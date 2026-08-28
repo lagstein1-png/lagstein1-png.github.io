@@ -2568,8 +2568,8 @@ function header(){
   var nav=[["home",_("בית"),"home"],["practice",_("תרגול"),"pencil"],["topics",_("נושאים"),"list"],
            ["formulas",_("נוסחאות"),"book"],["progress",_("התקדמות"),"chart"],["settings",_("הגדרות"),"gear"]];
   return '<header><div class="wrap hbar">'+
-    _('<button class="brand" data-a="go" data-v="home" aria-label="לדף הבית">')+
-      _('<span class="mk">א</span><span><b>אקסיומה</b><small>מתמטיקה לתואר ראשון</small></span></button>')+
+    '<button class="brand" data-a="go" data-v="home" aria-label="'+esc(_('לדף הבית'))+'">'+
+      '<span class="mk">'+_('א')+'</span><span><b>'+_('אקסיומה')+'</b><small>'+_('מתמטיקה לתואר ראשון')+'</small></span></button>'+
     '<nav>'+nav.map(function(n){
       return '<button class="nb'+(view===n[0]?" on":"")+'" data-a="go" data-v="'+n[0]+'" title="'+n[1]+'" aria-current="'+(view===n[0]?"page":"false")+'">'+ic(n[2],17)+'<span>'+n[1]+'</span></button>';
     }).join("")+'</nav>'+
@@ -2578,7 +2578,7 @@ function header(){
 
 var LVL_C=["var(--c-base)","var(--c-alg)","var(--c-geo)"];
 function levelPicker(){
-  return _('<div class="seg" role="group" aria-label="רמת קושי">')+LVL.map(function(l,i){
+  return '<div class="seg" role="group" aria-label="'+esc(_('רמת קושי'))+'">'+LVL.map(function(l,i){
     return '<button class="'+(state.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="lvl" data-l="'+(i+1)+'">'+l+'</button>';
   }).join("")+'</div>';
 }
@@ -2600,8 +2600,8 @@ function viewOnboard(){
   return '<div class="wrap" style="padding-block:clamp(24px,7vw,60px);max-width:760px">'+
    '<div class="rise">'+
 _f("{0}{1} לשנה א׳ באוניברסיטה</span>", '<span class="chip a">', ic("target",14))+
-   _('<h1 class="h1" style="margin-top:14px">חדו״א, לינארית והסתברות — צעד אחר צעד.</h1>')+
-   _('<p class="sub" style="font-size:1.05rem;max-width:34rem">בשנה א׳ ההרצאה רצה והתרגול מניח שהבנתם. כאן כל שאלה נפתחת לשלבים — כולל השורה שהמרצה דילג עליה — וכל תשובה שגויה אומרת בדיוק איזו טעות היא. דף נוסחאות פתוח תמיד, והקראה בקול טבעי.</p>')+
+   '<h1 class="h1" style="margin-top:14px">'+_('חדו״א, לינארית והסתברות — צעד אחר צעד.')+'</h1>'+
+   '<p class="sub" style="font-size:1.05rem;max-width:34rem">'+_('בשנה א׳ ההרצאה רצה והתרגול מניח שהבנתם. כאן כל שאלה נפתחת לשלבים — כולל השורה שהמרצה דילג עליה — וכל תשובה שגויה אומרת בדיוק איזו טעות היא. דף נוסחאות פתוח תמיד, והקראה בקול טבעי.')+'</p>'+
    '<div class="grid g3" style="margin-top:22px">'+
      [["steps",_("פתרון מודרך"),_("כל שאלה נפתחת לשלבים, כולל המעברים שמדלגים עליהם")],
       ["target",_("זיהוי הטעות"),_("תשובה שגויה אומרת איזו טעות היא, לא רק שהיא שגויה")],
@@ -2612,16 +2612,16 @@ _f("{0}{1} לשנה א׳ באוניברסיטה</span>", '<span class="chip a">'
    '<div class="card pad" style="margin-top:22px">'+
      '<div class="h2">'+(step===1?_("1. איך לקרוא לכם?"):step===2?_("2. מה אתם לומדים?"):_("3. איך נוח לכם לקרוא?"))+'</div>'+
      (step===1?
-       _('<p class="sub sm">לא חובה. זה נשמר רק במכשיר שלכם.</p>')+
+       '<p class="sub sm">'+_('לא חובה. זה נשמר רק במכשיר שלכם.')+'</p>'+
        _('<input id="nm" class="field" style="margin-top:12px" maxlength="18" placeholder="שם או כינוי" value="')+esc(state.name)+'" data-bind="name" />'
       :step===2?
-       _('<p class="sub sm">קובע אילו קורסים ייכנסו לתרגול. אפשר לשנות בכל רגע.</p>')+
+       '<p class="sub sm">'+_('קובע אילו קורסים ייכנסו לתרגול. אפשר לשנות בכל רגע.')+'</p>'+
        '<div class="seg" style="margin-top:12px">'+TRACKS.map(function(tr){
          return '<button class="'+(state.track===tr.v?"on":"")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>';
        }).join("")+'</div>'+
-       _('<p class="sub sm" style="margin-top:12px">רמת הקושי בתרגול:</p><div style="margin-top:8px">')+levelPicker()+'</div>'
+       '<p class="sub sm" style="margin-top:12px">'+_('רמת הקושי בתרגול:')+'</p><div style="margin-top:8px">'+levelPicker()+'</div>'
       :
-       _('<p class="sub sm">אפשר לשנות הכול אחר כך במסך ההגדרות.</p>')+
+       '<p class="sub sm">'+_('אפשר לשנות הכול אחר כך במסך ההגדרות.')+'</p>'+
        '<div style="margin-top:12px">'+
        togBtn("clearfont",_("פונט ברור לקריאה"),_("אותיות רחבות יותר, בלי קישוטים"))+
        togBtn("spaced",_("ריווח מוגדל"),_("רווח גדול יותר בין אותיות ומילים"))+
@@ -2661,7 +2661,7 @@ function viewHome(){
 _f("{0}{1} {2} נק'</span>", '<span class="chip">', ic("star",14), state.stats.xp)+
      '</div></div>';
   h+='<div class="card pad" style="margin-top:18px">'+
-     _('<div class="spread"><div style="min-width:0"><div class="h2">תרגול</div>')+
+     '<div class="spread"><div style="min-width:0"><div class="h2">'+_('תרגול')+'</div>'+
 _f("{0}{1} שאלות · {2} · {3} נושאים</p></div>", '<p class="sub sm">', state.settings.roundLen, LVL[state.level-1], pool.length)+
      levelPicker()+'</div>'+
      '<button class="btn btn-p w" style="margin-top:14px;padding:15px;font-size:1.1rem" data-a="start">'+
@@ -2674,7 +2674,7 @@ _f("{0} תרגול ממוקד: {1}</button>", ic("target",17), wt.name):"")+
     if(pre&&mastery(wt.id).m<40&&mastery(pre.id).m<70){
       h+='<div class="card pad" style="margin-top:14px;border-inline-start:4px solid var(--warn)">'+
 _f("{0}{1}<b>הצעה</b></div>", '<div class="row">', ic("bulb",18))+
-_f("{0}{1} עדיין תופס. הרבה פעמים זה לא הנושא עצמו אלא מה שמתחתיו — כאן זה {2}. שווה לתרגל אותו קודם.</p>", _('<p class="sub sm">נראה ש-'), wt.name, pre.name)+
+_f("{0}{1} עדיין תופס. הרבה פעמים זה לא הנושא עצמו אלא מה שמתחתיו — כאן זה {2}. שווה לתרגל אותו קודם.</p>", '<p class="sub sm">'+_('נראה ש-'), wt.name, pre.name)+
 _f("{0}{1}{2}{3} לתרגל {4}</button></div>", '<button class="btn btn-g" style="margin-top:10px" data-a="starttopic" data-t="', pre.id, '">', ic("arrow",16), pre.name);
     }
   }
@@ -2685,8 +2685,8 @@ _f("{0}{1}{2}{3} לתרגל {4}</button></div>", '<button class="btn btn-g" styl
     if(!mb.seen)return -1;
     return ma.m-mb.m;
   }).slice(0,6);
-  h+=_('<h2 class="h2" style="margin-top:26px">מה כדאי לתרגל עכשיו</h2>')+
-     _('<p class="sub sm">שישה נושאים לפי מה שעדיין לא יושב. לחיצה פותחת תרגול ממוקד.</p>')+
+  h+='<h2 class="h2" style="margin-top:26px">'+_('מה כדאי לתרגל עכשיו')+'</h2>'+
+     '<p class="sub sm">'+_('שישה נושאים לפי מה שעדיין לא יושב. לחיצה פותחת תרגול ממוקד.')+'</p>'+
      '<div class="grid g3" style="margin-top:12px">'+
      byNeed.map(function(id){
        var tp=topicById(id);
@@ -2706,13 +2706,13 @@ function voiceStrip(){
   if(s.engine==="gemini"&&hasKey()&&ttsState!=="err"){
     if(ttsState!=="ok")return "";      /* עוד לא הושמע דבר — אין מה להודיע */
     return _f("{0}{1}<span>קול טבעי · {2}</span>", '<div class="vstrip ok">', ic("speaker",15), gvName(s.gvoice).t)+
-      _('<button class="btn btn-g" data-a="go" data-v="settings">להחליף</button></div>');
+      '<button class="btn btn-g" data-a="go" data-v="settings">'+_('להחליף')+'</button></div>';
   }
   if(ttsState==="err")
     return _f("{0}{1}<span>הקול הטבעי לא הגיב, ההקראה עברה לקול המכשיר</span>", '<div class="vstrip bad">', ic("speaker",15))+
-      _('<button class="btn btn-g" data-a="go" data-v="settings">לבדוק</button></div>');
+      '<button class="btn btn-g" data-a="go" data-v="settings">'+_('לבדוק')+'</button></div>';
   return _f("{0}{1}<span>ההקראה בקול המכשיר. יש קול טבעי שנשמע כמו אדם</span>", '<div class="vstrip warn">', ic("speaker",15))+
-    _('<button class="btn btn-g" data-a="go" data-v="settings">להפעיל</button></div>');
+    '<button class="btn btn-g" data-a="go" data-v="settings">'+_('להפעיל')+'</button></div>';
 }
 function viewPractice(){
   if(!P.q)startRound();
@@ -2722,7 +2722,7 @@ function viewPractice(){
   /* שורת מצב */
   h+='<div class="spread">'+
       '<div class="row"><span class="chip area '+topicCls(q.topic)+'">'+q.topicName+'</span>'+
-_f("{0}{1} מתוך {2}</span></div>", _('<span class="chip">שאלה '), (P.i+1), P.list.length)+
+_f("{0}{1} מתוך {2}</span></div>", '<span class="chip">'+_('שאלה')+' ', (P.i+1), P.list.length)+
       '<div class="row"><span class="dots">'+
         P.list.map(function(ignored,i){
           var c=i<P.results.length?(P.results[i]==="ok"?"ok":P.results[i]==="hp"?"hp":"no"):"";
@@ -2744,7 +2744,7 @@ _f("{0}{1}>{2} רמז</button>", '<button class="btn btn-g" style="padding:9px 1
 _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="guide"', (P.steps>0?" disabled":""), ic("steps",16))+
      (q.rule?_f("{0}{1}{2}{3} הנוסחה</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="rule" data-r="', q.rule, '">', ic("book",16)):"")+
      '</div>';
-  if(P.hints>0&&q.hint)h+=_('<div class="hintbox rise"><b>רמז</b><div class="sm" style="margin-top:3px">')+q.hint+'</div></div>';
+  if(P.hints>0&&q.hint)h+='<div class="hintbox rise"><b>'+_('רמז')+'</b><div class="sm" style="margin-top:3px">'+q.hint+'</div></div>';
   /* תשובות */
   var keys=["1","2","3","4"];
   h+='<div class="opts">'+q.options.map(function(o,i){
@@ -2761,7 +2761,7 @@ _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style
   }).join("")+'</div>';
   /* אבחון הטעות האחרונה */
   if(P.lastWhy&&P.phase!=="reveal"){
-    h+=_('<div class="diag rise"><b>מה קרה כאן</b><div class="sm" style="margin-top:3px">')+P.lastWhy+'</div></div>';
+    h+='<div class="diag rise"><b>'+_('מה קרה כאן')+'</b><div class="sm" style="margin-top:3px">'+P.lastWhy+'</div></div>';
   }
   h+='</div>';
   /* פתרון מודרך */
@@ -2777,8 +2777,8 @@ _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style
         (s.m?'<div class="mstep">'+s.m+'</div>':"")+'</div>';
     }).join("")+'</div>';
     if(!showAll&&shown<q.steps.length){
-      h+=_('<button class="btn btn-p w" style="margin-top:12px" data-a="nextstep">הצעד הבא ')+ic("arrow",17)+'</button>';
-      h+=_('<p class="sub xs" style="text-align:center;margin-top:8px">אפשר לעצור בכל שלב ולנסות להמשיך לבד.</p>');
+      h+='<button class="btn btn-p w" style="margin-top:12px" data-a="nextstep">'+_('הצעד הבא')+' '+ic("arrow",17)+'</button>';
+      h+='<p class="sub xs" style="text-align:center;margin-top:8px">'+_('אפשר לעצור בכל שלב ולנסות להמשיך לבד.')+'</p>';
     }
     h+='</div>';
   }
@@ -2789,12 +2789,12 @@ _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style
        '<div class="row">'+ic(kind==="ok"?"check":"bulb",19)+'<b>'+lineFor(kind)+'</b></div>'+
        '<button class="btn btn-p w" style="margin-top:12px;padding:14px" data-a="next">'+
          (P.i+1>=P.list.length?_("לסיכום הסבב"):_("לשאלה הבאה"))+' '+ic("arrow",18)+'</button>'+
-       (state.settings.keys?_('<p class="sub xs" style="text-align:center;margin-top:8px">אפשר גם ללחוץ Enter</p>'):"")+
+       (state.settings.keys?'<p class="sub xs" style="text-align:center;margin-top:8px">'+_('אפשר גם ללחוץ Enter')+'</p>':"")+
        '</div>';
   }
   h+='</div>';
   if(state.settings.keys&&P.phase==="ask")
-    h+=_('<p class="sub xs" style="margin-top:14px;text-align:center">מקלדת: 1–4 תשובה · רווח הקראה · H רמז · S פתרון</p>');
+    h+='<p class="sub xs" style="margin-top:14px;text-align:center">'+_('מקלדת: 1–4 תשובה · רווח הקראה · H רמז · S פתרון')+'</p>';
   return h+'</main>';
 }
 
@@ -2825,7 +2825,7 @@ _f("{0}{1}</b><span>עם פתרון מודרך</span></div>", '<div class="tile"
 _f("{0}{1}</b><span>לא נפתרו</span></div>", '<div class="tile" style="--c:var(--bad)"><b>', no)+
 _f("{0}{1}%</b><span>דיוק</span></div>", '<div class="tile" style="--c:var(--c-geo)"><b>', pct)+
      '</div>';
-  h+=_('<hr class="sep"><div class="h2">לפי נושא</div><div class="grid" style="margin-top:10px">')+
+  h+='<hr class="sep"><div class="h2">'+_('לפי נושא')+'</div><div class="grid" style="margin-top:10px">'+
      Object.keys(byTopic).map(function(id){
        var b=byTopic[id],tp=topicById(id);
        return '<div class="spread '+topicCls(id)+'" style="gap:8px"><span class="arh">'+tp.name+'</span>'+
@@ -2848,18 +2848,18 @@ _f("{0}{1} להתקדמות</button></div>", '<button class="btn btn-g" data-a="
 function viewTopics(){
   var chosen=state.topics,all=topicsForTrack(state.track);
   var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
-  h+=_('<h1 class="h1">נושאים</h1>')+
-     _('<p class="sub">בוחרים מה ייכנס לסבבי התרגול. בלי בחירה — כל נושאי הקורסים שלכם נכנסים.</p>');
-  h+=_('<div class="card pad" style="margin-top:16px"><div class="spread"><div><b>מה אני לומד</b>')+
-     _('<p class="sub sm">קובע אילו נושאים מוצגים כאן</p></div>')+
+  h+='<h1 class="h1">'+_('נושאים')+'</h1>'+
+     '<p class="sub">'+_('בוחרים מה ייכנס לסבבי התרגול. בלי בחירה — כל נושאי הקורסים שלכם נכנסים.')+'</p>';
+  h+='<div class="card pad" style="margin-top:16px"><div class="spread"><div><b>'+_('מה אני לומד')+'</b>'+
+     '<p class="sub sm">'+_('קובע אילו נושאים מוצגים כאן')+'</p></div>'+
      '<div class="seg">'+TRACKS.map(function(tr){
        return '<button class="'+(state.track===tr.v?"on":"")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>';
      }).join("")+'</div></div>'+
-     _('<hr class="sep"><div class="spread"><div><b>רמת קושי</b><p class="sub sm">אפשר לשנות גם באמצע סבב</p></div>')+levelPicker()+'</div>'+
+     '<hr class="sep"><div class="spread"><div><b>'+_('רמת קושי')+'</b><p class="sub sm">'+_('אפשר לשנות גם באמצע סבב')+'</p></div>'+levelPicker()+'</div>'+
      '</div>';
   h+='<div class="row" style="margin-top:14px">'+
-     _('<button class="btn btn-g" data-a="selall">בחירת הכול</button>')+
-     _('<button class="btn btn-g" data-a="selnone">ניקוי הבחירה</button>')+
+     '<button class="btn btn-g" data-a="selall">'+_('בחירת הכול')+'</button>'+
+     '<button class="btn btn-g" data-a="selnone">'+_('ניקוי הבחירה')+'</button>'+
      '<span class="chip">'+(chosen.length?_f("{0} נבחרו", chosen.length):_("כל הנושאים"))+'</span></div>';
   AREAS.forEach(function(area){
     var list=all.filter(function(t){return t.area===area});
@@ -2887,12 +2887,12 @@ function viewFormulas(){
     return (f.t+" "+f.n+" "+plainOf(f.m)+" "+f.g).indexOf(q)>=0;
   });
   var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
-  h+=_('<h1 class="h1">דף נוסחאות</h1>')+
-     _('<p class="sub">להשתמש בדף נוסחאות זו לא רמאות. מי שלא מבזבז זיכרון עבודה על שינון, פנוי לחשוב על השאלה עצמה.</p>');
+  h+='<h1 class="h1">'+_('דף נוסחאות')+'</h1>'+
+     '<p class="sub">'+_('להשתמש בדף נוסחאות זו לא רמאות. מי שלא מבזבז זיכרון עבודה על שינון, פנוי לחשוב על השאלה עצמה.')+'</p>';
   h+='<div class="row" style="margin-top:14px">'+
      _('<input class="field" style="flex:1;min-width:min(100%,220px)" placeholder="חיפוש נוסחה — למשל: נגזרת, דטרמיננטה, בייס" value="')+esc(fq)+'" data-bind="fq" />'+
      (q?'<button class="btn btn-g" data-a="fclear">'+ic("x",16)+'</button>':"")+'</div>';
-  if(!list.length)h+=_f("{0}{1}״.</p>", _('<p class="sub" style="margin-top:20px">לא נמצאה נוסחה עם ״'), esc(q));
+  if(!list.length)h+=_f("{0}{1}״.</p>", '<p class="sub" style="margin-top:20px">'+_('לא נמצאה נוסחה עם ״'), esc(q));
   /* לפי רשימת התחומים של האפליקציה, ולא לפי רשימה קבועה —
      אחרת דף הנוסחאות נשאר ריק ברגע ששמות התחומים משתנים. */
   AREAS.forEach(function(g){
@@ -2920,22 +2920,22 @@ function viewProgress(){
   var maxA=Math.max.apply(null,days.map(function(x){return x.r.a}).concat([1]));
   var seen=TOPICS.filter(function(t){return mastery(t.id).seen>0});
   var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
-  h+=_('<h1 class="h1">התקדמות</h1><p class="sub">המספרים כאן הם כלי עבודה, לא ציון.</p>');
+  h+='<h1 class="h1">'+_('התקדמות')+'</h1><p class="sub">'+_('המספרים כאן הם כלי עבודה, לא ציון.')+'</p>';
   h+='<div class="grid g4" style="margin-top:16px">'+
 _f("{0}{1}</b><span>שאלות שנפתרו</span></div>", '<div class="tile" style="--c:var(--c-base)"><b>', st.answered)+
 _f("{0}{1}%</b><span>דיוק כולל</span></div>", '<div class="tile" style="--c:var(--ok)"><b>', acc)+
 _f("{0}{1}</b><span>עם פתרון מודרך</span></div>", '<div class="tile" style="--c:var(--c-alg)"><b>', st.helped)+
 _f("{0}{1}</b><span>נקודות</span></div></div>", '<div class="tile" style="--c:var(--c-geo)"><b>', st.xp);
-  h+=_('<div class="card pad" style="margin-top:16px"><div class="h2">שבועיים אחרונים</div>')+
+  h+='<div class="card pad" style="margin-top:16px"><div class="h2">'+_('שבועיים אחרונים')+'</div>'+
      '<div style="display:flex;gap:5px;align-items:flex-end;height:120px;margin-top:14px;direction:ltr">'+
      days.map(function(x){
        var hh=Math.round(x.r.a/maxA*88);
        return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;height:100%">'+
-         '<i style="display:block;width:100%;border-radius:5px 5px 0 0;background:'+(x.r.a?"linear-gradient(180deg,var(--c-alg),var(--c-data))":"var(--surface2)")+';height:'+Math.max(hh,4)+'px" title="'+x.r.a+_(' שאלות"></i>')+
+         '<i style="display:block;width:100%;border-radius:5px 5px 0 0;background:'+(x.r.a?"linear-gradient(180deg,var(--c-alg),var(--c-data))":"var(--surface2)")+';height:'+Math.max(hh,4)+'px" title="'+x.r.a+' '+_('שאלות">')+'</i>'+
          '<span class="xs faint">'+x.lbl+'</span></div>';
      }).join("")+'</div></div>';
-  h+=_('<div class="card pad" style="margin-top:16px"><div class="h2">שליטה לפי נושא</div>');
-  if(!seen.length)h+=_('<p class="sub sm">עוד לא תרגלתם נושאים. אחרי הסבב הראשון תופיע כאן תמונה.</p>');
+  h+='<div class="card pad" style="margin-top:16px"><div class="h2">'+_('שליטה לפי נושא')+'</div>';
+  if(!seen.length)h+='<p class="sub sm">'+_('עוד לא תרגלתם נושאים. אחרי הסבב הראשון תופיע כאן תמונה.')+'</p>';
   else h+='<div class="grid" style="margin-top:12px;gap:11px">'+seen.sort(function(a,b){return mastery(a.id).m-mastery(b.id).m}).map(function(tp){
     var m=mastery(tp.id);
     return '<div class="'+areaCls(tp.area)+'"><div class="spread" style="gap:8px"><span class="arh" style="font-weight:600">'+tp.name+'</span>'+
@@ -2950,7 +2950,7 @@ _f("{0}{1} מתוך {2}{3}</span></div>", '<span class="xs faint">', m.ok, m.see
 function viewSettings(){
   var s=state.settings,hv=hebVoices();
   var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px;max-width:820px">';
-  h+=_('<h1 class="h1">הגדרות</h1><p class="sub">הכול נשמר במכשיר הזה בלבד.</p>');
+  h+='<h1 class="h1">'+_('הגדרות')+'</h1><p class="sub">'+_('הכול נשמר במכשיר הזה בלבד.')+'</p>';
 
   /* בורר השפה יושב ראשון ומראה כל שפה בשמה שלה. מי שאינו קורא
      עברית לא אמור להיאלץ לקרוא עברית כדי לצאת ממנה. */
@@ -2961,12 +2961,12 @@ function viewSettings(){
          '" dir="'+LANGS[k].dir+'">'+esc(LANGS[k].name)+'</button>';
      }).join("")+'</div></div>';
 
-  h+=_('<div class="card pad" style="margin-top:16px"><div class="h2">קריאה ונגישות</div>')+
-     _('<p class="sub sm">גודל האותיות</p><div class="seg" style="margin-top:8px">')+
+  h+='<div class="card pad" style="margin-top:16px"><div class="h2">'+_('קריאה ונגישות')+'</div>'+
+     '<p class="sub sm">'+_('גודל האותיות')+'</p><div class="seg" style="margin-top:8px">'+
      [[1,_("רגיל")],[2,_("גדול")],[3,_("ענק")]].map(function(o){
        return '<button class="'+(s.ts===o[0]?"on":"")+'" data-a="ts" data-n="'+o[0]+'">'+o[1]+'</button>';
      }).join("")+'</div>'+
-     _('<p class="sub sm" style="margin-top:14px">ערכת צבע</p><div class="seg" style="margin-top:8px">')+
+     '<p class="sub sm" style="margin-top:14px">'+_('ערכת צבע')+'</p><div class="seg" style="margin-top:8px">'+
      [["auto",_("לפי המכשיר")],["light",_("בהיר")],["dark",_("כהה")]].map(function(o){
        return '<button class="'+(s.theme===o[0]?"on":"")+'" data-a="theme" data-n="'+o[0]+'">'+o[1]+'</button>';
      }).join("")+'</div>'+
@@ -2977,32 +2977,32 @@ function viewSettings(){
      togBtn("rm",_("הפחתת תנועה"),_("בלי אנימציות"))+
      '</div></div>';
 
-  h+=_('<div class="card pad" style="margin-top:14px"><div class="h2">איך לומדים כאן</div>')+
+  h+='<div class="card pad" style="margin-top:14px"><div class="h2">'+_('איך לומדים כאן')+'</div>'+
      '<div style="margin-top:12px">'+
      togBtn("calm",_("מצב רגוע"),_("בלי רצף ימים, בלי אדום, ניסוחים מרוככים"))+
      togBtn("autoSteps",_("לפתוח פתרון מודרך אוטומטית"),_("הצעד הראשון מוצג כבר עם השאלה"))+
      togBtn("keys",_("קיצורי מקלדת"),_("1–4 לבחירה, רווח להקראה, H רמז, S פתרון"))+
      '</div>'+
-     _('<p class="sub sm" style="margin-top:14px">אורך סבב</p><div class="seg" style="margin-top:8px">')+
+     '<p class="sub sm" style="margin-top:14px">'+_('אורך סבב')+'</p><div class="seg" style="margin-top:8px">'+
      [5,8,12].map(function(n){
        return _f("{0}{1}{2}{3}{4}{5} שאלות</button>", '<button class="', (s.roundLen===n?"on":""), '" data-a="rlen" data-n="', n, '">', n);
      }).join("")+'</div></div>';
 
-  h+=_('<div class="card pad" style="margin-top:14px"><div class="h2">הקראה</div>')+
+  h+='<div class="card pad" style="margin-top:14px"><div class="h2">'+_('הקראה')+'</div>'+
      '<div style="margin-top:12px">'+togBtn("tts",_("הקראה קולית"),_("קריאת שאלות, רמזים והסברים"))+'</div>';
   if(s.tts){
-    h+=_('<p class="sub sm" style="margin-top:16px">מקור הקול</p><div class="seg" style="margin-top:8px">')+
+    h+='<p class="sub sm" style="margin-top:16px">'+_('מקור הקול')+'</p><div class="seg" style="margin-top:8px">'+
        '<button class="'+(s.engine==="gemini"?"on":"")+_('" data-a="engine" data-n="gemini">קול טבעי</button>')+
        '<button class="'+(s.engine!=="gemini"?"on":"")+_('" data-a="engine" data-n="device">קול המכשיר</button>')+
        '</div>';
     if(s.engine==="gemini"){
       if(!hasKey()){
-        h+=_('<div class="hintbox" style="margin-top:14px"><b>צריך מפתח חינמי פעם אחת</b>')+
-           _('<div class="sm" style="margin-top:4px">הקול הטבעי מגיע מגוגל. נכנסים ל-')+
+        h+='<div class="hintbox" style="margin-top:14px"><b>'+_('צריך מפתח חינמי פעם אחת')+'</b>'+
+           '<div class="sm" style="margin-top:4px">'+_('הקול הטבעי מגיע מגוגל. נכנסים ל-')+
            '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>'+
            _f(", יוצרים מפתח ומדביקים אותו כאן. הוא נשמר במכשיר בלבד ולא נשלח לשום מקום חוץ מגוגל.</div></div>")+
-           _('<input class="field" style="margin-top:10px;direction:ltr;text-align:left" placeholder="מדביקים כאן את המפתח" data-bind="gkey" />')+
-           _('<p class="sub xs" style="margin-top:8px">עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.</p>');
+           '<input class="field" style="margin-top:10px;direction:ltr;text-align:left" placeholder="'+esc(_('מדביקים כאן את המפתח'))+'" data-bind="gkey" />'+
+           '<p class="sub xs" style="margin-top:8px">'+_('עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.')+'</p>';
       }else{
         h+=[["f",_("קולות נשיים")],["m",_("קולות גבריים")]].map(function(grp){
           return '<p class="sub sm" style="margin-top:14px">'+grp[1]+'</p><div class="grid vgrid" style="margin-top:8px">'+
@@ -3013,20 +3013,20 @@ function viewSettings(){
                 '<span class="tt"><b>'+g.t+'</b><span>'+g.d+'</span></span></button>';
             }).join("")+'</div>';
         }).join("")+
-          _('<div class="row" style="margin-top:12px"><button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="clearkey">החלפת המפתח</button></div>');
-        if(ttsErr)h+=_('<div class="diag" style="margin-top:12px"><b>הקול הטבעי לא הגיב</b>')+
+          '<div class="row" style="margin-top:12px"><button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="clearkey">'+_('החלפת המפתח')+'</button></div>';
+        if(ttsErr)h+='<div class="diag" style="margin-top:12px"><b>'+_('הקול הטבעי לא הגיב')+'</b>'+
           '<div class="sm" style="margin-top:3px">'+esc(ttsErr)+'</div>'+
-          _('<div class="sm" style="margin-top:6px">בינתיים ההקראה עברה לקול המכשיר. אם כתוב כאן 400 או 403 — כנראה המפתח לא תקין או שהמודל לא זמין לחשבון.</div></div>');
+          '<div class="sm" style="margin-top:6px">'+_('בינתיים ההקראה עברה לקול המכשיר. אם כתוב כאן 400 או 403 — כנראה המפתח לא תקין או שהמודל לא זמין לחשבון.')+'</div></div>';
       }
     }else{
       var vl=pickList();
       if(!vl.length){
-        h+=_('<div class="hintbox" style="margin-top:14px"><b>לא נמצאו קולות במכשיר</b>')+
-           _('<div class="sm" style="margin-top:3px">שווה לנסות את הקול הטבעי, או להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.</div></div>');
+        h+='<div class="hintbox" style="margin-top:14px"><b>'+_('לא נמצאו קולות במכשיר')+'</b>'+
+           '<div class="sm" style="margin-top:3px">'+_('שווה לנסות את הקול הטבעי, או להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.')+'</div></div>';
       }else{
-        if(!hv.length)h+=_('<div class="hintbox" style="margin-top:14px"><b>אין קול עברי במכשיר</b>')+
-          _('<div class="sm" style="margin-top:3px">הקולות שברשימה ידברו עברית במבטא זר. הקול הטבעי יישמע הרבה יותר טוב.</div></div>');
-        h+=_('<p class="sub sm" style="margin-top:14px">קולות במכשיר</p><div class="grid" style="margin-top:8px;gap:8px;max-height:340px;overflow-y:auto">')+
+        if(!hv.length)h+='<div class="hintbox" style="margin-top:14px"><b>'+_('אין קול עברי במכשיר')+'</b>'+
+          '<div class="sm" style="margin-top:3px">'+_('הקולות שברשימה ידברו עברית במבטא זר. הקול הטבעי יישמע הרבה יותר טוב.')+'</div></div>';
+        h+='<p class="sub sm" style="margin-top:14px">'+_('קולות במכשיר')+'</p><div class="grid" style="margin-top:8px;gap:8px;max-height:340px;overflow-y:auto">'+
           vl.slice(0,24).map(function(v){
             var on=(deviceVoice()||{}).voiceURI===v.voiceURI;
             var heb=/^(he|iw)/i.test(v.lang||"");
@@ -3036,24 +3036,24 @@ function viewSettings(){
           }).join("")+'</div>';
       }
     }
-    h+=_('<p class="sub sm" style="margin-top:16px">מהירות דיבור — <span id="ratev">')+s.rate.toFixed(2)+'</span></p>'+
+    h+='<p class="sub sm" style="margin-top:16px">'+_('מהירות דיבור —')+' <span id="ratev">'+s.rate.toFixed(2)+'</span></p>'+
        '<input type="range" min="0.6" max="1.3" step="0.05" value="'+s.rate+'" data-slide="rate" style="margin-top:6px" />'+
 _f("{0}{1} לשמוע דוגמה</button>", '<button class="btn btn-g w" style="margin-top:12px" data-a="test">', ic("speaker",16));
   }
   h+='</div>';
 
-  h+=_('<div class="card pad" style="margin-top:14px"><div class="h2">פרטים</div>')+
-     _('<p class="sub sm" style="margin-top:10px">שם או כינוי</p>')+
+  h+='<div class="card pad" style="margin-top:14px"><div class="h2">'+_('פרטים')+'</div>'+
+     '<p class="sub sm" style="margin-top:10px">'+_('שם או כינוי')+'</p>'+
      '<input class="field" style="margin-top:6px" maxlength="18" value="'+esc(state.name)+_('" data-bind="name" placeholder="לא חובה" />')+
-     _('<p class="sub sm" style="margin-top:14px">תחום הלימוד</p><div class="seg" style="margin-top:8px">')+
+     '<p class="sub sm" style="margin-top:14px">'+_('תחום הלימוד')+'</p><div class="seg" style="margin-top:8px">'+
      TRACKS.map(function(tr){return '<button class="'+(state.track===tr.v?"on":"")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>'}).join("")+
      '</div></div>';
 
-  h+=_('<div class="card pad" style="margin-top:14px;border-color:var(--bad)"><div class="h2">איפוס</div>')+
-     _('<p class="sub sm">מוחק את ההתקדמות, ההגדרות והנושאים שנבחרו במכשיר הזה. אין דרך לשחזר.</p>')+
-     _('<button class="btn btn-g" style="margin-top:10px;color:var(--bad);border-color:var(--bad)" data-a="reset">מחיקת הכול</button></div>');
+  h+='<div class="card pad" style="margin-top:14px;border-color:var(--bad)"><div class="h2">'+_('איפוס')+'</div>'+
+     '<p class="sub sm">'+_('מוחק את ההתקדמות, ההגדרות והנושאים שנבחרו במכשיר הזה. אין דרך לשחזר.')+'</p>'+
+     '<button class="btn btn-g" style="margin-top:10px;color:var(--bad);border-color:var(--bad)" data-a="reset">'+_('מחיקת הכול')+'</button></div>';
 
-  h+=_('<p class="sub xs" style="margin-top:18px;text-align:center">אקסיומה · גרסה ')+BUILD+'</p>';
+  h+='<p class="sub xs" style="margin-top:18px;text-align:center">'+_('אקסיומה · גרסה')+' '+BUILD+'</p>';
   return h+'</main>';
 }
 /* ============================================================
@@ -3074,7 +3074,7 @@ function render(){
     else if(view==="settings")html+=viewSettings();
     html+='<footer><div class="wrap fbar">'+
       _f("<span>אקסיומה · מתמטיקה לתואר ראשון, צעד אחר צעד</span>")+
-      _('<span class="faint">הכול נשמר במכשיר הזה · ')+BUILD+'</span></div></footer>';
+      '<span class="faint">'+_('הכול נשמר במכשיר הזה ·')+' '+BUILD+'</span></div></footer>';
   }
   $("#app").innerHTML=html;
   afterRender();
@@ -3258,9 +3258,9 @@ document.addEventListener("keydown",function(e){
 window.addEventListener("error",function(){
   try{
     $("#app").innerHTML='<div class="wrap" style="padding-block:60px;max-width:520px">'+
-      _('<div class="card pad"><h1 class="h1">משהו נתקע</h1>')+
-      _('<p class="sub">זו תקלה שלנו, לא שלכם. ההתקדמות שמורה.</p>')+
-      _('<button class="btn btn-p" style="margin-top:14px" onclick="location.reload()">לטעון מחדש</button></div></div>');
+      '<div class="card pad"><h1 class="h1">'+_('משהו נתקע')+'</h1>'+
+      '<p class="sub">'+_('זו תקלה שלנו, לא שלכם. ההתקדמות שמורה.')+'</p>'+
+      '<button class="btn btn-p" style="margin-top:14px" onclick="location.reload()">'+_('לטעון מחדש')+'</button></div></div>';
   }catch(e){}
 });
 
@@ -3278,7 +3278,6 @@ var TR_KEYS=[
 " כפול ",
 " מטריצה ",
 " מטריצה: {0} ",
-" שאלות\"></i>",
 "\" data-a=\"engine\" data-n=\"device\">קול המכשיר</button>",
 "\" data-a=\"engine\" data-n=\"gemini\">קול טבעי</button>",
 "\" data-bind=\"name\" placeholder=\"לא חובה\" />",
@@ -3296,78 +3295,8 @@ var TR_KEYS=[
 "2. מה אתם לומדים?",
 "2×2, 3×3 ותכונות",
 "3. איך נוח לכם לקרוא?",
-"<button class=\"brand\" data-a=\"go\" data-v=\"home\" aria-label=\"לדף הבית\">",
-"<button class=\"btn btn-g\" data-a=\"go\" data-v=\"settings\">לבדוק</button></div>",
-"<button class=\"btn btn-g\" data-a=\"go\" data-v=\"settings\">להחליף</button></div>",
-"<button class=\"btn btn-g\" data-a=\"go\" data-v=\"settings\">להפעיל</button></div>",
-"<button class=\"btn btn-g\" data-a=\"selall\">בחירת הכול</button>",
-"<button class=\"btn btn-g\" data-a=\"selnone\">ניקוי הבחירה</button>",
-"<button class=\"btn btn-g\" style=\"margin-top:10px;color:var(--bad);border-color:var(--bad)\" data-a=\"reset\">מחיקת הכול</button></div>",
-"<button class=\"btn btn-p w\" style=\"margin-top:12px\" data-a=\"nextstep\">הצעד הבא ",
-"<button class=\"btn btn-p\" style=\"margin-top:14px\" onclick=\"location.reload()\">לטעון מחדש</button></div></div>",
-"<div class=\"card pad\" style=\"margin-top:14px\"><div class=\"h2\">איך לומדים כאן</div>",
-"<div class=\"card pad\" style=\"margin-top:14px\"><div class=\"h2\">הקראה</div>",
-"<div class=\"card pad\" style=\"margin-top:14px\"><div class=\"h2\">פרטים</div>",
-"<div class=\"card pad\" style=\"margin-top:14px;border-color:var(--bad)\"><div class=\"h2\">איפוס</div>",
-"<div class=\"card pad\" style=\"margin-top:16px\"><div class=\"h2\">קריאה ונגישות</div>",
-"<div class=\"card pad\" style=\"margin-top:16px\"><div class=\"h2\">שבועיים אחרונים</div>",
-"<div class=\"card pad\" style=\"margin-top:16px\"><div class=\"h2\">שליטה לפי נושא</div>",
-"<div class=\"card pad\" style=\"margin-top:16px\"><div class=\"spread\"><div><b>מה אני לומד</b>",
-"<div class=\"card pad\"><h1 class=\"h1\">משהו נתקע</h1>",
-"<div class=\"diag rise\"><b>מה קרה כאן</b><div class=\"sm\" style=\"margin-top:3px\">",
-"<div class=\"diag\" style=\"margin-top:12px\"><b>הקול הטבעי לא הגיב</b>",
-"<div class=\"hintbox rise\"><b>רמז</b><div class=\"sm\" style=\"margin-top:3px\">",
-"<div class=\"hintbox\" style=\"margin-top:14px\"><b>אין קול עברי במכשיר</b>",
-"<div class=\"hintbox\" style=\"margin-top:14px\"><b>לא נמצאו קולות במכשיר</b>",
-"<div class=\"hintbox\" style=\"margin-top:14px\"><b>צריך מפתח חינמי פעם אחת</b>",
-"<div class=\"row\" style=\"margin-top:12px\"><button class=\"btn btn-g\" style=\"padding:8px 12px;font-size:.85rem\" data-a=\"clearkey\">החלפת המפתח</button></div>",
-"<div class=\"seg\" role=\"group\" aria-label=\"רמת קושי\">",
-"<div class=\"sm\" style=\"margin-top:3px\">הקולות שברשימה ידברו עברית במבטא זר. הקול הטבעי יישמע הרבה יותר טוב.</div></div>",
-"<div class=\"sm\" style=\"margin-top:3px\">שווה לנסות את הקול הטבעי, או להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.</div></div>",
-"<div class=\"sm\" style=\"margin-top:4px\">הקול הטבעי מגיע מגוגל. נכנסים ל-",
-"<div class=\"sm\" style=\"margin-top:6px\">בינתיים ההקראה עברה לקול המכשיר. אם כתוב כאן 400 או 403 — כנראה המפתח לא תקין או שהמודל לא זמין לחשבון.</div></div>",
-"<div class=\"spread\"><div style=\"min-width:0\"><div class=\"h2\">תרגול</div>",
-"<h1 class=\"h1\" style=\"margin-top:14px\">חדו״א, לינארית והסתברות — צעד אחר צעד.</h1>",
-"<h1 class=\"h1\">דף נוסחאות</h1>",
-"<h1 class=\"h1\">הגדרות</h1><p class=\"sub\">הכול נשמר במכשיר הזה בלבד.</p>",
-"<h1 class=\"h1\">התקדמות</h1><p class=\"sub\">המספרים כאן הם כלי עבודה, לא ציון.</p>",
-"<h1 class=\"h1\">נושאים</h1>",
-"<h2 class=\"h2\" style=\"margin-top:26px\">מה כדאי לתרגל עכשיו</h2>",
-"<hr class=\"sep\"><div class=\"h2\">לפי נושא</div><div class=\"grid\" style=\"margin-top:10px\">",
-"<hr class=\"sep\"><div class=\"spread\"><div><b>רמת קושי</b><p class=\"sub sm\">אפשר לשנות גם באמצע סבב</p></div>",
 "<input class=\"field\" style=\"flex:1;min-width:min(100%,220px)\" placeholder=\"חיפוש נוסחה — למשל: נגזרת, דטרמיננטה, בייס\" value=\"",
-"<input class=\"field\" style=\"margin-top:10px;direction:ltr;text-align:left\" placeholder=\"מדביקים כאן את המפתח\" data-bind=\"gkey\" />",
 "<input id=\"nm\" class=\"field\" style=\"margin-top:12px\" maxlength=\"18\" placeholder=\"שם או כינוי\" value=\"",
-"<p class=\"sub sm\" style=\"margin-top:10px\">שם או כינוי</p>",
-"<p class=\"sub sm\" style=\"margin-top:12px\">רמת הקושי בתרגול:</p><div style=\"margin-top:8px\">",
-"<p class=\"sub sm\" style=\"margin-top:14px\">אורך סבב</p><div class=\"seg\" style=\"margin-top:8px\">",
-"<p class=\"sub sm\" style=\"margin-top:14px\">ערכת צבע</p><div class=\"seg\" style=\"margin-top:8px\">",
-"<p class=\"sub sm\" style=\"margin-top:14px\">קולות במכשיר</p><div class=\"grid\" style=\"margin-top:8px;gap:8px;max-height:340px;overflow-y:auto\">",
-"<p class=\"sub sm\" style=\"margin-top:14px\">תחום הלימוד</p><div class=\"seg\" style=\"margin-top:8px\">",
-"<p class=\"sub sm\" style=\"margin-top:16px\">מהירות דיבור — <span id=\"ratev\">",
-"<p class=\"sub sm\" style=\"margin-top:16px\">מקור הקול</p><div class=\"seg\" style=\"margin-top:8px\">",
-"<p class=\"sub sm\">אפשר לשנות הכול אחר כך במסך ההגדרות.</p>",
-"<p class=\"sub sm\">גודל האותיות</p><div class=\"seg\" style=\"margin-top:8px\">",
-"<p class=\"sub sm\">לא חובה. זה נשמר רק במכשיר שלכם.</p>",
-"<p class=\"sub sm\">מוחק את ההתקדמות, ההגדרות והנושאים שנבחרו במכשיר הזה. אין דרך לשחזר.</p>",
-"<p class=\"sub sm\">נראה ש-",
-"<p class=\"sub sm\">עוד לא תרגלתם נושאים. אחרי הסבב הראשון תופיע כאן תמונה.</p>",
-"<p class=\"sub sm\">קובע אילו נושאים מוצגים כאן</p></div>",
-"<p class=\"sub sm\">קובע אילו קורסים ייכנסו לתרגול. אפשר לשנות בכל רגע.</p>",
-"<p class=\"sub sm\">שישה נושאים לפי מה שעדיין לא יושב. לחיצה פותחת תרגול ממוקד.</p>",
-"<p class=\"sub xs\" style=\"margin-top:14px;text-align:center\">מקלדת: 1–4 תשובה · רווח הקראה · H רמז · S פתרון</p>",
-"<p class=\"sub xs\" style=\"margin-top:18px;text-align:center\">אקסיומה · גרסה ",
-"<p class=\"sub xs\" style=\"margin-top:8px\">עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.</p>",
-"<p class=\"sub xs\" style=\"text-align:center;margin-top:8px\">אפשר גם ללחוץ Enter</p>",
-"<p class=\"sub xs\" style=\"text-align:center;margin-top:8px\">אפשר לעצור בכל שלב ולנסות להמשיך לבד.</p>",
-"<p class=\"sub\" style=\"font-size:1.05rem;max-width:34rem\">בשנה א׳ ההרצאה רצה והתרגול מניח שהבנתם. כאן כל שאלה נפתחת לשלבים — כולל השורה שהמרצה דילג עליה — וכל תשובה שגויה אומרת בדיוק איזו טעות היא. דף נוסחאות פתוח תמיד, והקראה בקול טבעי.</p>",
-"<p class=\"sub\" style=\"margin-top:20px\">לא נמצאה נוסחה עם ״",
-"<p class=\"sub\">בוחרים מה ייכנס לסבבי התרגול. בלי בחירה — כל נושאי הקורסים שלכם נכנסים.</p>",
-"<p class=\"sub\">זו תקלה שלנו, לא שלכם. ההתקדמות שמורה.</p>",
-"<p class=\"sub\">להשתמש בדף נוסחאות זו לא רמאות. מי שלא מבזבז זיכרון עבודה על שינון, פנוי לחשוב על השאלה עצמה.</p>",
-"<span class=\"chip\">שאלה ",
-"<span class=\"faint\">הכול נשמר במכשיר הזה · ",
-"<span class=\"mk\">א</span><span><b>אקסיומה</b><small>מתמטיקה לתואר ראשון</small></span></button>",
 "<span>אקסיומה · מתמטיקה לתואר ראשון, צעד אחר צעד</span>",
 "A הפיכה ⇔ det(A) ≠ 0",
 "A,B בלתי תלויים ⇔ P(A∩B) = P(A)·P(B)",
@@ -3447,6 +3376,7 @@ var TR_KEYS=[
 "|q| < 1 ⇔ מתכנס",
 "Φ אינה זוגית. הערך בצד השלילי הוא המשלים.",
 "Φ(−z) = 1 פחות Φ(z), מתוך הסימטריה.",
+"א",
 "אאודה",
 "אבגדהוש",
 "או אמת אם לפחות צד אחד אמת.",
@@ -3454,6 +3384,7 @@ var TR_KEYS=[
 "אוטונואה",
 "אורוס",
 "אורך וקטור = שורש של סכום ריבועי הרכיבים.",
+"אורך סבב",
 "אותו אדם לא יכול למלא שני תפקידים, ולכן אין החזרה.",
 "אותיות פשוטות ורחבות, בלי קישוטים",
 "אותיות רחבות יותר, בלי קישוטים",
@@ -3470,10 +3401,12 @@ var TR_KEYS=[
 "איזה מהווקטורים מאונך ל-u?",
 "איזה סוג קיצון יש לפונקציה?",
 "איזה פסוק שקול לוגית ל-p ⇒ q?",
+"איך לומדים כאן",
 "אילו ספרנו בסדר היינו מקבלים {0}, וכל ועדה הייתה נספרת {1} פעמים.",
 "אין סדר — צירופים. יש סדר — חליפות.",
 "אין סכום סופי",
 "אין פתרון",
+"אין קול עברי במכשיר",
 "אין קיצון",
 "אינטגרל הוא הפעולה ההפוכה לגזירה",
 "אינטגרל לא מסוים",
@@ -3484,6 +3417,7 @@ var TR_KEYS=[
 "אינטגרלים יסודיים",
 "אינטגרציה בהצבה",
 "אינסוף פתרונות",
+"איפוס",
 "איפוס הנגזרת וזיהוי סוג הקיצון",
 "אלה העקבה והדטרמיננטה, ולא הערכים העצמיים עצמם.",
 "אלה סכום ומכפלת הערכים העצמיים, לא הם עצמם.",
@@ -3494,9 +3428,15 @@ var TR_KEYS=[
 "אמת",
 "אפשר בהחלט — מחשבים דטרמיננטה ובודקים אם היא אפס.",
 "אפשר בהחלט — משווים את החיתוך למכפלת ההסתברויות.",
+"אפשר גם ללחוץ Enter",
 "אפשר להתחיל מתי שנוח.",
+"אפשר לעצור בכל שלב ולנסות להמשיך לבד.",
 "אפשר לפתח לפי כל שורה או עמודה — כדאי לבחור את זו עם הכי הרבה אפסים.",
+"אפשר לשנות גם באמצע סבב",
+"אפשר לשנות הכול אחר כך במסך ההגדרות.",
 "אפשרות {0}. {1}",
+"אקסיומה",
+"אקסיומה · גרסה",
 "ארבע השורות יוצאות זהות בשני הפסוקים.",
 "ארבע מכפלות, בדיוק כמו במכפלת בינומים.",
 "את הנגזרת הפנימית הכי הרבה שוכחים.",
@@ -3524,9 +3464,12 @@ var TR_KEYS=[
 "בוועדה כל החברים שווים, ולכן הסדר לא משנה. במקרה כזה משתמשים בצירופים.",
 "בוחרים {0} אנשים מתוך {1} לתפקידים שונים. בכמה דרכים?",
 "בוחרים ועדה של {0} אנשים מתוך {1}. בכמה דרכים?",
+"בוחרים מה ייכנס לסבבי התרגול. בלי בחירה — כל נושאי הקורסים שלכם נכנסים.",
 "בונים מאונך במישור",
 "בחיבור מטריצות כל איבר מתחבר עם האיבר שבאותו מקום.",
+"בחירת הכול",
 "בחרתם {0} אנשים במקום {1}.",
+"בינתיים ההקראה עברה לקול המכשיר. אם כתוב כאן 400 או 403 — כנראה המפתח לא תקין או שהמודל לא זמין לחשבון.",
 "בית",
 "בכמה סדרים שונים אפשר להושיב {0} אנשים בשורה?",
 "בלבלתם בין בינומית לפואסונית. בבינומית השונות היא np(1−p), והיא תמיד קטנה מהתוחלת.",
@@ -3546,12 +3489,14 @@ var TR_KEYS=[
 "בקבוצה האוניברסלית {0} איברים ובקבוצה A יש {1}. כמה איברים במשלים של A?",
 "בקיצון המשיק אופקי. פותרים את המשוואה ומקבלים את שיעורי ה-x.",
 "בשונות: הקבוע נעלם, והמקדם עולה בריבוע.",
+"בשנה א׳ ההרצאה רצה והתרגול מניח שהבנתם. כאן כל שאלה נפתחת לשלבים — כולל השורה שהמרצה דילג עליה — וכל תשובה שגויה אומרת בדיוק איזו טעות היא. דף נוסחאות פתוח תמיד, והקראה בקול טבעי.",
 "גבול באינסוף",
 "גבול של פונקציה רציפה",
 "גבולות",
 "גדול",
 "גדול מ-1, מתבדר",
 "גדולה",
+"גודל האותיות",
 "גוזרים",
 "גוזרים איבר איבר",
 "גוזרים את החיצונית",
@@ -3644,6 +3589,7 @@ var TR_KEYS=[
 "החזקה עולה באחת ומחלקים בחדשה. תמיד +C.",
 "החיצונית היא ״משהו בחזקת {0}״, והפנימית היא {1}{2}.",
 "החיתוך: {0}   ,   התנאי: {1}",
+"החלפת המפתח",
 "החלפתם אינדקסים באלכסון. בחיבור כל איבר מתחבר עם האיבר שבאותו מקום בדיוק.",
 "החלפתם בין a ל-d אבל שכחתם את המינוסים על האלכסון המשני.",
 "החלפתם בין החלקים.",
@@ -3658,6 +3604,8 @@ var TR_KEYS=[
 "היום פתרתם {0} שאלות, {1} מהן נכון.",
 "היי {0}.",
 "היי.",
+"הכול נשמר במכשיר הזה ·",
+"הכול נשמר במכשיר הזה בלבד.",
 "הכי קל לחשב על אוכלוסייה של 1000 ולספור.",
 "הכלה והדחה, משלים ודה־מורגן",
 "הכפלתם איבר באיבר. בכפל מטריצות כל איבר בתוצאה הוא מכפלה סקלרית של שורה בעמודה.",
@@ -3694,6 +3642,7 @@ var TR_KEYS=[
 "המכנה צריך להיות x בריבוע.",
 "המכפלה הסקלרית כאן היא {0} ולא אפס.",
 "המכפלה שונה מאפס, ולכן הווקטורים אינם מאונכים.",
+"המספרים כאן הם כלי עבודה, לא ציון.",
 "המעריך יורד למקדם והחזקה קטנה באחת.",
 "המקדם נשאר",
 "המקדמים פרופורציוניים אבל האגפים הימניים לא — שתי משוואות סותרות, ולכן אין פתרון.",
@@ -3743,8 +3692,13 @@ var TR_KEYS=[
 "הצבתם רק את הגבול העליון ושכחתם לחסר את התחתון.",
 "הצורה כאן היא משולש עם בסיס {0} וגובה {1}, ושטחו {2} — מתאים.",
 "הצלבתם רכיבים. מכפילים רכיב ראשון ברכיב ראשון ושני בשני.",
+"הצעד הבא",
 "הצעד הראשון מוצג כבר עם השאלה",
 "הקבוצה ומשלימה מכסות יחד בדיוק את הכול.",
+"הקול הטבעי לא הגיב",
+"הקול הטבעי מגיע מגוגל. נכנסים ל-",
+"הקולות שברשימה ידברו עברית במבטא זר. הקול הטבעי יישמע הרבה יותר טוב.",
+"הקראה",
 "הקראה קולית",
 "השונות תמיד קטנה מהתוחלת בבינומית, כי (1−p) קטן מ-1.",
 "השורה השנייה היא פי {0} מהראשונה — השורות תלויות, ולכן הדטרמיננטה מתאפסת.",
@@ -3822,8 +3776,10 @@ var TR_KEYS=[
 "זו נוסחת הסדרה החשבונית. בהנדסית מכפילים, לא מחברים.",
 "זו סטיית התקן — שורש השונות.",
 "זו רגישות הבדיקה — ההסתברות לתוצאה חיובית בהינתן מחלה. השאלה מבקשת את הכיוון ההפוך.",
+"זו תקלה שלנו, לא שלכם. ההתקדמות שמורה.",
 "זיהוי הטעות",
 "זרים",
+"חדו״א, לינארית והסתברות — צעד אחר צעד.",
 "חוזרים ל-x",
 "חולים חיוביים: {0}   ,   בריאים חיוביים בטעות: {1}",
 "חולים: {0}   ,   בריאים: {1}",
@@ -3950,14 +3906,22 @@ var TR_KEYS=[
 "לא הפחתתם את המעריך.",
 "לא הפיכה",
 "לא התקבל שמע",
+"לא חובה. זה נשמר רק במכשיר שלכם.",
 "לא חילקתם בכלל.",
 "לא לקחתם משלימים בכלל.",
 "לא מוגדר",
 "לא נכון. {0}",
+"לא נמצאה נוסחה עם ״",
+"לא נמצאו קולות במכשיר",
 "לא שוכחים את C",
 "לא שללתם את הצדדים כלל.",
+"לבדוק",
 "לדה",
+"לדף הבית",
 "להוסיף",
+"להחליף",
+"להפעיל",
+"להשתמש בדף נוסחאות זו לא רמאות. מי שלא מבזבז זיכרון עבודה על שינון, פנוי לחשוב על השאלה עצמה.",
 "לוג של מכפלה = סכום הלוגים. של מנה = הפרש.",
 "לוגיקה",
 "לוגריתם",
@@ -3965,6 +3929,7 @@ var TR_KEYS=[
 "לוגריתם הוא השאלה ״באיזו חזקה״.",
 "לוגריתמים",
 "לוחצים שוב כדי למחוק סופית",
+"לטעון מחדש",
 "לכל מערכת הומוגנית יש אגף ימני אפס, וברוב המקרים הפתרון היחיד הוא הטריוויאלי.",
 "למה",
 "למה האינטואיציה נכשלת כאן",
@@ -3978,6 +3943,7 @@ var TR_KEYS=[
 "לסיכום הסבב",
 "לספור אחת, שתיים, שלוש הצלחות זו עבודה מיותרת. יש רק מקרה אחד לשלול.",
 "לפי המכשיר",
+"לפי נושא",
 "לפרבולה תמיד יש נקודת קיצון אחת.",
 "לפתוח פתרון מודרך אוטומטית",
 "לקחתם איברים שאינם על האלכסון. במטריצה משולשת הערכים העצמיים הם בדיוק איברי האלכסון.",
@@ -3992,17 +3958,23 @@ var TR_KEYS=[
 "מבחן אי־התלות",
 "מבצעים {0} ניסויים בלתי תלויים, בכל אחד הסתברות הצלחה {1}. מה ההסתברות ל-{2} הצלחות בדיוק?",
 "מבצעים {0} ניסויים בלתי תלויים, בכל אחד הסתברות הצלחה {1}. מה ההסתברות שתהיה לפחות הצלחה אחת?",
+"מדביקים כאן את המפתח",
 "מדויק.",
 "מדעי החברה",
 "מדעי המחשב",
 "מדעים והנדסה",
+"מה אני לומד",
 "מה זה אומר",
+"מה כדאי לתרגל עכשיו",
 "מה לוגריתם שואל",
 "מה עושה התקנון",
 "מה קורה כשמכפילים מטריצה בסקלר",
+"מה קרה כאן",
 "מהי הדטרמיננטה שבמכנה של המטריצה ההופכית?",
 "מהי הצורה השקולה?",
 "מהי השלילה של הפסוק p ∧ q?",
+"מהירות דיבור —",
+"מוחק את ההתקדמות, ההגדרות והנושאים שנבחרו במכשיר הזה. אין דרך לשחזר.",
 "מוצאים x",
 "מוצאים פונקציה קדומה",
 "מזהים",
@@ -4015,6 +3987,7 @@ var TR_KEYS=[
 "מחברים ומחסרים את החיתוך פעם אחת.",
 "מחברים חלק ממשי עם ממשי",
 "מחברים לפי הסימנים",
+"מחיקת הכול",
 "מחלה מופיעה אצל {0}% מהאוכלוסייה. בדיקה מזהה חולה בהסתברות {1}%, ונותנת תוצאה חיובית שגויה אצל {2}% מהבריאים. אדם קיבל תוצאה חיובית — מה ההסתברות שהוא חולה?",
 "מחליפים a ו-d, הופכים סימן ל-b ול-c, ומחלקים בדטרמיננטה.",
 "מחליפים בין a ל-d, הופכים סימן ל-b ול-c, ומחלקים בדטרמיננטה.",
@@ -4090,8 +4063,11 @@ var TR_KEYS=[
 "מצמצמים",
 "מקדם בינומי, כפול ההצלחות, כפול הכישלונות.",
 "מקדם קבוע פשוט מוכפל בנגזרת — הוא לא משתתף בגזירה.",
+"מקור הקול",
+"מקלדת: 1–4 תשובה · רווח הקראה · H רמז · S פתרון",
 "מקסימום",
 "מרווח גדול יותר בין אותיות, מילים ושורות",
+"משהו נתקע",
 "משוואה אופיינית, עקבה ודטרמיננטה",
 "משוואה ראשונה: ",
 "משוואה שנייה: ",
@@ -4112,6 +4088,7 @@ var TR_KEYS=[
 "מתחילים מנוסחת התקנון ומעבירים אגפים.",
 "מתי גרירה שקרית",
 "מתי יש פתרון נוסף",
+"מתמטיקה לתואר ראשון",
 "נבחר",
 "נבין את הצעד ואז ננסה שוב.",
 "נגזרות בסיסיות",
@@ -4137,6 +4114,7 @@ var TR_KEYS=[
 "נושאים",
 "ניגודיות גבוהה",
 "ניוטון־לייבניץ, שטח וסימטריה",
+"ניקוי הבחירה",
 "נכון",
 "נכון — ולא היה מובן מאליו.",
 "נכון.",
@@ -4145,6 +4123,7 @@ var TR_KEYS=[
 "נקודות קיצון",
 "נקודת פיתול",
 "נקודת פיתול היא מקום שבו הנגזרת השנייה מתאפסת. כאן היא קבועה ושונה מאפס.",
+"נראה ש-",
 "נתון E(X) = {0} ו-V(X) = {1}. חשבו את השונות של {2}X{3}.",
 "נתון P(A) = {0} , P(B) = {1} , P(A∩B) = {2}. האם המאורעות בלתי תלויים?",
 "נתון p = {0} ו-q = {1}. מהו ערך האמת של הפסוק?",
@@ -4182,6 +4161,8 @@ var TR_KEYS=[
 "סקלר מוכפל בכל אחד מאיברי המטריצה.",
 "עבד.",
 "עברית",
+"עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.",
+"עוד לא תרגלתם נושאים. אחרי הסבב הראשון תופיע כאן תמונה.",
 "עליון פחות תחתון. הקבוע C מתבטל ולכן מיותר.",
 "ענק",
 "עצרתם אחרי החיסור, בלי לחלק בסטיית התקן.",
@@ -4194,6 +4175,7 @@ var TR_KEYS=[
 "ערך מוחלט של מרוכב = שורש של סכום ריבועי החלקים.",
 "ערכי p ו-q נתונים, ולכן לפסוק יש ערך אמת יחיד ומוגדר.",
 "ערכים עצמיים",
+"ערכת צבע",
 "פאק",
 "פולינום רציף בכל הישר, ולכן הגבול הוא פשוט ההצבה. אין כאן שום דבר מסובך.",
 "פולינום רציף בכל נקודה, אז מציבים ישירות.",
@@ -4213,6 +4195,7 @@ var TR_KEYS=[
 "פנריר",
 "פעולות איבר־איבר. הגדלים חייבים להיות זהים.",
 "פעולות במטריצות",
+"פרטים",
 "פתוח תמיד — כמו בכל מבחן שנותנים בו דף",
 "פתרו את המערכת",
 "פתרו את המשוואה",
@@ -4220,9 +4203,13 @@ var TR_KEYS=[
 "פתרון לא טריוויאלי קיים",
 "פתרון מודרך",
 "צירופים",
+"צריך מפתח חינמי פעם אחת",
 "קבוצות",
+"קובע אילו נושאים מוצגים כאן",
+"קובע אילו קורסים ייכנסו לתרגול. אפשר לשנות בכל רגע.",
 "קודם בודקים התכנסות",
 "קודם הנגזרת של הפונקציה הבסיסית, והמקדם פשוט נשאר מוכפל.",
+"קולות במכשיר",
 "קולות גבריים",
 "קולות נשיים",
 "קומבינטוריקה",
@@ -4238,6 +4225,7 @@ var TR_KEYS=[
 "קרא בקצב מהיר, בעברית: ",
 "קרא לאט וברור, בעברית: ",
 "קרא לאט מאוד וברור, בעברית: ",
+"קריאה ונגישות",
 "קריאת השאלות וההסברים בקול",
 "קריאת שאלות, רמזים והסברים",
 "קשרים לוגיים",
@@ -4248,14 +4236,21 @@ var TR_KEYS=[
 "רווח גדול יותר בין אותיות ומילים",
 "ריווח מוגדל",
 "רכיב כפול רכיב, ואז מחברים. התוצאה מספר.",
+"רמז",
+"רמת הקושי בתרגול:",
 "רמת מבחן",
+"רמת קושי",
 "רמת תרגיל",
 "רק איברי האלכסון הראשי נספרים בעקבה.",
 "רק החזקות הגבוהות קובעות.",
 "רק כשההנחה אמת והמסקנה שקר. בכל שאר המקרים היא אמת.",
+"שאלה",
+"שאלות\">",
+"שבועיים אחרונים",
 "שואלים איזו פונקציה גוזרת לזה, ולא שוכחים את הקבוע.",
 "שואלים: איזו פונקציה גוזרת למה שכתוב כאן?",
 "שווה",
+"שווה לנסות את הקול הטבעי, או להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.",
 "שוללים כל צד, והפעולה מתהפכת.",
 "שונות",
 "שונות = תוחלת הריבוע פחות ריבוע התוחלת.",
@@ -4273,6 +4268,7 @@ var TR_KEYS=[
 "שימו לב לסימנים",
 "שימוש מעשי",
 "שיניתם את המעריך. הוא נשאר בדיוק כמו שהוא.",
+"שישה נושאים לפי מה שעדיין לא יושב. לחיצה פותחת תרגול ממוקד.",
 "שכחתם את a₁ במונה או טעיתם בחישוב 1 פחות q.",
 "שכחתם את ה-2 במכנה. √x הוא x בחזקת חצי, והחצי יורד למקדם.",
 "שכחתם את המינוס. הנגזרת של 1/x היא מינוס 1 חלקי x².",
@@ -4292,9 +4288,11 @@ var TR_KEYS=[
 "שכחתם ש-i בריבוע שווה מינוס אחת. bd·i² הופך ל-−bd, ולכן מחסרים.",
 "שלושה חלקים: כמה סדרים, ההסתברות להצלחות, וההסתברות לכישלונות.",
 "שלושת האיברים",
+"שליטה לפי נושא",
 "שלילי ולכן מקסימום",
 "שללתם כל צד אבל השארתם ״וגם״. לפי דה־מורגן הקשר מתהפך.",
 "שללתם רק צד אחד.",
+"שם או כינוי",
 "שמים לב לסימטריה",
 "שמרתם על האיחוד. לפי דה־מורגן לקבוצות, הפעולה מתהפכת.",
 "שני הפתרונות",
@@ -4311,6 +4309,7 @@ var TR_KEYS=[
 "תוחלת = סכום של ערך כפול ההסתברות שלו.",
 "תוחלת היא ממוצע משוקלל",
 "תוחלת ושונות",
+"תחום הלימוד",
 "תכונות הדטרמיננטה",
 "תלוי",
 "תלויים",
