@@ -248,6 +248,10 @@ html.light .seg button.on{background:rgba(22,98,164,.09)}
         <button data-v="Kore">טבעי · נשי</button>
         <button data-v="Puck">טבעי · גברי</button>
       </div>
+      <div class="seg" id="segSync" style="display:none;margin-top:8px">
+        <button data-v="1" class="on">הדגשת מילים</button>
+        <button data-v="0">הדגשת משפט</button>
+      </div>
       <div class="keyrow" id="keyRow" style="display:none">
         <input id="gkey" type="password" placeholder="מפתח Gemini" autocomplete="off" spellcheck="false" />
         <button class="btn" id="btnKey">שמירה</button>
@@ -294,7 +298,7 @@ var heVoice = null;
 var voicesReady = false;
 
 var P = {              /* העדפות תצוגה */
-  nikud:1, size:1.5, space:1, focus:0, rate:0.9, light:0, voice:'browser'
+  nikud:1, size:1.5, space:1, focus:0, rate:0.9, light:0, voice:'browser', wordsync:1
 };
 
 /* ---------- ניקוד דרך דיקטה ----------
@@ -496,8 +500,75 @@ function gGet(text){
   return gSynth(text, VOICE).then(function(url){ gCache[ck] = url; return url; });
 }
 function gStop(){
+  stopSync();
   if(gAudio){ try{ gAudio.pause(); gAudio.src=''; }catch(e){} gAudio = null; }
 }
+/* ---------- סנכרון מילים בקול טבעי ----------
+   Gemini לא מדווח מתי כל מילה נאמרת, אבל הטקסט אצלנו מנוקד —
+   ומספר סימני הניקוד במילה מקורב היטב למספר ההברות שלה, שזה
+   מנבא זמן דיבור הרבה יותר טוב ממספר האותיות.
+   מחלקים את אורך השמע בין המילים לפי המשקל הזה, ואז עוקבים אחרי
+   currentTime של השמע. מעקב ולא טיימר — כך אין הצטברות סטייה. */
+var SHVA = /\u05B0/g;
+var VOWEL = /[\u05B1-\u05BB\u05C7]/g;
+
+function wordWeight(w){
+  var t = w.nikud || w.plain;
+  var v = (t.match(VOWEL) || []).length;
+  /* שווא בתחילת מילה נהגה (שווא נע) ולכן שווה כמעט הברה.
+     שווא באמצע מילה בדרך כלל נח ולא נשמע כלל. */
+  var sh = 0;
+  t.replace(SHVA, function(m, off){ sh += (off <= 2) ? 0.5 : 0.15; return m; });
+  var val = v + sh;
+  if(!val){   /* מילה בלי ניקוד — נופלים למספר אותיות */
+    var letters = (w.plain.match(/[\u05D0-\u05EA]/g) || []).length;
+    val = Math.max(1, letters / 2.5);
+  }
+  return Math.max(0.6, val);
+}
+
+/* בונה לוח זמנים: לכל מילה במשפט, באיזו שנייה היא מתחילה ונגמרת */
+function buildSchedule(n, duration){
+  var items = [], total = 0;
+  W.forEach(function(w, i){
+    if(w.sent !== n) return;
+    if(w.word){
+      var wt = wordWeight(w);
+      items.push({ i:i, wt:wt });
+      total += wt;
+    }else if(/[,;:.!?—]/.test(w.plain)){
+      /* סימני פיסוק לוקחים זמן גם הם — בלעדיהם ההדגשה מקדימה */
+      if(items.length){ items[items.length-1].pause = 0.45; total += 0.45; }
+    }
+  });
+  if(!items.length || !total) return [];
+  var t = 0, out = [];
+  items.forEach(function(it){
+    var span = (it.wt + (it.pause || 0)) / total * duration;
+    out.push({ i:it.i, from:t, to:t + span });
+    t += span;
+  });
+  return out;
+}
+
+var syncTimer = null;
+function startSync(schedule){
+  stopSync();
+  if(!schedule.length || !gAudio) return;
+  var last = -1;
+  syncTimer = setInterval(function(){
+    if(!gAudio || !speaking) return;
+    var c = gAudio.currentTime;
+    for(var k=0;k<schedule.length;k++){
+      if(c >= schedule[k].from && c < schedule[k].to){
+        if(last !== schedule[k].i){ last = schedule[k].i; hit(schedule[k].i); }
+        return;
+      }
+    }
+  }, 60);
+}
+function stopSync(){ if(syncTimer){ clearInterval(syncTimer); syncTimer = null; } }
+
 function markReading(n){
   var all = document.querySelectorAll('#text .s');
   for(var i=0;i<all.length;i++) all[i].classList.toggle('reading', n !== null && Number(all[i].getAttribute('data-s')) === n);
@@ -589,7 +660,15 @@ function speakGemini(n){
     if(!speaking || SENT !== n) return;
     gStop();
     gAudio = new Audio(url);
+    /* משך השמע ידוע רק אחרי שהוא נטען — ורק אז אפשר לחלק אותו למילים */
+    gAudio.onloadedmetadata = function(){
+      if(!speaking || SENT !== n) return;
+      if(P.wordsync && isFinite(gAudio.duration) && gAudio.duration > 0){
+        startSync(buildSchedule(n, gAudio.duration));
+      }
+    };
     gAudio.onended = function(){
+      stopSync(); clearHit();
       if(!speaking) return;
       if(SENT + 1 < SENTS){ SENT++; markSentence(); speakGemini(SENT); } else stop();
     };
@@ -694,6 +773,7 @@ function applyPrefs(){
   $('#screenRead').classList.toggle('focusing', !!P.focus);
   VOICE = P.voice || 'browser';
   mark('#segVoice', VOICE);
+  mark('#segSync', String(P.wordsync));
   syncVoiceUi();
   mark('#segNikud', String(P.nikud));
   mark('#segSize',  String(P.size));
@@ -811,15 +891,23 @@ segment('#segRate', function(b){
 function syncVoiceUi(){
   var natural = VOICE !== 'browser';
   $('#keyRow').style.display = natural ? 'flex' : 'none';
+  $('#segSync').style.display = natural ? 'flex' : 'none';
   var note = $('#vnote');
   if(!natural){
     note.textContent = 'קול המחשב. הוא היחיד שמאפשר הדגשה של כל מילה בנפרד בזמן ההקראה.';
   }else if(!GKEY){
     note.textContent = 'קול טבעי דורש מפתח Gemini. בלעדיו נשתמש בקול המחשב.';
   }else{
-    note.textContent = 'קול טבעי. ההדגשה כאן היא של המשפט כולו — גוגל לא מדווח מתי כל מילה נאמרת.';
+    note.textContent = P.wordsync
+      ? 'קול טבעי. גוגל לא מדווח מתי כל מילה נאמרת, אז ההדגשה מחושבת לפי מספר ההברות בכל מילה. אם היא מקדימה או מפגרת — עברו להדגשת משפט.'
+      : 'קול טבעי, עם הדגשה של המשפט כולו.';
   }
 }
+segment('#segSync', function(b){
+  P.wordsync = Number(b.getAttribute('data-v'));
+  if(!P.wordsync){ stopSync(); clearHit(); }
+  if(speaking){ gStop(); speakSentence(SENT); }
+});
 segment('#segVoice', function(b){
   VOICE = b.getAttribute('data-v');
   P.voice = VOICE;
