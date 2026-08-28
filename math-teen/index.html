@@ -91,7 +91,7 @@ a{color:var(--accent)}
 /* ---------- כותרת עליונה ---------- */
 header{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 88%,transparent);
   backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.hbar{display:flex;align-items:center;gap:10px;padding:10px 0;flex-wrap:wrap}
+.hbar{display:flex;align-items:center;gap:10px;padding-block:10px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .brand .mk{width:38px;height:38px;border-radius:11px;background:var(--ink);color:var(--bg);
   display:grid;place-items:center;font-weight:800;font-size:1.05rem;flex-shrink:0}
@@ -257,7 +257,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
 footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface)}
 .fbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;
-  padding:16px 0;font-size:.82rem;color:var(--muted)}
+  padding-block:16px;font-size:.82rem;color:var(--muted)}
 .skip{position:absolute;inset-inline-start:-9999px}
 .skip:focus{position:static;display:inline-block;margin:8px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);border-radius:8px}
 </style>
@@ -710,7 +710,7 @@ function genLinear(L){
       S("התשובה","","x = "+num(x))
     ];
     wrong=[
-      W(num((c+b)/a),"העברתם את "+num(b)+" לצד השני בלי להחליף סימן."),
+      W(num(r2((c+b)/a)),"העברתם את "+num(b)+" לצד השני בלי להחליף סימן."),
       W(num(c-b),"עצרתם צעד מוקדם מדי — נשאר לחלק במקדם של x."),
       W(num((c-b)*a),"הכפלתם במקדם במקום לחלק בו.")
     ];
@@ -731,8 +731,8 @@ function genLinear(L){
       S("מחלקים במקדם","","x = "+num(d-b)+" ÷ "+pn(a-c)+" = "+num(x))
     ];
     wrong=[
-      W(num((d+b)/(a-c)),"המספר לא החליף סימן כשעבר צד."),
-      W(num((d-b)/(a+c)),"חיברתם את מקדמי ה-x במקום לחסר אותם. איבר שעובר צד מחליף סימן."),
+      W(num(r2((d+b)/(a-c))),"המספר לא החליף סימן כשעבר צד."),
+      W(num(r2((d-b)/(a+c))),"חיברתם את מקדמי ה-x במקום לחסר אותם. איבר שעובר צד מחליף סימן."),
       W(num(-x),"הסימן של התשובה התהפך בשלב החילוק.")
     ];
     return {ask:"פתרו את המשוואה",expr:expr,ans:W("x = "+num(x)),wrong:wrong.map(function(w){return W("x = "+w.h,w.why)}),
@@ -758,8 +758,8 @@ function genLinear(L){
   ];
   wrong=[
     W("x = "+num(-x),"הסימן התהפך — כדאי לבדוק את החיסור של המקדמים."),
-    W("x = "+num((c*d-a*b)/(a+c)),"חיברתם את מקדמי ה-x במקום לחסר. איבר שעובר צד מחליף סימן."),
-    W("x = "+num((c*d+a*b)/(a-c)),"בפתיחת הסוגריים בצד שמאל נשמר הסימן במקום להתהפך.")
+    W("x = "+num(r2((c*d-a*b)/(a+c))),"חיברתם את מקדמי ה-x במקום לחסר. איבר שעובר צד מחליף סימן."),
+    W("x = "+num(r2((c*d+a*b)/(a-c))),"בפתיחת הסוגריים בצד שמאל נשמר הסימן במקום להתהפך.")
   ];
   return {ask:"פתרו את המשוואה",expr:expr,ans:W("x = "+num(x)),wrong:wrong,steps:steps,rule:"lin",
     hint:"קודם פותחים את שני זוגות הסוגריים, ורק אחר כך מעבירים אגפים."};
@@ -867,7 +867,7 @@ function genPercent(L){
       S("מחשבים","",(p/100)+" · "+N+" = "+num(res))
     ];
     wrong=[
-      W(num(N/p),"חילקתם את המספר באחוז. אחוז זה כפל בשבר, לא חילוק."),
+      W(num(r2(N/p)),"חילקתם את המספר באחוז. אחוז זה כפל בשבר, לא חילוק."),
       W(num(N-p),"חיסרתם את המספר "+p+" מהסכום. "+p+"% הוא לא "+p+" יחידות."),
       W(num(res*10),"טעות בהזזת נקודה עשרונית — חלקתם ב-10 במקום ב-100.")
     ];
@@ -1126,7 +1126,7 @@ function genLine(L){
       expr:"("+num(x1)+", "+num(y1)+")   ,   ("+num(x2)+", "+num(y2)+")",
       ans:W("m = "+num(m)),
       wrong:[
-        W("m = "+num((x2-x1)/(y2-y1)),"הפכתם את השבר. השינוי ב-y הוא המונה, השינוי ב-x הוא המכנה."),
+        W("m = "+num(r2((x2-x1)/(y2-y1))),"הפכתם את השבר. השינוי ב-y הוא המונה, השינוי ב-x הוא המכנה."),
         W("m = "+num(-m),"טעות סימן בחיסור. שמרו על אותו סדר בשני החיסורים."),
         W("m = "+num(y2-y1),"עצרתם אחרי החיסור בלי לחלק בהפרש ה-x.")
       ],steps:steps,rule:"slope",
@@ -1525,7 +1525,7 @@ function genTrig(L){
       expr:"",fig:ang===30?svgRightTri(null,"?",c+' ס"מ',ang+"°"):svgRightTri("?",null,c+' ס"מ',ang+"°"),
       ans:W(num(res)+' ס"מ'),
       wrong:[
-        W(num(c*Math.round(Math.sqrt(3)/2*1000)/1000)+' ס"מ',"השתמשתם ב-√3/2, שזה הערך של הפונקציה השנייה בזווית הזו."),
+        W(num(r2(c*Math.sqrt(3)/2))+' ס"מ',"השתמשתם ב-√3/2, שזה הערך של הפונקציה השנייה בזווית הזו."),
         W(num(c*2)+' ס"מ',"הכפלתם ביתר במקום לקחת ממנו חלק. ניצב תמיד קצר מהיתר."),
         W(num(ang)+' ס"מ',"זו מידת הזווית במעלות, לא אורך צלע.")
       ],steps:steps,rule:"trigval",
@@ -1772,7 +1772,7 @@ function genWord(L){
   return {ask:"שתי מכוניות יוצאות זו לקראת זו ממרחק "+d+' ק"מ, במהירויות '+v1+" ו-"+v2+' קמ"ש. אחרי כמה שעות ייפגשו?',
     expr:"",ans:W(t+" שעות"),
     wrong:[
-      W(num(d/v1)+" שעות","התייחסתם רק לרכב אחד. כששניהם נוסעים זה לקראת זה — המהירויות מתחברות."),
+      W(num(r2(d/v1))+" שעות","התייחסתם רק לרכב אחד. כששניהם נוסעים זה לקראת זה — המהירויות מתחברות."),
       W(num(r2(d/Math.abs(v1-v2)))+" שעות","חיסרתם מהירויות. חיסור מתאים למרדף באותו כיוון, לא לנסיעה זה לקראת זה."),
       W(num(r2(d/(v1+v2)/2))+" שעות","חילקתם ב-2 מיותר — לא צריך לחצות את המרחק.")
     ],steps:steps,rule:"motion",
@@ -2013,7 +2013,7 @@ function masteryBar(id){
 /* ---------- מסך פתיחה ---------- */
 function viewOnboard(){
   var step=P.obStep||1;
-  return '<div class="wrap" style="padding:clamp(24px,7vw,60px) 0;max-width:760px">'+
+  return '<div class="wrap" style="padding-block:clamp(24px,7vw,60px);max-width:760px">'+
    '<div class="rise">'+
    '<span class="chip a">'+ic("target",14)+' לתלמידי תיכון שלומדים אחרת</span>'+
    '<h1 class="h1" style="margin-top:14px">מתמטיקה, צעד אחר צעד.</h1>'+
@@ -2069,7 +2069,7 @@ function viewHome(){
   })[0];
   var wt=topicById(weak);
   var hello=state.name?"היי "+esc(state.name)+".":"היי.";
-  var h='<main id="main" class="wrap" style="padding:22px 0 40px">';
+  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:40px">';
   h+='<div class="spread"><div><h1 class="h1">'+hello+'</h1>'+
      '<p class="sub">'+(d.a?"היום פתרתם "+d.a+" שאלות, "+d.c+" מהן נכון.":"אפשר להתחיל מתי שנוח.")+'</p></div>'+
      '<div class="row">'+
@@ -2118,7 +2118,7 @@ function viewPractice(){
   if(!P.q)startRound();
   if(P.phase==="done")return viewSummary();
   var q=P.q,calm=state.settings.calm;
-  var h='<main id="main" class="wrap" style="padding:18px 0 44px">';
+  var h='<main id="main" class="wrap" style="padding-top:18px;padding-bottom:44px">';
   /* שורת מצב */
   h+='<div class="spread">'+
       '<div class="row"><span class="chip a">'+q.topicName+'</span>'+
@@ -2216,7 +2216,7 @@ function viewSummary(){
        :pct>=60?"רוב הדברים במקום. יש נקודה אחת או שתיים שכדאי לחדד."
        :pct>=35?"חלק מהחומר עוד לא יושב. זה בדיוק מה שמדידה כזאת נועדה להראות."
        :"סבב כזה לא אומר עליכם כלום חוץ מזה שהחומר הזה חדש. שווה לרדת רמה ולבנות מלמטה.";
-  var h='<main id="main" class="wrap" style="padding:26px 0 44px;max-width:760px">';
+  var h='<main id="main" class="wrap" style="padding-top:26px;padding-bottom:44px;max-width:760px">';
   h+='<div class="card pad rise"><h1 class="h1">'+title+'</h1><p class="sub">'+sub+'</p>'+
      '<div class="grid g4" style="margin-top:18px">'+
        '<div class="tile"><b>'+ok+'</b><span>נכון לבד</span></div>'+
@@ -2246,7 +2246,7 @@ function viewSummary(){
 /* ---------- נושאים ---------- */
 function viewTopics(){
   var chosen=state.topics,all=topicsForTrack(state.track);
-  var h='<main id="main" class="wrap" style="padding:22px 0 44px">';
+  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
   h+='<h1 class="h1">נושאים</h1>'+
      '<p class="sub">בוחרים מה ייכנס לסבבי התרגול. בלי בחירה — כל נושאי המסלול נכנסים.</p>';
   h+='<div class="card pad" style="margin-top:16px"><div class="spread"><div><b>המסלול שלי</b>'+
@@ -2285,7 +2285,7 @@ function viewFormulas(){
     if(!q)return true;
     return (f.t+" "+f.n+" "+plainOf(f.m)+" "+f.g).indexOf(q)>=0;
   });
-  var h='<main id="main" class="wrap" style="padding:22px 0 44px">';
+  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
   h+='<h1 class="h1">דף נוסחאות</h1>'+
      '<p class="sub">להשתמש בדף נוסחאות זו לא רמאות — גם בבגרות נותנים אחד. מי שלא מבזבז זיכרון על שינון, פנוי לחשוב.</p>';
   h+='<div class="row" style="margin-top:14px">'+
@@ -2316,7 +2316,7 @@ function viewProgress(){
   }
   var maxA=Math.max.apply(null,days.map(function(x){return x.r.a}).concat([1]));
   var seen=TOPICS.filter(function(t){return mastery(t.id).seen>0});
-  var h='<main id="main" class="wrap" style="padding:22px 0 44px">';
+  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
   h+='<h1 class="h1">התקדמות</h1><p class="sub">המספרים כאן הם כלי עבודה, לא ציון.</p>';
   h+='<div class="grid g4" style="margin-top:16px">'+
      '<div class="tile"><b>'+st.answered+'</b><span>שאלות שנפתרו</span></div>'+
@@ -2346,7 +2346,7 @@ function viewProgress(){
 /* ---------- הגדרות ---------- */
 function viewSettings(){
   var s=state.settings,hv=hebVoices();
-  var h='<main id="main" class="wrap" style="padding:22px 0 44px;max-width:820px">';
+  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px;max-width:820px">';
   h+='<h1 class="h1">הגדרות</h1><p class="sub">הכול נשמר במכשיר הזה בלבד.</p>';
 
   h+='<div class="card pad" style="margin-top:16px"><div class="h2">קריאה ונגישות</div>'+
@@ -2592,7 +2592,7 @@ document.addEventListener("keydown",function(e){
 });
 window.addEventListener("error",function(){
   try{
-    $("#app").innerHTML='<div class="wrap" style="padding:60px 0;max-width:520px">'+
+    $("#app").innerHTML='<div class="wrap" style="padding-block:60px;max-width:520px">'+
       '<div class="card pad"><h1 class="h1">משהו נתקע</h1>'+
       '<p class="sub">זו תקלה שלנו, לא שלכם. ההתקדמות שמורה.</p>'+
       '<button class="btn btn-p" style="margin-top:14px" onclick="location.reload()">לטעון מחדש</button></div></div>';
