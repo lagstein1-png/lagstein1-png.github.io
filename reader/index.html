@@ -174,6 +174,15 @@ html.light .seg button.on{background:rgba(22,98,164,.09)}
   .seg button{min-width:0;padding:10px 11px;font-size:.86rem}
 }
 </style>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="copyright" content="© 2026 יהושע לגשטיין. כל הזכויות שמורות.">
+<meta name="author" content="יהושע לגשטיין">
+<link rel="license" href="/legal/">
 </head>
 <body>
 
@@ -1126,6 +1135,18 @@ document.addEventListener('visibilitychange', function(){ if(document.hidden) st
 
 loadKey();
 loadPrefs();
+</script>
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<script src="/legal/terms.js"></script>
+<script src="/legal/protect.js"></script>
+<script>
+/* רישום ה-service worker. הכתובת נושאת את הגרסה, ולכן שינוי גרסה
+   מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js?v=1-pwa1").catch(function(){});
+  });
+}
 </script>
 </body>
 </html>

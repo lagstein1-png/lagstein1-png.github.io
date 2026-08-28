@@ -334,6 +334,16 @@ footer{border-top:3px solid rgba(23,51,60,.08);background:color-mix(in srgb,var(
 @media(max-width:430px){.sm-ex{font-size:1.6rem}.sm-cap{font-size:1.15rem}.sm-d{width:23px;height:23px}.sm-ctl button{font-size:.92rem;padding:11px 13px;min-width:78px}}
 
 </style>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="copyright" content="© 2026 יהושע לגשטיין. כל הזכויות שמורות.">
+<meta name="author" content="יהושע לגשטיין">
+<link rel="license" href="/legal/">
+<meta name="theme-color" content="#111827">
 </head>
 <body>
 <div class="bg" id="bg" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
@@ -2189,6 +2199,18 @@ if(view==="practice")startRound(activeLevel());
 })();
 try{speechSynthesis.onvoiceschanged=function(){if(view==="settings")render()}}catch(e){}
 render();
+</script>
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<script src="/legal/terms.js"></script>
+<script src="/legal/protect.js"></script>
+<script>
+/* רישום ה-service worker. הכתובת נושאת את הגרסה, ולכן שינוי גרסה
+   מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js?v=b13-pwa1").catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
