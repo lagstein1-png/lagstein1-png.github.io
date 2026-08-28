@@ -156,6 +156,8 @@ nav{display:flex;gap:4px;margin-inline-start:auto;flex-wrap:wrap}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
 .g4{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
+/* רשימת הקולות: שתי עמודות רק כשבאמת יש מקום, אחרת השמות נקטעים */
+.vgrid{grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));gap:8px}
 .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .spread{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
@@ -282,6 +284,16 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .fcard .ft{font-weight:700;font-size:.93rem}
 .fcard .fm{margin-top:7px;font-size:1.05rem}
 .fcard .fn{color:var(--muted);font-size:.82rem;margin-top:6px;overflow-wrap:anywhere}
+
+/* ---------- שורת מצב הקול ---------- */
+.vstrip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;
+  padding:9px 13px;border-radius:11px;font-size:.86rem;font-weight:600;line-height:1.5}
+.vstrip>span{flex:1;min-width:0}
+.vstrip .btn{padding:6px 12px;font-size:.8rem;background:var(--surface);border-color:currentColor}
+.vstrip.ok{background:var(--ok-soft);color:var(--ok)}
+.vstrip.warn{background:var(--warn-soft);color:var(--warn)}
+.vstrip.bad{background:var(--bad-soft);color:var(--bad)}
+.vstrip svg{flex-shrink:0}
 
 /* ---------- שכבות ---------- */
 .ov{position:fixed;inset:0;z-index:80;background:rgba(8,11,18,.62);backdrop-filter:blur(3px);
@@ -532,11 +544,16 @@ function applyModes(){
    אלא מתבקש במילים בתוך הטקסט עצמו.
    ============================================================ */
 var GEM_VOICES=[
-  {id:"Kore",  t:"קורה",  d:"נשי, רגוע וברור"},
-  {id:"Puck",  t:"פאק",   d:"גברי, ער וזורם"},
-  {id:"Leda",  t:"לדה",   d:"נשי, צעיר יותר"},
-  {id:"Charon",t:"כארון", d:"גברי, עמוק ואיטי"}
+  {id:"Kore",     t:"קורה",    g:"f", d:"רגוע וברור"},
+  {id:"Aoede",    t:"אאודה",   g:"f", d:"חם ונעים"},
+  {id:"Leda",     t:"לדה",     g:"f", d:"צעיר וקליל"},
+  {id:"Autonoe",  t:"אוטונואה",g:"f", d:"בהיר ומדויק"},
+  {id:"Puck",     t:"פאק",     g:"m", d:"ער וזורם"},
+  {id:"Charon",   t:"כארון",   g:"m", d:"עמוק ושקול"},
+  {id:"Orus",     t:"אורוס",   g:"m", d:"יציב ונינוח"},
+  {id:"Fenrir",   t:"פנריר",   g:"m", d:"נמרץ יותר"}
 ];
+function gvName(id){for(var i=0;i<GEM_VOICES.length;i++)if(GEM_VOICES[i].id===id)return GEM_VOICES[i];return GEM_VOICES[0]}
 var GKEY="";
 function loadKey(){
   try{
@@ -632,7 +649,7 @@ function pcmToWav(b64){
   }catch(e){return null}
 }
 
-var ttsErr="";
+var ttsErr="",ttsState="";   /* "" · "ok" · "device" · "err" */
 function speakDevice(text){
   if(!("speechSynthesis" in window))return;
   try{
@@ -647,19 +664,25 @@ function speakDevice(text){
 function speak(text){
   if(!state.settings.tts||!text)return;
   stopSpeak();
-  if(voiceMode()!=="gemini"){speakDevice(text);return}
+  if(voiceMode()!=="gemini"){
+    if(ttsState!=="device"){ttsState="device"}
+    speakDevice(text);return;
+  }
   var name=state.settings.gvoice||"Kore",rate=state.settings.rate;
   var ck=name+"|"+rate.toFixed(2)+"|"+text;
   function play(url){gStop();gAudio=new Audio(url);gAudio.play().catch(function(){speakDevice(text)})}
   if(gCache[ck]){play(gCache[ck]);return}
   gSynth(text,name,rate).then(function(url){
-    gCache[ck]=url;ttsErr="";play(url);
+    gCache[ck]=url;ttsErr="";
+    if(ttsState!=="ok"){ttsState="ok";if(view==="practice")render()}
+    play(url);
   }).catch(function(e){
     /* נופלים חזרה לקול המכשיר במקום להשתתק, ורושמים למה — כדי
        שמסך ההגדרות יוכל להראות את הסיבה במקום "לא עובד". */
     ttsErr=String(e&&e.message||e);
+    ttsState="err";
     speakDevice(text);
-    if(view==="settings")render();
+    render();
   });
 }
 function stopSpeak(){
@@ -716,12 +739,15 @@ var SAY_MAP=[
   /* מפרידים בין מספר לאות, כדי שגבול־מילה יעבוד על האות */
   [/(\d)([a-zA-Z])/g,"$1 $2"],
   /* אותיות בודדות בשמן העברי */
-  [/\bx\b/g," איקס "],[/\by\b/g," וואי "],[/\bn\b/g," אֵן "],[/\bd\b/g," דִי "],
-  [/\bm\b/g," אֵם "],[/\ba\b/g," אֵיי "],[/\bb\b/g," בִּי "],[/\bc\b/g," סִי "],
-  [/\bh\b/g," אֵייץ' "],[/\br\b/g," ר "],[/\bt\b/g," טִי "],[/\bv\b/g," וִי "],
-  [/\bS\b/g," אֵס "],[/\bP\b/g," פִּי "],
-  /* סוגריים בסוף, אחרי שכל מה שבתוכם כבר תורגם */
-  [/\(/g," סוגריים "],[/\)/g," סוף סוגריים "]
+  /* שמות האותיות בלי ניקוד — חלק ממנועי ההקראה מועדים עליו.
+     איפה שלאות יש משמעות קבועה בנוסחה, אומרים את המשמעות. */
+  [/\bx\b/g," איקס "],[/\by\b/g," וואי "],[/\bn\b/g," אן "],[/\bd\b/g," די "],
+  [/\bm\b/g," שיפוע "],[/\ba\b/g," איי "],[/\bb\b/g," בי "],[/\bc\b/g," סי "],
+  [/\bh\b/g," גובה "],[/\br\b/g," רדיוס "],[/\bt\b/g," זמן "],[/\bv\b/g," מהירות "],
+  [/\bS\b/g," שטח "],[/\bP\b/g," היקף "],
+  /* סוגריים: "בסוגריים" לפתיחה, ופסיק לסגירה. הניסוח הקודם,
+     "סוגריים ... סוף סוגריים", הפך כל ביטוי קצר לנאום. */
+  [/\(/g," בסוגריים "],[/\)/g," , "]
 ];
 function speakMath(plain){
   var s=" "+String(plain)+" ",i;
@@ -731,9 +757,9 @@ function speakMath(plain){
 /* טקסט הסבר הוא עברית רגילה שמשובצים בה סימנים בודדים. כאן מתרגמים
    רק את מה שחד־משמעי — מקף בעברית הוא מקף, לא מינוס. */
 var PROSE_MAP=[
-  [/²/g," בריבוע "],[/³/g," בשלישית "],[/₁/g," אחת "],[/₂/g," שתיים "],[/ₙ/g," אֵן "],
+  [/²/g," בריבוע "],[/³/g," בשלישית "],[/₁/g," אחת "],[/₂/g," שתיים "],[/ₙ/g," אן "],
   /* מעריכים מוגבהים ביוניקוד, כמו x⁻ᵃ */
-  [/⁻/g," מינוס "],[/⁺/g," ועוד "],[/ᵃ/g," אֵיי "],[/ᵇ/g," בִּי "],[/⁰/g," אפס "],[/¹/g," אחת "],
+  [/⁻/g," מינוס "],[/⁺/g," ועוד "],[/ᵃ/g," איי "],[/ᵇ/g," בי "],[/⁰/g," אפס "],[/¹/g," אחת "],
   [/√/g," שורש של "],[/π/g," פאי "],[/°/g," מעלות "],[/Δ/g," דלתא "],
   [/α/g," אלפא "],[/[×·]/g," כפול "],[/÷/g," חלקי "],[/≈/g," בערך "],
   /* מינוס טיפוגרפי ו-en dash לא מופיעים בעברית, ולכן בטוח לתרגם.
@@ -2340,6 +2366,22 @@ function viewHome(){
   return h+'</main>';
 }
 /* ---------- תרגול ---------- */
+/* מצב הקול חייב להיות במסך התרגול עצמו. הודעה שמסבירה למה
+   הקול לא מה שביקשת חסרת ערך אם היא מוסתרת בהגדרות. */
+function voiceStrip(){
+  var s=state.settings;
+  if(!s.tts)return "";
+  if(s.engine==="gemini"&&hasKey()&&ttsState!=="err"){
+    if(ttsState!=="ok")return "";      /* עוד לא הושמע דבר — אין מה להודיע */
+    return '<div class="vstrip ok">'+ic("speaker",15)+'<span>קול טבעי · '+gvName(s.gvoice).t+'</span>'+
+      '<button class="btn btn-g" data-a="go" data-v="settings">להחליף</button></div>';
+  }
+  if(ttsState==="err")
+    return '<div class="vstrip bad">'+ic("speaker",15)+'<span>הקול הטבעי לא הגיב, ההקראה עברה לקול המכשיר</span>'+
+      '<button class="btn btn-g" data-a="go" data-v="settings">לבדוק</button></div>';
+  return '<div class="vstrip warn">'+ic("speaker",15)+'<span>ההקראה בקול המכשיר. יש קול טבעי שנשמע כמו אדם</span>'+
+    '<button class="btn btn-g" data-a="go" data-v="settings">להפעיל</button></div>';
+}
 function viewPractice(){
   if(!P.q)startRound();
   if(P.phase==="done")return viewSummary();
@@ -2356,6 +2398,7 @@ function viewPractice(){
         }).join("")+'</span>'+
       '<button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="stop">'+ic("pause",15)+' עצירה</button></div>'+
      '</div>';
+  h+=voiceStrip();
   h+='<div class="grid" style="grid-template-columns:minmax(0,1fr);margin-top:14px">';
   /* כרטיס השאלה */
   h+='<div class="card pad rise '+topicCls(q.topic)+'" style="border-top:3px solid var(--c)">';
@@ -2618,13 +2661,15 @@ function viewSettings(){
            '<input class="field" style="margin-top:10px;direction:ltr;text-align:left" placeholder="מדביקים כאן את המפתח" data-bind="gkey" />'+
            '<p class="sub xs" style="margin-top:8px">עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.</p>';
       }else{
-        h+='<p class="sub sm" style="margin-top:14px">בחירת קול</p><div class="grid g2" style="margin-top:8px">'+
-          GEM_VOICES.map(function(g){
-            var on=(s.gvoice||"Kore")===g.id;
-            return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="gvoice" data-n="'+g.id+'">'+
-              '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"לשמוע")+'</span>'+
-              '<span class="tt"><b>'+g.t+'</b><span>'+g.d+'</span></span></button>';
-          }).join("")+'</div>'+
+        h+=[["f","קולות נשיים"],["m","קולות גבריים"]].map(function(grp){
+          return '<p class="sub sm" style="margin-top:14px">'+grp[1]+'</p><div class="grid vgrid" style="margin-top:8px">'+
+            GEM_VOICES.filter(function(g){return g.g===grp[0]}).map(function(g){
+              var on=(s.gvoice||"Kore")===g.id;
+              return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="gvoice" data-n="'+g.id+'">'+
+                '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"לשמוע")+'</span>'+
+                '<span class="tt"><b>'+g.t+'</b><span>'+g.d+'</span></span></button>';
+            }).join("")+'</div>';
+        }).join("")+
           '<div class="row" style="margin-top:12px"><button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="clearkey">החלפת המפתח</button></div>';
         if(ttsErr)h+='<div class="diag" style="margin-top:12px"><b>הקול הטבעי לא הגיב</b>'+
           '<div class="sm" style="margin-top:3px">'+esc(ttsErr)+'</div>'+
@@ -2797,8 +2842,8 @@ function onAction(a,el){
   if(a==="ts"){s.ts=parseInt(el.getAttribute("data-n"),10);save();applyModes();render();return}
   if(a==="theme"){s.theme=el.getAttribute("data-n");save();applyModes();render();return}
   if(a==="rlen"){s.roundLen=parseInt(el.getAttribute("data-n"),10);save();render();return}
-  if(a==="engine"){s.engine=el.getAttribute("data-n");save();render();speak(VOICE_SAMPLE);return}
-  if(a==="gvoice"){s.gvoice=el.getAttribute("data-n");save();render();speak(VOICE_SAMPLE);return}
+  if(a==="engine"){s.engine=el.getAttribute("data-n");ttsErr="";ttsState="";save();render();speak(VOICE_SAMPLE);return}
+  if(a==="gvoice"){s.gvoice=el.getAttribute("data-n");ttsErr="";ttsState="";save();render();speak(VOICE_SAMPLE);return}
   if(a==="clearkey"){saveKey("");ttsErr="";render();return}
   if(a==="voice"){s.voice=el.getAttribute("data-u");s.engine="device";save();render();speak(VOICE_SAMPLE);return}
   if(a==="test"){speak(VOICE_SAMPLE);return}
