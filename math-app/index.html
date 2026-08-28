@@ -53,7 +53,7 @@ html.hi-contrast .btn{border:2px solid #000}
 .keys kbd{font-family:var(--font-display);font-weight:700;background:var(--paper);border:2px solid rgba(23,51,60,.18);
   border-radius:8px;padding:4px 11px;min-width:38px;text-align:center;color:var(--ink);font-size:.9rem}
 .fd{font-family:var(--font-display)}
-.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+.wrap{width:100%;max-width:min(1100px,100%);margin:0 auto;padding:0 20px}
 /* ambient graph paper */
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
   background-image:linear-gradient(to left,rgba(14,156,141,.07) 1px,transparent 1px),linear-gradient(to bottom,rgba(14,156,141,.07) 1px,transparent 1px);background-size:28px 28px}
@@ -196,7 +196,8 @@ input[type=range]{width:100%;accent-color:var(--teal)}
 .wkd.on{background:var(--teal);color:#fff;border-color:var(--teal-deep);box-shadow:0 4px 0 var(--teal-deep)}
 .wkd.td{background:var(--amber-soft);color:var(--amber-deep);border-color:var(--amber)}
 .cols{display:grid;gap:18px}
-@media(min-width:860px){.cols{grid-template-columns:1fr 1fr}.cols3{grid-template-columns:repeat(3,1fr)}.cols4{grid-template-columns:repeat(4,1fr)}}
+.cols>*,.cols4>*{min-width:0}
+@media(min-width:860px){.cols{grid-template-columns:1fr 1fr}.cols3{grid-template-columns:repeat(3,1fr)}.cols4{grid-template-columns:repeat(4,1fr)}.cols-hero{grid-template-columns:1.05fr 1fr}.cols-play{grid-template-columns:1.6fr 1fr}}
 .cols4{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .hbar2{display:flex;align-items:flex-end;gap:8px;height:130px;direction:ltr}
 .hbar2 .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;height:100%}
@@ -217,6 +218,10 @@ footer{border-top:3px solid rgba(23,51,60,.08);background:color-mix(in srgb,var(
 .qask{font-family:var(--font-display);font-weight:600;font-size:1.35rem;text-align:center;color:var(--ink-soft);margin-top:28px}
 .qbig{font-family:var(--font-display);font-weight:700;font-size:3rem;text-align:center;margin-top:6px;direction:ltr;unicode-bidi:isolate;letter-spacing:3px}
 @media(max-width:640px){.qask{font-size:1.1rem}.qbig{font-size:2.3rem}.opt{font-size:1.6rem;padding:16px 8px}}
+.obcard{padding:30px;transform:rotate(-1.2deg)}
+.petpick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.petpick .pick{flex-direction:column;padding:12px 8px 8px}
+@media(max-width:400px){.obcard{padding:20px}.petpick{gap:8px}.petpick .pick{padding:8px 4px 6px}.petpick .fd{font-size:.85rem}}
 /* ===== בורר שפה במסך הפתיחה ===== */
 .oblang{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:99px;border:2px solid rgba(23,51,60,.12);background:var(--card);font-family:var(--font-display);font-weight:600;font-size:.95rem;color:var(--ink-soft);transition:all .15s}
 .oblang:hover{border-color:var(--teal);color:var(--ink)}
@@ -815,7 +820,7 @@ function petSvg(kind,mood,size){
   }else{
     e='<path d="M24 44 L38 8 L57 35 Z" fill="'+c.c+'"/><path d="M96 44 L82 8 L63 35 Z" fill="'+c.c+'"/><path d="M33 37 L40 17 L50 33 Z" fill="'+c.s+'"/><path d="M87 37 L80 17 L70 33 Z" fill="'+c.s+'"/><ellipse cx="60" cy="67" rx="38" ry="34" fill="'+c.c+'"/><ellipse cx="60" cy="82" rx="23" ry="16" fill="'+c.s+'"/><circle cx="33" cy="72" r="5" fill="#ff9e9e" opacity=".6"/><circle cx="87" cy="72" r="5" fill="#ff9e9e" opacity=".6"/>'+eyes()+'<ellipse cx="60" cy="75" rx="5" ry="4" fill="'+ink+'"/>'+mouth();
   }
-  return '<svg viewBox="0 0 120 120" width="'+(size||140)+'" height="'+(size||140)+'" aria-hidden="true">'+e+'</svg>';
+  return '<svg viewBox="0 0 120 120" width="'+(size||140)+'" height="'+(size||140)+'" style="max-width:100%;height:auto" aria-hidden="true">'+e+'</svg>';
 }
 
 /* ================= questions ================= */
@@ -1157,7 +1162,7 @@ function onboarding(){
   /* בורר שפה — כדי שאפשר יהיה להחליף שפה כבר במסך הפתיחה */
   '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'+Object.keys(LANGS).map(function(l){
     return '<button class="oblang'+(state.settings.lang===l?" on":"")+'" data-a="lang" data-l="'+l+'"><span style="font-size:1.25rem">'+LANGS[l].flag+'</span>'+esc(LANGS[l].label)+'</button>';
-  }).join("")+'</div>'+'<div class="cols" style="grid-template-columns:1.05fr 1fr;align-items:center">'+
+  }).join("")+'</div>'+'<div class="cols cols-hero" style="align-items:center">'+
   '<div>'+
     '<span class="fd" style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--paper);font-weight:500;font-size:.85rem;padding:7px 16px;border-radius:99px;transform:rotate(-1deg)">'+ic("sparkle",15)+' '+esc(t.obBadge)+'</span>'+
     '<h1 class="fd" style="font-weight:700;font-size:clamp(2.6rem,6vw,3.9rem);line-height:1.08;margin-top:22px">'+esc(t.obTitle1)+'<br>'+esc(t.obTitle2)+' <span style="position:relative;display:inline-block">'+esc(t.obTitle3)+'<span style="position:absolute;left:0;right:0;bottom:4px;height:15px;background:var(--amber);z-index:-1;transform:rotate(-1deg);border-radius:4px"></span></span></h1>'+
@@ -1168,12 +1173,12 @@ function onboarding(){
       }).join("")+
     '</div>'+
   '</div>'+
-  '<div class="card" style="padding:30px;transform:rotate(-1.2deg)">'+
+  '<div class="card obcard">'+
     '<p class="fd" style="font-weight:600;font-size:1.4rem"><span style="display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;margin-inline-end:10px">1</span>'+esc(t.step1)+'</p>'+
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px">'+
+    '<div class="petpick">'+
       pets.map(function(k){
         var on=sel===k;
-        return '<button class="pick'+(on?" on":"")+'" style="flex-direction:column;padding:12px 8px 8px" data-a="selpet" data-p="'+k+'">'+
+        return '<button class="pick'+(on?" on":"")+'" data-a="selpet" data-p="'+k+'">'+
           '<span class="'+(on?"wig":"")+'">'+petSvg(k,on?"cheer":"idle",104)+'</span>'+
           '<span class="fd" style="font-weight:600;margin-top:4px;color:'+(on?"var(--ink)":"var(--ink-soft)")+'">'+esc(names[k])+'</span></button>';
       }).join("")+
@@ -1455,7 +1460,7 @@ function practice(){
   /* daily banner */
   if(isDaily)h+='<div class="rise" style="display:flex;align-items:center;gap:12px;margin-top:14px;background:var(--amber-soft);border:2px solid rgba(255,197,49,.55);border-radius:18px;padding:12px 18px">'+ic("star",22)+'<span><b class="fd" style="color:var(--amber-deep)">'+esc(t.dailyTag)+'</b><br><span style="font-size:.78rem;color:rgba(217,154,0,.85)">'+esc(t.dailyDesc)+'</span></span></div>';
   /* main grid */
-  h+='<div class="cols" style="margin-top:18px;grid-template-columns:1.6fr 1fr;padding-bottom:60px"><div class="card" style="padding:26px">';
+  h+='<div class="cols cols-play" style="margin-top:18px;padding-bottom:60px"><div class="card" style="padding:26px">';
   h+='<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><span class="fd" style="font-weight:600;color:var(--teal-deep);background:var(--teal-soft);border:1px solid rgba(14,156,141,.25);border-radius:99px;padding:5px 16px;font-size:.88rem">'+esc({add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[q.kind])+' · '+esc(names[al-1])+'</span><button class="chip" data-a="listen" style="color:var(--sky-deep);background:var(--sky-soft);border-color:rgba(88,183,224,.4)">'+ic("speaker",16)+' '+esc(t.listen)+'</button></div>';
   /* שורה 1: המשפט, בכיוון השפה. שורה 2: התרגיל לבדו, תמיד משמאל לימין. */
   h+='<p class="qask">'+esc(t.ask)+'</p>';
