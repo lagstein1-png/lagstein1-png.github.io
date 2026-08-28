@@ -16,7 +16,20 @@
   --amber:#ffc531; --amber-deep:#d99a00; --amber-soft:#fff3ce;
   --coral:#ff6f61; --coral-deep:#d94f42; --coral-soft:#ffe3de;
   --sky:#58b7e0; --sky-deep:#2e86ad; --sky-soft:#dff1fa;
+  --violet:#8a63d2; --violet-deep:#6a45b0; --violet-soft:#ece4fa;
 }
+/* לכל פעולת חשבון יש צבע קבוע. ילד לומד את הצבע לפני שהוא
+   קורא את המילה, וזה עוזר במיוחד למי שהקריאה עצמה מאמצת אותו. */
+.op-add{--op:var(--teal);--op-d:var(--teal-deep);--op-s:var(--teal-soft)}
+.op-sub{--op:var(--coral);--op-d:var(--coral-deep);--op-s:var(--coral-soft)}
+.op-mul{--op:var(--amber);--op-d:var(--amber-deep);--op-s:var(--amber-soft)}
+.op-div{--op:var(--sky);--op-d:var(--sky-deep);--op-s:var(--sky-soft)}
+.opdot{display:inline-block;width:13px;height:13px;border-radius:5px;background:var(--op);
+  border:2px solid var(--op-d);flex-shrink:0;vertical-align:-2px}
+.opchip{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.88rem;
+  color:var(--op-d);background:var(--op-s);border:2px solid var(--op);border-radius:99px;padding:5px 16px}
+/* פס צבע בראש כרטיס השאלה, בצבע הפעולה */
+.card.opcard{box-shadow:0 12px 0 rgba(23,51,60,.12),inset 0 10px 0 var(--op)}
 html[data-theme="grape"]{ --paper:#f7f4fc; --teal:#8a63d2; --teal-deep:#6a45b0; --teal-soft:#ece4fa; --sky:#4db8a4; --sky-deep:#358d7c; --sky-soft:#dff4ee; }
 html[data-theme="berry"]{ --paper:#fdf2f5; --teal:#d94f70; --teal-deep:#b03a57; --teal-soft:#fbdde6; --sky:#4fb3c9; --sky-deep:#35899d; --sky-soft:#ddf1f6; }
 *{box-sizing:border-box;margin:0}
@@ -44,6 +57,11 @@ html.hi-contrast{
   --sky:#00517a;--sky-deep:#003651;--sky-soft:#e7f0f6;
 }
 html.hi-contrast .bg{display:none}
+html.hi-contrast .op-add,html.hi-contrast .op-sub,html.hi-contrast .op-mul,html.hi-contrast .op-div{
+  --op:#000;--op-d:#000;--op-s:#fff}
+html.hi-contrast .lvl{--lv:#000}
+html.hi-contrast .lvl .n{background:#000;color:#fff}
+html.hi-contrast .card.opcard{box-shadow:none}
 html.hi-contrast .card,html.hi-contrast .opt,html.hi-contrast .tog,
 html.hi-contrast .chip,html.hi-contrast .pick,html.hi-contrast .tile{border:2px solid #000}
 html.hi-contrast .btn{border:2px solid #000}
@@ -124,15 +142,30 @@ html.reduce-motion *{animation:none!important;transition:none!important}
 .lvl{display:inline-flex;align-items:center;gap:7px;flex-shrink:0;font-family:var(--font-display);font-weight:600;font-size:.88rem;border-radius:999px;border:2.5px solid rgba(23,51,60,.15);background:var(--card);color:var(--ink-soft);padding:7px 14px;transition:all .15s}
 .lvl:hover{border-color:var(--amber);color:var(--amber-deep)}
 .lvl.on{border-color:var(--ink);background:var(--amber);color:var(--ink);box-shadow:0 4px 0 var(--amber-deep);transform:rotate(-1deg)}
-.lvl .n{width:20px;height:20px;border-radius:50%;background:rgba(23,51,60,.08);display:grid;place-items:center;font-size:.72rem;font-weight:700}
+.lvl .n{width:20px;height:20px;border-radius:50%;background:var(--lv,rgba(23,51,60,.08));
+  color:#fff;display:grid;place-items:center;font-size:.72rem;font-weight:700}
+/* צבעי הרמות קבועים ולא נגזרים מהערכה, כי ערכת ״ענבים״ מחליפה
+   את הטורקיז בסגול — ואז שתי רמות היו מקבלות אותו צבע בדיוק.
+   חוץ מזה, ״רמה 5 היא סגולה״ עדיף שיישאר נכון בכל ערכה. */
+.lvl.l1{--lv:#2e86ad}
+.lvl.l2{--lv:#0b7568}
+.lvl.l3{--lv:#d99a00}
+.lvl.l4{--lv:#d94f42}
+.lvl.l5{--lv:#6a45b0}
+.lvl.l6{--lv:#17333c}
+.lvl.l6 .n{color:var(--amber)}
 .lvl.on .n{background:var(--ink);color:var(--amber)}
+/* גם הטבעת סביב הכפתור מקבלת את צבע הרמה, כדי שרואים את הסולם
+   גם בלי לקרוא את המספרים */
+.lvl{border-color:var(--lv,rgba(23,51,60,.15))!important}
+.lvl.on{border-color:var(--ink)!important}
 .dots{display:flex;gap:6px}
 .dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(23,51,60,.2);background:transparent}
 .dot.ok{background:var(--teal);border-color:var(--teal-deep)}
 .dot.no{background:var(--coral);border-color:var(--coral-deep)}
 .dot.sk{background:var(--sky);opacity:.6}
 .opt{font-family:var(--font-display);font-weight:700;font-size:2.1rem;border-radius:18px;border:3px solid rgba(23,51,60,.15);background:var(--paper);padding:22px 10px;transition:all .15s;box-shadow:0 6px 0 rgba(23,51,60,.12)}
-.opt:hover:not([disabled]){border-color:var(--teal);background:var(--teal-soft);transform:translateY(-2px)}
+.opt:hover:not([disabled]){border-color:var(--op,var(--teal));background:var(--op-s,var(--teal-soft));transform:translateY(-2px)}
 .opt.right{border-color:var(--teal-deep);background:var(--teal);color:#fff;box-shadow:0 6px 0 var(--teal-deep)}
 .opt.wrong{border-color:rgba(255,111,97,.4);background:var(--coral-soft);color:rgba(217,79,66,.5);text-decoration:line-through;cursor:not-allowed}
 .opt.flash{border-color:var(--coral);background:var(--coral-soft);color:var(--coral-deep)}
@@ -1242,7 +1275,7 @@ function visualHint(q){
     for(i=0;i<groups;i++)g+='<span class="visgrid" style="border:2px dashed rgba(23,51,60,.25);border-radius:12px;padding:6px">'+dotN(per,"var(--sky)")+'</span>';
     dots='<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">'+g+'</div>';
   }
-  return '<div class="rise" style="margin-top:18px;background:var(--paper);border:2px solid rgba(23,51,60,.1);border-radius:18px;padding:16px"><p class="fd" style="font-weight:600;color:var(--teal-deep);text-align:center;margin-bottom:10px">'+ic("eye",16)+' '+esc(t.visualTitle)+'</p>'+dots+'</div>';
+  return '<div class="'+lc("rise op-"+q.kind)+'" style="margin-top:18px;background:var(--paper);border:2px solid var(--op);border-radius:18px;padding:16px"><p class="fd" style="font-weight:600;color:var(--op-d);text-align:center;margin-bottom:10px">'+ic("eye",16)+' '+esc(t.visualTitle)+'</p>'+dots+'</div>';
 }
 function dotN(n,color){var s="";for(var i=0;i<n;i++)s+='<span class="visdot" style="background:'+color+'"></span>';return s}
 function dotX(n){var s="";for(var i=0;i<n;i++)s+='<span class="visdot x"></span>';return s}
@@ -1479,10 +1512,10 @@ function practice(){
   var h="";
   /* level bar */
   h+='<div class="wrap" style="padding-top:22px"><div class="lvlbar"><button class="'+lc("lvl"+(state.level===null?" on":""))+'" data-a="lvl" data-l="0">'+ic("sparkle",15)+' '+esc(t.levelAuto)+'</button>';
-  for(var L=1;L<=6;L++)h+='<button class="'+lc("lvl"+(state.level===L?" on":""))+'" data-a="lvl" data-l="'+L+'" title="'+esc(names[L-1])+'"><span class="n">'+L+'</span>'+esc(names[L-1])+'</button>';
+  for(var L=1;L<=6;L++)h+='<button class="'+lc("lvl l"+L+(state.level===L?" on":""))+'" data-a="lvl" data-l="'+L+'" title="'+esc(names[L-1])+'"><span class="n">'+L+'</span>'+esc(names[L-1])+'</button>';
   h+='</div>';
   /* status strip */
-  h+='<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px"><span class="fd" style="font-weight:700;font-size:1.1rem">'+fmt(t.qOf,{a:P.qi+1,b:P.ses.length})+'</span>'+(P.focus?'<span class="chip" style="background:var(--teal-soft);border-color:rgba(14,156,141,.4);color:var(--teal-deep)">'+ic("sparkle",14)+' '+esc(t.focusBadge)+' · '+esc({add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[P.focus]||"")+'</span>':"")+'<span class="dots">';
+  h+='<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px"><span class="fd" style="font-weight:700;font-size:1.1rem">'+fmt(t.qOf,{a:P.qi+1,b:P.ses.length})+'</span>'+(P.focus?'<span class="'+lc("chip op-"+P.focus)+'" style="background:var(--op-s);border-color:var(--op);color:var(--op-d)">'+ic("sparkle",14)+' '+esc(t.focusBadge)+' · '+esc({add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[P.focus]||"")+'</span>':"")+'<span class="dots">';
   P.ses.forEach(function(_,i){var cls=i<P.results.length?(P.results[i]==="ok"?"ok":P.results[i]==="sk"?"sk":"no"):"";h+='<span class="'+lc("dot "+cls)+'"></span>'});
   h+='</span><span style="margin-inline-start:auto;display:flex;gap:8px"><button class="chip" data-a="break">'+ic("heart",15)+' '+esc(t.breakBtn)+'</button>';
   if(s.streak>0)h+='<span class="chip" style="border-color:rgba(255,111,97,.4);color:var(--coral-deep)">'+ic("flame",15)+' '+s.streak+'</span>';
@@ -1490,8 +1523,8 @@ function practice(){
   /* daily banner */
   if(isDaily)h+='<div class="rise" style="display:flex;align-items:center;gap:12px;margin-top:14px;background:var(--amber-soft);border:2px solid rgba(255,197,49,.55);border-radius:18px;padding:12px 18px">'+ic("star",22)+'<span><b class="fd" style="color:var(--amber-deep)">'+esc(t.dailyTag)+'</b><br><span style="font-size:.78rem;color:rgba(217,154,0,.85)">'+esc(t.dailyDesc)+'</span></span></div>';
   /* main grid */
-  h+='<div class="cols pr-cols" style="margin-top:18px;padding-bottom:60px"><div class="card" style="padding:26px">';
-  h+='<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><span class="fd" style="font-weight:600;color:var(--teal-deep);background:var(--teal-soft);border:1px solid rgba(14,156,141,.25);border-radius:99px;padding:5px 16px;font-size:.88rem">'+esc({add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[q.kind])+' · '+esc(names[al-1])+'</span><button class="chip" data-a="listen" style="color:var(--sky-deep);background:var(--sky-soft);border-color:rgba(88,183,224,.4)">'+ic("speaker",16)+' '+esc(t.listen)+'</button></div>';
+  h+='<div class="cols pr-cols" style="margin-top:18px;padding-bottom:60px"><div class="'+lc("card opcard op-"+q.kind)+'" style="padding:26px">';
+  h+='<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><span class="fd opchip"><span class="opdot"></span>'+esc({add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[q.kind])+' · '+esc(names[al-1])+'</span><button class="chip" data-a="listen" style="color:var(--sky-deep);background:var(--sky-soft);border-color:rgba(88,183,224,.4)">'+ic("speaker",16)+' '+esc(t.listen)+'</button></div>';
   /* שורה 1: המשפט, בכיוון השפה. שורה 2: התרגיל לבדו, תמיד משמאל לימין. */
   h+='<p class="qask">'+esc(t.ask)+'</p>';
   h+='<p class="qbig" dir="ltr">'+esc(q.expr||q.text)+'</p>';
@@ -1612,7 +1645,7 @@ function progressView(){
     h+='<div style="margin-top:18px;display:grid;gap:16px">';
     ops.forEach(function(o){
       var pct=o.total>0?Math.round(o.ok/o.total*100):0;
-      h+='<div><div style="display:flex;justify-content:space-between;font-size:.9rem;font-weight:500;margin-bottom:5px"><span>'+esc(o.label)+'</span><span class="fd" style="color:var(--ink-soft)">'+(o.total>0?pct+"%":"—")+'</span></div><div class="bar" style="height:13px;direction:ltr"><i style="width:'+pct+'%;background:'+(pct>=75?"var(--teal)":pct>=50?"var(--amber)":"var(--coral)")+'"></i></div></div>';
+      h+='<div class="'+lc("op-"+o.key)+'"><div style="display:flex;justify-content:space-between;font-size:.9rem;font-weight:500;margin-bottom:5px"><span style="display:inline-flex;align-items:center;gap:8px"><span class="opdot"></span>'+esc(o.label)+'</span><span class="fd" style="color:var(--ink-soft)">'+(o.total>0?pct+"%":"—")+'</span></div><div class="bar" style="height:13px;direction:ltr"><i style="width:'+pct+'%;background:'+(pct>=75?"var(--teal)":pct>=50?"var(--amber)":"var(--coral)")+'"></i></div></div>';
     });
     h+='</div>';
     if(strongest)h+='<div class="note ok" style="margin-top:18px;display:flex;gap:10px;align-items:flex-start">'+ic("sparkle",18)+'<span>'+esc(fmt(t.progStrength,{name:strongest.label}))+'</span></div>';
