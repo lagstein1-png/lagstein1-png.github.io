@@ -95,6 +95,17 @@ html.light .msg.warn{background:#fdf3dd;border-color:#e0c88a;color:#6b5109}
 .focusing .s{opacity:.2}
 .focusing .s.cur{opacity:1}
 
+/* משפט שנקרא כרגע בקול טבעי. שם אין דיווח על מילים בודדות,
+   אז מדגישים את המשפט כולו במקום את המילה. */
+.s.reading{background:rgba(245,196,81,.16);border-radius:6px;box-shadow:0 0 0 3px rgba(245,196,81,.16)}
+html.light .s.reading{background:rgba(255,210,77,.32);box-shadow:0 0 0 3px rgba(255,210,77,.32)}
+
+.keyrow{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+.keyrow input{flex:1 1 210px;min-width:0;background:var(--bg);border:1px solid var(--line);
+  border-radius:9px;padding:10px 13px;color:var(--ink);font-family:inherit;font-size:.92rem}
+.keyrow input:focus{outline:none;border-color:var(--accent)}
+.vnote{color:var(--ink-faint);font-size:.82rem;margin-top:8px;line-height:1.6}
+
 /* ---------- סרגל ההקראה ---------- */
 .play{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);z-index:25;
   display:flex;gap:7px;align-items:center;background:var(--panel);
@@ -170,8 +181,9 @@ html.light .seg button.on{background:rgba(22,98,164,.09)}
   <div class="msg warn hidden" id="warn"></div>
 
   <p class="hint">
-    הניקוד נעשה בשרת של דיקטה ודורש חיבור לאינטרנט.
-    הטקסט עצמו לא נשמר בשום מקום — לא בשרת ולא בדפדפן.
+    הניקוד נעשה בשרת של דיקטה ודורש חיבור לאינטרנט,
+    ואם בוחרים קול טבעי הטקסט נשלח גם לשרת של גוגל כדי להפוך אותו לקול.
+    הוא לא נשמר בשום מקום — לא בשרתים האלה ולא בדפדפן.
   </p>
 </main>
 
@@ -230,6 +242,20 @@ html.light .seg button.on{background:rgba(22,98,164,.09)}
       </div>
     </div>
     <div class="grp">
+      <label>קול</label>
+      <div class="seg" id="segVoice">
+        <button data-v="browser" class="on">קול המחשב</button>
+        <button data-v="Kore">טבעי · נשי</button>
+        <button data-v="Puck">טבעי · גברי</button>
+      </div>
+      <div class="keyrow" id="keyRow" style="display:none">
+        <input id="gkey" type="password" placeholder="מפתח Gemini" autocomplete="off" spellcheck="false" />
+        <button class="btn" id="btnKey">שמירה</button>
+      </div>
+      <p class="vnote" id="vnote"></p>
+    </div>
+
+    <div class="grp">
       <label>מהירות ההקראה</label>
       <div class="seg" id="segRate">
         <button data-v="0.6">איטית מאוד</button>
@@ -268,7 +294,7 @@ var heVoice = null;
 var voicesReady = false;
 
 var P = {              /* העדפות תצוגה */
-  nikud:1, size:1.5, space:1, focus:0, rate:0.9, light:0
+  nikud:1, size:1.5, space:1, focus:0, rate:0.9, light:0, voice:'browser'
 };
 
 /* ---------- ניקוד דרך דיקטה ----------
@@ -393,6 +419,90 @@ function markSentence(){
   if(el && P.focus) el.scrollIntoView({ block:'center', behavior:'smooth' });
 }
 
+/* ---------- קול טבעי דרך Gemini ----------
+   הבדל חשוב מקול המחשב: Gemini מחזיר קובץ שמע שלם ולא מדווח מתי
+   כל מילה נאמרת. לכן בקול טבעי מדגישים את המשפט כולו ולא מילה־מילה.
+   זו הסיבה שהבחירה נשארת בידי המשתמש ולא נקבעה מראש. */
+var VOICE = 'browser';          /* 'browser' | 'Kore' | 'Puck' */
+var GKEY = '';
+var gAudio = null;
+var gCache = {};                /* שמע לפי משפט — כדי לא לשלם פעמיים על אותו טקסט */
+
+function loadKey(){
+  try{
+    GKEY = localStorage.getItem('reader-gkey') || '';
+    if(!GKEY){
+      /* אותו אתר, אותו אחסון: אם כבר הוזן מפתח באפליקציית המתמטיקה, נשתמש בו */
+      var raw = localStorage.getItem('mlh-state-v2');
+      if(raw){
+        var o = JSON.parse(raw);
+        if(o && o.settings && o.settings.googleKey) GKEY = String(o.settings.googleKey).trim();
+      }
+    }
+  }catch(e){}
+}
+function saveKey(k){
+  GKEY = String(k || '').trim();
+  try{ GKEY ? localStorage.setItem('reader-gkey', GKEY) : localStorage.removeItem('reader-gkey'); }catch(e){}
+}
+
+/* Gemini מחזיר PCM גולמי. הדפדפן לא יודע לנגן אותו בלי כותרת WAV. */
+function pcmToWav(b64){
+  try{
+    var bin = atob(b64), len = bin.length, buf = new Uint8Array(len);
+    for(var i=0;i<len;i++) buf[i] = bin.charCodeAt(i);
+    var sr = 24000, ch = 1, bits = 16;
+    var hdr = new ArrayBuffer(44 + len), v = new DataView(hdr);
+    function ws(o, t){ for(var i=0;i<t.length;i++) v.setUint8(o+i, t.charCodeAt(i)); }
+    ws(0,'RIFF'); v.setUint32(4, 36+len, true); ws(8,'WAVE'); ws(12,'fmt ');
+    v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,ch,true);
+    v.setUint32(24,sr,true); v.setUint32(28,sr*ch*bits/8,true);
+    v.setUint16(32,ch*bits/8,true); v.setUint16(34,bits,true);
+    ws(36,'data'); v.setUint32(40,len,true);
+    new Uint8Array(hdr,44).set(buf);
+    var out = '', bytes = new Uint8Array(hdr);
+    for(var j=0;j<bytes.length;j+=0x8000) out += String.fromCharCode.apply(null, bytes.subarray(j, j+0x8000));
+    return 'data:audio/wav;base64,' + btoa(out);
+  }catch(e){ return null; }
+}
+
+function gSynth(text, voiceName){
+  var body = {
+    contents:[{ parts:[{ text:text }] }],
+    generationConfig:{ responseModalities:['AUDIO'],
+      speechConfig:{ voiceConfig:{ prebuiltVoiceConfig:{ voiceName:voiceName } } } },
+    audioConfig:{ audioEncoding:'MP3', speakingRate:Math.max(0.25, Math.min(2, P.rate)) }
+  };
+  return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=' + encodeURIComponent(GKEY),
+    { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })
+    .then(function(r){ if(!r.ok) throw new Error('גוגל החזיר ' + r.status); return r.json(); })
+    .then(function(d){
+      var parts = (d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts) || [];
+      for(var i=0;i<parts.length;i++){
+        var pd = parts[i].inlineData;
+        if(pd && pd.data){
+          if((pd.mimeType||'').indexOf('wav') >= 0 || (pd.mimeType||'').indexOf('pcm') >= 0){
+            return pcmToWav(pd.data) || ('data:audio/wav;base64,' + pd.data);
+          }
+          return 'data:audio/mp3;base64,' + pd.data;
+        }
+      }
+      throw new Error('לא התקבל שמע');
+    });
+}
+function gGet(text){
+  var ck = VOICE + '|' + P.rate + '|' + text;
+  if(gCache[ck]) return Promise.resolve(gCache[ck]);
+  return gSynth(text, VOICE).then(function(url){ gCache[ck] = url; return url; });
+}
+function gStop(){
+  if(gAudio){ try{ gAudio.pause(); gAudio.src=''; }catch(e){} gAudio = null; }
+}
+function markReading(n){
+  var all = document.querySelectorAll('#text .s');
+  for(var i=0;i<all.length;i++) all[i].classList.toggle('reading', n !== null && Number(all[i].getAttribute('data-s')) === n);
+}
+
 /* ---------- הקראה ---------- */
 function pickVoice(){
   if(!('speechSynthesis' in window)) return;
@@ -428,6 +538,7 @@ function hit(idx){
    ההקראה תמיד על הטקסט בלי ניקוד — סימני ניקוד מבלבלים חלק מהמנועים.
    התצוגה יכולה להיות מנוקדת, זה לא קשור. */
 function speakSentence(n){
+  if(VOICE !== 'browser'){ speakGemini(n); return; }
   if(!('speechSynthesis' in window)) return;
   var full = sentencePlain(n), text = full.trim();
   if(!text){                               /* משפט ריק — מדלגים */
@@ -465,12 +576,49 @@ function speakSentence(n){
   speechSynthesis.speak(u);
 }
 
+/* ניגון משפט בקול טבעי. מדגישים את המשפט כולו, ומורידים מראש
+   את המשפט הבא כדי שלא יהיה שקט בין משפט למשפט. */
+function speakGemini(n){
+  var text = sentencePlain(n).trim();
+  if(!text){
+    if(n + 1 < SENTS){ SENT = n + 1; markSentence(); speakGemini(SENT); } else stop();
+    return;
+  }
+  clearHit(); markReading(n);
+  gGet(text).then(function(url){
+    if(!speaking || SENT !== n) return;
+    gStop();
+    gAudio = new Audio(url);
+    gAudio.onended = function(){
+      if(!speaking) return;
+      if(SENT + 1 < SENTS){ SENT++; markSentence(); speakGemini(SENT); } else stop();
+    };
+    gAudio.onerror = function(){ voiceFailed('הניגון נכשל'); };
+    gAudio.play().catch(function(){ voiceFailed('הדפדפן חסם את הניגון'); });
+    /* הורדה מוקדמת של המשפט הבא */
+    if(SENT + 1 < SENTS){
+      var nx = sentencePlain(SENT + 1).trim();
+      if(nx) gGet(nx).catch(function(){});
+    }
+  }).catch(function(e){ voiceFailed(e.message); });
+}
+
+/* אם הקול הטבעי נכשל, חוזרים לקול המחשב במקום להשתתק */
+function voiceFailed(why){
+  VOICE = 'browser'; savePrefs();
+  mark('#segVoice', 'browser'); syncVoiceUi();
+  $('#vnote').textContent = 'הקול הטבעי לא עבד (' + why + '). חזרנו לקול המחשב.';
+  markReading(null);
+  if(speaking) speakSentence(SENT);
+}
+
 function play(){
-  if(!('speechSynthesis' in window)) return;
+  if(VOICE === 'browser' && !('speechSynthesis' in window)) return;
   speaking = true;
   $('#btnPlay').textContent = '❚❚';
   $('#btnPlay').setAttribute('aria-label', 'עצירה');
   try{ speechSynthesis.cancel(); }catch(e){}
+  gStop();
   speakSentence(SENT);
 }
 function stop(){
@@ -478,12 +626,14 @@ function stop(){
   $('#btnPlay').textContent = '▶';
   $('#btnPlay').setAttribute('aria-label', 'הקראה');
   try{ speechSynthesis.cancel(); }catch(e){}
+  gStop(); markReading(null);
   clearHit();
 }
 function go(n){
   if(n < 0 || n >= SENTS) return;
   SENT = n; markSentence(); clearHit();
-  if(speaking){ try{ speechSynthesis.cancel(); }catch(e){} speakSentence(SENT); }
+  if(speaking){ try{ speechSynthesis.cancel(); }catch(e){} gStop(); speakSentence(SENT); }
+  else markReading(null);
   syncNav();
 }
 function syncNav(){
@@ -542,6 +692,9 @@ function applyPrefs(){
   document.documentElement.classList.toggle('light', !!P.light);
   $('#btnTheme').textContent = P.light ? 'מצב כהה' : 'מצב בהיר';
   $('#screenRead').classList.toggle('focusing', !!P.focus);
+  VOICE = P.voice || 'browser';
+  mark('#segVoice', VOICE);
+  syncVoiceUi();
   mark('#segNikud', String(P.nikud));
   mark('#segSize',  String(P.size));
   mark('#segSpace', String(P.space));
@@ -610,6 +763,12 @@ $('#text').addEventListener('click', function(e){
   if(!w) return;
   stop();
   hit(i);
+  if(VOICE !== 'browser'){
+    gGet(w.plain.trim()).then(function(url){
+      gStop(); gAudio = new Audio(url); gAudio.play().catch(function(){});
+    }).catch(function(){});
+    return;
+  }
   if(!('speechSynthesis' in window)) return;
   var u = new SpeechSynthesisUtterance(w.plain);
   u.lang = 'he-IL';
@@ -648,6 +807,34 @@ segment('#segRate', function(b){
   if(speaking){ try{ speechSynthesis.cancel(); }catch(e){} speakSentence(SENT); }
 });
 
+/* מציג/מסתיר את שדה המפתח ומסביר מה כל בחירה נותנת */
+function syncVoiceUi(){
+  var natural = VOICE !== 'browser';
+  $('#keyRow').style.display = natural ? 'flex' : 'none';
+  var note = $('#vnote');
+  if(!natural){
+    note.textContent = 'קול המחשב. הוא היחיד שמאפשר הדגשה של כל מילה בנפרד בזמן ההקראה.';
+  }else if(!GKEY){
+    note.textContent = 'קול טבעי דורש מפתח Gemini. בלעדיו נשתמש בקול המחשב.';
+  }else{
+    note.textContent = 'קול טבעי. ההדגשה כאן היא של המשפט כולו — גוגל לא מדווח מתי כל מילה נאמרת.';
+  }
+}
+segment('#segVoice', function(b){
+  VOICE = b.getAttribute('data-v');
+  P.voice = VOICE;
+  gStop(); markReading(null);
+  if(VOICE !== 'browser' && !GKEY){ $('#gkey').focus(); }
+  syncVoiceUi();
+  if(speaking){ try{ speechSynthesis.cancel(); }catch(e){} speakSentence(SENT); }
+});
+$('#btnKey').addEventListener('click', function(){
+  saveKey($('#gkey').value);
+  $('#gkey').value = '';
+  syncVoiceUi();
+  $('#vnote').textContent = GKEY ? 'המפתח נשמר במכשיר הזה.' : 'המפתח נמחק.';
+});
+
 function toggleTools(){
   var open = $('#tools').classList.toggle('open');
   $('#toolsLabel').textContent = open ? '▼ סגירה' : '▲ תצוגה';
@@ -678,6 +865,7 @@ document.addEventListener('keydown', function(e){
 window.addEventListener('beforeunload', function(){ try{ speechSynthesis.cancel(); }catch(e){} });
 document.addEventListener('visibilitychange', function(){ if(document.hidden) stop(); });
 
+loadKey();
 loadPrefs();
 </script>
 </body>
