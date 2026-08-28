@@ -22,9 +22,14 @@
   --ink:#e8edf4;         /* לבן שבור, לא לבן מלא */
   --ink-soft:#9aa8b8;
   --ink-faint:#8593a3;
-  --accent:#5aa9e6;      /* כחול רגוע — צבע ההדגשה היחיד */
+  --accent:#5aa9e6;      /* כחול רגוע — צבע הממשק */
+  /* שלושה ערוצי צבע בטקסט עצמו, כל אחד עונה על שאלה אחרת:
+     ״איפה אני?״ — המשפט. ״מה נאמר עכשיו?״ — המילה. ״מה כבר עבר?״ */
   --hit:#f5c451;         /* המילה שנקראת ברגע זה */
   --hit-ink:#1a1300;
+  --track:#5aa9e6;       /* המשפט שנקרא עכשיו */
+  --done:#5fbf8a;        /* מה שכבר נקרא */
+  --alert:#e8737f;       /* תקלה */
   --font:"Assistant",Tahoma,Arial,sans-serif;
   --size:1.5rem;         /* ארבעת אלה נשלטים ממגירת התצוגה */
   --lh:2.1;
@@ -35,6 +40,7 @@ html.light{
   --bg:#f7f8fa;--panel:#ffffff;--line:#d8dfe7;--ink:#151d26;
   --ink-soft:#4d5a68;--ink-faint:#5b6774;--accent:#1662a4;
   --hit:#ffd24d;--hit-ink:#241a00;
+  --track:#1662a4;--done:#1d7a4f;--alert:#a52334;
 }
 *{box-sizing:border-box;margin:0}
 html{-webkit-text-size-adjust:100%}
@@ -82,7 +88,8 @@ html.light .msg.warn{background:#fdf3dd;border-color:#e0c88a;color:#6b5109}
 .crumb{display:flex;align-items:center;gap:12px;color:var(--ink-faint);
   font-size:.85rem;margin-bottom:18px;flex-wrap:wrap}
 .pbar{flex:1;min-width:110px;height:4px;background:var(--line);border-radius:99px;overflow:hidden}
-.pbar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.pbar i{display:block;height:100%;width:0;transition:width .2s;
+  background:linear-gradient(90deg,var(--done),var(--track))}
 
 #text{font-size:var(--size);line-height:var(--lh);letter-spacing:var(--ls);
   word-spacing:var(--ws);white-space:pre-wrap;overflow-wrap:break-word}
@@ -95,10 +102,13 @@ html.light .msg.warn{background:#fdf3dd;border-color:#e0c88a;color:#6b5109}
 .focusing .s{opacity:.2}
 .focusing .s.cur{opacity:1}
 
-/* משפט שנקרא כרגע בקול טבעי. שם אין דיווח על מילים בודדות,
-   אז מדגישים את המשפט כולו במקום את המילה. */
-.s.reading{background:rgba(245,196,81,.16);border-radius:6px;box-shadow:0 0 0 3px rgba(245,196,81,.16)}
-html.light .s.reading{background:rgba(255,210,77,.32);box-shadow:0 0 0 3px rgba(255,210,77,.32)}
+/* המשפט שנקרא עכשיו. מסומן תמיד — גם כשיש הדגשת מילה — כי
+   לאבד את השורה באמצע משפט זה בדיוק מה שקורה למי שמתקשה לעקוב. */
+.s.reading{background:rgba(90,169,230,.15);border-radius:6px;box-shadow:0 0 0 3px rgba(90,169,230,.15)}
+html.light .s.reading{background:rgba(22,98,164,.11);box-shadow:0 0 0 3px rgba(22,98,164,.11)}
+/* מה שכבר נקרא נסוג מעט — רק בזמן הקראה, כדי שבעצירה
+   הטקסט יחזור להיראות אחיד. */
+.speaking .s.done{opacity:.5}
 
 .keyrow{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
 .keyrow input{flex:1 1 210px;min-width:0;background:var(--bg);border:1px solid var(--line);
@@ -113,6 +123,10 @@ html.light .s.reading{background:rgba(255,210,77,.32);box-shadow:0 0 0 3px rgba(
   background:#33290f;border:1px solid #6b5624;color:#f0d79a;font-size:.93rem;line-height:1.55}
 html.light .vbar{background:#fdf3dd;border-color:#e0c88a;color:#6b5109}
 .vbar .btn{padding:7px 13px;font-size:.88rem}
+.vbar.ok{background:#13301f;border-color:#2c6b46;color:#a9e7c2}
+.vbar.bad{background:#3a1f22;border-color:#6b3239;color:#f3c2c7}
+html.light .vbar.ok{background:#e7f6ed;border-color:#a6d6ba;color:#155f3a}
+html.light .vbar.bad{background:#fdeaec;border-color:#e8aeb4;color:#8a2530}
 
 /* ---------- סרגל ההקראה ---------- */
 .play{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);z-index:25;
@@ -124,7 +138,11 @@ html.light .play{box-shadow:0 10px 30px rgba(20,35,55,.16)}
   font-size:1.05rem;color:var(--ink)}
 .play button:hover:not(:disabled){background:var(--line)}
 .play button:disabled{opacity:.3}
-.play button.main{background:var(--accent);color:#0b1017;width:60px;font-size:1.15rem}
+.play button.main{background:var(--accent);color:#0b1017;width:60px;font-size:1.15rem;transition:background .2s}
+.play button.main.on{background:var(--done)}                     /* מקריא */
+.play button.main.load{background:var(--hit);color:var(--hit-ink);animation:wait 1.1s ease-in-out infinite}
+@keyframes wait{0%,100%{opacity:1}50%{opacity:.55}}
+@media (prefers-reduced-motion:reduce){.play button.main.load{animation:none}}
 
 /* ---------- מגירת התצוגה ---------- */
 .tools{position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--panel);
@@ -420,7 +438,9 @@ function draw(){
 function markSentence(){
   var all = document.querySelectorAll('#text .s');
   for(var i=0;i<all.length;i++){
-    all[i].classList.toggle('cur', Number(all[i].getAttribute('data-s')) === SENT);
+    var n = Number(all[i].getAttribute('data-s'));
+    all[i].classList.toggle('cur', n === SENT);
+    all[i].classList.toggle('done', n < SENT);
   }
   $('#pos').textContent = 'משפט ' + (SENT + 1) + ' מתוך ' + SENTS;
   $('#pfill').style.width = Math.round((SENT + 1) / SENTS * 100) + '%';
@@ -589,9 +609,11 @@ function stopSync(){ if(syncTimer){ clearInterval(syncTimer); syncTimer = null; 
 
 /* מציגה הודעה על הקול במסך הקריאה עצמו.
    withKeyButton — מוסיפה כפתור שפותח ישר את שדה המפתח. */
-function voiceBar(text, withKeyButton){
+function voiceBar(text, withKeyButton, kind){
   var b = document.querySelector('#vbar');
+  b.classList.remove('ok','bad');
   if(!text){ b.classList.add('hidden'); b.innerHTML = ''; return; }
+  if(kind === 'ok' || kind === 'bad') b.classList.add(kind);
   b.innerHTML = '<span style="flex:1">' + text + '</span>';
   if(withKeyButton){
     var btn = document.createElement('button');
@@ -745,7 +767,9 @@ function speakSentence(n){
       }
     }, 1500);
   }
-  if(boundaryOK === false) markReading(n);
+  /* קודם סימנו את המשפט רק כשלא היה דיווח על מילים. עכשיו תמיד:
+     המשפט אומר ״איפה אני״, המילה אומרת ״מה נאמר עכשיו״. */
+  markReading(n);
 
   speechSynthesis.speak(u);
 }
@@ -759,6 +783,7 @@ function speakGemini(n){
     return;
   }
   clearHit(); markReading(n);
+  playState('loading');
   gGet(text).then(function(url){
     if(!speaking || SENT !== n) return;
     gStop();
@@ -776,7 +801,10 @@ function speakGemini(n){
       if(SENT + 1 < SENTS){ SENT++; markSentence(); speakGemini(SENT); } else stop();
     };
     gAudio.onerror = function(){ voiceFailed('הניגון נכשל'); };
-    voiceBar('');   /* הקול הטבעי עובד — אין מה להודיע */
+    /* אומרים איזה קול נשמע ברגע זה. ״למה זה לא הקול שביקשתי״
+       היא שאלה שחוזרת, ועדיף לענות עליה לפני שהיא נשאלת. */
+    voiceBar('קול טבעי · ' + geminiName(), false, 'ok');
+    playState('playing');
     gAudio.play().catch(function(){ voiceFailed('הדפדפן חסם את הניגון'); });
     /* הורדה מוקדמת של המשפט הבא */
     if(SENT + 1 < SENTS){
@@ -794,16 +822,27 @@ function voiceFailed(why){
   $('#vnote').textContent = 'הקול הטבעי לא עבד (' + why + '). חזרנו לקול המחשב.';
   voiceBar(noKey
     ? 'לא נמצא מפתח Gemini, אז ההקראה בקול המחשב.'
-    : 'הקול הטבעי לא עבד (' + esc(why) + '), אז ההקראה בקול המחשב.', noKey);
+    : 'הקול הטבעי לא עבד (' + esc(why) + '), אז ההקראה בקול המחשב.', noKey, 'bad');
   markReading(null);
+  playState(speaking ? 'playing' : 'idle');
   if(speaking) speakSentence(SENT);
 }
 
+/* הכפתור מדווח על מצב: כחול ממתין, צהוב מהבהב מכין קול טבעי,
+   ירוק מקריא. עם קול טבעי יש השהיה עד שהשמע מגיע, ובלי סימון
+   נראה כאילו הלחיצה לא נקלטה. */
+function playState(st){
+  var b = $('#btnPlay');
+  b.classList.toggle('on', st === 'playing');
+  b.classList.toggle('load', st === 'loading');
+  $('#screenRead').classList.toggle('speaking', st !== 'idle');
+}
 function play(){
   if(VOICE === 'browser' && !('speechSynthesis' in window)) return;
   speaking = true;
   $('#btnPlay').textContent = '❚❚';
   $('#btnPlay').setAttribute('aria-label', 'עצירה');
+  playState(isGemini() ? 'loading' : 'playing');
   try{ speechSynthesis.cancel(); }catch(e){}
   gStop();
   speakSentence(SENT);
@@ -813,6 +852,7 @@ function stop(){
   if(boundaryTimer){ clearTimeout(boundaryTimer); boundaryTimer = null; }   /* אחרת הטיימר יורה אחרי שכבר עצרנו */
   $('#btnPlay').textContent = '▶';
   $('#btnPlay').setAttribute('aria-label', 'הקראה');
+  playState('idle');
   try{ speechSynthesis.cancel(); }catch(e){}
   gStop(); markReading(null);
   clearHit();
