@@ -64,6 +64,9 @@ html.hi-contrast .btn{border:2px solid #000}
 .fl{position:absolute;font-family:var(--font-display);font-weight:700;color:var(--ink);opacity:.06;user-select:none;animation:floaty var(--d,16s) ease-in-out var(--dl,0s) infinite alternate}
 @keyframes floaty{from{transform:translateY(0) rotate(var(--r,0deg))}to{transform:translateY(-22px) rotate(calc(var(--r,0deg) + 7deg))}}
 #app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+/* בלי זה כרום מותח כל מסך לרוחב המינימלי של התוכן שלו,
+   ואז כל העמוד גולש הצידה בטלפון. */
+#app>*{min-width:0;width:100%}
 /* header */
 header{background:color-mix(in srgb,var(--paper) 85%,transparent);backdrop-filter:blur(6px);border-bottom:3px solid rgba(23,51,60,.08);position:sticky;top:0;z-index:30}
 .hbar{display:flex;align-items:center;gap:14px;padding:12px 0;flex-wrap:wrap}
@@ -181,11 +184,27 @@ input[type=range]{width:100%;accent-color:var(--teal)}
 .pod{display:flex;align-items:flex-end;justify-content:center;gap:14px;margin-top:26px}
 .pcol{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--card);border:3px solid var(--ink);border-radius:24px;padding:18px 14px 14px;box-shadow:0 9px 0 rgba(23,51,60,.12);width:130px}
 .pcol.p1{transform:translateY(-16px);background:var(--amber-soft)}
+/* בטלפון שלוש עמודות של 130px רחבות מהמסך — מצמצמים אותן
+   ומקטינים איתן את החיה, במקום לדחוף את העמוד הצידה. */
+@media(max-width:520px){
+  .pod{gap:8px}
+  .pcol{width:auto;flex:1 1 0;min-width:0;padding:14px 8px 10px}
+  .pcol>svg{width:100%;height:auto;max-width:64px}
+  .pcol b{font-size:.95rem;overflow-wrap:anywhere}
+}
 .tbl{width:100%;border-collapse:collapse;margin-top:22px}
 .tbl th{font-family:var(--font-display);font-size:.85rem;color:var(--ink-faint);text-align:start;padding:10px 12px;border-bottom:3px solid rgba(23,51,60,.12)}
 .tbl td{padding:12px;border-bottom:2px solid rgba(23,51,60,.07);font-weight:500}
 .tbl tr.me td{background:var(--teal-soft);font-weight:700}
 .tbl tr.me td:first-child{border-inline-start:5px solid var(--teal)}
+/* בטלפון צר ארבע העמודות לא נכנסות — מצמצמים ריווח כדי
+   שלא יצטרכו לגלול את הטבלה הצידה. */
+@media(max-width:520px){
+  .tbl th,.tbl td{padding:9px 6px}
+  .tbl th{font-size:.78rem}
+  .tbl td{font-size:.9rem}
+  .tbl td svg{width:26px;height:26px}
+}
 /* progress */
 .tile{background:var(--card);border:3px solid var(--ink);border-radius:22px;padding:16px;text-align:center;box-shadow:0 7px 0 rgba(23,51,60,.12)}
 .tile b{display:block;font-family:var(--font-display);font-size:1.9rem;margin-top:8px}
@@ -196,7 +215,16 @@ input[type=range]{width:100%;accent-color:var(--teal)}
 .wkd.on{background:var(--teal);color:#fff;border-color:var(--teal-deep);box-shadow:0 4px 0 var(--teal-deep)}
 .wkd.td{background:var(--amber-soft);color:var(--amber-deep);border-color:var(--amber)}
 .cols{display:grid;gap:18px}
-@media(min-width:860px){.cols{grid-template-columns:1fr 1fr}.cols3{grid-template-columns:repeat(3,1fr)}.cols4{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:860px){.cols{grid-template-columns:1fr 1fr}.cols3{grid-template-columns:repeat(3,1fr)}.cols4{grid-template-columns:repeat(4,1fr)}.cols.ob-hero{grid-template-columns:1.05fr 1fr}.cols.pr-cols{grid-template-columns:1.6fr 1fr}}
+/* עמודות גריד לא נותנות לילדים שלהן להצטמצם כברירת מחדל,
+   וזה מה שדוחף את העמוד מעבר לרוחב המסך בטלפון. */
+.cols>*{min-width:0}
+/* כותרת עמוד: אייקון + כותרת. בטלפון צר הכותרת חייבת להתכווץ,
+   אחרת היא לבדה רחבה מהמסך וגוררת איתה את כל העמוד. */
+.phead{display:flex;align-items:center;gap:16px}
+.phead>span:last-child{min-width:0}
+.phead h1{font-size:clamp(1.55rem,7.5vw,2.4rem);overflow-wrap:anywhere}
+.phead p{overflow-wrap:anywhere}
 .cols4{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .hbar2{display:flex;align-items:flex-end;gap:8px;height:130px;direction:ltr}
 .hbar2 .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;height:100%}
@@ -221,6 +249,13 @@ footer{border-top:3px solid rgba(23,51,60,.08);background:color-mix(in srgb,var(
 .oblang{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:99px;border:2px solid rgba(23,51,60,.12);background:var(--card);font-family:var(--font-display);font-weight:600;font-size:.95rem;color:var(--ink-soft);transition:all .15s}
 .oblang:hover{border-color:var(--teal);color:var(--ink)}
 .oblang.on{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 5px 14px rgba(14,156,141,.3)}
+/* מסך הפתיחה בטלפון: העמודות חייבות להיות מסוגלות להצטמצם,
+   אחרת שלוש חיות ברוחב קבוע דוחפות את כל העמוד מעבר לרוחב המסך. */
+.wrap.rise,.wrap.rise>div,.cols.ob-hero,.cols.ob-hero>*{min-width:0}
+.ob-pets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.ob-pets .pick{min-width:0;justify-content:center}
+.ob-pets .pick>span{display:block;width:100%}
+.ob-pets svg{width:100%;height:auto;max-width:104px;margin:0 auto;display:block}
 
 /* ===== מצב "למידה איטית" — עיצוב ===== */
 .sm-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px;border-radius:18px;font-family:var(--font-display);font-weight:600;font-size:1.05rem;color:#fff;background:linear-gradient(135deg,var(--teal),var(--sky-deep));box-shadow:0 6px 16px rgba(14,156,141,.3);transition:transform .15s}
@@ -1157,7 +1192,7 @@ function onboarding(){
   /* בורר שפה — כדי שאפשר יהיה להחליף שפה כבר במסך הפתיחה */
   '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'+Object.keys(LANGS).map(function(l){
     return '<button class="oblang'+(state.settings.lang===l?" on":"")+'" data-a="lang" data-l="'+l+'"><span style="font-size:1.25rem">'+LANGS[l].flag+'</span>'+esc(LANGS[l].label)+'</button>';
-  }).join("")+'</div>'+'<div class="cols" style="grid-template-columns:1.05fr 1fr;align-items:center">'+
+  }).join("")+'</div>'+'<div class="cols ob-hero" style="align-items:center">'+
   '<div>'+
     '<span class="fd" style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--paper);font-weight:500;font-size:.85rem;padding:7px 16px;border-radius:99px;transform:rotate(-1deg)">'+ic("sparkle",15)+' '+esc(t.obBadge)+'</span>'+
     '<h1 class="fd" style="font-weight:700;font-size:clamp(2.6rem,6vw,3.9rem);line-height:1.08;margin-top:22px">'+esc(t.obTitle1)+'<br>'+esc(t.obTitle2)+' <span style="position:relative;display:inline-block">'+esc(t.obTitle3)+'<span style="position:absolute;left:0;right:0;bottom:4px;height:15px;background:var(--amber);z-index:-1;transform:rotate(-1deg);border-radius:4px"></span></span></h1>'+
@@ -1170,7 +1205,7 @@ function onboarding(){
   '</div>'+
   '<div class="card" style="padding:30px;transform:rotate(-1.2deg)">'+
     '<p class="fd" style="font-weight:600;font-size:1.4rem"><span style="display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;margin-inline-end:10px">1</span>'+esc(t.step1)+'</p>'+
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px">'+
+    '<div class="ob-pets">'+
       pets.map(function(k){
         var on=sel===k;
         return '<button class="pick'+(on?" on":"")+'" style="flex-direction:column;padding:12px 8px 8px" data-a="selpet" data-p="'+k+'">'+
@@ -1455,7 +1490,7 @@ function practice(){
   /* daily banner */
   if(isDaily)h+='<div class="rise" style="display:flex;align-items:center;gap:12px;margin-top:14px;background:var(--amber-soft);border:2px solid rgba(255,197,49,.55);border-radius:18px;padding:12px 18px">'+ic("star",22)+'<span><b class="fd" style="color:var(--amber-deep)">'+esc(t.dailyTag)+'</b><br><span style="font-size:.78rem;color:rgba(217,154,0,.85)">'+esc(t.dailyDesc)+'</span></span></div>';
   /* main grid */
-  h+='<div class="cols" style="margin-top:18px;grid-template-columns:1.6fr 1fr;padding-bottom:60px"><div class="card" style="padding:26px">';
+  h+='<div class="cols pr-cols" style="margin-top:18px;padding-bottom:60px"><div class="card" style="padding:26px">';
   h+='<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><span class="fd" style="font-weight:600;color:var(--teal-deep);background:var(--teal-soft);border:1px solid rgba(14,156,141,.25);border-radius:99px;padding:5px 16px;font-size:.88rem">'+esc({add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[q.kind])+' · '+esc(names[al-1])+'</span><button class="chip" data-a="listen" style="color:var(--sky-deep);background:var(--sky-soft);border-color:rgba(88,183,224,.4)">'+ic("speaker",16)+' '+esc(t.listen)+'</button></div>';
   /* שורה 1: המשפט, בכיוון השפה. שורה 2: התרגיל לבדו, תמיד משמאל לימין. */
   h+='<p class="qask">'+esc(t.ask)+'</p>';
@@ -1500,7 +1535,7 @@ function practice(){
   h+='</div></div>';
   /* break overlay */
   if(P.brk)h+='<div class="overlay" data-a="closebrk"><div class="card rise" style="padding:34px;text-align:center;max-width:380px" onclick="event.stopPropagation()"><h2 class="fd" style="font-size:1.6rem">'+esc(t.breatheTitle)+'</h2><div class="brc" style="margin:22px auto" id="brc">'+esc(t.breatheIn)+'</div><button class="btn btn-teal" data-a="closebrk" style="padding:13px 26px;font-size:1.05rem">'+esc(t.breatheClose)+'</button></div></div>';
-  return '<div class="wrap">'+h+'</div>';
+  return '<div>'+h+'</div>';
 }
 /* בוחרת כותרת, משפט וכוכבים לפי התוצאה בפועל.
    מחושב באחוזים ולא במספרים, כי סבב רגיל הוא 8 שאלות
@@ -1566,7 +1601,7 @@ function progressView(){
   var strongest=withD.length?withD.slice().sort(function(a,b){return b.ok/b.total-a.ok/a.total})[0]:null;
   var weakest=withD.length?withD.slice().sort(function(a,b){return a.ok/a.total-b.ok/b.total})[0]:null;
   var h='<div class="wrap rise" style="padding-top:34px;padding-bottom:60px;max-width:980px">'+
-  '<div style="display:flex;align-items:center;gap:16px"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(-3deg)">'+ic("chart",30)+'</span><span><h1 class="fd" style="font-size:2.4rem">'+esc(t.progTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.progSub)+'</p></span></div>'+
+  '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(-3deg)">'+ic("chart",30)+'</span><span><h1 class="fd">'+esc(t.progTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.progSub)+'</p></span></div>'+
   '<div class="cols4" style="margin-top:26px">'+
   [["check",s.correct,t.progTotal,"var(--teal-soft)","var(--teal-deep)"],["star",acc+"%",t.progAcc,"var(--amber-soft)","var(--amber-deep)"],["flame",s.bestStreak,t.progBest,"var(--coral-soft)","var(--coral-deep)"],["trophy",s.sessions,t.progSessions,"var(--sky-soft)","var(--sky-deep)"]].map(function(x){
     return '<div class="tile"><span class="ic" style="background:'+x[3]+';color:'+x[4]+'">'+ic(x[0],20)+'</span><b>'+x[1]+'</b><span>'+esc(x[2])+'</span></div>';
@@ -1617,7 +1652,7 @@ function recordsView(){
   var all=RIVALS.map(function(r){return{name:r.name,pet:r.pet,ok:r.ok,acc:r.acc}}).concat([me]).sort(function(a,b){return b.ok-a.ok});
   var myRank=all.indexOf(me)+1;
   var h='<div class="wrap rise" style="padding-top:34px;padding-bottom:60px;max-width:860px">'+
-  '<div style="display:flex;align-items:center;gap:16px"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(3deg)">'+ic("trophy",30)+'</span><span><h1 class="fd" style="font-size:2.4rem">'+esc(t.recTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.recSub)+'</p></span></div>'+
+  '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(3deg)">'+ic("trophy",30)+'</span><span><h1 class="fd">'+esc(t.recTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.recSub)+'</p></span></div>'+
   '<div class="pod">';
   [1,0,2].forEach(function(idx,place){
     var r=all[idx];if(!r)return;
@@ -1644,7 +1679,7 @@ function tog(key,label,desc,badge){
 function settingsView(){
   var t=T(),s=state.settings,lang=s.lang||"he",pl={he:"he",en:"en",ru:"ru",ar:"ar"}[lang];
   var h='<div class="wrap rise" style="padding-top:34px;padding-bottom:60px;max-width:780px">'+
-  '<div style="display:flex;align-items:center;gap:16px"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--teal);color:#fff;box-shadow:0 6px 0 var(--teal-deep);transform:rotate(3deg)">'+ic("gear",30)+'</span><span><h1 class="fd" style="font-size:2.4rem">'+esc(t.setTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.setSub)+'</p></span></div>';
+  '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--teal);color:#fff;box-shadow:0 6px 0 var(--teal-deep);transform:rotate(3deg)">'+ic("gear",30)+'</span><span><h1 class="fd">'+esc(t.setTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.setSub)+'</p></span></div>';
   /* learning style */
   h+='<div class="card" style="padding:24px;margin-top:26px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.lsTitle)+'</h2><div style="margin-top:14px">'+
   tog("calmMode",t.lsCalm,t.lsCalmD,t.lsCalmBadge)+tog("soundFx",t.sfxTitle,t.sfxDesc)+
