@@ -426,7 +426,7 @@ moreVoices:"עוד {n} קולות מהמכשיר",noHeVoices:"לא נמצאו ק
 rate:"מהירות הקראה",pitch:"גובה הצליל",slow:"לאט",fast:"מהר",low:"נמוך",high:"גבוה",sample:"השמע דוגמה",
 gTitle:"קולות Gemini — הכי טבעי שיש",
 gDesc:"הדור החדש של מנועי הקול של גוגל: קול שמבין את הטקסט ומקריא באינטונציה אנושית אמיתית. תומך בעברית, אנגלית, רוסית וערבית.",
-gFemale:"נשי רך — Kore",gMale:"גברי — Puck",gOn:"פעיל",
+gFemale:"קולות נשיים",gMale:"קולות גבריים",gOn:"פעיל",
 gKeyLabel:"מפתח Google API",gKeyPh:"הדביקו כאן את המפתח (מתחיל ב־AIza...)",
 gSave:"שמירה ובדיקה",gChecking:"בודקים מול גוגל...",
 gOk:"המפתח עובד! הוא נשמר במכשיר — לא צריך להכניס אותו שוב.",
@@ -524,7 +524,7 @@ moreVoices:"{n} more device voices",noHeVoices:"No Hebrew voices found — open 
 rate:"Speaking rate",pitch:"Pitch",slow:"Slow",fast:"Fast",low:"Low",high:"High",sample:"Play a sample",
 gTitle:"Gemini voices — the most natural",
 gDesc:"Google's newest voice engine: a voice that understands the text and reads with real human intonation. Supports Hebrew, English, Russian and Arabic.",
-gFemale:"Soft female — Kore",gMale:"Male — Puck",gOn:"Active",
+gFemale:"Female voices",gMale:"Male voices",gOn:"Active",
 gKeyLabel:"Google API key",gKeyPh:"Paste your key here (starts with AIza...)",
 gSave:"Save & test",gChecking:"Checking with Google...",
 gOk:"The key works! It's saved on this device — no need to enter it again.",
@@ -622,7 +622,7 @@ moreVoices:"Ещё {n} голосов",noHeVoices:"Русские голоса �
 rate:"Скорость речи",pitch:"Высота",slow:"Медленно",fast:"Быстро",low:"Низко",high:"Высоко",sample:"Послушать пример",
 gTitle:"Голоса Gemini — самые естественные",
 gDesc:"Новейший голосовой движок Google: голос понимает текст и говорит с настоящей интонацией.",
-gFemale:"Мягкий женский — Kore",gMale:"Мужской — Puck",gOn:"Активно",
+gFemale:"Женские голоса",gMale:"Мужские голоса",gOn:"Активно",
 gKeyLabel:"Ключ Google API",gKeyPh:"Вставь ключ сюда (начинается с AIza...)",
 gSave:"Сохранить и проверить",gChecking:"Проверяем...",
 gOk:"Ключ работает! Он сохранён на устройстве — вводить снова не нужно.",
@@ -720,7 +720,7 @@ moreVoices:"{n} أصوات أخرى",noHeVoices:"لم تُعثر على أصوا
 rate:"سرعة الكلام",pitch:"طبقة الصوت",slow:"بطيء",fast:"سريع",low:"منخفض",high:"عالٍ",sample:"شغّل عينة",
 gTitle:"أصوات Gemini — الأكثر طبيعية",
 gDesc:"أحدث محرك أصوات من غوغل: صوت يفهم النص ويتحدث بنبرة إنسانية حقيقية.",
-gFemale:"نسائي ناعم — Kore",gMale:"رجالي — Puck",gOn:"نشط",
+gFemale:"أصوات نسائية",gMale:"أصوات رجالية",gOn:"نشط",
 gKeyLabel:"مفتاح Google API",gKeyPh:"الصق المفتاح هنا (يبدأ بـ AIza...)",
 gSave:"حفظ وفحص",gChecking:"نفحص لدى غوغل...",
 gOk:"المفتاح يعمل! حُفظ على الجهاز — لا حاجة لإدخاله مجددًا.",
@@ -805,7 +805,7 @@ function defaults(){
     /* מעקב טעויות חוזרות. r = תוצאות השאלות האחרונות בכל פעולה (1 = נכון, 0 = טעות).
        near = טעויות שהיו קרובות לתשובה, far = טעויות רחוקות. */
     weak:{add:{r:[],near:0,far:0},sub:{r:[],near:0,far:0},mul:{r:[],near:0,far:0},div:{r:[],near:0,far:0}},
-    settings:{tts:true,preset:"calm-female",voiceURI:null,rate:0.95,pitch:1.12,largeText:false,textSize:1,clearFont:false,contrast:false,spaced:false,reduceMotion:false,calmMode:true,soundFx:true,googleKey:"",googleVoice:"female",lang:null,theme:"ocean"}
+    settings:{tts:true,preset:"calm-female",voiceURI:null,rate:0.95,pitch:1.12,largeText:false,textSize:1,clearFont:false,contrast:false,spaced:false,reduceMotion:false,calmMode:true,soundFx:true,googleKey:"",googleVoice:"Kore",lang:null,theme:"ocean"}
   };
 }
 function load(){
@@ -832,6 +832,10 @@ function load(){
     })();
     var st=p.settings||{};
     ["tts","preset","voiceURI","rate","pitch","largeText","textSize","clearFont","contrast","spaced","reduceMotion","calmMode","soundFx","googleKey","googleVoice","lang","theme"].forEach(function(k){if(st[k]!==undefined)d.settings[k]=st[k]});
+    /* עד כאן googleVoice החזיק "female"/"male". עכשיו הוא מזהה קול. */
+    if(d.settings.googleVoice==="female")d.settings.googleVoice="Kore";
+    else if(d.settings.googleVoice==="male")d.settings.googleVoice="Puck";
+    else if(!GEM_VOICES.some(function(v){return v.id===d.settings.googleVoice}))d.settings.googleVoice="Kore";
     /* מי שהיה לו "אותיות גדולות" בגרסה הישנה מקבל אוטומטית גודל 2 */
     if(st.textSize===undefined&&st.largeText)d.settings.textSize=2;
     if([1,2,3].indexOf(d.settings.textSize)<0)d.settings.textSize=1;
@@ -946,10 +950,42 @@ function toSpoken(text,lang){
 
 /* ================= TTS: Web Speech + Gemini ================= */
 var gCache={},gAudio=null;
-var GEM={he:{f:["Kore","Puck"],pre:{Kore:"היי! קוראים לי קורֵה, ואני אקריא לכם את התרגילים. בואו נתחיל!",Puck:"היי! אני פָּאק, ואני אקריא לכם. יאללה, מתחילים!"}},
-  en:{f:["Kore","Puck"],pre:{Kore:"Hi! I'm Kore and I'll read the exercises for you. Let's begin!",Puck:"Hi! I'm Puck and I'll do the reading. Let's go!"}},
-  ru:{f:["Kore","Puck"],pre:{Kore:"Привет! Я Коре, и я буду читать задания. Начнём!",Puck:"Привет! Я Пак, читаю задания. Поехали!"}},
-  ar:{f:["Kore","Puck"],pre:{Kore:"مرحبًا! أنا كوري وسأقرأ لكم التمارين. لنبدأ!",Puck:"مرحبًا! أنا باك وسأقرأ لكم. هيا نبدأ!"}}};
+/* שמונה קולות ג׳מיני, ארבעה נשיים וארבעה גבריים. קודם היו שניים בלבד
+   ולא הייתה שום דרך לבחור ביניהם — googleVoice נקרא ומעולם לא נכתב.
+   התיאור חשוב יותר מהשם: "אאודה" לא אומר לילד כלום, "חם ונעים" כן. */
+var GEM_VOICES=[
+  {id:"Kore",   g:"f",he:"קורֵה",   en:"Kore",   ru:"Коре",    ar:"كوري",
+   dhe:"רגוע וברור",  den:"Calm and clear", dru:"Спокойный и чёткий", dar:"هادئ وواضح"},
+  {id:"Aoede",  g:"f",he:"אאודֵה",  en:"Aoede",  ru:"Аэда",    ar:"آودي",
+   dhe:"חם ונעים",    den:"Warm and gentle",dru:"Тёплый и мягкий",    dar:"دافئ ولطيف"},
+  {id:"Leda",   g:"f",he:"לֵדָה",    en:"Leda",   ru:"Леда",    ar:"ليدا",
+   dhe:"צעיר וקליל",  den:"Young and light",dru:"Молодой и лёгкий",   dar:"شاب وخفيف"},
+  {id:"Autonoe",g:"f",he:"אוטונואה",en:"Autonoe",ru:"Автоноя", ar:"أوتونوي",
+   dhe:"בהיר ומדויק", den:"Bright and precise",dru:"Ясный и точный",  dar:"مشرق ودقيق"},
+  {id:"Puck",   g:"m",he:"פָּאק",    en:"Puck",   ru:"Пак",     ar:"باك",
+   dhe:"ער וזורם",    den:"Lively and flowing",dru:"Живой и плавный", dar:"حيوي وسلس"},
+  {id:"Charon", g:"m",he:"כָארוֹן",  en:"Charon", ru:"Харон",   ar:"كارون",
+   dhe:"עמוק ושקול",  den:"Deep and steady",dru:"Глубокий и ровный",  dar:"عميق ومتزن"},
+  {id:"Orus",   g:"m",he:"אוֹרוּס",  en:"Orus",   ru:"Орус",    ar:"أوروس",
+   dhe:"יציב ונינוח", den:"Stable and relaxed",dru:"Ровный и спокойный",dar:"ثابت ومسترخٍ"},
+  {id:"Fenrir", g:"m",he:"פֶנְריר",  en:"Fenrir", ru:"Фенрир",  ar:"فنرير",
+   dhe:"נמרץ יותר",   den:"More energetic", dru:"Более энергичный",   dar:"أكثر حيوية"}
+];
+function gvOf(id){for(var i=0;i<GEM_VOICES.length;i++)if(GEM_VOICES[i].id===id)return GEM_VOICES[i];return GEM_VOICES[0]}
+function gvLabel(v,pl){return v[pl]||v.en}
+function gvDesc(v,pl){return v["d"+pl]||v.den}
+/* הקצב נשלח למודל במילים. ה-API הזה מחזיר 400 על audioConfig, ואין בו
+   שדה speakingRate — הבקשה הקודמת נדחתה תמיד ונפלה בשקט לקול המכשיר. */
+var GEM_LEAD={
+  he:{slow:"קרא לאט מאוד וברור, בעברית: ",soft:"קרא לאט וברור, בעברית: ",
+      fast:"קרא בקצב מהיר, בעברית: ",norm:"קרא בקצב טבעי, בעברית: "},
+  en:{slow:"Read very slowly and clearly, in English: ",soft:"Read slowly and clearly, in English: ",
+      fast:"Read at a brisk pace, in English: ",norm:"Read at a natural pace, in English: "},
+  ru:{slow:"Читай очень медленно и чётко, по-русски: ",soft:"Читай медленно и чётко, по-русски: ",
+      fast:"Читай в быстром темпе, по-русски: ",norm:"Читай в естественном темпе, по-русски: "},
+  ar:{slow:"اقرأ ببطء شديد وبوضوح، بالعربية: ",soft:"اقرأ ببطء وبوضوح، بالعربية: ",
+      fast:"اقرأ بوتيرة سريعة، بالعربية: ",norm:"اقرأ بوتيرة طبيعية، بالعربية: "}
+};
 function gStop(){if(gAudio){try{gAudio.pause();gAudio.src=""}catch(e){}gAudio=null}}
 function pcmToWav(b64){
   try{
@@ -968,56 +1004,97 @@ function pcmToWav(b64){
     return "data:audio/wav;base64,"+btoa(out);
   }catch(e){return null}
 }
-function gSynth(text,voiceName,langCode,rate,pitch){
-  var gp=Math.max(-20,Math.min(20,Math.round((pitch-1)*10)));
-  var body={contents:[{parts:[{text:text}]}],generationConfig:{responseModalities:["AUDIO"],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voiceName}}}},
-    audioConfig:{audioEncoding:"MP3",speakingRate:Math.max(0.25,Math.min(2,rate)),pitch:gp}};
+function gSynth(text,voiceName,rate,lang){
+  var L=GEM_LEAD[lang||"he"]||GEM_LEAD.he;
+  var lead=rate<=0.75?L.slow:rate<=0.9?L.soft:rate>=1.15?L.fast:L.norm;
+  var body={contents:[{parts:[{text:lead+text}]}],
+    generationConfig:{responseModalities:["AUDIO"],
+      speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voiceName}}}}};
   return fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key="+encodeURIComponent(state.settings.googleKey),
     {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
-  .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
+  .then(function(r){
+    if(r.ok)return r.json();
+    /* גוגל מסביר בגוף התשובה למה סירב. בלי זה אי אפשר להבחין בין מפתח
+       שגוי, מודל חסום, ובקשה לא תקינה — וכולם נראים כמו "לא עובד". */
+    return r.text().then(function(tx){
+      var msg="";
+      try{var j=JSON.parse(tx);msg=(j.error&&j.error.message)||""}catch(e){msg=String(tx).slice(0,140)}
+      throw new Error(r.status+(msg?" — "+msg:""));
+    });
+  })
   .then(function(d){
     var parts=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
     for(var i=0;i<parts.length;i++){
       var pd=parts[i].inlineData;
       if(pd&&pd.data){
-        if((pd.mimeType||"").indexOf("wav")>=0)return pcmToWav(pd.data)||("audio/wav;base64,"+pd.data);
-        return "audio/mp3;base64,"+pd.data;
+        var mt=pd.mimeType||"";
+        /* המודל מחזיר PCM גולמי. בלי כותרת WAV אין לדפדפן מה לנגן,
+           ובלי הקידומת data: הכתובת אינה כתובת בכלל. */
+        if(mt.indexOf("wav")>=0||mt.indexOf("pcm")>=0||mt.indexOf("L16")>=0)
+          return pcmToWav(pd.data)||("data:audio/wav;base64,"+pd.data);
+        return "data:audio/mp3;base64,"+pd.data;
       }
     }
     throw new Error("no-audio");
   });
 }
 function googleOn(){return !!(state.settings.googleKey&&String(state.settings.googleKey).trim())}
-function speakGoogle(text,rate,pitch,onFail){
-  var lang=state.settings.lang||"he",meta=GEM[lang]||GEM.he;
-  var names=state.settings.googleVoice==="male"?["Puck","Kore"]:["Kore","Puck"];
-  var pre=(meta.pre[names[0]])||text;
-  var ck=lang+"|"+names[0]+"|"+rate.toFixed(2)+"|"+pitch.toFixed(2)+"|"+text;
+function speakGoogle(text,rate,pitch,onFail,voiceId){
+  var lang=state.settings.lang||"he";
+  var first=gvOf(voiceId||state.settings.googleVoice).id;
+  /* נפילה לאחור לקול מהמגדר ההפוך תשנה את המין שהילד שומע. לכן נופלים
+     לקול אחר מאותו מגדר, ורק אם גם הוא נכשל — לקול המכשיר. */
+  var g=gvOf(first).g;
+  var alt=GEM_VOICES.filter(function(v){return v.g===g&&v.id!==first})[0];
+  var ck=lang+"|"+first+"|"+rate.toFixed(2)+"|"+text;
   function play(url){gStop();gAudio=new Audio(url);gAudio.play().catch(function(){if(onFail)onFail()})}
   if(gCache[ck]){play(gCache[ck]);return}
   var done=function(url){gCache[ck]=url;play(url)};
-  gSynth(text,names[0],LANGS[lang].tts,rate,pitch).then(done)
-    .catch(function(){return gSynth(text,names[1],LANGS[lang].tts,rate,pitch).then(done)})
+  gSynth(text,first,rate,lang).then(done)
+    .catch(function(){if(!alt)throw new Error("no-alt");return gSynth(text,alt.id,rate,lang).then(done)})
     .catch(function(){if(onFail)onFail()});
 }
+/* "google" הוא שם יצרן ולא מגדר. כשהוא נספר כנשי, "Google עברית" —
+   שהוא קול גברי בחלק מהמכשירים — נבחר דווקא כשמבקשים קול נשי.
+   השמות שלמטה הם שמות הקולות שהמערכות באמת מתקינות, לפי שפה. */
+var VOICE_F=/(female|woman|\bf\b|hila|carmit|miri|dana|zira|hazel|aria|jenny|sara|salma|hala|zariyah|amina|svetlana|dariya|irina|milena|elena|katja|ekaterina|noura|mona)/;
+var VOICE_M=/(male|\bman\b|\bm\b|daniel|david|yoni|moshe|asaf|guy|george|mark|ryan|guy|maged|hamed|shakir|dmitry|pavel|yuri|artemi|maxim|omar|tarek)/;
 function guessGender(v){
   var n=(v.name+" "+v.lang).toLowerCase();
-  if(/(female|woman|google|miri|dana|hila)/.test(n))return "female";
-  if(/(male|man|daniel|david|yoni|moshe)/.test(n))return "male";
+  if(VOICE_F.test(n))return "female";
+  if(VOICE_M.test(n))return "male";
   return "unknown";
 }
 function allVoices(){try{return speechSynthesis.getVoices()}catch(e){return[]}}
-function heVoices(){return allVoices().filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf("he")===0})}
-function pickVoice(prefer,uri){
+/* שם השפה כפי שהוא מופיע בשם הקול — גם בשפה עצמה וגם בלועזית. יש
+   מכשירים שבהם v.lang ריק והשם הוא הרמז היחיד. */
+var LANG_HINT={he:/עברית|hebrew|ivrit/i,en:/english/i,ru:/русский|russian/i,ar:/العربية|arabic/i};
+/* הקולות שמתאימים לשפה הנוכחית. קודם סוננו כאן קולות עברית בלבד, בכל
+   שפה — ילד שלמד באנגלית קיבל קול עברי שמבטא מילים אנגליות. */
+function langVoices(lang){
+  var code=(LANGS[lang]||LANGS.he).tts,base=code.split("-")[0].toLowerCase(),hint=LANG_HINT[lang];
+  return allVoices().filter(function(v){
+    var l=(v.lang||"").replace("_","-").toLowerCase();
+    if(l.split("-")[0]===base)return true;
+    return !l&&hint?hint.test(v.name||""):false;
+  });
+}
+function heVoices(){return langVoices(state.settings.lang||"he")}
+function pickVoice(prefer,uri,lang){
   var vs=allVoices();
   if(uri){var f=vs.filter(function(v){return v.voiceURI===uri})[0];if(f)return f}
-  var he=heVoices(),pool=he.length?he:vs;
+  lang=lang||state.settings.lang||"he";
+  var code=(LANGS[lang]||LANGS.he).tts.toLowerCase();
+  var pool=langVoices(lang);
+  /* אין קול בשפה הנכונה? עדיף לא לבחור כלום מאשר להקריא רוסית בקול
+     עברי. null מחזיר את הבחירה לדפדפן, שלפחות מכבד את u.lang. */
   if(!pool.length)return null;
   function score(v){
     var s=0,n=(v.name+" "+v.lang).toLowerCase();
-    if(/\b(google|natural|neural)\b/.test(n))s+=30;
-    if(/(hila|miri|dana)/.test(n))s+=26;
-    if(/wavenet|standard/.test(n))s+=18;
+    if((v.lang||"").replace("_","-").toLowerCase()===code)s+=12;
+    if(/\b(google|microsoft)\b/.test(n))s+=30;
+    if(/natural|neural|enhanced|premium|wavenet/.test(n))s+=22;
+    if(/espeak|compact|pico/.test(n))s-=40;
     var g=guessGender(v);
     if(prefer==="female")s+=g==="female"?35:g==="male"?-40:0;
     if(prefer==="male")s+=g==="male"?35:g==="female"?-40:0;
@@ -1032,9 +1109,8 @@ function speakLocal(text,preset,rate,pitch,langCode){
     speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(text);
     u.lang=langCode||"he-IL";
-    var v=pickVoice(preset.prefer,state.settings.voiceURI);
-    if(v){u.voice=v;u.lang=v.lang}
-    if(preset.prefer==="female"&&v&&guessGender(v)==="male")v=null;
+    var v=pickVoice(preset.prefer,state.settings.voiceURI,state.settings.lang||"he");
+    if(v){u.voice=v;u.lang=v.lang||langCode||"he-IL"}
     u.rate=rate;u.pitch=pitch;
     speechSynthesis.speak(u);
   }catch(e){}
@@ -1138,7 +1214,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b12 · 28.08";
+var BUILD="b13 · 28.08";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -1746,9 +1822,20 @@ function settingsView(){
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--coral-soft);color:var(--coral-deep)">'+ic("sparkle",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.gTitle)+'</h2>'+(googleOn()?'<span class="badge b-teal">'+esc(t.gOn)+' ✓</span>':"")+'</div>'+
   '<p style="color:var(--ink-soft);margin-top:10px;line-height:1.7">'+esc(t.gDesc)+'</p>'+
   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:14px">'+
-  [["female",t.gFemale,"Kore"],["male",t.gMale,"Puck"]].map(function(v){
-    var on=s.googleVoice===v[0];
-    return '<div class="pick'+(on?" on":"")+'" style="cursor:default"><span style="flex:1;text-align:start"><b class="fd" style="font-size:1.15rem;display:flex;justify-content:space-between">'+esc(v[1])+(on?ic("check",18):"")+'</b><span style="color:var(--ink-soft);font-size:.8rem">'+esc(v[2])+' · gemini-2.5-flash-preview-tts</span></span><button class="btn btn-teal" data-a="gsample" data-v="'+v[0]+'" style="padding:9px 16px;font-size:.85rem">'+ic("play",13)+' '+esc(t.sample)+'</button></div>';
+  ["f","m"].map(function(grp){
+    return '<p class="fd" style="grid-column:1/-1;font-weight:600;font-size:1rem;margin:6px 0 0">'+
+      esc(grp==="f"?t.gFemale:t.gMale)+'</p>'+
+    GEM_VOICES.filter(function(v){return v.g===grp}).map(function(v){
+      var on=s.googleVoice===v.id;
+      return '<div class="pick'+(on?" on":"")+'" data-a="gvoice" data-v="'+esc(v.id)+'" '+
+        'role="button" tabindex="0" aria-pressed="'+(on?"true":"false")+'">'+
+        '<span style="flex:1;text-align:start">'+
+        '<b class="fd" style="font-size:1.15rem;display:flex;justify-content:space-between">'+
+        esc(gvLabel(v,pl))+(on?ic("check",18):"")+'</b>'+
+        '<span style="color:var(--ink-soft);font-size:.85rem">'+esc(gvDesc(v,pl))+'</span></span>'+
+        '<button class="btn btn-teal" type="button" data-a="gsample" data-v="'+esc(v.id)+'" '+
+        'style="padding:9px 16px;font-size:.85rem">'+ic("play",13)+' '+esc(t.sample)+'</button></div>';
+    }).join("");
   }).join("")+'</div>'+
   '<label class="fd" for="gkey" style="font-weight:600;font-size:1.1rem;display:block;margin-top:20px">'+esc(t.gKeyLabel)+'</label>'+
   '<div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">'+
@@ -2012,14 +2099,18 @@ function onAction(a,el){
     var inp3=$("#gkey");state.settings.googleKey=inp3?inp3.value.trim():"";save();
     if(!state.settings.googleKey){gkMsg={ok:true,msg:t.gRemoved};render();return}
     gkMsg=null;var btn=$("#gsave");if(btn){btn.innerHTML='<span class="spin" style="display:inline-block">'+ic("refresh",16)+'</span> '+esc(t.gChecking);btn.disabled=true}
-    gSynth("בדיקה","Kore","he-IL",1,0).then(function(){gkMsg={ok:true,msg:t.gOk};render();speak(t.gSample,true)})
+    gSynth(t.gSample,gvOf(state.settings.googleVoice).id,state.settings.rate,state.settings.lang||"he")
+      .then(function(){gkMsg={ok:true,msg:t.gOk};render();speak(t.gSample,true)})
       .catch(function(){gkMsg={ok:false,msg:t.gErr};render()});
   }
+  else if(a==="gvoice"){state.settings.googleVoice=gvOf(el.getAttribute("data-v")).id;save();render()}
   else if(a==="gsample"){
-    var vv2=el.getAttribute("data-v")||"female",lang=state.settings.lang||"he";
+    /* קודם נשלח כאן טקסט של קול אחד ונוגן בקול אחר: speakGoogle התעלם
+       מהכפתור שנלחץ וסינתז תמיד בקול השמור. */
+    var vv2=gvOf(el.getAttribute("data-v")).id;
     if(!googleOn()){gkMsg={ok:false,msg:t.gNeedKey};render();return}
-    var pre=GEM[lang].pre[vv2==="male"?"Puck":"Kore"]||t.gSample;
-    speakGoogle(pre,state.settings.rate,state.settings.pitch,function(){gkMsg={ok:false,msg:t.gPlayFail};render()});
+    speakGoogle(t.gSample,state.settings.rate,state.settings.pitch,
+      function(){gkMsg={ok:false,msg:t.gPlayFail};render()},vv2);
   }
   else if(a==="askreset"){confirmReset=true;render()}
   else if(a==="noreset"){confirmReset=false;render()}
