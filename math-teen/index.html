@@ -2561,7 +2561,9 @@ function viewFormulas(){
      '<input class="field" style="flex:1;min-width:min(100%,220px)" placeholder="חיפוש נוסחה — למשל: שיפוע, פיתגורס, אחוז" value="'+esc(fq)+'" data-bind="fq" />'+
      (q?'<button class="btn btn-g" data-a="fclear">'+ic("x",16)+'</button>':"")+'</div>';
   if(!list.length)h+='<p class="sub" style="margin-top:20px">לא נמצאה נוסחה עם ״'+esc(q)+'״.</p>';
-  ["יסודות","אלגברה","גיאומטריה","נתונים"].forEach(function(g){
+  /* לפי רשימת התחומים של האפליקציה, ולא לפי רשימה קבועה —
+     אחרת דף הנוסחאות נשאר ריק ברגע ששמות התחומים משתנים. */
+  AREAS.forEach(function(g){
     var sub=list.filter(function(f){return f.g===g});
     if(!sub.length)return;
     h+='<h2 class="h2 arh '+areaCls(g)+'" style="margin-top:24px">'+g+'</h2><div class="grid g3" style="margin-top:10px">'+

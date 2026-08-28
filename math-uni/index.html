@@ -1,0 +1,3187 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד</title>
+<meta name="description" content="תרגול מתמטיקה לשנה א׳ באוניברסיטה: חדו״א, אלגברה לינארית, הסתברות ובדידה. כל שאלה עם פתרון מודרך צעד־צעד, זיהוי הטעות, דף נוסחאות והקראה בקול טבעי." />
+<meta name="theme-color" content="#0e1117" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   אקסיומה — מתמטיקה לתואר ראשון
+   אותו עיקרון של ״שלב״, בחומר של שנה א׳: חדו״א, אלגברה לינארית,
+   הסתברות ובדידה. סטודנט שמתקשה לא צריך פחות חומר — הוא צריך
+   לראות את הצעדים שבין שורה לשורה.
+   ============================================================ */
+:root{
+  --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
+  --bg:#f5f7fb; --surface:#ffffff; --surface2:#eef1f7;
+  --ink:#101828; --muted:#5b6478; --faint:#8b93a7; --line:#e0e4ee;
+  --accent:#4f46e5; --accent-ink:#ffffff; --accent-soft:#e9e8fd;
+  --cyan:#0e7490; --cyan-soft:#dcf3f8;
+  --ok:#15803d; --ok-soft:#dcfce7; --bad:#be123c; --bad-soft:#ffe4e9;
+  --warn:#b45309; --warn-soft:#fef3c7;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px -12px rgba(16,24,40,.18);
+  --r:14px;
+  /* צבע לכל תחום לימוד. זה לא קישוט — זה עוזר לזהות מיד באיזה
+     סוג חומר מדובר, וזה בדיוק מה שעוזר למי שמתקשה להתמצא. */
+  --c-base:#0d9488; --cs-base:#d2f4ef;
+  --c-alg:#5b56e0;  --cs-alg:#e6e5fe;
+  --c-geo:#b45309;  --cs-geo:#fbecd3;
+  --c-data:#be185d; --cs-data:#fbdfeb;
+}
+:root[data-theme="dark"]{
+  --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
+  --ink:#e8ecf4; --muted:#9aa4ba; --faint:#6f7a91; --line:#28313f;
+  --accent:#818cf8; --accent-ink:#0e1117; --accent-soft:#232842;
+  --cyan:#22d3ee; --cyan-soft:#132b33;
+  --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
+  --warn:#fbbf24; --warn-soft:#33260f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  --c-base:#2dd4bf; --cs-base:#0f2e2b;
+  --c-alg:#a5b4fc;  --cs-alg:#1e2140;
+  --c-geo:#fbbf24;  --cs-geo:#33270f;
+  --c-data:#f472b6; --cs-data:#33162a;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
+    --ink:#e8ecf4; --muted:#9aa4ba; --faint:#6f7a91; --line:#28313f;
+    --accent:#818cf8; --accent-ink:#0e1117; --accent-soft:#232842;
+    --cyan:#22d3ee; --cyan-soft:#132b33;
+    --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
+    --warn:#fbbf24; --warn-soft:#33260f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  --c-base:#2dd4bf; --cs-base:#0f2e2b;
+  --c-alg:#a5b4fc;  --cs-alg:#1e2140;
+  --c-geo:#fbbf24;  --cs-geo:#33270f;
+  --c-data:#f472b6; --cs-data:#33162a;
+  }
+}
+/* ניגודיות גבוהה — שחור על לבן, מסגרות מלאות, בלי גוונים רכים */
+:root.hc{
+  --bg:#ffffff; --surface:#ffffff; --surface2:#ffffff;
+  --ink:#000000; --muted:#1a1a1a; --faint:#333333; --line:#000000;
+  --accent:#00308f; --accent-ink:#ffffff; --accent-soft:#e8edf8;
+  --cyan:#004b57; --cyan-soft:#e6f2f4;
+  --ok:#0a5c2a; --ok-soft:#e6f4ea; --bad:#8c0f2c; --bad-soft:#fbe9ed;
+  --warn:#6b3d00; --warn-soft:#f7efdf; --shadow:none;
+  --c-base:#00308f; --cs-base:#e8edf8; --c-alg:#00308f; --cs-alg:#e8edf8;
+  --c-geo:#00308f;  --cs-geo:#e8edf8;  --c-data:#00308f; --cs-data:#e8edf8;
+}
+:root.hc .card,:root.hc .opt,:root.hc .btn,:root.hc .chip,:root.hc .tile{border:2px solid #000}
+:root.hc .deco{display:none}
+
+*{box-sizing:border-box;margin:0}
+html{font-size:100%}
+html.ts2{font-size:112%}
+html.ts3{font-size:126%}
+/* פונט ברור לקריאה: Tahoma ו-Verdana קיימים כמעט בכל מכשיר וכוללים עברית */
+html.clearfont{--font:Tahoma,Verdana,Arial,sans-serif}
+/* ריווח מוגדל — עוזר לקוראים עם דיסלקציה */
+html.spaced body{letter-spacing:.03em;word-spacing:.16em;line-height:1.95}
+html.rm *,html.rm *::before,html.rm *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.65;
+  -webkit-text-size-adjust:100%;overflow-x:hidden}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;text-align:inherit}
+input,select,textarea{font:inherit;color:var(--ink)}
+a{color:var(--accent)}
+::selection{background:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* ---------- שלד ---------- */
+#app{min-height:100vh;display:flex;flex-direction:column}
+/* בלי זה כרום מותח כל מסך לרוחב המינימלי של התוכן שלו והעמוד גולש בטלפון */
+#app>*{min-width:0;width:100%}
+.wrap{max-width:1120px;margin:0 auto;padding:0 clamp(12px,4vw,22px)}
+.deco{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.85;
+  background:
+    radial-gradient(760px 380px at 92% -6%,var(--cs-alg),transparent 62%),
+    radial-gradient(620px 340px at 2% 18%,var(--cs-data),transparent 58%),
+    radial-gradient(700px 380px at 10% 102%,var(--cs-base),transparent 60%),
+    radial-gradient(520px 300px at 96% 78%,var(--cs-geo),transparent 58%)}
+#app{position:relative;z-index:1}
+
+/* ---------- כותרת עליונה ---------- */
+header{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hbar{display:flex;align-items:center;gap:10px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.brand .mk{width:38px;height:38px;border-radius:11px;
+  background:linear-gradient(140deg,var(--c-alg),var(--c-data) 55%,var(--c-geo));color:#fff;
+  display:grid;place-items:center;font-weight:800;font-size:1.05rem;flex-shrink:0}
+:root.hc .brand .mk{background:var(--ink)}
+.brand b{display:block;font-size:1rem;line-height:1.15;font-weight:800}
+.brand small{display:block;color:var(--muted);font-size:.72rem;font-weight:500}
+nav{display:flex;gap:4px;margin-inline-start:auto;flex-wrap:wrap}
+.nb{display:inline-flex;align-items:center;gap:6px;border-radius:10px;padding:8px 12px;
+  font-size:.9rem;font-weight:600;color:var(--muted);border:1px solid transparent;transition:.15s}
+.nb:hover{background:var(--surface2);color:var(--ink)}
+.nb.on{background:var(--accent);color:#fff}
+:root.hc .nb.on{background:var(--ink);color:var(--bg)}
+.nb svg{flex-shrink:0}
+@media(max-width:560px){.nb span{display:none}.nb{padding:9px 11px}}
+
+/* ---------- רכיבי בסיס ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.pad{padding:clamp(14px,3.4vw,22px)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;
+  font-weight:700;padding:12px 18px;transition:.15s;border:1px solid transparent;line-height:1.3}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--c-data));color:#fff}
+.btn-p:hover{filter:brightness(1.1)}
+:root.hc .btn-p{background:var(--accent)}
+.btn-d{background:var(--ink);color:var(--bg)}
+.btn-g{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn-g:hover{background:var(--surface2)}
+.btn[disabled]{opacity:.42;cursor:not-allowed}
+.btn.w{width:100%}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;
+  font-size:.82rem;font-weight:600;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.chip.a{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.chip.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.chip.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.chip.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.h1{font-size:clamp(1.5rem,5.2vw,2.05rem);font-weight:800;line-height:1.2;overflow-wrap:anywhere}
+.h2{font-size:clamp(1.1rem,3.6vw,1.3rem);font-weight:700;overflow-wrap:anywhere}
+.sub{color:var(--muted);margin-top:5px;overflow-wrap:anywhere}
+.muted{color:var(--muted)}
+.faint{color:var(--faint)}
+.sm{font-size:.85rem}
+.xs{font-size:.76rem}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
+/* רשימת הקולות: שתי עמודות רק כשבאמת יש מקום, אחרת השמות נקטעים */
+.vgrid{grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));gap:8px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.spread{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
+
+/* ---------- מתמטיקה: תמיד משמאל לימין, מבודד מהעברית ---------- */
+.m{direction:ltr;unicode-bidi:isolate;display:inline-block;font-variant-numeric:tabular-nums}
+.mline{direction:ltr;unicode-bidi:isolate;text-align:center;font-weight:700;
+  font-size:clamp(1.55rem,7vw,2.5rem);letter-spacing:.01em;line-height:1.35;overflow-wrap:anywhere}
+.mstep{direction:ltr;unicode-bidi:isolate;text-align:center;font-weight:700;
+  font-size:clamp(1.05rem,4.6vw,1.35rem);background:var(--surface2);border-radius:10px;
+  padding:9px 12px;margin-top:8px;overflow-wrap:anywhere}
+sup{font-size:.62em;vertical-align:super;line-height:0}
+sub{font-size:.62em;vertical-align:sub;line-height:0}
+/* ---------- מטריצה ווקטור ---------- */
+.mtx{display:inline-flex;align-items:stretch;gap:7px;vertical-align:middle;
+  padding:3px 10px;margin:0 .2em;position:relative;direction:ltr}
+.mtx::before,.mtx::after{content:"";position:absolute;top:0;bottom:0;width:7px;
+  border-top:2px solid currentColor;border-bottom:2px solid currentColor}
+.mtx::before{inset-inline-start:0;border-inline-start:2px solid currentColor}
+.mtx::after{inset-inline-end:0;border-inline-end:2px solid currentColor}
+.mtx .mcol{display:flex;flex-direction:column;gap:3px;text-align:center;min-width:1.5em}
+.mtx .mcol>span{padding:1px 4px;font-variant-numeric:tabular-nums}
+.vec{display:inline-flex;gap:9px;padding:2px 11px;margin:0 .16em;direction:ltr;
+  border-inline-start:2px solid currentColor;border-inline-end:2px solid currentColor;border-radius:9px}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+  line-height:1.05;margin:0 .18em;font-size:.86em}
+.frac>span:first-child{border-bottom:.09em solid currentColor;padding:0 .22em}
+.frac>span:last-child{padding:0 .22em}
+
+/* ---------- תשובות ---------- */
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}
+@media(max-width:430px){.opts{grid-template-columns:minmax(0,1fr)}}
+.opt{position:relative;border:2px solid var(--line);background:var(--surface);border-radius:12px;
+  padding:15px 14px 15px 44px;font-weight:700;font-size:clamp(1rem,4vw,1.2rem);transition:.14s;min-height:58px;
+  display:flex;align-items:center;gap:10px}
+[dir="rtl"] .opt{padding:15px 44px 15px 14px}
+.opt:hover:not([disabled]){border-color:var(--c,var(--accent));background:var(--cs,var(--accent-soft))}
+.opt .k{position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);
+  width:24px;height:24px;border-radius:7px;background:var(--cs,var(--surface2));color:var(--c,var(--faint));
+  display:grid;place-items:center;font-size:.76rem;font-weight:700}
+/* currentColor כאן היה נפתר לצבע שנקבע באותה הצהרה עצמה,
+   ולכן הרקע והטקסט יצאו זהים והספרה נעלמה. */
+.opt.right .k{background:var(--ok);color:var(--surface)}
+.opt.wrong .k{background:var(--bad);color:var(--surface)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.opt.dim{opacity:.4}
+.opt.gone{opacity:.35;text-decoration:line-through}
+
+/* ---------- פתרון מודרך ---------- */
+.steps{margin-top:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.step{padding:13px 15px;border-top:1px solid var(--line);background:var(--surface)}
+.step:first-child{border-top:none}
+.step.future{display:none}
+.step .st{display:flex;align-items:center;gap:9px;font-weight:700;font-size:.95rem}
+.step .num{width:23px;height:23px;border-radius:50%;background:var(--c,var(--accent));color:#fff;
+  display:grid;place-items:center;font-size:.76rem;flex-shrink:0;font-weight:700}
+.step .sd{color:var(--muted);font-size:.92rem;margin-top:4px;overflow-wrap:anywhere}
+.step.last{background:var(--ok-soft)}
+.step.last .num{background:var(--ok);color:var(--surface)}
+
+/* ---------- פירוט טעות ---------- */
+.diag{margin-top:14px;border-inline-start:4px solid var(--bad);background:var(--bad-soft);
+  border-radius:0 10px 10px 0;padding:12px 15px}
+[dir="rtl"] .diag{border-radius:10px 0 0 10px}
+.diag b{color:var(--bad)}
+.hintbox{margin-top:14px;border-inline-start:4px solid var(--warn);background:var(--warn-soft);
+  border-radius:0 10px 10px 0;padding:12px 15px}
+[dir="rtl"] .hintbox{border-radius:10px 0 0 10px}
+
+/* ---------- מדדים ---------- */
+.bar{height:7px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .5s,background .3s}
+.bar.ok>i{background:var(--ok)}
+.bar.mid>i{background:var(--warn)}
+.bar.low>i{background:var(--bad)}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--surface2);border:1px solid var(--line)}
+.dot.ok{background:var(--ok);border-color:var(--ok)}
+.dot.no{background:var(--bad);border-color:var(--bad)}
+.dot.hp{background:var(--warn);border-color:var(--warn)}
+.tile{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--c,var(--accent));
+  border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.tile b{display:block;font-size:1.7rem;font-weight:800;line-height:1.2;color:var(--c,var(--ink))}
+.tile span{color:var(--muted);font-size:.82rem}
+
+/* ---------- כרטיס נושא ---------- */
+.tpc{position:relative;display:flex;flex-direction:column;gap:9px;text-align:start;background:var(--surface);
+  border:1px solid var(--line);border-inline-start:4px solid var(--c,var(--accent));
+  border-radius:12px;padding:14px;transition:.15s;box-shadow:var(--shadow);min-width:0}
+.tpc:hover{border-color:var(--c,var(--accent));transform:translateY(-2px);box-shadow:0 8px 22px -12px var(--c)}
+.tpc:hover{border-inline-start-color:var(--c,var(--accent))}
+.tpc.on{border-color:var(--c,var(--accent));background:var(--cs,var(--accent-soft))}
+.tpc .tn{color:var(--c,var(--ink))}
+.tpc .tn{font-weight:700;font-size:.98rem;overflow-wrap:anywhere}
+.tpc .td{color:var(--muted);font-size:.8rem;overflow-wrap:anywhere}
+.tpc .tm{display:flex;align-items:center;gap:7px;font-size:.74rem;color:var(--faint)}
+.tpc .tm .bar{flex:1;min-width:0}
+
+/* ---------- מתגים והגדרות ---------- */
+.tog{display:flex;align-items:center;gap:13px;width:100%;text-align:start;background:var(--surface2);
+  border:1px solid transparent;border-radius:12px;padding:13px 15px;transition:.15s;min-width:0}
+.tog:hover{border-color:var(--line)}
+.tog+.tog{margin-top:9px}
+.tog .tt{flex:1;min-width:0}
+.tog .tt b{display:block;font-size:.97rem;overflow-wrap:anywhere}
+.tog .tt span{display:block;color:var(--muted);font-size:.82rem;overflow-wrap:anywhere}
+.sw{position:relative;width:46px;height:27px;border-radius:99px;background:var(--line);flex-shrink:0;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:21px;height:21px;border-radius:50%;
+  background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .2s}
+.tog[aria-checked="true"] .sw{background:var(--accent)}
+.tog[aria-checked="true"] .sw::after{transform:translateX(-19px)}
+[dir="ltr"] .tog[aria-checked="true"] .sw::after{transform:translateX(19px)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1 1 auto;min-width:0;border:1px solid var(--line);background:var(--surface);
+  border-radius:10px;padding:10px 12px;font-weight:600;font-size:.9rem;color:var(--muted);transition:.15s}
+.seg button.on{background:var(--c,var(--ink));color:#fff;border-color:transparent}
+:root.hc .seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.field{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;
+  padding:12px 14px;font-size:1rem;outline:none}
+.field:focus{border-color:var(--accent)}
+
+/* ---------- דף נוסחאות ---------- */
+.a-base{--c:var(--c-base);--cs:var(--cs-base)}
+.a-alg{--c:var(--c-alg);--cs:var(--cs-alg)}
+.a-geo{--c:var(--c-geo);--cs:var(--cs-geo)}
+.a-data{--c:var(--c-data);--cs:var(--cs-data)}
+.chip.area{background:var(--cs);color:var(--c);border-color:transparent}
+.arh{display:flex;align-items:center;gap:9px}
+.arh::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--c);flex-shrink:0}
+.fcard{background:var(--surface);border:1px solid var(--line);border-inline-start:4px solid var(--c,var(--line));
+  border-radius:12px;padding:13px 15px;min-width:0}
+.fcard .fm{color:var(--c,var(--ink))}
+.fcard .ft{font-weight:700;font-size:.93rem}
+.fcard .fm{margin-top:7px;font-size:1.05rem}
+.fcard .fn{color:var(--muted);font-size:.82rem;margin-top:6px;overflow-wrap:anywhere}
+
+/* ---------- שורת מצב הקול ---------- */
+.vstrip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;
+  padding:9px 13px;border-radius:11px;font-size:.86rem;font-weight:600;line-height:1.5}
+.vstrip>span{flex:1;min-width:0}
+.vstrip .btn{padding:6px 12px;font-size:.8rem;background:var(--surface);border-color:currentColor}
+.vstrip.ok{background:var(--ok-soft);color:var(--ok)}
+.vstrip.warn{background:var(--warn-soft);color:var(--warn)}
+.vstrip.bad{background:var(--bad-soft);color:var(--bad)}
+.vstrip svg{flex-shrink:0}
+
+/* ---------- שכבות ---------- */
+.ov{position:fixed;inset:0;z-index:80;background:rgba(8,11,18,.62);backdrop-filter:blur(3px);
+  display:grid;place-items:center;padding:14px}
+.ovbox{background:var(--surface);border-radius:16px;width:100%;max-width:560px;max-height:92vh;
+  overflow-y:auto;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.45)}
+.ovx{width:36px;height:36px;border-radius:50%;background:var(--surface2);font-size:1.1rem;
+  font-weight:700;color:var(--muted);flex-shrink:0;display:grid;place-items:center}
+
+/* ---------- אנימציות מדודות ---------- */
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes nudge{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.rise{animation:rise .3s ease both}
+.nudge{animation:nudge .3s ease}
+
+footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface)}
+.fbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;
+  padding-block:16px;font-size:.82rem;color:var(--muted)}
+.skip{position:absolute;inset-inline-start:-9999px}
+.skip:focus{position:static;display:inline-block;margin:8px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);border-radius:8px}
+</style>
+</head>
+<body>
+<div class="deco" aria-hidden="true"></div>
+<a class="skip" href="#main">דילוג לתוכן</a>
+<div id="app"></div>
+<div id="live" aria-live="polite" class="skip"></div>
+<script>
+"use strict";
+/* ============================================================
+   1. עזרים כלליים
+   ============================================================ */
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function shuffle(a){var i,j,t;for(i=a.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));t=a[i];a[i]=a[j];a[j]=t}return a}
+/* מספר שלם שאינו אפס — הרבה מחוללים צריכים בדיוק את זה */
+function rnz(a,b){var v=0;while(v===0)v=ri(a,b);return v}
+function todayIso(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000)}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function uniq(a){return a.filter(function(v,i){return a.indexOf(v)===i})}
+
+/* ============================================================
+   2. עזרי מתמטיקה — שברים, מספרים, ביטויים
+   כל התצוגה במתמטיקה נבנית כאן, כדי שהעברית והנוסחאות
+   לא יתערבבו בכיוון הכתיבה.
+   ============================================================ */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){var t=b;b=a%b;a=t}return a||1}
+function lcm(a,b){return Math.abs(a*b)/gcd(a,b)}
+
+/* שבר מצומצם. den תמיד חיובי, הסימן יושב במונה. */
+function Fr(n,d){
+  if(d===undefined)d=1;
+  if(d===0)d=1;
+  if(d<0){n=-n;d=-d}
+  var g=gcd(n,d);
+  this.n=n/g;this.d=d/g;
+}
+Fr.prototype.add=function(o){return new Fr(this.n*o.d+o.n*this.d,this.d*o.d)};
+Fr.prototype.sub=function(o){return new Fr(this.n*o.d-o.n*this.d,this.d*o.d)};
+Fr.prototype.mul=function(o){return new Fr(this.n*o.n,this.d*o.d)};
+Fr.prototype.div=function(o){return new Fr(this.n*o.d,this.d*o.n)};
+Fr.prototype.isInt=function(){return this.d===1};
+Fr.prototype.val=function(){return this.n/this.d};
+Fr.prototype.eq=function(o){return this.n===o.n&&this.d===o.d};
+/* טקסט פשוט — להקראה ולהשוואה */
+Fr.prototype.txt=function(){return this.d===1?String(this.n):(this.n+"/"+this.d)};
+/* HTML — שבר אמיתי עם קו אופקי, קריא הרבה יותר לתלמיד שמתקשה */
+Fr.prototype.html=function(){
+  if(this.d===1)return String(this.n);
+  var sign=this.n<0?"−":"";
+  return sign+'<span class="frac"><span>'+Math.abs(this.n)+'</span><span>'+this.d+'</span></span>';
+};
+Fr.prototype.say=function(){
+  if(this.d===1)return String(this.n);
+  return (this.n<0?"מינוס ":"")+Math.abs(this.n)+" חלקי "+this.d;
+};
+function fr(n,d){return new Fr(n,d)}
+/* הצגה בלי צמצום. שלב ההרחבה למכנה משותף חייב להראות את 10/15,
+   ולא את 2/3 שאליו הוא מצטמצם. */
+function rawFr(n,d){
+  if(d===1)return String(n);
+  var sign=n<0?"−":"";
+  return sign+'<span class="frac"><span>'+Math.abs(n)+'</span><span>'+d+'</span></span>';
+}
+
+/* מספר לתצוגה: מינוס טיפוגרפי, בלי אפסים מיותרים אחרי הנקודה */
+function r2(v){return Math.round(v*100)/100}
+function num(v){
+  if(typeof v!=="number")return String(v);
+  var s=(Math.round(v*1e6)/1e6).toString();
+  return s.replace(/^-/,"−");
+}
+function say(v){return String(v).replace(/−/g,"מינוס ").replace(/·/g," כפול ")}
+
+/* " + 5" / " − 5" — לחיבור איברים בביטוי */
+function sgn(v){return (v<0?" − ":" + ")+Math.abs(v)}
+/* מקדם לפני משתנה: 1x -> x, -1x -> -x */
+function coef(c,v){
+  if(c===1)return v;
+  if(c===-1)return "−"+v;
+  return num(c)+v;
+}
+/* מקדם שמופיע לפני סוגריים. 1 לא נכתב, ו-−1 נכתב כמינוס בלבד. */
+function fac(c){return c===1?"":c===-1?"−":num(c)}
+/* איבר עם סימן, לשרשור בתוך ביטוי: " + 3x" / " − x" */
+function term(c,v){
+  if(c===0)return "";
+  var s=c<0?" − ":" + ",a=Math.abs(c);
+  return s+(a===1?v:a+v);
+}
+/* חזקה */
+function pw(base,e){
+  if(e===1)return base;
+  if(e===0)return "1";
+  return base+"<sup>"+num(e)+"</sup>";
+}
+/* פולינום ריבועי מהמקדמים */
+function quadStr(a,b,c,v){
+  v=v||"x";
+  var s=(a===1?"":a===-1?"−":num(a))+v+"<sup>2</sup>";
+  s+=term(b,v);
+  if(c!==0)s+=sgn(c);
+  return s;
+}
+/* שורש: מציג √50 = 5√2 */
+function simpRoot(n){
+  var out=1,i;
+  for(i=Math.floor(Math.sqrt(n));i>=2;i--){ if(n%(i*i)===0){out=i;n=n/(i*i);break} }
+  return {out:out,in:n};
+}
+function rootHtml(o){
+  if(o.in===1)return String(o.out);
+  return (o.out===1?"":o.out)+"√"+o.in;
+}
+function isSquare(n){var r=Math.round(Math.sqrt(n));return r*r===n}
+
+/* מטריצה מ-מערך שורות: mat([[1,2],[3,4]]) */
+function mat(rows){
+  var cols=rows[0].length,out="",c,r;
+  for(c=0;c<cols;c++){
+    out+='<span class="mcol">';
+    for(r=0;r<rows.length;r++)out+='<span>'+num(rows[r][c])+'</span>';
+    out+='</span>';
+  }
+  return '<span class="mtx">'+out+'</span>';
+}
+function vecH(a){return '<span class="vec">'+a.map(num).join(" , ")+'</span>'}
+/* פולינום ממערך מקדמים מהחזקה הגבוהה לנמוכה: poly([2,0,-5,1]) */
+function poly(cs,v){
+  v=v||"x";
+  var n=cs.length-1,out="",i,c,p,t;
+  for(i=0;i<cs.length;i++){
+    c=cs[i];p=n-i;
+    if(c===0)continue;
+    t=(p===0?String(Math.abs(c)):(Math.abs(c)===1?"":Math.abs(c))+pw(v,p));
+    out+=out===""?(c<0?"−":"")+t:(c<0?" − ":" + ")+t;
+  }
+  return out===""?"0":out;
+}
+
+/* ============================================================
+   3. אייקונים
+   ============================================================ */
+var ICONS={
+  home:'M3 10.5 12 3l9 7.5M5.5 9.5V20h13V9.5',
+  pencil:'M4 20h4l10-10-4-4L4 16v4ZM14.5 5.5l4 4',
+  book:'M4 5.5A2 2 0 0 1 6 3.5h13v14H6a2 2 0 0 0-2 2V5.5ZM4 19.5A2 2 0 0 1 6 17.5h13v3H6a2 2 0 0 1-2-1Z',
+  chart:'M4 20V10M10 20V4M16 20v-7M22 20H2',
+  gear:'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM19.4 13.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z',
+  speaker:'M11 5 6.5 9H3v6h3.5L11 19V5ZM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13',
+  bulb:'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6v.5h5.4v-.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3Z',
+  steps:'M3 20h5v-5h5v-5h5V5h3',
+  check:'M4 12.5 9.5 18 20 6.5',
+  x:'M6 6l12 12M18 6 6 18',
+  flame:'M12 22c4 0 6.5-2.6 6.5-6 0-4.5-4.5-6.5-4-11-3 1.5-5 4.5-5 7 0 1-1 1.5-1.5.5-.5-1-.5-2-.5-2C5 12 5.5 22 12 22Z',
+  arrow:'M5 12h13M12.5 5.5 19 12l-6.5 6.5',
+  back:'M19 12H6M11.5 5.5 5 12l6.5 6.5',
+  search:'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM21 21l-4.4-4.4',
+  moon:'M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z',
+  sun:'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4',
+  star:'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9L12 3.5Z',
+  refresh:'M20 11.5A8 8 0 1 0 18.5 17M20 5v6h-6',
+  target:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 16.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM12 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z',
+  list:'M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01',
+  pause:'M9 5v14M15 5v14',
+  eye:'M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Zm10 2.6a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2Z'
+};
+function ic(name,size){
+  var d=ICONS[name];if(!d)return"";
+  var s=size||18;
+  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+d+'"/></svg>';
+}
+/* ============================================================
+   4. מצב האפליקציה ושמירה מקומית
+   הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
+   ============================================================ */
+var BUILD="u1 · 2026-08-28";
+var KEY="axiom-state-v1";
+
+function blankState(){
+  return {
+    v:1,
+    name:"",
+    track:1,                 /* 1 מדעים והנדסה · 2 מדעי המחשב · 3 מדעי החברה */
+    level:2,                 /* 1 בסיס · 2 רגיל · 3 מאתגר */
+    topics:[],               /* הנושאים שנבחרו לתרגול */
+    mastery:{},              /* לכל נושא: {seen,ok,help,m} כאשר m הוא 0..100 */
+    stats:{answered:0,correct:0,helped:0,xp:0,streakDays:0,lastDay:"",rounds:0},
+    days:{},
+    wrongBank:[],            /* נושאים שנפלו בהם — חוזרים לתרגול */
+    settings:{theme:"auto",ts:1,clearfont:false,spaced:false,hc:false,rm:false,
+              calm:false,tts:true,rate:0.95,engine:"gemini",gvoice:"Kore",voice:"",
+              roundLen:8,keys:true,autoSteps:false}
+  };
+}
+var state=blankState();
+
+function load(){
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(!raw)return false;
+    var s=JSON.parse(raw);
+    if(!s||typeof s!=="object")return false;
+    var base=blankState(),k;
+    for(k in base)if(!(k in s))s[k]=base[k];
+    for(k in base.settings)if(!(k in s.settings))s.settings[k]=base.settings[k];
+    for(k in base.stats)if(!(k in s.stats))s.stats[k]=base.stats[k];
+    state=s;
+    return true;
+  }catch(e){return false}
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+
+/* רצף ימים — נספר רק כשבאמת תרגלו, ובמצב רגוע לא מוצג בכלל */
+function touchDay(){
+  var d=todayIso(),st=state.stats;
+  if(st.lastDay===d)return;
+  if(st.lastDay&&daysBetween(st.lastDay,d)===1)st.streakDays++;
+  else st.streakDays=1;
+  st.lastDay=d;
+}
+function dayRec(){
+  var d=todayIso();
+  if(!state.days[d])state.days[d]={a:0,c:0};
+  return state.days[d];
+}
+
+/* ============================================================
+   5. נגישות: גודל טקסט, פונט, ניגודיות, תנועה, ערכת צבע
+   ============================================================ */
+function applyModes(){
+  var h=document.documentElement,s=state.settings;
+  h.classList.toggle("ts2",s.ts===2);
+  h.classList.toggle("ts3",s.ts===3);
+  h.classList.toggle("clearfont",!!s.clearfont);
+  h.classList.toggle("spaced",!!s.spaced);
+  h.classList.toggle("hc",!!s.hc);
+  h.classList.toggle("rm",!!s.rm);
+  if(s.theme==="auto")h.removeAttribute("data-theme");
+  else h.setAttribute("data-theme",s.theme);
+}
+
+/* ============================================================
+   6. הקראה קולית
+   שני מקורות קול:
+   · Gemini — קול טבעי שנשמע כמו אדם. דורש אינטרנט ומפתח.
+   · קול המכשיר — עובד תמיד ובלי רשת, אבל נשמע רובוטי.
+   הקצב אצל Gemini לא נשלח כפרמטר (ה-API מחזיר 400 על audioConfig),
+   אלא מתבקש במילים בתוך הטקסט עצמו.
+   ============================================================ */
+var GEM_VOICES=[
+  {id:"Kore",     t:"קורה",    g:"f", d:"רגוע וברור"},
+  {id:"Aoede",    t:"אאודה",   g:"f", d:"חם ונעים"},
+  {id:"Leda",     t:"לדה",     g:"f", d:"צעיר וקליל"},
+  {id:"Autonoe",  t:"אוטונואה",g:"f", d:"בהיר ומדויק"},
+  {id:"Puck",     t:"פאק",     g:"m", d:"ער וזורם"},
+  {id:"Charon",   t:"כארון",   g:"m", d:"עמוק ושקול"},
+  {id:"Orus",     t:"אורוס",   g:"m", d:"יציב ונינוח"},
+  {id:"Fenrir",   t:"פנריר",   g:"m", d:"נמרץ יותר"}
+];
+function gvName(id){for(var i=0;i<GEM_VOICES.length;i++)if(GEM_VOICES[i].id===id)return GEM_VOICES[i];return GEM_VOICES[0]}
+var GKEY="";
+function loadKey(){
+  try{
+    GKEY=localStorage.getItem("axiom-gkey")||"";
+    /* מפתח שכבר הוזן באחת האפליקציות האחרות באתר עובד גם כאן */
+    if(!GKEY)GKEY=localStorage.getItem("shlav-gkey")||"";
+    if(!GKEY)GKEY=localStorage.getItem("reader-gkey")||"";
+    if(!GKEY){
+      var raw=localStorage.getItem("mlh-state-v2");
+      if(raw){var o=JSON.parse(raw);if(o&&o.settings&&o.settings.googleKey)GKEY=String(o.settings.googleKey).trim()}
+    }
+  }catch(e){GKEY=""}
+  return GKEY;
+}
+function saveKey(k){
+  GKEY=String(k||"").trim();
+  try{GKEY?localStorage.setItem("axiom-gkey",GKEY):localStorage.removeItem("axiom-gkey")}catch(e){}
+}
+function hasKey(){return !!GKEY}
+
+function voices(){try{return window.speechSynthesis?speechSynthesis.getVoices():[]}catch(e){return[]}}
+function hebVoices(){return voices().filter(function(v){return /^(he|iw)/i.test(v.lang||"")})}
+/* עברית קודם, ואחריה כל השאר — כדי שתמיד תהיה רשימה לבחור ממנה */
+function pickList(){
+  var he=hebVoices(),rest=voices().filter(function(v){return he.indexOf(v)<0});
+  return he.concat(rest);
+}
+function deviceVoice(){
+  var list=pickList(),i;
+  if(!list.length)return null;
+  for(i=0;i<list.length;i++)if(list[i].voiceURI===state.settings.voice)return list[i];
+  return list[0];
+}
+/* "gemini:Kore" או "device" */
+function voiceMode(){
+  var v=state.settings.engine;
+  if(v==="gemini"&&hasKey())return "gemini";
+  return "device";
+}
+
+var gAudio=null,gCache={};
+function gStop(){if(gAudio){try{gAudio.pause();gAudio.src=""}catch(e){}gAudio=null}}
+function gSynth(text,voiceName,rate){
+  var lead=rate<=0.75?"קרא לאט מאוד וברור, בעברית: "
+          :rate<=0.9 ?"קרא לאט וברור, בעברית: "
+          :rate>=1.15?"קרא בקצב מהיר, בעברית: "
+          :"קרא בקצב טבעי, בעברית: ";
+  var body={contents:[{parts:[{text:lead+text}]}],
+    generationConfig:{responseModalities:["AUDIO"],
+      speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voiceName}}}}};
+  return fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key="+encodeURIComponent(GKEY),
+    {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+  .then(function(r){
+    if(r.ok)return r.json();
+    /* גוגל מסביר בגוף התשובה למה סירב. בלי זה אי אפשר לדעת אם
+       המפתח שגוי, המודל חסום, או שהבקשה עצמה לא תקינה. */
+    return r.text().then(function(t){
+      var msg="";
+      try{var j=JSON.parse(t);msg=(j.error&&j.error.message)||""}catch(e){msg=String(t).slice(0,140)}
+      throw new Error(r.status+(msg?" — "+msg:""));
+    });
+  })
+  .then(function(d){
+    var parts=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
+    for(var i=0;i<parts.length;i++){
+      var pd=parts[i].inlineData;
+      if(pd&&pd.data){
+        var mt=pd.mimeType||"";
+        if(mt.indexOf("wav")>=0||mt.indexOf("pcm")>=0||mt.indexOf("L16")>=0)
+          return pcmToWav(pd.data)||("data:audio/wav;base64,"+pd.data);
+        return "data:audio/mp3;base64,"+pd.data;
+      }
+    }
+    throw new Error("לא התקבל שמע");
+  });
+}
+/* Gemini מחזיר PCM גולמי. בלי כותרת WAV אף דפדפן לא ינגן אותו. */
+function pcmToWav(b64){
+  try{
+    var bin=atob(b64),len=bin.length,buf=new Uint8Array(len),i;
+    for(i=0;i<len;i++)buf[i]=bin.charCodeAt(i);
+    var sr=24000,ch=1,bits=16;
+    var hdr=new ArrayBuffer(44+len),v=new DataView(hdr);
+    function ws(o,str){for(var k=0;k<str.length;k++)v.setUint8(o+k,str.charCodeAt(k))}
+    ws(0,"RIFF");v.setUint32(4,36+len,true);ws(8,"WAVE");ws(12,"fmt ");
+    v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);
+    v.setUint32(24,sr,true);v.setUint32(28,sr*ch*bits/8,true);
+    v.setUint16(32,ch*bits/8,true);v.setUint16(34,bits,true);
+    ws(36,"data");v.setUint32(40,len,true);
+    new Uint8Array(hdr,44).set(buf);
+    var bytes=new Uint8Array(hdr),out="";
+    for(var j=0;j<bytes.length;j+=0x8000)out+=String.fromCharCode.apply(null,bytes.subarray(j,j+0x8000));
+    return "data:audio/wav;base64,"+btoa(out);
+  }catch(e){return null}
+}
+
+var ttsErr="",ttsState="";   /* "" · "ok" · "device" · "err" */
+function speakDevice(text){
+  if(!("speechSynthesis" in window))return;
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(String(text));
+    var v=deviceVoice();
+    if(v){u.voice=v;u.lang=v.lang}else{u.lang="he-IL"}
+    u.rate=state.settings.rate;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function speak(text){
+  if(!state.settings.tts||!text)return;
+  stopSpeak();
+  if(voiceMode()!=="gemini"){
+    if(ttsState!=="device"){ttsState="device"}
+    speakDevice(text);return;
+  }
+  var name=state.settings.gvoice||"Kore",rate=state.settings.rate;
+  var ck=name+"|"+rate.toFixed(2)+"|"+text;
+  function play(url){gStop();gAudio=new Audio(url);gAudio.play().catch(function(){speakDevice(text)})}
+  if(gCache[ck]){play(gCache[ck]);return}
+  gSynth(text,name,rate).then(function(url){
+    gCache[ck]=url;ttsErr="";
+    if(ttsState!=="ok"){ttsState="ok";if(view==="practice")render()}
+    play(url);
+  }).catch(function(e){
+    /* נופלים חזרה לקול המכשיר במקום להשתתק, ורושמים למה — כדי
+       שמסך ההגדרות יוכל להראות את הסיבה במקום "לא עובד". */
+    ttsErr=String(e&&e.message||e);
+    ttsState="err";
+    speakDevice(text);
+    render();
+  });
+}
+function stopSpeak(){
+  gStop();
+  try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
+}
+
+/* הודעה לקורא מסך */
+function announce(msg){var el=$("#live");if(el)el.textContent=msg}
+/* ============================================================
+   7. מ-HTML לטקסט מדובר
+   המחוללים כותבים את המתמטיקה כ-HTML (שברים אמיתיים, חזקות
+   מוגבהות). הפונקציות כאן הופכות אותו לטקסט פשוט להשוואה,
+   ומשם לעברית מדוברת להקראה.
+   ============================================================ */
+function plainOf(html){
+  var s=String(html);
+  /* מטריצה משוטחת לרצף ספרות היא חסרת פשר בהקראה, ולכן מפרקים
+     אותה לשורות לפני שמסירים את התגיות. */
+  s=s.replace(/<span class="mtx">((?:<span class="mcol">(?:<span>[^<]*<\/span>)+<\/span>)+)<\/span>/g,function(_,inner){
+    var cols=inner.split('<span class="mcol">').slice(1).map(function(c){
+      return (c.match(/<span>[^<]*<\/span>/g)||[]).map(function(z){return z.replace(/<\/?span>/g,"")});
+    });
+    if(!cols.length||!cols[0])return " מטריצה ";
+    var rows=cols[0].map(function(_x,i){return cols.map(function(c){return c[i]}).join(" , ")});
+    return " מטריצה: "+rows.map(function(r,i){return "שורה "+(i+1)+" — "+r}).join(" ; ")+" ";
+  });
+  s=s.replace(/<span class="frac"><span>(.*?)<\/span><span>(.*?)<\/span><\/span>/g,"($1)/($2)");
+  s=s.replace(/<sup>(.*?)<\/sup>/g,"^$1");
+  s=s.replace(/<sub>(.*?)<\/sub>/g,"_$1");
+  s=s.replace(/<br\s*\/?>/g," ");
+  s=s.replace(/<[^>]+>/g,"");
+  s=s.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"');
+  return s.replace(/\s+/g," ").trim();
+}
+/* מ-״3x + 5 = 20״ ל-״שלוש איקס ועוד חמש שווה עשרים״.
+   הסדר כאן חשוב: קודם מבנים מורכבים (שברים, חזקות, שורשים),
+   ורק אחר כך סימנים בודדים ואותיות. */
+var SAY_MAP=[
+  /* שבר שהגיע מ-plainOf בצורה (3)/(4) */
+  [/\(([^()]{1,14})\)\s*\/\s*\(([^()]{1,14})\)/g,"$1 חלקי $2"],
+  /* מפרידים ספרה מאות מיד בהתחלה: בלי זה "5cos" לא נתפס ככלל
+     טריגונומטרי, כי אין גבול־מילה בין ספרה לאות. */
+  [/(\d)([a-zA-Z])/g,"$1 $2"],
+  [/\be\s*\^/g," אי בחזקת "],
+  /* שמות פונקציות לפני מיפוי אותיות בודדות */
+  [/\bsin/gi," סינוס "],[/\bcos/gi," קוסינוס "],[/\btan/gi," טנגנס "],
+  /* חזקות */
+  [/\^2\b/g," בריבוע "],[/\^3\b/g," בשלישית "],[/\^\(?([−–-]?\d+)\)?/g," בחזקת $1 "],
+  [/²/g," בריבוע "],[/³/g," בשלישית "],
+  /* אינדקסים תחתונים: a₁ , aₙ , Sₙ */
+  [/₁/g," אחת "],[/₂/g," שתיים "],[/₃/g," שלוש "],[/ₙ/g," אן "],
+  /* שורש */
+  [/(\d)\s*√/g,"$1 כפול √"],[/√/g," שורש של "],
+  /* ביטויים שלמים לפני סימנים בודדים — אחרת "lim_x→3" נקרא כרצף תווים */
+  [/lim_?\s*x\s*→\s*/gi," הגבול כאשר איקס שואף ל "],
+  [/∫_\(?(-?[−\d]+)\)?\^\(?(-?[−\d]+)\)?/g," האינטגרל מ $1 עד $2 של "],
+  [/X\s*~\s*N/g," איקס מתפלגת נורמלית עם "],
+  [/\bP\(([^()]{1,12})\)/g," ההסתברות ל $1 "],
+  [/\bE\(([^()]{1,12})\)/g," התוחלת של $1 "],
+  [/\bV\(([^()]{1,12})\)/g," השונות של $1 "],
+  [/\bC\((\d+)\s*,\s*(\d+)\)/g," מספר הצירופים של $1 מתוך $2 "],
+  [/\bf\s*'\s*\(x\)\s*=/g," הנגזרת היא "],[/\bf\s*\(x\)\s*=/g," הפונקציה היא "],
+  [/\bf\s*'\s*\(x\)/g," הנגזרת "],[/\bf\s*\(x\)/g," הפונקציה "],
+  [/lim/gi," הגבול של "],[/→/g," כאשר שואף ל "],[/∞/g," אינסוף "],
+  [/∫/g," אינטגרל של "],[/\bdx\b/g," די איקס "],[/\bdt\b/g," די טי "],
+  [/\bln\b/gi," לוג טבעי של "],[/\blog\b/gi," לוג "],
+  [/Σ/g," סכום "],[/∈/g," שייך ל "],[/∉/g," לא שייך ל "],
+  [/∪/g," איחוד "],[/∩/g," חיתוך "],[/⊆/g," מוכל ב "],[/∅/g," הקבוצה הריקה "],
+  [/¬/g," לא "],[/∧/g," וגם "],[/∨/g," או "],[/⇒/g," גורר "],[/⇔/g," אם ורק אם "],
+  [/\bdet\b/gi," דטרמיננטה של "],[/λ/g," למדה "],[/μ/g," מיו "],[/σ/g," סיגמא "],
+  [/\bP\b/g," ההסתברות "],[/\bE\b/g," התוחלת "],[/\bV\b/g," השונות "],
+  /* סימנים מיוחדים */
+  [/π/g," פאי "],[/°/g," מעלות "],[/α/g," אלפא "],[/β/g," בטא "],[/Δ/g," דלתא "],
+  [/≈/g," בערך "],[/≠/g," לא שווה "],[/≤/g," קטן או שווה "],[/≥/g," גדול או שווה "],
+  [/→/g," ולכן "],
+  /* יחס — רק בין מספרים או x, כדי לא לפגוע בנקודתיים בעברית */
+  [/([\dx])\s*:\s*([\dx])/g,"$1 ל $2"],
+  /* השוואה */
+  [/=/g," שווה "],[/</g," קטן מ "],[/>/g," גדול מ "],
+  /* כפל מרומז: 3(x+2) וגם (x+1)(x+2) */
+  [/(\d)\s*\(/g,"$1 כפול ("],[/\)\s*\(/g,") כפול ("],
+  /* פעולות */
+  [/\+/g," ועוד "],[/[−–-]/g," מינוס "],[/[×·]/g," כפול "],[/÷/g," חלקי "],
+  [/\//g," חלקי "],[/%/g," אחוז "],
+  /* מפרידים בין מספר לאות, כדי שגבול־מילה יעבוד על האות */
+  [/(\d)([a-zA-Z])/g,"$1 $2"],
+  /* אותיות בודדות בשמן העברי */
+  /* שמות האותיות בלי ניקוד — חלק ממנועי ההקראה מועדים עליו.
+     איפה שלאות יש משמעות קבועה בנוסחה, אומרים את המשמעות. */
+  [/\bx\b/g," איקס "],[/\by\b/g," וואי "],[/\bn\b/g," אן "],[/\bd\b/g," די "],
+  [/\bm\b/g," אם "],[/\ba\b/g," איי "],[/\bb\b/g," בי "],[/\bc\b/g," סי "],
+  [/\bk\b/g," קיי "],[/\bu\b/g," יו "],[/\bv\b/g," וי "],[/\bt\b/g," טי "],
+  [/\bp\b/g," פי "],[/\bq\b/g," קיו "],[/\bi\b/g," אי "],
+  [/\bS\b/g," אס "],[/\bA\b/g," איי "],[/\bB\b/g," בי "],[/\bU\b/g," יו "],
+  /* סוגריים: "בסוגריים" לפתיחה, ופסיק לסגירה. הניסוח הקודם,
+     "סוגריים ... סוף סוגריים", הפך כל ביטוי קצר לנאום. */
+  [/\(/g," בסוגריים "],[/\)/g," , "]
+];
+function speakMath(plain){
+  var s=" "+String(plain)+" ",i;
+  for(i=0;i<SAY_MAP.length;i++)s=s.replace(SAY_MAP[i][0],SAY_MAP[i][1]);
+  /* פסיקים רצופים נוצרים כשסוגר נסגר מיד לפני מפריד */
+  s=s.replace(/(\s*,\s*){2,}/g," , ");
+  return s.replace(/\s+/g," ").trim();
+}
+/* טקסט הסבר הוא עברית רגילה שמשובצים בה סימנים בודדים. כאן מתרגמים
+   רק את מה שחד־משמעי — מקף בעברית הוא מקף, לא מינוס. */
+var PROSE_MAP=[
+  [/\(([^()]{1,10})\)\/\(([^()]{1,10})\)/g,"$1 חלקי $2"],
+  [/\bP\(([^()]{1,12})\)/g," ההסתברות ל $1 "],
+  [/\bE\(([^()]{1,12})\)/g," התוחלת של $1 "],
+  [/\bV\(([^()]{1,12})\)/g," השונות של $1 "],
+  [/lim/gi," הגבול "],[/∞/g," אינסוף "],[/∫/g," אינטגרל "],
+  [/∈/g," שייך ל "],[/∪/g," איחוד "],[/∩/g," חיתוך "],[/∅/g," הקבוצה הריקה "],
+  [/¬/g," לא "],[/∧/g," וגם "],[/∨/g," או "],[/⇒/g," גורר "],[/⇔/g," אם ורק אם "],
+  [/λ/g," למדה "],[/μ/g," מיו "],[/σ/g," סיגמא "],[/Φ/g," פי גדולה "],
+  [/²/g," בריבוע "],[/³/g," בשלישית "],[/₁/g," אחת "],[/₂/g," שתיים "],[/ₙ/g," אן "],
+  /* מעריכים מוגבהים ביוניקוד, כמו x⁻ᵃ */
+  [/⁻/g," מינוס "],[/⁺/g," ועוד "],[/ᵃ/g," איי "],[/ᵇ/g," בי "],[/⁰/g," אפס "],[/¹/g," אחת "],
+  [/√/g," שורש של "],[/π/g," פאי "],[/°/g," מעלות "],[/Δ/g," דלתא "],
+  [/α/g," אלפא "],[/[×·]/g," כפול "],[/÷/g," חלקי "],[/≈/g," בערך "],
+  /* מינוס טיפוגרפי ו-en dash לא מופיעים בעברית, ולכן בטוח לתרגם.
+     מקף רגיל נשאר מקף — "ה-3" הוא לא חיסור. */
+  [/[−–]/g," מינוס "],[/=/g," שווה "],[/\+/g," ועוד "],[/\//g," חלקי "],
+  [/\bsin/gi," סינוס "],[/\bcos/gi," קוסינוס "],[/\btan/gi," טנגנס "]
+];
+function speakProse(t){
+  var s=String(t||""),i;
+  for(i=0;i<PROSE_MAP.length;i++)s=s.replace(PROSE_MAP[i][0],PROSE_MAP[i][1]);
+  return s.replace(/\s+/g," ").trim();
+}
+
+/* ============================================================
+   8. עזרי בנייה למחוללים
+   ============================================================ */
+function S(t,d,m){return {t:t,d:d||"",m:m||""}}         /* צעד בפתרון */
+function W(h,why){return {h:String(h),why:why||""}}      /* מסיח + הטעות שהוא מייצג */
+
+/* ============================================================
+   9. מחוללי השאלות — חדו״א
+   כל מחולל מחזיר שאלה שלמה: ניסוח, תשובה, מסיחים שכל אחד מהם
+   הוא טעות אמיתית שסטודנטים עושים, ופתרון מלא צעד־צעד.
+   ============================================================ */
+function pn(v){return v<0?"("+num(v)+")":String(v)}
+function fact(n){var r=1,i;for(i=2;i<=n;i++)r*=i;return r}
+function Cnk(n,k){if(k<0||k>n)return 0;return Math.round(fact(n)/(fact(k)*fact(n-k)))}
+
+/* ---------- 1. גבולות ---------- */
+function genLimits(L){
+  var a,b,c,r,steps;
+  if(L===1){
+    a=rnz(-4,4);b=rnz(-6,6);c=rnz(-9,9);r=rnz(-3,3);
+    var val=a*r*r+b*r+c;
+    return {ask:"חשבו את הגבול",expr:"lim<sub>x→"+num(r)+"</sub> ("+poly([a,b,c])+")",
+      ans:W(num(val)),
+      wrong:[
+        W(num(a*r+b*r+c),"העליתם בריבוע רק חלק מהביטוי. מציבים "+num(r)+" בכל מקום שבו מופיע x."),
+        W(num(c),"הצבתם אפס במקום "+num(r)+"."),
+        W(num(-val),"טעות סימן בהצבה. שימו לב לסוגריים סביב מספר שלילי."),
+        W("הגבול לא קיים","הפונקציה כאן פולינום, והיא רציפה בכל נקודה — לפולינום תמיד יש גבול.")
+      ],
+      steps:[
+        S("הפונקציה רציפה בנקודה","פולינום רציף בכל הישר, ולכן הגבול הוא פשוט ההצבה. אין כאן שום דבר מסובך.",
+          "lim f(x) = f("+num(r)+")"),
+        S("מציבים","",num(a)+"·"+pn(r)+"² + "+num(b)+"·"+pn(r)+" + "+num(c)),
+        S("מחשבים","",num(a*r*r)+" + "+num(b*r)+" + "+num(c)+" = "+num(val))
+      ],rule:"limsub",hint:"פולינום רציף בכל נקודה, אז מציבים ישירות."};
+  }
+  if(L===2){
+    r=rnz(-6,6);var q=rnz(-6,6);
+    while(q===r)q=rnz(-6,6);
+    var num2=[1,-(r+q),r*q];
+    return {ask:"חשבו את הגבול",
+      expr:'lim<sub>x→'+num(r)+'</sub> <span class="frac"><span>'+poly(num2)+'</span><span>x'+sgn(-r)+'</span></span>',
+      ans:W(num(r-q)),
+      wrong:[
+        W("0","קיבלתם 0 חלקי 0 והסקתם שהתוצאה אפס. 0/0 הוא ביטוי לא מוגדר — הוא לא ערך, הוא סימן שצריך לפרק."),
+        W("הגבול לא קיים","0/0 לא אומר שאין גבול, אלא שצריך לפרק לגורמים ולצמצם."),
+        W(num(q-r),"טעות סימן בפירוק. הגורם הוא (x − "+num(q)+"), והשורש שלו הוא "+num(q)+"."),
+        W(num(r*q),"זו מכפלת השורשים, כלומר האיבר החופשי — לא הגבול.")
+      ],
+      steps:[
+        S("בודקים הצבה ישירה","מציבים x = "+num(r)+" ומקבלים 0 חלקי 0. זה לא ערך — זו הודעה שצריך לעבוד.",
+          "0 / 0"),
+        S("מפרקים את המונה לגורמים","מחפשים שני מספרים שסכומם "+num(r+q)+" ומכפלתם "+num(r*q)+".",
+          poly(num2)+" = (x"+sgn(-r)+")(x"+sgn(-q)+")"),
+        S("מצמצמים","הגורם (x"+sgn(-r)+") מופיע במונה ובמכנה. מותר לצמצם אותו כי x שואף ל-"+num(r)+" אבל אינו שווה לו.",
+          "x"+sgn(-q)),
+        S("מציבים בביטוי המצומצם","",num(r)+sgn(-q)+" = "+num(r-q))
+      ],rule:"lim00",hint:"0/0 היא לא תשובה. מפרקים לגורמים, מצמצמים, ורק אז מציבים."};
+  }
+  var n1=ri(1,3),n2=ri(1,3);
+  a=rnz(-6,6);b=rnz(-6,6);
+  var ansTxt,why1,why2,why3;
+  if(n1===n2){ansTxt=fr(a,b).html();why1="דרגות המונה והמכנה שוות, ולכן הגבול הוא יחס המקדמים המובילים — לא אפס.";}
+  else if(n1<n2){ansTxt="0";why1="דרגת המכנה גבוהה יותר, ולכן המכנה גדל מהר יותר והמנה שואפת לאפס.";}
+  else{ansTxt="∞";why1="דרגת המונה גבוהה יותר, ולכן הביטוי גדל ללא גבול.";}
+  var others=[fr(a,b).html(),"0","∞"].filter(function(v){return v!==ansTxt});
+  return {ask:"חשבו את הגבול",
+    expr:'lim<sub>x→∞</sub> <span class="frac"><span>'+(a===1?"":num(a))+pw("x",n1)+' + 3</span><span>'+(b===1?"":num(b))+pw("x",n2)+' − 1</span></span>',
+    ans:W(ansTxt),
+    wrong:others.map(function(v){return W(v,why1)}).concat([
+      W(fr(b,a).html(),"הפכתם את יחס המקדמים. המונה נשאר במונה.")
+    ]),
+    steps:[
+      S("מסתכלים רק על הדרגות הגבוהות","באינסוף האיברים הקטנים לא משנים כלום. מה שקובע הוא החזקה הגבוהה בכל צד.",
+        "דרגת מונה: "+n1+"   דרגת מכנה: "+n2),
+      S("משווים דרגות","דרגת מונה גדולה יותר ← אינסוף. שווה ← יחס המקדמים המובילים. קטנה יותר ← אפס.",
+        n1>n2?"גדולה":n1===n2?"שווה":"קטנה"),
+      S("התשובה","",ansTxt)
+    ],rule:"liminf",hint:"באינסוף משווים את דרגות המונה והמכנה, ורק אז מסתכלים על המקדמים."};
+}
+
+/* ---------- 2. נגזרות בסיסיות ---------- */
+function genDeriv(L){
+  var a,b,c,n,steps;
+  if(L===1){
+    a=rnz(-6,6);n=ri(2,6);b=rnz(-8,8);c=rnz(-9,9);
+    var d1=a*n,d2=b;
+    return {ask:"גזרו את הפונקציה",expr:"f(x) = "+num(a)+pw("x",n)+term(b,"x")+sgn(c),
+      ans:W("f'(x) = "+num(d1)+pw("x",n-1)+sgn(b)),
+      wrong:[
+        W("f'(x) = "+num(d1)+pw("x",n)+sgn(b),"הורדתם את המעריך למקדם אבל לא הפחתתם אותו ב-1."),
+        W("f'(x) = "+num(a)+pw("x",n-1)+sgn(b),"הפחתתם את המעריך אבל שכחתם להכפיל בו את המקדם."),
+        W("f'(x) = "+num(d1)+pw("x",n-1)+sgn(b)+sgn(c),"האיבר החופשי לא נעלם. נגזרת של קבוע היא תמיד אפס.")
+      ],
+      steps:[
+        S("כלל החזקה","(xⁿ)' = n·xⁿ⁻¹ — המעריך יורד ונעשה מקדם, והחזקה קטנה באחת.","(xⁿ)' = n·xⁿ⁻¹"),
+        S("גוזרים איבר איבר","",num(a)+pw("x",n)+" → "+num(d1)+pw("x",n-1)),
+        S("האיבר הלינארי והקבוע","נגזרת של "+num(b)+"x היא "+num(b)+", ונגזרת של קבוע היא אפס.",
+          num(b)+"x → "+num(b)+"   ,   "+num(c)+" → 0"),
+        S("מחברים","","f'(x) = "+num(d1)+pw("x",n-1)+sgn(b))
+      ],rule:"dpow",hint:"כל איבר בנפרד: המעריך יורד למקדם והחזקה קטנה באחת. קבוע נעלם."};
+  }
+  if(L===2){
+    a=rnz(-5,5);
+    var kind=pick(["exp","ln","sqrt","inv"]);
+    var f,df,why=[];
+    if(kind==="exp"){f=num(a)+"e<sup>x</sup>";df=num(a)+"e<sup>x</sup>";
+      why=[W("f'(x) = "+num(a)+"x·e<sup>x</sup>","גזרתם את e^x כאילו הוא חזקה של x. הנגזרת של eˣ היא eˣ עצמה."),
+           W("f'(x) = e<sup>x</sup>","איבדתם את המקדם. מקדם קבוע נשאר בנגזרת."),
+           W("f'(x) = "+num(a)+"e<sup>x−1</sup>","הורדתם את המעריך באחת. זה כלל החזקה, והוא לא חל על eˣ.")];}
+    else if(kind==="ln"){f=num(a)+"ln x";df='<span class="frac"><span>'+num(a)+'</span><span>x</span></span>';
+      why=[W("f'(x) = "+num(a)+"ln x","לא גזרתם בכלל."),
+           W('f\'(x) = <span class="frac"><span>1</span><span>x</span></span>',"איבדתם את המקדם "+num(a)+"."),
+           W("f'(x) = "+num(a)+"x","הפכתם את הכלל. הנגזרת של ln x היא 1 חלקי x.")];}
+    else if(kind==="sqrt"){f=num(a)+"√x";df='<span class="frac"><span>'+num(a)+'</span><span>2√x</span></span>';
+      why=[W("f'(x) = "+num(a)+"√x","לא גזרתם."),
+           W('f\'(x) = <span class="frac"><span>1</span><span>2√x</span></span>',"איבדתם את המקדם."),
+           W('f\'(x) = <span class="frac"><span>'+num(a)+'</span><span>√x</span></span>',"שכחתם את ה-2 במכנה. √x הוא x בחזקת חצי, והחצי יורד למקדם.")];}
+    else{f='<span class="frac"><span>'+num(a)+'</span><span>x</span></span>';
+      df='<span class="frac"><span>'+num(-a)+'</span><span>x<sup>2</sup></span></span>';
+      why=[W('f\'(x) = <span class="frac"><span>'+num(a)+'</span><span>x<sup>2</sup></span></span>',"שכחתם את המינוס. הנגזרת של 1/x היא מינוס 1 חלקי x²."),
+           W('f\'(x) = <span class="frac"><span>'+num(-a)+'</span><span>x</span></span>',"המכנה צריך להיות x בריבוע."),
+           W("f'(x) = "+num(a)+"ln x","זה האינטגרל של "+num(a)+"/x, לא הנגזרת.")];}
+    return {ask:"גזרו את הפונקציה",expr:"f(x) = "+f,ans:W("f'(x) = "+df),wrong:why,
+      steps:[
+        S("מזהים את הפונקציה הבסיסית","",kind==="exp"?"(eˣ)' = eˣ":kind==="ln"?"(ln x)' = 1/x":kind==="sqrt"?"(√x)' = 1 / (2√x)":"(1/x)' = −1/x²"),
+        S("המקדם נשאר","מקדם קבוע פשוט מוכפל בנגזרת — הוא לא משתתף בגזירה.","(c·f)' = c·f'"),
+        S("התשובה","","f'(x) = "+df)
+      ],rule:"dbasic",hint:"קודם הנגזרת של הפונקציה הבסיסית, והמקדם פשוט נשאר מוכפל."};
+  }
+  a=rnz(-5,5);b=rnz(-5,5);
+  var tk=pick(["sin","cos"]);
+  var dtk=tk==="sin"?num(a)+"cos x":num(-a)+"sin x";
+  return {ask:"גזרו את הפונקציה",expr:"f(x) = "+num(a)+tk+" x"+term(b,"x"),
+    ans:W("f'(x) = "+dtk+sgn(b)),
+    wrong:[
+      W("f'(x) = "+(tk==="sin"?num(-a)+"cos x":num(a)+"sin x")+sgn(b),
+        tk==="sin"?"הוספתם מינוס. המינוס מופיע בנגזרת של קוסינוס, לא של סינוס.":"שכחתם את המינוס. הנגזרת של cos היא מינוס sin."),
+      W("f'(x) = "+num(a)+tk+" x"+sgn(b),"לא גזרתם את הפונקציה הטריגונומטרית."),
+      W("f'(x) = "+dtk,"שכחתם לגזור את האיבר הלינארי. הנגזרת של "+num(b)+"x היא "+num(b)+".")
+    ],
+    steps:[
+      S("נגזרות טריגונומטריות","(sin x)' = cos x, ו-(cos x)' = −sin x. המינוס נמצא רק אצל הקוסינוס.",
+        "(sin x)' = cos x   ,   (cos x)' = −sin x"),
+      S("גוזרים איבר איבר","",num(a)+tk+" x → "+dtk),
+      S("האיבר הלינארי","",num(b)+"x → "+num(b)),
+      S("מחברים","","f'(x) = "+dtk+sgn(b))
+    ],rule:"dtrig",hint:"סינוס גוזר לקוסינוס, וקוסינוס גוזר למינוס סינוס."};
+}
+
+/* ---------- 3. כלל השרשרת ---------- */
+function genChain(L){
+  var a,b,n,steps;
+  if(L===1){
+    a=rnz(-5,5);b=rnz(-8,8);n=ri(2,6);
+    return {ask:"גזרו את הפונקציה",expr:"f(x) = (" + coef(a,"x")+sgn(b)+")<sup>"+n+"</sup>",
+      ans:W("f'(x) = "+num(n*a)+"("+coef(a,"x")+sgn(b)+")<sup>"+(n-1)+"</sup>"),
+      wrong:[
+        W("f'(x) = "+n+"("+coef(a,"x")+sgn(b)+")<sup>"+(n-1)+"</sup>",
+          "שכחתם להכפיל בנגזרת הפנימית. הנגזרת של "+coef(a,"x")+sgn(b)+" היא "+num(a)+", וצריך להכפיל בה."),
+        W("f'(x) = "+num(n*a)+"("+coef(a,"x")+sgn(b)+")<sup>"+n+"</sup>","לא הפחתתם את המעריך."),
+        W("f'(x) = "+num(n*a)+pw("x",n-1),"גזרתם כאילו בפנים יש רק x. הביטוי הפנימי כולו נשאר בסוגריים.")
+      ],
+      steps:[
+        S("מזהים חיצוני ופנימי","החיצונית היא ״משהו בחזקת "+n+"״, והפנימית היא "+coef(a,"x")+sgn(b)+".",
+          "f = uⁿ  ,  u = "+coef(a,"x")+sgn(b)),
+        S("כלל השרשרת","גוזרים את החיצונית ומשאירים את הפנימית כמו שהיא, ואז מכפילים בנגזרת הפנימית.",
+          "f' = n·uⁿ⁻¹ · u'"),
+        S("מציבים","","f' = "+n+"("+coef(a,"x")+sgn(b)+")<sup>"+(n-1)+"</sup> · "+num(a)),
+        S("מסדרים","","f'(x) = "+num(n*a)+"("+coef(a,"x")+sgn(b)+")<sup>"+(n-1)+"</sup>")
+      ],rule:"chain",hint:"אחרי שגוזרים את החיצונית — חייבים להכפיל בנגזרת של מה שבפנים."};
+  }
+  if(L===2){
+    a=rnz(-5,5);b=rnz(-8,8);
+    var k=pick(["exp","ln","sin"]);
+    var inner=coef(a,"x")+sgn(b);
+    var f,df,ws;
+    if(k==="exp"){f="e<sup>"+inner+"</sup>";df=num(a)+"e<sup>"+inner+"</sup>";
+      ws=[W("f'(x) = e<sup>"+inner+"</sup>","שכחתם את הנגזרת הפנימית. eᵘ גוזר ל-eᵘ·u′."),
+          W("f'(x) = "+num(a)+"e<sup>"+coef(a,"x")+"</sup>","שיניתם את המעריך. הוא נשאר בדיוק כמו שהוא."),
+          W("f'(x) = "+num(a)+"("+inner+")e<sup>"+inner+"</sup>","הכפלתם בביטוי הפנימי במקום בנגזרת שלו.")];}
+    else if(k==="ln"){f="ln("+inner+")";df='<span class="frac"><span>'+num(a)+'</span><span>'+inner+'</span></span>';
+      ws=[W('f\'(x) = <span class="frac"><span>1</span><span>'+inner+'</span></span>',"שכחתם את הנגזרת הפנימית במונה."),
+          W('f\'(x) = <span class="frac"><span>'+num(a)+'</span><span>x</span></span>',"המכנה הוא כל הביטוי הפנימי, לא רק x."),
+          W("f'(x) = "+num(a)+"ln("+inner+")","לא גזרתם את הלוגריתם.")];}
+    else{f="sin("+inner+")";df=num(a)+"cos("+inner+")";
+      ws=[W("f'(x) = cos("+inner+")","שכחתם להכפיל בנגזרת הפנימית."),
+          W("f'(x) = "+num(-a)+"cos("+inner+")","הוספתם מינוס. המינוס שייך לנגזרת של קוסינוס."),
+          W("f'(x) = "+num(a)+"cos x","הביטוי הפנימי נשאר בתוך הקוסינוס.")];}
+    return {ask:"גזרו את הפונקציה",expr:"f(x) = "+f,ans:W("f'(x) = "+df),wrong:ws,
+      steps:[
+        S("מפרקים לשתי שכבות","הפנימית היא "+inner+", והנגזרת שלה היא "+num(a)+".","u = "+inner+"  ,  u' = "+num(a)),
+        S("גוזרים את החיצונית","",k==="exp"?"(eᵘ)' = eᵘ·u'":k==="ln"?"(ln u)' = u'/u":"(sin u)' = cos u · u'"),
+        S("מציבים","","f'(x) = "+df)
+      ],rule:"chain",hint:"שתי שכבות: גוזרים את החיצונית על הפנימית כמו שהיא, ומכפילים בנגזרת הפנימית."};
+  }
+  a=rnz(2,6);b=rnz(-9,9);
+  return {ask:"גזרו את הפונקציה",expr:"f(x) = √(" + num(a)+"x"+sgn(b)+")",
+    ans:W('f\'(x) = <span class="frac"><span>'+num(a)+'</span><span>2√('+num(a)+'x'+sgn(b)+')</span></span>'),
+    wrong:[
+      W('f\'(x) = <span class="frac"><span>1</span><span>2√('+num(a)+'x'+sgn(b)+')</span></span>',"שכחתם את הנגזרת הפנימית "+num(a)+"."),
+      W('f\'(x) = <span class="frac"><span>'+num(a)+'</span><span>√('+num(a)+'x'+sgn(b)+')</span></span>',"חסר ה-2 במכנה — שורש הוא חזקת חצי, והחצי נשאר."),
+      W('f\'(x) = <span class="frac"><span>'+num(a)+'</span><span>2√x</span></span>',"הביטוי הפנימי נשאר שלם בתוך השורש.")
+    ],
+    steps:[
+      S("כותבים את השורש כחזקה","√u הוא u בחזקת חצי, וכך רואים שזה בדיוק כלל השרשרת.","f = u^(1/2)  ,  u = "+num(a)+"x"+sgn(b)),
+      S("גוזרים","","f' = ½·u^(−1/2) · u' = u' / (2√u)"),
+      S("מציבים","","f'(x) = "+num(a)+" / (2√("+num(a)+"x"+sgn(b)+"))")
+    ],rule:"chain",hint:"√u גוזר ל-u′ חלקי 2√u. הנגזרת הפנימית עולה למונה."};
+}
+
+/* ---------- 4. כלל המכפלה והמנה ---------- */
+function genProdQuo(L){
+  var a,b,n,steps;
+  if(L===1){
+    n=ri(2,4);a=rnz(-4,4);
+    /* f = xⁿ · e^x  →  f' = xⁿ⁻¹·e^x·(n + x) */
+    return {ask:"גזרו את הפונקציה",expr:"f(x) = "+pw("x",n)+"e<sup>x</sup>",
+      ans:W("f'(x) = "+n+pw("x",n-1)+"e<sup>x</sup> + "+pw("x",n)+"e<sup>x</sup>"),
+      wrong:[
+        W("f'(x) = "+n+pw("x",n-1)+"e<sup>x</sup>",
+          "גזרתם כל גורם בנפרד והכפלתם. נגזרת של מכפלה איננה מכפלת הנגזרות — צריך שני איברים."),
+        W("f'(x) = "+pw("x",n)+"e<sup>x</sup>","גזרתם רק את הגורם השני."),
+        W("f'(x) = "+n+pw("x",n-1)+"e<sup>x</sup> · "+pw("x",n)+"e<sup>x</sup>","הכפלתם את שני האיברים במקום לחבר אותם.")
+      ],
+      steps:[
+        S("כלל המכפלה","(f·g)' = f'g + fg'. שני איברים, לא אחד — וזו הטעות הנפוצה ביותר כאן.","(f·g)' = f'g + fg'"),
+        S("מזהים את שני הגורמים","","f = "+pw("x",n)+"  ,  g = eˣ"),
+        S("גוזרים כל אחד","","f' = "+n+pw("x",n-1)+"  ,  g' = eˣ"),
+        S("מציבים","","f'(x) = "+n+pw("x",n-1)+"e<sup>x</sup> + "+pw("x",n)+"e<sup>x</sup>")
+      ],rule:"prod",hint:"נגזרת של מכפלה נותנת סכום של שני איברים."};
+  }
+  if(L===2){
+    a=rnz(-6,6);b=rnz(-6,6);
+    /* f = (ax+b)/x  →  f' = −b/x²   (כי ax/x = a קבוע) */
+    while(b===0)b=rnz(-6,6);
+    return {ask:"גזרו את הפונקציה",
+      expr:'f(x) = <span class="frac"><span>'+coef(a,"x")+sgn(b)+'</span><span>x</span></span>',
+      ans:W('f\'(x) = <span class="frac"><span>'+num(-b)+'</span><span>x<sup>2</sup></span></span>'),
+      wrong:[
+        W('f\'(x) = <span class="frac"><span>'+num(b)+'</span><span>x<sup>2</sup></span></span>',
+          "טעות סימן. בכלל המנה המונה הוא f′g פחות fg′ — הסדר קובע את הסימן."),
+        W('f\'(x) = <span class="frac"><span>'+num(a)+'</span><span>1</span></span>',
+          "גזרתם מונה ומכנה בנפרד וחילקתם. נגזרת של מנה אינה מנת הנגזרות."),
+        W('f\'(x) = <span class="frac"><span>'+num(-b)+'</span><span>x</span></span>',
+          "שכחתם להעלות את המכנה בריבוע. בכלל המנה המכנה הוא g².")
+      ],
+      steps:[
+        S("כלל המנה","(f/g)' = (f'g − fg') ÷ g². הסדר במונה קריטי, והמכנה עולה בריבוע.","(f/g)' = (f'g − fg') / g²"),
+        S("מזהים","","f = "+coef(a,"x")+sgn(b)+"  ,  g = x"),
+        S("גוזרים","","f' = "+num(a)+"  ,  g' = 1"),
+        S("מציבים במונה","",num(a)+"·x − ("+coef(a,"x")+sgn(b)+")·1 = "+num(-b)),
+        S("מחלקים ב-g²","",'f\'(x) = '+num(-b)+' / x²')
+      ],rule:"quo",hint:"כלל המנה: f′g פחות fg′, והכול חלקי g בריבוע."};
+  }
+  a=rnz(2,5);b=rnz(-6,6);
+  /* f = x·ln x + b  →  f' = ln x + 1 */
+  return {ask:"גזרו את הפונקציה",expr:"f(x) = x·ln x"+sgn(b),
+    ans:W("f'(x) = ln x + 1"),
+    wrong:[
+      W("f'(x) = ln x","גזרתם רק את הגורם השני. בכלל המכפלה יש שני איברים."),
+      W('f\'(x) = <span class="frac"><span>1</span><span>x</span></span>',"הכפלתם את הנגזרות במקום להשתמש בכלל המכפלה."),
+      W("f'(x) = ln x + 1"+sgn(b),"האיבר החופשי נעלם בגזירה.")
+    ],
+    steps:[
+      S("כלל המכפלה","","(f·g)' = f'g + fg'"),
+      S("מזהים וגוזרים","","f = x → f' = 1   ,   g = ln x → g' = 1/x"),
+      S("מציבים","","1·ln x + x·(1/x)"),
+      S("מפשטים","x כפול 1 חלקי x מצטמצם ל-1.","f'(x) = ln x + 1")
+    ],rule:"prod",hint:"x·ln x הוא מכפלה. אחרי ההצבה, x חלקי x מצטמצם."};
+}
+
+/* ---------- 5. נקודות קיצון ---------- */
+function genExtrema(L){
+  var a,b,c,r1,r2,steps;
+  if(L===1){
+    a=rnz(-4,4);r1=rnz(-6,6);
+    b=-2*a*r1;c=rnz(-9,9);
+    return {ask:"מצאו את שיעור ה-x של נקודת הקיצון",expr:"f(x) = "+poly([a,b,c]),
+      ans:W("x = "+num(r1)),
+      wrong:[
+        W("x = "+num(-r1),"טעות סימן בפתרון f′(x)=0."),
+        W("x = "+num(c),"האיבר החופשי לא משפיע על מיקום הקיצון — הוא רק מזיז את הגרף מעלה ומטה."),
+        W("x = "+num(b),"זה המקדם של x, לא הפתרון של המשוואה.")
+      ],
+      steps:[
+        S("קיצון נמצא היכן שהנגזרת מתאפסת","זו ההגדרה: בנקודת קיצון המשיק אופקי, כלומר השיפוע אפס.","f'(x) = 0"),
+        S("גוזרים","","f'(x) = "+num(2*a)+"x"+sgn(b)),
+        S("משווים לאפס","",num(2*a)+"x"+sgn(b)+" = 0"),
+        S("פותרים","","x = "+num(-b)+" ÷ "+pn(2*a)+" = "+num(r1))
+      ],rule:"extr",hint:"גוזרים, משווים לאפס ופותרים. האיבר החופשי לא משתתף."};
+  }
+  if(L===2){
+    r1=rnz(-5,5);r2=rnz(-5,5);
+    while(r2===r1)r2=rnz(-5,5);
+    var lo=Math.min(r1,r2),hi=Math.max(r1,r2);
+    /* f' = 3(x−r1)(x−r2) = 3x² −3(r1+r2)x + 3r1r2 → f = x³ − 1.5(r1+r2)x² + 3r1r2 x */
+    var B=-3*(r1+r2)/2, Cc=3*r1*r2;
+    if(Math.round(B)!==B){r2=r1+2;lo=Math.min(r1,r2);hi=Math.max(r1,r2);B=-3*(r1+r2)/2;Cc=3*r1*r2}
+    return {ask:"כמה נקודות קיצון יש לפונקציה, ומהם שיעורי ה-x שלהן?",
+      expr:"f(x) = x<sup>3</sup>"+term(B,"x<sup>2</sup>")+term(Cc,"x"),
+      ans:W("x = "+num(lo)+" , x = "+num(hi)),
+      wrong:[
+        W("x = "+num(-lo)+" , x = "+num(-hi),"טעות סימן בפתרון המשוואה הריבועית."),
+        W("x = 0","הנחתם שהקיצון תמיד באפס. צריך לפתור את f′(x)=0."),
+        W("x = "+num(lo),"מצאתם פתרון אחד. למשוואה ריבועית עם דיסקרימיננטה חיובית יש שניים.")
+      ],
+      steps:[
+        S("גוזרים","נגזרת של פונקציה ממעלה שלישית היא ריבועית, ולכן ייתכנו שתי נקודות קיצון.",
+          "f'(x) = 3x²"+term(2*B,"x")+sgn(Cc)),
+        S("משווים לאפס ומחלקים ב-3","","x²"+term(2*B/3,"x")+sgn(Cc/3)+" = 0"),
+        S("מפרקים לגורמים","","(x"+sgn(-lo)+")(x"+sgn(-hi)+") = 0"),
+        S("שני הפתרונות","","x = "+num(lo)+"   ,   x = "+num(hi))
+      ],rule:"extr",hint:"נגזרת של פונקציה ממעלה שלישית היא ריבועית — פותרים אותה ומקבלים עד שתי נקודות."};
+  }
+  a=pick([1,-1]);r1=rnz(-6,6);
+  b=-2*a*r1;c=rnz(-9,9);
+  var isMin=a>0;
+  return {ask:"איזה סוג קיצון יש לפונקציה?",expr:"f(x) = "+poly([a,b,c]),
+    ans:W(isMin?"מינימום":"מקסימום"),
+    wrong:[
+      W(isMin?"מקסימום":"מינימום","הסתכלו על סימן הנגזרת השנייה: f″ = "+num(2*a)+", והוא "+(isMin?"חיובי ולכן מינימום":"שלילי ולכן מקסימום")+"."),
+      W("נקודת פיתול","נקודת פיתול היא מקום שבו הנגזרת השנייה מתאפסת. כאן היא קבועה ושונה מאפס."),
+      W("אין קיצון","לפרבולה תמיד יש נקודת קיצון אחת.")
+    ],
+    steps:[
+      S("גוזרים פעמיים","הנגזרת הראשונה מוצאת את המיקום, השנייה מספרת איזה סוג.",
+        "f'(x) = "+num(2*a)+"x"+sgn(b)+"   ,   f''(x) = "+num(2*a)),
+      S("קוראים את הסימן","f″ חיובי ← הפונקציה קמורה ← מינימום. f″ שלילי ← קעורה ← מקסימום.",
+        "f'' = "+num(2*a)+" → "+(isMin?"מינימום":"מקסימום")),
+      S("התשובה","",isMin?"מינימום":"מקסימום")
+    ],rule:"extr2",hint:"הנגזרת השנייה קובעת את הסוג: חיובית מינימום, שלילית מקסימום."};
+}
+
+/* ---------- 6. אינטגרל לא מסוים ---------- */
+function genIntegral(L){
+  var a,n,b,steps;
+  if(L===1){
+    a=rnz(-6,6);n=ri(1,5);b=rnz(-8,8);
+    var co=fr(a,n+1);
+    return {ask:"חשבו את האינטגרל",expr:"∫ ("+num(a)+pw("x",n)+sgn(b)+") dx",
+      ans:W(co.html()+pw("x",n+1)+term(b,"x")+" + C"),
+      wrong:[
+        W(co.html()+pw("x",n+1)+term(b,"x"),"שכחתם את קבוע האינטגרציה. באינטגרל לא מסוים חייבים +C."),
+        W(num(a)+pw("x",n+1)+term(b,"x")+" + C","העליתם את החזקה אבל לא חילקתם בחזקה החדשה."),
+        W(num(a*n)+pw("x",n-1)+sgn(b)+" + C","גזרתם במקום לאנטגרל. הפעולות הפוכות זו לזו.")
+      ],
+      steps:[
+        S("כלל האינטגרל של חזקה","∫xⁿ dx = xⁿ⁺¹ ÷ (n+1) + C — החזקה עולה באחת ומחלקים בחזקה החדשה.",
+          "∫xⁿ dx = xⁿ⁺¹/(n+1) + C"),
+        S("מאנטגרלים איבר איבר","",num(a)+pw("x",n)+" → "+co.html()+pw("x",n+1)),
+        S("האיבר הקבוע","",num(b)+" → "+num(b)+"x"),
+        S("לא שוכחים את C","אינטגרל לא מסוים מייצג משפחה שלמה של פונקציות, ולכן תמיד מוסיפים קבוע.",
+          co.html()+pw("x",n+1)+term(b,"x")+" + C")
+      ],rule:"intpow",hint:"החזקה עולה באחת ומחלקים בה. ותמיד +C."};
+  }
+  if(L===2){
+    a=rnz(-5,5);
+    var k=pick(["exp","inv","sin","cos"]);
+    var f,F,ws;
+    if(k==="exp"){f=num(a)+"e<sup>x</sup>";F=num(a)+"e<sup>x</sup> + C";
+      ws=[W(num(a)+"e<sup>x</sup>","חסר קבוע האינטגרציה."),
+          W(fr(a,2).html()+"e<sup>2x</sup> + C","הוספתם חזקה שלא קיימת. eˣ הוא האינטגרל של עצמו."),
+          W(num(a)+"x·e<sup>x</sup> + C","התייחסתם ל-eˣ כמו לחזקה של x.")];}
+    else if(k==="inv"){f='<span class="frac"><span>'+num(a)+'</span><span>x</span></span>';F=num(a)+"ln|x| + C";
+      ws=[W(num(a)+"ln x + C","הערך המוחלט חשוב: ln מוגדר רק לחיוביים, והאינטגרל תקף גם לשליליים."),
+          W(fr(a,2).html()+"x<sup>−2</sup> + C","הפעלתם את כלל החזקה. הוא לא תקף כאשר החזקה היא מינוס אחת."),
+          W('<span class="frac"><span>'+num(-a)+'</span><span>x<sup>2</sup></span></span> + C',"גזרתם במקום לאנטגרל.")];}
+    else if(k==="sin"){f=num(a)+"sin x";F=num(-a)+"cos x + C";
+      ws=[W(num(a)+"cos x + C","חסר המינוס. האינטגרל של סינוס הוא מינוס קוסינוס."),
+          W(num(a)+"sin x + C","לא ביצעתם אינטגרציה."),
+          W(num(a)+"cos x","גם המינוס וגם ה-C חסרים.")];}
+    else{f=num(a)+"cos x";F=num(a)+"sin x + C";
+      ws=[W(num(-a)+"sin x + C","הוספתם מינוס. המינוס שייך לאינטגרל של סינוס, לא של קוסינוס."),
+          W(num(-a)+"cos x + C","זו הנגזרת, לא האינטגרל."),
+          W(num(a)+"sin x","חסר קבוע האינטגרציה.")];}
+    return {ask:"חשבו את האינטגרל",expr:"∫ "+f+" dx",ans:W(F),wrong:ws,
+      steps:[
+        S("אינטגרל הוא הפעולה ההפוכה לגזירה","שואלים: איזו פונקציה גוזרת למה שכתוב כאן?",
+          k==="exp"?"(eˣ)' = eˣ":k==="inv"?"(ln|x|)' = 1/x":k==="sin"?"(−cos x)' = sin x":"(sin x)' = cos x"),
+        S("המקדם נשאר","","∫c·f = c·∫f"),
+        S("ומוסיפים C","",F)
+      ],rule:"intbasic",hint:"שואלים איזו פונקציה גוזרת לזה, ולא שוכחים את הקבוע."};
+  }
+  a=rnz(2,5);b=rnz(-8,8);n=ri(2,4);
+  return {ask:"חשבו את האינטגרל",expr:"∫ ("+num(a)+"x"+sgn(b)+")<sup>"+n+"</sup> dx",
+    ans:W('<span class="frac"><span>('+num(a)+'x'+sgn(b)+')<sup>'+(n+1)+'</sup></span><span>'+(a*(n+1))+'</span></span> + C'),
+    wrong:[
+      W('<span class="frac"><span>('+num(a)+'x'+sgn(b)+')<sup>'+(n+1)+'</sup></span><span>'+(n+1)+'</span></span> + C',
+        "חילקתם רק בחזקה החדשה ושכחתם לחלק גם בנגזרת הפנימית "+num(a)+"."),
+      W("("+num(a)+"x"+sgn(b)+")<sup>"+(n+1)+"</sup> + C","לא חילקתם בכלל."),
+      W(num(a*n)+"("+num(a)+"x"+sgn(b)+")<sup>"+(n-1)+"</sup> + C","גזרתם במקום לאנטגרל.")
+    ],
+    steps:[
+      S("הצבה","מסמנים u = "+num(a)+"x"+sgn(b)+", ואז du = "+num(a)+"dx, כלומר dx = du/"+num(a)+".",
+        "u = "+num(a)+"x"+sgn(b)),
+      S("מחליפים משתנה","","∫ uⁿ du / "+num(a)),
+      S("מאנטגרלים","","u<sup>"+(n+1)+"</sup> / ("+num(a)+"·"+(n+1)+")"),
+      S("חוזרים ל-x","","("+num(a)+"x"+sgn(b)+")<sup>"+(n+1)+"</sup> / "+(a*(n+1))+" + C")
+    ],rule:"intsub",hint:"מחלקים גם בחזקה החדשה וגם בנגזרת הפנימית."};
+}
+
+/* ---------- 7. אינטגרל מסוים ושטח ---------- */
+function genDefInt(L){
+  var a,b,n,lo,hi,steps;
+  if(L===1){
+    n=ri(1,3);a=rnz(1,4);lo=ri(0,2);hi=lo+ri(1,3);
+    var F=function(x){return a*Math.pow(x,n+1)/(n+1)};
+    var val=F(hi)-F(lo);
+    if(Math.round(val*6)!==val*6){a=n+1;val=F(hi)-F(lo)}
+    val=a*(Math.pow(hi,n+1)-Math.pow(lo,n+1))/(n+1);
+    return {ask:"חשבו את האינטגרל המסוים",
+      expr:"∫<sub>"+lo+"</sub><sup>"+hi+"</sup> "+(a===1?"":num(a))+pw("x",n)+" dx",
+      ans:W(num(Math.round(val*1000)/1000)),
+      wrong:[
+        W(num(Math.round((F(lo)-F(hi))*1000)/1000),"הפכתם את סדר הגבולות. מציבים את הגבול העליון פחות התחתון."),
+        W(num(Math.round(F(hi)*1000)/1000),"הצבתם רק את הגבול העליון ושכחתם לחסר את התחתון."),
+        W(num(a*(Math.pow(hi,n)-Math.pow(lo,n))),"הצבתם בפונקציה המקורית במקום בפונקציה הקדומה.")
+      ],
+      steps:[
+        S("מוצאים פונקציה קדומה","באינטגרל מסוים אין צורך ב-C — הוא מתבטל בחיסור.",
+          "F(x) = "+fr(a,n+1).html()+pw("x",n+1)),
+        S("משפט ניוטון־לייבניץ","מציבים את הגבול העליון ומחסרים את התחתון.","F("+hi+") − F("+lo+")"),
+        S("מציבים","",num(Math.round(F(hi)*1000)/1000)+" − "+pn(Math.round(F(lo)*1000)/1000)),
+        S("מחשבים","",num(Math.round(val*1000)/1000))
+      ],rule:"defint",hint:"פונקציה קדומה, ואז עליון פחות תחתון."};
+  }
+  if(L===2){
+    a=ri(1,4);hi=ri(2,5);
+    /* שטח מתחת ל-y = a·x בין 0 ל-hi — משולש, כדי שאפשר לבדוק גיאומטרית */
+    var area=a*hi*hi/2;
+    return {ask:"חשבו את השטח הכלוא בין הפונקציה, ציר ה-x והישרים x=0 ו-x="+hi,
+      expr:"y = "+coef(a,"x"),
+      ans:W(num(area)),
+      wrong:[
+        W(num(a*hi),"זה ערך הפונקציה בנקודה, לא השטח."),
+        W(num(a*hi*hi),"שכחתם לחלק ב-2 — האינטגרל של ax הוא ax²/2."),
+        W(num(hi*hi/2),"איבדתם את המקדם "+a+".")
+      ],
+      steps:[
+        S("שטח הוא אינטגרל מסוים","כשהפונקציה חיובית בקטע, השטח שווה בדיוק לאינטגרל.",
+          "S = ∫<sub>0</sub><sup>"+hi+"</sup> "+coef(a,"x")+" dx"),
+        S("פונקציה קדומה","","F(x) = "+fr(a,2).html()+"x²"),
+        S("מציבים גבולות","","F("+hi+") − F(0) = "+num(area)+" − 0"),
+        S("בדיקה גיאומטרית","הצורה כאן היא משולש עם בסיס "+hi+" וגובה "+num(a*hi)+", ושטחו "+num(area)+" — מתאים.",
+          "S = "+num(area))
+      ],rule:"area",hint:"שטח מתחת לגרף הוא האינטגרל המסוים בין הגבולות."};
+  }
+  a=ri(1,3);lo=-ri(1,3);hi=ri(1,3);
+  /* אינטגרל של פונקציה אי־זוגית בקטע סימטרי מתאפס */
+  return {ask:"חשבו את האינטגרל המסוים",
+    expr:"∫<sub>"+num(-hi)+"</sub><sup>"+hi+"</sup> "+(a===1?"":num(a))+"x<sup>3</sup> dx",
+    ans:W("0"),
+    wrong:[
+      W(num(a*Math.pow(hi,4)/2),"חישבתם רק את החלק החיובי. בקטע סימטרי החלק השלילי מבטל אותו."),
+      W(num(a*Math.pow(hi,4)/4),"זה הערך של הפונקציה הקדומה בגבול העליון, לא ההפרש."),
+      W(num(2*a*Math.pow(hi,4)/4),"חיברתם את שני החלקים במקום לחסר.")
+    ],
+    steps:[
+      S("שמים לב לסימטריה","x³ היא פונקציה אי־זוגית: f(−x) = −f(x). הקטע סימטרי סביב אפס.",
+        "f(−x) = −f(x)"),
+      S("מה זה אומר","כל תרומה מצד ימין מתקזזת בדיוק מול צד שמאל.","∫ מקטע סימטרי = 0"),
+      S("בדיקה בחישוב","","F(x) = "+fr(a,4).html()+"x⁴  →  F("+hi+") − F("+num(-hi)+") = 0")
+    ],rule:"defint",hint:"פונקציה אי־זוגית בקטע סימטרי סביב אפס — האינטגרל מתאפס."};
+}
+
+/* ============================================================
+   מחוללי השאלות — אלגברה לינארית
+   ============================================================ */
+
+/* ---------- 8. פעולות במטריצות ---------- */
+function genMatOps(L){
+  var A,B,i,j,steps;
+  function m2(){return [[rnz(-6,6),rnz(-6,6)],[rnz(-6,6),rnz(-6,6)]]}
+  if(L===1){
+    A=m2();B=m2();
+    var S1=[[A[0][0]+B[0][0],A[0][1]+B[0][1]],[A[1][0]+B[1][0],A[1][1]+B[1][1]]];
+    return {ask:"חשבו את סכום המטריצות",expr:mat(A)+" + "+mat(B),ans:W(mat(S1)),
+      wrong:[
+        W(mat([[A[0][0]-B[0][0],A[0][1]-B[0][1]],[A[1][0]-B[1][0],A[1][1]-B[1][1]]]),"חיסרתם במקום לחבר."),
+        W(mat([[A[0][0]+B[0][0],A[0][1]+B[1][0]],[A[1][0]+B[0][1],A[1][1]+B[1][1]]]),"החלפתם אינדקסים באלכסון. בחיבור כל איבר מתחבר עם האיבר שבאותו מקום בדיוק."),
+        W(mat([[A[0][0]*B[0][0],A[0][1]*B[0][1]],[A[1][0]*B[1][0],A[1][1]*B[1][1]]]),"הכפלתם איבר באיבר. זו לא הפעולה שנדרשה, וגם לא כפל מטריצות.")
+      ],
+      steps:[
+        S("חיבור מטריצות הוא איבר־איבר","זו הפעולה הפשוטה מבין השתיים: כל איבר מתחבר עם זה שבאותו מקום.",
+          "(A+B)ᵢⱼ = Aᵢⱼ + Bᵢⱼ"),
+        S("שורה ראשונה","",num(A[0][0])+" + "+pn(B[0][0])+" = "+num(A[0][0]+B[0][0])+"   ,   "+num(A[0][1])+" + "+pn(B[0][1])+" = "+num(A[0][1]+B[0][1])),
+        S("שורה שנייה","",num(A[1][0])+" + "+pn(B[1][0])+" = "+num(A[1][0]+B[1][0])+"   ,   "+num(A[1][1])+" + "+pn(B[1][1])+" = "+num(A[1][1]+B[1][1])),
+        S("התוצאה","",mat(S1))
+      ],rule:"matadd",hint:"בחיבור מטריצות כל איבר מתחבר עם האיבר שבאותו מקום."};
+  }
+  if(L===2){
+    A=m2();var k=rnz(-5,5);
+    var K=[[A[0][0]*k,A[0][1]*k],[A[1][0]*k,A[1][1]*k]];
+    return {ask:"חשבו",expr:num(k)+" · "+mat(A),ans:W(mat(K)),
+      wrong:[
+        W(mat([[A[0][0]*k,A[0][1]],[A[1][0],A[1][1]]]),"הכפלתם רק את האיבר הראשון. בכפל בסקלר כל איבר מוכפל."),
+        W(mat([[A[0][0]+k,A[0][1]+k],[A[1][0]+k,A[1][1]+k]]),"חיברתם את הסקלר לכל איבר במקום להכפיל בו."),
+        W(mat([[A[0][0]*k,A[0][1]*k],[A[1][0],A[1][1]]]),"הכפלתם רק את השורה הראשונה.")
+      ],
+      steps:[
+        S("כפל בסקלר","כל איבר במטריצה מוכפל במספר — בלי יוצאים מן הכלל.","(cA)ᵢⱼ = c·Aᵢⱼ"),
+        S("מכפילים","",num(k)+"·"+pn(A[0][0])+" = "+num(A[0][0]*k)+"   ,   "+num(k)+"·"+pn(A[0][1])+" = "+num(A[0][1]*k)),
+        S("וכך בשורה השנייה","",num(k)+"·"+pn(A[1][0])+" = "+num(A[1][0]*k)+"   ,   "+num(k)+"·"+pn(A[1][1])+" = "+num(A[1][1]*k)),
+        S("התוצאה","",mat(K))
+      ],rule:"matadd",hint:"סקלר מוכפל בכל אחד מאיברי המטריצה."};
+  }
+  A=[[rnz(-4,4),rnz(-4,4)],[rnz(-4,4),rnz(-4,4)]];
+  B=[[rnz(-4,4),rnz(-4,4)],[rnz(-4,4),rnz(-4,4)]];
+  var P=[[A[0][0]*B[0][0]+A[0][1]*B[1][0], A[0][0]*B[0][1]+A[0][1]*B[1][1]],
+         [A[1][0]*B[0][0]+A[1][1]*B[1][0], A[1][0]*B[0][1]+A[1][1]*B[1][1]]];
+  var elem=[[A[0][0]*B[0][0],A[0][1]*B[0][1]],[A[1][0]*B[1][0],A[1][1]*B[1][1]]];
+  var BA=[[B[0][0]*A[0][0]+B[0][1]*A[1][0], B[0][0]*A[0][1]+B[0][1]*A[1][1]],
+          [B[1][0]*A[0][0]+B[1][1]*A[1][0], B[1][0]*A[0][1]+B[1][1]*A[1][1]]];
+  return {ask:"חשבו את מכפלת המטריצות",expr:mat(A)+" · "+mat(B),ans:W(mat(P)),
+    wrong:[
+      W(mat(elem),"הכפלתם איבר באיבר. בכפל מטריצות כל איבר בתוצאה הוא מכפלה סקלרית של שורה בעמודה."),
+      W(mat(BA),"הכפלתם בסדר ההפוך. כפל מטריצות אינו חילופי — A·B ו-B·A בדרך כלל שונים."),
+      W(mat([[P[0][0],P[1][0]],[P[0][1],P[1][1]]]),"שחלפתם את התוצאה — החלפתם בין שורות לעמודות.")
+    ],
+    steps:[
+      S("כל איבר הוא שורה כפול עמודה","האיבר במקום (i,j) נבנה משורה i של A ומעמודה j של B — לא מהאיברים שבאותו מקום.",
+        "Cᵢⱼ = Σ Aᵢₖ·Bₖⱼ"),
+      S("האיבר בפינה השמאלית העליונה","",num(A[0][0])+"·"+pn(B[0][0])+" + "+num(A[0][1])+"·"+pn(B[1][0])+" = "+num(P[0][0])),
+      S("וכך שאר האיברים","",num(P[0][1])+"  ,  "+num(P[1][0])+"  ,  "+num(P[1][1])),
+      S("התוצאה","",mat(P))
+    ],rule:"matmul",hint:"שורה של הראשונה כפול עמודה של השנייה, איבר איבר ומחברים."};
+}
+
+/* ---------- 9. דטרמיננטה ---------- */
+function genDet(L){
+  var a,b,c,d,steps;
+  if(L===1){
+    a=rnz(-8,8);b=rnz(-8,8);c=rnz(-8,8);d=rnz(-8,8);
+    var det=a*d-b*c;
+    return {ask:"חשבו את הדטרמיננטה",expr:"det "+mat([[a,b],[c,d]]),ans:W(num(det)),
+      wrong:[
+        W(num(a*d+b*c),"חיברתם את שתי המכפלות. באלכסון המשני יש מינוס."),
+        W(num(b*c-a*d),"הפכתם את הסדר. מתחילים מהאלכסון הראשי ומחסרים ממנו את המשני."),
+        W(num(a*b-c*d),"הכפלתם שורות במקום אלכסונים.")
+      ],
+      steps:[
+        S("נוסחת הדטרמיננטה למטריצה 2×2","מכפלת האלכסון הראשי פחות מכפלת האלכסון המשני.","det = ad − bc"),
+        S("האלכסון הראשי","",num(a)+"·"+pn(d)+" = "+num(a*d)),
+        S("האלכסון המשני","",num(b)+"·"+pn(c)+" = "+num(b*c)),
+        S("מחסרים","",num(a*d)+" − "+pn(b*c)+" = "+num(det))
+      ],rule:"det2",hint:"אלכסון ראשי פחות אלכסון משני."};
+  }
+  if(L===2){
+    var M=[[rnz(-4,4),rnz(-4,4),rnz(-4,4)],[rnz(-4,4),rnz(-4,4),rnz(-4,4)],[rnz(-4,4),rnz(-4,4),rnz(-4,4)]];
+    var p1=M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1]);
+    var p2=M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0]);
+    var p3=M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]);
+    var det3=p1-p2+p3;
+    return {ask:"חשבו את הדטרמיננטה",expr:"det "+mat(M),ans:W(num(det3)),
+      wrong:[
+        W(num(p1+p2+p3),"חיברתם את שלושת האיברים. בפיתוח לפי שורה הסימנים מתחלפים: פלוס, מינוס, פלוס."),
+        W(num(p1-p2-p3),"הסימן של האיבר השלישי צריך להיות פלוס."),
+        W(num(M[0][0]*M[1][1]*M[2][2]),"הכפלתם רק את האלכסון הראשי. זה נכון רק במטריצה משולשת.")
+      ],
+      steps:[
+        S("מפתחים לפי השורה הראשונה","כל איבר מוכפל בדטרמיננטה של המטריצה שנשארת כשמוחקים את שורתו ועמודתו.",
+          "det = a₁₁·M₁₁ − a₁₂·M₁₂ + a₁₃·M₁₃"),
+        S("שימו לב לסימנים","הם מתחלפים: פלוס, מינוס, פלוס. זה מקור טעות נפוץ מאוד.","+ , − , +"),
+        S("שלושת האיברים","",num(p1)+"  ,  "+num(p2)+"  ,  "+num(p3)),
+        S("מחברים לפי הסימנים","",num(p1)+" − "+pn(p2)+" + "+pn(p3)+" = "+num(det3))
+      ],rule:"det3",hint:"פיתוח לפי שורה, וסימנים מתחלפים פלוס מינוס פלוס."};
+  }
+  a=rnz(-6,6);b=rnz(-6,6);c=rnz(-6,6);d=rnz(-6,6);
+  var D=a*d-b*c,k=rnz(2,4);
+  return {ask:"נתון שהדטרמיננטה של מטריצה A בגודל 2×2 היא "+num(D)+". מהי הדטרמיננטה של "+k+"A?",
+    expr:"det("+k+"A) = ?",ans:W(num(k*k*D)),
+    wrong:[
+      W(num(k*D),"הכפלתם ב-k פעם אחת. כפל בסקלר מכפיל כל שורה, ובמטריצה n×n יש n שורות — לכן k בחזקת n."),
+      W(num(D),"כפל בסקלר כן משנה את הדטרמיננטה."),
+      W(num(k*k*k*D),"החזקה היא לפי סדר המטריצה. כאן 2×2, ולכן k בריבוע.")
+    ],
+    steps:[
+      S("מה קורה כשמכפילים מטריצה בסקלר","כל אחת מהשורות מוכפלת ב-k, וכל שורה כזאת מוציאה k מחוץ לדטרמיננטה.",
+        "det(kA) = kⁿ · det(A)"),
+      S("כאן n שווה 2","",	"det("+k+"A) = "+k+"² · "+num(D)),
+      S("מחשבים","",num(k*k)+" · "+num(D)+" = "+num(k*k*D))
+    ],rule:"detprop",hint:"det(kA) = k בחזקת סדר המטריצה, כפול det(A)."};
+}
+
+/* ---------- 10. מטריצה הופכית ---------- */
+function genInverse(L){
+  var a,b,c,d,steps;
+  if(L===1){
+    /* det = 1 כדי שההופכית תצא שלמה */
+    a=rnz(-4,4);b=rnz(-4,4);
+    var tries=0;c=rnz(-4,4);d=0;
+    while(tries<200){c=rnz(-4,4);if(a!==0&&(1+b*c)%a===0){d=(1+b*c)/a;if(Math.abs(d)<=9)break}tries++}
+    if(tries>=200){a=1;b=2;c=1;d=3}
+    var det=a*d-b*c;
+    var inv=[[d/det,-b/det],[-c/det,a/det]];
+    return {ask:"מצאו את המטריצה ההופכית",expr:"A = "+mat([[a,b],[c,d]]),ans:W(mat(inv)),
+      wrong:[
+        W(mat([[a,-b],[-c,d]]),"החלפתם סימנים אבל לא החלפתם בין האיברים שעל האלכסון הראשי."),
+        W(mat([[d,b],[c,a]]),"החלפתם בין a ל-d אבל שכחתם את המינוסים על האלכסון המשני."),
+        W(mat([[1/a,1/b],[1/c,1/d]].map(function(r){return r.map(function(v){return Math.round(v*100)/100})})),
+          "הפכתם כל איבר בנפרד. הופכית של מטריצה איננה מטריצת ההופכיים.")
+      ],
+      steps:[
+        S("בודקים שהמטריצה הפיכה","מטריצה הפיכה אם ורק אם הדטרמיננטה שלה שונה מאפס.","det = "+num(a)+"·"+pn(d)+" − "+pn(b)+"·"+pn(c)+" = "+num(det)),
+        S("נוסחת ההופכית ל-2×2","מחליפים בין a ל-d, הופכים סימן ל-b ול-c, ומחלקים בדטרמיננטה.",
+          "A⁻¹ = (1/det)·[[d, −b], [−c, a]]"),
+        S("מציבים","",mat([[d,-b],[-c,a]])),
+        S("הדטרמיננטה כאן היא "+num(det),"","A⁻¹ = "+mat(inv))
+      ],rule:"inv2",hint:"מחליפים a ו-d, הופכים סימן ל-b ול-c, ומחלקים בדטרמיננטה."};
+  }
+  if(L===2){
+    a=rnz(-5,5);b=rnz(-5,5);c=rnz(-5,5);d=rnz(-5,5);
+    var D2=a*d-b*c;
+    while(D2===0){d=rnz(-5,5);D2=a*d-b*c}
+    return {ask:"מהי הדטרמיננטה שבמכנה של המטריצה ההופכית?",expr:"A = "+mat([[a,b],[c,d]]),
+      ans:W(num(D2)),
+      wrong:[
+        W(num(a*d+b*c),"סימן שגוי — האלכסון המשני מחוסר."),
+        W(num(a+d),"זה העקבה, סכום האלכסון הראשי, ולא הדטרמיננטה."),
+        W(num(1/D2===Math.round(1/D2)?1/D2:Math.round(100/D2)/100),"זה כבר ההופכי של הדטרמיננטה. השאלה מבקשת אותה עצמה.")
+      ],
+      steps:[
+        S("ההופכית מוגדרת רק כשהדטרמיננטה שונה מאפס","היא מופיעה במכנה, ולכן אפס היה הופך את הביטוי לחסר משמעות.",
+          "A⁻¹ = (1/det)·adj(A)"),
+        S("מחשבים","",	"det = "+num(a)+"·"+pn(d)+" − "+pn(b)+"·"+pn(c)),
+        S("התוצאה","",num(D2))
+      ],rule:"inv2",hint:"הדטרמיננטה היא ad פחות bc, והיא זו שיושבת במכנה."};
+  }
+  a=rnz(-5,5);b=rnz(-5,5);
+  var k2=rnz(2,4);c=a*k2;d=b*k2;    /* שורות תלויות → det = 0 */
+  return {ask:"האם המטריצה הפיכה?",expr:"A = "+mat([[a,b],[c,d]]),
+    ans:W("לא הפיכה"),
+    wrong:[
+      W("הפיכה","הדטרמיננטה כאן היא אפס: השורה השנייה היא בדיוק פי "+k2+" מהראשונה, ולכן השורות תלויות לינארית."),
+      W("הפיכה רק אם a שונה מאפס","התנאי היחיד הוא שהדטרמיננטה תהיה שונה מאפס, ולא תנאי על איבר בודד."),
+      W("אי אפשר לדעת","אפשר בהחלט — מחשבים דטרמיננטה ובודקים אם היא אפס.")
+    ],
+    steps:[
+      S("התנאי להפיכות","מטריצה הפיכה אם ורק אם הדטרמיננטה שלה שונה מאפס.","A הפיכה ⇔ det(A) ≠ 0"),
+      S("מחשבים","",	"det = "+num(a)+"·"+pn(d)+" − "+pn(b)+"·"+pn(c)+" = "+num(a*d-b*c)),
+      S("מה זה אומר","השורה השנייה היא פי "+k2+" מהראשונה — השורות תלויות, ולכן הדטרמיננטה מתאפסת.",
+        "det = 0 → לא הפיכה")
+    ],rule:"inv2",hint:"בודקים דטרמיננטה. אפס פירושו שהשורות תלויות ואין הופכית."};
+}
+
+/* ---------- 11. מערכת משוואות ודירוג ---------- */
+function genLinEq(L){
+  var x,y,a1,b1,c1,a2,b2,c2,steps;
+  if(L===1){
+    x=rnz(-7,7);y=rnz(-7,7);
+    a1=rnz(-4,4);b1=rnz(-4,4);a2=rnz(-4,4);b2=rnz(-4,4);
+    var t=0;
+    while(a1*b2-a2*b1===0&&t<60){a2=rnz(-4,4);b2=rnz(-4,4);t++}
+    if(a1*b2-a2*b1===0){a1=1;b1=1;a2=1;b2=-1}
+    c1=a1*x+b1*y;c2=a2*x+b2*y;
+    return {ask:"פתרו את המערכת",
+      expr:coef(a1,"x")+term(b1,"y")+" = "+num(c1)+"<br>"+coef(a2,"x")+term(b2,"y")+" = "+num(c2),
+      ans:W("x = "+num(x)+" , y = "+num(y)),
+      wrong:[
+        W("x = "+num(y)+" , y = "+num(x),"החלפתם בין הנעלמים בסוף."),
+        W("x = "+num(-x)+" , y = "+num(y),"טעות סימן בשלב הסילוק."),
+        W("אין פתרון","הדטרמיננטה של מטריצת המקדמים היא "+num(a1*b2-a2*b1)+", שונה מאפס, ולכן יש פתרון יחיד.")
+      ],
+      steps:[
+        S("כותבים כמטריצה מורחבת","זו בדיוק אותה מערכת, רק בלי לכתוב שוב ושוב x ו-y.",
+          mat([[a1,b1,c1],[a2,b2,c2]])),
+        S("מסלקים נעלם","מכפילים שורות כך שמקדמי y יתבטלו בחיבור.",
+          num(a1*b2-a2*b1)+"x = "+num(c1*b2-c2*b1)),
+        S("מוצאים x","","x = "+num(x)),
+        S("מציבים חזרה ומוצאים y","","y = "+num(y))
+      ],rule:"gauss",hint:"מסלקים נעלם אחד, פותרים לשני, ומציבים חזרה."};
+  }
+  if(L===2){
+    a1=rnz(-4,4);b1=rnz(-4,4);
+    var k=rnz(2,3);
+    var kind=pick(["one","none","inf"]);
+    a2=a1*k;b2=b1*k;c1=rnz(-9,9);
+    if(kind==="one"){a2=b1;b2=-a1;c2=rnz(-9,9)}     /* דטרמיננטה שונה מאפס */
+    else if(kind==="inf"){c2=c1*k}
+    else{c2=c1*k+rnz(1,4)}
+    var ansTxt=kind==="one"?"פתרון יחיד":kind==="inf"?"אינסוף פתרונות":"אין פתרון";
+    var det=a1*b2-a2*b1;
+    return {ask:"כמה פתרונות יש למערכת?",
+      expr:coef(a1,"x")+term(b1,"y")+" = "+num(c1)+"<br>"+coef(a2,"x")+term(b2,"y")+" = "+num(c2),
+      ans:W(ansTxt),
+      wrong:["פתרון יחיד","אינסוף פתרונות","אין פתרון"].filter(function(v){return v!==ansTxt})
+        .map(function(v){return W(v,
+          kind==="one"?"הדטרמיננטה היא "+num(det)+", שונה מאפס, ולכן הפתרון יחיד."
+          :kind==="inf"?"המשוואה השנייה היא בדיוק המשוואה הראשונה כפול "+k+" — אותה משוואה פעמיים, ולכן אינסוף פתרונות."
+          :"המקדמים פרופורציוניים אבל האגפים הימניים לא — שתי משוואות סותרות, ולכן אין פתרון.")}),
+      steps:[
+        S("בודקים את הדטרמיננטה","det שונה מאפס פירושו פתרון יחיד. det אפס דורש בדיקה נוספת.",
+          "det = "+num(a1)+"·"+pn(b2)+" − "+pn(a2)+"·"+pn(b1)+" = "+num(det)),
+        S(det!==0?"דטרמיננטה שונה מאפס":"דטרמיננטה מתאפסת",
+          det!==0?"השורות בלתי תלויות, והמערכת נחתכת בנקודה אחת בדיוק."
+                 :"השורות פרופורציוניות. עכשיו בודקים אם גם האגפים הימניים באותו יחס.",
+          det!==0?"פתרון יחיד":(kind==="inf"?"גם האגפים ביחס "+k+" → אותה משוואה":"האגפים לא ביחס → סתירה")),
+        S("התשובה","",ansTxt)
+      ],rule:"gauss",hint:"דטרמיננטה שונה מאפס — פתרון יחיד. אפס — בודקים אם המשוואות זהות או סותרות."};
+  }
+  a1=rnz(-4,4);b1=rnz(-4,4);
+  var k3=rnz(2,4);a2=a1*k3;b2=b1*k3;
+  return {ask:"למערכת ההומוגנית הבאה יש פתרון לא טריוויאלי. מדוע?",
+    expr:coef(a1,"x")+term(b1,"y")+" = 0<br>"+coef(a2,"x")+term(b2,"y")+" = 0",
+    ans:W("כי הדטרמיננטה מתאפסת"),
+    wrong:[
+      W("כי האגפים הימניים אפס","לכל מערכת הומוגנית יש אגף ימני אפס, וברוב המקרים הפתרון היחיד הוא הטריוויאלי."),
+      W("כי יש שתי משוואות ושני נעלמים","מספר שווה של משוואות ונעלמים דווקא מרמז על פתרון יחיד."),
+      W("כי המקדמים שליליים","סימן המקדמים לא קובע דבר בעניין הזה.")
+    ],
+    steps:[
+      S("מערכת הומוגנית תמיד פתירה","הפתרון x=0, y=0 תמיד מקיים אותה. השאלה היא אם יש גם פתרון אחר.",
+        "x = 0 , y = 0 תמיד פתרון"),
+      S("מתי יש פתרון נוסף","בדיוק כאשר הדטרמיננטה מתאפסת, כלומר כשהשורות תלויות לינארית.",
+        "det = "+num(a1*b2-a2*b1)),
+      S("כאן","השורה השנייה היא פי "+k3+" מהראשונה, ולכן יש למעשה משוואה אחת ואינסוף פתרונות.",
+        "פתרון לא טריוויאלי קיים")
+    ],rule:"gauss",hint:"למערכת הומוגנית יש פתרון לא טריוויאלי בדיוק כשהדטרמיננטה אפס."};
+}
+
+/* ---------- 12. וקטורים ---------- */
+function genVectors(L){
+  var u,v,steps;
+  var TRIP=[[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15],[7,24,25]];
+  if(L===1){
+    var t=pick(TRIP);
+    u=[t[0]*pick([1,-1]),t[1]*pick([1,-1])];
+    return {ask:"חשבו את אורך הווקטור",expr:"u = "+vecH(u),ans:W(String(t[2])),
+      wrong:[
+        W(num(Math.abs(u[0])+Math.abs(u[1])),"חיברתם את הרכיבים. האורך מחושב לפי פיתגורס, על הריבועים."),
+        W(num(t[2]*t[2]),"עצרתם לפני הוצאת השורש."),
+        W(num(Math.abs(u[0]*u[1])),"הכפלתם את הרכיבים.")
+      ],
+      steps:[
+        S("נורמה היא פיתגורס","האורך הוא שורש סכום ריבועי הרכיבים. הסימנים נעלמים בהעלאה בריבוע.",
+          "|u| = √(u₁² + u₂²)"),
+        S("מציבים","","√("+pn(u[0])+"² + "+pn(u[1])+"²) = √("+(u[0]*u[0])+" + "+(u[1]*u[1])+")"),
+        S("מחשבים","","√"+(t[2]*t[2])+" = "+t[2])
+      ],rule:"norm",hint:"אורך וקטור = שורש של סכום ריבועי הרכיבים."};
+  }
+  if(L===2){
+    u=[rnz(-6,6),rnz(-6,6)];v=[rnz(-6,6),rnz(-6,6)];
+    var dot=u[0]*v[0]+u[1]*v[1];
+    return {ask:"חשבו את המכפלה הסקלרית",expr:"u = "+vecH(u)+" ,  v = "+vecH(v),
+      ans:W(num(dot)),
+      wrong:[
+        W(vecH([u[0]*v[0],u[1]*v[1]]),"התוצאה של מכפלה סקלרית היא מספר, לא וקטור. אחרי הכפל מחברים."),
+        W(num(u[0]*v[0]-u[1]*v[1]),"חיסרתם בין המכפלות. במכפלה סקלרית מחברים."),
+        W(num(u[0]*v[1]+u[1]*v[0]),"הצלבתם רכיבים. מכפילים רכיב ראשון ברכיב ראשון ושני בשני.")
+      ],
+      steps:[
+        S("הגדרת המכפלה הסקלרית","מכפילים רכיבים מתאימים ומחברים. התוצאה היא מספר יחיד.",
+          "u·v = u₁v₁ + u₂v₂"),
+        S("מציבים","",pn(u[0])+"·"+pn(v[0])+" + "+pn(u[1])+"·"+pn(v[1])),
+        S("מחשבים","",num(u[0]*v[0])+" + "+pn(u[1]*v[1])+" = "+num(dot)),
+        S("מה זה אומר",dot===0?"מכפלה סקלרית אפס פירושה שהווקטורים מאונכים.":"המכפלה שונה מאפס, ולכן הווקטורים אינם מאונכים.","")
+      ],rule:"dot",hint:"רכיב כפול רכיב, ואז מחברים. התוצאה מספר."};
+  }
+  u=[rnz(-6,6),rnz(-6,6)];
+  var w=[-u[1],u[0]];        /* מאונך לפי בנייה */
+  var wNot=[u[0],rnz(-6,6)];
+  while(u[0]*wNot[0]+u[1]*wNot[1]===0)wNot[1]=rnz(-6,6);
+  return {ask:"איזה מהווקטורים מאונך ל-u?",expr:"u = "+vecH(u),
+    ans:W(vecH(w)),
+    wrong:[
+      W(vecH([u[0],u[1]]),"זה הווקטור עצמו. וקטור מאונך לעצמו רק אם הוא וקטור האפס."),
+      W(vecH([-u[0],-u[1]]),"זה הווקטור ההפוך — הוא מקביל ל-u, לא מאונך לו."),
+      W(vecH(wNot),"המכפלה הסקלרית כאן היא "+num(u[0]*wNot[0]+u[1]*wNot[1])+" ולא אפס.")
+    ],
+    steps:[
+      S("תנאי הניצבות","שני וקטורים מאונכים בדיוק כאשר המכפלה הסקלרית שלהם מתאפסת.","u·v = 0 ⇔ u ⊥ v"),
+      S("בונים מאונך במישור","מחליפים בין הרכיבים והופכים סימן לאחד מהם.","u = (a,b) → (−b,a)"),
+      S("בודקים","",pn(u[0])+"·"+pn(w[0])+" + "+pn(u[1])+"·"+pn(w[1])+" = 0")
+    ],rule:"dot",hint:"מאונכים כשהמכפלה הסקלרית אפס. במישור: מחליפים רכיבים והופכים סימן לאחד."};
+}
+
+/* ---------- 13. ערכים עצמיים ---------- */
+function genEigen(L){
+  var l1,l2,a,b,c,d,steps;
+  if(L===1){
+    l1=rnz(-5,5);l2=rnz(-5,5);
+    while(l2===l1)l2=rnz(-5,5);
+    a=l1;d=l2;b=rnz(-4,4);c=0;      /* משולשת — הערכים העצמיים על האלכסון */
+    return {ask:"מצאו את הערכים העצמיים",expr:"A = "+mat([[a,b],[c,d]]),
+      ans:W("λ = "+num(l1)+" , λ = "+num(l2)),
+      wrong:[
+        W("λ = "+num(b)+" , λ = "+num(a),"לקחתם איברים שאינם על האלכסון. במטריצה משולשת הערכים העצמיים הם בדיוק איברי האלכסון."),
+        W("λ = "+num(a+d)+" , λ = "+num(a*d),"אלה העקבה והדטרמיננטה, ולא הערכים העצמיים עצמם."),
+        W("λ = "+num(-l1)+" , λ = "+num(-l2),"טעות סימן. במשוואה det(A−λI)=0 המינוס כבר נלקח בחשבון.")
+      ],
+      steps:[
+        S("המשוואה האופיינית","מחפשים λ שעבורו המטריצה A מינוס λI מאבדת הפיכות.","det(A − λI) = 0"),
+        S("כותבים את המטריצה","",mat([["a−λ",b],[c,"d−λ"]])),
+        S("המטריצה משולשת","כשיש אפס מתחת לאלכסון, הדטרמיננטה היא מכפלת האלכסון.",
+          "("+num(a)+" − λ)("+num(d)+" − λ) = 0"),
+        S("הפתרונות","","λ = "+num(l1)+"   ,   λ = "+num(l2))
+      ],rule:"eigen",hint:"במטריצה משולשת הערכים העצמיים יושבים על האלכסון."};
+  }
+  l1=rnz(-4,4);l2=rnz(-4,4);
+  while(l2===l1)l2=rnz(-4,4);
+  var tr=l1+l2,de=l1*l2;
+  a=rnz(-4,4);d=tr-a;
+  b=rnz(1,4);c=(a*d-de)/b;
+  var t2=0;
+  while((Math.round(c)!==c||Math.abs(c)>9)&&t2<120){a=rnz(-4,4);d=tr-a;b=rnz(1,4);c=(a*d-de)/b;t2++}
+  if(Math.round(c)!==c){a=l1;d=l2;b=0;c=0}
+  if(L===2){
+    return {ask:"מצאו את הערכים העצמיים",expr:"A = "+mat([[a,b],[c,d]]),
+      ans:W("λ = "+num(Math.min(l1,l2))+" , λ = "+num(Math.max(l1,l2))),
+      wrong:[
+        W("λ = "+num(a)+" , λ = "+num(d),"לקחתם את איברי האלכסון. זה נכון רק במטריצה משולשת."),
+        W("λ = "+num(-Math.min(l1,l2))+" , λ = "+num(-Math.max(l1,l2)),"טעות סימן בפתרון המשוואה הריבועית."),
+        W("λ = "+num(tr)+" , λ = "+num(de),"אלה סכום ומכפלת הערכים העצמיים, לא הם עצמם.")
+      ],
+      steps:[
+        S("שתי עובדות שחוסכות עבודה","סכום הערכים העצמיים הוא העקבה, ומכפלתם היא הדטרמיננטה.",
+          "λ₁+λ₂ = "+num(tr)+"   ,   λ₁·λ₂ = "+num(de)),
+        S("המשוואה האופיינית","","λ²"+term(-tr,"λ")+sgn(de)+" = 0"),
+        S("מפרקים לגורמים","","(λ"+sgn(-l1)+")(λ"+sgn(-l2)+") = 0"),
+        S("הפתרונות","","λ = "+num(Math.min(l1,l2))+"   ,   λ = "+num(Math.max(l1,l2)))
+      ],rule:"eigen",hint:"סכום הערכים העצמיים הוא העקבה, ומכפלתם הדטרמיננטה."};
+  }
+  return {ask:"סכום הערכים העצמיים של מטריצה שווה תמיד ל־",expr:"",
+    ans:W("עקבת המטריצה"),
+    wrong:[
+      W("דטרמיננטת המטריצה","הדטרמיננטה שווה למכפלת הערכים העצמיים, לא לסכומם."),
+      W("סכום כל איברי המטריצה","רק איברי האלכסון הראשי נספרים בעקבה."),
+      W("מספר השורות","זה נכון רק במקרה פרטי של מטריצת היחידה.")
+    ],
+    steps:[
+      S("שני קשרים שכדאי לזכור","הם חוסכים פתרון מלא של המשוואה האופיינית, ומאפשרים לבדוק תשובה בשנייה.",
+        "Σλ = trace(A)   ,   Πλ = det(A)"),
+      S("העקבה","סכום איברי האלכסון הראשי בלבד.","trace = a₁₁ + a₂₂"),
+      S("שימוש מעשי","אם חישבתם ערכים עצמיים והסכום לא יוצא כמו העקבה — יש טעות.","")
+    ],rule:"eigen",hint:"עקבה = סכום האלכסון הראשי = סכום הערכים העצמיים."};
+}
+
+/* ============================================================
+   מחוללי השאלות — הסתברות וסטטיסטיקה
+   ============================================================ */
+
+/* ---------- 14. קומבינטוריקה ---------- */
+function genComb(L){
+  var n,k,steps;
+  if(L===1){
+    n=ri(4,7);
+    return {ask:"בכמה סדרים שונים אפשר להושיב "+n+" אנשים בשורה?",expr:"",
+      ans:W(String(fact(n))),
+      wrong:[
+        W(String(n*n),"הכפלתם ב-n בכל מקום. אחרי שאדם התיישב הוא כבר לא זמין, ולכן המספר יורד באחד בכל שלב."),
+        W(String(Math.pow(2,n)),"זה מספר תת־הקבוצות, לא מספר הסדרים."),
+        W(String(n*(n-1)),"עצרתם אחרי שני מקומות. צריך להמשיך עד המקום האחרון.")
+      ],
+      steps:[
+        S("סופרים מקום אחרי מקום","למקום הראשון יש "+n+" מועמדים. אחרי שאחד התיישב נשארו "+(n-1)+", וכן הלאה.",
+          n+" · "+(n-1)+" · … · 1"),
+        S("זו בדיוק העצרת","","n! = "+n+"!"),
+        S("מחשבים","","= "+fact(n))
+      ],rule:"perm",hint:"סידור של כל האנשים בשורה הוא n עצרת."};
+  }
+  if(L===2){
+    n=ri(5,9);k=ri(2,Math.min(4,n-1));
+    var c=Cnk(n,k),p=Math.round(fact(n)/fact(n-k));
+    return {ask:"בוחרים ועדה של "+k+" אנשים מתוך "+n+". בכמה דרכים?",expr:"",
+      ans:W(String(c)),
+      wrong:[
+        W(String(p),"ספרתם גם את הסדר. בוועדה אין תפקידים, ולכן צריך לחלק ב-"+k+"! כדי לא לספור את אותה קבוצה שוב ושוב."),
+        W(String(n*k),"הכפלתם את המספרים. זו לא נוסחת הבחירה."),
+        W(String(Cnk(n,k-1)),"בחרתם "+(k-1)+" אנשים במקום "+k+".")
+      ],
+      steps:[
+        S("סדר או לא סדר — זו השאלה","בוועדה כל החברים שווים, ולכן הסדר לא משנה. במקרה כזה משתמשים בצירופים.",
+          "C(n,k) = n! / (k!·(n−k)!)"),
+        S("מציבים","","C("+n+","+k+") = "+n+"! / ("+k+"!·"+(n-k)+"!)"),
+        S("מחשבים","","= "+c),
+        S("למה מחלקים ב-"+k+"!","אילו ספרנו בסדר היינו מקבלים "+p+", וכל ועדה הייתה נספרת "+fact(k)+" פעמים.",
+          p+" ÷ "+fact(k)+" = "+c)
+      ],rule:"comb",hint:"אין סדר — צירופים. יש סדר — חליפות."};
+  }
+  n=ri(4,6);k=ri(2,3);
+  var perm=Math.round(fact(n)/fact(n-k));
+  return {ask:"בוחרים "+k+" אנשים מתוך "+n+" לתפקידים שונים. בכמה דרכים?",expr:"",
+    ans:W(String(perm)),
+    wrong:[
+      W(String(Cnk(n,k)),"התעלמתם מהסדר. תפקידים שונים פירושם שהסדר כן משנה, ולכן חליפות ולא צירופים."),
+      W(String(fact(n)),"סידרתם את כולם. בוחרים רק "+k+" מתוך "+n+"."),
+      W(String(Math.pow(n,k)),"אותו אדם לא יכול למלא שני תפקידים, ולכן אין החזרה.")
+    ],
+    steps:[
+      S("כאן הסדר משנה","מי שקיבל תפקיד א׳ אינו במצב זהה למי שקיבל תפקיד ב׳, ולכן זו חליפה.",
+        "P(n,k) = n! / (n−k)!"),
+      S("סופרים","","למקום הראשון "+n+" אפשרויות, לשני "+(n-1)+", וכן הלאה"),
+      S("מחשבים","","= "+perm)
+    ],rule:"perm",hint:"תפקידים שונים = הסדר משנה = חליפות."};
+}
+
+/* ---------- 15. הסתברות מותנית ובייס ---------- */
+function genCondProb(L){
+  var a,b,ab,tot,steps;
+  if(L===1){
+    tot=pick([40,50,60,80,100]);
+    a=Math.round(tot*pick([0.3,0.4,0.5,0.6]));
+    b=Math.round(tot*pick([0.3,0.4,0.5]));
+    ab=Math.round(Math.min(a,b)*pick([0.4,0.5,0.6]));
+    var p=fr(ab,b);
+    return {ask:"מתוך "+tot+" סטודנטים, "+b+" לומדים סטטיסטיקה ו-"+ab+" מהם לומדים גם אלגברה. סטודנט נבחר באקראי מבין לומדי הסטטיסטיקה — מה ההסתברות שהוא לומד גם אלגברה?",
+      expr:"",ans:W(p.html()),
+      wrong:[
+        W(fr(ab,tot).html(),"חילקתם בכלל הסטודנטים. בהסתברות מותנית המכנה מצטמצם לתנאי בלבד."),
+        W(fr(b,tot).html(),"זו ההסתברות ללמוד סטטיסטיקה, ולא ההסתברות המבוקשת."),
+        W(fr(b,ab).html(),"הפכתם את השבר.")
+      ],
+      steps:[
+        S("הגדרת הסתברות מותנית","המכנה מצטמצם: כבר ידוע שהסטודנט מקבוצת הסטטיסטיקה, ולכן זה כל המרחב שלנו.",
+          "P(A|B) = P(A∩B) / P(B)"),
+        S("סופרים","","החיתוך: "+ab+"   ,   התנאי: "+b),
+        S("מחלקים","",fr(ab,b).html())
+      ],rule:"cond",hint:"בהסתברות מותנית המכנה הוא התנאי, לא כל המרחב."};
+  }
+  if(L===2){
+    var pd=pick([2,4,5]),sens=pick([90,95]),fp=pick([5,10]);
+    var pop=1000,sick=pop/pd/10*1;
+    sick=Math.round(pop*pd/100);
+    var tp=Math.round(sick*sens/100),fpN=Math.round((pop-sick)*fp/100);
+    var post=fr(tp,tp+fpN);
+    return {ask:"מחלה מופיעה אצל "+pd+"% מהאוכלוסייה. בדיקה מזהה חולה בהסתברות "+sens+"%, ונותנת תוצאה חיובית שגויה אצל "+fp+"% מהבריאים. אדם קיבל תוצאה חיובית — מה ההסתברות שהוא חולה?",
+      expr:"",ans:W(post.html()+" ≈ "+Math.round(post.val()*100)+"%"),
+      wrong:[
+        W(sens+"%","זו רגישות הבדיקה — ההסתברות לתוצאה חיובית בהינתן מחלה. השאלה מבקשת את הכיוון ההפוך."),
+        W(pd+"%","זו השכיחות באוכלוסייה, לפני שהתקבל מידע מהבדיקה."),
+        W((100-fp)+"%","זו הסגוליות של הבדיקה, לא ההסתברות המבוקשת.")
+      ],
+      steps:[
+        S("למה האינטואיציה נכשלת כאן","הבריאים הם רוב עצום, ולכן גם אחוז קטן של טעויות אצלם מייצר הרבה תוצאות חיוביות שגויות.",
+          "רוב החיוביים מגיעים דווקא מהבריאים"),
+        S("סופרים על "+pop+" אנשים","",	"חולים: "+sick+"   ,   בריאים: "+(pop-sick)),
+        S("כמה חיוביים מכל קבוצה","",	"חולים חיוביים: "+tp+"   ,   בריאים חיוביים בטעות: "+fpN),
+        S("מחלקים","",tp+" ÷ ("+tp+" + "+fpN+") = "+post.html()+" ≈ "+Math.round(post.val()*100)+"%")
+      ],rule:"bayes",hint:"סופרים על אוכלוסייה שלמה: כמה חיוביים אמיתיים מול כמה חיוביים שגויים."};
+  }
+  var pa=pick([2,3,4,5]),pb=pick([2,3,4,5]);
+  var indep=Math.random()<0.5;
+  var pAB=indep?fr(1,pa*pb):fr(1,pa*pb+1);
+  return {ask:"נתון P(A) = "+fr(1,pa).html()+" , P(B) = "+fr(1,pb).html()+" , P(A∩B) = "+pAB.html()+". האם המאורעות בלתי תלויים?",
+    expr:"",ans:W(indep?"בלתי תלויים":"תלויים"),
+    wrong:[
+      W(indep?"תלויים":"בלתי תלויים","מכפלת ההסתברויות היא "+fr(1,pa*pb).html()+", והחיתוך הוא "+pAB.html()+". "+(indep?"הם שווים, ולכן בלתי תלויים.":"הם שונים, ולכן תלויים.")),
+      W("זרים","מאורעות זרים הם כאלה שהחיתוך שלהם ריק. כאן החיתוך שונה מאפס."),
+      W("אי אפשר לקבוע","אפשר בהחלט — משווים את החיתוך למכפלת ההסתברויות.")
+    ],
+    steps:[
+      S("מבחן אי־התלות","אי־תלות אינה עניין של תחושה אלא של שוויון מספרי אחד.","A,B בלתי תלויים ⇔ P(A∩B) = P(A)·P(B)"),
+      S("מחשבים את המכפלה","",fr(1,pa).html()+" · "+fr(1,pb).html()+" = "+fr(1,pa*pb).html()),
+      S("משווים לחיתוך","",pAB.html()+(indep?" = ":" ≠ ")+fr(1,pa*pb).html()),
+      S("מסקנה","",indep?"בלתי תלויים":"תלויים")
+    ],rule:"indep",hint:"בלתי תלויים אם ורק אם ההסתברות של החיתוך שווה למכפלת ההסתברויות."};
+}
+
+/* ---------- 16. תוחלת ושונות ---------- */
+function genExpVar(L){
+  var vals,probs,i,E,steps;
+  if(L===1){
+    var n=3,den=pick([4,6,8,10]);
+    var p1=ri(1,den-2),p2=ri(1,den-p1-1),p3=den-p1-p2;
+    vals=[rnz(-5,10),rnz(-5,10),rnz(-5,10)];
+    while(vals[1]===vals[0])vals[1]=rnz(-5,10);
+    while(vals[2]===vals[0]||vals[2]===vals[1])vals[2]=rnz(-5,10);
+    probs=[fr(p1,den),fr(p2,den),fr(p3,den)];
+    E=(vals[0]*p1+vals[1]*p2+vals[2]*p3)/den;
+    return {ask:"חשבו את התוחלת",
+      expr:"x:  "+vals.map(num).join(" , ")+"<br>P:  "+probs.map(function(f){return f.html()}).join(" , "),
+      ans:W(num(Math.round(E*1000)/1000)),
+      wrong:[
+        W(num(Math.round((vals[0]+vals[1]+vals[2])/3*1000)/1000),"חישבתם ממוצע פשוט. בתוחלת כל ערך מקבל משקל לפי ההסתברות שלו."),
+        W(num(vals[0]+vals[1]+vals[2]),"חיברתם את הערכים בלי להכפיל בהסתברויות."),
+        W(num(Math.round((p1+p2+p3)/den*1000)/1000),"סכמתם את ההסתברויות. הן תמיד מסתכמות ל-1.")
+      ],
+      steps:[
+        S("תוחלת היא ממוצע משוקלל","כל ערך נכנס לחישוב לפי ההסתברות שלו, ולא בחלקים שווים.","E(X) = Σ xᵢ·P(xᵢ)"),
+        S("מכפילים כל ערך בהסתברות","",vals.map(function(v,ix){return num(v)+"·"+[p1,p2,p3][ix]+"/"+den}).join(" + ")),
+        S("מחברים","","E(X) = "+num(Math.round(E*1000)/1000))
+      ],rule:"exp",hint:"תוחלת = סכום של ערך כפול ההסתברות שלו."};
+  }
+  if(L===2){
+    var a=ri(1,6),b=a+ri(1,6);
+    /* משתנה עם שני ערכים בהסתברות חצי־חצי — שונות פשוטה לבדיקה */
+    E=(a+b)/2;
+    var E2=(a*a+b*b)/2,V=E2-E*E;
+    return {ask:"משתנה מקרי מקבל את הערכים "+a+" ו-"+b+", כל אחד בהסתברות חצי. חשבו את השונות.",
+      expr:"",ans:W(num(Math.round(V*1000)/1000)),
+      wrong:[
+        W(num(Math.round(E*1000)/1000),"זו התוחלת, לא השונות."),
+        W(num(Math.round((E2)*1000)/1000),"זו E(X²). צריך עוד לחסר ממנה את התוחלת בריבוע."),
+        W(num(Math.round(Math.sqrt(V)*1000)/1000),"זו סטיית התקן — שורש השונות.")
+      ],
+      steps:[
+        S("נוסחת השונות","V(X) = E(X²) − [E(X)]². שימו לב: קודם מרבעים ואז ממצעים, ולא להפך.",
+          "V(X) = E(X²) − E(X)²"),
+        S("מחשבים תוחלת","","E(X) = ("+a+" + "+b+") / 2 = "+num(E)),
+        S("מחשבים E(X²)","","E(X²) = ("+(a*a)+" + "+(b*b)+") / 2 = "+num(E2)),
+        S("מחסרים","","V = "+num(E2)+" − "+pn(E)+"² = "+num(Math.round(V*1000)/1000))
+      ],rule:"var",hint:"שונות = תוחלת הריבוע פחות ריבוע התוחלת."};
+  }
+  var m=ri(2,8),v=ri(2,6),k=ri(2,5),c=rnz(-6,6);
+  return {ask:"נתון E(X) = "+m+" ו-V(X) = "+v+". חשבו את השונות של "+k+"X"+sgn(c)+".",
+    expr:"",ans:W(String(k*k*v)),
+    wrong:[
+      W(String(k*v),"הכפלתם ב-k פעם אחת. בשונות המקדם עולה בריבוע, כי השונות עצמה מדודה ביחידות בריבוע."),
+      W(String(k*k*v+c),"הוספתם את הקבוע. הזזה לא משנה את הפיזור, ולכן היא לא משפיעה על השונות."),
+      W(String(k*m+c),"זו התוחלת של הביטוי, לא השונות.")
+    ],
+    steps:[
+      S("שני כללים","התוחלת לינארית לגמרי. השונות מתעלמת מהזזה ומעלה את המקדם בריבוע.",
+        "E(aX+b) = aE(X)+b   ,   V(aX+b) = a²V(X)"),
+      S("למה הקבוע נעלם","הוספת קבוע מזיזה את כל ההתפלגות, אבל לא משנה כמה היא מפוזרת.",
+        "V(X + b) = V(X)"),
+      S("מציבים","","V("+k+"X"+sgn(c)+") = "+k+"²·"+v+" = "+(k*k*v))
+    ],rule:"var",hint:"בשונות: הקבוע נעלם, והמקדם עולה בריבוע."};
+}
+
+/* ---------- 17. התפלגות בינומית ---------- */
+function genBinom(L){
+  var n,k,den,steps;
+  if(L===1){
+    n=ri(3,6);k=ri(1,n-1);den=pick([2,3,4]);
+    var c=Cnk(n,k);
+    var p=fr(c*Math.pow(den-1,n-k),Math.pow(den,n));
+    return {ask:"מבצעים "+n+" ניסויים בלתי תלויים, בכל אחד הסתברות הצלחה "+fr(1,den).html()+". מה ההסתברות ל-"+k+" הצלחות בדיוק?",
+      expr:"",ans:W(p.html()),
+      wrong:[
+        W(fr(Math.pow(den-1,n-k),Math.pow(den,n)).html(),"שכחתם את מקדם הבחירה. יש "+c+" סדרים שונים שבהם "+k+" ההצלחות יכולות להופיע."),
+        W(fr(c,Math.pow(den,n)).html(),"התייחסתם לכישלונות כאילו הסתברותם 1."),
+        W(fr(k,n).html(),"זה היחס בין מספר ההצלחות למספר הניסויים, ולא הסתברות.")
+      ],
+      steps:[
+        S("נוסחת ההתפלגות הבינומית","שלושה חלקים: כמה סדרים, ההסתברות להצלחות, וההסתברות לכישלונות.",
+          "P(X=k) = C(n,k)·pᵏ·(1−p)ⁿ⁻ᵏ"),
+        S("מספר הסדרים","","C("+n+","+k+") = "+c),
+        S("הסתברות הרצף","",fr(1,den).html()+"<sup>"+k+"</sup> · "+fr(den-1,den).html()+"<sup>"+(n-k)+"</sup>"),
+        S("מכפילים","",p.html())
+      ],rule:"binom",hint:"מקדם בינומי, כפול ההצלחות, כפול הכישלונות."};
+  }
+  if(L===2){
+    n=ri(10,40);den=pick([2,4,5,10]);
+    var E=n/den,V=n*(1/den)*(1-1/den);
+    return {ask:"משתנה מקרי בינומי עם n = "+n+" ו-p = "+fr(1,den).html()+". חשבו את התוחלת ואת השונות.",
+      expr:"",ans:W("E = "+num(E)+" , V = "+num(Math.round(V*100)/100)),
+      wrong:[
+        W("E = "+num(E)+" , V = "+num(E),"בלבלתם בין בינומית לפואסונית. בבינומית השונות היא np(1−p), והיא תמיד קטנה מהתוחלת."),
+        W("E = "+num(n)+" , V = "+num(Math.round(V*100)/100),"התוחלת היא n כפול p, לא n."),
+        W("E = "+num(Math.round(V*100)/100)+" , V = "+num(E),"החלפתם בין השניים.")
+      ],
+      steps:[
+        S("נוסחאות ההתפלגות הבינומית","","E(X) = np   ,   V(X) = np(1−p)"),
+        S("מציבים בתוחלת","","E = "+n+" · "+fr(1,den).html()+" = "+num(E)),
+        S("מציבים בשונות","","V = "+n+" · "+fr(1,den).html()+" · "+fr(den-1,den).html()+" = "+num(Math.round(V*100)/100)),
+        S("בדיקת סבירות","השונות תמיד קטנה מהתוחלת בבינומית, כי (1−p) קטן מ-1.","")
+      ],rule:"binom",hint:"E = np, ו-V = np(1−p)."};
+  }
+  n=ri(3,6);den=pick([2,3,4]);
+  var pNone=fr(Math.pow(den-1,n),Math.pow(den,n));
+  var pAtLeast=fr(1,1).sub(pNone);
+  return {ask:"מבצעים "+n+" ניסויים בלתי תלויים, בכל אחד הסתברות הצלחה "+fr(1,den).html()+". מה ההסתברות שתהיה לפחות הצלחה אחת?",
+    expr:"",ans:W(pAtLeast.html()),
+    wrong:[
+      W(pNone.html(),"זו ההסתברות לאפס הצלחות. השאלה מבקשת את המשלים שלה."),
+      W(fr(n,den).html(),"חיברתם הסתברויות. מאורעות ״לפחות אחת״ אינם זרים, ולכן אי אפשר לחבר."),
+      W(fr(1,den).html(),"זו ההסתברות בניסוי בודד.")
+    ],
+    steps:[
+      S("״לפחות אחת״ נפתר דרך המשלים","לספור אחת, שתיים, שלוש הצלחות זו עבודה מיותרת. יש רק מקרה אחד לשלול.",
+        "P(לפחות 1) = 1 − P(אף אחת)"),
+      S("ההסתברות לאפס הצלחות","כל "+n+" הניסויים נכשלים.",fr(den-1,den).html()+"<sup>"+n+"</sup> = "+pNone.html()),
+      S("משלימים ל-1","","1 − "+pNone.html()+" = "+pAtLeast.html())
+    ],rule:"binom",hint:"״לפחות אחת״ = 1 פחות ההסתברות לאף אחת."};
+}
+
+/* ---------- 18. התפלגות נורמלית ---------- */
+function genNormal(L){
+  var mu,sig,x,z,steps;
+  if(L===1){
+    mu=pick([50,70,80,100,120]);sig=pick([4,5,8,10,15,20]);
+    z=pick([-2,-1.5,-1,1,1.5,2,2.5]);
+    x=mu+z*sig;
+    return {ask:"תקננו את הערך",expr:"X ~ N("+mu+" , "+(sig*sig)+")  ,  x = "+num(x),
+      ans:W("z = "+num(z)),
+      wrong:[
+        W("z = "+num(-z),"טעות סימן. מחסרים את התוחלת מהערך, ולא להפך."),
+        W("z = "+num(Math.round((x-mu)/(sig*sig)*1000)/1000),"חילקתם בשונות. בתקנון מחלקים בסטיית התקן, שהיא השורש שלה."),
+        W("z = "+num(x-mu),"עצרתם אחרי החיסור, בלי לחלק בסטיית התקן.")
+      ],
+      steps:[
+        S("מה עושה התקנון","הוא מתרגם ״כמה רחוק״ ליחידות של סטיות תקן, וכך אפשר להשוות בין התפלגויות שונות.",
+          "z = (x − μ) / σ"),
+        S("שימו לב לסימון","N("+mu+" , "+(sig*sig)+") — המספר השני הוא השונות, וסטיית התקן היא השורש שלו.",
+          "σ = √"+(sig*sig)+" = "+sig),
+        S("מציבים","","z = ("+num(x)+" − "+mu+") / "+sig),
+        S("מחשבים","","z = "+num(z))
+      ],rule:"znorm",hint:"מחסרים תוחלת ומחלקים בסטיית תקן — לא בשונות."};
+  }
+  if(L===2){
+    var zz=pick([0.5,1,1.5,2]);
+    var phi={"0.5":0.6915,"1":0.8413,"1.5":0.9332,"2":0.9772}[String(zz)];
+    return {ask:"נתון Φ("+zz+") = "+phi+". חשבו את Φ(−"+zz+").",expr:"",
+      ans:W(num(Math.round((1-phi)*10000)/10000)),
+      wrong:[
+        W(num(-phi),"הסתברות לעולם אינה שלילית. הסימטריה עובדת על ההשלמה ל-1, לא על הסימן."),
+        W(num(phi),"Φ אינה זוגית. הערך בצד השלילי הוא המשלים."),
+        W(num(Math.round((phi-0.5)*10000)/10000),"זו ההסתברות בין 0 ל-"+zz+", ולא Φ(−"+zz+").")
+      ],
+      steps:[
+        S("ההתפלגות סימטרית סביב אפס","השטח משמאל ל-−z שווה בדיוק לשטח מימין ל-z.","Φ(−z) = 1 − Φ(z)"),
+        S("מציבים","","Φ(−"+zz+") = 1 − "+phi),
+        S("מחשבים","","= "+num(Math.round((1-phi)*10000)/10000))
+      ],rule:"znorm",hint:"Φ(−z) = 1 פחות Φ(z), מתוך הסימטריה."};
+  }
+  mu=pick([60,80,100]);sig=pick([5,10,20]);
+  z=pick([1,1.5,2,-1,-2]);
+  x=mu+z*sig;
+  return {ask:"בהתפלגות N("+mu+" , "+(sig*sig)+"), איזה ערך של x מתאים ל-z = "+num(z)+"?",
+    expr:"",ans:W("x = "+num(x)),
+    wrong:[
+      W("x = "+num(mu-z*sig),"טעות סימן. מהנוסחה z=(x−μ)/σ נובע x = μ + zσ."),
+      W("x = "+num(mu+z),"שכחתם להכפיל בסטיית התקן. z נמדד ביחידות של σ."),
+      W("x = "+num(mu+z*sig*sig),"הכפלתם בשונות במקום בסטיית התקן.")
+    ],
+    steps:[
+      S("מבודדים את x","מתחילים מנוסחת התקנון ומעבירים אגפים.","z = (x−μ)/σ  →  x = μ + z·σ"),
+      S("מציבים","","x = "+mu+" + "+pn(z)+"·"+sig),
+      S("מחשבים","","x = "+num(x))
+    ],rule:"znorm",hint:"x = μ ועוד z כפול σ."};
+}
+
+/* ============================================================
+   מחוללי השאלות — בדידה ויסודות
+   ============================================================ */
+
+/* ---------- 19. לוגיקה ---------- */
+function genLogic(L){
+  var p,q,steps;
+  if(L===1){
+    p=Math.random()<0.5;q=Math.random()<0.5;
+    var op=pick(["∧","∨","⇒"]);
+    var res=op==="∧"?(p&&q):op==="∨"?(p||q):(!p||q);
+    var TF=function(v){return v?"אמת":"שקר"};
+    return {ask:"נתון p = "+TF(p)+" ו-q = "+TF(q)+". מהו ערך האמת של הפסוק?",
+      expr:"p "+op+" q",ans:W(TF(res)),
+      wrong:[
+        W(TF(!res),op==="⇒"?"גרירה שקרית רק במקרה אחד: כשההנחה אמת והמסקנה שקר. בכל שאר המקרים היא אמת."
+          :op==="∧"?"וגם דורש ששניהם יהיו אמת."
+          :"או דורש שלפחות אחד יהיה אמת."),
+        W("תלוי","ערכי p ו-q נתונים, ולכן לפסוק יש ערך אמת יחיד ומוגדר."),
+        W("לא מוגדר","כל צירוף של ערכי אמת מוגדר היטב בטבלת האמת.")
+      ],
+      steps:[
+        S("מזכירים את הכלל",op==="∧"?"וגם אמת רק כששני הצדדים אמת.":op==="∨"?"או אמת אם לפחות צד אחד אמת.":"גרירה שקרית רק כאשר ההנחה אמת והמסקנה שקר.",
+          op==="∧"?"T∧T=T, אחרת F":op==="∨"?"F∨F=F, אחרת T":"T⇒F=F, אחרת T"),
+        S("מציבים","",TF(p)+" "+op+" "+TF(q)),
+        S("התוצאה","",TF(res))
+      ],rule:"logic",hint:"גרירה שקרית רק כשההנחה אמת והמסקנה שקר."};
+  }
+  if(L===2){
+    return {ask:"איזה פסוק שקול לוגית ל-p ⇒ q?",expr:"p ⇒ q",
+      ans:W("¬p ∨ q"),
+      wrong:[
+        W("p ∨ ¬q","זו לא השקילות. בדקו בטבלת אמת: כאשר p שקר ו-q שקר, הפסוק הזה שקר והגרירה אמת."),
+        W("¬q ⇒ ¬p"+"","זו אמנם שקילות נכונה — הפסוק המנוגד — אבל השאלה מבקשת את הצורה עם ״או״."),
+        W("q ⇒ p","זו הגרירה ההפוכה, והיא אינה שקולה למקורית.")
+      ],
+      steps:[
+        S("מתי גרירה שקרית","רק כשההנחה אמת והמסקנה שקר. בכל שאר המקרים היא אמת.","p⇒q שקר ⇔ p אמת ו-q שקר"),
+        S("מנסחים אחרת","״לא קורה ש-p אמת ו-q שקר״ הוא בדיוק ״p שקר או q אמת״.","¬(p ∧ ¬q) ≡ ¬p ∨ q"),
+        S("בדיקה בטבלה","ארבע השורות יוצאות זהות בשני הפסוקים.","p⇒q ≡ ¬p ∨ q")
+      ],rule:"logic",hint:"p⇒q שקול ל-״לא p או q״."};
+  }
+  return {ask:"מהי השלילה של הפסוק p ∧ q?",expr:"¬(p ∧ q)",
+    ans:W("¬p ∨ ¬q"),
+    wrong:[
+      W("¬p ∧ ¬q","שללתם כל צד אבל השארתם ״וגם״. לפי דה־מורגן הקשר מתהפך."),
+      W("p ∨ q","לא שללתם את הצדדים כלל."),
+      W("¬(p) ∧ q","שללתם רק צד אחד.")
+    ],
+    steps:[
+      S("חוקי דה־מורגן","כששוללים, כל צד נשלל וגם הקשר מתהפך: ״וגם״ נעשה ״או״ ולהפך.",
+        "¬(p ∧ q) ≡ ¬p ∨ ¬q"),
+      S("למה זה הגיוני","אם לא נכון ששניהם מתקיימים, אז לפחות אחד מהם אינו מתקיים.",""),
+      S("התשובה","","¬p ∨ ¬q")
+    ],rule:"demorgan",hint:"דה־מורגן: שוללים כל צד והקשר מתהפך."};
+}
+
+/* ---------- 20. קבוצות ---------- */
+function genSets(L){
+  var A,B,AB,U,steps;
+  if(L===1){
+    A=ri(10,30);B=ri(10,30);AB=ri(2,Math.min(A,B)-1);
+    return {ask:"בקבוצה A יש "+A+" איברים, ב-B יש "+B+", ובחיתוך "+AB+". כמה איברים באיחוד?",
+      expr:"|A ∪ B| = ?",ans:W(String(A+B-AB)),
+      wrong:[
+        W(String(A+B),"חיברתם בלי לחסר את החיתוך, ולכן ספרתם את האיברים המשותפים פעמיים."),
+        W(String(A+B+AB),"הוספתם את החיתוך במקום לחסר אותו."),
+        W(String(AB),"זה גודל החיתוך, לא האיחוד.")
+      ],
+      steps:[
+        S("עקרון ההכלה וההדחה","כשמחברים שתי קבוצות, האיברים המשותפים נספרים פעמיים — ולכן מחסרים אותם פעם אחת.",
+          "|A∪B| = |A| + |B| − |A∩B|"),
+        S("מציבים","",A+" + "+B+" − "+AB),
+        S("מחשבים","","= "+(A+B-AB))
+      ],rule:"sets",hint:"מחברים ומחסרים את החיתוך פעם אחת."};
+  }
+  if(L===2){
+    U=ri(40,80);A=ri(10,U-15);
+    return {ask:"בקבוצה האוניברסלית "+U+" איברים ובקבוצה A יש "+A+". כמה איברים במשלים של A?",
+      expr:"|A<sup>c</sup>| = ?",ans:W(String(U-A)),
+      wrong:[
+        W(String(U+A),"חיברתם. המשלים הוא מה שנשאר, ולכן מחסרים."),
+        W(String(A),"זו הקבוצה עצמה, לא המשלים."),
+        W(String(U),"זו הקבוצה האוניברסלית כולה.")
+      ],
+      steps:[
+        S("הגדרת המשלים","כל מה שנמצא בקבוצה האוניברסלית ואינו ב-A.","Aᶜ = U \\ A"),
+        S("מחשבים","",U+" − "+A+" = "+(U-A)),
+        S("בדיקה","הקבוצה ומשלימה מכסות יחד בדיוק את הכול.",A+" + "+(U-A)+" = "+U)
+      ],rule:"sets",hint:"משלים = הכול פחות הקבוצה."};
+  }
+  return {ask:"מהי הצורה השקולה?",expr:"(A ∪ B)<sup>c</sup>",
+    ans:W("A<sup>c</sup> ∩ B<sup>c</sup>"),
+    wrong:[
+      W("A<sup>c</sup> ∪ B<sup>c</sup>","שמרתם על האיחוד. לפי דה־מורגן לקבוצות, הפעולה מתהפכת."),
+      W("A ∩ B","לא לקחתם משלימים בכלל."),
+      W("(A ∩ B)<sup>c</sup>","זה המשלים של החיתוך, וזו טענה אחרת.")
+    ],
+    steps:[
+      S("דה־מורגן לקבוצות","זהה בדיוק לדה־מורגן בלוגיקה: כל קבוצה מוחלפת במשלימה, והפעולה מתהפכת.",
+        "(A∪B)ᶜ = Aᶜ ∩ Bᶜ"),
+      S("למה","אם איבר אינו באיחוד — הוא לא ב-A וגם לא ב-B.",""),
+      S("התשובה","","Aᶜ ∩ Bᶜ")
+    ],rule:"demorgan",hint:"משלים של איחוד הוא חיתוך המשלימים."};
+}
+
+/* ---------- 21. סדרות וטורים ---------- */
+function genSeries(L){
+  var a1,q,n,steps;
+  if(L===1){
+    a1=rnz(1,6);q=pick([2,3,-2,-3]);n=ri(3,6);
+    var an=a1*Math.pow(q,n-1);
+    return {ask:"בסדרה הנדסית a₁ = "+num(a1)+" ו-q = "+num(q)+". מהו האיבר ה-"+n+"?",
+      expr:"",ans:W(num(an)),
+      wrong:[
+        W(num(a1*Math.pow(q,n)),"השתמשתם ב-n במקום ב-n מינוס 1. מהאיבר הראשון ל-n עושים "+(n-1)+" הכפלות."),
+        W(num(a1+(n-1)*q),"זו נוסחת הסדרה החשבונית. בהנדסית מכפילים, לא מחברים."),
+        W(num(a1*q*n),"הכפלתם ב-n במקום להעלות בחזקה.")
+      ],
+      steps:[
+        S("נוסחת האיבר הכללי","aₙ = a₁·qⁿ⁻¹. שימו לב למינוס אחד בחזקה — הוא מספר ההכפלות, לא מספר האיברים.",
+          "aₙ = a₁·qⁿ⁻¹"),
+        S("מציבים","","a"+n+" = "+num(a1)+" · "+pn(q)+"<sup>"+(n-1)+"</sup>"),
+        S("מחשבים","","= "+num(an))
+      ],rule:"geo",hint:"בהנדסית מכפילים במנה, והחזקה היא n מינוס אחת."};
+  }
+  if(L===2){
+    a1=rnz(1,5);q=pick([2,3]);n=ri(3,6);
+    var Sn=a1*(Math.pow(q,n)-1)/(q-1);
+    return {ask:"חשבו את סכום "+n+" האיברים הראשונים של סדרה הנדסית עם a₁ = "+num(a1)+" ו-q = "+q+".",
+      expr:"",ans:W(num(Sn)),
+      wrong:[
+        W(num(a1*Math.pow(q,n-1)),"זה האיבר ה-"+n+" עצמו, לא הסכום."),
+        W(num(a1*n),"זה היה נכון אילו כל האיברים היו שווים."),
+        W(num(a1*(Math.pow(q,n)-1)),"שכחתם לחלק ב-(q−1).")
+      ],
+      steps:[
+        S("נוסחת הסכום","Sₙ = a₁·(qⁿ − 1) ÷ (q − 1), תקפה לכל q ששונה מ-1.","Sₙ = a₁(qⁿ−1)/(q−1)"),
+        S("מציבים","","S"+n+" = "+num(a1)+"·("+q+"<sup>"+n+"</sup> − 1) / ("+q+" − 1)"),
+        S("מחשבים","","= "+num(a1)+"·"+(Math.pow(q,n)-1)+" / "+(q-1)+" = "+num(Sn))
+      ],rule:"geosum",hint:"סכום סדרה הנדסית: a₁ כפול (qⁿ פחות 1) חלקי (q פחות 1)."};
+  }
+  var den=pick([2,3,4,5]);
+  var conv=Math.random()<0.6;
+  a1=rnz(1,6);
+  var qq=conv?fr(1,den):fr(den,1);
+  var ansTxt=conv?fr(a1*den,den-1).html():"הטור מתבדר";
+  return {ask:"האם הטור ההנדסי האינסופי מתכנס, ואם כן — לכמה?",
+    expr:"a₁ = "+num(a1)+"  ,  q = "+qq.html(),
+    ans:W(ansTxt),
+    wrong:conv?[
+      W("הטור מתבדר","מנה שערכה המוחלט קטן מ-1 גורמת לאיברים לדעוך, והטור מתכנס."),
+      W(fr(a1,den-1).html(),"שכחתם את a₁ במונה או טעיתם בחישוב 1 פחות q."),
+      W(fr(a1*den,den+1).html(),"במכנה צריך 1 פחות q, ולא 1 ועוד q.")
+    ]:[
+      W(fr(a1,1-den===0?1:1-den).html(),"הצבתם בנוסחת הסכום בלי לבדוק את תנאי ההתכנסות. עם q גדול מ-1 היא לא תקפה."),
+      W(num(a1),"זה האיבר הראשון בלבד."),
+      W("0","האיברים גדלים ולא דועכים.")
+    ],
+    steps:[
+      S("קודם בודקים התכנסות","טור הנדסי אינסופי מתכנס אם ורק אם הערך המוחלט של המנה קטן מ-1.",
+        "|q| < 1 ⇔ מתכנס"),
+      S("כאן","","|q| = "+qq.html()+" → "+(conv?"קטן מ-1, מתכנס":"גדול מ-1, מתבדר")),
+      S(conv?"מציבים בנוסחת הסכום":"אין סכום סופי",
+        conv?"S = a₁ / (1 − q)":"האיברים גדלים ללא גבול, ולכן אין ערך סופי.",
+        conv?"S = "+num(a1)+" / (1 − "+qq.html()+") = "+ansTxt:"מתבדר")
+    ],rule:"geoinf",hint:"טור אינסופי מתכנס רק כשהערך המוחלט של המנה קטן מ-1."};
+}
+
+/* ---------- 22. לוגריתמים ---------- */
+function genLogs(L){
+  var b,n,steps;
+  if(L===1){
+    b=pick([2,3,5,10]);n=ri(2,5);
+    var val=Math.pow(b,n);
+    return {ask:"חשבו",expr:"log<sub>"+b+"</sub> "+val,ans:W(String(n)),
+      wrong:[
+        W(String(val/b),"זה המספר חלקי הבסיס. לוגריתם שואל באיזו חזקה, ולא כמה פעמים."),
+        W(String(b*n),"הכפלתם את הבסיס במעריך."),
+        W(String(val),"זה המספר עצמו.")
+      ],
+      steps:[
+        S("מה לוגריתם שואל","באיזו חזקה צריך להעלות את "+b+" כדי לקבל "+val+"?","log_b(x) = y ⇔ bʸ = x"),
+        S("בודקים","",b+"<sup>"+n+"</sup> = "+val),
+        S("התשובה","",String(n))
+      ],rule:"log",hint:"לוגריתם הוא החזקה שאליה מעלים את הבסיס."};
+  }
+  if(L===2){
+    b=pick([2,3,10]);var u=ri(2,6),v=ri(2,6);
+    var lg="log<sub>"+b+"</sub>";
+    return {ask:"נתון "+lg+"(a) = "+u+" ו-"+lg+"(c) = "+v+". חשבו את "+lg+"(a·c).",
+      expr:"",ans:W(String(u+v)),
+      wrong:[
+        W(String(u*v),"הכפלתם את הלוגריתמים. לוג של מכפלה הוא סכום הלוגים, לא מכפלתם."),
+        W(num(u-v),"חיסור מתאים ללוג של מנה, לא של מכפלה."),
+        W(String(Math.pow(u,v)),"העלאה בחזקה מתאימה ללוג של חזקה.")
+      ],
+      steps:[
+        S("חוק הלוג של מכפלה","הלוגריתם מתרגם כפל לחיבור — זו כל התועלת שלו.","log(a·c) = log a + log c"),
+        S("מציבים","",u+" + "+v),
+        S("מחשבים","","= "+(u+v))
+      ],rule:"logrules",hint:"לוג של מכפלה = סכום הלוגים. של מנה = הפרש."};
+  }
+  b=pick([2,3,5]);n=ri(2,5);
+  var target=Math.pow(b,n);
+  return {ask:"פתרו את המשוואה",expr:b+"<sup>x</sup> = "+target,
+    ans:W("x = "+n),
+    wrong:[
+      W("x = "+num(target/b),"חילקתם בבסיס. משוואה מעריכית נפתרת בלוגריתם, לא בחילוק."),
+      W("x = "+num(target-b),"חיסרתם."),
+      W("x = "+num(Math.round(target/n*100)/100),"חילקתם במעריך.")
+    ],
+    steps:[
+      S("הנעלם נמצא בחזקה","כשהנעלם במעריך, הכלי הוא לוגריתם — הוא הפעולה ההפוכה להעלאה בחזקה.",
+        b+"ˣ = "+target),
+      S("מפעילים לוג על שני האגפים","","x = log<sub>"+b+"</sub>("+target+")"),
+      S("מחשבים","",b+"<sup>"+n+"</sup> = "+target+"  →  x = "+n)
+    ],rule:"log",hint:"נעלם בחזקה — מפעילים לוגריתם על שני האגפים."};
+}
+
+/* ---------- 23. מספרים מרוכבים ---------- */
+function genComplex(L){
+  var a,b,c,d,steps;
+  function cx(re,im){
+    if(im===0)return num(re);
+    if(re===0)return (im===1?"":im===-1?"−":num(im))+"i";
+    return num(re)+(im<0?" − ":" + ")+(Math.abs(im)===1?"":Math.abs(im))+"i";
+  }
+  if(L===1){
+    a=rnz(-6,6);b=rnz(-6,6);c=rnz(-6,6);d=rnz(-6,6);
+    return {ask:"חשבו את הסכום",expr:"("+cx(a,b)+") + ("+cx(c,d)+")",
+      ans:W(cx(a+c,b+d)),
+      wrong:[
+        W(cx(a+c+b+d,0),"חיברתם הכול יחד. החלק הממשי והחלק המדומה נשארים נפרדים."),
+        W(cx(a+d,b+c),"החלפתם בין החלקים."),
+        W(cx(a*c,b*d),"הכפלתם במקום לחבר.")
+      ],
+      steps:[
+        S("מחברים חלק ממשי עם ממשי","i הוא כמו משתנה — מחברים רק איברים דומים.","(a+bi)+(c+di) = (a+c)+(b+d)i"),
+        S("החלק הממשי","",num(a)+" + "+pn(c)+" = "+num(a+c)),
+        S("החלק המדומה","",num(b)+" + "+pn(d)+" = "+num(b+d)),
+        S("התוצאה","",cx(a+c,b+d))
+      ],rule:"cxadd",hint:"ממשי עם ממשי, מדומה עם מדומה."};
+  }
+  if(L===2){
+    a=rnz(-5,5);b=rnz(-5,5);c=rnz(-5,5);d=rnz(-5,5);
+    var re=a*c-b*d,im=a*d+b*c;
+    return {ask:"חשבו את המכפלה",expr:"("+cx(a,b)+")("+cx(c,d)+")",
+      ans:W(cx(re,im)),
+      wrong:[
+        W(cx(a*c+b*d,im),"שכחתם ש-i בריבוע שווה מינוס אחת. bd·i² הופך ל-−bd, ולכן מחסרים."),
+        W(cx(a*c,b*d),"הכפלתם חלק בחלק. צריך לפתוח סוגריים במלואם, ארבע מכפלות."),
+        W(cx(re,a*c+b*d),"החלק המדומה מורכב מ-ad ועוד bc.")
+      ],
+      steps:[
+        S("פותחים סוגריים כרגיל","ארבע מכפלות, בדיוק כמו במכפלת בינומים.",
+          "ac + adi + bci + bd·i²"),
+        S("כאן נכנס הכלל היחיד שצריך לזכור","i בריבוע שווה מינוס אחת, ולכן האיבר האחרון משנה סימן.",
+          "i² = −1  →  bd·i² = −bd"),
+        S("מכנסים","","("+num(a*c)+" − "+pn(b*d)+") + ("+num(a*d)+" + "+pn(b*c)+")i"),
+        S("התוצאה","",cx(re,im))
+      ],rule:"cxmul",hint:"פותחים סוגריים כרגיל, וזוכרים ש-i בריבוע הוא מינוס אחת."};
+  }
+  var TRIP2=[[3,4,5],[6,8,10],[5,12,13],[8,15,17]];
+  var t=pick(TRIP2);
+  a=t[0]*pick([1,-1]);b=t[1]*pick([1,-1]);
+  return {ask:"חשבו את הערך המוחלט",expr:"|"+cx(a,b)+"|",
+    ans:W(String(t[2])),
+    wrong:[
+      W(num(Math.abs(a)+Math.abs(b)),"חיברתם את החלקים. הערך המוחלט מחושב לפי פיתגורס."),
+      W(num(t[2]*t[2]),"עצרתם לפני הוצאת השורש."),
+      W(num(a),"זה החלק הממשי בלבד.")
+    ],
+    steps:[
+      S("הערך המוחלט הוא מרחק","במישור המרוכב זהו המרחק מהראשית, כלומר בדיוק פיתגורס.",
+        "|a+bi| = √(a² + b²)"),
+      S("מציבים","","√("+pn(a)+"² + "+pn(b)+"²) = √("+(a*a)+" + "+(b*b)+")"),
+      S("מחשבים","","√"+(t[2]*t[2])+" = "+t[2])
+    ],rule:"cxabs",hint:"ערך מוחלט של מרוכב = שורש של סכום ריבועי החלקים."};
+}
+
+/* ============================================================
+   10. רשימת הנושאים
+   tracks — 1 מדעים והנדסה · 2 מדעי המחשב · 3 מדעי החברה
+   pre    — נושא שכדאי לחזק קודם אם נופלים כאן שוב ושוב
+   ============================================================ */
+var TOPICS=[
+  {id:"limits",  area:"חדו״א",           tracks:[1,2,3],pre:[],          gen:genLimits,  name:"גבולות",              desc:"הצבה, ביטול 0/0 וגבול באינסוף"},
+  {id:"deriv",   area:"חדו״א",           tracks:[1,2,3],pre:["limits"],  gen:genDeriv,   name:"נגזרות בסיסיות",      desc:"כלל החזקה, eˣ, ln x וטריגונומטריות"},
+  {id:"chain",   area:"חדו״א",           tracks:[1,2],  pre:["deriv"],   gen:genChain,   name:"כלל השרשרת",          desc:"פונקציה בתוך פונקציה, והנגזרת הפנימית"},
+  {id:"prodquo", area:"חדו״א",           tracks:[1,2],  pre:["deriv"],   gen:genProdQuo, name:"מכפלה ומנה",          desc:"שני כללי הגזירה שהכי נופלים בהם"},
+  {id:"extrema", area:"חדו״א",           tracks:[1,2,3],pre:["deriv"],   gen:genExtrema, name:"נקודות קיצון",        desc:"איפוס הנגזרת וזיהוי סוג הקיצון"},
+  {id:"integral",area:"חדו״א",           tracks:[1,2],  pre:["deriv"],   gen:genIntegral,name:"אינטגרל לא מסוים",    desc:"כלל החזקה ההפוך, פונקציות יסוד והצבה"},
+  {id:"defint",  area:"חדו״א",           tracks:[1,2,3],pre:["integral"],gen:genDefInt,  name:"אינטגרל מסוים ושטח",  desc:"ניוטון־לייבניץ, שטח וסימטריה"},
+  {id:"matops",  area:"אלגברה לינארית", tracks:[1,2],  pre:[],          gen:genMatOps,  name:"פעולות במטריצות",     desc:"חיבור, כפל בסקלר וכפל מטריצות"},
+  {id:"det",     area:"אלגברה לינארית", tracks:[1,2],  pre:["matops"],  gen:genDet,     name:"דטרמיננטה",           desc:"2×2, 3×3 ותכונות"},
+  {id:"inverse", area:"אלגברה לינארית", tracks:[1,2],  pre:["det"],     gen:genInverse, name:"מטריצה הופכית",       desc:"נוסחת ההופכית ותנאי ההפיכות"},
+  {id:"lineq",   area:"אלגברה לינארית", tracks:[1,2],  pre:["det"],     gen:genLinEq,   name:"מערכות משוואות",      desc:"דירוג, מספר פתרונות ומערכת הומוגנית"},
+  {id:"vectors", area:"אלגברה לינארית", tracks:[1,2],  pre:[],          gen:genVectors, name:"וקטורים",             desc:"נורמה, מכפלה סקלרית וניצבות"},
+  {id:"eigen",   area:"אלגברה לינארית", tracks:[1,2],  pre:["det"],     gen:genEigen,   name:"ערכים עצמיים",        desc:"משוואה אופיינית, עקבה ודטרמיננטה"},
+  {id:"comb",    area:"הסתברות",        tracks:[1,2,3],pre:[],          gen:genComb,    name:"קומבינטוריקה",        desc:"תמורות, חליפות וצירופים"},
+  {id:"condprob",area:"הסתברות",        tracks:[1,2,3],pre:[],          gen:genCondProb,name:"הסתברות מותנית",      desc:"תנאי, בייס ואי־תלות"},
+  {id:"expvar",  area:"הסתברות",        tracks:[1,2,3],pre:[],          gen:genExpVar,  name:"תוחלת ושונות",        desc:"ממוצע משוקלל, שונות וכללי לינאריות"},
+  {id:"binom",   area:"הסתברות",        tracks:[1,2,3],pre:["comb"],    gen:genBinom,   name:"התפלגות בינומית",     desc:"P(X=k), תוחלת, שונות ומשלים"},
+  {id:"normal",  area:"הסתברות",        tracks:[1,2,3],pre:["expvar"],  gen:genNormal,  name:"התפלגות נורמלית",     desc:"תקנון, סימטריה ומעבר חזרה ל-x"},
+  {id:"logic",   area:"בדידה ויסודות",  tracks:[1,2],  pre:[],          gen:genLogic,   name:"לוגיקה",              desc:"טבלאות אמת, שקילות ודה־מורגן"},
+  {id:"sets",    area:"בדידה ויסודות",  tracks:[1,2,3],pre:[],          gen:genSets,    name:"קבוצות",              desc:"הכלה והדחה, משלים ודה־מורגן"},
+  {id:"series",  area:"בדידה ויסודות",  tracks:[1,2],  pre:[],          gen:genSeries,  name:"סדרות וטורים",        desc:"סדרה הנדסית, סכום והתכנסות"},
+  {id:"logs",    area:"בדידה ויסודות",  tracks:[1,2,3],pre:[],          gen:genLogs,    name:"לוגריתמים",           desc:"הגדרה, חוקים ומשוואה מעריכית"},
+  {id:"complex", area:"בדידה ויסודות",  tracks:[1,2],  pre:[],          gen:genComplex, name:"מספרים מרוכבים",      desc:"חיבור, כפל וערך מוחלט"}
+];
+var AREA_CLS={"חדו״א":"a-alg","אלגברה לינארית":"a-base","הסתברות":"a-data","בדידה ויסודות":"a-geo"};
+function areaCls(a){return AREA_CLS[a]||"a-alg"}
+function topicCls(id){var t=topicById(id);return t?areaCls(t.area):"a-alg"}
+function topicById(id){for(var i=0;i<TOPICS.length;i++)if(TOPICS[i].id===id)return TOPICS[i];return null}
+function topicsForTrack(tr){return TOPICS.filter(function(t){return t.tracks.indexOf(tr)>=0})}
+var AREAS=["חדו״א","אלגברה לינארית","הסתברות","בדידה ויסודות"];
+
+/* ============================================================
+   11. דף הנוסחאות
+   בכל מבחן שנותנים בו דף — הדף הזה הוא מה שכתוב עליו.
+   ============================================================ */
+var FORMULAS=[
+  {id:"limsub",g:"חדו״א",t:"גבול של פונקציה רציפה",m:"lim<sub>x→a</sub> f(x) = f(a)",n:"פולינום רציף בכל נקודה, ולכן פשוט מציבים."},
+  {id:"lim00",g:"חדו״א",t:"אי־ודאות 0/0",m:"מפרקים לגורמים ומצמצמים",n:"0/0 אינו ערך — הוא סימן שצריך לעבוד על הביטוי."},
+  {id:"liminf",g:"חדו״א",t:"גבול באינסוף",m:"משווים דרגות: מונה גבוה ← ∞ · שווה ← יחס מקדמים · נמוך ← 0",n:"רק החזקות הגבוהות קובעות."},
+  {id:"dpow",g:"חדו״א",t:"כלל החזקה",m:"(xⁿ)' = n·xⁿ⁻¹   ·   (c)' = 0",n:"המעריך יורד למקדם והחזקה קטנה באחת."},
+  {id:"dbasic",g:"חדו״א",t:"נגזרות יסוד",m:"(eˣ)' = eˣ · (ln x)' = 1/x · (√x)' = 1/(2√x) · (1/x)' = −1/x²",n:"eˣ היא הפונקציה היחידה שהיא נגזרת של עצמה."},
+  {id:"dtrig",g:"חדו״א",t:"נגזרות טריגונומטריות",m:"(sin x)' = cos x   ·   (cos x)' = −sin x",n:"המינוס מופיע רק אצל הקוסינוס."},
+  {id:"chain",g:"חדו״א",t:"כלל השרשרת",m:"[f(g(x))]' = f'(g(x))·g'(x)",n:"את הנגזרת הפנימית הכי הרבה שוכחים."},
+  {id:"prod",g:"חדו״א",t:"כלל המכפלה",m:"(f·g)' = f'g + fg'",n:"התוצאה היא סכום של שני איברים, לא מכפלה אחת."},
+  {id:"quo",g:"חדו״א",t:"כלל המנה",m:"(f/g)' = (f'g − fg') ÷ g²",n:"הסדר במונה קובע את הסימן, והמכנה עולה בריבוע."},
+  {id:"extr",g:"חדו״א",t:"נקודות קיצון",m:"f'(x) = 0",n:"בקיצון המשיק אופקי. פותרים את המשוואה ומקבלים את שיעורי ה-x."},
+  {id:"extr2",g:"חדו״א",t:"סוג הקיצון",m:"f''>0 מינימום   ·   f''<0 מקסימום   ·   f''=0 בדיקה נוספת",n:"הנגזרת השנייה מודדת קמירות."},
+  {id:"intpow",g:"חדו״א",t:"אינטגרל של חזקה",m:"∫xⁿ dx = x<sup>n+1</sup>/(n+1) + C   (n ≠ −1)",n:"החזקה עולה באחת ומחלקים בחדשה. תמיד +C."},
+  {id:"intbasic",g:"חדו״א",t:"אינטגרלים יסודיים",m:"∫eˣ = eˣ · ∫1/x = ln|x| · ∫sin = −cos · ∫cos = sin",n:"הערך המוחלט ב-ln נחוץ, כי הפונקציה מוגדרת גם לשליליים."},
+  {id:"intsub",g:"חדו״א",t:"אינטגרציה בהצבה",m:"∫(ax+b)ⁿ dx = (ax+b)<sup>n+1</sup> / (a(n+1)) + C",n:"מחלקים גם בחזקה החדשה וגם בנגזרת הפנימית."},
+  {id:"defint",g:"חדו״א",t:"אינטגרל מסוים",m:"∫<sub>a</sub><sup>b</sup> f = F(b) − F(a)",n:"עליון פחות תחתון. הקבוע C מתבטל ולכן מיותר."},
+  {id:"area",g:"חדו״א",t:"שטח מתחת לגרף",m:"S = ∫<sub>a</sub><sup>b</sup> f(x) dx",n:"תקף כשהפונקציה חיובית בקטע. אחרת מפצלים לפי נקודות החיתוך."},
+  {id:"matadd",g:"אלגברה לינארית",t:"חיבור וכפל בסקלר",m:"(A+B)ᵢⱼ = Aᵢⱼ + Bᵢⱼ   ·   (cA)ᵢⱼ = c·Aᵢⱼ",n:"פעולות איבר־איבר. הגדלים חייבים להיות זהים."},
+  {id:"matmul",g:"אלגברה לינארית",t:"כפל מטריצות",m:"Cᵢⱼ = Σₖ Aᵢₖ·Bₖⱼ",n:"שורה כפול עמודה. הכפל אינו חילופי: A·B ≠ B·A."},
+  {id:"det2",g:"אלגברה לינארית",t:"דטרמיננטה 2×2",m:"det = ad − bc",n:"אלכסון ראשי פחות אלכסון משני."},
+  {id:"det3",g:"אלגברה לינארית",t:"דטרמיננטה 3×3",m:"פיתוח לפי שורה, בסימנים + − +",n:"אפשר לפתח לפי כל שורה או עמודה — כדאי לבחור את זו עם הכי הרבה אפסים."},
+  {id:"detprop",g:"אלגברה לינארית",t:"תכונות הדטרמיננטה",m:"det(kA) = kⁿ·det(A)   ·   det(AB) = det(A)·det(B)",n:"n הוא סדר המטריצה."},
+  {id:"inv2",g:"אלגברה לינארית",t:"הופכית 2×2",m:"A⁻¹ = (1/det)·[[d, −b], [−c, a]]",n:"קיימת אם ורק אם det ≠ 0."},
+  {id:"gauss",g:"אלגברה לינארית",t:"מספר פתרונות",m:"det ≠ 0 יחיד · det = 0 ← אפס או אינסוף",n:"כשהדטרמיננטה מתאפסת בודקים אם המשוואות זהות או סותרות."},
+  {id:"norm",g:"אלגברה לינארית",t:"נורמה",m:"|u| = √(u₁² + u₂²)",n:"פיתגורס. הסימנים נעלמים בריבוע."},
+  {id:"dot",g:"אלגברה לינארית",t:"מכפלה סקלרית",m:"u·v = u₁v₁ + u₂v₂ = |u||v|cos θ",n:"התוצאה מספר. אפס פירושו ניצבות."},
+  {id:"eigen",g:"אלגברה לינארית",t:"ערכים עצמיים",m:"det(A − λI) = 0   ·   Σλ = trace   ·   Πλ = det",n:"שני הקשרים האחרונים מאפשרים לבדוק תשובה מיד."},
+  {id:"perm",g:"הסתברות",t:"תמורות וחליפות",m:"n!   ·   P(n,k) = n!/(n−k)!",n:"כשהסדר משנה."},
+  {id:"comb",g:"הסתברות",t:"צירופים",m:"C(n,k) = n! / (k!·(n−k)!)",n:"כשהסדר לא משנה. מחלקים ב-k! כדי לא לספור אותה קבוצה פעמיים."},
+  {id:"cond",g:"הסתברות",t:"הסתברות מותנית",m:"P(A|B) = P(A∩B) / P(B)",n:"התנאי מצמצם את המכנה למרחב החדש."},
+  {id:"bayes",g:"הסתברות",t:"נוסחת בייס",m:"P(A|B) = P(B|A)·P(A) ÷ P(B)",n:"הכי קל לחשב על אוכלוסייה של 1000 ולספור."},
+  {id:"indep",g:"הסתברות",t:"אי־תלות",m:"P(A∩B) = P(A)·P(B)",n:"אי־תלות אינה זהה לזרות. מאורעות זרים דווקא תלויים מאוד."},
+  {id:"exp",g:"הסתברות",t:"תוחלת",m:"E(X) = Σ xᵢ·P(xᵢ)   ·   E(aX+b) = aE(X)+b",n:"ממוצע משוקלל לפי ההסתברויות."},
+  {id:"var",g:"הסתברות",t:"שונות",m:"V(X) = E(X²) − [E(X)]²   ·   V(aX+b) = a²V(X)",n:"הזזה לא משנה פיזור, ומקדם עולה בריבוע."},
+  {id:"binom",g:"הסתברות",t:"התפלגות בינומית",m:"P(X=k) = C(n,k)pᵏ(1−p)ⁿ⁻ᵏ   ·   E = np   ·   V = np(1−p)",n:"״לפחות אחת״ נוח לחשב כ-1 פחות ההסתברות לאף אחת."},
+  {id:"znorm",g:"הסתברות",t:"התפלגות נורמלית",m:"z = (x − μ) / σ   ·   Φ(−z) = 1 − Φ(z)",n:"ב-N(μ,σ²) המספר השני הוא השונות — סטיית התקן היא השורש שלו."},
+  {id:"logic",g:"בדידה ויסודות",t:"קשרים לוגיים",m:"p⇒q ≡ ¬p ∨ q   ·   p⇒q ≡ ¬q⇒¬p",n:"גרירה שקרית רק כשההנחה אמת והמסקנה שקר."},
+  {id:"demorgan",g:"בדידה ויסודות",t:"דה־מורגן",m:"¬(p∧q) ≡ ¬p ∨ ¬q   ·   (A∪B)ᶜ = Aᶜ ∩ Bᶜ",n:"שוללים כל צד, והפעולה מתהפכת."},
+  {id:"sets",g:"בדידה ויסודות",t:"קבוצות",m:"|A∪B| = |A| + |B| − |A∩B|   ·   |Aᶜ| = |U| − |A|",n:"האיברים המשותפים נספרים פעמיים, ולכן מחסרים אותם."},
+  {id:"geo",g:"בדידה ויסודות",t:"סדרה הנדסית",m:"aₙ = a₁·qⁿ⁻¹",n:"החזקה היא מספר ההכפלות, כלומר n מינוס אחת."},
+  {id:"geosum",g:"בדידה ויסודות",t:"סכום סדרה הנדסית",m:"Sₙ = a₁(qⁿ − 1) ÷ (q − 1)",n:"תקף לכל q ששונה מ-1."},
+  {id:"geoinf",g:"בדידה ויסודות",t:"טור הנדסי אינסופי",m:"S = a₁ ÷ (1 − q)   בתנאי |q| < 1",n:"בלי התנאי הנוסחה חסרת משמעות — קודם בודקים התכנסות."},
+  {id:"log",g:"בדידה ויסודות",t:"לוגריתם",m:"log<sub>b</sub>(x) = y ⇔ bʸ = x",n:"לוגריתם הוא השאלה ״באיזו חזקה״."},
+  {id:"logrules",g:"בדידה ויסודות",t:"חוקי לוגריתמים",m:"log(ac) = log a + log c   ·   log(a/c) = log a − log c   ·   log(aⁿ) = n·log a",n:"הלוגריתם מתרגם כפל לחיבור."},
+  {id:"cxadd",g:"בדידה ויסודות",t:"חיבור מרוכבים",m:"(a+bi) + (c+di) = (a+c) + (b+d)i",n:"ממשי עם ממשי, מדומה עם מדומה."},
+  {id:"cxmul",g:"בדידה ויסודות",t:"כפל מרוכבים",m:"(a+bi)(c+di) = (ac − bd) + (ad + bc)i",n:"i² = −1, ומכאן המינוס בחלק הממשי."},
+  {id:"cxabs",g:"בדידה ויסודות",t:"ערך מוחלט של מרוכב",m:"|a+bi| = √(a² + b²)",n:"המרחק מהראשית במישור המרוכב."}
+];
+function formulaById(id){for(var i=0;i<FORMULAS.length;i++)if(FORMULAS[i].id===id)return FORMULAS[i];return null}
+
+/* ============================================================
+   12. בניית שאלה
+   מנרמל את מה שהמחולל החזיר: מסנן מסיחים כפולים או פגומים,
+   מערבב, ומכין גם טקסט להקראה.
+   ============================================================ */
+function badStr(s){return !s||/NaN|Infinity|undefined|null/.test(s)}
+
+function buildQ(topicId,level){
+  var t=topicById(topicId);
+  if(!t)t=TOPICS[0];
+  var raw=null,tries=0,opts,i,p,seen,ansP;
+  while(tries<8){
+    tries++;
+    try{raw=t.gen(level)}catch(e){raw=null}
+    if(!raw||!raw.ans||badStr(plainOf(raw.ans.h)))continue;
+    ansP=plainOf(raw.ans.h);
+    seen={};seen[ansP]=1;
+    opts=[{h:raw.ans.h,t:ansP,ok:true,why:""}];
+    for(i=0;i<(raw.wrong||[]).length;i++){
+      p=plainOf(raw.wrong[i].h);
+      if(badStr(p)||seen[p])continue;
+      seen[p]=1;
+      opts.push({h:raw.wrong[i].h,t:p,ok:false,why:raw.wrong[i].why||""});
+    }
+    if(opts.length>=3)break;
+  }
+  if(!raw)raw={ask:"חשבו",expr:"1 + 1",ans:W("2"),wrong:[W("1"),W("3"),W("11")],steps:[S("חיבור","","1 + 1 = 2")],hint:"",rule:"order"};
+  if(!opts||opts.length<2){
+    ansP=plainOf(raw.ans.h);
+    opts=[{h:raw.ans.h,t:ansP,ok:true,why:""}];
+  }
+  shuffle(opts);
+  var sayTxt=raw.ask+(raw.expr?". "+speakMath(plainOf(raw.expr)):"");
+  return {
+    topic:t.id,topicName:t.name,level:level,
+    ask:raw.ask,expr:raw.expr||"",fig:raw.fig||"",
+    options:opts,steps:raw.steps||[],hint:raw.hint||"",rule:raw.rule||"",
+    say:sayTxt
+  };
+}
+
+/* ============================================================
+   13. מצב הסבב
+   ============================================================ */
+var P={list:[],i:0,q:null,phase:"ask",picked:[],hints:0,steps:0,usedHelp:false,results:[],startedAt:0};
+
+function mastery(id){
+  var m=state.mastery[id];
+  if(!m){m={seen:0,ok:0,help:0,m:0};state.mastery[id]=m}
+  return m;
+}
+function activeTopics(){
+  var chosen=state.topics.filter(function(id){return !!topicById(id)});
+  if(chosen.length)return chosen;
+  return topicsForTrack(state.track).map(function(t){return t.id});
+}
+/* בחירת הנושא הבא: מי שחלש יותר מקבל יותר תורות, ומדי כמה
+   שאלות חוזר נושא שנפלו בו קודם. ככה החזרה קורית לבד. */
+function nextTopic(idx){
+  var pool=activeTopics();
+  if(idx>0&&idx%3===2&&state.wrongBank.length){
+    var w=state.wrongBank[state.wrongBank.length-1-Math.floor(Math.random()*Math.min(5,state.wrongBank.length))];
+    if(w&&pool.indexOf(w.topic)>=0)return w.topic;
+  }
+  var weights=pool.map(function(id){return 110-mastery(id).m}),total=0,i;
+  for(i=0;i<weights.length;i++)total+=weights[i];
+  var r=Math.random()*total;
+  for(i=0;i<pool.length;i++){r-=weights[i];if(r<=0)return pool[i]}
+  return pool[pool.length-1];
+}
+function startRound(forceTopic){
+  var n=state.settings.roundLen,i;
+  P.list=[];
+  for(i=0;i<n;i++)P.list.push(forceTopic||nextTopic(i));
+  P.i=0;P.results=[];P.startedAt=Date.now();
+  loadQ();
+}
+function loadQ(){
+  P.q=buildQ(P.list[P.i],state.level);
+  P.phase="ask";P.picked=[];P.hints=0;P.steps=0;P.usedHelp=false;
+  if(state.settings.autoSteps)P.steps=1;
+}
+function roundDone(){return P.i>=P.list.length}
+
+/* השליטה בנושא נמדדת כממוצע נע של הביצועים האחרונים, ולא
+   כמונה שמטפס לאט. תלמיד שענה נכון צריך לראות מספר שמשקף
+   את זה מיד — אחרת המדד מתסכל במקום לעזור. */
+function scoreAnswer(ok){
+  var m=mastery(P.q.topic),d=dayRec(),score;
+  m.seen++;d.a++;state.stats.answered++;
+  touchDay();
+  if(ok&&!P.usedHelp&&P.picked.length===1){
+    m.ok++;d.c++;state.stats.correct++;state.stats.xp+=10;
+    score=1;P.results.push("ok");
+  }else if(ok&&!P.usedHelp){
+    m.ok++;d.c++;state.stats.correct++;state.stats.xp+=4;
+    score=0.7;P.results.push("ok");
+  }else if(P.usedHelp){
+    m.help++;state.stats.helped++;state.stats.xp+=2;
+    score=0.35;P.results.push("hp");
+  }else{
+    score=0;P.results.push("no");
+  }
+  m.m=m.seen===1?Math.round(score*100):Math.round(m.m*0.6+score*40);
+  if(!ok||P.usedHelp){
+    state.wrongBank.push({topic:P.q.topic,ts:Date.now()});
+    if(state.wrongBank.length>40)state.wrongBank.shift();
+  }
+  save();
+}
+
+/* ============================================================
+   14. משפטי ליווי — קצרים, בוגרים, בלי קונפטי
+   ============================================================ */
+var LINE_OK=["מדויק.","זה בדיוק זה.","עבד.","נכון — ולא היה מובן מאליו.","יפה. ממשיכים."];
+var LINE_NO=["טעות היא מידע. נראה איפה בדיוק.","הנה מה שקרה בשורה הזאת.","זה מעבר שנופלים בו הרבה. שווה להבין אותו פעם אחת ולתמיד.","נבין את הצעד ואז ננסה שוב."];
+var LINE_HELP=["ראיתם את כל המעבר. בפעם הבאה לבד.","זו בדיוק המטרה של הפתרון המודרך."];
+function lineFor(kind){
+  if(state.settings.calm)return kind==="ok"?"נכון.":"נסתכל על הפתרון.";
+  return pick(kind==="ok"?LINE_OK:kind==="hp"?LINE_HELP:LINE_NO);
+}
+/* ============================================================
+   15. תצוגות
+   ============================================================ */
+var view="home";
+var LVL=["בסיס","רמת תרגיל","רמת מבחן"];
+var TRACKS=[{v:1,t:"מדעים והנדסה"},{v:2,t:"מדעי המחשב"},{v:3,t:"מדעי החברה"}];
+
+function header(){
+  var nav=[["home","בית","home"],["practice","תרגול","pencil"],["topics","נושאים","list"],
+           ["formulas","נוסחאות","book"],["progress","התקדמות","chart"],["settings","הגדרות","gear"]];
+  return '<header><div class="wrap hbar">'+
+    '<button class="brand" data-a="go" data-v="home" aria-label="לדף הבית">'+
+      '<span class="mk">א</span><span><b>אקסיומה</b><small>מתמטיקה לתואר ראשון</small></span></button>'+
+    '<nav>'+nav.map(function(n){
+      return '<button class="nb'+(view===n[0]?" on":"")+'" data-a="go" data-v="'+n[0]+'" title="'+n[1]+'" aria-current="'+(view===n[0]?"page":"false")+'">'+ic(n[2],17)+'<span>'+n[1]+'</span></button>';
+    }).join("")+'</nav>'+
+  '</div></header>';
+}
+
+var LVL_C=["var(--c-base)","var(--c-alg)","var(--c-geo)"];
+function levelPicker(){
+  return '<div class="seg" role="group" aria-label="רמת קושי">'+LVL.map(function(l,i){
+    return '<button class="'+(state.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="lvl" data-l="'+(i+1)+'">'+l+'</button>';
+  }).join("")+'</div>';
+}
+
+/* אדום · כתום · ירוק — כדי שמבט אחד יספיק כדי לדעת מה חלש */
+function barCls(m){
+  if(!m.seen)return "";
+  return m.m>=70?"ok":m.m>=40?"mid":"low";
+}
+function masteryBar(id){
+  var m=mastery(id);
+  var lbl=!m.seen?"טרם":(m.seen<3?m.m+"% · מדגם קטן":m.m+"%");
+  return '<div class="tm"><span>'+lbl+'</span><span class="bar '+barCls(m)+'"><i style="width:'+(m.seen?m.m:0)+'%"></i></span></div>';
+}
+
+/* ---------- מסך פתיחה ---------- */
+function viewOnboard(){
+  var step=P.obStep||1;
+  return '<div class="wrap" style="padding-block:clamp(24px,7vw,60px);max-width:760px">'+
+   '<div class="rise">'+
+   '<span class="chip a">'+ic("target",14)+' לשנה א׳ באוניברסיטה</span>'+
+   '<h1 class="h1" style="margin-top:14px">חדו״א, לינארית והסתברות — צעד אחר צעד.</h1>'+
+   '<p class="sub" style="font-size:1.05rem;max-width:34rem">בשנה א׳ ההרצאה רצה והתרגול מניח שהבנתם. כאן כל שאלה נפתחת לשלבים — כולל השורה שהמרצה דילג עליה — וכל תשובה שגויה אומרת בדיוק איזו טעות היא. דף נוסחאות פתוח תמיד, והקראה בקול טבעי.</p>'+
+   '<div class="grid g3" style="margin-top:22px">'+
+     [["steps","פתרון מודרך","כל שאלה נפתחת לשלבים, כולל המעברים שמדלגים עליהם"],
+      ["target","זיהוי הטעות","תשובה שגויה אומרת איזו טעות היא, לא רק שהיא שגויה"],
+      ["book","דף נוסחאות","פתוח תמיד — כמו בכל מבחן שנותנים בו דף"]].map(function(f){
+       return '<div class="card pad"><span class="chip a">'+ic(f[0],15)+'</span><div style="font-weight:700;margin-top:9px">'+f[1]+'</div><div class="sm muted">'+f[2]+'</div></div>';
+     }).join("")+
+   '</div>'+
+   '<div class="card pad" style="margin-top:22px">'+
+     '<div class="h2">'+(step===1?"1. איך לקרוא לכם?":step===2?"2. מה אתם לומדים?":"3. איך נוח לכם לקרוא?")+'</div>'+
+     (step===1?
+       '<p class="sub sm">לא חובה. זה נשמר רק במכשיר שלכם.</p>'+
+       '<input id="nm" class="field" style="margin-top:12px" maxlength="18" placeholder="שם או כינוי" value="'+esc(state.name)+'" data-bind="name" />'
+      :step===2?
+       '<p class="sub sm">קובע אילו קורסים ייכנסו לתרגול. אפשר לשנות בכל רגע.</p>'+
+       '<div class="seg" style="margin-top:12px">'+TRACKS.map(function(tr){
+         return '<button class="'+(state.track===tr.v?"on":"")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>';
+       }).join("")+'</div>'+
+       '<p class="sub sm" style="margin-top:12px">רמת הקושי בתרגול:</p><div style="margin-top:8px">'+levelPicker()+'</div>'
+      :
+       '<p class="sub sm">אפשר לשנות הכול אחר כך במסך ההגדרות.</p>'+
+       '<div style="margin-top:12px">'+
+       togBtn("clearfont","פונט ברור לקריאה","אותיות רחבות יותר, בלי קישוטים")+
+       togBtn("spaced","ריווח מוגדל","רווח גדול יותר בין אותיות ומילים")+
+       togBtn("tts","הקראה קולית","קריאת השאלות וההסברים בקול")+
+       togBtn("calm","מצב רגוע","בלי רצפים, בלי לחץ, בלי אדום")+
+       '</div>')+
+     '<div class="row" style="margin-top:18px;justify-content:space-between">'+
+       (step>1?'<button class="btn btn-g" data-a="obback">'+ic("back",17)+' חזרה</button>':'<span></span>')+
+       '<button class="btn btn-p" data-a="obnext">'+(step===3?"מתחילים":"ממשיכים")+' '+ic("arrow",17)+'</button>'+
+     '</div>'+
+   '</div>'+
+   '</div></div>';
+}
+function togBtn(key,title,desc){
+  var on=!!state.settings[key];
+  return '<button class="tog" role="switch" aria-checked="'+on+'" data-a="tog" data-k="'+key+'">'+
+    '<span class="sw"></span><span class="tt"><b>'+title+'</b><span>'+desc+'</span></span></button>';
+}
+
+/* ---------- בית ---------- */
+function viewHome(){
+  var t=todayIso(),d=state.days[t]||{a:0,c:0};
+  var pool=activeTopics();
+  var weak=pool.slice().sort(function(a,b){
+    var ma=mastery(a),mb=mastery(b);
+    if(!ma.seen&&mb.seen)return 1;
+    if(ma.seen&&!mb.seen)return -1;
+    return ma.m-mb.m;
+  })[0];
+  var wt=topicById(weak);
+  var hello=state.name?"היי "+esc(state.name)+".":"היי.";
+  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:40px">';
+  h+='<div class="spread"><div><h1 class="h1">'+hello+'</h1>'+
+     '<p class="sub">'+(d.a?"היום פתרתם "+d.a+" שאלות, "+d.c+" מהן נכון.":"אפשר להתחיל מתי שנוח.")+'</p></div>'+
+     '<div class="row">'+
+       (!state.settings.calm&&state.stats.streakDays>1?'<span class="chip warn">'+ic("flame",14)+' '+state.stats.streakDays+' ימים ברצף</span>':"")+
+       '<span class="chip">'+ic("star",14)+' '+state.stats.xp+' נק\'</span>'+
+     '</div></div>';
+  h+='<div class="card pad" style="margin-top:18px">'+
+     '<div class="spread"><div style="min-width:0"><div class="h2">תרגול</div>'+
+     '<p class="sub sm">'+state.settings.roundLen+' שאלות · '+LVL[state.level-1]+' · '+pool.length+' נושאים</p></div>'+
+     levelPicker()+'</div>'+
+     '<button class="btn btn-p w" style="margin-top:14px;padding:15px;font-size:1.1rem" data-a="start">'+
+       ic("pencil",19)+' מתחילים סבב</button>'+
+     (wt?'<button class="btn btn-g w" style="margin-top:9px" data-a="starttopic" data-t="'+wt.id+'">'+
+       ic("target",17)+' תרגול ממוקד: '+wt.name+'</button>':"")+
+     '</div>';
+  if(wt&&mastery(wt.id).seen){
+    var pre=wt.pre&&wt.pre.length?topicById(wt.pre[0]):null;
+    if(pre&&mastery(wt.id).m<40&&mastery(pre.id).m<70){
+      h+='<div class="card pad" style="margin-top:14px;border-inline-start:4px solid var(--warn)">'+
+        '<div class="row">'+ic("bulb",18)+'<b>הצעה</b></div>'+
+        '<p class="sub sm">נראה ש-'+wt.name+' עדיין תופס. הרבה פעמים זה לא הנושא עצמו אלא מה שמתחתיו — כאן זה '+pre.name+'. שווה לתרגל אותו קודם.</p>'+
+        '<button class="btn btn-g" style="margin-top:10px" data-a="starttopic" data-t="'+pre.id+'">'+ic("arrow",16)+' לתרגל '+pre.name+'</button></div>';
+    }
+  }
+  var byNeed=pool.slice().sort(function(a,b){
+    var ma=mastery(a),mb=mastery(b);
+    if(!ma.seen&&!mb.seen)return 0;
+    if(!ma.seen)return 1;
+    if(!mb.seen)return -1;
+    return ma.m-mb.m;
+  }).slice(0,6);
+  h+='<h2 class="h2" style="margin-top:26px">מה כדאי לתרגל עכשיו</h2>'+
+     '<p class="sub sm">שישה נושאים לפי מה שעדיין לא יושב. לחיצה פותחת תרגול ממוקד.</p>'+
+     '<div class="grid g3" style="margin-top:12px">'+
+     byNeed.map(function(id){
+       var tp=topicById(id);
+       return '<button class="tpc '+areaCls(tp.area)+'" data-a="starttopic" data-t="'+id+'">'+
+         '<span class="tn">'+tp.name+'</span><span class="td">'+tp.desc+'</span>'+masteryBar(id)+'</button>';
+     }).join("")+'</div>';
+  h+='<div class="row" style="margin-top:20px"><button class="btn btn-g" data-a="go" data-v="topics">'+ic("list",17)+' כל '+pool.length+' הנושאים</button>'+
+     '<button class="btn btn-g" data-a="go" data-v="formulas">'+ic("book",17)+' דף נוסחאות</button></div>';
+  return h+'</main>';
+}
+/* ---------- תרגול ---------- */
+/* מצב הקול חייב להיות במסך התרגול עצמו. הודעה שמסבירה למה
+   הקול לא מה שביקשת חסרת ערך אם היא מוסתרת בהגדרות. */
+function voiceStrip(){
+  var s=state.settings;
+  if(!s.tts)return "";
+  if(s.engine==="gemini"&&hasKey()&&ttsState!=="err"){
+    if(ttsState!=="ok")return "";      /* עוד לא הושמע דבר — אין מה להודיע */
+    return '<div class="vstrip ok">'+ic("speaker",15)+'<span>קול טבעי · '+gvName(s.gvoice).t+'</span>'+
+      '<button class="btn btn-g" data-a="go" data-v="settings">להחליף</button></div>';
+  }
+  if(ttsState==="err")
+    return '<div class="vstrip bad">'+ic("speaker",15)+'<span>הקול הטבעי לא הגיב, ההקראה עברה לקול המכשיר</span>'+
+      '<button class="btn btn-g" data-a="go" data-v="settings">לבדוק</button></div>';
+  return '<div class="vstrip warn">'+ic("speaker",15)+'<span>ההקראה בקול המכשיר. יש קול טבעי שנשמע כמו אדם</span>'+
+    '<button class="btn btn-g" data-a="go" data-v="settings">להפעיל</button></div>';
+}
+function viewPractice(){
+  if(!P.q)startRound();
+  if(P.phase==="done")return viewSummary();
+  var q=P.q,calm=state.settings.calm;
+  var h='<main id="main" class="wrap" style="padding-top:18px;padding-bottom:44px">';
+  /* שורת מצב */
+  h+='<div class="spread">'+
+      '<div class="row"><span class="chip area '+topicCls(q.topic)+'">'+q.topicName+'</span>'+
+      '<span class="chip">שאלה '+(P.i+1)+' מתוך '+P.list.length+'</span></div>'+
+      '<div class="row"><span class="dots">'+
+        P.list.map(function(_,i){
+          var c=i<P.results.length?(P.results[i]==="ok"?"ok":P.results[i]==="hp"?"hp":"no"):"";
+          return '<span class="dot '+c+'"></span>';
+        }).join("")+'</span>'+
+      '<button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="stop">'+ic("pause",15)+' עצירה</button></div>'+
+     '</div>';
+  h+=voiceStrip();
+  h+='<div class="grid" style="grid-template-columns:minmax(0,1fr);margin-top:14px">';
+  /* כרטיס השאלה */
+  h+='<div class="card pad rise '+topicCls(q.topic)+'" style="border-top:3px solid var(--c)">';
+  h+='<p style="font-size:clamp(1rem,3.6vw,1.15rem);font-weight:600">'+q.ask+'</p>';
+  if(q.expr)h+='<p class="mline" style="margin-top:14px">'+q.expr+'</p>';
+  if(q.fig)h+=q.fig;
+  /* כפתורי עזר */
+  h+='<div class="row" style="margin-top:16px;gap:8px">'+
+     (state.settings.tts?'<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="read">'+ic("speaker",16)+' הקראה</button>':"")+
+     '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="hint"'+(P.hints>0?" disabled":"")+'>'+ic("bulb",16)+' רמז</button>'+
+     '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="guide"'+(P.steps>0?" disabled":"")+'>'+ic("steps",16)+' פתרון מודרך</button>'+
+     (q.rule?'<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="rule" data-r="'+q.rule+'">'+ic("book",16)+' הנוסחה</button>':"")+
+     '</div>';
+  if(P.hints>0&&q.hint)h+='<div class="hintbox rise"><b>רמז</b><div class="sm" style="margin-top:3px">'+q.hint+'</div></div>';
+  /* תשובות */
+  var keys=["1","2","3","4"];
+  h+='<div class="opts">'+q.options.map(function(o,i){
+    var cls="opt",dis="";
+    var wasPicked=P.picked.indexOf(i)>=0;
+    if(P.phase==="reveal"){
+      dis=" disabled";
+      if(o.ok)cls+=" right";
+      else if(wasPicked)cls+=calm?" gone":" wrong";
+      else cls+=" dim";
+    }else if(wasPicked){cls+=calm?" gone":" wrong";dis=" disabled"}
+    return '<button class="'+cls+'"'+dis+' data-a="ans" data-i="'+i+'">'+
+      '<span class="k">'+keys[i]+'</span><span class="m">'+o.h+'</span></button>';
+  }).join("")+'</div>';
+  /* אבחון הטעות האחרונה */
+  if(P.lastWhy&&P.phase!=="reveal"){
+    h+='<div class="diag rise"><b>מה קרה כאן</b><div class="sm" style="margin-top:3px">'+P.lastWhy+'</div></div>';
+  }
+  h+='</div>';
+  /* פתרון מודרך */
+  if(P.steps>0||P.phase==="reveal"){
+    var showAll=P.phase==="reveal";
+    var shown=showAll?q.steps.length:Math.min(P.steps,q.steps.length);
+    h+='<div class="card pad rise '+topicCls(q.topic)+'"><div class="spread"><div class="h2" style="color:var(--c)">'+ic("steps",18)+' הפתרון, צעד אחר צעד</div>'+
+       (state.settings.tts?'<button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="readsteps">'+ic("speaker",15)+' הקראה</button>':"")+'</div>';
+    h+='<div class="steps">'+q.steps.map(function(s,i){
+      if(i>=shown)return "";
+      return '<div class="step'+(i===q.steps.length-1?" last":"")+'"><div class="st"><span class="num">'+(i+1)+'</span>'+s.t+'</div>'+
+        (s.d?'<div class="sd">'+s.d+'</div>':"")+
+        (s.m?'<div class="mstep">'+s.m+'</div>':"")+'</div>';
+    }).join("")+'</div>';
+    if(!showAll&&shown<q.steps.length){
+      h+='<button class="btn btn-p w" style="margin-top:12px" data-a="nextstep">הצעד הבא '+ic("arrow",17)+'</button>';
+      h+='<p class="sub xs" style="text-align:center;margin-top:8px">אפשר לעצור בכל שלב ולנסות להמשיך לבד.</p>';
+    }
+    h+='</div>';
+  }
+  /* פס תחתון אחרי מענה */
+  if(P.phase==="reveal"){
+    var kind=P.results[P.results.length-1];
+    h+='<div class="card pad rise" style="border-inline-start:4px solid var(--'+(kind==="ok"?"ok":kind==="hp"?"accent":"bad")+')">'+
+       '<div class="row">'+ic(kind==="ok"?"check":"bulb",19)+'<b>'+lineFor(kind)+'</b></div>'+
+       '<button class="btn btn-p w" style="margin-top:12px;padding:14px" data-a="next">'+
+         (P.i+1>=P.list.length?"לסיכום הסבב":"לשאלה הבאה")+' '+ic("arrow",18)+'</button>'+
+       (state.settings.keys?'<p class="sub xs" style="text-align:center;margin-top:8px">אפשר גם ללחוץ Enter</p>':"")+
+       '</div>';
+  }
+  h+='</div>';
+  if(state.settings.keys&&P.phase==="ask")
+    h+='<p class="sub xs" style="margin-top:14px;text-align:center">מקלדת: 1–4 תשובה · רווח הקראה · H רמז · S פתרון</p>';
+  return h+'</main>';
+}
+
+/* ---------- סיכום סבב ---------- */
+function viewSummary(){
+  var ok=P.results.filter(function(r){return r==="ok"}).length;
+  var hp=P.results.filter(function(r){return r==="hp"}).length;
+  var no=P.results.length-ok-hp;
+  var pct=Math.round(ok/Math.max(1,P.results.length)*100);
+  var byTopic={},i;
+  for(i=0;i<P.list.length&&i<P.results.length;i++){
+    var id=P.list[i];
+    if(!byTopic[id])byTopic[id]={ok:0,n:0};
+    byTopic[id].n++;if(P.results[i]==="ok")byTopic[id].ok++;
+  }
+  var worst=null;
+  for(var k in byTopic)if(byTopic[k].n>=2&&(!worst||byTopic[k].ok/byTopic[k].n<byTopic[worst].ok/byTopic[worst].n))worst=k;
+  var title=pct>=85?"סבב חזק.":pct>=60?"סבב טוב.":pct>=35?"סבב עם עבודה.":"סבב קשה — וזה בסדר.";
+  var sub=pct>=85?"אתם שולטים ברוב מה שתרגלתם כאן."
+       :pct>=60?"רוב הדברים במקום. יש נקודה אחת או שתיים שכדאי לחדד."
+       :pct>=35?"חלק מהחומר עוד לא יושב. זה בדיוק מה שמדידה כזאת נועדה להראות."
+       :"סבב כזה לא אומר עליכם כלום חוץ מזה שהחומר הזה חדש. שווה לרדת רמה ולבנות מלמטה.";
+  var h='<main id="main" class="wrap" style="padding-top:26px;padding-bottom:44px;max-width:760px">';
+  h+='<div class="card pad rise"><h1 class="h1">'+title+'</h1><p class="sub">'+sub+'</p>'+
+     '<div class="grid g4" style="margin-top:18px">'+
+       '<div class="tile" style="--c:var(--ok)"><b>'+ok+'</b><span>נכון לבד</span></div>'+
+       '<div class="tile" style="--c:var(--c-alg)"><b>'+hp+'</b><span>עם פתרון מודרך</span></div>'+
+       '<div class="tile" style="--c:var(--bad)"><b>'+no+'</b><span>לא נפתרו</span></div>'+
+       '<div class="tile" style="--c:var(--c-geo)"><b>'+pct+'%</b><span>דיוק</span></div>'+
+     '</div>';
+  h+='<hr class="sep"><div class="h2">לפי נושא</div><div class="grid" style="margin-top:10px">'+
+     Object.keys(byTopic).map(function(id){
+       var b=byTopic[id],tp=topicById(id);
+       return '<div class="spread '+topicCls(id)+'" style="gap:8px"><span class="arh">'+tp.name+'</span>'+
+         '<span class="chip '+(b.ok===b.n?"ok":b.ok===0?"bad":"warn")+'">'+b.ok+' מתוך '+b.n+'</span></div>';
+     }).join("")+'</div>';
+  if(worst&&byTopic[worst].ok<byTopic[worst].n){
+    var wt=topicById(worst);
+    h+='<div class="card pad" style="margin-top:16px;background:var(--surface2)">'+
+       '<div class="row">'+ic("target",17)+'<b>מה לקחת מכאן</b></div>'+
+       '<p class="sub sm">'+wt.name+' היה הנושא שהכי הפריע בסבב הזה. סבב ממוקד אחד בו יעשה יותר מעוד עשר שאלות מעורבות.</p>'+
+       '<button class="btn btn-p" style="margin-top:10px" data-a="starttopic" data-t="'+worst+'">'+ic("pencil",16)+' סבב ממוקד ב'+wt.name+'</button></div>';
+  }
+  h+='<div class="row" style="margin-top:18px">'+
+     '<button class="btn btn-p" data-a="start">'+ic("refresh",17)+' סבב נוסף</button>'+
+     '<button class="btn btn-g" data-a="go" data-v="home">'+ic("home",17)+' לדף הבית</button>'+
+     '<button class="btn btn-g" data-a="go" data-v="progress">'+ic("chart",17)+' להתקדמות</button></div>';
+  return h+'</div></main>';
+}
+/* ---------- נושאים ---------- */
+function viewTopics(){
+  var chosen=state.topics,all=topicsForTrack(state.track);
+  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
+  h+='<h1 class="h1">נושאים</h1>'+
+     '<p class="sub">בוחרים מה ייכנס לסבבי התרגול. בלי בחירה — כל נושאי הקורסים שלכם נכנסים.</p>';
+  h+='<div class="card pad" style="margin-top:16px"><div class="spread"><div><b>מה אני לומד</b>'+
+     '<p class="sub sm">קובע אילו נושאים מוצגים כאן</p></div>'+
+     '<div class="seg">'+TRACKS.map(function(tr){
+       return '<button class="'+(state.track===tr.v?"on":"")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>';
+     }).join("")+'</div></div>'+
+     '<hr class="sep"><div class="spread"><div><b>רמת קושי</b><p class="sub sm">אפשר לשנות גם באמצע סבב</p></div>'+levelPicker()+'</div>'+
+     '</div>';
+  h+='<div class="row" style="margin-top:14px">'+
+     '<button class="btn btn-g" data-a="selall">בחירת הכול</button>'+
+     '<button class="btn btn-g" data-a="selnone">ניקוי הבחירה</button>'+
+     '<span class="chip">'+(chosen.length?chosen.length+" נבחרו":"כל הנושאים")+'</span></div>';
+  AREAS.forEach(function(area){
+    var list=all.filter(function(t){return t.area===area});
+    if(!list.length)return;
+    h+='<h2 class="h2 arh '+areaCls(area)+'" style="margin-top:24px">'+area+'</h2><div class="grid g3" style="margin-top:10px">'+
+      list.map(function(tp){
+        var on=chosen.indexOf(tp.id)>=0;
+        return '<div class="tpc '+areaCls(tp.area)+(on?" on":"")+'">'+
+          '<div class="spread"><span class="tn">'+tp.name+'</span>'+
+          '<button class="chip'+(on?" a":"")+'" data-a="pick" data-t="'+tp.id+'" aria-pressed="'+on+'">'+(on?"בסבב":"להוסיף")+'</button></div>'+
+          '<span class="td">'+tp.desc+'</span>'+masteryBar(tp.id)+
+          '<button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="starttopic" data-t="'+tp.id+'">'+ic("pencil",15)+' תרגול ממוקד</button>'+
+          '</div>';
+      }).join("")+'</div>';
+  });
+  return h+'</main>';
+}
+
+/* ---------- דף נוסחאות ---------- */
+var fq="";
+function viewFormulas(){
+  var q=fq.trim();
+  var list=FORMULAS.filter(function(f){
+    if(!q)return true;
+    return (f.t+" "+f.n+" "+plainOf(f.m)+" "+f.g).indexOf(q)>=0;
+  });
+  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
+  h+='<h1 class="h1">דף נוסחאות</h1>'+
+     '<p class="sub">להשתמש בדף נוסחאות זו לא רמאות. מי שלא מבזבז זיכרון עבודה על שינון, פנוי לחשוב על השאלה עצמה.</p>';
+  h+='<div class="row" style="margin-top:14px">'+
+     '<input class="field" style="flex:1;min-width:min(100%,220px)" placeholder="חיפוש נוסחה — למשל: נגזרת, דטרמיננטה, בייס" value="'+esc(fq)+'" data-bind="fq" />'+
+     (q?'<button class="btn btn-g" data-a="fclear">'+ic("x",16)+'</button>':"")+'</div>';
+  if(!list.length)h+='<p class="sub" style="margin-top:20px">לא נמצאה נוסחה עם ״'+esc(q)+'״.</p>';
+  /* לפי רשימת התחומים של האפליקציה, ולא לפי רשימה קבועה —
+     אחרת דף הנוסחאות נשאר ריק ברגע ששמות התחומים משתנים. */
+  AREAS.forEach(function(g){
+    var sub=list.filter(function(f){return f.g===g});
+    if(!sub.length)return;
+    h+='<h2 class="h2 arh '+areaCls(g)+'" style="margin-top:24px">'+g+'</h2><div class="grid g3" style="margin-top:10px">'+
+      sub.map(function(f){
+        return '<div class="fcard '+areaCls(g)+'" id="f-'+f.id+'"><div class="ft">'+f.t+'</div>'+
+          '<div class="fm m">'+f.m+'</div><div class="fn">'+f.n+'</div></div>';
+      }).join("")+'</div>';
+  });
+  return h+'</main>';
+}
+
+/* ---------- התקדמות ---------- */
+function viewProgress(){
+  var st=state.stats;
+  var acc=st.answered?Math.round(st.correct/st.answered*100):0;
+  var days=[],i,d=new Date();
+  for(i=13;i>=0;i--){
+    var dd=new Date(d.getTime()-i*86400000);
+    var key=dd.getFullYear()+"-"+String(dd.getMonth()+1).padStart(2,"0")+"-"+String(dd.getDate()).padStart(2,"0");
+    days.push({k:key,r:state.days[key]||{a:0,c:0},lbl:"אבגדהוש".charAt(dd.getDay())});
+  }
+  var maxA=Math.max.apply(null,days.map(function(x){return x.r.a}).concat([1]));
+  var seen=TOPICS.filter(function(t){return mastery(t.id).seen>0});
+  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
+  h+='<h1 class="h1">התקדמות</h1><p class="sub">המספרים כאן הם כלי עבודה, לא ציון.</p>';
+  h+='<div class="grid g4" style="margin-top:16px">'+
+     '<div class="tile" style="--c:var(--c-base)"><b>'+st.answered+'</b><span>שאלות שנפתרו</span></div>'+
+     '<div class="tile" style="--c:var(--ok)"><b>'+acc+'%</b><span>דיוק כולל</span></div>'+
+     '<div class="tile" style="--c:var(--c-alg)"><b>'+st.helped+'</b><span>עם פתרון מודרך</span></div>'+
+     '<div class="tile" style="--c:var(--c-geo)"><b>'+st.xp+'</b><span>נקודות</span></div></div>';
+  h+='<div class="card pad" style="margin-top:16px"><div class="h2">שבועיים אחרונים</div>'+
+     '<div style="display:flex;gap:5px;align-items:flex-end;height:120px;margin-top:14px;direction:ltr">'+
+     days.map(function(x){
+       var hh=Math.round(x.r.a/maxA*88);
+       return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;height:100%">'+
+         '<i style="display:block;width:100%;border-radius:5px 5px 0 0;background:'+(x.r.a?"linear-gradient(180deg,var(--c-alg),var(--c-data))":"var(--surface2)")+';height:'+Math.max(hh,4)+'px" title="'+x.r.a+' שאלות"></i>'+
+         '<span class="xs faint">'+x.lbl+'</span></div>';
+     }).join("")+'</div></div>';
+  h+='<div class="card pad" style="margin-top:16px"><div class="h2">שליטה לפי נושא</div>';
+  if(!seen.length)h+='<p class="sub sm">עוד לא תרגלתם נושאים. אחרי הסבב הראשון תופיע כאן תמונה.</p>';
+  else h+='<div class="grid" style="margin-top:12px;gap:11px">'+seen.sort(function(a,b){return mastery(a.id).m-mastery(b.id).m}).map(function(tp){
+    var m=mastery(tp.id);
+    return '<div class="'+areaCls(tp.area)+'"><div class="spread" style="gap:8px"><span class="arh" style="font-weight:600">'+tp.name+'</span>'+
+      '<span class="xs faint">'+m.ok+' מתוך '+m.seen+(m.help?" · "+m.help+" עם עזרה":"")+'</span></div>'+
+      '<div class="bar '+barCls(m)+'" style="margin-top:5px"><i style="width:'+m.m+'%"></i></div></div>';
+  }).join("")+'</div>';
+  h+='</div>';
+  return h+'</main>';
+}
+
+/* ---------- הגדרות ---------- */
+function viewSettings(){
+  var s=state.settings,hv=hebVoices();
+  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px;max-width:820px">';
+  h+='<h1 class="h1">הגדרות</h1><p class="sub">הכול נשמר במכשיר הזה בלבד.</p>';
+
+  h+='<div class="card pad" style="margin-top:16px"><div class="h2">קריאה ונגישות</div>'+
+     '<p class="sub sm">גודל האותיות</p><div class="seg" style="margin-top:8px">'+
+     [[1,"רגיל"],[2,"גדול"],[3,"ענק"]].map(function(o){
+       return '<button class="'+(s.ts===o[0]?"on":"")+'" data-a="ts" data-n="'+o[0]+'">'+o[1]+'</button>';
+     }).join("")+'</div>'+
+     '<p class="sub sm" style="margin-top:14px">ערכת צבע</p><div class="seg" style="margin-top:8px">'+
+     [["auto","לפי המכשיר"],["light","בהיר"],["dark","כהה"]].map(function(o){
+       return '<button class="'+(s.theme===o[0]?"on":"")+'" data-a="theme" data-n="'+o[0]+'">'+o[1]+'</button>';
+     }).join("")+'</div>'+
+     '<div style="margin-top:14px">'+
+     togBtn("clearfont","פונט ברור לקריאה","אותיות פשוטות ורחבות, בלי קישוטים")+
+     togBtn("spaced","ריווח מוגדל","מרווח גדול יותר בין אותיות, מילים ושורות")+
+     togBtn("hc","ניגודיות גבוהה","שחור על לבן עם מסגרות ברורות")+
+     togBtn("rm","הפחתת תנועה","בלי אנימציות")+
+     '</div></div>';
+
+  h+='<div class="card pad" style="margin-top:14px"><div class="h2">איך לומדים כאן</div>'+
+     '<div style="margin-top:12px">'+
+     togBtn("calm","מצב רגוע","בלי רצף ימים, בלי אדום, ניסוחים מרוככים")+
+     togBtn("autoSteps","לפתוח פתרון מודרך אוטומטית","הצעד הראשון מוצג כבר עם השאלה")+
+     togBtn("keys","קיצורי מקלדת","1–4 לבחירה, רווח להקראה, H רמז, S פתרון")+
+     '</div>'+
+     '<p class="sub sm" style="margin-top:14px">אורך סבב</p><div class="seg" style="margin-top:8px">'+
+     [5,8,12].map(function(n){
+       return '<button class="'+(s.roundLen===n?"on":"")+'" data-a="rlen" data-n="'+n+'">'+n+' שאלות</button>';
+     }).join("")+'</div></div>';
+
+  h+='<div class="card pad" style="margin-top:14px"><div class="h2">הקראה</div>'+
+     '<div style="margin-top:12px">'+togBtn("tts","הקראה קולית","קריאת שאלות, רמזים והסברים")+'</div>';
+  if(s.tts){
+    h+='<p class="sub sm" style="margin-top:16px">מקור הקול</p><div class="seg" style="margin-top:8px">'+
+       '<button class="'+(s.engine==="gemini"?"on":"")+'" data-a="engine" data-n="gemini">קול טבעי</button>'+
+       '<button class="'+(s.engine!=="gemini"?"on":"")+'" data-a="engine" data-n="device">קול המכשיר</button>'+
+       '</div>';
+    if(s.engine==="gemini"){
+      if(!hasKey()){
+        h+='<div class="hintbox" style="margin-top:14px"><b>צריך מפתח חינמי פעם אחת</b>'+
+           '<div class="sm" style="margin-top:4px">הקול הטבעי מגיע מגוגל. נכנסים ל-'+
+           '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>'+
+           ', יוצרים מפתח ומדביקים אותו כאן. הוא נשמר במכשיר בלבד ולא נשלח לשום מקום חוץ מגוגל.</div></div>'+
+           '<input class="field" style="margin-top:10px;direction:ltr;text-align:left" placeholder="מדביקים כאן את המפתח" data-bind="gkey" />'+
+           '<p class="sub xs" style="margin-top:8px">עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.</p>';
+      }else{
+        h+=[["f","קולות נשיים"],["m","קולות גבריים"]].map(function(grp){
+          return '<p class="sub sm" style="margin-top:14px">'+grp[1]+'</p><div class="grid vgrid" style="margin-top:8px">'+
+            GEM_VOICES.filter(function(g){return g.g===grp[0]}).map(function(g){
+              var on=(s.gvoice||"Kore")===g.id;
+              return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="gvoice" data-n="'+g.id+'">'+
+                '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"לשמוע")+'</span>'+
+                '<span class="tt"><b>'+g.t+'</b><span>'+g.d+'</span></span></button>';
+            }).join("")+'</div>';
+        }).join("")+
+          '<div class="row" style="margin-top:12px"><button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="clearkey">החלפת המפתח</button></div>';
+        if(ttsErr)h+='<div class="diag" style="margin-top:12px"><b>הקול הטבעי לא הגיב</b>'+
+          '<div class="sm" style="margin-top:3px">'+esc(ttsErr)+'</div>'+
+          '<div class="sm" style="margin-top:6px">בינתיים ההקראה עברה לקול המכשיר. אם כתוב כאן 400 או 403 — כנראה המפתח לא תקין או שהמודל לא זמין לחשבון.</div></div>';
+      }
+    }else{
+      var vl=pickList();
+      if(!vl.length){
+        h+='<div class="hintbox" style="margin-top:14px"><b>לא נמצאו קולות במכשיר</b>'+
+           '<div class="sm" style="margin-top:3px">שווה לנסות את הקול הטבעי, או להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.</div></div>';
+      }else{
+        if(!hv.length)h+='<div class="hintbox" style="margin-top:14px"><b>אין קול עברי במכשיר</b>'+
+          '<div class="sm" style="margin-top:3px">הקולות שברשימה ידברו עברית במבטא זר. הקול הטבעי יישמע הרבה יותר טוב.</div></div>';
+        h+='<p class="sub sm" style="margin-top:14px">קולות במכשיר</p><div class="grid" style="margin-top:8px;gap:8px;max-height:340px;overflow-y:auto">'+
+          vl.slice(0,24).map(function(v){
+            var on=(deviceVoice()||{}).voiceURI===v.voiceURI;
+            var heb=/^(he|iw)/i.test(v.lang||"");
+            return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="voice" data-u="'+esc(v.voiceURI)+'">'+
+              '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"לשמוע")+'</span>'+
+              '<span class="tt"><b>'+esc(v.name)+'</b><span>'+esc(v.lang)+(heb?" · עברית":"")+'</span></span></button>';
+          }).join("")+'</div>';
+      }
+    }
+    h+='<p class="sub sm" style="margin-top:16px">מהירות דיבור — <span id="ratev">'+s.rate.toFixed(2)+'</span></p>'+
+       '<input type="range" min="0.6" max="1.3" step="0.05" value="'+s.rate+'" data-slide="rate" style="margin-top:6px" />'+
+       '<button class="btn btn-g w" style="margin-top:12px" data-a="test">'+ic("speaker",16)+' לשמוע דוגמה</button>';
+  }
+  h+='</div>';
+
+  h+='<div class="card pad" style="margin-top:14px"><div class="h2">פרטים</div>'+
+     '<p class="sub sm" style="margin-top:10px">שם או כינוי</p>'+
+     '<input class="field" style="margin-top:6px" maxlength="18" value="'+esc(state.name)+'" data-bind="name" placeholder="לא חובה" />'+
+     '<p class="sub sm" style="margin-top:14px">תחום הלימוד</p><div class="seg" style="margin-top:8px">'+
+     TRACKS.map(function(tr){return '<button class="'+(state.track===tr.v?"on":"")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>'}).join("")+
+     '</div></div>';
+
+  h+='<div class="card pad" style="margin-top:14px;border-color:var(--bad)"><div class="h2">איפוס</div>'+
+     '<p class="sub sm">מוחק את ההתקדמות, ההגדרות והנושאים שנבחרו במכשיר הזה. אין דרך לשחזר.</p>'+
+     '<button class="btn btn-g" style="margin-top:10px;color:var(--bad);border-color:var(--bad)" data-a="reset">מחיקת הכול</button></div>';
+
+  h+='<p class="sub xs" style="margin-top:18px;text-align:center">אקסיומה · גרסה '+BUILD+'</p>';
+  return h+'</main>';
+}
+/* ============================================================
+   16. ציור המסך
+   ============================================================ */
+var pendingScroll=null;
+function render(){
+  var html="";
+  if(!state.onboarded){
+    html=viewOnboard();
+  }else{
+    html=header();
+    if(view==="home")html+=viewHome();
+    else if(view==="practice")html+=viewPractice();
+    else if(view==="topics")html+=viewTopics();
+    else if(view==="formulas")html+=viewFormulas();
+    else if(view==="progress")html+=viewProgress();
+    else if(view==="settings")html+=viewSettings();
+    html+='<footer><div class="wrap fbar">'+
+      '<span>אקסיומה · מתמטיקה לתואר ראשון, צעד אחר צעד</span>'+
+      '<span class="faint">הכול נשמר במכשיר הזה · '+BUILD+'</span></div></footer>';
+  }
+  $("#app").innerHTML=html;
+  afterRender();
+}
+function afterRender(){
+  if(pendingScroll){
+    var el=document.getElementById(pendingScroll);
+    if(el){
+      el.scrollIntoView({block:"center",behavior:state.settings.rm?"auto":"smooth"});
+      el.style.outline="3px solid var(--accent)";el.style.outlineOffset="3px";
+      setTimeout(function(){el.style.outline="";},2600);
+    }
+    pendingScroll=null;
+  }
+}
+
+/* ============================================================
+   17. פעולות
+   ============================================================ */
+function goto(v){
+  if(view===v)return;
+  view=v;stopSpeak();
+  window.scrollTo(0,0);
+  render();
+}
+function readQuestion(){
+  if(!P.q)return;
+  var body=P.q.expr;
+  if(body&&body.indexOf("<br>")>=0){
+    var eqs=body.split("<br>");
+    body=eqs.map(function(e,i){return (i===0?"משוואה ראשונה: ":"משוואה שנייה: ")+speakMath(plainOf(e))}).join(". ");
+  }else body=body?speakMath(plainOf(body)):"";
+  var head=speakProse(plainOf(P.q.ask)).replace(/\s+$/,"");
+  var sep=/[.?!]$/.test(head)?" ":". ";
+  var txt=head+(body?sep+body:"")+
+    ". האפשרויות: "+P.q.options.map(function(o,i){return "אפשרות "+(i+1)+". "+speakMath(o.t)}).join(", ");
+  speak(txt);
+}
+function readSteps(){
+  if(!P.q)return;
+  var shown=P.phase==="reveal"?P.q.steps.length:Math.min(P.steps,P.q.steps.length);
+  var txt=P.q.steps.slice(0,shown).map(function(s){
+    return s.t+". "+speakProse(s.d||"")+" "+(s.m?speakMath(plainOf(s.m)):"");
+  }).join(". ");
+  speak(txt);
+}
+function onAnswer(i){
+  if(P.phase!=="ask"||!P.q)return;
+  if(P.picked.indexOf(i)>=0)return;
+  var o=P.q.options[i];
+  P.picked.push(i);
+  if(o.ok){
+    P.lastWhy="";
+    P.phase="reveal";
+    scoreAnswer(true);
+    announce("נכון");
+    if(state.settings.tts)speak(lineFor(P.results[P.results.length-1]));
+  }else{
+    P.lastWhy=o.why||"התשובה הזו לא נכונה. שווה לפתוח את הפתרון המודרך ולראות איפה הדרך מתפצלת.";
+    announce("לא נכון. "+P.lastWhy);
+    if(state.settings.tts)speak(P.lastWhy);
+    /* אם נגמרו האפשרויות — עוברים לחשיפה ולא משאירים תקועים */
+    if(P.picked.length>=P.q.options.length-1){
+      P.phase="reveal";
+      scoreAnswer(false);
+    }
+  }
+  render();
+}
+function advance(){
+  P.i++;
+  P.lastWhy="";
+  if(roundDone()){P.phase="done";state.stats.rounds++;save();render();return}
+  loadQ();
+  window.scrollTo(0,0);
+  render();
+}
+var VOICE_SAMPLE="פותרים את המשוואה: שלוש איקס ועוד חמש שווה עשרים. מעבירים את החמש לצד השני, ומחלקים בשלוש.";
+function onAction(a,el){
+  var s=state.settings;
+  if(a==="go"){goto(el.getAttribute("data-v"));return}
+  if(a==="lvl"){state.level=parseInt(el.getAttribute("data-l"),10);save();if(view==="practice"&&P.phase==="ask")loadQ();render();return}
+  if(a==="track"){state.track=parseInt(el.getAttribute("data-t"),10);
+    state.topics=state.topics.filter(function(id){var t=topicById(id);return t&&t.tracks.indexOf(state.track)>=0});
+    save();render();return}
+  if(a==="start"){startRound();view="practice";window.scrollTo(0,0);render();return}
+  if(a==="starttopic"){var tid=el.getAttribute("data-t");startRound(tid);view="practice";window.scrollTo(0,0);render();return}
+  if(a==="ans"){onAnswer(parseInt(el.getAttribute("data-i"),10));return}
+  if(a==="next"){advance();return}
+  if(a==="stop"){
+    if(P.results.length===0){goto("home");return}
+    P.list=P.list.slice(0,P.results.length);P.phase="done";save();window.scrollTo(0,0);render();return}
+  if(a==="hint"){P.hints=1;render();if(s.tts&&P.q.hint)speak(P.q.hint);return}
+  if(a==="guide"){
+    P.steps=1;P.usedHelp=true;
+    render();if(s.tts)readSteps();return}
+  if(a==="nextstep"){
+    P.steps++;P.usedHelp=true;
+    if(P.steps>=P.q.steps.length&&P.phase==="ask"){P.phase="reveal";scoreAnswer(false)}
+    render();
+    if(s.tts&&P.q.steps[P.steps-1]){
+      var st=P.q.steps[P.steps-1];
+      speak(st.t+". "+speakProse(st.d||"")+" "+(st.m?speakMath(plainOf(st.m)):""));
+    }
+    return}
+  if(a==="read"){readQuestion();return}
+  if(a==="readsteps"){readSteps();return}
+  if(a==="rule"){fq="";view="formulas";pendingScroll="f-"+el.getAttribute("data-r");window.scrollTo(0,0);render();return}
+  if(a==="tog"){var k=el.getAttribute("data-k");s[k]=!s[k];save();applyModes();render();return}
+  if(a==="ts"){s.ts=parseInt(el.getAttribute("data-n"),10);save();applyModes();render();return}
+  if(a==="theme"){s.theme=el.getAttribute("data-n");save();applyModes();render();return}
+  if(a==="rlen"){s.roundLen=parseInt(el.getAttribute("data-n"),10);save();render();return}
+  if(a==="engine"){s.engine=el.getAttribute("data-n");ttsErr="";ttsState="";save();render();speak(VOICE_SAMPLE);return}
+  if(a==="gvoice"){s.gvoice=el.getAttribute("data-n");ttsErr="";ttsState="";save();render();speak(VOICE_SAMPLE);return}
+  if(a==="clearkey"){saveKey("");ttsErr="";render();return}
+  if(a==="voice"){s.voice=el.getAttribute("data-u");s.engine="device";save();render();speak(VOICE_SAMPLE);return}
+  if(a==="test"){speak(VOICE_SAMPLE);return}
+  if(a==="pick"){
+    var id=el.getAttribute("data-t"),ix=state.topics.indexOf(id);
+    if(ix>=0)state.topics.splice(ix,1);else state.topics.push(id);
+    save();render();return}
+  if(a==="selall"){state.topics=topicsForTrack(state.track).map(function(t){return t.id});save();render();return}
+  if(a==="selnone"){state.topics=[];save();render();return}
+  if(a==="fclear"){fq="";render();return}
+  if(a==="obnext"){
+    P.obStep=(P.obStep||1)+1;
+    if(P.obStep>3){state.onboarded=true;save();applyModes();view="home";window.scrollTo(0,0)}
+    save();render();return}
+  if(a==="obback"){P.obStep=Math.max(1,(P.obStep||1)-1);render();return}
+  if(a==="reset"){
+    if(!P.confirmReset){P.confirmReset=true;el.textContent="לוחצים שוב כדי למחוק סופית";return}
+    try{localStorage.removeItem(KEY)}catch(e){}
+    state=blankState();P=({list:[],i:0,q:null,phase:"ask",picked:[],hints:0,steps:0,usedHelp:false,results:[]});
+    applyModes();view="home";render();return}
+}
+
+/* ============================================================
+   18. אירועים
+   ============================================================ */
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-a]");
+  if(el&&!el.disabled)onAction(el.getAttribute("data-a"),el);
+});
+document.addEventListener("input",function(e){
+  var el=e.target;
+  if(!el.dataset)return;
+  if(el.dataset.bind==="name"){state.name=el.value;save();return}
+  if(el.dataset.bind==="gkey"){
+    var k=String(el.value||"").trim();
+    /* מציירים מחדש רק כשהמפתח נראה שלם, אחרת הפוקוס קופץ בכל תו */
+    if(/^AIza[\w-]{25,}$/.test(k)){saveKey(k);ttsErr="";render();speak(VOICE_SAMPLE)}
+    return}
+  if(el.dataset.bind==="fq"){fq=el.value;
+    var pos=el.selectionStart;render();
+    var again=document.querySelector('[data-bind="fq"]');
+    if(again){again.focus();try{again.setSelectionRange(pos,pos)}catch(x){}}
+    return}
+  if(el.dataset.slide==="rate"){
+    state.settings.rate=parseFloat(el.value);save();
+    var lab=$("#ratev");if(lab)lab.textContent=state.settings.rate.toFixed(2);
+    return}
+});
+document.addEventListener("keydown",function(e){
+  if(!state.settings.keys)return;
+  if(e.target.closest("input,textarea,select"))return;
+  if(!state.onboarded||view!=="practice"||!P.q)return;
+  if(P.phase==="ask"&&/^[1-4]$/.test(e.key)){
+    var i=parseInt(e.key,10)-1;
+    if(P.q.options[i]){e.preventDefault();onAnswer(i)}
+    return;
+  }
+  if(e.key===" "){e.preventDefault();readQuestion();return}
+  if(e.key==="h"||e.key==="H"){e.preventDefault();if(P.phase==="ask"&&!P.hints)onAction("hint",document.body);return}
+  if(e.key==="s"||e.key==="S"){e.preventDefault();if(!P.steps)onAction("guide",document.body);else onAction("nextstep",document.body);return}
+  if(e.key==="Enter"&&P.phase==="reveal"){e.preventDefault();advance();return}
+});
+window.addEventListener("error",function(){
+  try{
+    $("#app").innerHTML='<div class="wrap" style="padding-block:60px;max-width:520px">'+
+      '<div class="card pad"><h1 class="h1">משהו נתקע</h1>'+
+      '<p class="sub">זו תקלה שלנו, לא שלכם. ההתקדמות שמורה.</p>'+
+      '<button class="btn btn-p" style="margin-top:14px" onclick="location.reload()">לטעון מחדש</button></div></div>';
+  }catch(e){}
+});
+
+/* ============================================================
+   19. הפעלה
+   ============================================================ */
+load();
+loadKey();
+applyModes();
+try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(view==="settings")render()}}catch(e){}
+render();
+</script>
+</body>
+</html>
