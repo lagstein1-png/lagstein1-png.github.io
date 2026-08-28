@@ -252,11 +252,7 @@ html.light .seg button.on{background:rgba(22,98,164,.09)}
     </div>
     <div class="grp">
       <label>קול</label>
-      <div class="seg" id="segVoice">
-        <button data-v="browser" class="on">קול המחשב</button>
-        <button data-v="Kore">טבעי · נשי</button>
-        <button data-v="Puck">טבעי · גברי</button>
-      </div>
+      <div class="seg" id="segVoice"></div>
       <div class="seg" id="segSync" style="display:none;margin-top:8px">
         <button data-v="1" class="on">הדגשת מילים</button>
         <button data-v="0">הדגשת משפט</button>
@@ -506,7 +502,7 @@ function gSynth(text, voiceName){
 function gGet(text){
   var ck = VOICE + '|' + P.rate + '|' + text;
   if(gCache[ck]) return Promise.resolve(gCache[ck]);
-  return gSynth(text, VOICE).then(function(url){ gCache[ck] = url; return url; });
+  return gSynth(text, geminiName()).then(function(url){ gCache[ck] = url; return url; });
 }
 function gStop(){
   stopSync();
@@ -604,12 +600,53 @@ function markReading(n){
 }
 
 /* ---------- הקראה ---------- */
+var heVoices = [];
+
+/* אוסף את כל הקולות העבריים שהדפדפן מציע — לא רק את הראשון.
+   ההבדל משמעותי: בכרום יש בדרך כלל קול אחד בלבד, וב-Edge יש
+   גם קולות נוירוניים מקוונים, כולל נשיים, בלי מפתח ובלי תשלום. */
 function pickVoice(){
   if(!('speechSynthesis' in window)) return;
   var v = speechSynthesis.getVoices();
   if(!v.length) return;
   voicesReady = true;
-  heVoice = v.filter(function(x){ return /^he/i.test(x.lang); })[0] || null;
+  heVoices = v.filter(function(x){ return /^he/i.test(x.lang); });
+  heVoice = heVoices.filter(function(x){ return x.voiceURI === P.voice; })[0] || heVoices[0] || null;
+  renderVoices();
+}
+
+/* שם קצר וקריא לקול. שמות המערכת ארוכים ומלאי סוגריים. */
+function voiceLabel(v){
+  var n = String(v.name || '')
+    .replace(/^Microsoft\s+/i, '')
+    .replace(/\s*-\s*Hebrew.*$/i, '')
+    .replace(/\s*\(.*?\)\s*/g, ' ')
+    .trim();
+  var natural = /online|natural|neural/i.test(v.name);
+  return (n || 'קול') + (natural ? ' · טבעי' : '');
+}
+
+function renderVoices(){
+  var host = document.querySelector('#segVoice');
+  if(!host) return;
+  var html = '';
+  heVoices.forEach(function(v){
+    html += '<button data-v="' + esc(v.voiceURI) + '">' + esc(voiceLabel(v)) + '</button>';
+  });
+  if(!heVoices.length){
+    html += '<button data-v="browser">קול המחשב</button>';
+  }
+  /* קולות Gemini מוצגים רק כשיש מפתח — אין טעם להציע מה שלא יעבוד */
+  if(GKEY){
+    html += '<button data-v="gemini:Kore">Gemini · נשי</button>';
+    html += '<button data-v="gemini:Puck">Gemini · גברי</button>';
+  }
+  host.innerHTML = html;
+  mark('#segVoice', VOICE);
+  if(!host.querySelector('button.on')){
+    var first = host.querySelector('button');
+    if(first){ first.classList.add('on'); VOICE = first.getAttribute('data-v'); P.voice = VOICE; }
+  }
 }
 if('speechSynthesis' in window){
   pickVoice();
@@ -637,8 +674,11 @@ function hit(idx){
    וגם מנועי הקראה שנחנקים על טקסט ארוך מסתדרים.
    ההקראה תמיד על הטקסט בלי ניקוד — סימני ניקוד מבלבלים חלק מהמנועים.
    התצוגה יכולה להיות מנוקדת, זה לא קשור. */
+function isGemini(){ return VOICE.indexOf('gemini:') === 0; }
+function geminiName(){ return VOICE.split(':')[1] || 'Kore'; }
+
 function speakSentence(n){
-  if(VOICE !== 'browser'){ speakGemini(n); return; }
+  if(isGemini()){ speakGemini(n); return; }
   if(!('speechSynthesis' in window)) return;
   var full = sentencePlain(n), text = full.trim();
   if(!text){                               /* משפט ריק — מדלגים */
@@ -658,7 +698,8 @@ function speakSentence(n){
 
   var u = new SpeechSynthesisUtterance(text);
   u.lang = 'he-IL';
-  if(heVoice) u.voice = heVoice;
+  var chosen = heVoices.filter(function(v){ return v.voiceURI === VOICE; })[0] || heVoice;
+  if(chosen) u.voice = chosen;
   u.rate = P.rate;
   u.onboundary = function(e){
     if(e.name && e.name !== 'word') return;
@@ -715,8 +756,8 @@ function speakGemini(n){
 /* אם הקול הטבעי נכשל, חוזרים לקול המחשב במקום להשתתק */
 function voiceFailed(why){
   var noKey = !GKEY;
-  VOICE = 'browser'; savePrefs();
-  mark('#segVoice', 'browser'); syncVoiceUi();
+  VOICE = (heVoices[0] && heVoices[0].voiceURI) || 'browser'; savePrefs();
+  mark('#segVoice', VOICE); syncVoiceUi();
   $('#vnote').textContent = 'הקול הטבעי לא עבד (' + why + '). חזרנו לקול המחשב.';
   voiceBar(noKey
     ? 'לא נמצא מפתח Gemini, אז ההקראה בקול המחשב.'
@@ -768,8 +809,8 @@ function toReader(fromNikud){
   /* אם אין קול עברי במחשב — אומרים את זה מראש ולא נותנים לו לגלות לבד */
   if(voicesReady && !heVoice) showWarnIn('#text', 'לא נמצא קול עברי במחשב הזה, אז ההקראה עשויה להישמע מוזר. הטקסט המנוקד עובד כרגיל.');
   /* אם נבחר קול טבעי בביקור קודם אבל אין מפתח — אומרים לפני שילחץ נגן */
-  if(VOICE !== 'browser' && !GKEY){
-    voiceBar('כדי לשמוע קול טבעי צריך מפתח Gemini. בלעדיו ההקראה תישאר בקול המחשב.', true);
+  if(isGemini() && !GKEY){
+    voiceBar('כדי לשמוע קול Gemini צריך מפתח. בלעדיו ההקראה תישאר בקול של הדפדפן.', true);
   }else{
     voiceBar('');
   }
@@ -813,6 +854,9 @@ function applyPrefs(){
   $('#btnTheme').textContent = P.light ? 'מצב כהה' : 'מצב בהיר';
   $('#screenRead').classList.toggle('focusing', !!P.focus);
   VOICE = P.voice || 'browser';
+  /* ערכים מגרסה קודמת: 'Kore' / 'Puck' היו שמות Gemini */
+  if(VOICE === 'Kore' || VOICE === 'Puck'){ VOICE = 'gemini:' + VOICE; P.voice = VOICE; }
+  renderVoices();
   mark('#segVoice', VOICE);
   mark('#segSync', String(P.wordsync));
   syncVoiceUi();
@@ -884,7 +928,7 @@ $('#text').addEventListener('click', function(e){
   if(!w) return;
   stop();
   hit(i);
-  if(VOICE !== 'browser'){
+  if(isGemini()){
     gGet(w.plain.trim()).then(function(url){
       gStop(); gAudio = new Audio(url); gAudio.play().catch(function(){});
     }).catch(function(){});
@@ -893,7 +937,8 @@ $('#text').addEventListener('click', function(e){
   if(!('speechSynthesis' in window)) return;
   var u = new SpeechSynthesisUtterance(w.plain);
   u.lang = 'he-IL';
-  if(heVoice) u.voice = heVoice;
+  var cv = heVoices.filter(function(v){ return v.voiceURI === VOICE; })[0] || heVoice;
+  if(cv) u.voice = cv;
   u.rate = Math.min(P.rate, 0.75);
   speechSynthesis.speak(u);
 });
@@ -930,14 +975,18 @@ segment('#segRate', function(b){
 
 /* מציג/מסתיר את שדה המפתח ומסביר מה כל בחירה נותנת */
 function syncVoiceUi(){
-  var natural = VOICE !== 'browser';
+  var natural = isGemini();
   $('#keyRow').style.display = natural ? 'flex' : 'none';
   $('#segSync').style.display = natural ? 'flex' : 'none';
   var note = $('#vnote');
   if(!natural){
-    note.textContent = 'קול המחשב. הוא היחיד שמאפשר הדגשה של כל מילה בנפרד בזמן ההקראה.';
+    var cur = heVoices.filter(function(v){ return v.voiceURI === VOICE; })[0];
+    var isNat = cur && /online|natural|neural/i.test(cur.name);
+    note.textContent = heVoices.length > 1
+      ? ('קול של הדפדפן — בחינם, בלי מפתח, ועם הדגשה מדויקת של כל מילה.' + (isNat ? ' זה קול טבעי.' : ''))
+      : 'קול של הדפדפן. הדגשה מדויקת של כל מילה. אם דפדפן אחר מציע קולות נוספים, הם יופיעו כאן.';
   }else if(!GKEY){
-    note.textContent = 'קול טבעי דורש מפתח Gemini. בלעדיו נשתמש בקול המחשב.';
+    note.textContent = 'קול Gemini דורש מפתח, ולכן מתאים רק לשימוש אישי — לא לקהל.';
   }else{
     note.textContent = P.wordsync
       ? 'קול טבעי. גוגל לא מדווח מתי כל מילה נאמרת, אז ההדגשה מחושבת לפי מספר ההברות בכל מילה. אם היא מקדימה או מפגרת — עברו להדגשת משפט.'
@@ -952,10 +1001,11 @@ segment('#segSync', function(b){
 segment('#segVoice', function(b){
   VOICE = b.getAttribute('data-v');
   P.voice = VOICE;
+  heVoice = heVoices.filter(function(v){ return v.voiceURI === VOICE; })[0] || heVoice;
   gStop(); markReading(null);
-  if(VOICE !== 'browser' && !GKEY){
+  if(isGemini() && !GKEY){
     /* אומרים את זה מיד, במסך, ולא מחכים שינסה וישמע קול אחר */
-    voiceBar('כדי לשמוע קול טבעי צריך מפתח Gemini. בלעדיו ההקראה תישאר בקול המחשב.', true);
+    voiceBar('כדי לשמוע קול Gemini צריך מפתח. בלעדיו ההקראה תישאר בקול של הדפדפן.', true);
   }else{
     voiceBar('');
   }
@@ -965,8 +1015,9 @@ segment('#segVoice', function(b){
 $('#btnKey').addEventListener('click', function(){
   saveKey($('#gkey').value);
   $('#gkey').value = '';
+  renderVoices();
   syncVoiceUi();
-  $('#vnote').textContent = GKEY ? 'המפתח נשמר במכשיר הזה.' : 'המפתח נמחק.';
+  $('#vnote').textContent = GKEY ? 'המפתח נשמר. קולות Gemini נוספו לרשימה.' : 'המפתח נמחק.';
 });
 
 function toggleTools(){
