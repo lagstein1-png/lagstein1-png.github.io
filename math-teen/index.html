@@ -320,6 +320,13 @@ Fr.prototype.say=function(){
   return (this.n<0?"מינוס ":"")+Math.abs(this.n)+" חלקי "+this.d;
 };
 function fr(n,d){return new Fr(n,d)}
+/* הצגה בלי צמצום. שלב ההרחבה למכנה משותף חייב להראות את 10/15,
+   ולא את 2/3 שאליו הוא מצטמצם. */
+function rawFr(n,d){
+  if(d===1)return String(n);
+  var sign=n<0?"−":"";
+  return sign+'<span class="frac"><span>'+Math.abs(n)+'</span><span>'+d+'</span></span>';
+}
 
 /* מספר לתצוגה: מינוס טיפוגרפי, בלי אפסים מיותרים אחרי הנקודה */
 function r2(v){return Math.round(v*100)/100}
@@ -423,7 +430,8 @@ function blankState(){
     days:{},
     wrongBank:[],            /* נושאים שנפלו בהם — חוזרים לתרגול */
     settings:{theme:"auto",ts:1,clearfont:false,spaced:false,hc:false,rm:false,
-              calm:false,tts:true,rate:0.95,voice:"",roundLen:8,keys:true,autoSteps:false}
+              calm:false,tts:true,rate:0.95,engine:"gemini",gvoice:"Kore",voice:"",
+              roundLen:8,keys:true,autoSteps:false}
   };
 }
 var state=blankState();
@@ -475,34 +483,147 @@ function applyModes(){
 
 /* ============================================================
    6. הקראה קולית
-   קוראים את השאלה, את הצעדים ואת הסבר הטעות. בעברית,
-   בקצב שאפשר לשנות. אם אין קול עברי — אומרים את זה בהגדרות
-   במקום להשמיע ג'יבריש באנגלית.
+   שני מקורות קול:
+   · Gemini — קול טבעי שנשמע כמו אדם. דורש אינטרנט ומפתח.
+   · קול המכשיר — עובד תמיד ובלי רשת, אבל נשמע רובוטי.
+   הקצב אצל Gemini לא נשלח כפרמטר (ה-API מחזיר 400 על audioConfig),
+   אלא מתבקש במילים בתוך הטקסט עצמו.
    ============================================================ */
+var GEM_VOICES=[
+  {id:"Kore",  t:"קורה",  d:"נשי, רגוע וברור"},
+  {id:"Puck",  t:"פאק",   d:"גברי, ער וזורם"},
+  {id:"Leda",  t:"לדה",   d:"נשי, צעיר יותר"},
+  {id:"Charon",t:"כארון", d:"גברי, עמוק ואיטי"}
+];
+var GKEY="";
+function loadKey(){
+  try{
+    GKEY=localStorage.getItem("shlav-gkey")||"";
+    /* מפתח שכבר הוזן באחת האפליקציות האחרות באתר עובד גם כאן */
+    if(!GKEY)GKEY=localStorage.getItem("reader-gkey")||"";
+    if(!GKEY){
+      var raw=localStorage.getItem("mlh-state-v2");
+      if(raw){var o=JSON.parse(raw);if(o&&o.settings&&o.settings.googleKey)GKEY=String(o.settings.googleKey).trim()}
+    }
+  }catch(e){GKEY=""}
+  return GKEY;
+}
+function saveKey(k){
+  GKEY=String(k||"").trim();
+  try{GKEY?localStorage.setItem("shlav-gkey",GKEY):localStorage.removeItem("shlav-gkey")}catch(e){}
+}
+function hasKey(){return !!GKEY}
+
 function voices(){try{return window.speechSynthesis?speechSynthesis.getVoices():[]}catch(e){return[]}}
-function hebVoices(){return voices().filter(function(v){return /^he|iw/i.test(v.lang||"")})}
-function chosenVoice(){
-  var list=hebVoices(),i;
+function hebVoices(){return voices().filter(function(v){return /^(he|iw)/i.test(v.lang||"")})}
+/* עברית קודם, ואחריה כל השאר — כדי שתמיד תהיה רשימה לבחור ממנה */
+function pickList(){
+  var he=hebVoices(),rest=voices().filter(function(v){return he.indexOf(v)<0});
+  return he.concat(rest);
+}
+function deviceVoice(){
+  var list=pickList(),i;
   if(!list.length)return null;
   for(i=0;i<list.length;i++)if(list[i].voiceURI===state.settings.voice)return list[i];
   return list[0];
 }
-var speaking=false;
-function speak(text){
-  if(!state.settings.tts||!text)return;
+/* "gemini:Kore" או "device" */
+function voiceMode(){
+  var v=state.settings.engine;
+  if(v==="gemini"&&hasKey())return "gemini";
+  return "device";
+}
+
+var gAudio=null,gCache={};
+function gStop(){if(gAudio){try{gAudio.pause();gAudio.src=""}catch(e){}gAudio=null}}
+function gSynth(text,voiceName,rate){
+  var lead=rate<=0.75?"קרא לאט מאוד וברור, בעברית: "
+          :rate<=0.9 ?"קרא לאט וברור, בעברית: "
+          :rate>=1.15?"קרא בקצב מהיר, בעברית: "
+          :"קרא בקצב טבעי, בעברית: ";
+  var body={contents:[{parts:[{text:lead+text}]}],
+    generationConfig:{responseModalities:["AUDIO"],
+      speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voiceName}}}}};
+  return fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key="+encodeURIComponent(GKEY),
+    {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+  .then(function(r){
+    if(r.ok)return r.json();
+    /* גוגל מסביר בגוף התשובה למה סירב. בלי זה אי אפשר לדעת אם
+       המפתח שגוי, המודל חסום, או שהבקשה עצמה לא תקינה. */
+    return r.text().then(function(t){
+      var msg="";
+      try{var j=JSON.parse(t);msg=(j.error&&j.error.message)||""}catch(e){msg=String(t).slice(0,140)}
+      throw new Error(r.status+(msg?" — "+msg:""));
+    });
+  })
+  .then(function(d){
+    var parts=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
+    for(var i=0;i<parts.length;i++){
+      var pd=parts[i].inlineData;
+      if(pd&&pd.data){
+        var mt=pd.mimeType||"";
+        if(mt.indexOf("wav")>=0||mt.indexOf("pcm")>=0||mt.indexOf("L16")>=0)
+          return pcmToWav(pd.data)||("data:audio/wav;base64,"+pd.data);
+        return "data:audio/mp3;base64,"+pd.data;
+      }
+    }
+    throw new Error("לא התקבל שמע");
+  });
+}
+/* Gemini מחזיר PCM גולמי. בלי כותרת WAV אף דפדפן לא ינגן אותו. */
+function pcmToWav(b64){
+  try{
+    var bin=atob(b64),len=bin.length,buf=new Uint8Array(len),i;
+    for(i=0;i<len;i++)buf[i]=bin.charCodeAt(i);
+    var sr=24000,ch=1,bits=16;
+    var hdr=new ArrayBuffer(44+len),v=new DataView(hdr);
+    function ws(o,str){for(var k=0;k<str.length;k++)v.setUint8(o+k,str.charCodeAt(k))}
+    ws(0,"RIFF");v.setUint32(4,36+len,true);ws(8,"WAVE");ws(12,"fmt ");
+    v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);
+    v.setUint32(24,sr,true);v.setUint32(28,sr*ch*bits/8,true);
+    v.setUint16(32,ch*bits/8,true);v.setUint16(34,bits,true);
+    ws(36,"data");v.setUint32(40,len,true);
+    new Uint8Array(hdr,44).set(buf);
+    var bytes=new Uint8Array(hdr),out="";
+    for(var j=0;j<bytes.length;j+=0x8000)out+=String.fromCharCode.apply(null,bytes.subarray(j,j+0x8000));
+    return "data:audio/wav;base64,"+btoa(out);
+  }catch(e){return null}
+}
+
+var ttsErr="";
+function speakDevice(text){
   if(!("speechSynthesis" in window))return;
   try{
     speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(String(text));
-    var v=chosenVoice();
+    var v=deviceVoice();
     if(v){u.voice=v;u.lang=v.lang}else{u.lang="he-IL"}
     u.rate=state.settings.rate;
-    u.onend=function(){speaking=false};
-    speaking=true;
     speechSynthesis.speak(u);
-  }catch(e){speaking=false}
+  }catch(e){}
 }
-function stopSpeak(){try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}speaking=false}
+function speak(text){
+  if(!state.settings.tts||!text)return;
+  stopSpeak();
+  if(voiceMode()!=="gemini"){speakDevice(text);return}
+  var name=state.settings.gvoice||"Kore",rate=state.settings.rate;
+  var ck=name+"|"+rate.toFixed(2)+"|"+text;
+  function play(url){gStop();gAudio=new Audio(url);gAudio.play().catch(function(){speakDevice(text)})}
+  if(gCache[ck]){play(gCache[ck]);return}
+  gSynth(text,name,rate).then(function(url){
+    gCache[ck]=url;ttsErr="";play(url);
+  }).catch(function(e){
+    /* נופלים חזרה לקול המכשיר במקום להשתתק, ורושמים למה — כדי
+       שמסך ההגדרות יוכל להראות את הסיבה במקום "לא עובד". */
+    ttsErr=String(e&&e.message||e);
+    speakDevice(text);
+    if(view==="settings")render();
+  });
+}
+function stopSpeak(){
+  gStop();
+  try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
+}
 
 /* הודעה לקורא מסך */
 function announce(msg){var el=$("#live");if(el)el.textContent=msg}
@@ -522,20 +643,65 @@ function plainOf(html){
   s=s.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"');
   return s.replace(/\s+/g," ").trim();
 }
+/* מ-״3x + 5 = 20״ ל-״שלוש איקס ועוד חמש שווה עשרים״.
+   הסדר כאן חשוב: קודם מבנים מורכבים (שברים, חזקות, שורשים),
+   ורק אחר כך סימנים בודדים ואותיות. */
 var SAY_MAP=[
-  [/\^2/g," בריבוע "],[/\^3/g," בשלישית "],[/\^(\d+)/g," בחזקת $1 "],
-  [/√/g," שורש של "],[/π/g," פאי "],
+  /* שבר שהגיע מ-plainOf בצורה (3)/(4) */
+  [/\(([^()]{1,14})\)\s*\/\s*\(([^()]{1,14})\)/g,"$1 חלקי $2"],
+  /* שמות פונקציות לפני מיפוי אותיות בודדות */
+  [/\bsin/gi," סינוס "],[/\bcos/gi," קוסינוס "],[/\btan/gi," טנגנס "],
+  /* חזקות */
+  [/\^2\b/g," בריבוע "],[/\^3\b/g," בשלישית "],[/\^\(?([−–-]?\d+)\)?/g," בחזקת $1 "],
+  [/²/g," בריבוע "],[/³/g," בשלישית "],
+  /* אינדקסים תחתונים: a₁ , aₙ , Sₙ */
+  [/₁/g," אחת "],[/₂/g," שתיים "],[/₃/g," שלוש "],[/ₙ/g," אן "],
+  /* שורש */
+  [/(\d)\s*√/g,"$1 כפול √"],[/√/g," שורש של "],
+  /* סימנים מיוחדים */
+  [/π/g," פאי "],[/°/g," מעלות "],[/α/g," אלפא "],[/β/g," בטא "],[/Δ/g," דלתא "],
   [/≈/g," בערך "],[/≠/g," לא שווה "],[/≤/g," קטן או שווה "],[/≥/g," גדול או שווה "],
+  [/→/g," ולכן "],
+  /* יחס — רק בין מספרים או x, כדי לא לפגוע בנקודתיים בעברית */
+  [/([\dx])\s*:\s*([\dx])/g,"$1 ל $2"],
+  /* השוואה */
   [/=/g," שווה "],[/</g," קטן מ "],[/>/g," גדול מ "],
-  [/[+]/g," ועוד "],[/[−-]/g," מינוס "],[/[×·]/g," כפול "],[/[÷]/g," חלקי "],
+  /* כפל מרומז: 3(x+2) וגם (x+1)(x+2) */
+  [/(\d)\s*\(/g,"$1 כפול ("],[/\)\s*\(/g,") כפול ("],
+  /* פעולות */
+  [/\+/g," ועוד "],[/[−–-]/g," מינוס "],[/[×·]/g," כפול "],[/÷/g," חלקי "],
   [/\//g," חלקי "],[/%/g," אחוז "],
-  [/\bx\b/g," איקס "],[/\by\b/g," וואי "],[/\bn\b/g," אן "],
-  [/([0-9])x/g,"$1 איקס "],[/([0-9])y/g,"$1 וואי "],
-  [/\(/g," סוגריים "],[/\)/g," סוגריים נסגרים "]
+  /* מפרידים בין מספר לאות, כדי שגבול־מילה יעבוד על האות */
+  [/(\d)([a-zA-Z])/g,"$1 $2"],
+  /* אותיות בודדות בשמן העברי */
+  [/\bx\b/g," איקס "],[/\by\b/g," וואי "],[/\bn\b/g," אֵן "],[/\bd\b/g," דִי "],
+  [/\bm\b/g," אֵם "],[/\ba\b/g," אֵיי "],[/\bb\b/g," בִּי "],[/\bc\b/g," סִי "],
+  [/\bh\b/g," אֵייץ' "],[/\br\b/g," ר "],[/\bt\b/g," טִי "],[/\bv\b/g," וִי "],
+  [/\bS\b/g," אֵס "],[/\bP\b/g," פִּי "],
+  /* סוגריים בסוף, אחרי שכל מה שבתוכם כבר תורגם */
+  [/\(/g," סוגריים "],[/\)/g," סוף סוגריים "]
 ];
 function speakMath(plain){
   var s=" "+String(plain)+" ",i;
   for(i=0;i<SAY_MAP.length;i++)s=s.replace(SAY_MAP[i][0],SAY_MAP[i][1]);
+  return s.replace(/\s+/g," ").trim();
+}
+/* טקסט הסבר הוא עברית רגילה שמשובצים בה סימנים בודדים. כאן מתרגמים
+   רק את מה שחד־משמעי — מקף בעברית הוא מקף, לא מינוס. */
+var PROSE_MAP=[
+  [/²/g," בריבוע "],[/³/g," בשלישית "],[/₁/g," אחת "],[/₂/g," שתיים "],[/ₙ/g," אֵן "],
+  /* מעריכים מוגבהים ביוניקוד, כמו x⁻ᵃ */
+  [/⁻/g," מינוס "],[/⁺/g," ועוד "],[/ᵃ/g," אֵיי "],[/ᵇ/g," בִּי "],[/⁰/g," אפס "],[/¹/g," אחת "],
+  [/√/g," שורש של "],[/π/g," פאי "],[/°/g," מעלות "],[/Δ/g," דלתא "],
+  [/α/g," אלפא "],[/[×·]/g," כפול "],[/÷/g," חלקי "],[/≈/g," בערך "],
+  /* מינוס טיפוגרפי ו-en dash לא מופיעים בעברית, ולכן בטוח לתרגם.
+     מקף רגיל נשאר מקף — "ה-3" הוא לא חיסור. */
+  [/[−–]/g," מינוס "],[/=/g," שווה "],[/\+/g," ועוד "],[/\//g," חלקי "],
+  [/\bsin/gi," סינוס "],[/\bcos/gi," קוסינוס "],[/\btan/gi," טנגנס "]
+];
+function speakProse(t){
+  var s=String(t||""),i;
+  for(i=0;i<PROSE_MAP.length;i++)s=s.replace(PROSE_MAP[i][0],PROSE_MAP[i][1]);
   return s.replace(/\s+/g," ").trim();
 }
 
@@ -559,6 +725,9 @@ function genNeg(L){
   var a,b,c,res,expr,steps,wrong;
   if(L===1){
     a=rnz(-20,20);b=rnz(-20,20);
+    /* בלי מינוס אחד לפחות אין כאן שאלה על מספרים מכוונים,
+       וגם המסיחים קורסים כי כולם מתלכדים עם התשובה. */
+    while(a>0&&b>0)b=rnz(-20,-1);
     var op=pick(["+","−"]);
     res=op==="+"?a+b:a-b;
     expr=num(a)+" "+op+" "+pn(b);
@@ -579,7 +748,8 @@ function genNeg(L){
     wrong=[
       W(num(-res),"הפכתם את הסימן של התוצאה. שווה לבדוק שוב איזה מהמספרים גדול יותר בערכו המוחלט."),
       W(num(a+Math.abs(b)),"התעלמתם מהמינוס של המספר השני והתייחסתם אליו כאילו הוא חיובי."),
-      W(num(Math.abs(a)+Math.abs(b)),"חיברתם את הגדלים בלי להתחשב בסימנים בכלל.")
+      W(num(Math.abs(a)+Math.abs(b)),"חיברתם את הגדלים בלי להתחשב בסימנים בכלל."),
+      W(num(Math.abs(a)-Math.abs(b)),"חיסרתם את הגדלים והתעלמתם מהסימנים.")
     ];
     return {ask:"חשבו",expr:expr,ans:W(num(res)),wrong:wrong,steps:steps,rule:"neg",
       hint:"חיסור זה חיבור של ההפך. אחרי זה שאלו: שני המספרים לאותו כיוון או לכיוונים הפוכים?"};
@@ -743,7 +913,7 @@ function genLinear(L){
   if(a===c)c=a+pick([1,2,-2,3]);
   x=(c*d-a*b)/(a-c);
   var tries=0;
-  while((!isFinite(x)||Math.round(x)!==x||Math.abs(x)>25)&&tries<80){
+  while((!isFinite(x)||Math.round(x)!==x||Math.abs(x)>25||b===d)&&tries<80){
     a=rnz(-6,6);b=rnz(-9,9);c=rnz(-6,6);d=rnz(-9,9);
     if(a===c)c=a+pick([1,2,-2,3]);
     x=(c*d-a*b)/(a-c);tries++;
@@ -782,12 +952,17 @@ function genFrac(L){
     var m=lcm(b,d);
     a=f1.n;b=f1.d;c=f2.n;d=f2.d;
     expr=f1.html()+(plus?" + ":" − ")+f2.html();
-    steps=[
+    steps=b===d?[
+      S("המכנים כבר שווים","כששני המכנים זהים אין מה להרחיב — עוברים ישר למונים.","מכנה משותף: "+m),
+      S("פועלים על המונים בלבד","המכנה נשאר "+m+". רק המונים מתחברים או מתחסרים.",
+        a+(plus?" + ":" − ")+c+" = "+(plus?a+c:a-c)),
+      S("מצמצמים","",res.html())
+    ]:[
       S("מוצאים מכנה משותף","המכנה המשותף הקטן ביותר של "+b+" ו-"+d+" הוא "+m+".","מכנה משותף: "+m),
       S("מרחיבים את שני השברים","מכפילים מונה ומכנה באותו מספר — ערך השבר לא משתנה.",
-        fr(a*(m/b),m).html()+(plus?" + ":" − ")+fr(c*(m/d),m).html()),
+        rawFr(a*(m/b),m)+(plus?" + ":" − ")+rawFr(c*(m/d),m)),
       S("פועלים על המונים בלבד","המכנה נשאר "+m+". רק המונים מתחברים או מתחסרים.",
-        fr(plus?a*(m/b)+c*(m/d):a*(m/b)-c*(m/d),m).html()),
+        rawFr(plus?a*(m/b)+c*(m/d):a*(m/b)-c*(m/d),m)),
       S("מצמצמים","",res.html())
     ];
     wrong=[
@@ -1543,9 +1718,9 @@ function genTrig(L){
     wrong:others.slice(0,3).map(function(v){return W(v,"זה הערך של פונקציה אחרת או של זווית אחרת בטבלת הזוויות המיוחדות.")}),
     steps:[
       S("משולש הזוויות המיוחדות","30°, 45° ו-60° הן זוויות שהערכים שלהן ידועים במדויק, בלי מחשבון.",
-        "sin30=1/2 · cos30=√3/2 · tan30=1/√3"),
-      S("ממשיכים בטבלה","","sin45=cos45=√2/2 · tan45=1"),
-      S("ולסיום","","sin60=√3/2 · cos60=1/2 · tan60=√3"),
+        "sin30 = 1/2 , cos30 = √3/2 , tan30 = 1/√3"),
+      S("ממשיכים בטבלה","","sin45 = cos45 = √2/2 , tan45 = 1"),
+      S("ולסיום","","sin60 = √3/2 , cos60 = 1/2 , tan60 = √3"),
       S("התשובה","",fn+" "+ang3+"° = "+val3)
     ],rule:"trigval",
     hint:"שווה לשנן טבלה קטנה: הזוויות 30, 45 ו-60 חוזרות כמעט בכל שאלה."};
@@ -2379,21 +2554,52 @@ function viewSettings(){
   h+='<div class="card pad" style="margin-top:14px"><div class="h2">הקראה</div>'+
      '<div style="margin-top:12px">'+togBtn("tts","הקראה קולית","קריאת שאלות, רמזים והסברים")+'</div>';
   if(s.tts){
-    if(!hv.length){
-      h+='<div class="hintbox" style="margin-top:12px"><b>אין קול עברי במכשיר הזה</b>'+
-         '<div class="sm" style="margin-top:3px">בלי קול עברי מותקן ההקראה תשמע שגויה. באנדרואיד מוסיפים אותו דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.</div></div>';
+    h+='<p class="sub sm" style="margin-top:16px">מקור הקול</p><div class="seg" style="margin-top:8px">'+
+       '<button class="'+(s.engine==="gemini"?"on":"")+'" data-a="engine" data-n="gemini">קול טבעי</button>'+
+       '<button class="'+(s.engine!=="gemini"?"on":"")+'" data-a="engine" data-n="device">קול המכשיר</button>'+
+       '</div>';
+    if(s.engine==="gemini"){
+      if(!hasKey()){
+        h+='<div class="hintbox" style="margin-top:14px"><b>צריך מפתח חינמי פעם אחת</b>'+
+           '<div class="sm" style="margin-top:4px">הקול הטבעי מגיע מגוגל. נכנסים ל-'+
+           '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>'+
+           ', יוצרים מפתח ומדביקים אותו כאן. הוא נשמר במכשיר בלבד ולא נשלח לשום מקום חוץ מגוגל.</div></div>'+
+           '<input class="field" style="margin-top:10px;direction:ltr;text-align:left" placeholder="מדביקים כאן את המפתח" data-bind="gkey" />'+
+           '<p class="sub xs" style="margin-top:8px">עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.</p>';
+      }else{
+        h+='<p class="sub sm" style="margin-top:14px">בחירת קול</p><div class="grid g2" style="margin-top:8px">'+
+          GEM_VOICES.map(function(g){
+            var on=(s.gvoice||"Kore")===g.id;
+            return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="gvoice" data-n="'+g.id+'">'+
+              '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"לשמוע")+'</span>'+
+              '<span class="tt"><b>'+g.t+'</b><span>'+g.d+'</span></span></button>';
+          }).join("")+'</div>'+
+          '<div class="row" style="margin-top:12px"><button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="clearkey">החלפת המפתח</button></div>';
+        if(ttsErr)h+='<div class="diag" style="margin-top:12px"><b>הקול הטבעי לא הגיב</b>'+
+          '<div class="sm" style="margin-top:3px">'+esc(ttsErr)+'</div>'+
+          '<div class="sm" style="margin-top:6px">בינתיים ההקראה עברה לקול המכשיר. אם כתוב כאן 400 או 403 — כנראה המפתח לא תקין או שהמודל לא זמין לחשבון.</div></div>';
+      }
     }else{
-      h+='<p class="sub sm" style="margin-top:14px">קול</p><div class="grid" style="margin-top:8px;gap:8px">'+
-        hv.map(function(v){
-          var on=(chosenVoice()||{}).voiceURI===v.voiceURI;
-          return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="voice" data-u="'+esc(v.voiceURI)+'">'+
-            '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"בחירה")+'</span>'+
-            '<span class="tt"><b>'+esc(v.name)+'</b><span>'+esc(v.lang)+'</span></span></button>';
-        }).join("")+'</div>';
+      var vl=pickList();
+      if(!vl.length){
+        h+='<div class="hintbox" style="margin-top:14px"><b>לא נמצאו קולות במכשיר</b>'+
+           '<div class="sm" style="margin-top:3px">שווה לנסות את הקול הטבעי, או להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.</div></div>';
+      }else{
+        if(!hv.length)h+='<div class="hintbox" style="margin-top:14px"><b>אין קול עברי במכשיר</b>'+
+          '<div class="sm" style="margin-top:3px">הקולות שברשימה ידברו עברית במבטא זר. הקול הטבעי יישמע הרבה יותר טוב.</div></div>';
+        h+='<p class="sub sm" style="margin-top:14px">קולות במכשיר</p><div class="grid" style="margin-top:8px;gap:8px;max-height:340px;overflow-y:auto">'+
+          vl.slice(0,24).map(function(v){
+            var on=(deviceVoice()||{}).voiceURI===v.voiceURI;
+            var heb=/^(he|iw)/i.test(v.lang||"");
+            return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="voice" data-u="'+esc(v.voiceURI)+'">'+
+              '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"לשמוע")+'</span>'+
+              '<span class="tt"><b>'+esc(v.name)+'</b><span>'+esc(v.lang)+(heb?" · עברית":"")+'</span></span></button>';
+          }).join("")+'</div>';
+      }
     }
-    h+='<p class="sub sm" style="margin-top:14px">מהירות דיבור — <span id="ratev">'+s.rate.toFixed(2)+'</span></p>'+
-       '<input type="range" min="0.5" max="1.4" step="0.05" value="'+s.rate+'" data-slide="rate" style="margin-top:6px" />'+
-       '<button class="btn btn-g" style="margin-top:10px" data-a="test">'+ic("speaker",16)+' לשמוע דוגמה</button>';
+    h+='<p class="sub sm" style="margin-top:16px">מהירות דיבור — <span id="ratev">'+s.rate.toFixed(2)+'</span></p>'+
+       '<input type="range" min="0.6" max="1.3" step="0.05" value="'+s.rate+'" data-slide="rate" style="margin-top:6px" />'+
+       '<button class="btn btn-g w" style="margin-top:12px" data-a="test">'+ic("speaker",16)+' לשמוע דוגמה</button>';
   }
   h+='</div>';
 
@@ -2457,7 +2663,12 @@ function goto(v){
 }
 function readQuestion(){
   if(!P.q)return;
-  var txt=P.q.ask+". "+(P.q.expr?speakMath(plainOf(P.q.expr)):"")+
+  var body=P.q.expr;
+  if(body&&body.indexOf("<br>")>=0){
+    var eqs=body.split("<br>");
+    body=eqs.map(function(e,i){return (i===0?"משוואה ראשונה: ":"משוואה שנייה: ")+speakMath(plainOf(e))}).join(". ");
+  }else body=body?speakMath(plainOf(body)):"";
+  var txt=P.q.ask+". "+body+
     ". האפשרויות: "+P.q.options.map(function(o,i){return "אפשרות "+(i+1)+". "+speakMath(o.t)}).join(", ");
   speak(txt);
 }
@@ -2465,7 +2676,7 @@ function readSteps(){
   if(!P.q)return;
   var shown=P.phase==="reveal"?P.q.steps.length:Math.min(P.steps,P.q.steps.length);
   var txt=P.q.steps.slice(0,shown).map(function(s){
-    return s.t+". "+(s.d||"")+" "+(s.m?speakMath(plainOf(s.m)):"");
+    return s.t+". "+speakProse(s.d||"")+" "+(s.m?speakMath(plainOf(s.m)):"");
   }).join(". ");
   speak(txt);
 }
@@ -2500,6 +2711,7 @@ function advance(){
   window.scrollTo(0,0);
   render();
 }
+var VOICE_SAMPLE="פותרים את המשוואה: שלוש איקס ועוד חמש שווה עשרים. מעבירים את החמש לצד השני, ומחלקים בשלוש.";
 function onAction(a,el){
   var s=state.settings;
   if(a==="go"){goto(el.getAttribute("data-v"));return}
@@ -2524,7 +2736,7 @@ function onAction(a,el){
     render();
     if(s.tts&&P.q.steps[P.steps-1]){
       var st=P.q.steps[P.steps-1];
-      speak(st.t+". "+(st.d||"")+" "+(st.m?speakMath(plainOf(st.m)):""));
+      speak(st.t+". "+speakProse(st.d||"")+" "+(st.m?speakMath(plainOf(st.m)):""));
     }
     return}
   if(a==="read"){readQuestion();return}
@@ -2534,8 +2746,11 @@ function onAction(a,el){
   if(a==="ts"){s.ts=parseInt(el.getAttribute("data-n"),10);save();applyModes();render();return}
   if(a==="theme"){s.theme=el.getAttribute("data-n");save();applyModes();render();return}
   if(a==="rlen"){s.roundLen=parseInt(el.getAttribute("data-n"),10);save();render();return}
-  if(a==="voice"){s.voice=el.getAttribute("data-u");save();render();speak("שלום, ככה אני נשמע.");return}
-  if(a==="test"){speak("פותרים את המשוואה שלוש איקס ועוד חמש שווה עשרים.");return}
+  if(a==="engine"){s.engine=el.getAttribute("data-n");save();render();speak(VOICE_SAMPLE);return}
+  if(a==="gvoice"){s.gvoice=el.getAttribute("data-n");save();render();speak(VOICE_SAMPLE);return}
+  if(a==="clearkey"){saveKey("");ttsErr="";render();return}
+  if(a==="voice"){s.voice=el.getAttribute("data-u");s.engine="device";save();render();speak(VOICE_SAMPLE);return}
+  if(a==="test"){speak(VOICE_SAMPLE);return}
   if(a==="pick"){
     var id=el.getAttribute("data-t"),ix=state.topics.indexOf(id);
     if(ix>=0)state.topics.splice(ix,1);else state.topics.push(id);
@@ -2566,6 +2781,11 @@ document.addEventListener("input",function(e){
   var el=e.target;
   if(!el.dataset)return;
   if(el.dataset.bind==="name"){state.name=el.value;save();return}
+  if(el.dataset.bind==="gkey"){
+    var k=String(el.value||"").trim();
+    /* מציירים מחדש רק כשהמפתח נראה שלם, אחרת הפוקוס קופץ בכל תו */
+    if(/^AIza[\w-]{25,}$/.test(k)){saveKey(k);ttsErr="";render();speak(VOICE_SAMPLE)}
+    return}
   if(el.dataset.bind==="fq"){fq=el.value;
     var pos=el.selectionStart;render();
     var again=document.querySelector('[data-bind="fq"]');
@@ -2603,6 +2823,7 @@ window.addEventListener("error",function(){
    19. הפעלה
    ============================================================ */
 load();
+loadKey();
 applyModes();
 try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(view==="settings")render()}}catch(e){}
 render();
