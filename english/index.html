@@ -1,0 +1,2150 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ניב — אנגלית מדוברת וספרותית</title>
+<meta name="description" content="לימוד אנגלית למי שלומד אחרת: כל מילה נשמעת לפני שהיא נקראת, זוגות צלילים קרובים, מצבים מהחיים וקטעי קריאה. בעברית, ערבית, רוסית ואנגלית." />
+<meta name="theme-color" content="#0d1b1a" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   ניב — אנגלית מדוברת וספרותית
+   קהל היעד לא "לא יודע אנגלית". הוא נכשל בה שוב ושוב, ולכן כל
+   החלטה כאן נמדדת בשאלה אחת: האם היא מורידה עומס, או מוסיפה.
+   · האנגלית תמיד ב-Lexend ובכיוון LTR, גם כשהממשק בעברית.
+   · שום מילה אנגלית לא מוצגת בלי שאפשר לשמוע אותה.
+   · שפת האם היא פיגום, לא קביים — היא נסוגה עם העלייה ברמה.
+   כל המידות ב-rem, כדי שהגדלת טקסט תגדיל את הכול יחד.
+   ============================================================ */
+:root{
+  --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
+  --en:"Lexend","Heebo",system-ui,"Segoe UI",Arial,sans-serif;
+  --bg:#f4f7f6; --surface:#ffffff; --surface2:#e9efee;
+  --ink:#0f1f1d; --muted:#54655f; --faint:#83948e; --line:#dde6e3;
+  --accent:#0f766e; --accent-ink:#ffffff; --accent-soft:#d6f0eb;
+  --gold:#a16207; --gold-soft:#fbf0d5;
+  --ok:#15803d; --ok-soft:#dcfce7; --bad:#be123c; --bad-soft:#ffe4e9;
+  --warn:#b45309; --warn-soft:#fef3c7;
+  --shadow:0 1px 2px rgba(15,31,29,.05),0 8px 24px -12px rgba(15,31,29,.2);
+  --r:14px;
+  /* צבע לכל מסלול. לא קישוט: ארבעה סוגי לימוד שונים לגמרי, וצבע
+     קבוע לכל אחד חוסך למי שמתקשה להתמצא את השאלה "איפה אני". */
+  --c-sound:#0369a1; --cs-sound:#dbeefc;   /* צליל ואות   */
+  --c-words:#15803d; --cs-words:#dcfce7;   /* מילים       */
+  --c-talk:#c2410c;  --cs-talk:#fde5d8;    /* מדוברת      */
+  --c-read:#6d28d9;  --cs-read:#eae2fd;    /* ספרותית     */
+}
+:root[data-theme="dark"]{
+  --bg:#0d1b1a; --surface:#142624; --surface2:#1c3230;
+  --ink:#e6f0ee; --muted:#9ab0aa; --faint:#6f8781; --line:#264240;
+  --accent:#5eead4; --accent-ink:#0d1b1a; --accent-soft:#123c37;
+  --gold:#fbbf24; --gold-soft:#33270f;
+  --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
+  --warn:#fbbf24; --warn-soft:#33260f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  --c-sound:#7dd3fc; --cs-sound:#0b2a3d;
+  --c-words:#86efac; --cs-words:#0f2a1a;
+  --c-talk:#fdba74;  --cs-talk:#3a2113;
+  --c-read:#c4b5fd;  --cs-read:#261a45;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1b1a; --surface:#142624; --surface2:#1c3230;
+    --ink:#e6f0ee; --muted:#9ab0aa; --faint:#6f8781; --line:#264240;
+    --accent:#5eead4; --accent-ink:#0d1b1a; --accent-soft:#123c37;
+    --gold:#fbbf24; --gold-soft:#33270f;
+    --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
+    --warn:#fbbf24; --warn-soft:#33260f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+    --c-sound:#7dd3fc; --cs-sound:#0b2a3d;
+    --c-words:#86efac; --cs-words:#0f2a1a;
+    --c-talk:#fdba74;  --cs-talk:#3a2113;
+    --c-read:#c4b5fd;  --cs-read:#261a45;
+  }
+}
+/* ניגודיות גבוהה — שחור על לבן, מסגרות מלאות, בלי גוונים רכים */
+:root.hc{
+  --bg:#ffffff; --surface:#ffffff; --surface2:#ffffff;
+  --ink:#000000; --muted:#1a1a1a; --faint:#333333; --line:#000000;
+  --accent:#00434b; --accent-ink:#ffffff; --accent-soft:#e6f2f3;
+  --gold:#5c3d00; --gold-soft:#f7efdf;
+  --ok:#0a5c2a; --ok-soft:#e6f4ea; --bad:#8c0f2c; --bad-soft:#fbe9ed;
+  --warn:#6b3d00; --warn-soft:#f7efdf; --shadow:none;
+  --c-sound:#00305c; --cs-sound:#e8eef7;
+  --c-words:#0a5c2a; --cs-words:#e6f4ea;
+  --c-talk:#7a2c00;  --cs-talk:#f9ece4;
+  --c-read:#3d1a75;  --cs-read:#eee8f9;
+}
+:root.hc *{box-shadow:none!important}
+:root.hc .card,:root.hc .btn,:root.hc .opt{border-width:2px!important}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:var(--fs,17px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
+  font-size:1rem;line-height:1.65;-webkit-text-size-adjust:100%}
+:root.clear body{font-family:"Verdana","Tahoma","Heebo",sans-serif;letter-spacing:.012em}
+:root.spaced body{word-spacing:.22em;line-height:1.95}
+:root.rm *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+h1,h2,h3{margin:0;line-height:1.3;font-weight:800}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* כל טקסט אנגלי — כיוון, גופן ומרווח משלו. unicode-bidi:isolate מונע
+   מהמשפט האנגלי לגרור אחריו את סימני הפיסוק של המשפט העברי. */
+.en{font-family:var(--en);direction:ltr;unicode-bidi:isolate;text-align:start}
+.en-b{font-family:var(--en);direction:ltr;unicode-bidi:isolate;display:inline-block}
+
+.wrap{max-width:56rem;margin:0 auto;padding:0 clamp(.9rem,3vw,1.5rem)}
+.hbar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-block:.6rem}
+:root.hc .hbar{background:var(--bg);backdrop-filter:none}
+.hrow{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.brand{font-size:1.35rem;font-weight:800;letter-spacing:-.01em;display:flex;
+  align-items:baseline;gap:.5rem;margin-inline-end:auto}
+.brand small{font-size:.72rem;font-weight:600;color:var(--muted);letter-spacing:.06em}
+.gbtn{display:inline-flex;align-items:center;gap:.4rem;background:var(--surface);
+  border:1px solid var(--line);border-radius:999px;padding:.42rem .8rem;cursor:pointer;
+  font-size:.86rem;font-weight:600;box-shadow:var(--shadow)}
+.gbtn:hover{border-color:var(--accent)}
+.gbtn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);padding:1.1rem}
+.grid{display:grid;gap:.85rem}
+@media(min-width:640px){.g2{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){.g3{grid-template-columns:repeat(3,1fr)}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;
+  border:1px solid var(--line);background:var(--surface);border-radius:12px;
+  padding:.72rem 1.1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow);
+  min-height:2.9rem;font-size:1rem}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent;box-shadow:none}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn.wide{width:100%}
+
+.chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;
+  padding:.22rem .6rem;font-size:.78rem;font-weight:700;background:var(--surface2);color:var(--muted)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+
+/* ===== מסלולים: הצבע נכנס ככרטיס, לא כרקע של טקסט ===== */
+.trk{--c:var(--accent);--cs:var(--accent-soft)}
+.t-sound{--c:var(--c-sound);--cs:var(--cs-sound)}
+.t-words{--c:var(--c-words);--cs:var(--cs-words)}
+.t-talk{--c:var(--c-talk); --cs:var(--cs-talk)}
+.t-read{--c:var(--c-read); --cs:var(--cs-read)}
+.tcard{border-inline-start:5px solid var(--c);cursor:pointer;text-align:start;width:100%;
+  display:flex;flex-direction:column;gap:.4rem;align-items:stretch}
+.tcard:hover{border-color:var(--c)}
+.tcard h3{font-size:1.05rem}
+.tcard .sub{font-size:.85rem;color:var(--muted)}
+.tdot{width:.62rem;height:.62rem;border-radius:50%;background:var(--c);flex:none}
+.thead{display:flex;align-items:center;gap:.5rem}
+.tpill{background:var(--cs);color:var(--c);border-radius:999px;padding:.15rem .55rem;
+  font-size:.72rem;font-weight:800}
+
+/* ===== סרגל שליטה ברמות ===== */
+.lvls{display:flex;gap:.4rem;flex-wrap:wrap}
+.lvl{border:1px solid var(--line);background:var(--surface);border-radius:10px;
+  padding:.4rem .7rem;font-size:.82rem;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:.4rem}
+.lvl.on{background:var(--c,var(--accent));color:#fff;border-color:var(--c,var(--accent))}
+.bar{height:.42rem;border-radius:999px;background:var(--surface2);overflow:hidden;flex:1;min-width:3rem}
+.bar i{display:block;height:100%;background:var(--c,var(--accent))}
+.bar.b0 i{background:var(--bad)} .bar.b1 i{background:var(--warn)} .bar.b2 i{background:var(--ok)}
+
+/* ===== תרגול ===== */
+.qcard{border-top:5px solid var(--c,var(--accent))}
+.qtop{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.7rem}
+.qtext{font-size:1.12rem;font-weight:600;margin:.2rem 0 .3rem}
+.qhint{color:var(--muted);font-size:.9rem}
+/* המילה או המשפט שנלמדים. גדול, מרווח, ותמיד לצד כפתור השמעה. */
+.subject{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;
+  background:var(--surface2);border-radius:12px;padding:.85rem 1rem;margin:.5rem 0}
+.subject .word{font-family:var(--en);direction:ltr;unicode-bidi:isolate;
+  font-size:1.7rem;font-weight:700;letter-spacing:.01em;line-height:1.25}
+.subject .ipa{font-family:var(--en);direction:ltr;unicode-bidi:isolate;
+  color:var(--muted);font-size:.95rem}
+.spk{border:1px solid var(--line);background:var(--surface);border-radius:999px;
+  width:2.7rem;height:2.7rem;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;flex:none;box-shadow:var(--shadow)}
+.spk:hover{border-color:var(--accent);color:var(--accent)}
+.spk.sm{width:2.1rem;height:2.1rem}
+.spk.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+.opts{display:grid;gap:.6rem;margin-top:.9rem}
+@media(min-width:560px){.opts.two{grid-template-columns:1fr 1fr}}
+.opt{display:flex;align-items:center;gap:.6rem;text-align:start;width:100%;
+  border:2px solid var(--line);background:var(--surface);border-radius:12px;
+  padding:.8rem .9rem;cursor:pointer;font-size:1.02rem;font-weight:600;min-height:3.1rem}
+.opt:hover{border-color:var(--accent)}
+.opt .k{width:1.9rem;height:1.9rem;border-radius:8px;background:var(--surface2);
+  display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;
+  font-weight:800;color:var(--muted);flex:none}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ok .k{background:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt.bad .k{background:var(--bad);color:#fff}
+.opt[disabled]{cursor:default}
+.opt.dim{opacity:.55}
+
+/* אריחי בניית משפט. הסדר הוא התרגיל, ולכן האריח חייב להיראות כמשהו
+   שאפשר להרים — מסגרת מלאה ורקע משלו, לא טקסט על רקע הכרטיס. */
+.tiles{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.7rem}
+.tile{font-family:var(--en);direction:ltr;border:2px solid var(--line);
+  background:var(--surface);border-radius:10px;padding:.5rem .8rem;font-weight:600;
+  cursor:pointer;font-size:1.02rem;min-height:2.7rem}
+.tile:hover{border-color:var(--accent)}
+.slot{min-height:3.2rem;border:2px dashed var(--line);border-radius:12px;
+  background:var(--surface2);padding:.5rem;display:flex;flex-wrap:wrap;gap:.45rem;
+  align-items:center;direction:ltr}
+.slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.slot.bad{border-style:solid;border-color:var(--bad);background:var(--bad-soft)}
+.slot .tile{background:var(--surface)}
+
+/* ===== משוב ===== */
+.fb{margin-top:.9rem;border-radius:12px;padding:.85rem 1rem;border:1px solid transparent}
+.fb.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.fb b{display:block;font-size:1.02rem;margin-bottom:.2rem}
+.fb .body{color:var(--ink);font-weight:500;font-size:.95rem}
+.why{margin-top:.55rem;padding-top:.55rem;border-top:1px dashed currentColor;color:var(--ink);
+  font-weight:500;font-size:.93rem}
+
+/* ===== קטע קריאה ===== */
+.passage{background:var(--surface2);border-radius:12px;padding:1rem 1.1rem;margin:.6rem 0;
+  font-family:var(--en);direction:ltr;unicode-bidi:isolate;font-size:1.08rem;line-height:2}
+.passage .s{border-radius:5px;padding:.05em .12em;cursor:pointer}
+.passage .s:hover{background:var(--accent-soft)}
+.passage .s.now{background:var(--accent-soft);box-shadow:0 2px 0 var(--accent)}
+.gloss{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+.gword{border:1px solid var(--line);background:var(--surface);border-radius:999px;
+  padding:.25rem .6rem;font-size:.85rem;cursor:pointer}
+.gword b{font-family:var(--en);direction:ltr;unicode-bidi:isolate}
+
+/* ===== סרגל מצב הקול ===== */
+.vstrip{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;border-radius:10px;
+  padding:.45rem .7rem;font-size:.85rem;font-weight:600;margin-bottom:.7rem}
+.vstrip.ok{background:var(--ok-soft);color:var(--ok)}
+.vstrip.warn{background:var(--warn-soft);color:var(--warn)}
+.vstrip.bad{background:var(--bad-soft);color:var(--bad)}
+.vstrip .btn{padding:.3rem .7rem;min-height:2.1rem;font-size:.82rem}
+
+/* ===== הגדרות ===== */
+.row{display:flex;align-items:center;justify-content:space-between;gap:.8rem;
+  padding:.7rem 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.row:last-child{border-bottom:0}
+.row .lab{font-weight:700}
+.row .desc{font-size:.85rem;color:var(--muted);font-weight:500}
+.sw{width:3.2rem;height:1.8rem;border-radius:999px;background:var(--surface2);
+  border:1px solid var(--line);position:relative;cursor:pointer;flex:none}
+.sw i{position:absolute;top:.18rem;inset-inline-start:.2rem;width:1.3rem;height:1.3rem;
+  border-radius:50%;background:var(--faint);transition:.15s}
+.sw.on{background:var(--accent);border-color:var(--accent)}
+.sw.on i{inset-inline-start:1.5rem;background:#fff}
+.vgrid{display:grid;gap:.5rem;grid-template-columns:1fr}
+@media(min-width:560px){.vgrid{grid-template-columns:1fr 1fr}}
+.vopt{display:flex;align-items:center;gap:.6rem;border:2px solid var(--line);
+  background:var(--surface);border-radius:12px;padding:.6rem .75rem;cursor:pointer;text-align:start}
+.vopt.on{border-color:var(--accent);background:var(--accent-soft)}
+.vopt .nm{font-weight:700}
+.vopt .ds{font-size:.8rem;color:var(--muted)}
+input[type=password],input[type=text]{font:inherit;background:var(--surface);color:var(--ink);
+  border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;min-width:0;flex:1;
+  direction:ltr;text-align:left}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+.fbar{border-top:1px solid var(--line);margin-top:2rem;padding-block:1rem;
+  color:var(--faint);font-size:.82rem}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="live" class="sr" aria-live="polite"></div>
+<div id="app"></div>
+<script>
+"use strict";
+/* ============================================================
+   1. עזרים
+   ============================================================ */
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function shuffle(a){var i,j,t;for(i=a.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));
+  t=a[i];a[i]=a[j];a[j]=t}return a}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function uniq(a){return a.filter(function(v,i){return a.indexOf(v)===i})}
+function todayIso(){var d=new Date();return d.getFullYear()+"-"+
+  String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+
+/* ============================================================
+   2. שפות הממשק
+   ארבע שפות אם. הן אינן תרגום של האפליקציה בלבד — הן הפיגום שדרכו
+   נלמדת האנגלית, ולכן כל מחרוזת לימודית קיימת בארבעתן.
+   ============================================================ */
+var LANGS={
+  he:{name:"עברית",   dir:"rtl", tts:"he-IL"},
+  ar:{name:"العربية", dir:"rtl", tts:"ar-SA"},
+  ru:{name:"Русский", dir:"ltr", tts:"ru-RU"},
+  en:{name:"English", dir:"ltr", tts:"en-US"}
+};
+var EN_TTS="en-US";
+
+var T={};
+T.he={
+  app:"ניב", tagline:"אנגלית מדוברת וספרותית",
+  navHome:"מסלולים", navProg:"התקדמות", navSet:"הגדרות", back:"חזרה",
+  heroT:"אנגלית שנשמעת לפני שהיא נקראת",
+  heroP:"כל מילה, כל משפט וכל קטע — עם כפתור השמעה. אפשר להאט, לחזור, ולראות את המשמעות בשפה שלכם. אין טיימר ואין עונש על טעות.",
+  start:"התחילו כאן", cont:"המשיכו מאיפה שהפסקתם",
+  trkSound:"צליל ואות", trkSoundD:"להבחין בין צלילים קרובים באנגלית",
+  trkWords:"מילים", trkWordsD:"המילים שחוזרות הכי הרבה",
+  trkTalk:"מדוברת", trkTalkD:"מה באמת אומרים במצבים אמיתיים",
+  trkRead:"ספרותית", trkReadD:"קריאה, ניבים וטקסט שלם",
+  lv1:"בסיס", lv2:"בנייה", lv3:"שוטף",
+  lv1D:"מילה אחת בכל פעם, עם תרגום", lv2D:"משפטים קצרים, פחות תרגום", lv3D:"אנגלית בלבד",
+  qMean:"מה המשמעות?", qHear:"איזו מילה שמעתם?", qGap:"מה חסר במשפט?",
+  qOrder:"סדרו את המשפט", qSay:"איך אומרים את זה באנגלית?", qRead:"לפי הקטע:",
+  qUse:"איזה משפט מתאים למצב?",
+  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט",
+  check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", showAll:"הראו הכול",
+  correct:"נכון!", wrong:"עוד לא", answerIs:"התשובה:", why:"למה",
+  tapOrder:"לחצו על המילים לפי הסדר", clearSlot:"נקו",
+  progT:"ההתקדמות שלכם", progNone:"עוד לא התחלתם. כל מסלול נפתח מיד — אין נעילות.",
+  seen:"נראו", mastered:"נשלטות", streakL:"רצף", todayL:"היום", accL:"דיוק",
+  setT:"הגדרות", setVoice:"קול והקראה", setRead:"קריאות", setLang:"שפת הממשק",
+  vEngine:"מנוע הקול", vGem:"קול טבעי (ג׳מיני)", vDev:"קול המכשיר",
+  vGemD:"נשמע כמו אדם. דורש אינטרנט ומפתח חינמי.", vDevD:"עובד תמיד, גם בלי רשת.",
+  vFemale:"קולות נשיים", vMale:"קולות גבריים", vSample:"דוגמה",
+  vKey:"מפתח Gemini", vKeyPh:"מתחיל ב-AIza…", vSave:"שמרו", vShow:"הצג", vHide:"הסתר",
+  vSaved:"המפתח נשמר במכשיר הזה בלבד. הוא לא נשלח לשום מקום אחר.",
+  vRemoved:"המפתח נמחק.", vChecking:"בודקים…", vOk:"המפתח עובד.",
+  vErr:"המפתח לא התקבל.", vNeed:"קודם שמרו מפתח.",
+  vsOk:"קול טבעי פעיל", vsDev:"קול המכשיר", vsNoEn:"אין קול אנגלי במכשיר",
+  vsNoEnD:"אפשר להתקין קול אנגלי בהגדרות המכשיר, או להפעיל קול טבעי כאן.",
+  rate:"מהירות הקראה", slow:"לאט", fast:"מהר",
+  bigText:"טקסט גדול", bigTextD:"מגדיל את הכול יחד, לא רק את השאלה",
+  clearFont:"גופן קריא", clearFontD:"אותיות רחבות יותר, פחות דומות זו לזו",
+  spacing:"מרווח בין מילים", spacingD:"עוזר לעין לא לדלג על מילה",
+  contrast:"ניגודיות גבוהה", contrastD:"שחור על לבן, בלי גוונים רכים",
+  motion:"בלי אנימציות", motionD:"מבטל תנועה על המסך",
+  theme:"מראה", thAuto:"אוטומטי", thLight:"בהיר", thDark:"כהה",
+  reset:"איפוס התקדמות", resetD:"מוחק את כל מה שנשמר במכשיר הזה", resetAsk:"למחוק הכול?",
+  yes:"כן, מחקו", no:"לא",
+  savedNote:"ההתקדמות נשמרת אוטומטית במכשיר הזה בלבד.",
+  ofN:"מתוך", newWord:"מילה חדשה", review:"חזרה"
+};
+T.ar={
+  app:"نِيف", tagline:"إنجليزية محكية وأدبية",
+  navHome:"المسارات", navProg:"التقدّم", navSet:"الإعدادات", back:"رجوع",
+  heroT:"إنجليزية تُسمَع قبل أن تُقرأ",
+  heroP:"كل كلمة وكل جملة وكل نص — مع زر استماع. يمكنك الإبطاء والإعادة ورؤية المعنى بلغتك. بلا مؤقّت وبلا عقاب على الخطأ.",
+  start:"ابدأ من هنا", cont:"تابع من حيث توقفت",
+  trkSound:"الصوت والحرف", trkSoundD:"التمييز بين الأصوات المتقاربة",
+  trkWords:"مفردات", trkWordsD:"الكلمات الأكثر تكرارًا",
+  trkTalk:"محكية", trkTalkD:"ما يُقال فعلًا في مواقف حقيقية",
+  trkRead:"أدبية", trkReadD:"قراءة وتعابير ونصّ كامل",
+  lv1:"أساس", lv2:"بناء", lv3:"طلاقة",
+  lv1D:"كلمة واحدة كل مرة، مع ترجمة", lv2D:"جمل قصيرة، ترجمة أقل", lv3D:"إنجليزية فقط",
+  qMean:"ما المعنى؟", qHear:"أي كلمة سمعت؟", qGap:"ما الناقص في الجملة؟",
+  qOrder:"رتّب الجملة", qSay:"كيف تقول ذلك بالإنجليزية؟", qRead:"حسب النص:",
+  qUse:"أي جملة تناسب الموقف؟",
+  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع للكلمة", hearSent:"استمع للجملة",
+  check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", showAll:"أظهر الكل",
+  correct:"صحيح!", wrong:"ليس بعد", answerIs:"الإجابة:", why:"لماذا",
+  tapOrder:"اضغط الكلمات بالترتيب", clearSlot:"مسح",
+  progT:"تقدّمك", progNone:"لم تبدأ بعد. كل مسار مفتوح فورًا — بلا أقفال.",
+  seen:"شوهدت", mastered:"مُتقنة", streakL:"تتابع", todayL:"اليوم", accL:"الدقة",
+  setT:"الإعدادات", setVoice:"الصوت والقراءة", setRead:"سهولة القراءة", setLang:"لغة الواجهة",
+  vEngine:"محرّك الصوت", vGem:"صوت طبيعي (جيميني)", vDev:"صوت الجهاز",
+  vGemD:"يبدو كإنسان. يحتاج إنترنت ومفتاحًا مجانيًا.", vDevD:"يعمل دائمًا، حتى بلا شبكة.",
+  vFemale:"أصوات نسائية", vMale:"أصوات رجالية", vSample:"عيّنة",
+  vKey:"مفتاح Gemini", vKeyPh:"يبدأ بـ AIza…", vSave:"حفظ", vShow:"إظهار", vHide:"إخفاء",
+  vSaved:"حُفظ المفتاح على هذا الجهاز فقط، ولا يُرسل إلى أي مكان آخر.",
+  vRemoved:"حُذف المفتاح.", vChecking:"جارٍ الفحص…", vOk:"المفتاح يعمل.",
+  vErr:"لم يُقبل المفتاح.", vNeed:"احفظ مفتاحًا أولًا.",
+  vsOk:"الصوت الطبيعي مُفعّل", vsDev:"صوت الجهاز", vsNoEn:"لا يوجد صوت إنجليزي في الجهاز",
+  vsNoEnD:"يمكن تثبيت صوت إنجليزي من إعدادات الجهاز، أو تفعيل الصوت الطبيعي هنا.",
+  rate:"سرعة القراءة", slow:"بطيء", fast:"سريع",
+  bigText:"نص كبير", bigTextD:"يكبّر كل شيء معًا، لا السؤال وحده",
+  clearFont:"خط واضح", clearFontD:"حروف أعرض وأقل تشابهًا",
+  spacing:"تباعد بين الكلمات", spacingD:"يساعد العين على عدم تخطّي كلمة",
+  contrast:"تباين عالٍ", contrastD:"أسود على أبيض، بلا ألوان ناعمة",
+  motion:"بلا حركة", motionD:"يلغي الحركة على الشاشة",
+  theme:"المظهر", thAuto:"تلقائي", thLight:"فاتح", thDark:"داكن",
+  reset:"تصفير التقدّم", resetD:"يمحو كل ما حُفظ على هذا الجهاز", resetAsk:"محو الكل؟",
+  yes:"نعم، امحُ", no:"لا",
+  savedNote:"يُحفظ التقدّم تلقائيًا على هذا الجهاز فقط.",
+  ofN:"من", newWord:"كلمة جديدة", review:"مراجعة"
+};
+T.ru={
+  app:"Нив", tagline:"Английский разговорный и литературный",
+  navHome:"Направления", navProg:"Прогресс", navSet:"Настройки", back:"Назад",
+  heroT:"Английский, который слышно раньше, чем читаешь",
+  heroP:"Каждое слово, каждая фраза и каждый текст — с кнопкой прослушивания. Можно замедлить, повторить и увидеть значение на своём языке. Без таймера и без наказания за ошибку.",
+  start:"Начать здесь", cont:"Продолжить с места остановки",
+  trkSound:"Звук и буква", trkSoundD:"Различать близкие английские звуки",
+  trkWords:"Слова", trkWordsD:"Слова, которые встречаются чаще всего",
+  trkTalk:"Разговорный", trkTalkD:"Что говорят на самом деле в реальных ситуациях",
+  trkRead:"Литературный", trkReadD:"Чтение, идиомы и цельный текст",
+  lv1:"Основа", lv2:"Сборка", lv3:"Свободно",
+  lv1D:"По одному слову, с переводом", lv2D:"Короткие фразы, меньше перевода", lv3D:"Только английский",
+  qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?",
+  qOrder:"Соберите предложение", qSay:"Как сказать это по-английски?", qRead:"По тексту:",
+  qUse:"Какая фраза подходит к ситуации?",
+  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать слово", hearSent:"Послушать фразу",
+  check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", showAll:"Показать всё",
+  correct:"Верно!", wrong:"Пока нет", answerIs:"Ответ:", why:"Почему",
+  tapOrder:"Нажимайте слова по порядку", clearSlot:"Очистить",
+  progT:"Ваш прогресс", progNone:"Вы ещё не начинали. Все направления открыты сразу — без замков.",
+  seen:"Просмотрено", mastered:"Освоено", streakL:"Серия", todayL:"Сегодня", accL:"Точность",
+  setT:"Настройки", setVoice:"Голос и чтение", setRead:"Читаемость", setLang:"Язык интерфейса",
+  vEngine:"Голосовой движок", vGem:"Естественный голос (Gemini)", vDev:"Голос устройства",
+  vGemD:"Звучит как человек. Нужен интернет и бесплатный ключ.", vDevD:"Работает всегда, даже без сети.",
+  vFemale:"Женские голоса", vMale:"Мужские голоса", vSample:"Пример",
+  vKey:"Ключ Gemini", vKeyPh:"начинается с AIza…", vSave:"Сохранить", vShow:"Показать", vHide:"Скрыть",
+  vSaved:"Ключ сохранён только на этом устройстве и никуда не отправляется.",
+  vRemoved:"Ключ удалён.", vChecking:"Проверяем…", vOk:"Ключ работает.",
+  vErr:"Ключ не принят.", vNeed:"Сначала сохраните ключ.",
+  vsOk:"Естественный голос включён", vsDev:"Голос устройства", vsNoEn:"На устройстве нет английского голоса",
+  vsNoEnD:"Английский голос можно установить в настройках устройства или включить естественный голос здесь.",
+  rate:"Скорость чтения", slow:"Медленно", fast:"Быстро",
+  bigText:"Крупный текст", bigTextD:"Увеличивает всё сразу, а не только вопрос",
+  clearFont:"Читаемый шрифт", clearFontD:"Буквы шире и меньше похожи друг на друга",
+  spacing:"Промежутки между словами", spacingD:"Помогает глазу не перескакивать через слово",
+  contrast:"Высокий контраст", contrastD:"Чёрное на белом, без мягких оттенков",
+  motion:"Без анимаций", motionD:"Отключает движение на экране",
+  theme:"Оформление", thAuto:"Авто", thLight:"Светлое", thDark:"Тёмное",
+  reset:"Сбросить прогресс", resetD:"Удаляет всё сохранённое на этом устройстве", resetAsk:"Удалить всё?",
+  yes:"Да, удалить", no:"Нет",
+  savedNote:"Прогресс сохраняется автоматически только на этом устройстве.",
+  ofN:"из", newWord:"новое слово", review:"повторение"
+};
+T.en={
+  app:"Niv", tagline:"Spoken and literary English",
+  navHome:"Tracks", navProg:"Progress", navSet:"Settings", back:"Back",
+  heroT:"English you hear before you read it",
+  heroP:"Every word, every sentence and every passage comes with a play button. Slow it down, repeat it, and see the meaning in your own language. No timer, and no penalty for a wrong answer.",
+  start:"Start here", cont:"Pick up where you left off",
+  trkSound:"Sound and letter", trkSoundD:"Telling close English sounds apart",
+  trkWords:"Words", trkWordsD:"The words that come back most often",
+  trkTalk:"Spoken", trkTalkD:"What people actually say in real situations",
+  trkRead:"Literary", trkReadD:"Reading, idiom and whole text",
+  lv1:"Foundation", lv2:"Building", lv3:"Fluent",
+  lv1D:"One word at a time, with a translation", lv2D:"Short sentences, less translation", lv3D:"English only",
+  qMean:"What does it mean?", qHear:"Which word did you hear?", qGap:"What is missing?",
+  qOrder:"Put the sentence in order", qSay:"How do you say this in English?", qRead:"According to the passage:",
+  qUse:"Which sentence fits the situation?",
+  hear:"Play", hearSlow:"Slowly", hearWord:"Play the word", hearSent:"Play the sentence",
+  check:"Check", next:"Next", again:"Again", dunno:"I don't know", showAll:"Show all",
+  correct:"Correct!", wrong:"Not yet", answerIs:"Answer:", why:"Why",
+  tapOrder:"Tap the words in order", clearSlot:"Clear",
+  progT:"Your progress", progNone:"You have not started yet. Every track is open right away — nothing is locked.",
+  seen:"Seen", mastered:"Mastered", streakL:"Streak", todayL:"Today", accL:"Accuracy",
+  setT:"Settings", setVoice:"Voice and reading", setRead:"Readability", setLang:"Interface language",
+  vEngine:"Voice engine", vGem:"Natural voice (Gemini)", vDev:"Device voice",
+  vGemD:"Sounds human. Needs the internet and a free key.", vDevD:"Always works, even offline.",
+  vFemale:"Female voices", vMale:"Male voices", vSample:"Sample",
+  vKey:"Gemini key", vKeyPh:"starts with AIza…", vSave:"Save", vShow:"Show", vHide:"Hide",
+  vSaved:"The key is stored on this device only. It is not sent anywhere else.",
+  vRemoved:"Key removed.", vChecking:"Checking…", vOk:"The key works.",
+  vErr:"The key was not accepted.", vNeed:"Save a key first.",
+  vsOk:"Natural voice on", vsDev:"Device voice", vsNoEn:"No English voice on this device",
+  vsNoEnD:"You can install an English voice in your device settings, or turn on the natural voice here.",
+  rate:"Reading speed", slow:"Slow", fast:"Fast",
+  bigText:"Large text", bigTextD:"Scales everything together, not just the question",
+  clearFont:"Readable font", clearFontD:"Wider letters that look less alike",
+  spacing:"Word spacing", spacingD:"Helps the eye not skip a word",
+  contrast:"High contrast", contrastD:"Black on white, no soft tints",
+  motion:"No animation", motionD:"Turns off movement on screen",
+  theme:"Appearance", thAuto:"Auto", thLight:"Light", thDark:"Dark",
+  reset:"Reset progress", resetD:"Deletes everything saved on this device", resetAsk:"Delete everything?",
+  yes:"Yes, delete", no:"No",
+  savedNote:"Progress is saved automatically on this device only.",
+  ofN:"of", newWord:"new word", review:"review"
+};
+function t(k){var d=T[state.lang]||T.he;return d[k]!==undefined?d[k]:(T.he[k]!==undefined?T.he[k]:k)}
+/* המשמעות בשפת האם. נופלים לאנגלית ולא לעברית: מי שלמד ברוסית וחסר
+   לו תרגום יבין "a large boat" הרבה לפני "אונייה". */
+function gl(g){if(!g)return"";return g[state.lang]||g.en||g.he||""}
+
+/* ============================================================
+   3. אייקונים — SVG בקוד, אפס בקשות רשת
+   ============================================================ */
+var ICONS={
+  play:'<path d="M6 4l14 8-14 8z"/>',
+  /* "לאט" חייב להיראות אחרת מ"נגן", אחרת יש שני כפתורים זהים זה
+     ליד זה. הקו האנכי הקודם היה path בלי מילוי — הוא לא צויר כלל. */
+  slow:'<path d="M4 4l10 8-10 8z"/><rect x="16" y="5" width="2.4" height="14" rx="1"/><rect x="20" y="5" width="2.4" height="14" rx="1"/>',
+  stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
+  check:'<path d="M4 12l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>',
+  arrow:'<path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+  home:'<path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  gear:'<circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>',
+  book:'<path d="M4 4h7a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M20 4h-3a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  eye:'<path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/>',
+  key:'<circle cx="8" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 12h9M18 12v3M21 12v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  redo:'<path d="M20 11a8 8 0 1 0-2.3 6.1" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
+};
+function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="'+s+
+  '" aria-hidden="true" focusable="false" fill="currentColor">'+(ICONS[n]||"")+'</svg>'}
+
+/* ============================================================
+   4. מצב ושמירה
+   ============================================================ */
+var BUILD="n1 · 2026-08-28";
+var SKEY="niv-state-v1";
+var GKEY_STORE="niv-gkey";
+
+function blankState(){
+  return {
+    lang:null,            /* נקבע לפי שפת הדפדפן בהפעלה הראשונה */
+    screen:"home", topic:null, level:1,
+    voiceMode:"device",   /* "device" | "gem" */
+    gemVoice:"Kore",
+    rate:0.95,
+    big:false, clear:false, spaced:false, hc:false, rm:false, theme:"auto",
+    stats:{},             /* topic|level → {seen,ok,bad} */
+    item:{},              /* מזהה פריט → {n,ok} — בסיס לחזרה מרווחת */
+    day:{d:"",n:0}, streak:0, lastDay:"", totalOk:0, totalAsk:0
+  };
+}
+var state=blankState();
+
+function load(){
+  try{
+    var raw=localStorage.getItem(SKEY); if(!raw)return;
+    var o=JSON.parse(raw); if(!o||typeof o!=="object")return;
+    Object.keys(blankState()).forEach(function(k){if(o[k]!==undefined)state[k]=o[k]});
+  }catch(e){}
+  if(!LANGS[state.lang])state.lang=guessLang();
+  if(GEM_VOICES.every(function(v){return v.id!==state.gemVoice}))state.gemVoice="Kore";
+  state.rate=clamp(Number(state.rate)||0.95,0.6,1.3);
+}
+function save(){try{localStorage.setItem(SKEY,JSON.stringify(state))}catch(e){}}
+
+/* שפת הדפדפן, לא ברירת מחדל עברית. מי שפותח את האפליקציה במכשיר
+   ברוסית לא אמור להיתקל קודם במסך בעברית שאינו יכול לקרוא. */
+function guessLang(){
+  var ls=(navigator.languages||[navigator.language||"he"]).map(function(x){
+    return String(x).toLowerCase().split("-")[0]});
+  for(var i=0;i<ls.length;i++){
+    var c=ls[i]==="iw"?"he":ls[i];
+    if(LANGS[c])return c;
+  }
+  return "he";
+}
+function touchDay(){
+  var d=todayIso();
+  if(state.day.d!==d){
+    var y=new Date(Date.now()-86400000);
+    var yi=y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0");
+    state.streak=(state.lastDay===yi)?(state.streak||0)+1:1;
+    state.lastDay=d; state.day={d:d,n:0};
+  }
+}
+function stKey(tid,lv){return tid+"|"+lv}
+function stOf(tid,lv){
+  var k=stKey(tid,lv);
+  if(!state.stats[k])state.stats[k]={seen:0,ok:0,bad:0};
+  return state.stats[k];
+}
+function mastery(tid,lv){
+  var s=state.stats[stKey(tid,lv)];
+  if(!s||!s.seen)return 0;
+  return clamp(s.ok/Math.max(6,s.seen),0,1);
+}
+function barCls(m){return m>=.75?"b2":m>=.4?"b1":"b0"}
+
+/* ============================================================
+   5. מצבי קריאות
+   ============================================================ */
+var booted=false;
+function applyModes(){
+  var r=document.documentElement;
+  if(!LANGS[state.lang])state.lang=guessLang();
+  r.lang=state.lang; r.dir=LANGS[state.lang].dir;
+  r.style.setProperty("--fs",state.big?"20px":"17px");
+  r.classList.toggle("clear",!!state.clear);
+  r.classList.toggle("spaced",!!state.spaced);
+  r.classList.toggle("hc",!!state.hc);
+  r.classList.toggle("rm",!!state.rm);
+  if(state.theme==="auto")r.removeAttribute("data-theme");
+  else r.setAttribute("data-theme",state.theme);
+}
+function announce(m){var e=$("#live");if(e)e.textContent=m}
+
+/* ============================================================
+   6. קול
+   שני מנועים ושתי שפות. האנגלית היא החומר הנלמד ולכן היא חייבת
+   להישמע נכון; שפת האם משמשת להוראות בלבד. הבחירה נעשית לכל שפה
+   בנפרד — קול עברי שמקריא אנגלית הוא בדיוק הכישלון שהאפליקציה
+   הזאת קיימת כדי למנוע.
+   הקצב אצל ג׳מיני אינו פרמטר: ה-API מחזיר 400 על audioConfig,
+   ולכן הוא מתבקש במילים בתוך הטקסט.
+   ============================================================ */
+var GEM_VOICES=[
+  {id:"Kore",   g:"f", he:"קורֵה",    ar:"كوري",   ru:"Коре",    en:"Kore",
+   dhe:"רגוע וברור",  dar:"هادئ وواضح",     dru:"Спокойный и чёткий", den:"Calm and clear"},
+  {id:"Aoede",  g:"f", he:"אאודֵה",   ar:"آودي",   ru:"Аэда",    en:"Aoede",
+   dhe:"חם ונעים",    dar:"دافئ ولطيف",     dru:"Тёплый и мягкий",    den:"Warm and gentle"},
+  {id:"Leda",   g:"f", he:"לֵדָה",     ar:"ليدا",   ru:"Леда",    en:"Leda",
+   dhe:"צעיר וקליל",  dar:"شاب وخفيف",      dru:"Молодой и лёгкий",   den:"Young and light"},
+  {id:"Autonoe",g:"f", he:"אוטונואה", ar:"أوتونوي",ru:"Автоноя", en:"Autonoe",
+   dhe:"בהיר ומדויק", dar:"مشرق ودقيق",     dru:"Ясный и точный",     den:"Bright and precise"},
+  {id:"Puck",   g:"m", he:"פָּאק",     ar:"باك",    ru:"Пак",     en:"Puck",
+   dhe:"ער וזורם",    dar:"حيوي وسلس",      dru:"Живой и плавный",    den:"Lively and flowing"},
+  {id:"Charon", g:"m", he:"כָארוֹן",   ar:"كارون",  ru:"Харон",   en:"Charon",
+   dhe:"עמוק ושקול",  dar:"عميق ومتزن",     dru:"Глубокий и ровный",  den:"Deep and steady"},
+  {id:"Orus",   g:"m", he:"אוֹרוּס",   ar:"أوروس",  ru:"Орус",    en:"Orus",
+   dhe:"יציב ונינוח", dar:"ثابت ومسترخٍ",   dru:"Ровный и спокойный", den:"Stable and relaxed"},
+  {id:"Fenrir", g:"m", he:"פֶנְריר",   ar:"فنرير",  ru:"Фенрир",  en:"Fenrir",
+   dhe:"נמרץ יותר",   dar:"أكثر حيوية",     dru:"Более энергичный",   den:"More energetic"}
+];
+function gvOf(id){for(var i=0;i<GEM_VOICES.length;i++)if(GEM_VOICES[i].id===id)return GEM_VOICES[i];
+  return GEM_VOICES[0]}
+function gvName(v){return v[state.lang]||v.en}
+function gvDesc(v){return v["d"+state.lang]||v.den}
+
+var GKEY="";
+function loadKey(){try{GKEY=localStorage.getItem(GKEY_STORE)||""}catch(e){GKEY=""}}
+function saveKey(k){GKEY=k||"";try{k?localStorage.setItem(GKEY_STORE,k):localStorage.removeItem(GKEY_STORE)}catch(e){}}
+function hasKey(){return !!GKEY}
+function gemOn(){return state.voiceMode==="gem"&&hasKey()}
+
+/* --- קול המכשיר, לפי שפה --- */
+function allVoices(){try{return window.speechSynthesis?(speechSynthesis.getVoices()||[]):[]}catch(e){return[]}}
+var LANG_HINT={he:/עברית|hebrew|ivrit/i,ar:/العربية|arabic/i,ru:/русский|russian/i,en:/english/i};
+var V_F=/(female|woman|carmit|hila|aria|jenny|sara|salma|hala|zariyah|amina|svetlana|dariya|irina|milena|elena|katja|noura|mona|samantha|karen|moira|tessa|serena)/;
+var V_M=/(\bmale\b|\bman\b|daniel|david|yoni|moshe|asaf|guy|george|mark|ryan|alex|fred|maged|hamed|shakir|dmitry|pavel|yuri|maxim|omar|tarek|oliver|thomas)/;
+function vGender(v){var n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
+  return V_F.test(n)?"f":V_M.test(n)?"m":"?"}
+function voicesFor(code){
+  var base=String(code).split("-")[0].toLowerCase(),hint=LANG_HINT[base];
+  return allVoices().filter(function(v){
+    var l=String(v.lang||"").replace("_","-").toLowerCase();
+    if(l.split("-")[0]===base)return true;
+    return !l&&hint?hint.test(v.name||""):false;
+  });
+}
+function bestVoice(code){
+  var pool=voicesFor(code); if(!pool.length)return null;
+  var want=String(code).toLowerCase();
+  var pref=state.gemVoice&&gvOf(state.gemVoice).g==="m"?"m":"f";
+  function score(v){
+    var s=0,n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
+    if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
+    if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
+    if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    if(/espeak|compact|pico/.test(n))s-=40;
+    var g=vGender(v);
+    if(g===pref)s+=10; else if(g!=="?")s-=4;
+    if(v.default)s+=4;
+    return s;
+  }
+  return pool.slice().sort(function(a,b){return score(b)-score(a)})[0];
+}
+function hasEnglishVoice(){return voicesFor(EN_TTS).length>0}
+
+/* --- מצב הקול, כפי שהוא מוצג למשתמש --- */
+function voiceStatus(){
+  if(gemOn())return "ok";
+  return hasEnglishVoice()?"dev":"none";
+}
+
+/* --- ג׳מיני --- */
+var gAudio=null,gCache={},gBusy=false;
+function gStop(){if(gAudio){try{gAudio.pause();gAudio.src=""}catch(e){}gAudio=null}}
+function pcmToWav(b64){
+  try{
+    var bin=atob(b64),len=bin.length,buf=new Uint8Array(len),i;
+    for(i=0;i<len;i++)buf[i]=bin.charCodeAt(i);
+    var sr=24000,ch=1,bits=16,dl=len,hdr=new ArrayBuffer(44+dl),v=new DataView(hdr);
+    function ws(o,s){for(var j=0;j<s.length;j++)v.setUint8(o+j,s.charCodeAt(j))}
+    ws(0,"RIFF");v.setUint32(4,36+dl,true);ws(8,"WAVE");ws(12,"fmt ");
+    v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);
+    v.setUint32(24,sr,true);v.setUint32(28,sr*ch*bits/8,true);
+    v.setUint16(32,ch*bits/8,true);v.setUint16(34,bits,true);
+    ws(36,"data");v.setUint32(40,dl,true);
+    new Uint8Array(hdr,44).set(buf);
+    var bytes=new Uint8Array(hdr),out="";
+    for(var k=0;k<bytes.length;k+=8192)out+=String.fromCharCode.apply(null,bytes.subarray(k,k+8192));
+    return "data:audio/wav;base64,"+btoa(out);
+  }catch(e){return null}
+}
+var GEM_LEAD={
+  en:{slow:"Read this English very slowly and clearly, one word at a time: ",
+      soft:"Read this English slowly and clearly: ",
+      norm:"Read this English at a natural, friendly pace: ",
+      fast:"Read this English at a brisk pace: "},
+  he:{slow:"קרא לאט מאוד וברור, בעברית: ",soft:"קרא לאט וברור, בעברית: ",
+      norm:"קרא בקצב טבעי, בעברית: ",fast:"קרא בקצב מהיר, בעברית: "},
+  ar:{slow:"اقرأ ببطء شديد وبوضوح، بالعربية: ",soft:"اقرأ ببطء وبوضوح، بالعربية: ",
+      norm:"اقرأ بوتيرة طبيعية، بالعربية: ",fast:"اقرأ بوتيرة سريعة، بالعربية: "},
+  ru:{slow:"Читай очень медленно и чётко, по-русски: ",soft:"Читай медленно и чётко, по-русски: ",
+      norm:"Читай в естественном темпе, по-русски: ",fast:"Читай в быстром темпе, по-русски: "}
+};
+function gSynth(text,voiceName,rate,lang){
+  var L=GEM_LEAD[lang]||GEM_LEAD.en;
+  var lead=rate<=0.7?L.slow:rate<=0.9?L.soft:rate>=1.15?L.fast:L.norm;
+  var body={contents:[{parts:[{text:lead+text}]}],
+    generationConfig:{responseModalities:["AUDIO"],
+      speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voiceName}}}}};
+  return fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key="+
+      encodeURIComponent(GKEY),
+    {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+  .then(function(r){
+    if(r.ok)return r.json();
+    return r.text().then(function(tx){
+      var m="";try{var j=JSON.parse(tx);m=(j.error&&j.error.message)||""}catch(e){m=String(tx).slice(0,140)}
+      throw new Error(r.status+(m?" — "+m:""));
+    });
+  })
+  .then(function(d){
+    var parts=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
+    for(var i=0;i<parts.length;i++){
+      var pd=parts[i].inlineData;
+      if(pd&&pd.data){
+        var mt=pd.mimeType||"";
+        if(mt.indexOf("wav")>=0||mt.indexOf("pcm")>=0||mt.indexOf("L16")>=0)
+          return pcmToWav(pd.data)||("data:audio/wav;base64,"+pd.data);
+        return "data:audio/mp3;base64,"+pd.data;
+      }
+    }
+    throw new Error("no-audio");
+  });
+}
+function speakDevice(text,code,rate){
+  if(!("speechSynthesis" in window))return false;
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    var v=bestVoice(code);
+    u.lang=(v&&v.lang)||code;
+    if(v)u.voice=v;
+    u.rate=clamp(rate,0.55,1.4); u.pitch=1;
+    speechSynthesis.speak(u);
+    return true;
+  }catch(e){return false}
+}
+/* lang: "en" לחומר הנלמד, או קוד שפת האם להוראה. */
+function speak(text,lang,rateMul){
+  text=String(text||"").trim(); if(!text)return;
+  lang=lang||"en";
+  var code=lang==="en"?EN_TTS:LANGS[lang].tts;
+  var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
+  stopSpeak();
+  if(gemOn()){
+    var vid=gvOf(state.gemVoice).id;
+    var ck=lang+"|"+vid+"|"+rate.toFixed(2)+"|"+text;
+    if(gCache[ck]){playUrl(gCache[ck],text,code,rate);return}
+    gBusy=true; renderSpeakState();
+    gSynth(text,vid,rate,lang).then(function(u){
+      gCache[ck]=u; gBusy=false; renderSpeakState(); playUrl(u,text,code,rate);
+    }).catch(function(){
+      gBusy=false; renderSpeakState(); speakDevice(text,code,rate);
+    });
+    return;
+  }
+  speakDevice(text,code,rate);
+}
+function playUrl(url,text,code,rate){
+  gStop(); gAudio=new Audio(url);
+  gAudio.play().catch(function(){speakDevice(text,code,rate)});
+}
+function stopSpeak(){gStop();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function renderSpeakState(){
+  var b=document.querySelectorAll(".spk");
+  for(var i=0;i<b.length;i++)b[i].classList.toggle("on",gBusy);
+}
+
+/* ============================================================
+   7. תוכן
+   ------------------------------------------------------------
+   W(word, ipa, gloss, near)  — פריט מילה. near הוא המילים שקל
+     לבלבל איתה, וזה לא קישוט: משם נבנים המסיחים וגם תרגיל
+     ההאזנה. מסיח אקראי מלמד לנחש; מסיח קרוב מלמד להבחין.
+   S(sentence, gloss, situation) — פריט משפט. situation מתאר מתי
+     אומרים את זה, ולא מה זה אומר — ההבדל הזה הוא כל ההבדל בין
+     לדעת מילה לבין לדעת להשתמש בה.
+   P(lines, glosses, questions) — קטע קריאה.
+   ============================================================ */
+function W(w,ipa,g,near){return {k:"w",w:w,ipa:ipa||"",g:g,near:near||[]}}
+function S(s,g,u){return {k:"s",s:s,g:g,u:u||null}}
+function P(lines,words,qs){return {k:"p",lines:lines,words:words||[],qs:qs||[]}}
+function Q(q,ans,wrongs){return {q:q,a:ans,w:wrongs}}
+
+var TRACKS=[
+  {id:"sound",cls:"t-sound",nk:"trkSound",dk:"trkSoundD",icon:"spark"},
+  {id:"words",cls:"t-words",nk:"trkWords",dk:"trkWordsD",icon:"book"},
+  {id:"talk", cls:"t-talk", nk:"trkTalk", dk:"trkTalkD", icon:"play"},
+  {id:"read", cls:"t-read", nk:"trkRead", dk:"trkReadD", icon:"book"}
+];
+
+var TOPICS=[];
+function topic(id,trk,n,d,levels){TOPICS.push({id:id,trk:trk,n:n,d:d,L:levels})}
+
+/* ---------- מסלול 1: צליל ואות ----------
+   דובר עברית, ערבית או רוסית לא "לא שומע" את ההבדל בין ship ל-sheep.
+   הוא שומע צליל אחד, כי בשפת האם שלו זה באמת צליל אחד. לכן התרגיל
+   הראשון אינו לבטא אלא להבחין — בלי הבחנה, ההגייה לא תשתנה לעולם. */
+topic("vowels","sound",
+  {he:"תנועות קרובות",ar:"حركات متقاربة",ru:"Близкие гласные",en:"Close vowels"},
+  {he:"ship או sheep — אותה מילה כמעט, שתי משמעויות רחוקות",
+   ar:"ship أم sheep — الكلمة نفسها تقريبًا، بمعنيين بعيدين",
+   ru:"ship или sheep — почти одно слово, два далёких значения",
+   en:"ship or sheep — nearly the same word, two very different meanings"},
+[
+ [ /* רמה 1 — /ɪ/ מול /iː/ */
+  W("ship","/ʃɪp/",{he:"אונייה",ar:"سفينة",ru:"корабль",en:"a large boat"},["sheep"]),
+  W("sheep","/ʃiːp/",{he:"כבשה",ar:"خروف",ru:"овца",en:"a farm animal with wool"},["ship"]),
+  W("bit","/bɪt/",{he:"קצת",ar:"قليلاً",ru:"немного",en:"a small amount"},["beat"]),
+  W("beat","/biːt/",{he:"פעימה, להכות",ar:"نبضة، يضرب",ru:"удар, бить",en:"a regular sound or hit"},["bit"]),
+  W("live","/lɪv/",{he:"לגור, לחיות",ar:"يعيش، يسكن",ru:"жить",en:"to have your home somewhere"},["leave"]),
+  W("leave","/liːv/",{he:"לעזוב",ar:"يغادر",ru:"уходить",en:"to go away from a place"},["live"]),
+  W("fill","/fɪl/",{he:"למלא",ar:"يملأ",ru:"наполнять",en:"to make something full"},["feel"]),
+  W("feel","/fiːl/",{he:"להרגיש",ar:"يشعر",ru:"чувствовать",en:"to have a feeling"},["fill"]),
+  W("sit","/sɪt/",{he:"לשבת",ar:"يجلس",ru:"сидеть",en:"to rest on a chair"},["seat"]),
+  W("seat","/siːt/",{he:"מושב",ar:"مقعد",ru:"сиденье",en:"a place to sit"},["sit"])
+ ],
+ [ /* רמה 2 — /æ/ מול /e/, ו-/ʊ/ מול /uː/ */
+  W("bad","/bæd/",{he:"רע",ar:"سيّئ",ru:"плохой",en:"not good"},["bed"]),
+  W("bed","/bed/",{he:"מיטה",ar:"سرير",ru:"кровать",en:"where you sleep"},["bad"]),
+  W("man","/mæn/",{he:"גבר",ar:"رجل",ru:"мужчина",en:"one adult male"},["men"]),
+  W("men","/men/",{he:"גברים",ar:"رجال",ru:"мужчины",en:"more than one man"},["man"]),
+  W("sad","/sæd/",{he:"עצוב",ar:"حزين",ru:"грустный",en:"unhappy"},["said"]),
+  W("said","/sed/",{he:"אמר",ar:"قال",ru:"сказал",en:"past of 'say'"},["sad"]),
+  W("full","/fʊl/",{he:"מלא",ar:"ممتلئ",ru:"полный",en:"with no space left"},["fool"]),
+  W("fool","/fuːl/",{he:"טיפש",ar:"أحمق",ru:"глупец",en:"a silly person"},["full"]),
+  W("pull","/pʊl/",{he:"למשוך",ar:"يسحب",ru:"тянуть",en:"to move something towards you"},["pool"]),
+  W("pool","/puːl/",{he:"בריכה",ar:"بركة سباحة",ru:"бассейн",en:"a place for swimming"},["pull"])
+ ],
+ [ /* רמה 3 — /æ/ מול /ɒ/, ותנועה שמשנה זמן */
+  W("hat","/hæt/",{he:"כובע",ar:"قبعة",ru:"шляпа",en:"you wear it on your head"},["hot"]),
+  W("hot","/hɒt/",{he:"חם",ar:"ساخن",ru:"горячий",en:"at a high temperature"},["hat"]),
+  W("cap","/kæp/",{he:"מצחייה",ar:"قبعة بحافة",ru:"кепка",en:"a soft hat with a front"},["cop","cup"]),
+  W("cop","/kɒp/",{he:"שוטר (מדוברת)",ar:"شرطي (عامية)",ru:"полицейский (разг.)",en:"a police officer, informally"},["cap","cup"]),
+  W("cup","/kʌp/",{he:"כוס",ar:"كوب",ru:"чашка",en:"you drink from it"},["cap","cop"]),
+  W("walk","/wɔːk/",{he:"ללכת",ar:"يمشي",ru:"идти пешком",en:"to move on your feet"},["work"]),
+  W("work","/wɜːk/",{he:"לעבוד",ar:"يعمل",ru:"работать",en:"to do a job"},["walk"]),
+  W("won't","/wəʊnt/",{he:"לא י(עשה)",ar:"لن",ru:"не будет",en:"will not"},["want"]),
+  W("want","/wɒnt/",{he:"לרצות",ar:"يريد",ru:"хотеть",en:"to wish for something"},["won't"]),
+  W("first","/fɜːst/",{he:"ראשון",ar:"الأول",ru:"первый",en:"before all the others"},["fast"]),
+  W("fast","/fɑːst/",{he:"מהר",ar:"سريع",ru:"быстрый",en:"moving with speed"},["first"])
+ ]
+]);
+
+topic("cons","sound",
+  {he:"עיצורים קשים",ar:"حروف صعبة",ru:"Трудные согласные",en:"Hard consonants"},
+  {he:"th, w מול v, b מול p — הצלילים שאין להם מקבילה בשפה שלכם",
+   ar:"th وw مقابل v وb مقابل p — أصوات لا مقابل لها في لغتك",
+   ru:"th, w против v, b против p — звуки, которых нет в вашем языке",
+   en:"th, w against v, b against p — the sounds your first language does not have"},
+[
+ [
+  W("think","/θɪŋk/",{he:"לחשוב",ar:"يفكّر",ru:"думать",en:"to use your mind"},["sink"]),
+  W("sink","/sɪŋk/",{he:"כיור, לשקוע",ar:"مغسلة، يغرق",ru:"раковина, тонуть",en:"a basin, or to go under water"},["think"]),
+  W("three","/θriː/",{he:"שלוש",ar:"ثلاثة",ru:"три",en:"the number 3"},["tree","free"]),
+  W("tree","/triː/",{he:"עץ",ar:"شجرة",ru:"дерево",en:"a tall plant"},["three","free"]),
+  W("free","/friː/",{he:"חופשי, חינם",ar:"حر، مجاني",ru:"свободный, бесплатный",en:"costing nothing, or not held"},["three","tree"]),
+  W("thin","/θɪn/",{he:"דק",ar:"رفيع",ru:"тонкий",en:"not thick"},["tin","sin"]),
+  W("they","/ðeɪ/",{he:"הם",ar:"هم",ru:"они",en:"those people"},["day"]),
+  W("day","/deɪ/",{he:"יום",ar:"يوم",ru:"день",en:"24 hours"},["they"])
+ ],
+ [
+  W("west","/west/",{he:"מערב",ar:"غرب",ru:"запад",en:"the direction of sunset"},["vest"]),
+  W("vest","/vest/",{he:"גופייה, אפודה",ar:"صدرية",ru:"жилет",en:"a piece of clothing with no sleeves"},["west"]),
+  W("wine","/waɪn/",{he:"יין",ar:"نبيذ",ru:"вино",en:"a drink made from grapes"},["vine"]),
+  W("vine","/vaɪn/",{he:"גפן",ar:"كرمة",ru:"лоза",en:"the plant that grapes grow on"},["wine"]),
+  W("big","/bɪɡ/",{he:"גדול",ar:"كبير",ru:"большой",en:"large in size"},["pig"]),
+  W("pig","/pɪɡ/",{he:"חזיר",ar:"خنزير",ru:"свинья",en:"a farm animal"},["big"]),
+  W("bear","/beə/",{he:"דוב",ar:"دب",ru:"медведь",en:"a large wild animal"},["pear"]),
+  W("pear","/peə/",{he:"אגס",ar:"إجاص",ru:"груша",en:"a sweet fruit"},["bear"])
+ ],
+ [
+  W("right","/raɪt/",{he:"נכון, ימין",ar:"صحيح، يمين",ru:"правильный, правый",en:"correct, or the opposite of left"},["light","write"]),
+  W("light","/laɪt/",{he:"אור, קל",ar:"ضوء، خفيف",ru:"свет, лёгкий",en:"brightness, or not heavy"},["right"]),
+  W("road","/rəʊd/",{he:"כביש",ar:"طريق",ru:"дорога",en:"cars drive on it"},["load"]),
+  W("load","/ləʊd/",{he:"מטען",ar:"حمولة",ru:"груз",en:"something heavy you carry"},["road"]),
+  W("sing","/sɪŋ/",{he:"לשיר",ar:"يغنّي",ru:"петь",en:"to make music with your voice"},["sin","thing"]),
+  W("thing","/θɪŋ/",{he:"דבר",ar:"شيء",ru:"вещь",en:"an object you do not name"},["thin","sing"]),
+  W("mouth","/maʊθ/",{he:"פֶּה",ar:"فم",ru:"рот",en:"you eat and speak with it"},["mouse"]),
+  W("mouse","/maʊs/",{he:"עכבר",ar:"فأر",ru:"мышь",en:"a small animal, or a computer part"},["mouth"])
+ ]
+]);
+
+topic("ends","sound",
+  {he:"סופי מילה והטעמה",ar:"نهايات الكلمات والنبر",ru:"Окончания и ударение",en:"Endings and stress"},
+  {he:"אותה אות, שלושה צלילים — וההברה המוטעמת שמשנה משמעות",
+   ar:"الحرف نفسه بثلاثة أصوات — والنبر الذي يغيّر المعنى",
+   ru:"Одна буква — три звука, и ударение, меняющее смысл",
+   en:"One letter, three sounds — and the stress that changes the meaning"},
+[
+ [ /* -ed: /t/ · /d/ · /ɪd/ */
+  W("walked","/wɔːkt/",{he:"הלך — הסיומת נשמעת t",ar:"مشى — النهاية تُلفظ t",ru:"шёл — окончание звучит как t",en:"past of walk — the ending sounds like t"},["wanted","played"]),
+  W("asked","/ɑːskt/",{he:"שאל — הסיומת נשמעת t",ar:"سأل — النهاية t",ru:"спросил — окончание t",en:"past of ask — ending sounds like t"},["added"]),
+  W("played","/pleɪd/",{he:"שיחק — הסיומת נשמעת d",ar:"لعب — النهاية d",ru:"играл — окончание d",en:"past of play — the ending sounds like d"},["walked","wanted"]),
+  W("called","/kɔːld/",{he:"התקשר — הסיומת נשמעת d",ar:"اتّصل — النهاية d",ru:"позвонил — окончание d",en:"past of call — ending sounds like d"},["counted"]),
+  W("wanted","/ˈwɒntɪd/",{he:"רצה — הסיומת הברה שלמה, id",ar:"أراد — النهاية مقطع كامل، id",ru:"хотел — окончание отдельный слог, id",en:"past of want — the ending is a whole syllable, id"},["walked","played"]),
+  W("needed","/ˈniːdɪd/",{he:"היה צריך — סיומת id",ar:"احتاج — النهاية id",ru:"нуждался — окончание id",en:"past of need — ending id"},["called"])
+ ],
+ [ /* רבים: /s/ · /z/ · /ɪz/ */
+  W("cats","/kæts/",{he:"חתולים — s",ar:"قطط — s",ru:"кошки — s",en:"more than one cat — s"},["dogs","boxes"]),
+  W("books","/bʊks/",{he:"ספרים — s",ar:"كتب — s",ru:"книги — s",en:"more than one book — s"},["boxes"]),
+  W("dogs","/dɒɡz/",{he:"כלבים — z",ar:"كلاب — z",ru:"собаки — z",en:"more than one dog — z"},["cats","boxes"]),
+  W("keys","/kiːz/",{he:"מפתחות — z",ar:"مفاتيح — z",ru:"ключи — z",en:"more than one key — z"},["books"]),
+  W("boxes","/ˈbɒksɪz/",{he:"קופסאות — הברה שלמה, iz",ar:"صناديق — مقطع كامل، iz",ru:"коробки — отдельный слог, iz",en:"more than one box — a whole syllable, iz"},["cats","dogs"]),
+  W("watches","/ˈwɒtʃɪz/",{he:"שעונים — iz",ar:"ساعات — iz",ru:"часы — iz",en:"more than one watch — iz"},["keys"])
+ ],
+ [ /* אותיות אילמות והטעמה שמשנה משמעות */
+  W("knee","/niː/",{he:"ברך — ה-k לא נשמעת",ar:"ركبة — الـk لا تُلفظ",ru:"колено — k не произносится",en:"the joint in your leg — the k is silent"},["need"]),
+  W("write","/raɪt/",{he:"לכתוב — ה-w לא נשמעת",ar:"يكتب — الـw لا تُلفظ",ru:"писать — w не произносится",en:"to put words on paper — the w is silent"},["right"]),
+  W("hour","/aʊə/",{he:"שעה — ה-h לא נשמעת",ar:"ساعة — الـh لا تُلفظ",ru:"час — h не произносится",en:"sixty minutes — the h is silent"},["our"]),
+  W("island","/ˈaɪlənd/",{he:"אי — ה-s לא נשמעת",ar:"جزيرة — الـs لا تُلفظ",ru:"остров — s не произносится",en:"land with water all around — the s is silent"},["ireland"]),
+  W("present","/ˈprezənt/",{he:"מתנה — ההטעמה בהתחלה",ar:"هدية — النبر في البداية",ru:"подарок — ударение в начале",en:"a gift — stress on the first part"},["present (verb)"]),
+  W("record","/ˈrekɔːd/",{he:"תקליט, שיא — ההטעמה בהתחלה",ar:"تسجيل، رقم قياسي — النبر في البداية",ru:"запись, рекорд — ударение в начале",en:"a disc or a best result — stress at the start"},["record (verb)"])
+ ]
+]);
+
+/* ---------- מסלול 2: מילים ----------
+   לא רשימה אלפביתית. הסדר הוא סדר התועלת: המילים שמחזירות את
+   ההשקעה הכי מהר, לפי כמה טקסט אמיתי הן פותחות. */
+topic("core","words",
+  {he:"המילים שחוזרות תמיד",ar:"الكلمات التي تتكرّر دائمًا",ru:"Слова, которые повторяются всегда",en:"The words that keep coming back"},
+  {he:"מאה מילים מכסות כמחצית מכל טקסט אנגלי. אלה הן",
+   ar:"مئة كلمة تغطي نحو نصف أي نص إنجليزي. هذه هي",
+   ru:"Сто слов покрывают около половины любого английского текста. Вот они",
+   en:"A hundred words cover about half of any English text. These are they"},
+[
+ [
+  W("the","/ðə/",{he:"ה־ (יידוע)",ar:"أداة التعريف",ru:"определённый артикль",en:"points to one we already know"},["a","this"]),
+  W("and","/ænd/",{he:"וְ־",ar:"و",ru:"и",en:"joins two things"},["or","but"]),
+  W("but","/bʌt/",{he:"אבל",ar:"لكن",ru:"но",en:"introduces a contrast"},["and","or"]),
+  W("with","/wɪð/",{he:"עם",ar:"مع",ru:"с",en:"together, or using"},["without","from"]),
+  W("here","/hɪə/",{he:"כאן",ar:"هنا",ru:"здесь",en:"in this place"},["there","hear"]),
+  W("there","/ðeə/",{he:"שם",ar:"هناك",ru:"там",en:"in that place"},["here","their"]),
+  W("now","/naʊ/",{he:"עכשיו",ar:"الآن",ru:"сейчас",en:"at this moment"},["new","know"]),
+  W("very","/ˈveri/",{he:"מאוד",ar:"جدًا",ru:"очень",en:"to a high degree"},["every"]),
+  W("because","/bɪˈkɒz/",{he:"כי",ar:"لأنّ",ru:"потому что",en:"gives the reason"},["before"]),
+  W("about","/əˈbaʊt/",{he:"על, בערך",ar:"عن، تقريبًا",ru:"о, около",en:"on the subject of, or roughly"},["above"])
+ ],
+ [
+  W("always","/ˈɔːlweɪz/",{he:"תמיד",ar:"دائمًا",ru:"всегда",en:"every time"},["never","often"]),
+  W("never","/ˈnevə/",{he:"אף פעם",ar:"أبدًا",ru:"никогда",en:"not at any time"},["always","ever"]),
+  W("often","/ˈɒfən/",{he:"לעיתים קרובות",ar:"غالبًا",ru:"часто",en:"many times"},["always","sometimes"]),
+  W("enough","/ɪˈnʌf/",{he:"מספיק",ar:"كافٍ",ru:"достаточно",en:"as much as is needed"},["through"]),
+  W("almost","/ˈɔːlməʊst/",{he:"כמעט",ar:"تقريبًا",ru:"почти",en:"very nearly"},["most"]),
+  W("together","/təˈɡeðə/",{he:"ביחד",ar:"معًا",ru:"вместе",en:"with each other"},["another"]),
+  W("between","/bɪˈtwiːn/",{he:"בין",ar:"بين",ru:"между",en:"in the space separating two things"},["before"]),
+  W("without","/wɪˈðaʊt/",{he:"בלי",ar:"بدون",ru:"без",en:"not having"},["with","within"]),
+  W("instead","/ɪnˈsted/",{he:"במקום",ar:"بدلاً من",ru:"вместо",en:"in place of something else"},["inside"]),
+  W("although","/ɔːlˈðəʊ/",{he:"למרות ש־",ar:"مع أنّ",ru:"хотя",en:"introduces something surprising"},["also"])
+ ],
+ [
+  W("however","/haʊˈevə/",{he:"עם זאת",ar:"غير أنّ",ru:"однако",en:"but, in a more formal way"},["whatever"]),
+  W("therefore","/ˈðeəfɔː/",{he:"לכן",ar:"لذلك",ru:"поэтому",en:"for that reason"},["before"]),
+  W("besides","/bɪˈsaɪdz/",{he:"חוץ מזה",ar:"إلى جانب ذلك",ru:"кроме того",en:"in addition to that"},["beside"]),
+  W("meanwhile","/ˈmiːnwaɪl/",{he:"בינתיים",ar:"في هذه الأثناء",ru:"тем временем",en:"at the same time"},["meaning"]),
+  W("unless","/ənˈles/",{he:"אלא אם כן",ar:"ما لم",ru:"если не",en:"except if"},["useless"]),
+  W("whether","/ˈweðə/",{he:"האם, בין אם",ar:"سواء، هل",ru:"ли",en:"introduces a choice of two"},["weather"]),
+  W("rather","/ˈrɑːðə/",{he:"די, מעדיף",ar:"إلى حدّ ما، يفضّل",ru:"довольно, скорее",en:"quite, or as a preference"},["other"]),
+  W("actually","/ˈæktʃuəli/",{he:"למעשה",ar:"في الواقع",ru:"на самом деле",en:"in fact — often correcting"},["usually"]),
+  W("otherwise","/ˈʌðəwaɪz/",{he:"אחרת",ar:"وإلاّ",ru:"иначе",en:"if not, then this happens"},["other"]),
+  W("nevertheless","/ˌnevəðəˈles/",{he:"אף על פי כן",ar:"ومع ذلك",ru:"тем не менее",en:"in spite of that"},["never"])
+ ]
+]);
+
+topic("verbs","words",
+  {he:"פעלים בסיסיים",ar:"أفعال أساسية",ru:"Основные глаголы",en:"Core verbs"},
+  {he:"עשרים פעלים שאיתם אפשר להגיד כמעט כל דבר",
+   ar:"عشرون فعلًا تكفي لقول كل شيء تقريبًا",
+   ru:"Двадцать глаголов, которыми можно сказать почти всё",
+   en:"Twenty verbs that will say almost anything"},
+[
+ [
+  W("go","/ɡəʊ/",{he:"ללכת, לנסוע",ar:"يذهب",ru:"идти, ехать",en:"to move to another place"},["come","do"]),
+  W("come","/kʌm/",{he:"לבוא",ar:"يأتي",ru:"приходить",en:"to move towards the speaker"},["go"]),
+  W("take","/teɪk/",{he:"לקחת",ar:"يأخذ",ru:"брать",en:"to get and hold something"},["give","make"]),
+  W("give","/ɡɪv/",{he:"לתת",ar:"يعطي",ru:"давать",en:"to hand something to someone"},["take"]),
+  W("make","/meɪk/",{he:"לעשות, ליצור",ar:"يصنع",ru:"делать, создавать",en:"to create something"},["take","do"]),
+  W("get","/ɡet/",{he:"לקבל, להשיג",ar:"يحصل على",ru:"получать",en:"to receive or obtain"},["give"]),
+  W("know","/nəʊ/",{he:"לדעת",ar:"يعرف",ru:"знать",en:"to have information"},["now","no"]),
+  W("need","/niːd/",{he:"להזדקק",ar:"يحتاج",ru:"нуждаться",en:"to must have something"},["knee"])
+ ],
+ [
+  W("bring","/brɪŋ/",{he:"להביא",ar:"يُحضر",ru:"приносить",en:"to take something to the speaker"},["take"]),
+  W("keep","/kiːp/",{he:"לשמור, להמשיך",ar:"يحتفظ، يستمر",ru:"держать, продолжать",en:"to hold on to, or to continue"},["kept"]),
+  W("leave","/liːv/",{he:"לעזוב, להשאיר",ar:"يغادر، يترك",ru:"уходить, оставлять",en:"to go away, or to let stay behind"},["live"]),
+  W("mean","/miːn/",{he:"להתכוון, משמעו",ar:"يقصد، يعني",ru:"значить, иметь в виду",en:"to have this meaning"},["men"]),
+  W("try","/traɪ/",{he:"לנסות",ar:"يحاول",ru:"пытаться",en:"to make an attempt"},["tree"]),
+  W("ask","/ɑːsk/",{he:"לשאול, לבקש",ar:"يسأل، يطلب",ru:"спрашивать, просить",en:"to put a question or a request"},["answer"]),
+  W("show","/ʃəʊ/",{he:"להראות",ar:"يُري",ru:"показывать",en:"to let someone see"},["so"]),
+  W("become","/bɪˈkʌm/",{he:"להפוך ל־",ar:"يصبح",ru:"становиться",en:"to start to be something"},["come"])
+ ],
+ [
+  W("afford","/əˈfɔːd/",{he:"להיות מסוגל להרשות כלכלית",ar:"يقدر على تحمّل التكلفة",ru:"позволить себе",en:"to have enough money for it"},["offer"]),
+  W("manage","/ˈmænɪdʒ/",{he:"להצליח, לנהל",ar:"ينجح في، يدير",ru:"справиться, управлять",en:"to succeed in doing, or to run something"},["damage"]),
+  W("realise","/ˈrɪəlaɪz/",{he:"להבין לפתע",ar:"يدرك",ru:"осознать",en:"to suddenly understand"},["realistic"]),
+  W("suggest","/səˈdʒest/",{he:"להציע",ar:"يقترح",ru:"предлагать",en:"to put an idea forward"},["success"]),
+  W("avoid","/əˈvɔɪd/",{he:"להימנע",ar:"يتجنّب",ru:"избегать",en:"to keep away from"},["avoidable"]),
+  W("mind","/maɪnd/",{he:"להתנגד, אכפת",ar:"يمانع",ru:"возражать",en:"to be bothered by something"},["find"]),
+  W("owe","/əʊ/",{he:"להיות חייב כסף",ar:"يدين بمبلغ",ru:"быть должным",en:"to have to pay someone back"},["own"]),
+  W("borrow","/ˈbɒrəʊ/",{he:"לשאול חפץ",ar:"يستعير",ru:"брать взаймы",en:"to take and give back later"},["lend"])
+ ]
+]);
+
+topic("adj","words",
+  {he:"תארים והפכים",ar:"صفات وأضداد",ru:"Прилагательные и антонимы",en:"Adjectives and opposites"},
+  {he:"מילה והיפוכה נזכרות יחד. זה זול יותר בזיכרון משתי מילים נפרדות",
+   ar:"الكلمة وضدّها تُحفظان معًا — أرخص للذاكرة من كلمتين منفصلتين",
+   ru:"Слово и его противоположность запоминаются вместе — дешевле, чем два отдельных слова",
+   en:"A word and its opposite are remembered together — cheaper than two separate words"},
+[
+ [
+  W("early","/ˈɜːli/",{he:"מוקדם",ar:"مبكر",ru:"рано",en:"before the usual time"},["late"]),
+  W("late","/leɪt/",{he:"מאוחר",ar:"متأخر",ru:"поздно",en:"after the usual time"},["early"]),
+  W("cheap","/tʃiːp/",{he:"זול",ar:"رخيص",ru:"дешёвый",en:"costing little"},["expensive"]),
+  W("expensive","/ɪkˈspensɪv/",{he:"יקר",ar:"غالي",ru:"дорогой",en:"costing a lot"},["cheap"]),
+  W("easy","/ˈiːzi/",{he:"קל",ar:"سهل",ru:"лёгкий",en:"not difficult"},["hard"]),
+  W("hard","/hɑːd/",{he:"קשה",ar:"صعب",ru:"трудный",en:"difficult, or not soft"},["easy"]),
+  W("empty","/ˈempti/",{he:"ריק",ar:"فارغ",ru:"пустой",en:"with nothing in it"},["full"]),
+  W("full","/fʊl/",{he:"מלא",ar:"ممتلئ",ru:"полный",en:"with no space left"},["empty"])
+ ],
+ [
+  W("safe","/seɪf/",{he:"בטוח",ar:"آمن",ru:"безопасный",en:"free from danger"},["dangerous"]),
+  W("dangerous","/ˈdeɪndʒərəs/",{he:"מסוכן",ar:"خطير",ru:"опасный",en:"likely to cause harm"},["safe"]),
+  W("quiet","/ˈkwaɪət/",{he:"שקט",ar:"هادئ",ru:"тихий",en:"with little sound"},["loud","quite"]),
+  W("loud","/laʊd/",{he:"רועש",ar:"صاخب",ru:"громкий",en:"with a lot of sound"},["quiet"]),
+  W("polite","/pəˈlaɪt/",{he:"מנומס",ar:"مهذّب",ru:"вежливый",en:"showing good manners"},["rude"]),
+  W("rude","/ruːd/",{he:"גס",ar:"وقح",ru:"грубый",en:"not polite"},["polite"]),
+  W("clear","/klɪə/",{he:"ברור",ar:"واضح",ru:"понятный",en:"easy to understand or see through"},["unclear"]),
+  W("strange","/streɪndʒ/",{he:"מוזר",ar:"غريب",ru:"странный",en:"unusual and surprising"},["strong"])
+ ],
+ [
+  W("reliable","/rɪˈlaɪəbl/",{he:"אמין",ar:"موثوق",ru:"надёжный",en:"you can depend on it"},["unreliable"]),
+  W("worth","/wɜːθ/",{he:"שווה",ar:"يستحق",ru:"стоящий",en:"good enough to justify the cost"},["worse"]),
+  W("aware","/əˈweə/",{he:"מודע",ar:"مُدرك",ru:"осведомлённый",en:"knowing that something exists"},["away"]),
+  W("likely","/ˈlaɪkli/",{he:"סביר",ar:"مُرجَّح",ru:"вероятный",en:"probably going to happen"},["lonely"]),
+  W("willing","/ˈwɪlɪŋ/",{he:"מוכן, נכון ל־",ar:"مستعدّ",ru:"готовый",en:"happy to do it if asked"},["waiting"]),
+  W("upset","/ʌpˈset/",{he:"נסער",ar:"منزعج",ru:"расстроенный",en:"unhappy and troubled"},["upside"]),
+  W("proud","/praʊd/",{he:"גאה",ar:"فخور",ru:"гордый",en:"pleased with what you did"},["proved"]),
+  W("fair","/feə/",{he:"הוגן",ar:"عادل",ru:"справедливый",en:"treating everyone equally"},["far","fare"])
+ ]
+]);
+
+topic("prep","words",
+  {he:"מילות יחס",ar:"حروف الجرّ",ru:"Предлоги",en:"Prepositions"},
+  {he:"in, on, at — המקום שבו רוב הטעויות נעשות, ואי אפשר לתרגם אותן אחת לאחת",
+   ar:"in وon وat — هنا معظم الأخطاء، ولا تُترجم واحدة بواحدة",
+   ru:"in, on, at — здесь больше всего ошибок, и они не переводятся один в один",
+   en:"in, on, at — where most mistakes happen, and no one-to-one translation exists"},
+[
+ [
+  W("in","/ɪn/",{he:"בתוך — חודש, שנה, עיר",ar:"في — شهر، سنة، مدينة",ru:"в — месяц, год, город",en:"inside — a month, a year, a city"},["on","at"]),
+  W("on","/ɒn/",{he:"על — יום, תאריך, משטח",ar:"على — يوم، تاريخ، سطح",ru:"на — день, дата, поверхность",en:"on top of — a day, a date, a surface"},["in","at"]),
+  W("at","/æt/",{he:"ב־ — שעה מדויקת, נקודה",ar:"عند — ساعة محدّدة، نقطة",ru:"в — точное время, точка",en:"at a point — an exact time, a spot"},["in","on"]),
+  W("to","/tuː/",{he:"אל — כיוון",ar:"إلى — اتجاه",ru:"к, в — направление",en:"towards — direction"},["from","for"]),
+  W("from","/frɒm/",{he:"מ־ — מקור",ar:"من — مصدر",ru:"из, от — источник",en:"out of — the origin"},["to"]),
+  W("for","/fɔː/",{he:"בשביל, במשך",ar:"لأجل، لمدّة",ru:"для, в течение",en:"intended for, or a length of time"},["from","four"])
+ ],
+ [
+  W("since","/sɪns/",{he:"מאז — נקודת התחלה",ar:"منذ — نقطة بداية",ru:"с — момент начала",en:"from a starting point until now"},["for"]),
+  W("during","/ˈdjʊərɪŋ/",{he:"במהלך",ar:"خلال",ru:"во время",en:"through the whole of a period"},["while"]),
+  W("until","/ənˈtɪl/",{he:"עד",ar:"حتى",ru:"до",en:"up to that time"},["till","since"]),
+  W("by","/baɪ/",{he:"עד (לא יאוחר מ־), על ידי",ar:"بحلول، بواسطة",ru:"к (сроку), посредством",en:"not later than, or done by someone"},["buy"]),
+  W("among","/əˈmʌŋ/",{he:"בין (רבים)",ar:"بين (جماعة)",ru:"среди",en:"in the middle of a group"},["between"]),
+  W("against","/əˈɡenst/",{he:"נגד",ar:"ضد",ru:"против",en:"in opposition to"},["again"])
+ ],
+ [
+  W("despite","/dɪˈspaɪt/",{he:"למרות",ar:"رغم",ru:"несмотря на",en:"even though this is true"},["although"]),
+  W("throughout","/θruːˈaʊt/",{he:"לאורך כל",ar:"طوال",ru:"на протяжении всего",en:"in every part, all the time"},["through"]),
+  W("towards","/təˈwɔːdz/",{he:"לכיוון",ar:"نحو",ru:"по направлению к",en:"in the direction of"},["toward"]),
+  W("apart from","/əˈpɑːt frɒm/",{he:"חוץ מ־",ar:"باستثناء",ru:"кроме",en:"except for"},["a part of"]),
+  W("according to","/əˈkɔːdɪŋ tuː/",{he:"לפי",ar:"وفقًا لـ",ru:"согласно",en:"as said by someone else"},["depending on"]),
+  W("regardless of","/rɪˈɡɑːdləs ɒv/",{he:"בלי קשר ל־",ar:"بغضّ النظر عن",ru:"независимо от",en:"whatever the situation is"},["regarding"])
+ ]
+]);
+
+/* ---------- מסלול 3: אנגלית מדוברת ----------
+   כל פריט כאן הוא משפט שלם שאפשר לומר כמו שהוא. u מתאר את המצב
+   שבו אומרים אותו — לא את המשמעות. תלמיד שיודע ש-"Could you say
+   that again?" פירושו "אפשר לחזור?" עדיין לא יודע שזה מה שאומרים
+   כשלא הבינו, במקום לחייך ולהנהן. */
+topic("hello","talk",
+  {he:"היכרות ונימוס",ar:"تعارف وتهذيب",ru:"Знакомство и вежливость",en:"Meeting people"},
+  {he:"מה אומרים בשלושים השניות הראשונות, וכשלא הבנתם מילה",
+   ar:"ماذا تقول في أول ثلاثين ثانية، وحين لا تفهم كلمة",
+   ru:"Что сказать в первые тридцать секунд и когда вы не поняли слово",
+   en:"What to say in the first thirty seconds, and when you did not catch a word"},
+[
+ [
+  S("Nice to meet you.",{he:"נעים להכיר.",ar:"سعدت بلقائك.",ru:"Приятно познакомиться.",en:"A greeting for a first meeting."},
+    {he:"בפעם הראשונה שאתם לוחצים יד",ar:"في أول مصافحة",ru:"При первом рукопожатии",en:"The first time you shake hands"}),
+  S("Sorry, I didn't catch that.",{he:"סליחה, לא תפסתי.",ar:"عذرًا، لم ألتقط ذلك.",ru:"Извините, я не расслышал.",en:"You heard something but not clearly."},
+    {he:"כששמעתם משהו אבל לא הבנתם — עדיף מלהנהן",ar:"حين سمعت شيئًا ولم تفهمه — أفضل من الإيماء",ru:"Когда вы что-то услышали, но не поняли — лучше, чем кивнуть",en:"When you heard something but did not understand — better than nodding"}),
+  S("Could you say that again, please?",{he:"אפשר לחזור על זה בבקשה?",ar:"هل يمكنك إعادة ذلك من فضلك؟",ru:"Повторите, пожалуйста.",en:"A polite request to repeat."},
+    {he:"בקשה מנומסת לחזרה — לא גסה ולא מביכה",ar:"طلب مهذّب للإعادة",ru:"Вежливая просьба повторить",en:"A polite ask to repeat"}),
+  S("Could you speak a bit more slowly?",{he:"אפשר לדבר קצת יותר לאט?",ar:"هل يمكنك التحدّث ببطء أكثر قليلًا؟",ru:"Не могли бы вы говорить чуть медленнее?",en:"Ask for a slower pace."},
+    {he:"כשהמהירות היא הבעיה, לא אוצר המילים",ar:"حين تكون السرعة هي المشكلة لا المفردات",ru:"Когда проблема в скорости, а не в словах",en:"When speed is the problem, not vocabulary"}),
+  S("How do you spell that?",{he:"איך מאייתים את זה?",ar:"كيف تُكتب هذه؟",ru:"Как это пишется?",en:"Ask for the letters."},
+    {he:"לשם, לכתובת או למילה חדשה",ar:"لاسم أو عنوان أو كلمة جديدة",ru:"Для имени, адреса или нового слова",en:"For a name, an address, or a new word"}),
+  S("My English isn't very good yet.",{he:"האנגלית שלי עוד לא כל כך טובה.",ar:"إنجليزيتي ليست جيدة بعد.",ru:"Мой английский пока не очень.",en:"State it plainly and move on."},
+    {he:"אומרים את זה פעם אחת בהתחלה, וזה מוריד לחץ מכולם",ar:"تُقال مرّة في البداية، فتخفّف التوتر عن الجميع",ru:"Сказать один раз в начале — и всем становится легче",en:"Say it once at the start and everyone relaxes"})
+ ],
+ [
+  S("I'm not sure I understand.",{he:"אני לא בטוח שהבנתי.",ar:"لست متأكدًا أنني فهمت.",ru:"Я не уверен, что понял.",en:"Softer than 'I don't understand'."},
+    {he:"רך יותר מ-I don't understand, ולכן קל יותר לומר",ar:"ألطف من I don't understand",ru:"Мягче, чем I don't understand",en:"Softer, and easier to say"}),
+  S("Do you mean the one on the left?",{he:"אתה מתכוון לזה שמשמאל?",ar:"تقصد الذي على اليسار؟",ru:"Вы имеете в виду тот, что слева?",en:"Check that you understood correctly."},
+    {he:"במקום לנחש — בודקים ומקבלים כן או לא",ar:"بدل التخمين — تتحقق فتحصل على نعم أو لا",ru:"Вместо догадки — проверить и получить да или нет",en:"Instead of guessing, check and get a yes or a no"}),
+  S("Let me think for a second.",{he:"תן לי לחשוב רגע.",ar:"دعني أفكّر لحظة.",ru:"Дайте мне секунду подумать.",en:"Buy yourself time politely."},
+    {he:"קונה זמן בלי שתיקה מביכה",ar:"يكسب وقتًا بلا صمت محرج",ru:"Выигрывает время без неловкой паузы",en:"Buys time without an awkward silence"}),
+  S("How do you say this in English?",{he:"איך אומרים את זה באנגלית?",ar:"كيف تقول هذا بالإنجليزية؟",ru:"Как это сказать по-английски?",en:"Ask for the word you are missing."},
+    {he:"מותר לשאול. זו לא הודאה בכישלון",ar:"يُسمح بالسؤال، وليس اعترافًا بالفشل",ru:"Спрашивать можно — это не признание поражения",en:"You are allowed to ask; it is not an admission of failure"}),
+  S("I'll get back to you on that.",{he:"אחזור אליך בעניין הזה.",ar:"سأعود إليك بخصوص ذلك.",ru:"Я вернусь к вам с этим.",en:"Delay an answer without refusing."},
+    {he:"כשאין לכם תשובה עכשיו ואתם לא רוצים לסרב",ar:"حين لا جواب لديك الآن ولا تريد الرفض",ru:"Когда ответа сейчас нет, а отказывать не хочется",en:"When you have no answer now and do not want to refuse"}),
+  S("Thanks, that's very kind of you.",{he:"תודה, זה ממש נחמד מצדך.",ar:"شكرًا، هذا لطف كبير منك.",ru:"Спасибо, это очень любезно.",en:"A warmer thank-you."},
+    {he:"תודה חמה יותר מ-thanks, כשמישהו באמת עזר",ar:"شكر أدفأ حين ساعدك أحدهم فعلًا",ru:"Теплее, чем thanks, когда вам правда помогли",en:"Warmer than thanks, when someone really helped"})
+ ],
+ [
+  S("I'd rather not, if that's all right.",{he:"אני מעדיף שלא, אם זה בסדר.",ar:"أفضّل ألّا أفعل، إن كان ذلك مقبولًا.",ru:"Я бы предпочёл не делать этого, если можно.",en:"A soft refusal."},
+    {he:"סירוב מנומס בלי להסביר ובלי להתנצל",ar:"رفض مهذّب بلا شرح ولا اعتذار",ru:"Вежливый отказ без объяснений и извинений",en:"A polite refusal with no explanation and no apology"}),
+  S("Just to make sure I've got this right —",{he:"רק כדי לוודא שהבנתי נכון —",ar:"فقط لأتأكّد أنني فهمت صحيحًا —",ru:"Просто чтобы убедиться, что я правильно понял —",en:"Open a summary of what was said."},
+    {he:"פותחים בזה כשחוזרים על מה שנאמר, וזה מונע חצי מהטעויות",ar:"تبدأ بها حين تلخّص ما قيل، فتمنع نصف الأخطاء",ru:"С этого начинают пересказ услышанного — половина ошибок отпадает",en:"Open with this when you repeat back what was said; half the mistakes disappear"}),
+  S("Would it be possible to...?",{he:"האם יהיה אפשרי ל...?",ar:"هل من الممكن أن...؟",ru:"Было бы возможно...?",en:"A very polite request."},
+    {he:"בקשה מאוד מנומסת, מתאימה למקום עבודה",ar:"طلب مهذّب جدًا، يناسب مكان العمل",ru:"Очень вежливая просьба, годится для работы",en:"Very polite; fits a workplace"}),
+  S("I see what you mean, but...",{he:"אני מבין למה אתה מתכוון, אבל...",ar:"أفهم ما تقصده، لكن...",ru:"Я понимаю, что вы имеете в виду, но...",en:"Disagree without a clash."},
+    {he:"לא מסכימים בלי לריב",ar:"تعارض بلا مشاجرة",ru:"Не согласиться, не ссорясь",en:"Disagreeing without a fight"}),
+  S("Sorry to interrupt, but could I add something?",{he:"סליחה שאני קוטע, אפשר להוסיף משהו?",ar:"عذرًا على المقاطعة، هل أضيف شيئًا؟",ru:"Простите, что перебиваю, можно добавить?",en:"Enter a conversation already running."},
+    {he:"נכנסים לשיחה שכבר רצה, בלי לחתוך",ar:"تدخل حوارًا جاريًا بلا قطع",ru:"Войти в идущий разговор, не обрывая его",en:"Joining a conversation already in motion"}),
+  S("That works for me.",{he:"זה מתאים לי.",ar:"هذا يناسبني.",ru:"Мне это подходит.",en:"Agree to a plan."},
+    {he:"מסכימים לתוכנית או לשעה, קצר ומקצועי",ar:"موافقة على خطة أو موعد، قصيرة ومهنية",ru:"Согласие на план или время — коротко и по-деловому",en:"Agreeing to a plan or a time — short and professional"})
+ ]
+]);
+
+topic("food","talk",
+  {he:"אוכל והזמנה",ar:"طعام وطلب",ru:"Еда и заказ",en:"Food and ordering"},
+  {he:"בית קפה, מסעדה, סופר — וגם איך אומרים שמשהו לא בסדר",
+   ar:"مقهى ومطعم وسوبرماركت — وكيف تقول إنّ شيئًا ليس على ما يرام",
+   ru:"Кафе, ресторан, магазин — и как сказать, что что-то не так",
+   en:"A café, a restaurant, a shop — and how to say something is wrong"},
+[
+ [
+  S("A coffee, please.",{he:"קפה, בבקשה.",ar:"قهوة من فضلك.",ru:"Кофе, пожалуйста.",en:"The shortest complete order."},
+    {he:"ההזמנה הקצרה ביותר שהיא עדיין מנומסת",ar:"أقصر طلب يظلّ مهذّبًا",ru:"Самый короткий заказ, который остаётся вежливым",en:"The shortest order that is still polite"}),
+  S("Could I have the menu, please?",{he:"אפשר לקבל תפריט בבקשה?",ar:"هل يمكنني الحصول على القائمة من فضلك؟",ru:"Можно меню, пожалуйста?",en:"Ask for the menu."},
+    {he:"Could I have הוא הפתיח שעובד כמעט לכל בקשה",ar:"Could I have افتتاحية تصلح لأي طلب تقريبًا",ru:"Could I have — начало почти для любой просьбы",en:"Could I have opens almost any request"}),
+  S("I'll have the same, please.",{he:"אני אקח את אותו הדבר, בבקשה.",ar:"سآخذ نفس الشيء من فضلك.",ru:"Мне то же самое, пожалуйста.",en:"Order what the other person ordered."},
+    {he:"פתרון מצוין כשלא הבנתם את התפריט",ar:"حلّ ممتاز حين لا تفهم القائمة",ru:"Отличный выход, когда меню непонятно",en:"An excellent way out when the menu defeated you"}),
+  S("Is this vegetarian?",{he:"זה צמחוני?",ar:"هل هذا نباتي؟",ru:"Это вегетарианское?",en:"Check what is in it."},
+    {he:"שאלה ישירה, וגם דרך לברר מה יש במנה",ar:"سؤال مباشر، وطريقة لمعرفة المكوّنات",ru:"Прямой вопрос и способ узнать состав",en:"A direct question, and a way to learn what is in it"}),
+  S("The bill, please.",{he:"את החשבון בבקשה.",ar:"الحساب من فضلك.",ru:"Счёт, пожалуйста.",en:"Ask to pay."},
+    {he:"בבריטניה bill, בארה\"ב check — שתיהן מובנות",ar:"في بريطانيا bill وفي أمريكا check — كلتاهما مفهومة",ru:"В Британии bill, в США check — понимают обе",en:"bill in Britain, check in America — both are understood"}),
+  S("No, thank you.",{he:"לא, תודה.",ar:"لا، شكرًا.",ru:"Нет, спасибо.",en:"A complete refusal."},
+    {he:"סירוב שלם. אין צורך להסביר למה",ar:"رفض كامل، بلا حاجة إلى تفسير",ru:"Полный отказ — объяснять не нужно",en:"A complete refusal — no reason needed"})
+ ],
+ [
+  S("Could we sit outside?",{he:"אפשר לשבת בחוץ?",ar:"هل يمكننا الجلوس في الخارج؟",ru:"Можно сесть на улице?",en:"Ask for a different table."},
+    {he:"מבקשים שולחן אחר לפני שיושבים, לא אחרי",ar:"تطلب طاولة أخرى قبل الجلوس لا بعده",ru:"Другой столик просят до того, как сели",en:"Ask for a different table before you sit, not after"}),
+  S("Does it come with a side?",{he:"זה מגיע עם תוספת?",ar:"هل يأتي مع طبق جانبي؟",ru:"К этому идёт гарнир?",en:"Ask what else is on the plate."},
+    {he:"מברר מה עוד בצלחת לפני שמזמינים עוד",ar:"يعرف ما في الطبق قبل طلب المزيد",ru:"Узнать, что ещё в тарелке, до нового заказа",en:"Find out what else is on the plate before ordering more"}),
+  S("I'm allergic to nuts.",{he:"יש לי אלרגיה לאגוזים.",ar:"لديّ حساسية من المكسّرات.",ru:"У меня аллергия на орехи.",en:"State an allergy clearly."},
+    {he:"אומרים את זה בקול ובבירור, לא כבקשה",ar:"تُقال بصوت واضح، لا كطلب",ru:"Говорят чётко и вслух — это не просьба",en:"Say it clearly and out loud; it is not a request"}),
+  S("Sorry, this isn't what I ordered.",{he:"סליחה, זה לא מה שהזמנתי.",ar:"عذرًا، هذا ليس ما طلبته.",ru:"Извините, это не то, что я заказывал.",en:"Report a mistake without anger."},
+    {he:"מתלוננים בלי לכעוס — Sorry בהתחלה עושה את כל העבודה",ar:"تشتكي بلا غضب — كلمة Sorry في البداية تكفي",ru:"Пожаловаться без злости — Sorry в начале делает всё",en:"Complain without anger — Sorry at the start does all the work"}),
+  S("Could I get that to go?",{he:"אפשר לארוז לקחת?",ar:"هل يمكن أخذه معي؟",ru:"Можно с собой?",en:"Ask for takeaway."},
+    {he:"to go באמריקה, takeaway בבריטניה",ar:"to go في أمريكا، takeaway في بريطانيا",ru:"to go в Америке, takeaway в Британии",en:"to go in America, takeaway in Britain"}),
+  S("Can we split the bill?",{he:"אפשר לחלק את החשבון?",ar:"هل يمكننا تقسيم الحساب؟",ru:"Можно разделить счёт?",en:"Ask to pay separately."},
+    {he:"שואלים לפני שהחשבון מגיע, לא אחרי",ar:"يُسأل قبل وصول الحساب لا بعده",ru:"Спрашивают до того, как принесли счёт",en:"Ask before the bill arrives, not after"})
+ ],
+ [
+  S("What would you recommend?",{he:"מה היית ממליץ?",ar:"بماذا توصي؟",ru:"Что вы посоветуете?",en:"Hand the choice to the waiter."},
+    {he:"מוסרים את הבחירה למלצר — כמעט תמיד עובד לטובתכם",ar:"تترك الاختيار للنادل — وغالبًا في مصلحتك",ru:"Отдать выбор официанту — почти всегда в вашу пользу",en:"Hand the choice to the waiter — it almost always works in your favour"}),
+  S("Is service included?",{he:"האם השירות כלול?",ar:"هل الخدمة مشمولة؟",ru:"Обслуживание включено?",en:"Ask about the tip."},
+    {he:"שאלת הטיפ, בלי לשאול על טיפ",ar:"سؤال البقشيش دون ذكر البقشيش",ru:"Вопрос о чаевых, не называя их",en:"The tip question, without saying tip"}),
+  S("I'd like it well done, please.",{he:"אני רוצה את זה עשוי היטב, בבקשה.",ar:"أريده مطهوًّا جيدًا من فضلك.",ru:"Хорошо прожаренный, пожалуйста.",en:"Specify how meat is cooked."},
+    {he:"rare · medium · well done — שלוש דרגות, וזו האחרונה",ar:"rare وmedium وwell done — ثلاث درجات وهذه الأخيرة",ru:"rare, medium, well done — три степени, эта последняя",en:"rare, medium, well done — three levels, this is the last"}),
+  S("Could you make it a bit less spicy?",{he:"אפשר לעשות את זה קצת פחות חריף?",ar:"هل يمكن جعله أقلّ حرارة قليلًا؟",ru:"Можно чуть менее острым?",en:"Ask for a change to the dish."},
+    {he:"a bit הופך בקשה לדרישה לבקשה",ar:"a bit تحوّل المطلب إلى طلب",ru:"a bit превращает требование в просьбу",en:"a bit turns a demand into a request"}),
+  S("We're not quite ready to order yet.",{he:"עוד לא ממש מוכנים להזמין.",ar:"لسنا مستعدّين للطلب بعد.",ru:"Мы ещё не готовы заказать.",en:"Ask for more time."},
+    {he:"קונים עוד דקה בלי להתנצל",ar:"تكسب دقيقة أخرى بلا اعتذار",ru:"Выиграть ещё минуту без извинений",en:"Buy another minute without apologising"}),
+  S("That was lovely, thank you.",{he:"זה היה נהדר, תודה.",ar:"كان رائعًا، شكرًا.",ru:"Было прекрасно, спасибо.",en:"Praise at the end of a meal."},
+    {he:"מחמאה בסוף ארוחה — קצרה ומספיקה",ar:"مجاملة في نهاية الوجبة — قصيرة وكافية",ru:"Похвала в конце обеда — короткая и достаточная",en:"A compliment at the end of a meal — short and enough"})
+ ]
+]);
+
+topic("shop","talk",
+  {he:"קניות וכסף",ar:"تسوّق ومال",ru:"Покупки и деньги",en:"Shopping and money"},
+  {he:"מחיר, מידה, החזרה — והמשפטים שמונעים לשלם יותר מדי",
+   ar:"سعر ومقاس وإرجاع — والجمل التي تمنعك من دفع الزائد",
+   ru:"Цена, размер, возврат — и фразы, которые не дают переплатить",
+   en:"Price, size, returns — and the lines that stop you overpaying"},
+[
+ [
+  S("How much is this?",{he:"כמה זה עולה?",ar:"بكم هذا؟",ru:"Сколько это стоит?",en:"Ask the price."},
+    {he:"השאלה הבסיסית. תמיד this ולא it, כשמצביעים",ar:"السؤال الأساسي: this لا it حين تشير",ru:"Базовый вопрос: this, а не it, когда указываешь",en:"The basic question — this, not it, when you point"}),
+  S("Do you have this in a larger size?",{he:"יש את זה במידה גדולה יותר?",ar:"هل لديكم مقاس أكبر من هذا؟",ru:"У вас есть это большего размера?",en:"Ask for another size."},
+    {he:"larger ולא bigger כשמדובר במידות בגדים",ar:"larger لا bigger حين نتحدّث عن مقاسات الملابس",ru:"larger, а не bigger, когда речь об одежде",en:"larger, not bigger, when it is clothing sizes"}),
+  S("Can I try it on?",{he:"אפשר למדוד?",ar:"هل يمكنني قياسه؟",ru:"Можно померить?",en:"Ask to try clothing."},
+    {he:"try on הוא לבגדים בלבד. try alone זה לטעום",ar:"try on للملابس فقط، وtry وحدها للتذوّق",ru:"try on — только про одежду; try — попробовать на вкус",en:"try on is for clothes only; try alone is to taste"}),
+  S("I'm just looking, thanks.",{he:"אני רק מסתכל, תודה.",ar:"أتفرّج فقط، شكرًا.",ru:"Я просто смотрю, спасибо.",en:"Decline help politely."},
+    {he:"התשובה המנומסת ל-Can I help you? כשלא רוצים עזרה",ar:"الردّ المهذّب على Can I help you? حين لا تريد مساعدة",ru:"Вежливый ответ на Can I help you?, если помощь не нужна",en:"The polite answer to Can I help you? when you want none"}),
+  S("Do you take cards?",{he:"מקבלים כרטיסים?",ar:"هل تقبلون البطاقات؟",ru:"Вы принимаете карты?",en:"Ask about payment."},
+    {he:"שואלים לפני שעומדים בתור, לא בקופה",ar:"يُسأل قبل الوقوف في الطابور لا عند الصندوق",ru:"Спрашивают до очереди, а не на кассе",en:"Ask before you join the queue, not at the till"}),
+  S("Could I have a receipt, please?",{he:"אפשר לקבל קבלה בבקשה?",ar:"هل يمكنني الحصول على إيصال؟",ru:"Можно чек, пожалуйста?",en:"Ask for the receipt."},
+    {he:"בלי קבלה אין החזרה. תמיד לבקש",ar:"بلا إيصال لا إرجاع. اطلبه دائمًا",ru:"Без чека нет возврата. Просите всегда",en:"No receipt, no return. Always ask"})
+ ],
+ [
+  S("Is this on sale?",{he:"זה במבצע?",ar:"هل هذا بتخفيض؟",ru:"Это со скидкой?",en:"Check for a discount."},
+    {he:"on sale זה במבצע. for sale זה למכירה — הבדל יקר",ar:"on sale بتخفيض، وfor sale للبيع — فرق مكلف",ru:"on sale — со скидкой; for sale — продаётся. Разница дорогая",en:"on sale is discounted; for sale means simply available — an expensive difference"}),
+  S("I'd like to return this, please.",{he:"אני רוצה להחזיר את זה, בבקשה.",ar:"أريد إرجاع هذا من فضلك.",ru:"Я хотел бы вернуть это.",en:"Start a return."},
+    {he:"פותחים ככה, ורק אחר כך מסבירים למה",ar:"تبدأ هكذا ثم تشرح السبب",ru:"Начинают с этого, а причину — потом",en:"Open with this, explain why afterwards"}),
+  S("It doesn't fit.",{he:"זה לא מתאים במידה.",ar:"المقاس لا يناسبني.",ru:"Не подходит по размеру.",en:"The size is wrong."},
+    {he:"על מידה. אם זה לא מוצא חן — I don't like it",ar:"عن المقاس. أمّا الذوق فـI don't like it",ru:"О размере. Если не нравится — I don't like it",en:"About size. If you dislike it, that is I don't like it"}),
+  S("Could you keep it for me until tomorrow?",{he:"אפשר לשמור לי את זה עד מחר?",ar:"هل يمكنك حفظه لي حتى الغد؟",ru:"Можете отложить до завтра?",en:"Ask them to hold an item."},
+    {he:"מבקשים שמירה כשחוזרים עם כסף או עם דעה",ar:"تطلب الحفظ حين تعود بالمال أو بالقرار",ru:"Просят отложить, когда вернутся с деньгами или решением",en:"Ask them to hold it when you will come back with money, or a decision"}),
+  S("That's a bit more than I wanted to spend.",{he:"זה קצת יותר ממה שתכננתי להוציא.",ar:"هذا أكثر قليلًا مما أردت إنفاقه.",ru:"Это немного больше, чем я планировал потратить.",en:"Say no to a price, politely."},
+    {he:"מסרבים למחיר בלי לומר יקר מדי",ar:"ترفض السعر دون قول \"غالٍ جدًا\"",ru:"Отказать цене, не говоря «дорого»",en:"Refuse a price without saying too expensive"}),
+  S("Is there a warranty?",{he:"יש אחריות?",ar:"هل هناك ضمان؟",ru:"Есть гарантия?",en:"Ask about the guarantee."},
+    {he:"לחשמל ולמכשירים. שואלים לפני התשלום",ar:"للأجهزة. يُسأل قبل الدفع",ru:"Для техники. Спрашивают до оплаты",en:"For appliances. Ask before you pay"})
+ ],
+ [
+  S("Would you be able to do anything on the price?",{he:"אפשר לעשות משהו עם המחיר?",ar:"هل يمكن فعل شيء بشأن السعر؟",ru:"Можно что-то сделать с ценой?",en:"Open a negotiation gently."},
+    {he:"מיקוח מנומס. לא שואלים \"תוריד?\" אלא \"אפשר?\"",ar:"مساومة مهذّبة: لا \"خفّض\" بل \"هل يمكن\"",ru:"Вежливый торг: не «скиньте», а «можно ли»",en:"A polite haggle: not lower it, but is it possible"}),
+  S("I'll think about it and come back.",{he:"אחשוב על זה ואחזור.",ar:"سأفكّر وأعود.",ru:"Я подумаю и вернусь.",en:"Leave without buying."},
+    {he:"יוצאים בלי לקנות ובלי להתנצל",ar:"تخرج دون شراء ودون اعتذار",ru:"Уйти без покупки и без извинений",en:"Leave without buying and without apologising"}),
+  S("Could you hold on to that for a moment?",{he:"אפשר להחזיק את זה רגע?",ar:"هل يمكنك إمساك هذا لحظة؟",ru:"Подержите это минутку?",en:"Ask them to wait with an item."},
+    {he:"hold on to — להחזיק. hold on — לחכות. שתי משמעויות",ar:"hold on to يمسك، وhold on ينتظر",ru:"hold on to — держать; hold on — подождать",en:"hold on to is to hold; hold on is to wait"}),
+  S("Does that include VAT?",{he:"זה כולל מע\"מ?",ar:"هل يشمل ذلك الضريبة؟",ru:"Это с НДС?",en:"Check whether tax is in the price."},
+    {he:"במקומות מסוימים המחיר המוצג אינו הסופי",ar:"في أماكن، السعر المعروض ليس النهائي",ru:"Кое-где указанная цена — не окончательная",en:"In some places the price on the label is not the final one"}),
+  S("It stopped working after a week.",{he:"זה הפסיק לעבוד אחרי שבוע.",ar:"توقّف عن العمل بعد أسبوع.",ru:"Перестало работать через неделю.",en:"Report a fault with a time."},
+    {he:"עובדה עם תאריך. זה מה שמזיז תלונה",ar:"حقيقة مع تاريخ — هذا ما يحرّك الشكوى",ru:"Факт с датой — именно это двигает жалобу",en:"A fact with a date — that is what moves a complaint"}),
+  S("Could I speak to the manager, please?",{he:"אפשר לדבר עם המנהל בבקשה?",ar:"هل يمكنني التحدّث مع المدير؟",ru:"Можно поговорить с менеджером?",en:"Escalate calmly."},
+    {he:"מסלימים בשקט. הצעקה מורידה את הסיכוי",ar:"تصعّد بهدوء — الصراخ يقلّل الفرصة",ru:"Обостряют спокойно: крик снижает шансы",en:"Escalate quietly — shouting lowers your chances"})
+ ]
+]);
+
+topic("way","talk",
+  {he:"כיוונים ותחבורה",ar:"اتجاهات ومواصلات",ru:"Дорога и транспорт",en:"Directions and transport"},
+  {he:"לשאול את הדרך, ובעיקר — להבין את התשובה",
+   ar:"أن تسأل عن الطريق، والأهم أن تفهم الجواب",
+   ru:"Спросить дорогу и, главное, понять ответ",
+   en:"Asking the way, and above all understanding the answer"},
+[
+ [
+  S("Excuse me, how do I get to the station?",{he:"סליחה, איך מגיעים לתחנה?",ar:"عذرًا، كيف أصل إلى المحطة؟",ru:"Извините, как добраться до вокзала?",en:"Ask for the way."},
+    {he:"Excuse me פותח, ואז שאלה אחת בלבד",ar:"Excuse me تفتح، ثم سؤال واحد فقط",ru:"Excuse me открывает, дальше — один вопрос",en:"Excuse me opens it, then just one question"}),
+  S("Is it far from here?",{he:"זה רחוק מכאן?",ar:"هل هو بعيد من هنا؟",ru:"Это далеко отсюда?",en:"Ask about distance."},
+    {he:"שאלה שנייה שחשובה כמו הראשונה",ar:"سؤال ثانٍ لا يقلّ أهمية عن الأول",ru:"Второй вопрос не менее важен, чем первый",en:"A second question that matters as much as the first"}),
+  S("Turn left at the traffic lights.",{he:"פנה שמאלה ברמזור.",ar:"انعطف يسارًا عند الإشارة.",ru:"Поверните налево на светофоре.",en:"A direction you will hear."},
+    {he:"זו תשובה שתשמעו, לא שתגידו. חשוב לזהות אותה",ar:"جواب ستسمعه لا تقوله — المهم أن تميّزه",ru:"Это ответ, который вы услышите, а не скажете",en:"This is an answer you will hear, not say — the point is to recognise it"}),
+  S("It's on your right.",{he:"זה מימין שלך.",ar:"إنّه على يمينك.",ru:"Это справа от вас.",en:"Another answer you will hear."},
+    {he:"on your right ולא in your right",ar:"on your right لا in your right",ru:"on your right, а не in your right",en:"on your right, never in your right"}),
+  S("Which platform is it?",{he:"מאיזה רציף?",ar:"أيّ رصيف؟",ru:"С какой платформы?",en:"Ask at a station."},
+    {he:"ברכבת: platform. באוטובוס: stop",ar:"في القطار platform وفي الحافلة stop",ru:"На поезде platform, на автобусе stop",en:"On a train it is a platform; on a bus, a stop"}),
+  S("Does this bus go to the city centre?",{he:"האוטובוס הזה נוסע למרכז העיר?",ar:"هل تذهب هذه الحافلة إلى وسط المدينة؟",ru:"Этот автобус идёт в центр?",en:"Check the route before boarding."},
+    {he:"שואלים לפני שעולים, ליד הדלת",ar:"يُسأل قبل الصعود عند الباب",ru:"Спрашивают до посадки, у двери",en:"Ask before you board, at the door"})
+ ],
+ [
+  S("Could you show me on the map?",{he:"אפשר להראות לי במפה?",ar:"هل يمكنك أن تريني على الخريطة؟",ru:"Покажете на карте?",en:"Turn words into a picture."},
+    {he:"המשפט שמציל כשההסבר בעל פה ארוך מדי",ar:"الجملة التي تنقذك حين يطول الشرح الشفوي",ru:"Фраза, которая спасает, когда объяснение слишком длинное",en:"The line that saves you when the spoken explanation runs long"}),
+  S("How long does it take?",{he:"כמה זמן זה לוקח?",ar:"كم يستغرق ذلك؟",ru:"Сколько это займёт?",en:"Ask about duration."},
+    {he:"take לזמן. last למשך אירוע",ar:"take للوقت، وlast لمدّة حدث",ru:"take — про время в пути; last — про длительность события",en:"take for a journey; last for how long an event runs"}),
+  S("Where do I change?",{he:"איפה מחליפים?",ar:"أين أبدّل؟",ru:"Где пересадка?",en:"Ask about a connection."},
+    {he:"change הוא גם להחליף קו וגם עודף. ההקשר מכריע",ar:"change تعني تبديل الخط وأيضًا الفكّة — السياق يحسم",ru:"change — и пересадка, и сдача. Решает контекст",en:"change is both a connection and small money; context decides"}),
+  S("I think I'm lost.",{he:"נראה לי שאני אבוד.",ar:"أظنّني تهت.",ru:"Кажется, я заблудился.",en:"Say you are lost."},
+    {he:"I think מרכך. גם כשאתם בטוחים",ar:"I think تُلطّف حتى حين تكون متأكدًا",ru:"I think смягчает, даже если вы уверены",en:"I think softens it, even when you are certain"}),
+  S("Is there a later train?",{he:"יש רכבת מאוחרת יותר?",ar:"هل هناك قطار لاحق؟",ru:"Есть более поздний поезд?",en:"Ask about the next one."},
+    {he:"later ולא late — late זו רכבת שאיחרה",ar:"later لا late — فlate تعني قطارًا متأخرًا",ru:"later, а не late: late — поезд, который опоздал",en:"later, not late — a late train is one that is behind schedule"}),
+  S("I'd like a return ticket, please.",{he:"כרטיס הלוך ושוב, בבקשה.",ar:"تذكرة ذهاب وإياب من فضلك.",ru:"Билет туда и обратно, пожалуйста.",en:"Buy a two-way ticket."},
+    {he:"return בבריטניה, round trip באמריקה",ar:"return في بريطانيا وround trip في أمريكا",ru:"return в Британии, round trip в Америке",en:"return in Britain, round trip in America"})
+ ],
+ [
+  S("Am I heading in the right direction?",{he:"אני הולך בכיוון הנכון?",ar:"هل أسير في الاتجاه الصحيح؟",ru:"Я иду в правильном направлении?",en:"Check mid-journey."},
+    {he:"בודקים באמצע הדרך, לא רק בהתחלה",ar:"تتحقّق في منتصف الطريق لا في بدايتها فقط",ru:"Проверяют по дороге, а не только в начале",en:"Check on the way, not only at the start"}),
+  S("Would it be quicker to walk?",{he:"יהיה מהיר יותר ללכת ברגל?",ar:"هل المشي أسرع؟",ru:"Пешком будет быстрее?",en:"Compare two options."},
+    {he:"משווים שתי אפשרויות בשאלה אחת",ar:"تقارن خيارين في سؤال واحد",ru:"Сравнить два варианта одним вопросом",en:"Compare two options in a single question"}),
+  S("The train has been delayed.",{he:"הרכבת התעכבה.",ar:"تأخّر القطار.",ru:"Поезд задерживается.",en:"An announcement you will hear."},
+    {he:"הכרזה שתשמעו. delayed מתעכבת, cancelled בוטלה",ar:"إعلان ستسمعه: delayed تأخّر وcancelled أُلغي",ru:"Объявление: delayed — задержан, cancelled — отменён",en:"An announcement: delayed is late, cancelled is not coming"}),
+  S("Does this fare cover the whole journey?",{he:"התעריף הזה מכסה את כל הנסיעה?",ar:"هل تغطي هذه الأجرة الرحلة كاملة؟",ru:"Этот тариф покрывает всю поездку?",en:"Check the ticket covers everything."},
+    {he:"fare הוא מחיר נסיעה. price הוא כל דבר אחר",ar:"fare أجرة السفر، وprice لكل شيء آخر",ru:"fare — плата за проезд; price — всё остальное",en:"fare is the price of travel; price is everything else"}),
+  S("Could you drop me off at the corner?",{he:"אפשר להוריד אותי בפינה?",ar:"هل يمكنك إنزالي عند الزاوية؟",ru:"Высадите меня на углу?",en:"Tell a driver where to stop."},
+    {he:"drop off להוריד נוסע. pick up לאסוף",ar:"drop off إنزال الراكب، وpick up أخذه",ru:"drop off — высадить; pick up — забрать",en:"drop off is to let someone out; pick up is to collect them"}),
+  S("I must have taken the wrong exit.",{he:"כנראה יצאתי ביציאה הלא נכונה.",ar:"لا بدّ أنني أخذت المخرج الخطأ.",ru:"Похоже, я свернул не на том выезде.",en:"A guess about a past mistake."},
+    {he:"must have — ניחוש על משהו שכבר קרה",ar:"must have — تخمين عن أمر وقع",ru:"must have — догадка о том, что уже случилось",en:"must have is a guess about something already done"})
+ ]
+]);
+
+topic("work","talk",
+  {he:"עבודה ובריאות",ar:"عمل وصحّة",ru:"Работа и здоровье",en:"Work and health"},
+  {he:"ראיון, יום עבודה ומרפאה — המקומות שבהם מילה חסרה עולה ביוקר",
+   ar:"مقابلة ويوم عمل وعيادة — حيث تكلّف الكلمة الناقصة كثيرًا",
+   ru:"Собеседование, рабочий день и приём у врача — там, где нехватка слова дорого стоит",
+   en:"An interview, a working day and a clinic — where a missing word costs the most"},
+[
+ [
+  S("I'm looking for work.",{he:"אני מחפש עבודה.",ar:"أبحث عن عمل.",ru:"Я ищу работу.",en:"State that you are job hunting."},
+    {he:"work בלי a. a job עם a. שתי צורות נכונות",ar:"work بلا a، وa job مع a — الصيغتان صحيحتان",ru:"work без артикля, a job — с ним. Обе верны",en:"work takes no article; a job takes one. Both are right"}),
+  S("I have five years of experience.",{he:"יש לי חמש שנות ניסיון.",ar:"لديّ خمس سنوات خبرة.",ru:"У меня пять лет опыта.",en:"State experience."},
+    {he:"experience בלי s כשמדובר בניסיון מקצועי",ar:"experience بلا s حين تعني الخبرة المهنية",ru:"experience без s, когда это профессиональный опыт",en:"experience takes no s when it means professional background"}),
+  S("When can I start?",{he:"מתי אפשר להתחיל?",ar:"متى يمكنني البدء؟",ru:"Когда я могу начать?",en:"Ask about the start date."},
+    {he:"שאלה שמסמנת רצינות, בסוף ראיון",ar:"سؤال يدلّ على الجدّية في نهاية المقابلة",ru:"Вопрос, показывающий серьёзность, в конце собеседования",en:"A question that signals you are serious, at the end of an interview"}),
+  S("I don't feel well.",{he:"אני לא מרגיש טוב.",ar:"لا أشعر أنني بخير.",ru:"Я плохо себя чувствую.",en:"Say you are unwell."},
+    {he:"well ולא good. I don't feel good אומר משהו אחר",ar:"well لا good — فI don't feel good تعني شيئًا آخر",ru:"well, а не good: I don't feel good значит другое",en:"well, not good — I don't feel good says something else"}),
+  S("I have a headache.",{he:"יש לי כאב ראש.",ar:"عندي صداع.",ru:"У меня болит голова.",en:"Name a symptom."},
+    {he:"have לכאב. am לתחושה: I am tired",ar:"have للألم، وam للشعور: I am tired",ru:"have — про боль; am — про состояние: I am tired",en:"have for a pain; am for a state: I am tired"}),
+  S("Where does it hurt?",{he:"איפה כואב?",ar:"أين يؤلم؟",ru:"Где болит?",en:"A question the doctor asks."},
+    {he:"שאלה שהרופא שואל. חשוב לזהות ולא לומר",ar:"سؤال يطرحه الطبيب — يهمّ أن تميّزه لا أن تقوله",ru:"Этот вопрос задаёт врач — важно узнать, а не сказать",en:"The doctor asks this — the point is to recognise it, not to say it"})
+ ],
+ [
+  S("Could I book an appointment?",{he:"אפשר לקבוע תור?",ar:"هل يمكنني حجز موعد؟",ru:"Можно записаться на приём?",en:"Book a slot."},
+    {he:"appointment לרופא ולפגישה. queue הוא תור פיזי",ar:"appointment للموعد، وqueue للطابور",ru:"appointment — запись; queue — живая очередь",en:"appointment is a booked slot; queue is a line of people"}),
+  S("It's been hurting for three days.",{he:"זה כואב כבר שלושה ימים.",ar:"يؤلمني منذ ثلاثة أيام.",ru:"Болит уже три дня.",en:"Give the duration of a symptom."},
+    {he:"for למשך זמן. since לנקודת התחלה",ar:"for للمدّة، وsince لنقطة البداية",ru:"for — длительность; since — момент начала",en:"for is a length of time; since is a starting point"}),
+  S("Am I allowed to drive after this?",{he:"מותר לי לנהוג אחרי זה?",ar:"هل يُسمح لي بالقيادة بعد هذا؟",ru:"Мне можно вести машину после этого?",en:"Ask about a restriction."},
+    {he:"allowed to — מותר. able to — מסוגל. לא אותו דבר",ar:"allowed to مسموح، وable to قادر — ليسا سواء",ru:"allowed to — разрешено; able to — способен. Не одно и то же",en:"allowed to is permitted; able to is capable — not the same"}),
+  S("I'd like to take a day off.",{he:"אני רוצה לקחת יום חופש.",ar:"أودّ أخذ يوم إجازة.",ru:"Я хотел бы взять выходной.",en:"Ask for a day of leave."},
+    {he:"a day off יום חופש. a holiday חופשה ארוכה",ar:"a day off يوم واحد، وa holiday إجازة طويلة",ru:"a day off — один день; a holiday — длинный отпуск",en:"a day off is one day; a holiday is a longer break"}),
+  S("Could you go over that once more?",{he:"אפשר לעבור על זה עוד פעם?",ar:"هل يمكنك مراجعة ذلك مرّة أخرى؟",ru:"Пройдёмся по этому ещё раз?",en:"Ask for a repeat at work."},
+    {he:"go over לעבור על. get over להתגבר. שתי מילים קטנות, משמעות רחוקה",ar:"go over مراجعة، وget over تجاوز — كلمتان صغيرتان بمعنى بعيد",ru:"go over — пройтись по; get over — пережить",en:"go over is to review; get over is to recover from"}),
+  S("I'll have it ready by Thursday.",{he:"זה יהיה מוכן עד יום חמישי.",ar:"سيكون جاهزًا بحلول الخميس.",ru:"Будет готово к четвергу.",en:"Commit to a deadline."},
+    {he:"by עד לא יאוחר מ־. until עד ובכל הזמן שלפני",ar:"by بحلول، وuntil حتى وطوال ما قبلها",ru:"by — не позже; until — всё время до",en:"by is not later than; until is all the time up to"})
+ ],
+ [
+  S("I'd rather we agreed on that in writing.",{he:"אני מעדיף שנסכם על זה בכתב.",ar:"أفضّل أن نتّفق على ذلك كتابةً.",ru:"Я бы предпочёл зафиксировать это письменно.",en:"Ask for a written agreement."},
+    {he:"בקשה נחרצת שנשמעת רכה. שימושית מאוד",ar:"طلب حازم بصياغة لطيفة — مفيد جدًا",ru:"Твёрдая просьба в мягкой форме — очень полезно",en:"A firm request that sounds soft — very useful"}),
+  S("That's outside my area, but I can point you to someone.",{he:"זה מחוץ לתחום שלי, אבל אני יכול להפנות אותך.",ar:"هذا خارج مجالي، لكن يمكنني إرشادك إلى شخص.",ru:"Это не моя область, но я подскажу, к кому обратиться.",en:"Decline and redirect."},
+    {he:"מסרבים ומועילים באותו משפט",ar:"ترفض وتفيد في الجملة نفسها",ru:"Отказать и помочь одной фразой",en:"Refuse and help in the same sentence"}),
+  S("Could we push the meeting back an hour?",{he:"אפשר לדחות את הפגישה בשעה?",ar:"هل نؤجّل الاجتماع ساعة؟",ru:"Можно сдвинуть встречу на час?",en:"Move a meeting later."},
+    {he:"push back לדחות. bring forward להקדים",ar:"push back تأجيل، وbring forward تقديم",ru:"push back — отложить; bring forward — перенести раньше",en:"push back is later; bring forward is earlier"}),
+  S("I've been off sick since Monday.",{he:"אני בחופשת מחלה מיום שני.",ar:"أنا في إجازة مرضية منذ الاثنين.",ru:"Я на больничном с понедельника.",en:"Report sick leave."},
+    {he:"off sick באנגלית בריטית. out sick באמריקאית",ar:"off sick بريطانية، وout sick أمريكية",ru:"off sick — британское; out sick — американское",en:"off sick is British; out sick is American"}),
+  S("Is there anything I should watch out for?",{he:"יש משהו שכדאי לי לשים לב אליו?",ar:"هل هناك ما ينبغي أن أنتبه له؟",ru:"На что мне стоит обратить внимание?",en:"Ask a doctor about warning signs."},
+    {he:"שאלה שרופא מעריך: מה סימני האזהרה",ar:"سؤال يقدّره الطبيب: ما علامات التحذير",ru:"Врачи ценят этот вопрос: какие тревожные признаки",en:"A question doctors value: what are the warning signs"}),
+  S("I appreciate you letting me know.",{he:"אני מעריך שהודעת לי.",ar:"أقدّر إعلامك لي.",ru:"Спасибо, что сообщили.",en:"Thank someone for information."},
+    {he:"תודה מקצועית על מידע, גם כשהמידע רע",ar:"شكر مهني على معلومة حتى لو كانت سيئة",ru:"Профессиональная благодарность за информацию, даже плохую",en:"A professional thank-you for information, even bad information"})
+ ]
+]);
+
+/* ---------- מסלול 4: אנגלית ספרותית ----------
+   כאן שפת האם נסוגה כמעט לגמרי. הקטעים קצרים בכוונה: פסקה שאפשר
+   לסיים היא פסקה שיקראו, ופסקה ארוכה מדי היא ההוכחה הבאה של
+   הקורא לעצמו שהוא לא מסוגל. */
+topic("tense","read",
+  {he:"זמנים בסיפור",ar:"الأزمنة في السرد",ru:"Времена в рассказе",en:"Tense in a story"},
+  {he:"מה קרה, מה היה קורה, ומה כבר קרה לפני זה",
+   ar:"ما حدث، وما كان سيحدث، وما حدث قبل ذلك",
+   ru:"Что случилось, что случилось бы и что произошло до этого",
+   en:"What happened, what would have, and what had already"},
+[
+ [
+  S("She walked home in the rain.",{he:"היא הלכה הביתה בגשם.",ar:"مشت إلى البيت تحت المطر.",ru:"Она шла домой под дождём.",en:"Simple past: it happened and it ended."},
+    {he:"עבר פשוט — קרה ונגמר",ar:"ماضٍ بسيط — حدث وانتهى",ru:"Простое прошедшее — случилось и закончилось",en:"Simple past — it happened and it is over"}),
+  S("It was raining when she left.",{he:"ירד גשם כשהיא יצאה.",ar:"كانت تمطر عندما غادرت.",ru:"Шёл дождь, когда она ушла.",en:"Past continuous as a background."},
+    {he:"רקע מתמשך שקורה סביב אירוע קצר",ar:"خلفية مستمرة حول حدث قصير",ru:"Длящийся фон вокруг короткого события",en:"A continuing background around a short event"}),
+  S("He has lived here for ten years.",{he:"הוא גר כאן כבר עשר שנים.",ar:"يعيش هنا منذ عشر سنوات.",ru:"Он живёт здесь уже десять лет.",en:"Present perfect: it started before and is still true."},
+    {he:"התחיל בעבר וממשיך עכשיו — לכן לא past פשוט",ar:"بدأ في الماضي ويستمرّ الآن، لذا ليس ماضيًا بسيطًا",ru:"Началось в прошлом и длится — потому не простое прошедшее",en:"It began in the past and still holds — so not the simple past"}),
+  S("They had already gone when I arrived.",{he:"הם כבר הלכו כשהגעתי.",ar:"كانوا قد ذهبوا حين وصلت.",ru:"Они уже ушли, когда я пришёл.",en:"Past perfect: earlier than another past."},
+    {he:"מוקדם יותר מעבר אחר. שני אירועים, סדר ברור",ar:"أسبق من ماضٍ آخر: حدثان بترتيب واضح",ru:"Раньше другого прошедшего: два события, ясный порядок",en:"Earlier than another past — two events, a clear order"}),
+  S("I will call you tomorrow.",{he:"אתקשר אליך מחר.",ar:"سأتّصل بك غدًا.",ru:"Я позвоню тебе завтра.",en:"A decision about the future."},
+    {he:"החלטה על העתיד",ar:"قرار بشأن المستقبل",ru:"Решение о будущем",en:"A decision about the future"}),
+  S("I'm meeting her at six.",{he:"אני נפגש איתה בשש.",ar:"سألتقي بها في السادسة.",ru:"Я встречаюсь с ней в шесть.",en:"A fixed arrangement, in present form."},
+    {he:"סידור קבוע. באנגלית העתיד הזה נאמר בהווה",ar:"ترتيب ثابت: هذا المستقبل يُقال بصيغة الحاضر",ru:"Договорённость: это будущее говорят настоящим",en:"An arrangement — English says this future in the present"})
+ ],
+ [
+  S("If it rains, we'll stay in.",{he:"אם ירד גשם, נישאר בבית.",ar:"إن أمطرت، سنبقى في البيت.",ru:"Если пойдёт дождь, останемся дома.",en:"A real condition about the future."},
+    {he:"תנאי אמיתי. שימו לב: if + הווה, ואז will",ar:"شرط حقيقي: if مع الحاضر ثم will",ru:"Реальное условие: if + настоящее, затем will",en:"A real condition: if plus the present, then will"}),
+  S("If I had time, I would help.",{he:"אם היה לי זמן, הייתי עוזר.",ar:"لو كان لديّ وقت، لساعدت.",ru:"Если бы у меня было время, я бы помог.",en:"An unreal present condition."},
+    {he:"תנאי לא אמיתי בהווה — אין לי זמן",ar:"شرط غير واقعي في الحاضر — لا وقت لديّ",ru:"Нереальное условие в настоящем — времени нет",en:"An unreal present condition — I do not have time"}),
+  S("If I had known, I would have come.",{he:"אם הייתי יודע, הייתי בא.",ar:"لو كنت أعلم، لجئت.",ru:"Если бы я знал, я бы пришёл.",en:"An unreal past — regret."},
+    {he:"עבר שלא קרה. זה משפט של חרטה",ar:"ماضٍ لم يقع — جملة ندم",ru:"Прошлое, которого не было — фраза сожаления",en:"A past that did not happen — a sentence of regret"}),
+  S("She used to work nights.",{he:"היא נהגה לעבוד בלילות.",ar:"كانت تعمل ليلًا في السابق.",ru:"Раньше она работала по ночам.",en:"A past habit that has ended."},
+    {he:"הרגל בעבר שנפסק. אחרי used to תמיד שם פועל",ar:"عادة ماضية انتهت. بعد used to مصدر دائمًا",ru:"Привычка в прошлом, которая прекратилась",en:"A past habit that stopped — used to is always followed by the plain verb"}),
+  S("The letter was written by hand.",{he:"המכתב נכתב בכתב יד.",ar:"كُتِبَ الخطاب بخطّ اليد.",ru:"Письмо было написано от руки.",en:"Passive: the doer does not matter."},
+    {he:"סביל. כשלא חשוב מי עשה, או שלא יודעים",ar:"مبني للمجهول: حين لا يهمّ الفاعل أو لا يُعرف",ru:"Пассив: когда исполнитель неважен или неизвестен",en:"Passive — when who did it does not matter, or is unknown"}),
+  S("He said he was tired.",{he:"הוא אמר שהוא עייף.",ar:"قال إنّه متعب.",ru:"Он сказал, что устал.",en:"Reported speech steps one tense back."},
+    {he:"דיווח על דיבור מזיז את הזמן צעד אחורה",ar:"الكلام المنقول يُرجع الزمن خطوة",ru:"Косвенная речь сдвигает время на шаг назад",en:"Reported speech moves the tense one step back"})
+ ],
+ [
+  P(["The house had been empty for years.",
+     "Nobody in the village could say who owned it.",
+     "One winter a light appeared in an upstairs window,",
+     "and the next morning the gate stood open."],
+    [{w:"empty",g:{he:"ריק",ar:"فارغ",ru:"пустой",en:"with nobody in it"}},
+     {w:"owned",g:{he:"היה בבעלותו",ar:"يملك",ru:"владел",en:"had it as property"}},
+     {w:"appeared",g:{he:"הופיע",ar:"ظهر",ru:"появился",en:"came into sight"}},
+     {w:"gate",g:{he:"שער",ar:"بوابة",ru:"ворота",en:"a door in a fence"}}],
+    [Q({he:"כמה זמן הבית עמד ריק?",ar:"كم بقي البيت فارغًا؟",ru:"Как долго дом стоял пустым?",en:"How long had the house been empty?"},
+        {he:"שנים",ar:"سنوات",ru:"годы",en:"For years"},
+        [{he:"חורף אחד",ar:"شتاء واحد",ru:"одну зиму",en:"One winter"},
+         {he:"לילה אחד",ar:"ليلة واحدة",ru:"одну ночь",en:"One night"}]),
+     Q({he:"מה קרה בבוקר שאחרי?",ar:"ماذا حدث في الصباح التالي؟",ru:"Что случилось на следующее утро?",en:"What happened the next morning?"},
+        {he:"השער היה פתוח",ar:"كانت البوابة مفتوحة",ru:"Ворота были открыты",en:"The gate was open"},
+        [{he:"האור כבה",ar:"انطفأ الضوء",ru:"Свет погас",en:"The light went out"},
+         {he:"הכפר התעורר",ar:"استيقظ القرويون",ru:"Деревня проснулась",en:"The village woke up"}])])
+ ]
+]);
+
+topic("idiom","read",
+  {he:"ניבים וצירופים",ar:"تعابير واصطلاحات",ru:"Идиомы и выражения",en:"Idiom and phrase"},
+  {he:"צירופים שהמילים שלהם לא מסגירות את המשמעות. אי אפשר לתרגם, אפשר רק להכיר",
+   ar:"تعابير لا تكشف كلماتها معناها — لا تُترجم، تُعرَف فقط",
+   ru:"Выражения, слова которых не выдают смысла — их не переводят, их узнают",
+   en:"Phrases whose words do not give away the meaning — you cannot translate them, only know them"},
+[
+ [
+  W("give up","/ɡɪv ʌp/",{he:"לוותר, להפסיק לנסות",ar:"يستسلم",ru:"сдаться",en:"to stop trying"},["give in","give out"]),
+  W("look after","/lʊk ˈɑːftə/",{he:"לטפל ב־",ar:"يعتني بـ",ru:"заботиться о",en:"to take care of"},["look for","look at"]),
+  W("look for","/lʊk fɔː/",{he:"לחפש",ar:"يبحث عن",ru:"искать",en:"to try to find"},["look after"]),
+  W("find out","/faɪnd aʊt/",{he:"לגלות",ar:"يكتشف",ru:"выяснить",en:"to learn a fact"},["find"]),
+  W("run out of","/rʌn aʊt ɒv/",{he:"שנגמר לו",ar:"ينفد منه",ru:"закончиться (у кого-то)",en:"to have no more left"},["run into"]),
+  W("put off","/pʊt ɒf/",{he:"לדחות",ar:"يؤجّل",ru:"откладывать",en:"to move to a later time"},["put on","put up"])
+ ],
+ [
+  W("get along with","/ɡet əˈlɒŋ wɪð/",{he:"להסתדר עם",ar:"ينسجم مع",ru:"ладить с",en:"to have a good relationship with"},["get on"]),
+  W("come across","/kʌm əˈkrɒs/",{he:"להיתקל ב־",ar:"يصادف",ru:"наткнуться на",en:"to meet or find by chance"},["come over"]),
+  W("turn down","/tɜːn daʊn/",{he:"לדחות הצעה, להנמיך",ar:"يرفض عرضًا، يخفض",ru:"отклонить, убавить",en:"to refuse an offer, or lower a volume"},["turn up","turn off"]),
+  W("bring up","/brɪŋ ʌp/",{he:"להעלות נושא, לגדל ילד",ar:"يطرح موضوعًا، يربّي",ru:"поднять тему, растить ребёнка",en:"to raise a subject, or raise a child"},["bring back"]),
+  W("make up for","/meɪk ʌp fɔː/",{he:"לפצות על",ar:"يعوّض عن",ru:"компенсировать",en:"to do something good after something bad"},["make up"]),
+  W("stand for","/stænd fɔː/",{he:"לייצג, ראשי תיבות של",ar:"يرمز إلى",ru:"означать, обозначать",en:"to represent, as letters do"},["stand up"])
+ ],
+ [
+  W("once in a blue moon","/wʌns ɪn ə bluː muːn/",{he:"אחת לזמן רב מאוד",ar:"مرّة كلّ فترة طويلة جدًا",ru:"крайне редко",en:"very rarely indeed"},["once a month"]),
+  W("out of the blue","/aʊt ɒv ðə bluː/",{he:"פתאום, בלי אזהרה",ar:"فجأة بلا سابق إنذار",ru:"как гром среди ясного неба",en:"suddenly and with no warning"},["in the blue"]),
+  W("the last straw","/ðə lɑːst strɔː/",{he:"הקש ששבר את הגב",ar:"القشّة الأخيرة",ru:"последняя капля",en:"the small thing that finally ends your patience"},["the last word"]),
+  W("bite off more than you can chew",'/baɪt ɒf mɔː/',{he:"לקחת על עצמך יותר מדי",ar:"يحمّل نفسه أكثر من طاقته",ru:"взять на себя слишком много",en:"to take on more than you can manage"},["bite your tongue"]),
+  W("call it a day","/kɔːl ɪt ə deɪ/",{he:"לסיים ליום",ar:"ينهي العمل لليوم",ru:"закончить на сегодня",en:"to stop working for today"},["call it off"]),
+  W("beat around the bush","/biːt əˈraʊnd ðə bʊʃ/",{he:"לדבר סחור סחור",ar:"يلفّ ويدور",ru:"ходить вокруг да около",en:"to avoid saying the main thing"},["beat the clock"])
+ ]
+]);
+
+topic("story","read",
+  {he:"קטעי קריאה",ar:"نصوص للقراءة",ru:"Тексты для чтения",en:"Reading passages"},
+  {he:"פסקה קצרה שאפשר לסיים. כל משפט נשמע בנפרד, וכל מילה קשה מתורגמת",
+   ar:"فقرة قصيرة يمكن إنهاؤها. كل جملة تُسمع وحدها وكل كلمة صعبة مترجمة",
+   ru:"Короткий абзац, который можно дочитать. Каждое предложение звучит отдельно, каждое трудное слово переведено",
+   en:"A paragraph short enough to finish. Every sentence plays on its own, every hard word is glossed"},
+[
+ [
+  P(["Maya worked in a bakery near the station.",
+     "She started at four in the morning, before the buses ran.",
+     "The street was quiet then, and the ovens made the shop warm.",
+     "By seven the queue reached the door."],
+    [{w:"bakery",g:{he:"מאפייה",ar:"مخبز",ru:"пекарня",en:"a shop that makes bread"}},
+     {w:"ovens",g:{he:"תנורים",ar:"أفران",ru:"печи",en:"where bread is baked"}},
+     {w:"queue",g:{he:"תור",ar:"طابور",ru:"очередь",en:"a line of people waiting"}}],
+    [Q({he:"מתי מאיה התחילה לעבוד?",ar:"متى بدأت مايا العمل؟",ru:"Когда Майя начинала работу?",en:"When did Maya start work?"},
+        {he:"בארבע לפנות בוקר",ar:"في الرابعة فجرًا",ru:"В четыре утра",en:"At four in the morning"},
+        [{he:"בשבע בבוקר",ar:"في السابعة صباحًا",ru:"В семь утра",en:"At seven in the morning"},
+         {he:"כשהאוטובוסים התחילו",ar:"حين بدأت الحافلات",ru:"Когда пошли автобусы",en:"When the buses started"}]),
+     Q({he:"למה החנות הייתה חמה?",ar:"لماذا كان المحل دافئًا؟",ru:"Почему в магазине было тепло?",en:"Why was the shop warm?"},
+        {he:"בגלל התנורים",ar:"بسبب الأفران",ru:"Из-за печей",en:"Because of the ovens"},
+        [{he:"בגלל התור",ar:"بسبب الطابور",ru:"Из-за очереди",en:"Because of the queue"},
+         {he:"בגלל השמש",ar:"بسبب الشمس",ru:"Из-за солнца",en:"Because of the sun"}])])
+ ],
+ [
+  P(["The library kept one book that nobody was allowed to borrow.",
+     "It sat behind glass, and the pages had gone the colour of tea.",
+     "Every year a class came to look at it, and every year someone asked why.",
+     "The librarian always gave the same answer: because it is the only one left."],
+    [{w:"borrow",g:{he:"לשאול, לקחת בהשאלה",ar:"يستعير",ru:"брать на время",en:"to take and give back later"}},
+     {w:"pages",g:{he:"דפים",ar:"صفحات",ru:"страницы",en:"the sheets in a book"}},
+     {w:"librarian",g:{he:"ספרן",ar:"أمين المكتبة",ru:"библиотекарь",en:"the person who runs a library"}}],
+    [Q({he:"למה אי אפשר היה להשאיל את הספר?",ar:"لماذا لم يُسمح باستعارة الكتاب؟",ru:"Почему книгу нельзя было взять?",en:"Why could nobody borrow the book?"},
+        {he:"כי זה העותק היחיד שנשאר",ar:"لأنّها النسخة الوحيدة الباقية",ru:"Потому что это единственный оставшийся экземпляр",en:"Because it is the only one left"},
+        [{he:"כי הוא היה יקר מדי",ar:"لأنّه كان غاليًا جدًا",ru:"Потому что он был слишком дорогим",en:"Because it was too expensive"},
+         {he:"כי הוא היה מאחורי זכוכית",ar:"لأنّه كان خلف زجاج",ru:"Потому что он был за стеклом",en:"Because it was behind glass"}]),
+     Q({he:"מה מספר צבע הדפים?",ar:"ماذا يخبرنا لون الصفحات؟",ru:"О чём говорит цвет страниц?",en:"What does the colour of the pages tell us?"},
+        {he:"שהספר ישן מאוד",ar:"أنّ الكتاب قديم جدًا",ru:"Что книга очень старая",en:"That the book is very old"},
+        [{he:"שהספר נשפך עליו תה",ar:"أنّ الشاي انسكب عليه",ru:"Что на него пролили чай",en:"That tea was spilled on it"},
+         {he:"שהספר נדפס בחום",ar:"أنّه طُبع باللون البني",ru:"Что его напечатали коричневым",en:"That it was printed in brown"}])])
+ ],
+ [
+  P(["Every port keeps a list of ships that never came back,",
+     "and every list is shorter than the truth.",
+     "Some names were written down twice, some not at all,",
+     "and the sea, which keeps nothing, is the only honest register."],
+    [{w:"port",g:{he:"נמל",ar:"ميناء",ru:"порт",en:"where ships arrive"}},
+     {w:"truth",g:{he:"אמת",ar:"حقيقة",ru:"правда",en:"what really happened"}},
+     {w:"honest",g:{he:"ישר, אמין",ar:"صادق",ru:"честный",en:"telling no lies"}},
+     {w:"register",g:{he:"רישום, פנקס",ar:"سجلّ",ru:"реестр",en:"an official written list"}}],
+    [Q({he:"למה הרשימה קצרה מהאמת?",ar:"لماذا القائمة أقصر من الحقيقة؟",ru:"Почему список короче правды?",en:"Why is the list shorter than the truth?"},
+        {he:"כי שמות מסוימים כלל לא נרשמו",ar:"لأنّ بعض الأسماء لم تُسجَّل أصلًا",ru:"Потому что некоторые имена не записали вовсе",en:"Because some names were never written down"},
+        [{he:"כי הים מחק אותם",ar:"لأنّ البحر محاها",ru:"Потому что море их стёрло",en:"Because the sea erased them"},
+         {he:"כי הנמל היה קטן",ar:"لأنّ الميناء كان صغيرًا",ru:"Потому что порт был маленьким",en:"Because the port was small"}]),
+     Q({he:"מה הכוונה ב\"הים הוא הרישום הישר היחיד\"?",ar:"ما معنى \"البحر هو السجلّ الصادق الوحيد\"؟",ru:"Что значит «море — единственный честный реестр»?",en:"What does 'the sea is the only honest register' mean?"},
+        {he:"רק הים יודע באמת מה קרה",ar:"البحر وحده يعرف ما حدث حقًا",ru:"Только море знает, что было на самом деле",en:"Only the sea really knows what happened"},
+        [{he:"הים כותב רשימות",ar:"البحر يكتب القوائم",ru:"Море ведёт списки",en:"The sea writes lists"},
+         {he:"הים מחזיר את הספינות",ar:"البحر يعيد السفن",ru:"Море возвращает корабли",en:"The sea brings ships back"}])])
+ ]
+]);
+function topicOf(id){for(var i=0;i<TOPICS.length;i++)if(TOPICS[i].id===id)return TOPICS[i];return null}
+function trackOf(id){for(var i=0;i<TRACKS.length;i++)if(TRACKS[i].id===id)return TRACKS[i];return TRACKS[0]}
+function tName(tp){return tp.n[state.lang]||tp.n.en}
+function tDesc(tp){return tp.d[state.lang]||tp.d.en}
+
+/* ============================================================
+   8. מנוע התרגילים
+   ------------------------------------------------------------
+   כלל אחד מנחה את כל הבנייה כאן: מסיח חייב להיות מסיח *סביר*.
+   ארבע אפשרויות אקראיות מלמדות לנחש לפי אורך המילה. ארבע
+   אפשרויות קרובות מכריחות באמת להבחין, וזו כל התועלת.
+   ============================================================ */
+function itemId(tid,lv,i){return tid+"|"+lv+"|"+i}
+function itemRec(id){
+  if(!state.item[id])state.item[id]={n:0,ok:0};
+  return state.item[id];
+}
+/* בחירת פריט: קודם מה שעוד לא נראה, אחר כך מה שנכשל, ורק בסוף
+   מה שכבר נשלט. חזרה מרווחת פשוטה, בלי שעון ובלי נוסחה. */
+function chooseIndex(tid,lv,pool,avoid){
+  var cand=[],i,w;
+  for(i=0;i<pool.length;i++){
+    if(avoid!==undefined&&i===avoid&&pool.length>1)continue;
+    var r=state.item[itemId(tid,lv,i)];
+    if(!r||!r.n)w=6;                       /* חדש */
+    else if(r.ok<r.n)w=1+Math.min(4,r.n-r.ok);  /* נכשל בעבר */
+    else w=1;                               /* נשלט */
+    for(var j=0;j<w;j++)cand.push(i);
+  }
+  if(!cand.length)return 0;
+  return pick(cand);
+}
+function poolOf(tp,lv){return (tp.L[lv-1]||tp.L[0]||[])}
+function kindsIn(pool){
+  var k={w:[],s:[],p:[]},i;
+  for(i=0;i<pool.length;i++)if(k[pool[i].k])k[pool[i].k].push(i);
+  return k;
+}
+/* מילים דומות מכל התוכן, לא רק מהרמה הזאת — כדי שמסיח יוכל להיות
+   מילה שנלמדה קודם, וזה בעצמו תרגול חזרה. */
+var ALL_WORDS=null;
+function allWords(){
+  if(ALL_WORDS)return ALL_WORDS;
+  ALL_WORDS=[];
+  TOPICS.forEach(function(tp){tp.L.forEach(function(lvl){
+    lvl.forEach(function(it){if(it.k==="w")ALL_WORDS.push(it)})})});
+  return ALL_WORDS;
+}
+function wordByText(txt){
+  var a=allWords();
+  for(var i=0;i<a.length;i++)if(a[i].w.toLowerCase()===String(txt).toLowerCase())return a[i];
+  return null;
+}
+/* מסיחים למילה: קודם ה-near שלה, ואז מילים מאותו נושא. */
+/* needGloss: בתרגיל משמעות האפשרויות *הן* המשמעויות, ולכן מסיח בלי
+   תרגום אינו מסיח אלא שורה ריקה. חלק מה-near הם צורות ("record
+   (verb)") שאין להן ערך משלהן, והם נופלים בדיוק כאן. */
+function wordDistract(it,pool,n,needGloss){
+  var out=[],i,seen={};
+  function add(x){
+    var k=x.w.toLowerCase();
+    if(seen[k])return false;
+    if(needGloss&&!x.g)return false;
+    seen[k]=1; out.push(x); return true;
+  }
+  seen[it.w.toLowerCase()]=1;
+  (it.near||[]).forEach(function(nw){
+    add(wordByText(nw)||{k:"w",w:nw,ipa:"",g:null,near:[]});
+  });
+  var rest=shuffle(pool.filter(function(x){return x.k==="w"}));
+  for(i=0;i<rest.length&&out.length<n;i++)add(rest[i]);
+  rest=shuffle(allWords());
+  for(i=0;i<rest.length&&out.length<n;i++)add(rest[i]);
+  return out.slice(0,n);
+}
+function O(html,ok,why){return {h:html,ok:!!ok,why:why||""}}
+
+/* --- צורה 1: מילה נשמעת ונראית → מה המשמעות --- */
+function formMean(tp,lv,pool,idx){
+  var it=pool[idx];
+  var ds=wordDistract(it,pool,3,true);
+  var seen={},opts=[O(esc(gl(it.g)),true)];
+  seen[gl(it.g)]=1;
+  ds.forEach(function(d){
+    var g=gl(d.g);
+    /* שתי מילים שונות יכולות לחלוק תרגום. שתי אפשרויות זהות הן
+       שאלה בלי תשובה יחידה. */
+    if(!g||seen[g])return; seen[g]=1;
+    opts.push(O(esc(g),false,d.w+" = "+g));
+  });
+  return {type:"mean",prompt:t("qMean"),subject:it,opts:shuffle(opts),
+    answer:gl(it.g),say:it.w};
+}
+/* --- צורה 2: המשמעות בשפת האם → איזו מילה באנגלית --- */
+function formBack(tp,lv,pool,idx){
+  var it=pool[idx];
+  var ds=wordDistract(it,pool,3);
+  var opts=[O('<span class="en-b">'+esc(it.w)+"</span>",true)];
+  ds.slice(0,3).forEach(function(d){opts.push(O('<span class="en-b">'+esc(d.w)+"</span>",false,
+    d.g?(d.w+" = "+gl(d.g)):""))});
+  return {type:"back",prompt:t("qSay"),lead:gl(it.g),subject:null,
+    opts:shuffle(opts),answer:it.w,say:it.w,reveal:it};
+}
+/* --- צורה 3: רק אוזן. המילה אינה מוצגת עד שעונים --- */
+function formHear(tp,lv,pool,idx){
+  var it=pool[idx];
+  var ds=wordDistract(it,pool,3);
+  var opts=[O('<span class="en-b">'+esc(it.w)+"</span>",true)];
+  ds.slice(0,2).forEach(function(d){opts.push(O('<span class="en-b">'+esc(d.w)+"</span>",false,
+    d.g?(d.w+" = "+gl(d.g)):""))});
+  return {type:"hear",prompt:t("qHear"),subject:null,hidden:it,
+    opts:shuffle(opts),answer:it.w,say:it.w,reveal:it,auto:true};
+}
+/* --- צורה 4: המצב בשפת האם → איזה משפט אומרים --- */
+function formUse(tp,lv,pool,idx){
+  var it=pool[idx];
+  var others=shuffle(pool.filter(function(x){return x.k==="s"&&x!==it}));
+  var opts=[O('<span class="en-b">'+esc(it.s)+"</span>",true)];
+  others.slice(0,2).forEach(function(d){opts.push(O('<span class="en-b">'+esc(d.s)+"</span>",false,
+    gl(d.g)))});
+  return {type:"use",prompt:t("qUse"),lead:it.u?gl(it.u):gl(it.g),subject:null,
+    opts:shuffle(opts),answer:it.s,say:it.s,reveal:it};
+}
+/* --- צורה 5: משפט עם חסר --- */
+var STOP_GAP=/^(a|an|the|to|of|is|are|was|were|be|i|you|he|she|it|we|they|my|your)$/i;
+function formGap(tp,lv,pool,idx){
+  var it=pool[idx];
+  var parts=it.s.split(" ");
+  var cand=[];
+  for(var i=0;i<parts.length;i++){
+    var bare=parts[i].replace(/[^A-Za-z']/g,"");
+    if(bare.length>=3&&!STOP_GAP.test(bare))cand.push(i);
+  }
+  if(!cand.length)return formUse(tp,lv,pool,idx);
+  var gi=pick(cand),gone=parts[gi].replace(/[^A-Za-z']/g,"");
+  var shown=parts.slice();
+  shown[gi]=parts[gi].replace(gone,"_____");
+  var others=[],seen={};seen[gone.toLowerCase()]=1;
+  pool.forEach(function(x){
+    var src=x.k==="s"?x.s:(x.k==="w"?x.w:"");
+    src.split(" ").forEach(function(p){
+      var b=p.replace(/[^A-Za-z']/g,"");
+      if(b.length>=3&&!STOP_GAP.test(b)&&!seen[b.toLowerCase()]){seen[b.toLowerCase()]=1;others.push(b)}
+    });
+  });
+  var opts=[O('<span class="en-b">'+esc(gone)+"</span>",true)];
+  shuffle(others).slice(0,3).forEach(function(w){
+    opts.push(O('<span class="en-b">'+esc(w)+"</span>",false))});
+  return {type:"gap",prompt:t("qGap"),gapHtml:'<span class="en-b">'+esc(shown.join(" "))+"</span>",
+    lead:gl(it.g),subject:null,opts:shuffle(opts),answer:gone,say:it.s,reveal:it};
+}
+/* --- צורה 6: בניית משפט מאריחים --- */
+function formOrder(tp,lv,pool,idx){
+  var it=pool[idx];
+  var words=it.s.split(" ");
+  if(words.length<3||words.length>9)return formUse(tp,lv,pool,idx);
+  var tiles=shuffle(words.slice());
+  /* ערבוב שיצא זהה למקור אינו תרגיל */
+  if(tiles.join(" ")===words.join(" ")&&words.length>2)tiles=shuffle(tiles.reverse());
+  return {type:"order",prompt:t("qOrder"),lead:gl(it.g),tiles:tiles,target:words,
+    say:it.s,reveal:it,subject:null};
+}
+/* --- צורה 7: הבנת הנקרא --- */
+function formComp(tp,lv,pool,idx){
+  var it=pool[idx];
+  var qq=pick(it.qs);
+  var opts=[O(esc(gl(qq.a)),true)];
+  qq.w.forEach(function(x){opts.push(O(esc(gl(x)),false))});
+  return {type:"comp",prompt:t("qRead"),passage:it,qtext:gl(qq.q),
+    opts:shuffle(opts),answer:gl(qq.a),say:it.lines.join(" "),subject:null};
+}
+
+/* בוחר את צורת התרגיל. הרמה קובעת כמה פיגום נשאר: ברמה 1 שפת האם
+   נוכחת תמיד, ברמה 3 היא נעלמת וגם האוזן לבדה נדרשת. */
+function buildQuestion(tid,lv,avoid){
+  var tp=topicOf(tid); if(!tp)return null;
+  var pool=poolOf(tp,lv), k=kindsIn(pool);
+  var idx=chooseIndex(tid,lv,pool,avoid);
+  var it=pool[idx];
+  var q;
+  if(it.k==="p")q=formComp(tp,lv,pool,idx);
+  else if(it.k==="s"){
+    var sForms=lv===1?["use","gap"]:lv===2?["use","gap","order"]:["gap","order","use"];
+    var f=pick(sForms);
+    q=f==="gap"?formGap(tp,lv,pool,idx):f==="order"?formOrder(tp,lv,pool,idx):formUse(tp,lv,pool,idx);
+  } else {
+    var wForms=lv===1?["mean","mean","hear"]:lv===2?["mean","back","hear"]:["back","hear","hear","mean"];
+    var f2=pick(wForms);
+    q=f2==="back"?formBack(tp,lv,pool,idx):f2==="hear"?formHear(tp,lv,pool,idx):formMean(tp,lv,pool,idx);
+  }
+  q.tid=tid; q.lv=lv; q.idx=idx; q.id=itemId(tid,lv,idx);
+  return q;
+}
+
+/* ============================================================
+   9. מסכים
+   ============================================================ */
+var P={q:null,picked:-1,done:false,slot:[],used:[],ok:false};
+
+function hdr(){
+  var s=state.screen;
+  return '<div class="hbar"><div class="wrap hrow">'+
+    '<h1 class="brand">'+esc(t("app"))+'<small>'+esc(t("tagline"))+'</small></h1>'+
+    (s==="home"?"":'<button class="gbtn" data-a="home">'+ic("home",16)+" "+esc(t("navHome"))+"</button>")+
+    '<button class="gbtn'+(s==="prog"?" on":"")+'" data-a="prog">'+ic("chart",16)+" "+esc(t("navProg"))+"</button>"+
+    '<button class="gbtn'+(s==="set"?" on":"")+'" data-a="set">'+ic("gear",16)+" "+esc(t("navSet"))+"</button>"+
+  "</div></div>"}
+
+function fbar(){
+  return '<div class="fbar"><div class="wrap">'+esc(t("savedNote"))+" · "+BUILD+"</div></div>"}
+
+function vstrip(){
+  var st=voiceStatus();
+  if(st==="ok")return '<div class="vstrip ok">'+ic("spark",15)+" "+esc(t("vsOk"))+"</div>";
+  if(st==="dev")return '<div class="vstrip warn">'+ic("play",15)+" "+esc(t("vsDev"))+
+    ' <button class="btn ghost" data-a="set">'+esc(t("vGem"))+"</button></div>";
+  return '<div class="vstrip bad">'+ic("x",15)+" <b>"+esc(t("vsNoEn"))+"</b> "+esc(t("vsNoEnD"))+
+    ' <button class="btn ghost" data-a="set">'+esc(t("setVoice"))+"</button></div>";
+}
+
+function screenHome(){
+  var h='<div class="wrap">';
+  h+='<div class="card" style="margin:1.1rem 0"><h2 style="font-size:1.5rem">'+esc(t("heroT"))+"</h2>"+
+     '<p style="color:var(--muted);margin:.5rem 0 0">'+esc(t("heroP"))+"</p></div>";
+  h+=vstrip();
+  TRACKS.forEach(function(tr){
+    var tops=TOPICS.filter(function(x){return x.trk===tr.id});
+    if(!tops.length)return;
+    h+='<div class="trk '+tr.cls+'" style="margin:1.4rem 0 .6rem">'+
+       '<div class="thead"><span class="tdot"></span><h2 style="font-size:1.15rem">'+
+       esc(t(tr.nk))+'</h2><span class="tpill">'+tops.length+"</span></div>"+
+       '<p style="color:var(--muted);font-size:.9rem;margin:.25rem 0 0">'+esc(t(tr.dk))+"</p></div>";
+    h+='<div class="grid g2">';
+    tops.forEach(function(tp){
+      var best=0,li;
+      for(li=1;li<=3;li++)best=Math.max(best,mastery(tp.id,li));
+      h+='<button class="card tcard trk '+tr.cls+'" data-a="open" data-t="'+esc(tp.id)+'">'+
+        "<h3>"+esc(tName(tp))+"</h3>"+
+        '<div class="sub">'+esc(tDesc(tp))+"</div>"+
+        '<div style="display:flex;align-items:center;gap:.5rem;margin-top:.35rem">'+
+        '<span class="bar '+barCls(best)+'"><i style="width:'+Math.round(best*100)+'%"></i></span>'+
+        '<span class="chip">'+Math.round(best*100)+"%</span></div></button>";
+    });
+    h+="</div>";
+  });
+  return h+"</div>"+fbar();
+}
+
+function levelBar(tp){
+  var h='<div class="lvls">',i;
+  for(i=1;i<=3;i++){
+    var m=mastery(tp.id,i);
+    h+='<button class="lvl'+(state.level===i?" on":"")+'" data-a="lvl" data-v="'+i+'">'+
+      esc(t("lv"+i))+' <span class="bar '+barCls(m)+'" style="width:2.6rem;flex:none">'+
+      '<i style="width:'+Math.round(m*100)+'%"></i></span></button>';
+  }
+  return h+"</div>";
+}
+
+function spkBtn(text,lang,slow,label){
+  return '<button class="spk'+(slow?" sm":"")+'" data-a="say" data-say="'+esc(text)+
+    '" data-lang="'+esc(lang)+'"'+(slow?' data-slow="1"':"")+
+    ' aria-label="'+esc(label||t("hear"))+'">'+ic(slow?"slow":"play",slow?15:18)+"</button>";
+}
+
+function subjectBox(it){
+  var w=it.w||it.s||"";
+  return '<div class="subject"><span class="word">'+esc(w)+"</span>"+
+    (it.ipa?'<span class="ipa">'+esc(it.ipa)+"</span>":"")+
+    '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
+    spkBtn(w,"en",false,t("hearWord"))+spkBtn(w,"en",true,t("hearSlow"))+"</span></div>";
+}
+
+function screenPractice(){
+  var tp=topicOf(state.topic); if(!tp){state.screen="home";return screenHome()}
+  var tr=trackOf(tp.trk), q=P.q;
+  var h='<div class="wrap"><div class="trk '+tr.cls+'">';
+  h+='<div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin:1rem 0 .6rem">'+
+     '<span class="tdot"></span><h2 style="font-size:1.2rem">'+esc(tName(tp))+"</h2>"+
+     '<span class="tpill">'+esc(t(tr.nk))+"</span></div>";
+  h+=levelBar(tp);
+  h+='<p style="color:var(--muted);font-size:.88rem;margin:.5rem 0 .8rem">'+esc(t("lv"+state.level+"D"))+"</p>";
+  h+=vstrip();
+  if(!q)return h+"</div></div>"+fbar();
+
+  h+='<div class="card qcard">';
+  h+='<div class="qtop"><span class="chip">'+esc(q.prompt)+"</span>"+
+     '<span class="chip" style="margin-inline-start:auto">'+esc(t("todayL"))+" "+(state.day.n||0)+"</span></div>";
+
+  if(q.type==="comp"){
+    h+='<div style="display:flex;gap:.4rem;margin-bottom:.4rem">'+
+       spkBtn(q.passage.lines.join(" "),"en",false,t("hearSent"))+
+       spkBtn(q.passage.lines.join(" "),"en",true,t("hearSlow"))+"</div>";
+    h+='<div class="passage">';
+    q.passage.lines.forEach(function(ln,i){
+      h+='<span class="s" data-a="sayline" data-say="'+esc(ln)+'">'+esc(ln)+"</span> ";
+    });
+    h+="</div>";
+    if(q.passage.words.length){
+      h+='<div class="gloss">';
+      q.passage.words.forEach(function(g){
+        h+='<button class="gword" data-a="say" data-say="'+esc(g.w)+'" data-lang="en"><b>'+
+          esc(g.w)+"</b> — "+esc(gl(g.g))+"</button>";
+      });
+      h+="</div>";
+    }
+    h+='<p class="qtext">'+esc(q.qtext)+"</p>";
+  }
+  else if(q.type==="hear"){
+    h+='<div class="subject"><span class="word" style="letter-spacing:.35em">? ? ?</span>'+
+       '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
+       spkBtn(q.say,"en",false,t("hearWord"))+spkBtn(q.say,"en",true,t("hearSlow"))+"</span></div>";
+    h+='<p class="qhint">'+esc(t("qHear"))+"</p>";
+  }
+  else if(q.type==="mean"){
+    h+=subjectBox(q.subject);
+  }
+  else if(q.type==="gap"){
+    h+='<div class="subject"><span class="word" style="font-size:1.25rem">'+q.gapHtml+"</span>"+
+       '<span style="margin-inline-start:auto">'+spkBtn(q.say,"en",true,t("hearSlow"))+"</span></div>";
+    if(state.level<3&&q.lead)h+='<p class="qhint">'+esc(q.lead)+"</p>";
+  }
+  else if(q.type==="order"){
+    h+=(state.level<3&&q.lead?'<p class="qtext">'+esc(q.lead)+"</p>":"")+
+       '<p class="qhint">'+esc(t("tapOrder"))+"</p>";
+    h+='<div class="slot'+(P.done?(P.ok?" ok":" bad"):"")+'" id="slot">';
+    P.slot.forEach(function(w,i){h+='<button class="tile" data-a="unslot" data-i="'+i+'">'+esc(w)+"</button>"});
+    h+="</div>";
+    h+='<div class="tiles">';
+    q.tiles.forEach(function(w,i){
+      if(P.used.indexOf(i)>=0)return;
+      h+='<button class="tile" data-a="slot" data-i="'+i+'">'+esc(w)+"</button>";
+    });
+    h+="</div>";
+    h+='<div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap">'+
+       '<button class="btn" data-a="clear">'+esc(t("clearSlot"))+"</button>"+
+       '<button class="btn pri" data-a="checkorder"'+(P.slot.length?"":" disabled")+'>'+
+       ic("check",16)+" "+esc(t("check"))+"</button></div>";
+  }
+  else { /* back · use */
+    h+='<p class="qtext">'+esc(q.lead||"")+"</p>";
+  }
+
+  if(q.type!=="order"){
+    h+='<div class="opts'+(q.opts.length>3?"":" two")+'" id="opts">';
+    q.opts.forEach(function(o,i){
+      var cls="opt";
+      if(P.done){
+        if(o.ok)cls+=" ok";
+        else if(i===P.picked)cls+=" bad";
+        else cls+=" dim";
+      }
+      h+='<button class="'+cls+'" data-a="pick" data-i="'+i+'"'+(P.done?" disabled":"")+'>'+
+        '<span class="k">'+String.fromCharCode(65+i)+"</span><span>"+o.h+"</span></button>";
+    });
+    h+="</div>";
+  }
+
+  if(P.done){
+    var it=q.reveal||q.subject||q.hidden;
+    h+='<div class="fb '+(P.ok?"ok":"bad")+'"><b>'+(P.ok?esc(t("correct")):esc(t("wrong")))+"</b>";
+    if(!P.ok)h+='<div class="body">'+esc(t("answerIs"))+' <span class="en-b"><b>'+esc(q.answer)+"</b></span></div>";
+    if(it&&it.k==="w"&&it.g)h+='<div class="why"><span class="en-b"><b>'+esc(it.w)+"</b></span>"+
+      (it.ipa?' <span class="en-b">'+esc(it.ipa)+"</span>":"")+" — "+esc(gl(it.g))+"</div>";
+    if(it&&it.k==="s")h+='<div class="why"><span class="en-b">'+esc(it.s)+"</span><br>"+esc(gl(it.g))+
+      (it.u?"<br><b>"+esc(gl(it.u))+"</b>":"")+"</div>";
+    if(!P.ok&&P.picked>=0&&q.opts&&q.opts[P.picked]&&q.opts[P.picked].why)
+      h+='<div class="why">'+esc(q.opts[P.picked].why)+"</div>";
+    h+="</div>";
+    h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+
+       spkBtn(q.say,"en",false,t("hearSent"))+spkBtn(q.say,"en",true,t("hearSlow"))+
+       '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
+       esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
+  } else if(q.type!=="order"){
+    h+='<div style="margin-top:.9rem"><button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button></div>";
+  }
+  h+="</div></div></div>"+fbar();
+  return h;
+}
+
+function screenProg(){
+  var h='<div class="wrap"><h2 style="margin:1.1rem 0 .3rem;font-size:1.4rem">'+esc(t("progT"))+"</h2>";
+  var acc=state.totalAsk?Math.round(100*state.totalOk/state.totalAsk):0;
+  var seen=0,mast=0;
+  TOPICS.forEach(function(tp){for(var l=1;l<=3;l++){
+    var s=state.stats[stKey(tp.id,l)];
+    if(s&&s.seen){seen++;if(mastery(tp.id,l)>=.75)mast++}}});
+  h+='<div class="grid g3" style="margin:.8rem 0 1.2rem">';
+  [[t("streakL"),state.streak||0],[t("todayL"),state.day.n||0],[t("accL"),acc+"%"]].forEach(function(p){
+    h+='<div class="card" style="text-align:center"><div style="font-size:1.9rem;font-weight:800">'+
+      esc(String(p[1]))+'</div><div style="color:var(--muted);font-size:.9rem">'+esc(p[0])+"</div></div>";
+  });
+  h+="</div>";
+  if(!state.totalAsk)h+='<div class="card"><p style="margin:0;color:var(--muted)">'+esc(t("progNone"))+"</p></div>";
+  TRACKS.forEach(function(tr){
+    var tops=TOPICS.filter(function(x){return x.trk===tr.id&&
+      [1,2,3].some(function(l){var s=state.stats[stKey(x.id,l)];return s&&s.seen})});
+    if(!tops.length)return;
+    h+='<div class="trk '+tr.cls+'"><div class="thead" style="margin:1.2rem 0 .5rem">'+
+       '<span class="tdot"></span><h3 style="font-size:1.05rem">'+esc(t(tr.nk))+"</h3></div>";
+    h+='<div class="card">';
+    tops.forEach(function(tp){
+      h+='<div class="row"><div><div class="lab">'+esc(tName(tp))+"</div>"+
+        '<div class="desc">';
+      for(var l=1;l<=3;l++){
+        var s=state.stats[stKey(tp.id,l)];
+        if(s&&s.seen)h+=esc(t("lv"+l))+" "+s.ok+"/"+s.seen+"   ";
+      }
+      h+="</div></div>";
+      var best=Math.max(mastery(tp.id,1),mastery(tp.id,2),mastery(tp.id,3));
+      h+='<span class="bar '+barCls(best)+'" style="max-width:8rem"><i style="width:'+
+        Math.round(best*100)+'%"></i></span></div>';
+    });
+    h+="</div></div>";
+  });
+  h+='<p style="color:var(--muted);font-size:.9rem;margin-top:1rem">'+esc(t("seen"))+": "+seen+
+     " · "+esc(t("mastered"))+": "+mast+"</p>";
+  return h+"</div>"+fbar();
+}
+
+var gkShow=false,gkMsg=null,askReset=false;
+function screenSet(){
+  var h='<div class="wrap"><h2 style="margin:1.1rem 0 .6rem;font-size:1.4rem">'+esc(t("setT"))+"</h2>";
+
+  /* --- שפת הממשק --- */
+  h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
+     esc(t("setLang"))+"</h3><div class=\"lvls\">";
+  Object.keys(LANGS).forEach(function(k){
+    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'">'+
+      esc(LANGS[k].name)+"</button>";
+  });
+  h+="</div></div>";
+
+  /* --- קול --- */
+  h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem">'+esc(t("setVoice"))+"</h3>";
+  h+=vstrip();
+  h+='<div class="vgrid" style="margin:.6rem 0">'+
+     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" data-a="vmode" data-v="device">'+
+     '<span><span class="nm">'+esc(t("vDev"))+'</span><br><span class="ds">'+esc(t("vDevD"))+"</span></span></button>"+
+     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" data-a="vmode" data-v="gem">'+
+     '<span><span class="nm">'+esc(t("vGem"))+'</span><br><span class="ds">'+esc(t("vGemD"))+"</span></span></button></div>";
+
+  h+='<div class="row"><div><div class="lab">'+esc(t("rate"))+'</div>'+
+     '<div class="desc">'+esc(t("slow"))+" ← → "+esc(t("fast"))+"</div></div>"+
+     '<input type="range" min="0.6" max="1.3" step="0.05" value="'+state.rate+
+     '" data-a="rate" style="max-width:14rem"></div>';
+
+  if(state.voiceMode==="gem"){
+    ["f","m"].forEach(function(g){
+      h+='<p style="font-weight:700;margin:.9rem 0 .4rem">'+esc(g==="f"?t("vFemale"):t("vMale"))+"</p>";
+      h+='<div class="vgrid">';
+      GEM_VOICES.filter(function(v){return v.g===g}).forEach(function(v){
+        h+='<div class="vopt'+(state.gemVoice===v.id?" on":"")+'" data-a="gvoice" data-v="'+v.id+
+          '" role="button" tabindex="0" aria-pressed="'+(state.gemVoice===v.id?"true":"false")+'">'+
+          '<span style="flex:1"><span class="nm">'+esc(gvName(v))+'</span><br>'+
+          '<span class="ds">'+esc(gvDesc(v))+"</span></span>"+
+          '<button class="btn ghost" data-a="gsample" data-v="'+v.id+
+          '" style="padding:.35rem .7rem;min-height:2.2rem;font-size:.82rem">'+
+          ic("play",14)+" "+esc(t("vSample"))+"</button></div>";
+      });
+      h+="</div>";
+    });
+    h+='<label class="lab" for="gk" style="display:block;margin:1rem 0 .4rem">'+esc(t("vKey"))+"</label>"+
+       '<div style="display:flex;gap:.5rem;flex-wrap:wrap">'+
+       '<input id="gk" type="'+(gkShow?"text":"password")+'" value="'+esc(GKEY)+
+       '" placeholder="'+esc(t("vKeyPh"))+'" autocomplete="off">'+
+       '<button class="btn" data-a="gkshow">'+ic("eye",15)+" "+esc(gkShow?t("vHide"):t("vShow"))+"</button>"+
+       '<button class="btn pri" id="gsave" data-a="gsave">'+ic("key",15)+" "+esc(t("vSave"))+"</button></div>";
+    if(gkMsg)h+='<p class="chip '+(gkMsg.ok?"ok":"bad")+'" style="margin-top:.6rem">'+esc(gkMsg.m)+"</p>";
+    h+='<p style="color:var(--muted);font-size:.85rem;margin-top:.6rem">'+esc(t("vSaved"))+"</p>";
+  }
+  h+="</div>";
+
+  /* --- קריאות --- */
+  h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.3rem">'+
+     esc(t("setRead"))+"</h3>";
+  [["big","bigText","bigTextD"],["clear","clearFont","clearFontD"],
+   ["spaced","spacing","spacingD"],["hc","contrast","contrastD"],
+   ["rm","motion","motionD"]].forEach(function(r){
+    h+='<div class="row"><div><div class="lab">'+esc(t(r[1]))+"</div>"+
+      '<div class="desc">'+esc(t(r[2]))+'</div></div>'+
+      '<button class="sw'+(state[r[0]]?" on":"")+'" data-a="tog" data-v="'+r[0]+
+      '" role="switch" aria-checked="'+(state[r[0]]?"true":"false")+
+      '" aria-label="'+esc(t(r[1]))+'"><i></i></button></div>';
+  });
+  h+='<div class="row"><div class="lab">'+esc(t("theme"))+'</div><div class="lvls">'+
+     [["auto","thAuto"],["light","thLight"],["dark","thDark"]].map(function(x){
+       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" data-a="theme" data-v="'+x[0]+'">'+
+         esc(t(x[1]))+"</button>"}).join("")+"</div></div>";
+  h+="</div>";
+
+  /* --- איפוס --- */
+  h+='<div class="card"><div class="row"><div><div class="lab">'+esc(t("reset"))+"</div>"+
+     '<div class="desc">'+esc(t("resetD"))+"</div></div>"+
+     (askReset?
+       '<span style="display:flex;gap:.5rem"><button class="btn" data-a="noreset">'+esc(t("no"))+"</button>"+
+       '<button class="btn pri" data-a="doreset">'+esc(t("yes"))+"</button></span>":
+       '<button class="btn" data-a="askreset">'+ic("redo",15)+" "+esc(t("reset"))+"</button>")+
+     "</div></div>";
+  return h+"</div>"+fbar();
+}
+
+function render(){
+  applyModes();
+  var body=state.screen==="prog"?screenProg():
+           state.screen==="set" ?screenSet():
+           state.screen==="prac"?screenPractice():screenHome();
+  $("#app").innerHTML=hdr()+body;
+}
+
+/* ============================================================
+   10. אירועים
+   ============================================================ */
+function newQuestion(){
+  var prev=P.q?P.q.idx:undefined;
+  P.q=buildQuestion(state.topic,state.level,prev);
+  P.picked=-1; P.done=false; P.ok=false; P.slot=[]; P.used=[];
+  render();
+  /* בתרגיל האזנה המילה אינה מוצגת, ולכן שמיעה אחת אוטומטית היא
+     לא נוחות אלא תנאי לכך שיש בכלל שאלה. */
+  if(P.q&&P.q.auto)setTimeout(function(){speak(P.q.say,"en")},260);
+}
+function record(ok){
+  var q=P.q; if(!q)return;
+  var s=stOf(q.tid,q.lv); s.seen++; ok?s.ok++:s.bad++;
+  var r=itemRec(q.id); r.n++; if(ok)r.ok++;
+  touchDay(); state.day.n=(state.day.n||0)+1;
+  state.totalAsk++; if(ok)state.totalOk++;
+  save();
+}
+function answer(i){
+  if(P.done)return;
+  var q=P.q,o=q.opts[i];
+  P.picked=i; P.done=true; P.ok=!!(o&&o.ok);
+  record(P.ok);
+  render();
+  announce(P.ok?t("correct"):t("wrong")+". "+t("answerIs")+" "+q.answer);
+  /* התשובה הנכונה נשמעת מיד, גם כשטעו — במיוחד כשטעו. הצליל הוא
+     החומר, ותיקון שקט אינו תיקון. */
+  setTimeout(function(){speak(q.say,"en")},P.ok?200:420);
+}
+function checkOrder(){
+  var q=P.q; if(!q||P.done)return;
+  P.ok=P.slot.join(" ")===q.target.join(" ");
+  P.done=true; record(P.ok); render();
+  announce(P.ok?t("correct"):t("wrong"));
+  setTimeout(function(){speak(q.say,"en")},P.ok?200:420);
+}
+function testKey(){
+  var inp=$("#gk"); var k=inp?inp.value.trim():"";
+  saveKey(k);
+  if(!k){gkMsg={ok:true,m:t("vRemoved")};render();return}
+  gkMsg=null;
+  var b=$("#gsave"); if(b){b.textContent=t("vChecking");b.disabled=true}
+  gSynth("Hello.",gvOf(state.gemVoice).id,state.rate,"en")
+    .then(function(){gkMsg={ok:true,m:t("vOk")};render();speak("Hello. This is how I sound.","en")})
+    .catch(function(){gkMsg={ok:false,m:t("vErr")};render()});
+}
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-a]"); if(!el)return;
+  var a=el.getAttribute("data-a"),v=el.getAttribute("data-v");
+  if(a==="say"||a==="sayline"){
+    var txt=el.getAttribute("data-say")||"";
+    var lg=el.getAttribute("data-lang")||"en";
+    var slow=el.getAttribute("data-slow")==="1";
+    /* לחיצה על משפט בקטע מסמנת אותו — הקורא צריך לדעת מה מדבר */
+    if(a==="sayline"){
+      var all=document.querySelectorAll(".passage .s");
+      for(var z=0;z<all.length;z++)all[z].classList.remove("now");
+      el.classList.add("now");
+    }
+    speak(txt,lg,slow?0.7:1);
+    return;
+  }
+  if(a==="home"){state.screen="home";P.q=null;stopSpeak();save();render();window.scrollTo(0,0);return}
+  if(a==="prog"){state.screen="prog";stopSpeak();render();window.scrollTo(0,0);return}
+  if(a==="set"){state.screen="set";stopSpeak();gkMsg=null;render();window.scrollTo(0,0);return}
+  if(a==="open"){
+    state.topic=el.getAttribute("data-t"); state.screen="prac";
+    save(); newQuestion(); window.scrollTo(0,0); return;
+  }
+  if(a==="lvl"){state.level=clamp(parseInt(v,10)||1,1,3);save();newQuestion();return}
+  if(a==="pick"){answer(parseInt(el.getAttribute("data-i"),10));return}
+  if(a==="next"){newQuestion();return}
+  if(a==="dunno"){
+    /* "לא יודע" אינו דילוג: הוא נספר כטעות, ומיד מראה ומשמיע את
+       התשובה. מי שמנחש לומד פחות ממי שמודה. */
+    var q=P.q; if(!q)return;
+    P.done=true; P.ok=false; P.picked=-1; record(false); render();
+    setTimeout(function(){speak(q.say,"en")},260);
+    return;
+  }
+  if(a==="slot"){var i=parseInt(el.getAttribute("data-i"),10);
+    if(P.used.indexOf(i)<0){P.used.push(i);P.slot.push(P.q.tiles[i]);render()}return}
+  if(a==="unslot"){var j=parseInt(el.getAttribute("data-i"),10);
+    var w=P.slot[j]; P.slot.splice(j,1);
+    var pos=P.q.tiles.indexOf(w),k;
+    for(k=0;k<P.used.length;k++)if(P.q.tiles[P.used[k]]===w){P.used.splice(k,1);break}
+    render(); return}
+  if(a==="clear"){P.slot=[];P.used=[];render();return}
+  if(a==="checkorder"){checkOrder();return}
+  if(a==="lang"){state.lang=LANGS[v]?v:"he";save();render();return}
+  if(a==="vmode"){state.voiceMode=v==="gem"?"gem":"device";save();render();return}
+  if(a==="gvoice"){state.gemVoice=gvOf(v).id;save();render();return}
+  if(a==="gsample"){
+    if(!hasKey()){gkMsg={ok:false,m:t("vNeed")};render();return}
+    var vid=gvOf(el.getAttribute("data-v")).id, old=state.gemVoice;
+    state.gemVoice=vid; state.voiceMode="gem";
+    speak("Hello. This is how I sound.","en");
+    state.gemVoice=old; save(); return;
+  }
+  if(a==="gkshow"){var inp=$("#gk");var val=inp?inp.value:GKEY;gkShow=!gkShow;render();
+    var i2=$("#gk"); if(i2){i2.value=val;i2.focus()} return}
+  if(a==="gsave"){testKey();return}
+  if(a==="tog"){state[v]=!state[v];save();render();return}
+  if(a==="theme"){state.theme=v;save();render();return}
+  if(a==="askreset"){askReset=true;render();return}
+  if(a==="noreset"){askReset=false;render();return}
+  if(a==="doreset"){
+    var lg2=state.lang; state=blankState(); state.lang=lg2;
+    try{localStorage.removeItem(SKEY)}catch(e){}
+    askReset=false; save(); render(); return;
+  }
+});
+document.addEventListener("input",function(e){
+  var el=e.target.closest("[data-a='rate']"); if(!el)return;
+  state.rate=clamp(parseFloat(el.value)||0.95,0.6,1.3); save();
+});
+/* Enter ורווח על כרטיס קול — הוא div ולכן המקלדת אינה מקבלת אותו בחינם */
+document.addEventListener("keydown",function(e){
+  if(e.key!=="Enter"&&e.key!==" ")return;
+  var el=e.target.closest("[data-a='gvoice']"); if(!el)return;
+  e.preventDefault(); el.click();
+});
+/* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
+   הקול מכריז "אין קול אנגלי" על מכשיר שיש בו אחד. */
+if(window.speechSynthesis){
+  try{speechSynthesis.getVoices()}catch(e){}
+  speechSynthesis.onvoiceschanged=function(){
+    /* הרשימה יכולה להגיע לפני שהמצב נטען. רינדור אז מצייר מסך של
+       אפליקציה שעדיין לא קיימת. */
+    if(booted)render();
+  };
+}
+window.addEventListener("pagehide",stopSpeak);
+
+/* ============================================================
+   11. הפעלה
+   ============================================================ */
+loadKey();
+load();
+touchDay();
+booted=true;
+applyModes();
+render();
+</script>
+</body>
+</html>
