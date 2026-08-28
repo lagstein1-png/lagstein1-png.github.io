@@ -614,6 +614,8 @@ function markReading(n){
 
 /* ---------- הקראה ---------- */
 var heVoices = [];
+var boundaryOK = null;   /* null = עוד לא ידוע, true/false = נבדק */
+var boundaryTimer = null;
 
 /* אוסף את כל הקולות העבריים שהדפדפן מציע — לא רק את הראשון.
    ההבדל משמעותי: בכרום יש בדרך כלל קול אחד בלבד, וב-Edge יש
@@ -716,6 +718,8 @@ function speakSentence(n){
   u.rate = P.rate;
   u.onboundary = function(e){
     if(e.name && e.name !== 'word') return;
+    boundaryOK = true;
+    if(boundaryTimer){ clearTimeout(boundaryTimer); boundaryTimer = null; }
     var c = e.charIndex + lead;
     for(var k=0;k<map.length;k++){
       if(c >= map[k].from && c < map[k].to){ hit(map[k].i); return; }
@@ -727,6 +731,22 @@ function speakSentence(n){
     else stop();
   };
   u.onerror = function(){ stop(); };
+
+  /* אנדרואיד, ולעתים גם ספארי, לא שולחים דיווח על מילים.
+     בלי זיהוי כזה ההדגשה פשוט לא זזה והמשתמש חושב שהכלי תקוע.
+     בודקים פעם אחת, ואם אין דיווח עוברים להדגשת משפט. */
+  if(boundaryOK === null){
+    if(boundaryTimer) clearTimeout(boundaryTimer);
+    boundaryTimer = setTimeout(function(){
+      if(boundaryOK === null && speaking){
+        boundaryOK = false;
+        markReading(SENT);
+        voiceBar('הדפדפן הזה לא מדווח מתי כל מילה נאמרת, אז ההדגשה היא של המשפט כולו. קורה בעיקר בטלפונים.');
+      }
+    }, 1500);
+  }
+  if(boundaryOK === false) markReading(n);
+
   speechSynthesis.speak(u);
 }
 
@@ -790,6 +810,7 @@ function play(){
 }
 function stop(){
   speaking = false;
+  if(boundaryTimer){ clearTimeout(boundaryTimer); boundaryTimer = null; }   /* אחרת הטיימר יורה אחרי שכבר עצרנו */
   $('#btnPlay').textContent = '▶';
   $('#btnPlay').setAttribute('aria-label', 'הקראה');
   try{ speechSynthesis.cancel(); }catch(e){}
