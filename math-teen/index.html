@@ -25,6 +25,12 @@
   --warn:#b45309; --warn-soft:#fef3c7;
   --shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px -12px rgba(16,24,40,.18);
   --r:14px;
+  /* צבע לכל תחום לימוד. זה לא קישוט — זה עוזר לזהות מיד באיזה
+     סוג חומר מדובר, וזה בדיוק מה שעוזר למי שמתקשה להתמצא. */
+  --c-base:#0d9488; --cs-base:#d2f4ef;
+  --c-alg:#5b56e0;  --cs-alg:#e6e5fe;
+  --c-geo:#b45309;  --cs-geo:#fbecd3;
+  --c-data:#be185d; --cs-data:#fbdfeb;
 }
 :root[data-theme="dark"]{
   --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
@@ -34,6 +40,10 @@
   --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
   --warn:#fbbf24; --warn-soft:#33260f;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  --c-base:#2dd4bf; --cs-base:#0f2e2b;
+  --c-alg:#a5b4fc;  --cs-alg:#1e2140;
+  --c-geo:#fbbf24;  --cs-geo:#33270f;
+  --c-data:#f472b6; --cs-data:#33162a;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -44,6 +54,10 @@
     --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
     --warn:#fbbf24; --warn-soft:#33260f;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  --c-base:#2dd4bf; --cs-base:#0f2e2b;
+  --c-alg:#a5b4fc;  --cs-alg:#1e2140;
+  --c-geo:#fbbf24;  --cs-geo:#33270f;
+  --c-data:#f472b6; --cs-data:#33162a;
   }
 }
 /* ניגודיות גבוהה — שחור על לבן, מסגרות מלאות, בלי גוונים רכים */
@@ -54,6 +68,8 @@
   --cyan:#004b57; --cyan-soft:#e6f2f4;
   --ok:#0a5c2a; --ok-soft:#e6f4ea; --bad:#8c0f2c; --bad-soft:#fbe9ed;
   --warn:#6b3d00; --warn-soft:#f7efdf; --shadow:none;
+  --c-base:#00308f; --cs-base:#e8edf8; --c-alg:#00308f; --cs-alg:#e8edf8;
+  --c-geo:#00308f;  --cs-geo:#e8edf8;  --c-data:#00308f; --cs-data:#e8edf8;
 }
 :root.hc .card,:root.hc .opt,:root.hc .btn,:root.hc .chip,:root.hc .tile{border:2px solid #000}
 :root.hc .deco{display:none}
@@ -82,10 +98,12 @@ a{color:var(--accent)}
 /* בלי זה כרום מותח כל מסך לרוחב המינימלי של התוכן שלו והעמוד גולש בטלפון */
 #app>*{min-width:0;width:100%}
 .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(12px,4vw,22px)}
-.deco{position:fixed;inset:0;z-index:0;pointer-events:none;
+.deco{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.85;
   background:
-    radial-gradient(900px 420px at 88% -8%,var(--accent-soft),transparent 65%),
-    radial-gradient(720px 380px at 4% 104%,var(--cyan-soft),transparent 62%)}
+    radial-gradient(760px 380px at 92% -6%,var(--cs-alg),transparent 62%),
+    radial-gradient(620px 340px at 2% 18%,var(--cs-data),transparent 58%),
+    radial-gradient(700px 380px at 10% 102%,var(--cs-base),transparent 60%),
+    radial-gradient(520px 300px at 96% 78%,var(--cs-geo),transparent 58%)}
 #app{position:relative;z-index:1}
 
 /* ---------- כותרת עליונה ---------- */
@@ -93,15 +111,18 @@ header{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 8
   backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .hbar{display:flex;align-items:center;gap:10px;padding-block:10px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.brand .mk{width:38px;height:38px;border-radius:11px;background:var(--ink);color:var(--bg);
+.brand .mk{width:38px;height:38px;border-radius:11px;
+  background:linear-gradient(140deg,var(--c-alg),var(--c-data) 55%,var(--c-geo));color:#fff;
   display:grid;place-items:center;font-weight:800;font-size:1.05rem;flex-shrink:0}
+:root.hc .brand .mk{background:var(--ink)}
 .brand b{display:block;font-size:1rem;line-height:1.15;font-weight:800}
 .brand small{display:block;color:var(--muted);font-size:.72rem;font-weight:500}
 nav{display:flex;gap:4px;margin-inline-start:auto;flex-wrap:wrap}
 .nb{display:inline-flex;align-items:center;gap:6px;border-radius:10px;padding:8px 12px;
   font-size:.9rem;font-weight:600;color:var(--muted);border:1px solid transparent;transition:.15s}
 .nb:hover{background:var(--surface2);color:var(--ink)}
-.nb.on{background:var(--ink);color:var(--bg)}
+.nb.on{background:var(--accent);color:#fff}
+:root.hc .nb.on{background:var(--ink);color:var(--bg)}
 .nb svg{flex-shrink:0}
 @media(max-width:560px){.nb span{display:none}.nb{padding:9px 11px}}
 
@@ -110,8 +131,9 @@ nav{display:flex;gap:4px;margin-inline-start:auto;flex-wrap:wrap}
 .pad{padding:clamp(14px,3.4vw,22px)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;
   font-weight:700;padding:12px 18px;transition:.15s;border:1px solid transparent;line-height:1.3}
-.btn-p{background:var(--accent);color:var(--accent-ink)}
-.btn-p:hover{filter:brightness(1.08)}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--c-data));color:#fff}
+.btn-p:hover{filter:brightness(1.1)}
+:root.hc .btn-p{background:var(--accent)}
 .btn-d{background:var(--ink);color:var(--bg)}
 .btn-g{background:var(--surface);border-color:var(--line);color:var(--ink)}
 .btn-g:hover{background:var(--surface2)}
@@ -159,10 +181,14 @@ sub{font-size:.62em;vertical-align:sub;line-height:0}
   padding:15px 14px 15px 44px;font-weight:700;font-size:clamp(1rem,4vw,1.2rem);transition:.14s;min-height:58px;
   display:flex;align-items:center;gap:10px}
 [dir="rtl"] .opt{padding:15px 44px 15px 14px}
-.opt:hover:not([disabled]){border-color:var(--accent);background:var(--accent-soft)}
+.opt:hover:not([disabled]){border-color:var(--c,var(--accent));background:var(--cs,var(--accent-soft))}
 .opt .k{position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);
-  width:24px;height:24px;border-radius:7px;background:var(--surface2);color:var(--faint);
+  width:24px;height:24px;border-radius:7px;background:var(--cs,var(--surface2));color:var(--c,var(--faint));
   display:grid;place-items:center;font-size:.76rem;font-weight:700}
+/* currentColor כאן היה נפתר לצבע שנקבע באותה הצהרה עצמה,
+   ולכן הרקע והטקסט יצאו זהים והספרה נעלמה. */
+.opt.right .k{background:var(--ok);color:var(--surface)}
+.opt.wrong .k{background:var(--bad);color:var(--surface)}
 .opt.right{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
 .opt.dim{opacity:.4}
@@ -174,7 +200,7 @@ sub{font-size:.62em;vertical-align:sub;line-height:0}
 .step:first-child{border-top:none}
 .step.future{display:none}
 .step .st{display:flex;align-items:center;gap:9px;font-weight:700;font-size:.95rem}
-.step .num{width:23px;height:23px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
+.step .num{width:23px;height:23px;border-radius:50%;background:var(--c,var(--accent));color:#fff;
   display:grid;place-items:center;font-size:.76rem;flex-shrink:0;font-weight:700}
 .step .sd{color:var(--muted);font-size:.92rem;margin-top:4px;overflow-wrap:anywhere}
 .step.last{background:var(--ok-soft)}
@@ -191,22 +217,28 @@ sub{font-size:.62em;vertical-align:sub;line-height:0}
 
 /* ---------- מדדים ---------- */
 .bar{height:7px;background:var(--surface2);border-radius:99px;overflow:hidden}
-.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .5s}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .5s,background .3s}
 .bar.ok>i{background:var(--ok)}
+.bar.mid>i{background:var(--warn)}
+.bar.low>i{background:var(--bad)}
 .dots{display:flex;gap:5px;flex-wrap:wrap}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--surface2);border:1px solid var(--line)}
 .dot.ok{background:var(--ok);border-color:var(--ok)}
 .dot.no{background:var(--bad);border-color:var(--bad)}
 .dot.hp{background:var(--warn);border-color:var(--warn)}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
-.tile b{display:block;font-size:1.7rem;font-weight:800;line-height:1.2}
+.tile{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--c,var(--accent));
+  border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.tile b{display:block;font-size:1.7rem;font-weight:800;line-height:1.2;color:var(--c,var(--ink))}
 .tile span{color:var(--muted);font-size:.82rem}
 
 /* ---------- כרטיס נושא ---------- */
-.tpc{display:flex;flex-direction:column;gap:9px;text-align:start;background:var(--surface);
-  border:1px solid var(--line);border-radius:12px;padding:14px;transition:.15s;box-shadow:var(--shadow);min-width:0}
-.tpc:hover{border-color:var(--accent);transform:translateY(-2px)}
-.tpc.on{border-color:var(--accent);background:var(--accent-soft)}
+.tpc{position:relative;display:flex;flex-direction:column;gap:9px;text-align:start;background:var(--surface);
+  border:1px solid var(--line);border-inline-start:4px solid var(--c,var(--accent));
+  border-radius:12px;padding:14px;transition:.15s;box-shadow:var(--shadow);min-width:0}
+.tpc:hover{border-color:var(--c,var(--accent));transform:translateY(-2px);box-shadow:0 8px 22px -12px var(--c)}
+.tpc:hover{border-inline-start-color:var(--c,var(--accent))}
+.tpc.on{border-color:var(--c,var(--accent));background:var(--cs,var(--accent-soft))}
+.tpc .tn{color:var(--c,var(--ink))}
 .tpc .tn{font-weight:700;font-size:.98rem;overflow-wrap:anywhere}
 .tpc .td{color:var(--muted);font-size:.8rem;overflow-wrap:anywhere}
 .tpc .tm{display:flex;align-items:center;gap:7px;font-size:.74rem;color:var(--faint)}
@@ -229,14 +261,24 @@ sub{font-size:.62em;vertical-align:sub;line-height:0}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
 .seg button{flex:1 1 auto;min-width:0;border:1px solid var(--line);background:var(--surface);
   border-radius:10px;padding:10px 12px;font-weight:600;font-size:.9rem;color:var(--muted);transition:.15s}
-.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg button.on{background:var(--c,var(--ink));color:#fff;border-color:transparent}
+:root.hc .seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;
   padding:12px 14px;font-size:1rem;outline:none}
 .field:focus{border-color:var(--accent)}
 
 /* ---------- דף נוסחאות ---------- */
-.fcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 15px;min-width:0}
+.a-base{--c:var(--c-base);--cs:var(--cs-base)}
+.a-alg{--c:var(--c-alg);--cs:var(--cs-alg)}
+.a-geo{--c:var(--c-geo);--cs:var(--cs-geo)}
+.a-data{--c:var(--c-data);--cs:var(--cs-data)}
+.chip.area{background:var(--cs);color:var(--c);border-color:transparent}
+.arh{display:flex;align-items:center;gap:9px}
+.arh::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--c);flex-shrink:0}
+.fcard{background:var(--surface);border:1px solid var(--line);border-inline-start:4px solid var(--c,var(--line));
+  border-radius:12px;padding:13px 15px;min-width:0}
+.fcard .fm{color:var(--c,var(--ink))}
 .fcard .ft{font-weight:700;font-size:.93rem}
 .fcard .fm{margin-top:7px;font-size:1.05rem}
 .fcard .fn{color:var(--muted);font-size:.82rem;margin-top:6px;overflow-wrap:anywhere}
@@ -1978,6 +2020,9 @@ var TOPICS=[
   {id:"prob",   area:"נתונים",   tracks:[3,4,5],pre:["frac"],     gen:genProb,    name:"הסתברות",            desc:"מאורע יחיד, משלים ושני ניסויים"},
   {id:"word",   area:"יסודות",   tracks:[3,4,5],pre:["linear"],   gen:genWord,    name:"בעיות מילוליות",     desc:"תנועה, גילים ותרגום משפט למשוואה"}
 ];
+var AREA_CLS={"יסודות":"a-base","אלגברה":"a-alg","גיאומטריה":"a-geo","נתונים":"a-data"};
+function areaCls(a){return AREA_CLS[a]||"a-alg"}
+function topicCls(id){var t=topicById(id);return t?areaCls(t.area):"a-alg"}
 function topicById(id){for(var i=0;i<TOPICS.length;i++)if(TOPICS[i].id===id)return TOPICS[i];return null}
 function topicsForTrack(tr){return TOPICS.filter(function(t){return t.tracks.indexOf(tr)>=0})}
 var AREAS=["יסודות","אלגברה","גיאומטריה","נתונים"];
@@ -2173,16 +2218,22 @@ function header(){
   '</div></header>';
 }
 
+var LVL_C=["var(--c-base)","var(--c-alg)","var(--c-geo)"];
 function levelPicker(){
   return '<div class="seg" role="group" aria-label="רמת קושי">'+LVL.map(function(l,i){
-    return '<button class="'+(state.level===i+1?"on":"")+'" data-a="lvl" data-l="'+(i+1)+'">'+l+'</button>';
+    return '<button class="'+(state.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="lvl" data-l="'+(i+1)+'">'+l+'</button>';
   }).join("")+'</div>';
 }
 
+/* אדום · כתום · ירוק — כדי שמבט אחד יספיק כדי לדעת מה חלש */
+function barCls(m){
+  if(!m.seen)return "";
+  return m.m>=70?"ok":m.m>=40?"mid":"low";
+}
 function masteryBar(id){
   var m=mastery(id);
   var lbl=!m.seen?"טרם":(m.seen<3?m.m+"% · מדגם קטן":m.m+"%");
-  return '<div class="tm"><span>'+lbl+'</span><span class="bar'+(m.m>=70?" ok":"")+'"><i style="width:'+(m.seen?m.m:0)+'%"></i></span></div>';
+  return '<div class="tm"><span>'+lbl+'</span><span class="bar '+barCls(m)+'"><i style="width:'+(m.seen?m.m:0)+'%"></i></span></div>';
 }
 
 /* ---------- מסך פתיחה ---------- */
@@ -2281,7 +2332,7 @@ function viewHome(){
      '<div class="grid g3" style="margin-top:12px">'+
      byNeed.map(function(id){
        var tp=topicById(id);
-       return '<button class="tpc" data-a="starttopic" data-t="'+id+'">'+
+       return '<button class="tpc '+areaCls(tp.area)+'" data-a="starttopic" data-t="'+id+'">'+
          '<span class="tn">'+tp.name+'</span><span class="td">'+tp.desc+'</span>'+masteryBar(id)+'</button>';
      }).join("")+'</div>';
   h+='<div class="row" style="margin-top:20px"><button class="btn btn-g" data-a="go" data-v="topics">'+ic("list",17)+' כל '+pool.length+' הנושאים</button>'+
@@ -2296,7 +2347,7 @@ function viewPractice(){
   var h='<main id="main" class="wrap" style="padding-top:18px;padding-bottom:44px">';
   /* שורת מצב */
   h+='<div class="spread">'+
-      '<div class="row"><span class="chip a">'+q.topicName+'</span>'+
+      '<div class="row"><span class="chip area '+topicCls(q.topic)+'">'+q.topicName+'</span>'+
       '<span class="chip">שאלה '+(P.i+1)+' מתוך '+P.list.length+'</span></div>'+
       '<div class="row"><span class="dots">'+
         P.list.map(function(_,i){
@@ -2307,7 +2358,7 @@ function viewPractice(){
      '</div>';
   h+='<div class="grid" style="grid-template-columns:minmax(0,1fr);margin-top:14px">';
   /* כרטיס השאלה */
-  h+='<div class="card pad rise">';
+  h+='<div class="card pad rise '+topicCls(q.topic)+'" style="border-top:3px solid var(--c)">';
   h+='<p style="font-size:clamp(1rem,3.6vw,1.15rem);font-weight:600">'+q.ask+'</p>';
   if(q.expr)h+='<p class="mline" style="margin-top:14px">'+q.expr+'</p>';
   if(q.fig)h+=q.fig;
@@ -2342,7 +2393,7 @@ function viewPractice(){
   if(P.steps>0||P.phase==="reveal"){
     var showAll=P.phase==="reveal";
     var shown=showAll?q.steps.length:Math.min(P.steps,q.steps.length);
-    h+='<div class="card pad rise"><div class="spread"><div class="h2">'+ic("steps",18)+' הפתרון, צעד אחר צעד</div>'+
+    h+='<div class="card pad rise '+topicCls(q.topic)+'"><div class="spread"><div class="h2" style="color:var(--c)">'+ic("steps",18)+' הפתרון, צעד אחר צעד</div>'+
        (state.settings.tts?'<button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="readsteps">'+ic("speaker",15)+' הקראה</button>':"")+'</div>';
     h+='<div class="steps">'+q.steps.map(function(s,i){
       if(i>=shown)return "";
@@ -2394,15 +2445,15 @@ function viewSummary(){
   var h='<main id="main" class="wrap" style="padding-top:26px;padding-bottom:44px;max-width:760px">';
   h+='<div class="card pad rise"><h1 class="h1">'+title+'</h1><p class="sub">'+sub+'</p>'+
      '<div class="grid g4" style="margin-top:18px">'+
-       '<div class="tile"><b>'+ok+'</b><span>נכון לבד</span></div>'+
-       '<div class="tile"><b>'+hp+'</b><span>עם פתרון מודרך</span></div>'+
-       '<div class="tile"><b>'+no+'</b><span>לא נפתרו</span></div>'+
-       '<div class="tile"><b>'+pct+'%</b><span>דיוק</span></div>'+
+       '<div class="tile" style="--c:var(--ok)"><b>'+ok+'</b><span>נכון לבד</span></div>'+
+       '<div class="tile" style="--c:var(--c-alg)"><b>'+hp+'</b><span>עם פתרון מודרך</span></div>'+
+       '<div class="tile" style="--c:var(--bad)"><b>'+no+'</b><span>לא נפתרו</span></div>'+
+       '<div class="tile" style="--c:var(--c-geo)"><b>'+pct+'%</b><span>דיוק</span></div>'+
      '</div>';
   h+='<hr class="sep"><div class="h2">לפי נושא</div><div class="grid" style="margin-top:10px">'+
      Object.keys(byTopic).map(function(id){
        var b=byTopic[id],tp=topicById(id);
-       return '<div class="spread" style="gap:8px"><span>'+tp.name+'</span>'+
+       return '<div class="spread '+topicCls(id)+'" style="gap:8px"><span class="arh">'+tp.name+'</span>'+
          '<span class="chip '+(b.ok===b.n?"ok":b.ok===0?"bad":"warn")+'">'+b.ok+' מתוך '+b.n+'</span></div>';
      }).join("")+'</div>';
   if(worst&&byTopic[worst].ok<byTopic[worst].n){
@@ -2438,10 +2489,10 @@ function viewTopics(){
   AREAS.forEach(function(area){
     var list=all.filter(function(t){return t.area===area});
     if(!list.length)return;
-    h+='<h2 class="h2" style="margin-top:24px">'+area+'</h2><div class="grid g3" style="margin-top:10px">'+
+    h+='<h2 class="h2 arh '+areaCls(area)+'" style="margin-top:24px">'+area+'</h2><div class="grid g3" style="margin-top:10px">'+
       list.map(function(tp){
         var on=chosen.indexOf(tp.id)>=0;
-        return '<div class="tpc'+(on?" on":"")+'">'+
+        return '<div class="tpc '+areaCls(tp.area)+(on?" on":"")+'">'+
           '<div class="spread"><span class="tn">'+tp.name+'</span>'+
           '<button class="chip'+(on?" a":"")+'" data-a="pick" data-t="'+tp.id+'" aria-pressed="'+on+'">'+(on?"בסבב":"להוסיף")+'</button></div>'+
           '<span class="td">'+tp.desc+'</span>'+masteryBar(tp.id)+
@@ -2470,9 +2521,9 @@ function viewFormulas(){
   ["יסודות","אלגברה","גיאומטריה","נתונים"].forEach(function(g){
     var sub=list.filter(function(f){return f.g===g});
     if(!sub.length)return;
-    h+='<h2 class="h2" style="margin-top:24px">'+g+'</h2><div class="grid g3" style="margin-top:10px">'+
+    h+='<h2 class="h2 arh '+areaCls(g)+'" style="margin-top:24px">'+g+'</h2><div class="grid g3" style="margin-top:10px">'+
       sub.map(function(f){
-        return '<div class="fcard" id="f-'+f.id+'"><div class="ft">'+f.t+'</div>'+
+        return '<div class="fcard '+areaCls(g)+'" id="f-'+f.id+'"><div class="ft">'+f.t+'</div>'+
           '<div class="fm m">'+f.m+'</div><div class="fn">'+f.n+'</div></div>';
       }).join("")+'</div>';
   });
@@ -2494,25 +2545,25 @@ function viewProgress(){
   var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
   h+='<h1 class="h1">התקדמות</h1><p class="sub">המספרים כאן הם כלי עבודה, לא ציון.</p>';
   h+='<div class="grid g4" style="margin-top:16px">'+
-     '<div class="tile"><b>'+st.answered+'</b><span>שאלות שנפתרו</span></div>'+
-     '<div class="tile"><b>'+acc+'%</b><span>דיוק כולל</span></div>'+
-     '<div class="tile"><b>'+st.helped+'</b><span>עם פתרון מודרך</span></div>'+
-     '<div class="tile"><b>'+st.xp+'</b><span>נקודות</span></div></div>';
+     '<div class="tile" style="--c:var(--c-base)"><b>'+st.answered+'</b><span>שאלות שנפתרו</span></div>'+
+     '<div class="tile" style="--c:var(--ok)"><b>'+acc+'%</b><span>דיוק כולל</span></div>'+
+     '<div class="tile" style="--c:var(--c-alg)"><b>'+st.helped+'</b><span>עם פתרון מודרך</span></div>'+
+     '<div class="tile" style="--c:var(--c-geo)"><b>'+st.xp+'</b><span>נקודות</span></div></div>';
   h+='<div class="card pad" style="margin-top:16px"><div class="h2">שבועיים אחרונים</div>'+
      '<div style="display:flex;gap:5px;align-items:flex-end;height:120px;margin-top:14px;direction:ltr">'+
      days.map(function(x){
        var hh=Math.round(x.r.a/maxA*88);
        return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;height:100%">'+
-         '<i style="display:block;width:100%;border-radius:5px 5px 0 0;background:'+(x.r.a?"var(--accent)":"var(--surface2)")+';height:'+Math.max(hh,4)+'px" title="'+x.r.a+' שאלות"></i>'+
+         '<i style="display:block;width:100%;border-radius:5px 5px 0 0;background:'+(x.r.a?"linear-gradient(180deg,var(--c-alg),var(--c-data))":"var(--surface2)")+';height:'+Math.max(hh,4)+'px" title="'+x.r.a+' שאלות"></i>'+
          '<span class="xs faint">'+x.lbl+'</span></div>';
      }).join("")+'</div></div>';
   h+='<div class="card pad" style="margin-top:16px"><div class="h2">שליטה לפי נושא</div>';
   if(!seen.length)h+='<p class="sub sm">עוד לא תרגלתם נושאים. אחרי הסבב הראשון תופיע כאן תמונה.</p>';
   else h+='<div class="grid" style="margin-top:12px;gap:11px">'+seen.sort(function(a,b){return mastery(a.id).m-mastery(b.id).m}).map(function(tp){
     var m=mastery(tp.id);
-    return '<div><div class="spread" style="gap:8px"><span style="font-weight:600">'+tp.name+'</span>'+
+    return '<div class="'+areaCls(tp.area)+'"><div class="spread" style="gap:8px"><span class="arh" style="font-weight:600">'+tp.name+'</span>'+
       '<span class="xs faint">'+m.ok+' מתוך '+m.seen+(m.help?" · "+m.help+" עם עזרה":"")+'</span></div>'+
-      '<div class="bar'+(m.m>=70?" ok":"")+'" style="margin-top:5px"><i style="width:'+m.m+'%"></i></div></div>';
+      '<div class="bar '+barCls(m)+'" style="margin-top:5px"><i style="width:'+m.m+'%"></i></div></div>';
   }).join("")+'</div>';
   h+='</div>';
   return h+'</main>';
