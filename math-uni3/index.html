@@ -580,7 +580,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g12 · 2026-08-29";
+var BUILD="g13 · 2026-08-29";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -738,8 +738,8 @@ function pickList(){
 /* אין שדה מגדר ב-Web Speech API. השם הוא הרמז היחיד, ולכן אלה
    שמות הקולות שהמערכות באמת מתקינות — ולא ניחוש לפי צליל.
    "google" הוא שם יצרן ולא מגדר, ומכוון אינו מופיע כאן. */
-var VOICE_F=/(female|woman|carmit|hila|miri|dana|zira|hazel|aria|jenny|\bsara\b|salma|hala|zariyah|amina|hoda|asma|laila|maryam|svetlana|dariya|irina|milena|elena|katja|ekaterina|noura|\bmona\b|samantha|karen|moira|tessa|serena|victoria|\bava\b|heera|raveena)/;
-var VOICE_M=/(\bmale\b|\bman\b|daniel|david|yoni|moshe|asaf|\bguy\b|george|\bmark\b|ryan|\balex\b|\bfred\b|maged|hamed|shakir|naayf|dmitry|pavel|yuri|artemi|maxim|\bomar\b|tarek|oliver|thomas|arthur|aaron|rishi|hemant)/;
+var VOICE_F=/(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/
+var VOICE_M=/(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/
 function guessGender(v){
   var n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
   if(VOICE_F.test(n))return "f";
@@ -761,7 +761,11 @@ function deviceVoice(){
   var mine=hebVoices();
   for(i=0;i<mine.length;i++)if(guessGender(mine[i])==="f")return mine[i];
   if(mine.length)return mine[0];
-  return list[0];
+  /* אין קול בשפת הממשק? מחזירים null ולא את הקול הראשון שיש.
+     קול אנגלי שמושם על משפט עברי גורר איתו גם את u.lang, והמשפט
+     נקרא באנגלית. null משאיר את u.lang בשפה הנכונה ומשאיר לדפדפן
+     לבחור — גרוע פחות מהקראה בשפה הלא נכונה. */
+  return null;
 }
 /* "gemini:Kore" או "device" */
 function voiceMode(){
@@ -7422,7 +7426,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g12-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g13-pwa1").catch(function(){});
   });
 }
 </script>
