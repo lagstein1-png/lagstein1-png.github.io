@@ -656,7 +656,11 @@ function pickVoice(){
   var v = speechSynthesis.getVoices();
   if(!v.length) return;
   voicesReady = true;
-  heVoices = v.filter(function(x){ return /^he/i.test(x.lang); });
+  /* קול נשי בראש הרשימה. שלושה מקומות שונים נופלים על "הראשון"
+     כברירת מחדל — כאן, ברינדור הכפתורים, ובנפילה מהקול הטבעי —
+     ולכן הסדר נקבע פעם אחת במקום שכל אחד מהם יחליט לבד. */
+  heVoices = v.filter(function(x){ return /^he/i.test(x.lang); })
+             .sort(function(a,b){ return (voiceGender(b)==='f') - (voiceGender(a)==='f'); });
   heVoice = heVoices.filter(function(x){ return x.voiceURI === P.voice; })[0] || heVoices[0] || null;
   renderVoices();
 }
@@ -669,10 +673,11 @@ var VOICE_F = /(female|woman|carmit|hila|miri|dana|zira|hazel|aria|jenny|\bsara\
 var VOICE_M = /(\bmale\b|\bman\b|daniel|david|yoni|moshe|asaf|\bguy\b|george|\bmark\b|ryan|\balex\b|\bfred\b|maged|hamed|shakir|naayf|dmitry|pavel|yuri|maxim|\bomar\b|tarek|oliver|thomas)/;
 function voiceGender(v){
   var n = ((v.name || '') + ' ' + (v.lang || '')).toLowerCase();
-  if (VOICE_F.test(n)) return ' · נשי';
-  if (VOICE_M.test(n)) return ' · גברי';
+  if (VOICE_F.test(n)) return 'f';
+  if (VOICE_M.test(n)) return 'm';
   return '';
 }
+var GENDER_LABEL = { f:' · נשי', m:' · גברי', '':'' };
 function voiceLabel(v){
   var n = String(v.name || '')
     .replace(/^Microsoft\s+/i, '')
@@ -680,7 +685,7 @@ function voiceLabel(v){
     .replace(/\s*\(.*?\)\s*/g, ' ')
     .trim();
   var natural = /online|natural|neural/i.test(v.name);
-  return (n || 'קול') + voiceGender(v) + (natural ? ' · טבעי' : '');
+  return (n || 'קול') + GENDER_LABEL[voiceGender(v)] + (natural ? ' · טבעי' : '');
 }
 
 function renderVoices(){
@@ -1163,7 +1168,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=3-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=4-pwa1").catch(function(){});
   });
 }
 </script>

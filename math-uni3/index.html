@@ -562,7 +562,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g6 · 2026-08-29";
+var BUILD="g7 · 2026-08-29";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -736,6 +736,10 @@ function deviceVoice(){
   var want=(state.settings.voiceByLang||{})[LG]||
            (LG==="he"?state.settings.voice:"");
   for(i=0;i<list.length;i++)if(list[i].voiceURI===want)return list[i];
+  /* בלי בחירה ידנית — קול נשי קודם. זו הבקשה, ובעברית הקול
+     הנשי גם נוטה להיות האיכותי מבין המותקנים. אם אין כזה,
+     חוזרים לראשון ברשימה במקום לשתוק. */
+  for(i=0;i<list.length;i++)if(guessGender(list[i])==="f")return list[i];
   return list[0];
 }
 /* "gemini:Kore" או "device" */
@@ -7219,7 +7223,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g6-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g7-pwa1").catch(function(){});
   });
 }
 </script>
