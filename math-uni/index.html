@@ -211,6 +211,10 @@ sub{font-size:.62em;vertical-align:sub;line-height:0}
 .opt.wrong .k{background:var(--bad);color:var(--surface)}
 .opt.right{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+/* בחירה במבחן היא בחירה, לא תשובה נכונה. במסכי התרגול הצבע
+   הירוק אומר "צדקת", ובמבחן אסור לו להופיע כלל — הוא נותן
+   משוב שגוי לכל בחירה. ניטרלי, ורק מסמן מה סומן. */
+.opt.picked{border-color:var(--accent);background:var(--accent-soft)}
 .opt.dim{opacity:.4}
 .opt.gone{opacity:.35;text-decoration:line-through}
 
@@ -247,6 +251,7 @@ sub{font-size:.62em;vertical-align:sub;line-height:0}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--surface2);border:1px solid var(--line)}
 .dot.ok{background:var(--ok);border-color:var(--ok)}
 .dot.no{background:var(--bad);border-color:var(--bad)}
+.dot.flag{box-shadow:0 0 0 2px var(--accent)}
 .dot.hp{background:var(--warn);border-color:var(--warn)}
 .tile{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--c,var(--accent));
   border-radius:12px;padding:14px;box-shadow:var(--shadow)}
@@ -573,7 +578,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u11 · 2026-08-29";
+var BUILD="u12 · 2026-08-29";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -3381,7 +3386,7 @@ function gradeResult(spec,res){
 /* ------------------------------------------------------------
    מסך המורה — בניית מבחן
    ------------------------------------------------------------ */
-var EB={title:"",n:10,level:2,topics:[],phone:"",tts:true,formulas:true,built:null,copied:""};
+var EB={title:"",n:10,mins:0,level:2,topics:[],phone:"",tts:true,formulas:true,built:null,copied:""};
 
 function viewExamNew(){
   var tops=topicsForTrack(state.track);
@@ -3407,6 +3412,9 @@ function viewExamNew(){
 
   h+='<div style="margin-top:16px"><b>מספר שאלות: <span id="exNlab">'+EB.n+'</span></b>'+
      '<input type="range" min="5" max="25" step="1" value="'+EB.n+'" data-slide="exn" style="margin-top:6px"></div>';
+  h+='<div style="margin-top:16px"><b>הגבלת זמן: <span id="exMlab">'+(EB.mins?EB.mins+' דקות':'ללא')+'</span></b>'+
+     '<p class="sub sm" style="margin:2px 0 0">אפס פירושו בלי טיימר. בתום הזמן המבחן מוגש מעצמו.</p>'+
+     '<input type="range" min="0" max="90" step="5" value="'+EB.mins+'" data-slide="exm" style="margin-top:6px"></div>';
 
   h+='<div style="margin-top:18px"><b>נושאים</b>'+
      '<p class="sub" style="margin:4px 0 8px">השאלות מתחלקות שווה בשווה בין הנושאים שנבחרו.</p>'+
@@ -3551,19 +3559,82 @@ function marksTable(ex){
 /* ------------------------------------------------------------
    מסך התלמיד — מבחן מתוך קישור
    ------------------------------------------------------------ */
-var SIT={spec:null,id:"",qs:[],i:0,name:"",answers:[],phase:"intro",code:"",copied:false};
+var SIT={spec:null,id:"",qs:[],i:0,name:"",answers:[],flags:[],
+         t0:0,tick:null,phase:"intro",code:"",copied:false};
+
+/* ------------------------------------------------------------
+   מבחן שנפתח מחדש — ריענון, שיחה נכנסת, נעילת מסך
+   ------------------------------------------------------------
+   תלמיד שדפדפן שלו רענן באמצע מבחן איבד עד כה את הכול. התשובות
+   נשמרות עכשיו במכשיר, לפי מזהה המבחן, יחד עם שעת ההתחלה — כדי
+   שגם טיימר לא יתאפס ויעניק זמן נוסף. השמירה מקומית בלבד.
+   ------------------------------------------------------------ */
+function sitKey(){return EKEY+"-run-"+SIT.id}
+function sitSave(){
+  if(!SIT.id)return;
+  try{localStorage.setItem(sitKey(),JSON.stringify({
+    n:SIT.name,a:SIT.answers,f:SIT.flags,t:SIT.t0,i:SIT.i,p:SIT.phase}))}catch(e){}
+}
+function sitDrop(){try{localStorage.removeItem(sitKey())}catch(e){}}
+function sitRestore(){
+  if(!SIT.id)return false;
+  try{
+    var o=JSON.parse(localStorage.getItem(sitKey())||"null");
+    if(!o||!o.a||!o.a.length)return false;
+    SIT.qs=examQuestions(SIT.spec);
+    if(o.a.length!==SIT.qs.length)return false;   /* מבחן אחר תחת אותו מזהה */
+    SIT.name=o.n||""; SIT.answers=o.a;
+    SIT.flags=o.f&&o.f.length===o.a.length?o.f:SIT.qs.map(function(){return false});
+    SIT.t0=o.t||0; SIT.i=Math.min(Math.max(0,o.i|0),SIT.qs.length-1);
+    SIT.phase=o.p==="done"?"done":"ask";
+    if(SIT.phase==="done")SIT.code=encodeResult(SIT.id,SIT.name,SIT.answers);
+    return true;
+  }catch(e){return false}
+}
+/* שניות שנותרו, או null כשלא הוגדרה הגבלת זמן */
+function sitLeft(){
+  var m=SIT.spec&&SIT.spec.m;
+  if(!m||!SIT.t0)return null;
+  return Math.max(0,Math.round((SIT.t0+m*60000-Date.now())/1000));
+}
+function sitClock(){
+  var l=sitLeft(); if(l===null)return "";
+  var mm=Math.floor(l/60),ss=l%60;
+  return mm+":"+(ss<10?"0":"")+ss;
+}
+/* הזמן נגמר — מגישים. לא מבקשים אישור: אישור שאיש לא לוחץ עליו
+   פירושו מבחן שנשאר פתוח לנצח. */
+function sitTimerOn(){
+  sitTimerOff();
+  if(sitLeft()===null)return;
+  SIT.tick=setInterval(function(){
+    if(SIT.phase!=="ask"){sitTimerOff();return}
+    if(sitLeft()<=0){sitTimerOff();sitFinish();return}
+    var el=$("#sitclock"); if(el)el.textContent=sitClock();
+  },1000);
+}
+function sitTimerOff(){if(SIT.tick){clearInterval(SIT.tick);SIT.tick=null}}
 
 function sitStart(){
   var nm=$("#sitName"); SIT.name=nm?nm.value.trim():"";
   SIT.qs=examQuestions(SIT.spec);
   SIT.answers=SIT.qs.map(function(){return -1});
-  SIT.i=0; SIT.phase="ask";
+  SIT.flags=SIT.qs.map(function(){return false});
+  SIT.i=0; SIT.phase="ask"; SIT.t0=Date.now();
+  sitSave(); sitTimerOn();
   window.scrollTo(0,0); render();
 }
 function sitAnswer(i){
   if(SIT.phase!=="ask")return;
   SIT.answers[SIT.i]=i;
+  sitSave();
   sitNext();
+}
+/* סימון לחזרה אינו תשובה ואינו משנה אותה — הוא רק מסמן. */
+function sitFlag(){
+  if(SIT.phase!=="ask")return;
+  SIT.flags[SIT.i]=!SIT.flags[SIT.i];
+  sitSave(); render();
 }
 function sitNext(){
   if(SIT.i+1<SIT.qs.length){SIT.i++;window.scrollTo(0,0);render();return}
@@ -3577,7 +3648,9 @@ function sitGo(i){
 }
 function sitFinish(){
   SIT.phase="done";
+  sitTimerOff();
   SIT.code=encodeResult(SIT.id,SIT.name,SIT.answers);
+  sitSave();
   stopSpeak(); window.scrollTo(0,0); render();
 }
 function sitGrade(){
@@ -3595,7 +3668,7 @@ function viewSit(){
     h+='<div class="card pad"><h1 class="h1">'+esc(sp.t||"מבחן")+'</h1>'+
        '<p class="sub">'+sp.q.length+' שאלות · '+esc(LVL[sp.l-1]||"")+' · בלי הגבלת זמן.</p>';
     h+='<ul class="sub" style="margin:14px 0 0;padding-inline-start:20px;line-height:1.9">'+
-       '<li>אין טיימר. אפשר לקחת את הזמן.</li>'+
+       (sp.m?'<li>יש הגבלת זמן: '+sp.m+' דקות. בסופן המבחן מוגש מעצמו.</li>':'<li>אין טיימר. אפשר לקחת את הזמן.</li>')+
        '<li>אין ניקוד שלילי — תשובה לא נכונה לא גורעת.</li>'+
        (sp.r!==false?'<li>אפשר לבקש הקראה של כל שאלה.</li>':'<li>ההקראה כבויה במבחן הזה.</li>')+
        (sp.f!==false?'<li>דף הנוסחאות פתוח לאורך כל המבחן.</li>':'<li>דף הנוסחאות סגור במבחן הזה.</li>')+
@@ -3612,9 +3685,10 @@ function viewSit(){
     var h2='<main class="wrap" style="padding-block:18px">';
     h2+='<div class="spread"><div class="row">'+
         '<span class="chip area '+topicCls(q.topic)+'">'+esc(q.topicName)+'</span>'+
-        '<span class="chip">שאלה '+(SIT.i+1)+' מתוך '+SIT.qs.length+'</span></div>'+
+        '<span class="chip">שאלה '+(SIT.i+1)+' מתוך '+SIT.qs.length+'</span>'+
+        (sitLeft()===null?"":'<span class="chip" id="sitclock" aria-live="polite">'+sitClock()+'</span>')+'</div>'+
         '<span class="dots">'+SIT.answers.map(function(a,i){
-          return '<span class="dot '+(i<SIT.i?(a>=0?"ok":"no"):"")+'"></span>'}).join("")+'</span></div>';
+          return '<span class="dot '+(SIT.flags[i]?"flag ":"")+(i<SIT.i?(a>=0?"ok":"no"):"")+'"></span>'}).join("")+'</span></div>';
     h2+='<div class="card pad rise '+topicCls(q.topic)+'" style="border-top:3px solid var(--c);margin-top:14px">';
     h2+='<p style="font-size:clamp(1rem,3.6vw,1.15rem);font-weight:600">'+q.ask+'</p>';
     if(q.expr)h2+='<p class="mline" style="margin-top:14px">'+q.expr+'</p>';
@@ -3627,7 +3701,7 @@ function viewSit(){
     if(tools.length)h2+='<div class="row" style="margin-top:16px;gap:8px">'+tools.join("")+'</div>';
     var cur=SIT.answers[SIT.i];
     h2+='<div class="opts">'+q.options.map(function(o,i){
-      return '<button class="opt'+(cur===i?" right":"")+'" data-a="sitans" data-i="'+i+'">'+
+      return '<button class="opt'+(cur===i?" picked":"")+'" data-a="sitans" data-i="'+i+'" aria-pressed="'+(cur===i?"true":"false")+'">'+
         '<span class="k">'+(i+1)+'</span><span class="m">'+o.h+'</span></button>';
     }).join("")+'</div>';
     /* "לא יודע/ת" הוא תשובה לגיטימית ולא דילוג. היא נספרת כשגויה,
@@ -3635,6 +3709,7 @@ function viewSit(){
     h2+='<div class="row" style="margin-top:14px">'+
         (SIT.i>0?'<button class="btn btn-g" data-a="sitprev">'+ic("back",16)+' קודמת</button>':"")+
         '<button class="btn btn-g" data-a="sitskip">לא יודע/ת</button>'+
+        '<button class="btn btn-g" data-a="sitflag" aria-pressed="'+(SIT.flags[SIT.i]?"true":"false")+'">'+(SIT.flags[SIT.i]?'✓ מסומנת לחזרה':'לחזור אליה')+'</button>'+
         (cur>=0?'<button class="btn btn-g" data-a="sitfwd">הבאה '+ic("arrow",16)+'</button>':"")+
         '</div>';
     h2+='</div></main>';
@@ -3736,7 +3811,7 @@ function examAction(a,el){
     var q=[],i;
     for(i=0;i<EB.n;i++)q.push([tops[i%tops.length],EB.level]);
     var spec={v:GENV,t:EB.title||"מבחן",s:(Math.random()*4294967295)>>>0,l:EB.level,
-              q:shuffle(q),r:!!EB.tts,f:!!EB.formulas,w:true};
+              q:shuffle(q),r:!!EB.tts,f:!!EB.formulas,w:true,m:EB.mins||0};
     if(EB.phone)spec.p=EB.phone.replace(/[^0-9]/g,"");
     EB.built=spec; EB.copied="";
     var id=examId(spec);
@@ -3790,7 +3865,8 @@ function examAction(a,el){
   /* --- התלמיד --- */
   if(a==="sitstart"){sitStart();return true}
   if(a==="sitans"){sitAnswer(parseInt(el.getAttribute("data-i"),10));return true}
-  if(a==="sitskip"){SIT.answers[SIT.i]=-1;sitNext();return true}
+  if(a==="sitskip"){SIT.answers[SIT.i]=-1;sitSave();sitNext();return true}
+  if(a==="sitflag"){sitFlag();return true}
   if(a==="sitprev"){sitGo(SIT.i-1);return true}
   if(a==="sitfwd"){sitNext();return true}
   if(a==="sitgo"){sitGo(parseInt(el.getAttribute("data-i"),10));return true}
@@ -3813,6 +3889,9 @@ function examFromUrl(){
   }
   if(sp.v!==GENV){view="oldexam";return true}
   SIT.spec=sp; SIT.id=examId(sp); SIT.phase="intro";
+  /* מבחן שכבר התחיל במכשיר הזה נמשך מהמקום שבו נעצר, עם הזמן
+     שכבר חלף. בלי זה ריענון היה מוחק תשובות ומאפס טיימר. */
+  if(sitRestore()&&SIT.phase==="ask")sitTimerOn();
   view="sit"; return true;
 }
 function viewBadExam(msg){
@@ -4044,6 +4123,20 @@ document.addEventListener("input",function(e){
     var pos=el.selectionStart;render();
     var again=document.querySelector('[data-bind="fq"]');
     if(again){again.focus();try{again.setSelectionRange(pos,pos)}catch(x){}}
+    return}
+  /* מחווני בונה המבחן. exn היה קיים בלי מטפל מאז ומעולם, ולכן
+     מספר השאלות תמיד נשאר על ברירת המחדל ולא משנה מה נגרר.
+     מעדכנים תווית בלבד ולא מציירים מסך — ציור מחדש בונה את
+     המחוון מאפס ומנתק את הגרירה באמצע. */
+  if(el.dataset.slide==="exn"){
+    EB.n=parseInt(el.value,10)||10;
+    var ln=$("#exNlab"); if(ln)ln.textContent=EB.n;
+    EB.built=null;
+    return}
+  if(el.dataset.slide==="exm"){
+    EB.mins=parseInt(el.value,10)||0;
+    var lm=$("#exMlab"); if(lm)lm.textContent=EB.mins?EB.mins+" דקות":"ללא";
+    EB.built=null;
     return}
   if(el.dataset.slide==="rate"){
     state.settings.rate=parseFloat(el.value);save();
@@ -8746,7 +8839,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u11-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u12-pwa1").catch(function(){});
   });
 }
 </script>
