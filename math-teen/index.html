@@ -497,7 +497,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t18 · 2026-08-29";
+var BUILD="t19 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -932,6 +932,36 @@ function tuneRate(lang,rate){
   return Math.max(0.5,Math.min(1.6,Math.round(r*100)/100));
 }
 
+
+/* ------------------------------------------------------------
+   כשאין במכשיר קול נשי בשפה הנוכחית — ווינדוס עם Asaf בלבד הוא
+   המקרה הנפוץ בעברית — מרימים את גובה הקול. זה לא קול נשי אמיתי,
+   וגם לא מתיימר להיות: זו הדרך היחידה בדפדפן להזיז קול גברי לכיוון
+   הנשי בלי הקלטות ובלי שירות חיצוני. מי שמתקין קול נשי מקבל אותו
+   מיד ובלי שינוי הגובה.
+   ------------------------------------------------------------ */
+var FEM_PITCH=1.35;
+function femLift(v){
+  if(!v)return 1;
+  try{ return guessGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
+}
+
+
+/* הודעה כשאין קול נשי בשפה — עם ההוראות למערכת ההפעלה שהמשתמש
+   נמצא בה. בלי זה "אין קול נשי" נראה כמו החלטה של האפליקציה. */
+function femNote(){
+  var mine=hebVoices(),i,has=false;
+  for(i=0;i<mine.length;i++)if(guessGender(mine[i])==="f")has=true;
+  if(has||!mine.length)return "";
+  var ua=navigator.userAgent||"";
+  var how=/Android/i.test(ua)
+    ? ("באנדרואיד: הגדרות ← ניהול כללי ← טקסט לדיבור ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי.")
+    : /iPhone|iPad|iPod/i.test(ua)
+    ? ("באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.")
+    : ("בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.");
+  return ("במכשיר הזה אין קול נשי בשפה הנוכחית, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו.")+" "+how;
+}
+
 function speakDevice(text){
   if(!("speechSynthesis" in window))return;
   try{speechSynthesis.cancel()}catch(e){}
@@ -944,6 +974,7 @@ function speakDevice(text){
      voicesReady נשאר בשימוש למסך בחירת הקול, שם ההמתנה במקומה. */
   var _v=deviceVoice(), _lang=(_v&&_v.lang)||"he-IL";
   var _segs=segments(String(text)), _rate=tuneRate(_lang,state.settings.rate);
+  var _pitch=femLift(_v);
   /* המקטע הראשון יוצא כאן, בתוך הלחיצה. השאר נשרשרים מ-onend. */
   (function sayseg(k){
     if(k>=_segs.length){ hlClear(); ttsOK(); return }
@@ -952,7 +983,7 @@ function speakDevice(text){
       var u=new SpeechSynthesisUtterance(seg.text);
       u.lang=_lang;
       if(_v){ try{ u.voice=_v }catch(e2){} }
-      u.rate=_rate; u.pitch=1; u.volume=1;
+      u.rate=_rate; u.pitch=_pitch; u.volume=1;
       u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
       u.onend=function(){
         if(k+1<_segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
@@ -3026,6 +3057,8 @@ function viewSettings(){
       /* רק קולות בשפת הממשק. הרשימה הציעה גם קולות אנגליים,
          והכפתור שלידם אינו משמיע אלא בוחר — כך נשמר קול אנגלי
          כקול שמקריא עברית. מה שלא יכול להיבחר, לא מוצג. */
+      var _fn=femNote();
+      if(_fn)h+='<div class="hintbox" style="margin-top:14px"><div class="sm">'+esc(_fn)+'</div></div>';
       var vl=hebVoices();
       if(!vl.length){
         h+='<div class="hintbox" style="margin-top:14px"><b>לא נמצאו קולות במכשיר</b>'+
@@ -3982,7 +4015,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t18-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t19-pwa1").catch(function(){});
   });
 }
 </script>

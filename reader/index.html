@@ -789,6 +789,20 @@ function ttsFail(err){
 /* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
 function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
 
+
+/* ------------------------------------------------------------
+   כשאין במכשיר קול נשי בשפה הנוכחית — ווינדוס עם Asaf בלבד הוא
+   המקרה הנפוץ בעברית — מרימים את גובה הקול. זה לא קול נשי אמיתי,
+   וגם לא מתיימר להיות: זו הדרך היחידה בדפדפן להזיז קול גברי לכיוון
+   הנשי בלי הקלטות ובלי שירות חיצוני. מי שמתקין קול נשי מקבל אותו
+   מיד ובלי שינוי הגובה.
+   ------------------------------------------------------------ */
+var FEM_PITCH=1.35;
+function femLift(v){
+  if(!v)return 1;
+  try{ return voiceGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
+}
+
 function speakSentence(n){
   if(isGemini()){ speakGemini(n); return; }
   if(!('speechSynthesis' in window)) return;
@@ -813,6 +827,7 @@ function speakSentence(n){
   var chosen = heVoices.filter(function(v){ return v.voiceURI === VOICE; })[0] || heVoice;
   if(chosen) u.voice = chosen;
   u.rate = P.rate;
+  u.pitch = femLift(chosen);
   u.onboundary = function(e){
     if(e.name && e.name !== 'word') return;
     boundaryOK = true;
@@ -1232,7 +1247,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=9-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=10-pwa1").catch(function(){});
   });
 }
 </script>

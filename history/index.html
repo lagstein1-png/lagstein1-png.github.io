@@ -599,7 +599,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m20 · 2026-08-29";
+var BUILD="m21 · 2026-08-29";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -1079,6 +1079,20 @@ function tuneRate(lang,rate){
   return Math.max(0.5,Math.min(1.6,Math.round(r*100)/100));
 }
 
+
+/* ------------------------------------------------------------
+   כשאין במכשיר קול נשי בשפה הנוכחית — ווינדוס עם Asaf בלבד הוא
+   המקרה הנפוץ בעברית — מרימים את גובה הקול. זה לא קול נשי אמיתי,
+   וגם לא מתיימר להיות: זו הדרך היחידה בדפדפן להזיז קול גברי לכיוון
+   הנשי בלי הקלטות ובלי שירות חיצוני. מי שמתקין קול נשי מקבל אותו
+   מיד ובלי שינוי הגובה.
+   ------------------------------------------------------------ */
+var FEM_PITCH=1.35;
+function femLift(v){
+  if(!v)return 1;
+  try{ return vGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
+}
+
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
   try{speechSynthesis.cancel()}catch(e){}
@@ -1093,13 +1107,14 @@ function speakDevice(text,code,rate){
     try{
       var v=bestVoice(code), lang=(v&&v.lang)||code;
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
+      var pit=femLift(v);
       (function sayseg(k){
         if(k>=segs.length){ hlClear(); ttsOK(); return }
         var seg=segs[k];
         var u=new SpeechSynthesisUtterance(seg.text);
         u.lang=lang;
         if(v){ try{ u.voice=v }catch(e2){} }
-        u.rate=rt; u.pitch=1; u.volume=1;
+        u.rate=rt; u.pitch=pit; u.volume=1;
         u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
         u.onend=function(){
           if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
@@ -4609,7 +4624,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m20-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m21-pwa1").catch(function(){});
   });
 }
 </script>

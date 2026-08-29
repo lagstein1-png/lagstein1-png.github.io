@@ -1243,6 +1243,20 @@ function ttsFail(err){
 /* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
 function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
 
+
+/* ------------------------------------------------------------
+   כשאין במכשיר קול נשי בשפה הנוכחית — ווינדוס עם Asaf בלבד הוא
+   המקרה הנפוץ בעברית — מרימים את גובה הקול. זה לא קול נשי אמיתי,
+   וגם לא מתיימר להיות: זו הדרך היחידה בדפדפן להזיז קול גברי לכיוון
+   הנשי בלי הקלטות ובלי שירות חיצוני. מי שמתקין קול נשי מקבל אותו
+   מיד ובלי שינוי הגובה.
+   ------------------------------------------------------------ */
+var FEM_PITCH=1.35;
+function femLift(v){
+  if(!v)return 1;
+  try{ return guessGender(v)==="male"?FEM_PITCH:1 }catch(e){ return 1 }
+}
+
 function speakLocal(text,preset,rate,pitch,langCode){
   if(!("speechSynthesis" in window))return;
   try{speechSynthesis.cancel()}catch(e){}
@@ -1259,7 +1273,7 @@ function speakLocal(text,preset,rate,pitch,langCode){
       u.lang=langCode||"he-IL";
       var v=pickVoice(preset.prefer,state.settings.voiceURI,state.settings.lang||"he");
       if(v){u.voice=v;u.lang=v.lang||langCode||"he-IL"}
-      u.rate=rate;u.pitch=pitch;
+      u.rate=rate;u.pitch=Math.min(1.45,pitch*femLift(v));
       /* לא היה כאן מטפל שגיאות בכלל: כשהמנוע נכשל, האפליקציה
          פשוט השתתקה בלי שאיש ידע למה. */
       u.onerror=function(e){ttsFail(e&&e.error)};
@@ -1399,7 +1413,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b25 · 2026-08-29";
+var BUILD="b26 · 2026-08-29";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -3053,7 +3067,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b25-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b26-pwa1").catch(function(){});
   });
 }
 </script>
