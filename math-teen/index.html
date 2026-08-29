@@ -481,7 +481,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t4 · 2026-08-29";
+var BUILD="t5 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -617,6 +617,17 @@ function hebVoices(){return voices().filter(function(v){return /^(he|iw)/i.test(
 function pickList(){
   var he=hebVoices(),rest=voices().filter(function(v){return he.indexOf(v)<0});
   return he.concat(rest);
+}
+/* אין שדה מגדר ב-Web Speech API. השם הוא הרמז היחיד, ולכן אלה
+   שמות הקולות שהמערכות באמת מתקינות — ולא ניחוש לפי צליל.
+   "google" הוא שם יצרן ולא מגדר, ומכוון אינו מופיע כאן. */
+var VOICE_F=/(female|woman|carmit|hila|miri|dana|zira|hazel|aria|jenny|\bsara\b|salma|hala|zariyah|amina|hoda|asma|laila|maryam|svetlana|dariya|irina|milena|elena|katja|ekaterina|noura|\bmona\b|samantha|karen|moira|tessa|serena|victoria|\bava\b|heera|raveena)/;
+var VOICE_M=/(\bmale\b|\bman\b|daniel|david|yoni|moshe|asaf|\bguy\b|george|\bmark\b|ryan|\balex\b|\bfred\b|maged|hamed|shakir|naayf|dmitry|pavel|yuri|artemi|maxim|\bomar\b|tarek|oliver|thomas|arthur|aaron|rishi|hemant)/;
+function guessGender(v){
+  var n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
+  if(VOICE_F.test(n))return "f";
+  if(VOICE_M.test(n))return "m";
+  return "?";
 }
 function deviceVoice(){
   var list=pickList(),i;
@@ -2740,14 +2751,22 @@ function viewSettings(){
       }else{
         if(!hv.length)h+='<div class="hintbox" style="margin-top:14px"><b>אין קול עברי במכשיר</b>'+
           '<div class="sm" style="margin-top:3px">הקולות שברשימה ידברו עברית במבטא זר. הקול הטבעי יישמע הרבה יותר טוב.</div></div>';
-        h+='<p class="sub sm" style="margin-top:14px">קולות במכשיר</p><div class="grid" style="margin-top:8px;gap:8px;max-height:340px;overflow-y:auto">'+
-          vl.slice(0,24).map(function(v){
-            var on=(deviceVoice()||{}).voiceURI===v.voiceURI;
-            var heb=/^(he|iw)/i.test(v.lang||"");
-            return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="voice" data-u="'+esc(v.voiceURI)+'">'+
-              '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"לשמוע")+'</span>'+
-              '<span class="tt"><b>'+esc(v.name)+'</b><span>'+esc(v.lang)+(heb?" · עברית":"")+'</span></span></button>';
-          }).join("")+'</div>';
+        /* שלוש קבוצות במקום רשימה שטוחה. מי שלא זוהה מופיע בנפרד
+           ולא מסווג בניחוש — עדיף "לא ידוע" מאשר תווית שגויה. */
+        var vbtn=function(v){
+          var on=(deviceVoice()||{}).voiceURI===v.voiceURI;
+          var heb=/^(he|iw)/i.test(v.lang||"");
+          return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="voice" data-u="'+esc(v.voiceURI)+'">'+
+            '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"לשמוע")+'</span>'+
+            '<span class="tt"><b>'+esc(v.name)+'</b><span>'+esc(v.lang)+(heb?" · עברית":"")+'</span></span></button>';
+        };
+        [["f","קולות נשיים"],["m","קולות גבריים"],["?","קולות במכשיר"]].forEach(function(grp){
+          var gv=vl.filter(function(v){return guessGender(v)===grp[0]}).slice(0,24);
+          if(!gv.length)return;
+          h+='<p class="sub sm" style="margin-top:14px">'+grp[1]+'</p>'+
+             '<div class="grid" style="margin-top:8px;gap:8px;max-height:340px;overflow-y:auto">'+
+             gv.map(vbtn).join("")+'</div>';
+        });
       }
     }
     h+='<p class="sub sm" style="margin-top:16px">מהירות דיבור — <span id="ratev">'+s.rate.toFixed(2)+'</span></p>'+
@@ -3593,7 +3612,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t4-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t5-pwa1").catch(function(){});
   });
 }
 </script>
