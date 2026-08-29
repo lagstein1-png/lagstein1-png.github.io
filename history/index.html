@@ -549,7 +549,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m11 · 2026-08-29";
+var BUILD="m12 · 2026-08-29";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -704,8 +704,12 @@ function voicesReady(){
   return _voicesP;
 }
 var LANG_HINT={he:/עברית|hebrew|ivrit/i,ar:/العربية|arabic/i,ru:/русский|russian/i,en:/english/i};
-var V_F=/(female|woman|carmit|hila|aria|jenny|sara|salma|hala|zariyah|amina|svetlana|dariya|irina|milena|elena|katja|noura|mona|samantha|karen|moira|tessa|serena)/;
-var V_M=/(\bmale\b|\bman\b|daniel|david|yoni|moshe|asaf|guy|george|mark|ryan|alex|fred|maged|hamed|shakir|dmitry|pavel|yuri|maxim|omar|tarek|oliver|thomas)/;
+/* שמות שהמערכות באמת מתקינות. חסרו כאן קולות ערביים ורוסיים,
+   ואז שניהם חזרו "לא ידוע" — איש מהם לא קיבל את בונוס המגדר,
+   וההכרעה נפלה על התאמת אזור מדויקת. כך נבחר קול גברי כשקיים
+   קול נשי באותה שפה. */
+var V_F=/(female|woman|carmit|hila|miri|dana|zira|hazel|aria|jenny|\bsara\b|salma|hala|zariyah|amina|hoda|asma|laila|maryam|svetlana|dariya|irina|milena|elena|katja|ekaterina|noura|\bmona\b|samantha|karen|moira|tessa|serena|victoria|\bava\b|heera|raveena)/;
+var V_M=/(\bmale\b|\bman\b|daniel|david|yoni|moshe|asaf|\bguy\b|george|\bmark\b|ryan|\balex\b|\bfred\b|maged|hamed|shakir|naayf|dmitry|pavel|yuri|artemi|maxim|\bomar\b|tarek|oliver|thomas|arthur|aaron|rishi|hemant)/;
 function vGender(v){var n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
   return V_F.test(n)?"f":V_M.test(n)?"m":"?"}
 function voicesFor(code){
@@ -4409,7 +4413,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m11-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m12-pwa1").catch(function(){});
   });
 }
 </script>
