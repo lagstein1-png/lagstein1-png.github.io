@@ -1,178 +1,309 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>יהושע – ליווי אישי</title>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      color: #1d2a3a;
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 35px 18px;
-      line-height: 1.8;
-      text-align: center;
-    }
-
-    .box {
-      background: white;
-      padding: 30px 22px;
-      border-radius: 16px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.10);
-    }
-
-    h1 {
-      color: #174c7e;
-    }
-
-    .button {
-      display: block;
-      background: #1d7a46;
-      color: white;
-      padding: 14px;
-      margin: 14px 0;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    .phone {
-      background: #174c7e;
-    }
-
-    .study {
-      background: #5b3f8a;
-    }
-
-    .teen {
-      background: #3b3f9e;
-    }
-
-    .uni {
-      background: #1f4f6b;
-    }
-
-    .eng {
-      background: #0f766e;
-    }
-
-    .uni2 {
-      background: #164e63;
-    }
-
-    .uni3 {
-      background: #115e59;
-    }
-
-    .hist {
-      background: #7c2d12;
-    }
-
-
-    .apps-title {
-      color: #174c7e;
-      font-size: 20px;
-      margin: 30px 0 4px;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 22px;
-    }
-
-    .app small {
-      display: block;
-      font-size: 14px;
-      font-weight: normal;
-      opacity: 0.9;
-      margin-top: 3px;
-    }
-    footer {
-      margin-top: 25px;
-      font-size: 14px;
-      color: #5d6772;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>יהושע לגשטיין — אפליקציות לימוד</title>
+<meta name="description" content="תשע אפליקציות לימוד חינמיות: מתמטיקה מהיסודי ועד התואר, אנגלית, היסטוריה, מקריא קולי ותאוריה. הכול עם הקראה קולית, בלי הרשמה ובלי עלות.">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="copyright" content="© 2026 יהושע לגשטיין. כל הזכויות שמורות.">
-<meta name="author" content="יהושע לגשטיין">
 <link rel="license" href="/legal/">
-<meta name="theme-color" content="#111827">
+<meta name="theme-color" content="#f6f7fb" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0b0f17" media="(prefers-color-scheme:dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   דף הבית. ערכי הצבע נתונים ואינם משתנים לפי מצב — רק נדרסים
+   בבלוק הכהה, כדי ששני המצבים יישארו זהים במבנה.
+   כל המידות לוגיות (inset-inline, margin-inline) ולא ימין/שמאל,
+   כדי שה-RTL יישאר תקין גם אם הדף ייטען בכיוון אחר.
+   ============================================================ */
+:root{
+  --bg:#f6f7fb; --bg-elev:#ffffff; --text:#14181f; --text-soft:#4a5464;
+  --line:#e2e6ef; --brand:#2f5fd8; --radius:18px;
+  --shadow:0 1px 2px rgba(20,24,31,.04),0 10px 30px -18px rgba(20,24,31,.25);
+  --c-math:#2f5fd8; --c-lang:#0f766e; --c-life:#a1520d;
+}
+:root[data-theme="dark"]{
+  --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6; --line:#222c3d;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 12px 34px -20px rgba(0,0,0,.8);
+  --c-math:#8fb0ff; --c-lang:#6ee7d5; --c-life:#f0b866;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6; --line:#222c3d;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 12px 34px -20px rgba(0,0,0,.8);
+    --c-math:#8fb0ff; --c-lang:#6ee7d5; --c-life:#f0b866;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--text);
+  font:400 17px/1.65 Heebo,"Segoe UI",system-ui,Arial,sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:1080px; margin-inline:auto; padding-inline:clamp(14px,4vw,26px)}
+
+/* --- כותרת --- */
+header{padding-block:clamp(26px,6vw,54px) 8px}
+.brand{display:flex; align-items:center; gap:14px}
+.mark{
+  inline-size:52px; block-size:52px; border-radius:15px; flex:none;
+  display:grid; place-items:center; background:var(--brand); color:#fff;
+  font-weight:800; font-size:1.5rem;
+}
+h1{margin:0; font-size:clamp(1.7rem,5.5vw,2.5rem); font-weight:800; letter-spacing:-.02em}
+.tag{margin:6px 0 0; color:var(--text-soft); font-size:clamp(.98rem,2.6vw,1.08rem)}
+
+/* --- שורת כלים --- */
+.tools{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-block:22px 6px}
+.search{
+  flex:1 1 240px; min-inline-size:0; display:flex; align-items:center; gap:9px;
+  background:var(--bg-elev); border:1px solid var(--line); border-radius:14px;
+  padding-inline:14px; min-block-size:48px;
+}
+.search input{
+  flex:1; min-inline-size:0; border:0; background:none; color:inherit;
+  font:inherit; min-block-size:46px;
+}
+.search input:focus{outline:none}
+.search:focus-within{border-color:var(--brand); box-shadow:0 0 0 3px rgba(47,95,216,.18)}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{
+  min-block-size:44px; padding-inline:16px; border-radius:999px; cursor:pointer;
+  border:1px solid var(--line); background:var(--bg-elev); color:var(--text-soft);
+  font:600 .95rem/1 Heebo,system-ui,sans-serif;
+}
+.chip[aria-pressed="true"]{background:var(--brand); border-color:var(--brand); color:#fff}
+.count{color:var(--text-soft); font-size:.92rem; margin-block:14px 0}
+
+/* --- כרטיסים --- */
+.grid{
+  display:grid; gap:16px; padding-block:14px 8px;
+  grid-template-columns:repeat(auto-fill,minmax(276px,1fr));
+}
+.card{
+  position:relative; display:flex; flex-direction:column; gap:10px;
+  background:var(--bg-elev); border:1px solid var(--line);
+  border-radius:var(--radius); padding:20px 22px;
+  box-shadow:var(--shadow); overflow:hidden;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+/* פס הצבע — תמיד בצד הפתיחה של הטקסט, ולכן inset-inline-start */
+.card::before{
+  content:""; position:absolute; inset-block:0; inset-inline-start:0;
+  inline-size:5px; background:var(--c);
+}
+.card::after{
+  content:""; position:absolute; inset:0; background:var(--c);
+  opacity:.045; pointer-events:none;
+}
+.card:hover{transform:translateY(-3px); box-shadow:0 2px 4px rgba(20,24,31,.05),0 18px 40px -22px rgba(20,24,31,.4)}
+.card h2{margin:0; font-size:1.22rem; font-weight:700; position:relative}
+.card p{margin:0; color:var(--text-soft); font-size:.96rem; position:relative}
+.tags{display:flex; flex-wrap:wrap; gap:6px; position:relative; margin-block-start:2px}
+.t{
+  font:600 .78rem/1 Heebo,system-ui,sans-serif; padding:6px 10px; border-radius:999px;
+  background:color-mix(in srgb,var(--c) 14%,transparent); color:var(--c);
+  border:1px solid color-mix(in srgb,var(--c) 26%,transparent);
+}
+.go{
+  margin-block-start:auto; position:relative; align-self:flex-start;
+  display:inline-flex; align-items:center; gap:7px; min-block-size:44px;
+  color:var(--c); font-weight:700; text-decoration:none;
+}
+.card a.go::after{content:""; position:absolute; inset:0}
+.go .arw{transition:transform .18s ease}
+.card:hover .go .arw{transform:translateX(4px)}
+html[dir="rtl"] .card:hover .go .arw{transform:translateX(-4px)}
+
+/* --- תחתית --- */
+footer.site{
+  margin-block-start:34px; padding-block:22px 30px;
+  border-block-start:1px solid var(--line); color:var(--text-soft); font-size:.9rem;
+  display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center;
+}
+footer.site a{color:inherit}
+.empty{padding:28px 4px; color:var(--text-soft)}
+
+/* יעד מגע של 44px גם לקישורי התחתית. קישור טקסט בשורה יוצא
+   בגובה הטקסט בלבד, וזה קטן מדי לאצבע. */
+footer.site a,.lg-foot a{
+  display:inline-flex; align-items:center; min-block-size:44px;
+  padding-inline:4px;
+}
+a:focus-visible,button:focus-visible,input:focus-visible{
+  outline:3px solid var(--brand); outline-offset:2px; border-radius:8px;
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important; animation:none !important}
+}
+</style>
 </head>
-
 <body>
-  <div class="box">
-    <h1>ברוכים הבאים לאתר של יהושע</h1>
-אתר בו יש שילוב של למידה וספרים שונים להנאה ולימוד
-    <p>
-      ליווי אישי, מכבד וסבלני לנוער עם צרכי למידה מיוחדים.
-    </p>
 
+<main class="wrap">
+  <header>
+    <div class="brand">
+      <span class="mark" aria-hidden="true">י</span>
+      <div>
+        <h1 id="ttl"></h1>
+        <p class="tag" id="sub"></p>
+      </div>
+    </div>
 
-    <h2 class="apps-title">האפליקציות שלי</h2>
+    <div class="tools">
+      <div class="search">
+        <span aria-hidden="true">🔍</span>
+        <label class="sr" for="q" style="position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)"></label>
+        <input id="q" type="search" autocomplete="off">
+      </div>
+      <div class="chips" id="chips" role="group"></div>
+    </div>
+    <p class="count" id="count" aria-live="polite"></p>
+  </header>
 
-    <a class="button app" href="/math-app/">
-      ➗ מתמטיקה לחכמים שמתקשים
-      <small>תרגול עם הקראה, רמזים וחיית מחמד</small>
-    </a>
+  <section class="grid" id="grid"></section>
+  <p class="empty" id="empty" hidden></p>
 
-    <a class="button app teen" href="/math-teen/">
-      📐 שלב — מתמטיקה לתיכון
-      <small>פתרון מודרך צעד־צעד, זיהוי הטעות ודף נוסחאות</small>
-    </a>
+  <footer class="site">
+    <span id="foot"></span>
+    <a href="https://lagstein1-png.github.io/" id="home"></a>
+    <button class="chip" id="theme" type="button"></button>
+  </footer>
+</main>
 
-    <a class="button app uni" href="/math-uni/">
-      ∫ אקסיומה — מתמטיקה לתואר ראשון
-      <small>חדו״א, לינארית והסתברות — בעברית, ערבית, רוסית ואנגלית</small>
-    </a>
+<script>
+/* ============================================================
+   כל המחרוזות במקום אחד. אין טקסט מוטבע בקוד למטה.
+   ============================================================ */
+var STR={
+  title:"האפליקציות שלי",
+  sub:"תשע אפליקציות לימוד — הכול נפתח בדפדפן, בלי הרשמה ובלי עלות.",
+  searchPh:"חיפוש — למשל: חדו״א, אנגלית, תאוריה",
+  searchLabel:"חיפוש באפליקציות",
+  all:"הכול", math:"מתמטיקה", lang:"שפות ומדעי הרוח", life:"כלים לחיים",
+  count:"{n} מתוך {t} אפליקציות",
+  none:"לא נמצאה אפליקציה מתאימה. אפשר לנקות את החיפוש ולנסות שוב.",
+  enter:"כניסה",
+  foot:"© 2026 יהושע לגשטיין",
+  home:"תנאי שימוש וזכויות יוצרים",
+  dark:"מצב כהה", light:"מצב בהיר",
+  tRead:"הקראה", tTeacher:"מצב מורה", tLangs:"4 שפות", tFree:"בלי הרשמה"
+};
 
-    <a class="button app uni2" href="/math-uni2/">
-      ∮ אקסיומה ב׳ — מתמטיקה לשנה ב׳
-      <small>חדו״א 2, לינארית 2, משוואות דיפרנציאליות והסתברות — בארבע שפות</small>
-    </a>
+/* ============================================================
+   האפליקציות. התגיות כאן אינן קישוט — הן נבדקו מול הקוד עצמו,
+   ולכן "מצב מורה" מופיע רק היכן שהוא באמת קיים.
+   ============================================================ */
+var APPS=[
+  {id:"math-app", cat:"math", c:"var(--c-math)", n:"מתמטיקה לחכמים שמתקשים",
+   d:"ארבע פעולות החשבון, צעד אחר צעד, עם חיית מחמד ובלי לחץ של זמן.",
+   t:["tRead","tTeacher","tLangs"], k:"יסודי חטיבה חיבור חיסור כפל חילוק"},
+  {id:"math-teen", cat:"math", c:"var(--c-math)", n:"שלב — מתמטיקה לתיכון",
+   d:"פתרון מודרך, זיהוי הטעות המדויקת ודף נוסחאות מלא.",
+   t:["tRead","tTeacher"], k:"תיכון בגרות אלגברה גאומטריה"},
+  {id:"math-uni", cat:"math", c:"var(--c-math)", n:"אקסיומה — תואר, שנה א׳",
+   d:"חדו״א, אלגברה לינארית והסתברות — ההסברים מלאים בארבע שפות.",
+   t:["tRead","tTeacher","tLangs"], k:"אוניברסיטה חדוא לינארית הסתברות"},
+  {id:"math-uni2", cat:"math", c:"var(--c-math)", n:"אקסיומה ב׳ — שנה שנייה",
+   d:"חדו״א 2, לינארית 2, משוואות דיפרנציאליות והסתברות.",
+   t:["tRead","tTeacher","tLangs"], k:"אוניברסיטה מדר משוואות דיפרנציאליות"},
+  {id:"math-uni3", cat:"math", c:"var(--c-math)", n:"אקסיומה ג׳ — שנה שלישית",
+   d:"אנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית.",
+   t:["tRead","tTeacher","tLangs"], k:"אוניברסיטה אנליזה מרוכבות נומרית"},
 
-    <a class="button app uni3" href="/math-uni3/">
-      ∮ אקסיומה ג׳ — מתמטיקה לשנה ג׳
-      <small>אנליזה, מרוכבת, אלגברה מופשטת ונומרית — בארבע שפות</small>
-    </a>
+  {id:"english", cat:"lang", c:"var(--c-lang)", n:"ניב — אנגלית מדוברת וספרותית",
+   d:"כל מילה נשמעת לפני שהיא נקראת — אוצר מילים, שיחה והבנת הנקרא.",
+   t:["tRead","tTeacher","tLangs"], k:"אנגלית שפה קריאה דיבור"},
+  {id:"history", cat:"lang", c:"var(--c-lang)", n:"מפנה — היסטוריה לחטיבה",
+   d:"אירועים, סיבות ותוצאות, עם קטעי מקור ורמז בכל שאלה.",
+   t:["tRead","tTeacher","tLangs"], k:"היסטוריה חטיבה מקורות תקופות"},
 
-    <a class="button app eng" href="/english/">
-      🗣️ ניב — אנגלית מדוברת וספרותית
-      <small>כל מילה נשמעת לפני שהיא נקראת — בעברית, ערבית, רוסית ואנגלית</small>
-    </a>
+  {id:"reader", cat:"life", c:"var(--c-life)", n:"מקריא קולי",
+   d:"מדביקים טקסט בעברית, והוא נקרא בקול עם מעקב אחרי המילה הנאמרת.",
+   t:["tRead"], k:"הקראה דיסלקציה ניקוד טקסט"},
+  {id:"drivewise", cat:"life", c:"var(--c-life)", n:"תאוריה מדברת",
+   d:"מאגר שאלות התאוריה המלא, עם הקראה מוקלטת של כל שאלה.",
+   t:["tRead"], k:"תאוריה נהיגה רישיון"}
+];
 
-    <a class="button app hist" href="/history/">
-      🕰️ מפנה — היסטוריה לחטיבת הביניים
-      <small>מהעת העתיקה ועד המאה ה-20 — בעברית, ערבית, רוסית ואנגלית</small>
-    </a>
+var $=function(s){return document.querySelector(s)};
+var esc=function(x){return String(x).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
 
-    <a class="button app study" href="/reader/">
-      📖 מקריא קולי
-      <small>טקסט בעברית — מנוקד, מוקרא, מילה־מילה</small>
-    </a>
+/* --- מצב כהה: העדפת המערכת, ודריסה ידנית שנשמרת --- */
+var KEY="site-theme";
+function savedTheme(){try{return localStorage.getItem(KEY)||""}catch(e){return""}}
+function applyTheme(v){
+  var r=document.documentElement;
+  if(v)r.setAttribute("data-theme",v); else r.removeAttribute("data-theme");
+  var dark=v?v==="dark":matchMedia("(prefers-color-scheme:dark)").matches;
+  $("#theme").textContent=dark?STR.light:STR.dark;
+  $("#theme").setAttribute("aria-pressed",dark?"true":"false");
+}
+$("#theme").addEventListener("click",function(){
+  var dark=document.documentElement.getAttribute("data-theme")==="dark"||
+           (!savedTheme()&&matchMedia("(prefers-color-scheme:dark)").matches);
+  var next=dark?"light":"dark";
+  try{localStorage.setItem(KEY,next)}catch(e){}
+  applyTheme(next);
+});
 
-    <a class="button app phone" href="/drivewise/">
-      🚗 תאוריה מדברת
-      <small>לימוד תיאוריה לנהיגה עם הקראה</small>
-    </a>
-    <p>
-      לשיחה, שאלות ופרטים נוספים — אפשר ליצור איתי קשר במייל:
-    </p>
+/* --- סינון --- */
+var CATS=[["all","all"],["math","math"],["lang","lang"],["life","life"]];
+var cat="all", q="";
 
-    <a class="button" href="mailto:lagstein1@gmail.com">
-      ✉️ lagstein1@gmail.com
-    </a>
+function draw(){
+  var list=APPS.filter(function(a){
+    if(cat!=="all"&&a.cat!==cat)return false;
+    if(!q)return true;
+    var hay=(a.n+" "+a.d+" "+a.k).toLowerCase();
+    return hay.indexOf(q)>=0;
+  });
+  $("#grid").innerHTML=list.map(function(a){
+    return '<article class="card" style="--c:'+a.c+'">'+
+      '<h2>'+esc(a.n)+'</h2>'+
+      '<p>'+esc(a.d)+'</p>'+
+      '<div class="tags">'+a.t.map(function(k){
+        return '<span class="t">'+esc(STR[k])+'</span>'}).join("")+'</div>'+
+      '<a class="go" href="/'+a.id+'/">'+esc(STR.enter)+
+        '<span class="arw" aria-hidden="true">←</span></a>'+
+    '</article>';
+  }).join("");
+  $("#count").textContent=STR.count.replace("{n}",list.length).replace("{t}",APPS.length);
+  $("#empty").textContent=STR.none;
+  $("#empty").hidden=list.length>0;
+}
 
-    <footer>
-      הפרטים נשמרים בפרטיות מלאה.
-    </footer>
-  </div>
+function boot(){
+  $("#ttl").textContent=STR.title;
+  $("#sub").textContent=STR.sub;
+  $("#q").placeholder=STR.searchPh;
+  $("#q").setAttribute("aria-label",STR.searchLabel);
+  $("#foot").textContent=STR.foot;
+  $("#home").textContent=STR.home;
+  $("#home").setAttribute("href","/legal/");
+  $("#chips").innerHTML=CATS.map(function(c){
+    return '<button class="chip" type="button" data-c="'+c[0]+'" aria-pressed="'+
+      (c[0]===cat)+'">'+esc(STR[c[1]])+'</button>'}).join("");
+  $("#chips").addEventListener("click",function(e){
+    var b=e.target.closest("[data-c]"); if(!b)return;
+    cat=b.getAttribute("data-c");
+    Array.prototype.forEach.call($("#chips").children,function(x){
+      x.setAttribute("aria-pressed",String(x.getAttribute("data-c")===cat))});
+    draw();
+  });
+  $("#q").addEventListener("input",function(){q=this.value.trim().toLowerCase();draw()});
+  applyTheme(savedTheme());
+  draw();
+}
+boot();
+</script>
+
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
@@ -181,7 +312,7 @@
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=1-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=2-pwa1").catch(function(){});
   });
 }
 </script>
