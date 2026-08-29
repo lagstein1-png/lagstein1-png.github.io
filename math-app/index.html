@@ -1291,7 +1291,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b18 · 2026-08-29";
+var BUILD="b19 · 2026-08-29";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -1921,7 +1921,10 @@ function settingsView(){
   '<button class="btn btn-ghost" data-a="gkshow" style="padding:10px 16px;font-size:.9rem">'+ic("eye",17)+' '+(gkShow?esc(t.gHide):esc(t.gShow))+'</button>'+
   '<button class="btn btn-teal" data-a="gsave" id="gsave" style="padding:10px 20px;font-size:.95rem">'+ic("key",17)+' '+esc(t.gSave)+'</button></div>'+
   (googleOn()?'<p class="note ok" style="margin-top:12px">✓ '+esc(t.gSavedNote)+'</p>':"")+
-  (gkMsg?'<p class="note '+(gkMsg.ok?"ok":"err")+'" style="margin-top:12px">'+esc(gkMsg.msg)+'</p>':"")+
+  /* ההודעה נשמרת כמפתח ומתורגמת בציור. קודם נשמר הטקסט עצמו,
+     ולכן הודעה שנוצרה לפני החלפת שפה נשארה על המסך בשפה
+     הישנה — הודעה ברוסית בתוך ממשק עברי. */
+  (gkMsg?'<p class="note '+(gkMsg.ok?"ok":"err")+'" style="margin-top:12px">'+esc(t[gkMsg.k]||"")+'</p>':"")+
   '<p style="color:var(--ink-faint);font-size:.82rem;margin-top:12px;line-height:1.6">'+esc(t.gHow)+'</p>'+
   '<p class="note warn" style="margin-top:10px">'+esc(t.gFallback)+'</p></div>';
   /* link */
@@ -2794,10 +2797,21 @@ function onAction(a,el){
   else if(a==="vpick"){state.settings.voiceURI=el.getAttribute("data-u")||null;save();render()}
   else if(a==="vtest"){
     var u=el.getAttribute("data-u")||null;
-    try{speechSynthesis.cancel();var ut=new SpeechSynthesisUtterance(t.gSample);ut.lang=LANGS[state.settings.lang||"he"].tts;
-      var vv=u?allVoices().filter(function(x){return x.voiceURI===u})[0]:pickVoice((PRESETS.filter(function(p){return p.id===state.settings.preset})[0]||{}).prefer||"any",null);
-      if(vv){ut.voice=vv;ut.lang=vv.lang}
-      ut.rate=state.settings.rate;ut.pitch=state.settings.pitch;speechSynthesis.speak(ut);}catch(e){}
+    try{speechSynthesis.cancel()}catch(e){}
+    /* הכפתור הזה דיבר ישירות, בלי להמתין לרשימת הקולות. בפתיחה
+       ראשונה הרשימה עדיין ריקה, ולכן "השמע דוגמה" פשוט לא השמיע
+       כלום — לא בקול הלא נכון, אלא בכלל. */
+    voicesReady().then(function(){
+      try{
+        var ut=new SpeechSynthesisUtterance(t.gSample);
+        ut.lang=LANGS[state.settings.lang||"he"].tts;
+        var vv=u?allVoices().filter(function(x){return x.voiceURI===u})[0]
+                :pickVoice((PRESETS.filter(function(p){return p.id===state.settings.preset})[0]||{}).prefer||"any",null);
+        if(vv){ut.voice=vv;ut.lang=vv.lang}
+        ut.rate=state.settings.rate;ut.pitch=state.settings.pitch;
+        speechSynthesis.speak(ut);
+      }catch(e){}
+    });
   }
   else if(a==="sample")speak(t.gSample);
   else if(a==="lang"){state.settings.lang=el.getAttribute("data-l");save();applyModes();startRound(activeLevel());render();window.scrollTo(0,0)}
@@ -2806,20 +2820,20 @@ function onAction(a,el){
   else if(a==="gkshow"){gkShow=!gkShow;var inp=$("#gkey"),val=inp?inp.value:state.settings.googleKey;render();var inp2=$("#gkey");if(inp2){inp2.value=val;inp2.focus()}}
   else if(a==="gsave"){
     var inp3=$("#gkey");state.settings.googleKey=inp3?inp3.value.trim():"";save();
-    if(!state.settings.googleKey){gkMsg={ok:true,msg:t.gRemoved};render();return}
+    if(!state.settings.googleKey){gkMsg={ok:true,k:"gRemoved"};render();return}
     gkMsg=null;var btn=$("#gsave");if(btn){btn.innerHTML='<span class="spin" style="display:inline-block">'+ic("refresh",16)+'</span> '+esc(t.gChecking);btn.disabled=true}
     gSynth(t.gSample,gvOf(state.settings.googleVoice).id,state.settings.rate,state.settings.lang||"he")
-      .then(function(){gkMsg={ok:true,msg:t.gOk};render();speak(t.gSample,true)})
-      .catch(function(){gkMsg={ok:false,msg:t.gErr};render()});
+      .then(function(){gkMsg={ok:true,k:"gOk"};render();speak(t.gSample,true)})
+      .catch(function(){gkMsg={ok:false,k:"gErr"};render()});
   }
   else if(a==="gvoice"){state.settings.googleVoice=gvOf(el.getAttribute("data-v")).id;save();render()}
   else if(a==="gsample"){
     /* קודם נשלח כאן טקסט של קול אחד ונוגן בקול אחר: speakGoogle התעלם
        מהכפתור שנלחץ וסינתז תמיד בקול השמור. */
     var vv2=gvOf(el.getAttribute("data-v")).id;
-    if(!googleOn()){gkMsg={ok:false,msg:t.gNeedKey};render();return}
+    if(!googleOn()){gkMsg={ok:false,k:"gNeedKey"};render();return}
     speakGoogle(t.gSample,state.settings.rate,state.settings.pitch,
-      function(){gkMsg={ok:false,msg:t.gPlayFail};render()},vv2);
+      function(){gkMsg={ok:false,k:"gPlayFail"};render()},vv2);
   }
   else if(a==="askreset"){confirmReset=true;render()}
   else if(a==="noreset"){confirmReset=false;render()}
@@ -2913,7 +2927,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b18-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b19-pwa1").catch(function(){});
   });
 }
 </script>
