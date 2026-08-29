@@ -590,7 +590,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g17 · 2026-08-29";
+var BUILD="g18 · 2026-08-29";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -605,7 +605,7 @@ function blankState(){
     days:{},
     wrongBank:[],            /* נושאים שנפלו בהם — חוזרים לתרגול */
     settings:{theme:"auto",ts:1,clearfont:false,spaced:false,hc:false,rm:false,
-              calm:false,tts:true,rate:0.95,engine:"gemini",gvoice:"Kore",voice:"",
+              calm:false,tts:true,rate:0.95,engine:"device",gvoice:"Kore",voice:"",
               roundLen:8,keys:true,autoSteps:false,lang:null,voiceByLang:{}}
   };
 }
@@ -918,6 +918,11 @@ var ttsErr="",ttsState="";   /* "" · "ok" · "device" · "err" */
 var _ttsBar=null;
 function ttsFail(err){
   try{ hlClear() }catch(e){}
+  /* "interrupted" ו-"canceled" אינן תקלות: זה מה שהמנוע מדווח על
+     אמירה שבוטלה כדי לפנות מקום לאמירה הבאה — כלומר מהלך תקין
+     לגמרי, שקורה בכל לחיצה שנייה. הצגתן כשגיאה הבהילה משתמש
+     ואמרה לו שהמכשיר שלו שבור בזמן שהוא עבד. */
+  if(err==="interrupted"||err==="canceled")return;
   if(_ttsBar)return;
   var m=document.createElement("div");
   m.setAttribute("role","alert");
@@ -944,11 +949,45 @@ function ttsFail(err){
 /* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
 function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
 
+
+/* ------------------------------------------------------------
+   בדיקת קול בתוך האפליקציה. הפשוטה ביותר שאפשר: אמירה אחת,
+   בתוך הלחיצה, בלי מילון, בלי בחירת קול ובלי שום שכבה — ומדווחת
+   על המסך מה קרה. יום שלם אבד כי כשלא היה קול, שום דבר לא אמר למה.
+   ------------------------------------------------------------ */
+var VCHK="";
+function voiceCheck(){
+  VCHK="נשלח…"; render();
+  function show(m){ VCHK=m; render() }
+  if(!("speechSynthesis" in window)){ show("✗ הדפדפן הזה לא תומך בהקראה"); return }
+  var list=[]; try{ list=speechSynthesis.getVoices()||[] }catch(e){}
+  try{ speechSynthesis.cancel() }catch(e){}
+  var u;
+  try{ u=new SpeechSynthesisUtterance("שלום, זו בדיקת קול") }
+  catch(e){ show("✗ יצירת האמירה נכשלה: "+e.message); return }
+  u.lang="he-IL"; u.volume=1; u.rate=1; u.pitch=1;
+  var done=false;
+  u.onstart=function(){ done=true; show("✓ הקול פועל — "+list.length+" קולות במכשיר") };
+  u.onerror=function(e){ done=true;
+    var er=(e&&e.error)||"לא ידוע";
+    show("✗ המנוע החזיר "+er+" · "+list.length+" קולות · זו תקלה במכשיר, לא באפליקציה"); };
+  try{ speechSynthesis.speak(u) }
+  catch(e){ show("✗ speak נכשל: "+e.message); return }
+  setTimeout(function(){ if(!done)
+    show("✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר") },2000);
+}
+
 function speakDevice(text){
   if(!("speechSynthesis" in window))return;
   try{speechSynthesis.cancel()}catch(e){}
-  /* ממתינים שרשימת הקולות תעלה לפני האמירה הראשונה. */
-  voicesReady().then(function(){
+  /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
+     שממתין לרשימת הקולות ועד ארבע שניות אם היא לא מגיעה — ואמירה
+     שיוצאת ארבע שניות אחרי המגע נזרקת בשקט באנדרואיד ובספארי.
+     כשהרשימה כבר כאן, בוחרים קול ומדברים. כשהיא ריקה — מדברים
+     בכל זאת, עם u.lang בלבד: קול ברירת מחדל בשפה הנכונה עדיף על
+     שתיקה, ויש מכשירים שמחזירים רשימה ריקה לצמיתות ומדברים היטב.
+     voicesReady נשאר בשימוש למסך בחירת הקול, שם ההמתנה במקומה. */
+  (function(){
     try{
       var u=new SpeechSynthesisUtterance(String(text));
       /* השפה נקבעת ראשונה ובנפרד מהקול. אם השמת הקול נכשלת — וזה קורה
@@ -963,7 +1002,7 @@ function speakDevice(text){
     u.onerror=function(e){ttsFail(e&&e.error)};
     speechSynthesis.speak(u);
     }catch(e){}
-  });
+  })();
 }
 function speak(text){
   if(!state.settings.tts||!text)return;
@@ -2845,6 +2884,11 @@ function viewSettings(){
        '<button class="'+(s.engine==="gemini"?"on":"")+_('" data-a="engine" data-n="gemini">קול טבעי</button>')+
        '<button class="'+(s.engine!=="gemini"?"on":"")+_('" data-a="engine" data-n="device">קול המכשיר</button>')+
        '</div>';
+    /* בדיקה במקום ניחוש: לחיצה אחת שאומרת אם הקול עובד. */
+    h+='<div style="margin-top:12px"><button class="btn btn-p" data-a="vcheck">'+
+       ic("speaker",17)+' '+_("בדיקת קול")+'</button>'+
+       (VCHK?'<p class="sub sm" style="margin-top:8px">'+esc(VCHK)+'</p>':"")+
+       '<p class="sub sm" style="margin-top:6px;opacity:.7">'+esc(BUILD)+'</p></div>';
     /* התנאי הוא המצב בפועל ולא ההעדפה השמורה: ברירת המחדל היא
        "gemini", וכשאין מפתח האפליקציה מדברת בקול המכשיר — אבל
        המסך הראה רק את תיבת המפתח, בלי אף קול לבחור מתוכו. */
@@ -3756,6 +3800,7 @@ function onAction(a,el){
     if(!s.voiceByLang)s.voiceByLang={};
     s.voiceByLang[LG]=uri;
     s.engine="device";save();render();speak(_(VOICE_SAMPLE));return}
+  if(a==="vcheck"){voiceCheck();return}
   if(a==="test"){speak(_(VOICE_SAMPLE));return}
   if(a==="pick"){
     var id=el.getAttribute("data-t"),ix=state.topics.indexOf(id);
@@ -7497,7 +7542,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g17-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g18-pwa1").catch(function(){});
   });
 }
 </script>

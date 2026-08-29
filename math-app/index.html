@@ -1212,6 +1212,11 @@ function pickVoice(prefer,uri,lang){
 var _ttsBar=null;
 function ttsFail(err){
   try{ hlClear() }catch(e){}
+  /* "interrupted" ו-"canceled" אינן תקלות: זה מה שהמנוע מדווח על
+     אמירה שבוטלה כדי לפנות מקום לאמירה הבאה — כלומר מהלך תקין
+     לגמרי, שקורה בכל לחיצה שנייה. הצגתן כשגיאה הבהילה משתמש
+     ואמרה לו שהמכשיר שלו שבור בזמן שהוא עבד. */
+  if(err==="interrupted"||err==="canceled")return;
   if(_ttsBar)return;
   var m=document.createElement("div");
   m.setAttribute("role","alert");
@@ -1241,8 +1246,14 @@ function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild
 function speakLocal(text,preset,rate,pitch,langCode){
   if(!("speechSynthesis" in window))return;
   try{speechSynthesis.cancel()}catch(e){}
-  /* ממתינים שרשימת הקולות תעלה לפני האמירה הראשונה. */
-  voicesReady().then(function(){
+  /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
+     שממתין לרשימת הקולות ועד ארבע שניות אם היא לא מגיעה — ואמירה
+     שיוצאת ארבע שניות אחרי המגע נזרקת בשקט באנדרואיד ובספארי.
+     כשהרשימה כבר כאן, בוחרים קול ומדברים. כשהיא ריקה — מדברים
+     בכל זאת, עם u.lang בלבד: קול ברירת מחדל בשפה הנכונה עדיף על
+     שתיקה, ויש מכשירים שמחזירים רשימה ריקה לצמיתות ומדברים היטב.
+     voicesReady נשאר בשימוש למסך בחירת הקול, שם ההמתנה במקומה. */
+  (function(){
     try{
       var u=new SpeechSynthesisUtterance(text);
       u.lang=langCode||"he-IL";
@@ -1255,7 +1266,7 @@ function speakLocal(text,preset,rate,pitch,langCode){
       u.onend=function(){ttsOK()};
       speechSynthesis.speak(u);
     }catch(e){}
-  });
+  })();
 }
 function speak(text,excited){
   if(!state.settings.tts)return;
@@ -1388,7 +1399,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b24 · 2026-08-29";
+var BUILD="b25 · 2026-08-29";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2913,8 +2924,10 @@ function onAction(a,el){
     try{speechSynthesis.cancel()}catch(e){}
     /* הכפתור הזה דיבר ישירות, בלי להמתין לרשימת הקולות. בפתיחה
        ראשונה הרשימה עדיין ריקה, ולכן "השמע דוגמה" פשוט לא השמיע
-       כלום — לא בקול הלא נכון, אלא בכלל. */
-    voicesReady().then(function(){
+       כלום — לא בקול הלא נכון, אלא בכלל.
+       ההמתנה נשארת רק כשהרשימה באמת ריקה: כאן צריך קול מסוים כדי
+       להשמיע אותו, אבל אמירה שמחכה יוצאת מחוץ למחוות המשתמש. */
+    (allVoices().length?function(fn){fn()}:function(fn){voicesReady().then(fn)})(function(){
       try{
         var ut=new SpeechSynthesisUtterance(t.gSample);
         ut.lang=LANGS[state.settings.lang||"he"].tts;
@@ -3040,7 +3053,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b24-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b25-pwa1").catch(function(){});
   });
 }
 </script>

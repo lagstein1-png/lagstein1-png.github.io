@@ -599,7 +599,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m18 · 2026-08-29";
+var BUILD="m19 · 2026-08-29";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -985,6 +985,11 @@ function hlAt(c){
 var _ttsBar=null;
 function ttsFail(err){
   try{ hlClear() }catch(e){}
+  /* "interrupted" ו-"canceled" אינן תקלות: זה מה שהמנוע מדווח על
+     אמירה שבוטלה כדי לפנות מקום לאמירה הבאה — כלומר מהלך תקין
+     לגמרי, שקורה בכל לחיצה שנייה. הצגתן כשגיאה הבהילה משתמש
+     ואמרה לו שהמכשיר שלו שבור בזמן שהוא עבד. */
+  if(err==="interrupted"||err==="canceled")return;
   if(_ttsBar)return;
   var m=document.createElement("div");
   m.setAttribute("role","alert");
@@ -1014,8 +1019,14 @@ function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
   try{speechSynthesis.cancel()}catch(e){}
-  /* ממתינים שרשימת הקולות תעלה לפני האמירה הראשונה. */
-  voicesReady().then(function(){
+  /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
+     שממתין לרשימת הקולות ועד ארבע שניות אם היא לא מגיעה — ואמירה
+     שיוצאת ארבע שניות אחרי המגע נזרקת בשקט באנדרואיד ובספארי.
+     כשהרשימה כבר כאן, בוחרים קול ומדברים. כשהיא ריקה — מדברים
+     בכל זאת, עם u.lang בלבד: קול ברירת מחדל בשפה הנכונה עדיף על
+     שתיקה, ויש מכשירים שמחזירים רשימה ריקה לצמיתות ומדברים היטב.
+     voicesReady נשאר בשימוש למסך בחירת הקול, שם ההמתנה במקומה. */
+  (function(){
     try{
       var u=new SpeechSynthesisUtterance(text);
       var v=bestVoice(code);
@@ -1027,7 +1038,7 @@ function speakDevice(text,code,rate){
       u.onerror=function(e){ttsFail(e&&e.error)};
       speechSynthesis.speak(u);
     }catch(e){}
-  });
+  })();
   return true;
 }
 /* lang: "en" לחומר הנלמד, או קוד שפת האם להוראה. */
@@ -4527,7 +4538,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m18-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m19-pwa1").catch(function(){});
   });
 }
 </script>

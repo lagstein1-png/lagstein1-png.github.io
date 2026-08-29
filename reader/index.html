@@ -758,6 +758,11 @@ function geminiName(){ return VOICE.split(':')[1] || 'Kore'; }
 var _ttsBar=null;
 function ttsFail(err){
   try{ markReading(null) }catch(e){}
+  /* "interrupted" ו-"canceled" אינן תקלות: זה מה שהמנוע מדווח על
+     אמירה שבוטלה כדי לפנות מקום לאמירה הבאה — כלומר מהלך תקין
+     לגמרי, שקורה בכל לחיצה שנייה. הצגתן כשגיאה הבהילה משתמש
+     ואמרה לו שהמכשיר שלו שבור בזמן שהוא עבד. */
+  if(err==="interrupted"||err==="canceled")return;
   if(_ttsBar)return;
   var m=document.createElement("div");
   m.setAttribute("role","alert");
@@ -1227,7 +1232,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=8-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=9-pwa1").catch(function(){});
   });
 }
 </script>
