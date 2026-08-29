@@ -17,23 +17,25 @@
 /* ============================================================
    דף הבית. ערכי הצבע נתונים ואינם משתנים לפי מצב — רק נדרסים
    בבלוק הכהה, כדי ששני המצבים יישארו זהים במבנה.
-   כל המידות לוגיות (inset-inline, margin-inline) ולא ימין/שמאל,
-   כדי שה-RTL יישאר תקין גם אם הדף ייטען בכיוון אחר.
+   כל המידות לוגיות (inset-inline, margin-inline) ולא ימין/שמאל:
+   הדף מתחלף בין ארבע שפות, ושתיים מהן נכתבות לשמאל.
    ============================================================ */
 :root{
   --bg:#f6f7fb; --bg-elev:#ffffff; --text:#14181f; --text-soft:#4a5464;
-  --line:#e2e6ef; --brand:#2f5fd8; --radius:18px;
+  --line:#e2e6ef; --brand:#2f5fd8; --brand-soft:#eaf0ff; --radius:18px;
   --shadow:0 1px 2px rgba(20,24,31,.04),0 10px 30px -18px rgba(20,24,31,.25);
   --c-math:#2f5fd8; --c-lang:#0f766e; --c-life:#a1520d;
 }
 :root[data-theme="dark"]{
-  --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6; --line:#222c3d;
+  --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6;
+  --line:#222c3d; --brand:#7ba2ff; --brand-soft:#18233a;
   --shadow:0 1px 2px rgba(0,0,0,.5),0 12px 34px -20px rgba(0,0,0,.8);
   --c-math:#8fb0ff; --c-lang:#6ee7d5; --c-life:#f0b866;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6; --line:#222c3d;
+    --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6;
+    --line:#222c3d; --brand:#7ba2ff; --brand-soft:#18233a;
     --shadow:0 1px 2px rgba(0,0,0,.5),0 12px 34px -20px rgba(0,0,0,.8);
     --c-math:#8fb0ff; --c-lang:#6ee7d5; --c-life:#f0b866;
   }
@@ -46,17 +48,118 @@ body{
   -webkit-text-size-adjust:100%;
 }
 .wrap{max-width:1080px; margin-inline:auto; padding-inline:clamp(14px,4vw,26px)}
-
-/* --- כותרת --- */
-header{padding-block:clamp(26px,6vw,54px) 8px}
-.brand{display:flex; align-items:center; gap:14px}
-.mark{
-  inline-size:52px; block-size:52px; border-radius:15px; flex:none;
-  display:grid; place-items:center; background:var(--brand); color:#fff;
-  font-weight:800; font-size:1.5rem;
+.sr{position:absolute; inline-size:1px; block-size:1px; overflow:hidden; clip-path:inset(50%)}
+.skip{
+  position:absolute; inset-block-start:-100px; inset-inline-start:12px; z-index:9;
+  background:var(--brand); color:#fff; padding:12px 18px; border-radius:12px;
+  text-decoration:none; font-weight:700;
 }
-h1{margin:0; font-size:clamp(1.7rem,5.5vw,2.5rem); font-weight:800; letter-spacing:-.02em}
-.tag{margin:6px 0 0; color:var(--text-soft); font-size:clamp(.98rem,2.6vw,1.08rem)}
+.skip:focus{inset-block-start:12px}
+
+/* --- סרגל עליון --- */
+.topbar{
+  position:sticky; inset-block-start:0; z-index:8;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(10px); border-block-end:1px solid var(--line);
+}
+.topbar .wrap{
+  display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px;
+  min-block-size:64px; padding-block:8px;
+}
+.logo{
+  display:flex; align-items:center; gap:11px; text-decoration:none;
+  color:inherit; font-weight:800; font-size:1.05rem; margin-inline-end:auto;
+}
+.mark{
+  inline-size:38px; block-size:38px; border-radius:11px; flex:none;
+  display:grid; place-items:center; background:var(--brand); color:#fff;
+  font-weight:800; font-size:1.15rem;
+}
+.nav{display:flex; flex-wrap:wrap; gap:2px}
+.nav a{
+  display:inline-flex; align-items:center; min-block-size:44px; padding-inline:11px;
+  color:var(--text-soft); text-decoration:none; font-weight:600; font-size:.95rem;
+  border-radius:10px;
+}
+.nav a:hover{color:var(--text); background:var(--brand-soft)}
+/* בצר מסך: שורה אחת ללוגו, לשפות ולמצב הכהה, ושורה שנייה לניווט
+   שנגללת לרוחב. בלי זה כפתור מצב הכהה נדחק לשורה משלו והסרגל
+   הדביק אכל שליש ממסך הטלפון. */
+@media (max-width:720px){
+  .topbar .wrap{min-block-size:0; gap:8px}
+  .logo{font-size:.98rem; gap:8px}
+  .mark{inline-size:32px; block-size:32px; border-radius:9px; font-size:1rem}
+  .lang{padding:2px}
+  .lang button{min-block-size:36px; min-inline-size:38px; padding-inline:7px; font-size:.8rem}
+  .ico{min-block-size:38px; min-inline-size:38px; border-radius:10px}
+  .nav{
+    order:9; inline-size:100%; flex-wrap:nowrap; overflow-x:auto;
+    scrollbar-width:none; padding-block-end:2px;
+  }
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{flex:none; min-block-size:40px; font-size:.9rem}
+  section.blk{scroll-margin-block-start:112px}
+}
+
+/* --- כפתורי שפה ומצב כהה --- */
+.lang{display:flex; gap:4px; background:var(--bg-elev);
+  border:1px solid var(--line); border-radius:999px; padding:3px}
+.lang button{
+  min-block-size:38px; min-inline-size:44px; padding-inline:10px; border:0;
+  border-radius:999px; background:none; color:var(--text-soft); cursor:pointer;
+  font:700 .86rem/1 Heebo,system-ui,sans-serif;
+}
+.lang button[aria-pressed="true"]{background:var(--brand); color:#fff}
+.ico{
+  min-block-size:44px; min-inline-size:44px; border-radius:12px; cursor:pointer;
+  border:1px solid var(--line); background:var(--bg-elev); color:var(--text-soft);
+  font-size:1.05rem; line-height:1;
+}
+
+/* --- גיבור --- */
+.hero{padding-block:clamp(30px,7vw,64px) clamp(20px,4vw,34px)}
+.badge{
+  display:inline-flex; align-items:center; gap:8px; margin:0 0 18px;
+  background:var(--brand-soft); color:var(--brand); border-radius:999px;
+  padding:9px 16px; font-weight:700; font-size:.88rem;
+}
+.hero h1{
+  margin:0; font-size:clamp(2rem,7vw,3.6rem); font-weight:800;
+  letter-spacing:-.025em; line-height:1.12; max-inline-size:16ch;
+}
+.hero h1 em{font-style:normal; color:var(--brand)}
+.lead{
+  margin:20px 0 0; color:var(--text-soft); max-inline-size:62ch;
+  font-size:clamp(1rem,2.5vw,1.15rem);
+}
+.cta{display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-block-start:28px}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  min-block-size:52px; padding-inline:26px; border-radius:14px;
+  font:700 1rem/1 Heebo,system-ui,sans-serif; text-decoration:none; cursor:pointer;
+  border:1px solid var(--brand); background:var(--brand); color:#fff;
+}
+.btn.ghost{background:var(--bg-elev); color:var(--text); border-color:var(--line)}
+.noads{margin:14px 0 0; color:var(--text-soft); font-size:.9rem}
+
+/* --- מספרים --- */
+.stats{
+  display:grid; gap:14px; margin-block:clamp(24px,5vw,44px);
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+}
+.stat{
+  background:var(--bg-elev); border:1px solid var(--line); border-radius:var(--radius);
+  padding:20px 22px; box-shadow:var(--shadow);
+}
+.stat b{display:block; font-size:clamp(1.7rem,4.5vw,2.2rem); font-weight:800;
+  letter-spacing:-.02em; color:var(--brand)}
+.stat span{color:var(--text-soft); font-size:.93rem}
+
+/* --- מקטע --- */
+section.blk{padding-block:clamp(26px,5vw,48px); scroll-margin-block-start:78px}
+.h2{margin:0; font-size:clamp(1.45rem,4vw,2rem); font-weight:800; letter-spacing:-.02em}
+.h2s{margin:8px 0 0; color:var(--text-soft)}
+.prose{margin:16px 0 0; color:var(--text-soft); max-inline-size:66ch}
 
 /* --- שורת כלים --- */
 .tools{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-block:22px 6px}
@@ -65,10 +168,8 @@ h1{margin:0; font-size:clamp(1.7rem,5.5vw,2.5rem); font-weight:800; letter-spaci
   background:var(--bg-elev); border:1px solid var(--line); border-radius:14px;
   padding-inline:14px; min-block-size:48px;
 }
-.search input{
-  flex:1; min-inline-size:0; border:0; background:none; color:inherit;
-  font:inherit; min-block-size:46px;
-}
+.search input{flex:1; min-inline-size:0; border:0; background:none; color:inherit;
+  font:inherit; min-block-size:46px}
 .search input:focus{outline:none}
 .search:focus-within{border-color:var(--brand); box-shadow:0 0 0 3px rgba(47,95,216,.18)}
 .chips{display:flex; flex-wrap:wrap; gap:8px}
@@ -81,10 +182,8 @@ h1{margin:0; font-size:clamp(1.7rem,5.5vw,2.5rem); font-weight:800; letter-spaci
 .count{color:var(--text-soft); font-size:.92rem; margin-block:14px 0}
 
 /* --- כרטיסים --- */
-.grid{
-  display:grid; gap:16px; padding-block:14px 8px;
-  grid-template-columns:repeat(auto-fill,minmax(276px,1fr));
-}
+.grid{display:grid; gap:16px; padding-block:14px 8px;
+  grid-template-columns:repeat(auto-fill,minmax(276px,1fr))}
 .card{
   position:relative; display:flex; flex-direction:column; gap:10px;
   background:var(--bg-elev); border:1px solid var(--line);
@@ -93,16 +192,13 @@ h1{margin:0; font-size:clamp(1.7rem,5.5vw,2.5rem); font-weight:800; letter-spaci
   transition:transform .18s ease, box-shadow .18s ease;
 }
 /* פס הצבע — תמיד בצד הפתיחה של הטקסט, ולכן inset-inline-start */
-.card::before{
-  content:""; position:absolute; inset-block:0; inset-inline-start:0;
-  inline-size:5px; background:var(--c);
-}
-.card::after{
-  content:""; position:absolute; inset:0; background:var(--c);
-  opacity:.045; pointer-events:none;
-}
-.card:hover{transform:translateY(-3px); box-shadow:0 2px 4px rgba(20,24,31,.05),0 18px 40px -22px rgba(20,24,31,.4)}
-.card h2{margin:0; font-size:1.22rem; font-weight:700; position:relative}
+.card::before{content:""; position:absolute; inset-block:0; inset-inline-start:0;
+  inline-size:5px; background:var(--c)}
+.card::after{content:""; position:absolute; inset:0; background:var(--c);
+  opacity:.045; pointer-events:none}
+.card:hover{transform:translateY(-3px);
+  box-shadow:0 2px 4px rgba(20,24,31,.05),0 18px 40px -22px rgba(20,24,31,.4)}
+.card h3{margin:0; font-size:1.22rem; font-weight:700; position:relative}
 .card p{margin:0; color:var(--text-soft); font-size:.96rem; position:relative}
 .tags{display:flex; flex-wrap:wrap; gap:6px; position:relative; margin-block-start:2px}
 .t{
@@ -116,190 +212,246 @@ h1{margin:0; font-size:clamp(1.7rem,5.5vw,2.5rem); font-weight:800; letter-spaci
   color:var(--c); font-weight:700; text-decoration:none;
 }
 .card a.go::after{content:""; position:absolute; inset:0}
-.go .arw{transition:transform .18s ease}
+.go .arw{transition:transform .18s ease; display:inline-block}
 .card:hover .go .arw{transform:translateX(4px)}
 html[dir="rtl"] .card:hover .go .arw{transform:translateX(-4px)}
+/* החץ מצביע לכיוון הקריאה. ב-RTL הוא מסתובב, ולא מוחלף בתו אחר —
+   כך הוא נשאר אותו סימן גם כשהשפה מתחלפת. */
+html[dir="ltr"] .arw{transform:scaleX(-1)}
+html[dir="ltr"] .card:hover .go .arw{transform:scaleX(-1) translateX(-4px)}
+
+/* --- איך זה עובד --- */
+.steps{display:grid; gap:14px; margin-block-start:22px;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.step{
+  background:var(--bg-elev); border:1px solid var(--line);
+  border-radius:var(--radius); padding:20px 22px; box-shadow:var(--shadow);
+  color:var(--text-soft);
+}
+.step b{
+  display:grid; place-items:center; inline-size:34px; block-size:34px;
+  border-radius:11px; background:var(--brand-soft); color:var(--brand);
+  font-size:1rem; margin-block-end:12px;
+}
 
 /* --- תחתית --- */
 footer.site{
-  margin-block-start:34px; padding-block:22px 30px;
+  margin-block-start:20px; padding-block:22px 30px;
   border-block-start:1px solid var(--line); color:var(--text-soft); font-size:.9rem;
   display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center;
 }
 footer.site a{color:inherit}
 .empty{padding:28px 4px; color:var(--text-soft)}
-
-/* יעד מגע של 44px גם לקישורי התחתית. קישור טקסט בשורה יוצא
-   בגובה הטקסט בלבד, וזה קטן מדי לאצבע. */
-footer.site a,.lg-foot a{
-  display:inline-flex; align-items:center; min-block-size:44px;
-  padding-inline:4px;
-}
+footer.site a,.lg-foot a{display:inline-flex; align-items:center;
+  min-block-size:44px; padding-inline:4px}
 a:focus-visible,button:focus-visible,input:focus-visible{
   outline:3px solid var(--brand); outline-offset:2px; border-radius:8px;
 }
-@media (prefers-reduced-motion:reduce){
-  *{transition:none !important; animation:none !important}
-}
+@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important}}
 </style>
 </head>
 <body>
 
-<main class="wrap">
-  <header>
-    <div class="brand">
-      <span class="mark" aria-hidden="true">י</span>
-      <div>
-        <h1 id="ttl"></h1>
-        <p class="tag" id="sub"></p>
+<a class="skip" href="#apps" id="skip"></a>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="logo" href="#top"><span class="mark" aria-hidden="true">י</span><span id="me"></span></a>
+    <nav class="nav" id="nav" aria-label="ניווט ראשי"></nav>
+    <div class="lang" id="lang" role="group"></div>
+    <button class="ico" id="theme" type="button"></button>
+  </div>
+</div>
+
+<main id="top">
+  <div class="wrap">
+
+    <header class="hero">
+      <p class="badge" id="badge"></p>
+      <h1 id="h1"></h1>
+      <p class="lead" id="lead"></p>
+      <div class="cta">
+        <a class="btn" href="#apps" id="ctaApps"></a>
+        <a class="btn ghost" href="#contact" id="ctaContact"></a>
       </div>
-    </div>
+      <p class="noads" id="noads"></p>
+    </header>
 
-    <div class="tools">
-      <div class="search">
-        <span aria-hidden="true">🔍</span>
-        <label class="sr" for="q" style="position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)"></label>
-        <input id="q" type="search" autocomplete="off">
+    <section class="stats" id="stats" aria-label="במספרים"></section>
+
+    <section class="blk" id="apps">
+      <h2 class="h2" id="ttl"></h2>
+      <p class="h2s" id="sub"></p>
+      <div class="tools">
+        <div class="search">
+          <span aria-hidden="true">🔍</span>
+          <label class="sr" for="q" id="qlab"></label>
+          <input id="q" type="search" autocomplete="off">
+        </div>
+        <div class="chips" id="chips" role="group"></div>
       </div>
-      <div class="chips" id="chips" role="group"></div>
-    </div>
-    <p class="count" id="count" aria-live="polite"></p>
-  </header>
+      <p class="count" id="count" aria-live="polite"></p>
+      <div class="grid" id="grid"></div>
+      <p class="empty" id="empty" hidden></p>
+    </section>
 
-  <section class="grid" id="grid"></section>
-  <p class="empty" id="empty" hidden></p>
+    <section class="blk" id="how">
+      <h2 class="h2" id="howT"></h2>
+      <div class="steps" id="steps"></div>
+    </section>
 
-  <footer class="site">
-    <span id="foot"></span>
-    <a href="https://lagstein1-png.github.io/" id="home"></a>
-    <button class="chip" id="theme" type="button"></button>
-  </footer>
+    <section class="blk" id="about">
+      <h2 class="h2" id="aboutT"></h2>
+      <p class="prose" id="aboutP"></p>
+    </section>
+
+    <section class="blk" id="contact">
+      <h2 class="h2" id="contactT"></h2>
+      <p class="prose"><span id="contactL"></span>
+        <a href="mailto:lagstein1@gmail.com" dir="ltr">lagstein1@gmail.com</a></p>
+    </section>
+
+    <footer class="site">
+      <span id="foot"></span>
+      <a href="/legal/" id="terms"></a>
+    </footer>
+
+  </div>
 </main>
 
 <script>
 /* ============================================================
-   כל המחרוזות במקום אחד. אין טקסט מוטבע בקוד למטה.
+   כל הטקסט של הדף — בארבע שפות, במקום אחד. אין מחרוזת מוטבעת
+   בקוד שלמטה, ולכן החלפת שפה היא החלפת אובייקט ולא חיפוש בדף.
    ============================================================ */
-var STR={
-  title:"האפליקציות שלי",
-  sub:"תשע אפליקציות לימוד — הכול נפתח בדפדפן, בלי הרשמה ובלי עלות.",
-  searchPh:"חיפוש — למשל: חדו״א, אנגלית, תאוריה",
-  searchLabel:"חיפוש באפליקציות",
-  all:"הכול", math:"מתמטיקה", lang:"שפות ומדעי הרוח", life:"כלים לחיים",
-  count:"{n} מתוך {t} אפליקציות",
-  none:"לא נמצאה אפליקציה מתאימה. אפשר לנקות את החיפוש ולנסות שוב.",
-  enter:"כניסה",
-  foot:"© 2026 יהושע לגשטיין",
-  home:"תנאי שימוש וזכויות יוצרים",
-  dark:"מצב כהה", light:"מצב בהיר",
-  tRead:"הקראה", tTeacher:"מצב מורה", tLangs:"4 שפות", tFree:"בלי הרשמה"
-};
-
-/* ============================================================
-   האפליקציות. התגיות כאן אינן קישוט — הן נבדקו מול הקוד עצמו,
-   ולכן "מצב מורה" מופיע רק היכן שהוא באמת קיים.
-   ============================================================ */
-var APPS=[
-  {id:"math-app", cat:"math", c:"var(--c-math)", n:"מתמטיקה לחכמים שמתקשים",
-   d:"ארבע פעולות החשבון, צעד אחר צעד, עם חיית מחמד ובלי לחץ של זמן.",
-   t:["tRead","tTeacher","tLangs"], k:"יסודי חטיבה חיבור חיסור כפל חילוק"},
-  {id:"math-teen", cat:"math", c:"var(--c-math)", n:"שלב — מתמטיקה לתיכון",
-   d:"פתרון מודרך, זיהוי הטעות המדויקת ודף נוסחאות מלא.",
-   t:["tRead","tTeacher"], k:"תיכון בגרות אלגברה גאומטריה"},
-  {id:"math-uni", cat:"math", c:"var(--c-math)", n:"אקסיומה — תואר, שנה א׳",
-   d:"חדו״א, אלגברה לינארית והסתברות — ההסברים מלאים בארבע שפות.",
-   t:["tRead","tTeacher","tLangs"], k:"אוניברסיטה חדוא לינארית הסתברות"},
-  {id:"math-uni2", cat:"math", c:"var(--c-math)", n:"אקסיומה ב׳ — שנה שנייה",
-   d:"חדו״א 2, לינארית 2, משוואות דיפרנציאליות והסתברות.",
-   t:["tRead","tTeacher","tLangs"], k:"אוניברסיטה מדר משוואות דיפרנציאליות"},
-  {id:"math-uni3", cat:"math", c:"var(--c-math)", n:"אקסיומה ג׳ — שנה שלישית",
-   d:"אנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית.",
-   t:["tRead","tTeacher","tLangs"], k:"אוניברסיטה אנליזה מרוכבות נומרית"},
-
-  {id:"english", cat:"lang", c:"var(--c-lang)", n:"ניב — אנגלית מדוברת וספרותית",
-   d:"כל מילה נשמעת לפני שהיא נקראת — אוצר מילים, שיחה והבנת הנקרא.",
-   t:["tRead","tTeacher","tLangs"], k:"אנגלית שפה קריאה דיבור"},
-  {id:"history", cat:"lang", c:"var(--c-lang)", n:"מפנה — היסטוריה לחטיבה",
-   d:"אירועים, סיבות ותוצאות, עם קטעי מקור ורמז בכל שאלה.",
-   t:["tRead","tTeacher","tLangs"], k:"היסטוריה חטיבה מקורות תקופות"},
-
-  {id:"reader", cat:"life", c:"var(--c-life)", n:"מקריא קולי",
-   d:"מדביקים טקסט בעברית, והוא נקרא בקול עם מעקב אחרי המילה הנאמרת.",
-   t:["tRead"], k:"הקראה דיסלקציה ניקוד טקסט"},
-  {id:"drivewise", cat:"life", c:"var(--c-life)", n:"תאוריה מדברת",
-   d:"מאגר שאלות התאוריה המלא, עם הקראה מוקלטת של כל שאלה.",
-   t:["tRead"], k:"תאוריה נהיגה רישיון"}
-];
+var DATA={"APPS":[{"id":"math-app","cat":"math","c":"math","n":{"he":"מתמטיקה לחכמים שמתקשים","ar":"رياضيات لمن يجد صعوبة","ru":"Математика для тех, кому трудно","en":"Maths for clever strugglers"},"d":{"he":"ארבע פעולות החשבון, צעד אחר צעד, עם חיית מחמד ובלי לחץ של זמן.","ar":"العمليات الحسابية الأربع، خطوة بخطوة، مع حيوان أليف وبلا ضغط وقت.","ru":"Четыре действия, шаг за шагом, с питомцем и без давления времени.","en":"The four operations, step by step, with a pet and no time pressure."},"t":["tRead","tTeacher","tLangs"],"k":"יסודי חטיבה חיבור חיסור כפל חילוק math primary"},{"id":"math-teen","cat":"math","c":"math","n":{"he":"שלב — מתמטיקה לתיכון","ar":"شلاف — رياضيات للثانوية","ru":"Шлав — математика для старших классов","en":"Shlav — secondary maths"},"d":{"he":"פתרון מודרך, זיהוי הטעות המדויקת ודף נוסחאות מלא.","ar":"حلّ موجَّه، تحديد الخطأ بدقّة، وورقة قوانين كاملة.","ru":"Пошаговое решение, точное определение ошибки и полный лист формул.","en":"Guided solutions, the exact mistake named, and a full formula sheet."},"t":["tRead","tTeacher"],"k":"תיכון בגרות אלגברה גאומטריה"},{"id":"math-uni","cat":"math","c":"math","n":{"he":"אקסיומה — תואר, שנה א׳","ar":"أكسيوما — السنة الأولى","ru":"Аксиома — первый курс","en":"Axiom — first year"},"d":{"he":"חדו״א, אלגברה לינארית והסתברות — ההסברים מלאים בארבע שפות.","ar":"التفاضل والتكامل، الجبر الخطّي والاحتمالات — بشرح كامل بأربع لغات.","ru":"Матанализ, линейная алгебра и теория вероятностей — с полными объяснениями.","en":"Calculus, linear algebra and probability, explained in full."},"t":["tRead","tTeacher","tLangs"],"k":"אוניברסיטה חדוא לינארית הסתברות"},{"id":"math-uni2","cat":"math","c":"math","n":{"he":"אקסיומה ב׳ — שנה שנייה","ar":"أكسيوما ٢ — السنة الثانية","ru":"Аксиома II — второй курс","en":"Axiom II — second year"},"d":{"he":"חדו״א 2, לינארית 2, משוואות דיפרנציאליות והסתברות.","ar":"التفاضل ٢، الجبر الخطّي ٢، المعادلات التفاضلية والاحتمالات.","ru":"Матанализ 2, линейная алгебра 2, дифференциальные уравнения.","en":"Calculus 2, linear algebra 2, differential equations and probability."},"t":["tRead","tTeacher","tLangs"],"k":"אוניברסיטה מדר משוואות דיפרנציאליות"},{"id":"math-uni3","cat":"math","c":"math","n":{"he":"אקסיומה ג׳ — שנה שלישית","ar":"أكسيوما ٣ — السنة الثالثة","ru":"Аксиома III — третий курс","en":"Axiom III — third year"},"d":{"he":"אנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית.","ar":"التحليل، الدوال المركّبة، الجبر المجرّد والتحليل العددي.","ru":"Анализ, комплексные функции, абстрактная алгебра и численные методы.","en":"Analysis, complex functions, abstract algebra and numerical analysis."},"t":["tRead","tTeacher","tLangs"],"k":"אוניברסיטה אנליזה מרוכבות נומרית"},{"id":"english","cat":"lang","c":"lang","n":{"he":"ניב — אנגלית מדוברת וספרותית","ar":"نيف — إنجليزية محكيّة وأدبيّة","ru":"Нив — английский разговорный и книжный","en":"Niv — spoken and written English"},"d":{"he":"כל מילה נשמעת לפני שהיא נקראת — אוצר מילים, שיחה והבנת הנקרא.","ar":"كلّ كلمة تُسمع قبل أن تُقرأ — مفردات ومحادثة وفهم مقروء.","ru":"Каждое слово сначала звучит — лексика, речь и понимание текста.","en":"Every word is heard before it is read — vocabulary, speech, comprehension."},"t":["tRead","tTeacher","tLangs"],"k":"אנגלית שפה קריאה דיבור english"},{"id":"history","cat":"lang","c":"lang","n":{"he":"מפנה — היסטוריה לחטיבה","ar":"منعطف — تاريخ للإعدادية","ru":"Поворот — история для средней школы","en":"Turning Point — history"},"d":{"he":"אירועים, סיבות ותוצאות, עם קטעי מקור ורמז בכל שאלה.","ar":"أحداث وأسباب ونتائج، مع نصوص مصدرية وتلميح في كلّ سؤال.","ru":"События, причины и следствия, с источниками и подсказкой к каждому вопросу.","en":"Events, causes and consequences, with sources and a hint on every question."},"t":["tRead","tTeacher","tLangs"],"k":"היסטוריה חטיבה מקורות תקופות"},{"id":"reader","cat":"life","c":"life","n":{"he":"מקריא קולי","ar":"قارئ صوتي","ru":"Голосовой чтец","en":"Voice reader"},"d":{"he":"מדביקים טקסט בעברית, והוא נקרא בקול עם מעקב אחרי המילה הנאמרת.","ar":"تُلصق نصًّا بالعبرية فيُقرأ بصوت عالٍ مع تتبّع الكلمة المنطوقة.","ru":"Вставьте текст на иврите — он читается вслух с подсветкой слова.","en":"Paste Hebrew text and hear it read, with the spoken word tracked."},"t":["tRead"],"k":"הקראה דיסלקציה ניקוד טקסט reader"},{"id":"drivewise","cat":"life","c":"life","n":{"he":"תאוריה מדברת","ar":"نظرية ناطقة","ru":"Говорящая теория","en":"Talking Theory"},"d":{"he":"מאגר שאלות התאוריה המלא, עם הקראה מוקלטת של כל שאלה.","ar":"بنك أسئلة النظرية كاملًا، مع قراءة مسجّلة لكلّ سؤال.","ru":"Полный банк вопросов по теории с записанной озвучкой каждого.","en":"The full driving-theory question bank, every question recorded."},"t":["tRead"],"k":"תאוריה נהיגה רישיון theory"}],"STR":{"he":{"dirv":"rtl","me":"יהושע","nApps":"האפליקציות","nHow":"איך זה עובד","nAbout":"עליי","nContact":"צרו קשר","badge":"תשע אפליקציות לימוד · חינם לגמרי · בארבע שפות","h1a":"למידה שנשמעת,","h1b":"מוסברת","h1c":"ומכבדת","lead":"אוסף כלים שבניתי לנוער ולסטודנטים — לקהל שמתקשה עם השפה העברית ולבעלי צרכי למידה מיוחדים. מתמטיקה מיסודי ועד תואר, אנגלית, היסטוריה, מקריא קולי ותאוריה לנהיגה. בכל אפליקציה: הקראה של כל מילה, הסבר צעד־צעד, וקצב שנקבע על ידי הלומד.","noAds":"ללא הרשמה, ללא פרסומות","ctaApps":"לכל האפליקציות","ctaContact":"צרו קשר","s1":"אפליקציות לימוד","s2":"שפות ממשק","s3":"עם הקראה קולית","s4":"ללא עלות והרשמה","title":"האפליקציות שלי","sub":"סננו לפי תחום או חפשו בשם — הכול נפתח ישירות בדפדפן.","searchPh":"חיפוש… (למשל: חדו״א, אנגלית, תאוריה)","searchLabel":"חיפוש באפליקציות","all":"הכול","math":"מתמטיקה","lang":"שפות ומדעי הרוח","life":"כלים לחיים","count":"{n} מתוך {t}","none":"לא נמצאה אפליקציה מתאימה. נסו לנקות את החיפוש.","enter":"כניסה","howT":"איך זה עובד","how1":"נכנסים לאפליקציה מהדפדפן. אין הורדה, אין הרשמה ואין חשבון.","how2":"בוחרים נושא ורמה. כל שאלה נקראת בקול, ואפשר לעצור ולחזור בכל רגע.","how3":"ההתקדמות נשמרת במכשיר שלכם בלבד ולא נשלחת לשום מקום.","aboutT":"עליי","about":"אני יהושע לגשטיין. בניתי את הכלים האלה מתוך עבודה עם לומדים שהחומר הקיים לא מדבר אליהם — מי שקורא לאט, מי שלומד בשפה שאינה שפת אמו, ומי שצריך לשמוע כדי להבין. כל אפליקציה כאן נבנתה סביב השאלה אחת: מה מוריד עומס מהלומד.","contactT":"צרו קשר","contactL":"לשאלות, הצעות ותקלות:","dark":"מצב כהה","light":"מצב בהיר","tRead":"הקראה","tTeacher":"מצב מורה","tLangs":"4 שפות","foot":"© 2026 יהושע לגשטיין","terms":"תנאי שימוש וזכויות יוצרים"},"ar":{"dirv":"rtl","me":"يهوشع","nApps":"التطبيقات","nHow":"كيف يعمل","nAbout":"عنّي","nContact":"اتّصلوا بنا","badge":"تسعة تطبيقات تعليمية · مجّانية تمامًا · بأربع لغات","h1a":"تعلُّم يُسمَع،","h1b":"ويُشرَح","h1c":"ويحترم","lead":"مجموعة أدوات بنيتها للشباب والطلاب — لمن يجد صعوبة في العبرية ولذوي احتياجات التعلّم الخاصة. رياضيات من الابتدائي حتى الجامعة، إنجليزية، تاريخ، قارئ صوتي ونظرية السياقة. في كلّ تطبيق: قراءة كلّ كلمة، شرح خطوة بخطوة، وإيقاع يحدّده المتعلّم.","noAds":"بلا تسجيل وبلا إعلانات","ctaApps":"إلى كلّ التطبيقات","ctaContact":"اتّصلوا بنا","s1":"تطبيقات تعليمية","s2":"لغات واجهة","s3":"مع قراءة صوتية","s4":"بلا تكلفة وتسجيل","title":"تطبيقاتي","sub":"صنّفوا حسب المجال أو ابحثوا بالاسم — كلّ شيء يفتح في المتصفّح.","searchPh":"بحث… (مثلًا: تفاضل، إنجليزية، نظرية)","searchLabel":"بحث في التطبيقات","all":"الكلّ","math":"رياضيات","lang":"لغات وعلوم إنسانية","life":"أدوات للحياة","count":"{n} من {t}","none":"لا يوجد تطبيق مطابق. جرّبوا مسح البحث.","enter":"دخول","howT":"كيف يعمل","how1":"تدخلون التطبيق من المتصفّح. بلا تنزيل، بلا تسجيل، وبلا حساب.","how2":"تختارون موضوعًا ومستوى. كلّ سؤال يُقرأ بصوت، ويمكن التوقّف والعودة في أيّ لحظة.","how3":"التقدّم يُحفَظ على جهازكم وحده ولا يُرسل إلى أيّ مكان.","aboutT":"عنّي","about":"أنا يهوشع لچشطاين. بنيت هذه الأدوات من عمل مع متعلّمين لا تخاطبهم المواد القائمة — من يقرأ ببطء، ومن يتعلّم بلغة ليست لغته الأمّ، ومن يحتاج أن يسمع كي يفهم. كلّ تطبيق هنا بُني حول سؤال واحد: ما الذي يخفّف العبء عن المتعلّم.","contactT":"اتّصلوا بنا","contactL":"للأسئلة والاقتراحات والأعطال:","dark":"وضع داكن","light":"وضع فاتح","tRead":"قراءة صوتية","tTeacher":"وضع المعلّم","tLangs":"٤ لغات","foot":"© 2026 يهوشع لچشطاين","terms":"شروط الاستخدام وحقوق النشر"},"ru":{"dirv":"ltr","me":"Иехошуа","nApps":"Приложения","nHow":"Как это работает","nAbout":"Обо мне","nContact":"Связаться","badge":"Девять учебных приложений · полностью бесплатно · на четырёх языках","h1a":"Учёба, которую слышно,","h1b":"объясняют","h1c":"и уважают","lead":"Набор инструментов, который я собрал для подростков и студентов — для тех, кому труден иврит, и для тех, у кого особые учебные потребности. Математика от начальной школы до университета, английский, история, голосовой чтец и теория вождения. В каждом приложении: озвучивание каждого слова, пошаговое объяснение и темп, который задаёт сам учащийся.","noAds":"Без регистрации и без рекламы","ctaApps":"Ко всем приложениям","ctaContact":"Связаться","s1":"учебных приложений","s2":"языка интерфейса","s3":"с озвучиванием","s4":"без оплаты и регистрации","title":"Мои приложения","sub":"Отфильтруйте по области или найдите по названию — всё открывается в браузере.","searchPh":"Поиск… (например: анализ, английский, теория)","searchLabel":"Поиск по приложениям","all":"Все","math":"Математика","lang":"Языки и гуманитарные","life":"Инструменты для жизни","count":"{n} из {t}","none":"Ничего не найдено. Попробуйте очистить поиск.","enter":"Войти","howT":"Как это работает","how1":"Приложение открывается в браузере. Без загрузки, без регистрации и без аккаунта.","how2":"Выбираете тему и уровень. Каждый вопрос читается вслух, остановиться можно в любой момент.","how3":"Прогресс хранится только на вашем устройстве и никуда не отправляется.","aboutT":"Обо мне","about":"Я Иехошуа Лагштейн. Эти инструменты выросли из работы с учениками, к которым существующие материалы не обращаются: с теми, кто читает медленно, кто учится не на родном языке, кому нужно услышать, чтобы понять. Каждое приложение здесь построено вокруг одного вопроса: что снимает нагрузку с учащегося.","contactT":"Связаться","contactL":"Вопросы, предложения и неполадки:","dark":"Тёмная тема","light":"Светлая тема","tRead":"Озвучивание","tTeacher":"Режим учителя","tLangs":"4 языка","foot":"© 2026 Иехошуа Лагштейн","terms":"Условия использования и авторские права"},"en":{"dirv":"ltr","me":"Joshua","nApps":"Apps","nHow":"How it works","nAbout":"About","nContact":"Contact","badge":"Nine learning apps · entirely free · in four languages","h1a":"Learning you can hear,","h1b":"that explains","h1c":"and respects","lead":"A set of tools I built for teenagers and students — for people who find Hebrew hard, and for people with particular learning needs. Maths from primary school to university, English, history, a voice reader and driving theory. In every one: every word read aloud, an explanation step by step, and a pace the learner sets.","noAds":"No sign-up, no adverts","ctaApps":"See all the apps","ctaContact":"Contact","s1":"learning apps","s2":"interface languages","s3":"with read-aloud","s4":"free, no sign-up","title":"My apps","sub":"Filter by subject or search by name — everything opens in the browser.","searchPh":"Search… (e.g. calculus, English, theory)","searchLabel":"Search the apps","all":"All","math":"Maths","lang":"Languages and humanities","life":"Everyday tools","count":"{n} of {t}","none":"Nothing matched. Try clearing the search.","enter":"Open","howT":"How it works","how1":"You open an app in the browser. Nothing to download, no sign-up, no account.","how2":"You choose a subject and a level. Every question is read aloud, and you can stop and go back whenever you like.","how3":"Progress is kept on your device alone and is not sent anywhere.","aboutT":"About","about":"I am Joshua Lagstein. These tools came out of working with learners the existing material does not speak to — people who read slowly, people studying in a language that is not their first, and people who need to hear something to understand it. Every app here was built around one question: what takes load off the learner.","contactT":"Contact","contactL":"Questions, suggestions and faults:","dark":"Dark mode","light":"Light mode","tRead":"Read-aloud","tTeacher":"Teacher mode","tLangs":"4 languages","foot":"© 2026 Joshua Lagstein","terms":"Terms of use and copyright"}}};
+var APPS=DATA.APPS, TR=DATA.STR;
+var CC={math:"var(--c-math)",lang:"var(--c-lang)",life:"var(--c-life)"};
 
 var $=function(s){return document.querySelector(s)};
 var esc=function(x){return String(x).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
 
+/* --- שפה --- */
+var LKEY="site-lang", LANGS=[["he","עב"],["ar","ع"],["ru","Ру"],["en","EN"]];
+function savedLang(){try{return localStorage.getItem(LKEY)||""}catch(e){return""}}
+/* שפת הדפדפן היא רמז ולא הוראה: מכשירים רבים בישראל מדווחים en-US
+   גם כשהמשתמש קורא עברית. לכן ברירת המחדל היא עברית, ואנגלית
+   נבחרת רק כשאין התאמה לאף אחת מהשפות שהדף באמת יודע. */
+function guessLang(){
+  var l=(navigator.language||"").toLowerCase().split("-")[0];
+  return {he:1,iw:1}[l]?"he":{ar:1,ru:1,en:1}[l]?l:"he";
+}
+var LG=savedLang()||guessLang(); if(!TR[LG])LG="he";
+var S=TR[LG];
+
 /* --- מצב כהה: העדפת המערכת, ודריסה ידנית שנשמרת --- */
-var KEY="site-theme";
-function savedTheme(){try{return localStorage.getItem(KEY)||""}catch(e){return""}}
+var TKEY="site-theme";
+function savedTheme(){try{return localStorage.getItem(TKEY)||""}catch(e){return""}}
 function applyTheme(v){
   var r=document.documentElement;
   if(v)r.setAttribute("data-theme",v); else r.removeAttribute("data-theme");
   var dark=v?v==="dark":matchMedia("(prefers-color-scheme:dark)").matches;
-  $("#theme").textContent=dark?STR.light:STR.dark;
-  $("#theme").setAttribute("aria-pressed",dark?"true":"false");
+  var b=$("#theme");
+  b.textContent=dark?"☀":"☾";
+  b.setAttribute("aria-label",dark?S.light:S.dark);
+  b.setAttribute("aria-pressed",dark?"true":"false");
 }
 $("#theme").addEventListener("click",function(){
   var dark=document.documentElement.getAttribute("data-theme")==="dark"||
            (!savedTheme()&&matchMedia("(prefers-color-scheme:dark)").matches);
   var next=dark?"light":"dark";
-  try{localStorage.setItem(KEY,next)}catch(e){}
+  try{localStorage.setItem(TKEY,next)}catch(e){}
   applyTheme(next);
 });
 
 /* --- סינון --- */
-var CATS=[["all","all"],["math","math"],["lang","lang"],["life","life"]];
+var CATS=["all","math","lang","life"];
 var cat="all", q="";
 
 function draw(){
   var list=APPS.filter(function(a){
     if(cat!=="all"&&a.cat!==cat)return false;
     if(!q)return true;
-    var hay=(a.n+" "+a.d+" "+a.k).toLowerCase();
+    /* החיפוש רץ גם על שם האפליקציה בשפת הממשק וגם על מילות המפתח
+       בעברית — מי שמחפש "חדו״א" באנגלית עדיין מוצא. */
+    var hay=(a.n[LG]+" "+a.d[LG]+" "+a.n.he+" "+a.k).toLowerCase();
     return hay.indexOf(q)>=0;
   });
   $("#grid").innerHTML=list.map(function(a){
-    return '<article class="card" style="--c:'+a.c+'">'+
-      '<h2>'+esc(a.n)+'</h2>'+
-      '<p>'+esc(a.d)+'</p>'+
+    return '<article class="card" style="--c:'+CC[a.c]+'">'+
+      '<h3>'+esc(a.n[LG])+'</h3>'+
+      '<p>'+esc(a.d[LG])+'</p>'+
       '<div class="tags">'+a.t.map(function(k){
-        return '<span class="t">'+esc(STR[k])+'</span>'}).join("")+'</div>'+
-      '<a class="go" href="/'+a.id+'/">'+esc(STR.enter)+
+        return '<span class="t">'+esc(S[k])+'</span>'}).join("")+'</div>'+
+      '<a class="go" href="/'+a.id+'/">'+esc(S.enter)+
         '<span class="arw" aria-hidden="true">←</span></a>'+
     '</article>';
   }).join("");
-  $("#count").textContent=STR.count.replace("{n}",list.length).replace("{t}",APPS.length);
-  $("#empty").textContent=STR.none;
+  $("#count").textContent=S.count.replace("{n}",list.length).replace("{t}",APPS.length);
+  $("#empty").textContent=S.none;
   $("#empty").hidden=list.length>0;
 }
 
-function boot(){
-  $("#ttl").textContent=STR.title;
-  $("#sub").textContent=STR.sub;
-  $("#q").placeholder=STR.searchPh;
-  $("#q").setAttribute("aria-label",STR.searchLabel);
-  $("#foot").textContent=STR.foot;
-  $("#home").textContent=STR.home;
-  $("#home").setAttribute("href","/legal/");
+function paint(){
+  S=TR[LG];
+  var r=document.documentElement;
+  r.setAttribute("lang",LG); r.setAttribute("dir",S.dirv);
+  document.title=S.me+" — "+S.title;
+
+  $("#me").textContent=S.me;
+  $("#skip").textContent=S.nApps;
+  $("#nav").innerHTML=[["apps","nApps"],["how","nHow"],["about","nAbout"],["contact","nContact"]]
+    .map(function(x){return '<a href="#'+x[0]+'">'+esc(S[x[1]])+"</a>"}).join("");
+  $("#badge").textContent=S.badge;
+  /* שלושה חלקים ולא משפט אחד: המילה האמצעית צבועה, והחלוקה
+     לחלקים מאפשרת לכל שפה לשמור על סדר המילים שלה. */
+  $("#h1").innerHTML=esc(S.h1a)+" <em>"+esc(S.h1b)+"</em> "+esc(S.h1c);
+  $("#lead").textContent=S.lead;
+  $("#ctaApps").textContent=S.ctaApps;
+  $("#ctaContact").textContent=S.ctaContact;
+  $("#noads").textContent=S.noAds;
+  $("#stats").innerHTML=[["9",S.s1],["4",S.s2],["100%",S.s3],["0 ₪",S.s4]]
+    .map(function(x){return '<div class="stat"><b dir="ltr">'+esc(x[0])+"</b><span>"+
+      esc(x[1])+"</span></div>"}).join("");
+  $("#ttl").textContent=S.title;
+  $("#sub").textContent=S.sub;
+  $("#qlab").textContent=S.searchLabel;
+  $("#q").placeholder=S.searchPh;
+  $("#q").setAttribute("aria-label",S.searchLabel);
   $("#chips").innerHTML=CATS.map(function(c){
-    return '<button class="chip" type="button" data-c="'+c[0]+'" aria-pressed="'+
-      (c[0]===cat)+'">'+esc(STR[c[1]])+'</button>'}).join("");
-  $("#chips").addEventListener("click",function(e){
-    var b=e.target.closest("[data-c]"); if(!b)return;
-    cat=b.getAttribute("data-c");
-    Array.prototype.forEach.call($("#chips").children,function(x){
-      x.setAttribute("aria-pressed",String(x.getAttribute("data-c")===cat))});
-    draw();
-  });
-  $("#q").addEventListener("input",function(){q=this.value.trim().toLowerCase();draw()});
+    return '<button class="chip" type="button" data-c="'+c+'" aria-pressed="'+
+      (c===cat)+'">'+esc(S[c])+"</button>"}).join("");
+  $("#howT").textContent=S.howT;
+  $("#steps").innerHTML=[1,2,3].map(function(i){
+    return '<div class="step"><b dir="ltr">'+i+"</b>"+esc(S["how"+i])+"</div>"}).join("");
+  $("#aboutT").textContent=S.aboutT;
+  $("#aboutP").textContent=S.about;
+  $("#contactT").textContent=S.contactT;
+  $("#contactL").textContent=S.contactL+" ";
+  $("#foot").textContent=S.foot;
+  $("#terms").textContent=S.terms;
+  $("#lang").innerHTML=LANGS.map(function(x){
+    return '<button type="button" data-l="'+x[0]+'" aria-pressed="'+(x[0]===LG)+
+      '" lang="'+x[0]+'">'+esc(x[1])+"</button>"}).join("");
   applyTheme(savedTheme());
   draw();
+}
+
+function boot(){
+  document.addEventListener("click",function(e){
+    var l=e.target.closest("#lang [data-l]");
+    if(l){ LG=l.getAttribute("data-l");
+      try{localStorage.setItem(LKEY,LG)}catch(err){}
+      paint(); return; }
+    var b=e.target.closest("#chips [data-c]");
+    if(b){ cat=b.getAttribute("data-c");
+      Array.prototype.forEach.call($("#chips").children,function(x){
+        x.setAttribute("aria-pressed",String(x.getAttribute("data-c")===cat))});
+      draw(); }
+  });
+  $("#q").addEventListener("input",function(){q=this.value.trim().toLowerCase();draw()});
+  paint();
 }
 boot();
 </script>
@@ -312,7 +464,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=2-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=3-pwa1").catch(function(){});
   });
 }
 </script>
