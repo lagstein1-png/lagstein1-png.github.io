@@ -590,7 +590,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v19 · 2026-08-29";
+var BUILD="v20 · 2026-08-29";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -986,6 +986,69 @@ function voiceCheck(){
     show("✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר") },2000);
 }
 
+
+/* ------------------------------------------------------------
+   פיצול לאמירות קצרות — הועתק מ"תאוריה מדברת", שם ההקראה נשמעת
+   הכי טוב. מנועי מכשיר מאיצים ובולעים סופי מילים במשפט ארוך;
+   כאן נשלחה שאלה שלמה באמירה אחת, לפעמים 300 תווים.
+   כל מקטע נושא את ההיסט שלו במחרוזת המלאה, כי charIndex מתאפס
+   בכל אמירה ובלעדיו ההדגשה קופצת לתחילת המשפט בכל מקטע.
+   ------------------------------------------------------------ */
+var SEG_MAX=90, SEG_GAP=260;
+/* סימן פיסוק בין שתי ספרות הוא חלק מהמספר ולא מקום לחתוך בו:
+   בלי הבדיקה הזאת "3,500" נשבר והמנוע קורא "שלוש, חמש מאות". */
+function insideNumber(str,i){
+  return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]);
+}
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  /* מקטע זעיר — "12." או ")" — עם הפסקה של רבע שנייה אחריו נשמע
+     כמו גמגום. מאחדים אותו לזה שאחריו. */
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&
+       merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){
+      merged[merged.length-1].text+=out[i].text; continue;
+    }
+    if(out[i].text.trim().length<12&&i+1<out.length){
+      out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue;
+    }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
+/* קצב לפי שפה — אותם ערכים שנבחרו בתאוריה מדברת אחרי האזנה */
+var VOICE_TUNE={he:0.82,ar:0.85,en:0.90,ru:0.88};
+function tuneRate(lang,rate){
+  var t=VOICE_TUNE[String(lang||"he").split("-")[0].toLowerCase()]||0.88;
+  var r=t*(rate||1);
+  return Math.max(0.5,Math.min(1.6,Math.round(r*100)/100));
+}
+
 function speakDevice(text){
   if(!("speechSynthesis" in window))return;
   try{speechSynthesis.cancel()}catch(e){}
@@ -996,22 +1059,30 @@ function speakDevice(text){
      בכל זאת, עם u.lang בלבד: קול ברירת מחדל בשפה הנכונה עדיף על
      שתיקה, ויש מכשירים שמחזירים רשימה ריקה לצמיתות ומדברים היטב.
      voicesReady נשאר בשימוש למסך בחירת הקול, שם ההמתנה במקומה. */
-  (function(){
+  /* השפה נקבעת ראשונה ובנפרד מהקול. אם השמת הקול נכשלת — וזה קורה
+     כשרשימת הקולות התיישנה אחרי שהמערכת החליפה מנוע — עדיף להקריא
+     בשפה הנכונה בקול ברירת המחדל מאשר לשתוק לגמרי. */
+  var _v=deviceVoice(), _lang=LANGS[LG].tts;
+  if(_v&&_v.lang)_lang=_v.lang;
+  var _segs=segments(String(text)), _rate=tuneRate(_lang,state.settings.rate);
+  /* המקטע הראשון יוצא כאן, בתוך הלחיצה. השאר נשרשרים מ-onend. */
+  (function sayseg(k){
+    if(k>=_segs.length){ hlClear(); ttsOK(); return }
+    var seg=_segs[k];
     try{
-      var u=new SpeechSynthesisUtterance(String(text));
-      /* השפה נקבעת ראשונה ובנפרד מהקול. אם השמת הקול נכשלת — וזה קורה
-         כשרשימת הקולות התיישנה אחרי שהמערכת החליפה מנוע — עדיף להקריא
-         בשפה הנכונה בקול ברירת המחדל מאשר לשתוק לגמרי. */
-      u.lang=LANGS[LG].tts;
-      var v=deviceVoice();
-      if(v){ try{ u.voice=v; if(v.lang)u.lang=v.lang; }catch(e2){} }
-      u.rate=state.settings.rate;
-      u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(e.charIndex)};
-    u.onend=function(){hlClear();ttsOK()};
-    u.onerror=function(e){ttsFail(e&&e.error)};
-    speechSynthesis.speak(u);
+      var u=new SpeechSynthesisUtterance(seg.text);
+      u.lang=_lang;
+      if(_v){ try{ u.voice=_v }catch(e2){} }
+      u.rate=_rate; u.pitch=1; u.volume=1;
+      u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
+      u.onend=function(){
+        if(k+1<_segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+        else { hlClear(); ttsOK() }
+      };
+      u.onerror=function(e){ttsFail(e&&e.error)};
+      speechSynthesis.speak(u);
     }catch(e){}
-  })();
+  })(0);
 }
 function speak(text){
   if(!state.settings.tts||!text)return;
@@ -8047,7 +8118,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v19-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v20-pwa1").catch(function(){});
   });
 }
 </script>

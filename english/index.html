@@ -579,7 +579,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n16 · 2026-08-29";
+var BUILD="n17 · 2026-08-29";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -994,6 +994,69 @@ function ttsFail(err){
 /* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
 function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
 
+
+/* ------------------------------------------------------------
+   פיצול לאמירות קצרות — הועתק מ"תאוריה מדברת", שם ההקראה נשמעת
+   הכי טוב. מנועי מכשיר מאיצים ובולעים סופי מילים במשפט ארוך;
+   כאן נשלחה שאלה שלמה באמירה אחת, לפעמים 300 תווים.
+   כל מקטע נושא את ההיסט שלו במחרוזת המלאה, כי charIndex מתאפס
+   בכל אמירה ובלעדיו ההדגשה קופצת לתחילת המשפט בכל מקטע.
+   ------------------------------------------------------------ */
+var SEG_MAX=90, SEG_GAP=260;
+/* סימן פיסוק בין שתי ספרות הוא חלק מהמספר ולא מקום לחתוך בו:
+   בלי הבדיקה הזאת "3,500" נשבר והמנוע קורא "שלוש, חמש מאות". */
+function insideNumber(str,i){
+  return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]);
+}
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  /* מקטע זעיר — "12." או ")" — עם הפסקה של רבע שנייה אחריו נשמע
+     כמו גמגום. מאחדים אותו לזה שאחריו. */
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&
+       merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){
+      merged[merged.length-1].text+=out[i].text; continue;
+    }
+    if(out[i].text.trim().length<12&&i+1<out.length){
+      out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue;
+    }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
+/* קצב לפי שפה — אותם ערכים שנבחרו בתאוריה מדברת אחרי האזנה */
+var VOICE_TUNE={he:0.82,ar:0.85,en:0.90,ru:0.88};
+function tuneRate(lang,rate){
+  var t=VOICE_TUNE[String(lang||"he").split("-")[0].toLowerCase()]||0.88;
+  var r=t*(rate||1);
+  return Math.max(0.5,Math.min(1.6,Math.round(r*100)/100));
+}
+
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
   try{speechSynthesis.cancel()}catch(e){}
@@ -1006,15 +1069,23 @@ function speakDevice(text,code,rate){
      voicesReady נשאר בשימוש למסך בחירת הקול, שם ההמתנה במקומה. */
   (function(){
     try{
-      var u=new SpeechSynthesisUtterance(text);
-      var v=bestVoice(code);
-      u.lang=(v&&v.lang)||code;
-      if(v)u.voice=v;
-      u.rate=clamp(rate,0.55,1.4); u.pitch=1;
-      u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(e.charIndex)};
-      u.onend=function(){hlClear();ttsOK()};
-      u.onerror=function(e){ttsFail(e&&e.error)};
-      speechSynthesis.speak(u);
+      var v=bestVoice(code), lang=(v&&v.lang)||code;
+      var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
+      (function sayseg(k){
+        if(k>=segs.length){ hlClear(); ttsOK(); return }
+        var seg=segs[k];
+        var u=new SpeechSynthesisUtterance(seg.text);
+        u.lang=lang;
+        if(v){ try{ u.voice=v }catch(e2){} }
+        u.rate=rt; u.pitch=1; u.volume=1;
+        u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
+        u.onend=function(){
+          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+          else { hlClear(); ttsOK() }
+        };
+        u.onerror=function(e){ttsFail(e&&e.error)};
+        speechSynthesis.speak(u);
+      })(0);
     }catch(e){}
   })();
   return true;
@@ -3371,7 +3442,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n16-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n17-pwa1").catch(function(){});
   });
 }
 </script>
