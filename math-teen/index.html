@@ -493,7 +493,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t10 · 2026-08-29";
+var BUILD="t11 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -645,10 +645,13 @@ function deviceVoice(){
   var list=pickList(),i;
   if(!list.length)return null;
   for(i=0;i<list.length;i++)if(list[i].voiceURI===state.settings.voice)return list[i];
-  /* בלי בחירה ידנית — קול נשי קודם. זו הבקשה, ובעברית הקול
-     הנשי גם נוטה להיות האיכותי מבין המותקנים. אם אין כזה,
-     חוזרים לראשון ברשימה במקום לשתוק. */
-  for(i=0;i<list.length;i++)if(guessGender(list[i])==="f")return list[i];
+  /* בלי בחירה ידנית — קול נשי, אבל *רק מתוך שפת הממשק*.
+     pickList מחזיר קודם את שפת הממשק ואחריה את כל השאר, ולכן
+     סריקה על כל הרשימה מצאה קול אנגלי נשי במכשיר שאין בו קול
+     עברי נשי — והעברית הוקראה באנגלית. שפה קודמת למגדר. */
+  var mine=hebVoices();
+  for(i=0;i<mine.length;i++)if(guessGender(mine[i])==="f")return mine[i];
+  if(mine.length)return mine[0];
   return list[0];
 }
 /* "gemini:Kore" או "device" */
@@ -3800,7 +3803,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t10-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t11-pwa1").catch(function(){});
   });
 }
 </script>
