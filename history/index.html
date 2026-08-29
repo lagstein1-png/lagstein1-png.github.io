@@ -522,7 +522,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m3 · 2026-08-29";
+var BUILD="m4 · 2026-08-29";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -2934,7 +2934,10 @@ function formWhen(tp,lv,pool,idx){
     opts.push(O(esc(s2),false,""));
   }
   return {type:"fact",prompt:t("qWhen"),lead:gl(it.t),
-    opts:shuffle(opts),answer:yr(it.y),say:gl(it.t)+". "+gl(it.w),reveal:it};
+    opts:shuffle(opts),answer:yr(it.y),
+    /* השנה היא התשובה, ולכן היא חייבת להיאמר. קודם נאמרו רק
+       הכותרת והתיאור — כלומר הכול חוץ ממה שנשאל. */
+    say:gl(it.t)+", "+yr(it.y)+". "+gl(it.w),reveal:it};
 }
 /* --- צורה 2: מה קרה --- */
 function formWhat(tp,lv,pool,idx){
@@ -2950,7 +2953,9 @@ function formName(tp,lv,pool,idx){
   var opts=optsFromField(it,nearEvents(it,pool,10),"t",4);
   if(!opts)return formWhen(tp,lv,pool,idx);
   return {type:"fact",prompt:t("qName"),lead:gl(it.w),
-    opts:opts,answer:gl(it.t),say:gl(it.w),reveal:it};
+    opts:opts,answer:gl(it.t),
+    /* שם האירוע הוא התשובה. בלעדיו נשמע רק התיאור שכבר הופיע בשאלה. */
+    say:gl(it.t)+". "+gl(it.w),reveal:it};
 }
 /* --- צורה 4: סיבה --- */
 function formWhy(tp,lv,pool,idx){
@@ -3003,7 +3008,10 @@ function formSrc(tp,lv,pool,idx){
   var opts=[O(esc(gl(qq.a)),true)];
   qq.w.forEach(function(x){opts.push(O(esc(gl(x)),false))});
   return {type:"src",prompt:t("qRead"),passage:it,qtext:gl(qq.q),
-    opts:shuffle(opts),answer:gl(qq.a),say:gl(it.lines).join(" "),reveal:null};
+    opts:shuffle(opts),answer:gl(qq.a),
+    /* הקטע עצמו כבר מוקרא בכפתור נפרד מעל הפסקה. אחרי המענה
+       מה שצריך להישמע הוא השאלה והתשובה עליה. */
+    say:gl(qq.q)+" "+gl(qq.a),reveal:null};
 }
 
 /* בוחר את צורת התרגיל. הרמה קובעת מה נשאל: ברמה 1 האירוע עצמו,
@@ -3454,7 +3462,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m3-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m4-pwa1").catch(function(){});
   });
 }
 </script>
