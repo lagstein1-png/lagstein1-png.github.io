@@ -481,7 +481,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t5 · 2026-08-29";
+var BUILD="t6 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -2720,15 +2720,10 @@ function viewSettings(){
        '<button class="'+(s.engine==="gemini"?"on":"")+'" data-a="engine" data-n="gemini">קול טבעי</button>'+
        '<button class="'+(s.engine!=="gemini"?"on":"")+'" data-a="engine" data-n="device">קול המכשיר</button>'+
        '</div>';
-    if(s.engine==="gemini"){
-      if(!hasKey()){
-        h+='<div class="hintbox" style="margin-top:14px"><b>צריך מפתח חינמי פעם אחת</b>'+
-           '<div class="sm" style="margin-top:4px">הקול הטבעי מגיע מגוגל. נכנסים ל-'+
-           '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>'+
-           ', יוצרים מפתח ומדביקים אותו כאן. הוא נשמר במכשיר בלבד ולא נשלח לשום מקום חוץ מגוגל.</div></div>'+
-           '<input class="field" style="margin-top:10px;direction:ltr;text-align:left" placeholder="מדביקים כאן את המפתח" data-bind="gkey" />'+
-           '<p class="sub xs" style="margin-top:8px">עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.</p>';
-      }else{
+    /* התנאי הוא המצב בפועל ולא ההעדפה השמורה: ברירת המחדל היא
+       "gemini", וכשאין מפתח האפליקציה מדברת בקול המכשיר — אבל
+       המסך הראה רק את תיבת המפתח, בלי אף קול לבחור מתוכו. */
+    if(s.engine==="gemini"&&hasKey()){
         h+=[["f","קולות נשיים"],["m","קולות גבריים"]].map(function(grp){
           return '<p class="sub sm" style="margin-top:14px">'+grp[1]+'</p><div class="grid vgrid" style="margin-top:8px">'+
             GEM_VOICES.filter(function(g){return g.g===grp[0]}).map(function(g){
@@ -2742,8 +2737,16 @@ function viewSettings(){
         if(ttsErr)h+='<div class="diag" style="margin-top:12px"><b>הקול הטבעי לא הגיב</b>'+
           '<div class="sm" style="margin-top:3px">'+esc(ttsErr)+'</div>'+
           '<div class="sm" style="margin-top:6px">בינתיים ההקראה עברה לקול המכשיר. אם כתוב כאן 400 או 403 — כנראה המפתח לא תקין או שהמודל לא זמין לחשבון.</div></div>';
+      }else{
+      if(s.engine==="gemini"){
+        h+='<div class="hintbox" style="margin-top:14px"><b>צריך מפתח חינמי פעם אחת</b>'+
+           '<div class="sm" style="margin-top:4px">הקול הטבעי מגיע מגוגל. נכנסים ל-'+
+           '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>'+
+           ', יוצרים מפתח ומדביקים אותו כאן. הוא נשמר במכשיר בלבד ולא נשלח לשום מקום חוץ מגוגל.</div></div>'+
+           '<input class="field" style="margin-top:10px;direction:ltr;text-align:left" placeholder="מדביקים כאן את המפתח" data-bind="gkey" />'+
+           '<p class="sub xs" style="margin-top:8px">עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.</p>';
       }
-    }else{
+
       var vl=pickList();
       if(!vl.length){
         h+='<div class="hintbox" style="margin-top:14px"><b>לא נמצאו קולות במכשיר</b>'+
@@ -3612,7 +3615,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t5-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t6-pwa1").catch(function(){});
   });
 }
 </script>
