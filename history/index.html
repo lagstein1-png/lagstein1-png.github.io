@@ -326,7 +326,8 @@ T.he={
   qEff:"מה הייתה התוצאה?", qFirst:"מה קרה קודם?", qTerm:"מה פירוש המושג?",
   qName:"על איזה אירוע מדובר?", qRead:"לפי המקור:",
   hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו", hearSent:"השמיעו את הקטע",
-  check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", showAll:"הראו הכול",
+  check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", hintB:"רמז", hintYearL:"השנה", hintTopicL:"מהתחום",
+  hintSrcL:"התשובה נמצאת בקטע שלמעלה", hintOrderL:"השוו את השנים של האפשרויות", showAll:"הראו הכול",
   correct:"נכון!", wrong:"עוד לא", answerIs:"התשובה:", why:"למה",
   tapOrder:"לחצו על המילים לפי הסדר", clearSlot:"נקו",
   progT:"ההתקדמות שלכם", progNone:"עוד לא התחלתם. כל מסלול נפתח מיד — אין נעילות.",
@@ -371,7 +372,8 @@ T.ar={
   qEff:"ما كانت النتيجة؟", qFirst:"ما الذي حدث أولًا؟", qTerm:"ما معنى المصطلح؟",
   qName:"عن أي حدث يدور الحديث؟", qRead:"حسب المصدر:",
   hear:"استمع", hearSlow:"ببطء", hearWord:"استمع", hearSent:"استمع للنص",
-  check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", showAll:"أظهر الكل",
+  check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", hintB:"تلميح", hintYearL:"السنة", hintTopicL:"من المجال",
+  hintSrcL:"الإجابة موجودة في المقطع أعلاه", hintOrderL:"قارنوا سنوات الخيارات", showAll:"أظهر الكل",
   correct:"صحيح!", wrong:"ليس بعد", answerIs:"الإجابة:", why:"لماذا",
   tapOrder:"اضغط الكلمات بالترتيب", clearSlot:"مسح",
   progT:"تقدّمك", progNone:"لم تبدأ بعد. كل مسار مفتوح فورًا — بلا أقفال.",
@@ -416,7 +418,8 @@ T.ru={
   qEff:"Каким было следствие?", qFirst:"Что произошло раньше?", qTerm:"Что означает понятие?",
   qName:"О каком событии идёт речь?", qRead:"По источнику:",
   hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать", hearSent:"Послушать отрывок",
-  check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", showAll:"Показать всё",
+  check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", hintB:"Подсказка", hintYearL:"Год", hintTopicL:"Из области",
+  hintSrcL:"Ответ есть в отрывке выше", hintOrderL:"Сравните годы вариантов", showAll:"Показать всё",
   correct:"Верно!", wrong:"Пока нет", answerIs:"Ответ:", why:"Почему",
   tapOrder:"Нажимайте слова по порядку", clearSlot:"Очистить",
   progT:"Ваш прогресс", progNone:"Вы ещё не начинали. Все направления открыты сразу — без замков.",
@@ -461,7 +464,8 @@ T.en={
   qEff:"What was the consequence?", qFirst:"Which came first?", qTerm:"What does the term mean?",
   qName:"Which event is this?", qRead:"According to the source:",
   hear:"Play", hearSlow:"Slowly", hearWord:"Play", hearSent:"Play the passage",
-  check:"Check", next:"Next", again:"Again", dunno:"I don't know", showAll:"Show all",
+  check:"Check", next:"Next", again:"Again", dunno:"I don't know", hintB:"Hint", hintYearL:"Year", hintTopicL:"From",
+  hintSrcL:"The answer is in the passage above", hintOrderL:"Compare the years of the options", showAll:"Show all",
   correct:"Correct!", wrong:"Not yet", answerIs:"Answer:", why:"Why",
   tapOrder:"Tap the words in order", clearSlot:"Clear",
   progT:"Your progress", progNone:"You have not started yet. Every track is open right away — nothing is locked.",
@@ -522,7 +526,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m4 · 2026-08-29";
+var BUILD="m5 · 2026-08-29";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -3016,6 +3020,19 @@ function formSrc(tp,lv,pool,idx){
 
 /* בוחר את צורת התרגיל. הרמה קובעת מה נשאל: ברמה 1 האירוע עצמו,
    ברמה 2 הקשר שבין אירועים, וברמה 3 מקור ומושג. */
+/* הרמז נותן תכונה אחרת מזו שנשאלה: לשאלת שנה — המאה, ולשאלה על
+   טקסט — השנה. הוא נגזר מהשאלה שחזרה בפועל ולא מהצורה שביקשנו,
+   כי formName נופלת חזרה ל-formWhen כשאין די מסיחים — ורמז לפי
+   הצורה המבוקשת היה מוסר שם את התשובה. */
+function hintFor(q,tp){
+  if(!q)return "";
+  if(q.type==="src")return t("hintSrcL");
+  if(q.prompt===t("qFirst"))return t("hintOrderL");
+  var it=q.reveal;
+  if(!it||typeof it.y!=="number")return t("hintTopicL")+": "+tName(tp);
+  if(q.answer===yr(it.y))return centuryStr(it.y);
+  return t("hintYearL")+": "+yr(it.y);
+}
 function buildQuestion(tid,lv,avoid){
   var tp=topicOf(tid); if(!tp)return null;
   var pool=poolOf(tp,lv);
@@ -3038,13 +3055,14 @@ function buildQuestion(tid,lv,avoid){
   }
   if(!q)q=formWhen(tp,lv,pool,idx);
   q.tid=tid; q.lv=lv; q.idx=idx; q.id=itemId(tid,lv,idx);
+  q.hint=hintFor(q,tp);
   return q;
 }
 
 /* ============================================================
    9. מסכים
    ============================================================ */
-var P={q:null,picked:-1,done:false,slot:[],used:[],ok:false};
+var P={q:null,picked:-1,done:false,slot:[],used:[],ok:false,hint:false};
 
 function hdr(){
   var s=state.screen;
@@ -3191,7 +3209,10 @@ function screenPractice(){
        '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
        esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
   } else {
-    h+='<div style="margin-top:.9rem"><button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button></div>";
+    h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+
+       (P.hint?"":'<button class="btn ghost" data-a="hint">'+esc(t("hintB"))+"</button>")+
+       '<button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button></div>";
+    if(P.hint&&q.hint)h+='<div class="qhint" style="margin-top:.6rem">'+esc(q.hint)+"</div>";
   }
   h+="</div></div></div>"+fbar();
   return h;
@@ -3333,7 +3354,7 @@ function render(){
 function newQuestion(){
   var prev=P.q?P.q.idx:undefined;
   P.q=buildQuestion(state.topic,state.level,prev);
-  P.picked=-1; P.done=false; P.ok=false;
+  P.picked=-1; P.done=false; P.ok=false; P.hint=false;
   render();
 }
 function record(ok){
@@ -3391,6 +3412,13 @@ document.addEventListener("click",function(e){
   if(a==="lvl"){state.level=clamp(parseInt(v,10)||1,1,3);save();newQuestion();return}
   if(a==="pick"){answer(parseInt(el.getAttribute("data-i"),10));return}
   if(a==="next"){newQuestion();return}
+  if(a==="hint"){
+    /* רמז אינו טעות ואינו נספר ככזו. מי שנעזר בו עדיין עונה בעצמו. */
+    if(!P.q||P.done)return;
+    P.hint=true; render();
+    if(P.q.hint)speak(P.q.hint,state.lang);
+    return;
+  }
   if(a==="dunno"){
     /* "לא יודע" אינו דילוג: הוא נספר כטעות, ומיד מראה ומשמיע את
        התשובה. מי שמנחש לומד פחות ממי שמודה. */
@@ -3462,7 +3490,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m4-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m5-pwa1").catch(function(){});
   });
 }
 </script>
