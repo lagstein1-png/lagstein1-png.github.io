@@ -593,7 +593,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g22 · 2026-08-29";
+var BUILD="g23 · 2026-08-29";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -1148,7 +1148,18 @@ function speak(text){
     /* נופלים חזרה לקול המכשיר במקום להשתתק, ורושמים למה — כדי
        שמסך ההגדרות יוכל להראות את הסיבה במקום "לא עובד". */
     ttsErr=String(e&&e.message||e);
-    if(/\b(400|401|403)\b|blocked|permission|API key|not valid/i.test(ttsErr))gDead=true;
+    if(/\b(400|401|403)\b|blocked|permission|API key|not valid/i.test(ttsErr)){
+      /* מפתח שנדחה לצמיתות אינו תקלה שחוזרת על עצמה — הוא הכרעה.
+         עוברים לקול המכשיר, שומרים, ומפסיקים להודיע על כך בכל
+         שאלה. ההסבר נשאר במסך ההגדרות, שם הוא רלוונטי. */
+      gDead=true;
+      state.settings.engine="device";
+      try{ save() }catch(e2){}
+      ttsState="device";
+      speakDevice(text);   /* המשפט הזה עדיין צריך להישמע */
+      render();
+      return;
+    }
     ttsState="err";
     speakDevice(text);
     render();
@@ -2707,6 +2718,9 @@ _f("{0}{1} דף נוסחאות</button></div>", '<button class="btn btn-g" data-
 function voiceStrip(){
   var s=state.settings;
   if(!s.tts)return "";
+  /* מפתח שנדחה לצמיתות: אין מה להציע ואין על מה להתריע. ההקראה
+     עובדת בקול המכשיר, וההסבר ממתין במסך ההגדרות. */
+  if(gDead)return "";
   if(s.engine==="gemini"&&hasKey()&&ttsState!=="err"){
     if(ttsState!=="ok")return "";      /* עוד לא הושמע דבר — אין מה להודיע */
     return _f("{0}{1}<span>קול טבעי · {2}</span>", '<div class="vstrip ok">', ic("speaker",15), gvName(s.gvoice).t)+
@@ -7662,7 +7676,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g22-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g23-pwa1").catch(function(){});
   });
 }
 </script>

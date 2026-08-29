@@ -497,7 +497,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t19 · 2026-08-29";
+var BUILD="t20 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -1024,7 +1024,18 @@ function speak(text){
     /* נופלים חזרה לקול המכשיר במקום להשתתק, ורושמים למה — כדי
        שמסך ההגדרות יוכל להראות את הסיבה במקום "לא עובד". */
     ttsErr=String(e&&e.message||e);
-    if(/\b(400|401|403)\b|blocked|permission|API key|not valid/i.test(ttsErr))gDead=true;
+    if(/\b(400|401|403)\b|blocked|permission|API key|not valid/i.test(ttsErr)){
+      /* מפתח שנדחה לצמיתות אינו תקלה שחוזרת על עצמה — הוא הכרעה.
+         עוברים לקול המכשיר, שומרים, ומפסיקים להודיע על כך בכל
+         שאלה. ההסבר נשאר במסך ההגדרות, שם הוא רלוונטי. */
+      gDead=true;
+      state.settings.engine="device";
+      try{ save() }catch(e2){}
+      ttsState="device";
+      speakDevice(text);   /* המשפט הזה עדיין צריך להישמע */
+      render();
+      return;
+    }
     ttsState="err";
     speakDevice(text);
     render();
@@ -2739,6 +2750,9 @@ function viewHome(){
 function voiceStrip(){
   var s=state.settings;
   if(!s.tts)return "";
+  /* מפתח שנדחה לצמיתות: אין מה להציע ואין על מה להתריע. ההקראה
+     עובדת בקול המכשיר, וההסבר ממתין במסך ההגדרות. */
+  if(gDead)return "";
   if(s.engine==="gemini"&&hasKey()&&ttsState!=="err"){
     if(ttsState!=="ok")return "";      /* עוד לא הושמע דבר — אין מה להודיע */
     return '<div class="vstrip ok">'+ic("speaker",15)+'<span>קול טבעי · '+gvName(s.gvoice).t+'</span>'+
@@ -4015,7 +4029,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t19-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t20-pwa1").catch(function(){});
   });
 }
 </script>
