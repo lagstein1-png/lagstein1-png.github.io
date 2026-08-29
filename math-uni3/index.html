@@ -593,7 +593,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g23 · 2026-08-29";
+var BUILD="g24 · 2026-08-29";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -927,6 +927,12 @@ var ttsErr="",ttsState="";   /* "" · "ok" · "device" · "err" */
    "אין קול" נראה כמו תקלה באפליקציה בזמן ש-synthesis-failed
    הגיע מהמערכת. שגיאה שנבלעת עולה יום של חיפוש.
    ------------------------------------------------------------ */
+var TTSMSG={
+  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה"},
+  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق"},
+  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть"},
+  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close"}
+};
 var _ttsBar=null;
 function ttsFail(err){
   try{ hlClear() }catch(e){}
@@ -936,22 +942,24 @@ function ttsFail(err){
      ואמרה לו שהמכשיר שלו שבור בזמן שהוא עבד. */
   if(err==="interrupted"||err==="canceled")return;
   if(_ttsBar)return;
+  var _g="he"; try{_g=LG||"he"}catch(e){} if(!TTSMSG[_g])_g="he";
+  var TT=TTSMSG[_g];
   var m=document.createElement("div");
   m.setAttribute("role","alert");
   m.id="tts-fail";
-  m.dir="rtl";
+  m.dir=TT.dir;
   m.style.cssText="position:fixed;inset-inline:10px;bottom:10px;z-index:99999;"+
     "background:#7f1d1d;color:#fff;padding:13px 15px;border-radius:12px;"+
     "font:600 15px/1.55 system-ui,Arial,sans-serif;box-shadow:0 10px 34px rgba(0,0,0,.45);"+
     "display:flex;gap:10px;align-items:flex-start";
   var t=document.createElement("div");
   t.style.cssText="flex:1;min-width:0";
-  t.innerHTML="מנוע הדיבור של המכשיר לא הצליח להקריא"+
+  t.innerHTML=TT.msg+
     (err?" <span dir=ltr>("+String(err)+")</span>":"")+
-    ". זו תקלה במכשיר, לא באפליקציה. "+
-    '<a href="/voice/" style="color:#fff">בדיקה והוראות תיקון</a>';
+    TT.tail+
+    '<a href="/voice/" style="color:#fff">'+TT.link+'</a>';
   var x=document.createElement("button");
-  x.type="button"; x.textContent="✕"; x.setAttribute("aria-label","סגירה");
+  x.type="button"; x.textContent="✕"; x.setAttribute("aria-label",TT.close);
   x.style.cssText="min-width:44px;min-height:44px;border:0;border-radius:9px;"+
     "background:rgba(255,255,255,.16);color:#fff;font-size:16px;cursor:pointer";
   x.onclick=function(){ if(_ttsBar&&_ttsBar.parentNode)_ttsBar.parentNode.removeChild(_ttsBar); _ttsBar=null };
@@ -3759,7 +3767,36 @@ function viewBadExam(msg){
    16. ציור המסך
    ============================================================ */
 var pendingScroll=null;
-function render(){
+
+/* ==== כותרת תחתונה וקישור הדילוג בשפת הממשק ====
+   שניהם HTML סטטי שאינו עובר דרך render, ולכן נשארו עבריים בכל שפה. */
+var LGFOOT={he:"© 2026 יהושע לגשטיין",ar:"© 2026 يهوشع لچشطاين",ru:"© 2026 Иехошуа Лагштейн",en:"© 2026 Joshua Lagstein"};
+var LGTERMS={he:"תנאי שימוש וזכויות יוצרים",ar:"شروط الاستخدام وحقوق النشر",ru:"Условия использования и авторские права",en:"Terms of use and copyright"};
+var LGSKIP={he:"דילוג לתוכן",ar:"تخطّي إلى المحتوى",ru:"Перейти к содержимому",en:"Skip to content"};
+function lgChrome(){
+  var g="he"; try{ g=LG||"he" }catch(e){}
+  if(!LGFOOT[g])g="he";
+  var dir=(g==="ru"||g==="en")?"ltr":"rtl";
+  var f=document.querySelector("footer.lg-foot");
+  if(f){
+    f.setAttribute("lang",g); f.setAttribute("dir",dir);
+    f.textContent="";
+    f.appendChild(document.createTextNode(LGFOOT[g]+" · "));
+    var a=document.createElement("a");
+    a.href="/legal/"; a.style.color="inherit"; a.textContent=LGTERMS[g];
+    f.appendChild(a);
+  }
+  var s=document.querySelector("a.skip[href='#main']");
+  if(s){ s.setAttribute("lang",g); s.setAttribute("dir",dir); s.textContent=LGSKIP[g] }
+}
+
+/* בחירת שפה מתוך שער התנאים — הוא נפתח לפני שיש בכלל גישה להגדרות. */
+window.addEventListener("legal:lang",function(e){
+  var k=e&&e.detail; if(!k)return;
+  try{ state.settings.lang=k;save();applyModes();render(); }catch(err){}
+});
+
+function render(){ try{lgChrome()}catch(e){}
   var html="";
   /* תלמיד שפתח את דף הנוסחאות באמצע מבחן חייב דרך חזרה מפורשת.
      סרגל הניווט הרגיל לא מכיר את המבחן ולא יחזיר אותו אליו. */
@@ -4925,7 +4962,12 @@ var TR_KEYS=[
 "תלוי באיברים",
 "תמורות",
 "תרגול",
-"תשובה שגויה אומרת איזו טעות היא, לא רק שהיא שגויה"
+"תשובה שגויה אומרת איזו טעות היא, לא רק שהיא שגויה",
+"בדיקת קול",
+"במכשיר הזה אין קול נשי בשפה הנוכחית, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו.",
+"באנדרואיד: הגדרות ← ניהול כללי ← טקסט לדיבור ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי.",
+"באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.",
+"בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות."
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -4956,6 +4998,27 @@ function trMissing(lang){
   for(i=0;i<TR_KEYS.length;i++)if(!d[TR_KEYS[i]])n++;
   return n;
 }
+
+/* מחרוזות הקול שנוספו אחרי הבנייה הראשונה של המילון. */
+trAt("ar",899,[
+"فحص الصوت",
+"لا يوجد في هذا الجهاز صوت أنثويّ باللغة الحاليّة، ولذلك رُفعت طبقة الصوت. هذا ليس صوتًا أنثويًّا حقيقيًّا — وللحصول على واحد يجب تثبيته.",
+"على أندرويد: الإعدادات ← الإدارة العامّة ← تحويل النصّ إلى كلام ← الترس بجانب المحرّك ← تثبيت بيانات الصوت ← اختيار صيغة أنثويّة.",
+"على آيفون: الإعدادات ← تسهيلات الاستخدام ← المحتوى المنطوق ← الأصوات ← اختيار صوت أنثويّ وتنزيله.",
+"على ويندوز: الإعدادات ← الوقت واللغة ← الكلام ← إدارة الأصوات ← إضافة أصوات."]);
+trAt("ru",899,[
+"Проверка голоса",
+"На этом устройстве нет женского голоса для текущего языка, поэтому тон был повышен. Это не настоящий женский голос — чтобы получить его, нужно его установить.",
+"На Android: Настройки → Общие настройки → Синтез речи → шестерёнка рядом с движком → Установка голосовых данных → выбрать женский вариант.",
+"На iPhone: Настройки → Универсальный доступ → Устный контент → Голоса → выбрать женский голос и загрузить.",
+"В Windows: Параметры → Время и язык → Речь → Управление голосами → Добавить голоса."]);
+trAt("en",899,[
+"Voice check",
+"This device has no female voice in the current language, so the pitch was raised. It is not a real female voice — to get one, it has to be installed.",
+"On Android: Settings → General management → Text-to-speech → the gear beside the engine → Install voice data → choose a female variant.",
+"On iPhone: Settings → Accessibility → Spoken Content → Voices → choose a female voice and download it.",
+"On Windows: Settings → Time & language → Speech → Manage voices → Add voices."]);
+
 
 trAt("en",0,[" · {0} with help",
 " · Hebrew",
@@ -7676,7 +7739,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g23-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g24-pwa1").catch(function(){});
   });
 }
 </script>

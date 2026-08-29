@@ -20,7 +20,11 @@ window.__protectLoaded=true;
 var L=window.LEGAL;
 var KEY="legal-accepted-v"+L.version;
 
+/* השער יכול להיות בשפה שהאפליקציה עצמה אינה תומכת בה: אפליקציה
+   עברית בלבד לא אמורה להתהפך ל-LTR רק מפני שקראו את התנאים באנגלית. */
+var forced=null;
 function lang(){
+  if(forced&&L[forced])return forced;
   var c=(document.documentElement.lang||"he").toLowerCase().split("-")[0];
   if(c==="iw")c="he";
   return L[c]?c:"he";
@@ -63,12 +67,19 @@ var CSS=''+
 '  box-shadow:0 10px 26px -8px rgba(0,0,0,.55);max-width:calc(100vw - 28px)}'+
 '.lg-install .x{opacity:.65;font-weight:700;padding:0 .1rem}'+
 '.lg-steps{margin:10px 0 0;padding-inline-start:22px;line-height:1.9;color:#374151}'+
+'.lg-lgs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}'+
+'.lg-lgs button{font:inherit;font-weight:700;font-size:.9rem;border:1px solid #d1d5db;'+
+'  background:#fff;color:#374151;border-radius:10px;padding:.55rem .8rem;cursor:pointer;min-height:44px}'+
+'.lg-lgs button[aria-pressed="true"]{background:#111827;color:#fff;border-color:#111827}'+
+'.lg-lgs button:focus-visible{outline:3px solid #2563eb;outline-offset:2px}'+
 '@media (prefers-color-scheme:dark){'+
 '  .lg-box{background:#141a24;color:#e8ecf4}'+
 '  .lg-lead,.lg-scroll p,.lg-steps{color:#b9c2d4}'+
 '  .lg-btn{background:#1d2531;color:#e8ecf4;border-color:#2c3648}'+
 '  .lg-btn.pri{background:#e8ecf4;color:#141a24;border-color:#e8ecf4}'+
 '  .lg-btn.link{color:#b9c2d4}'+
+'  .lg-lgs button{background:#1d2531;color:#b9c2d4;border-color:#2c3648}'+
+'  .lg-lgs button[aria-pressed="true"]{background:#e8ecf4;color:#141a24;border-color:#e8ecf4}'+
 '  .lg-install{background:#e8ecf4;color:#141a24}}';
 function style(){
   if(document.getElementById("lg-style"))return;
@@ -108,6 +119,37 @@ function close(){
   if(o.onClose)o.onClose();
 }
 
+/* מי שאינו קורא עברית נתקל כאן בקיר: השער חוסם את האפליקציה עוד לפני
+   שהגיע למסך ההגדרות, ולכן בורר השפה חייב לשבת בתוך השער עצמו. */
+var LGNAME={he:"עברית",ar:"العربية",ru:"Русский",en:"English"};
+var LGDIR={he:"rtl",ar:"rtl",ru:"ltr",en:"ltr"};
+var relang=null;   /* מה לצייר מחדש כשמחליפים שפה */
+var selfLang=false;/* החלפה שיצאה מהרצועה עצמה — לא לצייר פעמיים */
+function langStrip(){
+  var cur=lang();
+  return '<div class="lg-lgs" role="group">'+
+    Object.keys(LGNAME).filter(function(k){return !!L[k]}).map(function(k){
+      return '<button type="button" data-lg="'+k+'" lang="'+k+'" dir="'+LGDIR[k]+
+        '" aria-pressed="'+(k===cur?"true":"false")+'">'+esc(LGNAME[k])+'</button>';
+    }).join("")+'</div>';
+}
+function wireStrip(){
+  var box=open&&open.el; if(!box)return;
+  var bs=box.querySelectorAll(".lg-lgs button");
+  for(var i=0;i<bs.length;i++)bs[i].onclick=function(){
+    var k=this.getAttribute("data-lg");
+    if(k===lang())return;
+    /* מקור האמת לשפה הוא documentElement.lang, וכך גם האפליקציה קוראת אותה */
+    selfLang=true; forced=k;
+    if(relang)relang();
+    /* אפליקציה רב־לשונית מקשיבה, מחליפה את השפה שלה בעצמה ומעדכנת
+       את documentElement. אפליקציה עברית בלבד פשוט לא מגיבה, והשער
+       לבדו מתורגם — בלי לשבור את כיווניות המסך שמאחוריו. */
+    try{ window.dispatchEvent(new CustomEvent("legal:lang",{detail:k})) }catch(e){}
+    setTimeout(function(){selfLang=false},0);
+  };
+}
+
 function fullText(){
   var t=T();
   return t.sections.map(function(s){
@@ -118,7 +160,9 @@ function fullText(){
 /* השער עצמו. אין X ואין לחיצה בחוץ שסוגרת — הסכמה חייבת להיות פעולה. */
 function gate(){
   var t=T();
+  relang=gate;
   modal(
+    langStrip()+
     '<h2>'+esc(t.gateTitle)+'</h2>'+
     '<p class="lg-lead">'+esc(t.gateLead)+'</p>'+
     '<div class="lg-scroll" id="lg-full">'+fullText()+'</div>'+
@@ -129,10 +173,11 @@ function gate(){
       '<button class="lg-btn" id="lg-no">'+esc(t.decline)+'</button>'+
     '</div>'
   );
+  wireStrip();
   document.getElementById("lg-ok").onclick=function(){
     /* נשמר מה שנחוץ כדי להראות מה בדיוק אושר ומתי */
     store(KEY,JSON.stringify({v:L.version,at:new Date().toISOString(),lang:lang()}));
-    close(); installMaybe();
+    relang=null; close(); installMaybe();
   };
   document.getElementById("lg-no").onclick=function(){
     var t2=T();
@@ -145,8 +190,10 @@ function gate(){
 /* קריאה חוזרת מתוך האפליקציה, בלי לחסום */
 function show(){
   var t=T(),rec=null;
+  relang=show;
   try{rec=JSON.parse(read(KEY)||"null")}catch(e){}
   modal(
+    langStrip()+
     '<h2>'+esc(t.title)+'</h2>'+
     '<p class="lg-lead">'+esc(t.intro)+'</p>'+
     '<div class="lg-scroll">'+fullText()+'</div>'+
@@ -155,7 +202,8 @@ function show(){
       (rec&&rec.at?'<br>'+esc(t.acceptedOn)+' '+esc(String(rec.at).slice(0,10)):'')+'</p>'+
     '<div class="lg-row"><button class="lg-btn pri" id="lg-close">'+esc(t.accept.split(",")[0])+'</button></div>'
   );
-  document.getElementById("lg-close").onclick=close;
+  wireStrip();
+  document.getElementById("lg-close").onclick=function(){relang=null;close()};
 }
 
 /* ---------- התקנה למסך הבית ---------- */
@@ -235,6 +283,21 @@ window.addEventListener("beforeinstallprompt",function(e){
   e.preventDefault(); deferred=e; installMaybe();
 });
 window.addEventListener("appinstalled",function(){ store("lg-install-off","1"); hideBar(); });
+
+/* האפליקציה משנה את documentElement.lang כשמחליפים שפה בהגדרות.
+   חלון תנאים שכבר פתוח צריך להתחלף איתה, לא להישאר בשפה הקודמת. */
+try{
+  var lastLang=document.documentElement.lang;
+  new MutationObserver(function(){
+    var now=document.documentElement.lang;
+    if(now===lastLang)return;
+    lastLang=now;
+    forced=null;               /* האפליקציה ענתה — היא המקור מעכשיו */
+    if(selfLang)return;
+    if(open&&relang)relang();
+    if(bar){hideBar();showBar()}
+  }).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
+}catch(e){}
 
 /* ---------- הפעלה ---------- */
 function boot(){

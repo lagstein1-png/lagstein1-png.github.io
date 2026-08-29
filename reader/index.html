@@ -755,6 +755,12 @@ function geminiName(){ return VOICE.split(':')[1] || 'Kore'; }
    "אין קול" נראה כמו תקלה באפליקציה בזמן ש-synthesis-failed
    הגיע מהמערכת. שגיאה שנבלעת עולה יום של חיפוש.
    ------------------------------------------------------------ */
+var TTSMSG={
+  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה"},
+  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق"},
+  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть"},
+  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close"}
+};
 var _ttsBar=null;
 function ttsFail(err){
   try{ markReading(null) }catch(e){}
@@ -764,22 +770,23 @@ function ttsFail(err){
      ואמרה לו שהמכשיר שלו שבור בזמן שהוא עבד. */
   if(err==="interrupted"||err==="canceled")return;
   if(_ttsBar)return;
+  var TT=TTSMSG.he;   /* האפליקציה הזאת בעברית בלבד */
   var m=document.createElement("div");
   m.setAttribute("role","alert");
   m.id="tts-fail";
-  m.dir="rtl";
+  m.dir=TT.dir;
   m.style.cssText="position:fixed;inset-inline:10px;bottom:10px;z-index:99999;"+
     "background:#7f1d1d;color:#fff;padding:13px 15px;border-radius:12px;"+
     "font:600 15px/1.55 system-ui,Arial,sans-serif;box-shadow:0 10px 34px rgba(0,0,0,.45);"+
     "display:flex;gap:10px;align-items:flex-start";
   var t=document.createElement("div");
   t.style.cssText="flex:1;min-width:0";
-  t.innerHTML="מנוע הדיבור של המכשיר לא הצליח להקריא"+
+  t.innerHTML=TT.msg+
     (err?" <span dir=ltr>("+String(err)+")</span>":"")+
-    ". זו תקלה במכשיר, לא באפליקציה. "+
-    '<a href="/voice/" style="color:#fff">בדיקה והוראות תיקון</a>';
+    TT.tail+
+    '<a href="/voice/" style="color:#fff">'+TT.link+'</a>';
   var x=document.createElement("button");
-  x.type="button"; x.textContent="✕"; x.setAttribute("aria-label","סגירה");
+  x.type="button"; x.textContent="✕"; x.setAttribute("aria-label",TT.close);
   x.style.cssText="min-width:44px;min-height:44px;border:0;border-radius:9px;"+
     "background:rgba(255,255,255,.16);color:#fff;font-size:16px;cursor:pointer";
   x.onclick=function(){ if(_ttsBar&&_ttsBar.parentNode)_ttsBar.parentNode.removeChild(_ttsBar); _ttsBar=null };
@@ -1247,7 +1254,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=10-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=11-pwa1").catch(function(){});
   });
 }
 </script>
