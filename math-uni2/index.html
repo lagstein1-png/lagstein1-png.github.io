@@ -2180,8 +2180,11 @@ function badStr(s){return !s||/NaN|Infinity|undefined|null/.test(s)}
 function buildQ(topicId,level){
   var t=topicById(topicId);
   if(!t)t=TOPICS[0];
-  var raw=null,tries=0,opts,i,p,seen,ansP;
-  while(tries<8){
+  var raw=null,tries=0,opts=null,i,p,seen,ansP,best=null;
+  /* מגרילים עד שיוצאות ארבע אפשרויות שונות. מסיח שיצא במקרה שווה
+     לתשובה נעלם בסינון, והשאלה הייתה מציגה שלוש — קל מדי בלי סיבה.
+     אם אחרי כמה ניסיונות עדיין לא, לוקחים את ההגרלה העשירה ביותר. */
+  while(tries<12){
     tries++;
     try{raw=t.gen(level)}catch(e){raw=null}
     if(!raw||!raw.ans||badStr(plainOf(raw.ans.h)))continue;
@@ -2194,8 +2197,10 @@ function buildQ(topicId,level){
       seen[p]=1;
       opts.push({h:raw.wrong[i].h,t:p,ok:false,why:raw.wrong[i].why||""});
     }
-    if(opts.length>=3)break;
+    if(!best||opts.length>best.opts.length)best={raw:raw,opts:opts};
+    if(opts.length>=4)break;
   }
+  if(best){raw=best.raw;opts=best.opts}
   if(!raw)raw={ask:_("חשבו"),expr:"1 + 1",ans:W("2"),wrong:[W("1"),W("3"),W("11")],steps:[S(_("חיבור"),"","1 + 1 = 2")],hint:"",rule:"order"};
   if(!opts||opts.length<2){
     ansP=plainOf(raw.ans.h);
