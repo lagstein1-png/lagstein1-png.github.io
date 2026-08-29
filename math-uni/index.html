@@ -557,7 +557,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u2 · 2026-08-28";
+var BUILD="u3 · 2026-08-29";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -666,6 +666,32 @@ function saveKey(k){
 function hasKey(){return !!GKEY}
 
 function voices(){try{return window.speechSynthesis?speechSynthesis.getVoices():[]}catch(e){return[]}}
+/* הקולות נטענים אסינכרונית, ורק אז נורה voiceschanged. מי שמקריא
+   לפני כן מקבל את ברירת המחדל של הדפדפן — לרוב קול אנגלי, גם כשמותקן
+   קול עברי טוב. onvoiceschanged לבדו אינו פתרון: הוא מרענן תפריט,
+   הוא לא מעכב את האמירה הראשונה. */
+var _voicesP=null;
+function voicesReady(){
+  if(_voicesP)return _voicesP;
+  _voicesP=new Promise(function(done){
+    if(!("speechSynthesis" in window)){done();return}
+    if(voices().length){done();return}
+    var poll=null,cap=null,fired=false;
+    function finish(){
+      if(fired)return; fired=true;
+      clearInterval(poll); clearTimeout(cap);
+      try{speechSynthesis.removeEventListener("voiceschanged",finish)}catch(e){}
+      done();
+    }
+    try{speechSynthesis.addEventListener("voiceschanged",finish)}catch(e){}
+    /* Safari לא תמיד יורה את האירוע — לכן גם דגימה */
+    poll=setInterval(function(){if(voices().length)finish()},120);
+    /* תקרה: יש מכשירים שמחזירים רשימה ריקה לצמיתות ומדברים מצוין.
+       עדיף לדבר בקול ברירת מחדל מאשר לשתוק לנצח. */
+    cap=setTimeout(finish,4000);
+  });
+  return _voicesP;
+}
 /* קולות בשפת הממשק. קול עברי שמקריא רוסית הוא בדיוק הכישלון
    שהאפליקציה הזאת אמורה למנוע, ולכן הסינון עוקב אחרי השפה. */
 var LANG_HINT={he:/עברית|hebrew|ivrit/i,ar:/العربية|arabic/i,
@@ -763,18 +789,21 @@ function pcmToWav(b64){
 var ttsErr="",ttsState="";   /* "" · "ok" · "device" · "err" */
 function speakDevice(text){
   if(!("speechSynthesis" in window))return;
-  try{
-    speechSynthesis.cancel();
-    var u=new SpeechSynthesisUtterance(String(text));
-    /* השפה נקבעת ראשונה ובנפרד מהקול. אם השמת הקול נכשלת — וזה קורה
-       כשרשימת הקולות התיישנה אחרי שהמערכת החליפה מנוע — עדיף להקריא
-       בשפה הנכונה בקול ברירת המחדל מאשר לשתוק לגמרי. */
-    u.lang=LANGS[LG].tts;
-    var v=deviceVoice();
-    if(v){ try{ u.voice=v; if(v.lang)u.lang=v.lang; }catch(e2){} }
-    u.rate=state.settings.rate;
-    speechSynthesis.speak(u);
-  }catch(e){}
+  try{speechSynthesis.cancel()}catch(e){}
+  /* ממתינים שרשימת הקולות תעלה לפני האמירה הראשונה. */
+  voicesReady().then(function(){
+    try{
+      var u=new SpeechSynthesisUtterance(String(text));
+      /* השפה נקבעת ראשונה ובנפרד מהקול. אם השמת הקול נכשלת — וזה קורה
+         כשרשימת הקולות התיישנה אחרי שהמערכת החליפה מנוע — עדיף להקריא
+         בשפה הנכונה בקול ברירת המחדל מאשר לשתוק לגמרי. */
+      u.lang=LANGS[LG].tts;
+      var v=deviceVoice();
+      if(v){ try{ u.voice=v; if(v.lang)u.lang=v.lang; }catch(e2){} }
+      u.rate=state.settings.rate;
+      speechSynthesis.speak(u);
+    }catch(e){}
+  });
 }
 function speak(text){
   if(!state.settings.tts||!text)return;
@@ -7972,7 +8001,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u2-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u3-pwa1").catch(function(){});
   });
 }
 </script>

@@ -514,7 +514,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n1 · 2026-08-28";
+var BUILD="n2 · 2026-08-29";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -636,6 +636,32 @@ function gemOn(){return state.voiceMode==="gem"&&hasKey()}
 
 /* --- קול המכשיר, לפי שפה --- */
 function allVoices(){try{return window.speechSynthesis?(speechSynthesis.getVoices()||[]):[]}catch(e){return[]}}
+/* הקולות נטענים אסינכרונית, ורק אז נורה voiceschanged. מי שמקריא
+   לפני כן מקבל את ברירת המחדל של הדפדפן — לרוב קול אנגלי, גם כשמותקן
+   קול עברי טוב. onvoiceschanged לבדו אינו פתרון: הוא מרענן תפריט,
+   הוא לא מעכב את האמירה הראשונה. */
+var _voicesP=null;
+function voicesReady(){
+  if(_voicesP)return _voicesP;
+  _voicesP=new Promise(function(done){
+    if(!("speechSynthesis" in window)){done();return}
+    if(allVoices().length){done();return}
+    var poll=null,cap=null,fired=false;
+    function finish(){
+      if(fired)return; fired=true;
+      clearInterval(poll); clearTimeout(cap);
+      try{speechSynthesis.removeEventListener("voiceschanged",finish)}catch(e){}
+      done();
+    }
+    try{speechSynthesis.addEventListener("voiceschanged",finish)}catch(e){}
+    /* Safari לא תמיד יורה את האירוע — לכן גם דגימה */
+    poll=setInterval(function(){if(allVoices().length)finish()},120);
+    /* תקרה: יש מכשירים שמחזירים רשימה ריקה לצמיתות ומדברים מצוין.
+       עדיף לדבר בקול ברירת מחדל מאשר לשתוק לנצח. */
+    cap=setTimeout(finish,4000);
+  });
+  return _voicesP;
+}
 var LANG_HINT={he:/עברית|hebrew|ivrit/i,ar:/العربية|arabic/i,ru:/русский|russian/i,en:/english/i};
 var V_F=/(female|woman|carmit|hila|aria|jenny|sara|salma|hala|zariyah|amina|svetlana|dariya|irina|milena|elena|katja|noura|mona|samantha|karen|moira|tessa|serena)/;
 var V_M=/(\bmale\b|\bman\b|daniel|david|yoni|moshe|asaf|guy|george|mark|ryan|alex|fred|maged|hamed|shakir|dmitry|pavel|yuri|maxim|omar|tarek|oliver|thomas)/;
@@ -738,16 +764,19 @@ function gSynth(text,voiceName,rate,lang){
 }
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
-  try{
-    speechSynthesis.cancel();
-    var u=new SpeechSynthesisUtterance(text);
-    var v=bestVoice(code);
-    u.lang=(v&&v.lang)||code;
-    if(v)u.voice=v;
-    u.rate=clamp(rate,0.55,1.4); u.pitch=1;
-    speechSynthesis.speak(u);
-    return true;
-  }catch(e){return false}
+  try{speechSynthesis.cancel()}catch(e){}
+  /* ממתינים שרשימת הקולות תעלה לפני האמירה הראשונה. */
+  voicesReady().then(function(){
+    try{
+      var u=new SpeechSynthesisUtterance(text);
+      var v=bestVoice(code);
+      u.lang=(v&&v.lang)||code;
+      if(v)u.voice=v;
+      u.rate=clamp(rate,0.55,1.4); u.pitch=1;
+      speechSynthesis.speak(u);
+    }catch(e){}
+  });
+  return true;
 }
 /* lang: "en" לחומר הנלמד, או קוד שפת האם להוראה. */
 function speak(text,lang,rateMul){
@@ -2163,7 +2192,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n1-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n2-pwa1").catch(function(){});
   });
 }
 </script>
