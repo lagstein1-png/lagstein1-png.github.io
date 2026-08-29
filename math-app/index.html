@@ -1202,6 +1202,42 @@ function pickVoice(prefer,uri,lang){
   }
   return pool.slice().sort(function(a,b){return score(b)-score(a)})[0];
 }
+
+/* ------------------------------------------------------------
+   כשמנוע הדיבור של המכשיר נכשל — לומר את זה.
+   עד כאן onerror רק ניקה הדגשה, והמשתמש קיבל שקט בלי הסבר:
+   "אין קול" נראה כמו תקלה באפליקציה בזמן ש-synthesis-failed
+   הגיע מהמערכת. שגיאה שנבלעת עולה יום של חיפוש.
+   ------------------------------------------------------------ */
+var _ttsBar=null;
+function ttsFail(err){
+  try{ hlClear() }catch(e){}
+  if(_ttsBar)return;
+  var m=document.createElement("div");
+  m.setAttribute("role","alert");
+  m.id="tts-fail";
+  m.dir="rtl";
+  m.style.cssText="position:fixed;inset-inline:10px;bottom:10px;z-index:99999;"+
+    "background:#7f1d1d;color:#fff;padding:13px 15px;border-radius:12px;"+
+    "font:600 15px/1.55 system-ui,Arial,sans-serif;box-shadow:0 10px 34px rgba(0,0,0,.45);"+
+    "display:flex;gap:10px;align-items:flex-start";
+  var t=document.createElement("div");
+  t.style.cssText="flex:1;min-width:0";
+  t.innerHTML="מנוע הדיבור של המכשיר לא הצליח להקריא"+
+    (err?" <span dir=ltr>("+String(err)+")</span>":"")+
+    ". זו תקלה במכשיר, לא באפליקציה. "+
+    '<a href="/voice/" style="color:#fff">בדיקה והוראות תיקון</a>';
+  var x=document.createElement("button");
+  x.type="button"; x.textContent="✕"; x.setAttribute("aria-label","סגירה");
+  x.style.cssText="min-width:44px;min-height:44px;border:0;border-radius:9px;"+
+    "background:rgba(255,255,255,.16);color:#fff;font-size:16px;cursor:pointer";
+  x.onclick=function(){ if(_ttsBar&&_ttsBar.parentNode)_ttsBar.parentNode.removeChild(_ttsBar); _ttsBar=null };
+  m.appendChild(t); m.appendChild(x);
+  document.body.appendChild(m); _ttsBar=m;
+}
+/* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
+function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
+
 function speakLocal(text,preset,rate,pitch,langCode){
   if(!("speechSynthesis" in window))return;
   try{speechSynthesis.cancel()}catch(e){}
@@ -1213,6 +1249,10 @@ function speakLocal(text,preset,rate,pitch,langCode){
       var v=pickVoice(preset.prefer,state.settings.voiceURI,state.settings.lang||"he");
       if(v){u.voice=v;u.lang=v.lang||langCode||"he-IL"}
       u.rate=rate;u.pitch=pitch;
+      /* לא היה כאן מטפל שגיאות בכלל: כשהמנוע נכשל, האפליקציה
+         פשוט השתתקה בלי שאיש ידע למה. */
+      u.onerror=function(e){ttsFail(e&&e.error)};
+      u.onend=function(){ttsOK()};
       speechSynthesis.speak(u);
     }catch(e){}
   });
@@ -1348,7 +1388,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b23 · 2026-08-29";
+var BUILD="b24 · 2026-08-29";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -3000,7 +3040,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b23-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b24-pwa1").catch(function(){});
   });
 }
 </script>

@@ -748,6 +748,42 @@ function hit(idx){
 function isGemini(){ return VOICE.indexOf('gemini:') === 0; }
 function geminiName(){ return VOICE.split(':')[1] || 'Kore'; }
 
+
+/* ------------------------------------------------------------
+   כשמנוע הדיבור של המכשיר נכשל — לומר את זה.
+   עד כאן onerror רק ניקה הדגשה, והמשתמש קיבל שקט בלי הסבר:
+   "אין קול" נראה כמו תקלה באפליקציה בזמן ש-synthesis-failed
+   הגיע מהמערכת. שגיאה שנבלעת עולה יום של חיפוש.
+   ------------------------------------------------------------ */
+var _ttsBar=null;
+function ttsFail(err){
+  try{ markReading(null) }catch(e){}
+  if(_ttsBar)return;
+  var m=document.createElement("div");
+  m.setAttribute("role","alert");
+  m.id="tts-fail";
+  m.dir="rtl";
+  m.style.cssText="position:fixed;inset-inline:10px;bottom:10px;z-index:99999;"+
+    "background:#7f1d1d;color:#fff;padding:13px 15px;border-radius:12px;"+
+    "font:600 15px/1.55 system-ui,Arial,sans-serif;box-shadow:0 10px 34px rgba(0,0,0,.45);"+
+    "display:flex;gap:10px;align-items:flex-start";
+  var t=document.createElement("div");
+  t.style.cssText="flex:1;min-width:0";
+  t.innerHTML="מנוע הדיבור של המכשיר לא הצליח להקריא"+
+    (err?" <span dir=ltr>("+String(err)+")</span>":"")+
+    ". זו תקלה במכשיר, לא באפליקציה. "+
+    '<a href="/voice/" style="color:#fff">בדיקה והוראות תיקון</a>';
+  var x=document.createElement("button");
+  x.type="button"; x.textContent="✕"; x.setAttribute("aria-label","סגירה");
+  x.style.cssText="min-width:44px;min-height:44px;border:0;border-radius:9px;"+
+    "background:rgba(255,255,255,.16);color:#fff;font-size:16px;cursor:pointer";
+  x.onclick=function(){ if(_ttsBar&&_ttsBar.parentNode)_ttsBar.parentNode.removeChild(_ttsBar); _ttsBar=null };
+  m.appendChild(t); m.appendChild(x);
+  document.body.appendChild(m); _ttsBar=m;
+}
+/* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
+function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
+
 function speakSentence(n){
   if(isGemini()){ speakGemini(n); return; }
   if(!('speechSynthesis' in window)) return;
@@ -782,11 +818,13 @@ function speakSentence(n){
     }
   };
   u.onend = function(){
+    ttsOK();
     if(!speaking) return;
     if(SENT + 1 < SENTS){ SENT++; markSentence(); speakSentence(SENT); }
     else stop();
   };
-  u.onerror = function(){ stop(); };
+  /* המנוע נכשל — לומר את זה במקום להיעצר בשקט */
+  u.onerror = function(e){ ttsFail(e&&e.error); stop(); };
 
   /* אנדרואיד, ולעתים גם ספארי, לא שולחים דיווח על מילים.
      בלי זיהוי כזה ההדגשה פשוט לא זזה והמשתמש חושב שהכלי תקוע.
@@ -1189,7 +1227,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=7-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=8-pwa1").catch(function(){});
   });
 }
 </script>
