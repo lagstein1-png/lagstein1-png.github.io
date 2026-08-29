@@ -156,7 +156,7 @@ button{font:inherit;color:inherit}
 .lvl{border:1px solid var(--line);background:var(--surface);border-radius:10px;
   padding:.4rem .7rem;font-size:.82rem;font-weight:700;cursor:pointer;
   display:inline-flex;align-items:center;gap:.4rem}
-.lvl.on{background:var(--c,var(--accent));color:#fff;border-color:var(--c,var(--accent))}
+.lvl.on{background:var(--c,var(--accent));color:var(--accent-ink);border-color:var(--c,var(--accent))}
 .bar{height:.42rem;border-radius:999px;background:var(--surface2);overflow:hidden;flex:1;min-width:3rem}
 .bar i{display:block;height:100%;background:var(--c,var(--accent))}
 .bar.b0 i{background:var(--bad)} .bar.b1 i{background:var(--warn)} .bar.b2 i{background:var(--ok)}
@@ -273,7 +273,7 @@ input[type=password],input[type=text]{font:inherit;background:var(--surface);col
 input[type=range]{width:100%;accent-color:var(--accent)}
 
 .fbar{border-top:1px solid var(--line);margin-top:2rem;padding-block:1rem;
-  color:var(--faint);font-size:.82rem}
+  color:var(--muted);font-size:.82rem}   /* --faint יצא 2.96:1 */
 .hidden{display:none!important}
 
 /* ---------- שדה קלט של המבחן ----------
@@ -325,6 +325,9 @@ textarea.field{min-height:96px;resize:vertical}
 .tpc.on{border-color:var(--accent);background:var(--accent-soft)}
 .tpc .tn{font-weight:700;font-size:.98rem;overflow-wrap:anywhere;color:var(--c,var(--ink))}
 .tpc .td{color:var(--muted);font-size:.8rem;overflow-wrap:anywhere}
+
+/* טקסט על רקע ההדגשה: --accent-ink ולא לבן קבוע. במצב כהה
+   ההדגשה בהירה, ולבן עליה יצא 1.5–2.0:1 — כמעט בלתי קריא. */
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -599,7 +602,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m22 · 2026-08-29";
+var BUILD="m23 · 2026-08-29";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -4658,7 +4661,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m22-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m23-pwa1").catch(function(){});
   });
 }
 </script>

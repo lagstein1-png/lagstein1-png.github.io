@@ -19,7 +19,7 @@
 :root{
   --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
   --bg:#f5f7fb; --surface:#ffffff; --surface2:#eef1f7;
-  --ink:#101828; --muted:#5b6478; --faint:#8b93a7; --line:#e0e4ee;
+  --ink:#101828; --muted:#5b6478; --faint:#687080; --line:#e0e4ee;
   --accent:#4f46e5; --accent-ink:#ffffff; --accent-soft:#e9e8fd;
   /* צהוב ההדגשה — אותו צהוב של מקריא קולי, כדי שמעקב ההקראה
      ייראה אותו דבר בכל האתר. */
@@ -31,14 +31,14 @@
   --r:14px;
   /* צבע לכל תחום לימוד. זה לא קישוט — זה עוזר לזהות מיד באיזה
      סוג חומר מדובר, וזה בדיוק מה שעוזר למי שמתקשה להתמצא. */
-  --c-base:#0d9488; --cs-base:#d2f4ef;
-  --c-alg:#5b56e0;  --cs-alg:#e6e5fe;
-  --c-geo:#b45309;  --cs-geo:#fbecd3;
+  --c-base:#0a6f66; --cs-base:#d2f4ef;
+  --c-alg:#4a45c9;  --cs-alg:#e6e5fe;
+  --c-geo:#9a4708;  --cs-geo:#fbecd3;
   --c-data:#be185d; --cs-data:#fbdfeb;
 }
 :root[data-theme="dark"]{
   --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
-  --ink:#e8ecf4; --muted:#9aa4ba; --faint:#6f7a91; --line:#28313f;
+  --ink:#e8ecf4; --muted:#9aa4ba; --faint:#8f99ae; --line:#28313f;
   --accent:#818cf8; --accent-ink:#0e1117; --accent-soft:#232842;
   --hit:#ffd24d; --hit-ink:#241a00;
   --cyan:#22d3ee; --cyan-soft:#132b33;
@@ -53,7 +53,7 @@
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
-    --ink:#e8ecf4; --muted:#9aa4ba; --faint:#6f7a91; --line:#28313f;
+    --ink:#e8ecf4; --muted:#9aa4ba; --faint:#8f99ae; --line:#28313f;
     --accent:#818cf8; --accent-ink:#0e1117; --accent-soft:#232842;
     --hit:#ffd24d; --hit-ink:#241a00;
     --cyan:#22d3ee; --cyan-soft:#132b33;
@@ -128,7 +128,7 @@ nav{display:flex;gap:4px;margin-inline-start:auto;flex-wrap:wrap}
 .nb{display:inline-flex;align-items:center;gap:6px;border-radius:10px;padding:8px 12px;
   font-size:.9rem;font-weight:600;color:var(--muted);border:1px solid transparent;transition:.15s}
 .nb:hover{background:var(--surface2);color:var(--ink)}
-.nb.on{background:var(--accent);color:#fff}
+.nb.on{background:var(--accent);color:var(--accent-ink)}
 :root.hc .nb.on{background:var(--ink);color:var(--bg)}
 .nb svg{flex-shrink:0}
 @media(max-width:560px){.nb span{display:none}.nb{padding:9px 11px}}
@@ -224,7 +224,7 @@ sub{font-size:.62em;vertical-align:sub;line-height:0}
 .step:first-child{border-top:none}
 .step.future{display:none}
 .step .st{display:flex;align-items:center;gap:9px;font-weight:700;font-size:.95rem}
-.step .num{width:23px;height:23px;border-radius:50%;background:var(--c,var(--accent));color:#fff;
+.step .num{width:23px;height:23px;border-radius:50%;background:var(--c,var(--accent));color:var(--accent-ink);
   display:grid;place-items:center;font-size:.76rem;flex-shrink:0;font-weight:700}
 .step .sd{color:var(--muted);font-size:.92rem;margin-top:4px;overflow-wrap:anywhere}
 .step.last{background:var(--ok-soft)}
@@ -288,7 +288,7 @@ sub{font-size:.62em;vertical-align:sub;line-height:0}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
 .seg button{flex:1 1 auto;min-width:0;border:1px solid var(--line);background:var(--surface);
   border-radius:10px;padding:10px 12px;font-weight:600;font-size:.9rem;color:var(--muted);transition:.15s}
-.seg button.on{background:var(--c,var(--ink));color:#fff;border-color:transparent}
+.seg button.on{background:var(--c,var(--ink));color:var(--bg);border-color:transparent}
 :root.hc .seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;
@@ -349,6 +349,9 @@ footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface
    נשמרה במסכי התרגול: כפתורי הניווט יצאו 37, "הקראה" ו"רמז" 38,
    ו"עצור" 36. הרוחב נקבע לפי הטקסט; רק הגובה מוצמד. */
 .btn,.nb,button.chip,.brand{min-block-size:44px}
+
+/* טקסט על רקע ההדגשה: --accent-ink ולא לבן קבוע. במצב כהה
+   ההדגשה בהירה, ולבן עליה יצא 1.5–2.0:1 — כמעט בלתי קריא. */
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -590,7 +593,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g21 · 2026-08-29";
+var BUILD="g22 · 2026-08-29";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -7659,7 +7662,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g21-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g22-pwa1").catch(function(){});
   });
 }
 </script>

@@ -11,11 +11,11 @@
 <style>
 :root{
   --font-display:"Fredoka","Rubik",sans-serif; --font-body:"Rubik",sans-serif;
-  --paper:#f3f8f4; --card:#ffffff; --ink:#17333c; --ink-soft:#4c666e; --ink-faint:#7d959c;
+  --paper:#f3f8f4; --card:#ffffff; --ink:#17333c; --ink-soft:#4c666e; --ink-faint:#5a7178;
   --teal:#0e9c8d; --teal-deep:#0b7568; --teal-soft:#d9f2ec;
-  --amber:#ffc531; --amber-deep:#d99a00; --amber-soft:#fff3ce;
-  --coral:#ff6f61; --coral-deep:#d94f42; --coral-soft:#ffe3de;
-  --sky:#58b7e0; --sky-deep:#2e86ad; --sky-soft:#dff1fa;
+  --amber:#ffc531; --amber-deep:#8a6100; --amber-soft:#fff3ce;
+  --coral:#ff6f61; --coral-deep:#c4402f; --coral-soft:#ffe3de;
+  --sky:#58b7e0; --sky-deep:#246c8c; --sky-soft:#dff1fa;
   --violet:#8a63d2; --violet-deep:#6a45b0; --violet-soft:#ece4fa;
 }
 /* לכל פעולת חשבון יש צבע קבוע. ילד לומד את הצבע לפני שהוא
@@ -99,7 +99,7 @@ nav{display:flex;gap:6px;margin-inline-start:auto;flex-wrap:wrap}
 .nb.on{background:var(--ink);color:var(--paper);box-shadow:0 5px 0 rgba(23,51,60,.2);transform:rotate(-1deg)}
 .chip{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:8px 14px;font-weight:600;font-size:.85rem;border:2px solid rgba(23,51,60,.12);background:var(--card);color:var(--ink-soft);transition:all .15s}
 .chip:hover{border-color:var(--teal);color:var(--teal-deep);transform:translateY(-1px)}
-.chip.ok{background:var(--teal);color:#fff;border-color:var(--teal-deep)}
+.chip.ok{background:var(--teal-deep);color:#fff;border-color:var(--teal-deep)}
 .xpchip{display:inline-flex;align-items:center;gap:10px;background:var(--card);border:2px solid rgba(23,51,60,.1);border-radius:999px;padding:5px 16px 5px 6px}
 [dir="ltr"] .xpchip{padding:5px 6px 5px 16px}
 .xpchip svg{display:block}
@@ -107,8 +107,8 @@ nav{display:flex;gap:6px;margin-inline-start:auto;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:var(--font-display);font-weight:700;border-radius:18px;transition:transform .15s,box-shadow .15s,background .2s}
 .btn:hover{transform:translateY(-2px)}
 .btn:active{transform:translateY(3px)!important;box-shadow:0 1px 0 rgba(23,51,60,.15)!important}
-.btn-teal{background:var(--teal);color:#fff;box-shadow:0 6px 0 var(--teal-deep)}
-.btn-teal:hover{background:var(--teal-deep)}
+.btn-teal{background:var(--teal-deep);color:#fff;box-shadow:0 6px 0 var(--teal-deep)}
+.btn-teal:hover{filter:brightness(1.12)}
 .btn-amber{background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep)}
 .btn-amber:hover{background:var(--amber-deep);color:#fff}
 .btn-ink{background:var(--ink);color:var(--paper);box-shadow:0 6px 0 rgba(23,51,60,.35)}
@@ -166,7 +166,7 @@ html.reduce-motion *{animation:none!important;transition:none!important}
 .dot.sk{background:var(--sky);opacity:.6}
 .opt{font-family:var(--font-display);font-weight:700;font-size:2.1rem;border-radius:18px;border:3px solid rgba(23,51,60,.15);background:var(--paper);padding:22px 10px;transition:all .15s;box-shadow:0 6px 0 rgba(23,51,60,.12)}
 .opt:hover:not([disabled]){border-color:var(--op,var(--teal));background:var(--op-s,var(--teal-soft));transform:translateY(-2px)}
-.opt.right{border-color:var(--teal-deep);background:var(--teal);color:#fff;box-shadow:0 6px 0 var(--teal-deep)}
+.opt.right{border-color:var(--teal-deep);background:var(--teal-deep);color:#fff;box-shadow:0 6px 0 var(--teal-deep)}
 .opt.wrong{border-color:rgba(255,111,97,.4);background:var(--coral-soft);color:rgba(217,79,66,.5);text-decoration:line-through;cursor:not-allowed}
 .opt.flash{border-color:var(--coral);background:var(--coral-soft);color:var(--coral-deep)}
 .hintpill{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;background:var(--amber);color:var(--ink);font-family:var(--font-display);font-weight:700;font-size:1.15rem;border-radius:18px;padding:15px 24px;box-shadow:0 6px 0 var(--amber-deep);transition:all .15s}
@@ -245,7 +245,7 @@ input[type=range]{width:100%;accent-color:var(--teal)}
 .ic{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:13px}
 .wk{display:flex;justify-content:space-between;gap:8px}
 .wkd{flex:1;max-width:52px;aspect-ratio:1;border-radius:15px;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;border:2.5px solid rgba(23,51,60,.1);background:var(--paper);color:var(--ink-faint)}
-.wkd.on{background:var(--teal);color:#fff;border-color:var(--teal-deep);box-shadow:0 4px 0 var(--teal-deep)}
+.wkd.on{background:var(--teal-deep);color:#fff;border-color:var(--teal-deep);box-shadow:0 4px 0 var(--teal-deep)}
 .wkd.td{background:var(--amber-soft);color:var(--amber-deep);border-color:var(--amber)}
 .cols{display:grid;gap:18px}
 @media(min-width:860px){.cols{grid-template-columns:1fr 1fr}.cols3{grid-template-columns:repeat(3,1fr)}.cols4{grid-template-columns:repeat(4,1fr)}.cols.ob-hero{grid-template-columns:1.05fr 1fr}.cols.pr-cols{grid-template-columns:1.6fr 1fr}}
@@ -281,7 +281,7 @@ footer{border-top:3px solid rgba(23,51,60,.08);background:color-mix(in srgb,var(
 /* ===== בורר שפה במסך הפתיחה ===== */
 .oblang{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:99px;border:2px solid rgba(23,51,60,.12);background:var(--card);font-family:var(--font-display);font-weight:600;font-size:.95rem;color:var(--ink-soft);transition:all .15s}
 .oblang:hover{border-color:var(--teal);color:var(--ink)}
-.oblang.on{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 5px 14px rgba(14,156,141,.3)}
+.oblang.on{background:var(--teal-deep);border-color:var(--teal-deep);color:#fff;box-shadow:0 5px 14px rgba(14,156,141,.3)}
 /* מסך הפתיחה בטלפון: העמודות חייבות להיות מסוגלות להצטמצם,
    אחרת שלוש חיות ברוחב קבוע דוחפות את כל העמוד מעבר לרוחב המסך. */
 .wrap.rise,.wrap.rise>div,.cols.ob-hero,.cols.ob-hero>*{min-width:0}
@@ -363,7 +363,7 @@ textarea.field{min-height:96px;resize:vertical}
 .seg button{flex:1 1 auto;min-width:0;min-height:44px;border:2px solid rgba(23,51,60,.12);
   background:var(--paper);color:var(--ink-soft);border-radius:12px;padding:10px 12px;
   font:inherit;font-weight:700;font-size:.9rem;cursor:pointer}
-.seg button.on{background:var(--teal);color:#fff;border-color:var(--teal-deep)}
+.seg button.on{background:var(--teal-deep);color:#fff;border-color:var(--teal-deep)}
 .tpc{position:relative;display:flex;flex-direction:column;gap:8px;text-align:start;
   background:var(--paper);border:2px solid rgba(23,51,60,.12);
   border-inline-start:5px solid var(--c,var(--teal));border-radius:16px;padding:14px;
@@ -372,6 +372,10 @@ textarea.field{min-height:96px;resize:vertical}
 .tpc .tn{font-weight:800;font-size:.98rem;overflow-wrap:anywhere}
 .tpc .td{color:var(--ink-soft);font-size:.8rem;overflow-wrap:anywhere}
 .btn,.lvl,.nb,button.chip{min-height:44px}
+
+/* טקסט לבן על --teal יוצא 3.41:1 — מתחת ל-4.5 שנדרש. --teal-deep
+   מגיע ל-5.4 באותה משפחת צבע, ולכן כל רקע שיש עליו טקסט לבן
+   משתמש בו. --teal נשאר לקישוט: פסים, נקודות, סמן. */
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1413,7 +1417,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b26 · 2026-08-29";
+var BUILD="b27 · 2026-08-29";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -1529,7 +1533,8 @@ function onboarding(){
       (sel?'<button class="btn btn-ghost" style="padding:10px 16px;font-size:.9rem" data-a="takesugg">'+esc(t.takeSugg)+' "'+esc(sugg[sel])+'"</button>':"")+
     '</div>'+
     '<button class="btn btn-teal" data-a="startpet" '+(sel?"":"disabled")+' style="width:100%;margin-top:24px;padding:17px;font-size:1.4rem">'+esc(t.start)+' '+ic("arrow",24)+'</button>'+
-    '<p style="text-align:center;color:var(--ink-faint);font-size:.85rem;margin-top:14px">'+esc(t.obNote)+'</p>'+
+    /* --ink-faint יצא 3.16:1 על הרקע הזה — מתחת ל-4.5 */
+    '<p style="text-align:center;color:var(--ink-soft);font-size:.85rem;margin-top:14px">'+esc(t.obNote)+'</p>'+
   '</div>'+
   '</div></div>'+
   '<button class="btn btn-ghost floatlink" data-a="copylink" style="padding:14px 20px">'+ic("link",18)+' '+esc(t.copyLink)+'</button>'+
@@ -1798,7 +1803,7 @@ function practice(){
   if(s.streak>0)h+='<span class="chip" style="border-color:rgba(255,111,97,.4);color:var(--coral-deep)">'+ic("flame",15)+' '+s.streak+'</span>';
   h+='</span></div>';
   /* daily banner */
-  if(isDaily)h+='<div class="rise" style="display:flex;align-items:center;gap:12px;margin-top:14px;background:var(--amber-soft);border:2px solid rgba(255,197,49,.55);border-radius:18px;padding:12px 18px">'+ic("star",22)+'<span><b class="fd" style="color:var(--amber-deep)">'+esc(t.dailyTag)+'</b><br><span style="font-size:.78rem;color:rgba(217,154,0,.85)">'+esc(t.dailyDesc)+'</span></span></div>';
+  if(isDaily)h+='<div class="rise" style="display:flex;align-items:center;gap:12px;margin-top:14px;background:var(--amber-soft);border:2px solid rgba(255,197,49,.55);border-radius:18px;padding:12px 18px">'+ic("star",22)+'<span><b class="fd" style="color:var(--amber-deep)">'+esc(t.dailyTag)+'</b><br><span style="font-size:.78rem;color:var(--amber-deep)">'+esc(t.dailyDesc)+'</span></span></div>';
   /* main grid */
   h+='<div class="cols pr-cols" style="margin-top:18px;padding-bottom:60px"><div class="'+lc("card opcard op-"+q.kind)+'" style="padding:26px">';
   h+='<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><span class="fd opchip"><span class="opdot"></span>'+esc({add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[q.kind])+' · '+esc(names[al-1])+'</span><button class="chip" data-a="listen" style="color:var(--sky-deep);background:var(--sky-soft);border-color:rgba(88,183,224,.4)">'+ic("speaker",16)+' '+esc(t.listen)+'</button></div>';
@@ -3067,7 +3072,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b26-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b27-pwa1").catch(function(){});
   });
 }
 </script>
