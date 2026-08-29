@@ -227,6 +227,12 @@ sub{font-size:.62em;vertical-align:sub;line-height:0}
   border-radius:0 10px 10px 0;padding:12px 15px}
 .wd{border-radius:5px;padding:1px 3px}
 .wd.hit{background:var(--hit);color:var(--hit-ink);font-weight:600}
+/* כשמנוע הדיבור אינו מדווח על גבולות מילים — קורה הרבה בעברית
+   באנדרואיד — אין מה להדגיש מילה־מילה, ואז מודגש כל האיבר. הכלל
+   הזה חסר, ולכן ההדגשה החלופית לא נראתה כלל: מי שהמנוע שלו שקט
+   קיבל טקסט בלי שום סימון והמשיך לחפש את המקום בעיניים. */
+.now{background:var(--hit);color:var(--hit-ink);border-radius:8px;
+  box-shadow:0 0 0 4px var(--hit)}
 [dir="rtl"] .hintbox{border-radius:10px 0 0 10px}
 
 /* ---------- מדדים ---------- */
@@ -330,6 +336,47 @@ footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface
 /* יעד מגע לקישור התחתית. קישור טקסט בשורה יוצא בגובה הטקסט —
    15 פיקסלים — וזה קטן מדי לאצבע, גם כשהוא רק לתנאי השימוש. */
 .lg-foot a{display:inline-flex;align-items:center;min-height:44px;padding-inline:6px}
+/* ---------- מצב מורה ---------- */
+.te-wrap{position:fixed;inset:0;z-index:2147482500;background:rgba(8,12,20,.72);
+  display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;
+  font-family:system-ui,"Heebo","Rubik",Arial,sans-serif}
+.te-box{background:#fff;color:#111827;max-width:26rem;width:100%;border-radius:18px;
+  box-shadow:0 24px 70px -20px rgba(0,0,0,.6);padding:clamp(18px,4vw,26px);
+  max-height:92vh;overflow-y:auto;font-size:16px;line-height:1.6}
+.te-box h2{margin:0 0 6px;font-size:1.35rem;font-weight:800;line-height:1.25}
+.te-lead{margin:0 0 10px;color:#374151}
+.te-warn{margin:0 0 12px;font-size:.88rem;color:#7c2d12;background:#fef3c7;
+  border-radius:10px;padding:9px 11px}
+.te-lab{display:block;margin:10px 0 4px;font-weight:700;font-size:.92rem}
+.te-in{width:100%;box-sizing:border-box;font:inherit;letter-spacing:.3em;
+  border:1px solid #d1d5db;border-radius:11px;padding:.7rem .8rem;min-height:48px;
+  background:#fff;color:#111827}
+.te-in:focus-visible{outline:3px solid #2563eb;outline-offset:1px}
+.te-chk{display:flex;align-items:center;gap:.5rem;margin-top:14px;min-height:44px;
+  font-size:.94rem;cursor:pointer}
+.te-chk input{width:20px;height:20px}
+.te-note{margin:2px 0 0;font-size:.82rem;color:#6b7280}
+.te-msg{margin:10px 0 0;font-size:.92rem;font-weight:700;color:#7f1d1d;
+  background:#fee2e2;border-radius:10px;padding:9px 11px}
+.te-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.te-btn{font:inherit;font-weight:700;border-radius:12px;padding:.75rem 1.2rem;
+  cursor:pointer;border:1px solid #d1d5db;background:#fff;color:#111827;min-height:48px}
+.te-btn.pri{background:#111827;color:#fff;border-color:#111827;flex:1 1 9rem}
+.te-btn.pri[disabled]{opacity:.5;cursor:default}
+.te-btn.link{border:0;background:none;text-decoration:underline;padding:.6rem .2rem;
+  color:#374151;margin-top:8px;min-height:44px}
+.te-btn:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
+@media (prefers-color-scheme:dark){
+  .te-box{background:#141a24;color:#e8ecf4}
+  .te-lead,.te-note{color:#b9c2d4}
+  .te-warn{background:#3a2a10;color:#fcd9a5}
+  .te-in{background:#1d2531;color:#e8ecf4;border-color:#2c3648}
+  .te-msg{background:#4a1717;color:#ffd7d7}
+  .te-btn{background:#1d2531;color:#e8ecf4;border-color:#2c3648}
+  .te-btn.pri{background:#e8ecf4;color:#141a24;border-color:#e8ecf4}
+  .te-btn.link{color:#b9c2d4}
+}
+
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -501,7 +548,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t23 · 2026-08-29";
+var BUILD="t24 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -819,12 +866,15 @@ var TTSMSG={
 };
 var _ttsBar=null;
 function ttsFail(err){
-  try{ hlClear() }catch(e){}
   /* "interrupted" ו-"canceled" אינן תקלות: זה מה שהמנוע מדווח על
      אמירה שבוטלה כדי לפנות מקום לאמירה הבאה — כלומר מהלך תקין
      לגמרי, שקורה בכל לחיצה שנייה. הצגתן כשגיאה הבהילה משתמש
-     ואמרה לו שהמכשיר שלו שבור בזמן שהוא עבד. */
+     ואמרה לו שהמכשיר שלו שבור בזמן שהוא עבד.
+     גם ניקוי ההדגשה חייב לבוא אחרי היציאה הזאת ולא לפניה: הביטול
+     של האמירה הקודמת מגיע אחרי שהאמירה החדשה כבר הכינה את ההדגשה
+     שלה, וניקוי כאן מחק אותה מיד. */
   if(err==="interrupted"||err==="canceled")return;
+  try{ hlClear() }catch(e){}
   if(_ttsBar)return;
   var TT=TTSMSG.he;   /* האפליקציה הזאת בעברית בלבד */
   var m=document.createElement("div");
@@ -2623,7 +2673,8 @@ var TRACKS=[{v:3,t:"3 יחידות"},{v:4,t:"4 יחידות"},{v:5,t:"5 יחיד
 function header(){
   var nav=[["home","בית","home"],["practice","תרגול","pencil"],["topics","נושאים","list"],
            ["formulas","נוסחאות","book"],["progress","התקדמות","chart"],
-           ["marks","מבחן","share"],["settings","הגדרות","gear"]];
+           ["settings","הגדרות","gear"]];
+  if(teOpen())nav.splice(nav.length-1,0,["marks","מבחן","share"]);
   return '<header><div class="wrap hbar">'+
     '<button class="brand" data-a="go" data-v="home" aria-label="לדף הבית">'+
       '<span class="mk">ש</span><span><b>שלב</b><small>מתמטיקה לתיכון</small></span></button>'+
@@ -3013,6 +3064,21 @@ function viewSettings(){
   var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px;max-width:820px">';
   h+='<h1 class="h1">הגדרות</h1><p class="sub">הכול נשמר במכשיר הזה בלבד.</p>';
 
+  /* מצב מורה. הכרטיס הוא גם הדרך היחידה לגלות שהתכונה קיימת —
+     ?teacher=1 בכתובת אינו משהו שמישהו מנחש. */
+  h+='<div class="card pad" style="margin-top:16px"><div class="h2">'+esc(teT("teHideT"))+'</div>'+
+     '<p class="sub sm" style="margin-top:6px">'+esc(teT("teHideNote"))+'</p>'+
+     '<div class="row" style="margin-top:10px">'+
+     (!teHas()
+       ? '<button class="btn btn-p" data-a="teask">'+esc(teT("teHideBtn"))+'</button>'
+       : (teOpen()
+          ? '<span class="chip ok">'+esc(teT("teOpenNow"))+'</span>'+
+            '<button class="btn btn-g" data-a="telock">'+esc(teT("teLockBtn"))+'</button>'+
+            '<button class="btn btn-g" data-a="techange">'+esc(teT("teChangeBtn"))+'</button>'+
+            '<button class="btn btn-g" data-a="teremove">'+esc(teT("teRemoveBtn"))+'</button>'
+          : '<button class="btn btn-p" data-a="teask">'+esc(teT("teUnlock"))+'</button>'))+
+     '</div></div>';
+
   h+='<div class="card pad" style="margin-top:16px"><div class="h2">קריאה ונגישות</div>'+
      '<p class="sub sm">גודל האותיות</p><div class="seg" style="margin-top:8px">'+
      [[1,"רגיל"],[2,"גדול"],[3,"ענק"]].map(function(o){
@@ -3166,8 +3232,8 @@ function render(){
     else if(view==="formulas")html+=viewFormulas();
     else if(view==="progress")html+=viewProgress();
     else if(view==="settings")html+=viewSettings();
-    else if(view==="exam")html+=viewExamNew();
-    else if(view==="marks")html+=viewMarks();
+    else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
+    else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
     html+='<footer><div class="wrap fbar">'+
       '<span>שלב · מתמטיקה לתיכון, צעד אחר צעד</span>'+
       '<span class="faint">הכול נשמר במכשיר הזה · '+BUILD+'</span></div></footer>';
@@ -3501,6 +3567,13 @@ function gradeResult(spec,res){
    ------------------------------------------------------------ */
 var EB={title:"",n:10,mins:0,level:2,topics:[],phone:"",tts:true,formulas:true,built:null,copied:""};
 
+function viewLocked(){
+  return '<div class="wrap" style="padding-block:40px;max-width:32rem">'+
+    '<div class="card pad"><h1 class="h1">'+esc(teT("teTitle"))+'</h1>'+
+    '<p class="sub">'+esc(teT("teLocked"))+'</p>'+
+    '<div class="row" style="margin-top:14px">'+
+    '<button class="btn btn-p" data-a="teask">'+esc(teT("teUnlock"))+'</button></div></div></div>';
+}
 function viewExamNew(){
   var tops=topicsForTrack(state.track);
   if(!EB.topics.length)EB.topics=tops.slice(0,4).map(function(t){return t.id});
@@ -3673,6 +3746,206 @@ function csvCell(v){
   return /[",\n\r;\t]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
 }
 function csvRow(a){ return a.map(csvCell).join(",") }
+var TES={"teTitle":"קוד מורה","teSet":"בחירת קוד מורה","teEnter":"מסכי המורה נעולים. הקלידו את הקוד כדי לפתוח אותם.","teLead":"בונה המבחן ומסך הציונים ייעלמו מהתפריט, וייפתחו רק עם הקוד הזה.","teWarn":"זו אינה אבטחה. היא עוצרת יד סקרנית, לא מישהו שמבין במחשבים.","tePin":"קוד — 4 עד 8 ספרות","teAgain":"שוב, לוודא","teRemember":"לזכור במכשיר הזה","teRememberNote":"בלי זה הקוד יידרש שוב בכל פתיחה של האפליקציה. על טאבלט כיתתי — עדיף בלי.","teOk":"אישור","teCancel":"ביטול","teBad":"הקוד שגוי.","teMismatch":"שני הקודים אינם זהים.","teShort":"צריך בין 4 ל-8 ספרות, בלי אותיות.","teWaitN":"יותר מדי ניסיונות. נסו שוב בעוד {0} שניות.","teForgot":"שכחתי את הקוד","teForgotHow":"אין דרך לשחזר קוד — הוא לא נשמר בשום מקום. מחיקת נתוני האתר בדפדפן מסירה אותו, ואיתם גם ההתקדמות והמבחנים.","teHideT":"להסתיר את מסכי המורה","teHideNote":"על מכשיר שהילד משתמש בו, בונה המבחן ומסך הציונים יכולים לשבת מאחורי קוד. לפתיחה מאוחר יותר: להוסיף ?teacher=1 לכתובת.","teHideBtn":"בחירת קוד","teOpenNow":"מצב מורה פתוח","teLockBtn":"יציאה ממצב מורה","teChangeBtn":"שינוי הקוד","teRemoveBtn":"ביטול הקוד","teLocked":"מסכי המורה נעולים במכשיר הזה.","teUnlock":"פתיחה"};
+function teT(k){return TES[k]||k}
+function teF(k,v){return String(teT(k)).replace("{0}",v)}
+/* ============================================================
+   מצב מורה.
+   בונה המבחן ומסך הציונים נועדו למורה. על טאבלט כיתתי, או על
+   טלפון שהילד לוקח לעצמו, אין סיבה שהם יהיו במרחק הקשה אחת:
+   ילד יכול למחוק מבחן, לראות ציונים של חברים, או לפתוח מבחן
+   ולראות מראש את השאלות.
+   זו אינה אבטחה, ואסור להציג אותה ככזאת: מי שיודע לפתוח כלי
+   פיתוח יעקוף אותה בשנייה. זו נעילה מפני יד סקרנית — בדיוק מה
+   שצריך כאן, ולא יותר.
+   כל עוד לא נבחר קוד, שום דבר לא משתנה והמסכים גלויים כתמיד.
+   ============================================================ */
+var TE={ask:false,mode:"",msg:"",busy:false};
+function teRead(){try{return JSON.parse(localStorage.getItem("shlav-teacher")||"null")}catch(e){return null}}
+function teWrite(o){try{o===null?localStorage.removeItem("shlav-teacher"):localStorage.setItem("shlav-teacher",JSON.stringify(o))}catch(e){}}
+function teHas(){var r=teRead();return !!(r&&r.h)}
+function teOpen(){
+  if(!teHas())return true;
+  try{if(sessionStorage.getItem("shlav-teacher"+"-open")==="1")return true}catch(e){}
+  try{if(localStorage.getItem("shlav-teacher"+"-open")==="1")return true}catch(e){}
+  return false;
+}
+function teSetOpen(on,remember){
+  try{sessionStorage.removeItem("shlav-teacher"+"-open")}catch(e){}
+  try{localStorage.removeItem("shlav-teacher"+"-open")}catch(e){}
+  if(!on)return;
+  try{(remember?localStorage:sessionStorage).setItem("shlav-teacher"+"-open","1")}catch(e){}
+}
+/* גיבוב חלש כגיבוי בלבד. SubtleCrypto קיים בכל דפדפן מודרני
+   בהקשר מאובטח, ו-GitHub Pages הוא כזה. */
+function teWeak(s){var h=5381,i;for(i=0;i<s.length;i++)h=((h*33)^s.charCodeAt(i))>>>0;return "w"+h.toString(16)}
+function teHash(pin,salt,cb){
+  var msg=salt+"|"+pin;
+  try{
+    if(window.crypto&&crypto.subtle&&crypto.subtle.digest&&window.TextEncoder){
+      crypto.subtle.digest("SHA-256",new TextEncoder().encode(msg)).then(function(d){
+        var a=Array.prototype.slice.call(new Uint8Array(d));
+        cb(a.map(function(b){return ("0"+b.toString(16)).slice(-2)}).join(""));
+      },function(){cb(teWeak(msg))});
+      return;
+    }
+  }catch(e){}
+  cb(teWeak(msg));
+}
+function teSalt(){
+  var s="";
+  try{
+    var a=new Uint8Array(8);crypto.getRandomValues(a);
+    s=Array.prototype.slice.call(a).map(function(b){return ("0"+b.toString(16)).slice(-2)}).join("");
+  }catch(e){ s=String(Date.now())+Math.random().toString(36).slice(2) }
+  return s;
+}
+/* השהיה אחרי ניסיונות כושלים. ארבע ספרות הן עשרת אלפים
+   אפשרויות, וילד סבלני יכול לנסות הרבה. */
+function teWait(){
+  var r=teRead();if(!r||!r.bad||r.bad<3)return 0;
+  var pen=Math.min(300,Math.pow(2,r.bad-3)*5)*1000;
+  var left=Math.ceil(((r.badAt||0)+pen-Date.now())/1000);
+  return left>0?left:0;
+}
+function teDialog(){
+  var wrap=document.getElementById("te-wrap");
+  if(wrap&&wrap.parentNode)wrap.parentNode.removeChild(wrap);
+  if(!TE.ask)return;
+  var setting=(TE.mode==="set"||TE.mode==="change"||!teHas());
+  var dirv="rtl";
+  var w=document.createElement("div");
+  w.id="te-wrap"; w.className="te-wrap"; w.dir=dirv;
+  w.setAttribute("role","dialog"); w.setAttribute("aria-modal","true");
+  var wait=teWait();
+  w.innerHTML='<div class="te-box" tabindex="-1">'+
+    '<h2>'+esc(setting?teT("teSet"):teT("teTitle"))+'</h2>'+
+    '<p class="te-lead">'+esc(setting?teT("teLead"):teT("teEnter"))+'</p>'+
+    (setting?'<p class="te-warn">'+esc(teT("teWarn"))+'</p>':'')+
+    '<label class="te-lab" for="te-pin">'+esc(teT("tePin"))+'</label>'+
+    '<input id="te-pin" class="te-in" type="password" inputmode="numeric" '+
+      'autocomplete="off" maxlength="8" dir="ltr">'+
+    (setting?'<label class="te-lab" for="te-pin2">'+esc(teT("teAgain"))+'</label>'+
+      '<input id="te-pin2" class="te-in" type="password" inputmode="numeric" '+
+      'autocomplete="off" maxlength="8" dir="ltr">':'')+
+    '<label class="te-chk"><input type="checkbox" id="te-rem"> '+esc(teT("teRemember"))+'</label>'+
+    '<p class="te-note">'+esc(teT("teRememberNote"))+'</p>'+
+    (TE.msg?'<p class="te-msg" role="alert">'+esc(TE.msg)+'</p>':'')+
+    (wait?'<p class="te-msg" role="alert">'+esc(teF("teWaitN",wait))+'</p>':'')+
+    '<div class="te-row">'+
+      '<button class="te-btn pri" id="te-ok"'+(wait?' disabled':'')+'>'+esc(teT("teOk"))+'</button>'+
+      '<button class="te-btn" id="te-no">'+esc(teT("teCancel"))+'</button>'+
+    '</div>'+
+    (!setting&&teHas()?'<button class="te-btn link" id="te-forgot">'+esc(teT("teForgot"))+'</button>':'')+
+    '</div>';
+  document.body.appendChild(w);
+  var box=w.firstChild, pin=document.getElementById("te-pin");
+  box.focus(); if(pin&&!wait)pin.focus();
+  /* מלכודת פוקוס, כמו בשער התנאים */
+  w.addEventListener("keydown",function(e){
+    if(e.key==="Escape"){teClose();return}
+    if(e.key==="Enter"){e.preventDefault();teSubmit();return}
+    if(e.key!=="Tab")return;
+    var f=box.querySelectorAll("button:not([disabled]),input");
+    if(!f.length)return;
+    var a=f[0],z=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}
+    else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}
+  });
+  document.getElementById("te-no").onclick=teClose;
+  document.getElementById("te-ok").onclick=teSubmit;
+  var fg=document.getElementById("te-forgot");
+  if(fg)fg.onclick=function(){ TE.msg=teT("teForgotHow"); teDialog() };
+}
+function teClose(){ TE.ask=false; TE.mode=""; TE.msg=""; teDialog(); }
+function teSubmit(){
+  if(TE.busy)return;
+  var setting=(TE.mode==="set"||TE.mode==="change"||!teHas());
+  var pin=(document.getElementById("te-pin")||{}).value||"";
+  var rem=!!(document.getElementById("te-rem")||{}).checked;
+  if(!/^[0-9]{4,8}$/.test(pin)){TE.msg=teT("teShort");teDialog();return}
+  if(setting){
+    var p2=(document.getElementById("te-pin2")||{}).value||"";
+    if(pin!==p2){TE.msg=teT("teMismatch");teDialog();return}
+    var salt=teSalt();
+    TE.busy=true;
+    teHash(pin,salt,function(h){
+      TE.busy=false;
+      teWrite({h:h,s:salt,bad:0,badAt:0});
+      teSetOpen(true,rem);
+      TE.ask=false;TE.mode="";TE.msg="";
+      teDialog(); render();
+    });
+    return;
+  }
+  if(teWait()){teDialog();return}
+  var rec=teRead(); if(!rec){teClose();return}
+  TE.busy=true;
+  teHash(pin,rec.s,function(h){
+    TE.busy=false;
+    if(h===rec.h){
+      rec.bad=0;rec.badAt=0;teWrite(rec);
+      teSetOpen(true,rem);
+      TE.ask=false;TE.mode="";TE.msg="";
+      teDialog(); render();
+    }else{
+      rec.bad=(rec.bad||0)+1;rec.badAt=Date.now();teWrite(rec);
+      TE.msg=teT("teBad"); teDialog();
+    }
+  });
+}
+function teAsk(mode){ TE.ask=true; TE.mode=mode||""; TE.msg=""; teDialog() }
+function teLock(){ teSetOpen(false); render() }
+function teRemove(){ teWrite(null); teSetOpen(false); render() }
+/* נעילה אוטומטית אחרי שהאפליקציה הייתה מוסתרת זמן־מה.
+   מורה שבנה מבחן ומסר את הטאבלט בלי ללחוץ "יציאה" השאיר אותו
+   פתוח, וזה בדיוק המצב שהתכונה אמורה למנוע. שתי דקות מספיקות
+   כדי לא להפריע לעבודה רצופה, ולנעול כשהמכשיר עבר יד.
+   נעילה שנשמרה כ"לזכור במכשיר הזה" היא בחירה מפורשת ולא נוגעים בה. */
+var TE_HID=0;
+try{
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden){ TE_HID=Date.now(); return }
+    if(!TE_HID||!teHas())return;
+    var away=Date.now()-TE_HID; TE_HID=0;
+    if(away<120000)return;
+    var kept=false;
+    try{ kept=localStorage.getItem("shlav-teacher"+"-open")==="1" }catch(e){}
+    if(kept)return;
+    try{ if(sessionStorage.getItem("shlav-teacher"+"-open")!=="1")return }catch(e){ return }
+    teSetOpen(false); render();
+  });
+}catch(e){}
+
+/* ?teacher=1 פותח את החלון, והפרמטר מוסר מיד מהכתובת כדי שלא
+   יישאר בקישור ששותף או בהיסטוריה. */
+(function(){
+  try{
+    var u=new URL(location.href);
+    if(u.searchParams.get("teacher")==="1"){
+      u.searchParams.delete("teacher");
+      history.replaceState(null,"",u.pathname+(u.searchParams.toString()?"?"+u.searchParams:"")+u.hash);
+      /* שער התנאים יושב מעל הכול, וכך צריך להיות: אי־אפשר להשתמש
+         באפליקציה לפני שהוסכם עליהם. חלון הקוד ממתין לו במקום
+         להיפתח מתחתיו ולהיראות תקוע. */
+      var tries=0;
+      (function waitLegal(){
+        if(tries++>=600){ teAsk(teHas()?"":"set"); return }
+        /* LEGAL.accepted נוצר רק כש-protect.js מאותחל. עד אז אין
+           עדיין מה לבדוק, ובדיקה של ".lg-wrap" לבדה מחזירה "אין
+           שער" בדיוק ברגע שלפני שהוא נבנה. */
+        var ready=false;
+        try{ ready=!!(window.LEGAL&&window.LEGAL.accepted) }catch(e){}
+        if(!ready){ setTimeout(waitLegal,200); return }
+        var ok=true;
+        try{ ok=!!window.LEGAL.accepted() }catch(e){ ok=true }
+        if(!ok){ setTimeout(waitLegal,200); return }
+        teAsk(teHas()?"":"set");
+      })();
+    }
+  }catch(e){}
+})();
+
 function marksCsv(ex){
   var subs=(ex.subs||[]).slice().sort(function(a,b){return b.pct-a.pct});
   var n=ex.spec.q.length,i;
@@ -4029,6 +4302,10 @@ function examAction(a,el){
     EX.list=EX.list.filter(function(x){return x.id!==id3});
     exSave(); MK.open=""; MK.del=""; render(); return true;
   }
+  if(a==="teask"){ teAsk(teHas()?"":"set"); return true }
+  if(a==="techange"){ teAsk("change"); return true }
+  if(a==="telock"){ teLock(); return true }
+  if(a==="teremove"){ teRemove(); return true }
   if(a==="mkcsv"){
     var exc=exFind(el.getAttribute("data-i")); if(!exc)return true;
     downloadCsv(exc);
@@ -4131,7 +4408,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t23-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t24-pwa1").catch(function(){});
   });
 }
 </script>

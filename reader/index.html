@@ -763,12 +763,14 @@ var TTSMSG={
 };
 var _ttsBar=null;
 function ttsFail(err){
-  try{ markReading(null) }catch(e){}
   /* "interrupted" ו-"canceled" אינן תקלות: זה מה שהמנוע מדווח על
      אמירה שבוטלה כדי לפנות מקום לאמירה הבאה — כלומר מהלך תקין
      לגמרי, שקורה בכל לחיצה שנייה. הצגתן כשגיאה הבהילה משתמש
-     ואמרה לו שהמכשיר שלו שבור בזמן שהוא עבד. */
+     ואמרה לו שהמכשיר שלו שבור בזמן שהוא עבד.
+     גם סימון המשפט הנקרא מנוקה רק אחרי היציאה הזאת: הביטול מגיע
+     אחרי שהמשפט הבא כבר סומן, וניקוי כאן מחק אותו מיד. */
   if(err==="interrupted"||err==="canceled")return;
+  try{ markReading(null) }catch(e){}
   if(_ttsBar)return;
   var TT=TTSMSG.he;   /* האפליקציה הזאת בעברית בלבד */
   var m=document.createElement("div");
@@ -1254,7 +1256,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=11-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=12-pwa1").catch(function(){});
   });
 }
 </script>
