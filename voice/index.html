@@ -26,6 +26,10 @@ button.g{background:#0f766e;border-color:#0f766e}
 table{width:100%;border-collapse:collapse;font-size:.8rem}
 td,th{border-bottom:1px solid #28313f;padding:4px 6px;text-align:start;vertical-align:top}
 code{background:#0b0e13;padding:1px 5px;border-radius:5px}
+#verdict{font-size:1rem;line-height:1.6}
+#verdict.bad{color:#fb7185}#verdict.warn{color:#fbbf24}#verdict.ok{color:#4ade80}
+summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
+details table{margin-top:6px}
 </style>
 </head>
 <body>
@@ -33,6 +37,19 @@ code{background:#0b0e13;padding:1px 5px;border-radius:5px}
 <h1>בדיקת קול</h1>
 <p class="sub">הדף הזה לא משתמש במילון, בניקוד, בחלוקת מילים או במנגנון ההקראה של האפליקציות.
 הוא מדבר ישירות אל מנוע הדיבור של המכשיר.</p>
+
+<section id="verdictBox" style="border-width:2px">
+  <h2 style="font-size:1.05rem">קביעה</h2>
+  <div id="verdict" class="dim">עוד לא נבדק. לחץ על שני הכפתורים במקטע 0, ואז על "הקראה גולמית".</div>
+</section>
+
+<section>
+  <h2>0 · האם יש בכלל קול במכשיר</h2>
+  <p class="sub">לפני הדיבור — צליל פשוט. אם גם הוא שותק, הבעיה אינה במנוע הדיבור
+  אלא בעוצמת המדיה, במתג ההשתקה או בניתוב לרמקול אחר.</p>
+  <button class="p" id="beep">🔊 צפצוף (WebAudio)</button>
+  <button class="p" id="wav">🔊 צליל (אלמנט Audio)</button>
+</section>
 
 <section>
   <h2>1 · מה יש במכשיר</h2>
@@ -112,24 +129,25 @@ function renderEnv(){
   ];
   var h='<table>'+rows.map(function(r){
     return '<tr><th>'+r[0]+'</th><td class="'+(r[2]?"ok":"bad")+'">'+r[1]+'</td></tr>'}).join("")+'</table>';
+  /* ההתאמה לפי שפה קודמת לרשימה המלאה: במכשיר עם 92 קולות אי אפשר
+     לגלול תשעים שורות רק כדי לראות אם יש עברית. */
+  var langs=[["he-IL","עברית"],["en-US","אנגלית"],["ar-SA","ערבית"],["ru-RU","רוסית"]];
+  h+='<p class="sub" style="margin:12px 0 4px"><b>האם יש קול לכל שפה:</b></p><table>'+
+    langs.map(function(L){
+      var base=L[0].split("-")[0], hit=v.filter(function(x){
+        return String(x.lang||"").replace("_","-").toLowerCase().split("-")[0]===base});
+      return '<tr><th>'+L[1]+'</th><td class="'+(hit.length?"ok":"bad")+'">'+
+        (hit.length?hit.length+" — "+hit.map(function(x){return x.name}).slice(0,2).join(", "):"אין קול")+'</td></tr>';
+    }).join("")+'</table>';
   if(v.length){
-    h+='<p class="sub" style="margin:10px 0 4px">הקולות שהמכשיר מדווח:</p><table>'+
+    h+='<details style="margin-top:10px"><summary class="sub">כל '+v.length+' הקולות</summary><table>'+
       '<tr><th>שם</th><th>שפה</th><th>מקומי</th></tr>'+
       v.map(function(x){return '<tr><td>'+x.name+'</td><td>'+x.lang+'</td><td>'+
-        (x.localService?"כן":"רשת")+'</td></tr>'}).join("")+'</table>';
+        (x.localService?"כן":"רשת")+'</td></tr>'}).join("")+'</table></details>';
   }else{
     h+='<p class="sub warn" style="margin-top:8px">רשימה ריקה אינה הוכחה שאין מנוע — '+
        'יש מכשירים שמחזירים ריק ומדברים מצוין. ההוכחה היחידה היא ניסיון לדבר.</p>';
   }
-  /* התאמה לכל שפה */
-  var langs=[["he-IL","עברית"],["en-US","אנגלית"],["ar-SA","ערבית"],["ru-RU","רוסית"]];
-  h+='<p class="sub" style="margin:10px 0 4px">התאמת קול לפי שפה:</p><table>'+
-    langs.map(function(L){
-      var base=L[0].split("-")[0], hit=v.filter(function(x){
-        return String(x.lang||"").replace("_","-").toLowerCase().split("-")[0]===base});
-      return '<tr><th>'+L[1]+' ('+L[0]+')</th><td class="'+(hit.length?"ok":"bad")+'">'+
-        (hit.length?hit.length+" — "+hit.map(function(x){return x.name}).slice(0,3).join(", "):"אין קול")+'</td></tr>';
-    }).join("")+'</table>';
   box.innerHTML=h;
 }
 
@@ -192,9 +210,10 @@ function say(opts){
   u.volume=1; u.rate=1; u.pitch=1;
   log("  volume=1 rate=1 pitch=1");
   var started=false;
-  u.onstart=function(){ started=true; log("  ✔ onstart","ok") };
+  u.onstart=function(){ started=true; audioHeard.speech=true; log("  ✔ onstart","ok"); verdict() };
   u.onend=function(){ log("  ✔ onend"+(started?"":" — בלי onstart לפניו!"),started?"ok":"warn") };
-  u.onerror=function(e){ log("  ✘ onerror: "+(e&&e.error||"לא ידוע"),"bad") };
+  u.onerror=function(e){ lastErr=(e&&e.error)||"לא ידוע"; audioHeard.speech=false;
+    log("  ✘ onerror: "+lastErr,"bad"); verdict() };
   u.onboundary=function(e){ if(!u.__b){u.__b=1; log("  onboundary ראשון @"+e.charIndex,"dim")} };
   try{ SS.speak(u); log("  speak() נקרא") }
   catch(e){ log("  speak() זרק: "+e.message,"bad"); return }
@@ -204,7 +223,8 @@ function say(opts){
         (started?"":"  ← onstart עוד לא נורה"), started?"dim":"warn");
   },400);
   setTimeout(function(){
-    if(!started) log("  ✘ שתי שניות ואין onstart — האמירה נבלעה בשקט","bad");
+    if(!started){ if(audioHeard.speech===null)audioHeard.speech=false;
+      log("  ✘ שתי שניות ואין onstart — האמירה נבלעה בשקט","bad"); verdict() }
   },2000);
 }
 
@@ -258,7 +278,114 @@ document.getElementById("copy").addEventListener("click",function(){
   }
 });
 
-renderEnv();
+/* ============================================================
+   מבחן 0 — צליל בלי דיבור. מפריד בין "המכשיר שקט" לבין
+   "מנוע הדיבור לא עובד". בלי ההפרדה הזאת כל שאר המדידה חסרת ערך.
+   ============================================================ */
+var audioHeard={beep:null,wav:null,speech:null};
+
+document.getElementById("beep").addEventListener("click",function(){
+  log("── 0א · צפצוף דרך WebAudio");
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC){ log("  אין AudioContext בדפדפן הזה","bad"); audioHeard.beep=false; verdict(); return }
+    var ctx=new AC();
+    log("  AudioContext state = "+ctx.state);
+    var go=function(){
+      var o=ctx.createOscillator(), g=ctx.createGain();
+      o.type="sine"; o.frequency.value=440;
+      g.gain.value=0.25; o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime+0.7);
+      log("  צליל 440Hz נשלח למשך 0.7 שניות · state="+ctx.state,"ok");
+      audioHeard.beep=(ctx.state==="running"); verdict();
+    };
+    if(ctx.state==="suspended"){ ctx.resume().then(function(){ log("  resume() הצליח"); go() },
+      function(e){ log("  resume() נכשל: "+e.message,"bad"); audioHeard.beep=false; verdict() }); }
+    else go();
+  }catch(e){ log("  נכשל: "+e.message,"bad"); audioHeard.beep=false; verdict() }
+});
+
+/* WAV קצר של 0.6 שניות, 440Hz — מוטבע, בלי רשת */
+function toneWav(){
+  var sr=8000, n=Math.floor(sr*0.6), buf=new Uint8Array(44+n*2), dv=new DataView(buf.buffer);
+  function ws(o,str){for(var i=0;i<str.length;i++)dv.setUint8(o+i,str.charCodeAt(i))}
+  ws(0,"RIFF"); dv.setUint32(4,36+n*2,true); ws(8,"WAVE"); ws(12,"fmt ");
+  dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,1,true);
+  dv.setUint32(24,sr,true); dv.setUint32(28,sr*2,true); dv.setUint16(32,2,true);
+  dv.setUint16(34,16,true); ws(36,"data"); dv.setUint32(40,n*2,true);
+  for(var i=0;i<n;i++) dv.setInt16(44+i*2, Math.round(Math.sin(2*Math.PI*440*i/sr)*9000), true);
+  var bin=""; for(var k=0;k<buf.length;k+=8192) bin+=String.fromCharCode.apply(null,buf.subarray(k,k+8192));
+  return "data:audio/wav;base64,"+btoa(bin);
+}
+var TONE=null, TEL=null;
+document.getElementById("wav").addEventListener("click",function(){
+  log("── 0ב · צליל דרך אלמנט Audio");
+  try{
+    if(!TONE)TONE=toneWav();
+    if(!TEL)TEL=new Audio();
+    TEL.src=TONE; TEL.volume=1;
+    TEL.onplay=function(){ log("  onplay נורה","ok") };
+    TEL.onended=function(){ log("  onended נורה","ok"); audioHeard.wav=true; verdict() };
+    TEL.onerror=function(){ log("  onerror על האלמנט","bad"); audioHeard.wav=false; verdict() };
+    var pr=TEL.play();
+    if(pr&&pr.then) pr.then(function(){ log("  play() התקבל","ok") },
+      function(e){ log("  play() נדחה: "+e.name+" — "+e.message,"bad"); audioHeard.wav=false; verdict() });
+    else log("  play() ללא הבטחה");
+  }catch(e){ log("  נכשל: "+e.message,"bad"); audioHeard.wav=false; verdict() }
+});
+
+/* ============================================================
+   קביעה — מה שמופיע גדול על המסך, כדי שצילום מסך אחד יספיק.
+   ============================================================ */
+var lastErr="";
+function verdict(){
+  var box=document.getElementById("verdict");
+  var v=voices().length, ua=navigator.userAgent;
+  var android=/Android/i.test(ua), ios=/iPhone|iPad|iPod/i.test(ua);
+  var h="", cls="dim";
+  if(!SS){ cls="bad";
+    h="<b>הדפדפן הזה לא תומך בהקראה כלל.</b><br>אין אובייקט speechSynthesis. "+
+      "צריך לפתוח את הדף בכרום או בספארי, לא בדפדפן שמוטמע בתוך אפליקציה אחרת "+
+      "(פייסבוק, ווטסאפ, אינסטגרם — כולם פותחים דפדפן פנימי מוגבל).";
+  }
+  else if(audioHeard.beep===false&&audioHeard.wav===false){ cls="bad";
+    h="<b>אין קול במכשיר בכלל — גם לא צפצוף.</b><br>זה לא מנוע הדיבור. "+
+      "לבדוק: עוצמת <u>מדיה</u> (לא צלצול), מתג השתקה, אוזניות או בלוטות׳ מחוברים, "+
+      "ומצב \"נא לא להפריע\".";
+  }
+  else if(lastErr==="not-allowed"){ cls="bad";
+    h="<b>הדפדפן חסם את ההקראה (not-allowed).</b><br>ההקראה חייבת לצאת מלחיצה ישירה. "+
+      "אם היא נחסמה גם בלחיצה — לבדוק הרשאות אתר בדפדפן.";
+  }
+  else if(lastErr==="synthesis-failed"||lastErr==="synthesis-unavailable"){ cls="bad";
+    h="<b>מנוע הדיבור נכשל ("+lastErr+").</b><br>"+
+      (android?"באנדרואיד: הגדרות ← ניהול כללי ← טקסט לדיבור ← לבחור <b>Google</b> כמנוע המועדף, "+
+               "ואז גלגל שיניים ← <b>התקנת נתוני קול</b> ← להתקין עברית.":
+       ios?"באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית ← להוריד קול.":
+       "צריך להתקין נתוני קול במערכת ההפעלה.");
+  }
+  else if(audioHeard.speech===false&&v===0){ cls="bad";
+    h="<b>speak() נקרא, ולא קרה כלום — ואין קולות מותקנים.</b><br>"+
+      (android?"באנדרואיד: הגדרות ← ניהול כללי ← טקסט לדיבור ← מנוע Google ← התקנת נתוני קול ← עברית.":
+       ios?"באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית.":
+       "אין קולות מותקנים במערכת ההפעלה.");
+  }
+  else if(audioHeard.speech===false){ cls="warn";
+    h="<b>יש "+v+" קולות מותקנים, אבל ההקראה לא התחילה.</b><br>"+
+      "לא נורה onstart ולא נורתה שגיאה — האמירה נבלעה. "+
+      "לנסות: לסגור את הדף ולפתוח מחדש, ולוודא שהמכשיר לא במצב חיסכון בסוללה.";
+  }
+  else if(audioHeard.speech===true){ cls="ok";
+    h="<b>ההקראה עבדה.</b> onstart נורה. אם לא שמעת — הבעיה בעוצמת המדיה או בניתוב השמע.";
+  }
+  else if(audioHeard.beep===true||audioHeard.wav===true){ cls="warn";
+    h="<b>יש קול במכשיר.</b> עכשיו ללחוץ על \"הקראה גולמית\" ולראות מה קורה.";
+  }
+  else { h="עוד לא נבדק. ללחוץ על שני הכפתורים במקטע 0, ואז על \"הקראה גולמית\"."; }
+  box.className=cls; box.innerHTML=h;
+}
+
+renderEnv(); verdict();
 log("הדף נטען. speechSynthesis: "+(SS?"קיים":"חסר")+" · קולות כרגע: "+voices().length,
     SS?"ok":"bad");
 </script>
