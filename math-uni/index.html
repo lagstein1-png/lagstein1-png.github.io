@@ -21,6 +21,9 @@
   --bg:#f5f7fb; --surface:#ffffff; --surface2:#eef1f7;
   --ink:#101828; --muted:#5b6478; --faint:#8b93a7; --line:#e0e4ee;
   --accent:#4f46e5; --accent-ink:#ffffff; --accent-soft:#e9e8fd;
+  /* צהוב ההדגשה — אותו צהוב של מקריא קולי, כדי שמעקב ההקראה
+     ייראה אותו דבר בכל האתר. */
+  --hit:#f5c451; --hit-ink:#1a1300;
   --cyan:#0e7490; --cyan-soft:#dcf3f8;
   --ok:#15803d; --ok-soft:#dcfce7; --bad:#be123c; --bad-soft:#ffe4e9;
   --warn:#b45309; --warn-soft:#fef3c7;
@@ -37,6 +40,7 @@
   --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
   --ink:#e8ecf4; --muted:#9aa4ba; --faint:#6f7a91; --line:#28313f;
   --accent:#818cf8; --accent-ink:#0e1117; --accent-soft:#232842;
+  --hit:#ffd24d; --hit-ink:#241a00;
   --cyan:#22d3ee; --cyan-soft:#132b33;
   --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
   --warn:#fbbf24; --warn-soft:#33260f;
@@ -51,6 +55,7 @@
     --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
     --ink:#e8ecf4; --muted:#9aa4ba; --faint:#6f7a91; --line:#28313f;
     --accent:#818cf8; --accent-ink:#0e1117; --accent-soft:#232842;
+    --hit:#ffd24d; --hit-ink:#241a00;
     --cyan:#22d3ee; --cyan-soft:#132b33;
     --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
     --warn:#fbbf24; --warn-soft:#33260f;
@@ -66,6 +71,7 @@
   --bg:#ffffff; --surface:#ffffff; --surface2:#ffffff;
   --ink:#000000; --muted:#1a1a1a; --faint:#333333; --line:#000000;
   --accent:#00308f; --accent-ink:#ffffff; --accent-soft:#e8edf8;
+  --hit:#ffe600; --hit-ink:#000000;
   --cyan:#004b57; --cyan-soft:#e6f2f4;
   --ok:#0a5c2a; --ok-soft:#e6f4ea; --bad:#8c0f2c; --bad-soft:#fbe9ed;
   --warn:#6b3d00; --warn-soft:#f7efdf; --shadow:none;
@@ -227,6 +233,8 @@ sub{font-size:.62em;vertical-align:sub;line-height:0}
 .diag b{color:var(--bad)}
 .hintbox{margin-top:14px;border-inline-start:4px solid var(--warn);background:var(--warn-soft);
   border-radius:0 10px 10px 0;padding:12px 15px}
+.wd{border-radius:5px;padding:1px 3px}
+.wd.hit{background:var(--hit);color:var(--hit-ink);font-weight:600}
 [dir="rtl"] .hintbox{border-radius:10px 0 0 10px}
 
 /* ---------- מדדים ---------- */
@@ -560,7 +568,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u8 · 2026-08-29";
+var BUILD="u9 · 2026-08-29";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -805,6 +813,66 @@ function pcmToWav(b64){
   }catch(e){return null}
 }
 
+/* ============================================================
+   מעקב הקראה: הדגשת המילה הנאמרת
+   ------------------------------------------------------------
+   עובד רק כשהמחרוזת שנמסרה למנוע הדיבור זהה לזו שעל המסך.
+   כאן זה נכון לרמז, שנאמר גולמי; שאלה ונוסחה עוברות דרך
+   speakMath ומשנות צורה, ולכן שם אין מיפוי ומדגישים את הכרטיס.
+   hlPrep משווה בעצמו ומחליט — אין הנחה מראש.
+
+   charIndex מתאפס בכל אמירה, ולכן המפה נבנית מהמחרוזת שנמסרה
+   ולא מה-DOM. אנדרואיד, ולעתים ספארי, לא שולחים דיווח על מילים
+   כלל — ואז הדגשה שלא זזה נראית כמו תקלה, ולכן אחרי שנייה וחצי
+   בלי דיווח מודגש כל האיבר.
+   ============================================================ */
+var HL={el:null,raw:"",spans:[],map:[],timer:null,got:false,added:false};
+function hlClear(){
+  if(HL.timer){clearTimeout(HL.timer);HL.timer=null}
+  if(HL.el){try{HL.el.innerHTML=HL.raw;HL.el.classList.remove("now")}catch(e){}}
+  HL={el:null,raw:"",spans:[],map:[],timer:null,got:false,added:false};
+}
+function hlWhole(el){
+  hlClear();
+  if(!el)return;
+  HL.el=el; HL.raw=el.innerHTML; HL.added=true;
+  el.classList.add("now");
+}
+function hlPrep(el,text){
+  hlClear();
+  if(!el||!text)return;
+  /* אם המחרוזת הנאמרת אינה זהה למוצגת — אין מיפוי, ומדגישים הכול. */
+  var shown=(el.textContent||"").replace(/\s+/g," ").trim();
+  var said=String(text).replace(/\s+/g," ").trim();
+  if(shown!==said){hlWhole(el);return}
+  HL.el=el; HL.raw=el.innerHTML;
+  var parts=String(text).split(/(\s+)/),html="",pos=0,idx=0;
+  HL.map=[];
+  for(var i=0;i<parts.length;i++){
+    var pt=parts[i];
+    if(!pt.length)continue;
+    if(/^\s+$/.test(pt)){html+=pt;pos+=pt.length;continue}
+    HL.map.push({from:pos,to:pos+pt.length,i:idx});
+    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
+    pos+=pt.length; idx++;
+  }
+  if(!HL.map.length){hlClear();return}
+  el.innerHTML=html;
+  HL.spans=el.querySelectorAll(".wd");
+  HL.timer=setTimeout(function(){if(!HL.got&&HL.el){HL.added=true;HL.el.classList.add("now")}},1500);
+}
+function hlAt(c){
+  if(!HL.el||!HL.map.length)return;
+  HL.got=true;
+  if(HL.timer){clearTimeout(HL.timer);HL.timer=null}
+  if(HL.added){HL.el.classList.remove("now");HL.added=false}
+  for(var k=0;k<HL.map.length;k++){
+    if(c>=HL.map[k].from&&c<HL.map[k].to){
+      for(var j=0;j<HL.spans.length;j++)HL.spans[j].classList.toggle("hit",j===HL.map[k].i);
+      return;
+    }
+  }
+}
 var ttsErr="",ttsState="";   /* "" · "ok" · "device" · "err" */
 function speakDevice(text){
   if(!("speechSynthesis" in window))return;
@@ -820,7 +888,10 @@ function speakDevice(text){
       var v=deviceVoice();
       if(v){ try{ u.voice=v; if(v.lang)u.lang=v.lang; }catch(e2){} }
       u.rate=state.settings.rate;
-      speechSynthesis.speak(u);
+      u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(e.charIndex)};
+    u.onend=function(){hlClear()};
+    u.onerror=function(){hlClear()};
+    speechSynthesis.speak(u);
     }catch(e){}
   });
 }
@@ -850,6 +921,7 @@ function speak(text){
 }
 function stopSpeak(){
   gStop();
+  hlClear();
   try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
 }
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
@@ -2838,7 +2910,7 @@ _f("{0}{1}>{2} רמז</button>", '<button class="btn btn-g" style="padding:9px 1
 _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="guide"', (P.steps>0?" disabled":""), ic("steps",16))+
      (q.rule?_f("{0}{1}{2}{3} הנוסחה</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="rule" data-r="', q.rule, '">', ic("book",16)):"")+
      '</div>';
-  if(P.hints>0&&q.hint)h+='<div class="hintbox rise"><b>'+_('רמז')+'</b><div class="sm" style="margin-top:3px">'+q.hint+'</div></div>';
+  if(P.hints>0&&q.hint)h+='<div class="hintbox rise"><b>'+_('רמז')+'</b><div class="sm hintxt" style="margin-top:3px">'+q.hint+'</div></div>';
   /* תשובות */
   var keys=["1","2","3","4"];
   h+='<div class="opts">'+q.options.map(function(o,i){
@@ -3861,7 +3933,15 @@ function onAction(a,el){
   if(a==="stop"){
     if(P.results.length===0){goto("home");return}
     P.list=P.list.slice(0,P.results.length);P.phase="done";save();window.scrollTo(0,0);render();return}
-  if(a==="hint"){P.hints=1;render();if(s.tts&&P.q.hint)speak(P.q.hint);return}
+  if(a==="hint"){
+    P.hints=1;render();
+    if(s.tts&&P.q.hint){
+      speak(P.q.hint);
+      /* אחרי speak — הוא קורא ל-stopSpeak שמנקה הדגשה קודמת. */
+      hlPrep(document.querySelector(".hintxt"),P.q.hint);
+    }
+    return;
+  }
   if(a==="guide"){
     P.steps=1;P.usedHelp=true;
     render();if(s.tts)readSteps();return}
@@ -8643,7 +8723,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u8-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u9-pwa1").catch(function(){});
   });
 }
 </script>
