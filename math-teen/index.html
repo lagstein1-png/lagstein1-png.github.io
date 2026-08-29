@@ -497,7 +497,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t16 · 2026-08-29";
+var BUILD="t17 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -648,7 +648,12 @@ function guessGender(v){
 function deviceVoice(){
   var list=pickList(),i;
   if(!list.length)return null;
-  for(i=0;i<list.length;i++)if(list[i].voiceURI===state.settings.voice)return list[i];
+  /* בחירה ידנית מכובדת רק אם היא בשפת הממשק. הסריקה רצה קודם על
+     כל הרשימה, וכפתור "לשמוע" ברשימת הקולות אינו משמיע אלא בוחר —
+     לחיצה אחת ליד קול אנגלי נשמרה כקול שמקריא עברית, ומאז כל
+     המשפטים נקראו באנגלית. מחפשים רק בתוך שפת הממשק. */
+  var mineFirst=hebVoices();
+  for(i=0;i<mineFirst.length;i++)if(mineFirst[i].voiceURI===state.settings.voice)return mineFirst[i];
   /* בלי בחירה ידנית — קול נשי, אבל *רק מתוך שפת הממשק*.
      pickList מחזיר קודם את שפת הממשק ואחריה את כל השאר, ולכן
      סריקה על כל הרשימה מצאה קול אנגלי נשי במכשיר שאין בו קול
@@ -663,9 +668,13 @@ function deviceVoice(){
   return null;
 }
 /* "gemini:Kore" או "device" */
+/* מפתח חסום או שגוי (403/400/401) אינו תקלה חולפת. בלי הזיכרון
+   הזה כל משפט מנסה שוב את הרשת, ממתין, נכשל, ורק אז מדבר בקול
+   המכשיר — עיכוב לפני כל הקראה, ופס אדום שחוזר בלי סוף. */
+var gDead=false;
 function voiceMode(){
   var v=state.settings.engine;
-  if(v==="gemini"&&hasKey())return "gemini";
+  if(v==="gemini"&&hasKey()&&!gDead)return "gemini";
   return "device";
 }
 
@@ -913,6 +922,7 @@ function speak(text){
     /* נופלים חזרה לקול המכשיר במקום להשתתק, ורושמים למה — כדי
        שמסך ההגדרות יוכל להראות את הסיבה במקום "לא עובד". */
     ttsErr=String(e&&e.message||e);
+    if(/\b(400|401|403)\b|blocked|permission|API key|not valid/i.test(ttsErr))gDead=true;
     ttsState="err";
     speakDevice(text);
     render();
@@ -2942,7 +2952,10 @@ function viewSettings(){
            '<p class="sub xs" style="margin-top:8px">עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.</p>';
       }
 
-      var vl=pickList();
+      /* רק קולות בשפת הממשק. הרשימה הציעה גם קולות אנגליים,
+         והכפתור שלידם אינו משמיע אלא בוחר — כך נשמר קול אנגלי
+         כקול שמקריא עברית. מה שלא יכול להיבחר, לא מוצג. */
+      var vl=hebVoices();
       if(!vl.length){
         h+='<div class="hintbox" style="margin-top:14px"><b>לא נמצאו קולות במכשיר</b>'+
            '<div class="sm" style="margin-top:3px">שווה לנסות את הקול הטבעי, או להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.</div></div>';
@@ -3148,7 +3161,7 @@ function onAction(a,el){
   if(a==="ts"){s.ts=parseInt(el.getAttribute("data-n"),10);save();applyModes();render();return}
   if(a==="theme"){s.theme=el.getAttribute("data-n");save();applyModes();render();return}
   if(a==="rlen"){s.roundLen=parseInt(el.getAttribute("data-n"),10);save();render();return}
-  if(a==="engine"){s.engine=el.getAttribute("data-n");ttsErr="";ttsState="";save();render();speak(VOICE_SAMPLE);return}
+  if(a==="engine"){s.engine=el.getAttribute("data-n");ttsErr="";ttsState="";gDead=false;save();render();speak(VOICE_SAMPLE);return}
   if(a==="gvoice"){s.gvoice=el.getAttribute("data-n");ttsErr="";ttsState="";save();render();speak(VOICE_SAMPLE);return}
   if(a==="clearkey"){saveKey("");ttsErr="";render();return}
   if(a==="voice"){s.voice=el.getAttribute("data-u");s.engine="device";save();render();speak(VOICE_SAMPLE);return}
@@ -3898,7 +3911,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t16-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t17-pwa1").catch(function(){});
   });
 }
 </script>
