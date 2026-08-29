@@ -549,7 +549,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m14 · 2026-08-29";
+var BUILD="m15 · 2026-08-29";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -946,7 +946,11 @@ function speakDevice(text,code,rate){
 }
 /* lang: "en" לחומר הנלמד, או קוד שפת האם להוראה. */
 function speak(text,lang,rateMul){
-  text=String(text||"").trim(); if(!text)return;
+  /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
+     לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
+     עם <sub> או <span class="frac"> הוקראה בקול כתגית: הסטודנט
+     שמע "span class frac" באמצע השאלה. */
+  text=plainOf(String(text||"")).trim(); if(!text)return;
   lang=lang||"en";
   var code=lang==="en"?EN_TTS:LANGS[lang].tts;
   var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
@@ -4196,7 +4200,9 @@ function examAction(a,el){
   if(a==="sitfwd"){sitNext();return true}
   if(a==="sitgo"){sitGo(parseInt(el.getAttribute("data-i"),10));return true}
   if(a==="sitfinish"){sitFinish();return true}
-  if(a==="sitread"){var q2=SIT.qs[SIT.i];if(q2)speak(q2.say);return true}
+  /* בלי שפה מפורשת speak נופל ל-"en", ושאלת מבחן בעברית, בערבית
+     או ברוסית הוקראה בקול אנגלי. כאן החומר עצמו בשפת הממשק. */
+  if(a==="sitread"){var q2=SIT.qs[SIT.i];if(q2)speak(q2.say,state.lang);return true}
   if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
   if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
   if(a==="sitback"){view="sit";render();window.scrollTo(0,0);return true}
@@ -4418,7 +4424,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m14-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m15-pwa1").catch(function(){});
   });
 }
 </script>

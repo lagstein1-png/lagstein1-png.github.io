@@ -529,7 +529,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n11 · 2026-08-29";
+var BUILD="n12 · 2026-08-29";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -924,7 +924,11 @@ function speakDevice(text,code,rate){
 }
 /* lang: "en" לחומר הנלמד, או קוד שפת האם להוראה. */
 function speak(text,lang,rateMul){
-  text=String(text||"").trim(); if(!text)return;
+  /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
+     לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
+     עם <sub> או <span class="frac"> הוקראה בקול כתגית: הסטודנט
+     שמע "span class frac" באמצע השאלה. */
+  text=plainOf(String(text||"")).trim(); if(!text)return;
   lang=lang||"en";
   var code=lang==="en"?EN_TTS:LANGS[lang].tts;
   var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
@@ -3255,7 +3259,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n11-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n12-pwa1").catch(function(){});
   });
 }
 </script>

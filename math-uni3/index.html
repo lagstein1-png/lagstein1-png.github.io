@@ -580,7 +580,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g13 · 2026-08-29";
+var BUILD="g14 · 2026-08-29";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -921,6 +921,11 @@ function speakDevice(text){
 }
 function speak(text){
   if(!state.settings.tts||!text)return;
+  /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
+     לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
+     עם <sub> או <span class="frac"> הוקראה בקול כתגית: הסטודנט
+     שמע "span class frac" באמצע השאלה. */
+  text=plainOf(String(text));
   stopSpeak();
   if(voiceMode()!=="gemini"){
     if(ttsState!=="device"){ttsState="device"}
@@ -1682,7 +1687,7 @@ function genGroup(L){
     k=pick(cand);
     var g=gcd(n,k), ordv=n/g;
     return {ask:_f("מהו הסדר של האיבר {0} בחבורה (Z<sub>{1}</sub> , +)?", num(k), num(n)),
-      expr:"ord("+num(k)+") ב-Z<sub>"+num(n)+"</sub>",
+      expr:"ord("+num(k)+_(") ב-Z<sub>")+num(n)+"</sub>",
       ans:W(num(ordv)),
       wrong:[
         W(num(n),_("זה סדר החבורה כולה. הוא הסדר של יוצר, ולא של כל איבר.")),
@@ -1729,7 +1734,7 @@ function genGroup(L){
   var pair3=pick(pool3);
   a=pair3[0];ord3=pair3[1];
   return {ask:_f("מהו הסדר של האיבר {0} בחבורת ההפיכים U({1})?", num(a), num(n)),
-    expr:"ord("+num(a)+") ב-U("+num(n)+")",
+    expr:"ord("+num(a)+_(") ב-U(")+num(n)+")",
     ans:W(num(ord3)),
     wrong:[
       W(num(phi(n)),_("זה סדר החבורה כולה. סדר האיבר מחלק אותו, אבל אינו חייב להיות שווה לו.")),
@@ -7426,7 +7431,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g13-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g14-pwa1").catch(function(){});
   });
 }
 </script>

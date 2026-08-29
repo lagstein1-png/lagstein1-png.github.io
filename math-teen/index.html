@@ -493,7 +493,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t12 · 2026-08-29";
+var BUILD="t13 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -806,6 +806,11 @@ function speakDevice(text){
 }
 function speak(text){
   if(!state.settings.tts||!text)return;
+  /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
+     לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
+     עם <sub> או <span class="frac"> הוקראה בקול כתגית: הסטודנט
+     שמע "span class frac" באמצע השאלה. */
+  text=plainOf(String(text));
   stopSpeak();
   if(voiceMode()!=="gemini"){
     if(ttsState!=="device"){ttsState="device"}
@@ -3807,7 +3812,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t12-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t13-pwa1").catch(function(){});
   });
 }
 </script>
