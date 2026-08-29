@@ -491,13 +491,17 @@ var ICONS={
 function ic(name,size){
   var d=ICONS[name];if(!d)return"";
   var s=size||18;
-  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+d+'"/></svg>';
+  /* רוב האייקונים הם מחרוזת d חשופה, אבל שלושה (share, copy, plus)
+     הם סימון SVG מלא. עטיפתם ב-d= ייצרה <path d="<path d=..."> —
+     נתיב פסול שלא צויר כלל, והכפתור יצא בלי אייקון. */
+  var body=(d.charAt(0)==="<")?d:'<path d="'+d+'"/>';
+  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+body+'</svg>';
 }
 /* ============================================================
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t21 · 2026-08-29";
+var BUILD="t22 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -4036,7 +4040,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t21-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t22-pwa1").catch(function(){});
   });
 }
 </script>

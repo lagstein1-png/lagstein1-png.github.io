@@ -602,7 +602,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m24 · 2026-08-29";
+var BUILD="m25 · 2026-08-29";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -4668,6 +4668,21 @@ document.addEventListener("keydown",function(e){
   var el=e.target.closest("[data-a='gvoice']"); if(!el)return;
   e.preventDefault(); el.click();
 });
+/* קיצורי מקלדת בתרגול, כמו באפליקציות המתמטיקה: מי שהעכבר קשה לו,
+   או שהוא עובד עם מקלדת בלבד, לא אמור להיות תלוי בלחיצה מדויקת.
+   1–4 עונה, רווח מקריא שוב, Enter עובר לשאלה הבאה. */
+document.addEventListener("keydown",function(e){
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.target&&e.target.closest("input,textarea,select,[contenteditable]"))return;
+  if(state.screen!=="prac"||!P.q)return;
+  if(!P.done&&P.q.opts&&/^[1-4]$/.test(e.key)){
+    var i=parseInt(e.key,10)-1;
+    if(P.q.opts[i]){e.preventDefault();answer(i)}
+    return;
+  }
+  if(e.key===" "){e.preventDefault();speak(P.q.say,state.lang);return}
+  if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
+});
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
    הקול מכריז "אין קול אנגלי" על מכשיר שיש בו אחד. */
 if(window.speechSynthesis){
@@ -4698,7 +4713,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m24-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m25-pwa1").catch(function(){});
   });
 }
 </script>
