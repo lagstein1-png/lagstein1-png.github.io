@@ -25,7 +25,7 @@
   --bg:#f4f7f6; --surface:#ffffff; --surface2:#e9efee;
   --ink:#0f1f1d; --muted:#54655f; --faint:#83948e; --line:#dde6e3;
   --accent:#0f766e; --accent-ink:#ffffff; --accent-soft:#d6f0eb;
-  --gold:#a16207; --gold-soft:#fbf0d5;
+  --gold:#a16207; --gold-soft:#fbf0d5; --hit:#f5c451; --hit-ink:#1a1300;
   --ok:#15803d; --ok-soft:#dcfce7; --bad:#be123c; --bad-soft:#ffe4e9;
   --warn:#b45309; --warn-soft:#fef3c7;
   --shadow:0 1px 2px rgba(15,31,29,.05),0 8px 24px -12px rgba(15,31,29,.2);
@@ -41,7 +41,7 @@
   --bg:#0d1b1a; --surface:#142624; --surface2:#1c3230;
   --ink:#e6f0ee; --muted:#9ab0aa; --faint:#6f8781; --line:#264240;
   --accent:#5eead4; --accent-ink:#0d1b1a; --accent-soft:#123c37;
-  --gold:#fbbf24; --gold-soft:#33270f;
+  --gold:#fbbf24; --gold-soft:#33270f; --hit:#ffd24d; --hit-ink:#241a00;
   --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
   --warn:#fbbf24; --warn-soft:#33260f;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
@@ -55,7 +55,7 @@
     --bg:#0d1b1a; --surface:#142624; --surface2:#1c3230;
     --ink:#e6f0ee; --muted:#9ab0aa; --faint:#6f8781; --line:#264240;
     --accent:#5eead4; --accent-ink:#0d1b1a; --accent-soft:#123c37;
-    --gold:#fbbf24; --gold-soft:#33270f;
+    --gold:#fbbf24; --gold-soft:#33270f; --hit:#ffd24d; --hit-ink:#241a00;
     --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
     --warn:#fbbf24; --warn-soft:#33260f;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
@@ -70,7 +70,7 @@
   --bg:#ffffff; --surface:#ffffff; --surface2:#ffffff;
   --ink:#000000; --muted:#1a1a1a; --faint:#333333; --line:#000000;
   --accent:#00434b; --accent-ink:#ffffff; --accent-soft:#e6f2f3;
-  --gold:#5c3d00; --gold-soft:#f7efdf;
+  --gold:#5c3d00; --gold-soft:#f7efdf; --hit:#ffe600; --hit-ink:#000000;
   --ok:#0a5c2a; --ok-soft:#e6f4ea; --bad:#8c0f2c; --bad-soft:#fbe9ed;
   --warn:#6b3d00; --warn-soft:#f7efdf; --shadow:none;
   --c-sound:#00305c; --cs-sound:#e8eef7;
@@ -225,6 +225,8 @@ button{font:inherit;color:inherit}
 .passage .s{border-radius:5px;padding:.05em .12em;cursor:pointer}
 .passage .s:hover{background:var(--accent-soft)}
 .passage .s.now{background:var(--accent-soft);box-shadow:0 2px 0 var(--accent)}
+.wd{border-radius:5px;padding:1px 3px}
+.wd.hit{background:var(--hit);color:var(--hit-ink);font-weight:600}
 .gloss{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
 .gword{border:1px solid var(--line);background:var(--surface);border-radius:999px;
   padding:.25rem .6rem;font-size:.85rem;cursor:pointer}
@@ -522,7 +524,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n5 · 2026-08-29";
+var BUILD="n6 · 2026-08-29";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -812,6 +814,76 @@ function gSynth(text,voiceName,rate,lang){
     throw new Error("no-audio");
   });
 }
+/* ============================================================
+   מעקב הקראה: הדגשת המילה הנאמרת
+   ------------------------------------------------------------
+   עובד רק כשהטקסט הנאמר הוא הטקסט המוצג. כאן זה המצב — כפתור
+   ההשמעה נושא את אותה מחרוזת שמופיעה לידו על המסך.
+
+   charIndex מתאפס בכל אמירה, ולכן המפה נבנית מהמחרוזת שנמסרה
+   למנוע ולא מה-DOM. אנדרואיד, ולעתים ספארי, לא שולחים דיווח על
+   מילים כלל — ואז הדגשה שלא זזה נראית כמו תקלה, ולכן אחרי שנייה
+   וחצי בלי דיווח מודגש כל הטקסט במקום מילה בודדת.
+   ============================================================ */
+var HL={el:null,raw:"",spans:[],map:[],timer:null,got:false,added:false};
+function hlClear(){
+  if(HL.timer){clearTimeout(HL.timer);HL.timer=null}
+  if(HL.el){try{HL.el.innerHTML=HL.raw;HL.el.classList.remove("now")}catch(e){}}
+  HL={el:null,raw:"",spans:[],map:[],timer:null,got:false,added:false};
+}
+/* האיבר שמציג בדיוק את המחרוזת הזאת. מדלגים על איברים שמכילים
+   כפתור — החלפת ה-HTML שלהם הייתה מוחקת את כפתור ההשמעה עצמו. */
+function hlFind(btn,text){
+  var want=String(text||"").replace(/\s+/g," ").trim();
+  if(!want||!btn)return null;
+  var box=(btn.closest&&btn.closest(".subject,.qcard,.fb,.passage,.card"))||document.body;
+  var cand=box.querySelectorAll(".word,.s,span,p,b");
+  for(var i=0;i<cand.length;i++){
+    if(cand[i].querySelector("button"))continue;
+    if((cand[i].textContent||"").replace(/\s+/g," ").trim()===want)return cand[i];
+  }
+  return null;
+}
+/* כשאין איבר יחיד שמציג בדיוק את המחרוזת — למשל משפט שמורכב
+   מכותרת ומתיאור בשני איברים — אי אפשר למפות מילים. מדגישים את
+   הכרטיס כולו, כדי שיהיה משוב במקום שום דבר. */
+function hlWhole(el){
+  hlClear();
+  if(!el)return;
+  HL.el=el; HL.raw=el.innerHTML; HL.added=true;
+  el.classList.add("now");
+}
+function hlPrep(el,text){
+  hlClear();
+  if(!el||!text)return;
+  HL.el=el; HL.raw=el.innerHTML;
+  var parts=String(text).split(/(\s+)/),html="",pos=0,idx=0;
+  HL.map=[];
+  for(var i=0;i<parts.length;i++){
+    var pt=parts[i];
+    if(!pt.length)continue;
+    if(/^\s+$/.test(pt)){html+=pt;pos+=pt.length;continue}
+    HL.map.push({from:pos,to:pos+pt.length,i:idx});
+    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
+    pos+=pt.length; idx++;
+  }
+  if(!HL.map.length){hlClear();return}
+  el.innerHTML=html;
+  HL.spans=el.querySelectorAll(".wd");
+  HL.timer=setTimeout(function(){if(!HL.got&&HL.el){HL.added=true;HL.el.classList.add("now")}},1500);
+}
+function hlAt(c){
+  if(!HL.el||!HL.map.length)return;
+  HL.got=true;
+  if(HL.timer){clearTimeout(HL.timer);HL.timer=null}
+  if(HL.added){HL.el.classList.remove("now");HL.added=false}
+  for(var k=0;k<HL.map.length;k++){
+    if(c>=HL.map[k].from&&c<HL.map[k].to){
+      for(var j=0;j<HL.spans.length;j++)HL.spans[j].classList.toggle("hit",j===HL.map[k].i);
+      return;
+    }
+  }
+}
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
   try{speechSynthesis.cancel()}catch(e){}
@@ -823,6 +895,9 @@ function speakDevice(text,code,rate){
       u.lang=(v&&v.lang)||code;
       if(v)u.voice=v;
       u.rate=clamp(rate,0.55,1.4); u.pitch=1;
+      u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(e.charIndex)};
+      u.onend=function(){hlClear()};
+      u.onerror=function(){hlClear()};
       speechSynthesis.speak(u);
     }catch(e){}
   });
@@ -853,7 +928,7 @@ function playUrl(url,text,code,rate){
   gStop(); gAudio=new Audio(url);
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){gStop();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -2397,6 +2472,12 @@ document.addEventListener("click",function(e){
       el.classList.add("now");
     }
     speak(txt,lg,slow?0.7:1);
+    /* מכינים אחרי speak, כי הוא קורא ל-stopSpeak שמנקה הדגשה קודמת.
+       האמירה נוצרת אסינכרונית אחרי שרשימת הקולות עולה, ולכן ההכנה
+       כאן תמיד מקדימה אותה. */
+    var tgt=a==="sayline"?el:hlFind(el,txt);
+    if(tgt)hlPrep(tgt,txt);
+    else hlWhole(el.closest&&el.closest(".fb,.qcard,.card"));
     return;
   }
   if(a==="home"){state.screen="home";P.q=null;stopSpeak();save();render();window.scrollTo(0,0);return}
@@ -2502,7 +2583,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n5-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n6-pwa1").catch(function(){});
   });
 }
 </script>
