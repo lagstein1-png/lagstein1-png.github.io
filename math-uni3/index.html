@@ -560,17 +560,22 @@ function _f(h){
   for(i=1;i<args.length;i++)t=t.split("{"+(i-1)+"}").join(String(args[i]));
   return t;
 }
+/* אנגלית אינה סימן. טלפון בישראל מדווח אנגלית כברירת מחדל של
+   המכשיר, לא כבחירה, והאפליקציה נפתחה באנגלית למי שבא ללמוד
+   בעברית. ערבית ורוסית כן נחשבות — שם זו שפת אם של ממש. מי
+   שרוצה אנגלית בוחר אותה, והבחירה נשמרת. */
 function guessLang(){
   var ls=(navigator.languages||[navigator.language||"he"]);
   for(var i=0;i<ls.length;i++){
     var c=String(ls[i]).toLowerCase().split("-")[0];
     if(c==="iw")c="he";
+    if(c==="en")continue;
     if(LANGS[c])return c;
   }
   return "he";
 }
 
-var BUILD="g9 · 2026-08-29";
+var BUILD="g10 · 2026-08-29";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -7321,7 +7326,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g9-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g10-pwa1").catch(function(){});
   });
 }
 </script>
