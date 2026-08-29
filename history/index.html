@@ -549,7 +549,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m12 · 2026-08-29";
+var BUILD="m13 · 2026-08-29";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -3547,6 +3547,9 @@ var LVL_C=["var(--c-sound)","var(--c-words)","var(--c-talk)"];
 /* מסכי המבחן שואלים אם ההקראה פעילה. באפליקציה הזאת אין מתג כזה —
    ההקראה זמינה תמיד דרך כפתורי ההשמעה — ולכן התשובה קבועה. */
 if(!state.settings)state.settings={tts:true};
+/* לא לכל אפליקציה יש דף נוסחאות. מקטע המבחן הגיע מאפליקציה שיש
+   בה אחד, והציע אותו גם כאן — כפתור שמוביל למסך שאינו קיים. */
+var HAS_FORMULAS=(typeof viewFormulas==="function");
 function topicById(id){return topicOf(id)}
 /* אין track ב-blankState של האפליקציה הזאת, ולכן בכניסה הראשונה
    הוא undefined ורשימת הנושאים הייתה יוצאת ריקה. נופלים למסלול
@@ -3752,7 +3755,9 @@ function viewExamNew(){
   h+='<div style="margin-top:18px"><b>התאמות לנבחנים</b>'+
      '<p class="sub" style="margin:4px 0 8px">מה שמותר בבחינה עצמה. ההקראה ודף הנוסחאות אינם רמז — הם כלי נגישות.</p>';
   [["tts","הקראה קולית","כל שאלה נקראת בקול לפי בקשה"],
-   ["formulas","דף נוסחאות","נגיש מתוך המבחן, כמו בבגרות"]].forEach(function(r){
+   ["formulas","דף נוסחאות","נגיש מתוך המבחן, כמו בבגרות"]]
+   .filter(function(r){return r[0]!=="formulas"||HAS_FORMULAS})
+   .forEach(function(r){
     var on=!!EB[r[0]];
     h+='<button class="tog" data-a="exflag" data-f="'+r[0]+'" role="switch" aria-checked="'+(on?"true":"false")+'">'+
       '<span class="tt"><b>'+esc(r[1])+'</b><span>'+esc(r[2])+'</span></span><span class="sw"></span></button>';
@@ -3991,7 +3996,7 @@ function viewSit(){
        (sp.m?'<li>יש הגבלת זמן: '+sp.m+' דקות. בסופן המבחן מוגש מעצמו.</li>':'<li>אין טיימר. אפשר לקחת את הזמן.</li>')+
        '<li>אין ניקוד שלילי — תשובה לא נכונה לא גורעת.</li>'+
        (sp.r!==false?'<li>אפשר לבקש הקראה של כל שאלה.</li>':'<li>ההקראה כבויה במבחן הזה.</li>')+
-       (sp.f!==false?'<li>דף הנוסחאות פתוח לאורך כל המבחן.</li>':'<li>דף הנוסחאות סגור במבחן הזה.</li>')+
+       (!HAS_FORMULAS?'':(sp.f!==false?'<li>דף הנוסחאות פתוח לאורך כל המבחן.</li>':'<li>דף הנוסחאות סגור במבחן הזה.</li>'))+
        '<li>בסוף תקבלו קוד — שולחים אותו למורה בוואטסאפ.</li></ul>';
     h+='<label class="tt" style="display:block;margin-top:18px"><b>השם שלכם</b></label>'+
        '<p class="sub" style="margin:2px 0 6px">כדי שהמורה יידע מי ענה. השם לא נשלח לשום שרת — הוא נכנס לתוך הקוד.</p>'+
@@ -4016,7 +4021,7 @@ function viewSit(){
     var tools=[];
     if(sp.r!==false&&state.settings.tts)
       tools.push('<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="sitread">'+ic("speaker",16)+' הקראה</button>');
-    if(sp.f!==false)
+    if(sp.f!==false&&HAS_FORMULAS)
       tools.push('<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="sitform">'+ic("book",16)+' דף נוסחאות</button>');
     if(tools.length)h2+='<div class="row" style="margin-top:16px;gap:8px">'+tools.join("")+'</div>';
     var cur=SIT.answers[SIT.i];
@@ -4413,7 +4418,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m12-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m13-pwa1").catch(function(){});
   });
 }
 </script>
