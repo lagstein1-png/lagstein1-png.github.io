@@ -57,7 +57,7 @@ header{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;back
 button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);
   background:var(--panel);color:var(--ink);padding:10px 16px;border-radius:10px;
-  font-size:.95rem;font-weight:600;transition:border-color .15s}
+  font-size:.95rem;font-weight:600;transition:border-color .15s;min-height:44px}
 .btn:hover:not(:disabled){border-color:var(--accent)}
 .btn:disabled{opacity:.45;cursor:default}
 .btn.solid{background:var(--accent);border-color:var(--accent);color:#0b1017}
@@ -173,6 +173,10 @@ html.light .seg button.on{background:rgba(22,98,164,.09)}
   .play button.main{width:54px}
   .seg button{min-width:0;padding:10px 11px;font-size:.86rem}
 }
+
+/* יעד מגע לקישור התחתית. קישור טקסט בשורה יוצא בגובה הטקסט —
+   15 פיקסלים — וזה קטן מדי לאצבע, גם כשהוא רק לתנאי השימוש. */
+.lg-foot a{display:inline-flex;align-items:center;min-height:44px;padding-inline:6px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1185,7 +1189,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=6-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=7-pwa1").catch(function(){});
   });
 }
 </script>

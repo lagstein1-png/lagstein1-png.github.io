@@ -338,7 +338,17 @@ footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface
 .fbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;
   padding-block:16px;font-size:.82rem;color:var(--muted)}
 .skip{position:absolute;inset-inline-start:-9999px}
-.skip:focus{position:static;display:inline-block;margin:8px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);border-radius:8px}
+.skip:focus{position:static;display:inline-flex;align-items:center;min-height:44px;margin:8px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);border-radius:8px}
+
+/* יעד מגע לקישור התחתית. קישור טקסט בשורה יוצא בגובה הטקסט —
+   15 פיקסלים — וזה קטן מדי לאצבע, גם כשהוא רק לתנאי השימוש. */
+.lg-foot a{display:inline-flex;align-items:center;min-height:44px;padding-inline:6px}
+
+/* ---------- יעדי מגע ----------
+   44 פיקסלים היא המידה שהפרויקט הזה מחייב את עצמו בה, והיא לא
+   נשמרה במסכי התרגול: כפתורי הניווט יצאו 37, "הקראה" ו"רמז" 38,
+   ו"עצור" 36. הרוחב נקבע לפי הטקסט; רק הגובה מוצמד. */
+.btn,.nb,button.chip,.brand{min-block-size:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -580,7 +590,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g15 · 2026-08-29";
+var BUILD="g16 · 2026-08-29";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -2414,6 +2424,9 @@ _f("{0}{1} לשנה א׳ באוניברסיטה</span>", '<span class="chip a">'
      '<div class="h2">'+(step===1?_("1. איך לקרוא לכם?"):step===2?_("2. מה אתם לומדים?"):_("3. איך נוח לכם לקרוא?"))+'</div>'+
      (step===1?
        '<p class="sub sm">'+_('לא חובה. זה נשמר רק במכשיר שלכם.')+'</p>'+
+       /* תווית מוסתרת ולא רק placeholder — ומחוץ למחרוזת המתורגמת,
+          כי המחרוזת כולה היא מפתח במילון ושינוי שלה מבטל את התרגום. */
+       '<label class="skip" for="nm">'+esc(_("שם או כינוי"))+'</label>'+
        _('<input id="nm" class="field" style="margin-top:12px" maxlength="18" placeholder="שם או כינוי" value="')+esc(state.name)+'" data-bind="name" />'
       :step===2?
        '<p class="sub sm">'+_('קובע אילו קורסים ייכנסו לתרגול. אפשר לשנות בכל רגע.')+'</p>'+
@@ -7448,7 +7461,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g15-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g16-pwa1").catch(function(){});
   });
 }
 </script>

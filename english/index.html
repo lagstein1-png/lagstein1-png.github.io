@@ -109,7 +109,7 @@ button{font:inherit;color:inherit}
 .brand small{font-size:.72rem;font-weight:600;color:var(--muted);letter-spacing:.06em}
 .gbtn{display:inline-flex;align-items:center;gap:.4rem;background:var(--surface);
   border:1px solid var(--line);border-radius:999px;padding:.42rem .8rem;cursor:pointer;
-  font-size:.86rem;font-weight:600;box-shadow:var(--shadow)}
+  font-size:.86rem;font-weight:600;box-shadow:var(--shadow);min-height:44px}
 .gbtn:hover{border-color:var(--accent)}
 .gbtn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 
@@ -238,7 +238,7 @@ button{font:inherit;color:inherit}
 .vstrip.ok{background:var(--ok-soft);color:var(--ok)}
 .vstrip.warn{background:var(--warn-soft);color:var(--warn)}
 .vstrip.bad{background:var(--bad-soft);color:var(--bad)}
-.vstrip .btn{padding:.3rem .7rem;min-height:2.1rem;font-size:.82rem}
+.vstrip .btn{padding:.3rem .7rem;min-height:44px;font-size:.82rem}  /* 2.1rem היו 36 פיקסלים — מתחת ליעד המגע */
 
 /* ===== הגדרות ===== */
 .row{display:flex;align-items:center;justify-content:space-between;gap:.8rem;
@@ -288,6 +288,35 @@ textarea.field{min-height:96px;resize:vertical}
 .tog .tt{flex:1;min-width:0}
 .tog .tt b{display:block;font-size:.97rem;overflow-wrap:anywhere}
 .tog .tt span{display:block;color:var(--muted);font-size:.85rem;overflow-wrap:anywhere;margin-top:2px}
+
+/* יעד מגע לקישור התחתית. קישור טקסט בשורה יוצא בגובה הטקסט —
+   15 פיקסלים — וזה קטן מדי לאצבע, גם כשהוא רק לתנאי השימוש. */
+.lg-foot a{display:inline-flex;align-items:center;min-height:44px;padding-inline:6px}
+
+/* ---------- יעדי מגע ----------
+   .lvl יצא 39 פיקסלים ומתג ה-.sw רק 31, שניהם מתחת ל-44 שהפרויקט
+   מחייב את עצמו בהם. במתג לא מגדילים את המסילה — היא תיראה מגושמת —
+   אלא מרחיבים את שטח הלחיצה סביבה. */
+.lvl{min-height:44px}
+.sw{position:relative}
+.sw::after{content:"";position:absolute;inset-block:-7px;inset-inline:-4px}
+
+/* ---------- מסך בניית המבחן ----------
+   .seg ו-.tpc הגיעו עם מודול המבחן שהועתק לכאן, ולא היה להם עיצוב:
+   כפתורי הבחירה יצאו 34 פיקסלים, וכרטיסי הנושאים 6 פיקסלים בלבד —
+   כלומר המורה לא יכול היה לבחור נושאים בכלל. */
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1 1 auto;min-width:0;min-height:44px;border:1px solid var(--line);
+  background:var(--surface);border-radius:10px;padding:10px 12px;font:inherit;
+  font-weight:600;font-size:.9rem;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.tpc{position:relative;display:flex;flex-direction:column;gap:9px;text-align:start;
+  background:var(--surface);border:1px solid var(--line);
+  border-inline-start:4px solid var(--c,var(--accent));border-radius:12px;padding:14px;
+  box-shadow:var(--shadow);min-width:0;min-height:44px;cursor:pointer;font:inherit;color:inherit}
+.tpc.on{border-color:var(--accent);background:var(--accent-soft)}
+.tpc .tn{font-weight:700;font-size:.98rem;overflow-wrap:anywhere;color:var(--c,var(--ink))}
+.tpc .td{color:var(--muted);font-size:.8rem;overflow-wrap:anywhere}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -550,7 +579,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n13 · 2026-08-29";
+var BUILD="n14 · 2026-08-29";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -2699,8 +2728,8 @@ function viewExamNew(){
   tops.forEach(function(t){
     var on=EB.topics.indexOf(t.id)>=0;
     h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" data-a="extopic" data-t="'+t.id+
-       '" aria-pressed="'+(on?"true":"false")+'"><span class="tn">'+esc(t.name)+'</span>'+
-       '<span class="td">'+esc(t.desc)+'</span></button>';
+       '" aria-pressed="'+(on?"true":"false")+'"><span class="tn">'+esc(tName(t))+'</span>'+
+       '<span class="td">'+esc(tDesc(t))+'</span></button>';
   });
   h+='</div></div>';
 
@@ -3295,7 +3324,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n13-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n14-pwa1").catch(function(){});
   });
 }
 </script>

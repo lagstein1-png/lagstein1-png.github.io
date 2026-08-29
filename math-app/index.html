@@ -350,6 +350,28 @@ textarea.field{min-height:96px;resize:vertical}
 .tog .tt{flex:1;min-width:0}
 .tog .tt b{display:block;font-size:.97rem;overflow-wrap:anywhere}
 .tog .tt span{display:block;font-size:.85rem;opacity:.78;overflow-wrap:anywhere;margin-top:2px}
+
+/* יעד מגע לקישור התחתית. קישור טקסט בשורה יוצא בגובה הטקסט —
+   15 פיקסלים — וזה קטן מדי לאצבע, גם כשהוא רק לתנאי השימוש. */
+.lg-foot a{display:inline-flex;align-items:center;min-height:44px;padding-inline:6px}
+
+/* ---------- מסך בניית המבחן ויעדי מגע ----------
+   .seg ו-.tpc הגיעו עם מודול המבחן שהועתק לכאן ולא היה להם עיצוב:
+   כפתורי הבחירה יצאו 17 פיקסלים וכרטיסי הנושאים לא נראו כלל.
+   בנוסף מוצמד גובה 44 לכל מה שנלחץ — המידה שהפרויקט מחייב את עצמו בה. */
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1 1 auto;min-width:0;min-height:44px;border:2px solid rgba(23,51,60,.12);
+  background:var(--paper);color:var(--ink-soft);border-radius:12px;padding:10px 12px;
+  font:inherit;font-weight:700;font-size:.9rem;cursor:pointer}
+.seg button.on{background:var(--teal);color:#fff;border-color:var(--teal-deep)}
+.tpc{position:relative;display:flex;flex-direction:column;gap:8px;text-align:start;
+  background:var(--paper);border:2px solid rgba(23,51,60,.12);
+  border-inline-start:5px solid var(--c,var(--teal));border-radius:16px;padding:14px;
+  min-width:0;min-height:44px;cursor:pointer;font:inherit;color:inherit}
+.tpc.on{border-color:var(--teal);background:var(--teal-soft)}
+.tpc .tn{font-weight:800;font-size:.98rem;overflow-wrap:anywhere}
+.tpc .td{color:var(--ink-soft);font-size:.8rem;overflow-wrap:anywhere}
+.btn,.lvl,.nb,button.chip{min-height:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1289,6 +1311,13 @@ function ic(n,cl){
   var w=String(cl).replace("w:","");
   var p={
     speaker:'<path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"/><path d="M15 9.5a4 4 0 0 1 0 5M17.5 7a8 8 0 0 1 0 10"/>',
+    /* חמשת אלה הגיעו עם מודול המבחן ולא היו כאן: ic() החזיר
+       undefined, ולשונית "מבחן" בניווט נקראה "undefinedמבחן". */
+    share:'<path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 16V3M7.5 7.5 12 3l4.5 4.5"/>',
+    copy:'<path d="M9 9h11v12H9zM5 15V5a2 2 0 0 1 2-2h8"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    book:'<path d="M4 5.5A2 2 0 0 1 6 3.5h13v14H6a2 2 0 0 0-2 2V5.5ZM4 19.5A2 2 0 0 1 6 17.5h13v3H6a2 2 0 0 1-2-1Z"/>',
+    back:'<path d="M19 12H6M11.5 5.5 5 12l6.5 6.5"/>',
     bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.8.6 1.6 1.7 1.6 2.7h4c0-1 .8-2.1 1.6-2.7A6 6 0 0 0 12 3Z"/>',
     gear:'<circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.08a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.08a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/>',
     pencil:'<path d="M17 3.5 20.5 7 8 19.5l-4.5 1 1-4.5L17 3.5Z"/><path d="m14.5 6 3.5 3.5"/>',
@@ -1319,7 +1348,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b22 · 2026-08-29";
+var BUILD="b23 · 2026-08-29";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -1430,6 +1459,7 @@ function onboarding(){
     '</div>'+
     '<p class="fd" style="font-weight:600;font-size:1.4rem;margin-top:26px"><span style="display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;margin-inline-end:10px">2</span>'+esc(t.step2)+'</p>'+
     '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">'+
+      '<label for="pname" style="position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)">'+esc(t.namePh)+'</label>'+
       '<input id="pname" data-bind="petName" maxlength="14" value="'+esc(state.petName||"")+'" placeholder="'+esc(sel?sugg[sel]:t.namePh)+'" style="flex:1;min-width:12rem;background:var(--paper);border:3px solid rgba(23,51,60,.2);border-radius:16px;padding:13px 16px;font-size:1.1rem;font-weight:500;outline:none" onfocus="this.style.borderColor=\'var(--teal)\'" onblur="this.style.borderColor=\'rgba(23,51,60,.2)\'"/>'+
       (sel?'<button class="btn btn-ghost" style="padding:10px 16px;font-size:.9rem" data-a="takesugg">'+esc(t.takeSugg)+' "'+esc(sugg[sel])+'"</button>':"")+
     '</div>'+
@@ -2229,8 +2259,8 @@ function viewExamNew(){
   tops.forEach(function(t){
     var on=EB.topics.indexOf(t.id)>=0;
     h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" data-a="extopic" data-t="'+t.id+
-       '" aria-pressed="'+(on?"true":"false")+'"><span class="tn">'+esc(t.name)+'</span>'+
-       '<span class="td">'+esc(t.desc)+'</span></button>';
+       '" aria-pressed="'+(on?"true":"false")+'"><span class="tn">'+esc(tName(t))+'</span>'+
+       (typeof tDesc==="function"?'<span class="td">'+esc(tDesc(t))+'</span>':"")+'</button>';
   });
   h+='</div></div>';
 
@@ -2970,7 +3000,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b22-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b23-pwa1").catch(function(){});
   });
 }
 </script>

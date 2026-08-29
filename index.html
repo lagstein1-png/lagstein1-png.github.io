@@ -69,6 +69,7 @@ body{
 .logo{
   display:flex; align-items:center; gap:11px; text-decoration:none;
   color:inherit; font-weight:800; font-size:1.05rem; margin-inline-end:auto;
+  min-block-size:44px;
 }
 .mark{
   inline-size:38px; block-size:38px; border-radius:11px; flex:none;
@@ -86,26 +87,28 @@ body{
    שנגללת לרוחב. בלי זה כפתור מצב הכהה נדחק לשורה משלו והסרגל
    הדביק אכל שליש ממסך הטלפון. */
 @media (max-width:720px){
+  /* מצמצמים ברוחב ולא בגובה: 44 פיקסלים הוא יעד המגע, וכל ירידה
+     ממנו פוגעת קודם כול במי שהאפליקציות האלה נבנו בשבילו. */
   .topbar .wrap{min-block-size:0; gap:8px}
-  .logo{font-size:.98rem; gap:8px}
-  .mark{inline-size:32px; block-size:32px; border-radius:9px; font-size:1rem}
+  .logo{font-size:.98rem; gap:8px; min-block-size:44px}
+  .mark{inline-size:34px; block-size:34px; border-radius:10px; font-size:1.05rem}
   .lang{padding:2px}
-  .lang button{min-block-size:36px; min-inline-size:38px; padding-inline:7px; font-size:.8rem}
-  .ico{min-block-size:38px; min-inline-size:38px; border-radius:10px}
+  .lang button{min-block-size:44px; min-inline-size:44px; padding-inline:6px; font-size:.8rem}
+  .ico{min-block-size:44px; min-inline-size:44px; border-radius:11px}
   .nav{
     order:9; inline-size:100%; flex-wrap:nowrap; overflow-x:auto;
     scrollbar-width:none; padding-block-end:2px;
   }
   .nav::-webkit-scrollbar{display:none}
-  .nav a{flex:none; min-block-size:40px; font-size:.9rem}
-  section.blk{scroll-margin-block-start:112px}
+  .nav a{flex:none; min-block-size:44px; font-size:.9rem}
+  section.blk{scroll-margin-block-start:120px}
 }
 
 /* --- כפתורי שפה ומצב כהה --- */
 .lang{display:flex; gap:4px; background:var(--bg-elev);
   border:1px solid var(--line); border-radius:999px; padding:3px}
 .lang button{
-  min-block-size:38px; min-inline-size:44px; padding-inline:10px; border:0;
+  min-block-size:44px; min-inline-size:44px; padding-inline:10px; border:0;
   border-radius:999px; background:none; color:var(--text-soft); cursor:pointer;
   font:700 .86rem/1 Heebo,system-ui,sans-serif;
 }
@@ -464,7 +467,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=3-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=4-pwa1").catch(function(){});
   });
 }
 </script>

@@ -325,7 +325,11 @@ footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface
 .fbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;
   padding-block:16px;font-size:.82rem;color:var(--muted)}
 .skip{position:absolute;inset-inline-start:-9999px}
-.skip:focus{position:static;display:inline-block;margin:8px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);border-radius:8px}
+.skip:focus{position:static;display:inline-flex;align-items:center;min-height:44px;margin:8px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);border-radius:8px}
+
+/* יעד מגע לקישור התחתית. קישור טקסט בשורה יוצא בגובה הטקסט —
+   15 פיקסלים — וזה קטן מדי לאצבע, גם כשהוא רק לתנאי השימוש. */
+.lg-foot a{display:inline-flex;align-items:center;min-height:44px;padding-inline:6px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -493,7 +497,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t13 · 2026-08-29";
+var BUILD="t14 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -2457,6 +2461,7 @@ function viewOnboard(){
      '<div class="h2">'+(step===1?"1. איך לקרוא לכם?":step===2?"2. באיזה מסלול אתם?":"3. איך נוח לכם לקרוא?")+'</div>'+
      (step===1?
        '<p class="sub sm">לא חובה. זה נשמר רק במכשיר שלכם.</p>'+
+       '<label class="skip" for="nm">שם או כינוי</label>'+
        '<input id="nm" class="field" style="margin-top:12px" maxlength="18" placeholder="שם או כינוי" value="'+esc(state.name)+'" data-bind="name" />'
       :step===2?
        '<p class="sub sm">קובע אילו נושאים יוצעו לכם. אפשר לשנות בכל רגע.</p>'+
@@ -3812,7 +3817,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t13-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t14-pwa1").catch(function(){});
   });
 }
 </script>
