@@ -503,6 +503,9 @@ var ICONS={
   target:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 16.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM12 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z',
   list:'M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01',
   pause:'M9 5v14M15 5v14',
+  copy:'M9 9h11v12H9zM5 15V5a2 2 0 0 1 2-2h8',
+  plus:'M12 5v14M5 12h14',
+  share:'M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 16V3M7.5 7.5 12 3l4.5 4.5',
   eye:'M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Zm10 2.6a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2Z'
 };
 function ic(name,size){
@@ -557,7 +560,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u6 · 2026-08-29";
+var BUILD="u7 · 2026-08-29";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -2652,7 +2655,8 @@ var TRACKS=[{v:1,t:"מדעים והנדסה"},{v:2,t:"מדעי המחשב"},{v:3
 
 function header(){
   var nav=[["home",_("בית"),"home"],["practice",_("תרגול"),"pencil"],["topics",_("נושאים"),"list"],
-           ["formulas",_("נוסחאות"),"book"],["progress",_("התקדמות"),"chart"],["settings",_("הגדרות"),"gear"]];
+           ["formulas",_("נוסחאות"),"book"],["progress",_("התקדמות"),"chart"],
+           ["marks",_("מבחן"),"share"],["settings",_("הגדרות"),"gear"]];
   return '<header><div class="wrap hbar">'+
     '<button class="brand" data-a="go" data-v="home" aria-label="'+esc(_('לדף הבית'))+'">'+
       '<span class="mk">'+_('א')+'</span><span><b>'+_('אקסיומה')+'</b><small>'+_('מתמטיקה לתואר ראשון')+'</small></span></button>'+
@@ -3153,12 +3157,598 @@ _f("{0}{1} לשמוע דוגמה</button>", '<button class="btn btn-g w" style="
   h+='<p class="sub xs" style="margin-top:18px;text-align:center">'+_('אקסיומה · גרסה')+' '+BUILD+'</p>';
   return h+'</main>';
 }
+
+/* ============================================================
+   18. מבחן כיתתי — פרסום בוואטסאפ, קבלת תשובות וציונים
+   ------------------------------------------------------------
+   אין שרת, ואין כוונה שיהיה. לכן המבחן אינו נשלח לשום מקום:
+   הוא *נארז לתוך הקישור*. המורה מקבל קישור, שולח אותו בוואטסאפ,
+   והמכשיר של התלמיד בונה מהקישור בדיוק את אותן שאלות.
+
+   מה שהופך את זה לאפשרי הוא שכל מחולל שאלות כאן משתמש ב-
+   Math.random בלבד. אם מזרעים אותו, אותו זרע מייצר את אותן
+   שאלות ואת אותו סדר תשובות — אצל המורה ואצל התלמיד. הקישור
+   נושא זרע ורשימת נושאים, לא עשרים שאלות מלאות, ולכן הוא נשאר
+   קצר מספיק לוואטסאפ.
+
+   שלוש מגבלות שנאמרות כאן במפורש כי הן חלק מהתכנון:
+   · אין איסוף אוטומטי. התלמיד שולח קוד תשובות בוואטסאפ, והמורה
+     מדביק אותו. זה המחיר של אפס שרת ואפס עלות.
+   · אפשר לזייף קוד. הציון מחושב מחדש אצל המורה מתוך התשובות
+     ולא נלקח מהתלמיד, אבל אין כאן הגנה קריפטוגרפית — זה מבחן
+     כיתתי מעצב, לא בגרות.
+   · שמות התלמידים נשארים במכשיר של המורה. הם לא עוברים דרך
+     שום שרת, כי אין שרת.
+   ============================================================ */
+var GENV=1;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
+                               אינו נפתח — עדיף הודעה ברורה מאשר
+                               עשרים שאלות אחרות בשקט. */
+var EKEY="shlav-exams-v1";
+
+/* --- מחולל מזורע. mulberry32: קצר, מהיר, ופיזור טוב דיו --- */
+function withSeed(seed,fn){
+  var real=Math.random,s=(seed>>>0)||1;
+  Math.random=function(){
+    s|=0; s=s+0x6D2B79F5|0;
+    var t=Math.imul(s^s>>>15,1|s);
+    t=t+Math.imul(t^t>>>7,61|t)^t;
+    return ((t^t>>>14)>>>0)/4294967296;
+  };
+  try{return fn()}finally{Math.random=real}
+}
+function hash32(str){
+  var h=0x811c9dc5,i;
+  for(i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,0x01000193)}
+  return (h>>>0);
+}
+/* base64url. הניקוי בפענוח אינו קוסמטי: וואטסאפ שובר מחרוזות
+   ארוכות בשורות, ורווח אחד הורס את כל הקוד. */
+function b64e(str){
+  var bytes=new TextEncoder().encode(str),bin="",i;
+  for(i=0;i<bytes.length;i+=8192)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+8192));
+  return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function b64d(s){
+  s=String(s||"").replace(/[^A-Za-z0-9\-_]/g,"").replace(/-/g,"+").replace(/_/g,"/");
+  while(s.length%4)s+="=";
+  var bin=atob(s),bytes=new Uint8Array(bin.length),i;
+  for(i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+function examId(spec){return hash32(spec.s+"|"+spec.q.map(function(x){return x[0]+x[1]}).join(",")).toString(36)}
+function encodeExam(spec){return b64e(JSON.stringify(spec))}
+function decodeExam(code){
+  try{
+    var o=JSON.parse(b64d(code));
+    if(!o||!o.q||!o.q.length||typeof o.s!=="number")return null;
+    o.q=o.q.filter(function(x){return topicById(x[0])});
+    return o.q.length?o:null;
+  }catch(e){return null}
+}
+/* בונה את שאלות המבחן. אותו זרע → אותן שאלות, גם אצל המורה
+   כשהוא בודק וגם אצל התלמיד כשהוא נבחן. */
+function examQuestions(spec){
+  return withSeed(spec.s,function(){
+    return spec.q.map(function(pair){return buildQ(pair[0],pair[1])});
+  });
+}
+function examUrl(spec){
+  var base=location.origin+location.pathname;
+  return base+"#x="+encodeExam(spec);
+}
+function waLink(text,phone){
+  var p=String(phone||"").replace(/[^0-9]/g,"");
+  return "https://wa.me/"+p+"?text="+encodeURIComponent(text);
+}
+
+/* --- אחסון מבחנים והגשות, בנפרד מהתקדמות התלמיד --- */
+var EX={list:[]};
+function exLoad(){
+  try{var r=localStorage.getItem(EKEY);if(r){var o=JSON.parse(r);if(o&&o.list)EX=o}}catch(e){}
+  if(!EX.list)EX.list=[];
+}
+function exSave(){try{localStorage.setItem(EKEY,JSON.stringify(EX))}catch(e){}}
+function exFind(id){for(var i=0;i<EX.list.length;i++)if(EX.list[i].id===id)return EX.list[i];return null}
+
+/* --- קוד ההגשה של התלמיד --- */
+function encodeResult(id,name,answers){
+  var body={i:id,n:String(name||"").slice(0,40),a:answers,d:todayIso()};
+  body.c=hash32(JSON.stringify([body.i,body.n,body.a])).toString(36);
+  return b64e(JSON.stringify(body));
+}
+function decodeResult(code){
+  try{
+    var o=JSON.parse(b64d(code));
+    if(!o||!o.i||!o.a||!o.a.length)return null;
+    o.ok=(o.c===hash32(JSON.stringify([o.i,o.n,o.a])).toString(36));
+    return o;
+  }catch(e){return null}
+}
+/* הציון מחושב כאן מחדש מתוך התשובות. מה שהתלמיד שלח הוא מה
+   שסימן, לא כמה הוא קיבל. */
+function gradeResult(spec,res){
+  var qs=examQuestions(spec),per=[],ok=0,i,q,a;
+  for(i=0;i<qs.length;i++){
+    q=qs[i]; a=res.a[i];
+    var right=(a>=0&&q.options[a]&&q.options[a].ok)?1:0;
+    if(right)ok++;
+    per.push({topic:q.topic,topicName:q.topicName,ok:right,
+              picked:(a>=0&&q.options[a])?q.options[a].t:"—",
+              answer:(q.options.filter(function(o){return o.ok})[0]||{}).t||""});
+  }
+  return {ok:ok,n:qs.length,pct:Math.round(100*ok/qs.length),per:per};
+}
+
+/* ------------------------------------------------------------
+   מסך המורה — בניית מבחן
+   ------------------------------------------------------------ */
+var EB={title:"",n:10,level:2,topics:[],phone:"",tts:true,formulas:true,built:null,copied:""};
+
+function viewExamNew(){
+  var tops=topicsForTrack(state.track);
+  if(!EB.topics.length)EB.topics=tops.slice(0,4).map(function(t){return t.id});
+  var h='<div class="wrap" style="padding-block:22px">';
+  h+='<h1 class="h1">מבחן כיתתי</h1>'+
+     '<p class="sub">בונים מבחן, שולחים קישור בוואטסאפ, ומקבלים בחזרה קוד תשובות לכל תלמיד. '+
+     'אין שרת ואין חשבון — הכול עובר דרך הקישור ודרך וואטסאפ.</p>';
+
+  h+='<div class="card pad" style="margin-top:16px">';
+  h+='<label class="tt"><b>שם המבחן</b></label>'+
+     '<input class="field" id="exTitle" value="'+esc(EB.title)+'" placeholder="למשל: מבחן אלגברה — כיתה ט׳2" maxlength="60">';
+
+  h+='<div style="margin-top:16px"><b>יחידות</b>'+
+     '<div class="seg" style="margin-top:7px">'+[3,4,5].map(function(tr){
+       return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'">'+tr+' יח״ל</button>'
+     }).join("")+'</div></div>';
+
+  h+='<div style="margin-top:16px"><b>רמה</b><div class="seg" style="margin-top:7px">'+
+     LVL.map(function(l,i){
+       return '<button class="'+(EB.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
+     }).join("")+'</div></div>';
+
+  h+='<div style="margin-top:16px"><b>מספר שאלות: <span id="exNlab">'+EB.n+'</span></b>'+
+     '<input type="range" min="5" max="25" step="1" value="'+EB.n+'" data-slide="exn" style="margin-top:6px"></div>';
+
+  h+='<div style="margin-top:18px"><b>נושאים</b>'+
+     '<p class="sub" style="margin:4px 0 8px">השאלות מתחלקות שווה בשווה בין הנושאים שנבחרו.</p>'+
+     '<div class="grid g2">';
+  tops.forEach(function(t){
+    var on=EB.topics.indexOf(t.id)>=0;
+    h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" data-a="extopic" data-t="'+t.id+
+       '" aria-pressed="'+(on?"true":"false")+'"><span class="tn">'+esc(t.name)+'</span>'+
+       '<span class="td">'+esc(t.desc)+'</span></button>';
+  });
+  h+='</div></div>';
+
+  /* התאמות. לא "הקלות" — הן הסיבה שהאפליקציה הזאת קיימת, והמורה
+     הוא זה שמחליט מה מותר במבחן שלו. */
+  h+='<div style="margin-top:18px"><b>התאמות לנבחנים</b>'+
+     '<p class="sub" style="margin:4px 0 8px">מה שמותר בבחינה עצמה. ההקראה ודף הנוסחאות אינם רמז — הם כלי נגישות.</p>';
+  [["tts","הקראה קולית","כל שאלה נקראת בקול לפי בקשה"],
+   ["formulas","דף נוסחאות","נגיש מתוך המבחן, כמו בבגרות"]].forEach(function(r){
+    var on=!!EB[r[0]];
+    h+='<button class="tog" data-a="exflag" data-f="'+r[0]+'" role="switch" aria-checked="'+(on?"true":"false")+'">'+
+      '<span class="tt"><b>'+esc(r[1])+'</b><span>'+esc(r[2])+'</span></span><span class="sw"></span></button>';
+  });
+  h+='</div>';
+
+  h+='<div style="margin-top:18px"><label class="tt"><b>מספר הוואטסאפ שלכם (לא חובה)</b></label>'+
+     '<p class="sub" style="margin:4px 0 6px">אם תמלאו — כפתור השליחה אצל התלמיד ייפתח ישר לצ׳אט איתכם. '+
+     'שימו לב: המספר יופיע בתוך הקישור שאתם משתפים.</p>'+
+     '<input class="field" id="exPhone" value="'+esc(EB.phone)+'" placeholder="972501234567" inputmode="tel" maxlength="20"></div>';
+
+  h+='<button class="btn btn-p w" style="margin-top:20px" data-a="exbuild">'+ic("check",18)+' צרו את המבחן</button>';
+  h+='</div>';
+
+  if(EB.built){
+    var sp=EB.built,url=examUrl(sp);
+    var msg=(sp.t||"מבחן")+"\n"+sp.q.length+" שאלות. נכנסים לקישור, פותרים, ובסוף שולחים לי את הקוד.\n"+url;
+    h+='<div class="card pad" style="margin-top:18px;border-color:var(--ok)">'+
+       '<h2 class="h2">המבחן מוכן</h2>'+
+       '<p class="sub">'+esc(sp.t||"מבחן")+' · '+sp.q.length+' שאלות · '+esc(LVL[sp.l-1]||"")+'</p>'+
+       '<div class="row" style="margin-top:12px">'+
+       '<a class="btn btn-p" href="'+esc(waLink(msg,""))+'" target="_blank" rel="noopener">'+
+       ic("share",17)+' שליחה בוואטסאפ</a>'+
+       '<button class="btn" data-a="excopy" data-v="'+esc(url)+'">'+ic("copy",17)+' העתקת הקישור</button>'+
+       '<button class="btn btn-g" data-a="go" data-v="marks">'+ic("chart",17)+' לציונים</button></div>'+
+       (EB.copied==="url"?'<p class="chip ok" style="margin-top:10px">הקישור הועתק</p>':"")+
+       '<p class="sub" style="margin-top:12px;word-break:break-all;direction:ltr;text-align:left">'+esc(url)+'</p>'+
+       '</div>';
+  }
+  return h+'</div>';
+}
+
+/* ------------------------------------------------------------
+   מסך המורה — ציונים
+   ------------------------------------------------------------ */
+var MK={open:"",paste:"",msg:null,del:""};
+function viewMarks(){
+  var h='<div class="wrap" style="padding-block:22px">';
+  h+='<h1 class="h1">ציונים</h1>'+
+     '<p class="sub">מדביקים כאן את הקוד שהתלמיד שלח בוואטסאפ. הציון מחושב מחדש מהתשובות עצמן, '+
+     'ולא נלקח ממה שהתלמיד כתב.</p>';
+  h+='<div class="row" style="margin-top:14px"><button class="btn btn-p" data-a="go" data-v="exam">'+
+     ic("plus",17)+' מבחן חדש</button></div>';
+
+  if(!EX.list.length){
+    h+='<div class="card pad" style="margin-top:16px"><p class="sub" style="margin:0">'+
+       'עוד לא יצרתם מבחן. אפשר להתחיל מ״מבחן חדש״.</p></div>';
+    return h+'</div>';
+  }
+  EX.list.forEach(function(ex){
+    var open=MK.open===ex.id;
+    var subs=ex.subs||[];
+    var avg=subs.length?Math.round(subs.reduce(function(a,b){return a+b.pct},0)/subs.length):0;
+    h+='<div class="card pad" style="margin-top:14px">';
+    h+='<button class="row" data-a="mkopen" data-i="'+esc(ex.id)+'" style="width:100%;background:none;border:0;text-align:start;cursor:pointer">'+
+       '<span style="flex:1;min-width:0"><b>'+esc(ex.spec.t||"מבחן")+'</b>'+
+       '<span class="sub" style="display:block">'+ex.spec.q.length+' שאלות · '+esc(ex.date)+
+       ' · '+subs.length+' הגשות'+(subs.length?' · ממוצע '+avg:'')+'</span></span>'+
+       '<span class="chip'+(subs.length?(avg>=70?" ok":avg>=55?" warn":" bad"):"")+'">'+
+       (subs.length?avg+"%":"—")+'</span></button>';
+    if(!open){h+='</div>';return}
+
+    h+='<div style="margin-top:14px"><label class="tt"><b>הדבקת קוד תשובות</b></label>'+
+       '<textarea class="field" id="mkPaste" rows="3" placeholder="מדביקים כאן את הקוד מהוואטסאפ"></textarea>'+
+       '<div class="row" style="margin-top:8px">'+
+       '<button class="btn btn-p" data-a="mkadd" data-i="'+esc(ex.id)+'">'+ic("check",17)+' קליטה</button>'+
+       '<a class="btn" href="'+esc(waLink((ex.spec.t||"מבחן")+"\n"+examUrl(ex.spec),""))+'" target="_blank" rel="noopener">'+
+       ic("share",17)+' שליחה שוב</a>'+
+       (subs.length?'<button class="btn btn-g" data-a="mkcopy" data-i="'+esc(ex.id)+'">'+ic("copy",17)+' העתקת טבלה</button>':"")+
+       (MK.del===ex.id?
+         '<span class="row" style="gap:6px"><span class="chip bad">למחוק את המבחן ואת '+
+         (subs.length||0)+' ההגשות?</span>'+
+         '<button class="btn btn-d" data-a="mkdelyes" data-i="'+esc(ex.id)+'">כן, למחוק</button>'+
+         '<button class="btn btn-g" data-a="mkdelno">ביטול</button></span>':
+         '<button class="btn btn-g" data-a="mkdel" data-i="'+esc(ex.id)+'">מחיקת המבחן</button>')+
+       '</div>';
+    if(MK.msg&&MK.msg.id===ex.id)
+      h+='<p class="chip '+(MK.msg.ok?"ok":"bad")+'" style="margin-top:10px">'+esc(MK.msg.m)+'</p>';
+    h+='</div>';
+
+    if(subs.length){
+      /* לפי תלמיד */
+      h+='<div style="margin-top:16px"><b>לפי תלמיד</b>';
+      subs.slice().sort(function(a,b){return b.pct-a.pct}).forEach(function(s){
+        var wrong=s.per.filter(function(p){return !p.ok});
+        h+='<div class="tog" style="align-items:flex-start"><span class="tt"><b>'+esc(s.name||"ללא שם")+'</b>'+
+          '<span>'+s.ok+' מתוך '+s.n+(wrong.length?' · נפל ב: '+esc(uniq(wrong.map(function(p){return p.topicName})).join(", ")):' · הכול נכון')+
+          (s.valid?"":' · <b style="color:var(--bad)">הקוד לא תואם לעצמו</b>')+'</span></span>'+
+          '<span class="chip '+(s.pct>=70?"ok":s.pct>=55?"warn":"bad")+'">'+s.pct+'%</span></div>';
+      });
+      h+='</div>';
+      /* לפי נושא — זה מה שמורה באמת צריך: לא מי נכשל, אלא מה ללמד שוב */
+      var byT={};
+      subs.forEach(function(s){s.per.forEach(function(p){
+        if(!byT[p.topic])byT[p.topic]={n:0,ok:0,name:p.topicName};
+        byT[p.topic].n++; byT[p.topic].ok+=p.ok;
+      })});
+      h+='<div style="margin-top:16px"><b>לפי נושא — מה כדאי ללמד שוב</b>'+
+         '<p class="sub" style="margin:4px 0 8px">אחוז ההצלחה של כל הכיתה יחד.</p>';
+      Object.keys(byT).map(function(k){var o=byT[k];o.pct=Math.round(100*o.ok/o.n);return o})
+        .sort(function(a,b){return a.pct-b.pct}).forEach(function(o){
+        h+='<div class="tog"><span class="tt"><b>'+esc(o.name)+'</b>'+
+          '<span>'+o.ok+' תשובות נכונות מתוך '+o.n+'</span></span>'+
+          '<span class="bar '+(o.pct>=70?"ok":o.pct>=40?"mid":"low")+'" style="width:90px;flex:none">'+
+          '<i style="width:'+o.pct+'%"></i></span>'+
+          '<span class="chip">'+o.pct+'%</span></div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+  });
+  return h+'</div>';
+}
+function marksTable(ex){
+  var out=(ex.spec.t||"מבחן")+"\n";
+  out+="תלמיד\tציון\tנכונות\tנפל ב\n";
+  (ex.subs||[]).slice().sort(function(a,b){return b.pct-a.pct}).forEach(function(s){
+    var wrong=uniq(s.per.filter(function(p){return !p.ok}).map(function(p){return p.topicName}));
+    out+=(s.name||"ללא שם")+"\t"+s.pct+"\t"+s.ok+"/"+s.n+"\t"+wrong.join(", ")+"\n";
+  });
+  return out;
+}
+
+/* ------------------------------------------------------------
+   מסך התלמיד — מבחן מתוך קישור
+   ------------------------------------------------------------ */
+var SIT={spec:null,id:"",qs:[],i:0,name:"",answers:[],phase:"intro",code:"",copied:false};
+
+function sitStart(){
+  var nm=$("#sitName"); SIT.name=nm?nm.value.trim():"";
+  SIT.qs=examQuestions(SIT.spec);
+  SIT.answers=SIT.qs.map(function(){return -1});
+  SIT.i=0; SIT.phase="ask";
+  window.scrollTo(0,0); render();
+}
+function sitAnswer(i){
+  if(SIT.phase!=="ask")return;
+  SIT.answers[SIT.i]=i;
+  sitNext();
+}
+function sitNext(){
+  if(SIT.i+1<SIT.qs.length){SIT.i++;window.scrollTo(0,0);render();return}
+  /* לא מגישים בלחיצה על תשובה. לחיצה בטעות על האפשרות האחרונה
+     אינה אמורה לסיים מבחן. */
+  SIT.phase="review"; stopSpeak(); window.scrollTo(0,0); render();
+}
+function sitGo(i){
+  SIT.i=clamp(i,0,SIT.qs.length-1); SIT.phase="ask";
+  window.scrollTo(0,0); render();
+}
+function sitFinish(){
+  SIT.phase="done";
+  SIT.code=encodeResult(SIT.id,SIT.name,SIT.answers);
+  stopSpeak(); window.scrollTo(0,0); render();
+}
+function sitGrade(){
+  var ok=0,i;
+  for(i=0;i<SIT.qs.length;i++){
+    var a=SIT.answers[i];
+    if(a>=0&&SIT.qs[i].options[a]&&SIT.qs[i].options[a].ok)ok++;
+  }
+  return {ok:ok,n:SIT.qs.length,pct:Math.round(100*ok/SIT.qs.length)};
+}
+function viewSit(){
+  var sp=SIT.spec;
+  if(SIT.phase==="intro"){
+    var h='<div class="wrap" style="padding-block:26px;max-width:620px">';
+    h+='<div class="card pad"><h1 class="h1">'+esc(sp.t||"מבחן")+'</h1>'+
+       '<p class="sub">'+sp.q.length+' שאלות · '+esc(LVL[sp.l-1]||"")+' · בלי הגבלת זמן.</p>';
+    h+='<ul class="sub" style="margin:14px 0 0;padding-inline-start:20px;line-height:1.9">'+
+       '<li>אין טיימר. אפשר לקחת את הזמן.</li>'+
+       '<li>אין ניקוד שלילי — תשובה לא נכונה לא גורעת.</li>'+
+       (sp.r!==false?'<li>אפשר לבקש הקראה של כל שאלה.</li>':'<li>ההקראה כבויה במבחן הזה.</li>')+
+       (sp.f!==false?'<li>דף הנוסחאות פתוח לאורך כל המבחן.</li>':'<li>דף הנוסחאות סגור במבחן הזה.</li>')+
+       '<li>בסוף תקבלו קוד — שולחים אותו למורה בוואטסאפ.</li></ul>';
+    h+='<label class="tt" style="display:block;margin-top:18px"><b>השם שלכם</b></label>'+
+       '<p class="sub" style="margin:2px 0 6px">כדי שהמורה יידע מי ענה. השם לא נשלח לשום שרת — הוא נכנס לתוך הקוד.</p>'+
+       '<input class="field" id="sitName" value="'+esc(SIT.name)+'" placeholder="שם פרטי ושם משפחה" maxlength="40">';
+    h+='<button class="btn btn-p w" style="margin-top:16px" data-a="sitstart">'+ic("arrow",18)+' מתחילים</button>';
+    h+='</div></div>';
+    return h;
+  }
+  if(SIT.phase==="ask"){
+    var q=SIT.qs[SIT.i];
+    var h2='<main class="wrap" style="padding-block:18px">';
+    h2+='<div class="spread"><div class="row">'+
+        '<span class="chip area '+topicCls(q.topic)+'">'+esc(q.topicName)+'</span>'+
+        '<span class="chip">שאלה '+(SIT.i+1)+' מתוך '+SIT.qs.length+'</span></div>'+
+        '<span class="dots">'+SIT.answers.map(function(a,i){
+          return '<span class="dot '+(i<SIT.i?(a>=0?"ok":"no"):"")+'"></span>'}).join("")+'</span></div>';
+    h2+='<div class="card pad rise '+topicCls(q.topic)+'" style="border-top:3px solid var(--c);margin-top:14px">';
+    h2+='<p style="font-size:clamp(1rem,3.6vw,1.15rem);font-weight:600">'+q.ask+'</p>';
+    if(q.expr)h2+='<p class="mline" style="margin-top:14px">'+q.expr+'</p>';
+    if(q.fig)h2+=q.fig;
+    var tools=[];
+    if(sp.r!==false&&state.settings.tts)
+      tools.push('<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="sitread">'+ic("speaker",16)+' הקראה</button>');
+    if(sp.f!==false)
+      tools.push('<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="sitform">'+ic("book",16)+' דף נוסחאות</button>');
+    if(tools.length)h2+='<div class="row" style="margin-top:16px;gap:8px">'+tools.join("")+'</div>';
+    var cur=SIT.answers[SIT.i];
+    h2+='<div class="opts">'+q.options.map(function(o,i){
+      return '<button class="opt'+(cur===i?" right":"")+'" data-a="sitans" data-i="'+i+'">'+
+        '<span class="k">'+(i+1)+'</span><span class="m">'+o.h+'</span></button>';
+    }).join("")+'</div>';
+    /* "לא יודע/ת" הוא תשובה לגיטימית ולא דילוג. היא נספרת כשגויה,
+       אבל היא מגלה למורה משהו שניחוש מסתיר. */
+    h2+='<div class="row" style="margin-top:14px">'+
+        (SIT.i>0?'<button class="btn btn-g" data-a="sitprev">'+ic("back",16)+' קודמת</button>':"")+
+        '<button class="btn btn-g" data-a="sitskip">לא יודע/ת</button>'+
+        (cur>=0?'<button class="btn btn-g" data-a="sitfwd">הבאה '+ic("arrow",16)+'</button>':"")+
+        '</div>';
+    h2+='</div></main>';
+    return h2;
+  }
+  if(SIT.phase==="review"){
+    var notYet=SIT.answers.filter(function(a){return a<0}).length;
+    var hr='<div class="wrap" style="padding-block:24px;max-width:640px"><div class="card pad">'+
+      '<h1 class="h1">לפני ההגשה</h1>'+
+      '<p class="sub">אפשר לחזור לכל שאלה ולשנות. אחרי ההגשה נוצר הקוד.</p>'+
+      (notYet?'<p class="chip warn" style="margin-top:10px">'+notYet+' שאלות בלי תשובה</p>':
+              '<p class="chip ok" style="margin-top:10px">כל השאלות נענו</p>');
+    SIT.qs.forEach(function(q,i){
+      var a=SIT.answers[i];
+      hr+='<button class="tog" data-a="sitgo" data-i="'+i+'" style="align-items:flex-start">'+
+        '<span class="tt"><b>'+(i+1)+'. '+esc(q.topicName)+'</b>'+
+        '<span>'+(a>=0?"סימנתם: "+q.options[a].h:"<b>עוד לא עניתם</b>")+'</span></span>'+
+        '<span class="chip'+(a>=0?"":" warn")+'">'+(a>=0?"שינוי":"למלא")+'</span></button>';
+    });
+    hr+='<button class="btn btn-p w" style="margin-top:16px" data-a="sitfinish">'+
+        ic("check",18)+' סיימתי — ליצירת הקוד</button>';
+    return hr+'</div></div>';
+  }
+  /* סיום */
+  var g=sitGrade(),msg;
+  msg=(SIT.name||"תלמיד")+" — "+esc(sp.t||"מבחן")+"\nציון: "+g.pct+" ("+g.ok+"/"+g.n+")\nקוד:\n"+SIT.code;
+  var h3='<div class="wrap" style="padding-block:26px;max-width:640px">';
+  h3+='<div class="card pad"><h1 class="h1">סיימתם</h1>'+
+      '<p class="sub">'+esc(sp.t||"מבחן")+'</p>'+
+      '<div class="row" style="margin-top:12px"><span class="chip '+(g.pct>=70?"ok":g.pct>=55?"warn":"bad")+
+      '" style="font-size:1.4rem;padding:10px 18px">'+g.pct+'</span>'+
+      '<span class="sub">'+g.ok+' נכונות מתוך '+g.n+'</span></div>';
+  h3+='<p class="sub" style="margin-top:16px"><b>עכשיו שולחים את הקוד למורה.</b> '+
+      'הקוד מכיל את השם ואת התשובות שסימנתם — המורה מחשב את הציון אצלו מחדש.</p>';
+  h3+='<div class="row" style="margin-top:12px">'+
+      '<a class="btn btn-p" href="'+esc(waLink(msg,sp.p||""))+'" target="_blank" rel="noopener">'+
+      ic("share",17)+' שליחה בוואטסאפ'+(sp.p?' למורה':'')+'</a>'+
+      '<button class="btn" data-a="sitcopy">'+ic("copy",17)+' העתקת הקוד</button></div>';
+  if(SIT.copied)h3+='<p class="chip ok" style="margin-top:10px">הקוד הועתק</p>';
+  h3+='<p class="sub" style="margin-top:12px;word-break:break-all;direction:ltr;text-align:left;'+
+      'background:var(--surface2);border-radius:10px;padding:10px">'+esc(SIT.code)+'</p>';
+  h3+='</div>';
+
+  if(sp.w!==false){
+    h3+='<div class="card pad" style="margin-top:16px"><h2 class="h2">מה היה נכון</h2>'+
+        '<p class="sub">בשביל ללמוד מזה, לא בשביל הציון.</p>';
+    SIT.qs.forEach(function(q,i){
+      var a=SIT.answers[i],right=(a>=0&&q.options[a]&&q.options[a].ok);
+      var corr=(q.options.filter(function(o){return o.ok})[0]||{}).h||"";
+      h3+='<div class="tog" style="align-items:flex-start"><span class="tt">'+
+        '<b>'+(i+1)+'. '+esc(q.topicName)+'</b>'+
+        '<span>'+(right?"נכון":"התשובה הנכונה: "+corr)+'</span></span>'+
+        '<span class="chip '+(right?"ok":"bad")+'">'+(right?"✓":"✗")+'</span></div>';
+    });
+    h3+='</div>';
+  }
+  h3+='<div class="row" style="margin-top:16px"><a class="btn btn-g" href="'+
+      esc(location.origin+location.pathname)+'">לאפליקציה עצמה — לתרגול חופשי</a></div>';
+  return h3+'</div>';
+}
+
+/* ------------------------------------------------------------
+   פעולות המבחן
+   ------------------------------------------------------------ */
+function copyText(txt,done){
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done,function(){fallbackCopy(txt,done)});
+      return;
+    }
+  }catch(e){}
+  fallbackCopy(txt,done);
+}
+function fallbackCopy(txt,done){
+  try{
+    var ta=document.createElement("textarea");
+    ta.value=txt; ta.setAttribute("readonly","");
+    ta.style.position="fixed"; ta.style.top="-1000px";
+    document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+    done();
+  }catch(e){}
+}
+function examAction(a,el){
+  /* --- בניית מבחן --- */
+  if(a==="exlvl"){EB.level=parseInt(el.getAttribute("data-l"),10)||2;EB.built=null;render();return true}
+  if(a==="extopic"){
+    var id=el.getAttribute("data-t"),k=EB.topics.indexOf(id);
+    if(k>=0)EB.topics.splice(k,1);else EB.topics.push(id);
+    EB.built=null;render();return true;
+  }
+  if(a==="exflag"){var f=el.getAttribute("data-f");EB[f]=!EB[f];EB.built=null;render();return true}
+  if(a==="exbuild"){
+    var ti=$("#exTitle"),ph=$("#exPhone");
+    EB.title=ti?ti.value.trim():""; EB.phone=ph?ph.value.trim():"";
+    var tops=EB.topics.filter(function(x){return topicById(x)});
+    if(!tops.length)tops=topicsForTrack(state.track).slice(0,3).map(function(t){return t.id});
+    /* חלוקה שווה בין הנושאים, ואז ערבוב — כדי שלא יגיעו בגושים */
+    var q=[],i;
+    for(i=0;i<EB.n;i++)q.push([tops[i%tops.length],EB.level]);
+    var spec={v:GENV,t:EB.title||"מבחן",s:(Math.random()*4294967295)>>>0,l:EB.level,
+              q:shuffle(q),r:!!EB.tts,f:!!EB.formulas,w:true};
+    if(EB.phone)spec.p=EB.phone.replace(/[^0-9]/g,"");
+    EB.built=spec; EB.copied="";
+    var id=examId(spec);
+    if(!exFind(id)){EX.list.unshift({id:id,spec:spec,date:todayIso(),subs:[]});exSave()}
+    render(); return true;
+  }
+  if(a==="excopy"){var u=el.getAttribute("data-v");copyText(u,function(){EB.copied="url";render()});return true}
+
+  /* --- ציונים --- */
+  if(a==="mkopen"){var i2=el.getAttribute("data-i");MK.open=MK.open===i2?"":i2;MK.msg=null;render();return true}
+  /* מחיקה מוחקת גם את כל ההגשות. שאלה אחת לפני זה היא לא נימוס —
+     היא ההבדל בין טעות לבין אובדן של כיתה שלמה. */
+  if(a==="mkdel"){MK.del=el.getAttribute("data-i");render();return true}
+  if(a==="mkdelno"){MK.del="";render();return true}
+  if(a==="mkdelyes"){
+    var id3=el.getAttribute("data-i");
+    EX.list=EX.list.filter(function(x){return x.id!==id3});
+    exSave(); MK.open=""; MK.del=""; render(); return true;
+  }
+  if(a==="mkcopy"){
+    var ex4=exFind(el.getAttribute("data-i")); if(!ex4)return true;
+    copyText(marksTable(ex4),function(){MK.msg={id:ex4.id,ok:true,m:"הטבלה הועתקה"};render()});
+    return true;
+  }
+  if(a==="mkadd"){
+    var ex=exFind(el.getAttribute("data-i")); if(!ex)return true;
+    var ta=$("#mkPaste"),raw=ta?ta.value:"";
+    var res=decodeResult(raw);
+    if(!res){MK.msg={id:ex.id,ok:false,m:"לא הצלחנו לקרוא את הקוד. נסו להעתיק אותו שוב, במלואו."};render();return true}
+    if(res.i!==ex.id){
+      var other=exFind(res.i);
+      MK.msg={id:ex.id,ok:false,m:other?"הקוד הזה שייך למבחן „"+(other.spec.t||"מבחן")+"”.":
+        "הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה."};
+      render(); return true;
+    }
+    if(res.a.length!==ex.spec.q.length){
+      MK.msg={id:ex.id,ok:false,m:"מספר התשובות בקוד אינו תואם למבחן."};render();return true}
+    var g=gradeResult(ex.spec,res);
+    var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
+    /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
+    var k2=(ex.subs||[]).findIndex(function(s){return s.name===sub.name});
+    if(!ex.subs)ex.subs=[];
+    if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
+    exSave();
+    MK.msg={id:ex.id,ok:true,m:(sub.name||"תלמיד")+" נקלט · "+g.pct+" ("+g.ok+"/"+g.n+")"+
+      (sub.valid?"":" · שימו לב: הקוד לא תואם לעצמו")};
+    if(ta)ta.value="";
+    render(); return true;
+  }
+
+  /* --- התלמיד --- */
+  if(a==="sitstart"){sitStart();return true}
+  if(a==="sitans"){sitAnswer(parseInt(el.getAttribute("data-i"),10));return true}
+  if(a==="sitskip"){SIT.answers[SIT.i]=-1;sitNext();return true}
+  if(a==="sitprev"){sitGo(SIT.i-1);return true}
+  if(a==="sitfwd"){sitNext();return true}
+  if(a==="sitgo"){sitGo(parseInt(el.getAttribute("data-i"),10));return true}
+  if(a==="sitfinish"){sitFinish();return true}
+  if(a==="sitread"){var q2=SIT.qs[SIT.i];if(q2)speak(q2.say);return true}
+  if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
+  if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
+  if(a==="sitback"){view="sit";render();window.scrollTo(0,0);return true}
+  return false;
+}
+
+/* קליטת מבחן מהכתובת. עושים את זה לפני ה-render הראשון, אחרת
+   התלמיד רואה לרגע את מסך הבית של אפליקציה שהוא לא מכיר. */
+function examFromUrl(){
+  var m=String(location.hash||"").match(/^#x=(.+)$/);
+  if(!m)return false;
+  var sp=decodeExam(m[1]);
+  if(!sp){
+    view="badexam"; return true;
+  }
+  if(sp.v!==GENV){view="oldexam";return true}
+  SIT.spec=sp; SIT.id=examId(sp); SIT.phase="intro";
+  view="sit"; return true;
+}
+function viewBadExam(msg){
+  return '<div class="wrap" style="padding-block:40px;max-width:520px"><div class="card pad">'+
+    '<h1 class="h1">הקישור לא נקרא</h1><p class="sub">'+esc(msg)+'</p>'+
+    '<a class="btn btn-p" style="margin-top:14px" href="'+esc(location.origin+location.pathname)+
+    '">לאפליקציה</a></div></div>';
+}
+
+/* ============================================================
+
 /* ============================================================
    16. ציור המסך
    ============================================================ */
 var pendingScroll=null;
 function render(){
   var html="";
+  /* תלמיד שפתח את דף הנוסחאות באמצע מבחן חייב דרך חזרה מפורשת.
+     סרגל הניווט הרגיל לא מכיר את המבחן ולא יחזיר אותו אליו. */
+  if(view==="formulas"&&SIT.spec&&SIT.phase==="ask"){
+    $("#app").innerHTML=header()+
+      '<div class="wrap" style="padding-top:14px"><div class="row">'+
+      '<button class="btn btn-p" data-a="sitback">'+ic("back",17)+' חזרה למבחן — שאלה '+
+      (SIT.i+1)+' מתוך '+SIT.qs.length+'</button></div></div>'+viewFormulas();
+    afterRender(); return;
+  }
+  /* מבחן שהגיע מקישור עוקף הכול, כולל מסך הפתיחה: מי שנכנס להיבחן
+     לא בהכרח פתח את האפליקציה הזאת אי פעם. */
+  if(view==="sit"&&SIT.spec){ $("#app").innerHTML=viewSit(); afterRender(); return; }
+  if(view==="badexam"||view==="oldexam"){
+    $("#app").innerHTML=viewBadExam(view==="oldexam"?
+      "המבחן הזה נוצר בגרסה קודמת של האפליקציה, ולכן השאלות בו כבר לא זהות. בקשו מהמורה לשלוח מבחן חדש.":
+      "הקישור חסר או נשבר בדרך. אם הוא הגיע בוואטסאפ, נסו להיכנס אליו ישירות מההודעה.");
+    afterRender(); return;
+  }
   if(!state.onboarded){
     html=viewOnboard();
   }else{
@@ -3169,6 +3759,8 @@ function render(){
     else if(view==="formulas")html+=viewFormulas();
     else if(view==="progress")html+=viewProgress();
     else if(view==="settings")html+=viewSettings();
+    else if(view==="exam")html+=viewExamNew();
+    else if(view==="marks")html+=viewMarks();
     html+='<footer><div class="wrap fbar">'+
       _f("<span>אקסיומה · מתמטיקה לתואר ראשון, צעד אחר צעד</span>")+
       '<span class="faint">'+_('הכול נשמר במכשיר הזה ·')+' '+BUILD+'</span></div></footer>';
@@ -3251,6 +3843,7 @@ function advance(){
 }
 var VOICE_SAMPLE="פותרים את המשוואה: שלוש איקס ועוד חמש שווה עשרים. מעבירים את החמש לצד השני, ומחלקים בשלוש.";
 function onAction(a,el){
+  if(examAction(a,el))return;
   var s=state.settings;
   if(a==="go"){goto(el.getAttribute("data-v"));return}
   if(a==="lvl"){state.level=parseInt(el.getAttribute("data-l"),10);save();if(view==="practice"&&P.phase==="ask")loadQ();render();return}
@@ -8025,7 +8618,16 @@ trAt("ar",1050,["معظم الأمور في مكانها. ثمّة نقطة أو
 load();
 loadKey();
 trBuild();
+exLoad();
 applyModes();
+examFromUrl();
+/* מעבר לקישור מבחן כשהאפליקציה כבר פתוחה הוא ניווט בתוך אותו מסמך:
+   הדפדפן לא טוען מחדש, ולכן ההפעלה לא רצה שוב. בלי זה תלמיד שכבר
+   פתח את האפליקציה ואז לחץ על הקישור בוואטסאפ פשוט לא רואה כלום. */
+window.addEventListener("hashchange",function(){
+  if(examFromUrl()){stopSpeak();window.scrollTo(0,0);render()}
+  else if(view==="sit"||view==="badexam"||view==="oldexam"){view="home";render()}
+});
 try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(view==="settings")render()}}catch(e){}
 render();
 </script>
@@ -8037,7 +8639,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u6-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u7-pwa1").catch(function(){});
   });
 }
 </script>
