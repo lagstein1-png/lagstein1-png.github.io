@@ -1164,6 +1164,19 @@ function speak(text,excited){
   speakLocal(toSpoken(text,lang),preset,rate,pitch,LANGS[lang].tts);
 }
 function stopSpeak(){gStop();if("speechSynthesis" in window)try{speechSynthesis.cancel()}catch(e){}}
+/* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
+   אחר, ולפעמים נתקע עד סגירת הדפדפן. */
+try{document.addEventListener("visibilitychange",function(){
+  if(document.hidden)stopSpeak();
+});}catch(e){}
+/* iOS לא ישמיע כלום עד שאמירה אחת יצאה מתוך handler של מגע אמיתי.
+   אמירה אוטומטית בטעינת הדף נבלעת בשקט — בלי חריגה, בלי לוג, בלי
+   דרך לדעת. משחררים פעם אחת עם אמירה ריקה.
+   חשוב: קריאה ישירה, בלי voicesReady — הבטחה שוברת את שרשרת המגע
+   ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
+try{document.addEventListener("pointerdown",function(){
+  try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+},{once:true});}catch(e){}
 
 /* ================= sound FX (WebAudio synth) ================= */
 var actx=null;
@@ -1253,7 +1266,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b14 · 2026-08-29";
+var BUILD="b15 · 2026-08-29";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2237,7 +2250,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b14-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b15-pwa1").catch(function(){});
   });
 }
 </script>

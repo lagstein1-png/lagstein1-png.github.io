@@ -559,7 +559,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g2 · 2026-08-29";
+var BUILD="g3 · 2026-08-29";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -835,6 +835,19 @@ function stopSpeak(){
   gStop();
   try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
 }
+/* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
+   אחר, ולפעמים נתקע עד סגירת הדפדפן. */
+try{document.addEventListener("visibilitychange",function(){
+  if(document.hidden)stopSpeak();
+});}catch(e){}
+/* iOS לא ישמיע כלום עד שאמירה אחת יצאה מתוך handler של מגע אמיתי.
+   אמירה אוטומטית בטעינת הדף נבלעת בשקט — בלי חריגה, בלי לוג, בלי
+   דרך לדעת. משחררים פעם אחת עם אמירה ריקה.
+   חשוב: קריאה ישירה, בלי voicesReady — הבטחה שוברת את שרשרת המגע
+   ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
+try{document.addEventListener("pointerdown",function(){
+  try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+},{once:true});}catch(e){}
 
 /* הודעה לקורא מסך */
 function announce(msg){var el=$("#live");if(el)el.textContent=msg}
@@ -6581,7 +6594,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g2-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g3-pwa1").catch(function(){});
   });
 }
 </script>
