@@ -662,6 +662,17 @@ function pickVoice(){
 }
 
 /* שם קצר וקריא לקול. שמות המערכת ארוכים ומלאי סוגריים. */
+/* אין שדה מגדר ב-Web Speech API. השם הוא הרמז היחיד, ולכן אלה שמות
+   הקולות שהמערכות באמת מתקינות. מי שלא זוהה אינו מקבל תווית — עדיף
+   בלי מאשר תווית שגויה. "google" הוא שם יצרן ולא מגדר. */
+var VOICE_F = /(female|woman|carmit|hila|miri|dana|zira|hazel|aria|jenny|\bsara\b|salma|hala|amina|hoda|svetlana|irina|milena|elena|noura|\bmona\b|samantha|karen|moira|tessa|serena|victoria|\bava\b)/;
+var VOICE_M = /(\bmale\b|\bman\b|daniel|david|yoni|moshe|asaf|\bguy\b|george|\bmark\b|ryan|\balex\b|\bfred\b|maged|hamed|shakir|naayf|dmitry|pavel|yuri|maxim|\bomar\b|tarek|oliver|thomas)/;
+function voiceGender(v){
+  var n = ((v.name || '') + ' ' + (v.lang || '')).toLowerCase();
+  if (VOICE_F.test(n)) return ' · נשי';
+  if (VOICE_M.test(n)) return ' · גברי';
+  return '';
+}
 function voiceLabel(v){
   var n = String(v.name || '')
     .replace(/^Microsoft\s+/i, '')
@@ -669,7 +680,7 @@ function voiceLabel(v){
     .replace(/\s*\(.*?\)\s*/g, ' ')
     .trim();
   var natural = /online|natural|neural/i.test(v.name);
-  return (n || 'קול') + (natural ? ' · טבעי' : '');
+  return (n || 'קול') + voiceGender(v) + (natural ? ' · טבעי' : '');
 }
 
 function renderVoices(){
@@ -1152,7 +1163,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=2-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=3-pwa1").catch(function(){});
   });
 }
 </script>

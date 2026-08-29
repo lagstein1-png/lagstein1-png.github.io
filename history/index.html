@@ -336,6 +336,8 @@ T.he={
   vEngine:"מנוע הקול", vGem:"קול טבעי (ג׳מיני)", vDev:"קול המכשיר",
   vGemD:"נשמע כמו אדם. דורש אינטרנט ומפתח חינמי.", vDevD:"עובד תמיד, גם בלי רשת.",
   vFemale:"קולות נשיים", vMale:"קולות גבריים", vSample:"דוגמה",
+  vDevList:"קולות המכשיר", vAuto:"בחירה אוטומטית",
+  vNoneLang:"אין קול בשפה הזאת במכשיר",
   vKey:"מפתח Gemini", vKeyPh:"מתחיל ב-AIza…", vSave:"שמרו", vShow:"הצג", vHide:"הסתר",
   vSaved:"המפתח נשמר במכשיר הזה בלבד. הוא לא נשלח לשום מקום אחר.",
   vRemoved:"המפתח נמחק.", vChecking:"בודקים…", vOk:"המפתח עובד.",
@@ -382,6 +384,8 @@ T.ar={
   vEngine:"محرّك الصوت", vGem:"صوت طبيعي (جيميني)", vDev:"صوت الجهاز",
   vGemD:"يبدو كإنسان. يحتاج إنترنت ومفتاحًا مجانيًا.", vDevD:"يعمل دائمًا، حتى بلا شبكة.",
   vFemale:"أصوات نسائية", vMale:"أصوات رجالية", vSample:"عيّنة",
+  vDevList:"أصوات الجهاز", vAuto:"اختيار تلقائي",
+  vNoneLang:"لا يوجد صوت بهذه اللغة في الجهاز",
   vKey:"مفتاح Gemini", vKeyPh:"يبدأ بـ AIza…", vSave:"حفظ", vShow:"إظهار", vHide:"إخفاء",
   vSaved:"حُفظ المفتاح على هذا الجهاز فقط، ولا يُرسل إلى أي مكان آخر.",
   vRemoved:"حُذف المفتاح.", vChecking:"جارٍ الفحص…", vOk:"المفتاح يعمل.",
@@ -428,6 +432,8 @@ T.ru={
   vEngine:"Голосовой движок", vGem:"Естественный голос (Gemini)", vDev:"Голос устройства",
   vGemD:"Звучит как человек. Нужен интернет и бесплатный ключ.", vDevD:"Работает всегда, даже без сети.",
   vFemale:"Женские голоса", vMale:"Мужские голоса", vSample:"Пример",
+  vDevList:"Голоса устройства", vAuto:"Автоматически",
+  vNoneLang:"На устройстве нет голоса для этого языка",
   vKey:"Ключ Gemini", vKeyPh:"начинается с AIza…", vSave:"Сохранить", vShow:"Показать", vHide:"Скрыть",
   vSaved:"Ключ сохранён только на этом устройстве и никуда не отправляется.",
   vRemoved:"Ключ удалён.", vChecking:"Проверяем…", vOk:"Ключ работает.",
@@ -474,6 +480,8 @@ T.en={
   vEngine:"Voice engine", vGem:"Natural voice (Gemini)", vDev:"Device voice",
   vGemD:"Sounds human. Needs the internet and a free key.", vDevD:"Always works, even offline.",
   vFemale:"Female voices", vMale:"Male voices", vSample:"Sample",
+  vDevList:"Device voices", vAuto:"Automatic",
+  vNoneLang:"No voice for this language on this device",
   vKey:"Gemini key", vKeyPh:"starts with AIza…", vSave:"Save", vShow:"Show", vHide:"Hide",
   vSaved:"The key is stored on this device only. It is not sent anywhere else.",
   vRemoved:"Key removed.", vChecking:"Checking…", vOk:"The key works.",
@@ -526,7 +534,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m5 · 2026-08-29";
+var BUILD="m6 · 2026-08-29";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -536,6 +544,7 @@ function blankState(){
     screen:"home", topic:null, level:1,
     voiceMode:"device",   /* "device" | "gem" */
     gemVoice:"Kore",
+    devVoice:{},          /* קוד שפה → voiceURI שנבחר ידנית */
     rate:0.95,
     big:false, clear:false, spaced:false, hc:false, rm:false, theme:"auto",
     stats:{},             /* topic|level → {seen,ok,bad} */
@@ -687,8 +696,49 @@ function voicesFor(code){
     return !l&&hint?hint.test(v.name||""):false;
   });
 }
+/* בורר קולות המכשיר. עד כה לא היה כזה בכלל: bestVoice בחר לבד,
+   והמשתמש לא יכול היה להשפיע — כולל לבקש קול נשי. */
+function devPicker(lgs){
+  var out="";
+  lgs.forEach(function(lg){
+    var code=lg==="en"?EN_TTS:LANGS[lg].tts;
+    var pool=voicesFor(code);
+    if(lgs.length>1)out+='<p style="font-weight:700;margin:.9rem 0 .3rem">'+esc(LANGS[lg]?LANGS[lg].name:code)+"</p>";
+    if(!pool.length){
+      /* אומרים את זה במפורש. רשימה ריקה בלי הסבר נראית כמו תקלה. */
+      out+='<p class="chip bad" style="margin:.4rem 0">'+esc(t("vNoneLang"))+"</p>";
+      return;
+    }
+    var cur=(state.devVoice||{})[code]||"";
+    function row(v){
+      var on=v?cur===v.voiceURI:!cur;
+      var uri=v?v.voiceURI:"";
+      return '<div class="vopt'+(on?" on":"")+'" data-a="devvoice" data-l="'+lg+'" data-u="'+esc(uri)+
+        '" role="button" tabindex="0" aria-pressed="'+(on?"true":"false")+'">'+
+        '<span style="flex:1"><span class="nm">'+esc(v?v.name:t("vAuto"))+'</span><br>'+
+        '<span class="ds">'+esc(v?v.lang:t("vDevD"))+"</span></span>"+
+        (v?'<button class="btn ghost" data-a="devsample" data-l="'+lg+'" data-u="'+esc(uri)+
+           '" style="padding:.35rem .7rem;min-height:2.2rem;font-size:.82rem">'+
+           ic("play",14)+" "+esc(t("vSample"))+"</button>":"")+"</div>";
+    }
+    out+='<div class="vgrid">'+row(null)+"</div>";
+    /* שלוש קבוצות. מי שלא זוהה מקבל קבוצה משלו ולא מנוחש: אין שדה
+       מגדר ב-Web Speech API, ואנדרואיד מדווח שמות שאינם נושאים מגדר. */
+    [["f",t("vFemale")],["m",t("vMale")],["?",t("vDevList")]].forEach(function(grp){
+      var gv=pool.filter(function(v){return vGender(v)===grp[0]});
+      if(!gv.length)return;
+      out+='<p style="font-weight:700;margin:.9rem 0 .3rem">'+esc(grp[1])+"</p>"+
+           '<div class="vgrid">'+gv.slice(0,20).map(row).join("")+"</div>";
+    });
+  });
+  return out;
+}
 function bestVoice(code){
   var pool=voicesFor(code); if(!pool.length)return null;
+  /* בחירה ידנית גוברת על הניקוד. היא נשמרת לכל שפה בנפרד:
+     קול שנבחר לעברית אינו רלוונטי כשמדברים אנגלית. */
+  var want0=(state.devVoice||{})[code];
+  if(want0){var hit=pool.filter(function(v){return v.voiceURI===want0})[0]; if(hit)return hit}
   var want=String(code).toLowerCase();
   var pref=state.gemVoice&&gvOf(state.gemVoice).g==="m"?"m":"f";
   function score(v){
@@ -3285,6 +3335,8 @@ function screenSet(){
      '<input type="range" min="0.6" max="1.3" step="0.05" value="'+state.rate+
      '" data-a="rate" style="max-width:14rem"></div>';
 
+  if(state.voiceMode!=="gem")h+=devPicker([ state.lang ]);
+
   if(state.voiceMode==="gem"){
     ["f","m"].forEach(function(g){
       h+='<p style="font-weight:700;margin:.9rem 0 .4rem">'+esc(g==="f"?t("vFemale"):t("vMale"))+"</p>";
@@ -3429,6 +3481,19 @@ document.addEventListener("click",function(e){
   }
   if(a==="lang"){state.lang=LANGS[v]?v:"he";save();render();return}
   if(a==="vmode"){state.voiceMode=v==="gem"?"gem":"device";save();render();return}
+  if(a==="devvoice"||a==="devsample"){
+    var lg=el.getAttribute("data-l")||state.lang;
+    var code=lg==="en"?EN_TTS:LANGS[lg].tts;
+    var uri=el.getAttribute("data-u")||"";
+    if(a==="devvoice"){
+      if(!state.devVoice)state.devVoice={};
+      if(uri)state.devVoice[code]=uri; else delete state.devVoice[code];
+      save(); render();
+    }
+    /* משמיעים תמיד — בחירה בלי לשמוע אינה בחירה. */
+    speak(t("heroT"),lg);
+    return;
+  }
   if(a==="gvoice"){state.gemVoice=gvOf(v).id;save();render();return}
   if(a==="gsample"){
     if(!hasKey()){gkMsg={ok:false,m:t("vNeed")};render();return}
@@ -3490,7 +3555,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m5-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m6-pwa1").catch(function(){});
   });
 }
 </script>
