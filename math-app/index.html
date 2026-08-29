@@ -960,6 +960,11 @@ function toSpoken(text,lang){
 
 /* ================= TTS: Web Speech + Gemini ================= */
 var gCache={},gAudio=null;
+/* אלמנט שמע אחד, קבוע, שמשוחרר במגע הראשון. ב-iOS ההיתר להשמיע
+   ניתן לאלמנט ולא לדף, ואלמנט שנוצר אחרי fetch לא יקבל אותו
+   לעולם — ולכן הקול הטבעי היה שותק שם בלי שום שגיאה. */
+var GEL=null;
+var SILENT_WAV="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
 /* שמונה קולות ג׳מיני, ארבעה נשיים וארבעה גבריים. קודם היו שניים בלבד
    ולא הייתה שום דרך לבחור ביניהם — googleVoice נקרא ומעולם לא נכתב.
    התיאור חשוב יותר מהשם: "אאודה" לא אומר לילד כלום, "חם ונעים" כן. */
@@ -1057,7 +1062,13 @@ function speakGoogle(text,rate,pitch,onFail,voiceId){
   var g=gvOf(first).g;
   var alt=GEM_VOICES.filter(function(v){return v.g===g&&v.id!==first})[0];
   var ck=lang+"|"+first+"|"+rate.toFixed(2)+"|"+text;
-  function play(url){gStop();gAudio=new Audio(url);gAudio.play().catch(function(){if(onFail)onFail()})}
+  function play(url){
+    gStop();
+    /* משתמשים באלמנט ששוחרר במגע ולא יוצרים חדש. */
+    if(!GEL)GEL=new Audio();
+    gAudio=GEL; gAudio.onloadedmetadata=null; gAudio.src=url;
+    gAudio.play().catch(function(){if(onFail)onFail()});
+  }
   if(gCache[ck]){play(gCache[ck]);return}
   var done=function(url){gCache[ck]=url;play(url)};
   gSynth(text,first,rate,lang).then(done)
@@ -1176,6 +1187,13 @@ try{document.addEventListener("visibilitychange",function(){
    ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
 try{document.addEventListener("pointerdown",function(){
   try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+  /* ואותו דבר לאלמנט השמע: מקור שקט, play בתוך המגע עצמו. */
+  try{
+    if(!GEL)GEL=new Audio();
+    GEL.src=SILENT_WAV;
+    var pr=GEL.play();
+    if(pr&&pr.then)pr.then(function(){try{GEL.pause();GEL.currentTime=0}catch(e){}},function(){});
+  }catch(e){}
 },{once:true});}catch(e){}
 
 /* ================= sound FX (WebAudio synth) ================= */
@@ -1266,7 +1284,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b15 · 2026-08-29";
+var BUILD="b16 · 2026-08-29";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2250,7 +2268,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b15-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b16-pwa1").catch(function(){});
   });
 }
 </script>

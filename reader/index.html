@@ -464,6 +464,11 @@ function markSentence(){
 var VOICE = 'browser';          /* 'browser' | 'Kore' | 'Puck' */
 var GKEY = '';
 var gAudio = null;
+/* אלמנט שמע אחד, קבוע, שמשוחרר במגע הראשון. ב-iOS ההיתר להשמיע
+   ניתן לאלמנט ולא לדף, ואלמנט שנוצר אחרי fetch לא יקבל אותו
+   לעולם — ולכן הקול הטבעי היה שותק שם בלי שום שגיאה. */
+var GEL=null;
+var SILENT_WAV="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
 var gCache = {};                /* שמע לפי משפט — כדי לא לשלם פעמיים על אותו טקסט */
 
 function loadKey(){
@@ -812,7 +817,9 @@ function speakGemini(n){
   gGet(text).then(function(url){
     if(!speaking || SENT !== n) return;
     gStop();
-    gAudio = new Audio(url);
+    /* משתמשים באלמנט ששוחרר במגע ולא יוצרים חדש. */
+    if(!GEL) GEL = new Audio();
+    gAudio = GEL; gAudio.onloadedmetadata = null; gAudio.onended = null; gAudio.src = url;
     /* משך השמע ידוע רק אחרי שהוא נטען — ורק אז אפשר לחלק אותו למילים */
     gAudio.onloadedmetadata = function(){
       if(!speaking || SENT !== n) return;
@@ -1029,7 +1036,10 @@ $('#text').addEventListener('click', function(e){
   hit(i);
   if(isGemini()){
     gGet(w.plain.trim()).then(function(url){
-      gStop(); gAudio = new Audio(url); gAudio.play().catch(function(){});
+      gStop();
+      if(!GEL) GEL = new Audio();
+      gAudio = GEL; gAudio.onloadedmetadata = null; gAudio.onended = null; gAudio.src = url;
+      gAudio.play().catch(function(){});
     }).catch(function(){});
     return;
   }
@@ -1155,6 +1165,13 @@ document.addEventListener('visibilitychange', function(){ if(document.hidden) st
    ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
 try{document.addEventListener("pointerdown",function(){
   try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+  /* ואותו דבר לאלמנט השמע: מקור שקט, play בתוך המגע עצמו. */
+  try{
+    if(!GEL)GEL=new Audio();
+    GEL.src=SILENT_WAV;
+    var pr=GEL.play();
+    if(pr&&pr.then)pr.then(function(){try{GEL.pause();GEL.currentTime=0}catch(e){}},function(){});
+  }catch(e){}
 },{once:true});}catch(e){}
 
 loadKey();
@@ -1168,7 +1185,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=4-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=5-pwa1").catch(function(){});
   });
 }
 </script>

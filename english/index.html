@@ -524,7 +524,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n6 · 2026-08-29";
+var BUILD="n7 · 2026-08-29";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -754,6 +754,11 @@ function voiceStatus(){
 
 /* --- ג׳מיני --- */
 var gAudio=null,gCache={},gBusy=false;
+/* אלמנט שמע אחד, קבוע, שמשוחרר במגע הראשון. ב-iOS ההיתר להשמיע
+   ניתן לאלמנט ולא לדף, ואלמנט שנוצר אחרי fetch לא יקבל אותו
+   לעולם — ולכן הקול הטבעי היה שותק שם בלי שום שגיאה. */
+var GEL=null;
+var SILENT_WAV="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
 function gStop(){if(gAudio){try{gAudio.pause();gAudio.src=""}catch(e){}gAudio=null}}
 function pcmToWav(b64){
   try{
@@ -925,7 +930,10 @@ function speak(text,lang,rateMul){
   speakDevice(text,code,rate);
 }
 function playUrl(url,text,code,rate){
-  gStop(); gAudio=new Audio(url);
+  gStop();
+  /* משתמשים באלמנט ששוחרר במגע ולא יוצרים חדש. */
+  if(!GEL)GEL=new Audio();
+  gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
 function stopSpeak(){gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
@@ -941,6 +949,13 @@ try{document.addEventListener("visibilitychange",function(){
    ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
 try{document.addEventListener("pointerdown",function(){
   try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+  /* ואותו דבר לאלמנט השמע: מקור שקט, play בתוך המגע עצמו. */
+  try{
+    if(!GEL)GEL=new Audio();
+    GEL.src=SILENT_WAV;
+    var pr=GEL.play();
+    if(pr&&pr.then)pr.then(function(){try{GEL.pause();GEL.currentTime=0}catch(e){}},function(){});
+  }catch(e){}
 },{once:true});}catch(e){}
 function renderSpeakState(){
   var b=document.querySelectorAll(".spk");
@@ -2583,7 +2598,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n6-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n7-pwa1").catch(function(){});
   });
 }
 </script>

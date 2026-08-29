@@ -489,7 +489,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t8 · 2026-08-29";
+var BUILD="t9 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -655,6 +655,11 @@ function voiceMode(){
 }
 
 var gAudio=null,gCache={};
+/* אלמנט שמע אחד, קבוע, שמשוחרר במגע הראשון. ב-iOS ההיתר להשמיע
+   ניתן לאלמנט ולא לדף, ואלמנט שנוצר אחרי fetch לא יקבל אותו
+   לעולם — ולכן הקול הטבעי היה שותק שם בלי שום שגיאה. */
+var GEL=null;
+var SILENT_WAV="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
 function gStop(){if(gAudio){try{gAudio.pause();gAudio.src=""}catch(e){}gAudio=null}}
 function gSynth(text,voiceName,rate){
   var lead=rate<=0.75?"קרא לאט מאוד וברור, בעברית: "
@@ -797,7 +802,13 @@ function speak(text){
   }
   var name=state.settings.gvoice||"Kore",rate=state.settings.rate;
   var ck=name+"|"+rate.toFixed(2)+"|"+text;
-  function play(url){gStop();gAudio=new Audio(url);gAudio.play().catch(function(){speakDevice(text)})}
+  function play(url){
+    gStop();
+    /* משתמשים באלמנט ששוחרר במגע ולא יוצרים חדש. */
+    if(!GEL)GEL=new Audio();
+    gAudio=GEL; gAudio.src=url;
+    gAudio.play().catch(function(){speakDevice(text)});
+  }
   if(gCache[ck]){play(gCache[ck]);return}
   gSynth(text,name,rate).then(function(url){
     gCache[ck]=url;ttsErr="";
@@ -829,6 +840,13 @@ try{document.addEventListener("visibilitychange",function(){
    ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
 try{document.addEventListener("pointerdown",function(){
   try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+  /* ואותו דבר לאלמנט השמע: מקור שקט, play בתוך המגע עצמו. */
+  try{
+    if(!GEL)GEL=new Audio();
+    GEL.src=SILENT_WAV;
+    var pr=GEL.play();
+    if(pr&&pr.then)pr.then(function(){try{GEL.pause();GEL.currentTime=0}catch(e){}},function(){});
+  }catch(e){}
 },{once:true});}catch(e){}
 
 /* הודעה לקורא מסך */
@@ -3699,7 +3717,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t8-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t9-pwa1").catch(function(){});
   });
 }
 </script>
