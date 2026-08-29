@@ -501,7 +501,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t22 · 2026-08-29";
+var BUILD="t23 · 2026-08-29";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -3614,7 +3614,8 @@ function viewMarks(){
        '<button class="btn btn-p" data-a="mkadd" data-i="'+esc(ex.id)+'">'+ic("check",17)+' קליטה</button>'+
        '<a class="btn" href="'+esc(waLink((ex.spec.t||"מבחן")+"\n"+examUrl(ex.spec),""))+'" target="_blank" rel="noopener">'+
        ic("share",17)+' שליחה שוב</a>'+
-       (subs.length?'<button class="btn btn-g" data-a="mkcopy" data-i="'+esc(ex.id)+'">'+ic("copy",17)+' העתקת טבלה</button>':"")+
+       (subs.length?'<button class="btn btn-g" data-a="mkcopy" data-i="'+esc(ex.id)+'">'+ic("copy",17)+' העתקת טבלה</button>'+
+         '<button class="btn btn-g" data-a="mkcsv" data-i="'+esc(ex.id)+'">'+ic("share",17)+' הורדת CSV</button>':"")+
        (MK.del===ex.id?
          '<span class="row" style="gap:6px"><span class="chip bad">למחוק את המבחן ואת '+
          (subs.length||0)+' ההגשות?</span>'+
@@ -3658,6 +3659,90 @@ function viewMarks(){
     h+='</div>';
   });
   return h+'</div>';
+}
+/* ------------------------------------------------------------
+   ייצוא CSV של ההגשות.
+   העתקת הטבלה נותנת טקסט מופרד בטאבים — נוח להדבקה, אבל לא קובץ.
+   מורה שרוצה למיין, לסנן או לחשב ממוצע צריך גיליון. שורה לכל תלמיד,
+   ועמודה לכל שאלה, כדי שאפשר יהיה לראות מיד באיזו שאלה נפלה הכיתה.
+   ה-BOM בהתחלה הוא מה שגורם לאקסל לקרוא עברית, ערבית ורוסית נכון
+   במקום ג׳יבריש — בלעדיו הקובץ נפתח שבור בדיוק אצל מי שצריך אותו.
+   ------------------------------------------------------------ */
+function csvCell(v){
+  var s=(v===undefined||v===null)?"":String(v);
+  return /[",\n\r;\t]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+}
+function csvRow(a){ return a.map(csvCell).join(",") }
+function marksCsv(ex){
+  var subs=(ex.subs||[]).slice().sort(function(a,b){return b.pct-a.pct});
+  var n=ex.spec.q.length,i;
+  var head=["שם","ציון","נכונות","שאלות",
+            "תאריך","קוד תקין"];
+  for(i=0;i<n;i++)head.push(("שאלה "+(i+1)));
+  var rows=[csvRow(head)];
+  subs.forEach(function(s){
+    var r=[s.name||"ללא שם",s.pct,s.ok,s.n,s.date||"",
+           s.valid?"כן":"לא"];
+    for(i=0;i<n;i++){
+      var p=s.per&&s.per[i];
+      r.push(p?(p.ok?"כן":"לא"):"");
+    }
+    rows.push(csvRow(r));
+  });
+  return "\ufeff"+rows.join("\r\n")+"\r\n";
+}
+/* כרום מוחק את שם הקובץ כולו ברגע שיש בו תו אחד שאינו ASCII —
+   לא רק עברית: גם é או מקף ארוך. מה שיורד נקרא "download", בלי
+   סיומת, ואקסל לא יודע לפתוח אותו. מורה שקרא למבחן שלו בעברית
+   קיבל קובץ בלי שם ובלי סוג. לכן השם מתועתק ללטינית. */
+var TRLIT={
+  "א":"a","ב":"b","ג":"g","ד":"d","ה":"h","ו":"v","ז":"z","ח":"ch","ט":"t","י":"y",
+  "כ":"k","ך":"k","ל":"l","מ":"m","ם":"m","נ":"n","ן":"n","ס":"s","ע":"","פ":"f",
+  "ף":"f","צ":"tz","ץ":"tz","ק":"k","ר":"r","ש":"sh","ת":"t",
+  "ا":"a","ب":"b","ت":"t","ث":"th","ج":"j","ح":"h","خ":"kh","د":"d","ذ":"dh","ر":"r",
+  "ز":"z","س":"s","ش":"sh","ص":"s","ض":"d","ط":"t","ظ":"z","ع":"","غ":"gh","ف":"f",
+  "ق":"q","ك":"k","ل":"l","م":"m","ن":"n","ه":"h","و":"w","ي":"y","ة":"h","ى":"a","ء":"",
+  "أ":"a","إ":"i","آ":"a","ؤ":"w","ئ":"y",
+  "а":"a","б":"b","в":"v","г":"g","д":"d","е":"e","ё":"e","ж":"zh","з":"z","и":"i",
+  "й":"y","к":"k","л":"l","м":"m","н":"n","о":"o","п":"p","р":"r","с":"s","т":"t",
+  "у":"u","ф":"f","х":"kh","ц":"ts","ч":"ch","ш":"sh","щ":"sch","ъ":"","ы":"y","ь":"",
+  "э":"e","ю":"yu","я":"ya"
+};
+function asciiName(s){
+  var i,c,out="";
+  /* é ו-ü הם אות לטינית ועוד סימן מצורף. פירוק והסרת הסימן משאיר e ו-u. */
+  try{ s=s.normalize("NFD").replace(/[\u0300-\u036f]/g,"") }catch(e){}
+  for(i=0;i<s.length;i++){
+    c=s.charAt(i);
+    if(/[A-Za-z0-9]/.test(c)){ out+=c; continue }
+    var lower=c.toLowerCase();
+    if(TRLIT[lower]!==undefined){ out+=TRLIT[lower]; continue }
+    out+=" ";                     /* כל השאר — רווח, שיתכווץ בהמשך */
+  }
+  return out.replace(/\s+/g," ").trim();
+}
+function csvFileName(ex){
+  var t=asciiName(String(ex.spec.t||"")).slice(0,60).trim();
+  var d=String(ex.date||todayIso()).replace(/[^0-9-]/g,"");
+  /* כשלא נשאר כלום קריא, מזהה המבחן הוא מה שמבדיל בין שני קבצים
+     שירדו באותו יום. */
+  if(!t) t="exam "+String(ex.id||"").slice(0,6);
+  return (t+" "+d).trim()+".csv";
+}
+function downloadCsv(ex){
+  var txt=marksCsv(ex),url=null,a=document.createElement("a");
+  try{
+    url=URL.createObjectURL(new Blob([txt],{type:"text/csv;charset=utf-8"}));
+  }catch(e){
+    url="data:text/csv;charset=utf-8,"+encodeURIComponent(txt);
+  }
+  a.href=url; a.download=csvFileName(ex);
+  a.style.cssText="position:fixed;inset-inline-start:-9999px";
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){
+    if(a.parentNode)a.parentNode.removeChild(a);
+    if(url&&url.indexOf("blob:")===0){try{URL.revokeObjectURL(url)}catch(e){}}
+  },400);
 }
 function marksTable(ex){
   var out=(ex.spec.t||"מבחן")+"\n";
@@ -3944,6 +4029,12 @@ function examAction(a,el){
     EX.list=EX.list.filter(function(x){return x.id!==id3});
     exSave(); MK.open=""; MK.del=""; render(); return true;
   }
+  if(a==="mkcsv"){
+    var exc=exFind(el.getAttribute("data-i")); if(!exc)return true;
+    downloadCsv(exc);
+    MK.msg={id:exc.id,ok:true,m:"הקובץ ירד"}; render();
+    return true;
+  }
   if(a==="mkcopy"){
     var ex4=exFind(el.getAttribute("data-i")); if(!ex4)return true;
     copyText(marksTable(ex4),function(){MK.msg={id:ex4.id,ok:true,m:"הטבלה הועתקה"};render()});
@@ -4040,7 +4131,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t22-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t23-pwa1").catch(function(){});
   });
 }
 </script>
