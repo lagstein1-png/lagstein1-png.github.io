@@ -579,7 +579,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n18 · 2026-08-29";
+var BUILD="n19 · 2026-08-29";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -1069,6 +1069,35 @@ var FEM_PITCH=1.35;
 function femLift(v){
   if(!v)return 1;
   try{ return vGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
+}
+
+
+/* ------------------------------------------------------------
+   בדיקת קול בתוך האפליקציה. הפשוטה ביותר שאפשר: אמירה אחת,
+   בתוך הלחיצה, בלי מילון, בלי בחירת קול ובלי שום שכבה — ומדווחת
+   על המסך מה קרה. יום שלם אבד כי כשלא היה קול, שום דבר לא אמר למה.
+   ------------------------------------------------------------ */
+var VCHK="";
+function voiceCheck(){
+  VCHK="…"; render();
+  function show(m){ VCHK=m; render() }
+  if(!("speechSynthesis" in window)){ show("✗ הדפדפן הזה לא תומך בהקראה"); return }
+  var list=[]; try{ list=speechSynthesis.getVoices()||[] }catch(e){}
+  try{ speechSynthesis.cancel() }catch(e){}
+  var u;
+  try{ u=new SpeechSynthesisUtterance("שלום, זו בדיקת קול") }
+  catch(e){ show("✗ יצירת האמירה נכשלה: "+e.message); return }
+  u.lang="he-IL"; u.volume=1; u.rate=1; u.pitch=1;
+  var done=false;
+  u.onstart=function(){ done=true; show("✓ הקול פועל — "+list.length+" קולות במכשיר") };
+  u.onerror=function(e){ done=true;
+    var er=(e&&e.error)||"לא ידוע";
+    if(er==="interrupted"||er==="canceled"){ show("✓ הקול פועל"); return }
+    show("✗ המנוע החזיר "+er+" · "+list.length+" קולות · זו תקלה במכשיר, לא באפליקציה"); };
+  try{ speechSynthesis.speak(u) }
+  catch(e){ show("✗ speak נכשל: "+e.message); return }
+  setTimeout(function(){ if(!done)
+    show("✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר") },2000);
 }
 
 function speakDevice(text,code,rate){
@@ -2550,6 +2579,10 @@ function screenSet(){
 
   /* --- קול --- */
   h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem">'+esc(t("setVoice"))+"</h3>";
+  /* בדיקה במקום ניחוש: לחיצה אחת שאומרת אם הקול עובד. */
+  h+='<div style="margin:.6rem 0"><button class="btn" data-a="vcheck">'+esc(t("vSample"))+'</button>'+
+     (VCHK?'<p class="sub" style="margin-top:.4rem">'+esc(VCHK)+'</p>':"")+
+     '<p class="sub" style="margin-top:.3rem;opacity:.7">'+esc(BUILD)+'</p></div>';
   h+=vstrip();
   h+='<div class="vgrid" style="margin:.6rem 0">'+
      '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" data-a="vmode" data-v="device">'+
@@ -3383,6 +3416,7 @@ document.addEventListener("click",function(e){
   if(a==="checkorder"){checkOrder();return}
   if(a==="lang"){state.lang=LANGS[v]?v:"he";save();render();return}
   if(a==="vmode"){state.voiceMode=v==="gem"?"gem":"device";save();render();return}
+  if(a==="vcheck"){voiceCheck();return}
   if(a==="devvoice"||a==="devsample"){
     var lg=el.getAttribute("data-l")||state.lang;
     var code=lg==="en"?EN_TTS:LANGS[lg].tts;
@@ -3457,7 +3491,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n18-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n19-pwa1").catch(function(){});
   });
 }
 </script>
