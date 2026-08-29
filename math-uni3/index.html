@@ -580,7 +580,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g14 · 2026-08-29";
+var BUILD="g15 · 2026-08-29";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -2367,7 +2367,7 @@ var TRACKS=[{v:1,t:"מדעים והנדסה"},{v:2,t:"מדעי המחשב"},{v:3
 function header(){
   var nav=[["home",_("בית"),"home"],["practice",_("תרגול"),"pencil"],["topics",_("נושאים"),"list"],
            ["formulas",_("נוסחאות"),"book"],["progress",_("התקדמות"),"chart"],
-           ["marks",_("מבחן"),"share"],["settings",_("הגדרות"),"gear"]];
+           ["marks",xt("exam"),"share"],["settings",_("הגדרות"),"gear"]];
   return '<header><div class="wrap hbar">'+
     '<button class="brand" data-a="go" data-v="home" aria-label="'+esc(_('לדף הבית'))+'">'+
       '<span class="mk">'+_('ג')+'</span><span><b>'+_('אקסיומה ג׳')+'</b><small>'+_('שנה שלישית בתואר')+'</small></span></button>'+
@@ -2995,36 +2995,54 @@ function gradeResult(spec,res){
    ------------------------------------------------------------ */
 var EB={title:"",n:10,mins:0,level:2,topics:[],phone:"",tts:true,formulas:true,built:null,copied:""};
 
+
+/* ------------------------------------------------------------
+   מילון המבחן. הוא עומד בפני עצמו ואינו נשען על המילון הכללי
+   של האפליקציה: מודול המבחן זהה בכל האפליקציות ומועתק ביניהן
+   כמו שהוא, וכל אחת מהן מתרגמת בדרך אחרת. כך ההעתקה נשארת
+   העתקה, ותלמיד שלומד בערבית או ברוסית לא מקבל מבחן בעברית.
+   ------------------------------------------------------------ */
+var XK={"exam":"מבחן","student":"תלמיד","qs":"שאלות","minutes":"דקות","none":"ללא","outOf":"מתוך","exTitle":"מבחן כיתתי","exLead":"בונים מבחן, שולחים קישור בוואטסאפ, ומקבלים בחזרה קוד תשובות לכל תלמיד. אין שרת ואין חשבון — הכול עובר דרך הקישור ודרך וואטסאפ.","exName":"שם המבחן","exNamePh":"למשל: מבחן אלגברה — כיתה ט׳2","exUnits":"יחידות","exUnitSuf":"יח״ל","exLevel":"רמה","exCount":"מספר שאלות","exTime":"הגבלת זמן","exTimeNote":"אפס פירושו בלי טיימר. בתום הזמן המבחן מוגש מעצמו.","exTopics":"נושאים","exTopicsNote":"השאלות מתחלקות שווה בשווה בין הנושאים שנבחרו.","exAcc":"התאמות לנבחנים","exAccNote":"מה שמותר בבחינה עצמה. ההקראה ודף הנוסחאות אינם רמז — הם כלי נגישות.","exTts":"הקראה קולית","exTtsSub":"כל שאלה נקראת בקול לפי בקשה","exForm":"דף נוסחאות","exFormSub":"נגיש מתוך המבחן, כמו בבגרות","exPhone":"מספר הוואטסאפ שלכם (לא חובה)","exPhoneNote":"אם תמלאו — כפתור השליחה אצל התלמיד ייפתח ישר לצ׳אט איתכם. שימו לב: המספר יופיע בתוך הקישור שאתם משתפים.","exBuild":"צרו את המבחן","exShareMsg":"{0} שאלות. נכנסים לקישור, פותרים, ובסוף שולחים לי את הקוד.","exReady":"המבחן מוכן","exWa":"שליחה בוואטסאפ","exCopyUrl":"העתקת הקישור","exToMarks":"לציונים","exUrlCopied":"הקישור הועתק","mkTitle":"ציונים","mkLead":"מדביקים כאן את הקוד שהתלמיד שלח בוואטסאפ. הציון מחושב מחדש מהתשובות עצמן, ולא נלקח ממה שהתלמיד כתב.","mkNew":"מבחן חדש","mkEmpty":"עוד לא יצרתם מבחן. אפשר להתחיל מ״מבחן חדש״.","mkSubs":"הגשות","mkAvg":"ממוצע","mkPaste":"הדבקת קוד תשובות","mkPastePh":"מדביקים כאן את הקוד מהוואטסאפ","mkTake":"קליטה","mkResend":"שליחה שוב","mkCopyTbl":"העתקת טבלה","mkDelQ":"למחוק את המבחן ואת {0} ההגשות?","mkDelYes":"כן, למחוק","mkCancel":"ביטול","mkDel":"מחיקת המבחן","mkByStudent":"לפי תלמיד","mkNoName":"ללא שם","mkFell":"נפל ב:","mkAllOk":"הכול נכון","mkBadCode":"הקוד לא תואם לעצמו","mkByTopic":"לפי נושא — מה כדאי ללמד שוב","mkByTopicNote":"אחוז ההצלחה של כל הכיתה יחד.","mkRight":"תשובות נכונות מתוך","mkTblHead":"תלמיד\tציון\tנכונות\tנפל ב","mkTblCopied":"הטבלה הועתקה","mkErrRead":"לא הצלחנו לקרוא את הקוד. נסו להעתיק אותו שוב, במלואו.","mkErrOther":"הקוד הזה שייך למבחן „{0}”.","mkErrUnknown":"הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה.","mkErrCount":"מספר התשובות בקוד אינו תואם למבחן.","mkTaken":"נקלט","mkNoteBad":"שימו לב: הקוד לא תואם לעצמו","stNoTime":"בלי הגבלת זמן.","stTimed":"יש הגבלת זמן: {0} דקות. בסופן המבחן מוגש מעצמו.","stNoTimer":"אין טיימר. אפשר לקחת את הזמן.","stNoNeg":"אין ניקוד שלילי — תשובה לא נכונה לא גורעת.","stReadOn":"אפשר לבקש הקראה של כל שאלה.","stReadOff":"ההקראה כבויה במבחן הזה.","stFormOn":"דף הנוסחאות פתוח לאורך כל המבחן.","stFormOff":"דף הנוסחאות סגור במבחן הזה.","stCodeEnd":"בסוף תקבלו קוד — שולחים אותו למורה בוואטסאפ.","stYourName":"השם שלכם","stNameNote":"כדי שהמורה יידע מי ענה. השם לא נשלח לשום שרת — הוא נכנס לתוך הקוד.","stNamePh":"שם פרטי ושם משפחה","stStart":"מתחילים","stQn":"שאלה {0} מתוך {1}","stRead":"הקראה","stFormulas":"דף נוסחאות","stPrev":"קודמת","stDunno":"לא יודע/ת","stFlagged":"✓ מסומנת לחזרה","stFlag":"לחזור אליה","stNext":"הבאה","stReview":"לפני ההגשה","stReviewNote":"אפשר לחזור לכל שאלה ולשנות. אחרי ההגשה נוצר הקוד.","stUnanswered":"{0} שאלות בלי תשובה","stAllAnswered":"כל השאלות נענו","stPicked":"סימנתם:","stNotYet":"עוד לא עניתם","stChange":"שינוי","stFill":"למלא","stDone":"סיימתי — ליצירת הקוד","stFinished":"סיימתם","stScoreLine":"{0} נכונות מתוך {1}","stSendNow":"עכשיו שולחים את הקוד למורה.","stSendNote":"הקוד מכיל את השם ואת התשובות שסימנתם — המורה מחשב את הציון אצלו מחדש.","stToTeacher":"למורה","stCopyCode":"העתקת הקוד","stCodeCopied":"הקוד הועתק","stWhatRight":"מה היה נכון","stWhatRightNote":"בשביל ללמוד מזה, לא בשביל הציון.","stOk":"נכון","stCorrect":"התשובה הנכונה:","stToApp":"לאפליקציה עצמה — לתרגול חופשי","stGrade":"ציון:","stCode":"קוד:","badLink":"הקישור לא נקרא","toApp":"לאפליקציה","exOld":"המבחן הזה נוצר בגרסה קודמת של האפליקציה, ולכן השאלות בו כבר לא זהות. בקשו מהמורה לשלוח מבחן חדש.","exBroken":"הקישור חסר או נשבר בדרך. אם הוא הגיע בוואטסאפ, נסו להיכנס אליו ישירות מההודעה.","stBackTo":"חזרה למבחן — שאלה {0} מתוך {1}"};
+var XT={ar:{"exam":"امتحان","student":"طالب","qs":"أسئلة","minutes":"دقيقة","none":"بلا","outOf":"من أصل","exTitle":"امتحان صفّي","exLead":"تُعِدّ الامتحان، ترسل رابطًا في واتساب، وتستلم من كلّ طالب رمز إجابات. لا خادم ولا حساب — كلّ شيء يمرّ عبر الرابط وواتساب.","exName":"اسم الامتحان","exNamePh":"مثلًا: امتحان جبر — الصف التاسع/2","exUnits":"وحدات","exUnitSuf":"وحدات","exLevel":"المستوى","exCount":"عدد الأسئلة","exTime":"تحديد الوقت","exTimeNote":"صفر يعني بلا مؤقّت. عند انتهاء الوقت يُسلَّم الامتحان تلقائيًا.","exTopics":"المواضيع","exTopicsNote":"تُوزَّع الأسئلة بالتساوي بين المواضيع المختارة.","exAcc":"تسهيلات للممتحَنين","exAccNote":"ما هو مسموح في الامتحان نفسه. القراءة الصوتية وورقة القوانين ليستا تلميحًا — بل وسيلتا إتاحة.","exTts":"قراءة صوتية","exTtsSub":"كل سؤال يُقرأ بصوت عند الطلب","exForm":"ورقة قوانين","exFormSub":"متاحة داخل الامتحان، كما في البجروت","exPhone":"رقم واتساب الخاص بك (اختياري)","exPhoneNote":"إذا عبّأته — يفتح زرّ الإرسال عند الطالب محادثة معك مباشرة. انتبه: الرقم يظهر داخل الرابط الذي تشاركه.","exBuild":"أنشئ الامتحان","exShareMsg":"{0} أسئلة. ادخل إلى الرابط، حُلّ، وفي النهاية أرسل لي الرمز.","exReady":"الامتحان جاهز","exWa":"إرسال في واتساب","exCopyUrl":"نسخ الرابط","exToMarks":"إلى العلامات","exUrlCopied":"نُسخ الرابط","mkTitle":"العلامات","mkLead":"الصق هنا الرمز الذي أرسله الطالب في واتساب. تُحتسب العلامة من جديد من الإجابات نفسها، لا مما كتبه الطالب.","mkNew":"امتحان جديد","mkEmpty":"لم تُنشئ امتحانًا بعد. ابدأ من «امتحان جديد».","mkSubs":"تسليمات","mkAvg":"المعدّل","mkPaste":"لصق رمز الإجابات","mkPastePh":"الصق هنا الرمز من واتساب","mkTake":"استلام","mkResend":"إرسال مرّة أخرى","mkCopyTbl":"نسخ الجدول","mkDelQ":"حذف الامتحان و{0} من التسليمات؟","mkDelYes":"نعم، احذف","mkCancel":"إلغاء","mkDel":"حذف الامتحان","mkByStudent":"حسب الطالب","mkNoName":"بلا اسم","mkFell":"أخفق في:","mkAllOk":"كل الإجابات صحيحة","mkBadCode":"الرمز غير متطابق مع نفسه","mkByTopic":"حسب الموضوع — ما يستحقّ إعادة التدريس","mkByTopicNote":"نسبة نجاح الصفّ كلّه معًا.","mkRight":"إجابات صحيحة من أصل","mkTblHead":"الطالب\tالعلامة\tالصحيحة\tأخفق في","mkTblCopied":"نُسخ الجدول","mkErrRead":"تعذّرت قراءة الرمز. حاول نسخه من جديد، كاملًا.","mkErrOther":"هذا الرمز يعود لامتحان «{0}».","mkErrUnknown":"هذا الرمز يعود لامتحان آخر غير موجود على هذا الجهاز.","mkErrCount":"عدد الإجابات في الرمز لا يطابق الامتحان.","mkTaken":"استُلم","mkNoteBad":"انتبه: الرمز غير متطابق مع نفسه","stNoTime":"بلا تحديد وقت.","stTimed":"هناك تحديد للوقت: {0} دقيقة. عند انتهائها يُسلَّم الامتحان تلقائيًا.","stNoTimer":"لا مؤقّت. خذ وقتك.","stNoNeg":"لا علامات سالبة — الإجابة الخاطئة لا تخصم.","stReadOn":"يمكنك طلب قراءة أي سؤال بصوت.","stReadOff":"القراءة الصوتية مغلقة في هذا الامتحان.","stFormOn":"ورقة القوانين مفتوحة طوال الامتحان.","stFormOff":"ورقة القوانين مغلقة في هذا الامتحان.","stCodeEnd":"في النهاية تحصل على رمز — أرسله للمعلّم في واتساب.","stYourName":"اسمك","stNameNote":"كي يعرف المعلّم من أجاب. الاسم لا يُرسل إلى أي خادم — يدخل داخل الرمز.","stNamePh":"الاسم الشخصي واسم العائلة","stStart":"لنبدأ","stQn":"سؤال {0} من أصل {1}","stRead":"قراءة","stFormulas":"ورقة قوانين","stPrev":"السابق","stDunno":"لا أعرف","stFlagged":"✓ مُعلَّم للعودة","stFlag":"للعودة إليه","stNext":"التالي","stReview":"قبل التسليم","stReviewNote":"يمكنك العودة إلى أي سؤال وتغييره. بعد التسليم يُنشأ الرمز.","stUnanswered":"{0} أسئلة بلا إجابة","stAllAnswered":"أُجيبت كل الأسئلة","stPicked":"اخترت:","stNotYet":"لم تُجب بعد","stChange":"تغيير","stFill":"للتعبئة","stDone":"أنهيت — أنشئ الرمز","stFinished":"أنهيت","stScoreLine":"{0} صحيحة من أصل {1}","stSendNow":"الآن أرسل الرمز إلى المعلّم.","stSendNote":"الرمز يحوي الاسم والإجابات التي اخترتها — والمعلّم يحتسب العلامة عنده من جديد.","stToTeacher":"إلى المعلّم","stCopyCode":"نسخ الرمز","stCodeCopied":"نُسخ الرمز","stWhatRight":"ما كان صحيحًا","stWhatRightNote":"للتعلّم منه، لا من أجل العلامة.","stOk":"صحيح","stCorrect":"الإجابة الصحيحة:","stToApp":"إلى التطبيق نفسه — للتدرّب الحرّ","stGrade":"العلامة:","stCode":"الرمز:","badLink":"تعذّرت قراءة الرابط","toApp":"إلى التطبيق","exOld":"أُنشئ هذا الامتحان بنسخة سابقة من التطبيق، ولذلك لم تعد أسئلته مطابقة. اطلب من المعلّم إرسال امتحان جديد.","exBroken":"الرابط ناقص أو انكسر في الطريق. إذا وصلك في واتساب، فحاول الدخول إليه مباشرة من الرسالة.","stBackTo":"العودة إلى الامتحان — سؤال {0} من أصل {1}"},
+ ru:{"exam":"Экзамен","student":"Ученик","qs":"вопросов","minutes":"минут","none":"нет","outOf":"из","exTitle":"Классный экзамен","exLead":"Составьте экзамен, отправьте ссылку в WhatsApp и получите обратно код ответов от каждого ученика. Ни сервера, ни аккаунта — всё идёт через ссылку и WhatsApp.","exName":"Название экзамена","exNamePh":"например: экзамен по алгебре — 9-й класс, группа 2","exUnits":"Уровень программы","exUnitSuf":"ед.","exLevel":"Сложность","exCount":"Число вопросов","exTime":"Ограничение времени","exTimeNote":"Ноль означает без таймера. По истечении времени экзамен сдаётся сам.","exTopics":"Темы","exTopicsNote":"Вопросы делятся поровну между выбранными темами.","exAcc":"Условия для сдающих","exAccNote":"Что разрешено на самом экзамене. Озвучивание и лист формул — не подсказка, а средство доступности.","exTts":"Озвучивание","exTtsSub":"Каждый вопрос читается вслух по запросу","exForm":"Лист формул","exFormSub":"Доступен во время экзамена, как на настоящем","exPhone":"Ваш номер WhatsApp (необязательно)","exPhoneNote":"Если заполните — кнопка отправки у ученика откроет чат прямо с вами. Учтите: номер виден внутри ссылки, которой вы делитесь.","exBuild":"Создать экзамен","exShareMsg":"{0} вопросов. Откройте ссылку, решите, а в конце пришлите мне код.","exReady":"Экзамен готов","exWa":"Отправить в WhatsApp","exCopyUrl":"Скопировать ссылку","exToMarks":"К оценкам","exUrlCopied":"Ссылка скопирована","mkTitle":"Оценки","mkLead":"Вставьте сюда код, который ученик прислал в WhatsApp. Оценка считается заново по самим ответам, а не берётся из того, что написал ученик.","mkNew":"Новый экзамен","mkEmpty":"Вы ещё не создали экзамен. Начните с «Новый экзамен».","mkSubs":"сдач","mkAvg":"среднее","mkPaste":"Вставка кода ответов","mkPastePh":"Вставьте сюда код из WhatsApp","mkTake":"Принять","mkResend":"Отправить снова","mkCopyTbl":"Скопировать таблицу","mkDelQ":"Удалить экзамен и {0} сдач?","mkDelYes":"Да, удалить","mkCancel":"Отмена","mkDel":"Удалить экзамен","mkByStudent":"По ученикам","mkNoName":"Без имени","mkFell":"ошибся в:","mkAllOk":"всё верно","mkBadCode":"код не сходится сам с собой","mkByTopic":"По темам — что стоит объяснить заново","mkByTopicNote":"Доля верных ответов по всему классу.","mkRight":"верных ответов из","mkTblHead":"Ученик\tОценка\tВерно\tОшибся в","mkTblCopied":"Таблица скопирована","mkErrRead":"Не удалось прочитать код. Попробуйте скопировать его заново, целиком.","mkErrOther":"Этот код относится к экзамену «{0}».","mkErrUnknown":"Этот код относится к другому экзамену, которого нет на этом устройстве.","mkErrCount":"Число ответов в коде не совпадает с экзаменом.","mkTaken":"принят","mkNoteBad":"Внимание: код не сходится сам с собой","stNoTime":"без ограничения времени.","stTimed":"Есть ограничение: {0} минут. По их истечении экзамен сдаётся сам.","stNoTimer":"Таймера нет. Можно не спешить.","stNoNeg":"Штрафа за ошибку нет — неверный ответ ничего не отнимает.","stReadOn":"Любой вопрос можно попросить прочитать вслух.","stReadOff":"Озвучивание в этом экзамене отключено.","stFormOn":"Лист формул открыт весь экзамен.","stFormOff":"Лист формул в этом экзамене закрыт.","stCodeEnd":"В конце вы получите код — отправьте его учителю в WhatsApp.","stYourName":"Ваше имя","stNameNote":"Чтобы учитель знал, кто отвечал. Имя не уходит ни на какой сервер — оно входит внутрь кода.","stNamePh":"Имя и фамилия","stStart":"Начинаем","stQn":"Вопрос {0} из {1}","stRead":"Прочитать","stFormulas":"Лист формул","stPrev":"Предыдущий","stDunno":"Не знаю","stFlagged":"✓ отмечен для возврата","stFlag":"Вернуться к нему","stNext":"Следующий","stReview":"Перед сдачей","stReviewNote":"Можно вернуться к любому вопросу и изменить ответ. После сдачи создаётся код.","stUnanswered":"{0} вопросов без ответа","stAllAnswered":"Отвечены все вопросы","stPicked":"Вы выбрали:","stNotYet":"Ещё не отвечено","stChange":"Изменить","stFill":"Заполнить","stDone":"Готово — создать код","stFinished":"Готово","stScoreLine":"{0} верных из {1}","stSendNow":"Теперь отправьте код учителю.","stSendNote":"Код содержит имя и выбранные вами ответы — учитель пересчитывает оценку у себя.","stToTeacher":"учителю","stCopyCode":"Скопировать код","stCodeCopied":"Код скопирован","stWhatRight":"Как было правильно","stWhatRightNote":"Чтобы научиться, а не ради оценки.","stOk":"верно","stCorrect":"Правильный ответ:","stToApp":"К самому приложению — свободная практика","stGrade":"Оценка:","stCode":"Код:","badLink":"Ссылка не прочиталась","toApp":"К приложению","exOld":"Этот экзамен создан в прежней версии приложения, и вопросы в нём уже не те же самые. Попросите учителя прислать новый.","exBroken":"Ссылка неполная или сломалась по пути. Если она пришла в WhatsApp, попробуйте открыть её прямо из сообщения.","stBackTo":"Назад к экзамену — вопрос {0} из {1}"},
+ en:{"exam":"Exam","student":"Student","qs":"questions","minutes":"minutes","none":"none","outOf":"of","exTitle":"Class exam","exLead":"Build an exam, send the link on WhatsApp, and get an answer code back from every student. No server and no account — it all travels through the link and WhatsApp.","exName":"Exam name","exNamePh":"for example: Algebra exam — class 9/2","exUnits":"Units","exUnitSuf":"units","exLevel":"Level","exCount":"Number of questions","exTime":"Time limit","exTimeNote":"Zero means no timer. When the time is up the exam submits itself.","exTopics":"Topics","exTopicsNote":"The questions are split evenly between the topics you choose.","exAcc":"Access arrangements","exAccNote":"What is allowed during the exam itself. Read-aloud and the formula sheet are not a hint — they are access tools.","exTts":"Read aloud","exTtsSub":"Every question is read out on request","exForm":"Formula sheet","exFormSub":"Open during the exam, as in a state exam","exPhone":"Your WhatsApp number (optional)","exPhoneNote":"Fill it in and the student's send button opens a chat straight to you. Note: the number appears inside the link you share.","exBuild":"Create the exam","exShareMsg":"{0} questions. Open the link, answer, and send me the code at the end.","exReady":"The exam is ready","exWa":"Send on WhatsApp","exCopyUrl":"Copy the link","exToMarks":"To the marks","exUrlCopied":"Link copied","mkTitle":"Marks","mkLead":"Paste in the code the student sent you on WhatsApp. The mark is worked out again from the answers themselves, not taken from what the student wrote.","mkNew":"New exam","mkEmpty":"You have not created an exam yet. Start from “New exam”.","mkSubs":"submissions","mkAvg":"average","mkPaste":"Paste an answer code","mkPastePh":"Paste the code from WhatsApp here","mkTake":"Take it in","mkResend":"Send again","mkCopyTbl":"Copy the table","mkDelQ":"Delete the exam and its {0} submissions?","mkDelYes":"Yes, delete","mkCancel":"Cancel","mkDel":"Delete the exam","mkByStudent":"By student","mkNoName":"No name","mkFell":"tripped on:","mkAllOk":"all correct","mkBadCode":"the code does not match itself","mkByTopic":"By topic — what is worth teaching again","mkByTopicNote":"How the whole class did, together.","mkRight":"correct answers out of","mkTblHead":"Student\tMark\tCorrect\tTripped on","mkTblCopied":"Table copied","mkErrRead":"We could not read the code. Try copying it again, in full.","mkErrOther":"This code belongs to the exam “{0}”.","mkErrUnknown":"This code belongs to another exam, which is not on this device.","mkErrCount":"The number of answers in the code does not match the exam.","mkTaken":"taken in","mkNoteBad":"Note: the code does not match itself","stNoTime":"no time limit.","stTimed":"There is a time limit: {0} minutes. When it runs out the exam submits itself.","stNoTimer":"No timer. Take your time.","stNoNeg":"No negative marking — a wrong answer takes nothing away.","stReadOn":"You can ask for any question to be read aloud.","stReadOff":"Read-aloud is off in this exam.","stFormOn":"The formula sheet is open throughout the exam.","stFormOff":"The formula sheet is closed in this exam.","stCodeEnd":"At the end you get a code — send it to your teacher on WhatsApp.","stYourName":"Your name","stNameNote":"So the teacher knows who answered. The name is not sent to any server — it goes inside the code.","stNamePh":"First name and surname","stStart":"Let's start","stQn":"Question {0} of {1}","stRead":"Read aloud","stFormulas":"Formula sheet","stPrev":"Previous","stDunno":"I don't know","stFlagged":"✓ marked to come back","stFlag":"Come back to it","stNext":"Next","stReview":"Before you submit","stReviewNote":"You can go back to any question and change it. The code is created after you submit.","stUnanswered":"{0} questions with no answer","stAllAnswered":"Every question is answered","stPicked":"You chose:","stNotYet":"Not answered yet","stChange":"Change","stFill":"Fill in","stDone":"Finished — create the code","stFinished":"Finished","stScoreLine":"{0} correct out of {1}","stSendNow":"Now send the code to your teacher.","stSendNote":"The code holds your name and the answers you chose — the teacher works the mark out again at their end.","stToTeacher":"to the teacher","stCopyCode":"Copy the code","stCodeCopied":"Code copied","stWhatRight":"What the answers were","stWhatRightNote":"To learn from it, not for the mark.","stOk":"correct","stCorrect":"The correct answer:","stToApp":"To the app itself — free practice","stGrade":"Mark:","stCode":"Code:","badLink":"The link could not be read","toApp":"To the app","exOld":"This exam was made with an earlier version of the app, so its questions are no longer the same. Ask your teacher to send a new one.","exBroken":"The link is missing a piece or broke on the way. If it came on WhatsApp, try opening it straight from the message.","stBackTo":"Back to the exam — question {0} of {1}"}};
+function xlg(){return LG}
+function xt(k){var d=XT[xlg()];var v=d&&d[k];return v===undefined?(XK[k]===undefined?k:XK[k]):v}
+/* {0} ו-{1} — סדר המילים משתנה בין השפות, ולכן מספרים ולא רצף */
+function xf(k){var s=xt(k),a=arguments,i;
+  for(i=1;i<a.length;i++)s=s.split("{"+(i-1)+"}").join(String(a[i]));
+  return s}
+
 function viewExamNew(){
   var tops=topicsForTrack(state.track);
   if(!EB.topics.length)EB.topics=tops.slice(0,4).map(function(t){return t.id});
   var h='<div class="wrap" style="padding-block:22px">';
-  h+='<h1 class="h1">מבחן כיתתי</h1>'+
-     '<p class="sub">בונים מבחן, שולחים קישור בוואטסאפ, ומקבלים בחזרה קוד תשובות לכל תלמיד. '+
-     'אין שרת ואין חשבון — הכול עובר דרך הקישור ודרך וואטסאפ.</p>';
+  h+='<h1 class="h1">'+esc(xt("exTitle"))+'</h1>'+
+     '<p class="sub">'+esc(xt("exLead"))+'</p>';
 
   h+='<div class="card pad" style="margin-top:16px">';
-  h+='<label class="tt"><b>שם המבחן</b></label>'+
-     '<input class="field" id="exTitle" value="'+esc(EB.title)+'" placeholder="למשל: מבחן אלגברה — כיתה ט׳2" maxlength="60">';
+  h+='<label class="tt"><b>'+esc(xt("exName"))+'</b></label>'+
+     '<input class="field" id="exTitle" value="'+esc(EB.title)+'" placeholder="'+esc(xt("exNamePh"))+'" maxlength="60">';
 
-  h+='<div style="margin-top:16px"><b>יחידות</b>'+
+  h+='<div style="margin-top:16px"><b>'+esc(xt("exUnits"))+'</b>'+
      '<div class="seg" style="margin-top:7px">'+[3,4,5].map(function(tr){
-       return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'">'+tr+' יח״ל</button>'
+       return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
      }).join("")+'</div></div>';
 
-  h+='<div style="margin-top:16px"><b>רמה</b><div class="seg" style="margin-top:7px">'+
+  h+='<div style="margin-top:16px"><b>'+esc(xt("exLevel"))+'</b><div class="seg" style="margin-top:7px">'+
      LVL.map(function(l,i){
        return '<button class="'+(EB.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
      }).join("")+'</div></div>';
 
-  h+='<div style="margin-top:16px"><b>מספר שאלות: <span id="exNlab">'+EB.n+'</span></b>'+
+  h+='<div style="margin-top:16px"><b>'+esc(xt("exCount"))+': <span id="exNlab">'+EB.n+'</span></b>'+
      '<input type="range" min="5" max="25" step="1" value="'+EB.n+'" data-slide="exn" style="margin-top:6px"></div>';
-  h+='<div style="margin-top:16px"><b>הגבלת זמן: <span id="exMlab">'+(EB.mins?EB.mins+' דקות':'ללא')+'</span></b>'+
-     '<p class="sub sm" style="margin:2px 0 0">אפס פירושו בלי טיימר. בתום הזמן המבחן מוגש מעצמו.</p>'+
+  h+='<div style="margin-top:16px"><b>'+esc(xt("exTime"))+': <span id="exMlab">'+
+     esc(EB.mins?EB.mins+' '+xt("minutes"):xt("none"))+'</span></b>'+
+     '<p class="sub sm" style="margin:2px 0 0">'+esc(xt("exTimeNote"))+'</p>'+
      '<input type="range" min="0" max="90" step="5" value="'+EB.mins+'" data-slide="exm" style="margin-top:6px"></div>';
 
-  h+='<div style="margin-top:18px"><b>נושאים</b>'+
-     '<p class="sub" style="margin:4px 0 8px">השאלות מתחלקות שווה בשווה בין הנושאים שנבחרו.</p>'+
+  h+='<div style="margin-top:18px"><b>'+esc(xt("exTopics"))+'</b>'+
+     '<p class="sub" style="margin:4px 0 8px">'+esc(xt("exTopicsNote"))+'</p>'+
      '<div class="grid g2">';
   tops.forEach(function(t){
     var on=EB.topics.indexOf(t.id)>=0;
@@ -3036,36 +3054,35 @@ function viewExamNew(){
 
   /* התאמות. לא "הקלות" — הן הסיבה שהאפליקציה הזאת קיימת, והמורה
      הוא זה שמחליט מה מותר במבחן שלו. */
-  h+='<div style="margin-top:18px"><b>התאמות לנבחנים</b>'+
-     '<p class="sub" style="margin:4px 0 8px">מה שמותר בבחינה עצמה. ההקראה ודף הנוסחאות אינם רמז — הם כלי נגישות.</p>';
-  [["tts","הקראה קולית","כל שאלה נקראת בקול לפי בקשה"],
-   ["formulas","דף נוסחאות","נגיש מתוך המבחן, כמו בבגרות"]].forEach(function(r){
+  h+='<div style="margin-top:18px"><b>'+esc(xt("exAcc"))+'</b>'+
+     '<p class="sub" style="margin:4px 0 8px">'+esc(xt("exAccNote"))+'</p>';
+  [["tts",xt("exTts"),xt("exTtsSub")],
+   ["formulas",xt("exForm"),xt("exFormSub")]].forEach(function(r){
     var on=!!EB[r[0]];
     h+='<button class="tog" data-a="exflag" data-f="'+r[0]+'" role="switch" aria-checked="'+(on?"true":"false")+'">'+
       '<span class="tt"><b>'+esc(r[1])+'</b><span>'+esc(r[2])+'</span></span><span class="sw"></span></button>';
   });
   h+='</div>';
 
-  h+='<div style="margin-top:18px"><label class="tt"><b>מספר הוואטסאפ שלכם (לא חובה)</b></label>'+
-     '<p class="sub" style="margin:4px 0 6px">אם תמלאו — כפתור השליחה אצל התלמיד ייפתח ישר לצ׳אט איתכם. '+
-     'שימו לב: המספר יופיע בתוך הקישור שאתם משתפים.</p>'+
+  h+='<div style="margin-top:18px"><label class="tt"><b>'+esc(xt("exPhone"))+'</b></label>'+
+     '<p class="sub" style="margin:4px 0 6px">'+esc(xt("exPhoneNote"))+'</p>'+
      '<input class="field" id="exPhone" value="'+esc(EB.phone)+'" placeholder="972501234567" inputmode="tel" maxlength="20"></div>';
 
-  h+='<button class="btn btn-p w" style="margin-top:20px" data-a="exbuild">'+ic("check",18)+' צרו את המבחן</button>';
+  h+='<button class="btn btn-p w" style="margin-top:20px" data-a="exbuild">'+ic("check",18)+' '+esc(xt("exBuild"))+'</button>';
   h+='</div>';
 
   if(EB.built){
     var sp=EB.built,url=examUrl(sp);
-    var msg=(sp.t||"מבחן")+"\n"+sp.q.length+" שאלות. נכנסים לקישור, פותרים, ובסוף שולחים לי את הקוד.\n"+url;
+    var msg=(sp.t||xt("exam"))+"\n"+xf("exShareMsg",sp.q.length)+"\n"+url;
     h+='<div class="card pad" style="margin-top:18px;border-color:var(--ok)">'+
-       '<h2 class="h2">המבחן מוכן</h2>'+
-       '<p class="sub">'+esc(sp.t||"מבחן")+' · '+sp.q.length+' שאלות · '+esc(LVL[sp.l-1]||"")+'</p>'+
+       '<h2 class="h2">'+esc(xt("exReady"))+'</h2>'+
+       '<p class="sub">'+esc(sp.t||xt("exam"))+' · '+sp.q.length+' '+esc(xt("qs"))+' · '+esc(LVL[sp.l-1]||"")+'</p>'+
        '<div class="row" style="margin-top:12px">'+
        '<a class="btn btn-p" href="'+esc(waLink(msg,""))+'" target="_blank" rel="noopener">'+
-       ic("share",17)+' שליחה בוואטסאפ</a>'+
-       '<button class="btn" data-a="excopy" data-v="'+esc(url)+'">'+ic("copy",17)+' העתקת הקישור</button>'+
-       '<button class="btn btn-g" data-a="go" data-v="marks">'+ic("chart",17)+' לציונים</button></div>'+
-       (EB.copied==="url"?'<p class="chip ok" style="margin-top:10px">הקישור הועתק</p>':"")+
+       ic("share",17)+' '+esc(xt("exWa"))+'</a>'+
+       '<button class="btn" data-a="excopy" data-v="'+esc(url)+'">'+ic("copy",17)+' '+esc(xt("exCopyUrl"))+'</button>'+
+       '<button class="btn btn-g" data-a="go" data-v="marks">'+ic("chart",17)+' '+esc(xt("exToMarks"))+'</button></div>'+
+       (EB.copied==="url"?'<p class="chip ok" style="margin-top:10px">'+esc(xt("exUrlCopied"))+'</p>':"")+
        '<p class="sub" style="margin-top:12px;word-break:break-all;direction:ltr;text-align:left">'+esc(url)+'</p>'+
        '</div>';
   }
@@ -3078,15 +3095,14 @@ function viewExamNew(){
 var MK={open:"",paste:"",msg:null,del:""};
 function viewMarks(){
   var h='<div class="wrap" style="padding-block:22px">';
-  h+='<h1 class="h1">ציונים</h1>'+
-     '<p class="sub">מדביקים כאן את הקוד שהתלמיד שלח בוואטסאפ. הציון מחושב מחדש מהתשובות עצמן, '+
-     'ולא נלקח ממה שהתלמיד כתב.</p>';
+  h+='<h1 class="h1">'+esc(xt("mkTitle"))+'</h1>'+
+     '<p class="sub">'+esc(xt("mkLead"))+'</p>';
   h+='<div class="row" style="margin-top:14px"><button class="btn btn-p" data-a="go" data-v="exam">'+
-     ic("plus",17)+' מבחן חדש</button></div>';
+     ic("plus",17)+' '+esc(xt("mkNew"))+'</button></div>';
 
   if(!EX.list.length){
     h+='<div class="card pad" style="margin-top:16px"><p class="sub" style="margin:0">'+
-       'עוד לא יצרתם מבחן. אפשר להתחיל מ״מבחן חדש״.</p></div>';
+       esc(xt("mkEmpty"))+'</p></div>';
     return h+'</div>';
   }
   EX.list.forEach(function(ex){
@@ -3095,26 +3111,25 @@ function viewMarks(){
     var avg=subs.length?Math.round(subs.reduce(function(a,b){return a+b.pct},0)/subs.length):0;
     h+='<div class="card pad" style="margin-top:14px">';
     h+='<button class="row" data-a="mkopen" data-i="'+esc(ex.id)+'" style="width:100%;background:none;border:0;text-align:start;cursor:pointer">'+
-       '<span style="flex:1;min-width:0"><b>'+esc(ex.spec.t||"מבחן")+'</b>'+
-       '<span class="sub" style="display:block">'+ex.spec.q.length+' שאלות · '+esc(ex.date)+
-       ' · '+subs.length+' הגשות'+(subs.length?' · ממוצע '+avg:'')+'</span></span>'+
+       '<span style="flex:1;min-width:0"><b>'+esc(ex.spec.t||xt("exam"))+'</b>'+
+       '<span class="sub" style="display:block">'+ex.spec.q.length+' '+esc(xt("qs"))+' · '+esc(ex.date)+
+       ' · '+subs.length+' '+esc(xt("mkSubs"))+(subs.length?' · '+esc(xt("mkAvg"))+' '+avg:'')+'</span></span>'+
        '<span class="chip'+(subs.length?(avg>=70?" ok":avg>=55?" warn":" bad"):"")+'">'+
        (subs.length?avg+"%":"—")+'</span></button>';
     if(!open){h+='</div>';return}
 
-    h+='<div style="margin-top:14px"><label class="tt"><b>הדבקת קוד תשובות</b></label>'+
-       '<textarea class="field" id="mkPaste" rows="3" placeholder="מדביקים כאן את הקוד מהוואטסאפ"></textarea>'+
+    h+='<div style="margin-top:14px"><label class="tt"><b>'+esc(xt("mkPaste"))+'</b></label>'+
+       '<textarea class="field" id="mkPaste" rows="3" placeholder="'+esc(xt("mkPastePh"))+'"></textarea>'+
        '<div class="row" style="margin-top:8px">'+
-       '<button class="btn btn-p" data-a="mkadd" data-i="'+esc(ex.id)+'">'+ic("check",17)+' קליטה</button>'+
-       '<a class="btn" href="'+esc(waLink((ex.spec.t||"מבחן")+"\n"+examUrl(ex.spec),""))+'" target="_blank" rel="noopener">'+
-       ic("share",17)+' שליחה שוב</a>'+
-       (subs.length?'<button class="btn btn-g" data-a="mkcopy" data-i="'+esc(ex.id)+'">'+ic("copy",17)+' העתקת טבלה</button>':"")+
+       '<button class="btn btn-p" data-a="mkadd" data-i="'+esc(ex.id)+'">'+ic("check",17)+' '+esc(xt("mkTake"))+'</button>'+
+       '<a class="btn" href="'+esc(waLink((ex.spec.t||xt("exam"))+"\n"+examUrl(ex.spec),""))+'" target="_blank" rel="noopener">'+
+       ic("share",17)+' '+esc(xt("mkResend"))+'</a>'+
+       (subs.length?'<button class="btn btn-g" data-a="mkcopy" data-i="'+esc(ex.id)+'">'+ic("copy",17)+' '+esc(xt("mkCopyTbl"))+'</button>':"")+
        (MK.del===ex.id?
-         '<span class="row" style="gap:6px"><span class="chip bad">למחוק את המבחן ואת '+
-         (subs.length||0)+' ההגשות?</span>'+
-         '<button class="btn btn-d" data-a="mkdelyes" data-i="'+esc(ex.id)+'">כן, למחוק</button>'+
-         '<button class="btn btn-g" data-a="mkdelno">ביטול</button></span>':
-         '<button class="btn btn-g" data-a="mkdel" data-i="'+esc(ex.id)+'">מחיקת המבחן</button>')+
+         '<span class="row" style="gap:6px"><span class="chip bad">'+esc(xf("mkDelQ",subs.length||0))+'</span>'+
+         '<button class="btn btn-d" data-a="mkdelyes" data-i="'+esc(ex.id)+'">'+esc(xt("mkDelYes"))+'</button>'+
+         '<button class="btn btn-g" data-a="mkdelno">'+esc(xt("mkCancel"))+'</button></span>':
+         '<button class="btn btn-g" data-a="mkdel" data-i="'+esc(ex.id)+'">'+esc(xt("mkDel"))+'</button>')+
        '</div>';
     if(MK.msg&&MK.msg.id===ex.id)
       h+='<p class="chip '+(MK.msg.ok?"ok":"bad")+'" style="margin-top:10px">'+esc(MK.msg.m)+'</p>';
@@ -3122,12 +3137,13 @@ function viewMarks(){
 
     if(subs.length){
       /* לפי תלמיד */
-      h+='<div style="margin-top:16px"><b>לפי תלמיד</b>';
+      h+='<div style="margin-top:16px"><b>'+esc(xt("mkByStudent"))+'</b>';
       subs.slice().sort(function(a,b){return b.pct-a.pct}).forEach(function(s){
         var wrong=s.per.filter(function(p){return !p.ok});
-        h+='<div class="tog" style="align-items:flex-start"><span class="tt"><b>'+esc(s.name||"ללא שם")+'</b>'+
-          '<span>'+s.ok+' מתוך '+s.n+(wrong.length?' · נפל ב: '+esc(uniq(wrong.map(function(p){return p.topicName})).join(", ")):' · הכול נכון')+
-          (s.valid?"":' · <b style="color:var(--bad)">הקוד לא תואם לעצמו</b>')+'</span></span>'+
+        h+='<div class="tog" style="align-items:flex-start"><span class="tt"><b>'+esc(s.name||xt("mkNoName"))+'</b>'+
+          '<span>'+s.ok+' '+esc(xt("outOf"))+' '+s.n+
+          (wrong.length?' · '+esc(xt("mkFell"))+' '+esc(uniq(wrong.map(function(p){return p.topicName})).join(", ")):' · '+esc(xt("mkAllOk")))+
+          (s.valid?"":' · <b style="color:var(--bad)">'+esc(xt("mkBadCode"))+'</b>')+'</span></span>'+
           '<span class="chip '+(s.pct>=70?"ok":s.pct>=55?"warn":"bad")+'">'+s.pct+'%</span></div>';
       });
       h+='</div>';
@@ -3137,12 +3153,12 @@ function viewMarks(){
         if(!byT[p.topic])byT[p.topic]={n:0,ok:0,name:p.topicName};
         byT[p.topic].n++; byT[p.topic].ok+=p.ok;
       })});
-      h+='<div style="margin-top:16px"><b>לפי נושא — מה כדאי ללמד שוב</b>'+
-         '<p class="sub" style="margin:4px 0 8px">אחוז ההצלחה של כל הכיתה יחד.</p>';
+      h+='<div style="margin-top:16px"><b>'+esc(xt("mkByTopic"))+'</b>'+
+         '<p class="sub" style="margin:4px 0 8px">'+esc(xt("mkByTopicNote"))+'</p>';
       Object.keys(byT).map(function(k){var o=byT[k];o.pct=Math.round(100*o.ok/o.n);return o})
         .sort(function(a,b){return a.pct-b.pct}).forEach(function(o){
         h+='<div class="tog"><span class="tt"><b>'+esc(o.name)+'</b>'+
-          '<span>'+o.ok+' תשובות נכונות מתוך '+o.n+'</span></span>'+
+          '<span>'+o.ok+' '+esc(xt("mkRight"))+' '+o.n+'</span></span>'+
           '<span class="bar '+(o.pct>=70?"ok":o.pct>=40?"mid":"low")+'" style="width:90px;flex:none">'+
           '<i style="width:'+o.pct+'%"></i></span>'+
           '<span class="chip">'+o.pct+'%</span></div>';
@@ -3154,11 +3170,11 @@ function viewMarks(){
   return h+'</div>';
 }
 function marksTable(ex){
-  var out=(ex.spec.t||"מבחן")+"\n";
-  out+="תלמיד\tציון\tנכונות\tנפל ב\n";
+  var out=(ex.spec.t||xt("exam"))+"\n";
+  out+=xt("mkTblHead")+"\n";
   (ex.subs||[]).slice().sort(function(a,b){return b.pct-a.pct}).forEach(function(s){
     var wrong=uniq(s.per.filter(function(p){return !p.ok}).map(function(p){return p.topicName}));
-    out+=(s.name||"ללא שם")+"\t"+s.pct+"\t"+s.ok+"/"+s.n+"\t"+wrong.join(", ")+"\n";
+    out+=(s.name||xt("mkNoName"))+"\t"+s.pct+"\t"+s.ok+"/"+s.n+"\t"+wrong.join(", ")+"\n";
   });
   return out;
 }
@@ -3272,18 +3288,19 @@ function viewSit(){
   var sp=SIT.spec;
   if(SIT.phase==="intro"){
     var h='<div class="wrap" style="padding-block:26px;max-width:620px">';
-    h+='<div class="card pad"><h1 class="h1">'+esc(sp.t||"מבחן")+'</h1>'+
-       '<p class="sub">'+sp.q.length+' שאלות · '+esc(LVL[sp.l-1]||"")+' · בלי הגבלת זמן.</p>';
+    h+='<div class="card pad"><h1 class="h1">'+esc(sp.t||xt("exam"))+'</h1>'+
+       '<p class="sub">'+sp.q.length+' '+esc(xt("qs"))+' · '+esc(LVL[sp.l-1]||"")+' · '+
+       esc(sp.m?sp.m+' '+xt("minutes"):xt("stNoTime"))+'</p>';
     h+='<ul class="sub" style="margin:14px 0 0;padding-inline-start:20px;line-height:1.9">'+
-       (sp.m?'<li>יש הגבלת זמן: '+sp.m+' דקות. בסופן המבחן מוגש מעצמו.</li>':'<li>אין טיימר. אפשר לקחת את הזמן.</li>')+
-       '<li>אין ניקוד שלילי — תשובה לא נכונה לא גורעת.</li>'+
-       (sp.r!==false?'<li>אפשר לבקש הקראה של כל שאלה.</li>':'<li>ההקראה כבויה במבחן הזה.</li>')+
-       (sp.f!==false?'<li>דף הנוסחאות פתוח לאורך כל המבחן.</li>':'<li>דף הנוסחאות סגור במבחן הזה.</li>')+
-       '<li>בסוף תקבלו קוד — שולחים אותו למורה בוואטסאפ.</li></ul>';
-    h+='<label class="tt" style="display:block;margin-top:18px"><b>השם שלכם</b></label>'+
-       '<p class="sub" style="margin:2px 0 6px">כדי שהמורה יידע מי ענה. השם לא נשלח לשום שרת — הוא נכנס לתוך הקוד.</p>'+
-       '<input class="field" id="sitName" value="'+esc(SIT.name)+'" placeholder="שם פרטי ושם משפחה" maxlength="40">';
-    h+='<button class="btn btn-p w" style="margin-top:16px" data-a="sitstart">'+ic("arrow",18)+' מתחילים</button>';
+       '<li>'+esc(sp.m?xf("stTimed",sp.m):xt("stNoTimer"))+'</li>'+
+       '<li>'+esc(xt("stNoNeg"))+'</li>'+
+       '<li>'+esc(sp.r!==false?xt("stReadOn"):xt("stReadOff"))+'</li>'+
+       '<li>'+esc(sp.f!==false?xt("stFormOn"):xt("stFormOff"))+'</li>'+
+       '<li>'+esc(xt("stCodeEnd"))+'</li></ul>';
+    h+='<label class="tt" style="display:block;margin-top:18px"><b>'+esc(xt("stYourName"))+'</b></label>'+
+       '<p class="sub" style="margin:2px 0 6px">'+esc(xt("stNameNote"))+'</p>'+
+       '<input class="field" id="sitName" value="'+esc(SIT.name)+'" placeholder="'+esc(xt("stNamePh"))+'" maxlength="40">';
+    h+='<button class="btn btn-p w" style="margin-top:16px" data-a="sitstart">'+ic("arrow",18)+' '+esc(xt("stStart"))+'</button>';
     h+='</div></div>';
     return h;
   }
@@ -3292,7 +3309,7 @@ function viewSit(){
     var h2='<main class="wrap" style="padding-block:18px">';
     h2+='<div class="spread"><div class="row">'+
         '<span class="chip area '+topicCls(q.topic)+'">'+esc(q.topicName)+'</span>'+
-        '<span class="chip">שאלה '+(SIT.i+1)+' מתוך '+SIT.qs.length+'</span>'+
+        '<span class="chip">'+esc(xf("stQn",SIT.i+1,SIT.qs.length))+'</span>'+
         (sitLeft()===null?"":'<span class="chip" id="sitclock" aria-live="polite">'+sitClock()+'</span>')+'</div>'+
         '<span class="dots">'+SIT.answers.map(function(a,i){
           return '<span class="dot '+(SIT.flags[i]?"flag ":"")+(i<SIT.i?(a>=0?"ok":"no"):"")+'"></span>'}).join("")+'</span></div>';
@@ -3302,9 +3319,9 @@ function viewSit(){
     if(q.fig)h2+=q.fig;
     var tools=[];
     if(sp.r!==false&&state.settings.tts)
-      tools.push('<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="sitread">'+ic("speaker",16)+' הקראה</button>');
+      tools.push('<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="sitread">'+ic("speaker",16)+' '+esc(xt("stRead"))+'</button>');
     if(sp.f!==false)
-      tools.push('<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="sitform">'+ic("book",16)+' דף נוסחאות</button>');
+      tools.push('<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="sitform">'+ic("book",16)+' '+esc(xt("stFormulas"))+'</button>');
     if(tools.length)h2+='<div class="row" style="margin-top:16px;gap:8px">'+tools.join("")+'</div>';
     var cur=SIT.answers[SIT.i];
     h2+='<div class="opts">'+q.options.map(function(o,i){
@@ -3314,10 +3331,11 @@ function viewSit(){
     /* "לא יודע/ת" הוא תשובה לגיטימית ולא דילוג. היא נספרת כשגויה,
        אבל היא מגלה למורה משהו שניחוש מסתיר. */
     h2+='<div class="row" style="margin-top:14px">'+
-        (SIT.i>0?'<button class="btn btn-g" data-a="sitprev">'+ic("back",16)+' קודמת</button>':"")+
-        '<button class="btn btn-g" data-a="sitskip">לא יודע/ת</button>'+
-        '<button class="btn btn-g" data-a="sitflag" aria-pressed="'+(SIT.flags[SIT.i]?"true":"false")+'">'+(SIT.flags[SIT.i]?'✓ מסומנת לחזרה':'לחזור אליה')+'</button>'+
-        (cur>=0?'<button class="btn btn-g" data-a="sitfwd">הבאה '+ic("arrow",16)+'</button>':"")+
+        (SIT.i>0?'<button class="btn btn-g" data-a="sitprev">'+ic("back",16)+' '+esc(xt("stPrev"))+'</button>':"")+
+        '<button class="btn btn-g" data-a="sitskip">'+esc(xt("stDunno"))+'</button>'+
+        '<button class="btn btn-g" data-a="sitflag" aria-pressed="'+(SIT.flags[SIT.i]?"true":"false")+'">'+
+        esc(SIT.flags[SIT.i]?xt("stFlagged"):xt("stFlag"))+'</button>'+
+        (cur>=0?'<button class="btn btn-g" data-a="sitfwd">'+esc(xt("stNext"))+' '+ic("arrow",16)+'</button>':"")+
         '</div>';
     h2+='</div></main>';
     return h2;
@@ -3325,56 +3343,57 @@ function viewSit(){
   if(SIT.phase==="review"){
     var notYet=SIT.answers.filter(function(a){return a<0}).length;
     var hr='<div class="wrap" style="padding-block:24px;max-width:640px"><div class="card pad">'+
-      '<h1 class="h1">לפני ההגשה</h1>'+
-      '<p class="sub">אפשר לחזור לכל שאלה ולשנות. אחרי ההגשה נוצר הקוד.</p>'+
-      (notYet?'<p class="chip warn" style="margin-top:10px">'+notYet+' שאלות בלי תשובה</p>':
-              '<p class="chip ok" style="margin-top:10px">כל השאלות נענו</p>');
+      '<h1 class="h1">'+esc(xt("stReview"))+'</h1>'+
+      '<p class="sub">'+esc(xt("stReviewNote"))+'</p>'+
+      (notYet?'<p class="chip warn" style="margin-top:10px">'+esc(xf("stUnanswered",notYet))+'</p>':
+              '<p class="chip ok" style="margin-top:10px">'+esc(xt("stAllAnswered"))+'</p>');
     SIT.qs.forEach(function(q,i){
       var a=SIT.answers[i];
       hr+='<button class="tog" data-a="sitgo" data-i="'+i+'" style="align-items:flex-start">'+
         '<span class="tt"><b>'+(i+1)+'. '+esc(q.topicName)+'</b>'+
-        '<span>'+(a>=0?"סימנתם: "+q.options[a].h:"<b>עוד לא עניתם</b>")+'</span></span>'+
-        '<span class="chip'+(a>=0?"":" warn")+'">'+(a>=0?"שינוי":"למלא")+'</span></button>';
+        '<span>'+(a>=0?esc(xt("stPicked"))+" "+q.options[a].h:"<b>"+esc(xt("stNotYet"))+"</b>")+'</span></span>'+
+        '<span class="chip'+(a>=0?"":" warn")+'">'+esc(a>=0?xt("stChange"):xt("stFill"))+'</span></button>';
     });
     hr+='<button class="btn btn-p w" style="margin-top:16px" data-a="sitfinish">'+
-        ic("check",18)+' סיימתי — ליצירת הקוד</button>';
+        ic("check",18)+' '+esc(xt("stDone"))+'</button>';
     return hr+'</div></div>';
   }
   /* סיום */
   var g=sitGrade(),msg;
-  msg=(SIT.name||"תלמיד")+" — "+esc(sp.t||"מבחן")+"\nציון: "+g.pct+" ("+g.ok+"/"+g.n+")\nקוד:\n"+SIT.code;
+  msg=(SIT.name||xt("student"))+" — "+esc(sp.t||xt("exam"))+"\n"+xt("stGrade")+" "+g.pct+
+      " ("+g.ok+"/"+g.n+")\n"+xt("stCode")+"\n"+SIT.code;
   var h3='<div class="wrap" style="padding-block:26px;max-width:640px">';
-  h3+='<div class="card pad"><h1 class="h1">סיימתם</h1>'+
-      '<p class="sub">'+esc(sp.t||"מבחן")+'</p>'+
+  h3+='<div class="card pad"><h1 class="h1">'+esc(xt("stFinished"))+'</h1>'+
+      '<p class="sub">'+esc(sp.t||xt("exam"))+'</p>'+
       '<div class="row" style="margin-top:12px"><span class="chip '+(g.pct>=70?"ok":g.pct>=55?"warn":"bad")+
       '" style="font-size:1.4rem;padding:10px 18px">'+g.pct+'</span>'+
-      '<span class="sub">'+g.ok+' נכונות מתוך '+g.n+'</span></div>';
-  h3+='<p class="sub" style="margin-top:16px"><b>עכשיו שולחים את הקוד למורה.</b> '+
-      'הקוד מכיל את השם ואת התשובות שסימנתם — המורה מחשב את הציון אצלו מחדש.</p>';
+      '<span class="sub">'+esc(xf("stScoreLine",g.ok,g.n))+'</span></div>';
+  h3+='<p class="sub" style="margin-top:16px"><b>'+esc(xt("stSendNow"))+'</b> '+
+      esc(xt("stSendNote"))+'</p>';
   h3+='<div class="row" style="margin-top:12px">'+
       '<a class="btn btn-p" href="'+esc(waLink(msg,sp.p||""))+'" target="_blank" rel="noopener">'+
-      ic("share",17)+' שליחה בוואטסאפ'+(sp.p?' למורה':'')+'</a>'+
-      '<button class="btn" data-a="sitcopy">'+ic("copy",17)+' העתקת הקוד</button></div>';
-  if(SIT.copied)h3+='<p class="chip ok" style="margin-top:10px">הקוד הועתק</p>';
+      ic("share",17)+' '+esc(xt("exWa"))+(sp.p?' '+esc(xt("stToTeacher")):'')+'</a>'+
+      '<button class="btn" data-a="sitcopy">'+ic("copy",17)+' '+esc(xt("stCopyCode"))+'</button></div>';
+  if(SIT.copied)h3+='<p class="chip ok" style="margin-top:10px">'+esc(xt("stCodeCopied"))+'</p>';
   h3+='<p class="sub" style="margin-top:12px;word-break:break-all;direction:ltr;text-align:left;'+
       'background:var(--surface2);border-radius:10px;padding:10px">'+esc(SIT.code)+'</p>';
   h3+='</div>';
 
   if(sp.w!==false){
-    h3+='<div class="card pad" style="margin-top:16px"><h2 class="h2">מה היה נכון</h2>'+
-        '<p class="sub">בשביל ללמוד מזה, לא בשביל הציון.</p>';
+    h3+='<div class="card pad" style="margin-top:16px"><h2 class="h2">'+esc(xt("stWhatRight"))+'</h2>'+
+        '<p class="sub">'+esc(xt("stWhatRightNote"))+'</p>';
     SIT.qs.forEach(function(q,i){
       var a=SIT.answers[i],right=(a>=0&&q.options[a]&&q.options[a].ok);
       var corr=(q.options.filter(function(o){return o.ok})[0]||{}).h||"";
       h3+='<div class="tog" style="align-items:flex-start"><span class="tt">'+
         '<b>'+(i+1)+'. '+esc(q.topicName)+'</b>'+
-        '<span>'+(right?"נכון":"התשובה הנכונה: "+corr)+'</span></span>'+
+        '<span>'+(right?esc(xt("stOk")):esc(xt("stCorrect"))+" "+corr)+'</span></span>'+
         '<span class="chip '+(right?"ok":"bad")+'">'+(right?"✓":"✗")+'</span></div>';
     });
     h3+='</div>';
   }
   h3+='<div class="row" style="margin-top:16px"><a class="btn btn-g" href="'+
-      esc(location.origin+location.pathname)+'">לאפליקציה עצמה — לתרגול חופשי</a></div>';
+      esc(location.origin+location.pathname)+'">'+esc(xt("stToApp"))+'</a></div>';
   return h3+'</div>';
 }
 
@@ -3417,7 +3436,7 @@ function examAction(a,el){
     /* חלוקה שווה בין הנושאים, ואז ערבוב — כדי שלא יגיעו בגושים */
     var q=[],i;
     for(i=0;i<EB.n;i++)q.push([tops[i%tops.length],EB.level]);
-    var spec={v:GENV,t:EB.title||"מבחן",s:(Math.random()*4294967295)>>>0,l:EB.level,
+    var spec={v:GENV,t:EB.title||xt("exam"),s:(Math.random()*4294967295)>>>0,l:EB.level,
               q:shuffle(q),r:!!EB.tts,f:!!EB.formulas,w:true,m:EB.mins||0};
     if(EB.phone)spec.p=EB.phone.replace(/[^0-9]/g,"");
     EB.built=spec; EB.copied="";
@@ -3440,22 +3459,21 @@ function examAction(a,el){
   }
   if(a==="mkcopy"){
     var ex4=exFind(el.getAttribute("data-i")); if(!ex4)return true;
-    copyText(marksTable(ex4),function(){MK.msg={id:ex4.id,ok:true,m:"הטבלה הועתקה"};render()});
+    copyText(marksTable(ex4),function(){MK.msg={id:ex4.id,ok:true,m:xt("mkTblCopied")};render()});
     return true;
   }
   if(a==="mkadd"){
     var ex=exFind(el.getAttribute("data-i")); if(!ex)return true;
     var ta=$("#mkPaste"),raw=ta?ta.value:"";
     var res=decodeResult(raw);
-    if(!res){MK.msg={id:ex.id,ok:false,m:"לא הצלחנו לקרוא את הקוד. נסו להעתיק אותו שוב, במלואו."};render();return true}
+    if(!res){MK.msg={id:ex.id,ok:false,m:xt("mkErrRead")};render();return true}
     if(res.i!==ex.id){
       var other=exFind(res.i);
-      MK.msg={id:ex.id,ok:false,m:other?"הקוד הזה שייך למבחן „"+(other.spec.t||"מבחן")+"”.":
-        "הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה."};
+      MK.msg={id:ex.id,ok:false,m:other?xf("mkErrOther",other.spec.t||xt("exam")):xt("mkErrUnknown")};
       render(); return true;
     }
     if(res.a.length!==ex.spec.q.length){
-      MK.msg={id:ex.id,ok:false,m:"מספר התשובות בקוד אינו תואם למבחן."};render();return true}
+      MK.msg={id:ex.id,ok:false,m:xt("mkErrCount")};render();return true}
     var g=gradeResult(ex.spec,res);
     var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
     /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
@@ -3463,8 +3481,8 @@ function examAction(a,el){
     if(!ex.subs)ex.subs=[];
     if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
     exSave();
-    MK.msg={id:ex.id,ok:true,m:(sub.name||"תלמיד")+" נקלט · "+g.pct+" ("+g.ok+"/"+g.n+")"+
-      (sub.valid?"":" · שימו לב: הקוד לא תואם לעצמו")};
+    MK.msg={id:ex.id,ok:true,m:(sub.name||xt("student"))+" "+xt("mkTaken")+" · "+g.pct+" ("+g.ok+"/"+g.n+")"+
+      (sub.valid?"":" · "+xt("mkNoteBad"))};
     if(ta)ta.value="";
     render(); return true;
   }
@@ -3503,9 +3521,9 @@ function examFromUrl(){
 }
 function viewBadExam(msg){
   return '<div class="wrap" style="padding-block:40px;max-width:520px"><div class="card pad">'+
-    '<h1 class="h1">הקישור לא נקרא</h1><p class="sub">'+esc(msg)+'</p>'+
+    '<h1 class="h1">'+esc(xt("badLink"))+'</h1><p class="sub">'+esc(msg)+'</p>'+
     '<a class="btn btn-p" style="margin-top:14px" href="'+esc(location.origin+location.pathname)+
-    '">לאפליקציה</a></div></div>';
+    '">'+esc(xt("toApp"))+'</a></div></div>';
 }
 
 /* ============================================================
@@ -3521,8 +3539,8 @@ function render(){
   if(view==="formulas"&&SIT.spec&&SIT.phase==="ask"){
     $("#app").innerHTML=header()+
       '<div class="wrap" style="padding-top:14px"><div class="row">'+
-      '<button class="btn btn-p" data-a="sitback">'+ic("back",17)+' חזרה למבחן — שאלה '+
-      (SIT.i+1)+' מתוך '+SIT.qs.length+'</button></div></div>'+viewFormulas();
+      '<button class="btn btn-p" data-a="sitback">'+ic("back",17)+' '+
+      esc(xf("stBackTo",SIT.i+1,SIT.qs.length))+'</button></div></div>'+viewFormulas();
     afterRender(); return;
   }
   /* מבחן שהגיע מקישור עוקף הכול, כולל מסך הפתיחה: מי שנכנס להיבחן
@@ -3530,8 +3548,7 @@ function render(){
   if(view==="sit"&&SIT.spec){ $("#app").innerHTML=viewSit(); afterRender(); return; }
   if(view==="badexam"||view==="oldexam"){
     $("#app").innerHTML=viewBadExam(view==="oldexam"?
-      "המבחן הזה נוצר בגרסה קודמת של האפליקציה, ולכן השאלות בו כבר לא זהות. בקשו מהמורה לשלוח מבחן חדש.":
-      "הקישור חסר או נשבר בדרך. אם הוא הגיע בוואטסאפ, נסו להיכנס אליו ישירות מההודעה.");
+      xt("exOld"):xt("exBroken"));
     afterRender(); return;
   }
   if(!state.onboarded){
@@ -7431,7 +7448,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g14-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g15-pwa1").catch(function(){});
   });
 }
 </script>
