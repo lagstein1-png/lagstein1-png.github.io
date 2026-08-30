@@ -550,7 +550,7 @@ langTitle:"שפת האפליקציה",langDesc:"הכול מתורגם — כול
 themeTitle:"הצבע שלכם",themeDesc:"בוחרים צבע לאפליקציה — הכול נשמר",
 themeOcean:"ים ירוק",themeGrape:"ענבים",themeBerry:"תות",
 largeText:"אותיות גדולות",largeTextD:"מגדיל את כל הטקסט — קל יותר לקריאה",
-sizeTitle:"גודל האותיות",size1:"רגיל",size2:"גדול",size3:"ענק",
+dispTitle:"תצוגה ונוחות קריאה",sizeTitle:"גודל האותיות",size1:"רגיל",size2:"גדול",size3:"ענק",
 clearFont:"פונט ברור",clearFontD:"אותיות פשוטות ומרווחות יותר — נוח לקריאה בדיסלקציה",
 contrast:"ניגודיות גבוהה",contrastD:"שחור על לבן, בלי רקעים רכים — לראייה חלשה או אור חזק",
 keysTitle:"מקשי קיצור",keysSpace:"שמיעת השאלה שוב",keysEnter:"ממשיכים הלאה",keysNum:"בחירת תשובה",
@@ -648,7 +648,7 @@ langTitle:"App language",langDesc:"Everything is translated — including the pe
 themeTitle:"Your color",themeDesc:"Pick a color for the app — it's saved",
 themeOcean:"Green ocean",themeGrape:"Grape",themeBerry:"Berry",
 largeText:"Large letters",largeTextD:"Enlarges all text — easier to read",
-sizeTitle:"Text size",size1:"Normal",size2:"Large",size3:"Huge",
+dispTitle:"Display & reading comfort",sizeTitle:"Text size",size1:"Normal",size2:"Large",size3:"Huge",
 clearFont:"Clear font",clearFontD:"Simpler, wider letters — easier with dyslexia",
 contrast:"High contrast",contrastD:"Black on white, no soft backgrounds — for low vision or bright light",
 keysTitle:"Keyboard shortcuts",keysSpace:"Hear the question again",keysEnter:"Keep going",keysNum:"Pick an answer",
@@ -746,7 +746,7 @@ langTitle:"Язык приложения",langDesc:"Переведено всё 
 themeTitle:"Твой цвет",themeDesc:"Выбери цвет приложения — он сохранится",
 themeOcean:"Зелёный океан",themeGrape:"Виноград",themeBerry:"Ягода",
 largeText:"Крупные буквы",largeTextD:"Увеличивает весь текст",
-sizeTitle:"Размер текста",size1:"Обычный",size2:"Крупный",size3:"Очень крупный",
+dispTitle:"Отображение и удобство чтения",sizeTitle:"Размер текста",size1:"Обычный",size2:"Крупный",size3:"Очень крупный",
 clearFont:"Чёткий шрифт",clearFontD:"Более простые и широкие буквы — легче при дислексии",
 contrast:"Высокий контраст",contrastD:"Чёрное на белом, без мягких фонов",
 keysTitle:"Горячие клавиши",keysSpace:"Прослушать вопрос снова",keysEnter:"Дальше",keysNum:"Выбрать ответ",
@@ -844,7 +844,7 @@ langTitle:"لغة التطبيق",langDesc:"كل شيء مترجم — بما ف
 themeTitle:"لونك",themeDesc:"اختر لونًا للتطبيق — سيُحفظ",
 themeOcean:"محيط أخضر",themeGrape:"عنب",themeBerry:"توت",
 largeText:"حروف كبيرة",largeTextD:"تكبير كل النصوص",
-sizeTitle:"حجم النص",size1:"عادي",size2:"كبير",size3:"كبير جدًا",
+dispTitle:"العرض وراحة القراءة",sizeTitle:"حجم النص",size1:"عادي",size2:"كبير",size3:"كبير جدًا",
 clearFont:"خط واضح",clearFontD:"حروف أبسط وأوسع — أسهل مع عسر القراءة",
 contrast:"تباين عالٍ",contrastD:"أسود على أبيض، بلا خلفيات ناعمة",
 keysTitle:"اختصارات لوحة المفاتيح",keysSpace:"سماع السؤال مرة أخرى",keysEnter:"نواصل",keysNum:"اختيار إجابة",
@@ -1033,7 +1033,11 @@ function genQ(id,d,lang,force){
   else{b=ri(2,4+d);ans=ri(2,4+d);a=b*ans;text=fmt(t.qDiv,{a:a,b:b})}
   var opts=[ans],guard=0;
   while(opts.length<4&&guard++<99){var cand=ans+ri(1,Math.max(3,Math.round(ans/3)+2))*(Math.random()<0.5?-1:1);if(cand>=0&&opts.indexOf(cand)<0)opts.push(cand)}
-  opts.sort(function(){return Math.random()-0.5});
+  /* ערבוב פישר־ייטס. הערבוב הקודם היה sort עם משווה אקראי — משווה
+     לא עקבי, ולכן הפיזור לא היה אחיד: התשובה הנכונה נחתה במקום
+     הראשון בכ-36% מהשאלות ובאחרון בכ-31%, לעומת כ-16% באמצע.
+     ילד לומד את זה מהר יותר מכפי שהוא לומד לחשב. */
+  for(var si=opts.length-1;si>0;si--){var sj=Math.floor(Math.random()*(si+1)),st=opts[si];opts[si]=opts[sj];opts[sj]=st}
   /* רמז והסבר לפי סוג הפעולה. add -> hint1Add / explainAdd וכו'.
      אם משום מה חסר טקסט לפעולה מסוימת — נופלים חזרה לטקסט הכללי הישן. */
   var K=kind.charAt(0).toUpperCase()+kind.slice(1);
@@ -1622,7 +1626,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b31 · 2026-08-30";
+var BUILD="b32 · 2026-08-30";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2298,7 +2302,7 @@ function settingsView(){
     return '<button class="pick'+(on?" on":"")+'" data-a="theme" data-th="'+th[0]+'"><span class="thsw">'+THEMES[th[0]].map(function(c){return '<i style="background:'+c+'"></i>'}).join("")+'</span><b class="fd" style="flex:1;text-align:start">'+esc(th[1])+'</b>'+(on?ic("check",18):"")+'</button>';
   }).join("")+'</div></div>';
   /* display */
-  h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--sky-soft);color:var(--sky-deep)">'+ic("eye",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(T().langTitle==="שפת האפליקציה"?"תצוגה ונוחות קריאה":t.reduceMotion?"Display & reading comfort":"תצוגה ונוחות קריאה")+'</h2></div>'+
+  h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--sky-soft);color:var(--sky-deep)">'+ic("eye",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.dispTitle)+'</h2></div>'+
   /* בורר גודל טקסט — שלוש מדרגות */
   '<p class="fd" style="font-weight:600;margin-top:16px">'+esc(t.sizeTitle)+'</p>'+
   '<div style="display:flex;gap:9px;margin-top:9px;flex-wrap:wrap">'+
@@ -2398,7 +2402,7 @@ function buildQ(topicId,level){
    · שמות התלמידים נשארים במכשיר של המורה. הם לא עוברים דרך
      שום שרת, כי אין שרת.
    ============================================================ */
-var GENV=1;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
+var GENV=2;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
 var EKEY="shlav-exams-v1";
@@ -3623,7 +3627,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b31-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b32-pwa1").catch(function(){});
   });
 }
 </script>
