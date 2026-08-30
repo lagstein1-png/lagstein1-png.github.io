@@ -2553,30 +2553,30 @@ function genLinEq(L){
      תלוי באגפים הימניים: אותה משוואה פעמיים, או שתי משוואות סותרות.
      שני המצבים מוגרלים, ולכן אי אפשר לנחש. */
   if(L===4){
-    var a1=rnz(-4,4),b1=rnz(-4,4),k4=pick([-3,-2,2,3]),c1=rnz(-9,9),cons=Math.random()<0.5;
-    var b2=b1*k4,t0=a1*k4,c2=cons?c1*k4:c1*k4+rnz(1,4);
+    var ea1=rnz(-4,4),eb1=rnz(-4,4),k4=pick([-3,-2,2,3]),ec1=rnz(-9,9),cons=Math.random()<0.5;
+    var eb2=eb1*k4,t0=ea1*k4,ec2=cons?ec1*k4:ec1*k4+rnz(1,4);
     var oNo=_f("t = {0} — ואז למערכת אין פתרון כלל", num(t0));
     var oInf=_f("t = {0} — ואז למערכת אינסוף פתרונות", num(t0));
     var oAll=_("לכל t יש פתרון יחיד");
     var oZero=_("t = 0 — ואז למערכת אין פתרון");
     return {ask:_("עבור אילו ערכי t אין למערכת פתרון יחיד, ומה קורה שם?"),
-      expr:coef(a1,"x")+term(b1,"y")+" = "+num(c1)+"<br>t·x"+term(b2,"y")+" = "+num(c2),
+      expr:coef(ea1,"x")+term(eb1,"y")+" = "+num(ec1)+"<br>t·x"+term(eb2,"y")+" = "+num(ec2),
       ans:W(cons?oInf:oNo),
       wrong:[
         W(cons?oNo:oInf,cons?_f("כשמכפילים את המשוואה הראשונה ב-{0} מתקבלת בדיוק המשוואה השנייה, כולל האגף הימני — אותה משוואה פעמיים, ולכן אינסוף פתרונות.", num(k4))
                             :_f("המקדמים אמנם פרופורציוניים ביחס {0}, אבל האגפים הימניים אינם — שתי משוואות סותרות, ולכן אין פתרון.", num(k4))),
         W(oAll,_f("ב-t = {0} הדטרמיננטה מתאפסת, ולכן שם הפתרון אינו יחיד.", num(t0))),
-        W(oZero,_f("ב-t = 0 הדטרמיננטה היא {0}, שונה מאפס, ולכן שם דווקא יש פתרון יחיד.", num(a1*b2)))
+        W(oZero,_f("ב-t = 0 הדטרמיננטה היא {0}, שונה מאפס, ולכן שם דווקא יש פתרון יחיד.", num(ea1*eb2)))
       ],
       steps:[
         S(_("מתי הפתרון אינו יחיד"),_("בדיוק כשהדטרמיננטה של מטריצת המקדמים מתאפסת. לפני כן זו רק משוואה אחת ב-t."),
-          "det = "+num(a1)+"·"+pn(b2)+" − t·"+pn(b1)),
-        S(_("פותרים ל-t"),"",num(a1*b2)+" − "+pn(b1)+"t = 0  →  t = "+num(t0)),
+          "det = "+num(ea1)+"·"+pn(eb2)+" − t·"+pn(eb1)),
+        S(_("פותרים ל-t"),"",num(ea1*eb2)+" − "+pn(eb1)+"t = 0  →  t = "+num(t0)),
         S(_("אבל זה עוד לא סוף התשובה"),_("דטרמיננטה מתאפסת פירושה ״לא יחיד״ — ועדיין צריך להכריע בין אינסוף פתרונות לבין אין פתרון."),
           _("בודקים את האגפים הימניים")),
         S(_("מציבים ומשווים"),cons?_("המשוואה השנייה היא בדיוק הראשונה מוכפלת, ולכן אין בה מידע חדש.")
                                  :_("המקדמים ביחס קבוע והאגפים לא — סתירה."),
-          num(c1)+" · "+pn(k4)+" = "+num(c1*k4)+(cons?" = ":" ≠ ")+num(c2))
+          num(ec1)+" · "+pn(k4)+" = "+num(ec1*k4)+(cons?" = ":" ≠ ")+num(ec2))
       ],rule:"gauss",hint:_("קודם מוצאים איפה הדטרמיננטה מתאפסת, ורק אז בודקים את האגפים הימניים.")};
   }
   var x,y,a1,b1,c1,a2,b2,c2,steps;
@@ -2764,21 +2764,21 @@ function genEigen(L){
      לכסינות, ערך כפול אינו מבטיח דבר — וצריך להסתכל במטריצה עצמה
      כדי להבחין בין מטריצה סקלרית לבין בלוק ז׳ורדן. */
   if(L===4){
-    var cs4=pick(["distinct","scalar","jordan"]),lm=rnz(-4,4),l2=rnz(-4,4),bb=rnz(-4,4),g4=0;
-    while(l2===lm&&g4++<40)l2=rnz(-4,4);
-    if(l2===lm)l2=lm+1;
-    var M4=cs4==="distinct"?[[lm,bb],[0,l2]]:cs4==="scalar"?[[lm,0],[0,lm]]:[[lm,bb],[0,lm]];
+    var cs4=pick(["distinct","scalar","jordan"]),lm=rnz(-4,4),lz2=rnz(-4,4),bb=rnz(-4,4),g4=0;
+    while(lz2===lm&&g4++<40)lz2=rnz(-4,4);
+    if(lz2===lm)lz2=lm+1;
+    var M4=cs4==="distinct"?[[lm,bb],[0,lz2]]:cs4==="scalar"?[[lm,0],[0,lm]]:[[lm,bb],[0,lm]];
     if(cs4!=="scalar"&&bb===0)M4[0][1]=bb=1;
     var oDist=_("כן — שני ערכים עצמיים ממשיים שונים, ולכן יש שני וקטורים עצמיים בלתי תלויים");
     var oScal=_("כן — המטריצה סקלרית, כלומר כבר אלכסונית, וכל וקטור הוא וקטור עצמי שלה");
     var oJord=_("לא — הערך העצמי כפול, אך המרחב העצמי שלו הוא ממימד אחד בלבד");
     var oDet=_("לא — הדטרמיננטה מתאפסת");
     var map4=[["distinct",oDist],["scalar",oScal],["jordan",oJord]];
-    var evTxt=cs4==="distinct"?"λ = "+num(Math.min(lm,l2))+" , λ = "+num(Math.max(lm,l2)):_f("λ = {0} (ערך כפול)", num(lm));
+    var evTxt=cs4==="distinct"?"λ = "+num(Math.min(lm,lz2))+" , λ = "+num(Math.max(lm,lz2)):_f("λ = {0} (ערך כפול)", num(lm));
     return {ask:_("האם המטריצה לכסינה?"),expr:"A = "+mat(M4),
       ans:W(map4.filter(function(o){return o[0]===cs4})[0][1]),
       wrong:map4.filter(function(o){return o[0]!==cs4}).map(function(o){return W(o[1],
-        cs4==="distinct"?_f("איברי האלכסון כאן הם {0} ו-{1}, שני ערכים עצמיים שונים.", num(lm), num(l2))
+        cs4==="distinct"?_f("איברי האלכסון כאן הם {0} ו-{1}, שני ערכים עצמיים שונים.", num(lm), num(lz2))
         :cs4==="scalar"?_f("כל האיברים מחוץ לאלכסון הם אפס, והאלכסון כולו {0}.", num(lm))
         :_f("הערך העצמי {0} מופיע פעמיים, והאיבר שמעל האלכסון שונה מאפס.", num(lm)))})
         .concat([W(oDet,_f("הדטרמיננטה כאן היא {0}, שונה מאפס — ובכל מקרה הפיכות ולכסינות הן שתי תכונות שונות לגמרי.", num(M4[0][0]*M4[1][1]-M4[0][1]*M4[1][0])))]),
@@ -3352,11 +3352,11 @@ function genLogic(L){
      מוגרלים, ולכן ״לא נובע דבר״ אינו ניחוש בטוח יותר מכל תשובה. */
   if(L===4){
     var A4=pick(["p","¬p"]),B4=pick(["q","¬q"]);
-    var nA=A4==="p"?"¬p":"p",nB=B4==="q"?"¬q":"q";
+    var nA4=A4==="p"?"¬p":"p",nB4=B4==="q"?"¬q":"q";
     var cs4=pick(["mp","mt","ac","da"]);
-    var second=cs4==="mp"?A4:cs4==="da"?nA:cs4==="mt"?nB:B4;
+    var second=cs4==="mp"?A4:cs4==="da"?nA4:cs4==="mt"?nB4:B4;
     var side=(cs4==="mp"||cs4==="da")?"q":"p";
-    var tgt=side==="q"?B4:nA,alt=side==="q"?nB:A4;
+    var tgt=side==="q"?B4:nA4,alt=side==="q"?nB4:A4;
     var oNone=_f("לא נובע דבר על {0}", side);
     var oContra=_("ההנחות סותרות זו את זו, ולכן אפשר להסיק מהן כל דבר");
     var isValid=(cs4==="mp"||cs4==="mt");
@@ -3586,11 +3586,11 @@ function genSeries(L){
      בדיוק שם נשבר מבחן האיבר הכללי. */
   if(L===4){
     var cs4=pick(["pconv","pdiv","gconv","gdiv"]);
-    var pp=pick([2,3]),qq=pick([2,3,4,5]),half=Math.random()<0.5;
+    var pp=pick([2,3]),qq4=pick([2,3,4,5]),half=Math.random()<0.5;
     var ser=cs4==="pconv"?'<span class="frac"><span>1</span><span>'+pw("n",pp)+'</span></span>'
            :cs4==="pdiv"?(half?'<span class="frac"><span>1</span><span>n</span></span>':'<span class="frac"><span>1</span><span>√n</span></span>')
-           :cs4==="gconv"?'<span class="frac"><span>1</span><span>'+pw(String(qq),"n")+'</span></span>'
-           :pw(String(qq),"n");
+           :cs4==="gconv"?'<span class="frac"><span>1</span><span>'+pw(String(qq4),"n")+'</span></span>'
+           :pw(String(qq4),"n");
     var oPc=_("מתכנס — זהו טור p עם p גדול מ-1");
     var oPd=_("מתבדר — זהו טור p עם p קטן או שווה ל-1");
     var oGc=_("מתכנס — זהו טור הנדסי עם |q| קטן מ-1");
@@ -3604,7 +3604,7 @@ function genSeries(L){
       wrong:map4.filter(function(o){return o[0]!==cs4}).map(function(o){return W(o[1],why4)}),
       steps:[
         S(_("מזהים את משפחת הטור"),_("חזקה של n במכנה — טור p. חזקה של מספר קבוע — טור הנדסי. הכללים שונים לגמרי."),
-          (cs4==="pconv"||cs4==="pdiv")?_("טור p")+"  ,  "+pTxt:_("טור הנדסי")+"  ,  q = "+(cs4==="gconv"?fr(1,qq).txt():String(qq))),
+          (cs4==="pconv"||cs4==="pdiv")?_("טור p")+"  ,  "+pTxt:_("טור הנדסי")+"  ,  q = "+(cs4==="gconv"?fr(1,qq4).txt():String(qq4))),
         S(_("מפעילים את הכלל של אותה משפחה"),
           (cs4==="pconv"||cs4==="pdiv")?_("טור p מתכנס אם ורק אם p גדול מ-1. ב-p = 1 זה הטור ההרמוני, והוא מתבדר.")
                                        :_("טור הנדסי מתכנס אם ורק אם הערך המוחלט של המנה קטן מ-1."),
