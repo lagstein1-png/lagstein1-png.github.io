@@ -548,7 +548,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t25 · 2026-08-30";
+var BUILD="t26 · 2026-08-30";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -1014,11 +1014,17 @@ function femNote(){
   var mine=hebVoices(),i,has=false;
   for(i=0;i<mine.length;i++)if(guessGender(mine[i])==="f")has=true;
   if(has||!mine.length)return "";
+  /* המסלול נכתב למערכת שהמשתמש נמצא בה עכשיו. אנדרואיד של גוגל
+     מחזיק את ההגדרה תחת "נגישות" — "ניהול כללי" הוא מסלול של
+     סמסונג בלבד; אייפד מדווח מאז iPadOS 13 כמו מק ונבדל ממנו רק
+     במסך מגע; ומשתמש מק קיבל עד כה הוראות של ווינדוס. */
   var ua=navigator.userAgent||"";
   var how=/Android/i.test(ua)
-    ? ("באנדרואיד: הגדרות ← ניהול כללי ← טקסט לדיבור ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי.")
-    : /iPhone|iPad|iPod/i.test(ua)
-    ? ("באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.")
+    ? ("באנדרואיד: הגדרות ← נגישות ← טקסט לדיבור (בסמסונג: הגדרות ← ניהול כללי ← טקסט לדיבור) ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי.")
+    : (/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/i.test(ua)&&navigator.maxTouchPoints>1))
+    ? ("באייפון או באייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.")
+    : /Mac OS X|Macintosh/i.test(ua)
+    ? ("במק: הגדרות המערכת ← נגישות ← תוכן מדובר ← קול המערכת ← ניהול קולות ← להוריד קול נשי.")
     : ("בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.");
   return ("במכשיר הזה אין קול נשי בשפה הנוכחית, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו.")+" "+how;
 }
@@ -4465,7 +4471,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t25-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t26-pwa1").catch(function(){});
   });
 }
 </script>
