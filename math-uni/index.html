@@ -459,7 +459,9 @@ Fr.prototype.eq=function(o){return this.n===o.n&&this.d===o.d};
 Fr.prototype.txt=function(){return this.d===1?String(this.n):(this.n+"/"+this.d)};
 /* HTML — שבר אמיתי עם קו אופקי, קריא הרבה יותר לתלמיד שמתקשה */
 Fr.prototype.html=function(){
-  if(this.d===1)return String(this.n);
+  /* num ולא String: מינוס טיפוגרפי כמו בכל שאר התצוגה, וגם כדי
+     שההקראה תזהה אותו כמינוס ולא תבלע אותו. */
+  if(this.d===1)return num(this.n);
   var sign=this.n<0?"−":"";
   return sign+'<span class="frac"><span>'+Math.abs(this.n)+'</span><span>'+this.d+'</span></span>';
 };
@@ -638,7 +640,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u27 · 2026-08-29";
+var BUILD="u28 · 2026-08-30";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -1460,16 +1462,17 @@ function genDeriv(L){
   if(L===1){
     a=rnz(-6,6);n=ri(2,6);b=rnz(-8,8);c=rnz(-9,9);
     var d1=a*n,d2=b;
-    return {ask:_("גזרו את הפונקציה"),expr:"f(x) = "+num(a)+pw("x",n)+term(b,"x")+sgn(c),
+    /* fac ולא num: מקדם 1 אינו נכתב, ומקדם ‎−1 נכתב כמינוס בלבד */
+    return {ask:_("גזרו את הפונקציה"),expr:"f(x) = "+fac(a)+pw("x",n)+term(b,"x")+sgn(c),
       ans:W("f'(x) = "+num(d1)+pw("x",n-1)+sgn(b)),
       wrong:[
         W("f'(x) = "+num(d1)+pw("x",n)+sgn(b),_("הורדתם את המעריך למקדם אבל לא הפחתתם אותו ב-1.")),
-        W("f'(x) = "+num(a)+pw("x",n-1)+sgn(b),_("הפחתתם את המעריך אבל שכחתם להכפיל בו את המקדם.")),
+        W("f'(x) = "+fac(a)+pw("x",n-1)+sgn(b),_("הפחתתם את המעריך אבל שכחתם להכפיל בו את המקדם.")),
         W("f'(x) = "+num(d1)+pw("x",n-1)+sgn(b)+sgn(c),_("האיבר החופשי לא נעלם. נגזרת של קבוע היא תמיד אפס."))
       ],
       steps:[
         S(_("כלל החזקה"),_("(xⁿ)' = n·xⁿ⁻¹ — המעריך יורד ונעשה מקדם, והחזקה קטנה באחת."),"(xⁿ)' = n·xⁿ⁻¹"),
-        S(_("גוזרים איבר איבר"),"",num(a)+pw("x",n)+" → "+num(d1)+pw("x",n-1)),
+        S(_("גוזרים איבר איבר"),"",fac(a)+pw("x",n)+" → "+num(d1)+pw("x",n-1)),
         S(_("האיבר הלינארי והקבוע"),_f("נגזרת של {0}x היא {1}, ונגזרת של קבוע היא אפס.", num(b), num(b)),
           num(b)+"x → "+num(b)+"   ,   "+num(c)+" → 0"),
         S(_("מחברים"),"","f'(x) = "+num(d1)+pw("x",n-1)+sgn(b))
@@ -1477,25 +1480,27 @@ function genDeriv(L){
   }
   if(L===2){
     a=rnz(-5,5);
+    /* מקדם 1 היה הופך את המסיח "איבדתם את המקדם" לתשובה עצמה */
+    while(a===1)a=rnz(-5,5);
     var kind=pick(["exp","ln","sqrt","inv"]);
     var f,df,why=[];
-    if(kind==="exp"){f=num(a)+"e<sup>x</sup>";df=num(a)+"e<sup>x</sup>";
-      why=[W("f'(x) = "+num(a)+"x·e<sup>x</sup>",_("גזרתם את e^x כאילו הוא חזקה של x. הנגזרת של eˣ היא eˣ עצמה.")),
+    if(kind==="exp"){f=fac(a)+"e<sup>x</sup>";df=fac(a)+"e<sup>x</sup>";
+      why=[W("f'(x) = "+fac(a)+"x·e<sup>x</sup>",_("גזרתם את e^x כאילו הוא חזקה של x. הנגזרת של eˣ היא eˣ עצמה.")),
            W("f'(x) = e<sup>x</sup>",_("איבדתם את המקדם. מקדם קבוע נשאר בנגזרת.")),
-           W("f'(x) = "+num(a)+"e<sup>x−1</sup>",_("הורדתם את המעריך באחת. זה כלל החזקה, והוא לא חל על eˣ."))];}
-    else if(kind==="ln"){f=num(a)+"ln x";df='<span class="frac"><span>'+num(a)+'</span><span>x</span></span>';
-      why=[W("f'(x) = "+num(a)+"ln x",_("לא גזרתם בכלל.")),
+           W("f'(x) = "+fac(a)+"e<sup>x−1</sup>",_("הורדתם את המעריך באחת. זה כלל החזקה, והוא לא חל על eˣ."))];}
+    else if(kind==="ln"){f=fac(a)+"ln x";df='<span class="frac"><span>'+num(a)+'</span><span>x</span></span>';
+      why=[W("f'(x) = "+fac(a)+"ln x",_("לא גזרתם בכלל.")),
            W('f\'(x) = <span class="frac"><span>1</span><span>x</span></span>',_f("איבדתם את המקדם {0}.", num(a))),
-           W("f'(x) = "+num(a)+"x",_("הפכתם את הכלל. הנגזרת של ln x היא 1 חלקי x."))];}
-    else if(kind==="sqrt"){f=num(a)+"√x";df='<span class="frac"><span>'+num(a)+'</span><span>2√x</span></span>';
-      why=[W("f'(x) = "+num(a)+"√x",_("לא גזרתם.")),
+           W("f'(x) = "+coef(a,"x"),_("הפכתם את הכלל. הנגזרת של ln x היא 1 חלקי x."))];}
+    else if(kind==="sqrt"){f=fac(a)+"√x";df='<span class="frac"><span>'+num(a)+'</span><span>2√x</span></span>';
+      why=[W("f'(x) = "+fac(a)+"√x",_("לא גזרתם.")),
            W('f\'(x) = <span class="frac"><span>1</span><span>2√x</span></span>',_("איבדתם את המקדם.")),
            W('f\'(x) = <span class="frac"><span>'+num(a)+'</span><span>√x</span></span>',_("שכחתם את ה-2 במכנה. √x הוא x בחזקת חצי, והחצי יורד למקדם."))];}
     else{f='<span class="frac"><span>'+num(a)+'</span><span>x</span></span>';
       df='<span class="frac"><span>'+num(-a)+'</span><span>x<sup>2</sup></span></span>';
       why=[W('f\'(x) = <span class="frac"><span>'+num(a)+'</span><span>x<sup>2</sup></span></span>',_("שכחתם את המינוס. הנגזרת של 1/x היא מינוס 1 חלקי x².")),
            W('f\'(x) = <span class="frac"><span>'+num(-a)+'</span><span>x</span></span>',_("המכנה צריך להיות x בריבוע.")),
-           W("f'(x) = "+num(a)+"ln x",_f("זה האינטגרל של {0}/x, לא הנגזרת.", num(a)))];}
+           W("f'(x) = "+fac(a)+"ln x",_f("זה האינטגרל של {0}/x, לא הנגזרת.", num(a)))];}
     return {ask:_("גזרו את הפונקציה"),expr:"f(x) = "+f,ans:W("f'(x) = "+df),wrong:why,
       steps:[
         S(_("מזהים את הפונקציה הבסיסית"),"",kind==="exp"?"(eˣ)' = eˣ":kind==="ln"?"(ln x)' = 1/x":kind==="sqrt"?"(√x)' = 1 / (2√x)":"(1/x)' = −1/x²"),
@@ -1505,19 +1510,19 @@ function genDeriv(L){
   }
   a=rnz(-5,5);b=rnz(-5,5);
   var tk=pick(["sin","cos"]);
-  var dtk=tk==="sin"?num(a)+"cos x":num(-a)+"sin x";
-  return {ask:_("גזרו את הפונקציה"),expr:"f(x) = "+num(a)+tk+" x"+term(b,"x"),
+  var dtk=tk==="sin"?fac(a)+"cos x":fac(-a)+"sin x";
+  return {ask:_("גזרו את הפונקציה"),expr:"f(x) = "+fac(a)+tk+" x"+term(b,"x"),
     ans:W("f'(x) = "+dtk+sgn(b)),
     wrong:[
-      W("f'(x) = "+(tk==="sin"?num(-a)+"cos x":num(a)+"sin x")+sgn(b),
+      W("f'(x) = "+(tk==="sin"?fac(-a)+"cos x":fac(a)+"sin x")+sgn(b),
         tk==="sin"?_("הוספתם מינוס. המינוס מופיע בנגזרת של קוסינוס, לא של סינוס."):_("שכחתם את המינוס. הנגזרת של cos היא מינוס sin.")),
-      W("f'(x) = "+num(a)+tk+" x"+sgn(b),_("לא גזרתם את הפונקציה הטריגונומטרית.")),
+      W("f'(x) = "+fac(a)+tk+" x"+sgn(b),_("לא גזרתם את הפונקציה הטריגונומטרית.")),
       W("f'(x) = "+dtk,_f("שכחתם לגזור את האיבר הלינארי. הנגזרת של {0}x היא {1}.", num(b), num(b)))
     ],
     steps:[
       S(_("נגזרות טריגונומטריות"),_("(sin x)' = cos x, ו-(cos x)' = −sin x. המינוס נמצא רק אצל הקוסינוס."),
         "(sin x)' = cos x   ,   (cos x)' = −sin x"),
-      S(_("גוזרים איבר איבר"),"",num(a)+tk+" x → "+dtk),
+      S(_("גוזרים איבר איבר"),"",fac(a)+tk+" x → "+dtk),
       S(_("האיבר הלינארי"),"",num(b)+"x → "+num(b)),
       S(_("מחברים"),"","f'(x) = "+dtk+sgn(b))
     ],rule:"dtrig",hint:_("סינוס גוזר לקוסינוס, וקוסינוס גוזר למינוס סינוס.")};
@@ -1528,12 +1533,15 @@ function genChain(L){
   var a,b,n,steps;
   if(L===1){
     a=rnz(-5,5);b=rnz(-8,8);n=ri(2,6);
-    return {ask:_("גזרו את הפונקציה"),expr:"f(x) = (" + coef(a,"x")+sgn(b)+")<sup>"+n+"</sup>",
-      ans:W("f'(x) = "+num(n*a)+"("+coef(a,"x")+sgn(b)+")<sup>"+(n-1)+"</sup>"),
+    /* מקדם פנימי 1 היה הופך את "שכחתם את הנגזרת הפנימית" לתשובה עצמה */
+    while(a===1)a=rnz(-5,5);
+    var inr="("+coef(a,"x")+sgn(b)+")";
+    return {ask:_("גזרו את הפונקציה"),expr:"f(x) = "+pw(inr,n),
+      ans:W("f'(x) = "+num(n*a)+pw(inr,n-1)),
       wrong:[
-        W("f'(x) = "+n+"("+coef(a,"x")+sgn(b)+")<sup>"+(n-1)+"</sup>",
+        W("f'(x) = "+n+pw(inr,n-1),
           _f("שכחתם להכפיל בנגזרת הפנימית. הנגזרת של {0}{1} היא {2}, וצריך להכפיל בה.", coef(a,"x"), sgn(b), num(a))),
-        W("f'(x) = "+num(n*a)+"("+coef(a,"x")+sgn(b)+")<sup>"+n+"</sup>",_("לא הפחתתם את המעריך.")),
+        W("f'(x) = "+num(n*a)+pw(inr,n),_("לא הפחתתם את המעריך.")),
         W("f'(x) = "+num(n*a)+pw("x",n-1),_("גזרתם כאילו בפנים יש רק x. הביטוי הפנימי כולו נשאר בסוגריים."))
       ],
       steps:[
@@ -1541,27 +1549,29 @@ function genChain(L){
           "f = uⁿ  ,  u = "+coef(a,"x")+sgn(b)),
         S(_("כלל השרשרת"),_("גוזרים את החיצונית ומשאירים את הפנימית כמו שהיא, ואז מכפילים בנגזרת הפנימית."),
           "f' = n·uⁿ⁻¹ · u'"),
-        S(_("מציבים"),"","f' = "+n+"("+coef(a,"x")+sgn(b)+")<sup>"+(n-1)+"</sup> · "+num(a)),
-        S(_("מסדרים"),"","f'(x) = "+num(n*a)+"("+coef(a,"x")+sgn(b)+")<sup>"+(n-1)+"</sup>")
+        S(_("מציבים"),"","f' = "+n+pw(inr,n-1)+" · "+num(a)),
+        S(_("מסדרים"),"","f'(x) = "+num(n*a)+pw(inr,n-1))
       ],rule:"chain",hint:_("אחרי שגוזרים את החיצונית — חייבים להכפיל בנגזרת של מה שבפנים.")};
   }
   if(L===2){
     a=rnz(-5,5);b=rnz(-8,8);
+    /* |a| = 1 מוחק את הנגזרת הפנימית מהתצוגה, ואז המסיחים חופפים */
+    while(Math.abs(a)===1)a=rnz(-5,5);
     var k=pick(["exp","ln","sin"]);
     var inner=coef(a,"x")+sgn(b);
     var f,df,ws;
-    if(k==="exp"){f="e<sup>"+inner+"</sup>";df=num(a)+"e<sup>"+inner+"</sup>";
+    if(k==="exp"){f="e<sup>"+inner+"</sup>";df=fac(a)+"e<sup>"+inner+"</sup>";
       ws=[W("f'(x) = e<sup>"+inner+"</sup>",_("שכחתם את הנגזרת הפנימית. eᵘ גוזר ל-eᵘ·u′.")),
-          W("f'(x) = "+num(a)+"e<sup>"+coef(a,"x")+"</sup>",_("שיניתם את המעריך. הוא נשאר בדיוק כמו שהוא.")),
-          W("f'(x) = "+num(a)+"("+inner+")e<sup>"+inner+"</sup>",_("הכפלתם בביטוי הפנימי במקום בנגזרת שלו."))];}
+          W("f'(x) = "+fac(a)+"e<sup>"+coef(a,"x")+"</sup>",_("שיניתם את המעריך. הוא נשאר בדיוק כמו שהוא.")),
+          W("f'(x) = "+fac(a)+"("+inner+")e<sup>"+inner+"</sup>",_("הכפלתם בביטוי הפנימי במקום בנגזרת שלו."))];}
     else if(k==="ln"){f="ln("+inner+")";df='<span class="frac"><span>'+num(a)+'</span><span>'+inner+'</span></span>';
       ws=[W('f\'(x) = <span class="frac"><span>1</span><span>'+inner+'</span></span>',_("שכחתם את הנגזרת הפנימית במונה.")),
           W('f\'(x) = <span class="frac"><span>'+num(a)+'</span><span>x</span></span>',_("המכנה הוא כל הביטוי הפנימי, לא רק x.")),
-          W("f'(x) = "+num(a)+"ln("+inner+")",_("לא גזרתם את הלוגריתם."))];}
-    else{f="sin("+inner+")";df=num(a)+"cos("+inner+")";
+          W("f'(x) = "+fac(a)+"ln("+inner+")",_("לא גזרתם את הלוגריתם."))];}
+    else{f="sin("+inner+")";df=fac(a)+"cos("+inner+")";
       ws=[W("f'(x) = cos("+inner+")",_("שכחתם להכפיל בנגזרת הפנימית.")),
-          W("f'(x) = "+num(-a)+"cos("+inner+")",_("הוספתם מינוס. המינוס שייך לנגזרת של קוסינוס.")),
-          W("f'(x) = "+num(a)+"cos x",_("הביטוי הפנימי נשאר בתוך הקוסינוס."))];}
+          W("f'(x) = "+fac(-a)+"cos("+inner+")",_("הוספתם מינוס. המינוס שייך לנגזרת של קוסינוס.")),
+          W("f'(x) = "+fac(a)+"cos x",_("הביטוי הפנימי נשאר בתוך הקוסינוס."))];}
     return {ask:_("גזרו את הפונקציה"),expr:"f(x) = "+f,ans:W("f'(x) = "+df),wrong:ws,
       steps:[
         S(_("מפרקים לשתי שכבות"),_f("הפנימית היא {0}, והנגזרת שלה היא {1}.", inner, num(a)),"u = "+inner+"  ,  u' = "+num(a)),
@@ -1713,42 +1723,46 @@ function genIntegral(L){
   if(L===1){
     a=rnz(-6,6);n=ri(1,5);b=rnz(-8,8);
     var co=fr(a,n+1);
-    return {ask:_("חשבו את האינטגרל"),expr:"∫ ("+num(a)+pw("x",n)+sgn(b)+") dx",
-      ans:W(co.html()+pw("x",n+1)+term(b,"x")+" + C"),
+    /* מקדם שהוא שלם נכתב כמקדם ולא כשבר, ו-1 לא נכתב בכלל */
+    var coH=co.isInt()?fac(co.n):co.html();
+    return {ask:_("חשבו את האינטגרל"),expr:"∫ ("+fac(a)+pw("x",n)+sgn(b)+") dx",
+      ans:W(coH+pw("x",n+1)+term(b,"x")+" + C"),
       wrong:[
-        W(co.html()+pw("x",n+1)+term(b,"x"),_("שכחתם את קבוע האינטגרציה. באינטגרל לא מסוים חייבים +C.")),
-        W(num(a)+pw("x",n+1)+term(b,"x")+" + C",_("העליתם את החזקה אבל לא חילקתם בחזקה החדשה.")),
-        W(num(a*n)+pw("x",n-1)+sgn(b)+" + C",_("גזרתם במקום לאנטגרל. הפעולות הפוכות זו לזו."))
+        W(coH+pw("x",n+1)+term(b,"x"),_("שכחתם את קבוע האינטגרציה. באינטגרל לא מסוים חייבים +C.")),
+        W(fac(a)+pw("x",n+1)+term(b,"x")+" + C",_("העליתם את החזקה אבל לא חילקתם בחזקה החדשה.")),
+        W((n===1?num(a):num(a*n)+pw("x",n-1))+sgn(b)+" + C",_("גזרתם במקום לאנטגרל. הפעולות הפוכות זו לזו."))
       ],
       steps:[
         S(_("כלל האינטגרל של חזקה"),_("∫xⁿ dx = xⁿ⁺¹ ÷ (n+1) + C — החזקה עולה באחת ומחלקים בחזקה החדשה."),
           "∫xⁿ dx = xⁿ⁺¹/(n+1) + C"),
-        S(_("מאנטגרלים איבר איבר"),"",num(a)+pw("x",n)+" → "+co.html()+pw("x",n+1)),
+        S(_("מאנטגרלים איבר איבר"),"",fac(a)+pw("x",n)+" → "+coH+pw("x",n+1)),
         S(_("האיבר הקבוע"),"",num(b)+" → "+num(b)+"x"),
         S(_("לא שוכחים את C"),_("אינטגרל לא מסוים מייצג משפחה שלמה של פונקציות, ולכן תמיד מוסיפים קבוע."),
-          co.html()+pw("x",n+1)+term(b,"x")+" + C")
+          coH+pw("x",n+1)+term(b,"x")+" + C")
       ],rule:"intpow",hint:_("החזקה עולה באחת ומחלקים בה. ותמיד +C.")};
   }
   if(L===2){
     a=rnz(-5,5);
     var k=pick(["exp","inv","sin","cos"]);
     var f,F,ws;
-    if(k==="exp"){f=num(a)+"e<sup>x</sup>";F=num(a)+"e<sup>x</sup> + C";
-      ws=[W(num(a)+"e<sup>x</sup>",_("חסר קבוע האינטגרציה.")),
-          W(fr(a,2).html()+"e<sup>2x</sup> + C",_("הוספתם חזקה שלא קיימת. eˣ הוא האינטגרל של עצמו.")),
-          W(num(a)+"x·e<sup>x</sup> + C",_("התייחסתם ל-eˣ כמו לחזקה של x."))];}
-    else if(k==="inv"){f='<span class="frac"><span>'+num(a)+'</span><span>x</span></span>';F=num(a)+"ln|x| + C";
-      ws=[W(num(a)+"ln x + C",_("הערך המוחלט חשוב: ln מוגדר רק לחיוביים, והאינטגרל תקף גם לשליליים.")),
-          W(fr(a,2).html()+"x<sup>−2</sup> + C",_("הפעלתם את כלל החזקה. הוא לא תקף כאשר החזקה היא מינוס אחת.")),
+    /* חצי המקדם: כשהוא שלם הוא מקדם ולא שבר, ו-±1 אינו נכתב כמספר */
+    var hf=fr(a,2),hfH=hf.isInt()?fac(hf.n):hf.html();
+    if(k==="exp"){f=fac(a)+"e<sup>x</sup>";F=fac(a)+"e<sup>x</sup> + C";
+      ws=[W(fac(a)+"e<sup>x</sup>",_("חסר קבוע האינטגרציה.")),
+          W(hfH+"e<sup>2x</sup> + C",_("הוספתם חזקה שלא קיימת. eˣ הוא האינטגרל של עצמו.")),
+          W(fac(a)+"x·e<sup>x</sup> + C",_("התייחסתם ל-eˣ כמו לחזקה של x."))];}
+    else if(k==="inv"){f='<span class="frac"><span>'+num(a)+'</span><span>x</span></span>';F=fac(a)+"ln|x| + C";
+      ws=[W(fac(a)+"ln x + C",_("הערך המוחלט חשוב: ln מוגדר רק לחיוביים, והאינטגרל תקף גם לשליליים.")),
+          W(hfH+"x<sup>−2</sup> + C",_("הפעלתם את כלל החזקה. הוא לא תקף כאשר החזקה היא מינוס אחת.")),
           W('<span class="frac"><span>'+num(-a)+'</span><span>x<sup>2</sup></span></span> + C',_("גזרתם במקום לאנטגרל."))];}
-    else if(k==="sin"){f=num(a)+"sin x";F=num(-a)+"cos x + C";
-      ws=[W(num(a)+"cos x + C",_("חסר המינוס. האינטגרל של סינוס הוא מינוס קוסינוס.")),
-          W(num(a)+"sin x + C",_("לא ביצעתם אינטגרציה.")),
-          W(num(a)+"cos x",_("גם המינוס וגם ה-C חסרים."))];}
-    else{f=num(a)+"cos x";F=num(a)+"sin x + C";
-      ws=[W(num(-a)+"sin x + C",_("הוספתם מינוס. המינוס שייך לאינטגרל של סינוס, לא של קוסינוס.")),
-          W(num(-a)+"cos x + C",_("זו הנגזרת, לא האינטגרל.")),
-          W(num(a)+"sin x",_("חסר קבוע האינטגרציה."))];}
+    else if(k==="sin"){f=fac(a)+"sin x";F=fac(-a)+"cos x + C";
+      ws=[W(fac(a)+"cos x + C",_("חסר המינוס. האינטגרל של סינוס הוא מינוס קוסינוס.")),
+          W(fac(a)+"sin x + C",_("לא ביצעתם אינטגרציה.")),
+          W(fac(a)+"cos x",_("גם המינוס וגם ה-C חסרים."))];}
+    else{f=fac(a)+"cos x";F=fac(a)+"sin x + C";
+      ws=[W(fac(-a)+"sin x + C",_("הוספתם מינוס. המינוס שייך לאינטגרל של סינוס, לא של קוסינוס.")),
+          W(fac(-a)+"cos x + C",_("זו הנגזרת, לא האינטגרל.")),
+          W(fac(a)+"sin x",_("חסר קבוע האינטגרציה."))];}
     return {ask:_("חשבו את האינטגרל"),expr:"∫ "+f+" dx",ans:W(F),wrong:ws,
       steps:[
         S(_("אינטגרל הוא הפעולה ההפוכה לגזירה"),_("שואלים: איזו פונקציה גוזרת למה שכתוב כאן?"),
@@ -1827,9 +1841,11 @@ function genDefInt(L){
     expr:"∫<sub>"+num(-hi)+"</sub><sup>"+hi+"</sup> "+(a===1?"":num(a))+"x<sup>3</sup> dx",
     ans:W("0"),
     wrong:[
-      W(num(a*Math.pow(hi,4)/2),_("חישבתם רק את החלק החיובי. בקטע סימטרי החלק השלילי מבטל אותו.")),
-      W(num(a*Math.pow(hi,4)/4),_("זה הערך של הפונקציה הקדומה בגבול העליון, לא ההפרש.")),
-      W(num(2*a*Math.pow(hi,4)/4),_("חיברתם את שני החלקים במקום לחסר."))
+      /* ∫ מ-0 עד hi הוא a·hi⁴/4, ולא חצי ממנו. שלושת המסיחים כאן היו
+         שני ערכים בלבד, ואחד מהם נשא הסבר שאינו מתאים לו. */
+      W(num(a*Math.pow(hi,4)/4),_("חישבתם רק את החלק החיובי. בקטע סימטרי החלק השלילי מבטל אותו.")),
+      W(num(2*a*Math.pow(hi,3)),_("הצבתם בפונקציה המקורית במקום בפונקציה הקדומה.")),
+      W(num(a*Math.pow(hi,4)/2),_("חיברתם את שני החלקים במקום לחסר."))
     ],
     steps:[
       S(_("שמים לב לסימטריה"),_("x³ היא פונקציה אי־זוגית: f(−x) = −f(x). הקטע סימטרי סביב אפס."),
@@ -1965,7 +1981,8 @@ function genInverse(L){
     /* det = 1 כדי שההופכית תצא שלמה */
     a=rnz(-4,4);b=rnz(-4,4);
     var tries=0;c=rnz(-4,4);d=0;
-    while(tries<200){c=rnz(-4,4);if(a!==0&&(1+b*c)%a===0){d=(1+b*c)/a;if(Math.abs(d)<=9)break}tries++}
+    /* d=0 היה מייצר 1/d = אינסוף במסיח "הפכתם כל איבר בנפרד" */
+    while(tries<200){c=rnz(-4,4);if(a!==0&&(1+b*c)%a===0){d=(1+b*c)/a;if(d!==0&&Math.abs(d)<=9)break}tries++}
     if(tries>=200){a=1;b=2;c=1;d=3}
     var det=a*d-b*c;
     var inv=[[d/det,-b/det],[-c/det,a/det]];
@@ -2003,19 +2020,31 @@ function genInverse(L){
       ],rule:"inv2",hint:_("הדטרמיננטה היא ad פחות bc, והיא זו שיושבת במכנה.")};
   }
   a=rnz(-5,5);b=rnz(-5,5);
-  var k2=rnz(2,4);c=a*k2;d=b*k2;    /* שורות תלויות → det = 0 */
+  var k2=rnz(2,4),sing=Math.random()<0.5,itry=0;
+  c=a*k2;d=b*k2;                    /* שורות תלויות → det = 0 */
+  /* חצי מהמקרים הפיכים. קודם התשובה הייתה תמיד "לא הפיכה", ואפשר
+     היה לצבור מאה אחוז בלי לחשב דטרמיננטה אפילו פעם אחת. */
+  if(!sing){
+    while(a*d-b*c===0&&itry++<60){c=rnz(-5,5);d=rnz(-5,5)}
+    if(a*d-b*c===0){a=1;b=0;c=0;d=1}
+  }
+  var dt=a*d-b*c;
   return {ask:_("האם המטריצה הפיכה?"),expr:"A = "+mat([[a,b],[c,d]]),
-    ans:W(_("לא הפיכה")),
+    ans:W(sing?_("לא הפיכה"):_("הפיכה")),
     wrong:[
-      W(_("הפיכה"),_f("הדטרמיננטה כאן היא אפס: השורה השנייה היא בדיוק פי {0} מהראשונה, ולכן השורות תלויות לינארית.", k2)),
+      W(sing?_("הפיכה"):_("לא הפיכה"),
+        sing?_f("הדטרמיננטה כאן היא אפס: השורה השנייה היא בדיוק פי {0} מהראשונה, ולכן השורות תלויות לינארית.", k2)
+            :_f("הדטרמיננטה כאן היא {0}, שונה מאפס, ולכן המטריצה הפיכה.", num(dt))),
       W(_("הפיכה רק אם a שונה מאפס"),_("התנאי היחיד הוא שהדטרמיננטה תהיה שונה מאפס, ולא תנאי על איבר בודד.")),
       W(_("אי אפשר לדעת"),_("אפשר בהחלט — מחשבים דטרמיננטה ובודקים אם היא אפס."))
     ],
     steps:[
       S(_("התנאי להפיכות"),_("מטריצה הפיכה אם ורק אם הדטרמיננטה שלה שונה מאפס."),_("A הפיכה ⇔ det(A) ≠ 0")),
-      S(_("מחשבים"),"",	"det = "+num(a)+"·"+pn(d)+" − "+pn(b)+"·"+pn(c)+" = "+num(a*d-b*c)),
-      S(_("מה זה אומר"),_f("השורה השנייה היא פי {0} מהראשונה — השורות תלויות, ולכן הדטרמיננטה מתאפסת.", k2),
-        _("det = 0 → לא הפיכה"))
+      S(_("מחשבים"),"",	"det = "+num(a)+"·"+pn(d)+" − "+pn(b)+"·"+pn(c)+" = "+num(dt)),
+      S(_("מה זה אומר"),
+        sing?_f("השורה השנייה היא פי {0} מהראשונה — השורות תלויות, ולכן הדטרמיננטה מתאפסת.", k2)
+            :_("השורות אינן כפולה זו של זו, ולכן הדטרמיננטה שונה מאפס."),
+        sing?_("det = 0 → לא הפיכה"):_("det ≠ 0 → הפיכה"))
     ],rule:"inv2",hint:_("בודקים דטרמיננטה. אפס פירושו שהשורות תלויות ואין הופכית.")};
 }
 
@@ -2295,6 +2324,9 @@ function genCondProb(L){
   }
   if(L===2){
     var pd=pick([2,4,5]),sens=pick([90,95]),fp=pick([5,10]);
+    /* 100 פחות fp הוא הסגוליות. כשהיא שווה לרגישות, שני מסיחים
+       שונים מציגים את אותו מספר ואחד מהם נעלם. */
+    if(100-fp===sens)fp=(fp===5?10:5);
     var pop=1000,sick=pop/pd/10*1;
     sick=Math.round(pop*pd/100);
     var tp=Math.round(sick*sens/100),fpN=Math.round((pop-sick)*fp/100);
@@ -2405,7 +2437,7 @@ function genBinom(L){
       expr:"",ans:W(p.html()),
       wrong:[
         W(fr(Math.pow(den-1,n-k),Math.pow(den,n)).html(),_f("שכחתם את מקדם הבחירה. יש {0} סדרים שונים שבהם {1} ההצלחות יכולות להופיע.", c, k)),
-        W(fr(c,Math.pow(den,n)).html(),_("התייחסתם לכישלונות כאילו הסתברותם 1.")),
+        W(fr(c,Math.pow(den,n)).html(),_("השתמשתם ב-p גם לכישלונות. הסתברות הכישלון היא 1 פחות p.")),
         W(fr(k,n).html(),_("זה היחס בין מספר ההצלחות למספר הניסויים, ולא הסתברות."))
       ],
       steps:[
@@ -2910,8 +2942,11 @@ function badStr(s){return !s||/NaN|Infinity|undefined|null/.test(s)}
 function buildQ(topicId,level){
   var t=topicById(topicId);
   if(!t)t=TOPICS[0];
-  var raw=null,tries=0,opts,i,p,seen,ansP;
-  while(tries<8){
+  var raw=null,tries=0,opts=null,i,p,seen,ansP,best=null;
+  /* מגרילים עד שיוצאות ארבע אפשרויות שונות. מסיח שיצא במקרה שווה
+     לתשובה נעלם בסינון, והשאלה הייתה מציגה שלוש — קל מדי בלי סיבה.
+     אם אחרי כמה ניסיונות עדיין לא, לוקחים את ההגרלה העשירה ביותר. */
+  while(tries<12){
     tries++;
     try{raw=t.gen(level)}catch(e){raw=null}
     if(!raw||!raw.ans||badStr(plainOf(raw.ans.h)))continue;
@@ -2924,8 +2959,10 @@ function buildQ(topicId,level){
       seen[p]=1;
       opts.push({h:raw.wrong[i].h,t:p,ok:false,why:raw.wrong[i].why||""});
     }
-    if(opts.length>=3)break;
+    if(!best||opts.length>best.opts.length)best={raw:raw,opts:opts};
+    if(opts.length>=4)break;
   }
+  if(best){raw=best.raw;opts=best.opts}
   if(!raw)raw={ask:_("חשבו"),expr:"1 + 1",ans:W("2"),wrong:[W("1"),W("3"),W("11")],steps:[S(_("חיבור"),"","1 + 1 = 2")],hint:"",rule:"order"};
   if(!opts||opts.length<2){
     ansP=plainOf(raw.ans.h);
@@ -5990,7 +6027,11 @@ var TR_KEYS=[
 "במכשיר הזה אין קול נשי בשפה הנוכחית, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו.",
 "באנדרואיד: הגדרות ← ניהול כללי ← טקסט לדיבור ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי.",
 "באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.",
-"בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות."
+"בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.",
+"הדטרמיננטה כאן היא {0}, שונה מאפס, ולכן המטריצה הפיכה.",
+"השורות אינן כפולה זו של זו, ולכן הדטרמיננטה שונה מאפס.",
+"det ≠ 0 → הפיכה",
+"השתמשתם ב-p גם לכישלונות. הסתברות הכישלון היא 1 פחות p."
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -6035,6 +6076,22 @@ trAt("ru",1151,[
 "На Android: Настройки → Общие настройки → Синтез речи → шестерёнка рядом с движком → Установка голосовых данных → выбрать женский вариант.",
 "На iPhone: Настройки → Универсальный доступ → Устный контент → Голоса → выбрать женский голос и загрузить.",
 "В Windows: Параметры → Время и язык → Речь → Управление голосами → Добавить голоса."]);
+trAt("ar",1156,[
+"المحدِّد هنا هو {0}، وهو مختلف عن الصفر، ولذلك المصفوفة قابلة للعكس.",
+"الصفّان ليسا مضاعفًا أحدهما للآخر، ولذلك المحدِّد مختلف عن الصفر.",
+"det ≠ 0 ← قابلة للعكس",
+"استعملتم p للإخفاقات أيضًا. احتمال الإخفاق هو 1 ناقص p."]);
+trAt("ru",1156,[
+"Определитель здесь равен {0} и отличен от нуля, поэтому матрица обратима.",
+"Строки не являются кратными друг другу, поэтому определитель отличен от нуля.",
+"det ≠ 0 → обратима",
+"Вы использовали p и для неудач. Вероятность неудачи равна 1 минус p."]);
+trAt("en",1156,[
+"The determinant here is {0}, which is not zero, so the matrix is invertible.",
+"The rows are not multiples of each other, so the determinant is not zero.",
+"det ≠ 0 → invertible",
+"You used p for the failures too. The probability of failure is 1 minus p."]);
+
 trAt("en",1151,[
 "Voice check",
 "This device has no female voice in the current language, so the pitch was raised. It is not a real female voice — to get one, it has to be installed.",
@@ -9525,7 +9582,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u27-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u28-pwa1").catch(function(){});
   });
 }
 </script>

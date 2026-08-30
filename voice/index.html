@@ -188,10 +188,15 @@ function pick(lang){
   return v[0]||null;
 }
 
+var SEQ=0;
 function say(opts){
   var label=opts.label;
   if(!SS){ log(label+": אין speechSynthesis בדפדפן הזה","bad"); return }
   if(!HAS_U){ log(label+": אין SpeechSynthesisUtterance","bad"); return }
+  /* הקביעה מתארת את הניסיון האחרון. בלי איפוס, שגיאה אחת מלפני
+     חמש בדיקות המשיכה להכתיב את הכותרת גם אחרי שהמנוע דיבר. */
+  lastErr=""; audioHeard.speech=null;
+  var my=++SEQ;
   log("── "+label);
   if(opts.cancelFirst!==false){
     try{ SS.cancel(); log("  cancel() נקרא","dim") }catch(e){ log("  cancel זרק: "+e.message,"warn") }
@@ -212,17 +217,29 @@ function say(opts){
   var started=false;
   u.onstart=function(){ started=true; audioHeard.speech=true; log("  ✔ onstart","ok"); verdict() };
   u.onend=function(){ log("  ✔ onend"+(started?"":" — בלי onstart לפניו!"),started?"ok":"warn") };
-  u.onerror=function(e){ lastErr=(e&&e.error)||"לא ידוע"; audioHeard.speech=false;
-    log("  ✘ onerror: "+lastErr,"bad"); verdict() };
+  /* ביטול אינו תקלה: כל בדיקה קוראת cancel() לפני שהיא מדברת,
+     והאמירה הקודמת מדווחת אז canceled/interrupted. ספירה שלה
+     ככישלון הפכה מכשיר תקין ל״ההקראה לא התחילה״ על המסך, בדיוק
+     בגלל שהמשתמש לחץ על כפתור שני. */
+  u.onerror=function(e){
+    var er=(e&&e.error)||"לא ידוע";
+    if(er==="interrupted"||er==="canceled"){
+      log("  ⓘ האמירה בוטלה ("+er+") — מהלך תקין, לא תקלה","dim"); return }
+    if(my!==SEQ)return;
+    lastErr=er; audioHeard.speech=false;
+    log("  ✘ onerror: "+er,"bad"); verdict() };
   u.onboundary=function(e){ if(!u.__b){u.__b=1; log("  onboundary ראשון @"+e.charIndex,"dim")} };
   try{ SS.speak(u); log("  speak() נקרא") }
   catch(e){ log("  speak() זרק: "+e.message,"bad"); return }
   log("  מיד אחרי speak: speaking="+SS.speaking+" pending="+SS.pending);
   setTimeout(function(){
+    if(my!==SEQ)return;
     log("  אחרי 400ms: speaking="+SS.speaking+" pending="+SS.pending+
         (started?"":"  ← onstart עוד לא נורה"), started?"dim":"warn");
   },400);
   setTimeout(function(){
+    /* בדיקה חדשה ביטלה את זו — שתיקתה מוסברת, ואינה ראיה לכלום */
+    if(my!==SEQ)return;
     if(!started){ if(audioHeard.speech===null)audioHeard.speech=false;
       log("  ✘ שתי שניות ואין onstart — האמירה נבלעה בשקט","bad"); verdict() }
   },2000);
@@ -338,10 +355,36 @@ document.getElementById("wav").addEventListener("click",function(){
    קביעה — מה שמופיע גדול על המסך, כדי שצילום מסך אחד יספיק.
    ============================================================ */
 var lastErr="";
+
+/* הוראות ההתקנה, לפי המערכת שהמשתמש נמצא בה עכשיו. הוראה שאינה
+   קיימת במכשיר שלפניו גרועה מאין הוראה כלל, ולכן כל מערכת מקבלת
+   את המסלול שלה בלבד:
+   · אנדרואיד — שני מסלולים אמיתיים: סמסונג הזיזה את ההגדרה
+     ל״ניהול כללי״, ובאנדרואיד של גוגל היא יושבת תחת ״נגישות״.
+     קודם היה כתוב רק המסלול של סמסונג.
+   · אייפד — מדווח userAgent של מק מאז iPadOS 13, ולכן נבדק גם
+     מספר נקודות המגע. בלי זה אייפד קיבל הוראות של מק.
+   · ווינדוס ומק — קודם נאמר רק ״צריך להתקין נתוני קול״, בלי לומר
+     איפה. זה בדיוק המקרה שבו המשתמש נתקע. */
+function installHow(){
+  var ua=navigator.userAgent||"";
+  var ipad=/iPad/i.test(ua)||(/Macintosh/i.test(ua)&&navigator.maxTouchPoints>1);
+  if(/Android/i.test(ua))
+    return "באנדרואיד: הגדרות ← <b>נגישות</b> ← טקסט לדיבור "+
+           "(בסמסונג: הגדרות ← <b>ניהול כללי</b> ← טקסט לדיבור) ← לבחור <b>Google</b> "+
+           "כמנוע המועדף ← גלגל השיניים שלידו ← <b>התקנת נתוני קול</b> ← עברית.";
+  if(/iPhone|iPod/i.test(ua)||ipad)
+    return "ב"+(ipad?"אייפד":"אייפון")+": הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית ← להוריד קול.";
+  if(/Windows/i.test(ua))
+    return "בווינדוס: הגדרות ← שעה ושפה ← <b>דיבור</b> ← ניהול קולות ← <b>הוספת קולות</b> ← עברית.";
+  if(/Mac OS X|Macintosh/i.test(ua))
+    return "במק: הגדרות המערכת ← נגישות ← תוכן מדובר ← קול המערכת ← <b>ניהול קולות</b> ← להוריד קול בעברית.";
+  return "צריך להתקין נתוני קול במערכת ההפעלה.";
+}
+
 function verdict(){
   var box=document.getElementById("verdict");
-  var v=voices().length, ua=navigator.userAgent;
-  var android=/Android/i.test(ua), ios=/iPhone|iPad|iPod/i.test(ua);
+  var v=voices().length;
   var h="", cls="dim";
   if(!SS){ cls="bad";
     h="<b>הדפדפן הזה לא תומך בהקראה כלל.</b><br>אין אובייקט speechSynthesis. "+
@@ -358,17 +401,10 @@ function verdict(){
       "אם היא נחסמה גם בלחיצה — לבדוק הרשאות אתר בדפדפן.";
   }
   else if(lastErr==="synthesis-failed"||lastErr==="synthesis-unavailable"){ cls="bad";
-    h="<b>מנוע הדיבור נכשל ("+lastErr+").</b><br>"+
-      (android?"באנדרואיד: הגדרות ← ניהול כללי ← טקסט לדיבור ← לבחור <b>Google</b> כמנוע המועדף, "+
-               "ואז גלגל שיניים ← <b>התקנת נתוני קול</b> ← להתקין עברית.":
-       ios?"באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית ← להוריד קול.":
-       "צריך להתקין נתוני קול במערכת ההפעלה.");
+    h="<b>מנוע הדיבור נכשל ("+lastErr+").</b><br>"+installHow();
   }
   else if(audioHeard.speech===false&&v===0){ cls="bad";
-    h="<b>speak() נקרא, ולא קרה כלום — ואין קולות מותקנים.</b><br>"+
-      (android?"באנדרואיד: הגדרות ← ניהול כללי ← טקסט לדיבור ← מנוע Google ← התקנת נתוני קול ← עברית.":
-       ios?"באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית.":
-       "אין קולות מותקנים במערכת ההפעלה.");
+    h="<b>speak() נקרא, ולא קרה כלום — ואין קולות מותקנים.</b><br>"+installHow();
   }
   else if(audioHeard.speech===false){ cls="warn";
     h="<b>יש "+v+" קולות מותקנים, אבל ההקראה לא התחילה.</b><br>"+

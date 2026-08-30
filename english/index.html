@@ -645,7 +645,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n25 · 2026-08-30";
+var BUILD="n26 · 2026-08-30";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -1575,17 +1575,17 @@ topic("prep","words",
 [
  [
   W("in","/ɪn/",{he:"בתוך — חודש, שנה, עיר",ar:"في — شهر، سنة، مدينة",ru:"в — месяц, год, город",en:"inside — a month, a year, a city"},["on","at"]),
-  W("on","/ɒn/",{he:"על — יום, תאריך, משטח",ar:"على — يوم، تاريخ، سطح",ru:"на — день, дата, поверхность",en:"on top of — a day, a date, a surface"},["in","at"]),
-  W("at","/æt/",{he:"ב־ — שעה מדויקת, נקודה",ar:"عند — ساعة محدّدة، نقطة",ru:"в — точное время, точка",en:"at a point — an exact time, a spot"},["in","on"]),
+  W("on","/ɒn/",{he:"על — יום, תאריך, משטח",ar:"على — يوم، تاريخ، سطح",ru:"на — день, дата, поверхность",en:"resting upon — a day, a date, a surface"},["in","at"]),
+  W("at","/æt/",{he:"ב־ — שעה מדויקת, נקודה",ar:"عند — ساعة محدّدة، نقطة",ru:"в — точное время, точка",en:"a single point — an exact time, a spot"},["in","on"]),
   W("to","/tuː/",{he:"אל — כיוון",ar:"إلى — اتجاه",ru:"к, в — направление",en:"towards — direction"},["from","for"]),
   W("from","/frɒm/",{he:"מ־ — מקור",ar:"من — مصدر",ru:"из, от — источник",en:"out of — the origin"},["to"]),
-  W("for","/fɔː/",{he:"בשביל, במשך",ar:"لأجل، لمدّة",ru:"для, в течение",en:"intended for, or a length of time"},["from","four"])
+  W("for","/fɔː/",{he:"בשביל, במשך",ar:"لأجل، لمدّة",ru:"для, в течение",en:"who or what something is meant to help, or how long"},["from","four"])
  ],
  [
   W("since","/sɪns/",{he:"מאז — נקודת התחלה",ar:"منذ — نقطة بداية",ru:"с — момент начала",en:"from a starting point until now"},["for"]),
   W("during","/ˈdjʊərɪŋ/",{he:"במהלך",ar:"خلال",ru:"во время",en:"through the whole of a period"},["while"]),
   W("until","/ənˈtɪl/",{he:"עד",ar:"حتى",ru:"до",en:"up to that time"},["till","since"]),
-  W("by","/baɪ/",{he:"עד (לא יאוחר מ־), על ידי",ar:"بحلول، بواسطة",ru:"к (сроку), посредством",en:"not later than, or done by someone"},["buy"]),
+  W("by","/baɪ/",{he:"עד (לא יאוחר מ־), על ידי",ar:"بحلول، بواسطة",ru:"к (сроку), посредством",en:"not later than a time, or naming who did it"},["buy"]),
   W("among","/əˈmʌŋ/",{he:"בין (רבים)",ar:"بين (جماعة)",ru:"среди",en:"in the middle of a group"},["between"]),
   W("against","/əˈɡenst/",{he:"נגד",ar:"ضد",ru:"против",en:"in opposition to"},["again"])
  ],
@@ -2320,21 +2320,30 @@ function wordDistract(it,pool,n,needGloss){
 }
 function O(html,ok,why){return {h:html,ok:!!ok,why:why||""}}
 
+/* המשמעות כפי שהיא מוצגת בשאלה. ברמה 3 היא ניתנת באנגלית — זה מה
+   ש"אנגלית בלבד" אומר, וזה גם ההבדל בפועל בין רמה 3 לרמה 1 על אותה
+   מילה: בלעדיו התרגיל זהה בשתיהן והרמה מדורגת רק בשם. התרגום בשפת
+   האם חוזר בהסבר שאחרי התשובה, כך שאיש אינו נשאר תקוע.
+   הסינון של כפילויות נשאר על התרגום בשפת האם ולא על התצוגה, כדי
+   שמספר האפשרויות וסדר ההגרלה יישארו זהים — המבחן הכיתתי נבנה
+   מזרע, ושינוי במספר קריאות ה-random היה משנה מבחנים קיימים. */
+function ml(lv,g){ return (lv>=3&&g&&g.en)?g.en:gl(g) }
+
 /* --- צורה 1: מילה נשמעת ונראית → מה המשמעות --- */
 function formMean(tp,lv,pool,idx){
   var it=pool[idx];
   var ds=wordDistract(it,pool,3,true);
-  var seen={},opts=[O(esc(gl(it.g)),true)];
+  var seen={},opts=[O(esc(ml(lv,it.g)),true)];
   seen[gl(it.g)]=1;
   ds.forEach(function(d){
     var g=gl(d.g);
     /* שתי מילים שונות יכולות לחלוק תרגום. שתי אפשרויות זהות הן
        שאלה בלי תשובה יחידה. */
     if(!g||seen[g])return; seen[g]=1;
-    opts.push(O(esc(g),false,d.w+" = "+g));
+    opts.push(O(esc(ml(lv,d.g)),false,d.w+" = "+g));
   });
   return {type:"mean",prompt:t("qMean"),subject:it,opts:shuffle(opts),
-    answer:gl(it.g),say:it.w};
+    answer:ml(lv,it.g),say:it.w};
 }
 /* --- צורה 2: המשמעות בשפת האם → איזו מילה באנגלית --- */
 function formBack(tp,lv,pool,idx){
@@ -2343,7 +2352,7 @@ function formBack(tp,lv,pool,idx){
   var opts=[O('<span class="en-b">'+esc(it.w)+"</span>",true)];
   ds.slice(0,3).forEach(function(d){opts.push(O('<span class="en-b">'+esc(d.w)+"</span>",false,
     d.g?(d.w+" = "+gl(d.g)):""))});
-  return {type:"back",prompt:t("qSay"),lead:gl(it.g),subject:null,
+  return {type:"back",prompt:t("qSay"),lead:ml(lv,it.g),subject:null,
     opts:shuffle(opts),answer:it.w,say:it.w,reveal:it};
 }
 /* --- צורה 3: רק אוזן. המילה אינה מוצגת עד שעונים --- */
@@ -2371,11 +2380,24 @@ var STOP_GAP=/^(a|an|the|to|of|is|are|was|were|be|i|you|he|she|it|we|they|my|you
 function formGap(tp,lv,pool,idx){
   var it=pool[idx];
   var parts=it.s.split(" ");
-  var cand=[];
+  /* הרמז שמוצג מעל התרגיל הוא gl(it.g). כשהממשק באנגלית זהו תיאור
+     באנגלית, והוא עלול להכיל בדיוק את המילה שהוסרה — "Ask for the
+     menu" מול המשפט שממנו נגרע menu. מילה שכבר כתובה ברמז אינה
+     חסר אלא מתנה, ולכן היא נבחרת רק אם לא נשארה אחרת.
+     נבדק תמיד מול g.en ולא מול gl(it.g): רק בו יש מילים אנגליות,
+     והבדיקה חייבת לצאת זהה בכל שפת ממשק — המבחן הכיתתי נבנה מזרע
+     אצל המורה ואצל התלמיד, ואלה לא בהכרח באותה שפה. */
+  var leadW={},lw=String((it.g&&it.g.en)||"").toLowerCase().match(/[a-z']+/g)||[];
+  lw.forEach(function(w){leadW[w]=1});
+  var cand=[],free=[];
   for(var i=0;i<parts.length;i++){
     var bare=parts[i].replace(/[^A-Za-z']/g,"");
-    if(bare.length>=3&&!STOP_GAP.test(bare))cand.push(i);
+    if(bare.length>=3&&!STOP_GAP.test(bare)){
+      cand.push(i);
+      if(!leadW[bare.toLowerCase()])free.push(i);
+    }
   }
+  if(free.length)cand=free;
   if(!cand.length)return formUse(tp,lv,pool,idx);
   var gi=pick(cand),gone=parts[gi].replace(/[^A-Za-z']/g,"");
   var shown=parts.slice();
@@ -2844,14 +2866,37 @@ var LVL_C=["var(--c-sound)","var(--c-words)","var(--c-talk)"];
 function buildQ(tid,lv){
   var q=buildQuestion(tid,lv,undefined); if(!q)return null;
   var tp=topicOf(tid);
+  /* תרגיל סידור המשפט נבנה מאריחים ואין לו אפשרויות בחירה. במבחן
+     הכיתתי יש רק בחירה מרובה, ולכן שאלה כזאת הגיעה לתלמיד בלי שום
+     תשובה לסמן — בערך שליש משאלות המשפטים ברמות 2 ו-3. מגרילים
+     צורה אחרת. ההגרלה זהה אצל המורה ואצל התלמיד כי שניהם מזרעים
+     את אותו זרע, ולכן שניהם מקבלים בדיוק את אותה שאלה. */
+  for(var tryN=0;tryN<16&&(!q.opts||!q.opts.length);tryN++)
+    q=buildQuestion(tid,lv,undefined)||q;
+  if(!q.opts||!q.opts.length){
+    /* מוצא אחרון דטרמיניסטי, בלי הגרלה: המשפט הראשון בבנק של הרמה. */
+    var pool0=poolOf(tp,lv),si=0;
+    for(var pi=0;pi<pool0.length;pi++)if(pool0[pi].k==="s"){si=pi;break}
+    if(pool0.length&&pool0[si]&&pool0[si].k==="s")q=formUse(tp,lv,pool0,si);
+  }
+  if(!q.opts||!q.opts.length)return null;
   /* שאלת האזנה: המילה מוסתרת בכוונה והשמע הוא השאלה עצמה, לא
      סיוע. אסור לחשוף אותה בטקסט, וגם אסור לכבות לה את ההקראה —
      בלעדיה אין דרך לענות. */
   var audioOnly=(q.type==="hear");
-  var lead=q.lead||(q.subject?gl(q.subject.g||q.subject.w||""):"");
+  /* בתרגיל "מה המשמעות" מוצגת המילה והאפשרויות הן המשמעויות. כאן
+     נלקחה קודם gl(subject.g) — כלומר המשמעות עצמה — וכל שאלה כזאת
+     במבחן נשאה את תשובתה בגוף השאלה. הנושא הוא המילה. */
+  /* שאלת הבנת הנקרא נושאת את שאלתה ב-qtext ולא ב-lead; בלעדיו
+     הופיע רק "לפי הקטע:" בלי מה שנשאל. */
+  var lead=q.type==="comp"?(q.qtext||""):
+           (q.lead||(q.subject?(q.subject.w||q.subject.s||""):""));
   var ask=esc(q.prompt||"")+(lead&&!audioOnly?' <b>'+esc(lead)+"</b>":"");
   var expr="";
-  if(q.type==="p"&&q.passage){
+  /* "p" הוא סוג הפריט בבנק, לא סוג השאלה. השאלה שנבנית מקטע קריאה
+     חוזרת כ-"comp", ולכן הקטע לא צורף מעולם — ובלי הקטע אין על מה
+     לענות. */
+  if(q.type==="comp"&&q.passage){
     var lines=(q.passage.lines||[]);
     expr='<div class="passage">'+lines.map(function(l){
       return '<div class="s">'+esc(l)+"</div>"}).join("")+"</div>";
@@ -2885,7 +2930,7 @@ function buildQ(tid,lv){
    · שמות התלמידים נשארים במכשיר של המורה. הם לא עוברים דרך
      שום שרת, כי אין שרת.
    ============================================================ */
-var GENV=1;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
+var GENV=2;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
 var EKEY="shlav-exams-v1";
@@ -3948,7 +3993,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n25-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n26-pwa1").catch(function(){});
   });
 }
 </script>

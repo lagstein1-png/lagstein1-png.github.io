@@ -334,6 +334,17 @@ var speaking = false;
 var heVoice = null;
 var voicesReady = false;
 
+/* מספר סידורי לאמירה. ביטול אמירה אינו מוחק את האירועים שכבר
+   בדרך: onend ו-onerror של האמירה המבוטלת מגיעים *אחרי* שהאמירה
+   הבאה כבר יצאה, ואז הם מקדמים משפט או עוצרים הקראה תקינה.
+   כל אמירה זוכרת את המספר שהיה בזמן יציאתה, וכל ביטול מקדם אותו —
+   כך אירוע של אמירה שכבר בוטלה מזוהה ומתעלמים ממנו. */
+var SEQ = 0;
+function cancelSpeech(){
+  SEQ++;
+  try{ speechSynthesis.cancel(); }catch(e){}
+}
+
 var P = {              /* העדפות תצוגה */
   nikud:1, size:1.5, space:1, focus:0, rate:0.9, light:0, voice:'browser', wordsync:1
 };
@@ -395,6 +406,15 @@ function nakdanAll(text, onProgress){
 }
 
 /* ---------- בניית רשימת המילים ---------- */
+/* כמה משפטים באמת יש. נקודה בסוף הטקסט פותחת משפט נוסף שאין בו
+   כלום, ולכן סופרים לפי המילה האחרונה שיש בה תוכן ולא לפי מספר
+   הנקודות: בלי זה המונה אמר ״משפט 1 מתוך 4״ על שלושה משפטים,
+   ופס ההתקדמות לא הגיע לסוף גם כשהקריאה נגמרה. */
+function countSents(out){
+  for(var i = out.length - 1; i >= 0; i--)
+    if(String(out[i].plain).trim()) return out[i].sent + 1;
+  return 1;
+}
 function build(tokens){
   var out = [], s = 0;
   tokens.forEach(function(tk){
@@ -410,7 +430,7 @@ function build(tokens){
     out.push({ plain:plain, nikud:nik, word:isWord, sent:s });
     if(/[.!?]|\n/.test(plain)) s++;
   });
-  SENTS = Math.max(1, s + (out.length && out[out.length-1].sent === s ? 1 : 0));
+  SENTS = countSents(out);
   return out;
 }
 
@@ -425,7 +445,7 @@ function buildPlain(text){
     out.push({ plain:p, nikud:p, word:isWord, sent:s });
     if(/[.!?]|\n/.test(p)) s++;
   });
-  SENTS = Math.max(1, s + 1);
+  SENTS = countSents(out);
   return out;
 }
 
@@ -460,6 +480,11 @@ function markSentence(){
   $('#pfill').style.width = Math.round((SENT + 1) / SENTS * 100) + '%';
   var el = document.querySelector('#text .s.cur');
   if(el && P.focus) el.scrollIntoView({ block:'center', behavior:'smooth' });
+  /* מצב כפתורי הניווט נגזר מהמשפט הנוכחי, ולכן הוא מתעדכן כאן ולא
+     רק ב"הבא/קודם": כשההקראה מתקדמת לבדה ממשפט למשפט, "משפט קודם"
+     נשאר מושבת ואי אפשר היה לחזור אחורה, ו"משפט הבא" נשאר פעיל
+     במשפט האחרון ולא עשה כלום. */
+  syncNav();
 }
 
 /* ---------- קול טבעי דרך Gemini ----------
@@ -657,6 +682,7 @@ function markReading(n){
 var heVoices = [];
 var boundaryOK = null;   /* null = עוד לא ידוע, true/false = נבדק */
 var boundaryTimer = null;
+var boundaryMsg = false; /* האם ההודעה על "בלי דיווח מילים" מוצגת כרגע */
 
 /* אוסף את כל הקולות העבריים שהדפדפן מציע — לא רק את הראשון.
    ההבדל משמעותי: בכרום יש בדרך כלל קול אחד בלבד, וב-Edge יש
@@ -821,11 +847,17 @@ function femLift(v){
 function femNote(){
   if(!heVoices.length)return "";
   for(var i=0;i<heVoices.length;i++)if(voiceGender(heVoices[i])==="f")return "";
+  /* המסלול נכתב לפי המערכת שהמשתמש נמצא בה עכשיו. שני תיקונים:
+     באנדרואיד של גוגל ההגדרה יושבת תחת "נגישות" ולא תחת "ניהול
+     כללי" — זה מסלול של סמסונג בלבד; ומשתמש מק קיבל עד כה הוראות
+     של ווינדוס, כי כל מה שאינו אנדרואיד או אייפון נפל לשם. */
   var ua=navigator.userAgent||"";
   var how=/Android/i.test(ua)
-    ? "באנדרואיד: הגדרות ← ניהול כללי ← טקסט לדיבור ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי."
-    : /iPhone|iPad|iPod/i.test(ua)
-    ? "באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד."
+    ? "באנדרואיד: הגדרות ← נגישות ← טקסט לדיבור (בסמסונג: הגדרות ← ניהול כללי ← טקסט לדיבור) ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי."
+    : /iPhone|iPad|iPod/i.test(ua)||(/Macintosh/i.test(ua)&&navigator.maxTouchPoints>1)
+    ? "באייפון או באייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד."
+    : /Mac OS X|Macintosh/i.test(ua)
+    ? "במק: הגדרות המערכת ← נגישות ← תוכן מדובר ← קול המערכת ← ניהול קולות ← להוריד קול נשי בעברית."
     : "בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.";
   return "אין במכשיר הזה קול עברי נשי, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו. "+how;
 }
@@ -850,44 +882,63 @@ function speakSentence(n){
   var lead = full.length - full.replace(/^\s+/, '').length;
 
   var u = new SpeechSynthesisUtterance(text);
+  var tok = SEQ;                             /* האמירה הזאת שייכת לסבב הזה */
   u.lang = 'he-IL';
   var chosen = heVoices.filter(function(v){ return v.voiceURI === VOICE; })[0] || heVoice;
   if(chosen) u.voice = chosen;
   u.rate = P.rate;
   u.pitch = femLift(chosen);
   u.onboundary = function(e){
+    if(tok !== SEQ) return;
     if(e.name && e.name !== 'word') return;
     boundaryOK = true;
     if(boundaryTimer){ clearTimeout(boundaryTimer); boundaryTimer = null; }
+    /* דיווח הגיע אחרי שכבר נאמר שאין דיווח — ההודעה שקרית עכשיו */
+    if(boundaryMsg){ boundaryMsg = false; voiceBar(''); }
     var c = e.charIndex + lead;
     for(var k=0;k<map.length;k++){
       if(c >= map[k].from && c < map[k].to){ hit(map[k].i); return; }
     }
   };
   u.onend = function(){
+    if(tok !== SEQ) return;                  /* אמירה שכבר בוטלה — לא מקדמת משפט */
     ttsOK();
     if(!speaking) return;
     if(SENT + 1 < SENTS){ SENT++; markSentence(); speakSentence(SENT); }
     else stop();
   };
-  /* המנוע נכשל — לומר את זה במקום להיעצר בשקט */
-  u.onerror = function(e){ ttsFail(e&&e.error); stop(); };
+  /* המנוע נכשל — לומר את זה במקום להיעצר בשקט.
+     ביטול אינו כישלון: "משפט הבא", שינוי מהירות או החלפת קול
+     מבטלים את האמירה הנוכחית כדי לפנות מקום לבאה, והמנוע מדווח
+     על כך interrupted/canceled. עצירה כאן הרגה את ההקראה החדשה
+     שיצאה רגע קודם — כלומר כל לחיצה על ⏭ השתיקה את הקורא. */
+  u.onerror = function(e){
+    var er = e && e.error;
+    if(er === 'interrupted' || er === 'canceled') return;
+    if(tok !== SEQ) return;
+    ttsFail(er); stop();
+  };
 
   /* אנדרואיד, ולעתים גם ספארי, לא שולחים דיווח על מילים.
      בלי זיהוי כזה ההדגשה פשוט לא זזה והמשתמש חושב שהכלי תקוע.
-     בודקים פעם אחת, ואם אין דיווח עוברים להדגשת משפט. */
-  if(boundaryOK === null){
+     בודקים פעם אחת, ואם אין דיווח עוברים להדגשת משפט.
+     הספירה מתחילה ב-onstart ולא ברגע ה-speak: יש מכשירים שלוקח
+     להם יותר משנייה עד שהם פותחים את הפה, וספירה שהתחילה מוקדם
+     סימנה מנוע תקין לגמרי כמנוע שאינו מדווח על מילים. */
+  u.onstart = function(){
+    if(tok !== SEQ || boundaryOK !== null) return;
     if(boundaryTimer) clearTimeout(boundaryTimer);
     boundaryTimer = setTimeout(function(){
       if(boundaryOK === null && speaking){
-        boundaryOK = false;
+        boundaryOK = false; boundaryMsg = true;
         markReading(SENT);
         voiceBar('הדפדפן הזה לא מדווח מתי כל מילה נאמרת, אז ההדגשה היא של המשפט כולו. קורה בעיקר בטלפונים.');
       }
     }, 1500);
-  }
+  };
   /* קודם סימנו את המשפט רק כשלא היה דיווח על מילים. עכשיו תמיד:
      המשפט אומר ״איפה אני״, המילה אומרת ״מה נאמר עכשיו״. */
+  clearHit();                                /* מילה מהמשפט הקודם לא נשארת דלוקה */
   markReading(n);
 
   speechSynthesis.speak(u);
@@ -964,7 +1015,7 @@ function play(){
   $('#btnPlay').textContent = '❚❚';
   $('#btnPlay').setAttribute('aria-label', 'עצירה');
   playState(isGemini() ? 'loading' : 'playing');
-  try{ speechSynthesis.cancel(); }catch(e){}
+  cancelSpeech();
   gStop();
   speakSentence(SENT);
 }
@@ -974,14 +1025,14 @@ function stop(){
   $('#btnPlay').textContent = '▶';
   $('#btnPlay').setAttribute('aria-label', 'הקראה');
   playState('idle');
-  try{ speechSynthesis.cancel(); }catch(e){}
+  cancelSpeech();
   gStop(); markReading(null);
   clearHit();
 }
 function go(n){
   if(n < 0 || n >= SENTS) return;
   SENT = n; markSentence(); clearHit();
-  if(speaking){ try{ speechSynthesis.cancel(); }catch(e){} gStop(); speakSentence(SENT); }
+  if(speaking){ cancelSpeech(); gStop(); speakSentence(SENT); }
   else markReading(null);
   syncNav();
 }
@@ -1138,6 +1189,10 @@ $('#text').addEventListener('click', function(e){
   var cv = heVoices.filter(function(v){ return v.voiceURI === VOICE; })[0] || heVoice;
   if(cv) u.voice = cv;
   u.rate = Math.min(P.rate, 0.75);
+  /* אותו גובה קול כמו בהקראה הרגילה — אחרת מילה בודדת נשמעה
+     בקול גברי בזמן שכל השאר נשמע נשי, ונדמה שהתחלף הקול. */
+  u.pitch = femLift(cv);
+  u.onerror = function(ev){ ttsFail(ev && ev.error); };
   speechSynthesis.speak(u);
 });
 
@@ -1168,7 +1223,7 @@ segment('#segFocus', function(b){
 });
 segment('#segRate', function(b){
   P.rate = parseFloat(b.getAttribute('data-v'));
-  if(speaking){ try{ speechSynthesis.cancel(); }catch(e){} speakSentence(SENT); }
+  if(speaking){ cancelSpeech(); speakSentence(SENT); }
 });
 
 /* מציג/מסתיר את שדה המפתח ומסביר מה כל בחירה נותנת */
@@ -1208,7 +1263,7 @@ segment('#segVoice', function(b){
     voiceBar('');
   }
   syncVoiceUi();
-  if(speaking){ try{ speechSynthesis.cancel(); }catch(e){} speakSentence(SENT); }
+  if(speaking){ cancelSpeech(); speakSentence(SENT); }
 });
 $('#btnKey').addEventListener('click', function(){
   saveKey($('#gkey').value);
@@ -1245,7 +1300,7 @@ document.addEventListener('keydown', function(e){
 });
 
 /* ההקראה ממשיכה ברקע אם לא עוצרים אותה במפורש */
-window.addEventListener('beforeunload', function(){ try{ speechSynthesis.cancel(); }catch(e){} });
+window.addEventListener('beforeunload', function(){ cancelSpeech(); });
 document.addEventListener('visibilitychange', function(){ if(document.hidden) stop(); });
 /* iOS לא ישמיע כלום עד שאמירה אחת יצאה מתוך handler של מגע אמיתי.
    אמירה אוטומטית בטעינת הדף נבלעת בשקט — בלי חריגה, בלי לוג, בלי
@@ -1274,7 +1329,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=13-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=14-pwa1").catch(function(){});
   });
 }
 </script>
