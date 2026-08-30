@@ -51,6 +51,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);min-height:10
 header{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;background:var(--bg)}
 .bar{display:flex;align-items:center;gap:10px;padding:13px 0;flex-wrap:wrap}
 .brand{font-weight:700;font-size:1.15rem}
+/* בורר השפה יושב בכותרת ולא במגירת התצוגה: המגירה נפתחת רק במסך
+   הקריאה, ומי שאינו קורא עברית צריך אותו כבר במסך הראשון. */
+#langbar{display:flex;gap:6px}
+#langbar button{border:1px solid var(--line);background:transparent;color:var(--ink-soft);
+  border-radius:9px;padding:0 12px;min-height:44px;font:inherit;font-size:.9rem;font-weight:600;cursor:pointer}
+#langbar button.on{border-color:var(--accent);color:var(--accent);background:rgba(90,169,230,.12)}
+html.light #langbar button.on{background:rgba(22,98,164,.09)}
+#langbar button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .brand i{color:var(--ink-faint);font-weight:400;font-size:.85rem;font-style:normal;margin-inline-start:8px}
 .spacer{margin-inline-start:auto}
 
@@ -195,6 +203,7 @@ html.light .seg button.on{background:rgba(22,98,164,.09)}
     <span class="brand">מקריא קולי<i>טקסט מנוקד ומוקרא</i></span>
     <span class="spacer"></span>
     <button class="btn hidden" id="btnBack">טקסט אחר</button>
+    <div id="langbar" role="group" aria-label="שפת הממשק"></div>
     <button class="btn" id="btnTheme">מצב בהיר</button>
   </div>
 </header>
@@ -326,6 +335,111 @@ html.light .seg button.on{background:rgba(22,98,164,.09)}
 var $ = function(s){ return document.querySelector(s); };
 var PREFS_KEY = 'reader-prefs-v1';
 
+/* =====================================================================
+   שפת הממשק — עברית וערבית.
+   הטקסט שהמשתמש מדביק נשאר עברי תמיד, וגם ההקראה: זה כל תפקיד
+   האפליקציה. מה שמתחלף הוא רק מה שמסביב — הכפתורים, ההסברים
+   וההודעות. מי שאינו קורא עברית בשטף עדיין צריך להבין איך להפעיל
+   את הכלי שיקריא לו עברית.
+   שתי השפות מימין לשמאל, ולכן אין כאן היפוך פריסה.
+   ===================================================================== */
+var LANGS = {
+  he:{ name:'עברית',   dir:'rtl' },
+  ar:{ name:'العربية', dir:'rtl' }
+};
+var LG_KEY = 'reader-lang';
+var LG = 'he';
+var TR = {"ar": {"מקריא קולי": "قارئ صوتي","טקסט מנוקד ומוקרא": "نصّ مشكّل ومقروء","טקסט אחר": "نصّ آخر","מצב בהיר": "وضع فاتح","מצב כהה": "وضع داكن","הדביקו טקסט — ותקבלו אותו מנוקד ומוקרא": "ألصقوا نصًّا — وستحصلون عليه مشكّلًا ومقروءًا","שיעורי בית, פרק מספר, מאמר, הודעה. כל טקסט בעברית. הניקוד נוסף אוטומטית, וההקראה מדגישה כל מילה בזמן שהיא נאמרת.": "واجب بيتيّ، فصل من كتاب، مقال، رسالة. أيّ نصّ بالعبرية. يُضاف التشكيل تلقائيًّا، والقراءة تُبرِز كلّ كلمة في أثناء نطقها.","הדביקו כאן את הטקסט…": "ألصقوا النصّ هنا…","הטקסט לקריאה": "النصّ للقراءة","נקדו והתחילו": "شكّلوا وابدأوا","טקסט לדוגמה": "نصّ نموذجيّ","הניקוד נעשה בשרת של דיקטה ודורש חיבור לאינטרנט, ואם בוחרים קול טבעי הטקסט נשלח גם לשרת של גוגל כדי להפוך אותו לקול. הוא לא נשמר בשום מקום — לא בשרתים האלה ולא בדפדפן.": "يجري التشكيل على خادم «ديكتا» ويتطلّب اتّصالًا بالإنترنت، وإذا اختِير الصوت الطبيعيّ يُرسَل النصّ أيضًا إلى خادم غوغل لتحويله إلى صوت. لا يُحفَظ في أيّ مكان — لا على هذين الخادمين ولا في المتصفّح.","משפט 1": "الجملة 1","משפט ": "الجملة "," מתוך ": " من "," מילים": " كلمة","משפט קודם (חץ ימינה)": "الجملة السابقة (السهم الأيمن)","משפט קודם": "الجملة السابقة","הקראה (רווח)": "القراءة (مسافة)","הקראה": "القراءة","משפט הבא (חץ שמאלה)": "الجملة التالية (السهم الأيسر)","משפט הבא": "الجملة التالية","עצירה": "إيقاف","▲ תצוגה": "▲ العرض","▼ סגירה": "▼ إغلاق","ניקוד": "التشكيل","עם ניקוד": "مع تشكيل","בלי": "بدون","· בלי ניקוד": "· بلا تشكيل","גודל הטקסט": "حجم النصّ","קטן": "صغير","בינוני": "متوسّط","גדול": "كبير","ענק": "ضخم","ריווח": "التباعد","רגיל": "عاديّ","מרווח": "متباعد","מרווח מאוד": "متباعد جدًّا","מיקוד": "التركيز","כל הטקסט": "كلّ النصّ","משפט אחד בכל פעם": "جملة واحدة في كلّ مرّة","קול": "الصوت","הדגשת מילים": "إبراز الكلمات","הדגשת משפט": "إبراز الجملة","שמירה": "حفظ","מהירות ההקראה": "سرعة القراءة","איטית מאוד": "بطيئة جدًّا","איטית": "بطيئة","רגילה": "عاديّة","מהירה": "سريعة","הקישו על מילה כדי לשמוע רק אותה.": "انقروا على كلمة لسماعها وحدها.","מקשים:": "المفاتيح:","רווח": "مسافة","הקראה ·": "القراءة ·","משפט הבא ·": "الجملة التالية ·","משפט קודם ·": "الجملة السابقة ·","עצירה.": "إيقاف.","קול המחשב": "صوت الحاسوب","Gemini · נשי": "Gemini · أنثويّ","Gemini · גברי": "Gemini · ذكوريّ"," · נשי": " · أنثويّ"," · גברי": " · ذكوريّ"," · טבעי": " · طبيعيّ","קול טבעי · ": "صوت طبيعيّ · "," זה קול טבעי.": " هذا صوت طبيعيّ.","קול של הדפדפן — בחינם, בלי מפתח, ועם הדגשה מדויקת של כל מילה.": "صوت المتصفّح — مجّانًا، بلا مفتاح، مع إبراز دقيق لكلّ كلمة.","קול של הדפדפן. הדגשה מדויקת של כל מילה. אם דפדפן אחר מציע קולות נוספים, הם יופיעו כאן.": "صوت المتصفّح. إبراز دقيق لكلّ كلمة. إذا كان متصفّح آخر يوفّر أصواتًا إضافيّة، فستظهر هنا.","קול טבעי, עם הדגשה של המשפט כולו.": "صوت طبيعيّ، مع إبراز الجملة كاملةً.","קול טבעי. גוגל לא מדווח מתי כל מילה נאמרת, אז ההדגשה מחושבת לפי מספר ההברות בכל מילה. אם היא מקדימה או מפגרת — עברו להדגשת משפט.": "صوت طبيعيّ. لا تُبلّغ غوغل عن لحظة نطق كلّ كلمة، لذلك يُحسَب الإبراز حسب عدد المقاطع في كلّ كلمة. إذا سبق أو تأخّر — انتقلوا إلى إبراز الجملة.","הדפדפן הזה לא מדווח מתי כל מילה נאמרת, אז ההדגשה היא של המשפט כולו. קורה בעיקר בטלפונים.": "لا يُبلّغ هذا المتصفّح عن لحظة نطق كلّ كلمة، لذلك يجري إبراز الجملة كاملةً. يحدث هذا في الهواتف بالأساس.","לא נמצא קול עברי במחשב הזה, אז ההקראה עשויה להישמע מוזר. הטקסט המנוקד עובד כרגיל.": "لا يوجد صوت عبريّ في هذا الجهاز، لذلك قد تبدو القراءة غريبة. أمّا النصّ المشكّل فيعمل كالمعتاد.","צריך קודם להדביק טקסט.": "عليكم إلصاق نصّ أوّلًا.","לא מצאתי טקסט בעברית. הכלי הזה מיועד לעברית.": "لم أجد نصًّا بالعبرية. هذه الأداة مخصّصة للعبرية.","מנקד…": "يُشكّل…","מנקד… ": "يُشكّل… ","הניקוד לא הצליח (": "لم ينجح التشكيل (","). ייתכן שאין חיבור לאינטרנט.": "). ربّما لا يوجد اتّصال بالإنترنت.","<br><button class=\"btn\" id=\"btnNoNikud\">המשיכו בלי ניקוד</button>": "<br><button class=\"btn\" id=\"btnNoNikud\">تابِعوا بلا تشكيل</button>","לא התקבל טקסט": "لم يصل نصّ","לא התקבל שמע": "لم يصل صوت","הניגון נכשל": "فشل التشغيل","הדפדפן חסם את הניגון": "حجب المتصفّح التشغيل","השרת החזיר ": "أعاد الخادم ","הקול הטבעי לא עבד (": "لم يعمل الصوت الطبيعيّ (","). חזרנו לקול המחשב.": "). عُدنا إلى صوت الحاسوب.","לא נמצא מפתח Gemini, אז ההקראה בקול המחשב.": "لا يوجد مفتاح Gemini، لذلك ستكون القراءة بصوت الحاسوب.","), אז ההקראה בקול המחשב.": ")، لذلك ستكون القراءة بصوت الحاسوب.","מנוע הדיבור של המכשיר לא הצליח להקריא": "لم ينجح محرّك النطق في الجهاز في القراءة",". זו תקלה במכשיר, לא באפליקציה. ": ". هذا عطل في الجهاز، لا في التطبيق. ","בדיקה והוראות תיקון": "فحص وتعليمات إصلاح","סגירה": "إغلاق","מפתח Gemini": "مفتاح Gemini","הזנת מפתח": "إدخال مفتاح","המפתח נשמר. קולות Gemini נוספו לרשימה.": "حُفِظ المفتاح. أُضيفت أصوات Gemini إلى القائمة.","המפתח נמחק.": "حُذِف المفتاح.","כדי לשמוע קול Gemini צריך מפתח. בלעדיו ההקראה תישאר בקול של הדפדפן.": "لسماع صوت Gemini يلزم مفتاح. بدونه تبقى القراءة بصوت المتصفّح.","קול Gemini דורש מפתח, ולכן מתאים רק לשימוש אישי — לא לקהל.": "يتطلّب صوت Gemini مفتاحًا، ولذلك يناسب الاستخدام الشخصيّ فقط — لا لجمهور.","יהושע לגשטיין ·": "يهوشع لچشطاين ·","תנאי שימוש וזכויות יוצרים": "شروط الاستخدام وحقوق النشر"}};
+function _(h){
+  if(LG==='he') return h;
+  var d = TR[LG]; if(!d) return h;
+  var v = d[h];
+  return v===undefined ? h : v;
+}
+/* אזורים שבהם יושב הטקסט של המשתמש. תרגום עובר עליהם בלי לגעת —
+   מילה עברית שבמקרה זהה למחרוזת ממשק לא תוחלף בערבית באמצע הקטע. */
+function trSkip(el){
+  for(var n=el; n && n!==document.body; n=n.parentElement){
+    if(n.id==='text' || n.id==='input') return true;
+    var t=n.tagName;
+    if(t==='SCRIPT'||t==='STYLE'||t==='TEXTAREA') return true;
+    if(n.classList && n.classList.contains('lg-wrap')) return true;  /* שער התנאים מתרגם את עצמו */
+  }
+  return false;
+}
+/* צילום של הטקסט המקורי, פעם אחת. בלעדיו מעבר he→ar→he היה
+   מחפש את המחרוזת הערבית במילון עברי ומשאיר אותה ערבית. */
+var TR_NODES = null, TR_ATTRS = null;
+var TR_ATTR_NAMES = ['placeholder','aria-label','title'];
+function trSnap(){
+  if(TR_NODES) return;
+  TR_NODES = []; TR_ATTRS = [];
+  var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  var n;
+  while((n = w.nextNode())){
+    var t = n.nodeValue;
+    if(!t || !/\S/.test(t)) continue;
+    if(!n.parentElement || trSkip(n.parentElement)) continue;
+    TR_NODES.push({ n:n, src:t });
+  }
+  var els = document.body.querySelectorAll('['+TR_ATTR_NAMES.join('],[')+']');
+  for(var i=0;i<els.length;i++){
+    if(trSkip(els[i])) continue;
+    for(var k=0;k<TR_ATTR_NAMES.length;k++){
+      var a = TR_ATTR_NAMES[k];
+      if(els[i].hasAttribute(a)) TR_ATTRS.push({ el:els[i], a:a, src:els[i].getAttribute(a) });
+    }
+  }
+}
+/* הרווחים והשורות שמסביב נשמרים כפי שהיו — הטקסט ב-HTML מפוצל
+   לשורות, ותרגום שמוחק אותן היה מדביק מילים זו לזו. */
+function trApply(){
+  trSnap();
+  var i, o, pre, post, core;
+  for(i=0;i<TR_NODES.length;i++){
+    o = TR_NODES[i];
+    pre  = o.src.match(/^\s*/)[0];
+    post = o.src.match(/\s*$/)[0];
+    core = o.src.replace(/\s+/g,' ').trim();
+    o.n.nodeValue = pre + _(core) + post;
+  }
+  for(i=0;i<TR_ATTRS.length;i++){
+    o = TR_ATTRS[i];
+    o.el.setAttribute(o.a, _(String(o.src).replace(/\s+/g,' ').trim()));
+  }
+}
+function setLang(k, save){
+  if(!LANGS[k]) k = 'he';
+  LG = k;
+  document.documentElement.lang = k;
+  document.documentElement.dir = LANGS[k].dir;
+  if(save !== false){ try{ localStorage.setItem(LG_KEY, k); }catch(e){} }
+  trApply();
+  try{ renderLangBar(); }catch(e){}
+  try{ if(typeof refreshDynamic === 'function') refreshDynamic(); }catch(e){}
+}
+function renderLangBar(){
+  var bar = document.getElementById('langbar');
+  if(!bar) return;
+  var h = '';
+  for(var k in LANGS){
+    h += '<button type="button" data-lg="' + k + '" lang="' + k + '"' +
+         (k===LG ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') +
+         '>' + LANGS[k].name + '</button>';
+  }
+  bar.innerHTML = h;
+  var bs = bar.querySelectorAll('button');
+  for(var i=0;i<bs.length;i++){
+    bs[i].onclick = function(){ setLang(this.getAttribute('data-lg')); };
+  }
+}
+/* שער התנאים מודיע כשבחרו בו שפה, והאפליקציה הולכת אחריו. */
+window.addEventListener('legal:lang', function(e){
+  var k = e && e.detail;
+  if(k && LANGS[k]) setLang(k);
+});
+
+
 /* ---------- מצב ---------- */
 var W = [];            /* המילים: {plain, nikud, word, sent} */
 var SENT = 0;          /* המשפט הנוכחי */
@@ -365,7 +479,7 @@ function nakdanOnce(text){
       keepqq:false, nodageshdefmem:false, patachma:false, keepmetagim:true
     })
   }).then(function(r){
-    if(!r.ok) throw new Error('השרת החזיר ' + r.status);
+    if(!r.ok) throw new Error(_('השרת החזיר ') + r.status);
     return r.json();
   });
 }
@@ -476,7 +590,7 @@ function markSentence(){
     all[i].classList.toggle('cur', n === SENT);
     all[i].classList.toggle('done', n < SENT);
   }
-  $('#pos').textContent = 'משפט ' + (SENT + 1) + ' מתוך ' + SENTS;
+  $('#pos').textContent = _('משפט ') + (SENT + 1) + _(' מתוך ') + SENTS;
   $('#pfill').style.width = Math.round((SENT + 1) / SENTS * 100) + '%';
   var el = document.querySelector('#text .s.cur');
   if(el && P.focus) el.scrollIntoView({ block:'center', behavior:'smooth' });
@@ -573,7 +687,7 @@ function gSynth(text, voiceName){
           return 'data:audio/mp3;base64,' + pd.data;
         }
       }
-      throw new Error('לא התקבל שמע');
+      throw new Error(_('לא התקבל שמע'));
     });
 }
 function gGet(text){
@@ -661,7 +775,7 @@ function voiceBar(text, withKeyButton, kind){
   b.innerHTML = '<span style="flex:1">' + text + '</span>';
   if(withKeyButton){
     var btn = document.createElement('button');
-    btn.className = 'btn'; btn.textContent = 'הזנת מפתח';
+    btn.className = 'btn'; btn.textContent = _('הזנת מפתח');
     btn.onclick = function(){
       var t = document.querySelector('#tools');
       if(!t.classList.contains('open')) toggleTools();
@@ -713,7 +827,7 @@ function voiceGender(v){
   if (VOICE_M.test(n)) return 'm';
   return '';
 }
-var GENDER_LABEL = { f:' · נשי', m:' · גברי', '':'' };
+var GENDER_LABEL = { f:_(' · נשי'), m:_(' · גברי'), '':'' };
 function voiceLabel(v){
   var n = String(v.name || '')
     .replace(/^Microsoft\s+/i, '')
@@ -721,7 +835,7 @@ function voiceLabel(v){
     .replace(/\s*\(.*?\)\s*/g, ' ')
     .trim();
   var natural = /online|natural|neural/i.test(v.name);
-  return (n || 'קול') + GENDER_LABEL[voiceGender(v)] + (natural ? ' · טבעי' : '');
+  return (n || _('קול')) + GENDER_LABEL[voiceGender(v)] + (natural ? _(' · טבעי') : '');
 }
 
 function renderVoices(){
@@ -732,12 +846,12 @@ function renderVoices(){
     html += '<button data-v="' + esc(v.voiceURI) + '">' + esc(voiceLabel(v)) + '</button>';
   });
   if(!heVoices.length){
-    html += '<button data-v="browser">קול המחשב</button>';
+    html += '<button data-v="browser">' + _('קול המחשב') + '</button>';
   }
   /* קולות Gemini מוצגים רק כשיש מפתח — אין טעם להציע מה שלא יעבוד */
   if(GKEY){
-    html += '<button data-v="gemini:Kore">Gemini · נשי</button>';
-    html += '<button data-v="gemini:Puck">Gemini · גברי</button>';
+    html += '<button data-v="gemini:Kore">' + _('Gemini · נשי') + '</button>';
+    html += '<button data-v="gemini:Puck">' + _('Gemini · גברי') + '</button>';
   }
   host.innerHTML = html;
   var fn = $('#femnote');
@@ -785,7 +899,7 @@ function geminiName(){ return VOICE.split(':')[1] || 'Kore'; }
    הגיע מהמערכת. שגיאה שנבלעת עולה יום של חיפוש.
    ------------------------------------------------------------ */
 var TTSMSG={
-  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה"},
+  he:{dir:"rtl",msg:_("מנוע הדיבור של המכשיר לא הצליח להקריא"),tail:_(". זו תקלה במכשיר, לא באפליקציה. "),link:_("בדיקה והוראות תיקון"),close:_("סגירה")},
   ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق"},
   ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть"},
   en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close"}
@@ -932,7 +1046,7 @@ function speakSentence(n){
       if(boundaryOK === null && speaking){
         boundaryOK = false; boundaryMsg = true;
         markReading(SENT);
-        voiceBar('הדפדפן הזה לא מדווח מתי כל מילה נאמרת, אז ההדגשה היא של המשפט כולו. קורה בעיקר בטלפונים.');
+        voiceBar(_('הדפדפן הזה לא מדווח מתי כל מילה נאמרת, אז ההדגשה היא של המשפט כולו. קורה בעיקר בטלפונים.'));
       }
     }, 1500);
   };
@@ -972,12 +1086,12 @@ function speakGemini(n){
       if(!speaking) return;
       if(SENT + 1 < SENTS){ SENT++; markSentence(); speakGemini(SENT); } else stop();
     };
-    gAudio.onerror = function(){ voiceFailed('הניגון נכשל'); };
+    gAudio.onerror = function(){ voiceFailed(_('הניגון נכשל')); };
     /* אומרים איזה קול נשמע ברגע זה. ״למה זה לא הקול שביקשתי״
        היא שאלה שחוזרת, ועדיף לענות עליה לפני שהיא נשאלת. */
-    voiceBar('קול טבעי · ' + geminiName(), false, 'ok');
+    voiceBar(_('קול טבעי · ') + geminiName(), false, 'ok');
     playState('playing');
-    gAudio.play().catch(function(){ voiceFailed('הדפדפן חסם את הניגון'); });
+    gAudio.play().catch(function(){ voiceFailed(_('הדפדפן חסם את הניגון')); });
     /* הורדה מוקדמת של המשפט הבא */
     if(SENT + 1 < SENTS){
       var nx = sentencePlain(SENT + 1).trim();
@@ -991,10 +1105,10 @@ function voiceFailed(why){
   var noKey = !GKEY;
   VOICE = (heVoices[0] && heVoices[0].voiceURI) || 'browser'; savePrefs();
   mark('#segVoice', VOICE); syncVoiceUi();
-  $('#vnote').textContent = 'הקול הטבעי לא עבד (' + why + '). חזרנו לקול המחשב.';
+  $('#vnote').textContent = _('הקול הטבעי לא עבד (') + why + _('). חזרנו לקול המחשב.');
   voiceBar(noKey
-    ? 'לא נמצא מפתח Gemini, אז ההקראה בקול המחשב.'
-    : 'הקול הטבעי לא עבד (' + esc(why) + '), אז ההקראה בקול המחשב.', noKey, 'bad');
+    ? _('לא נמצא מפתח Gemini, אז ההקראה בקול המחשב.')
+    : _('הקול הטבעי לא עבד (') + esc(why) + _('), אז ההקראה בקול המחשב.'), noKey, 'bad');
   markReading(null);
   playState(speaking ? 'playing' : 'idle');
   if(speaking) speakSentence(SENT);
@@ -1013,7 +1127,7 @@ function play(){
   if(VOICE === 'browser' && !('speechSynthesis' in window)) return;
   speaking = true;
   $('#btnPlay').textContent = '❚❚';
-  $('#btnPlay').setAttribute('aria-label', 'עצירה');
+  $('#btnPlay').setAttribute('aria-label', _('עצירה'));
   playState(isGemini() ? 'loading' : 'playing');
   cancelSpeech();
   gStop();
@@ -1023,7 +1137,7 @@ function stop(){
   speaking = false;
   if(boundaryTimer){ clearTimeout(boundaryTimer); boundaryTimer = null; }   /* אחרת הטיימר יורה אחרי שכבר עצרנו */
   $('#btnPlay').textContent = '▶';
-  $('#btnPlay').setAttribute('aria-label', 'הקראה');
+  $('#btnPlay').setAttribute('aria-label', _('הקראה'));
   playState('idle');
   cancelSpeech();
   gStop(); markReading(null);
@@ -1048,15 +1162,15 @@ function toReader(fromNikud){
   $('#playBar').classList.remove('hidden');
   $('#tools').classList.remove('hidden');
   $('#btnBack').classList.remove('hidden');
-  $('#nikudNote').textContent = fromNikud ? '' : '· בלי ניקוד';
+  $('#nikudNote').textContent = fromNikud ? '' : _('· בלי ניקוד');
   SENT = 0;
   draw(); syncNav();
   window.scrollTo(0, 0);
   /* אם אין קול עברי במחשב — אומרים את זה מראש ולא נותנים לו לגלות לבד */
-  if(voicesReady && !heVoice) showWarnIn('#text', 'לא נמצא קול עברי במחשב הזה, אז ההקראה עשויה להישמע מוזר. הטקסט המנוקד עובד כרגיל.');
+  if(voicesReady && !heVoice) showWarnIn('#text', _('לא נמצא קול עברי במחשב הזה, אז ההקראה עשויה להישמע מוזר. הטקסט המנוקד עובד כרגיל.'));
   /* אם נבחר קול טבעי בביקור קודם אבל אין מפתח — אומרים לפני שילחץ נגן */
   if(isGemini() && !GKEY){
-    voiceBar('כדי לשמוע קול Gemini צריך מפתח. בלעדיו ההקראה תישאר בקול של הדפדפן.', true);
+    voiceBar(_('כדי לשמוע קול Gemini צריך מפתח. בלעדיו ההקראה תישאר בקול של הדפדפן.'), true);
   }else{
     voiceBar('');
   }
@@ -1073,7 +1187,7 @@ function toPaste(){
   $('#tools').classList.add('hidden');
   $('#btnBack').classList.add('hidden');
   $('#tools').classList.remove('open');
-  $('#toolsLabel').textContent = '▲ תצוגה';
+  $('#toolsLabel').textContent = _('▲ תצוגה');
   $('#screenPaste').classList.remove('hidden');
   var w = document.querySelector('#screenRead .msg'); if(w) w.remove();
   voiceBar('');
@@ -1097,7 +1211,7 @@ function applyPrefs(){
   var sp = [[1.7,'0','0.06em'],[2.1,'0.02em','0.16em'],[2.6,'0.05em','0.3em']][P.space] || [2.1,'0.02em','0.16em'];
   r.setProperty('--lh', sp[0]); r.setProperty('--ls', sp[1]); r.setProperty('--ws', sp[2]);
   document.documentElement.classList.toggle('light', !!P.light);
-  $('#btnTheme').textContent = P.light ? 'מצב כהה' : 'מצב בהיר';
+  $('#btnTheme').textContent = P.light ? _('מצב כהה') : _('מצב בהיר');
   $('#screenRead').classList.toggle('focusing', !!P.focus);
   VOICE = P.voice || 'browser';
   /* ערכים מגרסה קודמת: 'Kore' / 'Puck' היו שמות Gemini */
@@ -1121,7 +1235,7 @@ function mark(sel, val){
 $('#input').addEventListener('input', function(){
   var t = this.value.trim();
   var n = t ? t.split(/\s+/).length : 0;
-  $('#count').textContent = n ? (n + ' מילים') : '';
+  $('#count').textContent = n ? (n + _(' מילים')) : '';
 });
 
 function hideMsgs(){ $('#err').classList.add('hidden'); $('#warn').classList.add('hidden'); }
@@ -1130,28 +1244,28 @@ function showErr(m){ var e = $('#err'); e.textContent = m; e.classList.remove('h
 $('#btnGo').addEventListener('click', function(){
   var text = $('#input').value.replace(/\r/g, '').trim();
   hideMsgs();
-  if(!text){ showErr('צריך קודם להדביק טקסט.'); return; }
-  if(!/[֐-׿]/.test(text)){ showErr('לא מצאתי טקסט בעברית. הכלי הזה מיועד לעברית.'); return; }
+  if(!text){ showErr(_('צריך קודם להדביק טקסט.')); return; }
+  if(!/[֐-׿]/.test(text)){ showErr(_('לא מצאתי טקסט בעברית. הכלי הזה מיועד לעברית.')); return; }
 
   var b = this;
-  b.disabled = true; b.textContent = 'מנקד…';
-  nakdanAll(text, function(i, n){ b.textContent = n > 1 ? ('מנקד… ' + i + ' מתוך ' + n) : 'מנקד…'; })
+  b.disabled = true; b.textContent = _('מנקד…');
+  nakdanAll(text, function(i, n){ b.textContent = n > 1 ? (_('מנקד… ') + i + _(' מתוך ') + n) : _('מנקד…'); })
     .then(function(tokens){
       W = build(tokens);
-      if(!W.length) throw new Error('לא התקבל טקסט');
+      if(!W.length) throw new Error(_('לא התקבל טקסט'));
       toReader(true);
     })
     .catch(function(e){
       /* הניקוד נכשל — מציעים להמשיך בלעדיו במקום להשאיר מסך ריק */
       var w = $('#warn');
-      w.innerHTML = 'הניקוד לא הצליח (' + esc(e.message) + '). ייתכן שאין חיבור לאינטרנט.' +
-                    '<br><button class="btn" id="btnNoNikud">המשיכו בלי ניקוד</button>';
+      w.innerHTML = _('הניקוד לא הצליח (') + esc(e.message) + _('). ייתכן שאין חיבור לאינטרנט.') +
+                    _('<br><button class="btn" id="btnNoNikud">המשיכו בלי ניקוד</button>');
       w.classList.remove('hidden');
       $('#btnNoNikud').addEventListener('click', function(){
         W = buildPlain(text); hideMsgs(); toReader(false);
       });
     })
-    .then(function(){ b.disabled = false; b.textContent = 'נקדו והתחילו'; });
+    .then(function(){ b.disabled = false; b.textContent = _('נקדו והתחילו'); });
 });
 
 $('#btnSample').addEventListener('click', function(){
@@ -1236,14 +1350,14 @@ function syncVoiceUi(){
     var cur = heVoices.filter(function(v){ return v.voiceURI === VOICE; })[0];
     var isNat = cur && /online|natural|neural/i.test(cur.name);
     note.textContent = heVoices.length > 1
-      ? ('קול של הדפדפן — בחינם, בלי מפתח, ועם הדגשה מדויקת של כל מילה.' + (isNat ? ' זה קול טבעי.' : ''))
-      : 'קול של הדפדפן. הדגשה מדויקת של כל מילה. אם דפדפן אחר מציע קולות נוספים, הם יופיעו כאן.';
+      ? (_('קול של הדפדפן — בחינם, בלי מפתח, ועם הדגשה מדויקת של כל מילה.') + (isNat ? _(' זה קול טבעי.') : ''))
+      : _('קול של הדפדפן. הדגשה מדויקת של כל מילה. אם דפדפן אחר מציע קולות נוספים, הם יופיעו כאן.');
   }else if(!GKEY){
-    note.textContent = 'קול Gemini דורש מפתח, ולכן מתאים רק לשימוש אישי — לא לקהל.';
+    note.textContent = _('קול Gemini דורש מפתח, ולכן מתאים רק לשימוש אישי — לא לקהל.');
   }else{
     note.textContent = P.wordsync
-      ? 'קול טבעי. גוגל לא מדווח מתי כל מילה נאמרת, אז ההדגשה מחושבת לפי מספר ההברות בכל מילה. אם היא מקדימה או מפגרת — עברו להדגשת משפט.'
-      : 'קול טבעי, עם הדגשה של המשפט כולו.';
+      ? _('קול טבעי. גוגל לא מדווח מתי כל מילה נאמרת, אז ההדגשה מחושבת לפי מספר ההברות בכל מילה. אם היא מקדימה או מפגרת — עברו להדגשת משפט.')
+      : _('קול טבעי, עם הדגשה של המשפט כולו.');
   }
 }
 segment('#segSync', function(b){
@@ -1258,7 +1372,7 @@ segment('#segVoice', function(b){
   gStop(); markReading(null);
   if(isGemini() && !GKEY){
     /* אומרים את זה מיד, במסך, ולא מחכים שינסה וישמע קול אחר */
-    voiceBar('כדי לשמוע קול Gemini צריך מפתח. בלעדיו ההקראה תישאר בקול של הדפדפן.', true);
+    voiceBar(_('כדי לשמוע קול Gemini צריך מפתח. בלעדיו ההקראה תישאר בקול של הדפדפן.'), true);
   }else{
     voiceBar('');
   }
@@ -1270,12 +1384,12 @@ $('#btnKey').addEventListener('click', function(){
   $('#gkey').value = '';
   renderVoices();
   syncVoiceUi();
-  $('#vnote').textContent = GKEY ? 'המפתח נשמר. קולות Gemini נוספו לרשימה.' : 'המפתח נמחק.';
+  $('#vnote').textContent = GKEY ? _('המפתח נשמר. קולות Gemini נוספו לרשימה.') : _('המפתח נמחק.');
 });
 
 function toggleTools(){
   var open = $('#tools').classList.toggle('open');
-  $('#toolsLabel').textContent = open ? '▼ סגירה' : '▲ תצוגה';
+  $('#toolsLabel').textContent = open ? _('▼ סגירה') : _('▲ תצוגה');
 }
 $('#toolsHandle').addEventListener('click', toggleTools);
 $('#toolsHandle').addEventListener('keydown', function(e){
@@ -1285,7 +1399,7 @@ $('#toolsHandle').addEventListener('keydown', function(e){
 $('#btnTheme').addEventListener('click', function(){
   P.light = P.light ? 0 : 1;
   document.documentElement.classList.toggle('light', !!P.light);
-  this.textContent = P.light ? 'מצב כהה' : 'מצב בהיר';
+  this.textContent = P.light ? _('מצב כהה') : _('מצב בהיר');
   savePrefs();
 });
 
@@ -1320,6 +1434,34 @@ try{document.addEventListener("pointerdown",function(){
 
 loadKey();
 loadPrefs();
+
+/* חלקי ממשק שנכתבים מ-JS ולא יושבים ב-HTML הסטטי: הצילום של
+   trSnap אינו מכיר אותם, ולכן הם נבנים מחדש בהחלפת שפה. */
+function refreshDynamic(){
+  try{ $('#btnTheme').textContent = P.light ? _('מצב כהה') : _('מצב בהיר'); }catch(e){}
+  try{ $('#toolsLabel').textContent =
+        document.querySelector('#tools').classList.contains('open') ? _('▼ סגירה') : _('▲ תצוגה'); }catch(e){}
+  try{
+    var t = $('#input').value.trim();
+    var n = t ? t.split(/\s+/).length : 0;
+    $('#count').textContent = n ? (n + _(' מילים')) : '';
+  }catch(e){}
+  try{ if(SENTS) $('#pos').textContent = _('משפט ') + (SENT + 1) + _(' מתוך ') + SENTS; }catch(e){}
+  try{ renderVoices(); }catch(e){}
+}
+
+/* השפה נטענת אחרי שכל הדף נבנה: הכותרת התחתונה יושבת אחרי הסקריפט
+   הזה ב-HTML, וצילום שנעשה מוקדם מדי לא היה כולל אותה. */
+(function bootLang(){
+  function go(){
+    var k = 'he';
+    try{ k = localStorage.getItem(LG_KEY) || 'he'; }catch(e){}
+    setLang(LANGS[k] ? k : 'he', false);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+  else go();
+})();
+
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
 <script src="/legal/terms.js"></script>
@@ -1329,7 +1471,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=14-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=15-pwa1").catch(function(){});
   });
 }
 </script>
