@@ -439,6 +439,10 @@ T.he={
   vFemale:"קולות נשיים", vMale:"קולות גבריים", vSample:"דוגמה",
   vDevList:"קולות המכשיר", vAuto:"בחירה אוטומטית",
   vNoneLang:"אין קול בשפה הזאת במכשיר",
+  femNone:"אין במכשיר קול נשי בשפה הזאת, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו.",
+  femAndroid:"באנדרואיד: הגדרות ← ניהול כללי ← טקסט לדיבור ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי.",
+  femIos:"באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.",
+  femWin:"בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.",
   vKey:"מפתח Gemini", vKeyPh:"מתחיל ב-AIza…", vSave:"שמרו", vShow:"הצג", vHide:"הסתר",
   vSaved:"המפתח נשמר במכשיר הזה בלבד. הוא לא נשלח לשום מקום אחר.",
   vRemoved:"המפתח נמחק.", vChecking:"בודקים…", vOk:"המפתח עובד.",
@@ -484,6 +488,10 @@ T.ar={
   vFemale:"أصوات نسائية", vMale:"أصوات رجالية", vSample:"عيّنة",
   vDevList:"أصوات الجهاز", vAuto:"اختيار تلقائي",
   vNoneLang:"لا يوجد صوت بهذه اللغة في الجهاز",
+  femNone:"لا يوجد في هذا الجهاز صوت نسائي بهذه اللغة، لذلك رُفعت طبقة الصوت. هذا ليس صوتًا نسائيًا حقيقيًا — للحصول على واحد يجب تثبيته.",
+  femAndroid:"في أندرويد: الإعدادات ← الإدارة العامة ← تحويل النص إلى كلام ← الترس بجانب المحرّك ← تثبيت بيانات الصوت ← اختيار نسخة نسائية.",
+  femIos:"في آيفون: الإعدادات ← إمكانية الوصول ← المحتوى المنطوق ← الأصوات ← اختيار صوت نسائي وتنزيله.",
+  femWin:"في ويندوز: الإعدادات ← الوقت واللغة ← الكلام ← إدارة الأصوات ← إضافة أصوات.",
   vKey:"مفتاح Gemini", vKeyPh:"يبدأ بـ AIza…", vSave:"حفظ", vShow:"إظهار", vHide:"إخفاء",
   vSaved:"حُفظ المفتاح على هذا الجهاز فقط، ولا يُرسل إلى أي مكان آخر.",
   vRemoved:"حُذف المفتاح.", vChecking:"جارٍ الفحص…", vOk:"المفتاح يعمل.",
@@ -529,6 +537,10 @@ T.ru={
   vFemale:"Женские голоса", vMale:"Мужские голоса", vSample:"Пример",
   vDevList:"Голоса устройства", vAuto:"Автоматически",
   vNoneLang:"На устройстве нет голоса для этого языка",
+  femNone:"На этом устройстве нет женского голоса для этого языка, поэтому тон голоса повышен. Это не настоящий женский голос — чтобы получить его, его нужно установить.",
+  femAndroid:"В Android: Настройки → Общие настройки → Синтез речи → шестерёнка рядом с движком → Установить голосовые данные → выбрать женский вариант.",
+  femIos:"В iPhone: Настройки → Универсальный доступ → Устный контент → Голоса → выбрать женский голос и загрузить.",
+  femWin:"В Windows: Параметры → Время и язык → Речь → Управление голосами → Добавить голоса.",
   vKey:"Ключ Gemini", vKeyPh:"начинается с AIza…", vSave:"Сохранить", vShow:"Показать", vHide:"Скрыть",
   vSaved:"Ключ сохранён только на этом устройстве и никуда не отправляется.",
   vRemoved:"Ключ удалён.", vChecking:"Проверяем…", vOk:"Ключ работает.",
@@ -574,6 +586,10 @@ T.en={
   vFemale:"Female voices", vMale:"Male voices", vSample:"Sample",
   vDevList:"Device voices", vAuto:"Automatic",
   vNoneLang:"No voice for this language on this device",
+  femNone:"This device has no female voice for this language, so the pitch is raised. It is not a real female voice — to get one it has to be installed.",
+  femAndroid:"On Android: Settings → General management → Text-to-speech → the gear next to the engine → Install voice data → pick a female variant.",
+  femIos:"On iPhone: Settings → Accessibility → Spoken Content → Voices → pick a female voice and download it.",
+  femWin:"On Windows: Settings → Time & language → Speech → Manage voices → Add voices.",
   vKey:"Gemini key", vKeyPh:"starts with AIza…", vSave:"Save", vShow:"Show", vHide:"Hide",
   vSaved:"The key is stored on this device only. It is not sent anywhere else.",
   vRemoved:"Key removed.", vChecking:"Checking…", vOk:"The key works.",
@@ -629,7 +645,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n24 · 2026-08-29";
+var BUILD="n25 · 2026-08-30";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -802,6 +818,18 @@ function voicesFor(code){
 }
 /* בורר קולות המכשיר. עד כה לא היה כזה בכלל: bestVoice בחר לבד,
    והמשתמש לא יכול היה להשפיע — כולל לבקש קול נשי. */
+/* אין קול נשי בשפה שמוצגת? femLift מרים את הגובה, וזה כל מה
+   שדפדפן יכול לעשות בלי הקלטות ובלי שירות חיצוני. ההודעה מסבירה
+   את זה ומצרפת את ההוראות למערכת ההפעלה שהמשתמש נמצא בה — קול
+   נשי שמותקן נבחר מיד, בלי שינוי הגובה ובלי הודעה. */
+function femNote(pool){
+  if(!pool||!pool.length)return "";
+  for(var i=0;i<pool.length;i++)if(vGender(pool[i])==="f")return "";
+  var ua=navigator.userAgent||"";
+  var how=/Android/i.test(ua)?"femAndroid"
+         :/iPhone|iPad|iPod/i.test(ua)?"femIos":"femWin";
+  return t("femNone")+" "+t(how);
+}
 function devPicker(lgs){
   var out="";
   lgs.forEach(function(lg){
@@ -813,6 +841,11 @@ function devPicker(lgs){
       out+='<p class="chip bad" style="margin:.4rem 0">'+esc(t("vNoneLang"))+"</p>";
       return;
     }
+    /* אין קול נשי בשפה הזאת? הגובה מורם — וגם נאמר למה. בלי המשפט
+       הזה הקול הגברי נראה כמו בחירה של האפליקציה ולא כמו מה שיש
+       במכשיר, ואין שום רמז שאפשר להתקין קול נשי ולקבל אותו מיד. */
+    var fnote=femNote(pool);
+    if(fnote)out+='<p class="sub" style="margin:.4rem 0;line-height:1.5">'+esc(fnote)+"</p>";
     var cur=(state.devVoice||{})[code]||"";
     function row(v){
       var on=v?cur===v.voiceURI:!cur;
@@ -851,12 +884,18 @@ function bestVoice(code){
     if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
     if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
     if(/espeak|compact|pico/.test(n))s-=40;
-    var g=vGender(v);
-    if(g===pref)s+=10; else if(g!=="?")s-=4;
     if(v.default)s+=4;
     return s;
   }
-  return pool.slice().sort(function(a,b){return score(b)-score(a)})[0];
+  /* המגדר אינו עוד סעיף בתוך הניקוד אלא המיון הראשון. עשר נקודות
+     נבלעו מול שלושים על שם יצרן, וקול גברי ממותג ניצח קול נשי
+     שקיים באותו מכשיר — בדיוק מה שהעדפת המגדר הייתה אמורה למנוע.
+     קודם הקולות במגדר המבוקש, אחריהם מי שלא זוהה, ורק אז ההפוך;
+     ובתוך כל קבוצה מכריעה האיכות. */
+  function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
+  return pool.slice().sort(function(a,b){
+    var d=grank(b)-grank(a); return d||score(b)-score(a);
+  })[0];
 }
 function hasEnglishVoice(){return voicesFor(EN_TTS).length>0}
 
@@ -3909,7 +3948,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n24-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n25-pwa1").catch(function(){});
   });
 }
 </script>

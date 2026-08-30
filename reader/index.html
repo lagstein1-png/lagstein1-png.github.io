@@ -284,6 +284,7 @@ html.light .seg button.on{background:rgba(22,98,164,.09)}
     <div class="grp">
       <label>קול</label>
       <div class="seg" id="segVoice"></div>
+      <p class="vnote" id="femnote"></p>
       <div class="seg" id="segSync" style="display:none;margin-top:8px">
         <button data-v="1" class="on">הדגשת מילים</button>
         <button data-v="0">הדגשת משפט</button>
@@ -713,6 +714,8 @@ function renderVoices(){
     html += '<button data-v="gemini:Puck">Gemini · גברי</button>';
   }
   host.innerHTML = html;
+  var fn = $('#femnote');
+  if(fn){ var m = femNote(); fn.textContent = m; fn.style.display = m ? '' : 'none'; }
   mark('#segVoice', VOICE);
   if(!host.querySelector('button.on')){
     var first = host.querySelector('button');
@@ -810,6 +813,21 @@ var FEM_PITCH=1.35;
 function femLift(v){
   if(!v)return 1;
   try{ return voiceGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
+}
+
+/* ולומר את זה. הרמת הגובה בלי מילה אחת נראית כמו החלטה של
+   האפליקציה, ואין שום רמז שקול נשי אמיתי מרוחק התקנה אחת. קול
+   נשי שמותקן נבחר מיד, בלי שינוי הגובה ובלי ההודעה הזאת. */
+function femNote(){
+  if(!heVoices.length)return "";
+  for(var i=0;i<heVoices.length;i++)if(voiceGender(heVoices[i])==="f")return "";
+  var ua=navigator.userAgent||"";
+  var how=/Android/i.test(ua)
+    ? "באנדרואיד: הגדרות ← ניהול כללי ← טקסט לדיבור ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי."
+    : /iPhone|iPad|iPod/i.test(ua)
+    ? "באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד."
+    : "בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.";
+  return "אין במכשיר הזה קול עברי נשי, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו. "+how;
 }
 
 function speakSentence(n){
@@ -1256,7 +1274,7 @@ loadPrefs();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=12-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=13-pwa1").catch(function(){});
   });
 }
 </script>
