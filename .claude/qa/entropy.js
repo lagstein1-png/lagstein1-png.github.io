@@ -10,7 +10,8 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');
   const r=await page.evaluate(()=>{
     const plain=h=>{const d=document.createElement('div');d.innerHTML=String(h||'');return (d.textContent||'').replace(/\s+/g,' ').trim()};
     const rows=[],bad={noAns:0,multi:0,dupe:0,nan:0,n:0};
-    for(const t of TOPICS) for(const lv of [1,2,3]){
+    const LVLS=[];for(let i=1;i<=((typeof LVL!=='undefined'&&LVL.length)||3);i++)LVLS.push(i);
+    for(const t of TOPICS) for(const lv of LVLS){
       const seen={},N=500;let ok=0;
       for(let k=0;k<N;k++){
         let q;try{q=buildQ(t.id,lv)}catch(e){continue}
