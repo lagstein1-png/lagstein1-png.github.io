@@ -73,10 +73,22 @@ tools: Read, Grep, Glob, Bash, Edit
                             'close',(s.match(/<\/script>/g)||[]).length);"
 
    ולכל JSON: `node -e "JSON.parse(require('fs').readFileSync('f.json','utf8'))"`.
-2. **הגרסה ומפתח הקאש עודכנו — שניהם, יחד.** מספר גרסה חדש עם מפתח קאש
-   ישן פירושו שהמשתמש לא יראה כלום. חפש:
+2. **הגרסה ומפתח הקאש עודכנו — שניהם, יחד.**
 
-       grep -rn "BUILD\|CACHE\|VERSION\|v[0-9]\+" --include=index.html --include=sw.js | head -40
+**שני מקומות, שניהם ב-`index.html`, וחייבים להיות תואמים:**
+
+    var BUILD="b33 · 2026-08-30";                    // מה שמוצג למשתמש
+    navigator.serviceWorker.register("sw.js?v=b33-pwa1");   // מה שקובע את הקאש
+
+`sw.js` גוזר את מפתח הקאש מ-`?v=` שבכתובת הרישום (`const V = ... searchParams.get("v")`).
+ההערה בראש `sw.js` טוענת שיש "מקור אמת אחד" — **זה לא נכון בפועל**:
+מחרוזת הרישום מקודדת קשיח ואינה נגזרת מהמשתנה `BUILD`.
+לכן עדכון של `BUILD` לבדו **לא** מנקה את הקאש, והמשתמש לא יראה את התיקון.
+עדכנת אחד — עדכן את השני, ובדוק שהתחילית זהה.
+
+   בדיקת תאימות בכל האפליקציות:
+
+       grep -rn 'var BUILD=\|serviceWorker.register' --include=index.html . | grep -v node_modules
 
 3. **אף תיקון לא סתר תיקון אחר.** עבור על ה-diff במלואו:
 
