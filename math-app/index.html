@@ -1251,14 +1251,26 @@ function langVoices(lang){
 }
 function heVoices(){return langVoices(state.settings.lang||"he")}
 function pickVoice(prefer,uri,lang){
-  var vs=allVoices();
-  if(uri){var f=vs.filter(function(v){return v.voiceURI===uri})[0];if(f)return f}
   lang=lang||state.settings.lang||"he";
   var code=(LANGS[lang]||LANGS.he).tts.toLowerCase();
   var pool=langVoices(lang);
+  /* קול נעוץ נבדק מול השפה הנוכחית ולא מול כל הקולות שבמכשיר.
+     הנעיצה נשמרת בהגדרות ושורדת החלפת שפה: מי שנעץ קול עברי ועבר
+     לאנגלית קיבל קול עברי שמבטא אנגלית, ומאותו רגע גם בחירת "נשי"
+     לא שינתה כלום — הנעיצה קדמה לה והמגדר לא נבדק מעולם. נעיצה
+     שאינה בשפה הנוכחית חוזרת לבחירה אוטומטית, ומי שיחזור לשפה
+     שבה נעץ יקבל את הקול שלו בחזרה. */
+  if(uri){var f=pool.filter(function(v){return v.voiceURI===uri})[0];if(f)return f}
   /* אין קול בשפה הנכונה? עדיף לא לבחור כלום מאשר להקריא רוסית בקול
      עברי. null מחזיר את הבחירה לדפדפן, שלפחות מכבד את u.lang. */
   if(!pool.length)return null;
+  return voiceOrder(pool,prefer,code)[0]||null;
+}
+/* הדירוג הוצא מ-pickVoice כדי שגם הרשימה שבמסך ההגדרות תשתמש בו:
+   שני סדרים שונים לאותם קולות פירושו מסך שמראה משהו אחר ממה
+   שהאפליקציה באמת מקריאה. */
+function voiceOrder(pool,prefer,code){
+  code=String(code||"").toLowerCase();
   function score(v){
     var s=0,n=(v.name+" "+v.lang).toLowerCase();
     if((v.lang||"").replace("_","-").toLowerCase()===code)s+=12;
@@ -1280,7 +1292,7 @@ function pickVoice(prefer,uri,lang){
   }
   return pool.slice().sort(function(a,b){
     var d=grank(b)-grank(a); return d||score(b)-score(a);
-  })[0];
+  });
 }
 
 /* ------------------------------------------------------------
@@ -1343,15 +1355,32 @@ function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild
    מיד ובלי שינוי הגובה.
    ------------------------------------------------------------ */
 var FEM_PITCH=1.35;
-function femLift(v){
-  if(!v)return 1;
-  try{ return guessGender(v)==="male"?FEM_PITCH:1 }catch(e){ return 1 }
+/* ההרמה שייכת לבקשה ולא לקול לבדו. עד כאן היא חושבה בלי לדעת מה
+   ביקשו, ונכפלה בגובה של כל פריסט — ושתי הטעויות נבעו מזה:
+   בכיוון אחד, מי שבחר דווקא "גברי" עם Asaf קיבל 0.82 כפול 1.35,
+   כלומר קול גברי שהורם, בדיוק ההפך ממה שביקש; וגם "איטי וברור"
+   הורם באותה מידה.
+   בכיוון השני — והוא התלונה עצמה — קול שמגדרו אינו מזוהה לא הורם
+   כלל. "Google עברית" הוא הקול העברי היחיד ברוב מכשירי אנדרואיד
+   ושמו אינו שם פרטי, ולכן guessGender מחזיר עליו "unknown": בחירת
+   "נשי רגוע" השאירה אותו כפי שהוא, ובאפליקציה פשוט לא היה קול נשי.
+   עכשיו מרימים כשביקשו נשי והקול שנבחר אינו נשי — גם כשאינו מזוהה,
+   כי "לא ידוע" אינו "נשי". מי שיש במכשירו קול נשי אמיתי מקבל אותו
+   כמו שהוא, בלי הרמה. */
+function femLift(v,prefer){
+  if(!v||prefer!=="female")return 1;
+  try{ return guessGender(v)==="female"?1:FEM_PITCH }catch(e){ return 1 }
 }
 
 /* ולומר את זה. הרמת הגובה בלי מילה אחת נראית כמו החלטה של
    האפליקציה, ואין שום רמז שקול נשי אמיתי מרוחק התקנה אחת. קול
    נשי שמותקן נבחר מיד, בלי שינוי הגובה ובלי ההודעה הזאת. */
 function femNote(){
+  /* ההודעה מדברת על גובה שהורם, וההרמה קורית רק כשמבקשים קול נשי.
+     כשהפריסט הוא "גברי" או "איטי וברור" לא הורם כלום, והודעה על
+     הרמה שלא קרתה רק מבלבלת. */
+  var _pf=(PRESETS.filter(function(p){return p.id===state.settings.preset})[0]||{}).prefer;
+  if(_pf!=="female")return "";
   var pool=heVoices(),i;
   if(!pool.length)return "";
   for(i=0;i<pool.length;i++)if(guessGender(pool[i])==="female")return "";
@@ -1487,7 +1516,7 @@ function speakLocal(text,preset,rate,pitch,langCode){
         try{ u.voice=v }catch(e2){}
         u.lang=v.lang||langCode||"he-IL";
       }
-      u.rate=rate;u.pitch=Math.min(1.45,pitch*femLift(v));
+      u.rate=rate;u.pitch=Math.min(1.45,pitch*femLift(v,preset.prefer));
       /* לא היה כאן מטפל שגיאות בכלל: כשהמנוע נכשל, האפליקציה
          פשוט השתתקה בלי שאיש ידע למה. */
       u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(e.charIndex)};
@@ -1631,11 +1660,11 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b33 · 2026-08-30";
+var BUILD="b34 · 2026-08-31";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
-var confirmReset=false,gkShow=false,gkMsg=null;
+var confirmReset=false,gkShow=false,gkMsg=null,vMore=false;
 /* ================= מעקב טעויות חוזרות =================
    רושמים את התוצאות של השאלות האחרונות בכל פעולה (חלון נע),
    ולא את כל ההיסטוריה. ילד ששלט בחיבור לפני חודש ומתקשה בו היום
@@ -2239,13 +2268,26 @@ function settingsView(){
     h+='</div>';
     /* device voices */
     h+='<p class="fd" style="font-weight:600;font-size:1.1rem;margin-top:22px">'+esc(t.devVoices)+'</p>';
-    h+='<div class="vrow'+(s.voiceURI?"":" on")+'" data-a="vpick" data-u=""><span class="rd"></span><span style="flex:1"><b class="fd">'+esc(t.autoPick)+'</b></span><button class="btn btn-teal" data-a="vtest" data-u="" style="padding:8px 16px;font-size:.85rem">'+ic("play",13)+' '+esc(t.play)+'</button></div>';
-    var hv=heVoices().slice(0,6);
+    var _pool=heVoices();
+    /* הנעיצה נבדקת מול השפה גם כאן, כמו ב-pickVoice. קודם הראה המסך
+       "בחירה אוטומטית" לא מסומנת ואף שורה לא מסומנת — כלומר שום
+       דבר נבחר — בזמן שהאפליקציה בחרה אוטומטית. */
+    var _pin=_pool.filter(function(v){return v.voiceURI===s.voiceURI})[0];
+    var _pf=(PRESETS.filter(function(p){return p.id===s.preset})[0]||{}).prefer||"any";
+    h+='<div class="vrow'+(_pin?"":" on")+'" data-a="vpick" data-u=""><span class="rd"></span><span style="flex:1"><b class="fd">'+esc(t.autoPick)+'</b></span><button class="btn btn-teal" data-a="vtest" data-u="" style="padding:8px 16px;font-size:.85rem">'+ic("play",13)+' '+esc(t.play)+'</button></div>';
+    /* הרשימה נחתכה בשישה קולות לפי הסדר שהמכשיר החזיר, ולכן במכשיר
+       עם הרבה קולות הקול הנשי היחיד יכול היה ליפול מחוץ לשישייה —
+       ומי שחיפש אותו הסיק שאין כזה. עכשיו הסדר הוא הסדר שהאפליקציה
+       בוחרת בו, כלומר המגדר המבוקש קודם, והשאר נפתחים בלחיצה במקום
+       להיעלם. */
+    var _srt=voiceOrder(_pool,_pf,(LANGS[lang]||LANGS.he).tts);
+    var hv=vMore?_srt:_srt.slice(0,6);
     hv.forEach(function(v){
-      var on=s.voiceURI===v.voiceURI,g=guessGender(v),nat=/\b(google|natural|neural)\b|wavenet/i.test(v.name+" "+v.lang);
+      var on=_pin&&_pin.voiceURI===v.voiceURI,g=guessGender(v),nat=/\b(google|natural|neural)\b|wavenet/i.test(v.name+" "+v.lang);
       h+='<div class="vrow'+(on?" on":"")+'" data-a="vpick" data-u="'+esc(v.voiceURI)+'"><span class="rd"></span><span style="flex:1;display:flex;flex-wrap:wrap;gap:7px;align-items:center"><b class="fd">'+esc(v.name)+'</b><span style="font-size:.72rem;color:var(--ink-faint)">'+esc(v.lang)+'</span>'+(nat?'<span class="badge b-gold">'+esc(t.naturalTag)+'</span>':"")+(g==="female"?'<span class="badge b-teal">'+esc(t.femaleTag)+'</span>':g==="male"?'<span class="badge b-mut">'+esc(t.maleTag)+'</span>':"")+'</span><button class="btn btn-teal" data-a="vtest" data-u="'+esc(v.voiceURI)+'" style="padding:8px 16px;font-size:.85rem">'+ic("play",13)+' '+esc(t.play)+'</button></div>';
     });
     if(!hv.length)h+='<p class="note warn" style="margin-top:10px">'+esc(t.noHeVoices)+'</p>';
+    if(_srt.length>hv.length)h+='<button class="btn btn-ghost" data-a="vmore" style="margin-top:10px;padding:10px 18px;font-size:.9rem">'+esc(String(t.moreVoices).replace("{n}",_srt.length-hv.length))+'</button>';
     var _fn=femNote();
     if(_fn)h+='<p class="note warn" style="margin-top:10px">'+esc(_fn)+'</p>';
     /* sliders */
@@ -3498,6 +3540,7 @@ function onAction(a,el){
   else if(a==="tog"){var k=el.getAttribute("data-k");state.settings[k]=!state.settings[k];save();applyModes();render()}
   else if(a==="preset"){state.settings.preset=el.getAttribute("data-p");var pr=PRESETS.filter(function(p){return p.id===state.settings.preset})[0];if(pr){state.settings.rate=pr.rate;state.settings.pitch=pr.pitch}save();render()}
   else if(a==="vpick"){state.settings.voiceURI=el.getAttribute("data-u")||null;save();render()}
+  else if(a==="vmore"){vMore=true;render()}
   else if(a==="vtest"){
     var u=el.getAttribute("data-u")||null;
     try{speechSynthesis.cancel()}catch(e){}
@@ -3510,10 +3553,15 @@ function onAction(a,el){
       try{
         var ut=new SpeechSynthesisUtterance(t.gSample);
         ut.lang=LANGS[state.settings.lang||"he"].tts;
+        var _pf=(PRESETS.filter(function(p){return p.id===state.settings.preset})[0]||{}).prefer||"any";
         var vv=u?allVoices().filter(function(x){return x.voiceURI===u})[0]
-                :pickVoice((PRESETS.filter(function(p){return p.id===state.settings.preset})[0]||{}).prefer||"any",null);
+                :pickVoice(_pf,null);
         if(vv){ut.voice=vv;ut.lang=vv.lang}
-        ut.rate=state.settings.rate;ut.pitch=state.settings.pitch;
+        ut.rate=state.settings.rate;
+        /* אותה הרמה שההקראה עצמה עושה. בלעדיה הדוגמה נשמעה אחרת
+           מהשאלות, ומי שבדק בה את הקול הנשי שמע דווקא את הקול שבלי
+           ההרמה — כלומר בדק משהו שהאפליקציה לא משמיעה. */
+        ut.pitch=Math.min(1.45,state.settings.pitch*femLift(vv,_pf));
         speechSynthesis.speak(ut);
       }catch(e){}
     });
@@ -3632,7 +3680,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b33-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b34-pwa1").catch(function(){});
   });
 }
 </script>
