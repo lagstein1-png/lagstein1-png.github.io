@@ -20,21 +20,44 @@ eslint:
     cp .claude/qa/eslint.config.mjs /tmp/js/
     cd /tmp/js && npx --no-install eslint --config eslint.config.mjs .
 
-**קו הבסיס של eslint אינו אפס.** יש שגיאות `no-redeclare` על `var id`
-ועל `var lg` שקיימות מזמן ואינן באג (הצהרת `var` חוזרת באותו scope),
-ו-`'tDesc' is not defined` ב-math-app שהוא `typeof tDesc==="function"`,
-כלומר שמירה חוקית על תכונה אופציונלית. השוו לקו הבסיס, לא לאפס.
-
 **חסימת רשת חיצונית חובה** בכל הרצת דפדפן, אחרת כל דף נתקע על
 הגופנים של גוגל:
 
     await page.route('**/*', r =>
       r.request().url().startsWith('http://127.0.0.1:8099') ? r.continue() : r.abort());
 
-## אזהרה על `entropy.js`
+## קו הבסיס של `entropy.js` ו-`smoke.js` הוא אפס
 
-הוא משטח את האפשרויות ב-`textContent`, ולכן שבר `3/x` והמכפלה `3x`
-נראים לו זהים. `dupe` שאינו אפס ב-math-uni מגיע מ-`deriv` רמה 2 והוא
-**כוזב** — על המסך אלה שבר עם קו וביטוי רגיל, שתי אפשרויות שונות
-לגמרי. `noAns`, `multi` ו-`constant-answer levels` אינם סובלים מזה
-והם המדדים שחשובים.
+היה זמן ש-`dupe` ב-math-uni לא היה אפס ותועד כאן כ"כוזב". הוא באמת
+היה כוזב, אבל הסיבה לא היתה ב-math-uni אלא במדד: ההשוואה שיטחה את
+האפשרויות ל-`textContent`, ולכן השבר `−5/x` והמכפלה `−5x` נראו זהים,
+וכך גם שתי מטריצות שנבדלות רק בסידור העמודות (`−4 11 1 −24` מול
+`−4 1 11 −24` מצטרפות לאותה מחרוזת).
+
+`entropy.js` משווה היום במפתח מבני שבו כל גבול אלמנט הוא מפריד, ולכן
+שתי אפשרויות נחשבות כפולות רק אם הן זהות גם על המסך. **`dupe` שאינו
+אפס הוא באג אמיתי.** כך גם `noAns`, `multi`, `nan` ו-
+`constant-answer levels`.
+
+באותו אופן `smoke.js` היה מדווח על כל דף שטוען גופן מגוגל כ"שגיאה",
+כי חסימת הרשת החיצונית — שהיא שלנו — נרשמת בכרום כשגיאת קונסולה
+`net::ERR_FAILED`. הוא מסנן אותה היום ומדווח כמה בקשות חיצוניות נחסמו,
+ולכן **`ERRORS` ב-smoke הוא באג אמיתי**, ומספר ה-controls שנלחצו נראה
+גם כשהדף נקי.
+
+קו הבסיס של **eslint** אינו אפס, אבל הוא רשום כאן במלואו. כל שורה
+שאינה ברשימה הזאת היא ממצא חדש שצריך להסתכל עליו:
+
+| קובץ | ממצא | למה הוא שפיר |
+|---|---|---|
+| english, history, math-app, math-teen, math-uni, math-uni2, math-uni3 | `'id' is already defined` | `var id` חוזר באותו scope |
+| english, history | `'lg' is already defined` | אותו דבר |
+| math-app | `'nm' is already defined` | שני `var nm` עוקבים באותה פונקציה |
+| math-app | `'tDesc' is not defined` | `typeof tDesc==="function"` — שמירה על תכונה אופציונלית |
+| math-teen | `'VOICE_SAMPLE' is not defined` ×5 | מוגדר ב-`Object.defineProperty(window,...)` כדי להחזיר עברית או ערבית לפי `LG`. eslint אינו רואה גלובל שנוצר כך |
+
+`no-redeclare` שאינו ברשימה הזאת אינו בהכרח שפיר: כך נמצא ב-english
+ש-`function P(lines,words,qs)` הבונה קטעי קריאה נדרסה בזמן ריצה על ידי
+`var P={q:...}` של מצב המשחק. הבנאי נקרא היום רק בטעינה, לפני הדריסה,
+ולכן זה לא התפוצץ — אבל נושא קריאה שייבנה בעצלתיים היה מקבל
+`P is not a function`. הבנאי הוא `PARA` מאז.

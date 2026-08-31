@@ -9,6 +9,21 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');
   await page.waitForTimeout(1000);
   const r=await page.evaluate(()=>{
     const plain=h=>{const d=document.createElement('div');d.innerHTML=String(h||'');return (d.textContent||'').replace(/\s+/g,' ').trim()};
+    /* מפתח להשוואת אפשרויות. textContent לבדו משטח מבנה: השבר −5/x
+       והמכפלה −5x נותנים אותה מחרוזת, וכך גם שתי מטריצות שנבדלות רק
+       בסידור העמודות. כאן כל גבול אלמנט הוא מפריד, ולכן שתי אפשרויות
+       נחשבות זהות רק אם הן זהות גם על המסך. */
+    const key=h=>{
+      const d=document.createElement('div');d.innerHTML=String(h||'');
+      const walk=n=>{
+        if(n.nodeType===3) return (n.nodeValue||'').replace(/\s+/g,' ');
+        let s='<'+n.nodeName+'>';
+        for(const c of n.childNodes) s+=walk(c);
+        return s+'</>';
+      };
+      let s='';for(const c of d.childNodes) s+=walk(c);
+      return s.trim();
+    };
     const rows=[],bad={noAns:0,multi:0,dupe:0,nan:0,n:0};
     for(const t of TOPICS) for(const lv of [1,2,3]){
       const seen={},N=500;let ok=0;
@@ -18,8 +33,9 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');
         bad.n++;
         const cs=q.options.filter(o=>o.ok);
         if(cs.length===0)bad.noAns++; if(cs.length>1)bad.multi++;
+        const ks=q.options.map(o=>key(o.h!==undefined?o.h:o.t));
+        if(new Set(ks).size!==ks.length)bad.dupe++;
         const ts=q.options.map(o=>plain(o.h!==undefined?o.h:o.t));
-        if(new Set(ts).size!==ts.length)bad.dupe++;
         if(ts.some(x=>/NaN|Infinity|undefined/.test(x)))bad.nan++;
         if(cs.length===1){const a=plain(cs[0].h!==undefined?cs[0].h:cs[0].t);seen[a]=(seen[a]||0)+1;ok++}
       }

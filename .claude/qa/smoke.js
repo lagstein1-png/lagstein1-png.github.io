@@ -4,8 +4,20 @@ async function click(p,s){try{await p.click(s,{timeout:2000});await p.waitForTim
 for(const app of process.argv.slice(2)){
   const ctx=await b.newContext({locale:'he-IL'});const page=await ctx.newPage();
   const errs=[];page.on('pageerror',e=>errs.push('PAGEERROR: '+e.message));
-  page.on('console',m=>{if(m.type()==='error')errs.push('CONSOLE: '+m.text())});
-  await page.route('**/*',r=>r.request().url().startsWith('http://127.0.0.1:8099')?r.continue():r.abort());
+  /* חסימת הרשת החיצונית היא שלנו, וכרום מדווח עליה כשגיאת קונסולה.
+     בלעדי הסינון הזה כל דף שטוען גופן מגוגל "נכשל" תמיד, ושגיאה
+     אמיתית נבלעת בתוך הרעש. */
+  let blocked=0;
+  page.on('console',m=>{
+    if(m.type()!=='error')return;
+    const t=m.text();
+    if(/net::ERR_FAILED|net::ERR_BLOCKED/.test(t)&&blocked>0)return;
+    errs.push('CONSOLE: '+t);
+  });
+  await page.route('**/*',r=>{
+    if(r.request().url().startsWith('http://127.0.0.1:8099'))return r.continue();
+    blocked++;return r.abort();
+  });
   await page.goto('http://127.0.0.1:8099/'+app,{waitUntil:'domcontentloaded',timeout:20000});
   await page.waitForTimeout(700);
   await click(page,'#lg-ok');
@@ -24,7 +36,8 @@ for(const app of process.argv.slice(2)){
     await page.waitForTimeout(120);
   }
   await page.waitForTimeout(400);
-  console.log(app.padEnd(12)+(errs.length?'ERRORS ('+errs.length+'):\n   '+[...new Set(errs)].join('\n   '):'clean ('+labels.length+' controls exercised)'));
+  const tail=' ('+labels.length+' controls exercised, '+blocked+' external requests blocked)';
+  console.log(app.padEnd(24)+(errs.length?'ERRORS ('+errs.length+'):\n   '+[...new Set(errs)].join('\n   ')+'\n  '+tail:'clean'+tail));
   await ctx.close();
 }
 await b.close();})();

@@ -916,7 +916,7 @@ function earnedStickers(s){return STICKER_META.filter(function(m){return sticker
 var KEY="mlh-state-v2";
 function defaults(){
   return {
-    pet:null,petName:"",level:null,stickers:[],sessionHistory:[],dailyDates:[],
+    pet:null,petName:"",petAuto:false,level:null,stickers:[],sessionHistory:[],dailyDates:[],
     stats:{xp:0,correct:0,attempts:0,streak:0,bestStreak:0,sessions:0,dailies:0,days:[],ops:{add:{ok:0,total:0},sub:{ok:0,total:0},mul:{ok:0,total:0},div:{ok:0,total:0}}},
     /* מעקב טעויות חוזרות. r = תוצאות השאלות האחרונות בכל פעולה (1 = נכון, 0 = טעות).
        near = טעויות שהיו קרובות לתשובה, far = טעויות רחוקות. */
@@ -931,6 +931,9 @@ function load(){
     if(!raw) return base;
     var p=JSON.parse(raw),d=defaults();
     d.pet=p.pet||null; d.petName=p.petName||""; d.level=(typeof p.level==="number"?p.level:null);
+    /* שמירות ישנות אינן מכילות petAuto. שם שזהה להצעה באחת מארבע
+       השפות נשמר לפני שהיה אפשר להבחין, ולכן הוא ברירת מחדל. */
+    d.petAuto=(p.petAuto!==undefined)?!!p.petAuto:isSuggestedName(d.pet,d.petName);
     d.stickers=Array.isArray(p.stickers)?p.stickers:[];
     d.sessionHistory=Array.isArray(p.sessionHistory)?p.sessionHistory.slice(-30):[];
     d.dailyDates=Array.isArray(p.dailyDates)?p.dailyDates.slice(-60):[];
@@ -1295,7 +1298,16 @@ var TTSMSG={
   ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть"},
   en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close"}
 };
-var _ttsBar=null;
+var _ttsBar=null,_ttsErr=null,_ttsLang=null;
+/* הבאנר נבנה פעם אחת ואינו עובר render, ולכן אחרי החלפת שפה הוא
+   נשאר בשפה שבה נולד — הודעת שגיאה בעברית מתחת למסך ערבי. */
+function ttsRelang(){
+  if(!_ttsBar)return;
+  var g="he"; try{g=(state.settings&&state.settings.lang)||"he"}catch(e){} if(!TTSMSG[g])g="he";
+  if(g===_ttsLang)return;
+  try{_ttsBar.remove()}catch(e){}
+  _ttsBar=null; var e=_ttsErr; ttsFail(e);
+}
 function ttsFail(err){
   /* "interrupted" ו-"canceled" אינן תקלות: זה מה שהמנוע מדווח על
      אמירה שבוטלה כדי לפנות מקום לאמירה הבאה — כלומר מהלך תקין
@@ -1309,6 +1321,7 @@ function ttsFail(err){
   if(_ttsBar)return;
   var _g="he"; try{_g=(state.settings&&state.settings.lang)||"he"}catch(e){} if(!TTSMSG[_g])_g="he";
   var TT=TTSMSG[_g];
+  _ttsErr=err; _ttsLang=_g;
   var m=document.createElement("div");
   m.setAttribute("role","alert");
   m.id="tts-fail";
@@ -1744,7 +1757,7 @@ function onboarding(){
     '<p class="fd" style="font-weight:600;font-size:1.4rem;margin-top:26px"><span style="display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;margin-inline-end:10px">2</span>'+esc(t.step2)+'</p>'+
     '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">'+
       '<label for="pname" style="position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)">'+esc(t.namePh)+'</label>'+
-      '<input id="pname" data-bind="petName" maxlength="14" value="'+esc(state.petName||"")+'" placeholder="'+esc(sel?sugg[sel]:t.namePh)+'" style="flex:1;min-width:12rem;background:var(--paper);border:3px solid rgba(23,51,60,.2);border-radius:16px;padding:13px 16px;font-size:1.1rem;font-weight:500;outline:none" onfocus="this.style.borderColor=\'var(--teal)\'" onblur="this.style.borderColor=\'rgba(23,51,60,.2)\'"/>'+
+      '<input id="pname" data-bind="petName" maxlength="14" value="'+esc(petName())+'" placeholder="'+esc(sel?sugg[sel]:t.namePh)+'" style="flex:1;min-width:12rem;background:var(--paper);border:3px solid rgba(23,51,60,.2);border-radius:16px;padding:13px 16px;font-size:1.1rem;font-weight:500;outline:none" onfocus="this.style.borderColor=\'var(--teal)\'" onblur="this.style.borderColor=\'rgba(23,51,60,.2)\'"/>'+
       (sel?'<button class="btn btn-ghost" style="padding:10px 16px;font-size:.9rem" data-a="takesugg">'+esc(t.takeSugg)+' "'+esc(sugg[sel])+'"</button>':"")+
     '</div>'+
     '<button class="btn btn-teal" data-a="startpet" '+(sel?"":"disabled")+' style="width:100%;margin-top:24px;padding:17px;font-size:1.4rem">'+esc(t.start)+' '+ic("arrow",24)+'</button>'+
@@ -2046,12 +2059,12 @@ function practice(){
   h+='<div style="display:flex;flex-direction:column;gap:18px"><div class="card" style="padding:22px">';
   h+='<div class="bubble"><span id="btxt"></span>'+(BT.shown<BT.text.length?'<span class="caret"></span>':"")+'</div>';
   h+='<div style="display:flex;justify-content:center;margin-top:-6px"><span class="bob">'+petSvg(state.pet,P.mood||"happy",140)+'</span></div>';
-  h+='<div style="display:flex;justify-content:space-between;align-items:center"><b class="fd" style="font-size:1.2rem">'+esc(state.petName)+'</b><span class="badge b-gold">'+esc(names[al-1])+'</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center"><b class="fd" style="font-size:1.2rem">'+esc(petName())+'</b><span class="badge b-gold">'+esc(names[al-1])+'</span></div>';
   var xpIn=state.stats.xp%120;
   h+='<div class="bar" style="margin-top:10px;direction:ltr"><i style="width:'+Math.round(xpIn/120*100)+'%"></i></div>';
   h+='<div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--ink-soft);margin-top:6px;font-weight:500"><span>'+esc(T().level)+' '+lvlOf(state.stats)+'</span><span class="fd">'+(120-xpIn)+' XP</span></div>';
   /* sticker shelf */
-  h+='<div style="margin-top:14px;padding-top:12px;border-top:2px dashed rgba(23,51,60,.1)"><p class="fd" style="font-weight:600;font-size:.9rem">'+esc(fmt(t.stickerTitle,{name:state.petName}))+'</p><div class="shelf" style="margin-top:8px">';
+  h+='<div style="margin-top:14px;padding-top:12px;border-top:2px dashed rgba(23,51,60,.1)"><p class="fd" style="font-weight:600;font-size:.9rem">'+esc(fmt(t.stickerTitle,{name:petName()}))+'</p><div class="shelf" style="margin-top:8px">';
   STICKER_META.forEach(function(m){
     var got=state.stickers.indexOf(m.id)>=0;
     h+='<span class="stk '+(got?"got pop":"miss")+'" title="'+(got?esc(t[m.k]):"")+'">'+m.e+'</span>';
@@ -2178,7 +2191,7 @@ function progressView(){
 /* ================= records ================= */
 function recordsView(){
   var t=T(),s=state.stats;
-  var me={name:state.petName+" · "+esc(t.you),pet:state.pet,ok:s.correct,acc:s.attempts>0?Math.round(s.correct/s.attempts*100):0,me:true};
+  var me={name:petName()+" · "+esc(t.you),pet:state.pet,ok:s.correct,acc:s.attempts>0?Math.round(s.correct/s.attempts*100):0,me:true};
   var all=RIVALS.map(function(r){return{name:rivalName(r),pet:r.pet,ok:r.ok,acc:r.acc}}).concat([me]).sort(function(a,b){return b.ok-a.ok});
   var myRank=all.indexOf(me)+1;
   var h='<div class="wrap rise" style="padding-top:34px;padding-bottom:60px;max-width:860px">'+
@@ -2325,7 +2338,7 @@ function settingsView(){
   '</div></div>';
   /* companion */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--coral-soft);color:var(--coral-deep)">'+ic("paw",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.compTitle)+'</h2></div>'+
-  (state.pet?'<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:14px"><span class="bob">'+petSvg(state.pet,"happy",100)+'</span><span style="flex:1;min-width:160px"><b class="fd" style="font-size:1.4rem;display:block">'+esc(state.petName)+'</b><span style="color:var(--ink-soft);font-size:.9rem">'+state.stats.correct+' '+esc(t.compTogether)+'</span></span><button class="btn btn-ghost" data-a="changepet" style="padding:11px 20px">'+esc(t.compChange)+'</button></div>':"")+
+  (state.pet?'<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:14px"><span class="bob">'+petSvg(state.pet,"happy",100)+'</span><span style="flex:1;min-width:160px"><b class="fd" style="font-size:1.4rem;display:block">'+esc(petName())+'</b><span style="color:var(--ink-soft);font-size:.9rem">'+state.stats.correct+' '+esc(t.compTogether)+'</span></span><button class="btn btn-ghost" data-a="changepet" style="padding:11px 20px">'+esc(t.compChange)+'</button></div>':"")+
   '<div style="margin-top:20px;padding-top:16px;border-top:2px dashed rgba(23,51,60,.1)">';
   if(!confirmReset)h+='<button class="btn" data-a="askreset" style="color:var(--coral-deep);border:2px solid rgba(255,111,97,.3);padding:11px 18px;border-radius:16px;font-size:.95rem">'+ic("refresh",17)+' '+esc(t.reset)+'</button>';
   else h+='<div class="note err" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:200px">'+esc(t.resetSure)+'</span><button class="btn btn-coral" data-a="doreset" style="padding:10px 20px">'+esc(t.resetYes)+'</button><button class="btn btn-ghost" data-a="noreset" style="padding:10px 20px">'+esc(t.resetNo)+'</button></div>';
@@ -3433,6 +3446,21 @@ function onAns(opt){
     }
   }
 }
+/* שם החיה נשמר פעם אחת, באונבורדינג, כמחרוזת מוכנה בשפה שהיתה
+   פעילה אז. משפחה שהתחילה בעברית ועברה לערבית נשארה עם "ג׳ינג׳י"
+   בתוך "ملصقات ג׳ינג׳י". שם שהמשתמש הקליד הוא שלו ואינו זז; שם
+   שהאפליקציה הציעה נפתר מחדש בכל הצגה, לפי השפה שעל המסך עכשיו. */
+var PETSUGG={fox:"petFoxName",puppy:"petPuppyName",owl:"petOwlName"};
+function isSuggestedName(pet,name){
+  if(!pet||!name)return false;
+  var k=PETSUGG[pet];if(!k)return false;
+  for(var lg in STR){if(STR[lg]&&STR[lg][k]===name)return true}
+  return false;
+}
+function petName(){
+  if(state.petAuto&&state.pet){var k=PETSUGG[state.pet];if(k){var v=T()[k];if(v)return v}}
+  return state.petName||"";
+}
 function setBubbleNow(text){BT.text=text;BT.shown=text.length;if(BT.timer){clearInterval(BT.timer);BT.timer=null}var el=$("#btxt");if(el)el.textContent=text;afterRender()}
 function onAction(a,el){
   var t=T();
@@ -3443,13 +3471,15 @@ function onAction(a,el){
     render();window.scrollTo(0,0)}
   else if(a==="copylink")copyLink();
   else if(a==="selpet"){P.selPet=el.getAttribute("data-p");render()}
-  else if(a==="takesugg"){var sg={fox:t.petFoxName,puppy:t.petPuppyName,owl:t.petOwlName}[P.selPet]||"";state.petName=sg;save();render()}
+  else if(a==="takesugg"){var sg={fox:t.petFoxName,puppy:t.petPuppyName,owl:t.petOwlName}[P.selPet]||"";state.petName=sg;state.petAuto=true;save();render()}
   else if(a==="startpet"){
     if(!P.selPet)return;
     state.pet=P.selPet;
-    state.petName=state.petName.trim()||({fox:t.petFoxName,puppy:t.petPuppyName,owl:t.petOwlName}[P.selPet]);
+    var typed=state.petName.trim();
+    if(!typed){state.petName=({fox:t.petFoxName,puppy:t.petPuppyName,owl:t.petOwlName}[P.selPet]);state.petAuto=true}
+    else {state.petName=typed;if(!isSuggestedName(P.selPet,typed))state.petAuto=false}
     save();view="practice";startRound(activeLevel());render();window.scrollTo(0,0);
-    setBubble(fmt(t.hello,{name:state.petName}),"happy");speak(fmt(t.hello,{name:state.petName}));
+    setBubble(fmt(t.hello,{name:petName()}),"happy");speak(fmt(t.hello,{name:petName()}));
   }
   else if(a==="changepet"){view="onboarding";P.selPet=state.pet;render()}
   else if(a==="ans")onAns(parseInt(el.getAttribute("data-o"),10));
@@ -3485,7 +3515,7 @@ function onAction(a,el){
     var nm={add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[fk]||"";
     setBubble(fmt(t.weakMsg,{op:nm}),"happy");speak(fmt(t.weakMsg,{op:nm}));
   }
-  else if(a==="newround"){startRound(activeLevel());render();setBubble(fmt(t.hello,{name:state.petName}),"cheer")}
+  else if(a==="newround"){startRound(activeLevel());render();setBubble(fmt(t.hello,{name:petName()}),"cheer")}
   else if(a==="lvl"){
     var l=parseInt(el.getAttribute("data-l"),10);
     state.level=l===0?null:l;save();
@@ -3519,7 +3549,12 @@ function onAction(a,el){
     });
   }
   else if(a==="sample")speak(t.gSample);
-  else if(a==="lang"){state.settings.lang=el.getAttribute("data-l");save();applyModes();startRound(activeLevel());render();window.scrollTo(0,0)}
+  else if(a==="lang"){state.settings.lang=el.getAttribute("data-l");save();applyModes();startRound(activeLevel());render();
+    /* BT.text הוא טקסט פתור, ולכן הבועה נשארת במשפט של השפה
+       הקודמת אחרי שכל שאר המסך כבר התחלף. */
+    if(state.pet)setBubbleNow(fmt(T().hello,{name:petName()}));
+    ttsRelang();
+    window.scrollTo(0,0)}
   else if(a==="tsize"){state.settings.textSize=parseInt(el.getAttribute("data-z"),10)||1;save();applyModes();render()}
   else if(a==="theme"){state.settings.theme=el.getAttribute("data-th");save();applyModes();render()}
   else if(a==="gkshow"){gkShow=!gkShow;var inp=$("#gkey"),val=inp?inp.value:state.settings.googleKey;render();var inp2=$("#gkey");if(inp2){inp2.value=val;inp2.focus()}}
@@ -3564,7 +3599,7 @@ document.addEventListener("click",function(e){
 });
 document.addEventListener("input",function(e){
   var el=e.target;
-  if(el.dataset&&el.dataset.bind==="petName"){state.petName=el.value;return}
+  if(el.dataset&&el.dataset.bind==="petName"){state.petName=el.value;state.petAuto=false;return}
   if(el.dataset&&el.dataset.slide){
     var k=el.dataset.slide,v=parseFloat(el.value);
     state.settings[k]=v;save();
@@ -3590,7 +3625,7 @@ document.addEventListener("keydown",function(e){
   /* Enter = ממשיכים */
   if(e.key==="Enter"){
     if(P.phase==="reveal"){e.preventDefault();advance()}
-    else if(P.phase==="done"){e.preventDefault();startRound(activeLevel());render();setBubble(fmt(T().hello,{name:state.petName}),"cheer")}
+    else if(P.phase==="done"){e.preventDefault();startRound(activeLevel());render();setBubble(fmt(T().hello,{name:petName()}),"cheer")}
     return;
   }
 });

@@ -15,7 +15,8 @@ export default [
          "AudioContext webkitAudioContext MediaRecorder Notification BroadcastChannel getSelection "+
          "requestIdleCallback self top parent frames devicePixelRatio innerWidth innerHeight scrollTo open close print "+
          "addEventListener removeEventListener dispatchEvent CSS ClipboardItem MathMLElement HTMLCanvasElement "+
-         "OffscreenCanvas SVGElement CanvasRenderingContext2D ServiceWorker ServiceWorkerRegistration"
+         "OffscreenCanvas SVGElement CanvasRenderingContext2D ServiceWorker ServiceWorkerRegistration "+
+         "NodeFilter TreeWalker Range Selection"
         ).split(/\s+/).map(k=>[k,"readonly"])
       )
     },
@@ -31,7 +32,7 @@ export default [
       "no-unreachable": "error",
       "no-self-compare": "error",
       "no-constant-condition": "error",
-      "no-cond-assign": ["error","always"],
+      "no-cond-assign": ["error","except-parens"],
       "no-sparse-arrays": "error",
       "use-isnan": "error",
       "valid-typeof": "error",
