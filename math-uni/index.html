@@ -640,7 +640,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u30 · 2026-08-30";
+var BUILD="u31 · 2026-08-31";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -707,6 +707,10 @@ function applyModes(){
   h.classList.toggle("rm",!!s.rm);
   if(s.theme==="auto")h.removeAttribute("data-theme");
   else h.setAttribute("data-theme",s.theme);
+  /* הכותרת נשארה עברית קשיחה מה-HTML גם אחרי החלפת שפה: לשונית
+     הדפדפן, הסימנייה ושם האפליקציה המותקנת נשארו בעברית בזמן
+     שכל השאר כבר התחלף. */
+  try{ document.title=_("אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד") }catch(e){}
 }
 
 /* ============================================================
@@ -7560,7 +7564,8 @@ var TR_KEYS=[
 "מרחיבים בצמוד",
 "המכנה הופך לממשי",
 "מרחיבים בצמוד המכנה — זה הופך את המכנה למספר ממשי.",
-"נימוק"
+"נימוק",
+"אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד"
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -12494,6 +12499,9 @@ trAt("en",1625,["Reasoning"]);
 trAt("ru",1625,["Обоснование"]);
 trAt("ar",1625,["تعليل"]);
 
+trAt("ar",TR_KEYS.indexOf("אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד"),["أكسيوما — رياضيات للسنة الجامعية الأولى، خطوة بخطوة"]);
+trAt("ru",TR_KEYS.indexOf("אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד"),["Аксиома — математика первого курса, шаг за шагом"]);
+trAt("en",TR_KEYS.indexOf("אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד"),["Axioma — first-year university maths, step by step"]);
 trBuild();
 exLoad();
 applyModes();
@@ -12516,7 +12524,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u30-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u31-pwa1").catch(function(){});
   });
 }
 </script>

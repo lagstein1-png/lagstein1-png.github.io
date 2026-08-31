@@ -649,7 +649,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n28 · 2026-08-31";
+var BUILD="n29 · 2026-08-31";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -734,6 +734,10 @@ function applyModes(){
   r.classList.toggle("rm",!!state.rm);
   if(state.theme==="auto")r.removeAttribute("data-theme");
   else r.setAttribute("data-theme",state.theme);
+  /* הכותרת נשארה עברית קשיחה מה-HTML גם אחרי החלפת שפה: הכיווניות
+     והכותרת שעל המסך התחלפו, אבל לשונית הדפדפן, הסימנייה ושם
+     האפליקציה המותקנת נשארו בעברית. השם והתיאור כבר מתורגמים. */
+  try{ document.title=t("app")+" — "+t("tagline") }catch(e){}
 }
 function announce(m){var e=$("#live");if(e)e.textContent=m}
 
@@ -4082,7 +4086,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n28-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n29-pwa1").catch(function(){});
   });
 }
 </script>

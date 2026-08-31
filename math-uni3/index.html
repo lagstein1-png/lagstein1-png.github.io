@@ -642,7 +642,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g29 · 2026-08-30";
+var BUILD="g30 · 2026-08-31";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -709,6 +709,10 @@ function applyModes(){
   h.classList.toggle("rm",!!s.rm);
   if(s.theme==="auto")h.removeAttribute("data-theme");
   else h.setAttribute("data-theme",s.theme);
+  /* הכותרת נשארה עברית קשיחה מה-HTML גם אחרי החלפת שפה: לשונית
+     הדפדפן, הסימנייה ושם האפליקציה המותקנת נשארו בעברית בזמן
+     שכל השאר כבר התחלף. */
+  try{ document.title=_("אקסיומה ג׳ — שנה שלישית, צעד אחר צעד") }catch(e){}
 }
 
 /* ============================================================
@@ -6340,7 +6344,8 @@ var TR_KEYS=[
 "סימפסון",
 "סימפסון מעביר פרבולה דרך שלוש נקודות, אבל בפועל הוא מדויק גם למעלה 3 — שגיאת המעלה השלישית מתבטלת בסימטריה.",
 "השגיאה מתאפסת, והקירוב שווה בדיוק לאינטגרל.",
-"נימוק"
+"נימוק",
+"אקסיומה ג׳ — שנה שלישית, צעד אחר צעד"
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -10055,6 +10060,9 @@ trAt("ar",954,[
 "الخطأ ينعدم، والتقريب يساوي التكامل بالضبط.",
 "تعليل"]);
 
+trAt("ar",TR_KEYS.indexOf("אקסיומה ג׳ — שנה שלישית, צעד אחר צעד"),["أكسيوما ٣ — السنة الثالثة، خطوة بخطوة"]);
+trAt("ru",TR_KEYS.indexOf("אקסיומה ג׳ — שנה שלישית, צעד אחר צעד"),["Аксиома III — третий курс, шаг за шагом"]);
+trAt("en",TR_KEYS.indexOf("אקסיומה ג׳ — שנה שלישית, צעד אחר צעד"),["Axioma III — third year, step by step"]);
 trBuild();
 exLoad();
 applyModes();
@@ -10077,7 +10085,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g29-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g30-pwa1").catch(function(){});
   });
 }
 </script>
