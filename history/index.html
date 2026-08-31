@@ -669,7 +669,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m29 · 2026-08-30";
+var BUILD="m30 · 2026-08-31";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -3386,7 +3386,11 @@ function O(html,ok,why){return {h:html,ok:!!ok,why:why||""}}
 
 /* בונה ארבע אפשרויות משדה אחד של פריט, ומוודא שאין שתיים זהות.
    שני אירועים יכולים לחלוק תוצאה מנוסחת דומה, ואז השאלה נשארת
-   בלי תשובה יחידה — לכן הסינון כאן ולא בתצוגה. */
+   בלי תשובה יחידה — לכן הסינון כאן ולא בתצוגה.
+   מועמד שנפסל מוחלף במועמד הבא ואינו מנוכה ממספר האפשרויות:
+   שאלה עם שלוש אפשרויות היא ניחוש של אחד משלושה. אם גם רשימה
+   רחבה לא הספיקה לארבע — מחזירים null, והקורא נופל לצורה אחרת
+   במקום להציג שאלה חלשה יותר. */
 function optsFromField(it,cands,field,n){
   var seen={},opts=[],own=gl(it[field]);
   if(!own)return null;
@@ -3398,7 +3402,7 @@ function optsFromField(it,cands,field,n){
     seen[v]=1;
     opts.push(O(esc(v),false,evLabel(cands[i])));
   }
-  return opts.length>=3?shuffle(opts):null;
+  return opts.length>=n?shuffle(opts):null;
 }
 function evLabel(x){
   if(x.k==="e")return gl(x.t)+" · "+yr(x.y);
@@ -3435,7 +3439,7 @@ function formWhen(tp,lv,pool,idx){
 /* --- צורה 2: מה קרה --- */
 function formWhat(tp,lv,pool,idx){
   var it=pool[idx];
-  var opts=optsFromField(it,nearEvents(it,pool,10),"w",4);
+  var opts=optsFromField(it,nearEvents(it,pool,28),"w",4);
   if(!opts)return formWhen(tp,lv,pool,idx);
   return {type:"fact",prompt:t("qWhat"),lead:gl(it.t)+" · "+yr(it.y),
     opts:opts,answer:gl(it.w),say:gl(it.t)+". "+gl(it.w),reveal:it};
@@ -3443,7 +3447,7 @@ function formWhat(tp,lv,pool,idx){
 /* --- צורה 3: על איזה אירוע מדובר --- */
 function formName(tp,lv,pool,idx){
   var it=pool[idx];
-  var opts=optsFromField(it,nearEvents(it,pool,10),"t",4);
+  var opts=optsFromField(it,nearEvents(it,pool,28),"t",4);
   if(!opts)return formWhen(tp,lv,pool,idx);
   return {type:"fact",prompt:t("qName"),lead:gl(it.w),
     opts:opts,answer:gl(it.t),
@@ -3453,7 +3457,7 @@ function formName(tp,lv,pool,idx){
 /* --- צורה 4: סיבה --- */
 function formWhy(tp,lv,pool,idx){
   var it=pool[idx];
-  var opts=optsFromField(it,nearEvents(it,pool,10),"c",4);
+  var opts=optsFromField(it,nearEvents(it,pool,28),"c",4);
   if(!opts)return formWhat(tp,lv,pool,idx);
   return {type:"fact",prompt:t("qWhy"),lead:gl(it.t)+" · "+yr(it.y),
     opts:opts,answer:gl(it.c),say:gl(it.t)+". "+gl(it.c),reveal:it};
@@ -3461,7 +3465,7 @@ function formWhy(tp,lv,pool,idx){
 /* --- צורה 5: תוצאה --- */
 function formEff(tp,lv,pool,idx){
   var it=pool[idx];
-  var opts=optsFromField(it,nearEvents(it,pool,10),"e",4);
+  var opts=optsFromField(it,nearEvents(it,pool,28),"e",4);
   if(!opts)return formWhat(tp,lv,pool,idx);
   return {type:"fact",prompt:t("qEff"),lead:gl(it.t)+" · "+yr(it.y),
     opts:opts,answer:gl(it.e),say:gl(it.t)+". "+gl(it.e),reveal:it};
@@ -3469,13 +3473,24 @@ function formEff(tp,lv,pool,idx){
 /* --- צורה 6: מה קרה קודם --- */
 function formFirst(tp,lv,pool,idx){
   var it=pool[idx];
-  var cands=nearEvents(it,pool,12).filter(function(x){return x.y!==it.y});
-  if(cands.length<3)return formWhen(tp,lv,pool,idx);
-  var set=[it].concat(shuffle(cands).slice(0,3));
-  /* שנים חוזרות הופכות את השאלה לחסרת תשובה יחידה */
-  var seenY={},uniq=[];
-  set.forEach(function(x){if(!seenY[x.y]){seenY[x.y]=1;uniq.push(x)}});
-  if(uniq.length<3)return formWhen(tp,lv,pool,idx);
+  /* שנים חוזרות הופכות את השאלה לחסרת תשובה יחידה, וכך גם שני
+     אירועים שכותרתם מנוסחת אותו דבר. קודם נבחרו שלושה מועמדים
+     ורק אחר כך נפסלו הכפולים — ומי שנפסל פשוט נעלם, כך שהשאלה
+     הוצגה עם שלוש אפשרויות. כאן עוברים על רשימה רחבה ומקבלים
+     מועמד רק אם הוא מוסיף שנה חדשה, עד שיש ארבעה.
+     שנים־עשר הקרובים בזמן מעורבבים ומשמשים ראשונים — מסיח מאותה
+     תקופה נפסל לפי הידע ולא לפי התאריך; השאר ממשיכים אחריהם
+     לפי קרבה בזמן, רק אם צריך. */
+  var all=nearEvents(it,pool,40).filter(function(x){return x.y!==it.y});
+  var cands=shuffle(all.slice(0,12)).concat(all.slice(12));
+  var seenY={},seenT={},uniq=[it],i,x,xt;
+  seenY[it.y]=1; seenT[gl(it.t)]=1;
+  for(i=0;i<cands.length&&uniq.length<4;i++){
+    x=cands[i]; xt=gl(x.t);
+    if(seenY[x.y]||!xt||seenT[xt])continue;
+    seenY[x.y]=1; seenT[xt]=1; uniq.push(x);
+  }
+  if(uniq.length<4)return formWhen(tp,lv,pool,idx);
   var first=uniq.slice().sort(function(a,b){return a.y-b.y})[0];
   var opts=uniq.map(function(x){
     return O(esc(gl(x.t)),x===first,x===first?"":gl(x.t)+" · "+yr(x.y));
@@ -3979,7 +3994,7 @@ function buildQ(tid,lv){
    · שמות התלמידים נשארים במכשיר של המורה. הם לא עוברים דרך
      שום שרת, כי אין שרת.
    ============================================================ */
-var GENV=1;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
+var GENV=2;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
 var EKEY="shlav-exams-v1";
@@ -5125,7 +5140,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m29-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m30-pwa1").catch(function(){});
   });
 }
 </script>

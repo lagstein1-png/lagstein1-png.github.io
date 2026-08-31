@@ -649,7 +649,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n26 · 2026-08-30";
+var BUILD="n28 · 2026-08-31";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -2301,6 +2301,16 @@ function allWords(){
     lvl.forEach(function(it){if(it.k==="w")ALL_WORDS.push(it)})})});
   return ALL_WORDS;
 }
+/* משפטים מכל התוכן. מסיח למשפט חייב להיות משפט אמיתי שאומרים
+   באנגלית, ולכן הרשימה הרחבה נלקחת מהתוכן ולא מורכבת בזמן ריצה. */
+var ALL_SENTS=null;
+function allSents(){
+  if(ALL_SENTS)return ALL_SENTS;
+  ALL_SENTS=[];
+  TOPICS.forEach(function(tp){tp.L.forEach(function(lvl){
+    lvl.forEach(function(it){if(it.k==="s")ALL_SENTS.push(it)})})});
+  return ALL_SENTS;
+}
 function wordByText(txt){
   var a=allWords();
   for(var i=0;i<a.length;i++)if(a[i].w.toLowerCase()===String(txt).toLowerCase())return a[i];
@@ -2330,6 +2340,27 @@ function wordDistract(it,pool,n,needGloss){
 }
 function O(html,ok,why){return {h:html,ok:!!ok,why:why||""}}
 
+/* בורר מסיחים.
+   ------------------------------------------------------------
+   מסיח שיוצא במקרה זהה לתשובה או למסיח קודם *אינו* נזרק כדי
+   להשאיר שלוש אפשרויות — אז השאלה נעשית ניחוש של אחד משלושה
+   במקום אחד מארבעה, בשקט ובלי שאיש רואה. במקום זה מקבלים כאן
+   רשימת מועמדים רחבה מהדרוש, דוחים כל מועמד מתנגש וממשיכים
+   הלאה עד שיש בדיוק ארבע.
+   keyOf מחזיר את מה שהתלמיד באמת רואה — שתי אפשרויות שנראות
+   זהות הן שאלה בלי תשובה יחידה גם אם הפריטים שמאחוריהן שונים. */
+function fillOpts(opts,cands,need,keyOf,mkOpt,ownKey){
+  var seen={},i,k;
+  if(ownKey)seen[ownKey]=1;
+  for(i=0;i<cands.length&&opts.length<need;i++){
+    k=keyOf(cands[i]);
+    if(!k||seen[k])continue;
+    seen[k]=1;
+    opts.push(mkOpt(cands[i]));
+  }
+  return opts;
+}
+
 /* המשמעות כפי שהיא מוצגת בשאלה. ברמה 3 היא ניתנת באנגלית — זה מה
    ש"אנגלית בלבד" אומר, וזה גם ההבדל בפועל בין רמה 3 לרמה 1 על אותה
    מילה: בלעדיו התרגיל זהה בשתיהן והרמה מדורגת רק בשם. התרגום בשפת
@@ -2342,46 +2373,60 @@ function ml(lv,g){ return (lv>=3&&g&&g.en)?g.en:gl(g) }
 /* --- צורה 1: מילה נשמעת ונראית → מה המשמעות --- */
 function formMean(tp,lv,pool,idx){
   var it=pool[idx];
-  var ds=wordDistract(it,pool,3,true);
-  var seen={},opts=[O(esc(ml(lv,it.g)),true)];
-  seen[gl(it.g)]=1;
-  ds.forEach(function(d){
-    var g=gl(d.g);
-    /* שתי מילים שונות יכולות לחלוק תרגום. שתי אפשרויות זהות הן
-       שאלה בלי תשובה יחידה. */
-    if(!g||seen[g])return; seen[g]=1;
-    opts.push(O(esc(ml(lv,d.g)),false,d.w+" = "+g));
-  });
+  /* מבקשים הרבה יותר משלושה מועמדים: שתי מילים שונות יכולות
+     לחלוק תרגום, והמועמד שנפסל בגלל זה מוחלף ולא מנוכה. */
+  var ds=wordDistract(it,pool,14,true);
+  /* המפתח הוא מה שנראה על המסך ולא התרגום בשפת האם: ברמה 3
+     מוצג ההסבר האנגלי, ושתי מילים שהסברן האנגלי זהה היו נראות
+     לתלמיד כשתי אפשרויות זהות. */
+  var opts=fillOpts([O(esc(ml(lv,it.g)),true)],ds,4,
+    function(d){return ml(lv,d.g)},
+    function(d){return O(esc(ml(lv,d.g)),false,d.w+" = "+gl(d.g))},
+    ml(lv,it.g));
   return {type:"mean",prompt:t("qMean"),subject:it,opts:shuffle(opts),
     answer:ml(lv,it.g),say:it.w};
 }
 /* --- צורה 2: המשמעות בשפת האם → איזו מילה באנגלית --- */
 function formBack(tp,lv,pool,idx){
   var it=pool[idx];
-  var ds=wordDistract(it,pool,3);
-  var opts=[O('<span class="en-b">'+esc(it.w)+"</span>",true)];
-  ds.slice(0,3).forEach(function(d){opts.push(O('<span class="en-b">'+esc(d.w)+"</span>",false,
-    d.g?(d.w+" = "+gl(d.g)):""))});
+  var ds=wordDistract(it,pool,14);
+  var opts=fillOpts([O('<span class="en-b">'+esc(it.w)+"</span>",true)],ds,4,
+    function(d){return d.w.toLowerCase()},
+    function(d){return O('<span class="en-b">'+esc(d.w)+"</span>",false,
+      d.g?(d.w+" = "+gl(d.g)):"")},
+    it.w.toLowerCase());
   return {type:"back",prompt:t("qSay"),lead:ml(lv,it.g),subject:null,
     opts:shuffle(opts),answer:it.w,say:it.w,reveal:it};
 }
 /* --- צורה 3: רק אוזן. המילה אינה מוצגת עד שעונים --- */
 function formHear(tp,lv,pool,idx){
   var it=pool[idx];
-  var ds=wordDistract(it,pool,3);
-  var opts=[O('<span class="en-b">'+esc(it.w)+"</span>",true)];
-  ds.slice(0,2).forEach(function(d){opts.push(O('<span class="en-b">'+esc(d.w)+"</span>",false,
-    d.g?(d.w+" = "+gl(d.g)):""))});
+  /* שלושה מסיחים ולא שניים. שאלת האזנה עם שלוש אפשרויות היא
+     ניחוש של אחד משלושה, וזה בדיוק ההבדל שהתרגיל נועד לאמן.
+     הסדר ב-wordDistract הוא הסדר החינוכי: קודם זוגות המינימום
+     של המילה עצמה, ורק אחריהן מילים אחרות מאותה רמה. */
+  var ds=wordDistract(it,pool,14);
+  var opts=fillOpts([O('<span class="en-b">'+esc(it.w)+"</span>",true)],ds,4,
+    function(d){return d.w.toLowerCase()},
+    function(d){return O('<span class="en-b">'+esc(d.w)+"</span>",false,
+      d.g?(d.w+" = "+gl(d.g)):"")},
+    it.w.toLowerCase());
   return {type:"hear",prompt:t("qHear"),subject:null,hidden:it,
     opts:shuffle(opts),answer:it.w,say:it.w,reveal:it,auto:true};
 }
 /* --- צורה 4: המצב בשפת האם → איזה משפט אומרים --- */
 function formUse(tp,lv,pool,idx){
   var it=pool[idx];
-  var others=shuffle(pool.filter(function(x){return x.k==="s"&&x!==it}));
-  var opts=[O('<span class="en-b">'+esc(it.s)+"</span>",true)];
-  others.slice(0,2).forEach(function(d){opts.push(O('<span class="en-b">'+esc(d.s)+"</span>",false,
-    gl(d.g)))});
+  /* קודם משפטי אותו מצב באותה רמה — הם המסיחים הקרובים, כי כולם
+     שייכים לאותו הקשר וההבדל ביניהם הוא בדיוק מה שנשאל. אם הבנק
+     של הרמה דל, ממשיכים לשאר המשפטים באפליקציה במקום להסתפק
+     בשלוש אפשרויות. */
+  var others=shuffle(pool.filter(function(x){return x.k==="s"&&x!==it}))
+    .concat(shuffle(allSents().filter(function(x){return x!==it})));
+  var opts=fillOpts([O('<span class="en-b">'+esc(it.s)+"</span>",true)],others,4,
+    function(d){return d.s},
+    function(d){return O('<span class="en-b">'+esc(d.s)+"</span>",false,gl(d.g))},
+    it.s);
   return {type:"use",prompt:t("qUse"),lead:it.u?gl(it.u):gl(it.g),subject:null,
     opts:shuffle(opts),answer:it.s,say:it.s,reveal:it};
 }
@@ -2418,10 +2463,23 @@ function formGap(tp,lv,pool,idx){
     }
   }
   if(free.length)cand=free;
+  /* המילה הפותחת אינה מוסתרת כשיש חלופה.
+     שתי סיבות, ושתיהן מדודות:
+     · האות הגדולה מסגירה. התלמיד רואה "_____ to meet you." ויודע
+       שהתשובה מתחילה באות גדולה; ב-10% משאלות ההשלמה היא הייתה
+       האפשרות היחידה כזאת, כלומר סימון נכון בלי לקרוא מילה.
+     · המילה הפותחת כאן היא לרוב מודאל של בקשה, ו-"Can I have the
+       menu" נכון בדיוק כמו "Could I have the menu" — מסיח שהוא
+       תשובה שנייה. */
+  var inner=cand.filter(function(i){return i>0});
+  if(inner.length)cand=inner;
   if(!cand.length)return formUse(tp,lv,pool,idx);
   var gi=pick(cand),gone=parts[gi].replace(/[^A-Za-z']/g,"");
   var shown=parts.slice();
   shown[gi]=parts[gi].replace(gone,"_____");
+  /* מסיחים: מילים מהמשפטים והמילים של אותה רמה, ואם הבנק דל —
+     מילים שנלמדו באפליקציה. מועמד שכבר הופיע נדחה וממשיכים
+     הלאה, כדי שיישארו ארבע אפשרויות ולא שלוש. */
   var others=[],seen={};seen[gone.toLowerCase()]=1;
   pool.forEach(function(x){
     var src=x.k==="s"?x.s:(x.k==="w"?x.w:"");
@@ -2430,9 +2488,13 @@ function formGap(tp,lv,pool,idx){
       if(b.length>=3&&!STOP_GAP.test(b)&&!seen[b.toLowerCase()]){seen[b.toLowerCase()]=1;others.push(b)}
     });
   });
-  var opts=[O('<span class="en-b">'+esc(gone)+"</span>",true)];
-  shuffle(others).slice(0,3).forEach(function(w){
-    opts.push(O('<span class="en-b">'+esc(w)+"</span>",false))});
+  var backup=shuffle(allWords()).map(function(x){return x.w.replace(/[^A-Za-z']/g,"")})
+    .filter(function(b){return b.length>=3&&!STOP_GAP.test(b)});
+  var cands=shuffle(others).concat(backup);
+  var opts=fillOpts([O('<span class="en-b">'+esc(gone)+"</span>",true)],cands,4,
+    function(w){return w.toLowerCase()},
+    function(w){return O('<span class="en-b">'+esc(w)+"</span>",false)},
+    gone.toLowerCase());
   return {type:"gap",prompt:t("qGap"),gapHtml:'<span class="en-b">'+esc(shown.join(" "))+"</span>",
     lead:gl(it.g),subject:null,opts:shuffle(opts),answer:gone,say:it.s,reveal:it};
 }
@@ -2950,7 +3012,7 @@ function buildQ(tid,lv){
    · שמות התלמידים נשארים במכשיר של המורה. הם לא עוברים דרך
      שום שרת, כי אין שרת.
    ============================================================ */
-var GENV=2;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
+var GENV=3;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
 var EKEY="shlav-exams-v1";
@@ -4020,7 +4082,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n26-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n28-pwa1").catch(function(){});
   });
 }
 </script>
