@@ -327,6 +327,232 @@ a:focus-visible,button:focus-visible,input:focus-visible{
 
 <script>
 /* ============================================================
+   מצב הדגמה — נכנס אך ורק דרך ?demo=1 בכתובת.
+   ------------------------------------------------------------
+   התסריט הוא נתון, לא קוד שפזור במסכים: כל פריט אומר מה נכתב
+   בכתוביות (subtitle), מה נעשה על המסך (action) וכמה זמן הצופה
+   נשאר עם המסך הזה (duration, באלפיות שנייה).
+
+   ההדגמה מפעילה את האפליקציה האמיתית — היא לוחצת על אותם
+   כפתורים שהמשתמש לוחץ עליהם. אין כאן מסך מזויף ואין תוכן
+   שנכתב במיוחד להדגמה, ולכן היא גם לא יכולה להראות משהו
+   שהאפליקציה לא באמת עושה.
+
+   בלי ?demo=1 שום שורה כאן אינה רצה: המשתנים מוגדרים ונשארים
+   בלי שימוש, לא נרשם אף מאזין אירועים, ולא נוסף דבר למסך.
+   ============================================================ */
+var DEMO_ON=/(^|[?&])demo=1(&|$)/.test(location.search||"");
+
+var DEMO_SCRIPT=[
+  {subtitle:"יהושע לגשטיין — תשע אפליקציות לימוד. הכול נפתח בדפדפן, בלי הורדה, בלי הרשמה ובלי עלות.",
+   action:function(){window.scrollTo(0,0)}, duration:4200},
+
+  {subtitle:"סינון לפי תחום. כאן רק המתמטיקה — מארבע פעולות החשבון ועד השנה השלישית בתואר.",
+   action:function(){demoTap('#chips [data-c="math"]')}, duration:4400},
+
+  {subtitle:"וכאן הכלים לחיים: מקריא קולי ותאוריה לנהיגה.",
+   action:function(){demoTap('#chips [data-c="life"]')}, duration:3800},
+
+  {subtitle:"חיפוש חופשי. הוא רץ גם על מילות מפתח בעברית, כך שמי שמחפש ״חדו״א״ מוצא גם כשהממשק אנגלי.",
+   action:function(){demoTap('#chips [data-c="all"]');demoType("#q","היסטוריה")}, duration:5200},
+
+  {subtitle:"מנקים, וכל האפליקציות חוזרות.",
+   action:function(){var e=demoEl("#q");if(e){e.value="";e.dispatchEvent(new Event("input",{bubbles:true}))}}, duration:2800},
+
+  {subtitle:"ארבע שפות ממשק. אותו דף ואותו סדר — רק השפה והכיוון מתחלפים.",
+   action:function(){demoTap('#lang [data-l="ru"]')}, duration:4400},
+
+  {subtitle:"ערבית נכתבת לימין, רוסית ואנגלית לשמאל. הפריסה בנויה במידות לוגיות, ולכן היא לא נשברת.",
+   action:function(){demoTap('#lang [data-l="ar"]')}, duration:4600},
+
+  {subtitle:"וחזרה לעברית.",
+   action:function(){demoTap('#lang [data-l="he"]')}, duration:2800},
+
+  {subtitle:"מצב כהה, לפי העדפת המערכת או בבחירה ידנית.",
+   action:function(){demoTap("#theme")}, duration:3600},
+
+  {subtitle:"וחזרה למצב בהיר.",
+   action:function(){demoTap("#theme")}, duration:2800},
+
+  {subtitle:"איך זה עובד: נכנסים מהדפדפן, בוחרים נושא ורמה, וההתקדמות נשמרת במכשיר בלבד.",
+   action:function(){demoShow("#how")}, duration:5000},
+
+  {subtitle:"זהו. כניסה לכל אפליקציה — ישירות מהכרטיס שלה.",
+   action:function(){demoShow("#apps")}, duration:4200}
+];
+
+/* --- מנוע ההדגמה. הקוד כאן זהה בכל האפליקציות; רק DEMO_SCRIPT משתנה. --- */
+var DEMO={on:false,i:0,timer:null,extra:[],bar:null,txt:null,step:null,fill:null,btn:null};
+
+/* עוזרים לתסריט. כולם מחזירים false כשהאיבר אינו על המסך, כדי
+   שצעד שלא מצא את מה שחיפש ידלג ולא יפיל את ההדגמה כולה. */
+function demoEl(s){return typeof s==="string"?document.querySelector(s):s}
+function demoShow(s){
+  var e=demoEl(s); if(!e)return false;
+  try{e.scrollIntoView({behavior:"smooth",block:"center"})}catch(err){try{e.scrollIntoView()}catch(err2){}}
+  return true;
+}
+/* מדגיש את האיבר, ורק אז לוחץ — צופה שלא ראה לאן נלחץ לא הבין
+   מה קרה. לכן אין צעד קצר מ-1200 אלפיות בתסריטים. */
+function demoTap(s){
+  var e=demoEl(s); if(!e||e.disabled)return false;
+  demoShow(e);
+  e.classList.add("demo-tap");
+  DEMO.extra.push(setTimeout(function(){
+    e.classList.remove("demo-tap");
+    /* המסך מצטייר מחדש כל הזמן. אם האיבר שסומן כבר אינו במסמך,
+       מחפשים אותו שוב לפי אותו בורר — לחיצה על איבר מת אינה
+       עושה דבר, וזה בדיוק צעד שנראה כאילו נתקע. */
+    var live=(typeof s==="string"&&!document.contains(e))?demoEl(s):e;
+    if(DEMO.on&&live&&!live.disabled&&document.contains(live))try{live.click()}catch(err){}
+  },430));
+  return true;
+}
+function demoClick(s){
+  var e=demoEl(s); if(!e||e.disabled)return false;
+  try{e.click()}catch(err){return false}
+  return true;
+}
+/* הקלדה אות אחר אות, עם אירוע input אמיתי — שדה חיפוש שמאזין
+   ל-input לא היה מגיב להשמה ישירה ל-value. */
+function demoType(s,text){
+  var e=demoEl(s); if(!e)return false;
+  demoShow(e); try{e.focus()}catch(err){}
+  e.value=""; var i=0;
+  var t=setInterval(function(){
+    if(!DEMO.on||!e.parentNode){clearInterval(t);return}
+    e.value=String(text).slice(0,++i);
+    e.dispatchEvent(new Event("input",{bubbles:true}));
+    if(i>=String(text).length)clearInterval(t);
+  },85);
+  DEMO.extra.push(t);
+  return true;
+}
+function demoQuiet(){
+  try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
+  try{if(typeof stopSpeak==="function")stopSpeak()}catch(e){}
+}
+
+/* --- שכבת הכתוביות וכפתור ההפעלה --- */
+var DEMO_CSS=''+
+'.demo-tap{outline:3px solid #ffd23f!important;outline-offset:3px;'+
+'  box-shadow:0 0 0 7px rgba(255,210,63,.30)!important;border-radius:12px}'+
+'#demo-start{position:fixed;z-index:2147481000;'+
+'  inset-block-end:calc(14px + env(safe-area-inset-bottom));'+
+'  inset-inline-start:calc(14px + env(safe-area-inset-left));'+
+'  display:flex;align-items:center;gap:.5rem;font:inherit;font-size:.92rem;font-weight:700;'+
+'  background:#0d1220;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:999px;'+
+'  padding:.7rem 1.15rem;cursor:pointer;box-shadow:0 10px 26px -8px rgba(0,0,0,.55)}'+
+'#demo-start[hidden],#demo-bar[hidden]{display:none!important}'+
+'#demo-bar{position:fixed;z-index:2147481000;inset-inline:0;'+
+'  inset-block-end:calc(14px + env(safe-area-inset-bottom));'+
+'  display:flex;justify-content:center;padding:0 14px;pointer-events:none}'+
+'#demo-sub{max-width:46rem;width:100%;background:rgba(9,13,22,.93);color:#f4f7ff;'+
+'  border:1px solid rgba(255,255,255,.14);border-radius:16px;overflow:hidden;'+
+'  box-shadow:0 18px 50px -16px rgba(0,0,0,.75);backdrop-filter:blur(4px)}'+
+'#demo-txt{margin:0;padding:14px 18px 10px;font:inherit;font-size:clamp(1rem,2.6vw,1.22rem);'+
+'  font-weight:600;line-height:1.5;text-align:center}'+
+'#demo-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;'+
+'  padding:0 14px 10px;font-size:.78rem;color:#aab6cc}'+
+'#demo-exit{pointer-events:auto;font:inherit;font-size:.78rem;font-weight:700;cursor:pointer;'+
+'  background:transparent;color:#aab6cc;border:1px solid rgba(255,255,255,.22);'+
+'  border-radius:999px;padding:.3rem .7rem}'+
+'#demo-prog{height:3px;background:rgba(255,255,255,.12)}'+
+'#demo-prog i{display:block;height:100%;width:0;background:#ffd23f}'+
+'html.demo-running .lg-install{display:none!important}'+
+'@media (prefers-reduced-motion:reduce){#demo-prog i{transition:none!important}}';
+
+function demoMountUI(){
+  var st=document.createElement("style");
+  st.id="demo-style"; st.textContent=DEMO_CSS;
+  (document.head||document.documentElement).appendChild(st);
+
+  var b=document.createElement("button");
+  b.id="demo-start"; b.type="button";
+  b.innerHTML='<span aria-hidden="true">▶</span><span>התחל הדגמה</span>';
+  b.addEventListener("click",demoStart);
+  document.body.appendChild(b);
+
+  var bar=document.createElement("div");
+  bar.id="demo-bar"; bar.hidden=true;
+  bar.setAttribute("role","status");
+  bar.setAttribute("aria-live","polite");
+  bar.innerHTML='<div id="demo-sub"><p id="demo-txt"></p>'+
+    '<div id="demo-meta"><span id="demo-step"></span>'+
+    '<button id="demo-exit" type="button">יציאה · ESC</button></div>'+
+    '<div id="demo-prog"><i></i></div></div>';
+  document.body.appendChild(bar);
+
+  DEMO.btn=b; DEMO.bar=bar;
+  DEMO.txt=document.getElementById("demo-txt");
+  DEMO.step=document.getElementById("demo-step");
+  DEMO.fill=bar.querySelector("#demo-prog i");
+  document.getElementById("demo-exit").addEventListener("click",function(){demoStop()});
+  document.addEventListener("keydown",demoKey,true);
+}
+
+/* ESC יוצא. הקשבה בשלב הלכידה, כדי שמסך שכבר מטפל ב-Escape
+   לא יבלע את המקש לפני שההדגמה ראתה אותו. */
+function demoKey(e){
+  if(!DEMO.on)return;
+  if(e.key==="Escape"||e.keyCode===27){
+    e.preventDefault(); e.stopPropagation();
+    demoStop();
+  }
+}
+
+function demoStart(){
+  if(DEMO.on)return;
+  DEMO.on=true; DEMO.i=0;
+  DEMO.btn.hidden=true; DEMO.bar.hidden=false;
+  document.documentElement.classList.add("demo-running");
+  demoNext();
+}
+
+function demoNext(){
+  if(!DEMO.on)return;
+  if(DEMO.i>=DEMO_SCRIPT.length){demoStop();return}
+  var it=DEMO_SCRIPT[DEMO.i++]||{};
+  var d=Math.max(600,it.duration||3000);
+  DEMO.txt.textContent=it.subtitle||"";
+  DEMO.step.textContent=DEMO.i+" / "+DEMO_SCRIPT.length;
+  DEMO.fill.style.transition="none"; DEMO.fill.style.width="0";
+  void DEMO.fill.offsetWidth;
+  DEMO.fill.style.transition="width "+d+"ms linear";
+  DEMO.fill.style.width="100%";
+  if(typeof it.action==="function"){
+    try{it.action()}catch(err){if(window.console)console.warn("demo:",err)}
+  }
+  DEMO.timer=setTimeout(demoNext,d);
+}
+
+function demoStop(){
+  DEMO.on=false;
+  if(DEMO.timer){clearTimeout(DEMO.timer);DEMO.timer=null}
+  DEMO.extra.forEach(function(t){clearTimeout(t);clearInterval(t)});
+  DEMO.extra=[];
+  var m=document.querySelectorAll(".demo-tap"),i;
+  for(i=0;i<m.length;i++)m[i].classList.remove("demo-tap");
+  if(DEMO.bar)DEMO.bar.hidden=true;
+  if(DEMO.btn)DEMO.btn.hidden=false;
+  document.documentElement.classList.remove("demo-running");
+  demoQuiet();
+}
+
+/* שער התנאים הוא חלון מודאלי מעל הכול. כפתור הדגמה מתחתיו היה
+   מפעיל אפליקציה שאי אפשר לראות, ולכן ממתינים שייסגר. */
+function demoMount(){
+  if(document.querySelector(".lg-wrap")){setTimeout(demoMount,500);return}
+  if(!document.getElementById("demo-start"))demoMountUI();
+}
+
+if(DEMO_ON){
+  if(document.readyState==="complete")setTimeout(demoMount,0);
+  else window.addEventListener("load",function(){setTimeout(demoMount,0)});
+}
+
+
+/* ============================================================
    כל הטקסט של הדף — בארבע שפות, במקום אחד. אין מחרוזת מוטבעת
    בקוד שלמטה, ולכן החלפת שפה היא החלפת אובייקט ולא חיפוש בדף.
    ============================================================ */
@@ -469,7 +695,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=6-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=7-pwa1").catch(function(){});
   });
 }
 </script>
