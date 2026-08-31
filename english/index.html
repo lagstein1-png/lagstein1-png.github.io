@@ -649,7 +649,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n26 · 2026-08-30";
+var BUILD="n27 · 2026-08-31";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -2953,7 +2953,8 @@ function buildQ(tid,lv){
 var GENV=2;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
-var EKEY="shlav-exams-v1";
+var EKEY="shlav-exams-english-v1";   /* מפתח לאפליקציה הזאת בלבד */
+var EKEY_OLD="shlav-exams-v1";  /* המפתח המשותף הישן. לקריאה בלבד, לא נמחק. */
 
 /* --- מחולל מזורע. mulberry32: קצר, מהיר, ופיזור טוב דיו --- */
 function withSeed(seed,fn){
@@ -2998,8 +2999,13 @@ function decodeExam(code){
 /* בונה את שאלות המבחן. אותו זרע → אותן שאלות, גם אצל המורה
    כשהוא בודק וגם אצל התלמיד כשהוא נבחן. */
 function examQuestions(spec){
+  /* מסננים נושאים שאינם מוכרים לאפליקציה הזאת, בדיוק כמו decodeExam.
+     בלי הסינון buildQ מחזיר null על נושא זר, והמסך נופל על
+     q.topic של null. עדיף לדלג בשקט מאשר להתרסק. */
+  var pairs=(spec.q||[]).filter(function(x){return !!topicById(x[0])});
   return withSeed(spec.s,function(){
-    return spec.q.map(function(pair){return buildQ(pair[0],pair[1])});
+    return pairs.map(function(pair){return buildQ(pair[0],pair[1])})
+                .filter(function(q){return !!q});
   });
 }
 function examUrl(spec){
@@ -3013,9 +3019,41 @@ function waLink(text,phone){
 
 /* --- אחסון מבחנים והגשות, בנפרד מהתקדמות התלמיד --- */
 var EX={list:[]};
+/* --- הגירה מהמפתח המשותף הישן ---------------------------------
+   עד הגרסה הזאת כל האפליקציות כתבו מבחנים לאותו מפתח localStorage
+   ובאותו origin, ולכן מבחן שנבנה במתמטיקה הופיע ברשימת המבחנים של
+   אנגלית והפיל את המסך. מעכשיו לכל אפליקציה מפתח משלה, ובטעינה
+   מועתקות מהמפתח הישן רק רשומות שכל נושאיהן מוכרים כאן.
+   המפתח הישן נשאר על כנו ואינו נמחק, כדי שגם אפליקציה אחרת תוכל
+   לקלוט ממנו את המבחנים ששייכים לה. --------------------------- */
+function exSpecKnown(spec){
+  if(!spec||!spec.q||!spec.q.length)return false;
+  for(var i=0;i<spec.q.length;i++){
+    var pair=spec.q[i];
+    if(!pair||!topicById(pair[0]))return false;
+  }
+  return true;
+}
+function exAdoptLegacy(){
+  var added=0;
+  try{
+    var raw=localStorage.getItem(EKEY_OLD); if(!raw)return;
+    var old=JSON.parse(raw); if(!old||!old.list||!old.list.length)return;
+    var have={},i,ex;
+    for(i=0;i<EX.list.length;i++)have[EX.list[i].id]=1;
+    for(i=0;i<old.list.length;i++){
+      ex=old.list[i];
+      if(!ex||!ex.id||have[ex.id])continue;
+      if(!exSpecKnown(ex.spec))continue;
+      EX.list.push(ex); have[ex.id]=1; added++;
+    }
+  }catch(e){return}
+  if(added)exSave();
+}
 function exLoad(){
   try{var r=localStorage.getItem(EKEY);if(r){var o=JSON.parse(r);if(o&&o.list)EX=o}}catch(e){}
   if(!EX.list)EX.list=[];
+  exAdoptLegacy();
 }
 function exSave(){try{localStorage.setItem(EKEY,JSON.stringify(EX))}catch(e){}}
 function exFind(id){for(var i=0;i<EX.list.length;i++)if(EX.list[i].id===id)return EX.list[i];return null}
@@ -3533,6 +3571,9 @@ var SIT={spec:null,id:"",qs:[],i:0,name:"",answers:[],phase:"intro",code:"",copi
 function sitStart(){
   var nm=$("#sitName"); SIT.name=nm?nm.value.trim():"";
   SIT.qs=examQuestions(SIT.spec);
+  /* אם לא נותרה אף שאלה שאפשר לבנות (למשל מבחן של אפליקציה אחרת),
+     מציגים את מסך המבחן השבור במקום ליפול על שאלה שאינה קיימת. */
+  if(!SIT.qs.length){view="badexam"; render(); return}
   SIT.answers=SIT.qs.map(function(){return -1});
   SIT.i=0; SIT.phase="ask";
   window.scrollTo(0,0); render();
@@ -4020,7 +4061,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n26-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n27-pwa1").catch(function(){});
   });
 }
 </script>

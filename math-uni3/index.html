@@ -642,7 +642,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g28 · 2026-08-30";
+var BUILD="g29 · 2026-08-31";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -3316,7 +3316,8 @@ _f("{0}{1} לשמוע דוגמה</button>", '<button class="btn btn-g w" style="
 var GENV=1;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
-var EKEY="shlav-exams-v1";
+var EKEY="shlav-exams-math-uni3-v1";   /* מפתח לאפליקציה הזאת בלבד */
+var EKEY_OLD="shlav-exams-v1";  /* המפתח המשותף הישן. לקריאה בלבד, לא נמחק. */
 
 /* --- מחולל מזורע. mulberry32: קצר, מהיר, ופיזור טוב דיו --- */
 function withSeed(seed,fn){
@@ -3361,8 +3362,13 @@ function decodeExam(code){
 /* בונה את שאלות המבחן. אותו זרע → אותן שאלות, גם אצל המורה
    כשהוא בודק וגם אצל התלמיד כשהוא נבחן. */
 function examQuestions(spec){
+  /* מסננים נושאים שאינם מוכרים לאפליקציה הזאת, בדיוק כמו decodeExam.
+     בלי הסינון buildQ מחזיר null על נושא זר, והמסך נופל על
+     q.topic של null. עדיף לדלג בשקט מאשר להתרסק. */
+  var pairs=(spec.q||[]).filter(function(x){return !!topicById(x[0])});
   return withSeed(spec.s,function(){
-    return spec.q.map(function(pair){return buildQ(pair[0],pair[1])});
+    return pairs.map(function(pair){return buildQ(pair[0],pair[1])})
+                .filter(function(q){return !!q});
   });
 }
 function examUrl(spec){
@@ -3376,9 +3382,41 @@ function waLink(text,phone){
 
 /* --- אחסון מבחנים והגשות, בנפרד מהתקדמות התלמיד --- */
 var EX={list:[]};
+/* --- הגירה מהמפתח המשותף הישן ---------------------------------
+   עד הגרסה הזאת כל האפליקציות כתבו מבחנים לאותו מפתח localStorage
+   ובאותו origin, ולכן מבחן שנבנה במתמטיקה הופיע ברשימת המבחנים של
+   אנגלית והפיל את המסך. מעכשיו לכל אפליקציה מפתח משלה, ובטעינה
+   מועתקות מהמפתח הישן רק רשומות שכל נושאיהן מוכרים כאן.
+   המפתח הישן נשאר על כנו ואינו נמחק, כדי שגם אפליקציה אחרת תוכל
+   לקלוט ממנו את המבחנים ששייכים לה. --------------------------- */
+function exSpecKnown(spec){
+  if(!spec||!spec.q||!spec.q.length)return false;
+  for(var i=0;i<spec.q.length;i++){
+    var pair=spec.q[i];
+    if(!pair||!topicById(pair[0]))return false;
+  }
+  return true;
+}
+function exAdoptLegacy(){
+  var added=0;
+  try{
+    var raw=localStorage.getItem(EKEY_OLD); if(!raw)return;
+    var old=JSON.parse(raw); if(!old||!old.list||!old.list.length)return;
+    var have={},i,ex;
+    for(i=0;i<EX.list.length;i++)have[EX.list[i].id]=1;
+    for(i=0;i<old.list.length;i++){
+      ex=old.list[i];
+      if(!ex||!ex.id||have[ex.id])continue;
+      if(!exSpecKnown(ex.spec))continue;
+      EX.list.push(ex); have[ex.id]=1; added++;
+    }
+  }catch(e){return}
+  if(added)exSave();
+}
 function exLoad(){
   try{var r=localStorage.getItem(EKEY);if(r){var o=JSON.parse(r);if(o&&o.list)EX=o}}catch(e){}
   if(!EX.list)EX.list=[];
+  exAdoptLegacy();
 }
 function exSave(){try{localStorage.setItem(EKEY,JSON.stringify(EX))}catch(e){}}
 function exFind(id){for(var i=0;i<EX.list.length;i++)if(EX.list[i].id===id)return EX.list[i];return null}
@@ -3909,11 +3947,13 @@ function sitSave(){
   try{localStorage.setItem(sitKey(),JSON.stringify({
     n:SIT.name,a:SIT.answers,f:SIT.flags,t:SIT.t0,i:SIT.i,p:SIT.phase}))}catch(e){}
 }
-function sitDrop(){try{localStorage.removeItem(sitKey())}catch(e){}}
+function sitKeyOld(){return EKEY_OLD+"-run-"+SIT.id}
+function sitDrop(){try{localStorage.removeItem(sitKey());localStorage.removeItem(sitKeyOld())}catch(e){}}
 function sitRestore(){
   if(!SIT.id)return false;
   try{
-    var o=JSON.parse(localStorage.getItem(sitKey())||"null");
+    /* מבחן שהתחיל לפני פיצול המפתחות נשמר תחת המפתח הישן. */
+    var o=JSON.parse(localStorage.getItem(sitKey())||localStorage.getItem(sitKeyOld())||"null");
     if(!o||!o.a||!o.a.length)return false;
     SIT.qs=examQuestions(SIT.spec);
     if(o.a.length!==SIT.qs.length)return false;   /* מבחן אחר תחת אותו מזהה */
@@ -3952,6 +3992,9 @@ function sitTimerOff(){if(SIT.tick){clearInterval(SIT.tick);SIT.tick=null}}
 function sitStart(){
   var nm=$("#sitName"); SIT.name=nm?nm.value.trim():"";
   SIT.qs=examQuestions(SIT.spec);
+  /* אם לא נותרה אף שאלה שאפשר לבנות (למשל מבחן של אפליקציה אחרת),
+     מציגים את מסך המבחן השבור במקום ליפול על שאלה שאינה קיימת. */
+  if(!SIT.qs.length){view="badexam"; render(); return}
   SIT.answers=SIT.qs.map(function(){return -1});
   SIT.flags=SIT.qs.map(function(){return false});
   SIT.i=0; SIT.phase="ask"; SIT.t0=Date.now();
@@ -8430,7 +8473,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g28-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g29-pwa1").catch(function(){});
   });
 }
 </script>
