@@ -377,6 +377,29 @@ footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface
   .te-btn.link{color:#b9c2d4}
 }
 
+/* ---------- רשימת השאלות במסך בניית המבחן ---------- */
+.xq-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.xq{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface2)}
+.xq-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.xq-n{flex:0 0 auto;min-width:27px;height:27px;border-radius:8px;display:inline-flex;
+  align-items:center;justify-content:center;font-weight:800;font-size:.85rem;background:var(--line)}
+.xq-tp{font-weight:700;font-size:.88rem;color:var(--muted);overflow-wrap:anywhere}
+.xq-acts{margin-inline-start:auto;display:flex;gap:6px;flex-wrap:wrap}
+/* 44 פיקסלים גם כאן. כפתור קטן בתוך רשימה ארוכה הוא בדיוק
+   הכפתור שנהג מבוגר או ילד עם ADHD לא מצליח לפגוע בו. */
+.xq-b{padding:8px 13px;font-size:.88rem;font-weight:700;border-radius:10px;min-height:44px;
+  border:1px solid var(--line);background:transparent;color:inherit;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit}
+.xq-b:hover{background:var(--line)}
+.xq-b[aria-pressed="true"]{background:var(--line)}
+.xq-q{margin-top:8px;line-height:1.5;overflow-wrap:anywhere}
+.xq-e{margin-top:5px;font-weight:700;overflow-wrap:anywhere}
+.xq-a{margin-top:7px;font-size:.92rem;color:var(--ok);overflow-wrap:anywhere}
+.xq-add{margin-top:12px;gap:8px}
+.xq-add .sub{margin:0}
+/* שאלת מקור נושאת קטע שלם. בלי תקרה הוא דוחף את שאר הרשימה
+   אל מחוץ למסך. */
+.xq .passage{max-height:11rem;overflow:auto}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -669,6 +692,22 @@ var LANGS={
 var LG="he";
 /* המילון הערבי נטען בבלוק נפרד שלפני הקוד הזה — הציור הראשון
    קורה בסוף הסקריפט הזה, ומילון שמגיע אחריו מאחר במסך שלם. */
+/* מילות בחירת השאלות. המחרוזת העברית היא המפתח, כמו בכל
+   המילון — ולכן שינוי של מילה כאן מחייב שינוי גם שם. בלוק נפרד
+   כדי שיישאר קריא: TR_AR עצמו הוא שורה אחת ענקית. */
+var TR_AR_XQ={
+  "השאלות במבחן":"أسئلة الامتحان",
+  "אלה השאלות שהתלמידים יקבלו, בסדר הזה. אפשר להחליף שאלה בשאלה אחרת מאותו נושא, להסיר אותה, או להוסיף שאלה.":"هذه هي الأسئلة التي سيحصل عليها الطلاب، بهذا الترتيب. يمكن استبدال سؤال بآخر من الموضوع نفسه، أو إزالته، أو إضافة سؤال.",
+  "הצגת התשובות":"إظهار الإجابات",
+  "הסתרת התשובות":"إخفاء الإجابات",
+  "הגרלה מחדש":"قرعة من جديد",
+  "החלפה":"استبدال",
+  "הסרה":"إزالة",
+  "התשובה:":"الإجابة:",
+  "הוספת שאלה מנושא:":"إضافة سؤال من موضوع:",
+  "לא נמצאה שאלה למשבצת הזאת — כדאי להחליף אותה.":"لم يُعثر على سؤال لهذه الخانة — يُفضّل استبدالها."
+};
+(function(){var k;for(k in TR_AR_XQ)TR_AR[k]=TR_AR_XQ[k]})();
 var TR={ar:(typeof TR_AR!=="undefined"?TR_AR:{})};
 function _(h){
   if(LG==="he")return h;
@@ -851,7 +890,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t38 · 2026-09-01";
+var BUILD="t39 · 2026-09-01";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -4896,6 +4935,13 @@ document.addEventListener("click",function(e){
   var el=e.target.closest("[data-a]");
   if(el&&!el.disabled)onAction(el.getAttribute("data-a"),el);
 });
+document.addEventListener("change",function(e){
+  var xs=e.target;
+  if(xs&&xs.getAttribute&&xs.getAttribute("data-slide")==="exn"){
+    EB.n=clamp(parseInt(xs.value,10)||10,5,25);
+    EB.q=null;EB.built=null;render();
+  }
+});
 document.addEventListener("input",function(e){
   var el=e.target;
   if(!el.dataset)return;
@@ -4918,7 +4964,9 @@ document.addEventListener("input",function(e){
   if(el.dataset.slide==="exn"){
     EB.n=clamp(parseInt(el.value,10)||10,5,25);
     var lab2=$("#exNlab");if(lab2)lab2.textContent=EB.n;
-    EB.built=null;
+    /* הרשימה מתבטלת כאן ונבנית מחדש רק כשהגרירה נגמרת: ציור
+       מחדש באמצע גרירה מנתק אותה. */
+    EB.q=null;EB.built=null;
     return}
   if(el.dataset.slide==="rate"){
     state.settings.rate=parseFloat(el.value);save();
@@ -5007,7 +5055,12 @@ function b64d(s){
   for(i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
   return new TextDecoder().decode(bytes);
 }
-function examId(spec){return hash32(spec.s+"|"+spec.q.map(function(x){return x[0]+x[1]}).join(",")).toString(36)}
+/* הזרע של המשבצת נכנס למזהה: שני מבחנים באותם נושאים ובאותה
+   רמה, שהמורה החליף באחד מהם שאלה, אינם אותו מבחן. מבחן ישן
+   שאין לו זרעים מקבל בדיוק את המזהה שקיבל תמיד — אחרת ההגשות
+   שכבר נקלטו אליו מתייתמות. */
+function examId(spec){return hash32(spec.s+"|"+spec.q.map(function(x){
+  return x[0]+x[1]+(x.length>2?"@"+x[2]:"")}).join(",")).toString(36)}
 function encodeExam(spec){return b64e(JSON.stringify(spec))}
 function decodeExam(code){
   try{
@@ -5024,10 +5077,89 @@ function examQuestions(spec){
      בלי הסינון buildQ מחזיר null על נושא זר, והמסך נופל על
      q.topic של null. עדיף לדלג בשקט מאשר להתרסק. */
   var pairs=(spec.q||[]).filter(function(x){return !!topicById(x[0])});
+  /* מבחן שנבנה עם זרע לכל משבצת נבנה משבצת אחרי משבצת, וכל
+     שאלה תלויה בזרע שלה בלבד — כך המורה יכול להחליף אחת מהן.
+     מבחן ישן, בלי זרעים, חייב להיבנות בדיוק כפי שנבנה ביום
+     שנשלח: אחרת הציון של מי שכבר נבחן משתנה למפרע. */
+  if(pairs.length&&pairs.every(function(x){return typeof x[2]==="number"}))
+    return pairs.map(function(p){return exBuildSlot(p)})
+                .filter(function(q){return !!q});
   return withSeed(spec.s,function(){
     return pairs.map(function(pair){return buildQ(pair[0],pair[1])})
                 .filter(function(q){return !!q});
   });
+}
+/* --- בחירת השאלות בידי המורה ---------------------------------
+   עד כאן המורה בחר נושאים, רמה ומספר שאלות — והשאלות עצמן הוגרלו
+   מאחורי גבו. הוא ראה אותן לראשונה רק אחרי שהמבחן כבר היה אצל
+   התלמידים. מעכשיו כל שאלה היא משבצת נפרדת עם זרע משלה: המורה
+   רואה אותה לפני השליחה, מחליף אותה בשאלה אחרת מאותו נושא,
+   מסיר אותה, או מוסיף שאלה מנושא שחסר לו.
+
+   הזרע הנפרד לכל משבצת הוא מה שמאפשר את זה. בזרם אקראי אחד
+   ומשותף, כפי שהיה עד כאן, החלפה של השאלה השלישית הייתה משנה
+   גם את הרביעית ואת החמישית — כלומר לא "החלפה" אלא הגרלה מחדש
+   של כל מה שאחריה.
+
+   24 ביט ולא 32: הזרע נוסע בתוך הקישור שנשלח בוואטסאפ, וזרע
+   קצר יותר הוא קישור קצר יותר. שישה־עשר מיליון אפשרויות למשבצת
+   הן הרבה מעבר למה שהמחולל עצמו יודע לייצר. */
+function exNewSeed(){return (Math.random()*16777215)>>>0}
+function exSlot(topicId,level){return [topicId,level,exNewSeed()]}
+/* אותו זרע → אותה שאלה בדיוק: אצל המורה כשהוא בוחר, ואצל
+   התלמיד כשהוא נבחן. */
+function exBuildSlot(slot){
+  if(!slot||!topicById(slot[0]))return null;
+  return withSeed(slot[2],function(){return buildQ(slot[0],slot[1])})||null;
+}
+/* מסך הבנייה מצייר את עצמו מחדש אחרי כל לחיצה, ובניית עשרים
+   וחמש שאלות בכל ציור מיותרת. המטמון הוא לתצוגה בלבד — מי
+   שנבחן בונה את שאלותיו מחדש, כדי שאיש לא יערוך בטעות אובייקט
+   שגם מסך אחר מחזיק בו. */
+var EXQCACHE={};
+/* לכל אפליקציה מנגנון שפה משלה, ולא לכולן אותם שמות. הפנייה
+   דרך window ולא בשם ישיר, כי שם שאינו קיים באפליקציה מסוימת
+   הוא שגיאה בעיני הבודקים — רעש שמסתיר שגיאה אמיתית. */
+function exLangKey(){
+  try{
+    var g=(typeof window!=="undefined")?window:{};
+    if(typeof g.xlg==="function")return g.xlg();
+    if(typeof g.LG==="string")return g.LG;
+    return (state&&state.settings&&state.settings.lang)||"he";
+  }catch(e){return "he"}
+}
+function exPreviewQ(slot){
+  if(!slot)return null;
+  var k=slot[0]+"|"+slot[1]+"|"+slot[2]+"|"+exLangKey();
+  if(!(k in EXQCACHE)){
+    /* מורה שמחליף שאלות שוב ושוב מייצר מפתח חדש בכל לחיצה.
+       מטמון שרק גדל הוא דליפה; מרוקנים אותו ומתחילים מחדש. */
+    if(Object.keys(EXQCACHE).length>400)EXQCACHE={};
+    EXQCACHE[k]=exBuildSlot(slot);
+  }
+  return EXQCACHE[k];
+}
+function exTopicName(id){
+  var t=topicById(id); if(!t)return "";
+  var g=(typeof window!=="undefined")?window:{};
+  return (typeof g.tName==="function"?g.tName(t):t.name)||"";
+}
+function exRightAnswer(q){
+  var i; if(!q||!q.options)return null;
+  for(i=0;i<q.options.length;i++)if(q.options[i].ok)return q.options[i];
+  return null;
+}
+/* המשבצות שהמורה עורך. נבנות מחדש רק כשנושא, רמה או מספר
+   השאלות משתנים; עריכה של משבצת בודדת נשמרת. */
+function exSlots(){
+  if(EB.q&&EB.q.length)return EB.q;
+  var tops=EB.topics.filter(function(x){return topicById(x)});
+  if(!tops.length)tops=topicsForTrack(state.track).slice(0,3).map(function(t){return t.id});
+  var q=[],i;
+  for(i=0;i<EB.n;i++)q.push(exSlot(tops[i%tops.length],EB.level));
+  /* מערבבים כאן ולא בשליחה: המורה רואה את הסדר הסופי ומאשר אותו. */
+  EB.q=shuffle(q);
+  return EB.q;
 }
 function examUrl(spec){
   var base=location.origin+location.pathname;
@@ -5111,7 +5243,7 @@ function gradeResult(spec,res){
 /* ------------------------------------------------------------
    מסך המורה — בניית מבחן
    ------------------------------------------------------------ */
-var EB={title:"",n:10,mins:0,level:2,topics:[],phone:"",tts:true,formulas:true,built:null,copied:""};
+var EB={title:"",n:10,mins:0,level:2,topics:[],phone:"",tts:true,formulas:true,built:null,copied:"",q:null,ans:false};
 
 function viewLocked(){
   return '<div class="wrap" style="padding-block:40px;max-width:32rem">'+
@@ -5119,6 +5251,46 @@ function viewLocked(){
     '<p class="sub">'+esc(teT("teLocked"))+'</p>'+
     '<div class="row" style="margin-top:14px">'+
     '<button class="btn btn-p" data-a="teask">'+esc(teT("teUnlock"))+'</button></div></div></div>';
+}
+/* השאלות עצמן, על המסך של המורה, לפני שהמבחן נשלח. */
+function viewExamSlots(){
+  var ls=exSlots(),h="",tops=EB.topics.filter(function(x){return topicById(x)});
+  h+='<div style="margin-top:18px"><b>'+esc("השאלות במבחן")+'</b>'+
+     '<p class="sub" style="margin:4px 0 8px">'+esc("אלה השאלות שהתלמידים יקבלו, בסדר הזה. אפשר להחליף שאלה בשאלה אחרת מאותו נושא, להסיר אותה, או להוסיף שאלה.")+'</p>';
+  h+='<div class="row" style="margin:0 0 10px">'+
+     '<button class="xq-b" data-a="exqans" aria-pressed="'+(EB.ans?"true":"false")+'">'+
+     (EB.ans?esc("הסתרת התשובות"):esc("הצגת התשובות"))+'</button>'+
+     '<button class="xq-b" data-a="exqreset">'+esc("הגרלה מחדש")+'</button></div>';
+  h+='<ol class="xq-list">';
+  ls.forEach(function(sl,i){
+    var q=exPreviewQ(sl),ok=exRightAnswer(q);
+    h+='<li class="xq"><div class="xq-top">'+
+       '<span class="xq-n">'+(i+1)+'</span>'+
+       '<span class="xq-tp">'+esc(q&&q.topicName?q.topicName:exTopicName(sl[0]))+'</span>'+
+       '<span class="xq-acts">'+
+       '<button class="xq-b" data-a="exqroll" data-i="'+i+'">'+esc("החלפה")+'</button>'+
+       /* המבחן חייב להישאר עם שאלה אחת לפחות, ולכן הכפתור נעלם
+          ולא מוצג כבוי: כפתור שאי אפשר ללחוץ עליו מבלבל. */
+       (ls.length>1?'<button class="xq-b" data-a="exqdel" data-i="'+i+'">'+esc("הסרה")+'</button>':"")+
+       '</span></div>';
+    if(q){
+      h+='<div class="xq-q">'+q.ask+(q.expr?'<div class="xq-e">'+q.expr+'</div>':"")+'</div>';
+      if(EB.ans&&ok)h+='<div class="xq-a"><b>'+esc("התשובה:")+'</b> '+ok.h+'</div>';
+    }else h+='<div class="xq-q sub">'+esc("לא נמצאה שאלה למשבצת הזאת — כדאי להחליף אותה.")+'</div>';
+    h+='</li>';
+  });
+  h+='</ol>';
+  /* כפתור לכל נושא שנבחר, כדי שהמורה יוסיף בדיוק את מה שחסר לו
+     ולא שאלה אקראית מנושא כלשהו. */
+  if(tops.length){
+    h+='<div class="row xq-add"><span class="sub">'+esc("הוספת שאלה מנושא:")+'</span>';
+    tops.forEach(function(id){
+      h+='<button class="xq-b" data-a="exqadd" data-t="'+esc(id)+'">'+
+         '<b aria-hidden="true">+</b> <span>'+esc(exTopicName(id))+'</span></button>';
+    });
+    h+='</div>';
+  }
+  return h+'</div>';
 }
 function viewExamNew(){
   var tops=topicsForTrack(state.track);
@@ -5176,6 +5348,7 @@ function viewExamNew(){
      'שימו לב: המספר יופיע בתוך הקישור שאתם משתפים.</p>'+
      '<input class="field" id="exPhone" value="'+esc(EB.phone)+'" placeholder="972501234567" inputmode="tel" maxlength="20"></div>';
 
+  h+=viewExamSlots();
   h+='<button class="btn btn-p w" style="margin-top:20px" data-a="exbuild">'+ic("check",18)+' צרו את המבחן</button>';
   h+='</div>';
 
@@ -5817,23 +5990,44 @@ function fallbackCopy(txt,done){
 }
 function examAction(a,el){
   /* --- בניית מבחן --- */
-  if(a==="exlvl"){EB.level=parseInt(el.getAttribute("data-l"),10)||2;EB.built=null;render();return true}
+  if(a==="exlvl"){EB.level=parseInt(el.getAttribute("data-l"),10)||2;EB.q=null;EB.built=null;render();return true}
   if(a==="extopic"){
     var id=el.getAttribute("data-t"),k=EB.topics.indexOf(id);
     if(k>=0)EB.topics.splice(k,1);else EB.topics.push(id);
-    EB.built=null;render();return true;
+    EB.q=null;EB.built=null;render();return true;
   }
   if(a==="exflag"){var f=el.getAttribute("data-f");EB[f]=!EB[f];EB.built=null;render();return true}
+  /* --- בחירת השאלות --- */
+  if(a==="exqans"){EB.ans=!EB.ans;render();return true}
+  if(a==="exqreset"){EB.q=null;EB.built=null;render();return true}
+  if(a==="exqroll"){
+    var qi=parseInt(el.getAttribute("data-i"),10),ql=exSlots();
+    /* משבצת חדשה ולא רק זרע חדש, כדי שהמערך יישאר בן שלושה
+       איברים גם אם מישהו יוסיף שדה בעתיד. */
+    if(ql[qi])
+      {ql[qi]=exSlot(ql[qi][0],ql[qi][1]);EB.built=null}
+    render();return true;
+  }
+  if(a==="exqdel"){
+    var di=parseInt(el.getAttribute("data-i"),10),dl=exSlots();
+    /* מבחן בלי שאלות אינו מבחן. משאירים אחת. */
+    if(dl.length>1&&di>=0&&di<dl.length){dl.splice(di,1);EB.n=dl.length;EB.built=null}
+    render();return true;
+  }
+  if(a==="exqadd"){
+    var at=el.getAttribute("data-t"),al=exSlots();
+    /* עשרים וחמש — גם הגבול של המחוון, וגם מבחן ארוך דיו. */
+    if(topicById(at)&&al.length<25){al.push(exSlot(at,EB.level));EB.n=al.length;EB.built=null}
+    render();return true;
+  }
   if(a==="exbuild"){
     var ti=$("#exTitle"),ph=$("#exPhone");
     EB.title=ti?ti.value.trim():""; EB.phone=ph?ph.value.trim():"";
-    var tops=EB.topics.filter(function(x){return topicById(x)});
-    if(!tops.length)tops=topicsForTrack(state.track).slice(0,3).map(function(t){return t.id});
-    /* חלוקה שווה בין הנושאים, ואז ערבוב — כדי שלא יגיעו בגושים */
-    var q=[],i;
-    for(i=0;i<EB.n;i++)q.push([tops[i%tops.length],EB.level]);
+    /* המבחן נארז מהמשבצות שעל המסך — אותן שאלות ואותו סדר
+       שהמורה אישר. ערבוב כאן היה מסדר מחדש מבחן שכבר נבדק. */
+    var q=exSlots().slice();
     var spec={v:GENV,t:EB.title||"מבחן",s:(Math.random()*4294967295)>>>0,l:EB.level,
-              q:shuffle(q),r:!!EB.tts,f:!!EB.formulas,w:true,m:EB.mins||0};
+              q:q,r:!!EB.tts,f:!!EB.formulas,w:true,m:EB.mins||0};
     if(EB.phone)spec.p=EB.phone.replace(/[^0-9]/g,"");
     EB.built=spec; EB.copied="";
     var id=examId(spec);
@@ -5959,7 +6153,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t38-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t39-pwa1").catch(function(){});
   });
 }
 </script>
