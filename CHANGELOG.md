@@ -4,7 +4,7 @@
 worker. שינוי הגרסה הוא מה שמביא את הקוד החדש למי שכבר התקין את
 האפליקציה — ולכן שני המספרים זזים תמיד ביחד.
 
-## דף הבית 7 · math-app b36 · math-teen t36 · math-uni u32 · math-uni2 v32 · math-uni3 g31 · english n30 · history m33 · reader 16
+## מצב הדגמה — הפורטל 8 · b38 · t38 · u34 · v34 · g33 · n31 · m34 · reader 18
 
 ## הפורטל 7 · math-app b37 · math-teen t37 · אקסיומה u33/v33/g32
 
