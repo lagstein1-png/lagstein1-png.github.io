@@ -1,9 +1,13 @@
 /* =====================================================================
-   Service worker — אחת לכל אפליקציה, זהה בכולן.
-   הגרסה מגיעה מ-index.html דרך ?v= בכתובת הרישום, כדי שיהיה מקור אמת
-   אחד: שינוי הגרסה שם משנה את כתובת הסקריפט, הדפדפן רואה worker חדש,
-   מתקין אותו ומוחק את המטמון הישן. בלי זה שינוי בקוד לא מגיע למי
-   שכבר התקין את האפליקציה, וזו התקלה שהכי קשה לאבחן.
+   Service worker — אחת לכל אפליקציה, זהה בכולן חוץ משם המטמון.
+   הגרסה מגיעה מ-index.html דרך ?v= בכתובת הרישום: שינוי הגרסה שם משנה
+   את כתובת הסקריפט, הדפדפן רואה worker חדש, מתקין אותו ומוחק את המטמון
+   הישן. בלי זה שינוי בקוד לא מגיע למי שכבר התקין את האפליקציה, וזו
+   התקלה שהכי קשה לאבחן.
+
+   שים לב: אין כאן מקור אמת אחד. מחרוזת ה-?v= שברישום מקודדת קשיח
+   ב-index.html ואינה נגזרת מ-var BUILD. עדכון BUILD לבדו לא מנקה את
+   המטמון. עדכנת אחד — עדכן את השני.
    ===================================================================== */
 const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "math-uni-" + V;
@@ -29,17 +33,29 @@ self.addEventListener("fetch", e => {
   /* ניווט: רשת קודם כדי שגרסה חדשה תגיע מיד, ומטמון כשאין רשת */
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).then(r => {
-      const copy = r.clone();
-      caches.open(CACHE).then(c => c.put("./", copy)).catch(() => {});
+      /* רק תשובה תקינה נשמרת. בלי הבדיקה, דף 404 של GitHub Pages נשמר
+         כקליפת האפליקציה ומוגש אופליין במקומה. */
+      if (r && r.status === 200) {
+        const copy = r.clone();
+        /* תחת כתובת הבקשה עצמה, לא תחת "./" — worker אחד מגיש כמה דפים
+           (/legal/, /voice/), ו-"./" היה מקבל את התוכן של האחרון שנטען. */
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+      }
       return r;
-    }).catch(() => caches.match("./index.html").then(r => r || caches.match("./"))));
+    }).catch(() => caches.open(CACHE).then(c =>
+      c.match(req).then(r => r || c.match("./index.html")).then(r => r || c.match("./")))));
     return;
   }
-  e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(r => {
+  /* משאב: מטמון קודם — אבל רק המטמון של האפליקציה הזאת. caches.match
+     הגלובלי סורק את כל המטמונים ב-origin, ולכן היה מגיש עותק ש-worker
+     של אפליקציה אחרת שמר. תשע אפליקציות מקדימות-קאשינג את legal/terms.js,
+     וה-activate של כל אחת מוחק רק את התחילית שלה — כך שתיקון שם היה
+     נתקע לצמיתות מאחורי עותק זר. */
+  e.respondWith(caches.open(CACHE).then(c => c.match(req).then(hit => hit || fetch(req).then(r => {
     if (r && r.status === 200) {
       const copy = r.clone();
-      caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+      c.put(req, copy).catch(() => {});
     }
     return r;
-  }).catch(() => hit)));
+  }).catch(() => hit))));
 });
