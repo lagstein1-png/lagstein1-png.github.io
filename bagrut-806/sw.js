@@ -1,17 +1,36 @@
 /* =====================================================================
    Service worker — זהה במבנה לשאר האפליקציות.
-   הגרסה מגיעה מ-index.html דרך ?v= בכתובת הרישום: שינוי הגרסה שם
-   משנה את כתובת הסקריפט, הדפדפן רואה worker חדש, מתקין אותו ומוחק
-   את המטמון הישן. בלי זה שינוי בקוד לא מגיע למי שכבר התקין.
+   הגרסה מגיעה מ-app.js דרך ?v= בכתובת הרישום שב-index.html: שינוי
+   הגרסה שם משנה את כתובת הסקריפט, הדפדפן רואה worker חדש, מתקין
+   אותו ומוחק את המטמון הישן. בלי זה שינוי בקוד לא מגיע למי שכבר
+   התקין את האפליקציה.
 
-   שים לב: כאן, בשונה משאר האפליקציות, יש יותר מקובץ אחד. app.js,
-   speech.js ו-data/exams.js חייבים להיות ברשימת ההקדמה — אחרת
-   הדף ייטען אופליין ויישאר ריק.
+   שתי סטיות מן השאר, ושתיהן נובעות מכך שזו האפליקציה הראשונה כאן
+   שאינה קובץ HTML יחיד:
+
+   1. app.js, speech.js ו-data/exams.js חייבים להיות בהקדמה. בלעדיהם
+      הדף נטען אופליין ונשאר ריק, בלי שגיאה שרואים.
+
+   2. כל עשרים גופני KaTeX מוקדמים, ולא רק ה-CSS וה-JS. הדפדפן מוריד
+      גופן רק כשגליף ממנו נדרש, ולכן בלי הקדמה התלמיד היה רואה
+      נוסחה אופליין בגופן חלופי — בדיוק התקלה שהאפליקציה הזאת נבנתה
+      כדי למנוע. המחיר הוא כ-560 קילובייט בהתקנה, פעם אחת.
    ===================================================================== */
 const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "bagrut-806-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./app.js","./speech.js","./data/exams.js",
+             "./vendor/katex/katex.min.css","./vendor/katex/katex.min.js",
+             "./vendor/katex/fonts/KaTeX_AMS-Regular.woff2","./vendor/katex/fonts/KaTeX_Caligraphic-Bold.woff2",
+             "./vendor/katex/fonts/KaTeX_Caligraphic-Regular.woff2","./vendor/katex/fonts/KaTeX_Fraktur-Bold.woff2",
+             "./vendor/katex/fonts/KaTeX_Fraktur-Regular.woff2","./vendor/katex/fonts/KaTeX_Main-Bold.woff2",
+             "./vendor/katex/fonts/KaTeX_Main-BoldItalic.woff2","./vendor/katex/fonts/KaTeX_Main-Italic.woff2",
+             "./vendor/katex/fonts/KaTeX_Main-Regular.woff2","./vendor/katex/fonts/KaTeX_Math-BoldItalic.woff2",
+             "./vendor/katex/fonts/KaTeX_Math-Italic.woff2","./vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2",
+             "./vendor/katex/fonts/KaTeX_SansSerif-Italic.woff2","./vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2",
+             "./vendor/katex/fonts/KaTeX_Script-Regular.woff2","./vendor/katex/fonts/KaTeX_Size1-Regular.woff2",
+             "./vendor/katex/fonts/KaTeX_Size2-Regular.woff2","./vendor/katex/fonts/KaTeX_Size3-Regular.woff2",
+             "./vendor/katex/fonts/KaTeX_Size4-Regular.woff2","./vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2",
              "./img/icon-192.png","./img/icon-512.png",
              "/legal/terms.js","/legal/protect.js"];
 
