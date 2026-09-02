@@ -26,7 +26,11 @@
 :root{
   --font:"Heebo","Rubik","Segoe UI",system-ui,Arial,sans-serif;
   --bg:#f6f7fb; --surface:#ffffff; --surface2:#eceff7;
-  --ink:#0f1729; --muted:#4a5568; --faint:#6b7a90; --line:#dbe1ec;
+  /* --faint היה #6b7a90, ונמדד 4.08:1 מול רקע הדף ו-4.37:1 מול לבן —
+     מתחת ל-4.5 שהתקן דורש. הוא נושא את הפוטר ואת טקסט הרמז שבשדה
+     התשובה ("מספר — למשל 0.8"), שהוא הדבר היחיד שאומר לתלמיד מה
+     מותר לכתוב שם. הכהיה מינימלית: 4.76:1 מול הרקע, 5.09:1 מול לבן. */
+  --ink:#0f1729; --muted:#4a5568; --faint:#616f85; --line:#dbe1ec;
   --accent:#1e40af; --accent-ink:#ffffff; --accent-soft:#dde5fb;
   --ok:#15803d; --ok-soft:#dcfce7; --bad:#b91c1c; --bad-soft:#fee2e2;
   --warn:#b45309; --warn-soft:#fef3c7;
@@ -214,10 +218,15 @@ main{padding:1.1rem 0 3rem}
   display:flex;flex-direction:column;gap:.6rem;
 }
 .ansrow{display:flex;gap:.5rem;align-items:stretch;flex-wrap:wrap}
+/* מסגרת השדה ב---faint ולא ב---line: לשדה יש בדיוק אותו רקע כמו
+   לכרטיס שהוא יושב בו, ולכן המסגרת היא כל מה שאומר "כאן כותבים".
+   --line נותן 1.31:1 מול לבן — התקן דורש 3:1 לגבול של רכיב קלט,
+   ומי שרואה בניגודיות נמוכה פשוט לא ראה שיש כאן שדה. עכשיו 5.09:1
+   בבהיר ו-4.98:1 בכהה. */
 .ansrow input{
   flex:1 1 8rem;min-width:0;min-height:48px;padding:.5rem .8rem;
   font:inherit;font-size:1.05em;text-align:start;
-  border:2px solid var(--line);border-radius:12px;
+  border:2px solid var(--faint);border-radius:12px;
   background:var(--surface);color:var(--ink);
 }
 .ansrow input:focus-visible{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
@@ -395,7 +404,7 @@ footer{color:var(--faint);font-size:.85em;padding:1.2rem 0 2rem;text-align:cente
       <div class="row">
         <div class="grow">
           <div class="lab">מהירות ההקראה</div>
-          <div class="desc">אפשר לשנות גם באמצע, וההקראה תתחיל מחדש</div>
+          <div class="desc">שינוי באמצע עוצר את ההקראה הנוכחית, והבאה תישמע בקצב החדש</div>
         </div>
         <div class="group" role="group" aria-label="מהירות ההקראה">
           <button class="btn" data-rate="0.7">לאט</button>
