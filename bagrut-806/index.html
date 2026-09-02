@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>בגרות 806 — מתמטיקה 5 יחידות</title>
+<meta name="description" content="הכנה לבגרות במתמטיקה 5 יחידות, שאלון 806: סימולציה מתוזמנת ותרגול מודרך, וכל טקסט וכל נוסחה נשמעים לפני שקוראים אותם." />
+<meta name="theme-color" content="#12213a" />
+<style>
+/* ============================================================
+   בגרות 806 — כל ה-CSS של האפליקציה
+   ------------------------------------------------------------
+   קהל היעד מתקשה בקריאה, בריכוז או בעברית, ולכן:
+   · טקסט גדול כברירת מחדל, וכל המידות ב-rem — הגדלת גופן
+     בדפדפן מגדילה את הכול יחד ולא שוברת את הפריסה.
+   · אזור נגיעה מינימלי 48px בכל דבר שלוחצים עליו.
+   · אין גופן חיצוני. הדרישה היא אפס בקשות רשת בזמן ריצה, וגופן
+     מ-Google Fonts הוא בדיוק בקשה כזאת — ובלעדיה הדף היה נטען
+     בגופן ברירת מחדל אחרי הבהוב. גופן המערכת נכון יותר כאן.
+   · ניגודיות: הצבעים נבדקו מול AA. מצב כהה לפי העדפת המערכת.
+   ============================================================ */
+:root{
+  --font:system-ui,-apple-system,"Segoe UI","Noto Sans Hebrew",Arial,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --bg:#f7f6f3; --surface:#ffffff; --surface2:#eceff4;
+  --ink:#141a24; --muted:#4b5563; --line:#d9dee6;
+  --accent:#1d4ed8; --accent-ink:#ffffff; --accent-soft:#e3ebfd;
+  --ok:#15803d; --warn:#b45309; --warn-soft:#fef3c7; --bad:#be123c; --bad-soft:#ffe4e9;
+  --shadow:0 1px 2px rgba(20,26,36,.06),0 10px 26px -14px rgba(20,26,36,.28);
+  --r:14px;
+  --hit:48px;              /* אזור נגיעה מינימלי */
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0e141f; --surface:#161e2c; --surface2:#1e2839;
+    --ink:#eef2f8; --muted:#a8b3c4; --line:#2c3648;
+    --accent:#93b4fd; --accent-ink:#0e141f; --accent-soft:#1b2a47;
+    --ok:#4ade80; --warn:#fbbf24; --warn-soft:#33270f; --bad:#fb7185; --bad-soft:#33161f;
+    --shadow:0 1px 2px rgba(0,0,0,.45),0 12px 30px -16px rgba(0,0,0,.75);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:500 1.125rem/1.7 var(--font);
+}
+.wrap{max-width:46rem;margin:0 auto;padding:1.25rem 1rem 3rem}
+h1{font-size:clamp(1.6rem,6vw,2.2rem);line-height:1.25;margin:.2em 0 .3em}
+h2{font-size:clamp(1.15rem,4.4vw,1.4rem);line-height:1.3;margin:0 0 .4em}
+p{margin:.5em 0}
+.lead{color:var(--muted);font-size:1.0625rem}
+.sub{color:var(--muted);font-size:.95rem}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+header{background:var(--surface);border-bottom:1px solid var(--line)}
+header .wrap{padding-block:.75rem;display:flex;align-items:center;gap:.6rem}
+.mark{
+  width:2.25rem;height:2.25rem;flex:0 0 auto;border-radius:11px;
+  background:var(--accent);color:var(--accent-ink);
+  display:grid;place-items:center;font-weight:800;font-size:1rem;
+}
+header b{font-size:1.05rem}
+header small{display:block;color:var(--muted);font-weight:500;font-size:.85rem;line-height:1.3}
+
+.btn{
+  font:inherit;font-weight:700;cursor:pointer;
+  min-height:var(--hit);padding:.6rem 1.1rem;border-radius:12px;
+  border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);
+}
+.btn:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.btn.danger{background:var(--surface);color:var(--bad);border-color:var(--bad)}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.btn.back{margin-bottom:.75rem}
+.btn.spk{min-width:var(--hit);padding:.5rem .7rem;font-size:1.15rem;margin-inline-start:auto}
+
+.grid{display:grid;gap:.9rem;margin:1.25rem 0}
+@media (min-width:34rem){.grid{grid-template-columns:1fr 1fr}}
+.tile{
+  display:flex;flex-direction:column;gap:.35rem;text-align:start;
+  font:inherit;cursor:pointer;min-height:var(--hit);
+  padding:1.1rem;border-radius:var(--r);border:1px solid var(--line);
+  background:var(--surface);color:var(--ink);box-shadow:var(--shadow);
+}
+.tile:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.tile .tn{font-weight:800;font-size:1.2rem}
+.tile .td{color:var(--muted);font-size:.95rem;font-weight:500;line-height:1.55}
+
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:1.1rem;margin:1rem 0;box-shadow:var(--shadow);
+}
+.card.todo{border-inline-start:5px solid var(--warn);background:var(--warn-soft)}
+.card.todo h2{font-size:1.05rem}
+.row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.4rem}
+.chip{
+  font-size:.85rem;font-weight:700;padding:.25rem .6rem;border-radius:999px;
+  background:var(--accent-soft);color:var(--ink);
+}
+.chip.warn{background:var(--warn-soft);color:var(--ink)}
+.pts{font-size:.9rem;color:var(--muted);font-weight:700}
+
+.stages{margin:.5rem 0 0;padding-inline-start:1.3rem;line-height:1.9}
+.stages li{color:var(--muted)}
+.stages li.done{color:var(--ink);font-weight:700}
+.stages li.done::marker{color:var(--ok)}
+
+.subs{list-style:none;margin:1rem 0 0;padding:0}
+.sub-q{border-top:1px solid var(--line);padding-top:.9rem;margin-top:.9rem}
+
+/* נוסחה. `.raw` היא המצב שבו KaTeX עוד לא הותקן — מסומן במפורש
+   כדי שלא ייראה כמו נוסחה מעובדת. */
+.tex{display:block;margin:.7rem 0;padding:.7rem .9rem;border-radius:10px;background:var(--surface2);overflow-x:auto}
+.tex code{font-family:var(--mono);font-size:1rem;direction:ltr;display:block;text-align:left}
+.tex em{display:block;margin-top:.4rem;font-size:.82rem;color:var(--muted);font-style:normal}
+
+.schema-errs{
+  background:var(--bad-soft);color:var(--ink);border-bottom:3px solid var(--bad);
+  padding:1rem;font-size:.95rem;
+}
+.schema-errs ul{margin:.4rem 0 0;padding-inline-start:1.2rem}
+
+footer{border-top:1px solid var(--line);margin-top:2rem}
+footer .wrap{padding-block:1rem;color:var(--muted);font-size:.85rem;display:flex;
+  gap:.5rem;flex-wrap:wrap;justify-content:space-between}
+footer a{color:inherit}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<a class="sr" href="#app">דילוג לתוכן</a>
+
+<header>
+  <div class="wrap">
+    <span class="mark" aria-hidden="true">806</span>
+    <span><b>בגרות 806</b><small>מתמטיקה · 5 יחידות</small></span>
+  </div>
+</header>
+
+<main id="app" class="wrap" tabindex="-1"></main>
+
+<footer><div class="wrap">
+  <span>הכול נשמר במכשיר הזה בלבד</span>
+  <span><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/">תנאי שימוש</a></span>
+</div></footer>
+
+<!-- הסדר קובע: הנתונים, אחר כך מנוע ההקראה, ורק אז הלוגיקה שקוראת לשניהם.
+     אין fetch ואין CDN — שלוש תגיות מקומיות, ולכן הדף עובד גם אופליין. -->
+<script src="data/exams.js"></script>
+<script src="speech.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
