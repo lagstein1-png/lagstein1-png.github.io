@@ -26,7 +26,17 @@
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
   }
-  function say(msg) { var l = $("#live"); if (l) l.textContent = msg; }
+  /* אזור ההודעות לקורא מסך. אותה הודעה פעמיים ברצף — "עוד לא."
+     על אותה תשובה שגויה — אינה שינוי טקסט, וקורא מסך שותק בפעם
+     השנייה; המשתמש לוחץ "בדקו" ולא שומע דבר. תו רוחב־אפס מתחלף
+     הופך אותה לשינוי, והוא עצמו אינו נהגה. */
+  var ZWSP = String.fromCharCode(0x200b);
+  function say(msg) {
+    var l = $("#live");
+    if (!l) return;
+    var t = String(msg == null ? "" : msg);
+    l.textContent = (l.textContent.split(ZWSP).join("") === t) ? t + ZWSP : t;
+  }
   /* "1 שאלות" הוא בדיוק סוג המשפט שגורם לקורא מתקשה לעצור ולחזור
      אחורה. עברית מבחינה גם בשניים, ולכן שלוש צורות ולא שתיים. */
   function plural(n, one, two, many) {
@@ -138,7 +148,21 @@
   function markOverflow(root) {
     $$(".formula").forEach(function (el) {
       if (root && !root.contains(el)) return;
-      el.classList.toggle("over", el.scrollWidth > el.clientWidth + 1);
+      var over = el.scrollWidth > el.clientWidth + 1;
+      el.classList.toggle("over", over);
+      /* אזור שאפשר לגלול בו חייב להיות נגיש גם במקלדת. בלי tabindex
+         מי שאינו משתמש בעכבר או במגע אינו יכול להזיז נוסחה רחבה
+         מהמסך — כלומר החצי השני שלה אינו קיים בשבילו. נוסף רק
+         כשהנוסחה באמת גולשת: תחנת טאב על כל נוסחה היא רעש. */
+      if (over) {
+        el.setAttribute("tabindex", "0");
+        el.setAttribute("role", "group");
+        el.setAttribute("aria-label", "נוסחה רחבה מהמסך — אפשר לגלול לצדדים");
+      } else {
+        el.removeAttribute("tabindex");
+        el.removeAttribute("role");
+        el.removeAttribute("aria-label");
+      }
     });
   }
 
@@ -331,7 +355,11 @@
       '<button class="btn pri" data-check="' + esc(id) + '" type="button">בדקו</button></div>';
 
     if (st.res) {
-      h += '<div class="verdict ' + (st.res.ok ? "ok" : "no") + '" role="status">' +
+      /* בלי role="status" — ובכוונה. את המשוב מכריז #live, שקיים
+         בדף מרגע הטעינה ולכן נקרא באמינות; אזור חי שנוצר יחד עם
+         התוכן שבתוכו אינו מוכרז בכל קורא מסך. שני הערוצים יחד היו
+         משמיעים "נכון" פעמיים. */
+      h += '<div class="verdict ' + (st.res.ok ? "ok" : "no") + '">' +
         "<span>" + (st.res.ok ? "נכון." : "עוד לא.") + "</span>" +
         (st.res.why ? '<span class="why">' + esc(st.res.why) + "</span>" : "") +
         (!st.res.ok && st.tries >= 2 && !st.sol
@@ -395,6 +423,23 @@
     box.innerHTML = ansHtml(q, sub, Number(m[2]));
     markOverflow(box);
   }
+  /* renderAns בונה את הקופסה מחדש, והכפתור שנלחץ נעלם יחד איתה —
+     "הפתרון המלא" ו"סגרו" אפילו אינם נבנים שוב. הפוקוס נופל אז
+     ל-body, וההקשה הבאה על Tab מתחילה מראש הדף: במסך תרגול עם
+     ארבעה סעיפים זה עשרים הקשות בחזרה, בכל רמז. */
+  function focusEl(t) {
+    if (!t) return;
+    if (!/^(A|BUTTON|INPUT|SELECT|TEXTAREA)$/.test(t.tagName) &&
+        !t.hasAttribute("tabindex")) t.setAttribute("tabindex", "-1");
+    try { t.focus({ preventScroll: true }); } catch (e) { t.focus(); }
+  }
+  /* האחרון שמתאים בתוך קופסת הסעיף — הרמז שהרגע נחשף, ולא הראשון */
+  function lastIn(id, sel) {
+    var box = document.getElementById("ans-" + id);
+    if (!box) return null;
+    var all = box.querySelectorAll(sel);
+    return all.length ? all[all.length - 1] : null;
+  }
   /* כל רענון של הקופסה בונה את ה-input מחדש. בלי לקרוא ממנו קודם,
      תלמיד שכתב תשובה ואז לחץ "רמז" היה מוצא שדה ריק. */
   function keepVal(id) {
@@ -428,6 +473,29 @@
     return h + "</div>";
   }
 
+  /* מסך הסימולציה ומסך התרגול מרנדרים את אותן שאלות, ולכן אותם
+     מזהי t- ו-f- קיימים פעמיים במסמך בו־זמנית — המסך שעזבנו נשאר
+     בנוי, רק hidden. getElementById מחזיר את הראשון לפי סדר המסמך,
+     ו-scr-sim מופיע לפני scr-practice: ההדגשה סימנה טקסט במסך
+     המוסתר, ובמסך שהמשתמש רואה שום דבר לא הודגש. מחפשים קודם בתוך
+     המסך הפעיל, ורק אם אין — נופלים לחיפוש הרגיל. */
+  function elIn(id) {
+    var scope = document.getElementById("scr-" + state.screen);
+    var hit = scope ? scope.querySelector("#" + id) : null;
+    return hit || document.getElementById(id);
+  }
+  /* טקסט להקראה מתוך אלמנט שנבנה בלחיצה — רמז או פתרון. הפתרון הוא
+     <ol>, ו-textContent מדביק פריט לפריט בלי רווח: שלב שאינו נגמר
+     בנקודה היה נבלע לתוך השלב הבא במשפט אחד ארוך. */
+  function elText(el) {
+    var li = el.querySelectorAll("li");
+    if (!li.length) return el.textContent;
+    return Array.prototype.map.call(li, function (x) {
+      var t = String(x.textContent || "").trim();
+      return /[.!?;:]$/.test(t) ? t : t + ".";
+    }).join(" ");
+  }
+
   /* מאתר מה להקריא לפי המזהה שעל הכפתור. הטקסט תמיד ראשון והנוסחה
      אחריו, ומה שנאמר על נוסחה הוא השדה speech — לעולם לא ה-LaTeX. */
   function readUnits(id) {
@@ -439,8 +507,8 @@
     ex.questions.forEach(function (x) { if (String(x.number) === m[1]) q = x; });
     if (!q) return [];
     function pair(item, base) {
-      return [{ text: item.text, el: document.getElementById("t-" + base) },
-              { text: item.speech, el: document.getElementById("f-" + base) }];
+      return [{ text: item.text, el: elIn("t-" + base) },
+              { text: item.speech, el: elIn("f-" + base) }];
     }
     if (m[3]) {
       var qid = "q" + m[1];
@@ -571,6 +639,7 @@
     h += '<div class="saybar">' + spkBtn(id, "הקריאו את השאלה") +
          '<div class="grow"><p id="t-' + id + '">' + sentHtml(q.text) + "</p></div></div>";
     h += formula(q.latex, "f-" + id);
+    if (q.speech) h += '<p class="sr">בהקראה: ' + esc(q.speech) + "</p>";
     (q.subQuestions || []).forEach(function (sub, si) {
       var sid = id + "s" + si;
       h += '<div class="sub"><div class="saybar">' +
@@ -580,6 +649,11 @@
         '<p class="meta">' + plural(sub.points, "נקודה אחת", "שתי נקודות", "נקודות") +
         "</p></div></div>";
       h += formula(sub.latex, "f-" + sid);
+      /* בתרגול הניסוח העברי של הנוסחה מוצג על המסך; בסימולציה הוא
+         לא, וקורא מסך נשאר עם ה-MathML שקורא נוסחה באנגלית. מוסיפים
+         אותו כטקסט לקורא מסך בלבד: אפס שינוי חזותי, ואפס חשיפה —
+         speech הוא ניסוח הנוסחה ולא התשובה. */
+      if (sub.speech) h += '<p class="sr">בהקראה: ' + esc(sub.speech) + "</p>";
       h += '<div class="ansbox"><div class="ansrow">' +
         '<input type="text" data-sim="' + esc(sid) + '" ' +
         'dir="' + (sub.finalAnswer && sub.finalAnswer.type === "text" ? "rtl" : "ltr") + '" ' +
@@ -625,8 +699,11 @@
 
     h += "<h2>סעיף אחר סעיף</h2><table class=\"tbl\"><thead><tr>" +
       "<th>סעיף</th><th>מה נכתב</th><th>התשובה</th><th></th></tr></thead><tbody>";
+    /* "1" ואחריו "א" בתוך תא בכיוון ימין־לשמאל מוצגים הפוך — "א1" —
+       מפני שהספרה והאות הן שני כיוונים נגדיים. bdi בכיוון שמאל־לימין
+       מבודד את הצירוף ומציג אותו כפי שנכתב, והתא כולו נשאר במקומו. */
     r.rows.forEach(function (x) {
-      h += "<tr><td>" + esc(x.number) + esc(x.letter) + "</td><td>" +
+      h += '<tr><td><bdi dir="ltr">' + esc(x.number) + esc(x.letter) + "</bdi></td><td>" +
         (x.given ? esc(x.given) : '<span class="meta">ריק</span>') + "</td><td>" +
         esc(x.want) + '</td><td><span class="tag ' + (x.ok ? "ok" : "no") + '">' +
         (x.ok ? "נכון" : "לא") + "</span></td></tr>";
@@ -761,8 +838,23 @@
     if (screen === "practice") renderPractice();
     if (screen === "prog") renderProg();
     if (screen === "settings") applyPrefs();
+    /* הכפתור שנלחץ נמצא במסך שהרגע הוסתר, ולכן הפוקוס נופל ל-body:
+       הקשה על Tab מתחילה מראש המסמך, ומי שמנווט במקלדת אינו יודע
+       לאן הגיע. מעבירים את הפוקוס לכותרת המסך החדש. tabindex="-1"
+       הופך אותה למוקדת בלי להוסיף תחנת טאב, ו-:focus-visible אינו
+       נדלק על פוקוס תוכניתי אחרי לחיצת עכבר. */
+    var head = $("#scr-" + screen).querySelector("h1");
+    if (head) {
+      head.setAttribute("tabindex", "-1");
+      try { head.focus({ preventScroll: true }); } catch (e) { head.focus(); }
+    }
     window.scrollTo(0, 0);
-    say(TITLES[screen]);
+    /* שם המסך יורד לכותרת המסמך ולא ל-#live: הפוקוס על ה-h1 כבר
+       הכריז אותו, ושני ערוצים על אותו משפט פירושם לשמוע את שם
+       המסך פעמיים בכל מעבר. הכותרת מוסיפה מידע במקום לחזור עליו —
+       היא זו שנקראת בהחלפת לשונית ובחזרה לאפליקציה. */
+    document.title = TITLES[screen] +
+      (screen === "home" ? " — בגרות במתמטיקה, חמש יחידות" : " · שאלון 806");
   }
 
   /* --- אירועים. האזנה אחת על המסמך, ולא מאזין לכל כפתור --------- */
@@ -794,6 +886,8 @@
       keepVal(hint);
       if (sh && pst.shown < (sh.sub.steps || []).length) pst.shown++;
       renderAns(hint);
+      /* אל הרמז עצמו, ולא אל הכפתור: זה מה שהמשתמש ביקש לקרוא */
+      focusEl(lastIn(hint, ".hint .grow"));
       say("רמז " + pst.shown);
       return;
     }
@@ -802,6 +896,7 @@
       keepVal(sol);
       pOf(sol).sol = true;
       renderAns(sol);
+      focusEl(lastIn(sol, ".solution .grow"));
       say("הפתרון המלא נפתח.");
       return;
     }
@@ -810,6 +905,9 @@
       keepVal(hcl);
       var pc = pOf(hcl); pc.shown = 0; pc.sol = false;
       renderAns(hcl);
+      /* "סגרו" עצמו כבר לא קיים — חוזרים לשדה התשובה */
+      focusEl(lastIn(hcl, "#in-" + hcl));
+      say("הרמזים נסגרו.");
       return;
     }
     var chk = el.getAttribute("data-check");
@@ -822,17 +920,24 @@
       pc2.tries++;
       recordResult(sc.q, chk, pc2.res.ok);
       renderAns(chk);
-      say(pc2.res.ok ? "נכון" : "עוד לא. " + (pc2.res.why || ""));
-      var again = document.getElementById("in-" + chk);
-      if (again && !pc2.res.ok) again.focus();
+      /* אותו מידע שמופיע על המסך, ולא פחות ממנו: הנוסח שמופיע אחרי
+         שני ניסיונות הוא הדרך היחידה קדימה למי שנתקע, ומי שמקשיב
+         היה מפספס אותו לגמרי. */
+      say(pc2.res.ok ? "נכון" :
+          "עוד לא. " + (pc2.res.why || "") +
+          (pc2.tries >= 2 && !pc2.sol ? " אפשר לקחת רמז, ואפשר לפתוח את הפתרון המלא." : ""));
+      /* שגוי — חוזרים לשדה, שם צריך לתקן. נכון — חוזרים לכפתור
+         "בדקו", כדי לא לפתוח מקלדת על סעיף שכבר נגמר. */
+      if (!pc2.res.ok) focusEl(lastIn(chk, "#in-" + chk));
+      else focusEl(lastIn(chk, "[data-check]"));
       return;
     }
     var relEl = el.getAttribute("data-read-el");
     if (relEl) {
       if (el.classList.contains("on")) { window.Speech.stop(); return; }
-      var target = document.getElementById(relEl);
+      var target = elIn(relEl);
       if (!target) return;
-      window.Speech.speak([{ text: target.textContent, el: target }], "el:" + relEl);
+      window.Speech.speak([{ text: elText(target), el: target }], "el:" + relEl);
       return;
     }
 
@@ -856,7 +961,17 @@
       return;
     }
     var rt = el.getAttribute("data-rate");
-    if (rt) { store.data.rate = Number(rt); store.save(); applyPrefs(); return; }
+    if (rt) {
+      store.data.rate = Number(rt); store.save();
+      /* דרך setRate ולא בהשמה ישירה: שינוי קצב אינו משפיע על אמירה
+         שכבר יצאה למנוע, ולכן setRate עוצר את ההקראה הנוכחית. בלי
+         הקריאה הזאת המשתמש לחץ "לאט" באמצע הקראה, שמע את אותו קצב
+         ממשיך, והסיק שהבורר שבור. applyPrefs לבדו לא מתאים כאן:
+         הוא רץ גם על שינוי גודל טקסט ומראה, ושם עצירת ההקראה
+         הייתה עונש על פעולה שאין לה קשר לקול. */
+      if (window.Speech) window.Speech.setRate(store.data.rate);
+      applyPrefs(); return;
+    }
 
     var exam = el.getAttribute("data-exam");
     if (exam) { state.examId = exam; store.data.examId = exam; store.save(); go("mode"); return; }
@@ -914,7 +1029,11 @@
   if (window.Speech) {
     window.Speech.onstate = function (on) {
       $("#stopbar").hidden = !on;
-      $$("[data-read]").forEach(function (b) {
+      /* גם כפתורי הרמז והפתרון, ולא רק [data-read]. בלעדיהם הם לא
+         קיבלו את הסימון "on" לעולם — ולכן גם הבדיקה שבלחיצה, שאמורה
+         להפוך לחיצה שנייה לעצירה, לא הייתה נכונה אף פעם: מי שלחץ
+         שוב על הרמז שמע אותו מתחיל מחדש במקום להיפסק. */
+      $$("[data-read],[data-read-el]").forEach(function (b) {
         b.classList.remove("on");
         b.setAttribute("aria-pressed", "false");
       });
@@ -925,7 +1044,10 @@
       if (!on) return;
       var t = window.Speech.tag;
       if (t) {
-        var b = document.querySelector('[data-read="' + t + '"]');
+        var sel = t.indexOf("el:") === 0
+          ? '[data-read-el="' + t.slice(3) + '"]'
+          : '[data-read="' + t + '"]';
+        var b = document.querySelector(sel);
         if (b) { b.classList.add("on"); b.setAttribute("aria-pressed", "true"); }
       }
     };
