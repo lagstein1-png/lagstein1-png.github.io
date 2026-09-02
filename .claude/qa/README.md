@@ -15,7 +15,7 @@
 | `options.js <app...>` | **כמה אפשרויות התלמיד באמת רואה** — ומה שיעור השאלות שמציגות פחות מארבע |
 | `smoke.js <page...>` | טוען כל דף, עובר שער תנאים ואונבורדינג, לוחץ על כל כפתור, אוסף שגיאות JS |
 | `exam.js [app...]` | **האם מה שהמורה רואה בבונה המבחן הוא מה שהתלמיד מקבל** — וגם שמבחן ישן עדיין נבנה כפי שנבנה |
-| `cache.js [app...]` | **האם `BUILD` ומפתח ה-`?v=` תואמים בכל אחד־עשר ה-sw.js** — וגם שאין `caches.match` גלובלי |
+| `cache.js [app...]` | **האם `BUILD` ומפתח ה-`?v=` תואמים בכל שנים־עשר ה-sw.js** — וגם שאין `caches.match` גלובלי |
 
 eslint:
 
@@ -65,8 +65,8 @@ eslint:
 
 | קובץ | ממצא | למה הוא שפיר |
 |---|---|---|
-| english, history, math-app, math-teen, math-uni, math-uni2, math-uni3 | `'id' is already defined` | `var id` חוזר באותו scope |
-| english, history | `'lg' is already defined` | אותו דבר |
+| english, history, ulpan, civics, math-app, math-teen, math-uni, math-uni2, math-uni3 | `'id' is already defined` | `var id` חוזר באותו scope |
+| english, history, ulpan, civics | `'lg' is already defined` | אותו דבר |
 | math-app | `'nm' is already defined` | שני `var nm` עוקבים באותה פונקציה |
 | math-app | `'tDesc' is not defined` | `typeof tDesc==="function"` — שמירה על תכונה אופציונלית |
 | math-teen | `'VOICE_SAMPLE' is not defined` ×5 | מוגדר ב-`Object.defineProperty(window,...)` כדי להחזיר עברית או ערבית לפי `LG`. eslint אינו רואה גלובל שנוצר כך |
@@ -86,7 +86,7 @@ eslint:
 בלי מפתח הקאש. אף אחד מהשניים אינו מתפוצץ במסך: הראשון מגיש קובץ ישן
 ששמר worker של אפליקציה אחרת, והשני פשוט לא מגיע למי שכבר התקין.
 
-לכן הבדיקה רצה על כל אחד־עשר הקבצים יחד ולא על מה שהשתנה. **קו הבסיס
+לכן הבדיקה רצה על כל שנים־עשר הקבצים יחד ולא על מה שהשתנה. **קו הבסיס
 שלה הוא אפס.**
 
 `caches.match` בתוך הערה אינו ממצא — ההערות מוסרות לפני החיפוש, כי

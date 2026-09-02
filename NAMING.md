@@ -30,6 +30,7 @@
 | `math-uni3` | אקסיומה ג׳ | أكسيوما ٣ | Аксиома III | Axioma III |
 | `english` | ניב | نِيف | Нив | Niv |
 | `history` | מפנה | مفنيه | Мифне | Mifne |
+| `civics` | אזרח | إزراح | Эзрах | Ezrach |
 | `reader` | מקריא קולי | قارئ صوتي | Голосовой чтец | Voice reader |
 | `voice` | בדיקת קול | — | — | — |
 
