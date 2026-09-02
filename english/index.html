@@ -2915,9 +2915,9 @@ function formMean(tp,lv,pool,idx){
 function formBack(tp,lv,pool,idx){
   var it=pool[idx];
   var ds=wordDistract(it,pool,14);
-  var opts=fillOpts([O('<span class="en-b">'+esc(it.w)+"</span>",true)],ds,4,
+  var opts=fillOpts([O('<span class="en-b" lang="en">'+esc(it.w)+"</span>",true)],ds,4,
     function(d){return d.w.toLowerCase()},
-    function(d){return O('<span class="en-b">'+esc(d.w)+"</span>",false,
+    function(d){return O('<span class="en-b" lang="en">'+esc(d.w)+"</span>",false,
       d.g?(d.w+" = "+gl(d.g)):"")},
     it.w.toLowerCase());
   return {type:"back",prompt:t("qSay"),lead:ml(lv,it.g),subject:null,
@@ -2931,9 +2931,9 @@ function formHear(tp,lv,pool,idx){
      הסדר ב-wordDistract הוא הסדר החינוכי: קודם זוגות המינימום
      של המילה עצמה, ורק אחריהן מילים אחרות מאותה רמה. */
   var ds=wordDistract(it,pool,14);
-  var opts=fillOpts([O('<span class="en-b">'+esc(it.w)+"</span>",true)],ds,4,
+  var opts=fillOpts([O('<span class="en-b" lang="en">'+esc(it.w)+"</span>",true)],ds,4,
     function(d){return d.w.toLowerCase()},
-    function(d){return O('<span class="en-b">'+esc(d.w)+"</span>",false,
+    function(d){return O('<span class="en-b" lang="en">'+esc(d.w)+"</span>",false,
       d.g?(d.w+" = "+gl(d.g)):"")},
     it.w.toLowerCase());
   return {type:"hear",prompt:t("qHear"),subject:null,hidden:it,
@@ -2948,9 +2948,9 @@ function formUse(tp,lv,pool,idx){
      בשלוש אפשרויות. */
   var others=shuffle(pool.filter(function(x){return x.k==="s"&&x!==it}))
     .concat(shuffle(allSents().filter(function(x){return x!==it})));
-  var opts=fillOpts([O('<span class="en-b">'+esc(it.s)+"</span>",true)],others,4,
+  var opts=fillOpts([O('<span class="en-b" lang="en">'+esc(it.s)+"</span>",true)],others,4,
     function(d){return d.s},
-    function(d){return O('<span class="en-b">'+esc(d.s)+"</span>",false,gl(d.g))},
+    function(d){return O('<span class="en-b" lang="en">'+esc(d.s)+"</span>",false,gl(d.g))},
     it.s);
   return {type:"use",prompt:t("qUse"),lead:it.u?gl(it.u):gl(it.g),subject:null,
     opts:shuffle(opts),answer:it.s,say:it.s,reveal:it};
@@ -3016,11 +3016,11 @@ function formGap(tp,lv,pool,idx){
   var backup=shuffle(allWords()).map(function(x){return x.w.replace(/[^A-Za-z']/g,"")})
     .filter(function(b){return b.length>=3&&!STOP_GAP.test(b)});
   var cands=shuffle(others).concat(backup);
-  var opts=fillOpts([O('<span class="en-b">'+esc(gone)+"</span>",true)],cands,4,
+  var opts=fillOpts([O('<span class="en-b" lang="en">'+esc(gone)+"</span>",true)],cands,4,
     function(w){return w.toLowerCase()},
-    function(w){return O('<span class="en-b">'+esc(w)+"</span>",false)},
+    function(w){return O('<span class="en-b" lang="en">'+esc(w)+"</span>",false)},
     gone.toLowerCase());
-  return {type:"gap",prompt:t("qGap"),gapHtml:'<span class="en-b">'+esc(shown.join(" "))+"</span>",
+  return {type:"gap",prompt:t("qGap"),gapHtml:'<span class="en-b" lang="en">'+esc(shown.join(" "))+"</span>",
     lead:gl(it.g),subject:null,opts:shuffle(opts),answer:gone,say:it.s,reveal:it};
 }
 /* --- צורה 6: בניית משפט מאריחים --- */
@@ -3144,7 +3144,7 @@ function spkBtn(text,lang,slow,label){
 function subjectBox(it){
   var w=it.w||it.s||"";
   return '<div class="subject"><span class="word">'+esc(w)+"</span>"+
-    (it.ipa?'<span class="ipa">'+esc(it.ipa)+"</span>":"")+
+    (it.ipa?'<span class="ipa" aria-hidden="true">'+esc(it.ipa)+"</span>":"")+
     '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
     spkBtn(w,"en",false,t("hearWord"))+spkBtn(w,"en",true,t("hearSlow"))+"</span></div>";
 }
@@ -3237,10 +3237,10 @@ function screenPractice(){
   if(P.done){
     var it=q.reveal||q.subject||q.hidden;
     h+='<div class="fb '+(P.ok?"ok":"bad")+'"><b>'+(P.ok?esc(t("correct")):esc(t("wrong")))+"</b>";
-    if(!P.ok)h+='<div class="body">'+esc(t("answerIs"))+' <span class="en-b"><b>'+esc(q.answer)+"</b></span></div>";
-    if(it&&it.k==="w"&&it.g)h+='<div class="why"><span class="en-b"><b>'+esc(it.w)+"</b></span>"+
-      (it.ipa?' <span class="en-b">'+esc(it.ipa)+"</span>":"")+" — "+esc(gl(it.g))+"</div>";
-    if(it&&it.k==="s")h+='<div class="why"><span class="en-b">'+esc(it.s)+"</span><br>"+esc(gl(it.g))+
+    if(!P.ok)h+='<div class="body">'+esc(t("answerIs"))+' <span class="en-b" lang="en"><b>'+esc(q.answer)+"</b></span></div>";
+    if(it&&it.k==="w"&&it.g)h+='<div class="why"><span class="en-b" lang="en"><b>'+esc(it.w)+"</b></span>"+
+      (it.ipa?' <span class="en-b" lang="en" aria-hidden="true">'+esc(it.ipa)+"</span>":"")+" — "+esc(gl(it.g))+"</div>";
+    if(it&&it.k==="s")h+='<div class="why"><span class="en-b" lang="en">'+esc(it.s)+"</span><br>"+esc(gl(it.g))+
       (it.u?"<br><b>"+esc(gl(it.u))+"</b>":"")+"</div>";
     if(!P.ok&&P.picked>=0&&q.opts&&q.opts[P.picked]&&q.opts[P.picked].why)
       h+='<div class="why">'+esc(q.opts[P.picked].why)+"</div>";
