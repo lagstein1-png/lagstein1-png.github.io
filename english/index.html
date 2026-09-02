@@ -942,7 +942,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n34 · 2026-09-02";
+var BUILD="n35 · 2026-09-02";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -2811,6 +2811,22 @@ function chooseIndex(tid,lv,pool,avoid){
   return pick(cand);
 }
 function poolOf(tp,lv){return (tp.L[lv-1]||tp.L[0]||[])}
+/* בחירת פריט למבחן. אחידה, ואינה נוגעת ב-state כלל.
+
+   הבחירה לתרגול שמעליה שוקלת את הפריטים לפי היסטוריית הלמידה,
+   וזה נכון לתרגול ושגוי למבחן: מבחן נארז לקישור כזרע בלבד,
+   והתלמיד בונה ממנו את השאלות מחדש אצלו. משקלים שנגזרים
+   מ-state.item שונים אצל המורה ואצל התלמיד, ולכן אותו זרע היה
+   מייצר אצלם שאלות שונות — המורה מאשר מבחן אחד והכיתה נבחנת
+   באחר, בלי שדבר יצעק. נמדד: עשירית מהשאלות בהרכב מעורב. */
+function pureIndex(pool,avoid){
+  var cand=[],i;
+  for(i=0;i<pool.length;i++){
+    if(avoid!==undefined&&i===avoid&&pool.length>1)continue;
+    cand.push(i);
+  }
+  return cand.length?pick(cand):0;
+}
 function kindsIn(pool){
   var k={w:[],s:[],p:[]},i;
   for(i=0;i<pool.length;i++)if(k[pool[i].k])k[pool[i].k].push(i);
@@ -3048,10 +3064,10 @@ function formComp(tp,lv,pool,idx){
 
 /* בוחר את צורת התרגיל. הרמה קובעת כמה פיגום נשאר: ברמה 1 שפת האם
    נוכחת תמיד, ברמה 3 היא נעלמת וגם האוזן לבדה נדרשת. */
-function buildQuestion(tid,lv,avoid){
+function buildQuestion(tid,lv,avoid,pure){
   var tp=topicOf(tid); if(!tp)return null;
   var pool=poolOf(tp,lv), k=kindsIn(pool);
-  var idx=chooseIndex(tid,lv,pool,avoid);
+  var idx=pure?pureIndex(pool,avoid):chooseIndex(tid,lv,pool,avoid);
   var it=pool[idx];
   var q;
   if(it.k==="p")q=formComp(tp,lv,pool,idx);
@@ -3473,7 +3489,8 @@ function lvlSync(){LVL[0]=t("lv1");LVL[1]=t("lv2");LVL[2]=t("lv3")}
 var LVL_C=["var(--c-sound)","var(--c-words)","var(--c-talk)"];
 
 function buildQ(tid,lv){
-  var q=buildQuestion(tid,lv,undefined); if(!q)return null;
+  /* pure=true — המבחן אינו מביט בהתקדמות הלומד. ראו pureIndex. */
+  var q=buildQuestion(tid,lv,undefined,true); if(!q)return null;
   var tp=topicOf(tid);
   /* תרגיל סידור המשפט נבנה מאריחים ואין לו אפשרויות בחירה. במבחן
      הכיתתי יש רק בחירה מרובה, ולכן שאלה כזאת הגיעה לתלמיד בלי שום
@@ -4872,7 +4889,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n34-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n35-pwa1").catch(function(){});
   });
 }
 </script>

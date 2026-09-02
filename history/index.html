@@ -941,7 +941,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m36 · 2026-09-02";
+var BUILD="m37 · 2026-09-02";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -3726,6 +3726,22 @@ function chooseIndex(tid,lv,pool,avoid){
   return pick(cand);
 }
 function poolOf(tp,lv){return (tp.L[lv-1]||tp.L[0]||[])}
+/* בחירת פריט למבחן. אחידה, ואינה נוגעת ב-state כלל.
+
+   הבחירה לתרגול שמעליה שוקלת את הפריטים לפי היסטוריית הלמידה,
+   וזה נכון לתרגול ושגוי למבחן: מבחן נארז לקישור כזרע בלבד,
+   והתלמיד בונה ממנו את השאלות מחדש אצלו. משקלים שנגזרים
+   מ-state.item שונים אצל המורה ואצל התלמיד, ולכן אותו זרע היה
+   מייצר אצלם שאלות שונות — המורה מאשר מבחן אחד והכיתה נבחנת
+   באחר, בלי שדבר יצעק. נמדד: עשירית מהשאלות בהרכב מעורב. */
+function pureIndex(pool,avoid){
+  var cand=[],i;
+  for(i=0;i<pool.length;i++){
+    if(avoid!==undefined&&i===avoid&&pool.length>1)continue;
+    cand.push(i);
+  }
+  return cand.length?pick(cand):0;
+}
 
 /* שנה לתצוגה. שנה שלילית היא לפני הספירה, וזה נכתב במילים ולא
    במינוס — תלמיד שרואה "−450" לא יודע שמדובר בשנה. */
@@ -3951,11 +3967,11 @@ function hintFor(q,tp){
   if(q.answer===yr(it.y))return centuryStr(it.y);
   return t("hintYearL")+": "+yr(it.y);
 }
-function buildQuestion(tid,lv,avoid){
+function buildQuestion(tid,lv,avoid,pure){
   var tp=topicOf(tid); if(!tp)return null;
   var pool=poolOf(tp,lv);
   if(!pool.length)return null;
-  var idx=chooseIndex(tid,lv,pool,avoid);
+  var idx=pure?pureIndex(pool,avoid):chooseIndex(tid,lv,pool,avoid);
   var it=pool[idx],q=null,f;
   if(it.k==="p")q=formSrc(tp,lv,pool,idx);
   else if(it.k==="c")q=formTerm(tp,lv,pool,idx);
@@ -4367,7 +4383,8 @@ function plainOf(h){
   return (d.textContent||"").replace(/\s+/g," ").trim();
 }
 function buildQ(tid,lv){
-  var q=buildQuestion(tid,lv,undefined); if(!q)return null;
+  /* pure=true — המבחן אינו מביט בהתקדמות הלומד. ראו pureIndex. */
+  var q=buildQuestion(tid,lv,undefined,true); if(!q)return null;
   var tp=topicOf(tid);
   /* שאלה על מקור נושאת את הקטע עצמו. בלעדיו אי אפשר לענות עליה,
      והמבחן היה מציג שאלה בלי מה שהיא שואלת עליו. */
@@ -5810,7 +5827,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m36-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m37-pwa1").catch(function(){});
   });
 }
 </script>
