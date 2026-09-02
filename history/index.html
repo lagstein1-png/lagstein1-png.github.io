@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>מפנה — היסטוריה לחטיבת הביניים</title>
 <meta name="description" content="היסטוריה לחטיבת הביניים למי שלומד אחרת: כל אירוע עם תאריך, סיבה ותוצאה, עם מקורות ומושגים — מהעת העתיקה ועד המאה ה-20. בעברית, ערבית, רוסית ואנגלית." />
-<meta name="theme-color" content="#0d1b1a" />
+<meta name="theme-color" content="#f4f7f6" media="(prefers-color-scheme:light)" />
+<meta name="theme-color" content="#0d1b1a" media="(prefers-color-scheme:dark)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -23,7 +24,7 @@
   --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
   --en:"Lexend","Heebo",system-ui,"Segoe UI",Arial,sans-serif;
   --bg:#f4f7f6; --surface:#ffffff; --surface2:#e9efee;
-  --ink:#0f1f1d; --muted:#54655f; --faint:#83948e; --line:#dde6e3;
+  --ink:#0f1f1d; --muted:#54655f; --faint:#6f817b; --line:#dde6e3;
   --accent:#0f766e; --accent-ink:#ffffff; --accent-soft:#d6f0eb;
   --gold:#a16207; --gold-soft:#fbf0d5; --hit:#f5c451; --hit-ink:#1a1300;
   --ok:#15803d; --ok-soft:#dcfce7; --bad:#be123c; --bad-soft:#ffe4e9;
@@ -88,6 +89,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
 :root.clear body{font-family:"Verdana","Tahoma","Heebo",sans-serif;letter-spacing:.012em}
 :root.spaced body{word-spacing:.22em;line-height:1.95}
 :root.rm *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 h1,h2,h3{margin:0;line-height:1.3;font-weight:800}
 button{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
@@ -939,7 +941,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m35 · 2026-09-01";
+var BUILD="m36 · 2026-09-02";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -1484,31 +1486,70 @@ function femLift(v){
    על המסך מה קרה. יום שלם אבד כי כשלא היה קול, שום דבר לא אמר למה.
    ------------------------------------------------------------ */
 var VCHK="";
+/* ------------------------------------------------------------
+   תוצאת בדיקת הקול, בארבע שפות. הכפתור היה מתורגם והתשובה לא:
+   מי שהקול לא עובד לו ואינו קורא עברית קיבל הודעת תקלה בעברית —
+   בדיוק המשתמש שהבדיקה נועדה לו. טבלה נפרדת ולא TR_KEYS, כדי לא
+   להזיז אינדקסים, ומפני ש-math-teen מתרגם לערבית בלבד.
+   ------------------------------------------------------------ */
+var VCHKMSG={
+  he:{sent:"נשלח…",noSup:"✗ הדפדפן הזה לא תומך בהקראה",mkFail:"✗ יצירת האמירה נכשלה: ",
+      okN:["✓ הקול פועל — "," קולות במכשיר"],ok:"✓ הקול פועל",unk:"לא ידוע",
+      engine:["✗ המנוע החזיר "," קולות · זו תקלה במכשיר, לא באפליקציה"],
+      spFail:"✗ speak נכשל: ",timeout:["✗ שתי שניות ואין תגובה מהמנוע · "," קולות במכשיר"],
+      say:"שלום, זו בדיקת קול"},
+  ar:{sent:"جارٍ الإرسال…",noSup:"✗ هذا المتصفّح لا يدعم القراءة الصوتية",mkFail:"✗ فشل إنشاء النطق: ",
+      okN:["✓ الصوت يعمل — "," صوتًا في الجهاز"],ok:"✓ الصوت يعمل",unk:"غير معروف",
+      engine:["✗ أعاد المحرّك "," صوتًا · هذا عطل في الجهاز، لا في التطبيق"],
+      spFail:"✗ فشل speak: ",timeout:["✗ ثانيتان بلا ردّ من المحرّك · "," صوتًا في الجهاز"],
+      say:"مرحبًا، هذا فحص صوت"},
+  ru:{sent:"Отправляем…",noSup:"✗ Этот браузер не поддерживает озвучивание",mkFail:"✗ Не удалось создать реплику: ",
+      okN:["✓ Голос работает — голосов: ",""],ok:"✓ Голос работает",unk:"неизвестно",
+      engine:["✗ Синтезатор вернул "," голосов · это неполадка устройства, а не приложения"],
+      spFail:"✗ speak не сработал: ",timeout:["✗ Две секунды без ответа от синтезатора · "," голосов"],
+      say:"Здравствуйте, это проверка голоса"},
+  en:{sent:"Sending…",noSup:"✗ This browser does not support read-aloud",mkFail:"✗ Could not create the utterance: ",
+      okN:["✓ The voice works — "," voices on this device"],ok:"✓ The voice works",unk:"unknown",
+      engine:["✗ The engine returned "," voices · this is a device fault, not an app fault"],
+      spFail:"✗ speak failed: ",timeout:["✗ Two seconds and no response from the engine · "," voices on this device"],
+      say:"Hello, this is a voice check"}
+};
+function vchkT(){ var g=state.lang||"he"; return VCHKMSG[g]||VCHKMSG.he }
 function voiceCheck(){
-  VCHK="…"; render();
+  var M=vchkT();
+  VCHK=M.sent; render();
   function show(m){ VCHK=m; render() }
-  if(!("speechSynthesis" in window)){ show("✗ הדפדפן הזה לא תומך בהקראה"); return }
+  if(!("speechSynthesis" in window)){ show(M.noSup); return }
   var list=[]; try{ list=speechSynthesis.getVoices()||[] }catch(e){}
   try{ speechSynthesis.cancel() }catch(e){}
   var u;
-  try{ u=new SpeechSynthesisUtterance("שלום, זו בדיקת קול") }
-  catch(e){ show("✗ יצירת האמירה נכשלה: "+e.message); return }
-  u.lang="he-IL"; u.volume=1; u.rate=1; u.pitch=1;
+  try{ u=new SpeechSynthesisUtterance(M.say) }
+  catch(e){ show(M.mkFail+e.message); return }
+  u.lang=(LANGS[state.lang||"he"]||LANGS.he).tts; u.volume=1; u.rate=1; u.pitch=1;
   var done=false;
-  u.onstart=function(){ done=true; show("✓ הקול פועל — "+list.length+" קולות במכשיר") };
+  u.onstart=function(){ done=true; show(M.okN[0]+list.length+M.okN[1]) };
   u.onerror=function(e){ done=true;
-    var er=(e&&e.error)||"לא ידוע";
-    if(er==="interrupted"||er==="canceled"){ show("✓ הקול פועל"); return }
-    show("✗ המנוע החזיר "+er+" · "+list.length+" קולות · זו תקלה במכשיר, לא באפליקציה"); };
+    var er=(e&&e.error)||M.unk;
+    if(er==="interrupted"||er==="canceled"){ show(M.ok); return }
+    show(M.engine[0]+er+" · "+list.length+M.engine[1]); };
   try{ speechSynthesis.speak(u) }
-  catch(e){ show("✗ speak נכשל: "+e.message); return }
+  catch(e){ show(M.spFail+e.message); return }
   setTimeout(function(){ if(!done)
-    show("✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר") },2000);
+    show(M.timeout[0]+list.length+M.timeout[1]) },2000);
 }
 
+/* ------------------------------------------------------------
+   דור ההקראה. speechSynthesis.cancel() אינו מבטל setTimeout:
+   כרום יורה onend על האמירה שבוטלה, המקטע הבא נרשם בכל זאת,
+   וכעבור SEG_GAP ההקראה הישנה חוזרת מעל החדשה — שני קולות
+   במקביל. מונה אחד פותר את זה: כל הקראה מקבלת מספר, stopSpeak
+   מקדם אותו, ומקטע מדור ישן פשוט אינו מדבר.
+   ------------------------------------------------------------ */
+var _sayGen=0;
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
   try{speechSynthesis.cancel()}catch(e){}
+  var my=++_sayGen;
   /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
      שממתין לרשימת הקולות ועד ארבע שניות אם היא לא מגיעה — ואמירה
      שיוצאת ארבע שניות אחרי המגע נזרקת בשקט באנדרואיד ובספארי.
@@ -1522,6 +1563,7 @@ function speakDevice(text,code,rate){
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
       var pit=femLift(v);
       (function sayseg(k){
+        if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
         if(k>=segs.length){ hlClear(); ttsOK(); return }
         var seg=segs[k];
         var u=new SpeechSynthesisUtterance(seg.text);
@@ -1551,12 +1593,14 @@ function speak(text,lang,rateMul){
   var code=lang==="en"?EN_TTS:LANGS[lang].tts;
   var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
   stopSpeak();
+  var my=_sayGen;   /* גם תשובת רשת שמגיעה אחרי עצירה לא תושמע */
   if(gemOn()){
     var vid=gvOf(state.gemVoice).id;
     var ck=lang+"|"+vid+"|"+rate.toFixed(2)+"|"+text;
     if(gCache[ck]){playUrl(gCache[ck],text,code,rate);return}
     gBusy=true; renderSpeakState();
     gSynth(text,vid,rate,lang).then(function(u){
+      if(my!==_sayGen)return;
       gCache[ck]=u; gBusy=false; renderSpeakState(); playUrl(u,text,code,rate);
     }).catch(function(){
       gBusy=false; renderSpeakState(); speakDevice(text,code,rate);
@@ -1572,7 +1616,7 @@ function playUrl(url,text,code,rate){
   gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){_sayGen++;gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -1614,7 +1658,7 @@ function renderSpeakState(){
 function E(y,t,w,c,e){return {k:"e",y:y,t:t,w:w,c:c,e:e}}
 function C(t,d){return {k:"c",t:t,d:d}}
 function Sc(lines,qs){return {k:"p",lines:lines,qs:qs}}
-function Q(q,a,w){return {q:q,a:a,w:w}}
+function Q(q,a,w,y){return {q:q,a:a,w:w,y:y||[]}}
 
 var TRACKS=[
   {id:"anc", cls:"t-sound",nk:"trkAnc",dk:"trkAncD",icon:"spark"},
@@ -1780,14 +1824,20 @@ topic("greece","anc",
           "Poverty is no obstacle either: a man who can serve the city is not rejected because of his standing."]},
      [Q({he:"מה מציג פריקלס כיתרון של אתונה?",ar:"ما الذي يعرضه بريكليس كميزة لأثينا؟",ru:"Что Перикл представляет как преимущество Афин?",en:"What does Pericles present as the advantage of Athens?"},
         {he:"תפקיד ציבורי ניתן לפי כישרון ולא לפי מוצא או עושר.",ar:"المنصب العام يُمنح حسب الكفاءة لا حسب الأصل أو الثروة.",ru:"Общественная должность даётся по способностям, а не по происхождению или богатству.",en:"Public office is given by ability, not by birth or wealth."},
-        [{he:"רק בני האצולה יכולים לשמש בתפקיד ציבורי.",ar:"أبناء الأرستقراطية وحدهم يمكنهم تولّي منصب عام.",ru:"Только знатные могут занимать общественную должность.",en:"Only the nobility may hold public office."},
-         {he:"המלך ממנה את בעלי התפקידים.",ar:"الملك يعيّن أصحاب المناصب.",ru:"Должностных лиц назначает царь.",en:"The king appoints the officials."},
-         {he:"החוק שונה לעשירים ולעניים.",ar:"القانون يختلف للأغنياء والفقراء.",ru:"Закон различен для богатых и бедных.",en:"The law is different for rich and poor."}]),
+        [{he:"רק בני האצולה מקבלים תפקיד ציבורי, לפי מוצא המשפחה שלהם.",ar:"أبناء الأرستقراطية وحدهم ينالون منصبًا عامًا، حسب أصل العائلة.",ru:"Общественную должность в городе получают только знатные люди, по происхождению их семьи.",en:"Only nobles receive public office, according to their family birth."},
+         {he:"המלך ממנה את בעלי התפקידים, והעם מאשר את בחירתו באסיפה.",ar:"الملك يعيّن أصحاب المناصب، والشعب يصادق على اختياره في الجمعية.",ru:"Должностных лиц в городе назначает царь, а народ утверждает сделанный им выбор на собрании.",en:"The king appoints the officials, and the people approve his choice at the assembly."},
+         {he:"החוק שונה לעשירים ולעניים גם בסכסוך פרטי פשוט ביניהם.",ar:"القانون يختلف للأغنياء والفقراء حتى في خلاف خاص بسيط بينهم.",ru:"Закон различен для богатых и для бедных даже в самом простом частном споре между ними.",en:"The law differs for rich and poor in a private dispute between them."}],
+        [{he:"המקור אומר בדיוק ההפך: לא המוצא קובע אלא הכישרון.",ar:"المصدر يقول العكس تمامًا: لا يحسم الأصل بل الكفاءة.",ru:"Источник говорит прямо обратное: решает не происхождение, а способность.",en:"The source says the opposite: ability decides, not birth."},
+         {he:"באתונה אין מלך. את ההחלטות מקבלת אסיפת העם.",ar:"لا ملك في أثينا. الجمعية الشعبية هي التي تقرّر.",ru:"В Афинах нет царя. Решения принимает народное собрание.",en:"Athens has no king. The assembly of the people decides."},
+         {he:"המקור אומר שבפני החוק הכול שווים בסכסוך פרטי.",ar:"يقول المصدر إن الجميع سواء أمام القانون في خلاف خاص.",ru:"Источник говорит, что перед законом все равны в частном споре.",en:"The source says all are equal before the law in a private dispute."}]),
       Q({he:"מי אינו נכלל ב״רבים״ שעליהם מדבר פריקלס?",ar:"من لا يشمله «الكثرة» الذين يتحدث عنهم بريكليس؟",ru:"Кто не входит в «большинство», о котором говорит Перикл?",en:"Who is not included in the \"many\" Pericles speaks of?"},
-        {he:"נשים, זרים ועבדים — הם לא היו אזרחים ולא הצביעו.",ar:"النساء والغرباء والعبيد — لم يكونوا مواطنين ولم يصوّتوا.",ru:"Женщины, чужеземцы и рабы — они не были гражданами и не голосовали.",en:"Women, foreigners and slaves — they were not citizens and did not vote."},
-        [{he:"החקלאים, שגרו מחוץ לעיר.",ar:"الفلاحون، الذين سكنوا خارج المدينة.",ru:"Земледельцы, жившие за городом.",en:"The farmers, who lived outside the city."},
-         {he:"החיילים, שהיו בחזית.",ar:"الجنود، الذين كانوا في الجبهة.",ru:"Воины, находившиеся на фронте.",en:"The soldiers, who were at the front."},
-         {he:"אף אחד — כל תושבי אתונה הצביעו.",ar:"لا أحد — كل سكان أثينا صوّتوا.",ru:"Никто — голосовали все жители Афин.",en:"No one — every inhabitant of Athens voted."}])])
+        {he:"נשים, זרים ועבדים, שלא היו אזרחים ולא הצביעו.",ar:"النساء والغرباء والعبيد، فلم يكونوا مواطنين ولم يصوّتوا.",ru:"Женщины, чужеземцы и рабы, которые не были гражданами и не голосовали.",en:"Women, foreigners and slaves, who were not citizens and did not vote."},
+        [{he:"החקלאים, שגרו רחוק מהעיר ועבדו בשדה בימי האסיפה.",ar:"الفلاحون، الذين سكنوا بعيدًا عن المدينة وعملوا في الحقل أيام الجمعية.",ru:"Земледельцы, жившие далеко за городом и работавшие в поле в дни собрания.",en:"The farmers, who lived far outside the city and worked their fields on assembly days."},
+         {he:"החיילים, שהיו בחזית בימים שבהם התכנסה האסיפה בעיר.",ar:"الجنود، الذين كانوا في الجبهة أيام انعقاد الجمعية في المدينة.",ru:"Воины, находившиеся на фронте в те дни, когда собрание сходилось в городе.",en:"The soldiers, who were at the front in the days when the assembly met in the city."},
+         {he:"אף אחד, שהרי כל תושבי אתונה הצביעו באסיפת העם.",ar:"لا أحد، فكل سكان أثينا صوّتوا في الجمعية الشعبية.",ru:"Никто, ведь все жители Афин голосовали в народном собрании.",en:"No one, because all the inhabitants of Athens voted in the assembly."}],
+        [{he:"חקלאי אתונאי היה אזרח, וזכות ההצבעה שלו נשמרה.",ar:"الفلاح الأثيني كان مواطنًا، وحقّه في التصويت محفوظ.",ru:"Афинский земледелец был гражданином, и его право голоса сохранялось.",en:"An Athenian farmer was a citizen, and kept his right to vote."},
+         {he:"היעדרות זמנית אינה שלילת אזרחות. הם נשארו אזרחים.",ar:"الغياب المؤقت ليس سلبًا للمواطنة. بقوا مواطنين.",ru:"Временное отсутствие не лишает гражданства. Они оставались гражданами.",en:"Being away for a time is not loss of citizenship. They stayed citizens."},
+         {he:"רוב התושבים לא היו אזרחים כלל, ולכן לא הצביעו.",ar:"معظم السكان لم يكونوا مواطنين أصلًا، فلم يصوّتوا.",ru:"Большинство жителей вообще не были гражданами и не голосовали.",en:"Most inhabitants were not citizens at all, so they did not vote."}])])
  ]
 ]);
 
@@ -1939,14 +1989,20 @@ topic("rome","anc",
           "Whatever the people enacted last — that is the law."]},
      [Q({he:"מה מלמד המקור על המשפט ברומא?",ar:"ماذا يعلّمنا المصدر عن القضاء في روما؟",ru:"Что источник говорит о суде в Риме?",en:"What does the source show about justice in Rome?"},
         {he:"המשפט התנהל בפומבי ולפי כללים כתובים שכולם יכלו לדעת.",ar:"جرى القضاء علنًا ووفق قواعد مكتوبة يعرفها الجميع.",ru:"Суд шёл открыто и по записанным правилам, которые все могли знать.",en:"Justice was public and followed written rules that everyone could know."},
-        [{he:"רק כוהנים יכלו לשפוט.",ar:"الكهنة وحدهم كان لهم أن يقضوا.",ru:"Судить могли только жрецы.",en:"Only priests could judge."},
-         {he:"המלך הכריע בכל סכסוך.",ar:"الملك يفصل في كل نزاع.",ru:"Царь решал каждый спор.",en:"The king decided every dispute."},
-         {he:"אסור היה לחולה או לזקן לעמוד לדין.",ar:"لم يكن يجوز للمريض أو الشيخ أن يُحاكم.",ru:"Больного или старика нельзя было судить.",en:"The sick or the old could not be brought to trial."}]),
+        [{he:"רק כוהנים יכלו לשפוט, והחוק נשמר בידיהם ולא פורסם ברבים.",ar:"الكهنة وحدهم كان بإمكانهم القضاء، والقانون بأيديهم ولم يُنشر.",ru:"Судить могли только жрецы, и закон хранился в их руках, не оглашаясь.",en:"Only priests could judge, and the law was kept in their hands, unpublished."},
+         {he:"המלך הכריע בכל סכסוך, ופסק דינו נמסר בעל פה.",ar:"الملك كان يحسم كل خلاف، وحكمه يُبلَّغ شفويًا.",ru:"Царь решал каждый спор, и его приговор объявлялся устно.",en:"The king settled every dispute, and his ruling was given by word of mouth."},
+         {he:"אסור היה לחולה או לזקן לעמוד לדין בבית הדין הפומבי ברומא.",ar:"مُنع المريض أو المسنّ من المثول أمام المحكمة العلنية.",ru:"Больному или старику запрещалось представать перед открытым судом Рима.",en:"A sick or old man was forbidden to stand trial in the public court of Rome."}],
+        [{he:"המקור עצמו הוא חוק כתוב וגלוי, שכל אדם יכול לדעת.",ar:"المصدر نفسه قانون مكتوب ومعلن، يستطيع كل إنسان معرفته.",ru:"Сам источник — записанный и открытый закон, который может знать каждый.",en:"The source itself is a written, public law that anyone can know."},
+         {he:"המקור מייחס את קביעת החוק לעם, ולא למלך.",ar:"المصدر ينسب تقرير القانون إلى الشعب، لا إلى الملك.",ru:"Источник относит установление закона к народу, а не к царю.",en:"The source credits the people with setting the law, not a king."},
+         {he:"המקור אומר ההפך: נותנים לו בהמה כדי שיגיע.",ar:"المصدر يقول العكس: يُعطى دابّة كي يصل.",ru:"Источник говорит обратное: ему дают животное, чтобы он добрался.",en:"The source says the opposite: he is given an animal so he can come."}]),
       Q({he:"מהי משמעות המשפט האחרון?",ar:"ما معنى الجملة الأخيرة؟",ru:"Каков смысл последней строки?",en:"What does the last line mean?"},
         {he:"חוק חדש שהעם מחוקק גובר על חוק ישן יותר.",ar:"القانون الجديد الذي يسنّه الشعب يعلو على قانون أقدم.",ru:"Новый закон, принятый народом, отменяет более старый.",en:"A newer law made by the people overrides an older one."},
-        [{he:"רק חוקים עתיקים תקפים.",ar:"القوانين القديمة وحدها سارية.",ru:"Действуют только древние законы.",en:"Only ancient laws are valid."},
-         {he:"הסנאט לבדו מחוקק.",ar:"مجلس الشيوخ وحده يشرّع.",ru:"Законы принимает только сенат.",en:"Only the senate makes law."},
-         {he:"החוק אינו משתנה לעולם.",ar:"القانون لا يتغيّر أبدًا.",ru:"Закон никогда не меняется.",en:"The law never changes."}])])
+        [{he:"רק חוקים עתיקים תקפים, וחוק חדש בטל מעיקרו.",ar:"القوانين القديمة وحدها سارية، والقانون الجديد باطل من أصله.",ru:"Действуют только древние законы, а новый закон недействителен.",en:"Only ancient laws hold, and any new law is void from the start."},
+         {he:"הסנאט לבדו מחוקק את החוקים, בלי אישור של העם.",ar:"مجلس الشيوخ وحده يسنّ القوانين كلها، بلا مصادقة من الشعب.",ru:"Законы издаёт только сенат, без всякого утверждения народа.",en:"The senate alone makes the laws, without the people's approval."},
+         {he:"החוק אינו משתנה לעולם, גם לא בידי העם.",ar:"القانون لا يتغيّر أبدًا، ولا حتى بيد الشعب.",ru:"Закон не меняется никогда, даже самим народом.",en:"The law never changes, not even by the people."}],
+        [{he:"המילה ״באחרונה״ מצביעה על החוק המאוחר, לא המוקדם.",ar:"كلمة «أخيرًا» تشير إلى القانون المتأخر لا المبكر.",ru:"Слово «последним» указывает на поздний закон, а не на ранний.",en:"The word last points to the later law, not the earlier one."},
+         {he:"המשפט מייחס את הקביעה לעם, ולא לסנאט.",ar:"الجملة تنسب التقرير إلى الشعب، لا إلى مجلس الشيوخ.",ru:"Фраза относит решение к народу, а не к сенату.",en:"The line credits the people with the decision, not the senate."},
+         {he:"אם יש חוק ״אחרון״, סימן שהחוק כן משתנה.",ar:"إذا كان هناك قانون «أخير»، فالقانون يتغيّر إذن.",ru:"Если есть «последний» закон, значит закон всё же меняется.",en:"If there is a last law, then the law does change."}])])
  ]
 ]);
 
@@ -2102,14 +2158,20 @@ topic("temple2","anc",
           "So writes Josephus — who was a commander in the revolt, and later went over to the Roman side."]},
      [Q({he:"מה טוען המקור על שריפת המקדש?",ar:"بماذا يزعم المصدر بشأن حريق الهيكل؟",ru:"Что источник утверждает о пожаре Храма?",en:"What does the source claim about the burning of the Temple?"},
         {he:"היא לא נעשתה בפקודת הקיסר אלא ביוזמת חייל אחד.",ar:"أنه لم يقع بأمر القيصر بل بمبادرة جندي واحد.",ru:"Что он произошёл не по приказу императора, а по почину одного воина.",en:"That it was not by the emperor's order but on the initiative of a single soldier."},
-        [{he:"היהודים עצמם הציתו את המקדש.",ar:"اليهود أنفسهم أضرموا النار في الهيكل.",ru:"Что евреи сами подожгли Храм.",en:"That the Jews themselves set the Temple on fire."},
-         {he:"האש פרצה מברק בסערה.",ar:"اندلعت النار من صاعقة في عاصفة.",ru:"Что пожар начался от молнии в грозу.",en:"That the fire started from lightning in a storm."},
-         {he:"הקיסר ציווה במפורש לשרוף אותו.",ar:"أمر القيصر صراحةً بإحراقه.",ru:"Что император прямо приказал его сжечь.",en:"That the emperor expressly ordered it burned."}]),
+        [{he:"היהודים עצמם הציתו את המקדש במו ידיהם, כדי שלא ייפול.",ar:"اليهود أنفسهم أحرقوا الهيكل بأيديهم كي لا يسقط.",ru:"Сами иудеи подожгли Храм своими руками, чтобы он не достался врагу целым.",en:"The Jews themselves set the Temple on fire with their own hands, so it would not fall."},
+         {he:"האש פרצה מברק שפגע במקדש בזמן סערה גדולה בלילה ההוא.",ar:"اندلعت النار من صاعقة أصابت الهيكل في عاصفة ليلية.",ru:"Огонь начался от молнии, ударившей в Храм во время сильной ночной бури.",en:"The fire started from lightning that struck the Temple during a strong storm that night."},
+         {he:"הקיסר ציווה במפורש לשרוף את המקדש בפקודה כתובה.",ar:"أمر القيصر صراحةً بإحراق الهيكل بأمر مكتوب.",ru:"Император отдал прямой письменный приказ сжечь Храм.",en:"The emperor himself gave an explicit written order to burn the Temple."}],
+        [{he:"המקור מספר שהם זעקו ורצו להציל אותו מהאש.",ar:"المصدر يروي أنهم صرخوا وركضوا لإنقاذه من النار.",ru:"Источник рассказывает, что они кричали и бежали спасать его от огня.",en:"The source says they cried out and ran to save it from the fire."},
+         {he:"המקור מצביע על בול עץ בוער שהשליך חייל.",ar:"المصدر يشير إلى قطعة خشب مشتعلة ألقاها جندي.",ru:"Источник указывает на горящее полено, брошенное солдатом.",en:"The source points to a burning log thrown by a soldier."},
+         {he:"השורה הראשונה אומרת שהאש עלתה בלי שציווה.",ar:"السطر الأول يقول إن النار اشتعلت دون أمره.",ru:"Первая строка говорит, что огонь вспыхнул без его приказа.",en:"The first line says the fire rose without his order."}]),
       Q({he:"מדוע צריך לקרוא את המקור הזה בזהירות?",ar:"لماذا ينبغي قراءة هذا المصدر بحذر؟",ru:"Почему этот источник нужно читать осторожно?",en:"Why should this source be read with care?"},
         {he:"הכותב עבר לצד הרומאים, ויש לו עניין להסיר מהם אשמה.",ar:"لأن الكاتب انتقل إلى صفّ الرومان، وله مصلحة في رفع اللوم عنهم.",ru:"Автор перешёл на сторону римлян, и ему выгодно снять с них вину.",en:"The writer went over to the Roman side, and has an interest in clearing them of blame."},
-        [{he:"הוא נכתב מאות שנים אחרי האירוע.",ar:"لأنه كُتب بعد الحدث بمئات السنين.",ru:"Он написан через сотни лет после события.",en:"It was written hundreds of years after the event."},
-         {he:"הכותב לא היה בארץ מעולם.",ar:"لأن الكاتب لم يكن في البلاد قط.",ru:"Автор никогда не был в стране.",en:"The writer was never in the country."},
-         {he:"אין בו תיאור של מה שקרה.",ar:"لأنه لا يصف ما حدث.",ru:"В нём нет описания происшедшего.",en:"It contains no description of what happened."}])])
+        [{he:"הוא נכתב מאות שנים אחרי האירוע, בידי כותב מאוחר.",ar:"كُتب بعد الحدث بمئات السنين، على يد كاتب متأخر.",ru:"Он написан через сотни лет после события, поздним автором.",en:"It was written hundreds of years after the event, by a later writer."},
+         {he:"הכותב לא היה בארץ מעולם, ולא ראה את המקדש ולא את המלחמה.",ar:"الكاتب لم يكن في البلاد قط، ولم يشاهد الهيكل ولا المعركة بعينيه.",ru:"Автор никогда не был в стране и не видел своими глазами ни Храма, ни войны.",en:"The writer was never in the country and never saw the Temple or the war with his own eyes."},
+         {he:"אין בו תיאור של מה שקרה, אלא דעה כללית על המלחמה.",ar:"لا يوجد فيه وصف لما جرى، بل رأي عام عن الحرب وأطرافها.",ru:"В нём нет описания случившегося, а есть общее мнение о войне.",en:"It gives no account of what happened, but a general opinion of the war."}],
+        [{he:"יוסף בן מתתיהו היה שם בזמן המרד וכתב בסמוך לו.",ar:"كان يوسيفوس هناك زمن الثورة وكتب بعدها بقليل.",ru:"Иосиф Флавий был там во время восстания и писал вскоре после него.",en:"Josephus was there during the revolt and wrote soon after it."},
+         {he:"הוא היה מפקד במרד ביהודה, ולכן ראה את המלחמה.",ar:"كان قائدًا في ثورة يهودا، فرأى الحرب بعينيه.",ru:"Он был командиром в иудейском восстании и видел войну.",en:"He was a commander in the revolt in Judea and saw the war."},
+         {he:"יש בו תיאור מפורט. הבעיה היא בעמדת הכותב.",ar:"فيه وصف مفصّل. المشكلة في موقف الكاتب.",ru:"В нём есть подробное описание. Проблема — в позиции автора.",en:"It gives a detailed account. The problem is the writer's position."}])])
  ]
 ]);
 
@@ -2263,14 +2325,20 @@ topic("feudal","mid",
           "To no one will we sell, to no one deny or delay, right or justice."]},
      [Q({he:"איזה עיקרון קובע המקור?",ar:"أي مبدأ يقرّره المصدر؟",ru:"Какой принцип устанавливает источник?",en:"What principle does the source set out?"},
         {he:"אין להעניש אדם בלי משפט, וגם המלך כפוף לחוק.",ar:"لا يُعاقَب المرء بلا محاكمة، والملك أيضًا خاضع للقانون.",ru:"Никого нельзя наказать без суда, и король тоже подчинён закону.",en:"No one may be punished without trial, and the king too is bound by law."},
-        [{he:"המלך רשאי לאסור כל אדם לפי שיקול דעתו.",ar:"للملك أن يسجن أي إنسان حسب تقديره.",ru:"Король вправе заключить любого по своему усмотрению.",en:"The king may imprison anyone as he sees fit."},
-         {he:"רק הכנסייה מוסמכת לשפוט.",ar:"الكنيسة وحدها مخوّلة بالقضاء.",ru:"Судить вправе только церковь.",en:"Only the Church may judge."},
-         {he:"אפשר לקנות פסק דין בכסף.",ar:"يمكن شراء الحكم بالمال.",ru:"Приговор можно купить за деньги.",en:"A verdict may be bought with money."}]),
+        [{he:"המלך רשאי לאסור כל אדם לפי שיקול דעתו, בלי משפט מוקדם.",ar:"للملك أن يعتقل أي إنسان حسب تقديره، دون محاكمة مسبقة.",ru:"Король вправе заключить любого под стражу по своему усмотрению, без предварительного суда.",en:"The king may jail any man at his own discretion, without a prior trial."},
+         {he:"רק הכנסייה מוסמכת לשפוט אדם חופשי באנגליה.",ar:"الكنيسة وحدها مخوّلة بمحاكمة رجل حرّ في إنجلترا.",ru:"Судить свободного человека вправе только церковь Англии.",en:"Only the church is authorised to judge a free man in England."},
+         {he:"אפשר לקנות פסק דין בכסף מידי המלך ופקידיו.",ar:"يمكن شراء حكم قضائي بالمال من الملك ومن موظفيه.",ru:"Приговор можно купить за деньги у короля и его чиновников.",en:"A judgement can be bought with money from the king and his officers."}],
+        [{he:"המסמך נכתב בדיוק כדי להגביל את הכוח הזה.",ar:"كُتبت الوثيقة تحديدًا للحدّ من هذه السلطة.",ru:"Документ написан именно для того, чтобы ограничить эту власть.",en:"The document was written precisely to limit that power."},
+         {he:"המקור מדבר על משפט של שווים ועל חוק הארץ.",ar:"المصدر يتحدث عن محاكمة الأنداد وعن قانون البلاد.",ru:"Источник говорит о суде равных и о законе страны.",en:"The source speaks of judgement by equals and the law of the land."},
+         {he:"השורה האחרונה אוסרת למכור צדק לאיש.",ar:"السطر الأخير يمنع بيع العدل لأحد.",ru:"Последняя строка запрещает продавать правосудие.",en:"The last line forbids selling justice to anyone."}]),
       Q({he:"על מי חל המסמך בזמנו?",ar:"على من انطبقت الوثيقة في زمنها؟",ru:"На кого распространялся документ в то время?",en:"Whom did the document apply to at the time?"},
-        {he:"על ״אדם חופשי״ בלבד — חלק קטן מהאוכלוסייה, ולא על הצמיתים.",ar:"على «الرجل الحرّ» فقط — فئة صغيرة من السكان، لا على الأقنان.",ru:"Только на «свободного человека» — небольшую часть населения, но не на крепостных.",en:"Only to a \"free man\" — a small part of the population, and not to serfs."},
-        [{he:"על כל תושבי אנגליה במידה שווה.",ar:"على كل سكان إنجلترا بالتساوي.",ru:"На всех жителей Англии в равной мере.",en:"To every inhabitant of England equally."},
-         {he:"על אנשי הכנסייה בלבד.",ar:"على رجال الكنيسة وحدهم.",ru:"Только на церковных людей.",en:"Only to churchmen."},
-         {he:"על סוחרים בלבד.",ar:"على التجار وحدهم.",ru:"Только на купцов.",en:"Only to merchants."}])])
+        {he:"על ״אדם חופשי״ בלבד, שהוא חלק קטן מהאוכלוסייה, ולא על הצמיתים.",ar:"على «الرجل الحرّ» فقط، وهم فئة صغيرة من السكان، لا على الأقنان.",ru:"Только на «свободного человека», то есть на небольшую часть населения, но не на крепостных.",en:"Only to a \"free man\", a small part of the population, and not to serfs."},
+        [{he:"על כל תושבי אנגליה במידה שווה, בני חורין וצמיתים.",ar:"على كل سكان إنجلترا بالتساوي، أحرارًا كانوا أم أقنانًا.",ru:"На всех жителей Англии в равной мере, на свободных и на крепостных.",en:"On all the people of England equally, free men and serfs alike."},
+         {he:"על אנשי הכנסייה בלבד, ולא על אצילים או על איכרים.",ar:"على رجال الكنيسة وحدهم، لا على النبلاء ولا على الفلاحين.",ru:"Только на людей церкви, но не на знать и не на простых землепашцев.",en:"Only on men of the church, not on nobles and not on peasants."},
+         {he:"על סוחרים בלבד, כדי להגן על המסחר בערים הגדולות.",ar:"على التجار وحدهم، حمايةً للتجارة في المدن الكبرى.",ru:"Только на купцов, чтобы защитить торговлю в больших городах страны.",en:"Only on merchants, in order to protect trade in the larger towns."}],
+        [{he:"המסמך כותב ״אדם חופשי״, והצמיתים לא נכללו בו.",ar:"الوثيقة تقول «رجل حرّ»، والأقنان لم يشملهم ذلك.",ru:"Документ пишет «свободный человек», и крепостные в него не входили.",en:"The document says free man, and serfs were not included."},
+         {he:"המסמך אינו מוגבל לכנסייה. הוא מדבר על אדם חופשי.",ar:"الوثيقة ليست محصورة بالكنيسة. تتحدث عن رجل حرّ.",ru:"Документ не ограничен церковью. Он говорит о свободном человеке.",en:"The document is not limited to the church. It speaks of a free man."},
+         {he:"מעמד הסוחר אינו מופיע במקור כתנאי כלשהו.",ar:"مكانة التاجر لا ترد في المصدر كشرط.",ru:"Звание купца в источнике как условие не упоминается.",en:"The source never names merchant status as a condition."}])])
  ]
 ]);
 
@@ -2422,14 +2490,20 @@ topic("islam","mid",
           "And the numerals that came from India took the form Europe would adopt centuries later."]},
      [Q({he:"מה מלמד המקור על הידע באותה תקופה?",ar:"ماذا يعلّمنا المصدر عن المعرفة في تلك الحقبة؟",ru:"Что источник говорит о знании в ту эпоху?",en:"What does the source show about knowledge in that period?"},
         {he:"ידע עבר בין תרבויות ושפות, ונשמר ופותח בבגדאד.",ar:"أن المعرفة انتقلت بين الثقافات واللغات، وحُفظت وطُوّرت في بغداد.",ru:"Что знание переходило между культурами и языками и сохранялось и развивалось в Багдаде.",en:"That knowledge moved between cultures and languages, and was preserved and developed in Baghdad."},
-        [{he:"כל תרבות פיתחה מדע לעצמה בלי קשר לאחרות.",ar:"أن كل ثقافة طوّرت علمها بمعزل عن غيرها.",ru:"Что каждая культура развивала науку сама по себе, без связи с другими.",en:"That each culture developed science on its own, unconnected to the others."},
-         {he:"הידע היווני אבד ולא הועבר הלאה.",ar:"أن المعرفة اليونانية ضاعت ولم تُنقل.",ru:"Что греческое знание было утрачено и не передалось дальше.",en:"That Greek knowledge was lost and not passed on."},
-         {he:"רק מוסלמים הורשו לעסוק במדע.",ar:"أن المسلمين وحدهم سُمح لهم بالعلم.",ru:"Что заниматься наукой позволялось только мусульманам.",en:"That only Muslims were allowed to do science."}]),
+        [{he:"כל תרבות פיתחה מדע לעצמה, בנפרד מן התרבויות האחרות.",ar:"كل ثقافة طوّرت العلم لنفسها، بمعزل عن الثقافات الأخرى.",ru:"Каждая культура развивала науку сама по себе, отдельно от других культур.",en:"Each culture developed its own science, apart from the other cultures."},
+         {he:"כל הידע היווני אבד בלי שריד ולא הועבר לדורות שאחריו.",ar:"كل المعرفة اليونانية ضاعت دون أثر ولم تُنقل إلى الأجيال التي تلتها.",ru:"Всё греческое знание пропало без следа и не перешло ни к каким следующим поколениям после него.",en:"All of the Greek knowledge was lost without trace and was not passed on to the later generations."},
+         {he:"רק מוסלמים הורשו לעסוק במדע בעיר בגדאד.",ar:"المسلمون وحدهم سُمح لهم بالاشتغال بالعلم في مدينة بغداد.",ru:"Заниматься наукой в городе Багдаде позволялось одним лишь мусульманам.",en:"Only Muslims were permitted to take part in any science in the city of Baghdad."}],
+        [{he:"המקור מתאר תרגום מיוונית, מפרסית ומהודית.",ar:"المصدر يصف ترجمة من اليونانية والفارسية والهندية.",ru:"Источник описывает переводы с греческого, персидского и индийского.",en:"The source describes translation from Greek, Persian and Indian."},
+         {he:"המקור אומר שספרים יווניים תורגמו בבית החכמה.",ar:"المصدر يقول إن كتبًا يونانية تُرجمت في بيت الحكمة.",ru:"Источник говорит, что греческие книги переводили в Доме мудрости.",en:"The source says Greek books were translated in the House of Wisdom."},
+         {he:"בבית החכמה עבדו יחד מוסלמים, נוצרים ויהודים.",ar:"في بيت الحكمة عمل معًا مسلمون ومسيحيون ويهود.",ru:"В Доме мудрости вместе работали мусульмане, христиане и иудеи.",en:"In the House of Wisdom Muslims, Christians and Jews worked together."}]),
       Q({he:"מהיכן הגיעה המילה ״אלגוריתם״?",ar:"من أين جاءت كلمة «خوارزمية»؟",ru:"Откуда пришло слово «алгоритм»?",en:"Where does the word \"algorithm\" come from?"},
         {he:"משמו של מלומד שפעל בבגדאד וכתב על פתרון משוואות.",ar:"من اسم عالم عمل في بغداد وكتب في حلّ المعادلات.",ru:"От имени учёного, работавшего в Багдаде и писавшего о решении уравнений.",en:"From the name of a scholar who worked in Baghdad and wrote on solving equations."},
-        [{he:"מיוונית עתיקה, מהמילה ״מספר״.",ar:"من اليونانية القديمة، من كلمة «عدد».",ru:"Из древнегреческого, от слова «число».",en:"From ancient Greek, from the word for \"number\"."},
-         {he:"מלטינית של ימי הביניים.",ar:"من لاتينية العصور الوسطى.",ru:"Из средневековой латыни.",en:"From medieval Latin."},
-         {he:"משמו של מתמטיקאי אירופי מן המאה ה-19.",ar:"من اسم رياضي أوروبي من القرن التاسع عشر.",ru:"От имени европейского математика XIX века.",en:"From the name of a nineteenth-century European mathematician."}])])
+        [{he:"מהשפה היוונית העתיקה, מהמילה ״מספר״ שבפי המתמטיקאים.",ar:"من اللغة اليونانية القديمة، من كلمة «عدد» عند الرياضيين.",ru:"Из древнегреческого языка, от слова «число», которое было в устах математиков.",en:"From the ancient Greek language, from the word number that was used by mathematicians."},
+         {he:"מלטינית של ימי הביניים, משם של ספר לימוד אחד ישן מאוד.",ar:"من لاتينية العصور الوسطى، من اسم كتاب تعليمي قديم جدًا.",ru:"Из средневековой латыни, от названия одного очень старого школьного учебника.",en:"From medieval Latin, taken from the title of one very old school textbook of the time."},
+         {he:"משמו של מתמטיקאי אירופי שפעל במאה ה-19.",ar:"من اسم عالم رياضيات أوروبي من القرن الـ19.",ru:"От имени европейского математика, который жил и работал в 19 веке.",en:"From the name of a European mathematician who worked in the 19th century."}],
+        [{he:"המקור אומר במפורש שהמילה נגזרה משם של אדם.",ar:"المصدر يقول صراحةً إن الكلمة اشتُقّت من اسم شخص.",ru:"Источник прямо говорит, что слово произошло от имени человека.",en:"The source says plainly that the word came from a person's name."},
+         {he:"הצורה הלטינית באה אחר כך, והיא אינה המקור.",ar:"الصيغة اللاتينية جاءت لاحقًا، وليست هي الأصل.",ru:"Латинская форма появилась позже и не является источником.",en:"The Latin form came later, and it is not the origin."},
+         {he:"המילה עתיקה בהרבה, ומקורה בבגדאד של המאה ה-9.",ar:"الكلمة أقدم بكثير، وأصلها في بغداد القرن التاسع.",ru:"Слово намного древнее, и родом оно из Багдада 9 века.",en:"The word is far older, and comes from 9th century Baghdad."}])])
  ]
 ]);
 
@@ -2585,14 +2659,20 @@ topic("renaissance","mid",
           "And whoever accepts the Catholic faith — shall remain."]},
      [Q({he:"איזו ברירה מציב הצו?",ar:"ما الخيار الذي يضعه المرسوم؟",ru:"Какой выбор ставит указ?",en:"What choice does the decree set out?"},
         {he:"להתנצר ולהישאר, או לצאת מהממלכה עד תאריך שנקבע.",ar:"التنصّر والبقاء، أو الخروج من المملكة حتى تاريخ محدّد.",ru:"Креститься и остаться либо покинуть королевство к назначенному сроку.",en:"To convert and stay, or to leave the kingdom by a set date."},
-        [{he:"לשלם מס מיוחד ולהישאר.",ar:"دفع ضريبة خاصة والبقاء.",ru:"Заплатить особый налог и остаться.",en:"To pay a special tax and stay."},
-         {he:"לעבור לגור בעיר אחת בלבד.",ar:"الانتقال للسكن في مدينة واحدة فقط.",ru:"Переселиться и жить только в одном городе.",en:"To move and live in one city only."},
-         {he:"לצאת ולחזור אחרי שנה.",ar:"الخروج والعودة بعد سنة.",ru:"Уйти и вернуться через год.",en:"To leave and return after a year."}]),
+        [{he:"לשלם מס מיוחד ולהישאר לגור כרגיל בכל רחבי הממלכה.",ar:"دفع ضريبة خاصة والبقاء للعيش كالمعتاد في كل أنحاء المملكة.",ru:"Заплатить особый налог и остаться жить как прежде по всему королевству.",en:"To pay a special tax and stay living as before across the kingdom."},
+         {he:"לעבור לגור בעיר אחת בלבד, תחת פיקוח הכנסייה המקומית.",ar:"الانتقال للسكن في مدينة واحدة فقط، تحت إشراف الكنيسة المحلية.",ru:"Переселиться только в один единственный город, под надзором местной церкви.",en:"To move into one single town only, under the local church's watch."},
+         {he:"לצאת ולחזור אחרי שנה, כשהמצב בממלכה יירגע.",ar:"الخروج والعودة بعد سنة، حين تهدأ الأوضاع في المملكة.",ru:"Уехать и вернуться через год, когда в королевстве всё утихнет.",en:"To leave and return after a year, once things calm down."}],
+        [{he:"הצו אינו מציע תשלום. הברירה היא דת או יציאה.",ar:"المرسوم لا يعرض دفعًا. الخيار دين أو خروج.",ru:"Указ не предлагает платы. Выбор — вера или выезд.",en:"The decree offers no payment. The choice is faith or leaving."},
+         {he:"אין בצו הגבלה לעיר. יש בו גירוש מכל הממלכות.",ar:"لا حصر في مدينة في المرسوم. فيه طرد من كل الممالك.",ru:"В указе нет ограничения городом. В нём изгнание из всех королевств.",en:"The decree names no town limit. It orders exile from all the kingdoms."},
+         {he:"הצו אוסר לשוב — לא לגור ואף לא לעבור.",ar:"المرسوم يمنع العودة — لا للسكن ولا حتى للمرور.",ru:"Указ запрещает возвращаться — ни жить, ни даже проезжать.",en:"The decree forbids returning, neither to live nor even to pass."}]),
       Q({he:"מה מלמד הצו על מדיניות ספרד באותה שנה?",ar:"ماذا يبيّن المرسوم عن سياسة إسبانيا في تلك السنة؟",ru:"Что указ говорит о политике Испании в том году?",en:"What does the decree show about Spain's policy that year?"},
         {he:"שהממלכה ביקשה אחידות דתית מלאה בשטחה.",ar:"أن المملكة أرادت وحدة دينية كاملة في أراضيها.",ru:"Что королевство добивалось полного религиозного единообразия на своей земле.",en:"That the kingdom sought complete religious uniformity in its territory."},
-        [{he:"שהיא ביקשה למשוך אליה מהגרים.",ar:"أنها أرادت جذب مهاجرين إليها.",ru:"Что оно стремилось привлечь к себе переселенцев.",en:"That it wanted to attract immigrants."},
-         {he:"שהיא ויתרה על מעורבות הכנסייה.",ar:"أنها تخلّت عن تدخّل الكنيسة.",ru:"Что оно отказалось от вмешательства церкви.",en:"That it gave up on the involvement of the Church."},
-         {he:"שהיא הרחיבה את חופש הפולחן.",ar:"أنها وسّعت حرية العبادة.",ru:"Что оно расширило свободу вероисповедания.",en:"That it widened freedom of worship."}])])
+        [{he:"שהיא ביקשה למשוך אליה מהגרים חדשים.",ar:"أنها سعت لاجتذاب مهاجرين جدد إلى أراضيها.",ru:"Что королевство стремилось привлечь к себе новых переселенцев.",en:"That the kingdom sought to draw new immigrants to itself."},
+         {he:"שהיא ויתרה על מעורבות הכנסייה.",ar:"أنها تخلّت عن تدخّل الكنيسة في الحكم.",ru:"Что королевство отказалось от участия церкви в делах правления.",en:"That the kingdom gave up church involvement in its government."},
+         {he:"שהיא הרחיבה את חופש הפולחן לכל הדתות בשטחה.",ar:"أنها وسّعت حرية العبادة لكل الأديان في كل أراضيها.",ru:"Что королевство расширило свободу веры для людей всех религий на своих землях.",en:"That the kingdom widened freedom of worship for all religions in its lands."}],
+        [{he:"צו גירוש מוציא אנשים, ואינו מזמין אנשים.",ar:"مرسوم الطرد يُخرج الناس ولا يدعوهم.",ru:"Указ об изгнании выдворяет людей, а не зовёт их.",en:"An expulsion decree pushes people out, it does not invite them."},
+         {he:"הצו כורך שלטון ודת יחד, ואינו מפריד ביניהם.",ar:"المرسوم يربط الحكم والدين معًا ولا يفصل بينهما.",ru:"Указ связывает власть и веру вместе, а не разделяет их.",en:"The decree ties rule and religion together, it does not separate them."},
+         {he:"הצו מצמצם את חופש הפולחן עד כדי גירוש.",ar:"المرسوم يضيّق حرية العبادة حتى حدّ الطرد.",ru:"Указ сужает свободу веры вплоть до изгнания.",en:"The decree narrows freedom of worship to the point of expulsion."}])])
  ]
 ]);
 
@@ -2745,15 +2825,21 @@ topic("revolutions","mod",
           "The source of all sovereignty lies in the nation.",
           "Liberty is the power to do anything that does not harm another."]},
      [Q({he:"מהיכן נובעת הריבונות לפי המקור?",ar:"من أين تنبع السيادة وفق المصدر؟",ru:"Откуда, согласно источнику, происходит суверенитет?",en:"Where does sovereignty come from, according to the source?"},
-        {he:"מהאומה — כלומר מהעם, ולא מהמלך ולא מהאל.",ar:"من الأمة — أي من الشعب، لا من الملك ولا من الإله.",ru:"От нации — то есть от народа, а не от короля и не от Бога.",en:"From the nation — that is, from the people, not from the king and not from God."},
-        [{he:"מהמלך, שקיבל אותה בירושה.",ar:"من الملك، الذي ورثها.",ru:"От короля, получившего его по наследству.",en:"From the king, who received it by inheritance."},
-         {he:"מהכנסייה.",ar:"من الكنيسة.",ru:"От церкви.",en:"From the Church."},
-         {he:"מהצבא.",ar:"من الجيش.",ru:"От армии.",en:"From the army."}]),
+        {he:"מהאומה, כלומר מהעם, ולא מהמלך ולא מהאל.",ar:"من الأمة، أي من الشعب، لا من الملك ولا من الإله.",ru:"От нации, то есть от народа, а не от короля и не от Бога.",en:"From the nation, that is, from the people, not from the king and not from God."},
+        [{he:"מהמלך, שקיבל אותה בירושה מאבותיו ומאבות אבותיו.",ar:"من الملك، الذي ورثها عن آبائه وأجداده جيلًا بعد جيل.",ru:"От короля, получившего его по наследству от отцов и дедов своих.",en:"From the king, who received it by inheritance from his fathers and his forefathers."},
+         {he:"מהכנסייה, שמעניקה אותה למלך בטקס ההכתרה בקתדרלה.",ar:"من الكنيسة، التي تمنحها للملك في مراسم التتويج بالكاتدرائية.",ru:"От церкви, которая дарует его королю на обряде коронации в соборе.",en:"From the church, which grants it to the king at the coronation in the cathedral."},
+         {he:"מהצבא, ששומר על הסדר ומחזיק בכוח האמיתי בפועל.",ar:"من الجيش، الذي يحفظ النظام ويمسك بالقوة الحقيقية فعليًا.",ru:"От армии, которая хранит порядок и на деле держит настоящую силу.",en:"From the army, which keeps the order and which in practice holds all the real power."}],
+        [{he:"המקור כותב שמקור הריבונות באומה, לא במלך.",ar:"المصدر يكتب أن مصدر السيادة في الأمة لا في الملك.",ru:"Источник пишет, что суверенитет исходит от нации, а не от короля.",en:"The source writes that sovereignty comes from the nation, not the king."},
+         {he:"ההכרזה מעבירה את מקור הריבונות לאומה.",ar:"الإعلان ينقل مصدر السيادة إلى الأمة.",ru:"Декларация переносит источник суверенитета к нации.",en:"The declaration moves the source of sovereignty to the nation."},
+         {he:"כוח בפועל אינו ריבונות. המקור מדבר על האומה.",ar:"القوة الفعلية ليست سيادة. المصدر يتحدث عن الأمة.",ru:"Реальная сила не есть суверенитет. Источник говорит о нации.",en:"Actual force is not sovereignty. The source speaks of the nation."}]),
       Q({he:"כיצד מגדיר המקור את גבול החירות?",ar:"كيف يحدّ المصدر الحرية؟",ru:"Как источник определяет предел свободы?",en:"How does the source define the limit of liberty?"},
         {he:"חופשי לעשות כל דבר שאינו מזיק לאדם אחר.",ar:"حرّ في فعل كل ما لا يضرّ إنسانًا آخر.",ru:"Свободен делать всё, что не вредит другому человеку.",en:"Free to do anything that does not harm another person."},
-        [{he:"חופשי לעשות כל דבר, בלי גבול.",ar:"حرّ في فعل كل شيء بلا حدّ.",ru:"Свободен делать всё без предела.",en:"Free to do anything, with no limit."},
-         {he:"חופשי רק במה שהחוק מונה במפורש.",ar:"حرّ فقط فيما يعدّده القانون صراحةً.",ru:"Свободен лишь в том, что закон прямо перечисляет.",en:"Free only in what the law expressly lists."},
-         {he:"חופשי כל עוד השלטון מרשה.",ar:"حرّ ما دام الحكم يسمح.",ru:"Свободен, пока власть позволяет.",en:"Free as long as the government allows."}])])
+        [{he:"חופשי לעשות כל דבר, גם אם הוא מזיק לאדם אחר.",ar:"حرّ في فعل كل شيء، حتى لو أضرّ بإنسان آخر.",ru:"Свободен делать всё, даже если это вредит другому человеку.",en:"Free to do anything, even if it does harm to another person."},
+         {he:"חופשי רק במה שהחוק מונה ומתיר בצורה ברורה.",ar:"حرّ فقط فيما يعدّده القانون ويجيزه بوضوح.",ru:"Свободен лишь в том, что закон прямо перечисляет и разрешает.",en:"Free only in what the law expressly lists and clearly allows."},
+         {he:"חופשי כל עוד השלטון נותן לו רשות לעשות זאת.",ar:"حرّ ما دام الحكم يمنحه الإذن بفعل هذا الأمر.",ru:"Свободен до тех пор, пока власть даёт ему на это разрешение.",en:"Free for as long as the government gives him permission to do it."}],
+        [{he:"המקור מציב גבול ברור: הנזק לזולת.",ar:"المصدر يضع حدًّا واضحًا: الضرر بالغير.",ru:"Источник ставит ясную границу: вред другому.",en:"The source sets a clear limit: harm to another."},
+         {he:"ההגדרה הפוכה: מותר הכול, חוץ ממה שמזיק.",ar:"التعريف معكوس: كل شيء مباح إلا ما يضرّ.",ru:"Определение обратное: разрешено всё, кроме вредящего.",en:"The definition runs the other way: all is allowed except what harms."},
+         {he:"לפי המקור החירות טבעית, ואינה מתנה מהשלטון.",ar:"وفق المصدر الحرية طبيعية، وليست هبة من الحكم.",ru:"По источнику свобода естественна, а не дар власти.",en:"In the source liberty is natural, not a gift from the government."}])])
  ]
 ]);
 
@@ -2909,14 +2995,20 @@ topic("industry","mod",
           "From testimony before a commission of inquiry in Britain."]},
      [Q({he:"מה מלמדת העדות על עבודת ילדים בתקופה?",ar:"ماذا تبيّن الشهادة عن عمل الأطفال في تلك الحقبة؟",ru:"Что показания говорят о детском труде в ту эпоху?",en:"What does the testimony show about child labour in the period?"},
         {he:"ילדים עבדו יום עבודה ארוך מאוד, בתנאים קשים ובלי הגנה.",ar:"أن الأطفال عملوا يومًا طويلًا جدًا، في ظروف قاسية وبلا حماية.",ru:"Что дети работали очень долгий день, в тяжёлых условиях и без защиты.",en:"That children worked a very long day, in harsh conditions and with no protection."},
-        [{he:"ילדים הועסקו רק בעונות מסוימות.",ar:"أن الأطفال شُغّلوا في مواسم معيّنة فقط.",ru:"Что детей нанимали только в определённые сезоны.",en:"That children were employed only in certain seasons."},
-         {he:"עבודת ילדים הייתה אסורה בכל אירופה.",ar:"أن عمل الأطفال كان محظورًا في أوروبا كلها.",ru:"Что детский труд был запрещён во всей Европе.",en:"That child labour was banned throughout Europe."},
-         {he:"הילדים עבדו רק בשעות אחר הצהריים.",ar:"أن الأطفال عملوا في ساعات ما بعد الظهر فقط.",ru:"Что дети работали только после полудня.",en:"That the children worked only in the afternoon."}]),
+        [{he:"ילדים הועסקו רק בעונות מסוימות, בעיקר בקציר.",ar:"شُغّل الأطفال في مواسم معيّنة فقط، خاصة في الحصاد.",ru:"Детей нанимали лишь в определённые сезоны, в основном на жатву.",en:"Children were hired only in certain seasons, mainly at the harvest."},
+         {he:"עבודת ילדים הייתה אסורה בכל אירופה באותה תקופה.",ar:"كان عمل الأطفال ممنوعًا في كل أوروبا في تلك الحقبة.",ru:"Детский труд был запрещён по всей Европе в ту самую эпоху.",en:"Child labour was forbidden across all of Europe at that very time."},
+         {he:"הילדים עבדו רק בשעות אחר הצהריים, אחרי הלימודים.",ar:"عمل الأطفال في ساعات بعد الظهر فقط، بعد انتهاء الدراسة.",ru:"Дети работали только в послеобеденные часы, после уроков.",en:"The children worked only in the afternoon hours, after their school."}],
+        [{he:"העדות מתארת יום עבודה קבוע במפעל, ולא עונה.",ar:"الشهادة تصف يوم عمل ثابتًا في المصنع، لا موسمًا.",ru:"Показания описывают постоянный рабочий день на фабрике, не сезон.",en:"The testimony describes a fixed working day in a factory, not a season."},
+         {he:"ועדת חקירה שומעת עדות כזאת רק אם זה עדיין קורה.",ar:"لجنة تحقيق تسمع شهادة كهذه فقط إن كان الأمر ما زال يحدث.",ru:"Комиссия слушает такие показания, только если это ещё происходит.",en:"An inquiry hears such testimony only if it is still happening."},
+         {he:"בעדות העבודה מתחילה בחמש בבוקר ונגמרת בתשע.",ar:"في الشهادة يبدأ العمل الخامسة صباحًا وينتهي التاسعة.",ru:"В показаниях работа начинается в пять утра и кончается в девять.",en:"In the testimony work starts at five in the morning and ends at nine."}]),
       Q({he:"מדוע עדות אישית חשובה להיסטוריון?",ar:"لماذا تهمّ الشهادة الشخصية المؤرّخ؟",ru:"Почему личное свидетельство важно историку?",en:"Why does a personal testimony matter to a historian?"},
         {he:"היא מראה את חוויית היום־יום, שמספרים ונתונים לבדם אינם מספרים.",ar:"لأنها تُظهر تجربة اليوم العادي، وهو ما لا ترويه الأرقام وحدها.",ru:"Оно показывает повседневный опыт, о котором одни цифры не расскажут.",en:"It shows the daily experience, which figures alone do not tell."},
-        [{he:"היא תמיד מדויקת יותר ממסמכים רשמיים.",ar:"لأنها دائمًا أدقّ من الوثائق الرسمية.",ru:"Оно всегда точнее официальных документов.",en:"It is always more accurate than official documents."},
-         {he:"היא מייצגת בהכרח את כל העובדים.",ar:"لأنها تمثّل بالضرورة كل العمال.",ru:"Оно непременно представляет всех работников.",en:"It necessarily represents all the workers."},
-         {he:"היא אינה דורשת בדיקה מול מקורות אחרים.",ar:"لأنها لا تحتاج إلى مقارنة بمصادر أخرى.",ru:"Оно не требует проверки по другим источникам.",en:"It needs no checking against other sources."}])])
+        [{he:"היא תמיד מדויקת יותר ממסמכים רשמיים ומהנתונים שאספו בעלי המפעלים.",ar:"هي دائمًا أدقّ من الوثائق الرسمية ومن البيانات التي جمعها أصحاب المصانع.",ru:"Оно всегда точнее официальных документов и данных, собранных владельцами фабрик.",en:"It is always more exact than official papers and the owners' own figures."},
+         {he:"היא מייצגת בהכרח את כל העובדים בכל המפעלים שפעלו באנגליה באותה תקופה.",ar:"هي تمثّل بالضرورة كل العمال في كل المصانع التي عملت في إنجلترا آنذاك.",ru:"Оно непременно представляет всех рабочих всех фабрик Англии той эпохи.",en:"It represents all the workers in every factory that ran in England then."},
+         {he:"היא אינה דורשת בדיקה מול מקורות אחרים, כי היא עדות ראייה ישירה.",ar:"لا تحتاج إلى فحص أمام مصادر أخرى، لأنها شهادة عيان مباشرة من صاحبها.",ru:"Оно не требует сверки с другими источниками, ведь это прямое свидетельство.",en:"It needs no checking against other sources, as it is a direct eyewitness account."}],
+        [{he:"גם עדות אישית חלקית, וצריך לבדוק אותה כמו כל מקור.",ar:"الشهادة الشخصية جزئية أيضًا، ويجب فحصها كأي مصدر.",ru:"Личное свидетельство тоже неполно, и его проверяют, как любой источник.",en:"A personal account is partial too, and is checked like any source."},
+         {he:"עדות אחת מספרת סיפור אחד, ולא את סיפורם של כולם.",ar:"شهادة واحدة تروي قصة واحدة، لا قصة الجميع.",ru:"Одно свидетельство рассказывает одну историю, а не историю всех.",en:"One account tells one story, not the story of everyone."},
+         {he:"כל מקור נבדק מול מקורות אחרים, גם עדות ראייה.",ar:"كل مصدر يُفحص أمام مصادر أخرى، حتى شهادة العيان.",ru:"Любой источник сверяют с другими, даже свидетельство очевидца.",en:"Every source is checked against others, even an eyewitness account."}])])
  ]
 ]);
 
@@ -3076,14 +3168,20 @@ topic("nationalism","mod",
           "From the Basel Programme, 1897."]},
      [Q({he:"מהי המטרה שמנסחת התוכנית?",ar:"ما الهدف الذي يصوغه البرنامج؟",ru:"Какую цель формулирует программа?",en:"What goal does the programme set out?"},
         {he:"בית לעם היהודי בארץ ישראל, מובטח במשפט ולא רק בפועל.",ar:"وطن للشعب اليهودي في أرض إسرائيل، مضمون بالقانون لا بالأمر الواقع فقط.",ru:"Дом для еврейского народа в Земле Израиля, обеспеченный правом, а не только фактически.",en:"A home for the Jewish people in the Land of Israel, secured in law and not only in practice."},
-        [{he:"קהילות יהודיות חזקות יותר באירופה.",ar:"جماعات يهودية أقوى في أوروبا.",ru:"Более сильные еврейские общины в Европе.",en:"Stronger Jewish communities in Europe."},
-         {he:"הגירה למדינות שמעבר לים בלבד.",ar:"الهجرة إلى ما وراء البحار فقط.",ru:"Только эмиграция за океан.",en:"Emigration overseas only."},
-         {he:"שינוי הדת היהודית.",ar:"تغيير الدين اليهودي.",ru:"Изменение еврейской религии.",en:"A change in the Jewish religion."}]),
+        [{he:"קהילות יהודיות חזקות יותר באירופה, במקומות שהן יושבות היום.",ar:"جاليات يهودية أقوى وأمتن في أوروبا، في الأماكن نفسها التي تسكنها اليوم فعلًا.",ru:"Более крепкие и сильные еврейские общины в Европе, в тех самых местах, где они уже живут.",en:"Stronger and firmer Jewish communities in Europe, in the very places where they already live now."},
+         {he:"הגירה למדינות שמעבר לים בלבד, ובראשן אמריקה.",ar:"الهجرة إلى بلدان ما وراء البحار فقط، وفي مقدمتها أمريكا نفسها.",ru:"Только переселение в далёкие заморские страны, в первую очередь в Америку.",en:"Emigration only to distant countries across the ocean, above all to America."},
+         {he:"שינוי הדת היהודית והתאמתה לחיים המודרניים.",ar:"تغيير الدين اليهودي وملاءمته لظروف الحياة الحديثة في أوروبا.",ru:"Изменение самой иудейской религии и приспособление её к современной жизни.",en:"Changing the Jewish religion itself and fitting it to life in the modern age."}],
+        [{he:"התוכנית מדברת על בית בארץ ישראל, ולא באירופה.",ar:"البرنامج يتحدث عن بيت في أرض إسرائيل لا في أوروبا.",ru:"Программа говорит о доме в Земле Израиля, а не в Европе.",en:"The programme speaks of a home in the Land of Israel, not in Europe."},
+         {he:"היעד בתוכנית הוא ארץ ישראל, ולא יעד אחר.",ar:"الوجهة في البرنامج هي أرض إسرائيل لا سواها.",ru:"Цель программы — Земля Израиля, а не иное место.",en:"The programme's destination is the Land of Israel, nowhere else."},
+         {he:"התוכנית לאומית ומדינית, ואינה עוסקת בשינוי דת.",ar:"البرنامج قومي وسياسي، ولا يتناول تغيير الدين.",ru:"Программа национальная и политическая, о смене веры в ней нет.",en:"The programme is national and political, not about changing religion."}]),
       Q({he:"אילו אמצעים מונה התוכנית?",ar:"ما الوسائل التي يعدّدها البرنامج؟",ru:"Какие средства перечисляет программа?",en:"Which means does the programme list?"},
         {he:"התיישבות בארץ, ארגון היהודים במוסדות, וחיזוק ההכרה הלאומית.",ar:"الاستيطان في البلاد، وتنظيم اليهود في مؤسسات، وتقوية الوعي القومي.",ru:"Поселение в стране, объединение евреев в учреждениях и укрепление национального самосознания.",en:"Settlement in the country, organising Jewry in institutions, and strengthening national consciousness."},
-        [{he:"הקמת צבא ורכישת נשק.",ar:"إقامة جيش وشراء سلاح.",ru:"Создание армии и закупку оружия.",en:"Raising an army and buying weapons."},
-         {he:"פנייה לאפיפיור בבקשת תמיכה.",ar:"مخاطبة البابا طلبًا للدعم.",ru:"Обращение к папе за поддержкой.",en:"An appeal to the Pope for support."},
-         {he:"החרמת סחורות אירופיות.",ar:"مقاطعة البضائع الأوروبية.",ru:"Бойкот европейских товаров.",en:"A boycott of European goods."}])])
+        [{he:"הקמת צבא ורכישת נשק, לקראת מאבק מזוין בארץ ישראל.",ar:"إقامة جيش وشراء سلاح، استعدادًا لصراع مسلّح في البلاد.",ru:"Создание собственной армии и закупка оружия для вооружённой борьбы в стране.",en:"Raising an army of its own and buying weapons for an armed struggle in the country."},
+         {he:"פנייה לאפיפיור בבקשת תמיכה בהקמת הבית הלאומי בארץ.",ar:"التوجّه إلى البابا طلبًا لدعم إقامة البيت القومي في البلاد.",ru:"Обращение к папе римскому за поддержкой в создании национального дома в стране.",en:"Appealing to the pope in Rome for his support in building the national home in the land."},
+         {he:"החרמת סחורות אירופיות עד שיוסכם על זכויות היהודים.",ar:"مقاطعة البضائع الأوروبية حتى يُتّفق على حقوق اليهود فيها.",ru:"Бойкот европейских товаров до тех пор, пока не будут согласованы права евреев.",en:"Boycotting European goods for as long as the rights of the Jews are not yet agreed."}],
+        [{he:"התוכנית מונה התיישבות, ארגון ותודעה — ולא נשק.",ar:"البرنامج يعدّد الاستيطان والتنظيم والوعي — لا السلاح.",ru:"Программа перечисляет поселение, организацию и сознание, не оружие.",en:"The programme lists settlement, organisation and awareness, not weapons."},
+         {he:"התוכנית פונה למשפט הכלל, ולא לראש הכנסייה.",ar:"البرنامج يتوجّه إلى القانون العام لا إلى رأس الكنيسة.",ru:"Программа обращается к общему праву, а не к главе церкви.",en:"The programme turns to public law, not to the head of the church."},
+         {he:"אמצעי כלכלי כזה אינו מופיע בתוכנית בזל.",ar:"وسيلة اقتصادية كهذه لا ترد في برنامج بازل.",ru:"Такой экономической меры в Базельской программе нет.",en:"No such economic measure appears in the Basel programme."}])])
  ]
 ]);
 
@@ -3240,15 +3338,21 @@ topic("ww1","c20",
           "as a consequence of the war imposed upon them by the aggression of Germany and her allies.",
           "From article 231 of the Treaty of Versailles."]},
      [Q({he:"מה קובע הסעיף?",ar:"ماذا تقرّر المادة؟",ru:"Что устанавливает эта статья?",en:"What does the clause establish?"},
-        {he:"שגרמניה אחראית לנזקי המלחמה — ומכאן החובה לשלם פיצויים.",ar:"أن ألمانيا مسؤولة عن أضرار الحرب — ومن هنا واجب دفع التعويضات.",ru:"Что Германия ответственна за ущерб войны — отсюда обязанность платить репарации.",en:"That Germany is responsible for the damage of the war — and hence the duty to pay reparations."},
-        [{he:"שהמלחמה נגרמה בטעות ואין אשמים.",ar:"أن الحرب وقعت خطأً ولا مذنب فيها.",ru:"Что война произошла по ошибке и виновных нет.",en:"That the war happened by mistake and no one is to blame."},
-         {he:"שגרמניה תפורק מנשקה בלבד.",ar:"أن ألمانيا ستُنزع أسلحتها فقط.",ru:"Что Германия будет только разоружена.",en:"That Germany will merely be disarmed."},
-         {he:"שכל הצדדים אחראים במידה שווה.",ar:"أن كل الأطراف مسؤولون بالتساوي.",ru:"Что все стороны отвечают в равной мере.",en:"That all sides are equally responsible."}]),
+        {he:"שגרמניה אחראית לנזקי המלחמה, ומכאן החובה לשלם פיצויים.",ar:"أن ألمانيا مسؤولة عن أضرار الحرب، ومن هنا واجب دفع التعويضات.",ru:"Что Германия ответственна за ущерб войны, отсюда и обязанность платить репарации.",en:"That Germany is responsible for the damage of the war, and hence the duty to pay reparations."},
+        [{he:"שהמלחמה נגרמה בטעות, ואין צד אחד שאפשר להאשים.",ar:"أن الحرب وقعت بالخطأ، ولا طرف واحد يمكن اتهامه بها.",ru:"Что война случилась по ошибке и винить в ней одну сторону нельзя.",en:"That the war came about by mistake, and that no single side can be blamed for it."},
+         {he:"שגרמניה תפורק מנשקה בלבד, ולא תידרש לשלם דבר.",ar:"أن ألمانيا ستُنزع أسلحتها فقط، ولن يُطلب منها دفع شيء.",ru:"Что Германию только разоружат и платить с неё ничего не потребуют.",en:"That Germany would only be disarmed, and would not be asked to pay anything."},
+         {he:"שכל הצדדים אחראים במידה שווה לנזקי המלחמה הזאת.",ar:"أن كل الأطراف مسؤولة بالتساوي عن أضرار هذه الحرب الكبرى.",ru:"Что все стороны в равной мере отвечают за ущерб от этой большой войны.",en:"That all the sides are equally responsible for the damage of this great war."}],
+        [{he:"הסעיף מטיל את האחריות על גרמניה, במפורש.",ar:"المادة تُلقي المسؤولية على ألمانيا صراحةً.",ru:"Статья прямо возлагает ответственность на Германию.",en:"The clause places the responsibility on Germany, in plain words."},
+         {he:"הסעיף עוסק בנזק ובאובדן, ומהם באים הפיצויים.",ar:"المادة تتناول الضرر والخسارة، ومنهما تأتي التعويضات.",ru:"Статья говорит об ущербе и потерях, отсюда и репарации.",en:"The clause deals with damage and loss, and from those come reparations."},
+         {he:"הסעיף מדבר על גרמניה ועל בעלות בריתה בלבד.",ar:"المادة تتحدث عن ألمانيا وحلفائها فقط.",ru:"Статья говорит только о Германии и её союзниках.",en:"The clause speaks only of Germany and her allies."}]),
       Q({he:"מדוע היה לסעיף הזה משקל פוליטי בשנים שאחריו?",ar:"لماذا كان لهذه المادة وزن سياسي في السنوات التالية؟",ru:"Почему эта статья имела политический вес в последующие годы?",en:"Why did this clause carry political weight in the years that followed?"},
         {he:"תחושת העלבון שיצר שימשה תעמולה קיצונית בגרמניה.",ar:"لأن الشعور بالإهانة الذي أوجدته خدم دعاية متطرفة في ألمانيا.",ru:"Порождённое им чувство унижения послужило крайней пропаганде в Германии.",en:"The sense of humiliation it created served extremist propaganda in Germany."},
-        [{he:"הוא ביטל את חבר הלאומים.",ar:"لأنها ألغت عصبة الأمم.",ru:"Она упразднила Лигу Наций.",en:"It abolished the League of Nations."},
-         {he:"הוא חילק מחדש את אפריקה.",ar:"لأنها أعادت تقسيم إفريقيا.",ru:"Она заново поделила Африку.",en:"It repartitioned Africa."},
-         {he:"הוא קבע את גבולות רוסיה.",ar:"لأنها رسمت حدود روسيا.",ru:"Она определила границы России.",en:"It fixed the borders of Russia."}])])
+        [{he:"הסעיף ביטל את חבר הלאומים כמה שנים אחרי שהוקם בוורסאי.",ar:"ألغى هذا البند عصبة الأمم بعد بضع سنوات من إنشائها في فرساي.",ru:"Эта статья упразднила Лигу Наций через несколько лет после её создания в Версале.",en:"This clause abolished the League of Nations a few years after its founding in Versailles."},
+         {he:"הסעיף חילק מחדש את כל אפריקה בין המעצמות האירופיות.",ar:"قسّم هذا البند قارة أفريقيا من جديد بين الدول الأوروبية الكبرى.",ru:"Эта статья заново поделила Африку между великими европейскими державами.",en:"This clause divided the continent of Africa anew among the great European powers."},
+         {he:"הסעיף קבע את גבולות רוסיה אחרי המהפכה שהייתה בה ב-1917.",ar:"لقد حدّد هذا البند حدود روسيا بعد الثورة التي وقعت فيها سنة 1917.",ru:"Эта статья установила границы России после произошедшей там революции 1917 года.",en:"This clause fixed the borders of Russia after the revolution that happened there in 1917."}],
+        [{he:"הסעיף עוסק באחריות לנזק, ולא בחבר הלאומים.",ar:"المادة تتناول المسؤولية عن الضرر لا عصبة الأمم.",ru:"Статья касается ответственности за ущерб, а не Лиги Наций.",en:"The clause deals with liability for damage, not the League of Nations."},
+         {he:"חלוקת המושבות נעשתה בסעיפים אחרים של החוזה.",ar:"تقسيم المستعمرات جرى في مواد أخرى من المعاهدة.",ru:"Раздел колоний прошёл в других статьях договора.",en:"The colonies were divided in other clauses of the treaty."},
+         {he:"רוסיה כלל אינה נזכרת בסעיף 231 של החוזה.",ar:"روسيا لا تُذكر إطلاقًا في المادة 231 من المعاهدة.",ru:"Россия в статье 231 договора вообще не упоминается.",en:"Russia is not mentioned at all in clause 231 of the treaty."}])])
  ]
 ]);
 
@@ -3408,14 +3512,20 @@ topic("ww2","c20",
           "From the preamble to the Universal Declaration of Human Rights, 1948."]},
      [Q({he:"אילו אירועים עומדים ברקע המקור?",ar:"ما الأحداث التي تقف في خلفية المصدر؟",ru:"Какие события стоят за этим текстом?",en:"What events stand behind this source?"},
         {he:"מעשי הזוועה של מלחמת העולם השנייה והשואה.",ar:"فظائع الحرب العالمية الثانية والمحرقة.",ru:"Зверства Второй мировой войны и Холокоста.",en:"The atrocities of the Second World War and the Holocaust."},
-        [{he:"מלחמות הדת של המאה ה-17.",ar:"حروب الدين في القرن السابع عشر.",ru:"Религиозные войны XVII века.",en:"The religious wars of the seventeenth century."},
-         {he:"המהפכה התעשייתית.",ar:"الثورة الصناعية.",ru:"Промышленная революция.",en:"The Industrial Revolution."},
-         {he:"מסעי הצלב.",ar:"الحملات الصليبية.",ru:"Крестовые походы.",en:"The Crusades."}]),
+        [{he:"מלחמות הדת הגדולות של המאה ה-17 ברחבי אירופה.",ar:"حروب الدين الكبرى في القرن الـ17 في أوروبا.",ru:"Большие религиозные войны 17 века по всей Европе.",en:"The great religious wars of the 17th century across Europe."},
+         {he:"המהפכה התעשייתית ותנאי העבודה הקשים מאוד שבה.",ar:"الثورة الصناعية وظروف العمل القاسية فيها.",ru:"Промышленная революция и её тяжёлые условия труда.",en:"The industrial revolution and its very harsh working conditions."},
+         {he:"מסעי הצלב והמאבק הארוך על העיר הקדושה ירושלים.",ar:"الحروب الصليبية والصراع على مدينة القدس.",ru:"Крестовые походы и борьба за город Иерусалим.",en:"The Crusades and the long struggle over the holy city of Jerusalem."}],
+        [{he:"ההכרזה נכתבה ב-1948, סמוך למלחמה שהסתיימה.",ar:"كُتب الإعلان سنة 1948، عقب حرب انتهت لتوّها.",ru:"Декларация написана в 1948 году, сразу после окончившейся войны.",en:"The declaration was written in 1948, right after a war that had ended."},
+         {he:"הזמן אינו מתאים, וההכרזה מדברת על מעשי פראות.",ar:"الزمن لا يناسب، والإعلان يتحدث عن أعمال وحشية.",ru:"Время не совпадает, а декларация говорит о варварских делах.",en:"The dates do not fit, and the declaration speaks of acts of barbarism."},
+         {he:"בין מסעי הצלב לשנת 1948 חלפו מאות שנים.",ar:"بين الحروب الصليبية وسنة 1948 مرّت قرون.",ru:"Между крестовыми походами и 1948 годом прошли столетия.",en:"Hundreds of years passed between the Crusades and 1948."}]),
       Q({he:"מה מחדשת ההכרזה?",ar:"ما الجديد الذي يأتي به الإعلان؟",ru:"Что нового вносит эта декларация?",en:"What is new in the declaration?"},
         {he:"שזכויות שייכות לכל אדם באשר הוא, ולא רק לאזרחי מדינה מסוימת.",ar:"أن الحقوق تخصّ كل إنسان بما هو إنسان، لا مواطني دولة بعينها فقط.",ru:"Что права принадлежат всякому человеку как человеку, а не только гражданам определённого государства.",en:"That rights belong to every human being as such, and not only to the citizens of a particular state."},
-        [{he:"שכל מדינה קובעת לעצמה אילו זכויות יש.",ar:"أن كل دولة تحدّد لنفسها ما الحقوق.",ru:"Что каждое государство само определяет, какие есть права.",en:"That each state decides for itself which rights exist."},
-         {he:"שזכויות ניתנות רק בזמן שלום.",ar:"أن الحقوق تُمنح في زمن السلم فقط.",ru:"Что права даются только в мирное время.",en:"That rights are granted only in peacetime."},
-         {he:"שהיא מחייבת משפטית כמו חוק במדינה.",ar:"أنه ملزم قانونيًا كقانون داخل دولة.",ru:"Что она юридически обязательна, как закон внутри государства.",en:"That it is legally binding like a law inside a state."}])])
+        [{he:"שכל מדינה קובעת לעצמה אילו זכויות יש לתושבים שלה.",ar:"أن كل دولة تقرّر لنفسها ما هي الحقوق التي يملكها سكانها.",ru:"Что каждое государство само решает, какие именно права есть у его собственных жителей.",en:"That each and every state decides for itself which rights its own residents have."},
+         {he:"שזכויות ניתנות לאנשים רק בזמן שלום, ונפסקות בימי מלחמה.",ar:"أن الحقوق تُمنح في زمن السلم فقط، وتتوقف في زمن الحرب.",ru:"Что права даются людям только в мирное время и полностью прекращаются в дни войны.",en:"That rights are given to people only in peacetime and stop entirely in days of war."},
+         {he:"שהיא מחייבת משפטית כמו חוק, ואפשר לתבוע על פיה בבית משפט.",ar:"أنه ملزم قانونيًا كالقانون، ويمكن التقاضي وفقه في المحاكم.",ru:"Что она юридически обязательна, как обычный закон, и по ней можно судиться в суде.",en:"That it binds in law like an ordinary statute, and one can sue under it in court."}],
+        [{he:"ההכרזה קובעת זכויות משותפות, שעומדות מעל למדינה.",ar:"الإعلان يقرّر حقوقًا مشتركة تعلو على الدولة.",ru:"Декларация устанавливает общие права, стоящие выше государства.",en:"The declaration sets out shared rights that stand above the state."},
+         {he:"ההכרזה נולדה מתוך מלחמה, ואינה נעצרת בגללה.",ar:"الإعلان وُلد من رحم الحرب، ولا يتوقف بسببها.",ru:"Декларация родилась из войны и из-за войны не прекращается.",en:"The declaration was born out of war, and does not stop because of it."},
+         {he:"זו הכרזה. אמנות מחייבות משפטית נחתמו רק אחריה.",ar:"هذا إعلان. المعاهدات الملزمة قانونيًا وُقّعت بعده.",ru:"Это декларация. Юридически обязательные договоры подписали позже.",en:"It is a declaration. Legally binding treaties were signed only later."}])])
  ]
 ]);
 
@@ -3571,14 +3681,20 @@ topic("israel","c20",
           "From the Declaration of Independence, 1948."]},
      [Q({he:"אילו שתי התחייבויות מופיעות זו לצד זו במקור?",ar:"أي التزامين يظهران جنبًا إلى جنب في المصدر؟",ru:"Какие два обязательства стоят в источнике рядом?",en:"Which two commitments appear side by side in the source?"},
         {he:"פתיחות לעלייה יהודית, ושוויון זכויות גמור לכל האזרחים.",ar:"الانفتاح على الهجرة اليهودية، والمساواة التامة في الحقوق لكل المواطنين.",ru:"Открытость еврейской репатриации и полное равенство прав для всех граждан.",en:"Openness to Jewish immigration, and complete equality of rights for all citizens."},
-        [{he:"פתיחות לעלייה, וקביעת דת רשמית למדינה.",ar:"الانفتاح على الهجرة، وتحديد دين رسمي للدولة.",ru:"Открытость репатриации и установление государственной религии.",en:"Openness to immigration, and the setting of an official state religion."},
-         {he:"פיתוח הארץ, וסגירת שעריה בפני מהגרים.",ar:"تطوير البلاد، وإغلاق أبوابها أمام المهاجرين.",ru:"Развитие страны и закрытие её ворот для переселенцев.",en:"Developing the country, and closing its gates to immigrants."},
-         {he:"שוויון זכויות, וביטול הכנסת.",ar:"المساواة في الحقوق، وإلغاء الكنيست.",ru:"Равенство прав и упразднение Кнессета.",en:"Equality of rights, and the abolition of the Knesset."}]),
+        [{he:"פתיחות לעלייה יהודית, וקביעת דת רשמית למדינה החדשה שהוקמה.",ar:"الانفتاح على الهجرة اليهودية، وتحديد دين رسمي لهذه الدولة الجديدة التي أُقيمت.",ru:"Открытость еврейской репатриации и установление религии нового государства.",en:"Openness to Jewish immigration, and an official religion for the newly founded state."},
+         {he:"פיתוח הארץ, וסגירת שעריה בפני מהגרים יהודים חדשים.",ar:"تطوير البلاد، وإغلاق أبوابها أمام المهاجرين اليهود الجدد.",ru:"Развитие страны и закрытие её ворот перед еврейскими переселенцами.",en:"Developing the land, and closing its gates to new Jewish immigrants."},
+         {he:"שוויון זכויות לכל אזרח, וביטול הכנסת כבית נבחרים.",ar:"مساواة في الحقوق لكل مواطن، وإلغاء الكنيست كبرلمان منتخب.",ru:"Равенство прав для всех граждан и упразднение кнессета как парламента.",en:"Equal rights for every citizen, and abolishing the Knesset as a parliament."}],
+        [{he:"המגילה אינה קובעת דת רשמית, ומבטיחה שוויון לכולם.",ar:"الإعلان لا يحدّد دينًا رسميًا، ويضمن المساواة للجميع.",ru:"Декларация не устанавливает государственной религии и обещает равенство.",en:"The Declaration sets no official religion, and promises equality to all."},
+         {he:"המגילה כותבת שהמדינה תהא פתוחה לעלייה יהודית.",ar:"الإعلان يكتب أن الدولة ستكون مفتوحة للهجرة اليهودية.",ru:"Декларация пишет, что государство будет открыто для репатриации.",en:"The Declaration writes that the state will be open to Jewish immigration."},
+         {he:"אין במגילה שום דבר על ביטול בית נבחרים.",ar:"لا شيء في الإعلان عن إلغاء برلمان منتخب.",ru:"В Декларации нет ничего об упразднении выборного парламента.",en:"The Declaration says nothing about abolishing an elected parliament."}]),
       Q({he:"מה מעמדו המשפטי של המסמך?",ar:"ما المكانة القانونية للوثيقة؟",ru:"Каков правовой статус документа?",en:"What is the legal standing of the document?"},
-        {he:"הוא הכרזה על עקרונות ולא חוקה; ישראל לא כתבה חוקה שלמה.",ar:"إعلان مبادئ لا دستور؛ فإسرائيل لم تكتب دستورًا كاملًا.",ru:"Это провозглашение принципов, а не конституция; полной конституции Израиль не написал.",en:"It is a declaration of principles, not a constitution; Israel never wrote a full constitution."},
-        [{he:"הוא חוקת המדינה מאז 1948.",ar:"إنه دستور الدولة منذ 1948.",ru:"Это конституция государства с 1948 года.",en:"It has been the state's constitution since 1948."},
-         {he:"הוא הסכם בינלאומי מחייב.",ar:"إنه اتفاق دولي ملزم.",ru:"Это обязывающий международный договор.",en:"It is a binding international treaty."},
-         {he:"הוא חוק רגיל שהכנסת חוקקה.",ar:"إنه قانون عادي سنّه الكنيست.",ru:"Это обычный закон, принятый Кнессетом.",en:"It is an ordinary law passed by the Knesset."}])])
+        {he:"הוא הכרזה על עקרונות ולא חוקה, וישראל לא כתבה חוקה שלמה.",ar:"إعلان مبادئ لا دستور، وإسرائيل لم تكتب دستورًا كاملًا.",ru:"Это провозглашение принципов, а не конституция, и полной конституции Израиль не написал.",en:"It is a declaration of principles, not a constitution, and Israel never wrote a full constitution."},
+        [{he:"הוא חוקת המדינה מאז 1948, ובית המשפט פוסק לפיה.",ar:"هو دستور الدولة منذ 1948، والمحكمة تقضي وفقه.",ru:"Это конституция государства с 1948 года, и суд выносит по ней решения.",en:"It is the constitution of the state since 1948, and the courts rule according to it."},
+         {he:"הוא הסכם בינלאומי מחייב, שנחתם מול מדינות אחרות.",ar:"هو اتفاق دولي ملزم، وُقّع مع دول أخرى في العالم.",ru:"Это обязывающее международное соглашение, подписанное с другими странами.",en:"It is a binding international agreement, signed with a number of other states."},
+         {he:"הוא חוק רגיל שהכנסת חוקקה, ואפשר לשנותו ברוב.",ar:"هو قانون عادي سنّه الكنيست، ويمكن تغييره بأغلبية.",ru:"Это обычный закон кнессета, и его можно изменить простым большинством.",en:"It is an ordinary law passed by the Knesset, and changed by a simple majority."}],
+        [{he:"לישראל אין חוקה שלמה, והמגילה אינה חוקה.",ar:"لا دستور كاملًا لإسرائيل، والإعلان ليس دستورًا.",ru:"У Израиля нет полной конституции, и Декларация ею не является.",en:"Israel has no full constitution, and the Declaration is not one."},
+         {he:"זו הכרזה של מועצת העם, ולא הסכם בין מדינות.",ar:"هذا إعلان من مجلس الشعب، لا اتفاق بين دول.",ru:"Это провозглашение Народного совета, а не договор между государствами.",en:"It is a proclamation by the People's Council, not a treaty between states."},
+         {he:"המגילה נכתבה ב-1948, לפני שהכנסת קמה בכלל.",ar:"كُتب الإعلان سنة 1948، قبل قيام الكنيست أصلًا.",ru:"Декларация написана в 1948 году, ещё до появления кнессета.",en:"The Declaration was written in 1948, before the Knesset even existed."}])])
  ]
 ]);
 
@@ -3629,6 +3745,28 @@ function centuryStr(y){
 var ROM=["","I","II","III","IV","V","VI","VII","VIII","IX","X",
          "XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI"];
 function _rom(n){return ROM[n]||String(n)}
+/* ------------------------------------------------------------
+   שתי שכבות ניקוי להקראה בלבד. המסך אינו משתנה מהן.
+
+   הספרה הרומית נראית נכון על המסך ונשמעת רע באוזן: קול עברי או
+   ערבי מוסר "XVIII" כאותיות לטיניות ולא כמספר. ההשוואה היא מול
+   ROM עצמו ולא מול תבנית, כדי שמילה לטינית בשם נושא לא תהפוך
+   בטעות למספר.
+
+   והגרשיים העבריים משמשים כאן לשני דברים: ראשי תיבות (לפנה״ס,
+   או״ם) ומירכאות (״אדם חופשי״). המנוע מכיר רק את הראשון. הכלל
+   שמפריד ביניהם: בראשי תיבות באה אחרי הגרשיים אות עברית אחת
+   בדיוק וסוף מילה. הסיכון א-סימטרי — מירכאה שהוסרה אינה יכולה
+   להזיק, מירכאה שנשארה כן.
+   ------------------------------------------------------------ */
+function saySpell(x){
+  return String(x==null?"":x).replace(/[IVXLC]+/g,function(m){
+    var i=ROM.indexOf(m);
+    return i>0?String(i):m;
+  }).replace(/״/g,function(m,i,str){
+    return /^[\u05D0-\u05EA](?![\u05D0-\u05EA])/.test(str.slice(i+1))?m:"";
+  }).replace(/\s—\s/g,", ");
+}
 
 /* כל האירועים מכל התוכן — משם נלקחים מסיחים כשהנושא עצמו קטן מדי,
    וגם תרגיל הסדר הכרונולוגי בין תקופות. */
@@ -3787,8 +3925,10 @@ function formTerm(tp,lv,pool,idx){
 function formSrc(tp,lv,pool,idx){
   var it=pool[idx];
   var qq=pick(it.qs);
-  var opts=[O(esc(gl(qq.a)),true)];
-  qq.w.forEach(function(x){opts.push(O(esc(gl(x)),false))});
+  var opts=[O(esc(gl(qq.a)),true)],ys=qq.y||[];
+  /* לכל מסיח יש נימוק משלו: מה בדיוק במקור סותר אותו. y||[] שומר
+     על קריאות Q ישנות שעדיין אין בהן נימוקים. */
+  qq.w.forEach(function(x,i){opts.push(O(esc(gl(x)),false,ys[i]?gl(ys[i]):""))});
   return {type:"src",prompt:t("qRead"),passage:it,qtext:gl(qq.q),
     opts:shuffle(opts),answer:gl(qq.a),
     /* הקטע עצמו כבר מוקרא בכפתור נפרד מעל הפסקה. אחרי המענה
@@ -3985,7 +4125,7 @@ function screenPractice(){
       h+='<div class="why">'+esc(q.opts[P.picked].why)+"</div>";
     h+="</div>";
     h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+
-       spkBtn(q.say,state.lang,false,t("hearSent"))+spkBtn(q.say,state.lang,true,t("hearSlow"))+
+       spkBtn(saySpell(q.say),state.lang,false,t("hearSent"))+spkBtn(saySpell(q.say),state.lang,true,t("hearSlow"))+
        '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
        esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
   } else {
@@ -5391,7 +5531,12 @@ function examAction(a,el){
     var g=gradeResult(ex.spec,res);
     var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
     /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
-    var k2=(ex.subs||[]).findIndex(function(s){return s.name===sub.name});
+    /* הגשה חדשה מחליפה קודמת רק כששני השמות זהים אחרי נירמול, והשם
+       אינו ריק. בלי זה כל ההגשות בלי שם נראו כאותו תלמיד ודרסו זו את
+       זו בשקט, וגם "דני" מול "דני  " (רווח כפול פנימי) נחשבו לשניים. */
+    var nrm=function(x){return String(x==null?"":x).replace(/\s+/g," ").trim()};
+    var sn=nrm(sub.name);
+    var k2=sn?(ex.subs||[]).findIndex(function(s){return nrm(s.name)===sn}):-1;
     if(!ex.subs)ex.subs=[];
     if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
     exSave();
@@ -5412,7 +5557,13 @@ function examAction(a,el){
   if(a==="sitfinish"){sitFinish();return true}
   /* בלי שפה מפורשת speak נופל ל-"en", ושאלת מבחן בעברית, בערבית
      או ברוסית הוקראה בקול אנגלי. כאן החומר עצמו בשפת הממשק. */
-  if(a==="sitread"){var q2=SIT.qs[SIT.i];if(q2)speak(q2.say,state.lang);return true}
+  /* say נבנה במפורש כ"השאלה והתשובה עליה" ונועד להישמע *אחרי*
+     המענה. במבחן הכפתור זמין *לפני*, ולכן הוא הקריא לתלמיד את
+     התשובה. כאן מוקרא מה שעל המסך — הכותרת והמקור — והאפשרויות
+     ממילא אינן חלק ממנו. */
+  if(a==="sitread"){var q2=SIT.qs[SIT.i];
+    if(q2)speak(saySpell(plainOf(q2.ask||"")+" "+plainOf(q2.expr||"")),state.lang);
+    return true}
   if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
   if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
   if(a==="sitback"){view="sit";render();window.scrollTo(0,0);return true}
@@ -5470,7 +5621,7 @@ function answer(i){
   announce(P.ok?t("correct"):t("wrong")+". "+t("answerIs")+" "+q.answer);
   /* המשפט המלא נשמע מיד, גם כשטעו — במיוחד כשטעו. שמיעה של
      המשפט השלם היא מה שקושר את התאריך לסיפור. */
-  setTimeout(function(){speak(q.say,state.lang)},P.ok?200:420);
+  setTimeout(function(){speak(saySpell(q.say),state.lang)},P.ok?200:420);
 }
 function testKey(){
   var inp=$("#gk"); var k=inp?inp.value.trim():"";
@@ -5531,7 +5682,7 @@ document.addEventListener("click",function(e){
     /* רמז אינו טעות ואינו נספר ככזו. מי שנעזר בו עדיין עונה בעצמו. */
     if(!P.q||P.done)return;
     P.hint=true; render();
-    if(P.q.hint)speak(P.q.hint,state.lang);
+    if(P.q.hint)speak(saySpell(P.q.hint),state.lang);
     return;
   }
   if(a==="dunno"){
@@ -5539,7 +5690,7 @@ document.addEventListener("click",function(e){
        התשובה. מי שמנחש לומד פחות ממי שמודה. */
     var q=P.q; if(!q)return;
     P.done=true; P.ok=false; P.picked=-1; record(false); render();
-    setTimeout(function(){speak(q.say,state.lang)},260);
+    setTimeout(function(){speak(saySpell(q.say),state.lang)},260);
     return;
   }
   if(a==="lang"){state.lang=LANGS[v]?v:"he";save();render();return}
@@ -5601,7 +5752,7 @@ document.addEventListener("input",function(e){
     }
     if(k==="exm"){
       EB.mins=clamp(parseInt(sl.value,10)||0,0,90);
-      var lm=$("#exMlab"); if(lm)lm.textContent=EB.mins?EB.mins+" דקות":"ללא";
+      var lm=$("#exMlab"); if(lm)lm.textContent=EB.mins?EB.mins+" "+xt("minutes"):xt("none");
       EB.built=null; return;
     }
   }
@@ -5626,7 +5777,7 @@ document.addEventListener("keydown",function(e){
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();speak(P.q.say,state.lang);return}
+  if(e.key===" "){e.preventDefault();speak(saySpell(P.q.say),state.lang);return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
@@ -5651,7 +5802,7 @@ booted=true;
 applyModes();
 render();
 </script>
-<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -5659,7 +5810,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m35-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m36-pwa1").catch(function(){});
   });
 }
 </script>
