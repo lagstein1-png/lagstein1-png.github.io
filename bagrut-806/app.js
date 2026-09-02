@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x1 · 2026-09-02";
+  var BUILD = "x2 · 2026-09-02";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -42,7 +42,7 @@
   var store = {
     data: null,
     blank: function () {
-      return { fs: 1, theme: "auto", examId: null, solved: {}, sims: [], weak: {} };
+      return { fs: 1, theme: "auto", rate: 1, examId: null, solved: {}, sims: [], weak: {} };
     },
     load: function () {
       try {
@@ -65,7 +65,7 @@
   };
 
   /* --- מצב ------------------------------------------------------- */
-  var state = { screen: "home", examId: null, topic: null };
+  var state = { screen: "home", examId: null, topic: null, back: "home" };
 
   /* --- מראה וגודל טקסט ------------------------------------------ */
   function applyPrefs() {
@@ -80,12 +80,40 @@
       if (b.tagName !== "BUTTON") return;
       b.setAttribute("aria-pressed", String(b.getAttribute("data-theme") === d.theme));
     });
+    $$("[data-rate]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(Number(b.getAttribute("data-rate")) === d.rate));
+    });
+    if (window.Speech) window.Speech.rate = d.rate;
+    voiceState();
+  }
+
+  /* --- מצב הקול, כפי שהוא מוצג למשתמש ---------------------------
+     "אין קול" בלי הסבר נראה כמו תקלה באפליקציה. אומרים מה חסר
+     ואיפה מתקינים, כי זו הגדרה של המכשיר ולא שלנו. */
+  function voiceState() {
+    var el = $("#voice-state"), btn = $("#btn-try");
+    if (!el) return;
+    if (!window.Speech || !window.Speech.available()) {
+      el.textContent = "הדפדפן הזה אינו תומך בהקראה.";
+      if (btn) btn.disabled = true;
+      return;
+    }
+    window.Speech.ready().then(function () {
+      if (window.Speech.hasHebrewVoice()) {
+        el.textContent = "קול עברי במכשיר: " + window.Speech.voiceName();
+        if (btn) btn.disabled = false;
+      } else {
+        el.textContent = "אין במכשיר קול עברי. אפשר להתקין אחד בהגדרות המכשיר — " +
+          "באנדרואיד: הגדרות ← נגישות ← טקסט לדיבור; באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות.";
+        if (btn) btn.disabled = false;
+      }
+    });
   }
 
   /* --- נוסחאות ---------------------------------------------------
      KaTeX מקומי. אם מסיבה כלשהי הוא לא נטען, מוצג ה-LaTeX כטקסט
      ולא נופלת השאלה כולה — עדיף שורה מכוערת על מסך ריק. */
-  function formula(tex) {
+  function formula(tex, id) {
     if (!tex) return "";
     var html;
     try {
@@ -93,7 +121,7 @@
     } catch (e) {
       html = "<code>" + esc(tex) + "</code>";
     }
-    return '<div class="formula">' + html + "</div>";
+    return '<div class="formula"' + (id ? ' id="' + esc(id) + '"' : "") + ">" + html + "</div>";
   }
   /* הסימן שאפשר לגלול נוסף אחרי הציור, כי רק אז ידוע אם הנוסחה
      באמת רחבה מהמסך. סימן שמופיע תמיד הוא רעש; סימן שלא מופיע
@@ -103,6 +131,21 @@
       if (root && !root.contains(el)) return;
       el.classList.toggle("over", el.scrollWidth > el.clientWidth + 1);
     });
+  }
+
+  /* --- הקראה -----------------------------------------------------
+     המשפטים נעטפים כאן באותו מפצל שהמנוע משתמש בו, ולכן המשפט
+     שמודגש הוא בדיוק המשפט שנאמר. שני מפצלים נפרדים היו מתפצלים
+     ביום שמישהו יגע באחד מהם. */
+  function sentHtml(text) {
+    var ss = (window.Speech && window.Speech.sentences)
+      ? window.Speech.sentences(String(text))
+      : [String(text)];
+    return ss.map(function (x) { return '<span class="sent">' + esc(x) + "</span>"; }).join("");
+  }
+  function spkBtn(id, label) {
+    return '<button class="spk" data-read="' + esc(id) + '" type="button" ' +
+           'aria-label="' + esc(label) + '" title="' + esc(label) + '">🔊</button>';
   }
 
   /* --- בחירת בחינה ---------------------------------------------- */
@@ -140,12 +183,19 @@
     }).join("");
   }
 
-  /* --- תצוגת השאלה. בשלב הזה קריאה בלבד ------------------------- */
-  function subHtml(sub) {
-    var h = '<div class="sub"><h3><span class="letter">' + esc(sub.letter) +
-            ".</span> " + esc(sub.text) + "</h3>";
-    h += '<p class="meta">' + plural(sub.points, "נקודה אחת", "שתי נקודות", "נקודות") + "</p>";
-    h += formula(sub.latex);
+  /* --- תצוגת השאלה. בשלב הזה קריאה והקראה, בלי רמזים ------------ */
+  function subHtml(q, sub, si) {
+    var id = "q" + q.number + "s" + si;
+    /* הנוסחה יוצאת מעמודת הטקסט בכוונה: בתוכה היא מאבדת את רוחב
+       הכפתור, ועל מסך צר זה בדיוק ההפרש בין נוסחה שנכנסת לנוסחה
+       שצריך לגרור. */
+    var h = '<div class="sub"><div class="saybar">' +
+      spkBtn(id, "הקריאו את סעיף " + sub.letter) +
+      '<div class="grow"><h3 id="t-' + id + '"><span class="letter">' + esc(sub.letter) +
+      ".</span> " + sentHtml(sub.text) + "</h3>" +
+      '<p class="meta">' + plural(sub.points, "נקודה אחת", "שתי נקודות", "נקודות") +
+      "</p></div></div>";
+    h += formula(sub.latex, "f-" + id);
     if (sub.speech) h += '<p class="saytxt">בהקראה: ' + esc(sub.speech) + "</p>";
     var steps = sub.steps || [];
     h += '<p class="meta">' +
@@ -155,13 +205,31 @@
     return h + "</div>";
   }
   function questionHtml(q) {
+    var id = "q" + q.number;
     var h = '<div class="card"><div class="qhead"><span class="qnum">שאלה ' +
             esc(q.number) + '</span><span class="chip">' + esc(q.topic) + "</span></div>";
-    h += "<p>" + esc(q.text) + "</p>";
-    h += formula(q.latex);
+    h += '<div class="saybar">' + spkBtn(id, "הקריאו את השאלה") +
+         '<div class="grow"><p id="t-' + id + '">' + sentHtml(q.text) + "</p></div></div>";
+    h += formula(q.latex, "f-" + id);
     if (q.speech) h += '<p class="saytxt">בהקראה: ' + esc(q.speech) + "</p>";
-    (q.subQuestions || []).forEach(function (s) { h += subHtml(s); });
+    (q.subQuestions || []).forEach(function (sub, si) { h += subHtml(q, sub, si); });
     return h + "</div>";
+  }
+
+  /* מאתר מה להקריא לפי המזהה שעל הכפתור. הטקסט תמיד ראשון והנוסחה
+     אחריו, ומה שנאמר על נוסחה הוא השדה speech — לעולם לא ה-LaTeX. */
+  function readUnits(id) {
+    var ex = examById(state.examId);
+    if (!ex) return [];
+    var m = /^q(\d+)(?:s(\d+))?$/.exec(id);
+    if (!m) return [];
+    var q = null;
+    ex.questions.forEach(function (x) { if (String(x.number) === m[1]) q = x; });
+    if (!q) return [];
+    var src = m[2] === undefined ? q : (q.subQuestions || [])[Number(m[2])];
+    if (!src) return [];
+    return [{ text: src.text, el: document.getElementById("t-" + id) },
+            { text: src.speech, el: document.getElementById("f-" + id) }];
   }
 
   function topicsOf(ex) {
@@ -217,9 +285,19 @@
        בלי בחירה הייתה מגיעה למסך שמתייחס ל-examId שאינו קיים. */
     if ((screen === "mode" || screen === "sim" || screen === "practice") && !state.examId)
       screen = "home";
+    /* מי שנכנס להגדרות באמצע תרגול כדי להאט את ההקראה חוזר לשם,
+       ולא לרשימת הבחינות. שלוש לחיצות כדי לחזור למקום שבו היית
+       הן בדיוק העומס שהאפליקציה הזאת נועדה להוריד. */
+    if (screen === "settings" && state.screen !== "settings") state.back = state.screen;
     state.screen = screen;
+    /* מעבר מסך בזמן הקראה משאיר קול שמדבר על טקסט שכבר אינו על
+       המסך, וההדגשה נשארת על אלמנט מוסתר. */
+    if (window.Speech) window.Speech.stop();
     SCREENS.forEach(function (s) { $("#scr-" + s).hidden = s !== screen; });
-    $("#btn-home").hidden = screen === "home";
+    var back = $("#btn-home");
+    back.hidden = screen === "home";
+    back.textContent = screen === "settings" && state.back !== "home" ? "חזרה" : "לבחינות";
+    back.setAttribute("data-go", screen === "settings" ? state.back : "home");
     if (screen === "home") renderHome();
     if (screen === "mode") renderMode();
     if (screen === "sim") renderSim();
@@ -231,8 +309,26 @@
 
   /* --- אירועים. האזנה אחת על המסמך, ולא מאזין לכל כפתור --------- */
   document.addEventListener("click", function (e) {
-    var el = e.target.closest ? e.target.closest("[data-go],[data-exam],[data-topic],[data-fs],[data-theme],#btn-reset") : null;
+    var el = e.target.closest ? e.target.closest(
+      "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate]," +
+      "[data-read],#btn-reset,#btn-stop,#btn-try") : null;
     if (!el) return;
+
+    var read = el.getAttribute("data-read");
+    if (read) {
+      /* לחיצה חוזרת על אותו כפתור עוצרת. אחרת מי שלחץ פעמיים
+         שומע את עצמו מתחיל מחדש ולא מבין למה. */
+      if (el.classList.contains("on")) { window.Speech.stop(); return; }
+      window.Speech.speak(readUnits(read), read);
+      return;
+    }
+    if (el.id === "btn-stop") { window.Speech.stop(); return; }
+    if (el.id === "btn-try") {
+      window.Speech.speak([{ text: "שלום. כך נשמעת ההקראה בקצב שנבחר.", el: null }]);
+      return;
+    }
+    var rt = el.getAttribute("data-rate");
+    if (rt) { store.data.rate = Number(rt); store.save(); applyPrefs(); return; }
 
     var exam = el.getAttribute("data-exam");
     if (exam) { state.examId = exam; store.data.examId = exam; store.save(); go("mode"); return; }
@@ -258,6 +354,22 @@
   });
 
   /* --- הפעלה ----------------------------------------------------- */
+  /* כפתור ההקראה הפעיל מסומן, וסרגל העצירה נפתח רק כשבאמת מדברים.
+     סרגל שנשאר פתוח אחרי שהקול נגמר הוא בדיוק סוג הבלבול שהאפליקציה
+     הזאת אמורה למנוע. */
+  if (window.Speech) {
+    window.Speech.onstate = function (on) {
+      $("#stopbar").hidden = !on;
+      $$(".spk").forEach(function (b) { b.classList.remove("on"); });
+      if (!on) return;
+      var t = window.Speech.tag;
+      if (t) {
+        var b = document.querySelector('.spk[data-read="' + t + '"]');
+        if (b) b.classList.add("on");
+      }
+    };
+  }
+
   store.load();
   applyPrefs();
   $("#build").textContent = BUILD;
