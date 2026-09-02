@@ -4,8 +4,8 @@
    מה כאן ומה עוד לא:
      שלב 1  שלד, טעינת EXAMS, ניווט, הגדרות, שמירה במכשיר.
      שלב 2  speech.js — הקראה בעברית עם הדגשת המשפט הנקרא.
-     שלב 3  חשיפת רמזים אחד־אחד ובדיקת תשובה סופית.  ← עד כאן
-     שלב 4  PWA, אופליין מלא, ודוח נושאים חלשים.
+     שלב 3  חשיפת רמזים אחד־אחד ובדיקת תשובה סופית.
+     שלב 4  PWA, אופליין מלא, ודוח נושאים חלשים.  ← עד כאן
 
    אין framework ואין build. הקובץ נטען כ-<script> רגיל, ואחרי
    data/exams.js — הוא סומך על window.EXAMS שכבר קיים.
@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x6 · 2026-09-02";
+  var BUILD = "x7 · 2026-09-02";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -267,8 +267,13 @@
       return;
     }
     box.innerHTML = all.map(function (ex) {
-      var demo = ex.season === "הדגמה"
-        ? ' <span class="chip warn">בחינת הדגמה — לא בחינה אמיתית</span>' : "";
+      /* האזהרה נגזרת מהעונה, וכל ערך שאינו מועד אמיתי חייב להופיע
+         כאן. תלמיד שמתאמן על מה שנראה כבחינה אמיתית ומגלה שאינה —
+         מאבד אמון בכל השאר, וזה הכלל שכתוב בראש data/exams.js. */
+      var FAKE = { "הדגמה": "בחינת הדגמה — לא בחינה אמיתית",
+                   "תרגול": "שאלות תרגול — לא בחינה אמיתית" };
+      var demo = FAKE[ex.season]
+        ? ' <span class="chip warn">' + esc(FAKE[ex.season]) + "</span>" : "";
       return '<button class="card pick" data-exam="' + esc(ex.id) + '">' +
         "<h3>" + esc(examTitle(ex)) + demo + "</h3>" +
         '<p class="meta">' +
@@ -932,7 +937,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x6-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x7-pwa1").catch(function () {});
     });
   }
 
