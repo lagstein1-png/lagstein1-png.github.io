@@ -68,6 +68,7 @@ eslint:
 | math-app | `'nm' is already defined` | שני `var nm` עוקבים באותה פונקציה |
 | math-app | `'tDesc' is not defined` | `typeof tDesc==="function"` — שמירה על תכונה אופציונלית |
 | math-teen | `'VOICE_SAMPLE' is not defined` ×5 | מוגדר ב-`Object.defineProperty(window,...)` כדי להחזיר עברית או ערבית לפי `LG`. eslint אינו רואה גלובל שנוצר כך |
+| index (השורש), reader | `'stopSpeak' is not defined` | `typeof stopSpeak==="function"` ב-`demoQuiet()` — שמירה על תכונה אופציונלית, כמו `tDesc`. שני הדפים היחידים שאין בהם `function stopSpeak` |
 
 `no-redeclare` שאינו ברשימה הזאת אינו בהכרח שפיר: כך נמצא ב-english
 ש-`function P(lines,words,qs)` הבונה קטעי קריאה נדרסה בזמן ריצה על ידי
