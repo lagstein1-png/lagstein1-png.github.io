@@ -37,7 +37,13 @@ tools: Bash, Read, Edit, Write, Grep, Glob
 נושא ואותה רמה.
 
     node .claude/qa/serve.js &
-    node .claude/qa/entropy.js math-uni math-uni2 math-uni3
+    node .claude/qa/entropy.js math-app math-teen math-uni math-uni2 \
+      math-uni3 english history ulpan
+
+שמונה אלה הן **כל** האפליקציות שמגדירות `TOPICS` ו-`buildQ`, ולכן
+כל מה שיש ל-`entropy.js` ול-`options.js` לרוץ עליו. `bagrut-806`
+אינה ביניהן: היא נשענת על מאגר כתוב ב-`data/exams.js` ולא על מחולל,
+ושני הכלים האלה אינם חלים עליה. אל תסיקי מ"אין ממצאים" שנבדקה.
 
 השורה `constant-answer levels` צריכה להיות ריקה. אם רמה מחזירה
 תשובה אחת ב-500 מתוך 500 — סטודנט שמזהה את הדפוס מקבל 100% בלי
