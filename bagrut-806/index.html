@@ -115,6 +115,36 @@ header small{display:block;color:var(--muted);font-weight:500;font-size:.85rem;l
 .tex code{font-family:var(--mono);font-size:1rem;direction:ltr;display:block;text-align:left}
 .tex em{display:block;margin-top:.4rem;font-size:.82rem;color:var(--muted);font-style:normal}
 
+/* ---------- הקראה ----------
+   הבלוק המוקרא מסומן בשוליים, והמשפט שנקרא כרגע מודגש. ההדגשה
+   היא רקע ולא צבע טקסט: מי שקורא לאט מאבד את המקום, וקו הרקע
+   מחזיר אותו — בלי לפגוע בניגותיות של האותיות עצמן. */
+.say{position:relative;padding-inline-end:3.6rem}
+.say .spk{position:absolute;inset-block-start:0;inset-inline-end:0}
+.say.reading{
+  border-inline-start:4px solid var(--accent);
+  padding-inline-start:.7rem;border-radius:6px;
+}
+.sn{border-radius:5px;padding:1px 0}
+/* גם הנוסחה מודגשת כשקוראים את שדה ה-speech שלה. בלי זה ההדגשה
+   "נעלמת" בדיוק ברגע שבו הקול אומר את הנוסחה, והמשתמש מאבד
+   את המקום במקום שבו הוא הכי צריך אותו. */
+.sn.now,.tex.now{background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-soft)}
+.spk.live{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+.rate{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin:.6rem 0 1rem}
+.rate .btn{min-height:var(--hit);padding:.5rem .9rem;font-size:1rem}
+.rate .btn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.warn-line{background:var(--warn-soft);border-inline-start:4px solid var(--warn);
+  padding:.6rem .8rem;border-radius:8px;margin:.6rem 0 1rem}
+.bad-line{background:var(--bad-soft);border-inline-start:4px solid var(--bad);
+  padding:.6rem .8rem;border-radius:8px;margin:.4rem 0 1rem}
+
+/* ניגודיות מוגברת: רקע ההדגשה לבדו חלש שם, ולכן גם מסגרת. */
+@media (prefers-contrast:more){
+  .sn.now,.tex.now{outline:2px solid var(--accent);outline-offset:1px}
+}
+
 .schema-errs{
   background:var(--bad-soft);color:var(--ink);border-bottom:3px solid var(--bad);
   padding:1rem;font-size:.95rem;
