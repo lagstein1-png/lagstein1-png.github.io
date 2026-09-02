@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ניב — אנגלית מדוברת וספרותית</title>
 <meta name="description" content="לימוד אנגלית למי שלומד אחרת: כל מילה נשמעת לפני שהיא נקראת, זוגות צלילים קרובים, מצבים מהחיים וקטעי קריאה. בעברית, ערבית, רוסית ואנגלית." />
-<meta name="theme-color" content="#0d1b1a" />
+<meta name="theme-color" content="#f4f7f6" media="(prefers-color-scheme:light)" />
+<meta name="theme-color" content="#0d1b1a" media="(prefers-color-scheme:dark)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -23,7 +24,7 @@
   --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
   --en:"Lexend","Heebo",system-ui,"Segoe UI",Arial,sans-serif;
   --bg:#f4f7f6; --surface:#ffffff; --surface2:#e9efee;
-  --ink:#0f1f1d; --muted:#54655f; --faint:#83948e; --line:#dde6e3;
+  --ink:#0f1f1d; --muted:#54655f; --faint:#6f817b; --line:#dde6e3;
   --accent:#0f766e; --accent-ink:#ffffff; --accent-soft:#d6f0eb;
   --gold:#a16207; --gold-soft:#fbf0d5; --hit:#f5c451; --hit-ink:#1a1300;
   --ok:#15803d; --ok-soft:#dcfce7; --bad:#be123c; --bad-soft:#ffe4e9;
@@ -88,6 +89,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
 :root.clear body{font-family:"Verdana","Tahoma","Heebo",sans-serif;letter-spacing:.012em}
 :root.spaced body{word-spacing:.22em;line-height:1.95}
 :root.rm *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 h1,h2,h3{margin:0;line-height:1.3;font-weight:800}
 button{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
@@ -731,7 +733,7 @@ T.he={
   ofN:"מתוך", newWord:"מילה חדשה", review:"חזרה"
 };
 T.ar={
-  app:"نِيف", tagline:"إنجليزية محكية وأدبية",
+  app:"نِيف", tagline:"إنجليزية محكيّة وأدبيّة",
   navHome:"المسارات", navProg:"التقدّم", navSet:"الإعدادات", navExam:"امتحان", back:"رجوع",
   heroT:"إنجليزية تُسمَع قبل أن تُقرأ",
   heroP:"كل كلمة وكل جملة وكل نص — مع زر استماع. يمكنك الإبطاء والإعادة ورؤية المعنى بلغتك. بلا مؤقّت وبلا عقاب على الخطأ.",
@@ -781,7 +783,7 @@ T.ar={
   ofN:"من", newWord:"كلمة جديدة", review:"مراجعة"
 };
 T.ru={
-  app:"Нив", tagline:"Английский разговорный и литературный",
+  app:"Нив", tagline:"Английский разговорный и книжный",
   navHome:"Направления", navProg:"Прогресс", navSet:"Настройки", navExam:"Экзамен", back:"Назад",
   heroT:"Английский, который слышно раньше, чем читаешь",
   heroP:"Каждое слово, каждая фраза и каждый текст — с кнопкой прослушивания. Можно замедлить, повторить и увидеть значение на своём языке. Без таймера и без наказания за ошибку.",
@@ -831,7 +833,7 @@ T.ru={
   ofN:"из", newWord:"новое слово", review:"повторение"
 };
 T.en={
-  app:"Niv", tagline:"Spoken and literary English",
+  app:"Niv", tagline:"Spoken and written English",
   navHome:"Tracks", navProg:"Progress", navSet:"Settings", navExam:"Exam", back:"Back",
   heroT:"English you hear before you read it",
   heroP:"Every word, every sentence and every passage comes with a play button. Slow it down, repeat it, and see the meaning in your own language. No timer, and no penalty for a wrong answer.",
@@ -917,7 +919,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n31 · 2026-09-01";
+var BUILD="n33 · 2026-09-02";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -1460,31 +1462,70 @@ function femLift(v){
    על המסך מה קרה. יום שלם אבד כי כשלא היה קול, שום דבר לא אמר למה.
    ------------------------------------------------------------ */
 var VCHK="";
+/* ------------------------------------------------------------
+   תוצאת בדיקת הקול, בארבע שפות. הכפתור היה מתורגם והתשובה לא:
+   מי שהקול לא עובד לו ואינו קורא עברית קיבל הודעת תקלה בעברית —
+   בדיוק המשתמש שהבדיקה נועדה לו. טבלה נפרדת ולא TR_KEYS, כדי לא
+   להזיז אינדקסים, ומפני ש-math-teen מתרגם לערבית בלבד.
+   ------------------------------------------------------------ */
+var VCHKMSG={
+  he:{sent:"נשלח…",noSup:"✗ הדפדפן הזה לא תומך בהקראה",mkFail:"✗ יצירת האמירה נכשלה: ",
+      okN:["✓ הקול פועל — "," קולות במכשיר"],ok:"✓ הקול פועל",unk:"לא ידוע",
+      engine:["✗ המנוע החזיר "," קולות · זו תקלה במכשיר, לא באפליקציה"],
+      spFail:"✗ speak נכשל: ",timeout:["✗ שתי שניות ואין תגובה מהמנוע · "," קולות במכשיר"],
+      say:"שלום, זו בדיקת קול"},
+  ar:{sent:"جارٍ الإرسال…",noSup:"✗ هذا المتصفّح لا يدعم القراءة الصوتية",mkFail:"✗ فشل إنشاء النطق: ",
+      okN:["✓ الصوت يعمل — "," صوتًا في الجهاز"],ok:"✓ الصوت يعمل",unk:"غير معروف",
+      engine:["✗ أعاد المحرّك "," صوتًا · هذا عطل في الجهاز، لا في التطبيق"],
+      spFail:"✗ فشل speak: ",timeout:["✗ ثانيتان بلا ردّ من المحرّك · "," صوتًا في الجهاز"],
+      say:"مرحبًا، هذا فحص صوت"},
+  ru:{sent:"Отправляем…",noSup:"✗ Этот браузер не поддерживает озвучивание",mkFail:"✗ Не удалось создать реплику: ",
+      okN:["✓ Голос работает — голосов: ",""],ok:"✓ Голос работает",unk:"неизвестно",
+      engine:["✗ Синтезатор вернул "," голосов · это неполадка устройства, а не приложения"],
+      spFail:"✗ speak не сработал: ",timeout:["✗ Две секунды без ответа от синтезатора · "," голосов"],
+      say:"Здравствуйте, это проверка голоса"},
+  en:{sent:"Sending…",noSup:"✗ This browser does not support read-aloud",mkFail:"✗ Could not create the utterance: ",
+      okN:["✓ The voice works — "," voices on this device"],ok:"✓ The voice works",unk:"unknown",
+      engine:["✗ The engine returned "," voices · this is a device fault, not an app fault"],
+      spFail:"✗ speak failed: ",timeout:["✗ Two seconds and no response from the engine · "," voices on this device"],
+      say:"Hello, this is a voice check"}
+};
+function vchkT(){ var g=state.lang||"he"; return VCHKMSG[g]||VCHKMSG.he }
 function voiceCheck(){
-  VCHK="…"; render();
+  var M=vchkT();
+  VCHK=M.sent; render();
   function show(m){ VCHK=m; render() }
-  if(!("speechSynthesis" in window)){ show("✗ הדפדפן הזה לא תומך בהקראה"); return }
+  if(!("speechSynthesis" in window)){ show(M.noSup); return }
   var list=[]; try{ list=speechSynthesis.getVoices()||[] }catch(e){}
   try{ speechSynthesis.cancel() }catch(e){}
   var u;
-  try{ u=new SpeechSynthesisUtterance("שלום, זו בדיקת קול") }
-  catch(e){ show("✗ יצירת האמירה נכשלה: "+e.message); return }
-  u.lang="he-IL"; u.volume=1; u.rate=1; u.pitch=1;
+  try{ u=new SpeechSynthesisUtterance(M.say) }
+  catch(e){ show(M.mkFail+e.message); return }
+  u.lang=(LANGS[state.lang||"he"]||LANGS.he).tts; u.volume=1; u.rate=1; u.pitch=1;
   var done=false;
-  u.onstart=function(){ done=true; show("✓ הקול פועל — "+list.length+" קולות במכשיר") };
+  u.onstart=function(){ done=true; show(M.okN[0]+list.length+M.okN[1]) };
   u.onerror=function(e){ done=true;
-    var er=(e&&e.error)||"לא ידוע";
-    if(er==="interrupted"||er==="canceled"){ show("✓ הקול פועל"); return }
-    show("✗ המנוע החזיר "+er+" · "+list.length+" קולות · זו תקלה במכשיר, לא באפליקציה"); };
+    var er=(e&&e.error)||M.unk;
+    if(er==="interrupted"||er==="canceled"){ show(M.ok); return }
+    show(M.engine[0]+er+" · "+list.length+M.engine[1]); };
   try{ speechSynthesis.speak(u) }
-  catch(e){ show("✗ speak נכשל: "+e.message); return }
+  catch(e){ show(M.spFail+e.message); return }
   setTimeout(function(){ if(!done)
-    show("✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר") },2000);
+    show(M.timeout[0]+list.length+M.timeout[1]) },2000);
 }
 
+/* ------------------------------------------------------------
+   דור ההקראה. speechSynthesis.cancel() אינו מבטל setTimeout:
+   כרום יורה onend על האמירה שבוטלה, המקטע הבא נרשם בכל זאת,
+   וכעבור SEG_GAP ההקראה הישנה חוזרת מעל החדשה — שני קולות
+   במקביל. מונה אחד פותר את זה: כל הקראה מקבלת מספר, stopSpeak
+   מקדם אותו, ומקטע מדור ישן פשוט אינו מדבר.
+   ------------------------------------------------------------ */
+var _sayGen=0;
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
   try{speechSynthesis.cancel()}catch(e){}
+  var my=++_sayGen;
   /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
      שממתין לרשימת הקולות ועד ארבע שניות אם היא לא מגיעה — ואמירה
      שיוצאת ארבע שניות אחרי המגע נזרקת בשקט באנדרואיד ובספארי.
@@ -1498,6 +1539,7 @@ function speakDevice(text,code,rate){
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
       var pit=femLift(v);
       (function sayseg(k){
+        if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
         if(k>=segs.length){ hlClear(); ttsOK(); return }
         var seg=segs[k];
         var u=new SpeechSynthesisUtterance(seg.text);
@@ -1527,12 +1569,14 @@ function speak(text,lang,rateMul){
   var code=lang==="en"?EN_TTS:LANGS[lang].tts;
   var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
   stopSpeak();
+  var my=_sayGen;   /* גם תשובת רשת שמגיעה אחרי עצירה לא תושמע */
   if(gemOn()){
     var vid=gvOf(state.gemVoice).id;
     var ck=lang+"|"+vid+"|"+rate.toFixed(2)+"|"+text;
     if(gCache[ck]){playUrl(gCache[ck],text,code,rate);return}
     gBusy=true; renderSpeakState();
     gSynth(text,vid,rate,lang).then(function(u){
+      if(my!==_sayGen)return;
       gCache[ck]=u; gBusy=false; renderSpeakState(); playUrl(u,text,code,rate);
     }).catch(function(){
       gBusy=false; renderSpeakState(); speakDevice(text,code,rate);
@@ -1548,7 +1592,7 @@ function playUrl(url,text,code,rate){
   gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){_sayGen++;gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -4142,7 +4186,12 @@ function examAction(a,el){
     var g=gradeResult(ex.spec,res);
     var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
     /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
-    var k2=(ex.subs||[]).findIndex(function(s){return s.name===sub.name});
+    /* הגשה חדשה מחליפה קודמת רק כששני השמות זהים אחרי נירמול, והשם
+       אינו ריק. בלי זה כל ההגשות בלי שם נראו כאותו תלמיד ודרסו זו את
+       זו בשקט, וגם "דני" מול "דני  " (רווח כפול פנימי) נחשבו לשניים. */
+    var nrm=function(x){return String(x==null?"":x).replace(/\s+/g," ").trim()};
+    var sn=nrm(sub.name);
+    var k2=sn?(ex.subs||[]).findIndex(function(s){return nrm(s.name)===sn}):-1;
     if(!ex.subs)ex.subs=[];
     if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
     exSave();
@@ -4387,7 +4436,7 @@ booted=true;
 applyModes();
 render();
 </script>
-<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -4395,7 +4444,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n31-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n33-pwa1").catch(function(){});
   });
 }
 </script>

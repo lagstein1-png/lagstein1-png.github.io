@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>אקסיומה ג׳ — שנה שלישית, צעד אחר צעד</title>
 <meta name="description" content="תרגול מתמטיקה לשנה ב׳ באוניברסיטה: חדו״א 2, אלגברה לינארית 2, משוואות דיפרנציאליות והסתברות. כל שאלה עם פתרון מודרך צעד־צעד, זיהוי הטעות, דף נוסחאות והקראה בקול טבעי." />
-<meta name="theme-color" content="#0e1117" />
+<meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme:light)" />
+<meta name="theme-color" content="#0e1117" media="(prefers-color-scheme:dark)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -893,7 +894,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g33 · 2026-09-01";
+var BUILD="g35 · 2026-09-02";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -1283,25 +1284,55 @@ function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild
    על המסך מה קרה. יום שלם אבד כי כשלא היה קול, שום דבר לא אמר למה.
    ------------------------------------------------------------ */
 var VCHK="";
+/* ------------------------------------------------------------
+   תוצאת בדיקת הקול, בארבע שפות. הכפתור היה מתורגם והתשובה לא:
+   מי שהקול לא עובד לו ואינו קורא עברית קיבל הודעת תקלה בעברית —
+   בדיוק המשתמש שהבדיקה נועדה לו. טבלה נפרדת ולא TR_KEYS, כדי לא
+   להזיז אינדקסים, ומפני ש-math-teen מתרגם לערבית בלבד.
+   ------------------------------------------------------------ */
+var VCHKMSG={
+  he:{sent:"נשלח…",noSup:"✗ הדפדפן הזה לא תומך בהקראה",mkFail:"✗ יצירת האמירה נכשלה: ",
+      okN:["✓ הקול פועל — "," קולות במכשיר"],ok:"✓ הקול פועל",unk:"לא ידוע",
+      engine:["✗ המנוע החזיר "," קולות · זו תקלה במכשיר, לא באפליקציה"],
+      spFail:"✗ speak נכשל: ",timeout:["✗ שתי שניות ואין תגובה מהמנוע · "," קולות במכשיר"],
+      say:"שלום, זו בדיקת קול"},
+  ar:{sent:"جارٍ الإرسال…",noSup:"✗ هذا المتصفّح لا يدعم القراءة الصوتية",mkFail:"✗ فشل إنشاء النطق: ",
+      okN:["✓ الصوت يعمل — "," صوتًا في الجهاز"],ok:"✓ الصوت يعمل",unk:"غير معروف",
+      engine:["✗ أعاد المحرّك "," صوتًا · هذا عطل في الجهاز، لا في التطبيق"],
+      spFail:"✗ فشل speak: ",timeout:["✗ ثانيتان بلا ردّ من المحرّك · "," صوتًا في الجهاز"],
+      say:"مرحبًا، هذا فحص صوت"},
+  ru:{sent:"Отправляем…",noSup:"✗ Этот браузер не поддерживает озвучивание",mkFail:"✗ Не удалось создать реплику: ",
+      okN:["✓ Голос работает — голосов: ",""],ok:"✓ Голос работает",unk:"неизвестно",
+      engine:["✗ Синтезатор вернул "," голосов · это неполадка устройства, а не приложения"],
+      spFail:"✗ speak не сработал: ",timeout:["✗ Две секунды без ответа от синтезатора · "," голосов"],
+      say:"Здравствуйте, это проверка голоса"},
+  en:{sent:"Sending…",noSup:"✗ This browser does not support read-aloud",mkFail:"✗ Could not create the utterance: ",
+      okN:["✓ The voice works — "," voices on this device"],ok:"✓ The voice works",unk:"unknown",
+      engine:["✗ The engine returned "," voices · this is a device fault, not an app fault"],
+      spFail:"✗ speak failed: ",timeout:["✗ Two seconds and no response from the engine · "," voices on this device"],
+      say:"Hello, this is a voice check"}
+};
+function vchkT(){ var g=LG; return VCHKMSG[g]||VCHKMSG.he }
 function voiceCheck(){
-  VCHK="נשלח…"; render();
+  var M=vchkT();
+  VCHK=M.sent; render();
   function show(m){ VCHK=m; render() }
-  if(!("speechSynthesis" in window)){ show("✗ הדפדפן הזה לא תומך בהקראה"); return }
+  if(!("speechSynthesis" in window)){ show(M.noSup); return }
   var list=[]; try{ list=speechSynthesis.getVoices()||[] }catch(e){}
   try{ speechSynthesis.cancel() }catch(e){}
   var u;
-  try{ u=new SpeechSynthesisUtterance("שלום, זו בדיקת קול") }
-  catch(e){ show("✗ יצירת האמירה נכשלה: "+e.message); return }
-  u.lang="he-IL"; u.volume=1; u.rate=1; u.pitch=1;
+  try{ u=new SpeechSynthesisUtterance(M.say) }
+  catch(e){ show(M.mkFail+e.message); return }
+  u.lang=(LANGS[LG]||LANGS.he).tts; u.volume=1; u.rate=1; u.pitch=1;
   var done=false;
-  u.onstart=function(){ done=true; show("✓ הקול פועל — "+list.length+" קולות במכשיר") };
+  u.onstart=function(){ done=true; show(M.okN[0]+list.length+M.okN[1]) };
   u.onerror=function(e){ done=true;
-    var er=(e&&e.error)||"לא ידוע";
-    show("✗ המנוע החזיר "+er+" · "+list.length+" קולות · זו תקלה במכשיר, לא באפליקציה"); };
+    var er=(e&&e.error)||M.unk;
+    show(M.engine[0]+er+" · "+list.length+M.engine[1]); };
   try{ speechSynthesis.speak(u) }
-  catch(e){ show("✗ speak נכשל: "+e.message); return }
+  catch(e){ show(M.spFail+e.message); return }
   setTimeout(function(){ if(!done)
-    show("✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר") },2000);
+    show(M.timeout[0]+list.length+M.timeout[1]) },2000);
 }
 
 
@@ -1404,9 +1435,18 @@ function femNote(){
   return _("במכשיר הזה אין קול נשי בשפה הנוכחית, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו.")+" "+how;
 }
 
+/* ------------------------------------------------------------
+   דור ההקראה. speechSynthesis.cancel() אינו מבטל setTimeout:
+   כרום יורה onend על האמירה שבוטלה, המקטע הבא נרשם בכל זאת,
+   וכעבור SEG_GAP ההקראה הישנה חוזרת מעל החדשה — שני קולות
+   במקביל. מונה אחד פותר את זה: כל הקראה מקבלת מספר, stopSpeak
+   מקדם אותו, ומקטע מדור ישן פשוט אינו מדבר.
+   ------------------------------------------------------------ */
+var _sayGen=0;
 function speakDevice(text){
   if(!("speechSynthesis" in window))return;
   try{speechSynthesis.cancel()}catch(e){}
+  var my=++_sayGen;
   /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
      שממתין לרשימת הקולות ועד ארבע שניות אם היא לא מגיעה — ואמירה
      שיוצאת ארבע שניות אחרי המגע נזרקת בשקט באנדרואיד ובספארי.
@@ -1423,6 +1463,7 @@ function speakDevice(text){
   var _pitch=femLift(_v);
   /* המקטע הראשון יוצא כאן, בתוך הלחיצה. השאר נשרשרים מ-onend. */
   (function sayseg(k){
+    if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
     if(k>=_segs.length){ hlClear(); ttsOK(); return }
     var seg=_segs[k];
     try{
@@ -1452,6 +1493,7 @@ function speak(text){
     if(ttsState!=="device"){ttsState="device"}
     speakDevice(text);return;
   }
+  var my=_sayGen;   /* גם תשובת רשת שמגיעה אחרי עצירה לא תושמע */
   var name=state.settings.gvoice||"Kore",rate=state.settings.rate;
   var ck=name+"|"+rate.toFixed(2)+"|"+text;
   function play(url){
@@ -1463,6 +1505,7 @@ function speak(text){
   }
   if(gCache[ck]){play(gCache[ck]);return}
   gSynth(text,name,rate).then(function(url){
+    if(my!==_sayGen)return;
     gCache[ck]=url;ttsErr="";
     if(ttsState!=="ok"){ttsState="ok";if(view==="practice")render()}
     play(url);
@@ -1488,6 +1531,7 @@ function speak(text){
   });
 }
 function stopSpeak(){
+  _sayGen++;   /* כל מקטע שממתין ב-setTimeout שייך מעכשיו לדור ישן */
   gStop();
   hlClear();
   try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
@@ -1668,7 +1712,9 @@ function cnum(re,im){
 /* (n1 + n2 i) חלקי dn — שני החלקים כשברים מצומצמים */
 function cxq(n1,n2,dn){
   var A=fr(n1,dn),B=fr(n2,dn);
-  return A.html()+(B.n<0?" − ":" + ")+fr(Math.abs(B.n),B.d).html()+"i";
+  /* מקדם מדומה ששווה 1 נכתב i ולא 1i — אותו כלל כמו ב-cnum. */
+  var Bi=fr(Math.abs(B.n),B.d);
+  return A.html()+(B.n<0?" − ":" + ")+((Bi.n===1&&Bi.d===1)?"":Bi.html())+"i";
 }
 /* כפולה של πi לתצוגה, כולל שבר */
 function piI(f){
@@ -2128,26 +2174,26 @@ function genCArith(L){
     while(ctry++<40&&(im===0||re===0||re===a*c+b*d||im===re))
       {a=rnz(-5,5);b=rnz(-5,5);c=rnz(-5,5);d=rnz(-5,5);re=a*c-b*d;im=a*d+b*c}
     return {ask:_("חשבו את המכפלה"),
-      expr:"("+num(a)+sgn(b)+"i)("+num(c)+sgn(d)+"i)",
-      ans:W(num(re)+sgn(im)+"i"),
+      expr:"("+cnum(a,b)+")("+cnum(c,d)+")",
+      ans:W(cnum(re,im)),
       wrong:[
-        W(num(a*c+b*d)+sgn(im)+"i",_("i בריבוע הוא מינוס אחד, ולכן החלק הממשי מחסר ולא מחבר.")),
-        W(num(a*c)+sgn(b*d)+"i",_("הכפלתם ממשי בממשי ומדומה במדומה. צריך לפתוח סוגריים במלואן.")),
-        W(num(im)+sgn(re)+"i",_("החלפתם בין החלק הממשי למדומה."))
+        W(cnum(a*c+b*d,im),_("i בריבוע הוא מינוס אחד, ולכן החלק הממשי מחסר ולא מחבר.")),
+        W(cnum(a*c,b*d),_("הכפלתם ממשי בממשי ומדומה במדומה. צריך לפתוח סוגריים במלואן.")),
+        W(cnum(im,re),_("החלפתם בין החלק הממשי למדומה."))
       ],
       steps:[
         S(_("פותחים סוגריים"),_("בדיוק כמו בשני בינומים."),
-          num(a*c)+sgn(a*d)+"i"+sgn(b*c)+"i"+sgn(b*d)+"i²"),
+          num(a*c)+term(a*d,"i")+term(b*c,"i")+term(b*d,"i²")),
         S(_("מציבים i² = −1"),_("זה כל ההבדל בין מרוכבים לפולינומים."),
           num(a*c)+" − "+pn(b*d)+" = "+num(re)),
-        S(_("אוספים"),"",num(re)+sgn(im)+"i")
+        S(_("אוספים"),"",cnum(re,im))
       ],rule:"cmul",hint:_("פותחים סוגריים כרגיל, ואז מציבים i בריבוע שווה מינוס אחד.")};
   }
   if(L===2){
     var tri=pick([[3,4,5],[6,8,10],[5,12,13],[8,15,17]]);
     a=pick([1,-1])*tri[0];b=pick([1,-1])*tri[1];
     return {ask:_("מהו הערך המוחלט של המספר המרוכב?"),
-      expr:"z = "+num(a)+sgn(b)+"i",
+      expr:"z = "+cnum(a,b),
       ans:W(num(tri[2])),
       wrong:[
         W(num(Math.abs(a)+Math.abs(b)),_("חיברתם את החלקים. הערך המוחלט הוא שורש סכום הריבועים.")),
@@ -2169,11 +2215,12 @@ function genCArith(L){
       dn4=c4*c4+d4*d4;nr4=a4*c4+b4*d4;ni4=b4*c4-a4*d4;
       mr4=a4*c4-b4*d4;mi4=a4*d4+b4*c4;
       S1=cxq(nr4,ni4,dn4);S2=cxq(mr4,mi4,dn4);
-      S3=fr(a4,c4).html()+(b4*d4<0?" − ":" + ")+fr(Math.abs(b4),Math.abs(d4)).html()+"i";
+      var S3i=fr(Math.abs(b4),Math.abs(d4));
+      S3=fr(a4,c4).html()+(b4*d4<0?" − ":" + ")+((S3i.n===1&&S3i.d===1)?"":S3i.html())+"i";
       S4=cxq(nr4,ni4,1);
     }while(t4++<120&&(nr4===0||ni4===0||mr4===0||mi4===0||new Set([S1,S2,S3,S4]).size<4));
     return {ask:_("חשבו את המנה והציגו אותה בצורה a + bi"),
-      expr:frac(num(a4)+sgn(b4)+"i",num(c4)+sgn(d4)+"i"),
+      expr:frac(cnum(a4,b4),cnum(c4,d4)),
       ans:W(S1),
       wrong:[
         W(S2,_("הכפלתם את המונה ואת המכנה במכנה עצמו ולא במצומד שלו. רק המצומד הופך את המכנה לממשי.")),
@@ -2185,7 +2232,7 @@ function genCArith(L){
           frac("("+num(a4)+sgn(b4)+"i)("+num(c4)+" "+(d4>0?"−":"+")+" "+num(Math.abs(d4))+"i)",
                "("+num(c4)+sgn(d4)+"i)("+num(c4)+" "+(d4>0?"−":"+")+" "+num(Math.abs(d4))+"i)")),
         S(_("המכנה נעשה ממשי"),_("מכפלת מספר בצמוד שלו היא |z| בריבוע."),num(c4*c4)+" + "+num(d4*d4)+" = "+num(dn4)),
-        S(_("המונה"),_("פותחים סוגריים ומציבים i בריבוע שווה מינוס אחד."),num(nr4)+sgn(ni4)+"i"),
+        S(_("המונה"),_("פותחים סוגריים ומציבים i בריבוע שווה מינוס אחד."),cnum(nr4,ni4)),
         S(_("מחלקים ומצמצמים"),"",S1)
       ],rule:"cinv",hint:_("מנה של מרוכבים היא שני צעדים: הכפלה במצומד המכנה, ואז חלוקה ב-|z| בריבוע.")};
   }
@@ -2193,7 +2240,7 @@ function genCArith(L){
   a=pick([-4,-3,-2,2,3,4]);b=pick([-4,-3,-2,2,3,4]);
   var den=a*a+b*b;
   return {ask:_("מהו ההופכי של המספר המרוכב?"),
-    expr:frac("1",num(a)+sgn(b)+"i"),
+    expr:frac("1",cnum(a,b)),
     ans:W(fr(a,den).html()+" "+(b>0?"−":"+")+" "+fr(Math.abs(b),den).html()+"i"),
     wrong:[
       W(fr(a,den).html()+" "+(b>0?"+":"−")+" "+fr(Math.abs(b),den).html()+"i",
@@ -4135,7 +4182,7 @@ _f("{0}{1} לשמוע דוגמה</button>", '<button class="btn btn-g w" style="
    · שמות התלמידים נשארים במכשיר של המורה. הם לא עוברים דרך
      שום שרת, כי אין שרת.
    ============================================================ */
-var GENV=2;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
+var GENV=3;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
 var EKEY="shlav-exams-math-uni3-v1";   /* מפתח לאפליקציה הזאת בלבד */
@@ -5063,7 +5110,12 @@ function examAction(a,el){
     var g=gradeResult(ex.spec,res);
     var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
     /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
-    var k2=(ex.subs||[]).findIndex(function(s){return s.name===sub.name});
+    /* הגשה חדשה מחליפה קודמת רק כששני השמות זהים אחרי נירמול, והשם
+       אינו ריק. בלי זה כל ההגשות בלי שם נראו כאותו תלמיד ודרסו זו את
+       זו בשקט, וגם "דני" מול "דני  " (רווח כפול פנימי) נחשבו לשניים. */
+    var nrm=function(x){return String(x==null?"":x).replace(/\s+/g," ").trim()};
+    var sn=nrm(sub.name);
+    var k2=sn?(ex.subs||[]).findIndex(function(s){return nrm(s.name)===sn}):-1;
     if(!ex.subs)ex.subs=[];
     if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
     exSave();
@@ -5241,7 +5293,7 @@ function onAnswer(i){
   }else{
     P.lastWhy=o.why||_("התשובה הזו לא נכונה. שווה לפתוח את הפתרון המודרך ולראות איפה הדרך מתפצלת.");
     announce(_f("לא נכון. {0}", P.lastWhy));
-    if(state.settings.tts)speak(P.lastWhy);
+    if(state.settings.tts)speak(speakProse(P.lastWhy));
     /* אם נגמרו האפשרויות — עוברים לחשיפה ולא משאירים תקועים */
     if(P.picked.length>=P.q.options.length-1){
       P.phase="reveal";
@@ -5277,9 +5329,14 @@ function onAction(a,el){
   if(a==="hint"){
     P.hints=1;render();
     if(s.tts&&P.q.hint){
-      speak(P.q.hint);
+      /* אותה מחרוזת בדיוק להקראה ולהדגשה: hlPrep ממפה תווים לפי
+         מה שנאמר, ורמז שיש בו סימן (√, −, Φ) נאמר אחרת ממה שכתוב —
+         מיפוי לפי הכתוב היה מדגיש את המילה הלא נכונה. כשהשתיים
+         אינן זהות hlPrep מדגיש את הרמז כולו, וזה נכון. */
+      var hsay=speakProse(P.q.hint);
+      speak(hsay);
       /* אחרי speak — הוא קורא ל-stopSpeak שמנקה הדגשה קודמת. */
-      hlPrep(document.querySelector(".hintxt"),P.q.hint);
+      hlPrep(document.querySelector(".hintxt"),hsay);
     }
     return;
   }
@@ -5375,7 +5432,7 @@ document.addEventListener("input",function(e){
     return}
   if(el.dataset.slide==="exm"){
     EB.mins=parseInt(el.value,10)||0;
-    var lm=$("#exMlab"); if(lm)lm.textContent=EB.mins?EB.mins+" דקות":"ללא";
+    var lm=$("#exMlab"); if(lm)lm.textContent=EB.mins?EB.mins+" "+xt("minutes"):xt("none");
     EB.built=null;
     return}
   if(el.dataset.slide==="rate"){
@@ -10371,7 +10428,7 @@ window.addEventListener("hashchange",function(){
 try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(view==="settings")render()}}catch(e){}
 render();
 </script>
-<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -10379,7 +10436,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g33-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g35-pwa1").catch(function(){});
   });
 }
 </script>

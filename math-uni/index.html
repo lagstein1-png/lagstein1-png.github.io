@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד</title>
 <meta name="description" content="תרגול מתמטיקה לשנה א׳ באוניברסיטה: חדו״א, אלגברה לינארית, הסתברות ובדידה. כל שאלה עם פתרון מודרך צעד־צעד, זיהוי הטעות, דף נוסחאות והקראה בקול טבעי." />
-<meta name="theme-color" content="#0e1117" />
+<meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme:light)" />
+<meta name="theme-color" content="#0e1117" media="(prefers-color-scheme:dark)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -891,7 +892,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u34 · 2026-09-01";
+var BUILD="u36 · 2026-09-02";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -1281,25 +1282,55 @@ function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild
    על המסך מה קרה. יום שלם אבד כי כשלא היה קול, שום דבר לא אמר למה.
    ------------------------------------------------------------ */
 var VCHK="";
+/* ------------------------------------------------------------
+   תוצאת בדיקת הקול, בארבע שפות. הכפתור היה מתורגם והתשובה לא:
+   מי שהקול לא עובד לו ואינו קורא עברית קיבל הודעת תקלה בעברית —
+   בדיוק המשתמש שהבדיקה נועדה לו. טבלה נפרדת ולא TR_KEYS, כדי לא
+   להזיז אינדקסים, ומפני ש-math-teen מתרגם לערבית בלבד.
+   ------------------------------------------------------------ */
+var VCHKMSG={
+  he:{sent:"נשלח…",noSup:"✗ הדפדפן הזה לא תומך בהקראה",mkFail:"✗ יצירת האמירה נכשלה: ",
+      okN:["✓ הקול פועל — "," קולות במכשיר"],ok:"✓ הקול פועל",unk:"לא ידוע",
+      engine:["✗ המנוע החזיר "," קולות · זו תקלה במכשיר, לא באפליקציה"],
+      spFail:"✗ speak נכשל: ",timeout:["✗ שתי שניות ואין תגובה מהמנוע · "," קולות במכשיר"],
+      say:"שלום, זו בדיקת קול"},
+  ar:{sent:"جارٍ الإرسال…",noSup:"✗ هذا المتصفّح لا يدعم القراءة الصوتية",mkFail:"✗ فشل إنشاء النطق: ",
+      okN:["✓ الصوت يعمل — "," صوتًا في الجهاز"],ok:"✓ الصوت يعمل",unk:"غير معروف",
+      engine:["✗ أعاد المحرّك "," صوتًا · هذا عطل في الجهاز، لا في التطبيق"],
+      spFail:"✗ فشل speak: ",timeout:["✗ ثانيتان بلا ردّ من المحرّك · "," صوتًا في الجهاز"],
+      say:"مرحبًا، هذا فحص صوت"},
+  ru:{sent:"Отправляем…",noSup:"✗ Этот браузер не поддерживает озвучивание",mkFail:"✗ Не удалось создать реплику: ",
+      okN:["✓ Голос работает — голосов: ",""],ok:"✓ Голос работает",unk:"неизвестно",
+      engine:["✗ Синтезатор вернул "," голосов · это неполадка устройства, а не приложения"],
+      spFail:"✗ speak не сработал: ",timeout:["✗ Две секунды без ответа от синтезатора · "," голосов"],
+      say:"Здравствуйте, это проверка голоса"},
+  en:{sent:"Sending…",noSup:"✗ This browser does not support read-aloud",mkFail:"✗ Could not create the utterance: ",
+      okN:["✓ The voice works — "," voices on this device"],ok:"✓ The voice works",unk:"unknown",
+      engine:["✗ The engine returned "," voices · this is a device fault, not an app fault"],
+      spFail:"✗ speak failed: ",timeout:["✗ Two seconds and no response from the engine · "," voices on this device"],
+      say:"Hello, this is a voice check"}
+};
+function vchkT(){ var g=LG; return VCHKMSG[g]||VCHKMSG.he }
 function voiceCheck(){
-  VCHK="נשלח…"; render();
+  var M=vchkT();
+  VCHK=M.sent; render();
   function show(m){ VCHK=m; render() }
-  if(!("speechSynthesis" in window)){ show("✗ הדפדפן הזה לא תומך בהקראה"); return }
+  if(!("speechSynthesis" in window)){ show(M.noSup); return }
   var list=[]; try{ list=speechSynthesis.getVoices()||[] }catch(e){}
   try{ speechSynthesis.cancel() }catch(e){}
   var u;
-  try{ u=new SpeechSynthesisUtterance("שלום, זו בדיקת קול") }
-  catch(e){ show("✗ יצירת האמירה נכשלה: "+e.message); return }
-  u.lang="he-IL"; u.volume=1; u.rate=1; u.pitch=1;
+  try{ u=new SpeechSynthesisUtterance(M.say) }
+  catch(e){ show(M.mkFail+e.message); return }
+  u.lang=(LANGS[LG]||LANGS.he).tts; u.volume=1; u.rate=1; u.pitch=1;
   var done=false;
-  u.onstart=function(){ done=true; show("✓ הקול פועל — "+list.length+" קולות במכשיר") };
+  u.onstart=function(){ done=true; show(M.okN[0]+list.length+M.okN[1]) };
   u.onerror=function(e){ done=true;
-    var er=(e&&e.error)||"לא ידוע";
-    show("✗ המנוע החזיר "+er+" · "+list.length+" קולות · זו תקלה במכשיר, לא באפליקציה"); };
+    var er=(e&&e.error)||M.unk;
+    show(M.engine[0]+er+" · "+list.length+M.engine[1]); };
   try{ speechSynthesis.speak(u) }
-  catch(e){ show("✗ speak נכשל: "+e.message); return }
+  catch(e){ show(M.spFail+e.message); return }
   setTimeout(function(){ if(!done)
-    show("✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר") },2000);
+    show(M.timeout[0]+list.length+M.timeout[1]) },2000);
 }
 
 
@@ -1402,9 +1433,18 @@ function femNote(){
   return _("במכשיר הזה אין קול נשי בשפה הנוכחית, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו.")+" "+how;
 }
 
+/* ------------------------------------------------------------
+   דור ההקראה. speechSynthesis.cancel() אינו מבטל setTimeout:
+   כרום יורה onend על האמירה שבוטלה, המקטע הבא נרשם בכל זאת,
+   וכעבור SEG_GAP ההקראה הישנה חוזרת מעל החדשה — שני קולות
+   במקביל. מונה אחד פותר את זה: כל הקראה מקבלת מספר, stopSpeak
+   מקדם אותו, ומקטע מדור ישן פשוט אינו מדבר.
+   ------------------------------------------------------------ */
+var _sayGen=0;
 function speakDevice(text){
   if(!("speechSynthesis" in window))return;
   try{speechSynthesis.cancel()}catch(e){}
+  var my=++_sayGen;
   /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
      שממתין לרשימת הקולות ועד ארבע שניות אם היא לא מגיעה — ואמירה
      שיוצאת ארבע שניות אחרי המגע נזרקת בשקט באנדרואיד ובספארי.
@@ -1421,6 +1461,7 @@ function speakDevice(text){
   var _pitch=femLift(_v);
   /* המקטע הראשון יוצא כאן, בתוך הלחיצה. השאר נשרשרים מ-onend. */
   (function sayseg(k){
+    if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
     if(k>=_segs.length){ hlClear(); ttsOK(); return }
     var seg=_segs[k];
     try{
@@ -1450,6 +1491,7 @@ function speak(text){
     if(ttsState!=="device"){ttsState="device"}
     speakDevice(text);return;
   }
+  var my=_sayGen;   /* גם תשובת רשת שמגיעה אחרי עצירה לא תושמע */
   var name=state.settings.gvoice||"Kore",rate=state.settings.rate;
   var ck=name+"|"+rate.toFixed(2)+"|"+text;
   function play(url){
@@ -1461,6 +1503,7 @@ function speak(text){
   }
   if(gCache[ck]){play(gCache[ck]);return}
   gSynth(text,name,rate).then(function(url){
+    if(my!==_sayGen)return;
     gCache[ck]=url;ttsErr="";
     if(ttsState!=="ok"){ttsState="ok";if(view==="practice")render()}
     play(url);
@@ -1486,6 +1529,7 @@ function speak(text){
   });
 }
 function stopSpeak(){
+  _sayGen++;   /* כל מקטע שממתין ב-setTimeout שייך מעכשיו לדור ישן */
   gStop();
   hlClear();
   try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
@@ -1733,13 +1777,16 @@ function genLimits(L){
   }
   var n1=ri(1,3),n2=ri(1,3);
   a=rnz(-6,6);b=rnz(-6,6);
+  /* כשדרגת המונה גבוהה יותר הגבול הוא ∞ רק אם יחס המקדמים חיובי;
+     אחרת הוא −∞, והתשובה המוכרזת הייתה שגויה. מיישרים את הסימן. */
+  if(n1>n2&&a*b<0)b=-b;
   var ansTxt,why1,why2,why3;
   if(n1===n2){ansTxt=fr(a,b).html();why1=_("דרגות המונה והמכנה שוות, ולכן הגבול הוא יחס המקדמים המובילים — לא אפס.");}
   else if(n1<n2){ansTxt="0";why1=_("דרגת המכנה גבוהה יותר, ולכן המכנה גדל מהר יותר והמנה שואפת לאפס.");}
   else{ansTxt="∞";why1=_("דרגת המונה גבוהה יותר, ולכן הביטוי גדל ללא גבול.");}
   var others=[fr(a,b).html(),"0","∞"].filter(function(v){return v!==ansTxt});
   return {ask:_("חשבו את הגבול"),
-    expr:'lim<sub>x→∞</sub> <span class="frac"><span>'+(a===1?"":num(a))+pw("x",n1)+' + 3</span><span>'+(b===1?"":num(b))+pw("x",n2)+' − 1</span></span>',
+    expr:'lim<sub>x→∞</sub> <span class="frac"><span>'+coef(a,pw("x",n1))+' + 3</span><span>'+coef(b,pw("x",n2))+' − 1</span></span>',
     ans:W(ansTxt),
     wrong:others.map(function(v){return W(v,why1)}).concat([
       W(fr(b,a).html(),_("הפכתם את יחס המקדמים. המונה נשאר במונה."))
@@ -2147,7 +2194,9 @@ function genExtrema(L){
   }
   if(L===2){
     r1=rnz(-5,5);r2=rnz(-5,5);
-    while(r2===r1)r2=rnz(-5,5);
+    /* r2 === −r1 היה הופך את המסיח "טעות סימן" לאותה קבוצת פתרונות
+       בדיוק, ואז שתי אפשרויות נכונות. אותה זוגיות שומרת על B שלם. */
+    while(r2===r1||r2===-r1||(r1+r2)%2!==0)r2=rnz(-5,5);
     var lo=Math.min(r1,r2),hi=Math.max(r1,r2);
     /* f' = 3(x−r1)(x−r2) = 3x² −3(r1+r2)x + 3r1r2 → f = x³ − 1.5(r1+r2)x² + 3r1r2 x */
     var B=-3*(r1+r2)/2, Cc=3*r1*r2;
@@ -2291,7 +2340,7 @@ function genIntegral(L){
       W('<span class="frac"><span>('+num(a)+'x'+sgn(b)+')<sup>'+(n+1)+'</sup></span><span>'+(n+1)+'</span></span> + C',
         _f("חילקתם רק בחזקה החדשה ושכחתם לחלק גם בנגזרת הפנימית {0}.", num(a))),
       W("("+num(a)+"x"+sgn(b)+")<sup>"+(n+1)+"</sup> + C",_("לא חילקתם בכלל.")),
-      W(num(a*n)+"("+num(a)+"x"+sgn(b)+")<sup>"+(n-1)+"</sup> + C",_("גזרתם במקום לאנטגרל."))
+      W(num(a*n)+pw("("+num(a)+"x"+sgn(b)+")",n-1)+" + C",_("גזרתם במקום לאנטגרל."))
     ],
     steps:[
       S(_("הצבה"),_f("מסמנים u = {0}x{1}, ואז du = {2}dx, כלומר dx = du/{3}.", num(a), sgn(b), num(a), num(a)),
@@ -3408,11 +3457,11 @@ function genExpVar(L){
   }
   var m=ri(2,8),v=ri(2,6),k=ri(2,5),c=rnz(-6,6);
   return {ask:_f("נתון E(X) = {0} ו-V(X) = {1}. חשבו את השונות של {2}X{3}.", m, v, k, sgn(c)),
-    expr:"",ans:W(String(k*k*v)),
+    expr:"",ans:W(num(k*k*v)),
     wrong:[
-      W(String(k*v),_("הכפלתם ב-k פעם אחת. בשונות המקדם עולה בריבוע, כי השונות עצמה מדודה ביחידות בריבוע.")),
-      W(String(k*k*v+c),_("הוספתם את הקבוע. הזזה לא משנה את הפיזור, ולכן היא לא משפיעה על השונות.")),
-      W(String(k*m+c),_("זו התוחלת של הביטוי, לא השונות."))
+      W(num(k*v),_("הכפלתם ב-k פעם אחת. בשונות המקדם עולה בריבוע, כי השונות עצמה מדודה ביחידות בריבוע.")),
+      W(num(k*k*v+c),_("הוספתם את הקבוע. הזזה לא משנה את הפיזור, ולכן היא לא משפיעה על השונות.")),
+      W(num(k*m+c),_("זו התוחלת של הביטוי, לא השונות."))
     ],
     steps:[
       S(_("שני כללים"),_("התוחלת לינארית לגמרי. השונות מתעלמת מהזזה ומעלה את המקדם בריבוע."),
@@ -4196,7 +4245,7 @@ function areaName(a){var o=AREA_NAME[a];return o?(o[LG]||o.he):a}
 var FORMULAS=[
   {id:"limsub",g:"calc",t:"גבול של פונקציה רציפה",m:"lim<sub>x→a</sub> f(x) = f(a)",n:"פולינום רציף בכל נקודה, ולכן פשוט מציבים."},
   {id:"lim00",g:"calc",t:"אי־ודאות 0/0",m:"מפרקים לגורמים ומצמצמים",n:"0/0 אינו ערך — הוא סימן שצריך לעבוד על הביטוי."},
-  {id:"liminf",g:"calc",t:"גבול באינסוף",m:"משווים דרגות: מונה גבוה ← ∞ · שווה ← יחס מקדמים · נמוך ← 0",n:"רק החזקות הגבוהות קובעות."},
+  {id:"liminf",g:"calc",t:"גבול באינסוף",m:"משווים דרגות: מונה גבוה ← ±∞ לפי סימן יחס המקדמים · שווה ← יחס מקדמים · נמוך ← 0",n:"רק החזקות הגבוהות קובעות."},
   {id:"dpow",g:"calc",t:"כלל החזקה",m:"(xⁿ)' = n·xⁿ⁻¹   ·   (c)' = 0",n:"המעריך יורד למקדם והחזקה קטנה באחת."},
   {id:"dbasic",g:"calc",t:"נגזרות יסוד",m:"(eˣ)' = eˣ · (ln x)' = 1/x · (√x)' = 1/(2√x) · (1/x)' = −1/x²",n:"eˣ היא הפונקציה היחידה שהיא נגזרת של עצמה."},
   {id:"dtrig",g:"calc",t:"נגזרות טריגונומטריות",m:"(sin x)' = cos x   ·   (cos x)' = −sin x",n:"המינוס מופיע רק אצל הקוסינוס."},
@@ -4951,7 +5000,7 @@ _f("{0}{1} לשמוע דוגמה</button>", '<button class="btn btn-g w" style="
    · שמות התלמידים נשארים במכשיר של המורה. הם לא עוברים דרך
      שום שרת, כי אין שרת.
    ============================================================ */
-var GENV=2;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
+var GENV=3;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
 var EKEY="shlav-exams-math-uni-v1";   /* מפתח לאפליקציה הזאת בלבד */
@@ -5879,7 +5928,12 @@ function examAction(a,el){
     var g=gradeResult(ex.spec,res);
     var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
     /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
-    var k2=(ex.subs||[]).findIndex(function(s){return s.name===sub.name});
+    /* הגשה חדשה מחליפה קודמת רק כששני השמות זהים אחרי נירמול, והשם
+       אינו ריק. בלי זה כל ההגשות בלי שם נראו כאותו תלמיד ודרסו זו את
+       זו בשקט, וגם "דני" מול "דני  " (רווח כפול פנימי) נחשבו לשניים. */
+    var nrm=function(x){return String(x==null?"":x).replace(/\s+/g," ").trim()};
+    var sn=nrm(sub.name);
+    var k2=sn?(ex.subs||[]).findIndex(function(s){return nrm(s.name)===sn}):-1;
     if(!ex.subs)ex.subs=[];
     if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
     exSave();
@@ -6057,7 +6111,7 @@ function onAnswer(i){
   }else{
     P.lastWhy=o.why||_("התשובה הזו לא נכונה. שווה לפתוח את הפתרון המודרך ולראות איפה הדרך מתפצלת.");
     announce(_f("לא נכון. {0}", P.lastWhy));
-    if(state.settings.tts)speak(P.lastWhy);
+    if(state.settings.tts)speak(speakProse(P.lastWhy));
     /* אם נגמרו האפשרויות — עוברים לחשיפה ולא משאירים תקועים */
     if(P.picked.length>=P.q.options.length-1){
       P.phase="reveal";
@@ -6093,9 +6147,14 @@ function onAction(a,el){
   if(a==="hint"){
     P.hints=1;render();
     if(s.tts&&P.q.hint){
-      speak(P.q.hint);
+      /* אותה מחרוזת בדיוק להקראה ולהדגשה: hlPrep ממפה תווים לפי
+         מה שנאמר, ורמז שיש בו סימן (√, −, Φ) נאמר אחרת ממה שכתוב —
+         מיפוי לפי הכתוב היה מדגיש את המילה הלא נכונה. כשהשתיים
+         אינן זהות hlPrep מדגיש את הרמז כולו, וזה נכון. */
+      var hsay=speakProse(P.q.hint);
+      speak(hsay);
       /* אחרי speak — הוא קורא ל-stopSpeak שמנקה הדגשה קודמת. */
-      hlPrep(document.querySelector(".hintxt"),P.q.hint);
+      hlPrep(document.querySelector(".hintxt"),hsay);
     }
     return;
   }
@@ -6191,7 +6250,7 @@ document.addEventListener("input",function(e){
     return}
   if(el.dataset.slide==="exm"){
     EB.mins=parseInt(el.value,10)||0;
-    var lm=$("#exMlab"); if(lm)lm.textContent=EB.mins?EB.mins+" דקות":"ללא";
+    var lm=$("#exMlab"); if(lm)lm.textContent=EB.mins?EB.mins+" "+xt("minutes"):xt("none");
     EB.built=null;
     return}
   if(el.dataset.slide==="rate"){
@@ -7122,7 +7181,7 @@ var TR_KEYS=[
 "משוואה ראשונה: ",
 "משוואה שנייה: ",
 "משווים דרגות",
-"משווים דרגות: מונה גבוה ← ∞ · שווה ← יחס מקדמים · נמוך ← 0",
+"משווים דרגות: מונה גבוה ← ±∞ לפי סימן יחס המקדמים · שווה ← יחס מקדמים · נמוך ← 0",
 "משווים לאפס",
 "משווים לאפס ומחלקים ב-3",
 "משווים לחיתוך",
@@ -7859,7 +7918,8 @@ var TR_KEYS=[
 "המכנה הופך לממשי",
 "מרחיבים בצמוד המכנה — זה הופך את המכנה למספר ממשי.",
 "נימוק",
-"אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד"
+"אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד",
+" פחות "
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -8820,7 +8880,7 @@ trAt("en",750,["Why",
 "First equation: ",
 "Second equation: ",
 "Compare the degrees",
-"Compare degrees: numerator higher → ∞ · equal → ratio of coefficients · lower → 0",
+"Compare degrees: numerator higher → ±∞ by the sign of the coefficient ratio · equal → ratio of coefficients · lower → 0",
 "Set equal to zero",
 "Set equal to zero and divide by 3",
 "Compare with the intersection",
@@ -9971,7 +10031,7 @@ trAt("ru",750,["Почему",
 "Первое уравнение: ",
 "Второе уравнение: ",
 "Сравниваем степени",
-"Сравниваем степени: числитель выше → ∞ · равны → отношение коэффициентов · ниже → 0",
+"Сравниваем степени: числитель выше → ±∞ по знаку отношения коэффициентов · равны → отношение коэффициентов · ниже → 0",
 "Приравниваем нулю",
 "Приравниваем нулю и делим на 3",
 "Сравниваем с пересечением",
@@ -11122,7 +11182,7 @@ trAt("ar",750,["لماذا",
 "المعادلة الأولى: ",
 "المعادلة الثانية: ",
 "نقارن الدرجات",
-"نقارن الدرجات: البسط أعلى ← ∞ · متساويتان ← نسبة المعاملات · أدنى ← 0",
+"نقارن الدرجات: البسط أعلى ← ±∞ حسب إشارة نسبة المعاملات · متساويتان ← نسبة المعاملات · أدنى ← 0",
 "نساوي بالصفر",
 "نساوي بالصفر ونقسم على 3",
 "نقارن بالتقاطع",
@@ -12796,6 +12856,11 @@ trAt("ar",1625,["تعليل"]);
 trAt("ar",TR_KEYS.indexOf("אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד"),["أكسيوما — رياضيات للسنة الجامعية الأولى، خطوة بخطوة"]);
 trAt("ru",TR_KEYS.indexOf("אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד"),["Аксиома — математика первого курса, шаг за шагом"]);
 trAt("en",TR_KEYS.indexOf("אקסיומה — מתמטיקה לתואר ראשון, צעד אחר צעד"),["Axioma — first-year university maths, step by step"]);
+/* הפרש קבוצות A∖B. מילה שונה מ-" מינוס " בכוונה, כדי לשמר את
+   ההבחנה שהעברית עושה בין חיסור לבין הפרש קבוצות. */
+trAt("ar",TR_KEYS.indexOf(" פחות "),[" بدون "]);
+trAt("ru",TR_KEYS.indexOf(" פחות "),[" без "]);
+trAt("en",TR_KEYS.indexOf(" פחות "),[" without "]);
 trBuild();
 exLoad();
 applyModes();
@@ -12810,7 +12875,7 @@ window.addEventListener("hashchange",function(){
 try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(view==="settings")render()}}catch(e){}
 render();
 </script>
-<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -12818,7 +12883,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u34-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u36-pwa1").catch(function(){});
   });
 }
 </script>
