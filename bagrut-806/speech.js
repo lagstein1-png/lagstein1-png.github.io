@@ -143,6 +143,8 @@
   var qi = 0;
   var current = null;
   var keep = null;
+  var paused = false;
+  var held = null;    /* הצעד שממתין להמשך, כשהמנוע התעלם מ-pause */
   var token = 0;      /* עולה בכל עצירה — אמירה ישנה שמסתיימת מאוחר לא תמשיך */
 
   function clearMarks() {
@@ -166,6 +168,7 @@
   function stop() {
     token++;
     queue = []; qi = 0; current = null; api.tag = null;
+    paused = false; held = null;
     if (keep) { clearInterval(keep); keep = null; }
     try { speechSynthesis.cancel(); } catch (e) {}
     clearMarks();
@@ -186,7 +189,10 @@
     u.pitch = 1;
     u.onend = function () {
       if (my !== token) return;
-      setTimeout(function () { step(my); }, SEG_GAP);
+      /* אנדרואיד מתעלם מ-pause. לכן גם דגל משלנו: מנוע שמכבד
+         יישתק מיד, ומי שלא — יסיים את המקטע הנוכחי ויעצור כאן. */
+      if (paused) { held = function () { step(my); }; return; }
+      setTimeout(function () { if (!paused) step(my); else held = function () { step(my); }; }, SEG_GAP);
     };
     /* שגיאה באמצע רצף אינה סיבה לשתוק עד הסוף: ממשיכים למקטע הבא,
        ורק אם כולם נכשלו המשתמש רואה שדבר לא קרה. */
@@ -221,12 +227,64 @@
       api.speaking = true; fire();
       if (keep) clearInterval(keep);
       keep = setInterval(function () {
-        /* כרום עוצר הקראה ארוכה. resume על תור פעיל אינו מזיק. */
+        /* כרום עוצר הקראה ארוכה. resume על תור פעיל אינו מזיק.
+           אבל כשהמשתמש השהה בעצמו — הפינג הזה היה מחזיר את הקול
+           תוך ארבע שניות, כלומר מבטל את הכפתור שהוא הרגע לחץ. */
+        if (paused) return;
         try { if (speechSynthesis.speaking) { speechSynthesis.pause(); speechSynthesis.resume(); } }
         catch (e) {}
       }, KEEPALIVE);
       step(my);
     });
+  };
+
+  /* --- השהיה וניווט במשפטים -------------------------------------
+     הקהל של האפליקציה הזאת מאבד את השאלה באמצע. "עצרו" לבדו מחייב
+     אותו להתחיל את השאלה מהתחלה, וזה בדיוק מה שגרם לו לוותר. */
+  api.paused = function () { return paused; };
+  api.pause = function () {
+    if (!api.speaking || paused) return;
+    paused = true;
+    try { speechSynthesis.pause(); } catch (e) {}
+    fire();
+  };
+  api.resume = function () {
+    if (!api.speaking || !paused) return;
+    paused = false;
+    try { speechSynthesis.resume(); } catch (e) {}
+    if (held) { var f = held; held = null; f(); }
+    fire();
+  };
+  /* המקטע הראשון של המשפט שהמקטע במקום `i` שייך אליו */
+  function sentStart(i) {
+    var it = queue[i];
+    if (!it) return 0;
+    var k = i;
+    while (k > 0 && queue[k - 1].unit === it.unit && queue[k - 1].sent === it.sent) k--;
+    return k;
+  }
+  function jump(i) {
+    if (!api.speaking) return;
+    if (i < 0) i = 0;
+    if (i >= queue.length) { stop(); return; }
+    var my = ++token;
+    paused = false; held = null;
+    try { speechSynthesis.cancel(); } catch (e) {}
+    qi = i;
+    fire();
+    step(my);
+  }
+  /* "אחורה" מהמקטע הראשון של משפט חוזר למשפט הקודם; מאמצעו הוא
+     חוזר לתחילת אותו משפט — כמו כל נגן, ובלי להסביר. */
+  api.back = function () {
+    var cur = sentStart(qi - 1);
+    jump(qi - 1 > cur ? cur : sentStart(cur - 1));
+  };
+  api.fwd = function () {
+    var i = qi;
+    var it = queue[qi - 1];
+    while (i < queue.length && it && queue[i].unit === it.unit && queue[i].sent === it.sent) i++;
+    jump(i);
   };
 
   api.setRate = function (r) {

@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x2 · 2026-09-02";
+  var BUILD = "x3 · 2026-09-02";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -123,6 +123,15 @@
     }
     return '<div class="formula"' + (id ? ' id="' + esc(id) + '"' : "") + ">" + html + "</div>";
   }
+  /* נוסחה בלי `speech` פשוט אינה מוקראת, וזה נכון — אבל בשקט זה
+     נראה ככפתור הקראה שבור. השורה הזאת פונה לכותב התוכן, והיא
+     הדרך היחידה שבה חוסר כזה מתגלה לפני שתלמיד נתקל בו. */
+  function saySrc(item) {
+    if (item.speech) return '<p class="saytxt">בהקראה: ' + esc(item.speech) + "</p>";
+    if (item.latex) return '<p class="saytxt bad">חסר ניסוח להקראה, ולכן הנוסחה ' +
+      "הזאת לא תוקרא. מוסיפים <code>speech</code> ליד ה־<code>latex</code>.</p>";
+    return "";
+  }
   /* הסימן שאפשר לגלול נוסף אחרי הציור, כי רק אז ידוע אם הנוסחה
      באמת רחבה מהמסך. סימן שמופיע תמיד הוא רעש; סימן שלא מופיע
      כשצריך הוא נוסחה חתוכה שאיש לא ידע להזיז. */
@@ -196,7 +205,7 @@
       '<p class="meta">' + plural(sub.points, "נקודה אחת", "שתי נקודות", "נקודות") +
       "</p></div></div>";
     h += formula(sub.latex, "f-" + id);
-    if (sub.speech) h += '<p class="saytxt">בהקראה: ' + esc(sub.speech) + "</p>";
+    h += saySrc(sub);
     var steps = sub.steps || [];
     h += '<p class="meta">' +
          plural(steps.length, "שלב רמז אחד", "שני שלבי רמז", "שלבי רמז") +
@@ -206,12 +215,17 @@
   }
   function questionHtml(q) {
     var id = "q" + q.number;
+    /* כפתור אחד לשאלה על סעיפיה. בלעדיו תלמיד שרוצה לשמוע את
+       השאלה כולה לוחץ ארבע פעמים ומחכה בין לחיצה ללחיצה, ובדיוק
+       שם הוא מאבד את החוט. */
     var h = '<div class="card"><div class="qhead"><span class="qnum">שאלה ' +
-            esc(q.number) + '</span><span class="chip">' + esc(q.topic) + "</span></div>";
+            esc(q.number) + '</span><span class="chip">' + esc(q.topic) + "</span>" +
+            '<button class="btn wide" data-read="' + esc(id) + 'all" type="button">' +
+            '<span aria-hidden="true">🔊</span> השאלה כולה</button></div>';
     h += '<div class="saybar">' + spkBtn(id, "הקריאו את השאלה") +
          '<div class="grow"><p id="t-' + id + '">' + sentHtml(q.text) + "</p></div></div>";
     h += formula(q.latex, "f-" + id);
-    if (q.speech) h += '<p class="saytxt">בהקראה: ' + esc(q.speech) + "</p>";
+    h += saySrc(q);
     (q.subQuestions || []).forEach(function (sub, si) { h += subHtml(q, sub, si); });
     return h + "</div>";
   }
@@ -221,15 +235,26 @@
   function readUnits(id) {
     var ex = examById(state.examId);
     if (!ex) return [];
-    var m = /^q(\d+)(?:s(\d+))?$/.exec(id);
+    var m = /^q(\d+)(?:s(\d+)|(all))?$/.exec(id);
     if (!m) return [];
     var q = null;
     ex.questions.forEach(function (x) { if (String(x.number) === m[1]) q = x; });
     if (!q) return [];
+    function pair(item, base) {
+      return [{ text: item.text, el: document.getElementById("t-" + base) },
+              { text: item.speech, el: document.getElementById("f-" + base) }];
+    }
+    if (m[3]) {
+      var qid = "q" + m[1];
+      var out = pair(q, qid);
+      (q.subQuestions || []).forEach(function (sub, si) {
+        out = out.concat(pair(sub, qid + "s" + si));
+      });
+      return out;
+    }
     var src = m[2] === undefined ? q : (q.subQuestions || [])[Number(m[2])];
     if (!src) return [];
-    return [{ text: src.text, el: document.getElementById("t-" + id) },
-            { text: src.speech, el: document.getElementById("f-" + id) }];
+    return pair(src, id);
   }
 
   function topicsOf(ex) {
@@ -311,7 +336,8 @@
   document.addEventListener("click", function (e) {
     var el = e.target.closest ? e.target.closest(
       "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate]," +
-      "[data-read],#btn-reset,#btn-stop,#btn-try") : null;
+      "[data-read],#btn-reset,#btn-stop,#btn-try," +
+      "#btn-pause,#btn-back,#btn-fwd") : null;
     if (!el) return;
 
     var read = el.getAttribute("data-read");
@@ -323,6 +349,12 @@
       return;
     }
     if (el.id === "btn-stop") { window.Speech.stop(); return; }
+    if (el.id === "btn-pause") {
+      if (window.Speech.paused()) window.Speech.resume(); else window.Speech.pause();
+      return;
+    }
+    if (el.id === "btn-back") { window.Speech.back(); return; }
+    if (el.id === "btn-fwd") { window.Speech.fwd(); return; }
     if (el.id === "btn-try") {
       window.Speech.speak([{ text: "שלום. כך נשמעת ההקראה בקצב שנבחר.", el: null }]);
       return;
@@ -360,12 +392,19 @@
   if (window.Speech) {
     window.Speech.onstate = function (on) {
       $("#stopbar").hidden = !on;
-      $$(".spk").forEach(function (b) { b.classList.remove("on"); });
+      $$("[data-read]").forEach(function (b) {
+        b.classList.remove("on");
+        b.setAttribute("aria-pressed", "false");
+      });
+      var pz = window.Speech.paused();
+      $("#btn-pause").textContent = pz ? "המשיכו" : "השהו";
+      $("#btn-pause").setAttribute("aria-label", pz ? "המשיכו את ההקראה" : "השהו את ההקראה");
+      $("#stopbar .lbl").textContent = pz ? "מושהה" : "קורא…";
       if (!on) return;
       var t = window.Speech.tag;
       if (t) {
-        var b = document.querySelector('.spk[data-read="' + t + '"]');
-        if (b) b.classList.add("on");
+        var b = document.querySelector('[data-read="' + t + '"]');
+        if (b) { b.classList.add("on"); b.setAttribute("aria-pressed", "true"); }
       }
     };
   }
