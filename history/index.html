@@ -3745,6 +3745,28 @@ function centuryStr(y){
 var ROM=["","I","II","III","IV","V","VI","VII","VIII","IX","X",
          "XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI"];
 function _rom(n){return ROM[n]||String(n)}
+/* ------------------------------------------------------------
+   שתי שכבות ניקוי להקראה בלבד. המסך אינו משתנה מהן.
+
+   הספרה הרומית נראית נכון על המסך ונשמעת רע באוזן: קול עברי או
+   ערבי מוסר "XVIII" כאותיות לטיניות ולא כמספר. ההשוואה היא מול
+   ROM עצמו ולא מול תבנית, כדי שמילה לטינית בשם נושא לא תהפוך
+   בטעות למספר.
+
+   והגרשיים העבריים משמשים כאן לשני דברים: ראשי תיבות (לפנה״ס,
+   או״ם) ומירכאות (״אדם חופשי״). המנוע מכיר רק את הראשון. הכלל
+   שמפריד ביניהם: בראשי תיבות באה אחרי הגרשיים אות עברית אחת
+   בדיוק וסוף מילה. הסיכון א-סימטרי — מירכאה שהוסרה אינה יכולה
+   להזיק, מירכאה שנשארה כן.
+   ------------------------------------------------------------ */
+function saySpell(x){
+  return String(x==null?"":x).replace(/[IVXLC]+/g,function(m){
+    var i=ROM.indexOf(m);
+    return i>0?String(i):m;
+  }).replace(/״/g,function(m,i,str){
+    return /^[\u05D0-\u05EA](?![\u05D0-\u05EA])/.test(str.slice(i+1))?m:"";
+  }).replace(/\s—\s/g,", ");
+}
 
 /* כל האירועים מכל התוכן — משם נלקחים מסיחים כשהנושא עצמו קטן מדי,
    וגם תרגיל הסדר הכרונולוגי בין תקופות. */
@@ -4103,7 +4125,7 @@ function screenPractice(){
       h+='<div class="why">'+esc(q.opts[P.picked].why)+"</div>";
     h+="</div>";
     h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+
-       spkBtn(q.say,state.lang,false,t("hearSent"))+spkBtn(q.say,state.lang,true,t("hearSlow"))+
+       spkBtn(saySpell(q.say),state.lang,false,t("hearSent"))+spkBtn(saySpell(q.say),state.lang,true,t("hearSlow"))+
        '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
        esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
   } else {
@@ -5535,7 +5557,13 @@ function examAction(a,el){
   if(a==="sitfinish"){sitFinish();return true}
   /* בלי שפה מפורשת speak נופל ל-"en", ושאלת מבחן בעברית, בערבית
      או ברוסית הוקראה בקול אנגלי. כאן החומר עצמו בשפת הממשק. */
-  if(a==="sitread"){var q2=SIT.qs[SIT.i];if(q2)speak(q2.say,state.lang);return true}
+  /* say נבנה במפורש כ"השאלה והתשובה עליה" ונועד להישמע *אחרי*
+     המענה. במבחן הכפתור זמין *לפני*, ולכן הוא הקריא לתלמיד את
+     התשובה. כאן מוקרא מה שעל המסך — הכותרת והמקור — והאפשרויות
+     ממילא אינן חלק ממנו. */
+  if(a==="sitread"){var q2=SIT.qs[SIT.i];
+    if(q2)speak(saySpell(plainOf(q2.ask||"")+" "+plainOf(q2.expr||"")),state.lang);
+    return true}
   if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
   if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
   if(a==="sitback"){view="sit";render();window.scrollTo(0,0);return true}
@@ -5593,7 +5621,7 @@ function answer(i){
   announce(P.ok?t("correct"):t("wrong")+". "+t("answerIs")+" "+q.answer);
   /* המשפט המלא נשמע מיד, גם כשטעו — במיוחד כשטעו. שמיעה של
      המשפט השלם היא מה שקושר את התאריך לסיפור. */
-  setTimeout(function(){speak(q.say,state.lang)},P.ok?200:420);
+  setTimeout(function(){speak(saySpell(q.say),state.lang)},P.ok?200:420);
 }
 function testKey(){
   var inp=$("#gk"); var k=inp?inp.value.trim():"";
@@ -5654,7 +5682,7 @@ document.addEventListener("click",function(e){
     /* רמז אינו טעות ואינו נספר ככזו. מי שנעזר בו עדיין עונה בעצמו. */
     if(!P.q||P.done)return;
     P.hint=true; render();
-    if(P.q.hint)speak(P.q.hint,state.lang);
+    if(P.q.hint)speak(saySpell(P.q.hint),state.lang);
     return;
   }
   if(a==="dunno"){
@@ -5662,7 +5690,7 @@ document.addEventListener("click",function(e){
        התשובה. מי שמנחש לומד פחות ממי שמודה. */
     var q=P.q; if(!q)return;
     P.done=true; P.ok=false; P.picked=-1; record(false); render();
-    setTimeout(function(){speak(q.say,state.lang)},260);
+    setTimeout(function(){speak(saySpell(q.say),state.lang)},260);
     return;
   }
   if(a==="lang"){state.lang=LANGS[v]?v:"he";save();render();return}
@@ -5749,7 +5777,7 @@ document.addEventListener("keydown",function(e){
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();speak(P.q.say,state.lang);return}
+  if(e.key===" "){e.preventDefault();speak(saySpell(P.q.say),state.lang);return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב

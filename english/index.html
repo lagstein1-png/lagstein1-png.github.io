@@ -1582,6 +1582,16 @@ function speakDevice(text,code,rate){
   return true;
 }
 /* lang: "en" לחומר הנלמד, או קוד שפת האם להוראה. */
+function sitSay(q){
+  if(q.audioOnly)return {t:q.say||"",l:"en"};
+  var ex=plainOf(q.expr||"").trim();
+  var ok=(q.options||[]).filter(function(o){return o.ok})[0];
+  var a=ok?plainOf(ok.h).trim().toLowerCase():"";
+  var sy=plainOf(q.say||"").trim();
+  if(ex&&(!a||ex.toLowerCase().indexOf(a)<0))return {t:ex,l:"en"};
+  if(sy&&(!a||sy.toLowerCase().indexOf(a)<0))return {t:sy,l:"en"};
+  return {t:plainOf(q.ask||""),l:state.lang||"he"};
+}
 function speak(text,lang,rateMul){
   /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
      לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
@@ -4603,7 +4613,14 @@ function examAction(a,el){
   if(a==="sitfwd"){sitNext();return true}
   if(a==="sitgo"){sitGo(parseInt(el.getAttribute("data-i"),10));return true}
   if(a==="sitfinish"){sitFinish();return true}
-  if(a==="sitread"){var q2=SIT.qs[SIT.i];if(q2)speak(q2.say);return true}
+  /* say של שאלת מבחן הוא לעיתים בדיוק התשובה — בשאלת מילה,
+     בשאלת משפט ובהשלמת חסר. במבחן הכפתור זמין *לפני* המענה, ולכן
+     הוא הקריא לתלמיד את התשובה. בשאלת האזנה השמע הוא השאלה עצמה
+     ונשאר כפי שהוא; בשאר מוקרא מה שעל המסך ואינו התשובה, ואם לא
+     נשאר חומר אנגלי כזה — מוקראת השאלה בשפת הממשק. */
+  if(a==="sitread"){var q2=SIT.qs[SIT.i];
+    if(q2){var o2=sitSay(q2); if(o2.t)speak(o2.t,o2.l)}
+    return true}
   if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
   if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
   if(a==="sitback"){view="sit";render();window.scrollTo(0,0);return true}
