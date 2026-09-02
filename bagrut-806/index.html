@@ -6,6 +6,11 @@
 <title>בגרות 806 — מתמטיקה 5 יחידות</title>
 <meta name="description" content="הכנה לבגרות במתמטיקה 5 יחידות, שאלון 806: סימולציה מתוזמנת ותרגול מודרך, וכל טקסט וכל נוסחה נשמעים לפני שקוראים אותם." />
 <meta name="theme-color" content="#12213a" />
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="icon" href="img/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 /* ============================================================
    בגרות 806 — כל ה-CSS של האפליקציה
@@ -145,6 +150,63 @@ header small{display:block;color:var(--muted);font-weight:500;font-size:.85rem;l
   .sn.now,.tex.now{outline:2px solid var(--accent);outline-offset:1px}
 }
 
+/* ---------- תיבת התשובה ---------- */
+.answer{margin-top:1rem}
+.answer label{display:block;font-weight:700;margin-bottom:.2rem}
+.field{
+  font:inherit;flex:1 1 10rem;min-width:0;min-height:var(--hit);
+  padding:.6rem .8rem;border-radius:12px;border:2px solid var(--line);
+  background:var(--surface);color:var(--ink);
+}
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-color:var(--accent)}
+.msg{min-height:1.6em;margin:.5rem 0 0;font-weight:700}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)}
+.ask{font-weight:700;font-size:1.15rem}
+.ask-block{background:var(--surface2);border-radius:10px;padding:.8rem .9rem;margin-top:.9rem}
+
+/* ---------- רמזים ופתרון ----------
+   רמז ופתרון נראים שונה בכוונה. רמז הוא שאלה שמכוונת, ופתרון הוא
+   התשובה — ומי שמחפש רמז לא אמור למצוא פתרון בטעות. */
+.hints{margin-top:1.1rem}
+.hint-block{background:var(--warn-soft);border-inline-start:4px solid var(--warn);
+  border-radius:10px;padding:.75rem .9rem;margin-bottom:.6rem}
+.hint b{display:block;font-size:.85rem;color:var(--muted);margin-bottom:.15rem}
+.solution{margin-top:1rem;border-top:2px dashed var(--line);padding-top:.9rem}
+.solution h3{font-size:1.05rem;margin:0 0 .6rem}
+.step-block{background:var(--accent-soft);border-radius:10px;padding:.7rem .9rem;margin-bottom:.55rem}
+.step-block b{display:block;font-size:.85rem;color:var(--muted);margin-bottom:.15rem}
+.final{margin-top:.8rem;padding:.7rem .9rem;border-radius:10px;
+  background:var(--surface2);font-size:1.1rem}
+.btn.w{width:100%;margin-top:.5rem}
+.btn.big{padding:.9rem;font-size:1.15rem;margin-top:1.2rem}
+.nav-row{margin-top:1.2rem;gap:.6rem}
+
+/* ---------- סימולציה ---------- */
+.simbar{
+  position:sticky;inset-block-start:0;z-index:5;
+  display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:.6rem .8rem;margin-bottom:1rem;box-shadow:var(--shadow);
+}
+#clock{font-variant-numeric:tabular-nums;font-size:1.25rem;font-weight:800;
+  background:var(--accent-soft);padding:.35rem .8rem}
+#clock.low{background:var(--bad-soft);color:var(--bad)}
+.score{display:flex;align-items:center;gap:.8rem;margin:1rem 0}
+.big-num{font-size:3rem;font-weight:800;line-height:1}
+.big-num.ok{color:var(--ok)} .big-num.warn{color:var(--warn)} .big-num.bad{color:var(--bad)}
+.hist{display:flex;align-items:center;gap:.6rem;padding:.6rem 0;border-top:1px solid var(--line)}
+.hist:first-of-type{border-top:0}
+.hist.wide{width:100%;text-align:start;font:inherit;background:none;border:0;
+  border-top:1px solid var(--line);cursor:pointer;min-height:var(--hit);color:inherit}
+.hist.wide:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hist .tt{flex:1;min-width:0;display:flex;flex-direction:column}
+.hist .tt span{color:var(--muted);font-size:.9rem;font-weight:500}
+.chip.ok{background:#dcfce7;color:#14532d}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+@media (prefers-color-scheme:dark){.chip.ok{background:#123c24;color:#86efac}}
+.bar{display:block;height:6px;width:5rem;border-radius:99px;background:var(--surface2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+
 .schema-errs{
   background:var(--bad-soft);color:var(--ink);border-bottom:3px solid var(--bad);
   padding:1rem;font-size:.95rem;
@@ -173,14 +235,32 @@ footer a{color:inherit}
 <main id="app" class="wrap" tabindex="-1"></main>
 
 <footer><div class="wrap">
-  <span>הכול נשמר במכשיר הזה בלבד</span>
+  <span>הכול נשמר במכשיר הזה בלבד · <span id="build"></span></span>
   <span><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/">תנאי שימוש</a></span>
 </div></footer>
 
 <!-- הסדר קובע: הנתונים, אחר כך מנוע ההקראה, ורק אז הלוגיקה שקוראת לשניהם.
      אין fetch ואין CDN — שלוש תגיות מקומיות, ולכן הדף עובד גם אופליין. -->
+<script>
+/* שתי מחרוזות שחייבות להיות תואמות, ושתיהן כאן:
+   BUILD הוא מה שמוצג למשתמש, ו-?v= הוא מה שקובע את מפתח המטמון.
+   sw.js גוזר את שם המטמון מ-?v= שבכתובת הרישום — ולכן עדכון של
+   BUILD לבדו לא ינקה את הקאש, והתיקון לא יגיע למי שכבר התקין.
+   עדכנתם אחת — עדכנו את השנייה. */
+var BUILD = "s1 · 2026-09-02";
+document.getElementById("build").textContent = BUILD;
+</script>
 <script src="data/exams.js"></script>
 <script src="speech.js"></script>
 <script src="app.js"></script>
+<script src="/legal/terms.js"></script>
+<script src="/legal/protect.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js?v=s1-pwa1").catch(function () {});
+  });
+}
+</script>
 </body>
 </html>
