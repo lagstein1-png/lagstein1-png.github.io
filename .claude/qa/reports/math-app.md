@@ -40,20 +40,20 @@
 
 | ממצא | חומרה | מופעים | תאים | דוגמה | איפה |
 |---|---|---|---|---|---|
-| `symbol-in-say · ×` | REVIEW | 900 | 6 | סימן ש-SAY_MAP לא המיר: כמה זה 2 × 4? | mul L1 |
-| `symbol-in-say · ÷` | REVIEW | 900 | 6 | סימן ש-SAY_MAP לא המיר: כמה זה 10 ÷ 5? | div L1 |
+| `symbol-in-say · ×` | REVIEW | 900 | 6 | סימן ש-SAY_MAP לא המיר: כמה זה 3 × 2? | mul L1 |
+| `symbol-in-say · ÷` | REVIEW | 900 | 6 | סימן ש-SAY_MAP לא המיר: כמה זה 4 ÷ 2? | div L1 |
 
 <details><summary>symbol-in-say · × — עוד דוגמאות</summary>
 
+- `mul L1` סימן ש-SAY_MAP לא המיר: כמה זה 2 × 3?
 - `mul L1` סימן ש-SAY_MAP לא המיר: כמה זה 2 × 4?
-- `mul L1` סימן ש-SAY_MAP לא המיר: כמה זה 2 × 5?
 
 </details>
 
 <details><summary>symbol-in-say · ÷ — עוד דוגמאות</summary>
 
-- `div L1` סימן ש-SAY_MAP לא המיר: כמה זה 10 ÷ 5?
-- `div L1` סימן ש-SAY_MAP לא המיר: כמה זה 20 ÷ 4?
+- `div L1` סימן ש-SAY_MAP לא המיר: כמה זה 15 ÷ 3?
+- `div L1` סימן ש-SAY_MAP לא המיר: כמה זה 9 ÷ 3?
 
 </details>
 

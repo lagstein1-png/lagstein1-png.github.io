@@ -952,7 +952,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a4 · 2026-09-02";
+var BUILD="a5 · 2026-09-02";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -1552,6 +1552,22 @@ function speakDevice(text,code,rate){
   return true;
 }
 /* lang: LEARN לחומר הנלמד, או קוד שפת האם להוראה. */
+/* מה נאמר במבחן הכיתתי, שם אין "לפני" ו"אחרי" — יש רק שאלה
+   שעוד לא ענו עליה. ניב כבר נשא את הפונקציה הזאת, ואולפן —
+   שנולדה מהעתקה שלה — קיבלה במקומה `speak(q2.say)` חשוף.
+   ב-back וב-use ה-say הוא התשובה עצמה, כלומר כפתור ההקראה
+   במבחן הקריא את הפתרון. בשאלת האזנה השמע הוא השאלה ולכן
+   הוא נשאר. */
+function sitSay(q){
+  if(q.audioOnly)return {t:q.say||"",l:LEARN};
+  var ex=plainOf(q.expr||"").trim();
+  var ok=(q.options||[]).filter(function(o){return o.ok})[0];
+  var a=ok?plainOf(ok.h).trim().toLowerCase():"";
+  var sy=plainOf(q.say||"").trim();
+  if(ex&&(!a||ex.toLowerCase().indexOf(a)<0))return {t:ex,l:LEARN};
+  if(sy&&(!a||sy.toLowerCase().indexOf(a)<0))return {t:sy,l:LEARN};
+  return {t:plainOf(q.ask||""),l:state.lang||"he"};
+}
 function speak(text,lang,rateMul){
   /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
      לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
@@ -2719,6 +2735,29 @@ function subjectBox(it){
     spkBtn(w,LEARN,false,t("hearWord"))+spkBtn(w,LEARN,true,t("hearSlow"))+"</span></div>";
 }
 
+/* מה נאמר **לפני** שעונים.
+
+   מקש הרווח קרא עד כה את `q.say` תמיד, בלי לבדוק אם כבר ענו —
+   בעוד שמקשי 1–4 שלידו כן מוגנים ב-`!P.done`. וב-`q.say` יושבת
+   התשובה: נמדד שבאולפן היא ב-say של back ו-use — 285 מתוך 849
+   השאלות שנדגמו. מי שקורא לאט
+   לוחץ רווח כדי לשמוע את השאלה, ושמע את הפתרון.
+
+   אחרי שעונים `q.say` נשאר כפי שהיה — המשפט המלא הוא בדיוק מה
+   שצריך להישמע אז, גם כשטעו. כאן רק מה שנאמר קודם:
+
+   · שאלת האזנה — השמע **הוא** השאלה, ואסור להשתיק אותה.
+   · השלמה — המשפט עם החסר, וה-_____ נעשה שהות ולא מילה.
+   · השאר — הכותרת שמוצגת על המסך, בשפה שבה היא מוצגת. */
+function sayAsk(q){
+  if(!q)return {t:"",lg:LEARN};
+  if(q.type==="hear"||q.type==="mean")return {t:q.say,lg:LEARN};
+  if(q.type==="gap")return {t:plainOf(q.gapHtml||"").replace(/_+/g," , "),lg:LEARN};
+  if(q.type==="comp")return {t:q.qtext||"",lg:state.lang};
+  /* back מציג את המשמעות בשפת הלימוד ברמה 3 ובשפת האם מתחתיה */
+  return {t:q.lead||"",lg:(q.type==="back"&&state.level>=3)?LEARN:state.lang};
+}
+
 function screenPractice(){
   var tp=topicOf(state.topic); if(!tp){state.screen="home";return screenHome()}
   var tr=trackOf(tp.trk), q=P.q;
@@ -2765,7 +2804,7 @@ function screenPractice(){
   }
   else if(q.type==="gap"){
     h+='<div class="subject"><span class="word" style="font-size:1.25rem">'+q.gapHtml+"</span>"+
-       '<span style="margin-inline-start:auto">'+spkBtn(q.say,LEARN,true,t("hearSlow"))+"</span></div>";
+       '<span style="margin-inline-start:auto">'+spkBtn(P.done?q.say:sayAsk(q).t,LEARN,true,t("hearSlow"))+"</span></div>";
     if(state.level<3&&q.lead)h+='<p class="qhint">'+esc(q.lead)+"</p>";
   }
   else if(q.type==="order"){
@@ -4188,7 +4227,9 @@ function examAction(a,el){
   if(a==="sitfwd"){sitNext();return true}
   if(a==="sitgo"){sitGo(parseInt(el.getAttribute("data-i"),10));return true}
   if(a==="sitfinish"){sitFinish();return true}
-  if(a==="sitread"){var q2=SIT.qs[SIT.i];if(q2)speak(q2.say);return true}
+  if(a==="sitread"){var q2=SIT.qs[SIT.i];
+    if(q2){var o2=sitSay(q2); if(o2.t)speak(o2.t,o2.l)}
+    return true}
   if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
   if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
   if(a==="sitback"){view="sit";render();window.scrollTo(0,0);return true}
@@ -4407,7 +4448,9 @@ document.addEventListener("keydown",function(e){
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();speak(P.q.say,LEARN);return}
+  if(e.key===" "){e.preventDefault();
+    var sa=P.done?{t:P.q.say,lg:LEARN}:sayAsk(P.q);
+    speak(sa.t,sa.lg); return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
@@ -4440,7 +4483,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a4-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a5-pwa1").catch(function(){});
   });
 }
 </script>

@@ -942,7 +942,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n35 · 2026-09-02";
+var BUILD="n36 · 2026-09-02";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3149,6 +3149,29 @@ function subjectBox(it){
     spkBtn(w,"en",false,t("hearWord"))+spkBtn(w,"en",true,t("hearSlow"))+"</span></div>";
 }
 
+/* מה נאמר **לפני** שעונים.
+
+   מקש הרווח קרא עד כה את `q.say` תמיד, בלי לבדוק אם כבר ענו —
+   בעוד שמקשי 1–4 שלידו כן מוגנים ב-`!P.done`. וב-`q.say` יושבת
+   התשובה: נמדד שבניב היא ב-say של back, use ו-gap — 453 מתוך 1,031
+   השאלות שנדגמו. מי שקורא לאט
+   לוחץ רווח כדי לשמוע את השאלה, ושמע את הפתרון.
+
+   אחרי שעונים `q.say` נשאר כפי שהיה — המשפט המלא הוא בדיוק מה
+   שצריך להישמע אז, גם כשטעו. כאן רק מה שנאמר קודם:
+
+   · שאלת האזנה — השמע **הוא** השאלה, ואסור להשתיק אותה.
+   · השלמה — המשפט עם החסר, וה-_____ נעשה שהות ולא מילה.
+   · השאר — הכותרת שמוצגת על המסך, בשפה שבה היא מוצגת. */
+function sayAsk(q){
+  if(!q)return {t:"",lg:"en"};
+  if(q.type==="hear"||q.type==="mean")return {t:q.say,lg:"en"};
+  if(q.type==="gap")return {t:plainOf(q.gapHtml||"").replace(/_+/g," , "),lg:"en"};
+  if(q.type==="comp")return {t:q.qtext||"",lg:state.lang};
+  /* back מציג את המשמעות באנגלית ברמה 3 ובשפת האם מתחתיה */
+  return {t:q.lead||"",lg:(q.type==="back"&&state.level>=3)?"en":state.lang};
+}
+
 function screenPractice(){
   var tp=topicOf(state.topic); if(!tp){state.screen="home";return screenHome()}
   var tr=trackOf(tp.trk), q=P.q;
@@ -3195,7 +3218,7 @@ function screenPractice(){
   }
   else if(q.type==="gap"){
     h+='<div class="subject"><span class="word" style="font-size:1.25rem">'+q.gapHtml+"</span>"+
-       '<span style="margin-inline-start:auto">'+spkBtn(q.say,"en",true,t("hearSlow"))+"</span></div>";
+       '<span style="margin-inline-start:auto">'+spkBtn(P.done?q.say:sayAsk(q).t,"en",true,t("hearSlow"))+"</span></div>";
     if(state.level<3&&q.lead)h+='<p class="qhint">'+esc(q.lead)+"</p>";
   }
   else if(q.type==="order"){
@@ -4846,7 +4869,9 @@ document.addEventListener("keydown",function(e){
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();speak(P.q.say,"en");return}
+  if(e.key===" "){e.preventDefault();
+    var sa=P.done?{t:P.q.say,lg:"en"}:sayAsk(P.q);
+    speak(sa.t,sa.lg); return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
@@ -4879,7 +4904,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n35-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n36-pwa1").catch(function(){});
   });
 }
 </script>

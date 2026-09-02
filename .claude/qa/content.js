@@ -313,10 +313,50 @@ async function scan(page){
       if(sym) add('symbol-in-say','REVIEW',
         'סימן ש-SAY_MAP לא המיר: '+say.slice(0,80),where,sym[0]);
       if(say.length>400) add('long-say','REVIEW',say.length+' תווים בהקראה אחת',where);
+      /* דליפת תשובה בהקראה נמדדת על **מה שבאמת נאמר לפני
+         שעונים**, ולא על השדה הגולמי `say`.
+
+         `say` הוא המשפט המלא, והוא אמור להכיל את התשובה — הוא
+         נאמר *אחרי* שעונים. אפליקציה שיש בה `sitSay` כבר בוחרת
+         בעצמה מה להשמיע קודם, ומדידה על `say` הייתה מדווחת על
+         דליפה שנסגרה. אין `sitSay` — נופלים ל-`say`, כי אז הוא
+         באמת מה שנשמע. */
       if(!q.audioOnly&&ri>=0){
         const a=texts[ri];
-        if(a&&a.length>=2&&say.indexOf(a)>=0&&askT.indexOf(a)<0)
-          add('answer-in-say','REVIEW','ההקראה אומרת את התשובה: "'+a+'"',where);
+        let spoken=say, via='say';
+        if(typeof sitSay==='function'){
+          try{ const o=sitSay(q); spoken=plain(o&&o.t); via='sitSay' }catch(e){}
+        } else if(typeof questionSay==='function'){
+          try{ spoken=plain(questionSay(q)); via='questionSay' }catch(e){}
+        }
+        /* שתי הסתייגויות, בלעדיהן המדד מדווח על מה שחייב לקרות:
+
+           · תשובה שנמצאת ב-`expr` מוצגת על המסך ממילא — נוסחה,
+             מטריצה או קטע — ולהשמיע אותה אינו חושף דבר.
+           · הקראה שמונה את כל האפשרויות ("האפשרויות: אפשרות
+             אחת… אפשרות שתיים…") מכילה את התשובה בהכרח, וזה
+             בדיוק תפקידה: מי שאינו קורא את המסך חייב לשמוע גם
+             את המסיחים. ב״שלב״ זה 3,262 ממצאים שכולם תקינים.
+
+           דליפה אמיתית היא **א־סימטרית**: התשובה נאמרת ואף מסיח
+           לא. כך נשמע `say` של "מפנה" לפני התיקון. */
+        /* זיהוי המנייה נעשה על צורה מנוקה מסימנים, מפני
+           ש-`speakMath` כותב מחדש את מה שהוא מקריא: המסיח נראה
+           על המסך `−37` ונאמר "מינוס 37", ולכן השוואה מילולית
+           לא מצאה אותו — והמנייה נראתה כאילו היא אומרת את התשובה
+           לבדה. 69 ממצאים ב״שלב״, כולם כוזבים.
+
+           הניקוי משמש **רק** לספירת המסיחים. בדיקת התשובה עצמה
+           נשארת מילולית ומחמירה, כדי שהרפיית ההשוואה לא תבלע
+           דליפה אמיתית. */
+        const norm=x=>String(x).toLowerCase().replace(/[^0-9a-z֐-׿؀-ۿ]/g,'');
+        const nSpoken=norm(spoken);
+        const others=texts.filter((x,i)=>
+          i!==ri&&x&&norm(x).length>=2&&nSpoken.indexOf(norm(x))>=0).length;
+        if(a&&a.length>=2&&spoken.indexOf(a)>=0&&
+           askT.indexOf(a)<0&&exprT.indexOf(a)<0&&others===0)
+          add('answer-in-say','REVIEW',
+              'מה שנאמר לפני התשובה ('+via+') מכיל אותה, ואף מסיח לא: "'+a+'"',where,via);
       }
 
       /* 8. חשוד — נאסף לתא ומוכרע בסופו */

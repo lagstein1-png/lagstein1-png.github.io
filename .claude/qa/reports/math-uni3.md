@@ -1,6 +1,6 @@
 # דוח תוכן — math-uni3
 
-**REVIEW** · 0 ממצאים חוסמים (0 מופעים) · 12 לבדיקה (3384 מופעים)
+**REVIEW** · 0 ממצאים חוסמים (0 מופעים) · 11 לבדיקה (3280 מופעים)
 
 | | |
 |---|---|
@@ -55,14 +55,13 @@
 
 | ממצא | חומרה | מופעים | תאים | דוגמה | איפה |
 |---|---|---|---|---|---|
-| `symbol-in-say · _` | REVIEW | 1875 | 13 | סימן ש-SAY_MAP לא המיר: לאיזו פונקציה מתכנסת סדרת הפונקציות נקודתית?. f_n בסוגריים איקס , שווה איקס ועוד | unif L1 |
-| `html-in-say` | REVIEW | 600 | 4 | תגיות HTML ב-say: f<sub>n</sub>(x) = x חלקי n על [0 , 3]. מהו sup\|f<sub>n</sub> − f\| עבור n = 2?.  | unif L3 |
-| `symbol-in-say · ₁` | REVIEW | 150 | 1 | סימן ש-SAY_MAP לא המיר: מהו מרחק המונית (d₁) בין הנקודות?. ההסתברות שווה בסוגריים מינוס 3 , 2 , Q שווה ב | metric L2 |
-| `symbol-in-say · ×` | REVIEW | 150 | 1 | סימן ש-SAY_MAP לא המיר: מהו הסדר של האיבר (8 , 7) בחבורה Z<sub>15</sub> × Z<sub>9</sub>?. \|G\| שווה 15 כפ | group L4 |
-| `symbol-in-say · ²` | REVIEW | 150 | 1 | סימן ש-SAY_MAP לא המיר: שיטת ניוטון עבור f(x) = x² − 5 עם x₀ = 1. מהו x₁?. x_1 שווה x_0 מינוס בסוגריים f | newton L2 |
+| `symbol-in-say · _` | REVIEW | 1871 | 13 | סימן ש-SAY_MAP לא המיר: לאיזו פונקציה מתכנסת סדרת הפונקציות נקודתית?. f_n בסוגריים איקס , שווה איקס ועוד | unif L1 |
+| `html-in-say` | REVIEW | 600 | 4 | תגיות HTML ב-say: f<sub>n</sub>(x) = x חלקי n על [0 , 6]. מהו sup\|f<sub>n</sub> − f\| עבור n = 7?.  | unif L3 |
+| `symbol-in-say · ₁` | REVIEW | 150 | 1 | סימן ש-SAY_MAP לא המיר: מהו מרחק המונית (d₁) בין הנקודות?. ההסתברות שווה בסוגריים 0 , 3 , Q שווה בסוגריי | metric L2 |
+| `symbol-in-say · ×` | REVIEW | 150 | 1 | סימן ש-SAY_MAP לא המיר: מהו הסדר של האיבר (9 , 3) בחבורה Z<sub>10</sub> × Z<sub>8</sub>?. \|G\| שווה 10 כפ | group L4 |
+| `symbol-in-say · ²` | REVIEW | 150 | 1 | סימן ש-SAY_MAP לא המיר: שיטת ניוטון עבור f(x) = x² − 2 עם x₀ = 2. מהו x₁?. x_1 שווה x_0 מינוס בסוגריים f | newton L2 |
 | `symbol-in-say · ³` | REVIEW | 150 | 1 | סימן ש-SAY_MAP לא המיר: שיטת ניוטון עבור f(x) = x³ − 7 עם x₀ = 2. מהו x₁?. x_1 שווה x_0 מינוס x_0 בשלישי | newton L3 |
-| `answer-in-say` | REVIEW | 85 | 4 | ההקראה אומרת את התשובה: "12" | sup L1 |
-| `symbol-in-say · √` | REVIEW | 47 | 1 | סימן ש-SAY_MAP לא המיר: z = 1 + √3i. מהו הארגומנט של z בחזקת 2?. arg בסוגריים z בריבוע , שווה ? | cpolar L2 |
+| `symbol-in-say · √` | REVIEW | 32 | 1 | סימן ש-SAY_MAP לא המיר: z = √3 + i. מהו הארגומנט של z בחזקת 2?. arg בסוגריים z בריבוע , שווה ? | cpolar L2 |
 
 <details><summary>symbol-in-say · _ — עוד דוגמאות</summary>
 
@@ -73,49 +72,42 @@
 
 <details><summary>html-in-say — עוד דוגמאות</summary>
 
-- `unif L3` תגיות HTML ב-say: f<sub>n</sub>(x) = x חלקי n על [0 , 4]. מהו sup|f<sub>n</sub> − f| עבור n = 6?. 
-- `unif L3` תגיות HTML ב-say: f<sub>n</sub>(x) = x חלקי n על [0 , 2]. מהו sup|f<sub>n</sub> − f| עבור n = 7?. 
+- `unif L3` תגיות HTML ב-say: f<sub>n</sub>(x) = x חלקי n על [0 , 2]. מהו sup|f<sub>n</sub> − f| עבור n = 8?. 
+- `unif L3` תגיות HTML ב-say: f<sub>n</sub>(x) = x חלקי n על [0 , 5]. מהו sup|f<sub>n</sub> − f| עבור n = 2?. 
 
 </details>
 
 <details><summary>symbol-in-say · ₁ — עוד דוגמאות</summary>
 
-- `metric L2` סימן ש-SAY_MAP לא המיר: מהו מרחק המונית (d₁) בין הנקודות?. ההסתברות שווה בסוגריים 3 , 2 , Q שווה בסוגריי
-- `metric L2` סימן ש-SAY_MAP לא המיר: מהו מרחק המונית (d₁) בין הנקודות?. ההסתברות שווה בסוגריים 2 , מינוס 1 , Q שווה ב
+- `metric L2` סימן ש-SAY_MAP לא המיר: מהו מרחק המונית (d₁) בין הנקודות?. ההסתברות שווה בסוגריים 2 , 0 , Q שווה בסוגריי
+- `metric L2` סימן ש-SAY_MAP לא המיר: מהו מרחק המונית (d₁) בין הנקודות?. ההסתברות שווה בסוגריים מינוס 1 , 3 , Q שווה ב
 
 </details>
 
 <details><summary>symbol-in-say · × — עוד דוגמאות</summary>
 
-- `group L4` סימן ש-SAY_MAP לא המיר: מהו הסדר של האיבר (5 , 7) בחבורה Z<sub>12</sub> × Z<sub>9</sub>?. |G| שווה 12 כפ
-- `group L4` סימן ש-SAY_MAP לא המיר: מהו הסדר של האיבר (5 , 3) בחבורה Z<sub>12</sub> × Z<sub>14</sub>?. |G| שווה 12 כ
+- `group L4` סימן ש-SAY_MAP לא המיר: מהו הסדר של האיבר (1 , 11) בחבורה Z<sub>6</sub> × Z<sub>15</sub>?. |G| שווה 6 כפ
+- `group L4` סימן ש-SAY_MAP לא המיר: מהו הסדר של האיבר (7 , 1) בחבורה Z<sub>9</sub> × Z<sub>12</sub>?. |G| שווה 9 כפו
 
 </details>
 
 <details><summary>symbol-in-say · ² — עוד דוגמאות</summary>
 
-- `newton L2` סימן ש-SAY_MAP לא המיר: שיטת ניוטון עבור f(x) = x² − 5 עם x₀ = 1. מהו x₁?. x_1 שווה x_0 מינוס בסוגריים f
-- `newton L2` סימן ש-SAY_MAP לא המיר: שיטת ניוטון עבור f(x) = x² − 5 עם x₀ = 4. מהו x₁?. x_1 שווה x_0 מינוס בסוגריים f
+- `newton L2` סימן ש-SAY_MAP לא המיר: שיטת ניוטון עבור f(x) = x² − 2 עם x₀ = 2. מהו x₁?. x_1 שווה x_0 מינוס בסוגריים f
+- `newton L2` סימן ש-SAY_MAP לא המיר: שיטת ניוטון עבור f(x) = x² − 3 עם x₀ = 1. מהו x₁?. x_1 שווה x_0 מינוס בסוגריים f
 
 </details>
 
 <details><summary>symbol-in-say · ³ — עוד דוגמאות</summary>
 
-- `newton L3` סימן ש-SAY_MAP לא המיר: שיטת ניוטון עבור f(x) = x³ − 5 עם x₀ = 3. מהו x₁?. x_1 שווה x_0 מינוס x_0 בשלישי
-- `newton L3` סימן ש-SAY_MAP לא המיר: שיטת ניוטון עבור f(x) = x³ − 2 עם x₀ = 3. מהו x₁?. x_1 שווה x_0 מינוס x_0 בשלישי
-
-</details>
-
-<details><summary>answer-in-say — עוד דוגמאות</summary>
-
-- `sup L1` ההקראה אומרת את התשובה: "12"
-- `sup L1` ההקראה אומרת את התשובה: "10"
+- `newton L3` סימן ש-SAY_MAP לא המיר: שיטת ניוטון עבור f(x) = x³ − 2 עם x₀ = 1. מהו x₁?. x_1 שווה x_0 מינוס x_0 בשלישי
+- `newton L3` סימן ש-SAY_MAP לא המיר: שיטת ניוטון עבור f(x) = x³ − 2 עם x₀ = 2. מהו x₁?. x_1 שווה x_0 מינוס x_0 בשלישי
 
 </details>
 
 <details><summary>symbol-in-say · √ — עוד דוגמאות</summary>
 
-- `cpolar L2` סימן ש-SAY_MAP לא המיר: z = √3 + i. מהו הארגומנט של z בחזקת 2?. arg בסוגריים z בריבוע , שווה ?
+- `cpolar L2` סימן ש-SAY_MAP לא המיר: z = √3 + i. מהו הארגומנט של z בחזקת 3?. arg בסוגריים z בשלישית , שווה ?
 - `cpolar L2` סימן ש-SAY_MAP לא המיר: z = √3 + i. מהו הארגומנט של z בחזקת 2?. arg בסוגריים z בריבוע , שווה ?
 
 </details>
@@ -125,7 +117,7 @@
 | ממצא | חומרה | מופעים | תאים | דוגמה | איפה |
 |---|---|---|---|---|---|
 | `shortest-answer` | REVIEW | 13 | 13 | התשובה היא הקצרה ביותר ב-100% מהשאלות | sup L2 |
-| `longest-answer` | REVIEW | 5 | 5 | התשובה היא הארוכה ביותר ב-91% מהשאלות | unif L3 |
+| `longest-answer` | REVIEW | 5 | 5 | התשובה היא הארוכה ביותר ב-89% מהשאלות | unif L3 |
 
 <details><summary>shortest-answer — עוד דוגמאות</summary>
 
