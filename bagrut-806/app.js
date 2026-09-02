@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x4 · 2026-09-02";
+  var BUILD = "x5 · 2026-09-02";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -474,11 +474,242 @@
     markOverflow($("#prac-preview"));
   }
 
+  /* --- סימולציה (שלב 4) -----------------------------------------
+     שלושה מצבים באותו מסך: לפני, תוך כדי, ואחרי. אין רמזים ואין
+     פתרונות עד הסיום — זו כל ההבחנה בין המצב הזה לבין התרגול,
+     ובלעדיה שני המצבים היו אותו דבר בשני שמות. */
+  var SIM = { on: false, done: false, endsAt: 0, ans: {}, res: null, timer: null };
+
+  function simStop() {
+    if (SIM.timer) { clearInterval(SIM.timer); SIM.timer = null; }
+  }
+  function mmss(ms) {
+    if (ms < 0) ms = 0;
+    var t = Math.round(ms / 1000);
+    var h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), sec = t % 60;
+    function two(n) { return (n < 10 ? "0" : "") + n; }
+    return (h ? h + ":" : "") + two(m) + ":" + two(sec);
+  }
+  function simSubs(ex) {
+    var out = [];
+    ex.questions.forEach(function (q) {
+      (q.subQuestions || []).forEach(function (sub, si) {
+        out.push({ q: q, sub: sub, id: "q" + q.number + "s" + si });
+      });
+    });
+    return out;
+  }
+  function simStart(ex) {
+    SIM.on = true; SIM.done = false; SIM.res = null; SIM.ans = {};
+    SIM.endsAt = Date.now() + ex.durationMinutes * 60000;
+    renderSim();
+    simStop();
+    SIM.timer = setInterval(tickSim, 1000);
+  }
+  function tickSim() {
+    if (!SIM.on || SIM.done) { simStop(); return; }
+    var ex = examById(state.examId);
+    if (!ex || state.screen !== "sim") return;   /* השעון ממשיך לרוץ גם מחוץ למסך */
+    var left = SIM.endsAt - Date.now();
+    var el = $("#sim-clock");
+    if (el) {
+      var total = ex.durationMinutes * 60000;
+      el.querySelector(".t").textContent = mmss(left);
+      el.querySelector(".bar i").style.width =
+        Math.max(0, Math.min(100, (left / total) * 100)).toFixed(2) + "%";
+      el.classList.toggle("low", left <= 5 * 60000);
+    }
+    if (left <= 0) {
+      simFinish(true);
+    }
+  }
+  /* אוספים את מה שנכתב לפני כל רענון — אותו לקח מהתרגול. */
+  function simKeep() {
+    $$("[data-sim]").forEach(function (inp) { SIM.ans[inp.getAttribute("data-sim")] = inp.value; });
+  }
+  function simFinish(byTime) {
+    simKeep();
+    simStop();
+    SIM.done = true; SIM.on = false;
+    var ex = examById(state.examId);
+    if (!ex) return;
+    var got = 0, max = 0, byTopic = {}, rows = [];
+    simSubs(ex).forEach(function (it) {
+      var r = checkAnswer(it.sub.finalAnswer, SIM.ans[it.id] || "");
+      var pts = Number(it.sub.points) || 0;
+      max += pts;
+      if (r.ok) got += pts;
+      var t = byTopic[it.q.topic] || (byTopic[it.q.topic] = { ok: 0, n: 0, pts: 0, max: 0 });
+      t.n++; t.max += pts;
+      if (r.ok) { t.ok++; t.pts += pts; }
+      recordResult(it.q, it.id, r.ok);
+      rows.push({ id: it.id, letter: it.sub.letter, number: it.q.number,
+                  topic: it.q.topic, ok: r.ok, pts: pts,
+                  given: SIM.ans[it.id] || "", want: answerText(it.sub.finalAnswer) });
+    });
+    SIM.res = { got: got, max: max, byTopic: byTopic, rows: rows, byTime: !!byTime };
+    var d = store.data;
+    if (!d.sims) d.sims = [];
+    d.sims.push({ examId: ex.id, at: Date.now(), got: got, max: max });
+    if (d.sims.length > 50) d.sims = d.sims.slice(-50);
+    store.save();
+    renderSim();
+    say(byTime ? "הזמן נגמר. הנה הדוח." : "הבחינה הוגשה. הנה הדוח.");
+  }
+
+  function simQuestionHtml(q) {
+    var id = "q" + q.number;
+    var h = '<div class="card"><div class="qhead"><span class="qnum">שאלה ' +
+            esc(q.number) + '</span><span class="chip">' + esc(q.topic) + "</span>" +
+            '<button class="btn wide" data-read="' + esc(id) + 'all" type="button">' +
+            '<span aria-hidden="true">🔊</span> השאלה כולה</button></div>';
+    h += '<div class="saybar">' + spkBtn(id, "הקריאו את השאלה") +
+         '<div class="grow"><p id="t-' + id + '">' + sentHtml(q.text) + "</p></div></div>";
+    h += formula(q.latex, "f-" + id);
+    (q.subQuestions || []).forEach(function (sub, si) {
+      var sid = id + "s" + si;
+      h += '<div class="sub"><div class="saybar">' +
+        spkBtn(sid, "הקריאו את סעיף " + sub.letter) +
+        '<div class="grow"><h3 id="t-' + sid + '"><span class="letter">' + esc(sub.letter) +
+        ".</span> " + sentHtml(sub.text) + "</h3>" +
+        '<p class="meta">' + plural(sub.points, "נקודה אחת", "שתי נקודות", "נקודות") +
+        "</p></div></div>";
+      h += formula(sub.latex, "f-" + sid);
+      h += '<div class="ansbox"><div class="ansrow">' +
+        '<input type="text" data-sim="' + esc(sid) + '" ' +
+        'dir="' + (sub.finalAnswer && sub.finalAnswer.type === "text" ? "rtl" : "ltr") + '" ' +
+        'inputmode="' + (sub.finalAnswer && sub.finalAnswer.type === "number" ? "decimal" : "text") + '" ' +
+        'autocomplete="off" spellcheck="false" ' +
+        'value="' + esc(SIM.ans[sid] || "") + '" ' +
+        'aria-label="התשובה לשאלה ' + esc(q.number) + " סעיף " + esc(sub.letter) + '" ' +
+        'placeholder="' + esc(hintPlaceholder(sub.finalAnswer)) + '"></div></div>';
+      h += "</div>";
+    });
+    return h + "</div>";
+  }
+
+  function simReportHtml(ex) {
+    var r = SIM.res;
+    var pct = r.max ? Math.round((r.got / r.max) * 100) : 0;
+    var h = "";
+    if (r.byTime) h += '<p class="note">הזמן נגמר, והבחינה הוגשה כפי שהייתה.</p>';
+    h += '<div class="score"><div class="big">' + pct + "</div>" +
+      "<div>" + r.got + " מתוך " + r.max + " נקודות</div></div>";
+
+    var topics = Object.keys(r.byTopic);
+    h += "<h2>לפי נושא</h2><table class=\"tbl\"><thead><tr>" +
+      "<th>נושא</th><th>סעיפים</th><th>נקודות</th><th></th></tr></thead><tbody>";
+    topics.forEach(function (t) {
+      var x = r.byTopic[t];
+      var p = x.max ? Math.round((x.pts / x.max) * 100) : 0;
+      h += "<tr><td>" + esc(t) + "</td><td>" + x.ok + "/" + x.n + "</td><td>" +
+        x.pts + "/" + x.max + '</td><td><div class="bar2' + (p < 60 ? " weak" : "") +
+        '"><i style="width:' + p + '%"></i></div></td></tr>';
+    });
+    h += "</tbody></table>";
+
+    /* הנושאים החלשים נאמרים במפורש ולא רק מצוירים: מי שקורא לאט
+       לא מפענח גרף, והמשפט הזה הוא כל מה שהוא צריך מהדוח. */
+    var weak = topics.filter(function (t) {
+      var x = r.byTopic[t];
+      return x.max && x.pts / x.max < 0.6;
+    });
+    h += '<p class="note">' + (weak.length
+      ? "מה לחזור עליו קודם: " + weak.map(esc).join(", ") + "."
+      : "אין נושא שנפל מתחת ל-60%. אפשר להמשיך הלאה.") + "</p>";
+
+    h += "<h2>סעיף אחר סעיף</h2><table class=\"tbl\"><thead><tr>" +
+      "<th>סעיף</th><th>מה נכתב</th><th>התשובה</th><th></th></tr></thead><tbody>";
+    r.rows.forEach(function (x) {
+      h += "<tr><td>" + esc(x.number) + esc(x.letter) + "</td><td>" +
+        (x.given ? esc(x.given) : '<span class="meta">ריק</span>') + "</td><td>" +
+        esc(x.want) + '</td><td><span class="tag ' + (x.ok ? "ok" : "no") + '">' +
+        (x.ok ? "נכון" : "לא") + "</span></td></tr>";
+    });
+    h += "</tbody></table>";
+    h += '<div class="hintbar" style="margin-top:1rem">' +
+      '<button class="btn pri" data-go="practice" type="button">לתרגול מודרך, עם הפתרונות</button>' +
+      '<button class="btn" data-simstart="1" type="button">בחינה נוספת</button></div>';
+    return h;
+  }
+
   function renderSim() {
     var ex = examById(state.examId);
     if (!ex) return;
     $("#sim-meta").textContent = examTitle(ex) + " · " + ex.durationMinutes + " דקות · " +
       plural(ex.questions.length, "שאלה אחת", "שתי שאלות", "שאלות");
+    var box = $("#sim-body");
+
+    if (SIM.done && SIM.res) { box.innerHTML = simReportHtml(ex); markOverflow(box); return; }
+
+    if (!SIM.on) {
+      box.innerHTML = '<p class="note">בסימולציה אין רמזים ואין פתרונות עד הסיום, ' +
+        "והשעון רץ. ההקראה עובדת כרגיל — היא אינה עזרה חיצונית אלא הדרך " +
+        "שבה האפליקציה הזאת מוגשת.</p>" +
+        '<div class="card"><h2>' + esc(examTitle(ex)) + "</h2>" +
+        '<p class="meta">' + plural(countSubs(ex), "סעיף אחד", "שני סעיפים", "סעיפים") +
+        " · " + ex.durationMinutes + " דקות</p>" +
+        '<button class="btn pri" data-simstart="1" type="button">התחילו את הבחינה</button></div>';
+      return;
+    }
+
+    var total = ex.durationMinutes * 60000;
+    var left = SIM.endsAt - Date.now();
+    var h = '<div class="clock" id="sim-clock" role="timer" aria-label="הזמן שנותר">' +
+      '<span class="t">' + mmss(left) + "</span>" +
+      '<span class="bar"><i style="width:' +
+      Math.max(0, Math.min(100, (left / total) * 100)).toFixed(2) + '%"></i></span>' +
+      '<button class="btn" data-simend="1" type="button">סיימתי</button></div>';
+    ex.questions.forEach(function (q) { h += simQuestionHtml(q); });
+    h += '<button class="btn pri" data-simend="1" type="button" ' +
+         'style="width:100%">סיימתי — הגישו את הבחינה</button>';
+    box.innerHTML = h;
+    markOverflow(box);
+  }
+
+  /* --- התקדמות מצטברת -------------------------------------------
+     נבנית מ-weak, שנצבר גם בתרגול וגם בסימולציות. זה מה שהופך את
+     הדוח מ"מה קרה בבחינה אחת" ל"מה חוזר אצלי". */
+  function renderProg() {
+    var d = store.data;
+    var weak = d.weak || {};
+    var topics = Object.keys(weak);
+    var box = $("#prog-body");
+    if (!topics.length) {
+      box.innerHTML = '<div class="stub"><b>עוד לא נאסף מידע.</b>' +
+        "כל תשובה שנבדקת — בתרגול או בסימולציה — נספרת כאן לפי נושא.</div>";
+      return;
+    }
+    var rows = topics.map(function (t) {
+      var x = weak[t], n = x.ok + x.no;
+      return { t: t, ok: x.ok, n: n, p: n ? Math.round((x.ok / n) * 100) : 0 };
+    }).sort(function (a, b) { return a.p - b.p; });
+
+    var h = "<h2>לפי נושא</h2><table class=\"tbl\"><thead><tr>" +
+      "<th>נושא</th><th>נכונות</th><th>אחוז</th><th></th></tr></thead><tbody>";
+    rows.forEach(function (r) {
+      h += "<tr><td>" + esc(r.t) + "</td><td>" + r.ok + "/" + r.n + "</td><td>" + r.p +
+        '%</td><td><div class="bar2' + (r.p < 60 ? " weak" : "") +
+        '"><i style="width:' + r.p + '%"></i></div></td></tr>';
+    });
+    h += "</tbody></table>";
+    var w = rows.filter(function (r) { return r.p < 60; });
+    h += '<p class="note">' + (w.length
+      ? "הנושאים החלשים: " + w.map(function (r) { return esc(r.t); }).join(", ") + "."
+      : "אין נושא מתחת ל-60%.") + "</p>";
+
+    var sims = (d.sims || []).slice().reverse().slice(0, 8);
+    if (sims.length) {
+      h += "<h2>סימולציות אחרונות</h2><table class=\"tbl\"><thead><tr>" +
+        "<th>מתי</th><th>ציון</th></tr></thead><tbody>";
+      sims.forEach(function (x) {
+        var dt = new Date(x.at);
+        h += "<tr><td>" + dt.toLocaleDateString("he-IL") + "</td><td>" +
+          (x.max ? Math.round((x.got / x.max) * 100) : 0) + " (" + x.got + "/" + x.max + ")</td></tr>";
+      });
+      h += "</tbody></table>";
+    }
+    box.innerHTML = h;
   }
 
   function renderMode() {
@@ -492,10 +723,10 @@
   }
 
   /* --- ניווט ----------------------------------------------------- */
-  var SCREENS = ["home", "mode", "sim", "practice", "settings"];
+  var SCREENS = ["home", "mode", "sim", "practice", "prog", "settings"];
   var TITLES = {
     home: "שאלון 806", mode: "בחירת מצב", sim: "סימולציית בחינה",
-    practice: "תרגול מודרך", settings: "הגדרות"
+    practice: "תרגול מודרך", prog: "ההתקדמות שלכם", settings: "הגדרות"
   };
   function go(screen) {
     if (SCREENS.indexOf(screen) < 0) screen = "home";
@@ -507,6 +738,9 @@
        ולא לרשימת הבחינות. שלוש לחיצות כדי לחזור למקום שבו היית
        הן בדיוק העומס שהאפליקציה הזאת נועדה להוריד. */
     if (screen === "settings" && state.screen !== "settings") state.back = state.screen;
+    /* יציאה מהסימולציה באמצע אינה מבטלת אותה: מה שנכתב נשמר,
+       והשעון ממשיך לרוץ — בדיוק כמו בבחינה אמיתית. */
+    if (state.screen === "sim" && screen !== "sim" && SIM.on) simKeep();
     state.screen = screen;
     /* מעבר מסך בזמן הקראה משאיר קול שמדבר על טקסט שכבר אינו על
        המסך, וההדגשה נשארת על אלמנט מוסתר. */
@@ -520,6 +754,7 @@
     if (screen === "mode") renderMode();
     if (screen === "sim") renderSim();
     if (screen === "practice") renderPractice();
+    if (screen === "prog") renderProg();
     if (screen === "settings") applyPrefs();
     window.scrollTo(0, 0);
     say(TITLES[screen]);
@@ -530,9 +765,21 @@
     var el = e.target.closest ? e.target.closest(
       "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate]," +
       "[data-read],[data-read-el],[data-check],[data-hint],[data-sol],[data-hclear]," +
+      "[data-simstart],[data-simend]," +
       "#btn-reset,#btn-stop,#btn-try," +
       "#btn-pause,#btn-back,#btn-fwd") : null;
     if (!el) return;
+
+    if (el.getAttribute("data-simstart")) {
+      var exs = examById(state.examId);
+      if (exs) simStart(exs);
+      return;
+    }
+    if (el.getAttribute("data-simend")) {
+      if (!window.confirm("להגיש את הבחינה? אחרי ההגשה אי אפשר לשנות תשובות.")) return;
+      simFinish(false);
+      return;
+    }
 
     /* --- שלב 3: רמז, פתרון ובדיקה --- */
     var hint = el.getAttribute("data-hint");
@@ -620,7 +867,10 @@
 
     if (el.id === "btn-reset") {
       if (!window.confirm("למחוק את כל מה שנשמר במכשיר הזה?")) return;
-      store.reset(); applyPrefs(); state.examId = null; go("home");
+      store.reset(); applyPrefs(); state.examId = null;
+      simStop(); SIM = { on: false, done: false, endsAt: 0, ans: {}, res: null, timer: null };
+      P = {};
+      go("home");
       say("הנתונים נמחקו.");
       return;
     }
@@ -645,8 +895,12 @@
      ימחק אותו. */
   document.addEventListener("input", function (e) {
     var t = e.target;
-    if (t && t.getAttribute && t.getAttribute("data-ans")) pOf(t.getAttribute("data-ans")).val = t.value;
+    if (!t || !t.getAttribute) return;
+    if (t.getAttribute("data-ans")) pOf(t.getAttribute("data-ans")).val = t.value;
+    if (t.getAttribute("data-sim")) SIM.ans[t.getAttribute("data-sim")] = t.value;
   });
+  /* סגירת הכרטיסייה באמצע בחינה לא תשאיר את התלמיד בלי מה שכתב */
+  window.addEventListener("pagehide", function () { if (SIM.on) simKeep(); });
 
   /* --- הפעלה ----------------------------------------------------- */
   /* כפתור ההקראה הפעיל מסומן, וסרגל העצירה נפתח רק כשבאמת מדברים.
@@ -670,6 +924,16 @@
         if (b) { b.classList.add("on"); b.setAttribute("aria-pressed", "true"); }
       }
     };
+  }
+
+  /* --- רישום ה-service worker ------------------------------------
+     מפתח המטמון גזור מ-BUILD ידנית ולא אוטומטית, וזה מכוון: כך
+     אפשר לראות בעין אחת ששני המספרים תואמים. עדכנת את BUILD —
+     עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js?v=x5-pwa1").catch(function () {});
+    });
   }
 
   store.load();
