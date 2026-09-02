@@ -33,6 +33,11 @@
      1. עזרים כלליים
      =================================================================== */
 
+  /* המסמך, או null כשאין כזה. כל הגישות ל-DOM עוברות דרכו, ולכן
+     אפשר לטעון את core.js גם ב-node ולהריץ עליו בדיקות לוגיקה
+     בלי דפדפן — ראו test.js. */
+  var DOC = (typeof document !== 'undefined') ? document : null;
+
   function isStr(x) { return typeof x === 'string'; }
   function nonEmpty(x) { return isStr(x) && x.trim() !== ''; }
   function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
@@ -177,9 +182,10 @@
     i18n.lang = lang;
     store.set('lang', lang);
     try {
-      var root = document.documentElement;
-      root.setAttribute('lang', lang);
-      root.setAttribute('dir', LANGS[lang].dir);
+      if (DOC) {
+        DOC.documentElement.setAttribute('lang', lang);
+        DOC.documentElement.setAttribute('dir', LANGS[lang].dir);
+      }
     } catch (e) {}
     /* השפה השתנתה — הקול הנוכחי כבר לא מתאים לטקסט שעל המסך. */
     try { tts.stop(); } catch (e) {}
@@ -232,8 +238,17 @@
   }
 
   /* הטבלה הבסיסית. מפתח = המילה בלי ניקוד. ערך = איך היא נאמרת.
-     המילים כאן הן מה שנאסף בתאוריה מדברת ומה שחוזר בכל האפליקציות;
-     כל אפליקציה מוסיפה את שלה עם LC.ktiv.add(). */
+     כל אפליקציה מוסיפה את שלה עם LC.ktiv.add().
+
+     המקור: ב-drivewise יש *שתי* טבלאות KTIV שאינן זהות — אחת בתוך
+     index.html ואחת ב-tools/ktiv.js, והן נבדלות בשבעה ערכים
+     (חצייה, החצייה, בחצייה, לחצייה, צומת, לנסוע, מותר). בפועל רצה
+     זו של tools: היא מיוצאת ל-data/speech-rules.json, הקובץ נטען
+     מראש, והקוד מעדיף אותו על הטבלה שבדף (R.ktiv || KTIV). היא גם
+     זו שנצרבה להקלטות ה-MP3.
+     לכן נלקחו כאן הערכים של tools/ktiv.js, ולא אלה שבדף. בכל שבעת
+     המקרים הם אותו כלל: כתיב מלא עם ו' או י' עדיף על ניקוד טהור,
+     מפני שמנוע שממפה אותיות לצליל נשבר על ניקוד במקום להיעזר בו. */
   var KTIV_BASE = {
     /* כתיב חסר ← כתיב מלא */
     'לעצר': 'לעצור', 'בעצר': 'בעצור', 'לעבר': 'לעבור', 'לצפר': 'לצפור',
@@ -243,15 +258,15 @@
     'כוון': 'כיוון', 'לכוון': 'לכיוון', 'מלה': 'מילה', 'המלה': 'המילה',
     'עגול': 'עיגול',
     /* מילים שהמנוע קורא בהטעמה שגויה — כאן הניקוד הוא התיקון */
-    'חצייה': 'חֲצִיָּה', 'החצייה': 'הַחֲצִיָּה', 'בחצייה': 'בַּחֲצִיָּה', 'לחצייה': 'לַחֲצִיָּה',
+    'חצייה': 'חֲצִיָּיה', 'החצייה': 'הַחֲצִיָּיה', 'בחצייה': 'בַּחֲצִיָּיה', 'לחצייה': 'לַחֲצִיָּיה',
     'תמרור': 'תַּמְרוּר', 'תמרורים': 'תַּמְרוּרִים',
-    'רמזור': 'רַמְזוֹר', 'רמזורים': 'רַמְזוֹרִים', 'צומת': 'צֹמֶת',
-    'נסע': 'נָסַע', 'לנסוע': 'לִנְסֹעַ', 'עבר': 'עָבַר', 'לעבור': 'לַעֲבוֹר',
+    'רמזור': 'רַמְזוֹר', 'רמזורים': 'רַמְזוֹרִים', 'צומת': 'צוֹמֶת',
+    'נסע': 'נָסַע', 'לנסוע': 'לִנְסוֹעַ', 'עבר': 'עָבַר', 'לעבור': 'לַעֲבוֹר',
     'ירד': 'יָרַד', 'לרדת': 'לָרֶדֶת', 'עלה': 'עָלָה', 'לעלות': 'לַעֲלוֹת',
     'מהר': 'מַהֵר', 'חצי': 'חֲצִי', 'דרך': 'דֶּרֶךְ',
     'בנסיעה': 'בִּנְסִיעָה', 'כבש': 'כֶּבֶשׁ', 'מהירות': 'מְהִירוּת',
     'עצירה': 'עֲצִירָה', 'לעצור': 'לַעֲצוֹר', 'בעצירה': 'בַּעֲצִירָה',
-    'אסור': 'אָסוּר', 'מותר': 'מֻתָּר', 'חובה': 'חוֹבָה',
+    'אסור': 'אָסוּר', 'מותר': 'מוּתָּר', 'חובה': 'חוֹבָה',
     'רכב': 'רֶכֶב', 'הרכב': 'הָרֶכֶב', 'ברכב': 'בָּרֶכֶב',
     'כביש': 'כְּבִישׁ', 'הכביש': 'הַכְּבִישׁ', 'בכביש': 'בַּכְּבִישׁ',
     'נהג': 'נַהָג', 'הנהג': 'הַנַּהָג', 'לנהוג': 'לִנְהוֹג'
@@ -440,8 +455,8 @@
      voicesReady(). שניהם נדחים בלי חריגה ובלי לוג. */
   var SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
   function installUnlock() {
-    if (typeof document === 'undefined') return;
-    document.addEventListener('pointerdown', function unlock() {
+    if (!DOC) return;
+    DOC.addEventListener('pointerdown', function unlock() {
       try {
         if (!tts.el) tts.el = new Audio();
         tts.el.src = SILENT_WAV;
@@ -461,9 +476,9 @@
      עוזבים את הטאב והקול ממשיך ברקע, ולפעמים נתקע עד סגירת הדפדפן.
      synth.cancel() כאן הוא מה שמונע את זה. */
   function installVisibility() {
-    if (typeof document === 'undefined') return;
-    document.addEventListener('visibilitychange', function () {
-      if (document.hidden) {
+    if (!DOC) return;
+    DOC.addEventListener('visibilitychange', function () {
+      if (DOC.hidden) {
         ttsStop();
         try { if (synth) synth.cancel(); } catch (e) {}
       }
@@ -1034,8 +1049,8 @@
 
     init: function (rootSel) {
       this.root = (typeof rootSel === 'string')
-        ? document.querySelector(rootSel)
-        : (rootSel || document.body);
+        ? (DOC ? DOC.querySelector(rootSel) : null)
+        : (rootSel || (DOC ? DOC.body : null));
       return this;
     },
     define: function (name, renderFn) {
@@ -1052,12 +1067,14 @@
       ttsStop();
       this.current = name;
 
-      var root = this.root || document;
-      var all = root.querySelectorAll('[data-screen]');
-      for (var i = 0; i < all.length; i++) {
-        var on = all[i].getAttribute('data-screen') === name;
-        all[i].hidden = !on;
-        all[i].setAttribute('aria-hidden', on ? 'false' : 'true');
+      var root = this.root || DOC;
+      if (root) {
+        var all = root.querySelectorAll('[data-screen]');
+        for (var i = 0; i < all.length; i++) {
+          var on = all[i].getAttribute('data-screen') === name;
+          all[i].hidden = !on;
+          all[i].setAttribute('aria-hidden', on ? 'false' : 'true');
+        }
       }
 
       var fn = this.screens[name];
@@ -1065,9 +1082,11 @@
 
       /* מיקוד לכותרת המסך החדש. tabindex="-1" בתבנית מאפשר את זה
          בלי להוסיף את הכותרת לסדר ה-Tab. */
-      var pane = root.querySelector('[data-screen="' + name + '"]');
-      var h = pane && pane.querySelector('h1,h2,[data-focus]');
-      if (h) { try { h.focus(); } catch (e) {} }
+      if (root) {
+        var pane = root.querySelector('[data-screen="' + name + '"]');
+        var h = pane && pane.querySelector('h1,h2,[data-focus]');
+        if (h) { try { h.focus(); } catch (e) {} }
+      }
 
       this.listeners.forEach(function (cb) { try { cb(name, arg); } catch (e) {} });
       return name;
