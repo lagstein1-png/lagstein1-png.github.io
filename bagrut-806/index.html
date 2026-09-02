@@ -201,6 +201,51 @@ main{padding:1.1rem 0 3rem}
 }
 .stopbar .lbl{color:var(--muted);font-size:.9em}
 
+/* --- רמזים, תשובה ומשוב (שלב 3) ---
+   הרמז אינו הפתרון, והפתרון אינו נחשף בטעות: כל אחד מהם דורש
+   לחיצה משלו, ולתלמיד יש תמיד דרך אחורה. */
+.ansbox{
+  border-top:1px solid var(--line);margin-top:.85rem;padding-top:.85rem;
+  display:flex;flex-direction:column;gap:.6rem;
+}
+.ansrow{display:flex;gap:.5rem;align-items:stretch;flex-wrap:wrap}
+.ansrow input{
+  flex:1 1 8rem;min-width:0;min-height:48px;padding:.5rem .8rem;
+  font:inherit;font-size:1.05em;text-align:start;
+  border:2px solid var(--line);border-radius:12px;
+  background:var(--surface);color:var(--ink);
+}
+.ansrow input:focus-visible{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.ansrow input::placeholder{color:var(--faint)}
+
+/* שורה אחת ולא שתי עמודות: כשהמשוב היה flex, "עוד לא." הקצר
+   והסבר ארוך לצידו נשברו לשתי עמודות מקבילות, ומי שקורא לאט
+   קרא אותן לסירוגין. */
+.verdict{border-radius:12px;padding:.7rem .85rem;font-weight:800}
+.verdict.ok{background:var(--ok-soft);color:var(--ok)}
+.verdict.no{background:var(--bad-soft);color:var(--bad)}
+.verdict .why{display:block;font-weight:400;font-size:.94em;margin-top:.3rem;color:var(--ink)}
+
+/* רמז שנחשף. המספר בצד אינו קישוט: הוא אומר לתלמיד כמה נשארו,
+   וזה ההבדל בין "אני תקוע" לבין "אני בשלב שני מתוך שלושה". */
+.hint{
+  background:var(--surface2);border-inline-start:4px solid var(--accent);
+  border-radius:0 12px 12px 0;padding:.65rem .85rem;
+}
+:root[dir="rtl"] .hint{border-radius:12px 0 0 12px}
+.hint .n{
+  flex:none;align-self:flex-start;background:var(--accent);color:var(--accent-ink);
+  border-radius:8px;padding:.1rem .55rem;font-weight:800;font-size:.85em;
+}
+.solution{background:var(--ok-soft);border-inline-start:4px solid var(--ok);
+  border-radius:12px;padding:.7rem .9rem}
+.solution h4{margin:0 0 .5rem;font-size:1em;color:var(--ok)}
+.solution ol{margin:0;padding-inline-start:1.2rem}
+.solution li{margin-bottom:.5rem}
+.solution li:last-child{margin-bottom:0}
+.hintbar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.hintbar .left{color:var(--muted);font-size:.9em;margin-inline-start:auto}
+
 .note{
   background:var(--warn-soft);color:var(--warn);border-radius:10px;
   padding:.7rem .85rem;font-size:.92em;font-weight:600;margin:0 0 .9rem;
@@ -279,12 +324,9 @@ footer{color:var(--faint);font-size:.85em;padding:1.2rem 0 2rem;text-align:cente
   <section id="scr-practice" hidden>
     <h1>תרגול מודרך</h1>
     <p class="meta" id="prac-meta"></p>
-    <div class="stub" style="margin-bottom:1rem">
-      <b>המסך הזה עוד לא נבנה.</b>
-      חשיפת רמזים אחד־אחד ובדיקת תשובה סופית — שלב 3. ההקראה — שלב 2.
-      מה שמוצג מתחת הוא השאלה כפי שהיא יושבת ב־<code>data/exams.js</code>,
-      כדי שהסכימה תיבדק על תוכן אמיתי ולא על מלל ריק.
-    </div>
+    <p class="note">בתרגול המודרך אין שעון ואין עונש. הרמזים נחשפים
+      רק כשמבקשים אותם, אחד־אחד, והפתרון המלא אחרון. דוח הנושאים
+      החלשים ועבודה בלי אינטרנט נכנסים בשלב 4.</p>
     <h2>בחרו נושא</h2>
     <div class="group" id="topic-list" style="margin-bottom:1rem"></div>
     <div id="prac-preview"></div>

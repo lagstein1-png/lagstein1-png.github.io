@@ -1,11 +1,11 @@
 /* =====================================================================
-   806 — לוגיקה. שלב 1: שלד, סכימה, ומעבר בין מסכים.
+   806 — לוגיקה.
 
    מה כאן ומה עוד לא:
-     שלב 1 (זה)  שלד, טעינת EXAMS, ניווט, הגדרות, שמירה במכשיר.
-     שלב 2       speech.js — הקראה בעברית עם הדגשת המשפט הנקרא.
-     שלב 3       חשיפת רמזים אחד־אחד ובדיקת תשובה סופית.
-     שלב 4       PWA, אופליין מלא, ודוח נושאים חלשים.
+     שלב 1  שלד, טעינת EXAMS, ניווט, הגדרות, שמירה במכשיר.
+     שלב 2  speech.js — הקראה בעברית עם הדגשת המשפט הנקרא.
+     שלב 3  חשיפת רמזים אחד־אחד ובדיקת תשובה סופית.  ← עד כאן
+     שלב 4  PWA, אופליין מלא, ודוח נושאים חלשים.
 
    אין framework ואין build. הקובץ נטען כ-<script> רגיל, ואחרי
    data/exams.js — הוא סומך על window.EXAMS שכבר קיים.
@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x3 · 2026-09-02";
+  var BUILD = "x4 · 2026-09-02";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -152,9 +152,95 @@
       : [String(text)];
     return ss.map(function (x) { return '<span class="sent">' + esc(x) + "</span>"; }).join("");
   }
+  /* הקראה של אלמנט שקיים רק אחרי לחיצה — רמז או פתרון. הטקסט אינו
+     בקובץ התוכן במבנה שאפשר לשלוף לפי מזהה, ולכן הוא נקרא מהמסך. */
+  function spkElBtn(elId, label) {
+    return '<button class="spk" data-read-el="' + esc(elId) + '" type="button" ' +
+           'aria-label="' + esc(label) + '" title="' + esc(label) + '">🔊</button>';
+  }
   function spkBtn(id, label) {
     return '<button class="spk" data-read="' + esc(id) + '" type="button" ' +
            'aria-label="' + esc(label) + '" title="' + esc(label) + '">🔊</button>';
+  }
+
+  /* --- בדיקת התשובה הסופית (שלב 3) -------------------------------
+     הבדיקה סלחנית בכתיב ונוקשה במתמטיקה. תלמיד שכתב 7/12 במקום
+     0.5833 יודע את החומר, ואפליקציה שפוסלת אותו מלמדת אותו שהיא
+     לא הוגנת — ומאותו רגע הוא לא סומך עליה גם כשהיא צודקת. */
+  function parseNum(raw) {
+    var t = String(raw == null ? "" : raw).trim();
+    if (!t) return NaN;
+    t = t.replace(/[\u00a0\s]/g, "");
+    var pct = /%$/.test(t);
+    if (pct) t = t.slice(0, -1);
+    /* פסיק בעברית וברוסית הוא גם מפריד אלפים וגם נקודה עשרונית.
+       1,234 או 12,345,678 הם אלפים; 0,58 הוא עשרוני. */
+    if (/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(t)) t = t.replace(/,/g, "");
+    else t = t.replace(/,/g, ".");
+    var v;
+    var frac = /^(-?\d*\.?\d+)\/(-?\d*\.?\d+)$/.exec(t);
+    if (frac) {
+      var d = Number(frac[2]);
+      if (!d) return NaN;
+      v = Number(frac[1]) / d;
+    } else {
+      if (!/^-?(\d+\.?\d*|\.\d+)$/.test(t)) return NaN;
+      v = Number(t);
+    }
+    if (!isFinite(v)) return NaN;
+    return pct ? v / 100 : v;
+  }
+  /* רווחים כפולים, סימן בסוף המשפט ואות גדולה אינם טעות בתוכן. */
+  function normText(x) {
+    return String(x == null ? "" : x).trim().toLowerCase()
+      .replace(/[\u00a0\s]+/g, " ")
+      .replace(/[.,;:!?׳״"']+$/, "");
+  }
+  function normExpr(x) {
+    return String(x == null ? "" : x).toLowerCase()
+      .replace(/[\u00a0\s]/g, "")
+      .replace(/\*\*/g, "^")
+      .replace(/·|×/g, "*");
+  }
+  function checkAnswer(fa, raw) {
+    if (!fa) return { ok: false, why: "לסעיף הזה אין עדיין תשובה סופית בקובץ התוכן." };
+    if (!String(raw || "").trim()) return { ok: false, why: "עוד לא נכתבה תשובה." };
+    if (fa.type === "number") {
+      var v = parseNum(raw);
+      if (isNaN(v)) return { ok: false, why: "זה לא נקרא כמספר. אפשר לכתוב 0.8, גם 0,8 וגם 4/5." };
+      var tol = typeof fa.tolerance === "number" ? fa.tolerance : 0;
+      return { ok: Math.abs(v - fa.value) <= tol + 1e-12, why: "" };
+    }
+    var norm = fa.type === "expression" ? normExpr : normText;
+    var want = [fa.value].concat(fa.accept || []).map(norm);
+    return { ok: want.indexOf(norm(raw)) >= 0, why: "" };
+  }
+  function answerText(fa) {
+    if (!fa) return "—";
+    if (fa.type !== "number") return String(fa.value);
+    /* 0.5833 ולא 0.58330000000000001 */
+    return String(Math.round(fa.value * 1e6) / 1e6);
+  }
+
+  /* --- מצב התרגול, בזיכרון -------------------------------------
+     כמה רמזים נחשפו, האם הפתרון נפתח, ומה נכתב בשדה. נשמר בזיכרון
+     ולא במכשיר בכוונה: רמז שנחשף אתמול אינו אמור להיות פתוח היום.
+     מה שכן נשמר הוא התוצאה, וזו ההפרדה הנכונה. */
+  var P = {};
+  function pOf(id) {
+    if (!P[id]) P[id] = { shown: 0, sol: false, val: "", res: null, tries: 0 };
+    return P[id];
+  }
+  /* התוצאה נשמרת במכשיר: solved לסעיף, ו-weak לפי נושא. דוח
+     הנושאים החלשים בשלב 4 נבנה בדיוק מהשניים האלה. */
+  function recordResult(q, subId, ok) {
+    var d = store.data;
+    if (!d.solved) d.solved = {};
+    if (!d.weak) d.weak = {};
+    if (ok) d.solved[subId] = true;
+    var w = d.weak[q.topic] || (d.weak[q.topic] = { ok: 0, no: 0 });
+    if (ok) w.ok++; else w.no++;
+    store.save();
   }
 
   /* --- בחירת בחינה ---------------------------------------------- */
@@ -206,12 +292,119 @@
       "</p></div></div>";
     h += formula(sub.latex, "f-" + id);
     h += saySrc(sub);
-    var steps = sub.steps || [];
-    h += '<p class="meta">' +
-         plural(steps.length, "שלב רמז אחד", "שני שלבי רמז", "שלבי רמז") +
-         " · תשובה סופית מסוג " +
-         esc(sub.finalAnswer ? sub.finalAnswer.type : "—") + "</p>";
+    h += '<div class="ansbox" id="ans-' + id + '">' + ansHtml(q, sub, si) + "</div>";
     return h + "</div>";
+  }
+
+  /* --- רמזים, תשובה ומשוב ---------------------------------------
+     שלושה כפתורים ולא אחד: "בדקו" אינו חושף כלום, "רמז" מקדם שלב
+     אחד, ו"הפתרון המלא" נפרד מהם ודורש לחיצה משלו. תלמיד שנתקע
+     צריך דרך קדימה שאינה "תראה לי את התשובה", וזה בדיוק הפער
+     שהרמזים ממלאים. */
+  function hintPlaceholder(fa) {
+    if (!fa) return "התשובה";
+    if (fa.type === "number") return "מספר — למשל 0.8, 0,8 או 4/5";
+    if (fa.type === "expression") return "ביטוי — למשל 2x+3";
+    return "התשובה במילים";
+  }
+  function ansHtml(q, sub, si) {
+    var id = "q" + q.number + "s" + si;
+    var st = pOf(id);
+    var steps = sub.steps || [];
+    var h = "";
+
+    h += '<div class="ansrow">' +
+      /* מספר וביטוי נכתבים משמאל לימין; תשובה במילים היא עברית.
+         שדה בכיוון הלא נכון מזיז את הסמן לקצה הלא נכון בכל תו. */
+      '<input type="text" id="in-' + id + '" data-ans="' + esc(id) + '" ' +
+      'dir="' + (sub.finalAnswer && sub.finalAnswer.type === "text" ? "rtl" : "ltr") + '" ' +
+      'inputmode="' + (sub.finalAnswer && sub.finalAnswer.type === "number" ? "decimal" : "text") + '" ' +
+      'autocomplete="off" spellcheck="false" ' +
+      'value="' + esc(st.val) + '" ' +
+      'aria-label="התשובה הסופית לסעיף ' + esc(sub.letter) + '" ' +
+      'placeholder="' + esc(hintPlaceholder(sub.finalAnswer)) + '">' +
+      '<button class="btn pri" data-check="' + esc(id) + '" type="button">בדקו</button></div>';
+
+    if (st.res) {
+      h += '<div class="verdict ' + (st.res.ok ? "ok" : "no") + '" role="status">' +
+        "<span>" + (st.res.ok ? "נכון." : "עוד לא.") + "</span>" +
+        (st.res.why ? '<span class="why">' + esc(st.res.why) + "</span>" : "") +
+        (!st.res.ok && st.tries >= 2 && !st.sol
+          ? '<span class="why">אפשר לקחת רמז, ואפשר לפתוח את הפתרון המלא.</span>' : "") +
+        "</div>";
+    }
+
+    if (steps.length) {
+      var left = steps.length - st.shown;
+      h += '<div class="hintbar">';
+      if (st.shown < steps.length)
+        h += '<button class="btn" data-hint="' + esc(id) + '" type="button">' +
+             (st.shown ? "רמז נוסף" : "רמז ראשון") + "</button>";
+      if (!st.sol)
+        h += '<button class="btn" data-sol="' + esc(id) + '" type="button">הפתרון המלא</button>';
+      if (st.shown || st.sol)
+        h += '<button class="btn ghost" data-hclear="' + esc(id) + '" type="button">סגרו</button>';
+      if (st.shown < steps.length)
+        h += '<span class="left">' +
+             (st.shown ? plural(left, "נשאר רמז אחד", "נשארו שני רמזים", "רמזים נוספים")
+                       : plural(steps.length, "רמז אחד", "שני רמזים", "רמזים")) + "</span>";
+      h += "</div>";
+    }
+
+    for (var i = 0; i < st.shown && i < steps.length; i++) {
+      /* מספר הרמז יושב מחוץ לאלמנט שמוקרא. בתוכו המנוע אמר
+         "אחת" ואז את הרמז בלי הפסקה, ומי שמקשיב שמע מספר תלוש
+         בתחילת המשפט. */
+      h += '<div class="hint saybar">' +
+        spkElBtn("h-" + id + "-" + i, "הקריאו את הרמז") +
+        '<span class="n" aria-hidden="true">' + (i + 1) + "</span>" +
+        '<div class="grow" id="h-' + id + "-" + i + '">' +
+        sentHtml(steps[i].hint) + "</div></div>";
+    }
+
+    if (st.sol) {
+      h += '<div class="solution saybar">' +
+        spkElBtn("d-" + id, "הקריאו את הפתרון המלא") +
+        '<div class="grow"><h4>הפתרון המלא</h4><ol id="d-' + id + '">';
+      steps.forEach(function (x) { h += "<li>" + sentHtml(x.detail) + "</li>"; });
+      if (sub.finalAnswer)
+        h += "<li><b>התשובה הסופית: " + esc(answerText(sub.finalAnswer)) + "</b></li>";
+      h += "</ol></div></div>";
+    }
+    return h;
+  }
+
+  /* מרעננים רק את הקופסה של הסעיף. רענון כל המסך היה מאבד את מה
+     שנכתב בשדות של שאר הסעיפים, ומחזיר את הגלילה למעלה. */
+  function renderAns(id) {
+    var box = document.getElementById("ans-" + id);
+    if (!box) return;
+    var m = /^q(\d+)s(\d+)$/.exec(id);
+    var ex = examById(state.examId);
+    if (!m || !ex) return;
+    var q = null;
+    ex.questions.forEach(function (x) { if (String(x.number) === m[1]) q = x; });
+    if (!q) return;
+    var sub = (q.subQuestions || [])[Number(m[2])];
+    if (!sub) return;
+    box.innerHTML = ansHtml(q, sub, Number(m[2]));
+    markOverflow(box);
+  }
+  /* כל רענון של הקופסה בונה את ה-input מחדש. בלי לקרוא ממנו קודם,
+     תלמיד שכתב תשובה ואז לחץ "רמז" היה מוצא שדה ריק. */
+  function keepVal(id) {
+    var inp = document.getElementById("in-" + id);
+    if (inp) pOf(id).val = inp.value;
+  }
+  function subOf(id) {
+    var m = /^q(\d+)s(\d+)$/.exec(id);
+    var ex = examById(state.examId);
+    if (!m || !ex) return null;
+    var q = null;
+    ex.questions.forEach(function (x) { if (String(x.number) === m[1]) q = x; });
+    if (!q) return null;
+    var sub = (q.subQuestions || [])[Number(m[2])];
+    return sub ? { q: q, sub: sub } : null;
   }
   function questionHtml(q) {
     var id = "q" + q.number;
@@ -336,9 +529,60 @@
   document.addEventListener("click", function (e) {
     var el = e.target.closest ? e.target.closest(
       "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate]," +
-      "[data-read],#btn-reset,#btn-stop,#btn-try," +
+      "[data-read],[data-read-el],[data-check],[data-hint],[data-sol],[data-hclear]," +
+      "#btn-reset,#btn-stop,#btn-try," +
       "#btn-pause,#btn-back,#btn-fwd") : null;
     if (!el) return;
+
+    /* --- שלב 3: רמז, פתרון ובדיקה --- */
+    var hint = el.getAttribute("data-hint");
+    if (hint) {
+      var sh = subOf(hint);
+      var pst = pOf(hint);
+      keepVal(hint);
+      if (sh && pst.shown < (sh.sub.steps || []).length) pst.shown++;
+      renderAns(hint);
+      say("רמז " + pst.shown);
+      return;
+    }
+    var sol = el.getAttribute("data-sol");
+    if (sol) {
+      keepVal(sol);
+      pOf(sol).sol = true;
+      renderAns(sol);
+      say("הפתרון המלא נפתח.");
+      return;
+    }
+    var hcl = el.getAttribute("data-hclear");
+    if (hcl) {
+      keepVal(hcl);
+      var pc = pOf(hcl); pc.shown = 0; pc.sol = false;
+      renderAns(hcl);
+      return;
+    }
+    var chk = el.getAttribute("data-check");
+    if (chk) {
+      var sc = subOf(chk);
+      if (!sc) return;
+      var pc2 = pOf(chk);
+      keepVal(chk);
+      pc2.res = checkAnswer(sc.sub.finalAnswer, pc2.val);
+      pc2.tries++;
+      recordResult(sc.q, chk, pc2.res.ok);
+      renderAns(chk);
+      say(pc2.res.ok ? "נכון" : "עוד לא. " + (pc2.res.why || ""));
+      var again = document.getElementById("in-" + chk);
+      if (again && !pc2.res.ok) again.focus();
+      return;
+    }
+    var relEl = el.getAttribute("data-read-el");
+    if (relEl) {
+      if (el.classList.contains("on")) { window.Speech.stop(); return; }
+      var target = document.getElementById(relEl);
+      if (!target) return;
+      window.Speech.speak([{ text: target.textContent, el: target }], "el:" + relEl);
+      return;
+    }
 
     var read = el.getAttribute("data-read");
     if (read) {
@@ -383,6 +627,25 @@
 
     var to = el.getAttribute("data-go");
     if (to) go(to);
+  });
+
+  /* Enter בשדה התשובה שווה ללחיצה על "בדקו". מי שמקליד בנייד מקבל
+     מקש "אישור" במקלדת, ובלי זה הוא לוחץ עליו ולא קורה דבר. */
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter") return;
+    var t = e.target;
+    if (!t || !t.getAttribute) return;
+    var id = t.getAttribute("data-ans");
+    if (!id) return;
+    e.preventDefault();
+    var b = document.querySelector('[data-check="' + id + '"]');
+    if (b) b.click();
+  });
+  /* מה שנכתב נשמר בזיכרון גם בלי לחיצה, כדי שמעבר נושא וחזרה לא
+     ימחק אותו. */
+  document.addEventListener("input", function (e) {
+    var t = e.target;
+    if (t && t.getAttribute && t.getAttribute("data-ans")) pOf(t.getAttribute("data-ans")).val = t.value;
   });
 
   /* --- הפעלה ----------------------------------------------------- */
