@@ -942,7 +942,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n34 · 2026-09-02";
+var BUILD="n35 · 2026-09-02";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3505,6 +3505,13 @@ function buildQ(tid,lv){
   /* "p" הוא סוג הפריט בבנק, לא סוג השאלה. השאלה שנבנית מקטע קריאה
      חוזרת כ-"comp", ולכן הקטע לא צורף מעולם — ובלי הקטע אין על מה
      לענות. */
+  /* תרגיל ההשלמה נושא את המשפט עם ה-_____ ב-gapHtml, ומסך התרגול
+     מצייר אותו. המבחן הכיתתי מעולם לא צירף אותו, ולכן התלמיד קיבל
+     את הרמז בשפת האם וארבע מילים באנגלית — בלי המשפט ובלי לדעת
+     איפה החסר. ב-31% מההגרלות שתי מילים מהארבע נמצאות במשפט, ואז
+     שתיהן נכונות באותה מידה; בשאר פשוט אין על מה לענות.
+     כמו הקטע של הבנת הנקרא, גם זה נכנס ל-expr. */
+  if(q.type==="gap"&&q.gapHtml) expr=q.gapHtml;
   if(q.type==="comp"&&q.passage){
     var lines=(q.passage.lines||[]);
     expr='<div class="passage">'+lines.map(function(l){
@@ -4872,7 +4879,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n34-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n35-pwa1").catch(function(){});
   });
 }
 </script>

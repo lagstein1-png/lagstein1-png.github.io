@@ -1,0 +1,66 @@
+<!--
+  שער פנימי — מקטע להעתקה לתוך `index.html` של אפליקציה חדשה.
+  זה אינו קובץ חי ואינו נטען מאף מקום. הוא תבנית.
+
+  מה הוא עושה: אפליקציה שלא הגיעה לשלב `approved` אינה נפתחת
+  ללומד. מי שמגיע לכתובת רואה מסך "עדיין לא פורסם" והאפליקציה
+  אינה נטענת כלל.
+
+  מה הוא לא עושה, ואומרים את זה בקול: **זו אינה הגנה
+  קריפטוגרפית.** האתר הוא HTML יחיד ב-GitHub Pages, אין שרת,
+  ולכן מי שפותח את מקור הדף רואה את השאלות. השער מונע מלומד
+  אמיתי להיתקל באפליקציה לא בשלה — הוא אינו סוד. תוכן שאסור
+  לו לדלוף אינו נדחף לריפו הזה מלכתחילה.
+
+  שלושה מקומות בקובץ, ולא אחד:
+
+  1. ב-<head>, אחרי ה-meta:  את בלוק ה-<script> הראשון.
+  2. ב-<body>:                את בלוק ה-<div id="gate">.
+  3. בנקודת הבוט של האפליקציה: את שורת ה-if.
+
+  פתיחה בזמן בדיקה:  https://…/<app>/?internal=<המפתח>
+  המפתח נשמר ב-localStorage, ולכן פותחים אותו פעם אחת למכשיר.
+
+  בשלב `approved` מוסרים את שלושת המקומות ומעלים את מפתח הקאש.
+  `node .claude/qa/stage.js` נופל אם האפליקציה עוד לא `approved`
+  והשער אינו בקובץ, וגם אם היא כבר `public` והשער עדיין בו.
+-->
+
+<!-- ===== 1. ב-<head> ===== -->
+<meta name="robots" content="noindex,nofollow">
+<script>
+/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html */
+var INTERNAL_KEY="shlav-internal-APPID";   /* שנו APPID לשם התיקייה */
+var INTERNAL_OK=(function(){
+  try{
+    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
+    if(q) localStorage.setItem("shlav-internal", decodeURIComponent(q));
+    return localStorage.getItem("shlav-internal")===INTERNAL_KEY;
+  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
+})();
+</script>
+
+<!-- ===== 2. ב-<body>, כאלמנט הראשון ===== -->
+<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
+     align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
+     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
+  <div style="max-width:32rem">
+    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
+    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
+    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר.
+       אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
+    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;
+       background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a>
+  </div>
+</div>
+
+<!-- ===== 3. בנקודת הבוט, לפני כל דבר אחר ===== -->
+<script>
+/* INTERNAL-GATE — לא נטענת בלי מפתח. */
+if(!INTERNAL_OK){
+  document.getElementById("gate").hidden=false;
+  document.title="לא פורסם";
+}else{
+  boot();          /* ← שם פונקציית האתחול האמיתית של האפליקציה */
+}
+</script>

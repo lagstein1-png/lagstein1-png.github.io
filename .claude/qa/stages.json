@@ -1,0 +1,54 @@
+{
+  "_": "רישום השלבים. מקור האמת היחיד לשאלה 'מי מותר ללומדים אמיתיים'.",
+  "_pipeline": "build → internal → content-qa → approved → public. אפליקציה עולה שלב אחד בכל פעם, ביד, אחרי שהשלב הקודם נסגר. node .claude/qa/stage.js אוכף.",
+  "_stages": {
+    "build": "נבנית. עדיין לא נטענת בלי שגיאות, או שחסרים בה מסכים.",
+    "internal": "נטענת ועוברת smoke/parse/cache. נגישה רק דרך שער פנימי, ולא רשומה בדף הבית.",
+    "content-qa": "עברה בדיקה טכנית, ועכשיו נסרקת ב-content.js. עדיין פנימית.",
+    "approved": "הבעלים עבר על ממצאי ה-REVIEW ואישר. עדיין לא בדף הבית — כאן מסירים את השער הפנימי.",
+    "public": "רשומה ב-DATA.APPS שבדף הבית, בלי שער פנימי, ונמנית ב-badge."
+  },
+  "_contentQA": {
+    "not-run": "content.js עוד לא רץ עליה",
+    "pass": "אפס FAIL ואפס REVIEW",
+    "review": "אפס FAIL, יש ממצאים שדורשים עין אנושית",
+    "fail": "יש ממצא שחוסם",
+    "cleared": "היו ממצאי REVIEW, והבעלים עבר עליהם ואישר",
+    "legacy-published": "פורסמה לפני שהשער הזה נבנה. אינה חוסמת, אבל מדווחת כאזהרה עד שתיסרק"
+  },
+  "badge": {
+    "_": "מספר האפליקציות בכותרת דף הבית. אינו נגזר מ-DATA.APPS ולכן נשמר כאן, ו-stage.js משווה. הוסיפו אפליקציה — עדכנו את הארבע ביד ואת המספר כאן.",
+    "count": 11,
+    "words": {
+      "he": "אחת\u05beעשרה",
+      "ar": "أحد عشر",
+      "ru": "Одиннадцать",
+      "en": "Eleven"
+    }
+  },
+  "notApps": {
+    "legal": "עמוד תנאי השימוש",
+    "voice": "דף אבחון של מנוע ההקראה, לא אפליקציית לימוד",
+    "img": "נכסים",
+    "marketing": "טקסטים, לא דף",
+    ".well-known": "assetlinks",
+    ".claude": "כלים"
+  },
+  "apps": {
+    "math-app":   {"stage":"public","contentQA":"legacy-published","bank":"buildQ"},
+    "math-teen":  {"stage":"public","contentQA":"legacy-published","bank":"buildQ"},
+    "math-uni":   {"stage":"public","contentQA":"legacy-published","bank":"buildQ"},
+    "math-uni2":  {"stage":"public","contentQA":"legacy-published","bank":"buildQ"},
+    "math-uni3":  {"stage":"public","contentQA":"legacy-published","bank":"buildQ"},
+    "english":    {"stage":"public","contentQA":"legacy-published","bank":"buildQ"},
+    "history":    {"stage":"public","contentQA":"legacy-published","bank":"buildQ"},
+    "ulpan":      {"stage":"public","contentQA":"legacy-published","bank":"buildQ"},
+    "bagrut-806": {"stage":"public","contentQA":"legacy-published","bank":"data/exams.js",
+                   "note":"בנק סטטי בקבצים נפרדים, לא buildQ. content.js אינו סורק אותו עדיין."},
+    "reader":     {"stage":"public","contentQA":"none","bank":"none",
+                   "note":"אין בנק שאלות — הטקסט מגיע מהמשתמש. אין מה לסרוק."},
+    "drivewise":  {"stage":"public","contentQA":"legacy-published","bank":"external",
+                   "repo":"lagstein1-png/drivewise","external":true,
+                   "note":"אינה בריפו הזה. רשומה כאן כי היא בדף הבית ונמנית באחת־עשרה."}
+  }
+}

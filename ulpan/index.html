@@ -952,7 +952,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a3 · 2026-09-02";
+var BUILD="a4 · 2026-09-02";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -3075,6 +3075,16 @@ function buildQ(tid,lv){
   /* "p" הוא סוג הפריט בבנק, לא סוג השאלה. השאלה שנבנית מקטע קריאה
      חוזרת כ-"comp", ולכן הקטע לא צורף מעולם — ובלי הקטע אין על מה
      לענות. */
+  /* תרגיל ההשלמה נושא את המשפט עם ה-_____ ב-gapHtml, ומסך התרגול
+     מצייר אותו; המבחן הכיתתי מעולם לא צירף אותו, ובלי המשפט אין
+     על מה לענות. כמו הקטע של הבנת הנקרא, גם זה נכנס ל-expr.
+
+     **כאן זו כרגע שורה ריקה, בכוונה.** נמדד ב-1,080 הגרלות
+     (12 נושאים × 3 רמות × 30) שהבנק של אולפן מייצר mean, hear,
+     back, use, order ו-comp — ואף לא gap אחת. השורה נכתבת מפני
+     ש-`formGap` קיימת בקובץ הזה, ומפני שהקובץ הזה נולד מהעתקה
+     של ניב: תיקון שיושב רק בעותק אחד חוזר כבאג בעותק הבא. */
+  if(q.type==="gap"&&q.gapHtml) expr=q.gapHtml;
   if(q.type==="comp"&&q.passage){
     var lines=(q.passage.lines||[]);
     expr='<div class="passage">'+lines.map(function(l){
@@ -4430,7 +4440,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a3-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a4-pwa1").catch(function(){});
   });
 }
 </script>
