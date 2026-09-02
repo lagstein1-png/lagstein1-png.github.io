@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>בגרות 806 — מתמטיקה 5 יחידות</title>
+<meta name="description" content="שאלון 806 במתמטיקה 5 יחידות: סימולציה מלאה עם שעון, ותרגול מודרך שבו הרמזים נחשפים אחד-אחד. כל טקסט וכל נוסחה ניתנים להקראה בקול." />
+<meta name="theme-color" content="#101528" />
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   בגרות 806 — מתמטיקה 5 יחידות
+   הקהל אינו "תלמיד חלש במתמטיקה". הוא תלמיד שנוסחה על המסך
+   עוצרת אותו לפני שהספיק להבין מה שואלים. לכן:
+   · לכל פסקה ולכל סעיף יש כפתור הקראה, ליד הטקסט ולא בתפריט.
+   · נוסחה לעולם אינה מוקראת כ-LaTeX — מוקרא השדה speech.
+   · אזור נגיעה 44px לפחות, וטקסט שמתחיל ב-17px ולא ב-14.
+   · שני מצבי עבודה, שני צבעים קבועים — כדי שהשאלה "איפה אני"
+     תיענה בהצצה אחת.
+   כל המידות ב-rem, כדי שהגדלת טקסט במערכת תגדיל את הכול יחד.
+   ============================================================ */
+:root{
+  --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
+  --bg:#f6f7fb; --surface:#ffffff; --surface2:#eef1f8;
+  --ink:#151a2b; --muted:#4f586f; --faint:#77809a; --line:#dfe4f0;
+  --accent:#2b3a8f; --accent-ink:#ffffff; --accent-soft:#e5e9fa;
+  --ok:#15803d; --ok-soft:#dcfce7; --bad:#be123c; --bad-soft:#ffe4e9;
+  --warn:#b45309; --warn-soft:#fef3c7;
+  --shadow:0 1px 2px rgba(21,26,43,.05),0 8px 24px -12px rgba(21,26,43,.22);
+  --r:14px;
+  /* צבע לכל מצב עבודה */
+  --c-sim:#b91c1c;  --cs-sim:#fee2e2;   /* סימולציה — שעון רץ */
+  --c-prc:#0f766e;  --cs-prc:#d5f2ee;   /* תרגול   — בקצב שלך */
+}
+:root[data-theme="dark"]{
+  --bg:#101528; --surface:#1a2138; --surface2:#232c48;
+  --ink:#eef1fa; --muted:#a9b3cd; --faint:#7d88a6; --line:#2e3752;
+  --accent:#a8bcff; --accent-ink:#101528; --accent-soft:#26305a;
+  --ok:#4ade80; --ok-soft:#13291d; --bad:#fb7185; --bad-soft:#331620;
+  --warn:#fbbf24; --warn-soft:#33260f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  --c-sim:#fca5a5; --cs-sim:#3a1616;
+  --c-prc:#5eead4; --cs-prc:#0e3330;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#101528; --surface:#1a2138; --surface2:#232c48;
+    --ink:#eef1fa; --muted:#a9b3cd; --faint:#7d88a6; --line:#2e3752;
+    --accent:#a8bcff; --accent-ink:#101528; --accent-soft:#26305a;
+    --ok:#4ade80; --ok-soft:#13291d; --bad:#fb7185; --bad-soft:#331620;
+    --warn:#fbbf24; --warn-soft:#33260f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+    --c-sim:#fca5a5; --cs-sim:#3a1616;
+    --c-prc:#5eead4; --cs-prc:#0e3330;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:400 1.0625rem/1.65 var(--font);   /* 17px — לא 14 */
+  overflow-wrap:break-word;
+}
+h1,h2,h3{margin:0 0 .5rem;line-height:1.3;font-weight:700}
+h2{font-size:1.3rem}
+h3{font-size:1.1rem}
+p{margin:0 0 .6rem}
+.wrap{max-width:44rem;margin:0 auto;padding:0 1rem}
+
+/* --- כותרת עליונה --- */
+header{
+  position:sticky;top:0;z-index:20;background:var(--surface);
+  border-bottom:1px solid var(--line);
+}
+.hbar{display:flex;align-items:center;gap:.5rem;min-height:3.5rem;padding:.4rem 0}
+.brand{display:flex;flex-direction:column;flex:1;min-width:0}
+.brand b{font-size:1.05rem;font-weight:800;letter-spacing:-.01em}
+.brand small{font-size:.8rem;color:var(--faint);font-weight:500}
+.iconbtn{
+  min-width:2.75rem;min-height:2.75rem;                /* 44px */
+  border:1px solid var(--line);background:var(--surface2);color:var(--ink);
+  border-radius:10px;font:600 1.05rem/1 var(--font);cursor:pointer;
+}
+.iconbtn:hover{background:var(--accent-soft)}
+.iconbtn[hidden]{display:none}
+
+/* --- בורר מהירות הקראה --- */
+.speed{display:flex;align-items:center;gap:.35rem;padding:.5rem 0 .6rem;
+  border-top:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+.speed .lbl{margin-inline-end:.2rem}
+.rate{
+  min-width:3rem;min-height:2.25rem;border:1px solid var(--line);
+  background:var(--surface2);color:var(--muted);border-radius:8px;
+  font:600 .9rem/1 var(--font);cursor:pointer;
+}
+.rate.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+/* --- כרטיסים --- */
+main{padding:1rem 0 2rem;outline:none}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:1rem;margin:0 0 .85rem;box-shadow:var(--shadow);
+}
+.card.intro{background:var(--accent-soft);border-color:transparent;box-shadow:none}
+.muted{color:var(--muted);font-size:.92rem;margin-bottom:0}
+.stat{color:var(--muted)}
+.stat b{color:var(--ink);font-size:1.15rem}
+.list{margin:0;padding-inline-start:1.2rem;color:var(--muted)}
+.list li{margin-bottom:.3rem}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:.35rem .8rem;margin:.6rem 0 0}
+.facts dt{color:var(--muted);font-size:.92rem}
+.facts dd{margin:0;font-weight:600}
+
+/* --- שני מצבי העבודה --- */
+.modes{display:grid;gap:.85rem;margin-bottom:.85rem}
+@media (min-width:34rem){.modes{grid-template-columns:1fr 1fr}}
+.mode{
+  display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;
+  text-align:start;padding:1.1rem;min-height:8rem;cursor:pointer;
+  border:2px solid var(--line);border-radius:var(--r);
+  background:var(--surface);color:var(--ink);font:inherit;
+  box-shadow:var(--shadow);
+}
+.mode .ic{font-size:1.6rem;line-height:1}
+.mode .t{font-size:1.2rem;font-weight:800}
+.mode .d{font-size:.92rem;color:var(--muted)}
+.mode.sim{border-color:var(--c-sim)}
+.mode.sim .ic,.mode.sim .t{color:var(--c-sim)}
+.mode.sim:hover{background:var(--cs-sim)}
+.mode.prc{border-color:var(--c-prc)}
+.mode.prc .ic,.mode.prc .t{color:var(--c-prc)}
+.mode.prc:hover{background:var(--cs-prc)}
+
+/* --- בחירת נושא --- */
+.topics{display:grid;gap:.6rem}
+.topic{
+  display:flex;justify-content:space-between;align-items:center;gap:.6rem;
+  width:100%;min-height:3.5rem;padding:.85rem 1rem;cursor:pointer;
+  border:1px solid var(--line);border-radius:var(--r);
+  background:var(--surface);color:var(--ink);font:inherit;text-align:start;
+}
+.topic:hover{background:var(--cs-prc);border-color:var(--c-prc)}
+.topic .t{font-weight:700}
+.topic .c{color:var(--muted);font-size:.88rem;white-space:nowrap}
+
+/* --- שאלה --- */
+.tag{font-size:.82rem;color:var(--faint);font-weight:600;margin-bottom:.5rem}
+.qtext{font-size:1.1rem;margin:0}
+.row{display:flex;align-items:flex-start;gap:.5rem}
+.row>:first-child{flex:1;min-width:0}
+.pts{font-size:.82rem;font-weight:600;color:var(--muted)}
+.sub{border-inline-start:4px solid var(--c-prc)}
+
+/* כפתור הקראה — 44px גם כשהוא קטן למראה */
+.say{
+  flex:0 0 auto;min-width:2.75rem;min-height:2.75rem;
+  border:1px solid var(--line);background:var(--surface2);
+  border-radius:10px;font-size:1.1rem;cursor:pointer;color:var(--ink);
+}
+.say:hover:not(:disabled){background:var(--accent-soft);border-color:var(--accent)}
+.say:disabled{opacity:.4;cursor:not-allowed}
+
+/* נוסחה. עד ש-KaTeX המקומי יגיע, המקור מוצג ככתבו — ולידו
+   המשפט שיוקרא, שהוא ממילא מה שהתלמיד הזה באמת צריך. */
+.tex{
+  background:var(--surface2);border:1px dashed var(--line);border-radius:10px;
+  padding:.6rem .8rem;margin:.5rem 0 .3rem;
+  font:600 1rem/1.5 ui-monospace,"SFMono-Regular",Consolas,monospace;
+  overflow-x:auto;
+}
+.texnote{font-size:.92rem;color:var(--muted);margin:0}
+.lg-foot .build{white-space:nowrap}
+
+.soon{
+  margin:.6rem 0 0;padding:.5rem .7rem;border-radius:10px;
+  background:var(--warn-soft);color:var(--warn);
+  font-size:.88rem;font-weight:600;
+}
+
+.btn{
+  min-height:2.75rem;padding:.6rem 1.1rem;border-radius:10px;cursor:pointer;
+  border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);
+  font:600 1rem/1 var(--font);
+}
+.btn.ghost{background:transparent;color:var(--accent);border-color:var(--line)}
+.btn.ghost:hover{background:var(--accent-soft)}
+.back2{margin-bottom:.85rem}
+
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="hbar">
+      <button class="iconbtn" id="back" type="button" hidden aria-label="חזרה למסך הראשי">→</button>
+      <span class="brand">
+        <b>בגרות 806</b>
+        <small>מתמטיקה 5 יחידות · <span id="screen"></span></small>
+      </span>
+      <button class="iconbtn" id="theme" type="button" aria-pressed="false" aria-label="מצב כהה">☾</button>
+    </div>
+    <div class="speed">
+      <span class="lbl">מהירות הקראה</span>
+      <span id="rates"></span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app" tabindex="-1"></main>
+
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+
+<script src="data/exams.js"></script>
+<script src="speech.js"></script>
+<script src="app.js"></script>
+<script src="/legal/terms.js"></script>
+<script src="/legal/protect.js"></script>
+<script>
+/* גרסה. שתי מחרוזות, ושתיהן חייבות להיות תואמות: זו שמוצגת בפוטר,
+   וזו שב-?v= של רישום ה-service worker — היא לבדה קובעת את מפתח
+   המטמון. עדכנת אחת, עדכן את השנייה. */
+var BUILD="s1 · 2026-09-02";
+(function(){
+  var f=document.querySelector("footer.lg-foot");
+  if(f)f.insertAdjacentHTML("beforeend",' · <span class="build" dir="ltr">'+BUILD+'</span>');
+})();
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js?v=s1-pwa1").catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
