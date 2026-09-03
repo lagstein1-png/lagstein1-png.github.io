@@ -158,6 +158,7 @@
     node .claude/qa/parse.js                 # תקינות פרסינג
     node .claude/qa/entropy.js               # תשובה קבועה / כפילויות
     node .claude/qa/options.js               # כמה אפשרויות התלמיד באמת רואה
+    node .claude/qa/exam806.js               # התוכן הכתוב־ביד של 806
     node .claude/qa/cache.js                 # BUILD מול ?v=, ו-caches.match גלובלי
     node .claude/qa/extract.js /tmp/js …     # מחלץ סקריפטים ל-eslint
 
