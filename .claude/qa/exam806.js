@@ -36,16 +36,36 @@ function grab(name) {
   }
   return null;
 }
-const NEEDED = ['parseNum', 'normText', 'normExpr', 'checkAnswer'];
-const srcs = NEEDED.map(grab);
-if (srcs.some(s => !s)) {
+/* עוזרים ברמת הקובץ ש-normExpr נשען עליהם. grab מביא פונקציות
+   בלבד, ולכן var נשלף בנפרד. הרשימה הזאת גדלה כש-app.js גדל —
+   וזה בכוונה: בודק שמנחש מה חסר יריץ קוד שאינו הקוד שבאפליקציה. */
+function grabVar(name) {
+  const at = appSrc.indexOf('var ' + name + ' =');
+  if (at < 0) return null;
+  const end = appSrc.indexOf(';', at);
+  return end < 0 ? null : appSrc.slice(at, end + 1);
+}
+const VARS = ['LHS_NAME'];
+const NEEDED = ['parseNum', 'normText', 'normExpr', 'checkAnswer', 'dropMul', 'stripLhs'];
+const srcs = VARS.map(grabVar).filter(Boolean).concat(NEEDED.map(grab));
+const missing = NEEDED.filter(n => !grab(n));
+if (missing.length) {
   console.log('✗ לא הצלחתי לחלץ מ-app.js: ' +
-    NEEDED.filter((n, i) => !srcs[i]).join(', ') +
+    missing.join(', ') +
     '\n  הבודק מסרב לנחש. אם הפונקציות שונו — לעדכן את exam806.js.');
   process.exit(1);
 }
 const sandbox = {};
 vm.runInNewContext(srcs.join('\n'), sandbox);
+/* הרצה יבשה אחת לפני התוכן. בלעדיה עוזר חדש ב-app.js שלא נשלף כאן
+   מפיל את הבודק באמצע עם stack trace, ומי שקורא את הפלט חושב
+   שהתוכן שבור. */
+try { sandbox.checkAnswer({ type: 'number', value: 1, tolerance: 0 }, '1'); }
+catch (e) {
+  console.log('✗ הפונקציות שנשלפו מ-app.js אינן רצות: ' + e.message +
+    '\n  כנראה נוסף להן עוזר חדש. להוסיף אותו ל-NEEDED או ל-VARS ב-exam806.js.');
+  process.exit(1);
+}
 const checkAnswer = sandbox.checkAnswer;
 
 /* --- ממצאים ------------------------------------------------------ */
