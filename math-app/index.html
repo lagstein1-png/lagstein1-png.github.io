@@ -7,9 +7,10 @@
 <meta name="description" content="אפליקציית תרגול מתמטיקה למתקשים בלמידה ולילדים שלומדים אחרת — חיית מחמד מלווה, הקראה קולית, רמזים ויזואליים והמון עידוד." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
 :root{
+  --ar:"Noto Sans Arabic",system-ui,"Segoe UI",Arial,sans-serif;
   --font-display:"Fredoka","Rubik",sans-serif; --font-body:"Rubik",sans-serif;
   --paper:#f3f8f4; --card:#ffffff; --ink:#17333c; --ink-soft:#4c666e; --ink-faint:#5a7178;
   --teal:#0e9c8d; --teal-deep:#0b7568; --teal-soft:#d9f2ec;
@@ -19,6 +20,14 @@
   --violet:#8a63d2; --violet-deep:#6a45b0; --violet-soft:#ece4fa;
   --hit:#ffc531; --hit-ink:#1a1300;
 }
+
+/* Heebo, Fredoka ו-Assistant אינם מכילים גליפים ערביים. בלי
+   המשפחה הזאת הממשק הערבי נופל לגופן ברירת המחדל של המערכת —
+   נמדד: הוא הוצג כאן ב-Fredoka. Noto Sans Arabic נטען מאותה בקשת
+   גופנים שכבר קיימת, ולכן אין כאן תלות חיצונית חדשה, וקובצי
+   הגופן נמשכים רק כשבאמת מוצג טקסט ערבי. */
+html[lang="ar"] body,html[lang="ar"] input,html[lang="ar"] button,
+html[lang="ar"] textarea,html[lang="ar"] select{font-family:var(--ar)}
 /* לכל פעולת חשבון יש צבע קבוע. ילד לומד את הצבע לפני שהוא
    קורא את המילה, וזה עוזר במיוחד למי שהקריאה עצמה מאמצת אותו. */
 .op-add{--op:var(--teal);--op-d:var(--teal-deep);--op-s:var(--teal-soft)}
@@ -1954,7 +1963,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b40 · 2026-09-02";
+var BUILD="b41 · 2026-09-02";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4255,7 +4264,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b40-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b41-pwa1").catch(function(){});
   });
 }
 </script>

@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0e1117" media="(prefers-color-scheme:dark)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
 /* ============================================================
    אקסיומה — מתמטיקה לתואר ראשון
@@ -18,6 +18,7 @@
    לראות את הצעדים שבין שורה לשורה.
    ============================================================ */
 :root{
+  --ar:"Noto Sans Arabic",system-ui,"Segoe UI",Arial,sans-serif;
   --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
   --bg:#f5f7fb; --surface:#ffffff; --surface2:#eef1f7;
   --ink:#101828; --muted:#5b6478; --faint:#687080; --line:#e0e4ee;
@@ -37,6 +38,14 @@
   --c-geo:#9a4708;  --cs-geo:#fbecd3;
   --c-data:#be185d; --cs-data:#fbdfeb;
 }
+
+/* Heebo, Fredoka ו-Assistant אינם מכילים גליפים ערביים. בלי
+   המשפחה הזאת הממשק הערבי נופל לגופן ברירת המחדל של המערכת —
+   נמדד: הוא הוצג כאן ב-Heebo. Noto Sans Arabic נטען מאותה בקשת
+   גופנים שכבר קיימת, ולכן אין כאן תלות חיצונית חדשה, וקובצי
+   הגופן נמשכים רק כשבאמת מוצג טקסט ערבי. */
+html[lang="ar"] body,html[lang="ar"] input,html[lang="ar"] button,
+html[lang="ar"] textarea,html[lang="ar"] select{font-family:var(--ar)}
 :root[data-theme="dark"]{
   --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
   --ink:#e8ecf4; --muted:#9aa4ba; --faint:#8f99ae; --line:#28313f;
@@ -915,7 +924,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u38 · 2026-09-02";
+var BUILD="u39 · 2026-09-02";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -13715,7 +13724,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u38-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u39-pwa1").catch(function(){});
   });
 }
 </script>

@@ -39,6 +39,7 @@ const SUITE = [
   { id: 'naming',   args: [] },
   { id: 'apps',     args: [] },
   { id: 'a11y',     args: [] },
+  { id: 'arabic',   args: [] },
   { id: 'engine',   args: [] },
   { id: 'exam806',  args: [] },
   { id: 'smoke',    args: PAGES,  needsServer: true },

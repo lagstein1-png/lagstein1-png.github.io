@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#151a21" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
 /* =====================================================================
    קורא — עוזר קריאה בעברית
@@ -16,6 +16,7 @@
    כל הצבעים והמידות מוגדרים כאן פעם אחת.
    ===================================================================== */
 :root{
+  --ar:"Noto Sans Arabic",system-ui,"Segoe UI",Arial,sans-serif;
   --bg:#151a21;          /* רקע כהה — פחות סנוור בקריאה ארוכה */
   --panel:#1d242e;
   --line:#2b3542;
@@ -36,6 +37,14 @@
   --ls:0.02em;
   --ws:0.16em;
 }
+
+/* Heebo, Fredoka ו-Assistant אינם מכילים גליפים ערביים. בלי
+   המשפחה הזאת הממשק הערבי נופל לגופן ברירת המחדל של המערכת —
+   נמדד: הוא הוצג כאן ב-Assistant. Noto Sans Arabic נטען מאותה בקשת
+   גופנים שכבר קיימת, ולכן אין כאן תלות חיצונית חדשה, וקובצי
+   הגופן נמשכים רק כשבאמת מוצג טקסט ערבי. */
+html[lang="ar"] body,html[lang="ar"] input,html[lang="ar"] button,
+html[lang="ar"] textarea,html[lang="ar"] select{font-family:var(--ar)}
 html.light{
   --bg:#f7f8fa;--panel:#ffffff;--line:#d8dfe7;--ink:#151d26;
   --ink-soft:#4d5a68;--ink-faint:#5b6774;--accent:#1662a4;
@@ -1701,7 +1710,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=19-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=20-pwa1").catch(function(){});
   });
 }
 </script>
