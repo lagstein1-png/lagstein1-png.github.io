@@ -162,6 +162,13 @@ var GKEY_STORE="<app>-gkey";
 ## שלב 4 — בדיקה, ולא בעין
 
 ```
+node .claude/qa/all.js               # הכול, ופסק דין אחד ← התחל בזה
+node .claude/qa/all.js --fast        # בלי entropy ו-options
+```
+
+`all.js` מרים את השרת בעצמו וסוגר אותו בסוף. לכלי בודד תוך כדי עבודה:
+
+```
 node .claude/qa/serve.js &            # חובה ל-smoke ול-exam
 node .claude/qa/parse.js <app>/index.html
 node .claude/qa/smoke.js <app>        # דפדפן אמיתי
@@ -257,7 +264,7 @@ node .claude/qa/exam.js <app>         # אם יש מבחן כיתתי
 [ ] מפתח הקאש של דף הבית עלה
 [ ] תוכן בסכימת המשפחה, ארבע שפות
 [ ] מילון שורה־למפתח, לא שורה אחת
-[ ] parse + smoke נקיים, cache/apps/a11y/engine 0 ממצאים
+[ ] node .claude/qa/all.js — כל העשר עוברות
 [ ] נגעתי ב-legal/ ?  →  אחד־עשר מפתחות
 [ ] git fetch origin main שוב, לפני ה-commit
 ```
