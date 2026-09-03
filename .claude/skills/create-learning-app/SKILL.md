@@ -166,6 +166,7 @@ node .claude/qa/serve.js &            # חובה ל-smoke ול-exam
 node .claude/qa/parse.js <app>/index.html
 node .claude/qa/smoke.js <app>        # דפדפן אמיתי
 node .claude/qa/apps.js              # שבעת המקומות — ובראשם המניין
+node .claude/qa/engine.js            # שמונת עותקי המנוע עדיין זהים
 node .claude/qa/a11y.js              # ששת מצבי הנגישות מחווטים
 node .claude/qa/cache.js             # BUILD מול ?v= בכל אחד־עשר
 node .claude/qa/entropy.js <app>      # תשובה קבועה?
@@ -256,7 +257,7 @@ node .claude/qa/exam.js <app>         # אם יש מבחן כיתתי
 [ ] מפתח הקאש של דף הבית עלה
 [ ] תוכן בסכימת המשפחה, ארבע שפות
 [ ] מילון שורה־למפתח, לא שורה אחת
-[ ] parse + smoke נקיים, cache/apps/a11y 0 ממצאים
+[ ] parse + smoke נקיים, cache/apps/a11y/engine 0 ממצאים
 [ ] נגעתי ב-legal/ ?  →  אחד־עשר מפתחות
 [ ] git fetch origin main שוב, לפני ה-commit
 ```
