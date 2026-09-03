@@ -89,6 +89,16 @@ function detail(name, input) {
   return JSON.stringify(input);
 }
 
+/* מהן האפליקציות? לא רשימה קשיחה — כל תיקיית בת שיש בה index.html
+   בתיקיית העבודה של הסשן. רשימה קשיחה כאן הייתה מתיישנת באפליקציה
+   הבאה שנוספת, וזה בדיוק סוג הסחיפה שהפרויקט הזה נלחם בה. */
+function appsUnder(cwd) {
+  let names;
+  try { names = fs.readdirSync(cwd, { withFileTypes: true }) } catch (e) { return [] }
+  return names.filter(d => d.isDirectory() && fs.existsSync(path.join(cwd, d.name, 'index.html')))
+              .map(d => d.name).sort();
+}
+
 function textOf(block) {
   if (block.type === 'text') return block.text || '';
   if (block.type === 'thinking') return block.thinking || '';
@@ -101,13 +111,15 @@ function render(file) {
   const touched = [];        /* קבצים שנכתבו, לפי סדר ראשון */
   const failed = [];         /* כלים שהחזירו שגיאה */
   const byId = {};           /* tool_use_id → שם הכלי, כדי לשייך תוצאה */
+  const mentions = {};       /* שם אפליקציה → כמה פעמים נזכרה בקלט של כלי */
+  let apps = [];
   let head = null, first = null, last = null, turns = 0, tools = 0;
 
   for (const line of raw) {
     let o;
     try { o = JSON.parse(line) } catch (e) { continue }
     if (o.timestamp) { first = first || o.timestamp; last = o.timestamp }
-    if (!head && o.sessionId && o.cwd) head = o;
+    if (!head && o.sessionId && o.cwd) { head = o; apps = appsUnder(o.cwd) }
     if (o.type !== 'user' && o.type !== 'assistant') continue;
 
     const c = o.message && o.message.content;
@@ -120,6 +132,11 @@ function render(file) {
         if (WRITERS.indexOf(b.name) >= 0) {
           const p = b.input && (b.input.file_path || b.input.notebook_path);
           if (p && touched.indexOf(p) < 0) touched.push(p);
+        }
+        const blob = JSON.stringify(b.input || '');
+        for (const app of apps) {
+          const hits = blob.split(app + '/').length - 1;
+          if (hits) mentions[app] = (mentions[app] || 0) + hits;
         }
         out.push('  [' + b.name + '] ' + clip(detail(b.name, b.input), CUT));
       } else if (b.type === 'tool_result') {
@@ -153,6 +170,14 @@ function render(file) {
   L.push('פניות משתמש: ' + turns + ' · הפעלות כלים: ' + tools + ' · כשלים: ' + failed.length);
   L.push('');
   L.push(out.join('\n').replace(/\n{3,}/g, '\n\n').trim());
+  L.push('');
+  const ranked = Object.keys(mentions).sort((a, b) => mentions[b] - mentions[a]);
+  L.push('=== אפליקציות שנזכרו בפקודות ===');
+  L.push('(אזכור של "<שם>/" בקלט של כלי — לא הוכחה שהאפליקציה שונתה)');
+  L.push(ranked.length
+    ? ranked.map(a => '· ' + a + ' — ' + mentions[a]).join('\n')
+    : (apps.length ? '(אף אחת מ-' + apps.length + ' התיקיות עם index.html)'
+                   : '(תיקיית העבודה של הסשן אינה נגישה מכאן)'));
   L.push('');
   L.push('=== קבצים שנכתבו (לפי כלי Write / Edit) ===');
   L.push(touched.length ? touched.map(f => '· ' + f).join('\n')
