@@ -36,6 +36,7 @@ const PAGES = APPS.concat(['bagrut-806', 'reader', '.']);
 const SUITE = [
   { id: 'parse',    args: PAGES.filter(p => p !== '.').map(a => a + '/index.html').concat(['index.html']) },
   { id: 'cache',    args: [] },
+  { id: 'naming',   args: [] },
   { id: 'apps',     args: [] },
   { id: 'a11y',     args: [] },
   { id: 'engine',   args: [] },
