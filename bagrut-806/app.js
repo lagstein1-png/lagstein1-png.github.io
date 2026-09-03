@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x7 · 2026-09-02";
+  var BUILD = "x8 · 2026-09-03";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -220,11 +220,43 @@
       .replace(/[\u00a0\s]+/g, " ")
       .replace(/[.,;:!?׳״"']+$/, "");
   }
+  /* קידומת מוכרת בצד שמאל של סימן שוויון — f(x)= , f'(x)= , y= , y'= —
+     היא בדיוק מה שמורה מלמד לרשום, ולכן היא יורדת לפני ההשוואה.
+     רק תבנית של שם פונקציה, ורק כשיש סימן שוויון אחד בדיוק: בלי שני
+     התנאים האלה גם 3x^2-12x+9=0 וגם x=3x^2-12x+9 היו מתקבלים,
+     והם טענות אחרות לגמרי מהנגזרת. */
+  var LHS_NAME = /^(?:[a-z]'?\([a-z]\)|y'?)$/;
+  function stripLhs(s) {
+    var p = s.split("=");
+    if (p.length !== 2 || !p[1]) return s;
+    return LHS_NAME.test(p[0]) ? p[1] : s;
+  }
+  /* כוכבית כפל יורדת רק כשהיא אינה בין שתי ספרות: 3*x הוא 3x, אבל
+     2*3 הוא שש ולא עשרים ושלוש, ולכן שם היא נשארת במקומה. */
+  function dropMul(s) {
+    var out = "", i, c;
+    for (i = 0; i < s.length; i++) {
+      c = s.charAt(i);
+      if (c === "*" && /\d/.test(s.charAt(i - 1)) && /\d/.test(s.charAt(i + 1))) { out += c; continue; }
+      if (c !== "*") out += c;
+    }
+    return out;
+  }
+  /* מינוס טיפוגרפי, גרש, חזקה עילית ונקודה בסוף המשפט אינם טעות
+     במתמטיקה. תלמיד שהעתיק מהמסך מקבל − (U+2212) ולא -, עורך טקסט
+     הופך אותו ל-– או ל-—, מקלדת עברית נותנת ׳ ולא ', והמקלדת של
+     הטלפון נותנת ². הפיסוק נמחק מהסוף בלבד, כדי ש-0.75 יישאר 0.75. */
   function normExpr(x) {
-    return String(x == null ? "" : x).toLowerCase()
+    var s = String(x == null ? "" : x).toLowerCase()
       .replace(/[\u00a0\s]/g, "")
+      .replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\ufe63\uff0d]/g, "-")
+      .replace(/[\u2018\u2019\u02bc\u05f3\u2032]/g, "'")
       .replace(/\*\*/g, "^")
-      .replace(/·|×/g, "*");
+      .replace(/·|×/g, "*")
+      .replace(/²/g, "^2")
+      .replace(/³/g, "^3");
+    s = dropMul(s).replace(/[.,;:!?׳״"']+$/, "");
+    return stripLhs(s);
   }
   function checkAnswer(fa, raw) {
     if (!fa) return { ok: false, why: "לסעיף הזה אין עדיין תשובה סופית בקובץ התוכן." };
@@ -1054,7 +1086,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x7-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x8-pwa1").catch(function () {});
     });
   }
 
