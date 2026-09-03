@@ -29,7 +29,7 @@ git fetch origin main && git log --oneline -8 origin/main
 ואם משהו משתבש בהמשך:
 
 ```
-git checkout engine-baseline-2026-09-03
+git checkout 83ddf43        # נקודת החזרה, על origin/main
 ```
 
 ---
