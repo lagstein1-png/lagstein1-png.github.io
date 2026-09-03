@@ -93,6 +93,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
 :root.clear body{font-family:"Verdana","Tahoma","Heebo",sans-serif;letter-spacing:.012em}
 :root.spaced body{word-spacing:.22em;line-height:1.95}
 :root.rm *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+/* הגדרת המערכת ולא רק המתג שבאפליקציה: מי שכיבה אנימציות במכשיר
+   ציפה שזה יחול גם כאן. */
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 h1,h2,h3{margin:0;line-height:1.3;font-weight:800}
 button{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
@@ -205,7 +208,10 @@ html[lang="ar"] body{font-family:var(--ar)}
 .opt.bad{border-color:var(--bad);background:var(--bad-soft)}
 .opt.bad .k{background:var(--bad);color:#fff}
 .opt[disabled]{cursor:default}
-.opt.dim{opacity:.55}
+/* נסיגה בצבע ולא בשקיפות: opacity:.55 הוריד את הטקסט ל-3.87:1
+   ואת אות הסימון ל-2.37:1, ואחרי המענה קריאת המסיח היא הלמידה. */
+.opt.dim{color:var(--muted);border-color:var(--line);box-shadow:none}
+.opt.dim .k{background:var(--surface2);color:var(--muted)}
 
 /* אריחי בניית משפט. הסדר הוא התרגיל, ולכן האריח חייב להיראות כמשהו
    שאפשר להרים — מסגרת מלאה ורקע משלו, לא טקסט על רקע הכרטיס. */
@@ -919,6 +925,19 @@ function t(k){var d=T[state.lang]||T.he;return d[k]!==undefined?d[k]:(T.he[k]!==
 /* המשמעות בשפת האם. נופלים לאנגלית ולא לעברית: מי שלמד ברוסית וחסר
    לו תרגום יבין "a large boat" הרבה לפני "אונייה". */
 function gl(g){if(!g)return"";return g[state.lang]||g.en||g.he||""}
+/* ------------------------------------------------------------
+   עברית בתוך ממשק שאינו עברי. ה-CSS נותן כיוון וגופן, אבל קורא
+   מסך בוחר מנוע לפי lang: כשהממשק רוסי ה-html הוא lang="ru",
+   ומילה עברית בלי סימון נמסרת למנוע הרוסי — ועם ניקוד זו אות
+   ועוד שני סימנים לכל תו. WCAG 2.2 §3.1.2.
+   lrn() נושא גם את .lrn-b, ולכן טקסט שאינו עברי אינו מקבל את
+   הכיווניות הכפויה: תשובה ברוסית קיבלה עד כה direction:rtl.
+   ------------------------------------------------------------ */
+var HEB_RE=/[\u0590-\u05FF]/;
+function heb(x){x=String(x==null?"":x);
+  return HEB_RE.test(x)?'<span lang="he" dir="rtl">'+esc(x)+"</span>":esc(x)}
+function lrn(x){x=String(x==null?"":x);
+  return HEB_RE.test(x)?'<span class="lrn-b" lang="he" dir="rtl">'+esc(x)+"</span>":esc(x)}
 
 /* ============================================================
    3. אייקונים — SVG בקוד, אפס בקשות רשת
@@ -952,7 +971,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a3 · 2026-09-02";
+var BUILD="a4 · 2026-09-02";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -1042,7 +1061,13 @@ function applyModes(){
      האפליקציה המותקנת נשארו בעברית. השם והתיאור כבר מתורגמים. */
   try{ document.title=t("app")+" — "+t("tagline") }catch(e){}
 }
-function announce(m){var e=$("#live");if(e)e.textContent=m}
+function announce(m,ans){
+  var e=$("#live"); if(!e)return;
+  /* אזור ההודעות יורש את שפת הממשק. תשובה עברית בתוכו נמסרה למנוע
+     הרוסי או הערבי — מסמנים אותה כעברית, ורק אותה. */
+  if(ans===undefined){e.textContent=m;return}
+  e.innerHTML=esc(m)+" "+heb(ans);
+}
 
 /* ============================================================
    6. קול
@@ -1517,9 +1542,19 @@ function voiceCheck(){
     show("✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר") },2000);
 }
 
+/* ------------------------------------------------------------
+   דור ההקראה. speechSynthesis.cancel() אינו מבטל setTimeout:
+   כרום יורה onend על האמירה שבוטלה, המקטע הבא נרשם בכל זאת,
+   וכעבור SEG_GAP ההקראה הישנה חוזרת מעל החדשה — שני קולות
+   במקביל. מונה אחד פותר את זה: כל הקראה מקבלת מספר, stopSpeak
+   מקדם אותו, ומקטע מדור ישן פשוט אינו מדבר. כאן זה חמור יותר
+   מבשאר האפליקציות, כי קטע קריאה מנוקד מתפצל להרבה מקטעים.
+   ------------------------------------------------------------ */
+var _sayGen=0;
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
   try{speechSynthesis.cancel()}catch(e){}
+  var my=++_sayGen;
   /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
      שממתין לרשימת הקולות ועד ארבע שניות אם היא לא מגיעה — ואמירה
      שיוצאת ארבע שניות אחרי המגע נזרקת בשקט באנדרואיד ובספארי.
@@ -1533,6 +1568,7 @@ function speakDevice(text,code,rate){
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
       var pit=femLift(v);
       (function sayseg(k){
+        if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
         if(k>=segs.length){ hlClear(); ttsOK(); return }
         var seg=segs[k];
         var u=new SpeechSynthesisUtterance(seg.text);
@@ -1562,12 +1598,14 @@ function speak(text,lang,rateMul){
   var code=LANGS[lang].tts;
   var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
   stopSpeak();
+  var my=_sayGen;   /* גם תשובת רשת שמגיעה אחרי עצירה לא תושמע */
   if(gemOn()){
     var vid=gvOf(state.gemVoice).id;
     var ck=lang+"|"+vid+"|"+rate.toFixed(2)+"|"+text;
     if(gCache[ck]){playUrl(gCache[ck],text,code,rate);return}
     gBusy=true; renderSpeakState();
     gSynth(text,vid,rate,lang).then(function(u){
+      if(my!==_sayGen)return;
       gCache[ck]=u; gBusy=false; renderSpeakState(); playUrl(u,text,code,rate);
     }).catch(function(){
       gBusy=false; renderSpeakState(); speakDevice(text,code,rate);
@@ -1583,7 +1621,7 @@ function playUrl(url,text,code,rate){
   gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){_sayGen++;gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -2487,9 +2525,9 @@ function formMean(tp,lv,pool,idx){
 function formBack(tp,lv,pool,idx){
   var it=pool[idx];
   var ds=wordDistract(it,pool,14);
-  var opts=fillOpts([O('<span class="lrn-b">'+esc(it.w)+"</span>",true)],ds,4,
+  var opts=fillOpts([O(lrn(it.w),true)],ds,4,
     function(d){return d.w.toLowerCase()},
-    function(d){return O('<span class="lrn-b">'+esc(d.w)+"</span>",false,
+    function(d){return O(lrn(d.w),false,
       d.g?(d.w+" = "+gl(d.g)):"")},
     it.w.toLowerCase());
   return {type:"back",prompt:t("qSay"),lead:ml(lv,it.g),subject:null,
@@ -2503,9 +2541,9 @@ function formHear(tp,lv,pool,idx){
      הסדר ב-wordDistract הוא הסדר החינוכי: קודם זוגות המינימום
      של המילה עצמה, ורק אחריהן מילים אחרות מאותה רמה. */
   var ds=wordDistract(it,pool,14);
-  var opts=fillOpts([O('<span class="lrn-b">'+esc(it.w)+"</span>",true)],ds,4,
+  var opts=fillOpts([O(lrn(it.w),true)],ds,4,
     function(d){return d.w.toLowerCase()},
-    function(d){return O('<span class="lrn-b">'+esc(d.w)+"</span>",false,
+    function(d){return O(lrn(d.w),false,
       d.g?(d.w+" = "+gl(d.g)):"")},
     it.w.toLowerCase());
   return {type:"hear",prompt:t("qHear"),subject:null,hidden:it,
@@ -2520,79 +2558,188 @@ function formUse(tp,lv,pool,idx){
      בשלוש אפשרויות. */
   var others=shuffle(pool.filter(function(x){return x.k==="s"&&x!==it}))
     .concat(shuffle(allSents().filter(function(x){return x!==it})));
-  var opts=fillOpts([O('<span class="lrn-b">'+esc(it.s)+"</span>",true)],others,4,
+  var opts=fillOpts([O(lrn(it.s),true)],others,4,
     function(d){return d.s},
-    function(d){return O('<span class="lrn-b">'+esc(d.s)+"</span>",false,gl(d.g))},
+    function(d){return O(lrn(d.s),false,gl(d.g))},
     it.s);
   return {type:"use",prompt:t("qUse"),lead:it.u?gl(it.u):gl(it.g),subject:null,
     opts:shuffle(opts),answer:it.s,say:it.s,reveal:it};
 }
 /* --- צורה 5: משפט עם חסר --- */
-var STOP_GAP=/^(a|an|the|to|of|is|are|was|were|be|i|you|he|she|it|we|they|my|your)$/i;
+/* הקובץ הזה נולד מהעתקה של אפליקציית האנגלית, ושם "מילה" היא רצף
+   של [A-Za-z']. על משפט עברי הרגקס הזה החזיר תמיד מחרוזת ריקה,
+   רשימת המועמדים נשארה ריקה, וכל שאלת השלמה נפלה ל-formUse —
+   אפס שאלות מסוג gap ב-7,200 הגרלות. העזרים כאן הם התיקון.
+   הניקוד נשמר באפשרויות: הוא חומר הלימוד, לא קישוט. */
+var HEB_NIK=/[֑-ׇ]/g;                      /* ניקוד וטעמים */
+var HEB_NOT=/[^א-ת֑-ׇ'"׳״]/g;  /* לא אות, לא ניקוד, לא גרש */
+function hebBare(s){return String(s).replace(HEB_NOT,"")}     /* מילה מנוקדת בלי פיסוק */
+function hebPlain(s){return hebBare(s).replace(HEB_NIK,"")}   /* עיצורים בלבד */
+function hebText(s){return String(s).replace(HEB_NIK,"")}     /* טקסט שלם בלי ניקוד */
+function hebWords(s){return String(s).split(/\s+/).map(hebBare).filter(function(b){return b})}
+/* אותיות סופיות אינן אות אחרת. בלי הנרמול הזה "מִסְמָךְ" ו"מִסְמָכִים"
+   נראים כשתי מילים שאין ביניהן קשר. */
+var HEB_FIN={"ך":"כ","ם":"מ","ן":"נ","ף":"פ","ץ":"צ"};
+/* שורשים אפשריים של מילה. לא ניתוח מורפולוגי — קילוף: מסירים
+   תחילית אחת בכל סיבוב, סופית נפוצה, ואמות קריאה. מילה מחזירה כמה
+   מועמדים ולא אחד, כי "הַפְנָיָה" ו"לִפְנוֹת" נפגשים רק אחרי שתי
+   רמות קילוף שונות. עודף התאמות כאן עולה מסיח אחד; חוסר התאמה
+   עולה שאלה עם שתי תשובות נכונות, ולכן הנטייה היא לעודף. */
+var ROOT_CACHE={};
+function hebRoots(w){
+  var k=hebPlain(w); if(ROOT_CACHE[k])return ROOT_CACHE[k];
+  var s=k.replace(/[ךםןףץ]/g,function(c){return HEB_FIN[c]});
+  var out=[],cur=s,i,r;
+  for(i=0;i<3;i++){
+    r=cur.replace(/(ים|ות|תי|נו|תם|תן|כם|יה|יו|נה|ה|ת|י|ו|ך)$/,"").replace(/[אוהי]/g,"");
+    if(r.length>=2&&out.indexOf(r)<0)out.push(r);
+    if(!/^[והבכלמש]/.test(cur))break;
+    cur=cur.slice(1);
+  }
+  if(!out.length)out.push(s);
+  ROOT_CACHE[k]=out; return out;
+}
+function sameRoot(a,b){
+  if(hebPlain(a)===hebPlain(b))return true;
+  var A=hebRoots(a),B=hebRoots(b),i;
+  for(i=0;i<A.length;i++)if(B.indexOf(A[i])>=0)return true;
+  return false;
+}
+/* מילות תפקוד שהחסרתן אינה מלמדת: כינויי גוף, מילות יחס וזיקה.
+   מילות שאלה *אינן* כאן בכוונה — "כַּמָּה זֶה עוֹלֶה?" מול "מָתַי" הוא
+   בדיוק ההבדל שהתרגיל מלמד, והרמז מכריע ביניהן. הבדיקה נעשית על
+   הצורה בלי ניקוד, אחרת "אֲנִי" ו"אני" הן שתי מילים. */
+var STOP_GAP=/^(אני|אתה|את|אתם|אתן|הוא|היא|הם|הן|אנחנו|אנו|זה|זו|זאת|הזה|הזו|הזאת|הזאתי|של|שלי|שלו|שלה|שלך|שלנו|שלכם|שלהם|על|אל|עם|את|לי|לו|לה|לך|לנו|לכם|להם|אותי|אותו|אותה|אותם|בו|בה|לא|כן|גם|כי|אם|או|יש|אין|רק|אבל|כדי|אשר|כאן|שם|כבר|עוד|הכי)$/;
+/* וי"ו החיבור אינה הופכת מילת תפקוד למילת תוכן. בלי הקילוף הזה
+   נבחר "וְלֹא" כחסר, ו"קִבַּלְתִּי מִכְתָּב _____ הֵבַנְתִּי אוֹתוֹ" הוא משפט
+   קשה לקריאה שאינו מלמד מילה. */
+function isStop(p){return STOP_GAP.test(p)||STOP_GAP.test(p.replace(/^ו/,""))}
 function formGap(tp,lv,pool,idx){
   var it=pool[idx];
   var parts=it.s.split(" ");
-  /* הרמז שמוצג מעל התרגיל הוא gl(it.g). כשהממשק באנגלית זהו תיאור
-     באנגלית, והוא עלול להכיל בדיוק את המילה שהוסרה — "Ask for the
-     menu" מול המשפט שממנו נגרע menu. מילה שכבר כתובה ברמז אינה
-     חסר אלא מתנה, ולכן היא נבחרת רק אם לא נשארה אחרת.
-     נבדק תמיד מול g.en ולא מול gl(it.g): רק בו יש מילים אנגליות,
-     והבדיקה חייבת לצאת זהה בכל שפת ממשק — המבחן הכיתתי נבנה מזרע
-     אצל המורה ואצל התלמיד, ואלה לא בהכרח באותה שפה. */
-  var leadTxt=String((it.g&&it.g.en)||"").toLowerCase();
-  /* גם נוסח השאלה עצמו, ולא רק הרמז. הפרומפט האנגלי הוא "What is
-     missing?", ולכן כשהמילה שנגרעה מהמשפט הייתה What היא הופיעה
-     בשורה שמעל התרגיל. נלקח תמיד מהאנגלית ולא מ-t(), כדי שההגרלה
+  /* הרמז שמוצג מעל התרגיל הוא gl(it.g). הוא תיאור *התפקיד* של
+     המשפט, ולעיתים הוא מכיל בדיוק את המילה שהוסרה — הרמז "בבקשה
+     לרשום לי את זה על נייר" מול המשפט שממנו נגרע "לכתוב". מילה
+     שכבר כתובה ברמז אינה חסר אלא מתנה, ולכן היא נבחרת רק אם לא
+     נשארה אחרת.
+     נבדק תמיד מול g.he ו-g.en הקבועים ולא מול gl(it.g): הבדיקה
+     חייבת לצאת זהה בכל שפת ממשק — המבחן הכיתתי נבנה מזרע אצל
+     המורה ואצל התלמיד, ואלה לא בהכרח באותה שפה. g.en נשאר כי
+     בו נבדקות מילים לטיניות, אם ייכנסו כאלה לבנק. */
+  var leadTxt=hebText(String((it.g&&it.g.he)||""))+" "+String((it.g&&it.g.en)||"").toLowerCase();
+  /* גם נוסח השאלה עצמו, ולא רק הרמז. הפרומפט העברי הוא "מה חסר
+     במשפט?", ולכן כשהמילה שנגרעה הייתה "מָה" היא הופיעה בשורה
+     שמעל התרגיל. נלקח תמיד מ-T.he ו-T.en ולא מ-t(), כדי שההגרלה
      תצא זהה בכל שפת ממשק. */
-  var promptTxt=String((T.en&&T.en.qGap)||"").toLowerCase();
-  var leadW={},lw=(leadTxt+" "+promptTxt).match(/[a-z']+/g)||[];
-  lw.forEach(function(w){leadW[w]=1});
-  var cand=[],free=[];
-  for(var i=0;i<parts.length;i++){
-    var bare=parts[i].replace(/[^A-Za-z']/g,"");
-    if(bare.length>=3&&!STOP_GAP.test(bare)){
+  var promptTxt=hebText(String((T.he&&T.he.qGap)||""))+" "+String((T.en&&T.en.qGap)||"").toLowerCase();
+  var all=leadTxt+" "+promptTxt, leadRoots={};
+  hebWords(all).forEach(function(b){hebRoots(b).forEach(function(r){leadRoots[r]=1})});
+  var cand=[],free=[],i;
+  for(i=0;i<parts.length;i++){
+    /* מבחן האורך סופר עיצורים ולא תווים. מילה מנוקדת בת שתי אותיות
+       היא ארבעה עד שישה תווים, ולכן ספירת תווים הייתה מעבירה בדיוק
+       את המילים הקצרות שאין טעם להחסיר. */
+    var bare=hebBare(parts[i]), plain=hebPlain(bare);
+    if(plain.length>=3&&!isStop(plain)){
       cand.push(i);
-      /* לא רק מילה שלמה אלא גם הכלה: הרמז "first meeting" נושא
-         בתוכו את meet, "to have this meaning" את mean, ו-"unwell"
-         את well. מילה שאפשר לקרוא אותה מתוך הרמז אינה חסר. */
-      var bl=bare.toLowerCase();
-      if(!leadW[bl]&&(leadTxt+" "+promptTxt).indexOf(bl)<0)free.push(i);
+      /* לא רק מילה שלמה אלא גם שורש: הרמז "בקשה מנומסת" נושא בתוכו
+         את "מבקש", ו"כבר מסרתי את המסמך" את "המסמכים". מילה שאפשר
+         לקרוא אותה מתוך הרמז אינה חסר. */
+      var leaked=all.indexOf(plain)>=0;
+      hebRoots(bare).forEach(function(r){if(leadRoots[r])leaked=true});
+      if(!leaked)free.push(i);
     }
   }
   if(free.length)cand=free;
   /* המילה הפותחת אינה מוסתרת כשיש חלופה.
-     שתי סיבות, ושתיהן מדודות:
-     · האות הגדולה מסגירה. התלמיד רואה "_____ to meet you." ויודע
-       שהתשובה מתחילה באות גדולה; ב-10% משאלות ההשלמה היא הייתה
-       האפשרות היחידה כזאת, כלומר סימון נכון בלי לקרוא מילה.
-     · המילה הפותחת כאן היא לרוב מודאל של בקשה, ו-"Can I have the
-       menu" נכון בדיוק כמו "Could I have the menu" — מסיח שהוא
-       תשובה שנייה. */
+     באנגלית הסיבה הייתה האות הגדולה שמסגירה. בעברית אין אות גדולה,
+     אבל הסיבה השנייה נשארה בעינה: המילה הפותחת כאן היא לרוב מודאל
+     של בקשה, ו"אֶפְשָׁר לְקַבֵּל" נכון בדיוק כמו "אֲנִי מְבַקֵּשׁ לְקַבֵּל" —
+     מסיח שהוא תשובה שנייה. */
   var inner=cand.filter(function(i){return i>0});
   if(inner.length)cand=inner;
   if(!cand.length)return formUse(tp,lv,pool,idx);
-  var gi=pick(cand),gone=parts[gi].replace(/[^A-Za-z']/g,"");
+  var gi=pick(cand),gone=hebBare(parts[gi]);
   var shown=parts.slice();
   shown[gi]=parts[gi].replace(gone,"_____");
-  /* מסיחים: מילים מהמשפטים והמילים של אותה רמה, ואם הבנק דל —
-     מילים שנלמדו באפליקציה. מועמד שכבר הופיע נדחה וממשיכים
-     הלאה, כדי שיישארו ארבע אפשרויות ולא שלוש. */
-  var others=[],seen={};seen[gone.toLowerCase()]=1;
+  /* מסיחים: מילים מהמשפטים של אותה רמה, ואם הבנק דל — מילים
+     שנלמדו באפליקציה. מועמד שכבר הופיע נדחה וממשיכים הלאה, כדי
+     שיישארו ארבע אפשרויות ולא שלוש.
+     שתי פסילות שבלעדיהן לשאלה יש שתי תשובות נכונות:
+     · מסיח שחולק שורש עם התשובה — "חוֹזֵר" מול "לַחֲזוֹר".
+     · מסיח שכבר נמצא במשפט עצמו, בכל נטייה שהיא — "לְהַגִּישׁ" מול
+       "הַהַגָּשָׁה" שנשארה בשורה. */
+  var seen={},others=[],backup=[],sentW=hebWords(it.s);
+  seen[hebPlain(gone)]=1;
+  /* ------------------------------------------------------------
+     מסיח מאותו סוג מילה כמו התשובה יושב באותה משבצת תחבירית,
+     ולכן הוא מייצר משפט תקין באותה מידה. שני מקרים נמדדו:
+       ✓ אֶפְשָׁר לְדַבֵּר יוֹתֵר לְאַט?   מול   אֶפְשָׁר לְדַבֵּר מְאוֹד לְאַט?
+       ✓ אֶפְשָׁר לַחֲזוֹר בְּבַקָּשָׁה?   מול   אֶפְשָׁר לְדַבֵּר בְּבַקָּשָׁה?
+     בשניהם הרמז אינו מכריע, כי הוא מתאר את תפקיד המשפט ושתי
+     הגרסאות ממלאות אותו. שלוש קבוצות סגורות: שם פועל, תואר פועל
+     של מידה, ומילת נימוס. שתי מילים מאותה קבוצה לא ייפגשו באותה
+     שאלה. הבדיקה על העיצורים בלבד, כדי שהניקוד לא ישבש אותה.
+     ------------------------------------------------------------ */
+  var CLASS=[
+    /* תואר פועל של מידה או קצב */
+    ["מאוד","יותר","פחות","לאט","מהר","קצת","הרבה","כבר","שוב","עוד"],
+    /* מילת נימוס שפותחת פנייה */
+    ["שלום","תודה","סליחה","בבקשה","להתראות","בוקר","ערב"]
+  ];
+  function wordClass(p){
+    for(var i=0;i<CLASS.length;i++)if(CLASS[i].indexOf(p)>=0)return "c"+i;
+    /* שם פועל: ל׳ פותחת ועוד שני עיצורים לפחות. "לאט" נתפס כאן
+       בטעות ונפסל כמסיח לשם פועל — פסילה עודפת ולא חסרה, והמאגר
+       גדול מספיק כדי לספוג אותה. */
+    if(/^ל../.test(p))return "inf";
+    return null;
+  }
+  var goneClass=wordClass(hebPlain(gone));
+  function okDist(b){
+    var p=hebPlain(b),j,bad=false;
+    if(p.length<3||isStop(p)||seen[p])return false;
+    if(goneClass&&wordClass(p)===goneClass)return false;
+    if(sameRoot(b,gone))return false;
+    for(j=0;j<sentW.length;j++)if(sameRoot(b,sentW[j]))return false;
+    /* מסיח שהמילה שלו כתובה ברמז אינו מסיח אלא תשובה שנייה, והרמז
+       הוא זה שמאשר אותה: "קִבַּלְתִּי סֵרוּב וַאֲנִי _____ לָדַעַת לָמָּה" עם
+       הרמז "הבקשה נדחתה ואני מבקש את הנימוק" — "מְבַקֵּשׁ" נכון בדיוק
+       כמו "רוֹצֶה", והרמז אומר את זה במפורש. הבדיקה על הרמז הקבוע,
+       כמו בחירת החסר, כדי שההגרלה תישאר זהה בכל שפת ממשק. */
+    if(all.indexOf(p)>=0)return false;
+    hebRoots(b).forEach(function(r){if(leadRoots[r])bad=true});
+    if(bad)return false;
+    seen[p]=1;return true;
+  }
+  /* גם פריט מהבנק וגם משפט מפורקים למילים. בבנק יש ערכים של יותר
+     ממילה אחת ("שֵׁם פְּרָטִי", "אֵין כְּנִיסָה"), וניקוי הפיסוק על המחרוזת
+     השלמה הדביק אותם למילה אחת שאינה קיימת — "שֵׁםפְּרָטִי". */
   pool.forEach(function(x){
     var src=x.k==="s"?x.s:(x.k==="w"?x.w:"");
-    src.split(" ").forEach(function(p){
-      var b=p.replace(/[^A-Za-z']/g,"");
-      if(b.length>=3&&!STOP_GAP.test(b)&&!seen[b.toLowerCase()]){seen[b.toLowerCase()]=1;others.push(b)}
-    });
+    hebWords(src).forEach(function(b){if(okDist(b))others.push(b)});
   });
-  var backup=shuffle(allWords()).map(function(x){return x.w.replace(/[^A-Za-z']/g,"")})
-    .filter(function(b){return b.length>=3&&!STOP_GAP.test(b)});
-  var cands=shuffle(others).concat(backup);
-  var opts=fillOpts([O('<span class="lrn-b">'+esc(gone)+"</span>",true)],cands,4,
-    function(w){return w.toLowerCase()},
-    function(w){return O('<span class="lrn-b">'+esc(w)+"</span>",false)},
-    gone.toLowerCase());
-  return {type:"gap",prompt:t("qGap"),gapHtml:'<span class="lrn-b">'+esc(shown.join(" "))+"</span>",
+  shuffle(allWords()).forEach(function(x){
+    hebWords(x.w).forEach(function(b){if(okDist(b))backup.push(b)});
+  });
+  /* מסיח שאורכו רחוק מהתשובה מאפשר לענות בלי לקרוא — "הארוכה
+     ביותר" הופכת לאסטרטגיה. לכן בכל קבוצה קודם מועמדים באורך
+     דומה, והשאר אחריהם. הסידור נעשה *בתוך* כל קבוצה ולא על
+     האיחוד, כדי לשמור על סדר העדיפויות המקורי: מילים מאותה רמה
+     לפני מילים מרחבי האפליקציה. אחרת מילה מקרית מנושא אחר, שאורכה
+     קרוב במקרה, דחקה את המילה מאותו הקשר ממש. */
+  var nGone=hebPlain(gone).length;
+  function byLen(list){
+    var near=[],far=[];
+    list.forEach(function(b){(Math.abs(hebPlain(b).length-nGone)<=1?near:far).push(b)});
+    return near.concat(far);
+  }
+  var cands=byLen(shuffle(others)).concat(byLen(backup));
+  var opts=fillOpts([O(lrn(gone),true)],cands,4,
+    function(w){return hebPlain(w)},
+    function(w){return O(lrn(w),false)},
+    hebPlain(gone));
+  return {type:"gap",prompt:t("qGap"),gapHtml:lrn(shown.join(" ")),
     lead:gl(it.g),subject:null,opts:shuffle(opts),answer:gone,say:it.s,reveal:it};
 }
 /* --- צורה 6: בניית משפט מאריחים --- */
@@ -2713,7 +2860,7 @@ function spkBtn(text,lang,slow,label){
 
 function subjectBox(it){
   var w=it.w||it.s||"";
-  return '<div class="subject"><span class="word">'+esc(w)+"</span>"+
+  return '<div class="subject"><span class="word" lang="he" dir="rtl">'+esc(w)+"</span>"+
     (it.ipa?'<span class="ipa">'+esc(it.ipa)+"</span>":"")+
     '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
     spkBtn(w,LEARN,false,t("hearWord"))+spkBtn(w,LEARN,true,t("hearSlow"))+"</span></div>";
@@ -2739,9 +2886,9 @@ function screenPractice(){
     h+='<div style="display:flex;gap:.4rem;margin-bottom:.4rem">'+
        spkBtn(q.passage.lines.join(" "),LEARN,false,t("hearSent"))+
        spkBtn(q.passage.lines.join(" "),LEARN,true,t("hearSlow"))+"</div>";
-    h+='<div class="passage">';
+    h+='<div class="passage" lang="he" dir="rtl">';
     q.passage.lines.forEach(function(ln,i){
-      h+='<span class="s" data-a="sayline" data-say="'+esc(ln)+'">'+esc(ln)+"</span> ";
+      h+='<span class="s" role="button" tabindex="0" data-a="sayline" data-say="'+esc(ln)+'">'+esc(ln)+"</span> ";
     });
     h+="</div>";
     if(q.passage.words.length){
@@ -2772,12 +2919,12 @@ function screenPractice(){
     h+=(state.level<3&&q.lead?'<p class="qtext">'+esc(q.lead)+"</p>":"")+
        '<p class="qhint">'+esc(t("tapOrder"))+"</p>";
     h+='<div class="slot'+(P.done?(P.ok?" ok":" bad"):"")+'" id="slot">';
-    P.slot.forEach(function(w,i){h+='<button class="tile" data-a="unslot" data-i="'+i+'">'+esc(w)+"</button>"});
+    P.slot.forEach(function(w,i){h+='<button class="tile" lang="he" dir="rtl" data-a="unslot" data-i="'+i+'">'+esc(w)+"</button>"});
     h+="</div>";
     h+='<div class="tiles">';
     q.tiles.forEach(function(w,i){
       if(P.used.indexOf(i)>=0)return;
-      h+='<button class="tile" data-a="slot" data-i="'+i+'">'+esc(w)+"</button>";
+      h+='<button class="tile" lang="he" dir="rtl" data-a="slot" data-i="'+i+'">'+esc(w)+"</button>";
     });
     h+="</div>";
     h+='<div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap">'+
@@ -2807,10 +2954,10 @@ function screenPractice(){
   if(P.done){
     var it=q.reveal||q.subject||q.hidden;
     h+='<div class="fb '+(P.ok?"ok":"bad")+'"><b>'+(P.ok?esc(t("correct")):esc(t("wrong")))+"</b>";
-    if(!P.ok)h+='<div class="body">'+esc(t("answerIs"))+' <span class="lrn-b"><b>'+esc(q.answer)+"</b></span></div>";
-    if(it&&it.k==="w"&&it.g)h+='<div class="why"><span class="lrn-b"><b>'+esc(it.w)+"</b></span>"+
+    if(!P.ok)h+='<div class="body">'+esc(t("answerIs"))+' <b>'+lrn(q.answer)+"</b></div>";
+    if(it&&it.k==="w"&&it.g)h+='<div class="why"><b>'+lrn(it.w)+"</b>"+
       (it.ipa?' <span class="tr-b">'+esc(it.ipa)+"</span>":"")+" — "+esc(gl(it.g))+"</div>";
-    if(it&&it.k==="s")h+='<div class="why"><span class="lrn-b">'+esc(it.s)+"</span><br>"+esc(gl(it.g))+
+    if(it&&it.k==="s")h+='<div class="why">'+lrn(it.s)+"<br>"+esc(gl(it.g))+
       (it.u?"<br><b>"+esc(gl(it.u))+"</b>":"")+"</div>";
     if(!P.ok&&P.picked>=0&&q.opts&&q.opts[P.picked]&&q.opts[P.picked].why)
       h+='<div class="why">'+esc(q.opts[P.picked].why)+"</div>";
@@ -3077,7 +3224,7 @@ function buildQ(tid,lv){
      לענות. */
   if(q.type==="comp"&&q.passage){
     var lines=(q.passage.lines||[]);
-    expr='<div class="passage">'+lines.map(function(l){
+    expr='<div class="passage" lang="he" dir="rtl">'+lines.map(function(l){
       return '<div class="s">'+esc(l)+"</div>"}).join("")+"</div>";
   }
   return {topic:tid, topicName:tp?tName(tp):"", ask:ask, expr:expr, fig:"",
@@ -3109,7 +3256,7 @@ function buildQ(tid,lv){
    · שמות התלמידים נשארים במכשיר של המורה. הם לא עוברים דרך
      שום שרת, כי אין שרת.
    ============================================================ */
-var GENV=3;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
+var GENV=4;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
 var EKEY="shlav-exams-ulpan-v1";   /* מפתח לאפליקציה הזאת בלבד */
@@ -4240,7 +4387,7 @@ function answer(i){
   P.picked=i; P.done=true; P.ok=!!(o&&o.ok);
   record(P.ok);
   render();
-  announce(P.ok?t("correct"):t("wrong")+". "+t("answerIs")+" "+q.answer);
+  if(P.ok)announce(t("correct")); else announce(t("wrong")+". "+t("answerIs"),q.answer);
   /* התשובה הנכונה נשמעת מיד, גם כשטעו — במיוחד כשטעו. הצליל הוא
      החומר, ותיקון שקט אינו תיקון. */
   setTimeout(function(){speak(q.say,LEARN)},P.ok?200:420);
@@ -4309,7 +4456,10 @@ document.addEventListener("click",function(e){
        התשובה. מי שמנחש לומד פחות ממי שמודה. */
     var q=P.q; if(!q)return;
     P.done=true; P.ok=false; P.picked=-1; record(false); render();
-    setTimeout(function(){speak(q.say,LEARN)},260);
+    announce(t("wrong")+". "+t("answerIs"),q.answer);
+    /* לחיצה על "הבא" בתוך רבע שנייה החליפה את השאלה, וההקראה
+       הזאת דיברה על החדשה. */
+    setTimeout(function(){if(P.q===q)speak(q.say,LEARN)},260);
     return;
   }
   if(a==="slot"){var i=parseInt(el.getAttribute("data-i"),10);
@@ -4382,7 +4532,7 @@ document.addEventListener("input",function(e){
 /* Enter ורווח על כרטיס קול — הוא div ולכן המקלדת אינה מקבלת אותו בחינם */
 document.addEventListener("keydown",function(e){
   if(e.key!=="Enter"&&e.key!==" ")return;
-  var el=e.target.closest("[data-a='gvoice']"); if(!el)return;
+  var el=e.target.closest("[data-a='gvoice'],[data-a='devvoice'],[data-a='sayline']"); if(!el)return;
   e.preventDefault(); el.click();
 });
 /* קיצורי מקלדת בתרגול, כמו באפליקציות המתמטיקה: מי שהעכבר קשה לו,
@@ -4397,7 +4547,11 @@ document.addEventListener("keydown",function(e){
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();speak(P.q.say,LEARN);return}
+  if(e.key===" "){
+    /* רווח על כפתור ממוקד הוא הפעלה שלו ולא הקראה חוזרת — הדפדפן
+       כבר יורה click, וההקראה כאן רצה מעליו. */
+    if(e.target&&e.target.closest("button,[role='button'],a[href]"))return;
+    e.preventDefault();speak(P.q.say,LEARN);return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
@@ -4430,7 +4584,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a3-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a4-pwa1").catch(function(){});
   });
 }
 </script>

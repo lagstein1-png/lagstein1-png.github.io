@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x8 · 2026-09-03";
+  var BUILD = "x9 · 2026-09-03";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -291,13 +291,8 @@
       return;
     }
     box.innerHTML = all.map(function (ex) {
-      /* האזהרה נגזרת מהעונה, וכל ערך שאינו מועד אמיתי חייב להופיע
-         כאן. תלמיד שמתאמן על מה שנראה כבחינה אמיתית ומגלה שאינה —
-         מאבד אמון בכל השאר, וזה הכלל שכתוב בראש data/exams.js. */
-      var FAKE = { "הדגמה": "בחינת הדגמה — לא בחינה אמיתית",
-                   "תרגול": "שאלות תרגול — לא בחינה אמיתית" };
-      var demo = FAKE[ex.season]
-        ? ' <span class="chip warn">' + esc(FAKE[ex.season]) + "</span>" : "";
+      var demo = ex.season === "הדגמה"
+        ? ' <span class="chip warn">בחינת הדגמה — לא בחינה אמיתית</span>' : "";
       return '<button class="card pick" data-exam="' + esc(ex.id) + '">' +
         "<h3>" + esc(examTitle(ex)) + demo + "</h3>" +
         '<p class="meta">' +
@@ -1059,7 +1054,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x8-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x9-pwa1").catch(function () {});
     });
   }
 

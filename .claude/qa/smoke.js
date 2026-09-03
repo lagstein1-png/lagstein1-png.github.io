@@ -1,6 +1,7 @@
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');
 async function click(p,s){try{await p.click(s,{timeout:2000});await p.waitForTimeout(300);return true}catch(e){return false}}
 (async()=>{const b=await chromium.launch();
+let failed=0;   /* בלי זה הכלי מדפיס ERRORS ויוצא 0 */
 for(const app of process.argv.slice(2)){
   const ctx=await b.newContext({locale:'he-IL'});const page=await ctx.newPage();
   const errs=[];page.on('pageerror',e=>errs.push('PAGEERROR: '+e.message));
@@ -37,7 +38,9 @@ for(const app of process.argv.slice(2)){
   }
   await page.waitForTimeout(400);
   const tail=' ('+labels.length+' controls exercised, '+blocked+' external requests blocked)';
+  if(errs.length)failed++;
   console.log(app.padEnd(24)+(errs.length?'ERRORS ('+errs.length+'):\n   '+[...new Set(errs)].join('\n   ')+'\n  '+tail:'clean'+tail));
   await ctx.close();
 }
-await b.close();})();
+await b.close();
+process.exitCode = failed ? 1 : 0;})();
