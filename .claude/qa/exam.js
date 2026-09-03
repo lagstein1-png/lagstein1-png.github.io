@@ -3,7 +3,7 @@
    משנה אף אחת מהשאר. */
 const {chromium}=require("/opt/node22/lib/node_modules/playwright");
 const APPS=process.argv.slice(2).length?process.argv.slice(2)
-  :["math-app","math-teen","math-uni","math-uni2","math-uni3","ulpan","english","history"];
+  :["math-app","math-teen","math-uni","math-uni2","math-uni3","ulpan","english","history","lomda"];
 const BASE="http://127.0.0.1:8099";
 
 (async()=>{

@@ -10,8 +10,12 @@
    המטמון. עדכנת אחד — עדכן את השני.
    ===================================================================== */
 const V = new URL(self.location).searchParams.get("v") || "dev";
-const CACHE = "math-uni2-" + V;
+const CACHE = "lomda-" + V;
+/* קובצי התוכן נכנסים לכאן במפורש. נושא חדש שנשכח כאן ייטען מהרשת
+   ולא יעבוד אופליין — וזו התקלה שהכי קשה לשים לב אליה, כי בפיתוח
+   תמיד יש רשת. */
 const PRE = ["./","./index.html","./manifest.json",
+             "./data/schema.js","./data/science.js","./data/civics.js",
              "./img/icon-192.png","./img/icon-512.png",
              "/legal/terms.js","/legal/protect.js"];
 
@@ -22,7 +26,7 @@ self.addEventListener("install", e => {
 });
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => k.startsWith("math-uni2-") && k !== CACHE).map(k => caches.delete(k))
+    keys.filter(k => k.startsWith("lomda-") && k !== CACHE).map(k => caches.delete(k))
   )).then(() => self.clients.claim()));
 });
 self.addEventListener("fetch", e => {

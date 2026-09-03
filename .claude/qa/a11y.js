@@ -29,10 +29,10 @@ const path = require('path');
 
 const ROOT = process.cwd();
 
-/* שמונה אפליקציות הלימוד שיש בהן applyModes. reader ו-voice הם כלים
+/* תשע אפליקציות הלימוד שיש בהן applyModes. reader ו-voice הם כלים
    ולא אפליקציות לימוד, ול-bagrut-806 שלד משלו — הם אינם נבדקים כאן. */
 const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-              'english', 'history', 'ulpan'];
+              'english', 'history', 'ulpan', 'lomda'];
 
 /* יכולת → כל השמות שראינו לה בפועל. שם חדש מתווסף כאן, ולא בקוד. */
 const CAPS = [
