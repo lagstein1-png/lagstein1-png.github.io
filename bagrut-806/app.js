@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x8 · 2026-09-03";
+  var BUILD = "x9 · 2026-09-03";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -308,6 +308,17 @@
   function examTitle(ex) {
     return ex.season + " " + ex.year + (ex.moed && ex.moed !== "—" ? " · מועד " + ex.moed : "");
   }
+  /* שלוש בחינות ההדגמה נושאות את אותו season ואת אותה שנה, ולכן
+     examTitle מחזיר לשלושתן מחרוזת זהה — ושני כרטיסים שנבדלים רק
+     במניין הסעיפים הם שתי אפשרויות שנראות אחת. מוסיפים סימן סידורי
+     לכרטיס בלבד. season נשאר "הדגמה" בדיוק, מפני שהוא מה שמדליק את
+     תווית "לא בחינה אמיתית", ומועד לא נוגעים בו: "מועד ג׳" היה
+     מרמז על מועד בחינה שהתקיים. */
+  var SERIAL = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ז׳", "ח׳", "ט׳", "י׳"];
+  function examSerial(ex, i, all) {
+    var same = all.filter(function (o) { return examTitle(o) === examTitle(ex); });
+    return same.length > 1 && SERIAL[i] ? " · אוסף " + SERIAL[i] : "";
+  }
   function countSubs(ex) {
     var n = 0;
     ex.questions.forEach(function (q) { n += (q.subQuestions || []).length; });
@@ -322,11 +333,11 @@
         "הבחינות יושבות ב־<code>data/exams.js</code>.</div>";
       return;
     }
-    box.innerHTML = all.map(function (ex) {
+    box.innerHTML = all.map(function (ex, i) {
       var demo = ex.season === "הדגמה"
         ? ' <span class="chip warn">בחינת הדגמה — לא בחינה אמיתית</span>' : "";
       return '<button class="card pick" data-exam="' + esc(ex.id) + '">' +
-        "<h3>" + esc(examTitle(ex)) + demo + "</h3>" +
+        "<h3>" + esc(examTitle(ex) + examSerial(ex, i, all)) + demo + "</h3>" +
         '<p class="meta">' +
         plural(ex.questions.length, "שאלה אחת", "שתי שאלות", "שאלות") + " · " +
         plural(countSubs(ex), "סעיף אחד", "שני סעיפים", "סעיפים") + " · " +
@@ -1086,7 +1097,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x8-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x9-pwa1").catch(function () {});
     });
   }
 
