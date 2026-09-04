@@ -111,8 +111,8 @@ eslint:
 
 | קובץ | ממצא | למה הוא שפיר |
 |---|---|---|
-| english, history, math-app, math-teen, math-uni, math-uni2, math-uni3 | `'id' is already defined` | `var id` חוזר באותו scope |
-| english, history, ulpan | `'lg' is already defined` | אותו דבר |
+| english, history, math-app, math-teen, math-uni, math-uni2, math-uni3, ulpan, lomda | `'id' is already defined` | `var id` חוזר באותו scope |
+| english, history, ulpan, lomda | `'lg' is already defined` | אותו דבר |
 | math-uni | `'qq' is already defined` | שני `var qq` בשני ענפים של אותו מחולל, שמופרדים ב-`return` |
 | math-app | `'nm' is already defined` | שני `var nm` עוקבים באותה פונקציה |
 | math-app | `'tDesc' is not defined` | `typeof tDesc==="function"` — שמירה על תכונה אופציונלית |

@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x10 · 2026-09-03";
+  var BUILD = "x11 · 2026-09-03";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -52,7 +52,8 @@
   var store = {
     data: null,
     blank: function () {
-      return { fs: 1, theme: "auto", rate: 1, examId: null, solved: {}, sims: [], weak: {} };
+      return { fs: 1, theme: "auto", rate: 1, examId: null,
+               solved: {}, sims: [], weak: {}, att: {} };
     },
     load: function () {
       try {
@@ -289,13 +290,34 @@
   }
   /* התוצאה נשמרת במכשיר: solved לסעיף, ו-weak לפי נושא. דוח
      הנושאים החלשים בשלב 4 נבנה בדיוק מהשניים האלה. */
+  /* `att` הוא רשומה לכל סעיף שנבדק, ו-`weak` נבנה ממנו ולא נצבר
+     בעצמו. הספירה הקודמת הוסיפה שורה ל-`weak` בכל לחיצה על "בדקו",
+     ולכן תלמיד שניסה שלוש פעמים ופתר בפעם הרביעית נראה במסך
+     ההתקדמות כ-1 מתוך 4, והנושא נצבע אדום אף שהסעיף נפתר — הדוח
+     שאמור לומר לו במה להתחיל אמר לו שהוא חלש דווקא במה שהתעקש
+     עליו. סעיף נספר כאן פעם אחת: נפתר או לא, ומספר הניסיונות נשמר
+     בנפרד ואינו מוריד מהתוצאה. */
+  function rebuildWeak() {
+    var d = store.data, w = {};
+    for (var id in d.att) {
+      var a = d.att[id];
+      if (!a || !a.topic) continue;
+      var t = w[a.topic] || (w[a.topic] = { ok: 0, no: 0, tries: 0 });
+      if (a.ok) t.ok++; else t.no++;
+      t.tries += a.tries || 0;
+    }
+    d.weak = w;
+  }
   function recordResult(q, subId, ok) {
     var d = store.data;
     if (!d.solved) d.solved = {};
-    if (!d.weak) d.weak = {};
-    if (ok) d.solved[subId] = true;
-    var w = d.weak[q.topic] || (d.weak[q.topic] = { ok: 0, no: 0 });
-    if (ok) w.ok++; else w.no++;
+    if (!d.att) d.att = {};
+    var a = d.att[subId];
+    if (!a) a = d.att[subId] = { topic: q.topic, ok: false, tries: 0 };
+    a.topic = q.topic;
+    a.tries++;
+    if (ok) { a.ok = true; d.solved[subId] = true; }
+    rebuildWeak();
     store.save();
   }
 
@@ -653,7 +675,11 @@
       var t = byTopic[it.q.topic] || (byTopic[it.q.topic] = { ok: 0, n: 0, pts: 0, max: 0 });
       t.n++; t.max += pts;
       if (r.ok) { t.ok++; t.pts += pts; }
-      recordResult(it.q, it.id, r.ok);
+      /* בדוח הבחינה סעיף ריק שווה אפס נקודות, וכך צריך להיות. במסך
+         ההתקדמות הוא אינו נספר: "לא הגעתי לזה" אינו "טעיתי בזה",
+         ובחינה שנגמר בה הזמן הייתה מוסיפה לנושא כישלון לכל סעיף
+         שהתלמיד לא הספיק להגיע אליו. */
+      if (String(SIM.ans[it.id] || "").trim()) recordResult(it.q, it.id, r.ok);
       rows.push({ id: it.id, letter: it.sub.letter, number: it.q.number,
                   topic: it.q.topic, ok: r.ok, pts: pts,
                   given: SIM.ans[it.id] || "", want: answerText(it.sub.finalAnswer) });
@@ -797,7 +823,8 @@
     var box = $("#prog-body");
     if (!topics.length) {
       box.innerHTML = '<div class="stub"><b>עוד לא נאסף מידע.</b>' +
-        "כל תשובה שנבדקת — בתרגול או בסימולציה — נספרת כאן לפי נושא.</div>";
+        "כל סעיף שנבדקה בו תשובה — בתרגול או בסימולציה — נספר כאן " +
+        "לפי נושא, פעם אחת. סעיף שנשאר ריק אינו נספר.</div>";
       return;
     }
     var rows = topics.map(function (t) {
@@ -806,7 +833,7 @@
     }).sort(function (a, b) { return a.p - b.p; });
 
     var h = "<h2>לפי נושא</h2><table class=\"tbl\"><thead><tr>" +
-      "<th>נושא</th><th>נכונות</th><th>אחוז</th><th></th></tr></thead><tbody>";
+      "<th>נושא</th><th>סעיפים שנפתרו</th><th>אחוז</th><th></th></tr></thead><tbody>";
     rows.forEach(function (r) {
       h += "<tr><td>" + esc(r.t) + "</td><td>" + r.ok + "/" + r.n + "</td><td>" + r.p +
         '%</td><td><div class="bar2' + (r.p < 60 ? " weak" : "") +
@@ -956,7 +983,8 @@
       keepVal(chk);
       pc2.res = checkAnswer(sc.sub.finalAnswer, pc2.val);
       pc2.tries++;
-      recordResult(sc.q, chk, pc2.res.ok);
+      /* לחיצה על "בדקו" בשדה ריק אינה ניסיון שנכשל אלא לחיצה בטעות. */
+      if (String(pc2.val || "").trim()) recordResult(sc.q, chk, pc2.res.ok);
       renderAns(chk);
       /* אותו מידע שמופיע על המסך, ולא פחות ממנו: הנוסח שמופיע אחרי
          שני ניסיונות הוא הדרך היחידה קדימה למי שנתקע, ומי שמקשיב
@@ -1097,11 +1125,14 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x10-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x11-pwa1").catch(function () {});
     });
   }
 
   store.load();
+  /* מכשיר שנצברה בו הספירה הקודמת — שורה לכל לחיצה — מקבל כאן את
+     הספירה החדשה במקומה, כדי שלא יהיו שני בסיסי ספירה באותה טבלה. */
+  rebuildWeak();
   applyPrefs();
   $("#build").textContent = BUILD;
   if (store.data.examId && examById(store.data.examId)) state.examId = store.data.examId;
