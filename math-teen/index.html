@@ -173,7 +173,6 @@ nav{display:flex;gap:4px;margin-inline-start:auto;flex-wrap:wrap}
 .g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
 .g4{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
 /* רשימת הקולות: שתי עמודות רק כשבאמת יש מקום, אחרת השמות נקטעים */
-.vgrid{grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));gap:8px}
 .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .spread{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
@@ -312,16 +311,6 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .fcard .ft{font-weight:700;font-size:.93rem}
 .fcard .fm{margin-top:7px;font-size:1.05rem}
 .fcard .fn{color:var(--muted);font-size:.82rem;margin-top:6px;overflow-wrap:anywhere}
-
-/* ---------- שורת מצב הקול ---------- */
-.vstrip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;
-  padding:9px 13px;border-radius:11px;font-size:.86rem;font-weight:600;line-height:1.5}
-.vstrip>span{flex:1;min-width:0}
-.vstrip .btn{padding:6px 12px;font-size:.8rem;background:var(--surface);border-color:currentColor}
-.vstrip.ok{background:var(--ok-soft);color:var(--ok)}
-.vstrip.warn{background:var(--warn-soft);color:var(--warn)}
-.vstrip.bad{background:var(--bad-soft);color:var(--bad)}
-.vstrip svg{flex-shrink:0}
 
 /* ---------- שכבות ---------- */
 .ov{position:fixed;inset:0;z-index:80;background:rgba(8,11,18,.62);backdrop-filter:blur(3px);
@@ -735,6 +724,9 @@ TR_AR["הדיסקרימיננטה נבדקת רק אחרי שמעבירים הכ
 TR_AR["אין כאן פתרון בודד: כל מספר מקיים את המשוואה."]="لا يوجد هنا حلّ واحد: كلّ عدد يحقّق المعادلة.";
 TR_AR["זה ההפך. שני האגפים זהים, ולכן כל x מקיים את המשוואה ולא אף אחד."]="هذا العكس. الطرفان متطابقان، ولذلك كلّ x يحقّق المعادلة ولا يوجد x لا يحقّقها.";
 TR_AR["לפני שמחשבים דיסקרימיננטה — מעבירים הכול לצד אחד ובודקים מה בכלל נשאר."]="قبل حساب المميّز — ننقل كلّ شيء إلى طرف واحد ونفحص ما الذي بقي أصلًا.";
+TR_AR["אפשר להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור."]="يمكن تثبيت صوت عبري: في أندرويد عبر الإعدادات ← إمكانية الوصول ← تحويل النص إلى كلام ← تثبيت الأصوات، وفي ويندوز عبر الإعدادات ← الوقت واللغة ← الكلام.";
+TR_AR["הקולות שברשימה ידברו עברית במבטא זר."]="الأصوات في هذه القائمة ستنطق العبرية بلكنة أجنبية.";
+TR_AR["לוחצים על הקישור שהתלמיד שלח בוואטסאפ, או מדביקים כאן את הקוד. הציון מחושב מחדש מהתשובות עצמן, ולא נלקח ממה שהתלמיד כתב."]="اضغطوا على الرابط الذي أرسله الطالب عبر واتساب، أو ألصقوا هنا الرمز. تُحسب العلامة من جديد من الإجابات نفسها، ولا تُؤخذ ممّا كتبه الطالب.";
 var TR={ar:(typeof TR_AR!=="undefined"?TR_AR:{})};
 function _(h){
   if(LG==="he")return h;
@@ -920,7 +912,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t42 · 2026-09-04";
+var BUILD="t45 · 2026-09-04";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -935,7 +927,7 @@ function blankState(){
     days:{},
     wrongBank:[],            /* נושאים שנפלו בהם — חוזרים לתרגול */
     settings:{theme:"auto",ts:1,clearfont:false,spaced:false,hc:false,rm:false,
-              calm:false,tts:true,rate:0.95,engine:"device",gvoice:"Kore",voice:"",lang:"",
+              calm:false,tts:true,rate:0.95,voice:"",lang:"",
               roundLen:8,keys:true,autoSteps:false}
   };
 }
@@ -995,42 +987,8 @@ function applyModes(){
 
 /* ============================================================
    6. הקראה קולית
-   שני מקורות קול:
-   · Gemini — קול טבעי שנשמע כמו אדם. דורש אינטרנט ומפתח.
-   · קול המכשיר — עובד תמיד ובלי רשת, אבל נשמע רובוטי.
-   הקצב אצל Gemini לא נשלח כפרמטר (ה-API מחזיר 400 על audioConfig),
-   אלא מתבקש במילים בתוך הטקסט עצמו.
+   קול המכשיר בלבד (speechSynthesis) — עובד תמיד ובלי רשת.
    ============================================================ */
-var GEM_VOICES=[
-  {id:"Kore",     t:"קורה",    g:"f", d:"רגוע וברור"},
-  {id:"Aoede",    t:"אאודה",   g:"f", d:"חם ונעים"},
-  {id:"Leda",     t:"לדה",     g:"f", d:"צעיר וקליל"},
-  {id:"Autonoe",  t:"אוטונואה",g:"f", d:"בהיר ומדויק"},
-  {id:"Puck",     t:"פאק",     g:"m", d:"ער וזורם"},
-  {id:"Charon",   t:"כארון",   g:"m", d:"עמוק ושקול"},
-  {id:"Orus",     t:"אורוס",   g:"m", d:"יציב ונינוח"},
-  {id:"Fenrir",   t:"פנריר",   g:"m", d:"נמרץ יותר"}
-];
-function gvName(id){for(var i=0;i<GEM_VOICES.length;i++)if(GEM_VOICES[i].id===id)return GEM_VOICES[i];return GEM_VOICES[0]}
-var GKEY="";
-function loadKey(){
-  try{
-    GKEY=localStorage.getItem("shlav-gkey")||"";
-    /* מפתח שכבר הוזן באחת האפליקציות האחרות באתר עובד גם כאן */
-    if(!GKEY)GKEY=localStorage.getItem("reader-gkey")||"";
-    if(!GKEY){
-      var raw=localStorage.getItem("mlh-state-v2");
-      if(raw){var o=JSON.parse(raw);if(o&&o.settings&&o.settings.googleKey)GKEY=String(o.settings.googleKey).trim()}
-    }
-  }catch(e){GKEY=""}
-  return GKEY;
-}
-function saveKey(k){
-  GKEY=String(k||"").trim();
-  try{GKEY?localStorage.setItem("shlav-gkey",GKEY):localStorage.removeItem("shlav-gkey")}catch(e){}
-}
-function hasKey(){return !!GKEY}
-
 function voices(){try{return window.speechSynthesis?speechSynthesis.getVoices():[]}catch(e){return[]}}
 /* הקולות נטענים אסינכרונית, ורק אז נורה voiceschanged. מי שמקריא
    לפני כן מקבל את ברירת המחדל של הדפדפן — לרוב קול אנגלי, גם כשמותקן
@@ -1111,81 +1069,6 @@ function deviceVoice(){
      לבחור — גרוע פחות מהקראה בשפה הלא נכונה. */
   return null;
 }
-/* "gemini:Kore" או "device" */
-/* מפתח חסום או שגוי (403/400/401) אינו תקלה חולפת. בלי הזיכרון
-   הזה כל משפט מנסה שוב את הרשת, ממתין, נכשל, ורק אז מדבר בקול
-   המכשיר — עיכוב לפני כל הקראה, ופס אדום שחוזר בלי סוף. */
-var gDead=false;
-function voiceMode(){
-  var v=state.settings.engine;
-  if(v==="gemini"&&hasKey()&&!gDead)return "gemini";
-  return "device";
-}
-
-var gAudio=null,gCache={};
-/* אלמנט שמע אחד, קבוע, שמשוחרר במגע הראשון. ב-iOS ההיתר להשמיע
-   ניתן לאלמנט ולא לדף, ואלמנט שנוצר אחרי fetch לא יקבל אותו
-   לעולם — ולכן הקול הטבעי היה שותק שם בלי שום שגיאה. */
-var GEL=null;
-var SILENT_WAV="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
-function gStop(){if(gAudio){try{gAudio.pause();gAudio.src=""}catch(e){}gAudio=null}}
-function gSynth(text,voiceName,rate){
-  /* ההנחיה נוקבת בשפה במפורש. בלעדיה המודל מנחש לפי הטקסט, ונופל
-     בדיוק על מה שמעורבב — נוסחה לטינית בתוך משפט לא־לטיני. וכשהיא
-     עברית קשיחה, המודל מקבל "בעברית" מעל טקסט ערבי ומקריא בעברית. */
-  var lead=rate<=0.75?_("קרא לאט מאוד וברור, בעברית: ")
-          :rate<=0.9 ?_("קרא לאט וברור, בעברית: ")
-          :rate>=1.15?_("קרא בקצב מהיר, בעברית: ")
-          :_("קרא בקצב טבעי, בעברית: ");
-  var body={contents:[{parts:[{text:lead+text}]}],
-    generationConfig:{responseModalities:["AUDIO"],
-      speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voiceName}}}}};
-  return fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key="+encodeURIComponent(GKEY),
-    {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
-  .then(function(r){
-    if(r.ok)return r.json();
-    /* גוגל מסביר בגוף התשובה למה סירב. בלי זה אי אפשר לדעת אם
-       המפתח שגוי, המודל חסום, או שהבקשה עצמה לא תקינה. */
-    return r.text().then(function(t){
-      var msg="";
-      try{var j=JSON.parse(t);msg=(j.error&&j.error.message)||""}catch(e){msg=String(t).slice(0,140)}
-      throw new Error(r.status+(msg?" — "+msg:""));
-    });
-  })
-  .then(function(d){
-    var parts=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
-    for(var i=0;i<parts.length;i++){
-      var pd=parts[i].inlineData;
-      if(pd&&pd.data){
-        var mt=pd.mimeType||"";
-        if(mt.indexOf("wav")>=0||mt.indexOf("pcm")>=0||mt.indexOf("L16")>=0)
-          return pcmToWav(pd.data)||("data:audio/wav;base64,"+pd.data);
-        return "data:audio/mp3;base64,"+pd.data;
-      }
-    }
-    throw new Error("לא התקבל שמע");
-  });
-}
-/* Gemini מחזיר PCM גולמי. בלי כותרת WAV אף דפדפן לא ינגן אותו. */
-function pcmToWav(b64){
-  try{
-    var bin=atob(b64),len=bin.length,buf=new Uint8Array(len),i;
-    for(i=0;i<len;i++)buf[i]=bin.charCodeAt(i);
-    var sr=24000,ch=1,bits=16;
-    var hdr=new ArrayBuffer(44+len),v=new DataView(hdr);
-    function ws(o,str){for(var k=0;k<str.length;k++)v.setUint8(o+k,str.charCodeAt(k))}
-    ws(0,"RIFF");v.setUint32(4,36+len,true);ws(8,"WAVE");ws(12,"fmt ");
-    v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);
-    v.setUint32(24,sr,true);v.setUint32(28,sr*ch*bits/8,true);
-    v.setUint16(32,ch*bits/8,true);v.setUint16(34,bits,true);
-    ws(36,"data");v.setUint32(40,len,true);
-    new Uint8Array(hdr,44).set(buf);
-    var bytes=new Uint8Array(hdr),out="";
-    for(var j=0;j<bytes.length;j+=0x8000)out+=String.fromCharCode.apply(null,bytes.subarray(j,j+0x8000));
-    return "data:audio/wav;base64,"+btoa(out);
-  }catch(e){return null}
-}
-
 /* ============================================================
    מעקב הקראה: הדגשת המילה הנאמרת
    ------------------------------------------------------------
@@ -1246,7 +1129,6 @@ function hlAt(c){
     }
   }
 }
-var ttsErr="",ttsState="";   /* "" · "ok" · "device" · "err" */
 
 /* ------------------------------------------------------------
    כשמנוע הדיבור של המכשיר נכשל — לומר את זה.
@@ -1518,50 +1400,9 @@ function speak(text){
   stopSpeak();
   /* מדברים — וכפתור ההקראה בכרטיס מתחלף לעצירה */
   saying=true; if(view==="practice")render();
-  if(voiceMode()!=="gemini"){
-    if(ttsState!=="device"){ttsState="device"}
-    speakDevice(text);return;
-  }
-  var my=_sayGen;   /* גם תשובת הרשת שמגיעה אחרי עצירה לא תושמע */
-  var name=state.settings.gvoice||"Kore",rate=state.settings.rate;
-  var ck=name+"|"+rate.toFixed(2)+"|"+text;
-  function play(url){
-    gStop();
-    /* משתמשים באלמנט ששוחרר במגע ולא יוצרים חדש. */
-    if(!GEL)GEL=new Audio();
-    gAudio=GEL; gAudio.src=url;
-    gAudio.onended=sayDone;
-    gAudio.play().catch(function(){speakDevice(text)});
-  }
-  if(gCache[ck]){play(gCache[ck]);return}
-  gSynth(text,name,rate).then(function(url){
-    if(my!==_sayGen)return;
-    gCache[ck]=url;ttsErr="";
-    if(ttsState!=="ok"){ttsState="ok";if(view==="practice")render()}
-    play(url);
-  }).catch(function(e){
-    /* נופלים חזרה לקול המכשיר במקום להשתתק, ורושמים למה — כדי
-       שמסך ההגדרות יוכל להראות את הסיבה במקום "לא עובד". */
-    ttsErr=String(e&&e.message||e);
-    if(/\b(400|401|403)\b|blocked|permission|API key|not valid/i.test(ttsErr)){
-      /* מפתח שנדחה לצמיתות אינו תקלה שחוזרת על עצמה — הוא הכרעה.
-         עוברים לקול המכשיר, שומרים, ומפסיקים להודיע על כך בכל
-         שאלה. ההסבר נשאר במסך ההגדרות, שם הוא רלוונטי. */
-      gDead=true;
-      state.settings.engine="device";
-      try{ save() }catch(e2){}
-      ttsState="device";
-      if(my===_sayGen)speakDevice(text);   /* המשפט הזה עדיין צריך להישמע — אלא אם נעצר */
-      render();
-      return;
-    }
-    ttsState="err";
-    if(my===_sayGen)speakDevice(text);
-    render();
-  });
+  speakDevice(text);
 }
 function stopSpeak(){
-  gStop();
   hlClear();
   _sayGen++; saying=false;   /* כל מקטע שממתין ב-setTimeout שייך מעכשיו לדור ישן */
   try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
@@ -1578,13 +1419,6 @@ try{document.addEventListener("visibilitychange",function(){
    ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
 try{document.addEventListener("pointerdown",function(){
   try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
-  /* ואותו דבר לאלמנט השמע: מקור שקט, play בתוך המגע עצמו. */
-  try{
-    if(!GEL)GEL=new Audio();
-    GEL.src=SILENT_WAV;
-    var pr=GEL.play();
-    if(pr&&pr.then)pr.then(function(){try{GEL.pause();GEL.currentTime=0}catch(e){}},function(){});
-  }catch(e){}
 },{once:true});}catch(e){}
 
 /* הודעה לקורא מסך */
@@ -4304,25 +4138,6 @@ function viewHome(){
   return h+'</main>';
 }
 /* ---------- תרגול ---------- */
-/* מצב הקול חייב להיות במסך התרגול עצמו. הודעה שמסבירה למה
-   הקול לא מה שביקשת חסרת ערך אם היא מוסתרת בהגדרות. */
-function voiceStrip(){
-  var s=state.settings;
-  if(!s.tts)return "";
-  /* מפתח שנדחה לצמיתות: אין מה להציע ואין על מה להתריע. ההקראה
-     עובדת בקול המכשיר, וההסבר ממתין במסך ההגדרות. */
-  if(gDead)return "";
-  if(s.engine==="gemini"&&hasKey()&&ttsState!=="err"){
-    if(ttsState!=="ok")return "";      /* עוד לא הושמע דבר — אין מה להודיע */
-    return '<div class="vstrip ok">'+ic("speaker",15)+'<span>קול טבעי · '+gvName(s.gvoice).t+'</span>'+
-      '<button class="btn btn-g" data-a="go" data-v="settings">להחליף</button></div>';
-  }
-  if(ttsState==="err")
-    return '<div class="vstrip bad">'+ic("speaker",15)+'<span>הקול הטבעי לא הגיב, ההקראה עברה לקול המכשיר</span>'+
-      '<button class="btn btn-g" data-a="go" data-v="settings">לבדוק</button></div>';
-  return '<div class="vstrip warn">'+ic("speaker",15)+'<span>ההקראה בקול המכשיר. יש קול טבעי שנשמע כמו אדם</span>'+
-    '<button class="btn btn-g" data-a="go" data-v="settings">להפעיל</button></div>';
-}
 function viewPractice(){
   if(!P.q)startRound();
   if(P.phase==="done")return viewSummary();
@@ -4339,7 +4154,6 @@ function viewPractice(){
         }).join("")+'</span>'+
       '<button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="stop">'+ic("pause",15)+' עצירה</button></div>'+
      '</div>';
-  h+=voiceStrip();
   h+='<div class="grid" style="grid-template-columns:minmax(0,1fr);margin-top:14px">';
   /* כרטיס השאלה */
   h+='<div class="card pad rise '+topicCls(q.topic)+'" style="border-top:3px solid var(--c)">';
@@ -4621,71 +4435,39 @@ function viewSettings(){
   h+='<div class="card pad" style="margin-top:14px"><div class="h2">הקראה</div>'+
      '<div style="margin-top:12px">'+togBtn("tts","הקראה קולית","קריאת שאלות, רמזים והסברים")+'</div>';
   if(s.tts){
-    h+='<p class="sub sm" style="margin-top:16px">מקור הקול</p><div class="seg" style="margin-top:8px">'+
-       '<button class="'+(s.engine==="gemini"?"on":"")+'" data-a="engine" data-n="gemini">קול טבעי</button>'+
-       '<button class="'+(s.engine!=="gemini"?"on":"")+'" data-a="engine" data-n="device">קול המכשיר</button>'+
-       '</div>';
     /* בדיקה במקום ניחוש: לחיצה אחת שאומרת אם הקול עובד. */
     h+='<div style="margin-top:12px"><button class="btn btn-p" data-a="vcheck">'+
        ic("speaker",17)+' בדיקת קול</button>'+
        (VCHK?'<p class="sub sm" style="margin-top:8px">'+esc(VCHK)+'</p>':"")+
        '<p class="sub sm" style="margin-top:6px;opacity:.7">'+esc(BUILD)+'</p></div>';
-    /* התנאי הוא המצב בפועל ולא ההעדפה השמורה: ברירת המחדל היא
-       "gemini", וכשאין מפתח האפליקציה מדברת בקול המכשיר — אבל
-       המסך הראה רק את תיבת המפתח, בלי אף קול לבחור מתוכו. */
-    if(s.engine==="gemini"&&hasKey()){
-        h+=[["f","קולות נשיים"],["m","קולות גבריים"]].map(function(grp){
-          return '<p class="sub sm" style="margin-top:14px">'+grp[1]+'</p><div class="grid vgrid" style="margin-top:8px">'+
-            GEM_VOICES.filter(function(g){return g.g===grp[0]}).map(function(g){
-              var on=(s.gvoice||"Kore")===g.id;
-              return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="gvoice" data-n="'+g.id+'">'+
-                '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"לשמוע")+'</span>'+
-                '<span class="tt"><b>'+g.t+'</b><span>'+g.d+'</span></span></button>';
-            }).join("")+'</div>';
-        }).join("")+
-          '<div class="row" style="margin-top:12px"><button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="clearkey">החלפת המפתח</button></div>';
-        if(ttsErr)h+='<div class="diag" style="margin-top:12px"><b>הקול הטבעי לא הגיב</b>'+
-          '<div class="sm" style="margin-top:3px">'+esc(ttsErr)+'</div>'+
-          '<div class="sm" style="margin-top:6px">בינתיים ההקראה עברה לקול המכשיר. אם כתוב כאן 400 או 403 — כנראה המפתח לא תקין או שהמודל לא זמין לחשבון.</div></div>';
-      }else{
-      if(s.engine==="gemini"){
-        h+='<div class="hintbox" style="margin-top:14px"><b>צריך מפתח חינמי פעם אחת</b>'+
-           '<div class="sm" style="margin-top:4px">הקול הטבעי מגיע מגוגל. נכנסים ל-'+
-           '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>'+
-           ', יוצרים מפתח ומדביקים אותו כאן. הוא נשמר במכשיר בלבד ולא נשלח לשום מקום חוץ מגוגל.</div></div>'+
-           '<input class="field" style="margin-top:10px;direction:ltr;text-align:left" placeholder="מדביקים כאן את המפתח" data-bind="gkey" />'+
-           '<p class="sub xs" style="margin-top:8px">עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.</p>';
-      }
-
-      /* רק קולות בשפת הממשק. הרשימה הציעה גם קולות אנגליים,
-         והכפתור שלידם אינו משמיע אלא בוחר — כך נשמר קול אנגלי
-         כקול שמקריא עברית. מה שלא יכול להיבחר, לא מוצג. */
-      var _fn=femNote();
-      if(_fn)h+='<div class="hintbox" style="margin-top:14px"><div class="sm">'+esc(_fn)+'</div></div>';
-      var vl=hebVoices();
-      if(!vl.length){
-        h+='<div class="hintbox" style="margin-top:14px"><b>לא נמצאו קולות במכשיר</b>'+
-           '<div class="sm" style="margin-top:3px">שווה לנסות את הקול הטבעי, או להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.</div></div>';
-      }else{
-        if(!hv.length)h+='<div class="hintbox" style="margin-top:14px"><b>אין קול עברי במכשיר</b>'+
-          '<div class="sm" style="margin-top:3px">הקולות שברשימה ידברו עברית במבטא זר. הקול הטבעי יישמע הרבה יותר טוב.</div></div>';
-        /* שלוש קבוצות במקום רשימה שטוחה. מי שלא זוהה מופיע בנפרד
-           ולא מסווג בניחוש — עדיף "לא ידוע" מאשר תווית שגויה. */
-        var vbtn=function(v){
-          var on=(deviceVoice()||{}).voiceURI===v.voiceURI;
-          var heb=/^(he|iw)/i.test(v.lang||"");
-          return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="voice" data-u="'+esc(v.voiceURI)+'">'+
-            '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"לשמוע")+'</span>'+
-            '<span class="tt"><b>'+esc(v.name)+'</b><span>'+esc(v.lang)+(heb?" · עברית":"")+'</span></span></button>';
-        };
-        [["f","קולות נשיים"],["m","קולות גבריים"],["?","קולות במכשיר"]].forEach(function(grp){
-          var gv=vl.filter(function(v){return guessGender(v)===grp[0]}).slice(0,24);
-          if(!gv.length)return;
-          h+='<p class="sub sm" style="margin-top:14px">'+grp[1]+'</p>'+
-             '<div class="grid" style="margin-top:8px;gap:8px;max-height:340px;overflow-y:auto">'+
-             gv.map(vbtn).join("")+'</div>';
-        });
-      }
+    /* רק קולות בשפת הממשק. הרשימה הציעה גם קולות אנגליים,
+       והכפתור שלידם אינו משמיע אלא בוחר — כך נשמר קול אנגלי
+       כקול שמקריא עברית. מה שלא יכול להיבחר, לא מוצג. */
+    var _fn=femNote();
+    if(_fn)h+='<div class="hintbox" style="margin-top:14px"><div class="sm">'+esc(_fn)+'</div></div>';
+    var vl=hebVoices();
+    if(!vl.length){
+      h+='<div class="hintbox" style="margin-top:14px"><b>לא נמצאו קולות במכשיר</b>'+
+         '<div class="sm" style="margin-top:3px">אפשר להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.</div></div>';
+    }else{
+      if(!hv.length)h+='<div class="hintbox" style="margin-top:14px"><b>אין קול עברי במכשיר</b>'+
+        '<div class="sm" style="margin-top:3px">הקולות שברשימה ידברו עברית במבטא זר.</div></div>';
+      /* שלוש קבוצות במקום רשימה שטוחה. מי שלא זוהה מופיע בנפרד
+         ולא מסווג בניחוש — עדיף "לא ידוע" מאשר תווית שגויה. */
+      var vbtn=function(v){
+        var on=(deviceVoice()||{}).voiceURI===v.voiceURI;
+        var heb=/^(he|iw)/i.test(v.lang||"");
+        return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="voice" data-u="'+esc(v.voiceURI)+'">'+
+          '<span class="chip'+(on?" a":"")+'">'+(on?"נבחר":"לשמוע")+'</span>'+
+          '<span class="tt"><b>'+esc(v.name)+'</b><span>'+esc(v.lang)+(heb?" · עברית":"")+'</span></span></button>';
+      };
+      [["f","קולות נשיים"],["m","קולות גבריים"],["?","קולות במכשיר"]].forEach(function(grp){
+        var gv=vl.filter(function(v){return guessGender(v)===grp[0]}).slice(0,24);
+        if(!gv.length)return;
+        h+='<p class="sub sm" style="margin-top:14px">'+grp[1]+'</p>'+
+           '<div class="grid" style="margin-top:8px;gap:8px;max-height:340px;overflow-y:auto">'+
+           gv.map(vbtn).join("")+'</div>';
+      });
     }
     h+='<p class="sub sm" style="margin-top:16px">מהירות דיבור — <span id="ratev">'+s.rate.toFixed(2)+'</span></p>'+
        '<input type="range" min="0.6" max="1.3" step="0.05" value="'+s.rate+'" data-slide="rate" style="margin-top:6px" />'+
@@ -5019,10 +4801,7 @@ function onAction(a,el){
   if(a==="ts"){s.ts=parseInt(el.getAttribute("data-n"),10);save();applyModes();render();return}
   if(a==="theme"){s.theme=el.getAttribute("data-n");save();applyModes();render();return}
   if(a==="rlen"){s.roundLen=parseInt(el.getAttribute("data-n"),10);save();render();return}
-  if(a==="engine"){s.engine=el.getAttribute("data-n");ttsErr="";ttsState="";gDead=false;save();render();speak(VOICE_SAMPLE);return}
-  if(a==="gvoice"){s.gvoice=el.getAttribute("data-n");ttsErr="";ttsState="";save();render();speak(VOICE_SAMPLE);return}
-  if(a==="clearkey"){saveKey("");ttsErr="";render();return}
-  if(a==="voice"){s.voice=el.getAttribute("data-u");s.engine="device";save();render();speak(VOICE_SAMPLE);return}
+  if(a==="voice"){s.voice=el.getAttribute("data-u");save();render();speak(VOICE_SAMPLE);return}
   if(a==="vcheck"){voiceCheck();return}
   if(a==="test"){speak(VOICE_SAMPLE);return}
   if(a==="pick"){
@@ -5062,11 +4841,6 @@ document.addEventListener("input",function(e){
   var el=e.target;
   if(!el.dataset)return;
   if(el.dataset.bind==="name"){state.name=el.value;save();return}
-  if(el.dataset.bind==="gkey"){
-    var k=String(el.value||"").trim();
-    /* מציירים מחדש רק כשהמפתח נראה שלם, אחרת הפוקוס קופץ בכל תו */
-    if(/^AIza[\w-]{25,}$/.test(k)){saveKey(k);ttsErr="";render();speak(VOICE_SAMPLE)}
-    return}
   if(el.dataset.bind==="fq"){fq=el.value;
     var pos=el.selectionStart;render();
     var again=document.querySelector('[data-bind="fq"]');
@@ -5281,8 +5055,15 @@ function examUrl(spec){
   var base=location.origin+location.pathname;
   return base+"#x="+encodeExam(spec);
 }
+/* wa.me מקבל רק מספר בינלאומי בלי אפס מוביל. מורה שהקליד 050-8554380
+   כמו שמקלידים בטלפון קיבל אצל התלמיד "לא ניתן לבדוק את מספר הטלפון…
+   חסרה קידומת חיוג", והתשובות לא נשלחו. אפס מוביל הוא מספר ישראלי
+   מקומי ומקבל 972; "00" בהתחלה הוא קידומת בינלאומית ונופל; מספר
+   שכבר מתחיל בקידומת מדינה נשאר כפי שהוא. */
 function waLink(text,phone){
   var p=String(phone||"").replace(/[^0-9]/g,"");
+  if(p.indexOf("00")===0)p=p.slice(2);
+  else if(p.charAt(0)==="0")p="972"+p.slice(1);
   return "https://wa.me/"+p+"?text="+encodeURIComponent(text);
 }
 
@@ -5493,10 +5274,10 @@ var MK={open:"",paste:"",msg:null,del:""};
 function viewMarks(){
   var h='<div class="wrap" style="padding-block:22px">';
   h+='<h1 class="h1">ציונים</h1>'+
-     '<p class="sub">מדביקים כאן את הקוד שהתלמיד שלח בוואטסאפ. הציון מחושב מחדש מהתשובות עצמן, '+
-     'ולא נלקח ממה שהתלמיד כתב.</p>';
-  h+='<div class="row" style="margin-top:14px"><button class="btn btn-p" data-a="go" data-v="exam">'+
+     '<p class="sub">לוחצים על הקישור שהתלמיד שלח בוואטסאפ, או מדביקים כאן את הקוד. הציון מחושב מחדש מהתשובות עצמן, ולא נלקח ממה שהתלמיד כתב.</p>';
+  h+='<div class="row" style="margin-top:14px"><button class="btn btn-p" style="font-size:1.2rem;padding:14px 28px" data-a="go" data-v="exam">'+
      ic("plus",17)+' מבחן חדש</button></div>';
+  if(MK.msg&&!MK.msg.id)h+='<p class="chip '+(MK.msg.ok?"ok":"bad")+'" style="margin-top:10px">'+esc(MK.msg.m)+'</p>';
 
   if(!EX.list.length){
     h+='<div class="card pad" style="margin-top:16px"><p class="sub" style="margin:0">'+
@@ -5961,6 +5742,14 @@ function sitGo(i){
   SIT.i=clamp(i,0,SIT.qs.length-1); SIT.phase="ask";
   window.scrollTo(0,0); render();
 }
+/* התוצאה נשלחת כקישור ולא כקוד: המורה לוחץ, האפליקציה נפתחת אצלו
+   וקולטת. הקוד עצמו יושב אחרי #r=, ולכן גם הדבקה של הקישור השלם
+   בתיבת הקוד עובדת — codeOf מחלץ אותו משם. */
+function resultUrl(code){return location.origin+location.pathname+"#r="+code}
+function codeOf(raw){
+  var m=String(raw||"").match(/#r=([A-Za-z0-9\-_]+)/);
+  return (m?m[1]:String(raw||"")).trim();
+}
 function sitFinish(){
   SIT.phase="done";
   sitTimerOff();
@@ -6050,7 +5839,7 @@ function viewSit(){
   }
   /* סיום */
   var g=sitGrade(),msg;
-  msg=(SIT.name||"תלמיד")+" — "+esc(sp.t||"מבחן")+"\nציון: "+g.pct+" ("+g.ok+"/"+g.n+")\nקוד:\n"+SIT.code;
+  msg=(SIT.name||"תלמיד")+" — "+esc(sp.t||"מבחן")+"\nציון: "+g.pct+" ("+g.ok+"/"+g.n+")\nלקליטת התוצאה אצל המורה — לוחצים על הקישור:\n"+resultUrl(SIT.code);
   var h3='<div class="wrap" style="padding-block:26px;max-width:640px">';
   h3+='<div class="card pad"><h1 class="h1">סיימתם</h1>'+
       '<p class="sub">'+esc(sp.t||"מבחן")+'</p>'+
@@ -6185,31 +5974,9 @@ function examAction(a,el){
   if(a==="mkadd"){
     var ex=exFind(el.getAttribute("data-i")); if(!ex)return true;
     var ta=$("#mkPaste"),raw=ta?ta.value:"";
-    var res=decodeResult(raw);
+    var res=decodeResult(codeOf(raw));
     if(!res){MK.msg={id:ex.id,ok:false,m:"לא הצלחנו לקרוא את הקוד. נסו להעתיק אותו שוב, במלואו."};render();return true}
-    if(res.i!==ex.id){
-      var other=exFind(res.i);
-      MK.msg={id:ex.id,ok:false,m:other?"הקוד הזה שייך למבחן „"+(other.spec.t||"מבחן")+"”.":
-        "הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה."};
-      render(); return true;
-    }
-    if(res.a.length!==ex.spec.q.length){
-      MK.msg={id:ex.id,ok:false,m:"מספר התשובות בקוד אינו תואם למבחן."};render();return true}
-    var g=gradeResult(ex.spec,res);
-    var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
-    /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
-    /* הגשה חדשה מחליפה קודמת רק כששני השמות זהים אחרי נירמול, והשם
-       אינו ריק. בלי זה כל ההגשות בלי שם נראו כאותו תלמיד ודרסו זו את
-       זו בשקט, וגם "דני" מול "דני  " (רווח כפול פנימי) נחשבו לשניים. */
-    var nrm=function(x){return String(x==null?"":x).replace(/\s+/g," ").trim()};
-    var sn=nrm(sub.name);
-    var k2=sn?(ex.subs||[]).findIndex(function(s){return nrm(s.name)===sn}):-1;
-    if(!ex.subs)ex.subs=[];
-    if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
-    exSave();
-    MK.msg={id:ex.id,ok:true,m:(sub.name||"תלמיד")+" נקלט · "+g.pct+" ("+g.ok+"/"+g.n+")"+
-      (sub.valid?"":" · שימו לב: הקוד לא תואם לעצמו")};
-    if(ta)ta.value="";
+    if(mkImport(ex,res)&&ta)ta.value="";
     render(); return true;
   }
 
@@ -6231,6 +5998,45 @@ function examAction(a,el){
 
 /* קליטת מבחן מהכתובת. עושים את זה לפני ה-render הראשון, אחרת
    התלמיד רואה לרגע את מסך הבית של אפליקציה שהוא לא מכיר. */
+/* קולט תוצאה אחת למבחן. מחזיר true כשנשמרה; בכל מקרה משאיר הודעה
+   ב-MK.msg למסך הציונים. משמש גם את תיבת ההדבקה וגם את הקישור. */
+function mkImport(ex,res){
+    if(res.i!==ex.id){
+      var other=exFind(res.i);
+      MK.msg={id:ex.id,ok:false,m:other?"הקוד הזה שייך למבחן „"+(other.spec.t||"מבחן")+"”.":
+        "הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה."};
+      return false;
+    }
+    if(res.a.length!==ex.spec.q.length){
+      MK.msg={id:ex.id,ok:false,m:"מספר התשובות בקוד אינו תואם למבחן."};return false}
+    var g=gradeResult(ex.spec,res);
+    var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
+    /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
+    /* הגשה חדשה מחליפה קודמת רק כששני השמות זהים אחרי נירמול, והשם
+       אינו ריק. בלי זה כל ההגשות בלי שם נראו כאותו תלמיד ודרסו זו את
+       זו בשקט, וגם "דני" מול "דני  " (רווח כפול פנימי) נחשבו לשניים. */
+    var nrm=function(x){return String(x==null?"":x).replace(/\s+/g," ").trim()};
+    var sn=nrm(sub.name);
+    var k2=sn?(ex.subs||[]).findIndex(function(s){return nrm(s.name)===sn}):-1;
+    if(!ex.subs)ex.subs=[];
+    if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
+    exSave();
+    MK.msg={id:ex.id,ok:true,m:(sub.name||"תלמיד")+" נקלט · "+g.pct+" ("+g.ok+"/"+g.n+")"+
+      (sub.valid?"":" · שימו לב: הקוד לא תואם לעצמו")};
+    return true;
+}
+/* קליטת תוצאה מהכתובת — הצד של המורה. הכתובת מנוקה מיד, כדי שרענון
+   לא יקלוט שוב. */
+function resultFromUrl(){
+  var m=String(location.hash||"").match(/^#r=(.+)$/);
+  if(!m)return false;
+  var res=decodeResult(m[1]),ex=res?exFind(res.i):null;
+  try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
+  if(!res)MK.msg={id:"",ok:false,m:"לא הצלחנו לקרוא את הקוד. נסו להעתיק אותו שוב, במלואו."};
+  else if(!ex)MK.msg={id:"",ok:false,m:"הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה."};
+  else if(mkImport(ex,res))MK.open=ex.id;
+  view="marks"; return true;
+}
 function examFromUrl(){
   var m=String(location.hash||"").match(/^#x=(.+)$/);
   if(!m)return false;
@@ -6256,15 +6062,14 @@ function viewBadExam(msg){
    19. הפעלה
    ============================================================ */
 load();
-loadKey();
 exLoad();
 applyModes();
-examFromUrl();
+examFromUrl()||resultFromUrl();
 /* מעבר לקישור מבחן כשהאפליקציה כבר פתוחה הוא ניווט בתוך אותו מסמך:
    הדפדפן לא טוען מחדש, ולכן ההפעלה לא רצה שוב. בלי זה תלמיד שכבר
    פתח את האפליקציה ואז לחץ על הקישור בוואטסאפ פשוט לא רואה כלום. */
 window.addEventListener("hashchange",function(){
-  if(examFromUrl()){stopSpeak();window.scrollTo(0,0);render()}
+  if(examFromUrl()||resultFromUrl()){stopSpeak();window.scrollTo(0,0);render()}
   else if(view==="sit"||view==="badexam"||view==="oldexam"){view="home";render()}
 });
 try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(view==="settings")render()}}catch(e){}
@@ -6278,7 +6083,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t42-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t45-pwa1").catch(function(){});
   });
 }
 </script>
