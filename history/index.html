@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0d1b1a" media="(prefers-color-scheme:dark)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
 /* ============================================================
    מפנה — היסטוריה לחטיבת הביניים
@@ -21,6 +21,7 @@
    כל המידות ב-rem, כדי שהגדלת טקסט תגדיל את הכול יחד.
    ============================================================ */
 :root{
+  --ar:"Noto Sans Arabic",system-ui,"Segoe UI",Arial,sans-serif;
   --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
   --en:"Lexend","Heebo",system-ui,"Segoe UI",Arial,sans-serif;
   --bg:#f4f7f6; --surface:#ffffff; --surface2:#e9efee;
@@ -38,6 +39,14 @@
   --c-talk:#c2410c;  --cs-talk:#fde5d8;    /* מדוברת      */
   --c-read:#6d28d9;  --cs-read:#eae2fd;    /* ספרותית     */
 }
+
+/* Heebo, Fredoka ו-Assistant אינם מכילים גליפים ערביים. בלי
+   המשפחה הזאת הממשק הערבי נופל לגופן ברירת המחדל של המערכת —
+   נמדד: הוא הוצג כאן ב-Heebo. Noto Sans Arabic נטען מאותה בקשת
+   גופנים שכבר קיימת, ולכן אין כאן תלות חיצונית חדשה, וקובצי
+   הגופן נמשכים רק כשבאמת מוצג טקסט ערבי. */
+html[lang="ar"] body,html[lang="ar"] input,html[lang="ar"] button,
+html[lang="ar"] textarea,html[lang="ar"] select{font-family:var(--ar)}
 :root[data-theme="dark"]{
   --bg:#0d1b1a; --surface:#142624; --surface2:#1c3230;
   --ink:#e6f0ee; --muted:#9ab0aa; --faint:#6f8781; --line:#264240;
@@ -941,7 +950,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m36 · 2026-09-02";
+var BUILD="m37 · 2026-09-02";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -5810,7 +5819,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m36-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m37-pwa1").catch(function(){});
   });
 }
 </script>

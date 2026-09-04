@@ -1,5 +1,6 @@
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');
 (async()=>{
+let failed=0;   /* בלי זה הכלי מדפיס ממצאים ויוצא 0 */
  const b=await chromium.launch();
  for(const app of process.argv.slice(2)){
   const ctx=await b.newContext({locale:'he-IL'});const page=await ctx.newPage();
@@ -57,6 +58,9 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');
   });
   const constant=r.rows.filter(x=>x.distinct<=1);
   const nearConst=r.rows.filter(x=>x.distinct>1&&x.topShare>=95);
+  /* קו הבסיס כאן הוא אפס — ראו README. bad, רמה עם תשובה קבועה
+     ושגיאת JS הם כולם באגים אמיתיים, ולכן הם מפילים את הריצה. */
+  if(r.bad.noAns||r.bad.multi||r.bad.dupe||r.bad.nan||constant.length||errs.length)failed++;
   console.log('== '+app,JSON.stringify(r.bad),r.levels+' levels');
   console.log('   constant-answer levels:',constant.length?constant.map(x=>x.id+' L'+x.lv).join(', '):'none');
   console.log('   >=95% same answer:',nearConst.length?nearConst.map(x=>x.id+' L'+x.lv+'('+x.topShare+'%)').join(', '):'none');
@@ -64,4 +68,5 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');
   await ctx.close();
  }
  await b.close();
+ process.exitCode = failed ? 1 : 0;
 })();

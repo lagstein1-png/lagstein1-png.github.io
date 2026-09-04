@@ -113,14 +113,13 @@ service worker וקאשינג, מחזור חיים של PWA (`install` / `activa
 
 ## סדר ההרצה
 
-    node .claude/qa/serve.js &
-    node .claude/qa/parse.js $(ls index.html */index.html)
-    node .claude/qa/smoke.js . $(ls -d */ | sed 's:/$::')
+    node .claude/qa/all.js            # הכול, ומרים את השרת בעצמו
+    node .claude/qa/all.js --fast     # בלי entropy ו-options
 
 **אל תקליד את רשימת האפליקציות ביד.** הרשימה שהיתה כאן קודם דילגה
 על `ulpan/` ועל `bagrut-806/` פשוט מפני שהן נולדו אחריה, ובדיקה
-שלא רצה על אפליקציה היא בדיקה שעברה בה באפס. גלה את הרשימה מהדיסק,
-כמו ש-`cache.js` כבר עושה ב-`allApps()`.
+שלא רצה על אפליקציה היא בדיקה שעברה בה באפס. `all.js` מחזיק את
+הרשימה במקום אחד — ושם, ורק שם, מוסיפים אפליקציה חדשה.
 
 **`parse.js` עיוור ל-`bagrut-806`, וזו לא תקלה בכלי.** הוא סורק
 בלוקי `<script>` פנימיים בלבד, ושם כל הקוד יושב בקבצי `.js` חיצוניים.

@@ -36,14 +36,13 @@ tools: Bash, Read, Edit, Write, Grep, Glob
 המדד: כמה תשובות נכונות **שונות** יוצאות ב-500 הגרלות של אותו
 נושא ואותה רמה.
 
-    node .claude/qa/serve.js &
-    node .claude/qa/entropy.js math-app math-teen math-uni math-uni2 \
-      math-uni3 english history ulpan
+    node .claude/qa/all.js        # מרים את השרת ומריץ גם entropy וגם options
 
-שמונה אלה הן **כל** האפליקציות שמגדירות `TOPICS` ו-`buildQ`, ולכן
-כל מה שיש ל-`entropy.js` ול-`options.js` לרוץ עליו. `bagrut-806`
-אינה ביניהן: היא נשענת על מאגר כתוב ב-`data/exams.js` ולא על מחולל,
-ושני הכלים האלה אינם חלים עליה. אל תסיקי מ"אין ממצאים" שנבדקה.
+הרשימה שהיתה כאן מנתה שלוש אפליקציות מתוך אלה שיש להן מחולל, ולכן
+כל השאר לא נבדקו מעולם. `all.js` מחזיק אותה במקום אחד. `bagrut-806`
+אינה שם ובכוונה: היא נשענת על מאגר כתוב ב-`data/exams.js` ולא על
+מחולל, ו-`entropy.js` ו-`options.js` אינם חלים עליה כלל —
+`exam806.js` הוא שלה. אל תסיקי מ"אין ממצאים" שנבדקה.
 
 השורה `constant-answer levels` צריכה להיות ריקה. אם רמה מחזירה
 תשובה אחת ב-500 מתוך 500 — סטודנט שמזהה את הדפוס מקבל 100% בלי

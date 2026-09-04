@@ -1,5 +1,6 @@
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');
 (async()=>{
+let failed=0;   /* בלי זה הכלי מדפיס JS ERRORS ויוצא 0 */
  const b=await chromium.launch();
  for(const app of process.argv.slice(2)){
   const ctx=await b.newContext({locale:'he-IL'});const page=await ctx.newPage();
@@ -23,6 +24,10 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');
     }
     return {rows:rows.sort((a,b)=>b.pct-a.pct),tot,under,multi,none,levels:LV.length};
   });
+  /* under4 אינו מפיל: יש לו קו בסיס מתועד שאינו אפס (math-uni 2.2%,
+     שלוש שורות שנבדקו ונמצאו תקינות — ראו README). multiCorrect,
+     noCorrect ושגיאת JS כן: לאלה קו הבסיס הוא אפס. */
+  if(r.multi||r.none||errs.length)failed++;
   console.log('== '+app+'  levels='+r.levels+'  total='+r.tot+
     '  under4='+r.under+' ('+(r.under/r.tot*100).toFixed(1)+'%)  multiCorrect='+r.multi+'  noCorrect='+r.none);
   r.rows.slice(0,8).forEach(x=>console.log('     '+x.row.padEnd(16)+x.pct+'%'));
@@ -30,4 +35,5 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');
   await ctx.close();
  }
  await b.close();
+ process.exitCode = failed ? 1 : 0;
 })();
