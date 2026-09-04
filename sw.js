@@ -1,9 +1,13 @@
 /* =====================================================================
-   Service worker — אחת לכל אפליקציה, זהה בכולן.
-   הגרסה מגיעה מ-index.html דרך ?v= בכתובת הרישום, כדי שיהיה מקור אמת
-   אחד: שינוי הגרסה שם משנה את כתובת הסקריפט, הדפדפן רואה worker חדש,
-   מתקין אותו ומוחק את המטמון הישן. בלי זה שינוי בקוד לא מגיע למי
-   שכבר התקין את האפליקציה, וזו התקלה שהכי קשה לאבחן.
+   Service worker — אחת לכל אפליקציה, זהה בכולן חוץ משם המטמון.
+   הגרסה מגיעה מ-index.html דרך ?v= בכתובת הרישום: שינוי הגרסה שם משנה
+   את כתובת הסקריפט, הדפדפן רואה worker חדש, מתקין אותו ומוחק את המטמון
+   הישן. בלי זה שינוי בקוד לא מגיע למי שכבר התקין את האפליקציה, וזו
+   התקלה שהכי קשה לאבחן.
+
+   שים לב: אין כאן מקור אמת אחד. מחרוזת ה-?v= שברישום מקודדת קשיח
+   ב-index.html ואינה נגזרת מ-var BUILD. עדכון BUILD לבדו לא מנקה את
+   המטמון. עדכנת אחד — עדכן את השני.
    ===================================================================== */
 const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "site-" + V;
@@ -26,20 +30,43 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;   /* הקראה בענן לא נכנסת למטמון */
+  /* ה-worker הזה רשום ב-scope "/" ולכן הוא מטפל גם בביקור הראשון
+     באפליקציה אחרת — לפני שה-worker שלה נרשם. שמירת התשובה ההיא היא
+     כפילות גמורה: מהרגע שה-worker שלה קיים הוא זה שמגיש את הנתיב,
+     והעותק שכאן לא ייקרא עוד לעולם. נמדד בכרום אחרי סיור בכל
+     האפליקציות: 5,356KB זרים במטמון הזה מול 172KB משלו.
+
+     לכן מגישים רק את מה ששייך לדף הבית — קובץ בשורש, או אחת משלוש
+     התיקיות שאין להן worker משלהן. אפליקציה חדשה נופלת מכאן החוצה
+     מאליה, בלי שצריך לגעת בקובץ. */
+  const seg = url.pathname.split("/");
+  if (seg.length > 2 && seg[1] !== "img" && seg[1] !== "legal" && seg[1] !== "voice") return;
   /* ניווט: רשת קודם כדי שגרסה חדשה תגיע מיד, ומטמון כשאין רשת */
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).then(r => {
-      const copy = r.clone();
-      caches.open(CACHE).then(c => c.put("./", copy)).catch(() => {});
+      /* רק תשובה תקינה נשמרת. בלי הבדיקה, דף 404 של GitHub Pages נשמר
+         כקליפת האפליקציה ומוגש אופליין במקומה. */
+      if (r && r.status === 200) {
+        const copy = r.clone();
+        /* תחת כתובת הבקשה עצמה, לא תחת "./" — worker אחד מגיש כמה דפים
+           (/legal/, /voice/), ו-"./" היה מקבל את התוכן של האחרון שנטען. */
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+      }
       return r;
-    }).catch(() => caches.match("./index.html").then(r => r || caches.match("./"))));
+    }).catch(() => caches.open(CACHE).then(c =>
+      c.match(req).then(r => r || c.match("./index.html")).then(r => r || c.match("./")))));
     return;
   }
-  e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(r => {
+  /* משאב: מטמון קודם — אבל רק המטמון של האפליקציה הזאת. caches.match
+     הגלובלי סורק את כל המטמונים ב-origin, ולכן היה מגיש עותק ש-worker
+     של אפליקציה אחרת שמר. שנים־עשר קובצי sw.js מקדימים-קאשינג את legal/terms.js,
+     וה-activate של כל אחת מוחק רק את התחילית שלה — כך שתיקון שם היה
+     נתקע לצמיתות מאחורי עותק זר. */
+  e.respondWith(caches.open(CACHE).then(c => c.match(req).then(hit => hit || fetch(req).then(r => {
     if (r && r.status === 200) {
       const copy = r.clone();
-      caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+      c.put(req, copy).catch(() => {});
     }
     return r;
-  }).catch(() => hit)));
+  }).catch(() => hit))));
 });
