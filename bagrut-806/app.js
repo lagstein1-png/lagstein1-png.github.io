@@ -94,10 +94,15 @@
           need(typeof sq.points === "number", sa + ": points חייב להיות מספר.");
           if (sq.latex) need(!!sq.speech, sa + ": יש latex בלי speech.");
           if (sq.finalAnswer) {
-            need(["number", "expression", "text"].indexOf(sq.finalAnswer.type) >= 0,
-                 sa + ": finalAnswer.type חייב להיות number, expression או text.");
-            need(sq.finalAnswer.value !== undefined && sq.finalAnswer.value !== null,
-                 sa + ": finalAnswer בלי value.");
+            need(["number", "expression", "text", "open"].indexOf(sq.finalAnswer.type) >= 0,
+                 sa + ": finalAnswer.type חייב להיות number, expression, text או open.");
+            /* open הוא סעיף שאין לו תשובה יחידה — "הוכיחו ש…",
+               "הסבירו", "שרטטו". `value` בו הוא תשובת מופת להשוואה
+               עצמית, ולכן הוא רשות. בשאר הסוגים הוא חובה. */
+            if (sq.finalAnswer.type !== "open") {
+              need(sq.finalAnswer.value !== undefined && sq.finalAnswer.value !== null,
+                   sa + ": finalAnswer בלי value.");
+            }
           }
           need(Array.isArray(sq.steps) && sq.steps.length, sa + ": אין steps.");
           (sq.steps || []).forEach(function (st, k) {
@@ -160,8 +165,13 @@
       .replace(/\s+/g, " ");
   }
   /* מחזיר null כשאין מה לבדוק, אחרת {ok, msg} */
+  /* סעיף פתוח — אין מה להשוות אליו. סעיף בלי finalAnswer כלל נחשב
+     פתוח גם הוא: עדיף להציג אותו כ"לבדיקה עצמית" מאשר לסמן אותו
+     כשגוי, וזה בדיוק מה שקרה עד כאן. */
+  function isOpen(sq) { return !sq || !sq.finalAnswer || sq.finalAnswer.type === "open"; }
+
   function checkAnswer(fa, raw) {
-    if (!fa) return null;
+    if (!fa || fa.type === "open") return null;
     if (!String(raw == null ? "" : raw).trim()) return { ok: false, msg: "עוד לא כתבתם תשובה." };
     if (fa.type === "number") {
       var v = parseNum(raw);
@@ -181,7 +191,8 @@
   var TYPE_HINT = {
     number: "מספר. אפשר גם שבר (7/20) וגם אחוז (35%).",
     expression: "ביטוי. חזקה נכתבת עם ^, למשל 3x^2.",
-    text: "מילה או שתיים."
+    text: "מילה או שתיים.",
+    open: "סעיף פתוח — כתבו את התשובה במילים שלכם. אין כאן בדיקה אוטומטית."
   };
 
   /* ============================================================
@@ -316,7 +327,13 @@
                "סעיף " + sq.letter, "ask-block");
 
     /* --- תיבת התשובה --- */
-    if (sq.finalAnswer) {
+    if (isOpen(sq)) {
+      h += '<div class="answer" data-nospeak>' +
+        '<label for="ans">התשובה שלכם</label>' +
+        '<p class="sub">' + esc(TYPE_HINT.open) + "</p>" +
+        '<textarea id="ans" class="field ta" rows="4" spellcheck="false" ' +
+        'placeholder="כתבו כאן">' + esc(draft[id] || "") + "</textarea></div>";
+    } else {
       h += '<div class="answer" data-nospeak>' +
         '<label for="ans">התשובה שלכם</label>' +
         '<p class="sub">' + esc(TYPE_HINT[sq.finalAnswer.type] || "") + "</p>" +
@@ -354,7 +371,9 @@
           return sayBlock('<p><b data-nospeak>שלב ' + (k + 1) + "</b> " + esc(st.detail) + "</p>",
                           "שלב " + (k + 1), "step-block");
         }).join("") +
-        (sq.finalAnswer ? '<p class="final" data-nospeak><b>התשובה: </b>' + ansTxt(sq.finalAnswer.value) + "</p>" : "") +
+        (sq.finalAnswer && sq.finalAnswer.value !== undefined && sq.finalAnswer.value !== null ?
+          '<p class="final" data-nospeak><b>' + (isOpen(sq) ? "תשובת מופת: " : "התשובה: ") + "</b>" +
+          ansTxt(sq.finalAnswer.value) + "</p>" : "") +
         "</div>";
     }
     h += "</div></article>";
@@ -401,12 +420,20 @@
     sim = { examId: ex.id, startedAt: Date.now(), answers: {}, done: false };
     simSave(); view = "simrun"; render(); tick();
   }
+  /* סעיף פתוח אינו נכשל — הוא יוצא מהמניין. עד כאן הוא נספר כשגוי
+     והנקודות שלו נשארו במכנה, ולכן תלמיד שכתב הוכחה מושלמת קיבל
+     עליה אפס. בבגרות אמיתית יש "הוכיחו ש…", "הסבירו" ו"שרטטו"
+     כמעט בכל שאלון, ולכן זה לא מקרה קצה אלא רוב התוכן. */
   function simGrade() {
-    var per = {}, got = 0, tot = 0, rows = [];
+    var per = {}, got = 0, tot = 0, rows = [], open = [], openPts = 0;
     allSubs().forEach(function (s) {
-      var fa = s.sq.finalAnswer;
       var raw = sim.answers[s.id] || "";
-      var r = fa ? checkAnswer(fa, raw) : null;
+      if (isOpen(s.sq)) {
+        openPts += s.sq.points;
+        open.push({ id: s.id, q: s.q, sq: s.sq, raw: raw });
+        return;
+      }
+      var r = checkAnswer(s.sq.finalAnswer, raw);
       var ok = !!(r && r.ok);
       tot += s.sq.points; if (ok) got += s.sq.points;
       var p = per[s.q.topic] || (per[s.q.topic] = { topic: s.q.topic, got: 0, tot: 0, wrong: [] });
@@ -416,7 +443,8 @@
     var list = [];
     for (var t in per) list.push(per[t]);
     list.sort(function (a, b) { return (a.got / a.tot) - (b.got / b.tot); });
-    return { got: got, tot: tot, pct: tot ? Math.round(100 * got / tot) : 0, byTopic: list, rows: rows };
+    return { got: got, tot: tot, pct: tot ? Math.round(100 * got / tot) : 0,
+             byTopic: list, rows: rows, open: open, openPts: openPts };
   }
   function simFinish() {
     if (!sim || sim.done) return;
@@ -496,12 +524,16 @@
           '<div class="row" data-nospeak><b>סעיף ' + esc(sq.letter) + "</b>" +
           '<span class="pts">' + sq.points + " נק'</span></div>" +
           sayBlock("<p>" + esc(sq.text) + "</p>" + renderMath(sq.latex, sq.speech), "סעיף " + sq.letter) +
-          (sq.finalAnswer ?
-            '<div class="answer" data-nospeak><label class="sr" for="a-' + esc(id) + '">תשובה לסעיף ' + esc(sq.letter) + "</label>" +
-            '<input id="a-' + esc(id) + '" class="field" data-sim="' + esc(id) + '" ' +
-            'inputmode="' + (sq.finalAnswer.type === "number" ? "decimal" : "text") + '" ' +
-            'autocomplete="off" spellcheck="false" placeholder="' + esc(TYPE_HINT[sq.finalAnswer.type] || "") + '" ' +
-            'value="' + esc(sim.answers[id] || "") + '"></div>' : "") +
+          '<div class="answer" data-nospeak>' +
+            '<label class="sr" for="a-' + esc(id) + '">תשובה לסעיף ' + esc(sq.letter) + "</label>" +
+            (isOpen(sq) ?
+              '<textarea id="a-' + esc(id) + '" class="field ta" data-sim="' + esc(id) + '" rows="4" ' +
+              'spellcheck="false" placeholder="' + esc(TYPE_HINT.open) + '">' +
+              esc(sim.answers[id] || "") + "</textarea>" :
+              '<input id="a-' + esc(id) + '" class="field" data-sim="' + esc(id) + '" ' +
+              'inputmode="' + (sq.finalAnswer.type === "number" ? "decimal" : "text") + '" ' +
+              'autocomplete="off" spellcheck="false" placeholder="' + esc(TYPE_HINT[sq.finalAnswer.type] || "") + '" ' +
+              'value="' + esc(sim.answers[id] || "") + '">') + "</div>" +
           "</div>";
       });
       h += "</article>";
@@ -515,7 +547,9 @@
     var h = "<h1>הבחינה הוגשה</h1>" +
       '<div class="score" data-nospeak><span class="big-num ' +
       (res.pct >= 70 ? "ok" : res.pct >= 55 ? "warn" : "bad") + '">' + res.pct + "</span>" +
-      "<span>" + res.got + " נקודות מתוך " + res.tot + "</span></div>";
+      "<span>" + res.got + " נקודות מתוך " + res.tot +
+      (res.openPts ? " · " + res.openPts + " נק' בסעיפים פתוחים אינן נבדקות אוטומטית" : "") +
+      "</span></div>";
     h += sayBlock('<p class="lead">הציון הזה אינו ציון בגרות. מה שיש לו ערך הוא הטבלה שמתחת: ' +
                   "היא אומרת באיזה נושא ליפול פחות בפעם הבאה.</p>", "הסבר הדוח") + rateBar();
     h += '<section class="card" data-nospeak><h2>לפי נושא</h2>' +
@@ -528,6 +562,22 @@
           (t.wrong.length ? " · נפלתם ב-" + t.wrong.join(", ") : "") + "</span></span>" +
           '<span class="chip ' + (p >= 70 ? "ok" : p >= 40 ? "warn" : "bad") + '">' + p + "</span></button>";
       }).join("") + "</section>";
+    if (res.open.length) {
+      h += '<section class="card"><h2 data-nospeak>לבדיקה עצמית</h2>' +
+        '<p class="sub" data-nospeak>' + res.open.length + " סעיפים פתוחים · " + res.openPts +
+        " נק' שאינן נכללות בציון שלמעלה. אין להם תשובה יחידה, ולכן אין כאן בדיקה אוטומטית — " +
+        "משווים למה שכתבתם.</p>" +
+        res.open.map(function (r) {
+          var model = r.sq.finalAnswer && r.sq.finalAnswer.value;
+          return '<div class="hist wide" style="display:block">' +
+            "<b>" + r.q.number + esc(r.sq.letter) + " · " + esc(r.q.topic) + " · " + r.sq.points + " נק'</b>" +
+            '<p class="sub" data-nospeak>כתבתם:</p><p class="openans">' +
+            (r.raw ? esc(r.raw) : "— לא נכתבה תשובה") + "</p>" +
+            (model ? '<p class="sub" data-nospeak>תשובת מופת:</p><p class="openans model">' +
+                     esc(String(model)) + "</p>" : "") +
+            "</div>";
+        }).join("") + "</section>";
+    }
     h += '<section class="card"><h2 data-nospeak>סעיף אחרי סעיף</h2>' +
       res.rows.map(function (r) {
         var corr = r.sq.finalAnswer ? r.sq.finalAnswer.value : "—";
@@ -547,7 +597,8 @@
      ============================================================ */
   function viewHome() {
     var ex = exam();
-    var solved = Object.keys(store.solved).length, total = allSubs().length;
+    var solved = Object.keys(store.solved).length;
+    var total = allSubs().filter(function (s) { return !isOpen(s.sq); }).length;
     var h = "<h1>בגרות 806</h1>" +
       sayBlock('<p class="lead">מתמטיקה, 5 יחידות. כל טקסט וכל נוסחה נשמעים לפני שקוראים אותם.</p>',
                "הכותרת") + rateBar();
@@ -694,11 +745,14 @@
   });
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Enter" && e.target.id === "ans") { e.preventDefault(); doCheck(); }
+    /* בתיבה פתוחה Enter הוא שורה חדשה, לא הגשה. */
+    if (e.key === "Enter" && e.target.id === "ans" && e.target.tagName !== "TEXTAREA") {
+      e.preventDefault(); doCheck();
+    }
   });
 
   function doCheck() {
-    var c = curSub(); if (!c || !c.sq.finalAnswer) return;
+    var c = curSub(); if (!c || isOpen(c.sq)) return;
     var el = $("#ans");
     var raw = el ? el.value : (draft[c.id] || "");
     draft[c.id] = raw;
