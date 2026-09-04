@@ -25,7 +25,7 @@ let failed=0;   /* בלי זה הכלי מדפיס ממצאים ויוצא 0 */
       let s='';for(const c of d.childNodes) s+=walk(c);
       return s.trim();
     };
-    const rows=[],bad={noAns:0,multi:0,dupe:0,nan:0,n:0};
+    const rows=[],bad={noAns:0,multi:0,dupe:0,nan:0,nanTxt:0,n:0};
     /* מספר הרמות נלקח מהאפליקציה ולא מקובע כאן: רמה שנוספה בלי
        שהבודק ידע עליה היתה נבדקת אפס פעמים. */
     const LVLS=[];for(let i=1;i<=((typeof LVL!=='undefined'&&LVL.length)||3);i++)LVLS.push(i);
@@ -41,6 +41,13 @@ let failed=0;   /* בלי זה הכלי מדפיס ממצאים ויוצא 0 */
         if(new Set(ks).size!==ks.length)bad.dupe++;
         const ts=q.options.map(o=>plain(o.h!==undefined?o.h:o.t));
         if(ts.some(x=>/NaN|Infinity|undefined/.test(x)))bad.nan++;
+        /* nan סורק את האפשרויות בלבד, ולכן משתנה שלא קיבל ערך עוד
+           הציג "x − undefined" בשני צעדי פתרון ב-math-uni logs L4
+           ב-211 מתוך 400 הגרלות — ואף מדד לא הרגיש. הצעדים, הרמז,
+           השאלה והביטוי נראים לתלמיד בדיוק כמו האפשרויות. */
+        const txt=[q.ask,q.expr,q.hint].filter(x=>typeof x==='string').join(' ')+' '+
+                  JSON.stringify(q.steps||[])+' '+JSON.stringify((q.wrong||[]).map(w=>w&&w.why));
+        if(/NaN|Infinity|undefined/.test(txt))bad.nanTxt++;
         if(cs.length===1){const a=plain(cs[0].h!==undefined?cs[0].h:cs[0].t);seen[a]=(seen[a]||0)+1;ok++}
       }
       const keys=Object.keys(seen);

@@ -1,6 +1,6 @@
 ---
 name: release
-description: Release procedure for a single-file vanilla-JS PWA — parse check, BUILD and service-worker cache key bumped together, a smoke check, CHANGELOG, then commit, tag and push. Use when the user says to release, ship, cut a version, tag a version, or deploy. Every step stops for explicit approval before the next one runs, and nothing is staged that the user did not name.
+description: Release procedure for this portfolio of vanilla-JS PWAs — the full QA suite via .claude/qa/all.js, BUILD and service-worker cache key bumped together and proven to have actually changed, CHANGELOG, then commit, tag and push. Use when the user says to release, ship, cut a version, tag a version, or deploy. Every step stops for explicit approval before the next one runs, and nothing is staged that the user did not name.
 ---
 
 # נוהל שחרור גרסה
@@ -31,76 +31,112 @@ git diff --stat
 
 ---
 
-## שלב 1 — אין שגיאת parse
+## שלב 1 — החבילה עוברת
 
-מחלצים כל בלוק `<script>` שאין לו `src` ומריצים עליו `node --check`:
-
-```bash
-node -e '
-const fs=require("fs"),vm=require("vm");
-const h=fs.readFileSync(process.argv[1],"utf8");
-const re=/<script(?![^>]*\bsrc=)(?![^>]*\btype="(?!text\/javascript)[^"]*")[^>]*>([\s\S]*?)<\/script\s*>/gi;
-let m,n=0,bad=0;
-while((m=re.exec(h))){
-  n++;
-  const line=h.slice(0,m.index).split("\n").length;
-  try{ new vm.Script(m[1]) }
-  catch(e){ bad++; console.log("בלוק "+n+" (שורה "+line+"): "+e.message) }
-}
-console.log(n+" בלוקים נבדקו, "+bad+" נכשלו");
-process.exit(bad?1:0);
-' index.html
+```
+node .claude/qa/all.js --fast
 ```
 
-`type` שאינו `text/javascript` מסונן — בלוק JSON אינו קוד ואינו
-אמור להיבדק ככזה.
+אחת־עשרה בדיקות, והיא מרימה את השרת המקומי בעצמה וסוגרת אותו בסוף.
+`--fast` מדלג על `entropy` ועל `options` — שתי האיטיות, שמקומן
+בשלב 3.
 
-**אם יש שגיאה — עוצרים כאן.** לא "נתקן תוך כדי". קובץ שלא נטען
-לא משוחרר.
+**קו הבסיס של החבילה הוא אפס.** כישלון כאן הוא ממצא אמיתי, ולא
+"נתקן תוך כדי". קובץ שלא נטען לא משוחרר.
+
+**ובדיקה אחת שהחבילה אינה מכסה:** `parse.js` סורק בלוקי `<script>`
+פנימיים בלבד, ו-`bagrut-806` מחזיקה את כל הקוד שלה בקבצים
+חיצוניים — כלומר היא מקבלת שם מעבר שנראה נקי ולא בדק דבר. אם
+השחרור נוגע בה:
+
+```
+node --check bagrut-806/app.js
+node --check bagrut-806/speech.js
+node --check bagrut-806/data/exams.js
+```
+
+*(היה כאן סקריפט parse מוטמע בן שש־עשרה שורות. הוא עשה בדיוק את מה
+ש-`parse.js` עושה, על קובץ אחד, ובלי עשר הבדיקות האחרות — ולכן
+הוחלף. אין שתי מימושים לאותה בדיקה.)*
 
 ⏸ אישור לפני שלב 2.
 
 ---
 
-## שלב 2 — BUILD ומפתח המטמון, לאותו ערך
+## שלב 2 — הגרסה באמת עלתה, ולא רק תואמת
 
-שני מקומות, ולעולם לא אחד בלי השני:
+`cache.js` כבר רץ בשלב 1 והוכיח ש-`BUILD` תואם ל-`?v=` בכל
+האפליקציות. **הוא אינו מוכיח שהמספר השתנה.** זוג ישן ותואם עובר
+אצלו בהצלחה מלאה, והמשתמש שכבר התקין נשאר עם הקוד הקודם — התקלה
+הכי קשה לאבחון, כי בדפדפן של המפתח הכול תקין.
 
-1. `BUILD` ב-`index.html`
-2. מחרוזת הגרסה ב-`sw.js?v=...` שבקוד הרישום
-
-ולוודא ש-`sw.js` בונה את `CACHE` מ-`?v=` ולא מקבוע משלו — אחרת
-העדכון לא יגיע גם כשהמספרים תואמים.
-
-**להראות את שתי השורות זו מתחת לזו** לפני שממשיכים:
+לכן כאן, ורק כאן, בודקים את הדבר השני: שהמספר עלה **מול מה
+שמשוחרר עכשיו**.
 
 ```
-index.html:562   var BUILD="v58 · 2026-08-29";
-index.html:2916  navigator.serviceWorker.register("sw.js?v=v58");
-sw.js:9          const CACHE = "app-" + V;
+git fetch origin main
+git diff origin/main -- '*/index.html' '*/app.js' | grep -E '^[-+].*(BUILD=|sw\.js\?v=)'
 ```
 
-חוסר התאמה כאן פירושו שמי שכבר התקין את האפליקציה יקבל את הגרסה
-הישנה — התקלה הכי קשה לאבחון, כי בדפדפן של המפתח הכול תקין.
+לכל אפליקציה שנגעו בה חייבות להופיע ארבע שורות — ישן והדש, פעמיים:
+
+```
+-var BUILD="u42 · 2026-09-03";
++var BUILD="u43 · 2026-09-04";
+-    navigator.serviceWorker.register("sw.js?v=u42-pwa1")
++    navigator.serviceWorker.register("sw.js?v=u43-pwa1")
+```
+
+**אפליקציה ששונתה ואין לה ארבע השורות האלה — עוצרים.** התיקון שלה
+לא יגיע לאיש.
+
+ושלוש מלכודות שנלמדו ביוקר:
+
+- **בבגרות 806 שניהם ב-`app.js`**, לא ב-`index.html`.
+- **המספר מוקצה במיזוג, לא בבנייה.** כל ענף מתפצל, רואה `u42`
+  ומסמן את עצמו `u43`. אם `main` כבר נושא `u43` — זו התנגשות ולא
+  צירוף מקרים, ויש להקצות מחדש. שתי גרסאות שונות עם אותו מפתח
+  פירושן שמי שקיבל אחת לא יקבל את השנייה לעולם.
+- **נגעת ב-`legal/` — כל המפתחות עולים יחד.** כל האפליקציות מצרפות
+  מראש את אותם `/legal/terms.js` ו-`/legal/protect.js`, כל אחת
+  למטמון משלה, ועותק ישן משתחרר רק כשהמפתח של אותה אפליקציה עולה.
 
 ⏸ אישור לפני שלב 3.
 
 ---
 
-## שלב 3 — בדיקה שהגרסה באמת עובדת
+## שלב 3 — שתי הבדיקות האיטיות, על מה שנגעו בו
 
-*(המשתמש לא הגדיר את השלב הזה. זו ההשלמה שנבחרה — אם הוא התכוון
-למשהו אחר, לשאול ולעדכן את הקובץ.)*
+שלב 1 רץ ב-`--fast` ודילג על `entropy` ועל `options`. הן אלה
+שמוצאות את הבאגים שאין להם שגיאה בקונסולה: רמה שהתשובה בה קבועה,
+שאלה שמציגה שלוש אפשרויות במקום ארבע, ו-`undefined` שמגיע למסך.
 
-לפחות אחד מאלה, לפי מה שקיים בפרויקט:
+לאפליקציות שנגעו בהן:
 
-- אם יש `tests/` — להריץ, ולהראות כמה עברו וכמה נכשלו.
-- אם אין — לטעון את הדף, לוודא שהמסך הראשי מצייר, ושמספר הגרסה
-  שמוצג הוא **החדש**. זו הבדיקה שמוכיחה ששלב 2 באמת נתפס.
-- אם השינוי נוגע להקראה — להשמיע משפט אחד ולשמוע אותו.
+```
+node .claude/qa/serve.js &
+node .claude/qa/entropy.js <app>
+node .claude/qa/options.js <app>
+```
 
-**לדווח תוצאה אמיתית.** מבחן שנכשל נאמר עם הפלט שלו, לא מסוכם
-כ"בעיקר עובד".
+או, אם השחרור רחב, פשוט את הכול:
+
+```
+node .claude/qa/all.js
+```
+
+מה לקרוא בפלט:
+
+- `noAns`, `multi`, `dupe`, `nan`, `nanTxt` — **קו הבסיס אפס.**
+  כל אחד מהם שאינו אפס הוא באג אמיתי.
+- `constant-answer levels` — צריכה להיות `none`.
+- `under4` — **אינו נקרא לפי האחוז אלא לפי מקור האפשרויות.** שאלה
+  שיש לה שלוש תשובות אפשריות בסך הכול (״אין פתרון / פתרון יחיד /
+  אינסוף פתרונות״) תקינה; מסיח שנשמט במקרה אינו.
+
+**לדווח תוצאה אמיתית, עם המספרים.** ״עבר״ אינו דיווח.
+״46,000 שאלות, אפס סטיות״ הוא דיווח. וכל מה שלא הצלחת לאמת —
+תגיד שלא, ולמה.
 
 ⏸ אישור לפני שלב 4.
 

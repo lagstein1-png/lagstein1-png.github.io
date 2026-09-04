@@ -39,7 +39,13 @@ const SHOW = process.argv.includes('--show');
    ההבדל הזה מכוון ומתועד, ולכן אינו סחיפה. */
 const APPS9 = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
                'english', 'history', 'ulpan', 'lomda'];
-const SW10 = APPS9.filter(a => a !== 'lomda').concat(['reader', '.']);
+
+/* ה-sw.js של השורש **אינו** ברשימה, וגם זה מכוון. הוא רשום ב-scope
+   `/` ולכן הוא רואה גם ניווט לאפליקציה אחרת בביקור הראשון, ויש בו
+   שומר בעלות שאין באף אחד מהאחרים — ואסור שיהיה. הוא נבדק
+   ב-`cache.js`, שדורש את השומר בשורש ואוסר אותו בשאר; כאן הוא היה
+   מדווח כסחיפה על ההבדל שהוא עצם התפקיד שלו. */
+const SW9 = APPS9.filter(a => a !== 'lomda').concat(['reader']);
 
 /* נרמול: מה שמותר להשתנות בין אפליקציה לאפליקציה */
 const normCache   = s => s.replace(/"[a-z0-9-]+-"\s*\+\s*V/g, '"APP-"+V')
@@ -68,11 +74,11 @@ const normGate = s => normTeacher(s)
 const BLOCKS = [
   {
     id: 'service worker',
-    apps: SW10,
+    apps: SW9,
     file: 'sw.js',
     whole: true,
     norm: normCache,
-    why: 'עשרה קבצים, זהים חוץ משם המטמון',
+    why: 'תשעה קבצים, זהים חוץ משם המטמון. השורש נבדק ב-cache.js',
   },
   {
     id: 'אונבורדינג demo',
@@ -156,6 +162,42 @@ for (const b of BLOCKS) {
     findings++;
   }
   console.log(`     (${b.why})`);
+}
+
+/* ------------------------------------------------------------------
+   סימון שהועתק בלי ה-CSS שלו.
+
+   כפתור התשובה במבחן הכיתתי נבנה בכל האפליקציות כ-
+   `<span class="k">מספר</span><span class="m">ערך</span>`, והוא
+   תלוי בשני כללי CSS: `.opts` שנותן לו פריסה, ו-`.opt .k` שהופך
+   את המספר לתג. שניהם נכתבו פעם אחת ב-english והועתקו.
+
+   ב-math-app הסימון הועתק וה-CSS לא בא איתו, ולכן `.k` נפל לטקסט
+   inline רגיל ונדבק ל-`.m`: התשובה 18 בכפתור הראשון הוצגה "118",
+   ו-`.opts` בלי display פרש ארבעה כפתורים בשורה אחת. אין שגיאת JS,
+   אין ממצא ב-options.js — הוא בודק את הנתונים ולא את מה שמצויר —
+   והמסך פשוט משקר לתלמיד. נמדד בכרומיום: display "block",
+   ‏"116" "223" "327" "420" במקום 16, 23, 27, 20.
+
+   זו אותה משפחה של cache.js: באג שאינו נכתב אלא מועתק. */
+{
+  let cssBad = 0;
+  for (const app of APPS9) {
+    const f = path.join(ROOT, app, 'index.html');
+    if (!fs.existsSync(f)) continue;
+    const src = fs.readFileSync(f, 'utf8');
+    if (!/<span class="k">/.test(src)) continue;
+    const miss = [];
+    if (!/\.opts\s*\{[^}]*display\s*:/.test(src)) miss.push('.opts{display:…}');
+    if (!/\.opt\s+\.k\s*\{/.test(src) && !/\.opts\s+\.opt\s+\.k\s*\{/.test(src))
+      miss.push('.opt .k{…}');
+    if (miss.length) {
+      console.log(`✗ ${app}/index.html: יש <span class="k"> ואין ${miss.join(' ו-')} — התג יידבק לערך`);
+      cssBad++;
+    }
+  }
+  if (!cssBad && SHOW) console.log('✓ כל אפליקציה שיש בה <span class="k"> נושאת גם את ה-CSS שלו');
+  findings += cssBad;
 }
 
 if (!findings && !SHOW) {

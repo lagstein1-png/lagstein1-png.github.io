@@ -12,7 +12,13 @@ tools: Read, Grep, Glob, Edit
 
 ## הקשר הפרויקט (חובה לזכור בכל פעולה)
 
-- כל אפליקציה היא `index.html` יחיד: HTML + CSS + JS באותו קובץ.
+- כל אפליקציה היא `index.html` יחיד: HTML + CSS + JS באותו קובץ —
+  **חוץ מ-`bagrut-806`**, שהיא רב-קובצית: `index.html` שלה כמעט ריק מקוד
+  וטוען `vendor/katex/katex.min.js`, `data/exams.js`, `speech.js`
+  ו-`app.js`. שם, ב-`app.js`, יושבים גם `BUILD` וגם קריאת הרישום של
+  ה-service worker — ולא ב-`index.html` כמו בכל השאר.
+  `vendor/katex/` היא ספרייה חיצונית שהוטמעה בריפו כקבצים מקומיים;
+  היא אינה נטענת מהרשת, ואין להוסיף עוד כמותה.
 - Vanilla JS בלבד. אין React, אין Vue, אין Firebase, אין npm, אין build step, אין TypeScript.
 - PWA עם manifest ו-service worker. עברית RTL, לעיתים גם ערבית / אנגלית / רוסית.
 - אירוח: GitHub Pages תחת `lagstein1-png.github.io`. Netlify לא קיים יותר.

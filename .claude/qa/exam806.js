@@ -80,6 +80,21 @@ const has = v => str(v).length > 0;
    `$` הוא תוחם נוסחה. שניהם לא אמורים להיאמר בקול. */
 const looksLatex = s => /[\\$]/.test(String(s || ''));
 
+/* אוצר המילים של הנושאים — רשימה סגורה בכוונה.
+
+   `recordResult` שומר את דוח הנושאים החלשים כ-`d.weak[q.topic]`,
+   כלומר מחרוזת הנושא היא המפתח. שני שמות לאותו נושא מפצלים תלמיד
+   אחד לשתי שורות, וכל מחצית עלולה ליפול מתחת לסף ולא להיות מסומנת
+   כלל — כך היה כאן עם ״אינטגרל״ מול ״חשבון אינטגרלי״ ועם ״חקירת
+   פונקציה״ מול ״חשבון דיפרנציאלי״.
+
+   נושא חדש מוסיפים כאן ביד. זו לא בירוקרטיה: הוספה מודעת היא
+   בדיוק מה שמונע את הסחיפה, ושם שנכתב בהיסח הדעת נתפס. */
+const TOPICS = [
+  'הסתברות', 'סדרות', 'חשבון דיפרנציאלי', 'חשבון אינטגרלי',
+  'טריגונומטריה', 'גדילה ודעיכה', 'גאומטריה אנליטית', 'בעיות קיצון'
+];
+
 /* --- 1. שלמות הסכימה, 2. latex בלי speech, 3. תשובה שנבדקת מול עצמה --- */
 const ids = new Set();
 for (const ex of EXAMS) {
@@ -111,6 +126,10 @@ for (const ex of EXAMS) {
     else numbers.add(q.number);
 
     if (!has(q.topic)) fail('אין topic — דוח הנושאים החלשים נבנה ממנו');
+    else if (TOPICS.indexOf(str(q.topic)) < 0)
+      fail('topic "' + str(q.topic) + '" אינו באוצר המילים. שם נרדף לנושא ' +
+        'קיים מפצל את דוח הנושאים החלשים לשתי שורות. ' +
+        'אם זה באמת נושא חדש — להוסיף אותו ל-TOPICS ב-exam806.js');
     if (!has(q.text)) fail('אין text');
     else if (looksLatex(q.text)) fail('ב-text יש סימני LaTeX. הנוסחאות שייכות ל-latex');
 
@@ -189,14 +208,29 @@ for (const ex of EXAMS) {
       });
 
       /* רמז שמכיל את התשובה הסופית פותר במקום התלמיד. מספר
-         שכבר מופיע בנתוני השאלה אינו ממצא — הוא נתון, לא תשובה. */
+         שכבר מופיע בנתוני השאלה אינו ממצא — הוא נתון, לא תשובה.
+
+         וההתאמה נעשית בגבולות מספר ולא כתת־מחרוזת: התשובה 80
+         נמצאת בתוך 180, ורמז שאומר ״סכום הזוויות במשולש הוא 180
+         מעלות״ נדלק בטעות. חיפוש תת־מחרוזת על מספרים מייצר ממצא
+         כוזב בכל פעם שהתשובה היא סיפא או רישא של מספר אחר. */
       if (fa && has(fa.value !== undefined ? String(fa.value) : '')) {
         const ans = String(fa.value).trim();
+        const inside = (hay) => {
+          let from = 0, at;
+          while ((at = hay.indexOf(ans, from)) >= 0) {
+            const before = hay[at - 1], after = hay[at + ans.length];
+            const digit = c => c !== undefined && /[0-9.,]/.test(c);
+            if (!digit(before) && !digit(after)) return true;
+            from = at + 1;
+          }
+          return false;
+        };
         const given = (str(q.text) + ' ' + str(s.text) + ' ' + str(q.latex) + ' ' + str(s.latex));
-        const distinctive = ans.length >= 2 && given.indexOf(ans) < 0;
+        const distinctive = ans.length >= 2 && !inside(given);
         if (distinctive) {
           steps.forEach((st, i) => {
-            if (str(st.hint).indexOf(ans) >= 0)
+            if (inside(str(st.hint)))
               fail('שלב ' + (i + 1) + ': ה-hint מכיל את התשובה הסופית (' + ans + ')');
           });
         }
