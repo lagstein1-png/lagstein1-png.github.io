@@ -274,7 +274,7 @@ function checkEntropy(us) {
     /* קו הבסיס לארבעת אלה ול-constant הוא אפס — README, "קו הבסיס
        של entropy.js ו-smoke.js הוא אפס". */
     const hard = [];
-    for (const k of ['noAns', 'multi', 'dupe', 'nan']) if (b[k]) hard.push(`${k}=${b[k]}`);
+    for (const k of ['noAns', 'multi', 'dupe', 'nan', 'nanTxt']) if (b[k]) hard.push(`${k}=${b[k]}`);
     if (constant.trim() && constant.trim() !== 'none') hard.push('רמות עם תשובה קבועה: ' + constant.trim());
     if (hard.length) add('entropy', u, 'index.html', 'FAIL', hard.join(' | ') + ` (מתוך ${b.n} שאלות)`);
     else if (near.trim() && near.trim() !== 'none')
