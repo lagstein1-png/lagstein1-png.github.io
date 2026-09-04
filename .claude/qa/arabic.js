@@ -38,7 +38,7 @@ const ARABIC_OK = /Noto\s*Sans\s*Arabic|Noto\+Sans\+Arabic|Cairo|Amiri|Tajawal|A
 
 const PAGES = process.argv.slice(2).length ? process.argv.slice(2)
   : ['.', 'math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-     'english', 'history', 'ulpan', 'reader', 'bagrut-806'];
+     'english', 'history', 'ulpan', 'lomda', 'reader', 'bagrut-806'];
 
 let checked = 0, findings = 0;
 

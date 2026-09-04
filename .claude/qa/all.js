@@ -27,7 +27,7 @@ const path = require('path');
 
 const QA = __dirname;
 const FAST = process.argv.includes('--fast');
-const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
+const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'lomda',
               'english', 'history', 'ulpan'];
 const PAGES = APPS.concat(['bagrut-806', 'reader', '.']);
 
@@ -38,6 +38,7 @@ const SUITE = [
   { id: 'cache',    args: [] },
   { id: 'naming',   args: [] },
   { id: 'apps',     args: [] },
+  { id: 'banks',    args: [] },
   { id: 'a11y',     args: [] },
   { id: 'arabic',   args: [] },
   { id: 'engine',   args: [] },

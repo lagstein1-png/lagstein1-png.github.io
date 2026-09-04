@@ -10,8 +10,12 @@
    המטמון. עדכנת אחד — עדכן את השני.
    ===================================================================== */
 const V = new URL(self.location).searchParams.get("v") || "dev";
-const CACHE = "site-" + V;
+const CACHE = "lomda-" + V;
+/* קובצי התוכן נכנסים לכאן במפורש. נושא חדש שנשכח כאן ייטען מהרשת
+   ולא יעבוד אופליין — וזו התקלה שהכי קשה לשים לב אליה, כי בפיתוח
+   תמיד יש רשת. */
 const PRE = ["./","./index.html","./manifest.json",
+             "./data/schema.js","./data/science.js","./data/civics.js",
              "./img/icon-192.png","./img/icon-512.png",
              "/legal/terms.js","/legal/protect.js"];
 
@@ -22,7 +26,7 @@ self.addEventListener("install", e => {
 });
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => k.startsWith("site-") && k !== CACHE).map(k => caches.delete(k))
+    keys.filter(k => k.startsWith("lomda-") && k !== CACHE).map(k => caches.delete(k))
   )).then(() => self.clients.claim()));
 });
 self.addEventListener("fetch", e => {
@@ -30,17 +34,6 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;   /* הקראה בענן לא נכנסת למטמון */
-  /* ה-worker הזה רשום ב-scope "/" ולכן הוא מטפל גם בביקור הראשון
-     באפליקציה אחרת — לפני שה-worker שלה נרשם. שמירת התשובה ההיא היא
-     כפילות גמורה: מהרגע שה-worker שלה קיים הוא זה שמגיש את הנתיב,
-     והעותק שכאן לא ייקרא עוד לעולם. נמדד בכרום אחרי סיור בכל
-     האפליקציות: 5,356KB זרים במטמון הזה מול 172KB משלו.
-
-     לכן מגישים רק את מה ששייך לדף הבית — קובץ בשורש, או אחת משלוש
-     התיקיות שאין להן worker משלהן. אפליקציה חדשה נופלת מכאן החוצה
-     מאליה, בלי שצריך לגעת בקובץ. */
-  const seg = url.pathname.split("/");
-  if (seg.length > 2 && seg[1] !== "img" && seg[1] !== "legal" && seg[1] !== "voice") return;
   /* ניווט: רשת קודם כדי שגרסה חדשה תגיע מיד, ומטמון כשאין רשת */
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).then(r => {

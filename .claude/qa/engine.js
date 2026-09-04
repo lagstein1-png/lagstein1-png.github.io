@@ -33,9 +33,19 @@ const crypto = require('crypto');
 const ROOT = process.cwd();
 const SHOW = process.argv.includes('--show');
 
-const APPS8 = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-               'english', 'history', 'ulpan'];
-const SW10 = APPS8.concat(['reader', '.']);
+/* תשע אפליקציות שהמנוע בהן זהה. `lomda` מצטרפת לשלושת בלוקי
+   ה-index.html, אבל **לא** ל-sw.js: היא מצרפת מראש את קובצי התוכן
+   שלה, ולכן ה-PRE שלה שונה — בדיוק כמו ב-bagrut-806, שמצרף KaTeX.
+   ההבדל הזה מכוון ומתועד, ולכן אינו סחיפה. */
+const APPS9 = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
+               'english', 'history', 'ulpan', 'lomda'];
+
+/* ה-sw.js של השורש **אינו** ברשימה, וגם זה מכוון. הוא רשום ב-scope
+   `/` ולכן הוא רואה גם ניווט לאפליקציה אחרת בביקור הראשון, ויש בו
+   שומר בעלות שאין באף אחד מהאחרים — ואסור שיהיה. הוא נבדק
+   ב-`cache.js`, שדורש את השומר בשורש ואוסר אותו בשאר; כאן הוא היה
+   מדווח כסחיפה על ההבדל שהוא עצם התפקיד שלו. */
+const SW9 = APPS9.filter(a => a !== 'lomda').concat(['reader']);
 
 /* נרמול: מה שמותר להשתנות בין אפליקציה לאפליקציה */
 const normCache   = s => s.replace(/"[a-z0-9-]+-"\s*\+\s*V/g, '"APP-"+V')
@@ -64,15 +74,15 @@ const normGate = s => normTeacher(s)
 const BLOCKS = [
   {
     id: 'service worker',
-    apps: SW10,
+    apps: SW9,
     file: 'sw.js',
     whole: true,
     norm: normCache,
-    why: 'עשרה קבצים, זהים חוץ משם המטמון',
+    why: 'תשעה קבצים, זהים חוץ משם המטמון. השורש נבדק ב-cache.js',
   },
   {
     id: 'אונבורדינג demo',
-    apps: APPS8,
+    apps: APPS9,
     file: 'index.html',
     from: 'function demoEl',
     to: 'function demoMount\\b',
@@ -80,7 +90,7 @@ const BLOCKS = [
   },
   {
     id: 'מבחן כיתתי',
-    apps: APPS8,
+    apps: APPS9,
     file: 'index.html',
     from: 'function examId',
     to: 'function gradeResult',
@@ -88,7 +98,7 @@ const BLOCKS = [
   },
   {
     id: 'שער התנאים',
-    apps: APPS8,
+    apps: APPS9,
     file: 'index.html',
     from: 'function teHas',
     to: 'function waitLegal',
