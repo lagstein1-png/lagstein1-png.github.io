@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x10 · 2026-09-03";
+  var BUILD = "x12 · 2026-09-04";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -336,8 +336,13 @@
     box.innerHTML = all.map(function (ex, i) {
       var demo = ex.season === "הדגמה"
         ? ' <span class="chip warn">בחינת הדגמה — לא בחינה אמיתית</span>' : "";
+      /* רמת האוסף על הכרטיס. האפליקציה משרתת 3–4 יחידות וגם 5, ותלמיד
+         שנכנס לאוסף שאינו ברמה שלו מגלה זאת אחרי שהתחיל. אוסף בלי
+         level אינו מציג תווית — לא מנחשים רמה שלא נקבעה. */
+      var lvl = ex.level
+        ? ' <span class="chip">' + esc(ex.level) + "</span>" : "";
       return '<button class="card pick" data-exam="' + esc(ex.id) + '">' +
-        "<h3>" + esc(examTitle(ex) + examSerial(ex, i, all)) + demo + "</h3>" +
+        "<h3>" + esc(examTitle(ex) + examSerial(ex, i, all)) + lvl + demo + "</h3>" +
         '<p class="meta">' +
         plural(ex.questions.length, "שאלה אחת", "שתי שאלות", "שאלות") + " · " +
         plural(countSubs(ex), "סעיף אחד", "שני סעיפים", "סעיפים") + " · " +
@@ -705,6 +710,18 @@
     return h + "</div>";
   }
 
+  /* --- מתי נושא הוא חלש ------------------------------------------
+     סף אחוזים לבדו תלוי בכמה סעיפים יש בנושא, ולכן הוא מודד את
+     מבנה הבחינה ולא את התלמיד: נושא עם שני סעיפים נופל ל-50% על
+     טעות אחת ונצבע אדום, ונושא עם שלושה נשאר על 67% וירוק — אותה
+     ידיעה בדיוק, שני צבעים. הכלל כאן אינו תלוי במספר הסעיפים:
+     החלקה אחת אינה מסמנת נושא, שתי טעויות מסמנות, ונושא שכולו
+     שגוי מסומן תמיד — גם כשהוא סעיף אחד. */
+  function isWeak(ok, n) {
+    var wrong = n - ok;
+    return n > 0 && (wrong >= 2 || wrong === n);
+  }
+
   function simReportHtml(ex) {
     var r = SIM.res;
     var pct = r.max ? Math.round((r.got / r.max) * 100) : 0;
@@ -720,7 +737,7 @@
       var x = r.byTopic[t];
       var p = x.max ? Math.round((x.pts / x.max) * 100) : 0;
       h += "<tr><td>" + esc(t) + "</td><td>" + x.ok + "/" + x.n + "</td><td>" +
-        x.pts + "/" + x.max + '</td><td><div class="bar2' + (p < 60 ? " weak" : "") +
+        x.pts + "/" + x.max + '</td><td><div class="bar2' + (isWeak(x.ok, x.n) ? " weak" : "") +
         '"><i style="width:' + p + '%"></i></div></td></tr>';
     });
     h += "</tbody></table>";
@@ -729,11 +746,11 @@
        לא מפענח גרף, והמשפט הזה הוא כל מה שהוא צריך מהדוח. */
     var weak = topics.filter(function (t) {
       var x = r.byTopic[t];
-      return x.max && x.pts / x.max < 0.6;
+      return isWeak(x.ok, x.n);
     });
     h += '<p class="note">' + (weak.length
       ? "מה לחזור עליו קודם: " + weak.map(esc).join(", ") + "."
-      : "אין נושא שנפל מתחת ל-60%. אפשר להמשיך הלאה.") + "</p>";
+      : "אין נושא שחוזר בו יותר מטעות אחת. אפשר להמשיך הלאה.") + "</p>";
 
     h += "<h2>סעיף אחר סעיף</h2><table class=\"tbl\"><thead><tr>" +
       "<th>סעיף</th><th>מה נכתב</th><th>התשובה</th><th></th></tr></thead><tbody>";
@@ -809,14 +826,14 @@
       "<th>נושא</th><th>נכונות</th><th>אחוז</th><th></th></tr></thead><tbody>";
     rows.forEach(function (r) {
       h += "<tr><td>" + esc(r.t) + "</td><td>" + r.ok + "/" + r.n + "</td><td>" + r.p +
-        '%</td><td><div class="bar2' + (r.p < 60 ? " weak" : "") +
+        '%</td><td><div class="bar2' + (isWeak(r.ok, r.n) ? " weak" : "") +
         '"><i style="width:' + r.p + '%"></i></div></td></tr>';
     });
     h += "</tbody></table>";
-    var w = rows.filter(function (r) { return r.p < 60; });
+    var w = rows.filter(function (r) { return isWeak(r.ok, r.n); });
     h += '<p class="note">' + (w.length
       ? "הנושאים החלשים: " + w.map(function (r) { return esc(r.t); }).join(", ") + "."
-      : "אין נושא מתחת ל-60%.") + "</p>";
+      : "אין נושא שחוזרת בו יותר מטעות אחת.") + "</p>";
 
     var sims = (d.sims || []).slice().reverse().slice(0, 8);
     if (sims.length) {
@@ -892,7 +909,7 @@
        המסך פעמיים בכל מעבר. הכותרת מוסיפה מידע במקום לחזור עליו —
        היא זו שנקראת בהחלפת לשונית ובחזרה לאפליקציה. */
     document.title = TITLES[screen] +
-      (screen === "home" ? " — בגרות במתמטיקה, חמש יחידות" : " · שאלון 806");
+      (screen === "home" ? " — בגרות במתמטיקה, 3–4 ו-5 יח״ל" : " · שאלון 806");
   }
 
   /* --- אירועים. האזנה אחת על המסמך, ולא מאזין לכל כפתור --------- */
@@ -1097,7 +1114,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x10-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x12-pwa1").catch(function () {});
     });
   }
 

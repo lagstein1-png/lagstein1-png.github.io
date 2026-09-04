@@ -1,0 +1,248 @@
+<!doctype html>
+<!-- =====================================================================
+     learning-core · demo
+     הוכחה שהקוד המשותף עובד: שלושה משפטים בעברית שנקראים בקול,
+     ובדיקות עצמיות שרצות בטעינה ומראות תוצאה על המסך.
+
+     חייב לרוץ משרת. ב-file:// אין service worker, אין fetch, ולפעמים
+     גם אין הקראה:
+         cd learning-core && python3 -m http.server 8099
+         http://127.0.0.1:8099/demo/
+     ===================================================================== -->
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>learning-core · בדיקה</title>
+<link rel="stylesheet" href="../core.css">
+<style>
+  .row{ display:flex; gap:10px; align-items:flex-start; margin-bottom:12px; }
+  .row > p{ flex:1; margin:0; padding-top:.35em; }
+  .row > button{ flex:0 0 auto; min-width:var(--touch); }
+  .tier{ font-size:.8em; color:var(--ink-soft); }
+  table.chk{ width:100%; border-collapse:collapse; font-size:.85em; }
+  table.chk td, table.chk th{ border-bottom:1px solid var(--line); padding:.5em .4em; text-align:start; vertical-align:top; }
+  .pass{ color:var(--ok); font-weight:800; }
+  .fail{ color:var(--bad); font-weight:800; }
+  code{ direction:ltr; unicode-bidi:isolate; display:inline-block; }
+</style>
+</head>
+<body>
+<div class="lc-wrap" id="main">
+
+  <h1 tabindex="-1" data-focus>learning-core — בדיקה</h1>
+  <p class="lc-soft" id="ver"></p>
+
+  <!-- ============ שלושת המשפטים ============ -->
+  <section class="lc-card">
+    <h2>שלושה משפטים בעברית</h2>
+    <p class="lc-soft">
+      לחיצה על 🔊 מקריאה משפט אחד. "הקראת הכול" מקריאה את שלושתם בתור,
+      עם הפסקה ביניהם.
+    </p>
+    <div id="lines"></div>
+
+    <button class="lc-btn-main" id="btnAll" type="button">🔊 הקראת הכול</button>
+    <button class="lc-btn" id="btnStop" type="button">■ עצירה</button>
+
+    <p class="tier" id="tier" role="status" aria-live="polite"></p>
+    <p class="tier" id="voice"></p>
+  </section>
+
+  <!-- ============ בדיקות עצמיות ============ -->
+  <section class="lc-card">
+    <h2>בדיקות עצמיות</h2>
+    <p class="lc-soft">
+      רצות בטעינת הדף ולא דורשות רמקול — כדי שאפשר יהיה לראות שהקוד
+      עובד גם במקום שבו אין קול.
+    </p>
+    <table class="chk"><tbody id="checks"></tbody></table>
+    <p id="chkSum" role="status" aria-live="polite"></p>
+  </section>
+
+</div>
+
+<script src="../core.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  LC.init({
+    app: 'learning-core-demo',
+    lang: 'he',
+    strings: { he:{ play:'🔊', stop:'■ עצירה' } }
+  });
+
+  /* המשפטים. השלישי נבחר במכוון: הוא ארוך מסף הפיצול (120 תווים),
+     ולכן הוא מוכיח גם את החיתוך לפי סוף משפט. */
+  var LINES = [
+    'שלום. זאת בדיקה של מנוע ההקראה המשותף.',
+    'הרכב עוצר לפני מעבר החצייה, והנהג בודק שהכביש פנוי.',
+    'כשמשפט ארוך מדי נשלח למנוע ההקראה בבת אחת, המנוע מאיץ ובולע את סופי המילים. ' +
+    'לכן הטקסט נחתך כאן לפי סוף משפט, ורק אחר כך לפי פסיק — ולעולם לא באמצע מילה.'
+  ];
+
+  /* ---- שלושת הכפתורים ---- */
+  var box = $('lines');
+  LINES.forEach(function(txt, i){
+    var row = document.createElement('div');
+    row.className = 'row';
+
+    var p = document.createElement('p');
+    p.textContent = txt;
+
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'lc-btn';
+    b.textContent = '🔊';
+    b.setAttribute('aria-label', 'הקראת משפט ' + (i + 1));
+    b.addEventListener('click', function(){
+      LC.tts.stop();
+      LC.tts.speak(txt, { onDone: function(){ note('סיום.'); } });
+    });
+
+    row.appendChild(b);
+    row.appendChild(p);
+    box.appendChild(row);
+  });
+
+  function note(s){ $('tier').textContent = s; }
+
+  /* מדווח איזו שכבה באמת דיברה — זו הנקודה שבה "יש קול" הופך
+     ל"אני יודע מאיפה הקול הגיע". */
+  LC.tts.onTier(function(tier){
+    note(tier === 'static' ? 'שכבה 1 — קובץ MP3 מוקלט.'
+       : tier === 'device' ? 'שכבה 2 — קול המכשיר (speechSynthesis).'
+       : 'שכבה 3 — אין הקראה במכשיר הזה. הטקסט נשאר קריא על המסך.');
+  });
+
+  $('btnAll').addEventListener('click', function(){
+    LC.tts.queue(LINES, { onDone: function(){ note('סיום שלושת המשפטים.'); } });
+  });
+  $('btnStop').addEventListener('click', function(){
+    LC.tts.stop();
+    note('נעצר.');
+  });
+
+  $('ver').textContent = 'core ' + LC.version +
+    ' · אחסון: ' + (LC.store.persistent ? 'localStorage' : 'זיכרון בלבד') +
+    ' · מרחב שמות: ' + LC.store.prefix;
+
+  LC.tts.ready().then(function(list){
+    var v = LC.tts.pickVoice('he');
+    $('voice').textContent = 'קולות במכשיר: ' + list.length +
+      ' · נבחר לעברית: ' + (v ? v.name + ' (' + v.lang + ')' : 'ברירת המחדל של הדפדפן');
+  });
+
+  /* ---------------------------------------------------------------
+     בדיקות עצמיות
+     --------------------------------------------------------------- */
+  var rows = [], pass = 0, fail = 0;
+
+  function check(name, got, want){
+    var ok = String(got) === String(want);
+    ok ? pass++ : fail++;
+    rows.push('<tr><td>' + LC.util.escapeHTML(name) + '</td>' +
+              '<td><code>' + LC.util.escapeHTML(String(got)) + '</code></td>' +
+              '<td class="' + (ok ? 'pass' : 'fail') + '">' + (ok ? 'עבר' : 'נפל') + '</td></tr>');
+  }
+  function checkTrue(name, cond, detail){
+    cond ? pass++ : fail++;
+    rows.push('<tr><td>' + LC.util.escapeHTML(name) + '</td>' +
+              '<td><code>' + LC.util.escapeHTML(String(detail)) + '</code></td>' +
+              '<td class="' + (cond ? 'pass' : 'fail') + '">' + (cond ? 'עבר' : 'נפל') + '</td></tr>');
+  }
+
+  /* 1+2 — הבדיקה המרכזית: אותה מילה, פעם בלי ניקוד ופעם עם, חייבת
+     לקבל את אותו תיקון הגייה. זה הבאג שלא הועתק לכאן. */
+  var plainIn   = 'הרכב עוצר';
+  var voweledIn = 'הָרֶכֶב עוצר';
+  check('מילון על טקסט לא מנוקד', LC.ktiv.apply(plainIn),   'הָרֶכֶב עוצר');
+  check('מילון על טקסט מנוקד',    LC.ktiv.apply(voweledIn), 'הָרֶכֶב עוצר');
+  check('שני המסלולים זהים',
+        LC.ktiv.apply(plainIn) === LC.ktiv.apply(voweledIn), 'true');
+
+  /* 3 — התאמה ברמת מילה שלמה בלבד: "רכב" לא נוגע ב"הרכבת". */
+  check('אין חיפוש בתוך מילה', LC.ktiv.apply('הרכבת יצאה'), 'הרכבת יצאה');
+
+  /* 4 — פיצול: המשפט הארוך יורד מתחת לסף בכל מקטע. */
+  var segs = LC.tts.segments(LINES[2]);
+  var longest = 0;
+  segs.forEach(function(s){ if (s.text.length > longest) longest = s.text.length; });
+  checkTrue('פיצול לפי סף ' + LC.tts.SEG_MAX + ' תווים',
+            segs.length > 1 && longest <= LC.tts.SEG_MAX,
+            segs.length + ' מקטעים, הארוך ' + longest);
+
+  /* 5 — מספר עשרוני אינו סוף משפט. */
+  checkTrue('3.5 אינו נקודת חיתוך',
+            LC.tts.segments('הגובה 3.5 מטר בלבד.').length === 1, 'מקטע אחד');
+
+  /* 6 — ההיסטים רציפים, אחרת ההדגשה קופצת לתחילת המשפט בכל מקטע. */
+  var contiguous = segs.every(function(s, i){
+    return i === 0 ? s.start === 0 : s.start >= segs[i - 1].start;
+  });
+  checkTrue('היסטי המקטעים עולים', contiguous, 'start: ' +
+            segs.map(function(s){ return s.start; }).join(', '));
+
+  /* 7 — ערבוב טרי: שתי קריאות על אותה רשימה כמעט לעולם לא זהות. */
+  var base = [];
+  for (var i = 0; i < 40; i++) base.push(i);
+  var same = 0;
+  for (var k = 0; k < 20; k++) {
+    var a = LC.shuffle(base).join();
+    var b2 = LC.shuffle(base).join();
+    if (a === b2) same++;
+  }
+  checkTrue('ערבוב חדש בכל קריאה', same === 0, same + ' מתוך 20 יצאו זהים');
+  check('הערבוב אינו הורס את המקור', base.join(), base.slice().sort(function(a,b){return a-b;}).join());
+
+  /* 8 — אחסון עם מרחב שמות. */
+  LC.store.set('probe', '42');
+  check('אחסון ממורחב', LC.store.get('probe'), '42');
+  check('תבנית המפתח', LC.store.key('probe'), 'lc:learning-core-demo:probe');
+  LC.store.del('probe');
+
+  /* 9 — בנק טעויות ומקבץ תרגול. */
+  LC.mistakes.reset();
+  LC.mistakes.record('q7');
+  LC.mistakes.record('q7');
+  LC.mistakes.record('q3');
+  check('בנק טעויות סופר', LC.mistakes.all()['q7'].n, '2');
+  check('מקבץ תרגול', LC.mistakes.drill(5).sort().join(), 'q3,q7');
+  check('סינון למאגר קיים', LC.mistakes.drill(5, ['q3']).join(), 'q3');
+  LC.mistakes.reset();
+
+  /* 10 — ארבע שפות. */
+  LC.addStrings({ he:{hi:'שלום'}, ar:{hi:'مرحبا'}, en:{hi:'Hello'}, ru:{hi:'Привет'} });
+  var seenLangs = [];
+  ['he','ar','en','ru'].forEach(function(code){
+    LC.setLang(code, { silent:true });
+    seenLangs.push(LC.t('hi') + '/' + document.documentElement.getAttribute('dir'));
+  });
+  LC.setLang('he', { silent:true });
+  check('ארבע שפות + כיוון', seenLangs.join(' '),
+        'שלום/rtl مرحبا/rtl Hello/ltr Привет/ltr');
+
+  /* 11 — מפתח חסר מוצג כמו שהוא ולא כ-undefined. */
+  check('מפתח חסר', LC.t('no_such_key_here'), 'no_such_key_here');
+
+  /* 12 — מזהה קובץ השמע יציב, ותלוי בתוכן בלבד. */
+  check('audioId יציב', LC.tts.audioId('הרכב עוצר') === LC.tts.audioId(' הרכב   עוצר '), 'true');
+  checkTrue('audioId משתנה עם הטקסט',
+            LC.tts.audioId('הרכב עוצר') !== LC.tts.audioId('הרכב נוסע'),
+            LC.tts.audioId('הרכב עוצר'));
+
+  /* 13 — תגיות לא מוקראות בקול. */
+  check('ניקוי תגיות', LC.util.plainText('<b>שלום</b> <span>עולם</span>'), 'שלום עולם');
+
+  $('checks').innerHTML =
+    '<tr><th>בדיקה</th><th>תוצאה</th><th>מצב</th></tr>' + rows.join('');
+  $('chkSum').innerHTML = fail === 0
+    ? '<span class="pass">' + pass + ' בדיקות עברו, אף אחת לא נפלה.</span>'
+    : '<span class="fail">' + fail + ' נפלו</span> מתוך ' + (pass + fail) + '.';
+})();
+</script>
+</body>
+</html>
