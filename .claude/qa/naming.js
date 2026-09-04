@@ -25,6 +25,16 @@ const fs = require('fs'), path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const BANNED = /drivewise/i;
 const EXEMPT = new Set(['NAMING.md', path.join('.claude', 'qa', 'naming.js')]);
+/* מופע מותר אחד, ורק הוא: שדה `u` בכרטיס של האפליקציה שבריפו הנפרד.
+   GitHub Pages מפרסם פרויקט תחת שם הריפו, והריפו טרם שונה — נמדד
+   ב-5.9.2026 מול רשימת הריפוזיטוריז של החשבון, שבה שניים בלבד:
+   `lagstein1-png.github.io` ו-`lagstein1-png/drivewise`. בלי השדה
+   הכרטיס בונה `/theory/`, וזה 404 חי.
+
+   ההחרגה היא של המחרוזת המדויקת ולא של הקובץ: כל מופע אחר
+   ב-index.html עדיין נכשל, וגם אותה מחרוזת עם רווח אחר. כשהריפו
+   ישונה — נמחק כאן, ונמחק השדה. */
+const SANCTIONED = /"u":"\/drivewise\/"/g;
 const SKIP_DIR = new Set(['.git', 'img', 'vendor', 'node_modules', '.well-known']);
 const TEXT = /\.(html|js|json|md|css|svg|txt|webmanifest)$/i;
 
@@ -42,7 +52,9 @@ function walk(dir) {
     const rel = path.relative(ROOT, full);
     if (EXEMPT.has(rel)) continue;
     scanned++;
-    const lines = fs.readFileSync(full, 'utf8').split('\n');
+    let text = fs.readFileSync(full, 'utf8');
+    if (rel === 'index.html') text = text.replace(SANCTIONED, '"u":"<נתיב>"');
+    const lines = text.split('\n');
     lines.forEach((ln, i) => {
       if (BANNED.test(ln)) {
         console.log(`✗ ${rel}:${i + 1}: השם האנגלי הישן נמחק מהמאגר. השם הוא ״${OFFICIAL.he}״`);
@@ -83,5 +95,5 @@ if (!card) {
 }
 
 console.log(`\n${scanned} קבצים נסרקו, ${bad} ממצאים` +
-  (bad ? '' : ' · השם הישן אינו מופיע בשום קובץ במאגר'));
+  (bad ? '' : ' · השם הישן אינו מופיע מחוץ למסמכי הכלל ולשדה הנתיב שבכרטיס'));
 process.exit(bad ? 1 : 0);
