@@ -924,7 +924,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u39 · 2026-09-02";
+var BUILD="u40 · 2026-09-04";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -4248,9 +4248,6 @@ function genLogs(L){
       var qj=ri(1,3),qgap=qd*qj,qlow=ri(3,7);
       var qp,qq,qAns,qRoot,qFlip,qBound,qWr;
       var lgQ="log<sub>"+qb+"</sub>";
-      /* ב-math-uni אין frac() כללי — רק fr/rawFr למספרים. השבר כאן
-         נבנה באותה תגית שהאפליקציה משתמשת בה בכל מקום אחר. */
-      var qfrT='<span class="frac"><span>x − '+num(qp)+'</span><span>x − '+num(qq)+'</span></span>';
       if(qShape==="quotOk"){
         /* המכנה הוא בעל הגבול הגדול → יש פתרון */
         qp=qlow;qq=qlow+qgap;qRoot=qq+qj;qFlip=qp-qj;qBound=qq;
@@ -4270,6 +4267,12 @@ function genLogs(L){
           W("x = "+num(qBound),_("זהו גבול תחום ההגדרה עצמו, ושם הלוג אינו מוגדר — הביטוי שבתוכו מתאפס."))
         ];
       }
+      /* ב-math-uni אין frac() כללי — רק fr/rawFr למספרים. השבר כאן
+         נבנה באותה תגית שהאפליקציה משתמשת בה בכל מקום אחר.
+         **הבנייה חייבת להיות כאן ולא לפני ה-if.** qp ו-qq מוצהרים
+         למעלה אך מקבלים ערך רק בתוך שני הענפים, ולכן שורה שנבנתה
+         לפניהם הציגה לתלמיד "x − undefined" בשני צעדי פתרון. */
+      var qfrT='<span class="frac"><span>x − '+num(qp)+'</span><span>x − '+num(qq)+'</span></span>';
       return {ask:_("פתרו את המשוואה"),
         expr:lgQ+"(x − "+num(qp)+") − "+lgQ+"(x − "+num(qq)+") = "+num(qk),
         ans:W(qAns),
@@ -13724,7 +13727,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u39-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u40-pwa1").catch(function(){});
   });
 }
 </script>
