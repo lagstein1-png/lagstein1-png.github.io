@@ -139,6 +139,13 @@ button{font:inherit;color:inherit}
 .btn.ghost{background:transparent;box-shadow:none}
 .btn[disabled]{opacity:.45;cursor:default}
 .btn.wide{width:100%}
+/* מודול המבחן הכיתתי הועתק ממשפחת math-uni, ושם .btn-p ו-.btn.w
+   מוגדרים. כאן הם לא היו, ולכן "מבחן חדש", "צרו את המבחן", "התחלת
+   מבחן" וכפתורי הוואטסאפ נראו ככפתור ריק בלי צבע — טקסט קטן עם פלוס.
+   כחול, ולא טורקיז: זה כפתור של המורה, ובולט מכל שאר המסך. */
+.btn-p{background:#2563eb;color:#fff;border-color:#2563eb}
+.btn-p:hover{filter:brightness(1.1);border-color:#2563eb}
+.btn.w{width:100%}
 
 .chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;
   padding:.22rem .6rem;font-size:.78rem;font-weight:700;background:var(--surface2);color:var(--muted)}
@@ -955,7 +962,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n36 · 2026-09-04";
+var BUILD="n37 · 2026-09-04";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3987,7 +3994,7 @@ function viewMarks(){
   var h='<div class="wrap" style="padding-block:22px">';
   h+='<h1 class="h1">'+esc(xt("mkTitle"))+'</h1>'+
      '<p class="sub">'+esc(xt("mkLead"))+'</p>';
-  h+='<div class="row" style="margin-top:14px"><button class="btn btn-p" data-a="go" data-v="exam">'+
+  h+='<div class="row" style="margin-top:14px"><button class="btn btn-p" style="font-size:1.2rem;padding:14px 28px" data-a="go" data-v="exam">'+
      ic("plus",17)+' '+esc(xt("mkNew"))+'</button></div>';
 
   if(!EX.list.length){
@@ -4899,7 +4906,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n36-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n37-pwa1").catch(function(){});
   });
 }
 </script>
