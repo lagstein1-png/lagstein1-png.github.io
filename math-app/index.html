@@ -193,6 +193,18 @@ html.reduce-motion *{animation:none!important;transition:none!important}
 .opt.right{border-color:var(--teal-deep);background:var(--teal-deep);color:#fff;box-shadow:0 6px 0 var(--teal-deep)}
 .opt.wrong{border-color:rgba(255,111,97,.4);background:var(--coral-soft);color:rgba(217,79,66,.5);text-decoration:line-through;cursor:not-allowed}
 .opt.flash{border-color:var(--coral);background:var(--coral-soft);color:var(--coral-deep)}
+/* מצב המבחן הכיתתי בלבד. הכפתור שם נושא תג מספר (.k) לצד הערך
+   (.m), ולא רק ערך כמו בתרגול — ולכן הוא שורה, לא הריבוע הענק
+   שלמעלה. בלי הכלל הזה .k נופל לטקסט inline רגיל ונדבק ל-.m:
+   התשובה 18 בכפתור הראשון מוצגת "118", וארבעה כפתורים נפרשים
+   בשורה אחת כי ל-.opts אין display. הסימון הועתק לכאן ממשפחת
+   החידון, וה-CSS שלו לא בא איתו. */
+.opts{display:grid;gap:12px;margin-top:18px}
+@media(min-width:520px){.opts{grid-template-columns:1fr 1fr}}
+.opts .opt{display:flex;align-items:center;gap:12px;text-align:start;width:100%;font-size:1.5rem;padding:14px 16px;min-height:3.4rem}
+.opts .opt .k{flex:none;width:2rem;height:2rem;border-radius:10px;background:var(--teal-soft);color:var(--teal-deep);display:inline-flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:800}
+.opts .opt .m{direction:ltr}
+.opts .opt.right .k{background:var(--paper);color:var(--teal-deep)}
 .hintpill{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;background:var(--amber);color:var(--ink);font-family:var(--font-display);font-weight:700;font-size:1.15rem;border-radius:18px;padding:15px 24px;box-shadow:0 6px 0 var(--amber-deep);transition:all .15s}
 .hintpill:hover{background:var(--amber-deep);color:#fff;transform:translateY(-2px)}
 .hintpill .cnt{position:absolute;top:-9px;inset-inline-start:-9px;background:var(--coral);color:#fff;font-size:.72rem;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--card)}
@@ -1981,7 +1993,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b42 · 2026-09-04";
+var BUILD="b43 · 2026-09-04";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4290,7 +4302,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b42-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b43-pwa1").catch(function(){});
   });
 }
 </script>
