@@ -236,7 +236,7 @@ https://lagstein1-png.github.io
 | מפנה — היסטוריה | https://lagstein1-png.github.io/history/ | [`history/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/history/index.html) |
 | לומדה | https://lagstein1-png.github.io/lomda/ | [`lomda/`](https://github.com/lagstein1-png/lagstein1-png.github.io/tree/main/lomda) |
 | מקריא קולי | https://lagstein1-png.github.io/reader/ | [`reader/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/reader/index.html) |
-| תאוריה מדברת | הקישור שבכרטיס בדף הבית (השדה `u` ב-`DATA.APPS`) | ריפו נפרד. אין תיקייה כאן, וזה תקין. השם האנגלי הישן אסור בכל מקום — `naming.js` אוכף. |
+| תאוריה מדברת | https://lagstein1-png.github.io/theory/ | ריפו נפרד בשם `theory`. אין תיקייה כאן, וזה תקין. השם האנגלי הישן אסור בכל מקום — `naming.js` אוכף. |
 
 ---
 
