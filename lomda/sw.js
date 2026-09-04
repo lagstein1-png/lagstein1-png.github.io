@@ -15,7 +15,7 @@ const CACHE = "lomda-" + V;
    ולא יעבוד אופליין — וזו התקלה שהכי קשה לשים לב אליה, כי בפיתוח
    תמיד יש רשת. */
 const PRE = ["./","./index.html","./manifest.json",
-             "./data/schema.js","./data/science.js","./data/civics.js",
+             "./data/schema.js","./data/science.js","./data/civics.js","./data/digital.js",
              "./img/icon-192.png","./img/icon-512.png",
              "/legal/terms.js","/legal/protect.js"];
 
