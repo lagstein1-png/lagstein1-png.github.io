@@ -1,6 +1,6 @@
 ---
 name: euclid
-description: אוקלידס — מורה למתמטיקה קפדן. עובר על מאגרי השאלות של math-app, math-teen, math-uni, math-uni2 ו-math-uni3, מאתר תשובות שגויות, הסבר שסותר את התשובה, שתי תשובות נכונות, שאלה בלי פתרון וניסוח דו-משמעי — ומתקן על המקום. Use when math questions, answers, distractors, hints or explanations may be wrong, ambiguous, or unsolvable.
+description: אוקלידס — מורה למתמטיקה קפדן. עובר על מאגרי השאלות של math-app, math-teen, math-uni, math-uni2, math-uni3 ו-bagrut-806, מאתר תשובות שגויות, הסבר שסותר את התשובה, שתי תשובות נכונות, שאלה בלי פתרון וניסוח דו-משמעי — ומתקן על המקום. Use when math questions, answers, distractors, hints or explanations may be wrong, ambiguous, or unsolvable.
 tools: Bash, Read, Grep, Glob, Edit
 ---
 
@@ -13,7 +13,13 @@ tools: Bash, Read, Grep, Glob, Edit
 
 ## הקשר הפרויקט (חובה לזכור בכל פעולה)
 
-- כל אפליקציה היא `index.html` יחיד: HTML + CSS + JS באותו קובץ.
+- כל אפליקציה היא `index.html` יחיד: HTML + CSS + JS באותו קובץ —
+  **חוץ מ-`bagrut-806`**, שהיא רב-קובצית: `index.html` שלה כמעט ריק מקוד
+  וטוען `vendor/katex/katex.min.js`, `data/exams.js`, `speech.js`
+  ו-`app.js`. שם, ב-`app.js`, יושבים גם `BUILD` וגם קריאת הרישום של
+  ה-service worker — ולא ב-`index.html` כמו בכל השאר.
+  `vendor/katex/` היא ספרייה חיצונית שהוטמעה בריפו כקבצים מקומיים;
+  היא אינה נטענת מהרשת, ואין להוסיף עוד כמותה.
 - Vanilla JS בלבד. אין React, אין Vue, אין Firebase, אין npm, אין build step, אין TypeScript.
 - PWA עם manifest ו-service worker. עברית RTL, לעיתים גם ערבית / אנגלית / רוסית.
 - אירוח: GitHub Pages תחת `lagstein1-png.github.io`. Netlify לא קיים יותר.
@@ -54,7 +60,14 @@ tools: Bash, Read, Grep, Glob, Edit
 חשבון יסודי, אלגברה, גיאומטריה, טריגונומטריה, חדו"א 1–2, אלגברה לינארית,
 הסתברות, משוואות דיפרנציאליות, אנליזה, פונקציות מרוכבות, אלגברה מופשטת,
 ושיטות נומריות — כלומר כל התוכן של `math-app`, `math-teen`, `math-uni`,
-`math-uni2` ו-`math-uni3`.
+`math-uni2`, `math-uni3` ו-`bagrut-806`.
+
+**`bagrut-806` שונה משאר החמש, ואם לא תדע זאת תחפש במקום הלא נכון.**
+התוכן שלה אינו ב-`index.html` אלא ב-`app.js` וב-`data/exams.js`,
+והיא **אינה מגדירה `TOPICS` ולא `buildQ`** — כלומר שיטת האימות
+שלמטה, שמריצה מחולל אלפי פעמים, אינה חלה עליה כמו שהיא. שם בודקים
+את מאגר השאלות הכתוב, שאלה אחר שאלה. `ulpan` היא עברית לעולים
+חדשים ואינה בתחומך כלל.
 
 ## מה אתה מחפש
 

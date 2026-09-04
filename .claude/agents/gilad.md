@@ -12,7 +12,13 @@ tools: Read, Grep, Glob, Bash, Edit
 
 ## הקשר הפרויקט (חובה לזכור בכל פעולה)
 
-- כל אפליקציה היא `index.html` יחיד: HTML + CSS + JS באותו קובץ.
+- כל אפליקציה היא `index.html` יחיד: HTML + CSS + JS באותו קובץ —
+  **חוץ מ-`bagrut-806`**, שהיא רב-קובצית: `index.html` שלה כמעט ריק מקוד
+  וטוען `vendor/katex/katex.min.js`, `data/exams.js`, `speech.js`
+  ו-`app.js`. שם, ב-`app.js`, יושבים גם `BUILD` וגם קריאת הרישום של
+  ה-service worker — ולא ב-`index.html` כמו בכל השאר.
+  `vendor/katex/` היא ספרייה חיצונית שהוטמעה בריפו כקבצים מקומיים;
+  היא אינה נטענת מהרשת, ואין להוסיף עוד כמותה.
 - Vanilla JS בלבד. אין React, אין Vue, אין Firebase, אין npm, אין build step, אין TypeScript.
 - PWA עם manifest ו-service worker. עברית RTL, לעיתים גם ערבית / אנגלית / רוסית.
 - אירוח: GitHub Pages תחת `lagstein1-png.github.io`. Netlify לא קיים יותר.
@@ -77,7 +83,7 @@ tools: Read, Grep, Glob, Bash, Edit
    ולכל JSON: `node -e "JSON.parse(require('fs').readFileSync('f.json','utf8'))"`.
 2. **הגרסה ומפתח הקאש עודכנו — שניהם, יחד.**
 
-**שני מקומות, שניהם ב-`index.html`, וחייבים להיות תואמים:**
+**שני מקומות, וחייבים להיות תואמים** (ב-`index.html`, ובבגרות 806 ב-`app.js`)**:**
 
     var BUILD="b33 · 2026-08-30";                    // מה שמוצג למשתמש
     navigator.serviceWorker.register("sw.js?v=b33-pwa1");   // מה שקובע את הקאש
@@ -88,9 +94,14 @@ tools: Read, Grep, Glob, Bash, Edit
 לכן עדכון של `BUILD` לבדו **לא** מנקה את הקאש, והמשתמש לא יראה את התיקון.
 עדכנת אחד — עדכן את השני, ובדוק שהתחילית זהה.
 
-   בדיקת תאימות בכל האפליקציות:
+   בדיקת תאימות בכל קובצי ה-`sw.js`, בפקודה אחת:
 
-       grep -rn 'var BUILD=\|serviceWorker.register' --include=index.html . | grep -v node_modules
+       node .claude/qa/cache.js       # רק הגרסה מול מפתח הקאש
+       node .claude/qa/all.js --fast  # כל החבילה, בלי השתיים האיטיות
+
+   `cache.js` מגלה את האפליקציות מהדיסק ומחפש גם ב-`index.html` וגם
+   ב-`app.js`, ולכן הוא תופס גם את `bagrut-806`. ה-`grep` שהיה כאן
+   קודם הוגבל ל-`--include=index.html` והחמיץ אותה לגמרי.
 
 3. **אף תיקון לא סתר תיקון אחר.** עבור על ה-diff במלואו:
 
