@@ -5540,7 +5540,7 @@ function viewMarks(){
       h+='<div style="margin-top:16px"><b>לפי תלמיד</b>';
       subs.slice().sort(function(a,b){return b.pct-a.pct}).forEach(function(s){
         var wrong=s.per.filter(function(p){return !p.ok});
-        h+='<div class="tog" style="align-items:flex-start"><span class="tt"><b>'+esc(s.name||"ללא שם")+'</b>'+
+        h+='<div class="tog" style="align-items:flex-start"><span class="tt"><b>'+esc(s.name||_("ללא שם"))+'</b>'+
           '<span>'+s.ok+' '+_("מתוך")+' '+s.n+(wrong.length?' · '+_("נפל ב:")+' '+esc(uniq(wrong.map(function(p){return p.topicName})).join(", ")):' · '+_("הכול נכון"))+
           (s.valid?"":' · <b style="color:var(--bad)">הקוד לא תואם לעצמו</b>')+'</span></span>'+
           '<span class="chip '+(s.pct>=70?"ok":s.pct>=55?"warn":"bad")+'">'+s.pct+'%</span></div>';
@@ -5793,7 +5793,7 @@ function marksCsv(ex){
   for(i=0;i<n;i++)head.push(("שאלה "+(i+1)));
   var rows=[csvRow(head)];
   subs.forEach(function(s){
-    var r=[s.name||"ללא שם",s.pct,s.ok,s.n,s.date||"",
+    var r=[s.name||_("ללא שם"),s.pct,s.ok,s.n,s.date||"",
            s.valid?"כן":"לא"];
     for(i=0;i<n;i++){
       var p=s.per&&s.per[i];
@@ -5861,7 +5861,7 @@ function marksTable(ex){
   out+="תלמיד\tציון\tנכונות\tנפל ב\n";
   (ex.subs||[]).slice().sort(function(a,b){return b.pct-a.pct}).forEach(function(s){
     var wrong=uniq(s.per.filter(function(p){return !p.ok}).map(function(p){return p.topicName}));
-    out+=(s.name||"ללא שם")+"\t"+s.pct+"\t"+s.ok+"/"+s.n+"\t"+wrong.join(", ")+"\n";
+    out+=(s.name||_("ללא שם"))+"\t"+s.pct+"\t"+s.ok+"/"+s.n+"\t"+wrong.join(", ")+"\n";
   });
   return out;
 }
