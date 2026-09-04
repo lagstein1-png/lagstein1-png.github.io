@@ -734,6 +734,7 @@ T.he={
   femIos:"באייפון או באייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.",
   femMac:"במק: הגדרות המערכת ← נגישות ← תוכן מדובר ← קול המערכת ← ניהול קולות ← להוריד קול נשי.",
   femWin:"בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.",
+  edgeHas:"בדפדפן Microsoft Edge יש קולות טבעיים בשפה הזאת, נשיים וגבריים — בלי התקנה, בחיבור לאינטרנט.",openEdge:"לפתוח את האפליקציה ב-Edge",
   vKey:"מפתח Gemini", vKeyPh:"מתחיל ב-AIza…", vSave:"שמרו", vShow:"הצג", vHide:"הסתר",
   vSaved:"המפתח נשמר במכשיר הזה בלבד. הוא לא נשלח לשום מקום אחר.",
   vRemoved:"המפתח נמחק.", vChecking:"בודקים…", vOk:"המפתח עובד.",
@@ -787,6 +788,7 @@ T.ar={
   femIos:"في آيفون أو آيباد: الإعدادات ← إمكانية الوصول ← المحتوى المنطوق ← الأصوات ← اختيار صوت نسائي وتنزيله.",
   femMac:"في ماك: إعدادات النظام ← إمكانية الوصول ← المحتوى المنطوق ← صوت النظام ← إدارة الأصوات ← تنزيل صوت نسائي.",
   femWin:"في ويندوز: الإعدادات ← الوقت واللغة ← الكلام ← إدارة الأصوات ← إضافة أصوات.",
+  edgeHas:"في متصفح Microsoft Edge أصوات طبيعية لهذه اللغة، نسائية ورجالية — دون تثبيت، مع اتصال بالإنترنت.",openEdge:"افتح التطبيق في Edge",
   vKey:"مفتاح Gemini", vKeyPh:"يبدأ بـ AIza…", vSave:"حفظ", vShow:"إظهار", vHide:"إخفاء",
   vSaved:"حُفظ المفتاح على هذا الجهاز فقط، ولا يُرسل إلى أي مكان آخر.",
   vRemoved:"حُذف المفتاح.", vChecking:"جارٍ الفحص…", vOk:"المفتاح يعمل.",
@@ -840,6 +842,7 @@ T.ru={
   femIos:"В iPhone или iPad: Настройки → Универсальный доступ → Устный контент → Голоса → выбрать женский голос и загрузить.",
   femMac:"В Mac: Системные настройки → Универсальный доступ → Устный контент → Системный голос → Управление голосами → загрузить женский голос.",
   femWin:"В Windows: Параметры → Время и язык → Речь → Управление голосами → Добавить голоса.",
+  edgeHas:"В браузере Microsoft Edge есть естественные голоса для этого языка, женские и мужские — без установки, при подключении к интернету.",openEdge:"Открыть приложение в Edge",
   vKey:"Ключ Gemini", vKeyPh:"начинается с AIza…", vSave:"Сохранить", vShow:"Показать", vHide:"Скрыть",
   vSaved:"Ключ сохранён только на этом устройстве и никуда не отправляется.",
   vRemoved:"Ключ удалён.", vChecking:"Проверяем…", vOk:"Ключ работает.",
@@ -893,6 +896,7 @@ T.en={
   femIos:"On iPhone or iPad: Settings → Accessibility → Spoken Content → Voices → pick a female voice and download it.",
   femMac:"On Mac: System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → download a female voice.",
   femWin:"On Windows: Settings → Time & language → Speech → Manage voices → Add voices.",
+  edgeHas:"Microsoft Edge has natural voices for this language, female and male — nothing to install, with an internet connection.",openEdge:"Open the app in Edge",
   vKey:"Gemini key", vKeyPh:"starts with AIza…", vSave:"Save", vShow:"Show", vHide:"Hide",
   vSaved:"The key is stored on this device only. It is not sent anywhere else.",
   vRemoved:"Key removed.", vChecking:"Checking…", vOk:"The key works.",
@@ -950,7 +954,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m37 · 2026-09-02";
+var BUILD="m38 · 2026-09-04";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -1131,6 +1135,19 @@ function voicesFor(code){
    שדפדפן יכול לעשות בלי הקלטות ובלי שירות חיצוני. ההודעה מסבירה
    את זה ומצרפת את ההוראות למערכת ההפעלה שהמשתמש נמצא בה — קול
    נשי שמותקן נבחר מיד, בלי שינוי הגובה ובלי הודעה. */
+/* כרום על ווינדוס אין לו קולות משלו: הוא רואה רק את קולות המערכת,
+   ובעברית המערכת מציעה אחד בלבד — Asaf הגברי. "הוספת קולות" לא
+   תביא קול נשי בעברית, כי כזה אין למיקרוסופט להתקנה; ובערבית
+   וברוסית, בלי חבילת שפה, אין אף קול. Edge לעומתו נושא קולות
+   טבעיים משלו בארבע השפות, נשיים וגבריים (Hila ו-Avri בעברית).
+   הסכימה microsoft-edge: פותחת את אותה כתובת ב-Edge מתוך כל דפדפן
+   בווינדוס — לחיצה אחת במקום מסלול הגדרות שלא מוביל לשום מקום.
+   נצפה ב-4.9.2026 בכרום על ווינדוס: בעברית Asaf בלבד, בערבית כלום. */
+function isWinNotEdge(){var ua=navigator.userAgent||"";return /Windows/i.test(ua)&&!/Edg\//.test(ua)}
+function edgeNote(){
+  if(!isWinNotEdge())return "";
+  return " "+esc(t("edgeHas"))+' <a href="microsoft-edge:'+esc(location.href.split("#")[0])+'" style="font-weight:700;color:inherit">'+esc(t("openEdge"))+"</a>";
+}
 function femNote(pool){
   if(!pool||!pool.length)return "";
   for(var i=0;i<pool.length;i++)if(vGender(pool[i])==="f")return "";
@@ -1154,13 +1171,14 @@ function devPicker(lgs){
     if(!pool.length){
       /* אומרים את זה במפורש. רשימה ריקה בלי הסבר נראית כמו תקלה. */
       out+='<p class="chip bad" style="margin:.4rem 0">'+esc(t("vNoneLang"))+"</p>";
+      var en=edgeNote();if(en)out+='<p class="sub" style="margin:.4rem 0;line-height:1.5">'+en+"</p>";
       return;
     }
     /* אין קול נשי בשפה הזאת? הגובה מורם — וגם נאמר למה. בלי המשפט
        הזה הקול הגברי נראה כמו בחירה של האפליקציה ולא כמו מה שיש
        במכשיר, ואין שום רמז שאפשר להתקין קול נשי ולקבל אותו מיד. */
     var fnote=femNote(pool);
-    if(fnote)out+='<p class="sub" style="margin:.4rem 0;line-height:1.5">'+esc(fnote)+"</p>";
+    if(fnote)out+='<p class="sub" style="margin:.4rem 0;line-height:1.5">'+esc(fnote)+edgeNote()+"</p>";
     var cur=(state.devVoice||{})[code]||"";
     function row(v){
       var on=v?cur===v.voiceURI:!cur;
@@ -5819,7 +5837,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m37-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m38-pwa1").catch(function(){});
   });
 }
 </script>
