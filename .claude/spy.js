@@ -50,8 +50,31 @@ function allTranscripts() {
   return dirs.reduce((a, d) => a.concat(jsonlIn(path.join(ROOT, d))), []);
 }
 
+/* הסיכומים של המרגל רצים בעצמם דרך `claude -p`. בגרסה שנבדקה כאן
+   (2.1.259) קריאה כזאת לא הותירה תמליל משלה, אבל אם היא כן מותירה —
+   התמליל הזה הוא החדש ביותר בתיקייה, ו-`--last` היה מסכם את הסיכום
+   הקודם במקום את הסשן.
+
+   לכן הפרומפטים של המרגל נושאים סימון, ותמליל שהסימון הוא חלק
+   מ*שורתו הראשונה* מדולג. רק השורה הראשונה, ובכוונה: סשן רגיל שנגע
+   בקבצים האלה מזכיר את המחרוזת בהמשך הדרך, והוא אינו סיכום. */
+const SPY_MARK = 'SPY-TRANSCRIPT-IGNORE';
+
+function isSpyOwn(f) {
+  let fd;
+  try {
+    fd = fs.openSync(f, 'r');
+    const buf = Buffer.alloc(8192);
+    const n = fs.readSync(fd, buf, 0, buf.length, 0);
+    const head = buf.toString('utf8', 0, n).split('\n')[0];
+    return head.indexOf(SPY_MARK) >= 0;
+  } catch (e) { return false } finally { if (fd != null) try { fs.closeSync(fd) } catch (e) {} }
+}
+
 function newest(files) {
-  const live = files.filter(f => { try { return fs.statSync(f).isFile() } catch (e) { return false } });
+  const live = files.filter(f => {
+    try { return fs.statSync(f).isFile() && !isSpyOwn(f) } catch (e) { return false }
+  });
   if (!live.length) return null;
   return live.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0];
 }
@@ -105,56 +128,69 @@ function textOf(block) {
   return '';
 }
 
-function render(file) {
-  const raw = fs.readFileSync(file, 'utf8').split('\n').filter(l => l.trim());
-  const out = [];
-  const touched = [];        /* קבצים שנכתבו, לפי סדר ראשון */
-  const failed = [];         /* כלים שהחזירו שגיאה */
-  const byId = {};           /* tool_use_id → שם הכלי, כדי לשייך תוצאה */
-  const mentions = {};       /* שם אפליקציה → כמה פעמים נזכרה בקלט של כלי */
-  let apps = [];
-  let head = null, first = null, last = null, turns = 0, tools = 0;
+/* מצב מצטבר של קריאת תמליל. הוא נבנה שורה־שורה, ולכן אותו קוד משרת
+   גם קריאה של קובץ גמור (כאן) וגם מעקב חי אחרי קובץ שעדיין נכתב
+   (spy-live.js, שעושה require לקובץ הזה). */
+function newCtx() {
+  return {
+    out: [],         /* שורות התמליל הקריא */
+    touched: [],     /* קבצים שנכתבו, לפי סדר ראשון */
+    failed: [],      /* כלים שהחזירו שגיאה */
+    byId: {},        /* tool_use_id → שם הכלי, כדי לשייך תוצאה */
+    mentions: {},    /* שם אפליקציה → כמה פעמים נזכרה בקלט של כלי */
+    apps: [], head: null, first: null, last: null, turns: 0, tools: 0,
+  };
+}
 
-  for (const line of raw) {
-    let o;
-    try { o = JSON.parse(line) } catch (e) { continue }
-    if (o.timestamp) { first = first || o.timestamp; last = o.timestamp }
-    if (!head && o.sessionId && o.cwd) { head = o; apps = appsUnder(o.cwd) }
-    if (o.type !== 'user' && o.type !== 'assistant') continue;
+/* מוסיף שורת JSON אחת אל המצב. מחזיר כמה שורות קריאות נוספו. */
+function feed(ctx, line) {
+  const before = ctx.out.length;
+  let o;
+  try { o = JSON.parse(line) } catch (e) { return 0 }
+  if (o.timestamp) { ctx.first = ctx.first || o.timestamp; ctx.last = o.timestamp }
+  if (!ctx.head && o.sessionId && o.cwd) { ctx.head = o; ctx.apps = appsUnder(o.cwd) }
+  if (o.type !== 'user' && o.type !== 'assistant') return 0;
 
-    const c = o.message && o.message.content;
-    const blocks = typeof c === 'string' ? [{ type: 'text', text: c }] : (Array.isArray(c) ? c : []);
+  const c = o.message && o.message.content;
+  const blocks = typeof c === 'string' ? [{ type: 'text', text: c }] : (Array.isArray(c) ? c : []);
 
-    for (const b of blocks) {
-      if (b.type === 'tool_use') {
-        tools++;
-        byId[b.id] = b.name;
-        if (WRITERS.indexOf(b.name) >= 0) {
-          const p = b.input && (b.input.file_path || b.input.notebook_path);
-          if (p && touched.indexOf(p) < 0) touched.push(p);
-        }
-        const blob = JSON.stringify(b.input || '');
-        for (const app of apps) {
-          const hits = blob.split(app + '/').length - 1;
-          if (hits) mentions[app] = (mentions[app] || 0) + hits;
-        }
-        out.push('  [' + b.name + '] ' + clip(detail(b.name, b.input), CUT));
-      } else if (b.type === 'tool_result') {
-        if (b.is_error) {
-          const who = byId[b.tool_use_id] || 'כלי';
-          const body = typeof b.content === 'string' ? b.content
-            : (Array.isArray(b.content) ? b.content.map(x => x.text || '').join(' ') : '');
-          failed.push(who + ': ' + clip(body, 160));
-          out.push('  [!] ' + who + ' נכשל: ' + clip(body, CUT));
-        }
-      } else {
-        const t = textOf(b).trim();
-        if (!t) continue;
-        if (o.type === 'user') { turns++; out.push('', '>>> משתמש: ' + clip(t, FULL ? Infinity : 2000)) }
-        else out.push('    ' + clip(t, FULL ? Infinity : 1200));
+  for (const b of blocks) {
+    if (b.type === 'tool_use') {
+      ctx.tools++;
+      ctx.byId[b.id] = b.name;
+      if (WRITERS.indexOf(b.name) >= 0) {
+        const p = b.input && (b.input.file_path || b.input.notebook_path);
+        if (p && ctx.touched.indexOf(p) < 0) ctx.touched.push(p);
       }
+      const blob = JSON.stringify(b.input || '');
+      for (const app of ctx.apps) {
+        const hits = blob.split(app + '/').length - 1;
+        if (hits) ctx.mentions[app] = (ctx.mentions[app] || 0) + hits;
+      }
+      ctx.out.push('  [' + b.name + '] ' + clip(detail(b.name, b.input), CUT));
+    } else if (b.type === 'tool_result') {
+      if (b.is_error) {
+        const who = ctx.byId[b.tool_use_id] || 'כלי';
+        const body = typeof b.content === 'string' ? b.content
+          : (Array.isArray(b.content) ? b.content.map(x => x.text || '').join(' ') : '');
+        ctx.failed.push(who + ': ' + clip(body, 160));
+        ctx.out.push('  [!] ' + who + ' נכשל: ' + clip(body, CUT));
+      }
+    } else {
+      const t = textOf(b).trim();
+      if (!t) continue;
+      if (o.type === 'user') { ctx.turns++; ctx.out.push('', '>>> משתמש: ' + clip(t, FULL ? Infinity : 2000)) }
+      else ctx.out.push('    ' + clip(t, FULL ? Infinity : 1200));
     }
   }
+  return ctx.out.length - before;
+}
+
+function render(file) {
+  const raw = fs.readFileSync(file, 'utf8').split('\n').filter(l => l.trim());
+  const ctx = newCtx();
+  for (const line of raw) feed(ctx, line);
+  const { out, touched, failed, mentions, apps, head, first, last, turns, tools } = ctx;
 
   const L = [];
   L.push('=== תמליל סשן ===');
@@ -193,10 +229,14 @@ function render(file) {
 
 /* ---------- הרצה ------------------------------------------------- */
 
-const file = locate(arg);
-if (!file) {
-  console.error('spy: לא נמצא תמליל' + (arg ? ' עבור ' + arg : ' לתיקייה ' + process.cwd()));
-  console.error('spy: התמלילים יושבים תחת ' + ROOT);
-  process.exit(1);
+module.exports = { ROOT, SPY_MARK, slug, locate, newCtx, feed, render, clip };
+
+if (require.main === module) {
+  const file = locate(arg);
+  if (!file) {
+    console.error('spy: לא נמצא תמליל' + (arg ? ' עבור ' + arg : ' לתיקייה ' + process.cwd()));
+    console.error('spy: התמלילים יושבים תחת ' + ROOT);
+    process.exit(1);
+  }
+  process.stdout.write(render(file) + '\n');
 }
-process.stdout.write(render(file) + '\n');
