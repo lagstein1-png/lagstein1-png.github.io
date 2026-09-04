@@ -408,7 +408,9 @@
 
 ### D6 — eslint
 
-    rm -rf /tmp/js && node .claude/qa/extract.js /tmp/js index.html */index.html bagrut-806/app.js
+    rm -rf /tmp/js && mkdir -p /tmp/js
+    node .claude/qa/extract.js /tmp/js index.html */index.html
+    cp bagrut-806/app.js /tmp/js/bagrut-806_app.js
     cp .claude/qa/eslint.config.mjs /tmp/js/
     cd /tmp/js && npx --no-install eslint --config eslint.config.mjs . ; cd -
     sed -n 119,140p .claude/qa/README.md
@@ -447,7 +449,8 @@
 ### M2 — אימות facts.md
 
     node .claude/qa/banks.js
-    grep -c '"topic"\|TOPIC(' math-teen/index.html
+    awk '/^var TOPICS=\[/{f=1} f&&/^\];/{f=0} f' math-teen/index.html | grep -c '{id:"'
+    grep -c "TOPIC(" lomda/data/*.js
     grep -n "^| " marketing/facts.md | sed -n 1,20p
 
 ### M3 — שבוע 0
