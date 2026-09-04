@@ -915,7 +915,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v39 · 2026-09-04";
+var BUILD="v40 · 2026-09-04";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -4655,8 +4655,15 @@ function examUrl(spec){
   var base=location.origin+location.pathname;
   return base+"#x="+encodeExam(spec);
 }
+/* wa.me מקבל רק מספר בינלאומי בלי אפס מוביל. מורה שהקליד 050-8554380
+   כמו שמקלידים בטלפון קיבל אצל התלמיד "לא ניתן לבדוק את מספר הטלפון…
+   חסרה קידומת חיוג", והתשובות לא נשלחו. אפס מוביל הוא מספר ישראלי
+   מקומי ומקבל 972; "00" בהתחלה הוא קידומת בינלאומית ונופל; מספר
+   שכבר מתחיל בקידומת מדינה נשאר כפי שהוא. */
 function waLink(text,phone){
   var p=String(phone||"").replace(/[^0-9]/g,"");
+  if(p.indexOf("00")===0)p=p.slice(2);
+  else if(p.charAt(0)==="0")p="972"+p.slice(1);
   return "https://wa.me/"+p+"?text="+encodeURIComponent(text);
 }
 
@@ -11748,7 +11755,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v39-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v40-pwa1").catch(function(){});
   });
 }
 </script>
