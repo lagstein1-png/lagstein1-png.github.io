@@ -208,14 +208,29 @@ for (const ex of EXAMS) {
       });
 
       /* רמז שמכיל את התשובה הסופית פותר במקום התלמיד. מספר
-         שכבר מופיע בנתוני השאלה אינו ממצא — הוא נתון, לא תשובה. */
+         שכבר מופיע בנתוני השאלה אינו ממצא — הוא נתון, לא תשובה.
+
+         וההתאמה נעשית בגבולות מספר ולא כתת־מחרוזת: התשובה 80
+         נמצאת בתוך 180, ורמז שאומר ״סכום הזוויות במשולש הוא 180
+         מעלות״ נדלק בטעות. חיפוש תת־מחרוזת על מספרים מייצר ממצא
+         כוזב בכל פעם שהתשובה היא סיפא או רישא של מספר אחר. */
       if (fa && has(fa.value !== undefined ? String(fa.value) : '')) {
         const ans = String(fa.value).trim();
+        const inside = (hay) => {
+          let from = 0, at;
+          while ((at = hay.indexOf(ans, from)) >= 0) {
+            const before = hay[at - 1], after = hay[at + ans.length];
+            const digit = c => c !== undefined && /[0-9.,]/.test(c);
+            if (!digit(before) && !digit(after)) return true;
+            from = at + 1;
+          }
+          return false;
+        };
         const given = (str(q.text) + ' ' + str(s.text) + ' ' + str(q.latex) + ' ' + str(s.latex));
-        const distinctive = ans.length >= 2 && given.indexOf(ans) < 0;
+        const distinctive = ans.length >= 2 && !inside(given);
         if (distinctive) {
           steps.forEach((st, i) => {
-            if (str(st.hint).indexOf(ans) >= 0)
+            if (inside(str(st.hint)))
               fail('שלב ' + (i + 1) + ': ה-hint מכיל את התשובה הסופית (' + ans + ')');
           });
         }
