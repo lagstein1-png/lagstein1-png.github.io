@@ -1,26 +1,34 @@
 /* שומר על כלל השם.
 
-   ״DriveWise״ אסור כשם מותג (3.9.2026, חשש לזכויות יוצרים וסימן
-   מסחר), והשם הרשמי הוא ״תאוריה מדברת״. ביום שההחלטה התקבלה הכלל
-   כבר התקיים בקוד — הבדיקה הזאת אינה מתקנת דבר, היא מונעת נסיגה.
+   השם האנגלי הישן של ״תאוריה מדברת״ אסור לשימוש — חשש לזכויות
+   יוצרים וסימן מסחר, 3.9.2026 — ובהחלטה מ-4.9.2026 הוא נמחק
+   מהמאגר כליל, גם באות קטנה וגם כמזהה. אין שם חלופי.
 
    ולמה בדיקה ולא רק מסמך: אפליקציה חדשה נולדת מהעתקה של אפליקציה
    קיימת, ומחרוזת שיווקית מועתקת מדף לדף. מסמך אינו עוצר העתקה,
    וזה בדיוק הנימוק שכתוב ב-README על `cache.js`.
 
-   שני מסמכי הכלל — NAMING.md ו-CLAUDE.md — מוחרגים, כי הם המקום
-   היחיד במאגר שבו השם מופיע בכוונה. בלי ההחרגה הבדיקה הייתה
-   נכשלת על הכלל שהיא באה לאכוף. מאותה סיבה בדיוק מוחרג גם הקובץ
-   הזה: הוא מכיל את השם האסור בביטוי הרגולרי ובהודעת השגיאה, ובלי
-   ההחרגה הוא היה נכשל על עצמו בכל הרצה.
+   **נשאר מופע חוקי אחד בכל המאגר**, והוא נתיב ולא שם: השדה `u`
+   ברשומת האפליקציה שב-`DATA.APPS`. הכתובת שאליה הכרטיס מקשר
+   נקבעת בשם הריפו הנפרד, ו-GitHub Pages מפרסם פרויקט תחת שם
+   הריפו — ולכן היא לא ניתנת לשינוי מכאן. ברגע שהריפו יְשׁוּנֶה,
+   השדה `u` נמחק והמזהה `theory` מספיק לבדו.
 
-   שלושת המוחרגים הם רשימה סגורה. קובץ רביעי שיצטרך להזכיר את השם
-   הוא סימן שמשהו זולג, ולא סיבה להאריך את הרשימה.
+   הבדיקה אוכפת את זה: מחוץ לשדה הזה ולמסמכי הכלל, אף מופע אינו
+   מותר — לא באות גדולה ולא באות קטנה.
+
+   שני מסמכי הכלל — NAMING.md ו-CLAUDE.md — מוחרגים, כי הם המקום
+   שבו הכלל מנוסח. מאותה סיבה מוחרג גם הקובץ הזה, שמכיל את המילה
+   בביטוי הרגולרי ובהודעות. שלושת המוחרגים הם רשימה סגורה: קובץ
+   רביעי שיזדקק למילה הוא סימן שמשהו זולג, ולא סיבה להאריך אותה.
 */
 const fs = require('fs'), path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const BANNED = /DriveWise|Drivewise|DRIVEWISE/;
+const BANNED = /drivewise/i;
+/* המופע החוקי היחיד: שדה הנתיב ברשומת האפליקציה. הוא מנוכה מהשורה
+   לפני החיפוש, ולכן מופע *נוסף* באותה שורה עדיין ייתפס. */
+const LEGACY_PATH = '"u":"/drivewise/"';
 const EXEMPT = new Set(['NAMING.md', 'CLAUDE.md', path.join('.claude', 'qa', 'naming.js')]);
 const SKIP_DIR = new Set(['.git', 'img', 'vendor', 'node_modules', '.well-known']);
 const TEXT = /\.(html|js|json|md|css|svg|txt|webmanifest)$/i;
@@ -41,8 +49,8 @@ function walk(dir) {
     scanned++;
     const lines = fs.readFileSync(full, 'utf8').split('\n');
     lines.forEach((ln, i) => {
-      if (BANNED.test(ln)) {
-        console.log(`✗ ${rel}:${i + 1}: ״DriveWise״ אסור כשם מותג. השם הוא ״${OFFICIAL.he}״`);
+      if (BANNED.test(ln.split(LEGACY_PATH).join(''))) {
+        console.log(`✗ ${rel}:${i + 1}: השם האנגלי הישן נמחק מהמאגר. השם הוא ״${OFFICIAL.he}״`);
         bad++;
       }
     });
@@ -58,12 +66,12 @@ const a = home.indexOf('var DATA='), b = home.indexOf('\nvar APPS=DATA.APPS');
 let card = null;
 try {
   const D = JSON.parse(home.slice(a + 9, home.lastIndexOf('};', b) + 1));
-  card = (D.APPS || []).find(x => x.id === 'drivewise');
+  card = (D.APPS || []).find(x => x.id === 'theory');
 } catch (e) { /* נופל לענף שמתחת */ }
 
 if (!card) {
-  console.log('✗ index.html: לא נמצאה רשומת drivewise ב-DATA.APPS. ' +
-    'אם הנתיב שונה — לעדכן גם את ICONS, את מסמכי marketing ואת הבדיקה הזאת.');
+  console.log('✗ index.html: לא נמצאה רשומה עם id="theory" ב-DATA.APPS. ' +
+    'אם המזהה שונה — לעדכן גם את ICONS, את apps.js ואת הבדיקה הזאת.');
   bad++;
 } else {
   for (const lg of Object.keys(OFFICIAL)) {
@@ -80,5 +88,5 @@ if (!card) {
 }
 
 console.log(`\n${scanned} קבצים נסרקו, ${bad} ממצאים` +
-  (bad ? '' : ' · ״DriveWise״ אינו מופיע מחוץ ל-NAMING.md ול-CLAUDE.md'));
+  (bad ? '' : ' · השם הישן אינו מופיע מחוץ למסמכי הכלל ולשדה u'));
 process.exit(bad ? 1 : 0);

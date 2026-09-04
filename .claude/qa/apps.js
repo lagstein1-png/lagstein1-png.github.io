@@ -40,7 +40,7 @@ const WORDS = {
 };
 
 /* אפליקציות שנספרות בדף הבית אך אין להן תיקייה כאן — הן בריפו נפרד */
-const EXTERNAL = new Set(['drivewise']);
+const EXTERNAL = new Set(['theory']);
 
 let findings = 0;
 const bad = (m) => { console.log('✗ ' + m); findings++; };
