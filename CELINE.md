@@ -319,3 +319,146 @@
 כל ממצא שאת מגלה בדרך ואינו ברשימה — שורה עם סימון:
 **קריטי** (משתמש רואה שגיאה) / **חשוב** (משתמש רואה טעות) /
 **זניח** (רק אנחנו רואים). לא מתקנים אותו בלי לכתוב אותו קודם.
+
+---
+
+## פקודות להעתקה
+
+כל בלוק עומד בפני עצמו. מריצים מתיקיית הריפו. בכל מקום שכתוב
+`<ענף>` שמים את שם הענף של המשימה, למשל `celine/m1-count`.
+
+### פעם אחת — התקנה
+
+    git clone https://github.com/lagstein1-png/lagstein1-png.github.io.git
+    cd lagstein1-png.github.io
+    node --version
+    node .claude/qa/all.js
+
+השורה האחרונה צריכה להסתיים ב-"13 בדיקות, כולן עברו". אם לא —
+לעצור ולשלוח לי את הפלט לפני שנוגעים במשהו.
+
+### תחילת כל משימה
+
+    git fetch origin main
+    git log --oneline origin/main | head -5
+    git checkout -b <ענף> origin/main
+
+### שרת מקומי, כשצריך לראות אפליקציה בדפדפן
+
+    node .claude/qa/serve.js
+
+ואז בדפדפן: `http://127.0.0.1:8099/math-teen/` (או כל אפליקציה).
+הרשת חסומה מכאן לאתר החי — זו בדיקה מקומית.
+
+### סיום כל משימה
+
+    node .claude/qa/all.js
+    git fetch origin main
+    git log --oneline origin/main | head -3
+    git add -A
+    git status
+    git commit -m "<תחום>(<אפליקציה>): <מה השתנה, בעברית, שורה אחת>"
+    git push -u origin <ענף>
+
+`git status` לפני ה-commit מראה בדיוק מה נכנס. קובץ שלא ציפית
+לראות שם — לא מוסיפים.
+
+### D1 — אפשרויות חסרות באקסיומה
+
+    grep -n "lineq\|logic" math-uni/index.html | head -20
+    grep -n "function genLinEq\|function genLogic" math-uni/index.html
+    node .claude/qa/serve.js &
+    node .claude/qa/options.js math-uni
+    node .claude/qa/entropy.js math-uni
+
+### D2 — תגיות שיתוף
+
+    for f in index.html */index.html; do printf "%-24s %s\n" "$f" "$(grep -c 'property="og:' $f)"; done
+    sed -n 623p index.html | grep -o '"n":{"he":"[^"]*"' 
+    sed -n 623p index.html | grep -o '"d":{"he":"[^"]*"'
+
+השורה הראשונה היא המדידה לפני ואחרי. שתי האחרונות מדפיסות את
+השם והתיאור העבריים של כל אפליקציה, לשימוש מילה במילה.
+
+### D3 — README
+
+    cat README.md
+    cat LICENSE | head -5
+    node .claude/qa/status.js --md
+
+### D4 — תרגומים חסרים ב"שלב"
+
+    sed -n 4590,4600p math-teen/index.html
+    node .claude/qa/serve.js
+
+ואז בדפדפן: `http://127.0.0.1:8099/math-teen/`, לעבור לערבית,
+סיור בכל הנושאים, ובקונסולה (F12):
+
+    trTodo()
+
+### D5 — learning-core
+
+    ls learning-core
+    node learning-core/test.js
+    grep -rl "core.js" --include=*.html . | grep -v "^./learning-core"
+    node .claude/qa/engine.js --show | head -40
+
+השורה השלישית צריכה להחזיר כלום — זו ההוכחה שאף אפליקציה לא
+טוענת את הספרייה.
+
+### D6 — eslint
+
+    rm -rf /tmp/js && node .claude/qa/extract.js /tmp/js index.html */index.html bagrut-806/app.js
+    cp .claude/qa/eslint.config.mjs /tmp/js/
+    cd /tmp/js && npx --no-install eslint --config eslint.config.mjs . ; cd -
+    sed -n 119,140p .claude/qa/README.md
+
+### E1 — תמונות שיתוף
+
+    grep -h -o '"theme_color": *"[^"]*"' */manifest.json manifest.json
+    ls -l */img/og.png img/og.png
+    file */img/og.png img/og.png
+
+השורה האחרונה מדפיסה את המידות — כל אחת חייבת להיות 1200x630.
+
+### E2 — צילומי מסך
+
+    node .claude/qa/serve.js &
+    grep -l screenshots */manifest.json
+    node .claude/qa/cache.js
+
+השורה האמצעית היא המדידה: כלום לפני, 11 קבצים אחרי.
+
+### E3 — ביקורת צבעים
+
+    for d in */; do [ -f "$d/manifest.json" ] && printf "%-12s %s  %s\n" "$d" "$(grep -o '"theme_color": *"[^"]*"' $d/manifest.json)" "$(grep -o -m1 -- '--primary:[^;]*\|--accent:[^;]*\|--teal:[^;]*' $d/index.html)"; done
+
+זה נותן שתיים משלוש העמודות. את צבע האייקון בודקים בעין ומצלמים.
+
+### M1 — המניין בקובצי השיווק
+
+    grep -n "שמונה\|תשע\|שש מתוך\|שבע מתוך" marketing/*.md
+    grep -o 'var LANGS *= *\[[^]]*\]' */index.html
+    grep -n "מתוך שתים־עשרה" marketing/facts.md
+
+הראשונה: לפני ואחרי. השנייה: כמה שפות באמת יש בכל אפליקציה.
+השלישית: הנוסח שמותר להעתיק.
+
+### M2 — אימות facts.md
+
+    node .claude/qa/banks.js
+    grep -c '"topic"\|TOPIC(' math-teen/index.html
+    grep -n "^| " marketing/facts.md | sed -n 1,20p
+
+### M3 — שבוע 0
+
+    sed -n 12,26p marketing/plan-weekly.md
+    sed -n 21,40p marketing/video-scripts.md
+
+הבדיקה עצמה היא בטלפון ובמחשב, על האתר החי, לא בפקודה.
+
+### לפני כל דוח — המספרים מהמקור
+
+    git log --oneline -5
+    git diff --stat origin/main
+    node .claude/qa/all.js | tail -16
