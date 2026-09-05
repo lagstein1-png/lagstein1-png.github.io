@@ -408,6 +408,11 @@ https://lagstein1-png.github.io
 **סיום.** `grep -c 'property="og:'` מחזיר 5 בכל אחד מ-13 הדפים.
 `node .claude/qa/all.js` עובר. בדוח: "דורש העלאת גרסה ב-13 דפים".
 
+**בוצע 5.9 בענף `claude/global-social-growth-strategist-j2neaf`, לא ממוזג:**
+5 תגיות `og:` ו-`twitter:card` ב-12 הדפים שבריפו (״תאוריה מדברת״
+אינה כאן), עם `icon-512.png` של כל אפליקציה עד שתהיה תמונת E1.
+מפתחות הקאש לא הועלו — מוקצים במיזוג.
+
 ### D3 · חשוב · README ריק
 
 **הממצא.** `cat README.md` מחזיר שורה אחת: `# lagstein1-png.github.io`.
@@ -547,6 +552,9 @@ https://lagstein1-png.github.io
 
 **סיום.** `grep -n "שמונה" marketing/*.md` מחזיר רק שורות שבהן
 "שמונה" אינו מניין אפליקציות (למשל "ארבע עד שמונה ספרות").
+
+**בוצע 5.9 בענף `claude/global-social-growth-strategist-j2neaf`, לא ממוזג**, יחד עם
+הסרת ״חינם״ על כל האוסף לפי ההחלטה על גבייה (`facts.md`).
 
 ### M2 · חשוב · אימות המספרים ב-facts.md
 
