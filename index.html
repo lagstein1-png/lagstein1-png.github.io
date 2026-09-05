@@ -119,8 +119,6 @@ html[lang="ar"] .btn,html[lang="ar"] .t{
   .logo{font-size:.98rem; gap:8px; min-block-size:44px}
   .mark{inline-size:34px; block-size:34px; border-radius:11px}
   .mark svg{inline-size:20px; block-size:20px}
-  .lang{padding:2px}
-  .lang button{min-block-size:44px; min-inline-size:44px; padding-inline:6px; font-size:.8rem}
   .ico{min-block-size:44px; min-inline-size:44px; border-radius:11px}
   /* הניווט נשבר לשורה שנייה ולא נגלל: גלילה לרוחב עם פס גלילה מוסתר
      חתכה את הפריט האחרון — "צרו קשר" בעברית, Contact באנגלית — בלי
@@ -130,21 +128,40 @@ html[lang="ar"] .btn,html[lang="ar"] .t{
   section.blk{scroll-margin-block-start:120px}
 }
 
-/* --- כפתורי שפה ומצב כהה --- */
-.lang{display:flex; gap:4px; background:var(--bg-elev);
-  border:1px solid var(--line); border-radius:999px; padding:3px}
-.lang button{
-  min-block-size:44px; min-inline-size:44px; padding-inline:10px; border:0;
-  border-radius:999px; background:none; color:var(--text-soft); cursor:pointer;
-  font:700 .86rem/1 Heebo,system-ui,sans-serif;
+/* --- בורר שפה ומצב כהה --- */
+/* כפתור אחד — גלובוס ושם השפה הנוכחית — שפותח תפריט עם ארבעת השמות
+   המלאים, כמו בשער התנאים ובהגדרות של כל אפליקציה. הגלולה הקודמת
+   עם "עב · ع · Ру · EN" ערבבה ארבעה כתבים בארבעה גדלים בשורה אחת. */
+.lang{position:relative}
+.lang-cur{
+  display:inline-flex; align-items:center; gap:8px; min-block-size:44px;
+  padding-inline:12px 10px; border:1px solid var(--line); border-radius:12px;
+  background:var(--bg-elev); color:var(--text); cursor:pointer;
+  font:700 .92rem/1 Heebo,system-ui,sans-serif;
 }
-.lang button[aria-pressed="true"]{background:var(--brand); color:var(--brand-ink)}
-/* הכפתור "ع" נראה קטן מהאחרים: Heebo אינו מכיל ערבית, והאות נפלה
-   לגופן המערכת בגודל שנקבע לאותיות לטיניות. הגופן הערבי והגודל
-   נקבעים לפי lang של הכפתור, ולא לפי שפת הדף. */
-.lang button[lang="ar"]{
-  font-family:"Noto Sans Arabic",Heebo,system-ui,sans-serif; font-size:1.1rem;
+.lang-cur:hover{border-color:color-mix(in srgb,var(--brand) 45%,var(--line))}
+.lang-cur svg{inline-size:18px; block-size:18px; flex:none; color:var(--text-soft)}
+.lang-cur .chev{inline-size:14px; block-size:14px; transition:transform .16s ease}
+.lang-cur[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.lang-menu{
+  position:absolute; inset-block-start:calc(100% + 8px); inset-inline-end:0; z-index:20;
+  min-inline-size:190px; padding:6px; display:grid; gap:2px;
+  background:var(--bg-elev); border:1px solid var(--line); border-radius:14px;
+  box-shadow:var(--shadow-lg);
 }
+.lang-menu button{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  min-block-size:44px; padding-inline:12px; border:0; border-radius:10px;
+  background:none; color:var(--text); cursor:pointer; text-align:start;
+  font:600 .98rem/1 Heebo,system-ui,sans-serif;
+}
+.lang-menu button:hover{background:var(--brand-soft)}
+.lang-menu button[aria-pressed="true"]{color:var(--brand); font-weight:800}
+.lang-menu button svg{inline-size:16px; block-size:16px; flex:none; visibility:hidden}
+.lang-menu button[aria-pressed="true"] svg{visibility:visible}
+/* Heebo אינו מכיל ערבית. הגופן הערבי נקבע לפי lang של הפריט עצמו,
+   ולא לפי שפת הדף — "العربية" מופיעה בתפריט בכל שפה. */
+.lang [lang="ar"]{font-family:"Noto Sans Arabic",Heebo,system-ui,sans-serif}
 [hidden]{display:none !important}
 .ico{
   min-block-size:44px; min-inline-size:44px; border-radius:12px; cursor:pointer;
@@ -364,7 +381,12 @@ a:focus-visible,button:focus-visible,input:focus-visible{
   <div class="wrap">
     <div class="logo-slot"><a class="logo" href="#top"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg></span><span id="me"></span></a></div>
     <nav class="nav" id="nav" aria-label="ניווט ראשי"></nav>
-    <div class="lang" id="lang" role="group"></div>
+    <div class="lang" id="lang">
+      <button class="lang-cur" id="langBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="langMenu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/></svg><span id="langName"></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="lang-menu" id="langMenu" role="group" hidden></div>
+    </div>
     <button class="ico" id="theme" type="button"></button>
   </div>
 </div>
@@ -471,13 +493,13 @@ var DEMO_SCRIPT=[
    action:function(){var e=demoEl("#q");if(e){e.value="";e.dispatchEvent(new Event("input",{bubbles:true}))}}, duration:2800},
 
   {subtitle:"ארבע שפות ממשק. אותו דף ואותו סדר — רק השפה והכיוון מתחלפים.",
-   action:function(){demoTap('#lang [data-l="ru"]')}, duration:4400},
+   action:function(){langOpen(true);demoTap('#lang [data-l="ru"]')}, duration:4400},
 
   {subtitle:"ערבית נכתבת לימין, רוסית ואנגלית לשמאל. הפריסה בנויה במידות לוגיות, ולכן היא לא נשברת.",
-   action:function(){demoTap('#lang [data-l="ar"]')}, duration:4600},
+   action:function(){langOpen(true);demoTap('#lang [data-l="ar"]')}, duration:4600},
 
   {subtitle:"וחזרה לעברית.",
-   action:function(){demoTap('#lang [data-l="he"]')}, duration:2800},
+   action:function(){langOpen(true);demoTap('#lang [data-l="he"]')}, duration:2800},
 
   {subtitle:"מצב כהה, לפי העדפת המערכת או בבחירה ידנית.",
    action:function(){demoTap("#theme")}, duration:3600},
@@ -722,7 +744,7 @@ var esc=function(x){return String(x).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
 
 /* --- שפה --- */
-var LKEY="site-lang", LANGS=[["he","עב"],["ar","ع"],["ru","Ру"],["en","EN"]];
+var LKEY="site-lang", LANGS=[["he","עברית"],["ar","العربية"],["ru","Русский"],["en","English"]];
 function savedLang(){try{return localStorage.getItem(LKEY)||""}catch(e){return""}}
 /* שפת הדפדפן היא רמז ולא הוראה: מכשירים רבים בישראל מדווחים en-US
    גם כשהמשתמש קורא עברית. לכן ברירת המחדל היא עברית, ואנגלית
@@ -839,10 +861,15 @@ function paint(){
   $("#contactL").textContent=S.contactL+" ";
   $("#foot").textContent=S.foot;
   $("#terms").textContent=S.terms;
-  $("#lang").setAttribute("aria-label",S.langLabel);
-  $("#lang").innerHTML=LANGS.map(function(x){
+  $("#langMenu").setAttribute("aria-label",S.langLabel);
+  $("#langMenu").innerHTML=LANGS.map(function(x){
     return '<button type="button" data-l="'+x[0]+'" aria-pressed="'+(x[0]===LG)+
-      '" lang="'+x[0]+'">'+esc(x[1])+"</button>"}).join("");
+      '" lang="'+x[0]+'"><span>'+esc(x[1])+'</span>'+
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg></button>'}).join("");
+  var cur=LANGS.filter(function(x){return x[0]===LG})[0];
+  $("#langName").textContent=cur[1]; $("#langName").setAttribute("lang",LG);
+  $("#langBtn").setAttribute("aria-label",S.langLabel+": "+cur[1]);
+  langOpen(false);
   applyTheme(savedTheme());
   draw();
 }
@@ -865,6 +892,18 @@ window.addEventListener("appinstalled",function(){$("#install").hidden=true});
 $("#install").addEventListener("click",function(){
   var L=window.LEGAL; if(L&&L.install)L.install();
   showInstall();
+});
+
+/* פתיחה וסגירה של תפריט השפות. ההחלפה עצמה נשארת ב-boot(), על
+   #lang [data-l] — הכפתורים רק עברו לתוך התפריט. */
+function langOpen(v){
+  $("#langMenu").hidden=!v;
+  $("#langBtn").setAttribute("aria-expanded",v?"true":"false");
+}
+$("#langBtn").addEventListener("click",function(){langOpen($("#langMenu").hidden)});
+document.addEventListener("click",function(e){if(!e.target.closest("#lang"))langOpen(false)});
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape"&&!$("#langMenu").hidden){langOpen(false);$("#langBtn").focus()}
 });
 
 function boot(){
@@ -899,7 +938,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=28-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=29-pwa1").catch(function(){});
   });
 }
 </script>
