@@ -969,7 +969,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l9 · 2026-09-05";
+var BUILD="l10 · 2026-09-05";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -1536,27 +1536,37 @@ var VCHK="";
    ------------------------------------------------------------ */
 var VCHKMSG={
   he:{sent:"נשלח…",noSup:"✗ הדפדפן הזה לא תומך בהקראה",mkFail:"✗ יצירת האמירה נכשלה: ",
-      okN:["✓ הקול פועל — "," קולות במכשיר"],ok:"✓ הקול פועל",unk:"לא ידוע",
+      okN:["✓ הקול פועל — "," בשפה הזו מתוך "," קולות במכשיר"],ok:"✓ הקול פועל",unk:"לא ידוע",
       engine:["✗ המנוע החזיר "," קולות · זו תקלה במכשיר, לא באפליקציה"],
       spFail:"✗ speak נכשל: ",timeout:["✗ שתי שניות ואין תגובה מהמנוע · "," קולות במכשיר"],
       say:"שלום, זו בדיקת קול"},
   ar:{sent:"جارٍ الإرسال…",noSup:"✗ هذا المتصفّح لا يدعم القراءة الصوتية",mkFail:"✗ فشل إنشاء النطق: ",
-      okN:["✓ الصوت يعمل — "," صوتًا في الجهاز"],ok:"✓ الصوت يعمل",unk:"غير معروف",
+      okN:["✓ الصوت يعمل — "," بهذه اللغة من أصل "," صوتًا في الجهاز"],ok:"✓ الصوت يعمل",unk:"غير معروف",
       engine:["✗ أعاد المحرّك "," صوتًا · هذا عطل في الجهاز، لا في التطبيق"],
       spFail:"✗ فشل speak: ",timeout:["✗ ثانيتان بلا ردّ من المحرّك · "," صوتًا في الجهاز"],
       say:"مرحبًا، هذا فحص صوت"},
   ru:{sent:"Отправляем…",noSup:"✗ Этот браузер не поддерживает озвучивание",mkFail:"✗ Не удалось создать реплику: ",
-      okN:["✓ Голос работает — голосов: ",""],ok:"✓ Голос работает",unk:"неизвестно",
+      okN:["✓ Голос работает — на этом языке: ",", всего на устройстве: ",""],ok:"✓ Голос работает",unk:"неизвестно",
       engine:["✗ Синтезатор вернул "," голосов · это неполадка устройства, а не приложения"],
       spFail:"✗ speak не сработал: ",timeout:["✗ Две секунды без ответа от синтезатора · "," голосов"],
       say:"Здравствуйте, это проверка голоса"},
   en:{sent:"Sending…",noSup:"✗ This browser does not support read-aloud",mkFail:"✗ Could not create the utterance: ",
-      okN:["✓ The voice works — "," voices on this device"],ok:"✓ The voice works",unk:"unknown",
+      okN:["✓ The voice works — "," in this language, out of "," voices on this device"],ok:"✓ The voice works",unk:"unknown",
       engine:["✗ The engine returned "," voices · this is a device fault, not an app fault"],
       spFail:"✗ speak failed: ",timeout:["✗ Two seconds and no response from the engine · "," voices on this device"],
       say:"Hello, this is a voice check"}
 };
 function vchkT(){ var g=state.lang||"he"; return VCHKMSG[g]||VCHKMSG.he }
+/* כמה מהקולות הם בשפה שנבדקת. עד כה ההודעה מנתה את כל הקולות
+   במכשיר, בכל השפות — "23 קולות" בכרום על ווינדוס, כשבעברית יש
+   שם אחד בלבד (Asaf). המספר היה נכון ולא אמר כלום; עכשיו שניהם. */
+function sameLang(list,lang){
+  var base=String(lang||"").split("-")[0].toLowerCase(),n=0;
+  for(var i=0;i<list.length;i++){
+    if(String(list[i].lang||"").replace("_","-").toLowerCase().split("-")[0]===base)n++;
+  }
+  return n;
+}
 function voiceCheck(){
   var M=vchkT();
   VCHK=M.sent; render();
@@ -1569,7 +1579,7 @@ function voiceCheck(){
   catch(e){ show(M.mkFail+e.message); return }
   u.lang=(LANGS[state.lang||"he"]||LANGS.he).tts; u.volume=1; u.rate=1; u.pitch=1;
   var done=false;
-  u.onstart=function(){ done=true; show(M.okN[0]+list.length+M.okN[1]) };
+  u.onstart=function(){ done=true; show(M.okN[0]+sameLang(list,u.lang)+M.okN[1]+list.length+M.okN[2]) };
   u.onerror=function(e){ done=true;
     var er=(e&&e.error)||M.unk;
     if(er==="interrupted"||er==="canceled"){ show(M.ok); return }
@@ -3888,7 +3898,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l9-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l10-pwa1").catch(function(){});
   });
 }
 </script>

@@ -996,7 +996,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a9 · 2026-09-04";
+var BUILD="a10 · 2026-09-05";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -1559,6 +1559,16 @@ function femLift(v){
    על המסך מה קרה. יום שלם אבד כי כשלא היה קול, שום דבר לא אמר למה.
    ------------------------------------------------------------ */
 var VCHK="";
+/* כמה מהקולות הם בשפה שנבדקת. עד כה ההודעה מנתה את כל הקולות
+   במכשיר, בכל השפות — "23 קולות" בכרום על ווינדוס, כשבעברית יש
+   שם אחד בלבד (Asaf). המספר היה נכון ולא אמר כלום; עכשיו שניהם. */
+function sameLang(list,lang){
+  var base=String(lang||"").split("-")[0].toLowerCase(),n=0;
+  for(var i=0;i<list.length;i++){
+    if(String(list[i].lang||"").replace("_","-").toLowerCase().split("-")[0]===base)n++;
+  }
+  return n;
+}
 function voiceCheck(){
   VCHK="…"; render();
   function show(m){ VCHK=m; render() }
@@ -1570,7 +1580,7 @@ function voiceCheck(){
   catch(e){ show("✗ יצירת האמירה נכשלה: "+e.message); return }
   u.lang="he-IL"; u.volume=1; u.rate=1; u.pitch=1;
   var done=false;
-  u.onstart=function(){ done=true; show("✓ הקול פועל — "+list.length+" קולות במכשיר") };
+  u.onstart=function(){ done=true; show("✓ הקול פועל — "+sameLang(list,u.lang)+" בשפה הזו מתוך "+list.length+" קולות במכשיר") };
   u.onerror=function(e){ done=true;
     var er=(e&&e.error)||"לא ידוע";
     if(er==="interrupted"||er==="canceled"){ show("✓ הקול פועל"); return }
@@ -4660,7 +4670,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a9-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a10-pwa1").catch(function(){});
   });
 }
 </script>
