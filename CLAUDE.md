@@ -196,6 +196,7 @@
     node .claude/qa/naming.js                # כלל השם של ״תאוריה מדברת״
     node .claude/qa/cache.js                 # חמש בדיקות על שנים־עשר ה-sw.js
     node .claude/qa/banks.js                 # החיווט של lomda/data/, וארבע השפות בתוכן
+    node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/all.js                   # הכול, ופסק דין אחד
     node .claude/qa/extract.js /tmp/js …     # מחלץ סקריפטים ל-eslint
 
