@@ -48,7 +48,7 @@ self.addEventListener("fetch", e => {
   }
   /* משאב: מטמון קודם — אבל רק המטמון של האפליקציה הזאת. caches.match
      הגלובלי סורק את כל המטמונים ב-origin, ולכן היה מגיש עותק ש-worker
-     של אפליקציה אחרת שמר. תשע אפליקציות מקדימות-קאשינג את legal/terms.js,
+     של אפליקציה אחרת שמר. שנים־עשר ה-sw מקדימים-קאשינג את legal/terms.js,
      וה-activate של כל אחת מוחק רק את התחילית שלה — כך שתיקון שם היה
      נתקע לצמיתות מאחורי עותק זר. */
   e.respondWith(caches.open(CACHE).then(c => c.match(req).then(hit => hit || fetch(req).then(r => {
