@@ -82,6 +82,11 @@ html[lang="ar"] .btn,html[lang="ar"] .t{
   color:inherit; font-weight:800; font-size:1.05rem; margin-inline-end:auto;
   min-block-size:44px;
 }
+/* השם בלוגו מוסתר בינתיים — עד שייבחר שם חדש (5.9.2026). הסמל נשאר,
+   והקישור מקבל שם נגיש ב-paint(). ההסתרה פותרת גם את הסרגל בטלפון
+   צר: לוגו + ארבע שפות + מצב כהה לא נכנסו ב-360px וכפתור מצב כהה
+   נדחק לשורה משלו. */
+#me{display:none}
 .mark{
   inline-size:38px; block-size:38px; border-radius:12px; flex:none;
   display:grid; place-items:center; color:var(--brand-ink);
@@ -760,6 +765,7 @@ function paint(){
   document.title=S.me+" — "+S.title;
 
   $("#me").textContent=S.me;
+  $(".logo").setAttribute("aria-label",S.title);
   /* המונוגרמה היא האות הראשונה של השם באותה שפה — י/ي/И/J.
      אות עברית לצד "Joshua" נראית כתקלה, לא כמיתוג. */
   $("#skip").textContent=S.nApps;
@@ -861,7 +867,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=25-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=26-pwa1").catch(function(){});
   });
 }
 </script>
