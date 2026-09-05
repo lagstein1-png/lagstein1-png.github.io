@@ -178,6 +178,15 @@ for (const ex of EXAMS) {
           if (!tol && !Number.isInteger(fa.value))
             note('tolerance 0 על תשובה שאינה שלמה (' + fa.value + ') — מי שעיגל ייפסל');
           if (tol < 0) fail('tolerance שלילי');
+          /* `checkAnswer` יוצא בענף המספרי לפני שהוא מגיע ל-accept,
+             ולכן accept על מספר אינו נקרא כלל. מי שכתב אותו מאמין
+             שהוא הרחיב את מה שמתקבל, וזה בדיוק סוג הבאג שאינו
+             מתפוצץ: נבדק בפועל — accept:["חמש"] על value 5 מחזיר
+             false. הסובלנות במספרים היא tolerance, ו-parseNum כבר
+             מקבל שבר, אחוז ופסיק עשרוני בלי שיירשמו. */
+          if (fa.accept != null)
+            fail('accept על type:"number" אינו נקרא — checkAnswer מכריע לפי tolerance. ' +
+              'שבר, אחוז ופסיק עשרוני כבר מתקבלים ב-parseNum');
           /* טווח שבולע חצי מהתשובה מקבל גם מסלולי פתרון שגויים */
           if (tol > 0 && Math.abs(fa.value) > 0 && tol >= Math.abs(fa.value) * 0.5)
             fail('tolerance ' + tol + ' רחב מחצי מהתשובה (' + fa.value + ') — הוא יקבל גם פתרון שגוי');
@@ -189,9 +198,32 @@ for (const ex of EXAMS) {
         if (!has(fa.value)) fail('finalAnswer.value ריק');
         else if (!checkAnswer(fa, fa.value).ok)
           fail('התשובה הרשומה עצמה נכשלת ב-checkAnswer של האפליקציה');
+        /* כאן עמדה בדיקה שהזינה כל ניסוח מ-accept חזרה ל-checkAnswer
+           וציפתה שיתקבל. היא לא יכלה להיכשל לעולם: `checkAnswer`
+           בונה את רשימת המותרים כ-`[value].concat(accept)` ואז
+           מנרמל אותה, ולכן כל איבר ברשימה מתקבל מעצם היותו בה.
+           בדיקה שהתשובה עליה היא תמיד "כן" נראית כמו רשת ביטחון
+           ואינה אחת.
+
+           מה שכן יכול להישבר הוא ההפך: ניסוח שמנורמל בדיוק כמו
+           ה-`value` או כמו ניסוח קודם ברשימה. הוא נראה כמו סובלנות
+           נוספת, הוא נספר בעין ככזה, ואינו מוסיף ולו תשובה אחת
+           שלא התקבלה קודם. נבדק בפועל מול הקוד: "עולה.", "עולה!!"
+           ו-"  עולה  " כולם מנורמלים ל-"עולה".
+
+           זו הערה ולא ממצא, בכוונה: התלמיד שכותב את הניסוח הזה
+           **כן** מתקבל — דרך ה-`value`. מה שנשבר הוא רק האמונה של
+           מי שכתב את הרשימה, שסבר שהוסיף ניסוח וקיבל שורה מתה.
+           דבר שאינו פוגע בתלמיד אינו מצדיק חבילת בדיקות אדומה. */
+        const norm = fa.type === 'expression' ? sandbox.normExpr : sandbox.normText;
+        const seen = new Map([[norm(fa.value), 'value']]);
         for (const a of (fa.accept || [])) {
-          if (!checkAnswer(fa, a).ok)
-            fail('הניסוח החלופי "' + a + '" ב-accept נדחה על ידי checkAnswer');
+          if (typeof a !== 'string') { fail('accept מכיל ערך שאינו מחרוזת'); continue; }
+          const k = norm(a);
+          if (seen.has(k))
+            note('הניסוח "' + a + '" ב-accept זהה ל-' + seen.get(k) +
+              ' אחרי נרמול — שורה שאינה מוסיפה תשובה');
+          else seen.set(k, '"' + a + '"');
         }
       }
 
