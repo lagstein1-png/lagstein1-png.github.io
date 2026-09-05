@@ -1635,6 +1635,15 @@ function speakDevice(text,code,rate){
   return true;
 }
 /* lang: "en" לחומר הנלמד, או קוד שפת האם להוראה. */
+/* מה נאמר במבחן הכיתתי. שם אין "לפני" ו"אחרי" — יש רק שאלה
+   שעוד לא ענו עליה, ולכן `say`, שהוא כרטיס הפריט המלא עם
+   התאריך והסיפור, אסור בו לחלוטין. ניב ואולפן נושאות פונקציה
+   בשם הזה; כאן היא ישבה בתוך המטפל של הכפתור, ולכן אי אפשר היה
+   למצוא אותה ולא לבדוק אותה. */
+function sitSay(q){
+  var ex=plainOf(q.expr||"").trim();
+  return {t:plainOf(q.ask||"")+(ex?" "+ex:""),l:state.lang||"he"};
+}
 function speak(text,lang,rateMul){
   /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
      לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
@@ -2103,6 +2112,27 @@ function spkBtn(text,lang,slow,label){
 
 /* כרטיס הנושא: מה שמוצג מעל האפשרויות. בהיסטוריה זו כותרת
    האירוע או המושג, ולצידה כפתורי השמעה בשפת הממשק. */
+/* מה נאמר **לפני** שעונים.
+
+   מקש הרווח קרא עד כה את `q.say` תמיד, בלי לבדוק אם כבר ענו —
+   בעוד שמקשי 1–4 שלידו כן מוגנים ב-`!P.done`. וב-`q.say` יושבת
+   התשובה: נמדד בדפדפן אמיתי, 5.9.2026, שבלומדה `say` הוא כרטיס הפריט המלא — הכותרת, השנה והסיפור — כלומר התשובה עצמה, ב-54 מתוך 60 השאלות שנדגמו. הקובץ נולד מהעתקה של מפנה, והבאג בא איתו.
+   מי שקורא לאט לוחץ רווח כדי לשמוע את השאלה, ושמע את הפתרון.
+
+   אחרי שעונים `q.say` נשאר כפי שהיה — המשפט המלא הוא בדיוק מה
+   שצריך להישמע אז, גם כשטעו. כאן רק מה שנאמר קודם:
+
+   · שאלת האזנה — השמע **הוא** השאלה, ואסור להשתיק אותה.
+   · השלמה — המשפט עם החסר, וה-_____ נעשה שהות ולא מילה.
+   · השאר — הכותרת שמוצגת על המסך, בשפה שבה היא מוצגת. */
+function sayAsk(q){
+  if(!q)return "";
+  /* שאלת מקור נושאת את שאלתה ב-qtext; הקטע עצמו נקרא בכפתורים
+     שלו, ואינו חוזר כאן. */
+  if(q.type==="src")return q.qtext||"";
+  return (q.prompt?q.prompt+". ":"")+(q.lead||"");
+}
+
 function leadBox(txt,sub){
   if(!txt)return "";
   return '<div class="subject"><span class="word" style="font-size:1.15rem">'+esc(txt)+"</span>"+
@@ -2462,8 +2492,15 @@ function buildQ(tid,lv){
 var GENV=2;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
-var EKEY="shlav-exams-history-v1";   /* מפתח לאפליקציה הזאת בלבד */
-var EKEY_OLD="shlav-exams-v1";  /* המפתח המשותף הישן. לקריאה בלבד, לא נמחק. */
+/* הקובץ הזה נולד מהעתקה של מפנה, ועד 5.9.2026 נשא את המפתח שלה —
+   "shlav-exams-history-v1" — מילה במילה, כולל ההערה "לאפליקציה הזאת
+   בלבד". שתי האפליקציות יושבות באותו מקור, ולכן מבחן שמורה בנה
+   בלומדה הופיע במפנה ולהפך. זה בדיוק הבאג שתוקן ב-31.8 לכל
+   האחרות, והוא חזר בהעתקה. המפתח הישן כאן הוא זה שלומדה כתבה אליו
+   בפועל, כדי שמבחן שכבר נבנה לא יאבד: exAdoptLegacy מעתיקה ממנו
+   רק רשומות שכל נושאיהן מוכרים כאן, ואין נושא משותף למפנה וללומדה. */
+var EKEY="lomda-exams-v1";   /* מפתח לאפליקציה הזאת בלבד */
+var EKEY_OLD="shlav-exams-history-v1";  /* המפתח שחלק עם מפנה. לקריאה בלבד, לא נמחק. */
 
 /* --- מחולל מזורע. mulberry32: קצר, מהיר, ופיזור טוב דיו --- */
 function withSeed(seed,fn){
@@ -2993,20 +3030,24 @@ function csvRow(a){ return a.map(csvCell).join(",") }
    כל עוד לא נבחר קוד, שום דבר לא משתנה והמסכים גלויים כתמיד.
    ============================================================ */
 var TE={ask:false,mode:"",msg:"",busy:false};
-function teRead(){try{return JSON.parse(localStorage.getItem("mifne-teacher")||"null")}catch(e){return null}}
-function teWrite(o){try{o===null?localStorage.removeItem("mifne-teacher"):localStorage.setItem("mifne-teacher",JSON.stringify(o))}catch(e){}}
+/* קוד המורה. עד 5.9.2026 המפתח היה "mifne-teacher" — של מפנה — ולכן קוד
+   שנקבע באחת נעל את השנייה. הקריאה נופלת למפתח הישן כשאין חדש, כדי
+   שמורה שכבר קבע קוד לא יינעל בחוץ; הכתיבה היא למפתח של לומדה בלבד. */
+var TE_KEY_OLD="mifne-teacher";   /* ירושה: נקרא כשאין מפתח משלנו, ולעולם לא נכתב */
+function teRead(){try{return JSON.parse(localStorage.getItem("lomda-teacher")||localStorage.getItem(TE_KEY_OLD)||"null")}catch(e){return null}}
+function teWrite(o){try{o===null?localStorage.removeItem("lomda-teacher"):localStorage.setItem("lomda-teacher",JSON.stringify(o))}catch(e){}}
 function teHas(){var r=teRead();return !!(r&&r.h)}
 function teOpen(){
   if(!teHas())return true;
-  try{if(sessionStorage.getItem("mifne-teacher"+"-open")==="1")return true}catch(e){}
-  try{if(localStorage.getItem("mifne-teacher"+"-open")==="1")return true}catch(e){}
+  try{if(sessionStorage.getItem("lomda-teacher"+"-open")==="1")return true}catch(e){}
+  try{if(localStorage.getItem("lomda-teacher"+"-open")==="1")return true}catch(e){}
   return false;
 }
 function teSetOpen(on,remember){
-  try{sessionStorage.removeItem("mifne-teacher"+"-open")}catch(e){}
-  try{localStorage.removeItem("mifne-teacher"+"-open")}catch(e){}
+  try{sessionStorage.removeItem("lomda-teacher"+"-open")}catch(e){}
+  try{localStorage.removeItem("lomda-teacher"+"-open")}catch(e){}
   if(!on)return;
-  try{(remember?localStorage:sessionStorage).setItem("mifne-teacher"+"-open","1")}catch(e){}
+  try{(remember?localStorage:sessionStorage).setItem("lomda-teacher"+"-open","1")}catch(e){}
 }
 /* גיבוב חלש כגיבוי בלבד. SubtleCrypto קיים בכל דפדפן מודרני
    בהקשר מאובטח, ו-GitHub Pages הוא כזה. */
@@ -3142,9 +3183,9 @@ try{
     var away=Date.now()-TE_HID; TE_HID=0;
     if(away<120000)return;
     var kept=false;
-    try{ kept=localStorage.getItem("mifne-teacher"+"-open")==="1" }catch(e){}
+    try{ kept=localStorage.getItem("lomda-teacher"+"-open")==="1" }catch(e){}
     if(kept)return;
-    try{ if(sessionStorage.getItem("mifne-teacher"+"-open")!=="1")return }catch(e){ return }
+    try{ if(sessionStorage.getItem("lomda-teacher"+"-open")!=="1")return }catch(e){ return }
     teSetOpen(false); render();
   });
 }catch(e){}
@@ -3611,7 +3652,7 @@ function examAction(a,el){
      התשובה. כאן מוקרא מה שעל המסך — הכותרת והמקור — והאפשרויות
      ממילא אינן חלק ממנו. */
   if(a==="sitread"){var q2=SIT.qs[SIT.i];
-    if(q2)speak(saySpell(plainOf(q2.ask||"")+" "+plainOf(q2.expr||"")),state.lang);
+    if(q2){var o2=sitSay(q2); if(o2.t)speak(saySpell(o2.t),o2.l)}
     return true}
   if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
   if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
@@ -3865,7 +3906,8 @@ document.addEventListener("keydown",function(e){
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();speak(saySpell(P.q.say),state.lang);return}
+  if(e.key===" "){e.preventDefault();
+    speak(saySpell(P.done?P.q.say:sayAsk(P.q)),state.lang); return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב

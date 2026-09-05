@@ -3199,6 +3199,28 @@ function spkBtn(text,lang,slow,label){
     ' aria-label="'+esc(label||t("hear"))+'">'+ic(slow?"slow":"play",slow?15:18)+"</button>";
 }
 
+/* מה נאמר **לפני** שעונים.
+
+   מקש הרווח קרא עד כה את `q.say` תמיד, בלי לבדוק אם כבר ענו —
+   בעוד שמקשי 1–4 שלידו כן מוגנים ב-`!P.done`. וב-`q.say` יושבת
+   התשובה: נמדד בדפדפן אמיתי, 5.9.2026, שבניב היא נאמרת ב-back, use ו-gap — 21 מתוך 60 שאלות שנדגמו.
+   מי שקורא לאט לוחץ רווח כדי לשמוע את השאלה, ושמע את הפתרון.
+
+   אחרי שעונים `q.say` נשאר כפי שהיה — המשפט המלא הוא בדיוק מה
+   שצריך להישמע אז, גם כשטעו. כאן רק מה שנאמר קודם:
+
+   · שאלת האזנה — השמע **הוא** השאלה, ואסור להשתיק אותה.
+   · השלמה — המשפט עם החסר, וה-_____ נעשה שהות ולא מילה.
+   · השאר — הכותרת שמוצגת על המסך, בשפה שבה היא מוצגת. */
+function sayAsk(q){
+  if(!q)return {t:"",lg:"en"};
+  if(q.type==="hear"||q.type==="mean")return {t:q.say,lg:"en"};
+  if(q.type==="gap")return {t:plainOf(q.gapHtml||"").replace(/_+/g," , "),lg:"en"};
+  if(q.type==="comp")return {t:q.qtext||"",lg:state.lang};
+  /* back מציג את המשמעות באנגלית ברמה 3 ובשפת האם מתחתיה */
+  return {t:q.lead||"",lg:(q.type==="back"&&state.level>=3)?"en":state.lang};
+}
+
 function subjectBox(it){
   var w=it.w||it.s||"";
   return '<div class="subject"><span class="word">'+esc(w)+"</span>"+
@@ -3253,7 +3275,7 @@ function screenPractice(){
   }
   else if(q.type==="gap"){
     h+='<div class="subject"><span class="word" style="font-size:1.25rem">'+q.gapHtml+"</span>"+
-       '<span style="margin-inline-start:auto">'+spkBtn(q.say,"en",true,t("hearSlow"))+"</span></div>";
+       '<span style="margin-inline-start:auto">'+spkBtn(P.done?q.say:sayAsk(q).t,"en",true,t("hearSlow"))+"</span></div>";
     if(state.level<3&&q.lead)h+='<p class="qhint">'+esc(q.lead)+"</p>";
   }
   else if(q.type==="order"){
@@ -4934,7 +4956,9 @@ document.addEventListener("keydown",function(e){
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();speak(P.q.say,"en");return}
+  if(e.key===" "){e.preventDefault();
+    var sa=P.done?{t:P.q.say,lg:"en"}:sayAsk(P.q);
+    speak(sa.t,sa.lg); return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב

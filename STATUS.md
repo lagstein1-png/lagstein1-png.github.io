@@ -12,7 +12,7 @@
 ## המצב הנמדד — מרעננים לפני שקוראים
 
     node .claude/qa/status.js          גרסה ומפתח קאש לכל אפליקציה
-    node .claude/qa/all.js             שלוש־עשרה הבדיקות, פסק דין אחד
+    node .claude/qa/all.js             כל הבדיקות, פסק דין אחד
     node .claude/qa/apps.js            שבעת המקומות של אפליקציה חדשה
 
 הטבלה למטה היא פלט של `node .claude/qa/status.js --md`. **אם עברו

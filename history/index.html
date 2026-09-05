@@ -1641,6 +1641,15 @@ function speakDevice(text,code,rate){
   return true;
 }
 /* lang: "en" לחומר הנלמד, או קוד שפת האם להוראה. */
+/* מה נאמר במבחן הכיתתי. שם אין "לפני" ו"אחרי" — יש רק שאלה
+   שעוד לא ענו עליה, ולכן `say`, שהוא כרטיס הפריט המלא עם
+   התאריך והסיפור, אסור בו לחלוטין. ניב ואולפן נושאות פונקציה
+   בשם הזה; כאן היא ישבה בתוך המטפל של הכפתור, ולכן אי אפשר היה
+   למצוא אותה ולא לבדוק אותה. */
+function sitSay(q){
+  var ex=plainOf(q.expr||"").trim();
+  return {t:plainOf(q.ask||"")+(ex?" "+ex:""),l:state.lang||"he"};
+}
 function speak(text,lang,rateMul){
   /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
      לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
@@ -7252,6 +7261,27 @@ function spkBtn(text,lang,slow,label){
 
 /* כרטיס הנושא: מה שמוצג מעל האפשרויות. בהיסטוריה זו כותרת
    האירוע או המושג, ולצידה כפתורי השמעה בשפת הממשק. */
+/* מה נאמר **לפני** שעונים.
+
+   מקש הרווח קרא עד כה את `q.say` תמיד, בלי לבדוק אם כבר ענו —
+   בעוד שמקשי 1–4 שלידו כן מוגנים ב-`!P.done`. וב-`q.say` יושבת
+   התשובה: נמדד בדפדפן אמיתי, 5.9.2026, שבמפנה `say` הוא כרטיס הפריט המלא — הכותרת, השנה והסיפור — כלומר התשובה עצמה, ב-60 מתוך 60 השאלות שנדגמו.
+   מי שקורא לאט לוחץ רווח כדי לשמוע את השאלה, ושמע את הפתרון.
+
+   אחרי שעונים `q.say` נשאר כפי שהיה — המשפט המלא הוא בדיוק מה
+   שצריך להישמע אז, גם כשטעו. כאן רק מה שנאמר קודם:
+
+   · שאלת האזנה — השמע **הוא** השאלה, ואסור להשתיק אותה.
+   · השלמה — המשפט עם החסר, וה-_____ נעשה שהות ולא מילה.
+   · השאר — הכותרת שמוצגת על המסך, בשפה שבה היא מוצגת. */
+function sayAsk(q){
+  if(!q)return "";
+  /* שאלת מקור נושאת את שאלתה ב-qtext; הקטע עצמו נקרא בכפתורים
+     שלו, ואינו חוזר כאן. */
+  if(q.type==="src")return q.qtext||"";
+  return (q.prompt?q.prompt+". ":"")+(q.lead||"");
+}
+
 function leadBox(txt,sub){
   if(!txt)return "";
   return '<div class="subject"><span class="word" style="font-size:1.15rem">'+esc(txt)+"</span>"+
@@ -8760,7 +8790,7 @@ function examAction(a,el){
      התשובה. כאן מוקרא מה שעל המסך — הכותרת והמקור — והאפשרויות
      ממילא אינן חלק ממנו. */
   if(a==="sitread"){var q2=SIT.qs[SIT.i];
-    if(q2)speak(saySpell(plainOf(q2.ask||"")+" "+plainOf(q2.expr||"")),state.lang);
+    if(q2){var o2=sitSay(q2); if(o2.t)speak(saySpell(o2.t),o2.l)}
     return true}
   if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
   if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
@@ -9014,7 +9044,8 @@ document.addEventListener("keydown",function(e){
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();speak(saySpell(P.q.say),state.lang);return}
+  if(e.key===" "){e.preventDefault();
+    speak(saySpell(P.done?P.q.say:sayAsk(P.q)),state.lang); return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
