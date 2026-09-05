@@ -8,7 +8,10 @@ let failed=0;   /* בלי זה הכלי מדפיס ממצאים ויוצא 0 */
   await page.route('**/*',r=>r.request().url().startsWith('http://127.0.0.1:8099')?r.continue():r.abort());
   try{await page.goto('http://127.0.0.1:8099/'+app+'/',{waitUntil:'domcontentloaded'})}catch(e){console.log(app,'SKIP');await ctx.close();continue}
   await page.waitForTimeout(1000);
-  const r=await page.evaluate(()=>{
+  /* שגיאה באפליקציה אחת אינה גוזלת כיסוי מהשאר — אבל היא כן
+     מפילה את הריצה בסוף, כי בדיקה שיוצאת 0 אחרי שנשברה היא בדיוק
+     מה ש-all.js נועד למנוע. */
+  let r;try{r=await page.evaluate(()=>{
     const plain=h=>{const d=document.createElement('div');d.innerHTML=String(h||'');return (d.textContent||'').replace(/\s+/g,' ').trim()};
     /* מפתח להשוואת אפשרויות. textContent לבדו משטח מבנה: השבר −5/x
        והמכפלה −5x נותנים אותה מחרוזת, וכך גם שתי מטריצות שנבדלות רק
@@ -25,6 +28,13 @@ let failed=0;   /* בלי זה הכלי מדפיס ממצאים ויוצא 0 */
       let s='';for(const c of d.childNodes) s+=walk(c);
       return s.trim();
     };
+    /* אפליקציה שאינה בנויה על מחולל אינה חושפת TOPICS/buildQ.
+       bagrut-806 היא כזאת — IIFE שכל התוכן שלה ב-window.EXAMS.
+       הלולאה למטה ניגשה ל-TOPICS ישירות, וזרקה ReferenceError
+       שהפיל את התהליך כולו: כל אפליקציה שהופיעה אחריה ברשימה לא
+       נבדקה, והפלט נגמר באמצע כאילו הריצה תמה. LVL כבר היה מוגן
+       ב-typeof; TOPICS ו-buildQ לא. */
+    if(typeof TOPICS==='undefined'||typeof buildQ!=='function') return {na:true};
     const rows=[],bad={noAns:0,multi:0,dupe:0,nan:0,nanTxt:0,n:0};
     /* מספר הרמות נלקח מהאפליקציה ולא מקובע כאן: רמה שנוספה בלי
        שהבודק ידע עליה היתה נבדקת אפס פעמים. */
@@ -55,7 +65,10 @@ let failed=0;   /* בלי זה הכלי מדפיס ממצאים ויוצא 0 */
       rows.push({id:t.id,lv,distinct:keys.length,topShare:+(top*100).toFixed(1)});
     }
     return {rows,bad,levels:LVLS.length};
-  });
+  })}catch(e){failed++;console.log('✗ '+app+': '+String(e.message).split('\n')[0]);await ctx.close();continue}
+  /* · אינו ממצא ואינו מפיל: פירושו שהאפליקציה לא נבדקה כאן, ולא
+     שהיא תקינה. */
+  if(r.na){console.log('· '+app+': אין TOPICS/buildQ — סכימה אחרת, לא נבדק כאן');await ctx.close();continue}
   const constant=r.rows.filter(x=>x.distinct<=1);
   const nearConst=r.rows.filter(x=>x.distinct>1&&x.topShare>=95);
   /* קו הבסיס כאן הוא אפס — ראו README. bad, רמה עם תשובה קבועה
