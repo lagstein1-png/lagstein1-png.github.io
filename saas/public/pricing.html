@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מחירים · לומדים בקול</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="nav_home">בית</a>
+<header class="top" id="site-header"></header>
+
+<main id="main" data-i18n-title="pricing_h1">
+  <div id="setup-banner" class="notice" role="status" aria-live="polite"></div>
+  <div id="msg" class="notice" role="status" aria-live="polite"></div>
+
+  <h1 data-i18n="pricing_h1"></h1>
+  <p class="lead" data-i18n="pricing_lead"></p>
+
+  <div class="plans">
+    <section class="card plan" data-plan="starter">
+      <h3 data-i18n="plan_starter"></h3>
+      <div class="price" data-price="starter"><small data-i18n="price_pending"></small></div>
+      <ul class="plain">
+        <li data-i18n="starter_1"></li><li data-i18n="starter_2"></li><li data-i18n="starter_3"></li>
+      </ul>
+      <button type="button" class="btn" data-choose="starter" data-i18n="choose"></button>
+    </section>
+
+    <section class="card plan" data-plan="pro">
+      <h3 data-i18n="plan_pro"></h3>
+      <div class="price" data-price="pro"><small data-i18n="price_pending"></small></div>
+      <ul class="plain">
+        <li data-i18n="pro_1"></li><li data-i18n="pro_2"></li><li data-i18n="pro_3"></li>
+      </ul>
+      <button type="button" class="btn" data-choose="pro" data-i18n="choose"></button>
+    </section>
+
+    <section class="card plan" data-plan="family">
+      <h3 data-i18n="plan_family"></h3>
+      <div class="price" data-price="family"><small data-i18n="price_pending"></small></div>
+      <ul class="plain">
+        <li data-i18n="family_1"></li><li data-i18n="family_2"></li><li data-i18n="family_3"></li>
+      </ul>
+      <button type="button" class="btn" data-choose="family" data-i18n="choose"></button>
+    </section>
+  </div>
+</main>
+
+<footer><span data-i18n="brand"></span></footer>
+<script src="/app.js"></script>
+<script>
+(function () {
+  var msg = document.getElementById("msg");
+  function show(kind, text) { msg.className = "notice " + kind; msg.textContent = text; }
+
+  if (/checkout=cancel/.test(location.search)) {
+    document.addEventListener("DOMContentLoaded", function () { show("warn", App.t("checkout_cancel")); });
+  }
+
+  /* Prices come from Stripe through the server. Until Stripe is connected
+     the card says so instead of showing a number. */
+  function fmt(p) {
+    var amount = (p.amount / 100).toLocaleString(App.getLang() === "he" ? "he-IL" : "en-US", { style: "currency", currency: p.currency.toUpperCase() });
+    var per = p.interval === "year" ? App.t("per_year") : App.t("per_month");
+    return amount + " <small>" + per + "</small>";
+  }
+  var prices = null;
+  function paintPrices() {
+    if (!prices) return;
+    for (var id in prices) {
+      var el = document.querySelector('[data-price="' + id + '"]');
+      if (el && prices[id] && prices[id].amount != null) el.innerHTML = fmt(prices[id]);
+    }
+  }
+  document.addEventListener("langchange", paintPrices);
+  document.addEventListener("configready", function (e) {
+    if (!e.detail.stripe) return;
+    App.api("GET", "/api/prices").then(function (d) { prices = d.prices || {}; paintPrices(); }).catch(function () {});
+  });
+
+  var buttons = document.querySelectorAll("[data-choose]");
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function () {
+      var plan = this.getAttribute("data-choose");
+      if (!App.token()) {
+        show("warn", App.t("need_login"));
+        setTimeout(function () { location.href = "/signup.html#login"; }, 1200);
+        return;
+      }
+      var b = this; b.disabled = true;
+      App.api("POST", "/api/checkout", { plan: plan })
+        .then(function (d) { if (d.url) location.href = d.url; else show("err", App.t("err_generic")); })
+        .catch(function (err) { show("err", err.message); })
+        .then(function () { b.disabled = false; });
+    });
+  }
+})();
+</script>
+</body>
+</html>

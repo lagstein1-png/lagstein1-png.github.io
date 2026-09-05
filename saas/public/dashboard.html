@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>האזור שלי · לומדים בקול</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="nav_home">בית</a>
+<header class="top" id="site-header"></header>
+
+<main id="main" data-i18n-title="dash_h1">
+  <div id="setup-banner" class="notice" role="status" aria-live="polite"></div>
+  <div id="msg" class="notice" role="status" aria-live="polite"></div>
+
+  <h1 data-i18n="dash_h1"></h1>
+  <p id="status" class="lead" data-i18n="dash_loading"></p>
+
+  <div class="actions">
+    <a class="btn hidden" id="pick-btn" href="/pricing.html" data-i18n="dash_pick"></a>
+    <button type="button" class="btn secondary hidden" id="portal-btn" data-i18n="dash_manage"></button>
+  </div>
+
+  <section id="content" class="card hidden">
+    <h2 data-i18n="dash_content"></h2>
+    <p data-i18n="dash_content_p"></p>
+  </section>
+</main>
+
+<footer><span data-i18n="brand"></span></footer>
+<script src="/app.js"></script>
+<script>
+(function () {
+  /* Guard: no session -> login. No access -> pricing, with a message.
+     The server enforces the same rule on /api/dashboard, so this page can
+     only ever hide content, never grant it. */
+  if (!App.token()) { location.replace("/signup.html#login"); return; }
+
+  var msg = document.getElementById("msg");
+  var status = document.getElementById("status");
+  var pick = document.getElementById("pick-btn");
+  var portal = document.getElementById("portal-btn");
+  var content = document.getElementById("content");
+  var me = null;
+
+  function show(kind, text) { msg.className = "notice " + kind; msg.textContent = text; }
+
+  function paint() {
+    if (!me) return;
+    var sub = me.subscription;
+    status.removeAttribute("data-i18n");
+    if (me.access && me.reason === "trial") {
+      var end = Date.parse(sub.trial_end || sub.current_period_end);
+      var days = Math.max(0, Math.ceil((end - Date.now()) / 86400000));
+      status.textContent = App.t("dash_trial", { n: days });
+    } else if (me.access) {
+      status.textContent = App.t("dash_paid", { plan: App.t("plan_" + sub.plan) === "plan_" + sub.plan ? sub.plan : App.t("plan_" + sub.plan) });
+    } else if (me.reason === "trial_expired") {
+      status.textContent = App.t("dash_expired");
+    } else {
+      status.textContent = App.t("dash_no_access");
+    }
+    pick.classList.toggle("hidden", Boolean(me.access && me.reason === "paid"));
+    portal.classList.toggle("hidden", !(sub && sub.has_stripe_customer));
+    content.classList.toggle("hidden", !me.access);
+  }
+  document.addEventListener("langchange", paint);
+
+  document.addEventListener("DOMContentLoaded", function () {
+    if (/checkout=success/.test(location.search)) show("ok", App.t("checkout_success"));
+    App.api("GET", "/api/me")
+      .then(function (d) {
+        me = d;
+        if (!d.subscription) return App.api("POST", "/api/trial/start").then(function (t) { me.subscription = t.subscription; me.access = t.access; me.reason = t.reason; });
+      })
+      .then(paint)
+      .catch(function (err) {
+        if (err.status === 401) { App.setToken(null); location.replace("/signup.html#login"); return; }
+        status.textContent = err.message || App.t("err_generic");
+        status.removeAttribute("data-i18n");
+      });
+  });
+
+  portal.addEventListener("click", function () {
+    portal.disabled = true;
+    App.api("POST", "/api/billing/portal")
+      .then(function (d) { if (d.url) location.href = d.url; })
+      .catch(function (err) { show("err", err.message); })
+      .then(function () { portal.disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>

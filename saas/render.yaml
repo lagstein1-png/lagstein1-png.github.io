@@ -1,0 +1,41 @@
+# Render blueprint. Connect the GitHub repo in the Render dashboard and
+# pick "Blueprint"; Render reads this file.
+#
+# rootDir points at this folder because the site lives inside a larger
+# repository. If the folder is ever moved to its own repo, delete rootDir.
+#
+# Values marked sync: false are entered once in the Render dashboard and
+# never live in git. The server starts without them and reports what is
+# missing at /ready.
+
+services:
+  - type: web
+    name: learn-aloud-site
+    runtime: node
+    plan: free
+    rootDir: saas
+    buildCommand: "echo no build step"
+    startCommand: node server.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: APP_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_STARTER_PRICE_ID
+        sync: false
+      - key: STRIPE_PRO_PRICE_ID
+        sync: false
+      - key: STRIPE_FAMILY_PRICE_ID
+        sync: false

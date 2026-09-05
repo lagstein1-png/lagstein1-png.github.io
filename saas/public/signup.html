@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>הרשמה · לומדים בקול</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="nav_home">בית</a>
+<header class="top" id="site-header"></header>
+
+<main id="main">
+  <div id="setup-banner" class="notice" role="status" aria-live="polite"></div>
+
+  <h1 id="title" data-i18n="signup_h1"></h1>
+
+  <form id="auth-form" class="card" novalidate>
+    <label for="email" data-i18n="email"></label>
+    <input id="email" name="email" type="email" autocomplete="email" required inputmode="email">
+
+    <label for="password" data-i18n="password"></label>
+    <input id="password" name="password" type="password" autocomplete="new-password" required minlength="8">
+    <p class="help" data-i18n="password_help"></p>
+
+    <div id="msg" class="notice" role="alert" aria-live="assertive"></div>
+
+    <div class="actions">
+      <button type="submit" class="btn" id="submit-btn" data-i18n="signup_btn"></button>
+    </div>
+    <p><a href="#" id="toggle-mode" data-i18n="to_login"></a></p>
+  </form>
+</main>
+
+<footer><span data-i18n="brand"></span></footer>
+<script src="/app.js"></script>
+<script>
+(function () {
+  var mode = /login/.test(location.hash) ? "login" : "signup";
+  var form = document.getElementById("auth-form");
+  var msg = document.getElementById("msg");
+  var btn = document.getElementById("submit-btn");
+  var title = document.getElementById("title");
+  var toggle = document.getElementById("toggle-mode");
+  var pw = document.getElementById("password");
+
+  function paint() {
+    title.setAttribute("data-i18n", mode === "signup" ? "signup_h1" : "login_h1");
+    btn.setAttribute("data-i18n", mode === "signup" ? "signup_btn" : "login_btn");
+    toggle.setAttribute("data-i18n", mode === "signup" ? "to_login" : "to_signup");
+    pw.setAttribute("autocomplete", mode === "signup" ? "new-password" : "current-password");
+    title.textContent = App.t(title.getAttribute("data-i18n"));
+    btn.textContent = App.t(btn.getAttribute("data-i18n"));
+    toggle.textContent = App.t(toggle.getAttribute("data-i18n"));
+    document.title = title.textContent + " · " + App.t("brand");
+  }
+  document.addEventListener("langchange", paint);
+  document.addEventListener("DOMContentLoaded", function () {
+    paint();
+    if (App.token()) location.replace("/dashboard.html");
+  });
+
+  toggle.addEventListener("click", function (e) {
+    e.preventDefault();
+    mode = mode === "signup" ? "login" : "signup";
+    location.hash = mode;
+    msg.className = "notice"; msg.textContent = "";
+    paint();
+  });
+
+  function show(kind, text) { msg.className = "notice " + kind; msg.textContent = text; }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var email = document.getElementById("email").value.trim();
+    var password = pw.value;
+    if (!email || password.length < 8) { show("err", App.t("password_help")); return; }
+    btn.disabled = true; btn.textContent = App.t("working");
+    App.api("POST", "/api/auth/" + mode, { email: email, password: password })
+      .then(function (data) {
+        if (data.session && data.session.access_token) {
+          App.setToken(data.session.access_token);
+          location.href = "/dashboard.html";
+        } else if (data.needs_email_confirmation) {
+          show("ok", App.t("confirm_email"));
+        } else {
+          show("err", App.t("err_generic"));
+        }
+      })
+      .catch(function (err) { show("err", err.message || App.t("err_generic")); })
+      .then(function () { btn.disabled = false; paint(); });
+  });
+})();
+</script>
+</body>
+</html>
