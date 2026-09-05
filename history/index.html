@@ -199,6 +199,11 @@ button{font:inherit;color:inherit}
 .spk.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 
 .opts{display:grid;gap:.6rem;margin-top:.9rem}
+/* כל תא תשובה נושא רמקול משלו, מחוץ לכפתור: כפתור בתוך כפתור אינו
+   HTML תקין, ואחרי שעונים התא נעול (disabled) ובלי הפרדה גם הרמקול
+   היה נעלם איתו. */
+.orow{display:flex;gap:.45rem;align-items:center}
+.orow .opt{flex:1;min-width:0}
 @media(min-width:560px){.opts.two{grid-template-columns:1fr 1fr}}
 .opt{display:flex;align-items:center;gap:.6rem;text-align:start;width:100%;
   border:2px solid var(--line);background:var(--surface);border-radius:12px;
@@ -737,7 +742,7 @@ T.he={
   qWhen:"מתי זה קרה?", qWhat:"מה קרה?", qWhy:"מה הביא לזה?",
   qEff:"מה הייתה התוצאה?", qFirst:"מה קרה קודם?", qTerm:"מה פירוש המושג?",
   qName:"על איזה אירוע מדובר?", qRead:"לפי המקור:",
-  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו", hearSent:"השמיעו את הקטע",
+  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו", hearSent:"השמיעו את הקטע", hearOpt:"השמיעו את האפשרות",
   check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", hintB:"רמז", hintYearL:"השנה", hintTopicL:"מהתחום",
   hintSrcL:"התשובה נמצאת בקטע שלמעלה", hintOrderL:"השוו את השנים של האפשרויות", showAll:"הראו הכול",
   correct:"נכון!", wrong:"עוד לא", answerIs:"התשובה:", why:"למה",
@@ -791,7 +796,7 @@ T.ar={
   qWhen:"متى حدث ذلك؟", qWhat:"ماذا حدث؟", qWhy:"ما الذي أدّى إلى ذلك؟",
   qEff:"ما كانت النتيجة؟", qFirst:"ما الذي حدث أولًا؟", qTerm:"ما معنى المصطلح؟",
   qName:"عن أي حدث يدور الحديث؟", qRead:"حسب المصدر:",
-  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع", hearSent:"استمع للنص",
+  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع", hearSent:"استمع للنص", hearOpt:"استمع للخيار",
   check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", hintB:"تلميح", hintYearL:"السنة", hintTopicL:"من المجال",
   hintSrcL:"الإجابة موجودة في المقطع أعلاه", hintOrderL:"قارنوا سنوات الخيارات", showAll:"أظهر الكل",
   correct:"صحيح!", wrong:"ليس بعد", answerIs:"الإجابة:", why:"لماذا",
@@ -845,7 +850,7 @@ T.ru={
   qWhen:"Когда это произошло?", qWhat:"Что произошло?", qWhy:"Что к этому привело?",
   qEff:"Каким было следствие?", qFirst:"Что произошло раньше?", qTerm:"Что означает понятие?",
   qName:"О каком событии идёт речь?", qRead:"По источнику:",
-  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать", hearSent:"Послушать отрывок",
+  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать", hearSent:"Послушать отрывок", hearOpt:"Послушать вариант",
   check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", hintB:"Подсказка", hintYearL:"Год", hintTopicL:"Из области",
   hintSrcL:"Ответ есть в отрывке выше", hintOrderL:"Сравните годы вариантов", showAll:"Показать всё",
   correct:"Верно!", wrong:"Пока нет", answerIs:"Ответ:", why:"Почему",
@@ -899,7 +904,7 @@ T.en={
   qWhen:"When did this happen?", qWhat:"What happened?", qWhy:"What led to it?",
   qEff:"What was the consequence?", qFirst:"Which came first?", qTerm:"What does the term mean?",
   qName:"Which event is this?", qRead:"According to the source:",
-  hear:"Play", hearSlow:"Slowly", hearWord:"Play", hearSent:"Play the passage",
+  hear:"Play", hearSlow:"Slowly", hearWord:"Play", hearSent:"Play the passage", hearOpt:"Play this option",
   check:"Check", next:"Next", again:"Again", dunno:"I don't know", hintB:"Hint", hintYearL:"Year", hintTopicL:"From",
   hintSrcL:"The answer is in the passage above", hintOrderL:"Compare the years of the options", showAll:"Show all",
   correct:"Correct!", wrong:"Not yet", answerIs:"Answer:", why:"Why",
@@ -975,7 +980,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m46 · 2026-09-05";
+var BUILD="m47 · 2026-09-05";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -7334,8 +7339,14 @@ function screenPractice(){
         else if(i===P.picked)cls+=" bad";
         else cls+=" dim";
       }
-      h+='<button class="'+cls+'" data-a="pick" data-i="'+i+'"'+(P.done?" disabled":"")+'>'+
-        '<span class="k">'+String.fromCharCode(65+i)+"</span><span>"+o.h+"</span></button>";
+      /* רמקול לכל תא. בלומדה האפשרויות הן משפטים שלמים — "מה קרה?"
+         עם ארבעה תיאורים — ומי שקורא בקושי לא יכול לבחור בלי לשמוע
+         אותם. עד 5.9.2026 נקראו רק השאלה והכרטיס שאחרי התשובה, והתא
+         עצמו היה אילם. הרמקול מקריא את התא הזה בלבד, בשפת הממשק. */
+      h+='<div class="orow"><button class="'+cls+'" data-a="pick" data-i="'+i+'"'+(P.done?" disabled":"")+'>'+
+        '<span class="k">'+String.fromCharCode(65+i)+"</span><span>"+o.h+"</span></button>"+
+        '<button class="spk sm" data-a="say" data-say="'+esc(plainOf(o.h))+'" data-lang="'+esc(state.lang)+
+        '" aria-label="'+esc(t("hearOpt"))+'">'+ic("play",15)+"</button></div>";
     });
     h+="</div>";
   }
@@ -9078,7 +9089,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m46-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m47-pwa1").catch(function(){});
   });
 }
 </script>
