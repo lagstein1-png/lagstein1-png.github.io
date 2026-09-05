@@ -12,7 +12,7 @@
    ולכן המספרים כאן נגזרים, וההערכה האנושית נשארת ב-STATUS.md.
    ===================================================================== */
 const fs=require("fs"), path=require("path");
-const root=process.cwd(), md=process.argv.includes("--md");
+const root=process.cwd(), md=process.argv.includes("--md"), check=process.argv.includes("--check");
 
 /* רשימת האפליקציות מ-DATA.APPS שבדף הבית — מקור האמת למניין,
    ולא רשימה קשיחה שהייתה מתיישנת באפליקציה הבאה. */
@@ -42,6 +42,30 @@ for(const id of appIds()){
   const bk=b.split(" ")[0];
   const match = (!b&&w) ? "מפתח בלבד" : (bk&&w&&w.replace(/-pwa\d+$/,"")===bk) ? "תואם" : "לא תואם";
   rows.push({id,build:b||"—",sw:w||"—",match,note:""});
+}
+/* --check: הטבלה ב-STATUS.md מול הקבצים עצמם.
+   בלי זה המסמך משקר בשקט — הוא רוענן ידנית ב-4.9 ותוך יום היו בו
+   שוב שתי גרסאות ישנות. מספר שנשאר מאחור נתפס עכשיו כמו מניין
+   שנשאר מאחור ב-apps.js. */
+if(check){
+  const p=path.join(root,"STATUS.md");
+  if(!fs.existsSync(p)){ console.log("STATUS.md אינו קיים"); process.exit(1); }
+  const doc=fs.readFileSync(p,"utf8"), bad=[];
+  for(const r of rows){
+    const line=doc.split("\n").find(l=>l.includes("`"+r.id+"`"));
+    if(!line){ bad.push(`${r.id} — אינו בטבלה שב-STATUS.md`); continue; }
+    const cells=line.split("|").map(c=>c.trim());
+    if(cells[2]!==r.build||cells[3]!==r.sw)
+      bad.push(`${r.id} — במסמך ${cells[2]} / ${cells[3]}, בקובץ ${r.build} / ${r.sw}`);
+  }
+  if(bad.length){
+    bad.forEach(b=>console.log("· "+b));
+    console.log(`\nהטבלה ב-STATUS.md מאחור ב-${bad.length} שורות.`);
+    console.log("רענון: node .claude/qa/status.js --md");
+    process.exit(1);
+  }
+  console.log(`הטבלה ב-STATUS.md תואמת לכל ${rows.length} האפליקציות`);
+  process.exit(0);
 }
 const w=(s,n)=>String(s)+" ".repeat(Math.max(0,n-String(s).length));
 const out=[];

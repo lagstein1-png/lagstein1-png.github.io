@@ -38,6 +38,7 @@ const SUITE = [
   { id: 'cache',    args: [] },
   { id: 'naming',   args: [] },
   { id: 'apps',     args: [] },
+  { id: 'status',   args: ['--check'] },
   { id: 'banks',    args: [] },
   { id: 'a11y',     args: [] },
   { id: 'arabic',   args: [] },
