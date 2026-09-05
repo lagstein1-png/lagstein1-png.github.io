@@ -1840,7 +1840,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b48 · 2026-09-05";
+var BUILD="b49 · 2026-09-05";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2249,8 +2249,19 @@ function practice(){
   h+='</div>';
   if(P.visual&&P.phase==="ask")h+=visualHint(q);
   if(P.phase==="reveal"){
-    h+='<div class="rise"><div style="display:flex;align-items:center;gap:12px;background:var(--coral-soft);border:2px solid rgba(255,111,97,.3);border-radius:18px;padding:13px 18px;margin-top:22px;font-family:var(--font-display);font-weight:600;font-size:1.15rem;color:var(--coral-deep)">'+ic("x",22)+' '+(state.settings.calmMode?esc(t.calmMsg):esc(t.enc))+'</div>';
-    h+='<div style="margin-top:12px;background:var(--paper);border:2px solid rgba(23,51,60,.1);border-radius:18px;padding:18px"><span style="font-weight:500;font-size:1.05rem">'+esc(fmt(t.revealPre,{a:q.answer}))+' <b class="fd" style="font-size:1.4rem;color:var(--teal-deep)">'+q.answer+'</b></span><p style="color:var(--ink-soft);margin-top:6px">'+esc(q.explain)+'</p></div>';
+    /* אותו מסך משמש היום גם לתשובה נכונה וגם לשגויה, ולכן הוא נשען
+       על התוצאה האחרונה ולא מניח כישלון. עד שהתשובה הנכונה נעצרה
+       כאן, הבלוק הזה היה תמיד אדום ותמיד גילה את התשובה — מסך כזה
+       אחרי תשובה **נכונה** אומר לתלמיד שטעה. */
+    var okNow=P.results[P.results.length-1]==="ok";
+    h+='<div class="rise">';
+    if(okNow){
+      h+='<div style="display:flex;align-items:center;gap:12px;background:var(--teal-soft);border:2px solid rgba(14,156,141,.35);border-radius:18px;padding:13px 18px;margin-top:22px;font-family:var(--font-display);font-weight:600;font-size:1.15rem;color:var(--teal-deep)">'+ic("check",22)+' '+esc(BT.text||t.praise)+'</div>';
+    }else{
+      h+='<div style="display:flex;align-items:center;gap:12px;background:var(--coral-soft);border:2px solid rgba(255,111,97,.3);border-radius:18px;padding:13px 18px;margin-top:22px;font-family:var(--font-display);font-weight:600;font-size:1.15rem;color:var(--coral-deep)">'+ic("x",22)+' '+(state.settings.calmMode?esc(t.calmMsg):esc(t.enc))+'</div>';
+      /* הפתרון נפתח רק למי שלא הגיע אליו בעצמו */
+      h+='<div style="margin-top:12px;background:var(--paper);border:2px solid rgba(23,51,60,.1);border-radius:18px;padding:18px"><span style="font-weight:500;font-size:1.05rem">'+esc(fmt(t.revealPre,{a:q.answer}))+' <b class="fd" style="font-size:1.4rem;color:var(--teal-deep)">'+q.answer+'</b></span><p style="color:var(--ink-soft);margin-top:6px">'+esc(q.explain)+'</p></div>';
+    }
     h+='<button class="btn btn-ink" data-a="next" style="width:100%;margin-top:18px;padding:15px;font-size:1.2rem">'+esc(t.next)+' '+ic("arrow",22)+'</button></div>';
   }
   h+='</div>';
@@ -3884,13 +3895,19 @@ function onAns(opt){
     }
     sfxCorrect();confetti(false);
     var msg=Math.random()<0.5?t.praise:t.effort;
-    P.mood="cheer";
     speak(msg+" +10",true);
     announce(msg);
-    P.phase="wait";
-    var el=document.querySelector('[data-o="'+opt+'"]');if(el){el.className="opt right pop"}
-    setTimeout(function(){advance()},1000);
-    setBubbleNow(msg);
+    /* קודם עמד כאן setTimeout(advance,1000): תשובה נכונה קפצה לשאלה
+       הבאה מעצמה אחרי שנייה אחת. תלמיד שקורא לאט לא הספיק לקרוא את
+       "מעולה", ההקראה נקטעה באמצע המשפט על ידי השאלה הבאה, ולא היה
+       שום דבר ללחוץ עליו כדי להמשיך בקצב שלו.
+
+       שמונה האפליקציות האחרות כולן עוצרות על כפתור "ממשיכים הלאה"
+       גם בתשובה נכונה — math-app הייתה היחידה שלא, וזה סתר את מה
+       שדף הבית מבטיח: "קצב שנקבע על ידי הלומד". */
+    P.phase="reveal";
+    setBubble(msg,"cheer");
+    render();
   }else{
     if(P.wrong.indexOf(opt)>=0)return;
     P.wrong.push(opt);sfxWrong();
@@ -4140,7 +4157,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b48-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b49-pwa1").catch(function(){});
   });
 }
 </script>
