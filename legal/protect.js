@@ -237,7 +237,26 @@ var IS={
       ok:"Got it",dismiss:"Close"}
 };
 function is(){return IS[lang()]||IS.he}
-function dismissed(){return read("lg-install-off")==="1"}
+/* מפתח הביטול היה מחרוזת אחת לכל המקור, וכל שתים-עשרה האפליקציות
+   חולקות אותו. לכן סגירת הפס באפליקציה אחת — או **התקנה מוצלחת**
+   של אחת, שגם היא כותבת את המפתח — השתיקה את ההצעה בכל השאר
+   לתמיד. מי שהתקין את "שלב" לא היה מקבל הצעה להתקין את "ניב"
+   לעולם. המפתח פר-אפליקציה מהיום.
+
+   ו-`?install=1` הוא בקשה מפורשת שהגיעה מדף הבית, ולכן היא גוברת
+   על ביטול קודם — מי שלחץ "התקנה" ביקש לראות את הכפתור. */
+function appId(){
+  var seg=(location.pathname||"/").split("/")[1]||"";
+  return seg||"home";
+}
+var OFFKEY="lg-install-off:"+appId();
+var WANT=/(^|[?&])install=1(&|$)/.test(location.search||"");
+function dismissed(){
+  if(WANT)return false;
+  var v=read(OFFKEY);
+  if(v!==null)return v==="1";
+  return read("lg-install-off")==="1";   /* המפתח הישן, לתאימות אחורה */
+}
 
 function installMaybe(){
   if(standalone()||dismissed())return;
@@ -259,7 +278,7 @@ function showBar(){
     /* ה-✕ מבטל, כל השאר מתקין */
     var r=bar.getBoundingClientRect();
     var nearEnd=T().dir==="rtl"?(e.clientX-r.left)<26:(r.right-e.clientX)<26;
-    if(nearEnd&&e.clientX){ store("lg-install-off","1"); hideBar(); return; }
+    if(nearEnd&&e.clientX){ store(OFFKEY,"1"); hideBar(); return; }
     doInstall();
   });
   document.body.appendChild(bar);
@@ -282,7 +301,7 @@ function doInstall(){
 window.addEventListener("beforeinstallprompt",function(e){
   e.preventDefault(); deferred=e; installMaybe();
 });
-window.addEventListener("appinstalled",function(){ store("lg-install-off","1"); hideBar(); });
+window.addEventListener("appinstalled",function(){ store(OFFKEY,"1"); hideBar(); });
 
 /* האפליקציה משנה את documentElement.lang כשמחליפים שפה בהגדרות.
    חלון תנאים שכבר פתוח צריך להתחלף איתה, לא להישאר בשפה הקודמת. */

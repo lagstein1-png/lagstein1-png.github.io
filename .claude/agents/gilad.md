@@ -74,11 +74,12 @@ tools: Read, Grep, Glob, Bash, Edit
 
 ## אחרי שהצוות סיים — סגירת סשן
 
-1. **הקובץ נטען בלי שגיאות.** בדוק פרסינג לכל קובץ שנגעו בו:
+1. **הקובץ נטען בלי שגיאות.** יש כלים לזה, ואתה משתמש בהם — ספירת
+   `<script` מול `</script>` אינה בדיקת פרסינג: היא לא תתפוס שגיאת
+   תחביר בתוך בלוק שנסגר כהלכה.
 
-       node -e "const s=require('fs').readFileSync('APP/index.html','utf8');
-                console.log('open',(s.match(/<script/g)||[]).length,
-                            'close',(s.match(/<\/script>/g)||[]).length);"
+       node .claude/qa/serve.js &            # אם עוד לא רץ
+       node .claude/qa/all.js                # כל החבילה, פסק דין אחד
 
    ולכל JSON: `node -e "JSON.parse(require('fs').readFileSync('f.json','utf8'))"`.
 2. **הגרסה ומפתח הקאש עודכנו — שניהם, יחד.**
