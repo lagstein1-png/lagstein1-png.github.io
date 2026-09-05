@@ -24,6 +24,8 @@
 | `exam806.js` | **התוכן הכתוב־ביד של 806** — נוסחה בלי הקראה, רמז שפותר, ותשובה שנכשלת בבודק של האפליקציה |
 | `naming.js` | **כלל השם של ״תאוריה מדברת״** — שהשם האסור אינו חוזר לקוד, ושהכרטיס נושא את השם הרשמי בארבע שפות |
 | `cache.js [app...]` | **חמש בדיקות על שנים־עשר ה-sw.js** — `BUILD` מול `?v=`, `caches.match` גלובלי, שם המטמון מול מה ש-`activate` מוחק, נתיבי `PRE` שקיימים, ושומר הבעלות של דף הבית |
+| `storage.js [app...]` | **מפתח localStorage אחד לאפליקציה אחת** — כל האפליקציות באותו מקור, ומפתח שהועתק עם הקובץ הוא מגירה משותפת. משתנה `*_OLD` הוא ירושה לקריאה בלבד ומותר לו להיות משותף |
+| `say.js [app...] [--n N]` | **האם ההקראה מסגירה את התשובה לפני שעונים** — רווח בתרגול, בדפדפן אמיתי, בארבע אפליקציות החידון. שאלת האזנה אינה נספרת |
 | `a11y.js [app...]` | **האם ששת מצבי הנגישות מחווטים** — בכל אפליקציה, בכל שם, ועד ל-CSS |
 | `apps.js` | **שבעת המקומות שאפליקציה חדשה נוגעת בהם** — ובראשם המניין שכתוב כמילה בארבע שפות |
 | `banks.js [app...]` | **החיווט של `lomda/data/`** — תגית, `PRE`, וסדר הטעינה — ושלמות ארבע השפות בכל פריט תוכן |
@@ -121,12 +123,12 @@ eslint:
 
 | קובץ | ממצא | למה הוא שפיר |
 |---|---|---|
-| english, history, math-app, math-teen, math-uni, math-uni2, math-uni3 | `'id' is already defined` | `var id` חוזר באותו scope |
-| english, history, ulpan | `'lg' is already defined` | אותו דבר |
+| english, history, ulpan, lomda, math-app, math-teen, math-uni, math-uni2, math-uni3 | `'id' is already defined` | `var id` חוזר באותו scope |
+| english, history, ulpan, lomda | `'lg' is already defined` | אותו דבר |
 | math-uni | `'qq' is already defined` | שני `var qq` בשני ענפים של אותו מחולל, שמופרדים ב-`return` |
 | math-app | `'nm' is already defined` | שני `var nm` עוקבים באותה פונקציה |
 | math-app | `'tDesc' is not defined` | `typeof tDesc==="function"` — שמירה על תכונה אופציונלית |
-| math-teen | `'VOICE_SAMPLE' is not defined` ×5 | מוגדר ב-`Object.defineProperty(window,...)` כדי להחזיר עברית או ערבית לפי `LG`. eslint אינו רואה גלובל שנוצר כך |
+| math-teen | `'VOICE_SAMPLE' is not defined` ×2 (היו 5; נמדד 5.9.2026) | מוגדר ב-`Object.defineProperty(window,...)` כדי להחזיר עברית או ערבית לפי `LG`. eslint אינו רואה גלובל שנוצר כך |
 | index (השורש), reader | `'stopSpeak' is not defined` | `typeof stopSpeak==="function"` ב-`demoQuiet()` — שמירה על תכונה אופציונלית, כמו `tDesc`. שני הדפים היחידים שאין בהם `function stopSpeak` |
 
 `no-redeclare` שאינו ברשימה הזאת אינו בהכרח שפיר: כך נמצא ב-english
