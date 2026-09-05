@@ -39,6 +39,7 @@ const SUITE = [
   { id: 'naming',   args: [] },
   { id: 'apps',     args: [] },
   { id: 'status',   args: ['--check'] },
+  { id: 'wix',      args: ['--check'] },
   { id: 'banks',    args: [] },
   { id: 'a11y',     args: [] },
   { id: 'arabic',   args: [] },
