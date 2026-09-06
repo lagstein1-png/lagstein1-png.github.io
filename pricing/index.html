@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מחירים — לומדים בקצב שלהם</title>
+<meta name="description" content="שבעה ימי ניסיון חינם, בלי כרטיס אשראי. שלוש תוכניות: Starter, Pro ו-Family.">
+<meta name="theme-color" content="#f3f7ff">
+<link rel="icon" href="/img/icon-192.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   עמוד המחירים. אותם צבעי מותג כמו בדף הבית (--brand #2f5fd8),
+   וכל המידות לוגיות (inline/block) ולא ימין/שמאל — הדף מתחלף בין
+   ארבע שפות, ושתיים מהן נכתבות לשמאל.
+   המחירים כתובים ב-PLANS בלבד, ומוצגים בכל שפה מאותו מקום.
+   ============================================================ */
+:root{
+  --bg:#f3f7ff; --bg-elev:#ffffff; --text:#14181f; --text-soft:#4a5464;
+  --line:#dde4f3; --brand:#2f5fd8; --brand-ink:#ffffff; --brand-soft:#e6eeff;
+  --ok:#1a7f4b; --err-bg:#fdecec; --err-ink:#8a1c1c; --err-line:#f3b8b8;
+  --radius:20px;
+  --shadow:0 1px 2px rgba(20,24,31,.04),0 12px 32px -18px rgba(47,95,216,.28);
+  --shadow-lg:0 2px 4px rgba(20,24,31,.05),0 26px 56px -26px rgba(47,95,216,.5);
+  --ring:0 0 0 3px rgba(47,95,216,.28);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--text); font:400 1.02rem/1.55 Heebo,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg);
+  background-image:radial-gradient(900px 420px at 50% -80px,rgba(47,95,216,.14),transparent 70%);
+}
+html[lang="ar"] body{font-family:"Noto Sans Arabic",Heebo,system-ui,sans-serif}
+.wrap{max-width:1080px; margin-inline:auto; padding-inline:clamp(14px,4vw,26px)}
+.sr{position:absolute; inline-size:1px; block-size:1px; overflow:hidden; clip-path:inset(50%)}
+.skip{
+  position:absolute; inset-block-start:-100px; inset-inline-start:12px; z-index:9;
+  background:var(--brand); color:var(--brand-ink); padding:12px 18px; border-radius:12px;
+  text-decoration:none; font-weight:700;
+}
+.skip:focus{inset-block-start:12px}
+:focus-visible{outline:none; box-shadow:var(--ring)}
+
+/* --- סרגל עליון --- */
+.topbar{
+  position:sticky; inset-block-start:0; z-index:8;
+  background:rgba(243,247,255,.88); backdrop-filter:blur(10px);
+  border-block-end:1px solid var(--line);
+}
+.topbar .wrap{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; min-block-size:68px; padding-block:8px}
+.logo{
+  display:inline-flex; align-items:center; gap:11px; text-decoration:none; color:inherit;
+  font-weight:800; font-size:1.08rem; line-height:1.15; min-block-size:44px; margin-inline-end:auto;
+}
+.mark{
+  inline-size:40px; block-size:40px; border-radius:13px; flex:none; display:grid; place-items:center;
+  color:var(--brand-ink); background:linear-gradient(145deg,var(--brand),#1f44a8);
+  box-shadow:0 6px 16px -8px rgba(47,95,216,.7);
+}
+.mark svg{inline-size:22px; block-size:22px}
+.home{
+  display:inline-flex; align-items:center; min-block-size:44px; padding-inline:12px; border-radius:12px;
+  color:var(--text-soft); text-decoration:none; font-weight:600;
+}
+.home:hover{color:var(--text); background:var(--bg-elev)}
+/* במחשב העטיפה שקופה; בטלפון היא השורה השנייה: ״דף הבית״ וארבע השפות. */
+.nav2{display:contents}
+.lang{display:flex; gap:6px}
+.lang button{
+  min-block-size:44px; min-inline-size:44px; padding-inline:12px; border:1px solid var(--line); border-radius:12px;
+  background:var(--bg-elev); color:var(--text-soft); cursor:pointer; font:700 .9rem/1 Heebo,system-ui,sans-serif;
+}
+.lang button:hover{color:var(--text); border-color:#a9bdf0}
+.lang button[aria-pressed="true"]{background:var(--brand); color:var(--brand-ink); border-color:var(--brand)}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; min-block-size:48px;
+  padding-inline:20px; border-radius:14px; border:1px solid var(--brand); background:var(--brand);
+  color:var(--brand-ink); font:700 1rem/1 inherit; font-family:inherit; text-decoration:none; cursor:pointer;
+  transition:transform .12s ease,box-shadow .12s ease,background .12s ease;
+}
+.btn:hover{background:#2650bd; transform:translateY(-1px); box-shadow:0 10px 20px -12px rgba(47,95,216,.8)}
+.btn:active{transform:none}
+.btn.ghost{background:var(--bg-elev); color:var(--brand)}
+.btn.ghost:hover{background:var(--brand-soft)}
+.btn[disabled]{opacity:.6; cursor:progress; transform:none; box-shadow:none}
+@media (max-width:720px){
+  .topbar{position:static}
+  .topbar .wrap{gap:8px 10px}
+  /* שורה ראשונה: סמל והרשמה; שורה שנייה: ״דף הבית״ וארבע השפות ברוחב שווה. */
+  /* השם נשבר לשתי שורות בתוך המקום שנשאר, ולא דוחק את ההרשמה לשורה שנייה —
+     ברוסית ״Учатся в своём темпе״ ובאנגלית השם ארוך מדי ל-360px בשורה אחת. */
+  .logo{font-size:.95rem; gap:8px; flex:1 1 0; min-inline-size:0}
+  .mark{inline-size:36px; block-size:36px}
+  .nav2{display:flex; align-items:center; gap:8px; order:8; inline-size:100%; flex:none}
+  .home{padding-inline:8px; flex:none}
+  .lang{flex:1; min-inline-size:0}
+  .lang button{flex:1; min-inline-size:0; padding-inline:4px}
+  .signup{padding-inline:12px; min-block-size:44px; font-size:.95rem}
+}
+
+/* --- כותרת --- */
+.hero{text-align:center; padding-block:clamp(30px,6vw,64px) clamp(14px,3vw,24px)}
+h1{margin:0 0 14px; font-size:clamp(1.8rem,4.6vw,2.7rem); font-weight:800; line-height:1.18; letter-spacing:-.01em}
+.sub{margin:0 auto; max-inline-size:620px; color:var(--text-soft); font-size:1.08rem}
+.info{
+  display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px 10px;
+  margin:22px auto 0; max-inline-size:820px; padding:14px 18px; border-radius:16px;
+  background:var(--brand-soft); color:#1f3f8f; font-weight:600; border:1px solid #cfdcfb;
+}
+.info .dot{color:var(--brand); opacity:.75}
+/* בטלפון שלוש שורות ולא שורה אחת שנשברת באמצע משפט. כל פריט הוא span
+   משלו — טקסט חופשי בין נקודות מוסתרות היה מתאחד לפריט flex אחד. */
+@media (max-width:560px){.info{flex-direction:column; gap:4px} .info .dot{display:none}}
+
+/* --- כרטיסי התוכניות --- */
+.plans{
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(14px,2.4vw,24px);
+  align-items:stretch; padding-block:clamp(20px,4vw,40px) 12px; list-style:none; margin:0;
+}
+.plan{
+  position:relative; display:flex; flex-direction:column; gap:16px; padding:clamp(20px,3vw,30px);
+  border-radius:var(--radius); background:var(--bg-elev); border:1px solid var(--line); box-shadow:var(--shadow);
+}
+.plan.hot{border:2px solid var(--brand); box-shadow:var(--shadow-lg)}
+.tag{
+  position:absolute; inset-block-start:-15px; inset-inline-start:50%; transform:translateX(-50%);
+  background:var(--brand); color:var(--brand-ink); font-weight:700; font-size:.86rem;
+  padding:6px 14px; border-radius:999px; white-space:nowrap; box-shadow:0 8px 16px -10px rgba(47,95,216,.8);
+}
+html[dir="rtl"] .tag{transform:translateX(50%)}
+.plan h2{margin:0; font-size:1.35rem; font-weight:800}
+.plan .who{margin:-8px 0 0; color:var(--text-soft); font-size:.96rem; min-block-size:2.9em}
+.price{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
+.price .amt{font-size:2.35rem; font-weight:800; line-height:1; letter-spacing:-.02em; direction:ltr; unicode-bidi:isolate}
+.price .per{color:var(--text-soft); font-weight:500}
+.feats{list-style:none; margin:0; padding:0; display:grid; gap:10px; flex:1}
+.feats li{display:flex; gap:10px; align-items:flex-start; line-height:1.45}
+.feats .ok{
+  flex:none; inline-size:22px; block-size:22px; border-radius:50%; margin-block-start:2px;
+  display:grid; place-items:center; background:#e3f5ea; color:var(--ok); font-weight:800; font-size:.85rem;
+}
+.plan .btn{inline-size:100%; margin-block-start:auto; min-block-size:52px; font-size:1.05rem}
+@media (max-width:860px){
+  .plans{grid-template-columns:1fr; max-inline-size:520px; margin-inline:auto; padding-block-start:28px}
+  .plan.hot{order:-1}
+  .plan .who{min-block-size:0}
+}
+
+/* --- הודעת שגיאה: בתוך הכרטיס, מתחת לכפתור שנלחץ, כדי שבטלפון היא
+   לא תופיע שני מסכים מתחת. --- */
+.msg{
+  display:none; margin:0; padding:12px 14px; border-radius:12px; font-size:.95rem;
+  background:var(--err-bg); color:var(--err-ink); border:1px solid var(--err-line); font-weight:600;
+}
+.msg.show{display:block}
+
+/* --- שורה משותפת ותחתית --- */
+.all{
+  margin:22px auto 0; max-inline-size:820px; padding:18px 22px; border-radius:16px; text-align:center;
+  background:var(--bg-elev); border:1px solid var(--line); color:var(--text-soft);
+}
+.org{margin:18px auto 0; max-inline-size:820px; text-align:center; color:var(--text-soft)}
+.org a{color:var(--brand); font-weight:700; text-decoration:none; unicode-bidi:isolate}
+.org a:hover{text-decoration:underline}
+footer{padding-block:34px 44px; text-align:center; color:var(--text-soft); font-size:.92rem}
+footer a{color:inherit}
+</style>
+</head>
+<body>
+<a class="skip" href="#plans" id="skip">דילוג לתוכניות</a>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="logo" href="/" id="logo"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></span><span id="site"></span></a>
+    <div class="nav2">
+    <a class="home" href="/" id="home"></a>
+    <div class="lang" id="lang" role="group" aria-label="שפה">
+      <button type="button" data-l="he" lang="he" aria-pressed="true">HE</button>
+      <button type="button" data-l="en" lang="en" aria-pressed="false">EN</button>
+      <button type="button" data-l="ar" lang="ar" aria-pressed="false">AR</button>
+      <button type="button" data-l="ru" lang="ru" aria-pressed="false">RU</button>
+    </div>
+    </div>
+    <a class="btn signup" href="#plans" id="signup"></a>
+  </div>
+</div>
+
+<main class="wrap">
+  <header class="hero">
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
+    <p class="info" id="info"></p>
+  </header>
+
+  <ul class="plans" id="plans" aria-labelledby="title"></ul>
+
+  <p class="all" id="all"></p>
+  <p class="org" id="org"></p>
+</main>
+
+<footer><a href="/legal/" id="terms"></a></footer>
+
+<script>
+/* --- המחירים: מקור אחד. הערכים נמסרו על ידי בעל האתר (6.9.2026). --- */
+var PLANS=[
+  {id:"starter", price:39},
+  {id:"pro",     price:79, hot:true},
+  {id:"family",  price:129}
+];
+var CHECKOUT="/create-checkout-session";
+var EMAIL="lagstein1@gmail.com";
+
+/* --- הטקסטים בארבע שפות. המפתחות זהים בכל שפה. --- */
+var TR={
+he:{dir:"rtl", site:"לומדים בקצב שלהם", home:"דף הבית", signup:"הרשמה",
+  title:"בחרו את התוכנית שלכם",
+  sub:"מתחילים בחינם: שבעה ימים, כל האפליקציות, בלי כרטיס אשראי.",
+  info:["7 ימי ניסיון חינם","אין צורך בכרטיס אשראי","אפשר לבטל בכל עת"],
+  per:"/ חודש", hot:"הכי פופולרי", choose:"בחירה ב-{plan}", loading:"רגע…",
+  names:{starter:"Starter", pro:"Pro", family:"Family"},
+  who:{starter:"לומד אחד שצריך אפליקציה אחת", pro:"לומד אחד שצריך יותר מאחת", family:"בית עם יותר מלומד אחד"},
+  feats:{
+    starter:["אפליקציה אחת לבחירה","לומד אחד","כל השפות וההקראה שבה","עבודה בלי אינטרנט אחרי הכניסה הראשונה"],
+    pro:["כל שתים־עשרה האפליקציות","לומד אחד","הקראה של כל שאלה","ארבע שפות ממשק","עבודה בלי אינטרנט אחרי הכניסה הראשונה"],
+    family:["כל שתים־עשרה האפליקציות","לכל הלומדים בבית","הקראה של כל שאלה","ארבע שפות ממשק","עבודה בלי אינטרנט אחרי הכניסה הראשונה"]
+  },
+  all:"בכולם: ההתקדמות נשמרת במכשיר שלכם ולא אצלנו. מבטלים מתי שרוצים, מלוח הבקרה.",
+  org:"כיתה, בית ספר, ספרייה או מרכז קליטה? כותבים ל-{email} ונדבר.",
+  terms:"תנאי שימוש", skip:"דילוג לתוכניות", langs:"שפה",
+  errUnavailable:"התשלום אינו זמין כרגע. נסו שוב מאוחר יותר, או כתבו ל-{email}.",
+  errNet:"אין חיבור לשרת התשלום. בדקו את החיבור לאינטרנט ונסו שוב."},
+en:{dir:"ltr", site:"Learning at Their Own Pace", home:"Home", signup:"Sign up",
+  title:"Choose your plan",
+  sub:"Start free: seven days, every app, no credit card.",
+  info:["7-day free trial","No credit card needed","Cancel any time"],
+  per:"/ month", hot:"Most popular", choose:"Choose {plan}", loading:"One moment…",
+  names:{starter:"Starter", pro:"Pro", family:"Family"},
+  who:{starter:"One learner who needs one app", pro:"One learner who needs more than one", family:"A home with more than one learner"},
+  feats:{
+    starter:["One app of your choice","One learner","All its languages and read-aloud","Offline after the first sign-in"],
+    pro:["All twelve apps","One learner","Every question read aloud","Four interface languages","Offline after the first sign-in"],
+    family:["All twelve apps","Every learner at home","Every question read aloud","Four interface languages","Offline after the first sign-in"]
+  },
+  all:"In all of them: progress is kept on your device, not with us. Cancel any time, from your dashboard.",
+  org:"A class, a school, a library or an absorption centre? Write to {email}.",
+  terms:"Terms of use", skip:"Skip to plans", langs:"Language",
+  errUnavailable:"Payment is not available right now. Try again later, or write to {email}.",
+  errNet:"Could not reach the payment server. Check your connection and try again."},
+ar:{dir:"rtl", site:"يتعلّمون بوتيرتهم", home:"الصفحة الرئيسية", signup:"تسجيل",
+  title:"اختاروا خطّتكم",
+  sub:"ابدأ مجانًا: سبعة أيام، كل التطبيقات، بلا بطاقة ائتمان.",
+  info:["7 أيام تجربة مجانية","لا حاجة لبطاقة ائتمان","يمكن الإلغاء في أي وقت"],
+  per:"/ شهر", hot:"الأكثر شعبية", choose:"اختيار {plan}", loading:"لحظة…",
+  names:{starter:"Starter", pro:"Pro", family:"Family"},
+  who:{starter:"متعلّم واحد يحتاج تطبيقًا واحدًا", pro:"متعلّم واحد يحتاج أكثر من تطبيق", family:"بيت فيه أكثر من متعلّم"},
+  feats:{
+    starter:["تطبيق واحد تختاره","متعلّم واحد","كل لغاته والقراءة الصوتية","عمل بلا إنترنت بعد الدخول الأوّل"],
+    pro:["التطبيقات الاثنا عشر كلّها","متعلّم واحد","قراءة صوتية لكلّ سؤال","أربع لغات واجهة","عمل بلا إنترنت بعد الدخول الأوّل"],
+    family:["التطبيقات الاثنا عشر كلّها","لكلّ المتعلّمين في البيت","قراءة صوتية لكلّ سؤال","أربع لغات واجهة","عمل بلا إنترنت بعد الدخول الأوّل"]
+  },
+  all:"في كلّها: التقدّم يُحفظ على جهازك لا عندنا. تلغي متى شئت، من لوحة التحكّم.",
+  org:"صفّ أو مدرسة أو مكتبة أو مركز استيعاب؟ اكتبوا إلى {email} ونتحدّث.",
+  terms:"شروط الاستخدام", skip:"الانتقال إلى الخطط", langs:"اللغة",
+  errUnavailable:"الدفع غير متاح الآن. حاولوا لاحقًا، أو اكتبوا إلى {email}.",
+  errNet:"تعذّر الوصول إلى خادم الدفع. تحقّقوا من الاتصال وحاولوا مجددًا."},
+ru:{dir:"ltr", site:"Учатся в своём темпе", home:"Главная", signup:"Регистрация",
+  title:"Выберите свой план",
+  sub:"Начните бесплатно: семь дней, все приложения, без банковской карты.",
+  info:["7 дней бесплатно","Без банковской карты","Отмена в любой момент"],
+  per:"/ месяц", hot:"Самый популярный", choose:"Выбрать {plan}", loading:"Секунду…",
+  names:{starter:"Starter", pro:"Pro", family:"Family"},
+  who:{starter:"Один учащийся, которому нужно одно приложение", pro:"Один учащийся, которому нужно больше одного", family:"Семья, где учится не один"},
+  feats:{
+    starter:["Одно приложение на выбор","Один учащийся","Все его языки и озвучивание","Без интернета после первого входа"],
+    pro:["Все двенадцать приложений","Один учащийся","Озвучивание каждого вопроса","Четыре языка интерфейса","Без интернета после первого входа"],
+    family:["Все двенадцать приложений","Все учащиеся в семье","Озвучивание каждого вопроса","Четыре языка интерфейса","Без интернета после первого входа"]
+  },
+  all:"Во всех: прогресс хранится на вашем устройстве, а не у нас. Отменить можно в любой момент, из личного кабинета.",
+  org:"Класс, школа, библиотека или центр абсорбции? Напишите на {email}.",
+  terms:"Условия использования", skip:"К планам", langs:"Язык",
+  errUnavailable:"Оплата сейчас недоступна. Попробуйте позже или напишите на {email}.",
+  errNet:"Нет связи с сервером оплаты. Проверьте подключение и попробуйте снова."}
+};
+
+var $=function(s){return document.querySelector(s)};
+var esc=function(x){return String(x).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
+
+/* --- שפה. מפתח משלו ב-localStorage, לא של דף הבית (מגירה משותפת). --- */
+var LKEY="pricing-lang";
+function savedLang(){try{return localStorage.getItem(LKEY)||""}catch(e){return""}}
+function guessLang(){
+  var l=(navigator.language||"").toLowerCase().split("-")[0];
+  return {he:1,iw:1}[l]?"he":{ar:1,ru:1,en:1}[l]?l:"he";
+}
+var LG=savedLang()||guessLang(); if(!TR[LG])LG="he";
+var S=TR[LG];
+
+function money(n){return "₪"+n}
+
+function paint(){
+  S=TR[LG];
+  document.documentElement.lang=LG;
+  document.documentElement.dir=S.dir;
+  document.title=S.title+" — "+S.site;
+  $("#site").textContent=S.site;
+  $("#logo").setAttribute("aria-label",S.site);
+  $("#home").textContent=S.home;
+  $("#signup").textContent=S.signup;
+  $("#skip").textContent=S.skip;
+  $("#lang").setAttribute("aria-label",S.langs);
+  Array.prototype.forEach.call($("#lang").children,function(b){
+    b.setAttribute("aria-pressed",String(b.getAttribute("data-l")===LG));
+  });
+  $("#title").textContent=S.title;
+  $("#sub").textContent=S.sub;
+  $("#info").innerHTML=S.info.map(function(t){return "<span>"+esc(t)+"</span>"}).join('<span class="dot" aria-hidden="true">•</span>');
+  $("#plans").innerHTML=PLANS.map(function(p){
+    var name=S.names[p.id];
+    return '<li class="plan'+(p.hot?' hot':'')+'">'+
+      (p.hot?'<span class="tag">'+esc(S.hot)+'</span>':'')+
+      '<h2>'+esc(name)+'</h2>'+
+      '<p class="who">'+esc(S.who[p.id])+'</p>'+
+      '<p class="price"><span class="amt">'+esc(money(p.price))+'</span><span class="per">'+esc(S.per)+'</span></p>'+
+      '<ul class="feats">'+S.feats[p.id].map(function(f){
+        return '<li><span class="ok" aria-hidden="true">✓</span><span>'+esc(f)+'</span></li>'}).join("")+'</ul>'+
+      '<button type="button" class="btn" data-plan="'+p.id+'">'+esc(S.choose.replace("{plan}",name))+'</button>'+
+      '<p class="msg" role="alert"></p>'+
+    '</li>';
+  }).join("");
+  $("#all").textContent=S.all;
+  $("#org").innerHTML=esc(S.org).replace("{email}",'<a href="mailto:'+EMAIL+'">'+esc(EMAIL)+'</a>');
+  $("#terms").textContent=S.terms;
+}
+
+function showMsg(btn,t){var m=btn.parentNode.querySelector(".msg"); m.textContent=t.replace("{email}",EMAIL); m.classList.add("show")}
+function hideMsg(){Array.prototype.forEach.call(document.querySelectorAll(".msg"),function(m){m.textContent=""; m.classList.remove("show")})}
+
+/* --- תשלום. הדף שולח רק את שם התוכנית; המפתחות של Stripe ו-Supabase
+   יושבים בשרת בלבד, ולעולם לא כאן. --- */
+var busy=false;
+function checkout(btn){
+  if(busy)return; busy=true;
+  var plan=btn.getAttribute("data-plan"), label=btn.textContent;
+  hideMsg(); btn.disabled=true; btn.textContent=S.loading;
+  var done=function(){busy=false; btn.disabled=false; btn.textContent=label};
+  var fail=function(t){done(); showMsg(btn,t); btn.focus()};
+  if(!window.fetch){fail(S.errUnavailable);return}
+  fetch(CHECKOUT,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},
+    body:JSON.stringify({plan:plan})})
+  .then(function(r){
+    if(!r.ok)throw new Error("http "+r.status);
+    return r.json();
+  })
+  .then(function(d){
+    if(d&&typeof d.url==="string"&&/^https?:\/\//.test(d.url)){location.href=d.url;return}
+    throw new Error("no url");
+  })
+  .catch(function(e){
+    var net=e&&e.name==="TypeError";   /* fetch נופל ב-TypeError כשאין רשת */
+    fail(net?S.errNet:S.errUnavailable);
+  });
+}
+
+document.addEventListener("click",function(e){
+  var l=e.target.closest("#lang [data-l]");
+  if(l){LG=l.getAttribute("data-l"); try{localStorage.setItem(LKEY,LG)}catch(err){} paint(); return}
+  var b=e.target.closest("[data-plan]");
+  if(b)checkout(b);
+});
+paint();
+</script>
+</body>
+</html>
