@@ -72,7 +72,7 @@
 
 ### אנגלית
 
-**כותרת:** Learning you can hear, that explains and respects
+**כותרת:** Learning That Sounds, explains and respects
 
 **פסקת פתיחה:** A set of tools I built for teenagers and students — for people who find Hebrew hard, and for people with particular learning needs. Maths from primary school to university and the 3–4 and 5-unit matriculation, Hebrew for new arrivals, English, history, science, civics, the internet, household money and health, a voice reader and driving theory. In every one: every word read aloud, an explanation step by step, and a pace the learner sets.
 
