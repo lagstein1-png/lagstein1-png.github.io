@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>מבקרים — לוח בקרה</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#111827;--muted:#4b5563;--line:#e5e7eb;--bar:#2563eb;--bar-soft:#93c5fd;--bad:#b91c1c;--warn-bg:#fef3c7;--warn-ink:#78350f}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#0e1117;--card:#161b26;--ink:#e8ecf4;--muted:#9aa4ba;--line:#28313f;--bar:#60a5fa;--bar-soft:#1e3a8a;--bad:#fca5a5;--warn-bg:#3b2f0b;--warn-ink:#fde68a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;
+  font-family:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;font-size:17px}
+.wrap{max-width:60rem;margin:0 auto;padding:clamp(16px,4vw,36px)}
+h1{font-size:clamp(1.4rem,4vw,1.9rem);margin:0;line-height:1.25}
+h2{font-size:1.05rem;margin:0 0 .6rem}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:clamp(14px,3vw,24px);margin-top:14px}
+button{font:inherit;font-weight:700;cursor:pointer;border:1px solid var(--line);background:var(--card);
+  color:var(--ink);border-radius:12px;padding:.6rem 1.1rem;min-height:2.8rem}
+button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input{font:inherit;padding:.6rem .9rem;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);min-height:2.8rem;width:100%;max-width:22rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.tile .k{color:var(--muted);font-size:.9rem}
+.tile .v{font-size:2rem;font-weight:800;line-height:1.2;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:12px;padding:10px 14px;margin-top:14px}
+.err{color:var(--bad);font-weight:700}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{text-align:start;padding:.4rem .5rem;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:700;font-size:.9rem}
+td.n,th.n{text-align:end;width:6rem}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:14px}
+.chart{position:relative}
+.chart svg{width:100%;height:auto;display:block}
+.chart .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:.85rem;
+  padding:4px 8px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-115%);display:none}
+.bar{fill:var(--bar)}
+.bar:hover{fill:var(--bar-soft)}
+.axis{stroke:var(--line);stroke-width:1}
+.lbl{fill:var(--muted);font-size:11px}
+:focus-visible{outline:3px solid #2563eb;outline-offset:2px;border-radius:8px}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>מבקרים באתר</h1>
+    <div class="row" id="tools" hidden>
+      <span class="muted" id="stamp"></span>
+      <button id="refresh" type="button">רענון</button>
+      <button id="logout" type="button">יציאה</button>
+    </div>
+  </div>
+
+  <div class="card" id="loading">טוען נתונים…</div>
+
+  <div class="card" id="login" hidden>
+    <h2>כניסה</h2>
+    <p class="muted">המסך הזה לאדמין בלבד. הנתונים אנונימיים, אבל הסיכום אינו ציבורי.</p>
+    <form id="loginForm" class="row">
+      <label class="sr" for="pw">סיסמה</label>
+      <input id="pw" type="password" autocomplete="current-password" placeholder="סיסמה" required />
+      <button class="pri" type="submit">כניסה</button>
+    </form>
+    <p id="loginErr" class="err" hidden></p>
+  </div>
+
+  <div class="card" id="error" hidden>
+    <p class="err" id="errMsg"></p>
+    <button id="retry" type="button">לנסות שוב</button>
+  </div>
+
+  <div id="dash" hidden>
+    <div class="tiles">
+      <div class="tile"><div class="k">סך הכול</div><div class="v" id="tTotal">–</div></div>
+      <div class="tile"><div class="k">היום</div><div class="v" id="tToday">–</div></div>
+      <div class="tile"><div class="k">שבעת הימים האחרונים</div><div class="v" id="tWeek">–</div></div>
+      <div class="tile"><div class="k">פעילים עכשיו</div><div class="v" id="tActive">–</div><div class="k">חמש הדקות האחרונות</div></div>
+    </div>
+    <div class="warn" id="warn" hidden></div>
+    <div class="card" id="empty" hidden>
+      <h2>עדיין אין ביקורים</h2>
+      <p class="muted">כשהדף הראשון ייטען עם המדידה דלוקה, הוא יופיע כאן.</p>
+    </div>
+    <div class="card" id="chartCard">
+      <div class="row" style="justify-content:space-between">
+        <h2 id="chartTitle">ביקורים לפי יום</h2>
+        <button id="toggleTable" type="button" aria-pressed="false">להציג כטבלה</button>
+      </div>
+      <div class="chart" id="chart"><div class="tip" id="tip"></div></div>
+      <div id="dayTable" hidden></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h2>דפים</h2><div id="pages"></div></div>
+      <div class="card"><h2>שפות</h2><div id="languages"></div></div>
+      <div class="card"><h2>מאיפה הגיעו</h2><div id="referrers"></div></div>
+      <div class="card"><h2>דפדפנים</h2><div id="browsers"></div></div>
+    </div>
+    <p class="muted" id="foot"></p>
+  </div>
+</div>
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)};
+function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function num(n){return Number(n||0).toLocaleString("he-IL")}
+function show(id){["loading","login","error","dash"].forEach(function(k){$("#"+k).hidden=k!==id});$("#tools").hidden=id!=="dash"}
+function heDate(d){var p=d.split("-");return p[2]+"."+p[1]}
+var LBL={page:"דף",language:"שפה",referrer:"מקור",ua:"דפדפן"};
+var REF_NONE="כניסה ישירה";
+
+function table(el,rows,key){
+  if(!rows||!rows.length){el.innerHTML='<p class="muted">אין נתונים</p>';return}
+  el.innerHTML='<table><thead><tr><th>'+LBL[key]+'</th><th class="n">ביקורים</th></tr></thead><tbody>'+
+    rows.map(function(r){var k=r[key];if(key==="referrer"&&(k==="—"||!k))k=REF_NONE;
+      return"<tr><td>"+esc(k)+'</td><td class="n">'+num(r.visits)+"</td></tr>"}).join("")+"</tbody></table>";
+}
+
+function chart(days){
+  var box=$("#chart"), tip=$("#tip");
+  var W=720,H=220,PL=40,PB=28,PT=10,PR=8;
+  var max=Math.max.apply(null,days.map(function(d){return d.visits}).concat([1]));
+  var n=days.length, iw=(W-PL-PR)/n, bw=Math.max(2,iw-2);
+  var ticks=[0,Math.ceil(max/2),max];
+  var s='<svg viewBox="0 0 '+W+" "+H+'" role="img" aria-labelledby="chartTitle">';
+  ticks.forEach(function(t){var y=PT+(H-PT-PB)*(1-t/max);
+    s+='<line class="axis" x1="'+PL+'" x2="'+(W-PR)+'" y1="'+y+'" y2="'+y+'"/>'+
+       '<text class="lbl" x="'+(PL-6)+'" y="'+(y+4)+'" text-anchor="end">'+num(t)+"</text>"});
+  days.forEach(function(d,i){
+    var h=(H-PT-PB)*(d.visits/max), x=PL+i*iw+(iw-bw)/2, y=H-PB-h;
+    s+='<rect class="bar" data-i="'+i+'" x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="'+Math.min(4,bw/2)+'"><title>'+esc(heDate(d.day))+": "+num(d.visits)+"</title></rect>";
+    if(i%5===0||i===n-1)s+='<text class="lbl" x="'+(x+bw/2)+'" y="'+(H-8)+'" text-anchor="middle">'+heDate(d.day)+"</text>";
+  });
+  s+="</svg>";
+  box.innerHTML=s; box.appendChild(tip);
+  box.querySelectorAll(".bar").forEach(function(r){
+    r.addEventListener("mousemove",function(e){var d=days[+r.getAttribute("data-i")];
+      tip.textContent=heDate(d.day)+" · "+num(d.visits);tip.style.display="block";
+      var b=box.getBoundingClientRect();tip.style.left=(e.clientX-b.left)+"px";tip.style.top=(e.clientY-b.top)+"px"});
+    r.addEventListener("mouseleave",function(){tip.style.display="none"});
+  });
+  $("#dayTable").innerHTML='<table><thead><tr><th>יום</th><th class="n">ביקורים</th></tr></thead><tbody>'+
+    days.slice().reverse().map(function(d){return"<tr><td>"+esc(d.day)+'</td><td class="n">'+num(d.visits)+"</td></tr>"}).join("")+"</tbody></table>";
+}
+
+function render(s){
+  $("#tTotal").textContent=num(s.total);
+  $("#tToday").textContent=num(s.today);
+  $("#tWeek").textContent=num(s.week);
+  $("#tActive").textContent=num(s.activeNow);
+  $("#warn").hidden=!s.warning; $("#warn").textContent=s.warning||"";
+  var empty=!s.total; $("#empty").hidden=!empty; $("#chartCard").hidden=empty;
+  if(!empty)chart(s.days||[]);
+  table($("#pages"),s.pages,"page"); table($("#languages"),s.languages,"language");
+  table($("#referrers"),s.referrers,"referrer"); table($("#browsers"),s.browsers,"ua");
+  var src=s.store==="supabase"?"Supabase":s.store==="file"?"קובץ בשרת":"זיכרון השרת";
+  $("#foot").textContent="מקור: "+src+" · ביקורים גולמיים נמחקים אחרי "+num(s.retentionDays)+" יום, והסיכום היומי נשאר · אזור זמן "+s.tz;
+  $("#stamp").textContent="עודכן "+new Date().toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
+  show("dash");
+}
+
+function load(){
+  show("loading");
+  fetch("/api/analytics/summary?days=30",{credentials:"same-origin",cache:"no-store"}).then(function(r){
+    if(r.status===401){show("login");return null}
+    return r.json().then(function(j){if(!r.ok)throw new Error(j&&j.message||("שגיאה "+r.status));return j});
+  }).then(function(j){if(j)render(j)}).catch(function(e){
+    $("#errMsg").textContent="לא הצלחתי לטעון את הנתונים: "+(e&&e.message||e);show("error")});
+}
+
+$("#loginForm").addEventListener("submit",function(e){
+  e.preventDefault(); $("#loginErr").hidden=true;
+  fetch("/admin/analytics/login",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({password:$("#pw").value})}).then(function(r){return r.json().then(function(j){return[r,j]})})
+  .then(function(a){if(a[0].ok){$("#pw").value="";load()}else{$("#loginErr").textContent=a[1].message||"כניסה נכשלה";$("#loginErr").hidden=false}})
+  .catch(function(){$("#loginErr").textContent="אין קשר לשרת";$("#loginErr").hidden=false});
+});
+$("#logout").addEventListener("click",function(){fetch("/admin/analytics/logout",{method:"POST",credentials:"same-origin"}).then(load,load)});
+$("#refresh").addEventListener("click",load);
+$("#retry").addEventListener("click",load);
+$("#toggleTable").addEventListener("click",function(){
+  var on=this.getAttribute("aria-pressed")!=="true";this.setAttribute("aria-pressed",String(on));
+  this.textContent=on?"להציג כגרף":"להציג כטבלה";$("#dayTable").hidden=!on;$("#chart").hidden=on;
+});
+load();
+})();
+</script>
+</body>
+</html>

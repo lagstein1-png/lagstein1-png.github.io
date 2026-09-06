@@ -414,6 +414,25 @@ commit ודוחף, וגם מי שמוודא בסוף שהגרסה ומפתח ה�
 נבדקים בה כן, והם זהים.
 
 
+## `analytics/` — מונה מבקרים, ולמה הוא כבוי ב-GitHub Pages
+
+תיקייה בלי `index.html` ובלי `sw.js`, ולכן אף כלי QA אינו סופר אותה
+כאפליקציה. יש בה שרת Node קטן (`server.js`, בלי npm), `visit.js`
+לדפדפן, `admin.html` למסך `/admin/analytics`, ו-`schema.sql`
+ל-Supabase. הפירוט ב-`analytics/README.md`.
+
+**דף הבית מחווט, והמדידה כבויה:** `data-endpoint=""` בתגית שלפני
+רישום ה-service worker. GitHub Pages אינו מריץ שרת, ולכן אין לאן
+לשלוח. כשהאתר עובר למארח Node (`marketing/launch.md`) ממלאים את
+הכתובת — זו השורה היחידה שנוגעים בה. ה-`sw.js` של השורש אינו שומר
+את `/analytics/` במטמון (השומר שלו מדלג על כל תיקייה שאינה `img`,
+`legal`, `voice`), ולכן `visit.js` לא ייתקע בגרסה ישנה.
+
+ביקור אחד ל-session (`sessionStorage`), אין IP באחסון, אין מונה
+ציבורי, ומחיקה אחרי 90 יום. הודעת הפרטיות ב-`legal/terms.js`, סעיף
+"מה נשמר עליכם". הבדיקות: `node --test analytics/test.js` ו-`node
+analytics/test-browser.js`.
+
 ## אפליקציית התאוריה
 
 **״תאוריה מדברת״** מופיעה בדף הבית ומצביעה לריפו נפרד תחת אותו
