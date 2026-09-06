@@ -982,7 +982,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l15 · 2026-09-06";
+var BUILD="l16 · 2026-09-06";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -3920,6 +3920,11 @@ document.addEventListener("keydown",function(e){
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(e.target&&e.target.closest("input,textarea,select,[contenteditable]"))return;
   if(state.screen!=="prac"||!P.q)return;
+  /* רווח או Enter על כפתור ממוקד הם הפעלה שלו — הדפדפן כבר יורה
+     click — ולא הקראה חוזרת ולא מעבר לשאלה הבאה. בלי זה, רמקול של
+     תא תשובה שהגיעו אליו בטאב הקריא ברווח את השאלה במקום את התא,
+     ואחרי שעונים Enter עליו דילג לשאלה הבאה במקום להקריא. */
+  if((e.key===" "||e.key==="Enter")&&e.target&&e.target.closest("button,[role='button'],a[href]"))return;
   if(!P.done&&P.q.opts&&/^[1-4]$/.test(e.key)){
     var i=parseInt(e.key,10)-1;
     if(P.q.opts[i]){e.preventDefault();answer(i)}
@@ -3959,7 +3964,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l15-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l16-pwa1").catch(function(){});
   });
 }
 </script>
