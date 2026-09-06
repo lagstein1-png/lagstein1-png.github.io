@@ -202,7 +202,15 @@ button{font:inherit;color:inherit}
 /* כל תא תשובה נושא רמקול משלו, מחוץ לכפתור: כפתור בתוך כפתור אינו
    HTML תקין, ואחרי שעונים התא נעול (disabled) ובלי הפרדה גם הרמקול
    היה נעלם איתו. */
-.orow{display:flex;gap:.45rem;align-items:center}
+.orow{display:flex;gap:.45rem;align-items:center;min-width:0}
+/* min-width:0 — פריט grid נולד עם min-width:auto, ולכן מילה רוסית
+   ארוכה הרחיבה את השורה מעבר למכל ודחפה את הרמקול מחוץ למסך ב-320.
+   נמדד 6 מתוך 30 שאלות ברוסית, ואחרי השורה הזאת 0. */
+/* ומילה שרחבה מהתא כולו נשברת בתוכו במקום לחרוג ממנו: בלי זה, אחרי
+   min-width:0, הטקסט חרג מגבול התא ב-21–25 מתוך 120 תאים ברוסית ב-320
+   ונגע ברמקול ב-2–3. anywhere שובר רק כשאין ברירה — שורה שנכנסת
+   נשארת כפי שהיא. */
+.opt span:last-child{overflow-wrap:anywhere}
 .orow .opt{flex:1;min-width:0}
 @media(min-width:560px){.opts.two{grid-template-columns:1fr 1fr}}
 .opt{display:flex;align-items:center;gap:.6rem;text-align:start;width:100%;
@@ -980,7 +988,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m47 · 2026-09-05";
+var BUILD="m48 · 2026-09-06";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -9089,7 +9097,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m47-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m48-pwa1").catch(function(){});
   });
 }
 </script>
