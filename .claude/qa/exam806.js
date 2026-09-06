@@ -14,7 +14,11 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const APP = path.join(ROOT, 'bagrut-806', 'app.js');
-const DATA = path.join(ROOT, 'bagrut-806', 'data', 'exams.js');
+/* נתיב תוכן חלופי כארגומנט — כך אפשר להריץ את הבודק על מקרה מבחן
+   ולראות אותו נופל. בדיקה שלא נראתה נכשלת אינה בדיקה. */
+const DATA = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.join(ROOT, 'bagrut-806', 'data', 'exams.js');
 
 /* --- התוכן ------------------------------------------------------ */
 const win = {};
@@ -224,6 +228,27 @@ for (const ex of EXAMS) {
             note('הניסוח "' + a + '" ב-accept זהה ל-' + seen.get(k) +
               ' אחרי נרמול — שורה שאינה מוסיפה תשובה');
           else seen.set(k, '"' + a + '"');
+        }
+      }
+
+      /* --- reject: המסלול השגוי, כבדיקת רגרסיה ---------------------
+         הליקוי היקר ביותר בקובץ הזה אינו תשובה שגויה אלא תשובה
+         *נכונה* שמגיעים אליה בדרך שגויה, והוא נמצא כאן פעמיים ביד:
+         ב-60 מעלות מתקיים 2bc·cos A = bc בדיוק, ולכן משפט הקוסינוסים
+         התכווץ ותלמיד שהתעלם מהקוסינוס קיבל את מלוא הנקודות; ובשאלת
+         השטח הכלוא, תחום שבו הפונקציה חיובית לכל אורכו נתן שטח ששווה
+         לאינטגרל, ולכן מי שלא פיצל צדק.
+
+         שני אלה תוקנו, ושום בדיקה לא הייתה תופסת אם הם היו חוזרים.
+         `reject` הוא הדרך לרשום את המסלול השגוי בתוך התוכן עצמו:
+         כל מחרוזת כאן חייבת להידחות על ידי checkAnswer. tolerance
+         שיתרחב מתישהו ויבלע את הטעות — ייפול כאן. השדה רשות. */
+      if (s.reject != null) {
+        if (!Array.isArray(s.reject)) fail('reject אינו מערך');
+        else for (const w of s.reject) {
+          if (typeof w !== 'string') { fail('reject מכיל ערך שאינו מחרוזת'); continue; }
+          if (checkAnswer(fa, w).ok)
+            fail('reject: "' + w + '" מתקבל כתשובה נכונה — המסלול השגוי שוב מזכה');
         }
       }
 
