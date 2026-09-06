@@ -207,6 +207,19 @@ button{font:inherit;color:inherit}
 .spk.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 
 .opts{display:grid;gap:.6rem;margin-top:.9rem}
+/* כל תא תשובה נושא רמקול משלו, מחוץ לכפתור: כפתור בתוך כפתור אינו
+   HTML תקין, ואחרי שעונים התא נעול (disabled) ובלי הפרדה גם הרמקול
+   היה נעלם איתו. */
+.orow{display:flex;gap:.45rem;align-items:center;min-width:0}
+/* min-width:0 — פריט grid נולד עם min-width:auto, ולכן מילה רוסית
+   ארוכה הרחיבה את השורה מעבר למכל ודחפה את הרמקול מחוץ למסך ב-320.
+   נמדד 6 מתוך 30 שאלות ברוסית, ואחרי השורה הזאת 0. */
+/* ומילה שרחבה מהתא כולו נשברת בתוכו במקום לחרוג ממנו: בלי זה, אחרי
+   min-width:0, הטקסט חרג מגבול התא ב-21–25 מתוך 120 תאים ברוסית ב-320
+   ונגע ברמקול ב-2–3. anywhere שובר רק כשאין ברירה — שורה שנכנסת
+   נשארת כפי שהיא. */
+.opt span:last-child{overflow-wrap:anywhere}
+.orow .opt{flex:1;min-width:0}
 @media(min-width:560px){.opts.two{grid-template-columns:1fr 1fr}}
 .opt{display:flex;align-items:center;gap:.6rem;text-align:start;width:100%;
   border:2px solid var(--line);background:var(--surface);border-radius:12px;
@@ -749,7 +762,7 @@ T.he={
   qWhen:"מתי זה קרה?", qWhat:"מה קרה?", qWhy:"מה הביא לזה?",
   qEff:"מה הייתה התוצאה?", qFirst:"מה קרה קודם?", qTerm:"מה פירוש המושג?",
   qName:"על איזה אירוע מדובר?", qRead:"לפי המקור:",
-  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו", hearSent:"השמיעו את הקטע",
+  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו", hearSent:"השמיעו את הקטע", hearOpt:"השמיעו את האפשרות",
   check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", hintB:"רמז", hintYearL:"השנה", hintTopicL:"מהתחום",
   hintSrcL:"התשובה נמצאת בקטע שלמעלה", hintOrderL:"השוו את השנים של האפשרויות", showAll:"הראו הכול",
   correct:"נכון!", wrong:"עוד לא", answerIs:"התשובה:", why:"למה",
@@ -806,7 +819,7 @@ T.ar={
   qWhen:"متى حدث ذلك؟", qWhat:"ماذا حدث؟", qWhy:"ما الذي أدّى إلى ذلك؟",
   qEff:"ما كانت النتيجة؟", qFirst:"ما الذي حدث أولًا؟", qTerm:"ما معنى المصطلح؟",
   qName:"عن أي حدث يدور الحديث؟", qRead:"حسب المصدر:",
-  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع", hearSent:"استمع للنص",
+  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع", hearSent:"استمع للنص", hearOpt:"استمع للخيار",
   check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", hintB:"تلميح", hintYearL:"السنة", hintTopicL:"من المجال",
   hintSrcL:"الإجابة موجودة في المقطع أعلاه", hintOrderL:"قارنوا سنوات الخيارات", showAll:"أظهر الكل",
   correct:"صحيح!", wrong:"ليس بعد", answerIs:"الإجابة:", why:"لماذا",
@@ -863,7 +876,7 @@ T.ru={
   qWhen:"Когда это произошло?", qWhat:"Что произошло?", qWhy:"Что к этому привело?",
   qEff:"Каким было следствие?", qFirst:"Что произошло раньше?", qTerm:"Что означает понятие?",
   qName:"О каком событии идёт речь?", qRead:"По источнику:",
-  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать", hearSent:"Послушать отрывок",
+  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать", hearSent:"Послушать отрывок", hearOpt:"Послушать вариант",
   check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", hintB:"Подсказка", hintYearL:"Год", hintTopicL:"Из области",
   hintSrcL:"Ответ есть в отрывке выше", hintOrderL:"Сравните годы вариантов", showAll:"Показать всё",
   correct:"Верно!", wrong:"Пока нет", answerIs:"Ответ:", why:"Почему",
@@ -920,7 +933,7 @@ T.en={
   qWhen:"When did this happen?", qWhat:"What happened?", qWhy:"What led to it?",
   qEff:"What was the consequence?", qFirst:"Which came first?", qTerm:"What does the term mean?",
   qName:"Which event is this?", qRead:"According to the source:",
-  hear:"Play", hearSlow:"Slowly", hearWord:"Play", hearSent:"Play the passage",
+  hear:"Play", hearSlow:"Slowly", hearWord:"Play", hearSent:"Play the passage", hearOpt:"Play this option",
   check:"Check", next:"Next", again:"Again", dunno:"I don't know", hintB:"Hint", hintYearL:"Year", hintTopicL:"From",
   hintSrcL:"The answer is in the passage above", hintOrderL:"Compare the years of the options", showAll:"Show all",
   correct:"Correct!", wrong:"Not yet", answerIs:"Answer:", why:"Why",
@@ -1003,7 +1016,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l12 · 2026-09-05";
+var BUILD="l16 · 2026-09-06";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -1669,6 +1682,15 @@ function speakDevice(text,code,rate){
   return true;
 }
 /* lang: "en" לחומר הנלמד, או קוד שפת האם להוראה. */
+/* מה נאמר במבחן הכיתתי. שם אין "לפני" ו"אחרי" — יש רק שאלה
+   שעוד לא ענו עליה, ולכן `say`, שהוא כרטיס הפריט המלא עם
+   התאריך והסיפור, אסור בו לחלוטין. ניב ואולפן נושאות פונקציה
+   בשם הזה; כאן היא ישבה בתוך המטפל של הכפתור, ולכן אי אפשר היה
+   למצוא אותה ולא לבדוק אותה. */
+function sitSay(q){
+  var ex=plainOf(q.expr||"").trim();
+  return {t:plainOf(q.ask||"")+(ex?" "+ex:""),l:state.lang||"he"};
+}
 function speak(text,lang,rateMul){
   /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
      לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
@@ -2140,6 +2162,27 @@ function spkBtn(text,lang,slow,label){
 
 /* כרטיס הנושא: מה שמוצג מעל האפשרויות. בהיסטוריה זו כותרת
    האירוע או המושג, ולצידה כפתורי השמעה בשפת הממשק. */
+/* מה נאמר **לפני** שעונים.
+
+   מקש הרווח קרא עד כה את `q.say` תמיד, בלי לבדוק אם כבר ענו —
+   בעוד שמקשי 1–4 שלידו כן מוגנים ב-`!P.done`. וב-`q.say` יושבת
+   התשובה: נמדד בדפדפן אמיתי, 5.9.2026, שבלומדה `say` הוא כרטיס הפריט המלא — הכותרת, השנה והסיפור — כלומר התשובה עצמה, ב-54 מתוך 60 השאלות שנדגמו. הקובץ נולד מהעתקה של מפנה, והבאג בא איתו.
+   מי שקורא לאט לוחץ רווח כדי לשמוע את השאלה, ושמע את הפתרון.
+
+   אחרי שעונים `q.say` נשאר כפי שהיה — המשפט המלא הוא בדיוק מה
+   שצריך להישמע אז, גם כשטעו. כאן רק מה שנאמר קודם:
+
+   · שאלת האזנה — השמע **הוא** השאלה, ואסור להשתיק אותה.
+   · השלמה — המשפט עם החסר, וה-_____ נעשה שהות ולא מילה.
+   · השאר — הכותרת שמוצגת על המסך, בשפה שבה היא מוצגת. */
+function sayAsk(q){
+  if(!q)return "";
+  /* שאלת מקור נושאת את שאלתה ב-qtext; הקטע עצמו נקרא בכפתורים
+     שלו, ואינו חוזר כאן. */
+  if(q.type==="src")return q.qtext||"";
+  return (q.prompt?q.prompt+". ":"")+(q.lead||"");
+}
+
 function leadBox(txt,sub){
   if(!txt)return "";
   return '<div class="subject"><span class="word" style="font-size:1.15rem">'+esc(txt)+"</span>"+
@@ -2193,8 +2236,14 @@ function screenPractice(){
         else if(i===P.picked)cls+=" bad";
         else cls+=" dim";
       }
-      h+='<button class="'+cls+'" data-a="pick" data-i="'+i+'"'+(P.done?" disabled":"")+'>'+
-        '<span class="k">'+String.fromCharCode(65+i)+"</span><span>"+o.h+"</span></button>";
+      /* רמקול לכל תא. בלומדה האפשרויות הן משפטים שלמים — "מה קרה?"
+         עם ארבעה תיאורים — ומי שקורא בקושי לא יכול לבחור בלי לשמוע
+         אותם. עד 5.9.2026 נקראו רק השאלה והכרטיס שאחרי התשובה, והתא
+         עצמו היה אילם. הרמקול מקריא את התא הזה בלבד, בשפת הממשק. */
+      h+='<div class="orow"><button class="'+cls+'" data-a="pick" data-i="'+i+'"'+(P.done?" disabled":"")+'>'+
+        '<span class="k">'+String.fromCharCode(65+i)+"</span><span>"+o.h+"</span></button>"+
+        '<button class="spk sm" data-a="say" data-say="'+esc(plainOf(o.h))+'" data-lang="'+esc(state.lang)+
+        '" aria-label="'+esc(t("hearOpt"))+'">'+ic("play",15)+"</button></div>";
     });
     h+="</div>";
   }
@@ -2550,8 +2599,15 @@ function buildQ(tid,lv){
 var GENV=2;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
-var EKEY="shlav-exams-history-v1";   /* מפתח לאפליקציה הזאת בלבד */
-var EKEY_OLD="shlav-exams-v1";  /* המפתח המשותף הישן. לקריאה בלבד, לא נמחק. */
+/* הקובץ הזה נולד מהעתקה של מפנה, ועד 5.9.2026 נשא את המפתח שלה —
+   "shlav-exams-history-v1" — מילה במילה, כולל ההערה "לאפליקציה הזאת
+   בלבד". שתי האפליקציות יושבות באותו מקור, ולכן מבחן שמורה בנה
+   בלומדה הופיע במפנה ולהפך. זה בדיוק הבאג שתוקן ב-31.8 לכל
+   האחרות, והוא חזר בהעתקה. המפתח הישן כאן הוא זה שלומדה כתבה אליו
+   בפועל, כדי שמבחן שכבר נבנה לא יאבד: exAdoptLegacy מעתיקה ממנו
+   רק רשומות שכל נושאיהן מוכרים כאן, ואין נושא משותף למפנה וללומדה. */
+var EKEY="lomda-exams-v1";   /* מפתח לאפליקציה הזאת בלבד */
+var EKEY_OLD="shlav-exams-history-v1";  /* המפתח שחלק עם מפנה. לקריאה בלבד, לא נמחק. */
 
 /* --- מחולל מזורע. mulberry32: קצר, מהיר, ופיזור טוב דיו --- */
 function withSeed(seed,fn){
@@ -3081,20 +3137,24 @@ function csvRow(a){ return a.map(csvCell).join(",") }
    כל עוד לא נבחר קוד, שום דבר לא משתנה והמסכים גלויים כתמיד.
    ============================================================ */
 var TE={ask:false,mode:"",msg:"",busy:false};
-function teRead(){try{return JSON.parse(localStorage.getItem("mifne-teacher")||"null")}catch(e){return null}}
-function teWrite(o){try{o===null?localStorage.removeItem("mifne-teacher"):localStorage.setItem("mifne-teacher",JSON.stringify(o))}catch(e){}}
+/* קוד המורה. עד 5.9.2026 המפתח היה "mifne-teacher" — של מפנה — ולכן קוד
+   שנקבע באחת נעל את השנייה. הקריאה נופלת למפתח הישן כשאין חדש, כדי
+   שמורה שכבר קבע קוד לא יינעל בחוץ; הכתיבה היא למפתח של לומדה בלבד. */
+var TE_KEY_OLD="mifne-teacher";   /* ירושה: נקרא כשאין מפתח משלנו, ולעולם לא נכתב */
+function teRead(){try{return JSON.parse(localStorage.getItem("lomda-teacher")||localStorage.getItem(TE_KEY_OLD)||"null")}catch(e){return null}}
+function teWrite(o){try{o===null?localStorage.removeItem("lomda-teacher"):localStorage.setItem("lomda-teacher",JSON.stringify(o))}catch(e){}}
 function teHas(){var r=teRead();return !!(r&&r.h)}
 function teOpen(){
   if(!teHas())return true;
-  try{if(sessionStorage.getItem("mifne-teacher"+"-open")==="1")return true}catch(e){}
-  try{if(localStorage.getItem("mifne-teacher"+"-open")==="1")return true}catch(e){}
+  try{if(sessionStorage.getItem("lomda-teacher"+"-open")==="1")return true}catch(e){}
+  try{if(localStorage.getItem("lomda-teacher"+"-open")==="1")return true}catch(e){}
   return false;
 }
 function teSetOpen(on,remember){
-  try{sessionStorage.removeItem("mifne-teacher"+"-open")}catch(e){}
-  try{localStorage.removeItem("mifne-teacher"+"-open")}catch(e){}
+  try{sessionStorage.removeItem("lomda-teacher"+"-open")}catch(e){}
+  try{localStorage.removeItem("lomda-teacher"+"-open")}catch(e){}
   if(!on)return;
-  try{(remember?localStorage:sessionStorage).setItem("mifne-teacher"+"-open","1")}catch(e){}
+  try{(remember?localStorage:sessionStorage).setItem("lomda-teacher"+"-open","1")}catch(e){}
 }
 /* גיבוב חלש כגיבוי בלבד. SubtleCrypto קיים בכל דפדפן מודרני
    בהקשר מאובטח, ו-GitHub Pages הוא כזה. */
@@ -3230,9 +3290,9 @@ try{
     var away=Date.now()-TE_HID; TE_HID=0;
     if(away<120000)return;
     var kept=false;
-    try{ kept=localStorage.getItem("mifne-teacher"+"-open")==="1" }catch(e){}
+    try{ kept=localStorage.getItem("lomda-teacher"+"-open")==="1" }catch(e){}
     if(kept)return;
-    try{ if(sessionStorage.getItem("mifne-teacher"+"-open")!=="1")return }catch(e){ return }
+    try{ if(sessionStorage.getItem("lomda-teacher"+"-open")!=="1")return }catch(e){ return }
     teSetOpen(false); render();
   });
 }catch(e){}
@@ -3699,7 +3759,7 @@ function examAction(a,el){
      התשובה. כאן מוקרא מה שעל המסך — הכותרת והמקור — והאפשרויות
      ממילא אינן חלק ממנו. */
   if(a==="sitread"){var q2=SIT.qs[SIT.i];
-    if(q2)speak(saySpell(plainOf(q2.ask||"")+" "+plainOf(q2.expr||"")),state.lang);
+    if(q2){var o2=sitSay(q2); if(o2.t)speak(saySpell(o2.t),o2.l)}
     return true}
   if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
   if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
@@ -3960,12 +4020,18 @@ document.addEventListener("keydown",function(e){
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(e.target&&e.target.closest("input,textarea,select,[contenteditable]"))return;
   if(state.screen!=="prac"||!P.q)return;
+  /* רווח או Enter על כפתור ממוקד הם הפעלה שלו — הדפדפן כבר יורה
+     click — ולא הקראה חוזרת ולא מעבר לשאלה הבאה. בלי זה, רמקול של
+     תא תשובה שהגיעו אליו בטאב הקריא ברווח את השאלה במקום את התא,
+     ואחרי שעונים Enter עליו דילג לשאלה הבאה במקום להקריא. */
+  if((e.key===" "||e.key==="Enter")&&e.target&&e.target.closest("button,[role='button'],a[href]"))return;
   if(!P.done&&P.q.opts&&/^[1-4]$/.test(e.key)){
     var i=parseInt(e.key,10)-1;
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();speak(saySpell(P.q.say),state.lang);return}
+  if(e.key===" "){e.preventDefault();
+    speak(saySpell(P.done?P.q.say:sayAsk(P.q)),state.lang); return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
@@ -3998,7 +4064,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l12-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l16-pwa1").catch(function(){});
   });
 }
 </script>
