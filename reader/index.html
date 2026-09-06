@@ -752,9 +752,16 @@ function countSents(out){
     if(String(out[i].plain).trim()) return out[i].sent + 1;
   return 1;
 }
+/* נקודה או פסיק שמשני צידיהם ספרות הם חלק מהמספר — "14.5", "1,250" —
+   ולא סוף משפט. בלי זה "ב-14.5, הוקמה המדינה" נקרא כשני משפטים:
+   "ב-14." ואז "5, הוקמה המדינה", עם הפסקה באמצע המספר וסמן משפט
+   שקופץ. שאר האפליקציות מגנות על זה ב-insideNumber. */
+function insideNumber(prev, p, next){
+  return /^[.,]$/.test(p) && /\d$/.test(prev || '') && /^\d/.test(next || '');
+}
 function build(tokens){
   var out = [], s = 0;
-  tokens.forEach(function(tk){
+  tokens.forEach(function(tk, i){
     var plain = tk.word || '';
     if(!plain) return;
     var isWord = !!(tk.options && tk.options.length);
@@ -765,7 +772,8 @@ function build(tokens){
       nik = String(v).split('|').join('');   /* הקו האנכי הוא גבול מורפמה, לא טקסט */
     }
     out.push({ plain:plain, nikud:nik, word:isWord, sent:s });
-    if(/[.!?]|\n/.test(plain)) s++;
+    var prev = tokens[i - 1] && tokens[i - 1].word, next = tokens[i + 1] && tokens[i + 1].word;
+    if(/[.!?]|\n/.test(plain) && !insideNumber(prev, plain, next)) s++;
   });
   SENTS = countSents(out);
   return out;
@@ -776,11 +784,11 @@ function build(tokens){
 function buildPlain(text){
   var out = [], s = 0;
   var parts = text.split(/(\s+|[.!?,;:()\[\]"'–—“”]+)/);
-  parts.forEach(function(p){
+  parts.forEach(function(p, i){
     if(!p) return;
     var isWord = /[֐-׿]/.test(p);
     out.push({ plain:p, nikud:p, word:isWord, sent:s });
-    if(/[.!?]|\n/.test(p)) s++;
+    if(/[.!?]|\n/.test(p) && !insideNumber(parts[i - 1], p, parts[i + 1])) s++;
   });
   SENTS = countSents(out);
   return out;
@@ -1430,7 +1438,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=24-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=25-pwa1").catch(function(){});
   });
 }
 </script>
