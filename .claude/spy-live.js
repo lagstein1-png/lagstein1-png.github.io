@@ -74,11 +74,17 @@ const target = (function () {
 const EVERY = opt('every', 12);          /* אירועים */
 const IDLE = opt('idle', 45) * 1000;     /* מילישניות */
 const POLL = 1000;
+/* השקט מפעיל הסבר רק אם הצטבר משהו לומר. בלי זה, סשן שמתקדם לאט
+   שילם קריאה שלמה על שני אירועים — וזה מה שקרה בריצה אמיתית:
+   ארבעה הסברים כמעט זהים על אותה עבודה אחת. */
+const MIN_IDLE = 3;
 
 const PROMPT = 'אתה מרגל שצופה בסשן פיתוח בזמן אמת (SPY-TRANSCRIPT-IGNORE).\n'
   + 'לפניך רק מה שקרה בדקות האחרונות, ולא הסשן כולו.\n'
   + 'כתוב שתיים עד ארבע שורות בעברית פשוטה, בלי מושגים טכניים:\n'
   + 'מה הסוכן עושה עכשיו, ובאילו קבצים הוא נוגע.\n'
+  + 'אם מופיע לפניהם ההסבר הקודם שלך — אל תחזור עליו, כתוב רק מה שהתחדש.\n'
+  + 'לא התחדש דבר — כתוב בדיוק "אין חדש".\n'
   + 'אל תמציא שום פרט שאינו בטקסט. לא ברור מה קורה — כתוב "לא ברור מהקטע הזה".';
 
 /* ---------- איתור הקובץ, כולל המתנה שייווצר -------------------- */
@@ -108,20 +114,28 @@ function say(s) { process.stdout.write(s + '\n') }
 
 function count(n, one, many) { return n + ' ' + (n === 1 ? one : many) }
 
+let lastSummary = '';
+
 function explain(lines) {
   const body = lines.join('\n').replace(/^\n+|\n+$/g, '');
   if (!body.trim()) return;
   say('');
   say('── ' + stamp() + ' · ' + count(lines.length, 'אירוע', 'אירועים') + ' ──');
   if (SHOW) { say(body); return }
+  /* ההסבר הקודם נשלח יחד עם החדש. בלעדיו כל קטע מסוכם בפני עצמו,
+     והתוצאה היא אותו הסבר שוב ושוב על עבודה אחת שנמשכת. */
+  const input = (lastSummary ? 'ההסבר הקודם שלך:\n' + lastSummary + '\n\n' : '')
+    + 'האירועים החדשים:\n' + body;
   const r = spawnSync('claude', ['-p', '--output-format', 'text', PROMPT],
-    { input: body, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
+    { input, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
   if (r.error || r.status !== 0) {
     say('(המרגל לא הצליח לסכם: ' + ((r.error && r.error.message) || ('קוד ' + r.status)) + ')');
     say(body);                      /* עדיף האירועים הגולמיים מכלום */
     return;
   }
-  say(String(r.stdout).trim());
+  const answer = String(r.stdout).trim();
+  say(answer);
+  if (answer && answer.indexOf('אין חדש') !== 0) lastSummary = answer;
 }
 
 /* ---------- המעקב ------------------------------------------------ */
@@ -158,7 +172,8 @@ function drain() {
 
 function flush(force) {
   if (!pending.length) return;
-  if (!force && pending.length < EVERY && Date.now() - lastEvent < IDLE) return;
+  if (!force && pending.length < EVERY
+      && (Date.now() - lastEvent < IDLE || pending.length < MIN_IDLE)) return;
   const batch = pending;
   pending = [];
   explain(batch);

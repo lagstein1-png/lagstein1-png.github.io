@@ -169,12 +169,22 @@ function feed(ctx, line) {
       }
       ctx.out.push('  [' + b.name + '] ' + clip(detail(b.name, b.input), CUT));
     } else if (b.type === 'tool_result') {
+      const who = ctx.byId[b.tool_use_id] || 'כלי';
+      const body = typeof b.content === 'string' ? b.content
+        : (Array.isArray(b.content) ? b.content.map(x => x.text || '').join(' ') : '');
       if (b.is_error) {
-        const who = ctx.byId[b.tool_use_id] || 'כלי';
-        const body = typeof b.content === 'string' ? b.content
-          : (Array.isArray(b.content) ? b.content.map(x => x.text || '').join(' ') : '');
         ctx.failed.push(who + ': ' + clip(body, 160));
         ctx.out.push('  [!] ' + who + ' נכשל: ' + clip(body, CUT));
+      } else if (who === 'Bash') {
+        /* התוצאה של Bash היא הפסק — "17 בדיקות, כולן עברו". בלעדיה
+           הקורא רואה שהורצה בדיקה ולא יודע אם היא עברה, וזה בדיוק מה
+           שהמרגל החי ענה בריצה אמיתית: "לא ברור אם הבדיקות עברו".
+           רק Bash, ורק שתי השורות האחרונות: פלט של Read או Grep הוא
+           קובץ שלם, והוא היה מטביע את התמליל. */
+        const tail = body.trim().split('\n')
+          .filter(l => /[\p{L}\p{N}]/u.test(l))     /* לא שורת קו מפריד */
+          .slice(-2).join(' · ');
+        if (tail) ctx.out.push('  [⇒] ' + clip(tail, Math.min(CUT, 200)));
       }
     } else {
       const t = textOf(b).trim();
