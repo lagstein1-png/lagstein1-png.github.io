@@ -1022,7 +1022,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m51 · 2026-09-06";
+var BUILD="m52 · 2026-09-07";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -7021,9 +7021,17 @@ function _rom(n){return ROM[n]||String(n)}
    שתי שכבות ניקוי להקראה בלבד. המסך אינו משתנה מהן.
 
    הספרה הרומית נראית נכון על המסך ונשמעת רע באוזן: קול עברי או
-   ערבי מוסר "XVIII" כאותיות לטיניות ולא כמספר. ההשוואה היא מול
-   ROM עצמו ולא מול תבנית, כדי שמילה לטינית בשם נושא לא תהפוך
-   בטעות למספר.
+   ערבי מוסר "XVIII" כאותיות לטיניות ולא כמספר.
+
+   **וההשוואה מול ROM לבדה אינה מספיקה, למרות מה שנכתב כאן קודם.**
+   "I", "V" ו-"X" הן ערכים ב-ROM בעצמן, ולכן הרגקס תפס אותן גם
+   בתוך מילה לטינית: "Inflation" נהגתה "1nflation", "VAT" נהגתה
+   "5AT", ו-TCP/IP נשמע "TCP/1P" בכל ארבע השפות. נמדד על תוכן
+   הלומדה: 133 מחרוזות, מהן 124 באנגלית.
+
+   לכן הספרה נדרשת לעמוד בפני עצמה — אין אות לטינית לפניה ואין
+   אחריה. הבדיקה שלפניה נעשית בקבוצה ולא ב-lookbehind, שאינו
+   נתמך בספארי ישן.
 
    והגרשיים העבריים משמשים כאן לשני דברים: ראשי תיבות (לפנה״ס,
    או״ם) ומירכאות (״אדם חופשי״). המנוע מכיר רק את הראשון. הכלל
@@ -7032,9 +7040,9 @@ function _rom(n){return ROM[n]||String(n)}
    להזיק, מירכאה שנשארה כן.
    ------------------------------------------------------------ */
 function saySpell(x){
-  return String(x==null?"":x).replace(/[IVXLC]+/g,function(m){
-    var i=ROM.indexOf(m);
-    return i>0?String(i):m;
+  return String(x==null?"":x).replace(/(^|[^A-Za-z])([IVXLC]+)(?![A-Za-z])/g,function(m,p,r){
+    var i=ROM.indexOf(r);
+    return i>0?p+String(i):m;
   }).replace(/״/g,function(m,i,str){
     return /^[\u05D0-\u05EA](?![\u05D0-\u05EA])/.test(str.slice(i+1))?m:"";
   }).replace(/\s—\s/g,", ");
@@ -9219,7 +9227,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m51-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m52-pwa1").catch(function(){});
   });
 }
 </script>
