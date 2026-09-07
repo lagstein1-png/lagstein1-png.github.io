@@ -48,7 +48,7 @@ const SUITE = [
   { id: 'wix',      args: ['--check'] },
   { id: 'banks',    args: [] },
   { id: 'a11y',     args: [] },
-  { id: 'arabic',   args: [] },
+  { id: 'fonts',    args: [] },
   { id: 'engine',   args: [] },
   { id: 'exam806',  args: [] },
   { id: 'smoke',    args: PAGES,  needsServer: true },
