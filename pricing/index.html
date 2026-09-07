@@ -359,17 +359,21 @@ ru:{dir:"ltr",me:"Учёба, которую слышно",home:"Главная"
 var $=function(s){return document.querySelector(s)};
 var esc=function(x){return String(x).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
-/* אותו מפתח שפה כמו בדף הבית — site-lang — כדי שמי שבחר שפה שם
-   ינחת כאן באותה שפה. זה מפתח של האתר, לא של אפליקציה. */
-var LKEY="site-lang", LANGS=[["he","עברית"],["ar","العربية"],["ru","Русский"],["en","English"]];
-function savedLang(){try{return localStorage.getItem(LKEY)||""}catch(e){return""}}
+/* מפתח משלו, כמו לכל דף באתר (storage.js אוכף). site-lang של דף
+   הבית נקרא כירושה בלבד — מי שבחר שפה שם נוחת כאן באותה שפה —
+   ואינו נכתב מכאן. */
+var LKEY="pricing-lang";
+var LKEY_OLD="site-lang";
+var LANGS=[["he","עברית"],["ar","العربية"],["ru","Русский"],["en","English"]];
+function savedLang(){try{return localStorage.getItem(LKEY)||localStorage.getItem(LKEY_OLD)||""}catch(e){return""}}
 function guessLang(){
   var l=(navigator.language||"").toLowerCase().split("-")[0];
   return {he:1,iw:1}[l]?"he":{ar:1,ru:1,en:1}[l]?l:"he";
 }
 var LG=savedLang()||guessLang(); if(!TR[LG])LG="he";
-/* מצב כהה: אותה דריסה ידנית שדף הבית שומר ב-site-theme, נקראת בלבד */
-try{var th=localStorage.getItem("site-theme"); if(th)document.documentElement.setAttribute("data-theme",th)}catch(e){}
+/* מצב כהה: הדריסה הידנית שדף הבית שומר ב-site-theme — נקראת בלבד, לא נכתבת */
+var TKEY_OLD="site-theme";
+try{var th=localStorage.getItem(TKEY_OLD); if(th)document.documentElement.setAttribute("data-theme",th)}catch(e){}
 
 function mail(plan,S){
   return "mailto:"+EMAIL+"?subject="+encodeURIComponent(S.mailSubject.replace("{plan}",plan));
