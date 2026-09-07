@@ -19,6 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="launch.css?v=1">
 <style>
 /* ============================================================
    דף הבית. ערכי הצבע נתונים ואינם משתנים לפי מצב — רק נדרסים
@@ -815,7 +816,7 @@ function draw(){
     return hay.indexOf(q)>=0;
   });
   $("#grid").innerHTML=list.map(function(a){
-    return '<article class="card" style="--c:'+CC[a.c]+'">'+
+    return '<article class="card" data-app="'+esc(a.id)+'" style="--c:'+CC[a.c]+'">'+
       '<div class="crow"><span class="ic" aria-hidden="true">'+(ICONS[a.id]||"")+'</span>'+
       '<h3>'+esc(a.n[LG])+'</h3></div>'+
       '<p>'+esc(a.d[LG])+'</p>'+
@@ -971,7 +972,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=36-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=37-pwa1").catch(function(){});
   });
 }
 </script>
@@ -979,5 +980,10 @@ if("serviceWorker" in navigator){
      (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
      נמדדת בנפרד. קוד האתר yehoshua-apps נמסר על ידי הבעלים ב-7.9.2026. -->
 <script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<!-- מבצע השקה — חלון קופץ, תגיות ״חינם בתקופת ההשקה״ ו-״תאוריה מדברת״
+     בתשלום. שכבה מעל הכרטיסים, לא שינוי בהם: הכול ב-launch.js/launch.css.
+     שינוי באחד מהם — מעלים את ?v= כאן ואת מפתח ה-sw.js. -->
+<script src="launch.js?v=1"></script>
+<script>LAUNCH.init();</script>
 </body>
 </html>
