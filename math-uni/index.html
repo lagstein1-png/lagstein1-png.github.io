@@ -922,7 +922,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u49 · 2026-09-07";
+var BUILD="u50 · 2026-09-07";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -1057,6 +1057,36 @@ function guessGender(v){
   if(VOICE_M.test(n))return "m";
   return "?";
 }
+/* מדרגים ולא לוקחים את הראשון. עד כאן הבחירה נפלה על סדר ההתקנה
+   של המכשיר, ובמכשיר אחד יושבים כמה קולות באותה שפה באיכות שונה
+   מאוד — הראשון הוא לרוב של יצרן המכשיר ולא הטוב שבהם. הניקוד
+   הועתק מ"תאוריה מדברת": שם יצרן ומנוע נוירלי מעלים, espeak
+   ו-compact מורידים. */
+function voiceQuality(v){
+  var s=0,n=(v.name||"")+" "+(v.lang||"");
+  if(/google/i.test(n))s+=4;
+  if(/microsoft/i.test(n))s+=4;
+  if(/natural|enhanced|premium|neural|wavenet/i.test(n))s+=2;
+  /* קול רשת — הנוירליים של Edge הם כאלה — נשמע טוב יותר כשיש רשת,
+     וזה כל מה שנקבע כאן. מה קורה כשאין רשת נקבע ב-voiceUsable. */
+  if(v.localService===false&&voiceUsable(v))s+=2;
+  if(/espeak|compact|pico/i.test(n))s-=6;
+  if(v.default)s+=1;
+  return s;
+}
+/* המגדר אינו סעיף בתוך הניקוד אלא המיון הראשון. אחרת קול גברי
+   ממותג מנצח קול נשי שקיים באותו מכשיר — בדיוק מה שהעדפת המגדר
+   נועדה למנוע. קודם נשי, אחריו מי שלא זוהה, ורק אז גברי; ובתוך
+   כל קבוצה מכריעה האיכות. */
+function voiceOrder(pool){
+  function grank(v){var g=guessGender(v);return g==="f"?2:g==="?"?1:0}
+  return pool.slice().sort(function(a,b){
+    /* קול שלא יעבוד יורד לתחתית לפני כל שיקול אחר — גם לפני המגדר,
+       שאם לא כן קול נשי מת מנצח קול גברי חי. */
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||voiceQuality(b)-voiceQuality(a);
+  });
+}
 function deviceVoice(){
   var list=pickList(),i;
   if(!list.length)return null;
@@ -1075,8 +1105,7 @@ function deviceVoice(){
      סריקה על כל הרשימה מצאה קול אנגלי נשי במכשיר שאין בו קול
      עברי נשי — והעברית הוקראה באנגלית. שפה קודמת למגדר. */
   var mine=hebVoices();
-  for(i=0;i<mine.length;i++)if(guessGender(mine[i])==="f")return mine[i];
-  if(mine.length)return mine[0];
+  if(mine.length)return voiceOrder(mine)[0];
   /* אין קול בשפת הממשק? מחזירים null ולא את הקול הראשון שיש.
      קול אנגלי שמושם על משפט עברי גורר איתו גם את u.lang, והמשפט
      נקרא באנגלית. null משאיר את u.lang בשפה הנכונה ומשאיר לדפדפן
@@ -1271,6 +1300,76 @@ function voiceCheck(){
    כל מקטע נושא את ההיסט שלו במחרוזת המלאה, כי charIndex מתאפס
    בכל אמירה ובלעדיו ההדגשה קופצת לתחילת המשפט בכל מקטע.
    ------------------------------------------------------------ */
+/* =====================================================================
+   מנוע ההקראה של "תאוריה מדברת" — ארבעה מנגנונים
+   ---------------------------------------------------------------------
+   ארבעה כשלים שקטים של Web Speech. אף אחד מהם אינו מדווח כשגיאה,
+   וכולם נראים למשתמש בדיוק אותו דבר: הקול פשוט מפסיק באמצע. הקוד
+   כאן הועתק מהאפליקציה שבה הוא כבר רץ, ולא נוסח מחדש.
+   ===================================================================== */
+
+/* 1 · שומר-ער. באג ותיק ב-Chrome וב-Edge בשולחן העבודה: ההקראה
+   נחתכת אחרי כ-15 שניות, באמצע מילה. pause+resume תקופתי מחזיק את
+   המנוע ער. במובייל אין את הבאג ופעולה כזאת דווקא מקרטעת שם, ולכן
+   מפעילים רק היכן שבאמת צריך. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+/* עוצרים רק כששום דבר כבר לא מדבר — אחרת מקטע שהתחיל זה עתה מאבד
+   את השמירה שלו כשהמקטע הקודם מסיים להתנקות. */
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+
+/* 2 · הפניה חיה ל-utterance. Chrome אוסף אובייקט שאין אליו הפניה,
+   ואיתו נעלמים onend ו-onboundary: ההקראה נתקעת באמצע, ההדגשה
+   קופאת על מילה אחת, והמקטע הבא לא יוצא לעולם. */
+var _activeU=null;
+
+/* 3 · קול רשת שנכשל. הקולות הנוירליים של Edge הם קולות רשת, והם
+   שותקים בלי אינטרנט. הדגל נכבה ברגע שאחד מהם נכשל, ומאותו רגע
+   הדירוג מעדיף קול מקומי לשארית הסשן. */
+var _netVoiceOK=true;
+
+/* קול רשת שאי אפשר להשתמש בו עכשיו — אין אינטרנט, או שאחד כבר
+   נכשל בסשן הזה — אינו "פחות טוב", הוא פשוט לא יעבוד. לכן זה מיון
+   ראשון ולא עוד סעיף בתוך הניקוד: קנס בניקוד לא הספיק, מפני שקול
+   נוירלי של Microsoft צובר על שם היצרן ועל "Natural" יותר ממה שכל
+   קנס סביר מוריד — והוא נבחר שוב ושוב אחרי שכבר נכשל.
+   כשהוא הקול היחיד שיש הוא עדיין נבחר: מיון של רשימה בת אחד
+   מחזיר אותה כמו שהיא. */
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+
+/* 4 · שומר זמן. יש מכשירים שבהם onend פשוט לא נורה. בלי השומר הזה
+   התור נתקע: הכפתור נשאר על "עצירה" וההקראה לא ממשיכה לעולם. ארבע
+   שניות שבהן המנוע לא מדבר ולא ממתין נחשבות סוף.
+   מחזיר פונקציית ביטול — מי שסיים בדרך הרגילה מכבה את השומר. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+
 var SEG_MAX=90, SEG_GAP=260;
 /* סימן פיסוק בין שתי ספרות הוא חלק מהמספר ולא מקום לחתוך בו:
    בלי הבדיקה הזאת "3,500" נשבר והמנוע קורא "שלוש, חמש מאות". */
@@ -1403,23 +1502,51 @@ function speakDevice(text){
   if(_v&&_v.lang)_lang=_v.lang;
   var _segs=segments(String(text)), _rate=tuneRate(_lang,state.settings.rate);
   var _pitch=femLift(_v);
+  var _retried=false;
+  function _alive(){return my===_sayGen}
+  function _allDone(){ maybeStopKeepAlive(); hlClear(); ttsOK() }
   /* המקטע הראשון יוצא כאן, בתוך הלחיצה. השאר נשרשרים מ-onend. */
   (function sayseg(k){
-    if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
-    if(k>=_segs.length){ hlClear(); ttsOK(); return }
-    var seg=_segs[k];
+    if(!_alive())return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
+    if(k>=_segs.length){ _allDone(); return }
+    /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
+       יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+    var seg=_segs[k], moved=false, disarm=null;
+    function next(){
+      if(moved||!_alive())return;
+      moved=true; if(disarm)disarm();
+      if(k+1<_segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+      else _allDone();
+    }
     try{
       var u=new SpeechSynthesisUtterance(seg.text);
       u.lang=_lang;
       if(_v){ try{ u.voice=_v }catch(e2){} }
       u.rate=_rate; u.pitch=_pitch; u.volume=1;
       u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
-      u.onend=function(){
-        if(k+1<_segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
-        else { hlClear(); ttsOK() }
+      u.onend=next;
+      u.onerror=function(e){
+        if(moved||!_alive())return;
+        var err=(e&&e.error)||"";
+        /* ביטול יזום אינו תקלה — stopSpeak כבר ניקה אחריו */
+        if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+        /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול
+           מקומי וחוזרים על אותו מקטע, פעם אחת, כדי שההקראה לא
+           תישבר בשקט באמצע שאלה. */
+        if(!_retried&&_v&&_v.localService===false){
+          _retried=true; _netVoiceOK=false; moved=true;
+          if(disarm)disarm(); _activeU=null;
+          _v=deviceVoice(); if(_v&&_v.lang)_lang=_v.lang; _pitch=femLift(_v);
+          setTimeout(function(){sayseg(k)},SEG_GAP);
+          return;
+        }
+        moved=true; if(disarm)disarm(); maybeStopKeepAlive(); ttsFail(err);
       };
-      u.onerror=function(e){ttsFail(e&&e.error)};
+      _activeU=u;                        /* מגן מפני איסוף זבל */
+      try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e3){}
       speechSynthesis.speak(u);
+      startKeepAlive();
+      disarm=ttsWatchdog(function(){return _alive()&&!moved},next);
     }catch(e){}
   })(0);
 }
@@ -1436,6 +1563,7 @@ function speak(text){
 function stopSpeak(){
   _sayGen++;   /* כל מקטע שממתין ב-setTimeout שייך מעכשיו לדור ישן */
   hlClear();
+  stopKeepAlive(); _activeU=null;
   try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
 }
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
@@ -5118,7 +5246,9 @@ function viewSettings(){
        כקול שמקריא עברית. מה שלא יכול להיבחר, לא מוצג. */
     var _fn=femNote();
     if(_fn)h+='<div class="hintbox" style="margin-top:14px"><div class="sm">'+esc(_fn)+edgeNote()+'</div></div>';
-    var vl=hebVoices();
+    /* אותו סדר שבו האפליקציה באמת בוחרת. רשימה שמסודרת אחרת מציגה
+       למשתמש משהו אחר ממה שהוא ישמע. */
+    var vl=voiceOrder(hebVoices());
     if(!vl.length){
       h+='<div class="hintbox" style="margin-top:14px"><b>'+_('לא נמצאו קולות במכשיר')+'</b>'+
          '<div class="sm" style="margin-top:3px">'+_('אפשר להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.')+'</div></div>';
@@ -13699,7 +13829,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u49-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u50-pwa1").catch(function(){});
   });
 }
 </script>

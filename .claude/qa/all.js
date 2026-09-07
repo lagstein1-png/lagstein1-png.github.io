@@ -53,6 +53,9 @@ const SUITE = [
   { id: 'exam806',  args: [] },
   { id: 'smoke',    args: PAGES,  needsServer: true },
   { id: 'say',      args: [],     needsServer: true },
+  /* מנוע ההקראה מול speechSynthesis מזויף. slow: הוא ממתין 9.8
+     שניות לכל אפליקציה כדי לראות את שומר-הער פועם. */
+  { id: 'voice',    args: [],     needsServer: true, slow: true },
   { id: 'exam',     args: [],     needsServer: true },
   { id: 'entropy',  args: APPS,   needsServer: true, slow: true },
   { id: 'options',  args: APPS,   needsServer: true, slow: true },
