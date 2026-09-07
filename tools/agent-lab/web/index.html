@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>מעבדת סוכנים — מצב הדמיה</title>
+<style>
+/* גופני מערכת בלבד. אין בקשת רשת, ולכן הממשק עולה גם בלי אינטרנט. */
+:root{
+  --bg:#f4f6f9; --card:#fff; --ink:#16202c; --dim:#5a6a7a; --line:#d7dee7;
+  --accent:#1d5fbf; --warn:#8a4b00; --warnbg:#fff3d6; --warnline:#e0a54a;
+  --ok:#0d6b3f; --okbg:#e3f5eb; --bad:#a11b25; --badbg:#fdeaec;
+  --run:#7a4bb5; --runbg:#f1e9fb;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Segoe UI","Noto Sans Hebrew",Arial,sans-serif;
+  font-size:17px; line-height:1.65;
+}
+.wrap{max-width:1040px; margin:0 auto; padding:16px}
+
+/* --- שלט מצב ההדמיה. הוא הדבר הראשון שנראה, והוא לא נסגר. --- */
+.sim{
+  background:var(--warnbg); border:2px solid var(--warnline); color:var(--warn);
+  border-radius:12px; padding:12px 16px; margin:12px 0 20px;
+  font-weight:700; display:flex; gap:12px; align-items:flex-start;
+}
+.sim .big{font-size:26px; line-height:1}
+.sim small{display:block; font-weight:400; color:#6b4a13; margin-top:4px}
+
+h1{font-size:26px; margin:18px 0 2px}
+.sub{color:var(--dim); margin:0 0 6px}
+
+.card{background:var(--card); border:1px solid var(--line); border-radius:12px;
+      padding:16px; margin-bottom:16px}
+h2{font-size:20px; margin:0 0 12px}
+
+label{display:block; font-weight:600; margin:10px 0 4px}
+input,textarea{
+  width:100%; padding:11px 12px; font:inherit; color:inherit;
+  border:1px solid var(--line); border-radius:8px; background:#fff;
+}
+textarea{min-height:88px; resize:vertical}
+input:focus,textarea:focus{outline:3px solid #bcd4f7; border-color:var(--accent)}
+
+button{
+  font:inherit; font-weight:700; padding:11px 20px; border-radius:8px;
+  border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer;
+}
+button:hover{filter:brightness(1.08)}
+button:disabled{opacity:.55; cursor:default}
+button.ghost{background:#fff; color:var(--accent)}
+button.small{padding:6px 12px; font-size:15px}
+
+table{width:100%; border-collapse:collapse}
+th,td{text-align:right; padding:9px 8px; border-bottom:1px solid var(--line); vertical-align:top}
+th{color:var(--dim); font-size:15px}
+tr.row{cursor:pointer}
+tr.row:hover{background:#f0f5fd}
+tr.row.sel{background:#e6effc}
+
+.badge{display:inline-block; padding:2px 10px; border-radius:999px;
+       font-size:14px; font-weight:700; white-space:nowrap}
+.b-new{background:#eef1f5; color:#41505f}
+.b-running{background:var(--runbg); color:var(--run)}
+.b-done{background:var(--okbg); color:var(--ok)}
+.b-failed{background:var(--badbg); color:var(--bad)}
+
+.phase{margin-bottom:14px}
+.phase h3{margin:0 0 8px; font-size:18px; display:flex; gap:10px; align-items:center}
+.phase h3 .n{background:#eef1f5; color:var(--dim); border-radius:999px;
+             font-size:14px; padding:1px 10px}
+.step{border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:8px;
+      background:#fcfdff}
+.step .t{font-weight:700}
+.step .c{white-space:pre-wrap; color:#2b3947; margin-top:4px}
+.st-approved{border-right:5px solid var(--ok)}
+.st-rework{border-right:5px solid var(--warnline)}
+.st-rejected{border-right:5px solid var(--bad)}
+.st-done{border-right:5px solid var(--accent)}
+.st-partial{border-right:5px solid var(--warnline)}
+.st-planned{border-right:5px solid #9aa8b6}
+
+.log{font-size:15px; color:#2b3947; margin:0; padding:0; list-style:none}
+.log li{padding:5px 0; border-bottom:1px dashed var(--line)}
+.log .k{color:var(--dim); font-size:13px}
+
+.msg{padding:10px 12px; border-radius:8px; margin-bottom:10px; font-weight:600}
+.msg.err{background:var(--badbg); color:var(--bad)}
+.msg.ok{background:var(--okbg); color:var(--ok)}
+.empty{color:var(--dim); padding:10px 0}
+footer{color:var(--dim); font-size:14px; padding:8px 0 28px; text-align:center}
+@media (max-width:640px){ body{font-size:16px} .wrap{padding:10px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- שלט ההדמיה. אין מצב שבו הוא נעלם: המערכת אינה מדברת עם מודל. -->
+  <div class="sim" role="status">
+    <span class="big" aria-hidden="true">⚠</span>
+    <span>
+      מצב הדמיה — ללא חיבור אמיתי למודלים
+      <small>המתכנן, המבצע והמבקר הם ספקים מדומים שרצים על המחשב הזה בלבד.
+      אין קריאות רשת, אין מפתחות API, ואין חיוב כספי.</small>
+    </span>
+  </div>
+
+  <h1>מעבדת סוכנים</h1>
+  <p class="sub">משימה אחת עוברת שלושה שלבים: <strong>מתכנן</strong> ← <strong>מבצע</strong> ← <strong>מבקר</strong>.</p>
+
+  <div class="card">
+    <h2>משימה חדשה</h2>
+    <div id="formMsg"></div>
+    <label for="title">כותרת</label>
+    <input id="title" maxlength="200" placeholder="למשל: לסכם את חוברת התרגול בחשבון">
+    <label for="desc">תיאור (לא חובה)</label>
+    <textarea id="desc" maxlength="4000" placeholder="מה צריך לקרות, ובאילו תנאים"></textarea>
+    <p style="margin:12px 0 0"><button id="create">צור משימה</button></p>
+  </div>
+
+  <div class="card">
+    <h2>משימות</h2>
+    <div id="listMsg"></div>
+    <table>
+      <thead><tr><th style="width:60px">#</th><th>כותרת</th><th style="width:120px">סטטוס</th><th style="width:170px">עודכן</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p id="listEmpty" class="empty">אין עדיין משימות.</p>
+  </div>
+
+  <div class="card" id="detailCard" hidden>
+    <h2 id="detailTitle">פרטי משימה</h2>
+    <div id="detailMsg"></div>
+    <p>
+      <button id="run">הרץ תהליך</button>
+      <button id="refresh" class="ghost">רענן</button>
+      <button id="del" class="ghost">מחק</button>
+    </p>
+    <div id="phases"></div>
+    <h3 style="font-size:18px; margin:18px 0 6px">יומן</h3>
+    <ul class="log" id="log"></ul>
+  </div>
+
+  <footer id="foot">—</footer>
+</div>
+
+<script>
+"use strict";
+var sel = null;           /* מזהה המשימה הפתוחה */
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":s; return d.innerHTML; }
+
+function note(box, text, kind){
+  $(box).innerHTML = text ? '<div class="msg '+kind+'">'+esc(text)+'</div>' : "";
+}
+
+function api(method, path, body){
+  return fetch(path, {
+    method: method,
+    headers: body ? {"Content-Type":"application/json"} : undefined,
+    body: body ? JSON.stringify(body) : undefined
+  }).then(function(r){
+    return r.json().catch(function(){ return {ok:false, error:"תשובה שאינה JSON"}; })
+      .then(function(j){ if(!r.ok || j.ok===false) throw new Error(j.error||("שגיאה "+r.status)); return j; });
+  });
+}
+
+function fmt(ts){ return ts ? ts.replace("T"," ").replace("Z","") : ""; }
+
+function loadHealth(){
+  api("GET","/api/health").then(function(h){
+    $("foot").textContent = "מעבדת סוכנים " + h.version + " · מצב: " + h.mode +
+      " · ספקים זמינים: " + h.providers.join(", ");
+  }).catch(function(e){ $("foot").textContent = "אין קשר לשרת: " + e.message; });
+}
+
+function loadList(){
+  return api("GET","/api/tasks").then(function(j){
+    var tb = $("rows"); tb.innerHTML = "";
+    $("listEmpty").hidden = j.tasks.length > 0;
+    j.tasks.forEach(function(t){
+      var tr = document.createElement("tr");
+      tr.className = "row" + (t.id===sel ? " sel" : "");
+      tr.innerHTML = "<td>"+t.id+"</td><td>"+esc(t.title)+"</td>" +
+        '<td><span class="badge b-'+t.status+'">'+esc(t.status_label)+"</span></td>" +
+        "<td>"+esc(fmt(t.updated_at))+"</td>";
+      tr.onclick = function(){ open(t.id); };
+      tb.appendChild(tr);
+    });
+  }).catch(function(e){ note("listMsg", e.message, "err"); });
+}
+
+var PHASES = [["planner","מתכנן"],["executor","מבצע"],["reviewer","מבקר"]];
+
+function render(j){
+  var t = j.task;
+  sel = t.id;
+  $("detailCard").hidden = false;
+  $("detailTitle").innerHTML = "משימה " + t.id + " — " + esc(t.title) +
+    ' <span class="badge b-'+t.status+'">'+esc(t.status_label)+"</span>";
+
+  var html = t.description ? '<p class="sub">'+esc(t.description)+"</p>" : "";
+  PHASES.forEach(function(p){
+    var steps = j.steps.filter(function(s){ return s.phase===p[0]; });
+    if(!steps.length) return;
+    html += '<div class="phase"><h3>'+p[1]+' <span class="n">'+steps.length+' צעדים</span></h3>';
+    steps.forEach(function(s){
+      html += '<div class="step st-'+s.status+'">' +
+        '<div class="t">'+s.ordinal+". "+esc(s.title)+
+        ' <span class="badge b-new">'+esc(s.status_label)+"</span></div>" +
+        '<div class="c">'+esc(s.content)+"</div></div>";
+    });
+    html += "</div>";
+  });
+  if(!j.steps.length) html += '<p class="empty">התהליך עוד לא רץ על המשימה הזאת.</p>';
+  $("phases").innerHTML = html;
+
+  $("log").innerHTML = j.events.map(function(e){
+    return '<li><span class="k">'+esc(fmt(e.created_at))+" · "+esc(e.kind)+"</span><br>"+esc(e.message)+"</li>";
+  }).join("") || '<li class="empty">אין רשומות.</li>';
+}
+
+function open(id){
+  note("detailMsg","","ok");
+  return api("GET","/api/tasks/"+id).then(function(j){ render(j); loadList(); })
+    .catch(function(e){ note("detailMsg", e.message, "err"); });
+}
+
+$("create").onclick = function(){
+  var title = $("title").value.trim();
+  if(!title){ note("formMsg","צריך כותרת.","err"); return; }
+  var b = this; b.disabled = true;
+  api("POST","/api/tasks",{title:title, description:$("desc").value})
+    .then(function(j){
+      note("formMsg","נוצרה משימה "+j.task.id+".","ok");
+      $("title").value=""; $("desc").value="";
+      return open(j.task.id);
+    })
+    .catch(function(e){ note("formMsg", e.message, "err"); })
+    .then(function(){ b.disabled = false; });
+};
+
+$("run").onclick = function(){
+  if(!sel) return;
+  var b = this; b.disabled = true;
+  note("detailMsg","התהליך רץ…","ok");
+  api("POST","/api/tasks/"+sel+"/run")
+    .then(function(j){
+      render(j); loadList();
+      var s = j.summary;
+      note("detailMsg","הריצה הסתיימה: "+s.approved+" מתוך "+s.planned+
+           " צעדים אושרו, "+s.rework+" חזרו לתיקון ומתוכם "+s.fixed+" תוקנו.",
+           s.status==="done" ? "ok" : "err");
+    })
+    .catch(function(e){ note("detailMsg", e.message, "err"); })
+    .then(function(){ b.disabled = false; });
+};
+
+$("refresh").onclick = function(){ if(sel) open(sel); };
+
+$("del").onclick = function(){
+  if(!sel) return;
+  if(!confirm("למחוק את המשימה?")) return;
+  api("DELETE","/api/tasks/"+sel).then(function(){
+    sel = null; $("detailCard").hidden = true; loadList();
+  }).catch(function(e){ note("detailMsg", e.message, "err"); });
+};
+
+loadHealth();
+loadList();
+</script>
+</body>
+</html>
