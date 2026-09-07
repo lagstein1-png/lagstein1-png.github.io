@@ -36,7 +36,7 @@
    התפקיד של אוקלידס. כאן נמדד רק מה שאפשר למדוד בלי לדעת
    את החומר — ולכן ממצא REVIEW הוא שאלה, לא האשמה.
    ============================================================ */
-const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const {chromium}=require('./pw.js');
 const fs=require('fs'), path=require('path');
 const DIR=__dirname, ROOT=path.resolve(DIR,'..','..');
 const REG=JSON.parse(fs.readFileSync(path.join(DIR,'stages.json'),'utf8'));

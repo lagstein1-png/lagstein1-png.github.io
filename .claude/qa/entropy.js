@@ -1,4 +1,4 @@
-const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const {chromium}=require('./pw.js');
 (async()=>{
 let failed=0;   /* בלי זה הכלי מדפיס ממצאים ויוצא 0 */
  const b=await chromium.launch();

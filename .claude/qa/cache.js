@@ -35,10 +35,19 @@
       scope משלו, והשומר הזה בתוכו היה מבטל לו את כל הקאשינג. לכן:
       חובה בשורש, אסור בכל השאר.
 
+   6. **מפתח שכבר קיים ב-`origin/main` עם תוכן אחר.** מפתח הקאש הוא
+      הדבר היחיד שמביא קוד חדש למי שכבר התקין. ענף ששינה קובץ של
+      אפליקציה — או את `legal/`, שכל האפליקציות מצרפות מראש — והשאיר
+      את המפתח כפי שהוא ב-`main`, מוזג ואיש לא מקבל את התיקון. וגם
+      ההפך: שני ענפים שהקצו אותו מספר לתוכן שונה. הבדיקה משווה את
+      עץ העבודה ל-`origin/main`: אותו מפתח ותוכן שונה — כישלון.
+      אין `origin/main` (שיבוט רדוד) — הבדיקה מדלגת ואומרת זאת.
+
    לדף הבית ול-`reader` אין `BUILD` כלל, מפני שאין להם פוטר שמציג
    גרסה. זה תקין ואינו נספר כשגיאה — הם נבדקים על מפתח קאש בלבד.
    ===================================================================== */
 const fs = require('fs'), path = require('path');
+const { execFileSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 
@@ -48,6 +57,37 @@ const NO_BUILD = new Set(['.', 'reader']);
 /* מחרוזת הרישום ו-BUILD יושבות ב-index.html, ובבגרות 806 ב-app.js.
    מחפשים בשני הקבצים ומדווחים באיזה מהם נמצאו. */
 const HOSTS = ['index.html', 'app.js'];
+
+/* --- 6: origin/main --- */
+function git(args) {
+  /* maxBuffer: ברירת המחדל היא 1MB, ו-index.html של history ושל
+     math-teen גדולים ממנה — git show היה נכשל בשקט ושתיהן לא נבדקו. */
+  try { return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024,
+                                            stdio: ['ignore', 'pipe', 'ignore'] }); }
+  catch (e) { return null; }
+}
+const MAIN = git(['rev-parse', '--verify', '--quiet', 'origin/main']) ? 'origin/main' : null;
+if (!MAIN) console.log('· אין origin/main בשיבוט הזה — בדיקה 6 (מפתח מול main) מדולגת. git fetch origin main');
+
+function keyOnMain(app) {
+  for (const h of HOSTS) {
+    const t = git(['show', `${MAIN}:${app === '.' ? '' : app + '/'}${h}`]);
+    if (!t) continue;
+    const m = t.match(/serviceWorker\s*\.\s*register\s*\(\s*["'][^"']*sw\.js\?v=([^"'&]+)["']/);
+    if (m) return m[1];
+  }
+  return null;
+}
+/* מה נחשב "התוכן של האפליקציה": התיקייה שלה, ו-legal/ שכל sw.js מצרף
+   מראש. בשורש — רק הקבצים שהשורש מגיש בעצמו, לא תיקיות האפליקציות. */
+function changedSinceMain(app) {
+  const paths = app === '.'
+    ? ['index.html', 'sw.js', 'manifest.json', 'img', 'legal', 'voice']
+    : [app, 'legal'];
+  const out = git(['diff', '--name-only', MAIN, '--'].concat(paths));
+  if (out === null) return null;
+  return out.split('\n').filter(Boolean);
+}
 
 /* גם /* *\/ וגם // — כדי ש-caches.match שבתוך הערה לא ייחשב שימוש.
    מחרוזות אינן מטופלות: אין ב-sw.js מחרוזת שמכילה "//" או "/*". */
@@ -146,6 +186,17 @@ for (const app of apps) {
   const reg = src.match(/serviceWorker\s*\.\s*register\s*\(\s*["'][^"']*sw\.js\?v=([^"'&]+)["']/);
   const key = reg[1];                       // למשל b40-pwa1
   const keyVer = key.replace(/-pwa\d*$/, '');
+
+  /* 6 — אותו מפתח כמו ב-origin/main, ותוכן אחר */
+  if (MAIN) {
+    const mainKey = keyOnMain(app);
+    const changed = changedSinceMain(app);
+    if (mainKey && mainKey === key && changed && changed.length) {
+      console.log(`✗ ${name}: המפתח ${key} כבר קיים ב-origin/main ותוכן האפליקציה שונה — ` +
+                  `${changed.length} קבצים (${changed.slice(0, 3).join(', ')}${changed.length > 3 ? ', …' : ''}). הקצה מפתח טרי`);
+      bad++;
+    }
+  }
   const bm = src.match(/\bBUILD\s*=\s*["']([^"']+)["']/);
 
   if (!bm) {

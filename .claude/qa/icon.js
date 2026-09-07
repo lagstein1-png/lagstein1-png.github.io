@@ -9,7 +9,7 @@
    ביד בדף הבית, כדי שהסמל בכרטיס והסמל במסך הבית יהיו אותו סמל
    ולא שני ציורים שנפרדו עם הזמן.
    ===================================================================== */
-const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const {chromium}=require('./pw.js');
 const fs=require('fs'),path=require('path');
 const [dir,bg,ink,d]=process.argv.slice(2);
 if(!dir||!bg||!ink||!d){console.error("שימוש: node .claude/qa/icon.js <תיקייה> <רקע> <צבע-קו> '<path…>'");process.exit(1)}

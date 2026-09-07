@@ -24,7 +24,7 @@
    נזכר.
    ===================================================================== */
 'use strict';
-const { chromium } = require('/opt/node22/lib/node_modules/playwright');
+const { chromium } = require('./pw.js');
 
 const argv = process.argv.slice(2);
 const N = argv.includes('--n') ? Number(argv[argv.indexOf('--n') + 1]) || 60 : 60;

@@ -1,7 +1,7 @@
 /* בודק את מה שהיה נשבר בשקט: שהשאלה שהמורה רואה על המסך היא
    בדיוק השאלה שהתלמיד מקבל מהקישור, ושהחלפה של שאלה אחת אינה
    משנה אף אחת מהשאר. */
-const {chromium}=require("/opt/node22/lib/node_modules/playwright");
+const {chromium}=require('./pw.js');
 const APPS=process.argv.slice(2).length?process.argv.slice(2)
   :["math-app","math-teen","math-uni","math-uni2","math-uni3","ulpan","english","history","lomda"];
 const BASE="http://127.0.0.1:8099";
