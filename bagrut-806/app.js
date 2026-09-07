@@ -4,8 +4,8 @@
    מה כאן ומה עוד לא:
      שלב 1  שלד, טעינת EXAMS, ניווט, הגדרות, שמירה במכשיר.
      שלב 2  speech.js — הקראה בעברית עם הדגשת המשפט הנקרא.
-     שלב 3  חשיפת רמזים אחד־אחד ובדיקת תשובה סופית.  ← עד כאן
-     שלב 4  PWA, אופליין מלא, ודוח נושאים חלשים.
+     שלב 3  חשיפת רמזים אחד־אחד ובדיקת תשובה סופית.
+     שלב 4  PWA, אופליין מלא, ודוח נושאים חלשים.  ← עד כאן
 
    אין framework ואין build. הקובץ נטען כ-<script> רגיל, ואחרי
    data/exams.js — הוא סומך על window.EXAMS שכבר קיים.
@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x7 · 2026-09-02";
+  var BUILD = "x19 · 2026-09-06";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -52,7 +52,8 @@
   var store = {
     data: null,
     blank: function () {
-      return { fs: 1, theme: "auto", rate: 1, examId: null, solved: {}, sims: [], weak: {} };
+      return { fs: 1, theme: "auto", rate: 1, examId: null,
+               solved: {}, sims: [], weak: {}, att: {} };
     },
     load: function () {
       try {
@@ -220,11 +221,43 @@
       .replace(/[\u00a0\s]+/g, " ")
       .replace(/[.,;:!?׳״"']+$/, "");
   }
+  /* קידומת מוכרת בצד שמאל של סימן שוויון — f(x)= , f'(x)= , y= , y'= —
+     היא בדיוק מה שמורה מלמד לרשום, ולכן היא יורדת לפני ההשוואה.
+     רק תבנית של שם פונקציה, ורק כשיש סימן שוויון אחד בדיוק: בלי שני
+     התנאים האלה גם 3x^2-12x+9=0 וגם x=3x^2-12x+9 היו מתקבלים,
+     והם טענות אחרות לגמרי מהנגזרת. */
+  var LHS_NAME = /^(?:[a-z]'?\([a-z]\)|y'?)$/;
+  function stripLhs(s) {
+    var p = s.split("=");
+    if (p.length !== 2 || !p[1]) return s;
+    return LHS_NAME.test(p[0]) ? p[1] : s;
+  }
+  /* כוכבית כפל יורדת רק כשהיא אינה בין שתי ספרות: 3*x הוא 3x, אבל
+     2*3 הוא שש ולא עשרים ושלוש, ולכן שם היא נשארת במקומה. */
+  function dropMul(s) {
+    var out = "", i, c;
+    for (i = 0; i < s.length; i++) {
+      c = s.charAt(i);
+      if (c === "*" && /\d/.test(s.charAt(i - 1)) && /\d/.test(s.charAt(i + 1))) { out += c; continue; }
+      if (c !== "*") out += c;
+    }
+    return out;
+  }
+  /* מינוס טיפוגרפי, גרש, חזקה עילית ונקודה בסוף המשפט אינם טעות
+     במתמטיקה. תלמיד שהעתיק מהמסך מקבל − (U+2212) ולא -, עורך טקסט
+     הופך אותו ל-– או ל-—, מקלדת עברית נותנת ׳ ולא ', והמקלדת של
+     הטלפון נותנת ². הפיסוק נמחק מהסוף בלבד, כדי ש-0.75 יישאר 0.75. */
   function normExpr(x) {
-    return String(x == null ? "" : x).toLowerCase()
+    var s = String(x == null ? "" : x).toLowerCase()
       .replace(/[\u00a0\s]/g, "")
+      .replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\ufe63\uff0d]/g, "-")
+      .replace(/[\u2018\u2019\u02bc\u05f3\u2032]/g, "'")
       .replace(/\*\*/g, "^")
-      .replace(/·|×/g, "*");
+      .replace(/·|×/g, "*")
+      .replace(/²/g, "^2")
+      .replace(/³/g, "^3");
+    s = dropMul(s).replace(/[.,;:!?׳״"']+$/, "");
+    return stripLhs(s);
   }
   function checkAnswer(fa, raw) {
     if (!fa) return { ok: false, why: "לסעיף הזה אין עדיין תשובה סופית בקובץ התוכן." };
@@ -257,13 +290,34 @@
   }
   /* התוצאה נשמרת במכשיר: solved לסעיף, ו-weak לפי נושא. דוח
      הנושאים החלשים בשלב 4 נבנה בדיוק מהשניים האלה. */
+  /* `att` הוא רשומה לכל סעיף שנבדק, ו-`weak` נבנה ממנו ולא נצבר
+     בעצמו. הספירה הקודמת הוסיפה שורה ל-`weak` בכל לחיצה על "בדקו",
+     ולכן תלמיד שניסה שלוש פעמים ופתר בפעם הרביעית נראה במסך
+     ההתקדמות כ-1 מתוך 4, והנושא נצבע אדום אף שהסעיף נפתר — הדוח
+     שאמור לומר לו במה להתחיל אמר לו שהוא חלש דווקא במה שהתעקש
+     עליו. סעיף נספר כאן פעם אחת: נפתר או לא, ומספר הניסיונות נשמר
+     בנפרד ואינו מוריד מהתוצאה. */
+  function rebuildWeak() {
+    var d = store.data, w = {};
+    for (var id in d.att) {
+      var a = d.att[id];
+      if (!a || !a.topic) continue;
+      var t = w[a.topic] || (w[a.topic] = { ok: 0, no: 0, tries: 0 });
+      if (a.ok) t.ok++; else t.no++;
+      t.tries += a.tries || 0;
+    }
+    d.weak = w;
+  }
   function recordResult(q, subId, ok) {
     var d = store.data;
     if (!d.solved) d.solved = {};
-    if (!d.weak) d.weak = {};
-    if (ok) d.solved[subId] = true;
-    var w = d.weak[q.topic] || (d.weak[q.topic] = { ok: 0, no: 0 });
-    if (ok) w.ok++; else w.no++;
+    if (!d.att) d.att = {};
+    var a = d.att[subId];
+    if (!a) a = d.att[subId] = { topic: q.topic, ok: false, tries: 0 };
+    a.topic = q.topic;
+    a.tries++;
+    if (ok) { a.ok = true; d.solved[subId] = true; }
+    rebuildWeak();
     store.save();
   }
 
@@ -275,6 +329,17 @@
   }
   function examTitle(ex) {
     return ex.season + " " + ex.year + (ex.moed && ex.moed !== "—" ? " · מועד " + ex.moed : "");
+  }
+  /* שלוש בחינות ההדגמה נושאות את אותו season ואת אותה שנה, ולכן
+     examTitle מחזיר לשלושתן מחרוזת זהה — ושני כרטיסים שנבדלים רק
+     במניין הסעיפים הם שתי אפשרויות שנראות אחת. מוסיפים סימן סידורי
+     לכרטיס בלבד. season נשאר "הדגמה" בדיוק, מפני שהוא מה שמדליק את
+     תווית "לא בחינה אמיתית", ומועד לא נוגעים בו: "מועד ג׳" היה
+     מרמז על מועד בחינה שהתקיים. */
+  var SERIAL = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ז׳", "ח׳", "ט׳", "י׳"];
+  function examSerial(ex, i, all) {
+    var same = all.filter(function (o) { return examTitle(o) === examTitle(ex); });
+    return same.length > 1 && SERIAL[i] ? " · אוסף " + SERIAL[i] : "";
   }
   function countSubs(ex) {
     var n = 0;
@@ -290,11 +355,16 @@
         "הבחינות יושבות ב־<code>data/exams.js</code>.</div>";
       return;
     }
-    box.innerHTML = all.map(function (ex) {
+    box.innerHTML = all.map(function (ex, i) {
       var demo = ex.season === "הדגמה"
         ? ' <span class="chip warn">בחינת הדגמה — לא בחינה אמיתית</span>' : "";
+      /* רמת האוסף על הכרטיס. האפליקציה משרתת 3–4 יחידות וגם 5, ותלמיד
+         שנכנס לאוסף שאינו ברמה שלו מגלה זאת אחרי שהתחיל. אוסף בלי
+         level אינו מציג תווית — לא מנחשים רמה שלא נקבעה. */
+      var lvl = ex.level
+        ? ' <span class="chip">' + esc(ex.level) + "</span>" : "";
       return '<button class="card pick" data-exam="' + esc(ex.id) + '">' +
-        "<h3>" + esc(examTitle(ex)) + demo + "</h3>" +
+        "<h3>" + esc(examTitle(ex) + examSerial(ex, i, all)) + lvl + demo + "</h3>" +
         '<p class="meta">' +
         plural(ex.questions.length, "שאלה אחת", "שתי שאלות", "שאלות") + " · " +
         plural(countSubs(ex), "סעיף אחד", "שני סעיפים", "סעיפים") + " · " +
@@ -610,7 +680,11 @@
       var t = byTopic[it.q.topic] || (byTopic[it.q.topic] = { ok: 0, n: 0, pts: 0, max: 0 });
       t.n++; t.max += pts;
       if (r.ok) { t.ok++; t.pts += pts; }
-      recordResult(it.q, it.id, r.ok);
+      /* בדוח הבחינה סעיף ריק שווה אפס נקודות, וכך צריך להיות. במסך
+         ההתקדמות הוא אינו נספר: "לא הגעתי לזה" אינו "טעיתי בזה",
+         ובחינה שנגמר בה הזמן הייתה מוסיפה לנושא כישלון לכל סעיף
+         שהתלמיד לא הספיק להגיע אליו. */
+      if (String(SIM.ans[it.id] || "").trim()) recordResult(it.q, it.id, r.ok);
       rows.push({ id: it.id, letter: it.sub.letter, number: it.q.number,
                   topic: it.q.topic, ok: r.ok, pts: pts,
                   given: SIM.ans[it.id] || "", want: answerText(it.sub.finalAnswer) });
@@ -662,6 +736,18 @@
     return h + "</div>";
   }
 
+  /* --- מתי נושא הוא חלש ------------------------------------------
+     סף אחוזים לבדו תלוי בכמה סעיפים יש בנושא, ולכן הוא מודד את
+     מבנה הבחינה ולא את התלמיד: נושא עם שני סעיפים נופל ל-50% על
+     טעות אחת ונצבע אדום, ונושא עם שלושה נשאר על 67% וירוק — אותה
+     ידיעה בדיוק, שני צבעים. הכלל כאן אינו תלוי במספר הסעיפים:
+     החלקה אחת אינה מסמנת נושא, שתי טעויות מסמנות, ונושא שכולו
+     שגוי מסומן תמיד — גם כשהוא סעיף אחד. */
+  function isWeak(ok, n) {
+    var wrong = n - ok;
+    return n > 0 && (wrong >= 2 || wrong === n);
+  }
+
   function simReportHtml(ex) {
     var r = SIM.res;
     var pct = r.max ? Math.round((r.got / r.max) * 100) : 0;
@@ -677,7 +763,7 @@
       var x = r.byTopic[t];
       var p = x.max ? Math.round((x.pts / x.max) * 100) : 0;
       h += "<tr><td>" + esc(t) + "</td><td>" + x.ok + "/" + x.n + "</td><td>" +
-        x.pts + "/" + x.max + '</td><td><div class="bar2' + (p < 60 ? " weak" : "") +
+        x.pts + "/" + x.max + '</td><td><div class="bar2' + (isWeak(x.ok, x.n) ? " weak" : "") +
         '"><i style="width:' + p + '%"></i></div></td></tr>';
     });
     h += "</tbody></table>";
@@ -686,11 +772,11 @@
        לא מפענח גרף, והמשפט הזה הוא כל מה שהוא צריך מהדוח. */
     var weak = topics.filter(function (t) {
       var x = r.byTopic[t];
-      return x.max && x.pts / x.max < 0.6;
+      return isWeak(x.ok, x.n);
     });
     h += '<p class="note">' + (weak.length
       ? "מה לחזור עליו קודם: " + weak.map(esc).join(", ") + "."
-      : "אין נושא שנפל מתחת ל-60%. אפשר להמשיך הלאה.") + "</p>";
+      : "אין נושא שחוזר בו יותר מטעות אחת. אפשר להמשיך הלאה.") + "</p>";
 
     h += "<h2>סעיף אחר סעיף</h2><table class=\"tbl\"><thead><tr>" +
       "<th>סעיף</th><th>מה נכתב</th><th>התשובה</th><th></th></tr></thead><tbody>";
@@ -754,7 +840,8 @@
     var box = $("#prog-body");
     if (!topics.length) {
       box.innerHTML = '<div class="stub"><b>עוד לא נאסף מידע.</b>' +
-        "כל תשובה שנבדקת — בתרגול או בסימולציה — נספרת כאן לפי נושא.</div>";
+        "כל סעיף שנבדקה בו תשובה — בתרגול או בסימולציה — נספר כאן " +
+        "לפי נושא, פעם אחת. סעיף שנשאר ריק אינו נספר.</div>";
       return;
     }
     var rows = topics.map(function (t) {
@@ -763,17 +850,17 @@
     }).sort(function (a, b) { return a.p - b.p; });
 
     var h = "<h2>לפי נושא</h2><table class=\"tbl\"><thead><tr>" +
-      "<th>נושא</th><th>נכונות</th><th>אחוז</th><th></th></tr></thead><tbody>";
+      "<th>נושא</th><th>סעיפים שנפתרו</th><th>אחוז</th><th></th></tr></thead><tbody>";
     rows.forEach(function (r) {
       h += "<tr><td>" + esc(r.t) + "</td><td>" + r.ok + "/" + r.n + "</td><td>" + r.p +
-        '%</td><td><div class="bar2' + (r.p < 60 ? " weak" : "") +
+        '%</td><td><div class="bar2' + (isWeak(r.ok, r.n) ? " weak" : "") +
         '"><i style="width:' + r.p + '%"></i></div></td></tr>';
     });
     h += "</tbody></table>";
-    var w = rows.filter(function (r) { return r.p < 60; });
+    var w = rows.filter(function (r) { return isWeak(r.ok, r.n); });
     h += '<p class="note">' + (w.length
       ? "הנושאים החלשים: " + w.map(function (r) { return esc(r.t); }).join(", ") + "."
-      : "אין נושא מתחת ל-60%.") + "</p>";
+      : "אין נושא שחוזרת בו יותר מטעות אחת.") + "</p>";
 
     var sims = (d.sims || []).slice().reverse().slice(0, 8);
     if (sims.length) {
@@ -849,7 +936,7 @@
        המסך פעמיים בכל מעבר. הכותרת מוסיפה מידע במקום לחזור עליו —
        היא זו שנקראת בהחלפת לשונית ובחזרה לאפליקציה. */
     document.title = TITLES[screen] +
-      (screen === "home" ? " — בגרות במתמטיקה, חמש יחידות" : " · שאלון 806");
+      (screen === "home" ? " — בגרות במתמטיקה, 3–4 ו-5 יח״ל" : " · שאלון 806");
   }
 
   /* --- אירועים. האזנה אחת על המסמך, ולא מאזין לכל כפתור --------- */
@@ -913,7 +1000,8 @@
       keepVal(chk);
       pc2.res = checkAnswer(sc.sub.finalAnswer, pc2.val);
       pc2.tries++;
-      recordResult(sc.q, chk, pc2.res.ok);
+      /* לחיצה על "בדקו" בשדה ריק אינה ניסיון שנכשל אלא לחיצה בטעות. */
+      if (String(pc2.val || "").trim()) recordResult(sc.q, chk, pc2.res.ok);
       renderAns(chk);
       /* אותו מידע שמופיע על המסך, ולא פחות ממנו: הנוסח שמופיע אחרי
          שני ניסיונות הוא הדרך היחידה קדימה למי שנתקע, ומי שמקשיב
@@ -1054,11 +1142,14 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x7-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x19-pwa1").catch(function () {});
     });
   }
 
   store.load();
+  /* מכשיר שנצברה בו הספירה הקודמת — שורה לכל לחיצה — מקבל כאן את
+     הספירה החדשה במקומה, כדי שלא יהיו שני בסיסי ספירה באותה טבלה. */
+  rebuildWeak();
   applyPrefs();
   $("#build").textContent = BUILD;
   if (store.data.examId && examById(store.data.examId)) state.examId = store.data.examId;

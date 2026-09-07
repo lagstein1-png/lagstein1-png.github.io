@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>אולפן — עברית מעשית לעולים חדשים</title>
 <meta name="description" content="עברית מעשית לעולים חדשים: כל מילה נשמעת לפני שהיא נקראת, אותיות שקל להחליף, מצבים מהחיים, ושלטים וטפסים אמיתיים. בעברית, ערבית, רוסית ואנגלית." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="אולפן — עברית מעשית לעולים חדשים" />
+<meta property="og:description" content="עברית מעשית לעולים חדשים: כל מילה נשמעת לפני שהיא נקראת, אותיות שקל להחליף, מצבים מהחיים, ושלטים וטפסים אמיתיים. בעברית, ערבית, רוסית ואנגלית." />
+<meta property="og:url" content="https://lagstein1-png.github.io/ulpan/" />
+<meta property="og:image" content="https://lagstein1-png.github.io/ulpan/img/icon-512.png" />
+<meta name="twitter:card" content="summary" />
 <meta name="theme-color" content="#17120d" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -93,6 +99,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
 :root.clear body{font-family:"Verdana","Tahoma","Heebo",sans-serif;letter-spacing:.012em}
 :root.spaced body{word-spacing:.22em;line-height:1.95}
 :root.rm *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+/* הגדרת המערכת ולא רק המתג שבאפליקציה: מי שכיבה אנימציות במכשיר
+   ציפה שזה יחול גם כאן. */
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 h1,h2,h3{margin:0;line-height:1.3;font-weight:800}
 button{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
@@ -137,6 +146,13 @@ html[lang="ar"] body{font-family:var(--ar)}
 .btn.ghost{background:transparent;box-shadow:none}
 .btn[disabled]{opacity:.45;cursor:default}
 .btn.wide{width:100%}
+/* מודול המבחן הכיתתי הועתק ממשפחת math-uni, ושם .btn-p ו-.btn.w
+   מוגדרים. כאן הם לא היו, ולכן "מבחן חדש", "צרו את המבחן", "התחלת
+   מבחן" וכפתורי הוואטסאפ נראו ככפתור ריק בלי צבע — טקסט קטן עם פלוס.
+   כחול, ולא טורקיז: זה כפתור של המורה, ובולט מכל שאר המסך. */
+.btn-p{background:#2563eb;color:#fff;border-color:#2563eb}
+.btn-p:hover{filter:brightness(1.1);border-color:#2563eb}
+.btn.w{width:100%}
 
 .chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;
   padding:.22rem .6rem;font-size:.78rem;font-weight:700;background:var(--surface2);color:var(--muted)}
@@ -205,7 +221,10 @@ html[lang="ar"] body{font-family:var(--ar)}
 .opt.bad{border-color:var(--bad);background:var(--bad-soft)}
 .opt.bad .k{background:var(--bad);color:#fff}
 .opt[disabled]{cursor:default}
-.opt.dim{opacity:.55}
+/* נסיגה בצבע ולא בשקיפות: opacity:.55 הוריד את הטקסט ל-3.87:1
+   ואת אות הסימון ל-2.37:1, ואחרי המענה קריאת המסיח היא הלמידה. */
+.opt.dim{color:var(--muted);border-color:var(--line);box-shadow:none}
+.opt.dim .k{background:var(--surface2);color:var(--muted)}
 
 /* אריחי בניית משפט. הסדר הוא התרגיל, ולכן האריח חייב להיראות כמשהו
    שאפשר להרים — מסגרת מלאה ורקע משלו, לא טקסט על רקע הכרטיס. */
@@ -395,12 +414,26 @@ textarea.field{min-height:96px;resize:vertical}
 .xq-b[aria-pressed="true"]{background:var(--line)}
 .xq-q{margin-top:8px;line-height:1.5;overflow-wrap:anywhere}
 .xq-e{margin-top:5px;font-weight:700;overflow-wrap:anywhere}
+/* התרגיל לבד — "29 − 7" — הוא רצף של שני מספרים וסימן ניטרלי. בפסקה
+   עברית האלגוריתם הדו־כיווני הופך את סדר המספרים, והתלמיד ראה
+   "7 − 29" במבחן. מסך התרגול נמנע מזה עם .qbig; מסך המבחן, שהועתק
+   ממשפחת math-uni, לא הגדיר את .mline כלל. יישור לימין נשמר בכוונה:
+   הביטוי יושב מתחת לשאלה העברית, לא בקצה השמאלי. */
+[dir="rtl"] .mline,[dir="rtl"] .xq-e{direction:ltr;unicode-bidi:isolate;text-align:right}
 .xq-a{margin-top:7px;font-size:.92rem;color:var(--ok);overflow-wrap:anywhere}
 .xq-add{margin-top:12px;gap:8px}
 .xq-add .sub{margin:0}
 /* שאלת מקור נושאת קטע שלם. בלי תקרה הוא דוחף את שאר הרשימה
    אל מחוץ למסך. */
 .xq .passage{max-height:11rem;overflow:auto}
+
+/* ------------------------------------------------------------
+   מחלקות עזר שהסימון כאן משתמש בהן, והוגדרו רק במשפחת math-uni
+   שממנה הוא הועתק. בלי הכלל, האלמנט נופל לברירת המחדל של
+   הדפדפן ואין שום סימן לכך: אין שגיאת JS ואף בדיקה לא רואה זאת.
+   נמדד בכרומיום מול math-uni כקבוצת ביקורת. */
+.spread{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -747,6 +780,7 @@ T.he={
   femIos:"באייפון או באייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.",
   femMac:"במק: הגדרות המערכת ← נגישות ← תוכן מדובר ← קול המערכת ← ניהול קולות ← להוריד קול נשי.",
   femWin:"בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.",
+  edgeHas:"בדפדפן Microsoft Edge יש קולות טבעיים בשפה הזאת, נשיים וגבריים — בלי התקנה, בחיבור לאינטרנט.",openEdge:"לפתוח את האפליקציה ב-Edge",
   vKey:"מפתח Gemini", vKeyPh:"מתחיל ב-AIza…", vSave:"שמרו", vShow:"הצג", vHide:"הסתר",
   vSaved:"המפתח נשמר במכשיר הזה בלבד. הוא לא נשלח לשום מקום אחר.",
   vRemoved:"המפתח נמחק.", vChecking:"בודקים…", vOk:"המפתח עובד.",
@@ -763,7 +797,14 @@ T.he={
   reset:"איפוס התקדמות", resetD:"מוחק את כל מה שנשמר במכשיר הזה", resetAsk:"למחוק הכול?",
   yes:"כן, מחקו", no:"לא",
   savedNote:"ההתקדמות נשמרת אוטומטית במכשיר הזה בלבד.",
-  ofN:"מתוך", newWord:"מילה חדשה", review:"חזרה"
+  ofN:"מתוך", newWord:"מילה חדשה", review:"חזרה",
+  sumT1:"סבב חזק.", sumT2:"סבב טוב.", sumT3:"סבב עם עבודה.", sumT4:"סבב קשה — וזה בסדר.",
+  sumS1:"רוב מה שתרגלתם כאן יושב.", sumS2:"רוב הדברים במקום. עוד סבב אחד יחדד את מה שנשאר.",
+  sumS3:"חלק מהחומר עוד לא יושב, וזה בדיוק מה שהסבב נועד להראות. עוד סבב באותה רמה.",
+  sumS4:"סבב כזה אומר רק שהחומר עדיין חדש. עוד סבב, בקצב שלכם.",
+  sumOk:"נכון לבד", sumHp:"נכון עם רמז", sumNo:"לא נכון", sumAcc:"דיוק",
+  sumAgain:"סבב נוסף", sumUp:"לרמה הבאה", sumDown:"רמה אחת למטה", sumShare:"שליחה בוואטסאפ",
+  sumShareTxt:"{app} — {topic}, {lv}: {ok} מתוך {n} נכון.", sumStreak:"{n} ימים ברצף"
 };
 T.ar={
   app:"أولبان", tagline:"عبرية عملية للقادمين الجدد",
@@ -797,6 +838,7 @@ T.ar={
   femIos:"في آيفون أو آيباد: الإعدادات ← إمكانية الوصول ← المحتوى المنطوق ← الأصوات ← اختيار صوت نسائي وتنزيله.",
   femMac:"في ماك: إعدادات النظام ← إمكانية الوصول ← المحتوى المنطوق ← صوت النظام ← إدارة الأصوات ← تنزيل صوت نسائي.",
   femWin:"في ويندوز: الإعدادات ← الوقت واللغة ← الكلام ← إدارة الأصوات ← إضافة أصوات.",
+  edgeHas:"في متصفح Microsoft Edge أصوات طبيعية لهذه اللغة، نسائية ورجالية — دون تثبيت، مع اتصال بالإنترنت.",openEdge:"افتح التطبيق في Edge",
   vKey:"مفتاح Gemini", vKeyPh:"يبدأ بـ AIza…", vSave:"حفظ", vShow:"إظهار", vHide:"إخفاء",
   vSaved:"حُفظ المفتاح على هذا الجهاز فقط، ولا يُرسل إلى أي مكان آخر.",
   vRemoved:"حُذف المفتاح.", vChecking:"جارٍ الفحص…", vOk:"المفتاح يعمل.",
@@ -813,7 +855,14 @@ T.ar={
   reset:"تصفير التقدّم", resetD:"يمحو كل ما حُفظ على هذا الجهاز", resetAsk:"محو الكل؟",
   yes:"نعم، امحُ", no:"لا",
   savedNote:"يُحفظ التقدّم تلقائيًا على هذا الجهاز فقط.",
-  ofN:"من", newWord:"كلمة جديدة", review:"مراجعة"
+  ofN:"من", newWord:"كلمة جديدة", review:"مراجعة",
+  sumT1:"جولة قوية.", sumT2:"جولة جيّدة.", sumT3:"جولة فيها عمل.", sumT4:"جولة صعبة — ولا بأس.",
+  sumS1:"معظم ما تدرّبتم عليه هنا ثابت.", sumS2:"معظم الأمور في مكانها. جولة أخرى تصقل ما تبقّى.",
+  sumS3:"جزء من المادّة لم يثبت بعد، وهذا بالضبط ما تُظهره الجولة. جولة أخرى في المستوى نفسه.",
+  sumS4:"جولة كهذه تعني فقط أنّ المادّة ما زالت جديدة. جولة أخرى، على إيقاعكم.",
+  sumOk:"صحيح وحدكم", sumHp:"صحيح مع تلميح", sumNo:"غير صحيح", sumAcc:"الدقّة",
+  sumAgain:"جولة أخرى", sumUp:"إلى المستوى التالي", sumDown:"مستوى واحد أدنى", sumShare:"إرسال عبر واتساب",
+  sumShareTxt:"{app} — {topic}، {lv}: {ok} من {n} صحيحة.", sumStreak:"{n} أيام متتالية"
 };
 T.ru={
   app:"Ульпан", tagline:"Практический иврит для новых репатриантов",
@@ -847,6 +896,7 @@ T.ru={
   femIos:"В iPhone или iPad: Настройки → Универсальный доступ → Устный контент → Голоса → выбрать женский голос и загрузить.",
   femMac:"В Mac: Системные настройки → Универсальный доступ → Устный контент → Системный голос → Управление голосами → загрузить женский голос.",
   femWin:"В Windows: Параметры → Время и язык → Речь → Управление голосами → Добавить голоса.",
+  edgeHas:"В браузере Microsoft Edge есть естественные голоса для этого языка, женские и мужские — без установки, при подключении к интернету.",openEdge:"Открыть приложение в Edge",
   vKey:"Ключ Gemini", vKeyPh:"начинается с AIza…", vSave:"Сохранить", vShow:"Показать", vHide:"Скрыть",
   vSaved:"Ключ сохранён только на этом устройстве и никуда не отправляется.",
   vRemoved:"Ключ удалён.", vChecking:"Проверяем…", vOk:"Ключ работает.",
@@ -863,7 +913,14 @@ T.ru={
   reset:"Сбросить прогресс", resetD:"Удаляет всё сохранённое на этом устройстве", resetAsk:"Удалить всё?",
   yes:"Да, удалить", no:"Нет",
   savedNote:"Прогресс сохраняется автоматически только на этом устройстве.",
-  ofN:"из", newWord:"новое слово", review:"повторение"
+  ofN:"из", newWord:"новое слово", review:"повторение",
+  sumT1:"Сильный круг.", sumT2:"Хороший круг.", sumT3:"Круг с работой.", sumT4:"Трудный круг — и это нормально.",
+  sumS1:"Большая часть того, что вы здесь отрабатывали, усвоена.", sumS2:"Почти всё на месте. Ещё один круг отточит остальное.",
+  sumS3:"Часть материала ещё не усвоена, и именно это круг и должен показать. Ещё один круг на том же уровне.",
+  sumS4:"Такой круг значит только одно: материал ещё новый. Ещё один круг, в своём темпе.",
+  sumOk:"Верно сами", sumHp:"Верно с подсказкой", sumNo:"Неверно", sumAcc:"Точность",
+  sumAgain:"Ещё круг", sumUp:"На уровень выше", sumDown:"На уровень ниже", sumShare:"Отправить в WhatsApp",
+  sumShareTxt:"{app} — {topic}, {lv}: {ok} из {n} верно.", sumStreak:"{n} дней подряд"
 };
 T.en={
   app:"Ulpan", tagline:"Practical Hebrew for new arrivals",
@@ -897,6 +954,7 @@ T.en={
   femIos:"On iPhone or iPad: Settings → Accessibility → Spoken Content → Voices → pick a female voice and download it.",
   femMac:"On Mac: System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → download a female voice.",
   femWin:"On Windows: Settings → Time & language → Speech → Manage voices → Add voices.",
+  edgeHas:"Microsoft Edge has natural voices for this language, female and male — nothing to install, with an internet connection.",openEdge:"Open the app in Edge",
   vKey:"Gemini key", vKeyPh:"starts with AIza…", vSave:"Save", vShow:"Show", vHide:"Hide",
   vSaved:"The key is stored on this device only. It is not sent anywhere else.",
   vRemoved:"Key removed.", vChecking:"Checking…", vOk:"The key works.",
@@ -913,12 +971,32 @@ T.en={
   reset:"Reset progress", resetD:"Deletes everything saved on this device", resetAsk:"Delete everything?",
   yes:"Yes, delete", no:"No",
   savedNote:"Progress is saved automatically on this device only.",
-  ofN:"of", newWord:"new word", review:"review"
+  ofN:"of", newWord:"new word", review:"review",
+  sumT1:"A strong round.", sumT2:"A good round.", sumT3:"A round with work in it.", sumT4:"A hard round — and that's fine.",
+  sumS1:"Most of what you practised here has stuck.", sumS2:"Most of it is in place. One more round will sharpen the rest.",
+  sumS3:"Some of it hasn't settled yet, which is exactly what a round is for. Another round at the same level.",
+  sumS4:"A round like this only means the material is still new. Another round, at your pace.",
+  sumOk:"Right on your own", sumHp:"Right with a hint", sumNo:"Not right", sumAcc:"Accuracy",
+  sumAgain:"Another round", sumUp:"Next level", sumDown:"One level down", sumShare:"Send on WhatsApp",
+  sumShareTxt:"{app} — {topic}, {lv}: {ok} of {n} right.", sumStreak:"{n} days in a row"
 };
 function t(k){var d=T[state.lang]||T.he;return d[k]!==undefined?d[k]:(T.he[k]!==undefined?T.he[k]:k)}
 /* המשמעות בשפת האם. נופלים לאנגלית ולא לעברית: מי שלמד ברוסית וחסר
    לו תרגום יבין "a large boat" הרבה לפני "אונייה". */
 function gl(g){if(!g)return"";return g[state.lang]||g.en||g.he||""}
+/* ------------------------------------------------------------
+   עברית בתוך ממשק שאינו עברי. ה-CSS נותן כיוון וגופן, אבל קורא
+   מסך בוחר מנוע לפי lang: כשהממשק רוסי ה-html הוא lang="ru",
+   ומילה עברית בלי סימון נמסרת למנוע הרוסי — ועם ניקוד זו אות
+   ועוד שני סימנים לכל תו. WCAG 2.2 §3.1.2.
+   lrn() נושא גם את .lrn-b, ולכן טקסט שאינו עברי אינו מקבל את
+   הכיווניות הכפויה: תשובה ברוסית קיבלה עד כה direction:rtl.
+   ------------------------------------------------------------ */
+var HEB_RE=/[\u0590-\u05FF]/;
+function heb(x){x=String(x==null?"":x);
+  return HEB_RE.test(x)?'<span lang="he" dir="rtl">'+esc(x)+"</span>":esc(x)}
+function lrn(x){x=String(x==null?"":x);
+  return HEB_RE.test(x)?'<span class="lrn-b" lang="he" dir="rtl">'+esc(x)+"</span>":esc(x)}
 
 /* ============================================================
    3. אייקונים — SVG בקוד, אפס בקשות רשת
@@ -952,7 +1030,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a12 · 2026-09-02";
+var BUILD="a14 · 2026-09-06";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -1042,7 +1120,13 @@ function applyModes(){
      האפליקציה המותקנת נשארו בעברית. השם והתיאור כבר מתורגמים. */
   try{ document.title=t("app")+" — "+t("tagline") }catch(e){}
 }
-function announce(m){var e=$("#live");if(e)e.textContent=m}
+function announce(m,ans){
+  var e=$("#live"); if(!e)return;
+  /* אזור ההודעות יורש את שפת הממשק. תשובה עברית בתוכו נמסרה למנוע
+     הרוסי או הערבי — מסמנים אותה כעברית, ורק אותה. */
+  if(ans===undefined){e.textContent=m;return}
+  e.innerHTML=esc(m)+" "+heb(ans);
+}
 
 /* ============================================================
    6. קול
@@ -1133,6 +1217,19 @@ function voicesFor(code){
    שדפדפן יכול לעשות בלי הקלטות ובלי שירות חיצוני. ההודעה מסבירה
    את זה ומצרפת את ההוראות למערכת ההפעלה שהמשתמש נמצא בה — קול
    נשי שמותקן נבחר מיד, בלי שינוי הגובה ובלי הודעה. */
+/* כרום על ווינדוס אין לו קולות משלו: הוא רואה רק את קולות המערכת,
+   ובעברית המערכת מציעה אחד בלבד — Asaf הגברי. "הוספת קולות" לא
+   תביא קול נשי בעברית, כי כזה אין למיקרוסופט להתקנה; ובערבית
+   וברוסית, בלי חבילת שפה, אין אף קול. Edge לעומתו נושא קולות
+   טבעיים משלו בארבע השפות, נשיים וגבריים (Hila ו-Avri בעברית).
+   הסכימה microsoft-edge: פותחת את אותה כתובת ב-Edge מתוך כל דפדפן
+   בווינדוס — לחיצה אחת במקום מסלול הגדרות שלא מוביל לשום מקום.
+   נצפה ב-4.9.2026 בכרום על ווינדוס: בעברית Asaf בלבד, בערבית כלום. */
+function isWinNotEdge(){var ua=navigator.userAgent||"";return /Windows/i.test(ua)&&!/Edg\//.test(ua)}
+function edgeNote(){
+  if(!isWinNotEdge())return "";
+  return " "+esc(t("edgeHas"))+' <a href="microsoft-edge:'+esc(location.href.split("#")[0])+'" style="font-weight:700;color:inherit">'+esc(t("openEdge"))+"</a>";
+}
 function femNote(pool){
   if(!pool||!pool.length)return "";
   for(var i=0;i<pool.length;i++)if(vGender(pool[i])==="f")return "";
@@ -1156,13 +1253,14 @@ function devPicker(lgs){
     if(!pool.length){
       /* אומרים את זה במפורש. רשימה ריקה בלי הסבר נראית כמו תקלה. */
       out+='<p class="chip bad" style="margin:.4rem 0">'+esc(t("vNoneLang"))+"</p>";
+      var en=edgeNote();if(en)out+='<p class="sub" style="margin:.4rem 0;line-height:1.5">'+en+"</p>";
       return;
     }
     /* אין קול נשי בשפה הזאת? הגובה מורם — וגם נאמר למה. בלי המשפט
        הזה הקול הגברי נראה כמו בחירה של האפליקציה ולא כמו מה שיש
        במכשיר, ואין שום רמז שאפשר להתקין קול נשי ולקבל אותו מיד. */
     var fnote=femNote(pool);
-    if(fnote)out+='<p class="sub" style="margin:.4rem 0;line-height:1.5">'+esc(fnote)+"</p>";
+    if(fnote)out+='<p class="sub" style="margin:.4rem 0;line-height:1.5">'+esc(fnote)+edgeNote()+"</p>";
     var cur=(state.devVoice||{})[code]||"";
     function row(v){
       var on=v?cur===v.voiceURI:!cur;
@@ -1495,6 +1593,16 @@ function femLift(v){
    על המסך מה קרה. יום שלם אבד כי כשלא היה קול, שום דבר לא אמר למה.
    ------------------------------------------------------------ */
 var VCHK="";
+/* כמה מהקולות הם בשפה שנבדקת. עד כה ההודעה מנתה את כל הקולות
+   במכשיר, בכל השפות — "23 קולות" בכרום על ווינדוס, כשבעברית יש
+   שם אחד בלבד (Asaf). המספר היה נכון ולא אמר כלום; עכשיו שניהם. */
+function sameLang(list,lang){
+  var base=String(lang||"").split("-")[0].toLowerCase(),n=0;
+  for(var i=0;i<list.length;i++){
+    if(String(list[i].lang||"").replace("_","-").toLowerCase().split("-")[0]===base)n++;
+  }
+  return n;
+}
 function voiceCheck(){
   VCHK="…"; render();
   function show(m){ VCHK=m; render() }
@@ -1506,7 +1614,7 @@ function voiceCheck(){
   catch(e){ show("✗ יצירת האמירה נכשלה: "+e.message); return }
   u.lang="he-IL"; u.volume=1; u.rate=1; u.pitch=1;
   var done=false;
-  u.onstart=function(){ done=true; show("✓ הקול פועל — "+list.length+" קולות במכשיר") };
+  u.onstart=function(){ done=true; show("✓ הקול פועל — "+sameLang(list,u.lang)+" בשפה הזו מתוך "+list.length+" קולות במכשיר") };
   u.onerror=function(e){ done=true;
     var er=(e&&e.error)||"לא ידוע";
     if(er==="interrupted"||er==="canceled"){ show("✓ הקול פועל"); return }
@@ -1517,9 +1625,19 @@ function voiceCheck(){
     show("✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר") },2000);
 }
 
+/* ------------------------------------------------------------
+   דור ההקראה. speechSynthesis.cancel() אינו מבטל setTimeout:
+   כרום יורה onend על האמירה שבוטלה, המקטע הבא נרשם בכל זאת,
+   וכעבור SEG_GAP ההקראה הישנה חוזרת מעל החדשה — שני קולות
+   במקביל. מונה אחד פותר את זה: כל הקראה מקבלת מספר, stopSpeak
+   מקדם אותו, ומקטע מדור ישן פשוט אינו מדבר. כאן זה חמור יותר
+   מבשאר האפליקציות, כי קטע קריאה מנוקד מתפצל להרבה מקטעים.
+   ------------------------------------------------------------ */
+var _sayGen=0;
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
   try{speechSynthesis.cancel()}catch(e){}
+  var my=++_sayGen;
   /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
      שממתין לרשימת הקולות ועד ארבע שניות אם היא לא מגיעה — ואמירה
      שיוצאת ארבע שניות אחרי המגע נזרקת בשקט באנדרואיד ובספארי.
@@ -1533,6 +1651,7 @@ function speakDevice(text,code,rate){
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
       var pit=femLift(v);
       (function sayseg(k){
+        if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
         if(k>=segs.length){ hlClear(); ttsOK(); return }
         var seg=segs[k];
         var u=new SpeechSynthesisUtterance(seg.text);
@@ -1578,12 +1697,14 @@ function speak(text,lang,rateMul){
   var code=LANGS[lang].tts;
   var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
   stopSpeak();
+  var my=_sayGen;   /* גם תשובת רשת שמגיעה אחרי עצירה לא תושמע */
   if(gemOn()){
     var vid=gvOf(state.gemVoice).id;
     var ck=lang+"|"+vid+"|"+rate.toFixed(2)+"|"+text;
     if(gCache[ck]){playUrl(gCache[ck],text,code,rate);return}
     gBusy=true; renderSpeakState();
     gSynth(text,vid,rate,lang).then(function(u){
+      if(my!==_sayGen)return;
       gCache[ck]=u; gBusy=false; renderSpeakState(); playUrl(u,text,code,rate);
     }).catch(function(){
       gBusy=false; renderSpeakState(); speakDevice(text,code,rate);
@@ -1599,7 +1720,7 @@ function playUrl(url,text,code,rate){
   gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){_sayGen++;gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -2394,6 +2515,22 @@ function chooseIndex(tid,lv,pool,avoid){
   return pick(cand);
 }
 function poolOf(tp,lv){return (tp.L[lv-1]||tp.L[0]||[])}
+/* בחירת פריט למבחן. אחידה, ואינה נוגעת ב-state כלל.
+
+   הבחירה לתרגול שמעליה שוקלת את הפריטים לפי היסטוריית הלמידה,
+   וזה נכון לתרגול ושגוי למבחן: מבחן נארז לקישור כזרע בלבד,
+   והתלמיד בונה ממנו את השאלות מחדש אצלו. משקלים שנגזרים
+   מ-state.item שונים אצל המורה ואצל התלמיד, ולכן אותו זרע היה
+   מייצר אצלם שאלות שונות — המורה מאשר מבחן אחד והכיתה נבחנת
+   באחר, בלי ששום דבר יצעק. */
+function pureIndex(pool,avoid){
+  var cand=[],i;
+  for(i=0;i<pool.length;i++){
+    if(avoid!==undefined&&i===avoid&&pool.length>1)continue;
+    cand.push(i);
+  }
+  return cand.length?pick(cand):0;
+}
 function kindsIn(pool){
   var k={w:[],s:[],p:[]},i;
   for(i=0;i<pool.length;i++)if(k[pool[i].k])k[pool[i].k].push(i);
@@ -2503,9 +2640,9 @@ function formMean(tp,lv,pool,idx){
 function formBack(tp,lv,pool,idx){
   var it=pool[idx];
   var ds=wordDistract(it,pool,14);
-  var opts=fillOpts([O('<span class="lrn-b">'+esc(it.w)+"</span>",true)],ds,4,
+  var opts=fillOpts([O(lrn(it.w),true)],ds,4,
     function(d){return d.w.toLowerCase()},
-    function(d){return O('<span class="lrn-b">'+esc(d.w)+"</span>",false,
+    function(d){return O(lrn(d.w),false,
       d.g?(d.w+" = "+gl(d.g)):"")},
     it.w.toLowerCase());
   return {type:"back",prompt:t("qSay"),lead:ml(lv,it.g),subject:null,
@@ -2519,9 +2656,9 @@ function formHear(tp,lv,pool,idx){
      הסדר ב-wordDistract הוא הסדר החינוכי: קודם זוגות המינימום
      של המילה עצמה, ורק אחריהן מילים אחרות מאותה רמה. */
   var ds=wordDistract(it,pool,14);
-  var opts=fillOpts([O('<span class="lrn-b">'+esc(it.w)+"</span>",true)],ds,4,
+  var opts=fillOpts([O(lrn(it.w),true)],ds,4,
     function(d){return d.w.toLowerCase()},
-    function(d){return O('<span class="lrn-b">'+esc(d.w)+"</span>",false,
+    function(d){return O(lrn(d.w),false,
       d.g?(d.w+" = "+gl(d.g)):"")},
     it.w.toLowerCase());
   return {type:"hear",prompt:t("qHear"),subject:null,hidden:it,
@@ -2536,79 +2673,188 @@ function formUse(tp,lv,pool,idx){
      בשלוש אפשרויות. */
   var others=shuffle(pool.filter(function(x){return x.k==="s"&&x!==it}))
     .concat(shuffle(allSents().filter(function(x){return x!==it})));
-  var opts=fillOpts([O('<span class="lrn-b">'+esc(it.s)+"</span>",true)],others,4,
+  var opts=fillOpts([O(lrn(it.s),true)],others,4,
     function(d){return d.s},
-    function(d){return O('<span class="lrn-b">'+esc(d.s)+"</span>",false,gl(d.g))},
+    function(d){return O(lrn(d.s),false,gl(d.g))},
     it.s);
   return {type:"use",prompt:t("qUse"),lead:it.u?gl(it.u):gl(it.g),subject:null,
     opts:shuffle(opts),answer:it.s,say:it.s,reveal:it};
 }
 /* --- צורה 5: משפט עם חסר --- */
-var STOP_GAP=/^(a|an|the|to|of|is|are|was|were|be|i|you|he|she|it|we|they|my|your)$/i;
+/* הקובץ הזה נולד מהעתקה של אפליקציית האנגלית, ושם "מילה" היא רצף
+   של [A-Za-z']. על משפט עברי הרגקס הזה החזיר תמיד מחרוזת ריקה,
+   רשימת המועמדים נשארה ריקה, וכל שאלת השלמה נפלה ל-formUse —
+   אפס שאלות מסוג gap ב-7,200 הגרלות. העזרים כאן הם התיקון.
+   הניקוד נשמר באפשרויות: הוא חומר הלימוד, לא קישוט. */
+var HEB_NIK=/[֑-ׇ]/g;                      /* ניקוד וטעמים */
+var HEB_NOT=/[^א-ת֑-ׇ'"׳״]/g;  /* לא אות, לא ניקוד, לא גרש */
+function hebBare(s){return String(s).replace(HEB_NOT,"")}     /* מילה מנוקדת בלי פיסוק */
+function hebPlain(s){return hebBare(s).replace(HEB_NIK,"")}   /* עיצורים בלבד */
+function hebText(s){return String(s).replace(HEB_NIK,"")}     /* טקסט שלם בלי ניקוד */
+function hebWords(s){return String(s).split(/\s+/).map(hebBare).filter(function(b){return b})}
+/* אותיות סופיות אינן אות אחרת. בלי הנרמול הזה "מִסְמָךְ" ו"מִסְמָכִים"
+   נראים כשתי מילים שאין ביניהן קשר. */
+var HEB_FIN={"ך":"כ","ם":"מ","ן":"נ","ף":"פ","ץ":"צ"};
+/* שורשים אפשריים של מילה. לא ניתוח מורפולוגי — קילוף: מסירים
+   תחילית אחת בכל סיבוב, סופית נפוצה, ואמות קריאה. מילה מחזירה כמה
+   מועמדים ולא אחד, כי "הַפְנָיָה" ו"לִפְנוֹת" נפגשים רק אחרי שתי
+   רמות קילוף שונות. עודף התאמות כאן עולה מסיח אחד; חוסר התאמה
+   עולה שאלה עם שתי תשובות נכונות, ולכן הנטייה היא לעודף. */
+var ROOT_CACHE={};
+function hebRoots(w){
+  var k=hebPlain(w); if(ROOT_CACHE[k])return ROOT_CACHE[k];
+  var s=k.replace(/[ךםןףץ]/g,function(c){return HEB_FIN[c]});
+  var out=[],cur=s,i,r;
+  for(i=0;i<3;i++){
+    r=cur.replace(/(ים|ות|תי|נו|תם|תן|כם|יה|יו|נה|ה|ת|י|ו|ך)$/,"").replace(/[אוהי]/g,"");
+    if(r.length>=2&&out.indexOf(r)<0)out.push(r);
+    if(!/^[והבכלמש]/.test(cur))break;
+    cur=cur.slice(1);
+  }
+  if(!out.length)out.push(s);
+  ROOT_CACHE[k]=out; return out;
+}
+function sameRoot(a,b){
+  if(hebPlain(a)===hebPlain(b))return true;
+  var A=hebRoots(a),B=hebRoots(b),i;
+  for(i=0;i<A.length;i++)if(B.indexOf(A[i])>=0)return true;
+  return false;
+}
+/* מילות תפקוד שהחסרתן אינה מלמדת: כינויי גוף, מילות יחס וזיקה.
+   מילות שאלה *אינן* כאן בכוונה — "כַּמָּה זֶה עוֹלֶה?" מול "מָתַי" הוא
+   בדיוק ההבדל שהתרגיל מלמד, והרמז מכריע ביניהן. הבדיקה נעשית על
+   הצורה בלי ניקוד, אחרת "אֲנִי" ו"אני" הן שתי מילים. */
+var STOP_GAP=/^(אני|אתה|את|אתם|אתן|הוא|היא|הם|הן|אנחנו|אנו|זה|זו|זאת|הזה|הזו|הזאת|הזאתי|של|שלי|שלו|שלה|שלך|שלנו|שלכם|שלהם|על|אל|עם|את|לי|לו|לה|לך|לנו|לכם|להם|אותי|אותו|אותה|אותם|בו|בה|לא|כן|גם|כי|אם|או|יש|אין|רק|אבל|כדי|אשר|כאן|שם|כבר|עוד|הכי)$/;
+/* וי"ו החיבור אינה הופכת מילת תפקוד למילת תוכן. בלי הקילוף הזה
+   נבחר "וְלֹא" כחסר, ו"קִבַּלְתִּי מִכְתָּב _____ הֵבַנְתִּי אוֹתוֹ" הוא משפט
+   קשה לקריאה שאינו מלמד מילה. */
+function isStop(p){return STOP_GAP.test(p)||STOP_GAP.test(p.replace(/^ו/,""))}
 function formGap(tp,lv,pool,idx){
   var it=pool[idx];
   var parts=it.s.split(" ");
-  /* הרמז שמוצג מעל התרגיל הוא gl(it.g). כשהממשק באנגלית זהו תיאור
-     באנגלית, והוא עלול להכיל בדיוק את המילה שהוסרה — "Ask for the
-     menu" מול המשפט שממנו נגרע menu. מילה שכבר כתובה ברמז אינה
-     חסר אלא מתנה, ולכן היא נבחרת רק אם לא נשארה אחרת.
-     נבדק תמיד מול g.en ולא מול gl(it.g): רק בו יש מילים אנגליות,
-     והבדיקה חייבת לצאת זהה בכל שפת ממשק — המבחן הכיתתי נבנה מזרע
-     אצל המורה ואצל התלמיד, ואלה לא בהכרח באותה שפה. */
-  var leadTxt=String((it.g&&it.g.en)||"").toLowerCase();
-  /* גם נוסח השאלה עצמו, ולא רק הרמז. הפרומפט האנגלי הוא "What is
-     missing?", ולכן כשהמילה שנגרעה מהמשפט הייתה What היא הופיעה
-     בשורה שמעל התרגיל. נלקח תמיד מהאנגלית ולא מ-t(), כדי שההגרלה
+  /* הרמז שמוצג מעל התרגיל הוא gl(it.g). הוא תיאור *התפקיד* של
+     המשפט, ולעיתים הוא מכיל בדיוק את המילה שהוסרה — הרמז "בבקשה
+     לרשום לי את זה על נייר" מול המשפט שממנו נגרע "לכתוב". מילה
+     שכבר כתובה ברמז אינה חסר אלא מתנה, ולכן היא נבחרת רק אם לא
+     נשארה אחרת.
+     נבדק תמיד מול g.he ו-g.en הקבועים ולא מול gl(it.g): הבדיקה
+     חייבת לצאת זהה בכל שפת ממשק — המבחן הכיתתי נבנה מזרע אצל
+     המורה ואצל התלמיד, ואלה לא בהכרח באותה שפה. g.en נשאר כי
+     בו נבדקות מילים לטיניות, אם ייכנסו כאלה לבנק. */
+  var leadTxt=hebText(String((it.g&&it.g.he)||""))+" "+String((it.g&&it.g.en)||"").toLowerCase();
+  /* גם נוסח השאלה עצמו, ולא רק הרמז. הפרומפט העברי הוא "מה חסר
+     במשפט?", ולכן כשהמילה שנגרעה הייתה "מָה" היא הופיעה בשורה
+     שמעל התרגיל. נלקח תמיד מ-T.he ו-T.en ולא מ-t(), כדי שההגרלה
      תצא זהה בכל שפת ממשק. */
-  var promptTxt=String((T.en&&T.en.qGap)||"").toLowerCase();
-  var leadW={},lw=(leadTxt+" "+promptTxt).match(/[a-z']+/g)||[];
-  lw.forEach(function(w){leadW[w]=1});
-  var cand=[],free=[];
-  for(var i=0;i<parts.length;i++){
-    var bare=parts[i].replace(/[^A-Za-z']/g,"");
-    if(bare.length>=3&&!STOP_GAP.test(bare)){
+  var promptTxt=hebText(String((T.he&&T.he.qGap)||""))+" "+String((T.en&&T.en.qGap)||"").toLowerCase();
+  var all=leadTxt+" "+promptTxt, leadRoots={};
+  hebWords(all).forEach(function(b){hebRoots(b).forEach(function(r){leadRoots[r]=1})});
+  var cand=[],free=[],i;
+  for(i=0;i<parts.length;i++){
+    /* מבחן האורך סופר עיצורים ולא תווים. מילה מנוקדת בת שתי אותיות
+       היא ארבעה עד שישה תווים, ולכן ספירת תווים הייתה מעבירה בדיוק
+       את המילים הקצרות שאין טעם להחסיר. */
+    var bare=hebBare(parts[i]), plain=hebPlain(bare);
+    if(plain.length>=3&&!isStop(plain)){
       cand.push(i);
-      /* לא רק מילה שלמה אלא גם הכלה: הרמז "first meeting" נושא
-         בתוכו את meet, "to have this meaning" את mean, ו-"unwell"
-         את well. מילה שאפשר לקרוא אותה מתוך הרמז אינה חסר. */
-      var bl=bare.toLowerCase();
-      if(!leadW[bl]&&(leadTxt+" "+promptTxt).indexOf(bl)<0)free.push(i);
+      /* לא רק מילה שלמה אלא גם שורש: הרמז "בקשה מנומסת" נושא בתוכו
+         את "מבקש", ו"כבר מסרתי את המסמך" את "המסמכים". מילה שאפשר
+         לקרוא אותה מתוך הרמז אינה חסר. */
+      var leaked=all.indexOf(plain)>=0;
+      hebRoots(bare).forEach(function(r){if(leadRoots[r])leaked=true});
+      if(!leaked)free.push(i);
     }
   }
   if(free.length)cand=free;
   /* המילה הפותחת אינה מוסתרת כשיש חלופה.
-     שתי סיבות, ושתיהן מדודות:
-     · האות הגדולה מסגירה. התלמיד רואה "_____ to meet you." ויודע
-       שהתשובה מתחילה באות גדולה; ב-10% משאלות ההשלמה היא הייתה
-       האפשרות היחידה כזאת, כלומר סימון נכון בלי לקרוא מילה.
-     · המילה הפותחת כאן היא לרוב מודאל של בקשה, ו-"Can I have the
-       menu" נכון בדיוק כמו "Could I have the menu" — מסיח שהוא
-       תשובה שנייה. */
+     באנגלית הסיבה הייתה האות הגדולה שמסגירה. בעברית אין אות גדולה,
+     אבל הסיבה השנייה נשארה בעינה: המילה הפותחת כאן היא לרוב מודאל
+     של בקשה, ו"אֶפְשָׁר לְקַבֵּל" נכון בדיוק כמו "אֲנִי מְבַקֵּשׁ לְקַבֵּל" —
+     מסיח שהוא תשובה שנייה. */
   var inner=cand.filter(function(i){return i>0});
   if(inner.length)cand=inner;
   if(!cand.length)return formUse(tp,lv,pool,idx);
-  var gi=pick(cand),gone=parts[gi].replace(/[^A-Za-z']/g,"");
+  var gi=pick(cand),gone=hebBare(parts[gi]);
   var shown=parts.slice();
   shown[gi]=parts[gi].replace(gone,"_____");
-  /* מסיחים: מילים מהמשפטים והמילים של אותה רמה, ואם הבנק דל —
-     מילים שנלמדו באפליקציה. מועמד שכבר הופיע נדחה וממשיכים
-     הלאה, כדי שיישארו ארבע אפשרויות ולא שלוש. */
-  var others=[],seen={};seen[gone.toLowerCase()]=1;
+  /* מסיחים: מילים מהמשפטים של אותה רמה, ואם הבנק דל — מילים
+     שנלמדו באפליקציה. מועמד שכבר הופיע נדחה וממשיכים הלאה, כדי
+     שיישארו ארבע אפשרויות ולא שלוש.
+     שתי פסילות שבלעדיהן לשאלה יש שתי תשובות נכונות:
+     · מסיח שחולק שורש עם התשובה — "חוֹזֵר" מול "לַחֲזוֹר".
+     · מסיח שכבר נמצא במשפט עצמו, בכל נטייה שהיא — "לְהַגִּישׁ" מול
+       "הַהַגָּשָׁה" שנשארה בשורה. */
+  var seen={},others=[],backup=[],sentW=hebWords(it.s);
+  seen[hebPlain(gone)]=1;
+  /* ------------------------------------------------------------
+     מסיח מאותו סוג מילה כמו התשובה יושב באותה משבצת תחבירית,
+     ולכן הוא מייצר משפט תקין באותה מידה. שני מקרים נמדדו:
+       ✓ אֶפְשָׁר לְדַבֵּר יוֹתֵר לְאַט?   מול   אֶפְשָׁר לְדַבֵּר מְאוֹד לְאַט?
+       ✓ אֶפְשָׁר לַחֲזוֹר בְּבַקָּשָׁה?   מול   אֶפְשָׁר לְדַבֵּר בְּבַקָּשָׁה?
+     בשניהם הרמז אינו מכריע, כי הוא מתאר את תפקיד המשפט ושתי
+     הגרסאות ממלאות אותו. שלוש קבוצות סגורות: שם פועל, תואר פועל
+     של מידה, ומילת נימוס. שתי מילים מאותה קבוצה לא ייפגשו באותה
+     שאלה. הבדיקה על העיצורים בלבד, כדי שהניקוד לא ישבש אותה.
+     ------------------------------------------------------------ */
+  var CLASS=[
+    /* תואר פועל של מידה או קצב */
+    ["מאוד","יותר","פחות","לאט","מהר","קצת","הרבה","כבר","שוב","עוד"],
+    /* מילת נימוס שפותחת פנייה */
+    ["שלום","תודה","סליחה","בבקשה","להתראות","בוקר","ערב"]
+  ];
+  function wordClass(p){
+    for(var i=0;i<CLASS.length;i++)if(CLASS[i].indexOf(p)>=0)return "c"+i;
+    /* שם פועל: ל׳ פותחת ועוד שני עיצורים לפחות. "לאט" נתפס כאן
+       בטעות ונפסל כמסיח לשם פועל — פסילה עודפת ולא חסרה, והמאגר
+       גדול מספיק כדי לספוג אותה. */
+    if(/^ל../.test(p))return "inf";
+    return null;
+  }
+  var goneClass=wordClass(hebPlain(gone));
+  function okDist(b){
+    var p=hebPlain(b),j,bad=false;
+    if(p.length<3||isStop(p)||seen[p])return false;
+    if(goneClass&&wordClass(p)===goneClass)return false;
+    if(sameRoot(b,gone))return false;
+    for(j=0;j<sentW.length;j++)if(sameRoot(b,sentW[j]))return false;
+    /* מסיח שהמילה שלו כתובה ברמז אינו מסיח אלא תשובה שנייה, והרמז
+       הוא זה שמאשר אותה: "קִבַּלְתִּי סֵרוּב וַאֲנִי _____ לָדַעַת לָמָּה" עם
+       הרמז "הבקשה נדחתה ואני מבקש את הנימוק" — "מְבַקֵּשׁ" נכון בדיוק
+       כמו "רוֹצֶה", והרמז אומר את זה במפורש. הבדיקה על הרמז הקבוע,
+       כמו בחירת החסר, כדי שההגרלה תישאר זהה בכל שפת ממשק. */
+    if(all.indexOf(p)>=0)return false;
+    hebRoots(b).forEach(function(r){if(leadRoots[r])bad=true});
+    if(bad)return false;
+    seen[p]=1;return true;
+  }
+  /* גם פריט מהבנק וגם משפט מפורקים למילים. בבנק יש ערכים של יותר
+     ממילה אחת ("שֵׁם פְּרָטִי", "אֵין כְּנִיסָה"), וניקוי הפיסוק על המחרוזת
+     השלמה הדביק אותם למילה אחת שאינה קיימת — "שֵׁםפְּרָטִי". */
   pool.forEach(function(x){
     var src=x.k==="s"?x.s:(x.k==="w"?x.w:"");
-    src.split(" ").forEach(function(p){
-      var b=p.replace(/[^A-Za-z']/g,"");
-      if(b.length>=3&&!STOP_GAP.test(b)&&!seen[b.toLowerCase()]){seen[b.toLowerCase()]=1;others.push(b)}
-    });
+    hebWords(src).forEach(function(b){if(okDist(b))others.push(b)});
   });
-  var backup=shuffle(allWords()).map(function(x){return x.w.replace(/[^A-Za-z']/g,"")})
-    .filter(function(b){return b.length>=3&&!STOP_GAP.test(b)});
-  var cands=shuffle(others).concat(backup);
-  var opts=fillOpts([O('<span class="lrn-b">'+esc(gone)+"</span>",true)],cands,4,
-    function(w){return w.toLowerCase()},
-    function(w){return O('<span class="lrn-b">'+esc(w)+"</span>",false)},
-    gone.toLowerCase());
-  return {type:"gap",prompt:t("qGap"),gapHtml:'<span class="lrn-b">'+esc(shown.join(" "))+"</span>",
+  shuffle(allWords()).forEach(function(x){
+    hebWords(x.w).forEach(function(b){if(okDist(b))backup.push(b)});
+  });
+  /* מסיח שאורכו רחוק מהתשובה מאפשר לענות בלי לקרוא — "הארוכה
+     ביותר" הופכת לאסטרטגיה. לכן בכל קבוצה קודם מועמדים באורך
+     דומה, והשאר אחריהם. הסידור נעשה *בתוך* כל קבוצה ולא על
+     האיחוד, כדי לשמור על סדר העדיפויות המקורי: מילים מאותה רמה
+     לפני מילים מרחבי האפליקציה. אחרת מילה מקרית מנושא אחר, שאורכה
+     קרוב במקרה, דחקה את המילה מאותו הקשר ממש. */
+  var nGone=hebPlain(gone).length;
+  function byLen(list){
+    var near=[],far=[];
+    list.forEach(function(b){(Math.abs(hebPlain(b).length-nGone)<=1?near:far).push(b)});
+    return near.concat(far);
+  }
+  var cands=byLen(shuffle(others)).concat(byLen(backup));
+  var opts=fillOpts([O(lrn(gone),true)],cands,4,
+    function(w){return hebPlain(w)},
+    function(w){return O(lrn(w),false)},
+    hebPlain(gone));
+  return {type:"gap",prompt:t("qGap"),gapHtml:lrn(shown.join(" ")),
     lead:gl(it.g),subject:null,opts:shuffle(opts),answer:gone,say:it.s,reveal:it};
 }
 /* --- צורה 6: בניית משפט מאריחים --- */
@@ -2634,10 +2880,10 @@ function formComp(tp,lv,pool,idx){
 
 /* בוחר את צורת התרגיל. הרמה קובעת כמה פיגום נשאר: ברמה 1 שפת האם
    נוכחת תמיד, ברמה 3 היא נעלמת וגם האוזן לבדה נדרשת. */
-function buildQuestion(tid,lv,avoid){
+function buildQuestion(tid,lv,avoid,pure){
   var tp=topicOf(tid); if(!tp)return null;
   var pool=poolOf(tp,lv), k=kindsIn(pool);
-  var idx=chooseIndex(tid,lv,pool,avoid);
+  var idx=pure?pureIndex(pool,avoid):chooseIndex(tid,lv,pool,avoid);
   var it=pool[idx];
   var q;
   if(it.k==="p")q=formComp(tp,lv,pool,idx);
@@ -2657,7 +2903,10 @@ function buildQuestion(tid,lv,avoid){
 /* ============================================================
    9. מסכים
    ============================================================ */
-var P={q:null,picked:-1,done:false,slot:[],used:[],ok:false};
+var P={q:null,picked:-1,done:false,slot:[],used:[],ok:false,rres:[],sum:false};
+/* rres — תוצאות הסבב הנוכחי: ok / hp (נכון עם רמז) / no. sum — מסך הסיכום פתוח. */
+var ROUND=10;
+function roundReset(){P.rres=[];P.sum=false}
 
 function hdr(){
   var s=state.screen;
@@ -2727,21 +2976,12 @@ function spkBtn(text,lang,slow,label){
     ' aria-label="'+esc(label||t("hear"))+'">'+ic(slow?"slow":"play",slow?15:18)+"</button>";
 }
 
-function subjectBox(it){
-  var w=it.w||it.s||"";
-  return '<div class="subject"><span class="word">'+esc(w)+"</span>"+
-    (it.ipa?'<span class="ipa">'+esc(it.ipa)+"</span>":"")+
-    '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
-    spkBtn(w,LEARN,false,t("hearWord"))+spkBtn(w,LEARN,true,t("hearSlow"))+"</span></div>";
-}
-
 /* מה נאמר **לפני** שעונים.
 
    מקש הרווח קרא עד כה את `q.say` תמיד, בלי לבדוק אם כבר ענו —
    בעוד שמקשי 1–4 שלידו כן מוגנים ב-`!P.done`. וב-`q.say` יושבת
-   התשובה: נמדד שבאולפן היא ב-say של back ו-use — 285 מתוך 849
-   השאלות שנדגמו. מי שקורא לאט
-   לוחץ רווח כדי לשמוע את השאלה, ושמע את הפתרון.
+   התשובה: נמדד בדפדפן אמיתי, 5.9.2026, שבאולפן היא נאמרת ב-back, use ו-gap — 15 מתוך 60 שאלות שנדגמו.
+   מי שקורא לאט לוחץ רווח כדי לשמוע את השאלה, ושמע את הפתרון.
 
    אחרי שעונים `q.say` נשאר כפי שהיה — המשפט המלא הוא בדיוק מה
    שצריך להישמע אז, גם כשטעו. כאן רק מה שנאמר קודם:
@@ -2758,6 +2998,14 @@ function sayAsk(q){
   return {t:q.lead||"",lg:(q.type==="back"&&state.level>=3)?LEARN:state.lang};
 }
 
+function subjectBox(it){
+  var w=it.w||it.s||"";
+  return '<div class="subject"><span class="word" lang="he" dir="rtl">'+esc(w)+"</span>"+
+    (it.ipa?'<span class="ipa">'+esc(it.ipa)+"</span>":"")+
+    '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
+    spkBtn(w,LEARN,false,t("hearWord"))+spkBtn(w,LEARN,true,t("hearSlow"))+"</span></div>";
+}
+
 function screenPractice(){
   var tp=topicOf(state.topic); if(!tp){state.screen="home";return screenHome()}
   var tr=trackOf(tp.trk), q=P.q;
@@ -2772,15 +3020,16 @@ function screenPractice(){
 
   h+='<div class="card qcard">';
   h+='<div class="qtop"><span class="chip">'+esc(q.prompt)+"</span>"+
+     '<span class="chip">'+(P.done?P.rres.length:P.rres.length+1)+" "+esc(t("ofN"))+" "+ROUND+"</span>"+
      '<span class="chip" style="margin-inline-start:auto">'+esc(t("todayL"))+" "+(state.day.n||0)+"</span></div>";
 
   if(q.type==="comp"){
     h+='<div style="display:flex;gap:.4rem;margin-bottom:.4rem">'+
        spkBtn(q.passage.lines.join(" "),LEARN,false,t("hearSent"))+
        spkBtn(q.passage.lines.join(" "),LEARN,true,t("hearSlow"))+"</div>";
-    h+='<div class="passage">';
+    h+='<div class="passage" lang="he" dir="rtl">';
     q.passage.lines.forEach(function(ln,i){
-      h+='<span class="s" data-a="sayline" data-say="'+esc(ln)+'">'+esc(ln)+"</span> ";
+      h+='<span class="s" role="button" tabindex="0" data-a="sayline" data-say="'+esc(ln)+'">'+esc(ln)+"</span> ";
     });
     h+="</div>";
     if(q.passage.words.length){
@@ -2811,12 +3060,12 @@ function screenPractice(){
     h+=(state.level<3&&q.lead?'<p class="qtext">'+esc(q.lead)+"</p>":"")+
        '<p class="qhint">'+esc(t("tapOrder"))+"</p>";
     h+='<div class="slot'+(P.done?(P.ok?" ok":" bad"):"")+'" id="slot">';
-    P.slot.forEach(function(w,i){h+='<button class="tile" data-a="unslot" data-i="'+i+'">'+esc(w)+"</button>"});
+    P.slot.forEach(function(w,i){h+='<button class="tile" lang="he" dir="rtl" data-a="unslot" data-i="'+i+'">'+esc(w)+"</button>"});
     h+="</div>";
     h+='<div class="tiles">';
     q.tiles.forEach(function(w,i){
       if(P.used.indexOf(i)>=0)return;
-      h+='<button class="tile" data-a="slot" data-i="'+i+'">'+esc(w)+"</button>";
+      h+='<button class="tile" lang="he" dir="rtl" data-a="slot" data-i="'+i+'">'+esc(w)+"</button>";
     });
     h+="</div>";
     h+='<div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap">'+
@@ -2846,10 +3095,10 @@ function screenPractice(){
   if(P.done){
     var it=q.reveal||q.subject||q.hidden;
     h+='<div class="fb '+(P.ok?"ok":"bad")+'"><b>'+(P.ok?esc(t("correct")):esc(t("wrong")))+"</b>";
-    if(!P.ok)h+='<div class="body">'+esc(t("answerIs"))+' <span class="lrn-b"><b>'+esc(q.answer)+"</b></span></div>";
-    if(it&&it.k==="w"&&it.g)h+='<div class="why"><span class="lrn-b"><b>'+esc(it.w)+"</b></span>"+
+    if(!P.ok)h+='<div class="body">'+esc(t("answerIs"))+' <b>'+lrn(q.answer)+"</b></div>";
+    if(it&&it.k==="w"&&it.g)h+='<div class="why"><b>'+lrn(it.w)+"</b>"+
       (it.ipa?' <span class="tr-b">'+esc(it.ipa)+"</span>":"")+" — "+esc(gl(it.g))+"</div>";
-    if(it&&it.k==="s")h+='<div class="why"><span class="lrn-b">'+esc(it.s)+"</span><br>"+esc(gl(it.g))+
+    if(it&&it.k==="s")h+='<div class="why">'+lrn(it.s)+"<br>"+esc(gl(it.g))+
       (it.u?"<br><b>"+esc(gl(it.u))+"</b>":"")+"</div>";
     if(!P.ok&&P.picked>=0&&q.opts&&q.opts[P.picked]&&q.opts[P.picked].why)
       h+='<div class="why">'+esc(q.opts[P.picked].why)+"</div>";
@@ -2861,6 +3110,56 @@ function screenPractice(){
   } else if(q.type!=="order"){
     h+='<div style="margin-top:.9rem"><button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button></div>";
   }
+  h+="</div></div></div>"+fbar();
+  return h;
+}
+
+/* ---------- סיכום סבב ----------
+   עשר שאלות הן סבב. עד עכשיו התרגול כאן לא נגמר אף פעם: שאלה אחרי
+   שאלה, בלי רגע שבו רואים מה יצא ובלי סיבה לחזור מחר. הסיכום מועתק
+   ברוחו מ-math-teen (viewSummary): מה נכון לבד, מה עם רמז, מה לא,
+   ומה לעשות עכשיו — עוד סבב, רמה אחת למעלה או למטה. אין כאן שעון
+   ואין דירוג; המשפט הפותח מרגיע גם בסבב קשה. */
+function sumStats(){
+  var r=P.rres,n=r.length,ok=0,hp=0,i;
+  for(i=0;i<n;i++){if(r[i]==="ok")ok++;else if(r[i]==="hp")hp++}
+  return {n:n,ok:ok,hp:hp,no:n-ok-hp,pct:Math.round(100*(ok+hp)/Math.max(1,n))};
+}
+function sumTier(){var p=sumStats().pct;return p>=85?1:p>=60?2:p>=35?3:4}
+function sumFmt(s,m){return String(s).replace(/\{(\w+)\}/g,function(_,k){return m[k]!==undefined?String(m[k]):"{"+k+"}"})}
+function screenSum(){
+  var tp=topicOf(state.topic); if(!tp){state.screen="home";return screenHome()}
+  var tr=trackOf(tp.trk), s=sumStats(), tier=sumTier(), lv=state.level;
+  var h='<div class="wrap"><div class="trk '+tr.cls+'">';
+  h+='<div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin:1rem 0 .6rem">'+
+     '<span class="tdot"></span><h2 style="font-size:1.2rem">'+esc(tName(tp))+"</h2>"+
+     '<span class="tpill">'+esc(t(tr.nk))+"</span></div>";
+  h+='<div class="card qcard">';
+  h+='<div class="qtop"><span class="chip">'+s.n+" "+esc(t("ofN"))+" "+ROUND+"</span>"+
+     '<span class="chip">'+esc(t("lv"+lv))+"</span>"+
+     (state.streak>1?'<span class="chip ok" style="margin-inline-start:auto">'+
+       esc(sumFmt(t("sumStreak"),{n:state.streak}))+"</span>":"")+"</div>";
+  h+='<h2 class="qtext" style="font-size:1.35rem;margin-top:.6rem">'+esc(t("sumT"+tier))+"</h2>"+
+     '<p class="qhint" style="font-size:.98rem">'+esc(t("sumS"+tier))+"</p>";
+  var tiles=[[s.ok,t("sumOk"),"var(--ok)"]];
+  /* רמז קיים רק במפנה ובלומדה; באולפן ובניב אין מה למנות */
+  if("hint" in P)tiles.push([s.hp,t("sumHp"),"var(--warn)"]);
+  tiles.push([s.no,t("sumNo"),"var(--bad)"],[s.pct+"%",t("sumAcc"),"var(--c,var(--accent))"]);
+  h+='<div style="display:grid;grid-template-columns:repeat('+(tiles.length>3?2:3)+',1fr);gap:.6rem;margin:.9rem 0">';
+  tiles.forEach(function(p){
+    h+='<div style="background:var(--surface2);border-radius:12px;padding:.7rem .5rem;text-align:center;border-top:3px solid '+p[2]+'">'+
+       '<div style="font-size:1.7rem;font-weight:800">'+esc(String(p[0]))+"</div>"+
+       '<div style="color:var(--muted);font-size:.88rem">'+esc(p[1])+"</div></div>";
+  });
+  h+="</div>";
+  var msg=sumFmt(t("sumShareTxt"),{app:t("app"),topic:tName(tp),lv:t("lv"+lv),ok:s.ok+s.hp,n:s.n})+
+          "\n"+location.origin+location.pathname;
+  h+='<div style="display:flex;gap:.5rem;flex-wrap:wrap">'+
+     '<button class="btn pri" data-a="again">'+ic("redo",16)+" "+esc(t("sumAgain"))+"</button>"+
+     (tier<=2&&lv<3?'<button class="btn" data-a="sumlvl" data-v="'+(lv+1)+'">'+esc(t("sumUp"))+" "+ic("arrow",16)+"</button>":"")+
+     (tier===4&&lv>1?'<button class="btn" data-a="sumlvl" data-v="'+(lv-1)+'">'+esc(t("sumDown"))+"</button>":"")+
+     '<a class="btn" style="text-decoration:none" href="'+esc(waLink(msg,""))+'" target="_blank" rel="noopener">'+ic("share",16)+" "+esc(t("sumShare"))+"</a>"+
+     '<button class="btn ghost" data-a="home">'+ic("home",16)+" "+esc(t("navHome"))+"</button></div>";
   h+="</div></div></div>"+fbar();
   return h;
 }
@@ -3052,7 +3351,7 @@ function render(){ try{lgChrome()}catch(e){}
   }
   var body=state.screen==="prog"?screenProg():
            state.screen==="set" ?screenSet():
-           state.screen==="prac"?screenPractice():screenHome();
+           state.screen==="prac"?(P.sum?screenSum():screenPractice()):screenHome();
   $("#app").innerHTML=hdr()+body;
 }
 
@@ -3082,7 +3381,8 @@ function lvlSync(){LVL[0]=t("lv1");LVL[1]=t("lv2");LVL[2]=t("lv3")}
 var LVL_C=["var(--c-sound)","var(--c-words)","var(--c-talk)"];
 
 function buildQ(tid,lv){
-  var q=buildQuestion(tid,lv,undefined); if(!q)return null;
+  /* pure=true — המבחן אינו מביט בהתקדמות הלומד. ראו pureIndex. */
+  var q=buildQuestion(tid,lv,undefined,true); if(!q)return null;
   var tp=topicOf(tid);
   /* תרגיל סידור המשפט נבנה מאריחים ואין לו אפשרויות בחירה. במבחן
      הכיתתי יש רק בחירה מרובה, ולכן שאלה כזאת הגיעה לתלמיד בלי שום
@@ -3114,19 +3414,9 @@ function buildQ(tid,lv){
   /* "p" הוא סוג הפריט בבנק, לא סוג השאלה. השאלה שנבנית מקטע קריאה
      חוזרת כ-"comp", ולכן הקטע לא צורף מעולם — ובלי הקטע אין על מה
      לענות. */
-  /* תרגיל ההשלמה נושא את המשפט עם ה-_____ ב-gapHtml, ומסך התרגול
-     מצייר אותו; המבחן הכיתתי מעולם לא צירף אותו, ובלי המשפט אין
-     על מה לענות. כמו הקטע של הבנת הנקרא, גם זה נכנס ל-expr.
-
-     **כאן זו כרגע שורה ריקה, בכוונה.** נמדד ב-1,080 הגרלות
-     (12 נושאים × 3 רמות × 30) שהבנק של אולפן מייצר mean, hear,
-     back, use, order ו-comp — ואף לא gap אחת. השורה נכתבת מפני
-     ש-`formGap` קיימת בקובץ הזה, ומפני שהקובץ הזה נולד מהעתקה
-     של ניב: תיקון שיושב רק בעותק אחד חוזר כבאג בעותק הבא. */
-  if(q.type==="gap"&&q.gapHtml) expr=q.gapHtml;
   if(q.type==="comp"&&q.passage){
     var lines=(q.passage.lines||[]);
-    expr='<div class="passage">'+lines.map(function(l){
+    expr='<div class="passage" lang="he" dir="rtl">'+lines.map(function(l){
       return '<div class="s">'+esc(l)+"</div>"}).join("")+"</div>";
   }
   return {topic:tid, topicName:tp?tName(tp):"", ask:ask, expr:expr, fig:"",
@@ -3158,7 +3448,7 @@ function buildQ(tid,lv){
    · שמות התלמידים נשארים במכשיר של המורה. הם לא עוברים דרך
      שום שרת, כי אין שרת.
    ============================================================ */
-var GENV=3;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
+var GENV=4;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
 var EKEY="shlav-exams-ulpan-v1";   /* מפתח לאפליקציה הזאת בלבד */
@@ -3304,8 +3594,15 @@ function examUrl(spec){
   var base=location.origin+location.pathname;
   return base+"#x="+encodeExam(spec);
 }
+/* wa.me מקבל רק מספר בינלאומי בלי אפס מוביל. מורה שהקליד 050-8554380
+   כמו שמקלידים בטלפון קיבל אצל התלמיד "לא ניתן לבדוק את מספר הטלפון…
+   חסרה קידומת חיוג", והתשובות לא נשלחו. אפס מוביל הוא מספר ישראלי
+   מקומי ומקבל 972; "00" בהתחלה הוא קידומת בינלאומית ונופל; מספר
+   שכבר מתחיל בקידומת מדינה נשאר כפי שהוא. */
 function waLink(text,phone){
   var p=String(phone||"").replace(/[^0-9]/g,"");
+  if(p.indexOf("00")===0)p=p.slice(2);
+  else if(p.charAt(0)==="0")p="972"+p.slice(1);
   return "https://wa.me/"+p+"?text="+encodeURIComponent(text);
 }
 
@@ -3391,10 +3688,10 @@ var EB={title:"",n:10,level:2,topics:[],phone:"",tts:true,formulas:true,built:nu
    כמו שהוא, וכל אחת מהן מתרגמת בדרך אחרת. כך ההעתקה נשארת
    העתקה, ותלמיד שלומד בערבית או ברוסית לא מקבל מבחן בעברית.
    ------------------------------------------------------------ */
-var XK={"exam":"מבחן","student":"תלמיד","qs":"שאלות","minutes":"דקות","none":"ללא","outOf":"מתוך","exTitle":"מבחן כיתתי","exLead":"בונים מבחן, שולחים קישור בוואטסאפ, ומקבלים בחזרה קוד תשובות לכל תלמיד. אין שרת ואין חשבון — הכול עובר דרך הקישור ודרך וואטסאפ.","exName":"שם המבחן","exNamePh":"למשל: מבחן אלגברה — כיתה ט׳2","exUnits":"יחידות","exUnitSuf":"יח״ל","exLevel":"רמה","exCount":"מספר שאלות","exTime":"הגבלת זמן","exTimeNote":"אפס פירושו בלי טיימר. בתום הזמן המבחן מוגש מעצמו.","exTopics":"נושאים","exTopicsNote":"השאלות מתחלקות שווה בשווה בין הנושאים שנבחרו.","exAcc":"התאמות לנבחנים","exAccNote":"מה שמותר בבחינה עצמה. ההקראה ודף הנוסחאות אינם רמז — הם כלי נגישות.","exTts":"הקראה קולית","exTtsSub":"כל שאלה נקראת בקול לפי בקשה","exForm":"דף נוסחאות","exFormSub":"נגיש מתוך המבחן, כמו בבגרות","exPhone":"מספר הוואטסאפ שלכם (לא חובה)","exPhoneNote":"אם תמלאו — כפתור השליחה אצל התלמיד ייפתח ישר לצ׳אט איתכם. שימו לב: המספר יופיע בתוך הקישור שאתם משתפים.","exBuild":"צרו את המבחן","exShareMsg":"{0} שאלות. נכנסים לקישור, פותרים, ובסוף שולחים לי את הקוד.","exReady":"המבחן מוכן","exWa":"שליחה בוואטסאפ","exCopyUrl":"העתקת הקישור","exToMarks":"לציונים","exUrlCopied":"הקישור הועתק","mkTitle":"ציונים","mkLead":"מדביקים כאן את הקוד שהתלמיד שלח בוואטסאפ. הציון מחושב מחדש מהתשובות עצמן, ולא נלקח ממה שהתלמיד כתב.","mkNew":"מבחן חדש","mkEmpty":"עוד לא יצרתם מבחן. אפשר להתחיל מ״מבחן חדש״.","mkSubs":"הגשות","mkAvg":"ממוצע","mkPaste":"הדבקת קוד תשובות","mkPastePh":"מדביקים כאן את הקוד מהוואטסאפ","mkTake":"קליטה","mkResend":"שליחה שוב","mkCopyTbl":"העתקת טבלה","mkDelQ":"למחוק את המבחן ואת {0} ההגשות?","mkDelYes":"כן, למחוק","mkCancel":"ביטול","mkDel":"מחיקת המבחן","mkByStudent":"לפי תלמיד","mkNoName":"ללא שם","mkFell":"נפל ב:","mkAllOk":"הכול נכון","mkBadCode":"הקוד לא תואם לעצמו","mkByTopic":"לפי נושא — מה כדאי ללמד שוב","mkByTopicNote":"אחוז ההצלחה של כל הכיתה יחד.","mkRight":"תשובות נכונות מתוך","mkTblHead":"תלמיד\tציון\tנכונות\tנפל ב","mkTblCopied":"הטבלה הועתקה","mkErrRead":"לא הצלחנו לקרוא את הקוד. נסו להעתיק אותו שוב, במלואו.","mkErrOther":"הקוד הזה שייך למבחן „{0}”.","mkErrUnknown":"הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה.","mkErrCount":"מספר התשובות בקוד אינו תואם למבחן.","mkTaken":"נקלט","mkNoteBad":"שימו לב: הקוד לא תואם לעצמו","stNoTime":"בלי הגבלת זמן.","stTimed":"יש הגבלת זמן: {0} דקות. בסופן המבחן מוגש מעצמו.","stNoTimer":"אין טיימר. אפשר לקחת את הזמן.","stNoNeg":"אין ניקוד שלילי — תשובה לא נכונה לא גורעת.","stReadOn":"אפשר לבקש הקראה של כל שאלה.","stReadOff":"ההקראה כבויה במבחן הזה.","stFormOn":"דף הנוסחאות פתוח לאורך כל המבחן.","stFormOff":"דף הנוסחאות סגור במבחן הזה.","stCodeEnd":"בסוף תקבלו קוד — שולחים אותו למורה בוואטסאפ.","stYourName":"השם שלכם","stNameNote":"כדי שהמורה יידע מי ענה. השם לא נשלח לשום שרת — הוא נכנס לתוך הקוד.","stNamePh":"שם פרטי ושם משפחה","stStart":"מתחילים","stQn":"שאלה {0} מתוך {1}","stRead":"הקראה","stFormulas":"דף נוסחאות","stPrev":"קודמת","stDunno":"לא יודע/ת","stFlagged":"✓ מסומנת לחזרה","stFlag":"לחזור אליה","stNext":"הבאה","stReview":"לפני ההגשה","stReviewNote":"אפשר לחזור לכל שאלה ולשנות. אחרי ההגשה נוצר הקוד.","stUnanswered":"{0} שאלות בלי תשובה","stAllAnswered":"כל השאלות נענו","stPicked":"סימנתם:","stNotYet":"עוד לא עניתם","stChange":"שינוי","stFill":"למלא","stDone":"סיימתי — ליצירת הקוד","stFinished":"סיימתם","stScoreLine":"{0} נכונות מתוך {1}","stSendNow":"עכשיו שולחים את הקוד למורה.","stSendNote":"הקוד מכיל את השם ואת התשובות שסימנתם — המורה מחשב את הציון אצלו מחדש.","stToTeacher":"למורה","stCopyCode":"העתקת הקוד","stCodeCopied":"הקוד הועתק","stWhatRight":"מה היה נכון","stWhatRightNote":"בשביל ללמוד מזה, לא בשביל הציון.","stOk":"נכון","stCorrect":"התשובה הנכונה:","stToApp":"לאפליקציה עצמה — לתרגול חופשי","stGrade":"ציון:","stCode":"קוד:","badLink":"המבחן לא נפתח","toApp":"לאפליקציה","exOld":"המבחן הזה נוצר בגרסה קודמת של האפליקציה, ולכן השאלות בו כבר לא זהות. בקשו מהמורה לשלוח מבחן חדש.","exBroken":"אולי המבחן שייך לאפליקציה אחרת, ואולי הקישור נקטע בדרך. בקשו מהמורה לשלוח את הקישור שוב, ופתחו אותו ישר מההודעה.","stBackTo":"חזרה למבחן — שאלה {0} מתוך {1}","mkCsv":"הורדת CSV","mkCsvName":"שם","mkCsvPct":"ציון","mkCsvOk":"נכונות","mkCsvTotal":"שאלות","mkCsvDate":"תאריך","mkCsvValid":"קוד תקין","mkCsvQ":"שאלה {0}","mkCsvYes":"כן","mkCsvNo":"לא","mkCsvDone":"הקובץ ירד","teTitle":"קוד מורה","teSet":"בחירת קוד מורה","teEnter":"מסכי המורה נעולים. הקלידו את הקוד כדי לפתוח אותם.","teLead":"בונה המבחן ומסך הציונים ייעלמו מהתפריט, וייפתחו רק עם הקוד הזה.","teWarn":"זו אינה אבטחה. היא עוצרת יד סקרנית, לא מישהו שמבין במחשבים.","tePin":"קוד — 4 עד 8 ספרות","teAgain":"שוב, לוודא","teRemember":"לזכור במכשיר הזה","teRememberNote":"בלי זה הקוד יידרש שוב בכל פתיחה של האפליקציה. על טאבלט כיתתי — עדיף בלי.","teOk":"אישור","teCancel":"ביטול","teBad":"הקוד שגוי.","teMismatch":"שני הקודים אינם זהים.","teShort":"צריך בין 4 ל-8 ספרות, בלי אותיות.","teWaitN":"יותר מדי ניסיונות. נסו שוב בעוד {0} שניות.","teForgot":"שכחתי את הקוד","teForgotHow":"אין דרך לשחזר קוד — הוא לא נשמר בשום מקום. מחיקת נתוני האתר בדפדפן מסירה אותו, ואיתם גם ההתקדמות והמבחנים.","teHideT":"להסתיר את מסכי המורה","teHideNote":"על מכשיר שהילד משתמש בו, בונה המבחן ומסך הציונים יכולים לשבת מאחורי קוד. לפתיחה מאוחר יותר: להוסיף ?teacher=1 לכתובת.","teHideBtn":"בחירת קוד","teOpenNow":"מצב מורה פתוח","teLockBtn":"יציאה ממצב מורה","teChangeBtn":"שינוי הקוד","teRemoveBtn":"ביטול הקוד","teLocked":"מסכי המורה נעולים במכשיר הזה.","teUnlock":"פתיחה"};
-var XT={ar:{"exam":"امتحان","student":"طالب","qs":"أسئلة","minutes":"دقيقة","none":"بلا","outOf":"من أصل","exTitle":"امتحان صفّي","exLead":"تُعِدّ الامتحان، ترسل رابطًا في واتساب، وتستلم من كلّ طالب رمز إجابات. لا خادم ولا حساب — كلّ شيء يمرّ عبر الرابط وواتساب.","exName":"اسم الامتحان","exNamePh":"مثلًا: امتحان جبر — الصف التاسع/2","exUnits":"وحدات","exUnitSuf":"وحدات","exLevel":"المستوى","exCount":"عدد الأسئلة","exTime":"تحديد الوقت","exTimeNote":"صفر يعني بلا مؤقّت. عند انتهاء الوقت يُسلَّم الامتحان تلقائيًا.","exTopics":"المواضيع","exTopicsNote":"تُوزَّع الأسئلة بالتساوي بين المواضيع المختارة.","exAcc":"تسهيلات للممتحَنين","exAccNote":"ما هو مسموح في الامتحان نفسه. القراءة الصوتية وورقة القوانين ليستا تلميحًا — بل وسيلتا إتاحة.","exTts":"قراءة صوتية","exTtsSub":"كل سؤال يُقرأ بصوت عند الطلب","exForm":"ورقة قوانين","exFormSub":"متاحة داخل الامتحان، كما في البجروت","exPhone":"رقم واتساب الخاص بك (اختياري)","exPhoneNote":"إذا عبّأته — يفتح زرّ الإرسال عند الطالب محادثة معك مباشرة. انتبه: الرقم يظهر داخل الرابط الذي تشاركه.","exBuild":"أنشئ الامتحان","exShareMsg":"{0} أسئلة. ادخل إلى الرابط، حُلّ، وفي النهاية أرسل لي الرمز.","exReady":"الامتحان جاهز","exWa":"إرسال في واتساب","exCopyUrl":"نسخ الرابط","exToMarks":"إلى العلامات","exUrlCopied":"نُسخ الرابط","mkTitle":"العلامات","mkLead":"الصق هنا الرمز الذي أرسله الطالب في واتساب. تُحتسب العلامة من جديد من الإجابات نفسها، لا مما كتبه الطالب.","mkNew":"امتحان جديد","mkEmpty":"لم تُنشئ امتحانًا بعد. ابدأ من «امتحان جديد».","mkSubs":"تسليمات","mkAvg":"المعدّل","mkPaste":"لصق رمز الإجابات","mkPastePh":"الصق هنا الرمز من واتساب","mkTake":"استلام","mkResend":"إرسال مرّة أخرى","mkCopyTbl":"نسخ الجدول","mkDelQ":"حذف الامتحان و{0} من التسليمات؟","mkDelYes":"نعم، احذف","mkCancel":"إلغاء","mkDel":"حذف الامتحان","mkByStudent":"حسب الطالب","mkNoName":"بلا اسم","mkFell":"أخفق في:","mkAllOk":"كل الإجابات صحيحة","mkBadCode":"الرمز غير متطابق مع نفسه","mkByTopic":"حسب الموضوع — ما يستحقّ إعادة التدريس","mkByTopicNote":"نسبة نجاح الصفّ كلّه معًا.","mkRight":"إجابات صحيحة من أصل","mkTblHead":"الطالب\tالعلامة\tالصحيحة\tأخفق في","mkTblCopied":"نُسخ الجدول","mkErrRead":"تعذّرت قراءة الرمز. حاول نسخه من جديد، كاملًا.","mkErrOther":"هذا الرمز يعود لامتحان «{0}».","mkErrUnknown":"هذا الرمز يعود لامتحان آخر غير موجود على هذا الجهاز.","mkErrCount":"عدد الإجابات في الرمز لا يطابق الامتحان.","mkTaken":"استُلم","mkNoteBad":"انتبه: الرمز غير متطابق مع نفسه","stNoTime":"بلا تحديد وقت.","stTimed":"هناك تحديد للوقت: {0} دقيقة. عند انتهائها يُسلَّم الامتحان تلقائيًا.","stNoTimer":"لا مؤقّت. خذ وقتك.","stNoNeg":"لا علامات سالبة — الإجابة الخاطئة لا تخصم.","stReadOn":"يمكنك طلب قراءة أي سؤال بصوت.","stReadOff":"القراءة الصوتية مغلقة في هذا الامتحان.","stFormOn":"ورقة القوانين مفتوحة طوال الامتحان.","stFormOff":"ورقة القوانين مغلقة في هذا الامتحان.","stCodeEnd":"في النهاية تحصل على رمز — أرسله للمعلّم في واتساب.","stYourName":"اسمك","stNameNote":"كي يعرف المعلّم من أجاب. الاسم لا يُرسل إلى أي خادم — يدخل داخل الرمز.","stNamePh":"الاسم الشخصي واسم العائلة","stStart":"لنبدأ","stQn":"سؤال {0} من أصل {1}","stRead":"قراءة","stFormulas":"ورقة قوانين","stPrev":"السابق","stDunno":"لا أعرف","stFlagged":"✓ مُعلَّم للعودة","stFlag":"للعودة إليه","stNext":"التالي","stReview":"قبل التسليم","stReviewNote":"يمكنك العودة إلى أي سؤال وتغييره. بعد التسليم يُنشأ الرمز.","stUnanswered":"{0} أسئلة بلا إجابة","stAllAnswered":"أُجيبت كل الأسئلة","stPicked":"اخترت:","stNotYet":"لم تُجب بعد","stChange":"تغيير","stFill":"للتعبئة","stDone":"أنهيت — أنشئ الرمز","stFinished":"أنهيت","stScoreLine":"{0} صحيحة من أصل {1}","stSendNow":"الآن أرسل الرمز إلى المعلّم.","stSendNote":"الرمز يحوي الاسم والإجابات التي اخترتها — والمعلّم يحتسب العلامة عنده من جديد.","stToTeacher":"إلى المعلّم","stCopyCode":"نسخ الرمز","stCodeCopied":"نُسخ الرمز","stWhatRight":"ما كان صحيحًا","stWhatRightNote":"للتعلّم منه، لا من أجل العلامة.","stOk":"صحيح","stCorrect":"الإجابة الصحيحة:","stToApp":"إلى التطبيق نفسه — للتدرّب الحرّ","stGrade":"العلامة:","stCode":"الرمز:","badLink":"تعذّر فتح الامتحان","toApp":"إلى التطبيق","exOld":"أُنشئ هذا الامتحان بنسخة سابقة من التطبيق، ولذلك لم تعد أسئلته مطابقة. اطلب من المعلّم إرسال امتحان جديد.","exBroken":"ربما يعود الامتحان إلى تطبيق آخر، وربما انقطع الرابط في الطريق. اطلب من المعلّم إرسال الرابط من جديد، وافتحه مباشرة من الرسالة.","stBackTo":"العودة إلى الامتحان — سؤال {0} من أصل {1}","mkCsv":"تنزيل CSV","mkCsvName":"الاسم","mkCsvPct":"العلامة","mkCsvOk":"الصحيحة","mkCsvTotal":"الأسئلة","mkCsvDate":"التاريخ","mkCsvValid":"الرمز سليم","mkCsvQ":"سؤال {0}","mkCsvYes":"نعم","mkCsvNo":"لا","mkCsvDone":"نُزّل الملف","teTitle":"رمز المعلّم","teSet":"اختيار رمز المعلّم","teEnter":"شاشات المعلّم مقفلة. أدخلوا الرمز لفتحها.","teLead":"سيختفي بانِي الامتحان وشاشة العلامات من القائمة، ولن يُفتحا إلّا بهذا الرمز.","teWarn":"هذه ليست حماية. إنّها توقف يدًا فضولية، لا شخصًا يفهم في الحواسيب.","tePin":"الرمز — من ٤ إلى ٨ أرقام","teAgain":"مرّة أخرى، للتأكيد","teRemember":"التذكّر في هذا الجهاز","teRememberNote":"بدون ذلك سيُطلب الرمز في كلّ فتح للتطبيق. على لوح صفّيّ — الأفضل بدونه.","teOk":"تأكيد","teCancel":"إلغاء","teBad":"الرمز غير صحيح.","teMismatch":"الرمزان غير متطابقين.","teShort":"يلزم بين ٤ و‑٨ أرقام، بلا حروف.","teWaitN":"محاولات كثيرة. حاولوا مجدّدًا بعد {0} ثانية.","teForgot":"نسيت الرمز","teForgotHow":"لا توجد طريقة لاستعادة الرمز — فهو غير محفوظ في أيّ مكان. مسح بيانات الموقع من المتصفّح يزيله، ومعه التقدّم والامتحانات.","teHideT":"إخفاء شاشات المعلّم","teHideNote":"على جهاز يستخدمه الطفل، يمكن وضع بانِي الامتحان وشاشة العلامات خلف رمز. للفتح لاحقًا: أضيفوا ?teacher=1 إلى العنوان.","teHideBtn":"اختيار رمز","teOpenNow":"وضع المعلّم مفتوح","teLockBtn":"الخروج من وضع المعلّم","teChangeBtn":"تغيير الرمز","teRemoveBtn":"إلغاء الرمز","teLocked":"شاشات المعلّم مقفلة في هذا الجهاز.","teUnlock":"فتح"},
- ru:{"exam":"Экзамен","student":"Ученик","qs":"вопросов","minutes":"минут","none":"нет","outOf":"из","exTitle":"Классный экзамен","exLead":"Составьте экзамен, отправьте ссылку в WhatsApp и получите обратно код ответов от каждого ученика. Ни сервера, ни аккаунта — всё идёт через ссылку и WhatsApp.","exName":"Название экзамена","exNamePh":"например: экзамен по алгебре — 9-й класс, группа 2","exUnits":"Уровень программы","exUnitSuf":"ед.","exLevel":"Сложность","exCount":"Число вопросов","exTime":"Ограничение времени","exTimeNote":"Ноль означает без таймера. По истечении времени экзамен сдаётся сам.","exTopics":"Темы","exTopicsNote":"Вопросы делятся поровну между выбранными темами.","exAcc":"Условия для сдающих","exAccNote":"Что разрешено на самом экзамене. Озвучивание и лист формул — не подсказка, а средство доступности.","exTts":"Озвучивание","exTtsSub":"Каждый вопрос читается вслух по запросу","exForm":"Лист формул","exFormSub":"Доступен во время экзамена, как на настоящем","exPhone":"Ваш номер WhatsApp (необязательно)","exPhoneNote":"Если заполните — кнопка отправки у ученика откроет чат прямо с вами. Учтите: номер виден внутри ссылки, которой вы делитесь.","exBuild":"Создать экзамен","exShareMsg":"{0} вопросов. Откройте ссылку, решите, а в конце пришлите мне код.","exReady":"Экзамен готов","exWa":"Отправить в WhatsApp","exCopyUrl":"Скопировать ссылку","exToMarks":"К оценкам","exUrlCopied":"Ссылка скопирована","mkTitle":"Оценки","mkLead":"Вставьте сюда код, который ученик прислал в WhatsApp. Оценка считается заново по самим ответам, а не берётся из того, что написал ученик.","mkNew":"Новый экзамен","mkEmpty":"Вы ещё не создали экзамен. Начните с «Новый экзамен».","mkSubs":"сдач","mkAvg":"среднее","mkPaste":"Вставка кода ответов","mkPastePh":"Вставьте сюда код из WhatsApp","mkTake":"Принять","mkResend":"Отправить снова","mkCopyTbl":"Скопировать таблицу","mkDelQ":"Удалить экзамен и {0} сдач?","mkDelYes":"Да, удалить","mkCancel":"Отмена","mkDel":"Удалить экзамен","mkByStudent":"По ученикам","mkNoName":"Без имени","mkFell":"ошибся в:","mkAllOk":"всё верно","mkBadCode":"код не сходится сам с собой","mkByTopic":"По темам — что стоит объяснить заново","mkByTopicNote":"Доля верных ответов по всему классу.","mkRight":"верных ответов из","mkTblHead":"Ученик\tОценка\tВерно\tОшибся в","mkTblCopied":"Таблица скопирована","mkErrRead":"Не удалось прочитать код. Попробуйте скопировать его заново, целиком.","mkErrOther":"Этот код относится к экзамену «{0}».","mkErrUnknown":"Этот код относится к другому экзамену, которого нет на этом устройстве.","mkErrCount":"Число ответов в коде не совпадает с экзаменом.","mkTaken":"принят","mkNoteBad":"Внимание: код не сходится сам с собой","stNoTime":"без ограничения времени.","stTimed":"Есть ограничение: {0} минут. По их истечении экзамен сдаётся сам.","stNoTimer":"Таймера нет. Можно не спешить.","stNoNeg":"Штрафа за ошибку нет — неверный ответ ничего не отнимает.","stReadOn":"Любой вопрос можно попросить прочитать вслух.","stReadOff":"Озвучивание в этом экзамене отключено.","stFormOn":"Лист формул открыт весь экзамен.","stFormOff":"Лист формул в этом экзамене закрыт.","stCodeEnd":"В конце вы получите код — отправьте его учителю в WhatsApp.","stYourName":"Ваше имя","stNameNote":"Чтобы учитель знал, кто отвечал. Имя не уходит ни на какой сервер — оно входит внутрь кода.","stNamePh":"Имя и фамилия","stStart":"Начинаем","stQn":"Вопрос {0} из {1}","stRead":"Прочитать","stFormulas":"Лист формул","stPrev":"Предыдущий","stDunno":"Не знаю","stFlagged":"✓ отмечен для возврата","stFlag":"Вернуться к нему","stNext":"Следующий","stReview":"Перед сдачей","stReviewNote":"Можно вернуться к любому вопросу и изменить ответ. После сдачи создаётся код.","stUnanswered":"{0} вопросов без ответа","stAllAnswered":"Отвечены все вопросы","stPicked":"Вы выбрали:","stNotYet":"Ещё не отвечено","stChange":"Изменить","stFill":"Заполнить","stDone":"Готово — создать код","stFinished":"Готово","stScoreLine":"{0} верных из {1}","stSendNow":"Теперь отправьте код учителю.","stSendNote":"Код содержит имя и выбранные вами ответы — учитель пересчитывает оценку у себя.","stToTeacher":"учителю","stCopyCode":"Скопировать код","stCodeCopied":"Код скопирован","stWhatRight":"Как было правильно","stWhatRightNote":"Чтобы научиться, а не ради оценки.","stOk":"верно","stCorrect":"Правильный ответ:","stToApp":"К самому приложению — свободная практика","stGrade":"Оценка:","stCode":"Код:","badLink":"Экзамен не открылся","toApp":"К приложению","exOld":"Этот экзамен создан в прежней версии приложения, и вопросы в нём уже не те же самые. Попросите учителя прислать новый.","exBroken":"Возможно, экзамен относится к другому приложению, а возможно, ссылка оборвалась по пути. Попросите учителя прислать ссылку ещё раз и откройте её прямо из сообщения.","stBackTo":"Назад к экзамену — вопрос {0} из {1}","mkCsv":"Скачать CSV","mkCsvName":"Имя","mkCsvPct":"Оценка","mkCsvOk":"Верно","mkCsvTotal":"Вопросов","mkCsvDate":"Дата","mkCsvValid":"Код цел","mkCsvQ":"Вопрос {0}","mkCsvYes":"да","mkCsvNo":"нет","mkCsvDone":"Файл загружен","teTitle":"Код учителя","teSet":"Выбор кода учителя","teEnter":"Экраны учителя закрыты. Введите код, чтобы открыть их.","teLead":"Конструктор экзамена и экран оценок исчезнут из меню и будут открываться только по этому коду.","teWarn":"Это не защита. Она останавливает любопытную руку, а не того, кто разбирается в компьютерах.","tePin":"Код — от 4 до 8 цифр","teAgain":"Ещё раз, для проверки","teRemember":"Запомнить на этом устройстве","teRememberNote":"Без этого код будет запрашиваться при каждом открытии приложения. На классном планшете лучше без этого.","teOk":"Готово","teCancel":"Отмена","teBad":"Неверный код.","teMismatch":"Коды не совпадают.","teShort":"Нужно от 4 до 8 цифр, без букв.","teWaitN":"Слишком много попыток. Повторите через {0} с.","teForgot":"Я забыл код","teForgotHow":"Восстановить код нельзя — он нигде не хранится. Очистка данных сайта в браузере удалит его, а вместе с ним прогресс и экзамены.","teHideT":"Скрыть экраны учителя","teHideNote":"На устройстве, которым пользуется ребёнок, конструктор экзамена и экран оценок можно закрыть кодом. Чтобы открыть их потом, добавьте ?teacher=1 к адресу.","teHideBtn":"Выбрать код","teOpenNow":"Режим учителя открыт","teLockBtn":"Выйти из режима учителя","teChangeBtn":"Изменить код","teRemoveBtn":"Убрать код","teLocked":"Экраны учителя закрыты на этом устройстве.","teUnlock":"Открыть"},
- en:{"exam":"Exam","student":"Student","qs":"questions","minutes":"minutes","none":"none","outOf":"of","exTitle":"Class exam","exLead":"Build an exam, send the link on WhatsApp, and get an answer code back from every student. No server and no account — it all travels through the link and WhatsApp.","exName":"Exam name","exNamePh":"for example: Algebra exam — class 9/2","exUnits":"Units","exUnitSuf":"units","exLevel":"Level","exCount":"Number of questions","exTime":"Time limit","exTimeNote":"Zero means no timer. When the time is up the exam submits itself.","exTopics":"Topics","exTopicsNote":"The questions are split evenly between the topics you choose.","exAcc":"Access arrangements","exAccNote":"What is allowed during the exam itself. Read-aloud and the formula sheet are not a hint — they are access tools.","exTts":"Read aloud","exTtsSub":"Every question is read out on request","exForm":"Formula sheet","exFormSub":"Open during the exam, as in a state exam","exPhone":"Your WhatsApp number (optional)","exPhoneNote":"Fill it in and the student's send button opens a chat straight to you. Note: the number appears inside the link you share.","exBuild":"Create the exam","exShareMsg":"{0} questions. Open the link, answer, and send me the code at the end.","exReady":"The exam is ready","exWa":"Send on WhatsApp","exCopyUrl":"Copy the link","exToMarks":"To the marks","exUrlCopied":"Link copied","mkTitle":"Marks","mkLead":"Paste in the code the student sent you on WhatsApp. The mark is worked out again from the answers themselves, not taken from what the student wrote.","mkNew":"New exam","mkEmpty":"You have not created an exam yet. Start from “New exam”.","mkSubs":"submissions","mkAvg":"average","mkPaste":"Paste an answer code","mkPastePh":"Paste the code from WhatsApp here","mkTake":"Take it in","mkResend":"Send again","mkCopyTbl":"Copy the table","mkDelQ":"Delete the exam and its {0} submissions?","mkDelYes":"Yes, delete","mkCancel":"Cancel","mkDel":"Delete the exam","mkByStudent":"By student","mkNoName":"No name","mkFell":"tripped on:","mkAllOk":"all correct","mkBadCode":"the code does not match itself","mkByTopic":"By topic — what is worth teaching again","mkByTopicNote":"How the whole class did, together.","mkRight":"correct answers out of","mkTblHead":"Student\tMark\tCorrect\tTripped on","mkTblCopied":"Table copied","mkErrRead":"We could not read the code. Try copying it again, in full.","mkErrOther":"This code belongs to the exam “{0}”.","mkErrUnknown":"This code belongs to another exam, which is not on this device.","mkErrCount":"The number of answers in the code does not match the exam.","mkTaken":"taken in","mkNoteBad":"Note: the code does not match itself","stNoTime":"no time limit.","stTimed":"There is a time limit: {0} minutes. When it runs out the exam submits itself.","stNoTimer":"No timer. Take your time.","stNoNeg":"No negative marking — a wrong answer takes nothing away.","stReadOn":"You can ask for any question to be read aloud.","stReadOff":"Read-aloud is off in this exam.","stFormOn":"The formula sheet is open throughout the exam.","stFormOff":"The formula sheet is closed in this exam.","stCodeEnd":"At the end you get a code — send it to your teacher on WhatsApp.","stYourName":"Your name","stNameNote":"So the teacher knows who answered. The name is not sent to any server — it goes inside the code.","stNamePh":"First name and surname","stStart":"Let's start","stQn":"Question {0} of {1}","stRead":"Read aloud","stFormulas":"Formula sheet","stPrev":"Previous","stDunno":"I don't know","stFlagged":"✓ marked to come back","stFlag":"Come back to it","stNext":"Next","stReview":"Before you submit","stReviewNote":"You can go back to any question and change it. The code is created after you submit.","stUnanswered":"{0} questions with no answer","stAllAnswered":"Every question is answered","stPicked":"You chose:","stNotYet":"Not answered yet","stChange":"Change","stFill":"Fill in","stDone":"Finished — create the code","stFinished":"Finished","stScoreLine":"{0} correct out of {1}","stSendNow":"Now send the code to your teacher.","stSendNote":"The code holds your name and the answers you chose — the teacher works the mark out again at their end.","stToTeacher":"to the teacher","stCopyCode":"Copy the code","stCodeCopied":"Code copied","stWhatRight":"What the answers were","stWhatRightNote":"To learn from it, not for the mark.","stOk":"correct","stCorrect":"The correct answer:","stToApp":"To the app itself — free practice","stGrade":"Mark:","stCode":"Code:","badLink":"The exam did not open","toApp":"To the app","exOld":"This exam was made with an earlier version of the app, so its questions are no longer the same. Ask your teacher to send a new one.","exBroken":"The exam may belong to a different app, or the link may have been cut short. Ask your teacher to send the link again, and open it straight from the message.","stBackTo":"Back to the exam — question {0} of {1}","mkCsv":"Download CSV","mkCsvName":"Name","mkCsvPct":"Mark","mkCsvOk":"Correct","mkCsvTotal":"Questions","mkCsvDate":"Date","mkCsvValid":"Code intact","mkCsvQ":"Question {0}","mkCsvYes":"yes","mkCsvNo":"no","mkCsvDone":"The file downloaded","teTitle":"Teacher code","teSet":"Choose a teacher code","teEnter":"The teacher screens are locked. Enter the code to open them.","teLead":"The exam builder and the marks screen leave the menu, and open only with this code.","teWarn":"This is not security. It stops a curious hand, not somebody who knows computers.","tePin":"Code — 4 to 8 digits","teAgain":"Again, to be sure","teRemember":"Remember on this device","teRememberNote":"Without it the code is asked for every time the app opens. On a class tablet, better without.","teOk":"Confirm","teCancel":"Cancel","teBad":"That code is wrong.","teMismatch":"The two codes are not the same.","teShort":"It needs 4 to 8 digits, no letters.","teWaitN":"Too many tries. Try again in {0} seconds.","teForgot":"I forgot the code","teForgotHow":"There is no way to recover the code — it is not stored anywhere. Clearing the site data in the browser removes it, and the progress and exams with it.","teHideT":"Hide the teacher screens","teHideNote":"On a device a child uses, the exam builder and the marks screen can sit behind a code. To open them later, add ?teacher=1 to the address.","teHideBtn":"Choose a code","teOpenNow":"Teacher mode is open","teLockBtn":"Leave teacher mode","teChangeBtn":"Change the code","teRemoveBtn":"Remove the code","teLocked":"The teacher screens are locked on this device.","teUnlock":"Open"}};
+var XK={"exam":"מבחן","student":"תלמיד","qs":"שאלות","minutes":"דקות","none":"ללא","outOf":"מתוך","exTitle":"מבחן כיתתי","exLead":"בונים מבחן, שולחים קישור בוואטסאפ, ומקבלים בחזרה קוד תשובות לכל תלמיד. אין שרת ואין חשבון — הכול עובר דרך הקישור ודרך וואטסאפ.","exName":"שם המבחן","exNamePh":"למשל: מבחן אלגברה — כיתה ט׳2","exUnits":"יחידות","exUnitSuf":"יח״ל","exLevel":"רמה","exCount":"מספר שאלות","exTime":"הגבלת זמן","exTimeNote":"אפס פירושו בלי טיימר. בתום הזמן המבחן מוגש מעצמו.","exTopics":"נושאים","exTopicsNote":"השאלות מתחלקות שווה בשווה בין הנושאים שנבחרו.","exAcc":"התאמות לנבחנים","exAccNote":"מה שמותר בבחינה עצמה. ההקראה ודף הנוסחאות אינם רמז — הם כלי נגישות.","exTts":"הקראה קולית","exTtsSub":"כל שאלה נקראת בקול לפי בקשה","exForm":"דף נוסחאות","exFormSub":"נגיש מתוך המבחן, כמו בבגרות","exPhone":"מספר הוואטסאפ שלכם (לא חובה)","exPhoneNote":"אם תמלאו — כפתור השליחה אצל התלמיד ייפתח ישר לצ׳אט איתכם. שימו לב: המספר יופיע בתוך הקישור שאתם משתפים.","exBuild":"צרו את המבחן","exShareMsg":"{0} שאלות. נכנסים לקישור, פותרים, ובסוף שולחים לי את הקוד.","exReady":"המבחן מוכן","exWa":"שליחה בוואטסאפ","exCopyUrl":"העתקת הקישור","exToMarks":"לציונים","exUrlCopied":"הקישור הועתק","mkTitle":"ציונים","mkLead":"לוחצים על הקישור שהתלמיד שלח בוואטסאפ, או מדביקים כאן את הקוד. הציון מחושב מחדש מהתשובות עצמן, ולא נלקח ממה שהתלמיד כתב.","mkNew":"מבחן חדש","mkEmpty":"עוד לא יצרתם מבחן. אפשר להתחיל מ״מבחן חדש״.","mkSubs":"הגשות","mkAvg":"ממוצע","mkPaste":"הדבקת קוד תשובות","mkPastePh":"מדביקים כאן את הקוד מהוואטסאפ","mkTake":"קליטה","mkResend":"שליחה שוב","mkCopyTbl":"העתקת טבלה","mkDelQ":"למחוק את המבחן ואת {0} ההגשות?","mkDelYes":"כן, למחוק","mkCancel":"ביטול","mkDel":"מחיקת המבחן","mkByStudent":"לפי תלמיד","mkNoName":"ללא שם","mkFell":"נפל ב:","mkAllOk":"הכול נכון","mkBadCode":"הקוד לא תואם לעצמו","mkByTopic":"לפי נושא — מה כדאי ללמד שוב","mkByTopicNote":"אחוז ההצלחה של כל הכיתה יחד.","mkRight":"תשובות נכונות מתוך","mkTblHead":"תלמיד\tציון\tנכונות\tנפל ב","mkTblCopied":"הטבלה הועתקה","mkErrRead":"לא הצלחנו לקרוא את הקוד. נסו להעתיק אותו שוב, במלואו.","mkErrOther":"הקוד הזה שייך למבחן „{0}”.","mkErrUnknown":"הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה.","mkErrCount":"מספר התשובות בקוד אינו תואם למבחן.","mkTaken":"נקלט","mkNoteBad":"שימו לב: הקוד לא תואם לעצמו","stNoTime":"בלי הגבלת זמן.","stTimed":"יש הגבלת זמן: {0} דקות. בסופן המבחן מוגש מעצמו.","stNoTimer":"אין טיימר. אפשר לקחת את הזמן.","stNoNeg":"אין ניקוד שלילי — תשובה לא נכונה לא גורעת.","stReadOn":"אפשר לבקש הקראה של כל שאלה.","stReadOff":"ההקראה כבויה במבחן הזה.","stFormOn":"דף הנוסחאות פתוח לאורך כל המבחן.","stFormOff":"דף הנוסחאות סגור במבחן הזה.","stCodeEnd":"בסוף תקבלו קוד — שולחים אותו למורה בוואטסאפ.","stYourName":"השם שלכם","stNameNote":"כדי שהמורה יידע מי ענה. השם לא נשלח לשום שרת — הוא נכנס לתוך הקוד.","stNamePh":"שם פרטי ושם משפחה","stStart":"מתחילים","stQn":"שאלה {0} מתוך {1}","stRead":"הקראה","stFormulas":"דף נוסחאות","stPrev":"קודמת","stDunno":"לא יודע/ת","stFlagged":"✓ מסומנת לחזרה","stFlag":"לחזור אליה","stNext":"הבאה","stReview":"לפני ההגשה","stReviewNote":"אפשר לחזור לכל שאלה ולשנות. אחרי ההגשה נוצר הקוד.","stUnanswered":"{0} שאלות בלי תשובה","stAllAnswered":"כל השאלות נענו","stPicked":"סימנתם:","stNotYet":"עוד לא עניתם","stChange":"שינוי","stFill":"למלא","stDone":"סיימתי — ליצירת הקוד","stFinished":"סיימתם","stScoreLine":"{0} נכונות מתוך {1}","stSendNow":"עכשיו שולחים את הקוד למורה.","stSendNote":"הקוד מכיל את השם ואת התשובות שסימנתם — המורה מחשב את הציון אצלו מחדש.","stToTeacher":"למורה","stCopyCode":"העתקת הקוד","stCodeCopied":"הקוד הועתק","stWhatRight":"מה היה נכון","stWhatRightNote":"בשביל ללמוד מזה, לא בשביל הציון.","stOk":"נכון","stCorrect":"התשובה הנכונה:","stToApp":"לאפליקציה עצמה — לתרגול חופשי","stGrade":"ציון:","stCode":"קוד:","stLinkNote":"לקליטת התוצאה אצל המורה — לוחצים על הקישור:","badLink":"המבחן לא נפתח","toApp":"לאפליקציה","exOld":"המבחן הזה נוצר בגרסה קודמת של האפליקציה, ולכן השאלות בו כבר לא זהות. בקשו מהמורה לשלוח מבחן חדש.","exBroken":"אולי המבחן שייך לאפליקציה אחרת, ואולי הקישור נקטע בדרך. בקשו מהמורה לשלוח את הקישור שוב, ופתחו אותו ישר מההודעה.","stBackTo":"חזרה למבחן — שאלה {0} מתוך {1}","mkCsv":"הורדת CSV","mkCsvName":"שם","mkCsvPct":"ציון","mkCsvOk":"נכונות","mkCsvTotal":"שאלות","mkCsvDate":"תאריך","mkCsvValid":"קוד תקין","mkCsvQ":"שאלה {0}","mkCsvYes":"כן","mkCsvNo":"לא","mkCsvDone":"הקובץ ירד","teTitle":"קוד מורה","teSet":"בחירת קוד מורה","teEnter":"מסכי המורה נעולים. הקלידו את הקוד כדי לפתוח אותם.","teLead":"בונה המבחן ומסך הציונים ייעלמו מהתפריט, וייפתחו רק עם הקוד הזה.","teWarn":"זו אינה אבטחה. היא עוצרת יד סקרנית, לא מישהו שמבין במחשבים.","tePin":"קוד — 4 עד 8 ספרות","teAgain":"שוב, לוודא","teRemember":"לזכור במכשיר הזה","teRememberNote":"בלי זה הקוד יידרש שוב בכל פתיחה של האפליקציה. על טאבלט כיתתי — עדיף בלי.","teOk":"אישור","teCancel":"ביטול","teBad":"הקוד שגוי.","teMismatch":"שני הקודים אינם זהים.","teShort":"צריך בין 4 ל-8 ספרות, בלי אותיות.","teWaitN":"יותר מדי ניסיונות. נסו שוב בעוד {0} שניות.","teForgot":"שכחתי את הקוד","teForgotHow":"אין דרך לשחזר קוד — הוא לא נשמר בשום מקום. מחיקת נתוני האתר בדפדפן מסירה אותו, ואיתם גם ההתקדמות והמבחנים.","teHideT":"להסתיר את מסכי המורה","teHideNote":"על מכשיר שהילד משתמש בו, בונה המבחן ומסך הציונים יכולים לשבת מאחורי קוד. לפתיחה מאוחר יותר: להוסיף ?teacher=1 לכתובת.","teHideBtn":"בחירת קוד","teOpenNow":"מצב מורה פתוח","teLockBtn":"יציאה ממצב מורה","teChangeBtn":"שינוי הקוד","teRemoveBtn":"ביטול הקוד","teLocked":"מסכי המורה נעולים במכשיר הזה.","teUnlock":"פתיחה"};
+var XT={ar:{"exam":"امتحان","student":"طالب","qs":"أسئلة","minutes":"دقيقة","none":"بلا","outOf":"من أصل","exTitle":"امتحان صفّي","exLead":"تُعِدّ الامتحان، ترسل رابطًا في واتساب، وتستلم من كلّ طالب رمز إجابات. لا خادم ولا حساب — كلّ شيء يمرّ عبر الرابط وواتساب.","exName":"اسم الامتحان","exNamePh":"مثلًا: امتحان جبر — الصف التاسع/2","exUnits":"وحدات","exUnitSuf":"وحدات","exLevel":"المستوى","exCount":"عدد الأسئلة","exTime":"تحديد الوقت","exTimeNote":"صفر يعني بلا مؤقّت. عند انتهاء الوقت يُسلَّم الامتحان تلقائيًا.","exTopics":"المواضيع","exTopicsNote":"تُوزَّع الأسئلة بالتساوي بين المواضيع المختارة.","exAcc":"تسهيلات للممتحَنين","exAccNote":"ما هو مسموح في الامتحان نفسه. القراءة الصوتية وورقة القوانين ليستا تلميحًا — بل وسيلتا إتاحة.","exTts":"قراءة صوتية","exTtsSub":"كل سؤال يُقرأ بصوت عند الطلب","exForm":"ورقة قوانين","exFormSub":"متاحة داخل الامتحان، كما في البجروت","exPhone":"رقم واتساب الخاص بك (اختياري)","exPhoneNote":"إذا عبّأته — يفتح زرّ الإرسال عند الطالب محادثة معك مباشرة. انتبه: الرقم يظهر داخل الرابط الذي تشاركه.","exBuild":"أنشئ الامتحان","exShareMsg":"{0} أسئلة. ادخل إلى الرابط، حُلّ، وفي النهاية أرسل لي الرمز.","exReady":"الامتحان جاهز","exWa":"إرسال في واتساب","exCopyUrl":"نسخ الرابط","exToMarks":"إلى العلامات","exUrlCopied":"نُسخ الرابط","mkTitle":"العلامات","mkLead":"اضغط على الرابط الذي أرسله الطالب في واتساب، أو الصق هنا الرمز. تُحتسب العلامة من جديد من الإجابات نفسها، لا مما كتبه الطالب.","mkNew":"امتحان جديد","mkEmpty":"لم تُنشئ امتحانًا بعد. ابدأ من «امتحان جديد».","mkSubs":"تسليمات","mkAvg":"المعدّل","mkPaste":"لصق رمز الإجابات","mkPastePh":"الصق هنا الرمز من واتساب","mkTake":"استلام","mkResend":"إرسال مرّة أخرى","mkCopyTbl":"نسخ الجدول","mkDelQ":"حذف الامتحان و{0} من التسليمات؟","mkDelYes":"نعم، احذف","mkCancel":"إلغاء","mkDel":"حذف الامتحان","mkByStudent":"حسب الطالب","mkNoName":"بلا اسم","mkFell":"أخفق في:","mkAllOk":"كل الإجابات صحيحة","mkBadCode":"الرمز غير متطابق مع نفسه","mkByTopic":"حسب الموضوع — ما يستحقّ إعادة التدريس","mkByTopicNote":"نسبة نجاح الصفّ كلّه معًا.","mkRight":"إجابات صحيحة من أصل","mkTblHead":"الطالب\tالعلامة\tالصحيحة\tأخفق في","mkTblCopied":"نُسخ الجدول","mkErrRead":"تعذّرت قراءة الرمز. حاول نسخه من جديد، كاملًا.","mkErrOther":"هذا الرمز يعود لامتحان «{0}».","mkErrUnknown":"هذا الرمز يعود لامتحان آخر غير موجود على هذا الجهاز.","mkErrCount":"عدد الإجابات في الرمز لا يطابق الامتحان.","mkTaken":"استُلم","mkNoteBad":"انتبه: الرمز غير متطابق مع نفسه","stNoTime":"بلا تحديد وقت.","stTimed":"هناك تحديد للوقت: {0} دقيقة. عند انتهائها يُسلَّم الامتحان تلقائيًا.","stNoTimer":"لا مؤقّت. خذ وقتك.","stNoNeg":"لا علامات سالبة — الإجابة الخاطئة لا تخصم.","stReadOn":"يمكنك طلب قراءة أي سؤال بصوت.","stReadOff":"القراءة الصوتية مغلقة في هذا الامتحان.","stFormOn":"ورقة القوانين مفتوحة طوال الامتحان.","stFormOff":"ورقة القوانين مغلقة في هذا الامتحان.","stCodeEnd":"في النهاية تحصل على رمز — أرسله للمعلّم في واتساب.","stYourName":"اسمك","stNameNote":"كي يعرف المعلّم من أجاب. الاسم لا يُرسل إلى أي خادم — يدخل داخل الرمز.","stNamePh":"الاسم الشخصي واسم العائلة","stStart":"لنبدأ","stQn":"سؤال {0} من أصل {1}","stRead":"قراءة","stFormulas":"ورقة قوانين","stPrev":"السابق","stDunno":"لا أعرف","stFlagged":"✓ مُعلَّم للعودة","stFlag":"للعودة إليه","stNext":"التالي","stReview":"قبل التسليم","stReviewNote":"يمكنك العودة إلى أي سؤال وتغييره. بعد التسليم يُنشأ الرمز.","stUnanswered":"{0} أسئلة بلا إجابة","stAllAnswered":"أُجيبت كل الأسئلة","stPicked":"اخترت:","stNotYet":"لم تُجب بعد","stChange":"تغيير","stFill":"للتعبئة","stDone":"أنهيت — أنشئ الرمز","stFinished":"أنهيت","stScoreLine":"{0} صحيحة من أصل {1}","stSendNow":"الآن أرسل الرمز إلى المعلّم.","stSendNote":"الرمز يحوي الاسم والإجابات التي اخترتها — والمعلّم يحتسب العلامة عنده من جديد.","stToTeacher":"إلى المعلّم","stCopyCode":"نسخ الرمز","stCodeCopied":"نُسخ الرمز","stWhatRight":"ما كان صحيحًا","stWhatRightNote":"للتعلّم منه، لا من أجل العلامة.","stOk":"صحيح","stCorrect":"الإجابة الصحيحة:","stToApp":"إلى التطبيق نفسه — للتدرّب الحرّ","stGrade":"العلامة:","stCode":"الرمز:","stLinkNote":"لاستلام النتيجة عند المعلّم — اضغط على الرابط:","badLink":"تعذّر فتح الامتحان","toApp":"إلى التطبيق","exOld":"أُنشئ هذا الامتحان بنسخة سابقة من التطبيق، ولذلك لم تعد أسئلته مطابقة. اطلب من المعلّم إرسال امتحان جديد.","exBroken":"ربما يعود الامتحان إلى تطبيق آخر، وربما انقطع الرابط في الطريق. اطلب من المعلّم إرسال الرابط من جديد، وافتحه مباشرة من الرسالة.","stBackTo":"العودة إلى الامتحان — سؤال {0} من أصل {1}","mkCsv":"تنزيل CSV","mkCsvName":"الاسم","mkCsvPct":"العلامة","mkCsvOk":"الصحيحة","mkCsvTotal":"الأسئلة","mkCsvDate":"التاريخ","mkCsvValid":"الرمز سليم","mkCsvQ":"سؤال {0}","mkCsvYes":"نعم","mkCsvNo":"لا","mkCsvDone":"نُزّل الملف","teTitle":"رمز المعلّم","teSet":"اختيار رمز المعلّم","teEnter":"شاشات المعلّم مقفلة. أدخلوا الرمز لفتحها.","teLead":"سيختفي بانِي الامتحان وشاشة العلامات من القائمة، ولن يُفتحا إلّا بهذا الرمز.","teWarn":"هذه ليست حماية. إنّها توقف يدًا فضولية، لا شخصًا يفهم في الحواسيب.","tePin":"الرمز — من ٤ إلى ٨ أرقام","teAgain":"مرّة أخرى، للتأكيد","teRemember":"التذكّر في هذا الجهاز","teRememberNote":"بدون ذلك سيُطلب الرمز في كلّ فتح للتطبيق. على لوح صفّيّ — الأفضل بدونه.","teOk":"تأكيد","teCancel":"إلغاء","teBad":"الرمز غير صحيح.","teMismatch":"الرمزان غير متطابقين.","teShort":"يلزم بين ٤ و‑٨ أرقام، بلا حروف.","teWaitN":"محاولات كثيرة. حاولوا مجدّدًا بعد {0} ثانية.","teForgot":"نسيت الرمز","teForgotHow":"لا توجد طريقة لاستعادة الرمز — فهو غير محفوظ في أيّ مكان. مسح بيانات الموقع من المتصفّح يزيله، ومعه التقدّم والامتحانات.","teHideT":"إخفاء شاشات المعلّم","teHideNote":"على جهاز يستخدمه الطفل، يمكن وضع بانِي الامتحان وشاشة العلامات خلف رمز. للفتح لاحقًا: أضيفوا ?teacher=1 إلى العنوان.","teHideBtn":"اختيار رمز","teOpenNow":"وضع المعلّم مفتوح","teLockBtn":"الخروج من وضع المعلّم","teChangeBtn":"تغيير الرمز","teRemoveBtn":"إلغاء الرمز","teLocked":"شاشات المعلّم مقفلة في هذا الجهاز.","teUnlock":"فتح"},
+ ru:{"exam":"Экзамен","student":"Ученик","qs":"вопросов","minutes":"минут","none":"нет","outOf":"из","exTitle":"Классный экзамен","exLead":"Составьте экзамен, отправьте ссылку в WhatsApp и получите обратно код ответов от каждого ученика. Ни сервера, ни аккаунта — всё идёт через ссылку и WhatsApp.","exName":"Название экзамена","exNamePh":"например: экзамен по алгебре — 9-й класс, группа 2","exUnits":"Уровень программы","exUnitSuf":"ед.","exLevel":"Сложность","exCount":"Число вопросов","exTime":"Ограничение времени","exTimeNote":"Ноль означает без таймера. По истечении времени экзамен сдаётся сам.","exTopics":"Темы","exTopicsNote":"Вопросы делятся поровну между выбранными темами.","exAcc":"Условия для сдающих","exAccNote":"Что разрешено на самом экзамене. Озвучивание и лист формул — не подсказка, а средство доступности.","exTts":"Озвучивание","exTtsSub":"Каждый вопрос читается вслух по запросу","exForm":"Лист формул","exFormSub":"Доступен во время экзамена, как на настоящем","exPhone":"Ваш номер WhatsApp (необязательно)","exPhoneNote":"Если заполните — кнопка отправки у ученика откроет чат прямо с вами. Учтите: номер виден внутри ссылки, которой вы делитесь.","exBuild":"Создать экзамен","exShareMsg":"{0} вопросов. Откройте ссылку, решите, а в конце пришлите мне код.","exReady":"Экзамен готов","exWa":"Отправить в WhatsApp","exCopyUrl":"Скопировать ссылку","exToMarks":"К оценкам","exUrlCopied":"Ссылка скопирована","mkTitle":"Оценки","mkLead":"Нажмите на ссылку, которую ученик прислал в WhatsApp, или вставьте сюда код. Оценка пересчитывается по самим ответам, а не по тому, что написал ученик.","mkNew":"Новый экзамен","mkEmpty":"Вы ещё не создали экзамен. Начните с «Новый экзамен».","mkSubs":"сдач","mkAvg":"среднее","mkPaste":"Вставка кода ответов","mkPastePh":"Вставьте сюда код из WhatsApp","mkTake":"Принять","mkResend":"Отправить снова","mkCopyTbl":"Скопировать таблицу","mkDelQ":"Удалить экзамен и {0} сдач?","mkDelYes":"Да, удалить","mkCancel":"Отмена","mkDel":"Удалить экзамен","mkByStudent":"По ученикам","mkNoName":"Без имени","mkFell":"ошибся в:","mkAllOk":"всё верно","mkBadCode":"код не сходится сам с собой","mkByTopic":"По темам — что стоит объяснить заново","mkByTopicNote":"Доля верных ответов по всему классу.","mkRight":"верных ответов из","mkTblHead":"Ученик\tОценка\tВерно\tОшибся в","mkTblCopied":"Таблица скопирована","mkErrRead":"Не удалось прочитать код. Попробуйте скопировать его заново, целиком.","mkErrOther":"Этот код относится к экзамену «{0}».","mkErrUnknown":"Этот код относится к другому экзамену, которого нет на этом устройстве.","mkErrCount":"Число ответов в коде не совпадает с экзаменом.","mkTaken":"принят","mkNoteBad":"Внимание: код не сходится сам с собой","stNoTime":"без ограничения времени.","stTimed":"Есть ограничение: {0} минут. По их истечении экзамен сдаётся сам.","stNoTimer":"Таймера нет. Можно не спешить.","stNoNeg":"Штрафа за ошибку нет — неверный ответ ничего не отнимает.","stReadOn":"Любой вопрос можно попросить прочитать вслух.","stReadOff":"Озвучивание в этом экзамене отключено.","stFormOn":"Лист формул открыт весь экзамен.","stFormOff":"Лист формул в этом экзамене закрыт.","stCodeEnd":"В конце вы получите код — отправьте его учителю в WhatsApp.","stYourName":"Ваше имя","stNameNote":"Чтобы учитель знал, кто отвечал. Имя не уходит ни на какой сервер — оно входит внутрь кода.","stNamePh":"Имя и фамилия","stStart":"Начинаем","stQn":"Вопрос {0} из {1}","stRead":"Прочитать","stFormulas":"Лист формул","stPrev":"Предыдущий","stDunno":"Не знаю","stFlagged":"✓ отмечен для возврата","stFlag":"Вернуться к нему","stNext":"Следующий","stReview":"Перед сдачей","stReviewNote":"Можно вернуться к любому вопросу и изменить ответ. После сдачи создаётся код.","stUnanswered":"{0} вопросов без ответа","stAllAnswered":"Отвечены все вопросы","stPicked":"Вы выбрали:","stNotYet":"Ещё не отвечено","stChange":"Изменить","stFill":"Заполнить","stDone":"Готово — создать код","stFinished":"Готово","stScoreLine":"{0} верных из {1}","stSendNow":"Теперь отправьте код учителю.","stSendNote":"Код содержит имя и выбранные вами ответы — учитель пересчитывает оценку у себя.","stToTeacher":"учителю","stCopyCode":"Скопировать код","stCodeCopied":"Код скопирован","stWhatRight":"Как было правильно","stWhatRightNote":"Чтобы научиться, а не ради оценки.","stOk":"верно","stCorrect":"Правильный ответ:","stToApp":"К самому приложению — свободная практика","stGrade":"Оценка:","stCode":"Код:","stLinkNote":"Чтобы учитель получил результат — нажмите на ссылку:","badLink":"Экзамен не открылся","toApp":"К приложению","exOld":"Этот экзамен создан в прежней версии приложения, и вопросы в нём уже не те же самые. Попросите учителя прислать новый.","exBroken":"Возможно, экзамен относится к другому приложению, а возможно, ссылка оборвалась по пути. Попросите учителя прислать ссылку ещё раз и откройте её прямо из сообщения.","stBackTo":"Назад к экзамену — вопрос {0} из {1}","mkCsv":"Скачать CSV","mkCsvName":"Имя","mkCsvPct":"Оценка","mkCsvOk":"Верно","mkCsvTotal":"Вопросов","mkCsvDate":"Дата","mkCsvValid":"Код цел","mkCsvQ":"Вопрос {0}","mkCsvYes":"да","mkCsvNo":"нет","mkCsvDone":"Файл загружен","teTitle":"Код учителя","teSet":"Выбор кода учителя","teEnter":"Экраны учителя закрыты. Введите код, чтобы открыть их.","teLead":"Конструктор экзамена и экран оценок исчезнут из меню и будут открываться только по этому коду.","teWarn":"Это не защита. Она останавливает любопытную руку, а не того, кто разбирается в компьютерах.","tePin":"Код — от 4 до 8 цифр","teAgain":"Ещё раз, для проверки","teRemember":"Запомнить на этом устройстве","teRememberNote":"Без этого код будет запрашиваться при каждом открытии приложения. На классном планшете лучше без этого.","teOk":"Готово","teCancel":"Отмена","teBad":"Неверный код.","teMismatch":"Коды не совпадают.","teShort":"Нужно от 4 до 8 цифр, без букв.","teWaitN":"Слишком много попыток. Повторите через {0} с.","teForgot":"Я забыл код","teForgotHow":"Восстановить код нельзя — он нигде не хранится. Очистка данных сайта в браузере удалит его, а вместе с ним прогресс и экзамены.","teHideT":"Скрыть экраны учителя","teHideNote":"На устройстве, которым пользуется ребёнок, конструктор экзамена и экран оценок можно закрыть кодом. Чтобы открыть их потом, добавьте ?teacher=1 к адресу.","teHideBtn":"Выбрать код","teOpenNow":"Режим учителя открыт","teLockBtn":"Выйти из режима учителя","teChangeBtn":"Изменить код","teRemoveBtn":"Убрать код","teLocked":"Экраны учителя закрыты на этом устройстве.","teUnlock":"Открыть"},
+ en:{"exam":"Exam","student":"Student","qs":"questions","minutes":"minutes","none":"none","outOf":"of","exTitle":"Class exam","exLead":"Build an exam, send the link on WhatsApp, and get an answer code back from every student. No server and no account — it all travels through the link and WhatsApp.","exName":"Exam name","exNamePh":"for example: Algebra exam — class 9/2","exUnits":"Units","exUnitSuf":"units","exLevel":"Level","exCount":"Number of questions","exTime":"Time limit","exTimeNote":"Zero means no timer. When the time is up the exam submits itself.","exTopics":"Topics","exTopicsNote":"The questions are split evenly between the topics you choose.","exAcc":"Access arrangements","exAccNote":"What is allowed during the exam itself. Read-aloud and the formula sheet are not a hint — they are access tools.","exTts":"Read aloud","exTtsSub":"Every question is read out on request","exForm":"Formula sheet","exFormSub":"Open during the exam, as in a state exam","exPhone":"Your WhatsApp number (optional)","exPhoneNote":"Fill it in and the student's send button opens a chat straight to you. Note: the number appears inside the link you share.","exBuild":"Create the exam","exShareMsg":"{0} questions. Open the link, answer, and send me the code at the end.","exReady":"The exam is ready","exWa":"Send on WhatsApp","exCopyUrl":"Copy the link","exToMarks":"To the marks","exUrlCopied":"Link copied","mkTitle":"Marks","mkLead":"Tap the link the student sent on WhatsApp, or paste the code here. The grade is recomputed from the answers themselves, not from what the student wrote.","mkNew":"New exam","mkEmpty":"You have not created an exam yet. Start from “New exam”.","mkSubs":"submissions","mkAvg":"average","mkPaste":"Paste an answer code","mkPastePh":"Paste the code from WhatsApp here","mkTake":"Take it in","mkResend":"Send again","mkCopyTbl":"Copy the table","mkDelQ":"Delete the exam and its {0} submissions?","mkDelYes":"Yes, delete","mkCancel":"Cancel","mkDel":"Delete the exam","mkByStudent":"By student","mkNoName":"No name","mkFell":"tripped on:","mkAllOk":"all correct","mkBadCode":"the code does not match itself","mkByTopic":"By topic — what is worth teaching again","mkByTopicNote":"How the whole class did, together.","mkRight":"correct answers out of","mkTblHead":"Student\tMark\tCorrect\tTripped on","mkTblCopied":"Table copied","mkErrRead":"We could not read the code. Try copying it again, in full.","mkErrOther":"This code belongs to the exam “{0}”.","mkErrUnknown":"This code belongs to another exam, which is not on this device.","mkErrCount":"The number of answers in the code does not match the exam.","mkTaken":"taken in","mkNoteBad":"Note: the code does not match itself","stNoTime":"no time limit.","stTimed":"There is a time limit: {0} minutes. When it runs out the exam submits itself.","stNoTimer":"No timer. Take your time.","stNoNeg":"No negative marking — a wrong answer takes nothing away.","stReadOn":"You can ask for any question to be read aloud.","stReadOff":"Read-aloud is off in this exam.","stFormOn":"The formula sheet is open throughout the exam.","stFormOff":"The formula sheet is closed in this exam.","stCodeEnd":"At the end you get a code — send it to your teacher on WhatsApp.","stYourName":"Your name","stNameNote":"So the teacher knows who answered. The name is not sent to any server — it goes inside the code.","stNamePh":"First name and surname","stStart":"Let's start","stQn":"Question {0} of {1}","stRead":"Read aloud","stFormulas":"Formula sheet","stPrev":"Previous","stDunno":"I don't know","stFlagged":"✓ marked to come back","stFlag":"Come back to it","stNext":"Next","stReview":"Before you submit","stReviewNote":"You can go back to any question and change it. The code is created after you submit.","stUnanswered":"{0} questions with no answer","stAllAnswered":"Every question is answered","stPicked":"You chose:","stNotYet":"Not answered yet","stChange":"Change","stFill":"Fill in","stDone":"Finished — create the code","stFinished":"Finished","stScoreLine":"{0} correct out of {1}","stSendNow":"Now send the code to your teacher.","stSendNote":"The code holds your name and the answers you chose — the teacher works the mark out again at their end.","stToTeacher":"to the teacher","stCopyCode":"Copy the code","stCodeCopied":"Code copied","stWhatRight":"What the answers were","stWhatRightNote":"To learn from it, not for the mark.","stOk":"correct","stCorrect":"The correct answer:","stToApp":"To the app itself — free practice","stGrade":"Mark:","stCode":"Code:","stLinkNote":"For the teacher to receive the result — tap the link:","badLink":"The exam did not open","toApp":"To the app","exOld":"This exam was made with an earlier version of the app, so its questions are no longer the same. Ask your teacher to send a new one.","exBroken":"The exam may belong to a different app, or the link may have been cut short. Ask your teacher to send the link again, and open it straight from the message.","stBackTo":"Back to the exam — question {0} of {1}","mkCsv":"Download CSV","mkCsvName":"Name","mkCsvPct":"Mark","mkCsvOk":"Correct","mkCsvTotal":"Questions","mkCsvDate":"Date","mkCsvValid":"Code intact","mkCsvQ":"Question {0}","mkCsvYes":"yes","mkCsvNo":"no","mkCsvDone":"The file downloaded","teTitle":"Teacher code","teSet":"Choose a teacher code","teEnter":"The teacher screens are locked. Enter the code to open them.","teLead":"The exam builder and the marks screen leave the menu, and open only with this code.","teWarn":"This is not security. It stops a curious hand, not somebody who knows computers.","tePin":"Code — 4 to 8 digits","teAgain":"Again, to be sure","teRemember":"Remember on this device","teRememberNote":"Without it the code is asked for every time the app opens. On a class tablet, better without.","teOk":"Confirm","teCancel":"Cancel","teBad":"That code is wrong.","teMismatch":"The two codes are not the same.","teShort":"It needs 4 to 8 digits, no letters.","teWaitN":"Too many tries. Try again in {0} seconds.","teForgot":"I forgot the code","teForgotHow":"There is no way to recover the code — it is not stored anywhere. Clearing the site data in the browser removes it, and the progress and exams with it.","teHideT":"Hide the teacher screens","teHideNote":"On a device a child uses, the exam builder and the marks screen can sit behind a code. To open them later, add ?teacher=1 to the address.","teHideBtn":"Choose a code","teOpenNow":"Teacher mode is open","teLockBtn":"Leave teacher mode","teChangeBtn":"Change the code","teRemoveBtn":"Remove the code","teLocked":"The teacher screens are locked on this device.","teUnlock":"Open"}};
 /* מילות בחירת השאלות. בלוק נפרד ולא תוספת לשורות שמעליו —
    הן ארוכות מכדי לערוך אותן ביד, וכל שינוי בהן מתנגש במלואו. */
 var XQK={"exQs":"השאלות במבחן",
@@ -3507,7 +3804,10 @@ function viewExamNew(){
   h+='<label class="tt"><b>'+esc(xt("exName"))+'</b></label>'+
      '<input class="field" id="exTitle" value="'+esc(EB.title)+'" placeholder="'+esc(xt("exNamePh"))+'" maxlength="60">';
 
-  h+='<div style="margin-top:16px"><b>'+esc(xt("exUnits"))+'</b>'+
+  /* שורת יחידות הלימוד הגיעה עם מודול המבחן ממשפחת math-uni. באפליקציה
+     עם מסלול אחד — math-app, ארבע פעולות החשבון — אין 3/4/5 יח״ל, והשורה
+     רק בלבלה. מציגים אותה רק כשיש באמת יותר ממסלול אחד. */
+  if(TRACKS.length>1)h+='<div style="margin-top:16px"><b>'+esc(xt("exUnits"))+'</b>'+
      '<div class="seg" style="margin-top:7px">'+[3,4,5].map(function(tr){
        return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
      }).join("")+'</div></div>';
@@ -3579,8 +3879,9 @@ function viewMarks(){
   var h='<div class="wrap" style="padding-block:22px">';
   h+='<h1 class="h1">'+esc(xt("mkTitle"))+'</h1>'+
      '<p class="sub">'+esc(xt("mkLead"))+'</p>';
-  h+='<div class="row" style="margin-top:14px"><button class="btn btn-p" data-a="go" data-v="exam">'+
+  h+='<div class="row" style="margin-top:14px"><button class="btn btn-p" style="font-size:1.2rem;padding:14px 28px" data-a="go" data-v="exam">'+
      ic("plus",17)+' '+esc(xt("mkNew"))+'</button></div>';
+  if(MK.msg&&!MK.msg.id)h+='<p class="chip '+(MK.msg.ok?"ok":"bad")+'" style="margin-top:10px">'+esc(MK.msg.m)+'</p>';
 
   if(!EX.list.length){
     h+='<div class="card pad" style="margin-top:16px"><p class="sub" style="margin:0">'+
@@ -3973,6 +4274,14 @@ function sitGo(i){
   SIT.i=clamp(i,0,SIT.qs.length-1); SIT.phase="ask";
   window.scrollTo(0,0); render();
 }
+/* התוצאה נשלחת כקישור ולא כקוד: המורה לוחץ, האפליקציה נפתחת אצלו
+   וקולטת. הקוד עצמו יושב אחרי #r=, ולכן גם הדבקה של הקישור השלם
+   בתיבת הקוד עובדת — codeOf מחלץ אותו משם. */
+function resultUrl(code){return location.origin+location.pathname+"#r="+code}
+function codeOf(raw){
+  var m=String(raw||"").match(/#r=([A-Za-z0-9\-_]+)/);
+  return (m?m[1]:String(raw||"")).trim();
+}
 function sitFinish(){
   SIT.phase="done";
   SIT.code=encodeResult(SIT.id,SIT.name,SIT.answers);
@@ -4062,7 +4371,7 @@ function viewSit(){
   /* סיום */
   var g=sitGrade(),msg;
   msg=(SIT.name||xt("student"))+" — "+esc(sp.t||xt("exam"))+"\n"+xt("stGrade")+" "+g.pct+
-      " ("+g.ok+"/"+g.n+")\n"+xt("stCode")+"\n"+SIT.code;
+      " ("+g.ok+"/"+g.n+")\n"+xt("stLinkNote")+"\n"+resultUrl(SIT.code);
   var h3='<div class="wrap" style="padding-block:26px;max-width:640px">';
   h3+='<div class="card pad"><h1 class="h1">'+esc(xt("stFinished"))+'</h1>'+
       '<p class="sub">'+esc(sp.t||xt("exam"))+'</p>'+
@@ -4197,25 +4506,9 @@ function examAction(a,el){
   if(a==="mkadd"){
     var ex=exFind(el.getAttribute("data-i")); if(!ex)return true;
     var ta=$("#mkPaste"),raw=ta?ta.value:"";
-    var res=decodeResult(raw);
+    var res=decodeResult(codeOf(raw));
     if(!res){MK.msg={id:ex.id,ok:false,m:xt("mkErrRead")};render();return true}
-    if(res.i!==ex.id){
-      var other=exFind(res.i);
-      MK.msg={id:ex.id,ok:false,m:other?xf("mkErrOther",other.spec.t||xt("exam")):xt("mkErrUnknown")};
-      render(); return true;
-    }
-    if(res.a.length!==ex.spec.q.length){
-      MK.msg={id:ex.id,ok:false,m:xt("mkErrCount")};render();return true}
-    var g=gradeResult(ex.spec,res);
-    var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
-    /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
-    var k2=(ex.subs||[]).findIndex(function(s){return s.name===sub.name});
-    if(!ex.subs)ex.subs=[];
-    if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
-    exSave();
-    MK.msg={id:ex.id,ok:true,m:(sub.name||xt("student"))+" "+xt("mkTaken")+" · "+g.pct+" ("+g.ok+"/"+g.n+")"+
-      (sub.valid?"":" · "+xt("mkNoteBad"))};
-    if(ta)ta.value="";
+    if(mkImport(ex,res)&&ta)ta.value="";
     render(); return true;
   }
 
@@ -4238,6 +4531,40 @@ function examAction(a,el){
 
 /* קליטת מבחן מהכתובת. עושים את זה לפני ה-render הראשון, אחרת
    התלמיד רואה לרגע את מסך הבית של אפליקציה שהוא לא מכיר. */
+/* קולט תוצאה אחת למבחן. מחזיר true כשנשמרה; בכל מקרה משאיר הודעה
+   ב-MK.msg למסך הציונים. משמש גם את תיבת ההדבקה וגם את הקישור. */
+function mkImport(ex,res){
+    if(res.i!==ex.id){
+      var other=exFind(res.i);
+      MK.msg={id:ex.id,ok:false,m:other?xf("mkErrOther",other.spec.t||xt("exam")):xt("mkErrUnknown")};
+      return false;
+    }
+    if(res.a.length!==ex.spec.q.length){
+      MK.msg={id:ex.id,ok:false,m:xt("mkErrCount")};return false}
+    var g=gradeResult(ex.spec,res);
+    var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
+    /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
+    var k2=(ex.subs||[]).findIndex(function(s){return s.name===sub.name});
+    if(!ex.subs)ex.subs=[];
+    if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
+    exSave();
+    MK.msg={id:ex.id,ok:true,m:(sub.name||xt("student"))+" "+xt("mkTaken")+" · "+g.pct+" ("+g.ok+"/"+g.n+")"+
+      (sub.valid?"":" · "+xt("mkNoteBad"))};
+    return true;
+}
+/* קליטת תוצאה מהכתובת — הצד של המורה. הכתובת מנוקה מיד, כדי שרענון
+   לא יקלוט שוב; קליטה חוזרת של אותו תלמיד הייתה מחליפה ולא מכפילה,
+   אבל אין סיבה להשאיר קוד בשורת הכתובת. */
+function resultFromUrl(){
+  var m=String(location.hash||"").match(/^#r=(.+)$/);
+  if(!m)return false;
+  var res=decodeResult(m[1]),ex=res?exFind(res.i):null;
+  try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
+  if(!res)MK.msg={id:"",ok:false,m:xt("mkErrRead")};
+  else if(!ex)MK.msg={id:"",ok:false,m:xt("mkErrUnknown")};
+  else if(mkImport(ex,res))MK.open=ex.id;
+  view="marks"; return true;
+}
 function examFromUrl(){
   var m=String(location.hash||"").match(/^#x=(.+)$/);
   if(!m)return false;
@@ -4279,6 +4606,7 @@ function newQuestion(){
 }
 function record(ok){
   var q=P.q; if(!q)return;
+  P.rres.push(!ok?"no":(P.hint?"hp":"ok"));
   var s=stOf(q.tid,q.lv); s.seen++; ok?s.ok++:s.bad++;
   var r=itemRec(q.id); r.n++; if(ok)r.ok++;
   touchDay(); state.day.n=(state.day.n||0)+1;
@@ -4291,7 +4619,7 @@ function answer(i){
   P.picked=i; P.done=true; P.ok=!!(o&&o.ok);
   record(P.ok);
   render();
-  announce(P.ok?t("correct"):t("wrong")+". "+t("answerIs")+" "+q.answer);
+  if(P.ok)announce(t("correct")); else announce(t("wrong")+". "+t("answerIs"),q.answer);
   /* התשובה הנכונה נשמעת מיד, גם כשטעו — במיוחד כשטעו. הצליל הוא
      החומר, ותיקון שקט אינו תיקון. */
   setTimeout(function(){speak(q.say,LEARN)},P.ok?200:420);
@@ -4314,9 +4642,9 @@ function testKey(){
     .catch(function(){gkMsg={ok:false,m:t("vErr")};render()});
 }
 exLoad();
-examFromUrl();
+examFromUrl()||resultFromUrl();
 window.addEventListener("hashchange",function(){
-  if(examFromUrl()){stopSpeak();window.scrollTo(0,0);render()}
+  if(examFromUrl()||resultFromUrl()){stopSpeak();window.scrollTo(0,0);render()}
   else if(view==="sit"||view==="badexam"||view==="oldexam"){view="";render()}
 });
 document.addEventListener("click",function(e){
@@ -4350,17 +4678,31 @@ document.addEventListener("click",function(e){
   if(a==="set"){view="";state.screen="set";stopSpeak();gkMsg=null;render();window.scrollTo(0,0);return}
   if(a==="open"){
     state.topic=el.getAttribute("data-t"); state.screen="prac";
-    save(); newQuestion(); window.scrollTo(0,0); return;
+    roundReset(); save(); newQuestion(); window.scrollTo(0,0); return;
   }
-  if(a==="lvl"){state.level=clamp(parseInt(v,10)||1,1,3);save();newQuestion();return}
+  if(a==="lvl"){state.level=clamp(parseInt(v,10)||1,1,3);roundReset();save();newQuestion();return}
   if(a==="pick"){answer(parseInt(el.getAttribute("data-i"),10));return}
-  if(a==="next"){newQuestion();return}
+  if(a==="next"){
+    /* עשר שאלות הן סבב. אחרי העשירית "הבא" מוביל לסיכום ולא לשאלה
+       אחת־עשרה — בלי סיום אין מה לקחת מהתרגול ואין סיבה לחזור. */
+    if(P.rres.length>=ROUND){
+      P.sum=true; stopSpeak(); render(); window.scrollTo(0,0);
+      var st=sumTier(); announce(t("sumT"+st));
+      setTimeout(function(){if(P.sum)speak(t("sumT"+st)+" "+t("sumS"+st),state.lang)},260);
+      return;
+    }
+    newQuestion();return}
+  if(a==="again"){roundReset();newQuestion();window.scrollTo(0,0);return}
+  if(a==="sumlvl"){state.level=clamp(parseInt(v,10)||1,1,3);roundReset();save();newQuestion();window.scrollTo(0,0);return}
   if(a==="dunno"){
     /* "לא יודע" אינו דילוג: הוא נספר כטעות, ומיד מראה ומשמיע את
        התשובה. מי שמנחש לומד פחות ממי שמודה. */
     var q=P.q; if(!q)return;
     P.done=true; P.ok=false; P.picked=-1; record(false); render();
-    setTimeout(function(){speak(q.say,LEARN)},260);
+    announce(t("wrong")+". "+t("answerIs"),q.answer);
+    /* לחיצה על "הבא" בתוך רבע שנייה החליפה את השאלה, וההקראה
+       הזאת דיברה על החדשה. */
+    setTimeout(function(){if(P.q===q)speak(q.say,LEARN)},260);
     return;
   }
   if(a==="slot"){var i=parseInt(el.getAttribute("data-i"),10);
@@ -4433,7 +4775,7 @@ document.addEventListener("input",function(e){
 /* Enter ורווח על כרטיס קול — הוא div ולכן המקלדת אינה מקבלת אותו בחינם */
 document.addEventListener("keydown",function(e){
   if(e.key!=="Enter"&&e.key!==" ")return;
-  var el=e.target.closest("[data-a='gvoice']"); if(!el)return;
+  var el=e.target.closest("[data-a='gvoice'],[data-a='devvoice'],[data-a='sayline']"); if(!el)return;
   e.preventDefault(); el.click();
 });
 /* קיצורי מקלדת בתרגול, כמו באפליקציות המתמטיקה: מי שהעכבר קשה לו,
@@ -4448,7 +4790,11 @@ document.addEventListener("keydown",function(e){
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();
+  if(e.key===" "){
+    /* רווח על כפתור ממוקד הוא הפעלה שלו ולא הקראה חוזרת — הדפדפן
+       כבר יורה click, וההקראה כאן רצה מעליו. */
+    if(e.target&&e.target.closest("button,[role='button'],a[href]"))return;
+    e.preventDefault();
     var sa=P.done?{t:P.q.say,lg:LEARN}:sayAsk(P.q);
     speak(sa.t,sa.lg); return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
@@ -4483,7 +4829,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a12-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a14-pwa1").catch(function(){});
   });
 }
 </script>

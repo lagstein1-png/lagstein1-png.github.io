@@ -1,0 +1,284 @@
+<!doctype html>
+<!-- =====================================================================
+     learning-core · template/index.html
+     שלד לאפליקציה חדשה. שלושה מסכים: בית, תרגול, סיכום.
+
+     איך פותחים אפליקציה חדשה:
+       1. מעתיקים את התיקייה הזאת לשם החדש.
+       2. מעתיקים לתוכה  core.js  ו-core.css  מ-learning-core.
+       3. מעתיקים את  sw-template.js  בשם  sw.js , ומשנים בו APP.
+       4. כותבים manifest.json ואייקונים.
+       5. ממלאים את QUESTIONS ואת STRINGS כאן למטה.
+
+     שלושת הקבצים יושבים ליד index.html, ולכן הנתיבים כאן הם ./
+     קוראים את CORE-RULES.md לפני שמוסיפים משהו לקובץ הזה.
+     ===================================================================== -->
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E3E8C">
+<title>שם האפליקציה</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="stylesheet" href="./core.css">
+<style>
+  /* עיצוב ייחודי לאפליקציה הזאת בלבד. כל מה שמשותף — ב-core.css. */
+  .app-foot{ color:var(--ink-soft); font-size:.8em; text-align:center; padding:1em 0; }
+  .app-langs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:var(--gap); }
+  .app-langs button{ min-height:48px; padding:.4em .9em; }
+  .app-langs button[aria-pressed="true"]{ background:var(--brand); color:var(--brand-ink); border-color:var(--brand); }
+</style>
+</head>
+<body>
+
+<a class="lc-skip" href="#main">דילוג לתוכן</a>
+
+<div class="lc-wrap" id="main">
+
+  <!-- ============ מסך בית ============ -->
+  <section data-screen="home">
+    <h1 tabindex="-1" data-focus>שם האפליקציה</h1>
+    <p class="lc-soft" id="homeLead">תיאור קצר במשפט אחד.</p>
+
+    <div class="app-langs" role="group" aria-label="שפת הממשק" id="langBar"></div>
+
+    <div class="lc-card">
+      <p id="homeStat" role="status"></p>
+      <div class="lc-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <i id="homeBar" style="width:0%"></i>
+      </div>
+    </div>
+
+    <button class="lc-btn-main" id="btnStart" type="button">התחלה</button>
+    <button class="lc-btn" id="btnDrill" type="button" hidden>תרגול הטעויות שלי</button>
+  </section>
+
+  <!-- ============ מסך תרגול ============ -->
+  <section data-screen="practice" hidden>
+    <h2 tabindex="-1" data-focus id="qTitle">שאלה</h2>
+
+    <div class="lc-card">
+      <p id="qText"></p>
+      <button class="lc-btn" id="btnPlay" type="button" aria-live="off">🔊 הקראה</button>
+    </div>
+
+    <div class="lc-opts" id="opts" role="group" aria-labelledby="qTitle"></div>
+
+    <p id="feedback" role="status" aria-live="polite"></p>
+
+    <button class="lc-btn-main" id="btnNext" type="button" hidden>הבא</button>
+    <button class="lc-btn" id="btnHome" type="button">חזרה לבית</button>
+  </section>
+
+  <!-- ============ מסך סיכום ============ -->
+  <section data-screen="summary" hidden>
+    <h2 tabindex="-1" data-focus>סיכום</h2>
+    <div class="lc-card">
+      <p id="sumText"></p>
+      <p class="lc-soft" id="sumMistakes"></p>
+    </div>
+    <button class="lc-btn-main" id="btnAgain" type="button">סבב נוסף</button>
+    <button class="lc-btn" id="btnHome2" type="button">חזרה לבית</button>
+  </section>
+
+  <p class="app-foot" id="foot"></p>
+</div>
+
+<script src="./core.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  /* ---------------------------------------------------------------
+     1. תוכן
+     כל שאלה: מזהה יציב שלא משתנה לעולם (בנק הטעויות נשען עליו),
+     טקסט, אפשרויות, ואינדקס הנכונה.
+     --------------------------------------------------------------- */
+  var QUESTIONS = [
+    { id:'q1', q:'שאלה לדוגמה. להחליף בתוכן אמיתי.',
+      o:['תשובה א','תשובה ב','תשובה ג','תשובה ד'], c:0,
+      hint:'רמז קצר.' }
+  ];
+
+  /* ---------------------------------------------------------------
+     2. מחרוזות הממשק בארבע השפות
+     המפתח הוא באנגלית ולא בעברית: מחרוזת עברית כמפתח נשברת בשקט
+     ברגע שמתקנים בה מילה, וזו תקלה שקשה מאוד לראות.
+     --------------------------------------------------------------- */
+  var STRINGS = {
+    he:{ start:'התחלה', next:'הבא', home:'חזרה לבית', play:'🔊 הקראה', stop:'■ עצירה',
+         drill:'תרגול הטעויות שלי', again:'סבב נוסף', summary:'סיכום',
+         right:'נכון', wrong:'לא נכון', of:'שאלה {i} מתוך {n}', seen:'ראית {i} מתוך {n} שאלות.',
+         score:'ענית נכון על {ok} מתוך {n}.', noMistakes:'אין טעויות פתוחות.',
+         mistakes:'טעויות שממתינות לחזרה: {n}' },
+    ar:{ start:'ابدأ', next:'التالي', home:'العودة للرئيسية', play:'🔊 استماع', stop:'■ إيقاف',
+         drill:'تدريب على أخطائي', again:'جولة أخرى', summary:'ملخّص',
+         right:'صحيح', wrong:'غير صحيح', of:'سؤال {i} من {n}', seen:'شاهدت {i} من {n} أسئلة.',
+         score:'أجبت بشكل صحيح على {ok} من {n}.', noMistakes:'لا أخطاء مفتوحة.',
+         mistakes:'أخطاء بانتظار المراجعة: {n}' },
+    en:{ start:'Start', next:'Next', home:'Back home', play:'🔊 Listen', stop:'■ Stop',
+         drill:'Practise my mistakes', again:'Another round', summary:'Summary',
+         right:'Correct', wrong:'Not correct', of:'Question {i} of {n}', seen:'You have seen {i} of {n} questions.',
+         score:'You answered {ok} of {n} correctly.', noMistakes:'No open mistakes.',
+         mistakes:'Mistakes waiting for review: {n}' },
+    ru:{ start:'Начать', next:'Дальше', home:'На главную', play:'🔊 Слушать', stop:'■ Стоп',
+         drill:'Повторить мои ошибки', again:'Ещё круг', summary:'Итог',
+         right:'Верно', wrong:'Неверно', of:'Вопрос {i} из {n}', seen:'Просмотрено {i} из {n} вопросов.',
+         score:'Правильных ответов: {ok} из {n}.', noMistakes:'Открытых ошибок нет.',
+         mistakes:'Ошибок ждёт повторения: {n}' }
+  };
+
+  /* ---------------------------------------------------------------
+     3. אתחול
+     --------------------------------------------------------------- */
+  LC.init({
+    app: 'my-app',            /* מרחב השמות ב-localStorage. ייחודי! */
+    strings: STRINGS,
+    root: '#main',
+    /* מילים שדווקא באפליקציה הזאת נקראות לא נכון */
+    ktiv: {}
+  });
+
+  var $ = function(id){ return document.getElementById(id); };
+  var S = { deck:[], i:0, ok:0, answered:false };
+
+  /* ---------------------------------------------------------------
+     4. מסכים
+     --------------------------------------------------------------- */
+  LC.nav.define('home', renderHome)
+        .define('practice', renderQuestion)
+        .define('summary', renderSummary);
+
+  function renderHome(){
+    var p = LC.progress.load();
+    var total = QUESTIONS.length;
+    var seen = Object.keys(p.seen || {}).length;
+    $('homeStat').textContent = LC.t('seen', { i: seen, n: total });
+    var pct = total ? Math.round(seen / total * 100) : 0;
+    $('homeBar').style.width = pct + '%';
+    $('homeBar').parentElement.setAttribute('aria-valuenow', String(pct));
+
+    var m = LC.mistakes.count();
+    $('btnDrill').hidden = m === 0;
+    $('btnDrill').textContent = LC.t('drill') + ' (' + m + ')';
+    $('btnStart').textContent = LC.t('start');
+    renderLangs();
+  }
+
+  function renderLangs(){
+    var bar = $('langBar');
+    bar.innerHTML = '';
+    Object.keys(LC.langs).forEach(function(code){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = LC.langs[code].name;
+      b.setAttribute('aria-pressed', String(code === LC.lang));
+      b.addEventListener('click', function(){ LC.setLang(code); });
+      bar.appendChild(b);
+    });
+  }
+
+  /* ערבוב טרי בכל פתיחת סשן — לא פעם אחת בטעינת הקובץ. */
+  function startRound(ids){
+    var pool = ids && ids.length
+      ? QUESTIONS.filter(function(q){ return ids.indexOf(q.id) >= 0; })
+      : QUESTIONS;
+    S.deck = LC.deck(pool, 10);
+    S.i = 0; S.ok = 0;
+    LC.nav.go('practice');
+  }
+
+  function current(){ return S.deck[S.i]; }
+
+  function renderQuestion(){
+    var q = current();
+    if (!q) { LC.nav.go('summary'); return; }
+    S.answered = false;
+
+    $('qTitle').textContent = LC.t('of', { i: S.i + 1, n: S.deck.length });
+    $('qText').textContent = q.q;
+    $('feedback').textContent = '';
+    $('btnNext').hidden = true;
+    $('btnNext').textContent = LC.t('next');
+    $('btnHome').textContent = LC.t('home');
+    $('btnPlay').textContent = LC.t('play');
+
+    var box = $('opts');
+    box.innerHTML = '';
+    /* גם סדר התשובות מעורבב מחדש — אחרת "הראשונה תמיד נכונה"
+       הופך לאסטרטגיה שעובדת בלי לדעת את החומר. */
+    var order = LC.shuffle(q.o.map(function(text, idx){ return { text:text, idx:idx }; }));
+    order.forEach(function(item){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'lc-opt';
+      b.textContent = item.text;
+      b.addEventListener('click', function(){ answer(b, item.idx === q.c, q); });
+      box.appendChild(b);
+    });
+  }
+
+  function answer(btn, correct, q){
+    if (S.answered) return;      /* לחיצה שנייה על אותה שאלה אינה טעות נוספת */
+    S.answered = true;
+    btn.setAttribute('data-state', correct ? 'ok' : 'bad');
+    $('feedback').textContent = correct ? LC.t('right')
+                                        : (LC.t('wrong') + (q.hint ? ' — ' + q.hint : ''));
+    if (correct) S.ok++;
+    LC.progress.record(q.id, correct);   /* טעות נרשמת בבנק אוטומטית */
+    $('btnNext').hidden = false;
+    $('btnNext').focus();
+  }
+
+  function renderSummary(){
+    $('sumText').textContent = LC.t('score', { ok:S.ok, n:S.deck.length });
+    var m = LC.mistakes.count();
+    $('sumMistakes').textContent = m ? LC.t('mistakes', { n:m }) : LC.t('noMistakes');
+    $('btnAgain').textContent = LC.t('again');
+    $('btnHome2').textContent = LC.t('home');
+  }
+
+  /* ---------------------------------------------------------------
+     5. אירועים
+     --------------------------------------------------------------- */
+  $('btnStart').addEventListener('click', function(){ startRound(null); });
+  $('btnDrill').addEventListener('click', function(){
+    startRound(LC.mistakes.drill(10, QUESTIONS.map(function(q){ return q.id; })));
+  });
+  $('btnNext').addEventListener('click', function(){
+    S.i++;
+    if (S.i >= S.deck.length) LC.nav.go('summary'); else renderQuestion();
+  });
+  $('btnHome').addEventListener('click', function(){ LC.nav.go('home'); });
+  $('btnHome2').addEventListener('click', function(){ LC.nav.go('home'); });
+  $('btnAgain').addEventListener('click', function(){ startRound(null); });
+
+  $('btnPlay').addEventListener('click', function(){
+    var q = current();
+    if (!q) return;
+    if (LC.tts.speaking) { LC.tts.stop(); $('btnPlay').textContent = LC.t('play'); return; }
+    $('btnPlay').textContent = LC.t('stop');
+    LC.tts.queue([q.q].concat(q.o), {
+      onDone: function(){ $('btnPlay').textContent = LC.t('play'); }
+    });
+  });
+
+  /* החלפת שפה מרעננת את המסך הנוכחי, ולא רק את דף הבית. */
+  LC.onLangChange(function(){ LC.nav.go(LC.nav.current || 'home'); });
+
+  $('foot').textContent = 'learning-core ' + LC.version;
+  LC.nav.go('home');
+
+  /* ---------------------------------------------------------------
+     6. Service worker
+     כתובת נקייה, בלי ?v= — הגרסה חיה בקבוע אחד בתוך sw.js עצמו.
+     --------------------------------------------------------------- */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>
