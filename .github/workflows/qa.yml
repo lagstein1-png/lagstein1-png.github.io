@@ -1,0 +1,48 @@
+# חבילת הבדיקות של הריפו — node .claude/qa/all.js — בכל push ובכל PR.
+#
+# למה זה קיים: היו שמונה־עשרה בדיקות ואף אחת לא רצה מעצמה. תיקון שישב
+# בענף בלי שהחבילה רצה עליו נשבר בשקט (CLAUDE.md, "תיקון שיושב בענף").
+# כאן היא רצה על כל דחיפה, ומה שאדום נראה לפני המיזוג ולא אחריו.
+#
+# מה הריצה צריכה:
+#   · origin/main — cache.js משווה אליו מפתחות קאש (בדיקה 6), ולכן
+#     fetch-depth: 0 ו-fetch מפורש של main.
+#   · Playwright + Chromium — שבע בדיקות מריצות דפדפן. .claude/qa/pw.js
+#     מוצא את ההתקנה המקומית הזאת לפני הנתיב הגלובלי של סביבת הפיתוח.
+#   · אין package.json בריפו, וזו החלטה: ההתקנה כאן זמנית, לריצה בלבד.
+name: qa
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: origin/main for cache.js
+        run: git fetch origin main:refs/remotes/origin/main || true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Playwright
+        run: |
+          npm init -y >/dev/null
+          npm i --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+
+      - name: QA suite
+        run: node .claude/qa/all.js
+
+      - name: keep the tree clean
+        run: |
+          rm -f package.json package-lock.json
+          rm -rf node_modules
+          git status --short

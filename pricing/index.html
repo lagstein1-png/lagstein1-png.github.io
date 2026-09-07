@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מחירים — למידה שנשמעת</title>
+<meta name="description" content="ארבע אפליקציות חינם לתמיד, שמונה בתשלום. Starter, Pro 99 ₪, Family 149 ₪. מורים 29 ₪, בתי ספר 990 ₪.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="מחירים — למידה שנשמעת">
+<meta property="og:description" content="ארבע אפליקציות חינם לתמיד, שמונה בתשלום. Starter, Pro 99 ₪, Family 149 ₪.">
+<meta property="og:url" content="https://lagstein1-png.github.io/pricing/">
+<meta property="og:image" content="https://lagstein1-png.github.io/img/icon-512.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/img/icon-192.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="license" href="/legal/">
+<meta name="theme-color" content="#f6f7fb" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0b0f17" media="(prefers-color-scheme:dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   עמוד המחירים. אותם צבעי מותג ואותם משתנים כמו בדף הבית, כדי
+   שהמעבר ביניהם לא ירגיש כמו מעבר לאתר אחר. כל המידות לוגיות —
+   הדף מתחלף בין ארבע שפות, ושתיים מהן נכתבות לשמאל.
+
+   המחירים כתובים פעם אחת, ב-PLANS וב-APPS שבסקריפט, ומוצגים בכל
+   שפה מאותו מקום. המקור: הודעת הבעלים מ-7.9.2026.
+   ============================================================ */
+:root{
+  --bg:#f6f7fb; --bg-elev:#ffffff; --text:#14181f; --text-soft:#4a5464;
+  --line:#e2e6ef; --brand:#2f5fd8; --brand-ink:#ffffff; --brand-soft:#eaf0ff; --radius:18px;
+  --ok:#1a7f4b; --ok-soft:#e3f5ea;
+  --shadow:0 1px 2px rgba(20,24,31,.04),0 10px 30px -18px rgba(20,24,31,.25);
+  --shadow-lg:0 2px 4px rgba(20,24,31,.05),0 22px 48px -26px rgba(20,24,31,.45);
+}
+:root[data-theme="dark"]{
+  --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6;
+  --line:#222c3d; --brand:#7ba2ff; --brand-ink:#0b0f17; --brand-soft:#18233a;
+  --ok:#6ee7a8; --ok-soft:#14301f;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 12px 34px -20px rgba(0,0,0,.8);
+  --shadow-lg:0 2px 4px rgba(0,0,0,.55),0 26px 54px -26px rgba(0,0,0,.9);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6;
+    --line:#222c3d; --brand:#7ba2ff; --brand-ink:#0b0f17; --brand-soft:#18233a;
+    --ok:#6ee7a8; --ok-soft:#14301f;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 12px 34px -20px rgba(0,0,0,.8);
+    --shadow-lg:0 2px 4px rgba(0,0,0,.55),0 26px 54px -26px rgba(0,0,0,.9);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--text);
+  font:400 18px/1.65 Heebo,"Segoe UI",system-ui,Arial,sans-serif;
+  -webkit-text-size-adjust:100%; -webkit-font-smoothing:antialiased;
+}
+/* Heebo אינו מכיל גליפים ערביים ולא קיריליים. שתי המשפחות נטענות
+   מאותה בקשה, וקובצי הפונט נמשכים רק כשבאמת מוצג טקסט בכתב הזה. */
+html[lang="ar"] body,html[lang="ar"] button,html[lang="ar"] .btn{
+  font-family:"Noto Sans Arabic",Heebo,"Segoe UI",system-ui,Arial,sans-serif;
+}
+html[lang="ru"] body,html[lang="ru"] button,html[lang="ru"] .btn{
+  font-family:"Noto Sans",Heebo,"Segoe UI",system-ui,Arial,sans-serif;
+}
+.wrap{max-width:1080px; margin-inline:auto; padding-inline:clamp(14px,4vw,26px)}
+.skip{
+  position:absolute; inset-block-start:-100px; inset-inline-start:12px; z-index:9;
+  background:var(--brand); color:var(--brand-ink); padding:12px 18px; border-radius:12px;
+  text-decoration:none; font-weight:700;
+}
+.skip:focus{inset-block-start:12px}
+:focus-visible{outline:3px solid var(--brand); outline-offset:2px}
+
+/* --- סרגל עליון --- */
+.topbar{
+  position:sticky; inset-block-start:0; z-index:8;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(10px); border-block-end:1px solid var(--line);
+}
+.topbar .wrap{display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; min-block-size:64px; padding-block:8px}
+.logo{
+  display:inline-flex; align-items:center; gap:11px; text-decoration:none; color:inherit;
+  font-weight:800; font-size:1.05rem; line-height:1.15; min-block-size:44px; margin-inline-end:auto;
+}
+.mark{
+  inline-size:38px; block-size:38px; border-radius:12px; flex:none; display:grid; place-items:center;
+  color:var(--brand-ink); background:linear-gradient(145deg,var(--brand),color-mix(in srgb,var(--brand) 72%,#000));
+}
+.mark svg{inline-size:22px; block-size:22px}
+@media (max-width:560px){#me{display:none}}
+.home{
+  display:inline-flex; align-items:center; min-block-size:44px; padding-inline:12px; border-radius:12px;
+  color:var(--text-soft); text-decoration:none; font-weight:600;
+}
+.home:hover{color:var(--text); background:var(--brand-soft)}
+.lang{display:flex; gap:4px}
+.lang button{
+  min-block-size:44px; min-inline-size:44px; padding-inline:10px; border:1px solid var(--line); border-radius:12px;
+  background:var(--bg-elev); color:var(--text-soft); cursor:pointer; font:700 .9rem/1 Heebo,system-ui,sans-serif;
+}
+.lang button[aria-pressed="true"]{background:var(--brand); color:var(--brand-ink); border-color:var(--brand)}
+
+/* --- כותרת --- */
+.hero{text-align:center; padding-block:clamp(30px,6vw,64px) clamp(14px,3vw,24px)}
+h1{margin:0 0 12px; font-size:clamp(1.8rem,4.6vw,2.7rem); font-weight:800; line-height:1.18; letter-spacing:-.01em}
+.lead{margin:0 auto; max-inline-size:640px; color:var(--text-soft); font-size:1.08rem}
+.free-line{
+  display:inline-flex; flex-wrap:wrap; justify-content:center; gap:6px 10px; margin:20px auto 0;
+  padding:12px 18px; border-radius:14px; background:var(--ok-soft); color:var(--ok); font-weight:700;
+}
+
+/* --- כרטיסי המסלולים --- */
+.plans{display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); padding-block:18px 8px}
+.plan{
+  position:relative; display:flex; flex-direction:column; gap:12px;
+  background:var(--bg-elev); border:1px solid var(--line); border-radius:var(--radius);
+  padding:24px 22px; box-shadow:var(--shadow);
+}
+.plan.hot{border-color:var(--brand); box-shadow:var(--shadow-lg)}
+.plan .tag{
+  position:absolute; inset-block-start:-13px; inset-inline-start:20px;
+  background:var(--brand); color:var(--brand-ink); font-weight:800; font-size:.8rem;
+  padding:5px 12px; border-radius:999px;
+}
+.plan h2{margin:0; font-size:1.3rem; font-weight:800}
+.plan .who{margin:0; color:var(--text-soft); font-size:.96rem; min-block-size:3.1em}
+.price{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
+.price .amt{font-size:2.3rem; font-weight:800; line-height:1; letter-spacing:-.02em; direction:ltr; unicode-bidi:isolate}
+.price .per{color:var(--text-soft); font-weight:500}
+.plan ul{margin:0; padding:0; list-style:none; display:grid; gap:8px; color:var(--text-soft); font-size:.96rem}
+.plan li{display:flex; gap:9px; align-items:flex-start}
+.plan li::before{content:"✓"; color:var(--ok); font-weight:800; flex:none}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; min-block-size:48px;
+  padding-inline:20px; border-radius:14px; border:1px solid var(--brand); background:var(--brand);
+  color:var(--brand-ink); font-weight:700; font-size:1rem; text-decoration:none; cursor:pointer;
+  margin-block-start:auto;
+}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:var(--bg-elev); color:var(--text); border-color:var(--line)}
+
+/* --- קטעים --- */
+.blk{padding-block:clamp(26px,5vw,44px); border-block-start:1px solid var(--line)}
+.h2{margin:0 0 6px; font-size:clamp(1.4rem,3.6vw,1.9rem); font-weight:800; letter-spacing:-.01em}
+.h2s{margin:0 0 16px; color:var(--text-soft)}
+
+/* --- טבלת האפליקציות --- */
+.tbl{overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--bg-elev)}
+/* בלי רוחב מינימלי: בטלפון הטבלה נכנסת לרוחב המסך ותא ״חינם לתמיד״ נשבר לשתי שורות במקום להיחתך */
+table{border-collapse:collapse; inline-size:100%}
+th,td{padding:12px 16px; text-align:start; border-block-start:1px solid var(--line); vertical-align:top}
+thead th{border-block-start:0; background:var(--brand-soft); font-size:.9rem; color:var(--text-soft)}
+td.p{white-space:nowrap; font-weight:800; direction:ltr; unicode-bidi:isolate; text-align:end}
+html[dir="ltr"] td.p{text-align:start}
+td.p.free{color:var(--ok); white-space:normal}
+td .sm{display:block; color:var(--text-soft); font-size:.86rem; font-weight:500}
+
+/* --- מוסדות --- */
+.duo{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.box{background:var(--bg-elev); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; display:flex; flex-direction:column; gap:8px}
+.box h3{margin:0; font-size:1.12rem}
+.box p{margin:0; color:var(--text-soft)}
+.box .price{margin-block:4px}
+
+/* --- שאלות נפוצות --- */
+.faq{display:grid; gap:10px}
+.faq details{background:var(--bg-elev); border:1px solid var(--line); border-radius:14px; padding:0 18px}
+.faq summary{cursor:pointer; font-weight:700; padding-block:14px; min-block-size:44px; list-style:none; display:flex; justify-content:space-between; gap:12px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+"; color:var(--brand); font-weight:800; font-size:1.3rem; line-height:1}
+.faq details[open] summary::after{content:"−"}
+.faq p{margin:0 0 16px; color:var(--text-soft)}
+
+footer.site{padding-block:26px 40px; color:var(--text-soft); font-size:.9rem; display:flex; flex-wrap:wrap; gap:8px 18px; border-block-start:1px solid var(--line)}
+footer.site a{color:var(--brand)}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#plans" id="skip"></a>
+<div class="topbar"><div class="wrap">
+  <a class="logo" href="/"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg></span><span id="me"></span></a>
+  <a class="home" href="/" id="home"></a>
+  <div class="lang" id="lang" role="group"></div>
+</div></div>
+
+<main>
+  <div class="wrap">
+    <header class="hero">
+      <h1 id="h1"></h1>
+      <p class="lead" id="lead"></p>
+      <p class="free-line" id="freeLine"></p>
+    </header>
+
+    <section id="plans" aria-labelledby="plansT">
+      <h2 class="h2" id="plansT" style="text-align:center"></h2>
+      <p class="h2s" id="plansS" style="text-align:center"></p>
+      <div class="plans" id="planGrid"></div>
+    </section>
+
+    <section class="blk" id="apps">
+      <h2 class="h2" id="appsT"></h2>
+      <p class="h2s" id="appsS"></p>
+      <div class="tbl"><table id="appTbl"></table></div>
+    </section>
+
+    <section class="blk" id="org">
+      <h2 class="h2" id="orgT"></h2>
+      <p class="h2s" id="orgS"></p>
+      <div class="duo" id="orgGrid"></div>
+    </section>
+
+    <section class="blk" id="faq">
+      <h2 class="h2" id="faqT"></h2>
+      <div class="faq" id="faqList"></div>
+    </section>
+
+    <footer class="site">
+      <span id="foot"></span>
+      <a href="/" id="backHome"></a>
+      <a href="/legal/" id="terms"></a>
+    </footer>
+  </div>
+</main>
+
+<script>
+/* המחירים — מקום אחד. המקור: הודעת הבעלים, 7.9.2026. חודשי, בש״ח;
+   ״תאוריה מדברת״ בתשלום חד־פעמי. */
+var EMAIL="lagstein1@gmail.com";
+var PLANS=[
+  {id:"starter",from:39},
+  {id:"pro",price:99,hot:true},
+  {id:"family",price:149}
+];
+var TEACHER=29, SCHOOL=990;
+/* שמות האפליקציות הועתקו מ-DATA.APPS שבדף הבית (7.9.2026); שינוי שם שם
+   מחייב עדכון גם כאן. price בש״ח לחודש, 0 = חינם, once = חד־פעמי. */
+var APPS=[{"id":"math-app","n":{"he":"מתמטיקה לחכמים שמתקשים","ar":"رياضيات للأذكياء الذين يجدون صعوبة","ru":"Математика для умных, которым трудно","en":"Math for Smart Strugglers"},"price":39},{"id":"math-teen","n":{"he":"שלב — מתמטיקה לתיכון","ar":"شلاف — رياضيات للثانوية","ru":"Шлав — математика для старших классов","en":"Shlav — secondary maths"},"price":49},{"id":"math-uni","n":{"he":"אקסיומה — תואר, שנה א׳","ar":"أكسيوما — السنة الأولى","ru":"Аксиома — первый курс","en":"Axioma — first year"},"price":59},{"id":"math-uni2","n":{"he":"אקסיומה ב׳ — שנה שנייה","ar":"أكسيوما ٢ — السنة الثانية","ru":"Аксиома II — второй курс","en":"Axioma II — second year"},"price":69},{"id":"math-uni3","n":{"he":"אקסיומה ג׳ — שנה שלישית","ar":"أكسيوما ٣ — السنة الثالثة","ru":"Аксиома III — третий курс","en":"Axioma III — third year"},"price":79},{"id":"bagrut-806","n":{"he":"806 — בגרות במתמטיקה, 3–4 ו-5 יח״ל","ar":"٨٠٦ — بجروت رياضيات، ٣–٤ و٥ وحدات","ru":"806 — багрут по математике, 3–4 и 5 единиц","en":"806 — matriculation maths, 3–4 and 5 units"},"price":69},{"id":"ulpan","n":{"he":"אולפן — עברית מעשית לעולים חדשים","ar":"أولبان — عبرية عملية للقادمين الجدد","ru":"Ульпан — практический иврит для репатриантов","en":"Ulpan — practical Hebrew for new arrivals"},"price":0},{"id":"english","n":{"he":"ניב — אנגלית מדוברת וספרותית","ar":"نِيف — إنجليزية محكيّة وأدبيّة","ru":"Нив — английский разговорный и книжный","en":"Niv — spoken and written English"},"price":49},{"id":"history","n":{"he":"מפנה — היסטוריה לחטיבה","ar":"مفنيه — التاريخ للمرحلة الإعدادية","ru":"Мифне — история для средней школы","en":"Mifne — history for middle school"},"price":0},{"id":"lomda","n":{"he":"לומדה — לימוד לפי נושא","ar":"لومدا — تعلّم حسب الموضوع","ru":"Ломда — учёба по темам","en":"Lomda — learning by topic"},"price":0},{"id":"reader","n":{"he":"מקריא קולי","ar":"قارئ صوتي","ru":"Голосовой чтец","en":"Voice reader"},"price":0},{"id":"theory","n":{"he":"תאוריה מדברת","ar":"نظرية ناطقة","ru":"Говорящая теория","en":"Talking Theory"},"price":120,"once":true}];
+
+var TR={
+he:{dir:"rtl",me:"למידה שנשמעת",home:"דף הבית",skip:"למסלולים",
+  title:"מחירים — למידה שנשמעת",
+  h1:"מחירים פשוטים, בלי הפתעות",
+  lead:"ארבע אפליקציות חינם לתמיד, בלי הרשמה. שמונה נוספות במחיר של ספר לימוד אחד — למשפחה שלמה.",
+  freeLine:"חינם לתמיד: אולפן · מפנה · לומדה · מקריא קולי",
+  plansT:"שלושה מסלולים",plansS:"מחיר לחודש, בש״ח. מבטלים מתי שרוצים.",
+  perMonth:"לחודש",from:"החל מ-",popular:"הנבחר",
+  names:{starter:"Starter",pro:"Pro",family:"Family"},
+  who:{starter:"לומד אחד שצריך אפליקציה אחת",pro:"לומד אחד שצריך יותר מאחת",family:"בית עם יותר מלומד אחד"},
+  feats:{starter:["אפליקציה אחת לבחירה, לפי המחיר שבטבלה","לומד אחד","הקראה, ארבע שפות ועבודה בלי אינטרנט"],
+         pro:["כל שמונה האפליקציות בתשלום","לומד אחד","הקראה, ארבע שפות ועבודה בלי אינטרנט"],
+         family:["כל שמונה האפליקציות בתשלום","עד 4 בני משפחה","לכל אחד ההתקדמות שלו, במכשיר שלו"]},
+  start:"התחל",
+  appsT:"מה עולה כל אפליקציה",appsS:"ארבע חינם לתמיד. השאר — מחיר לחודש, ותאוריה מדברת בתשלום חד־פעמי.",
+  colApp:"אפליקציה",colPrice:"מחיר",free:"חינם לתמיד",once:"חד־פעמי",
+  orgT:"מורים ובתי ספר",orgS:"מצב המורה ובניית מבחן כיתתי קיימים כבר היום בתשע אפליקציות.",
+  teacherT:"מורה",teacherP:"כל האפליקציות בתשלום, כולל מצב מורה ומבחן כיתתי — למורה אחד.",
+  schoolT:"בית ספר",schoolP:"רישיון לבית ספר, לכל המורים והתלמידים. נסגר במייל.",
+  contact:"כתבו לנו",
+  faqT:"שאלות נפוצות",
+  faq:[["לא מרוצים?","החזר מלא לבקשה תוך 14 יום מכל חיוב. אחריו — ביטול שחל בתום התקופה ששולמה."],
+       ["האפליקציות עובדות בלי אינטרנט?","כן. אפליקציה בתשלום ממשיכה לעבוד עד 14 יום בלי חיבור, ובכל חיבור המונה מתאפס. ארבע החינמיות עובדות בלי אינטרנט בלי הגבלה."],
+       ["כמה לומדים במסלול Family?","עד 4 בני משפחה. לכל אחד ההתקדמות שלו, במכשיר שלו."],
+       ["מה נשמר בשרת?","רק מצב המנוי. ההתקדמות, ההגדרות והשם נשארים במכשיר שלכם, כמו היום."],
+       ["אפשר לנסות לפני שמשלמים?","כן. שבעה ימים, כל האפליקציות, בלי כרטיס אשראי."],
+       ["איך משלמים היום?","העמוד הזה הוא שלב ראשון. לוחצים ״התחל״, נפתח מייל אלינו, ואנחנו חוזרים עם קישור לתשלום."]],
+  foot:"© 2026 יהושע לגשטיין",back:"לדף הבית",terms:"תנאי שימוש",
+  mailSubject:"הצטרפות למסלול {plan}"},
+en:{dir:"ltr",me:"Learning That Sounds",home:"Home",skip:"Skip to plans",
+  title:"Pricing — Learning That Sounds",
+  h1:"Simple pricing, no surprises",
+  lead:"Four apps free forever, no sign-up. Eight more for the price of a single textbook — for the whole family.",
+  freeLine:"Free forever: Ulpan · Mifne · Lomda · Voice reader",
+  plansT:"Three plans",plansS:"Price per month, in ₪. Cancel any time.",
+  perMonth:"a month",from:"from ",popular:"Most chosen",
+  names:{starter:"Starter",pro:"Pro",family:"Family"},
+  who:{starter:"One learner who needs one app",pro:"One learner who needs more than one",family:"A home with more than one learner"},
+  feats:{starter:["One app of your choice, at the price in the table","One learner","Read-aloud, four languages, works offline"],
+         pro:["All eight paid apps","One learner","Read-aloud, four languages, works offline"],
+         family:["All eight paid apps","Up to 4 family members","Each with their own progress, on their own device"]},
+  start:"Start",
+  appsT:"What each app costs",appsS:"Four are free forever. The rest are priced per month; Talking Theory is a one-time payment.",
+  colApp:"App",colPrice:"Price",free:"Free forever",once:"one-time",
+  orgT:"Teachers and schools",orgS:"Teacher mode and class exams already exist today in nine of the apps.",
+  teacherT:"Teacher",teacherP:"All paid apps, including teacher mode and class exams — for one teacher.",
+  schoolT:"School",schoolP:"A school licence, for all teachers and students. Arranged by email.",
+  contact:"Write to us",
+  faqT:"Frequently asked questions",
+  faq:[["Not happy?","A full refund on request within 14 days of any charge. After that, cancellation takes effect at the end of the paid period."],
+       ["Do the apps work offline?","Yes. A paid app keeps working for up to 14 days without a connection, and every connection resets the counter. The four free apps work offline with no limit."],
+       ["How many learners on Family?","Up to 4 family members. Each has their own progress, on their own device."],
+       ["What is kept on the server?","Only your subscription status. Progress, settings and your name stay on your device, as they do today."],
+       ["Can I try before paying?","Yes. Seven days, every app, no credit card."],
+       ["How do I pay today?","This page is a first step. Press “Start”, an email to us opens, and we reply with a payment link."]],
+  foot:"© 2026 Joshua Lagstein",back:"Home",terms:"Terms of use",
+  mailSubject:"Joining the {plan} plan"},
+ar:{dir:"rtl",me:"تعلُّم يُسمَع",home:"الصفحة الرئيسية",skip:"إلى الخطط",
+  title:"الأسعار — تعلُّم يُسمَع",
+  h1:"أسعار بسيطة، بلا مفاجآت",
+  lead:"أربعة تطبيقات مجّانية للأبد، بلا تسجيل. وثمانية أخرى بثمن كتاب مدرسيّ واحد — لعائلة كاملة.",
+  freeLine:"مجّاني للأبد: أولبان · مفنيه · لومدا · قارئ صوتي",
+  plansT:"ثلاث خطط",plansS:"السعر شهريًا، بالشيكل. تلغي متى شئت.",
+  perMonth:"شهريًا",from:"ابتداءً من ",popular:"الأكثر اختيارًا",
+  names:{starter:"Starter",pro:"Pro",family:"Family"},
+  who:{starter:"متعلّم واحد يحتاج تطبيقًا واحدًا",pro:"متعلّم واحد يحتاج أكثر من تطبيق",family:"بيت فيه أكثر من متعلّم"},
+  feats:{starter:["تطبيق واحد تختاره، بالسعر الموجود في الجدول","متعلّم واحد","قراءة صوتية، أربع لغات، وعمل بلا إنترنت"],
+         pro:["التطبيقات المدفوعة الثمانية كلّها","متعلّم واحد","قراءة صوتية، أربع لغات، وعمل بلا إنترنت"],
+         family:["التطبيقات المدفوعة الثمانية كلّها","حتى ٤ أفراد من العائلة","لكلّ واحد تقدّمه، على جهازه"]},
+  start:"ابدأ",
+  appsT:"كم يكلّف كلّ تطبيق",appsS:"أربعة مجّانية للأبد. الباقي بسعر شهري، و«نظرية ناطقة» بدفعة واحدة.",
+  colApp:"التطبيق",colPrice:"السعر",free:"مجّاني للأبد",once:"دفعة واحدة",
+  orgT:"المعلّمون والمدارس",orgS:"وضع المعلّم وبناء امتحان صفّي موجودان اليوم في تسعة تطبيقات.",
+  teacherT:"معلّم",teacherP:"كلّ التطبيقات المدفوعة، مع وضع المعلّم والامتحان الصفّي — لمعلّم واحد.",
+  schoolT:"مدرسة",schoolP:"رخصة للمدرسة، لكلّ المعلّمين والطلّاب. تُرتَّب عبر البريد.",
+  contact:"اكتبوا لنا",
+  faqT:"أسئلة شائعة",
+  faq:[["غير راضٍ؟","استرداد كامل عند الطلب خلال 14 يومًا من أيّ دفعة. بعد ذلك يسري الإلغاء في نهاية الفترة المدفوعة."],
+       ["هل تعمل التطبيقات بلا إنترنت؟","نعم. التطبيق المدفوع يواصل العمل حتى 14 يومًا بلا اتصال، وكلّ اتصال يعيد العدّاد إلى الصفر. التطبيقات المجّانية الأربعة تعمل بلا إنترنت دون حدّ."],
+       ["كم متعلّمًا في خطة Family؟","حتى ٤ أفراد من العائلة. لكلّ واحد تقدّمه، على جهازه."],
+       ["ما الذي يُحفَظ على الخادم؟","حالة الاشتراك فقط. التقدّم والإعدادات والاسم تبقى على جهازك، كما هي اليوم."],
+       ["هل يمكن التجربة قبل الدفع؟","نعم. سبعة أيام، كلّ التطبيقات، بلا بطاقة ائتمان."],
+       ["كيف أدفع اليوم؟","هذه الصفحة خطوة أولى. اضغط «ابدأ»، فتُفتح رسالة بريد إلينا، ونردّ برابط للدفع."]],
+  foot:"© 2026 يهوشع لچشطاين",back:"الصفحة الرئيسية",terms:"شروط الاستخدام",
+  mailSubject:"الانضمام إلى خطة {plan}"},
+ru:{dir:"ltr",me:"Учёба, которую слышно",home:"Главная",skip:"К тарифам",
+  title:"Цены — Учёба, которую слышно",
+  h1:"Простые цены, без сюрпризов",
+  lead:"Четыре приложения бесплатны навсегда, без регистрации. Ещё восемь — по цене одного учебника, на всю семью.",
+  freeLine:"Бесплатно навсегда: Ульпан · Мифне · Ломда · Голосовой чтец",
+  plansT:"Три тарифа",plansS:"Цена в месяц, в шекелях. Отменить можно в любой момент.",
+  perMonth:"в месяц",from:"от ",popular:"Выбирают чаще всего",
+  names:{starter:"Starter",pro:"Pro",family:"Family"},
+  who:{starter:"Один учащийся, которому нужно одно приложение",pro:"Один учащийся, которому нужно больше одного",family:"Дом, где учится больше одного человека"},
+  feats:{starter:["Одно приложение на выбор, по цене из таблицы","Один учащийся","Озвучивание, четыре языка, работа без интернета"],
+         pro:["Все восемь платных приложений","Один учащийся","Озвучивание, четыре языка, работа без интернета"],
+         family:["Все восемь платных приложений","До 4 членов семьи","У каждого свой прогресс, на своём устройстве"]},
+  start:"Начать",
+  appsT:"Сколько стоит каждое приложение",appsS:"Четыре бесплатны навсегда. Остальные — цена в месяц; «Говорящая теория» — разовый платёж.",
+  colApp:"Приложение",colPrice:"Цена",free:"Бесплатно навсегда",once:"разово",
+  orgT:"Учителя и школы",orgS:"Режим учителя и классная контрольная уже есть сегодня в девяти приложениях.",
+  teacherT:"Учитель",teacherP:"Все платные приложения, включая режим учителя и классную контрольную — для одного учителя.",
+  schoolT:"Школа",schoolP:"Лицензия для школы, для всех учителей и учеников. Оформляется по почте.",
+  contact:"Напишите нам",
+  faqT:"Частые вопросы",
+  faq:[["Не понравилось?","Полный возврат по запросу в течение 14 дней после любого списания. Затем отмена вступает в силу в конце оплаченного периода."],
+       ["Работают ли приложения без интернета?","Да. Платное приложение работает до 14 дней без подключения, и каждое подключение сбрасывает счётчик. Четыре бесплатных работают без интернета без ограничений."],
+       ["Сколько учащихся в тарифе Family?","До 4 членов семьи. У каждого свой прогресс, на своём устройстве."],
+       ["Что хранится на сервере?","Только статус подписки. Прогресс, настройки и имя остаются на вашем устройстве, как и сегодня."],
+       ["Можно попробовать до оплаты?","Да. Семь дней, все приложения, без банковской карты."],
+       ["Как платить сегодня?","Эта страница — первый шаг. Нажмите «Начать», откроется письмо к нам, и мы ответим ссылкой на оплату."]],
+  foot:"© 2026 Иехошуа Лагштейн",back:"На главную",terms:"Условия использования",
+  mailSubject:"Подключение тарифа {plan}"}
+};
+
+var $=function(s){return document.querySelector(s)};
+var esc=function(x){return String(x).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
+/* מפתח משלו, כמו לכל דף באתר (storage.js אוכף). site-lang של דף
+   הבית נקרא כירושה בלבד — מי שבחר שפה שם נוחת כאן באותה שפה —
+   ואינו נכתב מכאן. */
+var LKEY="pricing-lang";
+var LKEY_OLD="site-lang";
+var LANGS=[["he","עברית"],["ar","العربية"],["ru","Русский"],["en","English"]];
+function savedLang(){try{return localStorage.getItem(LKEY)||localStorage.getItem(LKEY_OLD)||""}catch(e){return""}}
+function guessLang(){
+  var l=(navigator.language||"").toLowerCase().split("-")[0];
+  return {he:1,iw:1}[l]?"he":{ar:1,ru:1,en:1}[l]?l:"he";
+}
+var LG=savedLang()||guessLang(); if(!TR[LG])LG="he";
+/* מצב כהה: הדריסה הידנית שדף הבית שומר ב-site-theme — נקראת בלבד, לא נכתבת */
+var TKEY_OLD="site-theme";
+try{var th=localStorage.getItem(TKEY_OLD); if(th)document.documentElement.setAttribute("data-theme",th)}catch(e){}
+
+function mail(plan,S){
+  return "mailto:"+EMAIL+"?subject="+encodeURIComponent(S.mailSubject.replace("{plan}",plan));
+}
+function priceHtml(amt,per,S){
+  return '<div class="price"><span class="amt">'+esc(amt)+' ₪</span><span class="per">'+esc(per||S.perMonth)+'</span></div>';
+}
+function paint(){
+  var S=TR[LG], r=document.documentElement;
+  r.setAttribute("lang",LG); r.setAttribute("dir",S.dir);
+  document.title=S.title;
+  $("#me").textContent=S.me; $(".logo").setAttribute("aria-label",S.me);
+  $("#home").textContent=S.home; $("#skip").textContent=S.skip;
+  $("#h1").textContent=S.h1; $("#lead").textContent=S.lead; $("#freeLine").textContent=S.freeLine;
+  $("#plansT").textContent=S.plansT; $("#plansS").textContent=S.plansS;
+  $("#planGrid").innerHTML=PLANS.map(function(p){
+    var name=S.names[p.id];
+    return '<article class="plan'+(p.hot?' hot':'')+'">'+
+      (p.hot?'<span class="tag">'+esc(S.popular)+'</span>':'')+
+      '<h2>'+esc(name)+'</h2><p class="who">'+esc(S.who[p.id])+'</p>'+
+      (p.from!==undefined
+        ? '<div class="price"><span class="per">'+esc(S.from)+'</span><span class="amt">'+p.from+' ₪</span><span class="per">'+esc(S.perMonth)+'</span></div>'
+        : priceHtml(p.price,"",S))+
+      '<ul>'+S.feats[p.id].map(function(f){return '<li>'+esc(f)+'</li>'}).join("")+'</ul>'+
+      '<a class="btn" href="'+mail(name,S)+'">'+esc(S.start)+'</a>'+
+    '</article>';
+  }).join("");
+  $("#appsT").textContent=S.appsT; $("#appsS").textContent=S.appsS;
+  $("#appTbl").innerHTML='<thead><tr><th>'+esc(S.colApp)+'</th><th>'+esc(S.colPrice)+'</th></tr></thead><tbody>'+
+    APPS.map(function(a){
+      var cell=a.price===0?'<td class="p free">'+esc(S.free)+'</td>'
+        :'<td class="p">'+a.price+' ₪'+(a.once?'<span class="sm">'+esc(S.once)+'</span>':'<span class="sm">'+esc(S.perMonth)+'</span>')+'</td>';
+      return '<tr><td>'+esc(a.n[LG])+'</td>'+cell+'</tr>';
+    }).join("")+'</tbody>';
+  $("#orgT").textContent=S.orgT; $("#orgS").textContent=S.orgS;
+  $("#orgGrid").innerHTML=
+    '<div class="box"><h3>'+esc(S.teacherT)+'</h3>'+priceHtml(TEACHER,"",S)+'<p>'+esc(S.teacherP)+'</p>'+
+      '<a class="btn ghost" href="'+mail(S.teacherT,S)+'">'+esc(S.contact)+'</a></div>'+
+    '<div class="box"><h3>'+esc(S.schoolT)+'</h3>'+priceHtml(SCHOOL," ",S)+'<p>'+esc(S.schoolP)+'</p>'+
+      '<a class="btn ghost" href="'+mail(S.schoolT,S)+'">'+esc(S.contact)+'</a></div>';
+  $("#faqT").textContent=S.faqT;
+  $("#faqList").innerHTML=S.faq.map(function(q){
+    return '<details><summary>'+esc(q[0])+'</summary><p>'+esc(q[1])+'</p></details>'}).join("");
+  $("#foot").textContent=S.foot; $("#backHome").textContent=S.back; $("#terms").textContent=S.terms;
+  $("#lang").setAttribute("aria-label",S.home);
+  $("#lang").innerHTML=LANGS.map(function(x){
+    return '<button type="button" data-l="'+x[0]+'" aria-pressed="'+(x[0]===LG)+'" lang="'+x[0]+'">'+esc(x[1])+"</button>"}).join("");
+}
+document.addEventListener("click",function(e){
+  var l=e.target.closest("#lang [data-l]"); if(!l)return;
+  LG=l.getAttribute("data-l"); try{localStorage.setItem(LKEY,LG)}catch(err){}
+  paint();
+});
+window.addEventListener("legal:lang",function(e){
+  var k=e&&e.detail; if(!k||!TR[k]||k===LG)return;
+  LG=k; try{localStorage.setItem(LKEY,LG)}catch(err){}
+  paint();
+});
+paint();
+</script>
+
+<script src="/legal/terms.js"></script>
+<script src="/legal/protect.js"></script>
+<!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
+     (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
+     נמדדת בנפרד. קוד האתר yehoshua-apps נמסר על ידי הבעלים ב-7.9.2026. -->
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

@@ -15,7 +15,7 @@
 <meta name="theme-color" content="#0d1b1a" media="(prefers-color-scheme:dark)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
 /* ============================================================
    ניב — אנגלית מדוברת וספרותית
@@ -28,6 +28,7 @@
    ============================================================ */
 :root{
   --ar:"Noto Sans Arabic",system-ui,"Segoe UI",Arial,sans-serif;
+  --ru:"Noto Sans",system-ui,"Segoe UI",Arial,sans-serif;   /* קירילית — Heebo אינו מכיל אותה, נמדד 7.9 */
   --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
   --en:"Lexend","Heebo",system-ui,"Segoe UI",Arial,sans-serif;
   --bg:#f4f7f6; --surface:#ffffff; --surface2:#e9efee;
@@ -53,6 +54,8 @@
    הגופן נמשכים רק כשבאמת מוצג טקסט ערבי. */
 html[lang="ar"] body,html[lang="ar"] input,html[lang="ar"] button,
 html[lang="ar"] textarea,html[lang="ar"] select{font-family:var(--ar)}
+html[lang="ru"] body,html[lang="ru"] input,html[lang="ru"] button,
+html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
 :root[data-theme="dark"]{
   --bg:#0d1b1a; --surface:#142624; --surface2:#1c3230;
   --ink:#e6f0ee; --muted:#9ab0aa; --faint:#6f8781; --line:#264240;
@@ -1010,7 +1013,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n45 · 2026-09-06";
+var BUILD="n46 · 2026-09-07";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -5108,9 +5111,13 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n45-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n46-pwa1").catch(function(){});
   });
 }
 </script>
+<!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
+     (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
+     נמדדת בנפרד. קוד האתר yehoshua-apps נמסר על ידי הבעלים ב-7.9.2026. -->
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

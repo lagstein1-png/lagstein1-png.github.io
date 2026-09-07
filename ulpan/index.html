@@ -14,7 +14,7 @@
 <meta name="theme-color" content="#17120d" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
 /* ============================================================
    אולפן — עברית מעשית לעולים חדשים
@@ -32,6 +32,7 @@
 :root{
   --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
   --ar:"Noto Sans Arabic","Heebo",system-ui,"Segoe UI",Arial,sans-serif;
+  --ru:"Noto Sans","Heebo",system-ui,"Segoe UI",Arial,sans-serif;   /* קירילית — Heebo אינו מכיל אותה, נמדד 7.9 */
   --lrn:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
   --bg:#faf7f2; --surface:#ffffff; --surface2:#f0e9df;
   --ink:#1f1a14; --muted:#5c5147; --faint:#7f6a52; --line:#e5dbcc;
@@ -112,6 +113,7 @@ button{font:inherit;color:inherit}
    מונע מהמשפט העברי לגרור אחריו את סימני הפיסוק של המשפט הרוסי או האנגלי
    שלצידו, וזה קורה בדיוק במקום שבו הלומד קורא לאט וזקוק ליציבות. */
 html[lang="ar"] body{font-family:var(--ar)}
+html[lang="ru"] body{font-family:var(--ru)}
 .lrn{font-family:var(--lrn);direction:rtl;unicode-bidi:isolate;text-align:start}
 .lrn-b{font-family:var(--lrn);direction:rtl;unicode-bidi:isolate;display:inline-block}
 .tr-b{font-family:system-ui,"Segoe UI",Arial,sans-serif;direction:ltr;
@@ -1030,7 +1032,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a14 · 2026-09-06";
+var BUILD="a15 · 2026-09-07";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -4829,9 +4831,13 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a14-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a15-pwa1").catch(function(){});
   });
 }
 </script>
+<!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
+     (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
+     נמדדת בנפרד. קוד האתר yehoshua-apps נמסר על ידי הבעלים ב-7.9.2026. -->
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
