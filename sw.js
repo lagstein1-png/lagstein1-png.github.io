@@ -11,7 +11,7 @@
    ===================================================================== */
 const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "site-" + V;
-const PRE = ["./","./index.html","./manifest.json",
+const PRE = ["./","./index.html","./manifest.json","./launch.js","./launch.css",
              "./img/icon-192.png","./img/icon-512.png",
              "/legal/terms.js","/legal/protect.js"];
 

@@ -1,0 +1,63 @@
+/* ============================================================
+   מבצע השקה — שכבה מעל דף הבית. לא נוגעת בכרטיסים עצמם:
+   launch.js מוסיף את התגים ואת החלון, והקובץ הזה רק מעצב אותם.
+   כל הצבעים ממשתני דף הבית (--ok, --brand, --bg-elev), כדי שמצב
+   כהה ובהיר יעבדו כמו בשאר הדף. שינוי כאן — מעלים את ?v= בדף הבית.
+   ============================================================ */
+
+/* לדף הבית אין --ok כמו ל-/pricing/, ולכן הירוק מוגדר כאן, בשני המצבים
+   ובאותם כללים שבהם דף הבית מחליף ערכה (data-theme, ואחריו העדפת המערכת). */
+:root{--launch-ok:#1a7f4b; --launch-ok-soft:#e3f5ea}
+:root[data-theme="dark"]{--launch-ok:#6ee7a8; --launch-ok-soft:#14301f}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--launch-ok:#6ee7a8; --launch-ok-soft:#14301f}
+}
+
+/* --- תגית מחיר אחרי שהשכבה עברה עליה --- */
+.t.price.launch-tagged{
+  background:transparent; border-color:transparent; padding:0;
+  color:var(--text-soft); display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap;
+}
+.t.price.launch-tagged s{color:var(--text-soft); opacity:.8; text-decoration:line-through}
+.launch-badge{
+  display:inline-block; padding:6px 10px; border-radius:999px;
+  font:600 .78rem/1 Heebo,system-ui,sans-serif; white-space:nowrap;
+  background:var(--launch-ok-soft); color:var(--launch-ok);
+  border:1px solid color-mix(in srgb,var(--launch-ok) 30%,transparent);
+}
+.launch-badge--forever{
+  background:var(--brand-soft); color:var(--brand);
+  border-color:color-mix(in srgb,var(--brand) 30%,transparent);
+}
+/* ״תאוריה מדברת״ נשארת בתשלום: המחיר המלא חוצה, ולידו מחיר המבצע */
+.launch-sale{color:var(--launch-ok); font-weight:800; white-space:nowrap}
+/* .act לפני השם: הגיליון הזה נטען לפני ה-<style> של דף הבית, ובלי
+   הסלקטור הכפול הכלל .get של הדף היה גובר ומשאיר את הכפתור אפור */
+.act .launch-buy{background:var(--launch-ok-soft); color:var(--launch-ok);
+  border-color:color-mix(in srgb,var(--launch-ok) 40%,transparent)}
+.act .launch-buy:hover{color:var(--launch-ok); border-color:var(--launch-ok)}
+
+/* --- החלון הקופץ --- */
+.launch-bg{
+  position:fixed; inset:0; z-index:1000; display:grid; place-items:center; padding:16px;
+  background:rgba(11,15,23,.55); backdrop-filter:blur(3px);
+}
+.launch-box{
+  inline-size:min(440px,100%); background:var(--bg-elev); color:var(--text);
+  border:1px solid var(--line); border-radius:var(--radius); padding:26px 24px 22px;
+  box-shadow:var(--shadow-lg); outline:none;
+}
+.launch-box h2{margin:0 0 10px; font-size:1.45rem; line-height:1.25}
+.launch-box p{margin:0 0 20px; color:var(--text-soft); font-size:1.02rem; line-height:1.55}
+.launch-actions{display:flex; flex-wrap:wrap; gap:10px}
+.launch-btn{
+  min-block-size:44px; padding-inline:18px; border-radius:12px; cursor:pointer;
+  font:700 1rem Heebo,system-ui,sans-serif; border:1px solid var(--line);
+  background:var(--bg-elev); color:var(--text);
+}
+.launch-btn--main{background:var(--brand); color:var(--brand-ink); border-color:var(--brand)}
+.launch-btn:focus-visible{outline:3px solid color-mix(in srgb,var(--brand) 55%,transparent); outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){
+  .launch-box{animation:launch-in .22s ease-out}
+  @keyframes launch-in{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+}
