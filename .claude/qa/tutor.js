@@ -26,6 +26,10 @@ const CLIENT = path.join(ROOT, 'tutor', 'tutor.js');
    יושבת בריפו נפרד — ראו FINDINGS. */
 const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
               'lomda', 'english', 'history', 'ulpan', 'bagrut-806', 'reader'];
+/* ״תאוריה מדברת״ אינה בריפו הזה, אבל היא באותו מקור וטוענת את
+   /tutor/tutor.js מכאן — ולכן התפקיד שלה חייב להיות בשרת.
+   החיווט שלה עצמו נבדק בריפו שלה, לא כאן. */
+const EXTERNAL = ['theory'];
 const LANGS = ['he', 'ar', 'ru', 'en'];
 
 let bad = 0;
@@ -102,10 +106,11 @@ import(WORKER).then(W => {
     /השפה הנלמדת/.test(W.contextBlock({ app: 'english', lang: 'en', target: 'en', q: null }, 0)), false);
 
   /* ---------- 5. תפקיד לכל אפליקציה ---------- */
-  t('לכל אחת עשרה האפליקציות יש תפקיד', Object.keys(W.ROLE).sort(), APPS.slice().sort());
+  t('לכל שתים־עשרה האפליקציות יש תפקיד',
+    Object.keys(W.ROLE).sort(), APPS.concat(EXTERNAL).sort());
   const dup = new Set(Object.values(W.ROLE));
-  t('אין שני תפקידים זהים', dup.size, APPS.length);
-  APPS.forEach(a => {
+  t('אין שני תפקידים זהים', dup.size, APPS.length + EXTERNAL.length);
+  APPS.concat(EXTERNAL).forEach(a => {
     const c = W.contextBlock({ app: a, lang: 'he', q: null }, 0);
     if (c.indexOf(W.ROLE[a]) !== 0) { bad++; console.log(`✗ ${a}: התפקיד אינו נשלח בראש ההקשר`) }
   });
