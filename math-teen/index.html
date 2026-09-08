@@ -947,7 +947,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t52 · 2026-09-07";
+var BUILD="t53 · 2026-09-08";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -5119,8 +5119,21 @@ function exSlots(){
   if(EB.q&&EB.q.length)return EB.q;
   var tops=EB.topics.filter(function(x){return topicById(x)});
   if(!tops.length)tops=topicsForTrack(state.track).slice(0,3).map(function(t){return t.id});
-  var q=[],i;
-  for(i=0;i<EB.n;i++)q.push(exSlot(tops[i%tops.length],EB.level));
+  /* אותה שאלה פעמיים באותו מבחן היא שאלה מבוזבזת, והיא ודאית כשברמה
+     ארבעה פריטים והמורה ביקש עשר שאלות: הזרע נבחר באקראי ובלי זיכרון,
+     ונמדד מבחן שבו אותו מושג הופיע ארבע פעמים מתוך עשר. מגלגלים מחדש
+     עד שתים־עשרה פעמים, ואם כל השאלות האפשריות כבר נלקחו — משאירים
+     כפילות במקום להיתקע. */
+  var q=[],seen={},i,tries,sl,pq,key;
+  for(i=0;i<EB.n;i++){
+    for(tries=0;tries<12;tries++){
+      sl=exSlot(tops[i%tops.length],EB.level);
+      pq=exPreviewQ(sl); key=pq&&pq.ask?plainOf(pq.ask):"";
+      if(!key||!seen[key])break;
+    }
+    if(key)seen[key]=1;
+    q.push(sl);
+  }
   /* מערבבים כאן ולא בשליחה: המורה רואה את הסדר הסופי ומאשר אותו. */
   EB.q=shuffle(q);
   return EB.q;
@@ -6157,7 +6170,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t52-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t53-pwa1").catch(function(){});
   });
 }
 </script>
