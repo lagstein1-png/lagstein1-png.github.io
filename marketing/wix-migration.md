@@ -92,7 +92,7 @@
 
 | אפליקציה | כתובת | index.html (בתים) |
 |---|---|---|
-| מתמטיקה לחכמים שמתקשים | `https://lagstein1-png.github.io/math-app/` | 327,748 |
+| חשבון ליסודי | `https://lagstein1-png.github.io/math-app/` | 327,748 |
 | שלב — מתמטיקה לתיכון | `https://lagstein1-png.github.io/math-teen/` | 1,077,997 |
 | אקסיומה — תואר, שנה א׳ | `https://lagstein1-png.github.io/math-uni/` | 1,001,288 |
 | אקסיומה ב׳ — שנה שנייה | `https://lagstein1-png.github.io/math-uni2/` | 900,450 |
