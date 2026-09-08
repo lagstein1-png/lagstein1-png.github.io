@@ -568,6 +568,15 @@ function md(app,R){
   page.on('pageerror',function(e){errs.push(e.message)});
   await page.route('**/*',function(r){
     return r.request().url().startsWith('http://127.0.0.1:8099')?r.continue():r.abort()});
+  /* אפליקציה שאינה במשפחת buildQ אינה חושפת TOPICS, והסורק כולו
+     בנוי עליו. ברירת המחדל מסננת אותה החוצה, אבל שם מפורש בשורת
+     הפקודה עקף את הסינון והפיל את התהליך כולו ב-ReferenceError —
+     ודווקא אליו מזמינה האזהרה של stage.js. מוצהר ומדולג. */
+  const bank=(REG.apps[app]||{}).bank;
+  if(bank&&bank!=='buildQ'){
+    console.log(app,'מחוץ להיקף — bank="'+bank+'", והסורק דורש buildQ');
+    await ctx.close(); continue;
+  }
   try{ await page.goto('http://127.0.0.1:8099/'+app+'/',{waitUntil:'domcontentloaded'}) }
   catch(e){ console.log(app,'SKIP — הדף לא נטען'); await ctx.close(); continue }
   await page.waitForTimeout(1200);
