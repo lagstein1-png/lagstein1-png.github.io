@@ -1,0 +1,86 @@
+diff --git a/index.html b/index.html
+index 953f785..66bec06 100644
+--- a/index.html
++++ b/index.html
+@@ -350,6 +350,10 @@ button:disabled{cursor:default}
+ 
+ </div>
+ 
++<!-- ״עזרה מהמורה״. הקובץ מגיע מהריפו הראשי — שני הריפו מתפרסמים
++     תחת אותו מקור, בדיוק כמו /legal/. ההוראות יושבות בשרת. -->
++<script src="/tutor/tutor.js"></script>
++
+ <script>
+ /* =====================================================================
+    תאוריה מדברת · כל הקוד בתוך IIFE
+@@ -809,7 +813,7 @@ const DEV = (()=>{
+ })();
+ 
+ /* מספר גרסה גלוי — כדי שתמיד נדע איזו גרסה באמת רצה */
+-const BUILD = 'v98';
++const BUILD = 'v99';
+ 
+ const HEBREW_PRAISE = ["מעולה! 👏", "כל הכבוד! 🔥", "יפה מאוד! 🎯"];
+ let lastPraiseIndex = -1;
+@@ -3056,6 +3060,7 @@ function renderFlow(){
+     ${q.o.map((o,i)=>`<button class="opt" type="button" data-flow="${i}"><b class="optnum" aria-hidden="true">${i+1}</b><span aria-live="polite">${escapeHTML(o)}</span></button>`).join('')}
+     ${q.h1 || q.h2 ? `<button class="hintbtn" id="btnHint" type="button">${t('hint')}</button>` : ''}
+     <button class="hintbtn" id="btnSkip" type="button">${t('skipQ')}</button>
++    ${window.TUTOR && TUTOR.on() ? `<button class="hintbtn" id="btnTutor" type="button">${escapeHTML(TUTOR.label())}</button>` : ''}
+     ${EXPLAIN.enabled ? `<button class="explainbtn" id="btnExplain" type="button">${t('explain')}</button>` : ''}
+     <div id="explainBox"></div>
+     <div id="after"></div>`;
+@@ -3557,6 +3562,11 @@ screen.addEventListener('click', e => {
+   }
+   const fa = e.target.closest('[data-flow]');
+   if(fa && !fa.disabled){ flowAnswer(+fa.dataset.flow); return; }
++  if(e.target.closest('#btnTutor')){
++    stopSpeech();
++    if(window.TUTOR) TUTOR.open();
++    return;
++  }
+   if(e.target.closest('#btnHint')){
+     S.screen === 'flow' ? flowHint(S.hint + 1) : showHint(S.hint + 1, true);
+     return;
+@@ -3607,6 +3617,28 @@ loadBank().then(() => {
+   buildQueue();
+   if(S.screen === 'home' || (S.screen === 'flow' && !S.answered)) render();
+ });
++
++/* ״עזרה מהמורה״ — מחובר מכאן, מתוך ה-IIFE. מחוצה לו S, FLOW
++   ו-stopSpeech אינם קיימים, וה-catch היה מחזיר ברירת מחדל בשקט.
++   mount מחזיר false כשאין כתובת שרת, ואז הכפתור אינו נבנה. */
++if(window.TUTOR){
++  TUTOR.mount({
++    app: "theory",
++    lang: function(){ return (S && S.lang) || "he" },
++    q: function(){
++      var x = FLOW.q;
++      if(!x) return null;
++      var txt = function(v){
++        return String(v == null ? "" : v).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
++      };
++      return { expr: txt(x.q),
++               ans: (x.o && x.c != null) ? txt(x.o[x.c]) : null,
++               topic: x.cat || null,
++               level: "תאוריה" };
++    },
++    stopHost: function(){ try{ stopSpeech() }catch(e){} }
++  });
++}
+ })();
+ </script>
+ </body>
+diff --git a/sw.js b/sw.js
+index 61a215b..db866aa 100644
+--- a/sw.js
++++ b/sw.js
+@@ -17,6 +17,8 @@ const CACHE = 'theory-' + V;
+ const PRECACHE = [
+   './',
+   './index.html',
++  /* התשתית של ״עזרה מהמורה״ — מגיעה מהריפו הראשי, אותו מקור. */
++  '/tutor/tutor.js',
+   './manifest.json',
+   './data/questions.he.json',
+   './data/hints.he.json',

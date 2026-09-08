@@ -18,6 +18,7 @@ const PRE = ["./","./index.html","./manifest.json",
              "./data/schema.js","./data/science.js","./data/civics.js","./data/digital.js","./data/money.js","./data/health.js",
              "./data/bible.js","./data/bio.js","./data/chem.js","./data/edu.js","./data/eng.js","./data/geo.js","./data/lashon.js","./data/lit.js","./data/media.js","./data/med.js","./data/phys.js","./data/tech.js",
              "./img/icon-192.png","./img/icon-512.png",
+             "/tutor/tutor.js",
              "/legal/terms.js","/legal/protect.js"];
 
 self.addEventListener("install", e => {

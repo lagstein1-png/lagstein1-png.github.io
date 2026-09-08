@@ -1,0 +1,337 @@
+/* ============================================================
+   ״עזרה מהמורה״ — צד השרת, לכל אחת עשרה האפליקציות.
+
+   למה יש כאן שרת בכלל: האתר מתארח ב-GitHub Pages, שהוא סטטי.
+   מפתח API בקובץ סטטי הוא מפתח פומבי. הקובץ הזה הוא המקום
+   היחיד שבו המפתח קיים, והוא מגיע מ-Secret של הסביבה ולא
+   מהמאגר. אין כאן ולא יהיה כאן מפתח כתוב.
+
+   בלי npm ובלי build — fetch בלבד, כדי שאפשר יהיה להדביק את
+   הקובץ הזה כמו שהוא לעורך של Cloudflare. זה אותו כלל שחל על
+   שאר המאגר.
+
+   המבנה: גוף הוראות אחד שמשותף לכולן, ותפקיד אחד לכל אפליקציה
+   לפי המקצוע ורמת הלימוד. הגוף המשותף הוא הבלוק היציב שנשלח
+   ראשון, ולכן הוא זה שנשמר במטמון; ההקשר המשתנה בא אחריו.
+
+   פריסה, משתני סביבה ובדיקה: README.md שלצידו.
+   ============================================================ */
+
+/* ---------- הגוף המשותף. זהה בכל האפליקציות ובכל השפות ---------- */
+const CORE = [
+  "דבר בשפה פשוטה, נעימה ומכבדת, בלי תיוגים.",
+  "כתוב תשובות קצרות ושאל רק שאלה אחת בכל פעם.",
+  "התמקד בתרגיל הנוכחי וברמת הלימוד שהאפליקציה מספקת.",
+  "אם התרגיל אינו ידוע לך, בקש מהתלמיד לכתוב אותו.",
+  "התחל ברמז קטן והמתן לתשובת התלמיד.",
+  "אל תמסור מיד פתרון; אם התלמיד עדיין מתקשה, הדגם צעד אחד.",
+  "אם מתבקש פתרון מלא, הצג אותו בהדרגה עם הסבר.",
+  "בטעות, הסבר בעדינות מה כדאי לבדוק ונסה דרך אחרת.",
+  "השתמש בדוגמאות יומיומיות ובייצוגים פשוטים כשזה מועיל.",
+  "אל תבקש שם מלא, כתובת, טלפון או פרטים מזהים.",
+  "בשאלות שאינן קשורות ללימוד, החזר בעדינות לנושא."
+].join("\n");
+
+/* ---------- תפקיד לכל אפליקציה, לפי המקצוע ורמת הלימוד ---------- */
+const ROLE = {
+  "math-app":
+    "אתה מורה פרטי סבלני לחשבון לתלמידי בית ספר יסודי, כיתות א׳–ו׳: " +
+    "חיבור, חיסור, כפל וחילוק. המספרים קטנים, והילד לומד אחרת — לאט, בעיגולים ובדוגמאות.",
+  "math-teen":
+    "אתה מורה פרטי סבלני למתמטיקה לתלמידי תיכון: אלגברה, משוואות, " +
+    "פונקציות, גאומטריה וטריגונומטריה. התלמיד מתכונן לבגרות ולומד לפי מסלול יחידות.",
+  "math-uni":
+    "אתה מתרגל סבלני למתמטיקה לשנה א׳ בתואר ראשון: חשבון דיפרנציאלי " +
+    "ואינטגרלי, אלגברה לינארית והסתברות. כתוב נוסחאות בשורה אחת ובלי LaTeX.",
+  "math-uni2":
+    "אתה מתרגל סבלני למתמטיקה לשנה ב׳ בתואר ראשון: חדו״א מתקדם, " +
+    "משוואות דיפרנציאליות, אלגברה לינארית ב׳ וסטטיסטיקה. כתוב נוסחאות בשורה אחת ובלי LaTeX.",
+  "math-uni3":
+    "אתה מתרגל סבלני למתמטיקה לשנה ג׳ בתואר ראשון: אנליזה, אלגברה " +
+    "מופשטת, טופולוגיה ותהליכים אקראיים. כתוב נוסחאות בשורה אחת ובלי LaTeX.",
+  "bagrut-806":
+    "אתה מורה פרטי סבלני להכנה לבגרות במתמטיקה, שאלון 806, ברמות 3, 4 ו-5 יחידות. " +
+    "התלמיד ניגש לבחינה אמיתית, ולכן הקפד על סדר הפתרון ועל ניסוח שמתאים למחברת בחינה.",
+  "english":
+    "אתה מורה פרטי סבלני לאנגלית כשפה זרה — אוצר מילים, הבנת הנקרא ודקדוק בסיסי.",
+  "ulpan":
+    "אתה מורה פרטי סבלני לעברית לעולים חדשים, ברוח האולפן — מילים, " +
+    "ניקוד, בניינים ומשפטים לשימוש יומיומי.",
+  "history":
+    "אתה מורה פרטי סבלני להיסטוריה לחטיבת הביניים: אירועים, סיבות ותוצאות. " +
+    "אל תשנן תאריכים — עזור להבין למה קרה מה שקרה.",
+  "lomda":
+    "אתה מורה פרטי סבלני ללימוד לפי נושא: מדעים, אזרחות, לשון, היסטוריה ועוד. " +
+    "הנושא הנוכחי מופיע בהקשר שלמטה, והוא זה שקובע.",
+  "reader":
+    "אתה עוזר קריאה סבלני. התלמיד הדביק טקסט ומאזין לו, " +
+    "ואתה עוזר לו להבין מילה, משפט או רעיון בתוך הטקסט.",
+  /* ״תאוריה מדברת״ יושבת בריפו נפרד, אבל באותו מקור — ולכן היא
+     טוענת את /tutor/tutor.js מכאן ופונה לאותו שרת. התפקיד שלה
+     חייב להיות כאן, אחרת readBody דוחה אותה ב-400. */
+  "theory":
+    "אתה מורה פרטי סבלני לתאוריה בנהיגה. הלומד ניגש למבחן התאוריה " +
+    "האמיתי, ולכן הקפד על החוק כלשונו ואל תמציא תקנות. " +
+    "רבים מהלומדים כאן הם עולים חדשים או נהגים מבוגרים — משפטים קצרים."
+};
+
+/* שם השפה שבה נכתבת התשובה. מופיע בבלוק המשתנה ולא בקבוע,
+   כדי שהגוף המשותף יישאר זהה בכל השפות ויוכל להישמר במטמון. */
+const LANGNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנגלית" };
+const TARGETNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנגלית" };
+
+const MODEL = "claude-opus-5";   /* מודל זול יותר הוא שינוי שורה אחת, והוא החלטה של הבעלים */
+const MAX_TOKENS = 700;          /* תשובה קצרה. גבוה מספיק כדי לא להיחתך באמצע משפט */
+const API = "https://api.anthropic.com/v1/messages";
+
+/* ---------- גבולות הקלט. כל אחד מהם הוא גם תקרת עלות ---------- */
+const LIM = {
+  msgs: 14,          /* אורך השיחה שנשלח בחזרה */
+  chars: 300,        /* הודעה בודדת של התלמיד */
+  total: 2000,       /* כל השיחה יחד */
+  ctx: 400,          /* שדה הקשר בודד — התרגיל, התשובה, הנושא */
+  perDay: 60,        /* פניות ליום, לכל כתובת IP */
+  globalPerDay: 3000 /* תקרה יומית לכל השירות — חסם העלות האמיתי */
+};
+
+const LANGS = ["he", "ar", "ru", "en"];
+
+/* הודעת הנסיגה, כשהתשובה של המודל נפסלה פעמיים.
+   היא לעולם אינה מוסרת את הפתרון — זה כל הרעיון. */
+const FALLBACK = {
+  he: "בוא ננסה יחד: מה הצעד הראשון שהיית עושה כאן?",
+  ar: "لنجرّب معًا: ما هي الخطوة الأولى التي ستقوم بها هنا؟",
+  ru: "Давай попробуем вместе: какой первый шаг ты бы сделал?",
+  en: "Let's try together: what would your first step be here?"
+};
+
+/* ============ בדיקת נכונות ============
+   שתי בדיקות על התשובה שחזרה, ושתיהן מכניות ואינן מסתמכות על
+   המודל.
+
+   1. גילוי מוקדם — התשובה הנכונה אסורה בשני התורים הראשונים.
+      זה מה שאוכף את ״התחל ברמז קטן״ ואת ״אל תמסור מיד פתרון״.
+      חל רק כשהאפליקציה שלחה תשובה נכונה; באפליקציות שאין בהן
+      תשובה יחידה — reader למשל — אין מה לחסום.
+   2. משוואה שגויה — כל ״א פעולה ב = ג״ שמופיע בטקסט מחושב
+      מחדש כאן. מודל שכותב 8+7=16 נפסל, בלי קשר לתרגיל.
+
+   מה שלא נבדק כאן, בכוונה: מספרים ״זרים״ שאינם בתרגיל. מורה
+   שמפרק 17 ל-10 ו-7 כותב מספרים שאינם בתרגיל, וזו בדיוק
+   ההוראה ״ייצוגים פשוטים״. פסילה שלהם הייתה פוסלת הוראה טובה.
+*/
+function revealsAnswer(text, ans) {
+  if (ans === null || ans === undefined || ans === "") return false;
+  const s = String(ans).trim();
+  if (!s) return false;
+  if (/^-?\d+(\.\d+)?$/.test(s))
+    return new RegExp("(^|[^\\d.])" + s.replace(".", "\\.") + "([^\\d.]|$)").test(text);
+  /* תשובה מילולית: נחשבת חשופה רק אם היא מופיעה במלואה, ורק אם
+     היא ארוכה מספיק כדי שלא תהיה מילת קישור מקרית.
+
+     ההשוואה מתעלמת מאותיות השימוש — ״המהפכה״ מול ״למהפכה״ הוא
+     אותו דבר לענייננו, ובלי זה כל תשובה בעברית הייתה חומקת מהשומר
+     בגלל ו׳ אחת בהתחלה. אות שימוש מוסרת רק אם נשארת מילה של שלוש
+     אותיות לפחות, כדי לא לרסק מילים קצרות. */
+  return s.length >= 3 && strip(text).indexOf(strip(s)) >= 0;
+}
+
+function strip(txt) {
+  return String(txt).replace(/[\u0591-\u05C7]/g, "")          /* ניקוד וטעמים */
+    .split(/\s+/)
+    .map(w => /^[\u05D5\u05D4\u05D1\u05DC\u05DB\u05DE\u05E9]/.test(w) && w.length >= 4
+              ? w.slice(1) : w)
+    .join(" ").trim();
+}
+
+function badEquation(text) {
+  const re = /(\d+)\s*([+\-−×xX*÷:\/])\s*(\d+)\s*=\s*(\d+)/g;
+  let m;
+  while ((m = re.exec(text))) {
+    const a = +m[1], b = +m[3], said = +m[4];
+    let real;
+    if (m[2] === "+") real = a + b;
+    else if (m[2] === "-" || m[2] === "−") real = a - b;
+    else if (m[2] === "÷" || m[2] === ":" || m[2] === "/") { if (!b) return true; real = a / b; }
+    else real = a * b;
+    if (real !== said) return true;
+  }
+  return false;
+}
+
+/* ---------- עזרי HTTP ---------- */
+function cors(env) {
+  return {
+    "Access-Control-Allow-Origin": env.ALLOW_ORIGIN || "https://lagstein1-png.github.io",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "86400"
+  };
+}
+function json(obj, status, env) {
+  return new Response(JSON.stringify(obj), {
+    status: status || 200,
+    headers: Object.assign({ "Content-Type": "application/json; charset=utf-8" }, cors(env))
+  });
+}
+
+/* ---------- מונה יומי. בלי KV הוא פשוט אינו סופר ---------- */
+async function overLimit(env, ip) {
+  if (!env.RATE) return false;                    /* אין KV — התקרות הפנימיות עדיין חלות */
+  const day = new Date().toISOString().slice(0, 10);
+  const keys = ["d:" + day + ":" + ip, "d:" + day + ":ALL"];
+  const caps = [LIM.perDay, LIM.globalPerDay];
+  const now = [];
+  for (let i = 0; i < keys.length; i++) {
+    const v = +(await env.RATE.get(keys[i]) || 0);
+    if (v >= caps[i]) return true;
+    now.push(v);
+  }
+  /* נשמר ליומיים, כדי שמפתח של אתמול ייעלם לבד */
+  for (let i = 0; i < keys.length; i++)
+    await env.RATE.put(keys[i], String(now[i] + 1), { expirationTtl: 172800 });
+  return false;
+}
+
+function clean(v) {
+  return v === null || v === undefined ? null : String(v).trim().slice(0, LIM.ctx) || null;
+}
+
+/* ---------- אימות הגוף שהגיע מהדפדפן ---------- */
+function readBody(b) {
+  if (!b || typeof b !== "object") return null;
+  const app = ROLE[b.app] ? b.app : null;
+  if (!app) return null;                          /* אפליקציה שאינה ברשימה — נדחית */
+  const lang = LANGS.indexOf(b.lang) >= 0 ? b.lang : "he";
+  const target = LANGS.indexOf(b.target) >= 0 ? b.target : null;
+
+  /* התרגיל אינו חובה: ההוראות אומרות לבקש מהתלמיד לכתוב אותו
+     כשהוא אינו ידוע, וזה בדיוק המצב הזה. */
+  let q = null;
+  if (b.q && typeof b.q === "object") {
+    const expr = clean(b.q.expr), ans = clean(b.q.ans),
+          topic = clean(b.q.topic), level = clean(b.q.level);
+    if (expr || topic) q = { expr, ans, topic, level };
+  }
+
+  const src = Array.isArray(b.messages) ? b.messages.slice(-LIM.msgs) : [];
+  const msgs = [];
+  let total = 0;
+  for (const m of src) {
+    const role = m && m.role === "assistant" ? "assistant" : "user";
+    const text = String((m && m.text) || "").trim().slice(0, LIM.chars);
+    if (!text) continue;
+    total += text.length;
+    if (total > LIM.total) break;
+    msgs.push({ role, content: text });
+  }
+  /* Claude דורש שהתור הראשון והאחרון יהיו של המשתמש */
+  while (msgs.length && msgs[0].role === "assistant") msgs.shift();
+  if (!msgs.length || msgs[msgs.length - 1].role !== "user") return null;
+  return { app, lang, target, q, msgs };
+}
+
+/* ---------- ההקשר המשתנה. אחרי הגוף הקבוע, כדי לא לשבור את המטמון ---------- */
+function contextBlock(inp, turn) {
+  const q = inp.q, out = [];
+  out.push(ROLE[inp.app]);
+  out.push("כתוב את כל תשובתך ב" + (LANGNAME[inp.lang] || LANGNAME.he) + ", ורק בה.");
+
+  /* לימודי שפה: שפת ההסבר אינה השפה הנלמדת, ואסור לערבב ביניהן.
+     הסימון « » הוא מה שמאפשר לדפדפן להקריא כל קטע בקול שלו. */
+  if (inp.target && inp.target !== inp.lang) {
+    out.push("השפה הנלמדת היא " + (TARGETNAME[inp.target] || inp.target) +
+      ", ושפת ההסבר היא " + (LANGNAME[inp.lang] || LANGNAME.he) + ". " +
+      "הסבר בשפת ההסבר בלבד, ועטוף כל מילה או משפט שבשפה הנלמדת בסימנים « » — " +
+      "למשל: המילה «apple» פירושה תפוח. אל תשתמש בסימנים האלה לשום דבר אחר.");
+  }
+
+  if (!q) {
+    out.push("מה שעל המסך אינו ידוע לך. בקש מהתלמיד לכתוב את התרגיל או את השאלה.");
+    return out.join("\n");
+  }
+  if (q.expr)  out.push("מה שעל המסך: " + q.expr);
+  if (q.topic) out.push("הנושא: " + q.topic);
+  if (q.level) out.push("רמת הלימוד: " + q.level);
+  if (q.ans) {
+    out.push("התשובה הנכונה היא: " + q.ans + ". היא נתונה לך כדי שלא תטעה, ולא כדי שתמסור אותה.");
+    if (turn < 2)
+      out.push("זו תחילת השיחה: אל תכתוב את התשובה הזאת. תן רמז אחד ושאל שאלה אחת.");
+  }
+  return out.join("\n");
+}
+
+async function ask(env, ctx, msgs, extra) {
+  const body = {
+    model: MODEL,
+    max_tokens: MAX_TOKENS,
+    output_config: { effort: "low" },      /* שיחה קצרה — אין צורך בחשיבה עמוקה, וזה חוסך טוקנים */
+    fallbacks: "default",                  /* סירוב של המודל מנותב לגיבוי בצד השרת */
+    system: [
+      /* הגוף המשותף ראשון, ועליו סימון מטמון: הוא זהה בכל אחת עשרה
+         האפליקציות ובכל ארבע השפות. אם הוא ארוך מהמינימום של המודל
+         הוא ייקרא מהמטמון, ואפשר לוודא ב-usage.cache_read_input_tokens
+         שחוזר בתשובה. התפקיד וההקשר משתנים ולכן הם באים אחריו. */
+      { type: "text", text: CORE, cache_control: { type: "ephemeral" } },
+      { type: "text", text: ctx + (extra ? "\n" + extra : "") }
+    ],
+    messages: msgs
+  };
+  const r = await fetch(API, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+      "anthropic-beta": "server-side-fallback-2026-07-01"
+    },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) return { err: r.status };
+  const d = await r.json();
+  /* stop_reason נבדק לפני content — בסירוב content יכול לחזור ריק */
+  if (d.stop_reason === "refusal") return { err: "refusal" };
+  const text = (d.content || [])
+    .filter(c => c.type === "text").map(c => c.text).join("").trim();
+  return { text };
+}
+
+export default {
+  async fetch(request, env) {
+    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env) });
+    if (request.method !== "POST") return json({ error: "method" }, 405, env);
+    if (!env.ANTHROPIC_API_KEY) return json({ error: "server" }, 500, env);
+
+    let body;
+    try { body = await request.json() } catch (e) { return json({ error: "bad" }, 400, env) }
+    const inp = readBody(body);
+    if (!inp) return json({ error: "bad" }, 400, env);
+
+    const ip = request.headers.get("CF-Connecting-IP") || "0";
+    if (await overLimit(env, ip)) return json({ error: "limit" }, 429, env);
+
+    const turn = inp.msgs.filter(m => m.role === "assistant").length;
+    const ans = inp.q ? inp.q.ans : null;
+    const ctx = contextBlock(inp, turn);
+
+    let out = await ask(env, ctx, inp.msgs, "");
+    if (out.err) return json({ error: "upstream" }, 502, env);
+
+    /* הבדיקה, ואחריה ניסיון שני אחד ולא יותר */
+    const bad = t => (turn < 2 && revealsAnswer(t, ans)) || badEquation(t);
+    if (bad(out.text)) {
+      const nudge = turn < 2 && ans
+        ? "התשובה הקודמת שלך חשפה את הפתרון או הכילה חישוב שגוי. כתוב מחדש: " +
+          "רמז אחד בלבד, בלי לכתוב את התשובה הנכונה, ובלי משוואה מלאה."
+        : "התשובה הקודמת שלך הכילה חישוב שגוי. כתוב מחדש, ובדוק כל חישוב לפני שאתה כותב אותו.";
+      const again = await ask(env, ctx, inp.msgs, nudge);
+      out = (again.err || bad(again.text)) ? { text: "" } : again;
+    }
+
+    return json({ text: out.text || FALLBACK[inp.lang] || FALLBACK.he }, 200, env);
+  }
+};
+
+/* מיוצאים בנפרד כדי ש-node .claude/qa/tutor.js יוכל לבדוק אותם.
+   Cloudflare קורא רק את ה-default, וייצוא נוסף אינו מפריע לו. */
+export { revealsAnswer, badEquation, readBody, contextBlock, LIM, CORE, ROLE, LANGS };

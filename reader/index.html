@@ -210,6 +210,7 @@ html.light .seg button.on{background:rgba(22,98,164,.09)}
     <span class="spacer"></span>
     <button class="btn hidden" id="btnBack">טקסט אחר</button>
     <div id="langbar" role="group" aria-label="שפת הממשק"></div>
+    <button class="btn hidden" id="btnTutor" type="button"></button>
     <button class="btn" id="btnTheme">מצב בהיר</button>
   </div>
 </header>
@@ -1440,6 +1441,7 @@ function refreshDynamic(){
 
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<script src="/tutor/tutor.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -1447,13 +1449,42 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=27-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=30-pwa1").catch(function(){});
   });
 }
 </script>
 <!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
      (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
      נמדדת בנפרד. קוד האתר yehoshua-apps נמסר על ידי הבעלים ב-7.9.2026. -->
+<!-- ״עזרה מהמורה״. התשתית ב-/tutor/tutor.js, ההוראות בשרת.
+     כאן אין תרגיל אלא טקסט שהודבק, ולכן נשלח המשפט הנוכחי בלבד —
+     ולא הטקסט כולו: הוא של המשתמש, והוא יכול להיות ארוך ואישי. -->
+<script>
+if(window.TUTOR){
+  var btnTu=document.getElementById("btnTutor");
+  if(TUTOR.mount({
+    app:"reader",
+    lang:function(){return (typeof LG!=="undefined"&&LG)||"he"},
+    q:function(){
+      if(typeof W==="undefined"||!W.length)return null;
+      var out=[];
+      for(var i=0;i<W.length;i++)if(W[i].sent===SENT)out.push(W[i].plain||W[i].word||"");
+      var line=out.join(" ").replace(/\s+/g," ").trim();
+      return line?{expr:line, level:"משפט "+(SENT+1)+" מתוך "+SENTS}:null;
+    },
+    stopHost:function(){try{stop()}catch(e){}}
+  })&&btnTu){
+    btnTu.textContent=TUTOR.label();
+    btnTu.classList.remove("hidden");
+    btnTu.onclick=function(){try{stop()}catch(e){}TUTOR.open()};
+    /* תווית הכפתור הולכת אחרי בורר השפה הקיים */
+    document.addEventListener("click",function(e){
+      if(e.target&&e.target.closest&&e.target.closest("#langbar"))
+        setTimeout(function(){btnTu.textContent=TUTOR.label()},0);
+    });
+  }
+}
+</script>
 <script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
