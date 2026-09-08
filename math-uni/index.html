@@ -922,7 +922,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u51 · 2026-09-08";
+var BUILD="u52 · 2026-09-08";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -4842,7 +4842,7 @@ _f("{0}{1} עצירה</button></div>", '<button class="btn btn-g" style="padding
   /* כפתורי עזר */
   h+='<div class="row" style="margin-top:16px;gap:8px">'+
      (state.settings.tts?_f("{0}{1} הקראה</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="read">', ic("speaker",16)):"")+
-_f("{0}{1}>{2} רמז</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="hint"', (P.hints>0?" disabled":""), ic("bulb",16))+
+_f("{0}{1}>{2} רמז</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="hint"', (P.hints>0?" disabled":""), ic("bulb",16))+(window.TUTOR&&TUTOR.on()?'<button class="btn ghost" data-a="tutor" style="margin-inline-start:6px">'+esc(TUTOR.label())+"</button>":"")+
 _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="guide"', (P.steps>0?" disabled":""), ic("steps",16))+
      (q.rule?_f("{0}{1}{2}{3} הנוסחה</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="rule" data-r="', q.rule, '">', ic("book",16)):"")+
      '</div>';
@@ -6572,6 +6572,7 @@ function onAction(a,el){
   if(a==="stop"){
     if(P.results.length===0){goto("home");return}
     P.list=P.list.slice(0,P.results.length);P.phase="done";save();window.scrollTo(0,0);render();return}
+  if(a==="tutor"){ try{stopSpeak()}catch(e){} if(window.TUTOR)TUTOR.open(); return }
   if(a==="hint"){
     P.hints=1;render();
     if(s.tts&&P.q.hint){
@@ -13705,6 +13706,7 @@ try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(view
 render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<script src="/tutor/tutor.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -13712,8 +13714,43 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u51-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u52-pwa1").catch(function(){});
   });
+}
+</script>
+<!-- ״עזרה מהמורה״. התשתית ב-/tutor/tutor.js, ההוראות בשרת.
+     mount מחזיר false כשאין כתובת שרת, ואז הכפתור אינו נבנה. -->
+<script>
+if(window.TUTOR){
+  /* הניסוח שעל המסך מגיע כ-HTML; לשרת נשלח טקסט בלבד. */
+  var txt=function(x){return String(x==null?"":x).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim()};
+  TUTOR.mount({
+    app:"math-uni",
+    lang:function(){return (typeof state!=="undefined"&&state.settings&&state.settings.lang)||"he"},
+    q:function(){
+      /* מיפוי אחד לשתי המשפחות. השדות נמדדו בדפדפן, ולא הועתקו
+         מ-buildQ של בונה המבחן — שם הם אחרים.
+         משפחת המתמטיקה: ask / expr / options[].ok
+         משפחת החידון:   prompt / subject / opts[].ok / answer */
+      var x=(typeof P!=="undefined")?P.q:null; if(!x)return null;
+      var o=x.opts||x.options||[], ok=x.answer!=null?txt(x.answer):null, i;
+      if(!ok)for(i=0;i<o.length;i++)if(o[i].ok)ok=txt(o[i].t||o[i].h);
+      var line=txt(x.prompt||x.ask);
+      /* ב-english השדה הזה הוא אובייקט ולא מחרוזת, ובלי הפריקה
+         הזאת נשלח לשרת "[object Object]". נמדד בדפדפן. */
+      var sb=x.subject;
+      if(sb&&typeof sb==="object")sb=sb.h||sb.t||sb.text||sb.w||"";
+      if(sb)line+=" — "+txt(sb);
+      if(x.lead)line+=" "+txt(x.lead);
+      if(x.expr)line+=" "+txt(x.expr);
+      return {expr:line.trim()||null, ans:ok||null,
+              topic:txt(x.topicName||x.tid||"")||null,
+              level:(typeof state!=="undefined"&&state.track)?("מסלול "+state.track):
+                    (x.level!=null?("רמה "+x.level):null)};
+    },
+    stopHost:function(){try{stopSpeak()}catch(e){}}
+  });
+  try{render()}catch(e){}
 }
 </script>
 <!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
