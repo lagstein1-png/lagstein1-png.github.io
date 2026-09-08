@@ -1880,8 +1880,31 @@ function centuryOf(y){
   var a=Math.abs(y);
   return Math.floor((a-1)/100)+1;
 }
+/* המאה נכתבת אחרת בכל שפה — ולא רק המילה משתנה, אלא גם הסדר וגם
+   אופן כתיבת המספר. כאן נבנה תמיד ״מילה ואחריה ספרה רומית״, ולכן
+   באנגלית יצא "century XIX" — שאינו אנגלית — וברוסית "век XIX",
+   שהוא היפוך של הכתיב המקובל.
+
+   ולכל שפה יש כאן תשובה אחת נכונה, ולכן זו אינה העדפה:
+     עברית   המאה ה-19     אין ספרות רומיות בעברית
+     ערבית   القرن 19      ואין גם בערבית
+     רוסית   XIX век       הרומית לפני המילה — כך נכתב ברוסית
+     אנגלית  19th century  סודר לפני המילה
+
+   הרומית נשארת ברוסית בלבד, ו-saySpell ממיר אותה לספרה להקראה. */
+function _ord(n){
+  var tens=n%100;
+  if(tens>=11&&tens<=13)return n+"th";
+  var d=n%10;
+  return n+(d===1?"st":d===2?"nd":d===3?"rd":"th");
+}
 function centuryStr(y){
-  return t("century")+" "+_rom(centuryOf(y))+(y<0?" "+t("bce"):"");
+  var n=centuryOf(y),s;
+  if(state.lang==="ru")s=_rom(n)+" "+t("century");
+  else if(state.lang==="en")s=_ord(n)+" "+t("century");
+  else if(state.lang==="he")s=t("century")+" ה-"+n;
+  else s=t("century")+" "+n;
+  return s+(y<0?" "+t("bce"):"");
 }
 var ROM=["","I","II","III","IV","V","VI","VII","VIII","IX","X",
          "XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI"];

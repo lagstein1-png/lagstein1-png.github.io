@@ -9,6 +9,13 @@
      node .claude/qa/content.js math-uni         # אחת
      QA_N=400 node .claude/qa/content.js english # מדגם גדול יותר
 
+   **ריצה דורסת את הדוח השמור של אותה אפליקציה**, ו-`stage.js` קורא
+   בדיוק ממנו (`reports/<app>.json`). לכן `QA_N` קטן מוחק סריקה
+   מלאה ומחליף אותה במדגם — זה קרה ב-8.9.2026 ל-`history`, שסריקת
+   ה-PASS שלה על 5,400 שאלות הוחלפה ב-960. `QA_N` קטן הוא לבדיקת
+   המנגנון בלבד, ואחריו מחזירים את הדוח: `git checkout
+   .claude/qa/reports/`.
+
    הוא מגריל שאלות מכל נושא ומכל רמה — השאלות כאן נוצרות בזמן
    ריצה ואינן יושבות בקובץ, ולכן אין "מאגר" לפתוח ולקרוא —
    ומודד תשע משפחות ממצאים:
@@ -611,7 +618,16 @@ function md(app,R){
   await ctx.close();
  }
  await b.close();
- fs.writeFileSync(path.join(OUT,'summary.json'),JSON.stringify(summary,null,1));
+ /* מיזוג ולא דריסה. ריצה על אפליקציה אחת כתבה כאן מערך באורך אחד
+    ומחקה את הסריקות של כל השאר — ו-stage.js קורא בדיוק מהקובץ הזה,
+    ולכן אפליקציה שנסרקה חזרה להיראות "לא נסרקה". הרשומה של ריצה
+    זו מחליפה את הקודמת של אותה אפליקציה, ושאר הרשומות נשארות. */
+ const SUM=path.join(OUT,'summary.json');
+ let prev=[]; try{ prev=JSON.parse(fs.readFileSync(SUM,'utf8'))||[] }catch(e){}
+ const ran=new Set(summary.map(function(s){return s.app}));
+ const merged=prev.filter(function(s){return !ran.has(s.app)}).concat(summary)
+   .sort(function(a,b){return a.app<b.app?-1:a.app>b.app?1:0});
+ fs.writeFileSync(SUM,JSON.stringify(merged,null,1));
  const bad=summary.filter(function(s){return s.verdict==='FAIL'}).length;
  console.log('\n'+summary.length+' אפליקציות · '+
    summary.filter(function(s){return s.verdict==='PASS'}).length+' PASS · '+
