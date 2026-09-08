@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x22 · 2026-09-08";
+  var BUILD = "x23 · 2026-09-08";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -946,12 +946,14 @@
 
   /* --- אירועים. האזנה אחת על המסמך, ולא מאזין לכל כפתור --------- */
   /* ״עזרה מהמורה״ — התשתית ב-/tutor/tutor.js וההוראות בשרת.
-     הבוט כאן עברי בלבד, מפני שהאפליקציה כולה עברית: אין בה בורר
-     שפה ואין מילון ארבע־לשוני. ראו FINDINGS. */
+     האפליקציה עצמה עברית בלבד: אין בה בורר שפה ואין מילון
+     ארבע־לשוני, ותרגום שלה הוא עבודה אחרת לגמרי. לכן pickLang —
+     לפאנל בורר שפה משלו, והבוט מדבר בארבע השפות גם כאן. */
   var TUT_ID = null;
   if (window.TUTOR) {
     TUTOR.mount({
       app: "bagrut-806",
+      pickLang: true,                 /* אין בורר באפליקציה — הפאנל מביא אחד */
       lang: function () { return "he" },
       q: function () {
         var r = TUT_ID ? subOf(TUT_ID) : null;
@@ -1181,7 +1183,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x22-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x23-pwa1").catch(function () {});
     });
   }
 

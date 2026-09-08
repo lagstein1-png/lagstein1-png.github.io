@@ -127,6 +127,11 @@ import(WORKER).then(W => {
   t('קול לכל שפה', /VOICE\s*=\s*\{ he:"he-IL", ar:"ar-SA", ru:"ru-RU", en:"en-US" \}/.test(client), true);
   t('יש כפתורי הקראה ועצירה', /data-tu="say"/.test(client) && /data-tu="stop"/.test(client), true);
   t('יש בורר מהירות', /id="tu-rate"/.test(client), true);
+  t('יש בורר שפה לאפליקציה שאין בה אחד', /id="tu-lg"/.test(client), true);
+  /* bagrut-806 עברית בלבד. בלי pickLang הבוט בה היה עברי בלבד,
+     והדרישה היא ארבע שפות בכל אפליקציה. */
+  t('bagrut-806 מסמנת pickLang',
+    /pickLang:\s*true/.test(fs.readFileSync(path.join(ROOT, 'bagrut-806', 'app.js'), 'utf8')), true);
   t('אין מיקרופון בשלב הזה',
     /getUserMedia|SpeechRecognition|webkitSpeechRecognition/.test(client), false);
   t('השיחה אינה נשמרת', /localStorage\.setItem\(\s*(RATE_KEY|DAY_KEY)/.test(client)

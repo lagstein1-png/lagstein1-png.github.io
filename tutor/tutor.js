@@ -33,6 +33,7 @@ var API = "";
 
 var RATE_KEY = "tutor-rate-v1";   /* מהירות ההקראה. משותף בכוונה — מודול אחד, התנהגות אחת */
 var DAY_KEY  = "tutor-day-v1";    /* מונה יומי. ילד אחד, תקציב אחד, בלי קשר לאפליקציה */
+var LANG_KEY = "tutor-lang-v1";   /* רק לאפליקציה שאין בה בורר שפה משלה — ראו pickLang */
 var DAY_MAX  = 40;                /* תקרה מקומית. החסם האמיתי בשרת */
 var TURNS    = 12;                /* הודעות לשיחה אחת */
 var MAXLEN   = 300;               /* תווים בהודעה של הילד */
@@ -81,8 +82,19 @@ var EL = null, PLAYING = -1;
 
 function T(){ return L[lang()] || L.he }
 function lang(){
+  /* אפליקציה שיש בה בורר שפה — הבוט הולך אחריו, וזו הדרישה.
+     אפליקציה שאין בה בורר (bagrut-806 עברית בלבד) מסמנת
+     pickLang, ואז לפאנל בורר משלו: שפת הבוט אינה תלויה בתרגום
+     של האפליקציה כולה, שהוא עבודה אחרת לגמרי. */
+  if(CFG && CFG.pickLang){
+    try{ var v = localStorage.getItem(LANG_KEY); if(L[v]) return v }catch(e){}
+  }
   var k = CFG && CFG.lang ? CFG.lang() : "he";
   return L[k] ? k : "he";
+}
+function setLang(v){
+  if(!L[v]) return;
+  try{ localStorage.setItem(LANG_KEY, v) }catch(e){}
 }
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
   .replace(/>/g,"&gt;").replace(/"/g,"&quot;") }
@@ -208,10 +220,12 @@ var CSS = ''
 +'font:inherit;font-weight:600;cursor:pointer}'
 +'#tu-go[disabled],#tu-in[disabled]{opacity:.55}'
 +'#tu-pv{color:#5a7178;font-size:.78rem;margin:7px 0 0}'
++'#tu-lg{border:1px solid rgba(23,51,60,.28);border-radius:9px;padding:5px 8px;'
++'font:inherit;font-size:.85rem;background:#fff;color:#17333c;margin-inline-start:auto}'
 +'#tu-x{margin-inline-start:auto;background:transparent;border:1px solid rgba(23,51,60,.25);'
 +'border-radius:9px;padding:5px 12px;font:inherit;cursor:pointer;color:#17333c}'
 +'@media(prefers-color-scheme:dark){#tu-bx{background:#16232a;color:#eef5f7}'
-+'#tu-in,.tu-ctl button,.tu-ctl select,#tu-x{background:#1e2f38;color:#eef5f7;'
++'#tu-in,.tu-ctl button,.tu-ctl select,#tu-lg,#tu-x{background:#1e2f38;color:#eef5f7;'
 +'border-color:rgba(238,245,247,.3)}'
 +'.tu-me{background:#1d3b4a;border-color:#2f6a86}.tu-bot{background:#14403a;border-color:#1c7e70}'
 +'.tu-sys{color:#a9c2ca}#tu-pv{color:#93aeb7}}';
@@ -224,6 +238,7 @@ function build(){
   ov.innerHTML =
     '<div id="tu-bx" role="dialog" aria-modal="true" aria-labelledby="tu-ti">'
     + '<div id="tu-hd"><b id="tu-ti"></b><span id="tu-q" hidden></span>'
+    + '<select id="tu-lg" hidden></select>'
     + '<button id="tu-x" type="button"></button></div>'
     + '<div id="tu-log" aria-live="polite"></div>'
     + '<div id="tu-ft"><div id="tu-row">'
@@ -233,10 +248,17 @@ function build(){
   EL = {
     ov: ov, bx: ov.querySelector("#tu-bx"), ti: ov.querySelector("#tu-ti"),
     q: ov.querySelector("#tu-q"), x: ov.querySelector("#tu-x"),
+    lg: ov.querySelector("#tu-lg"),
     log: ov.querySelector("#tu-log"), inp: ov.querySelector("#tu-in"),
     go: ov.querySelector("#tu-go"), pv: ov.querySelector("#tu-pv")
   };
   EL.x.onclick = close;
+  EL.lg.onchange = function(){
+    setLang(this.value);
+    /* שפה חדשה — שיחה חדשה, אחרת הבוט ממשיך בשפה הקודמת */
+    MSGS = []; NOTE = ""; LANGAT = lang();
+    stopSay(); draw(); send(T().hello, true);
+  };
   EL.go.onclick = function(){ send(EL.inp.value) };
   ov.addEventListener("click", function(e){ if(e.target === ov) close() });
   EL.inp.addEventListener("keydown", function(e){
@@ -268,6 +290,14 @@ function draw(){
   e.inp.placeholder = t.ph;
   e.inp.setAttribute("aria-label", t.ph);
   e.pv.textContent = t.privacy;
+  if(CFG && CFG.pickLang){
+    e.lg.hidden = false;
+    var opt = "";
+    for(var k in L) if(L.hasOwnProperty(k))
+      opt += '<option value="' + k + '"' + (k === lg ? " selected" : "") + '>' + esc(L[k].title) + '</option>';
+    if(e.lg.innerHTML !== opt) e.lg.innerHTML = opt;
+    e.lg.value = lg;
+  } else e.lg.hidden = true;
   e.inp.disabled = BUSY; e.go.disabled = BUSY;
 
   var q = CFG && CFG.q ? CFG.q() : null;
