@@ -80,7 +80,16 @@ const ROLE = {
 const LANGNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנגלית" };
 const TARGETNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנגלית" };
 
-const MODEL = "claude-opus-5";   /* מודל זול יותר הוא שינוי שורה אחת, והוא החלטה של הבעלים */
+/* המודל. השורה הזאת היא רוב העלות.
+
+   נבחר `claude-haiku-4-5` להשקה, בבקשת הבעלים: התפקיד כאן הוא
+   רמז קצר ושאלה אחת, לא ניתוח. אם התשובות יימצאו רדודות מדי —
+   `claude-sonnet-5` ואז `claude-opus-5`, ואז כבר יהיו מספרי
+   שימוש אמיתיים מדף ה-Cost שבקונסולה במקום ניחוש.
+
+   **מחליפים כאן — CAP למטה כבר מטפל בהפרשים בין המודלים.**
+   בלי זה `effort` היה נשלח ל-haiku ומחזיר 400. */
+const MODEL = "claude-haiku-4-5";
 const MAX_TOKENS = 700;          /* תשובה קצרה. גבוה מספיק כדי לא להיחתך באמצע משפט */
 const API = "https://api.anthropic.com/v1/messages";
 
@@ -90,8 +99,15 @@ const LIM = {
   chars: 300,        /* הודעה בודדת של התלמיד */
   total: 2000,       /* כל השיחה יחד */
   ctx: 400,          /* שדה הקשר בודד — התרגיל, התשובה, הנושא */
-  perDay: 60,        /* פניות ליום, לכל כתובת IP */
-  globalPerDay: 3000 /* תקרה יומית לכל השירות — חסם העלות האמיתי */
+  /* שתי התקרות האלה הן חסם העלות, והן הורדו לפני ההשקה.
+     החשבון, על MAX_TOKENS ועל המחיר המפורסם: 100 פניות ביום
+     כפול 700 טוקני פלט הן 70,000 טוקנים ביום — כלומר תקרה של
+     סנטים בודדים ליום ב-haiku.
+
+     **זה חסם עליון של הפלט בלבד; הקלט מוסיף מעליו.** להעלות
+     אחרי שרואים שימוש אמיתי, לא לפני. */
+  perDay: 20,        /* פניות ליום, לכל כתובת IP */
+  globalPerDay: 100  /* תקרה יומית לכל השירות — חסם העלות האמיתי */
 };
 
 const LANGS = ["he", "ar", "ru", "en"];
@@ -271,12 +287,32 @@ function contextBlock(inp, turn) {
   return out.join("\n");
 }
 
-async function ask(env, ctx, msgs, extra) {
+/* ============ מה מותר לשלוח לאיזה מודל ============
+   שני הפרמטרים האלה נכונים למשפחת opus ו**שגויים** למודלים
+   הקטנים:
+
+   · `output_config.effort` — מחזיר שגיאה ב-Haiku 4.5.
+   · `fallbacks` — מנגנון הגיבוי בסירוב, ויעדיו הם מודלי opus.
+
+   כלומר החלפת `MODEL` לבדה הייתה שוברת כל פנייה ב-400, ביום
+   הראשון, בלי שאף בדיקה כאן תתפוס את זה — אין מפתח ואי אפשר
+   לפנות לשרת. לכן הבנייה מותנית במודל, ולא קבועה.
+
+   מוסיפים מודל חדש — מוסיפים אותו כאן. מודל שאינו ברשימה
+   מקבל את הגוף המינימלי, וזו ברירת המחדל הבטוחה. */
+const CAP = {
+  "claude-opus-5":    { effort: true,  fallbacks: true  },
+  "claude-opus-4-8":  { effort: true,  fallbacks: true  },
+  "claude-sonnet-5":  { effort: true,  fallbacks: false },
+  "claude-haiku-4-5": { effort: false, fallbacks: false }
+};
+function capOf(model) { return CAP[model] || { effort: false, fallbacks: false } }
+
+function buildBody(model, ctx, msgs, extra) {
+  const cap = capOf(model);
   const body = {
-    model: MODEL,
+    model: model,
     max_tokens: MAX_TOKENS,
-    output_config: { effort: "low" },      /* שיחה קצרה — אין צורך בחשיבה עמוקה, וזה חוסך טוקנים */
-    fallbacks: "default",                  /* סירוב של המודל מנותב לגיבוי בצד השרת */
     system: [
       /* הגוף המשותף ראשון, ועליו סימון מטמון: הוא זהה בכל אחת עשרה
          האפליקציות ובכל ארבע השפות. אם הוא ארוך מהמינימום של המודל
@@ -287,14 +323,29 @@ async function ask(env, ctx, msgs, extra) {
     ],
     messages: msgs
   };
+  /* שיחה קצרה — אין צורך בחשיבה עמוקה, וזה חוסך טוקנים */
+  if (cap.effort) body.output_config = { effort: "low" };
+  /* סירוב של המודל מנותב לגיבוי בצד השרת */
+  if (cap.fallbacks) body.fallbacks = "default";
+  return body;
+}
+
+function buildHeaders(model, key) {
+  const h = {
+    "Content-Type": "application/json",
+    "x-api-key": key,
+    "anthropic-version": "2023-06-01"
+  };
+  /* הכותרת נשלחת רק כשבאמת משתמשים בפרמטר שהיא פותחת */
+  if (capOf(model).fallbacks) h["anthropic-beta"] = "server-side-fallback-2026-07-01";
+  return h;
+}
+
+async function ask(env, ctx, msgs, extra) {
+  const body = buildBody(MODEL, ctx, msgs, extra);
   const r = await fetch(API, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-      "anthropic-beta": "server-side-fallback-2026-07-01"
-    },
+    headers: buildHeaders(MODEL, env.ANTHROPIC_API_KEY),
     body: JSON.stringify(body)
   });
   if (!r.ok) return { err: r.status };
@@ -344,4 +395,5 @@ export default {
 
 /* מיוצאים בנפרד כדי ש-node .claude/qa/tutor.js יוכל לבדוק אותם.
    Cloudflare קורא רק את ה-default, וייצוא נוסף אינו מפריע לו. */
-export { revealsAnswer, badEquation, readBody, contextBlock, LIM, CORE, ROLE, LANGS };
+export { revealsAnswer, badEquation, readBody, contextBlock, LIM, CORE, ROLE, LANGS,
+         buildBody, buildHeaders, capOf, MODEL, MAX_TOKENS };

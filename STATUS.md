@@ -28,10 +28,26 @@
 | `bagrut-806` | x24 · 2026-09-08 | x24-pwa1 | תואם |
 | `ulpan` | a20 · 2026-09-08 | a20-pwa1 | תואם |
 | `english` | n51 · 2026-09-08 | n51-pwa1 | תואם |
-| `history` | m58 · 2026-09-08 | m58-pwa1 | תואם |
-| `lomda` | l32 · 2026-09-08 | l32-pwa1 | תואם |
+| `history` | m59 · 2026-09-08 | m59-pwa1 | תואם |
+| `lomda` | l33 · 2026-09-08 | l33-pwa1 | תואם |
 | `reader` | — | 31-pwa1 | מפתח בלבד |
 | `theory` | — | — | אינה בריפו הזה |
+
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
+
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
+
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
+
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
+
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
+
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
+
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
+
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
 

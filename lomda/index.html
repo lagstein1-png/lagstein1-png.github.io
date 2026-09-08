@@ -1034,7 +1034,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l32 · 2026-09-08";
+var BUILD="l33 · 2026-09-08";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -2008,6 +2008,15 @@ function formWhat(tp,lv,pool,idx){
 /* --- צורה 3: על איזה אירוע מדובר --- */
 function formName(tp,lv,pool,idx){
   var it=pool[idx];
+  /* הכותרת היא התשובה, והתיאור הוא מה שנקרא בשאלה. פריט שהתיאור
+     שלו פותח בכותרת מוסר את התשובה בהקראה — נמדד ב-edu.js:
+     ״האוניברסיטה העברית נפתחה״ הוא גם הכותרת וגם שש המילים
+     הראשונות של התיאור. לילד שקורא לאט, שלוחץ רווח כדי לשמוע
+     את השאלה, זה הפתרון.
+
+     הבדיקה כאן ולא בתוכן: 18 מאגרים, ומאגר חדש יביא את זה שוב.
+     נופלים לצורה אחרת, בדיוק כמו כשאין די מסיחים. */
+  if(gl(it.w).indexOf(gl(it.t))>=0)return formWhen(tp,lv,pool,idx);
   var opts=optsFromField(it,nearEvents(it,pool,28),"t",4);
   if(!opts)return formWhen(tp,lv,pool,idx);
   return {type:"fact",prompt:t("qName"),lead:gl(it.w),
@@ -4136,7 +4145,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l32-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l33-pwa1").catch(function(){});
   });
 }
 </script>
