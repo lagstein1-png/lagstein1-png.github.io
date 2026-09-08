@@ -498,6 +498,15 @@ https://lagstein1-png.github.io
 **סיום.** 13 קבצים, כל אחד 1200×630, כל אחד מתחת ל-200KB
 (`ls -l` הוא המקור). D2 מצביע עליהם.
 
+**בוצע 8.9 בענף `claude/global-social-growth-strategist-j2neaf`:**
+12 קבצים (הבית ואחת־עשרה האפליקציות שבריפו; ״תאוריה מדברת״ אינה
+כאן), `<app>/img/og.png`, 1200×630, בין 35KB ל-46KB (`ls -l`).
+רקע מ-`theme_color` שב-manifest, האייקון, השם העברי מ-`DATA.APPS`,
+ושורת ״למידה שנשמעת״. ניגודיות לבן־על־רקע חושבה בסקריפט; רק
+`math-app` (#0e9c8d) הוכהה ב-15% כדי לעבור 4.5:1. `pricing/`
+מצביע על תמונת הבית. D2 מצביע עליהם, ו-`twitter:card` עלה
+ל-`summary_large_image`.
+
 ### E2 · חשוב · צילומי מסך ב-manifest
 
 **הממצא.** `grep -l screenshots */manifest.json` מחזיר כלום.
