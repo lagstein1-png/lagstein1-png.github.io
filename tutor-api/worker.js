@@ -144,8 +144,13 @@ function strip(txt) {
     .join(" ").trim();
 }
 
+/* המספרים כאן עשרוניים ולא שלמים, ולכן `\d+(\.\d+)?` ולא `\d+`.
+   עם `\d+` בלבד, ״1/2 = 0.5״ נקרא כ-״1/2 = 0״ ונפסל — כלומר
+   המורה אמר דבר נכון והשומר זרק אותו. נמדד: גם ״10 : 4 = 2.5״.
+   וההשוואה בסבילות, כי 0.1+0.2 אינו 0.3 בנקודה צפה. */
+const NUM = "(\\d+(?:\\.\\d+)?)";
 function badEquation(text) {
-  const re = /(\d+)\s*([+\-−×xX*÷:\/])\s*(\d+)\s*=\s*(\d+)/g;
+  const re = new RegExp(NUM + "\\s*([+\\-−×xX*÷:/])\\s*" + NUM + "\\s*=\\s*" + NUM, "g");
   let m;
   while ((m = re.exec(text))) {
     const a = +m[1], b = +m[3], said = +m[4];
@@ -154,7 +159,12 @@ function badEquation(text) {
     else if (m[2] === "-" || m[2] === "−") real = a - b;
     else if (m[2] === "÷" || m[2] === ":" || m[2] === "/") { if (!b) return true; real = a / b; }
     else real = a * b;
-    if (real !== said) return true;
+    /* שלושה שלמים — השוואה מדויקת. סבילות יחסית הייתה מפספסת
+       ״100 + 200 = 301״, טעות של אחד שהיא 0.33% בלבד.
+       יש עשרוני — סבילות של 0.011, שזה בדיוק עיגול לשתי ספרות:
+       ״1 : 3 = 0.33״ עובר, ״2.5 + 2.5 = 6״ נפסל. */
+    const whole = m[1].indexOf(".") < 0 && m[3].indexOf(".") < 0 && m[4].indexOf(".") < 0;
+    if (whole ? real !== said : Math.abs(real - said) > 0.011) return true;
   }
   return false;
 }
