@@ -29,9 +29,11 @@
 | `ulpan` | a19 · 2026-09-08 | a19-pwa1 | תואם |
 | `english` | n50 · 2026-09-08 | n50-pwa1 | תואם |
 | `history` | m57 · 2026-09-08 | m57-pwa1 | תואם |
-| `lomda` | l28 · 2026-09-08 | l28-pwa1 | תואם |
+| `lomda` | l29 · 2026-09-08 | l29-pwa1 | תואם |
 | `reader` | — | 30-pwa1 | מפתח בלבד |
 | `theory` | — | — | אינה בריפו הזה |
+
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
 
