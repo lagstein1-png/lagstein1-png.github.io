@@ -26,6 +26,7 @@ const PRE = [
   "./speech.js", "./data/exams.js", "./manifest.json",
   "./img/icon-192.png", "./img/icon-512.png", "./img/icon-maskable-512.png",
   "./img/apple-touch-icon.png", "./vendor/katex/katex.min.css", "./vendor/katex/katex.min.js",
+  "/tutor/tutor.js",
   "/legal/terms.js", "/legal/protect.js",
   "./vendor/katex/fonts/KaTeX_AMS-Regular.woff2", "./vendor/katex/fonts/KaTeX_Caligraphic-Bold.woff2", "./vendor/katex/fonts/KaTeX_Caligraphic-Regular.woff2",
   "./vendor/katex/fonts/KaTeX_Fraktur-Bold.woff2", "./vendor/katex/fonts/KaTeX_Fraktur-Regular.woff2", "./vendor/katex/fonts/KaTeX_Main-Bold.woff2",

@@ -51,6 +51,7 @@ const SUITE = [
   { id: 'fonts',    args: [] },
   { id: 'engine',   args: [] },
   { id: 'exam806',  args: [] },
+  { id: 'tutor',    args: [] },
   { id: 'smoke',    args: PAGES,  needsServer: true },
   { id: 'say',      args: [],     needsServer: true },
   { id: 'exam',     args: [],     needsServer: true },

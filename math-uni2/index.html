@@ -924,7 +924,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v47 · 2026-09-07";
+var BUILD="v51 · 2026-09-08";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -4318,7 +4318,7 @@ _f("{0}{1} עצירה</button></div>", '<button class="btn btn-g" style="padding
   /* כפתורי עזר */
   h+='<div class="row" style="margin-top:16px;gap:8px">'+
      (state.settings.tts?_f("{0}{1} הקראה</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="read">', ic("speaker",16)):"")+
-_f("{0}{1}>{2} רמז</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="hint"', (P.hints>0?" disabled":""), ic("bulb",16))+
+_f("{0}{1}>{2} רמז</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="hint"', (P.hints>0?" disabled":""), ic("bulb",16))+(window.TUTOR&&TUTOR.on()?'<button class="btn ghost" data-a="tutor" style="margin-inline-start:6px">'+esc(TUTOR.label())+"</button>":"")+
 _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="guide"', (P.steps>0?" disabled":""), ic("steps",16))+
      (q.rule?_f("{0}{1}{2}{3} הנוסחה</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="rule" data-r="', q.rule, '">', ic("book",16)):"")+
      '</div>';
@@ -4797,8 +4797,21 @@ function exSlots(){
   if(EB.q&&EB.q.length)return EB.q;
   var tops=EB.topics.filter(function(x){return topicById(x)});
   if(!tops.length)tops=topicsForTrack(state.track).slice(0,3).map(function(t){return t.id});
-  var q=[],i;
-  for(i=0;i<EB.n;i++)q.push(exSlot(tops[i%tops.length],EB.level));
+  /* אותה שאלה פעמיים באותו מבחן היא שאלה מבוזבזת, והיא ודאית כשברמה
+     ארבעה פריטים והמורה ביקש עשר שאלות: הזרע נבחר באקראי ובלי זיכרון,
+     ונמדד מבחן שבו אותו מושג הופיע ארבע פעמים מתוך עשר. מגלגלים מחדש
+     עד שתים־עשרה פעמים, ואם כל השאלות האפשריות כבר נלקחו — משאירים
+     כפילות במקום להיתקע. */
+  var q=[],seen={},i,tries,sl,pq,key;
+  for(i=0;i<EB.n;i++){
+    for(tries=0;tries<12;tries++){
+      sl=exSlot(tops[i%tops.length],EB.level);
+      pq=exPreviewQ(sl); key=pq&&pq.ask?plainOf(pq.ask):"";
+      if(!key||!seen[key])break;
+    }
+    if(key)seen[key]=1;
+    q.push(sl);
+  }
   /* מערבבים כאן ולא בשליחה: המורה רואה את הסדר הסופי ומאשר אותו. */
   EB.q=shuffle(q);
   return EB.q;
@@ -6035,6 +6048,7 @@ function onAction(a,el){
   if(a==="stop"){
     if(P.results.length===0){goto("home");return}
     P.list=P.list.slice(0,P.results.length);P.phase="done";save();window.scrollTo(0,0);render();return}
+  if(a==="tutor"){ try{stopSpeak()}catch(e){} if(window.TUTOR)TUTOR.open(); return }
   if(a==="hint"){
     P.hints=1;render();
     if(s.tts&&P.q.hint){
@@ -12028,6 +12042,7 @@ try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(view
 render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<script src="/tutor/tutor.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -12035,8 +12050,43 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v47-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v51-pwa1").catch(function(){});
   });
+}
+</script>
+<!-- ״עזרה מהמורה״. התשתית ב-/tutor/tutor.js, ההוראות בשרת.
+     mount מחזיר false כשאין כתובת שרת, ואז הכפתור אינו נבנה. -->
+<script>
+if(window.TUTOR){
+  /* הניסוח שעל המסך מגיע כ-HTML; לשרת נשלח טקסט בלבד. */
+  var txt=function(x){return String(x==null?"":x).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim()};
+  TUTOR.mount({
+    app:"math-uni2",
+    lang:function(){return (typeof state!=="undefined"&&state.settings&&state.settings.lang)||"he"},
+    q:function(){
+      /* מיפוי אחד לשתי המשפחות. השדות נמדדו בדפדפן, ולא הועתקו
+         מ-buildQ של בונה המבחן — שם הם אחרים.
+         משפחת המתמטיקה: ask / expr / options[].ok
+         משפחת החידון:   prompt / subject / opts[].ok / answer */
+      var x=(typeof P!=="undefined")?P.q:null; if(!x)return null;
+      var o=x.opts||x.options||[], ok=x.answer!=null?txt(x.answer):null, i;
+      if(!ok)for(i=0;i<o.length;i++)if(o[i].ok)ok=txt(o[i].t||o[i].h);
+      var line=txt(x.prompt||x.ask);
+      /* ב-english השדה הזה הוא אובייקט ולא מחרוזת, ובלי הפריקה
+         הזאת נשלח לשרת "[object Object]". נמדד בדפדפן. */
+      var sb=x.subject;
+      if(sb&&typeof sb==="object")sb=sb.h||sb.t||sb.text||sb.w||"";
+      if(sb)line+=" — "+txt(sb);
+      if(x.lead)line+=" "+txt(x.lead);
+      if(x.expr)line+=" "+txt(x.expr);
+      return {expr:line.trim()||null, ans:ok||null,
+              topic:txt(x.topicName||x.tid||"")||null,
+              level:(typeof state!=="undefined"&&state.track)?("מסלול "+state.track):
+                    (x.level!=null?("רמה "+x.level):null)};
+    },
+    stopHost:function(){try{stopSpeak()}catch(e){}}
+  });
+  try{render()}catch(e){}
 }
 </script>
 <!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
