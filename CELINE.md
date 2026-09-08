@@ -337,7 +337,7 @@ https://lagstein1-png.github.io
 
 | אפליקציה | חי | קוד |
 |---|---|---|
-| מתמטיקה לחכמים שמתקשים | https://lagstein1-png.github.io/math-app/ | [`math-app/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-app/index.html) |
+| חשבון ליסודי | https://lagstein1-png.github.io/math-app/ | [`math-app/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-app/index.html) |
 | שלב — תיכון | https://lagstein1-png.github.io/math-teen/ | [`math-teen/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-teen/index.html) |
 | אקסיומה — שנה א׳ | https://lagstein1-png.github.io/math-uni/ | [`math-uni/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-uni/index.html) |
 | אקסיומה ב׳ | https://lagstein1-png.github.io/math-uni2/ | [`math-uni2/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-uni2/index.html) |

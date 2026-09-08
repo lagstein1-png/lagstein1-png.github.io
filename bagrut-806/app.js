@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x20 · 2026-09-07";
+  var BUILD = "x22 · 2026-09-08";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -417,7 +417,12 @@
       'value="' + esc(st.val) + '" ' +
       'aria-label="התשובה הסופית לסעיף ' + esc(sub.letter) + '" ' +
       'placeholder="' + esc(hintPlaceholder(sub.finalAnswer)) + '">' +
-      '<button class="btn pri" data-check="' + esc(id) + '" type="button">בדקו</button></div>';
+      '<button class="btn pri" data-check="' + esc(id) + '" type="button">בדקו</button>' +
+      /* ״עזרה מהמורה״ יושב כאן ולא בשורת הרמזים: שורת הרמזים
+         נבנית רק כשיש steps, וסעיף בלי רמזים היה נשאר בלי מורה. */
+      (window.TUTOR && TUTOR.on()
+        ? '<button class="btn ghost" data-tutor="' + esc(id) + '" type="button">' +
+          esc(TUTOR.label()) + "</button>" : "") + "</div>";
 
     if (st.res) {
       /* בלי role="status" — ובכוונה. את המשוב מכריז #live, שקיים
@@ -940,10 +945,35 @@
   }
 
   /* --- אירועים. האזנה אחת על המסמך, ולא מאזין לכל כפתור --------- */
+  /* ״עזרה מהמורה״ — התשתית ב-/tutor/tutor.js וההוראות בשרת.
+     הבוט כאן עברי בלבד, מפני שהאפליקציה כולה עברית: אין בה בורר
+     שפה ואין מילון ארבע־לשוני. ראו FINDINGS. */
+  var TUT_ID = null;
+  if (window.TUTOR) {
+    TUTOR.mount({
+      app: "bagrut-806",
+      lang: function () { return "he" },
+      q: function () {
+        var r = TUT_ID ? subOf(TUT_ID) : null;
+        if (!r) return null;
+        var txt = function (x) {
+          return String(x == null ? "" : x).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+        };
+        return {
+          expr: txt(r.sub.text) + (r.sub.latex ? "  " + txt(r.sub.latex) : ""),
+          ans: r.sub.finalAnswer ? txt(answerText(r.sub.finalAnswer)) : null,
+          topic: r.q.topic || null,
+          level: "שאלון 806"
+        };
+      },
+      stopHost: function () { try { window.Speech.stop() } catch (e) {} }
+    });
+  }
+
   document.addEventListener("click", function (e) {
     var el = e.target.closest ? e.target.closest(
       "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate]," +
-      "[data-read],[data-read-el],[data-check],[data-hint],[data-sol],[data-hclear]," +
+      "[data-read],[data-read-el],[data-check],[data-hint],[data-sol],[data-hclear],[data-tutor]," +
       "[data-simstart],[data-simend]," +
       "#btn-reset,#btn-stop,#btn-try," +
       "#btn-pause,#btn-back,#btn-fwd") : null;
@@ -957,6 +987,15 @@
     if (el.getAttribute("data-simend")) {
       if (!window.confirm("להגיש את הבחינה? אחרי ההגשה אי אפשר לשנות תשובות.")) return;
       simFinish(false);
+      return;
+    }
+
+    /* ״עזרה מהמורה״. מזהה הסעיף נשמר, ו-q() קורא אותו. */
+    var tut = el.getAttribute("data-tutor");
+    if (tut) {
+      TUT_ID = tut;
+      try { window.Speech.stop() } catch (e) {}
+      if (window.TUTOR) TUTOR.open();
       return;
     }
 
@@ -1142,7 +1181,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x20-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x22-pwa1").catch(function () {});
     });
   }
 
