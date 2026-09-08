@@ -47,6 +47,7 @@ const SUITE = [
   { id: 'status',   args: ['--check'] },
   { id: 'wix',      args: ['--check'] },
   { id: 'banks',    args: [] },
+  { id: 'leaks',    args: [] },
   { id: 'a11y',     args: [] },
   { id: 'fonts',    args: [] },
   { id: 'engine',   args: [] },
