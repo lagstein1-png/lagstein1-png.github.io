@@ -39,12 +39,28 @@ p{margin:0 0 14px; color:var(--text-soft)}
     <div class="price" aria-label="מחיר"><s dir="ltr">120 ₪</s><b>מבצע השקה: 79 ₪</b><span>תשלום חד־פעמי</span></div>
     <p>ההרשמה לרכישה נפתחת בקרוב. השאירו מייל ונודיע לכם ביום הפתיחה.</p>
     <div class="form" id="form">
-      <!-- GOOGLE_FORM_HERE -->
-      <span>כאן ייכנס טופס ההרשמה.</span>
+      <span id="formHint">כאן ייכנס טופס ההרשמה.</span>
     </div>
     <a class="back" href="/">→ חזרה לדף הבית</a>
   </div>
 </main>
+<!-- GOOGLE_FORM_HERE — הדבקת הטופס היא שורה אחת:
+     ב-Google Forms: שלח (Send) → הלשונית < > → העתק את הכתובת שבתוך src="…"
+     (מסתיימת ב-?embedded=true). מדביקים אותה בין המירכאות של FORM_URL.
+     כל עוד FORM_URL ריק הדף מציג את הודעת ״בקרוב״, ושום דבר לא נשבר.
+     התבנית, כפי שנמסרה ב-9.9.2026 — מחליפים את XXXX במזהה הטופס בלבד:
+       var FORM_URL="https://docs.google.com/forms/d/e/XXXX/viewform?embedded=true";
+     עם XXXX הכתובת אינה טופס, ולכן היא לא הוכנסה: המבקר היה רואה שגיאה של
+     Google בתוך התיבה במקום ״בקרוב״. -->
+<script>
+var FORM_URL="";
+(function(){
+  if(!FORM_URL)return;
+  var box=document.getElementById("form"), f=document.createElement("iframe");
+  f.src=FORM_URL; f.title="טופס הרשמה — תאוריה מדברת"; f.loading="lazy";
+  box.textContent=""; box.appendChild(f);
+})();
+</script>
 <!-- GoatCounter — אותה ספירה אנונימית כמו בשאר הדפים, לפי נתיב. -->
 <script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
