@@ -1036,7 +1036,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n55 · 2026-09-09";
+var BUILD="n56 · 2026-09-09";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3840,7 +3840,22 @@ function buildQ(tid,lv){
      במבחן נשאה את תשובתה בגוף השאלה. הנושא הוא המילה. */
   /* שאלת הבנת הנקרא נושאת את שאלתה ב-qtext ולא ב-lead; בלעדיו
      הופיע רק "לפי הקטע:" בלי מה שנשאל. */
+  /* ברמה 3 שפת האם נעלמת. כך כתוב בתיאור הרמה עצמו — "אנגלית
+     בלבד" — וכך עושה מסך התרגול (`state.level<3&&q.lead`). המבחן
+     הכיתתי הציג אותה בכל שאלת השלמה: נמדד בדפדפן 150 מתוך 150
+     ברמה 3 בנתיב buildQ, מול 0 מתוך 101 בתרגול באותה רמה.
+     ובשאלת השלמה התרגום הוא התשובה עצמה — במשפט
+     "I would rather _____, if that is all right" הרמז "אני מעדיף
+     שלא" נותן את "not" בלי לדעת מילה אחת באנגלית. המורה בחר
+     רמה 3 והכיתה נבחנה בקלה ממנה.
+     התנאי הוא על lv של המשבצת ולא על state.level: רמת המבחן ארוזה
+     בקישור וזהה אצל המורה ואצל התלמיד, ואילו state.level הוא רמת
+     התרגול של המכשיר — ושני הצדדים היו מקבלים שאלה אחרת.
+     "order" נכלל אף שהוא מגולגל מחדש כאן (אין לו opts), כדי
+     שהכלל יהיה בדיוק הכלל של מסך התרגול. */
+  var hideLead=(q.type==="gap"||q.type==="order")&&lv>=3;
   var lead=q.type==="comp"?(q.qtext||""):
+           hideLead?"":
            (q.lead||(q.subject?(q.subject.w||q.subject.s||""):""));
   var ask=esc(q.prompt||"")+(lead&&!audioOnly?' <b>'+esc(lead)+"</b>":"");
   var expr="";
@@ -5292,7 +5307,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n55-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n56-pwa1").catch(function(){});
   });
 }
 </script>
