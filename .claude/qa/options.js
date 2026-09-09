@@ -29,7 +29,7 @@ let failed=0;   /* בלי זה הכלי מדפיס JS ERRORS ויוצא 0 */
   })}catch(e){failed++;console.log('✗ '+app+': '+String(e.message).split('\n')[0]);await ctx.close();continue}
   if(r.na){console.log('· '+app+': אין TOPICS/buildQ — סכימה אחרת, לא נבדק כאן');await ctx.close();continue}
   /* under4 אינו מפיל: יש לו קו בסיס מתועד שאינו אפס (math-uni 2.2%,
-     שלוש שורות שנבדקו ונמצאו תקינות — ראו README). multiCorrect,
+     שתי שורות שנבדקו ונמצאו תקינות — ראו README). multiCorrect,
      noCorrect ושגיאת JS כן: לאלה קו הבסיס הוא אפס. */
   if(r.multi||r.none||errs.length)failed++;
   console.log('== '+app+'  levels='+r.levels+'  total='+r.tot+
