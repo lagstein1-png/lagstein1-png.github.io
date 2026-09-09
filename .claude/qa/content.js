@@ -90,9 +90,26 @@ async function scan(page){
     let s=''; for(const c of div.childNodes) s+=walk(c); return s.trim()};
 
   /* מספר מתוך מחרוזת, אם המחרוזת כולה מספר. משמש רק כדי
-     לזהות מסיח ששווה לתשובה בכתיב אחר — 0.5 מול 1/2 מול 50%. */
+     לזהות מסיח ששווה לתשובה בכתיב אחר — 0.5 מול 1/2 מול 50%.
+
+     **ספרה, רווח, ספרה — אינו מספר אלא רשת.** הסרת כל הרווחים
+     שיטחה מטריצה לספרה אחת ארוכה, ולכן שתי מטריצות שונות לגמרי
+     קיבלו את אותו ״ערך״ ודווחו כמסיח ששקול לתשובה:
+
+         [[1,11],[1,2]]  →  "1 11 1 2"  →  "111112"
+         [[1,1],[11,2]]  →  "1 1 11 2"  →  "111112"
+
+     נמדד 9.9.2026 ב-math-uni: 14 מתוך 80,000 הגרלות של `matops`
+     (רמות 1 ו-3), וב**כולן** `key()` המבני של שתי האפשרויות היה
+     שונה — כלומר הן נראות שונה על המסך והתלמיד אינו מבולבל. זו
+     בדיוק הכשל שתועד ב-README על `dupe` של entropy: השטחה
+     ל-`textContent` מוחקת את גבול האלמנט.
+
+     הסרת הרווחים נשארת לכל השאר — "− 5" ו-"1 / 2" עדיין מספר. */
   function num(t){
-    let s=String(t).trim().replace(/[−–—]/g,'-').replace(/\s/g,'');
+    let s=String(t).trim().replace(/[−–—]/g,'-');
+    if(/\d\s+\d/.test(s)) return null;
+    s=s.replace(/\s/g,'');
     if(!s) return null;
     let pct=false; if(/%$/.test(s)){pct=true;s=s.slice(0,-1)}
     const m=s.match(/^(-?\d+(?:[.,]\d+)?)\/(-?\d+(?:[.,]\d+)?)$/);
@@ -347,14 +364,15 @@ async function scan(page){
          כך נולדו אלפי מופעים של `symbol-in-say` על סימנים
          ש-SAY_MAP דווקא כן ממיר — אותה התראת שווא בדיוק שההערה
          למעלה מתארת על `×` ו-`÷`. */
-      const say=(function(raw){
+      const spk=function(raw){
         try{
           if(typeof toSpoken==='function') return toSpoken(raw,'he');
           if(typeof speakMath==='function') return speakMath(raw);
           return raw;
         }
         catch(e){ return raw }
-      })(String(q.say||''));
+      };
+      const say=spk(String(q.say||''));
       if(askT&&!say.trim()) add('no-say','REVIEW','אין say — אין מה להקריא',where);
       if(/<[a-zA-Z\/]/.test(say)) add('html-in-say','REVIEW','תגיות HTML ב-say: '+say.slice(0,80),where);
       if(LATEX.test(say)) add('latex-in-say','FAIL','LaTeX ב-say: '+say.slice(0,80),where);
@@ -398,10 +416,39 @@ async function scan(page){
            הניקוי משמש **רק** לספירת המסיחים. בדיקת התשובה עצמה
            נשארת מילולית ומחמירה, כדי שהרפיית ההשוואה לא תבלע
            דליפה אמיתית. */
+        /* 9.9.2026 — **התשובה והמסיחים נמדדים באותה סרגל.**
+           סף ה-`length>=2` נועד למנוע התאמה מקרית של תו בודד,
+           אבל הוא חל על המסיחים בלבד: התשובה נבדקת גולמית
+           (`spoken.indexOf(a)`) ודי לה בשני תווים. באפליקציית
+           מתמטיקה כל האפשרויות הן מספרים קצרים, ולכן תשובה
+           דו־ספרתית מול שלושה מסיחים חד־ספרתיים הפילה את כל
+           השלושה מהספירה, `others` יצא 0, ומנייה שאומרת את
+           **ארבע** האפשרויות נראתה א־סימטרית.
+           נמדד ב-math-teen על 10,800 שאלות בכרומיום: 8 מופעים,
+           בכולם כל המסיחים חד־ספרתיים ובכולם כל המסיחים נאמרים
+           בפועל — 100% התראת שווא.
+           לכן מסיח נחשב "נאמר" גם בהתאמה גולמית, בדיוק כמו
+           התשובה. הדליפה האמיתית נשארת אדומה: `say` שאומר את
+           התשובה בלבד אינו מכיל אף מסיח בשום צורה. */
         const norm=x=>String(x).toLowerCase().replace(/[^0-9a-z֐-׿؀-ۿ]/g,'');
         const nSpoken=norm(spoken);
-        const others=texts.filter((x,i)=>
-          i!==ri&&x&&norm(x).length>=2&&nSpoken.indexOf(norm(x))>=0).length;
+        /* והמסיח נבדק גם **בצורתו המדוברת**, כי זו הצורה שבה
+           הוא נאמר. `questionSay` מריץ `speakMath` על כל אפשרות,
+           ולכן המסיח שכתוב על המסך `(18)/(5)` נשמע "18 חלקי 5" —
+           ולא נמצא לא בהשוואה גולמית ולא בהשוואה מנוקה, בעוד
+           שהתשובה `10` היא מספר שלם ש-`speakMath` אינו נוגע בו
+           ונמצאה מיד. תשובה שלמה מול מסיחים שבריים נראתה כך
+           כדליפה, ב-frac L2 של math-teen. */
+        const present=function(x){
+          const forms=[x];
+          const sx=spk(x); if(sx&&sx!==x) forms.push(sx);
+          for(const f of forms){
+            if(spoken.indexOf(f)>=0) return true;
+            if(norm(f).length>=2&&nSpoken.indexOf(norm(f))>=0) return true;
+          }
+          return false;
+        };
+        const others=texts.filter((x,i)=>i!==ri&&x&&present(x)).length;
         if(a&&a.length>=2&&spoken.indexOf(a)>=0&&
            askT.indexOf(a)<0&&exprT.indexOf(a)<0&&others===0)
           add('answer-in-say','REVIEW',
@@ -414,10 +461,26 @@ async function scan(page){
         add('long-option','REVIEW',tx.length+' תווים באפשרות',where);
       if(ri>=0){
         posN[ri]=(posN[ri]||0)+1;
+        /* 9.9.2026 — **נמדד סיכוי הניחוש, ולא "מי בקצה".**
+           הספירה הישנה מנתה כל שאלה שבה התשובה נמצאת באורך
+           הקיצוני, גם כשאפשרות נוספת חולקת איתו את אותו אורך.
+           אבל הממצא טוען שאפשר לנחש לפי אורך בלי לדעת מתמטיקה,
+           והטענה הזאת נכונה רק כשהקצה **יחיד**: בתיקו של שניים
+           המנחש קולע בחצי מהפעמים, ובתיקו של ארבעה — ברבע,
+           שהוא בדיוק הניחוש העיוור.
+           נמדד ב-math-teen על 150 הגרלות לכל תא בכרומיום:
+           ב-`ratio L1` המדד הישן אמר 98%, והקצה היה יחיד ב-0%
+           מהשאלות — המנחש קולע ב-48%. ב-`pyth L1` ו-`pyth L3`
+           98–100% מול קצה יחיד ב-0%. שלושה תאים מתוך עשרים
+           נשארו מעל הסף, וכל השאר היו רעש.
+           לכן כל שאלה תורמת `1/מספר האפשרויות שחולקות את הקצה`,
+           והמנה היא שיעור ההצלחה של מי שבוחר לפי אורך בלבד.
+           ארבע אפשרויות באותו אורך תורמות 0.25 — הבסיס. */
         const lens=texts.map(function(x){return x.length});
         const mx=Math.max.apply(null,lens), mn=Math.min.apply(null,lens);
-        if(mx!==mn&&texts[ri].length===mx) longest[0]++;
-        if(mx!==mn&&texts[ri].length===mn) longest[1]++;
+        const tie=function(v){return lens.filter(function(l){return l===v}).length};
+        if(texts[ri].length===mx) longest[0]+=1/tie(mx);
+        if(texts[ri].length===mn) longest[1]+=1/tie(mn);
       }
     }
 
@@ -434,9 +497,11 @@ async function scan(page){
         if(mx/tot>0.5) add('position-bias','REVIEW',
           'התשובה במקום קבוע ב-'+Math.round(mx/tot*100)+'% מהשאלות',where);
         if(longest[0]/tot>0.7) add('longest-answer','REVIEW',
-          'התשובה היא הארוכה ביותר ב-'+Math.round(longest[0]/tot*100)+'% מהשאלות',where);
+          'מי שבוחר תמיד את האפשרות הארוכה ביותר קולע ב-'+
+          Math.round(longest[0]/tot*100)+'% מהשאלות (ניחוש עיוור: 25%)',where);
         if(longest[1]/tot>0.7) add('shortest-answer','REVIEW',
-          'התשובה היא הקצרה ביותר ב-'+Math.round(longest[1]/tot*100)+'% מהשאלות',where);
+          'מי שבוחר תמיד את האפשרות הקצרה ביותר קולע ב-'+
+          Math.round(longest[1]/tot*100)+'% מהשאלות (ניחוש עיוור: 25%)',where);
       }
       let under=0;
       for(const s in sizes) if(+s<4) under+=sizes[s];
