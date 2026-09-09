@@ -154,9 +154,13 @@ html[lang="ru"] .btn,html[lang="ru"] .t{
 }
 .lang button:hover{color:var(--text); border-color:color-mix(in srgb,var(--brand) 45%,var(--line))}
 .lang button[aria-pressed="true"]{background:var(--brand); color:var(--brand-ink); border-color:var(--brand)}
-/* Heebo אינו מכיל ערבית. הגופן הערבי נקבע לפי lang של הלחצן עצמו,
-   ולא לפי שפת הדף — "العربية" מופיעה בכל שפה. */
+/* Heebo אינו מכיל ערבית ואינו מכיל קירילית. הגופן נקבע לפי lang של
+   הלחצן עצמו ולא לפי שפת הדף — "العربية" ו-"Русский" מופיעות בכל שפה.
+   בלי זה הן נופלות לגופן ברירת המחדל של המערכת, שהמידות שלו אחרות,
+   והלחצן נראה בגודל אחר משלושת האחרים. הכלל של html[lang=…] שלמעלה
+   אינו מכסה את זה: הוא חל רק כשהדף כולו באותה שפה. */
 .lang button[lang="ar"]{font-family:"Noto Sans Arabic",Heebo,system-ui,sans-serif}
+.lang button[lang="ru"]{font-family:"Noto Sans",Heebo,system-ui,sans-serif}
 /* בטלפון ארבעת הלחצנים בשורה משלהם, ברוחב שווה. נמדד בכרום ב-360px:
    כשחלקו שורה עם הסמל וכפתור מצב כהה כל לחצן קיבל 59px, "Русский"
    ו-"English" נחתכו, וכפתור מצב כהה נדחק לשורה משלו. שלוש שורות
@@ -974,7 +978,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=41-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=42-pwa1").catch(function(){});
   });
 }
 </script>

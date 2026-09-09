@@ -88,7 +88,10 @@ for(const [id,a] of Object.entries(REG.apps)){
     if(!PUBLIC_OK.includes(a.contentQA))
       F(id,"שלב "+stage+" עם contentQA=\""+a.contentQA+"\" — אישור דורש pass או cleared");
     if(a.contentQA==="legacy-published"&&!scanOf(id))
-      W(id,"פורסמה לפני שהשער נבנה, ו-content.js עוד לא רץ עליה.");
+      W(id, a.bank==="buildQ"
+        ? "פורסמה לפני שהשער נבנה, ו-content.js עוד לא רץ עליה."
+        : "פורסמה לפני שהשער נבנה, ו-content.js אינו יכול לסרוק אותה — "+
+          "bank=\""+(a.bank||"—")+"\" ולא buildQ. סקירה ידנית.");
   }
   /* 6. הדוח האחרון, אם יש. FAIL בדוח אינו מוריד אפליקציה שכבר
         פורסמה — הוא נאמר, והבעלים מחליט. באפליקציה שעדיין לא

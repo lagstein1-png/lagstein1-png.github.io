@@ -9,6 +9,13 @@
      node .claude/qa/content.js math-uni         # אחת
      QA_N=400 node .claude/qa/content.js english # מדגם גדול יותר
 
+   **ריצה דורסת את הדוח השמור של אותה אפליקציה**, ו-`stage.js` קורא
+   בדיוק ממנו (`reports/<app>.json`). לכן `QA_N` קטן מוחק סריקה
+   מלאה ומחליף אותה במדגם — זה קרה ב-8.9.2026 ל-`history`, שסריקת
+   ה-PASS שלה על 5,400 שאלות הוחלפה ב-960. `QA_N` קטן הוא לבדיקת
+   המנגנון בלבד, ואחריו מחזירים את הדוח: `git checkout
+   .claude/qa/reports/`.
+
    הוא מגריל שאלות מכל נושא ומכל רמה — השאלות כאן נוצרות בזמן
    ריצה ואינן יושבות בקובץ, ולכן אין "מאגר" לפתוח ולקרוא —
    ומודד תשע משפחות ממצאים:
@@ -100,7 +107,18 @@ async function scan(page){
 
   const HEB=/[֐-׿]/;
   const BROKEN=/\bNaN\b|\bInfinity\b|\bundefined\b|\bnull\b|\[object Object\]/;
-  const PLACEHOLDER=/\{(?:a|b|c|n|ans|0|1|2|3)\}/;
+  /* מציין מקום שלא הוחלף. `{a}` `{ans}` וכו׳ חד־משמעיים, אבל
+     `{0}`..`{3}` נראים בדיוק כמו **סימון קבוצה** — `{3} ∈ A` הוא
+     הקבוצה שאיברה 3, ו-SAY_MAP אף מכיל כלל ייעודי לסוגריים
+     מסולסלים. זה הפיל את math-uni ב-FAIL על שני מופעים תקינים
+     ב-sets L1, ו-FAIL חוסם `approved` בסולם השלבים.
+     לכן: השמיים תמיד; המספריים רק כשאין בטקסט אופרטור קבוצות. */
+  const SETOP=/[∈∉⊆⊂∪∩∅]/;
+  const PH_NAME=/\{(?:a|b|c|n|ans)\}/;
+  const PH_NUM=/\{[0-3]\}/;
+  const PLACEHOLDER={test:function(t){
+    return PH_NAME.test(t) || (PH_NUM.test(t) && !SETOP.test(t));
+  }};
   const MOJIBAKE=/[�]|Ã[ -¿]|Ð[ -¿]/;
   const ENTITY=/&(?:amp|lt|gt|quot|nbsp|#\d+);/;
   /* סימנים ש-SAY_MAP ו-PROSE_MAP קיימים כדי להמיר. אם אחד מהם
@@ -304,8 +322,19 @@ async function scan(page){
       textChecks('hint',hintT,where);
       for(const tx of texts) textChecks('option',tx,where);
 
-      /* 7. הקראה */
-      const say=String(q.say||'');
+      /* 7. הקראה
+         **מה שנבדק הוא מה שנאמר, ולא השדה הגולמי.** משפחת
+         האוניברסיטה אופה את ההמרה לתוך `say` בזמן הבנייה; `math-app`
+         נבנתה אחרת וממירה בזמן ההשמעה, ב-`toSpoken` שנקראת מ-`hlPrep`.
+         בלי השורה הזאת הבודק קרא את `say` הגולמי של math-app ודיווח
+         900 מופעים של `×` ו-900 של `÷` — 100% מתאי הכפל והחילוק —
+         בעוד שהילד שומע בפועל "כמה זה אַרְבַּע כפול חָמֵשׁ". נמדד
+         בכרומיום ב-9.9.2026. התראת שווא בהיקף כזה גרועה מאין בדיקה:
+         היא שולחת סשן לתקן מה שאינו שבור. */
+      const say=(function(raw){
+        try{ return typeof toSpoken==='function' ? toSpoken(raw,'he') : raw }
+        catch(e){ return raw }
+      })(String(q.say||''));
       if(askT&&!say.trim()) add('no-say','REVIEW','אין say — אין מה להקריא',where);
       if(/<[a-zA-Z\/]/.test(say)) add('html-in-say','REVIEW','תגיות HTML ב-say: '+say.slice(0,80),where);
       if(LATEX.test(say)) add('latex-in-say','FAIL','LaTeX ב-say: '+say.slice(0,80),where);
@@ -568,6 +597,15 @@ function md(app,R){
   page.on('pageerror',function(e){errs.push(e.message)});
   await page.route('**/*',function(r){
     return r.request().url().startsWith('http://127.0.0.1:8099')?r.continue():r.abort()});
+  /* אפליקציה שאינה במשפחת buildQ אינה חושפת TOPICS, והסורק כולו
+     בנוי עליו. ברירת המחדל מסננת אותה החוצה, אבל שם מפורש בשורת
+     הפקודה עקף את הסינון והפיל את התהליך כולו ב-ReferenceError —
+     ודווקא אליו מזמינה האזהרה של stage.js. מוצהר ומדולג. */
+  const bank=(REG.apps[app]||{}).bank;
+  if(bank&&bank!=='buildQ'){
+    console.log(app,'מחוץ להיקף — bank="'+bank+'", והסורק דורש buildQ');
+    await ctx.close(); continue;
+  }
   try{ await page.goto('http://127.0.0.1:8099/'+app+'/',{waitUntil:'domcontentloaded'}) }
   catch(e){ console.log(app,'SKIP — הדף לא נטען'); await ctx.close(); continue }
   await page.waitForTimeout(1200);
@@ -602,7 +640,16 @@ function md(app,R){
   await ctx.close();
  }
  await b.close();
- fs.writeFileSync(path.join(OUT,'summary.json'),JSON.stringify(summary,null,1));
+ /* מיזוג ולא דריסה. ריצה על אפליקציה אחת כתבה כאן מערך באורך אחד
+    ומחקה את הסריקות של כל השאר — ו-stage.js קורא בדיוק מהקובץ הזה,
+    ולכן אפליקציה שנסרקה חזרה להיראות "לא נסרקה". הרשומה של ריצה
+    זו מחליפה את הקודמת של אותה אפליקציה, ושאר הרשומות נשארות. */
+ const SUM=path.join(OUT,'summary.json');
+ let prev=[]; try{ prev=JSON.parse(fs.readFileSync(SUM,'utf8'))||[] }catch(e){}
+ const ran=new Set(summary.map(function(s){return s.app}));
+ const merged=prev.filter(function(s){return !ran.has(s.app)}).concat(summary)
+   .sort(function(a,b){return a.app<b.app?-1:a.app>b.app?1:0});
+ fs.writeFileSync(SUM,JSON.stringify(merged,null,1));
  const bad=summary.filter(function(s){return s.verdict==='FAIL'}).length;
  console.log('\n'+summary.length+' אפליקציות · '+
    summary.filter(function(s){return s.verdict==='PASS'}).length+' PASS · '+

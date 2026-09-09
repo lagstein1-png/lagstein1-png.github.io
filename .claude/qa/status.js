@@ -58,6 +58,13 @@ if(check){
     if(cells[2]!==r.build||cells[3]!==r.sw)
       bad.push(`${r.id} — במסמך ${cells[2]} / ${cells[3]}, בקובץ ${r.build} / ${r.sw}`);
   }
+  /* הפוטר הוא שורה אחת. הוא הוכפל שבע פעמים במיזוג ב-8.9, תוקן,
+     והוכפל תשע פעמים שוב ב-9.9 — מפני ש---md רק מדפיס, ומי שמדביק
+     מוסיף במקום להחליף. כפילות אינה משנה מספר ולכן לא נתפסה
+     בהשוואת הגרסאות, והיא הסימן היחיד לכך שהודבקה טבלה על טבלה. */
+  const foot=(doc.match(/נוצר ב-`node \.claude\/qa\/status\.js --md`/g)||[]).length;
+  if(foot>1) bad.push(`שורת הפוטר של הטבלה מופיעה ${foot} פעמים — הודבקה טבלה על טבלה`);
+
   if(bad.length){
     bad.forEach(b=>console.log("· "+b));
     console.log(`\nהטבלה ב-STATUS.md מאחור ב-${bad.length} שורות.`);
