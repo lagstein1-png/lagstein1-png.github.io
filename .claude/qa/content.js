@@ -649,6 +649,19 @@ function md(app,R){
   const v=verdict(R.find);
   R.app=app; R.sample=N; R.verdict=v.verdict; R.fail=v.fail; R.review=v.review;
   R.generated=new Date().toISOString().slice(0,10);
+  /* מול איזה קוד נמדד הדוח. בלי זה דוח שנשמר בגיט מתיישן בשקט
+     ומטעה את מי שקורא אותו: ב-9.9.2026 בריף נשען על דוח שנוצר
+     שתי קומיטות אחורה, דיבר על 13 תאים כשנשאר אחד, וניפח את
+     העבודה פי שנים־עשר. `dirty` מסמן שהעץ לא היה נקי בזמן
+     המדידה, ולכן ה-hash לבדו אינו מזהה את מה שנמדד. */
+  R.head=(function(){
+    try{
+      const cp=require('child_process');
+      const h=cp.execSync('git rev-parse --short HEAD',{cwd:ROOT,stdio:['ignore','pipe','ignore']}).toString().trim();
+      const d=cp.execSync('git status --porcelain',{cwd:ROOT,stdio:['ignore','pipe','ignore']}).toString().trim();
+      return h+(d?' (dirty)':'');
+    }catch(e){ return null }
+  })();
   fs.writeFileSync(path.join(OUT,app+'.json'),JSON.stringify(R,null,1));
   fs.writeFileSync(path.join(OUT,app+'.md'),md(app,R));
   summary.push({app:app,verdict:v.verdict,fail:v.fail,review:v.review,
