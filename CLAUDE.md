@@ -285,6 +285,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/content.js               # תוכן: תשע משפחות, דוח PASS/REVIEW/FAIL
     node .claude/qa/stage.js                 # שער השלבים — מי מותר ללומד
+    node .claude/qa/deployed.js              # מסלול הלומד על הבתים שנפרסו — ביד בלבד
     node .claude/qa/all.js                   # הכול, ופסק דין אחד
     node .claude/qa/extract.js /tmp/js …     # מחלץ סקריפטים ל-eslint
 
