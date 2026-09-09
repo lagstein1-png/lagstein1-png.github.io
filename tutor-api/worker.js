@@ -80,7 +80,16 @@ const ROLE = {
 const LANGNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנגלית" };
 const TARGETNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנגלית" };
 
-const MODEL = "claude-opus-5";   /* מודל זול יותר הוא שינוי שורה אחת, והוא החלטה של הבעלים */
+/* המודל. השורה הזאת היא רוב העלות.
+
+   נבחר `claude-haiku-4-5` להשקה, בבקשת הבעלים: התפקיד כאן הוא
+   רמז קצר ושאלה אחת, לא ניתוח. אם התשובות יימצאו רדודות מדי —
+   `claude-sonnet-5` ואז `claude-opus-5`, ואז כבר יהיו מספרי
+   שימוש אמיתיים מדף ה-Cost שבקונסולה במקום ניחוש.
+
+   **מחליפים כאן — CAP למטה כבר מטפל בהפרשים בין המודלים.**
+   בלי זה `effort` היה נשלח ל-haiku ומחזיר 400. */
+const MODEL = "claude-haiku-4-5";
 const MAX_TOKENS = 700;          /* תשובה קצרה. גבוה מספיק כדי לא להיחתך באמצע משפט */
 const API = "https://api.anthropic.com/v1/messages";
 
@@ -90,8 +99,15 @@ const LIM = {
   chars: 300,        /* הודעה בודדת של התלמיד */
   total: 2000,       /* כל השיחה יחד */
   ctx: 400,          /* שדה הקשר בודד — התרגיל, התשובה, הנושא */
-  perDay: 60,        /* פניות ליום, לכל כתובת IP */
-  globalPerDay: 3000 /* תקרה יומית לכל השירות — חסם העלות האמיתי */
+  /* שתי התקרות האלה הן חסם העלות, והן הורדו לפני ההשקה.
+     החשבון, על MAX_TOKENS ועל המחיר המפורסם: 100 פניות ביום
+     כפול 700 טוקני פלט הן 70,000 טוקנים ביום — כלומר תקרה של
+     סנטים בודדים ליום ב-haiku.
+
+     **זה חסם עליון של הפלט בלבד; הקלט מוסיף מעליו.** להעלות
+     אחרי שרואים שימוש אמיתי, לא לפני. */
+  perDay: 20,        /* פניות ליום, לכל כתובת IP */
+  globalPerDay: 100  /* תקרה יומית לכל השירות — חסם העלות האמיתי */
 };
 
 const LANGS = ["he", "ar", "ru", "en"];
@@ -144,8 +160,13 @@ function strip(txt) {
     .join(" ").trim();
 }
 
+/* המספרים כאן עשרוניים ולא שלמים, ולכן `\d+(\.\d+)?` ולא `\d+`.
+   עם `\d+` בלבד, ״1/2 = 0.5״ נקרא כ-״1/2 = 0״ ונפסל — כלומר
+   המורה אמר דבר נכון והשומר זרק אותו. נמדד: גם ״10 : 4 = 2.5״.
+   וההשוואה בסבילות, כי 0.1+0.2 אינו 0.3 בנקודה צפה. */
+const NUM = "(\\d+(?:\\.\\d+)?)";
 function badEquation(text) {
-  const re = /(\d+)\s*([+\-−×xX*÷:\/])\s*(\d+)\s*=\s*(\d+)/g;
+  const re = new RegExp(NUM + "\\s*([+\\-−×xX*÷:/])\\s*" + NUM + "\\s*=\\s*" + NUM, "g");
   let m;
   while ((m = re.exec(text))) {
     const a = +m[1], b = +m[3], said = +m[4];
@@ -154,7 +175,12 @@ function badEquation(text) {
     else if (m[2] === "-" || m[2] === "−") real = a - b;
     else if (m[2] === "÷" || m[2] === ":" || m[2] === "/") { if (!b) return true; real = a / b; }
     else real = a * b;
-    if (real !== said) return true;
+    /* שלושה שלמים — השוואה מדויקת. סבילות יחסית הייתה מפספסת
+       ״100 + 200 = 301״, טעות של אחד שהיא 0.33% בלבד.
+       יש עשרוני — סבילות של 0.011, שזה בדיוק עיגול לשתי ספרות:
+       ״1 : 3 = 0.33״ עובר, ״2.5 + 2.5 = 6״ נפסל. */
+    const whole = m[1].indexOf(".") < 0 && m[3].indexOf(".") < 0 && m[4].indexOf(".") < 0;
+    if (whole ? real !== said : Math.abs(real - said) > 0.011) return true;
   }
   return false;
 }
@@ -176,8 +202,19 @@ function json(obj, status, env) {
 }
 
 /* ---------- מונה יומי. בלי KV הוא פשוט אינו סופר ---------- */
+/* בלי KV אין מונה, ובלי מונה **אין תקרה יומית בכלל** — התקרות
+   האחרות מגבילות אורך בקשה, לא כמות. כלומר כל ההגנה על העלות
+   תלויה בקישור אחד שקל לשכוח בהקמה.
+
+   לכן נכשל־סגור: אין `RATE` — אין שירות, והתשובה אומרת בדיוק
+   מה חסר. מי שרוצה בכל זאת להריץ בלי מונה מצהיר על כך במפורש
+   במשתנה `ALLOW_NO_RATE_LIMIT=yes`, ואז זו החלטה ולא שכחה. */
+function noCounter(env) {
+  return !env.RATE && String(env.ALLOW_NO_RATE_LIMIT || "").toLowerCase() !== "yes";
+}
+
 async function overLimit(env, ip) {
-  if (!env.RATE) return false;                    /* אין KV — התקרות הפנימיות עדיין חלות */
+  if (!env.RATE) return false;                    /* הוצהר במפורש — ראו noCounter */
   const day = new Date().toISOString().slice(0, 10);
   const keys = ["d:" + day + ":" + ip, "d:" + day + ":ALL"];
   const caps = [LIM.perDay, LIM.globalPerDay];
@@ -261,12 +298,32 @@ function contextBlock(inp, turn) {
   return out.join("\n");
 }
 
-async function ask(env, ctx, msgs, extra) {
+/* ============ מה מותר לשלוח לאיזה מודל ============
+   שני הפרמטרים האלה נכונים למשפחת opus ו**שגויים** למודלים
+   הקטנים:
+
+   · `output_config.effort` — מחזיר שגיאה ב-Haiku 4.5.
+   · `fallbacks` — מנגנון הגיבוי בסירוב, ויעדיו הם מודלי opus.
+
+   כלומר החלפת `MODEL` לבדה הייתה שוברת כל פנייה ב-400, ביום
+   הראשון, בלי שאף בדיקה כאן תתפוס את זה — אין מפתח ואי אפשר
+   לפנות לשרת. לכן הבנייה מותנית במודל, ולא קבועה.
+
+   מוסיפים מודל חדש — מוסיפים אותו כאן. מודל שאינו ברשימה
+   מקבל את הגוף המינימלי, וזו ברירת המחדל הבטוחה. */
+const CAP = {
+  "claude-opus-5":    { effort: true,  fallbacks: true  },
+  "claude-opus-4-8":  { effort: true,  fallbacks: true  },
+  "claude-sonnet-5":  { effort: true,  fallbacks: false },
+  "claude-haiku-4-5": { effort: false, fallbacks: false }
+};
+function capOf(model) { return CAP[model] || { effort: false, fallbacks: false } }
+
+function buildBody(model, ctx, msgs, extra) {
+  const cap = capOf(model);
   const body = {
-    model: MODEL,
+    model: model,
     max_tokens: MAX_TOKENS,
-    output_config: { effort: "low" },      /* שיחה קצרה — אין צורך בחשיבה עמוקה, וזה חוסך טוקנים */
-    fallbacks: "default",                  /* סירוב של המודל מנותב לגיבוי בצד השרת */
     system: [
       /* הגוף המשותף ראשון, ועליו סימון מטמון: הוא זהה בכל אחת עשרה
          האפליקציות ובכל ארבע השפות. אם הוא ארוך מהמינימום של המודל
@@ -277,14 +334,29 @@ async function ask(env, ctx, msgs, extra) {
     ],
     messages: msgs
   };
+  /* שיחה קצרה — אין צורך בחשיבה עמוקה, וזה חוסך טוקנים */
+  if (cap.effort) body.output_config = { effort: "low" };
+  /* סירוב של המודל מנותב לגיבוי בצד השרת */
+  if (cap.fallbacks) body.fallbacks = "default";
+  return body;
+}
+
+function buildHeaders(model, key) {
+  const h = {
+    "Content-Type": "application/json",
+    "x-api-key": key,
+    "anthropic-version": "2023-06-01"
+  };
+  /* הכותרת נשלחת רק כשבאמת משתמשים בפרמטר שהיא פותחת */
+  if (capOf(model).fallbacks) h["anthropic-beta"] = "server-side-fallback-2026-07-01";
+  return h;
+}
+
+async function ask(env, ctx, msgs, extra) {
+  const body = buildBody(MODEL, ctx, msgs, extra);
   const r = await fetch(API, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-      "anthropic-beta": "server-side-fallback-2026-07-01"
-    },
+    headers: buildHeaders(MODEL, env.ANTHROPIC_API_KEY),
     body: JSON.stringify(body)
   });
   if (!r.ok) return { err: r.status };
@@ -301,6 +373,12 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env) });
     if (request.method !== "POST") return json({ error: "method" }, 405, env);
     if (!env.ANTHROPIC_API_KEY) return json({ error: "server" }, 500, env);
+    /* אין מונה יומי ואין הצהרה — לא מתחילים. עדיף בוט שאינו עונה
+       על חשבון שאינו חסום. */
+    if (noCounter(env))
+      return json({ error: "no-rate-limit",
+        detail: "חסר קישור KV בשם RATE. בלעדיו אין תקרה יומית. " +
+                "לקשור אותו, או להצהיר ALLOW_NO_RATE_LIMIT=yes." }, 503, env);
 
     let body;
     try { body = await request.json() } catch (e) { return json({ error: "bad" }, 400, env) }
@@ -334,4 +412,5 @@ export default {
 
 /* מיוצאים בנפרד כדי ש-node .claude/qa/tutor.js יוכל לבדוק אותם.
    Cloudflare קורא רק את ה-default, וייצוא נוסף אינו מפריע לו. */
-export { revealsAnswer, badEquation, readBody, contextBlock, LIM, CORE, ROLE, LANGS };
+export { revealsAnswer, badEquation, readBody, contextBlock, LIM, CORE, ROLE, LANGS,
+         buildBody, buildHeaders, capOf, noCounter, MODEL, MAX_TOKENS };

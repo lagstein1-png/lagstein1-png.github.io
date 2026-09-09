@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>בדיקות — מבצע השקה</title>
+<!-- ============================================================
+     שבע בדיקות על launch.js, בדפדפן. פותחים דרך השרת המקומי:
+         node .claude/qa/serve.js   →   http://127.0.0.1:8099/tests/launch.test.html
+
+     הוכחת נפילה קודם: ?without=1 טוען את הדף בלי launch.js, וכל
+     בדיקה חייבת להיות ❌. בלי הפרמטר — הכול ✅. תחת כל בדיקה מוצג
+     הקוד שלה (מה שמעביר אותה). הפלט של שני המצבים רשום ב-FINDINGS.md.
+
+     הבדיקות משתמשות ב-localStorage האמיתי של המקור (המפתח
+     launch-popup-seen), ומחזירות בסוף את הערך שהיה.
+     ============================================================ -->
+<link rel="stylesheet" href="/launch.css?v=1">
+<style>
+:root{--bg:#f6f7fb; --bg-elev:#fff; --text:#14181f; --text-soft:#4a5464; --line:#e2e6ef;
+  --brand:#2f5fd8; --brand-ink:#fff; --brand-soft:#eaf0ff; --ok:#1a7f4b; --ok-soft:#e3f5ea;
+  --radius:18px; --shadow-lg:0 22px 48px -26px rgba(20,24,31,.45)}
+body{margin:0; padding:24px; background:var(--bg); color:var(--text); font:400 1rem/1.5 Heebo,system-ui,sans-serif}
+h1{font-size:1.4rem; margin:0 0 4px}
+.mode{color:var(--text-soft); margin:0 0 18px}
+ol{padding-inline-start:0; list-style:none; margin:0}
+li{background:var(--bg-elev); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-block-end:10px}
+li b{font-size:1.05rem}
+li .why{color:#b42318; margin:6px 0 0; white-space:pre-wrap}
+details{margin-block-start:8px} summary{cursor:pointer; color:var(--text-soft); font-size:.9rem}
+pre{direction:ltr; text-align:left; font-size:.82rem; overflow:auto; background:#f2f4f8; padding:10px; border-radius:8px; margin:6px 0 0}
+#sum{font-weight:700; font-size:1.1rem; margin:16px 0}
+.t{font:600 .78rem/1 Heebo,system-ui,sans-serif; padding:6px 10px; border-radius:999px; display:inline-block; background:#ddd}
+.fx{opacity:.75; border-block-start:1px dashed var(--line); padding-block-start:12px; margin-block-start:20px}
+</style>
+</head>
+<body>
+<h1>בדיקות — מבצע השקה</h1>
+<p class="mode" id="mode"></p>
+<ol id="out"></ol>
+<p id="sum"></p>
+
+<!-- מתקן: שלוש תגיות מחיר כמו בדף הבית, ורקע לחלון -->
+<div class="fx" aria-hidden="true">
+  <p>מתקן הבדיקה:</p>
+  <div id="fx">
+    <span class="t price" id="tagPaid" dir="ltr">39 ₪</span>
+    <span class="t price" id="tagFree">חינם</span>
+    <span class="t price" id="tagDone" data-launch-done="1" dir="ltr">120 ₪ חד־פעמי</span>
+  </div>
+  <div id="grid"></div>
+</div>
+
+<script>
+/* global LAUNCH */
+var WITHOUT=/(^|[?&])without=1(&|$)/.test(location.search);
+document.getElementById("mode").textContent=WITHOUT
+  ? "מצב ?without=1 — launch.js לא נטען. כל הבדיקות אמורות להיות ❌ (הוכחת נפילה)."
+  : "launch.js נטען. כל הבדיקות אמורות להיות ✅. להוכחת נפילה: הוסיפו ?without=1 לכתובת.";
+
+/* שגיאות לא תפוסות נספרות — זה מה שבדיקה 7 בודקת */
+var ERRORS=[];
+window.addEventListener("error",function(e){ERRORS.push(e.message||String(e))});
+
+var KEY="launch-popup-seen", DAY=24*60*60*1000, fx=document.getElementById("fx");
+var saved=null; try{saved=localStorage.getItem(KEY)}catch(e){}
+function clearKey(){ try{localStorage.removeItem(KEY)}catch(e){} }
+function dialog(){ return document.querySelector('[data-launch-popup] [role="dialog"]'); }
+function must(cond,msg){ if(!cond)throw new Error(msg); }
+
+var TESTS=[
+ ["1. החלון מוצג בכניסה ראשונה (localStorage ריק)", function(){
+   clearKey();
+   var bg=LAUNCH.popup({root:fx});
+   must(bg&&dialog(),"popup() לא החזיר חלון");
+   var d=dialog();
+   must(d.getAttribute("aria-modal")==="true"&&d.getAttribute("aria-labelledby")==="launchT","חסרים aria-modal / aria-labelledby");
+   must(d.querySelector("h2").textContent==="🎉 מבצע השקה","הכותרת אינה ״🎉 מבצע השקה״");
+ }],
+ ["2. אחרי סגירה — launch-popup-seen נשמר, והחלון לא מוצג בטעינה הבאה", function(){
+   LAUNCH.close("dismiss");
+   must(!dialog(),"החלון לא נסגר");
+   var v=Number(localStorage.getItem(KEY));
+   must(v>0&&Date.now()-v<60*1000,"launch-popup-seen לא נשמר כחותמת זמן: "+localStorage.getItem(KEY));
+   must(LAUNCH.popup({root:fx})===null,"החלון הוצג שוב למרות שנשמר");
+ }],
+ ["3. חותמת זמן ישנה מ-7 ימים → החלון מוצג שוב", function(){
+   localStorage.setItem(KEY,String(Date.now()-8*DAY));
+   must(LAUNCH.shouldShow()===true,"shouldShow() החזיר false אחרי 8 ימים");
+   var bg=LAUNCH.popup({root:fx});
+   must(bg&&dialog(),"החלון לא הוצג אחרי 8 ימים");
+   LAUNCH.close("dismiss");
+   localStorage.setItem(KEY,String(Date.now()-6*DAY));
+   must(LAUNCH.shouldShow()===false,"shouldShow() החזיר true אחרי 6 ימים בלבד");
+ }],
+ ["4. תגית מחיר רגילה → קו חוצה + ״חינם בתקופת ההשקה״", function(){
+   LAUNCH.tags(fx);
+   var t=document.getElementById("tagPaid"), s=t.querySelector("s"), b=t.querySelector(".launch-badge");
+   must(s&&s.textContent==="39 ₪","המחיר הישן לא נמצא בתוך <s>");
+   must(b&&b.textContent==="חינם בתקופת ההשקה","אין תג ״חינם בתקופת ההשקה״");
+   must(!b.classList.contains("launch-badge--forever"),"התג ירוק ולא כחול? קיבל את מחלקת ״לתמיד״");
+ }],
+ ["5. תגית ״חינם״ → בלי קו חוצה, ״חינם לתמיד״", function(){
+   var t=document.getElementById("tagFree"), b=t.querySelector(".launch-badge");
+   must(!t.querySelector("s"),"תגית חינם קיבלה קו חוצה");
+   must(b&&b.textContent==="חינם לתמיד"&&b.classList.contains("launch-badge--forever"),"אין תג כחול ״חינם לתמיד״");
+ }],
+ ["6. תגית עם data-launch-done → לא משתנה", function(){
+   var t=document.getElementById("tagDone");
+   must(t.innerHTML==="120 ₪ חד־פעמי","התגית שונתה: "+t.innerHTML);
+   must(!t.classList.contains("launch-tagged"),"התגית קיבלה launch-tagged");
+ }],
+ ["7. כשאין window.goatcounter — שום שגיאה", function(){
+   must(typeof window.goatcounter==="undefined","בדף הזה אסור ש-goatcounter יהיה מוגדר");
+   ERRORS.length=0;
+   LAUNCH.track("launch-popup-shown");
+   clearKey(); LAUNCH.popup({root:fx}); LAUNCH.close("start");
+   var fresh=document.createElement("div"); fresh.innerHTML='<span class="t price">59 ₪</span>';
+   LAUNCH.tags(fresh);
+   must(ERRORS.length===0,"שגיאות בקונסול: "+ERRORS.join(" | "));
+ }]
+];
+
+function run(){
+  var out=document.getElementById("out"), pass=0;
+  TESTS.forEach(function(t){
+    var li=document.createElement("li"), ok=false, why="";
+    try{ t[1](); ok=true; }catch(e){ why=e&&e.message||String(e); }
+    if(ok)pass++;
+    li.innerHTML='<b>'+(ok?"✅":"❌")+" "+t[0]+"</b>"+(ok?"":'<p class="why"></p>')+
+      '<details><summary>הקוד שמעביר את הבדיקה</summary><pre></pre></details>';
+    if(!ok)li.querySelector(".why").textContent=why;
+    li.querySelector("pre").textContent=t[1].toString();
+    out.appendChild(li);
+  });
+  document.getElementById("sum").textContent=pass+" / "+TESTS.length+" עברו"+(pass===TESTS.length?" — ירוק":" — אדום");
+  document.body.setAttribute("data-result",pass+"/"+TESTS.length);
+  try{ if(saved===null)localStorage.removeItem(KEY); else localStorage.setItem(KEY,saved); }catch(e){}
+}
+
+if(WITHOUT){ run(); }
+else{
+  var s=document.createElement("script"); s.src="/launch.js?v=1";
+  s.onload=run; s.onerror=run;
+  document.head.appendChild(s);
+}
+</script>
+</body>
+</html>

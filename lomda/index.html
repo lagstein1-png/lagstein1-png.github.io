@@ -9,8 +9,10 @@
 <meta property="og:title" content="לומדה — לימוד לפי נושא" />
 <meta property="og:description" content="לומדה — לימוד לפי נושא, למי שלומד אחרת: כל פריט עם הסבר, סיבה ותוצאה, עם מושגים וקטעי מקור — בעברית, ערבית, רוסית ואנגלית, והכול מוקרא." />
 <meta property="og:url" content="https://lagstein1-png.github.io/lomda/" />
-<meta property="og:image" content="https://lagstein1-png.github.io/lomda/img/icon-512.png" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="https://lagstein1-png.github.io/lomda/img/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="theme-color" content="#f5f5fb" media="(prefers-color-scheme:light)" />
 <meta name="theme-color" content="#12122a" media="(prefers-color-scheme:dark)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -487,6 +489,7 @@ textarea.field{min-height:96px;resize:vertical}
 <script src="data/media.js"></script>
 <script src="data/med.js"></script>
 <script src="data/phys.js"></script>
+<script src="data/heat.js"></script>
 <script src="data/tech.js"></script>
 <script>
 /* ============================================================
@@ -813,7 +816,7 @@ T.he={
   yes:"כן, מחקו", no:"לא",
   savedNote:"ההתקדמות נשמרת אוטומטית במכשיר הזה בלבד.",
   ofN:"מתוך", newWord:"פריט חדש", review:"חזרה",
-  century:"המאה", centFmt:"המאה ה-{0}", bce:"לפנה״ס", ce:"לספירה", timeline:"ציר זמן", concept:"מושג",
+  century:"המאה", bce:"לפנה״ס", ce:"לספירה", timeline:"ציר זמן", concept:"מושג",
   source:"מקור", eventW:"אירוע", causeW:"סיבה", effectW:"תוצאה", yearW:"שנה",
   sumT1:"סבב חזק.", sumT2:"סבב טוב.", sumT3:"סבב עם עבודה.", sumT4:"סבב קשה — וזה בסדר.",
   sumS1:"רוב מה שתרגלתם כאן יושב.", sumS2:"רוב הדברים במקום. עוד סבב אחד יחדד את מה שנשאר.",
@@ -870,7 +873,7 @@ T.ar={
   yes:"نعم، امحُ", no:"لا",
   savedNote:"يُحفظ التقدّم تلقائيًا على هذا الجهاز فقط.",
   ofN:"من", newWord:"عنصر جديد", review:"مراجعة",
-  century:"القرن", centFmt:"القرن {0}", bce:"ق.م", ce:"م", timeline:"خط الزمن", concept:"مصطلح",
+  century:"القرن", bce:"ق.م", ce:"م", timeline:"خط الزمن", concept:"مصطلح",
   source:"مصدر", eventW:"حدث", causeW:"سبب", effectW:"نتيجة", yearW:"سنة",
   sumT1:"جولة قوية.", sumT2:"جولة جيّدة.", sumT3:"جولة فيها عمل.", sumT4:"جولة صعبة — ولا بأس.",
   sumS1:"معظم ما تدرّبتم عليه هنا ثابت.", sumS2:"معظم الأمور في مكانها. جولة أخرى تصقل ما تبقّى.",
@@ -927,7 +930,7 @@ T.ru={
   yes:"Да, удалить", no:"Нет",
   savedNote:"Прогресс сохраняется автоматически только на этом устройстве.",
   ofN:"из", newWord:"новый элемент", review:"повторение",
-  century:"век", centFmt:"{0}-й век", bce:"до н. э.", ce:"н. э.", timeline:"лента времени", concept:"понятие",
+  century:"век", bce:"до н. э.", ce:"н. э.", timeline:"лента времени", concept:"понятие",
   source:"источник", eventW:"событие", causeW:"причина", effectW:"следствие", yearW:"год",
   sumT1:"Сильный круг.", sumT2:"Хороший круг.", sumT3:"Круг с работой.", sumT4:"Трудный круг — и это нормально.",
   sumS1:"Большая часть того, что вы здесь отрабатывали, усвоена.", sumS2:"Почти всё на месте. Ещё один круг отточит остальное.",
@@ -984,7 +987,7 @@ T.en={
   yes:"Yes, delete", no:"No",
   savedNote:"Progress is saved automatically on this device only.",
   ofN:"of", newWord:"new item", review:"review",
-  century:"century", centFmt:"{0} century", bce:"BCE", ce:"CE", timeline:"timeline", concept:"concept",
+  century:"century", bce:"BCE", ce:"CE", timeline:"timeline", concept:"concept",
   source:"source", eventW:"event", causeW:"cause", effectW:"consequence", yearW:"year",
   sumT1:"A strong round.", sumT2:"A good round.", sumT3:"A round with work in it.", sumT4:"A hard round — and that's fine.",
   sumS1:"Most of what you practised here has stuck.", sumS2:"Most of it is in place. One more round will sharpen the rest.",
@@ -1031,7 +1034,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l30 · 2026-09-09";
+var BUILD="l33 · 2026-09-08";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -1877,23 +1880,31 @@ function centuryOf(y){
   var a=Math.abs(y);
   return Math.floor((a-1)/100)+1;
 }
-/* כמו xf, ומאותה סיבה: סדר המילים במשפט משתנה בין השפות. */
-function tf(k){var s=t(k),a=arguments,i;
-  for(i=1;i<a.length;i++)s=s.split("{"+(i-1)+"}").join(String(a[i]));
-  return s}
-/* הסיומת הסודרת קיימת רק באנגלית, ולכן היא נגזרת ואינה נכתבת במילון:
-   "19th", אבל "21st" ו-"22nd". 11–13 הם היוצא מן הכלל. */
+/* המאה נכתבת אחרת בכל שפה — ולא רק המילה משתנה, אלא גם הסדר וגם
+   אופן כתיבת המספר. כאן נבנה תמיד ״מילה ואחריה ספרה רומית״, ולכן
+   באנגלית יצא "century XIX" — שאינו אנגלית — וברוסית "век XIX",
+   שהוא היפוך של הכתיב המקובל.
+
+   ולכל שפה יש כאן תשובה אחת נכונה, ולכן זו אינה העדפה:
+     עברית   המאה ה-19     אין ספרות רומיות בעברית
+     ערבית   القرن 19      ואין גם בערבית
+     רוסית   XIX век       הרומית לפני המילה — כך נכתב ברוסית
+     אנגלית  19th century  סודר לפני המילה
+
+   הרומית נשארת ברוסית בלבד, ו-saySpell ממיר אותה לספרה להקראה. */
 function _ord(n){
-  var v=n%100; if(v>=11&&v<=13)return n+"th";
-  return n+(["th","st","nd","rd"][n%10]||"th");
+  var tens=n%100;
+  if(tens>=11&&tens<=13)return n+"th";
+  var d=n%10;
+  return n+(d===1?"st":d===2?"nd":d===3?"rd":"th");
 }
-/* המאה כמספר ולא בספרות רומיות. "המאה XIX" נראה נכון להיסטוריון
-   ונקרא רע לקהל של דיסלקציה ועולים חדשים, וזה הרמז שהם מקבלים
-   בשאלת "מתי". ROM נשאר — שכבת ההקראה עדיין צריכה אותו בשביל
-   ספרה רומית שכתובה בתוכן עצמו. */
 function centuryStr(y){
-  var n=centuryOf(y);
-  return tf("centFmt",state.lang==="en"?_ord(n):n)+(y<0?" "+t("bce"):"");
+  var n=centuryOf(y),s;
+  if(state.lang==="ru")s=_rom(n)+" "+t("century");
+  else if(state.lang==="en")s=_ord(n)+" "+t("century");
+  else if(state.lang==="he")s=t("century")+" ה-"+n;
+  else s=t("century")+" "+n;
+  return s+(y<0?" "+t("bce"):"");
 }
 var ROM=["","I","II","III","IV","V","VI","VII","VIII","IX","X",
          "XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI"];
@@ -2020,6 +2031,15 @@ function formWhat(tp,lv,pool,idx){
 /* --- צורה 3: על איזה אירוע מדובר --- */
 function formName(tp,lv,pool,idx){
   var it=pool[idx];
+  /* הכותרת היא התשובה, והתיאור הוא מה שנקרא בשאלה. פריט שהתיאור
+     שלו פותח בכותרת מוסר את התשובה בהקראה — נמדד ב-edu.js:
+     ״האוניברסיטה העברית נפתחה״ הוא גם הכותרת וגם שש המילים
+     הראשונות של התיאור. לילד שקורא לאט, שלוחץ רווח כדי לשמוע
+     את השאלה, זה הפתרון.
+
+     הבדיקה כאן ולא בתוכן: 18 מאגרים, ומאגר חדש יביא את זה שוב.
+     נופלים לצורה אחרת, בדיוק כמו כשאין די מסיחים. */
+  if(gl(it.w).indexOf(gl(it.t))>=0)return formWhen(tp,lv,pool,idx);
   var opts=optsFromField(it,nearEvents(it,pool,28),"t",4);
   if(!opts)return formWhen(tp,lv,pool,idx);
   return {type:"fact",prompt:t("qName"),lead:gl(it.w),
@@ -4148,7 +4168,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l30-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l33-pwa1").catch(function(){});
   });
 }
 </script>

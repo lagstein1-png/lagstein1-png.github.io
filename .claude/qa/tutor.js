@@ -62,6 +62,18 @@ import(WORKER).then(W => {
   t('חילוק נכון עובר',    W.badEquation('ולכן 12 : 3 = 4'), false);
   t('חילוק באפס נתפס',   W.badEquation('נחלק 5 : 0 = 0'), true);
   t('טקסט בלי משוואה עובר', W.badEquation('בוא נספור על האצבעות'), false);
+  /* תוצאה עשרונית נכונה נפסלה כשהביטוי קרא רק מספרים שלמים:
+     ״1/2 = 0.5״ נקרא כ-״= 0״. המורה אמר דבר נכון והשומר זרק
+     אותו, ואז נשלחה שאלה מנחה במקום ההסבר. נמדד 8.9.2026. */
+  t('חצי עשרוני נכון עובר',  W.badEquation('חצי זה 1/2 = 0.5'), false);
+  t('חילוק עם שארית עובר',   W.badEquation('אז 10 : 4 = 2.5'), false);
+  t('עיגול לשתי ספרות עובר', W.badEquation('בערך 1 : 3 = 0.33'), false);
+  t('עשרוני שגוי נתפס',      W.badEquation('אז 2.5 + 2.5 = 6'), true);
+  t('עיגול רחוק מדי נתפס',   W.badEquation('אז 1 : 3 = 0.5'), true);
+  /* ובכיוון השני: סבילות יחסית הייתה מחמיצה טעות של אחד
+     במספרים גדולים, ולכן שלושה שלמים נבדקים בדיוק. */
+  t('טעות של אחד במאות נתפסת', W.badEquation('כלומר 100 + 200 = 301'), true);
+  t('מאות נכון עובר',          W.badEquation('כלומר 100 + 200 = 300'), false);
 
   /* ---------- 3. אימות הקלט ---------- */
   t('גוף ריק נדחה', W.readBody({}), null);
@@ -120,6 +132,57 @@ import(WORKER).then(W => {
   t('הגוף המשותף כולל רמז אחד בכל פעם',
     /התחל ברמז קטן והמתן לתשובת התלמיד/.test(W.CORE), true);
   t('הגוף המשותף אינו נוקב במקצוע', /חשבון|אנגלית|היסטוריה/.test(W.CORE), false);
+
+  /* ---------- 5b. הגוף שנשלח, לפי המודל ----------
+
+     `effort` מחזיר שגיאה ב-Haiku, ו-`fallbacks` שייך למשפחת
+     opus. החלפת MODEL לבדה הייתה שוברת כל פנייה ב-400 ביום
+     הראשון — ואין כאן מפתח, ולכן שום בדיקה חיה לא הייתה תופסת
+     את זה. הבדיקה הזאת היא התחליף. */
+  const msgs = [{ role: 'user', content: 'היי' }];
+  const hb = W.buildBody('claude-haiku-4-5', 'ctx', msgs, '');
+  t('haiku — בלי effort',    hb.output_config, undefined);
+  t('haiku — בלי fallbacks', hb.fallbacks, undefined);
+  t('haiku — בלי כותרת beta',
+    W.buildHeaders('claude-haiku-4-5', 'k')['anthropic-beta'], undefined);
+  const ob = W.buildBody('claude-opus-5', 'ctx', msgs, '');
+  t('opus — עם effort',    ob.output_config, { effort: 'low' });
+  t('opus — עם fallbacks', ob.fallbacks, 'default');
+  t('opus — עם כותרת beta',
+    W.buildHeaders('claude-opus-5', 'k')['anthropic-beta'], 'server-side-fallback-2026-07-01');
+  const sb = W.buildBody('claude-sonnet-5', 'ctx', msgs, '');
+  t('sonnet — effort כן, fallbacks לא',
+    [!!sb.output_config, sb.fallbacks === undefined], [true, true]);
+  t('מודל לא מוכר מקבל גוף מינימלי',
+    W.capOf('claude-something-new'), { effort: false, fallbacks: false });
+  /* הגוף חייב להיות תקין תמיד, בכל מודל */
+  ['claude-haiku-4-5', 'claude-opus-5', 'claude-sonnet-5'].forEach(m => {
+    const b = W.buildBody(m, 'ctx', msgs, '');
+    if (b.model !== m || b.max_tokens !== W.MAX_TOKENS || b.system.length !== 2
+        || !b.system[0].cache_control) {
+      bad++; console.log(`✗ ${m}: הגוף אינו תקין`);
+    }
+  });
+  console.log('✓ הגוף תקין בכל שלושת המודלים');
+  /* והמודל שנבחר בפועל חייב להיות ברשימה — אחרת הוא מקבל
+     גוף מינימלי בשקט, וזה עלול להיות תקין אבל לא מכוון. */
+  t('המודל שנבחר מוכר לטבלת היכולות',
+    Object.prototype.hasOwnProperty.call(
+      { 'claude-opus-5':1, 'claude-opus-4-8':1, 'claude-sonnet-5':1, 'claude-haiku-4-5':1 },
+      W.MODEL), true);
+
+  /* ---------- 5c. תקרות העלות ----------
+     הן החסם היחיד בין הבעלים לבין חשבון פתוח. שינוי כלפי מעלה
+     הוא החלטה עסקית, ולכן הוא צריך להיראות בדיף. */
+  t('תקרה יומית לשירות כולו', W.LIM.globalPerDay <= 100, true);
+  t('תקרה יומית לכתובת אחת',  W.LIM.perDay <= 20, true);
+  t('תקרת אורך התשובה',       W.MAX_TOKENS <= 700, true);
+  /* בלי KV אין מונה, ובלי מונה אין תקרה יומית — כלומר כל ההגנה
+     על העלות תלויה בקישור אחד שקל לשכוח בהקמה. נכשל־סגור. */
+  t('בלי KV השירות מסרב',            W.noCounter({}), true);
+  t('עם KV השירות עובד',             W.noCounter({ RATE: {} }), false);
+  t('הצהרה מפורשת מתירה בלי KV',      W.noCounter({ ALLOW_NO_RATE_LIMIT: 'yes' }), false);
+  t('הצהרה חלקית אינה מתירה',         W.noCounter({ ALLOW_NO_RATE_LIMIT: 'true' }), true);
 
   /* ---------- 6. התשתית בדפדפן ---------- */
   LANGS.forEach(l => {
