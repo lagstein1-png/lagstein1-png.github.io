@@ -168,7 +168,7 @@ BANK({
      ru:"Наименьшая частица элемента, ещё сохраняющая его свойства: ядро в центре и электроны вокруг.",
      en:"The smallest particle of an element that still keeps its properties: a nucleus at the centre with electrons around it."}),
   C({he:"מולקולה",ar:"جزيء",ru:"Молекула",en:"Molecule"},
-    {he:"שני אטומים או יותר שקשורים זה לזה ומתנהגים כיחידה אחת, כמו שני אטומי מים.",
+    {he:"שני אטומים או יותר שקשורים זה לזה ומתנהגים כיחידה אחת, כמו במים.",
      ar:"ذرّتان أو أكثر مرتبطتان معًا وتتصرّفان كوحدة واحدة، كما في الماء.",
      ru:"Два или более атомов, связанных вместе и ведущих себя как одно целое, например в воде.",
      en:"Two or more atoms bound together and behaving as a single unit, as in water."}),

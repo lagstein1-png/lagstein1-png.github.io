@@ -331,8 +331,19 @@ async function scan(page){
          בעוד שהילד שומע בפועל "כמה זה אַרְבַּע כפול חָמֵשׁ". נמדד
          בכרומיום ב-9.9.2026. התראת שווא בהיקף כזה גרועה מאין בדיקה:
          היא שולחת סשן לתקן מה שאינו שבור. */
+      /* 9.9.2026 — שכבת ההקראה נקראת `toSpoken` רק ב-math-app.
+         ארבע אפליקציות הנוסחאות (math-teen, math-uni, math-uni2,
+         math-uni3) קוראות לה `speakMath`, ולכן התנאי הישן נפל
+         תמיד ל-`raw` ומדד את השדה הגולמי במקום את מה שנאמר.
+         כך נולדו אלפי מופעים של `symbol-in-say` על סימנים
+         ש-SAY_MAP דווקא כן ממיר — אותה התראת שווא בדיוק שההערה
+         למעלה מתארת על `×` ו-`÷`. */
       const say=(function(raw){
-        try{ return typeof toSpoken==='function' ? toSpoken(raw,'he') : raw }
+        try{
+          if(typeof toSpoken==='function') return toSpoken(raw,'he');
+          if(typeof speakMath==='function') return speakMath(raw);
+          return raw;
+        }
         catch(e){ return raw }
       })(String(q.say||''));
       if(askT&&!say.trim()) add('no-say','REVIEW','אין say — אין מה להקריא',where);

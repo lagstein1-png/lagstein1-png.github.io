@@ -427,10 +427,10 @@ BANK({
      en:"The difference that pushes the current along the wire, like a difference in height pushing water in a pipe. Measured in volts."}),
 
   C({he:"התנגדות",ar:"المقاومة",ru:"Сопротивление",en:"Resistance"},
-    {he:"כמה החומר מקשה על מעבר הזרם. ככל שהיא גדולה הזרם קטן יותר והחוט מתחמם, והיא נמדדת באוֹם.",
-     ar:"مقدار إعاقة المادّة لمرور التيّار. كلّما كبرت قلّ التيّار وسخُن السلك، وتُقاس بالأوم.",
-     ru:"Насколько вещество мешает току проходить. Чем оно больше, тем меньше ток и сильнее греется провод; в омах.",
-     en:"How much the material hinders the current. The higher it is, the smaller the current and the hotter the wire; in ohms."}),
+    {he:"כמה החומר מקשה על מעבר הזרם. באותו מתח, ככל שהיא גדולה הזרם קטן יותר, והזרם שעובר מחמם את החוט. נמדדת באוֹם.",
+     ar:"مقدار إعاقة المادّة لمرور التيّار. عند الجهد نفسه، كلّما كبرت قلّ التيّار، والتيّار المارّ يسخّن السلك. تُقاس بالأوم.",
+     ru:"Насколько вещество мешает току. При том же напряжении, чем сильнее мешает, тем меньше ток, и ток греет провод. В омах.",
+     en:"How much a material hinders current. At equal voltage, more of it means less current, which heats the wire. In ohms."}),
 
   C({he:"הספק",ar:"القدرة",ru:"Мощность",en:"Power"},
     {he:"כמה אנרגיה מכשיר צורך בכל שנייה. נמדד בוואט, ומכשיר שמחמם צורך הרבה יותר ממנורה.",
