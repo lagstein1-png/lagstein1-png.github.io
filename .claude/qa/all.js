@@ -3,6 +3,7 @@
 
      node .claude/qa/all.js           הכול
      node .claude/qa/all.js --fast    בלי entropy ו-options (הכי איטיות)
+     node .claude/qa/all.js --gate    רק מה שאינו דורש דפדפן — השער שלפני commit
 
    הוא מרים את השרת המקומי בעצמו וסוגר אותו בסוף, כי שלוש מהבדיקות
    דורשות אותו ושכחה שלו נראית בדיוק כמו כישלון אמיתי.
@@ -27,6 +28,10 @@ const path = require('path');
 
 const QA = __dirname;
 const FAST = process.argv.includes('--fast');
+/* --gate: הבדיקות שאינן דורשות דפדפן ושרת. זה מה שרץ לפני commit,
+   ולכן הוא חייב להיות מהיר ודטרמיניסטי. הוא אינו מחליף את הריצה
+   המלאה — הוא רק מונע דחיפה של מה שהיה נופל ב-CI ממילא. */
+const GATE = process.argv.includes('--gate');
 const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'lomda',
               'english', 'history', 'ulpan'];
 const PAGES = APPS.concat(['bagrut-806', 'reader', '.']);
@@ -61,7 +66,7 @@ const SUITE = [
   { id: 'options',  args: APPS,   needsServer: true, slow: true },
 ];
 
-const plan = SUITE.filter(t => !(FAST && t.slow));
+const plan = SUITE.filter(t => !(FAST && t.slow) && !(GATE && t.needsServer));
 const needServer = plan.some(t => t.needsServer);
 
 let server = null;
@@ -96,6 +101,7 @@ for (const [id, code] of results) {
   console.log(`  ${code ? '✗' : '✓'} ${id.padEnd(10)} ${code ? 'exit ' + code : ''}`);
 }
 if (FAST) console.log('  · entropy, options — דולגו (--fast)');
+if (GATE) console.log('  · smoke, say, exam, entropy, options — דולגו (--gate, בלי דפדפן)');
 console.log('═'.repeat(72));
 console.log(failed
   ? `${failed} מתוך ${results.length} נכשלו`
