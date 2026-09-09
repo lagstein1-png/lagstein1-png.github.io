@@ -1036,7 +1036,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n56 · 2026-09-09";
+var BUILD="n57 · 2026-09-09";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -5130,8 +5130,31 @@ window.addEventListener("hashchange",function(){
   if(examFromUrl()||resultFromUrl()){stopSpeak();window.scrollTo(0,0);render()}
   else if(view==="sit"||view==="badexam"||view==="oldexam"){view="";render()}
 });
+/* --- כל לחיצה מושמעת (O-27, 9.9.2026) ---
+   כשההקראה דולקת, כפתור שנלחץ מוקרא בשמו בשפת הממשק — לא לפני
+   הפעולה אלא חצי שנייה אחריה: פעולה שמדברת בעצמה (שאלה חדשה,
+   תשובה, רמז) מנצחת, והתווית לא נחתכת באמצע. אפשרויות התשובה
+   אינן כאן: אחרי הבחירה הן מדברות בעצמן, ולפניה אסור (say.js).
+   data-nosay על כפתור משתיק אותו. */
+function sayClick(el){
+  var a=el.getAttribute("data-a")||"";
+  if(/^(ans|pick|sitans)$/.test(a)||el.hasAttribute("data-nosay"))return;
+  if(!(state.settings&&state.settings.tts))return;
+  var label=el.getAttribute("aria-label")||el.textContent||"";
+  label=plainOf(String(label)).replace(/\s+/g," ").trim();
+  if(!label||label.length>60)return;
+  setTimeout(function(){
+    /* הפעולה עצמה כבר מדברת? שואלים את המנוע, לא מונה: ניווט קורא
+       ל-stopSpeak גם בלי לדבר, ומונה דורות היה משתיק את התווית
+       בדיוק בכפתורים שבשבילם היא נועדה; ו-_activeU נשאר תפוס כשאמירה
+       נתקעת בלי onend. */
+    try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+    speak(label,state.lang);
+  },500);
+}
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-a]"); if(!el)return;
+  sayClick(el);
   var a=el.getAttribute("data-a"),v=el.getAttribute("data-v");
   if(examAction(a,el))return;
   if(a==="go"){view=(v==="exam"||v==="marks"||v==="sit")?v:"";if(!view)state.screen="home";stopSpeak();render();window.scrollTo(0,0);return}
@@ -5307,7 +5330,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n56-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n57-pwa1").catch(function(){});
   });
 }
 </script>

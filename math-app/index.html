@@ -1974,7 +1974,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b62 · 2026-09-09";
+var BUILD="b63 · 2026-09-09";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4228,9 +4228,31 @@ function brCycle(){
   },4000);
 }
 /* ================= events ================= */
+/* --- כל לחיצה מושמעת (O-27, 9.9.2026) ---
+   כשההקראה דולקת, כפתור שנלחץ מוקרא בשמו בשפת הממשק — לא לפני
+   הפעולה אלא חצי שנייה אחריה: פעולה שמדברת בעצמה (שאלה חדשה,
+   תשובה, רמז) מנצחת, והתווית לא נחתכת באמצע. אפשרויות התשובה
+   אינן כאן: אחרי הבחירה הן מדברות בעצמן, ולפניה אסור (say.js).
+   data-nosay על כפתור משתיק אותו. */
+function sayClick(el){
+  var a=el.getAttribute("data-a")||"";
+  if(/^(ans|pick|sitans)$/.test(a)||el.hasAttribute("data-nosay"))return;
+  if(!(state.settings&&state.settings.tts))return;
+  var label=el.getAttribute("aria-label")||el.textContent||"";
+  label=plainOf(String(label)).replace(/\s+/g," ").trim();
+  if(!label||label.length>60)return;
+  setTimeout(function(){
+    /* הפעולה עצמה כבר מדברת? שואלים את המנוע, לא מונה: ניווט קורא
+       ל-stopSpeak גם בלי לדבר, ומונה דורות היה משתיק את התווית
+       בדיוק בכפתורים שבשבילם היא נועדה; ו-_activeU נשאר תפוס כשאמירה
+       נתקעת בלי onend. */
+    try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+    speak(label);
+  },500);
+}
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-a]");
-  if(el&&!el.disabled)onAction(el.getAttribute("data-a"),el);
+  if(el&&!el.disabled){sayClick(el);onAction(el.getAttribute("data-a"),el)}
 });
 document.addEventListener("change",function(e){
   var xs=e.target;
@@ -4318,7 +4340,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b62-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b63-pwa1").catch(function(){});
   });
 }
 </script>
