@@ -210,6 +210,15 @@ button{font:inherit;color:inherit}
 .spk.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 
 .opts{display:grid;gap:.6rem;margin-top:.9rem}
+/* כל תא תשובה נושא רמקול משלו, מחוץ לכפתור: כפתור בתוך כפתור אינו
+   HTML תקין, ואחרי שעונים התא נעול (disabled) ובלי ההפרדה גם הרמקול
+   היה נעלם איתו. הצורה זהה ללומדה ולמפנה. */
+.orow{display:flex;gap:.45rem;align-items:center;min-width:0}
+/* min-width:0 — פריט grid נולד עם min-width:auto, ולכן משפט אנגלי ארוך
+   באפשרות היה מרחיב את השורה מעבר למכל ודוחף את הרמקול מחוץ למסך. */
+.orow .opt{flex:1;min-width:0}
+/* ומילה שרחבה מהתא כולו נשברת בתוכו במקום לחרוג ממנו. */
+.opt span:last-child{overflow-wrap:anywhere}
 @media(min-width:560px){.opts.two{grid-template-columns:1fr 1fr}}
 .opt{display:flex;align-items:center;gap:.6rem;text-align:start;width:100%;
   border:2px solid var(--line);background:var(--surface);border-radius:12px;
@@ -773,7 +782,7 @@ T.he={
   qMean:"מה המשמעות?", qHear:"איזו מילה שמעתם?", qGap:"מה חסר במשפט?",
   qOrder:"סדרו את המשפט", qSay:"איך אומרים את זה באנגלית?", qRead:"לפי הקטע:",
   qUse:"איזה משפט מתאים למצב?",
-  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט",
+  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט", hearOpt:"השמיעו את האפשרות",
   check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", showAll:"הראו הכול",
   correct:"נכון!", wrong:"עוד לא", answerIs:"התשובה:", why:"למה",
   tapOrder:"לחצו על המילים לפי הסדר", clearSlot:"נקו",
@@ -831,7 +840,7 @@ T.ar={
   qMean:"ما المعنى؟", qHear:"أي كلمة سمعت؟", qGap:"ما الناقص في الجملة؟",
   qOrder:"رتّب الجملة", qSay:"كيف تقول ذلك بالإنجليزية؟", qRead:"حسب النص:",
   qUse:"أي جملة تناسب الموقف؟",
-  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع للكلمة", hearSent:"استمع للجملة",
+  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع للكلمة", hearSent:"استمع للجملة", hearOpt:"استمع للخيار",
   check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", showAll:"أظهر الكل",
   correct:"صحيح!", wrong:"ليس بعد", answerIs:"الإجابة:", why:"لماذا",
   tapOrder:"اضغط الكلمات بالترتيب", clearSlot:"مسح",
@@ -889,7 +898,7 @@ T.ru={
   qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?",
   qOrder:"Соберите предложение", qSay:"Как сказать это по-английски?", qRead:"По тексту:",
   qUse:"Какая фраза подходит к ситуации?",
-  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать слово", hearSent:"Послушать фразу",
+  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать слово", hearSent:"Послушать фразу", hearOpt:"Послушать вариант",
   check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", showAll:"Показать всё",
   correct:"Верно!", wrong:"Пока нет", answerIs:"Ответ:", why:"Почему",
   tapOrder:"Нажимайте слова по порядку", clearSlot:"Очистить",
@@ -947,7 +956,7 @@ T.en={
   qMean:"What does it mean?", qHear:"Which word did you hear?", qGap:"What is missing?",
   qOrder:"Put the sentence in order", qSay:"How do you say this in English?", qRead:"According to the passage:",
   qUse:"Which sentence fits the situation?",
-  hear:"Play", hearSlow:"Slowly", hearWord:"Play the word", hearSent:"Play the sentence",
+  hear:"Play", hearSlow:"Slowly", hearWord:"Play the word", hearSent:"Play the sentence", hearOpt:"Play this option",
   check:"Check", next:"Next", again:"Again", dunno:"I don't know", showAll:"Show all",
   correct:"Correct!", wrong:"Not yet", answerIs:"Answer:", why:"Why",
   tapOrder:"Tap the words in order", clearSlot:"Clear",
@@ -1027,7 +1036,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n54 · 2026-09-09";
+var BUILD="n55 · 2026-09-09";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3477,6 +3486,14 @@ function screenPractice(){
 
   if(q.type!=="order"){
     h+='<div class="opts'+(q.opts.length>3?"":" two")+'" id="opts">';
+    /* רמקול לכל אפשרות. זו אפליקציה ללימוד אנגלית, וארבע המילים
+       שבוחרים ביניהן היו אילמות — מי שאינו יודע לקרוא את המילה לא
+       יכול היה לשמוע אותה לפני שבחר. הקראת אפשרות אינה הסגרת תשובה:
+       היא זמינה על כל ארבע במידה שווה.
+       **חוץ מתרגיל ההאזנה.** שם השאלה עצמה היא הצליל, ורמקול על כל
+       אפשרות היה הופך אותו מזיהוי מילה להשוואת שני צלילים — כלומר
+       מבטל את התרגיל. */
+    var optSpk=(q.type!=="hear");
     q.opts.forEach(function(o,i){
       var cls="opt";
       if(P.done){
@@ -3484,8 +3501,17 @@ function screenPractice(){
         else if(i===P.picked)cls+=" bad";
         else cls+=" dim";
       }
-      h+='<button class="'+cls+'" data-a="pick" data-i="'+i+'"'+(P.done?" disabled":"")+'>'+
+      var ob='<button class="'+cls+'" data-a="pick" data-i="'+i+'"'+(P.done?" disabled":"")+'>'+
         '<span class="k">'+String.fromCharCode(65+i)+"</span><span>"+o.h+"</span></button>";
+      if(!optSpk){h+=ob;return}
+      var ot=plainOf(o.h);
+      /* שפת האפשרות נגזרת מהאותיות שבה: אפשרות שאין בה אות עברית,
+         ערבית או קירילית היא אנגלית ונאמרת בקול אנגלי; משמעות בשפת
+         האם נאמרת בשפת הממשק. */
+      var ol=/[\u0590-\u05FF\u0600-\u06FF\u0400-\u04FF]/.test(ot)?(state.lang||"he"):"en";
+      h+='<div class="orow">'+ob+
+        '<button class="spk sm" data-a="say" data-say="'+esc(ot)+'" data-lang="'+esc(ol)+
+        '" aria-label="'+esc(t("hearOpt"))+'">'+ic("play",15)+"</button></div>";
     });
     h+="</div>";
   }
@@ -3818,6 +3844,13 @@ function buildQ(tid,lv){
            (q.lead||(q.subject?(q.subject.w||q.subject.s||""):""));
   var ask=esc(q.prompt||"")+(lead&&!audioOnly?' <b>'+esc(lead)+"</b>":"");
   var expr="";
+  /* תרגיל ההשלמה נושא את המשפט עצמו ב-gapHtml, ולא ב-lead או ב-ask.
+     הוא לא צורף מעולם, ולכן במבחן הכיתתי הופיעו הכותרת "מה חסר
+     במשפט?", המשמעות בשפת האם וארבע מילים באנגלית — בלי המשפט
+     ובלי החסר. אי אפשר היה לענות. ומאותו משפט נבנות כמה שאלות,
+     חסר אחר בכל אחת, וכולן יצאו זהות על המסך עם תשובה נכונה אחרת.
+     ה-"_____" הוא מה שמבדיל ביניהן, והוא בדיוק מה שנשמט. */
+  if(q.type==="gap"&&q.gapHtml)expr=q.gapHtml;
   /* "p" הוא סוג הפריט בבנק, לא סוג השאלה. השאלה שנבנית מקטע קריאה
      חוזרת כ-"comp", ולכן הקטע לא צורף מעולם — ובלי הקטע אין על מה
      לענות. */
@@ -5259,7 +5292,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n54-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n55-pwa1").catch(function(){});
   });
 }
 </script>
