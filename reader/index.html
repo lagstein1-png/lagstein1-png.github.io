@@ -696,8 +696,79 @@ var voicesReady = false;
    כל אמירה זוכרת את המספר שהיה בזמן יציאתה, וכל ביטול מקדם אותו —
    כך אירוע של אמירה שכבר בוטלה מזוהה ומתעלמים ממנו. */
 var SEQ = 0;
+/* =====================================================================
+   מנוע ההקראה של "תאוריה מדברת" — ארבעה מנגנונים
+   ---------------------------------------------------------------------
+   ארבעה כשלים שקטים של Web Speech. אף אחד מהם אינו מדווח כשגיאה,
+   וכולם נראים למשתמש בדיוק אותו דבר: הקול פשוט מפסיק באמצע. הקוד
+   כאן הועתק מהאפליקציה שבה הוא כבר רץ, ולא נוסח מחדש.
+   ===================================================================== */
+
+/* 1 · שומר-ער. באג ותיק ב-Chrome וב-Edge בשולחן העבודה: ההקראה
+   נחתכת אחרי כ-15 שניות, באמצע מילה. pause+resume תקופתי מחזיק את
+   המנוע ער. במובייל אין את הבאג ופעולה כזאת דווקא מקרטעת שם, ולכן
+   מפעילים רק היכן שבאמת צריך. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+/* עוצרים רק כששום דבר כבר לא מדבר — אחרת מקטע שהתחיל זה עתה מאבד
+   את השמירה שלו כשהמקטע הקודם מסיים להתנקות. */
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+
+/* 2 · הפניה חיה ל-utterance. Chrome אוסף אובייקט שאין אליו הפניה,
+   ואיתו נעלמים onend ו-onboundary: ההקראה נתקעת באמצע, ההדגשה
+   קופאת על מילה אחת, והמקטע הבא לא יוצא לעולם. */
+var _activeU=null;
+
+/* 3 · קול רשת שנכשל. הקולות הנוירליים של Edge הם קולות רשת, והם
+   שותקים בלי אינטרנט. הדגל נכבה ברגע שאחד מהם נכשל, ומאותו רגע
+   הדירוג מעדיף קול מקומי לשארית הסשן. */
+var _netVoiceOK=true;
+
+/* קול רשת שאי אפשר להשתמש בו עכשיו — אין אינטרנט, או שאחד כבר
+   נכשל בסשן הזה — אינו "פחות טוב", הוא פשוט לא יעבוד. לכן זה מיון
+   ראשון ולא עוד סעיף בתוך הניקוד: קנס בניקוד לא הספיק, מפני שקול
+   נוירלי של Microsoft צובר על שם היצרן ועל "Natural" יותר ממה שכל
+   קנס סביר מוריד — והוא נבחר שוב ושוב אחרי שכבר נכשל.
+   כשהוא הקול היחיד שיש הוא עדיין נבחר: מיון של רשימה בת אחד
+   מחזיר אותה כמו שהיא. */
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+
+/* 4 · שומר זמן. יש מכשירים שבהם onend פשוט לא נורה. בלי השומר הזה
+   התור נתקע: הכפתור נשאר על "עצירה" וההקראה לא ממשיכה לעולם. ארבע
+   שניות שבהן המנוע לא מדבר ולא ממתין נחשבות סוף.
+   מחזיר פונקציית ביטול — מי שסיים בדרך הרגילה מכבה את השומר. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+
 function cancelSpeech(){
   SEQ++;
+  stopKeepAlive(); _activeU = null;
   try{ speechSynthesis.cancel(); }catch(e){}
 }
 
@@ -883,8 +954,17 @@ function pickVoice(){
   /* קול נשי בראש הרשימה. שני מקומות שונים נופלים על "הראשון"
      כברירת מחדל — כאן וברינדור הכפתורים — ולכן הסדר נקבע פעם
      אחת במקום שכל אחד מהם יחליט לבד. */
+  /* המגדר קודם, ובתוך כל קבוצה מכריעה האיכות. עד כאן המיון היה
+     לפי מגדר בלבד, ושני קולות עבריים באותו מגדר נבדלו רק בסדר
+     ההתקנה של המערכת. */
   heVoices = v.filter(function(x){ return /^he/i.test(x.lang); })
-             .sort(function(a,b){ return (voiceGender(b)==='f') - (voiceGender(a)==='f'); });
+             .sort(function(a,b){
+               /* קול שלא יעבוד יורד לתחתית לפני כל שיקול אחר — גם לפני
+                  המגדר, שאם לא כן קול נשי מת מנצח קול גברי חי. */
+               var d = voiceUsable(b) - voiceUsable(a); if(d) return d;
+               d = (voiceGender(b)==='f') - (voiceGender(a)==='f');
+               return d || voiceQuality(b) - voiceQuality(a);
+             });
   heVoice = heVoices.filter(function(x){ return x.voiceURI === P.voice; })[0] || heVoices[0] || null;
   renderVoices();
 }
@@ -900,6 +980,22 @@ function voiceGender(v){
   if (VOICE_F.test(n)) return 'f';
   if (VOICE_M.test(n)) return 'm';
   return '';
+}
+/* מדרגים ולא לוקחים את הראשון. כשיש כמה קולות עבריים במכשיר,
+   "הראשון" הוא מי שהמערכת התקינה קודם — לרוב הרובוטי שבהם. הניקוד
+   הועתק מ"תאוריה מדברת": שם יצרן ומנוע נוירלי מעלים, espeak
+   ו-compact מורידים. */
+function voiceQuality(v){
+  var s = 0, n = (v.name || '') + ' ' + (v.lang || '');
+  if (/google/i.test(n)) s += 4;
+  if (/microsoft/i.test(n)) s += 4;
+  if (/natural|enhanced|premium|neural|wavenet/i.test(n)) s += 2;
+  /* קול רשת — הנוירליים של Edge הם כאלה — נשמע טוב יותר כשיש רשת,
+     וזה כל מה שנקבע כאן. מה קורה כשאין רשת נקבע ב-voiceUsable. */
+  if (v.localService === false && voiceUsable(v)) s += 2;
+  if (/espeak|compact|pico/i.test(n)) s -= 6;
+  if (v.default) s += 1;
+  return s;
 }
 var GENDER_LABEL = { f:_(' · נשי'), m:_(' · גברי'), '':'' };
 function voiceLabel(v){
@@ -1100,13 +1196,19 @@ function speakSentence(n){
       if(c >= map[k].from && c < map[k].to){ hit(map[k].i); return; }
     }
   };
-  u.onend = function(){
-    if(tok !== SEQ) return;                  /* אמירה שכבר בוטלה — לא מקדמת משפט */
+  /* moved מבטיח שמשפט מתקדם פעם אחת בלבד: onend ושומר הזמן יכולים
+     שניהם לרצות לקדם אותו, וקידום כפול מדלג על משפט שלם. */
+  var moved = false, disarm = null;
+  function advance(){
+    if(moved || tok !== SEQ) return;         /* אמירה שכבר בוטלה — לא מקדמת משפט */
+    moved = true; if(disarm) disarm();
+    maybeStopKeepAlive();
     ttsOK();
     if(!speaking) return;
     if(SENT + 1 < SENTS){ SENT++; markSentence(); speakSentence(SENT); }
     else stop();
-  };
+  }
+  u.onend = advance;
   /* המנוע נכשל — לומר את זה במקום להיעצר בשקט.
      ביטול אינו כישלון: "משפט הבא", שינוי מהירות או החלפת קול
      מבטלים את האמירה הנוכחית כדי לפנות מקום לבאה, והמנוע מדווח
@@ -1114,8 +1216,22 @@ function speakSentence(n){
      שיצאה רגע קודם — כלומר כל לחיצה על ⏭ השתיקה את הקורא. */
   u.onerror = function(e){
     var er = e && e.error;
-    if(er === 'interrupted' || er === 'canceled') return;
-    if(tok !== SEQ) return;
+    if(er === 'interrupted' || er === 'canceled'){ moved = true; if(disarm) disarm(); return }
+    if(moved || tok !== SEQ) return;
+    /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול
+       מקומי וחוזרים על אותו משפט, פעם אחת בסשן, כדי שההקראה לא
+       תישבר בשקט באמצע קטע. */
+    if(!_netRetried && chosen && chosen.localService === false){
+      _netRetried = true; _netVoiceOK = false;
+      moved = true; if(disarm) disarm(); _activeU = null;
+      VOICE = 'browser';                     /* הנעיצה הצביעה על הקול שנכשל */
+      pickVoice();                           /* ממיין מחדש — עכשיו מקומי מנצח */
+      cancelSpeech();
+      speakSentence(n);
+      return;
+    }
+    moved = true; if(disarm) disarm();
+    maybeStopKeepAlive();
     ttsFail(er); stop();
   };
 
@@ -1141,8 +1257,16 @@ function speakSentence(n){
   clearHit();                                /* מילה מהמשפט הקודם לא נשארת דלוקה */
   markReading(n);
 
+  _activeU = u;                              /* מגן מפני איסוף זבל */
+  try{ if(speechSynthesis.paused) speechSynthesis.resume(); }catch(e){}
   speechSynthesis.speak(u);
+  startKeepAlive();
+  disarm = ttsWatchdog(function(){ return tok === SEQ && !moved; }, advance);
 }
+
+/* הקראה שנפלה פעם אחת מקול רשת לקול מקומי לא תיפול שוב — הדגל
+   נשאר דלוק עד סוף הסשן. */
+var _netRetried = false;
 
 /* הכפתור מדווח על מצב: כחול ממתין, ירוק מקריא. */
 function playState(st){
@@ -1458,7 +1582,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=32-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=33-pwa1").catch(function(){});
   });
 }
 </script>
