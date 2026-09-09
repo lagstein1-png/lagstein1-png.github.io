@@ -18,6 +18,11 @@ tools: Read, Grep, Glob, Bash, Edit
   ה-service worker — ולא ב-`index.html` כמו בכל השאר.
   `vendor/katex/` היא ספרייה חיצונית שהוטמעה בריפו כקבצים מקומיים;
   היא אינה נטענת מהרשת, ואין להוסיף עוד כמותה.
+- **וגם `lomda` אינה קובץ יחיד.** המנוע ו-`BUILD` שלה כן יושבים
+  ב-`index.html`, אבל **כל התוכן** יושב ב-18 קובצי `lomda/data/*.js`
+  שנטענים בתגיות `<script src="data/…">`, ו-`lomda/data/schema.js`
+  מגדיר את הסכימה. מי שמחפש שאלה בתוך `lomda/index.html` לא ימצא
+  אותה שם.
 - Vanilla JS בלבד. אין React, אין Vue, אין Firebase, אין npm, אין build step, אין TypeScript.
 - PWA עם manifest ו-service worker. עברית RTL, לעיתים גם ערבית / אנגלית / רוסית.
 - אירוח: GitHub Pages תחת `lagstein1-png.github.io`. Netlify לא קיים יותר.

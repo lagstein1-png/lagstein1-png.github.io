@@ -18,6 +18,11 @@ tools: Bash, Read, Grep, Glob, Edit
   ה-service worker — ולא ב-`index.html` כמו בכל השאר.
   `vendor/katex/` היא ספרייה חיצונית שהוטמעה בריפו כקבצים מקומיים;
   היא אינה נטענת מהרשת, ואין להוסיף עוד כמותה.
+- **וגם `lomda` אינה קובץ יחיד.** המנוע ו-`BUILD` שלה כן יושבים
+  ב-`index.html`, אבל **כל התוכן** יושב ב-18 קובצי `lomda/data/*.js`
+  שנטענים בתגיות `<script src="data/…">`, ו-`lomda/data/schema.js`
+  מגדיר את הסכימה. מי שמחפש שאלה בתוך `lomda/index.html` לא ימצא
+  אותה שם.
 - Vanilla JS בלבד. אין React, אין Vue, אין Firebase, אין npm, אין build step, אין TypeScript.
 - PWA עם manifest ו-service worker. עברית RTL, לעיתים גם ערבית / אנגלית / רוסית.
 - אירוח: GitHub Pages תחת `lagstein1-png.github.io`. Netlify לא קיים יותר.
@@ -86,7 +91,23 @@ tools: Bash, Read, Grep, Glob, Edit
 - `W(טקסט, למה)` = מסיח שגוי + ההסבר למה הוא שגוי.
 - `S(כותרת, הסבר, נוסחה)` = צעד בפתרון.
 
-**סכימה ג' — `english`, `history`, `ulpan`:** `{q, a, options:[{h, ok, why}], hint}`.
+**סכימה ג' — `english`, `history`, `ulpan` ו-`lomda`:** את כותבת קריאה
+ל-`Q(...)`, ולא אובייקט ביד:
+
+    Q(שאלה, תשובה_נכונה, [מסיחים], [למה_כל_מסיח_שגוי])
+
+    function Q(q,ans,wrongs,whys){return {q:q,a:ans,w:wrongs,y:whys||[]}}
+                                          english/index.html:1765
+
+כל אחד מארבעת הארגומנטים הוא אובייקט ארבע־שפות `{he, ar, ru, en}` —
+ולא מחרוזת. ב-`ulpan` החתימה קצרה יותר (`Q(q,ans,wrongs)`, בלי `whys`,
+`ulpan/index.html:1767`), וב-`lomda` אותה חתימה מוגדרת ב-
+`lomda/data/schema.js:43` יחד עם `E`, `C`, `Sc`, `TOPIC` ו-`BANK`.
+
+**אין כאן שדה `options` ואין שדה `hint`.** `options:[{h, ok, why}]` הוא
+מה ש-`buildQ` **מייצר** בזמן ריצה מתוך `w` ו-`y`; אין אף פריט תוכן
+בריפו שכתוב כך. נמדד: `grep -c 'options:\['` מחזיר `0` בכל ארבע
+האפליקציות. אל תכתבי לפי הצורה ההיא.
 
 **ו-`bagrut-806` אינה אף אחת מהשלוש.** התוכן שלה יושב ב-`app.js`
 וב-`data/exams.js` ולא ב-`index.html`, והיא **אינה משתמשת ב-`_()`
