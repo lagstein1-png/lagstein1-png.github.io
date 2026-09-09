@@ -7,7 +7,7 @@
       8+7=16 שנכתב בביטחון. לכן הם נבדקים, ולא נסמכים על
       ההוראות למודל בלבד.
 
-   2. **החיווט של אחת עשרה האפליקציות.** אפליקציה שיש בה כפתור
+   2. **החיווט של שתים־עשרה האפליקציות.** אפליקציה שיש בה כפתור
       אבל אין בה תגית סקריפט תיראה תקינה עד שמישהו ילחץ; אפליקציה
       שאין לה את הקובץ ב-PRE תעבוד ברשת ותישבר אופליין. שניהם
       נכשלים בשקט, ולכן שניהם נספרים כאן.
@@ -22,10 +22,11 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const WORKER = 'file://' + path.join(ROOT, 'tutor-api', 'worker.js');
 const CLIENT = path.join(ROOT, 'tutor', 'tutor.js');
 
-/* אחת עשרה. דף הבית אינו אפליקציית לימוד, ו״תאוריה מדברת״
+/* שתים־עשרה. דף הבית אינו אפליקציית לימוד, ו״תאוריה מדברת״
    יושבת בריפו נפרד — ראו FINDINGS. */
 const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-              'lomda', 'english', 'history', 'ulpan', 'bagrut-806', 'reader'];
+              'lomda', 'english', 'history', 'ulpan', 'bagrut-806', 'reader',
+              'kotvim'];
 /* ״תאוריה מדברת״ אינה בריפו הזה, אבל היא באותו מקור וטוענת את
    /tutor/tutor.js מכאן — ולכן התפקיד שלה חייב להיות בשרת.
    החיווט שלה עצמו נבדק בריפו שלה, לא כאן. */
@@ -250,7 +251,7 @@ import(WORKER).then(W => {
     if (sw.indexOf('"/tutor/tutor.js"') < 0) miss.push('PRE ב-sw.js');
     if (miss.length) { bad++; console.log(`✗ ${a}: חסר ${miss.join(', ')}`) }
   });
-  console.log(`✓ אחת עשרה האפליקציות מחווטות (תגית, mount, open, PRE)`);
+  console.log(`✓ שתים־עשרה האפליקציות מחווטות (תגית, mount, open, PRE)`);
 
   /* ---------- 8. שער התנאים ---------- */
   const url = (client.match(/var API\s*=\s*"([^"]*)"/) || [])[1];
