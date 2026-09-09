@@ -379,6 +379,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/langbtn.js               # כפתור השפה עצמו — "العربية" גם כשהממשק עברי
     node .claude/qa/banks.js                 # החיווט של lomda/data/, וארבע השפות בתוכן
     node .claude/qa/leaks.js                 # תיאור של פריט בלומדה אינו מצטט את כותרתו (ההקראה לא מסגירה)
+    node .claude/qa/markers.js               # סמני התנגשות מיזוג שנשארו בקובץ שנעקב
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/content.js               # תוכן: תשע משפחות, דוח PASS/REVIEW/FAIL
     node .claude/qa/stage.js                 # שער השלבים — מי מותר ללומד
