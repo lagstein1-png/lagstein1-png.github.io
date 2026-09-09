@@ -1046,7 +1046,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a23 · 2026-09-09";
+var BUILD="a24 · 2026-09-09";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -1877,11 +1877,15 @@ function renderSpeakState(){
      אומרים את זה, ולא מה זה אומר — ההבדל הזה הוא כל ההבדל בין
      לדעת מילה לבין לדעת להשתמש בה.
    PARA(lines, glosses, questions) — קטע קריאה.
+   Q(question, answer, wrongs, whys) — שאלה על הקטע. whys הוא הנימוק
+     לכל מסיח, באותו סדר, וזו אותה חתימה בדיוק שב-english. בלעדיו
+     הלומד מקבל "לא נכון" ולא יודע למה, וינחש שוב באותו מקום.
+     whys אופציונלי כדי שקטע ישן לא יישבר, אבל אין היום שאלה בלעדיו.
    ============================================================ */
 function W(w,ipa,g,near){return {k:"w",w:w,ipa:ipa||"",g:g,near:near||[]}}
 function S(s,g,u){return {k:"s",s:s,g:g,u:u||null}}
 function PARA(lines,words,qs){return {k:"p",lines:lines,words:words||[],qs:qs||[]}}
-function Q(q,ans,wrongs){return {q:q,a:ans,w:wrongs}}
+function Q(q,ans,wrongs,whys){return {q:q,a:ans,w:wrongs,y:whys||[]}}
 
 var TRACKS=[
   {id:"sound",cls:"t-sound",nk:"trkSound",dk:"trkSoundD",icon:"spark"},
@@ -2994,7 +2998,13 @@ function formComp(tp,lv,pool,idx){
   var it=pool[idx];
   var qq=pick(it.qs);
   var opts=[O(esc(gl(qq.a)),true)];
-  qq.w.forEach(function(x){opts.push(O(esc(gl(x)),false))});
+  /* הנימוק מגיע מ-whys שבשאלה, לפי אותו סדר. בהבנת הנקרא אין
+     לפריט g ואין reveal, ולכן בלי הנימוק המשוב היה "התשובה: X"
+     ותו לא — הלומד לא ידע מה בקטע פסל את מה שסימן. */
+  qq.w.forEach(function(x,i){
+    var y=(qq.y&&qq.y[i])?gl(qq.y[i]):"";
+    opts.push(O(esc(gl(x)),false,y));
+  });
   return {type:"comp",prompt:t("qRead"),passage:it,qtext:gl(qq.q),
     opts:shuffle(opts),answer:gl(qq.a),say:it.lines.join(" "),subject:null};
 }
@@ -4979,7 +4989,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a23-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a24-pwa1").catch(function(){});
   });
 }
 </script>
