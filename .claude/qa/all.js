@@ -62,6 +62,7 @@ const SUITE = [
   { id: 'tutor',    args: [] },
   { id: 'smoke',    args: PAGES,  needsServer: true },
   { id: 'say',      args: [],     needsServer: true },
+  { id: 'langbtn',  args: [],     needsServer: true },
   { id: 'exam',     args: [],     needsServer: true },
   { id: 'entropy',  args: APPS,   needsServer: true, slow: true },
   { id: 'options',  args: APPS,   needsServer: true, slow: true },

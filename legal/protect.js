@@ -72,6 +72,15 @@ var CSS=''+
 '  background:#fff;color:#374151;border-radius:10px;padding:.55rem .8rem;cursor:pointer;min-height:44px}'+
 '.lg-lgs button[aria-pressed="true"]{background:#111827;color:#fff;border-color:#111827}'+
 '.lg-lgs button:focus-visible{outline:3px solid #2563eb;outline-offset:2px}'+
+/* Heebo — הראשון במחרוזת של .lg-wrap — אין בו ערבית ואין בו קירילית,
+   ולכן "العربية" ו-"Русский" נפלו לגופן ברירת המחדל של המערכת, שהמידות
+   שלו אחרות, ושני הלחצנים נראו בגודל אחר משני האחרים. השער הוא המסך
+   הראשון שלומד חדש רואה, ובדיוק שם הוא בוחר את שפתו. הגופן נקבע לפי
+   lang של הלחצן עצמו, שכבר קיים בסימון למעלה. שתי המשפחות נטענות
+   באחד־עשר הדפים שנושאים את השער; ב-bagrut-806, שאין בו ממשק ערבי
+   ורוסי, השורות האלה פשוט אינן תופסות. */
+'.lg-lgs button[lang="ar"]{font-family:"Noto Sans Arabic","Heebo",system-ui,sans-serif}'+
+'.lg-lgs button[lang="ru"]{font-family:"Noto Sans","Heebo",system-ui,sans-serif}'+
 '@media (prefers-color-scheme:dark){'+
 '  .lg-box{background:#141a24;color:#e8ecf4}'+
 '  .lg-lead,.lg-scroll p,.lg-steps{color:#b9c2d4}'+
