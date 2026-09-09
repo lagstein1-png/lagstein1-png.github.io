@@ -1027,7 +1027,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m58 · 2026-09-08";
+var BUILD="m59 · 2026-09-08";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -7016,8 +7016,31 @@ function centuryOf(y){
   var a=Math.abs(y);
   return Math.floor((a-1)/100)+1;
 }
+/* המאה נכתבת אחרת בכל שפה — ולא רק המילה משתנה, אלא גם הסדר וגם
+   אופן כתיבת המספר. כאן נבנה תמיד ״מילה ואחריה ספרה רומית״, ולכן
+   באנגלית יצא "century XIX" — שאינו אנגלית — וברוסית "век XIX",
+   שהוא היפוך של הכתיב המקובל.
+
+   ולכל שפה יש כאן תשובה אחת נכונה, ולכן זו אינה העדפה:
+     עברית   המאה ה-19     אין ספרות רומיות בעברית
+     ערבית   القرن 19      ואין גם בערבית
+     רוסית   XIX век       הרומית לפני המילה — כך נכתב ברוסית
+     אנגלית  19th century  סודר לפני המילה
+
+   הרומית נשארת ברוסית בלבד, ו-saySpell ממיר אותה לספרה להקראה. */
+function _ord(n){
+  var tens=n%100;
+  if(tens>=11&&tens<=13)return n+"th";
+  var d=n%10;
+  return n+(d===1?"st":d===2?"nd":d===3?"rd":"th");
+}
 function centuryStr(y){
-  return t("century")+" "+_rom(centuryOf(y))+(y<0?" "+t("bce"):"");
+  var n=centuryOf(y),s;
+  if(state.lang==="ru")s=_rom(n)+" "+t("century");
+  else if(state.lang==="en")s=_ord(n)+" "+t("century");
+  else if(state.lang==="he")s=t("century")+" ה-"+n;
+  else s=t("century")+" "+n;
+  return s+(y<0?" "+t("bce"):"");
 }
 var ROM=["","I","II","III","IV","V","VI","VII","VIII","IX","X",
          "XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI"];
@@ -7144,6 +7167,11 @@ function formWhat(tp,lv,pool,idx){
 /* --- צורה 3: על איזה אירוע מדובר --- */
 function formName(tp,lv,pool,idx){
   var it=pool[idx];
+  /* אותו שומר שבלומדה, ומאותה סיבה: הכותרת היא התשובה, והתיאור
+     הוא מה שנקרא בשאלה. פריט שתיאורו פותח בכותרת מוסר את התשובה
+     בהקראה. נמדד בלומדה ב-8.9.2026, והמנוע כאן זהה — שומר בעותק
+     אחד בלבד הוא בדיוק המלכודת שהמאגר הזה כבר נפל בה. */
+  if(gl(it.w).indexOf(gl(it.t))>=0)return formWhen(tp,lv,pool,idx);
   var opts=optsFromField(it,nearEvents(it,pool,28),"t",4);
   if(!opts)return formWhen(tp,lv,pool,idx);
   return {type:"fact",prompt:t("qName"),lead:gl(it.w),
@@ -9261,7 +9289,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m58-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m59-pwa1").catch(function(){});
   });
 }
 </script>
