@@ -1974,7 +1974,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b61 · 2026-09-09";
+var BUILD="b62 · 2026-09-09";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2717,10 +2717,20 @@ function buildQ(topicId,level){
   var lang=state.settings.lang||"he";
   var q=genQ(0,clamp(level||1,1,6),lang,topicId);
   if(!q)return null;
-  /* האפשרויות כאן הן מספרים, לא אובייקטים. */
+  /* האפשרויות כאן הן מספרים, לא אובייקטים.
+     ואין להן `why`: מסיח כאן הוא מספר, והסכימה של math-app —
+     hint1/hint2/explain — אינה מגדירה הסבר למסיח. `why:""` שהיה
+     כאן היה ריפוד צורה בלבד, איש לא קרא אותו (אפס מופעים של
+     `.why` בקובץ), והוא זה שייצר "100% מהמסיחים בלי הסבר"
+     בדוח התוכן — התראה שאין עריכת תוכן שסוגרת אותה. */
   var opts=(q.options||[]).map(function(n){
-    return {h:String(n),t:String(n),ok:n===q.answer,why:""}});
+    return {h:String(n),t:String(n),ok:n===q.answer}});
   return {topic:topicId, topicName:tName(topicOf(topicId)),
+          /* הרמז הראשון מתוך שלושת הרמזים ש-genQ בונה. מסך המבחן
+             אינו מציג רמז ואינו קורא את השדה; הוא כאן כדי שהמתאם
+             ידווח על התוכן כפי שהוא — הלומד מקבל שלושה רמזים
+             בלחיצה על כפתור הנורה, והדוח קרא כאן "בלי רמז". */
+          hint:(q.hints&&q.hints[0])||"",
           /* השאלה מכילה את התרגיל בתוך משפט עברי, ושם הכיוון הופך את
              סדר המספרים: "כמה זה 29 − 7?" נראה "כמה זה 7 − 29?". התרגיל
              עצמו זהה למחרוזת expr, ולכן עוטפים בדיוק אותו בקטע שמאל־לימין. */
@@ -4308,7 +4318,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b61-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b62-pwa1").catch(function(){});
   });
 }
 </script>

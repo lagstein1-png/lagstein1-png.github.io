@@ -243,7 +243,7 @@ async function scan(page){
   /* שדות הסכימה נמדדים בשיעור ולא בספירה. "אין רמז" בכל שאלה
      היא עובדה אחת על האפליקציה — כמה שדות היא בכלל נושאת —
      ולא אלף באגים. הממצא נכתב פעם אחת בסוף, עם האחוז. */
-  const cov={q:0,noHint:0,noSteps:0,hasSteps:0,wrong:0,noWhy:0};
+  const cov={q:0,hasHint:0,noHint:0,noSteps:0,hasSteps:0,wrong:0,hasWhy:0,noWhy:0};
 
   for(const t of TOPICS) for(const lv of LVLS){
     const where=t.id+' L'+lv;
@@ -335,11 +335,25 @@ async function scan(page){
 
       /* 4. שדות שהסכימה מחייבת — נצברים, ונכתבים בסוף באחוזים */
       cov.q++;
-      if(!hintT) cov.noHint++;
+      /* **שדה שהסכימה אינה מגדירה אינו שדה חסר.** שלוש סכימות
+         תוכן כאן, ולא אחת: ב-math-app המסיחים הם מספרים ואין
+         להם `why`, וב-english וב-ulpan אין `hint` כלל. מדידה
+         של השדה עצמו החזירה "100% מהשאלות בלי רמז" על אפליקציה
+         שיש בה כפתור רמז שמגיש שלושה — התראת שווא שאין שום
+         עריכת תוכן שסוגרת אותה.
+         לכן נספר רק מה שהבנאי **מגדיר**: מפתח קיים וריק הוא
+         חסר אמיתי, מפתח שאינו קיים הוא סכימה אחרת. `hasSteps`
+         כבר עבד כך, ושתי השורות האלה מיישרות אליו.
+         והבחנה זו גם שומרת על רגישות לרגרסיה: `hintFor` שיחזיר
+         מחרוזת ריקה משאיר מפתח מוגדר, וייספר. */
+      if(q.hint!==undefined){ cov.hasHint++; if(!hintT) cov.noHint++ }
       if(Array.isArray(q.steps)){ cov.hasSteps++; if(!q.steps.length) cov.noSteps++ }
       for(let i=0;i<opts.length;i++) if(!opts[i].ok){
         cov.wrong++;
-        if(!String(opts[i].why||'').trim()) cov.noWhy++;
+        if(opts[i].why!==undefined){
+          cov.hasWhy++;
+          if(!String(opts[i].why).trim()) cov.noWhy++;
+        }
       }
 
       /* 5. ניסוח */
@@ -530,13 +544,14 @@ async function scan(page){
   /* --- 4. כיסוי שדות, פעם אחת, באחוזים --- */
   R.coverage=cov;
   const pc=function(a,b){return b?Math.round(a/b*100):0};
-  if(cov.q&&cov.noHint) add('no-hint','REVIEW',
-    pc(cov.noHint,cov.q)+'% מהשאלות ('+cov.noHint+' מתוך '+cov.q+') נבנות בלי רמז','—');
+  if(cov.hasHint&&cov.noHint) add('no-hint','REVIEW',
+    pc(cov.noHint,cov.hasHint)+'% מהשאלות ('+cov.noHint+' מתוך '+cov.hasHint+
+    ') נבנות בלי רמז','—');
   if(cov.hasSteps&&cov.noSteps) add('no-steps','REVIEW',
     pc(cov.noSteps,cov.hasSteps)+'% מהשאלות ('+cov.noSteps+' מתוך '+cov.hasSteps+
     ') נבנות בלי שלבי פתרון','—');
-  if(cov.wrong&&cov.noWhy) add('no-why','REVIEW',
-    pc(cov.noWhy,cov.wrong)+'% מהמסיחים ('+cov.noWhy+' מתוך '+cov.wrong+
+  if(cov.hasWhy&&cov.noWhy) add('no-why','REVIEW',
+    pc(cov.noWhy,cov.hasWhy)+'% מהמסיחים ('+cov.noWhy+' מתוך '+cov.hasWhy+
     ') בלי הסבר למה הם שגויים','—');
 
   return R;
@@ -628,6 +643,21 @@ function md(app,R){
   L.push('| מדגם לכל תא | '+R.sample+' |');
   L.push('| שפות שהוכרזו | '+(R.langs||[]).join(', ')+' |');
   L.push('');
+  /* כיסוי השדות נדפס תמיד, גם כשאין ממצא. שדה שהסכימה אינה
+     מגדירה אינו ממצא — אבל הוא כן עובדה שצריך לראות, ואם
+     מספר כאן קופץ פתאום ל-0 זו רגרסיה בחיווט. */
+  if(R.coverage){
+    const c=R.coverage, row=function(name,has,miss){
+      L.push('| '+name+' | '+(has?((has-miss).toLocaleString('en-US')+' מתוך '+
+        has.toLocaleString('en-US')):'אין שדה כזה בסכימה')+' |');
+    };
+    L.push('| שדה | מולא |');
+    L.push('|---|---|');
+    row('רמז (`hint`)',c.hasHint||0,c.noHint||0);
+    row('שלבי פתרון (`steps`)',c.hasSteps||0,c.noSteps||0);
+    row('הסבר למסיח (`why`)',c.hasWhy||0,c.noWhy||0);
+    L.push('');
+  }
   const byCat={};
   for(const k in R.find){ const c=CAT[R.find[k].kind||k]||8; (byCat[c]||(byCat[c]=[])).push(k) }
   for(let c=1;c<=9;c++){
