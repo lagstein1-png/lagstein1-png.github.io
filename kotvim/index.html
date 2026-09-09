@@ -1061,7 +1061,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="k3 · 2026-09-09";
+var BUILD="k4 · 2026-09-09";
 var SKEY="kotvim-state-v1";
 var GKEY_STORE="kotvim-gkey";
 
@@ -2892,8 +2892,24 @@ function testKey(){
     .catch(function(){gkMsg={ok:false,m:t("vErr")};render()});
 }
 /* exLoad היה טעינת המבחנים השמורים של המורה. אין מבחן כאן. */
+/* --- כל לחיצה מושמעת (O-27/O-28, 9.9.2026) ---
+   כפתור שנלחץ מוקרא בשמו בשפת הממשק — לא לפני הפעולה אלא חצי
+   שנייה אחריה, ורק אם המנוע שותק: פעולה שמדברת בעצמה מנצחת,
+   והתווית לא נחתכת. data-nosay על כפתור משתיק אותו. */
+function sayClick(el){
+  var a=el.getAttribute("data-a")||"";
+  if(/^(say|sayline|ksay)$/.test(a)||el.hasAttribute("data-nosay"))return;
+  var label=el.getAttribute("aria-label")||el.textContent||"";
+  label=plainOf(String(label)).replace(/\s+/g," ").trim();
+  if(!label||label.length>60)return;
+  setTimeout(function(){
+    try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+    speak(label,state.lang);
+  },500);
+}
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-a]"); if(!el)return;
+  sayClick(el);
   var a=el.getAttribute("data-a"),v=el.getAttribute("data-v");
   /* examAction היה נתב פעולות המבחן. אין מבחן כאן. */
   if(a==="go"){state.screen="home";stopSpeak();render();window.scrollTo(0,0);return}
@@ -3063,7 +3079,7 @@ if(!INTERNAL_OK){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=k3-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=k4-pwa1").catch(function(){});
   });
 }
 </script>
