@@ -107,6 +107,20 @@ function run() {
     }
   }
 
+  /* ואחידות בתוך הסוג. נושא שמציע שתי דוגמאות כשאחיו מציעים
+     שלוש אינו שבור — הוא פשוט נותן ללומד פחות, ואיש לא יראה
+     את זה בעין: שני המסכים תקינים. נמצא כך ב-`essay/spo`. */
+  for (const grp of BANKS) {
+    for (const [k, name] of KINDS) {
+      const n = grp.topics.map(t => (t[k] || []).length);
+      const mx = Math.max.apply(null, n);
+      grp.topics.forEach((t, i) => {
+        if (n[i] < mx)
+          bad.push(`נושא ${t.id}: ${n[i]} ${name} מול ${mx} באחיו ב-${grp.type} — הלומד מקבל שם פחות`);
+      });
+    }
+  }
+
   if (bad.length) {
     bad.forEach(b => console.log('✗ ' + b));
     console.log(`\n${bad.length} ממצאים`);
