@@ -795,7 +795,7 @@ T.he={
   yes:"כן, מחקו", no:"לא",
   savedNote:"ההתקדמות נשמרת אוטומטית במכשיר הזה בלבד.",
   ofN:"מתוך", newWord:"פריט חדש", review:"חזרה",
-  century:"המאה", bce:"לפנה״ס", ce:"לספירה", timeline:"ציר זמן", concept:"מושג",
+  century:"המאה", centFmt:"המאה ה-{0}", bce:"לפנה״ס", ce:"לספירה", timeline:"ציר זמן", concept:"מושג",
   source:"מקור", eventW:"אירוע", causeW:"סיבה", effectW:"תוצאה", yearW:"שנה",
   sumT1:"סבב חזק.", sumT2:"סבב טוב.", sumT3:"סבב עם עבודה.", sumT4:"סבב קשה — וזה בסדר.",
   sumS1:"רוב מה שתרגלתם כאן יושב.", sumS2:"רוב הדברים במקום. עוד סבב אחד יחדד את מה שנשאר.",
@@ -856,7 +856,7 @@ T.ar={
   yes:"نعم، امحُ", no:"لا",
   savedNote:"يُحفظ التقدّم تلقائيًا على هذا الجهاز فقط.",
   ofN:"من", newWord:"عنصر جديد", review:"مراجعة",
-  century:"القرن", bce:"ق.م", ce:"م", timeline:"خط الزمن", concept:"مصطلح",
+  century:"القرن", centFmt:"القرن {0}", bce:"ق.م", ce:"م", timeline:"خط الزمن", concept:"مصطلح",
   source:"مصدر", eventW:"حدث", causeW:"سبب", effectW:"نتيجة", yearW:"سنة",
   sumT1:"جولة قوية.", sumT2:"جولة جيّدة.", sumT3:"جولة فيها عمل.", sumT4:"جولة صعبة — ولا بأس.",
   sumS1:"معظم ما تدرّبتم عليه هنا ثابت.", sumS2:"معظم الأمور في مكانها. جولة أخرى تصقل ما تبقّى.",
@@ -917,7 +917,7 @@ T.ru={
   yes:"Да, удалить", no:"Нет",
   savedNote:"Прогресс сохраняется автоматически только на этом устройстве.",
   ofN:"из", newWord:"новый элемент", review:"повторение",
-  century:"век", bce:"до н. э.", ce:"н. э.", timeline:"лента времени", concept:"понятие",
+  century:"век", centFmt:"{0}-й век", bce:"до н. э.", ce:"н. э.", timeline:"лента времени", concept:"понятие",
   source:"источник", eventW:"событие", causeW:"причина", effectW:"следствие", yearW:"год",
   sumT1:"Сильный круг.", sumT2:"Хороший круг.", sumT3:"Круг с работой.", sumT4:"Трудный круг — и это нормально.",
   sumS1:"Большая часть того, что вы здесь отрабатывали, усвоена.", sumS2:"Почти всё на месте. Ещё один круг отточит остальное.",
@@ -978,7 +978,7 @@ T.en={
   yes:"Yes, delete", no:"No",
   savedNote:"Progress is saved automatically on this device only.",
   ofN:"of", newWord:"new item", review:"review",
-  century:"century", bce:"BCE", ce:"CE", timeline:"timeline", concept:"concept",
+  century:"century", centFmt:"{0} century", bce:"BCE", ce:"CE", timeline:"timeline", concept:"concept",
   source:"source", eventW:"event", causeW:"cause", effectW:"consequence", yearW:"year",
   sumT1:"A strong round.", sumT2:"A good round.", sumT3:"A round with work in it.", sumT4:"A hard round — and that's fine.",
   sumS1:"Most of what you practised here has stuck.", sumS2:"Most of it is in place. One more round will sharpen the rest.",
@@ -1025,7 +1025,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m57 · 2026-09-08";
+var BUILD="m58 · 2026-09-09";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -7014,8 +7014,23 @@ function centuryOf(y){
   var a=Math.abs(y);
   return Math.floor((a-1)/100)+1;
 }
+/* כמו xf, ומאותה סיבה: סדר המילים במשפט משתנה בין השפות. */
+function tf(k){var s=t(k),a=arguments,i;
+  for(i=1;i<a.length;i++)s=s.split("{"+(i-1)+"}").join(String(a[i]));
+  return s}
+/* הסיומת הסודרת קיימת רק באנגלית, ולכן היא נגזרת ואינה נכתבת במילון:
+   "19th", אבל "21st" ו-"22nd". 11–13 הם היוצא מן הכלל. */
+function _ord(n){
+  var v=n%100; if(v>=11&&v<=13)return n+"th";
+  return n+(["th","st","nd","rd"][n%10]||"th");
+}
+/* המאה כמספר ולא בספרות רומיות. "המאה XIX" נראה נכון להיסטוריון
+   ונקרא רע לקהל של דיסלקציה ועולים חדשים, וזה הרמז שהם מקבלים
+   בשאלת "מתי". ROM נשאר — שכבת ההקראה עדיין צריכה אותו בשביל
+   ספרה רומית שכתובה בתוכן עצמו. */
 function centuryStr(y){
-  return t("century")+" "+_rom(centuryOf(y))+(y<0?" "+t("bce"):"");
+  var n=centuryOf(y);
+  return tf("centFmt",state.lang==="en"?_ord(n):n)+(y<0?" "+t("bce"):"");
 }
 var ROM=["","I","II","III","IV","V","VI","VII","VIII","IX","X",
          "XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI"];
@@ -9259,7 +9274,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m57-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m58-pwa1").catch(function(){});
   });
 }
 </script>
