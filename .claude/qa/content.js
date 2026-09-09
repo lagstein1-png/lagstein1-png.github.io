@@ -439,16 +439,33 @@ async function scan(page){
            שהתשובה `10` היא מספר שלם ש-`speakMath` אינו נוגע בו
            ונמצאה מיד. תשובה שלמה מול מסיחים שבריים נראתה כך
            כדליפה, ב-frac L2 של math-teen. */
-        const present=function(x){
-          const forms=[x];
-          const sx=spk(x); if(sx&&sx!==x) forms.push(sx);
-          for(const f of forms){
+        /* מסיח נבדק בכל צורה מוכרת שלו, ולא רק באחת.
+           `texts` נגזר מ-`o.h` — השטחה של ה-HTML שעל המסך — ואילו
+           `questionSay` מקריא את `o.t`. בשבר הם אינם אותה מחרוזת:
+           על המסך המונה והמכנה יושבים בשתי שורות ומשטיחים ל-"185",
+           ב-`o.t` זה "(18)/(5)", ובאוזן זה "18 חלקי 5". השוואה
+           לצורה אחת בלבד לא מצאה את המסיח באף אחת מהשלוש, בעוד
+           שתשובה שיצאה מספר שלם נמצאה מיד — וכך שאלה ששומעים בה
+           את ארבע האפשרויות נספרה כדליפה. frac L2 ב-math-teen.
+           הכיוון כאן שמרני בכוונה: העשרת הצורות מקלה על ההשתקה
+           ולא על ההאשמה, ובדיקת התשובה עצמה נשארת גולמית ומחמירה. */
+        const forms=function(o,x){
+          const f=[], push=function(v){ v=String(v==null?'':v).trim();
+            if(v&&f.indexOf(v)<0) f.push(v) };
+          push(x);
+          if(o&&o.h!==undefined) push(plain(o.h));
+          if(o&&o.t!==undefined) push(plain(o.t));
+          for(const v of f.slice()) push(spk(v));
+          return f;
+        };
+        const present=function(i){
+          for(const f of forms(opts[i],texts[i])){
             if(spoken.indexOf(f)>=0) return true;
             if(norm(f).length>=2&&nSpoken.indexOf(norm(f))>=0) return true;
           }
           return false;
         };
-        const others=texts.filter((x,i)=>i!==ri&&x&&present(x)).length;
+        const others=texts.filter((x,i)=>i!==ri&&x&&present(i)).length;
         if(a&&a.length>=2&&spoken.indexOf(a)>=0&&
            askT.indexOf(a)<0&&exprT.indexOf(a)<0&&others===0)
           add('answer-in-say','REVIEW',
