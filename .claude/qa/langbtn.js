@@ -35,9 +35,7 @@ const SCRIPT = {
   ru: { name: 'רוסית',  want: /Noto Sans(?!\s*Arabic)/i },
 };
 
-/* הדפים שיש בהם סרגל שפות גלוי במסך הראשון, בלי ניווט.
-   בוררי השפה שיושבים בתוך מסך ההגדרות של האפליקציות אינם כאן —
-   הם דורשים ניווט, והם רשומים כממצא פתוח ב-FINDINGS.md. */
+/* הדפים שיש בהם סרגל שפות גלוי במסך הראשון, בלי ניווט. */
 const PAGES = [
   { id: 'דף הבית', url: '/',         sel: '.lang button' },
   { id: 'pricing', url: '/pricing/', sel: '.lang button' },
@@ -47,6 +45,38 @@ const PAGES = [
 /* שער התנאים מוזרק על ידי legal/protect.js לכל שתים־עשרה, ולכן
    מספיק לבדוק אותו בכמה מהן — נפילה בו היא נפילה בכולן. */
 const GATE = ['/', '/math-app/', '/lomda/', '/reader/'];
+
+/* בוררי השפה שבתוך מסך ההגדרות. הם יושבים מאחורי ניווט, ולכן הם לא
+   נבדקו ב-9.9 ונרשמו כ-O-14 ב-FINDINGS.md. הניווט אליהם אינו אחיד —
+   שלוש צורות, וכולן קבועות בקוד ולא נחושות:
+
+     english · history · lomda · ulpan   [data-a="set"]
+     math-teen · math-uni · uni2 · uni3  [data-a="go"][data-v="settings"]
+     math-app                            אותו כפתור, אבל רק אחרי אונבורדינג
+
+   bagrut-806 אינה כאן: אין בה ממשק ערבי ורוסי, ואין בה בורר שפה.
+
+   וכאן המדידה אינה יכולה להסתמך על תכונת lang: ארבע אפליקציות החידון
+   אינן מסמנות אותה על הכפתור כלל (`data-a="lang" data-v="ar"` בלבד),
+   ולכן הכתב מזוהה מטווח התווים של הטקסט שעל הכפתור. זה גם מה שהמשתמש
+   רואה: הגליף, לא התכונה. */
+/* אונבורדינג משפחת המתמטיקה: כמה מסכי "הבא" ואז "התחלה". חמש לחיצות
+   מספיקות לארוך שבהן, ולחיצה על סלקטור שאינו קיים אינה עושה דבר. */
+const OB = ['[data-a="obnext"]', '[data-a="obnext"]', '[data-a="obnext"]',
+            '[data-a="obnext"]', '[data-a="start"]'];
+
+const SETTINGS = [
+  { id: 'english',   url: '/english/',   nav: '[data-a="set"]' },
+  { id: 'history',   url: '/history/',   nav: '[data-a="set"]' },
+  { id: 'lomda',     url: '/lomda/',     nav: '[data-a="set"]' },
+  { id: 'ulpan',     url: '/ulpan/',     nav: '[data-a="set"]' },
+  { id: 'math-teen', url: '/math-teen/', nav: '[data-a="go"][data-v="settings"]', ob: OB },
+  { id: 'math-uni',  url: '/math-uni/',  nav: '[data-a="go"][data-v="settings"]', ob: OB },
+  { id: 'math-uni2', url: '/math-uni2/', nav: '[data-a="go"][data-v="settings"]', ob: OB },
+  { id: 'math-uni3', url: '/math-uni3/', nav: '[data-a="go"][data-v="settings"]', ob: OB },
+  { id: 'math-app',  url: '/math-app/',  nav: '[data-a="go"][data-v="settings"]',
+    ob: ['[data-a="selpet"]', '[data-a="startpet"]'] },
+];
 
 const dismissPopup = () => {
   const b = document.querySelector('[data-launch-popup]');
@@ -59,6 +89,28 @@ const families = (sel) => {
   for (const el of document.querySelectorAll(sel)) {
     const lg = el.getAttribute('lang');
     if (lg) out.push([lg, getComputedStyle(el).fontFamily]);
+  }
+  return out;
+};
+
+/* אותה מדידה כמו families, אבל הכתב מזוהה מהטקסט ולא מתכונת lang,
+   והגופן נמדד על האלמנט שבאמת נושא את הגליף — ב-math-app התווית
+   יושבת בתוך <b class="fd">, ול-.fd יש font-family משלו שדורס ירושה. */
+const tap = (sel) => { const e = document.querySelector(sel); if (!e) return false; e.click(); return true; };
+
+const settingsFamilies = () => {
+  const AR = /[\u0600-\u06FF]/, RU = /[\u0400-\u04FF]/;
+  const out = [];
+  for (const btn of document.querySelectorAll('[data-a="lang"]')) {
+    let el = btn, txt = (btn.textContent || '').trim();
+    if (!AR.test(txt) && !RU.test(txt)) continue;
+    /* יורדים לצאצא העמוק ביותר שנושא את הגליף */
+    for (let i = 0; i < 6; i++) {
+      const kid = [...el.children].find(c => AR.test(c.textContent) || RU.test(c.textContent));
+      if (!kid) break;
+      el = kid;
+    }
+    out.push([AR.test(el.textContent) ? 'ar' : 'ru', getComputedStyle(el).fontFamily]);
   }
   return out;
 };
@@ -113,6 +165,25 @@ const families = (sel) => {
     const page = await open(url, { gate: true });
     const pairs = await page.evaluate(families, '.lg-lgs button');
     judge('שער ' + url, pairs);
+    await page.close();
+  }
+
+  for (const app of SETTINGS) {
+    const page = await open(app.url, { gate: false });
+    /* לוחצים מתוך evaluate ולא ב-page.click: הדף מצויר מחדש בכל פעולה,
+       וסרגל הניווט הדביק מכשיל את בדיקת ה-actionability של playwright. */
+    for (const sel of (app.ob || [])) {
+      await page.evaluate(tap, sel);
+      await page.waitForTimeout(400);
+    }
+    const ok = await page.evaluate(tap, app.nav);
+    await page.waitForTimeout(600);
+    if (!ok) {
+      console.log(`\u2717 ${('הגדרות ' + app.id).padEnd(22)} לא הגעתי למסך ההגדרות — ${app.nav}`);
+      findings++;
+    } else {
+      judge('הגדרות ' + app.id, await page.evaluate(settingsFamilies));
+    }
     await page.close();
   }
 
