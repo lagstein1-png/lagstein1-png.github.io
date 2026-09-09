@@ -19,6 +19,14 @@
 
    כל רמה מחזיקה פריטים מאותו סוג, מפני שמהם המנוע בונה את המסיחים:
    רמה של חלקי התורה, רמה של מושגים, ורמה של דמויות.
+
+   **שמונה פריטים ברמה, ולא ארבעה.** ברמה של ארבעה פריטים המנוע
+   בונה תמיד את אותה שאלה: שלושת האחרים הם המסיחים היחידים
+   האפשריים, ולכן יצאו ארבע שאלות בלבד ב-150 הגרלות (content.js,
+   `low-variety`). מי שעבר על הרמה פעמיים כבר זכר את התשובה במקום
+   לדעת אותה. עם שמונה פריטים כל פריט מקבל שלושה מסיחים מתוך שבעה,
+   ונמדדו 109—120 שאלות שונות ב-150 הגרלות. **רמה חדשה נפתחת
+   בשמונה פריטים.**
    ===================================================================== */
 BANK({
   track:{
@@ -60,7 +68,27 @@ BANK({
     {he:"עשר אמירות שנאמרו לפי הכתוב בהר סיני, ונכתבו על שני לוחות אבן. חלקן בין אדם לאלוהים, וחלקן בין אדם לחברו.",
      ar:"عشر مقولات قيلت حسب النصّ عند جبل سيناء، وكُتبت على لوحين من حجر. بعضها بين الإنسان وربّه، وبعضها بين الإنسان وأخيه.",
      ru:"Десять речений, произнесённых, по тексту, у горы Синай и записанных на двух каменных скрижалях. Часть их — между человеком и Богом, часть — между человеком и ближним.",
-     en:"Ten sayings spoken, according to the text, at Mount Sinai and written on two stone tablets. Some are between a person and God, and some between a person and his fellow."})
+     en:"Ten sayings spoken, according to the text, at Mount Sinai and written on two stone tablets. Some are between a person and God, and some between a person and his fellow."}),
+  C({he:"ויקרא",ar:"سفر اللاويّين",ru:"Книга Левит",en:"Leviticus"},
+    {he:"הספר השלישי בתורה. רובו דיני הכוהנים והקורבנות, ובתוכו גם המשפט ״ואהבת לרעך כמוך״.",
+     ar:"السفر الثالث في التوراة. معظمه أحكام الكهنة والقرابين، وفيه أيضًا جملة «وأحبب لقريبك ما تحبّه لنفسك».",
+     ru:"Третья книга Торы. Бо́льшая её часть — законы священников и жертв, и в ней же стоит фраза «люби ближнего, как самого себя».",
+     en:"The third book of the Torah. Most of it is the laws of the priests and the offerings, and in it stands the line “love your neighbour as yourself”."}),
+  C({he:"במדבר",ar:"سفر العدد",ru:"Книга Чисел",en:"Numbers"},
+    {he:"הספר הרביעי בתורה. הוא מספר על ארבעים שנות המסע מהר סיני ועד גבול הארץ, על מפקד העם ועל המריבות בדרך.",
+     ar:"السفر الرابع في التوراة. يروي أربعين سنة من السير في الصحراء، وإحصاء الشعب، والخلافات في الطريق.",
+     ru:"Четвёртая книга Торы. Она рассказывает о сорока годах пути по пустыне, о переписи народа и о ссорах в дороге.",
+     en:"The fourth book of the Torah. It tells of the forty years of travel in the desert, the counting of the people, and the quarrels along the way."}),
+  C({he:"דברים",ar:"سفر التثنية",ru:"Второзаконие",en:"Deuteronomy"},
+    {he:"הספר החמישי והאחרון בתורה. רובו נאום ארוך של משה לפני הכניסה לארץ, והוא חוזר בו על החוקים.",
+     ar:"السفر الخامس والأخير في التوراة. معظمه خطاب طويل لموسى قبل دخول الأرض، يعيد فيه ذكر الشرائع.",
+     ru:"Пятая и последняя книга Торы. Бо́льшая её часть — длинная речь Моисея перед входом в землю, в которой он повторяет законы.",
+     en:"The fifth and last book of the Torah. Most of it is a long speech by Moses before entering the land, in which he repeats the laws."}),
+  C({he:"תנ״ך",ar:"التناخ",ru:"Танах",en:"The Hebrew Bible (Tanakh)"},
+    {he:"כל הספר כולו, ושלושה חלקים בו: תורה, נביאים וכתובים. השם נוצר מאותיות הפתיחה של שלושת החלקים.",
+     ar:"الكتاب كلّه، وفيه ثلاثة أقسام: التوراة والأنبياء والمكتوبات. والاسم مكوّن من أوائل حروف الأقسام الثلاثة.",
+     ru:"Вся книга целиком, и в ней три части: Тора, Пророки и Писания. Название сложено из первых букв этих трёх частей.",
+     en:"The whole book, and it has three parts: Torah, Prophets and Writings. Its Hebrew name is built from the first letters of those three parts."}),
  ],
 
  [ /* רמה 2 — מושגי היסוד */
@@ -83,7 +111,27 @@ BANK({
     {he:"החג שמציין את היציאה ממצרים. התורה מצווה לספר את הסיפור לילדים, ולאכול מצה במקום לחם.",
      ar:"العيد الذي يحيي ذكرى الخروج من مصر. تأمر التوراة بأن تُروى القصّة للأولاد، وبأكل الفطير بدل الخبز.",
      ru:"Праздник, отмечающий исход из Египта. Тора велит рассказывать эту историю детям и есть мацу вместо хлеба.",
-     en:"The festival that marks the exodus from Egypt. The Torah commands telling the story to the children, and eating matzah instead of bread."})
+     en:"The festival that marks the exodus from Egypt. The Torah commands telling the story to the children, and eating matzah instead of bread."}),
+  C({he:"סוכות",ar:"عيد المظالّ (سوكوت)",ru:"Суккот",en:"Sukkot — the festival of booths"},
+    {he:"חג שבו יושבים שבעה ימים במבנה ארעי מכוסה בענפים, לזכר החיים במדבר אחרי היציאה ממצרים.",
+     ar:"عيد يُقام فيه سبعة أيام في بناء مؤقّت مسقوف بالأغصان، ذكرى العيش في الصحراء بعد الخروج من مصر.",
+     ru:"Праздник, в который семь дней живут во временном шалаше, покрытом ветвями, в память о жизни в пустыне после исхода из Египта.",
+     en:"A festival on which people spend seven days in a temporary hut roofed with branches, in memory of life in the desert after leaving Egypt."}),
+  C({he:"שבועות",ar:"عيد الأسابيع (شفوعوت)",ru:"Шавуот",en:"Shavuot"},
+    {he:"חג שחל חמישים יום אחרי פסח. בתורה הוא חג הקציר, ומביאים בו את ראשית התבואה.",
+     ar:"عيد يقع بعد خمسين يومًا من الفصح. في التوراة هو عيد الحصاد، ويُقدَّم فيه باكورة المحصول.",
+     ru:"Праздник, который наступает через пятьдесят дней после Песаха. В Торе это праздник жатвы, и в него приносят первые плоды урожая.",
+     en:"A festival that falls fifty days after Passover. In the Torah it is the harvest festival, and the first of the crop is brought on it."}),
+  C({he:"שמיטה",ar:"السنة السابعة (شميطاه)",ru:"Швиит — седьмой год",en:"The sabbatical year"},
+    {he:"פעם בשבע שנים התורה מצווה לתת לאדמה שנת מנוחה: לא זורעים, ומה שגדל מעצמו פתוח לכול.",
+     ar:"مرّة كلّ سبع سنين تأمر التوراة بإعطاء الأرض سنة راحة: لا يُزرع فيها، وما ينبت من تلقاء نفسه مباح للجميع.",
+     ru:"Раз в семь лет Тора велит дать земле год покоя: не сеют, а то, что выросло само, открыто для всех.",
+     en:"Once in seven years the Torah commands giving the land a year of rest: no sowing, and whatever grows by itself is open to everyone."}),
+  C({he:"ערי מקלט",ar:"مدن اللجوء",ru:"Города-убежища",en:"The cities of refuge"},
+    {he:"שש ערים שאליהן יכול לברוח מי שהרג בלי כוונה, כדי שלא ינקמו בו לפני שיישפט.",
+     ar:"ستّ مدن يهرب إليها من قتل بغير قصد، لئلّا يُنتقم منه قبل أن يُحاكَم.",
+     ru:"Шесть городов, куда мог убежать тот, кто убил без умысла, чтобы ему не отомстили до суда.",
+     en:"Six towns that a person who killed without intent could flee to, so that no one would take revenge before he was tried."}),
  ],
 
  [ /* רמה 3 — הדמויות, וקטע על המדבר */
@@ -213,7 +261,27 @@ BANK({
     {he:"השלטון שבא אחרי השופטים. לפי הכתוב ביקש העם מלך קבוע, והשלטון עבר מאב לבן במקום לקום מחדש בכל צרה.",
      ar:"الحكم الذي جاء بعد القضاة. حسب النصّ طلب الشعب ملكًا دائمًا، فانتقل الحكم من الأب إلى الابن بدل أن يقوم من جديد عند كلّ شدّة.",
      ru:"Правление, пришедшее после судей. По тексту народ попросил постоянного царя, и власть стала переходить от отца к сыну, а не возникать заново при каждой беде.",
-     en:"The rule that came after the judges. According to the text the people asked for a permanent king, and rule passed from father to son instead of arising anew at every crisis."})
+     en:"The rule that came after the judges. According to the text the people asked for a permanent king, and rule passed from father to son instead of arising anew at every crisis."}),
+  C({he:"ספר יהושע",ar:"سفر يشوع",ru:"Книга Иисуса Навина",en:"The book of Joshua"},
+    {he:"הספר הראשון בחלק הזה. הוא מספר על הכניסה לארץ אחרי מות משה, ועל חלוקתה בין השבטים.",
+     ar:"السفر الأول في هذا القسم. يروي دخول الأرض بعد موت موسى، وتقسيمها بين الأسباط.",
+     ru:"Первая книга этой части. Она рассказывает о входе в землю после смерти Моисея и о её разделе между коленами.",
+     en:"The first book of this part. It tells of entering the land after the death of Moses, and of dividing it among the tribes."}),
+  C({he:"ספר שופטים",ar:"سفر القضاة",ru:"Книга Судей",en:"The book of Judges"},
+    {he:"הספר שבא אחריו. הוא אוסף סיפורים על מנהיגים שקמו לשעת צרה, ובהם דבורה, גדעון ושמשון.",
+     ar:"السفر الذي يليه. يجمع قصصًا عن قادة قاموا وقت الشدّة، منهم دبورة وجدعون وشمشون.",
+     ru:"Книга, идущая следом. В ней собраны рассказы о вождях, поднимавшихся в час беды, среди них Двора, Гидон и Шимшон.",
+     en:"The book that follows it. It gathers stories of leaders who rose in a time of trouble, among them Deborah, Gideon and Samson."}),
+  C({he:"ספר שמואל",ar:"سفر صموئيل",ru:"Книга Самуила",en:"The book of Samuel"},
+    {he:"הספר שבו קם השלטון המלוכני. נביא מושח בו את המלך הראשון ואחריו את השני, והוא מלווה את שניהם.",
+     ar:"السفر الذي يقوم فيه حكم الملوك. يمسح فيه نبيّ الملك الأول ثم الثاني، ويرافقهما السفر.",
+     ru:"Книга, в которой возникает царское правление. В ней пророк помазывает первого царя, а затем второго, и она сопровождает обоих.",
+     en:"The book in which royal rule begins. In it a prophet anoints the first king and then the second, and it follows them both."}),
+  C({he:"ספר מלכים",ar:"سفر الملوك",ru:"Книга Царей",en:"The book of Kings"},
+    {he:"הספר שמספר על בניית המקדש, על פילוג העם לשתי ממלכות, ועד החורבן והגלות.",
+     ar:"السفر الذي يروي بناء الهيكل، وانقسام الشعب إلى مملكتين، حتى الخراب والسبي.",
+     ru:"Книга, которая рассказывает о постройке Храма, о расколе народа на два царства и доходит до разрушения и изгнания.",
+     en:"The book that tells of the building of the Temple, of the people splitting into two kingdoms, and on to the destruction and the exile."}),
  ],
 
  [ /* רמה 2 — המלכים והמקדש */
@@ -236,7 +304,27 @@ BANK({
     {he:"בית המקדש שבנה שלמה בירושלים. הוא היה מרכז העבודה והעלייה לרגל, ובבל החריבה אותו בסוף ימי הממלכה.",
      ar:"الهيكل الذي بناه سليمان في القدس. كان مركز العبادة والحجّ، وخرّبته بابل في أواخر أيّام المملكة.",
      ru:"Храм, который построил Соломон в Иерусалиме. Он был центром служения и паломничества, и Вавилон разрушил его в конце дней царства.",
-     en:"The temple Solomon built in Jerusalem. It was the centre of worship and pilgrimage, and Babylon destroyed it at the end of the kingdom's days."})
+     en:"The temple Solomon built in Jerusalem. It was the centre of worship and pilgrimage, and Babylon destroyed it at the end of the kingdom's days."}),
+  C({he:"ירושלים",ar:"القدس (أورشليم)",ru:"Иерусалим",en:"Jerusalem"},
+    {he:"העיר שדוד הפך לעיר השלטון, ובימי בנו נבנה בה המקדש. משם נוהלו הממלכה והעבודה.",
+     ar:"المدينة التي جعلها داود مدينة الحكم، وفي أيّام ابنه بُني فيها الهيكل. ومنها أُديرت المملكة والعبادة.",
+     ru:"Город, который Давид сделал городом власти, а в дни его сына в нём построили Храм. Оттуда управляли и царством, и служением.",
+     en:"The city David made the seat of rule, and in his son's days the Temple was built there. From it both the kingdom and the worship were run."}),
+  C({he:"הממלכה המפולגת",ar:"المملكة المنقسمة",ru:"Разделённое царство",en:"The divided kingdom"},
+    {he:"אחרי מות שלמה נחלק העם לשניים: ישראל בצפון ויהודה בדרום, ולכל אחת מהן מלך משלה.",
+     ar:"بعد موت سليمان انقسم الشعب إلى اثنتين: إسرائيل في الشمال ويهوذا في الجنوب، ولكلّ واحدة ملك خاصّ بها.",
+     ru:"После смерти Соломона народ разделился надвое: Израиль на севере и Иудея на юге, и у каждой был свой царь.",
+     en:"After Solomon's death the people split in two: Israel in the north and Judah in the south, each with a king of its own."}),
+  C({he:"אליהו",ar:"إيليّا",ru:"Илия",en:"Elijah"},
+    {he:"נביא בימי מלכי הצפון. הוא מתעמת עם המלך ועם עובדי הבעל, ולפי הכתוב הוא עולה בסערה השמימה.",
+     ar:"نبيّ في أيّام ملوك الشمال. يواجه الملك وعبَدة البعل، وحسب النصّ يصعد في العاصفة إلى السماء.",
+     ru:"Пророк во дни северных царей. Он противостоит царю и служителям Баала, и, по тексту, возносится в вихре на небо.",
+     en:"A prophet in the days of the northern kings. He confronts the king and the servants of Baal, and by the text he goes up to heaven in a storm."}),
+  C({he:"ארון הברית",ar:"تابوت العهد",ru:"Ковчег завета",en:"The Ark of the Covenant"},
+    {he:"תיבת עץ מצופה זהב שבתוכה הונחו הלוחות. היא נישאה במסע, ובסוף הוצבה בקודש הקודשים.",
+     ar:"صندوق من خشب مغشّى بالذهب وُضع فيه اللوحان. حُمل في المسير، ووُضع في النهاية في قدس الأقداس.",
+     ru:"Деревянный ящик, покрытый золотом, в который положили скрижали. Его несли в пути, а в конце поставили в Святая святых.",
+     en:"A wooden chest overlaid with gold, in which the tablets were placed. It was carried on the journey, and at the end set in the Holy of Holies."}),
  ],
 
  [ /* רמה 3 — נביאים, ספרי הכתובים, וקטע על החורבן והשיבה */
