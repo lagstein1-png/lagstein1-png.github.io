@@ -1,7 +1,12 @@
 /* שרת סטטי לבדיקות מקומיות. משרת את שורש הריפו על 127.0.0.1:8099.
-   node .claude/qa/serve.js   (מהשורש) */
+   node .claude/qa/serve.js   (מהשורש)
+
+   QA_PORT מחליף את הפורט, ו-cwd קובע מה מוגש. שניהם קיימים בשביל
+   deployed.js, שמגיש תמונת מצב של קומיט בתיקייה אחרת ובמקביל לשרת
+   הרגיל — ולכן הוא מריץ את הקובץ הזה מהריפו, עם cwd אחר. */
 const http=require('http'),fs=require('fs'),path=require('path'),url=require('url');
 const root=process.cwd();
+const PORT=Number(process.env.QA_PORT)||8099;
 const mime={'.html':'text/html;charset=utf-8','.js':'text/javascript;charset=utf-8',
   '.json':'application/json;charset=utf-8','.png':'image/png','.svg':'image/svg+xml',
   '.css':'text/css','.mp3':'audio/mpeg','.webp':'image/webp','.ico':'image/x-icon',
@@ -26,4 +31,4 @@ http.createServer((req,res)=>{
     res.writeHead(200,{'Content-Type':mime[path.extname(f)]||'application/octet-stream'});
     res.end(d);
   });
-}).listen(8099,'127.0.0.1',()=>console.log('serving '+root+' on http://127.0.0.1:8099'));
+}).listen(PORT,'127.0.0.1',()=>console.log('serving '+root+' on http://127.0.0.1:'+PORT));

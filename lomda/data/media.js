@@ -51,10 +51,10 @@ BANK({
      en:"The long part after the lead. It adds details, background and responses, from the most important to the least."}),
 
   C({he:"מקור",ar:"المصدر",ru:"Источник",en:"Source"},
-    {he:"מי מסר את המידע: אדם, מסמך או גוף רשמי. ידיעה בלי מקור היא אמירה שאי אפשר לבדוק.",
+    {he:"מי מסר את המידע: אדם, מסמך או גוף רשמי. ידיעה שלא ידוע מי מסר אותה היא אמירה שאי אפשר לבדוק.",
      ar:"مَن قدّم المعلومة: شخص أو مستند أو جهة رسمية. خبر بلا مصدر هو قول لا يمكن التحقّق منه.",
-     ru:"Тот, кто дал сведения: человек, документ или официальный орган. Новость без источника — это утверждение, которое нельзя проверить.",
-     en:"Whoever gave the information: a person, a document or an official body. A report with no source is a claim you cannot check."}),
+     ru:"Тот, кто дал сведения: человек, документ или официальный орган. Новость без него — это утверждение, которое нельзя проверить.",
+     en:"Whoever gave the information: a person, a document or an official body. A report without one is a claim you cannot check."}),
 
   E(1605,
     {he:"העיתון המודפס הראשון",ar:"أول صحيفة مطبوعة",

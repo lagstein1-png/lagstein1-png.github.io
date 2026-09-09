@@ -90,9 +90,26 @@ async function scan(page){
     let s=''; for(const c of div.childNodes) s+=walk(c); return s.trim()};
 
   /* מספר מתוך מחרוזת, אם המחרוזת כולה מספר. משמש רק כדי
-     לזהות מסיח ששווה לתשובה בכתיב אחר — 0.5 מול 1/2 מול 50%. */
+     לזהות מסיח ששווה לתשובה בכתיב אחר — 0.5 מול 1/2 מול 50%.
+
+     **ספרה, רווח, ספרה — אינו מספר אלא רשת.** הסרת כל הרווחים
+     שיטחה מטריצה לספרה אחת ארוכה, ולכן שתי מטריצות שונות לגמרי
+     קיבלו את אותו ״ערך״ ודווחו כמסיח ששקול לתשובה:
+
+         [[1,11],[1,2]]  →  "1 11 1 2"  →  "111112"
+         [[1,1],[11,2]]  →  "1 1 11 2"  →  "111112"
+
+     נמדד 9.9.2026 ב-math-uni: 14 מתוך 80,000 הגרלות של `matops`
+     (רמות 1 ו-3), וב**כולן** `key()` המבני של שתי האפשרויות היה
+     שונה — כלומר הן נראות שונה על המסך והתלמיד אינו מבולבל. זו
+     בדיוק הכשל שתועד ב-README על `dupe` של entropy: השטחה
+     ל-`textContent` מוחקת את גבול האלמנט.
+
+     הסרת הרווחים נשארת לכל השאר — "− 5" ו-"1 / 2" עדיין מספר. */
   function num(t){
-    let s=String(t).trim().replace(/[−–—]/g,'-').replace(/\s/g,'');
+    let s=String(t).trim().replace(/[−–—]/g,'-');
+    if(/\d\s+\d/.test(s)) return null;
+    s=s.replace(/\s/g,'');
     if(!s) return null;
     let pct=false; if(/%$/.test(s)){pct=true;s=s.slice(0,-1)}
     const m=s.match(/^(-?\d+(?:[.,]\d+)?)\/(-?\d+(?:[.,]\d+)?)$/);
@@ -107,7 +124,18 @@ async function scan(page){
 
   const HEB=/[֐-׿]/;
   const BROKEN=/\bNaN\b|\bInfinity\b|\bundefined\b|\bnull\b|\[object Object\]/;
-  const PLACEHOLDER=/\{(?:a|b|c|n|ans|0|1|2|3)\}/;
+  /* מציין מקום שלא הוחלף. `{a}` `{ans}` וכו׳ חד־משמעיים, אבל
+     `{0}`..`{3}` נראים בדיוק כמו **סימון קבוצה** — `{3} ∈ A` הוא
+     הקבוצה שאיברה 3, ו-SAY_MAP אף מכיל כלל ייעודי לסוגריים
+     מסולסלים. זה הפיל את math-uni ב-FAIL על שני מופעים תקינים
+     ב-sets L1, ו-FAIL חוסם `approved` בסולם השלבים.
+     לכן: השמיים תמיד; המספריים רק כשאין בטקסט אופרטור קבוצות. */
+  const SETOP=/[∈∉⊆⊂∪∩∅]/;
+  const PH_NAME=/\{(?:a|b|c|n|ans)\}/;
+  const PH_NUM=/\{[0-3]\}/;
+  const PLACEHOLDER={test:function(t){
+    return PH_NAME.test(t) || (PH_NUM.test(t) && !SETOP.test(t));
+  }};
   const MOJIBAKE=/[�]|Ã[ -¿]|Ð[ -¿]/;
   const ENTITY=/&(?:amp|lt|gt|quot|nbsp|#\d+);/;
   /* סימנים ש-SAY_MAP ו-PROSE_MAP קיימים כדי להמיר. אם אחד מהם
@@ -139,8 +167,17 @@ async function scan(page){
     if(kind!=='ask'&&kind!=='hint') return;
     if(/[\p{L}]\s+[,.;!]/u.test(t))
       add('space-before-punct','REVIEW',kind+': '+t,where);
+    /* מילה כפולה — ויוצא מן הכלל אחד שנמדד ב-9.9.2026.
+       ״גוזרים איבר איבר״ ו״מאנטגרלים איבר איבר״ אינם שגיאת הקלדה
+       אלא הניסוח המתמטי התקני בעברית (term by term), והם הופיעו
+       150 פעם ב-math-uni. התראת שווא בהיקף כזה שולחת סשן לתקן
+       עברית נכונה — אותו כשל בדיוק שההערה על `×` ו-`÷` מתארת.
+       הרשימה מונה צירופים, לא מילים, כדי שכפילות אמיתית של אותה
+       מילה בהקשר אחר עדיין תיתפס. */
+    const DBL_OK=['איבר איבר','פעם פעם','לאט לאט','מעט מעט','יום יום','שנה שנה'];
     const dbl=t.match(/(^|\s)(\p{L}{2,})\s+\2(\s|$)/u);
-    if(dbl) add('doubled-word','REVIEW',kind+': …'+dbl[0].trim()+'…',where);
+    if(dbl&&DBL_OK.indexOf(dbl[0].trim())<0)
+      add('doubled-word','REVIEW',kind+': …'+dbl[0].trim()+'…',where);
   }
 
   /* ---------- 6. תרגום: מה שאפשר לספור בלי לנחש ---------- */
@@ -206,7 +243,7 @@ async function scan(page){
   /* שדות הסכימה נמדדים בשיעור ולא בספירה. "אין רמז" בכל שאלה
      היא עובדה אחת על האפליקציה — כמה שדות היא בכלל נושאת —
      ולא אלף באגים. הממצא נכתב פעם אחת בסוף, עם האחוז. */
-  const cov={q:0,noHint:0,noSteps:0,hasSteps:0,wrong:0,noWhy:0};
+  const cov={q:0,hasHint:0,noHint:0,noSteps:0,hasSteps:0,wrong:0,hasWhy:0,noWhy:0};
 
   for(const t of TOPICS) for(const lv of LVLS){
     const where=t.id+' L'+lv;
@@ -298,11 +335,25 @@ async function scan(page){
 
       /* 4. שדות שהסכימה מחייבת — נצברים, ונכתבים בסוף באחוזים */
       cov.q++;
-      if(!hintT) cov.noHint++;
+      /* **שדה שהסכימה אינה מגדירה אינו שדה חסר.** שלוש סכימות
+         תוכן כאן, ולא אחת: ב-math-app המסיחים הם מספרים ואין
+         להם `why`, וב-english וב-ulpan אין `hint` כלל. מדידה
+         של השדה עצמו החזירה "100% מהשאלות בלי רמז" על אפליקציה
+         שיש בה כפתור רמז שמגיש שלושה — התראת שווא שאין שום
+         עריכת תוכן שסוגרת אותה.
+         לכן נספר רק מה שהבנאי **מגדיר**: מפתח קיים וריק הוא
+         חסר אמיתי, מפתח שאינו קיים הוא סכימה אחרת. `hasSteps`
+         כבר עבד כך, ושתי השורות האלה מיישרות אליו.
+         והבחנה זו גם שומרת על רגישות לרגרסיה: `hintFor` שיחזיר
+         מחרוזת ריקה משאיר מפתח מוגדר, וייספר. */
+      if(q.hint!==undefined){ cov.hasHint++; if(!hintT) cov.noHint++ }
       if(Array.isArray(q.steps)){ cov.hasSteps++; if(!q.steps.length) cov.noSteps++ }
       for(let i=0;i<opts.length;i++) if(!opts[i].ok){
         cov.wrong++;
-        if(!String(opts[i].why||'').trim()) cov.noWhy++;
+        if(opts[i].why!==undefined){
+          cov.hasWhy++;
+          if(!String(opts[i].why).trim()) cov.noWhy++;
+        }
       }
 
       /* 5. ניסוח */
@@ -311,8 +362,31 @@ async function scan(page){
       textChecks('hint',hintT,where);
       for(const tx of texts) textChecks('option',tx,where);
 
-      /* 7. הקראה */
-      const say=String(q.say||'');
+      /* 7. הקראה
+         **מה שנבדק הוא מה שנאמר, ולא השדה הגולמי.** משפחת
+         האוניברסיטה אופה את ההמרה לתוך `say` בזמן הבנייה; `math-app`
+         נבנתה אחרת וממירה בזמן ההשמעה, ב-`toSpoken` שנקראת מ-`hlPrep`.
+         בלי השורה הזאת הבודק קרא את `say` הגולמי של math-app ודיווח
+         900 מופעים של `×` ו-900 של `÷` — 100% מתאי הכפל והחילוק —
+         בעוד שהילד שומע בפועל "כמה זה אַרְבַּע כפול חָמֵשׁ". נמדד
+         בכרומיום ב-9.9.2026. התראת שווא בהיקף כזה גרועה מאין בדיקה:
+         היא שולחת סשן לתקן מה שאינו שבור. */
+      /* 9.9.2026 — שכבת ההקראה נקראת `toSpoken` רק ב-math-app.
+         ארבע אפליקציות הנוסחאות (math-teen, math-uni, math-uni2,
+         math-uni3) קוראות לה `speakMath`, ולכן התנאי הישן נפל
+         תמיד ל-`raw` ומדד את השדה הגולמי במקום את מה שנאמר.
+         כך נולדו אלפי מופעים של `symbol-in-say` על סימנים
+         ש-SAY_MAP דווקא כן ממיר — אותה התראת שווא בדיוק שההערה
+         למעלה מתארת על `×` ו-`÷`. */
+      const spk=function(raw){
+        try{
+          if(typeof toSpoken==='function') return toSpoken(raw,'he');
+          if(typeof speakMath==='function') return speakMath(raw);
+          return raw;
+        }
+        catch(e){ return raw }
+      };
+      const say=spk(String(q.say||''));
       if(askT&&!say.trim()) add('no-say','REVIEW','אין say — אין מה להקריא',where);
       if(/<[a-zA-Z\/]/.test(say)) add('html-in-say','REVIEW','תגיות HTML ב-say: '+say.slice(0,80),where);
       if(LATEX.test(say)) add('latex-in-say','FAIL','LaTeX ב-say: '+say.slice(0,80),where);
@@ -356,10 +430,56 @@ async function scan(page){
            הניקוי משמש **רק** לספירת המסיחים. בדיקת התשובה עצמה
            נשארת מילולית ומחמירה, כדי שהרפיית ההשוואה לא תבלע
            דליפה אמיתית. */
+        /* 9.9.2026 — **התשובה והמסיחים נמדדים באותה סרגל.**
+           סף ה-`length>=2` נועד למנוע התאמה מקרית של תו בודד,
+           אבל הוא חל על המסיחים בלבד: התשובה נבדקת גולמית
+           (`spoken.indexOf(a)`) ודי לה בשני תווים. באפליקציית
+           מתמטיקה כל האפשרויות הן מספרים קצרים, ולכן תשובה
+           דו־ספרתית מול שלושה מסיחים חד־ספרתיים הפילה את כל
+           השלושה מהספירה, `others` יצא 0, ומנייה שאומרת את
+           **ארבע** האפשרויות נראתה א־סימטרית.
+           נמדד ב-math-teen על 10,800 שאלות בכרומיום: 8 מופעים,
+           בכולם כל המסיחים חד־ספרתיים ובכולם כל המסיחים נאמרים
+           בפועל — 100% התראת שווא.
+           לכן מסיח נחשב "נאמר" גם בהתאמה גולמית, בדיוק כמו
+           התשובה. הדליפה האמיתית נשארת אדומה: `say` שאומר את
+           התשובה בלבד אינו מכיל אף מסיח בשום צורה. */
         const norm=x=>String(x).toLowerCase().replace(/[^0-9a-z֐-׿؀-ۿ]/g,'');
         const nSpoken=norm(spoken);
-        const others=texts.filter((x,i)=>
-          i!==ri&&x&&norm(x).length>=2&&nSpoken.indexOf(norm(x))>=0).length;
+        /* והמסיח נבדק גם **בצורתו המדוברת**, כי זו הצורה שבה
+           הוא נאמר. `questionSay` מריץ `speakMath` על כל אפשרות,
+           ולכן המסיח שכתוב על המסך `(18)/(5)` נשמע "18 חלקי 5" —
+           ולא נמצא לא בהשוואה גולמית ולא בהשוואה מנוקה, בעוד
+           שהתשובה `10` היא מספר שלם ש-`speakMath` אינו נוגע בו
+           ונמצאה מיד. תשובה שלמה מול מסיחים שבריים נראתה כך
+           כדליפה, ב-frac L2 של math-teen. */
+        /* מסיח נבדק בכל צורה מוכרת שלו, ולא רק באחת.
+           `texts` נגזר מ-`o.h` — השטחה של ה-HTML שעל המסך — ואילו
+           `questionSay` מקריא את `o.t`. בשבר הם אינם אותה מחרוזת:
+           על המסך המונה והמכנה יושבים בשתי שורות ומשטיחים ל-"185",
+           ב-`o.t` זה "(18)/(5)", ובאוזן זה "18 חלקי 5". השוואה
+           לצורה אחת בלבד לא מצאה את המסיח באף אחת מהשלוש, בעוד
+           שתשובה שיצאה מספר שלם נמצאה מיד — וכך שאלה ששומעים בה
+           את ארבע האפשרויות נספרה כדליפה. frac L2 ב-math-teen.
+           הכיוון כאן שמרני בכוונה: העשרת הצורות מקלה על ההשתקה
+           ולא על ההאשמה, ובדיקת התשובה עצמה נשארת גולמית ומחמירה. */
+        const forms=function(o,x){
+          const f=[], push=function(v){ v=String(v==null?'':v).trim();
+            if(v&&f.indexOf(v)<0) f.push(v) };
+          push(x);
+          if(o&&o.h!==undefined) push(plain(o.h));
+          if(o&&o.t!==undefined) push(plain(o.t));
+          for(const v of f.slice()) push(spk(v));
+          return f;
+        };
+        const present=function(i){
+          for(const f of forms(opts[i],texts[i])){
+            if(spoken.indexOf(f)>=0) return true;
+            if(norm(f).length>=2&&nSpoken.indexOf(norm(f))>=0) return true;
+          }
+          return false;
+        };
+        const others=texts.filter((x,i)=>i!==ri&&x&&present(i)).length;
         if(a&&a.length>=2&&spoken.indexOf(a)>=0&&
            askT.indexOf(a)<0&&exprT.indexOf(a)<0&&others===0)
           add('answer-in-say','REVIEW',
@@ -372,10 +492,26 @@ async function scan(page){
         add('long-option','REVIEW',tx.length+' תווים באפשרות',where);
       if(ri>=0){
         posN[ri]=(posN[ri]||0)+1;
+        /* 9.9.2026 — **נמדד סיכוי הניחוש, ולא "מי בקצה".**
+           הספירה הישנה מנתה כל שאלה שבה התשובה נמצאת באורך
+           הקיצוני, גם כשאפשרות נוספת חולקת איתו את אותו אורך.
+           אבל הממצא טוען שאפשר לנחש לפי אורך בלי לדעת מתמטיקה,
+           והטענה הזאת נכונה רק כשהקצה **יחיד**: בתיקו של שניים
+           המנחש קולע בחצי מהפעמים, ובתיקו של ארבעה — ברבע,
+           שהוא בדיוק הניחוש העיוור.
+           נמדד ב-math-teen על 150 הגרלות לכל תא בכרומיום:
+           ב-`ratio L1` המדד הישן אמר 98%, והקצה היה יחיד ב-0%
+           מהשאלות — המנחש קולע ב-48%. ב-`pyth L1` ו-`pyth L3`
+           98–100% מול קצה יחיד ב-0%. שלושה תאים מתוך עשרים
+           נשארו מעל הסף, וכל השאר היו רעש.
+           לכן כל שאלה תורמת `1/מספר האפשרויות שחולקות את הקצה`,
+           והמנה היא שיעור ההצלחה של מי שבוחר לפי אורך בלבד.
+           ארבע אפשרויות באותו אורך תורמות 0.25 — הבסיס. */
         const lens=texts.map(function(x){return x.length});
         const mx=Math.max.apply(null,lens), mn=Math.min.apply(null,lens);
-        if(mx!==mn&&texts[ri].length===mx) longest[0]++;
-        if(mx!==mn&&texts[ri].length===mn) longest[1]++;
+        const tie=function(v){return lens.filter(function(l){return l===v}).length};
+        if(texts[ri].length===mx) longest[0]+=1/tie(mx);
+        if(texts[ri].length===mn) longest[1]+=1/tie(mn);
       }
     }
 
@@ -392,9 +528,11 @@ async function scan(page){
         if(mx/tot>0.5) add('position-bias','REVIEW',
           'התשובה במקום קבוע ב-'+Math.round(mx/tot*100)+'% מהשאלות',where);
         if(longest[0]/tot>0.7) add('longest-answer','REVIEW',
-          'התשובה היא הארוכה ביותר ב-'+Math.round(longest[0]/tot*100)+'% מהשאלות',where);
+          'מי שבוחר תמיד את האפשרות הארוכה ביותר קולע ב-'+
+          Math.round(longest[0]/tot*100)+'% מהשאלות (ניחוש עיוור: 25%)',where);
         if(longest[1]/tot>0.7) add('shortest-answer','REVIEW',
-          'התשובה היא הקצרה ביותר ב-'+Math.round(longest[1]/tot*100)+'% מהשאלות',where);
+          'מי שבוחר תמיד את האפשרות הקצרה ביותר קולע ב-'+
+          Math.round(longest[1]/tot*100)+'% מהשאלות (ניחוש עיוור: 25%)',where);
       }
       let under=0;
       for(const s in sizes) if(+s<4) under+=sizes[s];
@@ -406,13 +544,14 @@ async function scan(page){
   /* --- 4. כיסוי שדות, פעם אחת, באחוזים --- */
   R.coverage=cov;
   const pc=function(a,b){return b?Math.round(a/b*100):0};
-  if(cov.q&&cov.noHint) add('no-hint','REVIEW',
-    pc(cov.noHint,cov.q)+'% מהשאלות ('+cov.noHint+' מתוך '+cov.q+') נבנות בלי רמז','—');
+  if(cov.hasHint&&cov.noHint) add('no-hint','REVIEW',
+    pc(cov.noHint,cov.hasHint)+'% מהשאלות ('+cov.noHint+' מתוך '+cov.hasHint+
+    ') נבנות בלי רמז','—');
   if(cov.hasSteps&&cov.noSteps) add('no-steps','REVIEW',
     pc(cov.noSteps,cov.hasSteps)+'% מהשאלות ('+cov.noSteps+' מתוך '+cov.hasSteps+
     ') נבנות בלי שלבי פתרון','—');
-  if(cov.wrong&&cov.noWhy) add('no-why','REVIEW',
-    pc(cov.noWhy,cov.wrong)+'% מהמסיחים ('+cov.noWhy+' מתוך '+cov.wrong+
+  if(cov.hasWhy&&cov.noWhy) add('no-why','REVIEW',
+    pc(cov.noWhy,cov.hasWhy)+'% מהמסיחים ('+cov.noWhy+' מתוך '+cov.hasWhy+
     ') בלי הסבר למה הם שגויים','—');
 
   return R;
@@ -504,6 +643,21 @@ function md(app,R){
   L.push('| מדגם לכל תא | '+R.sample+' |');
   L.push('| שפות שהוכרזו | '+(R.langs||[]).join(', ')+' |');
   L.push('');
+  /* כיסוי השדות נדפס תמיד, גם כשאין ממצא. שדה שהסכימה אינה
+     מגדירה אינו ממצא — אבל הוא כן עובדה שצריך לראות, ואם
+     מספר כאן קופץ פתאום ל-0 זו רגרסיה בחיווט. */
+  if(R.coverage){
+    const c=R.coverage, row=function(name,has,miss){
+      L.push('| '+name+' | '+(has?((has-miss).toLocaleString('en-US')+' מתוך '+
+        has.toLocaleString('en-US')):'אין שדה כזה בסכימה')+' |');
+    };
+    L.push('| שדה | מולא |');
+    L.push('|---|---|');
+    row('רמז (`hint`)',c.hasHint||0,c.noHint||0);
+    row('שלבי פתרון (`steps`)',c.hasSteps||0,c.noSteps||0);
+    row('הסבר למסיח (`why`)',c.hasWhy||0,c.noWhy||0);
+    L.push('');
+  }
   const byCat={};
   for(const k in R.find){ const c=CAT[R.find[k].kind||k]||8; (byCat[c]||(byCat[c]=[])).push(k) }
   for(let c=1;c<=9;c++){
@@ -607,6 +761,19 @@ function md(app,R){
   const v=verdict(R.find);
   R.app=app; R.sample=N; R.verdict=v.verdict; R.fail=v.fail; R.review=v.review;
   R.generated=new Date().toISOString().slice(0,10);
+  /* מול איזה קוד נמדד הדוח. בלי זה דוח שנשמר בגיט מתיישן בשקט
+     ומטעה את מי שקורא אותו: ב-9.9.2026 בריף נשען על דוח שנוצר
+     שתי קומיטות אחורה, דיבר על 13 תאים כשנשאר אחד, וניפח את
+     העבודה פי שנים־עשר. `dirty` מסמן שהעץ לא היה נקי בזמן
+     המדידה, ולכן ה-hash לבדו אינו מזהה את מה שנמדד. */
+  R.head=(function(){
+    try{
+      const cp=require('child_process');
+      const h=cp.execSync('git rev-parse --short HEAD',{cwd:ROOT,stdio:['ignore','pipe','ignore']}).toString().trim();
+      const d=cp.execSync('git status --porcelain',{cwd:ROOT,stdio:['ignore','pipe','ignore']}).toString().trim();
+      return h+(d?' (dirty)':'');
+    }catch(e){ return null }
+  })();
   fs.writeFileSync(path.join(OUT,app+'.json'),JSON.stringify(R,null,1));
   fs.writeFileSync(path.join(OUT,app+'.md'),md(app,R));
   summary.push({app:app,verdict:v.verdict,fail:v.fail,review:v.review,

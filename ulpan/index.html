@@ -438,6 +438,18 @@ textarea.field{min-height:96px;resize:vertical}
    נמדד בכרומיום מול math-uni כקבוצת ביקורת. */
 .spread{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .dots{display:flex;gap:5px;flex-wrap:wrap}
+/* בורר השפה מציג ״العربية״ ו-״Русский״ גם כשהממשק עברי — זה כל
+   תפקידו — ולכן `html[lang]` אינו חל עליהם והם יורשים את `--font`,
+   שאין בו לא ערבית ולא קירילית. הגופן נקבע לפי השפה שהכפתור מציע,
+   ולא לפי שפת הממשק. הסימון אינו אחיד בין האפליקציות (`data-v`,
+   `data-n`, `data-l`, ולעיתים גם `lang`), ולכן הכלל מונה את כולם —
+   בלוק זהה בתשע האפליקציות, כדי שלא ייסחף ביניהן. */
+button[data-a="lang"][data-v="ar"],button[data-a="lang"][data-n="ar"],
+button[data-a="lang"][data-l="ar"],button[data-a="lang"][data-l="ar"] .fd,
+button[data-a="lang"][lang="ar"]{font-family:var(--ar)}
+button[data-a="lang"][data-v="ru"],button[data-a="lang"][data-n="ru"],
+button[data-a="lang"][data-l="ru"],button[data-a="lang"][data-l="ru"] .fd,
+button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1034,7 +1046,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a20 · 2026-09-08";
+var BUILD="a25 · 2026-09-09";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -1302,6 +1314,10 @@ function bestVoice(code){
     if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
     if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
     if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    /* קול רשת — הנוירליים של Edge הם כאלה — נשמע טוב יותר כשיש
+       רשת, וזה כל מה שנקבע כאן. מה קורה כשאין רשת נקבע ב-voiceUsable,
+       שהוא מיון קודם: קנס בתוך הניקוד לא הצליח להתגבר על שם היצרן. */
+    if(v.localService===false&&voiceUsable(v))s+=6;
     if(/espeak|compact|pico/.test(n))s-=40;
     if(v.default)s+=4;
     return s;
@@ -1313,7 +1329,10 @@ function bestVoice(code){
      ובתוך כל קבוצה מכריעה האיכות. */
   function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
   return pool.slice().sort(function(a,b){
-    var d=grank(b)-grank(a); return d||score(b)-score(a);
+    /* קול שלא יעבוד יורד לתחתית לפני כל שיקול אחר — גם לפני המגדר,
+       שאם לא כן קול נשי מת מנצח קול גברי חי. */
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||score(b)-score(a);
   })[0];
 }
 function hasLearnVoice(){return voicesFor(LEARN_TTS).length>0}
@@ -1521,6 +1540,76 @@ function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild
    כל מקטע נושא את ההיסט שלו במחרוזת המלאה, כי charIndex מתאפס
    בכל אמירה ובלעדיו ההדגשה קופצת לתחילת המשפט בכל מקטע.
    ------------------------------------------------------------ */
+/* =====================================================================
+   מנוע ההקראה של "תאוריה מדברת" — ארבעה מנגנונים
+   ---------------------------------------------------------------------
+   ארבעה כשלים שקטים של Web Speech. אף אחד מהם אינו מדווח כשגיאה,
+   וכולם נראים למשתמש בדיוק אותו דבר: הקול פשוט מפסיק באמצע. הקוד
+   כאן הועתק מהאפליקציה שבה הוא כבר רץ, ולא נוסח מחדש.
+   ===================================================================== */
+
+/* 1 · שומר-ער. באג ותיק ב-Chrome וב-Edge בשולחן העבודה: ההקראה
+   נחתכת אחרי כ-15 שניות, באמצע מילה. pause+resume תקופתי מחזיק את
+   המנוע ער. במובייל אין את הבאג ופעולה כזאת דווקא מקרטעת שם, ולכן
+   מפעילים רק היכן שבאמת צריך. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+/* עוצרים רק כששום דבר כבר לא מדבר — אחרת מקטע שהתחיל זה עתה מאבד
+   את השמירה שלו כשהמקטע הקודם מסיים להתנקות. */
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+
+/* 2 · הפניה חיה ל-utterance. Chrome אוסף אובייקט שאין אליו הפניה,
+   ואיתו נעלמים onend ו-onboundary: ההקראה נתקעת באמצע, ההדגשה
+   קופאת על מילה אחת, והמקטע הבא לא יוצא לעולם. */
+var _activeU=null;
+
+/* 3 · קול רשת שנכשל. הקולות הנוירליים של Edge הם קולות רשת, והם
+   שותקים בלי אינטרנט. הדגל נכבה ברגע שאחד מהם נכשל, ומאותו רגע
+   הדירוג מעדיף קול מקומי לשארית הסשן. */
+var _netVoiceOK=true;
+
+/* קול רשת שאי אפשר להשתמש בו עכשיו — אין אינטרנט, או שאחד כבר
+   נכשל בסשן הזה — אינו "פחות טוב", הוא פשוט לא יעבוד. לכן זה מיון
+   ראשון ולא עוד סעיף בתוך הניקוד: קנס בניקוד לא הספיק, מפני שקול
+   נוירלי של Microsoft צובר על שם היצרן ועל "Natural" יותר ממה שכל
+   קנס סביר מוריד — והוא נבחר שוב ושוב אחרי שכבר נכשל.
+   כשהוא הקול היחיד שיש הוא עדיין נבחר: מיון של רשימה בת אחד
+   מחזיר אותה כמו שהיא. */
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+
+/* 4 · שומר זמן. יש מכשירים שבהם onend פשוט לא נורה. בלי השומר הזה
+   התור נתקע: הכפתור נשאר על "עצירה" וההקראה לא ממשיכה לעולם. ארבע
+   שניות שבהן המנוע לא מדבר ולא ממתין נחשבות סוף.
+   מחזיר פונקציית ביטול — מי שסיים בדרך הרגילה מכבה את השומר. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+
 var SEG_MAX=90, SEG_GAP=260;
 /* סימן פיסוק בין שתי ספרות הוא חלק מהמספר ולא מקום לחתוך בו:
    בלי הבדיקה הזאת "3,500" נשבר והמנוע קורא "שלוש, חמש מאות". */
@@ -1654,21 +1743,49 @@ function speakDevice(text,code,rate){
       var v=bestVoice(code), lang=(v&&v.lang)||code;
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
       var pit=femLift(v);
+      var retried=false;
+      function alive(){return my===_sayGen}
+      function allDone(){ maybeStopKeepAlive(); hlClear(); ttsOK() }
       (function sayseg(k){
-        if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
-        if(k>=segs.length){ hlClear(); ttsOK(); return }
-        var seg=segs[k];
+        if(!alive())return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
+        if(k>=segs.length){ allDone(); return }
+        /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
+           יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+        var seg=segs[k], moved=false, disarm=null;
+        function next(){
+          if(moved||!alive())return;
+          moved=true; if(disarm)disarm();
+          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+          else allDone();
+        }
         var u=new SpeechSynthesisUtterance(seg.text);
         u.lang=lang;
         if(v){ try{ u.voice=v }catch(e2){} }
         u.rate=rt; u.pitch=pit; u.volume=1;
         u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
-        u.onend=function(){
-          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
-          else { hlClear(); ttsOK() }
+        u.onend=next;
+        u.onerror=function(e){
+          if(moved||!alive())return;
+          var err=(e&&e.error)||"";
+          /* ביטול יזום אינו תקלה — stopSpeak כבר ניקה אחריו */
+          if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+          /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול
+             מקומי וחוזרים על אותו מקטע, פעם אחת, כדי שההקראה לא
+             תישבר בשקט באמצע שאלה. */
+          if(!retried&&v&&v.localService===false){
+            retried=true; _netVoiceOK=false; moved=true;
+            if(disarm)disarm(); _activeU=null;
+            v=bestVoice(code); lang=(v&&v.lang)||code; pit=femLift(v);
+            setTimeout(function(){sayseg(k)},SEG_GAP);
+            return;
+          }
+          moved=true; if(disarm)disarm(); maybeStopKeepAlive(); ttsFail(err);
         };
-        u.onerror=function(e){ttsFail(e&&e.error)};
+        _activeU=u;                        /* מגן מפני איסוף זבל */
+        try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
         speechSynthesis.speak(u);
+        startKeepAlive();
+        disarm=ttsWatchdog(function(){return alive()&&!moved},next);
       })(0);
     }catch(e){}
   })();
@@ -1724,7 +1841,7 @@ function playUrl(url,text,code,rate){
   gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){_sayGen++;gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){_sayGen++;gStop();hlClear();stopKeepAlive();_activeU=null;try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -1760,11 +1877,198 @@ function renderSpeakState(){
      אומרים את זה, ולא מה זה אומר — ההבדל הזה הוא כל ההבדל בין
      לדעת מילה לבין לדעת להשתמש בה.
    PARA(lines, glosses, questions) — קטע קריאה.
+   Q(question, answer, wrongs, whys) — שאלה על הקטע. whys הוא הנימוק
+     לכל מסיח, באותו סדר, וזו אותה חתימה בדיוק שב-english. בלעדיו
+     הלומד מקבל "לא נכון" ולא יודע למה, וינחש שוב באותו מקום.
+     whys אופציונלי כדי שקטע ישן לא יישבר, אבל אין היום שאלה בלעדיו.
    ============================================================ */
 function W(w,ipa,g,near){return {k:"w",w:w,ipa:ipa||"",g:g,near:near||[]}}
 function S(s,g,u){return {k:"s",s:s,g:g,u:u||null}}
 function PARA(lines,words,qs){return {k:"p",lines:lines,words:words||[],qs:qs||[]}}
-function Q(q,ans,wrongs){return {q:q,a:ans,w:wrongs}}
+function Q(q,ans,wrongs,whys){return {q:q,a:ans,w:wrongs,y:whys||[]}}
+
+/* ------------------------------------------------------------
+   WHYG — מה המילה שסימנתם אומרת.
+   ------------------------------------------------------------
+   22% מהמסיחים באפליקציה יצאו בלי נימוק, ולא במקרה: מסיח בתרגיל
+   ההשלמה נחתך ממשפט בבנק, ומסיח בזוג המינימלי נלקח מ-near — ולשני
+   הסוגים אין פריט בנק, ולכן אין להם משמעות שאפשר להראות. לומד
+   שסימן וקיבל "לא נכון" בלי לדעת מה המילה שבחר אומרת ינחש שוב
+   באותו מקום.
+   הטבלה הזאת אינה חלק מאף מאגר שאלות: היא נקראת *רק* בבניית
+   הנימוק. לכן היא אינה משנה אף הגרלה, ואינה נוגעת במבחן הכיתתי
+   שנבנה מזרע.
+   המפתח הוא עיצורים בלבד (hebPlain), והחיפוש מדויק ובלי קילוף
+   תחיליות: "לָמָּה" מקולפת הייתה נמצאת כ"מָה", ו"בִּכְתָב" כ"כְּתָב" —
+   שתי משמעויות אחרות. צורה מוטה מקבלת ערך משלה.
+   ------------------------------------------------------------ */
+var WHYG={
+/* --- בקשה, נימוס ומילות שאלה --- */
+"אפשר":{he:"מילת בקשה מנומסת: ״מותר לי?״",ar:"كلمة طلب مهذّبة: «هل يمكن؟»",ru:"вежливая просьба: «можно?»",en:"a polite request: 'may I?'"},
+"מתי":{he:"שאלה על זמן",ar:"سؤال عن الوقت",ru:"вопрос о времени",en:"asks about time"},
+"כמה":{he:"שאלה על מספר או על מחיר",ar:"سؤال عن العدد أو السعر",ru:"вопрос о количестве или цене",en:"asks how many or how much"},
+"איזה":{he:"שאלה שבוחרת אחד מכמה",ar:"سؤال يختار واحدًا من عدّة",ru:"вопрос о выборе одного из нескольких",en:"asks which one of several"},
+"איפה":{he:"שאלה על מקום",ar:"سؤال عن المكان",ru:"вопрос о месте",en:"asks where something is"},
+"לאן":{he:"שאלה על היעד: לאיזה מקום הולכים",ar:"سؤال عن الوجهة: إلى أين",ru:"вопрос о направлении: куда",en:"asks where to, the destination"},
+"למי":{he:"שאלה על האדם שפונים אליו",ar:"سؤال عن الشخص الذي نتوجّه إليه",ru:"вопрос о том, к кому обращаются",en:"asks whom you turn to"},
+"למה":{he:"שאלה על הסיבה",ar:"سؤال عن السبب",ru:"вопрос о причине",en:"asks why, the reason"},
+"איך":{he:"שאלה על הדרך שבה עושים משהו",ar:"سؤال عن كيفيّة الفعل",ru:"вопрос о способе",en:"asks how something is done"},
+"בקשה":{he:"מה שמבקשים ממשרד או מאדם",ar:"طلب يُقدَّم لمكتب أو لشخص",ru:"просьба, заявление",en:"a request or an application"},
+"רבה":{he:"הרבה. ב״תודה רבה״ ו״שלום רב״",ar:"كثيرة؛ في «شكرًا جزيلًا»",ru:"большая; в «большое спасибо»",en:"great, much — as in 'thank you very much'"},
+"גם":{he:"מוסיף עוד דבר לרשימה",ar:"أيضًا، يضيف شيئًا آخر",ru:"тоже, также",en:"also, in addition"},
+"בודאי":{he:"בטוח לגמרי, בלי ספק",ar:"بالتأكيد، بلا شكّ",ru:"конечно, без сомнения",en:"certainly, without doubt"},
+"שוב":{he:"עוד פעם אחת",ar:"مرّة أخرى",ru:"снова, ещё раз",en:"again, one more time"},
+"מאוד":{he:"בדרגה גבוהה: ״חם מאוד״",ar:"جدًّا، بدرجة عالية",ru:"очень",en:"very, to a high degree"},
+"יותר":{he:"בכמות או בדרגה גדולה מזו",ar:"أكثر من ذلك",ru:"больше, более",en:"more than that"},
+"לאט":{he:"במהירות נמוכה",ar:"ببطء",ru:"медленно",en:"slowly"},
+"קשה":{he:"לא קל, דורש מאמץ",ar:"صعب",ru:"трудный, тяжёлый",en:"hard, difficult"},
+
+/* --- מסמכים ומשרד --- */
+"אשור":{he:"מסמך שמאשר שמשהו נכון",ar:"إفادة، وثيقة تأكيد",ru:"справка, подтверждение",en:"a confirmation document"},
+"טופס":{he:"דף עם שורות למילוי",ar:"استمارة",ru:"бланк, анкета",en:"a form to fill in"},
+"מכתב":{he:"מה ששולחים בדואר או במייל",ar:"رسالة، كتاب",ru:"письмо",en:"a letter"},
+"המסמך":{he:"הנייר הרשמי, בה״א הידיעה",ar:"الوثيقة المعيّنة",ru:"этот документ",en:"the document, the specific one"},
+"מסמכים":{he:"כמה ניירות רשמיים יחד",ar:"وثائق، مستندات",ru:"документы",en:"documents, more than one"},
+"תיק":{he:"כל החומר של אדם אחד במשרד",ar:"ملفّ",ru:"дело, папка",en:"a case file"},
+"בתיק":{he:"בתוך התיק שלכם במשרד",ar:"داخل الملفّ",ru:"в деле, в папке",en:"inside the file"},
+"המשרד":{he:"המקום שבו יושבים הפקידים",ar:"المكتب المعيّن",ru:"этот офис, учреждение",en:"the office"},
+"הממנה":{he:"מי שאחראי על המקום",ar:"المسؤول عن المكان",ru:"ответственный, начальник",en:"the person in charge"},
+"ערעור":{he:"בקשה לבדוק החלטה שוב",ar:"استئناف، اعتراض",ru:"апелляция, обжалование",en:"an appeal against a decision"},
+"סרוב":{he:"תשובה שאומרת ״לא״",ar:"رفض",ru:"отказ",en:"a refusal"},
+"תשובה":{he:"מה שעונים לשאלה או לבקשה",ar:"جواب، ردّ",ru:"ответ",en:"an answer, a reply"},
+"הסבר":{he:"דברים שמבהירים למה או איך",ar:"شرح، توضيح",ru:"объяснение",en:"an explanation"},
+"הסכום":{he:"כמה כסף בדיוק",ar:"المبلغ",ru:"сумма",en:"the amount of money"},
+"חשבון":{he:"דף התשלום; גם החשבון בבנק",ar:"فاتورة؛ وأيضًا حساب البنك",ru:"счёт (к оплате или в банке)",en:"a bill; also a bank account"},
+"עולה":{he:"מחירו הוא. גם: מי שהיגר לישראל",ar:"يُكلّف؛ وأيضًا: مهاجر إلى إسرائيل",ru:"стоит (о цене); также: репатриант",en:"costs; also: a new immigrant to Israel"},
+"ההגשה":{he:"מסירת הבקשה למשרד",ar:"تقديم الطلب",ru:"подача заявления",en:"submitting the application"},
+"להגשה":{he:"בשביל למסור את הבקשה",ar:"من أجل تقديم الطلب",ru:"для подачи заявления",en:"for submitting the application"},
+"הגש":{he:"מישהו כבר מסר אותו, בעבר",ar:"قُدِّم سابقًا",ru:"был подан",en:"was already submitted"},
+"בכתב":{he:"על נייר ולא בעל פה",ar:"كتابةً لا شفويًّا",ru:"в письменном виде",en:"in writing, not spoken"},
+"במלים":{he:"בעזרת מילים",ar:"بالكلمات",ru:"словами",en:"in words"},
+"המלה":{he:"המילה המסוימת שדיברו עליה",ar:"الكلمة المعيّنة",ru:"это слово",en:"that particular word"},
+"באתר":{he:"בעמוד האינטרנט של הגוף",ar:"في الموقع الإلكتروني",ru:"на сайте",en:"on the website"},
+"ברוסית":{he:"בשפה הרוסית",ar:"باللغة الروسية",ru:"по-русски",en:"in Russian"},
+"בערבית":{he:"בשפה הערבית",ar:"باللغة العربية",ru:"по-арабски",en:"in Arabic"},
+"מתרגמן":{he:"מי שמעביר את הדברים לשפה שלכם",ar:"مترجم",ru:"переводчик",en:"an interpreter"},
+"פשוטות":{he:"קלות להבנה, לא מסובכות",ar:"بسيطة، سهلة الفهم",ru:"простые, понятные",en:"simple, easy to understand"},
+"נוספת":{he:"עוד אחת מעבר למה שיש",ar:"إضافية، واحدة أخرى",ru:"дополнительная, ещё одна",en:"an additional one"},
+"האחרון":{he:"זה שבא בסוף, אין אחריו",ar:"الأخير",ru:"последний",en:"the last one"},
+"הקרוב":{he:"זה שיגיע ראשון בזמן",ar:"الأقرب زمنيًّا",ru:"ближайший",en:"the nearest one in time"},
+"הפנוי":{he:"זה שאיש לא תפס",ar:"الشاغر، غير المحجوز",ru:"свободный, незанятый",en:"the free, unbooked one"},
+"קבועה":{he:"נשארת אותו דבר ולא משתנה",ar:"ثابتة، لا تتغيّر",ru:"постоянная",en:"fixed, unchanging"},
+"פתוחים":{he:"אפשר להיכנס, לא סגורים",ar:"مفتوحون، يمكن الدخول",ru:"открыты",en:"open, you can come in"},
+"תוך":{he:"בתוך פרק זמן: ״תוך חמישה ימים״",ar:"خلال مدّة زمنية",ru:"в течение (срока)",en:"within a period of time"},
+"בענין":{he:"בנוגע לנושא הזה",ar:"بخصوص هذا الأمر",ru:"по этому вопросу",en:"regarding this matter"},
+
+/* --- פעלים --- */
+"מבקש":{he:"פונה ואומר מה הוא רוצה",ar:"يطلب",ru:"просит",en:"asks for, requests"},
+"מסכים":{he:"אומר ״כן״ להצעה",ar:"يوافق",ru:"согласен",en:"agrees"},
+"מחפש":{he:"מנסה למצוא משהו",ar:"يبحث",ru:"ищет",en:"is looking for"},
+"ממהר":{he:"אין לו זמן, הוא רץ",ar:"مستعجل",ru:"спешит",en:"is in a hurry"},
+"מענין":{he:"רוצה בזה, יש לו עניין",ar:"مهتمّ، راغب",ru:"заинтересован",en:"is interested in"},
+"חותם":{he:"כותב את שמו בסוף מסמך",ar:"يوقّع",ru:"подписывает",en:"signs a document"},
+"כותבים":{he:"מעלים על הכתב",ar:"يكتبون",ru:"пишут",en:"they write"},
+"לוקח":{he:"מקבל לידיים ומוציא משם",ar:"يأخذ",ru:"берёт",en:"takes"},
+"נראה":{he:"כך זה מצטייר, לפי מה שרואים",ar:"يبدو",ru:"кажется, выглядит",en:"it seems, it appears"},
+"אומרת":{he:"מוציאה מהפה מילים",ar:"تقول",ru:"говорит (о женщине)",en:"she says"},
+"צריכים":{he:"חייבים, יש בזה צורך",ar:"يحتاجون، عليهم",ru:"нужно, должны",en:"they need to, must"},
+"הגיעו":{he:"באו והם כבר כאן, בעבר",ar:"وصلوا",ru:"прибыли",en:"they arrived"},
+"קבלתי":{he:"הגיע אליי, בעבר",ar:"استلمتُ",ru:"я получил",en:"I received"},
+"אקבל":{he:"יגיע אליי, בעתיד",ar:"سأستلم",ru:"я получу",en:"I will receive"},
+"הבנתי":{he:"ידעתי מה נאמר, בעבר",ar:"فهمتُ",ru:"я понял",en:"I understood"},
+"שהבנתי":{he:"״ש...״ פותח משפט משנה: ״שהבנתי״",ar:"«أنّني فهمتُ» — جملة تابعة",ru:"«что я понял» — придаточное",en:"'that I understood' — a subordinate clause"},
+"לקבל":{he:"לקחת מה שנותנים לכם",ar:"أن تستلم",ru:"получить",en:"to receive"},
+"לקבע":{he:"לסגור מראש תאריך ושעה",ar:"أن تحدّد موعدًا",ru:"назначить, записаться",en:"to set a date and time"},
+"לחזור":{he:"לבוא שוב למקום שהייתם בו",ar:"أن تعود",ru:"вернуться",en:"to come back"},
+"לפתח":{he:"להסיר סגירה, ההפך מלסגור",ar:"أن تفتح",ru:"открыть",en:"to open"},
+"לפנות":{he:"לגשת למישהו ולבקש עזרה",ar:"أن تتوجّه إلى أحد",ru:"обратиться к кому-то",en:"to turn to someone"},
+"להגיש":{he:"למסור מסמך למי שאמור לקבלו",ar:"أن تقدّم مستندًا",ru:"подать документ",en:"to submit a document"},
+"לכתב":{he:"להעלות מילים על נייר",ar:"أن تكتب",ru:"писать",en:"to write"},
+"לעדכן":{he:"למסור מידע חדש במקום הישן",ar:"أن تحدّث المعلومات",ru:"обновить сведения",en:"to update information"},
+"לשלם":{he:"לתת כסף תמורת משהו",ar:"أن تدفع",ru:"платить",en:"to pay"},
+"לבוא":{he:"להגיע למקום",ar:"أن تأتي",ru:"прийти",en:"to come"},
+"לדעת":{he:"להחזיק מידע בראש",ar:"أن تعرف",ru:"знать",en:"to know"},
+"לעין":{he:"לקרוא ולבדוק מסמך",ar:"أن تطّلع على مستند",ru:"ознакомиться с документом",en:"to look through a document"},
+"שלח":{he:"העביר משהו למישהו, בעבר",ar:"أرسل",ru:"он послал",en:"he sent"},
+
+/* --- בריאות --- */
+"כואב":{he:"יש שם כאב",ar:"يؤلم",ru:"болит",en:"it hurts"},
+"מחלה":{he:"מצב שבו הגוף לא בריא",ar:"مرض",ru:"болезнь",en:"an illness"},
+"תרופה":{he:"מה שלוקחים כדי להבריא",ar:"دواء",ru:"лекарство",en:"a medicine"},
+"לרופא":{he:"אל האדם שמטפל בחולים",ar:"إلى الطبيب",ru:"к врачу",en:"to the doctor"},
+"לטפול":{he:"בשביל הטיפול הרפואי",ar:"من أجل العلاج",ru:"на лечение",en:"for the treatment"},
+"הבדיקה":{he:"הפעולה שבודקת מה יש בגוף",ar:"الفحص",ru:"обследование, анализ",en:"the medical test"},
+"התוצאות":{he:"מה שיצא מהבדיקה",ar:"النتائج",ru:"результаты",en:"the results"},
+"ממחה":{he:"רופא שיודע תחום אחד לעומק",ar:"طبيب مختصّ",ru:"врач-специалист",en:"a specialist doctor"},
+"חות":{he:"מ״חַוַּת דַּעַת״ — הערכה של מומחה",ar:"من «رأي خبير» — تقييم مختصّ",ru:"из «заключение специалиста»",en:"from 'expert opinion' — a specialist's assessment"},
+"אלרגיה":{he:"תגובה של הגוף לחומר מסוים",ar:"حساسيّة",ru:"аллергия",en:"an allergy"},
+"בטוח":{he:"יודע בוודאות; גם: אין בו סכנה",ar:"متأكّد؛ وأيضًا: آمن",ru:"уверен; также: безопасный",en:"sure; also: safe"},
+"נעים":{he:"עושה הרגשה טובה",ar:"لطيف، مريح",ru:"приятный",en:"pleasant"},
+"נכון":{he:"מתאים לאמת, לא שגוי",ar:"صحيح",ru:"верный, правильный",en:"correct, true"},
+
+/* --- מילים מזוגות המינימום שאין להן ערך בבנק --- */
+"תם":{he:"נגמר; גם: אדם ישר ופשוט",ar:"انتهى؛ وأيضًا: بسيط مستقيم",ru:"кончился; также: простодушный",en:"came to an end; also: simple and honest"},
+"מקום":{he:"נקודה שבה משהו נמצא",ar:"مكان",ru:"место",en:"a place"},
+"שלם":{he:"בלי שחסר בו כלום",ar:"كامل",ru:"целый, полный",en:"whole, complete"},
+"כף":{he:"כלי שאוכלים בו מרק",ar:"ملعقة",ru:"ложка",en:"a spoon"},
+"דבר":{he:"מגפה קשה. שונה מ״דָּבָר״",ar:"طاعون؛ غير «شيء»",ru:"мор, чума; не «вещь»",en:"a plague — not the word for 'thing'"},
+"כלה":{he:"האישה ביום החתונה שלה",ar:"عروس",ru:"невеста",en:"a bride"},
+"כנרת":{he:"האגם הגדול בצפון הארץ",ar:"بحيرة طبريا",ru:"озеро Кинерет",en:"the Sea of Galilee"},
+"משרד":{he:"מקום עבודה עם פקידים ושולחנות",ar:"مكتب",ru:"офис, учреждение",en:"an office"},
+"לכן":{he:"בגלל זה, מציג תוצאה",ar:"لذلك",ru:"поэтому",en:"therefore, so"},
+"אש":{he:"מה שבוער ושורף",ar:"نار",ru:"огонь",en:"fire"},
+"אדוני":{he:"פנייה מכבדת לגבר",ar:"سيّدي",ru:"господин мой, сударь",en:"sir"},
+"מאי":{he:"החודש החמישי בשנה",ar:"أيّار، مايو",ru:"май",en:"May, the fifth month"},
+"שמאלה":{he:"לכיוון שמאל",ar:"إلى اليسار",ru:"налево",en:"to the left"},
+"אחת":{he:"המספר 1 בלשון נקבה",ar:"واحدة",ru:"одна",en:"one, feminine"},
+"שתים":{he:"המספר 2 בלשון נקבה",ar:"اثنتان",ru:"две",en:"two, feminine"},
+"עשרים":{he:"המספר 20",ar:"عشرون",ru:"двадцать",en:"twenty"},
+"איש":{he:"גבר, אדם",ar:"رجل",ru:"мужчина, человек",en:"a man"},
+"שרות":{he:"עזרה שגוף נותן לפונים אליו",ar:"خدمة",ru:"обслуживание, служба",en:"a service"},
+"דרכון":{he:"מסמך שנוסעים איתו לחו״ל",ar:"جواز سفر",ru:"загранпаспорт",en:"a passport"},
+
+/* --- צורות מוטות שהמפתח המדויק שלהן אינו בבנק --- */
+"בבטן":{he:"בְּ+בֶּטֶן: החלק של הגוף מתחת לחזה",ar:"في البطن",ru:"в животе",en:"in the belly"},
+"להנחה":{he:"בשביל הפחתה בתשלום",ar:"من أجل تخفيض في الدفع",ru:"на скидку",en:"for a reduction in payment"},
+"שצריך":{he:"״ש...״ פותח משפט משנה: ״שצריך״",ar:"«أنّه يجب» — جملة تابعة",ru:"«что нужно» — придаточное",en:"'that one must' — a subordinate clause"},
+"לדבר":{he:"להוציא מילים בקול",ar:"أن تتكلّم",ru:"говорить",en:"to speak"},
+"מספר":{he:"הספרה שמזהה: מספר תיק, מספר טלפון",ar:"رقم يُعرِّف: رقم ملفّ أو هاتف",ru:"номер: дела, телефона",en:"an identifying number: of a file, of a phone"},
+"יומשלישי":{he:"היום השלישי בשבוע",ar:"يوم الثلاثاء",ru:"вторник",en:"Tuesday"},
+"כרגע":{he:"עכשיו, ברגע הזה",ar:"الآن، في هذه اللحظة",ru:"сейчас, в этот момент",en:"right now, at this moment"},
+"התור":{he:"התור המסוים שנקבע לכם",ar:"الموعد المعيّن",ru:"эта назначенная запись",en:"that particular appointment"},
+"דעת":{he:"מ״חַוַּת דַּעַת״ — מה שהמומחה חושב",ar:"من «رأي خبير» — ما يراه المختصّ",ru:"из «заключение специалиста»",en:"from 'expert opinion' — what the specialist thinks"},
+"התאריך":{he:"היום, החודש והשנה",ar:"التاريخ: اليوم والشهر والسنة",ru:"дата: день, месяц и год",en:"the date: day, month and year"}
+};
+/* מפתח משמעויות שכבר נכתבו בבנקים — פריטי מילה, ומילות ההסבר של
+   קטעי הקריאה. מסיח שנחתך ממשפט הוא לעיתים קרובות מילה שנלמדה
+   במקום אחר באפליקציה, ואז המשמעות שלה כבר כתובה ואין לכתוב אותה
+   שוב: תרגום כפול הוא שני נוסחים שיתפצלו בעריכה הבאה.
+   נבנה פעם אחת ונשמר, כמו ALL_WORDS. */
+/* אות סופית מנורמלת בשני הצדדים. בלעדיה מפתח שנכתב ביד עם מ׳ רגילה
+   לא נפגש לעולם עם "יוֹם שְׁלִישִׁי" שמסתיים ב-ם, ואין שגיאה — הנימוק
+   פשוט לא מופיע. זה קרה בפועל כאן. הנרמול בטוח: אות סופית עומדת רק
+   בסוף מילה, ולכן שתי מילים שונות אינן נדבקות זו לזו. */
+function whyKey(w){
+  return hebPlain(w).replace(/[ךםןףץ]/g,function(c){return HEB_FIN[c]});
+}
+var BANKG=null;
+function bankGloss(){
+  if(BANKG)return BANKG;
+  BANKG={};
+  var put=function(w,g){var k=whyKey(w); if(g&&k&&!BANKG[k])BANKG[k]=g};
+  for(var k in WHYG)put(k,WHYG[k]);
+  TOPICS.forEach(function(tp){tp.L.forEach(function(lvl){lvl.forEach(function(it){
+    if(it.k==="w")put(it.w,it.g);
+    if(it.k==="p")(it.words||[]).forEach(function(x){put(x.w,x.g)});
+  })})});
+  return BANKG;
+}
+/* המילה שסימנתם ומה היא אומרת, או מחרוזת ריקה כשאין ערך.
+   ריק עדיף על נימוק כללי: "המילה לא מתאימה" אינו מלמד דבר. */
+function whyWord(txt){
+  var g=bankGloss()[whyKey(txt)];
+  return g?(hebBare(txt)+" = "+gl(g)):"";
+}
 
 var TRACKS=[
   {id:"sound",cls:"t-sound",nk:"trkSound",dk:"trkSoundD",icon:"spark"},
@@ -2311,12 +2615,18 @@ topic("letter","read",
         {he:"ביום שלישי בבוקר ובצהריים",ar:"الثلاثاء صباحًا وظهرًا",ru:"Во вторник утром и днём",en:"On Tuesday, morning and midday"},
         [{he:"ביום שני כל היום",ar:"الاثنين طوال اليوم",ru:"В понедельник весь день",en:"All day Monday"},
          {he:"ביום שלישי בערב",ar:"الثلاثاء مساءً",ru:"Во вторник вечером",en:"On Tuesday evening"},
-         {he:"ביום חמישי בבוקר",ar:"الخميس صباحًا",ru:"В четверг утром",en:"On Thursday morning"}]),
+         {he:"ביום חמישי בבוקר",ar:"الخميس صباحًا",ru:"В четверг утром",en:"On Thursday morning"}],
+        [{he:"ההודעה מדברת על יום שלישי, לא על יום שני.",ar:"الإعلان يتحدّث عن الثلاثاء، لا عن الاثنين.",ru:"В объявлении речь о вторнике, а не о понедельнике.",en:"The notice is about Tuesday, not Monday."},
+         {he:"המים חוזרים בשתיים בצהריים, ובערב כבר יש מים.",ar:"يعود الماء الساعة الثانية ظهرًا، وفي المساء يكون موجودًا.",ru:"Вода возвращается в два часа дня, вечером она уже есть.",en:"The water is back at two in the afternoon, so by evening there is water."},
+         {he:"היום שכתוב בהודעה הוא שלישי, לא חמישי.",ar:"اليوم المكتوب في الإعلان هو الثلاثاء، لا الخميس.",ru:"В объявлении указан вторник, а не четверг.",en:"The day in the notice is Tuesday, not Thursday."}]),
      Q({he:"מה כדאי לעשות לפני?",ar:"ماذا يُستحسن أن تفعل قبل ذلك؟",ru:"Что стоит сделать заранее?",en:"What should you do beforehand?"},
         {he:"למלא מים",ar:"تعبئة الماء",ru:"Набрать воды",en:"Fill up water"},
         [{he:"לא להשתמש במעלית",ar:"عدم استعمال المصعد",ru:"Не пользоваться лифтом",en:"Not use the lift"},
          {he:"לצאת מהבניין",ar:"مغادرة المبنى",ru:"Выйти из здания",en:"Leave the building"},
-         {he:"להודיע לשכנים",ar:"إبلاغ الجيران",ru:"Предупредить соседей",en:"Tell the neighbours"}])]),
+         {he:"להודיע לשכנים",ar:"إبلاغ الجيران",ru:"Предупредить соседей",en:"Tell the neighbours"}],
+        [{he:"כתוב שהמעלית תעבוד כרגיל, ולכן אין בכך צורך.",ar:"مكتوب أنّ المصعد يعمل كالمعتاد، فلا حاجة لذلك.",ru:"Написано, что лифт работает как обычно, так что это не нужно.",en:"The notice says the lift works as usual, so there is no need."},
+         {he:"ההודעה לא מבקשת לצאת, רק להתכונן לשעות בלי מים.",ar:"الإعلان لا يطلب المغادرة، بل الاستعداد لساعات بلا ماء.",ru:"Объявление не просит уходить, а подготовиться к часам без воды.",en:"The notice does not ask you to leave, only to prepare for the hours without water."},
+         {he:"ההודעה נשלחה לכל הדיירים, ולכן השכנים כבר יודעים.",ar:"أُرسل الإعلان لكلّ السكّان، فالجيران يعرفون أصلًا.",ru:"Объявление разослали всем жильцам, соседи уже знают.",en:"The notice went to all the residents, so the neighbours already know."}])]),
 
   PARA(["שָׁלוֹם רַב,",
      "קָבַעְנוּ לְךָ תּוֹר בְּיוֹם חֲמִישִׁי בְּשָׁעָה תֵּשַׁע וָחֵצִי.",
@@ -2329,12 +2639,18 @@ topic("letter","read",
         {he:"תשע וחצי",ar:"التاسعة والنصف",ru:"В девять тридцать",en:"Half past nine"},
         [{he:"תשע",ar:"التاسعة",ru:"В девять",en:"Nine o'clock"},
          {he:"עשר",ar:"العاشرة",ru:"В десять",en:"Ten o'clock"},
-         {he:"תשע ועשרה",ar:"التاسعة وعشر دقائق",ru:"В девять десять",en:"Ten past nine"}]),
+         {he:"תשע ועשרה",ar:"التاسعة وعشر دقائق",ru:"В девять десять",en:"Ten past nine"}],
+        [{he:"תשע היא השעה בלי החצי. במכתב כתוב תשע וחצי.",ar:"التاسعة هي الساعة بلا النصف. في الكتاب مكتوب التاسعة والنصف.",ru:"Девять — это без половины. В письме написано девять тридцать.",en:"Nine is the hour without the half. The letter says half past nine."},
+         {he:"השעה עשר לא מופיעה במכתב כלל.",ar:"الساعة العاشرة لا تَرِد في الكتاب أبدًا.",ru:"Десяти часов в письме вообще нет.",en:"Ten o'clock does not appear in the letter at all."},
+         {he:"עשר דקות הן הזמן להגיע מוקדם, לא שעת התור.",ar:"العشر دقائق هي وقت الحضور المبكر، لا موعد الدور.",ru:"Десять минут — это время прийти заранее, а не время приёма.",en:"The ten minutes are for arriving early, not the appointment time."}]),
      Q({he:"מה צריך להביא?",ar:"ماذا يجب إحضاره؟",ru:"Что нужно принести?",en:"What must you bring?"},
         {he:"תעודת זהות והפניה",ar:"بطاقة الهويّة والتحويل",ru:"Удостоверение и направление",en:"An ID card and the referral"},
         [{he:"רק תעודת זהות",ar:"بطاقة الهويّة فقط",ru:"Только удостоверение",en:"Only an ID card"},
          {he:"תשלום במזומן",ar:"دفعة نقدية",ru:"Наличные",en:"Cash"},
-         {he:"רק את טופס ההפניה",ar:"استمارة التحويل فقط",ru:"Только направление",en:"Only the referral"}])]),
+         {he:"רק את טופס ההפניה",ar:"استمارة التحويل فقط",ru:"Только направление",en:"Only the referral"}],
+        [{he:"צריך גם את טופס ההפניה, ולא רק תעודה.",ar:"يلزم أيضًا استمارة التحويل، لا البطاقة وحدها.",ru:"Нужно ещё и направление, а не только удостоверение.",en:"You also need the referral form, not just the ID."},
+         {he:"המכתב לא מבקש כסף.",ar:"الكتاب لا يطلب مالًا.",ru:"В письме денег не требуют.",en:"The letter does not ask for money."},
+         {he:"צריך גם תעודת זהות, ולא רק את ההפניה.",ar:"يلزم أيضًا بطاقة الهويّة، لا التحويل وحده.",ru:"Нужно ещё и удостоверение, а не только направление.",en:"You also need the ID card, not just the referral."}])]),
 
   PARA(["הוֹדָעָה לַהוֹרִים.",
      "מָחָר יֵשׁ טִיּוּל, וְהַיְלָדִים יוֹצְאִים בְּשֶׁבַע וָחֵצִי.",
@@ -2347,12 +2663,18 @@ topic("letter","read",
         {he:"כובע ובקבוק מים",ar:"قبّعة وزجاجة ماء",ru:"Панаму и бутылку воды",en:"A hat and a bottle of water"},
         [{he:"ארוחה חמה",ar:"وجبة ساخنة",ru:"Горячую еду",en:"A hot meal"},
          {he:"כסף למונית",ar:"مالًا لسيارة أجرة",ru:"Деньги на такси",en:"Money for a taxi"},
-         {he:"מחברת ועיפרון",ar:"دفترًا وقلمًا",ru:"Тетрадь и карандаш",en:"A notebook and a pencil"}]),
+         {he:"מחברת ועיפרון",ar:"دفترًا وقلمًا",ru:"Тетрадь и карандаш",en:"A notebook and a pencil"}],
+        [{he:"ההודעה מבקשת כובע ומים בלבד.",ar:"الإعلان يطلب قبّعة وماء فقط.",ru:"В объявлении просят только панаму и воду.",en:"The notice asks only for a hat and water."},
+         {he:"אין בהודעה שום בקשה לכסף.",ar:"ليس في الإعلان أيّ طلب للمال.",ru:"Денег в объявлении не просят.",en:"There is no request for money in the notice."},
+         {he:"זה טיול ולא שיעור, ולא ביקשו כלי כתיבה.",ar:"هذه رحلة لا درس، ولم يُطلب أدوات كتابة.",ru:"Это экскурсия, а не урок, письменных принадлежностей не просили.",en:"This is an outing, not a lesson, and no writing kit was asked for."}]),
      Q({he:"מתי הילדים יוצאים?",ar:"متى يخرج الأولاد؟",ru:"Когда дети выезжают?",en:"When do the children set off?"},
         {he:"בשבע וחצי בבוקר",ar:"في السابعة والنصف صباحًا",ru:"В семь тридцать утра",en:"At half past seven in the morning"},
         [{he:"בשבע",ar:"في السابعة",ru:"В семь",en:"At seven"},
          {he:"בשמונה",ar:"في الثامنة",ru:"В восемь",en:"At eight"},
-         {he:"בארבע",ar:"في الرابعة",ru:"В четыре",en:"At four"}])])
+         {he:"בארבע",ar:"في الرابعة",ru:"В четыре",en:"At four"}],
+        [{he:"שבע היא השעה בלי החצי. כתוב שבע וחצי.",ar:"السابعة هي الساعة بلا النصف. مكتوب السابعة والنصف.",ru:"Семь — это без половины. Написано семь тридцать.",en:"Seven is the hour without the half. It says half past seven."},
+         {he:"השעה שמונה לא מופיעה בהודעה.",ar:"الساعة الثامنة لا تَرِد في الإعلان.",ru:"Восьми часов в объявлении нет.",en:"Eight o'clock does not appear in the notice."},
+         {he:"ארבע היא שעת החזרה לגן, לא שעת היציאה.",ar:"الرابعة هي وقت العودة إلى الروضة، لا وقت الخروج.",ru:"Четыре — это время возвращения в сад, а не выезда.",en:"Four is the time of return to the kindergarten, not of setting off."}])])
  ],
  [
   PARA(["לְכָבוֹד מַר לֵוִי,",
@@ -2366,12 +2688,18 @@ topic("letter","read",
         {he:"היא התקבלה ונמצאת בבדיקה",ar:"استُلم وهو قيد الفحص",ru:"Его приняли и проверяют",en:"It was received and is being checked"},
         [{he:"היא נדחתה",ar:"رُفض",ru:"Его отклонили",en:"It was refused"},
          {he:"היא אושרה",ar:"وُوفق عليه",ru:"Его одобрили",en:"It was approved"},
-         {he:"היא לא הגיעה",ar:"لم يصل",ru:"Оно не дошло",en:"It never arrived"}]),
+         {he:"היא לא הגיעה",ar:"لم يصل",ru:"Оно не дошло",en:"It never arrived"}],
+        [{he:"המכתב לא אומר ״לא״. הוא אומר שהבקשה נבדקת.",ar:"الكتاب لا يقول «لا»، بل إنّ الطلب قيد الفحص.",ru:"Письмо не отказывает: заявление проверяют.",en:"The letter does not say no — it says the application is being checked."},
+         {he:"עוד אין החלטה. התשובה תישלח תוך שלושים יום.",ar:"لا قرار بعد. سيُرسَل الجواب خلال ثلاثين يومًا.",ru:"Решения ещё нет: ответ придёт в течение тридцати дней.",en:"There is no decision yet — the answer will come within thirty days."},
+         {he:"כתוב במפורש שהבקשה התקבלה.",ar:"مكتوب صراحةً أنّ الطلب استُلم.",ru:"Прямо написано, что заявление получено.",en:"It says plainly that the application was received."}]),
      Q({he:"מה חשוב לשמור מהמכתב הזה?",ar:"ما المهمّ حفظه من هذا الكتاب؟",ru:"Что важно сохранить из письма?",en:"What is worth keeping from this letter?"},
         {he:"את מספר התיק",ar:"رقم الملفّ",ru:"Номер дела",en:"The case number"},
         [{he:"את התאריך בלבד",ar:"التاريخ فقط",ru:"Только дату",en:"Only the date"},
          {he:"את שם הפקיד",ar:"اسم الموظّف",ru:"Имя чиновника",en:"The clerk's name"},
-         {he:"את סכום הארנונה",ar:"مبلغ ضريبة البلدية",ru:"Сумму налога",en:"The tax amount"}])]),
+         {he:"את סכום הארנונה",ar:"مبلغ ضريبة البلدية",ru:"Сумму налога",en:"The tax amount"}],
+        [{he:"המספר 4127 הוא מה שמזהה את הבקשה שלכם.",ar:"الرقم 4127 هو ما يعرّف طلبكم.",ru:"Номер 4127 — то, что опознаёт ваше заявление.",en:"The number 4127 is what identifies your application."},
+         {he:"שם הפקיד לא מופיע במכתב כלל.",ar:"اسم الموظّف لا يَرِد في الكتاب أبدًا.",ru:"Имени чиновника в письме вообще нет.",en:"The clerk's name does not appear in the letter at all."},
+         {he:"המכתב לא נוקב בשום סכום.",ar:"الكتاب لا يذكر أيّ مبلغ.",ru:"В письме не названа никакая сумма.",en:"The letter names no amount at all."}])]),
 
   PARA(["דָּרוּשׁ עוֹבֵד לְמַחְסָן.",
      "הָעֲבוֹדָה בְּמִשְׁמָרוֹת, חָמֵשׁ פְּעָמִים בְּשָׁבוּעַ.",
@@ -2384,12 +2712,18 @@ topic("letter","read",
         {he:"לא, כלל לא",ar:"لا، ليس أبدًا",ru:"Нет, совсем не нужен",en:"No, none at all"},
         [{he:"כן, שנה לפחות",ar:"نعم، سنة على الأقلّ",ru:"Да, хотя бы год",en:"Yes, at least a year"},
          {he:"רק למשמרת לילה",ar:"لوردية الليل فقط",ru:"Только для ночной смены",en:"Only for the night shift"},
-         {he:"כן, במחסן דווקא",ar:"نعم، في مستودع تحديدًا",ru:"Да, именно на складе",en:"Yes, in a warehouse specifically"}]),
+         {he:"כן, במחסן דווקא",ar:"نعم، في مستودع تحديدًا",ru:"Да, именно на складе",en:"Yes, in a warehouse specifically"}],
+        [{he:"כתוב במודעה ״אין צורך בניסיון קודם״.",ar:"مكتوب في الإعلان «لا حاجة لخبرة سابقة».",ru:"В объявлении сказано: «прежний опыт не нужен».",en:"The advert says 'no previous experience needed'."},
+         {he:"המודעה לא מבדילה בין משמרות בעניין הניסיון.",ar:"الإعلان لا يفرّق بين الورديات في مسألة الخبرة.",ru:"Объявление не различает смены по требованию опыта.",en:"The advert does not treat shifts differently about experience."},
+         {he:"אין דרישת ניסיון, לא במחסן ולא במקום אחר.",ar:"لا يوجد شرط خبرة، لا في المستودع ولا في غيره.",ru:"Опыт не требуется — ни на складе, ни где-либо ещё.",en:"No experience is required, in a warehouse or anywhere else."}]),
      Q({he:"מה המשמעות של ״יתרון״ כאן?",ar:"ما معنى «ميزة» هنا؟",ru:"Что здесь значит «преимущество»?",en:"What does 'an advantage' mean here?"},
         {he:"זה עוזר אבל אפשר גם בלי",ar:"يساعد ولكن يمكن بدونه",ru:"Помогает, но можно и без",en:"It helps but is not required"},
         [{he:"זה תנאי הכרחי",ar:"شرط لا بدّ منه",ru:"Обязательное условие",en:"It is a strict condition"},
          {he:"זה שכר גבוה יותר",ar:"أجر أعلى",ru:"Более высокая зарплата",en:"A higher wage"},
-         {he:"זה נבדק במבחן",ar:"يُفحص في امتحان",ru:"Это проверяют экзаменом",en:"It is tested in an exam"}])]),
+         {he:"זה נבדק במבחן",ar:"يُفحص في امتحان",ru:"Это проверяют экзаменом",en:"It is tested in an exam"}],
+        [{he:"תנאי הכרחי היה נכתב ״חובה״, ולא ״יתרון״.",ar:"الشرط اللازم يُكتب «إلزامي»، لا «ميزة».",ru:"Обязательное условие писали бы «обязательно», а не «преимущество».",en:"A strict condition would say 'required', not 'an advantage'."},
+         {he:"המודעה לא מזכירה שכר בכלל.",ar:"الإعلان لا يذكر الأجر إطلاقًا.",ru:"О зарплате в объявлении вообще не сказано.",en:"The advert says nothing about pay."},
+         {he:"אין במודעה שום מבחן.",ar:"لا يوجد أيّ امتحان في الإعلان.",ru:"Никакого экзамена в объявлении нет.",en:"There is no exam anywhere in the advert."}])]),
 
   PARA(["לְעוֹבְדֵי הַמַּחְלָקָה שָׁלוֹם.",
      "מִיּוֹם רִאשׁוֹן הַכְּנִיסָה לַבִּנְיָן תִּהְיֶה מִצַּד הַחֲנָיָה.",
@@ -2402,17 +2736,26 @@ topic("letter","read",
         {he:"מצד החנייה",ar:"من جهة الموقف",ru:"Со стороны парковки",en:"From the car park side"},
         [{he:"מהשער הקדמי",ar:"من البوّابة الأمامية",ru:"Через передние ворота",en:"Through the front gate"},
          {he:"מהמדרגות האחוריות",ar:"من الدرج الخلفي",ru:"По задней лестнице",en:"Up the back stairs"},
-         {he:"מהמחסן",ar:"من المستودع",ru:"Через склад",en:"Through the warehouse"}]),
+         {he:"מהמחסן",ar:"من المستودع",ru:"Через склад",en:"Through the warehouse"}],
+        [{he:"השער הקדמי סגור, והוא בשיפוצים חודש.",ar:"البوّابة الأمامية مغلقة، وهي قيد الترميم شهرًا.",ru:"Передние ворота закрыты: там месяц идёт ремонт.",en:"The front gate is closed — it is under renovation for a month."},
+         {he:"מדרגות אחוריות לא מוזכרות בהודעה.",ar:"الدرج الخلفي غير مذكور في الإعلان.",ru:"Задняя лестница в объявлении не упомянута.",en:"Back stairs are not mentioned in the notice."},
+         {he:"אין בהודעה הזאת מחסן.",ar:"لا مستودع في هذا الإعلان.",ru:"Никакого склада в этом объявлении нет.",en:"There is no warehouse in this notice."}]),
      Q({he:"כמה זמן יימשכו השיפוצים?",ar:"كم تستمرّ أعمال الترميم؟",ru:"Сколько продлится ремонт?",en:"How long will the works last?"},
         {he:"חודש",ar:"شهر",ru:"Месяц",en:"A month"},
         [{he:"שבוע",ar:"أسبوع",ru:"Неделю",en:"A week"},
          {he:"יומיים",ar:"يومان",ru:"Два дня",en:"Two days"},
-         {he:"שנה",ar:"سنة",ru:"Год",en:"A year"}]),
+         {he:"שנה",ar:"سنة",ru:"Год",en:"A year"}],
+        [{he:"כתוב חודש, וחודש ארוך משבוע.",ar:"مكتوب شهر، والشهر أطول من أسبوع.",ru:"Написано «месяц», а месяц дольше недели.",en:"It says a month, and a month is longer than a week."},
+         {he:"יומיים הם הרבה פחות מחודש.",ar:"يومان أقلّ بكثير من شهر.",ru:"Два дня — намного меньше месяца.",en:"Two days is far less than a month."},
+         {he:"שנה היא הרבה יותר מחודש אחד.",ar:"السنة أكثر بكثير من شهر واحد.",ru:"Год — намного больше одного месяца.",en:"A year is far more than a single month."}]),
      Q({he:"מה עושה מי ששכח כרטיס?",ar:"ماذا يفعل من نسي البطاقة؟",ru:"Что делает тот, кто забыл пропуск?",en:"What does someone who forgot the card do?"},
         {he:"פונה לשומר",ar:"يتوجّه إلى الحارس",ru:"Обращается к охраннику",en:"Turns to the guard"},
         [{he:"חוזר הביתה",ar:"يعود إلى البيت",ru:"Возвращается домой",en:"Goes back home"},
          {he:"ממתין בחוץ",ar:"ينتظر في الخارج",ru:"Ждёт снаружи",en:"Waits outside"},
-         {he:"מתקשר למחלקה",ar:"يتّصل بالقسم",ru:"Звонит в отдел",en:"Calls the department"}])])
+         {he:"מתקשר למחלקה",ar:"يتّصل بالقسم",ru:"Звонит в отдел",en:"Calls the department"}],
+        [{he:"אין צורך לחזור: יש פתרון במקום, השומר.",ar:"لا داعي للعودة: الحلّ في المكان، الحارس.",ru:"Возвращаться не надо: на месте есть охранник.",en:"No need to go home — the guard is there to solve it."},
+         {he:"אין צורך לחכות. פונים לשומר ונכנסים.",ar:"لا داعي للانتظار: تتوجّه إلى الحارس وتدخل.",ru:"Ждать не нужно: обращаются к охраннику и входят.",en:"No need to wait — you turn to the guard and go in."},
+         {he:"ההודעה מפנה לשומר, ולא לטלפון.",ar:"الإعلان يوجّه إلى الحارس، لا إلى الهاتف.",ru:"Объявление отсылает к охраннику, а не к телефону.",en:"The notice sends you to the guard, not to the phone."}])])
  ],
  [
   PARA(["הוֹדָעָה עַל שִׁנּוּי בִּשְׁעוֹת קַבָּלַת קָהָל.",
@@ -2425,18 +2768,27 @@ topic("letter","read",
     [Q({he:"מה קורה למי שכבר קבע תור?",ar:"ماذا يحدث لمن حدّد موعدًا سابقًا؟",ru:"Что с теми, кто уже записан?",en:"What happens to someone already booked?"},
         {he:"התור שלו נשאר בתוקף",ar:"موعده يبقى ساريًا",ru:"Их приём остаётся в силе",en:"Their appointment still stands"},
         [{he:"עליו לקבוע מחדש",ar:"عليه إعادة التحديد",ru:"Надо записаться заново",en:"They must rebook"},
-         {he:"התור מתבטל",ar:"يُلغى الموعد",ru:"Приём отменяется",en:"The appointment is cancelled"},
-         {he:"התור עובר לטלפון",ar:"يتحوّل الموعد إلى الهاتف",ru:"Приём переносится на телефон",en:"The appointment moves to the phone"}]),
+         {he:"התור מתבטל והמשרד יודיע",ar:"يُلغى الموعد ويُبلغكم المكتب",ru:"Приём отменяется, и офис сообщит",en:"The appointment is cancelled and the office will let you know"},
+         {he:"התור עובר לטלפון",ar:"يتحوّل الموعد إلى الهاتف",ru:"Приём переносится на телефон",en:"The appointment moves to the phone"}],
+        [{he:"השורה האחרונה אומרת שהתור נשאר בתוקפו.",ar:"السطر الأخير يقول إنّ الموعد يبقى ساريًا.",ru:"Последняя строка говорит, что приём остаётся в силе.",en:"The last line says the appointment still stands."},
+         {he:"השינוי הוא בשעות הקבלה, ותורים שנקבעו נשארים.",ar:"التغيير في ساعات الاستقبال، والمواعيد المحدَّدة تبقى.",ru:"Меняются часы приёма, а назначенные приёмы остаются.",en:"What changed is the opening hours; booked appointments stay."},
+         {he:"הטלפון נועד לפניות דחופות, לא לתורים קיימים.",ar:"الهاتف للمراجعات العاجلة، لا للمواعيد القائمة.",ru:"Телефон — для срочных обращений, а не для готовых записей.",en:"The phone is for urgent enquiries, not for existing appointments."}]),
      Q({he:"באילו ימים המשרד פתוח לקהל?",ar:"في أيّ أيام يفتح المكتب للجمهور؟",ru:"В какие дни офис принимает?",en:"On which days is the office open to the public?"},
         {he:"שני ורביעי בלבד",ar:"الاثنين والأربعاء فقط",ru:"Только понедельник и среда",en:"Monday and Wednesday only"},
         [{he:"כל יום",ar:"كلّ يوم",ru:"Каждый день",en:"Every day"},
          {he:"שני עד חמישי",ar:"من الاثنين إلى الخميس",ru:"С понедельника по четверг",en:"Monday to Thursday"},
-         {he:"ראשון ורביעי",ar:"الأحد والأربعاء",ru:"Воскресенье и среда",en:"Sunday and Wednesday"}]),
+         {he:"ראשון, שני ורביעי",ar:"الأحد والاثنين والأربعاء",ru:"Воскресенье, понедельник и среда",en:"Sunday, Monday and Wednesday"}],
+        [{he:"המילה ״בלבד״ מצמצמת את הקבלה לשני ימים.",ar:"كلمة «فقط» تحصر الاستقبال بيومين.",ru:"Слово «только» сводит приём к двум дням.",en:"The word 'only' narrows it to two days."},
+         {he:"שלישי וחמישי אינם ימי קבלת קהל.",ar:"الثلاثاء والخميس ليسا يومَي استقبال.",ru:"Вторник и четверг — не приёмные дни.",en:"Tuesday and Thursday are not public days."},
+         {he:"היום הראשון שבהודעה הוא שני, ולא ראשון.",ar:"اليوم الأوّل في الإعلان هو الاثنين، لا الأحد.",ru:"Первый день в объявлении — понедельник, а не воскресенье.",en:"The first day in the notice is Monday, not Sunday."}]),
      Q({he:"מה אפשר לעשות בימים שהמשרד סגור?",ar:"ماذا يمكن فعله في الأيام المغلقة؟",ru:"Что можно сделать в закрытые дни?",en:"What can you do on the closed days?"},
         {he:"לפנות בטלפון או באתר",ar:"المراجعة بالهاتف أو الموقع",ru:"Обратиться по телефону или на сайте",en:"Get in touch by phone or online"},
         [{he:"לחכות לחודש הבא",ar:"الانتظار للشهر القادم",ru:"Ждать следующего месяца",en:"Wait for next month"},
-         {he:"לגשת לסניף אחר",ar:"التوجّه لفرع آخر",ru:"Идти в другой филиал",en:"Go to another branch"},
-         {he:"לשלוח מכתב בדואר",ar:"إرسال رسالة بالبريد",ru:"Отправить письмо почтой",en:"Send a letter by post"}])]),
+         {he:"לגשת לסניף אחר של המשרד",ar:"التوجّه إلى فرع آخر للمكتب",ru:"Пойти в другой филиал этого офиса",en:"Go to another branch of the office"},
+         {he:"לשלוח מכתב בדואר",ar:"إرسال رسالة بالبريد",ru:"Отправить письмо почтой",en:"Send a letter by post"}],
+        [{he:"אין צורך לחכות. יש טלפון ויש אתר.",ar:"لا داعي للانتظار: هناك هاتف وموقع.",ru:"Ждать не нужно: есть телефон и сайт.",en:"No need to wait — there is a phone and a website."},
+         {he:"ההודעה לא מזכירה שום סניף אחר.",ar:"الإعلان لا يذكر أيّ فرع آخر.",ru:"Ни о каком другом филиале в объявлении не сказано.",en:"The notice mentions no other branch."},
+         {he:"הדרכים שכתובות בהודעה הן טלפון ואתר.",ar:"الطرق المكتوبة هي الهاتف والموقع.",ru:"В объявлении названы телефон и сайт.",en:"The ways given are the phone and the website."}])]),
 
   PARA(["הוֹדָעָה מִבִּטּוּחַ לְאֻמִּי.",
      "הַתַּשְׁלוּם עֲבוּר הַחֹדֶשׁ הַקּוֹדֵם הֻעֲבַר לַחֶשְׁבּוֹן בְּ־28 בַּחֹדֶשׁ.",
@@ -2446,20 +2798,29 @@ topic("letter","read",
      {w:"יְמֵי עֲסָקִים",g:{he:"ימים שהבנק עובד בהם",ar:"أيام عمل",ru:"рабочие дни",en:"business days"}},
      {w:"סְנִיף",g:{he:"משרד מקומי של גוף גדול",ar:"فرع",ru:"филиал",en:"a branch"}}],
     [Q({he:"מתי צריך לפנות לסניף?",ar:"متى يجب التوجّه إلى الفرع؟",ru:"Когда надо обращаться в филиал?",en:"When should you turn to the branch?"},
-        {he:"אם הכסף לא הגיע תוך חמישה ימי עסקים",ar:"إذا لم يصل المال خلال خمسة أيام عمل",ru:"Если деньги не пришли за пять рабочих дней",en:"If the money has not arrived within five business days"},
+        {he:"אם לא הגיע תוך חמישה ימי עסקים",ar:"إذا لم يصل خلال خمسة أيام عمل",ru:"Если не пришло за пять рабочих дней",en:"If it has not arrived within five business days"},
         [{he:"מיד ב־28 בחודש",ar:"فورًا في 28 من الشهر",ru:"Сразу 28-го числа",en:"Right on the 28th of the month"},
          {he:"לפני שהתשלום נשלח",ar:"قبل إرسال الدفعة",ru:"До отправки выплаты",en:"Before the payment is sent"},
-         {he:"אחרי חודשיים המתנה",ar:"بعد شهرين من الانتظار",ru:"После двух месяцев ожидания",en:"After waiting two months"}]),
+         {he:"רק אחרי חודשיים של המתנה לתשובה",ar:"فقط بعد شهرين من انتظار الجواب",ru:"Только после двух месяцев ожидания ответа",en:"Only after two months of waiting for an answer"}],
+        [{he:"ב־28 הכסף רק יוצא. מחכים חמישה ימי עסקים.",ar:"في 28 يخرج المال فقط. ننتظر خمسة أيام عمل.",ru:"28-го деньги только уходят. Ждут пять рабочих дней.",en:"On the 28th the money only leaves. You wait five business days."},
+         {he:"פונים רק אחרי שהכסף לא הגיע, לא לפני.",ar:"نتوجّه بعد عدم وصول المال، لا قبله.",ru:"Обращаются лишь после того, как деньги не пришли.",en:"You turn to the branch only after the money fails to arrive."},
+         {he:"ההודעה נוקבת בחמישה ימי עסקים, לא בחודשיים.",ar:"الإعلان يحدّد خمسة أيام عمل، لا شهرين.",ru:"В объявлении названы пять рабочих дней, а не два месяца.",en:"The notice gives five business days, not two months."}]),
      Q({he:"מה עושים כשמחליפים חשבון בנק?",ar:"ماذا نفعل عند تغيير الحساب البنكي؟",ru:"Что делать при смене банковского счёта?",en:"What do you do when you change bank account?"},
         {he:"מודיעים על כך לפני ההחלפה",ar:"نُبلغ عن ذلك قبل التغيير",ru:"Сообщают об этом заранее",en:"You tell them before the change"},
         [{he:"מחכים לתשלום הבא",ar:"ننتظر الدفعة التالية",ru:"Ждут следующую выплату",en:"You wait for the next payment"},
          {he:"פותחים תיק חדש בסניף",ar:"نفتح ملفًّا جديدًا في الفرع",ru:"Открывают новое дело в филиале",en:"You open a new file at the branch"},
-         {he:"שולחים את המכתב בחזרה",ar:"نعيد إرسال الكتاب",ru:"Отправляют письмо обратно",en:"You send the letter back"}]),
+         {he:"שולחים את המכתב בחזרה בדואר",ar:"نعيد إرسال الكتاب بالبريد",ru:"Отправляют письмо обратно почтой",en:"You post the letter back to them"}],
+        [{he:"המתנה עלולה לשלוח את הכסף לחשבון שכבר נסגר.",ar:"الانتظار قد يرسل المال إلى حساب أُغلق.",ru:"Ожидание может отправить деньги на закрытый счёт.",en:"Waiting may send the money to an account already closed."},
+         {he:"ההודעה מבקשת לעדכן פרטים, ולא לפתוח תיק חדש.",ar:"الإعلان يطلب تحديث التفاصيل، لا فتح ملفّ جديد.",ru:"Просят обновить данные, а не заводить новое дело.",en:"The notice asks you to update details, not to open a new file."},
+         {he:"ההודעה היא לידיעה, ואין להחזיר אותה.",ar:"الإعلان للعلم، ولا يُعاد إرساله.",ru:"Объявление — для сведения, возвращать его не нужно.",en:"The notice is for your information; it is not sent back."}]),
      Q({he:"על איזה חודש התשלום הזה?",ar:"عن أيّ شهر هذه الدفعة؟",ru:"За какой месяц эта выплата?",en:"Which month is this payment for?"},
         {he:"על החודש שכבר עבר",ar:"عن الشهر الذي مضى",ru:"За прошедший месяц",en:"For the month that has passed"},
         [{he:"על החודש הנוכחי",ar:"عن الشهر الحالي",ru:"За текущий месяц",en:"For the current month"},
          {he:"על החודש הבא",ar:"عن الشهر القادم",ru:"За следующий месяц",en:"For next month"},
-         {he:"על חצי שנה אחורה",ar:"عن نصف سنة مضت",ru:"За полгода назад",en:"For the past half year"}])]),
+         {he:"על חצי שנה אחורה בבת אחת",ar:"عن نصف سنة مضت دفعةً واحدة",ru:"За полгода назад одной суммой",en:"For the past half year, all at once"}],
+        [{he:"כתוב ״עבור החודש הקודם״, ולא הנוכחי.",ar:"مكتوب «عن الشهر السابق»، لا الحالي.",ru:"Написано «за прошлый месяц», а не за текущий.",en:"It says 'for the previous month', not the current one."},
+         {he:"התשלום כאן הוא על מה שכבר היה, לא על מה שיבוא.",ar:"هذه الدفعة عمّا مضى، لا عمّا سيأتي.",ru:"Эта выплата — за прошедшее, а не за будущее.",en:"This payment is for what has passed, not for what is coming."},
+         {he:"מדובר בחודש אחד בלבד, לא בחצי שנה.",ar:"الحديث عن شهر واحد فقط، لا نصف سنة.",ru:"Речь об одном месяце, а не о полугоде.",en:"It is one month only, not half a year."}])]),
 
   PARA(["דִּירָה לְהַשְׂכָּרָה בְּקוֹמָה שְׁנִיָּה.",
      "שְׁלוֹשָׁה חֲדָרִים, מְרֻהֶטֶת חֶלְקִית, בְּלִי מַעֲלִית.",
@@ -2472,17 +2833,26 @@ topic("letter","read",
         {he:"ארנונה וחשמל",ar:"ضريبة البلدية والكهرباء",ru:"Муниципальный налог и электричество",en:"The city tax and the electricity"},
         [{he:"הרהיטים שבדירה",ar:"الأثاث الموجود في الشقّة",ru:"Мебель в квартире",en:"The furniture in the flat"},
          {he:"החדר השלישי",ar:"الغرفة الثالثة",ru:"Третья комната",en:"The third room"},
-         {he:"מים חמים בחורף",ar:"الماء الساخن شتاءً",ru:"Горячая вода зимой",en:"Hot water in winter"}]),
+         {he:"מים חמים בחורף",ar:"الماء الساخن شتاءً",ru:"Горячая вода зимой",en:"Hot water in winter"}],
+        [{he:"הדירה מרוהטת חלקית, והרהיטים כן נמצאים בה.",ar:"الشقّة مفروشة جزئيًا، والأثاث موجود فيها.",ru:"Квартира частично меблирована, мебель в ней есть.",en:"The flat is partly furnished, so the furniture is there."},
+         {he:"שלושת החדרים הם הדירה עצמה.",ar:"الغرف الثلاث هي الشقّة نفسها.",ru:"Три комнаты — это и есть сама квартира.",en:"The three rooms are the flat itself."},
+         {he:"המודעה מחריגה ארנונה וחשמל בלבד.",ar:"الإعلان يستثني ضريبة البلدية والكهرباء فقط.",ru:"Объявление исключает только налог и электричество.",en:"The advert leaves out only the city tax and the electricity."}]),
      Q({he:"מי שקשה לו במדרגות — הדירה מתאימה לו?",ar:"من يصعب عليه الدرج — هل تناسبه الشقّة؟",ru:"Подойдёт ли квартира тому, кому трудно по лестнице?",en:"Does the flat suit someone who finds stairs hard?"},
         {he:"לא, אין מעלית והדירה בקומה שנייה",ar:"لا، لا مصعد والشقّة في الطابق الثاني",ru:"Нет: лифта нет, а квартира на втором этаже",en:"No — there is no lift and the flat is on the second floor"},
         [{he:"כן, יש מעלית בבניין",ar:"نعم، في المبنى مصعد",ru:"Да, в доме есть лифт",en:"Yes, the building has a lift"},
          {he:"כן, הדירה בקומת הקרקע",ar:"نعم، الشقّة في الطابق الأرضي",ru:"Да, квартира на первом этаже",en:"Yes, the flat is on the ground floor"},
-         {he:"אי אפשר לדעת מהמודעה",ar:"لا يمكن معرفة ذلك من الإعلان",ru:"По объявлению не понять",en:"The advert does not say"}]),
+         {he:"אי אפשר לדעת מהמודעה, היא לא כותבת",ar:"لا يمكن معرفة ذلك، الإعلان لا يذكره",ru:"По объявлению не понять — оно об этом молчит",en:"The advert does not say — it leaves that out"}],
+        [{he:"כתוב במודעה במפורש ״בלי מעלית״.",ar:"مكتوب في الإعلان صراحةً «بلا مصعد».",ru:"В объявлении прямо сказано «без лифта».",en:"The advert says plainly 'no lift'."},
+         {he:"הדירה בקומה שנייה, ולא בקומת הקרקע.",ar:"الشقّة في الطابق الثاني، لا الأرضي.",ru:"Квартира на втором этаже, а не на первом.",en:"The flat is on the second floor, not the ground floor."},
+         {he:"המודעה כן אומרת: קומה שנייה, ובלי מעלית.",ar:"الإعلان يقول فعلًا: الطابق الثاني وبلا مصعد.",ru:"Объявление всё говорит: второй этаж и без лифта.",en:"The advert does say it: second floor, and no lift."}]),
      Q({he:"מתי אפשר להיכנס לדירה?",ar:"متى يمكن الدخول إلى الشقّة؟",ru:"Когда можно въехать в квартиру?",en:"When can you move into the flat?"},
         {he:"בתחילת החודש הבא, אחרי תיאום",ar:"في بداية الشهر القادم، بعد تنسيق",ru:"В начале следующего месяца, по согласованию",en:"At the start of next month, once arranged"},
         [{he:"מיד עם החתימה",ar:"فور التوقيع",ru:"Сразу после подписания",en:"Immediately on signing"},
          {he:"בסוף החודש הזה",ar:"في نهاية هذا الشهر",ru:"В конце этого месяца",en:"At the end of this month"},
-         {he:"אחרי שיביאו רהיטים",ar:"بعد إحضار الأثاث",ru:"После доставки мебели",en:"After the furniture arrives"}])])
+         {he:"אחרי שבעל הדירה יביא את הרהיטים",ar:"بعد أن يُحضر صاحب الشقّة الأثاث",ru:"После того как хозяин привезёт мебель",en:"After the landlord brings the furniture"}],
+        [{he:"הכניסה בראשון לחודש הבא, ולא ביום החתימה.",ar:"الدخول في الأوّل من الشهر القادم، لا يوم التوقيع.",ru:"Въезд — первого числа следующего месяца, а не в день подписания.",en:"You move in on the first of next month, not on signing day."},
+         {he:"התאריך שכתוב הוא הראשון לחודש הבא.",ar:"التاريخ المكتوب هو الأوّل من الشهر القادم.",ru:"Указана дата — первое число следующего месяца.",en:"The date given is the first of next month."},
+         {he:"הדירה כבר מרוהטת חלקית, ואין תנאי כזה במודעה.",ar:"الشقّة مفروشة جزئيًا أصلًا، ولا شرط كهذا في الإعلان.",ru:"Квартира уже частично меблирована, такого условия нет.",en:"The flat is already partly furnished; no such condition appears."}])])
  ]
 ]);
 
@@ -2646,8 +3016,10 @@ function formBack(tp,lv,pool,idx){
   var ds=wordDistract(it,pool,14);
   var opts=fillOpts([O(lrn(it.w),true)],ds,4,
     function(d){return d.w.toLowerCase()},
+    /* מסיח מ-near שאין לו פריט בבנק אין לו g, ואז הנימוק יצא ריק.
+       WHYG נותן לו משמעות במקום שורה חסרה. */
     function(d){return O(lrn(d.w),false,
-      d.g?(d.w+" = "+gl(d.g)):"")},
+      d.g?(d.w+" = "+gl(d.g)):whyWord(d.w))},
     it.w.toLowerCase());
   return {type:"back",prompt:t("qSay"),lead:ml(lv,it.g),subject:null,
     opts:shuffle(opts),answer:it.w,say:it.w,reveal:it};
@@ -2663,7 +3035,7 @@ function formHear(tp,lv,pool,idx){
   var opts=fillOpts([O(lrn(it.w),true)],ds,4,
     function(d){return d.w.toLowerCase()},
     function(d){return O(lrn(d.w),false,
-      d.g?(d.w+" = "+gl(d.g)):"")},
+      d.g?(d.w+" = "+gl(d.g)):whyWord(d.w))},
     it.w.toLowerCase());
   return {type:"hear",prompt:t("qHear"),subject:null,hidden:it,
     opts:shuffle(opts),answer:it.w,say:it.w,reveal:it,auto:true};
@@ -2854,9 +3226,12 @@ function formGap(tp,lv,pool,idx){
     return near.concat(far);
   }
   var cands=byLen(shuffle(others)).concat(byLen(backup));
+  /* מסיח בתרגיל ההשלמה נחתך ממשפט ואין לו פריט בבנק, ולכן אין לו
+     g. WHYG מחזיר את משמעותו, וזה הדבר היחיד שהמשוב עוד לא אומר:
+     המשפט המלא ותרגומו כבר מוצגים דרך reveal. */
   var opts=fillOpts([O(lrn(gone),true)],cands,4,
     function(w){return hebPlain(w)},
-    function(w){return O(lrn(w),false)},
+    function(w){return O(lrn(w),false,whyWord(w))},
     hebPlain(gone));
   return {type:"gap",prompt:t("qGap"),gapHtml:lrn(shown.join(" ")),
     lead:gl(it.g),subject:null,opts:shuffle(opts),answer:gone,say:it.s,reveal:it};
@@ -2877,7 +3252,13 @@ function formComp(tp,lv,pool,idx){
   var it=pool[idx];
   var qq=pick(it.qs);
   var opts=[O(esc(gl(qq.a)),true)];
-  qq.w.forEach(function(x){opts.push(O(esc(gl(x)),false))});
+  /* הנימוק מגיע מ-whys שבשאלה, לפי אותו סדר. בהבנת הנקרא אין
+     לפריט g ואין reveal, ולכן בלי הנימוק המשוב היה "התשובה: X"
+     ותו לא — הלומד לא ידע מה בקטע פסל את מה שסימן. */
+  qq.w.forEach(function(x,i){
+    var y=(qq.y&&qq.y[i])?gl(qq.y[i]):"";
+    opts.push(O(esc(gl(x)),false,y));
+  });
   return {type:"comp",prompt:t("qRead"),passage:it,qtext:gl(qq.q),
     opts:shuffle(opts),answer:gl(qq.a),say:it.lines.join(" "),subject:null};
 }
@@ -4862,7 +5243,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a20-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a25-pwa1").catch(function(){});
   });
 }
 </script>
