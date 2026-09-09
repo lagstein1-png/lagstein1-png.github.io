@@ -66,6 +66,10 @@ const SUITE = [
   { id: 'tutor',    args: [] },
   { id: 'smoke',    args: PAGES,  needsServer: true },
   { id: 'say',      args: [],     needsServer: true },
+  /* מה שבאמת מגיע למנוע ההקראה. content.js מודד שדה שנדגם; זה מריץ
+     את speakMath על שאלות שנבנו וקורא את הפלט. תפס ^ גולמי ב-math-uni2
+     בזמן ש-content.js החזיר עליה PASS. */
+  { id: 'saysym',   args: [],     needsServer: true },
   { id: 'clicks',   args: [],     needsServer: true },
   { id: 'langbtn',  args: [],     needsServer: true },
   /* מנוע ההקראה מול speechSynthesis מזויף. slow: הוא ממתין 9.8
