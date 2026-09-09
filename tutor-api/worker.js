@@ -202,8 +202,19 @@ function json(obj, status, env) {
 }
 
 /* ---------- מונה יומי. בלי KV הוא פשוט אינו סופר ---------- */
+/* בלי KV אין מונה, ובלי מונה **אין תקרה יומית בכלל** — התקרות
+   האחרות מגבילות אורך בקשה, לא כמות. כלומר כל ההגנה על העלות
+   תלויה בקישור אחד שקל לשכוח בהקמה.
+
+   לכן נכשל־סגור: אין `RATE` — אין שירות, והתשובה אומרת בדיוק
+   מה חסר. מי שרוצה בכל זאת להריץ בלי מונה מצהיר על כך במפורש
+   במשתנה `ALLOW_NO_RATE_LIMIT=yes`, ואז זו החלטה ולא שכחה. */
+function noCounter(env) {
+  return !env.RATE && String(env.ALLOW_NO_RATE_LIMIT || "").toLowerCase() !== "yes";
+}
+
 async function overLimit(env, ip) {
-  if (!env.RATE) return false;                    /* אין KV — התקרות הפנימיות עדיין חלות */
+  if (!env.RATE) return false;                    /* הוצהר במפורש — ראו noCounter */
   const day = new Date().toISOString().slice(0, 10);
   const keys = ["d:" + day + ":" + ip, "d:" + day + ":ALL"];
   const caps = [LIM.perDay, LIM.globalPerDay];
@@ -362,6 +373,12 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env) });
     if (request.method !== "POST") return json({ error: "method" }, 405, env);
     if (!env.ANTHROPIC_API_KEY) return json({ error: "server" }, 500, env);
+    /* אין מונה יומי ואין הצהרה — לא מתחילים. עדיף בוט שאינו עונה
+       על חשבון שאינו חסום. */
+    if (noCounter(env))
+      return json({ error: "no-rate-limit",
+        detail: "חסר קישור KV בשם RATE. בלעדיו אין תקרה יומית. " +
+                "לקשור אותו, או להצהיר ALLOW_NO_RATE_LIMIT=yes." }, 503, env);
 
     let body;
     try { body = await request.json() } catch (e) { return json({ error: "bad" }, 400, env) }
@@ -396,4 +413,4 @@ export default {
 /* מיוצאים בנפרד כדי ש-node .claude/qa/tutor.js יוכל לבדוק אותם.
    Cloudflare קורא רק את ה-default, וייצוא נוסף אינו מפריע לו. */
 export { revealsAnswer, badEquation, readBody, contextBlock, LIM, CORE, ROLE, LANGS,
-         buildBody, buildHeaders, capOf, MODEL, MAX_TOKENS };
+         buildBody, buildHeaders, capOf, noCounter, MODEL, MAX_TOKENS };

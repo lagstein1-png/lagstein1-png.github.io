@@ -177,6 +177,12 @@ import(WORKER).then(W => {
   t('תקרה יומית לשירות כולו', W.LIM.globalPerDay <= 100, true);
   t('תקרה יומית לכתובת אחת',  W.LIM.perDay <= 20, true);
   t('תקרת אורך התשובה',       W.MAX_TOKENS <= 700, true);
+  /* בלי KV אין מונה, ובלי מונה אין תקרה יומית — כלומר כל ההגנה
+     על העלות תלויה בקישור אחד שקל לשכוח בהקמה. נכשל־סגור. */
+  t('בלי KV השירות מסרב',            W.noCounter({}), true);
+  t('עם KV השירות עובד',             W.noCounter({ RATE: {} }), false);
+  t('הצהרה מפורשת מתירה בלי KV',      W.noCounter({ ALLOW_NO_RATE_LIMIT: 'yes' }), false);
+  t('הצהרה חלקית אינה מתירה',         W.noCounter({ ALLOW_NO_RATE_LIMIT: 'true' }), true);
 
   /* ---------- 6. התשתית בדפדפן ---------- */
   LANGS.forEach(l => {
