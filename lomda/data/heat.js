@@ -79,7 +79,13 @@ BANK({
     {he:"חומר שהחום עובר בו לאט. עץ, פלסטיק ואוויר הם מבודדים, ולכן ידית עץ נשארת קרה גם על אש.",
      ar:"مادّة تنتقل فيها الحرارة ببطء. الخشب والبلاستيك والهواء عوازل، لذلك يبقى المقبض الخشبي باردًا حتى فوق النار.",
      ru:"Вещество, в котором тепло проходит медленно. Дерево, пластик и воздух — изоляторы, поэтому деревянная ручка остаётся холодной даже над огнём.",
-     en:"A material that heat passes through slowly. Wood, plastic and air are insulators, which is why a wooden handle stays cool even over a flame."})
+     en:"A material that heat passes through slowly. Wood, plastic and air are insulators, which is why a wooden handle stays cool even over a flame."}),
+
+C({he:"שטח המגע",ar:"مساحة التلامس",ru:"Площадь соприкосновения",en:"The contact area"},
+    {he:"ככל ששני גופים נוגעים בשטח גדול יותר, החום עובר ביניהם מהר יותר. כף שטוחה על מחבת מתחממת מהר מכף שנוגעת בקצה בלבד.",
+     ar:"كلّما زادت مساحة تلامس جسمين، انتقلت الحرارة بينهما أسرع. ملعقة مسطّحة على المقلاة تسخن أسرع من ملعقة تلامسها بطرفها فقط.",
+     ru:"Чем больше площадь, которой тела соприкасаются, тем быстрее между ними идёт тепло. Плоская ложка на сковороде нагревается быстрее, чем та, что касается лишь кончиком.",
+     en:"The larger the area where two bodies touch, the faster heat passes between them. A flat spoon on a pan warms faster than one touching only at its tip."})
  ],
 
  [ /* רמה 2 — למה זה קורה, ואיפה כל דרך פועלת */
@@ -112,7 +118,13 @@ BANK({
     {he:"הערבוב יוצר הסעה ביד. הוא מביא את המים החמים במגע עם הקרים ועם האוויר, וכך התה מתקרר מהר יותר.",
      ar:"التحريك يصنع حملًا باليد. يجعل الماء الساخن يلامس البارد والهواء، فيبرد الشاي أسرع.",
      ru:"Размешивание создаёт конвекцию вручную. Оно приводит горячую воду в соприкосновение с холодной и с воздухом, и чай остывает быстрее.",
-     en:"Stirring makes convection by hand. It brings the hot liquid into contact with the cooler liquid and the air, so the tea cools faster."})
+     en:"Stirring makes convection by hand. It brings the hot liquid into contact with the cooler liquid and the air, so the tea cools faster."}),
+
+C({he:"למה נושפים על מרק חם",ar:"لماذا ننفخ على الحساء الساخن",ru:"Зачем дуют на горячий суп",en:"Why you blow on hot soup"},
+    {he:"הנשיפה מרחיקה את האדים החמים שמעל המרק ומביאה אוויר קר במקומם. שתי הדרכים פועלות יחד: אידוי מהיר יותר והסעה מהירה יותר.",
+     ar:"النفخ يُبعد البخار الساخن فوق الحساء ويجلب هواءً باردًا مكانه. الطريقتان تعملان معًا: تبخّر أسرع وحمل أسرع.",
+     ru:"Дуновение уносит горячий пар над супом и приводит на его место холодный воздух. Два пути работают вместе: быстрее испарение и быстрее конвекция.",
+     en:"Blowing pushes away the hot vapour above the soup and brings cool air in its place. Two ways work together: faster evaporation and faster convection."})
  ],
 
  [ /* רמה 3 — הבחנה בין המקרים, וזיהוי הדרך במצב מורכב */
@@ -327,7 +339,13 @@ BANK({
     {he:"המצב שבו שני גופים הגיעו לאותה טמפרטורה, והחום ביניהם מפסיק לעבור.",
      ar:"الحالة التي يصل فيها جسمان إلى درجة الحرارة نفسها، فتتوقّف الحرارة عن الانتقال بينهما.",
      ru:"Состояние, когда два тела пришли к одной температуре и теплота между ними перестаёт переходить.",
-     en:"The state in which two bodies have reached the same temperature, and heat stops passing between them."})
+     en:"The state in which two bodies have reached the same temperature, and heat stops passing between them."}),
+
+C({he:"מעלות צלזיוס",ar:"درجة مئوية",ru:"Градус Цельсия",en:"Degrees Celsius"},
+    {he:"סולם המדידה הנפוץ. אפס מעלות הוא הטמפרטורה שבה מים קופאים, ומאה מעלות היא זו שבה הם רותחים בגובה פני הים.",
+     ar:"سلّم القياس الشائع. الصفر هو درجة تجمّد الماء، والمئة هي درجة غليانه عند مستوى سطح البحر.",
+     ru:"Распространённая шкала измерения. Ноль — температура замерзания воды, сто — её кипения на уровне моря.",
+     en:"The common measuring scale. Zero is where water freezes, and a hundred is where it boils at sea level."})
  ],
 
  [ /* רמה 2 — ההבחנה שבין השניים */
@@ -360,7 +378,13 @@ BANK({
     {he:"מים צריכים הרבה חום כדי להתחמם במעלה אחת, ומתכת מעט. לכן הים מתחמם לאט וחול מתלהט מהר.",
      ar:"يحتاج الماء إلى حرارة كثيرة ليسخن درجة واحدة، والمعدن إلى قليل. لذلك يسخن البحر ببطء ويلتهب الرمل بسرعة.",
      ru:"Воде нужно много теплоты, чтобы нагреться на градус, металлу — мало. Поэтому море нагревается медленно, а песок раскаляется быстро.",
-     en:"Water needs a lot of heat to rise by one degree; metal needs little. That is why the sea warms slowly while sand turns scorching fast."})
+     en:"Water needs a lot of heat to rise by one degree; metal needs little. That is why the sea warms slowly while sand turns scorching fast."}),
+
+C({he:"למה לא מודדים טמפרטורה בשמש",ar:"لماذا لا تُقاس الحرارة تحت الشمس",ru:"Почему температуру не меряют на солнце",en:"Why you do not measure temperature in the sun"},
+    {he:"בשמש המדחום קולט קרינה ישירות ומתחמם מעבר לאוויר שסביבו. מדידה נכונה של טמפרטורת האוויר נעשית בצל.",
+     ar:"تحت الشمس يمتصّ المقياس الإشعاع مباشرة فيسخن أكثر من الهواء حوله. القياس الصحيح لحرارة الهواء يكون في الظلّ.",
+     ru:"На солнце термометр напрямую поглощает излучение и нагревается сильнее окружающего воздуха. Правильно измерять температуру воздуха в тени.",
+     en:"In the sun a thermometer absorbs radiation directly and warms beyond the air around it. Air temperature is measured correctly in the shade."})
  ],
 
  [ /* רמה 3 — יישום והסקה */
@@ -505,7 +529,13 @@ BANK({
     {he:"הבגד אינו מוסיף חום; הגוף מייצר אותו והבגד שומר. שתי אמירות שנשמעות דומה ומתארות דברים שונים.",
      ar:"الثوب لا يضيف حرارة؛ الجسم ينتجها والثوب يحفظها. عبارتان تبدوان متشابهتين وتصفان أمرين مختلفين.",
      ru:"Одежда не добавляет тепла; его вырабатывает тело, а одежда сохраняет. Две похожие фразы описывают разные вещи.",
-     en:"Clothing adds no heat; the body makes it and the clothing keeps it. Two phrases that sound alike describe different things."})
+     en:"Clothing adds no heat; the body makes it and the clothing keeps it. Two phrases that sound alike describe different things."}),
+
+C({he:"״האש עולה למעלה״ — לא מדויק",ar:"״النار تصعد إلى الأعلى״ — غير دقيق",ru:"«Огонь идёт вверх» — неточно",en:"'Fire goes up' — not accurate"},
+    {he:"מה שעולה הוא האוויר החם, והלהבה נמשכת אחריו. לכן להבה בחלל, בלי כוח כבידה, מקבלת צורה של כדור.",
+     ar:"ما يصعد هو الهواء الساخن، واللهب يتبعه. لذلك يأخذ اللهب في الفضاء، بلا جاذبية، شكل كرة.",
+     ru:"Вверх идёт горячий воздух, а пламя тянется за ним. Поэтому в космосе, без тяготения, пламя принимает форму шара.",
+     en:"What rises is the hot air, and the flame follows it. That is why a flame in space, with no gravity, takes the shape of a ball."})
  ],
 
  [ /* רמה 2 — שפה יומיומית מול שפה מדעית */
@@ -538,7 +568,13 @@ BANK({
     {he:"״סגור את החלון, קר״ הוא משפט טוב בבית. במבחן ובניסוי צריך את הניסוח המדעי, וכדאי לדעת לעבור בין השניים.",
      ar:"«أغلق النافذة، الجوّ بارد» جملة جيّدة في البيت. في الامتحان والتجربة نحتاج الصياغة العلمية، ويحسن أن نعرف التنقّل بينهما.",
      ru:"«Закрой окно, холодно» — хорошая фраза дома. На экзамене и в опыте нужна научная формулировка, и полезно уметь переходить между ними.",
-     en:"'Shut the window, it's cold' is a fine sentence at home. In an exam or an experiment you need the scientific wording, and it helps to move between the two."})
+     en:"'Shut the window, it's cold' is a fine sentence at home. In an exam or an experiment you need the scientific wording, and it helps to move between the two."}),
+
+C({he:"״טמפרטורה״ ביומיום",ar:"״درجة الحرارة״ في اليومي",ru:"«Температура» в быту",en:"'Temperature' in everyday speech"},
+    {he:"ביומיום אומרים ״יש לי טמפרטורה״ ומתכוונים לחום גבוה. במדע טמפרטורה היא מדד שקיים תמיד, גם כשהיא נמוכה.",
+     ar:"في اليومي نقول ״عندي حرارة״ ونقصد ارتفاعها. في العلم درجة الحرارة مقياس موجود دائمًا، حتى حين تكون منخفضة.",
+     ru:"В быту говорят «у меня температура», имея в виду жар. В науке температура — величина, которая есть всегда, даже когда она низкая.",
+     en:"In everyday speech people say 'I have a temperature' and mean a fever. In science temperature is a measure that always exists, even when it is low."})
  ],
 
  [ /* רמה 3 — לזהות טעות בטענה של מישהו אחר */
