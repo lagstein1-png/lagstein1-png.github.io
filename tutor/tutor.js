@@ -146,11 +146,71 @@ try{
       if(EL && EL.ov.classList.contains("on")) draw();
     });
 }catch(e){}
+/* ================= מנוע ההקראה — ארבעה מנגנונים =================
+   אותם ארבעה שיושבים בכל אחת עשרה האפליקציות, ומכסים כשלים שקטים
+   של Web Speech שכולם נראים למשתמש אותו דבר: הקול מפסיק באמצע.
+   הפאנל הזה הוא קורא שנים עשר, והוא נבנה בלעדיהם.
+
+   1 · שומר-ער — Chrome ו-Edge בשולחן העבודה חותכים הקראה אחרי
+       כ-15 שניות. במובייל אין את הבאג והפעולה מקרטעת שם.
+   2 · _activeU — הפניה חיה ל-utterance. בלעדיה Chrome אוסף אותו
+       ואיתו את onend, והמקטע הבא לא יוצא לעולם.
+   3 · ttsWatchdog — יש מכשירים שבהם onend לא נורה כלל.
+   4 · נפילה מקול רשת — קול נוירלי של Edge שותק בלי אינטרנט.
+
+   תשובה של ג׳וש היא עד 700 טוקנים, כלומר בקלות מעל 15 שניות. */
+var NEEDS_KEEPALIVE = /Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                   && !/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer = null, _activeU = null, _netVoiceOK = true;
+
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE || !("speechSynthesis" in window) || _kaTimer) return;
+  _kaTimer = setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){ stopKeepAlive(); return }
+      if(speechSynthesis.paused) return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause(); speechSynthesis.resume();
+    }catch(e){ stopKeepAlive() }
+  }, 9000);
+}
+function stopKeepAlive(){ if(_kaTimer){ clearInterval(_kaTimer); _kaTimer = null } }
+/* עוצרים רק כששום דבר כבר לא מדבר — אחרת מקטע שהתחיל זה עתה מאבד
+   את השמירה שלו כשהקודם מסיים להתנקות. */
+function maybeStopKeepAlive(){
+  try{ if(speechSynthesis.speaking || speechSynthesis.pending) return }catch(e){}
+  stopKeepAlive();
+}
+
+/* קול רשת שאי אפשר להשתמש בו עכשיו אינו ״פחות טוב״ — הוא לא יעבוד.
+   לכן מיון ראשון ולא סעיף בניקוד: קנס לא הספיק במאגר הזה, מפני
+   שקול נוירלי צובר על שם היצרן יותר ממה שכל קנס סביר מוריד. */
+function voiceUsable(v){
+  if(!v || v.localService !== false) return 1;
+  return (_netVoiceOK && navigator.onLine !== false) ? 1 : 0;
+}
+
+function ttsWatchdog(alive, onSilent){
+  var idle = 0, dog = setInterval(function(){
+    if(!alive()){ clearInterval(dog); return }
+    var busy = false;
+    try{ busy = !!(speechSynthesis.speaking || speechSynthesis.pending) }catch(e){}
+    if(busy){ idle = 0; return }
+    if(++idle >= 4){ clearInterval(dog); onSilent() }
+  }, 1000);
+  return function(){ clearInterval(dog) };
+}
+
 function pickVoice(code){
-  var v = voices(), p = code.slice(0,2), i;
-  for(i=0;i<v.length;i++) if((v[i].lang||"").replace("_","-").toLowerCase()===code.toLowerCase()) return v[i];
-  for(i=0;i<v.length;i++) if((v[i].lang||"").slice(0,2).toLowerCase()===p) return v[i];
-  return null;
+  var v = voices(), p = code.slice(0,2), i, exact = [], loose = [], l;
+  for(i=0;i<v.length;i++){
+    l = (v[i].lang||"").replace("_","-").toLowerCase();
+    if(l === code.toLowerCase()) exact.push(v[i]);
+    else if(l.slice(0,2) === p) loose.push(v[i]);
+  }
+  var list = exact.length ? exact : loose;
+  if(!list.length) return null;
+  list.sort(function(a,b){ return voiceUsable(b) - voiceUsable(a) });
+  return list[0];
 }
 function hasVoice(code){ return !!pickVoice(code) }
 
@@ -169,6 +229,7 @@ function segments(text){
 
 function stopSay(){
   PLAYING = -1;
+  stopKeepAlive(); _activeU = null;
   try{ speechSynthesis.cancel() }catch(e){}
   draw();
 }
@@ -181,13 +242,44 @@ function say(i){
   if(!segs.length) return;
   PLAYING = i; draw();
   (function next(){
-    if(PLAYING !== i || n >= segs.length){ if(PLAYING===i){ PLAYING=-1; draw() } return }
+    if(PLAYING !== i || n >= segs.length){
+      if(PLAYING === i){ PLAYING = -1; draw() }
+      _activeU = null; maybeStopKeepAlive(); return;
+    }
     var s = segs[n++], code = VOICE[s.l] || VOICE.he;
-    var u = new SpeechSynthesisUtterance(s.t);
+    speakSeg(s.t, code, r, function(){ return PLAYING === i }, next);
+  })();
+}
+
+/* מקטע אחד, ושלושת המנגנונים שסביבו. `done` נקרא בדיוק פעם אחת —
+   בסוף תקין, בשגיאה, או כשהשומר גילה שקט מוחלט. */
+function speakSeg(text, code, r, alive, done){
+  var moved = false, disarm = null, retried = false;
+  function fin(){
+    if(moved) return;
+    moved = true;
+    if(disarm){ disarm(); disarm = null }
+    done();
+  }
+  (function go(){
+    var u = new SpeechSynthesisUtterance(text);
     u.lang = code; u.rate = r;
     var v = pickVoice(code); if(v) u.voice = v;
-    u.onend = next; u.onerror = next;
-    try{ speechSynthesis.speak(u) }catch(e){ next() }
+    u.onend = fin;
+    u.onerror = function(){
+      /* 4 · קול רשת ששתק. מכבים את הדגל, ואותו טקסט נאמר שוב פעם
+         אחת בלבד — הפעם עם קול שהמיון החדש כבר מעדיף. */
+      if(!retried && v && v.localService === false && alive()){
+        retried = true; _netVoiceOK = false; _activeU = null;
+        if(disarm){ disarm(); disarm = null }
+        go(); return;
+      }
+      fin();
+    };
+    _activeU = u;                                      /* 2 */
+    try{ speechSynthesis.speak(u) }catch(e){ fin(); return }
+    startKeepAlive();                                  /* 1 */
+    disarm = ttsWatchdog(function(){ return alive() && !moved }, fin);  /* 3 */
   })();
 }
 
