@@ -208,7 +208,14 @@ const wait = (ms) => new Promise(r => setTimeout(r, ms));
       if (!gate && lg !== LANGS[0]) console.log(`   · ${label} · ${lg}: לא נמצא שער שפה — נבדק בשפת ברירת המחדל`);
 
       rows.push(`${lg}${errs.length ? '✗' : '✓'}`);
-      if (SHOTS) await p.screenshot({ path: path.join(SHOTS, (app || 'home') + '-' + lg + '.png') });
+      /* חלון מבצע ההשקה נפתח על דף הבית חצי שנייה אחרי הטעינה ומכסה
+         אותו. הבדיקות קוראות טקסט ואינן מושפעות; הצילום כן, והוא היה
+         יוצא תמונה של החלון במקום של הדף. Escape סוגר, ורק לפני הצילום. */
+      if (SHOTS) {
+        await p.keyboard.press('Escape');
+        await p.waitForTimeout(350);
+        await p.screenshot({ path: path.join(SHOTS, (app || 'home') + '-' + lg + '.png') });
+      }
       await ctx.close();
     }
     console.log(`${findings ? ' ' : ''}${label.padEnd(12)} ${rows.join(' ')}   ` +
