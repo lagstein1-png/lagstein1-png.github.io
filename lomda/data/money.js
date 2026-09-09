@@ -177,7 +177,7 @@ BANK({
      en:"A compulsory monthly payment that funds benefits — unemployment, disability, old age, maternity. It is deducted from pay and shown on the payslip."}),
   C({he:"פנסיה",ar:"تقاعد",ru:"Пенсия",en:"Pension"},
     {he:"חיסכון לגיל פרישה שמצטבר מדי חודש משלושה מקורות: העובד, המעסיק והפיצויים. הכסף עובר איתכם בין מקומות עבודה.",
-     ar:"ادّخار لسنّ التقاعد يتراكم شهريًّا من ثلاثة مصادر: العامل والمشغّل والتعويضات. المال ينتقل معكم بين أماكن العمل.",
+     ar:"ادّخار لما بعد سنّ العمل يتراكم شهريًّا من ثلاثة مصادر: العامل والمشغّل والتعويضات. المال ينتقل معكم بين أماكن العمل.",
      ru:"Накопление к пенсионному возрасту, пополняемое ежемесячно из трёх источников: работник, работодатель и компенсация. Деньги переходят с вами с работы на работу.",
      en:"Savings for retirement built up each month from three sources: the worker, the employer and severance. The money moves with you between jobs."}),
   C({he:"מס הכנסה",ar:"ضريبة الدخل",ru:"Подоходный налог",en:"Income tax"},

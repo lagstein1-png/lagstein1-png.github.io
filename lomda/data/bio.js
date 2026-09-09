@@ -33,10 +33,10 @@ BANK({
 [
  [ /* רמה 1 — מה יש בתוך התא */
   C({he:"תא",ar:"الخلية",ru:"Клетка",en:"Cell"},
-    {he:"יחידת הבנייה הקטנה של כל יצור חי. יש יצורים שכל גופם הוא תא אחד.",
+    {he:"יחידת הבנייה הקטנה של כל יצור חי. יש יצורים שכל גופם הוא יחידה אחת כזו.",
      ar:"أصغر وحدة بناء في كل كائن حيّ. هناك كائنات جسمها كلّه خليّة واحدة.",
-     ru:"Наименьшая единица строения любого живого существа. Есть существа, всё тело которых — одна клетка.",
-     en:"The smallest building unit of every living thing. Some creatures are a single cell in their whole body."}),
+     ru:"Наименьшая единица строения любого живого существа. Есть существа, всё тело которых состоит из одной такой.",
+     en:"The smallest building unit of every living thing. Some creatures have a whole body made of just one."}),
 
   C({he:"גרעין התא",ar:"نواة الخلية",ru:"Ядро клетки",en:"Cell nucleus"},
     {he:"החדר שבתוך התא שבו שמור החומר התורשתי. לתא של חיידק אין גרעין כזה.",
@@ -144,7 +144,7 @@ BANK({
     {he:"חוט DNA ארוך שארוז בצפיפות. בתא אדם יש 46 כרומוזומים, 23 מכל הורה.",
      ar:"خيط طويل من الحمض النووي ملفوف بإحكام. في خليّة الإنسان 46 صبغيًّا، 23 من كل والد.",
      ru:"Длинная нить ДНК, плотно упакованная. В клетке человека 46 хромосом, по 23 от каждого родителя.",
-     en:"A long thread of DNA packed tightly. A human cell has 46 chromosomes, 23 from each parent."}),
+     en:"A long thread of DNA packed tightly. A human cell has 46 of them, 23 from each parent."}),
 
   E(1866,
     {he:"מנדל פרסם את ניסויי האפונה",ar:"مندل ينشر تجارب البازلاء",
@@ -243,7 +243,7 @@ BANK({
      en:"A hard layer outside the membrane in plant, fungus and bacterial cells, giving the cell a fixed shape. An animal cell has no wall."}),
 
   C({he:"חיידק",ar:"جرثومة (بكتيريا)",ru:"Бактерия",en:"Bacterium"},
-    {he:"יצור חי שכולו תא אחד בלי גרעין, והוא מתרבה בכוחות עצמו. רוב החיידקים אינם גורמים מחלה.",
+    {he:"יצור חי שכולו תא אחד בלי גרעין, והוא מתרבה בכוחות עצמו. רובם אינם גורמים מחלה.",
      ar:"كائن حيّ من خليّة واحدة بلا نواة، ويتكاثر بذاته. ومعظم الجراثيم لا تسبّب المرض.",
      ru:"Живое существо из одной клетки без ядра, которое размножается само по себе. Большинство бактерий болезни не вызывают.",
      en:"A living thing of one cell without a nucleus, and it multiplies on its own. Most bacteria do not cause disease."}),
@@ -321,7 +321,7 @@ BANK({
      en:"A living thing that does not make food itself, and so eats plants or other animals."}),
 
   C({he:"מפרק",ar:"محلِّل",ru:"Разлагатель",en:"Decomposer"},
-    {he:"יצור כמו פטרייה או חיידק שמפרק שאריות של יצורים מתים ומחזיר את החומרים לאדמה.",
+    {he:"יצור כמו פטרייה או חיידק שמעכל שאריות של יצורים מתים ומחזיר את החומרים לאדמה.",
      ar:"كائن كالفطر أو الجرثومة يفكّك بقايا الكائنات الميتة ويعيد المواد إلى التربة.",
      ru:"Существо вроде гриба или бактерии, которое разлагает останки погибших организмов и возвращает вещества в почву.",
      en:"A living thing such as a fungus or a bacterium that breaks down the remains of dead organisms and returns the materials to the soil."}),

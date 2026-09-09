@@ -122,16 +122,16 @@ BANK({
 
  [ /* רמה 2 — הכוחות והצורות שמאחורי החלקים */
   C({he:"לחיצה",ar:"الانضغاط",ru:"Сжатие",en:"Compression"},
-    {he:"כוח שדוחף את החומר משני צדדיו ומקצר אותו. בטון ואבן חזקים מאוד בלחיצה, וזה השימוש שלהם.",
-     ar:"قوّة تدفع المادّة من طرفيها فتقصّرها. الخرسانة والحجر قويّان جدًّا أمام الانضغاط، وهذا استعمالهما.",
-     ru:"Сила, которая давит на материал с двух сторон и укорачивает его. Бетон и камень очень прочны на сжатие, в этом и их применение.",
-     en:"A force that pushes a material from both ends and shortens it. Concrete and stone are very strong in compression, and that is what they are used for."}),
+    {he:"כוח שדוחף את החומר משני צדדיו ומקצר אותו. בטון ואבן חזקים מאוד מולו, וזה השימוש שלהם.",
+     ar:"قوّة تدفع المادّة من طرفيها فتقصّرها. الخرسانة والحجر قويّان جدًّا أمامها، وهذا استعمالهما.",
+     ru:"Сила, которая давит на материал с двух сторон и укорачивает его. Бетон и камень очень хорошо ей сопротивляются, в этом и их применение.",
+     en:"A force that pushes a material from both ends and shortens it. Concrete and stone are very strong against it, and that is what they are used for."}),
 
   C({he:"מתיחה",ar:"الشدّ",ru:"Растяжение",en:"Tension"},
-    {he:"כוח שמושך את החומר לשני הצדדים ומאריך אותו. כבל ופלדה חזקים במתיחה, ובטון לבדו נסדק בה.",
-     ar:"قوّة تشدّ المادّة إلى الطرفين فتطيلها. الكبل والفولاذ قويّان أمام الشدّ، والخرسانة وحدها تتشقّق فيه.",
-     ru:"Сила, которая тянет материал в две стороны и удлиняет его. Трос и сталь прочны на растяжение, а бетон сам по себе при нём трескается.",
-     en:"A force that pulls a material in two directions and stretches it. Cable and steel are strong in tension, while concrete on its own cracks under it."}),
+    {he:"כוח שמושך את החומר לשני הצדדים ומאריך אותו. כבל ופלדה חזקים מולו, ובטון לבדו נסדק ממנו.",
+     ar:"قوّة تشدّ المادّة إلى الطرفين فتطيلها. الكبل والفولاذ قويّان أمامها، والخرسانة وحدها تتشقّق منها.",
+     ru:"Сила, которая тянет материал в две стороны и удлиняет его. Трос и сталь хорошо ей сопротивляются, а бетон сам по себе от неё трескается.",
+     en:"A force that pulls a material in two directions and stretches it. Cable and steel are strong against it, while concrete on its own cracks under it."}),
 
   C({he:"משולש — הצורה היציבה",ar:"المثلّث — الشكل الثابت",ru:"Треугольник — устойчивая форма",en:"The triangle — the stable shape"},
     {he:"אי אפשר לעוות משולש בלי לשנות אורך של צלע. ריבוע מתקפל לצד, ולכן מוסיפים לו מוט באלכסון.",
@@ -219,7 +219,7 @@ BANK({
   C({he:"פלדה",ar:"الفولاذ",ru:"Сталь",en:"Steel"},
     {he:"ברזל עם מעט פחמן. היא חזקה גם במתיחה, ולפני שהיא נשברת היא מתעקמת — וזו התראה שאפשר לראות.",
      ar:"حديد مع قليل من الكربون. قويّ أمام الشدّ أيضًا، وقبل أن ينكسر ينثني — وهذا إنذار يمكن رؤيته.",
-     ru:"Железо с небольшой добавкой углерода. Сталь прочна и на растяжение, а перед тем как сломаться, она гнётся — и это предупреждение, которое видно.",
+     ru:"Железо с небольшой добавкой углерода. Прочно и на растяжение, а перед тем как сломаться, оно гнётся — и это предупреждение, которое видно.",
      en:"Iron with a little carbon in it. It is strong in tension too, and before it breaks it bends — a warning you can see."}),
 
   C({he:"גשר תלוי",ar:"الجسر المعلّق",ru:"Висячий мост",en:"Suspension bridge"},
@@ -313,10 +313,10 @@ BANK({
      en:"A bar resting on one point. The further from the pivot you hold it, the less force you need, but the longer the distance you move."}),
 
   C({he:"גלגלת",ar:"البَكَرة",ru:"Блок",en:"Pulley"},
-    {he:"גלגל עם חריץ לחבל. גלגלת אחת רק משנה כיוון של כוח, וכמה גלגלות יחד מחלקות את המשקל בין קטעי החבל.",
+    {he:"גלגל עם חריץ לחבל. אחד כזה רק משנה כיוון של כוח, וכמה מהם יחד מחלקים את המשקל בין קטעי החבל.",
      ar:"عجلة فيها مجرى للحبل. بكرة واحدة تغيّر اتّجاه القوّة فقط، وعدّة بكرات معًا توزّع الوزن على مقاطع الحبل.",
-     ru:"Колесо с желобом для верёвки. Один блок только меняет направление силы, а несколько блоков вместе делят вес между участками верёвки.",
-     en:"A wheel with a groove for a rope. One pulley only changes the direction of a force, and several pulleys together split the weight between the parts of the rope."}),
+     ru:"Колесо с желобом для верёвки. Одно такое только меняет направление силы, а несколько вместе делят вес между участками верёвки.",
+     en:"A wheel with a groove for a rope. One of them only changes the direction of a force, and several together split the weight between the parts of the rope."}),
 
   C({he:"מישור משופע",ar:"المستوى المائل",ru:"Наклонная плоскость",en:"Inclined plane"},
     {he:"רמפה. מעלים משא לאותו גובה בכוח קטן יותר, אבל דוחפים אותו לאורך דרך ארוכה יותר.",
@@ -399,7 +399,7 @@ BANK({
     {he:"גלגל עם שיניים בהיקפו. השיניים נכנסות לשיניים של גלגל שכן, וכך הסיבוב עובר בלי החלקה ומחליף כיוון.",
      ar:"عجلة لها أسنان على محيطها. تدخل الأسنان في أسنان ترس مجاور، فينتقل الدوران بلا انزلاق ويعكس اتّجاهه.",
      ru:"Колесо с зубьями по ободу. Зубья входят в зубья соседней шестерни, и вращение передаётся без проскальзывания, меняя направление.",
-     en:"A wheel with teeth around its rim. The teeth mesh with the teeth of a neighbouring gear, so the turning passes on without slipping and reverses direction."}),
+     en:"A wheel with teeth around its rim. The teeth mesh with those of a neighbouring wheel, so the turning passes on without slipping and reverses direction."}),
 
   C({he:"יחס תמסורת",ar:"نسبة النقل",ru:"Передаточное отношение",en:"Gear ratio"},
     {he:"היחס בין מספר השיניים של שני גלגלים. גלגל קטן שמסובב גלגל גדול נותן פחות סיבובים וכוח סיבוב גדול יותר.",
@@ -414,10 +414,10 @@ BANK({
      en:"The force times the distance from the axis of rotation. A long spanner undoes a stuck bolt with less hand force than a short one."}),
 
   C({he:"מנוע",ar:"المحرّك",ru:"Двигатель",en:"Engine"},
-    {he:"רכיב שממיר אנרגיה לתנועה. מנוע בעירה שורף דלק ומנוע חשמלי מזרים זרם, ושניהם מסובבים ציר.",
-     ar:"مكوّن يحوّل الطاقة إلى حركة. محرّك الاحتراق يحرق الوقود والمحرّك الكهربائيّ يمرّر تيّارًا، وكلاهما يدير عمودًا.",
-     ru:"Устройство, превращающее энергию в движение. Двигатель внутреннего сгорания жжёт топливо, электрический пропускает ток, и оба вращают вал.",
-     en:"A part that turns energy into motion. A combustion engine burns fuel and an electric motor passes a current, and both of them spin a shaft."}),
+    {he:"רכיב שממיר אנרגיה לתנועה. יש כזה שבוער על דלק ויש חשמלי שמזרים זרם, ושניהם מסובבים ציר.",
+     ar:"مكوّن يحوّل الطاقة إلى حركة. نوع الاحتراق يحرق الوقود والنوع الكهربائيّ يمرّر تيّارًا، وكلاهما يدير عمودًا.",
+     ru:"Устройство, превращающее энергию в движение. Один тип жжёт топливо внутри цилиндра, электрический пропускает ток, и оба вращают вал.",
+     en:"A part that turns energy into motion. A combustion type burns fuel and an electric motor passes a current, and both of them spin a shaft."}),
   E(1884,
     {he:"טורבינת הקיטור",ar:"التوربين البخاريّ",
      ru:"Паровая турбина",en:"The steam turbine"},
@@ -521,10 +521,10 @@ BANK({
      en:"A set of gears that lets you pick the gear ratio. A low gear gives force on a climb, and a high gear gives speed on the flat."}),
 
   C({he:"הספק",ar:"القدرة",ru:"Мощность",en:"Power"},
-    {he:"כמה עבודה נעשית בכל שנייה. מנוע בעל הספק גדול יותר מרים את אותו משא מהר יותר, ולא בהכרח משא כבד יותר.",
-     ar:"كم عملًا يُنجَز في كلّ ثانية. المحرّك ذو القدرة الأكبر يرفع الحِمل نفسه أسرع، لا حِملًا أثقل بالضرورة.",
+    {he:"כמה עבודה נעשית בכל שנייה. מנוע חזק יותר מרים את אותו משא מהר יותר, ולא בהכרח משא כבד יותר.",
+     ar:"كم عملًا يُنجَز في كلّ ثانية. المحرّك الأقوى يرفع الحِمل نفسه أسرع، لا حِملًا أثقل بالضرورة.",
      ru:"Сколько работы совершается за каждую секунду. Двигатель большей мощности поднимает тот же груз быстрее, а не обязательно более тяжёлый груз.",
-     en:"How much work is done each second. An engine with more power lifts the same load faster, and not necessarily a heavier load."}),
+     en:"How much work is done each second. A stronger engine lifts the same load faster, and not necessarily a heavier load."}),
 
   Sc({he:["מכונה אינה מחזירה כתנועה את כל האנרגיה שנכנסה אליה.",
           "מה שלא הפך לתנועה לא נעלם: הוא הפך לחום. לכן מנוע מתחמם, וגם מברגה מתחממת אחרי עבודה ארוכה.",
