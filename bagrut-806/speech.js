@@ -90,6 +90,14 @@
       return /^he/i.test(normLang(v.lang));
     });
   }
+  /* מגדר הקול, לפי השם — אותם שני ביטויים שבאחת־עשרה האפליקציות
+     האחרות (english/index.html, V_F ו-V_M). ״?״ = לא זוהה. */
+  var VOICE_F = /(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
+  var VOICE_M = /(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
+  function vGender(v) {
+    var n = ((v.name || "") + " " + (v.lang || "")).toLowerCase();
+    return VOICE_F.test(n) ? "f" : VOICE_M.test(n) ? "m" : "?";
+  }
   function bestVoice() {
     var pool = hebrewVoices();
     if (!pool.length) return null;
@@ -110,7 +118,19 @@
       if (v.default) s += 4;
       return s;
     }
-    return pool.slice().sort(function (a, b) { return score(b) - score(a); })[0];
+    /* קול שלא יעבוד (רשת בלי רשת) יורד לתחתית לפני הכול; אחריו המגדר —
+       נשי קודם, לא־מזוהה אחריו, גברי אחרון — ורק בתוך כל קבוצה מכריעה
+       האיכות. עד 9.9.2026 האיכות לבדה הכריעה כאן, ו-Asaf של מיקרוסופט
+       ניצח קול נשי שהותקן לידו — מה שאחת־עשרה האפליקציות האחרות
+       כבר מנעו. */
+    function usable(v) {
+      return v.localService === false ? (netVoiceOK && navigator.onLine !== false) : true;
+    }
+    function grank(v) { var g = vGender(v); return g === "f" ? 2 : g === "?" ? 1 : 0; }
+    return pool.slice().sort(function (a, b) {
+      var d = usable(b) - usable(a); if (d) return d;
+      d = grank(b) - grank(a); return d || score(b) - score(a);
+    })[0];
   }
   api.hasHebrewVoice = function () { return hebrewVoices().length > 0; };
   api.voiceName = function () { var v = bestVoice(); return v ? v.name : ""; };
