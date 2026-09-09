@@ -227,6 +227,82 @@ function segments(text){
   return out.filter(function(s){ return s.t.replace(/\s/g,"") });
 }
 
+/* ================= מבנה התשובה =================
+   ג׳וש כותב מהתור השלישי תשובה מובנית — נקודות, צעדים ממוספרים
+   והדגשה — ולכן צריך שלושה דברים, ולא אחד:
+
+   · `fmt`      — מה שנראה על המסך. רץ **אחרי** `esc`, ולכן אין
+                  בו דרך להזריק HTML: כל `<` כבר `&lt;`.
+   · `stripMd`  — מה שנאמר בקול. בלעדיו מנוע ההקראה אומר ״מינוס״
+                  ו״כוכבית כוכבית״ בכל שורת רשימה, וזה בדיוק
+                  הכשל ש-`saysym.js` נבנה נגדו.
+   · `splitSugg`— הצעות ההמשך, שאינן חלק מהתשובה: לא מוצגות
+                  בבועה ולא מוקראות.
+
+   « » אינם מוסרים ב-`stripMd`: `segments` צריך אותם כדי לתת לכל
+   שפה את הקול שלה. `fmt` כן מסיר אותם — הם סימון להקראה, לא
+   טקסט לקורא. */
+var SUGG = "[[?]]";
+function splitSugg(text){
+  var i = String(text).indexOf(SUGG);
+  if(i < 0) return { body: String(text), sugg: [] };
+  var out = [], rest = String(text).slice(i + SUGG.length).split("\n");
+  for(var k = 0; k < rest.length && out.length < 3; k++){
+    var one = rest[k].trim();
+    if(one) out.push(one.slice(0, 60));
+  }
+  return { body: String(text).slice(0, i).replace(/\s+$/, ""), sugg: out };
+}
+function stripMd(text){
+  return String(text)
+    .replace(/\*\*/g, "")
+    .replace(/^\s*[-•]\s+/gm, "")
+    .replace(/^\s*\d+[.)]\s+/gm, "")
+    .replace(/^\s*#{1,6}\s+/gm, "");
+}
+function bold(s){ return s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>") }
+function fmt(text){
+  var lines = esc(String(text).replace(/«|»/g, "")).split("\n"),
+      out = [], list = null;
+  function shut(){ if(list){ out.push("</" + list + ">"); list = null } }
+  lines.forEach(function(ln){
+    var one = ln.trim();
+    var b = one.match(/^[-•]\s+(.*)$/), n = one.match(/^\d+[.)]\s+(.*)$/);
+    if(b){ if(list !== "ul"){ shut(); out.push("<ul class=\"tu-l\">"); list = "ul" }
+           out.push("<li>" + bold(b[1]) + "</li>"); return }
+    if(n){ if(list !== "ol"){ shut(); out.push("<ol class=\"tu-l\">"); list = "ol" }
+           out.push("<li>" + bold(n[1]) + "</li>"); return }
+    shut();
+    if(one) out.push("<p>" + bold(one) + "</p>");
+  });
+  shut();
+  return out.join("");
+}
+
+/* ================= החשיפה ההדרגתית =================
+   **זו אינה הזרמה מהמודל, וחשוב לא לבלבל.** השרת בודק את התשובה
+   **השלמה** לפני שהוא שולח אותה — `revealsAnswer` פוסל פתרון
+   בשני התורים הראשונים, ו-`badEquation` פוסל 8+7=16 — ואם היא
+   נפסלת נשלחת אחרת במקומה. הזרמה אמיתית הייתה מציגה לילד בדיוק
+   את התשובה שהשומר עומד לפסול.
+
+   לכן: הטקסט מגיע שלם ומאומת, ומתגלה על המסך מילה־מילה. התחושה
+   של Gemini, בלי לוותר על השומר שהוא כל הרעיון. */
+var REV = -1, REVN = 0, REVT = null;
+function stopReveal(){ if(REVT){ clearInterval(REVT); REVT = null } REV = -1 }
+function startReveal(i){
+  stopReveal();
+  var m = MSGS[i]; if(!m) return;
+  REV = i; REVN = 0;
+  REVT = setInterval(function(){
+    var cur = MSGS[REV];
+    if(!cur){ stopReveal(); draw(); return }
+    REVN += 4;
+    if(REVN >= cur.text.length) stopReveal();
+    draw();
+  }, 28);
+}
+
 function stopSay(){
   PLAYING = -1;
   stopKeepAlive(); _activeU = null;
@@ -238,7 +314,7 @@ function say(i){
   /* עוצרים גם את ההקראה של האפליקציה עצמה, אם יש לה כזאת */
   if(CFG && CFG.stopHost) try{ CFG.stopHost() }catch(e){}
   try{ speechSynthesis.cancel() }catch(e){}
-  var segs = segments(m.text), r = rate(), n = 0;
+  var segs = segments(stripMd(splitSugg(m.text).body)), r = rate(), n = 0;
   if(!segs.length) return;
   PLAYING = i; draw();
   (function next(){
@@ -300,6 +376,14 @@ var CSS = ''
 +'.tu-m{max-width:88%;border-radius:15px;padding:10px 14px;white-space:pre-wrap;word-break:break-word}'
 +'.tu-me{align-self:flex-end;background:#dff1fa;border:2px solid rgba(88,183,224,.45)}'
 +'.tu-bot{align-self:flex-start;background:#d9f2ec;border:2px solid rgba(14,156,141,.4)}'
++'.tu-m p{margin:0 0 .45em}.tu-m p:last-child{margin-bottom:0}'
++'.tu-l{margin:.2em 0 .45em;padding-inline-start:1.25em}.tu-l li{margin:.15em 0}'
++'.tu-m>*:last-child{margin-bottom:0}'
+/* ההצעות אינן בועה: הן פעולה, ולכן הן נראות ככפתורים ולא כטקסט. */
++'.tu-sg{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start;max-width:88%}'
++'.tu-sg button{font:inherit;font-size:.92em;border-radius:999px;cursor:pointer;'
++'padding:6px 13px;background:#eef8fb;color:#17333c;border:2px solid rgba(88,183,224,.55)}'
++'.tu-sg button:hover{background:#dff1fa}'
 +'.tu-sys{color:#4c666e;font-size:.92rem}'
 +'.tu-note{background:#fff3ce;border:2px solid rgba(230,184,0,.55);border-radius:13px;padding:10px 14px}'
 +'.tu-ctl{display:flex;gap:6px;align-items:center;margin-top:7px;flex-wrap:wrap}'
@@ -324,6 +408,8 @@ var CSS = ''
 +'#tu-in,.tu-ctl button,.tu-ctl select,#tu-lg,#tu-x{background:#1e2f38;color:#eef5f7;'
 +'border-color:rgba(238,245,247,.3)}'
 +'.tu-me{background:#1d3b4a;border-color:#2f6a86}.tu-bot{background:#14403a;border-color:#1c7e70}'
++'.tu-sg button{background:#12303d;color:#eaf6fa;border-color:#2f6a86}'
++'.tu-sg button:hover{background:#1d3b4a}'
 +'.tu-sys{color:#a9c2ca}#tu-pv{color:#93aeb7}}';
 
 function build(){
@@ -366,7 +452,9 @@ function build(){
   EL.log.addEventListener("click", function(e){
     var b = e.target.closest("[data-tu]"); if(!b) return;
     var a = b.getAttribute("data-tu"), i = +b.getAttribute("data-i");
-    if(a === "say") say(i); else if(a === "stop") stopSay();
+    if(a === "say") say(i);
+    else if(a === "stop") stopSay();
+    else if(a === "sugg") send(b.getAttribute("data-s"));
   });
   EL.log.addEventListener("change", function(e){
     if(e.target.id === "tu-rate"){ setRate(parseFloat(e.target.value)); if(PLAYING>=0) stopSay() }
@@ -405,9 +493,26 @@ function draw(){
     /* ההודעה הפותחת נשלחת על ידי האפליקציה ולא על ידי הילד */
     if(i === 0 && m.role === "user") return;
     var mine = m.role === "user";
-    h += '<div class="tu-m ' + (mine ? "tu-me" : "tu-bot") + '">'
-       + esc(m.text.replace(/«|»/g, "")) + '</div>';
-    if(!mine) h += ctl(i);
+    /* הודעת הילד נשארת טקסט; רק ג׳וש כותב מבנה. */
+    if(mine){
+      h += '<div class="tu-m tu-me">' + esc(m.text.replace(/«|»/g, "")) + '</div>';
+      return;
+    }
+    var sp = splitSugg(i === REV ? m.text.slice(0, REVN) : m.text);
+    h += '<div class="tu-m tu-bot">' + fmt(sp.body) + '</div>';
+    h += ctl(i);
+    /* ההצעות מופיעות רק כשהתשובה כולה על המסך, ורק על האחרונה —
+       שרשרת של הצעות ישנות היא רעש, ולחיצה עליהן שולחת שאלה
+       שכבר נענתה. */
+    if(i === REV || i !== MSGS.length - 1 || BUSY) return;
+    if(sp.sugg.length){
+      h += '<div class="tu-sg">';
+      sp.sugg.forEach(function(one){
+        h += '<button type="button" data-tu="sugg" data-s="' + esc(one) + '">'
+           + esc(one) + '</button>';
+      });
+      h += '</div>';
+    }
   });
   if(BUSY) h += '<div class="tu-sys">' + esc(t.wait) + '</div>';
   if(NOTE) h += '<div class="tu-note">' + esc(NOTE) + '</div>';
@@ -453,7 +558,7 @@ function open(){
   if(!MSGS.length) send(T().hello, true);
   else focus();
 }
-function close(){ stopSay(); NOTE = ""; if(EL) EL.ov.classList.remove("on") }
+function close(){ stopSay(); stopReveal(); NOTE = ""; if(EL) EL.ov.classList.remove("on") }
 function focus(){ try{ EL.inp.focus() }catch(e){} }
 
 function send(text, auto){
@@ -463,6 +568,7 @@ function send(text, auto){
   if(MSGS.length >= TURNS){ NOTE = t.full; draw(); return }
   if(left() <= 0){ NOTE = t.limit; draw(); return }
 
+  stopReveal();
   MSGS.push({ role:"user", text:text });
   if(EL) EL.inp.value = "";
   BUSY = true; NOTE = ""; draw();
@@ -501,6 +607,7 @@ function send(text, auto){
     var reply = String((d && d.text) || "").trim();
     if(!reply) throw new Error("empty");
     MSGS.push({ role:"assistant", text:reply });
+    startReveal(MSGS.length - 1);
     draw(); focus();
   })
   .catch(function(err){
