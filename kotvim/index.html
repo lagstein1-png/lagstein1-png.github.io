@@ -1061,7 +1061,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="k2 · 2026-09-09";
+var BUILD="k4 · 2026-09-09";
 var SKEY="kotvim-state-v1";
 var GKEY_STORE="kotvim-gkey";
 
@@ -2480,6 +2480,11 @@ function screenBuild(){
      (miss.length?esc(t("kMiss"))+" "+esc(miss.join(", ")):esc(t("kAllSet")))+"</div>";
   h+='<button class="btn btn-p" style="width:100%;margin-top:12px" data-a="kdone"'+
      (miss.length?" disabled":"")+">"+ic("book",18)+" "+esc(t("kShow"))+"</button>";
+  /* ״עזרה מהמורה״ בזמן ההרכבה. `q()` שב-mount מחזיר כאן את מה שכבר
+     נבחר, ולכן ג׳וש רואה טקסט חלקי ויכול לעזור לנסח את ההמשך. */
+  if(window.TUTOR&&TUTOR.on())
+    h+='<button class="btn btn-ghost" style="width:100%;margin-top:8px" data-a="tutor">'+
+       esc(TUTOR.label())+"</button>";
   return h+"</div>";
 }
 function screenText(){
@@ -2490,6 +2495,7 @@ function screenText(){
       '<button class="btn btn-g" data-a="kcopy">'+ic("share",18)+" "+esc(t("kCopy"))+"</button>"+
       '<button class="btn btn-ghost" data-a="kedit">'+esc(t("kEdit"))+"</button>"+
       '<button class="btn btn-ghost" data-a="knew">'+esc(t("kNew"))+"</button>"+
+      (window.TUTOR&&TUTOR.on()?'<button class="btn btn-ghost" data-a="tutor">'+esc(TUTOR.label())+"</button>":"")+
     "</div><div id=\"kmsg\" class=\"desc\" style=\"margin-top:10px\"></div></div>";
 }
 
@@ -2891,6 +2897,8 @@ document.addEventListener("click",function(e){
   var a=el.getAttribute("data-a"),v=el.getAttribute("data-v");
   /* examAction היה נתב פעולות המבחן. אין מבחן כאן. */
   if(a==="go"){state.screen="home";stopSpeak();render();window.scrollTo(0,0);return}
+  /* ג׳וש. עוצרים את ההקראה של האפליקציה לפני שהפאנל מדבר. */
+  if(a==="tutor"){ try{stopSpeak()}catch(e){} if(window.TUTOR)TUTOR.open(); return }
 
   if(a==="say"||a==="sayline"){
     var txt=el.getAttribute("data-say")||"";
@@ -3055,7 +3063,7 @@ if(!INTERNAL_OK){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=k2-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=k4-pwa1").catch(function(){});
   });
 }
 </script>
