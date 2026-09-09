@@ -53,6 +53,7 @@ const SUITE = [
   { id: 'wix',      args: ['--check'] },
   { id: 'banks',    args: [] },
   { id: 'leaks',    args: [] },
+  { id: 'markers',  args: [] },
   { id: 'century',  args: [] },
   { id: 'content806', args: [] },
   { id: 'a11y',     args: [] },

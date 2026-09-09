@@ -47,6 +47,7 @@ he:{ btn:"עזרה מהמורה", title:"עזרה מהמורה", close:"סגיר
   intro:"אפשר לשאול אותי על מה שעל המסך. אני נותן רמז אחד בכל פעם, ומחכה לתשובה.",
   ph:"מה לא ברור?", hello:"אני צריך עזרה במה שעל המסך.", wait:"רגע, חושב…",
   err:"לא הצלחתי להתחבר. אפשר לנסות שוב עוד רגע.",
+  setup:"העזרה עוד לא מוכנה. אפשר לנסות מאוחר יותר.",
   limit:"מספיק להיום — נמשיך מחר.",
   full:"דיברנו על זה הרבה. בוא ננסה, ובשאלה הבאה נתחיל מחדש.",
   privacy:"אל תכתבו כאן שם מלא, כתובת או טלפון.",
@@ -55,6 +56,7 @@ ar:{ btn:"مساعدة من المعلّم", title:"مساعدة من المعل
   intro:"يمكنك أن تسألني عمّا يظهر على الشاشة. أعطي تلميحًا واحدًا في كل مرة وأنتظر إجابتك.",
   ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
   err:"لم أتمكّن من الاتصال. حاول مرّة أخرى بعد قليل.",
+  setup:"المساعدة ليست جاهزة بعد. حاول لاحقًا.",
   limit:"يكفي لهذا اليوم — نُكمل غدًا.",
   full:"تحدّثنا كثيرًا عن هذا. لنجرّب، ونبدأ من جديد في التالي.",
   privacy:"لا تكتب هنا اسمك الكامل أو عنوانك أو رقم هاتفك.",
@@ -63,6 +65,7 @@ ru:{ btn:"Помощь учителя", title:"Помощь учителя", clo
   intro:"Можешь спросить меня о том, что на экране. Я даю по одной подсказке и жду ответа.",
   ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
   err:"Не удалось соединиться. Попробуй ещё раз через минуту.",
+  setup:"Помощь ещё не готова. Попробуй позже.",
   limit:"На сегодня хватит — продолжим завтра.",
   full:"Мы много об этом говорили. Давай попробуем, а дальше начнём заново.",
   privacy:"Не пиши здесь полное имя, адрес или телефон.",
@@ -71,6 +74,7 @@ en:{ btn:"Ask the teacher", title:"Ask the teacher", close:"Close", send:"Send",
   intro:"You can ask me about what is on the screen. I give one hint at a time, and wait for your answer.",
   ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
   err:"I could not connect. Try again in a moment.",
+  setup:"The help is not ready yet. Try again later.",
   limit:"That is enough for today — we will carry on tomorrow.",
   full:"We have talked about this a lot. Let's try, and start fresh on the next one.",
   privacy:"Do not write your full name, address or phone number here.",
@@ -386,8 +390,19 @@ function send(text, auto){
   })
   .then(function(r){
     if(r.status === 429) throw new Error("limit");
-    if(!r.ok) throw new Error("http");
-    return r.json();
+    if(r.ok) return r.json();
+    /* 500 ו-503 הם תקלת הקמה ולא תקלת רשת: מפתח שלא הוגדר, או
+       מונה יומי שלא הוגדר ולא הוצהר. הן נראות בדיוק כמו ״אין
+       אינטרנט״, ומי שמקים את השירות מחפש את הסיבה שעה.
+       לכן ההודעה למסך אומרת ״עוד לא מוכן״, והסיבה המדויקת —
+       שהיא טקסט למקים ולא לילד — נכתבת לקונסולה. */
+    if(r.status === 500 || r.status === 503)
+      return r.json().catch(function(){ return {} }).then(function(d){
+        try{ console.error("[tutor] " + r.status + " " +
+             ((d && (d.detail || d.error)) || "הגדרה חסרה בשרת")) }catch(e){}
+        throw new Error("setup");
+      });
+    throw new Error("http");
   })
   .then(function(d){
     BUSY = false;
@@ -401,7 +416,8 @@ function send(text, auto){
     /* ההודעה הפותחת נכשלה — מסירים אותה, אחרת השיחה מתחילה
        מתור של הילד שהוא בעצם שלנו */
     if(auto) MSGS = [];
-    NOTE = String(err && err.message) === "limit" ? t.limit : t.err;
+    var why = String(err && err.message);
+    NOTE = why === "limit" ? t.limit : why === "setup" ? t.setup : t.err;
     draw();
   });
 }
