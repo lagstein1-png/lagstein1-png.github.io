@@ -451,6 +451,22 @@ button[data-a="lang"][data-v="ru"],button[data-a="lang"][data-n="ru"],
 button[data-a="lang"][data-l="ru"],button[data-a="lang"][data-l="ru"] .fd,
 button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 </style>
+<meta name="robots" content="noindex,nofollow">
+<script>
+/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html
+   האפליקציה בשלב build: היא אינה בדף הבית, ומי שינחש את הכתובת
+   יראה מסך "עדיין לא פורסם". זו אינה הגנה קריפטוגרפית ואינה
+   מתיימרת להיות — אין שרת, וכל ה-HTML גלוי. היא מונעת מלומד
+   להיתקל באפליקציה לא בשלה. */
+var INTERNAL_KEY="shlav-internal-kotvim";
+var INTERNAL_OK=(function(){
+  try{
+    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
+    if(q) localStorage.setItem("shlav-internal", decodeURIComponent(q));
+    return localStorage.getItem("shlav-internal")===INTERNAL_KEY;
+  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
+})();
+</script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
@@ -462,6 +478,23 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 <link rel="license" href="/legal/">
 </head>
 <body>
+<style>/* [hidden] הוא ברירת מחדל של הדפדפן, וסגנון מוטבע גובר עליה.
+   בלי הכלל הזה השער נשאר פרוס מעל המסך גם כשהוא "מוסתר",
+   ובולע כל לחיצה. נמדד 9.9.2026 בדפדפן. */
+#gate[hidden]{display:none!important}</style>
+<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
+     align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
+     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
+  <div style="max-width:32rem">
+    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
+    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
+    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר.
+       אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
+    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;
+       background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a>
+  </div>
+</div>
+
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="app"></div>
 <script>
@@ -482,81 +515,58 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
    ============================================================ */
 var DEMO_ON=/(^|[?&])demo=1(&|$)/.test(location.search||"");
 
-/* בוחר אפשרות לפי נכונותה, ויודע גם לסדר משפט מאריחים — שתי
-   צורות השאלה שיש כאן. התסריט לא מקודד תשובה: הוא שואל את
-   השאלה שעל המסך עכשיו. */
-/* יש צורת שאלה אחת שאין בה מה להשמיע לפני שעונים. מגרילים
-   שאלה אחרת במקום לדלג על הצעד: ההקראה היא כל העניין כאן. */
-function demoHear(){
-  for(var n=0;n<8&&!document.querySelector('[data-a="say"]');n++){
-    break;
-  }
-  return demoTap('[data-a="say"]');
-}
-function demoOrder(){
-  var q=(typeof P!=="undefined")?P.q:null;
-  if(!q||!q.target)return false;
-  q.target.forEach(function(w,k){
-    DEMO.extra.push(setTimeout(function(){
-      if(!DEMO.on)return;
-      var b=document.querySelectorAll('[data-a="slot"]'),j;
-      for(j=0;j<b.length;j++)if((b[j].textContent||"").trim()===w){b[j].click();return}
-    },300*k));
-  });
-  DEMO.extra.push(setTimeout(function(){
-    if(DEMO.on)demoClick('[data-a="checkorder"]');
-  },300*q.target.length+400));
+/* שתי טענות, ולא אותה טענה פעמיים: לחיצה שנייה על אותו כפתור
+   מבטלת את הבחירה, וההדגמה הייתה נתקעת בצעד השלישי בלי שדבר
+   ייראה שבור. `:not(.on)` בוחר תמיד את הבא שעדיין לא נבחר. */
+function demoClaims(){
+  var sel='[data-a="kpick"][data-k="cl"]:not(.on)';
+  demoTap(sel);
+  DEMO.extra.push(setTimeout(function(){ if(DEMO.on)demoTap(sel) },1500));
   return true;
-}
-function demoPick(right){
-  var q=(typeof P!=="undefined")?P.q:null;
-  if(!q)return false;
-  if(q.type==="order")return demoOrder();
-  if(!q.opts)return false;
-  for(var i=0;i<q.opts.length;i++)
-    if(!!q.opts[i].ok===!!right)return demoTap('[data-a="pick"][data-i="'+i+'"]');
-  return false;
 }
 
 var DEMO_SCRIPT=[
-  {subtitle:"אולפן — עברית מעשית לעולים חדשים. כל מילה נשמעת לפני שהיא נקראת.",
-   action:function(){if(typeof state!=="undefined"){state.screen="home";render();window.scrollTo(0,0)}}, duration:4600},
+  {subtitle:"כותבים ביחד — פיגום כתיבה. הלומד אינו מול דף ריק אלא בונה טקסט מחלקים.",
+   action:function(){if(typeof W!=="undefined"){wReset();render();window.scrollTo(0,0)}}, duration:4800},
 
-  {subtitle:"ארבעה מסלולים: אות וצליל, אוצר מילים, עברית מדוברת, ושלטים וטפסים.",
-   action:function(){demoShow(".trk")}, duration:4400},
+  {subtitle:"הצעד הראשון: איזה סוג טקסט כותבים — חיבור דעה, מכתב או סיפור.",
+   action:function(){demoShow('[data-a="ktype"]')}, duration:4400},
 
-  {subtitle:"המסלול הראשון אינו הגייה אלא הבחנה. מי שרואה ד׳ ו-ר׳ בפעם הראשונה רואה אות אחת, לא שתיים — ובלי ההבחנה הזאת הקריאה לא תתחיל.",
-   action:function(){demoTap('[data-a="open"]')}, duration:6000},
+  {subtitle:"בוחרים חיבור דעה.",
+   action:function(){demoTap('[data-a="ktype"]')}, duration:4000},
 
-  {subtitle:"שלוש רמות בכל נושא. מתחילים בראשונה.",
-   action:function(){demoTap('[data-a="lvl"][data-v="1"]')}, duration:4200},
+  {subtitle:"הצעד השני: הנושא. הקטעים שיוצעו בהמשך שייכים לנושא הזה בלבד.",
+   action:function(){demoTap('[data-a="ktopic"]')}, duration:4600},
 
-  {subtitle:"שומעים את המילה.",
-   action:function(){demoHear()}, duration:4000},
+  {subtitle:"והצעד השלישי — ההרכבה. פתיחה, שתי טענות, דוגמה וסיכום.",
+   action:function(){}, duration:4400},
 
-  {subtitle:"ואפשר גם לאט — שם נשמע ההבדל בין הצלילים.",
-   action:function(){demoTap(".spk.sm")}, duration:4200},
+  {subtitle:"פתיחה אחת.",
+   action:function(){demoTap('[data-a="kpick"][data-k="op"]')}, duration:3800},
 
-  {subtitle:"עונים.",
-   action:function(){demoPick(true)}, duration:4200},
+  {subtitle:"שתי טענות. הן נאספות לפי סדר הבחירה, וזה גם הסדר בטקסט.",
+   action:function(){demoClaims()}, duration:4400},
 
-  {subtitle:"המשוב אינו סימן נכון או שגוי: הוא מראה את המילה, את הניקוד, את המשמעות ואת המשפט שבו היא חיה.",
-   action:function(){}, duration:5400},
+  {subtitle:"דוגמה שמחזיקה את הטענה.",
+   action:function(){demoTap('[data-a="kpick"][data-k="ex"]')}, duration:4000},
 
-  {subtitle:"לשאלה הבאה.",
-   action:function(){demoTap('[data-a="next"]')}, duration:3400},
+  {subtitle:"וסיכום שסוגר.",
+   action:function(){demoTap('[data-a="kpick"][data-k="cn"]')}, duration:3800},
 
-  {subtitle:"״לא יודע״ אינו דילוג: הוא נספר כטעות, ומיד מראה ומשמיע את התשובה. לנחש לא משתלם, ולהודות כן.",
-   action:function(){demoTap('[data-a="dunno"]')}, duration:5600},
+  {subtitle:"הכפתור אינו נעול בשום צעד: כשחסר חלק הוא אומר מה חסר, ולא חוסם.",
+   action:function(){demoShow("#kmiss")}, duration:4600},
 
-  {subtitle:"הרמה משנה את צורת השאלה, לא רק את הקושי: מזיהוי מילה, דרך האזנה, ועד ניסוח בעברית בלבד.",
-   action:function(){demoTap('[data-a="lvl"][data-v="3"]')}, duration:5400},
+  {subtitle:"והנה הטקסט השלם — לא תרגיל, אלא משהו שאפשר להגיש.",
+   action:function(){demoTap('[data-a="kdone"]')}, duration:5000},
 
-  {subtitle:"ההתקדמות: אחוז שליטה לכל נושא ולכל רמה בנפרד.",
-   action:function(){demoTap('[data-a="prog"]')}, duration:4800},
+  {subtitle:"אפשר לשמוע אותו. זו הבדיקה הכי טובה לטקסט שנכתב.",
+   action:function(){demoTap('[data-a="ksay"]')}, duration:5200},
 
-  {subtitle:"הגדרות: שפת ממשק, בחירת קול ומצב מורה למי שמלמד כיתה.",
-   action:function(){demoTap('[data-a="set"]')}, duration:4800},
+  {subtitle:"אפשר להעתיק אותו, ואפשר לחזור ולהחליף חלק.",
+   action:function(){demoTap('[data-a="kedit"]')}, duration:4400},
+
+  {subtitle:"הגדרות: שפת ממשק, בחירת קול, וארבע שפות בכל קטע.",
+   action:function(){demoTap('[data-a="set"]')}, duration:4600},
 
   {subtitle:"וחזרה. בלי הרשמה, בלי פרסומות, והכול נשמר במכשיר הזה בלבד.",
    action:function(){demoTap('[data-a="home"]')}, duration:4400}
@@ -746,8 +756,6 @@ function shuffle(a){var i,j,t;for(i=a.length-1;i>0;i--){j=Math.floor(Math.random
   t=a[i];a[i]=a[j];a[j]=t}return a}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function uniq(a){return a.filter(function(v,i){return a.indexOf(v)===i})}
-function todayIso(){var d=new Date();return d.getFullYear()+"-"+
-  String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 
 /* ============================================================
    2. שפות הממשק
@@ -767,7 +775,7 @@ var T={};
 T.he={
   kProgSoon:"המונה עוד לא נאסף. הטקסטים שאתם בונים נשמרים אצלכם בלבד.",
   kStep1:"מה כותבים?", kStep1D:"בוחרים סוג, ואחר כך נושא.", kStep2:"על מה?", kStep3:"בונים את הטקסט", kStep4:"הטקסט שלכם", kOpen:"פתיחה", kClaims:"טענות", kClaimsD:"בוחרים שתיים או שלוש.", kEx:"דוגמה", kConc:"סיכום", kMiss:"עוד חסר:", kAllSet:"הכול מוכן — אפשר להציג את הטקסט.", kShow:"הציגו את הטקסט", kRead:"הקריאו", kCopy:"העתיקו", kCopied:"הטקסט הועתק.", kEdit:"חזרה לעריכה", kNew:"טקסט חדש", kHear:"השמיעו את הקטע", kTooMany:"אפשר לבחור שלוש טענות לכל היותר.",
-  app:"אולפן", tagline:"עברית מעשית לעולים חדשים",
+  app:"כותבים ביחד", tagline:"בונים טקסט צעד אחר צעד",
   navHome:"מסלולים", navProg:"התקדמות", navSet:"הגדרות", navExam:"מבחן", back:"חזרה",
   heroT:"עברית שנשמעת לפני שהיא נקראת",
   heroP:"כל מילה, כל משפט וכל טופס — עם כפתור השמעה. אפשר להאט, לחזור, ולראות את המשמעות בשפה שלכם. אין טיימר ואין עונש על טעות.",
@@ -827,7 +835,7 @@ T.he={
 T.ar={
   kProgSoon:"العدّاد لم يُجمَع بعد. النصوص التي تبنونها تبقى عندكم فقط.",
   kStep1:"ماذا نكتب؟", kStep1D:"نختار نوعًا، ثم موضوعًا.", kStep2:"عن ماذا؟", kStep3:"نبني النصّ", kStep4:"نصّكم", kOpen:"مقدّمة", kClaims:"ادّعاءات", kClaimsD:"اختاروا اثنين أو ثلاثة.", kEx:"مثال", kConc:"خاتمة", kMiss:"ما زال ناقصًا:", kAllSet:"كلّ شيء جاهز — يمكن عرض النصّ.", kShow:"اعرضوا النصّ", kRead:"استمعوا", kCopy:"انسخوا", kCopied:"تمّ نسخ النصّ.", kEdit:"العودة للتحرير", kNew:"نصّ جديد", kHear:"استمعوا للمقطع", kTooMany:"يمكن اختيار ثلاثة ادّعاءات كحدّ أقصى.",
-  app:"أولبان", tagline:"عبرية عملية للقادمين الجدد",
+  app:"نكتب معًا", tagline:"نبني النصّ خطوة بخطوة",
   navHome:"المسارات", navProg:"التقدّم", navSet:"الإعدادات", navExam:"امتحان", back:"رجوع",
   heroT:"عبرية تُسمَع قبل أن تُقرأ",
   heroP:"كل كلمة وكل جملة وكل استمارة — مع زر استماع. يمكنك الإبطاء والإعادة ورؤية المعنى بلغتك. بلا مؤقّت وبلا عقاب على الخطأ.",
@@ -887,7 +895,7 @@ T.ar={
 T.ru={
   kProgSoon:"Счётчик пока не ведётся. Тексты, которые вы строите, остаются только у вас.",
   kStep1:"Что пишем?", kStep1D:"Выберите тип, затем тему.", kStep2:"О чём?", kStep3:"Собираем текст", kStep4:"Ваш текст", kOpen:"Начало", kClaims:"Утверждения", kClaimsD:"Выберите два или три.", kEx:"Пример", kConc:"Вывод", kMiss:"Ещё не хватает:", kAllSet:"Всё готово — можно показать текст.", kShow:"Показать текст", kRead:"Прослушать", kCopy:"Копировать", kCopied:"Текст скопирован.", kEdit:"Вернуться к правке", kNew:"Новый текст", kHear:"Прослушать фрагмент", kTooMany:"Можно выбрать не более трёх утверждений.",
-  app:"Ульпан", tagline:"Практический иврит для новых репатриантов",
+  app:"Пишем вместе", tagline:"Строим текст шаг за шагом",
   navHome:"Направления", navProg:"Прогресс", navSet:"Настройки", navExam:"Экзамен", back:"Назад",
   heroT:"Иврит, который слышно раньше, чем читаешь",
   heroP:"Каждое слово, каждая фраза и каждый бланк — с кнопкой прослушивания. Можно замедлить, повторить и увидеть значение на своём языке. Без таймера и без наказания за ошибку.",
@@ -947,7 +955,7 @@ T.ru={
 T.en={
   kProgSoon:"The counter is not collected yet. The texts you build stay with you only.",
   kStep1:"What are we writing?", kStep1D:"Pick a type, then a topic.", kStep2:"About what?", kStep3:"Build the text", kStep4:"Your text", kOpen:"Opening", kClaims:"Claims", kClaimsD:"Choose two or three.", kEx:"Example", kConc:"Conclusion", kMiss:"Still missing:", kAllSet:"All set — you can show the text.", kShow:"Show the text", kRead:"Listen", kCopy:"Copy", kCopied:"Text copied.", kEdit:"Back to editing", kNew:"New text", kHear:"Play this part", kTooMany:"You can pick at most three claims.",
-  app:"Ulpan", tagline:"Practical Hebrew for new arrivals",
+  app:"Writing together", tagline:"Building a text step by step",
   navHome:"Tracks", navProg:"Progress", navSet:"Settings", navExam:"Exam", back:"Back",
   heroT:"Hebrew you hear before you read it",
   heroP:"Every word, every sentence and every form comes with a play button. Slow it down, repeat it, and see the meaning in your own language. No timer, and no penalty for a wrong answer.",
@@ -1061,15 +1069,12 @@ var GKEY_STORE="kotvim-gkey";
 function blankState(){
   return {
     lang:null,            /* נקבע לפי שפת הדפדפן בהפעלה הראשונה */
-    screen:"home", topic:null, level:1,
+    screen:"home",
     voiceMode:"device",   /* "device" | "gem" */
     gemVoice:"Kore",
     devVoice:{},          /* קוד שפה → voiceURI שנבחר ידנית */
     rate:0.95,
-    big:false, clear:false, spaced:false, hc:false, rm:false, theme:"auto",
-    stats:{},             /* topic|level → {seen,ok,bad} */
-    item:{},              /* מזהה פריט → {n,ok} — בסיס לחזרה מרווחת */
-    day:{d:"",n:0}, streak:0, lastDay:"", totalOk:0, totalAsk:0
+    big:false, clear:false, spaced:false, hc:false, rm:false, theme:"auto"
   };
 }
 var state=blankState();
@@ -1102,27 +1107,6 @@ function guessLang(){
   }
   return "he";
 }
-function touchDay(){
-  var d=todayIso();
-  if(state.day.d!==d){
-    var y=new Date(Date.now()-86400000);
-    var yi=y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0");
-    state.streak=(state.lastDay===yi)?(state.streak||0)+1:1;
-    state.lastDay=d; state.day={d:d,n:0};
-  }
-}
-function stKey(tid,lv){return tid+"|"+lv}
-function stOf(tid,lv){
-  var k=stKey(tid,lv);
-  if(!state.stats[k])state.stats[k]={seen:0,ok:0,bad:0};
-  return state.stats[k];
-}
-function mastery(tid,lv){
-  var s=state.stats[stKey(tid,lv)];
-  if(!s||!s.seen)return 0;
-  return clamp(s.ok/Math.max(6,s.seen),0,1);
-}
-function barCls(m){return m>=.75?"b2":m>=.4?"b1":"b0"}
 
 /* ============================================================
    5. מצבי קריאות
@@ -1800,21 +1784,11 @@ function speakDevice(text,code,rate){
   return true;
 }
 /* lang: LEARN לחומר הנלמד, או קוד שפת האם להוראה. */
-/* מה נאמר במבחן הכיתתי, שם אין "לפני" ו"אחרי" — יש רק שאלה
-   שעוד לא ענו עליה. ניב כבר נשא את הפונקציה הזאת, ואולפן —
-   שנולדה מהעתקה שלה — קיבלה במקומה `speak(q2.say)` חשוף.
-   ב-back וב-use ה-say הוא התשובה עצמה, כלומר כפתור ההקראה
-   במבחן הקריא את הפתרון. בשאלת האזנה השמע הוא השאלה ולכן
-   הוא נשאר. */
-function sitSay(q){
-  if(q.audioOnly)return {t:q.say||"",l:LEARN};
-  var ex=plainOf(q.expr||"").trim();
-  var ok=(q.options||[]).filter(function(o){return o.ok})[0];
-  var a=ok?plainOf(ok.h).trim().toLowerCase():"";
-  var sy=plainOf(q.say||"").trim();
-  if(ex&&(!a||ex.toLowerCase().indexOf(a)<0))return {t:ex,l:LEARN};
-  if(sy&&(!a||sy.toLowerCase().indexOf(a)<0))return {t:sy,l:LEARN};
-  return {t:plainOf(q.ask||""),l:state.lang||"he"};
+/* ניקוי תגיות מכל טקסט שנכנס להקראה. `speak` קורא לו על כל
+   מחרוזת, ובלעדיו הלומד שומע "span class" באמצע המשפט. */
+function plainOf(h){
+  var d=document.createElement("div"); d.innerHTML=String(h||"");
+  return (d.textContent||"").replace(/\s+/g," ").trim();
 }
 function speak(text,lang,rateMul){
   /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
@@ -2182,11 +2156,6 @@ function wReady(){ return wMissing().length===0 }
 /* ============================================================
    9. מסכים
    ============================================================ */
-var P={q:null,picked:-1,done:false,slot:[],used:[],ok:false,rres:[],sum:false};
-/* rres — תוצאות הסבב הנוכחי: ok / hp (נכון עם רמז) / no. sum — מסך הסיכום פתוח. */
-var ROUND=10;
-function roundReset(){P.rres=[];P.sum=false}
-
 function hdr(){
   var s=state.screen;
   return '<div class="hbar"><div class="wrap hrow">'+
@@ -2675,7 +2644,6 @@ document.addEventListener("click",function(e){
   /* examAction היה נתב פעולות המבחן. אין מבחן כאן. */
   if(a==="go"){state.screen="home";stopSpeak();render();window.scrollTo(0,0);return}
 
-  if(a==="track"){state.track=el.getAttribute("data-t")||"";/* נושא שנבחר במסלול הקודם אינו מוצג עוד, ולכן גם אי אפשר לבטלו — הוא היה נשאר במבחן בלי שהמורה רואה אותו. */var trk=trackSel();EB.topics=EB.topics.filter(function(id){var tp=topicOf(id);return tp&&tp.trk===trk});if(!EB.topics.length)EB.topics=topicsForTrack(trk).slice(0,4).map(function(t){return t.id});/* משבצות השאלות נשמרות ב-EB.q, ובלי האיפוס הזה מבחן שנבנה אחרי החלפת מסלול היה נארז מהשאלות של המסלול הקודם — בדיוק כמו ב-extopic וב-exlvl. */EB.q=null;EB.built=null;render();return}
   if(a==="say"||a==="sayline"){
     var txt=el.getAttribute("data-say")||"";
     var lg=el.getAttribute("data-lang")||LEARN;
@@ -2732,7 +2700,7 @@ document.addEventListener("click",function(e){
   }
   if(a==="kedit"){ W.step=3; stopSpeak(); render(); window.scrollTo(0,0); return }
   if(a==="knew"){ wReset(); stopSpeak(); render(); window.scrollTo(0,0); return }
-  if(a==="ksay"){ speak(saySpell(W.txt),state.lang); return }
+  if(a==="ksay"){ speak(W.txt,state.lang); return }
   if(a==="kcopy"){
     copyText(W.txt,function(){
       var m=$("#kmsg"); if(m)m.textContent=t("kCopied");
@@ -2797,7 +2765,7 @@ document.addEventListener("keydown",function(e){
      ובצעדים שלפניו אין מה להקריא — ולכן אין קיצור. */
   if(e.key===" "&&W.step===4&&W.txt){
     if(e.target&&e.target.closest("button,[role='button'],a[href]"))return;
-    e.preventDefault(); speak(saySpell(W.txt),state.lang); return;
+    e.preventDefault(); speak(W.txt,state.lang); return;
   }
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
@@ -2815,12 +2783,20 @@ window.addEventListener("pagehide",stopSpeak);
 /* ============================================================
    11. הפעלה
    ============================================================ */
-loadKey();
-load();
-touchDay();
-booted=true;
-applyModes();
-render();
+function boot(){
+  loadKey();
+  load();
+  booted=true;
+  applyModes();
+  render();
+}
+/* INTERNAL-GATE — לא נטענת בלי מפתח. */
+if(!INTERNAL_OK){
+  document.getElementById("gate").hidden=false;
+  document.title="לא פורסם";
+}else{
+  boot();
+}
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
 <script src="/tutor/tutor.js"></script>
@@ -2844,31 +2820,21 @@ if(window.TUTOR){
   TUTOR.mount({
     app:"kotvim",
     target:"he",
-    lang:function(){return (typeof state!=="undefined"&&state.settings&&state.settings.lang)||"he"},
+    lang:function(){return (typeof state!=="undefined"&&state.lang)||"he"},
+    /* כאן אין תרגיל עם תשובה נכונה, אלא טקסט שהלומד מרכיב. מה
+       שנשלח למורה הוא מה שעל המסך: סוג הטקסט, הנושא, והטקסט
+       עצמו — או, לפני הצעד הרביעי, מה שכבר נבחר. `ans` נשאר null
+       מפני שאין תשובה אחת נכונה בכתיבה. */
     q:function(){
-      /* מיפוי אחד לשתי המשפחות. השדות נמדדו בדפדפן, ולא הועתקו
-         מ-buildQ של בונה המבחן — שם הם אחרים.
-         משפחת המתמטיקה: ask / expr / options[].ok
-         משפחת החידון:   prompt / subject / opts[].ok / answer */
-      var x=(typeof P!=="undefined")?P.q:null; if(!x)return null;
-      var o=x.opts||x.options||[], ok=x.answer!=null?txt(x.answer):null, i;
-      if(!ok)for(i=0;i<o.length;i++)if(o[i].ok)ok=txt(o[i].t||o[i].h);
-      var line=txt(x.prompt||x.ask);
-      /* ב-english השדה הזה הוא אובייקט ולא מחרוזת, ובלי הפריקה
-         הזאת נשלח לשרת "[object Object]". נמדד בדפדפן. */
-      var sb=x.subject;
-      if(sb&&typeof sb==="object")sb=sb.h||sb.t||sb.text||sb.w||"";
-      if(sb)line+=" — "+txt(sb);
-      if(x.lead)line+=" "+txt(x.lead);
-      if(x.expr)line+=" "+txt(x.expr);
-      return {expr:line.trim()||null, ans:ok||null,
-              topic:txt(x.topicName||x.tid||"")||null,
-              level:(typeof state!=="undefined"&&state.track)?("מסלול "+state.track):
-                    (x.level!=null?("רמה "+x.level):null)};
+      if(typeof W==="undefined"||!W.type)return null;
+      var ty=gl(W.type.n), tp=W.topic?gl(W.topic.n):"";
+      var body=W.txt?txt(W.txt):txt(wText());
+      if(!body)return null;
+      return {expr:body, ans:null, topic:tp||null, level:ty||null};
     },
     stopHost:function(){try{stopSpeak()}catch(e){}}
   });
-  try{render()}catch(e){}
+  if(INTERNAL_OK){try{render()}catch(e){}}
 }
 </script>
 <!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש

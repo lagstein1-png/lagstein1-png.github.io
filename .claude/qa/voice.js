@@ -30,6 +30,32 @@ const APPS = [
   { id:'math-uni',  say:'הקראה' },
   { id:'math-uni2', say:'הקראה' },
   { id:'math-uni3', say:'הקראה' },
+  /* כותבים ביחד — בשלב build ולכן היא נפתחת רק עם מפתח השער
+     הפנימי. היא נכנסת לרשימה כאן ולא אחרי הפרסום, מפני שעותק
+     מנוע שאיש אינו בודק הוא הבאג המרכזי של המאגר: היא ירשה את
+     ארבעת המנגנונים בהעתקה, ובלי הבדיקה סחיפה בה תתגלה ימים
+     אחרי. ההקראה שם היא של הטקסט שהלומד בנה — הרצף הארוך ביותר
+     באפליקציה — וזה בדיוק המקרה שבו החיתוך אחרי 15 שניות מורגש. */
+  { id:'kotvim', url:'/kotvim/?internal=shlav-internal-kotvim',
+    /* אין כאן שאלה שמחכה על המסך: הטקסט **נבנה** בארבעה צעדים,
+       וכפתור ההקראה קיים רק בצעד הרביעי. לכן הבדיקה מרכיבה טקסט
+       אמיתי דרך הממשק — סוג, נושא, פתיחה, שתי טענות, דוגמה
+       וסיכום — ורק אז מקריאה אותו. זה גם המסלול שהלומד עובר. */
+    open:async page => {
+      /* שער התנאים מכסה את המסך עד שמאשרים, ולכן הקליקים
+         נחסמים בלעדיו. זה נכון גם ללומד. */
+      const ok = page.locator('#lg-ok');
+      await ok.waitFor({ timeout: 8000 }).catch(() => {});
+      if(await ok.count()) await ok.click().catch(() => {});
+      await page.waitForTimeout(400);
+      await page.locator('[data-a="ktype"]').first().click();
+      await page.locator('[data-a="ktopic"]').first().click();
+      const pick = async (k,i)=>page.locator(`[data-a="kpick"][data-k="${k}"]`).nth(i).click();
+      await pick('op',0); await pick('cl',0); await pick('cl',1);
+      await pick('ex',0); await pick('cn',0);
+      await page.locator('[data-a="kdone"]').first().click();
+      await page.waitForTimeout(400);
+    }, speak:'[data-a="ksay"]' },
   /* נתיב אינו מתחיל בשאלה אלא בטקסט שמדביקים, ולכן הוא צריך
      פתיחה משלו. הוא גם האפליקציה שקוראת הכי הרבה ברצף — כלומר
      זו שבה חיתוך אחרי חמש־עשרה שניות מורגש יותר מכל. */
@@ -124,7 +150,10 @@ async function openApp(browser, app){
     const u = r.request().url();
     return u.startsWith(BASE) ? r.continue() : r.abort();
   });
-  await page.goto(`${BASE}/${app.id}/`, { waitUntil:'domcontentloaded' });
+  /* אפליקציה בשלב build נפתחת רק עם מפתח השער הפנימי, ולכן
+     היא מביאה `url` משלה. שאר האפליקציות ממשיכות בנתיב הרגיל. */
+  await page.goto(app.url ? `${BASE}${app.url}` : `${BASE}/${app.id}/`,
+                  { waitUntil:'domcontentloaded' });
   await page.waitForTimeout(700);
   if(app.open){ await app.open(page); }
   else {
