@@ -3,6 +3,7 @@
 
      node .claude/qa/all.js           הכול
      node .claude/qa/all.js --fast    בלי entropy ו-options (הכי איטיות)
+     node .claude/qa/all.js --static  רק מה שאינו דורש דפדפן (שניות)
 
    הוא מרים את השרת המקומי בעצמו וסוגר אותו בסוף, כי שלוש מהבדיקות
    דורשות אותו ושכחה שלו נראית בדיוק כמו כישלון אמיתי.
@@ -27,6 +28,10 @@ const path = require('path');
 
 const QA = __dirname;
 const FAST = process.argv.includes('--fast');
+/* --static מפיל כל בדיקה שדורשת דפדפן. נועד לשער שרץ בסיום עבודה:
+   הוא חייב להיות מהיר מספיק שלא יכבו אותו, ושש־עשרה הבדיקות
+   שנשארות קוראות קוד בלבד. */
+const STATIC = process.argv.includes('--static');
 const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'lomda',
               'english', 'history', 'ulpan'];
 const PAGES = APPS.concat(['bagrut-806', 'reader', '.']);
@@ -49,6 +54,7 @@ const SUITE = [
   { id: 'banks',    args: [] },
   { id: 'leaks',    args: [] },
   { id: 'century',  args: [] },
+  { id: 'content806', args: [] },
   { id: 'a11y',     args: [] },
   { id: 'fonts',    args: [] },
   { id: 'engine',   args: [] },
@@ -62,7 +68,7 @@ const SUITE = [
   { id: 'options',  args: APPS,   needsServer: true, slow: true },
 ];
 
-const plan = SUITE.filter(t => !(FAST && t.slow));
+const plan = SUITE.filter(t => !(FAST && t.slow) && !(STATIC && t.needsServer));
 const needServer = plan.some(t => t.needsServer);
 
 let server = null;
@@ -96,7 +102,8 @@ console.log('═'.repeat(72));
 for (const [id, code] of results) {
   console.log(`  ${code ? '✗' : '✓'} ${id.padEnd(10)} ${code ? 'exit ' + code : ''}`);
 }
-if (FAST) console.log('  · entropy, options — דולגו (--fast)');
+if (STATIC) console.log('  · כל הבדיקות שדורשות דפדפן — דולגו (--static)');
+else if (FAST) console.log('  · entropy, options — דולגו (--fast)');
 console.log('═'.repeat(72));
 console.log(failed
   ? `${failed} מתוך ${results.length} נכשלו`
