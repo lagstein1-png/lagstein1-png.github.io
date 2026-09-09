@@ -322,8 +322,19 @@ async function scan(page){
       textChecks('hint',hintT,where);
       for(const tx of texts) textChecks('option',tx,where);
 
-      /* 7. הקראה */
-      const say=String(q.say||'');
+      /* 7. הקראה
+         **מה שנבדק הוא מה שנאמר, ולא השדה הגולמי.** משפחת
+         האוניברסיטה אופה את ההמרה לתוך `say` בזמן הבנייה; `math-app`
+         נבנתה אחרת וממירה בזמן ההשמעה, ב-`toSpoken` שנקראת מ-`hlPrep`.
+         בלי השורה הזאת הבודק קרא את `say` הגולמי של math-app ודיווח
+         900 מופעים של `×` ו-900 של `÷` — 100% מתאי הכפל והחילוק —
+         בעוד שהילד שומע בפועל "כמה זה אַרְבַּע כפול חָמֵשׁ". נמדד
+         בכרומיום ב-9.9.2026. התראת שווא בהיקף כזה גרועה מאין בדיקה:
+         היא שולחת סשן לתקן מה שאינו שבור. */
+      const say=(function(raw){
+        try{ return typeof toSpoken==='function' ? toSpoken(raw,'he') : raw }
+        catch(e){ return raw }
+      })(String(q.say||''));
       if(askT&&!say.trim()) add('no-say','REVIEW','אין say — אין מה להקריא',where);
       if(/<[a-zA-Z\/]/.test(say)) add('html-in-say','REVIEW','תגיות HTML ב-say: '+say.slice(0,80),where);
       if(LATEX.test(say)) add('latex-in-say','FAIL','LaTeX ב-say: '+say.slice(0,80),where);
