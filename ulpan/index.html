@@ -438,6 +438,18 @@ textarea.field{min-height:96px;resize:vertical}
    נמדד בכרומיום מול math-uni כקבוצת ביקורת. */
 .spread{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .dots{display:flex;gap:5px;flex-wrap:wrap}
+/* בורר השפה מציג ״العربية״ ו-״Русский״ גם כשהממשק עברי — זה כל
+   תפקידו — ולכן `html[lang]` אינו חל עליהם והם יורשים את `--font`,
+   שאין בו לא ערבית ולא קירילית. הגופן נקבע לפי השפה שהכפתור מציע,
+   ולא לפי שפת הממשק. הסימון אינו אחיד בין האפליקציות (`data-v`,
+   `data-n`, `data-l`, ולעיתים גם `lang`), ולכן הכלל מונה את כולם —
+   בלוק זהה בתשע האפליקציות, כדי שלא ייסחף ביניהן. */
+button[data-a="lang"][data-v="ar"],button[data-a="lang"][data-n="ar"],
+button[data-a="lang"][data-l="ar"],button[data-a="lang"][data-l="ar"] .fd,
+button[data-a="lang"][lang="ar"]{font-family:var(--ar)}
+button[data-a="lang"][data-v="ru"],button[data-a="lang"][data-n="ru"],
+button[data-a="lang"][data-l="ru"],button[data-a="lang"][data-l="ru"] .fd,
+button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1034,7 +1046,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a20 · 2026-09-08";
+var BUILD="a22 · 2026-09-09";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -4862,7 +4874,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a20-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a22-pwa1").catch(function(){});
   });
 }
 </script>

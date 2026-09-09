@@ -20,36 +20,20 @@
 
 | אפליקציה | BUILD | מפתח קאש | תואם |
 |---|---|---|---|
-| `math-app` | b57 · 2026-09-08 | b57-pwa1 | תואם |
-| `math-teen` | t57 · 2026-09-08 | t57-pwa1 | תואם |
-| `math-uni` | u54 · 2026-09-08 | u54-pwa1 | תואם |
-| `math-uni2` | v52 · 2026-09-08 | v52-pwa1 | תואם |
-| `math-uni3` | g51 · 2026-09-08 | g51-pwa1 | תואם |
-| `bagrut-806` | x24 · 2026-09-08 | x24-pwa1 | תואם |
-| `ulpan` | a20 · 2026-09-08 | a20-pwa1 | תואם |
-| `english` | n51 · 2026-09-08 | n51-pwa1 | תואם |
-| `history` | m59 · 2026-09-08 | m59-pwa1 | תואם |
-| `lomda` | l34 · 2026-09-09 | l34-pwa1 | תואם |
-| `reader` | — | 31-pwa1 | מפתח בלבד |
+| `math-app` | b59 · 2026-09-09 | b59-pwa1 | תואם |
+| `math-teen` | t59 · 2026-09-09 | t59-pwa1 | תואם |
+| `math-uni` | u57 · 2026-09-09 | u57-pwa1 | תואם |
+| `math-uni2` | v55 · 2026-09-09 | v55-pwa1 | תואם |
+| `math-uni3` | g54 · 2026-09-09 | g54-pwa1 | תואם |
+| `bagrut-806` | x25 · 2026-09-09 | x25-pwa1 | תואם |
+| `ulpan` | a22 · 2026-09-09 | a22-pwa1 | תואם |
+| `english` | n53 · 2026-09-09 | n53-pwa1 | תואם |
+| `history` | m61 · 2026-09-09 | m61-pwa1 | תואם |
+| `lomda` | l36 · 2026-09-09 | l36-pwa1 | תואם |
+| `reader` | — | 32-pwa1 | מפתח בלבד |
 | `theory` | — | — | אינה בריפו הזה |
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-09.
 
 ## מה המחולל לא יודע
 

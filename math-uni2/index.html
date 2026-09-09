@@ -432,6 +432,18 @@ footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface
 /* שאלת מקור נושאת קטע שלם. בלי תקרה הוא דוחף את שאר הרשימה
    אל מחוץ למסך. */
 .xq .passage{max-height:11rem;overflow:auto}
+/* בורר השפה מציג ״العربية״ ו-״Русский״ גם כשהממשק עברי — זה כל
+   תפקידו — ולכן `html[lang]` אינו חל עליהם והם יורשים את `--font`,
+   שאין בו לא ערבית ולא קירילית. הגופן נקבע לפי השפה שהכפתור מציע,
+   ולא לפי שפת הממשק. הסימון אינו אחיד בין האפליקציות (`data-v`,
+   `data-n`, `data-l`, ולעיתים גם `lang`), ולכן הכלל מונה את כולם —
+   בלוק זהה בתשע האפליקציות, כדי שלא ייסחף ביניהן. */
+button[data-a="lang"][data-v="ar"],button[data-a="lang"][data-n="ar"],
+button[data-a="lang"][data-l="ar"],button[data-a="lang"][data-l="ar"] .fd,
+button[data-a="lang"][lang="ar"]{font-family:var(--ar)}
+button[data-a="lang"][data-v="ru"],button[data-a="lang"][data-n="ru"],
+button[data-a="lang"][data-l="ru"],button[data-a="lang"][data-l="ru"] .fd,
+button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -926,7 +938,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v52 · 2026-09-08";
+var BUILD="v55 · 2026-09-09";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -4050,7 +4062,7 @@ function buildQ(topicId,level){
     opts=[{h:raw.ans.h,t:ansP,ok:true,why:""}];
   }
   shuffle(opts);
-  var sayTxt=raw.ask+(raw.expr?". "+speakMath(plainOf(raw.expr)):"");
+  var sayTxt=speakProse(plainOf(raw.ask))+(raw.expr?". "+speakMath(plainOf(raw.expr)):"");
   return {
     topic:t.id,topicName:t.name,level:level,
     ask:raw.ask,expr:raw.expr||"",fig:raw.fig||"",
@@ -12052,7 +12064,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v52-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v55-pwa1").catch(function(){});
   });
 }
 </script>
