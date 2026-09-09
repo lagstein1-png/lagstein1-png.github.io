@@ -52,6 +52,9 @@ const SUITE = [
   { id: 'status',   args: ['--check'] },
   { id: 'wix',      args: ['--check'] },
   { id: 'banks',    args: [] },
+  /* התוכן של ״כותבים ביחד״. content.js אינו סורק אותה — כל תשע
+     המשפחות שלו מודדות שאלה, ואין שם שאלה. */
+  { id: 'kotvim',   args: [] },
   { id: 'leaks',    args: [] },
   { id: 'markers',  args: [] },
   { id: 'century',  args: [] },

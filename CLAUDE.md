@@ -363,6 +363,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/fonts.js                 # ערבית ורוסית בגופן שיש בו את הכתב
     node .claude/qa/langbtn.js               # כפתור השפה עצמו — "العربية" גם כשהממשק עברי
     node .claude/qa/banks.js                 # החיווט של lomda/data/, וארבע השפות בתוכן
+    node .claude/qa/kotvim.js                # התוכן של ״כותבים ביחד״ — ארבע שפות, ואין קטע גנרי
     node .claude/qa/leaks.js                 # תיאור של פריט בלומדה אינו מצטט את כותרתו (ההקראה לא מסגירה)
     node .claude/qa/markers.js               # סמני התנגשות מיזוג שנשארו בקובץ שנעקב
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
