@@ -562,7 +562,7 @@ async function scan(page){
    אפליקציה שנופלת בערבית היא FAIL, לא הערת ניסוח. */
 async function scanLang(page,lg){
  return page.evaluate(({lg})=>{
-  const out={lg:lg,built:0,threw:0,empty:0,heb:0,err:''};
+  const out={lg:lg,built:0,threw:0,empty:0,heb:0,hebOpt:0,hebWhy:0,err:''};
   try{
     if(typeof state==='object'&&state){
       if(state.settings) state.settings.lang=lg;
@@ -589,13 +589,27 @@ async function scanLang(page,lg){
   out.skipHeb=(teaches==='he');
   const view=(typeof trHTML==='function')?trHTML:function(h){return h};
   out.rendered=(typeof trHTML==='function');
-  for(const t of TOPICS) for(let k=0;k<4;k++){
+  /* עד 9.9.2026 נבדק כאן `q.ask` בלבד, וברמה 1 בלבד. שדה ה-`why`
+     של המסיח — ההסבר שהלומד מקבל **אחרי שטעה** — לא נבדק כלל,
+     וכך עשרים ואחת מחרוזות עברית חדשות ב-math-uni נפלו לעברית
+     בערבית, ברוסית ובאנגלית בלי שהדוח יאמר מילה: ״עברית בטקסט: 0״
+     וסעיף התרגום ״אפס״. הסריקה מכסה עכשיו את השאלה, את טקסט
+     האפשרות ואת הנימוק, בכל ארבע הרמות. */
+  for(const t of TOPICS) for(let lv=1;lv<=4;lv++) for(let k=0;k<2;k++){
     let q=null;
-    try{ q=buildQ(t.id,1) }
+    try{ q=buildQ(t.id,lv) }
     catch(e){ out.threw++; if(!out.err) out.err=String(e&&e.message||e); continue }
     if(!q||!q.options||!q.options.length){ out.empty++; continue }
     out.built++;
-    if(lg!=='he'&&!out.skipHeb&&HEB.test(plain(view('<i>'+q.ask+'</i>')))) out.heb++;
+    if(lg==='he'||out.skipHeb) continue;
+
+    let dirty=false;
+    if(HEB.test(plain(view('<i>'+q.ask+'</i>')))) dirty=true;
+    for(const o of q.options){
+      if(HEB.test(plain(view('<i>'+(o.h!=null?o.h:o.t)+'</i>')))){ dirty=true; out.hebOpt++ }
+      if(o.why&&HEB.test(plain(view('<i>'+o.why+'</i>')))){ dirty=true; out.hebWhy++ }
+    }
+    if(dirty) out.heb++;
   }
   return out;
  },{lg:lg});
@@ -753,7 +767,9 @@ function md(app,R){
       const f=R.find['lang-untranslated']||(R.find['lang-untranslated']={sev:'REVIEW',n:0,ex:[]});
       f.n+=r.heb;
       if(f.ex.length<3) f.ex.push(
-        {msg:lg+': '+r.heb+' שאלות מתוך '+r.built+' עדיין נושאות טקסט עברי',where:lg});
+        {msg:lg+': '+r.heb+' שאלות מתוך '+r.built+' עדיין נושאות טקסט עברי'+
+             ((r.hebOpt||r.hebWhy)?' ('+(r.hebOpt||0)+' באפשרות, '+(r.hebWhy||0)+' בנימוק)':''),
+           where:lg});
     }
   }
   if(errs.length) R.find['js-error']={sev:'FAIL',n:errs.length,ex:[{msg:errs[0],where:'page'}]};

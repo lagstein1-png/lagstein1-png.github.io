@@ -361,6 +361,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/storage.js               # מפתח localStorage אחד לאפליקציה אחת
     node .claude/qa/say.js                   # ההקראה לא מסגירה את התשובה לפני שעונים
     node .claude/qa/saysym.js                # מה באמת נאמר — אין ^ או _ גולמי בהקראה
+    node .claude/qa/guess.js                 # אי אפשר לקלוע לפי אורך התשובה או מיקומה
     node .claude/qa/clicks.js                # כל לחיצה מושמעת: כפתור שנלחץ מוקרא בשמו כשההקראה דולקת
     node .claude/qa/fonts.js                 # ערבית ורוסית בגופן שיש בו את הכתב
     node .claude/qa/langbtn.js               # כפתור השפה עצמו — "العربية" גם כשהממשק עברי

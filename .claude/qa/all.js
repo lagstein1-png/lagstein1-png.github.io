@@ -70,6 +70,10 @@ const SUITE = [
      את speakMath על שאלות שנבנו וקורא את הפלט. תפס ^ גולמי ב-math-uni2
      בזמן ש-content.js החזיר עליה PASS. */
   { id: 'saysym',   args: [],     needsServer: true },
+  /* האם אפשר לקלוע בלי לדעת את החומר. content.js מדווח את אותו
+     דבר כ-REVIEW — כלומר כשאלה שאפשר לדלג עליה — ושני תאים הגיעו
+     ככה ל-100% ונשארו בייצור. כאן זה שער חוסם. */
+  { id: 'guess',    args: [],     needsServer: true },
   { id: 'clicks',   args: [],     needsServer: true },
   { id: 'langbtn',  args: [],     needsServer: true },
   /* מנוע ההקראה מול speechSynthesis מזויף. slow: הוא ממתין 9.8
