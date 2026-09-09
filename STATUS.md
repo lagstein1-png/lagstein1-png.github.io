@@ -33,23 +33,8 @@
 | `reader` | — | 31-pwa1 | מפתח בלבד |
 | `theory` | — | — | אינה בריפו הזה |
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-09.
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
 
 ## מה המחולל לא יודע
 
