@@ -18,7 +18,8 @@ const { execFileSync } = require('child_process');
 const ROOT = process.argv[2] ? path.resolve(process.argv[2]) : path.resolve(__dirname, '..', '..');
 const TEXT = /\.(html|js|json|md|css|svg|txt|webmanifest|yml|yaml|sh)$/i;
 
-const files = execFileSync('git', ['ls-files', '-z'], { cwd: ROOT }).toString().split('\0').filter(f => f && TEXT.test(f));
+/* קובץ באמצע מיזוג מופיע ב-ls-files שלוש פעמים (שלושת השלבים) — נספר פעם אחת */
+const files = [...new Set(execFileSync('git', ['ls-files', '-z'], { cwd: ROOT }).toString().split('\0'))].filter(f => f && TEXT.test(f));
 let bad = 0, hits = 0;
 for (const f of files) {
   const full = path.join(ROOT, f);

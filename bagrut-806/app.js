@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x27 · 2026-09-09";
+  var BUILD = "x30 · 2026-09-09";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -972,6 +972,12 @@
     });
   }
 
+  function sayClick(el) {
+    if (el.matches("[data-read],[data-read-el],[data-tutor],#btn-stop,#btn-pause,#btn-back,#btn-fwd,[data-nosay]")) return;
+    var label = (el.getAttribute("aria-label") || el.textContent || "").replace(/\s+/g, " ").trim();
+    if (!label || label.length > 60 || !window.Speech || !window.Speech.say) return;
+    setTimeout(function () { window.Speech.say(label); }, 500);
+  }
   document.addEventListener("click", function (e) {
     var el = e.target.closest ? e.target.closest(
       "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate]," +
@@ -980,6 +986,11 @@
       "#btn-reset,#btn-stop,#btn-try," +
       "#btn-pause,#btn-back,#btn-fwd") : null;
     if (!el) return;
+
+    /* כל לחיצה מושמעת (O-28, 9.9.2026): תווית הכפתור נאמרת חצי
+       שנייה אחרי הפעולה, ורק אם ההקראה שותקת. כפתורי ההקראה עצמם
+       וכפתורי הבקרה שלה אינם כאן — הם מדברים או משתיקים בעצמם. */
+    sayClick(el);
 
     if (el.getAttribute("data-simstart")) {
       var exs = examById(state.examId);
@@ -1183,7 +1194,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x27-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x30-pwa1").catch(function () {});
     });
   }
 

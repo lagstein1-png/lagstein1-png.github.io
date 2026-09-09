@@ -687,6 +687,29 @@ var W = [];            /* המילים: {plain, nikud, word, sent} */
 var SENT = 0;          /* המשפט הנוכחי */
 var SENTS = 1;         /* כמה משפטים */
 var speaking = false;
+
+/* --- כל לחיצה מושמעת (O-27/O-28, 9.9.2026) ---
+   כפתור שנלחץ מוקרא בשמו בשפת הממשק — לא לפני הפעולה אלא חצי
+   שנייה אחריה, ורק אם המנוע שותק: פעולה שמדברת בעצמה מנצחת,
+   והתווית לא נחתכת. data-nosay על כפתור משתיק אותו. */
+var SAY_LANG={he:"he-IL",ar:"ar-SA",ru:"ru-RU",en:"en-US"};
+document.addEventListener("click",function(e){
+  var b=e.target&&e.target.closest&&e.target.closest("button");
+  if(!b||b.hasAttribute("data-nosay")||b.id==="demo-exit")return;
+  var label=(b.getAttribute("aria-label")||b.textContent||"").replace(/\s+/g," ").trim();
+  if(!label||label.length>60||!("speechSynthesis" in window))return;
+  setTimeout(function(){
+    /* ▶ ◀ ▶ מתחילים הקראה בעצמם — המנוע כבר עסוק, והתווית מוותרת */
+    try{if(speaking||speechSynthesis.speaking||speechSynthesis.pending)return}catch(err){}
+    var u=new SpeechSynthesisUtterance(label);
+    u.lang=SAY_LANG[LG]||"he-IL";
+    if(LG==="he"&&heVoice){u.voice=heVoice;u.pitch=femLift(heVoice)}
+    u.rate=P.rate;
+    try{speechSynthesis.speak(u)}catch(err){}
+  },500);
+/* capture: התווית נקראת לפני שהכפתור עצמו משנה אותה (״מצב בהיר״ →
+   ״מצב כהה״) — כמו בתשע האחרות, שם sayClick רץ לפני onAction */
+},true);
 var heVoice = null;
 var voicesReady = false;
 
@@ -1582,7 +1605,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=33-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=36-pwa1").catch(function(){});
   });
 }
 </script>

@@ -146,11 +146,71 @@ try{
       if(EL && EL.ov.classList.contains("on")) draw();
     });
 }catch(e){}
+/* ================= מנוע ההקראה — ארבעה מנגנונים =================
+   אותם ארבעה שיושבים בכל אחת עשרה האפליקציות, ומכסים כשלים שקטים
+   של Web Speech שכולם נראים למשתמש אותו דבר: הקול מפסיק באמצע.
+   הפאנל הזה הוא קורא שנים עשר, והוא נבנה בלעדיהם.
+
+   1 · שומר-ער — Chrome ו-Edge בשולחן העבודה חותכים הקראה אחרי
+       כ-15 שניות. במובייל אין את הבאג והפעולה מקרטעת שם.
+   2 · _activeU — הפניה חיה ל-utterance. בלעדיה Chrome אוסף אותו
+       ואיתו את onend, והמקטע הבא לא יוצא לעולם.
+   3 · ttsWatchdog — יש מכשירים שבהם onend לא נורה כלל.
+   4 · נפילה מקול רשת — קול נוירלי של Edge שותק בלי אינטרנט.
+
+   תשובה של ג׳וש היא עד 700 טוקנים, כלומר בקלות מעל 15 שניות. */
+var NEEDS_KEEPALIVE = /Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                   && !/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer = null, _activeU = null, _netVoiceOK = true;
+
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE || !("speechSynthesis" in window) || _kaTimer) return;
+  _kaTimer = setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){ stopKeepAlive(); return }
+      if(speechSynthesis.paused) return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause(); speechSynthesis.resume();
+    }catch(e){ stopKeepAlive() }
+  }, 9000);
+}
+function stopKeepAlive(){ if(_kaTimer){ clearInterval(_kaTimer); _kaTimer = null } }
+/* עוצרים רק כששום דבר כבר לא מדבר — אחרת מקטע שהתחיל זה עתה מאבד
+   את השמירה שלו כשהקודם מסיים להתנקות. */
+function maybeStopKeepAlive(){
+  try{ if(speechSynthesis.speaking || speechSynthesis.pending) return }catch(e){}
+  stopKeepAlive();
+}
+
+/* קול רשת שאי אפשר להשתמש בו עכשיו אינו ״פחות טוב״ — הוא לא יעבוד.
+   לכן מיון ראשון ולא סעיף בניקוד: קנס לא הספיק במאגר הזה, מפני
+   שקול נוירלי צובר על שם היצרן יותר ממה שכל קנס סביר מוריד. */
+function voiceUsable(v){
+  if(!v || v.localService !== false) return 1;
+  return (_netVoiceOK && navigator.onLine !== false) ? 1 : 0;
+}
+
+function ttsWatchdog(alive, onSilent){
+  var idle = 0, dog = setInterval(function(){
+    if(!alive()){ clearInterval(dog); return }
+    var busy = false;
+    try{ busy = !!(speechSynthesis.speaking || speechSynthesis.pending) }catch(e){}
+    if(busy){ idle = 0; return }
+    if(++idle >= 4){ clearInterval(dog); onSilent() }
+  }, 1000);
+  return function(){ clearInterval(dog) };
+}
+
 function pickVoice(code){
-  var v = voices(), p = code.slice(0,2), i;
-  for(i=0;i<v.length;i++) if((v[i].lang||"").replace("_","-").toLowerCase()===code.toLowerCase()) return v[i];
-  for(i=0;i<v.length;i++) if((v[i].lang||"").slice(0,2).toLowerCase()===p) return v[i];
-  return null;
+  var v = voices(), p = code.slice(0,2), i, exact = [], loose = [], l;
+  for(i=0;i<v.length;i++){
+    l = (v[i].lang||"").replace("_","-").toLowerCase();
+    if(l === code.toLowerCase()) exact.push(v[i]);
+    else if(l.slice(0,2) === p) loose.push(v[i]);
+  }
+  var list = exact.length ? exact : loose;
+  if(!list.length) return null;
+  list.sort(function(a,b){ return voiceUsable(b) - voiceUsable(a) });
+  return list[0];
 }
 function hasVoice(code){ return !!pickVoice(code) }
 
@@ -167,8 +227,85 @@ function segments(text){
   return out.filter(function(s){ return s.t.replace(/\s/g,"") });
 }
 
+/* ================= מבנה התשובה =================
+   ג׳וש כותב מהתור השלישי תשובה מובנית — נקודות, צעדים ממוספרים
+   והדגשה — ולכן צריך שלושה דברים, ולא אחד:
+
+   · `fmt`      — מה שנראה על המסך. רץ **אחרי** `esc`, ולכן אין
+                  בו דרך להזריק HTML: כל `<` כבר `&lt;`.
+   · `stripMd`  — מה שנאמר בקול. בלעדיו מנוע ההקראה אומר ״מינוס״
+                  ו״כוכבית כוכבית״ בכל שורת רשימה, וזה בדיוק
+                  הכשל ש-`saysym.js` נבנה נגדו.
+   · `splitSugg`— הצעות ההמשך, שאינן חלק מהתשובה: לא מוצגות
+                  בבועה ולא מוקראות.
+
+   « » אינם מוסרים ב-`stripMd`: `segments` צריך אותם כדי לתת לכל
+   שפה את הקול שלה. `fmt` כן מסיר אותם — הם סימון להקראה, לא
+   טקסט לקורא. */
+var SUGG = "[[?]]";
+function splitSugg(text){
+  var i = String(text).indexOf(SUGG);
+  if(i < 0) return { body: String(text), sugg: [] };
+  var out = [], rest = String(text).slice(i + SUGG.length).split("\n");
+  for(var k = 0; k < rest.length && out.length < 3; k++){
+    var one = rest[k].trim();
+    if(one) out.push(one.slice(0, 60));
+  }
+  return { body: String(text).slice(0, i).replace(/\s+$/, ""), sugg: out };
+}
+function stripMd(text){
+  return String(text)
+    .replace(/\*\*/g, "")
+    .replace(/^\s*[-•]\s+/gm, "")
+    .replace(/^\s*\d+[.)]\s+/gm, "")
+    .replace(/^\s*#{1,6}\s+/gm, "");
+}
+function bold(s){ return s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>") }
+function fmt(text){
+  var lines = esc(String(text).replace(/«|»/g, "")).split("\n"),
+      out = [], list = null;
+  function shut(){ if(list){ out.push("</" + list + ">"); list = null } }
+  lines.forEach(function(ln){
+    var one = ln.trim();
+    var b = one.match(/^[-•]\s+(.*)$/), n = one.match(/^\d+[.)]\s+(.*)$/);
+    if(b){ if(list !== "ul"){ shut(); out.push("<ul class=\"tu-l\">"); list = "ul" }
+           out.push("<li>" + bold(b[1]) + "</li>"); return }
+    if(n){ if(list !== "ol"){ shut(); out.push("<ol class=\"tu-l\">"); list = "ol" }
+           out.push("<li>" + bold(n[1]) + "</li>"); return }
+    shut();
+    if(one) out.push("<p>" + bold(one) + "</p>");
+  });
+  shut();
+  return out.join("");
+}
+
+/* ================= החשיפה ההדרגתית =================
+   **זו אינה הזרמה מהמודל, וחשוב לא לבלבל.** השרת בודק את התשובה
+   **השלמה** לפני שהוא שולח אותה — `revealsAnswer` פוסל פתרון
+   בשני התורים הראשונים, ו-`badEquation` פוסל 8+7=16 — ואם היא
+   נפסלת נשלחת אחרת במקומה. הזרמה אמיתית הייתה מציגה לילד בדיוק
+   את התשובה שהשומר עומד לפסול.
+
+   לכן: הטקסט מגיע שלם ומאומת, ומתגלה על המסך מילה־מילה. התחושה
+   של Gemini, בלי לוותר על השומר שהוא כל הרעיון. */
+var REV = -1, REVN = 0, REVT = null;
+function stopReveal(){ if(REVT){ clearInterval(REVT); REVT = null } REV = -1 }
+function startReveal(i){
+  stopReveal();
+  var m = MSGS[i]; if(!m) return;
+  REV = i; REVN = 0;
+  REVT = setInterval(function(){
+    var cur = MSGS[REV];
+    if(!cur){ stopReveal(); draw(); return }
+    REVN += 4;
+    if(REVN >= cur.text.length) stopReveal();
+    draw();
+  }, 28);
+}
+
 function stopSay(){
   PLAYING = -1;
+  stopKeepAlive(); _activeU = null;
   try{ speechSynthesis.cancel() }catch(e){}
   draw();
 }
@@ -177,17 +314,48 @@ function say(i){
   /* עוצרים גם את ההקראה של האפליקציה עצמה, אם יש לה כזאת */
   if(CFG && CFG.stopHost) try{ CFG.stopHost() }catch(e){}
   try{ speechSynthesis.cancel() }catch(e){}
-  var segs = segments(m.text), r = rate(), n = 0;
+  var segs = segments(stripMd(splitSugg(m.text).body)), r = rate(), n = 0;
   if(!segs.length) return;
   PLAYING = i; draw();
   (function next(){
-    if(PLAYING !== i || n >= segs.length){ if(PLAYING===i){ PLAYING=-1; draw() } return }
+    if(PLAYING !== i || n >= segs.length){
+      if(PLAYING === i){ PLAYING = -1; draw() }
+      _activeU = null; maybeStopKeepAlive(); return;
+    }
     var s = segs[n++], code = VOICE[s.l] || VOICE.he;
-    var u = new SpeechSynthesisUtterance(s.t);
+    speakSeg(s.t, code, r, function(){ return PLAYING === i }, next);
+  })();
+}
+
+/* מקטע אחד, ושלושת המנגנונים שסביבו. `done` נקרא בדיוק פעם אחת —
+   בסוף תקין, בשגיאה, או כשהשומר גילה שקט מוחלט. */
+function speakSeg(text, code, r, alive, done){
+  var moved = false, disarm = null, retried = false;
+  function fin(){
+    if(moved) return;
+    moved = true;
+    if(disarm){ disarm(); disarm = null }
+    done();
+  }
+  (function go(){
+    var u = new SpeechSynthesisUtterance(text);
     u.lang = code; u.rate = r;
     var v = pickVoice(code); if(v) u.voice = v;
-    u.onend = next; u.onerror = next;
-    try{ speechSynthesis.speak(u) }catch(e){ next() }
+    u.onend = fin;
+    u.onerror = function(){
+      /* 4 · קול רשת ששתק. מכבים את הדגל, ואותו טקסט נאמר שוב פעם
+         אחת בלבד — הפעם עם קול שהמיון החדש כבר מעדיף. */
+      if(!retried && v && v.localService === false && alive()){
+        retried = true; _netVoiceOK = false; _activeU = null;
+        if(disarm){ disarm(); disarm = null }
+        go(); return;
+      }
+      fin();
+    };
+    _activeU = u;                                      /* 2 */
+    try{ speechSynthesis.speak(u) }catch(e){ fin(); return }
+    startKeepAlive();                                  /* 1 */
+    disarm = ttsWatchdog(function(){ return alive() && !moved }, fin);  /* 3 */
   })();
 }
 
@@ -208,6 +376,14 @@ var CSS = ''
 +'.tu-m{max-width:88%;border-radius:15px;padding:10px 14px;white-space:pre-wrap;word-break:break-word}'
 +'.tu-me{align-self:flex-end;background:#dff1fa;border:2px solid rgba(88,183,224,.45)}'
 +'.tu-bot{align-self:flex-start;background:#d9f2ec;border:2px solid rgba(14,156,141,.4)}'
++'.tu-m p{margin:0 0 .45em}.tu-m p:last-child{margin-bottom:0}'
++'.tu-l{margin:.2em 0 .45em;padding-inline-start:1.25em}.tu-l li{margin:.15em 0}'
++'.tu-m>*:last-child{margin-bottom:0}'
+/* ההצעות אינן בועה: הן פעולה, ולכן הן נראות ככפתורים ולא כטקסט. */
++'.tu-sg{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start;max-width:88%}'
++'.tu-sg button{font:inherit;font-size:.92em;border-radius:999px;cursor:pointer;'
++'padding:6px 13px;background:#eef8fb;color:#17333c;border:2px solid rgba(88,183,224,.55)}'
++'.tu-sg button:hover{background:#dff1fa}'
 +'.tu-sys{color:#4c666e;font-size:.92rem}'
 +'.tu-note{background:#fff3ce;border:2px solid rgba(230,184,0,.55);border-radius:13px;padding:10px 14px}'
 +'.tu-ctl{display:flex;gap:6px;align-items:center;margin-top:7px;flex-wrap:wrap}'
@@ -232,6 +408,8 @@ var CSS = ''
 +'#tu-in,.tu-ctl button,.tu-ctl select,#tu-lg,#tu-x{background:#1e2f38;color:#eef5f7;'
 +'border-color:rgba(238,245,247,.3)}'
 +'.tu-me{background:#1d3b4a;border-color:#2f6a86}.tu-bot{background:#14403a;border-color:#1c7e70}'
++'.tu-sg button{background:#12303d;color:#eaf6fa;border-color:#2f6a86}'
++'.tu-sg button:hover{background:#1d3b4a}'
 +'.tu-sys{color:#a9c2ca}#tu-pv{color:#93aeb7}}';
 
 function build(){
@@ -274,7 +452,9 @@ function build(){
   EL.log.addEventListener("click", function(e){
     var b = e.target.closest("[data-tu]"); if(!b) return;
     var a = b.getAttribute("data-tu"), i = +b.getAttribute("data-i");
-    if(a === "say") say(i); else if(a === "stop") stopSay();
+    if(a === "say") say(i);
+    else if(a === "stop") stopSay();
+    else if(a === "sugg") send(b.getAttribute("data-s"));
   });
   EL.log.addEventListener("change", function(e){
     if(e.target.id === "tu-rate"){ setRate(parseFloat(e.target.value)); if(PLAYING>=0) stopSay() }
@@ -313,9 +493,26 @@ function draw(){
     /* ההודעה הפותחת נשלחת על ידי האפליקציה ולא על ידי הילד */
     if(i === 0 && m.role === "user") return;
     var mine = m.role === "user";
-    h += '<div class="tu-m ' + (mine ? "tu-me" : "tu-bot") + '">'
-       + esc(m.text.replace(/«|»/g, "")) + '</div>';
-    if(!mine) h += ctl(i);
+    /* הודעת הילד נשארת טקסט; רק ג׳וש כותב מבנה. */
+    if(mine){
+      h += '<div class="tu-m tu-me">' + esc(m.text.replace(/«|»/g, "")) + '</div>';
+      return;
+    }
+    var sp = splitSugg(i === REV ? m.text.slice(0, REVN) : m.text);
+    h += '<div class="tu-m tu-bot">' + fmt(sp.body) + '</div>';
+    h += ctl(i);
+    /* ההצעות מופיעות רק כשהתשובה כולה על המסך, ורק על האחרונה —
+       שרשרת של הצעות ישנות היא רעש, ולחיצה עליהן שולחת שאלה
+       שכבר נענתה. */
+    if(i === REV || i !== MSGS.length - 1 || BUSY) return;
+    if(sp.sugg.length){
+      h += '<div class="tu-sg">';
+      sp.sugg.forEach(function(one){
+        h += '<button type="button" data-tu="sugg" data-s="' + esc(one) + '">'
+           + esc(one) + '</button>';
+      });
+      h += '</div>';
+    }
   });
   if(BUSY) h += '<div class="tu-sys">' + esc(t.wait) + '</div>';
   if(NOTE) h += '<div class="tu-note">' + esc(NOTE) + '</div>';
@@ -361,7 +558,7 @@ function open(){
   if(!MSGS.length) send(T().hello, true);
   else focus();
 }
-function close(){ stopSay(); NOTE = ""; if(EL) EL.ov.classList.remove("on") }
+function close(){ stopSay(); stopReveal(); NOTE = ""; if(EL) EL.ov.classList.remove("on") }
 function focus(){ try{ EL.inp.focus() }catch(e){} }
 
 function send(text, auto){
@@ -371,6 +568,7 @@ function send(text, auto){
   if(MSGS.length >= TURNS){ NOTE = t.full; draw(); return }
   if(left() <= 0){ NOTE = t.limit; draw(); return }
 
+  stopReveal();
   MSGS.push({ role:"user", text:text });
   if(EL) EL.inp.value = "";
   BUSY = true; NOTE = ""; draw();
@@ -409,6 +607,7 @@ function send(text, auto){
     var reply = String((d && d.text) || "").trim();
     if(!reply) throw new Error("empty");
     MSGS.push({ role:"assistant", text:reply });
+    startReveal(MSGS.length - 1);
     draw(); focus();
   })
   .catch(function(err){

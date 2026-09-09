@@ -562,7 +562,8 @@ async function scan(page){
    אפליקציה שנופלת בערבית היא FAIL, לא הערת ניסוח. */
 async function scanLang(page,lg){
  return page.evaluate(({lg})=>{
-  const out={lg:lg,built:0,threw:0,empty:0,heb:0,hebOpt:0,hebWhy:0,err:''};
+  const out={lg:lg,built:0,threw:0,empty:0,heb:0,hebOpt:0,hebWhy:0,
+             err:'',longQ:0,longOpt:0,ex:[],lim:0};
   try{
     if(typeof state==='object'&&state){
       if(state.settings) state.settings.lang=lg;
@@ -589,25 +590,68 @@ async function scanLang(page,lg){
   out.skipHeb=(teaches==='he');
   const view=(typeof trHTML==='function')?trHTML:function(h){return h};
   out.rendered=(typeof trHTML==='function');
-  /* עד 9.9.2026 נבדק כאן `q.ask` בלבד, וברמה 1 בלבד. שדה ה-`why`
-     של המסיח — ההסבר שהלומד מקבל **אחרי שטעה** — לא נבדק כלל,
-     וכך עשרים ואחת מחרוזות עברית חדשות ב-math-uni נפלו לעברית
-     בערבית, ברוסית ובאנגלית בלי שהדוח יאמר מילה: ״עברית בטקסט: 0״
-     וסעיף התרגום ״אפס״. הסריקה מכסה עכשיו את השאלה, את טקסט
-     האפשרות ואת הנימוק, בכל ארבע הרמות. */
-  for(const t of TOPICS) for(let lv=1;lv<=4;lv++) for(let k=0;k<2;k++){
+
+  /* אורך השאלה והאפשרות — **הסף אינו מספר אחד לכל השפות.**
+
+     המעבר העברי מודד 120 תווים לאפשרות ו-300 לשאלה, והמספרים
+     האלה כוילו על עברית. עברית נכתבת בלי ניקוד, ולכן אותו משפט
+     קצר בה מכל השפות האחרות — והעתקת 120 לרוסית ולאנגלית אינה
+     בדיקה אלא הצפה.
+
+     **נמדד 9.9.2026 על כל 19 קובצי `lomda/data/`,** 3,050
+     מחרוזות לכל שפה: מעל 120 תווים יש מחרוזת עברית **אחת**,
+     מול 42 בערבית, 442 ברוסית ו-509 באנגלית — 993 בסך הכול.
+     סף מועתק היה מייצר 993 התראות, וזו בדיוק התראת השווא
+     בהיקף שההערות למעלה מתעדות פעמיים.
+
+     היחס עצמו נמדד באותה ריצה, על 2,300 זוגות לכל שפה שבהן
+     המקור העברי באורך 20 תווים לפחות (חציון אורך התרגום חלקי
+     אורך העברית): ערבית 1.08, רוסית 1.36, אנגלית 1.45. הסף
+     מוכפל ביחס הזה, ולכן הוא אומר בכל שפה את **אותו** דבר:
+     ״ארוך מדי למסך של טלפון״. בסף המדורג יש 53 חריגות מתוך
+     12,200 מחרוזות — ממצא שאפשר לעבור עליו.
+
+     שפה שאינה מוכרת מקבלת 1.45, היחס הגדול שנמדד, כדי שהוספת
+     שפה לא תיפתח בהצפה. */
+  const RATIO={he:1,ar:1.08,ru:1.36,en:1.45};
+  const rt=RATIO[lg]||1.45;
+  const limO=Math.round(120*rt), limQ=Math.round(300*rt);
+  out.lim=limO;
+  const note=function(kind,len,lim,txt){
+    if(kind==='q') out.longQ++; else out.longOpt++;
+    if(out.ex.length<3) out.ex.push({kind:kind,len:len,lim:lim,txt:String(txt).slice(0,60)});
+  };
+
+  /* כל הרמות, ולא רמה 1 בלבד. המעבר הזה בדק עד 9.9.2026 את
+     `buildQ(t.id,1)` בלבד, ולכן תוכן שיושב ברמות 2 ו-3 לא נמדד
+     בשום שפה. */
+  const LVLS_=[]; const nl_=(typeof LVL!=='undefined'&&LVL.length)||3;
+  for(let i=1;i<=nl_;i++) LVLS_.push(i);
+
+  /* ובאותה ריצה גם סריקת העברית. עד 9.9.2026 היא בדקה `q.ask`
+     בלבד — לא את טקסט האפשרות ולא את שדה ה-`why`, ההסבר שהלומד
+     מקבל **אחרי שטעה**. עשרים ואחת מחרוזות חדשות ב-math-uni נפלו
+     לעברית בערבית, ברוסית ובאנגלית, והדוח אמר ״עברית בטקסט: 0״
+     וסעיף תרגום ״אפס״. */
+  for(const t of TOPICS) for(const lv of LVLS_) for(let k=0;k<4;k++){
     let q=null;
     try{ q=buildQ(t.id,lv) }
     catch(e){ out.threw++; if(!out.err) out.err=String(e&&e.message||e); continue }
     if(!q||!q.options||!q.options.length){ out.empty++; continue }
     out.built++;
-    if(lg==='he'||out.skipHeb) continue;
-
+    const scanHeb=(lg!=='he'&&!out.skipHeb);
     let dirty=false;
-    if(HEB.test(plain(view('<i>'+q.ask+'</i>')))) dirty=true;
+
+    const askT=plain(view('<i>'+q.ask+'</i>'));
+    if(scanHeb&&HEB.test(askT)) dirty=true;
+    if(askT.length>limQ) note('q',askT.length,limQ,askT);
+
     for(const o of q.options){
-      if(HEB.test(plain(view('<i>'+(o.h!=null?o.h:o.t)+'</i>')))){ dirty=true; out.hebOpt++ }
-      if(o.why&&HEB.test(plain(view('<i>'+o.why+'</i>')))){ dirty=true; out.hebWhy++ }
+      if(!o||(o.h===undefined&&o.t===undefined)) continue;
+      const tx=plain(view('<i>'+(o.h!==undefined?o.h:o.t)+'</i>'));
+      if(tx.length>limO) note('o',tx.length,limO,tx);
+      if(scanHeb&&HEB.test(tx)){ dirty=true; out.hebOpt++ }
+      if(scanHeb&&o.why&&HEB.test(plain(view('<i>'+o.why+'</i>')))){ dirty=true; out.hebWhy++ }
     }
     if(dirty) out.heb++;
   }
@@ -636,6 +680,7 @@ const CAT={
   'translation-missing':6,'lang-broken':6,'lang-untranslated':6,
   'no-say':7,'html-in-say':7,'latex-in-say':7,'symbol-in-say':7,'long-say':7,'answer-in-say':7,
   'long-question':8,'long-option':8,'position-bias':8,'longest-answer':8,
+  'long-question-lang':8,'long-option-lang':8,
   'shortest-answer':8,'few-options':8,
   'build-throw':9,'build-null':9,'no-options':9,'too-few-options':9,
   'too-many-options':9,'option-shape':9,'empty-question':9,'js-error':9
@@ -705,12 +750,13 @@ function md(app,R){
   if(R.langsRun&&R.langsRun.length){
     L.push('## נספח — בנייה בכל שפה שהוכרזה');
     L.push('');
-    L.push('| שפה | נבנו | נפלו | ריקות | עברית בטקסט | מילון חסר |');
-    L.push('|---|---|---|---|---|---|');
+    L.push('| שפה | נבנו | נפלו | ריקות | עברית בטקסט | מילון חסר | סף אורך | ארוכות |');
+    L.push('|---|---|---|---|---|---|---|---|');
     for(const r of R.langsRun)
       L.push('| '+r.lg+' | '+r.built+' | '+r.threw+' | '+r.empty+' | '+
              (r.lg==='he'?'—':(r.skipHeb?'פטורה':r.heb))+' | '+
-             ((R.lang[r.lg]&&R.lang[r.lg].dictMissing!==undefined)?R.lang[r.lg].dictMissing:'—')+' |');
+             ((R.lang[r.lg]&&R.lang[r.lg].dictMissing!==undefined)?R.lang[r.lg].dictMissing:'—')+' | '+
+             (r.lim||'—')+' | '+((r.longOpt||0)+(r.longQ||0))+' |');
     L.push('');
     const r0=R.langsRun[0]||{};
     if(r0.skipHeb){
@@ -771,6 +817,17 @@ function md(app,R){
              ((r.hebOpt||r.hebWhy)?' ('+(r.hebOpt||0)+' באפשרות, '+(r.hebWhy||0)+' בנימוק)':''),
            where:lg});
     }
+    /* אורך בשפה — הסף מדורג לפי השפה, וההסבר המלא ב-scanLang. */
+    const addLang=function(kind,n_,which){
+      if(!n_) return;
+      const f=R.find[kind]||(R.find[kind]={sev:'REVIEW',n:0,ex:[]});
+      f.n+=n_;
+      const e=(r.ex||[]).filter(function(x){return x.kind===which})[0];
+      if(f.ex.length<3) f.ex.push({msg:lg+': '+n_+' מתוך '+r.built+' — סף '+
+        (e?e.lim:r.lim)+' תווים'+(e?', הארוך '+e.len+': "'+e.txt+'…"':''),where:lg});
+    };
+    addLang('long-option-lang',r.longOpt,'o');
+    addLang('long-question-lang',r.longQ,'q');
   }
   if(errs.length) R.find['js-error']={sev:'FAIL',n:errs.length,ex:[{msg:errs[0],where:'page'}]};
 

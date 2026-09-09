@@ -283,6 +283,21 @@
   }
   api.stop = stop;
 
+  /* --- אמירה קצרה, בלי תור --------------------------------------
+     תווית של כפתור (O-28): אותו קול ואותו קצב כמו בהקראה, אבל בלי
+     stopbar, בלי keepalive ובלי סימון "on" — משפט אחד וזהו. שותקת
+     כשההקראה עצמה מדברת. */
+  api.say = function (text) {
+    text = String(text || "").trim();
+    if (!text || !supported() || api.speaking) return;
+    try { if (speechSynthesis.speaking || speechSynthesis.pending) return; } catch (e) {}
+    var v = bestVoice(), u = new SpeechSynthesisUtterance(text);
+    if (v) u.voice = v;
+    u.lang = v ? normLang(v.lang) : LANG;
+    u.rate = Math.max(0.5, Math.min(2, RATE_BASE * api.rate));
+    try { speechSynthesis.speak(u); } catch (e) {}
+  };
+
   function step(my) {
     if (my !== token) return;
     if (qi >= queue.length) { stop(); return; }
