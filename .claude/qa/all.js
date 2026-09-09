@@ -54,6 +54,7 @@ const SUITE = [
   { id: 'banks',    args: [] },
   { id: 'leaks',    args: [] },
   { id: 'century',  args: [] },
+  { id: 'content806', args: [] },
   { id: 'a11y',     args: [] },
   { id: 'fonts',    args: [] },
   { id: 'engine',   args: [] },
