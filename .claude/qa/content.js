@@ -107,7 +107,18 @@ async function scan(page){
 
   const HEB=/[֐-׿]/;
   const BROKEN=/\bNaN\b|\bInfinity\b|\bundefined\b|\bnull\b|\[object Object\]/;
-  const PLACEHOLDER=/\{(?:a|b|c|n|ans|0|1|2|3)\}/;
+  /* מציין מקום שלא הוחלף. `{a}` `{ans}` וכו׳ חד־משמעיים, אבל
+     `{0}`..`{3}` נראים בדיוק כמו **סימון קבוצה** — `{3} ∈ A` הוא
+     הקבוצה שאיברה 3, ו-SAY_MAP אף מכיל כלל ייעודי לסוגריים
+     מסולסלים. זה הפיל את math-uni ב-FAIL על שני מופעים תקינים
+     ב-sets L1, ו-FAIL חוסם `approved` בסולם השלבים.
+     לכן: השמיים תמיד; המספריים רק כשאין בטקסט אופרטור קבוצות. */
+  const SETOP=/[∈∉⊆⊂∪∩∅]/;
+  const PH_NAME=/\{(?:a|b|c|n|ans)\}/;
+  const PH_NUM=/\{[0-3]\}/;
+  const PLACEHOLDER={test:function(t){
+    return PH_NAME.test(t) || (PH_NUM.test(t) && !SETOP.test(t));
+  }};
   const MOJIBAKE=/[�]|Ã[ -¿]|Ð[ -¿]/;
   const ENTITY=/&(?:amp|lt|gt|quot|nbsp|#\d+);/;
   /* סימנים ש-SAY_MAP ו-PROSE_MAP קיימים כדי להמיר. אם אחד מהם

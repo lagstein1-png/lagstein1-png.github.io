@@ -22,9 +22,9 @@
 |---|---|---|---|
 | `math-app` | b57 · 2026-09-08 | b57-pwa1 | תואם |
 | `math-teen` | t57 · 2026-09-08 | t57-pwa1 | תואם |
-| `math-uni` | u54 · 2026-09-08 | u54-pwa1 | תואם |
-| `math-uni2` | v52 · 2026-09-08 | v52-pwa1 | תואם |
-| `math-uni3` | g51 · 2026-09-08 | g51-pwa1 | תואם |
+| `math-uni` | u55 · 2026-09-09 | u55-pwa1 | תואם |
+| `math-uni2` | v53 · 2026-09-09 | v53-pwa1 | תואם |
+| `math-uni3` | g52 · 2026-09-09 | g52-pwa1 | תואם |
 | `bagrut-806` | x24 · 2026-09-08 | x24-pwa1 | תואם |
 | `ulpan` | a20 · 2026-09-08 | a20-pwa1 | תואם |
 | `english` | n51 · 2026-09-08 | n51-pwa1 | תואם |
@@ -33,23 +33,7 @@
 | `reader` | — | 31-pwa1 | מפתח בלבד |
 | `theory` | — | — | אינה בריפו הזה |
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
-
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-08.
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-09.
 
 ## מה המחולל לא יודע
 
