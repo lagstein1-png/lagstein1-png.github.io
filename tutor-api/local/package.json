@@ -7,9 +7,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "health": "node -e \"fetch('http://127.0.0.1:3000/health').then(r=>r.json()).then(j=>console.log(j))\""
+    "health": "node -e \"fetch('http://127.0.0.1:3000/health').then(r=>r.json()).then(j=>console.log(j))\"",
+    "doctor": "node doctor.js"
   },
-  "engines": { "node": ">=22.7.0" },
+  "engines": { "node": ">=18.0.0" },
   "dependencies": {},
   "_dependencies": "ריק בכוונה, ולא בהשמטה. שני נימוקים: (1) המאגר אוסר תלות חיצונית חדשה — CLAUDE.md, ״ארבעה דברים שלא עושים״ סעיף 3. (2) worker.js פונה ל-Anthropic ב-fetch גולמי מפני ש-Cloudflare Workers רץ בלי npm, והשרת המקומי מייבא ממנו את אותו קוד בדיוק. הוספת @anthropic-ai/sdk כאן הייתה יוצרת מסלול שני שמתנהג אחרת מהייצור, וזה בדיוק מה שהשרת הזה נועד למנוע. אין npm install: node server.js, וזהו."
 }

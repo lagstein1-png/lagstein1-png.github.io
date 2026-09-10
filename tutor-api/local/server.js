@@ -22,6 +22,23 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import worker, { LIM, ROLE } from "../worker.js";
 
+/* ---------- שומר גרסה ----------
+   `worker.js` פונה ל-Anthropic ב-`fetch` גלובלי, והוא קיים מ-Node 18.
+   בלי השומר הזה שרת על גרסה ישנה יותר עולה יפה ונופל רק כשמגיעה
+   הפנייה הראשונה — ואז השגיאה היא "fetch is not defined" בתוך קוד
+   שאינו שלך. עדיף להיעצר כאן, ולומר בדיוק מה חסר. */
+{
+  const major = Number(process.versions.node.split(".")[0]);
+  if (!(major >= 18)) {
+    console.error("");
+    console.error("  ✗ Node " + process.versions.node + " ישן מדי.");
+    console.error("    ג׳וש דורש Node 18 ומעלה (fetch גלובלי).");
+    console.error("    התקנה: https://nodejs.org  ואז  node --version");
+    console.error("");
+    process.exit(1);
+  }
+}
+
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");   /* שורש המאגר */
 const PORT = Number(process.env.PORT) || 3000;
@@ -160,6 +177,24 @@ const server = http.createServer((req, res) => {
   if (req.method !== "GET" && req.method !== "HEAD")
     return send(res, 405, "method not allowed");
   serveStatic(req, res, p);
+});
+
+/* פורט תפוס הוא הסיבה הנפוצה ביותר ל״השרת לא עולה״, ובלי המאזין
+   הזה Node זורק ERR_SERVER_ALREADY_LISTEN בלי לומר מה לעשות. */
+server.on("error", (e) => {
+  console.error("");
+  if (e && e.code === "EADDRINUSE") {
+    console.error("  ✗ פורט " + PORT + " כבר תפוס — משהו אחר מאזין עליו.");
+    console.error("    אפשרות א: לסגור אותו.");
+    console.error("    אפשרות ב: להריץ על פורט אחר —  PORT=3001 node tutor-api/local/server.js");
+  } else if (e && e.code === "EACCES") {
+    console.error("  ✗ אין הרשאה להאזין על פורט " + PORT + ".");
+    console.error("    פורט מתחת ל-1024 דורש הרשאות. נסה  PORT=3001 …");
+  } else {
+    console.error("  ✗ השרת לא עלה: " + (e && (e.code || e.message)));
+  }
+  console.error("");
+  process.exit(1);
 });
 
 server.listen(PORT, HOST, () => {
