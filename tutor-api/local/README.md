@@ -33,6 +33,9 @@
 
     node tutor-api/local/server.js
 
+ב-Windows, אם העברית בטרמינל יוצאת ג׳יבריש — `chcp 65001` פעם
+אחת לפני ההרצה. זה נוגע לתצוגה בלבד; השרת עצמו זהה.
+
 ואז:
 
 | כתובת | מה יש שם |
@@ -120,6 +123,9 @@ The root `.gitignore` already blocks `.env`.
 **2. Run.** There is no `npm install` — there are no dependencies:
 
     node tutor-api/local/server.js
+
+On Windows, if the Hebrew console output is garbled, run `chcp 65001`
+once beforehand. That affects display only.
 
 | URL | What's there |
 |---|---|
