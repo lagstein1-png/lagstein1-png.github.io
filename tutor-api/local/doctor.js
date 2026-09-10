@@ -79,12 +79,22 @@ if (!key && fs.existsSync(envFile)) {
     .split(/\r?\n/).find(l => /^\s*ANTHROPIC_API_KEY\s*=/.test(l));
   if (m) key = m.split("=").slice(1).join("=").trim().replace(/^["']|["']$/g, "");
 }
+/* שורה כפולה: פרסרים שונים קוראים מופע אחר, ולכן ״ערכתי ולא תפס״.
+   `setkey.js` מוחק מופעים קודמים, אבל קובץ שנערך ביד עלול לשאת. */
+if (fs.existsSync(envFile)) {
+  const dup = fs.readFileSync(envFile, "utf8").split(/\r?\n/)
+    .filter(l => /^\s*ANTHROPIC_API_KEY\s*=/.test(l)).length;
+  if (dup > 1)
+    fail("יש " + dup + " שורות ANTHROPIC_API_KEY בקובץ",
+         "פרסרים שונים קוראים מופע אחר. הרץ:  node tutor-api/local/setkey.js");
+}
 if (!fs.existsSync(envFile) && !process.env.ANTHROPIC_API_KEY)
   fail("אין קובץ .env ואין משתנה סביבה",
        "צור .env בשורש המאגר עם שורה:  ANTHROPIC_API_KEY=sk-ant-...");
 else if (!key)
   fail("המפתח ריק",
-       ".env קיים, אבל אין ערך אחרי ANTHROPIC_API_KEY=  ·  " + envFile);
+       ".env קיים, אבל אין ערך אחרי ANTHROPIC_API_KEY=\n      " + envFile +
+       "\n      אל תערוך ביד — הרץ:  node tutor-api/local/setkey.js");
 else if (!/^sk-ant-/.test(key))
   fail("המפתח אינו נראה כמו מפתח של Anthropic",
        "מפתח תקין מתחיל ב-sk-ant- . אולי הודבק חלקית, או עם מרכאות.");
