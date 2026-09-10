@@ -106,6 +106,12 @@ try {
   let d = R('STATUS.md').split('\n');
   const s0 = d.findIndex(l => l.startsWith('| אפליקציה | BUILD'));
   let e0 = s0; while (e0 < d.length && d[e0].startsWith('|')) e0++;
+  /* `--md` מדפיס גם שורת פוטר, ולא רק שורות טבלה. בליעה של שורות
+     `|` בלבד השאירה את הפוטר הישן במקומו והוסיפה חדש מתחתיו —
+     `status.js --check` סופר אותם ונופל על ״הודבקה טבלה על טבלה״.
+     לכן בולעים גם את השורה הריקה ואת הפוטר שאחריה. */
+  if (d[e0] === '' && /^נוצר ב-`node \.claude\/qa\/status\.js --md`/.test(d[e0 + 1] || ''))
+    e0 += 2;
   W('STATUS.md', d.slice(0, s0).concat(want2).concat(d.slice(e0)).join('\n'));
   console.log('· STATUS.md רוענן');
 } catch (e) { console.log('· STATUS.md לא רוענן: ' + e.message) }

@@ -16,8 +16,19 @@
    ===================================================================== */
 'use strict';
 const { chromium } = require('./pw.js');
+const fs = require('fs'), path = require('path');
 
 const BASE = 'http://127.0.0.1:8099';
+
+/* גרסת התנאים נגזרת מ-`legal/terms.js` ואינה קבועה כאן. היא עולה
+   מ-1.0 ל-1.1 ברגע שכתובת השרת של הבוט מולאה (`enable-tutor.js`),
+   ומפתח האישור ב-localStorage נושא את המספר. קבוע קשיח כאן היה
+   מחזיר את שער התנאים לכל אפליקציה מהרגע ההוא, והלחיצה על כפתור
+   ההתחלה הייתה נחסמת — נמדד בחזרה יבשה של ההפעלה, 10.9.2026. */
+const LEGAL_VER = (fs.readFileSync(
+  path.resolve(__dirname, '..', '..', 'legal', 'terms.js'), 'utf8')
+  .match(/version:\s*"([^"]+)"/) || [])[1];
+if (!LEGAL_VER) { console.log('✗ לא נמצא version ב-legal/terms.js'); process.exit(1) }
 
 /* האפליקציות ואיך מפעילים בהן הקראה. הבורר הוא כפתור הרמקול. */
 const APPS = [
@@ -142,10 +153,10 @@ async function openApp(browser, app){
   await page.addInitScript(FAKE);
   /* שער התנאים חוסם כל לחיצה עד שמאשרים אותו. מסמנים אותו כמאושר
      מראש — הוא אינו מה שנבדק כאן. */
-  await page.addInitScript(() => {
-    try{ localStorage.setItem('legal-accepted-v1.0',
-      JSON.stringify({ v:'1.0', at:new Date().toISOString(), lang:'he' })); }catch(e){}
-  });
+  await page.addInitScript((ver) => {
+    try{ localStorage.setItem('legal-accepted-v' + ver,
+      JSON.stringify({ v:ver, at:new Date().toISOString(), lang:'he' })); }catch(e){}
+  }, LEGAL_VER);
   await page.route('**', r => {
     const u = r.request().url();
     return u.startsWith(BASE) ? r.continue() : r.abort();
