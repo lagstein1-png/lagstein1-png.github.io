@@ -451,22 +451,7 @@ button[data-a="lang"][data-v="ru"],button[data-a="lang"][data-n="ru"],
 button[data-a="lang"][data-l="ru"],button[data-a="lang"][data-l="ru"] .fd,
 button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 </style>
-<meta name="robots" content="noindex,nofollow">
-<script>
-/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html
-   האפליקציה בשלב build: היא אינה בדף הבית, ומי שינחש את הכתובת
-   יראה מסך "עדיין לא פורסם". זו אינה הגנה קריפטוגרפית ואינה
-   מתיימרת להיות — אין שרת, וכל ה-HTML גלוי. היא מונעת מלומד
-   להיתקל באפליקציה לא בשלה. */
-var INTERNAL_KEY="shlav-internal-kotvim";
-var INTERNAL_OK=(function(){
-  try{
-    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
-    if(q) localStorage.setItem("shlav-internal", decodeURIComponent(q));
-    return localStorage.getItem("shlav-internal")===INTERNAL_KEY;
-  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
-})();
-</script>
+
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
@@ -478,22 +463,7 @@ var INTERNAL_OK=(function(){
 <link rel="license" href="/legal/">
 </head>
 <body>
-<style>/* [hidden] הוא ברירת מחדל של הדפדפן, וסגנון מוטבע גובר עליה.
-   בלי הכלל הזה השער נשאר פרוס מעל המסך גם כשהוא "מוסתר",
-   ובולע כל לחיצה. נמדד 9.9.2026 בדפדפן. */
-#gate[hidden]{display:none!important}</style>
-<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
-     align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
-     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
-  <div style="max-width:32rem">
-    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
-    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
-    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר.
-       אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
-    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;
-       background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a>
-  </div>
-</div>
+
 
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="app"></div>
@@ -3068,13 +3038,7 @@ function boot(){
   applyModes();
   render();
 }
-/* INTERNAL-GATE — לא נטענת בלי מפתח. */
-if(!INTERNAL_OK){
-  document.getElementById("gate").hidden=false;
-  document.title="לא פורסם";
-}else{
-  boot();
-}
+boot();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
 <script src="/tutor/tutor.js"></script>
@@ -3115,7 +3079,7 @@ if(window.TUTOR){
     },
     stopHost:function(){try{stopSpeak()}catch(e){}}
   });
-  if(INTERNAL_OK){try{render()}catch(e){}}
+  try{render()}catch(e){}
 }
 </script>
 </body>
