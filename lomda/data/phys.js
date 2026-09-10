@@ -231,7 +231,7 @@ BANK({
     {he:"כשגוף אחד דוחף גוף שני, השני דוחף אותו חזרה באותו גודל ובכיוון הפוך. לכן מי שקופץ מסירה אל המזח דוחף את הסירה אחורה.",
      ar:"عندما يدفع جسم جسمًا آخر، يدفعه الآخر بالمقدار نفسه وباتّجاه معاكس. لذلك مَن يقفز من القارب إلى الرصيف يدفع القارب إلى الخلف.",
      ru:"Когда одно тело толкает другое, другое толкает его в ответ с той же силой в обратную сторону. Поэтому прыгающий из лодки на причал толкает лодку назад.",
-     en:"When one body pushes a second, the second pushes it back with the same size of force in the opposite direction. That is why someone jumping from a boat onto the pier pushes the boat backwards."}),
+     en:"When one body pushes a second, the second pushes back with equal force the other way. That is why someone jumping from a boat onto the pier pushes the boat backwards."}),
 
   C({he:"מרחק תגובה",ar:"مسافة ردّ الفعل",ru:"Путь реакции",en:"Reaction distance"},
     {he:"הדרך שהרכב עובר מהרגע שהנהג רואה סכנה ועד שהוא לוחץ על הבלם. במהלכה המהירות עדיין אינה יורדת.",
