@@ -783,7 +783,7 @@ T.he={
   qOrder:"סדרו את המשפט", qSay:"איך אומרים את זה באנגלית?", qRead:"לפי הקטע:",
   qUse:"איזה משפט מתאים למצב?",
   hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט", hearOpt:"השמיעו את האפשרות",
-  check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", showAll:"הראו הכול",
+  check:"בדקו", next:"הבא", again:"שוב", hintB:"רמז", hintSrcL:"התשובה נמצאת בקטע שלמעלה", hintFirstW:"המילה הראשונה במשפט היא", hintStartL:"התשובה מתחילה באות", hintTopicL:"מהתחום", dunno:"לא יודע/ת", showAll:"הראו הכול",
   correct:"נכון!", wrong:"עוד לא", answerIs:"התשובה:", why:"למה",
   tapOrder:"לחצו על המילים לפי הסדר", clearSlot:"נקו",
   progT:"ההתקדמות שלכם", progNone:"עוד לא התחלתם. כל מסלול נפתח מיד — אין נעילות.",
@@ -841,7 +841,7 @@ T.ar={
   qOrder:"رتّب الجملة", qSay:"كيف تقول ذلك بالإنجليزية؟", qRead:"حسب النص:",
   qUse:"أي جملة تناسب الموقف؟",
   hear:"استمع", hearSlow:"ببطء", hearWord:"استمع للكلمة", hearSent:"استمع للجملة", hearOpt:"استمع للخيار",
-  check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", showAll:"أظهر الكل",
+  check:"تحقّق", next:"التالي", again:"مرة أخرى", hintB:"تلميح", hintSrcL:"الإجابة موجودة في المقطع أعلاه", hintFirstW:"الكلمة الأولى في الجملة هي", hintStartL:"الإجابة تبدأ بحرف", hintTopicL:"من المجال", dunno:"لا أعرف", showAll:"أظهر الكل",
   correct:"صحيح!", wrong:"ليس بعد", answerIs:"الإجابة:", why:"لماذا",
   tapOrder:"اضغط الكلمات بالترتيب", clearSlot:"مسح",
   progT:"تقدّمك", progNone:"لم تبدأ بعد. كل مسار مفتوح فورًا — بلا أقفال.",
@@ -899,7 +899,7 @@ T.ru={
   qOrder:"Соберите предложение", qSay:"Как сказать это по-английски?", qRead:"По тексту:",
   qUse:"Какая фраза подходит к ситуации?",
   hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать слово", hearSent:"Послушать фразу", hearOpt:"Послушать вариант",
-  check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", showAll:"Показать всё",
+  check:"Проверить", next:"Дальше", again:"Ещё раз", hintB:"Подсказка", hintSrcL:"Ответ есть в отрывке выше", hintFirstW:"Первое слово в предложении —", hintStartL:"Ответ начинается с буквы", hintTopicL:"Из области", dunno:"Не знаю", showAll:"Показать всё",
   correct:"Верно!", wrong:"Пока нет", answerIs:"Ответ:", why:"Почему",
   tapOrder:"Нажимайте слова по порядку", clearSlot:"Очистить",
   progT:"Ваш прогресс", progNone:"Вы ещё не начинали. Все направления открыты сразу — без замков.",
@@ -957,7 +957,7 @@ T.en={
   qOrder:"Put the sentence in order", qSay:"How do you say this in English?", qRead:"According to the passage:",
   qUse:"Which sentence fits the situation?",
   hear:"Play", hearSlow:"Slowly", hearWord:"Play the word", hearSent:"Play the sentence", hearOpt:"Play this option",
-  check:"Check", next:"Next", again:"Again", dunno:"I don't know", showAll:"Show all",
+  check:"Check", next:"Next", again:"Again", hintB:"Hint", hintSrcL:"The answer is in the passage above", hintFirstW:"The first word of the sentence is", hintStartL:"The answer starts with", hintTopicL:"From", dunno:"I don't know", showAll:"Show all",
   correct:"Correct!", wrong:"Not yet", answerIs:"Answer:", why:"Why",
   tapOrder:"Tap the words in order", clearSlot:"Clear",
   progT:"Your progress", progNone:"You have not started yet. Every track is open right away — nothing is locked.",
@@ -1036,7 +1036,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n59 · 2026-09-09";
+var BUILD="n60 · 2026-09-10";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3287,6 +3287,31 @@ function formComp(tp,lv,pool,idx){
 
 /* בוחר את צורת התרגיל. הרמה קובעת כמה פיגום נשאר: ברמה 1 שפת האם
    נוכחת תמיד, ברמה 3 היא נעלמת וגם האוזן לבדה נדרשת. */
+/* --- הרמז, ומה הוא אינו --------------------------------------
+   רמז מצמצם ואינו עונה. תשעה מהאפליקציות נותנות רמז, ושתי
+   אפליקציות השפה לא — למרות שכל התשתית כאן: `P.rres` כבר
+   מבדיל "נכון עם רמז" מ"נכון לבד", ה-CSS של `.qhint` קיים,
+   וחמש מחרוזות `sumHp` יושבות בכל שפה. חסרו רק הכפתור, המטפל
+   והרמז עצמו. קהל היעד — דיסלקציה ו-ADHD — הוא בדיוק מי
+   שהרמז נועד לו.
+
+   מה נאמר בכל צורת שאלה:
+     comp   התשובה בקטע שמעל — אין לצמצם יותר בלי לפתור
+     order  המילה הראשונה במשפט, ולא הסדר כולו
+     מילה   האות הראשונה שלה
+     אחרת   שם התחום, כשהתשובה ארוכה מדי לאות אחת
+
+   הרמז אינו נספר כטעות: מי שנעזר בו עדיין ענה בעצמו. */
+function hintFor(q,tp){
+  if(!q)return "";
+  if(q.type==="comp")return t("hintSrcL");
+  if(q.type==="order"&&q.target&&q.target.length)
+    return t("hintFirstW")+' "'+q.target[0]+'"';
+  /* התשובה מגיעה לפעמים עטופה בתגית, ואות ראשונה של "<" אינה רמז */
+  var a=String(q.answer==null?"":q.answer).replace(/<[^>]*>/g,"").trim();
+  if(a&&a.indexOf(" ")<0)return t("hintStartL")+' "'+a.charAt(0)+'"';
+  return t("hintTopicL")+" "+tName(tp);
+}
 function buildQuestion(tid,lv,avoid,pure){
   var tp=topicOf(tid); if(!tp)return null;
   var pool=poolOf(tp,lv), k=kindsIn(pool);
@@ -3304,6 +3329,7 @@ function buildQuestion(tid,lv,avoid,pure){
     q=f2==="back"?formBack(tp,lv,pool,idx):f2==="hear"?formHear(tp,lv,pool,idx):formMean(tp,lv,pool,idx);
   }
   q.tid=tid; q.lv=lv; q.idx=idx; q.id=itemId(tid,lv,idx);
+  q.hint=hintFor(q,tp);
   return q;
 }
 
@@ -3532,7 +3558,10 @@ function screenPractice(){
        '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
        esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
   } else if(q.type!=="order"){
-    h+='<div style="margin-top:.9rem"><button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button></div>"+(window.TUTOR&&TUTOR.on()?'<button class="btn ghost" data-a="tutor" style="margin-inline-start:6px">'+esc(TUTOR.label())+"</button>":"")+"</div>";
+    h+='<div style="margin-top:.9rem">'+
+       (P.hint||!q.hint?"":'<button class="btn ghost" data-a="hint" style="margin-inline-end:6px">'+esc(t("hintB"))+"</button>")+
+       '<button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button>"+
+       (P.hint&&q.hint?'<div class="qhint" data-hint="1" role="note" style="margin-top:.6rem">'+esc(q.hint)+"</div>":"")+"</div>"+(window.TUTOR&&TUTOR.on()?'<button class="btn ghost" data-a="tutor" style="margin-inline-start:6px">'+esc(TUTOR.label())+"</button>":"")+"</div>";
   }
   h+="</div></div></div>"+fbar();
   return h;
@@ -5074,7 +5103,7 @@ function viewBadExam(msg){
 function newQuestion(){
   var prev=P.q?P.q.idx:undefined;
   P.q=buildQuestion(state.topic,state.level,prev);
-  P.picked=-1; P.done=false; P.ok=false; P.slot=[]; P.used=[];
+  P.picked=-1; P.done=false; P.ok=false; P.hint=false; P.slot=[]; P.used=[];
   render();
   /* בתרגיל האזנה המילה אינה מוצגת, ולכן שמיעה אחת אוטומטית היא
      לא נוחות אלא תנאי לכך שיש בכלל שאלה. */
@@ -5201,6 +5230,17 @@ document.addEventListener("click",function(e){
   if(a==="again"){roundReset();newQuestion();window.scrollTo(0,0);return}
   if(a==="sumlvl"){state.level=clamp(parseInt(v,10)||1,1,3);roundReset();save();newQuestion();window.scrollTo(0,0);return}
   if(a==="tutor"){ try{stopSpeak()}catch(e){} if(window.TUTOR)TUTOR.open(); return }
+  if(a==="hint"){
+    /* הרמז אינו טעות ואינו מסיים את השאלה — הוא רק נרשם, כדי
+       שמסך הסיכום יבדיל "נכון עם רמז" מ"נכון לבד". */
+    if(!P.q||!P.q.hint)return;
+    P.hint=true; render();
+    /* מחרוזת אחת, ולא שני ארגומנטים: ב-english ל-announce יש
+       ארגומנט אחד בלבד, והרמז היה נבלע; וב-ulpan הארגומנט השני
+       מסמן טקסט כעברי, והרמז כתוב בשפת הממשק ולא בעברית. */
+    announce(t("hintB")+": "+P.q.hint);
+    return;
+  }
   if(a==="dunno"){
     /* "לא יודע" אינו דילוג: הוא נספר כטעות, ומיד מראה ומשמיע את
        התשובה. מי שמנחש לומד פחות ממי שמודה. */
@@ -5330,7 +5370,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n59-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n60-pwa1").catch(function(){});
   });
 }
 </script>
