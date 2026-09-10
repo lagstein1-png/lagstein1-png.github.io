@@ -23,9 +23,19 @@ const BASE = 'http://127.0.0.1:8099';
 const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3'];
 const PER_CELL = Number(process.env.QA_N || 40);
 
-/* אותו סף כמו ב-content.js, כדי ששני הכלים לא יסתרו זה את זה.
-   ניחוש עיוור מארבע אפשרויות הוא 25%. */
+/* סף הכישלון זהה ל-content.js, כדי ששני הכלים לא יסתרו זה את זה.
+   ניחוש עיוור מארבע אפשרויות הוא 25%.
+
+   **ושכבת אזהרה מתחתיו, שאינה מפילה.** שמונת התאים שנסגרו ב-9.9
+   לא הגיעו ל-100% ביום אחד — הם טיפסו, ואיש לא ראה אותם בדרך.
+   אזהרה שמדפיסה בלי להפיל היא מה שהופך את הטיפוס לנראה.
+
+   הסף נבחר מתוך מדידה ולא מהערכה: 224 תאים ב-math-app, math-teen,
+   math-uni2 ו-math-uni3 (N=120) נתנו **אפס מעל 60%**, שישה ב-50–57%
+   ו-211 מתחת ל-40%. 50% הוא לכן קו שמדבר על התא החריג ולא על הרעש,
+   ובין 57% ל-70% יש מרווח שמונע הבהוב בין ריצות. */
 const LIMIT = 0.70;
+const WARN  = 0.50;
 const MIN_N = 20;
 
 async function measure(page, perCell) {
@@ -70,7 +80,7 @@ async function measure(page, perCell) {
 
 async function run() {
   const browser = await chromium.launch();
-  let bad = 0, checked = 0;
+  let bad = 0, checked = 0, warned = 0;
 
   for (const app of APPS) {
     const ctx = await browser.newContext();
@@ -92,7 +102,7 @@ async function run() {
       continue;
     }
 
-    const hits = [];
+    const hits = [], warns = [];
     for (const c of res.cells) {
       if (c.n < MIN_N) continue;
       checked++;
@@ -100,8 +110,11 @@ async function run() {
       const tot = c.pos.reduce((a, b) => a + b, 0);
       const P = tot ? Math.max(...c.pos) / tot : 0;
       if (L > LIMIT) hits.push([c, 'הארוכה ביותר', L]);
+      else if (L > WARN) warns.push([c, 'הארוכה ביותר', L]);
       if (S > LIMIT) hits.push([c, 'הקצרה ביותר', S]);
+      else if (S > WARN) warns.push([c, 'הקצרה ביותר', S]);
       if (P > LIMIT) hits.push([c, 'מיקום קבוע', P]);
+      else if (P > WARN) warns.push([c, 'מיקום קבוע', P]);
     }
 
     bad += hits.length;
@@ -113,6 +126,12 @@ async function run() {
       console.log(`    ✗ ${c.tid} L${c.lv} — ${kind} היא התשובה ב-${Math.round(p * 100)}% ` +
                   `מ-${c.n} הגרלות (ניחוש עיוור: 25%)`);
     }
+    /* אזהרות אינן מפילות, ולכן הן נספרות בנפרד ואינן נכנסות ל-bad. */
+    warned += warns.length;
+    for (const [c, kind, p] of warns) {
+      console.log(`    · ${c.tid} L${c.lv} — ${kind} ב-${Math.round(p * 100)}% ` +
+                  `(מתחת לסף ${Math.round(LIMIT * 100)}%, מעל קו הראייה ${Math.round(WARN * 100)}%)`);
+    }
   }
 
   await browser.close();
@@ -121,7 +140,8 @@ async function run() {
     console.log(`${bad} תאים שאפשר לנחש בהם בלי לדעת את החומר`);
     process.exit(1);
   }
-  console.log(`✓ ${checked} תאים נמדדו, אין תא שאורך התשובה או מיקומה מסגירים אותה`);
+  console.log(`✓ ${checked} תאים נמדדו, אין תא שאורך התשובה או מיקומה מסגירים אותה` +
+              (warned ? ` (${warned} מעל קו הראייה — ראו למעלה)` : ''));
 }
 
 run().catch(e => { console.log('✗ ' + e.message); process.exit(1); });
