@@ -80,7 +80,7 @@
 `shot-desktop.png` 1920×1080) ומערך `screenshots` עם `form_factor`
 ב-11 קובצי `manifest.json`. לפני: `grep -l screenshots */manifest.json`
 — 0. אחרי: 11. `kotvim` (`internal`) לא נכללה. 11 מפתחות עלו
-(b67 t67 u68 v66 g66 x32 a32 n62 m67 l48, reader 38) — `cache.js` בדיקה 6 משווה את
+(b68 t69 u69 v67 g67 x33 a32 n63 m67 l50, reader 38) — `cache.js` בדיקה 6 משווה את
 תיקיית האפליקציה כולה, ו-`manifest.json` בתוכה.
 
 **דרך:** בסביבת הבדיקה אין קולות, וכל צילום נשא את הודעת
