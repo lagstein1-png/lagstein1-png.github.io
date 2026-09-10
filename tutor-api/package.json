@@ -1,0 +1,8 @@
+{
+  "name": "tutor-api",
+  "private": true,
+  "type": "module",
+  "description": "ג׳וש — צד השרת. הקובץ הזה קיים בשביל שורה אחת: \"type\": \"module\".",
+  "_why": "worker.js נכתב כ-ES module (export default ו-export {...}), אבל לא הייתה מעליו שום package.json. Node קורא .js ללא הצהרה כ-CommonJS, ולכן `import worker, { LIM, ROLE }` נכשל ב-'Named export LIM not found'. מ-Node 22.7 יש זיהוי תחביר אוטומטי שמציל את זה בשקט, ולכן זה עבד בסביבת הפיתוח ונשבר אצל הבעלים על גרסה ישנה יותר. ההצהרה כאן הופכת את זה לוודאי בכל גרסה. לא לפתור את זה בשינוי שורת הייבוא ל-`const { LIM, ROLE } = worker`: ה-default export הוא { fetch } בלבד, ושניהם היו יוצאים undefined בלי שגיאה.",
+  "dependencies": {}
+}

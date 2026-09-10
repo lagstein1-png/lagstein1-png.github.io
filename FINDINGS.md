@@ -4393,3 +4393,55 @@ n52→n53 · m60→m61 · l34→l35`. `bagrut-806`, `reader` והשורש לא
 
 **ולמי שיגע ב-`tutor/tutor.js` אחרי ההפעלה:** מאותו רגע הוא כן
 רץ, וכל שינוי בו דורש את שנים־עשר המפתחות בפועל.
+
+---
+
+### 10.9.2026 — השרת המקומי נשבר אצל הבעלים, ולא כאן: `worker.js` בלי הצהרת מודול
+
+**הבעלים דיווח:** `import worker, { LIM, ROLE } from "../worker.js"` נכשל
+עם `Named export 'LIM' not found. The requested module is a CommonJS
+module`. אצלי אותו קובץ עלה שוב ושוב.
+
+**ההסבר, ונמדד:** `tutor-api/worker.js` נכתב כ-ES module — יש בו
+`export default` ו-`export {...}` — אבל **לא הייתה מעליו שום
+`package.json`**. `tutor-api/local/package.json` מצהיר `"type":
+"module"`, אבל הוא יושב בתיקייה־בת: Node מחפש כלפי מעלה מתיקיית
+הקובץ, ו-`local/` אינו מעל `tutor-api/`. ולכן `.js` בלי הצהרה נקרא
+כ-CommonJS.
+
+**ולמה זה עבד בסביבת הפיתוח:** Node 22.7 ומעלה מזהה תחביר ESM
+אוטומטית ומנסה שוב. כאן רץ **v22.22.2**, ולכן הזיהוי הציל את זה
+בשקט. `local/package.json` אפילו מצהיר `"engines": { "node":
+">=22.7.0" }` — האזהרה הייתה כתובה, ואיש לא נאכף עליה.
+
+#### התיקון שהוצע היה מחמיר את התקלה — נמדד
+
+    import worker from "../worker.js";
+    const { LIM, ROLE } = worker;   →  LIM=undefined  ROLE=undefined
+
+`worker.js` מייצא כ-default את `{ fetch }` בלבד. `LIM` ו-`ROLE` הם
+named exports, ואינם עליו. השורה הזאת **אינה זורקת שגיאה**: השרת
+היה עולה, מדפיס תקרות ריקות, ו-`/health` היה מחזיר `limits:
+undefined`. תקלה שקטה במקום תקלה רועשת.
+
+#### מה נעשה במקום
+
+`tutor-api/package.json` עם `"type": "module"` — קובץ אחד, שורה
+אחת שקובעת. שורת הייבוא לא נגעה, ואין תלות (`"dependencies": {}`).
+
+#### ההוכחה — כלל 3
+
+`--no-experimental-detect-module` מכבה את הזיהוי האוטומטי, כלומר
+מדמה בדיוק את ה-Node שאצל הבעלים:
+
+    לפני   SyntaxError: Named export 'LIM' not found.
+           The requested module is a CommonJS module
+    אחרי   LIM.perDay=20 · ROLE=13 · default=fetch
+           והשרת עולה: /health מחזיר 13 אפליקציות ואת התקרות,
+           /josh מחזיר HTTP 200
+
+`node .claude/qa/all.js` — 30 מתוך 30.
+
+**הלקח:** ההצהרה `"engines"` אינה אכיפה. קובץ שנבדק רק על Node חדש
+נבדק גם על מנגנון הצלה שאינו קיים בכל מקום, ו-״עובד אצלי״ היה כאן
+מדויק וחסר ערך.
