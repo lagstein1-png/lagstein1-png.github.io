@@ -38,7 +38,7 @@
 | O-12 | ״תאוריה מדברת״ אינה בריפו הזה, ולכן ״מבצע השקה: 79 ₪״ מופיע בכרטיס וב-`buy.html` בלבד — בתוך האפליקציה עצמה אין זכר למבצע | זניח | `DATA.APPS` שדה `u` | החלטה אם גם שם |
 | O-13 | ״תאוריה מדברת״ אינה נסרקת על ידי `content.js` — `bank` שלה `external`. **חצי הממצא של `bagrut-806` שגוי, ונמחק 9.9: היא כן נסרקת** | זניח | `stage.js` מדפיס לה `סריקה PASS 0/0`; `content806` הוא `all.js:57`; `reports/bagrut-806.json` = PASS, 114 סעיפים | הריפו הנפרד — זהה ל-O-9 |
 | O-14 | שדה `icon` בכרטיס המסלול של הלומדה נקרא ונשמר ב-`TRACKS` ואינו מצויר לעולם — 19 קובצי תוכן נושאים ערך שאינו משפיע על דבר | זניח | `grep -n icon lomda/index.html` מחזיר את `trackOf` ואת שורת ה-`push` בלבד | החלטה: לצייר את האייקון בכרטיס, או להסיר את השדה מ-19 הקבצים |
-| O-16 | **אחד־עשר ענפים מרוחקים אינם ממוזגים ל-`main`** (נמדד 10.9 אחרי סבב מיזוג: `git branch -r --no-merged origin/main` = 11; קודם 29, 31 ו-19). **שניים מהם סשנים פעילים** (`global-social-growth-strategist`, `launch-popup-free-tags`) ואינם ממתינים לאיש. התשעה הנותרים נבדקו אחד־אחד ונחלקים לארבע קבוצות: **שניים בהיסטוריה לא־קשורה** (`new-session-6ap96l`, `edge-voice-test-rsfjo9` — `git merge-base` מחזיר ריק, ומיזוג דורש `--allow-unrelated-histories`); **אחד יישבר אם ימוזג** (`naming/theory-rename-ready` מוחק את שדה הנתיב `u` שברשומת ״תאוריה מדברת״ בהנחה ששם הריפו הנפרד שונה ל-`theory` — הוא לא שונה, והכרטיס היה בונה `/theory/` = 404 חי); **אחד ש-`CLAUDE.md` אוסר במפורש** (`new-exam-app-xkohvq` — ״אזרח״ כאפליקציה שלוש־עשרה, שאזרחות היא נושא ב-`lomda`); **וחמישה שהם החלטה שלך ולא שלי** | חשוב | `git branch -r --no-merged`, ובדיקת תוכן לכל ענף, 10.9 | החלטת בעלים על החמישה: `accessibility-saas-website` (Stripe ו-Supabase — שירות בתשלום ותלות חיצונית, שני איסורים), `secure-visitor-counter` (`analytics/server.js` — שרת, ואין שרת בארכיטקטורה), `feature/pricing-update` (מודל גבייה — `perMonth` ו-`trial`, החלטה עסקית), `visual-identity-nine-apps` (זהות חזותית ל**תשע** אפליקציות ויש היום 12 — מיזוג יוצר חוסר אחידות; `brand/build.js` הוא כלי גנרי בלי npm שאפשר להריץ גם על השלוש החדשות), `hebrew-rtl-task-interface` (`tools/agent-lab` — Python ו-SQLite, ספק `mock` בלבד בלי רשת ובלי מפתחות, כלומר עומד בארבעת האיסורים, אבל כלי פיתוח נפרד בריפו של vanilla-JS) |
+| O-16 | **שלושה־עשר ענפים מרוחקים אינם ממוזגים ל-`main`** (נמדד שוב 10.9 בסוף היום, **אחרי `git fetch origin '+refs/heads/*:refs/remotes/origin/*'` ו-`prune`** — כלומר על כל הרפרנסים ולא על אלה שהיו על הדיסק: `git branch -r --no-merged origin/main` = 13; באותו יום 11, וקודם 29, 31 ו-19. שלושה שלא היו במניין הקודם — `hebrew-text-session`, `historical-content-structure`, `status-report-21-apps`; `launch-popup-free-tags` מוזג; `agentlab-local-fix-17rv71` נמחק). **המדידה בלי fetch מלא מחזירה מספר קטן מדי** — זו אותה מלכודת שהפילה את חיפוש `agentlab` למטה. **אחד מהם סשן פעיל** (`global-social-growth-strategist`) ואינו ממתין לאיש. התשעה הנותרים נבדקו אחד־אחד ונחלקים לארבע קבוצות: **שניים בהיסטוריה לא־קשורה** (`new-session-6ap96l`, `edge-voice-test-rsfjo9` — `git merge-base` מחזיר ריק, ומיזוג דורש `--allow-unrelated-histories`); **אחד יישבר אם ימוזג** (`naming/theory-rename-ready` מוחק את שדה הנתיב `u` שברשומת ״תאוריה מדברת״ בהנחה ששם הריפו הנפרד שונה ל-`theory` — הוא לא שונה, והכרטיס היה בונה `/theory/` = 404 חי); **אחד ש-`CLAUDE.md` אוסר במפורש** (`new-exam-app-xkohvq` — ״אזרח״ כאפליקציה שלוש־עשרה, שאזרחות היא נושא ב-`lomda`); **וחמישה שהם החלטה שלך ולא שלי** | חשוב | `git branch -r --no-merged`, ובדיקת תוכן לכל ענף, 10.9 | החלטת בעלים על החמישה: `accessibility-saas-website` (Stripe ו-Supabase — שירות בתשלום ותלות חיצונית, שני איסורים), `secure-visitor-counter` (`analytics/server.js` — שרת, ואין שרת בארכיטקטורה), `feature/pricing-update` (מודל גבייה — `perMonth` ו-`trial`, החלטה עסקית), `visual-identity-nine-apps` (זהות חזותית ל**תשע** אפליקציות ויש היום 12 — מיזוג יוצר חוסר אחידות; `brand/build.js` הוא כלי גנרי בלי npm שאפשר להריץ גם על השלוש החדשות), `hebrew-rtl-task-interface` (`tools/agent-lab` — Python ו-SQLite, ספק `mock` בלבד בלי רשת ובלי מפתחות, כלומר עומד בארבעת האיסורים, אבל כלי פיתוח נפרד בריפו של vanilla-JS) |
 | O-17 | פרוטוקול ״חלוקת העבודה״ ב-`gilad.md` לא הורץ מעולם על סשן צוות אמיתי — הסדר נגזר מהכללים הכתובים, לא ממדידה | זניח | `.claude/agents/gilad.md` §חלוקת העבודה, 9.9.2026 | סשן עבודה אחד עם שלושה סוכנים לפחות, ואז לתקן את הסדר לפי מה שקרה |
 | O-22 | 32 הגדרות מדעיות ב-`phys`, `science`, `chem`, `eng`, `bio` ו-`med` נוסחו מחדש בידי כותבת תוכן ולא בידי מדען. חמש סומנו כרגישות במפורש — ובהן ״הספק״ שהפך ל״מנוע חזק יותר״, ו״מפרק״ שהפך ל״מעכל״ | חשוב | דוחות שתי הסוכנות, 9.9.2026 | מעבר של `euclid` על 12 מהן הוזמן ורץ; היתר ממתינות |
 | O-23 | מפתח הכפילות של בונה המבחן הוא `plainOf(pq.ask)` בלבד. `ask+expr` מבחין ביותר שאלות — **נמדד עצמאית 9.9:** `math-uni` 189→439, `math-uni2` 172→369, `math-uni3` 227→383, `math-teen` 213→419, `english` 229→254; בארבע האחרות אין הפרש. **האם זה באג או כוונה לא הוכרע:** מפתח לפי `ask` מונע שתי שאלות מאותו תא באותו מבחן, וזו אולי המטרה | חשוב | הרצת `buildQ` על כל הנושאים והרמות בכרומיום, 405–460 שאלות לאפליקציה | הכרעה, ואז שינוי בתשעה עותקים של בלוק מנוע משותף עם תשעה מפתחות קאש |
@@ -584,18 +584,40 @@ ans=10` בשתיהן, כלומר `hint` ב-`buildQ` לא שבר את המבחן 
 
 ### 10.9.2026 — השם ארתור, ופרויקט שאינו נגיש מסשן ענן
 
-**שני פרויקטים שנתבקשו בסשן הזה אינם קיימים בסביבה, ואין דרך
-להגיע אליהם מכאן.** הראשון היה ״מערכת agentlab המקומית״
-(`providers.py`, `claude_cli.py`, `pipeline.py`), והשני
-`C:\Users\joshua\Downloads\agentbridge\agent-bridge`. שניהם
-נבדקו ולא נמצאו:
+**שני פרויקטים שנתבקשו בסשן הזה לא נמצאו בסביבה.** הראשון היה
+״מערכת agentlab המקומית״ (`providers.py`, `claude_cli.py`,
+`pipeline.py`), והשני `C:\Users\joshua\Downloads\agentbridge\agent-bridge`.
+מה שהורץ:
 
     find . -name '*.py'                          → אפס
-    git log --all --diff-filter=A -- '*.py'      → אפס, מעולם לא היה
+    git log --all --diff-filter=A -- '*.py'      → אפס
     find / -maxdepth 6 -iname 'agent*bridge'     → אפס
     mount                                        → אין /mnt/c ואין /c
     list_repos                                   → שלושה ריפואים, אף אחד לא תואם
     list_repos query=bridge                      → {"repos":[]}
+
+**וזה היה חצי נכון. `agentlab` כן קיים במאגר הזה, ומצאתי אותו
+רק כשקראתי את `O-16`.** הוא יושב בענף
+`claude/hebrew-rtl-task-interface-q6p07l`, תחת `tools/agent-lab/` —
+שישה־עשר קבצים, ובהם בדיוק שניים מהשלושה שנתבקשו:
+
+    git ls-tree -r origin/claude/hebrew-rtl-task-interface-q6p07l --name-only | grep agent-lab
+    → 16 קבצים, ובהם agentlab/providers.py, agentlab/pipeline.py,
+      agentlab/server.py, agentlab/db.py, run.py, tests/ ו-web/index.html
+
+**הבדיקה שהחמיצה אותו היא `git log --all`, וזה הלקח.** `--all`
+סורק את הרפרנסים ש**יש לך**, לא את אלה שיש ב-origin. סשן ענן
+נפתח עם `main` ועם ענף העבודה בלבד, ולכן שבעים ושניים הענפים
+האחרים כלל לא היו על הדיסק. **חיפוש קובץ במאגר מחייב
+`git fetch origin '+refs/heads/*:refs/remotes/origin/*'` לפני
+`git log --all`** — או `git ls-tree` על שם ענף מפורש.
+
+**מה שכן נכון:** הגרסה שבענף אינה הגרסה שהמשימה תיארה. אין בה
+`claude_cli.py`, אין `run_once` ואין `AGENTLAB_BLOCK_REAL_PROVIDER`
+(`git grep` על שלושתם בענף → אפס), ו-`providers.py` שם מכריז
+`_REGISTRY = {"mock": MockProvider}` בלבד. כלומר העותק על המחשב
+של הבעלים מתקדם מזה שבענף, והעבודה שנתבקשה היא עליו — **לא על
+הענף הזה.** `agent-bridge` אכן אינו בשום מקום.
 
 **הכלל שנלמד:** סשן שנפתח מ-claude.ai/code רץ במכולת לינוקס
 בענן (`get_session` → `environment_kind: anthropic_cloud`), וקיבל
@@ -623,6 +645,24 @@ ans=10` בשתיהן, כלומר `hint` ב-`buildQ` לא שבר את המבחן 
 **הלקח, והוא מעבר לשם:** ״מיזוג עבר בלי קונפליקט״ אינו ״התוכן
 נכון״. `git` השווה שורות, לא משמעות. אחרי מיזוג לתוך `main` שזז —
 קוראים את הסעיף שנגעתם בו בעיניים.
+
+**הענף `claude/agentlab-local-fix-17rv71` נמחק, ברשת ומקומית.**
+המחיקה מהסביבה הזאת נחסמה כמתועד — `git push --delete` וגם
+`git push origin :<ענף>` החזירו `HTTP 403`, ואין ל-MCP כלי מחיקה
+(`create_branch` קיים, `delete_branch` לא). **הבעלים מחק מהדפדפן,
+והבדיקה שלי טעתה פעמיים לפני שהצליחה:** בשתי הפעמים הראשונות
+דיווח ״מחקתי״ הגיע והענף עדיין היה שם — פעם אחת הוא נראה בצילום
+המסך של הבעלים עצמו. **דיווח אינו אימות, וגם צילום מסך אינו:
+בודקים ב-`git ls-remote`.** אחרי המחיקה בפועל:
+
+    git ls-remote --heads origin claude/agentlab-local-fix-17rv71  → ריק
+    git remote prune origin  → * [pruned] origin/claude/agentlab-local-fix-17rv71
+
+אין אובדן: הקומיט היחיד שבו, `611c9ae`, הוא cherry-pick של
+`cb79858` שכבר ב-`main`. **`git cherry` סימן אותו `+`, כלומר
+״ייאבד״ — והתראת שווא:** הוא משווה טקסט תיקון, וההקשר השתנה
+במיזוג לתוך `main` שזז. האימות שהכריע היה `git show -U0` והשוואת
+שלוש השורות אחת־אחת מול `origin/main`.
 
 ### 10.9.2026 — ההקראה כבר מוזגה, ומה שנמצא במקומה: מזהה אחד לשני ממצאים
 
