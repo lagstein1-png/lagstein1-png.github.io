@@ -33,8 +33,13 @@ const EXEMPT = new Set(['NAMING.md', path.join('.claude', 'qa', 'naming.js')]);
 
    ההחרגה היא של המחרוזת המדויקת ולא של הקובץ: כל מופע אחר
    ב-index.html עדיין נכשל, וגם אותה מחרוזת עם רווח אחר. כשהריפו
-   ישונה — נמחק כאן, ונמחק השדה. */
-const SANCTIONED = /"u":"\/drivewise\/"/g;
+   ישונה — נמחק כאן, ונמחק השדה.
+
+   **וגם הצורה המוחלטת, מ-10.9.2026.** דף הבית מוגש גם ממראה
+   ב-Render, ומשם נתיב יחסי `/drivewise/` מצביע אל מקור המראה —
+   שאין בו את הריפו הנפרד, ולכן הכרטיס נשבר. הכתובת המלאה עובדת
+   משני המקומות. אותו נימוק בדיוק חל עליה: זו כתובת ולא שם. */
+const SANCTIONED = /"u":"(?:\/|https:\/\/lagstein1-png\.github\.io\/)drivewise\/"/g;
 const SKIP_DIR = new Set(['.git', 'img', 'vendor', 'node_modules', '.well-known']);
 const TEXT = /\.(html|js|json|md|css|svg|txt|webmanifest)$/i;
 
