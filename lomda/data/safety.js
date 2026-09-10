@@ -97,7 +97,13 @@ C({he:"שמיכת כיבוי",ar:"بطّانية إطفاء",ru:"Противо�
     {he:"יריעה שאינה נדלקת. פורשים אותה על אש קטנה במטבח, והיא מנתקת את האש מהאוויר בלי מים ובלי חומר מתיז.",
      ar:"قطعة قماش لا تشتعل. تُفرد على نار صغيرة في المطبخ فتفصل النار عن الهواء، بلا ماء وبلا مادّة تتناثر.",
      ru:"Полотно, которое не загорается. Его набрасывают на небольшой огонь на кухне, и оно отсекает пламя от воздуха — без воды и без разлетающегося вещества.",
-     en:"A sheet that will not catch fire. You spread it over a small kitchen fire, and it cuts the flame off from the air — no water, nothing that sprays."})
+     en:"A sheet that will not catch fire. You spread it over a small kitchen fire, and it cuts the flame off from the air — no water, nothing that sprays."}),
+
+  C({he:"הארקה",ar:"التأريض",ru:"Заземление",en:"Earthing"},
+    {he:"חוט שלישי שמוליך אל האדמה חשמל שדלף. הוא עובד עם מפסק הפחת: זה נותן לדליפה דרך, וזה מנתק אותה.",
+     ar:"سلك ثالث يوصّل إلى الأرض كهرباء تسرّبت. يعمل مع قاطع التسرّب: هذا يفتح للتسرّب طريقًا، وذاك يفصله.",
+     ru:"Третий провод, отводящий в землю утёкший ток. Он работает вместе с автоматом защиты: один даёт утечке путь, другой её отключает.",
+     en:"A third wire that carries leaked current into the ground. It works with the safety breaker: one gives the leak a path, the other cuts it."})
  ],
 
  [ /* רמה 2 — למה זה מסוכן, ולא רק שהוא מסוכן */
@@ -141,7 +147,13 @@ C({he:"למה ממששים דלת לפני שפותחים",ar:"لماذا نلم
     {he:"שני חומרים שכל אחד בטוח לבדו יכולים להגיב ולייצר גז חדש. הגז עולה מהדלי ונשאף, והריאות אינן יודעות מאין בא.",
      ar:"مادّتان آمنتان كلٌّ على حدة قد تتفاعلان فتُنتجان غازًا جديدًا. يصعد من الدلو ويُستنشق، والرئتان لا تعرفان مصدره.",
      ru:"Два безопасных по отдельности средства могут дать в реакции новый газ. Он идёт из ведра в лёгкие, а им всё равно.",
-     en:"Two products, each safe alone, can react and make a new gas. It rises from the bucket into lungs that do not care why."})
+     en:"Two products, each safe alone, can react and make a new gas. It rises from the bucket into lungs that do not care why."}),
+
+  C({he:"למה מנתקים את החשמל לפני שנוגעים בנפגע",ar:"لماذا نفصل الكهرباء قبل لمس المصاب",ru:"Почему сначала отключают электричество, а потом трогают пострадавшего",en:"Why you cut the power before touching the casualty"},
+    {he:"אדם שנוגע בזרם ממשיך להוליך אותו, ולכן מי שיתפוס אותו ייפגע גם הוא. קודם מנתקים את המפסק הראשי, ורק אז ניגשים.",
+     ar:"الشخص الملامس للتيار يظلّ يوصّله، لذلك من يمسك به يُصاب هو أيضًا. نفصل القاطع الرئيسي أوّلًا، وعندها فقط نقترب.",
+     ru:"Человек, коснувшийся тока, продолжает его проводить, поэтому тот, кто схватит его, пострадает тоже. Сначала выключают главный автомат и только потом подходят.",
+     en:"A person touching live current keeps conducting it, so whoever grabs them is hurt as well. First switch off the main breaker, and only then go near."})
  ],
 
  [ /* רמה 3 — מה שלא רואים, וקטע */
@@ -310,7 +322,13 @@ C({he:"כרית אוויר",ar:"الوسادة الهوائية",ru:"Подуш�
     {he:"כרית שמתנפחת בחלקיק שנייה ומאריכה את זמן העצירה של הגוף. היא עובדת יחד עם החגורה, ואינה מחליפה אותה.",
      ar:"وسادة تنتفخ في جزء من الثانية فتُطيل زمن توقّف الجسم. تعمل مع الحزام ولا تحلّ محلّه.",
      ru:"Подушка надувается за доли секунды и растягивает время остановки тела. Она работает вместе с ремнём, а не вместо него.",
-     en:"A cushion that inflates in a fraction of a second and stretches out the time the body takes to stop. It works with the seatbelt, not instead of it."})
+     en:"A cushion that inflates in a fraction of a second and stretches out the time the body takes to stop. It works with the seatbelt, not instead of it."}),
+
+  C({he:"מושב בטיחות לילד",ar:"مقعد أمان للطفل",ru:"Детское автокресло",en:"A child safety seat"},
+    {he:"מושב שמרים את הילד ומעביר את החגורה במקום הנכון על גופו. בלעדיו הרצועה עוברת על הצוואר ועל הבטן במקום על עצמות חזקות.",
+     ar:"مقعد يرفع الطفل ويمرّر الحزام في الموضع الصحيح على جسمه. بدونه يمرّ الحزام على الرقبة والبطن بدل العظام القوية.",
+     ru:"Кресло приподнимает ребёнка и проводит ремень по правильным местам его тела. Без него лямка ложится на шею и живот вместо крепких костей.",
+     en:"A seat that lifts the child so the belt runs across the right places on the body. Without it the strap crosses the neck and the belly instead of strong bones."})
  ],
 
  [ /* רמה 2 — למה, ולא רק מה */
@@ -359,7 +377,13 @@ C({he:"למה ילד קטן יושב מאחור",ar:"لماذا يجلس الط�
     {he:"המים על הכביש ועל השמשה מפזרים את האור. פנסי הרכב הנגדי נמרחים לכתם בוהק, והולך רגל כהה נבלע לידו.",
      ar:"يبعثر الماء على الطريق والزجاج الضوء. تنتشر مصابيح المركبة المقابلة كبقعة وهّاجة، فيبتلع الوهجُ مشاةً بلباس داكن.",
      ru:"Вода на дороге и на стекле рассеивает свет. Фары встречной расплываются в яркое пятно, и пешеход в тёмном тонет рядом.",
-     en:"Water on road and screen scatters light. Oncoming headlights smear into a bright blob that hides whoever is beside it."})
+     en:"Water on road and screen scatters light. Oncoming headlights smear into a bright blob that hides whoever is beside it."}),
+
+  C({he:"למה קסדה שספגה מכה מוחלפת",ar:"لماذا تُستبدل الخوذة التي تلقّت ضربة",ru:"Почему шлем после удара меняют",en:"Why a helmet that has taken a hit is replaced"},
+    {he:"השכבה הרכה שבתוכה נמעכת פעם אחת ואינה חוזרת לעצמה. גם כשהקסדה נראית שלמה מבחוץ, בפגיעה הבאה כבר אין מה שיימעך.",
+     ar:"الطبقة الليّنة في داخلها تنسحق مرّة واحدة ولا تعود. حتى لو بدت سليمة من الخارج، لم يبقَ ما ينسحق في الضربة التالية.",
+     ru:"Мягкий слой внутри сминается один раз и не восстанавливается. Даже если снаружи шлем выглядит целым, при следующем ударе сминаться уже нечему.",
+     en:"The soft layer inside crushes once and does not spring back. Even when the helmet looks intact from outside, at the next impact there is nothing left to crush."})
  ],
 
  [ /* רמה 3 — מה שנמדד, וקטע */
@@ -528,7 +552,13 @@ C({he:"שלט מידע",ar:"لافتة معلومات",ru:"Информацио�
     {he:"שלט שאינו אוסר ואינו מזהיר, אלא מראה איפה משהו נמצא — יציאה, עזרה ראשונה או מקום התכנסות. לרוב הוא ירוק.",
      ar:"لافتة لا تمنع ولا تُحذّر، بل تدلّ على مكان شيء ما — مخرج أو إسعاف أوّلي أو نقطة تجمّع. غالبًا خضراء.",
      ru:"Знак, который не запрещает и не предупреждает, а показывает, где что находится: выход, аптечка или место сбора. Чаще всего он зелёный.",
-     en:"A sign that neither forbids nor warns, but shows where something is — an exit, first aid, or an assembly point. It is usually green."})
+     en:"A sign that neither forbids nor warns, but shows where something is — an exit, first aid, or an assembly point. It is usually green."}),
+
+  C({he:"פס אזהרה צהוב־שחור",ar:"شريط تحذير أصفر وأسود",ru:"Жёлто-чёрная предупреждающая полоса",en:"A yellow-and-black hazard stripe"},
+    {he:"פסים אלכסוניים צהובים ושחורים שמסמנים גבול פיזי שיש להיזהר בו: מדרגה, קצה במה או חלק נע. הם מסמנים מקום, ולא פעולה.",
+     ar:"خطوط مائلة صفراء وسوداء تُعلّم حدًّا ماديًّا يجب الحذر عنده: درجة، حافّة منصّة أو جزء متحرّك. تُعلّم مكانًا لا فعلًا.",
+     ru:"Косые жёлтые и чёрные полосы отмечают опасный край: ступеньку, край помоста, движущуюся часть. Они отмечают место, а не действие.",
+     en:"Diagonal yellow and black stripes mark a physical edge to be careful at: a step, the lip of a platform, or a moving part. They mark a place, not an action."})
  ],
 
  [ /* רמה 2 — למה כך ולא אחרת */
@@ -572,7 +602,13 @@ C({he:"מה אומר ״מחמצן״",ar:"ماذا تعني ״مؤكسِد״",ru:
     {he:"אותה כמות פוגעת בגוף קטן הרבה יותר מבגוף גדול, ואריזה צבעונית נראית לילד כמו משקה. זו הוראה על האחסון, לא על השימוש.",
      ar:"الكمّية نفسها تؤذي الجسم الصغير أكثر بكثير، والعبوة الملوّنة تبدو للطفل كمشروب. تعليمات عن التخزين لا عن الاستعمال.",
      ru:"Одна и та же доза вредит малому телу куда сильнее, а яркая упаковка кажется ребёнку питьём. Это про хранение вещи.",
-     en:"The same amount harms a small body far more, and a bright container looks to a child like a drink. It is about storage."})
+     en:"The same amount harms a small body far more, and a bright container looks to a child like a drink. It is about storage."}),
+
+  C({he:"מה אומר ״רעיל״",ar:"ماذا تعني «سامّ»",ru:"Что означает «ядовито»",en:"What “toxic” says"},
+    {he:"שכמות קטנה מהחומר פוגעת בגוף מבפנים — בבליעה, בשאיפה או דרך העור. הנזק אינו נראה מיד, ולכן התווית חשובה יותר מהתחושה.",
+     ar:"أنّ كمّية صغيرة تؤذي الجسم من الداخل — بالبلع أو الاستنشاق أو عبر الجلد. الضرر لا يُرى فورًا، والملصق أهمّ من الإحساس.",
+     ru:"Что малое количество вещества вредит телу изнутри — при проглатывании, вдыхании или через кожу. Вред виден не сразу, поэтому этикетка важнее ощущения.",
+     en:"That a small amount harms the body from inside — swallowed, breathed in, or through the skin. The harm is not visible at once, so the label matters."})
  ],
 
  [ /* רמה 3 — מה שקוראים מתחת לשורה, וקטע */
