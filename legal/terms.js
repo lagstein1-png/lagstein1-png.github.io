@@ -5,7 +5,7 @@
 (function(g){
 "use strict";
 g.LEGAL = {
-  version: "1.0",
+  version: "1.1",
   updated: "2026-09-08",
   owner:   "יהושע לגשטיין",
   ownerEn: "Yehoshua Lagstein",
