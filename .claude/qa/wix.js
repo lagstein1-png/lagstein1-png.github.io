@@ -101,6 +101,32 @@ function prices() {
   return out.join("\n").replace(/\n+$/, "");
 }
 
+/* עמוד הבית — כותרת, פסקת פתיחה, "איך זה עובד" והכפתורים, כולם
+   מ-STR. הגוש הזה סטה בפועל: נמדד ב-10.9.2026 ששבע מחרוזות
+   במסמך כבר לא היו זהות לדף הבית — ארבע פסקאות פתיחה, how1,
+   how3 ו-about — והטקסט שהיה מודבק לוויקס תיאר מוצר אחר.
+
+   how1 נכלל כאן. הגרסה הקודמת של המסמך השמיטה אותו מפני שהוא
+   הבטיח "אין הרשמה", וזה לא יתקיים לשמונה שבתשלום; ההשמטה פתרה
+   את הסתירה במסמך והשאירה אותה בדף הבית. הפתרון הוא לתקן את
+   המחרוזת, לא להסתיר אותה. */
+function home() {
+  const d = data(), S = d.STR, out = [];
+  for (const [l, name] of LANGS) {
+    const T = S[l];
+    out.push("### " + name, "");
+    out.push("**כותרת:** " + [T.h1a, T.h1b, T.h1c].join(" ").replace(/\s+/g, " ").trim(), "");
+    out.push("**תווית:** " + T.badge, "");
+    out.push("**פסקת פתיחה:** " + T.lead, "");
+    out.push("**" + T.howT + ":**", "");
+    out.push("1. " + T.how1);
+    out.push("2. " + T.how2);
+    out.push("3. " + T.how3, "");
+    out.push("**כפתורים:** \"" + T.ctaApps + "\" · \"" + T.ctaContact + "\"", "");
+  }
+  return out.join("\n").replace(/\n+$/, "");
+}
+
 /* גבולות הגוש בתוך wix-content.md: מהכותרת של הקטגוריה הראשונה
    ועד לכותרת הראשית הבאה. */
 function bounds(doc) {
@@ -125,6 +151,19 @@ function priceBounds(doc) {
   return { start: first, end };
 }
 
+/* גבולות עמוד הבית: מכותרת השפה הראשונה שאחריו ועד הכותרת
+   הראשית הבאה. אותו עיקרון — נגזר נבדק, פרוזה נשארת. */
+function homeBounds(doc) {
+  const h = "## עמוד הבית";
+  const at = doc.indexOf(h);
+  if (at < 0) return null;
+  const next = doc.indexOf("\n## ", at + h.length);
+  const end = next < 0 ? doc.length : next;
+  const first = doc.indexOf("\n### ", at);
+  if (first < 0 || first > end) return null;
+  return { start: first, end };
+}
+
 const DOC = path.join(root, "marketing", "wix-content.md");
 
 if (check) {
@@ -138,10 +177,25 @@ if (check) {
   const pb = priceBounds(doc);
   const pHave = pb ? doc.slice(pb.start, pb.end).trim() : null;
   const pWant = prices().trim();
-  if (have === want && pHave === pWant) {
-    console.log(`כרטיסי האפליקציות והמחירים ב-wix-content.md תואמים לכל ${data().APPS.length} האפליקציות`);
+  const hb = homeBounds(doc);
+  const hHave = hb ? doc.slice(hb.start, hb.end).trim() : null;
+  const hWant = home().trim();
+  const diff = (a, b, title, how) => {
+    console.log(title);
+    const x = (a || "").split("\n"), y = b.split("\n");
+    let j = 0; while (j < x.length && j < y.length && x[j] === y[j]) j++;
+    console.log("· במסמך: " + (x[j] === undefined ? "(נגמר)" : x[j]));
+    console.log("· בקוד:  " + (y[j] === undefined ? "(נגמר)" : y[j]));
+    console.log("\nרענון: " + how);
+    process.exit(1);
+  };
+  if (have === want && pHave === pWant && hHave === hWant) {
+    console.log(`עמוד הבית, כרטיסי האפליקציות והמחירים ב-wix-content.md תואמים לכל ${data().APPS.length} האפליקציות`);
     process.exit(0);
   }
+  if (have === want && hHave !== hWant)
+    diff(hHave, hWant, "כרטיסי האפליקציות תואמים, אבל עמוד הבית סטה מ-DATA.STR.",
+      "node .claude/qa/wix.js --home");
   if (have === want && pHave !== pWant) {
     console.log("כרטיסי האפליקציות תואמים, אבל סעיף המחירים סטה מ-DATA.APPS.");
     const a = (pHave || "").split("\n"), b2 = pWant.split("\n");
@@ -158,6 +212,12 @@ if (check) {
   console.log("· בקוד:  " + (wl[i] === undefined ? "(נגמר)" : wl[i]));
   console.log("\nרענון: node .claude/qa/wix.js --md");
   process.exit(1);
+}
+
+if (process.argv.includes("--home")) {
+  console.log(home());
+  if (!md) console.log("\nמקור: DATA.STR שב-index.html");
+  process.exit(0);
 }
 
 if (process.argv.includes("--prices")) {
