@@ -523,6 +523,12 @@ https://lagstein1-png.github.io
 **סיום.** `grep -l screenshots */manifest.json` מחזיר 11 קבצים
 (כל האפליקציות שבריפו). `node .claude/qa/cache.js` עובר.
 
+**בוצע 10.9 בענף `claude/global-social-growth-strategist-j2neaf`:**
+11 מניפסטים (`kotvim` היא `internal` ולא נכללה), 22 צילומים,
+טלפון 1080×1920 ומחשב 1920×1080, ממסך שאלה עם רמז פתוח היכן שיש.
+`grep -l screenshots */manifest.json | wc -l` = 11. אחת־עשרה
+המפתחות עלו, כי `cache.js` משווה את תיקיית האפליקציה כולה.
+
 ### E3 · חשוב · ביקורת צבעי המותג
 
 **הממצא.** `grep theme_color */manifest.json manifest.json`:
