@@ -321,7 +321,7 @@ BANK({
      en:"A living thing that does not make food itself, and so eats plants or other animals."}),
 
   C({he:"מפרק",ar:"محلِّل",ru:"Разлагатель",en:"Decomposer"},
-    {he:"יצור כמו פטרייה או חיידק שמעכל שאריות של יצורים מתים ומחזיר את החומרים לאדמה.",
+    {he:"יצור כמו פטרייה או חיידק שמחזיר שאריות של יצורים מתים לחומרים פשוטים, ואלה חוזרים לאדמה.",
      ar:"كائن كالفطر أو الجرثومة يفكّك بقايا الكائنات الميتة ويعيد المواد إلى التربة.",
      ru:"Существо вроде гриба или бактерии, которое разлагает останки погибших организмов и возвращает вещества в почву.",
      en:"A living thing such as a fungus or a bacterium that breaks down the remains of dead organisms and returns the materials to the soil."}),
