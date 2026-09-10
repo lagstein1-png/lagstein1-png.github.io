@@ -841,6 +841,9 @@ function md(app,R){
   const v=verdict(R.find);
   R.app=app; R.sample=N; R.verdict=v.verdict; R.fail=v.fail; R.review=v.review;
   R.generated=new Date().toISOString().slice(0,10);
+  /* חתימת התוכן שנסרק. `fresh.js` מחשב אותה מחדש ונופל אם היא
+     זזה — דוח שמתאר עץ אחר אינו ידיעה. ההסבר ב-`sig.js`. */
+  R.sig=require('./sig.js').sigOf(app);
   /* מול איזה קוד נמדד הדוח. בלי זה דוח שנשמר בגיט מתיישן בשקט
      ומטעה את מי שקורא אותו: ב-9.9.2026 בריף נשען על דוח שנוצר
      שתי קומיטות אחורה, דיבר על 13 תאים כשנשאר אחד, וניפח את

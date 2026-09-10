@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x32 · 2026-09-10";
+  var BUILD = "x34 · 2026-09-10";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -52,7 +52,7 @@
   var store = {
     data: null,
     blank: function () {
-      return { fs: 1, theme: "auto", rate: 1, examId: null,
+      return { fs: 1, theme: "auto", rate: 1, say: true, examId: null,
                solved: {}, sims: [], weak: {}, att: {} };
     },
     load: function () {
@@ -93,6 +93,9 @@
     });
     $$("[data-rate]").forEach(function (b) {
       b.setAttribute("aria-pressed", String(Number(b.getAttribute("data-rate")) === d.rate));
+    });
+    $$("[data-say]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String((b.getAttribute("data-say") === "1") === (d.say !== false)));
     });
     if (window.Speech) window.Speech.rate = d.rate;
     voiceState();
@@ -974,13 +977,14 @@
 
   function sayClick(el) {
     if (el.matches("[data-read],[data-read-el],[data-tutor],#btn-stop,#btn-pause,#btn-back,#btn-fwd,[data-nosay]")) return;
+    if (store.data && store.data.say === false) return;   /* המתג בהגדרות (O-29) */
     var label = (el.getAttribute("aria-label") || el.textContent || "").replace(/\s+/g, " ").trim();
     if (!label || label.length > 60 || !window.Speech || !window.Speech.say) return;
     setTimeout(function () { window.Speech.say(label); }, 500);
   }
   document.addEventListener("click", function (e) {
     var el = e.target.closest ? e.target.closest(
-      "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate]," +
+      "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate],[data-say]," +
       "[data-read],[data-read-el],[data-check],[data-hint],[data-sol],[data-hclear],[data-tutor]," +
       "[data-simstart],[data-simend]," +
       "#btn-reset,#btn-stop,#btn-try," +
@@ -1095,6 +1099,9 @@
       window.Speech.speak([{ text: "שלום. כך נשמעת ההקראה בקצב שנבחר.", el: null }]);
       return;
     }
+    var sy = el.getAttribute("data-say");
+    if (sy !== null) { store.data.say = sy === "1"; store.save(); applyPrefs(); return; }
+
     var rt = el.getAttribute("data-rate");
     if (rt) {
       store.data.rate = Number(rt); store.save();
@@ -1194,7 +1201,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x32-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x34-pwa1").catch(function () {});
     });
   }
 

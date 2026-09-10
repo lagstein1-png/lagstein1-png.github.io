@@ -393,7 +393,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/say.js                   # ההקראה לא מסגירה את התשובה לפני שעונים
     node .claude/qa/saysym.js                # מה באמת נאמר — אין ^ או _ גולמי בהקראה
     node .claude/qa/guess.js                 # אי אפשר לקלוע לפי אורך התשובה או מיקומה
-    node .claude/qa/clicks.js                # כל לחיצה מושמעת: כפתור שנלחץ מוקרא בשמו, בשתים־עשרה האפליקציות
+    node .claude/qa/clicks.js                # כל לחיצה מושמעת, והמתג שמשתיק אותה — בשתים־עשרה האפליקציות
     node .claude/qa/fonts.js                 # ערבית ורוסית בגופן שיש בו את הכתב
     node .claude/qa/langbtn.js               # כפתור השפה עצמו — "العربية" גם כשהממשק עברי
     node .claude/qa/banks.js                 # החיווט של lomda/data/, וארבע השפות בתוכן
@@ -402,6 +402,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/markers.js               # סמני התנגשות מיזוג שנשארו בקובץ שנעקב
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/content.js               # תוכן: תשע משפחות, דוח PASS/REVIEW/FAIL
+    node .claude/qa/fresh.js                 # דוח תוכן שמתאר עץ שכבר אינו קיים
     node .claude/qa/stage.js                 # שער השלבים — מי מותר ללומד
     node .claude/qa/deployed.js              # מסלול הלומד על הבתים שנפרסו — ביד בלבד
     node .claude/qa/all.js                   # הכול, ופסק דין אחד
