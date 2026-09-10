@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ג׳וש — מסך בדיקה מקומי</title>
+<!--
+  מסך הבדיקה של ג׳וש. **אינו אפליקציית לימוד ואינו נספר** —
+  אין לו sw.js, אין לו manifest, והוא יושב תחת tutor-api/,
+  שרשומה ב-notApps שב-stages.json.
+
+  מה הוא כן: קונסולה שמדברת עם ../worker.js דרך server.js,
+  כדי לשמוע כל אחד משלושה־עשר התפקידים בכל אחת מארבע השפות
+  בלי לפתוח אפליקציה שלמה.
+
+  מנוע ההקראה של ״תאוריה מדברת״ — ארבעה מנגנונים:
+  שומר-ער, _activeU, ttsWatchdog, ונפילה מקול רשת.
+-->
+<style>
+:root{
+  --bg:#f7f7f5; --fg:#1c1c1a; --dim:#6b6b66; --line:#dededa;
+  --card:#fff; --me:#2f6f4e; --meFg:#fff; --bot:#eef1ef;
+  --accent:#2f6f4e; --warn:#8a3b2f; --shadow:0 6px 24px rgba(0,0,0,.14);
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16171a; --fg:#ececea; --dim:#9a9a94; --line:#2f3136;
+         --card:#1e2024; --bot:#25282d; --shadow:0 6px 24px rgba(0,0,0,.5) }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,"Segoe UI",Arial,sans-serif;
+     padding:24px 16px 120px}
+.wrap{max-width:760px;margin:0 auto}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--dim);margin:0 0 20px;font-size:.95rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+label{display:block;font-size:.85rem;color:var(--dim);margin-bottom:4px}
+select,input[type=text]{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:9px;
+     background:var(--bg);color:var(--fg);min-width:150px;max-width:100%}
+.hint{font-size:.85rem;color:var(--dim);margin-top:10px}
+code{background:var(--bot);padding:2px 6px;border-radius:5px;font-size:.9em}
+.state{display:inline-block;padding:3px 9px;border-radius:999px;font-size:.8rem;border:1px solid var(--line)}
+.ok{color:var(--accent)} .bad{color:var(--warn)}
+
+/* ---------- הכפתור הצף ---------- */
+#fab{position:fixed;inset-inline-end:20px;inset-block-end:20px;width:62px;height:62px;border-radius:50%;
+     border:0;background:var(--accent);color:#fff;font-size:1.6rem;cursor:pointer;box-shadow:var(--shadow);
+     z-index:60;display:flex;align-items:center;justify-content:center}
+#fab:focus-visible{outline:3px solid #fff;outline-offset:3px}
+
+/* ---------- החלון ---------- */
+#panel{position:fixed;inset-inline-end:20px;inset-block-end:94px;width:min(420px,calc(100vw - 40px));
+     max-height:min(72vh,620px);background:var(--card);border:1px solid var(--line);border-radius:16px;
+     box-shadow:var(--shadow);display:none;flex-direction:column;overflow:hidden;z-index:60}
+#panel.on{display:flex}
+@media (max-width:520px){
+  #panel{inset-inline:10px;inset-block-end:88px;width:auto;max-height:68vh}
+}
+.head{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.head b{flex:1;font-size:1rem}
+.head button{border:0;background:transparent;color:var(--dim);font-size:1.15rem;cursor:pointer;
+     padding:6px;border-radius:8px;min-width:34px;min-height:34px}
+.head button:hover{background:var(--bot)}
+.head button[aria-pressed=true]{color:var(--accent)}
+#log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:86%;padding:9px 12px;border-radius:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+.me{align-self:flex-start;background:var(--me);color:var(--meFg);border-end-start-radius:4px}
+.bot{align-self:flex-end;background:var(--bot);border-end-end-radius:4px}
+.sys{align-self:center;color:var(--dim);font-size:.85rem;text-align:center}
+.sg{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-end;max-width:92%}
+.sg button{font:inherit;font-size:.85rem;padding:5px 10px;border-radius:999px;border:1px solid var(--line);
+     background:transparent;color:var(--fg);cursor:pointer}
+.foot{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+.foot input{flex:1;min-width:0}
+.foot button{border:0;background:var(--accent);color:#fff;border-radius:9px;padding:0 16px;
+     font:inherit;cursor:pointer;min-height:42px}
+.foot button:disabled{opacity:.5;cursor:default}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>ג׳וש — מסך בדיקה מקומי</h1>
+  <p class="sub">מדבר עם <code>tutor-api/worker.js</code> דרך <code>/api/josh/chat</code>.
+     אותה אישיות ואותן בדיקות שירוצו בייצור.</p>
+
+  <div class="card">
+    <div class="row">
+      <div><label for="app">אפליקציה (התפקיד)</label><select id="app"></select></div>
+      <div><label for="lang">שפת התשובה</label><select id="lang">
+        <option value="auto">זיהוי אוטומטי</option>
+        <option value="he">עברית</option><option value="ar">العربية</option>
+        <option value="ru">Русский</option><option value="en">English</option>
+      </select></div>
+      <div><label for="expr">מה שעל המסך (לא חובה)</label>
+        <input type="text" id="expr" placeholder="8 + 7 ="></div>
+      <div><label for="ans">התשובה הנכונה (לא חובה)</label>
+        <input type="text" id="ans" placeholder="15"></div>
+    </div>
+    <p class="hint">מצב השרת: <span id="health" class="state">בודק…</span></p>
+  </div>
+
+  <div class="card">
+    <p class="hint" style="margin:0">
+      <b>זיהוי שפה אוטומטי</b> קורא את הכתב שכתבת: עברית, ערבית, קירילית או לטינית.
+      <b>ההקראה</b> נכבית ונדלקת בכפתור הרמקול שבראש החלון.
+      נתת <b>תשובה נכונה</b> — שני התורים הראשונים נבדקים, וג׳וש לא יכתוב אותה.
+    </p>
+  </div>
+</div>
+
+<button id="fab" aria-label="פתיחת הצ׳אט עם ג׳וש" aria-expanded="false">💬</button>
+
+<div id="panel" role="dialog" aria-label="צ׳אט עם ג׳וש" aria-modal="false">
+  <div class="head">
+    <b>ג׳וש</b>
+    <button id="spk" aria-pressed="true" aria-label="הקראה" title="הקראה">🔊</button>
+    <button id="clr" aria-label="שיחה חדשה" title="שיחה חדשה">↺</button>
+    <button id="x" aria-label="סגירה" title="סגירה">✕</button>
+  </div>
+  <div id="log" aria-live="polite"></div>
+  <div class="foot">
+    <input type="text" id="msg" placeholder="כתוב לג׳וש…" autocomplete="off"
+           aria-label="הודעה לג׳וש">
+    <button id="send">שלח</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+var API = "/api/josh/chat";
+var APPS = ["math-app","math-teen","math-uni","math-uni2","math-uni3","bagrut-806",
+            "english","ulpan","history","lomda","kotvim","reader","theory"];
+var NAMES = {"math-app":"חשבון ליסודי","math-teen":"שלב — תיכון","math-uni":"אקסיומה א׳",
+  "math-uni2":"אקסיומה ב׳","math-uni3":"אקסיומה ג׳","bagrut-806":"806 — בגרות",
+  "english":"ניב — אנגלית","ulpan":"אולפן — עברית","history":"מפנה — היסטוריה",
+  "lomda":"לומדה","kotvim":"כותבים ביחד","reader":"מקריא קולי","theory":"תאוריה מדברת"};
+
+var $ = function(id){ return document.getElementById(id) };
+var MSGS = [], BUSY = false, SPEAK = true;
+
+/* ---------- זיהוי שפה: לפי הכתב, לא לפי ניחוש ---------- */
+function detect(text){
+  var s = String(text || "");
+  if(/[֐-׿]/.test(s)) return "he";
+  if(/[؀-ۿݐ-ݿ]/.test(s)) return "ar";
+  if(/[Ѐ-ӿ]/.test(s)) return "ru";
+  if(/[A-Za-z]/.test(s)) return "en";
+  return "he";
+}
+function langOf(text){
+  var v = $("lang").value;
+  return v === "auto" ? detect(text) : v;
+}
+var DIR = { he:"rtl", ar:"rtl", ru:"ltr", en:"ltr" };
+var BCP = { he:"he-IL", ar:"ar-SA", ru:"ru-RU", en:"en-US" };
+
+/* ============================================================
+   מנוע ההקראה של ״תאוריה מדברת״ — ארבעה מנגנונים
+   ============================================================ */
+var _activeU = null, _kaTimer = null, _netVoiceOK = true;
+/* שומר-ער רק בשולחן העבודה: במובייל אין את הבאג, ושם pause/resume מקרטע */
+var NEEDS_KEEPALIVE = !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+function voices(){ try{ return speechSynthesis.getVoices() || [] }catch(e){ return [] } }
+if(window.speechSynthesis && speechSynthesis.addEventListener)
+  speechSynthesis.addEventListener("voiceschanged", function(){});
+
+/* 1 — שומר-ער: Chrome/Edge בשולחן העבודה חותכים אחרי ~15 שניות */
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE || !("speechSynthesis" in window) || _kaTimer) return;
+  _kaTimer = setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){ stopKeepAlive(); return }
+      if(speechSynthesis.paused) return;
+      speechSynthesis.pause(); speechSynthesis.resume();
+    }catch(e){ stopKeepAlive() }
+  }, 9000);
+}
+function stopKeepAlive(){ if(_kaTimer){ clearInterval(_kaTimer); _kaTimer = null } }
+
+/* voiceUsable הוא מיון ולא ניקוד — והוא מפתח המיון הראשון,
+   לפני כל שיקול אחר. קול רשת שכבר נכשל יורד לתחתית. */
+function voiceUsable(v){ return (v && v.localService) || _netVoiceOK ? 1 : 0 }
+
+function pickVoice(code){
+  var all = voices(), pre = code.split("-")[0], list = [];
+  for(var i = 0; i < all.length; i++){
+    var v = all[i], l = (v.lang || "").replace("_", "-");
+    if(l.toLowerCase().indexOf(pre) === 0) list.push(v);
+  }
+  if(!list.length) return null;
+  list.sort(function(a, b){
+    var u = voiceUsable(b) - voiceUsable(a);       /* 1 — מיון ראשון */
+    if(u) return u;
+    return (b.localService ? 1 : 0) - (a.localService ? 1 : 0);
+  });
+  return list[0];
+}
+
+/* 3 — ttsWatchdog: יש מכשירים שבהם onend לא נורה */
+function ttsWatchdog(alive, onSilent){
+  var t = setInterval(function(){
+    if(!alive()){ clearInterval(t); return }
+    var busy = false;
+    try{ busy = !!(speechSynthesis.speaking || speechSynthesis.pending) }catch(e){}
+    if(!busy){ clearInterval(t); onSilent() }
+  }, 4000);
+  return function(){ clearInterval(t) };
+}
+
+function stopSay(){
+  try{ speechSynthesis.cancel() }catch(e){}
+  _activeU = null; stopKeepAlive();
+}
+
+function say(text, code){
+  if(!SPEAK || !("speechSynthesis" in window) || !text) return;
+  stopSay();
+  var done = false, tried = false;
+  function go(){
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = code;
+    var v = pickVoice(code);
+    if(v) u.voice = v;
+    u.rate = 0.95;
+    _activeU = u;                                  /* 2 — הפניה חיה */
+    u.onend = function(){ done = true; _activeU = null; stopKeepAlive() };
+    u.onerror = function(){
+      /* 4 — נפילה מקול רשת: כיבוי, בחירת קול מקומי, וניסיון אחד נוסף */
+      if(!tried && v && !v.localService){
+        tried = true; _netVoiceOK = false; setTimeout(go, 60); return;
+      }
+      done = true; _activeU = null; stopKeepAlive();
+    };
+    try{ speechSynthesis.speak(u) }catch(e){ done = true; return }
+    startKeepAlive();
+    ttsWatchdog(function(){ return !done }, function(){ done = true; _activeU = null; stopKeepAlive() });
+  }
+  go();
+}
+
+/* ---------- ציור ---------- */
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") }
+function bold(s){ return s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>") }
+
+/* ג׳וש מציע שאלות המשך בשורה שבה [[?]] בלבד, ואחריה שאלה בכל שורה */
+function split(text){
+  var i = String(text).indexOf("[[?]]");
+  if(i < 0) return { body:text, sugg:[] };
+  return {
+    body: text.slice(0, i).trim(),
+    sugg: text.slice(i + 5).split("\n").map(function(s){ return s.trim() })
+              .filter(Boolean).slice(0, 3)
+  };
+}
+
+function add(kind, text, code){
+  var d = document.createElement("div");
+  d.className = "m " + kind;
+  if(code){ d.lang = code; d.dir = DIR[code] || "rtl" }
+  d.innerHTML = bold(esc(text));
+  $("log").appendChild(d);
+  return d;
+}
+function sysline(text){
+  var d = document.createElement("div");
+  d.className = "sys"; d.textContent = text;
+  $("log").appendChild(d); scroll();
+}
+function scroll(){ $("log").scrollTop = $("log").scrollHeight }
+
+function addSugg(list){
+  if(!list.length) return;
+  var box = document.createElement("div");
+  box.className = "sg";
+  list.forEach(function(q){
+    var b = document.createElement("button");
+    b.type = "button"; b.textContent = q;
+    b.onclick = function(){ box.remove(); ask(q) };
+    box.appendChild(b);
+  });
+  $("log").appendChild(box); scroll();
+}
+
+/* ---------- הפנייה ---------- */
+function ask(text){
+  if(BUSY || !text) return;
+  var code = langOf(text);
+  add("me", text, code); scroll();
+  MSGS.push({ role:"user", text:text });
+  BUSY = true; $("send").disabled = true;
+  var wait = document.createElement("div");
+  wait.className = "sys"; wait.textContent = "…";
+  $("log").appendChild(wait); scroll();
+
+  var q = null, expr = $("expr").value.trim(), ans = $("ans").value.trim();
+  if(expr) q = { expr:expr, ans:ans || null, topic:null, level:null };
+
+  fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ app:$("app").value, lang:code, q:q, messages:MSGS })
+  })
+  .then(function(r){ return r.json().then(function(j){ return { ok:r.ok, s:r.status, j:j } }) })
+  .then(function(res){
+    wait.remove();
+    if(!res.ok){
+      sysline("שגיאה " + res.s + (res.j && res.j.error ? " · " + res.j.error : "") +
+              (res.j && res.j.detail ? " — " + res.j.detail : ""));
+      return;
+    }
+    var parts = split(res.j.text || "");
+    MSGS.push({ role:"assistant", text:res.j.text || "" });
+    add("bot", parts.body, code); scroll();
+    addSugg(parts.sugg);
+    say(parts.body.replace(/[«»*]/g, ""), BCP[code] || BCP.he);
+  })
+  .catch(function(e){ wait.remove(); sysline("אין קשר לשרת: " + e.message) })
+  .then(function(){ BUSY = false; $("send").disabled = false; $("msg").focus() });
+}
+
+/* ---------- חיווט ---------- */
+APPS.forEach(function(id){
+  var o = document.createElement("option");
+  o.value = id; o.textContent = (NAMES[id] || id) + "  ·  " + id;
+  $("app").appendChild(o);
+});
+
+$("fab").onclick = function(){
+  var on = $("panel").classList.toggle("on");
+  $("fab").setAttribute("aria-expanded", on ? "true" : "false");
+  if(on) $("msg").focus(); else stopSay();
+};
+$("x").onclick = function(){
+  $("panel").classList.remove("on");
+  $("fab").setAttribute("aria-expanded", "false"); stopSay();
+};
+$("spk").onclick = function(){
+  SPEAK = !SPEAK;
+  $("spk").setAttribute("aria-pressed", SPEAK ? "true" : "false");
+  $("spk").textContent = SPEAK ? "🔊" : "🔇";
+  if(!SPEAK) stopSay();
+};
+$("clr").onclick = function(){ MSGS = []; $("log").innerHTML = ""; stopSay(); greet() };
+$("send").onclick = function(){
+  var v = $("msg").value.trim();
+  if(!v) return;
+  $("msg").value = ""; ask(v);
+};
+$("msg").addEventListener("keydown", function(e){
+  if(e.key === "Enter"){ e.preventDefault(); $("send").click() }
+});
+document.addEventListener("keydown", function(e){
+  if(e.key === "Escape" && $("panel").classList.contains("on")) $("x").click();
+});
+
+function greet(){
+  sysline("שאל את ג׳וש משהו. התפקיד נקבע לפי האפליקציה שבחרת למעלה.");
+}
+greet();
+
+fetch("/health").then(function(r){ return r.json() }).then(function(j){
+  var el = $("health");
+  if(j.key === "present"){ el.textContent = "מפתח נטען · " + j.apps.length + " תפקידים"; el.className = "state ok" }
+  else { el.textContent = "אין ANTHROPIC_API_KEY בקובץ .env"; el.className = "state bad" }
+}).catch(function(){
+  $("health").textContent = "השרת אינו עונה"; $("health").className = "state bad";
+});
+</script>
+</body>
+</html>
