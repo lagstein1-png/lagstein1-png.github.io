@@ -1,0 +1,140 @@
+# פריסת ג׳וש ל-Cloudflare Workers.
+#
+# למה ורקפלו ולא פקודה מקומית: סביבת הפיתוח של הסוכן חסומה מול
+# api.cloudflare.com ומול dash.cloudflare.com (403 מהשער), ולכן
+# אי אפשר לפרוס משם. הרנרים של GitHub אינם חסומים.
+#
+# **הפעלה ידנית בלבד** — workflow_dispatch. הוא לא ירוץ על push,
+# ולא יפרוס בטעות.
+#
+# מה צריך פעם אחת, ב-Settings → Secrets and variables → Actions:
+#   CLOUDFLARE_API_TOKEN    Secret   — טוקן עם ארבע הרשאות בלבד:
+#                                      Account: Workers Scripts: Edit
+#                                      Account: Workers KV Storage: Edit
+#                                      Account: Account Settings: Read
+#                                      User:    User Details: Read
+#   CLOUDFLARE_ACCOUNT_ID   Secret   — מזהה החשבון, מדף ה-Workers
+#   ANTHROPIC_API_KEY       Secret   — מפתח Anthropic
+#
+# שלושתם נכנסים בממשק של GitHub ואינם עוברים בצ׳אט או במאגר.
+
+name: deploy-tutor
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'הקלד DEPLOY כדי לאשר. פריסה מתחילה לצרוך מכסה.'
+        required: true
+        default: ''
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: אישור מפורש
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "DEPLOY" ]; then
+            echo "::error::לא אושר. יש להקליד DEPLOY בשדה האישור."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: מוצא או יוצר את מרחב ה-KV בשם RATE
+        id: kv
+        working-directory: tutor-api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          # הרשימה חוזרת כ-JSON. מחפשים לפי title, ויוצרים רק אם אין —
+          # יצירה כפולה הייתה נותנת מרחב שני והמונה היה מתאפס.
+          npx --yes wrangler@4 kv namespace list > /tmp/kv.json 2>/dev/null || echo '[]' > /tmp/kv.json
+          ID=$(node -e '
+            const fs=require("fs");
+            let l=[]; try{ l=JSON.parse(fs.readFileSync("/tmp/kv.json","utf8")) }catch(e){}
+            const m=l.find(n=>/(^|[-_])RATE$/i.test(n.title||"")||/tutor-RATE/i.test(n.title||""));
+            process.stdout.write(m?m.id:"");
+          ')
+          if [ -z "$ID" ]; then
+            echo "אין מרחב RATE — יוצר."
+            npx --yes wrangler@4 kv namespace create RATE > /tmp/kvnew.txt
+            cat /tmp/kvnew.txt
+            ID=$(grep -oE '[0-9a-f]{32}' /tmp/kvnew.txt | head -1)
+          fi
+          if [ -z "$ID" ]; then
+            echo "::error::לא הצלחתי להשיג מזהה KV."
+            exit 1
+          fi
+          echo "kv_id=$ID" >> "$GITHUB_OUTPUT"
+          echo "מרחב KV: $ID"
+
+      - name: מזריק את מזהה ה-KV ל-wrangler.toml
+        working-directory: tutor-api
+        run: |
+          sed -i "s/KV_ID_PLACEHOLDER/${{ steps.kv.outputs.kv_id }}/" wrangler.toml
+          grep -A2 kv_namespaces wrangler.toml
+
+      - name: פורס
+        id: deploy
+        working-directory: tutor-api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4 deploy 2>&1 | tee /tmp/deploy.txt
+          URL=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' /tmp/deploy.txt | head -1)
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: כותב את מפתח Anthropic כ-Secret של ה-Worker
+        working-directory: tutor-api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # דרך stdin, כדי שהמפתח לא יופיע בשורת הפקודה ולא בלוג.
+          printf '%s' "${{ secrets.ANTHROPIC_API_KEY }}" \
+            | npx --yes wrangler@4 secret put ANTHROPIC_API_KEY
+
+      - name: בדיקה חיה — תשובה אמיתית מג׳וש
+        env:
+          URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          set -euo pipefail
+          if [ -z "$URL" ]; then echo "::error::לא נמצאה כתובת בפלט הפריסה."; exit 1; fi
+          sleep 5
+          BODY='{"app":"math-app","lang":"he","q":{"expr":"8 + 7 =","ans":"15"},
+                 "messages":[{"role":"user","text":"לא הבנתי, אפשר רמז?"}]}'
+          CODE=$(curl -s -o /tmp/r.json -w '%{http_code}' -X POST "$URL" \
+                 -H 'Content-Type: application/json' -d "$BODY")
+          echo "סטטוס: $CODE"
+          cat /tmp/r.json
+          {
+            echo "## ג׳וש נפרס"
+            echo ""
+            echo "**כתובת:** \`$URL\`"
+            echo ""
+            echo "**בדיקה חיה:** HTTP $CODE"
+            echo ""
+            echo '```json'
+            cat /tmp/r.json
+            echo ""
+            echo '```'
+            echo ""
+            echo "הצעד הבא במאגר:"
+            echo ""
+            echo '```'
+            echo "node .claude/qa/enable-tutor.js $URL"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$CODE" != "200" ]; then
+            echo "::error::הפריסה הצליחה אבל הבדיקה החיה החזירה $CODE."
+            exit 1
+          fi

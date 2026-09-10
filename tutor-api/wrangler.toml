@@ -1,0 +1,24 @@
+# פריסת ג׳וש ל-Cloudflare Workers.
+#
+# **הקובץ הזה אינו מחליף את ההדבקה הידנית** שמתוארת ב-README —
+# הוא מוסיף מסלול שני, לפריסה מ-GitHub Actions בלי לפתוח דפדפן.
+# worker.js נשאר קובץ אחד בלי npm ובלי build, כפי שהוחלט.
+#
+# `id` של ה-KV הוא מציין מיקום: הוורקפלו
+# .github/workflows/deploy-tutor.yml מוצא או יוצר את המרחב
+# ומחליף אותו לפני הפריסה. אין כאן מזהה אמיתי ואין כאן סוד.
+
+name = "tutor"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+# חסם העלות. בלי הקישור הזה worker.js נכשל־סגור ומחזיר 503 —
+# וזו התנהגות מכוונת: בלי מונה אין תקרה יומית.
+[[kv_namespaces]]
+binding = "RATE"
+id = "KV_ID_PLACEHOLDER"
+
+# שתי הכתובות שהאתר מוגש מהן. מקור שאינו ברשימה נחסם.
+# ANTHROPIC_API_KEY אינו כאן — הוא Secret, ונכנס בנפרד.
+[vars]
+ALLOW_ORIGIN = "https://lagstein1-png.github.io,https://lagstein-hub.onrender.com"
