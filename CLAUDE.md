@@ -402,6 +402,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/markers.js               # סמני התנגשות מיזוג שנשארו בקובץ שנעקב
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/content.js               # תוכן: תשע משפחות, דוח PASS/REVIEW/FAIL
+    node .claude/qa/fresh.js                 # דוח תוכן שמתאר עץ שכבר אינו קיים
     node .claude/qa/stage.js                 # שער השלבים — מי מותר ללומד
     node .claude/qa/deployed.js              # מסלול הלומד על הבתים שנפרסו — ביד בלבד
     node .claude/qa/all.js                   # הכול, ופסק דין אחד
