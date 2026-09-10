@@ -1,4 +1,4 @@
-const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const {chromium}=require('./pw.js');
 async function click(p,s){try{await p.click(s,{timeout:2000});await p.waitForTimeout(300);return true}catch(e){return false}}
 (async()=>{const b=await chromium.launch();
 let failed=0;   /* בלי זה הכלי מדפיס ERRORS ויוצא 0 */

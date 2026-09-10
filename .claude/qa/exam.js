@@ -1,7 +1,7 @@
 /* בודק את מה שהיה נשבר בשקט: שהשאלה שהמורה רואה על המסך היא
    בדיוק השאלה שהתלמיד מקבל מהקישור, ושהחלפה של שאלה אחת אינה
    משנה אף אחת מהשאר. */
-const {chromium}=require("/opt/node22/lib/node_modules/playwright");
+const {chromium}=require('./pw.js');
 const APPS=process.argv.slice(2).length?process.argv.slice(2)
   :["math-app","math-teen","math-uni","math-uni2","math-uni3","ulpan","english","history","lomda"];
 const BASE="http://127.0.0.1:8099";
@@ -46,11 +46,18 @@ const BASE="http://127.0.0.1:8099";
       const before=slots.map(sig);
       out.nulls=before.filter(x=>x==="NULL").length;
 
-      /* החלפה של שאלה אחת — רק היא משתנה. */
+      /* החלפה של שאלה אחת — רק היא משתנה. הבדיקה היא על הזרע ועל
+         שאר השאלות, לא על הטקסט של השאלה שהוחלפה: מחולל אקראי מפיק
+         לפעמים מזרע אחר את אותה שאלה בדיוק — נמדד 1 מתוך 300
+         ב-math-uni2, math-uni3 ו-lomda, 6.9.2026 — והדרישה שהטקסט
+         ישתנה הפילה את הבדיקה בערך פעם במאה ריצות בלי שום באג. */
       const i=3;
+      const oldSeed=slots[i][2];
       slots[i]=exSlot(slots[i][0],slots[i][1]);
       const after=slots.map(sig);
       out.changedByRoll=before.map((x,k)=>x!==after[k]?k:-1).filter(k=>k>=0);
+      out.rollSeedChanged=slots[i][2]!==oldSeed;
+      out.rollOthersSame=before.every((x,k)=>k===i||x===after[k]);
 
       /* אריזה לקישור, ופענוח חזרה — כמו אצל התלמיד. */
       const spec={v:GENV,t:"בדיקה",s:(Math.random()*4294967295)>>>0,l:EB.level,
@@ -101,7 +108,7 @@ const BASE="http://127.0.0.1:8099";
     const builtN=await page.evaluate(()=>EB.built?EB.built.q.length:0);
 
     const ok = r.seeded && r.decoded && r.sameAsStudent && r.legacyStable
-            && r.changedByRoll.length===1 && r.changedByRoll[0]===3
+            && r.rollSeedChanged && r.rollOthersSame
             && rows===10 && rowsAfterDel===9 && rowsAfterAdd===10
             && builtN===10 && answers>0 && errs.length===0;
     if(!ok)bad++;

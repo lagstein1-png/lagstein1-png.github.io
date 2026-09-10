@@ -90,6 +90,14 @@
       return /^he/i.test(normLang(v.lang));
     });
   }
+  /* מגדר הקול, לפי השם — אותם שני ביטויים שבאחת־עשרה האפליקציות
+     האחרות (english/index.html, V_F ו-V_M). ״?״ = לא זוהה. */
+  var VOICE_F = /(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
+  var VOICE_M = /(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
+  function vGender(v) {
+    var n = ((v.name || "") + " " + (v.lang || "")).toLowerCase();
+    return VOICE_F.test(n) ? "f" : VOICE_M.test(n) ? "m" : "?";
+  }
   function bestVoice() {
     var pool = hebrewVoices();
     if (!pool.length) return null;
@@ -99,11 +107,30 @@
       if (/\b(google|microsoft|apple)\b/.test(n)) s += 30;
       if (/natural|neural|enhanced|premium|siri/.test(n)) s += 22;
       if (/espeak|compact|pico/.test(n)) s -= 40;
-      if (v.localService) s += 6;   /* עובד גם בלי רשת */
+      /* קול רשת — הנוירליים של Edge הם כאלה — נשמע טוב יותר, אבל
+         שותק בלי אינטרנט. עד כאן מקומי קיבל בונוס קבוע והקול הטוב
+         שבמכשירי ווינדוס הפסיד לו תמיד.
+         כשאין רשת, או אחרי שקול רשת כבר נכשל בסשן, הוא אינו "פחות
+         טוב" אלא לא יעבוד — ולכן הקנס גדול מסך כל הבונוסים כאן
+         (74 לכל היותר), כדי שיכריע תמיד. כשזה הקול היחיד הוא עדיין
+         נבחר: מיון של רשימה בת אחד מחזיר אותה כמו שהיא. */
+      if (v.localService === false) s += (netVoiceOK && navigator.onLine !== false) ? 6 : -200;
       if (v.default) s += 4;
       return s;
     }
-    return pool.slice().sort(function (a, b) { return score(b) - score(a); })[0];
+    /* קול שלא יעבוד (רשת בלי רשת) יורד לתחתית לפני הכול; אחריו המגדר —
+       נשי קודם, לא־מזוהה אחריו, גברי אחרון — ורק בתוך כל קבוצה מכריעה
+       האיכות. עד 9.9.2026 האיכות לבדה הכריעה כאן, ו-Asaf של מיקרוסופט
+       ניצח קול נשי שהותקן לידו — מה שאחת־עשרה האפליקציות האחרות
+       כבר מנעו. */
+    function usable(v) {
+      return v.localService === false ? (netVoiceOK && navigator.onLine !== false) : true;
+    }
+    function grank(v) { var g = vGender(v); return g === "f" ? 2 : g === "?" ? 1 : 0; }
+    return pool.slice().sort(function (a, b) {
+      var d = usable(b) - usable(a); if (d) return d;
+      d = grank(b) - grank(a); return d || score(b) - score(a);
+    })[0];
   }
   api.hasHebrewVoice = function () { return hebrewVoices().length > 0; };
   api.voiceName = function () { var v = bestVoice(); return v ? v.name : ""; };
@@ -218,6 +245,13 @@
   var paused = false;
   var held = null;    /* הצעד שממתין להמשך, כשהמנוע התעלם מ-pause */
   var token = 0;      /* עולה בכל עצירה — אמירה ישנה שמסתיימת מאוחר לא תמשיך */
+  /* נכבה ברגע שקול רשת נכשל, ואז הדירוג מעדיף מקומי לשארית הסשן. */
+  var NEEDS_KEEPALIVE = /Chrome|Chromium|Edg\//.test(navigator.userAgent) &&
+                        !/Android|Mobile/i.test(navigator.userAgent);
+  var netVoiceOK = true;
+  var netRetried = false;
+  var dog = null;     /* שומר הזמן של המקטע הנוכחי */
+  function disarmDog() { if (dog) { clearInterval(dog); dog = null; } }
 
   function clearMarks() {
     var els = document.querySelectorAll(".is-reading,.sent.on");
@@ -242,11 +276,27 @@
     queue = []; qi = 0; current = null; api.tag = null;
     paused = false; held = null;
     if (keep) { clearInterval(keep); keep = null; }
+    disarmDog(); current = null;
     try { speechSynthesis.cancel(); } catch (e) {}
     clearMarks();
     if (api.speaking) { api.speaking = false; fire(); }
   }
   api.stop = stop;
+
+  /* --- אמירה קצרה, בלי תור --------------------------------------
+     תווית של כפתור (O-28): אותו קול ואותו קצב כמו בהקראה, אבל בלי
+     stopbar, בלי keepalive ובלי סימון "on" — משפט אחד וזהו. שותקת
+     כשההקראה עצמה מדברת. */
+  api.say = function (text) {
+    text = String(text || "").trim();
+    if (!text || !supported() || api.speaking) return;
+    try { if (speechSynthesis.speaking || speechSynthesis.pending) return; } catch (e) {}
+    var v = bestVoice(), u = new SpeechSynthesisUtterance(text);
+    if (v) u.voice = v;
+    u.lang = v ? normLang(v.lang) : LANG;
+    u.rate = Math.max(0.5, Math.min(2, RATE_BASE * api.rate));
+    try { speechSynthesis.speak(u); } catch (e) {}
+  };
 
   function step(my) {
     if (my !== token) return;
@@ -261,21 +311,52 @@
     u.lang = v ? normLang(v.lang) : LANG;
     u.rate = Math.max(0.5, Math.min(2, RATE_BASE * api.rate));
     u.pitch = 1;
-    u.onend = function () {
-      if (my !== token) return;
+    /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
+       יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+    var moved = false;
+    function advance(gap) {
+      if (moved || my !== token) return;
+      moved = true; disarmDog();
       /* אנדרואיד מתעלם מ-pause. לכן גם דגל משלנו: מנוע שמכבד
          יישתק מיד, ומי שלא — יסיים את המקטע הנוכחי ויעצור כאן. */
       if (paused) { held = function () { step(my); }; return; }
-      setTimeout(function () { if (!paused) step(my); else held = function () { step(my); }; }, SEG_GAP);
-    };
+      setTimeout(function () { if (!paused) step(my); else held = function () { step(my); }; }, gap);
+    }
+    u.onend = function () { advance(SEG_GAP); };
     /* שגיאה באמצע רצף אינה סיבה לשתוק עד הסוף: ממשיכים למקטע הבא,
        ורק אם כולם נכשלו המשתמש רואה שדבר לא קרה. */
-    u.onerror = function () {
-      if (my !== token) return;
-      setTimeout(function () { step(my); }, 60);
+    u.onerror = function (ev) {
+      if (moved || my !== token) return;
+      var err = (ev && ev.error) || "";
+      if (err === "canceled" || err === "interrupted") { moved = true; disarmDog(); return; }
+      /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. מכבים אותו
+         וחוזרים על אותו מקטע, פעם אחת בסשן, במקום לדלג עליו —
+         דילוג כזה בולע משפט שלם והתלמיד לא יודע שהוא פספס אותו. */
+      if (!netRetried && v && v.localService === false) {
+        netRetried = true; netVoiceOK = false;
+        moved = true; disarmDog(); current = null;
+        qi--;                          /* אותו מקטע, קול אחר */
+        setTimeout(function () { step(my); }, 60);
+        return;
+      }
+      advance(60);
     };
-    current = u;
-    try { speechSynthesis.speak(u); } catch (e) { stop(); }
+    current = u;                       /* מגן מפני איסוף זבל */
+    try { if (speechSynthesis.paused && !paused) speechSynthesis.resume(); } catch (e) {}
+    try { speechSynthesis.speak(u); } catch (e) { stop(); return; }
+    /* שומר זמן: יש מכשירים שבהם onend פשוט לא נורה, והתור נתקע
+       עם כפתור שנשאר על "עצירה". ארבע שניות שבהן המנוע לא מדבר
+       ולא ממתין — והשהיה מכוונת אינה נספרת — נחשבות סוף. */
+    disarmDog();
+    var idle = 0;
+    dog = setInterval(function () {
+      if (moved || my !== token) { disarmDog(); return; }
+      if (paused) { idle = 0; return; }
+      var busy = false;
+      try { busy = !!(speechSynthesis.speaking || speechSynthesis.pending); } catch (e) {}
+      if (busy) { idle = 0; return; }
+      if (++idle >= 4) advance(0);
+    }, 1000);
   }
 
   /* --- ההפעלה מבחוץ ---------------------------------------------
@@ -301,8 +382,11 @@
         });
       });
       api.speaking = true; fire();
-      if (keep) clearInterval(keep);
-      keep = setInterval(function () {
+      if (keep) { clearInterval(keep); keep = null; }
+      /* הפינג הזה פותר באג של Chrome ושל Edge בשולחן העבודה בלבד.
+         במובייל אין את הבאג, ו-pause+resume דווקא מקרטע שם — עד
+         כאן הוא רץ גם שם. */
+      if (NEEDS_KEEPALIVE) keep = setInterval(function () {
         /* כרום עוצר הקראה ארוכה. resume על תור פעיל אינו מזיק.
            אבל כשהמשתמש השהה בעצמו — הפינג הזה היה מחזיר את הקול
            תוך ארבע שניות, כלומר מבטל את הכפתור שהוא הרגע לחץ. */

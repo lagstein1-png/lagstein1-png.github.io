@@ -14,7 +14,11 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const APP = path.join(ROOT, 'bagrut-806', 'app.js');
-const DATA = path.join(ROOT, 'bagrut-806', 'data', 'exams.js');
+/* נתיב תוכן חלופי כארגומנט — כך אפשר להריץ את הבודק על מקרה מבחן
+   ולראות אותו נופל. בדיקה שלא נראתה נכשלת אינה בדיקה. */
+const DATA = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.join(ROOT, 'bagrut-806', 'data', 'exams.js');
 
 /* --- התוכן ------------------------------------------------------ */
 const win = {};
@@ -80,6 +84,21 @@ const has = v => str(v).length > 0;
    `$` הוא תוחם נוסחה. שניהם לא אמורים להיאמר בקול. */
 const looksLatex = s => /[\\$]/.test(String(s || ''));
 
+/* אוצר המילים של הנושאים — רשימה סגורה בכוונה.
+
+   `recordResult` שומר את דוח הנושאים החלשים כ-`d.weak[q.topic]`,
+   כלומר מחרוזת הנושא היא המפתח. שני שמות לאותו נושא מפצלים תלמיד
+   אחד לשתי שורות, וכל מחצית עלולה ליפול מתחת לסף ולא להיות מסומנת
+   כלל — כך היה כאן עם ״אינטגרל״ מול ״חשבון אינטגרלי״ ועם ״חקירת
+   פונקציה״ מול ״חשבון דיפרנציאלי״.
+
+   נושא חדש מוסיפים כאן ביד. זו לא בירוקרטיה: הוספה מודעת היא
+   בדיוק מה שמונע את הסחיפה, ושם שנכתב בהיסח הדעת נתפס. */
+const TOPICS = [
+  'הסתברות', 'סדרות', 'חשבון דיפרנציאלי', 'חשבון אינטגרלי',
+  'טריגונומטריה', 'גדילה ודעיכה', 'גאומטריה אנליטית', 'בעיות קיצון'
+];
+
 /* --- 1. שלמות הסכימה, 2. latex בלי speech, 3. תשובה שנבדקת מול עצמה --- */
 const ids = new Set();
 for (const ex of EXAMS) {
@@ -111,6 +130,10 @@ for (const ex of EXAMS) {
     else numbers.add(q.number);
 
     if (!has(q.topic)) fail('אין topic — דוח הנושאים החלשים נבנה ממנו');
+    else if (TOPICS.indexOf(str(q.topic)) < 0)
+      fail('topic "' + str(q.topic) + '" אינו באוצר המילים. שם נרדף לנושא ' +
+        'קיים מפצל את דוח הנושאים החלשים לשתי שורות. ' +
+        'אם זה באמת נושא חדש — להוסיף אותו ל-TOPICS ב-exam806.js');
     if (!has(q.text)) fail('אין text');
     else if (looksLatex(q.text)) fail('ב-text יש סימני LaTeX. הנוסחאות שייכות ל-latex');
 
@@ -159,6 +182,15 @@ for (const ex of EXAMS) {
           if (!tol && !Number.isInteger(fa.value))
             note('tolerance 0 על תשובה שאינה שלמה (' + fa.value + ') — מי שעיגל ייפסל');
           if (tol < 0) fail('tolerance שלילי');
+          /* `checkAnswer` יוצא בענף המספרי לפני שהוא מגיע ל-accept,
+             ולכן accept על מספר אינו נקרא כלל. מי שכתב אותו מאמין
+             שהוא הרחיב את מה שמתקבל, וזה בדיוק סוג הבאג שאינו
+             מתפוצץ: נבדק בפועל — accept:["חמש"] על value 5 מחזיר
+             false. הסובלנות במספרים היא tolerance, ו-parseNum כבר
+             מקבל שבר, אחוז ופסיק עשרוני בלי שיירשמו. */
+          if (fa.accept != null)
+            fail('accept על type:"number" אינו נקרא — checkAnswer מכריע לפי tolerance. ' +
+              'שבר, אחוז ופסיק עשרוני כבר מתקבלים ב-parseNum');
           /* טווח שבולע חצי מהתשובה מקבל גם מסלולי פתרון שגויים */
           if (tol > 0 && Math.abs(fa.value) > 0 && tol >= Math.abs(fa.value) * 0.5)
             fail('tolerance ' + tol + ' רחב מחצי מהתשובה (' + fa.value + ') — הוא יקבל גם פתרון שגוי');
@@ -170,9 +202,53 @@ for (const ex of EXAMS) {
         if (!has(fa.value)) fail('finalAnswer.value ריק');
         else if (!checkAnswer(fa, fa.value).ok)
           fail('התשובה הרשומה עצמה נכשלת ב-checkAnswer של האפליקציה');
+        /* כאן עמדה בדיקה שהזינה כל ניסוח מ-accept חזרה ל-checkAnswer
+           וציפתה שיתקבל. היא לא יכלה להיכשל לעולם: `checkAnswer`
+           בונה את רשימת המותרים כ-`[value].concat(accept)` ואז
+           מנרמל אותה, ולכן כל איבר ברשימה מתקבל מעצם היותו בה.
+           בדיקה שהתשובה עליה היא תמיד "כן" נראית כמו רשת ביטחון
+           ואינה אחת.
+
+           מה שכן יכול להישבר הוא ההפך: ניסוח שמנורמל בדיוק כמו
+           ה-`value` או כמו ניסוח קודם ברשימה. הוא נראה כמו סובלנות
+           נוספת, הוא נספר בעין ככזה, ואינו מוסיף ולו תשובה אחת
+           שלא התקבלה קודם. נבדק בפועל מול הקוד: "עולה.", "עולה!!"
+           ו-"  עולה  " כולם מנורמלים ל-"עולה".
+
+           זו הערה ולא ממצא, בכוונה: התלמיד שכותב את הניסוח הזה
+           **כן** מתקבל — דרך ה-`value`. מה שנשבר הוא רק האמונה של
+           מי שכתב את הרשימה, שסבר שהוסיף ניסוח וקיבל שורה מתה.
+           דבר שאינו פוגע בתלמיד אינו מצדיק חבילת בדיקות אדומה. */
+        const norm = fa.type === 'expression' ? sandbox.normExpr : sandbox.normText;
+        const seen = new Map([[norm(fa.value), 'value']]);
         for (const a of (fa.accept || [])) {
-          if (!checkAnswer(fa, a).ok)
-            fail('הניסוח החלופי "' + a + '" ב-accept נדחה על ידי checkAnswer');
+          if (typeof a !== 'string') { fail('accept מכיל ערך שאינו מחרוזת'); continue; }
+          const k = norm(a);
+          if (seen.has(k))
+            note('הניסוח "' + a + '" ב-accept זהה ל-' + seen.get(k) +
+              ' אחרי נרמול — שורה שאינה מוסיפה תשובה');
+          else seen.set(k, '"' + a + '"');
+        }
+      }
+
+      /* --- reject: המסלול השגוי, כבדיקת רגרסיה ---------------------
+         הליקוי היקר ביותר בקובץ הזה אינו תשובה שגויה אלא תשובה
+         *נכונה* שמגיעים אליה בדרך שגויה, והוא נמצא כאן פעמיים ביד:
+         ב-60 מעלות מתקיים 2bc·cos A = bc בדיוק, ולכן משפט הקוסינוסים
+         התכווץ ותלמיד שהתעלם מהקוסינוס קיבל את מלוא הנקודות; ובשאלת
+         השטח הכלוא, תחום שבו הפונקציה חיובית לכל אורכו נתן שטח ששווה
+         לאינטגרל, ולכן מי שלא פיצל צדק.
+
+         שני אלה תוקנו, ושום בדיקה לא הייתה תופסת אם הם היו חוזרים.
+         `reject` הוא הדרך לרשום את המסלול השגוי בתוך התוכן עצמו:
+         כל מחרוזת כאן חייבת להידחות על ידי checkAnswer. tolerance
+         שיתרחב מתישהו ויבלע את הטעות — ייפול כאן. השדה רשות. */
+      if (s.reject != null) {
+        if (!Array.isArray(s.reject)) fail('reject אינו מערך');
+        else for (const w of s.reject) {
+          if (typeof w !== 'string') { fail('reject מכיל ערך שאינו מחרוזת'); continue; }
+          if (checkAnswer(fa, w).ok)
+            fail('reject: "' + w + '" מתקבל כתשובה נכונה — המסלול השגוי שוב מזכה');
         }
       }
 
@@ -189,14 +265,29 @@ for (const ex of EXAMS) {
       });
 
       /* רמז שמכיל את התשובה הסופית פותר במקום התלמיד. מספר
-         שכבר מופיע בנתוני השאלה אינו ממצא — הוא נתון, לא תשובה. */
+         שכבר מופיע בנתוני השאלה אינו ממצא — הוא נתון, לא תשובה.
+
+         וההתאמה נעשית בגבולות מספר ולא כתת־מחרוזת: התשובה 80
+         נמצאת בתוך 180, ורמז שאומר ״סכום הזוויות במשולש הוא 180
+         מעלות״ נדלק בטעות. חיפוש תת־מחרוזת על מספרים מייצר ממצא
+         כוזב בכל פעם שהתשובה היא סיפא או רישא של מספר אחר. */
       if (fa && has(fa.value !== undefined ? String(fa.value) : '')) {
         const ans = String(fa.value).trim();
+        const inside = (hay) => {
+          let from = 0, at;
+          while ((at = hay.indexOf(ans, from)) >= 0) {
+            const before = hay[at - 1], after = hay[at + ans.length];
+            const digit = c => c !== undefined && /[0-9.,]/.test(c);
+            if (!digit(before) && !digit(after)) return true;
+            from = at + 1;
+          }
+          return false;
+        };
         const given = (str(q.text) + ' ' + str(s.text) + ' ' + str(q.latex) + ' ' + str(s.latex));
-        const distinctive = ans.length >= 2 && given.indexOf(ans) < 0;
+        const distinctive = ans.length >= 2 && !inside(given);
         if (distinctive) {
           steps.forEach((st, i) => {
-            if (str(st.hint).indexOf(ans) >= 0)
+            if (inside(str(st.hint)))
               fail('שלב ' + (i + 1) + ': ה-hint מכיל את התשובה הסופית (' + ans + ')');
           });
         }

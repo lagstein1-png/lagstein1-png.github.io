@@ -7,6 +7,15 @@
 #   .claude/spy.sh "תקן את X"      אותו דבר עם פרומפט פתיחה
 #   .claude/spy.sh --last          רק סכם את הסשן האחרון, בלי להריץ חדש
 #   .claude/spy.sh --show          רק הדפס את התמליל הקריא, בלי לסכם
+#   .claude/spy.sh --live          סשן חדש עם פרשנות תוך כדי ריצה
+#
+# פרשנות חיה
+# ----------
+# --live מריץ ברקע את .claude/spy-live.js, שקורא את התמליל תוך כדי
+# כתיבתו ומסביר מדי כמה אירועים מה קורה. ההסבר אינו מודפס לטרמינל
+# של הסשן — הממשק של Claude Code מצייר את המסך מחדש והיה דורס אותו —
+# אלא נכתב לקובץ. פותחים טרמינל שני ומריצים tail -f עליו.
+# כל הסבר הוא קריאה נוספת ל-claude, ולכן הוא עולה כסף.
 #
 # למה זה לא `claude | tee`
 # ------------------------
@@ -24,7 +33,10 @@ set -u
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SPY="$HERE/spy.js"
 
-PROMPT='אתה מרגל שצפה בסשן פיתוח. לפניך תמליל שלו.
+# הסימון בפרומפט יושב בשורה הראשונה של התמליל שקריאת הסיכום מייצרת,
+# אם היא מייצרת אחד, ו-spy.js מדלג על תמליל כזה. בלעדיו --last היה
+# מסכם את הסיכום הקודם במקום את הסשן.
+PROMPT='אתה מרגל שצפה בסשן פיתוח (SPY-TRANSCRIPT-IGNORE). לפניך תמליל שלו.
 תסביר בעברית פשוטה, בלי מושגים טכניים, ובלי להמציא שום פרט שאינו בתמליל:
 1. מה ניסינו לעשות?
 2. מה הסוכן עשה צעד אחר צעד?
@@ -55,17 +67,35 @@ summarize() {                      # $1 = מזהה סשן, או ריק ל"אחר
   return $rc
 }
 
+LIVE=0
 case "${1:-}" in
   --last)  shift; summarize ""; exit $? ;;
   --show)  shift; SHOW_ONLY=1; summarize ""; exit $? ;;
+  --live)  shift; LIVE=1 ;;
 esac
 
 # מזהה סשן מקובע מראש, כדי לדעת אחר כך איזה קובץ תמליל לקרוא
 SID="$(node -e 'console.log(require("crypto").randomUUID())')" || exit 1
 
+WATCHER=""
+if [ "$LIVE" = 1 ]; then
+  # שם קבוע ולא מקרי, כדי שאפשר יהיה לפתוח את ה-tail עוד לפני שהסשן עולה
+  LOG="${SPY_LOG:-${TMPDIR:-/tmp}/claude-spy-live.txt}"
+  : > "$LOG" || exit 1
+  node "$HERE/spy-live.js" "$SID" >> "$LOG" 2>&1 &
+  WATCHER=$!
+  echo "spy: פרשנות חיה נכתבת אל $LOG"
+  echo "spy: בטרמינל שני הריצו:  tail -f $LOG"
+fi
+
 # בלי צינור ובלי tee: ה-TTY נשאר של Claude, והתמליל נכתב בצד
 claude --session-id "$SID" "$@"
 RC=$?
+
+if [ -n "$WATCHER" ]; then
+  kill -TERM "$WATCHER" 2>/dev/null   # הוא מסכם את מה שנשאר ואז יוצא
+  wait "$WATCHER" 2>/dev/null
+fi
 
 summarize "$SID"
 exit $RC

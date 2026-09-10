@@ -3,8 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>יהושע לגשטיין — אפליקציות לימוד</title>
-<meta name="description" content="תשע אפליקציות לימוד חינמיות: מתמטיקה מהיסודי ועד התואר, אנגלית, היסטוריה, מקריא קולי ותאוריה. הכול עם הקראה קולית, בלי הרשמה ובלי עלות.">
+<title>למידה שנשמעת — אפליקציות לימוד</title>
+<meta name="description" content="שתים־עשרה אפליקציות לימוד: מתמטיקה מהיסודי ועד התואר, אנגלית, היסטוריה, מקריא קולי ותאוריה. הכול עם הקראה קולית. ארבע חינם לתמיד, שמונה בתשלום.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="למידה שנשמעת — אפליקציות לימוד">
+<meta property="og:description" content="שתים־עשרה אפליקציות לימוד: מתמטיקה מהיסודי ועד התואר, אנגלית, היסטוריה, מקריא קולי ותאוריה. הכול עם הקראה קולית. ארבע חינם לתמיד, שמונה בתשלום.">
+<meta property="og:url" content="https://lagstein1-png.github.io/">
+<meta property="og:image" content="https://lagstein1-png.github.io/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="license" href="/legal/">
@@ -12,7 +20,8 @@
 <meta name="theme-color" content="#0b0f17" media="(prefers-color-scheme:dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="launch.css?v=1">
 <style>
 /* ============================================================
    דף הבית. ערכי הצבע נתונים ואינם משתנים לפי מצב — רק נדרסים
@@ -58,6 +67,12 @@ html[lang="ar"] body,html[lang="ar"] .lang button,html[lang="ar"] .chip,
 html[lang="ar"] .btn,html[lang="ar"] .t{
   font-family:"Noto Sans Arabic",Heebo,"Segoe UI",system-ui,Arial,sans-serif;
 }
+/* וגם לא קיריליים. הרוסית נפלה לאותו מקום, ונמדדה ב-7.9 — Noto Sans
+   נטען מאותה בקשה, ונמשך רק כשבאמת מוצג טקסט רוסי. */
+html[lang="ru"] body,html[lang="ru"] .lang button,html[lang="ru"] .chip,
+html[lang="ru"] .btn,html[lang="ru"] .t{
+  font-family:"Noto Sans",Heebo,"Segoe UI",system-ui,Arial,sans-serif;
+}
 .wrap{max-width:1080px; margin-inline:auto; padding-inline:clamp(14px,4vw,26px)}
 .sr{position:absolute; inline-size:1px; block-size:1px; overflow:hidden; clip-path:inset(50%)}
 .skip{
@@ -77,11 +92,24 @@ html[lang="ar"] .btn,html[lang="ar"] .t{
   display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px;
   min-block-size:64px; padding-block:8px;
 }
+/* המעטפת היא פריט ה-flex ולא הקישור עצמו. בסיס 0 אומר לסרגל שהלוגו
+   דורש רק את המילה הארוכה שלו (min-inline-size:auto), ולכן שם ארוך
+   נשבר לשתי שורות בתוך המקום שנשאר במקום לדחוק את הניווט לשורה
+   שנייה — ברוסית ״Учёба, которую слышно״ הוא 288px, ועם הניווט הרוסי
+   זה עבר את 1080px ושבר את הסרגל. הקישור עצמו נשאר צמוד לתוכן ולא
+   נמתח על כל הרווח. */
+.logo-slot{flex:1 1 0; margin-inline-end:auto}
 .logo{
-  display:flex; align-items:center; gap:11px; text-decoration:none;
-  color:inherit; font-weight:800; font-size:1.05rem; margin-inline-end:auto;
-  min-block-size:44px;
+  display:inline-flex; align-items:center; gap:11px; text-decoration:none;
+  color:inherit; font-weight:800; font-size:1.05rem; line-height:1.15;
+  min-block-size:44px; max-inline-size:100%;
 }
+/* שם האתר: ״למידה שנשמעת״, ובאנגלית Learning That Sounds — השם של
+   האתר בוויקס (5.9.2026). מתחת ל-1000px השם מוסתר והסמל נשאר: נמדד
+   בכרום — ב-721px נשארו לשם 16px באנגלית, וב-360px לוגו + ארבע שפות +
+   מצב כהה לא נכנסו וכפתור מצב כהה נדחק לשורה משלו. הקישור שומר על
+   שם נגיש ב-paint() גם כשהטקסט מוסתר. */
+@media (max-width:999px){#me{display:none}}
 .mark{
   inline-size:38px; block-size:38px; border-radius:12px; flex:none;
   display:grid; place-items:center; color:var(--brand-ink);
@@ -106,27 +134,51 @@ html[lang="ar"] .btn,html[lang="ar"] .t{
   .logo{font-size:.98rem; gap:8px; min-block-size:44px}
   .mark{inline-size:34px; block-size:34px; border-radius:11px}
   .mark svg{inline-size:20px; block-size:20px}
-  .lang{padding:2px}
-  .lang button{min-block-size:44px; min-inline-size:44px; padding-inline:6px; font-size:.8rem}
   .ico{min-block-size:44px; min-inline-size:44px; border-radius:11px}
-  .nav{
-    order:9; inline-size:100%; flex-wrap:nowrap; overflow-x:auto;
-    scrollbar-width:none; padding-block-end:2px;
-  }
-  .nav::-webkit-scrollbar{display:none}
-  .nav a{flex:none; min-block-size:44px; font-size:.9rem}
-  section.blk{scroll-margin-block-start:120px}
+  /* הניווט נשבר לשורה שנייה ולא נגלל: גלילה לרוחב עם פס גלילה מוסתר
+     חתכה את הפריט האחרון — "צרו קשר" בעברית, Contact באנגלית — בלי
+     שום רמז שיש עוד. */
+  .nav{order:9; inline-size:100%; flex-wrap:wrap; gap:0 2px}
+  .nav a{flex:none; min-block-size:44px; font-size:.9rem; padding-inline:8px}
 }
 
 /* --- כפתורי שפה ומצב כהה --- */
-.lang{display:flex; gap:4px; background:var(--bg-elev);
-  border:1px solid var(--line); border-radius:999px; padding:3px}
+/* ארבעה לחצנים נפרדים, כל אחד לבדו, עם השם המלא של השפה — כמו בשער
+   התנאים ובהגדרות של כל אפליקציה. הגלולה המחוברת עם "עב · ع · Ру · EN"
+   ערבבה ארבעה כתבים בארבעה גדלים בשורה אחת, ותפריט נפתח הסתיר אותן. */
+.lang{display:flex; gap:6px; flex-wrap:wrap}
 .lang button{
-  min-block-size:44px; min-inline-size:44px; padding-inline:10px; border:0;
-  border-radius:999px; background:none; color:var(--text-soft); cursor:pointer;
-  font:700 .86rem/1 Heebo,system-ui,sans-serif;
+  min-block-size:44px; padding-inline:12px; border:1px solid var(--line);
+  border-radius:12px; background:var(--bg-elev); color:var(--text-soft);
+  cursor:pointer; font:700 .9rem/1 Heebo,system-ui,sans-serif;
 }
-.lang button[aria-pressed="true"]{background:var(--brand); color:var(--brand-ink)}
+.lang button:hover{color:var(--text); border-color:color-mix(in srgb,var(--brand) 45%,var(--line))}
+.lang button[aria-pressed="true"]{background:var(--brand); color:var(--brand-ink); border-color:var(--brand)}
+/* Heebo אינו מכיל ערבית ואינו מכיל קירילית. הגופן נקבע לפי lang של
+   הלחצן עצמו ולא לפי שפת הדף — "العربية" ו-"Русский" מופיעות בכל שפה.
+   בלי זה הן נופלות לגופן ברירת המחדל של המערכת, שהמידות שלו אחרות,
+   והלחצן נראה בגודל אחר משלושת האחרים. הכלל של html[lang=…] שלמעלה
+   אינו מכסה את זה: הוא חל רק כשהדף כולו באותה שפה. */
+.lang button[lang="ar"]{font-family:"Noto Sans Arabic",Heebo,system-ui,sans-serif}
+.lang button[lang="ru"]{font-family:"Noto Sans",Heebo,system-ui,sans-serif}
+/* בטלפון ארבעת הלחצנים בשורה משלהם, ברוחב שווה. נמדד בכרום ב-360px:
+   כשחלקו שורה עם הסמל וכפתור מצב כהה כל לחצן קיבל 59px, "Русский"
+   ו-"English" נחתכו, וכפתור מצב כהה נדחק לשורה משלו. שלוש שורות
+   (סמל, שפות, ניווט) הן 160px — ולכן בטלפון הסרגל אינו דביק, אלא
+   נגלל עם הדף. */
+@media (max-width:720px){
+  .topbar{position:static}
+  .lang{order:8; inline-size:100%; flex:none; gap:6px; flex-wrap:nowrap}
+  .lang button{flex:1; min-inline-size:0; padding-inline:6px; font-size:.86rem}
+  section.blk{scroll-margin-block-start:16px}
+}
+@media (max-width:340px){.lang button{font-size:.8rem; padding-inline:3px}}
+/* ברוסית במחשב הכול לא נכנס בשורה אחת בשום רוחב — נמדד בכרום: שם האתר
+   142 + ניווט 517 + ארבעה לחצנים 337 + מצב כהה 44 + רווחים 48 = 1088,
+   מול 1028 שיש בתוך הסרגל (מוגבל ל-1080). בלי זה השם נשבר לשלוש
+   שורות וכפתור מצב כהה נופל מתחת. ברוסית בלבד הניווט יורד לשורה משלו. */
+@media (min-width:721px){html[lang="ru"] .nav{order:9; inline-size:100%}}
+[hidden]{display:none !important}
 .ico{
   min-block-size:44px; min-inline-size:44px; border-radius:12px; cursor:pointer;
   border:1px solid var(--line); background:var(--bg-elev); color:var(--text-soft);
@@ -134,7 +186,10 @@ html[lang="ar"] .btn,html[lang="ar"] .t{
 }
 
 /* --- גיבור --- */
-.hero{position:relative; padding-block:clamp(34px,7vw,72px) clamp(22px,4vw,38px)}
+/* overflow-x:clip — הזוהר שלמטה חורג 24vw לכל צד, ובלי החיתוך הדף כולו
+   נגלל לרוחב ובטלפון הסרגל העליון זז יחד איתו. clip ולא hidden, כדי
+   שהציר האנכי יישאר visible. */
+.hero{position:relative; padding-block:clamp(34px,7vw,72px) clamp(22px,4vw,38px); overflow-x:clip}
 /* הזוהר הוא קישוט בלבד: 12% מצבע המותג על הרקע, הרחק מתחת לטקסט,
    ולכן אינו נוגע ביחס הניגודיות של אף מילה. */
 .hero::before{
@@ -268,6 +323,8 @@ section.blk{padding-block:clamp(26px,5vw,48px); scroll-margin-block-start:78px}
   background:color-mix(in srgb,var(--c) 14%,transparent); color:var(--c);
   border:1px solid color-mix(in srgb,var(--c) 26%,transparent);
 }
+/* תגית המחיר: מלאה בצבע התחום, כדי שתיבדל משאר התוויות במבט אחד */
+.t.price{background:var(--c); color:var(--brand-ink); border-color:var(--c); unicode-bidi:isolate}
 .go{
   margin-block-start:auto; position:relative; align-self:flex-start;
   display:inline-flex; align-items:center; gap:7px; min-block-size:44px;
@@ -284,6 +341,20 @@ section.blk{padding-block:clamp(26px,5vw,48px); scroll-margin-block-start:78px}
 html[dir="rtl"] .card:hover .go .arw{transform:translateX(-4px)}
 /* החץ מצביע לכיוון הקריאה. ב-RTL הוא מסתובב, ולא מוחלף בתו אחר —
    כך הוא נשאר אותו סימן גם כשהשפה מתחלפת. */
+/* שתי פעולות בכרטיס: להיכנס, ולהתקין את האפליקציה הזאת בנפרד.
+   ה-::after של .go פרוש על כל שטח הכרטיס, ולכן ההתקנה חייבת לשבת
+   מעליו — אחרת הלחיצה עליה נבלעת ומובילה לכניסה. */
+.act{margin-block-start:auto; display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px}
+.act .go{margin-block-start:0}
+.get{
+  position:relative; z-index:1;
+  display:inline-flex; align-items:center; gap:7px;
+  min-block-size:44px; padding-inline:13px; border-radius:12px;
+  border:1px solid var(--line); background:var(--bg);
+  color:var(--text-soft); font-weight:700; font-size:.95rem; text-decoration:none;
+}
+.get svg{inline-size:17px; block-size:17px; flex:none}
+.get:hover{color:var(--c); border-color:color-mix(in srgb,var(--c) 45%,transparent)}
 html[dir="ltr"] .arw{transform:scaleX(-1)}
 html[dir="ltr"] .card:hover .go .arw{transform:scaleX(-1) translateX(-4px)}
 
@@ -317,16 +388,26 @@ footer.site a,.lg-foot a,#contact .prose a{display:inline-flex; align-items:cent
 a:focus-visible,button:focus-visible,input:focus-visible{
   outline:3px solid var(--brand); outline-offset:2px; border-radius:8px;
 }
+/* פס מבצע ההשקה — אותו פס שבעמוד המחירים, אותם צבעים קבועים,
+   גם במצב כהה. הסרה בסיום המבצע: מוחקים את ה-div ואת הכלל הזה. */
+.launch-bar{background:#fff3cd; color:#664d03; text-align:center; padding:12px 16px;
+  font-weight:600; line-height:1.5; white-space:pre-line}
 @media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important}}
 </style>
 </head>
 <body>
 
+<!-- מבצע השקה — פס הודעה. עברית בלבד, בכוונה: הנוסח נמסר על ידי הבעלים
+     ומוצג כלשונו, והוא זהה לזה שבעמוד המחירים. בלעדיו הכרטיסים מציגים
+     מחיר בזמן שאין גבייה כלל. הסרה בסיום המבצע: מוחקים את ה-div. -->
+<div class="launch-bar" role="status" dir="rtl" lang="he">🎉 מבצע השקה: כל המסלולים פתוחים כעת ללא חיוב, עד להודעה חדשה.
+המחירים המוצגים ייכנסו לתוקף בסיום המבצע.</div>
+
 <a class="skip" href="#apps" id="skip"></a>
 
 <div class="topbar">
   <div class="wrap">
-    <a class="logo" href="#top"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg></span><span id="me"></span></a>
+    <div class="logo-slot"><a class="logo" href="#top"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg></span><span id="me"></span></a></div>
     <nav class="nav" id="nav" aria-label="ניווט ראשי"></nav>
     <div class="lang" id="lang" role="group"></div>
     <button class="ico" id="theme" type="button"></button>
@@ -343,8 +424,11 @@ a:focus-visible,button:focus-visible,input:focus-visible{
       <div class="cta">
         <a class="btn" href="#apps" id="ctaApps"></a>
         <a class="btn ghost" href="#contact" id="ctaContact"></a>
+        <button class="btn ghost" id="install" type="button" hidden></button>
       </div>
       <p class="noads" id="noads"></p>
+      <p class="noads"><a href="#homescreen" id="installLink"></a></p>
+      <p class="noads" id="edge" hidden></p>
     </header>
 
     <section class="stats" id="stats" aria-label="במספרים"></section>
@@ -368,6 +452,27 @@ a:focus-visible,button:focus-visible,input:focus-visible{
     <section class="blk" id="how">
       <h2 class="h2" id="howT"></h2>
       <div class="steps" id="steps"></div>
+    </section>
+
+    <!-- הוראות ההתקנה נמצאות בדף עצמו, ולא רק בסרגל הצף של protect.js:
+         הסרגל נעלם לתמיד אחרי ✕ אחד, ובדפדפן בלי beforeinstallprompt
+         (פיירפוקס, ספארי במחשב) הוא לא מופיע כלל. -->
+    <section class="blk" id="homescreen">
+      <h2 class="h2" id="installT"></h2>
+      <p class="prose" id="installLead"></p>
+      <div class="steps" id="installSteps"></div>
+    </section>
+
+    <!-- למה Edge: ההקראה בכל האפליקציות היא קול המערכת, ובווינדוס יש
+         לכרום קול עברי אחד ול-Edge קולות טבעיים. ההסבר יושב בדף עצמו,
+         כי מי שנכנס בכרום גילה את זה עד עכשיו רק בתוך האפליקציה. -->
+    <section class="blk" id="voices">
+      <h2 class="h2" id="voicesT"></h2>
+      <p class="prose" id="voicesLead"></p>
+      <div class="steps" id="voicesSteps"></div>
+      <!-- הלחצן יושב ב-.cta ולא ב-.prose: הכלל .prose a צובע קישור בצבע
+           המותג, ועל לחצן בצבע המותג הטקסט היה נעלם. -->
+      <div class="cta" id="voicesCta" hidden></div>
     </section>
 
     <section class="blk" id="about">
@@ -620,7 +725,7 @@ if(DEMO_ON){
    כל הטקסט של הדף — בארבע שפות, במקום אחד. אין מחרוזת מוטבעת
    בקוד שלמטה, ולכן החלפת שפה היא החלפת אובייקט ולא חיפוש בדף.
    ============================================================ */
-var DATA={"APPS":[{"id":"math-app","cat":"math","c":"math","n":{"he":"מתמטיקה לחכמים שמתקשים","ar":"رياضيات للأذكياء الذين يجدون صعوبة","ru":"Математика для умных, которым трудно","en":"Math for Smart Strugglers"},"d":{"he":"ארבע פעולות החשבון, צעד אחר צעד, עם חיית מחמד ובלי לחץ של זמן.","ar":"العمليات الحسابية الأربع، خطوة بخطوة، مع حيوان أليف وبلا ضغط وقت.","ru":"Четыре действия, шаг за шагом, с питомцем и без давления времени.","en":"The four operations, step by step, with a pet and no time pressure."},"t":["tRead","tTeacher","tLangs"],"k":"יסודי חטיבה חיבור חיסור כפל חילוק math primary"},{"id":"math-teen","cat":"math","c":"math","n":{"he":"שלב — מתמטיקה לתיכון","ar":"شلاف — رياضيات للثانوية","ru":"Шлав — математика для старших классов","en":"Shlav — secondary maths"},"d":{"he":"פתרון מודרך, זיהוי הטעות המדויקת ודף נוסחאות מלא.","ar":"حلّ موجَّه، تحديد الخطأ بدقّة، وورقة قوانين كاملة.","ru":"Пошаговое решение, точное определение ошибки и полный лист формул.","en":"Guided solutions, the exact mistake named, and a full formula sheet."},"t":["tRead","tTeacher"],"k":"תיכון בגרות אלגברה גאומטריה"},{"id":"math-uni","cat":"math","c":"math","n":{"he":"אקסיומה — תואר, שנה א׳","ar":"أكسيوما — السنة الأولى","ru":"Аксиома — первый курс","en":"Axioma — first year"},"d":{"he":"חדו״א, אלגברה לינארית והסתברות — ההסברים מלאים בארבע שפות.","ar":"التفاضل والتكامل، الجبر الخطّي والاحتمالات — بشرح كامل بأربع لغات.","ru":"Матанализ, линейная алгебра и теория вероятностей — с полными объяснениями.","en":"Calculus, linear algebra and probability, explained in full."},"t":["tRead","tTeacher","tLangs"],"k":"אוניברסיטה חדוא לינארית הסתברות"},{"id":"math-uni2","cat":"math","c":"math","n":{"he":"אקסיומה ב׳ — שנה שנייה","ar":"أكسيوما ٢ — السنة الثانية","ru":"Аксиома II — второй курс","en":"Axioma II — second year"},"d":{"he":"חדו״א 2, לינארית 2, משוואות דיפרנציאליות והסתברות.","ar":"التفاضل ٢، الجبر الخطّي ٢، المعادلات التفاضلية والاحتمالات.","ru":"Матанализ 2, линейная алгебра 2, дифференциальные уравнения.","en":"Calculus 2, linear algebra 2, differential equations and probability."},"t":["tRead","tTeacher","tLangs"],"k":"אוניברסיטה מדר משוואות דיפרנציאליות"},{"id":"math-uni3","cat":"math","c":"math","n":{"he":"אקסיומה ג׳ — שנה שלישית","ar":"أكسيوما ٣ — السنة الثالثة","ru":"Аксиома III — третий курс","en":"Axioma III — third year"},"d":{"he":"אנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית.","ar":"التحليل، الدوال المركّبة، الجبر المجرّد والتحليل العددي.","ru":"Анализ, комплексные функции, абстрактная алгебра и численные методы.","en":"Analysis, complex functions, abstract algebra and numerical analysis."},"t":["tRead","tTeacher","tLangs"],"k":"אוניברסיטה אנליזה מרוכבות נומרית"},{"id":"bagrut-806","cat":"math","c":"math","n":{"he":"806 — בגרות במתמטיקה, 5 יח״ל","ar":"٨٠٦ — بجروت رياضيات، ٥ وحدات","ru":"806 — багрут по математике, 5 единиц","en":"806 — matriculation maths, 5 units"},"d":{"he":"סימולציית בחינה עם שעון, ותרגול מודרך שבו הרמזים נחשפים אחד־אחד.","ar":"محاكاة امتحان بساعة، وتدريب موجَّه تُكشف فيه التلميحات واحدًا تلو الآخر.","ru":"Симуляция экзамена с таймером и разбор, где подсказки открываются по одной.","en":"A timed mock exam, and guided practice where hints open one at a time."},"t":["tRead"],"k":"בגרות 806 חמש יחידות תיכון סימולציה bagrut matriculation"},{"id":"ulpan","cat":"lang","c":"lang","n":{"he":"אולפן — עברית מעשית לעולים חדשים","ar":"أولبان — عبرية عملية للقادمين الجدد","ru":"Ульпан — практический иврит для репатриантов","en":"Ulpan — practical Hebrew for new arrivals"},"d":{"he":"קופת חולים, בנק וטופס — המילים שעוצרות את היום, עם ניקוד והקראה.","ar":"العيادة والبنك والاستمارة — الكلمات التي توقف يومك، مع تشكيل وقراءة صوتية.","ru":"Поликлиника, банк и бланк — слова, на которых встаёт день, с огласовкой и озвучиванием.","en":"The clinic, the bank and the form — the words that stop your day, with vowel points and read-aloud."},"t":["tRead","tTeacher","tLangs"],"k":"עברית אולפן עולים חדשים שפה טפסים hebrew ulpan"},{"id":"english","cat":"lang","c":"lang","n":{"he":"ניב — אנגלית מדוברת וספרותית","ar":"نِيف — إنجليزية محكيّة وأدبيّة","ru":"Нив — английский разговорный и книжный","en":"Niv — spoken and written English"},"d":{"he":"כל מילה נשמעת לפני שהיא נקראת — אוצר מילים, שיחה והבנת הנקרא.","ar":"كلّ كلمة تُسمع قبل أن تُقرأ — مفردات ومحادثة وفهم مقروء.","ru":"Каждое слово сначала звучит — лексика, речь и понимание текста.","en":"Every word is heard before it is read — vocabulary, speech, comprehension."},"t":["tRead","tTeacher","tLangs"],"k":"אנגלית שפה קריאה דיבור english"},{"id":"history","cat":"lang","c":"lang","n":{"he":"מפנה — היסטוריה לחטיבה","ar":"مفنيه — التاريخ للمرحلة الإعدادية","ru":"Мифне — история для средней школы","en":"Mifne — history for middle school"},"d":{"he":"אירועים, סיבות ותוצאות, עם קטעי מקור ורמז בכל שאלה.","ar":"أحداث وأسباب ونتائج، مع نصوص مصدرية وتلميح في كلّ سؤال.","ru":"События, причины и следствия, с источниками и подсказкой к каждому вопросу.","en":"Events, causes and consequences, with sources and a hint on every question."},"t":["tRead","tTeacher","tLangs"],"k":"היסטוריה חטיבה מקורות תקופות"},{"id":"lomda","cat":"lang","c":"lang","n":{"he":"לומדה — מדע ואזרחות","ar":"لومدا — علوم ومدنيات","ru":"Ломда — наука и гражданское устройство","en":"Lomda — science and civics"},"d":{"he":"כל נושא נכנס כקובץ אחד: גילויים, מושגים וקטעי מקור, עם רמז בכל שאלה.","ar":"كل موضوع يدخل كملفّ واحد: اكتشافات ومفاهيم ونصوص، مع تلميح في كل سؤال.","ru":"Каждая тема — один файл: открытия, понятия и тексты, с подсказкой к каждому вопросу.","en":"Every topic is one file: discoveries, concepts and sources, with a hint on every question."},"t":["tRead","tTeacher","tLangs"],"k":"מדע אזרחות מושגים גילויים כנסת חוקי יסוד חיסונים אטום"},{"id":"reader","cat":"life","c":"life","n":{"he":"מקריא קולי","ar":"قارئ صوتي","ru":"Голосовой чтец","en":"Voice reader"},"d":{"he":"מדביקים טקסט בעברית, והוא נקרא בקול עם מעקב אחרי המילה הנאמרת.","ar":"تُلصق نصًّا بالعبرية فيُقرأ بصوت عالٍ مع تتبّع الكلمة المنطوقة.","ru":"Вставьте текст на иврите — он читается вслух с подсветкой слова.","en":"Paste Hebrew text and hear it read, with the spoken word tracked."},"t":["tRead"],"k":"הקראה דיסלקציה ניקוד טקסט reader"},{"id":"drivewise","cat":"life","c":"life","n":{"he":"תאוריה מדברת","ar":"نظرية ناطقة","ru":"Говорящая теория","en":"Talking Theory"},"d":{"he":"מאגר שאלות התאוריה המלא, עם הקראה מוקלטת של כל שאלה.","ar":"بنك أسئلة النظرية كاملًا، مع قراءة مسجّلة لكلّ سؤال.","ru":"Полный банк вопросов по теории с записанной озвучкой каждого.","en":"The full driving-theory question bank, every question recorded."},"t":["tRead"],"k":"תאוריה נהיגה רישיון theory"}],"STR":{"he":{"dirv":"rtl","me":"יהושע","nApps":"האפליקציות","nHow":"איך זה עובד","nAbout":"עליי","nContact":"צרו קשר","badge":"שתים־עשרה אפליקציות לימוד · חינם לגמרי · בארבע שפות","h1a":"למידה שנשמעת,","h1b":"מוסברת","h1c":"ומכבדת","lead":"אוסף כלים שבניתי לנוער ולסטודנטים — לקהל שמתקשה עם השפה העברית ולבעלי צרכי למידה מיוחדים. מתמטיקה מיסודי ועד תואר ובגרות 5 יח״ל, עברית לעולים חדשים, אנגלית, היסטוריה, מדע ואזרחות, מקריא קולי ותאוריה לנהיגה. בכל אפליקציה: הקראה של כל מילה, הסבר צעד־צעד, וקצב שנקבע על ידי הלומד.","noAds":"ללא הרשמה, ללא פרסומות","ctaApps":"לכל האפליקציות","ctaContact":"צרו קשר","s1":"אפליקציות לימוד","s2":"שפות ממשק","s3":"עם הקראה קולית","s4":"ללא עלות והרשמה","title":"האפליקציות שלי","sub":"סננו לפי תחום או חפשו בשם — הכול נפתח ישירות בדפדפן.","searchPh":"חיפוש… (למשל: חדו״א, אנגלית, תאוריה)","searchLabel":"חיפוש באפליקציות","langLabel":"בחירת שפה","catLabel":"סינון לפי תחום","all":"הכול","math":"מתמטיקה","lang":"שפות, מדעים ומדעי הרוח","life":"כלים לחיים","count":"{n} מתוך {t}","none":"לא נמצאה אפליקציה מתאימה. נסו לנקות את החיפוש.","enter":"כניסה","howT":"איך זה עובד","how1":"נכנסים לאפליקציה מהדפדפן. אין הורדה, אין הרשמה ואין חשבון.","how2":"בוחרים נושא ורמה. כל שאלה נקראת בקול, ואפשר לעצור ולחזור בכל רגע.","how3":"ההתקדמות נשמרת במכשיר שלכם בלבד ולא נשלחת לשום מקום.","aboutT":"עליי","about":"אני יהושע לגשטיין. בניתי את הכלים האלה מתוך עבודה עם לומדים שהחומר הקיים לא מדבר אליהם — מי שקורא לאט, מי שלומד בשפה שאינה שפת אמו, ומי שצריך לשמוע כדי להבין. כל אפליקציה כאן נבנתה סביב שאלה אחת: מה מוריד עומס מהלומד.","contactT":"צרו קשר","contactL":"לשאלות, הצעות ותקלות:","dark":"מצב כהה","light":"מצב בהיר","tRead":"הקראה","tTeacher":"מצב מורה","tLangs":"4 שפות","foot":"© 2026 יהושע לגשטיין","terms":"תנאי שימוש וזכויות יוצרים"},"ar":{"dirv":"rtl","me":"يهوشع","nApps":"التطبيقات","nHow":"كيف يعمل","nAbout":"عنّي","nContact":"اتّصلوا بنا","badge":"اثنا عشر تطبيقًا تعليميًّا · مجّانية تمامًا · بأربع لغات","h1a":"تعلُّم يُسمَع،","h1b":"ويُشرَح","h1c":"ويحترم","lead":"مجموعة أدوات بنيتها للشباب والطلاب — لمن يجد صعوبة في العبرية ولذوي احتياجات التعلّم الخاصة. رياضيات من الابتدائي حتى الجامعة وبجروت ٥ وحدات، عبرية للقادمين الجدد، إنجليزية، تاريخ، علوم ومدنيات، قارئ صوتي ونظرية السياقة. في كلّ تطبيق: قراءة كلّ كلمة، شرح خطوة بخطوة، وإيقاع يحدّده المتعلّم.","noAds":"بلا تسجيل وبلا إعلانات","ctaApps":"إلى كلّ التطبيقات","ctaContact":"اتّصلوا بنا","s1":"تطبيقات تعليمية","s2":"لغات واجهة","s3":"مع قراءة صوتية","s4":"بلا تكلفة وتسجيل","title":"تطبيقاتي","sub":"صنّفوا حسب المجال أو ابحثوا بالاسم — كلّ شيء يفتح في المتصفّح.","searchPh":"بحث… (مثلًا: تفاضل، إنجليزية، نظرية)","searchLabel":"بحث في التطبيقات","langLabel":"اختيار اللغة","catLabel":"تصنيف حسب المجال","all":"الكلّ","math":"رياضيات","lang":"لغات وعلوم","life":"أدوات للحياة","count":"{n} من {t}","none":"لا يوجد تطبيق مطابق. جرّبوا مسح البحث.","enter":"دخول","howT":"كيف يعمل","how1":"تدخلون التطبيق من المتصفّح. بلا تنزيل، بلا تسجيل، وبلا حساب.","how2":"تختارون موضوعًا ومستوى. كلّ سؤال يُقرأ بصوت، ويمكن التوقّف والعودة في أيّ لحظة.","how3":"التقدّم يُحفَظ على جهازكم وحده ولا يُرسل إلى أيّ مكان.","aboutT":"عنّي","about":"أنا يهوشع لچشطاين. بنيت هذه الأدوات من عمل مع متعلّمين لا تخاطبهم المواد القائمة — من يقرأ ببطء، ومن يتعلّم بلغة ليست لغته الأمّ، ومن يحتاج أن يسمع كي يفهم. كلّ تطبيق هنا بُني حول سؤال واحد: ما الذي يخفّف العبء عن المتعلّم.","contactT":"اتّصلوا بنا","contactL":"للأسئلة والاقتراحات والأعطال:","dark":"وضع داكن","light":"وضع فاتح","tRead":"قراءة صوتية","tTeacher":"وضع المعلّم","tLangs":"٤ لغات","foot":"© 2026 يهوشع لچشطاين","terms":"شروط الاستخدام وحقوق النشر"},"ru":{"dirv":"ltr","me":"Иехошуа","nApps":"Приложения","nHow":"Как это работает","nAbout":"Обо мне","nContact":"Связаться","badge":"Двенадцать учебных приложений · полностью бесплатно · на четырёх языках","h1a":"Учёба, которую слышно,","h1b":"объясняют","h1c":"и уважают","lead":"Набор инструментов, который я собрал для подростков и студентов — для тех, кому труден иврит, и для тех, у кого особые учебные потребности. Математика от начальной школы до университета и багрут, иврит для репатриантов, английский, история, наука и гражданское устройство, голосовой чтец и теория вождения. В каждом приложении: озвучивание каждого слова, пошаговое объяснение и темп, который задаёт сам учащийся.","noAds":"Без регистрации и без рекламы","ctaApps":"Ко всем приложениям","ctaContact":"Связаться","s1":"учебных приложений","s2":"языка интерфейса","s3":"с озвучиванием","s4":"без оплаты и регистрации","title":"Мои приложения","sub":"Отфильтруйте по области или найдите по названию — всё открывается в браузере.","searchPh":"Поиск… (например: анализ, английский, теория)","searchLabel":"Поиск по приложениям","langLabel":"Выбор языка","catLabel":"Фильтр по области","all":"Все","math":"Математика","lang":"Языки, науки и гуманитарные","life":"Инструменты для жизни","count":"{n} из {t}","none":"Ничего не найдено. Попробуйте очистить поиск.","enter":"Войти","howT":"Как это работает","how1":"Приложение открывается в браузере. Без загрузки, без регистрации и без аккаунта.","how2":"Выбираете тему и уровень. Каждый вопрос читается вслух, остановиться можно в любой момент.","how3":"Прогресс хранится только на вашем устройстве и никуда не отправляется.","aboutT":"Обо мне","about":"Я Иехошуа Лагштейн. Эти инструменты выросли из работы с учениками, к которым существующие материалы не обращаются: с теми, кто читает медленно, кто учится не на родном языке, кому нужно услышать, чтобы понять. Каждое приложение здесь построено вокруг одного вопроса: что снимает нагрузку с учащегося.","contactT":"Связаться","contactL":"Вопросы, предложения и неполадки:","dark":"Тёмная тема","light":"Светлая тема","tRead":"Озвучивание","tTeacher":"Режим учителя","tLangs":"4 языка","foot":"© 2026 Иехошуа Лагштейн","terms":"Условия использования и авторские права"},"en":{"dirv":"ltr","me":"Joshua","nApps":"Apps","nHow":"How it works","nAbout":"About","nContact":"Contact","badge":"Twelve learning apps · entirely free · in four languages","h1a":"Learning you can hear,","h1b":"that explains","h1c":"and respects","lead":"A set of tools I built for teenagers and students — for people who find Hebrew hard, and for people with particular learning needs. Maths from primary school to university and the 5-unit matriculation, Hebrew for new arrivals, English, history, science and civics, a voice reader and driving theory. In every one: every word read aloud, an explanation step by step, and a pace the learner sets.","noAds":"No sign-up, no adverts","ctaApps":"See all the apps","ctaContact":"Contact","s1":"learning apps","s2":"interface languages","s3":"with read-aloud","s4":"free, no sign-up","title":"My apps","sub":"Filter by subject or search by name — everything opens in the browser.","searchPh":"Search… (e.g. calculus, English, theory)","searchLabel":"Search the apps","langLabel":"Choose language","catLabel":"Filter by subject","all":"All","math":"Maths","lang":"Languages, sciences and humanities","life":"Everyday tools","count":"{n} of {t}","none":"Nothing matched. Try clearing the search.","enter":"Open","howT":"How it works","how1":"You open an app in the browser. Nothing to download, no sign-up, no account.","how2":"You choose a subject and a level. Every question is read aloud, and you can stop and go back whenever you like.","how3":"Progress is kept on your device alone and is not sent anywhere.","aboutT":"About","about":"I am Joshua Lagstein. These tools came out of working with learners the existing material does not speak to — people who read slowly, people studying in a language that is not their first, and people who need to hear something to understand it. Every app here was built around one question: what takes load off the learner.","contactT":"Contact","contactL":"Questions, suggestions and faults:","dark":"Dark mode","light":"Light mode","tRead":"Read-aloud","tTeacher":"Teacher mode","tLangs":"4 languages","foot":"© 2026 Joshua Lagstein","terms":"Terms of use and copyright"}}};
+var DATA={"APPS":[{"id":"math-app","cat":"math","c":"math","n":{"he":"חשבון ליסודי","ar":"الحساب للمرحلة الابتدائية","ru":"Арифметика для начальной школы","en":"Arithmetic for Primary School"},"d":{"he":"ארבע פעולות החשבון, צעד אחר צעד, עם חיית מחמד ובלי לחץ של זמן.","ar":"العمليات الحسابية الأربع، خطوة بخطوة، مع حيوان أليف وبلا ضغط وقت.","ru":"Четыре действия, шаг за шагом, с питомцем и без давления времени.","en":"The four operations, step by step, with a pet and no time pressure."},"t":["tRead","tTeacher","tLangs"],"k":"יסודי חטיבה חיבור חיסור כפל חילוק math primary","price":39},{"id":"math-teen","cat":"math","c":"math","n":{"he":"שלב — מתמטיקה לתיכון","ar":"شلاف — رياضيات للثانوية","ru":"Шлав — математика для старших классов","en":"Shlav — secondary maths"},"d":{"he":"פתרון מודרך, זיהוי הטעות המדויקת ודף נוסחאות מלא.","ar":"حلّ موجَّه، تحديد الخطأ بدقّة، وورقة قوانين كاملة.","ru":"Пошаговое решение, точное определение ошибки и полный лист формул.","en":"Guided solutions, the exact mistake named, and a full formula sheet."},"t":["tRead","tTeacher","tLangs"],"k":"תיכון בגרות אלגברה גאומטריה","price":49},{"id":"math-uni","cat":"math","c":"math","n":{"he":"אקסיומה — תואר, שנה א׳","ar":"أكسيوما — السنة الأولى","ru":"Аксиома — первый курс","en":"Axioma — first year"},"d":{"he":"חדו״א, אלגברה לינארית והסתברות — ההסברים מלאים בארבע שפות.","ar":"التفاضل والتكامل، الجبر الخطّي والاحتمالات — بشرح كامل بأربع لغات.","ru":"Матанализ, линейная алгебра и теория вероятностей — с полными объяснениями.","en":"Calculus, linear algebra and probability, explained in full."},"t":["tRead","tTeacher","tLangs"],"k":"אוניברסיטה חדוא לינארית הסתברות","price":59},{"id":"math-uni2","cat":"math","c":"math","n":{"he":"אקסיומה ב׳ — שנה שנייה","ar":"أكسيوما ٢ — السنة الثانية","ru":"Аксиома II — второй курс","en":"Axioma II — second year"},"d":{"he":"חדו״א 2, לינארית 2, משוואות דיפרנציאליות והסתברות.","ar":"التفاضل ٢، الجبر الخطّي ٢، المعادلات التفاضلية والاحتمالات.","ru":"Матанализ 2, линейная алгебра 2, дифференциальные уравнения.","en":"Calculus 2, linear algebra 2, differential equations and probability."},"t":["tRead","tTeacher","tLangs"],"k":"אוניברסיטה מדר משוואות דיפרנציאליות","price":69},{"id":"math-uni3","cat":"math","c":"math","n":{"he":"אקסיומה ג׳ — שנה שלישית","ar":"أكسيوما ٣ — السنة الثالثة","ru":"Аксиома III — третий курс","en":"Axioma III — third year"},"d":{"he":"אנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית.","ar":"التحليل، الدوال المركّبة، الجبر المجرّد والتحليل العددي.","ru":"Анализ, комплексные функции, абстрактная алгебра и численные методы.","en":"Analysis, complex functions, abstract algebra and numerical analysis."},"t":["tRead","tTeacher","tLangs"],"k":"אוניברסיטה אנליזה מרוכבות נומרית","price":79},{"id":"bagrut-806","cat":"math","c":"math","n":{"he":"806 — בגרות במתמטיקה, 3–4 ו-5 יח״ל","ar":"٨٠٦ — بجروت رياضيات، ٣–٤ و٥ وحدات","ru":"806 — багрут по математике, 3–4 и 5 единиц","en":"806 — matriculation maths, 3–4 and 5 units"},"d":{"he":"סימולציית בחינה עם שעון, ותרגול מודרך שבו הרמזים נחשפים אחד־אחד.","ar":"محاكاة امتحان بساعة، وتدريب موجَّه تُكشف فيه التلميحات واحدًا تلو الآخر.","ru":"Симуляция экзамена с таймером и разбор, где подсказки открываются по одной.","en":"A timed mock exam, and guided practice where hints open one at a time."},"t":["tRead"],"k":"בגרות 806 שלוש ארבע חמש יחידות תיכון סימולציה bagrut matriculation","price":69},{"id":"ulpan","cat":"lang","c":"lang","n":{"he":"אולפן — עברית מעשית לעולים חדשים","ar":"أولبان — عبرية عملية للقادمين الجدد","ru":"Ульпан — практический иврит для репатриантов","en":"Ulpan — practical Hebrew for new arrivals"},"d":{"he":"קופת חולים, בנק וטופס — המילים שעוצרות את היום, עם ניקוד והקראה.","ar":"العيادة والبنك والاستمارة — الكلمات التي توقف يومك، مع تشكيل وقراءة صوتية.","ru":"Поликлиника, банк и бланк — слова, на которых встаёт день, с огласовкой и озвучиванием.","en":"The clinic, the bank and the form — the words that stop your day, with vowel points and read-aloud."},"t":["tRead","tTeacher","tLangs"],"k":"עברית אולפן עולים חדשים שפה טפסים hebrew ulpan","price":0},{"id":"english","cat":"lang","c":"lang","n":{"he":"ניב — אנגלית מדוברת וספרותית","ar":"نِيف — إنجليزية محكيّة وأدبيّة","ru":"Нив — английский разговорный и книжный","en":"Niv — spoken and written English"},"d":{"he":"כל מילה נשמעת לפני שהיא נקראת — אוצר מילים, שיחה והבנת הנקרא.","ar":"كلّ كلمة تُسمع قبل أن تُقرأ — مفردات ومحادثة وفهم مقروء.","ru":"Каждое слово сначала звучит — лексика, речь и понимание текста.","en":"Every word is heard before it is read — vocabulary, speech, comprehension."},"t":["tRead","tTeacher","tLangs"],"k":"אנגלית שפה קריאה דיבור english","price":49},{"id":"history","cat":"lang","c":"lang","n":{"he":"מפנה — היסטוריה לחטיבה","ar":"مفنيه — التاريخ للمرحلة الإعدادية","ru":"Мифне — история для средней школы","en":"Mifne — history for middle school"},"d":{"he":"אירועים, סיבות ותוצאות, עם קטעי מקור ורמז בכל שאלה.","ar":"أحداث وأسباب ونتائج، مع نصوص مصدرية وتلميح في كلّ سؤال.","ru":"События, причины и следствия, с источниками и подсказкой к каждому вопросу.","en":"Events, causes and consequences, with sources and a hint on every question."},"t":["tRead","tTeacher","tLangs"],"k":"היסטוריה חטיבה מקורות תקופות","price":0},{"id":"lomda","cat":"lang","c":"lang","n":{"he":"לומדה — לימוד לפי נושא","ar":"لومدا — تعلّم حسب الموضوع","ru":"Ломда — учёба по темам","en":"Lomda — learning by topic"},"d":{"he":"תשעה־עשר תחומים — ממדע, אזרחות ורשת ועד תנ״ך, לשון, ספרות, רפואה והנדסה. כל נושא בקובץ אחד, עם רמז בכל שאלה.","ar":"تسعة عشر مجالًا — من العلوم والمدنيات والإنترنت إلى التوراة واللغة والأدب والطبّ والهندسة. كل موضوع في ملفّ واحد، مع تلميح في كل سؤال.","ru":"Девятнадцать областей — от науки, гражданского устройства и интернета до ТАНАХа, языка, литературы, медицины и инженерии. Каждая тема — один файл, с подсказкой к каждому вопросу.","en":"Nineteen fields — from science, civics and the internet to the Bible, Hebrew grammar, literature, medicine and engineering. Every topic is one file, with a hint on every question."},"t":["tRead","tTeacher","tLangs"],"k":"בטיחות سلامة безопасность safety מדע אזרחות מושגים גילויים כנסת חוקי יסוד חיסונים אטום אינטרנט פישינג סיסמה הונאה תלוש שכר פנסיה מעמ ריבית הלוואה בריאות תזונה ויטמין סוכר תווית עישון פעילות גופנית תנך תורה נביאים כתובים לשון שורש בניין ספרות שיר מטאפורה גיאוגרפיה מפה אקלים פיזיקה כוח אנרגיה חשמל כימיה אטום חומצה ביולוגיה תא תורשה אקולוגיה רפואה תרופה פלצבו חיסון הנדסה גשר מנוף מנוע טכנולוגיה המצאה בינה מלאכותית תקשורת ידיעה פייק ניוז חינוך למידה בגרות התאמות חום טמפרטורה הולכה הסעה קרינה חימום קירור בידוד מוליך","price":0},{"id":"reader","cat":"life","c":"life","n":{"he":"מקריא קולי","ar":"قارئ صوتي","ru":"Голосовой чтец","en":"Voice reader"},"d":{"he":"מדביקים טקסט בעברית, והוא נקרא בקול עם מעקב אחרי המילה הנאמרת.","ar":"تُلصق نصًّا بالعبرية فيُقرأ بصوت عالٍ مع تتبّع الكلمة المنطوقة.","ru":"Вставьте текст на иврите — он читается вслух с подсветкой слова.","en":"Paste Hebrew text and hear it read, with the spoken word tracked."},"t":["tRead","tLangs"],"k":"הקראה דיסלקציה ניקוד טקסט reader","price":0},{"id":"theory","u":"/drivewise/","cat":"life","c":"life","n":{"he":"תאוריה מדברת","ar":"نظرية ناطقة","ru":"Говорящая теория","en":"Talking Theory"},"d":{"he":"מאגר שאלות התאוריה המלא, עם הקראה מוקלטת של כל שאלה.","ar":"بنك أسئلة النظرية كاملًا، مع قراءة مسجّلة لكلّ سؤال.","ru":"Полный банк вопросов по теории с записанной озвучкой каждого.","en":"The full driving-theory question bank, every question recorded."},"t":["tRead","tLangs"],"k":"תאוריה נהיגה רישיון theory","price":120,"once":true}],"STR":{"he":{"dirv":"rtl","me":"למידה שנשמעת","nApps":"האפליקציות","nHow":"איך זה עובד","nAbout":"עליי","nContact":"צרו קשר","badge":"שתים־עשרה אפליקציות לימוד · 4 חינם לתמיד, 8 בתשלום · בארבע שפות","h1a":"למידה שנשמעת,","h1b":"מוסברת","h1c":"ומכבדת","lead":"אוסף כלים שבניתי לנוער ולסטודנטים — לקהל שמתקשה עם השפה העברית ולבעלי צרכי למידה מיוחדים. מתמטיקה מיסודי ועד תואר ובגרות 3–4 ו-5 יח״ל, עברית לעולים חדשים, אנגלית, היסטוריה, ובלומדה תשעה־עשר תחומים — ממדע, אזרחות ורשת ועד תנ״ך, לשון, רפואה והנדסה — מקריא קולי ותאוריה לנהיגה. בכל אפליקציה: הקראה של כל מילה, הסבר צעד־צעד, וקצב שנקבע על ידי הלומד.","noAds":"4 חינם בלי הרשמה · ללא פרסומות","ctaApps":"לכל האפליקציות","ctaContact":"צרו קשר","s1":"אפליקציות לימוד","s2":"שפות ממשק","s3":"עם הקראה קולית","s4":"אפליקציות חינם לתמיד","title":"האפליקציות שלי","sub":"סננו לפי תחום או חפשו בשם — הכול נפתח ישירות בדפדפן.","searchPh":"חיפוש… (למשל: חדו״א, אנגלית, תאוריה)","searchLabel":"חיפוש באפליקציות","langLabel":"בחירת שפה","catLabel":"סינון לפי תחום","all":"הכול","math":"מתמטיקה","lang":"שפות, מדעים ומדעי הרוח","life":"כלים לחיים","count":"{n} מתוך {t}","none":"לא נמצאה אפליקציה מתאימה. נסו לנקות את החיפוש.","enter":"כניסה","getApp":"התקנה","getAppOf":"התקנת {n} כאפליקציה נפרדת","howT":"איך זה עובד","how1":"נכנסים לאפליקציה מהדפדפן, בלי הורדה. 4 החינמיות נפתחות בלי הרשמה. ל-8 שבתשלום צריך חשבון.","how2":"בוחרים נושא ורמה. כל שאלה נקראת בקול, ואפשר לעצור ולחזור בכל רגע.","how3":"ההתקדמות נשמרת במכשיר. באפליקציות בתשלום נשמר בשרת רק מצב המנוי, לא תוכן הלמידה.","aboutT":"עליי","about":"אני יהושע לגשטיין. בניתי את הכלים האלה בשביל לומדים שהחומר הקיים לא מדבר אליהם - מי שקורא לאט, מי שלומד בשפה שאינה שפת אמו, ומי שצריך לשמוע כדי להבין. אני יודע מקרוב איך מרגיש חומר שלא נבנה בשבילך. לכן כל מה שמעייף את הקורא - הוצאתי. כל אפליקציה כאן נבנתה סביב שאלה אחת: מה מוריד עומס מהלומד - ומה רק מוסיף. ארבע אפליקציות חינמיות - לתמיד, בלי הרשמה. שמונה נוספות במחיר של ספר לימוד אחד, למשפחה שלמה.","contactT":"צרו קשר","contactL":"לשאלות, הצעות ותקלות:","dark":"מצב כהה","light":"מצב בהיר","tRead":"הקראה","tTeacher":"מצב מורה","tLangs":"4 שפות","foot":"© 2026 יהושע לגשטיין","install":"הוספה למסך הבית","installLead":"האתר נפתח כמו אפליקציה, במסך מלא, ועובד גם בלי אינטרנט. בוחרים לפי המכשיר:","installAndroid":"אנדרואיד, בכרום: התפריט ⋮ בפינת הדפדפן, ואז ״הוספה למסך הבית״ (או ״התקנה״), ואז ״הוסף״.","installIos":"אייפון ואייפד, בספארי: כפתור השיתוף — ריבוע עם חץ למעלה — ואז ״הוסף למסך הבית״, ואז ״הוסף״.","installPc":"מחשב, בכרום או באדג׳: סמל ההתקנה בקצה שורת הכתובת, או התפריט ⋮ ואז ״התקנה״.","installLink":"איך מוסיפים למסך הבית?","terms":"תנאי שימוש וזכויות יוצרים","edgeHas":"בדפדפן Microsoft Edge יש קולות טבעיים בעברית, נשיים וגבריים — בלי התקנה, בחיבור לאינטרנט.","openEdge":"לפתוח את האתר ב-Edge","voicesT":"הקראה — באיזה דפדפן שומעים הכי טוב","voicesLead":"כל האפליקציות מקריאות בקול שמותקן במכשיר. האפליקציה אינה מביאה קול משלה, ולכן איכות ההקראה נקבעת בדפדפן ובמערכת ההפעלה:","voicesWin":"מחשב עם ווינדוס: בכרום יש בעברית קול מערכת אחד בלבד, גברי (Asaf). ב-Microsoft Edge יש קולות טבעיים משלו, נשיים וגבריים (Hila ו-Avri) — בלי התקנה, בחיבור לאינטרנט. לכן במחשב מומלץ לפתוח את האתר ב-Edge.","voicesAndroid":"אנדרואיד: הקול מגיע מ״טקסט לדיבור״ של המכשיר. אם חסר קול בעברית: הגדרות ← נגישות ← טקסט לדיבור (בסמסונג: הגדרות ← ניהול כללי ← טקסט לדיבור) ← גלגל השיניים ליד המנוע ← התקנת נתוני קול.","voicesApple":"אייפון ואייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← להוריד קול בעברית. במק: הגדרות המערכת ← נגישות ← תוכן מדובר ← קול המערכת ← ניהול קולות.","inEdge":"אתם כבר ב-Edge — ההקראה כאן במיטבה.","voicesWhy":"למה?","free":"חינם","once":"חד־פעמי","nPricing":"מחירים"},"ar":{"dirv":"rtl","me":"تعلُّم يُسمَع","nApps":"التطبيقات","nHow":"كيف يعمل","nAbout":"عنّي","nContact":"اتّصلوا بنا","badge":"اثنا عشر تطبيقًا تعليميًّا · ٤ مجّانية للأبد و٨ مدفوعة · بأربع لغات","h1a":"تعلُّم يُسمَع،","h1b":"ويُشرَح","h1c":"ويحترم","lead":"مجموعة أدوات بنيتها للشباب والطلاب — لمن يجد صعوبة في العبرية ولذوي احتياجات التعلّم الخاصة. رياضيات من الابتدائي حتى الجامعة وبجروت ٣–٤ و٥ وحدات، عبرية للقادمين الجدد، إنجليزية، تاريخ، وفي لومدا تسعة عشر مجالًا — من العلوم والمدنيات والإنترنت إلى التوراة واللغة والطبّ والهندسة — قارئ صوتي ونظرية السياقة. في كلّ تطبيق: قراءة كلّ كلمة، شرح خطوة بخطوة، وإيقاع يحدّده المتعلّم.","noAds":"٤ مجّانية بلا تسجيل · بلا إعلانات","ctaApps":"إلى كلّ التطبيقات","ctaContact":"اتّصلوا بنا","s1":"تطبيقات تعليمية","s2":"لغات واجهة","s3":"مع قراءة صوتية","s4":"تطبيقات مجّانية للأبد","title":"تطبيقاتي","sub":"صنّفوا حسب المجال أو ابحثوا بالاسم — كلّ شيء يفتح في المتصفّح.","searchPh":"بحث… (مثلًا: تفاضل، إنجليزية، نظرية)","searchLabel":"بحث في التطبيقات","langLabel":"اختيار اللغة","catLabel":"تصنيف حسب المجال","all":"الكلّ","math":"رياضيات","lang":"لغات وعلوم","life":"أدوات للحياة","count":"{n} من {t}","none":"لا يوجد تطبيق مطابق. جرّبوا مسح البحث.","enter":"دخول","getApp":"تثبيت","getAppOf":"تثبيت {n} كتطبيق منفصل","howT":"كيف يعمل","how1":"تدخلون التطبيق من المتصفّح، بلا تنزيل. التطبيقات المجّانية الأربعة تُفتح بلا تسجيل، والثمانية المدفوعة تحتاج حسابًا.","how2":"تختارون موضوعًا ومستوى. كلّ سؤال يُقرأ بصوت، ويمكن التوقّف والعودة في أيّ لحظة.","how3":"التقدّم يُحفَظ على الجهاز. في التطبيقات المدفوعة لا يُحفَظ على الخادم إلا حالة الاشتراك، لا محتوى التعلّم.","aboutT":"عنّي","about":"أنا يهوشع لچشطاين. بنيت هذه الأدوات لمتعلّمين لا تخاطبهم المواد القائمة — من يقرأ ببطء، ومن يتعلّم بلغة ليست لغته الأمّ، ومن يحتاج أن يسمع كي يفهم. أعرف عن قرب كيف تبدو مادّة لم تُبنَ من أجلك. لذلك كلّ ما يُتعب القارئ — أخرجته. كلّ تطبيق هنا بُني حول سؤال واحد: ما الذي يخفّف العبء عن المتعلّم — وما الذي يزيده فقط. أربعة تطبيقات مجّانية — للأبد، بلا تسجيل. وثمانية أخرى بثمن كتاب مدرسيّ واحد، لعائلة كاملة.","contactT":"اتّصلوا بنا","contactL":"للأسئلة والاقتراحات والأعطال:","dark":"وضع داكن","light":"وضع فاتح","tRead":"قراءة صوتية","tTeacher":"وضع المعلّم","tLangs":"٤ لغات","foot":"© 2026 يهوشع لچشطاين","install":"إضافة إلى الشاشة الرئيسية","installLead":"يُفتح الموقع كتطبيق عادي بملء الشاشة، ويعمل أيضًا بلا إنترنت. اختاروا حسب الجهاز:","installAndroid":"أندرويد، في كروم: القائمة ⋮ في زاوية المتصفّح، ثم «إضافة إلى الشاشة الرئيسية» (أو «تثبيت»)، ثم «إضافة».","installIos":"آيفون وآيباد، في Safari: زرّ المشاركة — مربّع بسهم إلى الأعلى — ثم «إضافة إلى الشاشة الرئيسية»، ثم «إضافة».","installPc":"حاسوب، في كروم أو Edge: رمز التثبيت في طرف شريط العنوان، أو القائمة ⋮ ثم «تثبيت».","installLink":"كيف نضيف إلى الشاشة الرئيسية؟","terms":"شروط الاستخدام وحقوق النشر","edgeHas":"في متصفح Microsoft Edge أصوات طبيعية بالعبرية، نسائية ورجالية — دون تثبيت، مع اتصال بالإنترنت.","openEdge":"افتح الموقع في Edge","voicesT":"القراءة الصوتية — في أيّ متصفّح تُسمع أفضل","voicesLead":"كلّ التطبيقات تقرأ بصوت مثبَّت على الجهاز. التطبيق لا يأتي بصوت خاصّ به، ولذلك تتحدّد جودة القراءة بالمتصفّح ونظام التشغيل:","voicesWin":"حاسوب بويندوز: في كروم صوت نظام واحد فقط بالعبرية، رجالي (Asaf). في Microsoft Edge أصوات طبيعية خاصّة به، نسائية ورجالية (Hila وAvri) — دون تثبيت، مع اتصال بالإنترنت. لذلك يُنصح على الحاسوب بفتح الموقع في Edge.","voicesAndroid":"أندرويد: الصوت يأتي من «تحويل النص إلى كلام» في الجهاز. إن لم يوجد صوت بالعبرية: الإعدادات ← إمكانية الوصول ← تحويل النص إلى كلام (في سامسونغ: الإعدادات ← الإدارة العامة ← تحويل النص إلى كلام) ← الترس بجانب المحرّك ← تثبيت بيانات الصوت.","voicesApple":"آيفون وآيباد: الإعدادات ← إمكانية الوصول ← المحتوى المنطوق ← الأصوات ← تنزيل صوت بالعبرية. في ماك: إعدادات النظام ← إمكانية الوصول ← المحتوى المنطوق ← صوت النظام ← إدارة الأصوات.","inEdge":"أنتم في Edge بالفعل — القراءة هنا في أفضل حالاتها.","voicesWhy":"لماذا؟","free":"مجّاني","once":"دفعة واحدة","nPricing":"الأسعار"},"ru":{"dirv":"ltr","me":"Учёба, которую слышно","nApps":"Приложения","nHow":"Как это работает","nAbout":"Обо мне","nContact":"Связаться","badge":"Двенадцать учебных приложений · 4 бесплатно навсегда, 8 платных · на четырёх языках","h1a":"Учёба, которую слышно,","h1b":"объясняют","h1c":"и уважают","lead":"Набор инструментов, который я собрал для подростков и студентов — для тех, кому труден иврит, и для тех, у кого особые учебные потребности. Математика от начальной школы до университета и багрут, иврит для репатриантов, английский, история, а в «Ломде» девятнадцать областей — от науки, гражданского устройства и интернета до ТАНАХа, языка, медицины и инженерии, — голосовой чтец и теория вождения. В каждом приложении: озвучивание каждого слова, пошаговое объяснение и темп, который задаёт сам учащийся.","noAds":"4 бесплатных без регистрации · без рекламы","ctaApps":"Ко всем приложениям","ctaContact":"Связаться","s1":"учебных приложений","s2":"языка интерфейса","s3":"с озвучиванием","s4":"приложения бесплатно навсегда","title":"Мои приложения","sub":"Отфильтруйте по области или найдите по названию — всё открывается в браузере.","searchPh":"Поиск… (например: анализ, английский, теория)","searchLabel":"Поиск по приложениям","langLabel":"Выбор языка","catLabel":"Фильтр по области","all":"Все","math":"Математика","lang":"Языки, науки и гуманитарные","life":"Инструменты для жизни","count":"{n} из {t}","none":"Ничего не найдено. Попробуйте очистить поиск.","enter":"Войти","getApp":"Установить","getAppOf":"Установить «{n}» как отдельное приложение","howT":"Как это работает","how1":"Приложение открывается в браузере, без загрузки. 4 бесплатных доступны без регистрации. Для 8 платных нужен аккаунт.","how2":"Выбираете тему и уровень. Каждый вопрос читается вслух, остановиться можно в любой момент.","how3":"Прогресс хранится на устройстве. В платных приложениях на сервере хранится только статус подписки, а не содержание учёбы.","aboutT":"Обо мне","about":"Я Иехошуа Лагштейн. Я создал эти инструменты для учащихся, к которым существующие материалы не обращаются: для тех, кто читает медленно, кто учится не на родном языке, кому нужно услышать, чтобы понять. Я не понаслышке знаю, каково это — материал, который строили не для тебя. Поэтому всё, что утомляет читателя, я убрал. Каждое приложение здесь построено вокруг одного вопроса: что снимает нагрузку с учащегося — а что только добавляет её. Четыре приложения бесплатны — навсегда, без регистрации. Ещё восемь — по цене одного учебника, на всю семью.","contactT":"Связаться","contactL":"Вопросы, предложения и неполадки:","dark":"Тёмная тема","light":"Светлая тема","tRead":"Озвучивание","tTeacher":"Режим учителя","tLangs":"4 языка","foot":"© 2026 Иехошуа Лагштейн","install":"Добавить на главный экран","installLead":"Сайт открывается как обычное приложение, во весь экран, и работает без интернета. Выберите своё устройство:","installAndroid":"Android, в Chrome: меню ⋮ в углу браузера, затем «Добавить на главный экран» (или «Установить»), затем «Добавить».","installIos":"iPhone и iPad, в Safari: кнопка «Поделиться» — квадрат со стрелкой вверх — затем «На экран „Домой“», затем «Добавить».","installPc":"Компьютер, в Chrome или Edge: значок установки в конце адресной строки, или меню ⋮ и затем «Установить».","installLink":"Как добавить на главный экран?","terms":"Условия использования и авторские права","edgeHas":"В браузере Microsoft Edge есть естественные голоса на иврите, женские и мужские — без установки, при подключении к интернету.","openEdge":"Открыть сайт в Edge","voicesT":"Озвучивание — в каком браузере слышно лучше всего","voicesLead":"Все приложения читают голосом, установленным на устройстве. Своего голоса у приложения нет, поэтому качество озвучивания зависит от браузера и операционной системы:","voicesWin":"Компьютер с Windows: в Chrome есть только один системный голос на иврите, мужской (Asaf). В Microsoft Edge есть собственные естественные голоса, женские и мужские (Hila и Avri) — без установки, при подключении к интернету. Поэтому на компьютере сайт лучше открывать в Edge.","voicesAndroid":"Android: голос берётся из «Синтеза речи» устройства. Если голоса на иврите нет: Настройки → Спец. возможности → Синтез речи (в Samsung: Настройки → Общие настройки → Синтез речи) → шестерёнка рядом с движком → Установить голосовые данные.","voicesApple":"iPhone и iPad: Настройки → Универсальный доступ → Устный контент → Голоса → загрузить голос на иврите. На Mac: Системные настройки → Универсальный доступ → Устный контент → Системный голос → Управление голосами.","inEdge":"Вы уже в Edge — озвучивание здесь работает лучше всего.","voicesWhy":"Почему?","free":"Бесплатно","once":"разово","nPricing":"Цены"},"en":{"dirv":"ltr","me":"Learning That Sounds","nApps":"Apps","nHow":"How it works","nAbout":"About","nContact":"Contact","badge":"Twelve learning apps · 4 free forever, 8 paid · in four languages","h1a":"Learning That Sounds,","h1b":"explains","h1c":"and respects","lead":"A set of tools I built for teenagers and students — for people who find Hebrew hard, and for people with particular learning needs. Maths from primary school to university and the 3–4 and 5-unit matriculation, Hebrew for new arrivals, English, history, and in Lomda nineteen fields — from science, civics and the internet to the Bible, Hebrew grammar, medicine and engineering — a voice reader and driving theory. In every one: every word read aloud, an explanation step by step, and a pace the learner sets.","noAds":"4 free with no sign-up · no adverts","ctaApps":"See all the apps","ctaContact":"Contact","s1":"learning apps","s2":"interface languages","s3":"with read-aloud","s4":"apps free forever","title":"My apps","sub":"Filter by subject or search by name — everything opens in the browser.","searchPh":"Search… (e.g. calculus, English, theory)","searchLabel":"Search the apps","langLabel":"Choose language","catLabel":"Filter by subject","all":"All","math":"Maths","lang":"Languages, sciences and humanities","life":"Everyday tools","count":"{n} of {t}","none":"Nothing matched. Try clearing the search.","enter":"Open","getApp":"Install","getAppOf":"Install {n} as a separate app","howT":"How it works","how1":"You open an app in the browser, nothing to download. The 4 free apps need no sign-up. The 8 paid ones need an account.","how2":"You choose a subject and a level. Every question is read aloud, and you can stop and go back whenever you like.","how3":"Progress is kept on your device. In the paid apps the server keeps only your subscription status, never your learning content.","aboutT":"About","about":"I am Joshua Lagstein. I built these tools for learners the existing material does not speak to — people who read slowly, people learning in a language that is not their mother tongue, and people who need to hear something to understand it. I know at first hand what material that was not built for you feels like. So everything that tires the reader — I took out. Every app here was built around one question: what takes load off the learner — and what only adds to it. Four apps are free — forever, with no sign-up. Eight more for the price of a single textbook, for the whole family.","contactT":"Contact","contactL":"Questions, suggestions and faults:","dark":"Dark mode","light":"Light mode","tRead":"Read-aloud","tTeacher":"Teacher mode","tLangs":"4 languages","foot":"© 2026 Joshua Lagstein","install":"Add to home screen","installLead":"The site opens like an ordinary app, full screen, and works without an internet connection. Pick your device:","installAndroid":"Android, in Chrome: the ⋮ menu in the corner of the browser, then “Add to Home screen” (or “Install”), then “Add”.","installIos":"iPhone and iPad, in Safari: the Share button — a square with an arrow pointing up — then “Add to Home Screen”, then “Add”.","installPc":"Computer, in Chrome or Edge: the install icon at the end of the address bar, or the ⋮ menu and then “Install”.","installLink":"How do I add it to my home screen?","terms":"Terms of use and copyright","edgeHas":"Microsoft Edge has natural Hebrew voices, female and male — nothing to install, with an internet connection.","openEdge":"Open the site in Edge","voicesT":"Read-aloud — which browser sounds best","voicesLead":"Every app reads with a voice installed on the device. The app brings no voice of its own, so the quality of the read-aloud is decided by the browser and the operating system:","voicesWin":"Windows computer: Chrome has only one system voice for Hebrew, male (Asaf). Microsoft Edge carries natural voices of its own, female and male (Hila and Avri) — nothing to install, with an internet connection. So on a computer, open the site in Edge.","voicesAndroid":"Android: the voice comes from the device’s text-to-speech. If there is no Hebrew voice: Settings → Accessibility → Text-to-speech (on Samsung: Settings → General management → Text-to-speech) → the gear next to the engine → Install voice data.","voicesApple":"iPhone and iPad: Settings → Accessibility → Spoken Content → Voices → download a Hebrew voice. On Mac: System Settings → Accessibility → Spoken Content → System Voice → Manage Voices.","inEdge":"You are already in Edge — read-aloud is at its best here.","voicesWhy":"Why?","free":"Free","once":"one-time","nPricing":"Pricing"}}};
 var APPS=DATA.APPS, TR=DATA.STR;
 var CC={math:"var(--c-math)",lang:"var(--c-lang)",life:"var(--c-life)"};
 
@@ -629,6 +734,11 @@ var CC={math:"var(--c-math)",lang:"var(--c-lang)",life:"var(--c-life)"};
    התחום מ---c של הכרטיס. הם קישוט: aria-hidden, כי השם כבר כתוב
    לידם, וכך הם גם ניטרליים לשפה ואינם דורשים תרגום.
    ============================================================ */
+/* חץ אל קו — "הורדה". אותו סט תווי SVG כמו שאר האייקונים בדף. */
+var DLIC='<path d="M12 3.6v10M8 9.8l4 4 4-4M4.6 19.4h14.8"/>';
+/* ?install=1 אומר לאפליקציה להציג את כפתור ההתקנה מיד, גם למי
+   שסגר אותו פעם. חלק מהכתובות כבר נושאות שאילתה משלהן. */
+function installUrl(u){return u+(u.indexOf("?")<0?"?":"&")+"install=1"}
 var IC=function(d){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"'+
   ' stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>'};
 var ICONS={
@@ -661,7 +771,7 @@ var ICONS={
   /* טקסט שנקרא בקול */
   "reader":IC('<path d="M4 6.4h9M4 11h9M4 15.6h5.8"/><path d="M17 9.4v5.2M20.4 6.8v10.4"/>'),
   /* הגה */
-  "drivewise":IC('<circle cx="12" cy="12" r="8.6"/><circle cx="12" cy="12" r="2.6"/>'+
+  "theory":IC('<circle cx="12" cy="12" r="8.6"/><circle cx="12" cy="12" r="2.6"/>'+
     '<path d="M12 14.6V20.6M9.5 11.2 4 8.8M14.5 11.2 20 8.8"/>')
 };
 
@@ -670,7 +780,7 @@ var esc=function(x){return String(x).replace(/[&<>"']/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
 
 /* --- שפה --- */
-var LKEY="site-lang", LANGS=[["he","עב"],["ar","ع"],["ru","Ру"],["en","EN"]];
+var LKEY="site-lang", LANGS=[["he","עברית"],["ar","العربية"],["ru","Русский"],["en","English"]];
 function savedLang(){try{return localStorage.getItem(LKEY)||""}catch(e){return""}}
 /* שפת הדפדפן היא רמז ולא הוראה: מכשירים רבים בישראל מדווחים en-US
    גם כשהמשתמש קורא עברית. לכן ברירת המחדל היא עברית, ואנגלית
@@ -680,6 +790,7 @@ function guessLang(){
   return {he:1,iw:1}[l]?"he":{ar:1,ru:1,en:1}[l]?l:"he";
 }
 var LG=savedLang()||guessLang(); if(!TR[LG])LG="he";
+function isWinNotEdge(){var ua=navigator.userAgent||"";return /Windows/i.test(ua)&&!/Edg\//.test(ua)}
 var S=TR[LG];
 
 /* --- מצב כהה: העדפת המערכת, ודריסה ידנית שנשמרת --- */
@@ -706,6 +817,11 @@ $("#theme").addEventListener("click",function(){
 var CATS=["all","math","lang","life"];
 var cat="all", q="";
 
+function priceLabel(a){
+  if(a.price===0)return S.free;
+  return a.price+" ₪"+(a.once?" "+S.once:"");
+}
+
 function draw(){
   var list=APPS.filter(function(a){
     if(cat!=="all"&&a.cat!==cat)return false;
@@ -716,14 +832,25 @@ function draw(){
     return hay.indexOf(q)>=0;
   });
   $("#grid").innerHTML=list.map(function(a){
-    return '<article class="card" style="--c:'+CC[a.c]+'">'+
+    return '<article class="card" data-app="'+esc(a.id)+'" style="--c:'+CC[a.c]+'">'+
       '<div class="crow"><span class="ic" aria-hidden="true">'+(ICONS[a.id]||"")+'</span>'+
       '<h3>'+esc(a.n[LG])+'</h3></div>'+
       '<p>'+esc(a.d[LG])+'</p>'+
-      '<div class="tags">'+a.t.map(function(k){
+      /* תגית המחיר ראשונה בשורת התוויות. price הוא מספר בש״ח לחודש,
+         0 = חינם, ו-once מסמן תשלום חד־פעמי (״תאוריה מדברת״). */
+      '<div class="tags"><span class="t price" dir="ltr">'+esc(priceLabel(a))+'</span>'+a.t.map(function(k){
         return '<span class="t">'+esc(S[k])+'</span>'}).join("")+'</div>'+
-      '<a class="go" href="/'+a.id+'/">'+esc(S.enter)+
-        '<span class="arw" aria-hidden="true">←</span></a>'+
+      /* a.u הוא נתיב מפורש, והוא קיים רק כשכתובת הפרסום אינה
+         זהה למזהה. היום זה נכון לאפליקציה אחת בלבד — ראו NAMING.md. */
+      '<div class="act">'+
+        '<a class="go" href="'+(a.u||("/"+a.id+"/"))+'">'+esc(S.enter)+
+          '<span class="arw" aria-hidden="true">←</span></a>'+
+        /* שם נגיש נפרד לכל אחת: "התקנה" לבדו חוזר זהה בשתים-עשרה
+           כרטיסים, ולקורא מסך זו רשימה של מילים זהות. */
+        '<a class="get" href="'+installUrl(a.u||("/"+a.id+"/"))+'" '+
+          'aria-label="'+esc(S.getAppOf.replace("{n}",a.n[LG]))+'">'+
+          IC(DLIC)+'<span>'+esc(S.getApp)+'</span></a>'+
+      '</div>'+
     '</article>';
   }).join("");
   $("#count").textContent=S.count.replace("{n}",list.length).replace("{t}",APPS.length);
@@ -738,11 +865,11 @@ function paint(){
   document.title=S.me+" — "+S.title;
 
   $("#me").textContent=S.me;
-  /* המונוגרמה היא האות הראשונה של השם באותה שפה — י/ي/И/J.
-     אות עברית לצד "Joshua" נראית כתקלה, לא כמיתוג. */
+  $(".logo").setAttribute("aria-label",S.me);
   $("#skip").textContent=S.nApps;
-  $("#nav").innerHTML=[["apps","nApps"],["how","nHow"],["about","nAbout"],["contact","nContact"]]
-    .map(function(x){return '<a href="#'+x[0]+'">'+esc(S[x[1]])+"</a>"}).join("");
+  /* ״מחירים״ הוא דף נפרד (/pricing/), ולכן הכתובת מלאה ולא עוגן. */
+  $("#nav").innerHTML=[["#apps","nApps"],["/pricing/","nPricing"],["#how","nHow"],["#about","nAbout"],["#contact","nContact"]]
+    .map(function(x){return '<a href="'+x[0]+'">'+esc(S[x[1]])+"</a>"}).join("");
   $("#badge").textContent=S.badge;
   /* שלושה חלקים ולא משפט אחד: המילה האמצעית צבועה, והחלוקה
      לחלקים מאפשרת לכל שפה לשמור על סדר המילים שלה. */
@@ -750,9 +877,37 @@ function paint(){
   $("#lead").textContent=S.lead;
   $("#ctaApps").textContent=S.ctaApps;
   $("#ctaContact").textContent=S.ctaContact;
+  $("#install").textContent=S.install;
+  $("#installLink").textContent=S.installLink;
+  $("#installT").textContent=S.install;
+  $("#installLead").textContent=S.installLead;
+  $("#installSteps").innerHTML=["installAndroid","installIos","installPc"].map(function(k,i){
+    return '<div class="step"><b dir="ltr">'+(i+1)+"</b>"+esc(S[k])+"</div>"}).join("");
   $("#noads").textContent=S.noAds;
+  /* כרום על ווינדוס רואה רק את קולות המערכת, ובעברית יש שם קול אחד,
+     גברי. Edge נושא קולות טבעיים משלו, ולכן ההקראה בכל האפליקציות
+     טובה בו יותר. הסכימה microsoft-edge: פותחת את אותה כתובת ב-Edge
+     מתוך כל דפדפן בווינדוס — אותו קישור שיש בכל אפליקציה, וכאן הוא
+     מוצג לפני שנכנסים. מחוץ לווינדוס, ובתוך Edge, השורה נסתרת. */
+  var ed=$("#edge");
+  ed.hidden=!isWinNotEdge();
+  ed.innerHTML=esc(S.edgeHas)+" <a href=\"microsoft-edge:"+esc(location.href.split("#")[0])+
+    "\" style=\"font-weight:700;color:inherit\">"+esc(S.openEdge)+"</a> · <a href=\"#voices\">"+esc(S.voicesWhy)+"</a>";
+  $("#voicesT").textContent=S.voicesT;
+  $("#voicesLead").textContent=S.voicesLead;
+  $("#voicesSteps").innerHTML=["voicesWin","voicesAndroid","voicesApple"].map(function(k,i){
+    return '<div class="step"><b dir="ltr">'+(i+1)+"</b>"+esc(S[k])+"</div>"}).join("");
+  /* הקישור נשאר קישור microsoft-edge: רק בווינדוס מחוץ ל-Edge — במק,
+     באנדרואיד ובאייפון הוא לא פותח כלום. בתוך Edge בווינדוס: משפט
+     אחד במקום קישור. בשאר המערכות הפסקה נסתרת וההסבר לבדו נשאר. */
+  var isWin=/Windows/i.test(navigator.userAgent||""), vc=$("#voicesCta");
+  vc.hidden=!isWin;
+  vc.innerHTML=isWinNotEdge()
+    ? '<a class="btn" href="microsoft-edge:'+esc(location.href.split("#")[0])+'">'+esc(S.openEdge)+"</a>"
+    : '<p class="prose" style="margin:0">'+esc(S.inEdge)+"</p>";
+  /* מספר החינמיות נגזר משדה price ב-DATA.APPS, ולא נכתב ביד. */
   $("#stats").innerHTML=[[String(APPS.length),S.s1],[String(LANGS.length),S.s2],
-                         ["100%",S.s3],["0 ₪",S.s4]]
+                         ["100%",S.s3],[String(APPS.filter(function(a){return a.price===0}).length),S.s4]]
     .map(function(x){return '<div class="stat"><b dir="ltr">'+esc(x[0])+"</b><span>"+
       esc(x[1])+"</span></div>"}).join("");
   $("#ttl").textContent=S.title;
@@ -780,6 +935,26 @@ function paint(){
   applyTheme(savedTheme());
   draw();
 }
+
+/* --- הוספה למסך הבית --- */
+/* המנגנון עצמו יושב ב-legal/protect.js, המשותף לכל האפליקציות: סרגל
+   צף שנעלם לתמיד אחרי ✕ אחד. הכפתור כאן הוא דרך קבועה לאותה פעולה
+   — LEGAL.install() פותח את דיאלוג ההתקנה של הדפדפן, ובספארי את
+   ההוראות. אין כפתור כשאין דרך להתקין, וכשהדף כבר רץ כאפליקציה.
+   protect.js נטען אחרי הסקריפט הזה, ולכן הבדיקה נדחית ל-load ולסוף
+   התור של beforeinstallprompt. */
+function showInstall(){
+  var L=window.LEGAL;
+  var standalone=navigator.standalone===true||matchMedia("(display-mode:standalone)").matches;
+  $("#install").hidden=standalone||!(L&&L.canInstall&&L.canInstall());
+}
+window.addEventListener("load",showInstall);
+window.addEventListener("beforeinstallprompt",function(){setTimeout(showInstall,0)});
+window.addEventListener("appinstalled",function(){$("#install").hidden=true});
+$("#install").addEventListener("click",function(){
+  var L=window.LEGAL; if(L&&L.install)L.install();
+  showInstall();
+});
 
 function boot(){
   document.addEventListener("click",function(e){
@@ -813,9 +988,14 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=15-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=46-pwa1").catch(function(){});
   });
 }
 </script>
+<!-- מבצע השקה — חלון קופץ, תגיות ״חינם בתקופת ההשקה״ ו-״תאוריה מדברת״
+     בתשלום. שכבה מעל הכרטיסים, לא שינוי בהם: הכול ב-launch.js/launch.css.
+     שינוי באחד מהם — מעלים את ?v= כאן ואת מפתח ה-sw.js. -->
+<script src="launch.js?v=1"></script>
+<script>LAUNCH.init();</script>
 </body>
 </html>

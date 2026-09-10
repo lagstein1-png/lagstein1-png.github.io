@@ -40,7 +40,7 @@ const WORDS = {
 };
 
 /* אפליקציות שנספרות בדף הבית אך אין להן תיקייה כאן — הן בריפו נפרד */
-const EXTERNAL = new Set(['drivewise']);
+const EXTERNAL = new Set(['theory']);
 
 let findings = 0;
 const bad = (m) => { console.log('✗ ' + m); findings++; };
@@ -106,6 +106,18 @@ for (const a of apps) {
   }
 }
 
+/* --- 4.5. אפליקציה בריפו נפרד חייבת נתיב מפורש --- */
+/* הכרטיס בונה את הקישור כ-`a.u || "/" + a.id + "/"`. לאפליקציה
+   שאין לה תיקייה כאן, המזהה לבדו מוביל ל-404 — נמדד ב-5.9.2026,
+   ואותו מחיקה בוצעה פעמיים בטעות. השדה נמחק רק אחרי ששם הריפו
+   הנפרד ישונה, ואז הבדיקה הזאת נמחקת איתו. הנימוק המלא ב-NAMING.md. */
+for (const id of EXTERNAL) {
+  const a = apps.find(x => x.id === id);
+  if (!a) { bad(`${id}: מופיע ב-EXTERNAL ואינו ב-DATA.APPS`); continue; }
+  if (!a.u) bad(`${id}: אין נתיב מפורש בכרטיס. המזהה לבדו מוביל ל-404 — ראה NAMING.md, והענף naming/theory-rename-ready`);
+  else console.log(`· ${id} — בריפו נפרד, נתיב מפורש קיים. תקין.`);
+}
+
 /* --- 5. שם המטמון ב-sw.js ייחודי לאפליקציה --- */
 const caches = new Map();
 for (const a of apps) {
@@ -130,6 +142,55 @@ for (const a of apps) {
   if (!k) continue;                       /* לא כל משפחה משתמשת ב-SKEY */
   if (keys.has(k[1])) bad(`${a.id}: SKEY "${k[1]}" כבר בשימוש ב-${keys.get(k[1])} — שתיהן ידרסו זו את זו`);
   else keys.set(k[1], a.id);
+}
+
+/* --- 6.5. מניין התחומים של הלומדה, בארבע שפות --- */
+/* אותה מלכודת של ה-`badge` בדיוק, במקום שני: כרטיס הלומדה ופסקת
+   הפתיחה אומרים ״שמונה־עשר תחומים״ **כמילה**, והמספר אינו נגזר
+   מ-`lomda/data/`. ב-8.9.2026 נוסף מאגר שמונה־עשר ושתי המחרוזות
+   נשארו על ״שבעה־עשר״ בכל ארבע השפות — הבדיקות היו ירוקות, והדף
+   הצהיר על מספר שאינו נכון. מאגר תשעה־עשר יפיל את הבדיקה הזאת.
+
+   שים לב לרוסית: ״Восемнадцать״ מכיל בתוכו את ״семнадцать״, ולכן
+   המילה הנכונה ממוסכת לפני החיפוש אחרי מילה ישנה. בלי זה כל 18
+   נראה כמו 17 שנשאר מאחור. */
+const FIELDS = {
+  14: { he: 'ארבעה־עשר', ar: 'أربعة عشر', ru: 'четырнадцать', en: 'fourteen' },
+  15: { he: 'חמישה־עשר', ar: 'خمسة عشر',  ru: 'пятнадцать',   en: 'fifteen' },
+  16: { he: 'שישה־עשר',  ar: 'ستة عشر',   ru: 'шестнадцать',  en: 'sixteen' },
+  17: { he: 'שבעה־עשר',  ar: 'سبعة عشر',  ru: 'семнадцать',   en: 'seventeen' },
+  18: { he: 'שמונה־עשר', ar: 'ثمانية عشر', ru: 'восемнадцать', en: 'eighteen' },
+  19: { he: 'תשעה־עשר',  ar: 'تسعة عشر',  ru: 'девятнадцать', en: 'nineteen' },
+  20: { he: 'עשרים',     ar: 'عشرون',     ru: 'двадцать',     en: 'twenty' },
+};
+
+const dataDir = path.join(ROOT, 'lomda', 'data');
+if (fs.existsSync(dataDir)) {
+  const banks = fs.readdirSync(dataDir).filter(f => f.endsWith('.js') && f !== 'schema.js').length;
+  const fw = FIELDS[banks];
+  if (!fw) {
+    bad(`lomda: ${banks} מאגרים ואין מילת מספר בטבלת FIELDS — הוסף שורה, בארבע השפות`);
+  } else {
+    const card = (apps.find(a => a.id === 'lomda') || {}).d || {};
+    for (const lg of ['he', 'ar', 'ru', 'en']) {
+      const lead = ((DATA.STR[lg] || {}).lead) || '';
+      for (const [what, text] of [['כרטיס הלומדה', card[lg] || ''], ['פסקת הפתיחה', lead]]) {
+        if (!text) { bad(`lomda ${what} ${lg}: אין טקסט`); continue; }
+        const low = text.toLowerCase();
+        if (low.indexOf(fw[lg].toLowerCase()) < 0) {
+          bad(`lomda ${what} ${lg}: אינו אומר "${fw[lg]}" (${banks} מאגרים)`);
+          continue;
+        }
+        /* המילה הנכונה ממוסכת, ורק אז מחפשים מילה של מספר אחר */
+        const masked = low.split(fw[lg].toLowerCase()).join('·');
+        const stale = Object.keys(FIELDS)
+          .filter(k => +k !== banks && masked.indexOf(FIELDS[k][lg].toLowerCase()) >= 0)
+          .sort((a, b) => FIELDS[b][lg].length - FIELDS[a][lg].length)[0];
+        if (stale) bad(`lomda ${what} ${lg}: נשאר בו גם "${FIELDS[stale][lg]}" (${stale})`);
+      }
+    }
+    console.log(`· lomda — ${banks} מאגרים, והמניין במילה תואם בארבע השפות`);
+  }
 }
 
 /* --- 7. תיקיות שאינן אפליקציות לימוד — לא ממצא, רק תזכורת --- */

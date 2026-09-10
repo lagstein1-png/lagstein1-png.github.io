@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>לרכישה — תאוריה מדברת</title>
+<meta name="description" content="ההרשמה לרכישת ״תאוריה מדברת״ נפתחת בקרוב. השאירו מייל ונודיע ביום הפתיחה.">
+<link rel="icon" href="/img/icon-192.png">
+<link rel="license" href="/legal/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* אותם משתני מותג כמו בדף הבית וב-/pricing/, כדי שהמעבר לא ירגיש
+   כמו אתר אחר. עמוד אחד, בלי סקריפט משלו: הטופס יגיע כ-iframe. */
+:root{--bg:#f6f7fb; --bg-elev:#fff; --text:#14181f; --text-soft:#4a5464; --line:#e2e6ef;
+  --brand:#2f5fd8; --brand-ink:#fff; --ok:#1a7f4b; --ok-soft:#e3f5ea; --radius:18px}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9;
+  --text-soft:#aab4c6; --line:#222c3d; --brand:#7ba2ff; --brand-ink:#0b0f17; --ok:#6ee7a8; --ok-soft:#14301f}}
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--text); font:400 1.05rem/1.6 Heebo,system-ui,sans-serif}
+main{max-inline-size:640px; margin:0 auto; padding:32px 20px 48px}
+.card{background:var(--bg-elev); border:1px solid var(--line); border-radius:var(--radius); padding:28px 24px}
+h1{margin:0 0 8px; font-size:1.7rem; line-height:1.25}
+.price{display:inline-flex; align-items:center; gap:10px; margin:10px 0 18px; font-weight:700}
+.price s{color:var(--text-soft); opacity:.8}
+.price b{color:var(--ok); background:var(--ok-soft); padding:6px 12px; border-radius:999px}
+p{margin:0 0 14px; color:var(--text-soft)}
+.form{margin-block-start:22px; min-block-size:80px; border:1px dashed var(--line); border-radius:12px;
+  display:grid; place-items:center; color:var(--text-soft); font-size:.95rem; padding:16px}
+.form iframe{inline-size:100%; min-block-size:520px; border:0}
+.back{display:inline-block; margin-block-start:22px; color:var(--brand); font-weight:700}
+/* פס מבצע ההשקה — אותו פס שבעמוד המחירים, אותם צבעים קבועים,
+   גם במצב כהה. הסרה בסיום המבצע: מוחקים את ה-div ואת הכלל הזה. */
+.launch-bar{background:#fff3cd; color:#664d03; text-align:center; padding:12px 16px;
+  font-weight:600; line-height:1.5; white-space:pre-line}
+</style>
+</head>
+<body>
+<!-- מבצע השקה — פס הודעה. עברית בלבד, בכוונה: הנוסח נמסר על ידי הבעלים
+     ומוצג כלשונו, והוא זהה לזה שבעמוד המחירים. בלעדיו הכרטיסים מציגים
+     מחיר בזמן שאין גבייה כלל. הסרה בסיום המבצע: מוחקים את ה-div. -->
+<div class="launch-bar" role="status" dir="rtl" lang="he">🎉 מבצע השקה: כל המסלולים פתוחים כעת ללא חיוב, עד להודעה חדשה.
+המחירים המוצגים ייכנסו לתוקף בסיום המבצע.</div>
+
+<main>
+  <div class="card">
+    <h1>🎉 תאוריה מדברת — לרכישה</h1>
+    <div class="price" aria-label="מחיר"><s dir="ltr">120 ₪</s><b>מבצע השקה: 79 ₪</b><span>תשלום חד־פעמי</span></div>
+    <p>ההרשמה לרכישה נפתחת בקרוב. השאירו מייל ונודיע לכם ביום הפתיחה.</p>
+    <div class="form" id="form">
+      <span id="formHint">כאן ייכנס טופס ההרשמה.</span>
+    </div>
+    <a class="back" href="/">→ חזרה לדף הבית</a>
+  </div>
+</main>
+<!-- GOOGLE_FORM_HERE — הדבקת הטופס היא שורה אחת:
+     ב-Google Forms: שלח (Send) → הלשונית < > → העתק את הכתובת שבתוך src="…"
+     (מסתיימת ב-?embedded=true). מדביקים אותה בין המירכאות של FORM_URL.
+     כל עוד FORM_URL ריק הדף מציג את הודעת ״בקרוב״, ושום דבר לא נשבר.
+     התבנית, כפי שנמסרה ב-9.9.2026 — מחליפים את XXXX במזהה הטופס בלבד:
+       var FORM_URL="https://docs.google.com/forms/d/e/XXXX/viewform?embedded=true";
+     עם XXXX הכתובת אינה טופס, ולכן היא לא הוכנסה: המבקר היה רואה שגיאה של
+     Google בתוך התיבה במקום ״בקרוב״. -->
+<script>
+var FORM_URL="";
+(function(){
+  if(!FORM_URL)return;
+  var box=document.getElementById("form"), f=document.createElement("iframe");
+  f.src=FORM_URL; f.title="טופס הרשמה — תאוריה מדברת"; f.loading="lazy";
+  box.textContent=""; box.appendChild(f);
+})();
+</script>
+</body>
+</html>

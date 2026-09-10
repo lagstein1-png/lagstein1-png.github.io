@@ -4,12 +4,20 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>אקסיומה ג׳ — שנה שלישית, צעד אחר צעד</title>
-<meta name="description" content="תרגול מתמטיקה לשנה ג׳ באוניברסיטה: אנליזה, פונקציות מרוכבות, אלגברה מופשטת ושיטות נומריות. כל שאלה עם פתרון מודרך צעד־צעד, זיהוי הטעות, דף נוסחאות והקראה בקול טבעי." />
+<meta name="description" content="תרגול מתמטיקה לשנה ג׳ באוניברסיטה: אנליזה, פונקציות מרוכבות, אלגברה מופשטת ושיטות נומריות. כל שאלה עם פתרון מודרך צעד־צעד, זיהוי הטעות, דף נוסחאות והקראה בקול." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="אקסיומה ג׳ — שנה שלישית, צעד אחר צעד" />
+<meta property="og:description" content="תרגול מתמטיקה לשנה ג׳ באוניברסיטה: אנליזה, פונקציות מרוכבות, אלגברה מופשטת ושיטות נומריות. כל שאלה עם פתרון מודרך צעד־צעד, זיהוי הטעות, דף נוסחאות והקראה בקול." />
+<meta property="og:url" content="https://lagstein1-png.github.io/math-uni3/" />
+<meta property="og:image" content="https://lagstein1-png.github.io/math-uni3/img/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme:light)" />
 <meta name="theme-color" content="#0e1117" media="(prefers-color-scheme:dark)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
 /* ============================================================
    אקסיומה ג׳ — מתמטיקה לשנה ג׳
@@ -19,6 +27,7 @@
    ============================================================ */
 :root{
   --ar:"Noto Sans Arabic",system-ui,"Segoe UI",Arial,sans-serif;
+  --ru:"Noto Sans",system-ui,"Segoe UI",Arial,sans-serif;   /* קירילית — Heebo אינו מכיל אותה, נמדד 7.9 */
   --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
   --bg:#f5f7fb; --surface:#ffffff; --surface2:#eef1f7;
   --ink:#101828; --muted:#5b6478; --faint:#687080; --line:#e0e4ee;
@@ -46,6 +55,8 @@
    הגופן נמשכים רק כשבאמת מוצג טקסט ערבי. */
 html[lang="ar"] body,html[lang="ar"] input,html[lang="ar"] button,
 html[lang="ar"] textarea,html[lang="ar"] select{font-family:var(--ar)}
+html[lang="ru"] body,html[lang="ru"] input,html[lang="ru"] button,
+html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
 :root[data-theme="dark"]{
   --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
   --ink:#e8ecf4; --muted:#9aa4ba; --faint:#8f99ae; --line:#28313f;
@@ -174,7 +185,6 @@ nav{display:flex;gap:4px;margin-inline-start:auto;flex-wrap:wrap}
 .g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
 .g4{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
 /* רשימת הקולות: שתי עמודות רק כשבאמת יש מקום, אחרת השמות נקטעים */
-.vgrid{grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));gap:8px}
 .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .spread{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
@@ -326,16 +336,6 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .fcard .fm{margin-top:7px;font-size:1.05rem}
 .fcard .fn{color:var(--muted);font-size:.82rem;margin-top:6px;overflow-wrap:anywhere}
 
-/* ---------- שורת מצב הקול ---------- */
-.vstrip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;
-  padding:9px 13px;border-radius:11px;font-size:.86rem;font-weight:600;line-height:1.5}
-.vstrip>span{flex:1;min-width:0}
-.vstrip .btn{padding:6px 12px;font-size:.8rem;background:var(--surface);border-color:currentColor}
-.vstrip.ok{background:var(--ok-soft);color:var(--ok)}
-.vstrip.warn{background:var(--warn-soft);color:var(--warn)}
-.vstrip.bad{background:var(--bad-soft);color:var(--bad)}
-.vstrip svg{flex-shrink:0}
-
 /* ---------- שכבות ---------- */
 .ov{position:fixed;inset:0;z-index:80;background:rgba(8,11,18,.62);backdrop-filter:blur(3px);
   display:grid;place-items:center;padding:14px}
@@ -432,6 +432,18 @@ footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface
 /* שאלת מקור נושאת קטע שלם. בלי תקרה הוא דוחף את שאר הרשימה
    אל מחוץ למסך. */
 .xq .passage{max-height:11rem;overflow:auto}
+/* בורר השפה מציג ״العربية״ ו-״Русский״ גם כשהממשק עברי — זה כל
+   תפקידו — ולכן `html[lang]` אינו חל עליהם והם יורשים את `--font`,
+   שאין בו לא ערבית ולא קירילית. הגופן נקבע לפי השפה שהכפתור מציע,
+   ולא לפי שפת הממשק. הסימון אינו אחיד בין האפליקציות (`data-v`,
+   `data-n`, `data-l`, ולעיתים גם `lang`), ולכן הכלל מונה את כולם —
+   בלוק זהה בתשע האפליקציות, כדי שלא ייסחף ביניהן. */
+button[data-a="lang"][data-v="ar"],button[data-a="lang"][data-n="ar"],
+button[data-a="lang"][data-l="ar"],button[data-a="lang"][data-l="ar"] .fd,
+button[data-a="lang"][lang="ar"]{font-family:var(--ar)}
+button[data-a="lang"][data-v="ru"],button[data-a="lang"][data-n="ru"],
+button[data-a="lang"][data-l="ru"],button[data-a="lang"][data-l="ru"] .fd,
+button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -525,7 +537,7 @@ var DEMO_SCRIPT=[
   {subtitle:"ההתקדמות: מה כבר נלמד, ואיפה עוד חלש — לפי נושא ולפי רמה.",
    action:function(){demoTap('[data-a="go"][data-v="progress"]')}, duration:4800},
 
-  {subtitle:"וחזרה לדף הבית. בלי הרשמה, בלי פרסומות, והכול נשמר במכשיר הזה בלבד.",
+  {subtitle:"וחזרה לדף הבית. בלי פרסומות, והכול נשמר במכשיר הזה בלבד.",
    action:function(){demoTap('[data-a="go"][data-v="home"]')}, duration:4400}
 ];
 
@@ -926,7 +938,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g38 · 2026-09-10";
+var BUILD="g71 · 2026-09-10";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -941,7 +953,7 @@ function blankState(){
     days:{},
     wrongBank:[],            /* נושאים שנפלו בהם — חוזרים לתרגול */
     settings:{theme:"auto",ts:1,clearfont:false,spaced:false,hc:false,rm:false,
-              calm:false,tts:true,rate:0.95,engine:"device",gvoice:"Kore",voice:"",
+              calm:false,tts:true,rate:0.95,voice:"",
               roundLen:8,keys:true,autoSteps:false,lang:null,voiceByLang:{}}
   };
 }
@@ -1001,43 +1013,8 @@ function applyModes(){
 
 /* ============================================================
    6. הקראה קולית
-   שני מקורות קול:
-   · Gemini — קול טבעי שנשמע כמו אדם. דורש אינטרנט ומפתח.
-   · קול המכשיר — עובד תמיד ובלי רשת, אבל נשמע רובוטי.
-   הקצב אצל Gemini לא נשלח כפרמטר (ה-API מחזיר 400 על audioConfig),
-   אלא מתבקש במילים בתוך הטקסט עצמו.
+   קול המכשיר בלבד (speechSynthesis) — עובד תמיד ובלי רשת.
    ============================================================ */
-var GEM_VOICES=[
-  {id:"Kore",     t:"קורה",    g:"f", d:"רגוע וברור"},
-  {id:"Aoede",    t:"אאודה",   g:"f", d:"חם ונעים"},
-  {id:"Leda",     t:"לדה",     g:"f", d:"צעיר וקליל"},
-  {id:"Autonoe",  t:"אוטונואה",g:"f", d:"בהיר ומדויק"},
-  {id:"Puck",     t:"פאק",     g:"m", d:"ער וזורם"},
-  {id:"Charon",   t:"כארון",   g:"m", d:"עמוק ושקול"},
-  {id:"Orus",     t:"אורוס",   g:"m", d:"יציב ונינוח"},
-  {id:"Fenrir",   t:"פנריר",   g:"m", d:"נמרץ יותר"}
-];
-function gvName(id){for(var i=0;i<GEM_VOICES.length;i++)if(GEM_VOICES[i].id===id)return GEM_VOICES[i];return GEM_VOICES[0]}
-var GKEY="";
-function loadKey(){
-  try{
-    GKEY=localStorage.getItem("axiom3-gkey")||"";
-    /* מפתח שכבר הוזן באחת האפליקציות האחרות באתר עובד גם כאן */
-    if(!GKEY)GKEY=localStorage.getItem("shlav-gkey")||"";
-    if(!GKEY)GKEY=localStorage.getItem("reader-gkey")||"";
-    if(!GKEY){
-      var raw=localStorage.getItem("mlh-state-v2");
-      if(raw){var o=JSON.parse(raw);if(o&&o.settings&&o.settings.googleKey)GKEY=String(o.settings.googleKey).trim()}
-    }
-  }catch(e){GKEY=""}
-  return GKEY;
-}
-function saveKey(k){
-  GKEY=String(k||"").trim();
-  try{GKEY?localStorage.setItem("axiom3-gkey",GKEY):localStorage.removeItem("axiom3-gkey")}catch(e){}
-}
-function hasKey(){return !!GKEY}
-
 function voices(){try{return window.speechSynthesis?speechSynthesis.getVoices():[]}catch(e){return[]}}
 /* הקולות נטענים אסינכרונית, ורק אז נורה voiceschanged. מי שמקריא
    לפני כן מקבל את ברירת המחדל של הדפדפן — לרוב קול אנגלי, גם כשמותקן
@@ -1096,6 +1073,36 @@ function guessGender(v){
   if(VOICE_M.test(n))return "m";
   return "?";
 }
+/* מדרגים ולא לוקחים את הראשון. עד כאן הבחירה נפלה על סדר ההתקנה
+   של המכשיר, ובמכשיר אחד יושבים כמה קולות באותה שפה באיכות שונה
+   מאוד — הראשון הוא לרוב של יצרן המכשיר ולא הטוב שבהם. הניקוד
+   הועתק מ"תאוריה מדברת": שם יצרן ומנוע נוירלי מעלים, espeak
+   ו-compact מורידים. */
+function voiceQuality(v){
+  var s=0,n=(v.name||"")+" "+(v.lang||"");
+  if(/google/i.test(n))s+=4;
+  if(/microsoft/i.test(n))s+=4;
+  if(/natural|enhanced|premium|neural|wavenet/i.test(n))s+=2;
+  /* קול רשת — הנוירליים של Edge הם כאלה — נשמע טוב יותר כשיש רשת,
+     וזה כל מה שנקבע כאן. מה קורה כשאין רשת נקבע ב-voiceUsable. */
+  if(v.localService===false&&voiceUsable(v))s+=2;
+  if(/espeak|compact|pico/i.test(n))s-=6;
+  if(v.default)s+=1;
+  return s;
+}
+/* המגדר אינו סעיף בתוך הניקוד אלא המיון הראשון. אחרת קול גברי
+   ממותג מנצח קול נשי שקיים באותו מכשיר — בדיוק מה שהעדפת המגדר
+   נועדה למנוע. קודם נשי, אחריו מי שלא זוהה, ורק אז גברי; ובתוך
+   כל קבוצה מכריעה האיכות. */
+function voiceOrder(pool){
+  function grank(v){var g=guessGender(v);return g==="f"?2:g==="?"?1:0}
+  return pool.slice().sort(function(a,b){
+    /* קול שלא יעבוד יורד לתחתית לפני כל שיקול אחר — גם לפני המגדר,
+       שאם לא כן קול נשי מת מנצח קול גברי חי. */
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||voiceQuality(b)-voiceQuality(a);
+  });
+}
 function deviceVoice(){
   var list=pickList(),i;
   if(!list.length)return null;
@@ -1114,88 +1121,13 @@ function deviceVoice(){
      סריקה על כל הרשימה מצאה קול אנגלי נשי במכשיר שאין בו קול
      עברי נשי — והעברית הוקראה באנגלית. שפה קודמת למגדר. */
   var mine=hebVoices();
-  for(i=0;i<mine.length;i++)if(guessGender(mine[i])==="f")return mine[i];
-  if(mine.length)return mine[0];
+  if(mine.length)return voiceOrder(mine)[0];
   /* אין קול בשפת הממשק? מחזירים null ולא את הקול הראשון שיש.
      קול אנגלי שמושם על משפט עברי גורר איתו גם את u.lang, והמשפט
      נקרא באנגלית. null משאיר את u.lang בשפה הנכונה ומשאיר לדפדפן
      לבחור — גרוע פחות מהקראה בשפה הלא נכונה. */
   return null;
 }
-/* "gemini:Kore" או "device" */
-/* מפתח חסום או שגוי (403/400/401) אינו תקלה חולפת. בלי הזיכרון
-   הזה כל משפט מנסה שוב את הרשת, ממתין, נכשל, ורק אז מדבר בקול
-   המכשיר — עיכוב לפני כל הקראה, ופס אדום שחוזר בלי סוף. */
-var gDead=false;
-function voiceMode(){
-  var v=state.settings.engine;
-  if(v==="gemini"&&hasKey()&&!gDead)return "gemini";
-  return "device";
-}
-
-var gAudio=null,gCache={};
-/* אלמנט שמע אחד, קבוע, שמשוחרר במגע הראשון. ב-iOS ההיתר להשמיע
-   ניתן לאלמנט ולא לדף, ואלמנט שנוצר אחרי fetch לא יקבל אותו
-   לעולם — ולכן הקול הטבעי היה שותק שם בלי שום שגיאה. */
-var GEL=null;
-var SILENT_WAV="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
-function gStop(){if(gAudio){try{gAudio.pause();gAudio.src=""}catch(e){}gAudio=null}}
-function gSynth(text,voiceName,rate){
-  /* ההנחיה נוקבת בשפה במפורש. בלעדיה המודל מנחש לפי הטקסט, ונופל
-     בדיוק על מה שמעורבב — נוסחה לטינית בתוך משפט לא־לטיני. */
-  var lead=rate<=0.75?_("קרא לאט מאוד וברור, בעברית: ")
-          :rate<=0.9 ?_("קרא לאט וברור, בעברית: ")
-          :rate>=1.15?_("קרא בקצב מהיר, בעברית: ")
-          :_("קרא בקצב טבעי, בעברית: ");
-  var body={contents:[{parts:[{text:lead+text}]}],
-    generationConfig:{responseModalities:["AUDIO"],
-      speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voiceName}}}}};
-  return fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key="+encodeURIComponent(GKEY),
-    {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
-  .then(function(r){
-    if(r.ok)return r.json();
-    /* גוגל מסביר בגוף התשובה למה סירב. בלי זה אי אפשר לדעת אם
-       המפתח שגוי, המודל חסום, או שהבקשה עצמה לא תקינה. */
-    return r.text().then(function(t){
-      var msg="";
-      try{var j=JSON.parse(t);msg=(j.error&&j.error.message)||""}catch(e){msg=String(t).slice(0,140)}
-      throw new Error(r.status+(msg?" — "+msg:""));
-    });
-  })
-  .then(function(d){
-    var parts=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
-    for(var i=0;i<parts.length;i++){
-      var pd=parts[i].inlineData;
-      if(pd&&pd.data){
-        var mt=pd.mimeType||"";
-        if(mt.indexOf("wav")>=0||mt.indexOf("pcm")>=0||mt.indexOf("L16")>=0)
-          return pcmToWav(pd.data)||("data:audio/wav;base64,"+pd.data);
-        return "data:audio/mp3;base64,"+pd.data;
-      }
-    }
-    throw new Error(_("לא התקבל שמע"));
-  });
-}
-/* Gemini מחזיר PCM גולמי. בלי כותרת WAV אף דפדפן לא ינגן אותו. */
-function pcmToWav(b64){
-  try{
-    var bin=atob(b64),len=bin.length,buf=new Uint8Array(len),i;
-    for(i=0;i<len;i++)buf[i]=bin.charCodeAt(i);
-    var sr=24000,ch=1,bits=16;
-    var hdr=new ArrayBuffer(44+len),v=new DataView(hdr);
-    function ws(o,str){for(var k=0;k<str.length;k++)v.setUint8(o+k,str.charCodeAt(k))}
-    ws(0,"RIFF");v.setUint32(4,36+len,true);ws(8,"WAVE");ws(12,"fmt ");
-    v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);
-    v.setUint32(24,sr,true);v.setUint32(28,sr*ch*bits/8,true);
-    v.setUint16(32,ch*bits/8,true);v.setUint16(34,bits,true);
-    ws(36,"data");v.setUint32(40,len,true);
-    new Uint8Array(hdr,44).set(buf);
-    var bytes=new Uint8Array(hdr),out="";
-    for(var j=0;j<bytes.length;j+=0x8000)out+=String.fromCharCode.apply(null,bytes.subarray(j,j+0x8000));
-    return "data:audio/wav;base64,"+btoa(out);
-  }catch(e){return null}
-}
-
 /* ============================================================
    מעקב הקראה: הדגשת המילה הנאמרת
    ------------------------------------------------------------
@@ -1256,7 +1188,6 @@ function hlAt(c){
     }
   }
 }
-var ttsErr="",ttsState="";   /* "" · "ok" · "device" · "err" */
 
 /* ------------------------------------------------------------
    כשמנוע הדיבור של המכשיר נכשל — לומר את זה.
@@ -1324,27 +1255,37 @@ var VCHK="";
    ------------------------------------------------------------ */
 var VCHKMSG={
   he:{sent:"נשלח…",noSup:"✗ הדפדפן הזה לא תומך בהקראה",mkFail:"✗ יצירת האמירה נכשלה: ",
-      okN:["✓ הקול פועל — "," קולות במכשיר"],ok:"✓ הקול פועל",unk:"לא ידוע",
+      okN:["✓ הקול פועל — "," בשפה הזו מתוך "," קולות במכשיר"],ok:"✓ הקול פועל",unk:"לא ידוע",
       engine:["✗ המנוע החזיר "," קולות · זו תקלה במכשיר, לא באפליקציה"],
       spFail:"✗ speak נכשל: ",timeout:["✗ שתי שניות ואין תגובה מהמנוע · "," קולות במכשיר"],
       say:"שלום, זו בדיקת קול"},
   ar:{sent:"جارٍ الإرسال…",noSup:"✗ هذا المتصفّح لا يدعم القراءة الصوتية",mkFail:"✗ فشل إنشاء النطق: ",
-      okN:["✓ الصوت يعمل — "," صوتًا في الجهاز"],ok:"✓ الصوت يعمل",unk:"غير معروف",
+      okN:["✓ الصوت يعمل — "," بهذه اللغة من أصل "," صوتًا في الجهاز"],ok:"✓ الصوت يعمل",unk:"غير معروف",
       engine:["✗ أعاد المحرّك "," صوتًا · هذا عطل في الجهاز، لا في التطبيق"],
       spFail:"✗ فشل speak: ",timeout:["✗ ثانيتان بلا ردّ من المحرّك · "," صوتًا في الجهاز"],
       say:"مرحبًا، هذا فحص صوت"},
   ru:{sent:"Отправляем…",noSup:"✗ Этот браузер не поддерживает озвучивание",mkFail:"✗ Не удалось создать реплику: ",
-      okN:["✓ Голос работает — голосов: ",""],ok:"✓ Голос работает",unk:"неизвестно",
+      okN:["✓ Голос работает — на этом языке: ",", всего на устройстве: ",""],ok:"✓ Голос работает",unk:"неизвестно",
       engine:["✗ Синтезатор вернул "," голосов · это неполадка устройства, а не приложения"],
       spFail:"✗ speak не сработал: ",timeout:["✗ Две секунды без ответа от синтезатора · "," голосов"],
       say:"Здравствуйте, это проверка голоса"},
   en:{sent:"Sending…",noSup:"✗ This browser does not support read-aloud",mkFail:"✗ Could not create the utterance: ",
-      okN:["✓ The voice works — "," voices on this device"],ok:"✓ The voice works",unk:"unknown",
+      okN:["✓ The voice works — "," in this language, out of "," voices on this device"],ok:"✓ The voice works",unk:"unknown",
       engine:["✗ The engine returned "," voices · this is a device fault, not an app fault"],
       spFail:"✗ speak failed: ",timeout:["✗ Two seconds and no response from the engine · "," voices on this device"],
       say:"Hello, this is a voice check"}
 };
 function vchkT(){ var g=LG; return VCHKMSG[g]||VCHKMSG.he }
+/* כמה מהקולות הם בשפה שנבדקת. עד כה ההודעה מנתה את כל הקולות
+   במכשיר, בכל השפות — "23 קולות" בכרום על ווינדוס, כשבעברית יש
+   שם אחד בלבד (Asaf). המספר היה נכון ולא אמר כלום; עכשיו שניהם. */
+function sameLang(list,lang){
+  var base=String(lang||"").split("-")[0].toLowerCase(),n=0;
+  for(var i=0;i<list.length;i++){
+    if(String(list[i].lang||"").replace("_","-").toLowerCase().split("-")[0]===base)n++;
+  }
+  return n;
+}
 function voiceCheck(){
   var M=vchkT();
   VCHK=M.sent; render();
@@ -1357,7 +1298,7 @@ function voiceCheck(){
   catch(e){ show(M.mkFail+e.message); return }
   u.lang=(LANGS[LG]||LANGS.he).tts; u.volume=1; u.rate=1; u.pitch=1;
   var done=false;
-  u.onstart=function(){ done=true; show(M.okN[0]+list.length+M.okN[1]) };
+  u.onstart=function(){ done=true; show(M.okN[0]+sameLang(list,u.lang)+M.okN[1]+list.length+M.okN[2]) };
   u.onerror=function(e){ done=true;
     var er=(e&&e.error)||M.unk;
     show(M.engine[0]+er+" · "+list.length+M.engine[1]); };
@@ -1375,6 +1316,76 @@ function voiceCheck(){
    כל מקטע נושא את ההיסט שלו במחרוזת המלאה, כי charIndex מתאפס
    בכל אמירה ובלעדיו ההדגשה קופצת לתחילת המשפט בכל מקטע.
    ------------------------------------------------------------ */
+/* =====================================================================
+   מנוע ההקראה של "תאוריה מדברת" — ארבעה מנגנונים
+   ---------------------------------------------------------------------
+   ארבעה כשלים שקטים של Web Speech. אף אחד מהם אינו מדווח כשגיאה,
+   וכולם נראים למשתמש בדיוק אותו דבר: הקול פשוט מפסיק באמצע. הקוד
+   כאן הועתק מהאפליקציה שבה הוא כבר רץ, ולא נוסח מחדש.
+   ===================================================================== */
+
+/* 1 · שומר-ער. באג ותיק ב-Chrome וב-Edge בשולחן העבודה: ההקראה
+   נחתכת אחרי כ-15 שניות, באמצע מילה. pause+resume תקופתי מחזיק את
+   המנוע ער. במובייל אין את הבאג ופעולה כזאת דווקא מקרטעת שם, ולכן
+   מפעילים רק היכן שבאמת צריך. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+/* עוצרים רק כששום דבר כבר לא מדבר — אחרת מקטע שהתחיל זה עתה מאבד
+   את השמירה שלו כשהמקטע הקודם מסיים להתנקות. */
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+
+/* 2 · הפניה חיה ל-utterance. Chrome אוסף אובייקט שאין אליו הפניה,
+   ואיתו נעלמים onend ו-onboundary: ההקראה נתקעת באמצע, ההדגשה
+   קופאת על מילה אחת, והמקטע הבא לא יוצא לעולם. */
+var _activeU=null;
+
+/* 3 · קול רשת שנכשל. הקולות הנוירליים של Edge הם קולות רשת, והם
+   שותקים בלי אינטרנט. הדגל נכבה ברגע שאחד מהם נכשל, ומאותו רגע
+   הדירוג מעדיף קול מקומי לשארית הסשן. */
+var _netVoiceOK=true;
+
+/* קול רשת שאי אפשר להשתמש בו עכשיו — אין אינטרנט, או שאחד כבר
+   נכשל בסשן הזה — אינו "פחות טוב", הוא פשוט לא יעבוד. לכן זה מיון
+   ראשון ולא עוד סעיף בתוך הניקוד: קנס בניקוד לא הספיק, מפני שקול
+   נוירלי של Microsoft צובר על שם היצרן ועל "Natural" יותר ממה שכל
+   קנס סביר מוריד — והוא נבחר שוב ושוב אחרי שכבר נכשל.
+   כשהוא הקול היחיד שיש הוא עדיין נבחר: מיון של רשימה בת אחד
+   מחזיר אותה כמו שהיא. */
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+
+/* 4 · שומר זמן. יש מכשירים שבהם onend פשוט לא נורה. בלי השומר הזה
+   התור נתקע: הכפתור נשאר על "עצירה" וההקראה לא ממשיכה לעולם. ארבע
+   שניות שבהן המנוע לא מדבר ולא ממתין נחשבות סוף.
+   מחזיר פונקציית ביטול — מי שסיים בדרך הרגילה מכבה את השומר. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+
 var SEG_MAX=90, SEG_GAP=260;
 /* סימן פיסוק בין שתי ספרות הוא חלק מהמספר ולא מקום לחתוך בו:
    בלי הבדיקה הזאת "3,500" נשבר והמנוע קורא "שלוש, חמש מאות". */
@@ -1447,6 +1458,20 @@ function femLift(v){
 
 /* הודעה כשאין קול נשי בשפה — עם ההוראות למערכת ההפעלה שהמשתמש
    נמצא בה. בלי זה "אין קול נשי" נראה כמו החלטה של האפליקציה. */
+/* כרום על ווינדוס אינו נושא קולות משלו — הוא רואה רק את קולות
+   המערכת, ובעברית המערכת מציעה אחד בלבד: Asaf הגברי. "הוספת קולות"
+   בהגדרות ווינדוס לא תביא קול נשי בעברית, כי כזה אין למיקרוסופט
+   להתקנה, ולכן ההוראות שב-femNote מובילות שם למבוי סתום. Edge נושא
+   קולות טבעיים משלו, נשיים וגבריים (Hila ו-Avri בעברית), והסכימה
+   microsoft-edge: פותחת בו את אותה כתובת מתוך כל דפדפן בווינדוס —
+   לחיצה אחת במקום מסלול התקנה שאינו קיים. */
+function isWinNotEdge(){var ua=navigator.userAgent||"";return /Windows/i.test(ua)&&!/Edg\//.test(ua)}
+function edgeNote(){
+  if(!isWinNotEdge())return "";
+  return " "+esc(_("בדפדפן Microsoft Edge יש קולות טבעיים בשפה הזאת, נשיים וגבריים — בלי התקנה, בחיבור לאינטרנט."))+
+    ' <a href="microsoft-edge:'+esc(location.href.split("#")[0])+'" style="font-weight:700;color:inherit">'+
+    esc(_("לפתוח את האפליקציה ב-Edge"))+"</a>";
+}
 function femNote(){
   var mine=hebVoices(),i,has=false;
   for(i=0;i<mine.length;i++)if(guessGender(mine[i])==="f")has=true;
@@ -1493,23 +1518,51 @@ function speakDevice(text){
   if(_v&&_v.lang)_lang=_v.lang;
   var _segs=segments(String(text)), _rate=tuneRate(_lang,state.settings.rate);
   var _pitch=femLift(_v);
+  var _retried=false;
+  function _alive(){return my===_sayGen}
+  function _allDone(){ maybeStopKeepAlive(); hlClear(); ttsOK() }
   /* המקטע הראשון יוצא כאן, בתוך הלחיצה. השאר נשרשרים מ-onend. */
   (function sayseg(k){
-    if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
-    if(k>=_segs.length){ hlClear(); ttsOK(); return }
-    var seg=_segs[k];
+    if(!_alive())return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
+    if(k>=_segs.length){ _allDone(); return }
+    /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
+       יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+    var seg=_segs[k], moved=false, disarm=null;
+    function next(){
+      if(moved||!_alive())return;
+      moved=true; if(disarm)disarm();
+      if(k+1<_segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+      else _allDone();
+    }
     try{
       var u=new SpeechSynthesisUtterance(seg.text);
       u.lang=_lang;
       if(_v){ try{ u.voice=_v }catch(e2){} }
       u.rate=_rate; u.pitch=_pitch; u.volume=1;
       u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
-      u.onend=function(){
-        if(k+1<_segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
-        else { hlClear(); ttsOK() }
+      u.onend=next;
+      u.onerror=function(e){
+        if(moved||!_alive())return;
+        var err=(e&&e.error)||"";
+        /* ביטול יזום אינו תקלה — stopSpeak כבר ניקה אחריו */
+        if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+        /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול
+           מקומי וחוזרים על אותו מקטע, פעם אחת, כדי שההקראה לא
+           תישבר בשקט באמצע שאלה. */
+        if(!_retried&&_v&&_v.localService===false){
+          _retried=true; _netVoiceOK=false; moved=true;
+          if(disarm)disarm(); _activeU=null;
+          _v=deviceVoice(); if(_v&&_v.lang)_lang=_v.lang; _pitch=femLift(_v);
+          setTimeout(function(){sayseg(k)},SEG_GAP);
+          return;
+        }
+        moved=true; if(disarm)disarm(); maybeStopKeepAlive(); ttsFail(err);
       };
-      u.onerror=function(e){ttsFail(e&&e.error)};
+      _activeU=u;                        /* מגן מפני איסוף זבל */
+      try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e3){}
       speechSynthesis.speak(u);
+      startKeepAlive();
+      disarm=ttsWatchdog(function(){return _alive()&&!moved},next);
     }catch(e){}
   })(0);
 }
@@ -1521,51 +1574,12 @@ function speak(text){
      שמע "span class frac" באמצע השאלה. */
   text=plainOf(String(text));
   stopSpeak();
-  if(voiceMode()!=="gemini"){
-    if(ttsState!=="device"){ttsState="device"}
-    speakDevice(text);return;
-  }
-  var my=_sayGen;   /* גם תשובת רשת שמגיעה אחרי עצירה לא תושמע */
-  var name=state.settings.gvoice||"Kore",rate=state.settings.rate;
-  var ck=name+"|"+rate.toFixed(2)+"|"+text;
-  function play(url){
-    gStop();
-    /* משתמשים באלמנט ששוחרר במגע ולא יוצרים חדש. */
-    if(!GEL)GEL=new Audio();
-    gAudio=GEL; gAudio.src=url;
-    gAudio.play().catch(function(){speakDevice(text)});
-  }
-  if(gCache[ck]){play(gCache[ck]);return}
-  gSynth(text,name,rate).then(function(url){
-    if(my!==_sayGen)return;
-    gCache[ck]=url;ttsErr="";
-    if(ttsState!=="ok"){ttsState="ok";if(view==="practice")render()}
-    play(url);
-  }).catch(function(e){
-    /* נופלים חזרה לקול המכשיר במקום להשתתק, ורושמים למה — כדי
-       שמסך ההגדרות יוכל להראות את הסיבה במקום "לא עובד". */
-    ttsErr=String(e&&e.message||e);
-    if(/\b(400|401|403)\b|blocked|permission|API key|not valid/i.test(ttsErr)){
-      /* מפתח שנדחה לצמיתות אינו תקלה שחוזרת על עצמה — הוא הכרעה.
-         עוברים לקול המכשיר, שומרים, ומפסיקים להודיע על כך בכל
-         שאלה. ההסבר נשאר במסך ההגדרות, שם הוא רלוונטי. */
-      gDead=true;
-      state.settings.engine="device";
-      try{ save() }catch(e2){}
-      ttsState="device";
-      speakDevice(text);   /* המשפט הזה עדיין צריך להישמע */
-      render();
-      return;
-    }
-    ttsState="err";
-    speakDevice(text);
-    render();
-  });
+  speakDevice(text);
 }
 function stopSpeak(){
   _sayGen++;   /* כל מקטע שממתין ב-setTimeout שייך מעכשיו לדור ישן */
-  gStop();
   hlClear();
+  stopKeepAlive(); _activeU=null;
   try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
 }
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
@@ -1580,13 +1594,6 @@ try{document.addEventListener("visibilitychange",function(){
    ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
 try{document.addEventListener("pointerdown",function(){
   try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
-  /* ואותו דבר לאלמנט השמע: מקור שקט, play בתוך המגע עצמו. */
-  try{
-    if(!GEL)GEL=new Audio();
-    GEL.src=SILENT_WAV;
-    var pr=GEL.play();
-    if(pr&&pr.then)pr.then(function(){try{GEL.pause();GEL.currentTime=0}catch(e){}},function(){});
-  }catch(e){}
 },{once:true});}catch(e){}
 
 /* הודעה לקורא מסך */
@@ -1612,6 +1619,15 @@ function plainOf(html){
   s=s.replace(/<span class="frac"><span>(.*?)<\/span><span>(.*?)<\/span><\/span>/g,"($1)/($2)");
   s=s.replace(/<sup>(.*?)<\/sup>/g,"^$1");
   s=s.replace(/<sub>(.*?)<\/sub>/g,"_$1");
+  /* גבול אינטגרל או סכום שנכתב בכתב תחתי יוניקוד ("∫₀") ולא כ-
+     "<sub>0</sub>". בלי הנרמול הזה כלל האינטגרל אינו תופס בכלל,
+     והלומד שומע "אינטגרל של אפס ^ אינסוף" במקום "האינטגרל מ-0 עד
+     אינסוף" — כלומר הגבולות נעלמים. נמדד ב-math-uni2, cont L3.
+     מוגבל ל-∫ ול-Σ בכוונה: "x₀" הוא אינדקס ולא גבול, והוא ממשיך
+     להיקרא דרך מפת הספרות התחתיות. */
+  s=s.replace(/([∫Σ])([₀-₉]+)/g,function(m,op,d){
+    return op+"_"+d.replace(/[₀-₉]/g,function(c){return "₀₁₂₃₄₅₆₇₈₉".indexOf(c)});
+  });
   s=s.replace(/<br\s*\/?>/g," ");
   s=s.replace(/<[^>]+>/g,"");
   s=s.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"');
@@ -1629,16 +1645,60 @@ var SAY_MAP=[
   [/\be\s*\^/g," אי בחזקת "],
   /* שמות פונקציות לפני מיפוי אותיות בודדות */
   [/\bsin/gi," סינוס "],[/\bcos/gi," קוסינוס "],[/\btan/gi," טנגנס "],
+  /* ביטויים שלמים לפני סימנים בודדים — אחרת "lim_x→3" נקרא כרצף תווים.
+     **הבלוק הזה ישב אחרי כללי החזקה, וזו הייתה הפרה של ההערה הזאת
+     עצמה.** ב-"∫_2^5" כלל החזקה בלע את "^5" קודם, ולכן כלל
+     האינטגרל לא תפס אף פעם — קוד מת. הסטודנט שמע "אינטגרל של _2
+     בחזקת 5" במקום "האינטגרל מ 2 עד 5", כלומר טענה מתמטית שגויה.
+     נמדד 9.9.2026: 8.2% מהשאלות ב-math-uni, 19.4% ב-math-uni2,
+     7.1% ב-math-uni3, ותאים שלמים ב-100%. */
+  [/lim_?\s*x\s*→\s*/gi," הגבול כאשר איקס שואף ל "],
+  /* הגבול אינו תמיד ספרה: באינטגרל מקונן הוא ביטוי ("∫_y²^..."),
+     ובלא־אמיתי הוא ∞. מוגבל לשישה תווים שאינם רווח, "^" או סוגר —
+     כדי לא לבלוע את הפונקציה שאחרי הגבול. */
+  [/∫_\(?([^\s^()]{1,6})\)?\^\(?([^\s^()]{1,6})\)?/g," האינטגרל מ $1 עד $2 של "],
+  /* בסיס הלוגריתם. בלי זה "log_2 32" נשמע "לוג _2 32" — הבסיס
+     נעלם, וזו בדיוק המידה שהשאלה בודקת. */
+  [/\blog_\(?(\d+)\)?\s*/gi," לוג בבסיס $1 של "],
+  /* לגבולות הסכום לא היה כלל כלל, ולכן "Σ_n=0^∞" נשמע
+     "סכום _n שווה 0^ אינסוף". אותה צורה של כלל האינטגרל. */
+  [/Σ_\(?([^^]{1,14}?)\)?\^\(?([^\s,)]{1,10})\)?/g," הסכום מ $1 עד $2 של "],
+  /* אינטגרל כפול על תחום: "∫∫_D" — כאן "_D" הוא שם התחום ולא גבול
+     מספרי, ולכן הוא לא נתפס בכלל הגבולות שמעליו. */
+  [/∫\s*∫_\(?([A-Z])\)?/g," האינטגרל הכפול על התחום $1 של "],
+  /* אינדקס על מזהה: "f_n", "S_x", "A_2". אינו שגיאה מתמטית אלא רעש,
+     ולא ידוע אם מנוע ההקראה אומר "קו תחתון" או שותק — לא נמדד כאן,
+     אין קולות מערכת בסביבה. רווח בטוח בשני המקרים.
+     אחרי הכללים הייעודיים למעלה, כדי שלא ייבלעו. */
+  [/_\(?([A-Za-z0-9]{1,3})\)?/g," $1 "],
+  [/±/g," פלוס מינוס "],
   /* חזקות */
   [/\^2\b/g," בריבוע "],[/\^3\b/g," בשלישית "],[/\^\(?([−–-]?\d+)\)?/g," בחזקת $1 "],
+  /* מעריך שהוא אות. הכלל שמעל תופס ספרות בלבד, ולכן "2^n" ו-"x^n"
+     נשארו עם הגלגל: "2^ אן". האות עצמה ממופה בהמשך המפה. */
+  /* גבול חד-צדדי: "x → 0⁺" מגיע כ-"0^+" אחרי plainOf. בלי הכלל הזה
+     ה-"+" נופל לכלל החיבור והלומד שומע "אפס ועוד" — כלומר הצד נעלם
+     והמשפט המתמטי משתנה. נמדד ב-math-uni2, improper L2.
+     ה-lookahead מוציא מכאן "^-p" ו-"^-3", שהם מעריכים ולא צדדים. */
+  [/\^\(?\+\)?(?![\w−–-])/g," מימין "],
+  [/\^\(?[−–-]\)?(?![\w])/g," משמאל "],
+  [/\^T\b/g," משוחלפת "],
+  /* מעריך אות עם סימן: "x^-p". כלל הספרות שמעליו דורש ספרה, וכלל
+     האות שמתחתיו אינו מתיר סימן, ולכן "^-p" נפל בין השניים ונשמע
+     "איקס ^ מינוס פי". נמדד ב-math-uni2, improper L4. */
+  [/\^\(?[−–-]([a-zA-Z])\)?/g," בחזקת מינוס $1 "],
+  [/\^\(?([a-zA-Z])\)?/g," בחזקת $1 "],
   [/²/g," בריבוע "],[/³/g," בשלישית "],
   /* אינדקסים תחתונים: a₁ , aₙ , Sₙ */
   [/₁/g," אחת "],[/₂/g," שתיים "],[/₃/g," שלוש "],[/ₙ/g," אן "],
+  /* ₀ נעדר מהמפה הראשית והיה קיים רק במפה השנייה, ולכן "x₀"
+     בשיטת ניוטון נשמע "איקס ₀" — 300 מופעים. שאר האינדקסים
+     נוספו יחד כדי שזה לא ייפתח שוב באינדקס הבא. */
+  [/₀/g," אפס "],[/₄/g," ארבע "],[/₅/g," חמש "],[/₆/g," שש "],
+  [/₇/g," שבע "],[/₈/g," שמונה "],[/₉/g," תשע "],[/ᵢ/g," איי "],
   /* שורש */
   [/(\d)\s*√/g,"$1 כפול √"],[/√/g," שורש של "],
-  /* ביטויים שלמים לפני סימנים בודדים — אחרת "lim_x→3" נקרא כרצף תווים */
-  [/lim_?\s*x\s*→\s*/gi," הגבול כאשר איקס שואף ל "],
-  [/∫_\(?(-?[−\d]+)\)?\^\(?(-?[−\d]+)\)?/g," האינטגרל מ $1 עד $2 של "],
+
   [/X\s*~\s*N/g," איקס מתפלגת נורמלית עם "],
   [/\bP\(([^()]{1,12})\)/g," ההסתברות ל $1 "],
   [/\bE\(([^()]{1,12})\)/g," התוחלת של $1 "],
@@ -1695,6 +1755,43 @@ var PROSE_MAP=[
   [/\bP\(([^()]{1,12})\)/g," ההסתברות ל $1 "],
   [/\bE\(([^()]{1,12})\)/g," התוחלת של $1 "],
   [/\bV\(([^()]{1,12})\)/g," השונות של $1 "],
+  /* גבולות, בסיסים ומעריכים. PROSE_MAP נשאר שמרני בכוונה — מקף
+     בעברית הוא מקף — אבל "^" ו-"_" אינם מופיעים בפרוזה עברית כלל,
+     ולכן המרתם חד־משמעית. בלי אלה טקסט השאלה נשמע "log _10 בסוגריים
+     איי" ו-"אינטגרל _2 בחזקת 5", כלומר הבסיס והגבול נעלמים. */
+  /* הגבול אינו תמיד ספרה: באינטגרל מקונן הוא ביטוי ("∫_y²^..."),
+     ובלא־אמיתי הוא ∞. מוגבל לשישה תווים שאינם רווח, "^" או סוגר —
+     כדי לא לבלוע את הפונקציה שאחרי הגבול. */
+  [/∫_\(?([^\s^()]{1,6})\)?\^\(?([^\s^()]{1,6})\)?/g," האינטגרל מ $1 עד $2 של "],
+  [/Σ_\(?([^^]{1,14}?)\)?\^\(?([^\s,)]{1,10})\)?/g," הסכום מ $1 עד $2 של "],
+  /* אינטגרל כפול על תחום: "∫∫_D" — כאן "_D" הוא שם התחום ולא גבול
+     מספרי, ולכן הוא לא נתפס בכלל הגבולות שמעליו. */
+  [/∫\s*∫_\(?([A-Z])\)?/g," האינטגרל הכפול על התחום $1 של "],
+  /* אינדקס על מזהה: "f_n", "S_x", "A_2". אינו שגיאה מתמטית אלא רעש,
+     ולא ידוע אם מנוע ההקראה אומר "קו תחתון" או שותק — לא נמדד כאן,
+     אין קולות מערכת בסביבה. רווח בטוח בשני המקרים.
+     אחרי הכללים הייעודיים למעלה, כדי שלא ייבלעו. */
+  [/_\(?([A-Za-z0-9]{1,3})\)?/g," $1 "],
+  [/±/g," פלוס מינוס "],
+  [/\blog_\(?(\d+)\)?\s*/gi," לוג בבסיס $1 של "],
+  /* גבול חד-צדדי: "x → 0⁺" מגיע כ-"0^+" אחרי plainOf. בלי הכלל הזה
+     ה-"+" נופל לכלל החיבור והלומד שומע "אפס ועוד" — כלומר הצד נעלם
+     והמשפט המתמטי משתנה. נמדד ב-math-uni2, improper L2.
+     ה-lookahead מוציא מכאן "^-p" ו-"^-3", שהם מעריכים ולא צדדים. */
+  [/\^\(?\+\)?(?![\w−–-])/g," מימין "],
+  [/\^\(?[−–-]\)?(?![\w])/g," משמאל "],
+  [/\^T\b/g," משוחלפת "],
+  [/\^\(?([−–-]?\d+)\)?/g," בחזקת $1 "],
+  /* מעריך אות עם סימן: "x^-p". כלל הספרות שמעליו דורש ספרה, וכלל
+     האות שמתחתיו אינו מתיר סימן, ולכן "^-p" נפל בין השניים ונשמע
+     "איקס ^ מינוס פי". נמדד ב-math-uni2, improper L4. */
+  [/\^\(?[−–-]([a-zA-Z])\)?/g," בחזקת מינוס $1 "],
+  [/\^\(?([a-zA-Z])\)?/g," בחזקת $1 "],
+  [/₀/g," אפס "],[/±/g," פלוס מינוס "],
+  /* ₃–₉ לא היו במפה כלל, ולכן "A₄" הוקרא כ-"איי ₄" — התו עצמו
+     הגיע למנוע. נמדד ב-math-uni3, lagrange3 L4. נקבה, כמו ₁ ו-₂. */
+  [/₃/g," שלוש "],[/₄/g," ארבע "],[/₅/g," חמש "],[/₆/g," שש "],
+  [/₇/g," שבע "],[/₈/g," שמונה "],[/₉/g," תשע "],
   [/lim/gi," הגבול "],[/∞/g," אינסוף "],[/∫/g," אינטגרל "],
   [/∈/g," שייך ל "],[/∪/g," איחוד "],[/∩/g," חיתוך "],[/∅/g," הקבוצה הריקה "],
   [/¬/g," לא "],[/∧/g," וגם "],[/∨/g," או "],[/⇒/g," גורר "],[/⇔/g," אם ורק אם "],
@@ -1787,6 +1884,23 @@ function genSupInf(L){
   if(L===2){
     /* קטע פתוח — הסופרמום קיים אך אינו שייך לקבוצה */
     a=ri(-6,2);b=a+ri(2,7);
+    /* קודם היה הקטע חסום בכל הגרלה, ולכן "אין סופרמום" היה מסיח
+       שלעולם אינו נכון. עכשיו בשליש מההגרלות הקצה הימני אינסופי. */
+    if(Math.random()<0.33){
+      return {ask:_("מהו הסופרמום של הקטע?"),
+        expr:"A = ( "+num(a)+" , ∞ )",
+        ans:W(_("אין סופרמום")),
+        wrong:[
+          W(num(a),_("זה האינפימום — הקצה השמאלי. מלמעלה הקבוצה אינה חסומה כלל.")),
+          W("∞",_("אינסוף אינו מספר ממשי, ולכן אינו יכול להיות סופרמום.")),
+          W(num(b),_("אין כאן קצה ימני: לכל מספר שתבחרו יש בקבוצה איבר גדול ממנו."))
+        ],
+        steps:[
+          S(_("חסום מלמעלה"),_("אקסיומת השלמות מבטיחה סופרמום רק לקבוצה חסומה מלמעלה, וכאן אין אף חסם כזה."),""),
+          S(_("הקטן שבחסמים"),_("אין אף חסם מלמעלה, ולכן אין גם הקטן שבהם."),""),
+          S(_("מסקנה"),"",_("אין סופרמום"))
+        ],rule:"sup",hint:_("סופרמום קיים רק לקבוצה חסומה מלמעלה. קודם בודקים חסימות.")};
+    }
     return {ask:_("מהו הסופרמום של הקטע?"),
       expr:"A = ( "+num(a)+" , "+num(b)+" )",
       ans:W(num(b)),
@@ -1904,12 +2018,16 @@ function genPwUnif(L){
     /* קודם עמדה כאן סדרה אחת, x חלקי n, ולכן הגבול היה f(x) = 0 בכל
        הגרלה, והמקרים שבהם הגבול אינו האפס לא הופיעו מעולם. */
     a=ri(2,6);
-    var cs1=pick(["over","plus","const"]),c1=ri(2,5),ex1,lim1;
+    /* קודם התכנס הגבול הנקודתי בכל שלושת המקרים, ולכן "אינה מתכנסת"
+       לא היה התשובה אף פעם. המצב הרביעי, n·x על קטע שאינו כולל את
+       האפס, אינו מתכנס באף נקודה. */
+    var cs1=pick(["over","plus","const","grow"]),c1=ri(2,5),ex1,lim1;
     if(cs1==="over"){ex1=frac("x","n");lim1="f(x) = 0"}
     else if(cs1==="plus"){ex1="x + "+frac("1","n");lim1="f(x) = x"}
-    else{ex1=frac("x + "+num(c1)+"n","n");lim1="f(x) = "+num(c1)}
+    else if(cs1==="const"){ex1=frac("x + "+num(c1)+"n","n");lim1="f(x) = "+num(c1)}
+    else{ex1="n·x";lim1=_("אינה מתכנסת")}
     return {ask:_("לאיזו פונקציה מתכנסת סדרת הפונקציות נקודתית?"),
-      expr:"f<sub>n</sub>(x) = "+ex1+"   ,   x ∈ [0 , "+num(a)+"]",
+      expr:"f<sub>n</sub>(x) = "+ex1+"   ,   x ∈ ["+(cs1==="grow"?"1":"0")+" , "+num(a)+"]",
       ans:W(lim1),
       wrong:(cs1==="over"?[
         W("f(x) = x",_("x נשאר קבוע, אבל המכנה גדל בלי גבול. המנה שואפת לאפס.")),
@@ -1917,14 +2035,21 @@ function genPwUnif(L){
       ]:cs1==="plus"?[
         W("f(x) = 0",_("רק התוספת 1 חלקי n נעלמת בגבול. האיבר x אינו תלוי ב-n ונשאר כמות שהוא.")),
         W("f(x) = x + 1",_("1 חלקי n שואף לאפס, לא ל-1."))
-      ]:[
+      ]:cs1==="const"?[
         W("f(x) = 0",_("רק האיבר x חלקי n נעלם. האיבר השני אינו תלוי ב-n כלל.")),
         W("f(x) = x + "+num(c1),_("x חלקי n שואף לאפס, ולכן x אינו נשאר בגבול."))
-      ]).concat([W(_("אינה מתכנסת"),_("לכל x קבוע זו סדרה מספרית פשוטה שיש לה גבול."))]),
+      ]:[
+        W("f(x) = 0",_("אין בקטע נקודה שבה הסדרה מתאפסת — בכל נקודה שלו האיברים גדלים בלי גבול.")),
+        W("f(x) = x",_("המקדם n אינו נעלם, הוא זה שגדל. n·x אינו שואף ל-x."))
+      ]).concat([cs1==="grow"
+        ?W("f(x) = "+num(a),_("קצה הקטע אינו הגבול. מציבים x קבוע ומגדילים את n."))
+        :W(_("אינה מתכנסת"),_("לכל x קבוע זו סדרה מספרית פשוטה שיש לה גבול."))]),
       steps:[
         S(_("מקבעים x"),_("התכנסות נקודתית נבדקת עבור כל x בנפרד, כאילו הוא מספר."),"x = const"),
-        S(_("לוקחים גבול ב-n"),"","lim<sub>n→∞</sub> "+ex1+" = "+lim1.replace("f(x) = ","")),
-        S(_("הפונקציה הגבולית"),_("מה שתלוי ב-n נעלם, ומה שאינו תלוי בו נשאר."),lim1)
+        S(_("לוקחים גבול ב-n"),"","lim<sub>n→∞</sub> "+ex1+" = "+(cs1==="grow"?"∞":lim1.replace("f(x) = ",""))),
+        S(_("הפונקציה הגבולית"),cs1==="grow"
+          ?_("בכל נקודה של הקטע האיברים גדלים בלי גבול, ולכן אין פונקציה גבולית והסדרה אינה מתכנסת נקודתית.")
+          :_("מה שתלוי ב-n נעלם, ומה שאינו תלוי בו נשאר."),lim1)
       ],rule:"pw",hint:_("בהתכנסות נקודתית מקבעים x ומגדילים רק את n.")};
   }
   if(L===2){
@@ -1970,7 +2095,9 @@ function genPwUnif(L){
       wrong:uniU.filter(function(v){return v!==ansU}).map(function(v){
           return W(v, (cs2==="param")?why2
             :(v===uniU[2]?_("יש כאן מבחן מלא: מחשבים סופרמום של ההפרש ובודקים אם הוא שואף לאפס."):why2))})
-        .concat([W(_("רק על קטע סגור"),_("סגירות הקטע אינה הקריטריון. מה שקובע הוא אם סופרמום ההפרש שואף לאפס."))]),
+        .concat([Math.random()<0.5
+          ?W(_("רק אם הפונקציות רציפות"),_("רציפות אינה תנאי להתכנסות במידה שווה. המבחן הוא סופרמום ההפרש בלבד."))
+          :W(_("רק על קטע סגור"),_("סגירות הקטע אינה הקריטריון. מה שקובע הוא אם סופרמום ההפרש שואף לאפס."))]),
       steps:[
         S(_("הגבול הנקודתי"),_("מקבעים x ומגדילים את n."),"f(x) = 0"),
         S(_("מודדים את ההפרש"),_("במידה שווה בודקים את הסופרמום של ההפרש על כל הקטע, ולא נקודה נקודה."),
@@ -2011,11 +2138,11 @@ function genPwUnif(L){
          של I ו-J, והשני טוען שהסופרמום שואף לאפס על שניהם — ומכל
          חמשת המסיחים מוגרלים שלושה. */
       wrong:shuffle([
-        W(_("כי J סגור ו-I אינו — סגירות הקטע היא שמבטיחה התכנסות במידה שווה."),
+        W(_("J הוא קטע סגור ו-I אינו. סגירות הקטע היא שמבטיחה התכנסות במידה שווה, ולכן היא מתקיימת על J בלבד."),
           _("סגירות אינה מספיקה. על הקטע הסגור [0 , 1] הסדרה n·x·e בחזקת מינוס nx מתכנסת נקודתית ולא במידה שווה.")),
-        W(_("כי הפונקציה הגבולית רציפה על J ואינה רציפה על I."),
+        W(_("הפונקציה הגבולית רציפה על J ואינה רציפה על I. רציפות של הפונקציה הגבולית היא התנאי להתכנסות במידה שווה."),
           _("הפונקציה הגבולית כאן רציפה על שני הקטעים. אי־רציפות של הגבול אכן שוללת התכנסות במידה שווה, אבל אין כאן אי־רציפות.")),
-        W(_("כי J קצר מ-I, וקטע קצר יותר תמיד נותן התכנסות במידה שווה."),
+        W(_("J קצר מ-I. אורך הקטע הוא שקובע, וקטע קצר יותר תמיד נותן התכנסות במידה שווה."),
           _("אורך הקטע אינו הקריטריון. סופרמום ההפרש הוא שקובע, והוא יכול להישאר גדול גם על קטע קצר מאוד.")),
         W(swW,_("התפקידים הפוכים. הקטע שעליו הסופרמום נשאר גדול הוא I, והקטע שעליו הוא שואף לאפס הוא J.")),
         W(_("כי סופרמום ההפרש שואף לאפס על שני הקטעים, אלא שעל I הוא עושה זאת לאט יותר."),
@@ -2051,7 +2178,30 @@ function genPwUnif(L){
 function genPowerS(L){
   var a;
   if(L===1){
-    a=ri(2,6);
+    /* טווח 2..6 נתן שבע שאלות שונות בלבד בתא, ולומד שחזר על הנושא
+       זכר אותן. הנוסחה לא השתנתה: R = a, והמסיחים 1/a, a² ו-1
+       נשארים נבדלים בכל a. */
+    a=ri(2,9);
+    /* קודם עמד כאן תמיד המכנה a בחזקת n, ולכן R היה a בכל הגרלה
+       ו-"R = 1" היה מסיח שלעולם אינו התשובה. עכשיו בשליש מההגרלות
+       המקדמים הם 1 חלקי n בחזקת k, ואז הרדיוס הוא בדיוק 1. */
+    if(Math.random()<0.34){
+      var kR=pick([2,3]);
+      return {ask:_("מהו רדיוס ההתכנסות של טור החזקות?"),
+        expr:"Σ<sub>n=1</sub><sup>∞</sup> "+frac("x<sup>n</sup>","n<sup>"+num(kR)+"</sup>"),
+        ans:W("R = 1"),
+        wrong:[
+          W("R = "+num(kR),_("החזקה של n קובעת מה קורה בקצוות הקטע, לא את הרדיוס.")),
+          W("R = "+fr(1,kR).html(),_("הפכתם את החזקה. יחס המקדמים שואף ל-1 בכל חזקה של n.")),
+          W("R = ∞",_("מקדמים ששואפים לאפס אינם מספיקים. מה שקובע הוא גבול היחס בין מקדמים סמוכים, והוא 1."))
+        ],
+        steps:[
+          S(_("מבחן המנה"),_("מחשבים את גבול היחס בין איבר לקודמו, בערך מוחלט."),
+            "| "+frac("n<sup>"+num(kR)+"</sup> · x<sup>n+1</sup>","(n+1)<sup>"+num(kR)+"</sup> · x<sup>n</sup>")+" | → |x|"),
+          S(_("דורשים קטן מ-1"),"","|x| < 1"),
+          S(_("הרדיוס"),_("יחס המקדמים שואף ל-1 בכל חזקה של n, ולכן החזקה אינה משפיעה על הרדיוס."),"R = 1")
+        ],rule:"radius",hint:_("רדיוס ההתכנסות הוא הגבול שעד אליו מבחן המנה נותן פחות מ-1.")};
+    }
     return {ask:_("מהו רדיוס ההתכנסות של טור החזקות?"),
       expr:"Σ<sub>n=0</sub><sup>∞</sup> "+frac("x<sup>n</sup>",num(a)+"<sup>n</sup>"),
       ans:W("R = "+num(a)),
@@ -2268,10 +2418,19 @@ function genMetric(L){
       {d:num(kk4)+"| x − y |",k:"ok",n:_f("כפל בקבוע חיובי {0} אינו פוגע באף אחת מארבע התכונות.", num(kk4))}
     ];
     var mc=pick(MC);
-    var O1=_("d היא מטריקה על ℝ"),
+    /* ארבע האפשרויות הן מחרוזות קבועות, ולכן סדר האורכים ביניהן
+       קבוע בכל הגרלה. "d היא מטריקה על ℝ" היה קצר בהרבה משלושת
+       האחרים — 17 תווים מול 34 ומעלה — והוא התשובה בארבעה מתוך
+       שמונת המקרים, ולכן הקצרה ביותר הייתה התשובה ב-50% מההגרלות.
+       שתי האפשרויות נוסחו מחדש כך שכל אחת אומרת מה בדיוק נבדק:
+       החיובית מונה את ארבע התכונות, והשלילית נכתבת בצורת דוגמה
+       נגדית כמו אחותה שמעליה. האורכים היום 34 · 40 · 41 · 43,
+       והקצרה ביותר היא אי־שוויון המשולש והארוכה היא האי־שליליות —
+       שאינה התשובה אף פעם. */
+    var O1=_("d היא מטריקה על ℝ: ארבע התכונות מתקיימות"),
         O2=_("אינה מטריקה: אי־שוויון המשולש נשבר"),
         O3=_("אינה מטריקה: יש x ≠ y שעבורם d(x , y) = 0"),
-        O4=_("אינה מטריקה: d מקבלת גם ערכים שליליים");
+        O4=_("אינה מטריקה: יש x , y שעבורם d(x , y) שלילי");
     var A4=mc.k==="ok"?O1:mc.k==="tri"?O2:O3;
     var WR4=[];
     if(mc.k!=="ok")WR4.push(W(O1,mc.n));
@@ -2413,7 +2572,18 @@ var CPOL=[
   {z:"i",          r:"1",  rv:1,          th:90},
   {z:"−1",         r:"1",  rv:1,          th:180},
   {z:"√3 + i",     r:"2",  rv:2,          th:30},
-  {z:"1 + √3i",    r:"2",  rv:2,          th:60}
+  {z:"1 + √3i",    r:"2",  rv:2,          th:60},
+  /* שמונה הראשונות הן קטלוג חלקי. הערכים המדויקים עם מודול 2 הם
+     שמונה — ±√3 ± i ו-±1 ± √3i — ושניים בלבד הופיעו כאן. ששת
+     הנותרים הם אותה שאלה בדיוק, בשלושת הרבעים האחרים.
+     יחד עם ארבעת מספרי ה-√2 זה כל הקטלוג שבו הזווית
+     כפולה של 15° והמודול שלם או √k פשוט. */
+  {z:"−1 + √3i",   r:"2",  rv:2,          th:120},
+  {z:"−√3 + i",    r:"2",  rv:2,          th:150},
+  {z:"−√3 − i",    r:"2",  rv:2,          th:210},
+  {z:"−1 − √3i",   r:"2",  rv:2,          th:240},
+  {z:"1 − √3i",    r:"2",  rv:2,          th:300},
+  {z:"√3 − i",     r:"2",  rv:2,          th:330}
 ];
 /* ל-L1 רק מספרים שמודולם אינו 1: אחרת ״שכחתם שורש״ נותן שוב 1 */
 var CPOL1=CPOL.filter(function(x){return x.rv!==1});
@@ -2486,8 +2656,10 @@ function genCPolar(L){
         S(_("וחזרה לצורה אלגברית"),_("מציבים את הקוסינוס והסינוס של הזווית שהתקבלה, ומכפילים במודול."),S1)
       ],rule:"demoivre",hint:_("שלושה מעברים: לקוטבי, דה־מואבר, וחזרה ל-a + bi.")};
   }
-  /* L3 — שורשי היחידה */
-  n=ri(3,8);
+  /* L3 — שורשי היחידה. ri(3,8) נתן שש שאלות בלבד.
+     הרשימה מעדיפה n ש-360 מתחלק בו, כלומר זווית שלמה;
+     7 נשאר כפי שהיה, ובו בלבד התשובה עשרונית (51.43°). */
+  n=pick([3,4,5,6,7,8,9,10,12,15,18,20]);
   return {ask:_f("מהי הזווית בין שני שורשים סמוכים מסדר {0} של היחידה?", num(n)),
     expr:"z<sup>"+num(n)+"</sup> = 1",
     ans:W(num(r2(360/n))+"°"),
@@ -2529,7 +2701,9 @@ function genCR(L){
       wrong:uniC.filter(function(v){return v!==ansC}).map(function(v){
           return W(v, prm?whyC
             :(v===uniC[2]?_("שתי הנגזרות החלקיות קיימות כאן, ולכן המבחן מכריע."):whyC))})
-        .concat([W(_("אנליטית רק בראשית"),_("קושי־רימן נבדקות כזהות בין פונקציות, ולא בנקודה בודדת."))]),
+        .concat([Math.random()<0.5
+          ?W(_("אנליטית בכל נקודה שבה u ו-v גזירות"),_("גזירות של u ו-v אינה מספיקה. קושי־רימן הן תנאי נוסף, והן שקובעות."))
+          :W(_("אנליטית רק בראשית"),_("קושי־רימן נבדקות כזהות בין פונקציות, ולא בנקודה בודדת."))]),
       steps:prm?[
         S(_("משוואה ראשונה"),_("u לפי x שווה ל-v לפי y."),"u<sub>x</sub> = "+coef(2*mC,"x")+"   ,   v<sub>y</sub> = a·x"),
         S(_("משוואה שנייה"),_("u לפי y שווה למינוס v לפי x."),"u<sub>y</sub> = "+coef(-2*mC,"y")+"   ,   −v<sub>x</sub> = −a·y"),
@@ -2543,36 +2717,71 @@ function genCR(L){
   if(L===2){
     /* קודם עמדה כאן u אחת בלבד, x² − y², ולכן התשובה הייתה v = 2xy + C
        בכל הגרלה. עכשיו המקדם מוגרל, וגם המשפחה השנייה — u = 2a·xy —
-       מופיעה, ובה הצמודה יוצאת הפרש ריבועים ולא מכפלה. */
-    var m=ri(1,3);
-    if(Math.random()<0.5){
+       מופיעה, ובה הצמודה יוצאת הפרש ריבועים ולא מכפלה.
+       טווח 1–3 נתן שתי משפחות כפול שלושה = שש שאלות בלבד;
+       המקדם נכנס לתשובה כמכפלה בלבד, ולכן הרחבה שלו אינה
+       משנה לא את השיטה ולא את צורת התשובה. */
+    /* המקדם היה תמיד חיובי, ולכן התשובה 2m·xy + C לא נשאה סימן
+       ומסיח טעות־הסימן היה בדיוק היא ועוד תו אחד. התוצאה: התשובה
+       הייתה הקצרה מבין הארבע בכל הגרלה של הענף הזה. עכשיו מוגרל
+       גם סימן המקדם: כש-u = −m·x² + m·y² התשובה עצמה נושאת מינוס,
+       ומסיח טעות־הסימן הוא זה שקצר ממנה. האורך מפסיק להיגזר
+       מהמבנה, בדיוק כמו בתיקון של err רמה 1.
+       המינוס נכתב ביד ולא דרך coef, אחרת u היה מוצג "−3x² − −3y²". */
+    /* היו 18 שאלות: שתי משפחות, m עד 6, וסימן בראשונה בלבד. עכשיו m
+       עד 9, סימן בשתיהן, ומשפחה שלישית — u = m·(x³ − 3xy²), החלק
+       הממשי של m·z³ — 54 שאלות (O-41). בכל משפחה יש מסיח באורך
+       התשובה, כדי שהאורך לא יסגיר. */
+    var m=ri(1,9),sA=pick([1,-1]),mA=sA*m,fam=ri(1,3);
+    if(fam===1){
       return {ask:_("מהי הצמודה ההרמונית v?"),
-        expr:"u(x , y) = "+coef(m,"x²")+" − "+coef(m,"y²"),
-        ans:W("v = "+coef(2*m,"xy")+" + C"),
+        expr:"u(x , y) = "+coef(mA,"x²")+(sA>0?" − ":" + ")+coef(m,"y²"),
+        ans:W("v = "+coef(2*mA,"xy")+" + C"),
         wrong:[
-          W("v = "+coef(m,"x²")+" + "+coef(m,"y²")+" + C",_("v אינה עוד פונקציה הרמונית כלשהי — היא נקבעת מ-u דרך קושי־רימן.")),
-          W("v = "+coef(-2*m,"xy")+" + C",_f("טעות סימן. מהמשוואה הראשונה v לפי y שווה ל-u לפי x, שהוא {0} חיובי.", coef(2*m,"x"))),
-          W("v = "+coef(2*m,"x")+" − "+coef(2*m,"y")+" + C",_f("איבדתם את האינטגרציה. אינטגרל של {0} לפי y הוא {1}.", coef(2*m,"x"), coef(2*m,"xy")))
+          W("v = "+coef(mA,"x²")+(sA>0?" + ":" − ")+coef(m,"y²")+" + C",_("v אינה עוד פונקציה הרמונית כלשהי — היא נקבעת מ-u דרך קושי־רימן.")),
+          W("v = "+coef(-2*mA,"xy")+" + C",_f("טעות סימן. מהמשוואה הראשונה v לפי y שווה ל-u לפי x, שהוא {0}, ולא הנגדי שלו.", coef(2*mA,"x"))),
+          W("v = "+coef(2*mA,"x")+(sA>0?" − ":" + ")+coef(2*m,"y")+" + C",_f("איבדתם את האינטגרציה. אינטגרל של {0} לפי y הוא {1}.", coef(2*mA,"x"), coef(2*mA,"xy")))
         ],
         steps:[
-          S(_("משוואה ראשונה"),"","v<sub>y</sub> = u<sub>x</sub> = "+coef(2*m,"x")),
-          S(_("מאנטגרלים לפי y"),_("x מתנהג כקבוע, ולכן ״הקבוע״ שנוסף עשוי להיות פונקציה של x."),"v = "+coef(2*m,"xy")+" + g(x)"),
-          S(_("בודקים מול המשוואה השנייה"),_("v לפי x שווה למינוס u לפי y, ושני הצדדים יוצאים זהים — ולכן g קבועה."),"v = "+coef(2*m,"xy")+" + C")
+          S(_("משוואה ראשונה"),"","v<sub>y</sub> = u<sub>x</sub> = "+coef(2*mA,"x")),
+          S(_("מאנטגרלים לפי y"),_("x מתנהג כקבוע, ולכן ״הקבוע״ שנוסף עשוי להיות פונקציה של x."),"v = "+coef(2*mA,"xy")+" + g(x)"),
+          S(_("בודקים מול המשוואה השנייה"),_("v לפי x שווה למינוס u לפי y, ושני הצדדים יוצאים זהים — ולכן g קבועה."),"v = "+coef(2*mA,"xy")+" + C")
         ],rule:"cr",hint:_("מאנטגרלים משוואה אחת, ובודקים את התוצאה מול השנייה כדי לקבוע את הקבוע.")};
     }
-    /* u = 2m·xy  →  v_y = u_x = 2my  →  v = m·y² + g(x) ;  v_x = −u_y = −2mx  →  v = m·y² − m·x² + C */
+    if(fam===2){
+      /* u = 2mA·xy  →  v_y = u_x = 2mA·y  →  v = mA·y² + g(x) ;  v_x = −u_y = −2mA·x  →  v = mA·y² − mA·x² + C.
+         כש-mA שלילי התשובה נכתבת "m·x² − m·y²", ומסיח טעות־הסימן הוא הצורה ההפוכה. */
+      var vB=sA>0?coef(m,"y²")+" − "+coef(m,"x²"):coef(m,"x²")+" − "+coef(m,"y²");
+      var vBs=sA>0?coef(m,"x²")+" − "+coef(m,"y²"):coef(m,"y²")+" − "+coef(m,"x²");
+      return {ask:_("מהי הצמודה ההרמונית v?"),
+        expr:"u(x , y) = "+coef(2*mA,"xy"),
+        ans:W("v = "+vB+" + C"),
+        wrong:[
+          W("v = "+vBs+" + C",_("טעות סימן. המשוואה השנייה נותנת v לפי x שווה למינוס u לפי y, וזה מה שקובע את הסימן של x².")),
+          W("v = "+coef(2*mA,"xy")+" + C",_("זו u עצמה. הצמודה היא פונקציה אחרת, שנקבעת ממנה דרך קושי־רימן.")),
+          W("v = "+coef(m,"y²")+" + "+coef(m,"x²")+" + C",_("סכום ריבועים אינו הרמוני — הלפלסיאן שלו אינו מתאפס, ולכן הוא אינו יכול להיות צמודה."))
+        ],
+        steps:[
+          S(_("משוואה ראשונה"),"","v<sub>y</sub> = u<sub>x</sub> = "+coef(2*mA,"y")),
+          S(_("מאנטגרלים לפי y"),_("y הוא משתנה האינטגרציה, ולכן החזקה עולה באחת ומחלקים בה."),"v = "+coef(mA,"y²")+" + g(x)"),
+          S(_("בודקים מול המשוואה השנייה"),_("v לפי x שווה למינוס u לפי y, ומכאן נקבע g."),"v = "+vB+" + C")
+        ],rule:"cr",hint:_("מאנטגרלים משוואה אחת, ובודקים את התוצאה מול השנייה כדי לקבוע את הקבוע.")};
+    }
+    /* u = mA·x³ − 3mA·xy² — החלק הממשי של mA·z³.
+       u_x = 3mA·x² − 3mA·y² , u_y = −6mA·xy  →  v = 3mA·x²y − mA·y³ + g(x) , g′ = 0 */
+    var vC=coef(3*mA,"x²y")+(sA>0?" − ":" + ")+coef(m,"y³");
     return {ask:_("מהי הצמודה ההרמונית v?"),
-      expr:"u(x , y) = "+coef(2*m,"xy"),
-      ans:W("v = "+coef(m,"y²")+" − "+coef(m,"x²")+" + C"),
+      expr:"u(x , y) = "+coef(mA,"x³")+(sA>0?" − ":" + ")+coef(3*m,"xy²"),
+      ans:W("v = "+vC+" + C"),
       wrong:[
-        W("v = "+coef(m,"x²")+" − "+coef(m,"y²")+" + C",_("טעות סימן. המשוואה השנייה נותנת v לפי x שווה למינוס u לפי y, ולכן x² מופיע עם מינוס.")),
-        W("v = "+coef(2*m,"xy")+" + C",_("זו u עצמה. הצמודה היא פונקציה אחרת, שנקבעת ממנה דרך קושי־רימן.")),
-        W("v = "+coef(m,"y²")+" + "+coef(m,"x²")+" + C",_("סכום ריבועים אינו הרמוני — הלפלסיאן שלו אינו מתאפס, ולכן הוא אינו יכול להיות צמודה."))
+        W("v = "+coef(-3*mA,"x²y")+(sA>0?" + ":" − ")+coef(m,"y³")+" + C",_("טעות סימן בשתי המשוואות יחד — זו מינוס v, ולא v.")),
+        W("v = "+coef(3*mA,"x²y")+(sA>0?" + ":" − ")+coef(m,"y³")+" + C",_("טעות סימן באיבר y³. הוא יוצא מהאינטגרל לפי y של האיבר עם y² ב-u לפי x, ושומר על הסימן שלו.")),
+        W("v = "+coef(mA,"x³")+(sA>0?" − ":" + ")+coef(3*m,"xy²")+" + C",_("זו u עצמה. הצמודה היא פונקציה אחרת, שנקבעת ממנה דרך קושי־רימן."))
       ],
       steps:[
-        S(_("משוואה ראשונה"),"","v<sub>y</sub> = u<sub>x</sub> = "+coef(2*m,"y")),
-        S(_("מאנטגרלים לפי y"),_("y הוא משתנה האינטגרציה, ולכן החזקה עולה באחת ומחלקים בה."),"v = "+coef(m,"y²")+" + g(x)"),
-        S(_("בודקים מול המשוואה השנייה"),_("v לפי x שווה למינוס u לפי y, ומכאן נקבע g."),"v = "+coef(m,"y²")+" − "+coef(m,"x²")+" + C")
+        S(_("משוואה ראשונה"),"","v<sub>y</sub> = u<sub>x</sub> = "+coef(3*mA,"x²")+(sA>0?" − ":" + ")+coef(3*m,"y²")),
+        S(_("מאנטגרלים לפי y"),_("x מתנהג כקבוע, ולכן ״הקבוע״ שנוסף עשוי להיות פונקציה של x."),"v = "+vC+" + g(x)"),
+        S(_("בודקים מול המשוואה השנייה"),_("v לפי x שווה למינוס u לפי y, ושני הצדדים יוצאים זהים — ולכן g קבועה."),"v = "+vC+" + C")
       ],rule:"cr",hint:_("מאנטגרלים משוואה אחת, ובודקים את התוצאה מול השנייה כדי לקבוע את הקבוע.")};
   }
   /* רמה 4 — ההבחנה שנופלים בה במבחן: קושי־רימן בנקודה אינן
@@ -2683,6 +2892,27 @@ function genResidue(L){
   if(L===1){
     k=pick([-6,-5,-4,-3,-2,2,3,4,5,6]);a=rnz(-5,5);
     while(a===k||a===k*k)a=rnz(-5,5);
+    /* קודם נשאלה תמיד השארית בקוטב עצמו, ולכן "0" היה מסיח שלעולם
+       אינו נכון. עכשיו בשליש מההגרלות הנקודה אינה קוטב, ושם
+       הפונקציה אנליטית והשארית אפס. */
+    if(Math.random()<0.33){
+      var bR=rnz(-5,5),btry=0;
+      while(btry++<40&&(bR===a||bR===k||bR===k*k))bR=rnz(-5,5);
+      if(bR===a)bR=a+1;
+      return {ask:_f("מהי השארית של f בנקודה z = {0}?", num(bR)),
+        expr:"f(z) = "+frac(num(k),"z"+sgn(-a)),
+        ans:W("0"),
+        wrong:[
+          W(num(k),_f("זו השארית בקוטב z = {0}, ולא בנקודה שנשאלה.", num(a))),
+          W(num(a),_("זה מיקום הקוטב, לא הנקודה שנשאלה עליה.")),
+          W(num(k*k),_("השארית אינה מועלית בריבוע, ובנקודה שאינה קוטב היא אפס בכל מקרה."))
+        ],
+        steps:[
+          S(_("מזהים את סוג הקוטב"),_("המכנה מתאפס בנקודה אחת בלבד, וזו הנקודה היחידה שיש בה קוטב."),"z = "+num(a)),
+          S(_("בודקים את הנקודה שנשאלה"),_("בנקודה שאינה קוטב הפונקציה אנליטית, ולכן בפיתוח לורן שלה אין איבר בחזקת מינוס אחת."),"z = "+num(bR)),
+          S(_("מסקנה"),_("שארית בנקודה שהפונקציה אנליטית בה היא אפס תמיד."),"Res = 0")
+        ],rule:"res",hint:_("שארית שונה מאפס יש רק בקוטב. בנקודה שהפונקציה אנליטית בה השארית אפס.")};
+    }
     return {ask:_f("מהי השארית של f בקוטב z = {0}?", num(a)),
       expr:"f(z) = "+frac(num(k),"z"+sgn(-a)),
       ans:W(num(k)),
@@ -2722,8 +2952,15 @@ function genResidue(L){
      בדיוק הרעיון ששווה לראות. */
   if(L>=4){
     /* הרדיוס נבחר לפי המקרה המבוקש ולא באקראי, אחרת ב-R גדול שני
-       הקטבים תמיד בפנים והתשובה "0" הייתה חוזרת ברוב ההגרלות. */
-    var a4,b4,R4,t4=0,inA,inB,lo,hi,cs4=pick(["one","one","both","none"]);
+       הקטבים תמיד בפנים והתשובה "0" הייתה חוזרת ברוב ההגרלות.
+       ומשקל המקרים אינו אחיד מאותה סיבה: שני המקרים שהתשובה בהם
+       "0" — שני קטבים בפנים ואף אחד בפנים — נתנו יחד מחצית
+       מההגרלות, ו-"0" הוא באורך תו אחד מול שלושה מסיחים שכולם
+       כפולות של πi. כלומר הקצרה ביותר הייתה התשובה במחצית
+       ההגרלות, בלי לדעת דבר. היחס היום ארבע לאחת לאחת: שני
+       כיווני הכלל עדיין מוצגים — כל אחד מהם בכשישית מההגרלות —
+       והאורך חדל להיות רמז. */
+    var a4,b4,R4,t4=0,inA,inB,lo,hi,cs4=pick(["one","one","one","one","both","none"]);
     do{
       a4=rnz(-6,6);b4=rnz(-6,6);
       lo=Math.min(Math.abs(a4),Math.abs(b4));hi=Math.max(Math.abs(a4),Math.abs(b4));
@@ -2915,7 +3152,7 @@ function genGroup(L){
         S(_("הנוסחה"),_("הסדר הוא n חלקי המחלק המשותף המרבי של n ושל האיבר."),
           "gcd("+num(n)+" , "+num(k)+") = "+num(g)),
         S(_("מחשבים"),"",frac(num(n),num(g))+" = "+num(ordv))
-      ],rule:"order",hint:_("הסדר של k ב-Z_n הוא n חלקי gcd(n , k).")};
+      ],rule:"order",hint:_("הסדר של k ב-Z_n הוא n חלקי gcd(n, k).")};
   }
   if(L===2){
     var ph,ftry=0;
@@ -2926,7 +3163,11 @@ function genGroup(L){
       ans:W(num(ph)),
       wrong:[
         W(num(n),_("לא כל איבר הוא יוצר. יוצר הוא איבר שסדרו שווה לסדר החבורה.")),
-        W("1",_("היוצר אינו יחיד. גם 1 וגם n פחות 1 הם יוצרים, ולרוב יש עוד.")),
+        /* "1" הופיע בכל הגרלה ולא היה נכון אף פעם. הוא מתחלף עכשיו
+           עם n פחות 1, שאינו נכון אלא כאשר n ראשוני — ואז אינו מוגרל. */
+        ((ph!==n-1&&Math.random()<0.5)
+          ?W(num(n-1),_("כל איבר שאינו אפס הוא יוצר רק כאשר n ראשוני. כאן סופרים רק את הזרים ל-n."))
+          :W("1",_("היוצר אינו יחיד. גם 1 וגם n פחות 1 הם יוצרים, ולרוב יש עוד."))),
         W(num(divisors(n).length),_("זה מספר תת־החבורות, לא מספר היוצרים."))
       ],
       steps:[
@@ -2955,7 +3196,7 @@ function genGroup(L){
       ],
       steps:[
         S(_("החיבור נעשה רכיב־רכיב"),_("במכפלה ישרה כל רכיב מתנהג בחבורה שלו בלבד."),""),
-        S(_("הסדר בכל רכיב"),_("הסדר של k ב-Z_n הוא n חלקי gcd(n , k)."),
+        S(_("הסדר בכל רכיב"),_("הסדר של k ב-Z_n הוא n חלקי gcd(n, k)."),
           "ord("+num(u4)+") = "+num(o1)+"   ,   ord("+num(v4)+") = "+num(o2)),
         S(_("מאחדים"),_("דרוש מספר צעדים שמאפס את שני הרכיבים יחד."),"lcm("+num(o1)+" , "+num(o2)+") = "+num(od)),
         S(_("בדיקה בעזרת לגראנז׳"),_f("הסדר חייב לחלק את |G| = {0}.", num(m4*n4)),num(m4*n4)+" ÷ "+num(od)+" = "+num(m4*n4/od))
@@ -3016,7 +3257,9 @@ function genLagr3(L){
         wrong:[
           W(_("כן"),whyD),
           W(_("לא"),whyD),
-          W(_("רק אם G אבלית"),_("משפט לגראנז׳ אינו דורש חילופיות. הוא נכון בכל חבורה סופית."))
+          (Math.random()<0.5
+          ?W(_("לגראנז׳ מבטיח תת־חבורה לכל מחלק"),_("המשפט שולל בלבד. הכיוון ההפוך אינו חלק ממנו: ל-A₄ מסדר 12 אין תת־חבורה מסדר 6."))
+          :W(_("רק אם G אבלית"),_("משפט לגראנז׳ אינו דורש חילופיות. הוא נכון בכל חבורה סופית.")))
         ],
         steps:[
           S(_("משפט לגראנז׳"),_("סדר תת־חבורה מחלק תמיד את סדר החבורה."),"|H| ∣ |G|"),
@@ -3036,7 +3279,9 @@ function genLagr3(L){
           yes?_f("{0} מחלק את {1}, ובחבורה ציקלית יש בדיוק תת־חבורה אחת לכל מחלק.", num(d), num(n))
              :_f("{0} אינו מחלק את {1}, ולכן לפי לגראנז׳ אין תת־חבורה כזאת.", num(d), num(n))),
         W(_("אי אפשר לקבוע"),_("החבורה נתונה כציקלית, ובה לכל מחלק של הסדר יש תת־חבורה — ולכן ההכרעה מלאה.")),
-        W(_("רק אם G אבלית"),_("משפט לגראנז׳ אינו דורש חילופיות. הוא נכון בכל חבורה סופית."))
+        (Math.random()<0.5
+          ?W(_("לגראנז׳ מבטיח תת־חבורה לכל מחלק"),_("המשפט שולל בלבד. הכיוון ההפוך אינו חלק ממנו: ל-A₄ מסדר 12 אין תת־חבורה מסדר 6."))
+          :W(_("רק אם G אבלית"),_("משפט לגראנז׳ אינו דורש חילופיות. הוא נכון בכל חבורה סופית.")))
       ],
       steps:[
         S(_("משפט לגראנז׳"),_("סדר תת־חבורה מחלק תמיד את סדר החבורה."),"|H| ∣ |G|"),
@@ -3161,7 +3406,9 @@ function genPerm(L){
       ans:W(num(k)),
       wrong:[
         W(num(k-1),_("אורך המחזור נספר לפי מספר האיברים בו, לא לפי מספר החילופים.")),
-        W("2",_("סדר 2 יש לחילוף בלבד — מחזור באורך שתיים.")),
+        (Math.random()<0.5
+          ?W(num(2*k),_("סיבוב אחד מלא כבר מחזיר כל איבר למקומו. אין צורך לעבור את המחזור פעמיים."))
+          :W("2",_("סדר 2 יש לחילוף בלבד — מחזור באורך שתיים."))),
         W(num(fact(k)),_("זה גודל חבורת התמורות כולה, לא הסדר של התמורה הזאת."))
       ],
       steps:[
@@ -3271,7 +3518,18 @@ function genPerm(L){
 function genErr(L){
   var ex,ap,k;
   if(L===1){
-    ex=ri(20,200);ap=ex+ri(1,9);   /* קירוב גדול מהמדויק, כדי שההפרש בלי ערך מוחלט יהיה שלילי */
+    /* הפער היה תמיד ri(1,9), ולכן השגיאה המוחלטת הייתה תמיד ספרה
+       אחת — הקצרה מבין ארבע האפשרויות ב-100% מההגרלות. תלמיד
+       שבוחר תמיד את הקצרה פתר את התא בלי לדעת מה זו שגיאה מוחלטת.
+       והמסיח ״בלי ערך מוחלט״ הוא בדיוק התשובה ועוד סימן מינוס,
+       כלומר ארוך ממנה באחד תמיד — אז לא די להגריל פער גדול יותר.
+       עכשיו שני הנתונים עשרוניים, כמו מדידה אמיתית: השגיאה
+       המוחלטת נעשית מספר בן שתי ספרות אחרי הנקודה, והשגיאה
+       היחסית (0.0x) נעשית לרוב קצרה ממנה או שווה לה. כשהאורך
+       המינימלי משותף לשתי אפשרויות הוא מפסיק להיות רמז.
+       הקירוב נשאר גדול מהמדויק, כדי שההפרש בלי ערך מוחלט יהיה
+       שלילי, והפער נשאר קטן ממנו כדי שיישאר קירוב סביר. */
+    ex=r2(ri(2000,20000)/100);ap=r2(ex+ri(10,900)/100);
     return {ask:_f("הערך המדויק הוא {0} והקירוב הוא {1}. מהי השגיאה המוחלטת?", num(ex), num(ap)),
       expr:"|"+_("מדויק")+" − "+_("קירוב")+"| = ?",
       ans:W(num(Math.abs(ex-ap))),
@@ -3341,7 +3599,12 @@ function genErr(L){
     wrong:[
       W(num(Math.pow(10,-k)),_("זהו המרווח בין שני ערכים אפשריים. העיגול מקרב לקרוב, ולכן החסם הוא חצי ממנו.")),
       W(num(Math.pow(10,-k)*2),_("הכפלתם במקום לחלק. עיגול מקטין שגיאה, לא מגדיל.")),
-      W(num(k),_("זה מספר הספרות, לא החסם."))
+      /* היה כאן num(k) — ״זה מספר הספרות, לא החסם״. הוא היה מספר שלם
+         בודד בין שלושה עשרוניים, כלומר הקצר ביותר תמיד, ובמקביל
+         חצי-המרווח תמיד מוסיף ספרה ולכן התשובה הייתה הארוכה ביותר
+         ב-100% מההגרלות. הוחלף בטעות חדה יותר באותו אורך: עיגול
+         לספרה אחת יותר מדי, שהיא הטעות שבאמת קורית בחישוב הזה. */
+      W(num(Math.pow(10,-(k+1))/2),_("עיגלתם לספרה אחת יותר מדי. החסם נגזר ממספר הספרות שבשאלה, ולא מאחת מעבר לו."))
     ],
     steps:[
       S(_("המרווח בין ערכים"),_f("עם {0} ספרות אחרי הנקודה המרווח הוא 10 בחזקת מינוס {0}.", num(k)),
@@ -3356,7 +3619,9 @@ function genNewton(L){
   var a,b,c,x0;
   if(L===1){
     var btry=0;
-    do{ a=ri(0,4);b=a+pick([2,4,6]); }
+    /* קצה שמאלי 0..4 נתן שבע שאלות שונות בלבד. נקודת האמצע
+       נשארת (a+b)/2 בדיוק כשהייתה. */
+    do{ a=ri(0,9);b=a+pick([2,4,6]); }
     while(btry++<40&&new Set([(a+b)/2,a,b,b-a]).size<4);
     return {ask:_("בשיטת החצייה, מהי נקודת האמצע הראשונה?"),
       expr:"f("+num(a)+") < 0 < f("+num(b)+")   ,   ["+num(a)+" , "+num(b)+"]",
@@ -3542,14 +3807,19 @@ function genInterp(L){
       ],rule:"interp",hint:_("קודם בודקים אם כל ערכי x שונים, ורק אז שואלים על המעלה.")};
   }
   /* L3 — מעלת פולינום האינטרפולציה */
-  var np=ri(3,7);
+  /* קודם np התחיל ב-3, ולכן התשובה הייתה 2 לפחות ו-"1" היה מסיח
+     שלעולם אינו נכון. שתי נקודות נותנות ישר, כלומר מעלה 1. */
+  /* 2..7 נתן שש שאלות שונות בלבד. n נקודות עם ערכי x שונים קובעות
+     פולינום יחיד ממעלה n−1 לכל היותר — נכון לכל n. */
+  var np=ri(2,12);
   return {ask:_f("דרך {0} נקודות עם ערכי x שונים עובר פולינום אינטרפולציה יחיד. מהי מעלתו לכל היותר?", num(np)),
     expr:num(np)+" "+_("נקודות"),
     ans:W(num(np-1)),
     wrong:[
       W(num(np),_("מעלה n הייתה דורשת n ועוד 1 מקדמים, ואין מספיק משוואות.")),
       W(num(np+1),_("ככל שהמעלה גבוהה יותר צריך יותר נקודות, לא פחות.")),
-      W("1",_("מעלה 1 מספיקה רק לשתי נקודות."))
+      (np===2?W("0",_("מעלה 0 היא פונקציה קבועה, והיא מספיקה רק לנקודה אחת."))
+             :W("1",_("מעלה 1 מספיקה רק לשתי נקודות.")))
     ],
     steps:[
       S(_("סופרים מקדמים"),_("פולינום ממעלה d נקבע על ידי d ועוד 1 מקדמים."),"d + 1"),
@@ -3727,7 +3997,7 @@ var FORMULAS=[
   {id:"restheo",g:"cplx",t:"משפט השאריות",m:"∮ f dz = 2πi · Σ Res",n:"סופרים רק קטבים שבתוך המסלול. קוטב מחוץ לו אינו תורם דבר."},
   {id:"mod",g:"alg",t:"אריתמטיקה מודולרית",m:"a ≡ b (mod n)  ⇔  n ∣ (a − b)",n:"אפשר לצמצם לפני פעולה וגם אחריה. את השני שוכחים."},
   {id:"modpow",g:"alg",t:"חזקה מודולרית",m:"ריבועים חוזרים, וצמצום אחרי כל הכפלה",n:"משפט פרמה הקטן: a בחזקת p−1 שקול ל-1 כאשר p ראשוני ואינו מחלק את a."},
-  {id:"order",g:"alg",t:"סדר של איבר",m:"ord(k) ב-Z<sub>n</sub> = n ÷ gcd(n , k)",n:"בחבורת ההפיכים מעלים בחזקות עד שמתקבל 1."},
+  {id:"order",g:"alg",t:"סדר של איבר",m:"ord(k) ב-Z<sub>n</sub> = n ÷ gcd(n, k)",n:"בחבורת ההפיכים מעלים בחזקות עד שמתקבל 1."},
   {id:"cyclic",g:"alg",t:"יוצרים של חבורה ציקלית",m:"k יוצר את Z<sub>n</sub>  ⇔  gcd(k , n) = 1",n:"מספר היוצרים הוא φ(n)."},
   {id:"lagrange3",g:"alg",t:"משפט לגראנז׳",m:"|H| ∣ |G|   ·   [G:H] = |G| ÷ |H|",n:"שולל מיד סדרים שאינם מחלקים, אבל אינו מבטיח קיום בכיוון ההפוך."},
   {id:"perm",g:"alg",t:"סדר של תמורה",m:"מחזור באורך k: סדר k   ·   מחזורים זרים: lcm של האורכים",n:"זרים פועלים על איברים שונים, ולכן אפשר לחשב כל אחד לחוד."},
@@ -3778,7 +4048,7 @@ function buildQ(topicId,level){
     opts=[{h:raw.ans.h,t:ansP,ok:true,why:""}];
   }
   shuffle(opts);
-  var sayTxt=raw.ask+(raw.expr?". "+speakMath(plainOf(raw.expr)):"");
+  var sayTxt=speakProse(plainOf(raw.ask))+(raw.expr?". "+speakMath(plainOf(raw.expr)):"");
   return {
     topic:t.id,topicName:t.name,level:level,
     ask:raw.ask,expr:raw.expr||"",fig:raw.fig||"",
@@ -3923,7 +4193,7 @@ function viewOnboard(){
    '<div class="rise">'+
 _f("{0}{1} לשנה א׳ באוניברסיטה</span>", '<span class="chip a">', ic("target",14))+
    '<h1 class="h1" style="margin-top:14px">'+_('חדו״א, לינארית והסתברות — צעד אחר צעד.')+'</h1>'+
-   '<p class="sub" style="font-size:1.05rem;max-width:34rem">'+_('בשנה א׳ ההרצאה רצה והתרגול מניח שהבנתם. כאן כל שאלה נפתחת לשלבים — כולל השורה שהמרצה דילג עליה — וכל תשובה שגויה אומרת בדיוק איזו טעות היא. דף נוסחאות פתוח תמיד, והקראה בקול טבעי.')+'</p>'+
+   '<p class="sub" style="font-size:1.05rem;max-width:34rem">'+_('בשנה א׳ ההרצאה רצה והתרגול מניח שהבנתם. כאן כל שאלה נפתחת לשלבים — כולל השורה שהמרצה דילג עליה — וכל תשובה שגויה אומרת בדיוק איזו טעות היא. דף נוסחאות פתוח תמיד, והקראה בקול.')+'</p>'+
    '<div class="grid g3" style="margin-top:22px">'+
      [["steps",_("פתרון מודרך"),_("כל שאלה נפתחת לשלבים, כולל המעברים שמדלגים עליהם")],
       ["target",_("זיהוי הטעות"),_("תשובה שגויה אומרת איזו טעות היא, לא רק שהיא שגויה")],
@@ -4023,25 +4293,6 @@ _f("{0}{1} דף נוסחאות</button></div>", '<button class="btn btn-g" data-
   return h+'</main>';
 }
 /* ---------- תרגול ---------- */
-/* מצב הקול חייב להיות במסך התרגול עצמו. הודעה שמסבירה למה
-   הקול לא מה שביקשת חסרת ערך אם היא מוסתרת בהגדרות. */
-function voiceStrip(){
-  var s=state.settings;
-  if(!s.tts)return "";
-  /* מפתח שנדחה לצמיתות: אין מה להציע ואין על מה להתריע. ההקראה
-     עובדת בקול המכשיר, וההסבר ממתין במסך ההגדרות. */
-  if(gDead)return "";
-  if(s.engine==="gemini"&&hasKey()&&ttsState!=="err"){
-    if(ttsState!=="ok")return "";      /* עוד לא הושמע דבר — אין מה להודיע */
-    return _f("{0}{1}<span>קול טבעי · {2}</span>", '<div class="vstrip ok">', ic("speaker",15), gvName(s.gvoice).t)+
-      '<button class="btn btn-g" data-a="go" data-v="settings">'+_('להחליף')+'</button></div>';
-  }
-  if(ttsState==="err")
-    return _f("{0}{1}<span>הקול הטבעי לא הגיב, ההקראה עברה לקול המכשיר</span>", '<div class="vstrip bad">', ic("speaker",15))+
-      '<button class="btn btn-g" data-a="go" data-v="settings">'+_('לבדוק')+'</button></div>';
-  return _f("{0}{1}<span>ההקראה בקול המכשיר. יש קול טבעי שנשמע כמו אדם</span>", '<div class="vstrip warn">', ic("speaker",15))+
-    '<button class="btn btn-g" data-a="go" data-v="settings">'+_('להפעיל')+'</button></div>';
-}
 function viewPractice(){
   if(!P.q)startRound();
   if(P.phase==="done")return viewSummary();
@@ -4058,7 +4309,6 @@ _f("{0}{1} מתוך {2}</span></div>", '<span class="chip">'+_('שאלה')+' ', 
         }).join("")+'</span>'+
 _f("{0}{1} עצירה</button></div>", '<button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="stop">', ic("pause",15))+
      '</div>';
-  h+=voiceStrip();
   h+='<div class="grid" style="grid-template-columns:minmax(0,1fr);margin-top:14px">';
   /* כרטיס השאלה */
   h+='<div class="card pad rise '+topicCls(q.topic)+'" style="border-top:3px solid var(--c)">';
@@ -4068,7 +4318,7 @@ _f("{0}{1} עצירה</button></div>", '<button class="btn btn-g" style="padding
   /* כפתורי עזר */
   h+='<div class="row" style="margin-top:16px;gap:8px">'+
      (state.settings.tts?_f("{0}{1} הקראה</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="read">', ic("speaker",16)):"")+
-_f("{0}{1}>{2} רמז</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="hint"', (P.hints>0?" disabled":""), ic("bulb",16))+
+_f("{0}{1}>{2} רמז</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="hint"', (P.hints>0?" disabled":""), ic("bulb",16))+(window.TUTOR&&TUTOR.on()?'<button class="btn ghost" data-a="tutor" style="margin-inline-start:6px">'+esc(TUTOR.label())+"</button>":"")+
 _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="guide"', (P.steps>0?" disabled":""), ic("steps",16))+
      (q.rule?_f("{0}{1}{2}{3} הנוסחה</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="rule" data-r="', q.rule, '">', ic("book",16)):"")+
      '</div>';
@@ -4334,71 +4584,41 @@ function viewSettings(){
   h+='<div class="card pad" style="margin-top:14px"><div class="h2">'+_('הקראה')+'</div>'+
      '<div style="margin-top:12px">'+togBtn("tts",_("הקראה קולית"),_("קריאת שאלות, רמזים והסברים"))+'</div>';
   if(s.tts){
-    h+='<p class="sub sm" style="margin-top:16px">'+_('מקור הקול')+'</p><div class="seg" style="margin-top:8px">'+
-       '<button class="'+(s.engine==="gemini"?"on":"")+_('" data-a="engine" data-n="gemini">קול טבעי</button>')+
-       '<button class="'+(s.engine!=="gemini"?"on":"")+_('" data-a="engine" data-n="device">קול המכשיר</button>')+
-       '</div>';
     /* בדיקה במקום ניחוש: לחיצה אחת שאומרת אם הקול עובד. */
     h+='<div style="margin-top:12px"><button class="btn btn-p" data-a="vcheck">'+
        ic("speaker",17)+' '+_("בדיקת קול")+'</button>'+
        (VCHK?'<p class="sub sm" style="margin-top:8px">'+esc(VCHK)+'</p>':"")+
        '<p class="sub sm" style="margin-top:6px;opacity:.7">'+esc(BUILD)+'</p></div>';
-    /* התנאי הוא המצב בפועל ולא ההעדפה השמורה: ברירת המחדל היא
-       "gemini", וכשאין מפתח האפליקציה מדברת בקול המכשיר — אבל
-       המסך הראה רק את תיבת המפתח, בלי אף קול לבחור מתוכו. */
-    if(s.engine==="gemini"&&hasKey()){
-        h+=[["f",_("קולות נשיים")],["m",_("קולות גבריים")]].map(function(grp){
-          return '<p class="sub sm" style="margin-top:14px">'+grp[1]+'</p><div class="grid vgrid" style="margin-top:8px">'+
-            GEM_VOICES.filter(function(g){return g.g===grp[0]}).map(function(g){
-              var on=(s.gvoice||"Kore")===g.id;
-              return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="gvoice" data-n="'+g.id+'">'+
-                '<span class="chip'+(on?" a":"")+'">'+(on?_("נבחר"):_("לשמוע"))+'</span>'+
-                '<span class="tt"><b>'+g.t+'</b><span>'+g.d+'</span></span></button>';
-            }).join("")+'</div>';
-        }).join("")+
-          '<div class="row" style="margin-top:12px"><button class="btn btn-g" style="padding:8px 12px;font-size:.85rem" data-a="clearkey">'+_('החלפת המפתח')+'</button></div>';
-        if(ttsErr)h+='<div class="diag" style="margin-top:12px"><b>'+_('הקול הטבעי לא הגיב')+'</b>'+
-          '<div class="sm" style="margin-top:3px">'+esc(ttsErr)+'</div>'+
-          '<div class="sm" style="margin-top:6px">'+_('בינתיים ההקראה עברה לקול המכשיר. אם כתוב כאן 400 או 403 — כנראה המפתח לא תקין או שהמודל לא זמין לחשבון.')+'</div></div>';
-      }else{
-      if(s.engine==="gemini"){
-        h+='<div class="hintbox" style="margin-top:14px"><b>'+_('צריך מפתח חינמי פעם אחת')+'</b>'+
-           '<div class="sm" style="margin-top:4px">'+_('הקול הטבעי מגיע מגוגל. נכנסים ל-')+
-           '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>'+
-           _f(", יוצרים מפתח ומדביקים אותו כאן. הוא נשמר במכשיר בלבד ולא נשלח לשום מקום חוץ מגוגל.</div></div>")+
-           '<input class="field" style="margin-top:10px;direction:ltr;text-align:left" placeholder="'+esc(_('מדביקים כאן את המפתח'))+'" data-bind="gkey" />'+
-           '<p class="sub xs" style="margin-top:8px">'+_('עד שיוזן מפתח — ההקראה תעבוד עם קול המכשיר.')+'</p>';
-      }
-
-      /* רק קולות בשפת הממשק. הרשימה הציעה גם קולות אנגליים,
-         והכפתור שלידם אינו משמיע אלא בוחר — כך נשמר קול אנגלי
-         כקול שמקריא עברית. מה שלא יכול להיבחר, לא מוצג. */
-      var _fn=femNote();
-      if(_fn)h+='<div class="hintbox" style="margin-top:14px"><div class="sm">'+esc(_fn)+'</div></div>';
-      var vl=hebVoices();
-      if(!vl.length){
-        h+='<div class="hintbox" style="margin-top:14px"><b>'+_('לא נמצאו קולות במכשיר')+'</b>'+
-           '<div class="sm" style="margin-top:3px">'+_('שווה לנסות את הקול הטבעי, או להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.')+'</div></div>';
-      }else{
-        if(!hv.length)h+='<div class="hintbox" style="margin-top:14px"><b>'+_('אין קול עברי במכשיר')+'</b>'+
-          '<div class="sm" style="margin-top:3px">'+_('הקולות שברשימה ידברו עברית במבטא זר. הקול הטבעי יישמע הרבה יותר טוב.')+'</div></div>';
-        /* שלוש קבוצות במקום רשימה שטוחה. מי שלא זוהה מופיע בנפרד
-           ולא מסווג בניחוש — עדיף "לא ידוע" מאשר תווית שגויה. */
-          var vbtn=function(v){
-            var on=(deviceVoice()||{}).voiceURI===v.voiceURI;
-            var heb=/^(he|iw)/i.test(v.lang||"");
-            return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="voice" data-u="'+esc(v.voiceURI)+'">'+
-              '<span class="chip'+(on?" a":"")+'">'+(on?_("נבחר"):_("לשמוע"))+'</span>'+
-              '<span class="tt"><b>'+esc(v.name)+'</b><span>'+esc(v.lang)+(heb?_(" · עברית"):"")+'</span></span></button>';
-          };
-          [["f",_('קולות נשיים')],["m",_('קולות גבריים')],["?",_('קולות במכשיר')]].forEach(function(grp){
-            var gv=vl.filter(function(v){return guessGender(v)===grp[0]}).slice(0,24);
-            if(!gv.length)return;
-            h+='<p class="sub sm" style="margin-top:14px">'+grp[1]+'</p>'+
-               '<div class="grid" style="margin-top:8px;gap:8px;max-height:340px;overflow-y:auto">'+
-               gv.map(vbtn).join("")+'</div>';
-          });
-      }
+    /* רק קולות בשפת הממשק. הרשימה הציעה גם קולות אנגליים,
+       והכפתור שלידם אינו משמיע אלא בוחר — כך נשמר קול אנגלי
+       כקול שמקריא עברית. מה שלא יכול להיבחר, לא מוצג. */
+    var _fn=femNote();
+    if(_fn)h+='<div class="hintbox" style="margin-top:14px"><div class="sm">'+esc(_fn)+edgeNote()+'</div></div>';
+    /* אותו סדר שבו האפליקציה באמת בוחרת. רשימה שמסודרת אחרת מציגה
+       למשתמש משהו אחר ממה שהוא ישמע. */
+    var vl=voiceOrder(hebVoices());
+    if(!vl.length){
+      h+='<div class="hintbox" style="margin-top:14px"><b>'+_('לא נמצאו קולות במכשיר')+'</b>'+
+         '<div class="sm" style="margin-top:3px">'+_('אפשר להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.')+'</div></div>';
+    }else{
+      if(!hv.length)h+='<div class="hintbox" style="margin-top:14px"><b>'+_('אין קול עברי במכשיר')+'</b>'+
+        '<div class="sm" style="margin-top:3px">'+_('הקולות שברשימה ידברו עברית במבטא זר.')+'</div></div>';
+      /* שלוש קבוצות במקום רשימה שטוחה. מי שלא זוהה מופיע בנפרד
+         ולא מסווג בניחוש — עדיף "לא ידוע" מאשר תווית שגויה. */
+        var vbtn=function(v){
+          var on=(deviceVoice()||{}).voiceURI===v.voiceURI;
+          var heb=/^(he|iw)/i.test(v.lang||"");
+          return '<button class="tog" style="'+(on?"border-color:var(--accent)":"")+'" data-a="voice" data-u="'+esc(v.voiceURI)+'">'+
+            '<span class="chip'+(on?" a":"")+'">'+(on?_("נבחר"):_("לשמוע"))+'</span>'+
+            '<span class="tt"><b>'+esc(v.name)+'</b><span>'+esc(v.lang)+(heb?_(" · עברית"):"")+'</span></span></button>';
+        };
+        [["f",_('קולות נשיים')],["m",_('קולות גבריים')],["?",_('קולות במכשיר')]].forEach(function(grp){
+          var gv=vl.filter(function(v){return guessGender(v)===grp[0]}).slice(0,24);
+          if(!gv.length)return;
+          h+='<p class="sub sm" style="margin-top:14px">'+grp[1]+'</p>'+
+             '<div class="grid" style="margin-top:8px;gap:8px;max-height:340px;overflow-y:auto">'+
+             gv.map(vbtn).join("")+'</div>';
+        });
     }
     h+='<p class="sub sm" style="margin-top:16px">'+_('מהירות דיבור —')+' <span id="ratev">'+s.rate.toFixed(2)+'</span></p>'+
        '<input type="range" min="0.6" max="1.3" step="0.05" value="'+s.rate+'" data-slide="rate" style="margin-top:6px" />'+
@@ -4443,7 +4663,7 @@ _f("{0}{1} לשמוע דוגמה</button>", '<button class="btn btn-g w" style="
    · שמות התלמידים נשארים במכשיר של המורה. הם לא עוברים דרך
      שום שרת, כי אין שרת.
    ============================================================ */
-var GENV=5;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
+var GENV=7;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
 var EKEY="shlav-exams-math-uni3-v1";   /* מפתח לאפליקציה הזאת בלבד */
@@ -4579,8 +4799,21 @@ function exSlots(){
   if(EB.q&&EB.q.length)return EB.q;
   var tops=EB.topics.filter(function(x){return topicById(x)});
   if(!tops.length)tops=topicsForTrack(state.track).slice(0,3).map(function(t){return t.id});
-  var q=[],i;
-  for(i=0;i<EB.n;i++)q.push(exSlot(tops[i%tops.length],EB.level));
+  /* אותה שאלה פעמיים באותו מבחן היא שאלה מבוזבזת, והיא ודאית כשברמה
+     ארבעה פריטים והמורה ביקש עשר שאלות: הזרע נבחר באקראי ובלי זיכרון,
+     ונמדד מבחן שבו אותו מושג הופיע ארבע פעמים מתוך עשר. מגלגלים מחדש
+     עד שתים־עשרה פעמים, ואם כל השאלות האפשריות כבר נלקחו — משאירים
+     כפילות במקום להיתקע. */
+  var q=[],seen={},i,tries,sl,pq,key;
+  for(i=0;i<EB.n;i++){
+    for(tries=0;tries<12;tries++){
+      sl=exSlot(tops[i%tops.length],EB.level);
+      pq=exPreviewQ(sl); key=pq&&pq.ask?plainOf(pq.ask):"";
+      if(!key||!seen[key])break;
+    }
+    if(key)seen[key]=1;
+    q.push(sl);
+  }
   /* מערבבים כאן ולא בשליחה: המורה רואה את הסדר הסופי ומאשר אותו. */
   EB.q=shuffle(q);
   return EB.q;
@@ -4589,8 +4822,15 @@ function examUrl(spec){
   var base=location.origin+location.pathname;
   return base+"#x="+encodeExam(spec);
 }
+/* wa.me מקבל רק מספר בינלאומי בלי אפס מוביל. מורה שהקליד 050-8554380
+   כמו שמקלידים בטלפון קיבל אצל התלמיד "לא ניתן לבדוק את מספר הטלפון…
+   חסרה קידומת חיוג", והתשובות לא נשלחו. אפס מוביל הוא מספר ישראלי
+   מקומי ומקבל 972; "00" בהתחלה הוא קידומת בינלאומית ונופל; מספר
+   שכבר מתחיל בקידומת מדינה נשאר כפי שהוא. */
 function waLink(text,phone){
   var p=String(phone||"").replace(/[^0-9]/g,"");
+  if(p.indexOf("00")===0)p=p.slice(2);
+  else if(p.charAt(0)==="0")p="972"+p.slice(1);
   return "https://wa.me/"+p+"?text="+encodeURIComponent(text);
 }
 
@@ -4676,10 +4916,10 @@ var EB={title:"",n:10,mins:0,level:2,topics:[],phone:"",tts:true,formulas:true,b
    כמו שהוא, וכל אחת מהן מתרגמת בדרך אחרת. כך ההעתקה נשארת
    העתקה, ותלמיד שלומד בערבית או ברוסית לא מקבל מבחן בעברית.
    ------------------------------------------------------------ */
-var XK={"exam":"מבחן","student":"תלמיד","qs":"שאלות","minutes":"דקות","none":"ללא","outOf":"מתוך","exTitle":"מבחן כיתתי","exLead":"בונים מבחן, שולחים קישור בוואטסאפ, ומקבלים בחזרה קוד תשובות לכל תלמיד. אין שרת ואין חשבון — הכול עובר דרך הקישור ודרך וואטסאפ.","exName":"שם המבחן","exNamePh":"למשל: מבחן אלגברה — כיתה ט׳2","exUnits":"יחידות","exUnitSuf":"יח״ל","exLevel":"רמה","exCount":"מספר שאלות","exTime":"הגבלת זמן","exTimeNote":"אפס פירושו בלי טיימר. בתום הזמן המבחן מוגש מעצמו.","exTopics":"נושאים","exTopicsNote":"השאלות מתחלקות שווה בשווה בין הנושאים שנבחרו.","exAcc":"התאמות לנבחנים","exAccNote":"מה שמותר בבחינה עצמה. ההקראה ודף הנוסחאות אינם רמז — הם כלי נגישות.","exTts":"הקראה קולית","exTtsSub":"כל שאלה נקראת בקול לפי בקשה","exForm":"דף נוסחאות","exFormSub":"נגיש מתוך המבחן, כמו בבגרות","exPhone":"מספר הוואטסאפ שלכם (לא חובה)","exPhoneNote":"אם תמלאו — כפתור השליחה אצל התלמיד ייפתח ישר לצ׳אט איתכם. שימו לב: המספר יופיע בתוך הקישור שאתם משתפים.","exBuild":"צרו את המבחן","exShareMsg":"{0} שאלות. נכנסים לקישור, פותרים, ובסוף שולחים לי את הקוד.","exReady":"המבחן מוכן","exWa":"שליחה בוואטסאפ","exCopyUrl":"העתקת הקישור","exToMarks":"לציונים","exUrlCopied":"הקישור הועתק","mkTitle":"ציונים","mkLead":"מדביקים כאן את הקוד שהתלמיד שלח בוואטסאפ. הציון מחושב מחדש מהתשובות עצמן, ולא נלקח ממה שהתלמיד כתב.","mkNew":"מבחן חדש","mkEmpty":"עוד לא יצרתם מבחן. אפשר להתחיל מ״מבחן חדש״.","mkSubs":"הגשות","mkAvg":"ממוצע","mkPaste":"הדבקת קוד תשובות","mkPastePh":"מדביקים כאן את הקוד מהוואטסאפ","mkTake":"קליטה","mkResend":"שליחה שוב","mkCopyTbl":"העתקת טבלה","mkDelQ":"למחוק את המבחן ואת {0} ההגשות?","mkDelYes":"כן, למחוק","mkCancel":"ביטול","mkDel":"מחיקת המבחן","mkByStudent":"לפי תלמיד","mkNoName":"ללא שם","mkFell":"נפל ב:","mkAllOk":"הכול נכון","mkBadCode":"הקוד לא תואם לעצמו","mkByTopic":"לפי נושא — מה כדאי ללמד שוב","mkByTopicNote":"אחוז ההצלחה של כל הכיתה יחד.","mkRight":"תשובות נכונות מתוך","mkTblHead":"תלמיד\tציון\tנכונות\tנפל ב","mkTblCopied":"הטבלה הועתקה","mkErrRead":"לא הצלחנו לקרוא את הקוד. נסו להעתיק אותו שוב, במלואו.","mkErrOther":"הקוד הזה שייך למבחן „{0}”.","mkErrUnknown":"הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה.","mkErrCount":"מספר התשובות בקוד אינו תואם למבחן.","mkTaken":"נקלט","mkNoteBad":"שימו לב: הקוד לא תואם לעצמו","stNoTime":"בלי הגבלת זמן.","stTimed":"יש הגבלת זמן: {0} דקות. בסופן המבחן מוגש מעצמו.","stNoTimer":"אין טיימר. אפשר לקחת את הזמן.","stNoNeg":"אין ניקוד שלילי — תשובה לא נכונה לא גורעת.","stReadOn":"אפשר לבקש הקראה של כל שאלה.","stReadOff":"ההקראה כבויה במבחן הזה.","stFormOn":"דף הנוסחאות פתוח לאורך כל המבחן.","stFormOff":"דף הנוסחאות סגור במבחן הזה.","stCodeEnd":"בסוף תקבלו קוד — שולחים אותו למורה בוואטסאפ.","stYourName":"השם שלכם","stNameNote":"כדי שהמורה יידע מי ענה. השם לא נשלח לשום שרת — הוא נכנס לתוך הקוד.","stNamePh":"שם פרטי ושם משפחה","stStart":"מתחילים","stQn":"שאלה {0} מתוך {1}","stRead":"הקראה","stFormulas":"דף נוסחאות","stPrev":"קודמת","stDunno":"לא יודע/ת","stFlagged":"✓ מסומנת לחזרה","stFlag":"לחזור אליה","stNext":"הבאה","stReview":"לפני ההגשה","stReviewNote":"אפשר לחזור לכל שאלה ולשנות. אחרי ההגשה נוצר הקוד.","stUnanswered":"{0} שאלות בלי תשובה","stAllAnswered":"כל השאלות נענו","stPicked":"סימנתם:","stNotYet":"עוד לא עניתם","stChange":"שינוי","stFill":"למלא","stDone":"סיימתי — ליצירת הקוד","stFinished":"סיימתם","stScoreLine":"{0} נכונות מתוך {1}","stSendNow":"עכשיו שולחים את הקוד למורה.","stSendNote":"הקוד מכיל את השם ואת התשובות שסימנתם — המורה מחשב את הציון אצלו מחדש.","stToTeacher":"למורה","stCopyCode":"העתקת הקוד","stCodeCopied":"הקוד הועתק","stWhatRight":"מה היה נכון","stWhatRightNote":"בשביל ללמוד מזה, לא בשביל הציון.","stOk":"נכון","stCorrect":"התשובה הנכונה:","stToApp":"לאפליקציה עצמה — לתרגול חופשי","stGrade":"ציון:","stCode":"קוד:","badLink":"המבחן לא נפתח","toApp":"לאפליקציה","exOld":"המבחן הזה נוצר בגרסה קודמת של האפליקציה, ולכן השאלות בו כבר לא זהות. בקשו מהמורה לשלוח מבחן חדש.","exBroken":"אולי המבחן שייך לאפליקציה אחרת, ואולי הקישור נקטע בדרך. בקשו מהמורה לשלוח את הקישור שוב, ופתחו אותו ישר מההודעה.","stBackTo":"חזרה למבחן — שאלה {0} מתוך {1}","mkCsv":"הורדת CSV","mkCsvName":"שם","mkCsvPct":"ציון","mkCsvOk":"נכונות","mkCsvTotal":"שאלות","mkCsvDate":"תאריך","mkCsvValid":"קוד תקין","mkCsvQ":"שאלה {0}","mkCsvYes":"כן","mkCsvNo":"לא","mkCsvDone":"הקובץ ירד","teTitle":"קוד מורה","teSet":"בחירת קוד מורה","teEnter":"מסכי המורה נעולים. הקלידו את הקוד כדי לפתוח אותם.","teLead":"בונה המבחן ומסך הציונים ייעלמו מהתפריט, וייפתחו רק עם הקוד הזה.","teWarn":"זו אינה אבטחה. היא עוצרת יד סקרנית, לא מישהו שמבין במחשבים.","tePin":"קוד — 4 עד 8 ספרות","teAgain":"שוב, לוודא","teRemember":"לזכור במכשיר הזה","teRememberNote":"בלי זה הקוד יידרש שוב בכל פתיחה של האפליקציה. על טאבלט כיתתי — עדיף בלי.","teOk":"אישור","teCancel":"ביטול","teBad":"הקוד שגוי.","teMismatch":"שני הקודים אינם זהים.","teShort":"צריך בין 4 ל-8 ספרות, בלי אותיות.","teWaitN":"יותר מדי ניסיונות. נסו שוב בעוד {0} שניות.","teForgot":"שכחתי את הקוד","teForgotHow":"אין דרך לשחזר קוד — הוא לא נשמר בשום מקום. מחיקת נתוני האתר בדפדפן מסירה אותו, ואיתם גם ההתקדמות והמבחנים.","teHideT":"להסתיר את מסכי המורה","teHideNote":"על מכשיר שהילד משתמש בו, בונה המבחן ומסך הציונים יכולים לשבת מאחורי קוד. לפתיחה מאוחר יותר: להוסיף ?teacher=1 לכתובת.","teHideBtn":"בחירת קוד","teOpenNow":"מצב מורה פתוח","teLockBtn":"יציאה ממצב מורה","teChangeBtn":"שינוי הקוד","teRemoveBtn":"ביטול הקוד","teLocked":"מסכי המורה נעולים במכשיר הזה.","teUnlock":"פתיחה"};
-var XT={ar:{"exam":"امتحان","student":"طالب","qs":"أسئلة","minutes":"دقيقة","none":"بلا","outOf":"من أصل","exTitle":"امتحان صفّي","exLead":"تُعِدّ الامتحان، ترسل رابطًا في واتساب، وتستلم من كلّ طالب رمز إجابات. لا خادم ولا حساب — كلّ شيء يمرّ عبر الرابط وواتساب.","exName":"اسم الامتحان","exNamePh":"مثلًا: امتحان جبر — الصف التاسع/2","exUnits":"وحدات","exUnitSuf":"وحدات","exLevel":"المستوى","exCount":"عدد الأسئلة","exTime":"تحديد الوقت","exTimeNote":"صفر يعني بلا مؤقّت. عند انتهاء الوقت يُسلَّم الامتحان تلقائيًا.","exTopics":"المواضيع","exTopicsNote":"تُوزَّع الأسئلة بالتساوي بين المواضيع المختارة.","exAcc":"تسهيلات للممتحَنين","exAccNote":"ما هو مسموح في الامتحان نفسه. القراءة الصوتية وورقة القوانين ليستا تلميحًا — بل وسيلتا إتاحة.","exTts":"قراءة صوتية","exTtsSub":"كل سؤال يُقرأ بصوت عند الطلب","exForm":"ورقة قوانين","exFormSub":"متاحة داخل الامتحان، كما في البجروت","exPhone":"رقم واتساب الخاص بك (اختياري)","exPhoneNote":"إذا عبّأته — يفتح زرّ الإرسال عند الطالب محادثة معك مباشرة. انتبه: الرقم يظهر داخل الرابط الذي تشاركه.","exBuild":"أنشئ الامتحان","exShareMsg":"{0} أسئلة. ادخل إلى الرابط، حُلّ، وفي النهاية أرسل لي الرمز.","exReady":"الامتحان جاهز","exWa":"إرسال في واتساب","exCopyUrl":"نسخ الرابط","exToMarks":"إلى العلامات","exUrlCopied":"نُسخ الرابط","mkTitle":"العلامات","mkLead":"الصق هنا الرمز الذي أرسله الطالب في واتساب. تُحتسب العلامة من جديد من الإجابات نفسها، لا مما كتبه الطالب.","mkNew":"امتحان جديد","mkEmpty":"لم تُنشئ امتحانًا بعد. ابدأ من «امتحان جديد».","mkSubs":"تسليمات","mkAvg":"المعدّل","mkPaste":"لصق رمز الإجابات","mkPastePh":"الصق هنا الرمز من واتساب","mkTake":"استلام","mkResend":"إرسال مرّة أخرى","mkCopyTbl":"نسخ الجدول","mkDelQ":"حذف الامتحان و{0} من التسليمات؟","mkDelYes":"نعم، احذف","mkCancel":"إلغاء","mkDel":"حذف الامتحان","mkByStudent":"حسب الطالب","mkNoName":"بلا اسم","mkFell":"أخفق في:","mkAllOk":"كل الإجابات صحيحة","mkBadCode":"الرمز غير متطابق مع نفسه","mkByTopic":"حسب الموضوع — ما يستحقّ إعادة التدريس","mkByTopicNote":"نسبة نجاح الصفّ كلّه معًا.","mkRight":"إجابات صحيحة من أصل","mkTblHead":"الطالب\tالعلامة\tالصحيحة\tأخفق في","mkTblCopied":"نُسخ الجدول","mkErrRead":"تعذّرت قراءة الرمز. حاول نسخه من جديد، كاملًا.","mkErrOther":"هذا الرمز يعود لامتحان «{0}».","mkErrUnknown":"هذا الرمز يعود لامتحان آخر غير موجود على هذا الجهاز.","mkErrCount":"عدد الإجابات في الرمز لا يطابق الامتحان.","mkTaken":"استُلم","mkNoteBad":"انتبه: الرمز غير متطابق مع نفسه","stNoTime":"بلا تحديد وقت.","stTimed":"هناك تحديد للوقت: {0} دقيقة. عند انتهائها يُسلَّم الامتحان تلقائيًا.","stNoTimer":"لا مؤقّت. خذ وقتك.","stNoNeg":"لا علامات سالبة — الإجابة الخاطئة لا تخصم.","stReadOn":"يمكنك طلب قراءة أي سؤال بصوت.","stReadOff":"القراءة الصوتية مغلقة في هذا الامتحان.","stFormOn":"ورقة القوانين مفتوحة طوال الامتحان.","stFormOff":"ورقة القوانين مغلقة في هذا الامتحان.","stCodeEnd":"في النهاية تحصل على رمز — أرسله للمعلّم في واتساب.","stYourName":"اسمك","stNameNote":"كي يعرف المعلّم من أجاب. الاسم لا يُرسل إلى أي خادم — يدخل داخل الرمز.","stNamePh":"الاسم الشخصي واسم العائلة","stStart":"لنبدأ","stQn":"سؤال {0} من أصل {1}","stRead":"قراءة","stFormulas":"ورقة قوانين","stPrev":"السابق","stDunno":"لا أعرف","stFlagged":"✓ مُعلَّم للعودة","stFlag":"للعودة إليه","stNext":"التالي","stReview":"قبل التسليم","stReviewNote":"يمكنك العودة إلى أي سؤال وتغييره. بعد التسليم يُنشأ الرمز.","stUnanswered":"{0} أسئلة بلا إجابة","stAllAnswered":"أُجيبت كل الأسئلة","stPicked":"اخترت:","stNotYet":"لم تُجب بعد","stChange":"تغيير","stFill":"للتعبئة","stDone":"أنهيت — أنشئ الرمز","stFinished":"أنهيت","stScoreLine":"{0} صحيحة من أصل {1}","stSendNow":"الآن أرسل الرمز إلى المعلّم.","stSendNote":"الرمز يحوي الاسم والإجابات التي اخترتها — والمعلّم يحتسب العلامة عنده من جديد.","stToTeacher":"إلى المعلّم","stCopyCode":"نسخ الرمز","stCodeCopied":"نُسخ الرمز","stWhatRight":"ما كان صحيحًا","stWhatRightNote":"للتعلّم منه، لا من أجل العلامة.","stOk":"صحيح","stCorrect":"الإجابة الصحيحة:","stToApp":"إلى التطبيق نفسه — للتدرّب الحرّ","stGrade":"العلامة:","stCode":"الرمز:","badLink":"تعذّر فتح الامتحان","toApp":"إلى التطبيق","exOld":"أُنشئ هذا الامتحان بنسخة سابقة من التطبيق، ولذلك لم تعد أسئلته مطابقة. اطلب من المعلّم إرسال امتحان جديد.","exBroken":"ربما يعود الامتحان إلى تطبيق آخر، وربما انقطع الرابط في الطريق. اطلب من المعلّم إرسال الرابط من جديد، وافتحه مباشرة من الرسالة.","stBackTo":"العودة إلى الامتحان — سؤال {0} من أصل {1}","mkCsv":"تنزيل CSV","mkCsvName":"الاسم","mkCsvPct":"العلامة","mkCsvOk":"الصحيحة","mkCsvTotal":"الأسئلة","mkCsvDate":"التاريخ","mkCsvValid":"الرمز سليم","mkCsvQ":"سؤال {0}","mkCsvYes":"نعم","mkCsvNo":"لا","mkCsvDone":"نُزّل الملف","teTitle":"رمز المعلّم","teSet":"اختيار رمز المعلّم","teEnter":"شاشات المعلّم مقفلة. أدخلوا الرمز لفتحها.","teLead":"سيختفي بانِي الامتحان وشاشة العلامات من القائمة، ولن يُفتحا إلّا بهذا الرمز.","teWarn":"هذه ليست حماية. إنّها توقف يدًا فضولية، لا شخصًا يفهم في الحواسيب.","tePin":"الرمز — من ٤ إلى ٨ أرقام","teAgain":"مرّة أخرى، للتأكيد","teRemember":"التذكّر في هذا الجهاز","teRememberNote":"بدون ذلك سيُطلب الرمز في كلّ فتح للتطبيق. على لوح صفّيّ — الأفضل بدونه.","teOk":"تأكيد","teCancel":"إلغاء","teBad":"الرمز غير صحيح.","teMismatch":"الرمزان غير متطابقين.","teShort":"يلزم بين ٤ و‑٨ أرقام، بلا حروف.","teWaitN":"محاولات كثيرة. حاولوا مجدّدًا بعد {0} ثانية.","teForgot":"نسيت الرمز","teForgotHow":"لا توجد طريقة لاستعادة الرمز — فهو غير محفوظ في أيّ مكان. مسح بيانات الموقع من المتصفّح يزيله، ومعه التقدّم والامتحانات.","teHideT":"إخفاء شاشات المعلّم","teHideNote":"على جهاز يستخدمه الطفل، يمكن وضع بانِي الامتحان وشاشة العلامات خلف رمز. للفتح لاحقًا: أضيفوا ?teacher=1 إلى العنوان.","teHideBtn":"اختيار رمز","teOpenNow":"وضع المعلّم مفتوح","teLockBtn":"الخروج من وضع المعلّم","teChangeBtn":"تغيير الرمز","teRemoveBtn":"إلغاء الرمز","teLocked":"شاشات المعلّم مقفلة في هذا الجهاز.","teUnlock":"فتح"},
- ru:{"exam":"Экзамен","student":"Ученик","qs":"вопросов","minutes":"минут","none":"нет","outOf":"из","exTitle":"Классный экзамен","exLead":"Составьте экзамен, отправьте ссылку в WhatsApp и получите обратно код ответов от каждого ученика. Ни сервера, ни аккаунта — всё идёт через ссылку и WhatsApp.","exName":"Название экзамена","exNamePh":"например: экзамен по алгебре — 9-й класс, группа 2","exUnits":"Уровень программы","exUnitSuf":"ед.","exLevel":"Сложность","exCount":"Число вопросов","exTime":"Ограничение времени","exTimeNote":"Ноль означает без таймера. По истечении времени экзамен сдаётся сам.","exTopics":"Темы","exTopicsNote":"Вопросы делятся поровну между выбранными темами.","exAcc":"Условия для сдающих","exAccNote":"Что разрешено на самом экзамене. Озвучивание и лист формул — не подсказка, а средство доступности.","exTts":"Озвучивание","exTtsSub":"Каждый вопрос читается вслух по запросу","exForm":"Лист формул","exFormSub":"Доступен во время экзамена, как на настоящем","exPhone":"Ваш номер WhatsApp (необязательно)","exPhoneNote":"Если заполните — кнопка отправки у ученика откроет чат прямо с вами. Учтите: номер виден внутри ссылки, которой вы делитесь.","exBuild":"Создать экзамен","exShareMsg":"{0} вопросов. Откройте ссылку, решите, а в конце пришлите мне код.","exReady":"Экзамен готов","exWa":"Отправить в WhatsApp","exCopyUrl":"Скопировать ссылку","exToMarks":"К оценкам","exUrlCopied":"Ссылка скопирована","mkTitle":"Оценки","mkLead":"Вставьте сюда код, который ученик прислал в WhatsApp. Оценка считается заново по самим ответам, а не берётся из того, что написал ученик.","mkNew":"Новый экзамен","mkEmpty":"Вы ещё не создали экзамен. Начните с «Новый экзамен».","mkSubs":"сдач","mkAvg":"среднее","mkPaste":"Вставка кода ответов","mkPastePh":"Вставьте сюда код из WhatsApp","mkTake":"Принять","mkResend":"Отправить снова","mkCopyTbl":"Скопировать таблицу","mkDelQ":"Удалить экзамен и {0} сдач?","mkDelYes":"Да, удалить","mkCancel":"Отмена","mkDel":"Удалить экзамен","mkByStudent":"По ученикам","mkNoName":"Без имени","mkFell":"ошибся в:","mkAllOk":"всё верно","mkBadCode":"код не сходится сам с собой","mkByTopic":"По темам — что стоит объяснить заново","mkByTopicNote":"Доля верных ответов по всему классу.","mkRight":"верных ответов из","mkTblHead":"Ученик\tОценка\tВерно\tОшибся в","mkTblCopied":"Таблица скопирована","mkErrRead":"Не удалось прочитать код. Попробуйте скопировать его заново, целиком.","mkErrOther":"Этот код относится к экзамену «{0}».","mkErrUnknown":"Этот код относится к другому экзамену, которого нет на этом устройстве.","mkErrCount":"Число ответов в коде не совпадает с экзаменом.","mkTaken":"принят","mkNoteBad":"Внимание: код не сходится сам с собой","stNoTime":"без ограничения времени.","stTimed":"Есть ограничение: {0} минут. По их истечении экзамен сдаётся сам.","stNoTimer":"Таймера нет. Можно не спешить.","stNoNeg":"Штрафа за ошибку нет — неверный ответ ничего не отнимает.","stReadOn":"Любой вопрос можно попросить прочитать вслух.","stReadOff":"Озвучивание в этом экзамене отключено.","stFormOn":"Лист формул открыт весь экзамен.","stFormOff":"Лист формул в этом экзамене закрыт.","stCodeEnd":"В конце вы получите код — отправьте его учителю в WhatsApp.","stYourName":"Ваше имя","stNameNote":"Чтобы учитель знал, кто отвечал. Имя не уходит ни на какой сервер — оно входит внутрь кода.","stNamePh":"Имя и фамилия","stStart":"Начинаем","stQn":"Вопрос {0} из {1}","stRead":"Прочитать","stFormulas":"Лист формул","stPrev":"Предыдущий","stDunno":"Не знаю","stFlagged":"✓ отмечен для возврата","stFlag":"Вернуться к нему","stNext":"Следующий","stReview":"Перед сдачей","stReviewNote":"Можно вернуться к любому вопросу и изменить ответ. После сдачи создаётся код.","stUnanswered":"{0} вопросов без ответа","stAllAnswered":"Отвечены все вопросы","stPicked":"Вы выбрали:","stNotYet":"Ещё не отвечено","stChange":"Изменить","stFill":"Заполнить","stDone":"Готово — создать код","stFinished":"Готово","stScoreLine":"{0} верных из {1}","stSendNow":"Теперь отправьте код учителю.","stSendNote":"Код содержит имя и выбранные вами ответы — учитель пересчитывает оценку у себя.","stToTeacher":"учителю","stCopyCode":"Скопировать код","stCodeCopied":"Код скопирован","stWhatRight":"Как было правильно","stWhatRightNote":"Чтобы научиться, а не ради оценки.","stOk":"верно","stCorrect":"Правильный ответ:","stToApp":"К самому приложению — свободная практика","stGrade":"Оценка:","stCode":"Код:","badLink":"Экзамен не открылся","toApp":"К приложению","exOld":"Этот экзамен создан в прежней версии приложения, и вопросы в нём уже не те же самые. Попросите учителя прислать новый.","exBroken":"Возможно, экзамен относится к другому приложению, а возможно, ссылка оборвалась по пути. Попросите учителя прислать ссылку ещё раз и откройте её прямо из сообщения.","stBackTo":"Назад к экзамену — вопрос {0} из {1}","mkCsv":"Скачать CSV","mkCsvName":"Имя","mkCsvPct":"Оценка","mkCsvOk":"Верно","mkCsvTotal":"Вопросов","mkCsvDate":"Дата","mkCsvValid":"Код цел","mkCsvQ":"Вопрос {0}","mkCsvYes":"да","mkCsvNo":"нет","mkCsvDone":"Файл загружен","teTitle":"Код учителя","teSet":"Выбор кода учителя","teEnter":"Экраны учителя закрыты. Введите код, чтобы открыть их.","teLead":"Конструктор экзамена и экран оценок исчезнут из меню и будут открываться только по этому коду.","teWarn":"Это не защита. Она останавливает любопытную руку, а не того, кто разбирается в компьютерах.","tePin":"Код — от 4 до 8 цифр","teAgain":"Ещё раз, для проверки","teRemember":"Запомнить на этом устройстве","teRememberNote":"Без этого код будет запрашиваться при каждом открытии приложения. На классном планшете лучше без этого.","teOk":"Готово","teCancel":"Отмена","teBad":"Неверный код.","teMismatch":"Коды не совпадают.","teShort":"Нужно от 4 до 8 цифр, без букв.","teWaitN":"Слишком много попыток. Повторите через {0} с.","teForgot":"Я забыл код","teForgotHow":"Восстановить код нельзя — он нигде не хранится. Очистка данных сайта в браузере удалит его, а вместе с ним прогресс и экзамены.","teHideT":"Скрыть экраны учителя","teHideNote":"На устройстве, которым пользуется ребёнок, конструктор экзамена и экран оценок можно закрыть кодом. Чтобы открыть их потом, добавьте ?teacher=1 к адресу.","teHideBtn":"Выбрать код","teOpenNow":"Режим учителя открыт","teLockBtn":"Выйти из режима учителя","teChangeBtn":"Изменить код","teRemoveBtn":"Убрать код","teLocked":"Экраны учителя закрыты на этом устройстве.","teUnlock":"Открыть"},
- en:{"exam":"Exam","student":"Student","qs":"questions","minutes":"minutes","none":"none","outOf":"of","exTitle":"Class exam","exLead":"Build an exam, send the link on WhatsApp, and get an answer code back from every student. No server and no account — it all travels through the link and WhatsApp.","exName":"Exam name","exNamePh":"for example: Algebra exam — class 9/2","exUnits":"Units","exUnitSuf":"units","exLevel":"Level","exCount":"Number of questions","exTime":"Time limit","exTimeNote":"Zero means no timer. When the time is up the exam submits itself.","exTopics":"Topics","exTopicsNote":"The questions are split evenly between the topics you choose.","exAcc":"Access arrangements","exAccNote":"What is allowed during the exam itself. Read-aloud and the formula sheet are not a hint — they are access tools.","exTts":"Read aloud","exTtsSub":"Every question is read out on request","exForm":"Formula sheet","exFormSub":"Open during the exam, as in a state exam","exPhone":"Your WhatsApp number (optional)","exPhoneNote":"Fill it in and the student's send button opens a chat straight to you. Note: the number appears inside the link you share.","exBuild":"Create the exam","exShareMsg":"{0} questions. Open the link, answer, and send me the code at the end.","exReady":"The exam is ready","exWa":"Send on WhatsApp","exCopyUrl":"Copy the link","exToMarks":"To the marks","exUrlCopied":"Link copied","mkTitle":"Marks","mkLead":"Paste in the code the student sent you on WhatsApp. The mark is worked out again from the answers themselves, not taken from what the student wrote.","mkNew":"New exam","mkEmpty":"You have not created an exam yet. Start from “New exam”.","mkSubs":"submissions","mkAvg":"average","mkPaste":"Paste an answer code","mkPastePh":"Paste the code from WhatsApp here","mkTake":"Take it in","mkResend":"Send again","mkCopyTbl":"Copy the table","mkDelQ":"Delete the exam and its {0} submissions?","mkDelYes":"Yes, delete","mkCancel":"Cancel","mkDel":"Delete the exam","mkByStudent":"By student","mkNoName":"No name","mkFell":"tripped on:","mkAllOk":"all correct","mkBadCode":"the code does not match itself","mkByTopic":"By topic — what is worth teaching again","mkByTopicNote":"How the whole class did, together.","mkRight":"correct answers out of","mkTblHead":"Student\tMark\tCorrect\tTripped on","mkTblCopied":"Table copied","mkErrRead":"We could not read the code. Try copying it again, in full.","mkErrOther":"This code belongs to the exam “{0}”.","mkErrUnknown":"This code belongs to another exam, which is not on this device.","mkErrCount":"The number of answers in the code does not match the exam.","mkTaken":"taken in","mkNoteBad":"Note: the code does not match itself","stNoTime":"no time limit.","stTimed":"There is a time limit: {0} minutes. When it runs out the exam submits itself.","stNoTimer":"No timer. Take your time.","stNoNeg":"No negative marking — a wrong answer takes nothing away.","stReadOn":"You can ask for any question to be read aloud.","stReadOff":"Read-aloud is off in this exam.","stFormOn":"The formula sheet is open throughout the exam.","stFormOff":"The formula sheet is closed in this exam.","stCodeEnd":"At the end you get a code — send it to your teacher on WhatsApp.","stYourName":"Your name","stNameNote":"So the teacher knows who answered. The name is not sent to any server — it goes inside the code.","stNamePh":"First name and surname","stStart":"Let's start","stQn":"Question {0} of {1}","stRead":"Read aloud","stFormulas":"Formula sheet","stPrev":"Previous","stDunno":"I don't know","stFlagged":"✓ marked to come back","stFlag":"Come back to it","stNext":"Next","stReview":"Before you submit","stReviewNote":"You can go back to any question and change it. The code is created after you submit.","stUnanswered":"{0} questions with no answer","stAllAnswered":"Every question is answered","stPicked":"You chose:","stNotYet":"Not answered yet","stChange":"Change","stFill":"Fill in","stDone":"Finished — create the code","stFinished":"Finished","stScoreLine":"{0} correct out of {1}","stSendNow":"Now send the code to your teacher.","stSendNote":"The code holds your name and the answers you chose — the teacher works the mark out again at their end.","stToTeacher":"to the teacher","stCopyCode":"Copy the code","stCodeCopied":"Code copied","stWhatRight":"What the answers were","stWhatRightNote":"To learn from it, not for the mark.","stOk":"correct","stCorrect":"The correct answer:","stToApp":"To the app itself — free practice","stGrade":"Mark:","stCode":"Code:","badLink":"The exam did not open","toApp":"To the app","exOld":"This exam was made with an earlier version of the app, so its questions are no longer the same. Ask your teacher to send a new one.","exBroken":"The exam may belong to a different app, or the link may have been cut short. Ask your teacher to send the link again, and open it straight from the message.","stBackTo":"Back to the exam — question {0} of {1}","mkCsv":"Download CSV","mkCsvName":"Name","mkCsvPct":"Mark","mkCsvOk":"Correct","mkCsvTotal":"Questions","mkCsvDate":"Date","mkCsvValid":"Code intact","mkCsvQ":"Question {0}","mkCsvYes":"yes","mkCsvNo":"no","mkCsvDone":"The file downloaded","teTitle":"Teacher code","teSet":"Choose a teacher code","teEnter":"The teacher screens are locked. Enter the code to open them.","teLead":"The exam builder and the marks screen leave the menu, and open only with this code.","teWarn":"This is not security. It stops a curious hand, not somebody who knows computers.","tePin":"Code — 4 to 8 digits","teAgain":"Again, to be sure","teRemember":"Remember on this device","teRememberNote":"Without it the code is asked for every time the app opens. On a class tablet, better without.","teOk":"Confirm","teCancel":"Cancel","teBad":"That code is wrong.","teMismatch":"The two codes are not the same.","teShort":"It needs 4 to 8 digits, no letters.","teWaitN":"Too many tries. Try again in {0} seconds.","teForgot":"I forgot the code","teForgotHow":"There is no way to recover the code — it is not stored anywhere. Clearing the site data in the browser removes it, and the progress and exams with it.","teHideT":"Hide the teacher screens","teHideNote":"On a device a child uses, the exam builder and the marks screen can sit behind a code. To open them later, add ?teacher=1 to the address.","teHideBtn":"Choose a code","teOpenNow":"Teacher mode is open","teLockBtn":"Leave teacher mode","teChangeBtn":"Change the code","teRemoveBtn":"Remove the code","teLocked":"The teacher screens are locked on this device.","teUnlock":"Open"}};
+var XK={"exam":"מבחן","student":"תלמיד","qs":"שאלות","minutes":"דקות","none":"ללא","outOf":"מתוך","exTitle":"מבחן כיתתי","exLead":"בונים מבחן, שולחים קישור בוואטסאפ, ומקבלים בחזרה קוד תשובות לכל תלמיד. אין שרת ואין חשבון — הכול עובר דרך הקישור ודרך וואטסאפ.","exName":"שם המבחן","exNamePh":"למשל: מבחן אלגברה — כיתה ט׳2","exUnits":"יחידות","exUnitSuf":"יח״ל","exLevel":"רמה","exCount":"מספר שאלות","exTime":"הגבלת זמן","exTimeNote":"אפס פירושו בלי טיימר. בתום הזמן המבחן מוגש מעצמו.","exTopics":"נושאים","exTopicsNote":"השאלות מתחלקות שווה בשווה בין הנושאים שנבחרו.","exAcc":"התאמות לנבחנים","exAccNote":"מה שמותר בבחינה עצמה. ההקראה ודף הנוסחאות אינם רמז — הם כלי נגישות.","exTts":"הקראה קולית","exTtsSub":"כל שאלה נקראת בקול לפי בקשה","exForm":"דף נוסחאות","exFormSub":"נגיש מתוך המבחן, כמו בבגרות","exPhone":"מספר הוואטסאפ שלכם (לא חובה)","exPhoneNote":"אם תמלאו — כפתור השליחה אצל התלמיד ייפתח ישר לצ׳אט איתכם. שימו לב: המספר יופיע בתוך הקישור שאתם משתפים.","exBuild":"צרו את המבחן","exShareMsg":"{0} שאלות. נכנסים לקישור, פותרים, ובסוף שולחים לי את הקוד.","exReady":"המבחן מוכן","exWa":"שליחה בוואטסאפ","exCopyUrl":"העתקת הקישור","exToMarks":"לציונים","exUrlCopied":"הקישור הועתק","mkTitle":"ציונים","mkLead":"לוחצים על הקישור שהתלמיד שלח בוואטסאפ, או מדביקים כאן את הקוד. הציון מחושב מחדש מהתשובות עצמן, ולא נלקח ממה שהתלמיד כתב.","mkNew":"מבחן חדש","mkEmpty":"עוד לא יצרתם מבחן. אפשר להתחיל מ״מבחן חדש״.","mkSubs":"הגשות","mkAvg":"ממוצע","mkPaste":"הדבקת קוד תשובות","mkPastePh":"מדביקים כאן את הקוד מהוואטסאפ","mkTake":"קליטה","mkResend":"שליחה שוב","mkCopyTbl":"העתקת טבלה","mkDelQ":"למחוק את המבחן ואת {0} ההגשות?","mkDelYes":"כן, למחוק","mkCancel":"ביטול","mkDel":"מחיקת המבחן","mkByStudent":"לפי תלמיד","mkNoName":"ללא שם","mkFell":"נפל ב:","mkAllOk":"הכול נכון","mkBadCode":"הקוד לא תואם לעצמו","mkByTopic":"לפי נושא — מה כדאי ללמד שוב","mkByTopicNote":"אחוז ההצלחה של כל הכיתה יחד.","mkRight":"תשובות נכונות מתוך","mkTblHead":"תלמיד\tציון\tנכונות\tנפל ב","mkTblCopied":"הטבלה הועתקה","mkErrRead":"לא הצלחנו לקרוא את הקוד. נסו להעתיק אותו שוב, במלואו.","mkErrOther":"הקוד הזה שייך למבחן „{0}”.","mkErrUnknown":"הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה.","mkErrCount":"מספר התשובות בקוד אינו תואם למבחן.","mkTaken":"נקלט","mkNoteBad":"שימו לב: הקוד לא תואם לעצמו","stNoTime":"בלי הגבלת זמן.","stTimed":"יש הגבלת זמן: {0} דקות. בסופן המבחן מוגש מעצמו.","stNoTimer":"אין טיימר. אפשר לקחת את הזמן.","stNoNeg":"אין ניקוד שלילי — תשובה לא נכונה לא גורעת.","stReadOn":"אפשר לבקש הקראה של כל שאלה.","stReadOff":"ההקראה כבויה במבחן הזה.","stFormOn":"דף הנוסחאות פתוח לאורך כל המבחן.","stFormOff":"דף הנוסחאות סגור במבחן הזה.","stCodeEnd":"בסוף תקבלו קוד — שולחים אותו למורה בוואטסאפ.","stYourName":"השם שלכם","stNameNote":"כדי שהמורה יידע מי ענה. השם לא נשלח לשום שרת — הוא נכנס לתוך הקוד.","stNamePh":"שם פרטי ושם משפחה","stStart":"מתחילים","stQn":"שאלה {0} מתוך {1}","stRead":"הקראה","stFormulas":"דף נוסחאות","stPrev":"קודמת","stDunno":"לא יודע/ת","stFlagged":"✓ מסומנת לחזרה","stFlag":"לחזור אליה","stNext":"הבאה","stReview":"לפני ההגשה","stReviewNote":"אפשר לחזור לכל שאלה ולשנות. אחרי ההגשה נוצר הקוד.","stUnanswered":"{0} שאלות בלי תשובה","stAllAnswered":"כל השאלות נענו","stPicked":"סימנתם:","stNotYet":"עוד לא עניתם","stChange":"שינוי","stFill":"למלא","stDone":"סיימתי — ליצירת הקוד","stFinished":"סיימתם","stScoreLine":"{0} נכונות מתוך {1}","stSendNow":"עכשיו שולחים את הקוד למורה.","stSendNote":"הקוד מכיל את השם ואת התשובות שסימנתם — המורה מחשב את הציון אצלו מחדש.","stToTeacher":"למורה","stCopyCode":"העתקת הקוד","stCodeCopied":"הקוד הועתק","stWhatRight":"מה היה נכון","stWhatRightNote":"בשביל ללמוד מזה, לא בשביל הציון.","stOk":"נכון","stCorrect":"התשובה הנכונה:","stToApp":"לאפליקציה עצמה — לתרגול חופשי","stGrade":"ציון:","stCode":"קוד:","stLinkNote":"לקליטת התוצאה אצל המורה — לוחצים על הקישור:","badLink":"המבחן לא נפתח","toApp":"לאפליקציה","exOld":"המבחן הזה נוצר בגרסה קודמת של האפליקציה, ולכן השאלות בו כבר לא זהות. בקשו מהמורה לשלוח מבחן חדש.","exBroken":"אולי המבחן שייך לאפליקציה אחרת, ואולי הקישור נקטע בדרך. בקשו מהמורה לשלוח את הקישור שוב, ופתחו אותו ישר מההודעה.","stBackTo":"חזרה למבחן — שאלה {0} מתוך {1}","mkCsv":"הורדת CSV","mkCsvName":"שם","mkCsvPct":"ציון","mkCsvOk":"נכונות","mkCsvTotal":"שאלות","mkCsvDate":"תאריך","mkCsvValid":"קוד תקין","mkCsvQ":"שאלה {0}","mkCsvYes":"כן","mkCsvNo":"לא","mkCsvDone":"הקובץ ירד","teTitle":"קוד מורה","teSet":"בחירת קוד מורה","teEnter":"מסכי המורה נעולים. הקלידו את הקוד כדי לפתוח אותם.","teLead":"בונה המבחן ומסך הציונים ייעלמו מהתפריט, וייפתחו רק עם הקוד הזה.","teWarn":"זו אינה אבטחה. היא עוצרת יד סקרנית, לא מישהו שמבין במחשבים.","tePin":"קוד — 4 עד 8 ספרות","teAgain":"שוב, לוודא","teRemember":"לזכור במכשיר הזה","teRememberNote":"בלי זה הקוד יידרש שוב בכל פתיחה של האפליקציה. על טאבלט כיתתי — עדיף בלי.","teOk":"אישור","teCancel":"ביטול","teBad":"הקוד שגוי.","teMismatch":"שני הקודים אינם זהים.","teShort":"צריך בין 4 ל-8 ספרות, בלי אותיות.","teWaitN":"יותר מדי ניסיונות. נסו שוב בעוד {0} שניות.","teForgot":"שכחתי את הקוד","teForgotHow":"אין דרך לשחזר קוד — הוא לא נשמר בשום מקום. מחיקת נתוני האתר בדפדפן מסירה אותו, ואיתם גם ההתקדמות והמבחנים.","teHideT":"להסתיר את מסכי המורה","teHideNote":"על מכשיר שהילד משתמש בו, בונה המבחן ומסך הציונים יכולים לשבת מאחורי קוד. לפתיחה מאוחר יותר: להוסיף ?teacher=1 לכתובת.","teHideBtn":"בחירת קוד","teOpenNow":"מצב מורה פתוח","teLockBtn":"יציאה ממצב מורה","teChangeBtn":"שינוי הקוד","teRemoveBtn":"ביטול הקוד","teLocked":"מסכי המורה נעולים במכשיר הזה.","teUnlock":"פתיחה","stParent":"שליחה להורה","stParentMsg":"{0} סיים/ה את המבחן ״{1}״: {2} נכונות מתוך {3}, ציון {4}."};
+var XT={ar:{"exam":"امتحان","student":"طالب","qs":"أسئلة","minutes":"دقيقة","none":"بلا","outOf":"من أصل","exTitle":"امتحان صفّي","exLead":"تُعِدّ الامتحان، ترسل رابطًا في واتساب، وتستلم من كلّ طالب رمز إجابات. لا خادم ولا حساب — كلّ شيء يمرّ عبر الرابط وواتساب.","exName":"اسم الامتحان","exNamePh":"مثلًا: امتحان جبر — الصف التاسع/2","exUnits":"وحدات","exUnitSuf":"وحدات","exLevel":"المستوى","exCount":"عدد الأسئلة","exTime":"تحديد الوقت","exTimeNote":"صفر يعني بلا مؤقّت. عند انتهاء الوقت يُسلَّم الامتحان تلقائيًا.","exTopics":"المواضيع","exTopicsNote":"تُوزَّع الأسئلة بالتساوي بين المواضيع المختارة.","exAcc":"تسهيلات للممتحَنين","exAccNote":"ما هو مسموح في الامتحان نفسه. القراءة الصوتية وورقة القوانين ليستا تلميحًا — بل وسيلتا إتاحة.","exTts":"قراءة صوتية","exTtsSub":"كل سؤال يُقرأ بصوت عند الطلب","exForm":"ورقة قوانين","exFormSub":"متاحة داخل الامتحان، كما في البجروت","exPhone":"رقم واتساب الخاص بك (اختياري)","exPhoneNote":"إذا عبّأته — يفتح زرّ الإرسال عند الطالب محادثة معك مباشرة. انتبه: الرقم يظهر داخل الرابط الذي تشاركه.","exBuild":"أنشئ الامتحان","exShareMsg":"{0} أسئلة. ادخل إلى الرابط، حُلّ، وفي النهاية أرسل لي الرمز.","exReady":"الامتحان جاهز","exWa":"إرسال في واتساب","exCopyUrl":"نسخ الرابط","exToMarks":"إلى العلامات","exUrlCopied":"نُسخ الرابط","mkTitle":"العلامات","mkLead":"اضغط على الرابط الذي أرسله الطالب في واتساب، أو الصق هنا الرمز. تُحتسب العلامة من جديد من الإجابات نفسها، لا مما كتبه الطالب.","mkNew":"امتحان جديد","mkEmpty":"لم تُنشئ امتحانًا بعد. ابدأ من «امتحان جديد».","mkSubs":"تسليمات","mkAvg":"المعدّل","mkPaste":"لصق رمز الإجابات","mkPastePh":"الصق هنا الرمز من واتساب","mkTake":"استلام","mkResend":"إرسال مرّة أخرى","mkCopyTbl":"نسخ الجدول","mkDelQ":"حذف الامتحان و{0} من التسليمات؟","mkDelYes":"نعم، احذف","mkCancel":"إلغاء","mkDel":"حذف الامتحان","mkByStudent":"حسب الطالب","mkNoName":"بلا اسم","mkFell":"أخفق في:","mkAllOk":"كل الإجابات صحيحة","mkBadCode":"الرمز غير متطابق مع نفسه","mkByTopic":"حسب الموضوع — ما يستحقّ إعادة التدريس","mkByTopicNote":"نسبة نجاح الصفّ كلّه معًا.","mkRight":"إجابات صحيحة من أصل","mkTblHead":"الطالب\tالعلامة\tالصحيحة\tأخفق في","mkTblCopied":"نُسخ الجدول","mkErrRead":"تعذّرت قراءة الرمز. حاول نسخه من جديد، كاملًا.","mkErrOther":"هذا الرمز يعود لامتحان «{0}».","mkErrUnknown":"هذا الرمز يعود لامتحان آخر غير موجود على هذا الجهاز.","mkErrCount":"عدد الإجابات في الرمز لا يطابق الامتحان.","mkTaken":"استُلم","mkNoteBad":"انتبه: الرمز غير متطابق مع نفسه","stNoTime":"بلا تحديد وقت.","stTimed":"هناك تحديد للوقت: {0} دقيقة. عند انتهائها يُسلَّم الامتحان تلقائيًا.","stNoTimer":"لا مؤقّت. خذ وقتك.","stNoNeg":"لا علامات سالبة — الإجابة الخاطئة لا تخصم.","stReadOn":"يمكنك طلب قراءة أي سؤال بصوت.","stReadOff":"القراءة الصوتية مغلقة في هذا الامتحان.","stFormOn":"ورقة القوانين مفتوحة طوال الامتحان.","stFormOff":"ورقة القوانين مغلقة في هذا الامتحان.","stCodeEnd":"في النهاية تحصل على رمز — أرسله للمعلّم في واتساب.","stYourName":"اسمك","stNameNote":"كي يعرف المعلّم من أجاب. الاسم لا يُرسل إلى أي خادم — يدخل داخل الرمز.","stNamePh":"الاسم الشخصي واسم العائلة","stStart":"لنبدأ","stQn":"سؤال {0} من أصل {1}","stRead":"قراءة","stFormulas":"ورقة قوانين","stPrev":"السابق","stDunno":"لا أعرف","stFlagged":"✓ مُعلَّم للعودة","stFlag":"للعودة إليه","stNext":"التالي","stReview":"قبل التسليم","stReviewNote":"يمكنك العودة إلى أي سؤال وتغييره. بعد التسليم يُنشأ الرمز.","stUnanswered":"{0} أسئلة بلا إجابة","stAllAnswered":"أُجيبت كل الأسئلة","stPicked":"اخترت:","stNotYet":"لم تُجب بعد","stChange":"تغيير","stFill":"للتعبئة","stDone":"أنهيت — أنشئ الرمز","stFinished":"أنهيت","stScoreLine":"{0} صحيحة من أصل {1}","stSendNow":"الآن أرسل الرمز إلى المعلّم.","stSendNote":"الرمز يحوي الاسم والإجابات التي اخترتها — والمعلّم يحتسب العلامة عنده من جديد.","stToTeacher":"إلى المعلّم","stCopyCode":"نسخ الرمز","stCodeCopied":"نُسخ الرمز","stWhatRight":"ما كان صحيحًا","stWhatRightNote":"للتعلّم منه، لا من أجل العلامة.","stOk":"صحيح","stCorrect":"الإجابة الصحيحة:","stToApp":"إلى التطبيق نفسه — للتدرّب الحرّ","stGrade":"العلامة:","stCode":"الرمز:","stLinkNote":"لاستلام النتيجة عند المعلّم — اضغط على الرابط:","badLink":"تعذّر فتح الامتحان","toApp":"إلى التطبيق","exOld":"أُنشئ هذا الامتحان بنسخة سابقة من التطبيق، ولذلك لم تعد أسئلته مطابقة. اطلب من المعلّم إرسال امتحان جديد.","exBroken":"ربما يعود الامتحان إلى تطبيق آخر، وربما انقطع الرابط في الطريق. اطلب من المعلّم إرسال الرابط من جديد، وافتحه مباشرة من الرسالة.","stBackTo":"العودة إلى الامتحان — سؤال {0} من أصل {1}","mkCsv":"تنزيل CSV","mkCsvName":"الاسم","mkCsvPct":"العلامة","mkCsvOk":"الصحيحة","mkCsvTotal":"الأسئلة","mkCsvDate":"التاريخ","mkCsvValid":"الرمز سليم","mkCsvQ":"سؤال {0}","mkCsvYes":"نعم","mkCsvNo":"لا","mkCsvDone":"نُزّل الملف","teTitle":"رمز المعلّم","teSet":"اختيار رمز المعلّم","teEnter":"شاشات المعلّم مقفلة. أدخلوا الرمز لفتحها.","teLead":"سيختفي بانِي الامتحان وشاشة العلامات من القائمة، ولن يُفتحا إلّا بهذا الرمز.","teWarn":"هذه ليست حماية. إنّها توقف يدًا فضولية، لا شخصًا يفهم في الحواسيب.","tePin":"الرمز — من ٤ إلى ٨ أرقام","teAgain":"مرّة أخرى، للتأكيد","teRemember":"التذكّر في هذا الجهاز","teRememberNote":"بدون ذلك سيُطلب الرمز في كلّ فتح للتطبيق. على لوح صفّيّ — الأفضل بدونه.","teOk":"تأكيد","teCancel":"إلغاء","teBad":"الرمز غير صحيح.","teMismatch":"الرمزان غير متطابقين.","teShort":"يلزم بين ٤ و‑٨ أرقام، بلا حروف.","teWaitN":"محاولات كثيرة. حاولوا مجدّدًا بعد {0} ثانية.","teForgot":"نسيت الرمز","teForgotHow":"لا توجد طريقة لاستعادة الرمز — فهو غير محفوظ في أيّ مكان. مسح بيانات الموقع من المتصفّح يزيله، ومعه التقدّم والامتحانات.","teHideT":"إخفاء شاشات المعلّم","teHideNote":"على جهاز يستخدمه الطفل، يمكن وضع بانِي الامتحان وشاشة العلامات خلف رمز. للفتح لاحقًا: أضيفوا ?teacher=1 إلى العنوان.","teHideBtn":"اختيار رمز","teOpenNow":"وضع المعلّم مفتوح","teLockBtn":"الخروج من وضع المعلّم","teChangeBtn":"تغيير الرمز","teRemoveBtn":"إلغاء الرمز","teLocked":"شاشات المعلّم مقفلة في هذا الجهاز.","teUnlock":"فتح","stParent":"إرسال إلى وليّ الأمر","stParentMsg":"{0} أنهى/أنهت الامتحان «{1}»: {2} صحيحة من {3}، العلامة {4}."},
+ ru:{"exam":"Экзамен","student":"Ученик","qs":"вопросов","minutes":"минут","none":"нет","outOf":"из","exTitle":"Классный экзамен","exLead":"Составьте экзамен, отправьте ссылку в WhatsApp и получите обратно код ответов от каждого ученика. Ни сервера, ни аккаунта — всё идёт через ссылку и WhatsApp.","exName":"Название экзамена","exNamePh":"например: экзамен по алгебре — 9-й класс, группа 2","exUnits":"Уровень программы","exUnitSuf":"ед.","exLevel":"Сложность","exCount":"Число вопросов","exTime":"Ограничение времени","exTimeNote":"Ноль означает без таймера. По истечении времени экзамен сдаётся сам.","exTopics":"Темы","exTopicsNote":"Вопросы делятся поровну между выбранными темами.","exAcc":"Условия для сдающих","exAccNote":"Что разрешено на самом экзамене. Озвучивание и лист формул — не подсказка, а средство доступности.","exTts":"Озвучивание","exTtsSub":"Каждый вопрос читается вслух по запросу","exForm":"Лист формул","exFormSub":"Доступен во время экзамена, как на настоящем","exPhone":"Ваш номер WhatsApp (необязательно)","exPhoneNote":"Если заполните — кнопка отправки у ученика откроет чат прямо с вами. Учтите: номер виден внутри ссылки, которой вы делитесь.","exBuild":"Создать экзамен","exShareMsg":"{0} вопросов. Откройте ссылку, решите, а в конце пришлите мне код.","exReady":"Экзамен готов","exWa":"Отправить в WhatsApp","exCopyUrl":"Скопировать ссылку","exToMarks":"К оценкам","exUrlCopied":"Ссылка скопирована","mkTitle":"Оценки","mkLead":"Нажмите на ссылку, которую ученик прислал в WhatsApp, или вставьте сюда код. Оценка пересчитывается по самим ответам, а не по тому, что написал ученик.","mkNew":"Новый экзамен","mkEmpty":"Вы ещё не создали экзамен. Начните с «Новый экзамен».","mkSubs":"сдач","mkAvg":"среднее","mkPaste":"Вставка кода ответов","mkPastePh":"Вставьте сюда код из WhatsApp","mkTake":"Принять","mkResend":"Отправить снова","mkCopyTbl":"Скопировать таблицу","mkDelQ":"Удалить экзамен и {0} сдач?","mkDelYes":"Да, удалить","mkCancel":"Отмена","mkDel":"Удалить экзамен","mkByStudent":"По ученикам","mkNoName":"Без имени","mkFell":"ошибся в:","mkAllOk":"всё верно","mkBadCode":"код не сходится сам с собой","mkByTopic":"По темам — что стоит объяснить заново","mkByTopicNote":"Доля верных ответов по всему классу.","mkRight":"верных ответов из","mkTblHead":"Ученик\tОценка\tВерно\tОшибся в","mkTblCopied":"Таблица скопирована","mkErrRead":"Не удалось прочитать код. Попробуйте скопировать его заново, целиком.","mkErrOther":"Этот код относится к экзамену «{0}».","mkErrUnknown":"Этот код относится к другому экзамену, которого нет на этом устройстве.","mkErrCount":"Число ответов в коде не совпадает с экзаменом.","mkTaken":"принят","mkNoteBad":"Внимание: код не сходится сам с собой","stNoTime":"без ограничения времени.","stTimed":"Есть ограничение: {0} минут. По их истечении экзамен сдаётся сам.","stNoTimer":"Таймера нет. Можно не спешить.","stNoNeg":"Штрафа за ошибку нет — неверный ответ ничего не отнимает.","stReadOn":"Любой вопрос можно попросить прочитать вслух.","stReadOff":"Озвучивание в этом экзамене отключено.","stFormOn":"Лист формул открыт весь экзамен.","stFormOff":"Лист формул в этом экзамене закрыт.","stCodeEnd":"В конце вы получите код — отправьте его учителю в WhatsApp.","stYourName":"Ваше имя","stNameNote":"Чтобы учитель знал, кто отвечал. Имя не уходит ни на какой сервер — оно входит внутрь кода.","stNamePh":"Имя и фамилия","stStart":"Начинаем","stQn":"Вопрос {0} из {1}","stRead":"Прочитать","stFormulas":"Лист формул","stPrev":"Предыдущий","stDunno":"Не знаю","stFlagged":"✓ отмечен для возврата","stFlag":"Вернуться к нему","stNext":"Следующий","stReview":"Перед сдачей","stReviewNote":"Можно вернуться к любому вопросу и изменить ответ. После сдачи создаётся код.","stUnanswered":"{0} вопросов без ответа","stAllAnswered":"Отвечены все вопросы","stPicked":"Вы выбрали:","stNotYet":"Ещё не отвечено","stChange":"Изменить","stFill":"Заполнить","stDone":"Готово — создать код","stFinished":"Готово","stScoreLine":"{0} верных из {1}","stSendNow":"Теперь отправьте код учителю.","stSendNote":"Код содержит имя и выбранные вами ответы — учитель пересчитывает оценку у себя.","stToTeacher":"учителю","stCopyCode":"Скопировать код","stCodeCopied":"Код скопирован","stWhatRight":"Как было правильно","stWhatRightNote":"Чтобы научиться, а не ради оценки.","stOk":"верно","stCorrect":"Правильный ответ:","stToApp":"К самому приложению — свободная практика","stGrade":"Оценка:","stCode":"Код:","stLinkNote":"Чтобы учитель получил результат — нажмите на ссылку:","badLink":"Экзамен не открылся","toApp":"К приложению","exOld":"Этот экзамен создан в прежней версии приложения, и вопросы в нём уже не те же самые. Попросите учителя прислать новый.","exBroken":"Возможно, экзамен относится к другому приложению, а возможно, ссылка оборвалась по пути. Попросите учителя прислать ссылку ещё раз и откройте её прямо из сообщения.","stBackTo":"Назад к экзамену — вопрос {0} из {1}","mkCsv":"Скачать CSV","mkCsvName":"Имя","mkCsvPct":"Оценка","mkCsvOk":"Верно","mkCsvTotal":"Вопросов","mkCsvDate":"Дата","mkCsvValid":"Код цел","mkCsvQ":"Вопрос {0}","mkCsvYes":"да","mkCsvNo":"нет","mkCsvDone":"Файл загружен","teTitle":"Код учителя","teSet":"Выбор кода учителя","teEnter":"Экраны учителя закрыты. Введите код, чтобы открыть их.","teLead":"Конструктор экзамена и экран оценок исчезнут из меню и будут открываться только по этому коду.","teWarn":"Это не защита. Она останавливает любопытную руку, а не того, кто разбирается в компьютерах.","tePin":"Код — от 4 до 8 цифр","teAgain":"Ещё раз, для проверки","teRemember":"Запомнить на этом устройстве","teRememberNote":"Без этого код будет запрашиваться при каждом открытии приложения. На классном планшете лучше без этого.","teOk":"Готово","teCancel":"Отмена","teBad":"Неверный код.","teMismatch":"Коды не совпадают.","teShort":"Нужно от 4 до 8 цифр, без букв.","teWaitN":"Слишком много попыток. Повторите через {0} с.","teForgot":"Я забыл код","teForgotHow":"Восстановить код нельзя — он нигде не хранится. Очистка данных сайта в браузере удалит его, а вместе с ним прогресс и экзамены.","teHideT":"Скрыть экраны учителя","teHideNote":"На устройстве, которым пользуется ребёнок, конструктор экзамена и экран оценок можно закрыть кодом. Чтобы открыть их потом, добавьте ?teacher=1 к адресу.","teHideBtn":"Выбрать код","teOpenNow":"Режим учителя открыт","teLockBtn":"Выйти из режима учителя","teChangeBtn":"Изменить код","teRemoveBtn":"Убрать код","teLocked":"Экраны учителя закрыты на этом устройстве.","teUnlock":"Открыть","stParent":"Отправить родителю","stParentMsg":"{0} завершил(а) экзамен «{1}»: {2} верных из {3}, оценка {4}."},
+ en:{"exam":"Exam","student":"Student","qs":"questions","minutes":"minutes","none":"none","outOf":"of","exTitle":"Class exam","exLead":"Build an exam, send the link on WhatsApp, and get an answer code back from every student. No server and no account — it all travels through the link and WhatsApp.","exName":"Exam name","exNamePh":"for example: Algebra exam — class 9/2","exUnits":"Units","exUnitSuf":"units","exLevel":"Level","exCount":"Number of questions","exTime":"Time limit","exTimeNote":"Zero means no timer. When the time is up the exam submits itself.","exTopics":"Topics","exTopicsNote":"The questions are split evenly between the topics you choose.","exAcc":"Access arrangements","exAccNote":"What is allowed during the exam itself. Read-aloud and the formula sheet are not a hint — they are access tools.","exTts":"Read aloud","exTtsSub":"Every question is read out on request","exForm":"Formula sheet","exFormSub":"Open during the exam, as in a state exam","exPhone":"Your WhatsApp number (optional)","exPhoneNote":"Fill it in and the student's send button opens a chat straight to you. Note: the number appears inside the link you share.","exBuild":"Create the exam","exShareMsg":"{0} questions. Open the link, answer, and send me the code at the end.","exReady":"The exam is ready","exWa":"Send on WhatsApp","exCopyUrl":"Copy the link","exToMarks":"To the marks","exUrlCopied":"Link copied","mkTitle":"Marks","mkLead":"Tap the link the student sent on WhatsApp, or paste the code here. The grade is recomputed from the answers themselves, not from what the student wrote.","mkNew":"New exam","mkEmpty":"You have not created an exam yet. Start from “New exam”.","mkSubs":"submissions","mkAvg":"average","mkPaste":"Paste an answer code","mkPastePh":"Paste the code from WhatsApp here","mkTake":"Take it in","mkResend":"Send again","mkCopyTbl":"Copy the table","mkDelQ":"Delete the exam and its {0} submissions?","mkDelYes":"Yes, delete","mkCancel":"Cancel","mkDel":"Delete the exam","mkByStudent":"By student","mkNoName":"No name","mkFell":"tripped on:","mkAllOk":"all correct","mkBadCode":"the code does not match itself","mkByTopic":"By topic — what is worth teaching again","mkByTopicNote":"How the whole class did, together.","mkRight":"correct answers out of","mkTblHead":"Student\tMark\tCorrect\tTripped on","mkTblCopied":"Table copied","mkErrRead":"We could not read the code. Try copying it again, in full.","mkErrOther":"This code belongs to the exam “{0}”.","mkErrUnknown":"This code belongs to another exam, which is not on this device.","mkErrCount":"The number of answers in the code does not match the exam.","mkTaken":"taken in","mkNoteBad":"Note: the code does not match itself","stNoTime":"no time limit.","stTimed":"There is a time limit: {0} minutes. When it runs out the exam submits itself.","stNoTimer":"No timer. Take your time.","stNoNeg":"No negative marking — a wrong answer takes nothing away.","stReadOn":"You can ask for any question to be read aloud.","stReadOff":"Read-aloud is off in this exam.","stFormOn":"The formula sheet is open throughout the exam.","stFormOff":"The formula sheet is closed in this exam.","stCodeEnd":"At the end you get a code — send it to your teacher on WhatsApp.","stYourName":"Your name","stNameNote":"So the teacher knows who answered. The name is not sent to any server — it goes inside the code.","stNamePh":"First name and surname","stStart":"Let's start","stQn":"Question {0} of {1}","stRead":"Read aloud","stFormulas":"Formula sheet","stPrev":"Previous","stDunno":"I don't know","stFlagged":"✓ marked to come back","stFlag":"Come back to it","stNext":"Next","stReview":"Before you submit","stReviewNote":"You can go back to any question and change it. The code is created after you submit.","stUnanswered":"{0} questions with no answer","stAllAnswered":"Every question is answered","stPicked":"You chose:","stNotYet":"Not answered yet","stChange":"Change","stFill":"Fill in","stDone":"Finished — create the code","stFinished":"Finished","stScoreLine":"{0} correct out of {1}","stSendNow":"Now send the code to your teacher.","stSendNote":"The code holds your name and the answers you chose — the teacher works the mark out again at their end.","stToTeacher":"to the teacher","stCopyCode":"Copy the code","stCodeCopied":"Code copied","stWhatRight":"What the answers were","stWhatRightNote":"To learn from it, not for the mark.","stOk":"correct","stCorrect":"The correct answer:","stToApp":"To the app itself — free practice","stGrade":"Mark:","stCode":"Code:","stLinkNote":"For the teacher to receive the result — tap the link:","badLink":"The exam did not open","toApp":"To the app","exOld":"This exam was made with an earlier version of the app, so its questions are no longer the same. Ask your teacher to send a new one.","exBroken":"The exam may belong to a different app, or the link may have been cut short. Ask your teacher to send the link again, and open it straight from the message.","stBackTo":"Back to the exam — question {0} of {1}","mkCsv":"Download CSV","mkCsvName":"Name","mkCsvPct":"Mark","mkCsvOk":"Correct","mkCsvTotal":"Questions","mkCsvDate":"Date","mkCsvValid":"Code intact","mkCsvQ":"Question {0}","mkCsvYes":"yes","mkCsvNo":"no","mkCsvDone":"The file downloaded","teTitle":"Teacher code","teSet":"Choose a teacher code","teEnter":"The teacher screens are locked. Enter the code to open them.","teLead":"The exam builder and the marks screen leave the menu, and open only with this code.","teWarn":"This is not security. It stops a curious hand, not somebody who knows computers.","tePin":"Code — 4 to 8 digits","teAgain":"Again, to be sure","teRemember":"Remember on this device","teRememberNote":"Without it the code is asked for every time the app opens. On a class tablet, better without.","teOk":"Confirm","teCancel":"Cancel","teBad":"That code is wrong.","teMismatch":"The two codes are not the same.","teShort":"It needs 4 to 8 digits, no letters.","teWaitN":"Too many tries. Try again in {0} seconds.","teForgot":"I forgot the code","teForgotHow":"There is no way to recover the code — it is not stored anywhere. Clearing the site data in the browser removes it, and the progress and exams with it.","teHideT":"Hide the teacher screens","teHideNote":"On a device a child uses, the exam builder and the marks screen can sit behind a code. To open them later, add ?teacher=1 to the address.","teHideBtn":"Choose a code","teOpenNow":"Teacher mode is open","teLockBtn":"Leave teacher mode","teChangeBtn":"Change the code","teRemoveBtn":"Remove the code","teLocked":"The teacher screens are locked on this device.","teUnlock":"Open","stParent":"Send to a parent","stParentMsg":"{0} finished the exam “{1}”: {2} right out of {3}, score {4}."}};
 /* מילות בחירת השאלות. בלוק נפרד ולא תוספת לשורות שמעליו —
    הן ארוכות מכדי לערוך אותן ביד, וכל שינוי בהן מתנגש במלואו. */
 var XQK={"exQs":"השאלות במבחן",
@@ -4792,7 +5032,10 @@ function viewExamNew(){
   h+='<label class="tt"><b>'+esc(xt("exName"))+'</b></label>'+
      '<input class="field" id="exTitle" value="'+esc(EB.title)+'" placeholder="'+esc(xt("exNamePh"))+'" maxlength="60">';
 
-  h+='<div style="margin-top:16px"><b>'+esc(xt("exUnits"))+'</b>'+
+  /* שורת יחידות הלימוד הגיעה עם מודול המבחן ממשפחת math-uni. באפליקציה
+     עם מסלול אחד — math-app, ארבע פעולות החשבון — אין 3/4/5 יח״ל, והשורה
+     רק בלבלה. מציגים אותה רק כשיש באמת יותר ממסלול אחד. */
+  if(TRACKS.length>1)h+='<div style="margin-top:16px"><b>'+esc(xt("exUnits"))+'</b>'+
      '<div class="seg" style="margin-top:7px">'+[3,4,5].map(function(tr){
        return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
      }).join("")+'</div></div>';
@@ -4866,8 +5109,9 @@ function viewMarks(){
   var h='<div class="wrap" style="padding-block:22px">';
   h+='<h1 class="h1">'+esc(xt("mkTitle"))+'</h1>'+
      '<p class="sub">'+esc(xt("mkLead"))+'</p>';
-  h+='<div class="row" style="margin-top:14px"><button class="btn btn-p" data-a="go" data-v="exam">'+
+  h+='<div class="row" style="margin-top:14px"><button class="btn btn-p" style="font-size:1.2rem;padding:14px 28px" data-a="go" data-v="exam">'+
      ic("plus",17)+' '+esc(xt("mkNew"))+'</button></div>';
+  if(MK.msg&&!MK.msg.id)h+='<p class="chip '+(MK.msg.ok?"ok":"bad")+'" style="margin-top:10px">'+esc(MK.msg.m)+'</p>';
 
   if(!EX.list.length){
     h+='<div class="card pad" style="margin-top:16px"><p class="sub" style="margin:0">'+
@@ -5325,6 +5569,14 @@ function sitGo(i){
   SIT.i=clamp(i,0,SIT.qs.length-1); SIT.phase="ask";
   window.scrollTo(0,0); render();
 }
+/* התוצאה נשלחת כקישור ולא כקוד: המורה לוחץ, האפליקציה נפתחת אצלו
+   וקולטת. הקוד עצמו יושב אחרי #r=, ולכן גם הדבקה של הקישור השלם
+   בתיבת הקוד עובדת — codeOf מחלץ אותו משם. */
+function resultUrl(code){return location.origin+location.pathname+"#r="+code}
+function codeOf(raw){
+  var m=String(raw||"").match(/#r=([A-Za-z0-9\-_]+)/);
+  return (m?m[1]:String(raw||"")).trim();
+}
 function sitFinish(){
   SIT.phase="done";
   sitTimerOff();
@@ -5417,7 +5669,10 @@ function viewSit(){
   /* סיום */
   var g=sitGrade(),msg;
   msg=(SIT.name||xt("student"))+" — "+esc(sp.t||xt("exam"))+"\n"+xt("stGrade")+" "+g.pct+
-      " ("+g.ok+"/"+g.n+")\n"+xt("stCode")+"\n"+SIT.code;
+      " ("+g.ok+"/"+g.n+")\n"+xt("stLinkNote")+"\n"+resultUrl(SIT.code);
+  /* להורה: בלי הקוד — הוא של המורה — ועם הקישור לאפליקציה. בלי מספר
+     טלפון וואטסאפ פותח את בחירת איש הקשר. */
+  var pmsg=xf("stParentMsg",SIT.name||xt("student"),sp.t||xt("exam"),g.ok,g.n,g.pct)+"\n"+location.origin+location.pathname;
   var h3='<div class="wrap" style="padding-block:26px;max-width:640px">';
   h3+='<div class="card pad"><h1 class="h1">'+esc(xt("stFinished"))+'</h1>'+
       '<p class="sub">'+esc(sp.t||xt("exam"))+'</p>'+
@@ -5429,7 +5684,8 @@ function viewSit(){
   h3+='<div class="row" style="margin-top:12px">'+
       '<a class="btn btn-p" href="'+esc(waLink(msg,sp.p||""))+'" target="_blank" rel="noopener">'+
       ic("share",17)+' '+esc(xt("exWa"))+(sp.p?' '+esc(xt("stToTeacher")):'')+'</a>'+
-      '<button class="btn" data-a="sitcopy">'+ic("copy",17)+' '+esc(xt("stCopyCode"))+'</button></div>';
+      '<button class="btn" data-a="sitcopy">'+ic("copy",17)+' '+esc(xt("stCopyCode"))+'</button>'+
+      '<a class="btn" style="text-decoration:none" href="'+esc(waLink(pmsg,""))+'" target="_blank" rel="noopener">'+ic("share",17)+' '+esc(xt("stParent"))+'</a></div>';
   if(SIT.copied)h3+='<p class="chip ok" style="margin-top:10px">'+esc(xt("stCodeCopied"))+'</p>';
   h3+='<p class="sub" style="margin-top:12px;word-break:break-all;direction:ltr;text-align:left;'+
       'background:var(--surface2);border-radius:10px;padding:10px">'+esc(SIT.code)+'</p>';
@@ -5552,30 +5808,9 @@ function examAction(a,el){
   if(a==="mkadd"){
     var ex=exFind(el.getAttribute("data-i")); if(!ex)return true;
     var ta=$("#mkPaste"),raw=ta?ta.value:"";
-    var res=decodeResult(raw);
+    var res=decodeResult(codeOf(raw));
     if(!res){MK.msg={id:ex.id,ok:false,m:xt("mkErrRead")};render();return true}
-    if(res.i!==ex.id){
-      var other=exFind(res.i);
-      MK.msg={id:ex.id,ok:false,m:other?xf("mkErrOther",other.spec.t||xt("exam")):xt("mkErrUnknown")};
-      render(); return true;
-    }
-    if(res.a.length!==ex.spec.q.length){
-      MK.msg={id:ex.id,ok:false,m:xt("mkErrCount")};render();return true}
-    var g=gradeResult(ex.spec,res);
-    var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
-    /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
-    /* הגשה חדשה מחליפה קודמת רק כששני השמות זהים אחרי נירמול, והשם
-       אינו ריק. בלי זה כל ההגשות בלי שם נראו כאותו תלמיד ודרסו זו את
-       זו בשקט, וגם "דני" מול "דני  " (רווח כפול פנימי) נחשבו לשניים. */
-    var nrm=function(x){return String(x==null?"":x).replace(/\s+/g," ").trim()};
-    var sn=nrm(sub.name);
-    var k2=sn?(ex.subs||[]).findIndex(function(s){return nrm(s.name)===sn}):-1;
-    if(!ex.subs)ex.subs=[];
-    if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
-    exSave();
-    MK.msg={id:ex.id,ok:true,m:(sub.name||xt("student"))+" "+xt("mkTaken")+" · "+g.pct+" ("+g.ok+"/"+g.n+")"+
-      (sub.valid?"":" · "+xt("mkNoteBad"))};
-    if(ta)ta.value="";
+    if(mkImport(ex,res)&&ta)ta.value="";
     render(); return true;
   }
 
@@ -5597,6 +5832,45 @@ function examAction(a,el){
 
 /* קליטת מבחן מהכתובת. עושים את זה לפני ה-render הראשון, אחרת
    התלמיד רואה לרגע את מסך הבית של אפליקציה שהוא לא מכיר. */
+/* קולט תוצאה אחת למבחן. מחזיר true כשנשמרה; בכל מקרה משאיר הודעה
+   ב-MK.msg למסך הציונים. משמש גם את תיבת ההדבקה וגם את הקישור. */
+function mkImport(ex,res){
+    if(res.i!==ex.id){
+      var other=exFind(res.i);
+      MK.msg={id:ex.id,ok:false,m:other?xf("mkErrOther",other.spec.t||xt("exam")):xt("mkErrUnknown")};
+      return false;
+    }
+    if(res.a.length!==ex.spec.q.length){
+      MK.msg={id:ex.id,ok:false,m:xt("mkErrCount")};return false}
+    var g=gradeResult(ex.spec,res);
+    var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
+    /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
+    /* הגשה חדשה מחליפה קודמת רק כששני השמות זהים אחרי נירמול, והשם
+       אינו ריק. בלי זה כל ההגשות בלי שם נראו כאותו תלמיד ודרסו זו את
+       זו בשקט, וגם "דני" מול "דני  " (רווח כפול פנימי) נחשבו לשניים. */
+    var nrm=function(x){return String(x==null?"":x).replace(/\s+/g," ").trim()};
+    var sn=nrm(sub.name);
+    var k2=sn?(ex.subs||[]).findIndex(function(s){return nrm(s.name)===sn}):-1;
+    if(!ex.subs)ex.subs=[];
+    if(k2>=0)ex.subs[k2]=sub; else ex.subs.push(sub);
+    exSave();
+    MK.msg={id:ex.id,ok:true,m:(sub.name||xt("student"))+" "+xt("mkTaken")+" · "+g.pct+" ("+g.ok+"/"+g.n+")"+
+      (sub.valid?"":" · "+xt("mkNoteBad"))};
+    return true;
+}
+/* קליטת תוצאה מהכתובת — הצד של המורה. הכתובת מנוקה מיד, כדי שרענון
+   לא יקלוט שוב; קליטה חוזרת של אותו תלמיד הייתה מחליפה ולא מכפילה,
+   אבל אין סיבה להשאיר קוד בשורת הכתובת. */
+function resultFromUrl(){
+  var m=String(location.hash||"").match(/^#r=(.+)$/);
+  if(!m)return false;
+  var res=decodeResult(m[1]),ex=res?exFind(res.i):null;
+  try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
+  if(!res)MK.msg={id:"",ok:false,m:xt("mkErrRead")};
+  else if(!ex)MK.msg={id:"",ok:false,m:xt("mkErrUnknown")};
+  else if(mkImport(ex,res))MK.open=ex.id;
+  view="marks"; return true;
+}
 function examFromUrl(){
   var m=String(location.hash||"").match(/^#x=(.+)$/);
   if(!m)return false;
@@ -5780,6 +6054,7 @@ function onAction(a,el){
   if(a==="stop"){
     if(P.results.length===0){goto("home");return}
     P.list=P.list.slice(0,P.results.length);P.phase="done";save();window.scrollTo(0,0);render();return}
+  if(a==="tutor"){ try{stopSpeak()}catch(e){} if(window.TUTOR)TUTOR.open(); return }
   if(a==="hint"){
     P.hints=1;render();
     if(s.tts&&P.q.hint){
@@ -5824,15 +6099,12 @@ function onAction(a,el){
   if(a==="ts"){s.ts=parseInt(el.getAttribute("data-n"),10);save();applyModes();render();return}
   if(a==="theme"){s.theme=el.getAttribute("data-n");save();applyModes();render();return}
   if(a==="rlen"){s.roundLen=parseInt(el.getAttribute("data-n"),10);save();render();return}
-  if(a==="engine"){s.engine=el.getAttribute("data-n");ttsErr="";ttsState="";gDead=false;save();render();speak(_(VOICE_SAMPLE));return}
-  if(a==="gvoice"){s.gvoice=el.getAttribute("data-n");ttsErr="";ttsState="";save();render();speak(_(VOICE_SAMPLE));return}
-  if(a==="clearkey"){saveKey("");ttsErr="";render();return}
   if(a==="voice"){
     var uri=el.getAttribute("data-u");
     s.voice=uri;
     if(!s.voiceByLang)s.voiceByLang={};
     s.voiceByLang[LG]=uri;
-    s.engine="device";save();render();speak(_(VOICE_SAMPLE));return}
+    save();render();speak(_(VOICE_SAMPLE));return}
   if(a==="vcheck"){voiceCheck();return}
   if(a==="test"){speak(_(VOICE_SAMPLE));return}
   if(a==="pick"){
@@ -5857,9 +6129,31 @@ function onAction(a,el){
 /* ============================================================
    18. אירועים
    ============================================================ */
+/* --- כל לחיצה מושמעת (O-27, 9.9.2026) ---
+   כשההקראה דולקת, כפתור שנלחץ מוקרא בשמו בשפת הממשק — לא לפני
+   הפעולה אלא חצי שנייה אחריה: פעולה שמדברת בעצמה (שאלה חדשה,
+   תשובה, רמז) מנצחת, והתווית לא נחתכת באמצע. אפשרויות התשובה
+   אינן כאן: אחרי הבחירה הן מדברות בעצמן, ולפניה אסור (say.js).
+   data-nosay על כפתור משתיק אותו. */
+function sayClick(el){
+  var a=el.getAttribute("data-a")||"";
+  if(/^(ans|pick|sitans)$/.test(a)||el.hasAttribute("data-nosay"))return;
+  if(!(state.settings&&state.settings.tts))return;
+  var label=el.getAttribute("aria-label")||el.textContent||"";
+  label=plainOf(String(label)).replace(/\s+/g," ").trim();
+  if(!label||label.length>60)return;
+  setTimeout(function(){
+    /* הפעולה עצמה כבר מדברת? שואלים את המנוע, לא מונה: ניווט קורא
+       ל-stopSpeak גם בלי לדבר, ומונה דורות היה משתיק את התווית
+       בדיוק בכפתורים שבשבילם היא נועדה; ו-_activeU נשאר תפוס כשאמירה
+       נתקעת בלי onend. */
+    try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+    speak(label);
+  },500);
+}
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-a]");
-  if(el&&!el.disabled)onAction(el.getAttribute("data-a"),el);
+  if(el&&!el.disabled){sayClick(el);onAction(el.getAttribute("data-a"),el)}
 });
 document.addEventListener("change",function(e){
   var xs=e.target;
@@ -5872,11 +6166,6 @@ document.addEventListener("input",function(e){
   var el=e.target;
   if(!el.dataset)return;
   if(el.dataset.bind==="name"){state.name=el.value;save();return}
-  if(el.dataset.bind==="gkey"){
-    var k=String(el.value||"").trim();
-    /* מציירים מחדש רק כשהמפתח נראה שלם, אחרת הפוקוס קופץ בכל תו */
-    if(/^AIza[\w-]{25,}$/.test(k)){saveKey(k);ttsErr="";render();speak(_(VOICE_SAMPLE))}
-    return}
   if(el.dataset.bind==="fq"){fq=el.value;
     var pos=el.selectionStart;render();
     var again=document.querySelector('[data-bind="fq"]');
@@ -6059,7 +6348,7 @@ var TR_KEYS=[
 "k יוצר את Z<sub>n</sub>  ⇔  gcd(k , n) = 1",
 "n נקודות קובעות פולינום יחיד ממעלה n פחות 1 לכל היותר.",
 "n שורשים, במרווחי 360° ÷ n על מעגל היחידה",
-"ord(k) ב-Z<sub>n</sub> = n ÷ gcd(n , k)",
+"ord(k) ב-Z<sub>n</sub> = n ÷ gcd(n, k)",
 "r הוא המודול, θ הוא הארגומנט. כדאי לצייר כדי לא לטעות ברביע.",
 "sup A — הקטן שבחסמים מלמעלה   ·   inf A — הגדול שבחסמים מלמטה",
 "u לפי x שווה ל-v לפי y.",
@@ -6210,7 +6499,7 @@ var TR_KEYS=[
 "בקבוצה סופית החסם העליון הוא פשוט האיבר הגדול ביותר.",
 "בקוטב פשוט: מכפילים ב-(z − a), מצמצמים ומציבים.",
 "בשיטת החצייה, מהי נקודת האמצע הראשונה?",
-"בשנה א׳ ההרצאה רצה והתרגול מניח שהבנתם. כאן כל שאלה נפתחת לשלבים — כולל השורה שהמרצה דילג עליה — וכל תשובה שגויה אומרת בדיוק איזו טעות היא. דף נוסחאות פתוח תמיד, והקראה בקול טבעי.",
+"בשנה א׳ ההרצאה רצה והתרגול מניח שהבנתם. כאן כל שאלה נפתחת לשלבים — כולל השורה שהמרצה דילג עליה — וכל תשובה שגויה אומרת בדיוק איזו טעות היא. דף נוסחאות פתוח תמיד, והקראה בקול.",
 "בתוך הרדיוס מתכנס בהחלט, מחוצה לו מתבדר, ובקצוות בודקים בנפרד.",
 "ג",
 "גדול",
@@ -6290,7 +6579,7 @@ var TR_KEYS=[
 "הסדר אינו האיבר עצמו.",
 "הסדר אינו האיבר עצמו. הוא מספר הפעמים שצריך לחבר אותו לעצמו כדי לקבל אפס.",
 "הסדר הוא n חלקי המחלק המשותף המרבי של n ושל האיבר.",
-"הסדר של k ב-Z_n הוא n חלקי gcd(n , k).",
+"הסדר של k ב-Z_n הוא n חלקי gcd(n, k).",
 "הסדר של מחזור שווה לאורכו.",
 "הסופרמום אינו שואף לאפס — הוא שווה 1 לכל n.",
 "הסופרמום אינו שייך לקטע הפתוח, ולכן אין כאן מקסימום — רק סופרמום.",
@@ -6918,11 +7207,11 @@ var TR_KEYS=[
 "האיברים עולים אל {0} ולעולם אינם מגיעים אליו, כי 1 חלקי n אינו מתאפס.",
 "הפסגה יושבת ב-x = 1 חלקי n. היא נשארת בתוך I לכל n, אבל יוצאת מ-J ברגע ש-1 חלקי n קטן מ-{0}.",
 "ההתכנסות אינה במידה שווה על I = {0}, אבל כן על J = {1}. מה הנימוק?",
-"כי J סגור ו-I אינו — סגירות הקטע היא שמבטיחה התכנסות במידה שווה.",
+"J הוא קטע סגור ו-I אינו. סגירות הקטע היא שמבטיחה התכנסות במידה שווה, ולכן היא מתקיימת על J בלבד.",
 "סגירות אינה מספיקה. על הקטע הסגור [0 , 1] הסדרה n·x·e בחזקת מינוס nx מתכנסת נקודתית ולא במידה שווה.",
-"כי הפונקציה הגבולית רציפה על J ואינה רציפה על I.",
+"הפונקציה הגבולית רציפה על J ואינה רציפה על I. רציפות של הפונקציה הגבולית היא התנאי להתכנסות במידה שווה.",
 "הפונקציה הגבולית כאן רציפה על שני הקטעים. אי־רציפות של הגבול אכן שוללת התכנסות במידה שווה, אבל אין כאן אי־רציפות.",
-"כי J קצר מ-I, וקטע קצר יותר תמיד נותן התכנסות במידה שווה.",
+"J קצר מ-I. אורך הקטע הוא שקובע, וקטע קצר יותר תמיד נותן התכנסות במידה שווה.",
 "אורך הקטע אינו הקריטריון. סופרמום ההפרש הוא שקובע, והוא יכול להישאר גדול גם על קטע קצר מאוד.",
 "מקבעים x ומגדילים רק את n. הוא זהה על שני הקטעים.",
 "סופרמום ההפרש על I",
@@ -7215,7 +7504,66 @@ var TR_KEYS=[
 "המשוואה הראשונה אכן מתקיימת לכל a, אבל השנייה נותנת a = −a. המספר היחיד ששווה למינוס עצמו הוא אפס.",
 "כאן שתי משוואות קושי־רימן מתקיימות זהותית, בלי שום תנאי על a. אין ערך אחד שצריך לבחור.",
 "שתי המשוואות מתקיימות זהותית, ולכן אין תנאי על a כלל. למעשה f = {0}z² + az, וזו פונקציה שלמה לכל a.",
-"כותבים את שתי משוואות קושי־רימן, ומשווים מקדמים — אחת מהן קובעת את a, ולפעמים שתיהן מתקיימות מאליהן."
+"כותבים את שתי משוואות קושי־רימן, ומשווים מקדמים — אחת מהן קובעת את a, ולפעמים שתיהן מתקיימות מאליהן.",
+"אפשר להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור.",
+"הקולות שברשימה ידברו עברית במבטא זר.",
+"בדפדפן Microsoft Edge יש קולות טבעיים בשפה הזאת, נשיים וגבריים — בלי התקנה, בחיבור לאינטרנט.",
+"לפתוח את האפליקציה ב-Edge",
+"אנליטית בכל נקודה שבה u ו-v גזירות",
+"גזירות של u ו-v אינה מספיקה. קושי־רימן הן תנאי נוסף, והן שקובעות.",
+"כל איבר שאינו אפס הוא יוצר רק כאשר n ראשוני. כאן סופרים רק את הזרים ל-n.",
+"מעלה 0 היא פונקציה קבועה, והיא מספיקה רק לנקודה אחת.",
+"לגראנז׳ מבטיח תת־חבורה לכל מחלק",
+"המשפט שולל בלבד. הכיוון ההפוך אינו חלק ממנו: ל-A₄ מסדר 12 אין תת־חבורה מסדר 6.",
+"סיבוב אחד מלא כבר מחזיר כל איבר למקומו. אין צורך לעבור את המחזור פעמיים.",
+"החזקה של n קובעת מה קורה בקצוות הקטע, לא את הרדיוס.",
+"הפכתם את החזקה. יחס המקדמים שואף ל-1 בכל חזקה של n.",
+"מקדמים ששואפים לאפס אינם מספיקים. מה שקובע הוא גבול היחס בין מקדמים סמוכים, והוא 1.",
+"יחס המקדמים שואף ל-1 בכל חזקה של n, ולכן החזקה אינה משפיעה על הרדיוס.",
+"זו השארית בקוטב z = {0}, ולא בנקודה שנשאלה.",
+"זה מיקום הקוטב, לא הנקודה שנשאלה עליה.",
+"השארית אינה מועלית בריבוע, ובנקודה שאינה קוטב היא אפס בכל מקרה.",
+"המכנה מתאפס בנקודה אחת בלבד, וזו הנקודה היחידה שיש בה קוטב.",
+"בודקים את הנקודה שנשאלה",
+"בנקודה שאינה קוטב הפונקציה אנליטית, ולכן בפיתוח לורן שלה אין איבר בחזקת מינוס אחת.",
+"שארית בנקודה שהפונקציה אנליטית בה היא אפס תמיד.",
+"שארית שונה מאפס יש רק בקוטב. בנקודה שהפונקציה אנליטית בה השארית אפס.",
+"זה האינפימום — הקצה השמאלי. מלמעלה הקבוצה אינה חסומה כלל.",
+"אינסוף אינו מספר ממשי, ולכן אינו יכול להיות סופרמום.",
+"אין כאן קצה ימני: לכל מספר שתבחרו יש בקבוצה איבר גדול ממנו.",
+"אקסיומת השלמות מבטיחה סופרמום רק לקבוצה חסומה מלמעלה, וכאן אין אף חסם כזה.",
+"אין אף חסם מלמעלה, ולכן אין גם הקטן שבהם.",
+"סופרמום קיים רק לקבוצה חסומה מלמעלה. קודם בודקים חסימות.",
+"אין בקטע נקודה שבה הסדרה מתאפסת — בכל נקודה שלו האיברים גדלים בלי גבול.",
+"המקדם n אינו נעלם, הוא זה שגדל. n·x אינו שואף ל-x.",
+"בכל נקודה של הקטע האיברים גדלים בלי גבול, ולכן אין פונקציה גבולית והסדרה אינה מתכנסת נקודתית.",
+"רק אם הפונקציות רציפות",
+"רציפות אינה תנאי להתכנסות במידה שווה. המבחן הוא סופרמום ההפרש בלבד.",
+/* נוספו בסוף בלבד — trAt מיקומי, ומפתח שנדחף באמצע מזיז כל קטע
+   שאחריו ומצמיד תרגום למחרוזת מקור אחרת. הראשונה היא שאלה
+   שנראית למשתמש; השאר הן מחרוזות של speakMath ו-PROSE_MAP,
+   שנשמעו בעברית גם כשהממשק היה ערבי, רוסי או אנגלי. */
+"מהי השארית של f בנקודה z = {0}?",
+" ארבע ",
+" חמש ",
+" שש ",
+" שבע ",
+" שמונה ",
+" תשע ",
+" פלוס מינוס ",
+" משוחלפת ",
+" הסכום מ $1 עד $2 של ",
+" האינטגרל הכפול על התחום $1 של ",
+" לוג בבסיס $1 של ",
+/* שלוש מחרוזות שנוסחו מחדש כשאורך האפשרות חדל לשאת מידע על
+   נכונותה — metric רמה 4 ו-cr רמה 2. גם הן בסוף בלבד. */
+"d היא מטריקה על ℝ: ארבע התכונות מתקיימות",
+"אינה מטריקה: יש x , y שעבורם d(x , y) שלילי",
+"טעות סימן. מהמשוואה הראשונה v לפי y שווה ל-u לפי x, שהוא {0}, ולא הנגדי שלו.",
+/* שלוש מחרוזות של cr רמה 2 — המשפחה השלישית והסימן בשנייה (O-41). בסוף בלבד. */
+"טעות סימן. המשוואה השנייה נותנת v לפי x שווה למינוס u לפי y, וזה מה שקובע את הסימן של x².",
+"טעות סימן בשתי המשוואות יחד — זו מינוס v, ולא v.",
+"טעות סימן באיבר y³. הוא יוצא מהאינטגרל לפי y של האיבר עם y² ב-u לפי x, ושומר על הסימן שלו."
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -7408,7 +7756,7 @@ trAt("en",0,[" · {0} with help",
 "k generates Z<sub>n</sub>  ⇔  gcd(k , n) = 1",
 "n points determine a unique polynomial of degree at most n minus 1.",
 "n roots, spaced 360° ÷ n apart on the unit circle",
-"ord(k) in Z<sub>n</sub> = n ÷ gcd(n , k)",
+"ord(k) in Z<sub>n</sub> = n ÷ gcd(n, k)",
 "r is the modulus, θ is the argument. It helps to draw it so as not to get the quadrant wrong.",
 "sup A — the least upper bound   ·   inf A — the greatest lower bound",
 "u with respect to x equals v with respect to y.",
@@ -7559,7 +7907,7 @@ trAt("en",150,["{0}{1} To progress</button></div>",
 "In a finite set the supremum is simply the largest element.",
 "At a simple pole: multiply by (z − a), cancel and substitute.",
 "In the bisection method, what is the first midpoint?",
-"In first year the lecture races ahead and the tutorial assumes you followed it. Here every question opens into steps — including the line the lecturer skipped — and every wrong answer tells you exactly which mistake it is. The formula sheet is always open, and everything can be read aloud in a natural voice.",
+"In first year the lecture races ahead and the tutorial assumes you followed it. Here every question opens into steps — including the line the lecturer skipped — and every wrong answer tells you exactly which mistake it is. The formula sheet is always open, and everything can be read aloud.",
 "Inside the radius it converges absolutely, outside it diverges, and at the endpoints you check separately.",
 "III",
 "Large",
@@ -7639,7 +7987,7 @@ trAt("en",300,["Parity depends only on the length of the cycle, not on which ele
 "The order is not the element itself.",
 "The order is not the element itself. It is how many times you add it to itself to get zero.",
 "The order is n divided by the greatest common divisor of n and the element.",
-"The order of k in Z_n is n divided by gcd(n , k).",
+"The order of k in Z_n is n divided by gcd(n, k).",
 "The order of a cycle equals its length.",
 "The supremum does not tend to zero — it equals 1 for every n.",
 "The supremum does not belong to the open interval, so there is no maximum here — only a supremum.",
@@ -8307,7 +8655,7 @@ trAt("ru",0,[" · {0} с помощью",
 "k порождает Z<sub>n</sub>  ⇔  gcd(k , n) = 1",
 "n точек определяют единственный многочлен степени не выше n минус 1.",
 "n корней, с шагом 360° ÷ n на единичной окружности",
-"ord(k) в Z<sub>n</sub> = n ÷ gcd(n , k)",
+"ord(k) в Z<sub>n</sub> = n ÷ gcd(n, k)",
 "r — модуль, θ — аргумент. Стоит нарисовать, чтобы не ошибиться с четвертью.",
 "sup A — наименьшая из верхних границ   ·   inf A — наибольшая из нижних",
 "u по x равно v по y.",
@@ -8458,7 +8806,7 @@ trAt("ru",150,["{0}{1} К прогрессу</button></div>",
 "В конечном множестве супремум — это просто наибольший элемент.",
 "В простом полюсе: умножают на (z − a), сокращают и подставляют.",
 "В методе деления пополам: чему равна первая средняя точка?",
-"На первом курсе лекция мчится вперёд, а семинар считает, что вы всё поняли. Здесь каждый вопрос раскрывается по шагам — включая строку, которую лектор пропустил, — и каждый неверный ответ говорит, какая именно это ошибка. Справочник формул всегда открыт, а всё можно послушать естественным голосом.",
+"На первом курсе лекция мчится вперёд, а семинар считает, что вы всё поняли. Здесь каждый вопрос раскрывается по шагам — включая строку, которую лектор пропустил, — и каждый неверный ответ говорит, какая именно это ошибка. Справочник формул всегда открыт, а всё можно послушать.",
 "Внутри радиуса сходится абсолютно, вне его расходится, а на концах проверяют отдельно.",
 "III",
 "Крупный",
@@ -8538,7 +8886,7 @@ trAt("ru",300,["Чётность зависит только от длины ц�
 "Порядок — это не сам элемент.",
 "Порядок — это не сам элемент. Это сколько раз нужно прибавить его к себе, чтобы получить нуль.",
 "Порядок равен n, делённому на наибольший общий делитель n и элемента.",
-"Порядок k в Z_n равен n, делённому на gcd(n , k).",
+"Порядок k в Z_n равен n, делённому на gcd(n, k).",
 "Порядок цикла равен его длине.",
 "Супремум не стремится к нулю — он равен 1 при любом n.",
 "Супремум не принадлежит открытому интервалу, поэтому максимума здесь нет — только супремум.",
@@ -9206,7 +9554,7 @@ trAt("ar",0,[" · {0} بمساعدة",
 "k يولّد Z<sub>n</sub>  ⇔  gcd(k , n) = 1",
 "n نقطة تحدّد كثير حدود وحيدًا من الدرجة n ناقص 1 على الأكثر.",
 "n جذرًا، بمسافات 360° ÷ n على دائرة الوحدة",
-"ord(k) في Z<sub>n</sub> = n ÷ gcd(n , k)",
+"ord(k) في Z<sub>n</sub> = n ÷ gcd(n, k)",
 "r هو المقياس، و θ هو السعة. ويجدر الرسم كي لا نخطئ في الربع.",
 "sup A — أصغر الحدود العليا   ·   inf A — أكبر الحدود الدنيا",
 "u بالنسبة إلى x تساوي v بالنسبة إلى y.",
@@ -9357,7 +9705,7 @@ trAt("ar",150,["{0}{1} إلى التقدّم</button></div>",
 "في مجموعة منتهية يكون الحدّ الأعلى ببساطة أكبر عنصر.",
 "في القطب البسيط: نضرب في (z − a)، نختصر ونعوّض.",
 "في طريقة التنصيف، ما هي نقطة المنتصف الأولى؟",
-"في السنة الأولى تمضي المحاضرة مسرعة ويفترض التمرين أنّك فهمت. هنا يُفتح كل سؤال إلى خطوات — بما فيها السطر الذي تجاوزه المحاضر — وكل إجابة خاطئة تقول أيّ خطأ هي بالضبط. ورقة القوانين مفتوحة دائمًا، وكل شيء يمكن سماعه بصوت طبيعي.",
+"في السنة الأولى تمضي المحاضرة مسرعة ويفترض التمرين أنّك فهمت. هنا يُفتح كل سؤال إلى خطوات — بما فيها السطر الذي تجاوزه المحاضر — وكل إجابة خاطئة تقول أيّ خطأ هي بالضبط. ورقة القوانين مفتوحة دائمًا، وكل شيء يمكن سماعه.",
 "داخل نصف القطر يتقارب تقاربًا مطلقًا، وخارجه يتباعد، وعند الطرفين نفحص على حدة.",
 "٣",
 "كبير",
@@ -9437,7 +9785,7 @@ trAt("ar",300,["الزوجية تتعلق بطول الدورة فقط، لا ب
 "الرتبة ليست العنصر نفسه.",
 "الرتبة ليست العنصر نفسه. إنها عدد المرات التي نجمعه فيها إلى نفسه للحصول على صفر.",
 "الرتبة هي n مقسومًا على القاسم المشترك الأكبر لـ n والعنصر.",
-"رتبة k في Z_n هي n مقسومًا على gcd(n , k).",
+"رتبة k في Z_n هي n مقسومًا على gcd(n, k).",
 "رتبة الدورة تساوي طولها.",
 "الحدّ الأعلى لا يؤول إلى الصفر — إنه يساوي 1 لكل n.",
 "الحدّ الأعلى لا ينتمي إلى القطعة المفتوحة، ولذلك لا توجد هنا قيمة عظمى — بل حدّ أعلى فقط.",
@@ -10150,11 +10498,11 @@ trAt("en",954,[
 "The terms rise towards {0} and never reach it, because 1 over n never becomes zero.",
 "The peak sits at x = 1 over n. It stays inside I for every n, but leaves J as soon as 1 over n drops below {0}.",
 "The convergence is not uniform on I = {0}, but it is uniform on J = {1}. What is the reason?",
-"Because J is closed and I is not — closedness of the interval is what guarantees uniform convergence.",
+"J is a closed interval and I is not. Closedness of the interval is what guarantees uniform convergence, so it holds only on J.",
 "Closedness is not enough. On the closed interval [0 , 1] the sequence n·x·e to the power minus nx converges pointwise but not uniformly.",
-"Because the limit function is continuous on J and discontinuous on I.",
+"The limit function is continuous on J and discontinuous on I. Continuity of the limit function is the condition for uniform convergence.",
 "The limit function here is continuous on both intervals. A discontinuous limit does rule out uniform convergence, but there is no discontinuity here.",
-"Because J is shorter than I, and a shorter interval always gives uniform convergence.",
+"J is shorter than I. The length of the interval is what decides, and a shorter interval always gives uniform convergence.",
 "The length of the interval is not the criterion. The supremum of the difference is what decides, and it can stay large even on a very short interval.",
 "Fix x and let only n grow. It is the same on both intervals.",
 "Supremum of the difference on I",
@@ -10419,11 +10767,11 @@ trAt("ru",954,[
 "Элементы возрастают к {0} и никогда его не достигают, ведь 1 делить на n не обращается в нуль.",
 "Пик находится в x = 1 делить на n. Он остаётся внутри I при всех n, но выходит из J, как только 1 делить на n станет меньше {0}.",
 "Сходимость не равномерна на I = {0}, но равномерна на J = {1}. В чём причина?",
-"Потому что J замкнут, а I нет — именно замкнутость интервала обеспечивает равномерную сходимость.",
+"J — замкнутый промежуток, а I нет. Именно замкнутость промежутка обеспечивает равномерную сходимость, поэтому она есть только на J.",
 "Замкнутости недостаточно. На замкнутом отрезке [0 , 1] последовательность n·x·e в степени минус nx сходится поточечно, но не равномерно.",
-"Потому что предельная функция непрерывна на J и разрывна на I.",
+"Предельная функция непрерывна на J и разрывна на I. Непрерывность предельной функции — это и есть условие равномерной сходимости.",
 "Предельная функция здесь непрерывна на обоих промежутках. Разрывный предел действительно исключает равномерную сходимость, но разрыва здесь нет.",
-"Потому что J короче I, а более короткий промежуток всегда даёт равномерную сходимость.",
+"J короче I. Решает длина промежутка, а более короткий промежуток всегда даёт равномерную сходимость.",
 "Длина промежутка — не критерий. Решает супремум разности, и он может оставаться большим даже на очень коротком промежутке.",
 "Фиксируют x и увеличивают только n. Он одинаков на обоих промежутках.",
 "Супремум разности на I",
@@ -10688,11 +11036,11 @@ trAt("ar",954,[
 "العناصر تصعد نحو {0} ولا تبلغه أبدًا، لأنّ 1 على n لا يساوي الصفر أبدًا.",
 "القمّة عند x = 1 على n. تبقى داخل I لكلّ n، لكنّها تخرج من J ما إن يصبح 1 على n أصغر من {0}.",
 "التقارب ليس منتظمًا على I = {0}، لكنّه منتظم على J = {1}. ما التعليل؟",
-"لأنّ J مغلقة و-I ليست كذلك — انغلاق القطعة هو ما يضمن التقارب المنتظم.",
+"J قطعة مغلقة و-I ليست كذلك. انغلاق القطعة هو ما يضمن التقارب المنتظم، ولذلك يتحقّق على J فقط.",
 "الانغلاق لا يكفي. على القطعة المغلقة [0 , 1] تتقارب المتتالية n·x·e أُسّ سالب nx نقطيًّا لا انتظاميًّا.",
-"لأنّ الدالّة النهائيّة متّصلة على J وغير متّصلة على I.",
+"الدالّة النهائيّة متّصلة على J وغير متّصلة على I. اتّصال الدالّة النهائيّة هو الشرط للتقارب المنتظم.",
 "الدالّة النهائيّة هنا متّصلة على القطعتين معًا. عدم اتّصال النهاية ينفي التقارب المنتظم فعلًا، لكن لا يوجد هنا انقطاع.",
-"لأنّ J أقصر من I، والقطعة الأقصر تعطي دائمًا تقاربًا منتظمًا.",
+"J أقصر من I. طول القطعة هو الحاسم، والقطعة الأقصر تعطي دائمًا تقاربًا منتظمًا.",
 "طول القطعة ليس المعيار. الحاسم هو أعلى قيمة للفرق، وهي قد تبقى كبيرة حتّى على قطعة قصيرة جدًّا.",
 "نثبّت x ونكبّر n وحده. وهو نفسه على القطعتين.",
 "أعلى قيمة للفرق على I",
@@ -10937,7 +11285,6 @@ trAt("en",TR_KEYS.indexOf("אקסיומה ג׳ — שנה שלישית, צעד �
    ההגדרות ומפתח הקול נכתבו ל-localStorage ומעולם לא נקראו משם.
    שתי האחיות קוראות להן (math-uni:11402, math-uni2:10145). */
 load();
-loadKey();
 /* התרגומים של הבלוק שנוסף בסוף TR_KEYS. העוגן הוא המפתח הראשון בבלוק. */
 trAt("ar",TR_KEYS.indexOf("קושי־רימן מתקיימות בדיוק כאשר a = {0}, ולכל ערך אחר של a הפונקציה אינה אנליטית. בלי לדעת את a אי אפשר להכריע."),[
 "معادلتا كوشي–ريمان تتحقّقان بالضبط عندما يكون a = {0}، ولكلّ قيمة أخرى من a لا تكون الدالّة تحليليّة. وبدون معرفة a لا يمكن الحسم.",
@@ -11105,21 +11452,211 @@ trAt("en",TR_KEYS.indexOf("כל איברי הקבוצה חיוביים, ולכן
 "Here both Cauchy–Riemann equations hold identically, with no condition on a at all. There is no single value to pick.",
 "Both equations hold identically, so there is no condition on a at all. In fact f = {0}z² + az, which is entire for every a.",
 "Write both Cauchy–Riemann equations and compare coefficients — one of them fixes a, and sometimes both hold by themselves."]);
+/* שני הרמזים על קולות המכשיר, אחרי הסרת הקול הטבעי (Gemini). */
+trAt("ar",TR_KEYS.indexOf("אפשר להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור."),["يمكن تثبيت صوت عبري: في أندرويد عبر الإعدادات ← إمكانية الوصول ← تحويل النص إلى كلام ← تثبيت الأصوات، وفي ويندوز عبر الإعدادات ← الوقت واللغة ← الكلام.",
+"الأصوات في هذه القائمة ستنطق العبرية بلكنة أجنبية."]);
+trAt("ru",TR_KEYS.indexOf("אפשר להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור."),["Можно установить голос для иврита: на Android через Настройки → Специальные возможности → Синтез речи → Установка голосов, а в Windows через Параметры → Время и язык → Речь.",
+"Голоса из этого списка будут говорить на иврите с иностранным акцентом."]);
+trAt("en",TR_KEYS.indexOf("אפשר להתקין קול עברי: באנדרואיד דרך הגדרות ← נגישות ← טקסט לדיבור ← התקנת קולות, ובווינדוס דרך הגדרות ← שעה ושפה ← דיבור."),["You can install a Hebrew voice: on Android through Settings → Accessibility → Text-to-speech → Install voices, and on Windows through Settings → Time and language → Speech.",
+"The voices on this list will speak Hebrew with a foreign accent."]);
+/* הצעת Edge — נוספה כמנה בסוף, ולכן היא אינה מזיזה אף מפתח קיים. */
+trAt("ar",1278,[
+"في متصفح Microsoft Edge أصوات طبيعية لهذه اللغة، نسائية ورجالية — دون تثبيت، مع اتصال بالإنترنت.",
+"افتح التطبيق في Edge"
+]);
+/* תרגומי הבלוק של O-41 — שלושת התאים הדקים. העוגן הוא המפתח הראשון בבלוק. */
+trAt("ar",TR_KEYS.indexOf("טעות סימן. המשוואה השנייה נותנת v לפי x שווה למינוס u לפי y, וזה מה שקובע את הסימן של x²."),[
+"خطأ في الإشارة. المعادلة الثانية تعطي v بالنسبة إلى x يساوي ناقص u بالنسبة إلى y، وهذا ما يحدّد إشارة x².",
+"خطأ في الإشارة في المعادلتين معًا — هذه ناقص v، وليست v.",
+"خطأ في الإشارة في الحدّ y³. إنّه يخرج من تكامل الحدّ الذي يحوي y² في u بالنسبة إلى x حسب y، ويحفظ إشارته."
+]);
+trAt("ru",TR_KEYS.indexOf("טעות סימן. המשוואה השנייה נותנת v לפי x שווה למינוס u לפי y, וזה מה שקובע את הסימן של x²."),[
+"Ошибка знака. Второе уравнение даёт: v по x равно минус u по y, и именно это определяет знак x².",
+"Ошибка знака в обоих уравнениях сразу — это минус v, а не v.",
+"Ошибка знака в члене y³. Он получается интегрированием по y члена с y² из u по x и сохраняет его знак."
+]);
+trAt("en",TR_KEYS.indexOf("טעות סימן. המשוואה השנייה נותנת v לפי x שווה למינוס u לפי y, וזה מה שקובע את הסימן של x²."),[
+"Sign error. The second equation gives v by x equal to minus u by y, and that is what fixes the sign of x².",
+"A sign error in both equations at once — this is minus v, not v.",
+"Sign error in the y³ term. It comes from integrating, with respect to y, the y² term of u by x, and keeps its sign."
+]);
+trAt("ru",1278,[
+"В браузере Microsoft Edge есть естественные голоса для этого языка, женские и мужские — без установки, при подключении к интернету.",
+"Открыть приложение в Edge"
+]);
+trAt("en",1278,[
+"Microsoft Edge has natural voices for this language, female and male — nothing to install, with an internet connection.",
+"Open the app in Edge"
+]);
+/* מסיחים וצעדים שנוספו בסבב סגירת האפשרויות המתות. העוגן הוא המפתח
+   הראשון בבלוק, ולכן הוספה בסוף TR_KEYS אינה מזיזה שום אינדקס. */
+trAt("ar",TR_KEYS.indexOf("אנליטית בכל נקודה שבה u ו-v גזירות"),[
+"تحليليّة في كلّ نقطة يكون فيها u و v قابلين للاشتقاق",
+"قابليّة اشتقاق u و v غير كافية. معادلتا كوشي–ريمان شرط إضافيّ، وهما الحاسمتان.",
+"كلّ عنصر لا يساوي صفرًا يكون مولِّدًا فقط عندما يكون n أوّليًّا. هنا نعدّ الأعداد الأوّليّة بالنسبة إلى n فقط.",
+"الدرجة 0 هي دالّة ثابتة، وهي تكفي لنقطة واحدة فقط.",
+"لاغرانج يضمن زمرة جزئيّة لكلّ قاسم",
+"المبرهنة تنفي فقط. الاتّجاه المعاكس ليس جزءًا منها: A₄ من الرتبة 12 ليس لها زمرة جزئيّة من الرتبة 6.",
+"دورة كاملة واحدة تعيد كلّ عنصر إلى مكانه. لا حاجة للمرور بالدورة مرّتين.",
+"أُسّ n يحدّد ما يحدث عند طرفَي الفترة، لا نصف قطر التقارب.",
+"قلبتم الأُسّ. نسبة المعاملات تؤول إلى 1 مهما كان أُسّ n.",
+"معاملات تؤول إلى الصفر لا تكفي. ما يحسم هو نهاية النسبة بين معاملين متتاليين، وهي 1.",
+"نسبة المعاملات تؤول إلى 1 مهما كان أُسّ n، ولذلك الأُسّ لا يؤثّر في نصف القطر.",
+"هذه هي البقيّة عند القطب z = {0}، لا عند النقطة المسؤول عنها.",
+"هذا موقع القطب، لا النقطة المسؤول عنها.",
+"البقيّة لا تُربَّع، وعند نقطة ليست قطبًا هي صفر على أيّ حال.",
+"المقام ينعدم عند نقطة واحدة فقط، وهي النقطة الوحيدة التي فيها قطب.",
+"نفحص النقطة المسؤول عنها",
+"عند نقطة ليست قطبًا تكون الدالّة تحليليّة، ولذلك لا يوجد في نشر لوران حدّ بالأُسّ سالب واحد.",
+"البقيّة عند نقطة تكون الدالّة تحليليّة فيها هي صفر دائمًا.",
+"بقيّة لا تساوي صفرًا توجد عند القطب فقط. عند نقطة تكون الدالّة تحليليّة فيها البقيّة صفر.",
+"هذا الحدّ الأدنى — الطرف الأيسر. من الأعلى المجموعة غير محدودة أصلًا.",
+"اللانهاية ليست عددًا حقيقيًّا، ولذلك لا يمكن أن تكون حدًّا أعلى أصغريًّا.",
+"لا يوجد هنا طرف أيمن: لكلّ عدد تختارونه يوجد في المجموعة عنصر أكبر منه.",
+"أكسيوما التمام تضمن وجود حدّ أعلى أصغريّ لمجموعة محدودة من الأعلى فقط، وهنا لا يوجد أيّ حدّ كهذا.",
+"لا يوجد أيّ حدّ من الأعلى، ولذلك لا يوجد أصغرها أيضًا.",
+"الحدّ الأعلى الأصغريّ موجود فقط لمجموعة محدودة من الأعلى. أوّلًا نفحص المحدوديّة.",
+"لا توجد في الفترة نقطة تنعدم فيها المتتالية — في كلّ نقطة منها تكبر الحدود بلا حدّ.",
+"المعامل n لا يختفي، بل هو الذي يكبر. n·x لا يؤول إلى x.",
+"في كلّ نقطة من الفترة تكبر الحدود بلا حدّ، ولذلك لا توجد دالّة نهائيّة والمتتالية لا تتقارب نقطيًّا.",
+"فقط إذا كانت الدوالّ متّصلة",
+"الاتّصال ليس شرطًا للتقارب المنتظم. الاختبار هو الحدّ الأعلى للفرق فقط."]);
+trAt("ru",TR_KEYS.indexOf("אנליטית בכל נקודה שבה u ו-v גזירות"),[
+"Аналитична в каждой точке, где u и v дифференцируемы",
+"Дифференцируемости u и v недостаточно. Условия Коши–Римана — дополнительное требование, и решают именно они.",
+"Каждый ненулевой элемент является образующим только при простом n. Здесь считаем лишь взаимно простые с n.",
+"Степень 0 — это постоянная функция, её хватает только на одну точку.",
+"Лагранж гарантирует подгруппу для каждого делителя",
+"Теорема только запрещает. Обратное направление в неё не входит: у A₄ порядка 12 нет подгруппы порядка 6.",
+"Один полный оборот уже возвращает каждый элемент на место. Проходить цикл дважды не нужно.",
+"Степень n определяет, что происходит на концах промежутка, а не радиус.",
+"Вы перевернули степень. Отношение коэффициентов стремится к 1 при любой степени n.",
+"Коэффициентов, стремящихся к нулю, недостаточно. Решает предел отношения соседних коэффициентов, а он равен 1.",
+"Отношение коэффициентов стремится к 1 при любой степени n, поэтому степень на радиус не влияет.",
+"Это вычет в полюсе z = {0}, а не в точке, о которой спрашивают.",
+"Это положение полюса, а не точка, о которой спрашивают.",
+"Вычет не возводится в квадрат, а в точке, которая не является полюсом, он в любом случае равен нулю.",
+"Знаменатель обращается в ноль только в одной точке, и это единственная точка с полюсом.",
+"Проверяем точку, о которой спрашивают",
+"В точке, не являющейся полюсом, функция аналитична, поэтому в её ряде Лорана нет члена со степенью минус один.",
+"Вычет в точке, где функция аналитична, всегда равен нулю.",
+"Ненулевой вычет бывает только в полюсе. В точке, где функция аналитична, вычет равен нулю.",
+"Это инфимум — левый конец. Сверху множество вообще не ограничено.",
+"Бесконечность не является действительным числом, поэтому супремумом быть не может.",
+"Правого конца здесь нет: для любого числа в множестве найдётся элемент больше него.",
+"Аксиома полноты гарантирует супремум только для множества, ограниченного сверху, а здесь такой границы нет.",
+"Верхних границ нет вовсе, поэтому нет и наименьшей из них.",
+"Супремум существует только у ограниченного сверху множества. Сначала проверяем ограниченность.",
+"В промежутке нет точки, где последовательность обращается в ноль — в каждой его точке члены растут неограниченно.",
+"Коэффициент n не исчезает, именно он и растёт. n·x не стремится к x.",
+"В каждой точке промежутка члены растут неограниченно, поэтому предельной функции нет и последовательность не сходится поточечно.",
+"Только если функции непрерывны",
+"Непрерывность не является условием равномерной сходимости. Критерий — только супремум разности."]);
+trAt("en",TR_KEYS.indexOf("אנליטית בכל נקודה שבה u ו-v גזירות"),[
+"Analytic at every point where u and v are differentiable",
+"Differentiability of u and v is not enough. The Cauchy–Riemann equations are a further condition, and they are what decides.",
+"Every nonzero element is a generator only when n is prime. Here you count only those coprime to n.",
+"Degree 0 is a constant function, and it is enough for one point only.",
+"Lagrange guarantees a subgroup for every divisor",
+"The theorem only forbids. The converse is not part of it: A₄ of order 12 has no subgroup of order 6.",
+"One full turn already returns every element to its place. There is no need to go around the cycle twice.",
+"The power of n decides what happens at the endpoints of the interval, not the radius.",
+"You inverted the power. The ratio of the coefficients tends to 1 for any power of n.",
+"Coefficients tending to zero are not enough. What decides is the limit of the ratio of consecutive coefficients, and it is 1.",
+"The ratio of the coefficients tends to 1 for any power of n, so the power does not affect the radius.",
+"That is the residue at the pole z = {0}, not at the point asked about.",
+"That is the location of the pole, not the point asked about.",
+"The residue is not squared, and at a point that is not a pole it is zero in any case.",
+"The denominator vanishes at one point only, and that is the only point with a pole.",
+"Check the point that was asked about",
+"At a point that is not a pole the function is analytic, so its Laurent expansion has no term of power minus one.",
+"The residue at a point where the function is analytic is always zero.",
+"A nonzero residue occurs only at a pole. At a point where the function is analytic the residue is zero.",
+"That is the infimum — the left end. From above the set is not bounded at all.",
+"Infinity is not a real number, so it cannot be a supremum.",
+"There is no right end here: for any number you pick the set contains a larger element.",
+"The completeness axiom guarantees a supremum only for a set bounded above, and here there is no such bound.",
+"There is no upper bound at all, so there is no least one either.",
+"A supremum exists only for a set bounded above. First check boundedness.",
+"There is no point in the interval where the sequence vanishes — at every point of it the terms grow without bound.",
+"The coefficient n does not vanish, it is the one that grows. n·x does not tend to x.",
+"At every point of the interval the terms grow without bound, so there is no limit function and the sequence does not converge pointwise.",
+"Only if the functions are continuous",
+"Continuity is not a condition for uniform convergence. The test is the supremum of the difference alone."]);
+/* המפתחות שנוספו בסוף TR_KEYS. עוגן indexOf ולא מספר: מספר קשיח
+   נשבר בשקט מכל מפתח שיתווסף לפניו. */
+trAt("ar",TR_KEYS.indexOf("מהי השארית של f בנקודה z = {0}?"),[
+"ما باقي f عند النقطة z = {0}؟",
+" أربعة ",
+" خمسة ",
+" ستة ",
+" سبعة ",
+" ثمانية ",
+" تسعة ",
+" زائد ناقص ",
+" منقولة ",
+" المجموع من $1 إلى $2 لـ ",
+" التكامل الثنائي على المجال $1 لـ ",
+" لوغاريتم للأساس $1 لـ "]);
+trAt("ru",TR_KEYS.indexOf("מהי השארית של f בנקודה z = {0}?"),[
+"Чему равен вычет f в точке z = {0}?",
+" четыре ",
+" пять ",
+" шесть ",
+" семь ",
+" восемь ",
+" девять ",
+" плюс минус ",
+" транспонированная ",
+" сумма от $1 до $2 от ",
+" двойной интеграл по области $1 от ",
+" логарифм по основанию $1 от "]);
+trAt("en",TR_KEYS.indexOf("מהי השארית של f בנקודה z = {0}?"),[
+"What is the residue of f at the point z = {0}?",
+" four ",
+" five ",
+" six ",
+" seven ",
+" eight ",
+" nine ",
+" plus minus ",
+" transposed ",
+" the sum from $1 to $2 of ",
+" the double integral over the region $1 of ",
+" log base $1 of "]);
+/* שלוש המחרוזות שנוסחו מחדש כשאורך האפשרות חדל לשאת מידע על
+   נכונותה. בתא metric רמה 4 ארבע האפשרויות הן מחרוזות קבועות,
+   ולכן סדר האורכים ביניהן הוא בעצמו רמז. התרגומים נמדדו כך
+   שבכל שפה האפשרות "d(x , y) שלילי" — שאינה התשובה אף פעם —
+   נשארת הארוכה ביותר, ושלוש האחרות קרובות זו לזו. */
+trAt("ar",TR_KEYS.indexOf("d היא מטריקה על ℝ: ארבע התכונות מתקיימות"),[
+"‏d متريّة على ℝ: الخصائص الأربع تتحقّق",
+"ليست متريّة: يوجد x , y بحيث d(x , y) سالبة",
+"خطأ في الإشارة. من المعادلة الأولى، v بالنسبة لـ y تساوي u بالنسبة لـ x، وهي {0}، لا معاكسها."]);
+trAt("ru",TR_KEYS.indexOf("d היא מטריקה על ℝ: ארבע התכונות מתקיימות"),[
+"d — метрика на ℝ: все четыре свойства выполнены",
+"Не метрика: найдутся x , y с отрицательным d(x , y)",
+"Ошибка знака. Из первого уравнения v по y равно u по x, а это {0}, а не противоположное ему."]);
+trAt("en",TR_KEYS.indexOf("d היא מטריקה על ℝ: ארבע התכונות מתקיימות"),[
+"d is a metric on ℝ: all four properties hold",
+"Not a metric: there are x , y with d(x , y) negative",
+"A sign slip. From the first equation v by y equals u by x, which is {0}, not its negative."]);
 trBuild();
 exLoad();
 applyModes();
-examFromUrl();
+examFromUrl()||resultFromUrl();
 /* מעבר לקישור מבחן כשהאפליקציה כבר פתוחה הוא ניווט בתוך אותו מסמך:
    הדפדפן לא טוען מחדש, ולכן ההפעלה לא רצה שוב. בלי זה תלמיד שכבר
    פתח את האפליקציה ואז לחץ על הקישור בוואטסאפ פשוט לא רואה כלום. */
 window.addEventListener("hashchange",function(){
-  if(examFromUrl()){stopSpeak();window.scrollTo(0,0);render()}
+  if(examFromUrl()||resultFromUrl()){stopSpeak();window.scrollTo(0,0);render()}
   else if(view==="sit"||view==="badexam"||view==="oldexam"){view="home";render()}
 });
 try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(view==="settings")render()}}catch(e){}
 render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<script src="/tutor/tutor.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -11127,8 +11664,43 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g38-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g71-pwa1").catch(function(){});
   });
+}
+</script>
+<!-- ״עזרה מהמורה״. התשתית ב-/tutor/tutor.js, ההוראות בשרת.
+     mount מחזיר false כשאין כתובת שרת, ואז הכפתור אינו נבנה. -->
+<script>
+if(window.TUTOR){
+  /* הניסוח שעל המסך מגיע כ-HTML; לשרת נשלח טקסט בלבד. */
+  var txt=function(x){return String(x==null?"":x).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim()};
+  TUTOR.mount({
+    app:"math-uni3",
+    lang:function(){return (typeof state!=="undefined"&&state.settings&&state.settings.lang)||"he"},
+    q:function(){
+      /* מיפוי אחד לשתי המשפחות. השדות נמדדו בדפדפן, ולא הועתקו
+         מ-buildQ של בונה המבחן — שם הם אחרים.
+         משפחת המתמטיקה: ask / expr / options[].ok
+         משפחת החידון:   prompt / subject / opts[].ok / answer */
+      var x=(typeof P!=="undefined")?P.q:null; if(!x)return null;
+      var o=x.opts||x.options||[], ok=x.answer!=null?txt(x.answer):null, i;
+      if(!ok)for(i=0;i<o.length;i++)if(o[i].ok)ok=txt(o[i].t||o[i].h);
+      var line=txt(x.prompt||x.ask);
+      /* ב-english השדה הזה הוא אובייקט ולא מחרוזת, ובלי הפריקה
+         הזאת נשלח לשרת "[object Object]". נמדד בדפדפן. */
+      var sb=x.subject;
+      if(sb&&typeof sb==="object")sb=sb.h||sb.t||sb.text||sb.w||"";
+      if(sb)line+=" — "+txt(sb);
+      if(x.lead)line+=" "+txt(x.lead);
+      if(x.expr)line+=" "+txt(x.expr);
+      return {expr:line.trim()||null, ans:ok||null,
+              topic:txt(x.topicName||x.tid||"")||null,
+              level:(typeof state!=="undefined"&&state.track)?("מסלול "+state.track):
+                    (x.level!=null?("רמה "+x.level):null)};
+    },
+    stopHost:function(){try{stopSpeak()}catch(e){}}
+  });
+  try{render()}catch(e){}
 }
 </script>
 </body>

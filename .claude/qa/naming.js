@@ -1,27 +1,40 @@
 /* שומר על כלל השם.
 
-   ״DriveWise״ אסור כשם מותג (3.9.2026, חשש לזכויות יוצרים וסימן
-   מסחר), והשם הרשמי הוא ״תאוריה מדברת״. ביום שההחלטה התקבלה הכלל
-   כבר התקיים בקוד — הבדיקה הזאת אינה מתקנת דבר, היא מונעת נסיגה.
+   השם האנגלי הישן של ״תאוריה מדברת״ אסור לשימוש — חשש לזכויות
+   יוצרים וסימן מסחר, 3.9.2026 — ובהחלטה מ-4.9.2026 הוא נמחק
+   מהמאגר כליל, גם באות קטנה וגם כמזהה. אין שם חלופי.
 
    ולמה בדיקה ולא רק מסמך: אפליקציה חדשה נולדת מהעתקה של אפליקציה
    קיימת, ומחרוזת שיווקית מועתקת מדף לדף. מסמך אינו עוצר העתקה,
    וזה בדיוק הנימוק שכתוב ב-README על `cache.js`.
 
-   שני מסמכי הכלל — NAMING.md ו-CLAUDE.md — מוחרגים, כי הם המקום
-   היחיד במאגר שבו השם מופיע בכוונה. בלי ההחרגה הבדיקה הייתה
-   נכשלת על הכלל שהיא באה לאכוף. מאותה סיבה בדיוק מוחרג גם הקובץ
-   הזה: הוא מכיל את השם האסור בביטוי הרגולרי ובהודעת השגיאה, ובלי
-   ההחרגה הוא היה נכשל על עצמו בכל הרצה.
+   נשאר מופע אחד, והוא נתיב ולא שם: שדה `u` ברשומת האפליקציה,
+   מפני שהיא מתפרסמת מריפו נפרד תחת שם הריפו, והריפו טרם שונה
+   (הפירוט ליד SANCTIONED למטה).
 
-   שלושת המוחרגים הם רשימה סגורה. קובץ רביעי שיצטרך להזכיר את השם
-   הוא סימן שמשהו זולג, ולא סיבה להאריך את הרשימה.
+   הבדיקה אוכפת את זה: מחוץ לאותה מחרוזת ולמסמכי הכלל, אף מופע
+   אינו מותר — לא באות גדולה ולא באות קטנה.
+
+   שני קבצים מוחרגים והם רשימה סגורה: NAMING.md, שהוא המסמך שבו
+   הכלל מנוסח, והקובץ הזה, שמכיל את המילה בביטוי הרגולרי ובהודעות.
+   קובץ שלישי שיזדקק למילה הוא סימן שמשהו זולג, ולא סיבה להאריך
+   אותה.
 */
 const fs = require('fs'), path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const BANNED = /DriveWise|Drivewise|DRIVEWISE/;
-const EXEMPT = new Set(['NAMING.md', 'CLAUDE.md', path.join('.claude', 'qa', 'naming.js')]);
+const BANNED = /drivewise/i;
+const EXEMPT = new Set(['NAMING.md', path.join('.claude', 'qa', 'naming.js')]);
+/* מופע מותר אחד, ורק הוא: שדה `u` בכרטיס של האפליקציה שבריפו הנפרד.
+   GitHub Pages מפרסם פרויקט תחת שם הריפו, והריפו טרם שונה — נמדד
+   ב-5.9.2026 מול רשימת הריפוזיטוריז של החשבון, שבה שניים בלבד:
+   `lagstein1-png.github.io` ו-`lagstein1-png/drivewise`. בלי השדה
+   הכרטיס בונה `/theory/`, וזה 404 חי.
+
+   ההחרגה היא של המחרוזת המדויקת ולא של הקובץ: כל מופע אחר
+   ב-index.html עדיין נכשל, וגם אותה מחרוזת עם רווח אחר. כשהריפו
+   ישונה — נמחק כאן, ונמחק השדה. */
+const SANCTIONED = /"u":"\/drivewise\/"/g;
 const SKIP_DIR = new Set(['.git', 'img', 'vendor', 'node_modules', '.well-known']);
 const TEXT = /\.(html|js|json|md|css|svg|txt|webmanifest)$/i;
 
@@ -39,10 +52,12 @@ function walk(dir) {
     const rel = path.relative(ROOT, full);
     if (EXEMPT.has(rel)) continue;
     scanned++;
-    const lines = fs.readFileSync(full, 'utf8').split('\n');
+    let text = fs.readFileSync(full, 'utf8');
+    if (rel === 'index.html') text = text.replace(SANCTIONED, '"u":"<נתיב>"');
+    const lines = text.split('\n');
     lines.forEach((ln, i) => {
       if (BANNED.test(ln)) {
-        console.log(`✗ ${rel}:${i + 1}: ״DriveWise״ אסור כשם מותג. השם הוא ״${OFFICIAL.he}״`);
+        console.log(`✗ ${rel}:${i + 1}: השם האנגלי הישן נמחק מהמאגר. השם הוא ״${OFFICIAL.he}״`);
         bad++;
       }
     });
@@ -58,12 +73,12 @@ const a = home.indexOf('var DATA='), b = home.indexOf('\nvar APPS=DATA.APPS');
 let card = null;
 try {
   const D = JSON.parse(home.slice(a + 9, home.lastIndexOf('};', b) + 1));
-  card = (D.APPS || []).find(x => x.id === 'drivewise');
+  card = (D.APPS || []).find(x => x.id === 'theory');
 } catch (e) { /* נופל לענף שמתחת */ }
 
 if (!card) {
-  console.log('✗ index.html: לא נמצאה רשומת drivewise ב-DATA.APPS. ' +
-    'אם הנתיב שונה — לעדכן גם את ICONS, את מסמכי marketing ואת הבדיקה הזאת.');
+  console.log('✗ index.html: לא נמצאה רשומה עם id="theory" ב-DATA.APPS. ' +
+    'אם המזהה שונה — לעדכן גם את ICONS, את apps.js ואת הבדיקה הזאת.');
   bad++;
 } else {
   for (const lg of Object.keys(OFFICIAL)) {
@@ -80,5 +95,5 @@ if (!card) {
 }
 
 console.log(`\n${scanned} קבצים נסרקו, ${bad} ממצאים` +
-  (bad ? '' : ' · ״DriveWise״ אינו מופיע מחוץ ל-NAMING.md ול-CLAUDE.md'));
+  (bad ? '' : ' · השם הישן אינו מופיע מחוץ למסמכי הכלל ולשדה הנתיב שבכרטיס'));
 process.exit(bad ? 1 : 0);

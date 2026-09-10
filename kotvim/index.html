@@ -1,0 +1,3122 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>כותבים ביחד — פיגום כתיבה</title>
+<meta name="description" content="בונים טקסט צעד אחר צעד: פתיחה, טענה, דוגמה וסיכום — ושומעים את מה שנכתב. בעברית, ערבית, רוסית ואנגלית." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="כותבים ביחד — פיגום כתיבה" />
+<meta property="og:description" content="בונים טקסט צעד אחר צעד: פתיחה, טענה, דוגמה וסיכום — ושומעים את מה שנכתב. בעברית, ערבית, רוסית ואנגלית." />
+<meta property="og:url" content="https://lagstein1-png.github.io/kotvim/" />
+<meta property="og:image" content="https://lagstein1-png.github.io/kotvim/img/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#17120d" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   אולפן — עברית מעשית לעולים חדשים
+   קהל היעד אינו "לא יודע עברית". הוא חי בעברית כל יום ונכשל בה
+   כל יום — בקופת חולים, בטופס, מול פקיד — ולכן כל החלטה כאן
+   נמדדת בשאלה אחת: האם היא מורידה עומס, או מוסיפה.
+   · שום מילה עברית לא מוצגת בלי שאפשר לשמוע אותה.
+   · לצד כל מילה יש ניקוד. מי שקורא לאט קורא אותיות, לא מילים,
+     ובלי ניקוד הוא מנחש תנועה ומקבל מילה אחרת.
+   · שפת האם היא פיגום, לא קביים — היא נסוגה עם העלייה ברמה.
+   · Noto Sans Arabic נטען לצד Heebo: Heebo אינו מכיל גליפים
+     ערביים, ובלעדיו הממשק הערבי נופל לגופן ברירת המחדל.
+   כל המידות ב-rem, כדי שהגדלת טקסט תגדיל את הכול יחד.
+   ============================================================ */
+:root{
+  --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
+  --ar:"Noto Sans Arabic","Heebo",system-ui,"Segoe UI",Arial,sans-serif;
+  --ru:"Noto Sans","Heebo",system-ui,"Segoe UI",Arial,sans-serif;   /* קירילית — Heebo אינו מכיל אותה, נמדד 7.9 */
+  --lrn:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
+  --bg:#faf7f2; --surface:#ffffff; --surface2:#f0e9df;
+  --ink:#1f1a14; --muted:#5c5147; --faint:#7f6a52; --line:#e5dbcc;
+  --accent:#8a5a2b; --accent-ink:#ffffff; --accent-soft:#f3e3d1;
+  --gold:#a16207; --gold-soft:#fbf0d5; --hit:#f5c451; --hit-ink:#1a1300;
+  --ok:#15803d; --ok-soft:#dcfce7; --bad:#be123c; --bad-soft:#ffe4e9;
+  --warn:#b45309; --warn-soft:#fef3c7;
+  --shadow:0 1px 2px rgba(31,26,20,.05),0 8px 24px -12px rgba(31,26,20,.2);
+  --r:14px;
+  /* צבע לכל מסלול. לא קישוט: ארבעה סוגי לימוד שונים לגמרי, וצבע
+     קבוע לכל אחד חוסך למי שמתקשה להתמצא את השאלה "איפה אני". */
+  --c-sound:#0369a1; --cs-sound:#dbeefc;   /* אות וצליל      */
+  --c-words:#15803d; --cs-words:#dcfce7;   /* מילים          */
+  --c-talk:#c2410c;  --cs-talk:#fde5d8;    /* מדוברת         */
+  --c-read:#6d28d9;  --cs-read:#eae2fd;    /* שלטים וטפסים   */
+}
+:root[data-theme="dark"]{
+  --bg:#17120d; --surface:#221b14; --surface2:#2e251b;
+  --ink:#f2ece3; --muted:#b3a595; --faint:#8a7c6c; --line:#3a2f23;
+  --accent:#e8c9a0; --accent-ink:#17120d; --accent-soft:#3a2c1c;
+  --gold:#fbbf24; --gold-soft:#33270f; --hit:#ffd24d; --hit-ink:#241a00;
+  --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
+  --warn:#fbbf24; --warn-soft:#33260f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  --c-sound:#7dd3fc; --cs-sound:#0b2a3d;
+  --c-words:#86efac; --cs-words:#0f2a1a;
+  --c-talk:#fdba74;  --cs-talk:#3a2113;
+  --c-read:#c4b5fd;  --cs-read:#261a45;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1b1a; --surface:#142624; --surface2:#1c3230;
+    --ink:#e6f0ee; --muted:#9ab0aa; --faint:#6f8781; --line:#264240;
+    --accent:#5eead4; --accent-ink:#0d1b1a; --accent-soft:#123c37;
+    --gold:#fbbf24; --gold-soft:#33270f; --hit:#ffd24d; --hit-ink:#241a00;
+    --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
+    --warn:#fbbf24; --warn-soft:#33260f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+    --c-sound:#7dd3fc; --cs-sound:#0b2a3d;
+    --c-words:#86efac; --cs-words:#0f2a1a;
+    --c-talk:#fdba74;  --cs-talk:#3a2113;
+    --c-read:#c4b5fd;  --cs-read:#261a45;
+  }
+}
+/* ניגודיות גבוהה — שחור על לבן, מסגרות מלאות, בלי גוונים רכים */
+:root.hc{
+  --bg:#ffffff; --surface:#ffffff; --surface2:#ffffff;
+  --ink:#000000; --muted:#1a1a1a; --faint:#333333; --line:#000000;
+  --accent:#00434b; --accent-ink:#ffffff; --accent-soft:#e6f2f3;
+  --gold:#5c3d00; --gold-soft:#f7efdf; --hit:#ffe600; --hit-ink:#000000;
+  --ok:#0a5c2a; --ok-soft:#e6f4ea; --bad:#8c0f2c; --bad-soft:#fbe9ed;
+  --warn:#6b3d00; --warn-soft:#f7efdf; --shadow:none;
+  --c-sound:#00305c; --cs-sound:#e8eef7;
+  --c-words:#0a5c2a; --cs-words:#e6f4ea;
+  --c-talk:#7a2c00;  --cs-talk:#f9ece4;
+  --c-read:#3d1a75;  --cs-read:#eee8f9;
+}
+:root.hc *{box-shadow:none!important}
+:root.hc .card,:root.hc .btn,:root.hc .opt{border-width:2px!important}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:var(--fs,17px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
+  font-size:1rem;line-height:1.65;-webkit-text-size-adjust:100%}
+:root.clear body{font-family:"Verdana","Tahoma","Heebo",sans-serif;letter-spacing:.012em}
+:root.spaced body{word-spacing:.22em;line-height:1.95}
+:root.rm *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+/* הגדרת המערכת ולא רק המתג שבאפליקציה: מי שכיבה אנימציות במכשיר
+   ציפה שזה יחול גם כאן. */
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+h1,h2,h3{margin:0;line-height:1.3;font-weight:800}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* החומר הנלמד — עברית — בכיוון, בגופן ובמרווח משלו. unicode-bidi:isolate
+   מונע מהמשפט העברי לגרור אחריו את סימני הפיסוק של המשפט הרוסי או האנגלי
+   שלצידו, וזה קורה בדיוק במקום שבו הלומד קורא לאט וזקוק ליציבות. */
+html[lang="ar"] body{font-family:var(--ar)}
+html[lang="ru"] body{font-family:var(--ru)}
+.lrn{font-family:var(--lrn);direction:rtl;unicode-bidi:isolate;text-align:start}
+.lrn-b{font-family:var(--lrn);direction:rtl;unicode-bidi:isolate;display:inline-block}
+.tr-b{font-family:system-ui,"Segoe UI",Arial,sans-serif;direction:ltr;
+  unicode-bidi:isolate;display:inline-block;color:var(--muted)}
+
+.wrap{max-width:56rem;margin:0 auto;padding:0 clamp(.9rem,3vw,1.5rem)}
+.hbar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-block:.6rem}
+:root.hc .hbar{background:var(--bg);backdrop-filter:none}
+.hrow{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.brand{font-size:1.35rem;font-weight:800;letter-spacing:-.01em;display:flex;
+  align-items:baseline;gap:.5rem;margin-inline-end:auto}
+.brand small{font-size:.72rem;font-weight:600;color:var(--muted);letter-spacing:.06em}
+.gbtn{display:inline-flex;align-items:center;gap:.4rem;background:var(--surface);
+  border:1px solid var(--line);border-radius:999px;padding:.42rem .8rem;cursor:pointer;
+  font-size:.86rem;font-weight:600;box-shadow:var(--shadow);min-height:44px}
+.gbtn:hover{border-color:var(--accent)}
+.gbtn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);padding:1.1rem}
+.grid{display:grid;gap:.85rem}
+@media(min-width:640px){.g2{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){.g3{grid-template-columns:repeat(3,1fr)}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;
+  border:1px solid var(--line);background:var(--surface);border-radius:12px;
+  padding:.72rem 1.1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow);
+  min-height:2.9rem;font-size:1rem}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent;box-shadow:none}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn.wide{width:100%}
+/* מודול המבחן הכיתתי הועתק ממשפחת math-uni, ושם .btn-p ו-.btn.w
+   מוגדרים. כאן הם לא היו, ולכן "מבחן חדש", "צרו את המבחן", "התחלת
+   מבחן" וכפתורי הוואטסאפ נראו ככפתור ריק בלי צבע — טקסט קטן עם פלוס.
+   כחול, ולא טורקיז: זה כפתור של המורה, ובולט מכל שאר המסך. */
+.btn-p{background:#2563eb;color:#fff;border-color:#2563eb}
+.btn-p:hover{filter:brightness(1.1);border-color:#2563eb}
+.btn.w{width:100%}
+
+.chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;
+  padding:.22rem .6rem;font-size:.78rem;font-weight:700;background:var(--surface2);color:var(--muted)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+
+/* ===== מסלולים: הצבע נכנס ככרטיס, לא כרקע של טקסט ===== */
+.trk{--c:var(--accent);--cs:var(--accent-soft)}
+.t-sound{--c:var(--c-sound);--cs:var(--cs-sound)}
+.t-words{--c:var(--c-words);--cs:var(--cs-words)}
+.t-talk{--c:var(--c-talk); --cs:var(--cs-talk)}
+.t-read{--c:var(--c-read); --cs:var(--cs-read)}
+.tcard{border-inline-start:5px solid var(--c);cursor:pointer;text-align:start;width:100%;
+  display:flex;flex-direction:column;gap:.4rem;align-items:stretch}
+.tcard:hover{border-color:var(--c)}
+.tcard h3{font-size:1.05rem}
+.tcard .sub{font-size:.85rem;color:var(--muted)}
+.tdot{width:.62rem;height:.62rem;border-radius:50%;background:var(--c);flex:none}
+.thead{display:flex;align-items:center;gap:.5rem}
+.tpill{background:var(--cs);color:var(--c);border-radius:999px;padding:.15rem .55rem;
+  font-size:.72rem;font-weight:800}
+
+/* ===== סרגל שליטה ברמות ===== */
+.lvls{display:flex;gap:.4rem;flex-wrap:wrap}
+.lvl{border:1px solid var(--line);background:var(--surface);border-radius:10px;
+  padding:.4rem .7rem;font-size:.82rem;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:.4rem}
+.lvl.on{background:var(--c,var(--accent));color:var(--accent-ink);border-color:var(--c,var(--accent))}
+.bar{height:.42rem;border-radius:999px;background:var(--surface2);overflow:hidden;flex:1;min-width:3rem}
+.bar i{display:block;height:100%;background:var(--c,var(--accent))}
+.bar.b0 i{background:var(--bad)} .bar.b1 i{background:var(--warn)} .bar.b2 i{background:var(--ok)}
+
+/* ===== תרגול ===== */
+.qcard{border-top:5px solid var(--c,var(--accent))}
+.qtop{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.7rem}
+.qtext{font-size:1.12rem;font-weight:600;margin:.2rem 0 .3rem}
+.qhint{color:var(--muted);font-size:.9rem}
+/* המילה או המשפט שנלמדים. גדול, מרווח, ותמיד לצד כפתור השמעה. */
+.subject{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;
+  background:var(--surface2);border-radius:12px;padding:.85rem 1rem;margin:.5rem 0}
+.subject .word{font-family:var(--lrn);direction:rtl;unicode-bidi:isolate;
+  font-size:1.7rem;font-weight:700;letter-spacing:.01em;line-height:1.25}
+/* התעתיק הוא לטיני ולכן LTR — הוא נועד למי שעדיין אינו קורא אות
+   עברית בכלל, ובלעדיו רמה 1 חסומה בפניו לגמרי. */
+.subject .ipa{font-family:system-ui,"Segoe UI",Arial,sans-serif;direction:ltr;
+  unicode-bidi:isolate;color:var(--muted);font-size:.95rem;letter-spacing:.02em}
+.spk{border:1px solid var(--line);background:var(--surface);border-radius:999px;
+  width:2.7rem;height:2.7rem;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;flex:none;box-shadow:var(--shadow)}
+.spk:hover{border-color:var(--accent);color:var(--accent)}
+.spk.sm{width:2.1rem;height:2.1rem}
+.spk.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+.opts{display:grid;gap:.6rem;margin-top:.9rem}
+@media(min-width:560px){.opts.two{grid-template-columns:1fr 1fr}}
+.opt{display:flex;align-items:center;gap:.6rem;text-align:start;width:100%;
+  border:2px solid var(--line);background:var(--surface);border-radius:12px;
+  padding:.8rem .9rem;cursor:pointer;font-size:1.02rem;font-weight:600;min-height:3.1rem}
+.opt:hover{border-color:var(--accent)}
+.opt .k{width:1.9rem;height:1.9rem;border-radius:8px;background:var(--surface2);
+  display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;
+  font-weight:800;color:var(--muted);flex:none}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ok .k{background:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt.bad .k{background:var(--bad);color:#fff}
+.opt[disabled]{cursor:default}
+/* נסיגה בצבע ולא בשקיפות: opacity:.55 הוריד את הטקסט ל-3.87:1
+   ואת אות הסימון ל-2.37:1, ואחרי המענה קריאת המסיח היא הלמידה. */
+.opt.dim{color:var(--muted);border-color:var(--line);box-shadow:none}
+.opt.dim .k{background:var(--surface2);color:var(--muted)}
+
+/* אריחי בניית משפט. הסדר הוא התרגיל, ולכן האריח חייב להיראות כמשהו
+   שאפשר להרים — מסגרת מלאה ורקע משלו, לא טקסט על רקע הכרטיס. */
+.tiles{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.7rem}
+.tile{font-family:var(--lrn);direction:rtl;border:2px solid var(--line);
+  background:var(--surface);border-radius:10px;padding:.5rem .8rem;font-weight:600;
+  cursor:pointer;font-size:1.02rem;min-height:2.7rem}
+.tile:hover{border-color:var(--accent)}
+.slot{min-height:3.2rem;border:2px dashed var(--line);border-radius:12px;
+  background:var(--surface2);padding:.5rem;display:flex;flex-wrap:wrap;gap:.45rem;
+  align-items:center;direction:ltr}
+.slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.slot.bad{border-style:solid;border-color:var(--bad);background:var(--bad-soft)}
+.slot .tile{background:var(--surface)}
+
+/* ===== משוב ===== */
+.fb{margin-top:.9rem;border-radius:12px;padding:.85rem 1rem;border:1px solid transparent}
+.fb.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.fb b{display:block;font-size:1.02rem;margin-bottom:.2rem}
+.fb .body{color:var(--ink);font-weight:500;font-size:.95rem}
+.why{margin-top:.55rem;padding-top:.55rem;border-top:1px dashed currentColor;color:var(--ink);
+  font-weight:500;font-size:.93rem}
+
+/* ===== קטע קריאה ===== */
+.passage{background:var(--surface2);border-radius:12px;padding:1rem 1.1rem;margin:.6rem 0;
+  font-family:var(--lrn);direction:rtl;unicode-bidi:isolate;font-size:1.08rem;line-height:2}
+.passage .s{border-radius:5px;padding:.05em .12em;cursor:pointer}
+.passage .s:hover{background:var(--accent-soft)}
+.passage .s.now{background:var(--accent-soft);box-shadow:0 2px 0 var(--accent)}
+.wd{border-radius:5px;padding:1px 3px}
+.wd.hit{background:var(--hit);color:var(--hit-ink);font-weight:600}
+/* כשמנוע הדיבור אינו מדווח על גבולות מילים — קורה הרבה בעברית
+   באנדרואיד — אין מה להדגיש מילה־מילה, ואז מודגש כל האיבר. הכלל
+   שקיים כאן מכוון למשפט בתוך קטע קריאה בלבד, ולכן ההדגשה החלופית
+   על איבר אחר לא נראתה כלל. */
+.wd.now,p.now,div.now,span.now,b.now{background:var(--hit);color:var(--hit-ink);
+  border-radius:8px;box-shadow:0 0 0 4px var(--hit)}
+.gloss{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+.gword{border:1px solid var(--line);background:var(--surface);border-radius:999px;
+  padding:.25rem .6rem;font-size:.85rem;cursor:pointer}
+.gword b{font-family:var(--lrn);direction:rtl;unicode-bidi:isolate}
+
+/* ===== סרגל מצב הקול ===== */
+.vstrip{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;border-radius:10px;
+  padding:.45rem .7rem;font-size:.85rem;font-weight:600;margin-bottom:.7rem}
+.vstrip.ok{background:var(--ok-soft);color:var(--ok)}
+.vstrip.warn{background:var(--warn-soft);color:var(--warn)}
+.vstrip.bad{background:var(--bad-soft);color:var(--bad)}
+.vstrip .btn{padding:.3rem .7rem;min-height:44px;font-size:.82rem}  /* 2.1rem היו 36 פיקסלים — מתחת ליעד המגע */
+
+/* ===== הגדרות ===== */
+.row{display:flex;align-items:center;justify-content:space-between;gap:.8rem;
+  padding:.7rem 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.row:last-child{border-bottom:0}
+.row .lab{font-weight:700}
+.row .desc{font-size:.85rem;color:var(--muted);font-weight:500}
+.sw{width:3.2rem;height:1.8rem;border-radius:999px;background:var(--surface2);
+  border:1px solid var(--line);position:relative;cursor:pointer;flex:none}
+.sw i{position:absolute;top:.18rem;inset-inline-start:.2rem;width:1.3rem;height:1.3rem;
+  border-radius:50%;background:var(--faint);transition:.15s}
+.sw.on{background:var(--accent);border-color:var(--accent)}
+.sw.on i{inset-inline-start:1.5rem;background:#fff}
+.vgrid{display:grid;gap:.5rem;grid-template-columns:1fr}
+@media(min-width:560px){.vgrid{grid-template-columns:1fr 1fr}}
+.vopt{display:flex;align-items:center;gap:.6rem;border:2px solid var(--line);
+  background:var(--surface);border-radius:12px;padding:.6rem .75rem;cursor:pointer;text-align:start}
+.vopt.on{border-color:var(--accent);background:var(--accent-soft)}
+.vopt .nm{font-weight:700}
+.vopt .ds{font-size:.8rem;color:var(--muted)}
+input[type=password],input[type=text]{font:inherit;background:var(--surface);color:var(--ink);
+  border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;min-width:0;flex:1;
+  direction:ltr;text-align:left}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+.fbar{border-top:1px solid var(--line);margin-top:2rem;padding-block:1rem;
+  color:var(--muted);font-size:.82rem}   /* --faint יצא 2.96:1 */
+.hidden{display:none!important}
+
+/* ---------- שדה קלט של המבחן ----------
+   מודול המבחן הועתק לכאן מאפליקציה שבה .field כבר היה מוגדר.
+   בלי הכלל הזה שדה השם של הנבחן נשאר תיבת ברירת המחדל של
+   הדפדפן — 21 פיקסלים גובה, הרבה מתחת ליעד המגע של 44. */
+.field{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;
+  min-height:48px;padding:12px 14px;border-radius:11px;outline:none;background:var(--surface2);color:inherit;border:1px solid var(--line)}
+.field:focus{border-color:var(--accent)}
+textarea.field{min-height:96px;resize:vertical}
+
+/* ---------- שורות המבחן ----------
+   .tog הגיע ממודול המבחן שהועתק לכאן, ולא היה לו עיצוב כלל: השם
+   והמידע שמתחתיו נדבקו לשורה אחת בלי רווח. */
+.tog{display:flex;align-items:center;gap:13px;width:100%;text-align:start;
+  background:var(--surface2);border:1px solid transparent;border-radius:12px;
+  padding:13px 15px;min-width:0}
+.tog:hover{border-color:var(--line)}
+.tog+.tog{margin-top:9px}
+.tog .tt{flex:1;min-width:0}
+.tog .tt b{display:block;font-size:.97rem;overflow-wrap:anywhere}
+.tog .tt span{display:block;color:var(--muted);font-size:.85rem;overflow-wrap:anywhere;margin-top:2px}
+
+/* יעד מגע לקישור התחתית. קישור טקסט בשורה יוצא בגובה הטקסט —
+   15 פיקסלים — וזה קטן מדי לאצבע, גם כשהוא רק לתנאי השימוש. */
+.lg-foot a{display:inline-flex;align-items:center;min-height:44px;padding-inline:6px}
+
+/* ---------- יעדי מגע ----------
+   .lvl יצא 39 פיקסלים ומתג ה-.sw רק 31, שניהם מתחת ל-44 שהפרויקט
+   מחייב את עצמו בהם. במתג לא מגדילים את המסילה — היא תיראה מגושמת —
+   אלא מרחיבים את שטח הלחיצה סביבה. */
+.lvl{min-height:44px}
+.sw{position:relative}
+.sw::after{content:"";position:absolute;inset-block:-7px;inset-inline:-4px}
+
+/* ---------- מסך בניית המבחן ----------
+   .seg ו-.tpc הגיעו עם מודול המבחן שהועתק לכאן, ולא היה להם עיצוב:
+   כפתורי הבחירה יצאו 34 פיקסלים, וכרטיסי הנושאים 6 פיקסלים בלבד —
+   כלומר המורה לא יכול היה לבחור נושאים בכלל. */
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1 1 auto;min-width:0;min-height:44px;border:1px solid var(--line);
+  background:var(--surface);border-radius:10px;padding:10px 12px;font:inherit;
+  font-weight:600;font-size:.9rem;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.tpc{position:relative;display:flex;flex-direction:column;gap:9px;text-align:start;
+  background:var(--surface);border:1px solid var(--line);
+  border-inline-start:4px solid var(--c,var(--accent));border-radius:12px;padding:14px;
+  box-shadow:var(--shadow);min-width:0;min-height:44px;cursor:pointer;font:inherit;color:inherit}
+.tpc.on{border-color:var(--accent);background:var(--accent-soft)}
+.tpc .tn{font-weight:700;font-size:.98rem;overflow-wrap:anywhere;color:var(--c,var(--ink))}
+.tpc .td{color:var(--muted);font-size:.8rem;overflow-wrap:anywhere}
+
+/* טקסט על רקע ההדגשה: --accent-ink ולא לבן קבוע. במצב כהה
+   ההדגשה בהירה, ולבן עליה יצא 1.5–2.0:1 — כמעט בלתי קריא. */
+/* ---------- מצב מורה ---------- */
+.te-wrap{position:fixed;inset:0;z-index:2147482500;background:rgba(8,12,20,.72);
+  display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;
+  font-family:system-ui,"Heebo","Rubik",Arial,sans-serif}
+.te-box{background:#fff;color:#111827;max-width:26rem;width:100%;border-radius:18px;
+  box-shadow:0 24px 70px -20px rgba(0,0,0,.6);padding:clamp(18px,4vw,26px);
+  max-height:92vh;overflow-y:auto;font-size:16px;line-height:1.6}
+.te-box h2{margin:0 0 6px;font-size:1.35rem;font-weight:800;line-height:1.25}
+.te-lead{margin:0 0 10px;color:#374151}
+.te-warn{margin:0 0 12px;font-size:.88rem;color:#7c2d12;background:#fef3c7;
+  border-radius:10px;padding:9px 11px}
+.te-lab{display:block;margin:10px 0 4px;font-weight:700;font-size:.92rem}
+.te-in{width:100%;box-sizing:border-box;font:inherit;letter-spacing:.3em;
+  border:1px solid #d1d5db;border-radius:11px;padding:.7rem .8rem;min-height:48px;
+  background:#fff;color:#111827}
+.te-in:focus-visible{outline:3px solid #2563eb;outline-offset:1px}
+.te-chk{display:flex;align-items:center;gap:.5rem;margin-top:14px;min-height:44px;
+  font-size:.94rem;cursor:pointer}
+.te-chk input{width:20px;height:20px}
+.te-note{margin:2px 0 0;font-size:.82rem;color:#6b7280}
+.te-msg{margin:10px 0 0;font-size:.92rem;font-weight:700;color:#7f1d1d;
+  background:#fee2e2;border-radius:10px;padding:9px 11px}
+.te-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.te-btn{font:inherit;font-weight:700;border-radius:12px;padding:.75rem 1.2rem;
+  cursor:pointer;border:1px solid #d1d5db;background:#fff;color:#111827;min-height:48px}
+.te-btn.pri{background:#111827;color:#fff;border-color:#111827;flex:1 1 9rem}
+.te-btn.pri[disabled]{opacity:.5;cursor:default}
+.te-btn.link{border:0;background:none;text-decoration:underline;padding:.6rem .2rem;
+  color:#374151;margin-top:8px;min-height:44px}
+.te-btn:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
+@media (prefers-color-scheme:dark){
+  .te-box{background:#141a24;color:#e8ecf4}
+  .te-lead,.te-note{color:#b9c2d4}
+  .te-warn{background:#3a2a10;color:#fcd9a5}
+  .te-in{background:#1d2531;color:#e8ecf4;border-color:#2c3648}
+  .te-msg{background:#4a1717;color:#ffd7d7}
+  .te-btn{background:#1d2531;color:#e8ecf4;border-color:#2c3648}
+  .te-btn.pri{background:#e8ecf4;color:#141a24;border-color:#e8ecf4}
+  .te-btn.link{color:#b9c2d4}
+}
+
+/* ---------- רשימת השאלות במסך בניית המבחן ---------- */
+.xq-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.xq{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface2)}
+.xq-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.xq-n{flex:0 0 auto;min-width:27px;height:27px;border-radius:8px;display:inline-flex;
+  align-items:center;justify-content:center;font-weight:800;font-size:.85rem;background:var(--line)}
+.xq-tp{font-weight:700;font-size:.88rem;color:var(--muted);overflow-wrap:anywhere}
+.xq-acts{margin-inline-start:auto;display:flex;gap:6px;flex-wrap:wrap}
+/* 44 פיקסלים גם כאן. כפתור קטן בתוך רשימה ארוכה הוא בדיוק
+   הכפתור שנהג מבוגר או ילד עם ADHD לא מצליח לפגוע בו. */
+.xq-b{padding:8px 13px;font-size:.88rem;font-weight:700;border-radius:10px;min-height:44px;
+  border:1px solid var(--line);background:transparent;color:inherit;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit}
+.xq-b:hover{background:var(--line)}
+.xq-b[aria-pressed="true"]{background:var(--line)}
+.xq-q{margin-top:8px;line-height:1.5;overflow-wrap:anywhere}
+.xq-e{margin-top:5px;font-weight:700;overflow-wrap:anywhere}
+/* התרגיל לבד — "29 − 7" — הוא רצף של שני מספרים וסימן ניטרלי. בפסקה
+   עברית האלגוריתם הדו־כיווני הופך את סדר המספרים, והתלמיד ראה
+   "7 − 29" במבחן. מסך התרגול נמנע מזה עם .qbig; מסך המבחן, שהועתק
+   ממשפחת math-uni, לא הגדיר את .mline כלל. יישור לימין נשמר בכוונה:
+   הביטוי יושב מתחת לשאלה העברית, לא בקצה השמאלי. */
+[dir="rtl"] .mline,[dir="rtl"] .xq-e{direction:ltr;unicode-bidi:isolate;text-align:right}
+.xq-a{margin-top:7px;font-size:.92rem;color:var(--ok);overflow-wrap:anywhere}
+.xq-add{margin-top:12px;gap:8px}
+.xq-add .sub{margin:0}
+/* שאלת מקור נושאת קטע שלם. בלי תקרה הוא דוחף את שאר הרשימה
+   אל מחוץ למסך. */
+.xq .passage{max-height:11rem;overflow:auto}
+
+/* ------------------------------------------------------------
+   מחלקות עזר שהסימון כאן משתמש בהן, והוגדרו רק במשפחת math-uni
+   שממנה הוא הועתק. בלי הכלל, האלמנט נופל לברירת המחדל של
+   הדפדפן ואין שום סימן לכך: אין שגיאת JS ואף בדיקה לא רואה זאת.
+   נמדד בכרומיום מול math-uni כקבוצת ביקורת. */
+.spread{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+/* בורר השפה מציג ״العربية״ ו-״Русский״ גם כשהממשק עברי — זה כל
+   תפקידו — ולכן `html[lang]` אינו חל עליהם והם יורשים את `--font`,
+   שאין בו לא ערבית ולא קירילית. הגופן נקבע לפי השפה שהכפתור מציע,
+   ולא לפי שפת הממשק. הסימון אינו אחיד בין האפליקציות (`data-v`,
+   `data-n`, `data-l`, ולעיתים גם `lang`), ולכן הכלל מונה את כולם —
+   בלוק זהה בתשע האפליקציות, כדי שלא ייסחף ביניהן. */
+button[data-a="lang"][data-v="ar"],button[data-a="lang"][data-n="ar"],
+button[data-a="lang"][data-l="ar"],button[data-a="lang"][data-l="ar"] .fd,
+button[data-a="lang"][lang="ar"]{font-family:var(--ar)}
+button[data-a="lang"][data-v="ru"],button[data-a="lang"][data-n="ru"],
+button[data-a="lang"][data-l="ru"],button[data-a="lang"][data-l="ru"] .fd,
+button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
+</style>
+<meta name="robots" content="noindex,nofollow">
+<script>
+/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html
+   האפליקציה בשלב build: היא אינה בדף הבית, ומי שינחש את הכתובת
+   יראה מסך "עדיין לא פורסם". זו אינה הגנה קריפטוגרפית ואינה
+   מתיימרת להיות — אין שרת, וכל ה-HTML גלוי. היא מונעת מלומד
+   להיתקל באפליקציה לא בשלה. */
+var INTERNAL_KEY="shlav-internal-kotvim";
+var INTERNAL_OK=(function(){
+  try{
+    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
+    if(q) localStorage.setItem("shlav-internal", decodeURIComponent(q));
+    return localStorage.getItem("shlav-internal")===INTERNAL_KEY;
+  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="copyright" content="© 2026 יהושע לגשטיין. כל הזכויות שמורות.">
+<meta name="author" content="יהושע לגשטיין">
+<link rel="license" href="/legal/">
+</head>
+<body>
+<style>/* [hidden] הוא ברירת מחדל של הדפדפן, וסגנון מוטבע גובר עליה.
+   בלי הכלל הזה השער נשאר פרוס מעל המסך גם כשהוא "מוסתר",
+   ובולע כל לחיצה. נמדד 9.9.2026 בדפדפן. */
+#gate[hidden]{display:none!important}</style>
+<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
+     align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
+     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
+  <div style="max-width:32rem">
+    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
+    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
+    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר.
+       אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
+    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;
+       background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a>
+  </div>
+</div>
+
+<div id="live" class="sr" aria-live="polite"></div>
+<div id="app"></div>
+<script>
+/* ============================================================
+   מצב הדגמה — נכנס אך ורק דרך ?demo=1 בכתובת.
+   ------------------------------------------------------------
+   התסריט הוא נתון, לא קוד שפזור במסכים: כל פריט אומר מה נכתב
+   בכתוביות (subtitle), מה נעשה על המסך (action) וכמה זמן הצופה
+   נשאר עם המסך הזה (duration, באלפיות שנייה).
+
+   ההדגמה מפעילה את האפליקציה האמיתית — היא לוחצת על אותם
+   כפתורים שהמשתמש לוחץ עליהם. אין כאן מסך מזויף ואין תוכן
+   שנכתב במיוחד להדגמה, ולכן היא גם לא יכולה להראות משהו
+   שהאפליקציה לא באמת עושה.
+
+   בלי ?demo=1 שום שורה כאן אינה רצה: המשתנים מוגדרים ונשארים
+   בלי שימוש, לא נרשם אף מאזין אירועים, ולא נוסף דבר למסך.
+   ============================================================ */
+var DEMO_ON=/(^|[?&])demo=1(&|$)/.test(location.search||"");
+
+/* שתי טענות, ולא אותה טענה פעמיים: לחיצה שנייה על אותו כפתור
+   מבטלת את הבחירה, וההדגמה הייתה נתקעת בצעד השלישי בלי שדבר
+   ייראה שבור. `:not(.on)` בוחר תמיד את הבא שעדיין לא נבחר. */
+function demoClaims(){
+  var sel='[data-a="kpick"][data-k="cl"]:not(.on)';
+  demoTap(sel);
+  DEMO.extra.push(setTimeout(function(){ if(DEMO.on)demoTap(sel) },1500));
+  return true;
+}
+
+var DEMO_SCRIPT=[
+  {subtitle:"כותבים ביחד — פיגום כתיבה. הלומד אינו מול דף ריק אלא בונה טקסט מחלקים.",
+   action:function(){if(typeof W!=="undefined"){wReset();render();window.scrollTo(0,0)}}, duration:4800},
+
+  {subtitle:"הצעד הראשון: איזה סוג טקסט כותבים — חיבור דעה, מכתב או סיפור.",
+   action:function(){demoShow('[data-a="ktype"]')}, duration:4400},
+
+  {subtitle:"בוחרים חיבור דעה.",
+   action:function(){demoTap('[data-a="ktype"]')}, duration:4000},
+
+  {subtitle:"הצעד השני: הנושא. הקטעים שיוצעו בהמשך שייכים לנושא הזה בלבד.",
+   action:function(){demoTap('[data-a="ktopic"]')}, duration:4600},
+
+  {subtitle:"והצעד השלישי — ההרכבה. פתיחה, שתי טענות, דוגמה וסיכום.",
+   action:function(){}, duration:4400},
+
+  {subtitle:"פתיחה אחת.",
+   action:function(){demoTap('[data-a="kpick"][data-k="op"]')}, duration:3800},
+
+  {subtitle:"שתי טענות. הן נאספות לפי סדר הבחירה, וזה גם הסדר בטקסט.",
+   action:function(){demoClaims()}, duration:4400},
+
+  {subtitle:"דוגמה שמחזיקה את הטענה.",
+   action:function(){demoTap('[data-a="kpick"][data-k="ex"]')}, duration:4000},
+
+  {subtitle:"וסיכום שסוגר.",
+   action:function(){demoTap('[data-a="kpick"][data-k="cn"]')}, duration:3800},
+
+  {subtitle:"הכפתור אינו נעול בשום צעד: כשחסר חלק הוא אומר מה חסר, ולא חוסם.",
+   action:function(){demoShow("#kmiss")}, duration:4600},
+
+  {subtitle:"והנה הטקסט השלם — לא תרגיל, אלא משהו שאפשר להגיש.",
+   action:function(){demoTap('[data-a="kdone"]')}, duration:5000},
+
+  {subtitle:"אפשר לשמוע אותו. זו הבדיקה הכי טובה לטקסט שנכתב.",
+   action:function(){demoTap('[data-a="ksay"]')}, duration:5200},
+
+  {subtitle:"אפשר להעתיק אותו, ואפשר לחזור ולהחליף חלק.",
+   action:function(){demoTap('[data-a="kedit"]')}, duration:4400},
+
+  {subtitle:"הגדרות: שפת ממשק, בחירת קול, וארבע שפות בכל קטע.",
+   action:function(){demoTap('[data-a="set"]')}, duration:4600},
+
+  {subtitle:"וחזרה. בלי הרשמה, בלי פרסומות, והכול נשמר במכשיר הזה בלבד.",
+   action:function(){demoTap('[data-a="home"]')}, duration:4400}
+];
+
+/* --- מנוע ההדגמה. הקוד כאן זהה בכל האפליקציות; רק DEMO_SCRIPT משתנה. --- */
+var DEMO={on:false,i:0,timer:null,extra:[],bar:null,txt:null,step:null,fill:null,btn:null};
+
+/* עוזרים לתסריט. כולם מחזירים false כשהאיבר אינו על המסך, כדי
+   שצעד שלא מצא את מה שחיפש ידלג ולא יפיל את ההדגמה כולה. */
+function demoEl(s){return typeof s==="string"?document.querySelector(s):s}
+function demoShow(s){
+  var e=demoEl(s); if(!e)return false;
+  try{e.scrollIntoView({behavior:"smooth",block:"center"})}catch(err){try{e.scrollIntoView()}catch(err2){}}
+  return true;
+}
+/* מדגיש את האיבר, ורק אז לוחץ — צופה שלא ראה לאן נלחץ לא הבין
+   מה קרה. לכן אין צעד קצר מ-1200 אלפיות בתסריטים. */
+function demoTap(s){
+  var e=demoEl(s); if(!e||e.disabled)return false;
+  demoShow(e);
+  e.classList.add("demo-tap");
+  DEMO.extra.push(setTimeout(function(){
+    e.classList.remove("demo-tap");
+    /* המסך מצטייר מחדש כל הזמן. אם האיבר שסומן כבר אינו במסמך,
+       מחפשים אותו שוב לפי אותו בורר — לחיצה על איבר מת אינה
+       עושה דבר, וזה בדיוק צעד שנראה כאילו נתקע. */
+    var live=(typeof s==="string"&&!document.contains(e))?demoEl(s):e;
+    if(DEMO.on&&live&&!live.disabled&&document.contains(live))try{live.click()}catch(err){}
+  },430));
+  return true;
+}
+function demoClick(s){
+  var e=demoEl(s); if(!e||e.disabled)return false;
+  try{e.click()}catch(err){return false}
+  return true;
+}
+/* הקלדה אות אחר אות, עם אירוע input אמיתי — שדה חיפוש שמאזין
+   ל-input לא היה מגיב להשמה ישירה ל-value. */
+function demoType(s,text){
+  var e=demoEl(s); if(!e)return false;
+  demoShow(e); try{e.focus()}catch(err){}
+  e.value=""; var i=0;
+  var t=setInterval(function(){
+    if(!DEMO.on||!e.parentNode){clearInterval(t);return}
+    e.value=String(text).slice(0,++i);
+    e.dispatchEvent(new Event("input",{bubbles:true}));
+    if(i>=String(text).length)clearInterval(t);
+  },85);
+  DEMO.extra.push(t);
+  return true;
+}
+function demoQuiet(){
+  try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
+  try{if(typeof stopSpeak==="function")stopSpeak()}catch(e){}
+}
+
+/* --- שכבת הכתוביות וכפתור ההפעלה --- */
+var DEMO_CSS=''+
+'.demo-tap{outline:3px solid #ffd23f!important;outline-offset:3px;'+
+'  box-shadow:0 0 0 7px rgba(255,210,63,.30)!important;border-radius:12px}'+
+'#demo-start{position:fixed;z-index:2147481000;'+
+'  inset-block-end:calc(14px + env(safe-area-inset-bottom));'+
+'  inset-inline-start:calc(14px + env(safe-area-inset-left));'+
+'  display:flex;align-items:center;gap:.5rem;font:inherit;font-size:.92rem;font-weight:700;'+
+'  background:#0d1220;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:999px;'+
+'  padding:.7rem 1.15rem;cursor:pointer;box-shadow:0 10px 26px -8px rgba(0,0,0,.55)}'+
+'#demo-start[hidden],#demo-bar[hidden]{display:none!important}'+
+'#demo-bar{position:fixed;z-index:2147481000;inset-inline:0;'+
+'  inset-block-end:calc(14px + env(safe-area-inset-bottom));'+
+'  display:flex;justify-content:center;padding:0 14px;pointer-events:none}'+
+'#demo-sub{max-width:46rem;width:100%;background:rgba(9,13,22,.93);color:#f4f7ff;'+
+'  border:1px solid rgba(255,255,255,.14);border-radius:16px;overflow:hidden;'+
+'  box-shadow:0 18px 50px -16px rgba(0,0,0,.75);backdrop-filter:blur(4px)}'+
+'#demo-txt{margin:0;padding:14px 18px 10px;font:inherit;font-size:clamp(1rem,2.6vw,1.22rem);'+
+'  font-weight:600;line-height:1.5;text-align:center}'+
+'#demo-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;'+
+'  padding:0 14px 10px;font-size:.78rem;color:#aab6cc}'+
+'#demo-exit{pointer-events:auto;font:inherit;font-size:.78rem;font-weight:700;cursor:pointer;'+
+'  background:transparent;color:#aab6cc;border:1px solid rgba(255,255,255,.22);'+
+'  border-radius:999px;padding:.3rem .7rem}'+
+'#demo-prog{height:3px;background:rgba(255,255,255,.12)}'+
+'#demo-prog i{display:block;height:100%;width:0;background:#ffd23f}'+
+'html.demo-running .lg-install{display:none!important}'+
+'@media (prefers-reduced-motion:reduce){#demo-prog i{transition:none!important}}';
+
+function demoMountUI(){
+  var st=document.createElement("style");
+  st.id="demo-style"; st.textContent=DEMO_CSS;
+  (document.head||document.documentElement).appendChild(st);
+
+  var b=document.createElement("button");
+  b.id="demo-start"; b.type="button";
+  b.innerHTML='<span aria-hidden="true">▶</span><span>התחל הדגמה</span>';
+  b.addEventListener("click",demoStart);
+  document.body.appendChild(b);
+
+  var bar=document.createElement("div");
+  bar.id="demo-bar"; bar.hidden=true;
+  bar.setAttribute("role","status");
+  bar.setAttribute("aria-live","polite");
+  bar.innerHTML='<div id="demo-sub"><p id="demo-txt"></p>'+
+    '<div id="demo-meta"><span id="demo-step"></span>'+
+    '<button id="demo-exit" type="button">יציאה · ESC</button></div>'+
+    '<div id="demo-prog"><i></i></div></div>';
+  document.body.appendChild(bar);
+
+  DEMO.btn=b; DEMO.bar=bar;
+  DEMO.txt=document.getElementById("demo-txt");
+  DEMO.step=document.getElementById("demo-step");
+  DEMO.fill=bar.querySelector("#demo-prog i");
+  document.getElementById("demo-exit").addEventListener("click",function(){demoStop()});
+  document.addEventListener("keydown",demoKey,true);
+}
+
+/* ESC יוצא. הקשבה בשלב הלכידה, כדי שמסך שכבר מטפל ב-Escape
+   לא יבלע את המקש לפני שההדגמה ראתה אותו. */
+function demoKey(e){
+  if(!DEMO.on)return;
+  if(e.key==="Escape"||e.keyCode===27){
+    e.preventDefault(); e.stopPropagation();
+    demoStop();
+  }
+}
+
+function demoStart(){
+  if(DEMO.on)return;
+  DEMO.on=true; DEMO.i=0;
+  DEMO.btn.hidden=true; DEMO.bar.hidden=false;
+  document.documentElement.classList.add("demo-running");
+  demoNext();
+}
+
+function demoNext(){
+  if(!DEMO.on)return;
+  if(DEMO.i>=DEMO_SCRIPT.length){demoStop();return}
+  var it=DEMO_SCRIPT[DEMO.i++]||{};
+  var d=Math.max(600,it.duration||3000);
+  DEMO.txt.textContent=it.subtitle||"";
+  DEMO.step.textContent=DEMO.i+" / "+DEMO_SCRIPT.length;
+  DEMO.fill.style.transition="none"; DEMO.fill.style.width="0";
+  void DEMO.fill.offsetWidth;
+  DEMO.fill.style.transition="width "+d+"ms linear";
+  DEMO.fill.style.width="100%";
+  if(typeof it.action==="function"){
+    try{it.action()}catch(err){if(window.console)console.warn("demo:",err)}
+  }
+  DEMO.timer=setTimeout(demoNext,d);
+}
+
+function demoStop(){
+  DEMO.on=false;
+  if(DEMO.timer){clearTimeout(DEMO.timer);DEMO.timer=null}
+  DEMO.extra.forEach(function(t){clearTimeout(t);clearInterval(t)});
+  DEMO.extra=[];
+  var m=document.querySelectorAll(".demo-tap"),i;
+  for(i=0;i<m.length;i++)m[i].classList.remove("demo-tap");
+  if(DEMO.bar)DEMO.bar.hidden=true;
+  if(DEMO.btn)DEMO.btn.hidden=false;
+  document.documentElement.classList.remove("demo-running");
+  demoQuiet();
+}
+
+/* שער התנאים הוא חלון מודאלי מעל הכול. כפתור הדגמה מתחתיו היה
+   מפעיל אפליקציה שאי אפשר לראות, ולכן ממתינים שייסגר. */
+function demoMount(){
+  if(document.querySelector(".lg-wrap")){setTimeout(demoMount,500);return}
+  if(!document.getElementById("demo-start"))demoMountUI();
+}
+
+if(DEMO_ON){
+  if(document.readyState==="complete")setTimeout(demoMount,0);
+  else window.addEventListener("load",function(){setTimeout(demoMount,0)});
+}
+
+
+"use strict";
+/* ============================================================
+   1. עזרים
+   ============================================================ */
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function shuffle(a){var i,j,t;for(i=a.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));
+  t=a[i];a[i]=a[j];a[j]=t}return a}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function uniq(a){return a.filter(function(v,i){return a.indexOf(v)===i})}
+
+/* ============================================================
+   2. שפות הממשק
+   ארבע שפות אם. הן אינן תרגום של האפליקציה בלבד — הן הפיגום שדרכו
+   נלמדת העברית, ולכן כל מחרוזת לימודית קיימת בארבעתן.
+   ============================================================ */
+var LANGS={
+  he:{name:"עברית",   dir:"rtl", tts:"he-IL"},
+  ar:{name:"العربية", dir:"rtl", tts:"ar-SA"},
+  ru:{name:"Русский", dir:"ltr", tts:"ru-RU"},
+  en:{name:"English", dir:"ltr", tts:"en-US"}
+};
+var LEARN="he";           /* שפת הלימוד — מה שהלומד בא לרכוש */
+var LEARN_TTS=LANGS[LEARN].tts;
+
+var T={};
+T.he={
+  kProgSoon:"המונה עוד לא נאסף. הטקסטים שאתם בונים נשמרים אצלכם בלבד.",
+  kStep1:"מה כותבים?", kStep1D:"בוחרים סוג, ואחר כך נושא.", kStep2:"על מה?", kStep3:"בונים את הטקסט", kStep4:"הטקסט שלכם", kOpen:"פתיחה", kClaims:"טענות", kClaimsD:"בוחרים שתיים או שלוש.", kEx:"דוגמה", kConc:"סיכום", kMiss:"עוד חסר:", kAllSet:"הכול מוכן — אפשר להציג את הטקסט.", kShow:"הציגו את הטקסט", kRead:"הקריאו", kCopy:"העתיקו", kCopied:"הטקסט הועתק.", kEdit:"חזרה לעריכה", kNew:"טקסט חדש", kHear:"השמיעו את הקטע", kTooMany:"אפשר לבחור שלוש טענות לכל היותר.",
+  app:"כותבים ביחד", tagline:"בונים טקסט צעד אחר צעד",
+  navHome:"מסלולים", navProg:"התקדמות", navSet:"הגדרות", navExam:"מבחן", back:"חזרה",
+  heroT:"עברית שנשמעת לפני שהיא נקראת",
+  heroP:"כל מילה, כל משפט וכל טופס — עם כפתור השמעה. אפשר להאט, לחזור, ולראות את המשמעות בשפה שלכם. אין טיימר ואין עונש על טעות.",
+  start:"התחילו כאן", cont:"המשיכו מאיפה שהפסקתם",
+  trkSound:"אות וצליל", trkSoundD:"אותיות שנראות דומה, וניקוד שמשנה מילה",
+  trkWords:"מילים", trkWordsD:"המילים שחוזרות בכל יום",
+  trkTalk:"מדוברת", trkTalkD:"מה באמת אומרים בקופת חולים, בבנק ובעירייה",
+  trkRead:"שלטים וטפסים", trkReadD:"לקרוא שלט, טופס ומכתב רשמי",
+  lv1:"בסיס", lv2:"בנייה", lv3:"שוטף",
+  lv1D:"מילה אחת בכל פעם, עם תרגום", lv2D:"משפטים קצרים, פחות תרגום", lv3D:"עברית בלבד",
+  qMean:"מה המשמעות?", qHear:"איזו מילה שמעתם?", qGap:"מה חסר במשפט?",
+  qOrder:"סדרו את המשפט", qSay:"איך אומרים את זה בעברית?", qRead:"לפי הקטע:",
+  qUse:"איזה משפט מתאים למצב?",
+  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט",
+  check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", showAll:"הראו הכול",
+  correct:"נכון!", wrong:"עוד לא", answerIs:"התשובה:", why:"למה",
+  tapOrder:"לחצו על המילים לפי הסדר", clearSlot:"נקו",
+  progT:"ההתקדמות שלכם", progNone:"עוד לא התחלתם. כל מסלול נפתח מיד — אין נעילות.",
+  seen:"נראו", mastered:"נשלטות", streakL:"רצף", todayL:"היום", accL:"דיוק",
+  setT:"הגדרות", setVoice:"קול והקראה", setRead:"קריאות", setLang:"שפת הממשק",
+  vEngine:"מנוע הקול", vGem:"קול טבעי (ג׳מיני)", vDev:"קול המכשיר",
+  vGemD:"נשמע כמו אדם. דורש אינטרנט ומפתח חינמי.", vDevD:"עובד תמיד, גם בלי רשת.",
+  vFemale:"קולות נשיים", vMale:"קולות גבריים", vSample:"דוגמה",
+  vDevList:"קולות המכשיר", vAuto:"בחירה אוטומטית",
+  vNoneLang:"אין קול בשפה הזאת במכשיר",
+  femNone:"אין במכשיר קול נשי בשפה הזאת, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו.",
+  femAndroid:"באנדרואיד: הגדרות ← נגישות ← טקסט לדיבור (בסמסונג: הגדרות ← ניהול כללי ← טקסט לדיבור) ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי.",
+  femIos:"באייפון או באייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.",
+  femMac:"במק: הגדרות המערכת ← נגישות ← תוכן מדובר ← קול המערכת ← ניהול קולות ← להוריד קול נשי.",
+  femWin:"בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.",
+  edgeHas:"בדפדפן Microsoft Edge יש קולות טבעיים בשפה הזאת, נשיים וגבריים — בלי התקנה, בחיבור לאינטרנט.",openEdge:"לפתוח את האפליקציה ב-Edge",
+  vKey:"מפתח Gemini", vKeyPh:"מתחיל ב-AIza…", vSave:"שמרו", vShow:"הצג", vHide:"הסתר",
+  vSaved:"המפתח נשמר במכשיר הזה בלבד. הוא לא נשלח לשום מקום אחר.",
+  vRemoved:"המפתח נמחק.", vChecking:"בודקים…", vOk:"המפתח עובד.",
+  vErr:"המפתח לא התקבל.", vNeed:"קודם שמרו מפתח.",
+  vsOk:"קול טבעי פעיל", vsDev:"קול המכשיר", vsNoEn:"אין קול עברי במכשיר",
+  vsNoEnD:"אפשר להתקין קול עברי בהגדרות המכשיר, או להפעיל קול טבעי כאן.",
+  rate:"מהירות הקראה", slow:"לאט", fast:"מהר",
+  sayBtn:"כפתורים מדברים", sayBtnD:"כל כפתור שנלחץ מוקרא בשמו",
+  bigText:"טקסט גדול", bigTextD:"מגדיל את הכול יחד, לא רק את השאלה",
+  clearFont:"גופן קריא", clearFontD:"אותיות רחבות יותר, פחות דומות זו לזו",
+  spacing:"מרווח בין מילים", spacingD:"עוזר לעין לא לדלג על מילה",
+  contrast:"ניגודיות גבוהה", contrastD:"שחור על לבן, בלי גוונים רכים",
+  motion:"בלי אנימציות", motionD:"מבטל תנועה על המסך",
+  theme:"מראה", thAuto:"אוטומטי", thLight:"בהיר", thDark:"כהה",
+  reset:"איפוס התקדמות", resetD:"מוחק את כל מה שנשמר במכשיר הזה", resetAsk:"למחוק הכול?",
+  yes:"כן, מחקו", no:"לא",
+  savedNote:"ההתקדמות נשמרת אוטומטית במכשיר הזה בלבד.",
+  ofN:"מתוך", newWord:"מילה חדשה", review:"חזרה",
+  sumT1:"סבב חזק.", sumT2:"סבב טוב.", sumT3:"סבב עם עבודה.", sumT4:"סבב קשה — וזה בסדר.",
+  sumS1:"רוב מה שתרגלתם כאן יושב.", sumS2:"רוב הדברים במקום. עוד סבב אחד יחדד את מה שנשאר.",
+  sumS3:"חלק מהחומר עוד לא יושב, וזה בדיוק מה שהסבב נועד להראות. עוד סבב באותה רמה.",
+  sumS4:"סבב כזה אומר רק שהחומר עדיין חדש. עוד סבב, בקצב שלכם.",
+  sumOk:"נכון לבד", sumHp:"נכון עם רמז", sumNo:"לא נכון", sumAcc:"דיוק",
+  sumAgain:"סבב נוסף", sumUp:"לרמה הבאה", sumDown:"רמה אחת למטה", sumShare:"שליחה בוואטסאפ",
+  sumShareTxt:"{app} — {topic}, {lv}: {ok} מתוך {n} נכון.", sumStreak:"{n} ימים ברצף"
+};
+T.ar={
+  kProgSoon:"العدّاد لم يُجمَع بعد. النصوص التي تبنونها تبقى عندكم فقط.",
+  kStep1:"ماذا نكتب؟", kStep1D:"نختار نوعًا، ثم موضوعًا.", kStep2:"عن ماذا؟", kStep3:"نبني النصّ", kStep4:"نصّكم", kOpen:"مقدّمة", kClaims:"ادّعاءات", kClaimsD:"اختاروا اثنين أو ثلاثة.", kEx:"مثال", kConc:"خاتمة", kMiss:"ما زال ناقصًا:", kAllSet:"كلّ شيء جاهز — يمكن عرض النصّ.", kShow:"اعرضوا النصّ", kRead:"استمعوا", kCopy:"انسخوا", kCopied:"تمّ نسخ النصّ.", kEdit:"العودة للتحرير", kNew:"نصّ جديد", kHear:"استمعوا للمقطع", kTooMany:"يمكن اختيار ثلاثة ادّعاءات كحدّ أقصى.",
+  app:"نكتب معًا", tagline:"نبني النصّ خطوة بخطوة",
+  navHome:"المسارات", navProg:"التقدّم", navSet:"الإعدادات", navExam:"امتحان", back:"رجوع",
+  heroT:"عبرية تُسمَع قبل أن تُقرأ",
+  heroP:"كل كلمة وكل جملة وكل استمارة — مع زر استماع. يمكنك الإبطاء والإعادة ورؤية المعنى بلغتك. بلا مؤقّت وبلا عقاب على الخطأ.",
+  start:"ابدأ من هنا", cont:"تابع من حيث توقفت",
+  trkSound:"الحرف والصوت", trkSoundD:"حروف تتشابه في الشكل، وتشكيل يغيّر الكلمة",
+  trkWords:"مفردات", trkWordsD:"الكلمات التي تتكرّر كلّ يوم",
+  trkTalk:"محكية", trkTalkD:"ما يُقال فعلًا في العيادة والبنك والبلدية",
+  trkRead:"لافتات واستمارات", trkReadD:"قراءة لافتة واستمارة ورسالة رسمية",
+  lv1:"أساس", lv2:"بناء", lv3:"طلاقة",
+  lv1D:"كلمة واحدة كل مرة، مع ترجمة", lv2D:"جمل قصيرة، ترجمة أقل", lv3D:"عبرية فقط",
+  qMean:"ما المعنى؟", qHear:"أي كلمة سمعت؟", qGap:"ما الناقص في الجملة؟",
+  qOrder:"رتّب الجملة", qSay:"كيف تقول ذلك بالعبرية؟", qRead:"حسب النص:",
+  qUse:"أي جملة تناسب الموقف؟",
+  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع للكلمة", hearSent:"استمع للجملة",
+  check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", showAll:"أظهر الكل",
+  correct:"صحيح!", wrong:"ليس بعد", answerIs:"الإجابة:", why:"لماذا",
+  tapOrder:"اضغط الكلمات بالترتيب", clearSlot:"مسح",
+  progT:"تقدّمك", progNone:"لم تبدأ بعد. كل مسار مفتوح فورًا — بلا أقفال.",
+  seen:"شوهدت", mastered:"مُتقنة", streakL:"تتابع", todayL:"اليوم", accL:"الدقة",
+  setT:"الإعدادات", setVoice:"الصوت والقراءة", setRead:"سهولة القراءة", setLang:"لغة الواجهة",
+  vEngine:"محرّك الصوت", vGem:"صوت طبيعي (جيميني)", vDev:"صوت الجهاز",
+  vGemD:"يبدو كإنسان. يحتاج إنترنت ومفتاحًا مجانيًا.", vDevD:"يعمل دائمًا، حتى بلا شبكة.",
+  vFemale:"أصوات نسائية", vMale:"أصوات رجالية", vSample:"عيّنة",
+  vDevList:"أصوات الجهاز", vAuto:"اختيار تلقائي",
+  vNoneLang:"لا يوجد صوت بهذه اللغة في الجهاز",
+  femNone:"لا يوجد في هذا الجهاز صوت نسائي بهذه اللغة، لذلك رُفعت طبقة الصوت. هذا ليس صوتًا نسائيًا حقيقيًا — للحصول على واحد يجب تثبيته.",
+  femAndroid:"في أندرويد: الإعدادات ← إمكانية الوصول ← تحويل النص إلى كلام (في سامسونغ: الإعدادات ← الإدارة العامة ← تحويل النص إلى كلام) ← الترس بجانب المحرّك ← تثبيت بيانات الصوت ← اختيار نسخة نسائية.",
+  femIos:"في آيفون أو آيباد: الإعدادات ← إمكانية الوصول ← المحتوى المنطوق ← الأصوات ← اختيار صوت نسائي وتنزيله.",
+  femMac:"في ماك: إعدادات النظام ← إمكانية الوصول ← المحتوى المنطوق ← صوت النظام ← إدارة الأصوات ← تنزيل صوت نسائي.",
+  femWin:"في ويندوز: الإعدادات ← الوقت واللغة ← الكلام ← إدارة الأصوات ← إضافة أصوات.",
+  edgeHas:"في متصفح Microsoft Edge أصوات طبيعية لهذه اللغة، نسائية ورجالية — دون تثبيت، مع اتصال بالإنترنت.",openEdge:"افتح التطبيق في Edge",
+  vKey:"مفتاح Gemini", vKeyPh:"يبدأ بـ AIza…", vSave:"حفظ", vShow:"إظهار", vHide:"إخفاء",
+  vSaved:"حُفظ المفتاح على هذا الجهاز فقط، ولا يُرسل إلى أي مكان آخر.",
+  vRemoved:"حُذف المفتاح.", vChecking:"جارٍ الفحص…", vOk:"المفتاح يعمل.",
+  vErr:"لم يُقبل المفتاح.", vNeed:"احفظ مفتاحًا أولًا.",
+  vsOk:"الصوت الطبيعي مُفعّل", vsDev:"صوت الجهاز", vsNoEn:"لا يوجد صوت عبري في الجهاز",
+  vsNoEnD:"يمكن تثبيت صوت عبري من إعدادات الجهاز، أو تفعيل الصوت الطبيعي هنا.",
+  rate:"سرعة القراءة", slow:"بطيء", fast:"سريع",
+  sayBtn:"أزرار ناطقة", sayBtnD:"كل زرّ يُضغط يُقرأ باسمه",
+  bigText:"نص كبير", bigTextD:"يكبّر كل شيء معًا، لا السؤال وحده",
+  clearFont:"خط واضح", clearFontD:"حروف أعرض وأقل تشابهًا",
+  spacing:"تباعد بين الكلمات", spacingD:"يساعد العين على عدم تخطّي كلمة",
+  contrast:"تباين عالٍ", contrastD:"أسود على أبيض، بلا ألوان ناعمة",
+  motion:"بلا حركة", motionD:"يلغي الحركة على الشاشة",
+  theme:"المظهر", thAuto:"تلقائي", thLight:"فاتح", thDark:"داكن",
+  reset:"تصفير التقدّم", resetD:"يمحو كل ما حُفظ على هذا الجهاز", resetAsk:"محو الكل؟",
+  yes:"نعم، امحُ", no:"لا",
+  savedNote:"يُحفظ التقدّم تلقائيًا على هذا الجهاز فقط.",
+  ofN:"من", newWord:"كلمة جديدة", review:"مراجعة",
+  sumT1:"جولة قوية.", sumT2:"جولة جيّدة.", sumT3:"جولة فيها عمل.", sumT4:"جولة صعبة — ولا بأس.",
+  sumS1:"معظم ما تدرّبتم عليه هنا ثابت.", sumS2:"معظم الأمور في مكانها. جولة أخرى تصقل ما تبقّى.",
+  sumS3:"جزء من المادّة لم يثبت بعد، وهذا بالضبط ما تُظهره الجولة. جولة أخرى في المستوى نفسه.",
+  sumS4:"جولة كهذه تعني فقط أنّ المادّة ما زالت جديدة. جولة أخرى، على إيقاعكم.",
+  sumOk:"صحيح وحدكم", sumHp:"صحيح مع تلميح", sumNo:"غير صحيح", sumAcc:"الدقّة",
+  sumAgain:"جولة أخرى", sumUp:"إلى المستوى التالي", sumDown:"مستوى واحد أدنى", sumShare:"إرسال عبر واتساب",
+  sumShareTxt:"{app} — {topic}، {lv}: {ok} من {n} صحيحة.", sumStreak:"{n} أيام متتالية"
+};
+T.ru={
+  kProgSoon:"Счётчик пока не ведётся. Тексты, которые вы строите, остаются только у вас.",
+  kStep1:"Что пишем?", kStep1D:"Выберите тип, затем тему.", kStep2:"О чём?", kStep3:"Собираем текст", kStep4:"Ваш текст", kOpen:"Начало", kClaims:"Утверждения", kClaimsD:"Выберите два или три.", kEx:"Пример", kConc:"Вывод", kMiss:"Ещё не хватает:", kAllSet:"Всё готово — можно показать текст.", kShow:"Показать текст", kRead:"Прослушать", kCopy:"Копировать", kCopied:"Текст скопирован.", kEdit:"Вернуться к правке", kNew:"Новый текст", kHear:"Прослушать фрагмент", kTooMany:"Можно выбрать не более трёх утверждений.",
+  app:"Пишем вместе", tagline:"Строим текст шаг за шагом",
+  navHome:"Направления", navProg:"Прогресс", navSet:"Настройки", navExam:"Экзамен", back:"Назад",
+  heroT:"Иврит, который слышно раньше, чем читаешь",
+  heroP:"Каждое слово, каждая фраза и каждый бланк — с кнопкой прослушивания. Можно замедлить, повторить и увидеть значение на своём языке. Без таймера и без наказания за ошибку.",
+  start:"Начать здесь", cont:"Продолжить с места остановки",
+  trkSound:"Буква и звук", trkSoundD:"Похожие на вид буквы и огласовки, меняющие слово",
+  trkWords:"Слова", trkWordsD:"Слова, которые нужны каждый день",
+  trkTalk:"Разговорный", trkTalkD:"Что действительно говорят в поликлинике, банке и мэрии",
+  trkRead:"Вывески и бланки", trkReadD:"Прочитать вывеску, бланк и официальное письмо",
+  lv1:"Основа", lv2:"Сборка", lv3:"Свободно",
+  lv1D:"По одному слову, с переводом", lv2D:"Короткие фразы, меньше перевода", lv3D:"Только иврит",
+  qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?",
+  qOrder:"Соберите предложение", qSay:"Как сказать это на иврите?", qRead:"По тексту:",
+  qUse:"Какая фраза подходит к ситуации?",
+  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать слово", hearSent:"Послушать фразу",
+  check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", showAll:"Показать всё",
+  correct:"Верно!", wrong:"Пока нет", answerIs:"Ответ:", why:"Почему",
+  tapOrder:"Нажимайте слова по порядку", clearSlot:"Очистить",
+  progT:"Ваш прогресс", progNone:"Вы ещё не начинали. Все направления открыты сразу — без замков.",
+  seen:"Просмотрено", mastered:"Освоено", streakL:"Серия", todayL:"Сегодня", accL:"Точность",
+  setT:"Настройки", setVoice:"Голос и чтение", setRead:"Читаемость", setLang:"Язык интерфейса",
+  vEngine:"Голосовой движок", vGem:"Естественный голос (Gemini)", vDev:"Голос устройства",
+  vGemD:"Звучит как человек. Нужен интернет и бесплатный ключ.", vDevD:"Работает всегда, даже без сети.",
+  vFemale:"Женские голоса", vMale:"Мужские голоса", vSample:"Пример",
+  vDevList:"Голоса устройства", vAuto:"Автоматически",
+  vNoneLang:"На устройстве нет голоса для этого языка",
+  femNone:"На этом устройстве нет женского голоса для этого языка, поэтому тон голоса повышен. Это не настоящий женский голос — чтобы получить его, его нужно установить.",
+  femAndroid:"В Android: Настройки → Спец. возможности → Синтез речи (в Samsung: Настройки → Общие настройки → Синтез речи) → шестерёнка рядом с движком → Установить голосовые данные → выбрать женский вариант.",
+  femIos:"В iPhone или iPad: Настройки → Универсальный доступ → Устный контент → Голоса → выбрать женский голос и загрузить.",
+  femMac:"В Mac: Системные настройки → Универсальный доступ → Устный контент → Системный голос → Управление голосами → загрузить женский голос.",
+  femWin:"В Windows: Параметры → Время и язык → Речь → Управление голосами → Добавить голоса.",
+  edgeHas:"В браузере Microsoft Edge есть естественные голоса для этого языка, женские и мужские — без установки, при подключении к интернету.",openEdge:"Открыть приложение в Edge",
+  vKey:"Ключ Gemini", vKeyPh:"начинается с AIza…", vSave:"Сохранить", vShow:"Показать", vHide:"Скрыть",
+  vSaved:"Ключ сохранён только на этом устройстве и никуда не отправляется.",
+  vRemoved:"Ключ удалён.", vChecking:"Проверяем…", vOk:"Ключ работает.",
+  vErr:"Ключ не принят.", vNeed:"Сначала сохраните ключ.",
+  vsOk:"Естественный голос включён", vsDev:"Голос устройства", vsNoEn:"На устройстве нет голоса на иврите",
+  vsNoEnD:"Голос на иврите можно установить в настройках устройства или включить естественный голос здесь.",
+  rate:"Скорость чтения", slow:"Медленно", fast:"Быстро",
+  sayBtn:"Говорящие кнопки", sayBtnD:"Каждая нажатая кнопка произносит своё название",
+  bigText:"Крупный текст", bigTextD:"Увеличивает всё сразу, а не только вопрос",
+  clearFont:"Читаемый шрифт", clearFontD:"Буквы шире и меньше похожи друг на друга",
+  spacing:"Промежутки между словами", spacingD:"Помогает глазу не перескакивать через слово",
+  contrast:"Высокий контраст", contrastD:"Чёрное на белом, без мягких оттенков",
+  motion:"Без анимаций", motionD:"Отключает движение на экране",
+  theme:"Оформление", thAuto:"Авто", thLight:"Светлое", thDark:"Тёмное",
+  reset:"Сбросить прогресс", resetD:"Удаляет всё сохранённое на этом устройстве", resetAsk:"Удалить всё?",
+  yes:"Да, удалить", no:"Нет",
+  savedNote:"Прогресс сохраняется автоматически только на этом устройстве.",
+  ofN:"из", newWord:"новое слово", review:"повторение",
+  sumT1:"Сильный круг.", sumT2:"Хороший круг.", sumT3:"Круг с работой.", sumT4:"Трудный круг — и это нормально.",
+  sumS1:"Большая часть того, что вы здесь отрабатывали, усвоена.", sumS2:"Почти всё на месте. Ещё один круг отточит остальное.",
+  sumS3:"Часть материала ещё не усвоена, и именно это круг и должен показать. Ещё один круг на том же уровне.",
+  sumS4:"Такой круг значит только одно: материал ещё новый. Ещё один круг, в своём темпе.",
+  sumOk:"Верно сами", sumHp:"Верно с подсказкой", sumNo:"Неверно", sumAcc:"Точность",
+  sumAgain:"Ещё круг", sumUp:"На уровень выше", sumDown:"На уровень ниже", sumShare:"Отправить в WhatsApp",
+  sumShareTxt:"{app} — {topic}, {lv}: {ok} из {n} верно.", sumStreak:"{n} дней подряд"
+};
+T.en={
+  kProgSoon:"The counter is not collected yet. The texts you build stay with you only.",
+  kStep1:"What are we writing?", kStep1D:"Pick a type, then a topic.", kStep2:"About what?", kStep3:"Build the text", kStep4:"Your text", kOpen:"Opening", kClaims:"Claims", kClaimsD:"Choose two or three.", kEx:"Example", kConc:"Conclusion", kMiss:"Still missing:", kAllSet:"All set — you can show the text.", kShow:"Show the text", kRead:"Listen", kCopy:"Copy", kCopied:"Text copied.", kEdit:"Back to editing", kNew:"New text", kHear:"Play this part", kTooMany:"You can pick at most three claims.",
+  app:"Writing together", tagline:"Building a text step by step",
+  navHome:"Tracks", navProg:"Progress", navSet:"Settings", navExam:"Exam", back:"Back",
+  heroT:"Hebrew you hear before you read it",
+  heroP:"Every word, every sentence and every form comes with a play button. Slow it down, repeat it, and see the meaning in your own language. No timer, and no penalty for a wrong answer.",
+  start:"Start here", cont:"Pick up where you left off",
+  trkSound:"Letter and sound", trkSoundD:"Letters that look alike, and vowel points that change a word",
+  trkWords:"Words", trkWordsD:"The words you need every day",
+  trkTalk:"Spoken", trkTalkD:"What people actually say at the clinic, the bank and the council",
+  trkRead:"Signs and forms", trkReadD:"Reading a sign, a form and an official letter",
+  lv1:"Foundation", lv2:"Building", lv3:"Fluent",
+  lv1D:"One word at a time, with a translation", lv2D:"Short sentences, less translation", lv3D:"Hebrew only",
+  qMean:"What does it mean?", qHear:"Which word did you hear?", qGap:"What is missing?",
+  qOrder:"Put the sentence in order", qSay:"How do you say this in Hebrew?", qRead:"According to the passage:",
+  qUse:"Which sentence fits the situation?",
+  hear:"Play", hearSlow:"Slowly", hearWord:"Play the word", hearSent:"Play the sentence",
+  check:"Check", next:"Next", again:"Again", dunno:"I don't know", showAll:"Show all",
+  correct:"Correct!", wrong:"Not yet", answerIs:"Answer:", why:"Why",
+  tapOrder:"Tap the words in order", clearSlot:"Clear",
+  progT:"Your progress", progNone:"You have not started yet. Every track is open right away — nothing is locked.",
+  seen:"Seen", mastered:"Mastered", streakL:"Streak", todayL:"Today", accL:"Accuracy",
+  setT:"Settings", setVoice:"Voice and reading", setRead:"Readability", setLang:"Interface language",
+  vEngine:"Voice engine", vGem:"Natural voice (Gemini)", vDev:"Device voice",
+  vGemD:"Sounds human. Needs the internet and a free key.", vDevD:"Always works, even offline.",
+  vFemale:"Female voices", vMale:"Male voices", vSample:"Sample",
+  vDevList:"Device voices", vAuto:"Automatic",
+  vNoneLang:"No voice for this language on this device",
+  femNone:"This device has no female voice for this language, so the pitch is raised. It is not a real female voice — to get one it has to be installed.",
+  femAndroid:"On Android: Settings → Accessibility → Text-to-speech (on Samsung: Settings → General management → Text-to-speech) → the gear next to the engine → Install voice data → pick a female variant.",
+  femIos:"On iPhone or iPad: Settings → Accessibility → Spoken Content → Voices → pick a female voice and download it.",
+  femMac:"On Mac: System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → download a female voice.",
+  femWin:"On Windows: Settings → Time & language → Speech → Manage voices → Add voices.",
+  edgeHas:"Microsoft Edge has natural voices for this language, female and male — nothing to install, with an internet connection.",openEdge:"Open the app in Edge",
+  vKey:"Gemini key", vKeyPh:"starts with AIza…", vSave:"Save", vShow:"Show", vHide:"Hide",
+  vSaved:"The key is stored on this device only. It is not sent anywhere else.",
+  vRemoved:"Key removed.", vChecking:"Checking…", vOk:"The key works.",
+  vErr:"The key was not accepted.", vNeed:"Save a key first.",
+  vsOk:"Natural voice on", vsDev:"Device voice", vsNoEn:"No Hebrew voice on this device",
+  vsNoEnD:"You can install a Hebrew voice in your device settings, or turn on the natural voice here.",
+  rate:"Reading speed", slow:"Slow", fast:"Fast",
+  sayBtn:"Talking buttons", sayBtnD:"Every button you press says its name",
+  bigText:"Large text", bigTextD:"Scales everything together, not just the question",
+  clearFont:"Readable font", clearFontD:"Wider letters that look less alike",
+  spacing:"Word spacing", spacingD:"Helps the eye not skip a word",
+  contrast:"High contrast", contrastD:"Black on white, no soft tints",
+  motion:"No animation", motionD:"Turns off movement on screen",
+  theme:"Appearance", thAuto:"Auto", thLight:"Light", thDark:"Dark",
+  reset:"Reset progress", resetD:"Deletes everything saved on this device", resetAsk:"Delete everything?",
+  yes:"Yes, delete", no:"No",
+  savedNote:"Progress is saved automatically on this device only.",
+  ofN:"of", newWord:"new word", review:"review",
+  sumT1:"A strong round.", sumT2:"A good round.", sumT3:"A round with work in it.", sumT4:"A hard round — and that's fine.",
+  sumS1:"Most of what you practised here has stuck.", sumS2:"Most of it is in place. One more round will sharpen the rest.",
+  sumS3:"Some of it hasn't settled yet, which is exactly what a round is for. Another round at the same level.",
+  sumS4:"A round like this only means the material is still new. Another round, at your pace.",
+  sumOk:"Right on your own", sumHp:"Right with a hint", sumNo:"Not right", sumAcc:"Accuracy",
+  sumAgain:"Another round", sumUp:"Next level", sumDown:"One level down", sumShare:"Send on WhatsApp",
+  sumShareTxt:"{app} — {topic}, {lv}: {ok} of {n} right.", sumStreak:"{n} days in a row"
+};
+function t(k){var d=T[state.lang]||T.he;return d[k]!==undefined?d[k]:(T.he[k]!==undefined?T.he[k]:k)}
+/* המשמעות בשפת האם. נופלים לאנגלית ולא לעברית: מי שלמד ברוסית וחסר
+   לו תרגום יבין "a large boat" הרבה לפני "אונייה". */
+/* ------------------------------------------------------------
+   עברית בתוך ממשק שאינו עברי. ה-CSS נותן כיוון וגופן, אבל קורא
+   מסך בוחר מנוע לפי lang: כשהממשק רוסי ה-html הוא lang="ru",
+   ומילה עברית בלי סימון נמסרת למנוע הרוסי — ועם ניקוד זו אות
+   ועוד שני סימנים לכל תו. WCAG 2.2 §3.1.2.
+   lrn() נושא גם את .lrn-b, ולכן טקסט שאינו עברי אינו מקבל את
+   הכיווניות הכפויה: תשובה ברוסית קיבלה עד כה direction:rtl.
+   ------------------------------------------------------------ */
+var HEB_RE=/[\u0590-\u05FF]/;
+function heb(x){x=String(x==null?"":x);
+  return HEB_RE.test(x)?'<span lang="he" dir="rtl">'+esc(x)+"</span>":esc(x)}
+function lrn(x){x=String(x==null?"":x);
+  return HEB_RE.test(x)?'<span class="lrn-b" lang="he" dir="rtl">'+esc(x)+"</span>":esc(x)}
+
+/* ============================================================
+   3. אייקונים — SVG בקוד, אפס בקשות רשת
+   ============================================================ */
+var ICONS={
+  play:'<path d="M6 4l14 8-14 8z"/>',
+  /* "לאט" חייב להיראות אחרת מ"נגן", אחרת יש שני כפתורים זהים זה
+     ליד זה. הקו האנכי הקודם היה path בלי מילוי — הוא לא צויר כלל. */
+  slow:'<path d="M4 4l10 8-10 8z"/><rect x="16" y="5" width="2.4" height="14" rx="1"/><rect x="20" y="5" width="2.4" height="14" rx="1"/>',
+  stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
+  check:'<path d="M4 12l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>',
+  arrow:'<path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+  back:'<path d="M19 12H6M11.5 5.5 5 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  copy:'<rect x="9" y="9" width="11" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 15V5a2 2 0 0 1 2-2h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  plus:'<path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  share:'<path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 16V3M7.5 7.5 12 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  speaker:'<path d="M11 5 6.5 9H3v6h3.5L11 19V5ZM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  home:'<path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  gear:'<circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>',
+  book:'<path d="M4 4h7a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M20 4h-3a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  eye:'<path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/>',
+  key:'<circle cx="8" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 12h9M18 12v3M21 12v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  redo:'<path d="M20 11a8 8 0 1 0-2.3 6.1" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
+};
+function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="'+s+
+  '" aria-hidden="true" focusable="false" fill="currentColor">'+(ICONS[n]||"")+'</svg>'}
+
+/* ============================================================
+   4. מצב ושמירה
+   ============================================================ */
+var BUILD="k7 · 2026-09-10";
+var SKEY="kotvim-state-v1";
+var GKEY_STORE="kotvim-gkey";
+
+function blankState(){
+  return {
+    lang:null,            /* נקבע לפי שפת הדפדפן בהפעלה הראשונה */
+    screen:"home",
+    voiceMode:"device",   /* "device" | "gem" */
+    gemVoice:"Kore",
+    devVoice:{},          /* קוד שפה → voiceURI שנבחר ידנית */
+    rate:0.95,
+    big:false, clear:false, spaced:false, hc:false, rm:false, theme:"auto",
+    sayBtn:true           /* כל כפתור שנלחץ מוקרא בשמו (O-29) */
+  };
+}
+var state=blankState();
+
+function load(){
+  try{
+    var raw=localStorage.getItem(SKEY); if(!raw)return;
+    var o=JSON.parse(raw); if(!o||typeof o!=="object")return;
+    Object.keys(blankState()).forEach(function(k){if(o[k]!==undefined)state[k]=o[k]});
+  }catch(e){}
+  if(!LANGS[state.lang])state.lang=guessLang();
+  if(GEM_VOICES.every(function(v){return v.id!==state.gemVoice}))state.gemVoice="Kore";
+  state.rate=clamp(Number(state.rate)||0.95,0.6,1.3);
+}
+function save(){try{localStorage.setItem(SKEY,JSON.stringify(state))}catch(e){}}
+
+/* שפת הדפדפן, לא ברירת מחדל עברית. מי שפותח את האפליקציה במכשיר
+   ברוסית לא אמור להיתקל קודם במסך בעברית שאינו יכול לקרוא. */
+/* אנגלית אינה סימן. טלפון בישראל מדווח אנגלית כברירת מחדל של
+   המכשיר, לא כבחירה, והאפליקציה נפתחה באנגלית למי שבא ללמוד
+   בעברית. ערבית ורוסית כן נחשבות — שם זו שפת אם של ממש. מי
+   שרוצה אנגלית בוחר אותה, והבחירה נשמרת. */
+function guessLang(){
+  var ls=(navigator.languages||[navigator.language||"he"]).map(function(x){
+    return String(x).toLowerCase().split("-")[0]});
+  for(var i=0;i<ls.length;i++){
+    var c=ls[i]==="iw"?"he":ls[i];
+    if(c==="en")continue;
+    if(LANGS[c])return c;
+  }
+  return "he";
+}
+
+/* ============================================================
+   5. מצבי קריאות
+   ============================================================ */
+var booted=false;
+function applyModes(){
+  var r=document.documentElement;
+  if(!LANGS[state.lang])state.lang=guessLang();
+  r.lang=state.lang; r.dir=LANGS[state.lang].dir;
+  r.style.setProperty("--fs",state.big?"20px":"17px");
+  r.classList.toggle("clear",!!state.clear);
+  r.classList.toggle("spaced",!!state.spaced);
+  r.classList.toggle("hc",!!state.hc);
+  r.classList.toggle("rm",!!state.rm);
+  if(state.theme==="auto")r.removeAttribute("data-theme");
+  else r.setAttribute("data-theme",state.theme);
+  /* הכותרת נשארה עברית קשיחה מה-HTML גם אחרי החלפת שפה: הכיווניות
+     והכותרת שעל המסך התחלפו, אבל לשונית הדפדפן, הסימנייה ושם
+     האפליקציה המותקנת נשארו בעברית. השם והתיאור כבר מתורגמים. */
+  try{ document.title=t("app")+" — "+t("tagline") }catch(e){}
+}
+function announce(m,ans){
+  var e=$("#live"); if(!e)return;
+  /* אזור ההודעות יורש את שפת הממשק. תשובה עברית בתוכו נמסרה למנוע
+     הרוסי או הערבי — מסמנים אותה כעברית, ורק אותה. */
+  if(ans===undefined){e.textContent=m;return}
+  e.innerHTML=esc(m)+" "+heb(ans);
+}
+
+/* ============================================================
+   6. קול
+   שני מנועים ושתי שפות. העברית היא החומר הנלמד ולכן היא חייבת
+   להישמע נכון; שפת האם משמשת להוראות בלבד. הבחירה נעשית לכל שפה
+   בנפרד — קול רוסי שמקריא עברית הוא בדיוק הכישלון שהאפליקציה
+   הזאת קיימת כדי למנוע.
+   הקצב אצל ג׳מיני אינו פרמטר: ה-API מחזיר 400 על audioConfig,
+   ולכן הוא מתבקש במילים בתוך הטקסט.
+   ============================================================ */
+var GEM_VOICES=[
+  {id:"Kore",   g:"f", he:"קורֵה",    ar:"كوري",   ru:"Коре",    en:"Kore",
+   dhe:"רגוע וברור",  dar:"هادئ وواضح",     dru:"Спокойный и чёткий", den:"Calm and clear"},
+  {id:"Aoede",  g:"f", he:"אאודֵה",   ar:"آودي",   ru:"Аэда",    en:"Aoede",
+   dhe:"חם ונעים",    dar:"دافئ ولطيف",     dru:"Тёплый и мягкий",    den:"Warm and gentle"},
+  {id:"Leda",   g:"f", he:"לֵדָה",     ar:"ليدا",   ru:"Леда",    en:"Leda",
+   dhe:"צעיר וקליל",  dar:"شاب وخفيف",      dru:"Молодой и лёгкий",   den:"Young and light"},
+  {id:"Autonoe",g:"f", he:"אוטונואה", ar:"أوتونوي",ru:"Автоноя", en:"Autonoe",
+   dhe:"בהיר ומדויק", dar:"مشرق ودقيق",     dru:"Ясный и точный",     den:"Bright and precise"},
+  {id:"Puck",   g:"m", he:"פָּאק",     ar:"باك",    ru:"Пак",     en:"Puck",
+   dhe:"ער וזורם",    dar:"حيوي وسلس",      dru:"Живой и плавный",    den:"Lively and flowing"},
+  {id:"Charon", g:"m", he:"כָארוֹן",   ar:"كارون",  ru:"Харон",   en:"Charon",
+   dhe:"עמוק ושקול",  dar:"عميق ومتزن",     dru:"Глубокий и ровный",  den:"Deep and steady"},
+  {id:"Orus",   g:"m", he:"אוֹרוּס",   ar:"أوروس",  ru:"Орус",    en:"Orus",
+   dhe:"יציב ונינוח", dar:"ثابت ومسترخٍ",   dru:"Ровный и спокойный", den:"Stable and relaxed"},
+  {id:"Fenrir", g:"m", he:"פֶנְריר",   ar:"فنرير",  ru:"Фенрир",  en:"Fenrir",
+   dhe:"נמרץ יותר",   dar:"أكثر حيوية",     dru:"Более энергичный",   den:"More energetic"}
+];
+function gvOf(id){for(var i=0;i<GEM_VOICES.length;i++)if(GEM_VOICES[i].id===id)return GEM_VOICES[i];
+  return GEM_VOICES[0]}
+function gvName(v){return v[state.lang]||v.en}
+function gvDesc(v){return v["d"+state.lang]||v.den}
+
+var GKEY="";
+function loadKey(){try{GKEY=localStorage.getItem(GKEY_STORE)||""}catch(e){GKEY=""}}
+function saveKey(k){GKEY=k||"";try{k?localStorage.setItem(GKEY_STORE,k):localStorage.removeItem(GKEY_STORE)}catch(e){}}
+function hasKey(){return !!GKEY}
+function gemOn(){return state.voiceMode==="gem"&&hasKey()}
+
+/* --- קול המכשיר, לפי שפה --- */
+function allVoices(){try{return window.speechSynthesis?(speechSynthesis.getVoices()||[]):[]}catch(e){return[]}}
+/* הקולות נטענים אסינכרונית, ורק אז נורה voiceschanged. מי שמקריא
+   לפני כן מקבל את ברירת המחדל של הדפדפן — לרוב קול אנגלי, גם כשמותקן
+   קול עברי טוב. onvoiceschanged לבדו אינו פתרון: הוא מרענן תפריט,
+   הוא לא מעכב את האמירה הראשונה. */
+var _voicesP=null;
+function voicesReady(){
+  if(_voicesP)return _voicesP;
+  _voicesP=new Promise(function(done){
+    if(!("speechSynthesis" in window)){done();return}
+    if(allVoices().length){done();return}
+    var poll=null,cap=null,fired=false;
+    function finish(){
+      if(fired)return; fired=true;
+      clearInterval(poll); clearTimeout(cap);
+      try{speechSynthesis.removeEventListener("voiceschanged",finish)}catch(e){}
+      done();
+    }
+    try{speechSynthesis.addEventListener("voiceschanged",finish)}catch(e){}
+    /* Safari לא תמיד יורה את האירוע — לכן גם דגימה */
+    poll=setInterval(function(){if(allVoices().length)finish()},120);
+    /* תקרה: יש מכשירים שמחזירים רשימה ריקה לצמיתות ומדברים מצוין.
+       עדיף לדבר בקול ברירת מחדל מאשר לשתוק לנצח. */
+    cap=setTimeout(finish,4000);
+  });
+  return _voicesP;
+}
+var LANG_HINT={he:/עברית|hebrew|ivrit/i,ar:/العربية|arabic/i,ru:/русский|russian/i,en:/english/i};
+/* שמות שהמערכות באמת מתקינות. חסרו כאן קולות ערביים ורוסיים,
+   ואז שניהם חזרו "לא ידוע" — איש מהם לא קיבל את בונוס המגדר,
+   וההכרעה נפלה על התאמת אזור מדויקת. כך נבחר קול גברי כשקיים
+   קול נשי באותה שפה. */
+var V_F=/(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/
+var V_M=/(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/
+function vGender(v){var n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
+  return V_F.test(n)?"f":V_M.test(n)?"m":"?"}
+function voicesFor(code){
+  var base=String(code).split("-")[0].toLowerCase(),hint=LANG_HINT[base];
+  return allVoices().filter(function(v){
+    var l=String(v.lang||"").replace("_","-").toLowerCase();
+    if(l.split("-")[0]===base)return true;
+    return !l&&hint?hint.test(v.name||""):false;
+  });
+}
+/* בורר קולות המכשיר. עד כה לא היה כזה בכלל: bestVoice בחר לבד,
+   והמשתמש לא יכול היה להשפיע — כולל לבקש קול נשי. */
+/* אין קול נשי בשפה שמוצגת? femLift מרים את הגובה, וזה כל מה
+   שדפדפן יכול לעשות בלי הקלטות ובלי שירות חיצוני. ההודעה מסבירה
+   את זה ומצרפת את ההוראות למערכת ההפעלה שהמשתמש נמצא בה — קול
+   נשי שמותקן נבחר מיד, בלי שינוי הגובה ובלי הודעה. */
+/* כרום על ווינדוס אין לו קולות משלו: הוא רואה רק את קולות המערכת,
+   ובעברית המערכת מציעה אחד בלבד — Asaf הגברי. "הוספת קולות" לא
+   תביא קול נשי בעברית, כי כזה אין למיקרוסופט להתקנה; ובערבית
+   וברוסית, בלי חבילת שפה, אין אף קול. Edge לעומתו נושא קולות
+   טבעיים משלו בארבע השפות, נשיים וגבריים (Hila ו-Avri בעברית).
+   הסכימה microsoft-edge: פותחת את אותה כתובת ב-Edge מתוך כל דפדפן
+   בווינדוס — לחיצה אחת במקום מסלול הגדרות שלא מוביל לשום מקום.
+   נצפה ב-4.9.2026 בכרום על ווינדוס: בעברית Asaf בלבד, בערבית כלום. */
+function isWinNotEdge(){var ua=navigator.userAgent||"";return /Windows/i.test(ua)&&!/Edg\//.test(ua)}
+function edgeNote(){
+  if(!isWinNotEdge())return "";
+  return " "+esc(t("edgeHas"))+' <a href="microsoft-edge:'+esc(location.href.split("#")[0])+'" style="font-weight:700;color:inherit">'+esc(t("openEdge"))+"</a>";
+}
+function femNote(pool){
+  if(!pool||!pool.length)return "";
+  for(var i=0;i<pool.length;i++)if(vGender(pool[i])==="f")return "";
+  /* המסלול נכתב למערכת שהמשתמש נמצא בה עכשיו. אנדרואיד של גוגל
+     מחזיק את ההגדרה תחת "נגישות" — "ניהול כללי" הוא מסלול של
+     סמסונג בלבד; אייפד מדווח מאז iPadOS 13 כמו מק ונבדל ממנו רק
+     במסך מגע; ומשתמש מק קיבל עד כה הוראות של ווינדוס, כי כל מה
+     שאינו אנדרואיד או אייפון נפל לשם. */
+  var ua=navigator.userAgent||"";
+  var how=/Android/i.test(ua)?"femAndroid"
+         :(/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/i.test(ua)&&navigator.maxTouchPoints>1))?"femIos"
+         :/Mac OS X|Macintosh/i.test(ua)?"femMac":"femWin";
+  return t("femNone")+" "+t(how);
+}
+function devPicker(lgs){
+  var out="";
+  lgs.forEach(function(lg){
+    var code=LANGS[lg].tts;
+    var pool=voicesFor(code);
+    if(lgs.length>1)out+='<p style="font-weight:700;margin:.9rem 0 .3rem">'+esc(LANGS[lg]?LANGS[lg].name:code)+"</p>";
+    if(!pool.length){
+      /* אומרים את זה במפורש. רשימה ריקה בלי הסבר נראית כמו תקלה. */
+      out+='<p class="chip bad" style="margin:.4rem 0">'+esc(t("vNoneLang"))+"</p>";
+      var en=edgeNote();if(en)out+='<p class="sub" style="margin:.4rem 0;line-height:1.5">'+en+"</p>";
+      return;
+    }
+    /* אין קול נשי בשפה הזאת? הגובה מורם — וגם נאמר למה. בלי המשפט
+       הזה הקול הגברי נראה כמו בחירה של האפליקציה ולא כמו מה שיש
+       במכשיר, ואין שום רמז שאפשר להתקין קול נשי ולקבל אותו מיד. */
+    var fnote=femNote(pool);
+    if(fnote)out+='<p class="sub" style="margin:.4rem 0;line-height:1.5">'+esc(fnote)+edgeNote()+"</p>";
+    var cur=(state.devVoice||{})[code]||"";
+    function row(v){
+      var on=v?cur===v.voiceURI:!cur;
+      var uri=v?v.voiceURI:"";
+      return '<div class="vopt'+(on?" on":"")+'" data-a="devvoice" data-l="'+lg+'" data-u="'+esc(uri)+
+        '" role="button" tabindex="0" aria-pressed="'+(on?"true":"false")+'">'+
+        '<span style="flex:1"><span class="nm">'+esc(v?v.name:t("vAuto"))+'</span><br>'+
+        '<span class="ds">'+esc(v?v.lang:t("vDevD"))+"</span></span>"+
+        (v?'<button class="btn ghost" data-a="devsample" data-l="'+lg+'" data-u="'+esc(uri)+
+           '" style="padding:.35rem .7rem;min-height:2.2rem;font-size:.82rem">'+
+           ic("play",14)+" "+esc(t("vSample"))+"</button>":"")+"</div>";
+    }
+    out+='<div class="vgrid">'+row(null)+"</div>";
+    /* שלוש קבוצות. מי שלא זוהה מקבל קבוצה משלו ולא מנוחש: אין שדה
+       מגדר ב-Web Speech API, ואנדרואיד מדווח שמות שאינם נושאים מגדר. */
+    [["f",t("vFemale")],["m",t("vMale")],["?",t("vDevList")]].forEach(function(grp){
+      var gv=pool.filter(function(v){return vGender(v)===grp[0]});
+      if(!gv.length)return;
+      out+='<p style="font-weight:700;margin:.9rem 0 .3rem">'+esc(grp[1])+"</p>"+
+           '<div class="vgrid">'+gv.slice(0,20).map(row).join("")+"</div>";
+    });
+  });
+  return out;
+}
+function bestVoice(code){
+  var pool=voicesFor(code); if(!pool.length)return null;
+  /* בחירה ידנית גוברת על הניקוד. היא נשמרת לכל שפה בנפרד:
+     קול שנבחר לרוסית אינו רלוונטי כשמקריאים עברית. */
+  var want0=(state.devVoice||{})[code];
+  if(want0){var hit=pool.filter(function(v){return v.voiceURI===want0})[0]; if(hit)return hit}
+  var want=String(code).toLowerCase();
+  var pref=state.gemVoice&&gvOf(state.gemVoice).g==="m"?"m":"f";
+  function score(v){
+    var s=0,n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
+    if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
+    if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
+    if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    /* קול רשת — הנוירליים של Edge הם כאלה — נשמע טוב יותר כשיש
+       רשת, וזה כל מה שנקבע כאן. מה קורה כשאין רשת נקבע ב-voiceUsable,
+       שהוא מיון קודם: קנס בתוך הניקוד לא הצליח להתגבר על שם היצרן. */
+    if(v.localService===false&&voiceUsable(v))s+=6;
+    if(/espeak|compact|pico/.test(n))s-=40;
+    if(v.default)s+=4;
+    return s;
+  }
+  /* המגדר אינו עוד סעיף בתוך הניקוד אלא המיון הראשון. עשר נקודות
+     נבלעו מול שלושים על שם יצרן, וקול גברי ממותג ניצח קול נשי
+     שקיים באותו מכשיר — בדיוק מה שהעדפת המגדר הייתה אמורה למנוע.
+     קודם הקולות במגדר המבוקש, אחריהם מי שלא זוהה, ורק אז ההפוך;
+     ובתוך כל קבוצה מכריעה האיכות. */
+  function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
+  return pool.slice().sort(function(a,b){
+    /* קול שלא יעבוד יורד לתחתית לפני כל שיקול אחר — גם לפני המגדר,
+       שאם לא כן קול נשי מת מנצח קול גברי חי. */
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||score(b)-score(a);
+  })[0];
+}
+function hasLearnVoice(){return voicesFor(LEARN_TTS).length>0}
+
+/* --- מצב הקול, כפי שהוא מוצג למשתמש --- */
+function voiceStatus(){
+  if(gemOn())return "ok";
+  return hasLearnVoice()?"dev":"none";
+}
+
+/* --- ג׳מיני --- */
+var gAudio=null,gCache={},gBusy=false;
+/* אלמנט שמע אחד, קבוע, שמשוחרר במגע הראשון. ב-iOS ההיתר להשמיע
+   ניתן לאלמנט ולא לדף, ואלמנט שנוצר אחרי fetch לא יקבל אותו
+   לעולם — ולכן הקול הטבעי היה שותק שם בלי שום שגיאה. */
+var GEL=null;
+var SILENT_WAV="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
+function gStop(){if(gAudio){try{gAudio.pause();gAudio.src=""}catch(e){}gAudio=null}}
+function pcmToWav(b64){
+  try{
+    var bin=atob(b64),len=bin.length,buf=new Uint8Array(len),i;
+    for(i=0;i<len;i++)buf[i]=bin.charCodeAt(i);
+    var sr=24000,ch=1,bits=16,dl=len,hdr=new ArrayBuffer(44+dl),v=new DataView(hdr);
+    function ws(o,s){for(var j=0;j<s.length;j++)v.setUint8(o+j,s.charCodeAt(j))}
+    ws(0,"RIFF");v.setUint32(4,36+dl,true);ws(8,"WAVE");ws(12,"fmt ");
+    v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);
+    v.setUint32(24,sr,true);v.setUint32(28,sr*ch*bits/8,true);
+    v.setUint16(32,ch*bits/8,true);v.setUint16(34,bits,true);
+    ws(36,"data");v.setUint32(40,dl,true);
+    new Uint8Array(hdr,44).set(buf);
+    var bytes=new Uint8Array(hdr),out="";
+    for(var k=0;k<bytes.length;k+=8192)out+=String.fromCharCode.apply(null,bytes.subarray(k,k+8192));
+    return "data:audio/wav;base64,"+btoa(out);
+  }catch(e){return null}
+}
+var GEM_LEAD={
+  en:{slow:"Read this English very slowly and clearly, one word at a time: ",
+      soft:"Read this English slowly and clearly: ",
+      norm:"Read this English at a natural, friendly pace: ",
+      fast:"Read this English at a brisk pace: "},
+  he:{slow:"קרא לאט מאוד וברור, בעברית: ",soft:"קרא לאט וברור, בעברית: ",
+      norm:"קרא בקצב טבעי, בעברית: ",fast:"קרא בקצב מהיר, בעברית: "},
+  ar:{slow:"اقرأ ببطء شديد وبوضوح، بالعربية: ",soft:"اقرأ ببطء وبوضوح، بالعربية: ",
+      norm:"اقرأ بوتيرة طبيعية، بالعربية: ",fast:"اقرأ بوتيرة سريعة، بالعربية: "},
+  ru:{slow:"Читай очень медленно и чётко, по-русски: ",soft:"Читай медленно и чётко, по-русски: ",
+      norm:"Читай в естественном темпе, по-русски: ",fast:"Читай в быстром темпе, по-русски: "}
+};
+function gSynth(text,voiceName,rate,lang){
+  var L=GEM_LEAD[lang]||GEM_LEAD[LEARN];
+  var lead=rate<=0.7?L.slow:rate<=0.9?L.soft:rate>=1.15?L.fast:L.norm;
+  var body={contents:[{parts:[{text:lead+text}]}],
+    generationConfig:{responseModalities:["AUDIO"],
+      speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voiceName}}}}};
+  return fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key="+
+      encodeURIComponent(GKEY),
+    {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+  .then(function(r){
+    if(r.ok)return r.json();
+    return r.text().then(function(tx){
+      var m="";try{var j=JSON.parse(tx);m=(j.error&&j.error.message)||""}catch(e){m=String(tx).slice(0,140)}
+      throw new Error(r.status+(m?" — "+m:""));
+    });
+  })
+  .then(function(d){
+    var parts=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
+    for(var i=0;i<parts.length;i++){
+      var pd=parts[i].inlineData;
+      if(pd&&pd.data){
+        var mt=pd.mimeType||"";
+        if(mt.indexOf("wav")>=0||mt.indexOf("pcm")>=0||mt.indexOf("L16")>=0)
+          return pcmToWav(pd.data)||("data:audio/wav;base64,"+pd.data);
+        return "data:audio/mp3;base64,"+pd.data;
+      }
+    }
+    throw new Error("no-audio");
+  });
+}
+/* ============================================================
+   מעקב הקראה: הדגשת המילה הנאמרת
+   ------------------------------------------------------------
+   עובד רק כשהטקסט הנאמר הוא הטקסט המוצג. כאן זה המצב — כפתור
+   ההשמעה נושא את אותה מחרוזת שמופיעה לידו על המסך.
+
+   charIndex מתאפס בכל אמירה, ולכן המפה נבנית מהמחרוזת שנמסרה
+   למנוע ולא מה-DOM. אנדרואיד, ולעתים ספארי, לא שולחים דיווח על
+   מילים כלל — ואז הדגשה שלא זזה נראית כמו תקלה, ולכן אחרי שנייה
+   וחצי בלי דיווח מודגש כל הטקסט במקום מילה בודדת.
+   ============================================================ */
+var HL={el:null,raw:"",spans:[],map:[],timer:null,got:false,added:false};
+function hlClear(){
+  if(HL.timer){clearTimeout(HL.timer);HL.timer=null}
+  if(HL.el){try{HL.el.innerHTML=HL.raw;HL.el.classList.remove("now")}catch(e){}}
+  HL={el:null,raw:"",spans:[],map:[],timer:null,got:false,added:false};
+}
+/* האיבר שמציג בדיוק את המחרוזת הזאת. מדלגים על איברים שמכילים
+   כפתור — החלפת ה-HTML שלהם הייתה מוחקת את כפתור ההשמעה עצמו. */
+function hlFind(btn,text){
+  var want=String(text||"").replace(/\s+/g," ").trim();
+  if(!want||!btn)return null;
+  var box=(btn.closest&&btn.closest(".subject,.qcard,.fb,.passage,.card"))||document.body;
+  var cand=box.querySelectorAll(".word,.s,span,p,b");
+  for(var i=0;i<cand.length;i++){
+    if(cand[i].querySelector("button"))continue;
+    if((cand[i].textContent||"").replace(/\s+/g," ").trim()===want)return cand[i];
+  }
+  return null;
+}
+/* כשאין איבר יחיד שמציג בדיוק את המחרוזת — למשל משפט שמורכב
+   מכותרת ומתיאור בשני איברים — אי אפשר למפות מילים. מדגישים את
+   הכרטיס כולו, כדי שיהיה משוב במקום שום דבר. */
+function hlWhole(el){
+  hlClear();
+  if(!el)return;
+  HL.el=el; HL.raw=el.innerHTML; HL.added=true;
+  el.classList.add("now");
+}
+function hlPrep(el,text){
+  hlClear();
+  if(!el||!text)return;
+  HL.el=el; HL.raw=el.innerHTML;
+  var parts=String(text).split(/(\s+)/),html="",pos=0,idx=0;
+  HL.map=[];
+  for(var i=0;i<parts.length;i++){
+    var pt=parts[i];
+    if(!pt.length)continue;
+    if(/^\s+$/.test(pt)){html+=pt;pos+=pt.length;continue}
+    HL.map.push({from:pos,to:pos+pt.length,i:idx});
+    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
+    pos+=pt.length; idx++;
+  }
+  if(!HL.map.length){hlClear();return}
+  el.innerHTML=html;
+  HL.spans=el.querySelectorAll(".wd");
+  HL.timer=setTimeout(function(){if(!HL.got&&HL.el){HL.added=true;HL.el.classList.add("now")}},1500);
+}
+function hlAt(c){
+  if(!HL.el||!HL.map.length)return;
+  HL.got=true;
+  if(HL.timer){clearTimeout(HL.timer);HL.timer=null}
+  if(HL.added){HL.el.classList.remove("now");HL.added=false}
+  for(var k=0;k<HL.map.length;k++){
+    if(c>=HL.map[k].from&&c<HL.map[k].to){
+      for(var j=0;j<HL.spans.length;j++)HL.spans[j].classList.toggle("hit",j===HL.map[k].i);
+      return;
+    }
+  }
+}
+
+/* ------------------------------------------------------------
+   כשמנוע הדיבור של המכשיר נכשל — לומר את זה.
+   עד כאן onerror רק ניקה הדגשה, והמשתמש קיבל שקט בלי הסבר:
+   "אין קול" נראה כמו תקלה באפליקציה בזמן ש-synthesis-failed
+   הגיע מהמערכת. שגיאה שנבלעת עולה יום של חיפוש.
+   ------------------------------------------------------------ */
+var TTSMSG={
+  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה"},
+  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق"},
+  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть"},
+  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close"}
+};
+var _ttsBar=null;
+function ttsFail(err){
+  /* "interrupted" ו-"canceled" אינן תקלות: זה מה שהמנוע מדווח על
+     אמירה שבוטלה כדי לפנות מקום לאמירה הבאה — כלומר מהלך תקין
+     לגמרי, שקורה בכל לחיצה שנייה. הצגתן כשגיאה הבהילה משתמש
+     ואמרה לו שהמכשיר שלו שבור בזמן שהוא עבד.
+     גם ניקוי ההדגשה חייב לבוא אחרי היציאה הזאת ולא לפניה: הביטול
+     של האמירה הקודמת מגיע אחרי שהאמירה החדשה כבר הכינה את ההדגשה
+     שלה, וניקוי כאן מחק אותה מיד. */
+  if(err==="interrupted"||err==="canceled")return;
+  try{ hlClear() }catch(e){}
+  if(_ttsBar)return;
+  var _g="he"; try{_g=state.lang||"he"}catch(e){} if(!TTSMSG[_g])_g="he";
+  var TT=TTSMSG[_g];
+  var m=document.createElement("div");
+  m.setAttribute("role","alert");
+  m.id="tts-fail";
+  m.dir=TT.dir;
+  m.style.cssText="position:fixed;inset-inline:10px;bottom:10px;z-index:99999;"+
+    "background:#7f1d1d;color:#fff;padding:13px 15px;border-radius:12px;"+
+    "font:600 15px/1.55 system-ui,Arial,sans-serif;box-shadow:0 10px 34px rgba(0,0,0,.45);"+
+    "display:flex;gap:10px;align-items:flex-start";
+  var t=document.createElement("div");
+  t.style.cssText="flex:1;min-width:0";
+  t.innerHTML=TT.msg+
+    (err?" <span dir=ltr>("+String(err)+")</span>":"")+
+    TT.tail+
+    '<a href="/voice/" style="color:#fff">'+TT.link+'</a>';
+  var x=document.createElement("button");
+  x.type="button"; x.textContent="✕"; x.setAttribute("aria-label",TT.close);
+  x.style.cssText="min-width:44px;min-height:44px;border:0;border-radius:9px;"+
+    "background:rgba(255,255,255,.16);color:#fff;font-size:16px;cursor:pointer";
+  x.onclick=function(){ if(_ttsBar&&_ttsBar.parentNode)_ttsBar.parentNode.removeChild(_ttsBar); _ttsBar=null };
+  m.appendChild(t); m.appendChild(x);
+  document.body.appendChild(m); _ttsBar=m;
+}
+/* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
+function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
+
+
+/* ------------------------------------------------------------
+   פיצול לאמירות קצרות — הועתק מ"תאוריה מדברת", שם ההקראה נשמעת
+   הכי טוב. מנועי מכשיר מאיצים ובולעים סופי מילים במשפט ארוך;
+   כאן נשלחה שאלה שלמה באמירה אחת, לפעמים 300 תווים.
+   כל מקטע נושא את ההיסט שלו במחרוזת המלאה, כי charIndex מתאפס
+   בכל אמירה ובלעדיו ההדגשה קופצת לתחילת המשפט בכל מקטע.
+   ------------------------------------------------------------ */
+/* =====================================================================
+   מנוע ההקראה של "תאוריה מדברת" — ארבעה מנגנונים
+   ---------------------------------------------------------------------
+   ארבעה כשלים שקטים של Web Speech. אף אחד מהם אינו מדווח כשגיאה,
+   וכולם נראים למשתמש בדיוק אותו דבר: הקול פשוט מפסיק באמצע. הקוד
+   כאן הועתק מהאפליקציה שבה הוא כבר רץ, ולא נוסח מחדש.
+   ===================================================================== */
+
+/* 1 · שומר-ער. באג ותיק ב-Chrome וב-Edge בשולחן העבודה: ההקראה
+   נחתכת אחרי כ-15 שניות, באמצע מילה. pause+resume תקופתי מחזיק את
+   המנוע ער. במובייל אין את הבאג ופעולה כזאת דווקא מקרטעת שם, ולכן
+   מפעילים רק היכן שבאמת צריך. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+/* עוצרים רק כששום דבר כבר לא מדבר — אחרת מקטע שהתחיל זה עתה מאבד
+   את השמירה שלו כשהמקטע הקודם מסיים להתנקות. */
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+
+/* 2 · הפניה חיה ל-utterance. Chrome אוסף אובייקט שאין אליו הפניה,
+   ואיתו נעלמים onend ו-onboundary: ההקראה נתקעת באמצע, ההדגשה
+   קופאת על מילה אחת, והמקטע הבא לא יוצא לעולם. */
+var _activeU=null;
+
+/* 3 · קול רשת שנכשל. הקולות הנוירליים של Edge הם קולות רשת, והם
+   שותקים בלי אינטרנט. הדגל נכבה ברגע שאחד מהם נכשל, ומאותו רגע
+   הדירוג מעדיף קול מקומי לשארית הסשן. */
+var _netVoiceOK=true;
+
+/* קול רשת שאי אפשר להשתמש בו עכשיו — אין אינטרנט, או שאחד כבר
+   נכשל בסשן הזה — אינו "פחות טוב", הוא פשוט לא יעבוד. לכן זה מיון
+   ראשון ולא עוד סעיף בתוך הניקוד: קנס בניקוד לא הספיק, מפני שקול
+   נוירלי של Microsoft צובר על שם היצרן ועל "Natural" יותר ממה שכל
+   קנס סביר מוריד — והוא נבחר שוב ושוב אחרי שכבר נכשל.
+   כשהוא הקול היחיד שיש הוא עדיין נבחר: מיון של רשימה בת אחד
+   מחזיר אותה כמו שהיא. */
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+
+/* 4 · שומר זמן. יש מכשירים שבהם onend פשוט לא נורה. בלי השומר הזה
+   התור נתקע: הכפתור נשאר על "עצירה" וההקראה לא ממשיכה לעולם. ארבע
+   שניות שבהן המנוע לא מדבר ולא ממתין נחשבות סוף.
+   מחזיר פונקציית ביטול — מי שסיים בדרך הרגילה מכבה את השומר. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+
+var SEG_MAX=90, SEG_GAP=260;
+/* סימן פיסוק בין שתי ספרות הוא חלק מהמספר ולא מקום לחתוך בו:
+   בלי הבדיקה הזאת "3,500" נשבר והמנוע קורא "שלוש, חמש מאות". */
+function insideNumber(str,i){
+  return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]);
+}
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  /* מקטע זעיר — "12." או ")" — עם הפסקה של רבע שנייה אחריו נשמע
+     כמו גמגום. מאחדים אותו לזה שאחריו. */
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&
+       merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){
+      merged[merged.length-1].text+=out[i].text; continue;
+    }
+    if(out[i].text.trim().length<12&&i+1<out.length){
+      out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue;
+    }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
+/* קצב לפי שפה — אותם ערכים שנבחרו בתאוריה מדברת אחרי האזנה */
+var VOICE_TUNE={he:0.82,ar:0.85,en:0.90,ru:0.88};
+function tuneRate(lang,rate){
+  var t=VOICE_TUNE[String(lang||"he").split("-")[0].toLowerCase()]||0.88;
+  var r=t*(rate||1);
+  return Math.max(0.5,Math.min(1.6,Math.round(r*100)/100));
+}
+
+
+/* ------------------------------------------------------------
+   כשאין במכשיר קול נשי בשפה הנוכחית — ווינדוס עם Asaf בלבד הוא
+   המקרה הנפוץ בעברית — מרימים את גובה הקול. זה לא קול נשי אמיתי,
+   וגם לא מתיימר להיות: זו הדרך היחידה בדפדפן להזיז קול גברי לכיוון
+   הנשי בלי הקלטות ובלי שירות חיצוני. מי שמתקין קול נשי מקבל אותו
+   מיד ובלי שינוי הגובה.
+   ------------------------------------------------------------ */
+var FEM_PITCH=1.35;
+function femLift(v){
+  if(!v)return 1;
+  try{ return vGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
+}
+
+
+/* ------------------------------------------------------------
+   בדיקת קול בתוך האפליקציה. הפשוטה ביותר שאפשר: אמירה אחת,
+   בתוך הלחיצה, בלי מילון, בלי בחירת קול ובלי שום שכבה — ומדווחת
+   על המסך מה קרה. יום שלם אבד כי כשלא היה קול, שום דבר לא אמר למה.
+   ------------------------------------------------------------ */
+var VCHK="";
+/* כמה מהקולות הם בשפה שנבדקת. עד כה ההודעה מנתה את כל הקולות
+   במכשיר, בכל השפות — "23 קולות" בכרום על ווינדוס, כשבעברית יש
+   שם אחד בלבד (Asaf). המספר היה נכון ולא אמר כלום; עכשיו שניהם. */
+function sameLang(list,lang){
+  var base=String(lang||"").split("-")[0].toLowerCase(),n=0;
+  for(var i=0;i<list.length;i++){
+    if(String(list[i].lang||"").replace("_","-").toLowerCase().split("-")[0]===base)n++;
+  }
+  return n;
+}
+function voiceCheck(){
+  VCHK="…"; render();
+  function show(m){ VCHK=m; render() }
+  if(!("speechSynthesis" in window)){ show("✗ הדפדפן הזה לא תומך בהקראה"); return }
+  var list=[]; try{ list=speechSynthesis.getVoices()||[] }catch(e){}
+  try{ speechSynthesis.cancel() }catch(e){}
+  var u;
+  try{ u=new SpeechSynthesisUtterance("שלום, זו בדיקת קול") }
+  catch(e){ show("✗ יצירת האמירה נכשלה: "+e.message); return }
+  u.lang="he-IL"; u.volume=1; u.rate=1; u.pitch=1;
+  var done=false;
+  u.onstart=function(){ done=true; show("✓ הקול פועל — "+sameLang(list,u.lang)+" בשפה הזו מתוך "+list.length+" קולות במכשיר") };
+  u.onerror=function(e){ done=true;
+    var er=(e&&e.error)||"לא ידוע";
+    if(er==="interrupted"||er==="canceled"){ show("✓ הקול פועל"); return }
+    show("✗ המנוע החזיר "+er+" · "+list.length+" קולות · זו תקלה במכשיר, לא באפליקציה"); };
+  try{ speechSynthesis.speak(u) }
+  catch(e){ show("✗ speak נכשל: "+e.message); return }
+  setTimeout(function(){ if(!done)
+    show("✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר") },2000);
+}
+
+/* ------------------------------------------------------------
+   דור ההקראה. speechSynthesis.cancel() אינו מבטל setTimeout:
+   כרום יורה onend על האמירה שבוטלה, המקטע הבא נרשם בכל זאת,
+   וכעבור SEG_GAP ההקראה הישנה חוזרת מעל החדשה — שני קולות
+   במקביל. מונה אחד פותר את זה: כל הקראה מקבלת מספר, stopSpeak
+   מקדם אותו, ומקטע מדור ישן פשוט אינו מדבר. כאן זה חמור יותר
+   מבשאר האפליקציות, כי קטע קריאה מנוקד מתפצל להרבה מקטעים.
+   ------------------------------------------------------------ */
+var _sayGen=0;
+function speakDevice(text,code,rate){
+  if(!("speechSynthesis" in window))return false;
+  try{speechSynthesis.cancel()}catch(e){}
+  var my=++_sayGen;
+  /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
+     שממתין לרשימת הקולות ועד ארבע שניות אם היא לא מגיעה — ואמירה
+     שיוצאת ארבע שניות אחרי המגע נזרקת בשקט באנדרואיד ובספארי.
+     כשהרשימה כבר כאן, בוחרים קול ומדברים. כשהיא ריקה — מדברים
+     בכל זאת, עם u.lang בלבד: קול ברירת מחדל בשפה הנכונה עדיף על
+     שתיקה, ויש מכשירים שמחזירים רשימה ריקה לצמיתות ומדברים היטב.
+     voicesReady נשאר בשימוש למסך בחירת הקול, שם ההמתנה במקומה. */
+  (function(){
+    try{
+      var v=bestVoice(code), lang=(v&&v.lang)||code;
+      var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
+      var pit=femLift(v);
+      var retried=false;
+      function alive(){return my===_sayGen}
+      function allDone(){ maybeStopKeepAlive(); hlClear(); ttsOK() }
+      (function sayseg(k){
+        if(!alive())return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
+        if(k>=segs.length){ allDone(); return }
+        /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
+           יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+        var seg=segs[k], moved=false, disarm=null;
+        function next(){
+          if(moved||!alive())return;
+          moved=true; if(disarm)disarm();
+          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+          else allDone();
+        }
+        var u=new SpeechSynthesisUtterance(seg.text);
+        u.lang=lang;
+        if(v){ try{ u.voice=v }catch(e2){} }
+        u.rate=rt; u.pitch=pit; u.volume=1;
+        u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
+        u.onend=next;
+        u.onerror=function(e){
+          if(moved||!alive())return;
+          var err=(e&&e.error)||"";
+          /* ביטול יזום אינו תקלה — stopSpeak כבר ניקה אחריו */
+          if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+          /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול
+             מקומי וחוזרים על אותו מקטע, פעם אחת, כדי שההקראה לא
+             תישבר בשקט באמצע שאלה. */
+          if(!retried&&v&&v.localService===false){
+            retried=true; _netVoiceOK=false; moved=true;
+            if(disarm)disarm(); _activeU=null;
+            v=bestVoice(code); lang=(v&&v.lang)||code; pit=femLift(v);
+            setTimeout(function(){sayseg(k)},SEG_GAP);
+            return;
+          }
+          moved=true; if(disarm)disarm(); maybeStopKeepAlive(); ttsFail(err);
+        };
+        _activeU=u;                        /* מגן מפני איסוף זבל */
+        try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
+        speechSynthesis.speak(u);
+        startKeepAlive();
+        disarm=ttsWatchdog(function(){return alive()&&!moved},next);
+      })(0);
+    }catch(e){}
+  })();
+  return true;
+}
+/* lang: LEARN לחומר הנלמד, או קוד שפת האם להוראה. */
+/* ניקוי תגיות מכל טקסט שנכנס להקראה. `speak` קורא לו על כל
+   מחרוזת, ובלעדיו הלומד שומע "span class" באמצע המשפט. */
+function plainOf(h){
+  var d=document.createElement("div"); d.innerHTML=String(h||"");
+  return (d.textContent||"").replace(/\s+/g," ").trim();
+}
+function speak(text,lang,rateMul){
+  /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
+     לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
+     עם <sub> או <span class="frac"> הוקראה בקול כתגית: הסטודנט
+     שמע "span class frac" באמצע השאלה. */
+  text=plainOf(String(text||"")).trim(); if(!text)return;
+  lang=lang||LEARN;
+  var code=LANGS[lang].tts;
+  var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
+  stopSpeak();
+  var my=_sayGen;   /* גם תשובת רשת שמגיעה אחרי עצירה לא תושמע */
+  if(gemOn()){
+    var vid=gvOf(state.gemVoice).id;
+    var ck=lang+"|"+vid+"|"+rate.toFixed(2)+"|"+text;
+    if(gCache[ck]){playUrl(gCache[ck],text,code,rate);return}
+    gBusy=true; renderSpeakState();
+    gSynth(text,vid,rate,lang).then(function(u){
+      if(my!==_sayGen)return;
+      gCache[ck]=u; gBusy=false; renderSpeakState(); playUrl(u,text,code,rate);
+    }).catch(function(){
+      gBusy=false; renderSpeakState(); speakDevice(text,code,rate);
+    });
+    return;
+  }
+  speakDevice(text,code,rate);
+}
+function playUrl(url,text,code,rate){
+  gStop();
+  /* משתמשים באלמנט ששוחרר במגע ולא יוצרים חדש. */
+  if(!GEL)GEL=new Audio();
+  gAudio=GEL; gAudio.src=url;
+  gAudio.play().catch(function(){speakDevice(text,code,rate)});
+}
+function stopSpeak(){_sayGen++;gStop();hlClear();stopKeepAlive();_activeU=null;try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+/* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
+   אחר, ולפעמים נתקע עד סגירת הדפדפן. */
+try{document.addEventListener("visibilitychange",function(){
+  if(document.hidden)stopSpeak();
+});}catch(e){}
+/* iOS לא ישמיע כלום עד שאמירה אחת יצאה מתוך handler של מגע אמיתי.
+   אמירה אוטומטית בטעינת הדף נבלעת בשקט — בלי חריגה, בלי לוג, בלי
+   דרך לדעת. משחררים פעם אחת עם אמירה ריקה.
+   חשוב: קריאה ישירה, בלי voicesReady — הבטחה שוברת את שרשרת המגע
+   ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
+try{document.addEventListener("pointerdown",function(){
+  try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+  /* ואותו דבר לאלמנט השמע: מקור שקט, play בתוך המגע עצמו. */
+  try{
+    if(!GEL)GEL=new Audio();
+    GEL.src=SILENT_WAV;
+    var pr=GEL.play();
+    if(pr&&pr.then)pr.then(function(){try{GEL.pause();GEL.currentTime=0}catch(e){}},function(){});
+  }catch(e){}
+},{once:true});}catch(e){}
+function renderSpeakState(){
+  var b=document.querySelectorAll(".spk");
+  for(var i=0;i<b.length;i++)b[i].classList.toggle("on",gBusy);
+}
+
+/* ============================================================
+   7. תוכן
+   ------------------------------------------------------------
+   האפליקציה הזאת אינה חידון. אין בה שאלה, אין מסיחים ואין
+   תשובה נכונה — הלומד **מרכיב טקסט** מקטעים, והתוצר הוא
+   הטקסט שלו.
+
+   **הקטעים תלויי נושא, וזו ההחלטה המרכזית כאן.** אב־טיפוס
+   מוקדם החזיק ארבע פתיחות, ארבע טענות וארבע דוגמאות **בלי
+   קשר לנושא שנבחר**, ולכן שני לומדים שבחרו נושאים שונים
+   לגמרי קיבלו טקסט כמעט זהה: "בעולם המודרני… זה משפיע על…
+   לדוגמה… לסיכום…". זה אינו חיבור אלא שלד ריק, והוא מלמד
+   לכתוב טקסט חסר תוכן.
+
+   לכן כל נושא נושא את הקטעים שלו. `F` היא חבילת ארבע שפות,
+   בדיוק כמו בשאר הפורטפוליו.
+   ============================================================ */
+function F(he,ar,ru,en){return {he:he,ar:ar,ru:ru,en:en}}
+function TP(id,name,op,cl,ex,cn){return {id:id,n:name,op:op,cl:cl,ex:ex,cn:cn}}
+
+/* סוגי הכתיבה. `hint` הוא מה שמבדיל בין הסוגים בפועל —
+   מה נדרש מטקסט מהסוג הזה, בשפה של הלומד. */
+var TYPES=[
+  {id:"essay", ic:"book",
+   n:F("חיבור","مقالة","Сочинение","Essay"),
+   d:F("טענה, נימוק ודוגמה — ובסוף מסקנה",
+       "ادّعاء وتعليل ومثال — وفي النهاية استنتاج",
+       "Тезис, обоснование и пример — и вывод в конце",
+       "A claim, a reason and an example — and a conclusion")},
+  {id:"mail", ic:"share",
+   n:F("מייל רשמי","بريد رسمي","Официальное письмо","Formal email"),
+   d:F("פנייה קצרה, בקשה ברורה, וסיום מנומס",
+       "توجّه قصير، طلب واضح، وخاتمة مهذّبة",
+       "Краткое обращение, ясная просьба, вежливое окончание",
+       "A short opening, a clear request, a polite close")},
+  {id:"story", ic:"star",
+   n:F("סיפור אישי","قصة شخصية","Личная история","Personal story"),
+   d:F("מה קרה, מה הרגשתי, ומה למדתי",
+       "ماذا حدث، بماذا شعرت، وماذا تعلّمت",
+       "Что случилось, что я почувствовал, чему научился",
+       "What happened, how I felt, what I learned")}
+];
+
+/* הנושאים. כל נושא שייך לסוג אחד, ונושא ארבעה מאגרי קטעים
+   משלו. הקטעים אינם תבניות ריקות: כל אחד אומר משהו על הנושא
+   הזה דווקא. */
+var BANKS_K=[
+ {type:"essay", topics:[
+  TP("scr", F("זמן מסך","وقت الشاشة","Экранное время","Screen time"),
+   [F("הטלפון הפך לדבר הראשון שאנחנו נוגעים בו בבוקר.",
+      "أصبح الهاتف أوّل شيء نلمسه في الصباح.",
+      "Телефон стал первым, к чему мы тянемся утром.",
+      "The phone has become the first thing we touch in the morning."),
+    F("שעות המסך של בני נוער גדלו, והוויכוח עליהן לא נגמר.",
+      "ازدادت ساعات الشاشة لدى المراهقين، والجدل حولها لم ينتهِ.",
+      "Экранное время подростков выросло, и спор о нём не утихает.",
+      "Teenagers' screen hours have grown, and the argument about them goes on."),
+    F("קשה לדעת מתי המסך עוזר ומתי הוא פשוט גוזל זמן.",
+      "من الصعب معرفة متى تساعد الشاشة ومتى تسرق الوقت فقط.",
+      "Трудно понять, когда экран помогает, а когда просто крадёт время.",
+      "It is hard to tell when a screen helps and when it just takes time.")],
+   [F("מסך לפני השינה דוחה את ההירדמות ומקצר את הלילה.",
+      "الشاشة قبل النوم تؤخّر النعاس وتقصّر الليل.",
+      "Экран перед сном отдаляет засыпание и укорачивает ночь.",
+      "A screen before bed delays sleep and shortens the night."),
+    F("אותה שעה במסך יכולה להיות לימוד או בזבוז — תלוי במה עושים בה.",
+      "الساعة نفسها أمام الشاشة قد تكون تعلّمًا أو إضاعة — حسب ما نفعله فيها.",
+      "Один и тот же час у экрана может быть учёбой или потерей — смотря чем занят.",
+      "The same hour on a screen can be learning or waste — it depends what you do in it."),
+    F("הפסקה קצרה מהמסך מחזירה ריכוז מהר יותר משנדמה.",
+      "استراحة قصيرة من الشاشة تعيد التركيز أسرع ممّا نظنّ.",
+      "Короткий перерыв от экрана возвращает внимание быстрее, чем кажется.",
+      "A short break from the screen brings focus back faster than you would think."),
+    F("מי שקובע לעצמו שעה לכיבוי שומר על הזמן שלו.",
+      "من يحدّد لنفسه ساعة للإغلاق يحافظ على وقته.",
+      "Тот, кто назначает себе час выключения, бережёт своё время.",
+      "Someone who sets an off hour keeps their own time.")],
+   [F("בכיתה שלי הוסכם לכבות טלפונים בשיעור, והרעש ירד.",
+      "في صفّي اتّفقنا على إغلاق الهواتف في الحصّة، فقلّ الضجيج.",
+      "В моём классе договорились выключать телефоны на уроке, и шума стало меньше.",
+      "In my class we agreed to switch phones off in lessons, and the noise dropped."),
+    F("ניסיתי שבוע בלי מסך אחרי עשר בלילה, והתעוררתי אחרת.",
+      "جرّبت أسبوعًا بلا شاشة بعد العاشرة ليلًا، فاستيقظت مختلفًا.",
+      "Я попробовал неделю без экрана после десяти вечера и просыпался иначе.",
+      "I tried a week with no screen after ten at night, and woke up differently."),
+    F("חבר שלי למד לנגן מסרטונים — אותו מסך, שימוש אחר.",
+      "صديقي تعلّم العزف من مقاطع — الشاشة نفسها، استخدام آخر.",
+      "Мой друг научился играть по роликам — тот же экран, другое применение.",
+      "A friend of mine learned to play from videos — the same screen, a different use.")],
+   [F("לכן השאלה אינה כמה מסך, אלא איזה.",
+      "لذلك السؤال ليس كم شاشة، بل أيّ شاشة.",
+      "Поэтому вопрос не в том, сколько экрана, а в том, какой.",
+      "So the question is not how much screen, but which."),
+    F("אני חושב שגבול שקובעים מראש עדיף על ויכוח כל ערב.",
+      "أعتقد أنّ حدًّا نحدّده مسبقًا أفضل من جدال كلّ مساء.",
+      "Думаю, заранее поставленная граница лучше, чем спор каждый вечер.",
+      "I think a limit set in advance beats an argument every evening."),
+    F("בסופו של דבר המסך הוא כלי, והשאלה מי מחזיק במי.",
+      "في النهاية الشاشة أداة، والسؤال من يمسك بمن.",
+      "В конце концов экран — инструмент, вопрос лишь, кто кем управляет.",
+      "In the end the screen is a tool, and the question is who holds whom.")]),
+  TP("frn", F("חברות","الصداقة","Дружба","Friendship"),
+   [F("חברות נבחנת לא ביום טוב אלא ביום קשה.",
+      "الصداقة تُمتحن لا في اليوم الجميل بل في اليوم الصعب.",
+      "Дружба проверяется не в хороший день, а в трудный.",
+      "Friendship is tested not on a good day but on a hard one."),
+    F("יש חברים שנשארים שנים, ויש כאלה שנעלמים אחרי מעבר דירה.",
+      "هناك أصدقاء يبقون سنوات، وآخرون يختفون بعد انتقال البيت.",
+      "Есть друзья на годы, а есть те, кто исчезает после переезда.",
+      "Some friends stay for years, and some vanish after one move."),
+    F("קל להכיר הרבה אנשים, וקשה יותר להיות חבר של אחד.",
+      "من السهل معرفة كثيرين، والأصعب أن تكون صديقًا لواحد.",
+      "Легко познакомиться со многими, труднее быть другом одному.",
+      "It is easy to meet many people, and harder to be a friend to one.")],
+   [F("חבר אמיתי אומר גם את מה שלא נעים לשמוע.",
+      "الصديق الحقيقيّ يقول أيضًا ما لا يسرّ سماعه.",
+      "Настоящий друг говорит и то, что неприятно слышать.",
+      "A real friend also says the thing you would rather not hear."),
+    F("חברות דורשת זמן, ואי אפשר לקצר אותו.",
+      "الصداقة تحتاج وقتًا، ولا يمكن اختصاره.",
+      "Дружбе нужно время, и его нельзя сократить.",
+      "Friendship takes time, and there is no shortcut."),
+    F("מריבה שנפתרת מחזקת יותר משנה בלי מריבה.",
+      "خلاف يُحلّ يقوّي أكثر من سنة بلا خلاف.",
+      "Ссора, которую уладили, укрепляет больше, чем год без ссор.",
+      "A quarrel that gets resolved builds more than a year without one."),
+    F("לפעמים חברות נגמרת בלי ריב, פשוט מרוב שקט.",
+      "أحيانًا تنتهي الصداقة بلا شجار، من فرط الصمت فقط.",
+      "Иногда дружба кончается без ссоры — просто от молчания.",
+      "Sometimes a friendship ends with no fight at all, just silence.")],
+   [F("כשעברתי בית ספר, רק שניים המשיכו להתקשר.",
+      "حين غيّرت المدرسة، اثنان فقط واصلا الاتّصال.",
+      "Когда я сменил школу, звонить продолжили только двое.",
+      "When I changed schools, only two kept calling."),
+    F("חברה שלי אמרה לי משהו קשה, וצדקה.",
+      "صديقتي قالت لي شيئًا قاسيًا، وكانت محقّة.",
+      "Подруга сказала мне неприятную вещь — и была права.",
+      "A friend told me something hard to hear, and she was right."),
+    F("ישבנו יחד בהפסקה כל יום, ורק אחר כך הבנתי שזו חברות.",
+      "جلسنا معًا كلّ يوم في الاستراحة، وأدركت لاحقًا أنّها صداقة.",
+      "Мы сидели вместе на каждой перемене, и лишь потом я понял, что это дружба.",
+      "We sat together every break, and only later did I understand it was friendship.")],
+   [F("לכן חברות אינה מספר אנשים אלא עומק אחד.",
+      "لذلك الصداقة ليست عدد أشخاص بل عمق واحد.",
+      "Поэтому дружба — не число людей, а одна глубина.",
+      "So friendship is not a number of people but one depth."),
+    F("אני חושב שחברות נבנית מהרגלים קטנים ולא מרגעים גדולים.",
+      "أعتقد أنّ الصداقة تُبنى من عادات صغيرة لا من لحظات كبيرة.",
+      "Думаю, дружба строится из мелких привычек, а не из громких минут.",
+      "I think friendship is built from small habits, not big moments."),
+    F("בסופו של דבר נשארים אלה שהיו שם כשלא היה נוח.",
+      "في النهاية يبقى من كان حاضرًا حين لم يكن الأمر مريحًا.",
+      "В конце остаются те, кто был рядом, когда было неудобно.",
+      "In the end the ones who stay are those who were there when it was not easy.")]),
+  TP("spo", F("ספורט","الرياضة","Спорт","Sport"),
+   [F("כמעט כל אחד ניסה פעם ספורט, ולא כל אחד נשאר בו.",
+      "جرّب الجميع تقريبًا الرياضة مرّة، ولم يبقَ فيها الجميع.",
+      "Почти каждый когда-то пробовал спорт, но не каждый в нём остался.",
+      "Almost everyone has tried a sport once, and not everyone stayed with it."),
+    F("ספורט נראה מבחוץ כמו ניצחון, ומבפנים הוא בעיקר אימון.",
+      "تبدو الرياضة من الخارج انتصارًا، ومن الداخل هي تدريب في الأساس.",
+      "Со стороны спорт выглядит как победа, а изнутри это в основном тренировка.",
+      "From the outside sport looks like winning, and from the inside it is mostly training."),
+    F("יש מי שאומר שאין לו זמן לספורט, ויש מי שקם בשש בשבילו.",
+      "هناك من يقول إنّه لا وقت لديه للرياضة، وهناك من ينهض السادسة من أجلها.",
+      "Кто-то говорит, что нет времени на спорт, а кто-то встаёт ради него в шесть.",
+      "Some say they have no time for sport, and some get up at six for it.")],
+   [F("תנועה מורידה מתח, גם כשהיא רק חצי שעה של הליכה.",
+      "الحركة تخفّف التوتّر، حتّى لو كانت نصف ساعة مشي فقط.",
+      "Движение снимает напряжение, даже если это всего полчаса ходьбы.",
+      "Moving lowers stress, even when it is only half an hour of walking."),
+    F("בקבוצה לומדים לסמוך על אחרים, כי לבד לא מנצחים משחק.",
+      "في الفريق نتعلّم الثقة بالآخرين، لأنّ المباراة لا تُربح وحدنا.",
+      "В команде учатся доверять другим, ведь в одиночку матч не выиграть.",
+      "In a team you learn to trust others, because nobody wins a match alone."),
+    F("הפסד באימון מלמד להמשיך, וזה שימושי גם מחוץ למגרש.",
+      "الخسارة في التدريب تعلّم المواصلة، وهذا مفيد خارج الملعب أيضًا.",
+      "Проигрыш на тренировке учит продолжать, и это полезно и вне площадки.",
+      "Losing in training teaches you to keep going, and that helps off the field too."),
+    F("לא צריך להיות אלוף כדי להרוויח מספורט.",
+      "لا حاجة لأن تكون بطلًا كي تستفيد من الرياضة.",
+      "Не нужно быть чемпионом, чтобы получить пользу от спорта.",
+      "You do not have to be a champion to gain from sport.")],
+   [F("בקבוצה שלי הפסדנו חמישה משחקים ברצף, ובשישי ניצחנו.",
+      "في فريقي خسرنا خمس مباريات متتالية، وفي السادسة فزنا.",
+      "В моей команде мы проиграли пять матчей подряд, а шестой выиграли.",
+      "My team lost five games in a row, and won the sixth."),
+    F("התחלתי לרוץ עשר דקות ביום, והיום אני רץ שלושה קילומטרים.",
+      "بدأت أركض عشر دقائق يوميًّا، واليوم أركض ثلاثة كيلومترات.",
+      "Я начал бегать по десять минут в день, а сегодня пробегаю три километра.",
+      "I started running ten minutes a day, and today I run three kilometres."),
+    F("חבר שלי הצטרף לחוג שחייה ולא ידע לשחות בכלל.",
+      "انضمّ صديقي إلى نادي سباحة ولم يكن يعرف السباحة إطلاقًا.",
+      "Мой друг записался в секцию плавания и совсем не умел плавать.",
+      "A friend of mine joined a swimming club without knowing how to swim at all.")],
+   [F("לכן ספורט הוא לא רק תוצאה במגרש, אלא הרגל של יום.",
+      "لذلك الرياضة ليست نتيجة في الملعب فحسب، بل عادة يوميّة.",
+      "Поэтому спорт — это не только результат на поле, но и привычка дня.",
+      "So sport is not only a result on the field, but a habit of the day."),
+    F("אני חושב שכדאי לבחור ענף שנעים בו, ואז ממשיכים.",
+      "أعتقد أنّه يجدر اختيار رياضة نستمتع بها، وعندها نواصل.",
+      "Думаю, стоит выбрать вид спорта, в котором приятно, — тогда продолжаешь.",
+      "I think it is worth choosing a sport you enjoy, and then you keep going."),
+    F("בסופו של דבר הגוף זוכר את מי שזז, לא את מי שהתכוון.",
+      "في النهاية يتذكّر الجسد من تحرّك، لا من نوى.",
+      "В конце концов тело помнит того, кто двигался, а не того, кто собирался.",
+      "In the end the body remembers who moved, not who meant to.")])
+ ]},
+ {type:"mail", topics:[
+  TP("abs", F("בקשה להיעדרות","طلب غياب","Просьба об отсутствии","Absence request"),
+   [F("שלום, אני תלמיד בכיתה שלכם ומבקש לעדכן בהיעדרות.",
+      "مرحبًا، أنا طالب في صفّكم وأودّ إبلاغكم بغياب.",
+      "Здравствуйте, я ученик вашего класса и хочу сообщить об отсутствии.",
+      "Hello, I am a student in your class and I would like to report an absence."),
+    F("שלום, אני פונה בבקשה לאשר היעדרות מתוכננת.",
+      "مرحبًا، أتوجّه إليكم بطلب الموافقة على غياب مخطّط له.",
+      "Здравствуйте, обращаюсь с просьбой согласовать запланированное отсутствие.",
+      "Hello, I am writing to ask you to approve a planned absence."),
+    F("שלום, רציתי לעדכן מראש ולא בדיעבד.",
+      "مرحبًا، أردت الإبلاغ مسبقًا لا بعد وقوع الأمر.",
+      "Здравствуйте, я хотел сообщить заранее, а не задним числом.",
+      "Hello, I wanted to let you know in advance rather than after the fact.")],
+   [F("ההיעדרות היא ליום אחד בלבד, בתאריך שאציין למטה.",
+      "الغياب ليوم واحد فقط، في التاريخ الذي سأذكره أدناه.",
+      "Отсутствие только на один день, дата указана ниже.",
+      "The absence is for one day only, on the date given below."),
+    F("אשלים את החומר מהשיעורים שיוחמצו.",
+      "سأستكمل المادّة من الحصص الفائتة.",
+      "Материал пропущенных уроков я восполню.",
+      "I will catch up on the material from the lessons I miss."),
+    F("יש בידי אישור, ואשמח לצרף אותו.",
+      "لديّ تصديق، ويسعدني إرفاقه.",
+      "У меня есть справка, и я готов её приложить.",
+      "I have a note, and I will gladly attach it."),
+    F("אם נדרש טופס אחר, אשמח לדעת מהו.",
+      "إن كان مطلوبًا نموذج آخر، يسعدني معرفته.",
+      "Если нужна другая форма, буду рад узнать какая.",
+      "If a different form is needed, I would be glad to know which.")],
+   [F("למשל בשבוע שעבר השלמתי שיעור שהוחמץ באותו אופן.",
+      "مثلًا في الأسبوع الماضي استكملت حصّة فائتة بالطريقة نفسها.",
+      "Например, на прошлой неделе я так же восполнил пропущенный урок.",
+      "For example, last week I made up a missed lesson in the same way."),
+    F("צירפתי בעבר אישור דומה, והוא התקבל.",
+      "أرفقت سابقًا تصديقًا مشابهًا، وتمّ قبوله.",
+      "Раньше я прилагал похожую справку, и её приняли.",
+      "I have attached a similar note before, and it was accepted.")],
+   [F("תודה מראש, ואשמח לאישור.",
+      "شكرًا مقدّمًا، ويسعدني تلقّي الموافقة.",
+      "Заранее спасибо, буду признателен за подтверждение.",
+      "Thank you in advance, and I would appreciate your confirmation."),
+    F("תודה על הזמן, ואני זמין לכל שאלה.",
+      "شكرًا على وقتكم، وأنا متاح لأيّ سؤال.",
+      "Спасибо за ваше время, готов ответить на любые вопросы.",
+      "Thank you for your time, and I am available for any question."),
+    F("בברכה, ותודה על ההתחשבות.",
+      "مع التحيّة، وشكرًا على تفهّمكم.",
+      "С уважением и благодарностью за понимание.",
+      "With thanks for your understanding.")]),
+  TP("grd", F("בקשה לבדוק ציון","طلب مراجعة علامة","Просьба проверить оценку","Request to recheck a grade"),
+   [F("שלום, אני תלמיד בכיתה שלכם ומבקש לבדוק שוב ציון במבחן.",
+      "مرحبًا، أنا طالب في صفّكم وأطلب مراجعة علامة في امتحان.",
+      "Здравствуйте, я ученик вашего класса и прошу перепроверить оценку за контрольную.",
+      "Hello, I am a student in your class and I ask you to recheck a test grade."),
+    F("שלום, קיבלתי את המבחן בחזרה וברצוני לשאול על הבדיקה.",
+      "مرحبًا، استلمت الامتحان وأودّ السؤال عن التصحيح.",
+      "Здравствуйте, я получил проверенную работу и хотел бы спросить о проверке.",
+      "Hello, I got my test back and I would like to ask about the marking."),
+    F("שלום, אני פונה בבקשה לעבור יחד על שאלה אחת במבחן.",
+      "مرحبًا، أتوجّه إليكم بطلب أن نراجع معًا سؤالًا واحدًا في الامتحان.",
+      "Здравствуйте, обращаюсь с просьбой вместе разобрать один вопрос контрольной.",
+      "Hello, I am writing to ask that we go over one test question together.")],
+   [F("מדובר בשאלה אחת, ובה נראה לי שהתשובה שלי נכונה.",
+      "الأمر يتعلّق بسؤال واحد، وأرى أنّ إجابتي فيه صحيحة.",
+      "Речь об одном вопросе, и мне кажется, что мой ответ там верный.",
+      "It is about one question, where I think my answer is correct."),
+    F("כתבתי את הפתרון בצד השני של הדף, ואולי הוא לא נראה.",
+      "كتبت الحلّ على الوجه الآخر من الورقة، ولعلّه لم يُرَ.",
+      "Решение я написал на обороте листа, и, возможно, его не заметили.",
+      "I wrote the solution on the back of the page, and it may not have been seen."),
+    F("סכום הנקודות בדף אינו מסתדר לי עם הציון הסופי.",
+      "مجموع النقاط في الورقة لا يتّفق لديّ مع العلامة النهائيّة.",
+      "Сумма баллов на листе у меня не сходится с итоговой оценкой.",
+      "The points on the page do not add up to the final grade for me."),
+    F("אשמח להבין מה היה חסר בתשובה, גם אם הציון לא ישתנה.",
+      "يسعدني أن أفهم ما نقص في إجابتي، حتّى لو لم تتغيّر العلامة.",
+      "Буду рад понять, чего не хватило в ответе, даже если оценка не изменится.",
+      "I would be glad to understand what was missing, even if the grade stays.")],
+   [F("למשל בשאלה 4 כתבתי את אותו פתרון שהוצג בשיעור.",
+      "مثلًا في السؤال 4 كتبت الحلّ نفسه الذي عُرض في الحصّة.",
+      "Например, в вопросе 4 я написал то же решение, что показывали на уроке.",
+      "For example, in question 4 I wrote the same solution shown in the lesson."),
+    F("במבחן הקודם עברנו יחד על שאלה, וזה הבהיר לי הרבה.",
+      "في الامتحان السابق راجعنا معًا سؤالًا، وقد أوضح لي ذلك الكثير.",
+      "В прошлой работе мы вместе разобрали вопрос, и это многое мне прояснило.",
+      "On the previous test we went over a question together, and it made a lot clear.")],
+   [F("תודה מראש, ואשמח לבדיקה נוספת.",
+      "شكرًا مقدّمًا، ويسعدني إجراء مراجعة إضافيّة.",
+      "Заранее спасибо, буду признателен за дополнительную проверку.",
+      "Thank you in advance, and I would appreciate another look."),
+    F("תודה על הזמן, ואגיע בשמחה בהפסקה כדי לעבור על זה.",
+      "شكرًا على وقتكم، وسآتي بسرور في الاستراحة لمراجعة الأمر.",
+      "Спасибо за ваше время, с радостью подойду на перемене, чтобы разобрать это.",
+      "Thank you for your time, and I will gladly come at the break to go over it."),
+    F("בברכה, ותודה על הבדיקה.",
+      "مع التحيّة، وشكرًا على التصحيح.",
+      "С уважением и благодарностью за проверку.",
+      "With thanks for marking my test.")]),
+  TP("job", F("בקשת עבודה לקיץ","طلب عمل صيفي","Заявка на летнюю работу","Summer job request"),
+   [F("שלום, ראיתי שאתם מחפשים עובדים לקיץ, ואני מעוניין להצטרף.",
+      "مرحبًا، رأيت أنّكم تبحثون عن عمّال للصيف، وأودّ الانضمام.",
+      "Здравствуйте, я увидел, что вы ищете работников на лето, и хочу присоединиться.",
+      "Hello, I saw that you are looking for summer staff, and I would like to join."),
+    F("שלום, אני בן 16 ומחפש עבודה ראשונה לחודשי הקיץ.",
+      "مرحبًا، عمري 16 عامًا وأبحث عن عمل أوّل لأشهر الصيف.",
+      "Здравствуйте, мне 16 лет, и я ищу первую работу на летние месяцы.",
+      "Hello, I am 16 and I am looking for a first job for the summer months."),
+    F("שלום, אני פונה בבקשה לעבוד אצלכם בחופש הגדול.",
+      "مرحبًا، أتوجّه إليكم بطلب العمل لديكم في العطلة الصيفيّة.",
+      "Здравствуйте, обращаюсь с просьбой поработать у вас на летних каникулах.",
+      "Hello, I am writing to ask to work with you over the summer break.")],
+   [F("אני פנוי כל השבוע חוץ מיום שישי, גם בשעות הבוקר.",
+      "أنا متفرّغ طوال الأسبوع عدا يوم الجمعة، وأيضًا في ساعات الصباح.",
+      "Я свободен всю неделю, кроме пятницы, в том числе по утрам.",
+      "I am free all week except Friday, mornings included."),
+    F("אין לי ניסיון בעבודה, אבל אני לומד מהר ומגיע בזמן.",
+      "ليست لديّ خبرة في العمل، لكنّني أتعلّم بسرعة وأصل في الوقت.",
+      "Опыта работы у меня нет, но я быстро учусь и прихожу вовремя.",
+      "I have no work experience, but I learn fast and arrive on time."),
+    F("אני גר קרוב אליכם, ואגיע ברגל בלי תלות באוטובוס.",
+      "أسكن قريبًا منكم، وسآتي سيرًا دون الاعتماد على الحافلة.",
+      "Я живу рядом с вами и буду приходить пешком, не завися от автобуса.",
+      "I live near you, and I will come on foot without depending on a bus."),
+    F("אשמח לעבוד גם בסופי שבוע אם זה מה שנדרש.",
+      "يسعدني العمل في نهايات الأسبوع أيضًا إن كان ذلك مطلوبًا.",
+      "Готов работать и по выходным, если это нужно.",
+      "I would be glad to work weekends too, if that is what is needed.")],
+   [F("בשנה שעברה עזרתי בדוכן בשוק, ולמדתי לעבוד מול לקוחות.",
+      "في السنة الماضية ساعدت في بسطة في السوق، وتعلّمت التعامل مع الزبائن.",
+      "В прошлом году я помогал на прилавке на рынке и научился работать с покупателями.",
+      "Last year I helped at a market stall, and learned to work with customers."),
+    F("בבית הספר הייתי אחראי על מחסן הציוד במשך שנה.",
+      "في المدرسة كنت مسؤولًا عن مخزن المعدّات لمدّة سنة.",
+      "В школе я год отвечал за склад инвентаря.",
+      "At school I was in charge of the equipment room for a year.")],
+   [F("תודה מראש, ואשמח להגיע לפגישה.",
+      "شكرًا مقدّمًا، ويسعدني الحضور إلى مقابلة.",
+      "Заранее спасибо, буду рад прийти на встречу.",
+      "Thank you in advance, and I would be glad to come for a meeting."),
+    F("תודה על הזמן, ואפשר להשיג אותי בטלפון בכל שעה.",
+      "شكرًا على وقتكم، ويمكن الوصول إليّ هاتفيًّا في أيّ ساعة.",
+      "Спасибо за ваше время, со мной можно связаться по телефону в любой час.",
+      "Thank you for your time, and I can be reached by phone at any hour."),
+    F("בברכה, ותודה על ההזדמנות.",
+      "مع التحيّة، وشكرًا على الفرصة.",
+      "С уважением и благодарностью за возможность.",
+      "With thanks for the opportunity.")])
+ ]},
+ {type:"story", topics:[
+  TP("mov", F("מעבר למקום חדש","الانتقال إلى مكان جديد","Переезд на новое место","Moving somewhere new"),
+   [F("ביום שעברנו, הכול היה ארוז חוץ ממני.",
+      "يوم انتقلنا، كان كلّ شيء مُعبّأً إلّا أنا.",
+      "В день переезда всё было упаковано, кроме меня.",
+      "On the day we moved, everything was packed except me."),
+    F("לא ידעתי אף אחד בשכונה החדשה, וזה היה מוזר.",
+      "لم أعرف أحدًا في الحيّ الجديد، وكان ذلك غريبًا.",
+      "Я никого не знал в новом районе, и это было странно.",
+      "I knew nobody in the new neighbourhood, and it felt strange."),
+    F("ההורים אמרו שיהיה בסדר, ואני לא הייתי בטוח.",
+      "قال الوالدان إنّ الأمور ستكون بخير، ولم أكن واثقًا.",
+      "Родители говорили, что всё будет хорошо, а я не был уверен.",
+      "My parents said it would be fine, and I was not sure.")],
+   [F("בהתחלה ספרתי את הימים עד שנחזור לבקר.",
+      "في البداية عددت الأيّام حتّى نعود للزيارة.",
+      "Сначала я считал дни до поездки в гости.",
+      "At first I counted the days until we would visit."),
+    F("לאט לאט למדתי את הדרך לבית הספר בעצמי.",
+      "شيئًا فشيئًا تعلّمت الطريق إلى المدرسة وحدي.",
+      "Постепенно я сам выучил дорогу в школу.",
+      "Little by little I learned the way to school on my own."),
+    F("הבנתי שאני מחכה שמישהו יפנה אליי, במקום לפנות.",
+      "أدركت أنّني أنتظر من يبادرني، بدل أن أبادر.",
+      "Я понял, что жду, пока подойдут ко мне, вместо того чтобы подойти самому.",
+      "I realised I was waiting to be approached instead of approaching."),
+    F("ביום שדיברתי ראשון, משהו השתנה.",
+      "في اليوم الذي بادرت فيه بالكلام، تغيّر شيء ما.",
+      "В день, когда я заговорил первым, что-то изменилось.",
+      "The day I spoke first, something changed.")],
+   [F("שאלתי מישהו איפה המגרש, וזה נגמר במשחק.",
+      "سألت أحدهم أين الملعب، فانتهى الأمر بمباراة.",
+      "Я спросил, где площадка, и это кончилось игрой.",
+      "I asked someone where the court was, and it ended in a game."),
+    F("שכן הביא עוגה ביום הראשון, ולא ידעתי מה לומר.",
+      "أحضر جار كعكة في اليوم الأوّل، ولم أعرف ماذا أقول.",
+      "Сосед принёс пирог в первый день, и я не знал, что сказать.",
+      "A neighbour brought a cake on the first day, and I did not know what to say.")],
+   [F("היום אני יודע שהמקום לא היה הבעיה.",
+      "اليوم أعرف أنّ المكان لم يكن المشكلة.",
+      "Сегодня я знаю, что дело было не в месте.",
+      "Today I know the place was not the problem."),
+    F("למדתי שקשה בהתחלה זה לא אותו דבר כמו קשה תמיד.",
+      "تعلّمت أنّ الصعوبة في البداية ليست كالصعوبة دائمًا.",
+      "Я понял, что трудно вначале — не то же самое, что трудно всегда.",
+      "I learned that hard at first is not the same as hard forever."),
+    F("אם הייתי חוזר לאותו יום, הייתי מדבר ראשון.",
+      "لو عدت إلى ذلك اليوم، لبادرت بالكلام.",
+      "Если бы я вернулся в тот день, я бы заговорил первым.",
+      "If I went back to that day, I would speak first.")]),
+  TP("lng", F("שפה חדשה","لغة جديدة","Новый язык","A new language"),
+   [F("בשבוע הראשון שלי כאן ידעתי לומר שלום ותודה, וזה הכול.",
+      "في أسبوعي الأوّل هنا عرفت أن أقول مرحبًا وشكرًا، وهذا كلّ شيء.",
+      "В первую неделю здесь я умел сказать «здравствуйте» и «спасибо», и это всё.",
+      "In my first week here I could say hello and thank you, and that was all."),
+    F("המילים היו לי בראש, אבל בפה הן יצאו אחרת.",
+      "كانت الكلمات في رأسي، لكنّها خرجت من فمي بشكل آخر.",
+      "Слова были у меня в голове, но изо рта выходили другими.",
+      "The words were in my head, but they came out of my mouth differently."),
+    F("פחדתי לדבר בשפה החדשה, כי חשבתי שיצחקו עליי.",
+      "خفت أن أتكلّم باللغة الجديدة، لأنّني ظننت أنّهم سيضحكون عليّ.",
+      "Я боялся говорить на новом языке, потому что думал, что надо мной посмеются.",
+      "I was afraid to speak the new language, because I thought they would laugh at me.")],
+   [F("עניתי רק כן ולא, ובכל השאר שתקתי.",
+      "أجبت بنعم ولا فقط، وصمتّ في كلّ ما عدا ذلك.",
+      "Я отвечал только «да» и «нет», а во всём остальном молчал.",
+      "I answered only yes and no, and stayed silent for everything else."),
+    F("טעיתי במילה בכיתה, ואף אחד לא צחק כמו שדמיינתי.",
+      "أخطأت في كلمة في الصفّ، ولم يضحك أحد كما تخيّلت.",
+      "Я ошибся в слове на уроке, и никто не засмеялся, как я себе представлял.",
+      "I got a word wrong in class, and nobody laughed the way I had imagined."),
+    F("כתבתי מילים חדשות בפתק וחזרתי עליהן בדרך הביתה.",
+      "كتبت كلمات جديدة في ورقة وكرّرتها في الطريق إلى البيت.",
+      "Я записывал новые слова на листке и повторял их по дороге домой.",
+      "I wrote new words on a note and repeated them on the way home."),
+    F("הבנתי בדיחה בשיעור, וצחקתי יחד עם כולם.",
+      "فهمت نكتة في الحصّة، وضحكت مع الجميع.",
+      "Я понял шутку на уроке и засмеялся вместе со всеми.",
+      "I understood a joke in class, and laughed together with everyone.")],
+   [F("בקופה ביקשתי לחם ואמרתי מילה אחרת, והמוכר חייך והבין.",
+      "عند الصندوق طلبت خبزًا فقلت كلمة أخرى، فابتسم البائع وفهم.",
+      "На кассе я попросил хлеб, но сказал другое слово, и продавец улыбнулся и понял.",
+      "At the till I asked for bread and said another word, and the seller smiled and understood."),
+    F("בשיעור התנדבתי לקרוא בקול, ובפעם השנייה זה כבר היה קל.",
+      "في الحصّة تطوّعت للقراءة بصوت عالٍ، وفي المرّة الثانية صار الأمر سهلًا.",
+      "На уроке я вызвался читать вслух, и во второй раз это уже было легко.",
+      "In class I volunteered to read aloud, and the second time it was already easy.")],
+   [F("היום אני יודע שהשפה נכנסת דרך הפה, לא דרך הפחד.",
+      "اليوم أعرف أنّ اللغة تدخل عبر الفم، لا عبر الخوف.",
+      "Сегодня я знаю, что язык входит через рот, а не через страх.",
+      "Today I know a language comes in through the mouth, not through fear."),
+    F("למדתי שטעות בשפה עולה פחות משתיקה.",
+      "تعلّمت أنّ الخطأ في اللغة يكلّف أقلّ من الصمت.",
+      "Я понял, что ошибка в языке обходится дешевле молчания.",
+      "I learned that a mistake in a language costs less than silence."),
+    F("אם הייתי חוזר לשבוע הראשון, הייתי מדבר יותר ומתנצל פחות.",
+      "لو عدت إلى الأسبوع الأوّل، لتكلّمت أكثر واعتذرت أقلّ.",
+      "Если бы я вернулся в ту первую неделю, я бы больше говорил и меньше извинялся.",
+      "If I went back to that first week, I would speak more and apologise less.")]),
+  TP("stg", F("עלייה לבמה","الوقوف على المسرح","Выход на сцену","Going on stage"),
+   [F("עמדתי מאחורי הווילון ושמעתי את הלב שלי חזק מהמוזיקה.",
+      "وقفت خلف الستارة وسمعت قلبي أعلى من الموسيقى.",
+      "Я стоял за занавесом и слышал своё сердце громче музыки.",
+      "I stood behind the curtain and heard my heart louder than the music."),
+    F("נרשמתי להופעה של הכיתה ומיד התחרטתי.",
+      "سجّلت لعرض الصفّ وندمت فورًا.",
+      "Я записался на выступление класса и сразу пожалел.",
+      "I signed up for the class show and regretted it at once."),
+    F("המורה שאלה מי רוצה לעלות ראשון, והיד שלי עלתה לבד.",
+      "سألت المعلّمة من يريد الصعود أوّلًا، فارتفعت يدي وحدها.",
+      "Учительница спросила, кто хочет выйти первым, и моя рука поднялась сама.",
+      "The teacher asked who wanted to go first, and my hand went up by itself.")],
+   [F("חזרתי על הטקסט בבית עשרים פעם, ועל הבמה הוא נשמע אחרת.",
+      "كرّرت النصّ في البيت عشرين مرّة، وعلى المسرح بدا مختلفًا.",
+      "Дома я повторил текст двадцать раз, а на сцене он звучал иначе.",
+      "I went over the text at home twenty times, and on stage it sounded different."),
+    F("הידיים שלי רעדו, וגיליתי שאף אחד באולם לא ראה את זה.",
+      "ارتجفت يداي، واكتشفت أنّ أحدًا في القاعة لم يرَ ذلك.",
+      "Мои руки дрожали, и я обнаружил, что в зале этого никто не видел.",
+      "My hands shook, and I found out that nobody in the hall saw it."),
+    F("שכחתי שורה באמצע, המשכתי הלאה, והקהל לא הרגיש.",
+      "نسيت سطرًا في المنتصف، وواصلت، ولم يشعر الجمهور.",
+      "Я забыл строчку в середине, продолжил дальше, и зал не заметил.",
+      "I forgot a line in the middle, carried on, and the audience did not notice."),
+    F("מצאתי פנים מוכרות בשורה השלישית, ודיברתי אליהן.",
+      "وجدت وجهًا مألوفًا في الصفّ الثالث، وتحدّثت إليه.",
+      "Я нашёл знакомое лицо в третьем ряду и говорил ему.",
+      "I found a familiar face in the third row, and spoke to it.")],
+   [F("בחזרה האחרונה נפלתי מהמדרגה, וכולם צחקו איתי ולא עליי.",
+      "في البروفة الأخيرة سقطت عن الدرجة، وضحك الجميع معي لا عليّ.",
+      "На последней репетиции я упал со ступеньки, и все смеялись со мной, а не надо мной.",
+      "At the last rehearsal I fell off the step, and everyone laughed with me, not at me."),
+    F("בסוף ההופעה ילד קטן ביקש ממני צילום, ולא ידעתי מה לומר.",
+      "في نهاية العرض طلب منّي طفل صغير صورة، ولم أعرف ماذا أقول.",
+      "После выступления маленький мальчик попросил со мной сфотографироваться, и я не знал, что сказать.",
+      "After the show a small boy asked me for a photo, and I did not know what to say.")],
+   [F("היום אני יודע שהפחד לא נעלם, אבל אפשר לעלות איתו.",
+      "اليوم أعرف أنّ الخوف لا يزول، لكن يمكن الصعود معه.",
+      "Сегодня я знаю, что страх не исчезает, но с ним можно выйти на сцену.",
+      "Today I know the fear does not go away, but you can go on stage with it."),
+    F("למדתי שהקהל רואה הרבה פחות ממה שאני מרגיש.",
+      "تعلّمت أنّ الجمهور يرى أقلّ بكثير ممّا أشعر به.",
+      "Я понял, что зал видит гораздо меньше, чем я чувствую.",
+      "I learned that the audience sees far less than I feel."),
+    F("אם תהיה הופעה נוספת, אני נרשם שוב.",
+      "إن كان هناك عرض آخر، سأسجّل مرّة أخرى.",
+      "Если будет ещё одно выступление, я запишусь снова.",
+      "If there is another show, I will sign up again.")])
+ ]}
+];
+
+/* ============================================================
+   8. מנוע ההרכבה
+   ------------------------------------------------------------
+   אין כאן שאלה ואין תשובה נכונה. `W` הוא מצב הכתיבה: איזה סוג
+   נבחר, איזה נושא, ואילו קטעים סומנו בכל אחד מארבעת המקומות.
+
+   הטענות הן ריבוי־בחירה (הלומד מסמן שתיים או שלוש); שלושת
+   האחרים הם בחירה יחידה. זה לא קישוט: חיבור עם טענה אחת אינו
+   חיבור, וחיבור עם חמש טענות אינו נקרא.
+   ============================================================ */
+/* דגלי מסך ההגדרות. ההצהרה שלהם ישבה בבלוק שהוסר, ולכן היא כאן. */
+var gkShow=false,gkMsg=null,askReset=false;
+var W={step:1, type:null, topic:null, op:-1, cl:[], ex:-1, cn:-1, txt:""};
+var CL_MIN=2, CL_MAX=3;
+
+function wReset(){ W={step:1,type:null,topic:null,op:-1,cl:[],ex:-1,cn:-1,txt:""} }
+function typeById(id){ for(var i=0;i<TYPES.length;i++) if(TYPES[i].id===id) return TYPES[i]; return null }
+function bankOf(typeId){ for(var i=0;i<BANKS_K.length;i++) if(BANKS_K[i].type===typeId) return BANKS_K[i].topics; return [] }
+function topicById(typeId,id){ var a=bankOf(typeId),i; for(i=0;i<a.length;i++) if(a[i].id===id) return a[i]; return null }
+function gl(o){ return (o&&(o[state.lang]||o.he))||"" }
+
+/* הטקסט המורכב. שורה לכל חלק, ולא פסקה אחת ארוכה: הלומד צריך
+   לראות את המבנה שהוא בנה, ולא רק את התוצאה. */
+function wText(){
+  var tp=W.topic?topicById(W.type,W.topic):null;
+  if(!tp) return "";
+  var out=[],i;
+  if(W.op>=0&&tp.op[W.op]) out.push(gl(tp.op[W.op]));
+  for(i=0;i<W.cl.length;i++) if(tp.cl[W.cl[i]]) out.push(gl(tp.cl[W.cl[i]]));
+  if(W.ex>=0&&tp.ex[W.ex]) out.push(gl(tp.ex[W.ex]));
+  if(W.cn>=0&&tp.cn[W.cn]) out.push(gl(tp.cn[W.cn]));
+  return out.join(" ");
+}
+/* כמה חסר עדיין. המסך אינו נועל את הכפתור — הוא אומר מה חסר,
+   וזה ההבדל בין הדרכה לחסימה. */
+function wMissing(){
+  var m=[];
+  if(W.op<0) m.push(t("kOpen"));
+  if(W.cl.length<CL_MIN) m.push(t("kClaims"));
+  if(W.ex<0) m.push(t("kEx"));
+  if(W.cn<0) m.push(t("kConc"));
+  return m;
+}
+function wReady(){ return wMissing().length===0 }
+
+/* ============================================================
+   9. מסכים
+   ============================================================ */
+function hdr(){
+  var s=state.screen;
+  return '<div class="hbar"><div class="wrap hrow">'+
+    '<h1 class="brand">'+esc(t("app"))+'<small>'+esc(t("tagline"))+'</small></h1>'+
+    (s==="home"?"":'<button class="gbtn" data-a="home">'+ic("home",16)+" "+esc(t("navHome"))+"</button>")+
+    '<button class="gbtn'+(s==="prog"?" on":"")+'" data-a="prog">'+ic("chart",16)+" "+esc(t("navProg"))+"</button>"+
+    /* מסך המורה נעלם מהכותרת כשנבחר קוד והמכשיר נעול. */
+    ""+
+    '<button class="gbtn'+(s==="set"?" on":"")+'" data-a="set">'+ic("gear",16)+" "+esc(t("navSet"))+"</button>"+
+  "</div></div>"}
+
+function fbar(){
+  return '<div class="fbar"><div class="wrap">'+esc(t("savedNote"))+" · "+BUILD+"</div></div>"}
+
+function vstrip(){
+  var st=voiceStatus();
+  if(st==="ok")return '<div class="vstrip ok">'+ic("spark",15)+" "+esc(t("vsOk"))+"</div>";
+  if(st==="dev")return '<div class="vstrip warn">'+ic("play",15)+" "+esc(t("vsDev"))+
+    ' <button class="btn ghost" data-a="set">'+esc(t("vGem"))+"</button></div>";
+  return '<div class="vstrip bad">'+ic("x",15)+" <b>"+esc(t("vsNoEn"))+"</b> "+esc(t("vsNoEnD"))+
+    ' <button class="btn ghost" data-a="set">'+esc(t("setVoice"))+"</button></div>";
+}
+
+/* --- ארבעת המסכים --- */
+function kCard(inner,act,on,extra){
+  return '<button class="card'+(on?" on":"")+'" '+(act||"")+' style="width:100%;text-align:start;'+(extra||"")+'">'+inner+'</button>';
+}
+function screenType(){
+  var h='<div class="wrap"><h2 class="h2">'+esc(t("kStep1"))+"</h2>"+
+        '<p class="lead">'+esc(t("kStep1D"))+"</p><div class=\"grid\">";
+  TYPES.forEach(function(ty){
+    h+=kCard('<div style="display:flex;gap:12px;align-items:center">'+ic(ty.ic,26)+
+      '<div><div class="ttl">'+esc(gl(ty.n))+'</div><div class="desc">'+esc(gl(ty.d))+'</div></div></div>',
+      'data-a="ktype" data-v="'+esc(ty.id)+'"',false,"margin-bottom:10px");
+  });
+  return h+"</div></div>";
+}
+function screenTopic(){
+  var ty=typeById(W.type), a=bankOf(W.type);
+  var h='<div class="wrap"><button class="btn btn-ghost" data-a="kback">'+esc(t("back"))+"</button>"+
+        '<h2 class="h2">'+esc(t("kStep2"))+"</h2>"+
+        '<p class="lead">'+esc(gl(ty.n))+"</p><div class=\"grid\">";
+  a.forEach(function(tp){
+    h+=kCard('<div class="ttl">'+esc(gl(tp.n))+"</div>",
+      'data-a="ktopic" data-v="'+esc(tp.id)+'"',false,"margin-bottom:10px");
+  });
+  return h+"</div></div>";
+}
+/* שורת קטע: הטקסט עצמו ורמקול לידו. ההקראה כאן אינה מותרות —
+   זה בדיוק הקהל שקורא לאט, והקטע נבחר לפי מה שנשמע נכון. */
+function kOpt(txt,act,on){
+  return '<div class="orow"><button class="opt'+(on?" on":"")+'" '+act+'>'+esc(txt)+"</button>"+
+    '<button class="spk sm" data-a="say" data-say="'+esc(txt)+'" data-lang="'+esc(state.lang)+
+    '" aria-label="'+esc(t("kHear"))+'">'+ic("play",15)+"</button></div>";
+}
+function kGroup(title,note,arr,kind,sel){
+  var h='<h3 class="h3">'+esc(title)+"</h3>"+(note?'<p class="desc">'+esc(note)+"</p>":"");
+  arr.forEach(function(o,i){
+    var on = kind==="cl" ? W.cl.indexOf(i)>=0 : sel===i;
+    h+=kOpt(gl(o),'data-a="kpick" data-k="'+kind+'" data-i="'+i+'"',on);
+  });
+  return h;
+}
+function screenBuild(){
+  var tp=topicById(W.type,W.topic), miss=wMissing();
+  var h='<div class="wrap"><button class="btn btn-ghost" data-a="kback">'+esc(t("back"))+"</button>"+
+    '<h2 class="h2">'+esc(t("kStep3"))+"</h2>"+
+    '<p class="lead">'+esc(gl(typeById(W.type).n))+" · "+esc(gl(tp.n))+"</p>";
+  h+=kGroup(t("kOpen"),"",tp.op,"op",W.op);
+  h+=kGroup(t("kClaims"),t("kClaimsD"),tp.cl,"cl",-1);
+  h+=kGroup(t("kEx"),"",tp.ex,"ex",W.ex);
+  h+=kGroup(t("kConc"),"",tp.cn,"cn",W.cn);
+  h+='<div class="fb '+(miss.length?"warn":"ok")+'" style="margin-top:16px">'+
+     (miss.length?esc(t("kMiss"))+" "+esc(miss.join(", ")):esc(t("kAllSet")))+"</div>";
+  h+='<button class="btn btn-p" style="width:100%;margin-top:12px" data-a="kdone"'+
+     (miss.length?" disabled":"")+">"+ic("book",18)+" "+esc(t("kShow"))+"</button>";
+  /* ״עזרה מהמורה״ בזמן ההרכבה. `q()` שב-mount מחזיר כאן את מה שכבר
+     נבחר, ולכן ג׳וש רואה טקסט חלקי ויכול לעזור לנסח את ההמשך. */
+  if(window.TUTOR&&TUTOR.on())
+    h+='<button class="btn btn-ghost" style="width:100%;margin-top:8px" data-a="tutor">'+
+       esc(TUTOR.label())+"</button>";
+  return h+"</div>";
+}
+function screenText(){
+  return '<div class="wrap"><h2 class="h2">'+esc(t("kStep4"))+"</h2>"+
+    '<div class="para" style="font-size:1.12rem;line-height:1.9">'+esc(W.txt)+"</div>"+
+    '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:16px">'+
+      '<button class="btn btn-g" data-a="ksay">'+ic("speaker",18)+" "+esc(t("kRead"))+"</button>"+
+      '<button class="btn btn-g" data-a="kcopy">'+ic("share",18)+" "+esc(t("kCopy"))+"</button>"+
+      '<button class="btn btn-ghost" data-a="kedit">'+esc(t("kEdit"))+"</button>"+
+      '<button class="btn btn-ghost" data-a="knew">'+esc(t("kNew"))+"</button>"+
+      (window.TUTOR&&TUTOR.on()?'<button class="btn btn-ghost" data-a="tutor">'+esc(TUTOR.label())+"</button>":"")+
+    "</div><div id=\"kmsg\" class=\"desc\" style=\"margin-top:10px\"></div></div>";
+}
+
+/* מסך ההתקדמות של החידון מנה נכונות לפי נושא ורמה. באפליקציית
+   כתיבה אין נכון ולא נכון, ולכן הוא הוחלף בסיכום פשוט: כמה
+   טקסטים נבנו. **טרם נאסף** — המונה ייכנס כשיוחלט מה נספר,
+   ועד אז המסך אומר את האמת ולא מציג אפס מזויף. */
+function screenProg(){
+  return '<div class="wrap"><h2 class="h2">'+esc(t("navProg"))+"</h2>"+
+    '<p class="lead">'+esc(t("kProgSoon"))+"</p></div>";
+}
+function screenSet(){
+  var h='<div class="wrap"><h2 style="margin:1.1rem 0 .6rem;font-size:1.4rem">'+esc(t("setT"))+"</h2>";
+
+  /* מצב מורה. הכרטיס הוא גם הדרך היחידה לגלות שהתכונה קיימת. */
+  h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
+     esc(xt("teHideT"))+'</h3><p class="sub" style="margin:0 0 .6rem">'+esc(xt("teHideNote"))+'</p>'+
+     '<div class="lvls">'+
+     (!teHas()
+       ? '<button class="lvl" data-a="teask">'+esc(xt("teHideBtn"))+'</button>'
+       : (teOpen()
+          ? '<button class="lvl" data-a="telock">'+esc(xt("teLockBtn"))+'</button>'+
+            '<button class="lvl" data-a="techange">'+esc(xt("teChangeBtn"))+'</button>'+
+            '<button class="lvl" data-a="teremove">'+esc(xt("teRemoveBtn"))+'</button>'
+          : '<button class="lvl" data-a="teask">'+esc(xt("teUnlock"))+'</button>'))+
+     '</div></div>';
+
+  /* --- שפת הממשק --- */
+  h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
+     esc(t("setLang"))+"</h3><div class=\"lvls\">";
+  Object.keys(LANGS).forEach(function(k){
+    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'">'+
+      esc(LANGS[k].name)+"</button>";
+  });
+  h+="</div></div>";
+
+  /* --- קול --- */
+  h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem">'+esc(t("setVoice"))+"</h3>";
+  /* בדיקה במקום ניחוש: לחיצה אחת שאומרת אם הקול עובד. */
+  h+='<div style="margin:.6rem 0"><button class="btn" data-a="vcheck">'+esc(t("vSample"))+'</button>'+
+     (VCHK?'<p class="sub" style="margin-top:.4rem">'+esc(VCHK)+'</p>':"")+
+     '<p class="sub" style="margin-top:.3rem;opacity:.7">'+esc(BUILD)+'</p></div>';
+  h+=vstrip();
+  h+='<div class="vgrid" style="margin:.6rem 0">'+
+     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" data-a="vmode" data-v="device">'+
+     '<span><span class="nm">'+esc(t("vDev"))+'</span><br><span class="ds">'+esc(t("vDevD"))+"</span></span></button>"+
+     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" data-a="vmode" data-v="gem">'+
+     '<span><span class="nm">'+esc(t("vGem"))+'</span><br><span class="ds">'+esc(t("vGemD"))+"</span></span></button></div>";
+
+  h+='<div class="row"><div><div class="lab">'+esc(t("rate"))+'</div>'+
+     '<div class="desc">'+esc(t("slow"))+" ← → "+esc(t("fast"))+"</div></div>"+
+     '<input type="range" min="0.6" max="1.3" step="0.05" value="'+state.rate+
+     '" data-a="rate" style="max-width:14rem"></div>';
+
+  if(state.voiceMode!=="gem")h+=devPicker([ LEARN, state.lang ].filter(function(x,i,a){return a.indexOf(x)===i}));
+
+  if(state.voiceMode==="gem"){
+    ["f","m"].forEach(function(g){
+      h+='<p style="font-weight:700;margin:.9rem 0 .4rem">'+esc(g==="f"?t("vFemale"):t("vMale"))+"</p>";
+      h+='<div class="vgrid">';
+      GEM_VOICES.filter(function(v){return v.g===g}).forEach(function(v){
+        h+='<div class="vopt'+(state.gemVoice===v.id?" on":"")+'" data-a="gvoice" data-v="'+v.id+
+          '" role="button" tabindex="0" aria-pressed="'+(state.gemVoice===v.id?"true":"false")+'">'+
+          '<span style="flex:1"><span class="nm">'+esc(gvName(v))+'</span><br>'+
+          '<span class="ds">'+esc(gvDesc(v))+"</span></span>"+
+          '<button class="btn ghost" data-a="gsample" data-v="'+v.id+
+          '" style="padding:.35rem .7rem;min-height:2.2rem;font-size:.82rem">'+
+          ic("play",14)+" "+esc(t("vSample"))+"</button></div>";
+      });
+      h+="</div>";
+    });
+    h+='<label class="lab" for="gk" style="display:block;margin:1rem 0 .4rem">'+esc(t("vKey"))+"</label>"+
+       '<div style="display:flex;gap:.5rem;flex-wrap:wrap">'+
+       '<input id="gk" type="'+(gkShow?"text":"password")+'" value="'+esc(GKEY)+
+       '" placeholder="'+esc(t("vKeyPh"))+'" autocomplete="off">'+
+       '<button class="btn" data-a="gkshow">'+ic("eye",15)+" "+esc(gkShow?t("vHide"):t("vShow"))+"</button>"+
+       '<button class="btn pri" id="gsave" data-a="gsave">'+ic("key",15)+" "+esc(t("vSave"))+"</button></div>";
+    if(gkMsg)h+='<p class="chip '+(gkMsg.ok?"ok":"bad")+'" style="margin-top:.6rem">'+esc(gkMsg.m)+"</p>";
+    h+='<p style="color:var(--muted);font-size:.85rem;margin-top:.6rem">'+esc(t("vSaved"))+"</p>";
+  }
+  h+="</div>";
+
+  /* --- קריאות --- */
+  h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.3rem">'+
+     esc(t("setRead"))+"</h3>";
+  [["sayBtn","sayBtn","sayBtnD"],["big","bigText","bigTextD"],["clear","clearFont","clearFontD"],
+   ["spaced","spacing","spacingD"],["hc","contrast","contrastD"],
+   ["rm","motion","motionD"]].forEach(function(r){
+    h+='<div class="row"><div><div class="lab">'+esc(t(r[1]))+"</div>"+
+      '<div class="desc">'+esc(t(r[2]))+'</div></div>'+
+      '<button class="sw'+(state[r[0]]?" on":"")+'" data-a="tog" data-v="'+r[0]+
+      '" role="switch" aria-checked="'+(state[r[0]]?"true":"false")+
+      '" aria-label="'+esc(t(r[1]))+'"><i></i></button></div>';
+  });
+  h+='<div class="row"><div class="lab">'+esc(t("theme"))+'</div><div class="lvls">'+
+     [["auto","thAuto"],["light","thLight"],["dark","thDark"]].map(function(x){
+       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" data-a="theme" data-v="'+x[0]+'">'+
+         esc(t(x[1]))+"</button>"}).join("")+"</div></div>";
+  h+="</div>";
+
+  /* --- איפוס --- */
+  h+='<div class="card"><div class="row"><div><div class="lab">'+esc(t("reset"))+"</div>"+
+     '<div class="desc">'+esc(t("resetD"))+"</div></div>"+
+     (askReset?
+       '<span style="display:flex;gap:.5rem"><button class="btn" data-a="noreset">'+esc(t("no"))+"</button>"+
+       '<button class="btn pri" data-a="doreset">'+esc(t("yes"))+"</button></span>":
+       '<button class="btn" data-a="askreset">'+ic("redo",15)+" "+esc(t("reset"))+"</button>")+
+     "</div></div>";
+  return h+"</div>"+fbar();
+}
+
+
+/* ==== כותרת תחתונה וקישור הדילוג בשפת הממשק ====
+   שניהם HTML סטטי שאינו עובר דרך render, ולכן נשארו עבריים בכל שפה. */
+var LGFOOT={he:"© 2026 יהושע לגשטיין",ar:"© 2026 يهوشع لچشطاين",ru:"© 2026 Иехошуа Лагштейн",en:"© 2026 Joshua Lagstein"};
+var LGTERMS={he:"תנאי שימוש וזכויות יוצרים",ar:"شروط الاستخدام وحقوق النشر",ru:"Условия использования и авторские права",en:"Terms of use and copyright"};
+var LGSKIP={he:"דילוג לתוכן",ar:"تخطّي إلى المحتوى",ru:"Перейти к содержимому",en:"Skip to content"};
+function lgChrome(){
+  var g="he"; try{ g=state.lang||"he" }catch(e){}
+  if(!LGFOOT[g])g="he";
+  var dir=(g==="ru"||g==="en")?"ltr":"rtl";
+  var f=document.querySelector("footer.lg-foot");
+  if(f){
+    f.setAttribute("lang",g); f.setAttribute("dir",dir);
+    f.textContent="";
+    f.appendChild(document.createTextNode(LGFOOT[g]+" · "));
+    var a=document.createElement("a");
+    a.href="/legal/"; a.style.color="inherit"; a.textContent=LGTERMS[g];
+    f.appendChild(a);
+  }
+  var s=document.querySelector("a.skip[href='#main']");
+  if(s){ s.setAttribute("lang",g); s.setAttribute("dir",dir); s.textContent=LGSKIP[g] }
+}
+
+/* בחירת שפה מתוך שער התנאים — הוא נפתח לפני שיש בכלל גישה להגדרות. */
+window.addEventListener("legal:lang",function(e){
+  var k=e&&e.detail; if(!k)return;
+  try{ state.lang=k;save();render(); }catch(err){}
+});
+
+function render(){ try{lgChrome()}catch(e){}
+  applyModes();
+  /* lvlSync סנכרן שמות רמות. אין רמות באפליקציית כתיבה. */
+  /* ארבעת צעדי הכתיבה יושבים ב-W.step, ולא ב-state.screen:
+     ההתקדמות והגדרות הן מסכי מעטפת ונשארות כפי שהיו, והצעדים
+     הם האפליקציה עצמה. */
+  var body=state.screen==="prog"?screenProg():
+           state.screen==="set" ?screenSet():
+           W.step===4?screenText():
+           W.step===3?screenBuild():
+           W.step===2?screenTopic():screenType();
+  $("#app").innerHTML=hdr()+body;
+}
+/* ============================================================
+   מצב מורה.
+   בונה המבחן ומסך הציונים נועדו למורה. על טאבלט כיתתי, או על
+   טלפון שהילד לוקח לעצמו, אין סיבה שהם יהיו במרחק הקשה אחת:
+   ילד יכול למחוק מבחן, לראות ציונים של חברים, או לפתוח מבחן
+   ולראות מראש את השאלות.
+   זו אינה אבטחה, ואסור להציג אותה ככזאת: מי שיודע לפתוח כלי
+   פיתוח יעקוף אותה בשנייה. זו נעילה מפני יד סקרנית — בדיוק מה
+   שצריך כאן, ולא יותר.
+   כל עוד לא נבחר קוד, שום דבר לא משתנה והמסכים גלויים כתמיד.
+   ============================================================ */
+/* מחרוזות שער התנאים. הן נפרדות מ-T מפני שהשער הועתק כמות
+   שהוא מכל האפליקציות, ומפתחותיו אנגליים. נלקחו כאן רק
+   עשרים וארבעה המפתחות שהשער באמת קורא — לא מאות מחרוזות
+   המבחן שאין לו קיום כאן. */
+var XK={"teHideT":"להסתיר את מסכי המורה","teHideNote":"על מכשיר שהילד משתמש בו, בונה המבחן ומסך הציונים יכולים לשבת מאחורי קוד. לפתיחה מאוחר יותר: להוסיף ?teacher=1 לכתובת.","teHideBtn":"בחירת קוד","teLockBtn":"יציאה ממצב מורה","teChangeBtn":"שינוי הקוד","teRemoveBtn":"ביטול הקוד","teUnlock":"פתיחה","teSet":"בחירת קוד מורה","teTitle":"קוד מורה","teLead":"בונה המבחן ומסך הציונים ייעלמו מהתפריט, וייפתחו רק עם הקוד הזה.","teEnter":"מסכי המורה נעולים. הקלידו את הקוד כדי לפתוח אותם.","teWarn":"זו אינה אבטחה. היא עוצרת יד סקרנית, לא מישהו שמבין במחשבים.","tePin":"קוד — 4 עד 8 ספרות","teAgain":"שוב, לוודא","teRemember":"לזכור במכשיר הזה","teRememberNote":"בלי זה הקוד יידרש שוב בכל פתיחה של האפליקציה. על טאבלט כיתתי — עדיף בלי.","teWaitN":"יותר מדי ניסיונות. נסו שוב בעוד {0} שניות.","teOk":"אישור","teCancel":"ביטול","teForgot":"שכחתי את הקוד","teForgotHow":"אין דרך לשחזר קוד — הוא לא נשמר בשום מקום. מחיקת נתוני האתר בדפדפן מסירה אותו, ואיתם גם ההתקדמות והמבחנים.","teShort":"צריך בין 4 ל-8 ספרות, בלי אותיות.","teMismatch":"שני הקודים אינם זהים.","teBad":"הקוד שגוי."};
+var XT={"ar":{"teHideT":"إخفاء شاشات المعلّم","teHideNote":"على جهاز يستخدمه الطفل، يمكن وضع بانِي الامتحان وشاشة العلامات خلف رمز. للفتح لاحقًا: أضيفوا ?teacher=1 إلى العنوان.","teHideBtn":"اختيار رمز","teLockBtn":"الخروج من وضع المعلّم","teChangeBtn":"تغيير الرمز","teRemoveBtn":"إلغاء الرمز","teUnlock":"فتح","teSet":"اختيار رمز المعلّم","teTitle":"رمز المعلّم","teLead":"سيختفي بانِي الامتحان وشاشة العلامات من القائمة، ولن يُفتحا إلّا بهذا الرمز.","teEnter":"شاشات المعلّم مقفلة. أدخلوا الرمز لفتحها.","teWarn":"هذه ليست حماية. إنّها توقف يدًا فضولية، لا شخصًا يفهم في الحواسيب.","tePin":"الرمز — من ٤ إلى ٨ أرقام","teAgain":"مرّة أخرى، للتأكيد","teRemember":"التذكّر في هذا الجهاز","teRememberNote":"بدون ذلك سيُطلب الرمز في كلّ فتح للتطبيق. على لوح صفّيّ — الأفضل بدونه.","teWaitN":"محاولات كثيرة. حاولوا مجدّدًا بعد {0} ثانية.","teOk":"تأكيد","teCancel":"إلغاء","teForgot":"نسيت الرمز","teForgotHow":"لا توجد طريقة لاستعادة الرمز — فهو غير محفوظ في أيّ مكان. مسح بيانات الموقع من المتصفّح يزيله، ومعه التقدّم والامتحانات.","teShort":"يلزم بين ٤ و‑٨ أرقام، بلا حروف.","teMismatch":"الرمزان غير متطابقين.","teBad":"الرمز غير صحيح."},"ru":{"teHideT":"Скрыть экраны учителя","teHideNote":"На устройстве, которым пользуется ребёнок, конструктор экзамена и экран оценок можно закрыть кодом. Чтобы открыть их потом, добавьте ?teacher=1 к адресу.","teHideBtn":"Выбрать код","teLockBtn":"Выйти из режима учителя","teChangeBtn":"Изменить код","teRemoveBtn":"Убрать код","teUnlock":"Открыть","teSet":"Выбор кода учителя","teTitle":"Код учителя","teLead":"Конструктор экзамена и экран оценок исчезнут из меню и будут открываться только по этому коду.","teEnter":"Экраны учителя закрыты. Введите код, чтобы открыть их.","teWarn":"Это не защита. Она останавливает любопытную руку, а не того, кто разбирается в компьютерах.","tePin":"Код — от 4 до 8 цифр","teAgain":"Ещё раз, для проверки","teRemember":"Запомнить на этом устройстве","teRememberNote":"Без этого код будет запрашиваться при каждом открытии приложения. На классном планшете лучше без этого.","teWaitN":"Слишком много попыток. Повторите через {0} с.","teOk":"Готово","teCancel":"Отмена","teForgot":"Я забыл код","teForgotHow":"Восстановить код нельзя — он нигде не хранится. Очистка данных сайта в браузере удалит его, а вместе с ним прогресс и экзамены.","teShort":"Нужно от 4 до 8 цифр, без букв.","teMismatch":"Коды не совпадают.","teBad":"Неверный код."},"en":{"teHideT":"Hide the teacher screens","teHideNote":"On a device a child uses, the exam builder and the marks screen can sit behind a code. To open them later, add ?teacher=1 to the address.","teHideBtn":"Choose a code","teLockBtn":"Leave teacher mode","teChangeBtn":"Change the code","teRemoveBtn":"Remove the code","teUnlock":"Open","teSet":"Choose a teacher code","teTitle":"Teacher code","teLead":"The exam builder and the marks screen leave the menu, and open only with this code.","teEnter":"The teacher screens are locked. Enter the code to open them.","teWarn":"This is not security. It stops a curious hand, not somebody who knows computers.","tePin":"Code — 4 to 8 digits","teAgain":"Again, to be sure","teRemember":"Remember on this device","teRememberNote":"Without it the code is asked for every time the app opens. On a class tablet, better without.","teWaitN":"Too many tries. Try again in {0} seconds.","teOk":"Confirm","teCancel":"Cancel","teForgot":"I forgot the code","teForgotHow":"There is no way to recover the code — it is not stored anywhere. Clearing the site data in the browser removes it, and the progress and exams with it.","teShort":"It needs 4 to 8 digits, no letters.","teMismatch":"The two codes are not the same.","teBad":"That code is wrong."}};
+function xlg(){return state.lang||"he"}
+function xt(k){var d=XT[xlg()];var v=d&&d[k];return v===undefined?(XK[k]===undefined?k:XK[k]):v}
+/* {0} ו-{1} — סדר המילים משתנה בין השפות, ולכן מספרים ולא רצף */
+function xf(k){var s=xt(k),a=arguments,i;
+  for(i=1;i<a.length;i++)s=s.split("{"+(i-1)+"}").join(String(a[i]));
+  return s}
+var TE={ask:false,mode:"",msg:"",busy:false};
+function teRead(){try{return JSON.parse(localStorage.getItem("kotvim-teacher")||"null")}catch(e){return null}}
+function teWrite(o){try{o===null?localStorage.removeItem("kotvim-teacher"):localStorage.setItem("kotvim-teacher",JSON.stringify(o))}catch(e){}}
+function teHas(){var r=teRead();return !!(r&&r.h)}
+function teOpen(){
+  if(!teHas())return true;
+  try{if(sessionStorage.getItem("kotvim-teacher"+"-open")==="1")return true}catch(e){}
+  try{if(localStorage.getItem("kotvim-teacher"+"-open")==="1")return true}catch(e){}
+  return false;
+}
+function teSetOpen(on,remember){
+  try{sessionStorage.removeItem("kotvim-teacher"+"-open")}catch(e){}
+  try{localStorage.removeItem("kotvim-teacher"+"-open")}catch(e){}
+  if(!on)return;
+  try{(remember?localStorage:sessionStorage).setItem("kotvim-teacher"+"-open","1")}catch(e){}
+}
+/* גיבוב חלש כגיבוי בלבד. SubtleCrypto קיים בכל דפדפן מודרני
+   בהקשר מאובטח, ו-GitHub Pages הוא כזה. */
+function teWeak(s){var h=5381,i;for(i=0;i<s.length;i++)h=((h*33)^s.charCodeAt(i))>>>0;return "w"+h.toString(16)}
+function teHash(pin,salt,cb){
+  var msg=salt+"|"+pin;
+  try{
+    if(window.crypto&&crypto.subtle&&crypto.subtle.digest&&window.TextEncoder){
+      crypto.subtle.digest("SHA-256",new TextEncoder().encode(msg)).then(function(d){
+        var a=Array.prototype.slice.call(new Uint8Array(d));
+        cb(a.map(function(b){return ("0"+b.toString(16)).slice(-2)}).join(""));
+      },function(){cb(teWeak(msg))});
+      return;
+    }
+  }catch(e){}
+  cb(teWeak(msg));
+}
+function teSalt(){
+  var s="";
+  try{
+    var a=new Uint8Array(8);crypto.getRandomValues(a);
+    s=Array.prototype.slice.call(a).map(function(b){return ("0"+b.toString(16)).slice(-2)}).join("");
+  }catch(e){ s=String(Date.now())+Math.random().toString(36).slice(2) }
+  return s;
+}
+/* השהיה אחרי ניסיונות כושלים. ארבע ספרות הן עשרת אלפים
+   אפשרויות, וילד סבלני יכול לנסות הרבה. */
+function teWait(){
+  var r=teRead();if(!r||!r.bad||r.bad<3)return 0;
+  var pen=Math.min(300,Math.pow(2,r.bad-3)*5)*1000;
+  var left=Math.ceil(((r.badAt||0)+pen-Date.now())/1000);
+  return left>0?left:0;
+}
+function teDialog(){
+  var wrap=document.getElementById("te-wrap");
+  if(wrap&&wrap.parentNode)wrap.parentNode.removeChild(wrap);
+  if(!TE.ask)return;
+  var setting=(TE.mode==="set"||TE.mode==="change"||!teHas());
+  var dirv=(LANGS[state.lang]&&LANGS[state.lang].dir)||"rtl";
+  var w=document.createElement("div");
+  w.id="te-wrap"; w.className="te-wrap"; w.dir=dirv;
+  w.setAttribute("role","dialog"); w.setAttribute("aria-modal","true");
+  var wait=teWait();
+  w.innerHTML='<div class="te-box" tabindex="-1">'+
+    '<h2>'+esc(setting?xt("teSet"):xt("teTitle"))+'</h2>'+
+    '<p class="te-lead">'+esc(setting?xt("teLead"):xt("teEnter"))+'</p>'+
+    (setting?'<p class="te-warn">'+esc(xt("teWarn"))+'</p>':'')+
+    '<label class="te-lab" for="te-pin">'+esc(xt("tePin"))+'</label>'+
+    '<input id="te-pin" class="te-in" type="password" inputmode="numeric" '+
+      'autocomplete="off" maxlength="8" dir="ltr">'+
+    (setting?'<label class="te-lab" for="te-pin2">'+esc(xt("teAgain"))+'</label>'+
+      '<input id="te-pin2" class="te-in" type="password" inputmode="numeric" '+
+      'autocomplete="off" maxlength="8" dir="ltr">':'')+
+    '<label class="te-chk"><input type="checkbox" id="te-rem"> '+esc(xt("teRemember"))+'</label>'+
+    '<p class="te-note">'+esc(xt("teRememberNote"))+'</p>'+
+    (TE.msg?'<p class="te-msg" role="alert">'+esc(TE.msg)+'</p>':'')+
+    (wait?'<p class="te-msg" role="alert">'+esc(xf("teWaitN",wait))+'</p>':'')+
+    '<div class="te-row">'+
+      '<button class="te-btn pri" id="te-ok"'+(wait?' disabled':'')+'>'+esc(xt("teOk"))+'</button>'+
+      '<button class="te-btn" id="te-no">'+esc(xt("teCancel"))+'</button>'+
+    '</div>'+
+    (!setting&&teHas()?'<button class="te-btn link" id="te-forgot">'+esc(xt("teForgot"))+'</button>':'')+
+    '</div>';
+  document.body.appendChild(w);
+  var box=w.firstChild, pin=document.getElementById("te-pin");
+  box.focus(); if(pin&&!wait)pin.focus();
+  /* מלכודת פוקוס, כמו בשער התנאים */
+  w.addEventListener("keydown",function(e){
+    if(e.key==="Escape"){teClose();return}
+    if(e.key==="Enter"){e.preventDefault();teSubmit();return}
+    if(e.key!=="Tab")return;
+    var f=box.querySelectorAll("button:not([disabled]),input");
+    if(!f.length)return;
+    var a=f[0],z=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}
+    else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}
+  });
+  document.getElementById("te-no").onclick=teClose;
+  document.getElementById("te-ok").onclick=teSubmit;
+  var fg=document.getElementById("te-forgot");
+  if(fg)fg.onclick=function(){ TE.msg=xt("teForgotHow"); teDialog() };
+}
+function teClose(){ TE.ask=false; TE.mode=""; TE.msg=""; teDialog(); }
+function teSubmit(){
+  if(TE.busy)return;
+  var setting=(TE.mode==="set"||TE.mode==="change"||!teHas());
+  var pin=(document.getElementById("te-pin")||{}).value||"";
+  var rem=!!(document.getElementById("te-rem")||{}).checked;
+  if(!/^[0-9]{4,8}$/.test(pin)){TE.msg=xt("teShort");teDialog();return}
+  if(setting){
+    var p2=(document.getElementById("te-pin2")||{}).value||"";
+    if(pin!==p2){TE.msg=xt("teMismatch");teDialog();return}
+    var salt=teSalt();
+    TE.busy=true;
+    teHash(pin,salt,function(h){
+      TE.busy=false;
+      teWrite({h:h,s:salt,bad:0,badAt:0});
+      teSetOpen(true,rem);
+      TE.ask=false;TE.mode="";TE.msg="";
+      teDialog(); render();
+    });
+    return;
+  }
+  if(teWait()){teDialog();return}
+  var rec=teRead(); if(!rec){teClose();return}
+  TE.busy=true;
+  teHash(pin,rec.s,function(h){
+    TE.busy=false;
+    if(h===rec.h){
+      rec.bad=0;rec.badAt=0;teWrite(rec);
+      teSetOpen(true,rem);
+      TE.ask=false;TE.mode="";TE.msg="";
+      teDialog(); render();
+    }else{
+      rec.bad=(rec.bad||0)+1;rec.badAt=Date.now();teWrite(rec);
+      TE.msg=xt("teBad"); teDialog();
+    }
+  });
+}
+function teAsk(mode){ TE.ask=true; TE.mode=mode||""; TE.msg=""; teDialog() }
+function teLock(){ teSetOpen(false); render() }
+function teRemove(){ teWrite(null); teSetOpen(false); render() }
+/* נעילה אוטומטית אחרי שהאפליקציה הייתה מוסתרת זמן־מה.
+   מורה שבנה מבחן ומסר את הטאבלט בלי ללחוץ "יציאה" השאיר אותו
+   פתוח, וזה בדיוק המצב שהתכונה אמורה למנוע. שתי דקות מספיקות
+   כדי לא להפריע לעבודה רצופה, ולנעול כשהמכשיר עבר יד.
+   נעילה שנשמרה כ"לזכור במכשיר הזה" היא בחירה מפורשת ולא נוגעים בה. */
+var TE_HID=0;
+try{
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden){ TE_HID=Date.now(); return }
+    if(!TE_HID||!teHas())return;
+    var away=Date.now()-TE_HID; TE_HID=0;
+    if(away<120000)return;
+    var kept=false;
+    try{ kept=localStorage.getItem("kotvim-teacher"+"-open")==="1" }catch(e){}
+    if(kept)return;
+    try{ if(sessionStorage.getItem("kotvim-teacher"+"-open")!=="1")return }catch(e){ return }
+    teSetOpen(false); render();
+  });
+}catch(e){}
+
+/* ?teacher=1 פותח את החלון, והפרמטר מוסר מיד מהכתובת כדי שלא
+   יישאר בקישור ששותף או בהיסטוריה. */
+(function(){
+  try{
+    var u=new URL(location.href);
+    if(u.searchParams.get("teacher")==="1"){
+      u.searchParams.delete("teacher");
+      history.replaceState(null,"",u.pathname+(u.searchParams.toString()?"?"+u.searchParams:"")+u.hash);
+      /* שער התנאים יושב מעל הכול, וכך צריך להיות: אי־אפשר להשתמש
+         באפליקציה לפני שהוסכם עליהם. חלון הקוד ממתין לו במקום
+         להיפתח מתחתיו ולהיראות תקוע. */
+      var tries=0;
+      (function waitLegal(){
+        if(tries++>=600){ teAsk(teHas()?"":"set"); return }
+        /* LEGAL.accepted נוצר רק כש-protect.js מאותחל. עד אז אין
+           עדיין מה לבדוק, ובדיקה של ".lg-wrap" לבדה מחזירה "אין
+           שער" בדיוק ברגע שלפני שהוא נבנה. */
+        var ready=false;
+        try{ ready=!!(window.LEGAL&&window.LEGAL.accepted) }catch(e){}
+        if(!ready){ setTimeout(waitLegal,200); return }
+        var ok=true;
+        try{ ok=!!window.LEGAL.accepted() }catch(e){ ok=true }
+        if(!ok){ setTimeout(waitLegal,200); return }
+        teAsk(teHas()?"":"set");
+      })();
+    }
+  }catch(e){}
+})();
+
+function copyText(txt,done){
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done,function(){fallbackCopy(txt,done)});
+      return;
+    }
+  }catch(e){}
+  fallbackCopy(txt,done);
+}
+function fallbackCopy(txt,done){
+  try{
+    var ta=document.createElement("textarea");
+    ta.value=txt; ta.setAttribute("readonly","");
+    ta.style.position="fixed"; ta.style.top="-1000px";
+    document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+    done();
+  }catch(e){}
+}
+
+/* ============================================================
+   10. אירועים
+   ============================================================ */
+function testKey(){
+  var inp=$("#gk"); var k=inp?inp.value.trim():"";
+  saveKey(k);
+  if(!k){gkMsg={ok:true,m:t("vRemoved")};render();return}
+  gkMsg=null;
+  var b=$("#gsave"); if(b){b.textContent=t("vChecking");b.disabled=true}
+  gSynth("שלום.",gvOf(state.gemVoice).id,state.rate,LEARN)
+    .then(function(){gkMsg={ok:true,m:t("vOk")};render();speak("שלום. ככה אני נשמע.",LEARN)})
+    .catch(function(){gkMsg={ok:false,m:t("vErr")};render()});
+}
+/* exLoad היה טעינת המבחנים השמורים של המורה. אין מבחן כאן. */
+/* --- כל לחיצה מושמעת (O-27/O-28, 9.9.2026) ---
+   כפתור שנלחץ מוקרא בשמו בשפת הממשק — לא לפני הפעולה אלא חצי
+   שנייה אחריה, ורק אם המנוע שותק: פעולה שמדברת בעצמה מנצחת,
+   והתווית לא נחתכת. data-nosay על כפתור משתיק אותו. */
+function sayClick(el){
+  var a=el.getAttribute("data-a")||"";
+  if(/^(say|sayline|ksay)$/.test(a)||el.hasAttribute("data-nosay"))return;
+  if(state.sayBtn===false)return;   /* המתג במסך ההגדרות (O-29) */
+  var label=el.getAttribute("aria-label")||el.textContent||"";
+  label=plainOf(String(label)).replace(/\s+/g," ").trim();
+  if(!label||label.length>60)return;
+  setTimeout(function(){
+    try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+    speak(label,state.lang);
+  },500);
+}
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-a]"); if(!el)return;
+  sayClick(el);
+  var a=el.getAttribute("data-a"),v=el.getAttribute("data-v");
+  /* examAction היה נתב פעולות המבחן. אין מבחן כאן. */
+  if(a==="go"){state.screen="home";stopSpeak();render();window.scrollTo(0,0);return}
+  /* ג׳וש. עוצרים את ההקראה של האפליקציה לפני שהפאנל מדבר. */
+  if(a==="tutor"){ try{stopSpeak()}catch(e){} if(window.TUTOR)TUTOR.open(); return }
+
+  if(a==="say"||a==="sayline"){
+    var txt=el.getAttribute("data-say")||"";
+    var lg=el.getAttribute("data-lang")||LEARN;
+    var slow=el.getAttribute("data-slow")==="1";
+    /* לחיצה על משפט בקטע מסמנת אותו — הקורא צריך לדעת מה מדבר */
+    if(a==="sayline"){
+      var all=document.querySelectorAll(".passage .s");
+      for(var z=0;z<all.length;z++)all[z].classList.remove("now");
+      el.classList.add("now");
+    }
+    speak(txt,lg,slow?0.7:1);
+    /* מכינים אחרי speak, כי הוא קורא ל-stopSpeak שמנקה הדגשה קודמת.
+       האמירה נוצרת אסינכרונית אחרי שרשימת הקולות עולה, ולכן ההכנה
+       כאן תמיד מקדימה אותה. */
+    var tgt=a==="sayline"?el:hlFind(el,txt);
+    if(tgt)hlPrep(tgt,txt);
+    else hlWhole(el.closest&&el.closest(".fb,.qcard,.card"));
+    return;
+  }
+  if(a==="home"){state.screen="home";stopSpeak();save();render();window.scrollTo(0,0);return}
+  if(a==="prog"){state.screen="prog";stopSpeak();render();window.scrollTo(0,0);return}
+  if(a==="set"){state.screen="set";stopSpeak();gkMsg=null;render();window.scrollTo(0,0);return}
+  /* --- ארבעת הצעדים --- */
+  if(a==="ktype"){ W.type=v; W.topic=null; W.step=2; stopSpeak(); render(); window.scrollTo(0,0); return }
+  if(a==="ktopic"){
+    W.topic=v; W.op=-1; W.cl=[]; W.ex=-1; W.cn=-1; W.step=3;
+    stopSpeak(); render(); window.scrollTo(0,0); return;
+  }
+  if(a==="kback"){
+    stopSpeak();
+    if(W.step===3){W.step=2} else if(W.step===2){W.step=1;W.type=null}
+    render(); window.scrollTo(0,0); return;
+  }
+  if(a==="kpick"){
+    var kk=el.getAttribute("data-k"), ki=parseInt(el.getAttribute("data-i"),10);
+    if(kk==="cl"){
+      var at=W.cl.indexOf(ki);
+      /* טענות הן ריבוי־בחירה עם תקרה. מעל התקרה הלחיצה אינה
+         מתעלמת בשקט — היא מודיעה, אחרת נראה שהכפתור שבור. */
+      if(at>=0) W.cl.splice(at,1);
+      else if(W.cl.length>=CL_MAX){ announce(t("kTooMany")); return }
+      else W.cl.push(ki);
+    }
+    else if(kk==="op") W.op=(W.op===ki?-1:ki);
+    else if(kk==="ex") W.ex=(W.ex===ki?-1:ki);
+    else if(kk==="cn") W.cn=(W.cn===ki?-1:ki);
+    render(); return;
+  }
+  if(a==="kdone"){
+    if(!wReady())return;
+    W.txt=wText(); W.step=4; stopSpeak(); render(); window.scrollTo(0,0);
+    announce(t("kStep4"));
+    return;
+  }
+  if(a==="kedit"){ W.step=3; stopSpeak(); render(); window.scrollTo(0,0); return }
+  if(a==="knew"){ wReset(); stopSpeak(); render(); window.scrollTo(0,0); return }
+  if(a==="ksay"){ speak(W.txt,state.lang); return }
+  if(a==="kcopy"){
+    copyText(W.txt,function(){
+      var m=$("#kmsg"); if(m)m.textContent=t("kCopied");
+      announce(t("kCopied"));
+    });
+    return;
+  }
+  if(a==="lang"){state.lang=LANGS[v]?v:"he";save();render();return}
+  if(a==="vmode"){state.voiceMode=v==="gem"?"gem":"device";save();render();return}
+  if(a==="vcheck"){voiceCheck();return}
+  if(a==="devvoice"||a==="devsample"){
+    var lg=el.getAttribute("data-l")||state.lang;
+    var code=LANGS[lg].tts;
+    var uri=el.getAttribute("data-u")||"";
+    if(a==="devvoice"){
+      if(!state.devVoice)state.devVoice={};
+      if(uri)state.devVoice[code]=uri; else delete state.devVoice[code];
+      save(); render();
+    }
+    /* משמיעים תמיד — בחירה בלי לשמוע אינה בחירה. */
+    speak(lg==="en"?'Hello. This is the reading voice.':t("heroT"),lg);
+    return;
+  }
+  if(a==="gvoice"){state.gemVoice=gvOf(v).id;save();render();return}
+  if(a==="gsample"){
+    if(!hasKey()){gkMsg={ok:false,m:t("vNeed")};render();return}
+    var vid=gvOf(el.getAttribute("data-v")).id, old=state.gemVoice;
+    state.gemVoice=vid; state.voiceMode="gem";
+    speak("שלום. ככה אני נשמע.",LEARN);
+    state.gemVoice=old; save(); return;
+  }
+  if(a==="gkshow"){var inp=$("#gk");var val=inp?inp.value:GKEY;gkShow=!gkShow;render();
+    var i2=$("#gk"); if(i2){i2.value=val;i2.focus()} return}
+  if(a==="gsave"){testKey();return}
+  if(a==="tog"){state[v]=!state[v];save();render();return}
+  if(a==="theme"){state.theme=v;save();render();return}
+  if(a==="askreset"){askReset=true;render();return}
+  if(a==="noreset"){askReset=false;render();return}
+  if(a==="doreset"){
+    var lg2=state.lang; state=blankState(); state.lang=lg2;
+    try{localStorage.removeItem(SKEY)}catch(e){}
+    askReset=false; save(); render(); return;
+  }
+});
+document.addEventListener("input",function(e){
+  var el=e.target.closest("[data-a='rate']"); if(!el)return;
+  state.rate=clamp(parseFloat(el.value)||0.95,0.6,1.3); save();
+});
+/* Enter ורווח על כרטיס קול — הוא div ולכן המקלדת אינה מקבלת אותו בחינם */
+document.addEventListener("keydown",function(e){
+  if(e.key!=="Enter"&&e.key!==" ")return;
+  var el=e.target.closest("[data-a='gvoice'],[data-a='devvoice'],[data-a='sayline']"); if(!el)return;
+  e.preventDefault(); el.click();
+});
+/* קיצורי מקלדת בתרגול, כמו באפליקציות המתמטיקה: מי שהעכבר קשה לו,
+   או שהוא עובד עם מקלדת בלבד, לא אמור להיות תלוי בלחיצה מדויקת.
+   1–4 עונה, רווח מקריא שוב, Enter עובר לשאלה הבאה. */
+document.addEventListener("keydown",function(e){
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.target&&e.target.closest("input,textarea,select,[contenteditable]"))return;
+  /* רווח מקריא את מה שעל המסך. בצעד הרביעי זה הטקסט שנבנה,
+     ובצעדים שלפניו אין מה להקריא — ולכן אין קיצור. */
+  if(e.key===" "&&W.step===4&&W.txt){
+    if(e.target&&e.target.closest("button,[role='button'],a[href]"))return;
+    e.preventDefault(); speak(W.txt,state.lang); return;
+  }
+});
+/* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
+   הקול מכריז "אין קול אנגלי" על מכשיר שיש בו אחד. */
+if(window.speechSynthesis){
+  try{speechSynthesis.getVoices()}catch(e){}
+  speechSynthesis.onvoiceschanged=function(){
+    /* הרשימה יכולה להגיע לפני שהמצב נטען. רינדור אז מצייר מסך של
+       אפליקציה שעדיין לא קיימת. */
+    if(booted)render();
+  };
+}
+window.addEventListener("pagehide",stopSpeak);
+
+/* ============================================================
+   11. הפעלה
+   ============================================================ */
+function boot(){
+  loadKey();
+  load();
+  booted=true;
+  applyModes();
+  render();
+}
+/* INTERNAL-GATE — לא נטענת בלי מפתח. */
+if(!INTERNAL_OK){
+  document.getElementById("gate").hidden=false;
+  document.title="לא פורסם";
+}else{
+  boot();
+}
+</script>
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<script src="/tutor/tutor.js"></script>
+<script src="/legal/terms.js"></script>
+<script src="/legal/protect.js"></script>
+<script>
+/* רישום ה-service worker. הכתובת נושאת את הגרסה, ולכן שינוי גרסה
+   מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js?v=k7-pwa1").catch(function(){});
+  });
+}
+</script>
+<!-- ״עזרה מהמורה״. התשתית ב-/tutor/tutor.js, ההוראות בשרת.
+     mount מחזיר false כשאין כתובת שרת, ואז הכפתור אינו נבנה. -->
+<script>
+if(window.TUTOR){
+  /* הניסוח שעל המסך מגיע כ-HTML; לשרת נשלח טקסט בלבד. */
+  var txt=function(x){return String(x==null?"":x).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim()};
+  TUTOR.mount({
+    app:"kotvim",
+    target:"he",
+    lang:function(){return (typeof state!=="undefined"&&state.lang)||"he"},
+    /* כאן אין תרגיל עם תשובה נכונה, אלא טקסט שהלומד מרכיב. מה
+       שנשלח למורה הוא מה שעל המסך: סוג הטקסט, הנושא, והטקסט
+       עצמו — או, לפני הצעד הרביעי, מה שכבר נבחר. `ans` נשאר null
+       מפני שאין תשובה אחת נכונה בכתיבה. */
+    q:function(){
+      if(typeof W==="undefined"||!W.type)return null;
+      /* W.type ו-W.topic הם מזהים, לא אובייקטים. */
+      var t0=TYPES.filter(function(x){return x.id===W.type})[0];
+      var p0=W.topic?topicById(W.type,W.topic):null;
+      var ty=t0?txt(gl(t0.n)):"", tp=p0?txt(gl(p0.n)):"";
+      var body=W.txt?txt(W.txt):txt(wText());
+      if(!body)return null;
+      return {expr:body, ans:null, topic:tp||null, level:ty||null};
+    },
+    stopHost:function(){try{stopSpeak()}catch(e){}}
+  });
+  if(INTERNAL_OK){try{render()}catch(e){}}
+}
+</script>
+</body>
+</html>

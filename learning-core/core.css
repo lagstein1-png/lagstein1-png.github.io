@@ -1,0 +1,227 @@
+/* =====================================================================
+   learning-core · core.css
+   עיצוב משותף לאפליקציות הלימוד.
+
+   קהל היעד: דיסלקציה, ADHD, עולים חדשים, נהגים מבוגרים. לכן —
+   גופן גדול מברירת המחדל, ניגודיות גבוהה, יעד מגע שאי אפשר לפספס,
+   ואפס אנימציה למי שביקש בלעדיה.
+
+   אין כאן @import ואין גופן חיצוני: גופן שנטען מהרשת שובר עבודה
+   אופליין ומוסיף תלות. משתמשים במה שיש במכשיר.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------
+   1. משתנים
+   הצבעים נבחרו כך שכל טקסט על הרקע שלו עובר 7:1 לפחות (AAA),
+   ולא 4.5:1 שהוא המינימום. הפרש כזה הוא ההבדל בין "אפשר לקרוא"
+   לבין "אפשר לקרוא בשמש, על טלפון, בגיל שישים".
+   --------------------------------------------------------------- */
+:root{
+  --bg:        #FFFFFF;
+  --surface:   #F4F6F9;
+  --line:      #C7CFDA;
+  --ink:       #10182A;   /* על --bg  : יחס גבוה מאוד */
+  --ink-soft:  #3C4657;   /* טקסט משני, עדיין מעל 7:1 */
+  --brand:     #0E3E8C;
+  --brand-ink: #FFFFFF;
+  --ok:        #0B5E2A;
+  --ok-bg:     #E3F5E9;
+  --bad:       #8C1220;
+  --bad-bg:    #FBE7E9;
+  --focus:     #B25A00;
+
+  --r:      14px;         /* פינות */
+  --gap:    16px;
+  --touch:  56px;         /* יעד מגע מינימלי. 44 הוא המינימום בתקן;
+                             כאן 56, כי היד רועדת ומסך קטן. */
+  --fs:     20px;         /* גופן בסיס. גדול מ-16 במכוון. */
+  --lh:     1.7;          /* מרווח שורות — עוזר לדיסלקציה יותר מכל
+                             בחירת גופן */
+  --maxw:   720px;
+}
+
+/* גדלי גופן שהמשתמש בוחר. נשמר ב-localStorage על ידי האפליקציה. */
+:root[data-size="l"]  { --fs: 24px; --touch: 60px; }
+:root[data-size="xl"] { --fs: 29px; --touch: 64px; }
+
+/* מצב כהה — לפי העדפת המערכת, ולא ככפתור נוסף שצריך למצוא. */
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0B0F1A; --surface:#161C2B; --line:#39435A;
+    --ink:#F2F5FA; --ink-soft:#C3CBD9;
+    --brand:#8FB6F5; --brand-ink:#0B0F1A;
+    --ok:#7FE0A2; --ok-bg:#123222;
+    --bad:#FF9AA6; --bad-bg:#3A1218;
+    --focus:#FFC66B;
+  }
+}
+
+/* ---------------------------------------------------------------
+   2. יסודות
+   --------------------------------------------------------------- */
+*, *::before, *::after{ box-sizing:border-box; }
+
+html{
+  /* מונע מ-iOS להגדיל טקסט לבד כשמסובבים את המכשיר */
+  -webkit-text-size-adjust:100%;
+}
+
+body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-size:var(--fs);
+  line-height:var(--lh);
+  font-family: "Segoe UI", "Noto Sans Hebrew", "Arial Hebrew", Arial,
+               system-ui, -apple-system, sans-serif;
+  /* לא מיישרים לשני הצדדים: יישור דו-צדדי יוצר "נהרות" של רווח
+     לבן, וזו אחת התלונות החוזרות של קוראים דיסלקטיים. */
+  text-align:start;
+  overflow-wrap:break-word;
+}
+
+/* RTL הוא ברירת המחדל, ו-dir על <html> הוא מה שמחליף אותו.
+   כל המרווחים כאן לוגיים (inline-start / inline-end) ולא ימין-שמאל,
+   ולכן מעבר לאנגלית או לרוסית לא דורש אף כלל CSS נוסף. */
+[dir="rtl"]{ direction:rtl; }
+[dir="ltr"]{ direction:ltr; }
+
+.lc-wrap{
+  max-width:var(--maxw);
+  margin:0 auto;
+  padding:var(--gap);
+}
+
+/* ---------------------------------------------------------------
+   3. טיפוגרפיה
+   --------------------------------------------------------------- */
+h1,h2,h3{ line-height:1.3; margin:0 0 .5em; font-weight:800; }
+h1{ font-size:1.55em; }
+h2{ font-size:1.25em; }
+h3{ font-size:1.1em; }
+p{ margin:0 0 .8em; }
+p.lc-soft{ color:var(--ink-soft); }
+
+/* כותרת מסך מקבלת מיקוד במעבר — ראו nav.go ב-core.js.
+   בלי הכלל הזה נראה מלבן מיקוד סביב כותרת שאיש לא לחץ עליה. */
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus{ outline:none; }
+
+/* מספרים ונוסחאות תמיד משמאל לימין, גם בתוך משפט עברי */
+.lc-ltr{ direction:ltr; unicode-bidi:isolate; display:inline-block; }
+
+/* ---------------------------------------------------------------
+   4. יעדי מגע
+   כל דבר שאפשר ללחוץ עליו הוא לפחות --touch על --touch. זה לא
+   קישוט: יעד קטן הוא הסיבה הנפוצה ביותר לתשובה שגויה שאינה
+   נובעת מאי-ידיעה.
+   --------------------------------------------------------------- */
+button, .lc-btn, .lc-opt, select, input[type="button"]{
+  font:inherit;
+  min-height:var(--touch);
+  padding:.6em 1.1em;
+  border-radius:var(--r);
+  border:2px solid var(--line);
+  background:var(--surface);
+  color:var(--ink);
+  cursor:pointer;
+  text-align:start;
+}
+
+.lc-btn-main{
+  background:var(--brand);
+  color:var(--brand-ink);
+  border-color:var(--brand);
+  font-weight:700;
+  width:100%;
+}
+
+/* תשובות: אחת מתחת לשנייה, ברוחב מלא. שתיים בשורה נראה מסודר
+   ומייצר לחיצות שגויות. */
+.lc-opts{ display:flex; flex-direction:column; gap:12px; margin:var(--gap) 0; }
+.lc-opt{ width:100%; }
+
+/* נכון/לא נכון — צבע *ועוד* סימן. צבע לבדו אינו נגיש, ואחד מכל
+   שנים-עשר גברים לא יבחין בין הירוק לאדום. */
+.lc-opt[data-state="ok"]{  background:var(--ok-bg);  border-color:var(--ok);  color:var(--ink); }
+.lc-opt[data-state="bad"]{ background:var(--bad-bg); border-color:var(--bad); color:var(--ink); }
+.lc-opt[data-state="ok"]::after{  content:" ✓"; font-weight:800; color:var(--ok); }
+.lc-opt[data-state="bad"]::after{ content:" ✕"; font-weight:800; color:var(--bad); }
+
+/* ---------------------------------------------------------------
+   5. מיקוד
+   מלבן מיקוד עבה, בצבע שאינו הצבע של שום מצב אחר, וגם ב-:focus
+   רגיל ולא רק ב-:focus-visible — מי שמנווט במקלדת חייב לראות איפה
+   הוא נמצא.
+   --------------------------------------------------------------- */
+:focus-visible{
+  outline:4px solid var(--focus);
+  outline-offset:3px;
+  border-radius:6px;
+}
+
+/* דילוג לתוכן — הפריט הראשון ב-Tab בכל דף */
+.lc-skip{
+  position:absolute; inset-inline-start:-9999px; top:0;
+  background:var(--brand); color:var(--brand-ink);
+  padding:.7em 1.1em; z-index:99;
+}
+.lc-skip:focus{ inset-inline-start:0; }
+
+/* ---------------------------------------------------------------
+   6. כרטיסים, מסכים והדגשת הקראה
+   --------------------------------------------------------------- */
+.lc-card{
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:var(--r);
+  padding:var(--gap);
+  margin-bottom:var(--gap);
+}
+
+[data-screen][hidden]{ display:none !important; }
+
+/* המילה הנקראת כרגע. רקע ולא צבע טקסט — ניגודיות הטקסט נשמרת. */
+.lc-kw.on{ background:#FFE9A8; color:#10182A; border-radius:4px; }
+.lc-kwhole{ background:#FFF3CC; color:#10182A; border-radius:6px; }
+@media (prefers-color-scheme: dark){
+  .lc-kw.on{ background:#7A5B00; color:#FFFFFF; }
+  .lc-kwhole{ background:#5C4400; color:#FFFFFF; }
+}
+
+/* סרגל התקדמות */
+.lc-bar{ height:14px; background:var(--line); border-radius:99px; overflow:hidden; }
+.lc-bar > i{ display:block; height:100%; background:var(--ok); }
+
+/* טקסט שרואים רק בקורא מסך */
+.lc-sr{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+}
+
+/* ---------------------------------------------------------------
+   7. פחות תנועה
+   מי שביקש פחות תנועה מקבל אפס. ADHD ורגישות לתנועה הם חלק
+   מקהל היעד, ואנימציה כאן אינה נושאת שום מידע.
+   --------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+    scroll-behavior:auto !important;
+  }
+}
+
+/* ---------------------------------------------------------------
+   8. ניגודיות מוגברת והדפסה
+   --------------------------------------------------------------- */
+@media (prefers-contrast: more){
+  :root{ --line:#000000; --ink-soft:var(--ink); }
+  button, .lc-btn, .lc-opt, .lc-card{ border-width:3px; }
+}
+
+@media print{
+  button, .lc-btn{ display:none; }
+  body{ background:#fff; color:#000; }
+}

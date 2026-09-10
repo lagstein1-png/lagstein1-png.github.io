@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x10 · 2026-09-03";
+  var BUILD = "x34 · 2026-09-10";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -52,7 +52,8 @@
   var store = {
     data: null,
     blank: function () {
-      return { fs: 1, theme: "auto", rate: 1, examId: null, solved: {}, sims: [], weak: {} };
+      return { fs: 1, theme: "auto", rate: 1, say: true, examId: null,
+               solved: {}, sims: [], weak: {}, att: {} };
     },
     load: function () {
       try {
@@ -92,6 +93,9 @@
     });
     $$("[data-rate]").forEach(function (b) {
       b.setAttribute("aria-pressed", String(Number(b.getAttribute("data-rate")) === d.rate));
+    });
+    $$("[data-say]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String((b.getAttribute("data-say") === "1") === (d.say !== false)));
     });
     if (window.Speech) window.Speech.rate = d.rate;
     voiceState();
@@ -289,13 +293,34 @@
   }
   /* התוצאה נשמרת במכשיר: solved לסעיף, ו-weak לפי נושא. דוח
      הנושאים החלשים בשלב 4 נבנה בדיוק מהשניים האלה. */
+  /* `att` הוא רשומה לכל סעיף שנבדק, ו-`weak` נבנה ממנו ולא נצבר
+     בעצמו. הספירה הקודמת הוסיפה שורה ל-`weak` בכל לחיצה על "בדקו",
+     ולכן תלמיד שניסה שלוש פעמים ופתר בפעם הרביעית נראה במסך
+     ההתקדמות כ-1 מתוך 4, והנושא נצבע אדום אף שהסעיף נפתר — הדוח
+     שאמור לומר לו במה להתחיל אמר לו שהוא חלש דווקא במה שהתעקש
+     עליו. סעיף נספר כאן פעם אחת: נפתר או לא, ומספר הניסיונות נשמר
+     בנפרד ואינו מוריד מהתוצאה. */
+  function rebuildWeak() {
+    var d = store.data, w = {};
+    for (var id in d.att) {
+      var a = d.att[id];
+      if (!a || !a.topic) continue;
+      var t = w[a.topic] || (w[a.topic] = { ok: 0, no: 0, tries: 0 });
+      if (a.ok) t.ok++; else t.no++;
+      t.tries += a.tries || 0;
+    }
+    d.weak = w;
+  }
   function recordResult(q, subId, ok) {
     var d = store.data;
     if (!d.solved) d.solved = {};
-    if (!d.weak) d.weak = {};
-    if (ok) d.solved[subId] = true;
-    var w = d.weak[q.topic] || (d.weak[q.topic] = { ok: 0, no: 0 });
-    if (ok) w.ok++; else w.no++;
+    if (!d.att) d.att = {};
+    var a = d.att[subId];
+    if (!a) a = d.att[subId] = { topic: q.topic, ok: false, tries: 0 };
+    a.topic = q.topic;
+    a.tries++;
+    if (ok) { a.ok = true; d.solved[subId] = true; }
+    rebuildWeak();
     store.save();
   }
 
@@ -336,8 +361,13 @@
     box.innerHTML = all.map(function (ex, i) {
       var demo = ex.season === "הדגמה"
         ? ' <span class="chip warn">בחינת הדגמה — לא בחינה אמיתית</span>' : "";
+      /* רמת האוסף על הכרטיס. האפליקציה משרתת 3–4 יחידות וגם 5, ותלמיד
+         שנכנס לאוסף שאינו ברמה שלו מגלה זאת אחרי שהתחיל. אוסף בלי
+         level אינו מציג תווית — לא מנחשים רמה שלא נקבעה. */
+      var lvl = ex.level
+        ? ' <span class="chip">' + esc(ex.level) + "</span>" : "";
       return '<button class="card pick" data-exam="' + esc(ex.id) + '">' +
-        "<h3>" + esc(examTitle(ex) + examSerial(ex, i, all)) + demo + "</h3>" +
+        "<h3>" + esc(examTitle(ex) + examSerial(ex, i, all)) + lvl + demo + "</h3>" +
         '<p class="meta">' +
         plural(ex.questions.length, "שאלה אחת", "שתי שאלות", "שאלות") + " · " +
         plural(countSubs(ex), "סעיף אחד", "שני סעיפים", "סעיפים") + " · " +
@@ -390,7 +420,12 @@
       'value="' + esc(st.val) + '" ' +
       'aria-label="התשובה הסופית לסעיף ' + esc(sub.letter) + '" ' +
       'placeholder="' + esc(hintPlaceholder(sub.finalAnswer)) + '">' +
-      '<button class="btn pri" data-check="' + esc(id) + '" type="button">בדקו</button></div>';
+      '<button class="btn pri" data-check="' + esc(id) + '" type="button">בדקו</button>' +
+      /* ״עזרה מהמורה״ יושב כאן ולא בשורת הרמזים: שורת הרמזים
+         נבנית רק כשיש steps, וסעיף בלי רמזים היה נשאר בלי מורה. */
+      (window.TUTOR && TUTOR.on()
+        ? '<button class="btn ghost" data-tutor="' + esc(id) + '" type="button">' +
+          esc(TUTOR.label()) + "</button>" : "") + "</div>";
 
     if (st.res) {
       /* בלי role="status" — ובכוונה. את המשוב מכריז #live, שקיים
@@ -653,7 +688,11 @@
       var t = byTopic[it.q.topic] || (byTopic[it.q.topic] = { ok: 0, n: 0, pts: 0, max: 0 });
       t.n++; t.max += pts;
       if (r.ok) { t.ok++; t.pts += pts; }
-      recordResult(it.q, it.id, r.ok);
+      /* בדוח הבחינה סעיף ריק שווה אפס נקודות, וכך צריך להיות. במסך
+         ההתקדמות הוא אינו נספר: "לא הגעתי לזה" אינו "טעיתי בזה",
+         ובחינה שנגמר בה הזמן הייתה מוסיפה לנושא כישלון לכל סעיף
+         שהתלמיד לא הספיק להגיע אליו. */
+      if (String(SIM.ans[it.id] || "").trim()) recordResult(it.q, it.id, r.ok);
       rows.push({ id: it.id, letter: it.sub.letter, number: it.q.number,
                   topic: it.q.topic, ok: r.ok, pts: pts,
                   given: SIM.ans[it.id] || "", want: answerText(it.sub.finalAnswer) });
@@ -705,6 +744,18 @@
     return h + "</div>";
   }
 
+  /* --- מתי נושא הוא חלש ------------------------------------------
+     סף אחוזים לבדו תלוי בכמה סעיפים יש בנושא, ולכן הוא מודד את
+     מבנה הבחינה ולא את התלמיד: נושא עם שני סעיפים נופל ל-50% על
+     טעות אחת ונצבע אדום, ונושא עם שלושה נשאר על 67% וירוק — אותה
+     ידיעה בדיוק, שני צבעים. הכלל כאן אינו תלוי במספר הסעיפים:
+     החלקה אחת אינה מסמנת נושא, שתי טעויות מסמנות, ונושא שכולו
+     שגוי מסומן תמיד — גם כשהוא סעיף אחד. */
+  function isWeak(ok, n) {
+    var wrong = n - ok;
+    return n > 0 && (wrong >= 2 || wrong === n);
+  }
+
   function simReportHtml(ex) {
     var r = SIM.res;
     var pct = r.max ? Math.round((r.got / r.max) * 100) : 0;
@@ -720,7 +771,7 @@
       var x = r.byTopic[t];
       var p = x.max ? Math.round((x.pts / x.max) * 100) : 0;
       h += "<tr><td>" + esc(t) + "</td><td>" + x.ok + "/" + x.n + "</td><td>" +
-        x.pts + "/" + x.max + '</td><td><div class="bar2' + (p < 60 ? " weak" : "") +
+        x.pts + "/" + x.max + '</td><td><div class="bar2' + (isWeak(x.ok, x.n) ? " weak" : "") +
         '"><i style="width:' + p + '%"></i></div></td></tr>';
     });
     h += "</tbody></table>";
@@ -729,11 +780,11 @@
        לא מפענח גרף, והמשפט הזה הוא כל מה שהוא צריך מהדוח. */
     var weak = topics.filter(function (t) {
       var x = r.byTopic[t];
-      return x.max && x.pts / x.max < 0.6;
+      return isWeak(x.ok, x.n);
     });
     h += '<p class="note">' + (weak.length
       ? "מה לחזור עליו קודם: " + weak.map(esc).join(", ") + "."
-      : "אין נושא שנפל מתחת ל-60%. אפשר להמשיך הלאה.") + "</p>";
+      : "אין נושא שחוזר בו יותר מטעות אחת. אפשר להמשיך הלאה.") + "</p>";
 
     h += "<h2>סעיף אחר סעיף</h2><table class=\"tbl\"><thead><tr>" +
       "<th>סעיף</th><th>מה נכתב</th><th>התשובה</th><th></th></tr></thead><tbody>";
@@ -797,7 +848,8 @@
     var box = $("#prog-body");
     if (!topics.length) {
       box.innerHTML = '<div class="stub"><b>עוד לא נאסף מידע.</b>' +
-        "כל תשובה שנבדקת — בתרגול או בסימולציה — נספרת כאן לפי נושא.</div>";
+        "כל סעיף שנבדקה בו תשובה — בתרגול או בסימולציה — נספר כאן " +
+        "לפי נושא, פעם אחת. סעיף שנשאר ריק אינו נספר.</div>";
       return;
     }
     var rows = topics.map(function (t) {
@@ -806,17 +858,17 @@
     }).sort(function (a, b) { return a.p - b.p; });
 
     var h = "<h2>לפי נושא</h2><table class=\"tbl\"><thead><tr>" +
-      "<th>נושא</th><th>נכונות</th><th>אחוז</th><th></th></tr></thead><tbody>";
+      "<th>נושא</th><th>סעיפים שנפתרו</th><th>אחוז</th><th></th></tr></thead><tbody>";
     rows.forEach(function (r) {
       h += "<tr><td>" + esc(r.t) + "</td><td>" + r.ok + "/" + r.n + "</td><td>" + r.p +
-        '%</td><td><div class="bar2' + (r.p < 60 ? " weak" : "") +
+        '%</td><td><div class="bar2' + (isWeak(r.ok, r.n) ? " weak" : "") +
         '"><i style="width:' + r.p + '%"></i></div></td></tr>';
     });
     h += "</tbody></table>";
-    var w = rows.filter(function (r) { return r.p < 60; });
+    var w = rows.filter(function (r) { return isWeak(r.ok, r.n); });
     h += '<p class="note">' + (w.length
       ? "הנושאים החלשים: " + w.map(function (r) { return esc(r.t); }).join(", ") + "."
-      : "אין נושא מתחת ל-60%.") + "</p>";
+      : "אין נושא שחוזרת בו יותר מטעות אחת.") + "</p>";
 
     var sims = (d.sims || []).slice().reverse().slice(0, 8);
     if (sims.length) {
@@ -892,18 +944,57 @@
        המסך פעמיים בכל מעבר. הכותרת מוסיפה מידע במקום לחזור עליו —
        היא זו שנקראת בהחלפת לשונית ובחזרה לאפליקציה. */
     document.title = TITLES[screen] +
-      (screen === "home" ? " — בגרות במתמטיקה, חמש יחידות" : " · שאלון 806");
+      (screen === "home" ? " — בגרות במתמטיקה, 3–4 ו-5 יח״ל" : " · שאלון 806");
   }
 
   /* --- אירועים. האזנה אחת על המסמך, ולא מאזין לכל כפתור --------- */
+  /* ״עזרה מהמורה״ — התשתית ב-/tutor/tutor.js וההוראות בשרת.
+     האפליקציה עצמה עברית בלבד: אין בה בורר שפה ואין מילון
+     ארבע־לשוני, ותרגום שלה הוא עבודה אחרת לגמרי. לכן pickLang —
+     לפאנל בורר שפה משלו, והבוט מדבר בארבע השפות גם כאן. */
+  var TUT_ID = null;
+  if (window.TUTOR) {
+    TUTOR.mount({
+      app: "bagrut-806",
+      pickLang: true,                 /* אין בורר באפליקציה — הפאנל מביא אחד */
+      lang: function () { return "he" },
+      q: function () {
+        var r = TUT_ID ? subOf(TUT_ID) : null;
+        if (!r) return null;
+        var txt = function (x) {
+          return String(x == null ? "" : x).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+        };
+        return {
+          expr: txt(r.sub.text) + (r.sub.latex ? "  " + txt(r.sub.latex) : ""),
+          ans: r.sub.finalAnswer ? txt(answerText(r.sub.finalAnswer)) : null,
+          topic: r.q.topic || null,
+          level: "שאלון 806"
+        };
+      },
+      stopHost: function () { try { window.Speech.stop() } catch (e) {} }
+    });
+  }
+
+  function sayClick(el) {
+    if (el.matches("[data-read],[data-read-el],[data-tutor],#btn-stop,#btn-pause,#btn-back,#btn-fwd,[data-nosay]")) return;
+    if (store.data && store.data.say === false) return;   /* המתג בהגדרות (O-29) */
+    var label = (el.getAttribute("aria-label") || el.textContent || "").replace(/\s+/g, " ").trim();
+    if (!label || label.length > 60 || !window.Speech || !window.Speech.say) return;
+    setTimeout(function () { window.Speech.say(label); }, 500);
+  }
   document.addEventListener("click", function (e) {
     var el = e.target.closest ? e.target.closest(
-      "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate]," +
-      "[data-read],[data-read-el],[data-check],[data-hint],[data-sol],[data-hclear]," +
+      "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate],[data-say]," +
+      "[data-read],[data-read-el],[data-check],[data-hint],[data-sol],[data-hclear],[data-tutor]," +
       "[data-simstart],[data-simend]," +
       "#btn-reset,#btn-stop,#btn-try," +
       "#btn-pause,#btn-back,#btn-fwd") : null;
     if (!el) return;
+
+    /* כל לחיצה מושמעת (O-28, 9.9.2026): תווית הכפתור נאמרת חצי
+       שנייה אחרי הפעולה, ורק אם ההקראה שותקת. כפתורי ההקראה עצמם
+       וכפתורי הבקרה שלה אינם כאן — הם מדברים או משתיקים בעצמם. */
+    sayClick(el);
 
     if (el.getAttribute("data-simstart")) {
       var exs = examById(state.examId);
@@ -913,6 +1004,15 @@
     if (el.getAttribute("data-simend")) {
       if (!window.confirm("להגיש את הבחינה? אחרי ההגשה אי אפשר לשנות תשובות.")) return;
       simFinish(false);
+      return;
+    }
+
+    /* ״עזרה מהמורה״. מזהה הסעיף נשמר, ו-q() קורא אותו. */
+    var tut = el.getAttribute("data-tutor");
+    if (tut) {
+      TUT_ID = tut;
+      try { window.Speech.stop() } catch (e) {}
+      if (window.TUTOR) TUTOR.open();
       return;
     }
 
@@ -956,7 +1056,8 @@
       keepVal(chk);
       pc2.res = checkAnswer(sc.sub.finalAnswer, pc2.val);
       pc2.tries++;
-      recordResult(sc.q, chk, pc2.res.ok);
+      /* לחיצה על "בדקו" בשדה ריק אינה ניסיון שנכשל אלא לחיצה בטעות. */
+      if (String(pc2.val || "").trim()) recordResult(sc.q, chk, pc2.res.ok);
       renderAns(chk);
       /* אותו מידע שמופיע על המסך, ולא פחות ממנו: הנוסח שמופיע אחרי
          שני ניסיונות הוא הדרך היחידה קדימה למי שנתקע, ומי שמקשיב
@@ -998,6 +1099,9 @@
       window.Speech.speak([{ text: "שלום. כך נשמעת ההקראה בקצב שנבחר.", el: null }]);
       return;
     }
+    var sy = el.getAttribute("data-say");
+    if (sy !== null) { store.data.say = sy === "1"; store.save(); applyPrefs(); return; }
+
     var rt = el.getAttribute("data-rate");
     if (rt) {
       store.data.rate = Number(rt); store.save();
@@ -1097,11 +1201,14 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x10-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x34-pwa1").catch(function () {});
     });
   }
 
   store.load();
+  /* מכשיר שנצברה בו הספירה הקודמת — שורה לכל לחיצה — מקבל כאן את
+     הספירה החדשה במקומה, כדי שלא יהיו שני בסיסי ספירה באותה טבלה. */
+  rebuildWeak();
   applyPrefs();
   $("#build").textContent = BUILD;
   if (store.data.examId && examById(store.data.examId)) state.examId = store.data.examId;

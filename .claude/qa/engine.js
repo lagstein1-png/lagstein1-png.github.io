@@ -164,6 +164,42 @@ for (const b of BLOCKS) {
   console.log(`     (${b.why})`);
 }
 
+/* ------------------------------------------------------------------
+   סימון שהועתק בלי ה-CSS שלו.
+
+   כפתור התשובה במבחן הכיתתי נבנה בכל האפליקציות כ-
+   `<span class="k">מספר</span><span class="m">ערך</span>`, והוא
+   תלוי בשני כללי CSS: `.opts` שנותן לו פריסה, ו-`.opt .k` שהופך
+   את המספר לתג. שניהם נכתבו פעם אחת ב-english והועתקו.
+
+   ב-math-app הסימון הועתק וה-CSS לא בא איתו, ולכן `.k` נפל לטקסט
+   inline רגיל ונדבק ל-`.m`: התשובה 18 בכפתור הראשון הוצגה "118",
+   ו-`.opts` בלי display פרש ארבעה כפתורים בשורה אחת. אין שגיאת JS,
+   אין ממצא ב-options.js — הוא בודק את הנתונים ולא את מה שמצויר —
+   והמסך פשוט משקר לתלמיד. נמדד בכרומיום: display "block",
+   ‏"116" "223" "327" "420" במקום 16, 23, 27, 20.
+
+   זו אותה משפחה של cache.js: באג שאינו נכתב אלא מועתק. */
+{
+  let cssBad = 0;
+  for (const app of APPS9) {
+    const f = path.join(ROOT, app, 'index.html');
+    if (!fs.existsSync(f)) continue;
+    const src = fs.readFileSync(f, 'utf8');
+    if (!/<span class="k">/.test(src)) continue;
+    const miss = [];
+    if (!/\.opts\s*\{[^}]*display\s*:/.test(src)) miss.push('.opts{display:…}');
+    if (!/\.opt\s+\.k\s*\{/.test(src) && !/\.opts\s+\.opt\s+\.k\s*\{/.test(src))
+      miss.push('.opt .k{…}');
+    if (miss.length) {
+      console.log(`✗ ${app}/index.html: יש <span class="k"> ואין ${miss.join(' ו-')} — התג יידבק לערך`);
+      cssBad++;
+    }
+  }
+  if (!cssBad && SHOW) console.log('✓ כל אפליקציה שיש בה <span class="k"> נושאת גם את ה-CSS שלו');
+  findings += cssBad;
+}
+
 if (!findings && !SHOW) {
   console.log(`${BLOCKS.length} בלוקי מנוע נבדקו — כל העותקים זהים`);
 } else {
