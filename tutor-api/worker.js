@@ -243,18 +243,32 @@ function badEquation(text) {
 }
 
 /* ---------- עזרי HTTP ---------- */
-function cors(env) {
+/* `Access-Control-Allow-Origin` נושא **מקור אחד** ולא רשימה, ולכן
+   אי אפשר פשוט למנות שניים. האתר מוגש משתי כתובות — GitHub Pages
+   והמראה ב-Render — ומקור קבוע היה מרשה לאחת וחוסם את השנייה
+   בשקט: הדפדפן בולע את התשובה, ג׳וש לא עונה, ואין שגיאה בשרת.
+
+   לכן `ALLOW_ORIGIN` הוא רשימה מופרדת בפסיקים, והשרת **מהדהד**
+   את המקור של הבקשה אם הוא ברשימה. מקור שאינו ברשימה מקבל את
+   הראשון, כלומר נחסם — זו התנהגות סגורה, לא פתוחה. */
+const ORIGINS = "https://lagstein1-png.github.io,https://lagstein-hub.onrender.com";
+function pickOrigin(env, reqOrigin) {
+  const list = String(env.ALLOW_ORIGIN || ORIGINS).split(",").map(function (s) { return s.trim() }).filter(Boolean);
+  return list.indexOf(reqOrigin) >= 0 ? reqOrigin : list[0];
+}
+function cors(env, origin) {
   return {
-    "Access-Control-Allow-Origin": env.ALLOW_ORIGIN || "https://lagstein1-png.github.io",
+    "Access-Control-Allow-Origin": origin || pickOrigin(env, null),
+    "Vary": "Origin",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Max-Age": "86400"
   };
 }
-function json(obj, status, env) {
+function json(obj, status, env, origin) {
   return new Response(JSON.stringify(obj), {
     status: status || 200,
-    headers: Object.assign({ "Content-Type": "application/json; charset=utf-8" }, cors(env))
+    headers: Object.assign({ "Content-Type": "application/json; charset=utf-8" }, cors(env, origin))
   });
 }
 
@@ -427,30 +441,31 @@ async function ask(env, ctx, msgs, extra) {
 
 export default {
   async fetch(request, env) {
-    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env) });
-    if (request.method !== "POST") return json({ error: "method" }, 405, env);
-    if (!env.ANTHROPIC_API_KEY) return json({ error: "server" }, 500, env);
+    const org = pickOrigin(env, request.headers.get("Origin"));
+    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env, org) });
+    if (request.method !== "POST") return json({ error: "method" }, 405, env, org);
+    if (!env.ANTHROPIC_API_KEY) return json({ error: "server" }, 500, env, org);
     /* אין מונה יומי ואין הצהרה — לא מתחילים. עדיף בוט שאינו עונה
        על חשבון שאינו חסום. */
     if (noCounter(env))
       return json({ error: "no-rate-limit",
         detail: "חסר קישור KV בשם RATE. בלעדיו אין תקרה יומית. " +
-                "לקשור אותו, או להצהיר ALLOW_NO_RATE_LIMIT=yes." }, 503, env);
+                "לקשור אותו, או להצהיר ALLOW_NO_RATE_LIMIT=yes." }, 503, env, org);
 
     let body;
-    try { body = await request.json() } catch (e) { return json({ error: "bad" }, 400, env) }
+    try { body = await request.json() } catch (e) { return json({ error: "bad" }, 400, env, org) }
     const inp = readBody(body);
-    if (!inp) return json({ error: "bad" }, 400, env);
+    if (!inp) return json({ error: "bad" }, 400, env, org);
 
     const ip = request.headers.get("CF-Connecting-IP") || "0";
-    if (await overLimit(env, ip)) return json({ error: "limit" }, 429, env);
+    if (await overLimit(env, ip)) return json({ error: "limit" }, 429, env, org);
 
     const turn = inp.msgs.filter(m => m.role === "assistant").length;
     const ans = inp.q ? inp.q.ans : null;
     const ctx = contextBlock(inp, turn);
 
     let out = await ask(env, ctx, inp.msgs, "");
-    if (out.err) return json({ error: "upstream" }, 502, env);
+    if (out.err) return json({ error: "upstream" }, 502, env, org);
 
     /* הבדיקה, ואחריה ניסיון שני אחד ולא יותר */
     const bad = t => (turn < 2 && revealsAnswer(t, ans)) || badEquation(t);
@@ -463,7 +478,7 @@ export default {
       out = (again.err || bad(again.text)) ? { text: "" } : again;
     }
 
-    return json({ text: out.text || FALLBACK[inp.lang] || FALLBACK.he }, 200, env);
+    return json({ text: out.text || FALLBACK[inp.lang] || FALLBACK.he }, 200, env, org);
   }
 };
 
