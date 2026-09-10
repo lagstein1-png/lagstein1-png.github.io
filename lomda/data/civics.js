@@ -580,7 +580,16 @@ BANK({
     {he:"בחירות דמוקרטיות הן כלליות, שוות, חשאיות, ישירות ותקופתיות — וחופשיות. טקס בחירות בלי החלפת שלטון הוא מראית עין.",
      ar:"الانتخابات الديمقراطية عامّة ومتساوية وسرّية ومباشرة ودورية — وحرّة. وطقس انتخابيّ بلا إمكان تغيير السلطة مظهر لا أكثر.",
      ru:"Демократические выборы всеобщие, равные, тайные, прямые и свободные. Ритуал без возможности сменить власть — фасад.",
-     en:"Democratic elections are general, equal, secret, direct and free. A ritual with no way to change rulers is a facade."})
+     en:"Democratic elections are general, equal, secret, direct and free. A ritual with no way to change rulers is a facade."}),
+
+  C({he:"פלורליזם",
+     ar:"التعدّدية",
+     ru:"Плюрализм",
+     en:"Pluralism"},
+    {he:"ההכרה שריבוי דעות, אמונות ותרבויות הוא מצב תקין ולא תקלה. לכן הדמוקרטיה מגינה על דעת מיעוט גם כשהיא אינה מקובלת.",
+     ar:"الاعتراف بأنّ تعدّد الآراء والمعتقدات والثقافات وضع طبيعي لا خلل. لذلك تحمي الديمقراطية رأي الأقلّية حتى حين لا يكون مقبولًا.",
+     ru:"Признание того, что многообразие мнений, верований и культур — норма, а не сбой. Поэтому демократия защищает мнение меньшинства даже когда оно непопулярно.",
+     en:"The recognition that a plurality of opinions, beliefs and cultures is normal and not a fault. That is why democracy protects a minority view even when it is unpopular."})
  ],
  [ /* רמה 2 — הבנה */
   C({he:"חופש העיתונות",
@@ -630,7 +639,16 @@ BANK({
     {he:"הבלם שהופך זכויות מהצהרה למגן. אפשר לעצב אותה אחרת, אבל ביטולה מותיר את הרוב בלי מגבלה.",
      ar:"كابح يحوّل الحقوق من إعلان إلى درع. يمكن تصميمها بشكل آخر، لكن إلغاءها يترك الأغلبية بلا قيد.",
      ru:"Тормоз, что делает права из декларации щитом. Устроить его можно иначе, но отмена снимает предел.",
-     en:"The brake that turns rights from a declaration into a shield. Abolishing it leaves no limit at all."})
+     en:"The brake that turns rights from a declaration into a shield. Abolishing it leaves no limit at all."}),
+
+  C({he:"חופש ההפגנה",
+     ar:"حرّية التظاهر",
+     ru:"Свобода демонстраций",
+     en:"Freedom of assembly"},
+    {he:"מי שאין לו רוב בכנסת יכול עדיין להישמע ברחוב. לכן הגבלת הפגנה נבחנת לפי ההפרעה בפועל ולא לפי תוכן המחאה.",
+     ar:"من لا يملك أغلبية في الكنيست يستطيع أن يُسمع صوته في الشارع. لذلك يُفحص تقييد المظاهرة وفق الإعاقة الفعلية لا وفق مضمونها.",
+     ru:"У того, кто не имеет большинства в кнессете, остаётся улица. Поэтому ограничение демонстрации проверяется по реальной помехе, а не по содержанию протеста.",
+     en:"Someone without a majority in the Knesset can still be heard in the street. A demonstration is limited by its disruption, not its content."})
  ],
  [ /* רמה 3 — ניתוח */
   C({he:"מבחן המידתיות",
@@ -680,7 +698,16 @@ BANK({
     {he:"האזרחות הפורמלית היא מעמד משפטי; האזרחות המהותית היא פעולה. לכן חופש ההתאגדות וההפגנה הם זכויות פוליטיות.",
      ar:"المواطَنة الشكلية مكانة قانونية؛ والجوهرية فعل. لذلك تُعدّ حرّية التنظيم والتظاهر والمعلومة حقوقًا سياسية.",
      ru:"Формальное гражданство — правовой статус; содержательное — действие. Поэтому свобода собраний — политическое право.",
-     en:"Formal citizenship is a legal status; substantive citizenship is action. So assembly and information are political."})
+     en:"Formal citizenship is a legal status; substantive citizenship is action. So assembly and information are political."}),
+
+  C({he:"משילות מול ביקורת",
+     ar:"القدرة على الحكم مقابل الرقابة",
+     ru:"Управляемость против контроля",
+     en:"Governing power versus oversight"},
+    {he:"ככל שהפיקוח על השלטון הדוק יותר, כך פעולתו איטית יותר. זו אינה תקלה אלא מחיר מכוון, והוויכוח הוא היכן לקבוע את הרף.",
+     ar:"كلّما اشتدّت الرقابة على السلطة بطؤ عملها. ليس هذا خللًا بل ثمنًا مقصودًا، والخلاف هو أين يوضع الحدّ.",
+     ru:"Чем плотнее контроль над властью, тем медленнее она действует. Это не сбой, а сознательная цена, и спор идёт о том, где провести черту.",
+     en:"The tighter the oversight of government, the slower it acts. This is not a fault but a deliberate price, and the argument is about where to set the line."})
  ]
 ]),
 
@@ -742,7 +769,16 @@ BANK({
     {he:"פסקת ההגבלה היא הכלי המרכזי של הביקורת השיפוטית על חקיקה: אפשר לפגוע בזכות, אך רק בדרך שנקבעה ובמידה הנחוצה.",
      ar:"فقرة التقييد هي الأداة المركزية للرقابة القضائية على التشريع: يجوز المساس بالحقّ، لكن بالطريقة المحدّدة وبالقدر اللازم.",
      ru:"Ограничительная оговорка — главный инструмент судебного контроля: право ограничивают лишь по правилам и в нужной мере.",
-     en:"The limitation clause is the main tool of judicial review: a right may be infringed only in the set manner and extent."})
+     en:"The limitation clause is the main tool of judicial review: a right may be infringed only in the set manner and extent."}),
+
+  C({he:"חובות האזרח",
+     ar:"واجبات المواطن",
+     ru:"Обязанности гражданина",
+     en:"A citizen’s duties"},
+    {he:"לצד הזכויות יש חובות: לשלם מס, לציית לחוק ולהתייצב למשפט כעד. חובה נקבעת בחוק, ולכן אפשר לבקר אותה ולשנותה.",
+     ar:"إلى جانب الحقوق واجبات: دفع الضريبة، الامتثال للقانون، والمثول شاهدًا. الواجب يُحدَّد بقانون، لذلك يمكن تغييره.",
+     ru:"Наряду с правами есть обязанности: платить налоги, соблюдать закон, являться в суд свидетелем. Обязанность задана законом, и её можно изменить.",
+     en:"Alongside rights come duties: paying taxes, obeying the law, and appearing in court as a witness. A duty is set by law, so it can be criticised and changed."})
  ],
  [ /* רמה 2 — הבנה */
   C({he:"פסקת ההגבלה",
@@ -792,7 +828,16 @@ BANK({
     {he:"חוק נבחן מול הנורמה שמעליו, והחלטה מנהלית מול החוק והתקנות. לכן ביטול חוק חריג, וביטול החלטה מנהלית הוא יום־יום.",
      ar:"القانون يُفحص أمام المعيار الأعلى، والقرار الإداريّ أمام القانون واللوائح. لذلك إبطال قانون استثناء، والقرار يوميّ.",
      ru:"Закон проверяют против нормы над ним, а решение — против закона. Отмена закона исключение, отмена решения — будни.",
-     en:"A statute is tested against the norm above it, a decision against the statute. Striking a law is rare; quashing daily."})
+     en:"A statute is tested against the norm above it, a decision against the statute. Striking a law is rare; quashing daily."}),
+
+  C({he:"עתירה לבית המשפט הגבוה לצדק",
+     ar:"التماس إلى محكمة العدل العليا",
+     ru:"Обращение в Высший суд справедливости",
+     en:"Petition to the High Court of Justice"},
+    {he:"הדרך של הפרט להביא החלטה שלטונית לביקורת. די בכך שהוא נפגע ממנה, ובעניין ציבורי מוכרת גם עתירה של מי שאינו נפגע ישיר.",
+     ar:"سبيل الفرد لعرض قرار سلطوي على الرقابة. يكفي أن يكون قد تضرّر منه، وفي شأن عامّ يُقبل أيضًا التماس ممّن لم يتضرّر مباشرة.",
+     ru:"Путь частного лица вынести решение власти на проверку. Довольно того, что оно его затронуло; в общественном деле — и без прямого вреда.",
+     en:"The individual’s way of bringing a government decision under review. Being harmed by it is enough; in a public matter, even that is not required."})
  ],
  [ /* רמה 3 — ניתוח */
   C({he:"התנגשות זכויות",
@@ -842,7 +887,16 @@ BANK({
     {he:"ברוב הדמוקרטיות שינוי חוקתי דורש רוב מיוחד או משאל עם. בישראל אין דרישה כזאת לרוב חוקי היסוד.",
      ar:"في أغلب الديمقراطيات يستوجب التغيير الدستوريّ أغلبية خاصة أو استفتاء. وفي إسرائيل لا اشتراط كهذا لأغلب قوانين الأساس.",
      ru:"В большинстве демократий конституционное изменение требует особого большинства или референдума. В Израиле — нет.",
-     en:"In most democracies constitutional change needs a special majority or a referendum. In Israel most basic laws do not."})
+     en:"In most democracies constitutional change needs a special majority or a referendum. In Israel most basic laws do not."}),
+
+  C({he:"הפרטת שירות ציבורי",
+     ar:"خصخصة خدمة عامّة",
+     ru:"Приватизация государственной услуги",
+     en:"Privatising a public service"},
+    {he:"כשגוף פרטי מפעיל שירות של המדינה, הזכות נשארת של האזרח והאחריות נשארת של המדינה. המתח הוא בין חיסכון לפיקוח שנחלש.",
+     ar:"حين تشغّل جهة خاصّة خدمة تابعة للدولة، يبقى الحقّ للمواطن وتبقى المسؤولية على الدولة. التوتر بين التوفير وبين رقابة تضعف.",
+     ru:"Когда государственную услугу оказывает частная фирма, право остаётся у гражданина, а ответственность — у государства. Экономия против контроля.",
+     en:"When a private body runs a state service, the right stays with the citizen and the responsibility with the state. Saving money against oversight."})
  ]
 ]),
 
@@ -904,7 +958,16 @@ BANK({
     {he:"הוועדה לבחירת שופטים מונה תשעה חברים: שלושה שופטי עליון, שני שרים, שני חברי כנסת ושני נציגי לשכת עורכי הדין.",
      ar:"لجنة اختيار القضاة تسعة أعضاء: ثلاثة قضاة عليا، وزيران، عضوا كنيست، وممثّلان لنقابة المحامين.",
      ru:"Комиссия по отбору судей — девять членов: три судьи, два министра, два депутата и два адвоката.",
-     en:"The judicial selection committee has nine members: three justices, two ministers, two MKs and two bar delegates."})
+     en:"The judicial selection committee has nine members: three justices, two ministers, two MKs and two bar delegates."}),
+
+  C({he:"מבקר המדינה",
+     ar:"مراقب الدولة",
+     ru:"Государственный контролёр",
+     en:"The State Comptroller"},
+    {he:"נבחר בכנסת ואינו כפוף לממשלה. הוא בודק אם גוף ציבורי פעל כחוק ובחיסכון, ומשמש גם נציב תלונות הציבור.",
+     ar:"يُنتخب في الكنيست ولا يخضع للحكومة. يفحص إن كانت جهة عامّة قد عملت وفق القانون وباقتصاد، ويعمل أيضًا مفوّضًا لشكاوى الجمهور.",
+     ru:"Избирается кнессетом и не подчинён правительству. Проверяет, действовало ли ведомство по закону и экономно, и принимает жалобы граждан.",
+     en:"Elected by the Knesset and not under the government. Checks whether a public body acted lawfully and economically, and takes public complaints."})
  ],
  [ /* רמה 2 — הבנה */
   C({he:"קולות אבודים",
@@ -954,7 +1017,16 @@ BANK({
     {he:"מונע הפלת ממשלה בלי חלופה, מצב שמוביל לבחירות תכופות. יציבות היא ערך שלטוני.",
      ar:"يمنع إسقاط حكومة بلا بديل، وهو وضع يقود إلى انتخابات متكرّرة. فالاستقرار قيمة حُكمية.",
      ru:"Не даёт свалить правительство без альтернативы, что ведёт к частым выборам.",
-     en:"It stops a government falling without an alternative, which brings frequent elections."})
+     en:"It stops a government falling without an alternative, which brings frequent elections."}),
+
+  C({he:"משמעת סיעתית",
+     ar:"انضباط الكتلة",
+     ru:"Фракционная дисциплина",
+     en:"Party discipline"},
+    {he:"חבר כנסת מצביע לרוב לפי החלטת סיעתו. זה מייצב את הקואליציה, ובד בבד מחליש את הפיקוח: המפקח והמפוקח מאותו צד.",
+     ar:"يصوّت عضو الكنيست غالبًا وفق قرار كتلته. هذا يثبّت الائتلاف ويُضعف الرقابة في الوقت نفسه: الرقيب والمراقَب من الجهة ذاتها.",
+     ru:"Депутат обычно голосует так, как решила фракция. Это укрепляет коалицию и ослабляет контроль: проверяющий и проверяемый — с одной стороны.",
+     en:"A Knesset member usually votes the way the party bloc decided. That steadies the coalition and weakens oversight: watcher and watched sit on the same side."})
  ],
  [ /* רמה 3 — ניתוח */
   C({he:"ייצוגיות מול יציבות",
@@ -1004,7 +1076,16 @@ BANK({
     {he:"בישראל חוות דעתו של היועץ מחייבת את הממשלה כל עוד לא נקבע אחרת בבית משפט. זה הסדר שנוי במחלוקת.",
      ar:"في إسرائيل تُلزم فتوى المستشار الحكومةَ ما لم تقرّر محكمة خلاف ذلك. وهذا ترتيب موضع خلاف.",
      ru:"В Израиле заключение советника обязательно для правительства, пока суд не решит иначе. Порядок спорный.",
-     en:"In Israel his legal opinion binds the government unless a court rules otherwise. The arrangement is contested."})
+     en:"In Israel his legal opinion binds the government unless a court rules otherwise. The arrangement is contested."}),
+
+  C({he:"מינוי בכירים בשירות הציבורי",
+     ar:"تعيين كبار الموظفين في الخدمة العامّة",
+     ru:"Назначение высших чиновников",
+     en:"Appointing senior civil servants"},
+    {he:"ועדות איתור נועדו למנוע מינוי פוליטי. המתח הוא בין אחריות השר לתוצאה לבין עצמאות הפקיד שאמור לסרב לו.",
+     ar:"لجان البحث وُضعت لمنع التعيين السياسي. التوتر بين مسؤولية الوزير عن النتيجة واستقلال الموظف الذي عليه أن يرفض.",
+     ru:"Отборочные комиссии созданы, чтобы не допустить политического назначения. Напряжение — между ответственностью министра и независимостью чиновника.",
+     en:"Search committees exist to prevent political appointments. The tension is between a minister’s responsibility and an official’s independence."})
  ]
 ]),
 
@@ -1066,7 +1147,16 @@ BANK({
     {he:"״המגזר השלישי״: מייצג קבוצות בלי כוח פוליטי, מספק שירותים חסרים ומבקר את השלטון. תנאי לו — חופש התאגדות.",
      ar:"“القطاع الثالث”: يمثّل مجموعات بلا قوّة سياسية، ويقدّم خدمات ناقصة، ويراقب السلطة. وشرطه حرّية التنظّم.",
      ru:"«Третий сектор»: представляет группы без политической силы, даёт недостающие услуги и контролирует власть.",
-     en:"The third sector: it represents groups with no political power, supplies missing services and scrutinises government."})
+     en:"The third sector: it represents groups with no political power, supplies missing services and scrutinises government."}),
+
+  C({he:"מעמד התושב",
+     ar:"مكانة المقيم",
+     ru:"Статус постоянного жителя",
+     en:"Resident status"},
+    {he:"תושב קבע חי במדינה, משלם מס ובוחר לרשות המקומית — אך אינו בוחר לכנסת. אזרחות היא מעמד נוסף על מגורים.",
+     ar:"المقيم الدائم يعيش في الدولة، يدفع الضريبة وينتخب للسلطة المحلّية — لكنّه لا ينتخب للكنيست. المواطنة مكانة فوق السكن.",
+     ru:"Постоянный житель живёт в стране, платит налоги и голосует на местных выборах — но не в кнессет. Гражданство — статус сверх проживания.",
+     en:"A permanent resident lives here, pays taxes and votes in local elections — but not for the Knesset. Citizenship is a status beyond residence."})
  ],
  [ /* רמה 2 — הבנה */
   C({he:"קריטריון לאום בהגירה",
@@ -1116,7 +1206,16 @@ BANK({
     {he:"השסע החברתי־כלכלי ניכר לא רק בהכנסה אלא בנגישות לשירות. הדרישה חלה על המדינה ועל הרשות המקומית כאחת.",
      ar:"يظهر الانقسام الاجتماعيّ الاقتصاديّ لا في الدخل فحسب بل في إتاحة الخدمة. والمطلب يسري على الدولة والسلطة المحلّية.",
      ru:"Раскол виден не только в доходе, но и в доступе к услуге. Требование обязывает государство и местную власть.",
-     en:"The socio-economic cleavage shows in access to services, not only income. It binds the state and local councils alike."})
+     en:"The socio-economic cleavage shows in access to services, not only income. It binds the state and local councils alike."}),
+
+  C({he:"חופש הדת וחופש מדת",
+     ar:"حرّية الدين وحرّية من الدين",
+     ru:"Свобода религии и свобода от религии",
+     en:"Freedom of religion and freedom from religion"},
+    {he:"שני צדדים של אותה זכות: לקיים מצווה בלי הפרעה, ולא להיות מחויב לה. הסדרי הסטטוס קוו מנסים להחזיק את שניהם יחד.",
+     ar:"وجهان لحقّ واحد: أداء الفريضة دون إعاقة، وعدم الإلزام بها. ترتيبات الوضع الراهن تحاول أن تمسك الاثنين معًا.",
+     ru:"Две стороны одного права: исполнять религиозное предписание без помех и не быть к нему принуждённым. Соглашения статус-кво пытаются удержать и то, и другое.",
+     en:"Two sides of one right: to keep a religious practice undisturbed, and not to be obliged to keep it. The status-quo arrangements try to hold both at once."})
  ],
  [ /* רמה 3 — ניתוח */
   C({he:"המתח בין ״יהודית״ ל״דמוקרטית״",
@@ -1166,7 +1265,16 @@ BANK({
     {he:"כסף שהמדינה מעבירה לרשויות חלשות. היקפו משתנה עם התקציב, ולכן שוויון בשירות אינו מובטח מבנית.",
      ar:"مال تحوّله الدولة إلى سلطات ضعيفة. حجمه يتبدّل مع الميزانية، فالمساواة في الخدمة غير مضمونة بنيويًّا.",
      ru:"Деньги, которые государство даёт слабым муниципалитетам. Объём зависит от бюджета, и равенство услуг не гарантировано.",
-     en:"Money the state gives weaker local authorities. The sum shifts with the budget, so equal service is not guaranteed."})
+     en:"Money the state gives weaker local authorities. The sum shifts with the budget, so equal service is not guaranteed."}),
+
+  C({he:"חינוך משותף ונפרד",
+     ar:"تعليم مشترك ومنفصل",
+     ru:"Совместное и раздельное образование",
+     en:"Shared and separate schooling"},
+    {he:"החינוך בישראל מחולק לזרמים, וכל זרם שומר על תרבותו. המחיר: ילדים גדלים בלי להכיר זה את זה, ושסע חוצה נעשה חופף.",
+     ar:"التعليم في إسرائيل مقسّم إلى تيّارات، وكلّ تيّار يحفظ ثقافته. الثمن: أولاد يكبرون دون أن يعرفوا بعضهم، فيصير الشرخ متطابقًا.",
+     ru:"Образование в Израиле разделено на потоки, каждый хранит свою культуру. Цена: дети растут, не зная друг друга, и раскол становится совпадающим.",
+     en:"Israeli schooling is split into streams, each keeping its own culture. The price: children grow up not knowing one another, and the cleavage overlaps."})
  ]
 ])
 
