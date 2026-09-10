@@ -60,7 +60,7 @@
        node .claude/qa/all.js
 
    הכלי עושה את כל השאר: כותב את הכתובת ב-`tutor/tutor.js`,
-   מעלה את `LEGAL.version` ל-1.1, מעלה את שנים־עשר מפתחות הקאש
+   מעלה את `LEGAL.version` ל-1.1, מעלה את שלושה־עשר מפתחות הקאש
    ומרענן את `STATUS.md`. `--off` מחזיר הכול לאחור.
 
 ### למה `ALLOW_NO_RATE_LIMIT` ולא KV
