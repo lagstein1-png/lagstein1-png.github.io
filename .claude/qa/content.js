@@ -122,7 +122,14 @@ async function scan(page){
     return pct? v/100 : v;
   }
 
-  const HEB=/[֐-׿]/;
+  /* **אותיות** עבריות בלבד, ולא כל בלוק היוניקוד העברי.
+     `[\u0590-\u05FF]` תופס גם את הגרשיים העבריים ״ (U+05F4)
+     ו-׳ (U+05F3), והם משמשים בתוכן כמרכאות **בתוך** מחרוזת
+     ערבית — ״مؤكسِد״, ״درجة الحرارة״. נמדד 10.9.2026: ארבע
+     מחרוזות כאלה ב-`heat.js` וב-`safety.js` דיווחו כ-11 שאלות
+     ״שעדיין נושאות טקסט עברי״, ואין בהן אות עברית אחת. הטווח
+     כאן הוא א׳ (U+05D0) עד ת׳ (U+05EA), ובו גם חמש הסופיות. */
+  const HEB=/[א-ת]/;
   const BROKEN=/\bNaN\b|\bInfinity\b|\bundefined\b|\bnull\b|\[object Object\]/;
   /* מציין מקום שלא הוחלף. `{a}` `{ans}` וכו׳ חד־משמעיים, אבל
      `{0}`..`{3}` נראים בדיוק כמו **סימון קבוצה** — `{3} ∈ A` הוא
@@ -575,7 +582,7 @@ async function scanLang(page,lg){
   const div=document.createElement('div');
   const plain=function(h){div.innerHTML=String(h==null?'':h);
     return (div.textContent||'').replace(/\s+/g,' ').trim()};
-  const HEB=/[֐-׿]/;
+  const HEB=/[א-ת]/;
   /* שתי הסתייגויות, ושתיהן נמדדו ולא שוערו:
 
      · **מתי מתרגמים.** ב״שלב״ התרגום אינו קורה ב-buildQ אלא
