@@ -1448,7 +1448,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t66 · 2026-09-10";
+var BUILD="t67 · 2026-09-10";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -4782,11 +4782,12 @@ function genGrow(L){
       ],rule:"grow",hint:"בדעיכה הגורם השנתי הוא מה שנשאר — 1 פחות האחוז — ומעלים אותו בחזקה."};
   }
   if(L===3){
-    gP=pick([10000,20000,30000,50000]);gR=pick([10,20,50]);gN=ri(2,4);
+    gP=pick([10000,20000,30000,50000]);gR=pick([10,20,25]);gN=ri(2,3);
     gQ=1+gR/100;gV=gP*Math.pow(gQ,gN);
     return {ask:"השקעה של "+num(gP)+' ש"ח גדלה ל-'+num(gV)+' ש"ח תוך '+gN+" שנים, בריבית דריבית קבועה. מהו אחוז הריבית השנתי?",
       expr:"",ans:W(gR+"%"),
       wrong:wSel(gR+"%",[
+        [num(gR*gN)+"%","הכפלתם את האחוז השנתי במספר השנים. בריבית דריבית הגדילה מצטברת, ולכן לא מכפילים אלא מעלים בחזקה."],
         [num(r2((gV-gP)/gP*100))+"%","זה אחוז הגדילה הכולל לאורך כל "+gN+" השנים, לא האחוז השנתי."],
         [num(r2((gV-gP)/gP*100/gN))+"%","חילקתם את אחוז הגדילה הכולל במספר השנים. בריבית דריבית לא מחלקים — מוציאים שורש."],
         [num(r2(gV/gP*100))+"%","זה היחס בין הסכומים באחוזים, לא אחוז הריבית."],
@@ -4952,6 +4953,7 @@ function genSpace(L){
     return {ask:"בפירמידה ישרה שבסיסה ריבוע שצלעו "+pa+' ס"מ, ואורך המקצוע הצדדי '+pe+' ס"מ. מהו גובה הפירמידה?',
       expr:"",ans:W(num(ph)+' ס"מ'),
       wrong:wSel(num(ph)+' ס"מ',[
+        [num(pa/2)+' ס"מ',"זה חצי הצלע. הגובה יורד אל מרכז הריבוע, ולכן הניצב השני הוא חצי האלכסון — ארוך מחצי הצלע."],
         [num(r2(Math.sqrt(pe*pe-pa*pa/4)))+' ס"מ',"השתמשתם בחצי צלע. הגובה של פירמידה יורד אל מרכז הריבוע, ולכן הניצב השני הוא חצי האלכסון — לא חצי הצלע."],
         [num(half)+' ס"מ',"זה חצי אלכסון הבסיס — הניצב השני במשולש, לא הגובה."],
         [num(r2(Math.sqrt(pe*pe+pa*pa/2)))+' ס"מ',"חיברתם במקום לחסר. המקצוע הצדדי הוא היתר, ולכן מחסרים ממנו."],
@@ -6405,7 +6407,7 @@ function exSlot(topicId,level){return [topicId,level,exNewSeed()]}
    התלמיד כשהוא נבחן. */
 function exBuildSlot(slot){
   if(!slot||!topicById(slot[0]))return null;
-  return withSeed(slot[2],function(){return buildQ(slot[0],slot[1],slot[3])})||null;
+  return withSeed(slot[2],function(){return buildQ(slot[0],slot[1])})||null;
 }
 /* מסך הבנייה מצייר את עצמו מחדש אחרי כל לחיצה, ובניית עשרים
    וחמש שאלות בכל ציור מיותרת. המטמון הוא לתצוגה בלבד — מי
@@ -7686,7 +7688,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t66-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t67-pwa1").catch(function(){});
   });
 }
 </script>
