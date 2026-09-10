@@ -48,7 +48,7 @@ BANK({
      en:"How much the speed changes each second. Slowing down counts too, only pointed against the motion."}),
 
   C({he:"כוח",ar:"القوّة",ru:"Сила",en:"Force"},
-    {he:"דחיפה או משיכה. היא משנה את מהירותו של גוף או את כיוונו, או משנה את צורתו.",
+    {he:"דחיפה או משיכה. הוא משנה את מהירותו של גוף או את כיוונו, או משנה את צורתו.",
      ar:"دفع أو سحب يغيّر سرعة الجسم أو اتّجاهه، أو يغيّر شكله.",
      ru:"Толчок или притяжение. Меняет скорость тела или его направление либо меняет его форму.",
      en:"A push or a pull. It changes a body's speed or its direction, or changes its shape."}),

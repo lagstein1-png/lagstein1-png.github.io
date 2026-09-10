@@ -414,7 +414,7 @@ BANK({
      en:"The force times the distance from the axis of rotation. A long spanner undoes a stuck bolt with less hand force than a short one."}),
 
   C({he:"מנוע",ar:"المحرّك",ru:"Двигатель",en:"Engine"},
-    {he:"רכיב שממיר אנרגיה לתנועה. יש כזה שבוער על דלק ויש חשמלי שמזרים זרם, ושניהם מסובבים ציר.",
+    {he:"רכיב שממיר אנרגיה לתנועה. יש כזה ששורף דלק ויש חשמלי שמזרים זרם, ושניהם מסובבים ציר.",
      ar:"مكوّن يحوّل الطاقة إلى حركة. نوع الاحتراق يحرق الوقود والنوع الكهربائيّ يمرّر تيّارًا، وكلاهما يدير عمودًا.",
      ru:"Устройство, превращающее энергию в движение. Один тип жжёт топливо внутри цилиндра, электрический пропускает ток, и оба вращают вал.",
      en:"A part that turns energy into motion. A combustion type burns fuel and an electric motor passes a current, and both of them spin a shaft."}),
@@ -521,10 +521,10 @@ BANK({
      en:"A set of gears that lets you pick the gear ratio. A low gear gives force on a climb, and a high gear gives speed on the flat."}),
 
   C({he:"הספק",ar:"القدرة",ru:"Мощность",en:"Power"},
-    {he:"כמה עבודה נעשית בכל שנייה. מנוע חזק יותר מרים את אותו משא מהר יותר, ולא בהכרח משא כבד יותר.",
-     ar:"كم عملًا يُنجَز في كلّ ثانية. المحرّك الأقوى يرفع الحِمل نفسه أسرع، لا حِملًا أثقل بالضرورة.",
+    {he:"כמה עבודה נעשית בכל שנייה. מנוע שמרים את אותו משא מהר יותר עושה יותר בכל שנייה, ולא בהכרח מרים כבד יותר.",
+     ar:"كم عملًا يُنجَز في كلّ ثانية. المحرّك الذي يرفع الحِمل نفسه أسرع يُنجز أكثر في الثانية، لا حِملًا أثقل بالضرورة.",
      ru:"Сколько работы совершается за каждую секунду. Двигатель большей мощности поднимает тот же груз быстрее, а не обязательно более тяжёлый груз.",
-     en:"How much work is done each second. A stronger engine lifts the same load faster, and not necessarily a heavier load."}),
+     en:"How much work is done each second. An engine that lifts the same load faster does more each second, and not necessarily a heavier load."}),
 
   Sc({he:["מכונה אינה מחזירה כתנועה את כל האנרגיה שנכנסה אליה.",
           "מה שלא הפך לתנועה לא נעלם: הוא הפך לחום. לכן מנוע מתחמם, וגם מברגה מתחממת אחרי עבודה ארוכה.",
