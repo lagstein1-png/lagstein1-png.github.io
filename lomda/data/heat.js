@@ -54,7 +54,7 @@ BANK({
   C({he:"הולכה",ar:"التوصيل",ru:"Теплопроводность",en:"Conduction"},
     {he:"חום עובר במגע ישיר, בתוך חומר או בין שני חומרים שנוגעים. כף מתכת בסיר חם מתחממת עד הידית, בלי שהכף זזה.",
      ar:"تنتقل الحرارة بالتلامس المباشر، داخل مادّة أو بين مادّتين متلامستين. ملعقة معدنية في قدر ساخن تسخن حتى مقبضها دون أن تتحرّك.",
-     ru:"Тепло переходит при прямом контакте — внутри вещества или между двумя соприкасающимися телами. Металлическая ложка в горячей кастрюле нагревается до самой ручки, хотя не двигается.",
+     ru:"Тепло идёт при прямом контакте — внутри вещества или между двумя телами, что соприкасаются. Ложка в горячей кастрюле нагревается до самой ручки, хотя не двигается.",
      en:"Heat moves by direct contact, inside a material or between two materials that touch. A metal spoon in a hot pot warms right up to its handle, without the spoon moving."}),
 
   C({he:"הסעה",ar:"الحمل",ru:"Конвекция",en:"Convection"},
@@ -84,8 +84,14 @@ BANK({
 C({he:"שטח המגע",ar:"مساحة التلامس",ru:"Площадь соприкосновения",en:"The contact area"},
     {he:"ככל ששני גופים נוגעים בשטח גדול יותר, החום עובר ביניהם מהר יותר. כף שטוחה על מחבת מתחממת מהר מכף שנוגעת בקצה בלבד.",
      ar:"كلّما زادت مساحة تلامس جسمين، انتقلت الحرارة بينهما أسرع. ملعقة مسطّحة على المقلاة تسخن أسرع من ملعقة تلامسها بطرفها فقط.",
-     ru:"Чем больше площадь, которой тела соприкасаются, тем быстрее между ними идёт тепло. Плоская ложка на сковороде нагревается быстрее, чем та, что касается лишь кончиком.",
-     en:"The larger the area where two bodies touch, the faster heat passes between them. A flat spoon on a pan warms faster than one touching only at its tip."})
+     ru:"Чем шире место, где тела касаются, тем быстрее между ними идёт тепло. Плоская ложка на сковороде нагревается быстрее, чем та, что касается лишь кончиком.",
+     en:"The larger the area where two bodies touch, the faster heat passes between them. A flat spoon on a pan warms faster than one touching only at its tip."}),
+
+  C({he:"הפרש הטמפרטורות",ar:"فرق درجات الحرارة",ru:"Разность температур",en:"The temperature difference"},
+    {he:"ככל שההפרש בין החם לקר גדול יותר, החום עובר מהר יותר. לכן מרק רותח מתקרר מהר בהתחלה, ולאט כשהוא כבר פושר.",
+     ar:"كلّما كان الفرق بين الساخن والبارد أكبر انتقلت الحرارة أسرع. لذلك يبرد الحساء المغليّ بسرعة في البداية، وببطء حين يصبح فاترًا.",
+     ru:"Чем больше разница между горячим и холодным, тем быстрее переходит тепло. Поэтому кипящий суп сначала остывает быстро, а когда стал тёплым — медленно.",
+     en:"The bigger the difference between hot and cold, the faster heat moves. That is why boiling soup cools quickly at first and slowly once it is merely warm."})
  ],
 
  [ /* רמה 2 — למה זה קורה, ואיפה כל דרך פועלת */
@@ -124,7 +130,13 @@ C({he:"למה נושפים על מרק חם",ar:"لماذا ننفخ على ال
     {he:"הנשיפה מרחיקה את האדים החמים שמעל המרק ומביאה אוויר קר במקומם. שתי הדרכים פועלות יחד: אידוי מהיר יותר והסעה מהירה יותר.",
      ar:"النفخ يُبعد البخار الساخن فوق الحساء ويجلب هواءً باردًا مكانه. الطريقتان تعملان معًا: تبخّر أسرع وحمل أسرع.",
      ru:"Дуновение уносит горячий пар над супом и приводит на его место холодный воздух. Два пути работают вместе: быстрее испарение и быстрее конвекция.",
-     en:"Blowing pushes away the hot vapour above the soup and brings cool air in its place. Two ways work together: faster evaporation and faster convection."})
+     en:"Blowing pushes away the hot vapour above the soup and brings cool air in its place. Two ways work together: faster evaporation and faster convection."}),
+
+  C({he:"למה בגד כהה מתחמם בשמש",ar:"لماذا يسخن اللباس الداكن في الشمس",ru:"Почему тёмная одежда нагревается на солнце",en:"Why dark clothing heats up in the sun"},
+    {he:"בגד כהה בולע כמעט את כל האור שפוגע בו, ובגד בהיר מחזיר חלק ממנו החוצה. האור הנבלע הופך לחום, ולכן הכהה מתחמם יותר.",
+     ar:"اللباس الداكن يمتصّ معظم الضوء الذي يصله، والفاتح يعيد جزءًا منه. الضوء الممتصّ يتحوّل إلى حرارة، لذلك يسخن الداكن أكثر.",
+     ru:"Тёмная одежда поглощает почти весь падающий на неё свет, а светлая часть его отражает. Поглощённый свет становится теплом, поэтому тёмная нагревается сильнее.",
+     en:"Dark clothing absorbs almost all the light that hits it, while light clothing reflects some of it back. The absorbed light turns into heat, so the dark one gets hotter."})
  ],
 
  [ /* רמה 3 — הבחנה בין המקרים, וזיהוי הדרך במצב מורכב */
@@ -345,7 +357,13 @@ C({he:"מעלות צלזיוס",ar:"درجة مئوية",ru:"Градус Цел
     {he:"סולם המדידה הנפוץ. אפס מעלות הוא הטמפרטורה שבה מים קופאים, ומאה מעלות היא זו שבה הם רותחים בגובה פני הים.",
      ar:"سلّم القياس الشائع. الصفر هو درجة تجمّد الماء، والمئة هي درجة غليانه عند مستوى سطح البحر.",
      ru:"Распространённая шкала измерения. Ноль — температура замерзания воды, сто — её кипения на уровне моря.",
-     en:"The common measuring scale. Zero is where water freezes, and a hundred is where it boils at sea level."})
+     en:"The common measuring scale. Zero is where water freezes, and a hundred is where it boils at sea level."}),
+
+  C({he:"מקור חום",ar:"مصدر حرارة",ru:"Источник тепла",en:"A heat source"},
+    {he:"גוף או תהליך שמייצר אנרגיה תרמית ומוסר אותה לסביבה. להבה, גוף חימום חשמלי וגם גוף האדם הם מקורות חום.",
+     ar:"جسم أو عملية يُنتج طاقة حرارية ويمنحها للمحيط. اللهب، والمدفأة الكهربائية، وجسم الإنسان أيضًا مصادر حرارة.",
+     ru:"Тело или процесс, который вырабатывает тепловую энергию и отдаёт её окружению. Пламя, электрический обогреватель и тело человека — источники тепла.",
+     en:"A body or process that produces thermal energy and gives it to its surroundings. A flame, an electric heater and the human body are all heat sources."})
  ],
 
  [ /* רמה 2 — ההבחנה שבין השניים */
@@ -384,7 +402,13 @@ C({he:"למה לא מודדים טמפרטורה בשמש",ar:"لماذا لا �
     {he:"בשמש המדחום קולט קרינה ישירות ומתחמם מעבר לאוויר שסביבו. מדידה נכונה של טמפרטורת האוויר נעשית בצל.",
      ar:"تحت الشمس يمتصّ المقياس الإشعاع مباشرة فيسخن أكثر من الهواء حوله. القياس الصحيح لحرارة الهواء يكون في الظلّ.",
      ru:"На солнце термометр напрямую поглощает излучение и нагревается сильнее окружающего воздуха. Правильно измерять температуру воздуха в тени.",
-     en:"In the sun a thermometer absorbs radiation directly and warms beyond the air around it. Air temperature is measured correctly in the shade."})
+     en:"In the sun a thermometer absorbs radiation directly and warms beyond the air around it. Air temperature is measured correctly in the shade."}),
+
+  C({he:"למה קרח מקרר טוב ממים קרים",ar:"لماذا يبرّد الثلج أفضل من ماء بارد",ru:"Почему лёд охлаждает лучше холодной воды",en:"Why ice cools better than cold water"},
+    {he:"קרח לוקח אנרגיה גם כדי להפוך למים, לא רק כדי להתחמם. לכן הוא מקרר הרבה יותר ממים באותה טמפרטורה.",
+     ar:"الثلج يأخذ طاقة كي يتحوّل إلى ماء، لا كي يسخن فقط. لذلك يبرّد أكثر بكثير من ماء بالدرجة نفسها.",
+     ru:"Лёд забирает энергию ещё и на превращение в воду, не только на нагрев. Поэтому он охлаждает намного сильнее воды той же температуры.",
+     en:"Ice takes energy to turn into water as well, not only to warm up. So it cools far more than water at the same temperature."})
  ],
 
  [ /* רמה 3 — יישום והסקה */
@@ -535,7 +559,13 @@ C({he:"״האש עולה למעלה״ — לא מדויק",ar:"״النار تص
     {he:"מה שעולה הוא האוויר החם, והלהבה נמשכת אחריו. לכן להבה בחלל, בלי כוח כבידה, מקבלת צורה של כדור.",
      ar:"ما يصعد هو الهواء الساخن، واللهب يتبعه. لذلك يأخذ اللهب في الفضاء، بلا جاذبية، شكل كرة.",
      ru:"Вверх идёт горячий воздух, а пламя тянется за ним. Поэтому в космосе, без тяготения, пламя принимает форму шара.",
-     en:"What rises is the hot air, and the flame follows it. That is why a flame in space, with no gravity, takes the shape of a ball."})
+     en:"What rises is the hot air, and the flame follows it. That is why a flame in space, with no gravity, takes the shape of a ball."}),
+
+  C({he:"״המדחום מראה כמה חום יש״ — לא מדויק",ar:"«المِحرار يُظهر كم حرارة هناك» — غير دقيق",ru:"«Термометр показывает, сколько тепла» — неточно",en:"“The thermometer shows how much heat there is” — not exact"},
+    {he:"המדחום מראה טמפרטורה, כלומר כמה מהר נעים החלקיקים. כמה אנרגיה תרמית יש בגוף תלוי גם בגודלו, ואת זה המדחום אינו יודע.",
+     ar:"المِحرار يُظهر درجة الحرارة، أي سرعة حركة الجسيمات. أمّا كمّية الطاقة الحرارية فتتعلّق أيضًا بحجم الجسم.",
+     ru:"Термометр показывает температуру — насколько быстро движутся частицы. Сколько в теле тепловой энергии, зависит ещё и от его размера.",
+     en:"A thermometer shows temperature — how fast the particles move. How much thermal energy a body holds depends on its size too, and that the thermometer does not know."})
  ],
 
  [ /* רמה 2 — שפה יומיומית מול שפה מדעית */
@@ -574,7 +604,13 @@ C({he:"״טמפרטורה״ ביומיום",ar:"״درجة الحرارة״ في
     {he:"ביומיום אומרים ״יש לי טמפרטורה״ ומתכוונים לחום גבוה. במדע טמפרטורה היא מדד שקיים תמיד, גם כשהיא נמוכה.",
      ar:"في اليومي نقول ״عندي حرارة״ ونقصد ارتفاعها. في العلم درجة الحرارة مقياس موجود دائمًا، حتى حين تكون منخفضة.",
      ru:"В быту говорят «у меня температура», имея в виду жар. В науке температура — величина, которая есть всегда, даже когда она низкая.",
-     en:"In everyday speech people say 'I have a temperature' and mean a fever. In science temperature is a measure that always exists, even when it is low."})
+     en:"In everyday speech people say 'I have a temperature' and mean a fever. In science temperature is a measure that always exists, even when it is low."}),
+
+  C({he:"״מהר״ ו״הרבה״ אינם אותו דבר",ar:"«بسرعة» و«كثيرًا» ليسا الشيء ذاته",ru:"«Быстро» и «много» — не одно и то же",en:"“Fast” and “a lot” are not the same"},
+    {he:"משפט מדעי מפריד בין קצב לכמות: כמה חום עובר בשנייה, וכמה עבר בסך הכול. ״התחמם מהר״ מערבב את שניהם.",
+     ar:"الجملة العلمية تفصل المعدّل عن الكمّية: كم حرارة تنتقل في الثانية، وكم انتقلت إجمالًا. «سخن بسرعة» يخلط الاثنين.",
+     ru:"Научная фраза разделяет скорость и количество: сколько тепла проходит за секунду и сколько прошло всего. «Быстро нагрелся» смешивает их.",
+     en:"A scientific sentence separates rate from amount: how much heat passes each second, and how much passed in all. “Fast” mixes the two."})
  ],
 
  [ /* רמה 3 — לזהות טעות בטענה של מישהו אחר */

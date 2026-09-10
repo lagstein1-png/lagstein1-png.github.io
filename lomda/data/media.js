@@ -207,7 +207,7 @@ BANK({
      en:"At first the break-in looked like a small crime, and two reporters kept checking documents and talking to sources inside the administration."},
     {he:"התברר שתחקיר מתועד יכול להפיל נשיא, ומאז נחשב אימות בשני מקורות נפרדים לכלל בסיסי בעיתונות.",
      ar:"تبيّن أن تحقيقًا موثّقًا قادر على إسقاط رئيس، ومنذ ذلك الحين يُعدّ التثبّت من مصدرين منفصلين قاعدة أساسية في الصحافة.",
-     ru:"Выяснилось, что документированное расследование способно свалить президента, и с тех пор проверка по двум отдельным источникам считается основным правилом в журналистике.",
+     ru:"Выяснилось, что документированное расследование способно свалить президента, и с тех пор проверка по двум источникам — основное правило в журналистике.",
      en:"It turned out that a documented investigation can bring down a president, and ever since, checking with two separate sources is a basic rule of journalism."})
  ],
 
