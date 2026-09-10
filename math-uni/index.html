@@ -936,7 +936,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u72 · 2026-09-10";
+var BUILD="u73 · 2026-09-10";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -4456,7 +4456,12 @@ function genSeries(L){
       wrong:[
         W(num(a1*Math.pow(q,n-1)),_f("זה האיבר ה-{0} עצמו, לא הסכום.", n)),
         W(num(a1*n),_("זה היה נכון אילו כל האיברים היו שווים.")),
-        W(num(a1*(Math.pow(q,n)-1)),_("שכחתם לחלק ב-(q−1)."))
+        /* ב-q=2 המכנה (q−1) הוא 1, ולכן "שכחתם לחלק" מחזיר את התשובה
+           עצמה — המסיח נבלע בסינון של buildQ, וההגרלה חוזרת. חצי
+           ממרחב הפרמטרים נזרק כך בשקט, והלומד כמעט לא ראה q=2.
+           שם הטעות האפשרית היא ספירת איבר אחד יותר מדי. */
+        q===2?W(num(a1*(Math.pow(q,n+1)-1)/(q-1)),_("ספרתם איבר אחד יותר מדי."))
+             :W(num(a1*(Math.pow(q,n)-1)),_("שכחתם לחלק ב-(q−1)."))
       ],
       steps:[
         S(_("נוסחת הסכום"),_("Sₙ = a₁·(qⁿ − 1) ÷ (q − 1), תקפה לכל q ששונה מ-1."),"Sₙ = a₁(qⁿ−1)/(q−1)"),
@@ -8848,7 +8853,8 @@ var TR_KEYS=[
 "חיברתם. הפלוס שייך לכלל המכפלה, ובכלל המנה המונה הוא f′g פחות fg′.",
 "הפכתם את הסימן של כל איבר. מכפילים בסקלר עצמו, על הסימן שלו.",
 "אין ערך כזה של t",
-"חיסרתם את החלקים הממשיים במקום לחבר אותם."
+"חיסרתם את החלקים הממשיים במקום לחבר אותם.",
+"ספרתם איבר אחד יותר מדי."
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -14155,6 +14161,18 @@ trAt("en",TR_KEYS.indexOf("חיברתם. הפלוס שייך לכלל המכפל
 "no t has such a value",
 "You subtracted the real parts instead of adding them."
 ]);
+
+/* המסיח של q=2 בסכום סדרה הנדסית. נוסף בסוף המערך, ולכן אף מנה
+   קיימת לא זזה; ה-indexOf מוצא אותו גם אם ייווסף מפתח אחריו. */
+trAt("ar",TR_KEYS.indexOf("ספרתם איבר אחד יותר מדי."),[
+ "عددتم حدًّا واحدًا زائدًا."
+]);
+trAt("ru",TR_KEYS.indexOf("ספרתם איבר אחד יותר מדי."),[
+ "Вы посчитали на один член больше."
+]);
+trAt("en",TR_KEYS.indexOf("ספרתם איבר אחד יותר מדי."),[
+ "You counted one term too many."
+]);
 trBuild();
 exLoad();
 applyModes();
@@ -14178,7 +14196,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u72-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u73-pwa1").catch(function(){});
   });
 }
 </script>
