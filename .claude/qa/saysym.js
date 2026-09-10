@@ -19,7 +19,7 @@
 const { chromium } = require('./pw.js');
 
 const BASE = 'http://127.0.0.1:8099';
-const APPS = ['math-uni', 'math-uni2', 'math-uni3'];
+const APPS = ['math-teen', 'math-uni', 'math-uni2', 'math-uni3'];
 /* דגימות לכל תא (נושא × רמה). ללא תקרה על סך השאלות: תקרה כזאת
    חתכה את הריצה לפני הנושאים האחרונים ברשימה, ושני באגים
    אמיתיים — cont L3 ו-lagrange3 L4 — הוסתרו מאחוריה. */
