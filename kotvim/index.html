@@ -814,6 +814,7 @@ T.he={
   vsOk:"קול טבעי פעיל", vsDev:"קול המכשיר", vsNoEn:"אין קול עברי במכשיר",
   vsNoEnD:"אפשר להתקין קול עברי בהגדרות המכשיר, או להפעיל קול טבעי כאן.",
   rate:"מהירות הקראה", slow:"לאט", fast:"מהר",
+  sayBtn:"כפתורים מדברים", sayBtnD:"כל כפתור שנלחץ מוקרא בשמו",
   bigText:"טקסט גדול", bigTextD:"מגדיל את הכול יחד, לא רק את השאלה",
   clearFont:"גופן קריא", clearFontD:"אותיות רחבות יותר, פחות דומות זו לזו",
   spacing:"מרווח בין מילים", spacingD:"עוזר לעין לא לדלג על מילה",
@@ -874,6 +875,7 @@ T.ar={
   vsOk:"الصوت الطبيعي مُفعّل", vsDev:"صوت الجهاز", vsNoEn:"لا يوجد صوت عبري في الجهاز",
   vsNoEnD:"يمكن تثبيت صوت عبري من إعدادات الجهاز، أو تفعيل الصوت الطبيعي هنا.",
   rate:"سرعة القراءة", slow:"بطيء", fast:"سريع",
+  sayBtn:"أزرار ناطقة", sayBtnD:"كل زرّ يُضغط يُقرأ باسمه",
   bigText:"نص كبير", bigTextD:"يكبّر كل شيء معًا، لا السؤال وحده",
   clearFont:"خط واضح", clearFontD:"حروف أعرض وأقل تشابهًا",
   spacing:"تباعد بين الكلمات", spacingD:"يساعد العين على عدم تخطّي كلمة",
@@ -934,6 +936,7 @@ T.ru={
   vsOk:"Естественный голос включён", vsDev:"Голос устройства", vsNoEn:"На устройстве нет голоса на иврите",
   vsNoEnD:"Голос на иврите можно установить в настройках устройства или включить естественный голос здесь.",
   rate:"Скорость чтения", slow:"Медленно", fast:"Быстро",
+  sayBtn:"Говорящие кнопки", sayBtnD:"Каждая нажатая кнопка произносит своё название",
   bigText:"Крупный текст", bigTextD:"Увеличивает всё сразу, а не только вопрос",
   clearFont:"Читаемый шрифт", clearFontD:"Буквы шире и меньше похожи друг на друга",
   spacing:"Промежутки между словами", spacingD:"Помогает глазу не перескакивать через слово",
@@ -994,6 +997,7 @@ T.en={
   vsOk:"Natural voice on", vsDev:"Device voice", vsNoEn:"No Hebrew voice on this device",
   vsNoEnD:"You can install a Hebrew voice in your device settings, or turn on the natural voice here.",
   rate:"Reading speed", slow:"Slow", fast:"Fast",
+  sayBtn:"Talking buttons", sayBtnD:"Every button you press says its name",
   bigText:"Large text", bigTextD:"Scales everything together, not just the question",
   clearFont:"Readable font", clearFontD:"Wider letters that look less alike",
   spacing:"Word spacing", spacingD:"Helps the eye not skip a word",
@@ -1061,7 +1065,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="k6 · 2026-09-10";
+var BUILD="k7 · 2026-09-10";
 var SKEY="kotvim-state-v1";
 var GKEY_STORE="kotvim-gkey";
 
@@ -1073,7 +1077,8 @@ function blankState(){
     gemVoice:"Kore",
     devVoice:{},          /* קוד שפה → voiceURI שנבחר ידנית */
     rate:0.95,
-    big:false, clear:false, spaced:false, hc:false, rm:false, theme:"auto"
+    big:false, clear:false, spaced:false, hc:false, rm:false, theme:"auto",
+    sayBtn:true           /* כל כפתור שנלחץ מוקרא בשמו (O-29) */
   };
 }
 var state=blankState();
@@ -2581,7 +2586,7 @@ function screenSet(){
   /* --- קריאות --- */
   h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.3rem">'+
      esc(t("setRead"))+"</h3>";
-  [["big","bigText","bigTextD"],["clear","clearFont","clearFontD"],
+  [["sayBtn","sayBtn","sayBtnD"],["big","bigText","bigTextD"],["clear","clearFont","clearFontD"],
    ["spaced","spacing","spacingD"],["hc","contrast","contrastD"],
    ["rm","motion","motionD"]].forEach(function(r){
     h+='<div class="row"><div><div class="lab">'+esc(t(r[1]))+"</div>"+
@@ -2899,6 +2904,7 @@ function testKey(){
 function sayClick(el){
   var a=el.getAttribute("data-a")||"";
   if(/^(say|sayline|ksay)$/.test(a)||el.hasAttribute("data-nosay"))return;
+  if(state.sayBtn===false)return;   /* המתג במסך ההגדרות (O-29) */
   var label=el.getAttribute("aria-label")||el.textContent||"";
   label=plainOf(String(label)).replace(/\s+/g," ").trim();
   if(!label||label.length>60)return;
@@ -3079,7 +3085,7 @@ if(!INTERNAL_OK){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=k6-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=k7-pwa1").catch(function(){});
   });
 }
 </script>

@@ -8,6 +8,7 @@
 
    הוכחת נפילה (9.9.2026, לפני sayClick): תשע אפליקציות, אפס אמירות.
    O-28 (אותו יום): kotvim, reader ו-bagrut-806 — שלוש אדומות לפני, אפס אחרי.
+   O-29 (10.9.2026): המתג. כבוי → שקט. שלוש בלי מתג — אדומות לפני, אפס אחרי.
    ===================================================================== */
 'use strict';
 const { chromium } = require('./pw.js');
@@ -17,9 +18,13 @@ const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
 /* שלוש בלי שליח [data-a] אחיד (O-28): איפה נתפסת האמירה, ועל מה לוחצים.
    reader מדבר ישר אל speechSynthesis; bagrut-806 דרך Speech.say. */
 const SPECIAL = {
-  reader:       { stub: 'speech', pick: '#btnTheme' },
-  'bagrut-806': { stub: 'Speech', pick: '[data-go="settings"]' },
+  reader:       { stub: 'speech', pick: '#btnTheme',            off: '#btnSay' },
+  'bagrut-806': { stub: 'Speech', pick: '[data-go="settings"]', off: '[data-say="0"]' },
+  kotvim:       { off: '[data-a="tog"][data-v="sayBtn"]', open: '[data-a="set"]' },
 };
+/* O-29: המתג. בתשע — state.settings.tts; בשלוש — כפתור במסך ההגדרות
+   (off), ולפעמים צריך קודם להגיע למסך (open). כשהמתג כבוי, לחיצה
+   חייבת לשתוק. */
 /* מה לא לוחצים: תשובות (מדברות בעצמן), מתג ההקראה (היה מכבה אותה),
    כפתורי הקראה (מדברים תוכן), ומסכי הפתיחה. */
 const SKIP = /^(ans|pick|sitans|tts|say|sayline|ksay|selpet|startpet|obnext|vmode|slot|unslot)$/;
@@ -57,7 +62,7 @@ async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.
     const r = await page.evaluate(async ([skip, sp]) => {
       const out = { label: '', said: [], err: '' };
       window.said = [];
-      if (!sp) {
+      if (!sp || !sp.stub) {
         try { state.settings.tts = true; } catch (e) { /* kotvim: אין מתג, ההקראה תמיד זמינה */ }
         window.speak = function (t) { window.said.push(String(t || '')) };
       } else if (sp.stub === 'speech') {
@@ -67,7 +72,7 @@ async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.
         window.Speech.say = function (t) { window.said.push(String(t || '')) };
       }
       const re = new RegExp(skip);
-      const btn = sp ? document.querySelector(sp.pick)
+      const btn = (sp && sp.pick) ? document.querySelector(sp.pick)
         : Array.prototype.find.call(document.querySelectorAll('button[data-a]'), el => {
         const a = el.getAttribute('data-a');
         if (re.test(a) || el.disabled) return false;
@@ -82,9 +87,33 @@ async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.
       out.said = window.said.map(s => s.replace(/\s+/g, ' ').trim());
       return out;
     }, [SKIP.source, sp]);
-    const ok = !r.err && r.said.some(s => s === r.label) && !errs.length;
+    /* --- המתג כבוי: אותה לחיצה, שום אמירה --- */
+    const q = await page.evaluate(async (sp) => {
+      const out = { said: [], err: '' };
+      try {
+        if (sp && sp.open) { const o = document.querySelector(sp.open); if (o) { o.click(); await new Promise(f => setTimeout(f, 300)); } }
+        if (sp && sp.off) {
+          const t = document.querySelector(sp.off);
+          if (!t) { out.err = 'אין מתג ' + sp.off; return out }
+          /* המתג עצמו יכול לדבר לפני שהוא כבה — מחכים שיסיים */
+          t.click(); await new Promise(f => setTimeout(f, 800));
+          if (sp.off === '#btnSay' && t.getAttribute('aria-pressed') !== 'false') { t.click(); await new Promise(f => setTimeout(f, 800)); }
+          if (sp.off.indexOf('tog') >= 0 && t.getAttribute('aria-checked') !== 'false') { t.click(); await new Promise(f => setTimeout(f, 800)); }
+        } else { state.settings.tts = false; }
+        window.said = [];
+        const btn = document.querySelector((sp && sp.pick) || 'button[data-a="prog"],button[data-a="go"]');
+        if (!btn) { out.err = 'אין כפתור ללחוץ עליו כשהמתג כבוי'; return out }
+        btn.click(); await new Promise(f => setTimeout(f, 1000));
+        out.said = window.said.slice();
+      } catch (e) { out.err = String(e) }
+      return out;
+    }, sp);
+    const okOn = !r.err && r.said.some(s => s === r.label) && !errs.length;
+    const okOff = !q.err && q.said.length === 0;
+    const ok = okOn && okOff;
     if (!ok) failed++;
     console.log(`${ok ? '✓' : '✗'} ${app.padEnd(10)} ${r.err || `"${r.label}" (${r.action}) → נאמר: ${JSON.stringify(r.said.slice(0, 3))}`}` +
+                (okOff ? '  · כבוי: שקט' : '  · כבוי: ' + (q.err || 'נאמר ' + JSON.stringify(q.said.slice(0, 2)))) +
                 (errs.length ? '  JS: ' + errs[0] : ''));
     await ctx.close();
   }
