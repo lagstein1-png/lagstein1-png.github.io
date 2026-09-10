@@ -172,7 +172,9 @@ const R = {
     .sort((a, b) => b[1] - a[1]).slice(0, 8),
   app: APP, sample: nS,
   verdict: v.verdict, fail: v.fail, review: v.review,
-  generated: new Date().toISOString().slice(0, 10)
+  generated: new Date().toISOString().slice(0, 10),
+  /* חתימת `data/exams.js` שנסרק. ראו `sig.js`. */
+  sig: require('./sig.js').sigOf(APP)
 };
 
 function md() {
