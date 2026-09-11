@@ -183,6 +183,48 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           if [ "$CODE" != "200" ]; then
-            echo "::error::הפריסה הצליחה אבל הבדיקה החיה החזירה $CODE. ראה את גוף התשובה למעלה."
+            echo "::error::הפריסה הצליחה אבל הבדיקה החיה החזירה $CODE. ראה את האבחון בצעד הבא."
             exit 1
           fi
+
+      - name: אבחון — מה Anthropic עונה למפתח הזה
+        # רץ רק כשהבדיקה החיה נפלה. 502 מה-Worker פירושו ש-Anthropic
+        # החזירה משהו שאינו 2xx, וה-Worker לבדו אינו אומר מה. כאן
+        # פונים ל-Anthropic **ישירות מהרנר** עם אותו מפתח, ומדפיסים
+        # את הסטטוס ואת גוף השגיאה.
+        #
+        # גוף השגיאה של Anthropic נושא `type` ו-`message` ואינו
+        # נושא את המפתח, ולכן מותר להדפיס אותו. המפתח עצמו אינו
+        # מודפס, וגם אם היה — GitHub ממסך סודות בלוג.
+        if: failure() && steps.live.outputs.code != '200'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          CODE=$(curl -s -o /tmp/a.json -w '%{http_code}' --max-time 45 \
+            https://api.anthropic.com/v1/messages \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H 'anthropic-version: 2023-06-01' \
+            -H 'content-type: application/json' \
+            -d '{"model":"claude-haiku-4-5","max_tokens":16,
+                 "messages":[{"role":"user","content":"hi"}]}' || echo 000)
+          echo "Anthropic ענתה: HTTP $CODE"
+          cat /tmp/a.json || true
+          {
+            echo ""
+            echo "### אבחון — פנייה ישירה ל-Anthropic מהרנר"
+            echo ""
+            echo "**HTTP $CODE**"
+            echo ""
+            echo '```json'
+            cat /tmp/a.json 2>/dev/null || echo '(אין גוף)'
+            echo ""
+            echo '```'
+            echo ""
+            case "$CODE" in
+              200) echo "המפתח תקין. הבעיה אינה במפתח — ראה \`npx wrangler tail tutor\`." ;;
+              401) echo "**המפתח שגוי או בוטל.** החלף את הסוד ANTHROPIC_API_KEY והרץ שוב." ;;
+              400) echo "**בקשה נדחתה** — לרוב יתרה אפסית. ראה \`message\` למעלה." ;;
+              429) echo "**מכסה** — חריגה מקצב או מתקרת שימוש." ;;
+              *)   echo "סטטוס לא צפוי. ה-\`message\` למעלה הוא המקור." ;;
+            esac
+          } >> "$GITHUB_STEP_SUMMARY"

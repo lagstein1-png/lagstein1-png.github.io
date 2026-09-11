@@ -430,7 +430,17 @@ async function ask(env, ctx, msgs, extra) {
     headers: buildHeaders(MODEL, env.ANTHROPIC_API_KEY),
     body: JSON.stringify(body)
   });
-  if (!r.ok) return { err: r.status };
+  if (!r.ok) {
+    /* **הצד השני של O-42.** הסטטוס נתפס כאן ונזרק, ולכן 502 היה
+       חסר פשר: מפתח שגוי, אין יתרה ועומס חולף נראים זהים. גוף
+       השגיאה של Anthropic נושא את `type` ואת `message` ו**אינו
+       נושא את המפתח**, ולכן אפשר לכתוב אותו ללוג כמות שהוא.
+       נראה ב-`npx wrangler tail tutor`. */
+    let why = "";
+    try { why = (await r.text()).slice(0, 300) } catch (e) {}
+    console.error("[tutor] upstream " + r.status + " " + why);
+    return { err: r.status };
+  }
   const d = await r.json();
   /* stop_reason נבדק לפני content — בסירוב content יכול לחזור ריק */
   if (d.stop_reason === "refusal") return { err: "refusal" };
