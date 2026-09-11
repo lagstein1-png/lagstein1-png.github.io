@@ -130,8 +130,19 @@ jobs:
           fi
           # --secrets-file מעלה את המפתח **באותה גרסה** של הפריסה.
           # בלעדיו הייתה נוצרת חלון שבו ה-Worker חי בלי מפתח.
+          # **גוזמים רווח ושורה חדשה.** מפתח שהודבק לשדה הסוד ב-GitHub
+          # עם ירידת שורה בסוף היה נכתב כאן כמות שהוא, נשמר ב-Worker
+          # עם התו העודף, וכל פנייה הייתה חוזרת 401 — בלי שום רמז
+          # שזו הסיבה. זה התרחיש הראשון בסבירותו אחרי פריסה שנראית
+          # מוצלחת ואינה עונה.
+          KEY=$(printf '%s' "$ANTHROPIC_API_KEY" | tr -d '[:space:]')
+          case "$KEY" in
+            sk-ant-*) : ;;
+            *) echo "::error::המפתח אינו מתחיל ב-sk-ant-. בדוק את הסוד ANTHROPIC_API_KEY."; exit 1 ;;
+          esac
+          echo "אורך המפתח אחרי גזימה: ${#KEY} תווים (הערך עצמו אינו מודפס)"
           umask 077
-          printf 'ANTHROPIC_API_KEY=%s\n' "$ANTHROPIC_API_KEY" > /tmp/.secrets.env
+          printf 'ANTHROPIC_API_KEY=%s\n' "$KEY" > /tmp/.secrets.env
           trap 'shred -u /tmp/.secrets.env 2>/dev/null || rm -f /tmp/.secrets.env' EXIT
           npx --yes wrangler@4 deploy --secrets-file /tmp/.secrets.env 2>&1 | tee /tmp/deploy.txt
           URL=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' /tmp/deploy.txt | head -1)
@@ -202,7 +213,7 @@ jobs:
         run: |
           CODE=$(curl -s -o /tmp/a.json -w '%{http_code}' --max-time 45 \
             https://api.anthropic.com/v1/messages \
-            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "x-api-key: $(printf '%s' "$ANTHROPIC_API_KEY" | tr -d '[:space:]')" \
             -H 'anthropic-version: 2023-06-01' \
             -H 'content-type: application/json' \
             -d '{"model":"claude-haiku-4-5","max_tokens":16,
