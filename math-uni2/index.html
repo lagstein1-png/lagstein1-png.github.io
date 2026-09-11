@@ -938,7 +938,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v72 · 2026-09-10";
+var BUILD="v73 · 2026-09-11";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -6341,6 +6341,7 @@ var pendingScroll=null;
    שניהם HTML סטטי שאינו עובר דרך render, ולכן נשארו עבריים בכל שפה. */
 var LGFOOT={he:"© 2026 יהושע לגשטיין",ar:"© 2026 يهوشع لچشطاين",ru:"© 2026 Иехошуа Лагштейн",en:"© 2026 Joshua Lagstein"};
 var LGTERMS={he:"תנאי שימוש וזכויות יוצרים",ar:"شروط الاستخدام وحقوق النشر",ru:"Условия использования и авторские права",en:"Terms of use and copyright"};
+var LGHOME={"he":"כל האפליקציות","ar":"كل التطبيقات","ru":"Все приложения","en":"All apps"};
 var LGSKIP={he:"דילוג לתוכן",ar:"تخطّي إلى المحتوى",ru:"Перейти к содержимому",en:"Skip to content"};
 function lgChrome(){
   var g="he"; try{ g=LG||"he" }catch(e){}
@@ -6354,6 +6355,10 @@ function lgChrome(){
     var a=document.createElement("a");
     a.href="/legal/"; a.style.color="inherit"; a.textContent=LGTERMS[g];
     f.appendChild(a);
+    f.appendChild(document.createTextNode(" · "));
+    var h=document.createElement("a");
+    h.href="/"; h.style.color="inherit"; h.textContent=LGHOME[g];
+    f.appendChild(h);
   }
   var s=document.querySelector("a.skip[href='#main']");
   if(s){ s.setAttribute("lang",g); s.setAttribute("dir",dir); s.textContent=LGSKIP[g] }
@@ -12684,7 +12689,7 @@ window.addEventListener("hashchange",function(){
 try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(view==="settings")render()}}catch(e){}
 render();
 </script>
-<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a></footer>
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/tutor.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
@@ -12693,7 +12698,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v72-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v73-pwa1").catch(function(){});
   });
 }
 </script>
