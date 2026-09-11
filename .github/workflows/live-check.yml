@@ -1,0 +1,80 @@
+# בדיקה חיה של האתר שנפרס.
+#
+# למה ורקפלו: סביבת הפיתוח של הסוכן חסומה מול
+# lagstein1-png.github.io (זה כתוב גם ב-CLAUDE.md), ולכן אי אפשר
+# לבדוק משם מה באמת מוגש ללומד. הרנרים של GitHub אינם חסומים.
+#
+# **זו אינה בדיקת קוד — היא בדיקת מה שמוגש.** `all.js` בודק את
+# העץ; כאן נבדק ה-HTML שחוזר מהרשת, כולל השאלה החשובה: האם
+# מפתח הקאש שמוגש הוא זה שב-main, או שהפריסה מפגרת.
+#
+# בלי סודות ובלי כתיבה — כתובות ציבוריות בלבד.
+
+name: live-check
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: בודק את האתר החי
+        run: |
+          set -uo pipefail
+          BASE=https://lagstein1-png.github.io
+          APPS="math-app math-teen math-uni math-uni2 math-uni3 english ulpan history lomda kotvim reader bagrut-806"
+          FAIL=0
+          {
+            echo "## בדיקה חיה — $BASE"
+            echo ""
+            echo "| אפליקציה | HTTP | קישור לבית | מפתח מוגש | מפתח ב-main | |"
+            echo "|---|---|---|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for app in $APPS; do
+            # מנטרל מטמון קצה, כדי שלא ניבדק מול עותק ישן
+            CODE=$(curl -s -o /tmp/p.html -w '%{http_code}' --max-time 30 \
+                   -H 'Cache-Control: no-cache' "$BASE/$app/?cb=$GITHUB_RUN_ID")
+
+            if grep -q 'כל האפליקציות' /tmp/p.html; then LINK="✓"; else LINK="✗"; FAIL=1; fi
+
+            # המפתח שמוגש בפועל מול המפתח שבעץ
+            SRC=$app/index.html
+            [ "$app" = "bagrut-806" ] && SRC=$app/app.js
+            WANT=$(grep -o 'sw\.js?v=[a-z0-9-]*' "$SRC" | head -1 | sed 's/.*v=//')
+            GOT=$(grep -o 'sw\.js?v=[a-z0-9-]*' /tmp/p.html | head -1 | sed 's/.*v=//')
+            # ב-bagrut-806 המפתח יושב ב-app.js ולא בדף
+            if [ -z "$GOT" ] && [ "$app" = "bagrut-806" ]; then
+              curl -s --max-time 30 "$BASE/$app/app.js?cb=$GITHUB_RUN_ID" -o /tmp/a.js
+              GOT=$(grep -o 'sw\.js?v=[a-z0-9-]*' /tmp/a.js | head -1 | sed 's/.*v=//')
+            fi
+
+            if [ "$CODE" != "200" ]; then FAIL=1; fi
+            if [ "$GOT" = "$WANT" ]; then VER="✓"; else VER="✗ מפגר"; FAIL=1; fi
+
+            echo "| \`$app\` | $CODE | $LINK | $GOT | $WANT | $VER |" >> "$GITHUB_STEP_SUMMARY"
+            echo "$app  HTTP=$CODE  link=$LINK  served=$GOT  main=$WANT"
+          done
+
+          # הכפתור של ג׳וש — קובץ אחד, משותף לכולן
+          curl -s --max-time 30 "$BASE/tutor/tutor.js?cb=$GITHUB_RUN_ID" -o /tmp/t.js
+          if grep -q 'ג׳וש — עזרה מהמורה' /tmp/t.js; then JOSH="✓"; else JOSH="✗"; FAIL=1; fi
+          echo "tutor.js  josh-label=$JOSH"
+          {
+            echo ""
+            echo "**תווית ג׳וש ב-\`tutor/tutor.js\` החי:** $JOSH"
+            echo ""
+            echo "**כתובת השרת שמוגשת:** \`$(grep -o 'var API = "[^"]*"' /tmp/t.js | sed 's/.*= //')\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$FAIL" != "0" ]; then
+            echo "::error::הבדיקה החיה נכשלה. ראה את הטבלה בסיכום."
+            exit 1
+          fi
+          echo "הכול תקין באתר החי."
