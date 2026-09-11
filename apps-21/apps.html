@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>21 אפליקציות</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-bar {
+            background: #1e293b;
+            padding: 16px 24px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .top-bar h1 {
+            color: #38bdf8;
+            font-size: 24px;
+        }
+        .top-bar .badge {
+            background: #3b82f6;
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-size: 14px;
+        }
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 220px;
+            background: #1e293b;
+            overflow-y: auto;
+            padding: 12px;
+            border-left: 1px solid #334155;
+            flex-shrink: 0;
+        }
+        .sidebar .app-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 4px;
+            font-size: 18px;
+            border: 1px solid transparent;
+        }
+        .sidebar .app-item:hover {
+            background: #334155;
+            border-color: #475569;
+        }
+        .sidebar .app-item.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        .sidebar .app-item .icon {
+            font-size: 28px;
+            width: 40px;
+            text-align: center;
+        }
+        .viewer {
+            flex: 1;
+            background: #0f172a;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .app-card {
+            background: #1e293b;
+            padding: 50px 80px;
+            border-radius: 32px;
+            text-align: center;
+            border: 4px solid #3b82f6;
+            box-shadow: 0 0 60px rgba(59, 130, 246, 0.15);
+            max-width: 600px;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .app-card .icon-big {
+            font-size: 100px;
+            display: block;
+            margin-bottom: 16px;
+        }
+        .app-card h2 {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+        .app-card p {
+            color: #94a3b8;
+            font-size: 20px;
+            margin-bottom: 24px;
+        }
+        .app-card .btn-start {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .app-card .btn-start:hover {
+            transform: scale(1.05);
+            background: #2563eb;
+        }
+        .placeholder {
+            color: #64748b;
+            font-size: 28px;
+            text-align: center;
+        }
+        .placeholder span {
+            font-size: 80px;
+            display: block;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 140px;
+            }
+            .sidebar .app-item {
+                font-size: 14px;
+                padding: 8px 10px;
+                gap: 6px;
+            }
+            .sidebar .app-item .icon {
+                font-size: 20px;
+                width: 30px;
+            }
+            .app-card {
+                padding: 30px 20px;
+            }
+            .app-card .icon-big {
+                font-size: 60px;
+            }
+            .app-card h2 {
+                font-size: 30px;
+            }
+        }
+    </style>
+
+    <!-- ג'וש — המורה הדיגיטלי הצף. העיצוב נטען אחרי ה-style של הדף
+         כדי שהאיפוס הכללי (* { margin:0 }) לא ישפיע על הווידג'ט. -->
+    <link rel="stylesheet" href="josh-avatar.css">
+</head>
+<body>
+
+    <div class="top-bar">
+        <h1>📱 21 אפליקציות</h1>
+        <div class="badge">🎯 בחר אפליקציה</div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar" id="appList"></div>
+        <div class="viewer" id="appViewer">
+            <div class="placeholder">
+                <span>👈</span>
+                <p>בחר אפליקציה מהתפריט</p>
+                <p style="font-size:16px;color:#475569;">היא תופיע כאן באופן מיידי</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ----- 21 אפליקציות - כל המידע שלהן -----
+        const APPS = [
+            { id: 'ulpan', name: 'אולפן', icon: '🎓', color: '#1A73E8' },
+            { id: 'niv', name: 'ניב', icon: '🗣️', color: '#E3742A' },
+            { id: 'mafneh', name: 'מפנה', icon: '🔄', color: '#34A853' },
+            { id: 'lomda', name: 'לומדה', icon: '📚', color: '#9C27B0' },
+            { id: 'english', name: 'אנגלית', icon: '🇬🇧', color: '#0B5E9E' },
+            { id: 'history', name: 'היסטוריה', icon: '📜', color: '#7C4A2C' },
+            { id: 'math', name: 'מתמטיקה', icon: '📐', color: '#D32F2F' },
+            { id: 'science', name: 'מדעים', icon: '🔬', color: '#2E7D32' },
+            { id: 'geography', name: 'גיאוגרפיה', icon: '🌍', color: '#00695C' },
+            { id: 'bible', name: 'תנ"ך', icon: '📖', color: '#4E342E' },
+            { id: 'literature', name: 'ספרות', icon: '📝', color: '#C2185B' },
+            { id: 'language', name: 'לשון', icon: '✍️', color: '#1565C0' },
+            { id: 'communication', name: 'תקשורת', icon: '📡', color: '#00838F' },
+            { id: 'physics', name: 'פיזיקה', icon: '⚛️', color: '#263238' },
+            { id: 'chemistry', name: 'כימיה', icon: '🧪', color: '#00695C' },
+            { id: 'biology', name: 'ביולוגיה', icon: '🧬', color: '#2E7D32' },
+            { id: 'arithmetic', name: 'חשבון', icon: '➕', color: '#E65100' },
+            { id: 'engineering', name: 'הנדסה', icon: '⚙️', color: '#37474F' },
+            { id: 'medicine', name: 'רפואה', icon: '🏥', color: '#880E4F' },
+            { id: 'education', name: 'חינוך', icon: '🍎', color: '#4A148C' },
+            { id: 'technology', name: 'טכנולוגיה', icon: '💻', color: '#0D47A1' }
+        ];
+
+        const appList = document.getElementById('appList');
+        const viewer = document.getElementById('appViewer');
+
+        function openApp(id) {
+            // סמן את הפריט הפעיל
+            document.querySelectorAll('.app-item').forEach(el => el.classList.remove('active'));
+            const activeItem = document.querySelector(`.app-item[data-id="${id}"]`);
+            if (activeItem) activeItem.classList.add('active');
+
+            // מצא את האפליקציה
+            const app = APPS.find(a => a.id === id);
+            if (!app) return;
+
+            // הצג את האפליקציה
+            viewer.innerHTML = `
+                <div class="app-card" style="border-color: ${app.color}; box-shadow: 0 0 60px ${app.color}33;">
+                    <span class="icon-big">${app.icon}</span>
+                    <h2 style="color: ${app.color};">${app.name}</h2>
+                    <p>ברוך הבא לאפליקציית ${app.name}</p>
+                    <button class="btn-start" style="background: ${app.color};" onclick="alert('🚀 התחלת למידה ב-${app.name}!')">
+                        התחל למידה
+                    </button>
+                    <div style="margin-top: 20px; color: #64748b; font-size: 14px; border-top: 1px solid #334155; padding-top: 16px;">
+                        📂 קוד: ${app.id} | 🎨 צבע: ${app.color}
+                    </div>
+                </div>
+            `;
+        }
+
+        // בנה את תפריט הצד
+        APPS.forEach(app => {
+            const div = document.createElement('div');
+            div.className = 'app-item';
+            div.dataset.id = app.id;
+            div.innerHTML = `<span class="icon">${app.icon}</span> ${app.name}`;
+            div.addEventListener('click', function() {
+                openApp(app.id);
+            });
+            appList.appendChild(div);
+        });
+
+        // (אופציונלי) פותח את הראשונה אוטומטית - הסר את סימן ה-// בשורה הבאה אם תרצה:
+        // openApp(APPS[0].id);
+    </script>
+
+    <!-- המנוע של ג'וש. הוא מאתחל את עצמו ובונה את הבועה הצפה לבד,
+         ויוצר את window.Josh. אפשר להגדיר window.JOSH_OPTIONS לפניו
+         כדי לשנות שם, קצב דיבור, צד המסך או ברכת פתיחה. -->
+    <script>
+      window.JOSH_OPTIONS = {
+        name: "ג'וש הגאון",
+        lang: 'he-IL',
+        greeting: 'שלום! אני ג\'וש הגאון. בחר אפליקציה מהרשימה, ואם משהו לא ברור — לחץ על המיקרופון ושאל אותי.',
+        position: 'left'
+      };
+    </script>
+    <script src="josh-engine.js" defer></script>
+
+</body>
+</html>

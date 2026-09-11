@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>21 אפליקציות</title>
+<link rel="stylesheet" href="josh-avatar.css"><!-- ג'וש — מורה דיגיטלי צף -->
+<style>
+*{box-sizing:border-box;margin:0}
+body{font-family:Arial;background:#0f172a;color:#e2e8f0;padding:20px;text-align:center}
+h1{color:#60a5fa;font-size:2.2rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;max-width:1000px;margin:30px auto}
+.card{background:#1e293b;padding:20px;border-radius:12px;border:1px solid #334155;cursor:pointer;transition:.3s}
+.card:hover{background:#2d3748;transform:scale(1.05)}
+.card .icon{font-size:2.5rem;display:block;margin-bottom:6px}
+.card .name{font-size:1.1rem;font-weight:600}
+#appContainer{margin-top:30px;background:#1e293b;border-radius:16px;padding:20px;display:none}
+#appContainer iframe{width:100%;min-height:650px;border:none;border-radius:12px;background:#151a21}
+.back{background:#4CAF50;color:#fff;border:none;padding:12px 30px;border-radius:10px;font-size:1.2rem;cursor:pointer;margin:10px}
+.back:hover{background:#45a049}
+</style>
+</head>
+<body>
+
+<h1>🚀 21 האפליקציות שלי</h1>
+<p>לחץ על כל אפליקציה – היא תיטען בדף זה.</p>
+<div class="grid" id="appGrid"></div>
+<div id="appContainer">
+  <button class="back" onclick="closeApp()">⬅️ חזרה לרשימה</button>
+  <!-- allow="microphone" נדרש כדי שזיהוי הדיבור של ג'וש יעבוד בתוך ה-iframe -->
+  <iframe id="appFrame" allow="microphone" title="אפליקציה"></iframe>
+</div>
+
+<!-- ג'וש — מורה דיגיטלי צף: הקראה קולית + זיהוי דיבור -->
+<script>
+window.JOSH_OPTIONS = {
+  name: "ג'וש הגאון",
+  autoGreet: false,
+  continuous: true,
+  greeting: "שלום! אני ג'וש הגאון. בחרו אפליקציה מהרשימה, או אמרו לי את שמה."
+};
+</script>
+<script src="josh-engine.js"></script>
+
+<script>
+// ============================================================
+// כל 21 האפליקציות – קוד HTML מלא
+// ============================================================
+const apps = [
+  {id:"netiv",icon:"🚗",name:"נתיב",desc:"רישיון נהיגה"},
+  {id:"ulpan",icon:"🗣️",name:"אולפן",desc:"עברית לעולים"},
+  {id:"zkut",icon:"⚖️",name:"זכות",desc:"מיצוי זכויות"},
+  {id:"shkal",icon:"💰",name:"שקל",desc:"אוריינות פיננסית"},
+  {id:"tsura",icon:"📝",name:"צורה",desc:"לשון לבגרות"},
+  {id:"amana",icon:"🇮🇱",name:"אמנה",desc:"אזרחות לבגרות"},
+  {id:"miftan",icon:"🚪",name:"מפתן",desc:"מיצ\"ב לחטיבה"},
+  {id:"mapa",icon:"🌍",name:"מפה",desc:"גיאוגרפיה לחטיבה"},
+  {id:"ta",icon:"🧬",name:"תא",desc:"ביולוגיה לבגרות"},
+  {id:"yesod",icon:"➕",name:"יסוד",desc:"חשבון למבוגרים"},
+  {id:"ot",icon:"✍️",name:"אות",desc:"קריאה וכתיבה"},
+  {id:"chibur",icon:"💻",name:"חיבור",desc:"אוריינות דיגיטלית"},
+  {id:"korot",icon:"📄",name:"קורות",desc:"קורות חיים"},
+  {id:"midgam",icon:"📊",name:"מדגם",desc:"סטטיסטיקה"},
+  {id:"maslul",icon:"⚙️",name:"מסלול",desc:"מה\"ט והנדסאים"},
+  {id:"code",icon:"⌨️",name:"קוד",desc:"יסודות תכנות"},
+  {id:"gesher",icon:"🌉",name:"גשר",desc:"ערבית מדוברת"},
+  {id:"tavnit",icon:"⚠️",name:"תווית",desc:"בטיחות בעבודה"},
+  {id:"sha-ar",icon:"🛂",name:"שער",desc:"מבחן התאזרחות"},
+  {id:"mafteach",icon:"🧠",name:"מפתח",desc:"פסיכומטרי"},
+  {id:"mirsham",icon:"💊",name:"מרשם",desc:"מונחי רפואה"}
+];
+
+// ============================================================
+// פונקציה ליצירת HTML של אפליקציה (כללית)
+//
+// שימו לב לשני כללי כתיבה בתוך ה-template literal הזה:
+//   1. תגית הסגירה של script נכתבת עם לוכסן הפוך: <\/script>. פרסר ה-HTML
+//      סוגר את הסקריפט החיצוני בתגית הסגירה הראשונה שהוא רואה — גם כשהיא
+//      בתוך מחרוזת, ואפילו בתוך הערה כמו זו — וכל הקוד שאחריה נקרא כטקסט
+//      HTML במקום כקוד. זה היה הבאג שמנע מהקובץ הזה לעבוד.
+//   2. מעבר שורה בתוך מחרוזת של האפליקציה הפנימית נכתב \\n ולא \n.
+//      \n היה מתפרש כאן, ב-template literal החיצוני, והקוד שנוצר היה
+//      מכיל מעבר שורה אמיתי בתוך מחרוזת — שגיאת תחביר אצל הילד.
+// ============================================================
+function generateAppHTML(app) {
+  return `<!DOCTYPE html>
+<html dir="rtl" lang="he"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${app.name}</title>
+<link rel="stylesheet" href="josh-avatar.css">
+<style>
+:root{--bg:#151a21;--panel:#1d242e;--line:#2b3542;--ink:#e8edf4;--ink-soft:#9aa8b8;--accent:#5aa9e6;--font:Arial,sans-serif}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);padding:20px;text-align:center;font-size:1.2rem}
+.wrap{max-width:750px;margin:auto}
+.brand{font-size:2rem;font-weight:700;color:#60a5fa}
+#langbar{display:flex;gap:6px;justify-content:center;margin:15px 0;flex-wrap:wrap}
+#langbar button{border:1px solid var(--line);background:transparent;color:var(--ink-soft);border-radius:9px;padding:10px 18px;cursor:pointer;font-size:1.1rem}
+#langbar button.on{border-color:var(--accent);color:var(--accent);background:rgba(90,169,230,.12)}
+.q-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:25px;margin:20px 0}
+.q-text{font-size:1.8rem;font-weight:700;margin-bottom:16px}
+.options{display:flex;flex-direction:column;gap:12px;margin:16px 0}
+.option{background:var(--bg);padding:16px;border-radius:10px;cursor:pointer;font-size:1.3rem;border:2px solid var(--line);transition:.2s}
+.option:hover{border-color:var(--accent)}
+.option.selected-correct{border-color:#4CAF50;background:rgba(76,175,80,.2)}
+.option.selected-wrong{border-color:#ef4444;background:rgba(239,68,68,.2)}
+.feedback{font-size:1.4rem;font-weight:700;padding:12px 0}
+.btn{display:inline-block;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:12px 22px;border-radius:10px;font-size:1.1rem;font-weight:600;cursor:pointer;margin:5px}
+.btn:hover{border-color:var(--accent)}
+.solution{background:var(--bg);padding:20px;border-radius:10px;margin-top:16px;border-right:4px solid var(--accent);text-align:right}
+.solution p{font-size:1.2rem;line-height:2;white-space:pre-wrap}
+.hidden{display:none}
+</style></head><body>
+<div class="wrap"><div class="brand">${app.icon} ${app.name}</div>
+<div id="langbar"><button data-lang="he" class="on">עברית</button><button data-lang="ar">العربية</button><button data-lang="en">English</button><button data-lang="ru">Русский</button></div>
+<div class="q-box" id="questionBox"><div class="q-text" id="qHeader">שאלה 1 מתוך 5</div><div class="q-text" id="qText">טוען...</div><div class="options" id="optionsBox"></div><div id="feedback" class="feedback"></div><div>
+<button class="btn" onclick="skipQuestion()">⏭️ דלג</button>
+<button class="btn" onclick="showSolution()">📘 פתרון</button>
+<button class="btn" onclick="resetQuiz()">🔄 שוב</button>
+<button class="btn" onclick="nextQuestion()">➡️ הבא</button>
+</div></div>
+<div id="solutionBox" class="solution hidden"><h3>📘 פתרון</h3><div id="solutionContent"></div><button class="btn" onclick="hideSolution()">סגור</button></div>
+<div style="margin-top:16px;font-size:1.2rem">שאלה <span id="qNum">1</span> / <span id="qTotal">5</span></div></div>
+
+<!-- ג'וש נטען לפני קוד האפליקציה, כדי שיהיה קיים כשהשאלה הראשונה מוקראת -->
+<script>window.JOSH_OPTIONS={autoGreet:false,continuous:true};<\/script>
+<script src="josh-engine.js"><\/script>
+
+<script>
+// ============================================================
+// שאלות לדוגמה (ניתן להחליף לכל נושא)
+// ============================================================
+const questions = [
+  {q:{he:"מה הפירוש?",ar:"ماذا يعني؟",en:"What does it mean?",ru:"Что это значит?"},opts:{he:["אפשרות 1","אפשרות 2","אפשרות 3","אפשרות 4"],ar:["خيار 1","خيار 2","خيار 3","خيار 4"],en:["Option 1","Option 2","Option 3","Option 4"],ru:["Вариант 1","Вариант 2","Вариант 3","Вариант 4"]},ans:0,sol:{he:"1. הסבר.\\n2. תשובה: אפשרות 1.",ar:"1. شرح.\\n2. الإجابة: خيار 1.",en:"1. Explanation.\\n2. Answer: Option 1.",ru:"1. Объяснение.\\n2. Ответ: Вариант 1."}},
+  {q:{he:"האם זה נכון?",ar:"هل هذا صحيح؟",en:"Is this correct?",ru:"Это верно?"},opts:{he:["כן","לא","אולי","לא יודע"],ar:["نعم","لا","ربما","لا أعرف"],en:["Yes","No","Maybe","Don't know"],ru:["Да","Нет","Возможно","Не знаю"]},ans:0,sol:{he:"1. התשובה הנכונה: כן.",ar:"1. الإجابة الصحيحة: نعم.",en:"1. Correct answer: Yes.",ru:"1. Правильный ответ: Да."}},
+  {q:{he:"מה הבחירה הנכונה?",ar:"ما هو الخيار الصحيح؟",en:"What is the correct choice?",ru:"Какой правильный выбор?"},opts:{he:["א","ב","ג","ד"],ar:["أ","ب","ج","د"],en:["A","B","C","D"],ru:["А","Б","В","Г"]},ans:1,sol:{he:"1. התשובה: ב.",ar:"1. الإجابة: ب.",en:"1. Answer: B.",ru:"1. Ответ: Б."}},
+  {q:{he:"כמה זה 2+2?",ar:"كم 2+2؟",en:"What is 2+2?",ru:"Сколько 2+2?"},opts:{he:["3","4","5","6"],ar:["3","4","5","6"],en:["3","4","5","6"],ru:["3","4","5","6"]},ans:1,sol:{he:"1. 2+2=4.\\n2. תשובה: 4.",ar:"1. 2+2=4.\\n2. الإجابة: 4.",en:"1. 2+2=4.\\n2. Answer: 4.",ru:"1. 2+2=4.\\n2. Ответ: 4."}},
+  {q:{he:"מהי מילה נרדפת?",ar:"ما هي الكلمة المرادفة؟",en:"What is a synonym?",ru:"Что такое синоним?"},opts:{he:["מילה זהה","מילה הפוכה","מילה דומה","מילה שונה"],ar:["كلمة مطابقة","كلمة عكسية","كلمة مشابهة","كلمة مختلفة"],en:["Same word","Opposite word","Similar word","Different word"],ru:["Одинаковое слово","Противоположное слово","Похожее слово","Разное слово"]},ans:2,sol:{he:"1. מילה נרדפת = מילה דומה.\\n2. תשובה: מילה דומה.",ar:"1. الكلمة المرادفة = كلمة مشابهة.\\n2. الإجابة: كلمة مشابهة.",en:"1. Synonym = similar word.\\n2. Answer: Similar word.",ru:"1. Синоним = похожее слово.\\n2. Ответ: Похожее слово."}}
+];
+
+const LANGS = {he:'he-IL', ar:'ar-SA', en:'en-US', ru:'ru-RU'};
+let current=0, score=0, selected=null, answered=false, currentLang='he', femaleVoice=null;
+
+function pickVoice(){
+  if(!('speechSynthesis' in window))return;
+  const v=speechSynthesis.getVoices();
+  const f=['female','woman','girl','miri','hila','carmit','samantha','karen','zira','hazel','ava','emma','mia','chloe','zoe','luna','nova','aria','iris','lily','rose','jasmine','ruby','sophie','ella','grace','charlotte','amelia','olivia','isabella','sofia','elena','maria','ana','daria','svetlana','nadia','tanya','katya','anastasia','masha','olga','irina','vera','galina','ludmila','natasha','oksana','tamara','zoya','lara','rita','maya','lea','noa','tamar','shira','gaya','roni','neta','mor','lihi','yael','ayala','michal','dana','sivan','rotem','shani','tali','gali'];
+  for(let x of v){const n=x.name.toLowerCase();if(f.some(s=>n.includes(s))){femaleVoice=x;return;}}
+}
+if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=pickVoice;setTimeout(pickVoice,200);}
+
+/* ההקראה עוברת דרך ג'וש כשהוא נטען — מנוע קול אחד, לא שניים במקביל.
+   כשהוא לא נטען (פתיחה מקומית שחוסמת את הקובץ) נשארת ההקראה המקורית. */
+function speak(t){
+  if(!t)return;
+  const lang = LANGS[currentLang] || 'he-IL';
+  if(window.Josh){ Josh.config({lang:lang}); Josh.say(t); return; }
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);
+  u.lang=lang; u.rate=0.9;
+  if(femaleVoice)u.voice=femaleVoice; else u.pitch=1.3;
+  window.speechSynthesis.speak(u);
+}
+
+function setLang(l){currentLang=l;document.querySelectorAll('#langbar button').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));loadQuestion(current);speak('שפה שונתה');}
+function loadQuestion(i){const q=questions[i];document.getElementById('qHeader').textContent='שאלה '+(i+1)+' מתוך '+questions.length;document.getElementById('qText').textContent=q.q[currentLang];document.getElementById('qNum').textContent=i+1;document.getElementById('qTotal').textContent=questions.length;document.getElementById('feedback').innerHTML='';document.getElementById('solutionBox').classList.add('hidden');const box=document.getElementById('optionsBox');box.innerHTML='';q.opts[currentLang].forEach((opt,idx)=>{const div=document.createElement('div');div.className='option';div.textContent=opt;div.dataset.index=idx;div.onclick=()=>selectOption(idx);box.appendChild(div);});selected=null;answered=false;speak(q.q[currentLang]);if(window.Josh)Josh.solving(true);}
+function selectOption(idx){if(answered)return;selected=idx;const q=questions[current];const correct=(idx===q.ans);document.querySelectorAll('.option').forEach((el,i)=>{if(i===q.ans)el.classList.add('selected-correct');if(i===idx&&!correct)el.classList.add('selected-wrong');});answered=true;if(correct){score++;document.getElementById('feedback').innerHTML='✅ תשובה נכונה!';if(window.Josh){Josh.solving(false);Josh.celebrate();}else speak('תשובה נכונה');}else{document.getElementById('feedback').innerHTML='❌ שגוי. התשובה הנכונה: '+q.opts[currentLang][q.ans];if(window.Josh){Josh.solving(false);Josh.encourage('לא נורא. התשובה הנכונה היא: '+q.opts[currentLang][q.ans]);}else speak('תשובה שגויה. התשובה הנכונה היא: '+q.opts[currentLang][q.ans]);}}
+function showSolution(){const box=document.getElementById('solutionBox');box.classList.remove('hidden');document.getElementById('solutionContent').innerHTML='<p>'+questions[current].sol[currentLang].replace(/\\n/g,'<br>')+'</p>';speak('פתרון: '+questions[current].sol[currentLang]);}
+function hideSolution(){document.getElementById('solutionBox').classList.add('hidden');}
+function nextQuestion(){if(!answered){speak('ענה קודם');return;}if(current+1<questions.length){current++;loadQuestion(current);}else{document.getElementById('feedback').innerHTML='🎉 סיימת! ציון: '+score+'/'+questions.length;speak('סיימת! הציון שלך: '+score+' מתוך '+questions.length);}}
+function skipQuestion(){if(current+1<questions.length){current++;loadQuestion(current);speak('דילגת');}else speak('אין שאלות נוספות');}
+function resetQuiz(){current=0;score=0;loadQuestion(0);speak('אתחלת את המבחן');}
+
+/* ההרשמה ל-DOMContentLoaded נעשית אחרי זו של ג'וש, ולכן הוא כבר קיים
+   כאן וההקראה של השאלה הראשונה עוברת דרכו. */
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('#langbar button').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+  if(window.Josh){
+    // מחרוזת ולא RegExp: ג'וש עוטף אותה בגבול מילה שעובד בעברית.
+    // /\\bהבא\\b/ לא היה נורה לעולם — ה-\\b של JavaScript הוא אנגלית בלבד.
+    Josh.addCommand("הבא|קדימה", nextQuestion);
+    Josh.addCommand("דלג|הבא בבקשה", skipQuestion);
+    Josh.addCommand("פתרון|תסביר|הסבר", showSolution);
+    Josh.addCommand("מהתחלה|התחל שוב|אתחל", resetQuiz);
+    // srcdoc יורש את המקור של דף האב, ולכן אפשר לקרוא לו ישירות
+    Josh.addCommand("חזרה|רשימה|סגור", function(){
+      try { parent.closeApp(); } catch(e) { /* נפתח לבד, בלי דף אב */ }
+    });
+  }
+  loadQuestion(0);
+});
+<\/script></body></html>`;
+}
+
+// ============================================================
+// טעינת הרשימה
+// ============================================================
+const grid = document.getElementById('appGrid');
+apps.forEach(app => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<span class="icon">${app.icon}</span><span class="name">${app.name}</span>`;
+  card.title = app.desc;
+  card.onclick = () => openApp(app);
+  grid.appendChild(card);
+});
+
+// ============================================================
+// פתיחת אפליקציה
+//
+// srcdoc ולא data:text/html — כתובת data היא מקור אטום ובלי כתובת בסיס,
+// ולכן נתיבים יחסיים (josh-avatar.css, josh-engine.js) לא היו נפתרים שם.
+// ============================================================
+function openApp(app) {
+  const container = document.getElementById('appContainer');
+  const frame = document.getElementById('appFrame');
+  container.style.display = 'block';
+  frame.srcdoc = generateAppHTML(app);
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // לאפליקציה יש ג'וש משלה — שניים על המסך בבת אחת רק מבלבלים
+  if (window.Josh) Josh.hide();
+}
+
+function closeApp() {
+  const frame = document.getElementById('appFrame');
+  // עוצרים הקראה שרצה בתוך המסגרת, אחרת היא ממשיכה לדבר אחרי הסגירה
+  try { frame.contentWindow.speechSynthesis.cancel(); } catch (e) { /* noop */ }
+  document.getElementById('appContainer').style.display = 'none';
+  frame.removeAttribute('srcdoc');
+  frame.src = 'about:blank';
+  if (window.Josh) Josh.show();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// פקודות קוליות בדף הראשי: "פתח את נתיב", "חזרה"
+document.addEventListener('josh:ready', function () {
+  Josh.addCommand("חזרה|סגור|רשימה", closeApp);
+  Josh.addCommand(/.+/, function (said) {
+    const hit = apps.find(a => said.includes(a.name));
+    if (!hit) return false;               // לא זוהתה אפליקציה — נמשיך לפקודות הבאות
+    Josh.say('פותח את ' + hit.name);
+    openApp(hit);
+  });
+});
+</script>
+</body>
+</html>

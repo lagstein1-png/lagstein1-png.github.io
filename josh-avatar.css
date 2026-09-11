@@ -1,0 +1,575 @@
+/* ============================================================
+   josh-avatar.css  —  עיצוב הרכיב הצף "ג'וש" (מורה דיגיטלי)
+   נטען יחד עם josh-engine.js
+   ============================================================ */
+
+:root {
+  --josh-size: 92px;              /* קוטר הכפתור העגול */
+  --josh-face: 70px;              /* קוטר תמונת הפנים שבתוכו */
+  --josh-primary: #2563eb;
+  --josh-primary-dark: #1d4ed8;
+  --josh-accent: #f59e0b;
+  --josh-listen: #16a34a;
+  --josh-danger: #dc2626;
+  --josh-bubble-bg: #ffffff;
+  --josh-bubble-fg: #111827;
+  --josh-bubble-border: #e5e7eb;
+  --josh-shadow: 0 10px 30px rgba(0, 0, 0, .22);
+  --josh-radius: 18px;
+
+  /* הטבעת סביב הפנים: כחול עמוק עם הבהובי כסף, כמו מסגרת מתכת מלוטשת */
+  --josh-ring: conic-gradient(from 135deg,
+      #1d4ed8 0deg, #93c5fd 48deg, #f8fafc 76deg, #cbd5e1 104deg,
+      #2563eb 168deg, #1e3a8a 212deg, #e2e8f0 268deg, #94a3b8 300deg, #1d4ed8 360deg);
+  --josh-chat-bg: #ffffff;
+  --josh-chat-fg: #111827;
+  --josh-chat-line: #e5e7eb;
+  --josh-chat-soft: #f3f4f6;
+  --josh-font: "Rubik", "Assistant", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --josh-z: 2147483000;
+}
+
+/* ---------- מיכל ראשי ---------- */
+.josh-root {
+  position: fixed;
+  inset-inline-end: 20px;
+  inset-block-end: 20px;
+  z-index: var(--josh-z);
+  font-family: var(--josh-font);
+  direction: rtl;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.josh-root[data-pos="left"] { align-items: flex-start; }
+.josh-root[hidden] { display: none !important; }
+
+/* ---------- בועת דיבור ---------- */
+.josh-bubble {
+  position: relative;
+  max-width: min(340px, calc(100vw - 48px));
+  background: var(--josh-bubble-bg);
+  color: var(--josh-bubble-fg);
+  border: 1px solid var(--josh-bubble-border);
+  border-radius: var(--josh-radius);
+  padding: 14px 16px 12px;
+  box-shadow: var(--josh-shadow);
+  font-size: 16px;
+  line-height: 1.65;
+  opacity: 0;
+  transform: translateY(10px) scale(.96);
+  transform-origin: bottom left;
+  pointer-events: none;
+  transition: opacity .22s ease, transform .22s cubic-bezier(.2, .9, .3, 1.2);
+}
+.josh-root[data-pos="left"] .josh-bubble { transform-origin: bottom right; }
+.josh-bubble.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.josh-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -9px;
+  inset-inline-end: 28px;
+  width: 16px;
+  height: 16px;
+  background: inherit;
+  border-inline-end: 1px solid var(--josh-bubble-border);
+  border-block-end: 1px solid var(--josh-bubble-border);
+  transform: rotate(45deg);
+  border-radius: 0 0 4px 0;
+}
+.josh-bubble__name {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--josh-primary);
+  margin-bottom: 4px;
+  letter-spacing: .2px;
+}
+.josh-bubble__text { white-space: pre-wrap; word-break: break-word; }
+.josh-bubble__text em { color: var(--josh-primary-dark); font-style: normal; font-weight: 600; }
+.josh-bubble__close {
+  position: absolute;
+  top: 6px;
+  inset-inline-start: 8px;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.josh-bubble__close:hover { background: #f3f4f6; color: #374151; }
+
+/* טקסט זמני של זיהוי דיבור */
+.josh-bubble.is-interim .josh-bubble__text { color: #6b7280; font-style: italic; }
+
+/* ---------- שורת כפתורים ---------- */
+.josh-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.josh-btn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #374151;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .16);
+  cursor: pointer;
+  font-size: 19px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+.josh-btn:hover  { transform: translateY(-2px); }
+.josh-btn:active { transform: translateY(0) scale(.94); }
+.josh-btn:focus-visible { outline: 3px solid var(--josh-primary); outline-offset: 2px; }
+.josh-btn[aria-pressed="true"] { background: var(--josh-primary); color: #fff; }
+.josh-btn--mic[aria-pressed="true"] { background: var(--josh-listen); color: #fff; }
+.josh-btn--stop { background: var(--josh-danger); color: #fff; }
+.josh-btn[disabled] { opacity: .4; cursor: not-allowed; transform: none; }
+
+/* ---------- האווטאר ---------- */
+.josh-avatar {
+  width: var(--josh-size);
+  height: var(--josh-size);
+  border: 0;
+  padding: 0;
+  border-radius: 50%;
+  /* הטבעת עצמה: gradient חרוטי, ומעליו טבעת לבנה דקה שמפרידה אותה מהפנים */
+  background: var(--josh-ring);
+  box-shadow:
+    0 12px 28px rgba(29, 78, 216, .34),
+    0 3px 8px rgba(15, 23, 42, .28),
+    inset 0 0 0 1px rgba(255, 255, 255, .55);
+  cursor: grab;
+  position: relative;
+  display: grid;
+  place-items: center;
+  transition: transform .22s cubic-bezier(.2, .9, .3, 1.3), box-shadow .22s ease;
+  animation: josh-float 4.5s ease-in-out infinite;
+}
+.josh-avatar:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow:
+    0 18px 36px rgba(29, 78, 216, .42),
+    0 4px 10px rgba(15, 23, 42, .3),
+    inset 0 0 0 1px rgba(255, 255, 255, .7);
+}
+.josh-avatar:active { cursor: grabbing; transform: scale(.97); }
+.josh-avatar:focus-visible { outline: 3px solid var(--josh-accent); outline-offset: 4px; }
+
+/* תמונת הפנים — בדיוק 70×70, עגולה, ממורכזת, בלי עיוות יחס */
+.josh-face-img {
+  width: var(--josh-face);
+  height: var(--josh-face);
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  pointer-events: none;
+  background: #eef2f7;                        /* עד שהתמונה נטענת */
+  box-shadow:
+    0 0 0 2px #ffffff,                        /* הפרדה כסופה בהירה */
+    0 0 0 3px rgba(148, 163, 184, .85),
+    0 4px 10px rgba(15, 23, 42, .25) inset;
+}
+
+/* ---------- גיליון הספרייטים: המראה משתנה לפי הפעילות ----------
+   שתי שכבות זהות זו על זו. המנוע מצייר את המצב החדש על השכבה הכבויה
+   ורק אז מחליף שקיפות, ולכן המעבר בין 'מדבר' ל'חושב' הוא הצלבה רכה
+   ולא חיתוך. --josh-fade נקבע מ-josh-engine.js לפי sprite.fade. */
+.josh-sprite {
+  position: relative;
+  display: block;
+  width: var(--josh-face);
+  height: var(--josh-face);
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+  background: #eef2f7;
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 0 0 3px rgba(148, 163, 184, .85),
+    0 4px 10px rgba(15, 23, 42, .25) inset;
+}
+.josh-sprite__layer {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity var(--josh-fade, 260ms) ease;
+  will-change: opacity;
+}
+.josh-sprite__layer.is-on { opacity: 1; }
+
+/* בראש הצ'אט הפנים קטנות יותר, אותו גיליון בדיוק */
+.josh-chat__face .josh-sprite {
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .95), 0 0 0 3px rgba(148, 163, 184, .6);
+}
+
+/* הפנים המצוירות, כשאין תמונה — באותו קוטר בדיוק */
+.josh-avatar svg {
+  width: var(--josh-face);
+  height: var(--josh-face);
+  display: block;
+  pointer-events: none;
+  border-radius: 50%;
+  background: #fde8d0;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px rgba(148, 163, 184, .85);
+}
+
+/* טבעת סטטוס */
+.josh-avatar::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  transition: border-color .2s ease;
+}
+.josh-root[data-state="speaking"]  .josh-avatar::before { border-color: var(--josh-accent); }
+.josh-root[data-state="listening"] .josh-avatar::before { border-color: var(--josh-listen); }
+
+/* הילה פועמת בהאזנה */
+.josh-avatar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(22, 163, 74, .55);
+  opacity: 0;
+}
+.josh-root[data-state="listening"] .josh-avatar::after {
+  opacity: 1;
+  animation: josh-pulse 1.5s ease-out infinite;
+}
+
+/* אנימציית פה בדיבור */
+.josh-root[data-state="speaking"] .josh-mouth { animation: josh-talk .28s ease-in-out infinite alternate; }
+.josh-mouth { transform-origin: center; transform-box: fill-box; }
+
+/* מצמוץ עיניים */
+.josh-eye { transform-origin: center; transform-box: fill-box; animation: josh-blink 6s infinite; }
+.josh-eye--right { animation-delay: .08s; }
+
+/* תג מצב קטן */
+.josh-badge {
+  position: absolute;
+  bottom: 2px;
+  inset-inline-start: 2px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--josh-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: none;
+  place-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+}
+.josh-root[data-state="speaking"]  .josh-badge,
+.josh-root[data-state="listening"] .josh-badge { display: grid; }
+.josh-root[data-state="listening"] .josh-badge { background: var(--josh-listen); }
+
+/* ---------- חלון הצ'אט ---------- */
+/* מחוץ לזרימת ה-flex של המיכל: כך הוא נפתח מעל האווטאר
+   בלי להזיז אותו, ובלי לתפוס מקום כשהוא סגור. */
+.josh-chat {
+  position: absolute;
+  inset-block-end: 100%;
+  inset-inline-end: 0;
+  margin-block-end: 12px;
+  width: min(360px, calc(100vw - 32px));
+  height: min(520px, calc(100vh - 210px));
+  display: flex;
+  flex-direction: column;
+  background: var(--josh-chat-bg);
+  color: var(--josh-chat-fg);
+  border: 1px solid var(--josh-chat-line);
+  border-radius: 22px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, .28), 0 2px 8px rgba(15, 23, 42, .12);
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(16px) scale(.94);
+  transform-origin: bottom left;
+  transition:
+    opacity .24s ease,
+    transform .32s cubic-bezier(.22, 1, .36, 1),
+    visibility .24s;
+}
+.josh-root[data-pos="left"] .josh-chat { transform-origin: bottom right; }
+.josh-root.is-chat-open .josh-chat {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+/* אין מקום מעל — נפתח כלפי מטה */
+.josh-root.is-chat-below .josh-chat {
+  inset-block-end: auto;
+  inset-block-start: 100%;
+  margin-block-end: 0;
+  margin-block-start: 12px;
+  transform-origin: top left;
+}
+.josh-root[data-pos="left"].is-chat-below .josh-chat { transform-origin: top right; }
+
+/* כותרת */
+.josh-chat__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, var(--josh-primary-dark), var(--josh-primary) 55%, #60a5fa);
+  color: #fff;
+  flex: none;
+}
+.josh-chat__face { display: grid; place-items: center; flex: none; }
+.josh-chat__face .josh-face-img,
+.josh-chat__face svg {
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .95), 0 0 0 3px rgba(148, 163, 184, .6);
+}
+.josh-chat__titles { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.josh-chat__name { font-weight: 700; font-size: 16px; line-height: 1.3; }
+.josh-chat__status {
+  font-size: 12.5px;
+  opacity: .92;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.josh-chat__close {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .16);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.josh-chat__close:hover { background: rgba(255, 255, 255, .32); }
+
+/* יומן ההודעות */
+.josh-chat__log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+.josh-msg {
+  max-width: 88%;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  animation: josh-msg-in .2s ease-out;
+}
+.josh-msg__text {
+  padding: 10px 13px;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.josh-msg--bot { align-self: flex-start; }
+.josh-msg--bot .josh-msg__text {
+  background: var(--josh-chat-soft);
+  border: 1px solid var(--josh-chat-line);
+  border-start-start-radius: 6px;
+}
+.josh-msg--me { align-self: flex-end; }
+.josh-msg--me .josh-msg__text {
+  background: linear-gradient(135deg, var(--josh-primary), #4a8bff);
+  color: #fff;
+  border-end-end-radius: 6px;
+}
+.josh-msg--note { align-self: center; max-width: 100%; }
+.josh-msg--note .josh-msg__text {
+  background: transparent;
+  color: #6b7280;
+  font-size: 13px;
+  text-align: center;
+}
+.josh-msg__say {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .15s ease, background .15s ease, color .15s ease;
+}
+.josh-msg:hover .josh-msg__say,
+.josh-msg__say:focus-visible { opacity: 1; }
+.josh-msg__say:hover { background: var(--josh-chat-soft); color: var(--josh-primary); }
+
+@keyframes josh-msg-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* שורת הכתיבה */
+.josh-chat__form {
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid var(--josh-chat-line);
+}
+.josh-chat__input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  max-height: 110px;
+  padding: 11px 13px;
+  border: 1px solid var(--josh-chat-line);
+  border-radius: 14px;
+  background: var(--josh-chat-soft);
+  color: var(--josh-chat-fg);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  resize: none;
+}
+.josh-chat__input:focus {
+  outline: none;
+  border-color: var(--josh-primary);
+  background: var(--josh-chat-bg);
+}
+.josh-chat__send {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--josh-primary);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s ease, transform .15s ease;
+}
+.josh-chat__send:hover { background: var(--josh-primary-dark); }
+.josh-chat__send:active { transform: scale(.94); }
+
+/* כשהחלון פתוח הבועה החולפת מיותרת */
+.josh-root.is-chat-open .josh-bubble { display: none; }
+
+/* ---------- מצב ממוזער ---------- */
+.josh-root.is-minimized .josh-bubble,
+.josh-root.is-minimized .josh-actions { display: none; }
+.josh-root.is-minimized .josh-avatar { width: 56px; height: 56px; }
+
+/* ---------- אנימציות ---------- */
+@keyframes josh-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+@keyframes josh-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(22, 163, 74, .55); }
+  100% { box-shadow: 0 0 0 22px rgba(22, 163, 74, 0); }
+}
+@keyframes josh-talk {
+  from { transform: scaleY(.35); }
+  to   { transform: scaleY(1.15); }
+}
+@keyframes josh-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95%           { transform: scaleY(.1); }
+}
+
+/* ---------- מסכים קטנים ---------- */
+@media (max-width: 480px) {
+  :root { --josh-size: 76px; --josh-face: 58px; }
+  .josh-root { inset-inline-end: 12px; inset-block-end: 12px; gap: 8px; }
+  .josh-bubble { font-size: 15px; padding: 12px 14px; }
+  .josh-btn { width: 40px; height: 40px; font-size: 17px; }
+
+  /* בטלפון הצ'אט תופס את המסך — שדה כתיבה ברוחב סביר חשוב יותר מהפינה */
+  .josh-chat,
+  .josh-root.is-chat-below .josh-chat {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    transform-origin: center bottom;
+  }
+  .josh-msg { max-width: 92%; }
+  .josh-msg__say { opacity: 1; }        /* בלי ריחוף — הכפתור תמיד גלוי */
+}
+
+/* ---------- מצב כהה ---------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --josh-bubble-bg: #1f2937;
+    --josh-bubble-fg: #f3f4f6;
+    --josh-bubble-border: #374151;
+    --josh-chat-bg: #1f2937;
+    --josh-chat-fg: #f3f4f6;
+    --josh-chat-line: #374151;
+    --josh-chat-soft: #111827;
+  }
+  .josh-btn { background: #374151; color: #e5e7eb; }
+  .josh-bubble__close:hover { background: #374151; color: #e5e7eb; }
+  .josh-bubble.is-interim .josh-bubble__text { color: #9ca3af; }
+  .josh-msg--note .josh-msg__text { color: #9ca3af; }
+  .josh-msg__say { color: #6b7280; }
+  .josh-msg__say:hover { background: #374151; color: #93c5fd; }
+  .josh-face-img { background: #334155; }
+}
+
+/* ---------- העדפת פחות תנועה ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .josh-avatar,
+  .josh-eye,
+  .josh-msg,
+  .josh-root[data-state="speaking"] .josh-mouth,
+  .josh-root[data-state="listening"] .josh-avatar::after { animation: none !important; }
+  .josh-avatar:hover { transform: none; }
+  .josh-bubble { transition: opacity .15s linear; }
+  .josh-chat { transition: opacity .15s linear, visibility .15s linear; transform: none !important; }
+  .josh-chat__log { scroll-behavior: auto; }
+  /* המצב עדיין מתחלף, רק בלי הצלבה ובלי דפדוף פריימים
+     (את עצירת הפריימים עושה המנוע, ב-_reducedMotion) */
+  .josh-sprite__layer { transition: none; }
+}

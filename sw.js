@@ -13,6 +13,7 @@ const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "site-" + V;
 const PRE = ["./","./index.html","./manifest.json","./launch.js","./launch.css",
              "./img/icon-192.png","./img/icon-512.png",
+             "./josh-avatar.css","./josh-engine.js",
              "/legal/terms.js","/legal/protect.js"];
 
 self.addEventListener("install", e => {
