@@ -26,7 +26,13 @@ jobs:
 
       - name: בודק את האתר החי
         run: |
+          # **בלי -e, ובכוונה.** GitHub מריץ ב-bash -e, ו-grep שאינו
+          # מוצא יוצא 1 — ב-bagrut-806 מפתח הקאש יושב ב-app.js ולא
+          # בדף, ולכן החיפוש בדף ריק והריצה נפלה שם באמצע הלולאה.
+          # הכישלון נמדד ב-FAIL ומדווח בסוף, ולא בקריסה.
+          set +e
           set -uo pipefail
+          set +e
           BASE=https://lagstein1-png.github.io
           APPS="math-app math-teen math-uni math-uni2 math-uni3 english ulpan history lomda kotvim reader bagrut-806"
           FAIL=0
@@ -47,12 +53,12 @@ jobs:
             # המפתח שמוגש בפועל מול המפתח שבעץ
             SRC=$app/index.html
             [ "$app" = "bagrut-806" ] && SRC=$app/app.js
-            WANT=$(grep -o 'sw\.js?v=[a-z0-9-]*' "$SRC" | head -1 | sed 's/.*v=//')
-            GOT=$(grep -o 'sw\.js?v=[a-z0-9-]*' /tmp/p.html | head -1 | sed 's/.*v=//')
+            WANT=$(grep -o 'sw\.js?v=[a-z0-9-]*' "$SRC" 2>/dev/null | head -1 | sed 's/.*v=//' || true)
+            GOT=$(grep -o 'sw\.js?v=[a-z0-9-]*' /tmp/p.html 2>/dev/null | head -1 | sed 's/.*v=//' || true)
             # ב-bagrut-806 המפתח יושב ב-app.js ולא בדף
             if [ -z "$GOT" ] && [ "$app" = "bagrut-806" ]; then
               curl -s --max-time 30 "$BASE/$app/app.js?cb=$GITHUB_RUN_ID" -o /tmp/a.js
-              GOT=$(grep -o 'sw\.js?v=[a-z0-9-]*' /tmp/a.js | head -1 | sed 's/.*v=//')
+              GOT=$(grep -o 'sw\.js?v=[a-z0-9-]*' /tmp/a.js 2>/dev/null | head -1 | sed 's/.*v=//' || true)
             fi
 
             if [ "$CODE" != "200" ]; then FAIL=1; fi
