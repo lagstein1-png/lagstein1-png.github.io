@@ -432,6 +432,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/kotvim.js                # התוכן של ״כותבים ביחד״ — ארבע שפות, ואין קטע גנרי
     node .claude/qa/leaks.js                 # תיאור של פריט בלומדה אינו מצטט את כותרתו (ההקראה לא מסגירה)
     node .claude/qa/markers.js               # סמני התנגשות מיזוג שנשארו בקובץ שנעקב
+    node .claude/qa/guide.js                 # שם כפתור שהמדריך מבטיח, וכבר אינו בממשק
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/content.js               # תוכן: תשע משפחות, דוח PASS/REVIEW/FAIL
     node .claude/qa/fresh.js                 # דוח תוכן שמתאר עץ שכבר אינו קיים
