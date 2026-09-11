@@ -57,6 +57,9 @@ const SUITE = [
   { id: 'kotvim',   args: [] },
   { id: 'leaks',    args: [] },
   { id: 'markers',  args: [] },
+  /* שמות הכפתורים שב-GUIDE.md מול הממשק. המדריך צבר שלוש דריפטות
+     תוך יממה, ואיש לא ידע עד שקראו אותו. */
+  { id: 'guide',    args: [] },
   { id: 'century',  args: [] },
   { id: 'content806', args: [] },
   /* `content.js` עצמו אינו כאן, כאמור למעלה — אבל **הדוחות שהוא
