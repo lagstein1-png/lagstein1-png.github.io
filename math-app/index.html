@@ -106,9 +106,9 @@ html.hi-contrast .btn{border:2px solid #000}
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
   background-image:linear-gradient(to left,rgba(14,156,141,.07) 1px,transparent 1px),linear-gradient(to bottom,rgba(14,156,141,.07) 1px,transparent 1px);background-size:28px 28px}
 .bg .blob{position:absolute;border-radius:50%}
-.bg .b1{top:-96px;right:-96px;width:380px;height:380px;background:radial-gradient(circle,rgba(255,197,49,.28),transparent 70%);opacity:.5}
-.bg .b2{bottom:-120px;left:-96px;width:430px;height:430px;background:radial-gradient(circle,rgba(14,156,141,.22),transparent 70%);opacity:.5}
-.bg .b3{top:33%;left:24%;width:290px;height:290px;background:radial-gradient(circle,rgba(255,111,97,.15),transparent 70%);opacity:.45}
+.bg .b1{top:-96px;inset-inline-end:-96px;width:380px;height:380px;background:radial-gradient(circle,rgba(255,197,49,.28),transparent 70%);opacity:.5}
+.bg .b2{bottom:-120px;inset-inline-start:-96px;width:430px;height:430px;background:radial-gradient(circle,rgba(14,156,141,.22),transparent 70%);opacity:.5}
+.bg .b3{top:33%;inset-inline-start:24%;width:290px;height:290px;background:radial-gradient(circle,rgba(255,111,97,.15),transparent 70%);opacity:.45}
 .fl{position:absolute;font-family:var(--font-display);font-weight:700;color:var(--ink);opacity:.06;user-select:none;animation:floaty var(--d,16s) ease-in-out var(--dl,0s) infinite alternate}
 @keyframes floaty{from{transform:translateY(0) rotate(var(--r,0deg))}to{transform:translateY(-22px) rotate(calc(var(--r,0deg) + 7deg))}}
 #app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
@@ -325,7 +325,7 @@ input[type=range]{width:100%;accent-color:var(--teal)}
 .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;word-break:break-all;direction:ltr;text-align:left;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.18);border-radius:14px;padding:12px 16px;color:#fff}
 footer{border-top:3px solid rgba(23,51,60,.08);background:color-mix(in srgb,var(--paper) 80%,transparent);margin-top:auto}
 .fbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-block:16px;font-size:.86rem;color:var(--ink-soft)}
-.floatlink{position:fixed;bottom:20px;left:20px;z-index:40}
+.floatlink{position:fixed;bottom:20px;inset-inline-start:20px;z-index:40}
 .visdot{width:15px;height:15px;border-radius:50%;background:var(--sky);display:inline-block;margin:3px;opacity:.85}
 .visdot.x{background:var(--coral);position:relative}
 .visgrid{display:flex;flex-wrap:wrap;max-width:340px;gap:2px;align-items:center;justify-content:center}
@@ -1974,7 +1974,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b71 · 2026-09-11";
+var BUILD="b72 · 2026-09-11";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4349,7 +4349,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b71-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b72-pwa1").catch(function(){});
   });
 }
 </script>

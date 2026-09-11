@@ -220,10 +220,15 @@
 מתוך 15), הקראה, RTL (חמישה־עשר מתוך חמישה־עשר עם `dir="rtl"`),
 ארבע השפות, ששת מצבי הנגישות, וכללי איכות הקוד.
 
-**ארבעה דברים אין עליהם בדיקה**, ולכן הם נופלים על העין:
-`aria-pressed` שאינו מתעדכן בקוד, `outline: none` שמוחק מיקוד,
-`tabindex` חיובי, ומאפיין CSS פיזי (`margin-left`) במקום לוגי
-(`margin-inline-start`). ארבעתם עוברים את כל החבילה בשקט.
+**ארבעה דברים היו בלי בדיקה, ומ-11.9.2026 יש:**
+`node .claude/qa/aria.js` — `aria-pressed` עם ערך קבוע שאין קוד
+שמעדכן, `outline: none` בתוך `:focus` בלי `:focus-visible`
+שמחזיר, `tabindex` חיובי, ומאפיין פיזי בציר האופקי
+(`margin-left`) במקום לוגי (`margin-inline-start`).
+
+שלושת הפטורים מבניים: `direction:` מוצהר באותו כלל, `left`
+ו-`right` שניהם (מתיחה משני הקצוות), ו-`left:50%` עם
+`translateX(-50%)` (מרכוז).
 
 ## מלכודת הקאש של `legal/`
 
@@ -418,6 +423,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/exam806.js               # התוכן הכתוב־ביד של 806
     node .claude/qa/naming.js                # כלל השם של ״תאוריה מדברת״
     node .claude/qa/a11y.js                  # ששת מצבי הנגישות — מ-applyModes ועד כלל ב-CSS
+    node .claude/qa/aria.js                  # מצב דו־מצבי קבוע, outline בתוך :focus, tabindex חיובי, מאפיין פיזי
     node .claude/qa/cache.js                 # חמש בדיקות על שלושה־עשר ה-sw.js
     node .claude/qa/storage.js               # מפתח localStorage אחד לאפליקציה אחת
     node .claude/qa/say.js                   # ההקראה לא מסגירה את התשובה לפני שעונים
