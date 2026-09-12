@@ -13,10 +13,6 @@ const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "site-" + V;
 const PRE = ["./","./index.html","./manifest.json","./launch.js","./launch.css",
              "./img/icon-192.png","./img/icon-512.png",
-             /* josh-avatar.css, josh-engine.js ו-josh-sprites.png ירדו מכאן
-                בשלב 1: הדף אינו טוען אותם עוד, וצירוף מראש של 106,312 בתים שאיש
-                אינו מבקש הוא הורדה בכל התקנה ובכל העלאת גרסה. הקבצים
-                נשארים בריפו — ראו ההערה בדף הבית. */
              "/legal/terms.js","/legal/protect.js"];
 
 self.addEventListener("install", e => {
