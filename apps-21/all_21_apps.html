@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>21 אפליקציות</title>
-<link rel="stylesheet" href="josh-avatar.css"><!-- ג'וש — מורה דיגיטלי צף -->
+<link rel="stylesheet" href="josh-avatar.css"><!-- ג׳וש — מורה דיגיטלי צף -->
 <style>
 *{box-sizing:border-box;margin:0}
 body{font-family:Arial;background:#f5f7fb;color:#101828;padding:20px;text-align:center}
@@ -27,17 +27,17 @@ h1{color:#4f46e5;font-size:2.2rem}
 <div class="grid" id="appGrid"></div>
 <div id="appContainer">
   <button class="back" onclick="closeApp()">⬅️ חזרה לרשימה</button>
-  <!-- allow="microphone" נדרש כדי שזיהוי הדיבור של ג'וש יעבוד בתוך ה-iframe -->
+  <!-- allow="microphone" נדרש כדי שזיהוי הדיבור של ג׳וש יעבוד בתוך ה-iframe -->
   <iframe id="appFrame" allow="microphone" title="אפליקציה"></iframe>
 </div>
 
-<!-- ג'וש — מורה דיגיטלי צף: הקראה קולית + זיהוי דיבור -->
+<!-- ג׳וש — מורה דיגיטלי צף: הקראה קולית + זיהוי דיבור -->
 <script>
 window.JOSH_OPTIONS = {
-  name: "ג'וש הגאון",
+  name: "ג׳וש הגאון",
   autoGreet: false,
   continuous: true,
-  greeting: "שלום! אני ג'וש הגאון. בחרו אפליקציה מהרשימה, או אמרו לי את שמה."
+  greeting: "שלום! אני ג׳וש הגאון. בחרו אפליקציה מהרשימה, או אמרו לי את שמה."
 };
 </script>
 <script src="josh-engine.js"></script>
@@ -120,7 +120,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);padding:20px;
 <div id="solutionBox" class="solution hidden"><h3>📘 פתרון</h3><div id="solutionContent"></div><button class="btn" onclick="hideSolution()">סגור</button></div>
 <div style="margin-top:16px;font-size:1.2rem">שאלה <span id="qNum">1</span> / <span id="qTotal">5</span></div></div>
 
-<!-- ג'וש נטען לפני קוד האפליקציה, כדי שיהיה קיים כשהשאלה הראשונה מוקראת -->
+<!-- ג׳וש נטען לפני קוד האפליקציה, כדי שיהיה קיים כשהשאלה הראשונה מוקראת -->
 <script>window.JOSH_OPTIONS={autoGreet:false,continuous:true};<\/script>
 <script src="josh-engine.js"><\/script>
 
@@ -147,7 +147,7 @@ function pickVoice(){
 }
 if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=pickVoice;setTimeout(pickVoice,200);}
 
-/* ההקראה עוברת דרך ג'וש כשהוא נטען — מנוע קול אחד, לא שניים במקביל.
+/* ההקראה עוברת דרך ג׳וש כשהוא נטען — מנוע קול אחד, לא שניים במקביל.
    כשהוא לא נטען (פתיחה מקומית שחוסמת את הקובץ) נשארת ההקראה המקורית. */
 function speak(t){
   if(!t)return;
@@ -170,12 +170,12 @@ function nextQuestion(){if(!answered){speak('ענה קודם');return;}if(curren
 function skipQuestion(){if(current+1<questions.length){current++;loadQuestion(current);speak('דילגת');}else speak('אין שאלות נוספות');}
 function resetQuiz(){current=0;score=0;loadQuestion(0);speak('אתחלת את המבחן');}
 
-/* ההרשמה ל-DOMContentLoaded נעשית אחרי זו של ג'וש, ולכן הוא כבר קיים
+/* ההרשמה ל-DOMContentLoaded נעשית אחרי זו של ג׳וש, ולכן הוא כבר קיים
    כאן וההקראה של השאלה הראשונה עוברת דרכו. */
 document.addEventListener('DOMContentLoaded', function(){
   document.querySelectorAll('#langbar button').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
   if(window.Josh){
-    // מחרוזת ולא RegExp: ג'וש עוטף אותה בגבול מילה שעובד בעברית.
+    // מחרוזת ולא RegExp: ג׳וש עוטף אותה בגבול מילה שעובד בעברית.
     // /\\bהבא\\b/ לא היה נורה לעולם — ה-\\b של JavaScript הוא אנגלית בלבד.
     Josh.addCommand("הבא|קדימה", nextQuestion);
     Josh.addCommand("דלג|הבא בבקשה", skipQuestion);
@@ -216,7 +216,7 @@ function openApp(app) {
   container.style.display = 'block';
   frame.srcdoc = generateAppHTML(app);
   container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  // לאפליקציה יש ג'וש משלה — שניים על המסך בבת אחת רק מבלבלים
+  // לאפליקציה יש ג׳וש משלה — שניים על המסך בבת אחת רק מבלבלים
   if (window.Josh) Josh.hide();
 }
 
