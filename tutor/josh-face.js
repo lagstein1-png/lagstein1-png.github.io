@@ -55,7 +55,10 @@ var MOMENT = { correct:1400, wrong:1600, encourage:1600 };   /* מילישניו
 
 /* המצב שאליו חוזרים אחרי רגע. נקבע בכניסה לרגע ולא בסופו, אחרת
    שני רגעים רצופים היו מאבדים את הבסיס. */
-var base = "idle", cur = "idle", node = null, moTimer = null, blTimer = null;
+var base = "idle", cur = "idle", nodes = [], moTimer = null, blTimer = null;
+
+/* נתיב לדיוקן. ריק = הפנים המצוירות. ראו `photo()` למטה. */
+var photoURL = "";
 
 var MOTION_Q = "(prefers-reduced-motion: reduce)";
 function reduced() {
@@ -120,11 +123,49 @@ var CSS = [
 '.jf[data-state="correct"]{animation:jf-nod .5s ease-in-out}',
 "@keyframes jf-nod{0%,100%{transform:translateY(0)}45%{transform:translateY(3px)}}",
 
+/* ----------------------------------------------------------------
+   מצב תמונה. הדיוקן הוא תצלום, ולכן **אין כאן מצמוץ ואין סנכרון
+   שפתיים**: אי אפשר לחתוך עיניים עצומות מפריים שעיניו פתוחות.
+   המצב נאמר במה שכן אפשר על תצלום — הטיית ראש, קנה מידה, והנורית.
+   וריאנטים של אותה דמות יחזירו את המצמוץ; ראו O-54.
+   ---------------------------------------------------------------- */
+".jf--photo{overflow:visible}",
+".jf--photo .jf__ph{display:block;width:100%;height:auto;border-radius:50%;",
+"  box-shadow:0 2px 10px rgba(20,40,50,.12),0 10px 26px rgba(20,40,50,.10);",
+"  transform-origin:50% 88%;transition:transform .5s cubic-bezier(.22,.8,.3,1)}",
+'.jf--photo[data-state="listening"] .jf__ph,.jf--photo[data-state="stuck"] .jf__ph{transform:rotate(-3deg)}',
+'.jf--photo[data-state="thinking"] .jf__ph{transform:rotate(2.5deg) translateY(-2px)}',
+'.jf--photo[data-state="frustrated"] .jf__ph,.jf--photo[data-state="slow"] .jf__ph{transform:rotate(-1.5deg)}',
+/* טעות: הטיה קטנה פנימה, כמו מי שמתקרב להסתכל יחד. לא ריחוק. */
+'.jf--photo[data-state="wrong"] .jf__ph{transform:rotate(-2.5deg) scale(1.01)}',
+'.jf--photo[data-state="correct"] .jf__ph,.jf--photo[data-state="encourage"] .jf__ph{transform:translateY(-3px) scale(1.02)}',
+'.jf--photo[data-state="speaking"] .jf__ph{animation:jf-ph-talk 1.5s ease-in-out infinite}',
+"@keyframes jf-ph-talk{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}",
+".jf--photo.is-tilt .jf__ph{transform:rotate(-1.5deg)}",
+
+/* הטבעת והנורית יושבות מעל התצלום ולא בתוכו */
+/* הטבעת: `border-color` חייב להיקבע בכל מצב. בגרסה הראשונה הוא
+   נשאר `transparent` ואיש לא דרס אותו — האטימות עלתה ל-0.9 ולא
+   נראה דבר. נמדד בדפדפן. */
+".jf__halo{position:absolute;inset:-5px;border-radius:50%;border:2px solid transparent;",
+"  transition:border-color .4s ease,opacity .4s ease;opacity:0;pointer-events:none}",
+'.jf--photo[data-state="listening"] .jf__halo,.jf--photo[data-state="stuck"] .jf__halo{border-color:#3fa8a0}',
+'.jf--photo[data-state="thinking"] .jf__halo{border-color:#d9a441}',
+'.jf--photo[data-state="correct"] .jf__halo,.jf--photo[data-state="encourage"] .jf__halo{border-color:#4fb06a}',
+'.jf--photo[data-state="listening"] .jf__halo,.jf--photo[data-state="stuck"] .jf__halo{opacity:.9}',
+'.jf--photo[data-state="thinking"] .jf__halo{opacity:.6}',
+'.jf--photo[data-state="correct"] .jf__halo,.jf--photo[data-state="encourage"] .jf__halo{opacity:.85}',
+".jf__dot{position:absolute;inset-block-start:16%;inset-inline-end:2%;width:9%;height:9%;",
+"  background:#3fa8a0;box-shadow:0 0 6px rgba(63,168,160,.7);",
+"  border-radius:50%;opacity:0;transition:opacity .4s ease;pointer-events:none}",
+'.jf--photo[data-state="listening"] .jf__dot{opacity:1;animation:jf-led 1.9s ease-in-out infinite}',
+'.jf--photo[data-state="thinking"] .jf__dot{opacity:1;animation:jf-led 2.8s ease-in-out infinite}',
+
 /* וזה מכבה את הכול. `animation:none` על הצאצאים מכסה גם את
    הקשת ואת ההנהון, ולא רק את הפה. */
 "@media (prefers-reduced-motion: reduce){",
 "  .jf *,.jf{animation:none!important;transition:none!important}",
-"  .jf__head{transform:none!important}",
+"  .jf__head,.jf--photo .jf__ph{transform:none!important}",
 "}"
 ].join("");
 
@@ -268,29 +309,40 @@ var MOUTH = {
 /* ---------------------------------------------------------------
    ציור
    --------------------------------------------------------------- */
+/* **רשימה ולא צומת אחד.** `math-app` מציירת את ג׳וש פעמיים — גדול
+   בעמודת הליווי, וקטן בשבב ה-XP שבכותרת — ו-`querySelector` תפס את
+   הראשון בלבד: הפנים הגדולות לא קיבלו אף מצב. נמדד בדפדפן. */
 function paint() {
-  if (!node) return;
-  node.setAttribute("data-state", cur);
-  var want = MOUTH[cur] || "calm", list = node.querySelectorAll(".jf__m"), i;
-  for (i = 0; i < list.length; i++) {
-    list[i].classList.toggle("is-on", list[i].classList.contains("jf__m--" + want));
+  var want = MOUTH[cur] || "calm", n, list, i, k;
+  for (k = 0; k < nodes.length; k++) {
+    n = nodes[k];
+    if (!n || !n.isConnected) continue;
+    n.setAttribute("data-state", cur);
+    if (photoURL) continue;                   /* לתצלום אין פיות להחליף */
+    list = n.querySelectorAll(".jf__m");
+    for (i = 0; i < list.length; i++) {
+      list[i].classList.toggle("is-on", list[i].classList.contains("jf__m--" + want));
+    }
   }
 }
 
 /* המצמוץ. פרק זמן אקראי בין שלוש לשבע שניות, ולפעמים גם הטיית ראש
    זעירה — שתיהן באותה שרשרת, כדי שלא ירוצו שני טיימרים. */
+function eachNode(fn) {
+  for (var i = 0; i < nodes.length; i++) if (nodes[i] && nodes[i].isConnected) fn(nodes[i]);
+}
+
 function scheduleBlink() {
   clearTimeout(blTimer);
-  if (!node || reduced()) return;
+  if (!nodes.length || reduced()) return;
   blTimer = setTimeout(function () {
-    if (!node) return;
     if (!document.hidden) {
-      node.classList.add("is-blink");
-      setTimeout(function () { if (node) node.classList.remove("is-blink") }, 120);
+      eachNode(function (n) { n.classList.add("is-blink") });
+      setTimeout(function () { eachNode(function (n) { n.classList.remove("is-blink") }) }, 120);
       /* הטיה קלה רק כשאין מה לעשות. באמצע דיבור היא נראית כמו תקלה. */
       if (cur === "idle" && Math.random() < 0.28) {
-        node.classList.add("is-tilt");
-        setTimeout(function () { if (node) node.classList.remove("is-tilt") }, 1500);
+        eachNode(function (n) { n.classList.add("is-tilt") });
+        setTimeout(function () { eachNode(function (n) { n.classList.remove("is-tilt") }) }, 1500);
       }
     }
     scheduleBlink();
@@ -309,23 +361,56 @@ var JOSHFACE = {
        בדיוק כמו זה שהקובץ הזה נכתב כדי למנוע. ההזרקה מוגנת מכפילות. */
     injectCSS();
     var px = Math.max(48, Math.min(320, parseInt(size, 10) || 140));
+
+    if (photoURL) {
+      /* `decoding="async"` ו-`loading="lazy"`: הדיוקן לא יעכב את
+         הציור הראשון של האפליקציה. `alt=""` כי זה קישוט — מה שיש
+         לג׳וש לומר יושב בטקסט שלידו. */
+      return '<span class="jf jf--photo" data-state="' + cur + '" style="width:' + px + 'px">' +
+               '<img class="jf__ph" src="' + photoURL + '" alt="" decoding="async" loading="lazy">' +
+               '<span class="jf__halo"></span><span class="jf__dot"></span>' +
+             '</span>';
+    }
     return '<span class="jf" data-state="' + cur + '" style="width:' + px + 'px">' + faceSVG(px) + '</span>';
   },
 
+  /**
+   * מחליף את הפנים המצוירות בדיוקן.
+   *
+   * **נתיב יחסי בלבד.** כתובת מלאה נדחית ומחזירה false: הקובץ הזה
+   * אינו מביא דבר מהרשת, וזו אינה הבטחה בהערה אלא בדיקה בקוד —
+   * `node .claude/qa/joshface.js` אוכף את אותו כלל מבחוץ.
+   *
+   * מה שמשתנה במצב תמונה: **אין מצמוץ ואין סנכרון שפתיים**, מפני
+   * שאי אפשר לחתוך עיניים עצומות מפריים שעיניו פתוחות. עשרת
+   * האירועים עצמם ממשיכים לעבוד — הם נאמרים בהטיה, בקנה מידה,
+   * בטבעת ובנורית. ראו O-54.
+   *
+   * קריאה בלי ארגומנט מחזירה לפנים המצוירות.
+   */
+  photo: function (url) {
+    if (url === undefined || url === null || url === "") { photoURL = ""; return true }
+    if (/^[a-z]+:/i.test(String(url)) || String(url).indexOf("//") === 0) return false;
+    photoURL = String(url);
+    return true;
+  },
+
   /** מחבר את המודול לצומת שקיים עכשיו. נקרא אחרי כל render(). */
+  /** מחבר לכל הפנים שעל הדף. אלמנט מפורש מגביל לאחד. */
   attach: function (el) {
     injectCSS();
-    node = el || document.querySelector(".jf");
-    if (!node) return false;
+    nodes = el ? [el] : [].slice.call(document.querySelectorAll(".jf"));
+    if (!nodes.length) return false;
     paint();
-    scheduleBlink();
-    return true;
+    /* במצב תמונה אין עפעפיים, ולכן אין טעם בטיימר. */
+    if (!photoURL) scheduleBlink();
+    return nodes.length;
   },
 
   detach: function () {
     clearTimeout(blTimer); blTimer = null;
     clearTimeout(moTimer); moTimer = null;
-    node = null;
+    nodes = [];
   },
 
   /**
@@ -348,7 +433,7 @@ var JOSHFACE = {
   },
 
   /** המצב המוצג כרגע, ומצב הבסיס שאליו יחזור אחרי רגע. */
-  state: function () { return { current: cur, base: base } },
+  state: function () { return { current: cur, base: base, photo: photoURL || null } },
 
   /**
    * וו לסנכרון שפתיים, ו**רק וו**. הוא אינו מקריא ואינו יודע מה
@@ -357,11 +442,13 @@ var JOSHFACE = {
    * ב-CSS, וזה מספיק. אין כאן `speechSynthesis` ואין בחירת קול.
    */
   boundary: function () {
-    if (!node || cur !== "speaking" || reduced()) return false;
-    var m = node.querySelector(".jf__m--talk");
-    if (!m) return false;
-    m.style.transform = "scaleY(" + (0.6 + Math.random() * 0.6).toFixed(2) + ")";
-    return true;
+    if (!nodes.length || photoURL || cur !== "speaking" || reduced()) return false;
+    var v = "scaleY(" + (0.6 + Math.random() * 0.6).toFixed(2) + ")", hit = false;
+    eachNode(function (n) {
+      var m = n.querySelector(".jf__m--talk");
+      if (m) { m.style.transform = v; hit = true }
+    });
+    return hit;
   },
 
   reduced: reduced
@@ -370,7 +457,7 @@ var JOSHFACE = {
 /* לשונית מוסתרת — אין למי לצייר, והטיימר נעצר. */
 document.addEventListener("visibilitychange", function () {
   if (document.hidden) { clearTimeout(blTimer); blTimer = null; }
-  else if (node) scheduleBlink();
+  else if (nodes.length) scheduleBlink();
 });
 
 g.JOSHFACE = JOSHFACE;

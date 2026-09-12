@@ -12,7 +12,7 @@
 const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "math-app-" + V;
 const PRE = ["./","./index.html","./manifest.json",
-             "./img/icon-192.png","./img/icon-512.png",
+             "./img/icon-192.png","./img/icon-512.png","./img/josh.jpg",
              "./josh-sprites.png",
              "/tutor/josh-face.js",
              "/tutor/tutor.js",

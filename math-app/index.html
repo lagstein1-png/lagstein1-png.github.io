@@ -1299,6 +1299,12 @@ function applyModes(){
    ראשון אופליין). בשני המקרים ממשיכים עם הציור הישן ולא נשברים.
 
    `state.pet` הוא בחירת הלומד באונבורדינג: שועל, ינשוף או ג׳וש. */
+/* הדיוקן. נתיב יחסי — לכל אפליקציה עותק משלה, כמו האייקונים.
+   15,229 בתים, JPEG: אין צורך בשקיפות (הוא ממוסך לעיגול ב-CSS),
+   ו-PNG של אותו חתך היה 135,356 — פי תשעה, בלי שום רווח.
+   נחתך מהרפרנס של הבעלים, מהאזור שאין בו את הבועה. */
+var JF_PHOTO="img/josh.jpg";
+
 function jfOn(){ return state.pet==="josh" && typeof JOSHFACE!=="undefined" }
 /* מצבי הרוח של האפליקציה קדמו לשכבת הפנים, ולכן זו טבלת תרגום ולא
    שינוי: "cheer" כבר סימן תשובה נכונה, ו-"think" כבר סימן רמז. */
@@ -2020,7 +2026,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b77 · 2026-09-12";
+var BUILD="b78 · 2026-09-12";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4405,7 +4411,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b77-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b78-pwa1").catch(function(){});
   });
 }
 </script>
@@ -4413,6 +4419,13 @@ if("serviceWorker" in navigator){
      mount מחזיר false כשאין כתובת שרת, ואז הכפתור אינו נבנה. -->
 <script>
 if(window.TUTOR){
+  /* הדיוקן נדלק כאן ולא בסקריפט הראשי: `josh-face.js` נטען אחריו,
+     ובנקודה ההיא `JOSHFACE` עדיין לא קיים. נמדד — הקריאה נבלעה
+     בשקט והפנים נשארו מצוירות. אחרי ההדלקה מציירים מחדש. */
+  if(typeof JOSHFACE!=="undefined" && state.pet==="josh"){
+    JOSHFACE.photo(JF_PHOTO);
+  }
+
   TUTOR.mount({
     app:"math-app",
     lang:function(){return (state&&state.settings&&state.settings.lang)||"he"},
