@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ג׳וש — שיחה</title>
+<meta name="description" content="ג׳וש — דמות וירטואלית רגועה ותומכת, לשיחה בעברית פשוטה.">
+<meta name="theme-color" content="#2f6d7a">
+
+<!-- =====================================================================
+     josh.html — קובץ אחד, עצמאי לחלוטין.
+
+     אין כאן קובץ חיצוני אחד: אין גופן מהרשת, אין תמונה, אין סקריפט
+     ואין CSS נפרד. הדף עובד מכונן קשיח, בלי שרת ובלי אינטרנט.
+
+     **ג׳וש כאן אינו בינה מלאכותית, והדף אומר זאת בעצמו.** התשובות
+     נבחרות מרשימה כתובה לפי מילות מפתח. זה מכוון: בוט שמעמיד פנים
+     שהוא מבין יותר ממה שהוא מבין מאכזב בדיוק את מי שהכי צריך אותו.
+
+     הפנים בנויות מ-div ומ-CSS בלבד — בלי SVG ובלי תמונה.
+
+     הקהל: מי שקורא לאט. מכאן נגזרו גודל הטקסט, רווח השורות, אורך
+     השורה המוגבל, והיעדר כתב נטוי וטקסט מיושר לשני הצדדים.
+     ===================================================================== -->
+
+<style>
+/* ============================================================
+   1. יסודות
+   ============================================================ */
+:root{
+  --paper:#f2f6f7;        /* לא לבן: לבן טהור מסנוור, ולמי שקורא לאט זה מצטבר */
+  --card:#ffffff;
+  --ink:#1e2f36;          /* לא שחור — ניגודיות גבוהה בלי חדות מיותרת */
+  --ink-soft:#4a6873;
+  --line:#d7e3e7;
+  --teal:#2f6d7a;
+  --teal-deep:#245864;
+  --teal-soft:#e2f0f2;
+  --amber:#d98324;
+  --skin:#e8c3a0;
+  --skin-shade:#d2a67f;
+  --skin-deep:#b98a64;
+  --hair:#3b3340;
+  --shirt:#35566e;
+  --lip:#a66354;
+  --radius:18px;
+  --shadow:0 2px 10px rgba(30,47,54,.07), 0 10px 30px rgba(30,47,54,.06);
+}
+
+*{box-sizing:border-box}
+
+html,body{margin:0;padding:0}
+
+body{
+  background:var(--paper);
+  color:var(--ink);
+  /* גופני מערכת בלבד — גופן מהרשת היה קובץ חיצוני */
+  font-family:"Segoe UI","Noto Sans Hebrew",Arial,Helvetica,sans-serif;
+  font-size:19px;        /* גדול מברירת המחדל. לא מוקטן בשום מקום בדף */
+  line-height:1.75;      /* רווח שורות נדיב — הדבר שהכי עוזר לקריאה איטית */
+  letter-spacing:.01em;
+  -webkit-text-size-adjust:100%;
+}
+
+/* מי שמנווט במקלדת חייב לראות איפה הוא נמצא */
+:focus-visible{
+  outline:3px solid var(--amber);
+  outline-offset:3px;
+  border-radius:6px;
+}
+
+.wrap{
+  max-width:680px;       /* שורה קצרה נקראת טוב יותר מרוחב מסך מלא */
+  margin:0 auto;
+  padding:22px 18px 34px;
+}
+
+h1{
+  font-size:1.5rem;
+  margin:0 0 4px;
+  font-weight:700;
+}
+
+.sub{
+  margin:0;
+  color:var(--ink-soft);
+  font-size:.95rem;
+}
+
+/* ============================================================
+   2. ג׳וש — הפנים, מ-div ומ-CSS בלבד
+   ------------------------------------------------------------
+   כל איבר הוא אלמנט אחד עם רקע ורדיוס. ההבעות נקבעות במחלקה
+   אחת על .josh, וכל שאר הכללים נגזרים ממנה — כך אין צורך לגעת
+   בכל איבר בנפרד כשמצב משתנה.
+   ============================================================ */
+.stage{
+  background:linear-gradient(180deg,#e9f2f4 0%, #dde9ec 100%);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:26px 18px 0;
+  display:flex;
+  justify-content:center;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.josh{
+  position:relative;
+  width:200px;
+  height:210px;
+}
+
+/* --- כתפיים וחולצה --- */
+.shoulders{
+  position:absolute; inset-inline-start:50%; bottom:0;
+  transform:translateX(50%);
+  width:190px; height:66px;
+  background:var(--shirt);
+  border-radius:96px 96px 0 0;
+}
+.collar{
+  position:absolute; inset-inline-start:50%; bottom:30px;
+  transform:translateX(50%);
+  width:40px; height:34px;
+  background:#e9eef1;
+  clip-path:polygon(50% 100%, 0 0, 100% 0);
+}
+
+/* --- צוואר --- */
+.neck{
+  position:absolute; inset-inline-start:50%; bottom:52px;
+  transform:translateX(50%);
+  width:40px; height:34px;
+  background:var(--skin-shade);
+  border-radius:0 0 20px 20px;
+}
+
+/* --- הראש: גבוה מרוחבו, עם לסת. עיגול מלא נקרא כתינוק --- */
+.head{
+  position:absolute; inset-inline-start:50%; top:6px;
+  transform:translateX(50%);
+  width:112px; height:146px;
+  background:var(--skin);
+  border-radius:48% 48% 42% 42% / 54% 54% 46% 46%;
+  transform-origin:50% 92%;
+  transition:transform .5s cubic-bezier(.22,.8,.3,1);
+}
+
+/* --- אוזניים --- */
+.ear{
+  position:absolute; top:76px;
+  width:14px; height:22px;
+  background:var(--skin-shade);
+  border-radius:50%;
+}
+.ear--r{ inset-inline-end:-6px }
+.ear--l{ inset-inline-start:-6px }
+
+/* --- שיער: מסה אחורית + בלורית סרוקה לצד --- */
+.hair-back{
+  position:absolute; inset-inline-start:-4px; top:-4px;
+  width:116px; height:66px;
+  background:var(--hair);
+  border-radius:50% 50% 40% 40% / 62% 62% 38% 38%;
+}
+.hair-front{
+  position:absolute; inset-inline-start:-1px; top:0;
+  width:110px; height:32px;
+  background:var(--hair);
+  border-radius:50% 50% 46% 30% / 74% 74% 30% 26%;
+}
+
+/* --- גבות --- */
+.brow{
+  position:absolute; top:64px;
+  width:28px; height:6px;
+  background:var(--hair);
+  border-radius:6px;
+  transition:transform .35s ease;
+}
+.brow--r{ inset-inline-end:13px; transform:rotate(-5deg) }
+.brow--l{ inset-inline-start:13px; transform:rotate(5deg) }
+
+/* --- עיניים: שקד, לא עיגול --- */
+.eye{
+  position:absolute; top:78px;
+  width:26px; height:16px;
+  background:#fbf8f5;
+  border-radius:50% 50% 50% 50% / 62% 62% 38% 38%;
+  overflow:hidden;
+  box-shadow:inset 0 2px 0 rgba(51,39,33,.28);   /* קו ריסים — נותן עומק */
+}
+.eye--r{ inset-inline-end:14px }
+.eye--l{ inset-inline-start:14px }
+
+.pupil{
+  position:absolute; inset-inline-start:50%; top:4px;
+  transform:translateX(50%);
+  width:10px; height:10px;
+  background:#4b382d;
+  border-radius:50%;
+  transition:transform .45s cubic-bezier(.22,.8,.3,1);
+}
+.pupil::after{                                   /* נצנוץ — הופך עין לחיה */
+  content:""; position:absolute; top:2px; inset-inline-end:2px;
+  width:4px; height:4px; background:#fff; border-radius:50%;
+}
+
+/* העפעף יורד ב-scaleY. מצמוץ הוא מחלקה שנדלקת לרגע, ולא
+   אנימציה מחזורית: קצב קבוע נראה מכני, ובני אדם ממצמצים
+   בפרקי זמן לא שווים. */
+.lid{
+  position:absolute; inset-inline-start:0; top:0;
+  width:100%; height:100%;
+  background:var(--skin);
+  transform-origin:50% 0;
+  transform:scaleY(0);
+  transition:transform .09s ease-out;
+}
+.josh.is-blink .lid{ transform:scaleY(1) }
+
+/* --- אף --- */
+.nose{
+  position:absolute; inset-inline-start:50%; top:96px;
+  transform:translateX(50%);
+  width:12px; height:22px;
+  border-inline-end:3px solid var(--skin-shade);
+  border-bottom:3px solid var(--skin-deep);
+  border-end-end-radius:12px;
+  opacity:.85;
+}
+
+/* --- פה: צורה אחת שמשתנה לפי המצב --- */
+.mouth{
+  position:absolute; inset-inline-start:50%; top:124px;
+  transform:translateX(50%);
+  width:32px; height:9px;
+  border-bottom:3px solid var(--lip);
+  border-radius:0 0 40px 40px;
+  transition:all .25s ease;
+}
+
+/* --- לחיים --- */
+.cheek{
+  position:absolute; top:104px;
+  width:20px; height:14px;
+  background:#d98e7a;
+  border-radius:50%;
+  opacity:.2;
+}
+.cheek--r{ inset-inline-end:9px }
+.cheek--l{ inset-inline-start:9px }
+
+/* --- הנגיעה הטכנולוגית: אוזנייה קטנה ונורית. זה הכול. --- */
+.earpiece{
+  position:absolute; top:74px; inset-inline-end:-8px;
+  width:10px; height:18px;
+  border:2.5px solid #33505c;
+  border-inline-start:none;
+  border-radius:0 10px 10px 0;
+}
+.led{
+  position:absolute; top:90px; inset-inline-end:-9px;
+  width:6px; height:6px;
+  background:#3fa8a0;
+  border-radius:50%;
+  opacity:.75;
+}
+
+/* ============================================================
+   3. ההבעות — מחלקה אחת על .josh משנה את כל הפנים
+   ============================================================ */
+.josh[data-mood="happy"] .mouth{
+  height:15px; width:38px;
+  border-bottom-width:4px;
+}
+.josh[data-mood="happy"] .cheek{ opacity:.34 }
+
+.josh[data-mood="thinking"] .mouth{
+  width:26px; height:0;
+  border-bottom-width:3px;
+  border-radius:0;
+  transform:translateX(50%) rotate(-6deg);
+}
+.josh[data-mood="thinking"] .pupil{ transform:translateX(50%) translate(6px,-3px) }
+.josh[data-mood="thinking"] .brow--r{ transform:rotate(-5deg) translateY(-5px) }
+.josh[data-mood="thinking"] .brow--l{ transform:rotate(5deg) translateY(-2px) }
+.josh[data-mood="thinking"] .head{ transform:translateX(50%) rotate(3deg) }
+
+/* 'רך' — מה שמוצג כשהמשתמש מתקשה. לא פרצוף עצוב: מי שכבר
+   מתוסכל אינו צריך גם פנים מודאגות מולו. */
+.josh[data-mood="soft"] .mouth{ width:34px; height:6px }
+.josh[data-mood="soft"] .brow--r{ transform:rotate(-5deg) translateY(-3px) }
+.josh[data-mood="soft"] .brow--l{ transform:rotate(5deg) translateY(-3px) }
+.josh[data-mood="soft"] .head{ transform:translateX(50%) rotate(-3deg) }
+
+.josh[data-mood="talking"] .mouth{
+  height:16px; width:30px;
+  background:#7d4238;
+  border-radius:50%;
+  border-bottom:none;
+  animation:talk .28s ease-in-out infinite alternate;
+}
+@keyframes talk{ from{ transform:translateX(50%) scaleY(.55) } to{ transform:translateX(50%) scaleY(1.1) } }
+
+/* נשימה — תנועה זעירה מאוד. בלעדיה הדמות נראית קפואה. */
+.josh .head{ animation:breathe 5.5s ease-in-out infinite }
+@keyframes breathe{ 0%,100%{ translate:0 0 } 50%{ translate:0 -2px } }
+
+.josh.is-tilt .head{ transform:translateX(50%) rotate(-2.5deg) }
+
+/* ============================================================
+   4. מכבים הכול למי שביקש פחות תנועה
+   ============================================================ */
+@media (prefers-reduced-motion: reduce){
+  *{ animation:none !important; transition:none !important }
+}
+
+/* ============================================================
+   5. השיחה
+   ============================================================ */
+.log{
+  margin:18px 0 0;
+  padding:0;
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.msg{
+  max-width:88%;
+  padding:14px 18px;
+  border-radius:var(--radius);
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.msg--josh{
+  align-self:flex-start;
+  background:var(--card);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+.msg--me{
+  align-self:flex-end;
+  background:var(--teal);
+  color:#fff;
+}
+.who{
+  display:block;
+  font-size:.8rem;
+  font-weight:700;
+  margin-bottom:2px;
+  opacity:.72;
+}
+
+/* שלוש נקודות בזמן שג׳וש "חושב" — ורק כשבאמת ממתינים */
+.dots span{
+  display:inline-block; width:8px; height:8px; margin-inline-end:4px;
+  background:var(--ink-soft); border-radius:50%;
+  animation:bounce 1.1s infinite;
+}
+.dots span:nth-child(2){ animation-delay:.15s }
+.dots span:nth-child(3){ animation-delay:.3s }
+@keyframes bounce{ 0%,60%,100%{ transform:translateY(0); opacity:.4 } 30%{ transform:translateY(-5px); opacity:1 } }
+
+/* ============================================================
+   6. תיבת הכתיבה
+   ============================================================ */
+.composer{
+  margin-top:20px;
+  display:flex;
+  gap:10px;
+  align-items:flex-end;
+}
+
+textarea{
+  flex:1;
+  font:inherit;
+  color:inherit;
+  padding:14px 16px;
+  min-height:58px;
+  max-height:150px;
+  resize:none;
+  background:var(--card);
+  border:2px solid var(--line);
+  border-radius:var(--radius);
+}
+textarea:focus{ border-color:var(--teal) }
+
+button{
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+  border:none;
+  border-radius:var(--radius);
+  background:var(--teal);
+  color:#fff;
+  padding:16px 24px;
+  min-height:58px;          /* אזור מגע נוח */
+  transition:background .15s ease, transform .08s ease;
+}
+button:hover{ background:var(--teal-deep) }
+button:active{ transform:scale(.97) }
+
+.tools{
+  margin-top:14px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.ghost{
+  background:transparent;
+  color:var(--teal-deep);
+  border:2px solid var(--line);
+  padding:9px 16px;
+  min-height:0;
+  font-size:.9rem;
+  font-weight:600;
+}
+.ghost:hover{ background:var(--teal-soft) }
+
+.note{
+  margin:22px 0 0;
+  padding:12px 16px;
+  background:var(--teal-soft);
+  border-radius:12px;
+  color:var(--ink-soft);
+  font-size:.88rem;
+  line-height:1.6;
+}
+
+/* מסך צר */
+@media (max-width:520px){
+  body{ font-size:18px }
+  .composer{ flex-direction:column; align-items:stretch }
+  button{ width:100% }
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>ג׳וש</h1>
+    <p class="sub">אפשר לכתוב לי מה שרוצים. אני לא ממהר.</p>
+  </header>
+
+  <!-- ג׳וש עצמו. aria-hidden: אלה פנים ולא מידע, ומה שיש לו לומר
+       יושב בטקסט שמתחת. -->
+  <div class="stage">
+    <div class="josh" id="josh" data-mood="happy" aria-hidden="true">
+      <div class="shoulders"></div>
+      <div class="collar"></div>
+      <div class="neck"></div>
+
+      <div class="head">
+        <div class="ear ear--r"></div>
+        <div class="ear ear--l"></div>
+        <div class="earpiece"></div>
+        <div class="led"></div>
+
+        <div class="hair-back"></div>
+        <div class="hair-front"></div>
+
+        <div class="brow brow--r"></div>
+        <div class="brow brow--l"></div>
+
+        <div class="eye eye--r"><div class="pupil"></div><div class="lid"></div></div>
+        <div class="eye eye--l"><div class="pupil"></div><div class="lid"></div></div>
+
+        <div class="nose"></div>
+        <div class="cheek cheek--r"></div>
+        <div class="cheek cheek--l"></div>
+        <div class="mouth"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- aria-live: מקריא מסך מודיע על תשובה חדשה בלי שהמשתמש יחפש אותה -->
+  <ul class="log" id="log" aria-live="polite"></ul>
+
+  <form class="composer" id="form">
+    <label for="input" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">מה תרצו לכתוב?</label>
+    <textarea id="input" placeholder="כתבו לי משהו…" rows="1" autocomplete="off"></textarea>
+    <button type="submit">שליחה</button>
+  </form>
+
+  <div class="tools">
+    <button type="button" class="ghost" id="clear">התחלה מחדש</button>
+    <span class="sub" id="hello"></span>
+  </div>
+
+  <p class="note">
+    ג׳וש כאן עונה מתוך רשימת תשובות כתובה, ולא ממערכת חכמה.
+    השיחה נשמרת במכשיר הזה בלבד ואינה נשלחת לשום מקום.
+  </p>
+
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   1. זיכרון — במכשיר בלבד
+   ------------------------------------------------------------
+   שני מפתחות עם שם ייחודי לדף הזה. כל דפי האתר חולקים
+   localStorage אחד, ומפתח כללי כמו "name" היה מתנגש עם דף אחר.
+   כל גישה עטופה ב-try: בגלישה פרטית הקריאה זורקת.
+   ============================================================ */
+var K_NAME = "josh-demo-name-v1";
+var K_LOG  = "josh-demo-log-v1";
+var LOG_MAX = 40;                  /* כמה הודעות נזכרות */
+
+function load(key, fallback){
+  try{
+    var raw = localStorage.getItem(key);
+    return raw === null ? fallback : JSON.parse(raw);
+  }catch(e){ return fallback }
+}
+function save(key, value){
+  try{ localStorage.setItem(key, JSON.stringify(value)) }catch(e){}
+}
+
+var userName = load(K_NAME, "");
+/* לא `history` — `window.history` הוא מאפיין לקריאה בלבד, והצהרה
+   גלובלית בשם הזה מפילה את כל הסקריפט בשורה הראשונה. נמדד. */
+var chatLog  = load(K_LOG, []);
+
+/* ============================================================
+   2. הפנים
+   ============================================================ */
+var joshEl = document.getElementById("josh");
+var moodTimer = null;
+
+function reduced(){
+  try{ return matchMedia("(prefers-reduced-motion: reduce)").matches }
+  catch(e){ return false }
+}
+
+/** קובע הבעה. hold במילישניות מחזיר להבעה הרגועה אחר כך. */
+function setMood(mood, hold){
+  joshEl.setAttribute("data-mood", mood);
+  clearTimeout(moodTimer);
+  if(hold) moodTimer = setTimeout(function(){ joshEl.setAttribute("data-mood","happy") }, hold);
+}
+
+/* מצמוץ בפרקי זמן לא שווים. שרשרת setTimeout אחת, בלי לולאה. */
+function scheduleBlink(){
+  if(reduced()) return;
+  setTimeout(function(){
+    if(!document.hidden){
+      joshEl.classList.add("is-blink");
+      setTimeout(function(){ joshEl.classList.remove("is-blink") }, 120);
+      /* הטיית ראש קלה, ורק לפעמים. באמצע דיבור היא נראית כמו תקלה. */
+      if(joshEl.getAttribute("data-mood") === "happy" && Math.random() < .25){
+        joshEl.classList.add("is-tilt");
+        setTimeout(function(){ joshEl.classList.remove("is-tilt") }, 1500);
+      }
+    }
+    scheduleBlink();
+  }, 3000 + Math.random()*4000);
+}
+
+/* ============================================================
+   3. מה ג׳וש עונה
+   ------------------------------------------------------------
+   כל נושא הוא רשומה אחת: מילות מפתח, כמה נוסחים, והבעה.
+   נוסחים אחדים ולא אחד — מי שמתרגל עשר פעמים שומע את אותו
+   משפט עשר פעמים, וזה נשמע כמו מכונה.
+
+   הטון נגזר מכלל אחד: לא מביישים מי שמתקשה. אין כאן "טעית",
+   אין "אתה צריך", ואין סימני קריאה.
+   ============================================================ */
+var TOPICS = [
+  {
+    id:"greet",
+    keys:["שלום","היי","הי","בוקר טוב","ערב טוב","מה נשמע","מה שלומך","אהלן"],
+    mood:"happy",
+    lines:[
+      "שלום. טוב לראות אותך כאן.",
+      "היי. אני כאן, ויש לנו כל הזמן שבעולם.",
+      "שלום לך. במה מתחילים?"
+    ]
+  },
+  {
+    id:"tired",
+    keys:["עייף","עייפה","עיף","מותש","אין לי כוח","נמאס","גמור","לא ישנתי"],
+    mood:"soft",
+    lines:[
+      "אם אתה עייף — כדאי לנוח קצת. למידה על עייפות נכנסת לאט, ואין בזה שום פסול.\nננסה שוב אחרי הפסקה.",
+      "עייפות היא סימן שהגוף מבקש הפסקה, לא סימן של חולשה.\nקח כמה דקות, ואני אחכה.",
+      "בוא נעצור כאן לרגע. מים, אוויר, וחמש דקות בלי מסך — זה עוזר יותר ממה שנדמה."
+    ]
+  },
+  {
+    id:"hard",
+    keys:["קשה","לא מצליח","לא מצליחה","לא מבין","לא מבינה","לא הבנתי","מסובך","אני טיפש","אני גרוע","נכשלתי"],
+    mood:"soft",
+    lines:[
+      "בוא נבדוק את זה ביחד. מה החלק הראשון שלא הסתדר?",
+      "זה נושא מבלבל, וזה בסדר גמור. אני אסביר בדרך אחרת.",
+      "אתה בתהליך למידה, וזה לא אותו דבר כמו לא להצליח.\nנתחיל מחלק קטן אחד."
+    ]
+  },
+  {
+    id:"angry",
+    keys:["מתוסכל","כועס","עצבני","מספיק","אני מוותר","אני עוזב","שונא"],
+    mood:"soft",
+    lines:[
+      "אני מבין. זה באמת מעצבן כשמשהו לא נפתח.\nבוא ניקח נושא אחד קטן, ורק אותו.",
+      "התסכול הזה הגיוני. אתה לא היחיד שנתקע כאן.\nננשום רגע, ונחזור לזה לאט.",
+      "בוא נעצור. לפעמים הדבר הכי מועיל הוא להניח את זה לרגע ולחזור."
+    ]
+  },
+  {
+    id:"sad",
+    keys:["עצוב","בוכה","לבד","קשה לי היום","מדוכא","אין לי מצב רוח"],
+    mood:"soft",
+    lines:[
+      "אני שומע אותך. אתה לא צריך להסביר את זה או להצדיק.\nאני כאן.",
+      "יש ימים כאלה, והם עוברים.\nרוצה לדבר על זה, או שנעשה משהו קל ביחד?"
+    ]
+  },
+  {
+    id:"thanks",
+    keys:["תודה","תודה רבה","מעריך","עזרת"],
+    mood:"happy",
+    lines:[
+      "בשמחה. תמיד אפשר לחזור.",
+      "שמח לעזור. בהצלחה.",
+      "על לא דבר. אני כאן מתי שתרצה."
+    ]
+  },
+  {
+    id:"learn",
+    keys:["ללמוד","תרגיל","מבחן","שיעורי בית","מתמטיקה","חשבון","אנגלית","היסטוריה","עברית","לימודים"],
+    mood:"thinking",
+    lines:[
+      "בוא נתחיל מדבר אחד. מה הנושא שהכי לא ברור כרגע?",
+      "נפרק את זה לצעדים קטנים. תכתוב לי את השאלה עצמה ונלך צעד־צעד.",
+      "אני אוהב להתחיל מהסוף: מה אתה כן יודע על זה?"
+    ]
+  },
+  {
+    id:"bye",
+    keys:["ביי","להתראות","נתראה","לילה טוב","סיימתי"],
+    mood:"happy",
+    lines:[
+      "להתראות. היה נעים.",
+      "ביי. בוא שוב מתי שתרצה.",
+      "נתראה. תשמור על עצמך."
+    ]
+  },
+  {
+    id:"who",
+    keys:["מי אתה","מה אתה","איך קוראים לך","אתה רובוט","אתה אמיתי","בינה מלאכותית"],
+    mood:"thinking",
+    lines:[
+      "קוראים לי ג׳וש. אני דמות בדף הזה, ואני עונה מתוך רשימת תשובות כתובה — לא ממערכת חכמה.\nאבל אני כאן, ואני סבלני.",
+      "אני ג׳וש. לא אמציא לך תשובה כדי להישמע חכם: מה שאני לא יודע, אני אומר שאני לא יודע."
+    ]
+  }
+];
+
+/* תשובות כשאף נושא לא התאים. שאלה קצרה עדיפה על משפט חכם. */
+var FALLBACK = [
+  "אני לא בטוח שהבנתי. אפשר לכתוב את זה במילים אחרות?",
+  "מעניין. תספר לי קצת יותר?",
+  "אני שומע. מה הכי מטריד אותך בזה עכשיו?",
+  "לא הכרתי את זה. רוצה להסביר לי במשפט אחד?"
+];
+
+/* בקשת שם.
+
+   **"אני X" הוסר מכאן אחרי שנמדד בדפדפן.** הוא נראה טבעי, אבל
+   בעברית "אני" פותח גם את "אני עייף", "אני לא מבין" ו"אני מוותר" —
+   כלומר בדיוק את המשפטים שהדף הזה נבנה כדי לענות עליהם. בבדיקה
+   ג׳וש ענה "נעים מאוד, עייף", והתשובה על העייפות אבדה.
+
+   נשארו שלוש פתיחות שאין להן משמעות אחרת. */
+var NAME_RE = /(?:קוראים לי|שמי|השם שלי)\s+([֐-׿]{2,14})/;
+
+/* חגורה שנייה: גם אחרי הפתיחות האלה, מילה שברור שאינה שם אינה
+   נשמרת. עדיף להחמיץ שם מאשר לקרוא למישהו "קשה". */
+var NOT_A_NAME = ["לא","כן","קשה","עייף","עייפה","טוב","רע","בסדר","אולי","הכל","כלום"];
+
+function pick(list){ return list[Math.floor(Math.random()*list.length)] }
+
+/** בוחר תשובה לפי מה שנכתב. מחזיר {text, mood}. */
+function answerTo(text){
+  var t = String(text).trim();
+  var low = t.toLowerCase();
+
+  /* שם — נשמר, ומוזכר פעם אחת */
+  var m = t.match(NAME_RE);
+  if(m && m[1] && m[1] !== userName && NOT_A_NAME.indexOf(m[1]) < 0){
+    userName = m[1];
+    save(K_NAME, userName);
+    showHello();
+    return { text:"נעים מאוד, " + userName + ". אני אזכור.", mood:"happy" };
+  }
+
+  for(var i=0;i<TOPICS.length;i++){
+    var topic = TOPICS[i];
+    for(var k=0;k<topic.keys.length;k++){
+      if(low.indexOf(topic.keys[k]) >= 0){
+        return { text:pick(topic.lines), mood:topic.mood };
+      }
+    }
+  }
+
+  /* סימן שאלה בלי מילת מפתח — כנראה שאלה אמיתית */
+  if(t.indexOf("?") >= 0){
+    return { text:"שאלה טובה. אני לא יודע את התשובה לזה — לא אמציא אותה.\nאפשר לנסות לפרק אותה לחלק קטן יותר?", mood:"thinking" };
+  }
+
+  return { text:pick(FALLBACK), mood:"thinking" };
+}
+
+/* ============================================================
+   4. הצגת השיחה
+   ============================================================ */
+var logEl   = document.getElementById("log");
+var formEl  = document.getElementById("form");
+var inputEl = document.getElementById("input");
+var helloEl = document.getElementById("hello");
+
+function addMessage(who, text, remember){
+  var li = document.createElement("li");
+  li.className = "msg msg--" + (who === "josh" ? "josh" : "me");
+
+  var name = document.createElement("b");
+  name.className = "who";
+  name.textContent = who === "josh" ? "ג׳וש" : (userName || "אני");
+  li.appendChild(name);
+
+  li.appendChild(document.createTextNode(text));   /* טקסט ולא HTML */
+  logEl.appendChild(li);
+  li.scrollIntoView({ block:"nearest", behavior: reduced() ? "auto" : "smooth" });
+
+  if(remember !== false){
+    chatLog.push({ w:who, t:text });
+    if(chatLog.length > LOG_MAX) chatLog = chatLog.slice(-LOG_MAX);
+    save(K_LOG, chatLog);
+  }
+}
+
+/** שלוש נקודות בזמן ההמתנה, ואז התשובה */
+function joshReplies(text){
+  setMood("thinking");
+
+  var wait = document.createElement("li");
+  wait.className = "msg msg--josh dots";
+  wait.innerHTML = "<span></span><span></span><span></span>";
+  logEl.appendChild(wait);
+  wait.scrollIntoView({ block:"nearest" });
+
+  setTimeout(function(){
+    wait.remove();
+    var reply = answerTo(text);
+    setMood("talking");
+    addMessage("josh", reply.text);
+    /* משך ה"דיבור" נגזר מאורך המשפט, כדי שהפה לא ייעצר באמצע */
+    setTimeout(function(){ setMood(reply.mood, 2600) }, Math.min(2800, 500 + reply.text.length * 22));
+  }, reduced() ? 120 : 650);
+}
+
+function showHello(){
+  helloEl.textContent = userName ? ("אני זוכר אותך, " + userName) : "";
+}
+
+/* ============================================================
+   5. חיווט
+   ============================================================ */
+formEl.addEventListener("submit", function(e){
+  e.preventDefault();
+  var text = inputEl.value.trim();
+  if(!text) return;
+  addMessage("me", text);
+  inputEl.value = "";
+  inputEl.style.height = "auto";
+  joshReplies(text);
+});
+
+/* Enter שולח, Shift+Enter יורד שורה */
+inputEl.addEventListener("keydown", function(e){
+  if(e.key === "Enter" && !e.shiftKey){
+    e.preventDefault();
+    formEl.requestSubmit();
+  }
+});
+
+/* התיבה גדלה עם הטקסט */
+inputEl.addEventListener("input", function(){
+  inputEl.style.height = "auto";
+  inputEl.style.height = Math.min(150, inputEl.scrollHeight) + "px";
+});
+
+document.getElementById("clear").addEventListener("click", function(){
+  chatLog = [];
+  userName = "";
+  try{ localStorage.removeItem(K_NAME); localStorage.removeItem(K_LOG) }catch(e){}
+  logEl.innerHTML = "";
+  showHello();
+  greet();
+  inputEl.focus();
+});
+
+/* ============================================================
+   6. פתיחה
+   ============================================================ */
+function greet(){
+  var hi = userName
+    ? "שלום " + userName + ". טוב שחזרת.\nאפשר להמשיך מאיפה שעצרנו, או להתחיל משהו חדש."
+    : "שלום. אני ג׳וש.\nאפשר לכתוב לי כל דבר — שאלה, משהו שלא ברור, או סתם איך היה היום.\nאני לא ממהר, ואין שאלות טיפשיות.";
+  addMessage("josh", hi, false);
+  setMood("happy");
+}
+
+/* משחזרים שיחה קודמת, ורק אז מברכים */
+(function start(){
+  showHello();
+  for(var i=0;i<chatLog.length;i++){
+    addMessage(chatLog[i].w, chatLog[i].t, false);
+  }
+  greet();
+  scheduleBlink();
+})();
+</script>
+</body>
+</html>
