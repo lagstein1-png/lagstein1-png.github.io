@@ -18,7 +18,6 @@ button:hover{background:#166534}
 </style>
 
 <!-- ג׳וש — המורה הדיגיטלי הצף -->
-<link rel="stylesheet" href="josh-avatar.css">
 </head>
 <body>
 
@@ -100,7 +99,6 @@ function generateAppHTML(app) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${app.name.he} – ${app.desc.he}</title>
-<link rel="stylesheet" href="../../josh-avatar.css">
 <style>
 :root{--bg:#f5f7fb;--panel:#ffffff;--line:#e0e4ee;--ink:#101828;--ink-soft:#5b6478;--accent:#4f46e5;--font:Arial,sans-serif}
 *{box-sizing:border-box;margin:0}
@@ -271,7 +269,6 @@ document.querySelectorAll('#langbar button').forEach(b => b.onclick = () => setL
 loadQuestion(0);
 <\/script>
 <script>window.JOSH_OPTIONS={autoGreet:false,continuous:true};<\/script>
-<script src="../../josh-engine.js"><\/script>
 </body>
 </html>`;
 }
@@ -289,27 +286,15 @@ document.getElementById('btnCreate').addEventListener('click', function() {
     log.innerHTML += '<div>✅ '+(i+1)+'. '+app.name.he+'</div>';
   });
   // דף בית
-  let home = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>כל האפליקציות</title><style>body{font-family:Arial;background:#f5f7fb;color:#101828;padding:30px;text-align:center}h1{color:#4f46e5}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;max-width:900px;margin:30px auto}.card{background:#ffffff;padding:18px;border-radius:12px;border:1px solid #e0e4ee;transition:.3s}.card:hover{background:#eef1f7;transform:scale(1.03)}.card a{color:#4f46e5;text-decoration:none;font-size:1.1rem;display:block}.card .icon{font-size:2rem;display:block;margin-bottom:6px}</style><link rel="stylesheet" href="josh-avatar.css"></head><body><h1>🚀 21 האפליקציות שלי</h1><div class="grid">`;
+  let home = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>כל האפליקציות</title><style>body{font-family:Arial;background:#f5f7fb;color:#101828;padding:30px;text-align:center}h1{color:#4f46e5}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;max-width:900px;margin:30px auto}.card{background:#ffffff;padding:18px;border-radius:12px;border:1px solid #e0e4ee;transition:.3s}.card:hover{background:#eef1f7;transform:scale(1.03)}.card a{color:#4f46e5;text-decoration:none;font-size:1.1rem;display:block}.card .icon{font-size:2rem;display:block;margin-bottom:6px}</style></head><body><h1>🚀 21 האפליקציות שלי</h1><div class="grid">`;
   APPS.forEach(app => {
     home += `<div class="card"><span class="icon">${app.icon}</span><a href="apps/${app.id}/index.html">${app.name.he}</a></div>`;
   });
-  home += '</div><script src="josh-engine.js"><\\/script></body></html>';
+  home += '</div></body></html>';
   zip.file('index.html', home);
 
-  // מצרפים את קובצי ג׳וש עצמם, אחרת ההפניות שבאפליקציות מצביעות לשומקום
-  const joshFiles = ['josh-avatar.css', 'josh-engine.js', 'josh-sprites.png'];
-  const fetched = Promise.all(joshFiles.map(function (f) {
-    return fetch(f)
-      .then(function (r) { return r.ok ? r.blob() : null; })
-      .then(function (b) {
-        if (b) { zip.file(f, b); log.innerHTML += '<div>\u2795 ' + f + '</div>'; }
-        else { log.innerHTML += '<div class="info">\u26a0\ufe0f ' + f + ' \u05dc\u05d0 \u05e0\u05de\u05e6\u05d0</div>'; }
-      })
-      .catch(function () {
-        log.innerHTML += '<div class="info">\u26a0\ufe0f ' + f +
-          ' \u05dc\u05d0 \u05e0\u05d8\u05e2\u05df (\u05e6\u05e8\u05d9\u05da \u05dc\u05d4\u05e8\u05d9\u05e5 \u05de\u05e2\u05dc \u05e9\u05e8\u05ea, \u05dc\u05d0 \u05de\u05d4\u05d3\u05d9\u05e1\u05e7)</div>';
-      });
-  }));
+  // ג׳וש אינו נארז כאן: המוח היחיד הוא tutor-api/worker.js. ראו JOSH.md
+  const fetched = Promise.resolve();
 
   log.innerHTML += '<div class="info">📦 מוריד את הקובץ...</div>';
   fetched.then(function () {
@@ -331,6 +316,5 @@ window.JOSH_OPTIONS = {
   greeting: 'שלום! אני ג\'וש הגאון. לחצו על הכפתור כדי לייצר את האפליקציות, ואם משהו לא ברור — שאלו אותי.'
 };
 </script>
-<script src="josh-engine.js" defer></script>
 </body>
 </html>
