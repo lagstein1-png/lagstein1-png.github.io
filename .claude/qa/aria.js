@@ -26,6 +26,7 @@ const FILES = single >= 0
                      .filter(d => fs.existsSync(path.join(ROOT, d, 'index.html')))
                      .sort().map(d => path.join(d, 'index.html')));
 
+const HEBW = /[\u0590-\u05FF]/;   /* מילה שיש בה אות עברית */
 let bad = 0, checked = 0;
 const hit = (f, why, what) => { bad++; console.log('  ✗ ' + f + ' — ' + why + '\n      ' + what) };
 
@@ -184,6 +185,38 @@ for (const rel of FILES) {
       hit(rel, 'קישור הדילוג מצביע ל-#' + t + ' ואין אלמנט כזה',
           'הקישור תופס Tab, נראה, נלחץ — ולא קורה כלום.');
     }
+  }
+
+  /* ---------- 6 · עברית סטטית שאינה עוברת ב-lgChrome ----------
+     כל הממשק נבנה לתוך `#app` בזמן ריצה, ולכן כמעט כל מחרוזת
+     עוברת דרך מילון. **מה שנשאר סטטי ב-HTML אינו עובר שם** —
+     ו-`lgChrome()` הוא מה שמתרגם אותו ביד: קישור הדילוג
+     (`LGSKIP`) והפוטר (`LGFOOT` · `LGTERMS` · `LGHOME`).
+
+     אלמנט סטטי חדש שנכתב ישירות ב-HTML ולא נרשם שם **יישאר עברי
+     בערבית, ברוסית ובאנגלית, בלי שום שגיאה.**
+
+     **ולמה זה מדיד בכלל:** נמדד 12.9.2026 — כל עשר האפליקציות
+     שיש בהן `lgChrome` נושאות **76 תווים בדיוק** של עברית
+     סטטית, והם קישור הדילוג והפוטר. כל מילה מעבר לזה היא מילה
+     שתישאר עברית. */
+  if (/function lgChrome\(/.test(src)) {
+    const body = src.slice(Math.max(0, src.indexOf('<body')))
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<!--[\s\S]*?-->/g, ' ')
+      .replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    /* מה ש-lgChrome דורס — הטקסט שם הוא ברירת מחדל בלבד */
+    const owned = [];
+    const sk = src.match(/<a\b[^>]*class="skip"[^>]*>([^<]*)</);
+    if (sk) owned.push(sk[1]);
+    const ft = src.match(/class="lg-foot"[^>]*>([\s\S]*?)<\/footer>/);
+    if (ft) owned.push(ft[1].replace(/<[^>]*>/g, ' '));
+    const ok = new Set(owned.join(' ').split(/\s+/).filter(w => HEBW.test(w)));
+    const stray = body.split(' ').filter(w => HEBW.test(w) && !ok.has(w));
+    if (stray.length)
+      hit(rel, stray.length + ' מילים עבריות סטטיות שאינן במעטפת של lgChrome',
+          '״' + stray.slice(0, 8).join(' ') + '״ — יישארו עבריות בערבית, ברוסית ובאנגלית.');
   }
 }
 
