@@ -155,8 +155,38 @@ for (const rel of FILES) {
     const m = st.match(PHYS);
     if (m) hit(rel, 'מאפיין פיזי ב-style=: ' + m[0].trim(), st.slice(0, 70));
   }
+
+  /* ---------- 5 · קישור הדילוג, ושהיעד שלו קיים ----------
+     דף עם סרגל עליון וכפתורי ניווט הוא דף שמי שמנווט במקלדת
+     עובר בו עשר לחיצות Tab לפני התוכן, בכל מסך מחדש.
+
+     **וקישור דילוג שיעדו אינו קיים גרוע מאין קישור:** הוא תופס
+     Tab, נראה, נלחץ, ולא קורה כלום. זה בדיוק `O-46` — עשר
+     אפליקציות תרגמו את הקישור ב-`lgChrome`, ולשש מהן לא היה
+     אנקור כלל; `querySelector` החזיר `null` וההשמה דולגה בשקט.
+
+     היעד נבדק גם במחרוזת JS, מפני ש-`<main id="main">` כאן נבנה
+     ב-`render` ואינו יושב ב-HTML הסטטי. */
+  {
+    const anchors = [];
+    const are = /<a\b[^>]*class="skip"[^>]*>/g;
+    let am;
+    while ((am = are.exec(src))) {
+      const h = am[0].match(/href="#([^"]+)"/);
+      if (h) anchors.push(h[1]);
+    }
+    /* דף שמתרגם קישור דילוג (LGSKIP) התחייב שיש לו אחד */
+    if (/LGSKIP/.test(src) && !anchors.length)
+      hit(rel, 'הדף מתרגם קישור דילוג ואין בו אנקור',
+          'lgChrome מחפש a.skip[href="#main"] ומקבל null. יש להוסיף <a class="skip" href="#main">.');
+    for (const t of anchors) {
+      if (new RegExp('id="' + t + '"').test(src)) continue;
+      hit(rel, 'קישור הדילוג מצביע ל-#' + t + ' ואין אלמנט כזה',
+          'הקישור תופס Tab, נראה, נלחץ — ולא קורה כלום.');
+    }
+  }
 }
 
 console.log('');
 if (bad) { console.log(bad + ' ממצאי נגישות'); process.exit(1) }
-console.log('✓ ' + checked + ' דפים נבדקו — מצב דו־מצבי, מיקוד, tabindex ומאפיין פיזי');
+console.log('✓ ' + checked + ' דפים נבדקו — מצב דו־מצבי, מיקוד, tabindex, מאפיין פיזי וקישור דילוג');

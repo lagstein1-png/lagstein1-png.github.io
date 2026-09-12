@@ -1471,7 +1471,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t74 · 2026-09-11";
+var BUILD="t75 · 2026-09-12";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -5526,7 +5526,7 @@ function viewHome(){
   })[0];
   var wt=topicById(weak);
   var hello=state.name?"היי "+esc(state.name)+".":"היי.";
-  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:40px">';
+  var h='<div class="wrap" style="padding-top:22px;padding-bottom:40px">';
   h+='<div class="spread"><div><h1 class="h1">'+hello+'</h1>'+
      '<p class="sub">'+(d.a?"היום פתרתם "+d.a+" שאלות, "+d.c+" מהן נכון.":"אפשר להתחיל מתי שנוח.")+'</p></div>'+
      '<div class="row">'+
@@ -5572,14 +5572,14 @@ function viewHome(){
      '<button class="btn btn-g w" style="margin-top:12px" data-a="go" data-v="sim">'+ic("target",17)+' לסימולציה</button></div>';
   h+='<div class="row" style="margin-top:20px"><button class="btn btn-g" data-a="go" data-v="topics">'+ic("list",17)+' כל '+pool.length+' הנושאים</button>'+
      '<button class="btn btn-g" data-a="go" data-v="formulas">'+ic("book",17)+' דף נוסחאות</button></div>';
-  return h+'</main>';
+  return h+'</div>';
 }
 /* ---------- תרגול ---------- */
 function viewPractice(){
   if(!P.q)startRound();
   if(P.phase==="done")return viewSummary();
   var q=P.q,calm=state.settings.calm;
-  var h='<main id="main" class="wrap" style="padding-top:18px;padding-bottom:44px">';
+  var h='<div class="wrap" style="padding-top:18px;padding-bottom:44px">';
   /* שורת מצב */
   h+='<div class="spread">'+
       '<div class="row"><span class="chip area '+topicCls(q.topic)+'">'+q.topicName+'</span>'+
@@ -5661,7 +5661,7 @@ function viewPractice(){
   h+='</div>';
   if(state.settings.keys&&P.phase==="ask")
     h+='<p class="sub xs" style="margin-top:14px;text-align:center">מקלדת: 1–4 תשובה · רווח הקראה · H רמז · S פתרון</p>';
-  return h+'</main>';
+  return h+'</div>';
 }
 
 /* ---------- סיכום סבב ---------- */
@@ -5683,7 +5683,7 @@ function viewSummary(){
        :pct>=60?"רוב הדברים במקום. יש נקודה אחת או שתיים שכדאי לחדד."
        :pct>=35?"חלק מהחומר עוד לא יושב. זה בדיוק מה שמדידה כזאת נועדה להראות."
        :"סבב כזה לא אומר עליכם כלום חוץ מזה שהחומר הזה חדש. שווה לרדת רמה ולבנות מלמטה.";
-  var h='<main id="main" class="wrap" style="padding-top:26px;padding-bottom:44px;max-width:760px">';
+  var h='<div class="wrap" style="padding-top:26px;padding-bottom:44px;max-width:760px">';
   h+='<div class="card pad rise"><h1 class="h1">'+title+'</h1><p class="sub">'+sub+'</p>'+
      '<div class="grid g4" style="margin-top:18px">'+
        '<div class="tile" style="--c:var(--ok)"><b>'+ok+'</b><span>נכון לבד</span></div>'+
@@ -5708,12 +5708,12 @@ function viewSummary(){
      '<button class="btn btn-p" data-a="start">'+ic("refresh",17)+' סבב נוסף</button>'+
      '<button class="btn btn-g" data-a="go" data-v="home">'+ic("home",17)+' לדף הבית</button>'+
      '<button class="btn btn-g" data-a="go" data-v="progress">'+ic("chart",17)+' להתקדמות</button></div>';
-  return h+'</div></main>';
+  return h+'</div></div>';
 }
 /* ---------- נושאים ---------- */
 function viewTopics(){
   var chosen=state.topics,all=topicsForTrack(state.track);
-  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
+  var h='<div class="wrap" style="padding-top:22px;padding-bottom:44px">';
   h+='<h1 class="h1">נושאים</h1>'+
      '<p class="sub">בוחרים מה ייכנס לסבבי התרגול. בלי בחירה — כל נושאי המסלול נכנסים.</p>';
   h+='<div class="card pad" style="margin-top:16px"><div class="spread"><div><b>המסלול שלי</b>'+
@@ -5741,7 +5741,7 @@ function viewTopics(){
           '</div>';
       }).join("")+'</div>';
   });
-  return h+'</main>';
+  return h+'</div>';
 }
 
 /* ---------- דף נוסחאות ---------- */
@@ -5752,7 +5752,7 @@ function viewFormulas(){
     if(!q)return true;
     return (f.t+" "+f.n+" "+plainOf(f.m)+" "+f.g).indexOf(q)>=0;
   });
-  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
+  var h='<div class="wrap" style="padding-top:22px;padding-bottom:44px">';
   h+='<h1 class="h1">דף נוסחאות</h1>'+
      '<p class="sub">להשתמש בדף נוסחאות זו לא רמאות — גם בבגרות נותנים אחד. מי שלא מבזבז זיכרון על שינון, פנוי לחשוב.</p>';
   h+='<div class="row" style="margin-top:14px">'+
@@ -5770,7 +5770,7 @@ function viewFormulas(){
           '<div class="fm m">'+f.m+'</div><div class="fn">'+f.n+'</div></div>';
       }).join("")+'</div>';
   });
-  return h+'</main>';
+  return h+'</div>';
 }
 
 /* ---------- התקדמות ---------- */
@@ -5785,7 +5785,7 @@ function viewProgress(){
   }
   var maxA=Math.max.apply(null,days.map(function(x){return x.r.a}).concat([1]));
   var seen=TOPICS.filter(function(t){return mastery(t.id).seen>0});
-  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px">';
+  var h='<div class="wrap" style="padding-top:22px;padding-bottom:44px">';
   h+='<h1 class="h1">התקדמות</h1><p class="sub">המספרים כאן הם כלי עבודה, לא ציון.</p>';
   h+='<div class="grid g4" style="margin-top:16px">'+
      '<div class="tile" style="--c:var(--c-base)"><b>'+st.answered+'</b><span>שאלות שנפתרו</span></div>'+
@@ -5809,13 +5809,13 @@ function viewProgress(){
       '<div class="bar '+barCls(m)+'" style="margin-top:5px"><i style="width:'+m.m+'%"></i></div></div>';
   }).join("")+'</div>';
   h+='</div>';
-  return h+'</main>';
+  return h+'</div>';
 }
 
 /* ---------- הגדרות ---------- */
 function viewSettings(){
   var s=state.settings,hv=hebVoices();
-  var h='<main id="main" class="wrap" style="padding-top:22px;padding-bottom:44px;max-width:820px">';
+  var h='<div class="wrap" style="padding-top:22px;padding-bottom:44px;max-width:820px">';
   h+='<h1 class="h1">הגדרות</h1><p class="sub">הכול נשמר במכשיר הזה בלבד.</p>';
 
   /* בורר השפה יושב ראשון ומראה כל שפה בשמה שלה. מי שאינו קורא
@@ -5926,7 +5926,7 @@ function viewSettings(){
      '<button class="btn btn-g" style="margin-top:10px;color:var(--bad);border-color:var(--bad)" data-a="reset">מחיקת הכול</button></div>';
 
   h+='<p class="sub xs" style="margin-top:18px;text-align:center">שלב · גרסה '+BUILD+'</p>';
-  return h+'</main>';
+  return h+'</div>';
 }
 /* ============================================================
    16. ציור המסך
@@ -6060,6 +6060,14 @@ function lgChrome(){
   if(sk){ sk.setAttribute("lang",g); sk.setAttribute("dir",dir); sk.textContent=LGSKIP[g] }
 }
 
+/* קישור הדילוג מצביע ל-#main, ולכן לכל מסך חייב להיות אחד — גם
+   לאונבורדינג ולמסכי המבחן. עד 11.9.2026 ה-<main id="main"> ישב
+   בתוך כל view בנפרד, ולכן המסך הראשון שלומד חדש רואה — האונבורדינג —
+   לא היה בו אחד, והקישור היה מת בדיוק שם. העטיפה יושבת כאן, בנקודה
+   אחת. tabindex="-1" כדי שהפוקוס באמת יעבור: בלעדיו הדפדפן מגלגל
+   את הדף אבל משאיר את הפוקוס על הקישור, וה-Tab הבא חוזר לסרגל. */
+function wrapMain(h){return '<main id="main" tabindex="-1">'+(h||"")+'</main>'}
+
 function render(){ try{lgChrome()}catch(e){}
   var html="";
   /* תלמיד שפתח את דף הנוסחאות באמצע מבחן חייב דרך חזרה מפורשת.
@@ -6068,25 +6076,25 @@ function render(){ try{lgChrome()}catch(e){}
     $("#app").innerHTML=trHTML(header()+
       '<div class="wrap" style="padding-top:14px"><div class="row">'+
       '<button class="btn btn-p" data-a="sitback">'+ic("back",17)+' חזרה למבחן — שאלה '+
-      (SIT.i+1)+' מתוך '+SIT.qs.length+'</button></div></div>'+viewFormulas());
+      (SIT.i+1)+' מתוך '+SIT.qs.length+'</button></div></div>'+wrapMain(viewFormulas()));
     afterRender(); return;
   }
   /* מבחן שהגיע מקישור עוקף הכול, כולל מסך הפתיחה: מי שנכנס
      ללמוד לא בהכרח פתח את האפליקציה הזאת אי פעם. */
   if(view==="sit"&&SIT.spec){
-    $("#app").innerHTML=trHTML(viewSit());
+    $("#app").innerHTML=trHTML(wrapMain(viewSit()));
     afterRender(); return;
   }
   if(view==="badexam"||view==="oldexam"){
-    $("#app").innerHTML=trHTML(viewBadExam(view==="oldexam"?
+    $("#app").innerHTML=trHTML(wrapMain(viewBadExam(view==="oldexam"?
       "המבחן הזה נוצר בגרסה קודמת של האפליקציה, ולכן השאלות בו כבר לא זהות. בקשו מהמורה לשלוח מבחן חדש.":
-      "אולי המבחן שייך לאפליקציה אחרת, ואולי הקישור נקטע בדרך. בקשו מהמורה לשלוח את הקישור שוב, ופתחו אותו ישר מההודעה."));
+      "אולי המבחן שייך לאפליקציה אחרת, ואולי הקישור נקטע בדרך. בקשו מהמורה לשלוח את הקישור שוב, ופתחו אותו ישר מההודעה.")));
     afterRender(); return;
   }
   if(!state.onboarded){
-    html=viewOnboard();
+    html=wrapMain(viewOnboard());
   }else{
-    html=header();
+    html=header()+'<main id="main" tabindex="-1">';
     if(view==="home")html+=viewHome();
     else if(view==="practice")html+=viewPractice();
     else if(view==="topics")html+=viewTopics();
@@ -6096,7 +6104,7 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="sim")html+=viewSim();
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
-    html+='<footer><div class="wrap fbar">'+
+    html+='</main><footer><div class="wrap fbar">'+
       '<span>שלב · מתמטיקה לתיכון, צעד אחר צעד</span>'+
       '<span class="faint">הכול נשמר במכשיר הזה · '+BUILD+'</span></div></footer>';
   }
@@ -7259,7 +7267,7 @@ function simByTopic(){
   });
 }
 function viewSim(){
-  var h='<main id="main" class="wrap" style="padding-block:22px">';
+  var h='<div class="wrap" style="padding-block:22px">';
   h+='<h1 class="h1">סימולציית בגרות</h1>'+
      '<p class="sub">שאלות ברמת בגרות מכל הנושאים במסלול '+state.track+' יחידות, בזו אחר זו, עם שעון. '+
      'בלי רמזים ובלי פתרון תוך כדי — בדיוק כמו במבחן. הפתרון המלא מחכה בסוף.</p>';
@@ -7282,7 +7290,7 @@ function viewSim(){
      '<li>יציאה באמצע אינה מוחקת. הסימולציה תחכה במקום שבו נעצרה.</li></ul></div>';
   h+='<div class="row" style="margin-top:18px">'+
      '<button class="btn btn-g" data-a="go" data-v="home">'+ic("back",17)+' חזרה</button></div>';
-  return h+'</main>';
+  return h+'</div>';
 }
 /* שניות שנותרו, או null כשלא הוגדרה הגבלת זמן */
 function sitLeft(){
@@ -7389,7 +7397,7 @@ function viewSit(){
   }
   if(SIT.phase==="ask"){
     var q=SIT.qs[SIT.i];
-    var h2='<main class="wrap" style="padding-block:18px">';
+    var h2='<div class="wrap" style="padding-block:18px">';
     h2+='<div class="spread"><div class="row">'+
         '<span class="chip area '+topicCls(q.topic)+'">'+esc(q.topicName)+'</span>'+
         '<span class="chip">שאלה '+(SIT.i+1)+' מתוך '+SIT.qs.length+'</span>'+
@@ -7423,7 +7431,7 @@ function viewSit(){
         '<button class="btn btn-g" data-a="sitflag" aria-pressed="'+(SIT.flags[SIT.i]?"true":"false")+'">'+(SIT.flags[SIT.i]?'✓ מסומנת לחזרה':'לחזור אליה')+'</button>'+
         (cur>=0?'<button class="btn btn-g" data-a="sitfwd">הבאה '+ic("arrow",16)+'</button>':"")+
         '</div>';
-    h2+='</div></main>';
+    h2+='</div></div>';
     return h2;
   }
   if(SIT.phase==="review"){
@@ -7758,7 +7766,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t74-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t75-pwa1").catch(function(){});
   });
 }
 </script>

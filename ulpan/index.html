@@ -108,6 +108,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
 h1,h2,h3{margin:0;line-height:1.3;font-weight:800}
 button{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+/* קישור דילוג לתוכן: מוסתר עד שמגיעים אליו ב-Tab, ואז נראה ככפתור.
+   היעד הוא <main id="main"> שכל מסך נעטף בו ב-render. */
+.skip{position:absolute;inset-inline-start:-9999px}
+.skip:focus{position:static;display:inline-flex;align-items:center;min-height:44px;
+  margin:8px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);
+  border-radius:8px;font-weight:700;text-decoration:none;z-index:100}
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
   clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
@@ -462,6 +468,7 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 <link rel="license" href="/legal/">
 </head>
 <body>
+<a class="skip" href="#main">דילוג לתוכן</a>
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="app"></div>
 <script>
@@ -1078,7 +1085,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a35 · 2026-09-11";
+var BUILD="a36 · 2026-09-12";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -3844,25 +3851,32 @@ window.addEventListener("legal:lang",function(e){
   try{ state.lang=k;save();render(); }catch(err){}
 });
 
+/* קישור הדילוג מצביע ל-#main, ולכן לכל מסך חייב להיות אחד — גם
+   למסכי המבחן, שאין להם כותרת. העטיפה יושבת כאן, בנקודה אחת,
+   ולא בכל מסך בנפרד. tabindex="-1" כדי שהפוקוס באמת יעבור לשם:
+   בלעדיו הדפדפן מגלגל את הדף אבל משאיר את הפוקוס על הקישור,
+   וה-Tab הבא חוזר לסרגל שדילגנו עליו. */
+function wrapMain(h){return '<main id="main" tabindex="-1">'+(h||"")+'</main>'}
+
 function render(){ try{lgChrome()}catch(e){}
   applyModes();
   lvlSync();
   /* מבחן שהגיע מקישור עוקף הכול: מי שנכנס להיבחן לא בהכרח פתח
      את האפליקציה הזאת אי פעם. */
-  if(view==="sit"&&SIT.spec){ $("#app").innerHTML=viewSit(); return; }
+  if(view==="sit"&&SIT.spec){ $("#app").innerHTML=wrapMain(viewSit()); return; }
   if(view==="badexam"||view==="oldexam"){
-    $("#app").innerHTML=viewBadExam(view==="oldexam"?
-      xt("exOld"):xt("exBroken"));
+    $("#app").innerHTML=wrapMain(viewBadExam(view==="oldexam"?
+      xt("exOld"):xt("exBroken")));
     return;
   }
   if(view==="exam"||view==="marks"){
-    $("#app").innerHTML=hdr()+(!teOpen()?viewLocked():(view==="exam"?viewExamNew():viewMarks()));
+    $("#app").innerHTML=hdr()+wrapMain(!teOpen()?viewLocked():(view==="exam"?viewExamNew():viewMarks()));
     return;
   }
   var body=state.screen==="prog"?screenProg():
            state.screen==="set" ?screenSet():
            state.screen==="prac"?(P.sum?screenSum():screenPractice()):screenHome();
-  $("#app").innerHTML=hdr()+body;
+  $("#app").innerHTML=hdr()+wrapMain(body);
 }
 
 /* ============================================================
@@ -4854,7 +4868,7 @@ function viewSit(){
   }
   if(SIT.phase==="ask"){
     var q=SIT.qs[SIT.i];
-    var h2='<main class="wrap" style="padding-block:18px">';
+    var h2='<div class="wrap" style="padding-block:18px">';
     h2+='<div class="spread"><div class="row">'+
         '<span class="chip area '+topicCls(q.topic)+'">'+esc(q.topicName)+'</span>'+
         '<span class="chip">'+esc(xf("stQn",SIT.i+1,SIT.qs.length))+'</span></div>'+
@@ -4884,7 +4898,7 @@ function viewSit(){
         '<button class="btn btn-g" data-a="sitskip">'+esc(xt("stDunno"))+'</button>'+
         (cur>=0?'<button class="btn btn-g" data-a="sitfwd">'+esc(xt("stNext"))+' '+ic("arrow",16)+'</button>':"")+
         '</div>';
-    h2+='</div></main>';
+    h2+='</div></div>';
     return h2;
   }
   if(SIT.phase==="review"){
@@ -5404,7 +5418,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a35-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a36-pwa1").catch(function(){});
   });
 }
 </script>

@@ -178,6 +178,12 @@ html.reduce-motion *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 /* טבעת פוקוס — שמונה האפליקציות האחרות מגדירות אותה, זו לא. */
 :focus-visible{outline:3px solid var(--teal);outline-offset:2px;border-radius:6px}
+/* קישור דילוג לתוכן: מוסתר עד שמגיעים אליו ב-Tab, ואז נראה ככפתור.
+   היעד הוא <main id="main"> שכל מסך נעטף בו ב-render. */
+.skip{position:absolute;inset-inline-start:-9999px}
+.skip:focus{position:static;display:inline-flex;align-items:center;min-height:44px;
+  margin:8px;padding:8px 14px;background:var(--teal);color:#fff;
+  border-radius:8px;font-weight:700;text-decoration:none;z-index:100}
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 /* practice */
 .lvlbar{display:flex;gap:8px;overflow-x:auto;padding:6px 2px;scrollbar-width:thin}
@@ -536,6 +542,7 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 <meta name="theme-color" content="#f3f8f4">
 </head>
 <body>
+<a class="skip" href="#main">דילוג לתוכן</a>
 <div class="bg" id="bg" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="app"></div>
@@ -1984,7 +1991,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b74 · 2026-09-12";
+var BUILD="b75 · 2026-09-12";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -3654,7 +3661,7 @@ function viewSit(){
   }
   if(SIT.phase==="ask"){
     var q=SIT.qs[SIT.i];
-    var h2='<main class="wrap" style="padding-block:18px">';
+    var h2='<div class="wrap" style="padding-block:18px">';
     h2+='<div class="spread"><div class="row">'+
         '<span class="chip area '+topicCls(q.topic)+'">'+esc(q.topicName)+'</span>'+
         '<span class="chip">'+esc(xf("stQn",SIT.i+1,SIT.qs.length))+'</span></div>'+
@@ -3682,7 +3689,7 @@ function viewSit(){
         '<button class="btn btn-g" data-a="sitskip">'+esc(xt("stDunno"))+'</button>'+
         (cur>=0?'<button class="btn btn-g" data-a="sitfwd">'+esc(xt("stNext"))+' '+ic("arrow",16)+'</button>':"")+
         '</div>';
-    h2+='</div></main>';
+    h2+='</div></div>';
     return h2;
   }
   if(SIT.phase==="review"){
@@ -3960,18 +3967,24 @@ window.addEventListener("legal:lang",function(e){
   try{ state.settings.lang=k;save();applyModes();render(); }catch(err){}
 });
 
+/* קישור הדילוג מצביע ל-#main, ולכן לכל מסך חייב להיות אחד.
+   העטיפה יושבת כאן, בנקודה אחת, ולא בכל מסך בנפרד. tabindex="-1"
+   כדי שהפוקוס באמת יעבור לשם: בלעדיו הדפדפן מגלגל את הדף אבל
+   משאיר את הפוקוס על הקישור, וה-Tab הבא חוזר לסרגל שדילגנו עליו. */
+function wrapMain(h){return '<main id="main" tabindex="-1">'+(h||"")+'</main>'}
+
 function render(){ try{lgChrome()}catch(e){}
   var html="";
   lvlSync();
-  if(view==="sit"&&SIT.spec){ $("#app").innerHTML=viewSit(); return; }
+  if(view==="sit"&&SIT.spec){ $("#app").innerHTML=wrapMain(viewSit()); return; }
   if(view==="badexam"||view==="oldexam"){
-    $("#app").innerHTML=viewBadExam(view==="oldexam"?
-      xt("exOld"):xt("exBroken"));
+    $("#app").innerHTML=wrapMain(viewBadExam(view==="oldexam"?
+      xt("exOld"):xt("exBroken")));
     return;
   }
-  if(view==="onboarding")html=onboarding();
+  if(view==="onboarding")html=wrapMain(onboarding());
   else{
-    html=header();
+    html=header()+'<main id="main" tabindex="-1">';
     if(view==="practice")html+=practice();
     else if(view==="progress")html+=progressView();
     else if(view==="records")html+=recordsView();
@@ -3979,7 +3992,7 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
     var t=T();
-    html+='<footer><div class="wrap fbar"><span style="display:inline-flex;align-items:center;gap:8px">'+esc(t.footerLove)+' <span style="color:var(--coral)">'+ic("heart",15)+'</span></span><span style="color:var(--ink-faint)">'+esc(t.footerSaved)+' · '+BUILD+'</span></div></footer>';
+    html+='</main><footer><div class="wrap fbar"><span style="display:inline-flex;align-items:center;gap:8px">'+esc(t.footerLove)+' <span style="color:var(--coral)">'+ic("heart",15)+'</span></span><span style="color:var(--ink-faint)">'+esc(t.footerSaved)+' · '+BUILD+'</span></div></footer>';
   }
   $("#app").innerHTML=html;
   afterRender();
@@ -4322,7 +4335,7 @@ document.addEventListener("keydown",function(e){
 });
 window.addEventListener("error",function(){
   var t=T();
-  $("#app").innerHTML='<div class="wrap" style="display:grid;place-items:center;min-height:90vh"><div class="card rise" style="padding:36px;text-align:center;max-width:420px"><p style="font-size:3rem">🤔</p><h1 class="fd" style="font-size:1.6rem">'+esc(t.errTitle)+'</h1><p style="color:var(--ink-soft);margin-top:8px">'+esc(t.errMsg)+'</p><button class="btn btn-teal" style="margin-top:18px;padding:13px 30px" onclick="location.reload()">'+esc(t.errBtn)+'</button></div></div>';
+  $("#app").innerHTML='<main id="main" tabindex="-1" class="wrap" style="display:grid;place-items:center;min-height:90vh"><div class="card rise" style="padding:36px;text-align:center;max-width:420px"><p style="font-size:3rem">🤔</p><h1 class="fd" style="font-size:1.6rem">'+esc(t.errTitle)+'</h1><p style="color:var(--ink-soft);margin-top:8px">'+esc(t.errMsg)+'</p><button class="btn btn-teal" style="margin-top:18px;padding:13px 30px" onclick="location.reload()">'+esc(t.errBtn)+'</button></div></main>';
 });
 /* ================= boot ================= */
 applyModes();
@@ -4359,7 +4372,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b74-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b75-pwa1").catch(function(){});
   });
 }
 </script>
