@@ -21,7 +21,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="josh-avatar.css"><!-- ג׳וש — מורה דיגיטלי צף -->
 <link rel="stylesheet" href="launch.css?v=1">
 <style>
 /* ============================================================
@@ -990,9 +989,24 @@ function boot(){
 boot();
 </script>
 
-<!-- ג׳וש — מורה דיגיטלי צף: הקראה קולית + זיהוי דיבור -->
-<script>window.JOSH_OPTIONS={autoGreet:false,continuous:true};</script>
-<script src="josh-engine.js" defer></script>
+<!-- ג׳וש — מוח אחד, ואין שני. שלב 1.
+
+     `josh-engine.js` נטען כאן עד היום כמערכת עצמאית: הוא אתחל את
+     עצמו (`boot()` ב-DOMContentLoaded), בנה אווטאר צף עם צ׳אט,
+     ו**ענה לשאלות בעצמו** — `_responder` נשאר null מפני שאיש לא
+     קרא ל-`Josh.answer`, ולכן כל הודעה שלומד הקליד כאן זרמה ישר
+     אל `search()`, כלומר אל `he.wikipedia.org`.
+
+     שני דברים נפסלו בהחלטת הבעלים 12.9.2026: מוח שני (הראשון הוא
+     `tutor-api/worker.js`), וחיפוש מהדפדפן. הניתוק כאן סוגר את
+     שניהם בבת אחת, מפני שזו הייתה נקודת הטעינה החיה היחידה שלהם.
+
+     **הקובץ לא נמחק** — אין למחוק קוד לפני שיש הוכחה שאינו נדרש,
+     ושכבת הפנים שבו היא המקור לשלב 2. הוא פשוט אינו נטען.
+
+     ולדף הבית אין בוט כרגע, וגם קודם לא היה לו אחד שעונה מהמוח
+     המרכזי: הוא מעולם לא טען את `/tutor/tutor.js`, ול-`ROLE`
+     שבשרת אין רשומה עבורו. ראו O-51. -->
 
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
@@ -1001,7 +1015,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=53-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=54-pwa1").catch(function(){});
   });
 }
 </script>
