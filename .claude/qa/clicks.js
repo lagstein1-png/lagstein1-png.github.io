@@ -39,6 +39,17 @@ async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.
   for (const app of TARGET) {
     const ctx = await b.newContext({ locale: 'he-IL' });
     const page = await ctx.newPage();
+    /* `quiet()` זמין לשני הבלוקים שרצים בתוך הדף: מרוקן את תור
+       ההקראה ומחכה עד שהמנוע שקט, לכל היותר שתי שניות. */
+    await page.addInitScript(() => {
+      window.quiet = async function () {
+        try { speechSynthesis.cancel() } catch (e) { return }
+        for (let i = 0; i < 40; i++) {
+          if (!speechSynthesis.speaking && !speechSynthesis.pending) return;
+          await new Promise(f => setTimeout(f, 50));
+        }
+      };
+    });
     const errs = [];
     page.on('pageerror', e => errs.push(e.message));
     await page.route('**/*', r => r.request().url().startsWith(BASE) ? r.continue() : r.abort());
@@ -82,6 +93,12 @@ async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.
       if (!btn) { out.err = 'לא נמצא כפתור ניווט ללחוץ עליו'; return out }
       out.label = (btn.getAttribute('aria-label') || btn.textContent || '').replace(/\s+/g, ' ').trim();
       out.action = btn.getAttribute('data-a') || btn.getAttribute('data-go') || btn.id;
+      /* האמירה של האונבורדינג עלולה להימשך אל תוך הלחיצה, ואז השומר
+         שב-sayClick — "הפעולה עצמה כבר מדברת?" — מבליע את התווית,
+         והבדיקה מאשימה את האפליקציה במשהו שהיא עושה בכוונה. נמדד
+         ב-12.9.2026: בארבעת המחוללים "ממשיכים" עדיין התנגן בזמן
+         הלחיצה. מנקים את התור ומחכים לשקט לפני שלוחצים. */
+      await quiet();
       btn.click();
       await new Promise(f => setTimeout(f, 1000));
       out.said = window.said.map(s => s.replace(/\s+/g, ' ').trim());
@@ -103,6 +120,7 @@ async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.
         window.said = [];
         const btn = document.querySelector((sp && sp.pick) || 'button[data-a="prog"],button[data-a="go"]');
         if (!btn) { out.err = 'אין כפתור ללחוץ עליו כשהמתג כבוי'; return out }
+        await quiet();
         btn.click(); await new Promise(f => setTimeout(f, 1000));
         out.said = window.said.slice();
       } catch (e) { out.err = String(e) }
