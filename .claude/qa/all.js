@@ -76,6 +76,9 @@ const SUITE = [
   { id: 'engine',   args: [] },
   { id: 'exam806',  args: [] },
   { id: 'tutor',    args: [] },
+  /* הכתיב של ג׳וש. `JOSH.md` מחייב גרש עברי מהיום שהבוט נבנה, ואיש
+     לא אכף — דף הבית נשא את שתי הצורות יחד. */
+  { id: 'josh',     args: [] },
   { id: 'smoke',    args: PAGES,  needsServer: true },
   { id: 'say',      args: [],     needsServer: true },
   /* מה שבאמת מגיע למנוע ההקראה. content.js מודד שדה שנדגם; זה מריץ

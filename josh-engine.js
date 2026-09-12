@@ -1,5 +1,5 @@
 /* ============================================================
-   josh-engine.js — המנוע של "ג'וש", מורה דיגיטלי צף
+   josh-engine.js — המנוע של "ג׳וש", מורה דיגיטלי צף
    הקראה קולית (SpeechSynthesis) + זיהוי דיבור (SpeechRecognition)
 
    שימוש בסיסי:
@@ -7,7 +7,7 @@
      <script src="josh-engine.js" defer></script>
 
    API:
-     Josh.say("שלום!")             — ג'וש מקריא, וכותב בצ'אט או בבועה
+     Josh.say("שלום!")             — ג׳וש מקריא, וכותב בצ'אט או בבועה
      Josh.stop()                   — עצירת הקראה
      Josh.openChat() / closeChat() / toggleChat()
      Josh.send("שאלה")             — שליחת הודעה כאילו הוקלדה
@@ -19,7 +19,7 @@
      Josh.on("result", txt => ...) — אירועים: speakstart|speakend|result|interim|
                                      error|state|message|chatopen|chatclose
      Josh.addCommand(/למה/, fn)    — פקודה קולית מותאמת
-     Josh.config({ rate: 1.1, name: "ג'וש" })
+     Josh.config({ rate: 1.1, name: "ג׳וש" })
 
    מראה לפי פעילות (josh-sprites.png):
      Josh.greetPose()              — 'מברך', מנוגן אוטומטית בטעינה
@@ -36,7 +36,7 @@
    ברירת המחדל היא ויקיפדיה בעברית — פתוחה ל-CORS, בלי מפתח.
 
    תמונות: josh-sprites.png לגיליון המצבים, josh-avatar.png לפנים
-   סטטיות. אם קובץ חסר — ג'וש נופל אחורה לפנים המצוירות המובנות,
+   סטטיות. אם קובץ חסר — ג׳וש נופל אחורה לפנים המצוירות המובנות,
    בלי תמונה שבורה ובלי שגיאה בקונסולה.
    ============================================================ */
 
@@ -47,14 +47,14 @@
      הגדרות
      ------------------------------------------------------------------ */
   var DEFAULTS = {
-    name: "ג'וש הגאון",
+    name: "ג׳וש הגאון",
     lang: "he-IL",
     /* קצב רגוע וברור ללומדים צעירים. 1.0 מהיר מדי לתלמיד שקורא יחד
        עם ההקראה; 0.85 נותן זמן לעבד בלי להישמע מלאכותי. */
     rate: 0.85,
     pitch: 1.0,             // ללא שינוי גובה — הטבעיות מגיעה מבחירת הקול
     volume: 1,
-    greeting: "שלום! אני ג'וש הגאון, המורה הדיגיטלי שלך. אפשר ללחוץ על המיקרופון ולשאול אותי שאלה.",
+    greeting: "שלום! אני ג׳וש הגאון, המורה הדיגיטלי שלך. אפשר ללחוץ על המיקרופון ולשאול אותי שאלה.",
     autoGreet: false,       // האם להקריא ברכה בטעינה (נחסם בדפדפנים עד מגע ראשון)
     continuous: true,       // האזנה רציפה — מפעילה מחדש את המיקרופון אוטומטית
     draggable: true,
@@ -74,7 +74,7 @@
        (`if (!this.opts.avatarImage) return FACE_SVG`) בלי הבקשה.
        נכנס קובץ פנים אמיתי — כותבים כאן את שמו. */
     avatarImage: "",
-    muted: false,           // רמקול כבוי — ג'וש כותב בצ'אט בלי להקריא
+    muted: false,           // רמקול כבוי — ג׳וש כותב בצ'אט בלי להקריא
     chatPlaceholder: "כתבו לי שאלה...",
     chatFallback: "עוד אין לי תשובה מוכנה לשאלה הזאת. אפשר לבקש ממני להקריא את הדף, לעצור, או לדבר לאט יותר.",
 
@@ -86,7 +86,7 @@
        אין צורך לדעת את מידות הפיקסלים של הקובץ והוא יכול להתחלף בלי
        לגעת בקוד. row = שורת המצב בגיליון, frames = כמה פריימים בשורה.
 
-       אם הקובץ חסר או לא נטען — ג'וש ממשיך עם הפנים הרגילות, בלי
+       אם הקובץ חסר או לא נטען — ג׳וש ממשיך עם הפנים הרגילות, בלי
        תמונה שבורה ובלי שגיאה. לכן אפשר להריץ את זה עוד לפני שהגיליון
        מוכן, ולהחליף אותו אחר כך.
        ---------------------------------------------------------------- */
@@ -444,7 +444,7 @@
   };
 
   /* ==================================================================
-     גיליון הספרייטים — המראה של ג'וש לפי מה שהוא עושה
+     גיליון הספרייטים — המראה של ג׳וש לפי מה שהוא עושה
 
        greet  בטעינה          talk   בזמן הקראה
        think  בזמן המתנה ל-AI aside  כשהתלמיד פותר
@@ -472,7 +472,7 @@
       self.greetPose();                 // 'מברך' בטעינה
     });
     probe.addEventListener("error", function () {
-      console.info("[Josh] " + s.image + " לא נמצא — ג'וש ממשיך עם הפנים הרגילות.");
+      console.info("[Josh] " + s.image + " לא נמצא — ג׳וש ממשיך עם הפנים הרגילות.");
     });
     probe.src = s.image;
   };
@@ -874,7 +874,7 @@
     body.textContent = text;
     row.appendChild(body);
 
-    /* לכל תשובה של ג'וש יש כפתור הקראה משלה */
+    /* לכל תשובה של ג׳וש יש כפתור הקראה משלה */
     if (who !== "me" && who !== "note" && this.synth) {
       var self = this;
       var say = el("button", "josh-msg__say", "🔊");
@@ -903,7 +903,7 @@
     i.style.height = Math.min(i.scrollHeight, 110) + "px";
   };
 
-  /** תשובה של ג'וש: נכנסת ליומן ומוקראת (אלא אם הרמקול כבוי) */
+  /** תשובה של ג׳וש: נכנסת ליומן ומוקראת (אלא אם הרמקול כבוי) */
   P._reply = function (text) {
     this.addMessage(text, "bot");
     this.say(text, { bubble: false, logged: true });
@@ -1014,7 +1014,7 @@
       });
   };
 
-  /** רשת איטית לא אמורה להשאיר את ג'וש ב'חושב' לנצח */
+  /** רשת איטית לא אמורה להשאיר את ג׳וש ב'חושב' לנצח */
   P._withTimeout = function (promise, ms) {
     if (!ms) return Promise.resolve(promise);
     return new Promise(function (resolve, reject) {
@@ -1247,7 +1247,7 @@
 
     this.stop();                       // מבטלים הקראה קודמת
     var wasListening = this.listening;
-    this.stopListening(true);          // כדי שג'וש לא ישמע את עצמו
+    this.stopListening(true);          // כדי שג׳וש לא ישמע את עצמו
 
     var self = this;
     var chunks = chunkText(text);
@@ -1433,7 +1433,7 @@
     rec.onend = function () {
       self.listening = false;
       if (self.state === "listening") self._setState("idle");
-      // הפעלה מחדש כל עוד המשתמש לא כיבה את המיקרופון וג'וש לא מדבר
+      // הפעלה מחדש כל עוד המשתמש לא כיבה את המיקרופון וג׳וש לא מדבר
       if (self.wantsToListen && self.opts.continuous && self.state !== "speaking") {
         setTimeout(function () {
           if (self.wantsToListen) { try { rec.start(); } catch (e) { /* כבר פועל */ } }
