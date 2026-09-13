@@ -9,7 +9,8 @@
    מזויף שאפשר לומר לו להיכשל בדיוק כמו המכשיר הבעייתי — ואז לשאול
    את האפליקציה מה היא עשתה. ארבע בדיקות לכל אפליקציה:
 
-     · בחירה   — מתוך ארבעה קולות באותה שפה, נבחר הטוב ולא הראשון
+     · בחירה   — מתוך ארבעה קולות באותה שפה, נבחר הטוב ולא הראשון,
+                 והוא הקול הנשי הטבעי, בקצב 0.95 ובגובה 1.12 (״נשי רגוע״)
      · שומר-ער — pause+resume נורה כדי שההקראה לא תיחתך
      · שומר זמן — onend שלא נורה אינו מקפיא את התור
      · נפילה   — קול רשת שנכשל מוחלף בקול מקומי, ואותו טקסט נאמר שוב
@@ -104,7 +105,7 @@ const FAKE = `(function(){
     { name:'Samantha',             lang:'en-US', voiceURI:'samantha',   localService:true,  default:false },
     { name:'Microsoft Aria Online (Natural) - English (United States)', lang:'en-US', voiceURI:'aria-net', localService:false, default:false }
   ];
-  const log = { spoke:[], pauseResume:0, voices:[] };
+  const log = { spoke:[], pauseResume:0, voices:[], tune:[] };
   window.__tts = log;
   let mode = 'ok';
   window.__mode = m => { mode = m; };
@@ -122,6 +123,9 @@ const FAKE = `(function(){
     speak(u){
       log.spoke.push(u.text);
       log.voices.push(u.voice ? u.voice.voiceURI : '(ברירת מחדל)');
+      /* קצב וגובה — מה שבאמת נשלח למנוע, ולא מה שכתוב בהגדרות.
+         volume נרשם כדי לדלג על אמירת חימום שקטה (בגרות 806). */
+      log.tune.push({ rate:u.rate, pitch:u.pitch, volume:u.volume });
       this.speaking = true;
       if(mode === 'silent'){ return; }          /* לא יורה כלום, לנצח */
       if(mode === 'neterr' && u.voice && u.voice.localService === false){
@@ -210,13 +214,24 @@ async function run(){
     const fails = [];
     try{
       /* --- 1 · בחירת הקול --- */
-      await page.evaluate(() => { window.__mode('ok'); window.__tts.spoke = []; window.__tts.voices = []; });
+      await page.evaluate(() => { window.__mode('ok'); window.__tts.spoke = []; window.__tts.voices = []; window.__tts.tune = []; });
       if(!await pressSpeak(page, app)) throw new Error('לא נמצא כפתור הקראה');
       await page.waitForTimeout(400);
       const picked = await page.evaluate(() => window.__tts.voices[0] || '');
       /* espeak הוא הראשון ברשימה וגם default — מי שלוקח את הראשון ייפול כאן */
       if(picked === 'espeak-he' || picked === 'espeak-en') fails.push('בחירה: נבחר espeak — הדירוג לא עובד');
       else if(!picked) fails.push('בחירה: לא נאמר דבר');
+      /* הקול הנשי הטבעי — Hila בעברית, Aria באנגלית — הוא מה שהבעלים
+         שמע ב-math-app ב-13.9.2026 ואמר עליו ״נעים ומדויק״: קול נשי
+         ברירת מחדל, בקצב 0.95 ובגובה 1.12 (הפריסט ״נשי רגוע״).
+         שלושת המספרים חייבים להגיע לאותו מנוע מכל אפליקציה — לפני
+         התיקון תשע מהן שלחו 0.78 בגובה 1, בגרות 0.82 ונתיב 0.90. */
+      else if(picked !== 'hila-net' && picked !== 'aria-net')
+        fails.push('בחירה: נבחר ' + picked + ' ולא הקול הנשי הטבעי');
+      const tune = await page.evaluate(() => (window.__tts.tune || []).filter(t => t.volume > 0)[0] || null);
+      if(!tune) fails.push('קצב וגובה: לא נשלחה אמירה עם קול');
+      else if(Math.abs(tune.rate - 0.95) > 0.005 || Math.abs(tune.pitch - 1.12) > 0.005)
+        fails.push('קצב וגובה: ' + tune.rate + ' / ' + tune.pitch + ' במקום 0.95 / 1.12 של ״נשי רגוע״');
 
       /* --- 2 · שומר-ער ---
          'silent' הוא בדיוק הקראה ארוכה מבחינת השומר: המנוע נשאר
