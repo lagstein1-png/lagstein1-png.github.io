@@ -1373,17 +1373,10 @@ function petSvg(kind,mood,size){
   if(kind==="josh"){
     /* עיצוב 2: מורה אנושי עם נגיעה טכנולוגית עדינה. `josh-face.js`
        מחזיר SVG מוטבע — אפס נכסים, אפס בקשות רשת.
-       הנפילה אחורה לגיליון נשארת למקרה שהקובץ לא נטען. */
+       גיליון הספרייטים נמחק 13.9.2026 (O-52); אם הקובץ לא נטען,
+       נופלים לעיגול בצבעי ג׳וש עם הגרש, בלי בקשת רשת. */
     if(typeof JOSHFACE!=="undefined")return JOSHFACE.markup(size||140);
-    /* הגיליון הישן. josh-sprites.png הוא 4
-       פריימים על 6 שורות, ולכן המיקום נקבע באחוזים ואינו תלוי במידות
-       הפיקסלים של הקובץ — החלפת התמונה אינה דורשת שינוי כאן. */
-    var ROW={happy:0,idle:0,cheer:5,think:3,sad:3},COL={happy:0,idle:0,cheer:1,think:2,sad:2};
-    var r=ROW[mood]!==undefined?ROW[mood]:0,cc=COL[mood]!==undefined?COL[mood]:0,z=size||140;
-    return '<span class="joshpet" aria-hidden="true" style="display:inline-block;width:'+z+
-      'px;height:'+z+'px;background-image:url(josh-sprites.png);background-size:400% 600%;'+
-      'background-position:'+(cc/3*100).toFixed(4)+'% '+(r/5*100).toFixed(4)+'%;'+
-      'background-repeat:no-repeat"></span>';
+    e='<circle cx="60" cy="60" r="44" fill="'+c.c+'" stroke="'+c.d+'" stroke-width="4"/><text x="60" y="74" text-anchor="middle" font-size="40" font-weight="700" fill="#fff">ג׳</text>';
   }else if(kind==="owl"){
     e='<path d="M30 34 L42 8 L53 31 Z" fill="'+c.d+'"/><path d="M90 34 L78 8 L67 31 Z" fill="'+c.d+'"/><path d="M20 68 Q12 84 25 98 Q30 82 27 68 Z" fill="'+c.d+'"/><path d="M100 68 Q108 84 95 98 Q90 82 93 68 Z" fill="'+c.d+'"/><circle cx="60" cy="66" r="38" fill="'+c.c+'"/><ellipse cx="60" cy="88" rx="21" ry="14" fill="'+c.s+'"/><circle cx="44" cy="54" r="14.5" fill="#fff" stroke="'+c.d+'" stroke-width="2.5"/><circle cx="76" cy="54" r="14.5" fill="#fff" stroke="'+c.d+'" stroke-width="2.5"/>'+eyes().replace(/cy="58"/g,'cy="54"')+'<path d="M60 61 L53 71 L67 71 Z" fill="#ffb020" stroke="#d99a00" stroke-linejoin="round"/>';
     if(mood==="sad")e+='<path d="M36 40 L48 44 M84 40 L72 44" stroke="'+ink+'" stroke-width="2.4" stroke-linecap="round"/>';
@@ -2058,7 +2051,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b80 · 2026-09-13";
+var BUILD="b81 · 2026-09-13";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4463,7 +4456,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b80-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b81-pwa1").catch(function(){});
   });
 }
 </script>
