@@ -754,7 +754,16 @@ function startNudge(){
 }
 
 var AUTO_TRIES = 30;
+/* **לא בדפדפן מונחה.** חבילת ה-QA (`clicks`, `voice`, `exam` ועוד)
+   מריצה כרומיום אמיתי, מאשרת את שער התנאים ומתחילה ללחוץ — ושנייה
+   וחצי אחר כך `#tu-ov.on` היה נפרש על כל המסך וחוסם כל לחיצה
+   (Playwright: "intercepts pointer events"). ריצות 440–446 על
+   `main` נפלו על זה, 13.9.2026. `navigator.webdriver` הוא הסימן
+   התקני של דפדפן מונחה, ואינו קיים אצל לומד; הפתיחה בלחיצה על
+   הכפתור נשארת כפי שהיא גם שם, ולכן `deployed.js` עדיין רואה את
+   ג׳וש נפתח. */
 function autoOpen(tries){
+  if(navigator.webdriver) return;
   if(autoSeen()) return;
   if(document.querySelector(".lg-wrap")){
     if((tries || 0) >= AUTO_TRIES) return;
