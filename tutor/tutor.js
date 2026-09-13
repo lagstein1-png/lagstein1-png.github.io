@@ -45,7 +45,7 @@ var VOICE = { he:"he-IL", ar:"ar-SA", ru:"ru-RU", en:"en-US" };
 var L = {
 he:{ btn:"ג׳וש — עזרה מהמורה", title:"עזרה מהמורה", close:"סגירה", send:"שליחה",
   intro:"אפשר לשאול אותי על מה שעל המסך. אני נותן רמז אחד בכל פעם, ומחכה לתשובה.",
-  ph:"מה לא ברור?", hello:"אני צריך עזרה במה שעל המסך.", wait:"רגע, חושב…",
+  greet:"היי, אני ג׳וש. אני כאן אם משהו לא ברור. כתוב לי מה, ונעבור על זה יחד.", ph:"מה לא ברור?", hello:"אני צריך עזרה במה שעל המסך.", wait:"רגע, חושב…",
   err:"לא הצלחתי להתחבר. אפשר לנסות שוב עוד רגע.",
   setup:"העזרה עוד לא מוכנה. אפשר לנסות מאוחר יותר.",
   limit:"מספיק להיום — נמשיך מחר.",
@@ -56,7 +56,7 @@ he:{ btn:"ג׳וש — עזרה מהמורה", title:"עזרה מהמורה", cl
   femNote:"אין במכשיר הזה קול נשי בשפה הזאת, ולכן גובה הקול הורם. זה לא קול נשי אמיתי." },
 ar:{ btn:"جوش — مساعدة من المعلّم", title:"مساعدة من المعلّم", close:"إغلاق", send:"إرسال",
   intro:"يمكنك أن تسألني عمّا يظهر على الشاشة. أعطي تلميحًا واحدًا في كل مرة وأنتظر إجابتك.",
-  ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
+  greet:"مرحبًا، أنا جوش. أنا هنا إن كان شيء غير واضح. اكتب لي ما هو، ونمرّ عليه معًا.", ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
   err:"لم أتمكّن من الاتصال. حاول مرّة أخرى بعد قليل.",
   setup:"المساعدة ليست جاهزة بعد. حاول لاحقًا.",
   limit:"يكفي لهذا اليوم — نُكمل غدًا.",
@@ -67,7 +67,7 @@ ar:{ btn:"جوش — مساعدة من المعلّم", title:"مساعدة من
   femNote:"لا يوجد على هذا الجهاز صوت نسائيّ بهذه اللغة، لذلك رُفعت طبقة الصوت. هذا ليس صوتًا نسائيًّا حقيقيًّا." },
 ru:{ btn:"Джош — помощь учителя", title:"Помощь учителя", close:"Закрыть", send:"Отправить",
   intro:"Можешь спросить меня о том, что на экране. Я даю по одной подсказке и жду ответа.",
-  ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
+  greet:"Привет, я Джош. Я рядом, если что-то непонятно. Напиши, что именно, и разберём вместе.", ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
   err:"Не удалось соединиться. Попробуй ещё раз через минуту.",
   setup:"Помощь ещё не готова. Попробуй позже.",
   limit:"На сегодня хватит — продолжим завтра.",
@@ -78,7 +78,7 @@ ru:{ btn:"Джош — помощь учителя", title:"Помощь учи�
   femNote:"На этом устройстве нет женского голоса для этого языка, поэтому тон повышен. Это не настоящий женский голос." },
 en:{ btn:"Josh — ask the teacher", title:"Ask the teacher", close:"Close", send:"Send",
   intro:"You can ask me about what is on the screen. I give one hint at a time, and wait for your answer.",
-  ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
+  greet:"Hi, I am Josh. I am here if something is unclear. Write what it is, and we will go through it together.", ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
   err:"I could not connect. Try again in a moment.",
   setup:"The help is not ready yet. Try again later.",
   limit:"That is enough for today — we will carry on tomorrow.",
@@ -630,7 +630,23 @@ function qid(){
   return q ? (q.id || q.expr || JSON.stringify(q)) : "none";
 }
 
-function open(){
+/* הברכה הפותחת כשג׳וש צץ מעצמו — **מקומית, בלי קריאת שרת.**
+
+   `open()` בלחיצה שולח `T().hello` אל השרת, וזו ההתנהגות שסוכמה
+   ואינה משתנה כאן. אבל פתיחה אוטומטית בכל אפליקציה היא סיפור
+   אחר: לכל לומד עשרים הודעות ליום (`LIM` שב-`worker.js`), ולומד
+   שפותח חמש אפליקציות היה שורף רבע מהמכסה על חמש ברכות לפני
+   שהקליד מילה. כאן הברכה נכתבת בדפדפן, ולא עולה דבר.
+
+   היא נכנסת ל-MSGS כדי שתיראה בשיחה, ו-`send` מסיר הודעת בוט
+   פותחת לפני השליחה — שיחה חייבת להתחיל בתור של הלומד. */
+function greetLocal(){
+  MSGS.push({ role:"assistant", text:T().greet });
+  startReveal(MSGS.length - 1);
+  draw();
+}
+
+function open(auto){
   if(!API || !CFG) return;
   var id = qid(), lg = lang();
   /* תרגיל חדש — שיחה חדשה. וגם שפה חדשה: הבוט עונה בשפה שנשלחה
@@ -639,8 +655,10 @@ function open(){
   if(QID !== id || LANGAT !== lg){ MSGS = []; NOTE = ""; QID = id; LANGAT = lg }
   build().ov.classList.add("on");
   draw();
-  if(!MSGS.length) send(T().hello, true);
-  else focus();
+  /* פתיחה אוטומטית אינה גונבת מיקוד. הפאנל הוא דיאלוג, ומיקוד
+     שקופץ אליו בלי שהלומד ביקש מקפיץ גם קורא מסך באמצע משפט. */
+  if(!MSGS.length){ if(auto) greetLocal(); else send(T().hello, true) }
+  else if(!auto) focus();
 }
 function close(){
   stopSay(); stopReveal(); NOTE = "";
@@ -648,6 +666,52 @@ function close(){
   if(typeof JOSHFACE !== "undefined") JOSHFACE.emit("idle");
 }
 function focus(){ try{ EL.inp.focus() }catch(e){} }
+
+/* ---- ג׳וש צץ מעצמו בכל אפליקציה שנפתחת ------------------------
+   הכרעת הבעלים 13.9.2026: ״החלון שלו חייב להיות צץ בכל מקום
+   שפותחים״. `mount` קורא לזה, ולכן זה חל על שלושה־עשר הדפים
+   שטוענים את הקובץ הזה — בלי לגעת באף אחד מהם.
+
+   **פעם אחת לכל אפליקציה בכל ביקור, ולא יותר.** הסימון נכתב
+   *לפני* הפתיחה, ולכן לומד שסוגר את הפאנל אינו מקבל אותו שוב
+   באותו ביקור. `sessionStorage` ולא `localStorage`: מי שחוזר
+   מחר מקבל את ג׳וש שוב, ומי שעובר לאפליקציה אחרת מקבל אותו שם —
+   וזה בדיוק ״בכל מקום שפותחים״.
+
+   המפתח נושא את שם האפליקציה, לפי מלכודת ה-localStorage שב-
+   `CLAUDE.md`: כל האפליקציות באותו מקור, ומפתח בלי שם היה מגירה
+   משותפת שבה פתיחה באחת מבטלת את הפתיחה בשנייה.
+
+   ההשהיה נותנת לאפליקציה לצייר את המסך קודם. פאנל שקופץ על מסך
+   ריק נראה כמו תקלה, לא כמו מורה. */
+var AUTO_KEY = "tutor-auto-v1:";
+var AUTO_MS  = 900;
+function autoSeen(){
+  try{ return sessionStorage.getItem(AUTO_KEY + (CFG && CFG.app)) === "1" }
+  catch(e){ return true }
+}
+function autoMark(){
+  try{ sessionStorage.setItem(AUTO_KEY + (CFG && CFG.app), "1") }catch(e){}
+}
+/* שער התנאים קודם. נמדד בדפדפן 13.9.2026: בביקור ראשון `.lg-wrap`
+   הוא `aria-modal` והוא מכסה את הפאנל — ג׳וש היה נפתח מאחוריו,
+   והלומד היה סוגר את השער ומוצא חלון פתוח שלא ביקש. ההמתנה היא
+   אותו אידיום בדיוק שהאונבורדינג משתמש בו (`math-app/index.html`,
+   ליד `demoMount`): בודקים שוב כל חצי שנייה.
+
+   התקרה קיימת כדי שלא ייווצר טיימר נצחי בלשונית שנשארה פתוחה על
+   השער — אחרי כשלושים בדיקות מוותרים, והכפתור עדיין שם. */
+var AUTO_TRIES = 30;
+function autoOpen(tries){
+  if(autoSeen()) return;
+  if(document.querySelector(".lg-wrap")){
+    if((tries || 0) >= AUTO_TRIES) return;
+    setTimeout(function(){ autoOpen((tries || 0) + 1) }, 500);
+    return;
+  }
+  autoMark();
+  setTimeout(function(){ try{ open(true) }catch(e){} }, AUTO_MS);
+}
 
 /* ---- סימן הלמידה, אם יש גלאי ----------------------------------
    `tutor/josh-state.js` מחזיר ארבע מילים, ו-`ok` אינה נשלחת:
@@ -689,7 +753,11 @@ function send(text, auto){
       target: CFG.target || null,
       sign: sign(),
       q: q,
-      messages: MSGS
+      /* הברכה המקומית של הפתיחה האוטומטית היא הודעת בוט, והיא
+         יושבת ראשונה ב-MSGS. שיחה שמתחילה בבוט נדחית, ולכן היא
+         נחתכת כאן ואינה נשלחת. היא נשארת על המסך — הלומד רואה
+         אותה, השרת לא. */
+      messages: (MSGS.length && MSGS[0].role === "assistant") ? MSGS.slice(1) : MSGS
     })
   })
   .then(function(r){
@@ -764,7 +832,12 @@ g.TUTOR = {
      האלה המחרוזת העברית היא המפתח — הוספת מחרוזת חדשה שם היא
      נגיעה במנגנון התרגום, וכאן היא שורה במודול אחד. */
   label: function(){ return T().btn },
-  mount: function(cfg){ CFG = cfg || null; return !!API && !!CFG },
+  mount: function(cfg){
+    CFG = cfg || null;
+    var ok = !!API && !!CFG;
+    if(ok) autoOpen();
+    return ok;
+  },
   open: open,
   close: close,
   /* לבדיקות בלבד — אינם נקראים מהאפליקציות */
