@@ -1292,6 +1292,36 @@ function applyModes(){
   r.classList.toggle("reduce-motion",!!s.reduceMotion);
   document.title=T().appName;
 }
+/* ================= JOSH FACE ================= */
+/* שכבת הפנים של ג׳וש — `/tutor/josh-face.js`, תצוגה בלבד. כאן יושב
+   כל מה שהאפליקציה יודעת עליה: המרת מצב הרוח שכבר קיים כאן לאירוע,
+   והגנה על שני מקרים — שהלומד בחר חיה אחרת, ושהקובץ לא נטען (ביקור
+   ראשון אופליין). בשני המקרים ממשיכים עם הציור הישן ולא נשברים.
+
+   `state.pet` הוא בחירת הלומד באונבורדינג: שועל, ינשוף או ג׳וש. */
+/* הדיוקן יושב ב-`/img/` ולא בתיקיית האפליקציה, וזו החלטה ולא נוחות:
+   `/img/` הוא אחד משלושת הנתיבים המשותפים ש-worker השורש מגיש
+   (`seg[1] !== "img"` ב-`sw.js` שבשורש), בדיוק כמו `/tutor/` ו-`/legal/`.
+   לכן **קובץ אחד לכל האתר** במקום שנים־עשר עותקים של 15,229 בתים.
+
+   JPEG ולא PNG: אין צורך בשקיפות — התצלום ממוסך לעיגול ב-CSS —
+   ו-PNG של אותו חתך היה 135,356 בתים, פי תשעה בלי שום רווח. */
+var JF_PHOTO="/img/josh.jpg";
+
+function jfOn(){ return state.pet==="josh" && typeof JOSHFACE!=="undefined" }
+/* מצבי הרוח של האפליקציה קדמו לשכבת הפנים, ולכן זו טבלת תרגום ולא
+   שינוי: "cheer" כבר סימן תשובה נכונה, ו-"think" כבר סימן רמז. */
+var JF_MOOD={happy:"idle",cheer:"correct",think:"thinking",sad:"wrong"},_jfLast="";
+/* רק שינוי אמיתי נשלח: `afterRender` רץ בכל ציור, ורגע כמו "נכון"
+   שנשלח שוב ושוב לא היה נגמר לעולם. */
+function jfMood(m){
+  if(!jfOn())return;
+  var ev=JF_MOOD[m||"happy"]||"idle";
+  if(ev===_jfLast)return;
+  _jfLast=ev;JOSHFACE.emit(ev);
+}
+function jfSay(on){ if(jfOn())JOSHFACE.emit(on?"speaking":(JF_MOOD[P.mood]||"idle")) }
+
 /* ================= pet SVG ================= */
 function petSvg(kind,mood,size){
   var c=PETS[kind]||PETS.fox,ink="#17333c",e="",m="",xs=[44,76],ey=58;
@@ -1312,7 +1342,11 @@ function petSvg(kind,mood,size){
     return '<path d="M 52 '+(y-3)+' Q 60 '+(y+5)+' 68 '+(y-3)+'" stroke="'+ink+'" stroke-width="2.8" fill="none" stroke-linecap="round"/>';
   }
   if(kind==="josh"){
-    /* ג׳וש מצויר מגיליון josh-sprites.png ולא מ-SVG. הגיליון הוא 4
+    /* עיצוב 2: מורה אנושי עם נגיעה טכנולוגית עדינה. `josh-face.js`
+       מחזיר SVG מוטבע — אפס נכסים, אפס בקשות רשת.
+       הנפילה אחורה לגיליון נשארת למקרה שהקובץ לא נטען. */
+    if(typeof JOSHFACE!=="undefined")return JOSHFACE.markup(size||140);
+    /* הגיליון הישן. josh-sprites.png הוא 4
        פריימים על 6 שורות, ולכן המיקום נקבע באחוזים ואינו תלוי במידות
        הפיקסלים של הקובץ — החלפת התמונה אינה דורשת שינוי כאן. */
     var ROW={happy:0,idle:0,cheer:5,think:3,sad:3},COL={happy:0,idle:0,cheer:1,think:2,sad:2};
@@ -1819,6 +1853,7 @@ function speakLocal(text,preset,rate,pitch,langCode,isRetry){
       done=true; if(disarm)disarm();
       maybeStopKeepAlive();
       if(HL.tok===tok)hlClear();
+      try{jfSay(false)}catch(e5){}
       ttsOK();
     }
     try{
@@ -1856,6 +1891,9 @@ function speakLocal(text,preset,rate,pitch,langCode,isRetry){
       _activeU=u;                        /* מגן מפני איסוף זבל */
       try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e3){}
       speechSynthesis.speak(u);
+      /* הודעה לשכבת הפנים, ותו לא. המנוע כאן אינו משתנה: אין קול
+         חדש, אין בחירת קול, ואף אחד מארבעת המנגנונים לא נגע. */
+      try{jfSay(true)}catch(e4){}
       startKeepAlive();
       disarm=ttsWatchdog(function(){return alive()&&!done},finish);
     }catch(e){}
@@ -1991,7 +2029,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b76 · 2026-09-12";
+var BUILD="b78 · 2026-09-12";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4007,6 +4045,9 @@ function afterRender(){
       else if(BT.text){el.textContent=BT.text.slice(0,BT.shown)}
     }
   }
+  /* הפנים נבנו מחדש יחד עם `#app`, ולכן המודול צריך למצוא את הצומת
+     החדש. המצב עצמו חי במודול ולא ב-DOM, ולכן הוא שורד את הציור. */
+  if(jfOn()){JOSHFACE.attach();jfMood(P.mood)}
 }
 function setBubble(text,mood){
   P.mood=mood||"happy";
@@ -4364,6 +4405,7 @@ window.addEventListener("hashchange",function(){
 render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
+<script src="/tutor/josh-face.js"></script>
 <script src="/tutor/tutor.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
@@ -4372,7 +4414,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b76-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b78-pwa1").catch(function(){});
   });
 }
 </script>
@@ -4380,6 +4422,13 @@ if("serviceWorker" in navigator){
      mount מחזיר false כשאין כתובת שרת, ואז הכפתור אינו נבנה. -->
 <script>
 if(window.TUTOR){
+  /* הדיוקן נדלק כאן ולא בסקריפט הראשי: `josh-face.js` נטען אחריו,
+     ובנקודה ההיא `JOSHFACE` עדיין לא קיים. נמדד — הקריאה נבלעה
+     בשקט והפנים נשארו מצוירות. אחרי ההדלקה מציירים מחדש. */
+  if(typeof JOSHFACE!=="undefined" && state.pet==="josh"){
+    JOSHFACE.photo(JF_PHOTO);
+  }
+
   TUTOR.mount({
     app:"math-app",
     lang:function(){return (state&&state.settings&&state.settings.lang)||"he"},

@@ -13,7 +13,10 @@ const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "site-" + V;
 const PRE = ["./","./index.html","./manifest.json","./launch.js","./launch.css",
              "./img/icon-192.png","./img/icon-512.png",
-             "/legal/terms.js","/legal/protect.js"];
+             "/legal/terms.js","/legal/protect.js",
+             /* ג׳וש — שכבת הפנים והתמונה. שתיהן בנתיבים משותפים
+                (/tutor/, /img/) ולכן עותק אחד לכל האתר. */
+             "/tutor/josh-face.js","/img/josh.jpg"];
 
 self.addEventListener("install", e => {
   self.skipWaiting();
@@ -37,10 +40,12 @@ self.addEventListener("fetch", e => {
      האפליקציות: 5,356KB זרים במטמון הזה מול 172KB משלו.
 
      לכן מגישים רק את מה ששייך לדף הבית — קובץ בשורש, או אחת משלוש
-     התיקיות שאין להן worker משלהן. אפליקציה חדשה נופלת מכאן החוצה
+     התיקיות שאין להן worker משלהן — ובהן /tutor/, שדף הבית טוען ממנה
+     את שכבת הפנים של ג׳וש. אפליקציה חדשה נופלת מכאן החוצה
      מאליה, בלי שצריך לגעת בקובץ. */
   const seg = url.pathname.split("/");
-  if (seg.length > 2 && seg[1] !== "img" && seg[1] !== "legal" && seg[1] !== "voice") return;
+  if (seg.length > 2 && seg[1] !== "img" && seg[1] !== "legal" &&
+      seg[1] !== "voice" && seg[1] !== "tutor") return;
   /* ניווט: רשת קודם כדי שגרסה חדשה תגיע מיד, ומטמון כשאין רשת */
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).then(r => {

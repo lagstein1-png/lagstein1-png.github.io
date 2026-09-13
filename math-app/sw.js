@@ -14,6 +14,8 @@ const CACHE = "math-app-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
              "./josh-sprites.png",
+             "/img/josh.jpg",
+             "/tutor/josh-face.js",
              "/tutor/tutor.js",
              "/legal/terms.js","/legal/protect.js"];
 
