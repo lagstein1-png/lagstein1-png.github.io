@@ -542,7 +542,7 @@ Script, ו-`Metrics.post` שולח בכל פתיחה ובכל סגירת מפג�
 
 יש בריפו ניסיון קודם להוציא מנוע: `learning-core/`. מה יש שם,
 ב-`wc -l` (5.9.2026): `core.js` 1,216 שורות שמייצא `window.LC`,
-`core.css` 227, `sw-template.js` 102, ו-`test.js` 153 — 48 בדיקות
+`core.css` 227, `sw-template.js` 102, ו-`test.js` 162 — 53 בדיקות
 לוגיקה שרצות ב-node ועוברות (`node learning-core/test.js`: "48
 עברו, 0 נפלו"). יש גם `template/` לאפליקציה חדשה, `demo/` ו-`CORE-RULES.md`.
 

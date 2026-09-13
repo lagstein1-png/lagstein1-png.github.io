@@ -854,8 +854,15 @@ var CATS=["all","math","lang","life"];
 var cat="all", q="";
 
 function priceLabel(a){
-  if(a.price===0)return S.free;
-  return a.price+" ₪"+(a.once?" "+S.once:"");
+  /* מבצע ההשקה: הכול חינם, בהכרעת הבעלים 13.9.2026 — ״מחק כל
+     איזכור של כסף, הכל פתוח בחינם״. הלומד אינו רואה סכום, ולא
+     רק אחרי ש-launch.js משכתב את התגית: המקור עצמו אינו מייצר
+     אותו, ולכן גם מי שה-JS אצלו נכשל רואה ״חינם״.
+
+     a.price נשאר ב-DATA.APPS ואינו נמחק — כך הוכרע ב-10.9.2026,
+     והוא נכנס לתוקף בסיום המבצע. אז חוזרות לכאן שתי השורות
+     שהיו: תנאי על price===0, והרכבת המחיר עם S.once. */
+  return S.free;
 }
 
 function draw(){
@@ -1045,7 +1052,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=58-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=60-pwa1").catch(function(){});
   });
 }
 </script>

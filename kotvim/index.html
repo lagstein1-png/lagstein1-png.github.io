@@ -1039,7 +1039,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="k14 · 2026-09-13";
+var BUILD="k16 · 2026-09-13";
 var SKEY="kotvim-state-v1";
 var GKEY_STORE="kotvim-gkey";
 
@@ -2429,7 +2429,9 @@ function screenType(){
       '<div><div class="ttl">'+esc(gl(ty.n))+'</div><div class="desc">'+esc(gl(ty.d))+'</div></div></div>',
       'data-a="ktype" data-v="'+esc(ty.id)+'"',false,"margin-bottom:10px");
   });
-  return h+"</div></div>";
+  /* הפוטר עם הגרסה יושב במסך הראשון, כמו בכל אפליקציה אחרת. עד k14
+     הוא היה בהגדרות בלבד, והלומד לא ראה איזו גרסה אצלו בלי לחפש. */
+  return h+"</div></div>"+fbar();
 }
 function screenTopic(){
   var ty=typeById(W.type), a=bankOf(W.type);
@@ -3076,7 +3078,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=k14-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=k16-pwa1").catch(function(){});
   });
 }
 </script>
