@@ -124,6 +124,71 @@ learning-core״). `core.js`: `tts.rate` 0.95 (היה 1), `VOICE_TUNE` 1.0
 ואחרי: `✓ 53 עברו, 0 נפלו.` אין לו מפתח קאש — אינו אפליקציה ואף
 אפליקציה אינה טוענת אותו.
 
+### 13.9.2026 — `deployed.js` על `1319814`: הכפתור של ג׳וש נפתח בשתים־עשרה, ו-`kotvim` לא הראתה גרסה במסך הראשון
+
+**הבקשה:** להריץ את `deployed.js` ולבדוק שהכפתור של ג׳וש באמת
+מופיע. `deployed.js` אינו בודק את הכפתור — הוא בודק טעינה, שער
+שפה, אונבורדינג, BUILD בפוטר ורישום ה-worker. לכן רצו שני דברים.
+
+**1. `node .claude/qa/deployed.js origin/main`** על `1319814`,
+13 דפים × 4 שפות:
+
+    דף הבית      he✓ ar✓ ru✓ en✓   אין BUILD · ?v=57-pwa1
+    math-app     he✓ ar✓ ru✓ en✓   BUILD b80 · ?v=b80-pwa1
+    math-teen    he✓ ar✓ ru✓ en✓   BUILD t78 · ?v=t78-pwa1
+    math-uni     he✓ ar✓ ru✓ en✓   BUILD u79 · ?v=u79-pwa1
+    math-uni2    he✓ ar✓ ru✓ en✓   BUILD v77 · ?v=v77-pwa1
+    math-uni3    he✓ ar✓ ru✓ en✓   BUILD g77 · ?v=g77-pwa1
+    english      he✓ ar✓ ru✓ en✓   BUILD n70 · ?v=n70-pwa1
+    history      he✓ ar✓ ru✓ en✓   BUILD m75 · ?v=m75-pwa1
+    lomda        he✓ ar✓ ru✓ en✓   BUILD l58 · ?v=l58-pwa1
+    ulpan        he✓ ar✓ ru✓ en✓   BUILD a39 · ?v=a39-pwa1
+    bagrut-806   he✓ ar✓ ru✓ en✓   BUILD x39 · ?v=x39-pwa1
+    reader       he✓ ar✓ ru✓ en✓   אין BUILD · ?v=47-pwa1
+    ✗ kotvim · he: הפוטר אינו מציג "k14 · 2026-09-13" — הדף שמוגש אינו הגרסה הזאת
+    (וכך גם ar, ru, en)
+    13 דפים × 4 שפות · 4 ממצאים
+
+**הממצא אמיתי ואינו מהיום.** `fbar()` — הפוטר עם ״נשמר במכשיר ·
+BUILD״ — נקרא ב-`kotvim` פעם אחת בלבד, בסוף `screenSet`, ובאף
+משפחה אחרת הוא בסוף `screenHome`. אותה ריצה על `622619d` (`k13`)
+נפלה בדיוק כך, כלומר זה לא נשבר בקומיט הקול של היום. ״קריטי /
+חשוב / זניח״: **חשוב** — מספר הגרסה הוא הדבר היחיד שאומר ללומד
+אם התיקון הגיע אליו, ובאפליקציה הזאת הוא ישב מאחורי גלגל השיניים.
+
+**התיקון:** `return h+"</div></div>"+fbar();` ב-`screenType`, המסך
+הראשון. `k14` → `k15` בשני המקומות, `STATUS.md` ו-`CHANGELOG.md`
+אחריו. **הוכחה:** `deployed.js --dir . --app kotvim` —
+`kotvim he✓ ar✓ ru✓ en✓ · BUILD k15 · ?v=k15-pwa1 · 0 ממצאים`;
+`smoke.js kotvim` — clean; `all.js --static` — 28 עברו.
+
+**2. הכפתור של ג׳וש** — סקריפט Playwright בסקראצ׳פד (אינו בריפו):
+worktree של `origin/main` על שרת משלו, בכל אפליקציה שער השפה →
+אונבורדינג → מסך שאלה, ואז: הכפתור נראה, נושא ״ג׳וש״, פעיל,
+ולחיצה עליו פותחת את `#tu-ov`. בקשות חיצוניות חסומות, ולכן זו
+פתיחת החלון ולא תשובה מהשרת. הסלקטור: `[data-a="tutor"]` בעשר,
+`[data-tutor]` ב-806, `#btnTutor` ב-`reader`. הפלט:
+
+    ✓ math-app    "ג׳וש — עזרה מהמורה" · פעיל · חלון נפתח
+    ✓ math-teen   … ← [data-a="start"]
+    ✓ math-uni    … ← [data-a="start"]
+    ✓ math-uni2   … ← [data-a="start"]
+    ✓ math-uni3   … ← [data-a="start"]
+    ✓ english     … ← [data-a="open"]
+    ✓ history     … ← [data-a="open"]
+    ✓ ulpan       … ← [data-a="open"]
+    ✓ lomda       … ← [data-a="open"]
+    ✓ kotvim      … ← [data-a="ktype"] [data-a="ktopic"]
+    ✓ reader      … (הכפתור במסך הראשון)
+    ✓ bagrut-806  … ← [data-exam] [data-go="practice"]
+    12 אפליקציות · 0 ממצאים
+
+**שני דברים שנלמדו על הבדיקה עצמה, ולא על האפליקציות:** בדפדפן
+ללא קולות נפתח `#tts-fail` (״בדיקה והוראות תיקון״) והוא חוסם
+לחיצות פיזיות — `evaluate(b=>b.click())` עוקף; ובמשפחת
+האוניברסיטה `[data-a="lvl"]` יושב גם במסך הבית, ולכן ״לחץ על
+הרמה״ אינו מגיע לשאלה — `[data-a="start"]` כן.
+
 ### 13.9.2026 — האתר החי נבדק מהרנר: שלושה־עשר דפים 200, שלושה־עשר מפתחות תואמים, וג׳וש מגיע ב-HTML
 
 **הבקשה:** לולאת `curl` על שלושה־עשר הדפים, ואז לחפש ״ג׳וש״
