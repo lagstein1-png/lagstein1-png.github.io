@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>בדיקות — מבצע השקה</title>
 <!-- ============================================================
-     שבע בדיקות על launch.js, בדפדפן. פותחים דרך השרת המקומי:
+     שמונה בדיקות על launch.js, בדפדפן. פותחים דרך השרת המקומי:
          node .claude/qa/serve.js   →   http://127.0.0.1:8099/tests/launch.test.html
 
      הוכחת נפילה קודם: ?without=1 טוען את הדף בלי launch.js, וכל
@@ -47,6 +47,12 @@ pre{direction:ltr; text-align:left; font-size:.82rem; overflow:auto; background:
     <span class="t price" id="tagPaid" dir="ltr">39 ₪</span>
     <span class="t price" id="tagFree">חינם</span>
     <span class="t price" id="tagDone" data-launch-done="1" dir="ltr">120 ₪ חד־פעמי</span>
+    <!-- כרטיס ״תאוריה מדברת״ — עד 13.9.2026 הוא היה החריג היחיד
+         שנשאר בתשלום. בדיקה 8 נועלת את ביטול החריג. -->
+    <div class="card" data-app="theory" id="cardTheory">
+      <span class="t price" id="tagTheory" dir="ltr">120 ₪ חד־פעמי</span>
+      <div class="act"><a class="get" href="/theory/">לאפליקציה</a></div>
+    </div>
   </div>
   <div id="grid"></div>
 </div>
@@ -118,6 +124,18 @@ var TESTS=[
    var fresh=document.createElement("div"); fresh.innerHTML='<span class="t price">59 ₪</span>';
    LAUNCH.tags(fresh);
    must(ERRORS.length===0,"שגיאות בקונסול: "+ERRORS.join(" | "));
+ }],
+ ["8. ״תאוריה מדברת״ אינה חריג — אין מחיר מבצע ואין כפתור ״לרכישה״", function(){
+   LAUNCH.tags(fx);
+   var card=document.getElementById("cardTheory"), t=document.getElementById("tagTheory");
+   must(!card.querySelector(".launch-sale"),"הכרטיס קיבל מחיר מבצע (.launch-sale) — החריג חזר");
+   must(!card.querySelector(".launch-buy"),"הכרטיס קיבל כפתור ״לרכישה״ (.launch-buy) — החריג חזר");
+   must(card.querySelectorAll(".act a").length===1,"נוסף כפתור שלישי בשורת הפעולות: "+card.querySelector(".act").innerHTML);
+   /* ולא רק שאין חריג — הוא עבר את הטיפול הרגיל */
+   var sx=t.querySelector("s"), bx=t.querySelector(".launch-badge");
+   must(sx&&sx.textContent==="120 ₪ חד־פעמי","המחיר לא נחצה כמו בכל כרטיס אחר");
+   must(bx&&bx.textContent==="חינם בתקופת ההשקה","אין תג ״חינם בתקופת ההשקה״ — התג הוא: "+(bx&&bx.textContent));
+   must(typeof LAUNCH.theory==="undefined","LAUNCH.theory עדיין מיוצא — המסלול השני קיים");
  }]
 ];
 
