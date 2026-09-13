@@ -597,6 +597,23 @@ function close(){
 }
 function focus(){ try{ EL.inp.focus() }catch(e){} }
 
+/* ---- סימן הלמידה, אם יש גלאי ----------------------------------
+   `tutor/josh-state.js` מחזיר ארבע מילים, ו-`ok` אינה נשלחת:
+   היא היעדר סימן, ונוכחות השדה היא עצמה המשמעות. אפליקציה שאין
+   בה גלאי שולחת `null`, וזה בדיוק אותו דבר בשרת.
+
+   **מה שנשלח הוא מילה אחת, ולא היסטוריה.** אין כאן זמנים, אין
+   מניין תשובות ואין רצף — הגלאי מסכם בדפדפן, והשרת מקבל את
+   המסקנה בלבד. זו אינה קמצנות ברוחב פס אלא גבול: מה שלא נשלח
+   לא יכול לדלוף. */
+function sign(){
+  if(typeof JOSHSTATE === "undefined") return null;
+  try{
+    var s = JOSHSTATE.state();
+    return s && s !== "ok" ? s : null;
+  }catch(e){ return null }
+}
+
 function send(text, auto){
   var t = T();
   text = String(text || "").trim().slice(0, MAXLEN);
@@ -618,6 +635,7 @@ function send(text, auto){
       app: CFG.app,
       lang: lang(),
       target: CFG.target || null,
+      sign: sign(),
       q: q,
       messages: MSGS
     })
