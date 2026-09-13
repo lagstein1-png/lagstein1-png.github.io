@@ -18,6 +18,7 @@
    מריצים:  node .claude/qa/tutor.js
 */
 const fs = require('fs'), path = require('path');
+const vm = require('vm');
 const ROOT = path.resolve(__dirname, '..', '..');
 const WORKER = 'file://' + path.join(ROOT, 'tutor-api', 'worker.js');
 const CLIENT = path.join(ROOT, 'tutor', 'tutor.js');
@@ -40,7 +41,7 @@ function t(name, got, want) {
   console.log(`✗ ${name}\n    קיבלנו: ${JSON.stringify(got)}\n    ציפינו: ${JSON.stringify(want)}`);
 }
 
-import(WORKER).then(W => {
+import(WORKER).then(async W => {
   const client = fs.readFileSync(CLIENT, 'utf8');
 
   /* ---------- 1. חשיפת התשובה ---------- */
@@ -131,6 +132,127 @@ import(WORKER).then(W => {
     /« »/.test(W.contextBlock({ app: 'ulpan', lang: 'ru', target: 'he', q: null }, 0)), true);
   t('אין הפרדה כששפת ההסבר היא הנלמדת',
     /השפה הנלמדת/.test(W.contextBlock({ app: 'english', lang: 'en', target: 'en', q: null }, 0)), false);
+
+  /* ---------- 4א. סימן הלמידה — שלב 4 ----------
+
+     הגלאי יושב בדפדפן ואפשר לערוך אותו, ולכן הסימן הוא רמז ולא
+     עובדה. שלוש הבדיקות הראשונות כאן שומרות שהוא יישאר בגבול
+     הזה: שהוא מגיע רק כאחת משלוש מילים, שהוא משנה את **ההקשר**
+     ולא את ההוראות הקבועות, ושהוא אינו מגיע ללומד כתווית.
+
+     **ו-`ok` אינו ברשימה במתכוון.** הוא היעדר סימן, והלקוח אינו
+     שולח אותו — נוכחות השדה היא המשמעות. */
+  const mk = (sign) => W.readBody({ app: 'math-app', sign: sign,
+    messages: [{ role: 'user', text: 'היי' }] });
+  t('שלושה סימנים, ואין רביעי', W.SIGNS, ['slow', 'stuck', 'frustrated']);
+  t('לכל סימן יש התאמה', Object.keys(W.ADAPT).sort(), W.SIGNS.slice().sort());
+  W.SIGNS.forEach(sg => {
+    if (mk(sg).sign !== sg) { bad++; console.log(`✗ הסימן ${sg} לא עבר את readBody`) }
+  });
+  console.log('✓ שלושת הסימנים עוברים את readBody');
+  t('ok אינו סימן — הוא היעדר סימן', mk('ok').sign, null);
+  t('סימן שאינו ברשימה נזרק בשקט', mk('exhausted').sign, null);
+  t('בלי שדה כלל — אין סימן', mk(undefined).sign, null);
+  /* סימן פגום אינו סיבה לא לענות ללומד: הבקשה ממשיכה, בלי התאמה. */
+  t('סימן פגום אינו מפיל את הבקשה', mk('exhausted') === null, false);
+
+  W.SIGNS.forEach(sg => {
+    const c = W.contextBlock({ app: 'math-app', lang: 'he', sign: sg, q: null }, 0);
+    if (c.indexOf(W.ADAPT[sg]) < 0) { bad++; console.log(`✗ ההתאמה ל-${sg} אינה בהקשר`) }
+  });
+  console.log('✓ כל סימן מוסיף את ההתאמה שלו להקשר');
+  t('בלי סימן — אין שורת התאמה',
+    /סימן למידה מהרגע/.test(W.contextBlock({ app: 'math-app', lang: 'he', q: null }, 0)), false);
+  /* הסימן תקף גם בלי תרגיל: לומד שנתקע ואז הקליד שאלה חופשית
+     הוא אותו לומד. */
+  t('הסימן תקף גם כשאין תרגיל',
+    /סימן למידה מהרגע/.test(
+      W.contextBlock({ app: 'reader', lang: 'he', sign: 'stuck', q: null }, 0)), true);
+
+  /* **הכלל שאין לרכך:** סימן למידה, לא אבחון. ג׳וש אינו אומר
+     ללומד מה הסימן. זו שורה ב-CORE ולא בהקשר, מפני שהיא חייבת
+     לחול בכל אפליקציה ובכל שפה — ובלוק משתנה אינו חל תמיד. */
+  t('הגוף המשותף אוסר לומר ללומד מה הסימן',
+    /אל תאמר ללומד מה הסימן ואל תתאר לו את מצבו/.test(W.CORE), true);
+  /* ההתאמה עצמה חייבת להישאר בבלוק המשתנה: שורה שמשתנה מבקשה
+     לבקשה בתוך CORE שוברת את המטמון של הגוף הקבוע. */
+  W.SIGNS.forEach(sg => {
+    if (W.CORE.indexOf(W.ADAPT[sg]) >= 0) {
+      bad++; console.log(`✗ ההתאמה ל-${sg} נכנסה ל-CORE — היא שוברת את המטמון`);
+    }
+  });
+  console.log('✓ ההתאמות יושבות בהקשר המשתנה ולא בגוף הקבוע');
+
+  /* והלקוח — הוא זה ששולח. שדה שאין לו שולח הוא קוד מת. */
+  t('הלקוח שולח את הסימן', /sign:\s*sign\(\)/.test(client), true);
+  t('הלקוח אינו שולח ok', /s\s*!==\s*"ok"/.test(client), true);
+  /* **הגלאי אינו חייב להיות שם, ואינו חייב לעבוד.** שתים־עשרה
+     האפליקציות עדיין בלעדיו, והוא קוד בדפדפן שאפשר לשבור. בשני
+     המקרים הבוט חייב לענות — בלי התאמה, אבל לענות. נמדד בדפדפן:
+     גלאי שנמחק וגלאי שזורק החזירו שניהם `sign: null`. */
+  t('הלקוח מוגן מהיעדר גלאי',
+    /typeof\s+JOSHSTATE\s*===\s*"undefined"/.test(client), true);
+  t('הלקוח מוגן מגלאי שזורק',
+    /try\s*\{[\s\S]{0,200}JOSHSTATE\.state\(\)[\s\S]{0,200}catch/.test(client), true);
+
+  /* ---------- 4ב. התיקון של ״תאוריה מדברת״ — שלב 7 ----------
+
+     האפליקציה השתים־עשרה יושבת בריפו נפרד שאינו נגיש מכאן
+     (`O-9`), ולכן החיווט שלה שמור כתיקון: `tutor-api/theory.patch`.
+     **פקודה אחת של הבעלים מחילה אותו**, ואחרי זה אין הזדמנות
+     שנייה זולה.
+
+     **והתיקון הזה מתיישן בשקט.** הוא נכתב לפני שכבת הפנים, ולכן
+     הוא הוסיף `/tutor/tutor.js` לבד. שתים־עשרה האפליקציות מצרפות
+     מראש גם את `/tutor/josh-face.js` וגם את `/img/josh.jpg`, וכל
+     נתיב משותף חדש שייכנס אליהן יחזור על אותה סחיפה: התיקון היה
+     מביא לתאוריה בוט בלי פנים, בלי שגיאה ובלי שאיש ירגיש.
+
+     לכן הבדיקה **נגזרת ואינה מונה**: היא אוספת את הנתיבים
+     המוחלטים תחת `/tutor/` ו-`/img/` שרוב האפליקציות מצרפות
+     מראש, ודורשת שהתיקון יישא את כולם. `josh-state.js` אינו
+     נכנס — הוא בטייס באפליקציה אחת, וזה רוב של אחת. */
+  const PATCH = path.join(ROOT, 'tutor-api', 'theory.patch');
+  if (!fs.existsSync(PATCH)) { bad++; console.log('✗ tutor-api/theory.patch אינו קיים') }
+  else {
+    const pt = fs.readFileSync(PATCH, 'utf8');
+    const count = {};
+    for (const a of APPS) {
+      const sw = path.join(ROOT, a, 'sw.js');
+      if (!fs.existsSync(sw)) continue;
+      for (const m of fs.readFileSync(sw, 'utf8').matchAll(/["'](\/(?:tutor|img)\/[^"']+)["']/g))
+        count[m[1]] = (count[m[1]] || 0) + 1;
+    }
+    /* רוב האפליקציות, ולא כולן: נתיב טייס אינו חוב על התיקון. */
+    const shared = Object.keys(count).filter(k => count[k] > APPS.length / 2).sort();
+    /* **רק מה שנוסף ל-`sw.js`, ולא כל מופע בתיקון.** הניסוח
+       הראשון חיפש את הנתיב בתיקון כולו, ואז תגית `<script>`
+       הספיקה — נמדד: מחיקת `/tutor/josh-face.js` מה-`PRECACHE`
+       **לא הפילה את הבדיקה**, מפני שהשם נשאר בתגית. לכן נחתך
+       חלק ה-`sw.js` של התיקון, ונסרקות שורות ה-`+` שבו בלבד. */
+    const swPart = pt.slice(pt.indexOf('+++ b/sw.js'));
+    const pre = new Set();
+    for (const m of swPart.matchAll(/^\+\s*["']([^"']+)["']\s*,/gm)) pre.add(m[1]);
+    const missing = shared.filter(k => !pre.has(k));
+    t('התיקון מצרף מראש את כל הנתיבים המשותפים', missing, []);
+    /* וסדר הטעינה: `tutor.js` קורא ל-JOSHFACE, ולכן הפנים לפניו.
+       בסדר הפוך אין שגיאה — הקריאה מוגנת ב-typeof — ופשוט אין
+       פנים, וזה בדיוק סוג הכשל שאינו צועק. */
+    const iFace = pt.indexOf('josh-face.js"></script>');
+    const iTut  = pt.indexOf('tutor.js"></script>');
+    t('בתיקון, josh-face.js נטען לפני tutor.js', iFace >= 0 && iTut > iFace, true);
+    /* התיקון מעלה את BUILD של הריפו ההוא — שם הוא מקור אמת אחד
+       ומפתח הקאש נגזר ממנו. בלי ההעלאה מי שהתקין לא יקבל כלום.
+
+       **וההשוואה מספרית, ולא ״יש שורה״.** הניסוח הראשון חיפש
+       `+const BUILD = 'vNN'` בלבד, ולכן החלפת `v99` ל-`v98`
+       **לא הפילה אותו** — הוא ראה שורה שנוספה ולא שאל לאיזה
+       ערך. שורה שמחזירה את אותו מספר אינה העלאה. */
+    const bOld = pt.match(/^-const BUILD = 'v(\d+)';$/m);
+    const bNew = pt.match(/^\+const BUILD = 'v(\d+)';$/m);
+    t('התיקון מעלה את BUILD של הריפו הנפרד',
+      !!(bOld && bNew) && +bNew[1] > +bOld[1], true);
+  }
 
   /* ---------- 5. תפקיד לכל אפליקציה ---------- */
   t('לכל שתים־עשרה האפליקציות יש תפקיד',
@@ -238,12 +360,87 @@ import(WORKER).then(W => {
       { 'claude-opus-5':1, 'claude-opus-4-8':1, 'claude-sonnet-5':1, 'claude-haiku-4-5':1 },
       W.MODEL), true);
 
+  /* ---------- 5b·2. מגדר הקול ----------
+     **ג׳וש מדבר בקול נשי (הוראת הבעלים, 13.9.2026), אבל לא על
+     חשבון קול חי.** `voiceUsable` נשאר מפתח המיון הראשון: קול
+     נוירלי שנבחר לפי מגדר בזמן שאין רשת הוא שקט, ושקט גרוע
+     מקול גברי. הכלל כתוב ב-CLAUDE.md, וכאן הוא נבדק.
+
+     שלוש הפונקציות נחלצות מהמקור ורצות ב-vm מול רשימת קולות
+     מזויפת — אין כאן דפדפן עם קולות מותקנים, ובדיקה שהייתה
+     מסתמכת על כאלה לא הייתה רצה אף פעם. */
+  (function () {
+    const grab = re => { const m = client.match(re); return m ? m[0] : '' };
+    const src = [
+      grab(/var VOICE_F=\/[\s\S]*?\/;/),
+      grab(/var VOICE_M=\/[\s\S]*?\/;/),
+      grab(/function femScore\(v\)\{[\s\S]*?\n\}/),
+      grab(/function voiceUsable\(v\)\{[\s\S]*?\n\}/),
+      grab(/function pickVoice\(code\)\{[\s\S]*?\n\}/)
+    ];
+    if (src.some(x => !x)) { t('נחלצו חמשת חלקי בחירת הקול', false, true); return }
+    const ctx = { _netVoiceOK: true, navigator: { onLine: true }, out: null,
+                  voices: () => ctx.LIST };
+    vm.createContext(ctx);
+    vm.runInContext(src.join('\n') + '\nout = { pick: pickVoice, fem: femScore };', ctx);
+    const V = (name, local) => ({ name: name, lang: 'he-IL', localService: local !== false });
+
+    ctx.LIST = [V('Microsoft Asaf'), V('Google עברית'), V('Carmit')];
+    t('בוחר את הקול הנשי מבין קולות מקומיים',
+      (ctx.out.pick('he-IL') || {}).name, 'Carmit');
+
+    /* קול נשי מת מול קול גברי חי — הגברי מנצח, וזה העיקר. */
+    ctx.LIST = [V('Microsoft Asaf'), V('Microsoft Hila Online (Natural)', false)];
+    ctx._netVoiceOK = false;
+    t('קול נשי שאינו זמין אינו גובר על קול גברי חי',
+      (ctx.out.pick('he-IL') || {}).name, 'Microsoft Asaf');
+    ctx._netVoiceOK = true;
+    t('כשהרשת חזרה — הנשי חוזר לנצח',
+      (ctx.out.pick('he-IL') || {}).name, 'Microsoft Hila Online (Natural)');
+
+    /* ״google״ הוא שם יצרן ולא מגדר. אם ייספר כנשי, ״Google עברית״
+       — שהוא גברי בחלק מהמכשירים — ייבחר דווקא כשמבקשים נשי. */
+    t('שם יצרן אינו מגדר', ctx.out.fem(V('Google עברית')), 1);
+    t('שם נשי מזוהה',      ctx.out.fem(V('Carmit')), 2);
+    t('שם גברי מזוהה',     ctx.out.fem(V('Microsoft Asaf')), 0);
+  })();
+
   /* ---------- 5c. תקרות העלות ----------
      הן החסם היחיד בין הבעלים לבין חשבון פתוח. שינוי כלפי מעלה
      הוא החלטה עסקית, ולכן הוא צריך להיראות בדיף. */
-  t('תקרה יומית לשירות כולו', W.LIM.globalPerDay <= 100, true);
-  t('תקרה יומית לכתובת אחת',  W.LIM.perDay <= 20, true);
+  /* **שתי התקרות אינן אותו דבר, וזה מה שנבדק כאן.** עד
+     13.9.2026 הגלובלית הייתה 100 — חמישה לומדים ברמת ה-`perDay`
+     שלהם מילאו אותה, וגורם חיצוני אחד ב-`curl` היה משתיק את ג׳וש
+     לכולם. לכן שלוש טענות ולא אחת: גלובלית שהיא חסם עלות (תקרה
+     עליונה), תקרת לומד שנשארת קטנה, ו**היחס ביניהן** — לפחות
+     פי עשר, אחרת פיצול התקרה קיים בשם בלבד. */
+  t('חסם העלות הגלובלי קיים ואינו פתוח', W.LIM.globalPerDay <= 1000, true);
+  t('תקרה יומית לכתובת אחת',             W.LIM.perDay <= 20, true);
+  t('כתובת אחת אינה יכולה למלא את הגלובלית',
+    W.LIM.globalPerDay >= W.LIM.perDay * 10, true);
   t('תקרת אורך התשובה',       W.MAX_TOKENS <= 700, true);
+
+  /* ---------- 5d. איזו תקרה נגמרה ----------
+     `overLimit` מחזיר מילה ולא בוליאני, מפני שההבדל מגיע ללומד:
+     ״מספיק להיום״ נכון כשהוא מילא את שלו, ושקר כשמישהו אחר מילא
+     את הגלובלית. בוליאני אחד לשני מצבים הוא הכשל השקט. */
+  const kv = (map) => ({ RATE: {
+    get: async k => (k in map ? String(map[k]) : null),
+    put: async () => {}
+  } });
+  const day = new Date().toISOString().slice(0, 10);
+  const K = ip => 'd:' + day + ':' + ip;
+  await (async () => {
+    t('יש מקום — overLimit מחזיר null', await W.overLimit(kv({}), '1.2.3.4'), null);
+    t('תקרת הלומד נגמרה — "you"',
+      await W.overLimit(kv({ [K('1.2.3.4')]: W.LIM.perDay }), '1.2.3.4'), 'you');
+    t('חסם העלות נגמר — "all"',
+      await W.overLimit(kv({ [K('ALL')]: W.LIM.globalPerDay }), '1.2.3.4'), 'all');
+    /* לומד אחר, שהגלובלית פנויה והשלו ריקה — עובד. זו כל
+       הנקודה של הפיצול: מי שמילא את שלו אינו חוסם את השני. */
+    t('לומד שמילא אינו חוסם לומד אחר',
+      await W.overLimit(kv({ [K('1.2.3.4')]: W.LIM.perDay }), '5.6.7.8'), null);
+  })();
   /* בלי KV אין מונה, ובלי מונה אין תקרה יומית — כלומר כל ההגנה
      על העלות תלויה בקישור אחד שקל לשכוח בהקמה. נכשל־סגור. */
   t('בלי KV השירות מסרב',            W.noCounter({}), true);

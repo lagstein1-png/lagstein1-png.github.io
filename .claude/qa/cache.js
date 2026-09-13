@@ -78,12 +78,42 @@ function keyOnMain(app) {
   }
   return null;
 }
-/* מה נחשב "התוכן של האפליקציה": התיקייה שלה, ו-legal/ שכל sw.js מצרף
-   מראש. בשורש — רק הקבצים שהשורש מגיש בעצמו, לא תיקיות האפליקציות. */
+/* מה נחשב "התוכן של האפליקציה": התיקייה שלה, ו**כל נתיב משותף
+   שה-sw.js שלה מצרף מראש** — כלומר כל מחרוזת ב-`PRE` שמתחילה
+   בלוכסן. בשורש — רק מה שהשורש מגיש בעצמו, לא תיקיות האפליקציות.
+
+   **הרשימה נגזרת ואינה כתובה, וזה תיקון של באג אמיתי.** עד
+   13.9.2026 ישבה כאן `['legal']` קשיחה, מהיום שבו `legal/` היה
+   הנתיב המשותף היחיד. מאז נוספו `/tutor/tutor.js`,
+   `/tutor/josh-face.js` ו-`/img/josh.jpg` — שלושתם מצורפים מראש
+   בשלושה־עשר ה-`sw.js` — ו-`CLAUDE.md` אף אומר במפורש ״נגעת
+   ב-`tutor/tutor.js` — העלה את כל שלושה־עשר המפתחות יחד״.
+   **הכלל היה כתוב ולא נאכף:** שינוי ב-`tutor/tutor.js` הפיל את
+   השורש בלבד, ושתים־עשרה האפליקציות היו יוצאות עם מפתח ישן
+   ותוכן חדש — כלומר מי שכבר התקין אותן לא היה מקבל את השינוי
+   לעולם. נתפס בשלב 4, כשהקובץ באמת השתנה.
+
+   גזירה מ-`PRE` ולא רשימה חדשה, מפני שרשימה חדשה תתיישן בדיוק
+   כמו זו שקדמה לה — הנתיב המשותף הבא ייכנס ל-`PRE` ולא לכאן. */
+function sharedPaths(app) {
+  const sw = app === '.' ? path.join(ROOT, 'sw.js') : path.join(ROOT, app, 'sw.js');
+  if (!fs.existsSync(sw)) return [];
+  const src = fs.readFileSync(sw, 'utf8');
+  const blk = src.match(/const\s+PRE\s*=\s*\[([\s\S]*?)\]/);
+  if (!blk) return [];
+  const out = new Set();
+  for (const m of blk[1].matchAll(/["'](\/[^"']+)["']/g)) {
+    /* התיקייה הראשונה בנתיב, לא הקובץ: שינוי באח שלו באותה
+       תיקייה משותפת נוגע לאותה אפליקציה בדיוק אותו דבר. */
+    const seg = m[1].split('/')[1];
+    if (seg) out.add(seg);
+  }
+  return [...out];
+}
 function changedSinceMain(app) {
   const paths = app === '.'
     ? ['index.html', 'sw.js', 'manifest.json', 'img', 'legal', 'voice', 'tutor']
-    : [app, 'legal'];
+    : [app].concat(sharedPaths(app));
   const out = git(['diff', '--name-only', MAIN, '--'].concat(paths));
   if (out === null) return null;
   return out.split('\n').filter(Boolean);

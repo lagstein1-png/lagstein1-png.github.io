@@ -124,10 +124,25 @@ var CSS = [
 "@keyframes jf-nod{0%,100%{transform:translateY(0)}45%{transform:translateY(3px)}}",
 
 /* ----------------------------------------------------------------
-   מצב תמונה. הדיוקן הוא תצלום, ולכן **אין כאן מצמוץ ואין סנכרון
-   שפתיים**: אי אפשר לחתוך עיניים עצומות מפריים שעיניו פתוחות.
-   המצב נאמר במה שכן אפשר על תצלום — הטיית ראש, קנה מידה, והנורית.
-   וריאנטים של אותה דמות יחזירו את המצמוץ; ראו O-54.
+   מצב תמונה.
+
+   **הבעיה שנפתרה כאן, ואיך.** יש פריים אחד — `img/josh.jpg`,
+   200×300 — ואי אפשר לחתוך ממנו עיניים עצומות. הגרסה הראשונה
+   הסיקה מזה שאין מצמוץ ואין תנועת פה בתצלום, וזה היה מוקדם מדי:
+   **הפריים היחיד מכיל את הפיקסלים הדרושים לשניהם.**
+
+   המצמוץ הוא **העור שמעל העין**, מוסט כלפי מטה ל-120 מילישניות
+   דרך מסכת אליפסה שיושבת בדיוק על העין. אלה פיקסלים אמיתיים של
+   אותו אדם ולא כתם בצבע עור, ולכן אין תחושת ציור על תצלום.
+
+   תנועת הפה היא **אזור הפה עצמו**, נמתח אנכית עד 5% סביב ציר
+   שמתחת לאף. המסכה היא מדרג רדיאלי ולכן אין קצה נראה, וכשהאנימציה
+   עומדת השכבה זהה לתצלום שמתחתיה — כלומר בלתי נראית.
+
+   שלוש המסכות נמדדו על הקובץ, לא נוחשו: ראו `FACE.md`.
+
+   מה שווריאנטים יוסיפו: חיוך אמיתי, פה פתוח לדיבור, וכיוון מבט.
+   ראו O-54 — הוא נשאר פתוח, ומה שנסגר כאן הוא המצמוץ והלסת.
    ---------------------------------------------------------------- */
 ".jf--photo{overflow:visible}",
 /* `aspect-ratio` שומר את המקום לפני שהתצלום נטען. בלעדיו `height:auto`
@@ -135,19 +150,48 @@ var CSS = [
    לקפל ולכן `loading="lazy"` דוחה את הטעינה, נמדד בכרום `height:0px`
    ו-`naturalWidth:0`: הפנים פשוט לא היו שם. היחס הוא זה של הקובץ,
    200×300, ולכן הוא שומר את המראה בדיוק ורק מונע את הקפיצה. */
+/* `.jf__fx` נושאת את מצבי ההטיה, ולא `.jf__ph` — שלוש שכבות
+   התנועה חייבות לזוז עם התצלום. שכבה שנשארת ישרה בזמן שהתצלום
+   מוטה -3° מזיזה את העפעף אל מחוץ לעין. */
+".jf__fx{position:relative;display:block;transform-origin:50% 88%;",
+"  transition:transform .5s cubic-bezier(.22,.8,.3,1)}",
 ".jf--photo .jf__ph{display:block;width:100%;height:auto;aspect-ratio:2/3;",
 "  object-fit:cover;border-radius:50%;",
 "  box-shadow:0 2px 10px rgba(20,40,50,.12),0 10px 26px rgba(20,40,50,.10);",
 "  transform-origin:50% 88%;transition:transform .5s cubic-bezier(.22,.8,.3,1)}",
-'.jf--photo[data-state="listening"] .jf__ph,.jf--photo[data-state="stuck"] .jf__ph{transform:rotate(-3deg)}',
-'.jf--photo[data-state="thinking"] .jf__ph{transform:rotate(2.5deg) translateY(-2px)}',
-'.jf--photo[data-state="frustrated"] .jf__ph,.jf--photo[data-state="slow"] .jf__ph{transform:rotate(-1.5deg)}',
+'.jf--photo[data-state="listening"] .jf__fx,.jf--photo[data-state="stuck"] .jf__fx{transform:rotate(-3deg)}',
+'.jf--photo[data-state="thinking"] .jf__fx{transform:rotate(2.5deg) translateY(-2px)}',
+'.jf--photo[data-state="frustrated"] .jf__fx,.jf--photo[data-state="slow"] .jf__fx{transform:rotate(-1.5deg)}',
 /* טעות: הטיה קטנה פנימה, כמו מי שמתקרב להסתכל יחד. לא ריחוק. */
-'.jf--photo[data-state="wrong"] .jf__ph{transform:rotate(-2.5deg) scale(1.01)}',
-'.jf--photo[data-state="correct"] .jf__ph,.jf--photo[data-state="encourage"] .jf__ph{transform:translateY(-3px) scale(1.02)}',
-'.jf--photo[data-state="speaking"] .jf__ph{animation:jf-ph-talk 1.5s ease-in-out infinite}',
+'.jf--photo[data-state="wrong"] .jf__fx{transform:rotate(-2.5deg) scale(1.01)}',
+'.jf--photo[data-state="correct"] .jf__fx,.jf--photo[data-state="encourage"] .jf__fx{transform:translateY(-3px) scale(1.02)}',
+'.jf--photo[data-state="speaking"] .jf__fx{animation:jf-ph-talk 1.5s ease-in-out infinite}',
 "@keyframes jf-ph-talk{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}",
-".jf--photo.is-tilt .jf__ph{transform:rotate(-1.5deg)}",
+".jf--photo.is-tilt .jf__fx{transform:rotate(-1.5deg)}",
+
+/* --- שלוש שכבות התנועה על התצלום --- */
+/* כולן שואבות מאותו `--jf-ph`, שהוא אותו קובץ שכבר במטמון: אפס
+   בקשת רשת נוספת, ואפס נכס חדש. */
+".jf__plid,.jf__pjaw{position:absolute;inset:0;pointer-events:none}",
+".jf__plid>i,.jf__pjaw>i{position:absolute;inset:0;display:block;",
+"  background-image:var(--jf-ph);background-size:100% 100%;background-repeat:no-repeat;",
+"  border-radius:50%}",
+/* העפעף: העור שמעל העין, מוסט מטה. 3.1% מגובה התיבה הם כתשעה
+   פיקסלים במקור — המרחק בין קו הריסים לקפל שמעליו. */
+".jf__plid{opacity:0}",
+".jf__plid>i{transform:translateY(3.1%)}",
+".jf__plid--a{-webkit-mask-image:radial-gradient(ellipse 7% 2.6% at 59% 28.4%,#000 55%,transparent 100%);",
+"  mask-image:radial-gradient(ellipse 7% 2.6% at 59% 28.4%,#000 55%,transparent 100%)}",
+".jf__plid--b{-webkit-mask-image:radial-gradient(ellipse 7.5% 2.8% at 83% 32.2%,#000 55%,transparent 100%);",
+"  mask-image:radial-gradient(ellipse 7.5% 2.8% at 83% 32.2%,#000 55%,transparent 100%)}",
+".jf--photo.is-blink .jf__plid{opacity:1}",
+/* הלסת: אזור הפה, נמתח אנכית סביב ציר שמתחת לאף. כשהאנימציה
+   עומדת השכבה זהה למה שמתחתיה, ולכן אינה נראית כלל. */
+".jf__pjaw{-webkit-mask-image:radial-gradient(ellipse 13% 6% at 65% 47.5%,#000 45%,transparent 100%);",
+"  mask-image:radial-gradient(ellipse 13% 6% at 65% 47.5%,#000 45%,transparent 100%)}",
+".jf__pjaw>i{transform-origin:65% 41%}",
+'.jf--photo[data-state="speaking"] .jf__pjaw>i{animation:jf-jaw .22s ease-in-out infinite alternate}',
+"@keyframes jf-jaw{from{transform:scaleY(1)}to{transform:scaleY(1.05)}}",
 
 /* הטבעת והנורית יושבות מעל התצלום ולא בתוכו */
 /* הטבעת: `border-color` חייב להיקבע בכל מצב. בגרסה הראשונה הוא
@@ -171,7 +215,8 @@ var CSS = [
    הקשת ואת ההנהון, ולא רק את הפה. */
 "@media (prefers-reduced-motion: reduce){",
 "  .jf *,.jf{animation:none!important;transition:none!important}",
-"  .jf__head,.jf--photo .jf__ph{transform:none!important}",
+"  .jf__head,.jf--photo .jf__fx,.jf--photo .jf__fx *{transform:none!important}",
+  "  .jf--photo .jf__plid{opacity:0!important}",
 "}"
 ].join("");
 
@@ -372,8 +417,17 @@ var JOSHFACE = {
       /* `decoding="async"` ו-`loading="lazy"`: הדיוקן לא יעכב את
          הציור הראשון של האפליקציה. `alt=""` כי זה קישוט — מה שיש
          לג׳וש לומר יושב בטקסט שלידו. */
-      return '<span class="jf jf--photo" data-state="' + cur + '" style="width:' + px + 'px">' +
-               '<img class="jf__ph" src="' + photoURL + '" alt="" decoding="async" loading="lazy">' +
+      return '<span class="jf jf--photo" data-state="' + cur + '" style="width:' + px +
+               "px;--jf-ph:url('" + photoURL + "')\">" +
+               '<span class="jf__fx">' +
+                 '<img class="jf__ph" src="' + photoURL + '" alt="" decoding="async" loading="lazy">' +
+                 /* שלוש שכבות התנועה. `aria-hidden` מיותר — `<i>` ריק
+                    אינו נקרא — אבל `pointer-events:none` כן נדרש, והוא
+                    ב-CSS. */
+                 '<i class="jf__plid jf__plid--a"><i></i></i>' +
+                 '<i class="jf__plid jf__plid--b"><i></i></i>' +
+                 '<i class="jf__pjaw"><i></i></i>' +
+               '</span>' +
                '<span class="jf__halo"></span><span class="jf__dot"></span>' +
              '</span>';
     }
@@ -397,6 +451,9 @@ var JOSHFACE = {
   photo: function (url) {
     if (url === undefined || url === null || url === "") { photoURL = ""; return true }
     if (/^[a-z]+:/i.test(String(url)) || String(url).indexOf("//") === 0) return false;
+    /* הנתיב נכנס גם ל-`url('…')` שבתוך style, ולכן גרש, מירכאות,
+       סוגר או רווח פוסלים אותו. נתיב אמיתי אינו מכיל אותם. */
+    if (/['"()\s\\]/.test(String(url))) return false;
     photoURL = String(url);
     return true;
   },
@@ -408,8 +465,9 @@ var JOSHFACE = {
     nodes = el ? [el] : [].slice.call(document.querySelectorAll(".jf"));
     if (!nodes.length) return false;
     paint();
-    /* במצב תמונה אין עפעפיים, ולכן אין טעם בטיימר. */
-    if (!photoURL) scheduleBlink();
+    /* גם לתצלום יש עפעפיים מאז 13.9.2026 — שכבת העור שמעל העין.
+       הטיימר אחד לשני המצבים. */
+    scheduleBlink();
     return nodes.length;
   },
 

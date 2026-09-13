@@ -1046,7 +1046,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m73 · 2026-09-12";
+var BUILD="m74 · 2026-09-13";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -7838,7 +7838,31 @@ window.addEventListener("legal:lang",function(e){
    וה-Tab הבא חוזר לסרגל שדילגנו עליו. */
 function wrapMain(h){return '<main id="main" tabindex="-1">'+(h||"")+'</main>'}
 
+/* ---- ג׳וש: גלאי מצב הלומד ------------------------------------------
+   `tutor/josh-state.js` הוא **גלאי ותו לא**: הוא מקבל תוצאה של
+   שאלה ומחזיר מילה אחת מארבע. הוא אינו בוחר שאלה, אינו נוגע
+   ב-`state`, אינו משנה רמה ואין לו אחסון — המצב בזיכרון, וסגירת
+   הלשונית שוכחת.
+
+   `jsAnswer` נקרא **פעם אחת לשאלה**, מתוך פונקציית הניקוד, ולכן
+   שאלה שנענתה לא־נכון פעמיים היא שאלה שגויה אחת.
+
+   `hint` נקרא מהדגלים שכבר קיימים בסיבוב — אין כאן דגל חדש.
+   -------------------------------------------------------------------- */
+function jsOn(){ return typeof JOSHSTATE!=="undefined" }
+function jsAnswer(ok){
+  if(!jsOn()||typeof P==="undefined"||!P)return;
+  var t0=P.jsT0,hint=!!(P.hint||P.hints||P.usedHelp);
+  JOSHSTATE.answer({ok:!!ok,ms:t0?Date.now()-t0:null,hint:hint});
+  P.jsT0=0;
+}
+/* המבחן הכיתתי אינו מביט בהתקדמות הלומד: כל דבר שמשתנה מלומד
+   ללומד מפצל את המבחן לשניים. השער יושב ב-render ולא ליד כל
+   השמה ל-view, מפני ש-view נכתב בעשרות מקומות ו-render רץ אחרי
+   כל אחד מהם. */
+var JS_OFF={sit:1,exam:1,marks:1,badexam:1,oldexam:1,sim:1};
 function render(){ try{lgChrome()}catch(e){}
+  if(jsOn()){ if(JS_OFF[view])JOSHSTATE.off(); else JOSHSTATE.on() }
   applyModes();
   lvlSync();
   /* מבחן שהגיע מקישור עוקף הכול, כולל מסך הפתיחה: מי שנכנס
@@ -9200,11 +9224,13 @@ function viewBadExam(msg){
 function newQuestion(){
   var prev=P.q?P.q.idx:undefined;
   P.q=buildQuestion(state.topic,state.level,prev);
+  P.jsT0=Date.now();
   P.picked=-1; P.done=false; P.ok=false; P.hint=false;
   render();
 }
 function record(ok){
   var q=P.q; if(!q)return;
+  jsAnswer(ok);
   P.rres.push(!ok?"no":(P.hint?"hp":"ok"));
   var s=stOf(q.tid,q.lv); s.seen++; ok?s.ok++:s.bad++;
   var r=itemRec(q.id); r.n++; if(ok)r.ok++;
@@ -9445,6 +9471,7 @@ render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
+<script src="/tutor/josh-state.js"></script>
 <script src="/tutor/tutor.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
@@ -9453,7 +9480,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m73-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m74-pwa1").catch(function(){});
   });
 }
 </script>

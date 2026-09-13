@@ -1,12 +1,17 @@
 /* ============================================================
    מבצע השקה — שכבה מעל דף הבית.
 
-   שלושה דברים, ואף אחד מהם אינו נוגע בנתוני הכרטיסים:
+   שני דברים, ואף אחד מהם אינו נוגע בנתוני הכרטיסים:
    1. חלון קופץ, פעם ב-7 ימים (localStorage: launch-popup-seen).
    2. תגיות המחיר (.t.price) מקבלות ״חינם בתקופת ההשקה״; ״חינם״
       מקבלת ״חינם לתמיד״; תגית עם data-launch-done="1" לא נוגעים בה.
-   3. ״תאוריה מדברת״ (הכרטיס data-app="theory") נשארת בתשלום: המחיר
-      המלא חוצה, לידו מחיר המבצע, וכפתור ״לרכישה״ אל theory/buy.html.
+
+   **ואין חריג.** ״תאוריה מדברת״ (הכרטיס data-app="theory") נשארה
+   בתשלום עד 13.9.2026 — המחיר המלא חוצה, לידו 79 ₪, וכפתור
+   ״לרכישה״ אל theory/buy.html. הבעלים ביטל את החריג בלשונו ״לא
+   כלום לא בתשלום״, ולכן הכרטיס שלה עובר דרך tags() כמו כל השאר.
+   המחירים עצמם נשמרו ב-theory/buy.html וב-pricing/ ונכנסים לתוקף
+   בסיום המבצע; מה שהוסר הוא הגבייה, לא הנתון.
 
    הכרטיסים נבנים מחדש ב-draw() בכל סינון, חיפוש והחלפת שפה, ולכן
    השכבה מאזינה ל-#grid ורצה שוב אחרי כל ציור. תגית שכבר עברה
@@ -19,12 +24,15 @@
 "use strict";
 
 var KEY="launch-popup-seen", DAYS=7, DAY=24*60*60*1000;
-var SEL=".t.price", THEORY_SALE="79 ₪", BUY_URL="/theory/buy.html";
+var SEL=".t.price";
 /* השדה (U+0651) יושב בין ج ל-ا ב-"مجّاني", ולכן "مجان" חלק
    לא התאים: חמש האפליקציות החינמיות קיבלו בערבית מחיר בקו חוצה
    ו"חינם בתקופת ההשקה", במקום "חינם לתמיד". */
 var FREE=/חינם|free|مجّ?ان|бесплатно/i;
 
+/* `sale` ו-`buy` אינן בשימוש כל עוד המבצע כולל את הכול (סעיף 3
+   למעלה). הן נשמרו ולא נמחקו: ארבע שפות שיחזרו עם מסלול הרכישה,
+   ואין טעם לתרגם אותן מחדש. */
 var T={
   he:{dir:"rtl", title:"🎉 מבצע השקה",
       text:"כל האפליקציות פתוחות עכשיו בחינם – ללא חיוב, עד להודעה חדשה.",
@@ -158,31 +166,8 @@ function tags(root,opts){
   return n;
 }
 
-/* --- ״תאוריה מדברת״ נשארת בתשלום --- */
-function theory(root){
-  root=root||document;
-  var card=root.querySelector('[data-app="theory"]'); if(!card)return false;
-  var s=S(), tag=card.querySelector(SEL);
-  if(tag&&tag.getAttribute("data-launch-done")!=="1"){
-    var text=tag.textContent.trim();
-    tag.textContent="";
-    var old=el("s","",text); old.setAttribute("dir","auto");
-    var sale=el("b","launch-sale",s.sale.replace("{p}",THEORY_SALE)); sale.setAttribute("dir",s.dir);
-    tag.appendChild(old); tag.appendChild(document.createTextNode(" ")); tag.appendChild(sale);
-    tag.className+=" launch-tagged";
-    tag.setAttribute("data-launch-done","1");
-  }
-  var act=card.querySelector(".act");
-  if(act&&!act.querySelector(".launch-buy")){
-    var a=el("a","get launch-buy",s.buy); a.href=BUY_URL;
-    a.addEventListener("click",function(){track("theory-buy-click")});
-    act.appendChild(a);
-  }
-  return true;
-}
-
 /* --- הפעלה בדף הבית --- */
-function apply(quiet){ theory(); tags(null,{quiet:quiet}); }
+function apply(quiet){ tags(null,{quiet:quiet}); }
 
 /* בביקור הראשון שער התנאים (legal/protect.js, .lg-wrap) פתוח, והוא
    יושב מעל הכול. שני חלונות מודאליים יחד — השני אינו נגיש ואינו
@@ -207,5 +192,5 @@ function init(){
 }
 
 window.LAUNCH={KEY:KEY,DAYS:DAYS,shouldShow:shouldShow,markSeen:markSeen,
-  popup:popup,close:closePopup,tags:tags,theory:theory,track:track,init:init};
+  popup:popup,close:closePopup,tags:tags,track:track,init:init};
 })();
