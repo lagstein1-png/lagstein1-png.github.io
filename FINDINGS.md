@@ -111,6 +111,65 @@ bagrut-806/speech.js`), ובמנוע המזויף של `voice.js` כולן בח�
 0.82 — אף אפליקציה אינה טוענת אותו, ואפליקציה חדשה נולדת מהעתקת
 אפליקציה ב-`main`, לא ממנו. נשאר כפי שהוא.
 
+### 13.9.2026 — האתר החי נבדק מהרנר: שלושה־עשר דפים 200, שלושה־עשר מפתחות תואמים, וג׳וש מגיע ב-HTML
+
+**הבקשה:** לולאת `curl` על שלושה־עשר הדפים, ואז לחפש ״ג׳וש״
+ב-HTML שמגיע מהשרת לדף הבית ול-`math-app`.
+
+**מהסביבה זה לא ניתן, ונמדד ולא הונח:** כל שלושה־עשר הדפים
+החזירו `000`, ו-`curl -v` הראה `CONNECT tunnel failed, response
+403` מהפרוקסי. זה בדיוק מה ש-`CLAUDE.md` אומר בסעיף ״הרשת חסומה
+בסביבת הפיתוח״, והדרך היא `live-check.yml`.
+
+**ה-workflow לא ענה על השאלה כפי שנשאלה, ולכן הורחב:** הוא בדק
+שתים־עשרה אפליקציות ואת `tutor/tutor.js`, אבל **לא את דף הבית**
+ולא אם ״ג׳וש״ מגיע בפועל ב-HTML של דף. נוספו שורת `home` לטבלה
+(מפתח מוגש מול `index.html`) ומניין `grep -o 'ג׳וש' | wc -l` על
+דף הבית ועל `math-app` כפי שהשרת החזיר. הופעל על הענף ולא על
+`main` — `workflow_dispatch` מקבל `ref`.
+
+**הפלט, ריצה 5 (`actions/runs/34775527809`, `7cff592`):**
+
+    math-app    HTTP=200 link=✓ served=b80-pwa1 main=b80-pwa1
+    math-teen   HTTP=200 link=✓ served=t77-pwa1 main=t77-pwa1
+    math-uni    HTTP=200 link=✓ served=u78-pwa1 main=u78-pwa1
+    math-uni2   HTTP=200 link=✓ served=v76-pwa1 main=v76-pwa1
+    math-uni3   HTTP=200 link=✓ served=g76-pwa1 main=g76-pwa1
+    english     HTTP=200 link=✓ served=n69-pwa1 main=n69-pwa1
+    ulpan       HTTP=200 link=✓ served=a38-pwa1 main=a38-pwa1
+    history     HTTP=200 link=✓ served=m74-pwa1 main=m74-pwa1
+    lomda       HTTP=200 link=✓ served=l57-pwa1 main=l57-pwa1
+    kotvim      HTTP=200 link=✓ served=k13-pwa1 main=k13-pwa1
+    reader      HTTP=200 link=✓ served=46-pwa1  main=46-pwa1
+    bagrut-806  HTTP=200 link=✓ served=x38-pwa1 main=x38-pwa1
+    home        HTTP=200        served=57-pwa1  main=57-pwa1
+    josh-in-served-html  home=8  math-app=4
+    tutor.js  josh-label=✓
+    הכול תקין באתר החי.
+
+**והמניין המוגש זהה למניין בעץ:** `git show origin/main:index.html
+| grep -o 'ג׳וש' | wc -l` = 8, ועל `math-app/index.html` = 4.
+כלומר מה שמוגש הוא `main` בדיוק, בלי עותק ישן ב-CDN.
+
+**איפה ג׳וש יושב בדף הבית** (`grep -n 'ג׳וש' index.html`, 6
+שורות, 8 מופעים כי שורת `DATA` נושאת שלושה): הערת CSS 362,
+הערת HTML 467, הערת HTML 524 לפני `<script src="/tutor/josh-face.js">`
+בשורה 527, שורת `DATA` 760 (`joshT`, `joshLead`, ומשפט ״הן תמונה
+בלבד״), הערה 965, והערה 1035 שאומרת ״ג׳וש אינו יושב כאן״ — תצוגה
+בלבד, כפי ש-`CLAUDE.md` מתאר.
+
+**ב-`math-app`** (`grep -n`, 4 שורות, 4 מופעים): 833 שם החיה
+`petJoshName:"ג׳וש הגאון"`, הערות 1296 ו-1301 ליד שכבת הפנים,
+והערה 1339 ״ג׳וש: מצב הלומד״. הסקריפטים עצמם ב-4456 ו-4458.
+
+**מה לא נמדד:** הכפתור בפועל בדפדפן — זו בדיקת מה שמוגש ולא
+בדיקה בדפדפן; `deployed.js` הוא הכלי לזה, וביד בלבד.
+
+`node .claude/qa/all.js --static` — 28 בדיקות, כולן עברו.
+ריצת `qa.yml` האחרונה על `main` לפני המיזוג: 424, ירוקה, על
+`622619d`.
+
+
 ### שלבים 5 ו-7 — חוזה החיפוש, והתיקון של תאוריה שהתיישן בשקט · 13.9.2026
 
 **שלב 5 — חוזה, ולא ספק.** הבעלים פסל כל ספק חיפוש חיצוני

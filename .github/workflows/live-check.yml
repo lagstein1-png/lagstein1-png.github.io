@@ -68,6 +68,27 @@ jobs:
             echo "$app  HTTP=$CODE  link=$LINK  served=$GOT  main=$WANT"
           done
 
+          # דף הבית — אין לו BUILD, אבל יש לו מפתח קאש (CLAUDE.md, ״גרסאות״)
+          CODE=$(curl -s -o /tmp/home.html -w '%{http_code}' --max-time 30 \
+                 -H 'Cache-Control: no-cache' "$BASE/?cb=$GITHUB_RUN_ID")
+          WANT=$(grep -o 'sw\.js?v=[a-z0-9-]*' index.html | head -1 | sed 's/.*v=//' || true)
+          GOT=$(grep -o 'sw\.js?v=[a-z0-9-]*' /tmp/home.html 2>/dev/null | head -1 | sed 's/.*v=//' || true)
+          if [ "$CODE" != "200" ]; then FAIL=1; fi
+          if [ "$GOT" = "$WANT" ]; then VER="✓"; else VER="✗ מפגר"; FAIL=1; fi
+          echo "| \`home\` | $CODE | – | $GOT | $WANT | $VER |" >> "$GITHUB_STEP_SUMMARY"
+          echo "home  HTTP=$CODE  served=$GOT  main=$WANT"
+
+          # ״ג׳וש״ ב-HTML שמוגש בפועל — דף הבית ו-math-app. גרש עברי U+05F3.
+          # ספירה, לא כן/לא: כמה פעמים המחרוזת מופיעה במה שהשרת החזיר.
+          curl -s --max-time 30 -H 'Cache-Control: no-cache' "$BASE/math-app/?cb=$GITHUB_RUN_ID" -o /tmp/ma.html
+          JH=$(grep -o 'ג׳וש' /tmp/home.html | wc -l)
+          JM=$(grep -o 'ג׳וש' /tmp/ma.html | wc -l)
+          echo "josh-in-served-html  home=$JH  math-app=$JM"
+          {
+            echo ""
+            echo "**״ג׳וש״ ב-HTML המוגש:** דף הבית $JH · math-app $JM (מופעים)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
           # הכפתור של ג׳וש — קובץ אחד, משותף לכולן
           curl -s --max-time 30 "$BASE/tutor/tutor.js?cb=$GITHUB_RUN_ID" -o /tmp/t.js
           if grep -q 'ג׳וש — עזרה מהמורה' /tmp/t.js; then JOSH="✓"; else JOSH="✗"; FAIL=1; fi
