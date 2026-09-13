@@ -49,6 +49,7 @@ he:{ btn:"ג׳וש — עזרה מהמורה", title:"עזרה מהמורה", cl
   err:"לא הצלחתי להתחבר. אפשר לנסות שוב עוד רגע.",
   setup:"העזרה עוד לא מוכנה. אפשר לנסות מאוחר יותר.",
   limit:"מספיק להיום — נמשיך מחר.",
+  limitAll:"זה לא אתה — הגעתי לגבול היומי שלי. אפשר לנסות שוב מחר, וכל השאר באפליקציה עובד.",
   full:"דיברנו על זה הרבה. בוא ננסה, ובשאלה הבאה נתחיל מחדש.",
   privacy:"אל תכתבו כאן שם מלא, כתובת או טלפון.",
   play:"הקראה", stop:"עצירה", rate:"מהירות", off:"אין קול בשפה הזאת במכשיר הזה" },
@@ -58,6 +59,7 @@ ar:{ btn:"جوش — مساعدة من المعلّم", title:"مساعدة من
   err:"لم أتمكّن من الاتصال. حاول مرّة أخرى بعد قليل.",
   setup:"المساعدة ليست جاهزة بعد. حاول لاحقًا.",
   limit:"يكفي لهذا اليوم — نُكمل غدًا.",
+  limitAll:"ليست غلطتك — وصلتُ إلى حدّي اليوميّ. جرّب غدًا، وكلّ شيء آخر في التطبيق يعمل.",
   full:"تحدّثنا كثيرًا عن هذا. لنجرّب، ونبدأ من جديد في التالي.",
   privacy:"لا تكتب هنا اسمك الكامل أو عنوانك أو رقم هاتفك.",
   play:"استماع", stop:"إيقاف", rate:"السرعة", off:"لا يوجد صوت بهذه اللغة على هذا الجهاز" },
@@ -67,6 +69,7 @@ ru:{ btn:"Джош — помощь учителя", title:"Помощь учи�
   err:"Не удалось соединиться. Попробуй ещё раз через минуту.",
   setup:"Помощь ещё не готова. Попробуй позже.",
   limit:"На сегодня хватит — продолжим завтра.",
+  limitAll:"Это не ты — я достиг своего дневного предела. Попробуй завтра, остальное в приложении работает.",
   full:"Мы много об этом говорили. Давай попробуем, а дальше начнём заново.",
   privacy:"Не пиши здесь полное имя, адрес или телефон.",
   play:"Прочитать", stop:"Стоп", rate:"Скорость", off:"На этом устройстве нет голоса для этого языка" },
@@ -76,6 +79,7 @@ en:{ btn:"Josh — ask the teacher", title:"Ask the teacher", close:"Close", sen
   err:"I could not connect. Try again in a moment.",
   setup:"The help is not ready yet. Try again later.",
   limit:"That is enough for today — we will carry on tomorrow.",
+  limitAll:"It is not you — I have reached my daily limit. Try again tomorrow; everything else in the app still works.",
   full:"We have talked about this a lot. Let's try, and start fresh on the next one.",
   privacy:"Do not write your full name, address or phone number here.",
   play:"Read aloud", stop:"Stop", rate:"Speed", off:"This device has no voice for this language" }
@@ -641,7 +645,15 @@ function send(text, auto){
     })
   })
   .then(function(r){
-    if(r.status === 429) throw new Error("limit");
+    /* 429 נושא scope: "you" = התקרה של הלומד, "all" = חסם העלות
+       של השירות. שתיהן 429, ולכן צריך לקרוא את הגוף כדי לדעת מה
+       לומר — ובלי הקריאה הזאת לומד שמישהו אחר מילא את הגלובלית
+       היה שומע ״מספיק להיום״, וזה שקר. גוף שאינו JSON נופל
+       ל-"limit", שהוא הנוסח הזהיר מבין השניים. */
+    if(r.status === 429)
+      return r.json().catch(function(){ return {} }).then(function(j){
+        throw new Error(j && j.scope === "all" ? "limitAll" : "limit");
+      });
     if(r.ok) return r.json();
     /* 500 ו-503 הם תקלת הקמה ולא תקלת רשת: מפתח שלא הוגדר, או
        מונה יומי שלא הוגדר ולא הוצהר. הן נראות בדיוק כמו ״אין
@@ -682,7 +694,8 @@ function send(text, auto){
        מתור של הילד שהוא בעצם שלנו */
     if(auto) MSGS = [];
     var why = String(err && err.message);
-    NOTE = why === "limit" ? t.limit : why === "setup" ? t.setup : t.err;
+    NOTE = why === "limitAll" ? t.limitAll :
+           why === "limit" ? t.limit : why === "setup" ? t.setup : t.err;
     draw();
   });
 }

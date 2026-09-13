@@ -209,6 +209,6 @@ server.listen(PORT, HOST, () => {
     console.log("");
   }
   console.log("  תקרות (מ-worker.js, לא מספרים חדשים): " +
-              LIM.perDay + " פניות ליום לכתובת, " + LIM.globalPerDay + " לכל השירות.");
+              LIM.perDay + " פניות ליום לכתובת, " + LIM.globalPerDay + " חסם עלות לשירות.");
   console.log("");
 });
