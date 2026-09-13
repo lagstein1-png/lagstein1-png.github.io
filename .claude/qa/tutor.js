@@ -194,6 +194,65 @@ import(WORKER).then(W => {
   t('הלקוח מוגן מגלאי שזורק',
     /try\s*\{[\s\S]{0,200}JOSHSTATE\.state\(\)[\s\S]{0,200}catch/.test(client), true);
 
+  /* ---------- 4ב. התיקון של ״תאוריה מדברת״ — שלב 7 ----------
+
+     האפליקציה השתים־עשרה יושבת בריפו נפרד שאינו נגיש מכאן
+     (`O-9`), ולכן החיווט שלה שמור כתיקון: `tutor-api/theory.patch`.
+     **פקודה אחת של הבעלים מחילה אותו**, ואחרי זה אין הזדמנות
+     שנייה זולה.
+
+     **והתיקון הזה מתיישן בשקט.** הוא נכתב לפני שכבת הפנים, ולכן
+     הוא הוסיף `/tutor/tutor.js` לבד. שתים־עשרה האפליקציות מצרפות
+     מראש גם את `/tutor/josh-face.js` וגם את `/img/josh.jpg`, וכל
+     נתיב משותף חדש שייכנס אליהן יחזור על אותה סחיפה: התיקון היה
+     מביא לתאוריה בוט בלי פנים, בלי שגיאה ובלי שאיש ירגיש.
+
+     לכן הבדיקה **נגזרת ואינה מונה**: היא אוספת את הנתיבים
+     המוחלטים תחת `/tutor/` ו-`/img/` שרוב האפליקציות מצרפות
+     מראש, ודורשת שהתיקון יישא את כולם. `josh-state.js` אינו
+     נכנס — הוא בטייס באפליקציה אחת, וזה רוב של אחת. */
+  const PATCH = path.join(ROOT, 'tutor-api', 'theory.patch');
+  if (!fs.existsSync(PATCH)) { bad++; console.log('✗ tutor-api/theory.patch אינו קיים') }
+  else {
+    const pt = fs.readFileSync(PATCH, 'utf8');
+    const count = {};
+    for (const a of APPS) {
+      const sw = path.join(ROOT, a, 'sw.js');
+      if (!fs.existsSync(sw)) continue;
+      for (const m of fs.readFileSync(sw, 'utf8').matchAll(/["'](\/(?:tutor|img)\/[^"']+)["']/g))
+        count[m[1]] = (count[m[1]] || 0) + 1;
+    }
+    /* רוב האפליקציות, ולא כולן: נתיב טייס אינו חוב על התיקון. */
+    const shared = Object.keys(count).filter(k => count[k] > APPS.length / 2).sort();
+    /* **רק מה שנוסף ל-`sw.js`, ולא כל מופע בתיקון.** הניסוח
+       הראשון חיפש את הנתיב בתיקון כולו, ואז תגית `<script>`
+       הספיקה — נמדד: מחיקת `/tutor/josh-face.js` מה-`PRECACHE`
+       **לא הפילה את הבדיקה**, מפני שהשם נשאר בתגית. לכן נחתך
+       חלק ה-`sw.js` של התיקון, ונסרקות שורות ה-`+` שבו בלבד. */
+    const swPart = pt.slice(pt.indexOf('+++ b/sw.js'));
+    const pre = new Set();
+    for (const m of swPart.matchAll(/^\+\s*["']([^"']+)["']\s*,/gm)) pre.add(m[1]);
+    const missing = shared.filter(k => !pre.has(k));
+    t('התיקון מצרף מראש את כל הנתיבים המשותפים', missing, []);
+    /* וסדר הטעינה: `tutor.js` קורא ל-JOSHFACE, ולכן הפנים לפניו.
+       בסדר הפוך אין שגיאה — הקריאה מוגנת ב-typeof — ופשוט אין
+       פנים, וזה בדיוק סוג הכשל שאינו צועק. */
+    const iFace = pt.indexOf('josh-face.js"></script>');
+    const iTut  = pt.indexOf('tutor.js"></script>');
+    t('בתיקון, josh-face.js נטען לפני tutor.js', iFace >= 0 && iTut > iFace, true);
+    /* התיקון מעלה את BUILD של הריפו ההוא — שם הוא מקור אמת אחד
+       ומפתח הקאש נגזר ממנו. בלי ההעלאה מי שהתקין לא יקבל כלום.
+
+       **וההשוואה מספרית, ולא ״יש שורה״.** הניסוח הראשון חיפש
+       `+const BUILD = 'vNN'` בלבד, ולכן החלפת `v99` ל-`v98`
+       **לא הפילה אותו** — הוא ראה שורה שנוספה ולא שאל לאיזה
+       ערך. שורה שמחזירה את אותו מספר אינה העלאה. */
+    const bOld = pt.match(/^-const BUILD = 'v(\d+)';$/m);
+    const bNew = pt.match(/^\+const BUILD = 'v(\d+)';$/m);
+    t('התיקון מעלה את BUILD של הריפו הנפרד',
+      !!(bOld && bNew) && +bNew[1] > +bOld[1], true);
+  }
+
   /* ---------- 5. תפקיד לכל אפליקציה ---------- */
   t('לכל שתים־עשרה האפליקציות יש תפקיד',
     Object.keys(W.ROLE).sort(), APPS.concat(EXTERNAL).sort());

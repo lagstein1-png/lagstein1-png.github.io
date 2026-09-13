@@ -135,6 +135,36 @@ const MODEL = "claude-haiku-4-5";
 const MAX_TOKENS = 700;          /* תשובה קצרה. גבוה מספיק כדי לא להיחתך באמצע משפט */
 const API = "https://api.anthropic.com/v1/messages";
 
+/* ---------- חיפוש: אין ספק, ויש חוזה — שלב 5 ----------
+
+   **הבעלים פסל ספק חיפוש חיצוני ב-12.9.2026** (`O-48`), בלשון
+   מפורשת: אין ויקיפדיה, אין ספק אחר, אין חיפוש מהדפדפן, ואין
+   להציג ״אני בודק״. ג׳וש שאינו יודע אומר שאינו בטוח.
+
+   מה שנשאר פתוח שם הוא **החוזה**, וזה הוא: שדה אחד בתשובה
+   שמבחין בין **ידע המודל** לבין **בדיקה שבוצעה בפועל**.
+
+       checked: false   התשובה היא ידע המודל. שום בקשה חיצונית
+                        לא יצאה, ואין לרמוז ללומד שיצאה.
+       checked: true    יצאה בקשה לספק, היא חזרה, והתשובה
+                        נשענת עליה.
+
+   **היום הוא תמיד `false`, ואין קוד שיכול לכתוב `true`.** זה
+   אינו חוסר אלא המצב שהוחלט, ו-`node .claude/qa/search.js`
+   אוכף את שניהם: שאין ספק מחובר, ושהשדה אינו משקר.
+
+   למה שדה ולא הערה: ההבטחה ״לא ניצור אשליה שג׳וש עשה משהו
+   שלא עשה״ היא הדרישה הראשונה שהבעלים כתב, ו-`josh-engine.js`
+   הפר אותה בלי שאיש התכוון — הוא פנה לוויקיפדיה מפני שהקוד
+   היה שם. הבטחה שאין לה שדה אינה ניתנת לבדיקה.
+
+   **החוזה המלא — קלט, פלט, שגיאות, timeout, מגבלות והחלפת
+   ספק — נמצא ב-`tutor-api/SEARCH.md`**, ו-`search.js` משווה
+   את המסמך לקוד כפי ש-`tutor.js` משווה את `CORE` ל-`JOSH.md`.
+
+   `null` ולא מחרוזת ריקה: ״אין ספק מותקן״ אינו ספק ששמו ריק. */
+const PROVIDER = null;
+
 /* ---------- גבולות הקלט. כל אחד מהם הוא גם תקרת עלות ---------- */
 const LIM = {
   msgs: 14,          /* אורך השיחה שנשלח בחזרה */
@@ -532,12 +562,16 @@ export default {
       out = (again.err || bad(again.text)) ? { text: "" } : again;
     }
 
-    return json({ text: out.text || FALLBACK[inp.lang] || FALLBACK.he }, 200, env, org);
+    /* `checked` — ראו בלוק החיפוש למעלה. `!!PROVIDER` ולא `false`
+       קשיח: ביום שבו ספק יותקן, השדה יאמר את האמת מעצמו במקום
+       להישאר שקר שנשכח. היום `PROVIDER` הוא `null`, ולכן `false`. */
+    return json({ text: out.text || FALLBACK[inp.lang] || FALLBACK.he,
+                  checked: !!PROVIDER }, 200, env, org);
   }
 };
 
 /* מיוצאים בנפרד כדי ש-node .claude/qa/tutor.js יוכל לבדוק אותם.
    Cloudflare קורא רק את ה-default, וייצוא נוסף אינו מפריע לו. */
 export { revealsAnswer, badEquation, readBody, contextBlock, LIM, CORE, ROLE, LANGS,
-         SIGNS, ADAPT,
+         SIGNS, ADAPT, PROVIDER,
          buildBody, buildHeaders, capOf, noCounter, MODEL, MAX_TOKENS };
