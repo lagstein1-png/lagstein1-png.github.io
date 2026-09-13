@@ -232,7 +232,71 @@ scenario('17 · ארבע נכונות ברצף מנקות גם סימן של ר�
          feed(S, 4, true, 5000);
          return want(S.state(), 'ok') });
 
+/* =====================================================================
+   החיווט — תשע אפליקציות, ארבע נגיעות בכל אחת
+
+   **למה זה כאן ולא ב-`tutor.js`.** הגלאי יכול להיות נקי לגמרי
+   ועדיין לא להיות מחובר לשום דבר: שמונה האפליקציות שקיבלו אותו
+   ב-13.9.2026 הן שמונה קבצים שונים, וכל אחת יכולה לאבד נגיעה
+   אחת בעריכה הבאה בלי שאיש יראה. ארבע הנגיעות:
+
+     1. תגית `<script>` — **לפני** `tutor.js`
+     2. אותו נתיב ב-`PRE` של ה-`sw.js` שלה, אחרת אין אופליין
+     3. `jsAnswer(ok)` בתוך פונקציית הניקוד — פעם אחת לשאלה
+     4. שער המבחן ב-`render`
+
+   **`reader` ו-`kotvim` אינן ברשימה, וזו החלטה ולא שכחה:** אין
+   בהן נכון/לא־נכון כלל, ולכן אין לגלאי מה למדוד שם. ״תאוריה
+   מדברת״ אינה בריפו הזה; החיווט שלה נמצא ב-`tutor-api/theory.patch`,
+   ואת זה בודקת `tutor.js`.
+   ===================================================================== */
+const WIRED = { math:  ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3'],
+                quiz:  ['english', 'history', 'ulpan', 'lomda'] };
+/* שם פונקציית הניקוד לפי משפחה, ו-`math-app` חריגה: היא קוראת
+   לגלאי מתוך `onAns` — שני מקומות, ושניהם ברגע שבו השאלה נסגרת
+   ולא בכל לחיצה. */
+const SCORE = { math: 'scoreAnswer', quiz: 'record' };
+const WHERE = { 'math-app': 'onAns' };
+
+for (const fam of Object.keys(WIRED)) for (const app of WIRED[fam]) {
+  let html, sw;
+  try {
+    html = fs.readFileSync(path.join(ROOT, app, 'index.html'), 'utf8');
+    sw   = fs.readFileSync(path.join(ROOT, app, 'sw.js'), 'utf8');
+  } catch (e) { bad++; console.log('✗ ' + app + ' — ' + e.message); continue }
+
+  const iSt = html.indexOf('src="/tutor/josh-state.js"');
+  const iTu = html.indexOf('src="/tutor/tutor.js"');
+  const hit = [];
+  if (iSt < 0) hit.push('אין תגית josh-state.js');
+  else if (iTu >= 0 && iSt > iTu) hit.push('josh-state.js נטען אחרי tutor.js');
+  if (sw.indexOf('/tutor/josh-state.js') < 0) hit.push('אינו ב-PRE של sw.js');
+  /* הקריאה בתוך פונקציית הניקוד, ולא איפשהו בקובץ: גוף הפונקציה
+     נחתך עד הסוגר שבעומק אפס. `math-app` קוראת לה `jsAnswer` מתוך
+     `recordAnswer`, ולכן נבדק שם גם השם שלה. */
+  const name = WHERE[app] || SCORE[fam];
+  const fn = 'function ' + name + '(';
+  const at = html.indexOf(fn);
+  if (at < 0) hit.push('לא נמצאה ' + name);
+  else {
+    let d = 0, end = -1;
+    for (let k = html.indexOf('{', at); k < html.length; k++) {
+      if (html[k] === '{') d++;
+      else if (html[k] === '}') { d--; if (!d) { end = k; break } }
+    }
+    const body = end > 0 ? html.slice(at, end) : '';
+    if (!/\bjsAnswer\s*\(/.test(body) && !/JOSHSTATE\.answer\s*\(/.test(body))
+      hit.push('אין קריאה לגלאי בתוך ' + name);
+  }
+  if (!/JS_OFF\s*=/.test(html) || !/JS_OFF\[[a-z]+\]/.test(html))
+    hit.push('אין שער מבחן (JS_OFF)');
+  else if (!/JOSHSTATE\.off\(\)/.test(html)) hit.push('השער אינו מכבה');
+
+  if (hit.length) { bad++; console.log('✗ ' + app.padEnd(10) + hit.join(' · ')) }
+  else console.log('✓ ' + app.padEnd(10) + 'תגית · PRE · ' + name + ' · שער המבחן');
+}
+
 console.log(bad
   ? `✗ ${FILE} — ${CODE.length} שאלות קוד, ${ran} תרחישים, ${bad} ממצאים`
-  : `✓ ${FILE} — ${CODE.length} שאלות קוד, ${ran} תרחישים, 0 ממצאים`);
+  : `✓ ${FILE} — ${CODE.length} שאלות קוד, ${ran} תרחישים, תשע אפליקציות מחווטות, 0 ממצאים`);
 process.exit(bad ? 1 : 0);

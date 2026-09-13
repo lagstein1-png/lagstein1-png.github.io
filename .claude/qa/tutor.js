@@ -18,6 +18,7 @@
    מריצים:  node .claude/qa/tutor.js
 */
 const fs = require('fs'), path = require('path');
+const vm = require('vm');
 const ROOT = path.resolve(__dirname, '..', '..');
 const WORKER = 'file://' + path.join(ROOT, 'tutor-api', 'worker.js');
 const CLIENT = path.join(ROOT, 'tutor', 'tutor.js');
@@ -358,6 +359,51 @@ import(WORKER).then(async W => {
     Object.prototype.hasOwnProperty.call(
       { 'claude-opus-5':1, 'claude-opus-4-8':1, 'claude-sonnet-5':1, 'claude-haiku-4-5':1 },
       W.MODEL), true);
+
+  /* ---------- 5b·2. מגדר הקול ----------
+     **ג׳וש מדבר בקול נשי (הוראת הבעלים, 13.9.2026), אבל לא על
+     חשבון קול חי.** `voiceUsable` נשאר מפתח המיון הראשון: קול
+     נוירלי שנבחר לפי מגדר בזמן שאין רשת הוא שקט, ושקט גרוע
+     מקול גברי. הכלל כתוב ב-CLAUDE.md, וכאן הוא נבדק.
+
+     שלוש הפונקציות נחלצות מהמקור ורצות ב-vm מול רשימת קולות
+     מזויפת — אין כאן דפדפן עם קולות מותקנים, ובדיקה שהייתה
+     מסתמכת על כאלה לא הייתה רצה אף פעם. */
+  (function () {
+    const grab = re => { const m = client.match(re); return m ? m[0] : '' };
+    const src = [
+      grab(/var VOICE_F=\/[\s\S]*?\/;/),
+      grab(/var VOICE_M=\/[\s\S]*?\/;/),
+      grab(/function femScore\(v\)\{[\s\S]*?\n\}/),
+      grab(/function voiceUsable\(v\)\{[\s\S]*?\n\}/),
+      grab(/function pickVoice\(code\)\{[\s\S]*?\n\}/)
+    ];
+    if (src.some(x => !x)) { t('נחלצו חמשת חלקי בחירת הקול', false, true); return }
+    const ctx = { _netVoiceOK: true, navigator: { onLine: true }, out: null,
+                  voices: () => ctx.LIST };
+    vm.createContext(ctx);
+    vm.runInContext(src.join('\n') + '\nout = { pick: pickVoice, fem: femScore };', ctx);
+    const V = (name, local) => ({ name: name, lang: 'he-IL', localService: local !== false });
+
+    ctx.LIST = [V('Microsoft Asaf'), V('Google עברית'), V('Carmit')];
+    t('בוחר את הקול הנשי מבין קולות מקומיים',
+      (ctx.out.pick('he-IL') || {}).name, 'Carmit');
+
+    /* קול נשי מת מול קול גברי חי — הגברי מנצח, וזה העיקר. */
+    ctx.LIST = [V('Microsoft Asaf'), V('Microsoft Hila Online (Natural)', false)];
+    ctx._netVoiceOK = false;
+    t('קול נשי שאינו זמין אינו גובר על קול גברי חי',
+      (ctx.out.pick('he-IL') || {}).name, 'Microsoft Asaf');
+    ctx._netVoiceOK = true;
+    t('כשהרשת חזרה — הנשי חוזר לנצח',
+      (ctx.out.pick('he-IL') || {}).name, 'Microsoft Hila Online (Natural)');
+
+    /* ״google״ הוא שם יצרן ולא מגדר. אם ייספר כנשי, ״Google עברית״
+       — שהוא גברי בחלק מהמכשירים — ייבחר דווקא כשמבקשים נשי. */
+    t('שם יצרן אינו מגדר', ctx.out.fem(V('Google עברית')), 1);
+    t('שם נשי מזוהה',      ctx.out.fem(V('Carmit')), 2);
+    t('שם גברי מזוהה',     ctx.out.fem(V('Microsoft Asaf')), 0);
+  })();
 
   /* ---------- 5c. תקרות העלות ----------
      הן החסם היחיד בין הבעלים לבין חשבון פתוח. שינוי כלפי מעלה

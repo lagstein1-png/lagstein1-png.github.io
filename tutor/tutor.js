@@ -52,7 +52,8 @@ he:{ btn:"ג׳וש — עזרה מהמורה", title:"עזרה מהמורה", cl
   limitAll:"זה לא אתה — הגעתי לגבול היומי שלי. אפשר לנסות שוב מחר, וכל השאר באפליקציה עובד.",
   full:"דיברנו על זה הרבה. בוא ננסה, ובשאלה הבאה נתחיל מחדש.",
   privacy:"אל תכתבו כאן שם מלא, כתובת או טלפון.",
-  play:"הקראה", stop:"עצירה", rate:"מהירות", off:"אין קול בשפה הזאת במכשיר הזה" },
+  play:"הקראה", stop:"עצירה", rate:"מהירות", off:"אין קול בשפה הזאת במכשיר הזה",
+  femNote:"אין במכשיר הזה קול נשי בשפה הזאת, ולכן גובה הקול הורם. זה לא קול נשי אמיתי." },
 ar:{ btn:"جوش — مساعدة من المعلّم", title:"مساعدة من المعلّم", close:"إغلاق", send:"إرسال",
   intro:"يمكنك أن تسألني عمّا يظهر على الشاشة. أعطي تلميحًا واحدًا في كل مرة وأنتظر إجابتك.",
   ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
@@ -62,7 +63,8 @@ ar:{ btn:"جوش — مساعدة من المعلّم", title:"مساعدة من
   limitAll:"ليست غلطتك — وصلتُ إلى حدّي اليوميّ. جرّب غدًا، وكلّ شيء آخر في التطبيق يعمل.",
   full:"تحدّثنا كثيرًا عن هذا. لنجرّب، ونبدأ من جديد في التالي.",
   privacy:"لا تكتب هنا اسمك الكامل أو عنوانك أو رقم هاتفك.",
-  play:"استماع", stop:"إيقاف", rate:"السرعة", off:"لا يوجد صوت بهذه اللغة على هذا الجهاز" },
+  play:"استماع", stop:"إيقاف", rate:"السرعة", off:"لا يوجد صوت بهذه اللغة على هذا الجهاز",
+  femNote:"لا يوجد على هذا الجهاز صوت نسائيّ بهذه اللغة، لذلك رُفعت طبقة الصوت. هذا ليس صوتًا نسائيًّا حقيقيًّا." },
 ru:{ btn:"Джош — помощь учителя", title:"Помощь учителя", close:"Закрыть", send:"Отправить",
   intro:"Можешь спросить меня о том, что на экране. Я даю по одной подсказке и жду ответа.",
   ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
@@ -72,7 +74,8 @@ ru:{ btn:"Джош — помощь учителя", title:"Помощь учи�
   limitAll:"Это не ты — я достиг своего дневного предела. Попробуй завтра, остальное в приложении работает.",
   full:"Мы много об этом говорили. Давай попробуем, а дальше начнём заново.",
   privacy:"Не пиши здесь полное имя, адрес или телефон.",
-  play:"Прочитать", stop:"Стоп", rate:"Скорость", off:"На этом устройстве нет голоса для этого языка" },
+  play:"Прочитать", stop:"Стоп", rate:"Скорость", off:"На этом устройстве нет голоса для этого языка",
+  femNote:"На этом устройстве нет женского голоса для этого языка, поэтому тон повышен. Это не настоящий женский голос." },
 en:{ btn:"Josh — ask the teacher", title:"Ask the teacher", close:"Close", send:"Send",
   intro:"You can ask me about what is on the screen. I give one hint at a time, and wait for your answer.",
   ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
@@ -82,7 +85,8 @@ en:{ btn:"Josh — ask the teacher", title:"Ask the teacher", close:"Close", sen
   limitAll:"It is not you — I have reached my daily limit. Try again tomorrow; everything else in the app still works.",
   full:"We have talked about this a lot. Let's try, and start fresh on the next one.",
   privacy:"Do not write your full name, address or phone number here.",
-  play:"Read aloud", stop:"Stop", rate:"Speed", off:"This device has no voice for this language" }
+  play:"Read aloud", stop:"Stop", rate:"Speed", off:"This device has no voice for this language",
+  femNote:"This device has no female voice for this language, so the pitch is raised. It is not a real female voice." }
 };
 
 var CFG = null, MSGS = [], BUSY = false, NOTE = "", QID = null, LANGAT = null;
@@ -204,6 +208,35 @@ function ttsWatchdog(alive, onSilent){
   return function(){ clearInterval(dog) };
 }
 
+/* ---------- מגדר הקול ----------
+
+   **ג׳וש מדבר בקול נשי, וזו הוראת הבעלים מ-13.9.2026.** המנוע
+   בחר עד היום לפי `voiceUsable` בלבד — כלומר לפי מה שהדפדפן
+   החזיר ראשון, וזה היה לרוב הקול הגברי הראשון ברשימה.
+
+   שתי התבניות הן **העתק מדויק** מתוך `math-app/index.html`, ולא
+   רשימה חדשה: אותם שמות שהמערכות באמת מתקינות, לפי שפה. כתיבת
+   רשימה שנייה הייתה מייצרת שני מקורות אמת שנפרדים בעדכון הבא.
+
+   ו-"google" אינו מגדר אלא שם יצרן. הוא אינו ברשימה בכוונה —
+   כשהוא נספר כנשי, ״Google עברית״, שהוא גברי בחלק מהמכשירים,
+   נבחר דווקא כשמבקשים נשי. */
+var VOICE_F=/(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
+var VOICE_M=/(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
+function femScore(v){
+  var n = ((v && v.name) || "") + " " + ((v && v.lang) || "");
+  n = n.toLowerCase();
+  if(VOICE_F.test(n)) return 2;
+  if(VOICE_M.test(n)) return 0;
+  return 1;                                  /* לא ידוע — בין השניים */
+}
+/* גובה הקול כשאין נשי במכשיר. **זה אינו קול נשי** אלא אותו קול
+   מעט גבוה יותר, וההודעה ללומד אומרת בדיוק את זה. הערך הוא של
+   `calm-female` שבמאגר, ולא מספר חדש. */
+var FEM_PITCH = 1.12;
+/* האם האמירה האחרונה נאמרה בנפילה לאחור. מתעדכן ב-speakSeg. */
+var _femFallback = false;
+
 function pickVoice(code){
   var v = voices(), p = code.slice(0,2), i, exact = [], loose = [], l;
   for(i=0;i<v.length;i++){
@@ -213,7 +246,13 @@ function pickVoice(code){
   }
   var list = exact.length ? exact : loose;
   if(!list.length) return null;
-  list.sort(function(a,b){ return voiceUsable(b) - voiceUsable(a) });
+  /* `voiceUsable` נשאר מפתח המיון **הראשון**, וזה לא סגנון: קול
+     נוירלי מת שנבחר לפי מגדר הוא שקט, ושקט גרוע מקול גברי. הכלל
+     הזה כתוב ב-CLAUDE.md, והמגדר נכנס אחריו — בדיוק כמו בשאר
+     האפליקציות. */
+  list.sort(function(a,b){
+    return (voiceUsable(b) - voiceUsable(a)) || (femScore(b) - femScore(a));
+  });
   return list[0];
 }
 function hasVoice(code){ return !!pickVoice(code) }
@@ -345,6 +384,11 @@ function speakSeg(text, code, r, alive, done){
     var u = new SpeechSynthesisUtterance(text);
     u.lang = code; u.rate = r;
     var v = pickVoice(code); if(v) u.voice = v;
+    /* אין קול נשי בשפה הזאת במכשיר — מרימים את גובה הקול. זו
+       נפילה לאחור מוצהרת ולא העמדת פנים: המחרוזת `femNote` אומרת ללומד
+       שזה אינו קול נשי אמיתי. */
+    if(femScore(v) < 2){ u.pitch = FEM_PITCH; _femFallback = true }
+    else _femFallback = false;
     u.onend = fin;
     u.onerror = function(){
       /* 4 · קול רשת ששתק. מכבים את הדגל, ואותו טקסט נאמר שוב פעם
@@ -573,6 +617,10 @@ function ctl(i){
     });
     h += '</select></label>';
   }
+  /* ההודעה מופיעה **אחרי** אמירה שנפלה לאחור ולא לפניה: לפני
+     ההקראה הראשונה אין לדעת איזה קול המכשיר ייתן לשפה הזאת. */
+  if(_femFallback && i === MSGS.length - 1)
+    h += '<span class="tu-sys tu-fem">' + esc(t.femNote) + '</span>';
   return h + '</div>';
 }
 
@@ -719,7 +767,11 @@ g.TUTOR = {
   mount: function(cfg){ CFG = cfg || null; return !!API && !!CFG },
   open: open,
   close: close,
-  /* לבדיקות בלבד — אינו נקרא מהאפליקציות */
-  _state: function(){ return { api:API, msgs:MSGS, playing:PLAYING, lang:lang(), dir:DIR[lang()] } }
+  /* לבדיקות בלבד — אינם נקראים מהאפליקציות */
+  _state: function(){ return { api:API, msgs:MSGS, playing:PLAYING, lang:lang(), dir:DIR[lang()] } },
+  /* בחירת הקול חשופה כדי שאפשר יהיה לבדוק אותה מול רשימת קולות
+     מזויפת. בלי זה הכלל ״voiceUsable ראשון, המגדר אחריו״ אינו
+     ניתן לבדיקה בלי דפדפן עם קולות מותקנים — ואין כזה כאן. */
+  _voice: function(code){ return pickVoice(code || "he-IL") }
 };
 })(window);
