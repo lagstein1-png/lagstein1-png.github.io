@@ -1317,10 +1317,39 @@ var JF_MOOD={happy:"idle",cheer:"correct",think:"thinking",sad:"wrong"},_jfLast=
 function jfMood(m){
   if(!jfOn())return;
   var ev=JF_MOOD[m||"happy"]||"idle";
+  /* **המנוחה היא המקום שבו מצב הלומד נראה.** שלושת האירועים
+     frustrated/stuck/slow הם וריאציה רגועה של הקשבה ולא הבעה
+     שלישית — לומד מתוסכל אינו צריך פרצוף מודאג מולו. רגע אמיתי
+     (נכון / לא נכון / חושב) גובר עליהם וחוזר מעצמו. */
+  if(ev==="idle"&&jsOn()){
+    var ls=JOSHSTATE.state();
+    if(ls!=="ok")ev=ls;
+  }
   if(ev===_jfLast)return;
   _jfLast=ev;JOSHFACE.emit(ev);
 }
-function jfSay(on){ if(jfOn())JOSHFACE.emit(on?"speaking":(JF_MOOD[P.mood]||"idle")) }
+/* `_jfLast=""` לפני החזרה: בלעדיו `jfMood` היה רואה שהמצב לא השתנה
+   ושותק, והפנים היו נשארות על "speaking" אחרי שההקראה נגמרה. */
+function jfSay(on){
+  if(!jfOn())return;
+  if(on){_jfLast="speaking";JOSHFACE.emit("speaking");return}
+  _jfLast="";jfMood(P.mood);
+}
+
+/* ---- ג׳וש: מצב הלומד ----------------------------------------------
+   `tutor/josh-state.js` הוא גלאי ותו לא — הוא מקבל תוצאה של שאלה
+   ומחזיר מילה אחת מארבע. הוא **אינו** בוחר שאלה, אינו נוגע
+   ב-`state` ואינו משנה רמה; מה שהוא משנה הוא הבעת הפנים במנוחה.
+
+   `answer()` נקרא **פעם אחת לשאלה** ולא לכל לחיצה: שאלה שנענתה
+   לא־נכון פעמיים היא שאלה שגויה אחת. `recordAnswer` שלמטה נקרא
+   בשתי הלחיצות, מפני שהוא סופר ניסיונות לסטטיסטיקה — זה תפקיד
+   אחר, ולכן החיווט כאן אינו נתלה עליו. */
+function jsOn(){ return typeof JOSHSTATE!=="undefined" }
+function jsAnswer(ok){
+  if(!jsOn())return;
+  JOSHSTATE.answer({ok:!!ok, ms:P.t0?Date.now()-P.t0:null});
+}
 
 /* ================= pet SVG ================= */
 function petSvg(kind,mood,size){
@@ -2029,7 +2058,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b78 · 2026-09-12";
+var BUILD="b79 · 2026-09-13";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2080,7 +2109,7 @@ function startFocus(kind){
   P.ses=[];
   for(var i=0;i<5;i++)P.ses.push(genQ(i,lvl,state.settings.lang||"he",kind));
   P.qi=0;P.phase="ask";P.wrong=[];P.flash=null;P.hints=0;P.results=[];P.ok=0;P.visual=false;
-  P.focus=kind;
+  P.focus=kind;P.t0=Date.now();
   /* מאפסים את החלון — הסבב הזה עצמו יהיה העדות החדשה */
   if(state.weak[kind])state.weak[kind].r=[];
   save();
@@ -2091,7 +2120,10 @@ function lvlNames(){var t=T();return [t.lvl1,t.lvl2,t.lvl3,t.lvl4,t.lvl5,t.lvl6]
 function startRound(lvl){
   P.ses=genSession(8,Math.min(lvl,6),state.settings.lang||"he");
   P.qi=0;P.phase="ask";P.wrong=[];P.flash=null;P.hints=0;P.results=[];P.ok=0;P.visual=false;
-  P.focus=null;
+  P.focus=null;P.t0=Date.now();
+  /* סבב חדש הוא התחלה חדשה גם לגלאי: תסכול מהסבב הקודם אינו נתון
+     על הלומד עכשיו. */
+  if(jsOn())JOSHSTATE.reset();
 }
 startRound(activeLevel());
 
@@ -4011,9 +4043,19 @@ window.addEventListener("legal:lang",function(e){
    משאיר את הפוקוס על הקישור, וה-Tab הבא חוזר לסרגל שדילגנו עליו. */
 function wrapMain(h){return '<main id="main" tabindex="-1">'+(h||"")+'</main>'}
 
+/* המסכים שבהם הגלאי כבוי. **המבחן הכיתתי אסור בגלאי** — ההנחיה
+   מפורשת, והנימוק מבני: בונה המבחן אורז זרע והתלמיד בונה ממנו את
+   אותן שאלות אצלו, ולכן כל דבר שמשתנה מלומד ללומד מפצל את המבחן
+   לשניים. זה כבר קרה כאן דרך `chooseIndex` — 39 שאלות מתוך 200
+   יצאו שונות בין המורה לתלמיד, ושני המסכים היו תקינים.
+   הפירוט ב-`tutor/josh-state.js`. */
+var JS_OFF={sit:1,exam:1,marks:1,badexam:1,oldexam:1};
 function render(){ try{lgChrome()}catch(e){}
   var html="";
   lvlSync();
+  /* השער יושב כאן ולא ליד כל השמה ל-`view`: `view` נכתב בתריסר
+     מקומות, ו-`render` רץ אחרי כל אחד מהם. */
+  if(jsOn()){ if(JS_OFF[view])JOSHSTATE.off(); else JOSHSTATE.on() }
   if(view==="sit"&&SIT.spec){ $("#app").innerHTML=wrapMain(viewSit()); return; }
   if(view==="badexam"||view==="oldexam"){
     $("#app").innerHTML=wrapMain(viewBadExam(view==="oldexam"?
@@ -4112,6 +4154,7 @@ function advance(){
     speak(DL.sub,true);render();return;
   }
   P.qi++;P.phase="ask";P.wrong=[];P.flash=null;P.hints=0;P.visual=false;BT.text="";BT.shown=0;
+  P.t0=Date.now();
   render();
 }
 function onAns(opt){
@@ -4119,6 +4162,7 @@ function onAns(opt){
   if(P.phase!=="ask")return;
   if(opt===q.answer){
     recordAnswer(true,q.kind);
+    jsAnswer(true);
     /* נחשב "ידע" רק אם לא לחצו קודם על תשובה שגויה */
     noteResult(q.kind,P.wrong.length===0,0);
     P.results.push("ok");P.ok++;
@@ -4151,6 +4195,8 @@ function onAns(opt){
        הפתרון המלא מגיע אחרי הטעות השנייה. */
     if(P.wrong.length>=2){
       recordAnswer(false,q.kind);
+      /* כאן, ולא בלחיצה הראשונה: השאלה נסגרה עכשיו. */
+      jsAnswer(false);
       noteResult(q.kind,false,Math.abs(opt-q.answer));
       P.results.push("no");P.phase="reveal";P.mood="happy";
       setBubble(q.explain,"happy");
@@ -4161,6 +4207,7 @@ function onAns(opt){
       recordAnswer(false,q.kind);
       if(state.settings.calmMode&&P.hints<1&&q.hints&&q.hints[0]){
         P.hints=1;
+        if(jsOn())JOSHSTATE.hint();
         setBubble(t.enc+" "+q.hints[0],"think");speak(t.enc+" "+q.hints[0]);render();
       }else{setBubble(t.enc,"think");speak(t.enc)}
     }
@@ -4207,6 +4254,7 @@ function onAction(a,el){
     if(P.phase!=="ask")return;
     if(P.hints>=3){setBubble(t.noHints,"happy");return}
     var hint=q.hints[P.hints];P.hints++;
+    if(jsOn())JOSHSTATE.hint();
     if(state.settings.soundFx)sfxHint();
     if(P.hints===2)P.visual=true;
     setBubble(hint,"think");speak(hint);render();
@@ -4406,6 +4454,7 @@ render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
+<script src="/tutor/josh-state.js"></script>
 <script src="/tutor/tutor.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
@@ -4414,7 +4463,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b78-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b79-pwa1").catch(function(){});
   });
 }
 </script>
