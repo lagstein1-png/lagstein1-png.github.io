@@ -82,7 +82,7 @@ function keyOnMain(app) {
    מראש. בשורש — רק הקבצים שהשורש מגיש בעצמו, לא תיקיות האפליקציות. */
 function changedSinceMain(app) {
   const paths = app === '.'
-    ? ['index.html', 'sw.js', 'manifest.json', 'img', 'legal', 'voice']
+    ? ['index.html', 'sw.js', 'manifest.json', 'img', 'legal', 'voice', 'tutor']
     : [app, 'legal'];
   const out = git(['diff', '--name-only', MAIN, '--'].concat(paths));
   if (out === null) return null;
@@ -98,9 +98,11 @@ function stripComments(src) {
 
 function lineOf(src, idx) { return src.slice(0, idx).split('\n').length; }
 
-/* שלוש התיקיות שאין להן sw.js משלהן, ולכן ה-worker של השורש מגיש
-   אותן. הרשימה חייבת להיות זהה לזו שבשומר שבתוך sw.js של השורש. */
-const ROOT_OWNS = ['img', 'legal', 'voice'];
+/* התיקיות שאין להן sw.js משלהן, ולכן ה-worker של השורש מגיש אותן.
+   הרשימה חייבת להיות זהה לזו שבשומר שבתוך sw.js של השורש.
+   `tutor` נוספה 12.9.2026: דף הבית טוען /tutor/josh-face.js, ובלי
+   השומר העותק שב-PRE נשמר ולא מוגש לעולם. */
+const ROOT_OWNS = ['img', 'legal', 'voice', 'tutor'];
 
 /* כל תיקייה שיש בה sw.js. "." הוא דף הבית. */
 function allApps() {

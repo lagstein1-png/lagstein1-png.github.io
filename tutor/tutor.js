@@ -368,6 +368,9 @@ var CSS = ''
 +'max-height:88vh;display:flex;flex-direction:column;overflow:hidden;'
 +'box-shadow:0 18px 50px rgba(0,0,0,.3);font-size:16px;line-height:1.6}'
 +'#tu-hd{display:flex;align-items:center;gap:10px;padding:14px 18px;'
+/* הפנים בכותרת: קטנות, לא גוזלות מקום מהטקסט, ולא נדחסות
+   כשהשאלה שלצידן ארוכה. */
++'#tu-face{flex:0 0 auto;line-height:0;display:inline-block}'
 +'border-bottom:2px solid rgba(23,51,60,.12);flex-wrap:wrap}'
 +'#tu-hd b{font-size:1.05rem}'
 +'#tu-q{background:#fff3ce;border:1px solid #e6b800;border-radius:9px;padding:3px 9px;'
@@ -412,6 +415,14 @@ var CSS = ''
 +'.tu-sg button:hover{background:#1d3b4a}'
 +'.tu-sys{color:#a9c2ca}#tu-pv{color:#93aeb7}}';
 
+/* שלושת המצבים שהפאנל באמת יודע עליהם, ותו לא:
+   ממתין לשרת → חושב · מקריא → מדבר · אחרת → מקשיב.
+   `josh-face.js` הוא שכבת תצוגה; ההחלטה מה נכון היא כאן. */
+function faceState(){
+  if(typeof JOSHFACE === "undefined") return;
+  JOSHFACE.emit(BUSY ? "thinking" : PLAYING >= 0 ? "speaking" : "listening");
+}
+
 function build(){
   if(EL) return EL;
   var st = document.createElement("style"); st.textContent = CSS;
@@ -419,7 +430,7 @@ function build(){
   var ov = document.createElement("div"); ov.id = "tu-ov";
   ov.innerHTML =
     '<div id="tu-bx" role="dialog" aria-modal="true" aria-labelledby="tu-ti">'
-    + '<div id="tu-hd"><b id="tu-ti"></b><span id="tu-q" hidden></span>'
+    + '<div id="tu-hd"><span id="tu-face"></span><b id="tu-ti"></b><span id="tu-q" hidden></span>'
     + '<select id="tu-lg" hidden></select>'
     + '<button id="tu-x" type="button"></button></div>'
     + '<div id="tu-log" aria-live="polite"></div>'
@@ -427,6 +438,26 @@ function build(){
     + '<input id="tu-in" type="text" autocomplete="off" maxlength="' + MAXLEN + '" />'
     + '<button id="tu-go" type="button"></button></div><p id="tu-pv"></p></div></div>';
   document.body.appendChild(ov);
+
+  /* ---------------------------------------------------------------
+     הפנים של ג׳וש. `/tutor/josh-face.js` נטען לפני הקובץ הזה בכל
+     אפליקציה, ולכן הבדיקה כאן היא על קיום ולא על סדר.
+
+     **זו נקודת החיווט האחת לכל שתים־עשרה האפליקציות.** הפאנל הזה
+     כבר מותקן בכולן; הוספת הפנים כאן מגיעה לכולן בלי לגעת באף
+     `index.html`. זה בדיוק ההיגיון שבגללו הבוט עצמו יושב בקובץ
+     אחד ולא בשנים־עשר עותקים.
+
+     הדיוקן מגיע מ-`/img/josh.jpg` — נתיב מוחלט, קובץ אחד לכל
+     האתר. `photo()` דוחה כתובת עם סכימה, ונתיב שמתחיל בלוכסן
+     יחיד עובר.
+     --------------------------------------------------------------- */
+  if(typeof JOSHFACE !== "undefined"){
+    JOSHFACE.photo("/img/josh.jpg");
+    var fw = ov.querySelector("#tu-face");
+    if(fw){ fw.innerHTML = JOSHFACE.markup(46); JOSHFACE.attach() }
+  }
+
   EL = {
     ov: ov, bx: ov.querySelector("#tu-bx"), ti: ov.querySelector("#tu-ti"),
     q: ov.querySelector("#tu-q"), x: ov.querySelector("#tu-x"),
@@ -483,6 +514,7 @@ function draw(){
     e.lg.value = lg;
   } else e.lg.hidden = true;
   e.inp.disabled = BUSY; e.go.disabled = BUSY;
+  faceState();
 
   var q = CFG && CFG.q ? CFG.q() : null;
   if(q && q.expr){ e.q.hidden = false; e.q.textContent = q.expr }
@@ -558,7 +590,11 @@ function open(){
   if(!MSGS.length) send(T().hello, true);
   else focus();
 }
-function close(){ stopSay(); stopReveal(); NOTE = ""; if(EL) EL.ov.classList.remove("on") }
+function close(){
+  stopSay(); stopReveal(); NOTE = "";
+  if(EL) EL.ov.classList.remove("on");
+  if(typeof JOSHFACE !== "undefined") JOSHFACE.emit("idle");
+}
 function focus(){ try{ EL.inp.focus() }catch(e){} }
 
 function send(text, auto){

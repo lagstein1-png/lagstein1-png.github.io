@@ -130,7 +130,13 @@ var CSS = [
    וריאנטים של אותה דמות יחזירו את המצמוץ; ראו O-54.
    ---------------------------------------------------------------- */
 ".jf--photo{overflow:visible}",
-".jf--photo .jf__ph{display:block;width:100%;height:auto;border-radius:50%;",
+/* `aspect-ratio` שומר את המקום לפני שהתצלום נטען. בלעדיו `height:auto`
+   נותן גובה 0 עד שהבייטים מגיעים — ובדף הבית, שבו הפנים יושבות מתחת
+   לקפל ולכן `loading="lazy"` דוחה את הטעינה, נמדד בכרום `height:0px`
+   ו-`naturalWidth:0`: הפנים פשוט לא היו שם. היחס הוא זה של הקובץ,
+   200×300, ולכן הוא שומר את המראה בדיוק ורק מונע את הקפיצה. */
+".jf--photo .jf__ph{display:block;width:100%;height:auto;aspect-ratio:2/3;",
+"  object-fit:cover;border-radius:50%;",
 "  box-shadow:0 2px 10px rgba(20,40,50,.12),0 10px 26px rgba(20,40,50,.10);",
 "  transform-origin:50% 88%;transition:transform .5s cubic-bezier(.22,.8,.3,1)}",
 '.jf--photo[data-state="listening"] .jf__ph,.jf--photo[data-state="stuck"] .jf__ph{transform:rotate(-3deg)}',
