@@ -59,6 +59,15 @@ ok('הטקסט נשמר בשלמותו',
    segs.map(function (s) { return s.text; }).join('').replace(/\s+/g, ' ').trim() ===
    LONG.replace(/\s+/g, ' ').trim());
 eq('מקטע יחיד לטקסט קצר', LC.tts.segments('שלום.').length, 1);
+
+/* --- הקול של ״נשי רגוע״: 0.95 · 1.12, כמו בשתים־עשרה האפליקציות (13.9.2026) ---
+   מה שנבדק הוא מה שמגיע למנוע, לא מה שכתוב בהגדרות: הקצב אחרי
+   tuneRate בברירת המחדל, והגובה אחרי voicePitch על קול נשי. */
+eq('קצב ברירת מחדל בעברית — 0.95', LC.tts.tuneRate('he-IL'), 0.95);
+eq('קצב ברירת מחדל באנגלית — 0.95', LC.tts.tuneRate('en-US'), 0.95);
+eq('גובה בסיס על קול נשי — 1.12', LC.tts.voicePitch({ name: 'Microsoft Hila Online (Natural) - Hebrew' }), 1.12);
+eq('קול גברי מורם עד התקרה 1.45', LC.tts.voicePitch({ name: 'Microsoft Asaf - Hebrew' }), 1.45);
+eq('בלי קול — גובה הבסיס', LC.tts.voicePitch(null), 1.12);
 /* מילה אחת ארוכה מהסף נשארת שלמה ולא נחתכת באמצע */
 var word = new Array(200).join('א');
 eq('מילה ארוכה אינה נשברת', LC.tts.segments(word).length, 1);

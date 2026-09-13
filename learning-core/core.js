@@ -321,7 +321,7 @@
 
   var tts = {
     lang: 'he',
-    rate: 1,
+    rate: 0.95,          /* ״נשי רגוע״ — 0.95, כמו ב-math-app */
     enabled: true,
     pickedVoice: null,
     /* שכבה 1 */
@@ -642,10 +642,23 @@
   }
 
   /* ---- 5.8 שכבה 2: קול המכשיר ---- */
-  var VOICE_TUNE = { he: 0.82, ar: 0.85, en: 0.90, ru: 0.88 };
+  /* 1.0 בכל השפות מאז 13.9.2026, כמו בשתים־עשרה האפליקציות: הבעלים
+     שמע את Hila ב-math-app — שאינה מכוונת קצב לפי שפה — ואמר ״נעים
+     ומדויק, להכניס לכל האפליקציות״. 0.82 בעברית נבחר אחרי האזנה
+     למנועי מכשיר ישנים, והקול הטבעי אינו צריך אותו. */
+  var VOICE_TUNE = { he: 1.0, ar: 1.0, en: 1.0, ru: 1.0 };
   function tuneRate(lang) {
     var b = VOICE_TUNE[String(lang || 'he').split('-')[0]] || 0.88;
     return clamp(Math.round(b * (tts.rate || 1) * 100) / 100, 0.5, 1.6);
+  }
+
+  /* גובה הבסיס של כל אמירה. אין קול נשי בשפה הזאת במכשיר? מרימים
+     עוד — לא קול נשי אמיתי, אבל זו הדרך היחידה בדפדפן להתקרב בלי
+     הקלטות. התקרה 1.45 היא זו של math-app. */
+  var PITCH_BASE = 1.12; /* ״נשי רגוע״ של math-app, 13.9.2026 */
+  function voicePitch(v) {
+    var male = v && MALE_VOICE.test(v.name || '') && !FEMALE_VOICE.test(v.name || '');
+    return clamp(PITCH_BASE * (male ? 1.35 : 1), 0.5, 1.45);
   }
 
   function speakDevice(text, opts) {
@@ -701,8 +714,7 @@
       u.rate = tuneRate(u.lang);
       /* אין קול נשי בשפה הזאת במכשיר? מרימים את הגובה. לא קול נשי
          אמיתי, אבל זו הדרך היחידה בדפדפן להתקרב בלי הקלטות. */
-      var male = v && MALE_VOICE.test(v.name || '') && !FEMALE_VOICE.test(v.name || '');
-      u.pitch = male ? 1.35 : 1;
+      u.pitch = voicePitch(v);
       u.volume = 1;
       if (v) { try { u.voice = v; } catch (e) {} }
 
@@ -1188,7 +1200,10 @@
       setEnabled: function (on) { tts.enabled = !!on; if (!on) ttsStop(); return tts.enabled; },
       get enabled() { return tts.enabled; },
       onTier: function (fn) { tts.onTier = fn; },
-      SEG_MAX: SEG_MAX
+      SEG_MAX: SEG_MAX,
+      /* חשופים לבדיקה: מה באמת נשלח למנוע */
+      tuneRate: tuneRate,
+      voicePitch: voicePitch
     },
 
     /* התקדמות וטעויות */

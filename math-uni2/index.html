@@ -938,7 +938,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v77 · 2026-09-13";
+var BUILD="v78 · 2026-09-13";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -1065,8 +1065,8 @@ function pickList(){
 /* אין שדה מגדר ב-Web Speech API. השם הוא הרמז היחיד, ולכן אלה
    שמות הקולות שהמערכות באמת מתקינות — ולא ניחוש לפי צליל.
    "google" הוא שם יצרן ולא מגדר, ומכוון אינו מופיע כאן. */
-var VOICE_F=/(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/
-var VOICE_M=/(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/
+var VOICE_F=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/
+var VOICE_M=/(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/
 function guessGender(v){
   var n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
   if(VOICE_F.test(n))return "f";
@@ -1434,7 +1434,12 @@ function segments(spoken){
   return out.length?out:[{text:spoken,start:0}];
 }
 /* קצב לפי שפה — אותם ערכים שנבחרו בתאוריה מדברת אחרי האזנה */
-var VOICE_TUNE={he:0.82,ar:0.85,en:0.90,ru:0.88};
+/* 1.0 בכל השפות מאז 13.9.2026. הבעלים שמע את Hila ב-math-app — שאינה
+   מכוונת קצב לפי שפה ושולחת 0.95 כמו שהוא — ואמר ״נעים ומדויק, להכניס
+   לכל האפליקציות״. 0.82 בעברית נבחר כאן אחרי האזנה למנועי מכשיר ישנים,
+   והקול הטבעי אינו צריך אותו: 0.82×0.95 נתן 0.78, ואותו קול נשמע כאן
+   אחרת מאשר שם. המבנה נשאר כדי שכיוון לפי שפה יישאר אפשרי. */
+var VOICE_TUNE={he:1.0,ar:1.0,en:1.0,ru:1.0};
 function tuneRate(lang,rate){
   var t=VOICE_TUNE[String(lang||"he").split("-")[0].toLowerCase()]||0.88;
   var r=t*(rate||1);
@@ -1454,6 +1459,12 @@ function femLift(v){
   if(!v)return 1;
   try{ return guessGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
 }
+
+/* גובה הבסיס של כל אמירה — 1.12, הפריסט ״נשי רגוע״ של math-app, שהבעלים
+   בחר אחרי האזנה (13.9.2026). femLift נשאר מכפיל: קול גברי מורם עוד,
+   והתקרה 1.45 היא זו של math-app. voicePitch הוא מה שמושם ב-u.pitch. */
+var PITCH_BASE=1.12;
+function voicePitch(v){return Math.min(1.45,PITCH_BASE*femLift(v))}
 
 
 /* הודעה כשאין קול נשי בשפה — עם ההוראות למערכת ההפעלה שהמשתמש
@@ -1517,7 +1528,7 @@ function speakDevice(text){
   var _v=deviceVoice(), _lang=LANGS[LG].tts;
   if(_v&&_v.lang)_lang=_v.lang;
   var _segs=segments(String(text)), _rate=tuneRate(_lang,state.settings.rate);
-  var _pitch=femLift(_v);
+  var _pitch=voicePitch(_v);
   var _retried=false;
   function _alive(){return my===_sayGen}
   function _allDone(){ maybeStopKeepAlive(); hlClear(); ttsOK() }
@@ -1552,7 +1563,7 @@ function speakDevice(text){
         if(!_retried&&_v&&_v.localService===false){
           _retried=true; _netVoiceOK=false; moved=true;
           if(disarm)disarm(); _activeU=null;
-          _v=deviceVoice(); if(_v&&_v.lang)_lang=_v.lang; _pitch=femLift(_v);
+          _v=deviceVoice(); if(_v&&_v.lang)_lang=_v.lang; _pitch=voicePitch(_v);
           setTimeout(function(){sayseg(k)},SEG_GAP);
           return;
         }
@@ -12734,7 +12745,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v77-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v78-pwa1").catch(function(){});
   });
 }
 </script>

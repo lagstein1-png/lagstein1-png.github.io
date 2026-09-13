@@ -28,12 +28,14 @@
   "use strict";
 
   var LANG = "he-IL";
-  /* הקצב שנשלח למנוע. באפליקציות האחיות בריפו נמצא שמנועי מכשיר
-     בעברית רצים מהר מדי, ו"רגיל" שם הוא 0.82 — הערך יושב ב-
-     VOICE_TUNE שב-math-teen ונבחר שם אחרי האזנה. אותו מנוע, אותם
-     קולות, ואותו קהל: "רגיל" כאן חייב להישמע כמו "רגיל" שם.
+  /* הקצב והגובה שנשלחים למנוע — 0.95 ו-1.12, הפריסט ״נשי רגוע״ של
+     math-app, שהבעלים שמע ב-13.9.2026 ואמר עליו ״נעים ומדויק, להכניס
+     לכל האפליקציות״. עד אז "רגיל" כאן היה 0.82 בגובה 1, כמו
+     VOICE_TUNE שבאפליקציות האחיות — והוא הועלה שם באותו יום. אותו
+     מנוע, אותם קולות, ואותו קהל: "רגיל" כאן חייב להישמע כמו שם.
      המשתמש עדיין בוחר לאט/רגיל/מהר, וזה מכפיל את הבסיס. */
-  var RATE_BASE = 0.82;
+  var RATE_BASE = 0.95;
+  var PITCH_BASE = 1.12;
   var SEG_MAX = 90;      /* תווים לאמירה אחת */
   var SEG_GAP = 240;     /* מילישניות בין אמירות — נשימה, לא גמגום */
   var KEEPALIVE = 4000;  /* פינג נגד עצירת כרום */
@@ -92,8 +94,8 @@
   }
   /* מגדר הקול, לפי השם — אותם שני ביטויים שבאחת־עשרה האפליקציות
      האחרות (english/index.html, V_F ו-V_M). ״?״ = לא זוהה. */
-  var VOICE_F = /(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
-  var VOICE_M = /(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
+  var VOICE_F = /(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
+  var VOICE_M = /(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
   function vGender(v) {
     var n = ((v.name || "") + " " + (v.lang || "")).toLowerCase();
     return VOICE_F.test(n) ? "f" : VOICE_M.test(n) ? "m" : "?";
@@ -295,6 +297,7 @@
     if (v) u.voice = v;
     u.lang = v ? normLang(v.lang) : LANG;
     u.rate = Math.max(0.5, Math.min(2, RATE_BASE * api.rate));
+    u.pitch = PITCH_BASE;
     try { speechSynthesis.speak(u); } catch (e) {}
   };
 
@@ -310,7 +313,7 @@
        שמתעלמים מתגית שאינה חוקית וחוזרים לשפת ברירת המחדל. */
     u.lang = v ? normLang(v.lang) : LANG;
     u.rate = Math.max(0.5, Math.min(2, RATE_BASE * api.rate));
-    u.pitch = 1;
+    u.pitch = PITCH_BASE;
     /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
        יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
     var moved = false;

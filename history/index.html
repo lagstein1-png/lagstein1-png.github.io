@@ -1654,7 +1654,12 @@ function segments(spoken){
   return out.length?out:[{text:spoken,start:0}];
 }
 /* קצב לפי שפה — אותם ערכים שנבחרו בתאוריה מדברת אחרי האזנה */
-var VOICE_TUNE={he:0.82,ar:0.85,en:0.90,ru:0.88};
+/* 1.0 בכל השפות מאז 13.9.2026. הבעלים שמע את Hila ב-math-app — שאינה
+   מכוונת קצב לפי שפה ושולחת 0.95 כמו שהוא — ואמר ״נעים ומדויק, להכניס
+   לכל האפליקציות״. 0.82 בעברית נבחר כאן אחרי האזנה למנועי מכשיר ישנים,
+   והקול הטבעי אינו צריך אותו: 0.82×0.95 נתן 0.78, ואותו קול נשמע כאן
+   אחרת מאשר שם. המבנה נשאר כדי שכיוון לפי שפה יישאר אפשרי. */
+var VOICE_TUNE={he:1.0,ar:1.0,en:1.0,ru:1.0};
 function tuneRate(lang,rate){
   var t=VOICE_TUNE[String(lang||"he").split("-")[0].toLowerCase()]||0.88;
   var r=t*(rate||1);
@@ -1674,6 +1679,12 @@ function femLift(v){
   if(!v)return 1;
   try{ return vGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
 }
+
+/* גובה הבסיס של כל אמירה — 1.12, הפריסט ״נשי רגוע״ של math-app, שהבעלים
+   בחר אחרי האזנה (13.9.2026). femLift נשאר מכפיל: קול גברי מורם עוד,
+   והתקרה 1.45 היא זו של math-app. voicePitch הוא מה שמושם ב-u.pitch. */
+var PITCH_BASE=1.12;
+function voicePitch(v){return Math.min(1.45,PITCH_BASE*femLift(v))}
 
 
 /* ------------------------------------------------------------
@@ -1767,7 +1778,7 @@ function speakDevice(text,code,rate){
     try{
       var v=bestVoice(code), lang=(v&&v.lang)||code;
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
-      var pit=femLift(v);
+      var pit=voicePitch(v);
       var retried=false;
       function alive(){return my===_sayGen}
       function allDone(){ maybeStopKeepAlive(); hlClear(); ttsOK() }
@@ -1800,7 +1811,7 @@ function speakDevice(text,code,rate){
           if(!retried&&v&&v.localService===false){
             retried=true; _netVoiceOK=false; moved=true;
             if(disarm)disarm(); _activeU=null;
-            v=bestVoice(code); lang=(v&&v.lang)||code; pit=femLift(v);
+            v=bestVoice(code); lang=(v&&v.lang)||code; pit=voicePitch(v);
             setTimeout(function(){sayseg(k)},SEG_GAP);
             return;
           }
