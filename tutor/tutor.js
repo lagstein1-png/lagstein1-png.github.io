@@ -45,7 +45,7 @@ var VOICE = { he:"he-IL", ar:"ar-SA", ru:"ru-RU", en:"en-US" };
 var L = {
 he:{ btn:"ג׳וש — עזרה מהמורה", title:"עזרה מהמורה", close:"סגירה", send:"שליחה",
   intro:"אפשר לשאול אותי על מה שעל המסך. אני נותן רמז אחד בכל פעם, ומחכה לתשובה.",
-  greet:"היי, אני ג׳וש. אני כאן אם משהו לא ברור. כתוב לי מה, ונעבור על זה יחד.", ph:"מה לא ברור?", hello:"אני צריך עזרה במה שעל המסך.", wait:"רגע, חושב…",
+  nudge:{stuck:"שמתי לב שהשאלה הזאת תופסת זמן. רוצה שנפרק אותה יחד, צעד אחד בכל פעם?",frustrated:"אני רואה שזה לא הולך עכשיו, וזה בסדר גמור. בוא ננסה מכיוון אחר."}, greet:"היי, אני ג׳וש. אני כאן אם משהו לא ברור. כתוב לי מה, ונעבור על זה יחד.", ph:"מה לא ברור?", hello:"אני צריך עזרה במה שעל המסך.", wait:"רגע, חושב…",
   err:"לא הצלחתי להתחבר. אפשר לנסות שוב עוד רגע.",
   setup:"העזרה עוד לא מוכנה. אפשר לנסות מאוחר יותר.",
   limit:"מספיק להיום — נמשיך מחר.",
@@ -56,7 +56,7 @@ he:{ btn:"ג׳וש — עזרה מהמורה", title:"עזרה מהמורה", cl
   femNote:"אין במכשיר הזה קול נשי בשפה הזאת, ולכן גובה הקול הורם. זה לא קול נשי אמיתי." },
 ar:{ btn:"جوش — مساعدة من المعلّم", title:"مساعدة من المعلّم", close:"إغلاق", send:"إرسال",
   intro:"يمكنك أن تسألني عمّا يظهر على الشاشة. أعطي تلميحًا واحدًا في كل مرة وأنتظر إجابتك.",
-  greet:"مرحبًا، أنا جوش. أنا هنا إن كان شيء غير واضح. اكتب لي ما هو، ونمرّ عليه معًا.", ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
+  nudge:{stuck:"لاحظت أن هذا السؤال يأخذ وقتًا. تريد أن نفكّكه معًا، خطوة واحدة في كل مرة؟",frustrated:"أرى أن الأمر لا يسير الآن، وهذا طبيعي تمامًا. لنجرّب من زاوية أخرى."}, greet:"مرحبًا، أنا جوش. أنا هنا إن كان شيء غير واضح. اكتب لي ما هو، ونمرّ عليه معًا.", ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
   err:"لم أتمكّن من الاتصال. حاول مرّة أخرى بعد قليل.",
   setup:"المساعدة ليست جاهزة بعد. حاول لاحقًا.",
   limit:"يكفي لهذا اليوم — نُكمل غدًا.",
@@ -67,7 +67,7 @@ ar:{ btn:"جوش — مساعدة من المعلّم", title:"مساعدة من
   femNote:"لا يوجد على هذا الجهاز صوت نسائيّ بهذه اللغة، لذلك رُفعت طبقة الصوت. هذا ليس صوتًا نسائيًّا حقيقيًّا." },
 ru:{ btn:"Джош — помощь учителя", title:"Помощь учителя", close:"Закрыть", send:"Отправить",
   intro:"Можешь спросить меня о том, что на экране. Я даю по одной подсказке и жду ответа.",
-  greet:"Привет, я Джош. Я рядом, если что-то непонятно. Напиши, что именно, и разберём вместе.", ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
+  nudge:{stuck:"Я заметил, что этот вопрос отнимает время. Разберём его вместе, по одному шагу?",frustrated:"Вижу, что сейчас не идёт, и это совершенно нормально. Попробуем с другой стороны."}, greet:"Привет, я Джош. Я рядом, если что-то непонятно. Напиши, что именно, и разберём вместе.", ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
   err:"Не удалось соединиться. Попробуй ещё раз через минуту.",
   setup:"Помощь ещё не готова. Попробуй позже.",
   limit:"На сегодня хватит — продолжим завтра.",
@@ -78,7 +78,7 @@ ru:{ btn:"Джош — помощь учителя", title:"Помощь учи�
   femNote:"На этом устройстве нет женского голоса для этого языка, поэтому тон повышен. Это не настоящий женский голос." },
 en:{ btn:"Josh — ask the teacher", title:"Ask the teacher", close:"Close", send:"Send",
   intro:"You can ask me about what is on the screen. I give one hint at a time, and wait for your answer.",
-  greet:"Hi, I am Josh. I am here if something is unclear. Write what it is, and we will go through it together.", ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
+  nudge:{stuck:"I noticed this one is taking a while. Shall we break it down together, one step at a time?",frustrated:"I can see this is not working right now, and that is completely fine. Let us try another way."}, greet:"Hi, I am Josh. I am here if something is unclear. Write what it is, and we will go through it together.", ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
   err:"I could not connect. Try again in a moment.",
   setup:"The help is not ready yet. Try again later.",
   limit:"That is enough for today — we will carry on tomorrow.",
@@ -701,6 +701,58 @@ function autoMark(){
 
    התקרה קיימת כדי שלא ייווצר טיימר נצחי בלשונית שנשארה פתוחה על
    השער — אחרי כשלושים בדיקות מוותרים, והכפתור עדיין שם. */
+/* ---- ג׳וש יוזם כשהלומד נתקע ------------------------------------
+   הכרעת הבעלים 13.9.2026: ״שיזהה מה התלמיד עושה ומגיב ויוזם
+   תגובה, על מנת להיות חברי וגם מאד מרתק״.
+
+   הגלאי כבר קיים — `tutor/josh-state.js` מחזיר `ok`/`slow`/
+   `stuck`/`frustrated` מתוך זמני התשובה, רצף הטעויות ובקשות
+   הרמז. הוא אינו רואה את תוכן השאלות, והיוזמה כאן אינה מוסיפה
+   לו מידע: היא רק קוראת את המסקנה.
+
+   **שלושה בלמים, ובכוונה.** ג׳וש שקופץ בכל טעות אינו חבר אלא
+   הצקה, והקהל כאן הוא ADHD ודיסלקציה:
+
+     · `slow` אינו יוזם. לאט אינו תקוע, ולומד איטי שנקטע באמצע
+       מחשבה מאבד אותה.
+     · פעמיים בכל ביקור, לא יותר.
+     · רק כשהמצב **השתנה** — `stuck` שנמשך אינו קופץ שוב ושוב.
+
+   **הכול מקומי.** הנוסח נכתב בדפדפן ואינו עולה הודעה מהתקרה,
+   בדיוק כמו הברכה. ג׳וש פותח פה, והלומד מחליט אם לענות.
+
+   **ובמבחן כיתתי אין יוזמה כלל** — `JOSHSTATE.off()` מכבה את
+   הרישום, ואז `state()` מחזיר `ok` תמיד. זה האיסור המפורש
+   שב-O-47, והוא נאכף במקור ולא כאן. */
+var NUDGE_MAX  = 2;
+var NUDGE_MS   = 5000;
+var nudges = 0, nudgeAt = "ok", nudgeTimer = null;
+
+function nudgeTick(){
+  if(nudges >= NUDGE_MAX) return stopNudge();
+  if(typeof JOSHSTATE === "undefined") return stopNudge();
+  var st;
+  try{ st = JOSHSTATE.state() }catch(e){ return }
+  if(st !== "stuck" && st !== "frustrated"){ nudgeAt = st; return }
+  if(st === nudgeAt) return;
+  nudgeAt = st;
+  /* פאנל פתוח — הלומד כבר מדבר איתו, ואין מה ליזום. */
+  if(EL && EL.ov && EL.ov.classList.contains("on")) return;
+  if(document.querySelector(".lg-wrap")) return;
+  var txt = (T().nudge || {})[st];
+  if(!txt) return;
+  nudges++;
+  build().ov.classList.add("on");
+  MSGS.push({ role:"assistant", text:txt });
+  startReveal(MSGS.length - 1);
+  draw();
+}
+function stopNudge(){ if(nudgeTimer){ clearInterval(nudgeTimer); nudgeTimer = null } }
+function startNudge(){
+  if(nudgeTimer || typeof JOSHSTATE === "undefined") return;
+  nudgeTimer = setInterval(nudgeTick, NUDGE_MS);
+}
+
 var AUTO_TRIES = 30;
 function autoOpen(tries){
   if(autoSeen()) return;
@@ -835,7 +887,7 @@ g.TUTOR = {
   mount: function(cfg){
     CFG = cfg || null;
     var ok = !!API && !!CFG;
-    if(ok) autoOpen();
+    if(ok){ autoOpen(); startNudge() }
     return ok;
   },
   open: open,
