@@ -22,14 +22,28 @@
 "use strict";
 
 /* ---------------------------------------------------------------
-   כתובת השרת. ריקה = אין בוט: הכפתור אינו נבנה, הפאנל אינו קיים,
-   ואף בקשה אינה יוצאת. זו ברירת המחדל במאגר, והיא מכוונת —
-   מי שלא פרס שרת לא רואה כפתור שנשבר.
-   מילוי הכתובת הוא הרגע שבו מידע מתחיל לצאת מהמכשיר, ולכן הוא
-   גם הרגע שבו LEGAL.version חייב לעלות. `node .claude/qa/tutor.js`
-   נופל אם עשו את האחד בלי השני.
+   כתובת השרת — **ריקה בהוראת הבעלים, 14.9.2026.**
+
+   לשונו: ״אני לא רוצה שג׳וש יוציא כסף. לנתק אותו מכל מה שעולה
+   כסף, להשאיר מחובר רק למה שחינם.״ והנימוק, בהודעה שלפניה: ״כל
+   תלמיד שלא משלם סנט אחד ייצר עלות״ — המוצר חינם ללומד, ולכן
+   הצלחה גדולה יותר היא חשבון גדול יותר.
+
+   כל עוד היא ריקה **אף בקשה אינה יוצאת מהמכשיר**, והתשובות
+   נבנות ב-`tutor/josh-local.js`.
+
+   **להחזרת השרת:** להחזיר לכאן את הכתובת, ואז שלושה־עשר מפתחות
+   קאש. מילוי הכתובת הוא הרגע שבו מידע מתחיל לצאת מהמכשיר, ולכן
+   הוא גם הרגע שבו `LEGAL.version` חייב לעלות —
+   `node .claude/qa/tutor.js` נופל אם עשו את האחד בלי השני.
    --------------------------------------------------------------- */
-var API = "https://tutor.lagstein1.workers.dev/";
+var API = "";
+
+/* **יש מוח, ולכן יש כפתור.** עד 14.9 השאלה ״האם ג׳וש קיים״ הייתה
+   ״האם יש כתובת שרת״. מאז יש שני מוחות אפשריים, והשאלה היא האם
+   קיים אחד מהם: השרת בתשלום, או המקומי שבחינם. כפתור שנבנה בלי
+   אף אחד מהם הוא כפתור שבור, וזו הייתה הכוונה המקורית של השער. */
+var BRAIN = !!API || typeof JOSHLOCAL !== "undefined";
 
 var RATE_KEY = "tutor-rate-v1";   /* מהירות ההקראה. משותף בכוונה — מודול אחד, התנהגות אחת */
 var DAY_KEY  = "tutor-day-v1";    /* מונה יומי. ילד אחד, תקציב אחד, בלי קשר לאפליקציה */
@@ -667,7 +681,7 @@ function greetLocal(){
 }
 
 function open(auto){
-  if(!API || !CFG) return;
+  if(!BRAIN || !CFG) return;
   var id = qid(), lg = lang();
   /* תרגיל חדש — שיחה חדשה. וגם שפה חדשה: הבוט עונה בשפה שנשלחה
      אליו, ושיחה שהתחילה בעברית הייתה ממשיכה בעברית גם אחרי
@@ -811,11 +825,53 @@ function sign(){
   }catch(e){ return null }
 }
 
+/* המוח המקומי — התשובה כשאין שרת.
+
+   הכרעת הבעלים 14.9.2026: ג׳וש לא יוציא כסף. `API` ריקה, וכל
+   תשובה נבנית ב-`tutor/josh-local.js` בלי בקשה יוצאת אחת.
+
+   **המונה היומי אינו נספר כאן במתכוון.** `bump()` קיים כדי להגן
+   על תקציב, ומוח מקומי אינו עולה דבר — לומד שמדבר עם ג׳וש חמישים
+   פעם ביום אינו עולה יותר מלומד שמדבר איתו פעם אחת. תקרה כאן
+   הייתה מגבילה בלי שום דבר להגן עליו. */
+function replyLocal(text){
+  if(typeof JOSHLOCAL === "undefined") return false;
+  var out;
+  try{
+    out = JOSHLOCAL.reply(text, {
+      lang: lang(),
+      q:    CFG && CFG.q ? CFG.q() : null,
+      sign: sign()
+    });
+  }catch(e){ return false }
+  if(!out || !out.text) return false;
+
+  MSGS.push({ role:"assistant", text:out.text });
+  startReveal(MSGS.length - 1);
+  BUSY = false; draw(); focus();
+  return true;
+}
+
 function send(text, auto){
   var t = T();
   text = String(text || "").trim().slice(0, MAXLEN);
-  if(!text || BUSY || !API) return;
+  if(!text || BUSY) return;
   if(MSGS.length >= TURNS){ NOTE = t.full; draw(); return }
+
+  /* אין שרת — עונים מקומית. זה הנתיב הרגיל מ-14.9.2026, ולא
+     נפילה־אחורה: `API` ריקה בכוונה. */
+  if(!API){
+    stopReveal();
+    MSGS.push({ role:"user", text:text });
+    if(EL) EL.inp.value = "";
+    NOTE = ""; draw();
+    /* השהיה קצרה כדי שהפאנל יספיק לצייר את תור הלומד לפני
+       התשובה. בלעדיה שתי השורות מופיעות יחד וזה נראה כמו טופס. */
+    BUSY = true; draw();
+    setTimeout(function(){ if(!replyLocal(text)){ BUSY = false; NOTE = t.err; draw() } }, 420);
+    return;
+  }
+
   if(left() <= 0){ NOTE = t.limit; draw(); return }
 
   stopReveal();
@@ -908,14 +964,14 @@ function send(text, auto){
            stopHost: function(){...} } ההקראה של האפליקציה, לעצירה
    ================================================== */
 g.TUTOR = {
-  on: function(){ return !!API },
+  on: function(){ return BRAIN },
   /* תווית הכפתור. באה מכאן ולא ממילון האפליקציה, מפני שבמילונים
      האלה המחרוזת העברית היא המפתח — הוספת מחרוזת חדשה שם היא
      נגיעה במנגנון התרגום, וכאן היא שורה במודול אחד. */
   label: function(){ return T().btn },
   mount: function(cfg){
     CFG = cfg || null;
-    var ok = !!API && !!CFG;
+    var ok = BRAIN && !!CFG;
     if(ok){ autoOpen(); startNudge() }
     return ok;
   },
