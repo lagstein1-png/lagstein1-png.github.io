@@ -566,7 +566,9 @@ function build(){
      יחיד עובר.
      --------------------------------------------------------------- */
   if(typeof JOSHFACE !== "undefined"){
-    JOSHFACE.photo("/img/josh.jpg");
+    /* הרובוט, 14.9.2026. חזרה לדיוקן: `JOSHFACE.photo("/img/josh.jpg")`
+       במקום השורה הזאת — שורה אחת, לשני הכיוונים. */
+    JOSHFACE.look("robot");
     var fw = ov.querySelector("#tu-face");
     if(fw){ fw.innerHTML = JOSHFACE.markup(46); JOSHFACE.attach() }
   }

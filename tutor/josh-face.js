@@ -30,8 +30,15 @@
 
    **אפס נכסים.** הפנים הן SVG מוטבע — אין PNG, אין גופן, אין בקשת
    רשת, ולכן אין מה לטעון בעצלתיים ואין מה שיאט את עליית האפליקציה.
-   `josh-sprites.png` (21,797 בתים) אינו נטען כאן כלל: הוא רובוט
-   צעצוע עם אנטנה, ועיצוב 2 הוא מורה אנושי. ראו O-52.
+   `josh-sprites.png` (21,797 בתים) נמחק ב-13.9 ואינו נטען כאן:
+   הוא היה רובוט צעצוע עם אנטנה. ראו O-52.
+
+   **ומאז 14.9.2026 יש כאן שני פרצופים מצוירים, לא אחד.** הבעלים
+   שלח דגם תלת־ממד מ-Meshy — ראש כרום עם כיפה כהה ועיניים ציאן —
+   וביקש ״תן לו חיים״. הדגם עצמו אינו נכנס לדפדפן (1,946,666
+   פאות, ומציג תלת־ממד הוא תלות חיצונית אסורה), ולכן **העיצוב
+   צויר ב-SVG** ויושב ב-`robotSVG`. `look("human")` מחזיר את
+   המורה האנושי, ושניהם חיים.
 
    **תנועה.** אין `requestAnimationFrame` ואין לולאה. מה שרץ תמיד הוא
    שרשרת `setTimeout` אחת למצמוץ, שנעצרת כשהלשונית מוסתרת או כשאין
@@ -59,6 +66,13 @@ var base = "idle", cur = "idle", nodes = [], moTimer = null, blTimer = null;
 
 /* נתיב לדיוקן. ריק = הפנים המצוירות. ראו `photo()` למטה. */
 var photoURL = "";
+
+/* **איזה פרצוף נבנה כשאין תצלום — "robot" או "human".**
+
+   ברירת המחדל היא הרובוט, בהוראת הבעלים 14.9.2026. הפנים
+   האנושיות נשארות במלואן ואינן קוד מת: `JOSHFACE.look("human")`
+   מחזיר אותן, וזו שורה אחת. */
+var look = "robot";
 
 var MOTION_Q = "(prefers-reduced-motion: reduce)";
 function reduced() {
@@ -237,6 +251,23 @@ var CSS = [
 '.jf--photo[data-state="listening"] .jf__dot{opacity:1;animation:jf-led 1.9s ease-in-out infinite}',
 '.jf--photo[data-state="thinking"] .jf__dot{opacity:1;animation:jf-led 2.8s ease-in-out infinite}',
 
+/* הרובוט: ההילה סביב העין.
+
+   **זה מה שמפריד בין נורית דולקת לעין שמגיבה.** האישון עצמו אינו
+   משנה בהירות — עין שמהבהבת היא התראה — אלא ההילה שמסביבו, וזו
+   תנועה שנקראת בפריפריה בלי למשוך את המבט מהטקסט. בתסכול ובתקיעות
+   היא **יורדת** ולא עולה: מכונה שמאירה חזק יותר על לומד שנתקע היא
+   מכונה שלוחצת עליו.
+
+   `prefers-reduced-motion` מכבה גם את זה — הבלוק שמתחת חל על
+   `.jf *` כולו. */
+'.jf--bot .jf__glow{transition:opacity .45s ease}',
+'.jf--bot[data-state="listening"] .jf__glow,.jf--bot[data-state="speaking"] .jf__glow{opacity:.4}',
+'.jf--bot[data-state="correct"] .jf__glow,.jf--bot[data-state="encourage"] .jf__glow{opacity:.5}',
+'.jf--bot[data-state="frustrated"] .jf__glow,.jf--bot[data-state="stuck"] .jf__glow,.jf--bot[data-state="slow"] .jf__glow{opacity:.1}',
+'.jf--bot[data-state="thinking"] .jf__glow{animation:jf-glow 2.4s ease-in-out infinite}',
+"@keyframes jf-glow{0%,100%{opacity:.14}50%{opacity:.44}}",
+
 /* וזה מכבה את הכול. `animation:none` על הצאצאים מכסה גם את
    הקשת ואת ההנהון, ולא רק את הפה. */
 "@media (prefers-reduced-motion: reduce){",
@@ -273,6 +304,22 @@ var SKIN   = "#e3b28d",   /* גוון בסיס */
     HAIR   = "#2e2a31", HAIR_HI = "#433c48",
     SHIRT  = "#35566e", COLLAR = "#2a4459",
     LIP    = "#a96754", TECH = "#4aa8a0";
+
+/* ---------------------------------------------------------------
+   לוח הרובוט. נגזר מהדגם שהבעלים שלח: כרום קר, כיפה כהה, ציאן.
+
+   חמישה גווני כרום ולא שניים — משטח מתכתי נקרא ככזה בזכות
+   המדרגות שבין אור לצל, ושני גוונים נותנים פלסטיק. */
+var CH_HI = "#f4f7fa",  /* נצנוץ — עצמות לחיים, קצה לוח */
+    CH    = "#dce3ea",  /* לוח הפנים */
+    CH_M  = "#b3bfcb",  /* צל בינוני — תריסים, צווארון */
+    CH_D  = "#8795a6",  /* צל — תפרים, מתחת ללסת */
+    CH_X  = "#5d6b7c",  /* התפר העמוק ביותר */
+    PNL   = "#1b2331",  /* לוח כהה — כיפה, פודים, ארובות */
+    PNL_L = "#2e3a4c",  /* לוח כהה בהיר יותר — פס מרכזי */
+    CY    = "#3fd8ea",  /* ציאן — עיניים, תפרים חיים */
+    CY_D  = "#12a3bd",
+    CY_HI = "#a8f2fb";
 
 /* `width` ו-`height` יושבים כתכונות ולא ב-CSS בלבד, וזו חגורה ולא
    כפילות: נמדד בכרומיום — בלי גיליון הסגנון ה-SVG קורס ל-0×0, מפני
@@ -390,6 +437,128 @@ function faceSVG(px) {
   '</svg>';
 }
 
+
+/* עוגני האנטומיה זהים לאלה של הפנים האנושיות, וזה תנאי ולא סגנון:
+   ה-CSS מזיז את `jf__eyes` ב-3.5px ומקנה מידה את `jf__lid`
+   מ-`50% 0`. ציור עם עיניים במקום אחר היה מקבל את אותה תנועה
+   בדיוק — ונראה שבור. עיניים ב-cy 54.3, תריסים 49.6→58.4,
+   גבות סביב 43–45.6, פה 77–82.4, וראש 17→88.5. */
+function robotSVG(px) {
+  return '<svg viewBox="0 0 120 120" width="' + px + '" height="' + px + '" aria-hidden="true" focusable="false">' +
+
+    /* ---- גוף: לוחות כתף, צוואר מכני ונורית חזה ----
+       הנשימה נתלית כאן ולא על הראש, מאותה סיבה בדיוק כמו בפנים
+       האנושיות: ל-`jf__head` כבר יש טרנספורם הטיה. */
+    '<g class="jf__body">' +
+      /* צוואר: עמוד כהה עם שתי טבעות */
+      '<path fill="' + PNL + '" d="M 51.5 77 h 17 v 17 q -8.5 6.5 -17 0 Z"/>' +
+      '<path d="M 52.4 84 h 15.2 M 52.8 89 h 14.4" stroke="' + CY_D + '" stroke-width=".9" opacity=".55" fill="none"/>' +
+      '<path fill="#000" opacity=".22" d="M 51.5 77 q 8.5 10 17 0 v 4.5 q -8.5 8.5 -17 0 Z"/>' +
+      /* גוש הכתפיים — כהה מתחת, לוחות כרום מעל */
+      '<path fill="' + PNL + '" d="M 20 120 C 22 103 30.5 96.5 46.5 92.5 L 73.5 92.5 C 89.5 96.5 98 103 100 120 Z"/>' +
+      '<path fill="' + CH + '" d="M 20 120 C 22 104 30 97.5 45.5 93.5 L 48.5 100.5 C 36.5 104.5 30.5 110.5 29 120 Z"/>' +
+      '<path fill="' + CH + '" d="M 100 120 C 98 104 90 97.5 74.5 93.5 L 71.5 100.5 C 83.5 104.5 89.5 110.5 91 120 Z"/>' +
+      '<path fill="' + CH_HI + '" opacity=".55" d="M 22.6 116 C 24.6 106 31 100.5 44 97 L 45 99.4 C 33 103 27 109 24.6 118 Z"/>' +
+      '<path fill="' + CH_HI + '" opacity=".55" d="M 97.4 116 C 95.4 106 89 100.5 76 97 L 75 99.4 C 87 103 93 109 95.4 118 Z"/>' +
+      /* תפרי ציאן על הכתפיים */
+      '<path d="M 31.5 120 C 33 110.5 37.5 105 46.2 101.6" stroke="' + CY + '" stroke-width="1" opacity=".5" fill="none"/>' +
+      '<path d="M 88.5 120 C 87 110.5 82.5 105 73.8 101.6" stroke="' + CY + '" stroke-width="1" opacity=".5" fill="none"/>' +
+      /* צווארון: טבעת כרום שיורדת ל-V */
+      '<path fill="' + CH_M + '" d="M 46.5 92.5 L 60 104.5 L 73.5 92.5 L 70 99.5 L 60 108 L 50 99.5 Z"/>' +
+      /* נורית החזה */
+      '<ellipse cx="60" cy="112.5" rx="5.4" ry="5.4" fill="' + CY + '" opacity=".18"/>' +
+      '<ellipse cx="60" cy="112.5" rx="2.6" ry="2.6" fill="' + CY + '" opacity=".9"/>' +
+      '<ellipse cx="60" cy="112.5" rx="1.1" ry="1.1" fill="' + CY_HI + '"/>' +
+    '</g>' +
+
+    '<g class="jf__head">' +
+      /* ---- פודי צדע: יחידות כהות במקום אוזניים ---- */
+      '<path fill="' + PNL + '" d="M 37.5 49 L 33.4 50.8 C 31.2 51.9 30.6 55.2 31.1 59 C 31.6 62.8 32.8 65.4 34.7 66.4 L 37.5 67.6 Z"/>' +
+      '<path fill="' + PNL + '" d="M 82.5 49 L 86.6 50.8 C 88.8 51.9 89.4 55.2 88.9 59 C 88.4 62.8 87.2 65.4 85.3 66.4 L 82.5 67.6 Z"/>' +
+      '<path d="M 33.9 54.6 v 6.6 M 86.1 54.6 v 6.6" stroke="' + CY + '" stroke-width="1.3" opacity=".7" stroke-linecap="round" fill="none"/>' +
+
+      /* ---- לוח הפנים: אותה צללית אנושית, בקצוות חדים יותר ---- */
+      '<path fill="' + CH + '" d="M 36 48 C 36 26 44.5 17 60 17 C 75.5 17 84 26 84 48 C 84 60 82.5 67.5 79 73.5 C 74.5 81.5 67 88.5 60 88.5 C 53 88.5 45.5 81.5 41 73.5 C 37.5 67.5 36 60 36 48 Z"/>' +
+      /* עצמות לחיים — נצנוץ, ולא סומק */
+      '<ellipse cx="43.8" cy="62.5" rx="4.2" ry="6.4" fill="' + CH_HI + '" opacity=".5"/>' +
+      '<ellipse cx="76.2" cy="62.5" rx="4.2" ry="6.4" fill="' + CH_HI + '" opacity=".5"/>' +
+      /* צל הלסת */
+      '<path fill="' + CH_D + '" opacity=".3" d="M 41 64 C 44.5 80 52.5 88.5 60 88.5 C 67.5 88.5 75.5 80 79 64 C 76.5 74.5 69.5 80.5 60 80.5 C 50.5 80.5 43.5 74.5 41 64 Z"/>' +
+      /* תפרי הלוחות — זה מה שהופך משטח חלק למכונה.
+         **קצרים, ולא מהעין לסנטר.** הגרסה הראשונה התחילה ב-y=60.5,
+         מיד מתחת לעין, ושני הקווים נקראו כמו עקבות דמעות. מול ילד
+         שמתקשה זה הדבר האחרון שצריך להיות שם. נמדד בצילום מסך. */
+      '<path d="M 44.8 71.2 C 46.6 75.8 49.2 78.9 52.2 80.6" stroke="' + CH_D + '" stroke-width=".85" opacity=".65" fill="none"/>' +
+      '<path d="M 75.2 71.2 C 73.4 75.8 70.8 78.9 67.8 80.6" stroke="' + CH_D + '" stroke-width=".85" opacity=".65" fill="none"/>' +
+      '<path d="M 53.4 84.6 C 56.4 85.8 63.6 85.8 66.6 84.6" stroke="' + CH_X + '" stroke-width=".8" opacity=".5" fill="none"/>' +
+
+      /* ---- הכיפה: לוח כהה עם חריץ V במצח, כמו בדגם ---- */
+      '<path fill="' + PNL + '" d="M 36 48 C 36 26 44.5 17 60 17 C 75.5 17 84 26 84 48 C 83.1 42.2 81.6 38 80 35.4 L 66 35.4 L 60 43.4 L 54 35.4 L 40 35.4 C 38.4 38 36.9 42.2 36 48 Z"/>' +
+      '<path fill="' + PNL_L + '" d="M 56.2 17.5 C 58 17.15 62 17.15 63.8 17.5 L 63.8 33.8 L 60 38.6 L 56.2 33.8 Z"/>' +
+      '<path d="M 40 35.4 L 54 35.4 L 60 43.4 L 66 35.4 L 80 35.4" stroke="' + CY + '" stroke-width=".95" opacity=".6" fill="none" stroke-linejoin="round"/>' +
+      '<path fill="' + CH_HI + '" opacity=".22" d="M 62 18.6 C 71 20.4 78.4 26.4 81.4 34.4 C 77.2 27.2 70 21.4 62 18.6 Z"/>' +
+
+      /* ---- אוזנייה ונורית: הן חלק מהמכונה, ולא תוספת ---- */
+      '<path class="jf__ring" stroke="' + CY + '" d="M 85.4 49 C 91.4 50.6 93.6 56.2 92.4 62.2"/>' +
+      '<circle class="jf__led" cx="92" cy="63.8" r="1.9" fill="' + CY + '"/>' +
+
+      /* ---- גבות: חריצים כהים בלוח, ולא שיער ---- */
+      '<g class="jf__brows">' +
+        '<path d="M 42.8 45.8 L 47.2 43.4 L 53.6 43.2 L 56.8 45.4" stroke="' + PNL + '" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M 63.2 45.4 L 66.4 43.2 L 72.8 43.4 L 77.2 45.8" stroke="' + PNL + '" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</g>' +
+
+      /* ---- העיניים ---- */
+      '<g class="jf__eyes">' +
+        /* ארובה כהה — בלעדיה הציאן צף על הכרום ואינו נראה כנתון בפנים */
+        '<path fill="' + PNL + '" d="M 42.4 54.3 C 45 48.9 54.8 48.9 57.4 54.3 C 54.8 59.3 45 59.3 42.4 54.3 Z"/>' +
+        '<path fill="' + PNL + '" d="M 62.6 54.3 C 65.2 48.9 75 48.9 77.6 54.3 C 75 59.3 65.2 59.3 62.6 54.3 Z"/>' +
+        /* ההילה — היא מה שהופך עין דולקת לעין חיה */
+        '<ellipse class="jf__glow" cx="49.9" cy="54.3" rx="7" ry="4.6" fill="' + CY + '" opacity=".16"/>' +
+        '<ellipse class="jf__glow" cx="70.1" cy="54.3" rx="7" ry="4.6" fill="' + CY + '" opacity=".16"/>' +
+        '<ellipse cx="49.9" cy="54.3" rx="3.5" ry="3.1" fill="' + CY_D + '"/>' +
+        '<ellipse cx="70.1" cy="54.3" rx="3.5" ry="3.1" fill="' + CY_D + '"/>' +
+        '<ellipse cx="49.9" cy="54.3" rx="2.4" ry="2.1" fill="' + CY + '"/>' +
+        '<ellipse cx="70.1" cy="54.3" rx="2.4" ry="2.1" fill="' + CY + '"/>' +
+        '<ellipse cx="49.9" cy="54.3" rx="1.1" ry="1" fill="' + CY_HI + '"/>' +
+        '<ellipse cx="70.1" cy="54.3" rx="1.1" ry="1" fill="' + CY_HI + '"/>' +
+        '<circle cx="51.2" cy="52.8" r=".75" fill="#ffffff" opacity=".92"/>' +
+        '<circle cx="71.4" cy="52.8" r=".75" fill="#ffffff" opacity=".92"/>' +
+        /* שפת הארובה — קצה כרום מעל, שנותן עומק */
+        '<path d="M 42.4 54.3 C 45 48.7 54.8 48.7 57.4 54.3" stroke="' + CH_D + '" stroke-width="1.3" fill="none" stroke-linecap="round"/>' +
+        '<path d="M 62.6 54.3 C 65.2 48.7 75 48.7 77.6 54.3" stroke="' + CH_D + '" stroke-width="1.3" fill="none" stroke-linecap="round"/>' +
+        /* התריסים — אותה גאומטריה בדיוק של העפעפיים, ולכן אותו מצמוץ */
+        '<path class="jf__lid" fill="' + CH_M + '" d="M 42.4 49.6 h 14.2 v 8.8 c -2.6 2.4 -11.6 2.4 -14.2 0 Z"/>' +
+        '<path class="jf__lid" fill="' + CH_M + '" d="M 63.4 49.6 h 14.2 v 8.8 c -2.6 2.4 -11.6 2.4 -14.2 0 Z"/>' +
+      '</g>' +
+
+      /* ---- אף: רכס דק ושני פתחי אוורור ---- */
+      '<path d="M 57.9 56.4 C 57.2 62.4 56.9 66 58.1 68.6" stroke="' + CH_D + '" stroke-width="1.4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M 56.1 69.2 C 57.8 71.1 62.2 71.1 63.9 69.2" stroke="' + CH_X + '" stroke-width="1.2" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="56.9" cy="69.6" rx=".85" ry=".6" fill="' + PNL + '" opacity=".75"/>' +
+      '<ellipse cx="63.1" cy="69.6" rx=".85" ry=".6" fill="' + PNL + '" opacity=".75"/>' +
+
+      /* ---- חמישה פיות, אחד גלוי בכל רגע ----
+         תפר מכונה ולא שפתיים, ורק ב״מדבר״ הוא נפתח ונדלק מבפנים. */
+      '<g class="jf__mouths">' +
+        '<path class="jf__m jf__m--calm is-on" d="M 53.4 78.6 C 56.2 79.9 63.8 79.9 66.6 78.6" stroke="' + PNL + '" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+        '<path class="jf__m jf__m--smile" d="M 52.4 77.8 C 55.8 82.4 64.2 82.4 67.6 77.8" stroke="' + PNL + '" stroke-width="2.2" fill="none" stroke-linecap="round"/>' +
+        '<path class="jf__m jf__m--soft" d="M 53.8 78.9 C 56.6 80 63.4 80 66.2 78.4" stroke="' + PNL + '" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+        '<path class="jf__m jf__m--think" d="M 54.2 78.7 C 56.8 77.4 59.2 79.2 61.8 78.8 C 64.2 78.4 65.8 77.7 66.8 77.1" stroke="' + PNL + '" stroke-width="1.9" fill="none" stroke-linecap="round"/>' +
+        '<path class="jf__m jf__m--talk" fill="' + PNL + '" stroke="' + CY + '" stroke-width=".7" stroke-opacity=".65" d="M 54.6 77.8 C 57.4 76.4 62.6 76.4 65.4 77.8 C 64.4 82.5 55.6 82.5 54.6 77.8 Z"/>' +
+      '</g>' +
+    '</g>' +
+
+    /* שלוש נקודות חשיבה — מחוץ ל-`jf__head`, כדי שההטיה לא תסחוב
+       אותן. ציאן, כדי שיהיו של אותה מכונה. */
+    '<g class="jf__think">' +
+      '<circle r="3.1" cx="92" cy="30" fill="' + CY + '" opacity=".25"/>' +
+      '<circle r="3.1" cx="102" cy="26" fill="' + CY + '" opacity=".25"/>' +
+      '<circle r="3.1" cx="112" cy="22" fill="' + CY + '" opacity=".25"/>' +
+    '</g>' +
+  '</svg>';
+}
+
 /* איזה פה לכל מצב. טעות אינה מקבלת פרצוף עצוב: הכלל שנמסר הוא
    שלא מביישים מי שטעה, ופה נופל מול ילד הוא בדיוק זה. */
 var MOUTH = {
@@ -472,7 +641,26 @@ var JOSHFACE = {
                '<span class="jf__halo"></span><span class="jf__dot"></span>' +
              '</span>';
     }
+    if (look === "robot")
+      return '<span class="jf jf--bot" data-state="' + cur + '" style="width:' + px +
+             'px">' + robotSVG(px) + '</span>';
     return '<span class="jf" data-state="' + cur + '" style="width:' + px + 'px">' + faceSVG(px) + '</span>';
+  },
+
+  /**
+   * בוחר איזה פרצוף מצויר נבנה: `"robot"` או `"human"`.
+   *
+   * שם לא מוכר נדחה ומחזיר false, והבחירה הקודמת נשארת — כך
+   * ששגיאת כתיב אינה מוחקת את הפנים.
+   *
+   * **אינו נוגע בתצלום.** מי שקרא ל-`photo()` ימשיך לראות אותו,
+   * מפני ש-`markup` בודק את התצלום ראשון. סדר החזרה לאדם:
+   * `photo("")` ואז `look("human")`.
+   */
+  look: function (name) {
+    if (name !== "robot" && name !== "human") return false;
+    look = name;
+    return true;
   },
 
   /**
@@ -538,7 +726,7 @@ var JOSHFACE = {
   },
 
   /** המצב המוצג כרגע, ומצב הבסיס שאליו יחזור אחרי רגע. */
-  state: function () { return { current: cur, base: base, photo: photoURL || null } },
+  state: function () { return { current: cur, base: base, photo: photoURL || null, look: look } },
 
   /**
    * וו לסנכרון שפתיים, ו**רק וו**. הוא אינו מקריא ואינו יודע מה
