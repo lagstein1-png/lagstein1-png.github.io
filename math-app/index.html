@@ -16,12 +16,22 @@
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
 :root{
   --ar:"Noto Sans Arabic",system-ui,"Segoe UI",Arial,sans-serif;
   --ru:"Noto Sans",system-ui,"Segoe UI",Arial,sans-serif;   /* קירילית — Heebo אינו מכיל אותה, נמדד 7.9 */
-  --font-display:"Fredoka","Rubik",sans-serif; --font-body:"Rubik",sans-serif;
+  /* **Heebo, כמו בעשר האפליקציות האחרות — 14.9.2026.**
+
+     עד כאן זו הייתה היחידה ב-Fredoka, גופן תצוגה מעוגל־ילדותי,
+     ו-Rubik לגוף. הבעלים ביקש במפורש שהאתר ייראה **מקצועי ולא
+     ילדותי**, וזו הייתה החריגה הבולטת ביותר: אחת מול עשר.
+
+     ההפרדה בין תצוגה לגוף נשמרת — היא עוברת למשקל ולא למשפחה,
+     וזה נכון טיפוגרפית ממילא. ובדרך יורדות שתי משפחות מבקשת
+     הגופנים. */
+  --font-display:"Heebo",system-ui,"Segoe UI",Arial,sans-serif;
+  --font-body:"Heebo",system-ui,"Segoe UI",Arial,sans-serif;
   --paper:#f3f8f4; --card:#ffffff; --ink:#17333c; --ink-soft:#4c666e; --ink-faint:#5a7178;
   --teal:#0e9c8d; --teal-deep:#0b7568; --teal-soft:#d9f2ec;
   --amber:#ffc531; --amber-deep:#8a6100; --amber-soft:#fff3ce;
@@ -31,9 +41,9 @@
   --hit:#ffc531; --hit-ink:#1a1300;
 }
 
-/* Heebo, Fredoka ו-Assistant אינם מכילים גליפים ערביים. בלי
+/* Heebo אינו מכיל גליפים ערביים. בלי
    המשפחה הזאת הממשק הערבי נופל לגופן ברירת המחדל של המערכת —
-   נמדד: הוא הוצג כאן ב-Fredoka. Noto Sans Arabic נטען מאותה בקשת
+   נמדד ב-7.9: הוא הוצג בגופן אחר לגמרי. Noto Sans Arabic נטען מאותה בקשת
    גופנים שכבר קיימת, ולכן אין כאן תלות חיצונית חדשה, וקובצי
    הגופן נמשכים רק כשבאמת מוצג טקסט ערבי. */
 html[lang="ar"] body,html[lang="ar"] input,html[lang="ar"] button,
@@ -306,6 +316,14 @@ input[type=range]{width:100%;accent-color:var(--teal)}
 .vrow .rd{width:20px;height:20px;border-radius:50%;border:2.5px solid rgba(23,51,60,.25);display:grid;place-items:center;flex-shrink:0}
 .vrow.on .rd{border-color:var(--teal)}
 .vrow.on .rd::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--teal)}
+/* מדליית הדירוג ותג ״זה אתה״ — שניהם היו אמוג׳י עד 14.9.2026. */
+.mdl{display:inline-flex;align-items:center;justify-content:center;
+  inline-size:2rem;block-size:2rem;border-radius:50%;font-weight:800;
+  font-size:1.05rem;color:var(--paper);flex:0 0 auto}
+.you{display:inline-block;margin-inline-start:.4rem;padding:1px 7px;
+  border-radius:99px;background:var(--teal-soft);color:var(--teal-deep);
+  font-size:.68rem;font-weight:700;white-space:nowrap}
+.stk svg{inline-size:1.6rem;block-size:1.6rem}
 .badge{font-size:.68rem;font-weight:700;border-radius:99px;padding:2.5px 10px;white-space:nowrap}
 .b-gold{background:var(--amber-soft);color:var(--amber-deep);border:1px solid rgba(255,197,49,.6)}
 .b-teal{background:var(--teal-soft);color:var(--teal-deep);border:1px solid rgba(14,156,141,.35)}
@@ -483,7 +501,7 @@ textarea.field{min-height:96px;resize:vertical}
 /* ---------- מצב מורה ---------- */
 .te-wrap{position:fixed;inset:0;z-index:2147482500;background:rgba(8,12,20,.72);
   display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;
-  font-family:system-ui,"Heebo","Rubik",Arial,sans-serif}
+  font-family:system-ui,"Heebo",Arial,sans-serif}
 .te-box{background:#fff;color:#111827;max-width:26rem;width:100%;border-radius:18px;
   box-shadow:0 24px 70px -20px rgba(0,0,0,.6);padding:clamp(18px,4vw,26px);
   max-height:92vh;overflow-y:auto;font-size:16px;line-height:1.6}
@@ -916,7 +934,7 @@ progSesTitle:"הסיבובים האחרונים",progWeekTitle:"השבוע של�
 progStrength:"{name} הולך לכם מצוין — המשיכו כך!",progWeak:"כדאי להתאמן קצת על {name}",
 progParentNote:"מסך מצוין להראות להורים ולמורים",progGoPractice:"בואו נתרגל!",
 recTitle:"לוח השיאנים",recSub:"תחרות בריאה — כולם מתקדמים, כולם מרוויחים",
-yourPlace:"המקום שלכם",colRank:"מקום",colName:"שם",colCorrect:"נכונות",colAccuracy:"דיוק",you:"אתם",
+yourRow:"זה אתם",yourPlace:"המקום שלכם",colRank:"מקום",colName:"שם",colCorrect:"נכונות",colAccuracy:"דיוק",you:"אתם",
 setTitle:"הגדרות",setSub:"מכוונים את האפליקציה בדיוק בשבילכם",
 lsTitle:"סגנון למידה",lsCalm:"מצב רגוע",lsCalmBadge:"מומלץ",
 lsCalmD:"אחרי טעות אחת מקבלים רמז מיד ועוד ניסיון — הפתרון המלא רק אחרי הטעות השנייה",
@@ -1000,7 +1018,7 @@ progSesTitle:"Recent rounds",progWeekTitle:"Your week",
 progStrength:"{name} is going great — keep it up!",progWeak:"Worth practicing a bit more: {name}",
 progParentNote:"A great screen to show parents and teachers",progGoPractice:"Let's practice!",
 recTitle:"Leaders board",recSub:"Healthy competition — everyone advances, everyone wins",
-yourPlace:"Your place",colRank:"Rank",colName:"Name",colCorrect:"Correct",colAccuracy:"Accuracy",you:"You",
+yourRow:"You",yourPlace:"Your place",colRank:"Rank",colName:"Name",colCorrect:"Correct",colAccuracy:"Accuracy",you:"You",
 setTitle:"Settings",setSub:"Tune the app to fit you perfectly",
 lsTitle:"Learning style",lsCalm:"Calm mode",lsCalmBadge:"Recommended",
 lsCalmD:"After one mistake you get a hint right away and another try — the full solution only after the second mistake",
@@ -1084,7 +1102,7 @@ progSesTitle:"Последние раунды",progWeekTitle:"Твоя неде�
 progStrength:"{name} идёт отлично — так держать!",progWeak:"Стоит потренировать ещё: {name}",
 progParentNote:"Отличный экран, чтобы показать родителям и учителям",progGoPractice:"Потренируемся!",
 recTitle:"Доска рекордов",recSub:"Здоровое соперничество — продвигаются все",
-yourPlace:"Твоё место",colRank:"Место",colName:"Имя",colCorrect:"Верно",colAccuracy:"Точность",you:"Ты",
+yourRow:"Это ты",yourPlace:"Твоё место",colRank:"Место",colName:"Имя",colCorrect:"Верно",colAccuracy:"Точность",you:"Ты",
 setTitle:"Настройки",setSub:"Настрой приложение под себя",
 lsTitle:"Стиль обучения",lsCalm:"Спокойный режим",lsCalmBadge:"Рекомендуем",
 lsCalmD:"После одной ошибки сразу подсказка и ещё одна попытка — полное решение только после второй ошибки",
@@ -1168,7 +1186,7 @@ progSesTitle:"الجولات الأخيرة",progWeekTitle:"أسبوعك",
 progStrength:"{name} يسير معك بشكل ممتاز — واصل!",progWeak:"يستحق المزيد من التدريب: {name}",
 progParentNote:"شاشة رائعة لعرضها على الأهل والمعلمين",progGoPractice:"لنتدرب!",
 recTitle:"لوحة الأبطال",recSub:"منافسة صحية — الجميع يتقدم والجميع يربح",
-yourPlace:"مكانك",colRank:"الترتيب",colName:"الاسم",colCorrect:"صحيحة",colAccuracy:"دقة",you:"أنتم",
+yourRow:"هذا أنت",yourPlace:"مكانك",colRank:"الترتيب",colName:"الاسم",colCorrect:"صحيحة",colAccuracy:"دقة",you:"أنتم",
 setTitle:"الإعدادات",setSub:"اضبط التطبيق ليناسبك تمامًا",
 lsTitle:"أسلوب التعلم",lsCalm:"الوضع الهادئ",lsCalmBadge:"موصى به",
 lsCalmD:"بعد خطأ واحد تحصل على تلميح فورًا ومحاولة أخرى — الحل الكامل فقط بعد الخطأ الثاني",
@@ -1235,9 +1253,24 @@ var PRESETS=[
 ];
 var THEMES={ocean:["#0e9c8d","#ffc531","#ff6f61"],grape:["#8a63d2","#ffc531","#4db8a4"],berry:["#d94f70","#ffc531","#4fb3c9"]};
 var STICKER_META=[
-  {id:"first-step",e:"🌱",k:"st1"},{id:"first-round",e:"🏁",k:"st2"},{id:"ten-correct",e:"🌟",k:"st3"},
-  {id:"streak-5",e:"🔥",k:"st4"},{id:"level-3",e:"🏅",k:"st5"},{id:"fifty",e:"🏆",k:"st6"},
-  {id:"hundred",e:"👑",k:"st7"},{id:"daily-1",e:"📅",k:"st8"},{id:"daily-7",e:"🗓️",k:"st9"}
+  /* **התגים הם SVG ולא אמוג׳י — 14.9.2026.**
+
+     אמוג׳י כרכיב ממשק נצבע על ידי מערכת ההפעלה: הוא אינו מקבל
+     את צבע המותג, אינו מתחלף במצב כהה ובניגודיות גבוהה, נראה
+     אחרת בכל מכשיר, ומקריא־מסך אומר את שם התו המלא (״נבט״,
+     ״כתר״) במקום את שם ההישג שכבר יושב ב-`title`.
+
+     כל אחד שומר על המשמעות שהייתה לו, ומצויר בקו אחד — אותה
+     שפה של שלושה־עשר הסמלים שב-`ICONS` בדף הבית. */
+  {id:"first-step",  d:"M12 20.5v-7m0 0c0-3.4-2.4-5.6-5.6-5.9-.3 3.3 2 6 5.6 5.9Zm0 0c0-2.8 2-4.7 4.7-5 .3 2.8-1.9 5-4.7 5Z", k:"st1"},
+  {id:"first-round", d:"M6 20.5V4.2m0 0h11l-2.2 3.4L17 11H6", k:"st2"},
+  {id:"ten-correct", d:"M12 3.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 9.7l5.8-.8z", k:"st3"},
+  {id:"streak-5",    d:"M12 21c3.5 0 5.8-2.3 5.8-5.4 0-3.7-3.4-5.2-2.6-9.2-2.6.8-4 3-4 5.1 0 1.4-.8 2.1-1.6 2.1-.9 0-1.6-.7-1.6-2-1.6 1.3-2.4 3-2.4 4.6C5.6 18.6 8.3 21 12 21Z", k:"st4"},
+  {id:"level-3",     d:"M8.6 3.5h6.8l-1.6 5.6H10.2Zm3.4 5.6a5.9 5.9 0 1 0 0 11.8 5.9 5.9 0 0 0 0-11.8Zm0 3.4 1.2 2.4 2.6.4-1.9 1.8.4 2.6-2.3-1.2-2.3 1.2.4-2.6-1.9-1.8 2.6-.4z", k:"st5"},
+  {id:"fifty",       d:"M7.6 3.6h8.8v5.2a4.4 4.4 0 0 1-8.8 0ZM7.6 5.2H4.8v1.6a3.2 3.2 0 0 0 3 3.2M16.4 5.2h2.8v1.6a3.2 3.2 0 0 1-3 3.2M12 13.2v3.4M8.6 20.4h6.8", k:"st6"},
+  {id:"hundred",     d:"M4.4 8.2 7.6 12l4.4-5.6L16.4 12l3.2-3.8 -1.4 9.2H5.8Zm1.4 12.2h12.4", k:"st7"},
+  {id:"daily-1",     d:"M5 5.4h14v14H5zM5 9.8h14M8.8 3.4v3.6M15.2 3.4v3.6M12 13.2v3", k:"st8"},
+  {id:"daily-7",     d:"M5 5.4h14v14H5zM5 9.8h14M8.8 3.4v3.6M15.2 3.4v3.6M8.4 13h.01M12 13h.01M15.6 13h.01M8.4 16.4h.01M12 16.4h.01M15.6 16.4h.01", k:"st9"}
 ];
 function lvlOf(s){return Math.min(6,Math.floor(s.xp/120)+1)}
 function stickerTest(id,s){
@@ -1977,6 +2010,21 @@ function speak(text,excited){
      עם <sub> או <span class="frac"> הוקראה בקול כתגית: הסטודנט
      שמע "span class frac" באמצע השאלה. */
   text=plainOf(String(text));
+  /* **ואמוג׳י יורד לפני ההקראה — 14.9.2026.**
+
+     נמדד: עשרים ושניים אמוג׳י יושבים בתוך מחרוזות העידוד של
+     ארבע השפות, ולא היה שום סילוק לפני ההקראה. כלומר מנוע
+     ההקראה אמר **את שם התו המלא** — ״פופר מסיבה״, ״שריר״ —
+     באמצע משפט, לילד שהמשפט הזה נועד לעודד אותו.
+
+     **התו נשאר על המסך.** הוא תוכן ולא רכיב ממשק, והחום שהוא
+     מוסיף לטקסט אמיתי. מה שיורד הוא רק מה שנאמר.
+
+     `math-app` היא היחידה מבין האחת־עשרה שיש בה אמוג׳י בתוך
+     מחרוזות — בעשר האחרות המניין אפס, ולכן זה תיקון מקומי
+     ולא רוחבי. */
+  text=text.replace(/[🌀-🫿️‍]/gu,"")
+           .replace(/s{2,}/g," ").trim();
   var lang=state.settings.lang||"he";
   var preset=PRESETS.filter(function(p){return p.id===state.settings.preset})[0]||PRESETS[0];
   var rate=Math.min(1.3,state.settings.rate*(excited?1.08:1));
@@ -2100,7 +2148,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b99 · 2026-09-14";
+var BUILD="b100 · 2026-09-14";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2551,7 +2599,12 @@ function practice(){
   h+='<div style="margin-top:14px;padding-top:12px;border-top:2px dashed rgba(23,51,60,.1)"><p class="fd" style="font-weight:600;font-size:.9rem">'+esc(fmt(t.stickerTitle,{name:petName()}))+'</p><div class="shelf" style="margin-top:8px">';
   STICKER_META.forEach(function(m){
     var got=state.stickers.indexOf(m.id)>=0;
-    h+='<span class="stk '+(got?"got pop":"miss")+'" title="'+(got?esc(t[m.k]):"")+'">'+m.e+'</span>';
+    /* `aria-label` נושא את שם ההישג, ולכן מקריא־מסך אומר אותו
+       ולא את שם התו. `currentColor` נותן לתג את צבע המותג. */
+    h+='<span class="stk '+(got?"got pop":"miss")+'" title="'+(got?esc(t[m.k]):"")+'"'+
+       ' role="img" aria-label="'+esc(t[m.k]||"")+'">'+
+       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" '+
+       'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+m.d+'"/></svg></span>';
   });
   h+='</div>'+(state.stickers.length===0?'<p style="color:var(--ink-faint);font-size:.75rem;margin-top:6px">'+esc(t.stickerEmpty)+'</p>':"")+'</div>';
   h+='</div>';
@@ -2685,16 +2738,19 @@ function recordsView(){
   '<div class="pod">';
   [1,0,2].forEach(function(idx,place){
     var r=all[idx];if(!r)return;
-    var medals=["🥇","🥈","🥉"];
+    /* שלוש המדליות היו אמוג׳י, ולכן נצבעו על ידי מערכת ההפעלה
+       ולא קיבלו את צבע המותג. מספר בעיגול קריא יותר בקטן, ניטרלי
+       לשפה, ומתחלף עם המצב ועם הניגודיות. */
+    var medalC=["var(--amber)","var(--ink-faint)","var(--coral-deep)"];
     h+='<div class="pcol'+(idx===0?" p1":"")+'" style="'+(idx===1?"transform:translateY(6px)":idx===2?"transform:translateY(14px)":"")+'">'+
     (idx===0?'<span style="color:var(--amber);margin-bottom:-6px">'+ic("crown",30)+'</span>':("")).replace("undefined","")+
-    '<span style="font-size:1.5rem">'+medals[idx]+'</span>'+petSvg(r.pet,"happy",64)+
+    '<span class="mdl fd" style="background:'+medalC[idx]+'">'+(idx+1)+'</span>'+petSvg(r.pet,"happy",64)+
     '<b class="fd" style="font-size:1.05rem">'+esc(r.name)+'</b>'+
     '<span style="font-size:.78rem;color:var(--ink-soft)">'+r.ok+' · '+r.acc+'%</span></div>';
   });
   h+='</div><div class="card" style="padding:10px 22px 22px;margin-top:34px;overflow-x:auto"><table class="tbl"><thead><tr><th>'+esc(t.colRank)+'</th><th>'+esc(t.colName)+'</th><th>'+esc(t.colCorrect)+'</th><th>'+esc(t.colAccuracy)+'</th></tr></thead><tbody>';
   all.forEach(function(r,i){
-    h+='<tr'+(r.me?' class="me"':'')+'><td class="fd" style="font-weight:700">'+(i+1)+'</td><td style="display:flex;align-items:center;gap:10px">'+petSvg(r.pet,"happy",30)+'<span>'+esc(r.name)+(r.me?' ⭐':"")+'</span></td><td class="fd">'+r.ok+'</td><td><span class="badge '+(r.acc>=80?"b-teal":r.acc>=60?"b-gold":"b-mut")+'">'+r.acc+'%</span></td></tr>';
+    h+='<tr'+(r.me?' class="me"':'')+'><td class="fd" style="font-weight:700">'+(i+1)+'</td><td style="display:flex;align-items:center;gap:10px">'+petSvg(r.pet,"happy",30)+'<span>'+esc(r.name)+(r.me?'<span class="you">'+esc(t.yourRow||"")+'</span>':"")+'</span></td><td class="fd">'+r.ok+'</td><td><span class="badge '+(r.acc>=80?"b-teal":r.acc>=60?"b-gold":"b-mut")+'">'+r.acc+'%</span></td></tr>';
   });
   h+='</tbody></table></div>'+
   '<div class="note ok" style="margin-top:18px;text-align:center;font-size:1rem">'+esc(t.yourPlace)+': <b class="fd" style="font-size:1.25rem">#'+myRank+'</b> 🎉</div></div>';
@@ -4517,7 +4573,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b99-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b100-pwa1").catch(function(){});
   });
 }
 </script>
