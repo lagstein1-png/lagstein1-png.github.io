@@ -11,12 +11,12 @@
    ===================================================================== */
 const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "site-" + V;
-const PRE = ["./","./index.html","./manifest.json","./launch.js","./launch.css",
+const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
              "/legal/terms.js","/legal/protect.js",
              /* ג׳וש — שכבת הפנים והתמונה. שתיהן בנתיבים משותפים
                 (/tutor/, /img/) ולכן עותק אחד לכל האתר. */
-             "/tutor/josh-face.js","/img/josh.jpg","/img/josh-bot.jpg"];
+             "/tutor/josh-face.js","/img/paula.jpg","/img/josh.jpg","/img/josh-bot.jpg"];
 
 self.addEventListener("install", e => {
   self.skipWaiting();

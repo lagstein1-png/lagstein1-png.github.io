@@ -13,7 +13,7 @@ const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "math-teen-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
-             "/img/josh.jpg",
+             "/img/paula.jpg","/img/josh.jpg",
              "/img/josh-bot.jpg",
              "/tutor/josh-face.js",
              "/tutor/josh-state.js",

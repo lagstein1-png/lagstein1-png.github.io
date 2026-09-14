@@ -164,6 +164,7 @@ const FIELDS = {
   20: { he: 'עשרים',     ar: 'عشرون',     ru: 'двадцать',     en: 'twenty' },
   21: { he: 'עשרים ואחד', ar: 'واحد وعشرون', ru: 'двадцать одна', en: 'twenty-one' },
   22: { he: 'עשרים ושניים', ar: 'اثنان وعشرون', ru: 'двадцать две', en: 'twenty-two' },
+  23: { he: 'עשרים ושלושה', ar: 'ثلاثة وعشرون', ru: 'двадцать три', en: 'twenty-three' },
 };
 
 const dataDir = path.join(ROOT, 'lomda', 'data');

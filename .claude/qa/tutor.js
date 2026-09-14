@@ -173,7 +173,7 @@ import(WORKER).then(async W => {
      ללומד מה הסימן. זו שורה ב-CORE ולא בהקשר, מפני שהיא חייבת
      לחול בכל אפליקציה ובכל שפה — ובלוק משתנה אינו חל תמיד. */
   t('הגוף המשותף אוסר לומר ללומד מה הסימן',
-    /אל תאמר ללומד מה הסימן ואל תתאר לו את מצבו/.test(W.CORE), true);
+    /אל תאמרי ללומד מה הסימן ואל תתארי לו את מצבו/.test(W.CORE), true);
   /* ההתאמה עצמה חייבת להישאר בבלוק המשתנה: שורה שמשתנה מבקשה
      לבקשה בתוך CORE שוברת את המטמון של הגוף הקבוע. */
   W.SIGNS.forEach(sg => {
@@ -265,9 +265,9 @@ import(WORKER).then(async W => {
   });
   console.log('✓ התפקיד של כל אפליקציה נשלח בראש ההקשר');
   t('הגוף המשותף כולל את איסור הפרטים המזהים',
-    /אל תבקש שם מלא, כתובת, טלפון או פרטים מזהים/.test(W.CORE), true);
+    /אל תבקשי שם מלא, כתובת, טלפון או פרטים מזהים/.test(W.CORE), true);
   t('הגוף המשותף כולל רמז אחד בכל פעם',
-    /התחל ברמז קטן והמתן לתשובת התלמיד/.test(W.CORE), true);
+    /התחילי ברמז קטן והמתיני לתשובת התלמיד/.test(W.CORE), true);
   t('הגוף המשותף אינו נוקב במקצוע', /חשבון|אנגלית|היסטוריה/.test(W.CORE), false);
 
   /* ---------- 5א. האישיות של ג׳וש ----------
@@ -281,7 +281,7 @@ import(WORKER).then(async W => {
      שהוסרה כדי להסביר למה. הכיוון שנשמר הוא זה שמונע את הנזק:
      שורה שנוספה לשרת ואיש אינו יודע למה היא שם. */
   const JOSH = fs.readFileSync(path.join(ROOT, 'JOSH.md'), 'utf8');
-  t('הגוף המשותף נושא את השם ג׳וש', /שמך ג׳וש/.test(W.CORE), true);
+  t('הגוף המשותף נושא את השם פאולה', /שמך פאולה/.test(W.CORE), true);
   /* אמוג׳י וסימן קריאה נכשלים פעמיים: הם ילדותיים, וההקראה
      שבפאנל מקריאה אותם. ראו JOSH.md, ״איך הוא מדבר״. */
   t('אין אמוג׳י בגוף המשותף',
@@ -374,7 +374,7 @@ import(WORKER).then(async W => {
     const src = [
       grab(/var VOICE_F=\/[\s\S]*?\/;/),
       grab(/var VOICE_M=\/[\s\S]*?\/;/),
-      grab(/function manScore\(v\)\{[\s\S]*?\n\}/),
+      grab(/function femScore\(v\)\{[\s\S]*?\n\}/),
       grab(/function voiceUsable\(v\)\{[\s\S]*?\n\}/),
       /* **שלוש אלה נוספו 14.9.2026 עם בורר הקול.** `pickVoice`
          מתייעץ עכשיו עם הבחירה השמורה לפני כל מיון, ובלעדיהן
@@ -399,7 +399,7 @@ import(WORKER).then(async W => {
                                   setItem: (k, v) => { store[k] = String(v) } },
                   voices: () => ctx.LIST };
     vm.createContext(ctx);
-    vm.runInContext(src.join('\n') + '\nout = { pick: pickVoice, man: manScore, save: setVoice };', ctx);
+    vm.runInContext(src.join('\n') + '\nout = { pick: pickVoice, fem: femScore, save: setVoice };', ctx);
     /* `voiceURI` נוסף 14.9.2026: הבחירה הידנית נשמרת לפיו,
        ובלעדיו ההשוואה היא undefined === מחרוזת — כלומר הבדיקה
        נופלת על הקול המזויף ולא על הקוד. */
@@ -409,8 +409,8 @@ import(WORKER).then(async W => {
     /* **גברי, מ-14.9.2026.** ההוראה הקודמת (13.9) ביקשה נשי, והבעלים
        הפך אותה: ״ג׳וש מדבר בקול של אישה, תתקן לקול גברי עדין ורך״. */
     ctx.LIST = [V('Carmit'), V('Google עברית'), V('Microsoft Asaf')];
-    t('בוחר את הקול הגברי מבין קולות מקומיים',
-      (ctx.out.pick('he-IL') || {}).name, 'Microsoft Asaf');
+    t('בוחר את הקול הנשי מבין קולות מקומיים',
+      (ctx.out.pick('he-IL') || {}).name, 'Carmit');
 
     /* קול גברי מת מול קול נשי חי — הנשי מנצח, וזה העיקר:
        voiceUsable נשאר מפתח המיון הראשון, והמגדר אחריו. קול מת
@@ -420,8 +420,8 @@ import(WORKER).then(async W => {
     t('קול גברי שאינו זמין אינו גובר על קול נשי חי',
       (ctx.out.pick('he-IL') || {}).name, 'Carmit');
     ctx._netVoiceOK = true;
-    t('כשהרשת חזרה — הגברי חוזר לנצח',
-      (ctx.out.pick('he-IL') || {}).name, 'Microsoft Avri Online (Natural)');
+    t('כשהרשת חזרה — הנשי ממשיך לנצח',
+      (ctx.out.pick('he-IL') || {}).name, 'Carmit');
 
     /* ״google״ הוא שם יצרן ולא מגדר. אם ייספר כנשי, ״Google עברית״
        — שהוא גברי בחלק מהמכשירים — ייבחר דווקא כשמבקשים נשי. */
@@ -437,11 +437,11 @@ import(WORKER).then(async W => {
       (ctx.out.pick('he-IL') || {}).name, 'Carmit');
     ctx.out.save('he-IL', '');
     t('ביטול הבחירה מחזיר את המיון',
-      (ctx.out.pick('he-IL') || {}).name, 'Microsoft Asaf');
+      (ctx.out.pick('he-IL') || {}).name, 'Carmit');
 
-    t('שם יצרן אינו מגדר', ctx.out.man(V('Google עברית')), 1);
-    t('שם גברי מזוהה',     ctx.out.man(V('Microsoft Asaf')), 2);
-    t('שם נשי מזוהה כנשי', ctx.out.man(V('Carmit')), 0);
+    t('שם יצרן אינו מגדר', ctx.out.fem(V('Google עברית')), 1);
+    t('שם גברי מזוהה כגברי', ctx.out.fem(V('Microsoft Asaf')), 0);
+    t('שם נשי מזוהה כנשי', ctx.out.fem(V('Carmit')), 2);
   })();
 
   /* ---------- 5c. תקרות העלות ----------

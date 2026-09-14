@@ -59,4 +59,38 @@ for (const f of files) {
 
 console.log(`${bad ? '✗' : '✓'} ${files.length} קבצי טקסט נסרקו, ${bad} עם כתיב שאינו הגרש העברי (${hits} שורות)`);
 if (bad) console.log('  הכתיב הוא ג׳וש בגרש עברי U+05F3 — ראו JOSH.md, סעיף ״הכתיב״');
-process.exit(bad ? 1 : 0);
+
+/* =====================================================================
+   בדיקה 2: **השם שהלומד רואה הוא פאולה, בארבע השפות.**
+
+   הבעלים החליף את השם 14.9.2026. בדיקה 1 שומרת על **הכתיב** של
+   השם הישן בכל מקום שהוא עדיין מוזכר בו — היסטוריה, שמות קבצים,
+   `josh-server` — וזה נכון ונשאר. מה שלא היה שמור הוא השם עצמו:
+   אף דבר לא מנע מהעתקה הבאה להחזיר ״ג׳וש״ אל מחרוזת שהלומד רואה.
+
+   זה בדיוק מה שהקובץ הזה כבר מתעד על עצמו — ״שם בלי שומר נסחף
+   בהעתקה״ — רק שעכשיו הכיוון הפוך: לא הכתיב, אלא איזה שם.
+
+   נבדק `tutor/tutor.js` בלבד, ובו שבעת השדות שהלומד באמת קורא.
+   הערות וקוד אינם נסרקים כאן: `josh-face.js` ו-`josh-state.js`
+   נשארים בשמם בכוונה, וזה מתועד ב-`CLAUDE.md`.
+   ===================================================================== */
+const SHOWN = /(?:^|[,{\s])(btn|greet|title|ph|wait|hello|stuck|frustrated)\s*:\s*"((?:[^"\\]|\\.)*)"/g;
+const OLDNAME = /ג׳וש|جوش|Джош|Josh/;
+let nameBad = 0, shown = 0;
+const tf = path.join(ROOT, 'tutor', 'tutor.js');
+if (fs.existsSync(tf)) {
+  const src = fs.readFileSync(tf, 'utf8');
+  let m; SHOWN.lastIndex = 0;
+  while ((m = SHOWN.exec(src))) {
+    shown++;
+    if (OLDNAME.test(m[2])) {
+      nameBad++;
+      console.log(`✗ tutor/tutor.js — ${m[1]} נושא את השם הישן: ${m[2].slice(0, 46)}`);
+    }
+  }
+}
+console.log(`${nameBad ? '✗' : '✓'} ${shown} מחרוזות שהלומד רואה, ${nameBad} עם השם הישן`);
+if (nameBad) console.log('  השם הוא פאולה · باولا · Паула · Paula — ראו JOSH.md');
+
+process.exit(bad || nameBad ? 1 : 0);
