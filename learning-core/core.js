@@ -397,14 +397,21 @@
      שפה באיכות שונה מאוד, והראשון ברשימה הוא לרוב של יצרן המכשיר.
      אין קול בשפה הנכונה? מחזירים null ולא קול בשפה אחרת — קול אנגלי
      שקורא עברית הוא רעש, וזה גרוע מקול ברירת מחדל בינוני. */
+  /* שמות הקולות אינם תמיד לטיניים. מכשיר שמדווח "הילה" ולא "Hila",
+     "سلمى" ולא "Salma" או "Ирина" ולא "Irina" נפל מחוץ למילון כולו —
+     והתוצאה הייתה קול נשי שסווג כגברי, ולכן קיבל הרמת גובה שהוא לא
+     צריך. התיקון נעשה ב-13.9 בכל שתים־עשרה האפליקציות, בענף
+     claude/history-why-40, אבל אותו ענף לא מוזג ל-main — ולכן
+     הספרייה המשותפת נשארה עם הגרסה הלטינית בלבד, ונולדה עם הבאג
+     שכבר תוקן. זה בדיוק מה שהכלל ב-CLAUDE.md מזהיר מפניו. */
   var LANG_HINT = {
     he: /עברית|hebrew|ivrit/i,
     ar: /العربية|arabic/i,
     en: /english/i,
     ru: /русский|russian/i
   };
-  var FEMALE_VOICE = /(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|irina|milena|svetlana|\belena\b|katja|ekaterina|tatyana|hoda|salma|amina|\bhala\b|noura|laila|layla|fatima|zeina|maryam|asma|heera|raveena|neerja)/i;
-  var MALE_VOICE = /(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|liam|william|george|james|\bthomas\b|benjamin|dmitry|pavel|\byuri\b|maxim|nikolai|maged|tarik|hamed|shakir|\bomar\b|tarek|\bali\b|saleh|abdullah|yasser|hemant|madhur)/i;
+  var FEMALE_VOICE = /(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|irina|milena|svetlana|\belena\b|katja|ekaterina|tatyana|hoda|salma|amina|\bhala\b|noura|laila|layla|fatima|zeina|maryam|asma|heera|raveena|neerja)/i;
+  var MALE_VOICE = /(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|liam|william|george|james|\bthomas\b|benjamin|dmitry|pavel|\byuri\b|maxim|nikolai|maged|tarik|hamed|shakir|\bomar\b|tarek|\bali\b|saleh|abdullah|yasser|hemant|madhur)/i;
   var PREFER_FEMALE = true;
   /* נכבה ברגע שקול רשת נכשל, ואז הדירוג מעדיף מקומי לשארית הסשן. */
   var netVoiceOK = true;
@@ -432,6 +439,16 @@
       else if (MALE_VOICE.test(n)) s -= 1;
     }
     return s;
+  }
+
+  /* מגדר הקול לפי שמו — ל-Web Speech API אין שדה כזה, והשם הוא הרמז
+     היחיד. חשוף כדי שאפשר יהיה לבדוק את המילון בלי דפדפן: זו הדרך
+     היחידה לתפוס בחזרה מילון שנשאר לטיני בלבד. */
+  function voiceGender(name) {
+    var n = String(name == null ? '' : name);
+    if (FEMALE_VOICE.test(n)) return 'f';
+    if (MALE_VOICE.test(n)) return 'm';
+    return '?';
   }
 
   function pickVoice(lang) {
@@ -1189,6 +1206,7 @@
       ready: voicesReady,
       voices: safeVoices,
       pickVoice: pickVoice,
+      voiceGender: voiceGender,
       segments: segments,
       audioId: audioId,
       probeStatic: probeStatic,
