@@ -32,18 +32,29 @@ const crypto = require('crypto');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 
+/* **שורש אופציונלי, ולא קישוט.** ארבע בדיקות בחבילה כבר מקבלות
+   `[root]` כארגומנט ראשון — `josh.js`, `brain.js`, `guide.js`
+   ו-`markers.js` — וכך בודקים worktree של קומיט אחר. `fresh.js`
+   לא קיבל אחד, **והתעלם ממנו בשקט**: מי שהריץ
+   `fresh.js /tmp/worktree` קיבל מדידה של עץ העבודה הנוכחי עם
+   שם של עץ אחר. נמדד 14.9.2026 על worktree של `442ce79` —
+   הקוד הישן החזיר `10 דוחות, כולם על התוכן שבעץ` ויציאה 0,
+   בזמן שה-CI הפיל את אותו קומיט בדיוק על שני דוחות.
+   ארגומנט שמתעלמים ממנו גרוע מארגומנט שאינו קיים. */
+
 /* מקורות התוכן לכל אפליקציה — ורק מה שהדוח שלה קורא.
    ברירת המחדל היא `index.html` לבדו: שם יושבים גם הבנק וגם
    `buildQ`. `lomda` מחזיקה את התוכן ב-`data/`, ו-`bagrut-806`
    נסרקת על ידי `content806.js` שקורא את `data/exams.js` בלבד. */
-function sourcesOf(app) {
+function sourcesOf(app, root) {
+  const R = root || ROOT;
   const out = [];
   if (app === 'bagrut-806') {
-    out.push(path.join(ROOT, app, 'data', 'exams.js'));
+    out.push(path.join(R, app, 'data', 'exams.js'));
     return out.filter(f => fs.existsSync(f));
   }
-  out.push(path.join(ROOT, app, 'index.html'));
-  const dataDir = path.join(ROOT, app, 'data');
+  out.push(path.join(R, app, 'index.html'));
+  const dataDir = path.join(R, app, 'data');
   if (fs.existsSync(dataDir))
     for (const f of fs.readdirSync(dataDir).filter(x => x.endsWith('.js')).sort())
       out.push(path.join(dataDir, f));
@@ -57,12 +68,13 @@ function normalize(src) {
     .replace(/sw\.js\?v=[A-Za-z0-9_.-]+/g, 'sw.js?v=—');
 }
 
-function sigOf(app) {
-  const files = sourcesOf(app);
+function sigOf(app, root) {
+  const R = root || ROOT;
+  const files = sourcesOf(app, R);
   if (!files.length) return null;
   const h = crypto.createHash('sha256');
   for (const f of files) {
-    h.update(path.relative(ROOT, f).replace(/\\/g, '/'));
+    h.update(path.relative(R, f).replace(/\\/g, '/'));
     h.update('\0');
     h.update(normalize(fs.readFileSync(f, 'utf8')));
     h.update('\0');
