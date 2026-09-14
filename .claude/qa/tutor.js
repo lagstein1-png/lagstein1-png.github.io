@@ -374,7 +374,7 @@ import(WORKER).then(async W => {
     const src = [
       grab(/var VOICE_F=\/[\s\S]*?\/;/),
       grab(/var VOICE_M=\/[\s\S]*?\/;/),
-      grab(/function femScore\(v\)\{[\s\S]*?\n\}/),
+      grab(/function manScore\(v\)\{[\s\S]*?\n\}/),
       grab(/function voiceUsable\(v\)\{[\s\S]*?\n\}/),
       grab(/function pickVoice\(code\)\{[\s\S]*?\n\}/)
     ];
@@ -382,27 +382,31 @@ import(WORKER).then(async W => {
     const ctx = { _netVoiceOK: true, navigator: { onLine: true }, out: null,
                   voices: () => ctx.LIST };
     vm.createContext(ctx);
-    vm.runInContext(src.join('\n') + '\nout = { pick: pickVoice, fem: femScore };', ctx);
+    vm.runInContext(src.join('\n') + '\nout = { pick: pickVoice, man: manScore };', ctx);
     const V = (name, local) => ({ name: name, lang: 'he-IL', localService: local !== false });
 
-    ctx.LIST = [V('Microsoft Asaf'), V('Google עברית'), V('Carmit')];
-    t('בוחר את הקול הנשי מבין קולות מקומיים',
-      (ctx.out.pick('he-IL') || {}).name, 'Carmit');
-
-    /* קול נשי מת מול קול גברי חי — הגברי מנצח, וזה העיקר. */
-    ctx.LIST = [V('Microsoft Asaf'), V('Microsoft Hila Online (Natural)', false)];
-    ctx._netVoiceOK = false;
-    t('קול נשי שאינו זמין אינו גובר על קול גברי חי',
+    /* **גברי, מ-14.9.2026.** ההוראה הקודמת (13.9) ביקשה נשי, והבעלים
+       הפך אותה: ״ג׳וש מדבר בקול של אישה, תתקן לקול גברי עדין ורך״. */
+    ctx.LIST = [V('Carmit'), V('Google עברית'), V('Microsoft Asaf')];
+    t('בוחר את הקול הגברי מבין קולות מקומיים',
       (ctx.out.pick('he-IL') || {}).name, 'Microsoft Asaf');
+
+    /* קול גברי מת מול קול נשי חי — הנשי מנצח, וזה העיקר:
+       voiceUsable נשאר מפתח המיון הראשון, והמגדר אחריו. קול מת
+       הוא שקט, ושקט גרוע מקול במגדר הלא־מבוקש. */
+    ctx.LIST = [V('Carmit'), V('Microsoft Avri Online (Natural)', false)];
+    ctx._netVoiceOK = false;
+    t('קול גברי שאינו זמין אינו גובר על קול נשי חי',
+      (ctx.out.pick('he-IL') || {}).name, 'Carmit');
     ctx._netVoiceOK = true;
-    t('כשהרשת חזרה — הנשי חוזר לנצח',
-      (ctx.out.pick('he-IL') || {}).name, 'Microsoft Hila Online (Natural)');
+    t('כשהרשת חזרה — הגברי חוזר לנצח',
+      (ctx.out.pick('he-IL') || {}).name, 'Microsoft Avri Online (Natural)');
 
     /* ״google״ הוא שם יצרן ולא מגדר. אם ייספר כנשי, ״Google עברית״
        — שהוא גברי בחלק מהמכשירים — ייבחר דווקא כשמבקשים נשי. */
-    t('שם יצרן אינו מגדר', ctx.out.fem(V('Google עברית')), 1);
-    t('שם נשי מזוהה',      ctx.out.fem(V('Carmit')), 2);
-    t('שם גברי מזוהה',     ctx.out.fem(V('Microsoft Asaf')), 0);
+    t('שם יצרן אינו מגדר', ctx.out.man(V('Google עברית')), 1);
+    t('שם גברי מזוהה',     ctx.out.man(V('Microsoft Asaf')), 2);
+    t('שם נשי מזוהה כנשי', ctx.out.man(V('Carmit')), 0);
   })();
 
   /* ---------- 5c. תקרות העלות ----------
