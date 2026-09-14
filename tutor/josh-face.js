@@ -123,6 +123,32 @@ var CSS = [
 '.jf[data-state="correct"]{animation:jf-nod .5s ease-in-out}',
 "@keyframes jf-nod{0%,100%{transform:translateY(0)}45%{transform:translateY(3px)}}",
 
+/* נשימה, בהוראת הבעלים 14.9.2026.
+
+   **ארבע שניות וחצי, ו-1.5% בלבד.** נשימה שרואים אותה אינה
+   נשימה אלא פעימה, והיא מושכת את העין מהטקסט — וזה בדיוק ההפך
+   ממה שדרוש ללומד עם קשיי קשב. מה שהיא כן עושה: מונעת את
+   התחושה שהמסך קפא.
+
+   על `.jf__body` ולא על `.jf__head`, אחרת היא מתנגשת עם ההטיה
+   שכבר יושבת שם — שני טרנספורמים על אותו צומת, והאחרון מנצח.
+
+   `prefers-reduced-motion` מכבה אותה בבלוק שבסוף הקובץ, יחד עם
+   שאר התנועה. */
+'.jf__body{transform-box:fill-box;transform-origin:50% 100%;' +
+  'animation:jf-breathe 4.5s ease-in-out infinite}',
+"@keyframes jf-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}",
+
+/* שלוש נקודות בחשיבה — על הפנים המצוירות, לא רק על התצלום.
+   נדלקות אחת אחרי השנייה ולא יחד: שלוש נקודות שמהבהבות בו־זמנית
+   הן התראה, ובזו אחר זו הן ״רגע, אני חושב״. */
+'.jf__think{opacity:0;transition:opacity .25s}',
+'.jf[data-state="thinking"] .jf__think{opacity:1}',
+'.jf__think circle{animation:jf-think 1.4s ease-in-out infinite}',
+'.jf__think circle:nth-child(2){animation-delay:.18s}',
+'.jf__think circle:nth-child(3){animation-delay:.36s}',
+"@keyframes jf-think{0%,70%,100%{opacity:.25}35%{opacity:1}}",
+
 /* ----------------------------------------------------------------
    מצב תמונה.
 
@@ -273,14 +299,20 @@ var SKIN   = "#e3b28d",   /* גוון בסיס */
 function faceSVG(px) {
   return '<svg viewBox="0 0 120 120" width="' + px + '" height="' + px + '" aria-hidden="true" focusable="false">' +
 
-    /* ---- גוף: חולצה עם צווארון פתוח ---- */
-    '<path fill="' + SHIRT + '" d="M 21 120 C 23 104 31 97.5 46.5 93.5 L 73.5 93.5 C 89 97.5 97 104 99 120 Z"/>' +
-    '<path fill="' + SKIN_M + '" d="M 51 78 h 18 v 16 q -9 7 -18 0 Z"/>' +
-    '<path fill="' + SKIN_D + '" opacity=".45" d="M 51 78 q 9 11 18 0 v 5 q -9 9 -18 0 Z"/>' +
-    /* פתח הצווארון ושתי הדשים */
-    '<path fill="' + SKIN_M + '" d="M 53.5 93.5 L 60 104 L 66.5 93.5 Z"/>' +
-    '<path fill="' + COLLAR + '" d="M 46.5 92 L 60.5 105 L 54 92 Z"/>' +
-    '<path fill="' + COLLAR + '" d="M 73.5 92 L 59.5 105 L 66 92 Z"/>' +
+    /* ---- גוף: חולצה עם צווארון פתוח ----
+       עטוף ב-`jf__body` כדי שהנשימה תיתלה עליו ולא על הראש:
+       ל-`jf__head` כבר יש טרנספורם הטיה, ושני טרנספורמים על אותו
+       צומת אינם מצטברים — האחרון דורס. וגם אנטומית זה נכון יותר,
+       החזה עולה ולא הפנים. */
+    '<g class="jf__body">' +
+      '<path fill="' + SHIRT + '" d="M 21 120 C 23 104 31 97.5 46.5 93.5 L 73.5 93.5 C 89 97.5 97 104 99 120 Z"/>' +
+      '<path fill="' + SKIN_M + '" d="M 51 78 h 18 v 16 q -9 7 -18 0 Z"/>' +
+      '<path fill="' + SKIN_D + '" opacity=".45" d="M 51 78 q 9 11 18 0 v 5 q -9 9 -18 0 Z"/>' +
+      /* פתח הצווארון ושתי הדשים */
+      '<path fill="' + SKIN_M + '" d="M 53.5 93.5 L 60 104 L 66.5 93.5 Z"/>' +
+      '<path fill="' + COLLAR + '" d="M 46.5 92 L 60.5 105 L 54 92 Z"/>' +
+      '<path fill="' + COLLAR + '" d="M 73.5 92 L 59.5 105 L 66 92 Z"/>' +
+    '</g>' +
 
     '<g class="jf__head">' +
       /* ---- שיער אחורי, ואוזניים ---- */
@@ -345,6 +377,15 @@ function faceSVG(px) {
         '<path class="jf__m jf__m--think" d="M 54 78.6 C 56.6 77.2 59 79.1 61.6 78.7 C 64 78.3 65.6 77.6 66.6 77" stroke="' + LIP + '" stroke-width="1.9" fill="none" stroke-linecap="round"/>' +
         '<path class="jf__m jf__m--talk" fill="#7a3f35" d="M 54.4 77.6 C 57.2 76.3 62.8 76.3 65.6 77.6 C 64.6 82.6 55.4 82.6 54.4 77.6 Z"/>' +
       '</g>' +
+    '</g>' +
+
+    /* שלוש נקודות חשיבה — מחוץ ל-`jf__head`, כדי שההטיה של
+       ״חושב״ לא תסחוב אותן איתה. הן סימן על המסך, לא איבר.
+       `aria-hidden` יורש מה-svg כולו. */
+    '<g class="jf__think">' +
+      '<circle r="3.1" cx="91" cy="30" fill="' + LIP + '" opacity=".25"/>' +
+      '<circle r="3.1" cx="101" cy="26" fill="' + LIP + '" opacity=".25"/>' +
+      '<circle r="3.1" cx="111" cy="22" fill="' + LIP + '" opacity=".25"/>' +
     '</g>' +
   '</svg>';
 }

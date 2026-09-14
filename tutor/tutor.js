@@ -412,9 +412,29 @@ var CSS = ''
 +'#tu-ov{position:fixed;inset:0;background:rgba(20,30,35,.55);display:none;'
 +'place-items:center;z-index:9000;padding:16px}'
 +'#tu-ov.on{display:grid}'
+/* טיפוגרפיה לדיסלקציה, בהוראת הבעלים 14.9.2026.
+
+   הקהל כאן הוא ילדים שמפענחים כל שורה פעמיים, ולכן ארבעת
+   המספרים האלה אינם העדפת עיצוב אלא קריאוּת:
+
+     19px          — מעל 16 הקודמים; אות גדולה יותר נדרשת פחות
+                     פעמים לפענוח חוזר
+     line-height   — 1.75 במקום 1.6. השורה הבאה רחוקה מספיק כדי
+                     שהעין לא תקפוץ אליה באמצע הנוכחית
+     letter/word   — אותיות שנדבקות הן הסימפטום הנפוץ ביותר.
+                     .01em ו-.05em הם ריווח שמפריד בלי לפרק מילה
+     color         — #17333c ולא #000: ניגודיות גבוהה אך לא
+                     מסנוורת. שחור על לבן טהור מייצר הילה לחלק
+                     מהקוראים
+
+   **ואין נטוי בשום מקום בפאנל** — ראו הכלל מתחת ל-`.tu-m em`. */
 +'#tu-bx{background:#fff;color:#17333c;border-radius:20px;width:100%;max-width:540px;'
 +'max-height:88vh;display:flex;flex-direction:column;overflow:hidden;'
-+'box-shadow:0 18px 50px rgba(0,0,0,.3);font-size:16px;line-height:1.6}'
++'box-shadow:0 18px 50px rgba(0,0,0,.3);font-size:19px;line-height:1.75;'
++'letter-spacing:.01em;word-spacing:.05em}'
+/* נטוי הוא הצורה שהכי קשה לפענח בדיסלקציה: האותיות נשענות זו על
+   זו והמרווח ביניהן מתכווץ. כל הדגשה בפאנל היא משקל, לא הטיה. */
++'#tu-bx em,#tu-bx i,#tu-bx cite{font-style:normal;font-weight:700}'
 +'#tu-hd{display:flex;align-items:center;gap:10px;padding:14px 18px;'
 /* הפנים בכותרת: קטנות, לא גוזלות מקום מהטקסט, ולא נדחסות
    כשהשאלה שלצידן ארוכה. */
