@@ -184,7 +184,13 @@ button{font:inherit;color:inherit}
 .tcard:hover{border-color:var(--c)}
 .tcard h3{font-size:1.05rem}
 .tcard .sub{font-size:.85rem;color:var(--muted)}
-.tdot{width:.62rem;height:.62rem;border-radius:50%;background:var(--c);flex:none}
+/* הנקודה של המסלול. מאז שהאייקון מצויר בתוכה (O-14) היא עיגול
+   שמכיל SVG ולא נקודה מלאה: הרקע עובר ל-cs הבהיר, הצבע החזק
+   עובר לסמל עצמו, והמידה גדלה כדי שהסמל ייקרא. `grid` ולא
+   `block` — כך ה-SVG ממורכז בלי חישוב. */
+.tdot{width:1.5rem;height:1.5rem;border-radius:50%;background:var(--cs);color:var(--c);
+  flex:none;display:grid;place-items:center;line-height:0}
+.tdot:empty{width:.62rem;height:.62rem;background:var(--c)}
 .thead{display:flex;align-items:center;gap:.5rem}
 .tpill{background:var(--cs);color:var(--c);border-radius:999px;padding:.15rem .55rem;
   font-size:.72rem;font-weight:800}
@@ -1057,7 +1063,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l65 · 2026-09-14";
+var BUILD="l66 · 2026-09-14";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -2336,8 +2342,12 @@ function screenHome(){
   TRACKS.forEach(function(tr){
     var tops=TOPICS.filter(function(x){return x.trk===tr.id});
     if(!tops.length)return;
+    /* האייקון של המסלול במקום הנקודה. השדה `icon` נכתב ב-21 קובצי
+       התוכן ונקרא ל-TRACKS מאז שהם נבנו, אך לא צויר מעולם — זה היה
+       `O-14`. הוא תופס את מקום ה-`tdot` ולא נוסף לצידה, כדי שהשורה
+       לא תגדל. לקהל עם דיסלקציה סמל נקלט מהר ממילה, וזה כל היתרון. */
     h+='<div class="trk '+tr.cls+'" style="margin:1.4rem 0 .6rem">'+
-       '<div class="thead"><span class="tdot"></span><h2 style="font-size:1.15rem">'+
+       '<div class="thead"><span class="tdot">'+ic(tr.icon,14)+'</span><h2 style="font-size:1.15rem">'+
        esc(trName(tr))+'</h2><span class="tpill">'+tops.length+"</span></div>"+
        '<p style="color:var(--muted);font-size:.9rem;margin:.25rem 0 0">'+esc(trDesc(tr))+"</p></div>";
     h+='<div class="grid g2">';
@@ -2558,7 +2568,7 @@ function screenProg(){
       [1,2,3].some(function(l){var s=state.stats[stKey(x.id,l)];return s&&s.seen})});
     if(!tops.length)return;
     h+='<div class="trk '+tr.cls+'"><div class="thead" style="margin:1.2rem 0 .5rem">'+
-       '<span class="tdot"></span><h3 style="font-size:1.05rem">'+esc(trName(tr))+"</h3></div>";
+       '<span class="tdot">'+ic(tr.icon,14)+'</span><h3 style="font-size:1.05rem">'+esc(trName(tr))+"</h3></div>";
     h+='<div class="card">';
     tops.forEach(function(tp){
       h+='<div class="row"><div><div class="lab">'+esc(tName(tp))+"</div>"+
@@ -4374,7 +4384,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l65-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l66-pwa1").catch(function(){});
   });
 }
 </script>
