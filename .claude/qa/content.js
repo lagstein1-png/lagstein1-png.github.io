@@ -252,8 +252,43 @@ async function scan(page){
      ולא אלף באגים. הממצא נכתב פעם אחת בסוף, עם האחוז. */
   const cov={q:0,hasHint:0,noHint:0,noSteps:0,hasSteps:0,wrong:0,hasWhy:0,noWhy:0};
 
+  /* ---------- הזרעה: אותו קוד, אותו פסק דין ----------
+
+     עד כאן המדגם רץ על `Math.random` חשוף, ולכן **אותו HEAD
+     החזיר פסקי דין שונים בשתי ריצות**. נמדד 10.9.2026: math-teen
+     עבר `PASS` → `REVIEW`, ומאחורי ה-`PASS` הסתתרו 300 מופעים של
+     `∫` גולמי ב-`say` ו-96 שאלות ברוסית ובאנגלית שנושאות עברית.
+     ממצא שיושב בפריט אחד הופיע או נעלם לפי ההגרלה.
+
+     שער שפסק הדין שלו מתהפך בין ריצות זהות גרוע משער שאינו קיים:
+     `stage.js` קורא בדיוק מהדוח הזה כדי להחליט אם אפליקציה עולה
+     שלב.
+
+     **הזרעה אינה מצמצמת כיסוי.** הזרע נגזר מהתא — נושא ורמה —
+     ולכן כל תא מקבל זרם משלו, ו-N ההגרלות בתוכו מגוונות בדיוק
+     כמו קודם. מה שהשתנה הוא שהן *אותן* הגרלות בכל פעם. מה שנשאר
+     פתוח — וזה מחיר אמיתי — הוא שממצא שיושב מחוץ למדגם הקבוע
+     לא ייראה לעולם; התשובה לזה היא `QA_N` גדול יותר, ולא אקראיות.
+
+     mulberry32, אותו מחולל שהאפליקציות עצמן משתמשות בו ב-`withSeed`
+     כדי שהמורה והתלמיד יקבלו את אותו מבחן. */
+  const REAL_RANDOM=Math.random;
+  function seedAt(str){
+    let h=2166136261>>>0;
+    for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619) }
+    let s=h>>>0;
+    Math.random=function(){
+      s|=0; s=s+0x6D2B79F5|0;
+      let t=Math.imul(s^s>>>15,1|s);
+      t=t+Math.imul(t^t>>>7,61|t)^t;
+      return ((t^t>>>14)>>>0)/4294967296;
+    };
+  }
+  R.seeded=true;
+
   for(const t of TOPICS) for(const lv of LVLS){
     const where=t.id+' L'+lv;
+    seedAt(where);
     R.cells++;
     const qseen={}, qfull={}, posN=[0,0,0,0,0,0], longest=[0,0], sizes={};
     let cellN=0;
@@ -548,6 +583,10 @@ async function scan(page){
     }
   }
 
+  /* הדף ממשיך לחיות אחרי הסריקה — מעבר השפות רץ עליו, ואחריו
+     הדפדפן עוד מצייר. משאירים לו את המחולל האמיתי. */
+  Math.random=REAL_RANDOM;
+
   /* --- 4. כיסוי שדות, פעם אחת, באחוזים --- */
   R.coverage=cov;
   const pc=function(a,b){return b?Math.round(a/b*100):0};
@@ -640,7 +679,29 @@ async function scanLang(page,lg){
      מקבל **אחרי שטעה**. עשרים ואחת מחרוזות חדשות ב-math-uni נפלו
      לעברית בערבית, ברוסית ובאנגלית, והדוח אמר ״עברית בטקסט: 0״
      וסעיף תרגום ״אפס״. */
+  /* מוזרע כמו המדגם הראשי, ומאותה סיבה בדיוק. **כאן זה נמדד:**
+     `lang-untranslated` הופיע ונעלם בין שתי ריצות על אותו HEAD,
+     ומאחורי ה-`PASS` הסתתרו 96 שאלות ברוסית ובאנגלית שנושאות
+     עברית (284 מהן ב-`why`). ארבע הגרלות לתא הן מדגם קטן, ולכן
+     דווקא כאן ההגרלה הכריעה את הפסק.
+
+     הזרע כולל את **קוד השפה**: לולא זה, ארבע השפות היו מקבלות
+     את אותן ארבע שאלות בדיוק, ובדיקה שרצה ארבע פעמים על אותו
+     פריט אינה בודקת ארבע שפות אלא אחת. */
+  const REAL_RANDOM_LG=Math.random;
+  const seedLg=function(str){
+    let h=2166136261>>>0;
+    for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619) }
+    let s=h>>>0;
+    Math.random=function(){
+      s|=0; s=s+0x6D2B79F5|0;
+      let t=Math.imul(s^s>>>15,1|s);
+      t=t+Math.imul(t^t>>>7,61|t)^t;
+      return ((t^t>>>14)>>>0)/4294967296;
+    };
+  };
   for(const t of TOPICS) for(const lv of LVLS_) for(let k=0;k<4;k++){
+    if(k===0) seedLg(lg+'|'+t.id+'|'+lv);
     let q=null;
     try{ q=buildQ(t.id,lv) }
     catch(e){ out.threw++; if(!out.err) out.err=String(e&&e.message||e); continue }
@@ -662,6 +723,7 @@ async function scanLang(page,lg){
     }
     if(dirty) out.heb++;
   }
+  Math.random=REAL_RANDOM_LG;
   return out;
  },{lg:lg});
 }
