@@ -423,6 +423,11 @@ button[data-a="lang"][lang="ar"]{font-family:var(--ar)}
 button[data-a="lang"][data-v="ru"],button[data-a="lang"][data-n="ru"],
 button[data-a="lang"][data-l="ru"],button[data-a="lang"][data-l="ru"] .fd,
 button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
+
+/* סמל האתר בשורה העליונה — אותו סמל בכל שלושה־עשר הדפים.
+   `currentColor` ולכן הוא נצבע מעצמו בכל מצב נגישות. */
+.brand .sitemark{inline-size:1.15em;block-size:1.15em;flex:none;
+  vertical-align:-.16em;margin-inline-end:.4em;opacity:.9}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1472,7 +1477,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t85 · 2026-09-13";
+var BUILD="t86 · 2026-09-13";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -5454,7 +5459,7 @@ function header(){
            ["settings","הגדרות","gear"]];
   if(teOpen())nav.splice(nav.length-1,0,["marks","מבחן","share"]);
   return '<header><div class="wrap hbar">'+
-    '<button class="brand" data-a="go" data-v="home" aria-label="לדף הבית">'+
+    '<button class="brand" data-a="go" data-v="home" aria-label="לדף הבית"><svg class="sitemark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg>'+
       '<span class="mk">'+({ar:"ش",ru:"Ш",en:"S"}[LG]||"ש")+'</span><span><b>'+esc(_("שלב"))+'</b><small>'+esc(_("מתמטיקה לתיכון"))+'</small></span></button>'+
     '<nav>'+nav.map(function(n){
       return '<button class="nb'+(view===n[0]?" on":"")+'" data-a="go" data-v="'+n[0]+'" title="'+n[1]+'" aria-current="'+(view===n[0]?"page":"false")+'">'+ic(n[2],17)+'<span>'+n[1]+'</span></button>';
@@ -7807,7 +7812,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t85-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t86-pwa1").catch(function(){});
   });
 }
 </script>

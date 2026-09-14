@@ -461,6 +461,11 @@ button[data-a="lang"][lang="ar"]{font-family:var(--ar)}
 button[data-a="lang"][data-v="ru"],button[data-a="lang"][data-n="ru"],
 button[data-a="lang"][data-l="ru"],button[data-a="lang"][data-l="ru"] .fd,
 button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
+
+/* סמל האתר בשורה העליונה — אותו סמל בכל שלושה־עשר הדפים.
+   `currentColor` ולכן הוא נצבע מעצמו בכל מצב נגישות. */
+.brand .sitemark{inline-size:1.15em;block-size:1.15em;flex:none;
+  vertical-align:-.16em;margin-inline-end:.4em;opacity:.9}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1076,7 +1081,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n77 · 2026-09-13";
+var BUILD="n78 · 2026-09-13";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3412,7 +3417,7 @@ function roundReset(){P.rres=[];P.sum=false}
 function hdr(){
   var s=state.screen;
   return '<div class="hbar"><div class="wrap hrow">'+
-    '<h1 class="brand">'+esc(t("app"))+'<small>'+esc(t("tagline"))+'</small></h1>'+
+    '<h1 class="brand"><svg class="sitemark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg>'+esc(t("app"))+'<small>'+esc(t("tagline"))+'</small></h1>'+
     (s==="home"?"":'<button class="gbtn" data-a="home">'+ic("home",16)+" "+esc(t("navHome"))+"</button>")+
     '<button class="gbtn'+(s==="prog"?" on":"")+'" data-a="prog">'+ic("chart",16)+" "+esc(t("navProg"))+"</button>"+
     /* מסך המורה נעלם מהכותרת כשנבחר קוד והמכשיר נעול. */
@@ -5483,7 +5488,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n77-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n78-pwa1").catch(function(){});
   });
 }
 </script>
