@@ -11,7 +11,7 @@
    ===================================================================== */
 const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "site-" + V;
-const PRE = ["./","./index.html","./manifest.json","./launch.js","./launch.css",
+const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
              "/legal/terms.js","/legal/protect.js",
              /* ג׳וש — שכבת הפנים והתמונה. שתיהן בנתיבים משותפים
