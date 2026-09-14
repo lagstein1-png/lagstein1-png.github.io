@@ -853,6 +853,9 @@ $("#theme").addEventListener("click",function(){
 /* --- סינון --- */
 var CATS=["all","math","lang","life"];
 var cat="all", q="";
+/* השאילתה כפי שהוקלדה, לפני הנרמול. `q` המנורמל טוב להשוואה
+   ורע להעברה — `nrm` מסלקת ממנו גרשיים, ולומדה מנרמלת בעצמה. */
+var qRaw="";
 
 /* גרש וגרשיים מנוטרלים בשני הצדדים.
 
@@ -883,6 +886,21 @@ function priceLabel(a){
   return S.free;
 }
 
+/* הקישור מהכרטיס. **ללומדה בלבד, וכשיש שאילתה** — היא מחזיקה
+   שבעה־עשר מעשרים ואחד התחומים מאחורי כרטיס אחד, ולכן מי שחיפש
+   ״פיזיקה״ וקיבל אותה נשלח למסך שממנו הוא צריך לחפש שוב.
+
+   עוברת **השאילתה** ולא מזהה נושא: אינדקס של 52 נושאים כאן היה
+   מקור אמת שני שמתיישן בנושא הבא. `encodeURIComponent` הוא גם
+   מה שמגן על התכונה — הוא ממיר גרשיים, `<` ו-`>`.
+
+   קישור ההתקנה למטה **אינו** מקבל את זה בכוונה: מי שמתקין רוצה
+   את האפליקציה, לא חיפוש אחד שביצע. */
+function goUrl(a){
+  var u=a.u||("/"+a.id+"/");
+  return (a.id==="lomda"&&qRaw) ? u+"#q="+encodeURIComponent(qRaw) : u;
+}
+
 function draw(){
   var list=APPS.filter(function(a){
     if(cat!=="all"&&a.cat!==cat)return false;
@@ -911,7 +929,7 @@ function draw(){
       /* a.u הוא נתיב מפורש, והוא קיים רק כשכתובת הפרסום אינה
          זהה למזהה. היום זה נכון לאפליקציה אחת בלבד — ראו NAMING.md. */
       '<div class="act">'+
-        '<a class="go" href="'+(a.u||("/"+a.id+"/"))+'">'+esc(S.enter)+
+        '<a class="go" href="'+goUrl(a)+'">'+esc(S.enter)+
           '<span class="arw" aria-hidden="true">←</span></a>'+
         /* שם נגיש נפרד לכל אחת: "התקנה" לבדו חוזר זהה בשתים-עשרה
            כרטיסים, ולקורא מסך זו רשימה של מילים זהות. */
@@ -1051,7 +1069,7 @@ function boot(){
         x.setAttribute("aria-pressed",String(x.getAttribute("data-c")===cat))});
       draw(); }
   });
-  $("#q").addEventListener("input",function(){q=nrm(this.value.trim());draw()});
+  $("#q").addEventListener("input",function(){qRaw=this.value.trim();q=nrm(qRaw);draw()});
   /* שער התנאים נפתח לפני הכול ויש בו בורר שפה משלו. בלי המאזין הזה
      המשתמש בוחר בשער אנגלית, מאשר, ונוחת על דף בית בעברית. */
   window.addEventListener("legal:lang",function(e){
@@ -1077,7 +1095,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=74-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=75-pwa1").catch(function(){});
   });
 }
 </script>

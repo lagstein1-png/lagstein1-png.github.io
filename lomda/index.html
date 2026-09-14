@@ -1068,7 +1068,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l74 · 2026-09-14";
+var BUILD="l75 · 2026-09-14";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -4104,6 +4104,57 @@ function resultFromUrl(){
   else if(mkImport(ex,res))MK.open=ex.id;
   view="marks"; return true;
 }
+/* פתיחת נושא מתוך שאילתת חיפוש שהגיעה מדף הבית.
+
+   **הבעיה.** שבעה־עשר מעשרים ואחד התחומים של האתר יושבים כאן,
+   מאחורי כרטיס אחד. מי שחיפש ״פיזיקה״ בדף הבית קיבל את כרטיס
+   לומדה — ואז היה צריך להיכנס, ולחפש שוב. שלושה צעדים למשהו
+   שהוא כבר ביקש בשמו.
+
+   **ולמה הפתרון הוא להעביר את השאילתה ולא את המזהה.** דף הבית
+   אינו מכיר את `TOPICS` ואינו צריך להכיר: אינדקס של 52 נושאים
+   שם היה מקור אמת שני, והוא היה מתיישן בנושא הבא שנוסף — בדיוק
+   המלכודת שהמאגר הזה מכיר משם הכרטיס שמנה תחומים. לכן עובר
+   `#q=` גולמי, והצד שיש לו את הנתונים פותר.
+
+   **נושא לפני מסלול.** ״תנ״ך״ הוא שם מסלול, ״תורה — חמישה
+   חומשים״ הוא שם נושא; מי שהקליד את השני התכוון מדויק יותר.
+   מסלול שנמצא נפתח בנושא הראשון שלו.
+
+   **והנרמול זהה לזה שבדף הבית** — גרש וגרשיים מסולקים משני
+   הצדדים. בלעדיו ״תנ״ך״ מדף הבית לא היה מוצא את ״תנ״ך״ כאן. */
+function qNorm(s){
+  return String(s).replace(/["'\u05f3\u05f4\u2018\u2019\u201c\u201d]/g,"").toLowerCase().trim();
+}
+function findByName(list,q){
+  for(var i=0;i<list.length;i++){
+    var nm=list[i].n||{};
+    for(var k in nm) if(nm[k]&&qNorm(nm[k]).indexOf(q)>=0) return list[i];
+  }
+  return null;
+}
+function queryFromUrl(){
+  var m=String(location.hash||"").match(/^#q=(.+)$/);
+  if(!m)return false;
+  var raw=m[1],q;
+  try{q=qNorm(decodeURIComponent(raw))}catch(e){q=qNorm(raw)}
+  /* הכתובת מתנקה בין כה: ריענון לא יפתח שוב את אותו נושא בכוח,
+     ומי שניווט הלאה לא ייתקע עם שאילתה ישנה בשורת הכתובת. */
+  try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
+  if(!q)return false;
+  var hit=findByName(TOPICS,q);
+  if(!hit){
+    var tr=findByName(TRACKS,q);
+    if(tr) for(var i=0;i<TOPICS.length;i++) if(TOPICS[i].trk===tr.id){hit=TOPICS[i];break}
+  }
+  if(!hit)return false;
+  state.track=hit.trk; state.topic=hit.id; state.screen="prac";
+  /* בדיוק מה שלחיצה על נושא עושה. בלי `newQuestion` מסך התרגול
+     עולה בלי שאלה — `screenPractice` מטפל בזה בחן, אבל מי שביקש
+     פיזיקה רוצה שאלה ולא כותרת. */
+  roundReset(); save(); newQuestion();
+  return true;
+}
 function examFromUrl(){
   var m=String(location.hash||"").match(/^#x=(.+)$/);
   if(!m)return false;
@@ -4169,11 +4220,11 @@ function testKey(){
     .catch(function(){gkMsg={ok:false,m:t("vErr")};render()});
 }
 exLoad();
-examFromUrl()||resultFromUrl();
+examFromUrl()||resultFromUrl()||queryFromUrl();
 /* מעבר לקישור מבחן כשהאפליקציה כבר פתוחה הוא ניווט בתוך אותו מסמך:
    הדפדפן לא טוען מחדש, ולכן ההפעלה לא רצה שוב. */
 window.addEventListener("hashchange",function(){
-  if(examFromUrl()||resultFromUrl()){stopSpeak();window.scrollTo(0,0);render()}
+  if(examFromUrl()||resultFromUrl()||queryFromUrl()){stopSpeak();window.scrollTo(0,0);render()}
   else if(view==="sit"||view==="badexam"||view==="oldexam"){view="";render()}
 });
 /* --- כל לחיצה מושמעת (O-27, 9.9.2026) ---
@@ -4390,7 +4441,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l74-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l75-pwa1").catch(function(){});
   });
 }
 </script>
