@@ -14,7 +14,8 @@
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="theme-color" content="#17120d" />
+<meta name="theme-color" content="#faf7f2" media="(prefers-color-scheme:light)" />
+<meta name="theme-color" content="#17120d" media="(prefers-color-scheme:dark)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -39,7 +40,7 @@
   --lrn:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
   --bg:#faf7f2; --surface:#ffffff; --surface2:#f0e9df;
   --ink:#1f1a14; --muted:#5c5147; --faint:#7f6a52; --line:#e5dbcc;
-  --accent:#8a5a2b; --accent-ink:#ffffff; --accent-soft:#f3e3d1;
+  --accent:#3f6212; --accent-ink:#ffffff; --accent-soft:#eaf3dd;
   --gold:#a16207; --gold-soft:#fbf0d5; --hit:#f5c451; --hit-ink:#1a1300;
   --ok:#15803d; --ok-soft:#dcfce7; --bad:#be123c; --bad-soft:#ffe4e9;
   --warn:#b45309; --warn-soft:#fef3c7;
@@ -55,7 +56,7 @@
 :root[data-theme="dark"]{
   --bg:#17120d; --surface:#221b14; --surface2:#2e251b;
   --ink:#f2ece3; --muted:#b3a595; --faint:#8a7c6c; --line:#3a2f23;
-  --accent:#e8c9a0; --accent-ink:#17120d; --accent-soft:#3a2c1c;
+  --accent:#bef264; --accent-ink:#1a2408; --accent-soft:#2a3316;
   --gold:#fbbf24; --gold-soft:#33270f; --hit:#ffd24d; --hit-ink:#241a00;
   --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
   --warn:#fbbf24; --warn-soft:#33260f;
@@ -69,7 +70,7 @@
   :root:not([data-theme="light"]){
     --bg:#17120d; --surface:#221b14; --surface2:#2e251b;
     --ink:#f2ece3; --muted:#b3a595; --faint:#8a7c6c; --line:#3a2f23;
-    --accent:#e8c9a0; --accent-ink:#17120d; --accent-soft:#3a2c1c;
+    --accent:#bef264; --accent-ink:#1a2408; --accent-soft:#2a3316;
     --gold:#fbbf24; --gold-soft:#33270f; --hit:#ffd24d; --hit-ink:#241a00;
     --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
     --warn:#fbbf24; --warn-soft:#33260f;
@@ -163,6 +164,10 @@ html[lang="ru"] body{font-family:var(--ru)}
    כחול, ולא טורקיז: זה כפתור של המורה, ובולט מכל שאר המסך. */
 .btn-p{background:#2563eb;color:#fff;border-color:#2563eb}
 .btn-p:hover{filter:brightness(1.1);border-color:#2563eb}
+/* במצב ניגודיות גבוהה הכחול אינו החלטה אלא שריד:
+   כל המסך עובר לפלטת ה-hc, והכפתור הראשי נשאר לבדו. נוסף
+   14.9.2026 — ארבע אפליקציות המתמטיקה כבר החזיקו את זה. */
+:root.hc .btn-p{background:var(--accent);border-color:var(--accent);box-shadow:none}
 .btn.w{width:100%}
 
 .chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;
@@ -1045,7 +1050,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="k29 · 2026-09-14";
+var BUILD="k30 · 2026-09-14";
 var SKEY="kotvim-state-v1";
 var GKEY_STORE="kotvim-gkey";
 
@@ -3074,7 +3079,7 @@ function boot(){
 }
 boot();
 </script>
-<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font:500 13px/1.6 Heebo,Rubik,system-ui,Arial,sans-serif;opacity:.62"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
@@ -3085,7 +3090,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=k29-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=k30-pwa1").catch(function(){});
   });
 }
 </script>

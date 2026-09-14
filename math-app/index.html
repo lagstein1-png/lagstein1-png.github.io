@@ -77,6 +77,45 @@ html.ts3{font-size:128%}
 /* פונט ברור לקריאה. Tahoma ו-Verdana קיימים בכל מחשב וכוללים
    עברית, ערבית, רוסית ואנגלית — בניגוד לפונטים ייעודיים לקריאה
    נגישה שקיימים באותיות לטיניות בלבד. */
+
+/* ================= מצב כהה — נוסף 14.9.2026 =================
+
+   **math-app הייתה היחידה מבין שלוש־עשרה בלי מצב כהה בכלל.**
+   נמדד: מופע יחיד של `prefers-color-scheme` בכל הקובץ, והוא
+   מכסה אך ורק את מודול המבחן הכיתתי שהועתק מ-math-uni. **גוף
+   האפליקציה נשאר קרם בהיר גם בטלפון בלילה**, בזמן שתשע
+   אפליקציות אחרות עוברות.
+
+   **ושלוש ערכות הצבע חייבות לעבור איתה.** `data-theme` כאן אינו
+   בהיר/כהה אלא ערכת מותג — ocean, grape, berry — ולכן
+   `html[data-theme]` גובר על `:root` גם בתוך שאילתת מדיה. בלי
+   שתי השורות האחרונות, מי שבחר ענבים או פטל היה נשאר בבהיר
+   ולא היה מבין למה.
+
+   **הבלוק יושב לפני `html.hi-contrast` בכוונה:** בסלקטיביות שווה
+   מנצח האחרון, וניגודיות גבוהה היא בחירה מפורשת של הלומד שחייבת
+   לגבור על העדפת המערכת.
+
+   כל ערך נמדד מול הרקע ומול הכרטיס. הנמוך ביותר הוא 5.86
+   (`--ink-faint` על הכרטיס), והרוב מעל 7. */
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#101a1c; --card:#17262a; --ink:#e8f1f2; --ink-soft:#a9c0c5; --ink-faint:#8aa3a9;
+    --teal:#5fd9c8; --teal-deep:#3fbfae; --teal-soft:#123833;
+    --amber:#ffd45e; --amber-deep:#ffc531; --amber-soft:#3a2e0c;
+    --coral:#ff9186; --coral-deep:#ff6f61; --coral-soft:#3d1a16;
+    --sky:#7fcbea; --sky-deep:#58b7e0; --sky-soft:#12303d;
+    --violet:#b49aef; --violet-deep:#8a63d2; --violet-soft:#241a3a;
+    --hit:#ffd45e; --hit-ink:#1a1300;
+  }
+  /* שתי הערכות שומרות על הגוון שלהן, ומקבלות רקע כהה תואם. */
+  html[data-theme="grape"]{ --paper:#161228; --card:#1f1836;
+    --teal:#b49aef; --teal-deep:#8a63d2; --teal-soft:#241a3a;
+    --sky:#5fd9c8; --sky-deep:#3fbfae; --sky-soft:#123833; }
+  html[data-theme="berry"]{ --paper:#241218; --card:#331a22;
+    --teal:#f59db1; --teal-deep:#d94f70; --teal-soft:#3d1a24;
+    --sky:#7fcbea; --sky-deep:#58b7e0; --sky-soft:#12303d; }
+}
 html.clear-font{--font-display:Tahoma,Verdana,Arial,sans-serif;--font-body:Tahoma,Verdana,Arial,sans-serif}
 /* ניגודיות גבוהה: שחור על לבן, בלי גוונים רכים, עם מסגרות ברורות. */
 html.hi-contrast{
@@ -151,6 +190,10 @@ nav{display:flex;gap:6px;margin-inline-start:auto;flex-wrap:wrap}
    כחול, ולא טורקיז: זה כפתור של המורה, ובולט מכל שאר המסך. */
 .btn-p{background:#2563eb;color:#fff;box-shadow:0 6px 0 #1e40af}
 .btn-p:hover{filter:brightness(1.1)}
+/* במצב ניגודיות גבוהה הכחול אינו החלטה אלא שריד:
+   כל המסך עובר לפלטת ה-hc, והכפתור הראשי נשאר לבדו. נוסף
+   14.9.2026 — ארבע אפליקציות המתמטיקה כבר החזיקו את זה. */
+:root.hc .btn-p{background:var(--teal);border-color:var(--teal);box-shadow:none}
 .btn.w{width:100%}
 .btn[disabled]{opacity:.4;cursor:not-allowed;transform:none!important}
 .card{background:var(--card);border:3px solid var(--ink);border-radius:30px;box-shadow:0 12px 0 rgba(23,51,60,.12)}
@@ -540,7 +583,8 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 <meta name="copyright" content="© 2026 יהושע לגשטיין. כל הזכויות שמורות.">
 <meta name="author" content="יהושע לגשטיין">
 <link rel="license" href="/legal/">
-<meta name="theme-color" content="#f3f8f4">
+<meta name="theme-color" content="#f3f8f4" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#101a1c" media="(prefers-color-scheme:dark)">
 </head>
 <body>
 <a class="skip" href="#main">דילוג לתוכן</a>
@@ -2056,7 +2100,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b96 · 2026-09-14";
+var BUILD="b98 · 2026-09-14";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4473,7 +4517,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b96-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b98-pwa1").catch(function(){});
   });
 }
 </script>
