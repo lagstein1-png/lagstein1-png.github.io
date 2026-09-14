@@ -1234,9 +1234,13 @@ function load(){
     var raw=localStorage.getItem(KEY)||localStorage.getItem("mlh-state-v1");
     if(!raw) return base;
     var p=JSON.parse(raw),d=defaults();
-    /* שמירה ישנה מחזיקה "puppy"; בלי ההמרה הזאת הילד היה חוזר
-       למסך בחירת הדמות ומאבד את ההתקדמות שלו. */
-    d.pet=(p.pet==="puppy")?"josh":(p.pet||null); d.petName=p.petName||""; d.level=(typeof p.level==="number"?p.level:null);
+    /* שמירה ישנה מחזיקה "puppy", "fox" או "owl"; בלי ההמרה הזאת
+       הילד היה חוזר למסך בחירת הדמות ומאבד את ההתקדמות שלו.
+
+       **״fox״ ו-״owl״ נוספו 14.9.2026** בהוראת הבעלים — ״בלי
+       השועל והינשוף, במקומם ייכנס ג׳וש צף״. שלוש הדמויות הישנות
+       ממופות כולן לג׳וש, ולכן אף שמירה קיימת אינה אובדת. */
+    d.pet=(p.pet==="puppy"||p.pet==="fox"||p.pet==="owl")?"josh":(p.pet||null); d.petName=p.petName||""; d.level=(typeof p.level==="number"?p.level:null);
     /* שמירות ישנות אינן מכילות petAuto. שם שזהה להצעה באחת מארבע
        השפות נשמר לפני שהיה אפשר להבחין, ולכן הוא ברירת מחדל. */
     d.petAuto=(p.petAuto!==undefined)?!!p.petAuto:isSuggestedName(d.pet,d.petName);
@@ -2052,7 +2056,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b90 · 2026-09-13";
+var BUILD="b91 · 2026-09-13";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2137,7 +2141,18 @@ function header(){
 
 /* ================= onboarding ================= */
 function onboarding(){
-  var t=T(),pets=["fox","josh","owl"],names={fox:t.petFox,josh:t.petJosh,owl:t.petOwl},sugg={fox:t.petFoxName,josh:t.petJoshName,owl:t.petOwlName};
+  /* **ג׳וש בלבד, מ-14.9.2026** — הוראת הבעלים: ״בלי השועל
+     והינשוף, במקומם ייכנס ג׳וש צף״.
+
+     המחרוזות `petFox`, `petOwl` ושמותיהם **נשארו במילון בארבע
+     השפות**, וכך גם `PETS.fox`, `PETS.owl` ו-`petSvg` שמצייר
+     אותם. הסיבה אינה עצלות: שמירה של ילד שבחר שועל ממופה
+     ל-`josh` ב-`load()`, אבל `RIVALS` בלוח השיאים עדיין נושא
+     `pet:"fox"` ו-`pet:"owl"` — ומחיקת הצבעים הייתה מציירת את
+     כל המתחרים בכתום ברירת־מחדל.
+
+     כלומר: הדמויות ירדו **מהבחירה**, לא מהקוד. */
+  var t=T(),pets=["josh"],names={fox:t.petFox,josh:t.petJosh,owl:t.petOwl},sugg={fox:t.petFoxName,josh:t.petJoshName,owl:t.petOwlName};
   var sel=P.selPet||null;
   return '<div class="wrap rise" style="display:grid;gap:40px;padding-top:44px;padding-bottom:60px;align-items:center;min-height:88vh;grid-template-columns:1fr">'+
   '<div style="max-width:1100px;margin:0 auto;display:grid;gap:44px;width:100%">'+
@@ -4458,7 +4473,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b90-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b91-pwa1").catch(function(){});
   });
 }
 </script>
