@@ -854,6 +854,23 @@ $("#theme").addEventListener("click",function(){
 var CATS=["all","math","lang","life"];
 var cat="all", q="";
 
+/* גרש וגרשיים מנוטרלים בשני הצדדים.
+
+   **מקלדת הטלפון נותנת `"` ו-`'` ישרים, והמאגר כתוב ב-`״`
+   ו-`׳` עבריים** — שני תווים אחרים לגמרי (U+05F4 מול U+0022).
+   נמדד בשלוש שפות ממשק: `תנ"ך` החזיר **אפס תוצאות בכולן**,
+   וכך גם `חדו"א`, בזמן ש-`תנך` ו-`חדו״א` החזירו תוצאה. מי
+   שמקליד את האיות הטבעי ביותר הוא היחיד שלא מוצא.
+
+   הפתרון הוא סילוק ולא המרה: `תנך`, `תנ״ך` ו-`תנ"ך` הופכים
+   כולם ל-`תנך`, ולכן כל השלושה מוצאים. וגם השם ג׳וש, בשני
+   כתיביו, נופל ל-`גוש` בשני הצדדים וממשיך להתאים.
+
+   **והדוגמה השנייה אינה כתובה כאן באותיות בכוונה** — `josh.js`
+   אוסר את האפוסטרוף האמריקאי (U+0027) בכל המאגר, והערה שמצטטת
+   אותו היא מופע שלו. זו אותה מלכודת של `brain.js`. */
+function nrm(s){ return String(s).replace(/["'\u05f3\u05f4\u2018\u2019\u201c\u201d]/g,"").toLowerCase(); }
+
 function priceLabel(a){
   /* מבצע ההשקה: הכול חינם, בהכרעת הבעלים 13.9.2026 — ״מחק כל
      איזכור של כסף, הכל פתוח בחינם״. הלומד אינו רואה סכום, ולא
@@ -871,8 +888,15 @@ function draw(){
     if(cat!=="all"&&a.cat!==cat)return false;
     if(!q)return true;
     /* החיפוש רץ גם על שם האפליקציה בשפת הממשק וגם על מילות המפתח
-       בעברית — מי שמחפש "חדו״א" באנגלית עדיין מוצא. */
-    var hay=(a.n[LG]+" "+a.d[LG]+" "+a.n.he+" "+a.k).toLowerCase();
+       בעברית — מי שמחפש "חדו״א" באנגלית עדיין מוצא.
+
+       **וגם על התיאור העברי, מ-14.9.2026.** קודם נסרק `d[LG]`
+       בלבד, והתיאור העברי הוא המקום היחיד שבו מופיעים חלק
+       מהתחומים של `lomda` בכתיב המלא שלהם. נמדד בשלוש שפות
+       ממשק: עולה דובר רוסית שחיפש "תנ״ך" קיבל **אפס**, בזמן
+       שמשתמש עברי קיבל תוצאה — אותו אתר, אותו תוכן. `n.he`
+       כבר היה כאן מאותו נימוק בדיוק, ו-`d.he` נשכח. */
+    var hay=nrm(a.n[LG]+" "+a.d[LG]+" "+a.n.he+" "+a.d.he+" "+a.k);
     return hay.indexOf(q)>=0;
   });
   $("#grid").innerHTML=list.map(function(a){
@@ -1027,7 +1051,7 @@ function boot(){
         x.setAttribute("aria-pressed",String(x.getAttribute("data-c")===cat))});
       draw(); }
   });
-  $("#q").addEventListener("input",function(){q=this.value.trim().toLowerCase();draw()});
+  $("#q").addEventListener("input",function(){q=nrm(this.value.trim());draw()});
   /* שער התנאים נפתח לפני הכול ויש בו בורר שפה משלו. בלי המאזין הזה
      המשתמש בוחר בשער אנגלית, מאשר, ונוחת על דף בית בעברית. */
   window.addEventListener("legal:lang",function(e){
@@ -1053,7 +1077,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=73-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=74-pwa1").catch(function(){});
   });
 }
 </script>
