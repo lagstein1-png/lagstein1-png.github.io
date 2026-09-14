@@ -376,14 +376,35 @@ import(WORKER).then(async W => {
       grab(/var VOICE_M=\/[\s\S]*?\/;/),
       grab(/function manScore\(v\)\{[\s\S]*?\n\}/),
       grab(/function voiceUsable\(v\)\{[\s\S]*?\n\}/),
+      /* **שלוש אלה נוספו 14.9.2026 עם בורר הקול.** `pickVoice`
+         מתייעץ עכשיו עם הבחירה השמורה לפני כל מיון, ובלעדיהן
+         הריצה ב-vm נופלת על `savedVoice is not defined` — כלומר
+         הבדיקה הייתה אדומה מסיבה שאינה הבאג שהיא מחפשת. */
+      /* בלעדיו savedVoices זורקת ReferenceError, וה-try/catch שלה
+         בולע אותו ומחזיר {} — כלומר הבדיקה נכשלת בשקט
+         מסיבה שאינה הבאג שהיא מחפשת. */
+      grab(/var VOICE_KEY = "[^"]*";/),
+      grab(/function savedVoices\(\)\{[\s\S]*?\n\}/),
+      grab(/function savedVoice\(code\)\{[^\n]*\}/),
+      grab(/function setVoice\(code, uri\)\{[\s\S]*?\n\}/),
+      grab(/function voicesFor\(code\)\{[\s\S]*?\n\}/),
       grab(/function pickVoice\(code\)\{[\s\S]*?\n\}/)
     ];
-    if (src.some(x => !x)) { t('נחלצו חמשת חלקי בחירת הקול', false, true); return }
+    if (src.some(x => !x)) { t('נחלצו חלקי בחירת הקול', false, true); return }
+    /* `localStorage` מזויף וריק: המיון האוטומטי הוא מה שנבדק
+       ברוב השורות, והבחירה הידנית נבדקת בנפרד בסוף. */
+    const store = {};
     const ctx = { _netVoiceOK: true, navigator: { onLine: true }, out: null,
+                  localStorage: { getItem: k => (k in store ? store[k] : null),
+                                  setItem: (k, v) => { store[k] = String(v) } },
                   voices: () => ctx.LIST };
     vm.createContext(ctx);
-    vm.runInContext(src.join('\n') + '\nout = { pick: pickVoice, man: manScore };', ctx);
-    const V = (name, local) => ({ name: name, lang: 'he-IL', localService: local !== false });
+    vm.runInContext(src.join('\n') + '\nout = { pick: pickVoice, man: manScore, save: setVoice };', ctx);
+    /* `voiceURI` נוסף 14.9.2026: הבחירה הידנית נשמרת לפיו,
+       ובלעדיו ההשוואה היא undefined === מחרוזת — כלומר הבדיקה
+       נופלת על הקול המזויף ולא על הקוד. */
+    const V = (name, local) => ({ name: name, voiceURI: name, lang: 'he-IL',
+                                  localService: local !== false });
 
     /* **גברי, מ-14.9.2026.** ההוראה הקודמת (13.9) ביקשה נשי, והבעלים
        הפך אותה: ״ג׳וש מדבר בקול של אישה, תתקן לקול גברי עדין ורך״. */
@@ -404,6 +425,20 @@ import(WORKER).then(async W => {
 
     /* ״google״ הוא שם יצרן ולא מגדר. אם ייספר כנשי, ״Google עברית״
        — שהוא גברי בחלק מהמכשירים — ייבחר דווקא כשמבקשים נשי. */
+    /* **הבחירה הידנית גוברת על כל מיון — 14.9.2026.**
+
+       הבעלים שמע קול נשי גם אחרי שתוקן, מפני שרוב מנועי
+       ההקראה באנדרואיד מתעלמים מ-`pitch`. התשובה אינה ניחוש
+       טוב יותר אלא בורר, והבורר חייב לנצח — גם על `voiceUsable`.
+       מי שבחר קול ושומע אחר לא יבין למה. */
+    ctx.LIST = [V('Carmit'), V('Microsoft Asaf')];
+    ctx.out.save('he-IL', 'Carmit');
+    t('הקול שנבחר ביד גובר על המיון',
+      (ctx.out.pick('he-IL') || {}).name, 'Carmit');
+    ctx.out.save('he-IL', '');
+    t('ביטול הבחירה מחזיר את המיון',
+      (ctx.out.pick('he-IL') || {}).name, 'Microsoft Asaf');
+
     t('שם יצרן אינו מגדר', ctx.out.man(V('Google עברית')), 1);
     t('שם גברי מזוהה',     ctx.out.man(V('Microsoft Asaf')), 2);
     t('שם נשי מזוהה כנשי', ctx.out.man(V('Carmit')), 0);
@@ -468,8 +503,25 @@ import(WORKER).then(async W => {
      והדרישה היא ארבע שפות בכל אפליקציה. */
   t('bagrut-806 מסמנת pickLang',
     /pickLang:\s*true/.test(fs.readFileSync(path.join(ROOT, 'bagrut-806', 'app.js'), 'utf8')), true);
-  t('אין מיקרופון בשלב הזה',
-    /getUserMedia|SpeechRecognition|webkitSpeechRecognition/.test(client), false);
+  /* **המיקרופון נפתח 14.9.2026 בהוראת הבעלים** — ״אני רוצה שתהיה
+     אפשרות לדבר איתו מבלי להקליד״. השורה הקודמת כאן נקראה ״אין
+     מיקרופון **בשלב הזה**״, כלומר החלטת שלב, והבעלים הכריע.
+
+     מה שנשאר אסור, ומה שהבדיקה אוכפת במקומה:
+
+     · **אין `getUserMedia`** — זרם אודיו שנפתח ביד הוא הקלטה
+       שאנחנו מחזיקים. `SpeechRecognition` מחזיר טקסט ותו לא.
+     · **לחיצה לכל אמירה** — `continuous` חייב להיות false.
+       מיקרופון שנשאר פתוח הוא הבטחה אחרת לגמרי.
+     · **התנאים אומרים את זה** — ההקלטה יוצאת אל יצרן הדפדפן,
+       והנוסח הקודם הבטיח ״מה שכתבתם״ ו״אין צד שלישי נוסף״.
+       לכן הגרסה חייבת להיות מעל 1.2. */
+  t('אין getUserMedia — רק המרה לטקסט', /getUserMedia/.test(client), false);
+  t('המיקרופון נסגר אחרי אמירה אחת', /continuous\s*=\s*false/.test(client), true);
+  t('יש כפתור דיבור', /id="tu-mic"/.test(client), true);
+  t('התנאים עודכנו מעל 1.2',
+    parseFloat((fs.readFileSync(path.join(ROOT,"legal","terms.js"),"utf8")
+      .match(/version:\s*"([\d.]+)"/)||[0,"0"])[1]) > 1.2, true);
   t('השיחה אינה נשמרת', /localStorage\.setItem\(\s*(RATE_KEY|DAY_KEY)/.test(client)
     && !/localStorage\.setItem\(\s*["'].*msg/i.test(client), true);
 

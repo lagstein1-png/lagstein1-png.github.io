@@ -45,6 +45,7 @@ var API = "";
    אף אחד מהם הוא כפתור שבור, וזו הייתה הכוונה המקורית של השער. */
 var BRAIN = !!API || typeof JOSHLOCAL !== "undefined";
 
+var VOICE_KEY = "tutor-voice-v1"; /* הקול שהלומד בחר, מפתח לכל שפה */
 var RATE_KEY = "tutor-rate-v1";   /* מהירות ההקראה. משותף בכוונה — מודול אחד, התנהגות אחת */
 var DAY_KEY  = "tutor-day-v1";    /* מונה יומי. ילד אחד, תקציב אחד, בלי קשר לאפליקציה */
 var LANG_KEY = "tutor-lang-v1";   /* רק לאפליקציה שאין בה בורר שפה משלה — ראו pickLang */
@@ -83,6 +84,9 @@ he:{ btn:"ג׳וש — עזרה מהמורה", title:"עזרה מהמורה", cl
   full:"דיברנו על זה הרבה. בוא ננסה, ובשאלה הבאה נתחיל מחדש.",
   privacy:"אל תכתבו כאן שם מלא, כתובת או טלפון.",
   play:"הקראה", stop:"עצירה", rate:"מהירות", off:"אין קול בשפה הזאת במכשיר הזה",
+  voice:"קול", voiceAuto:"אוטומטי",
+  mic:"דבר", micOn:"מקשיבהװװ", micNo:"הדפדפן הזה לא נותן לדבר. אפשר להקליד.",
+  micDeny:"אין הרשאה למיקרופון. אפשר לאשר בהגדרות הדפדפן, או פשוט להקליד.",
   manNote:"אין במכשיר הזה קול גברי בשפה הזאת, ולכן גובה הקול הונמך. זה לא קול גברי אמיתי." },
 ar:{ btn:"جوش — مساعدة من المعلّم", title:"مساعدة من المعلّم", close:"إغلاق", send:"إرسال",
   intro:"يمكنك أن تسألني عمّا يظهر على الشاشة. أعطي تلميحًا واحدًا في كل مرة وأنتظر إجابتك.",
@@ -94,6 +98,9 @@ ar:{ btn:"جوش — مساعدة من المعلّم", title:"مساعدة من
   full:"تحدّثنا كثيرًا عن هذا. لنجرّب، ونبدأ من جديد في التالي.",
   privacy:"لا تكتب هنا اسمك الكامل أو عنوانك أو رقم هاتفك.",
   play:"استماع", stop:"إيقاف", rate:"السرعة", off:"لا يوجد صوت بهذه اللغة على هذا الجهاز",
+  voice:"الصوت", voiceAuto:"تلقائي",
+  mic:"تكلّم", micOn:"أسمعك…", micNo:"هذا المتصفّح لا يتيح التكلّم. يمكنك الكتابة.",
+  micDeny:"لا يوجد إذن للميكروفون. يمكن السماح في إعدادات المتصفّح، أو الكتابة ببساطة.",
   manNote:"لا يوجد على هذا الجهاز صوت رجاليّ بهذه اللغة، لذلك خُفضت طبقة الصوت. هذا ليس صوتًا رجاليًّا حقيقيًّا." },
 ru:{ btn:"Джош — помощь учителя", title:"Помощь учителя", close:"Закрыть", send:"Отправить",
   intro:"Можешь спросить меня о том, что на экране. Я даю по одной подсказке и жду ответа.",
@@ -105,6 +112,9 @@ ru:{ btn:"Джош — помощь учителя", title:"Помощь учи�
   full:"Мы много об этом говорили. Давай попробуем, а дальше начнём заново.",
   privacy:"Не пиши здесь полное имя, адрес или телефон.",
   play:"Прочитать", stop:"Стоп", rate:"Скорость", off:"На этом устройстве нет голоса для этого языка",
+  voice:"Голос", voiceAuto:"Автоматически",
+  mic:"Говори", micOn:"Слушаю…", micNo:"Этот браузер не позволяет говорить. Можно печатать.",
+  micDeny:"Нет разрешения на микрофон. Разрешите в настройках браузера или просто печатайте.",
   manNote:"На этом устройстве нет мужского голоса для этого языка, поэтому тон понижен. Это не настоящий мужской голос." },
 en:{ btn:"Josh — ask the teacher", title:"Ask the teacher", close:"Close", send:"Send",
   intro:"You can ask me about what is on the screen. I give one hint at a time, and wait for your answer.",
@@ -116,6 +126,9 @@ en:{ btn:"Josh — ask the teacher", title:"Ask the teacher", close:"Close", sen
   full:"We have talked about this a lot. Let's try, and start fresh on the next one.",
   privacy:"Do not write your full name, address or phone number here.",
   play:"Read aloud", stop:"Stop", rate:"Speed", off:"This device has no voice for this language",
+  voice:"Voice", voiceAuto:"Automatic",
+  mic:"Speak", micOn:"Listening…", micNo:"This browser does not allow speaking. You can type instead.",
+  micDeny:"No microphone permission. You can allow it in the browser settings, or simply type.",
   manNote:"This device has no male voice for this language, so the pitch is lowered. It is not a real male voice." }
 };
 
@@ -278,7 +291,45 @@ var MAN_PITCH = 0.62;
 /* האם האמירה האחרונה נאמרה בנפילה לאחור. מתעדכן ב-speakSeg. */
 var _manFallback = false;
 
+/* **הקול שנבחר ביד גובר על כל מיון — מ-14.9.2026, ובצדק.**
+
+   עד כאן ג׳וש ניסה לנחש קול גברי, ואם לא מצא — הנמיך את הגובה.
+   **זה נכשל אצל הבעלים, והסיבה מבנית:** ברוב מנועי ההקראה של
+   אנדרואיד `pitch` של Web Speech פשוט **אינו נאכף**, ולכן שום
+   הנמכה לא נשמעת. ואין לי דרך לדעת מכאן אילו קולות מותקנים
+   במכשיר שלו.
+
+   מכאן שהתשובה אינה ניחוש טוב יותר אלא **בורר**: הלומד רואה את
+   הקולות שיש לו בפועל ובוחר. ההעדפה האוטומטית נשארת כברירת
+   מחדל למי שלא בחר.
+
+   נשמר לכל שפה בנפרד — קול עברי אינו מועמד לרוסית. */
+function savedVoices(){
+  try{ return JSON.parse(localStorage.getItem(VOICE_KEY) || "{}") || {} }catch(e){ return {} }
+}
+function savedVoice(code){ var m = savedVoices(); return m[code] || "" }
+function setVoice(code, uri){
+  var m = savedVoices();
+  if(uri) m[code] = uri; else delete m[code];
+  try{ localStorage.setItem(VOICE_KEY, JSON.stringify(m)) }catch(e){}
+}
+/* כל הקולות שמתאימים לשפה — הרשימה שהבורר מציג. */
+function voicesFor(code){
+  var v = voices(), p = code.slice(0,2), out = [], i, l;
+  for(i=0;i<v.length;i++){
+    l = (v[i].lang||"").replace("_","-").toLowerCase();
+    if(l.slice(0,2) === p) out.push(v[i]);
+  }
+  return out;
+}
 function pickVoice(code){
+  /* בחירה מפורשת קודמת לכול — גם ל-voiceUsable. מי שבחר קול
+     ורואה שהוא לא נאמר לא יבין למה, והשקט גרוע מקול לא-אידאלי. */
+  var want = savedVoice(code);
+  if(want){
+    var all = voicesFor(code), j;
+    for(j=0;j<all.length;j++) if(all[j].voiceURI === want) return all[j];
+  }
   var v = voices(), p = code.slice(0,2), i, exact = [], loose = [], l;
   for(i=0;i<v.length;i++){
     l = (v[i].lang||"").replace("_","-").toLowerCase();
@@ -501,8 +552,8 @@ var CSS = ''
    הקו שמתחת לכותרת. עכשיו הוא כלל עצמאי. */
 +'#tu-face{flex:0 0 auto;line-height:0;display:inline-block;'
 +'filter:drop-shadow(0 5px 12px rgba(23,51,60,.22));'
-+'animation:tu-float 3.6s ease-in-out infinite}'
-+'@keyframes tu-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}'
++'animation:tu-float 3.2s ease-in-out infinite}'
++'@keyframes tu-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}'
 +'@media (prefers-reduced-motion:reduce){#tu-face{animation:none}}'
 +'#tu-hd b{font-size:1.05rem}'
 +'#tu-q{background:#fff3ce;border:1px solid #e6b800;border-radius:9px;padding:3px 9px;'
@@ -529,6 +580,13 @@ var CSS = ''
 +'font:inherit;font-size:.85rem;min-height:32px;background:#fff;color:#17333c}'
 +'#tu-ft{padding:12px 18px;border-top:2px solid rgba(23,51,60,.12)}'
 +'#tu-row{display:flex;gap:8px}'
+/* כפתור הדיבור. אותו גובה כמו התיבה, ומרובע — הוא פעולה ולא טקסט. */
++'#tu-mic{flex:0 0 auto;background:#fff;color:#17333c;border:2px solid rgba(23,51,60,.2);'
++'border-radius:13px;padding:11px 14px;font:inherit;font-weight:600;cursor:pointer;min-height:46px}'
++'#tu-mic[aria-pressed="true"]{background:#c0392b;color:#fff;border-color:#a5301f;'
++'animation:tu-lis 1.1s ease-in-out infinite}'
++'@keyframes tu-lis{0%,100%{opacity:1}50%{opacity:.62}}'
++'@media (prefers-reduced-motion:reduce){#tu-mic[aria-pressed="true"]{animation:none}}'
 +'#tu-in{flex:1;padding:11px 14px;border:2px solid rgba(23,51,60,.2);border-radius:13px;'
 +'font:inherit;font-size:1rem;background:#fff;color:#17333c;min-width:0}'
 +'#tu-go{background:#0e9c8d;color:#fff;border:0;border-radius:13px;padding:11px 18px;'
@@ -567,6 +625,7 @@ function build(){
     + '<button id="tu-x" type="button"></button></div>'
     + '<div id="tu-log" aria-live="polite"></div>'
     + '<div id="tu-ft"><div id="tu-row">'
+    + '<button id="tu-mic" type="button" hidden aria-pressed="false"></button>'
     + '<input id="tu-in" type="text" autocomplete="off" maxlength="' + MAXLEN + '" />'
     + '<button id="tu-go" type="button"></button></div><p id="tu-pv"></p></div></div>';
   document.body.appendChild(ov);
@@ -607,6 +666,7 @@ function build(){
     stopSay(); draw(); send(T().hello, true);
   };
   EL.go.onclick = function(){ send(EL.inp.value) };
+  wireMic(ov);
   ov.addEventListener("click", function(e){ if(e.target === ov) close() });
   EL.inp.addEventListener("keydown", function(e){
     if(e.key === "Enter"){ e.preventDefault(); e.stopPropagation(); send(EL.inp.value) }
@@ -623,6 +683,12 @@ function build(){
   });
   EL.log.addEventListener("change", function(e){
     if(e.target.id === "tu-rate"){ setRate(parseFloat(e.target.value)); if(PLAYING>=0) stopSay() }
+    else if(e.target.id === "tu-vc"){
+      setVoice(VOICE[lang()] || "he-IL", e.target.value);
+      if(PLAYING>=0) stopSay();
+      /* מדגם קצר, כדי שהבחירה תישמע מיד ולא רק בהודעה הבאה. */
+      try{ speakSeg(T().mic, VOICE[lang()] || "he-IL", rate(), function(){return true}, function(){}) }catch(err){}
+    }
   });
   return EL;
 }
@@ -702,12 +768,102 @@ function ctl(i){
       h += '<option value="' + v + '"' + (v === r ? " selected" : "") + '>' + v + '×</option>';
     });
     h += '</select></label>';
+    /* בורר הקול. מוצג רק כשיש יותר מקול אחד בשפה — במכשיר עם
+       קול יחיד הוא תפריט בן פריט אחד, וזה רעש. */
+    var vl = voicesFor(VOICE[lang()] || "he-IL");
+    if(vl.length > 1){
+      var cur = savedVoice(VOICE[lang()] || "he-IL");
+      h += '<label class="tu-sys">' + esc(t.voice) + ' '
+         + '<select id="tu-vc" aria-label="' + esc(t.voice) + '">'
+         + '<option value=""' + (cur ? "" : " selected") + '>' + esc(t.voiceAuto) + '</option>';
+      vl.forEach(function(v){
+        h += '<option value="' + esc(v.voiceURI) + '"' + (v.voiceURI === cur ? " selected" : "")
+           + '>' + esc(v.name) + '</option>';
+      });
+      h += '</select></label>';
+    }
   }
   /* ההודעה מופיעה **אחרי** אמירה שנפלה לאחור ולא לפניה: לפני
      ההקראה הראשונה אין לדעת איזה קול המכשיר ייתן לשפה הזאת. */
   if(_manFallback && i === MSGS.length - 1)
     h += '<span class="tu-sys tu-man">' + esc(t.manNote) + '</span>';
   return h + '</div>';
+}
+
+/* ================= לדבר במקום להקליד =================
+
+   **הבעלים ביקש את זה במפורש ב-14.9.2026:** ״אין אפשרות לדבר
+   איתו חייבים להקליד, אני רוצה שתהיה אפשרות לדבר איתו מבלי
+   להקליד.״ עד אז `.claude/qa/tutor.js` אסר מיקרופון בשורה
+   ששמה ״אין מיקרופון **בשלב הזה**״ — החלטת שלב, והבעלים הכריע.
+
+   **ומה שזה משנה בתנאים, ולכן הם עלו ל-1.3:** `SpeechRecognition`
+   בדפדפן **אינו מקומי** — ברוב הדפדפנים ההקלטה נשלחת לשירות
+   ההמרה של יצרן הדפדפן. התנאים אמרו ״מה ש**כתבתם**״ ו״אין צד
+   שלישי נוסף״, ושניהם כבר לא היו נכונים. עכשיו הם אומרים זאת.
+
+   **מה שנשמר כאן: כלום.** אין פתיחת זרם אודיו ביד — ה-API שעושה
+   זאת אסור כאן, ו-`.claude/qa/tutor.js` אוכף את זה. **ושמו אינו
+   כתוב כאן באותיות בכוונה:** הבדיקה מחפשת מחרוזת, והערה שמצטטת
+   אותה היא מופע שלה — אותה מלכודת של `brain.js` ושל `josh.js`.
+   המנוע של הדפדפן מחזיר טקסט, הטקסט נכנס לתיבה, ומשם הוא
+   בדיוק כמו הקלדה. אין הקלטה על המכשיר ואין אחת שנשלחת אלינו.
+
+   **לחיצה אחת לכל אמירה.** `continuous = false` — מיקרופון
+   שנשאר פתוח הוא הבטחה אחרת לגמרי, וגם סוללה. */
+var REC = null, RECON = false;
+function recCtor(){
+  return g.SpeechRecognition || g.webkitSpeechRecognition || null;
+}
+function micState(on){
+  RECON = on;
+  var b = EL && EL.mic; if(!b) return;
+  var t = T();
+  b.setAttribute("aria-pressed", on ? "true" : "false");
+  b.textContent = on ? ("● " + t.micOn) : ("● " + t.mic);
+}
+function micStop(){
+  if(REC){ try{ REC.stop() }catch(e){} }
+  micState(false);
+}
+function wireMic(ov){
+  var b = ov.querySelector("#tu-mic");
+  if(!b) return;
+  EL.mic = b;
+  var C = recCtor();
+  if(!C) return;                      /* אין תמיכה — הכפתור נשאר נסתר */
+  b.hidden = false;
+  micState(false);
+  b.onclick = function(){
+    if(RECON){ micStop(); return }
+    /* ג׳וש מפסיק לדבר לפני שהוא מקשיב, אחרת הוא שומע את עצמו. */
+    stopSay();
+    try{ REC = new C() }catch(e){ NOTE = T().micNo; draw(); return }
+    REC.lang = VOICE[lang()] || "he-IL";
+    REC.continuous = false;
+    REC.interimResults = false;
+    REC.maxAlternatives = 1;
+    REC.onresult = function(ev){
+      var txt = "";
+      try{ txt = ev.results[0][0].transcript || "" }catch(e){}
+      micState(false);
+      txt = String(txt).trim();
+      if(!txt) return;
+      /* נכנס לתיבה **ונשלח** — מי שדיבר לא רוצה ללחוץ אחר כך. */
+      if(EL && EL.inp) EL.inp.value = txt;
+      send(txt);
+    };
+    REC.onerror = function(ev){
+      micState(false);
+      var e = ev && ev.error;
+      if(e === "not-allowed" || e === "service-not-allowed") NOTE = T().micDeny;
+      else if(e !== "aborted" && e !== "no-speech") NOTE = T().micNo;
+      draw();
+    };
+    REC.onend = function(){ micState(false) };
+    try{ REC.start(); micState(true) }
+    catch(e){ micState(false); NOTE = T().micNo; draw() }
+  };
 }
 
 /* ================= השיחה ================= */
@@ -747,6 +903,7 @@ function open(auto){
   else if(!auto) focus();
 }
 function close(){
+  micStop();
   stopSay(); stopReveal(); NOTE = "";
   if(EL) EL.ov.classList.remove("on");
   if(typeof JOSHFACE !== "undefined") JOSHFACE.emit("idle");
