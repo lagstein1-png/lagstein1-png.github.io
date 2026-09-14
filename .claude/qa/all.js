@@ -96,7 +96,7 @@ const SUITE = [
   /* ומה שהדף מבטיח, ולא רק מה שהקוד עושה. `launch.js` פותח את הכול
      ללא חיוב, ותגית ה-meta — מה שגוגל וּוואטסאפ מציגים — אמרה
      ״שמונה בתשלום״ חודשיים. אף בדיקה לא הסתכלה לשם. */
-  { id: 'promo',    args: [] },
+  { id: 'money',    args: [] },
   { id: 'smoke',    args: PAGES,  needsServer: true },
   { id: 'say',      args: [],     needsServer: true },
   /* מה שבאמת מגיע למנוע ההקראה. content.js מודד שדה שנדגם; זה מריץ

@@ -13,7 +13,7 @@
    בגודל אחר, וזו בדיוק התלונה.
 
    נמדד ב-9.9.2026 לפני התיקון, בכרום דרך השרת המקומי:
-     דף הבית ru = Heebo · pricing ar+ru = Heebo · reader ar+ru = Assistant
+     דף הבית ru = Heebo · reader ar+ru = Assistant
      שער התנאים (legal/protect.js) ar+ru = Heebo, בכל שתים־עשרה
    אחרי: כולם "Noto Sans Arabic" / "Noto Sans".
 
@@ -38,7 +38,6 @@ const SCRIPT = {
 /* הדפים שיש בהם סרגל שפות גלוי במסך הראשון, בלי ניווט. */
 const PAGES = [
   { id: 'דף הבית', url: '/',         sel: '.lang button' },
-  { id: 'pricing', url: '/pricing/', sel: '.lang button' },
   { id: 'reader',  url: '/reader/',  sel: '#langbar button' },
 ];
 
