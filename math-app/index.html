@@ -151,6 +151,10 @@ nav{display:flex;gap:6px;margin-inline-start:auto;flex-wrap:wrap}
    כחול, ולא טורקיז: זה כפתור של המורה, ובולט מכל שאר המסך. */
 .btn-p{background:#2563eb;color:#fff;box-shadow:0 6px 0 #1e40af}
 .btn-p:hover{filter:brightness(1.1)}
+/* במצב ניגודיות גבוהה הכחול אינו החלטה אלא שריד:
+   כל המסך עובר לפלטת ה-hc, והכפתור הראשי נשאר לבדו. נוסף
+   14.9.2026 — ארבע אפליקציות המתמטיקה כבר החזיקו את זה. */
+:root.hc .btn-p{background:var(--teal);border-color:var(--teal);box-shadow:none}
 .btn.w{width:100%}
 .btn[disabled]{opacity:.4;cursor:not-allowed;transform:none!important}
 .card{background:var(--card);border:3px solid var(--ink);border-radius:30px;box-shadow:0 12px 0 rgba(23,51,60,.12)}
@@ -2056,7 +2060,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b96 · 2026-09-14";
+var BUILD="b97 · 2026-09-14";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4473,7 +4477,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b96-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b97-pwa1").catch(function(){});
   });
 }
 </script>

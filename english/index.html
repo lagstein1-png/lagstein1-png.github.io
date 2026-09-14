@@ -163,6 +163,10 @@ button{font:inherit;color:inherit}
    כחול, ולא טורקיז: זה כפתור של המורה, ובולט מכל שאר המסך. */
 .btn-p{background:#2563eb;color:#fff;border-color:#2563eb}
 .btn-p:hover{filter:brightness(1.1);border-color:#2563eb}
+/* במצב ניגודיות גבוהה הכחול אינו החלטה אלא שריד:
+   כל המסך עובר לפלטת ה-hc, והכפתור הראשי נשאר לבדו. נוסף
+   14.9.2026 — ארבע אפליקציות המתמטיקה כבר החזיקו את זה. */
+:root.hc .btn-p{background:var(--accent);border-color:var(--accent);box-shadow:none}
 .btn.w{width:100%}
 
 .chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;
@@ -1081,7 +1085,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n84 · 2026-09-14";
+var BUILD="n85 · 2026-09-14";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -5488,7 +5492,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n84-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n85-pwa1").catch(function(){});
   });
 }
 </script>
