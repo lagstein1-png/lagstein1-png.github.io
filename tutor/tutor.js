@@ -274,7 +274,7 @@ function manScore(v){
 
 /* כשאין קול גברי במכשיר. **זה אינו קול גברי** אלא אותו קול מעט
    נמוך יותר, וההודעה ללומד אומרת בדיוק את זה. */
-var MAN_PITCH = 0.88;
+var MAN_PITCH = 0.62;
 /* האם האמירה האחרונה נאמרה בנפילה לאחור. מתעדכן ב-speakSeg. */
 var _manFallback = false;
 
@@ -481,10 +481,29 @@ var CSS = ''
    זו והמרווח ביניהן מתכווץ. כל הדגשה בפאנל היא משקל, לא הטיה. */
 +'#tu-bx em,#tu-bx i,#tu-bx cite{font-style:normal;font-weight:700}'
 +'#tu-hd{display:flex;align-items:center;gap:10px;padding:14px 18px;'
-/* הפנים בכותרת: קטנות, לא גוזלות מקום מהטקסט, ולא נדחסות
-   כשהשאלה שלצידן ארוכה. */
-+'#tu-face{flex:0 0 auto;line-height:0;display:inline-block}'
 +'border-bottom:2px solid rgba(23,51,60,.12);flex-wrap:wrap}'
+
+/* הפנים בכותרת.
+
+   **שני תיקונים מ-14.9.2026, ושניהם דיווח של הבעלים:** הוא ראה
+   ״ציור שלא זז ולא צף״. נמדד בדפדפן, ושניהם היו נכונים —
+   הפרצוף היה **48×48 בפועל**, ובגודל הזה מצמוץ בן שתי נקודות
+   ונשימה של אחוז וחצי אינם נראים כלל; ו-`animationName` על ה-svg
+   החזיר `none`, כלומר לא הייתה שום ציפה.
+
+   הוא עלה ל-68 — נמדד, ו-76 כבר שובר את הכותרת לשתי שורות — קיבל צל מוטל שמרים אותו מהלוח, וציפה של חמישה
+   פיקסלים ב-3.6 שניות. **חמישה ולא עשרים:** תנועה שמושכת את
+   העין מהטקסט היא בדיוק ההפך ממה שדרוש ללומד עם קשיי קשב.
+
+   **והכלל הזה ישב קודם בתוך הכלל של `#tu-hd`** — השרשור ייצר
+   `#tu-hd{...#tu-face{...}border-bottom:...}`, וזה עבד רק בזכות
+   CSS nesting ילידי. בדפדפן ישן יותר כל הכלל נפסל, ואיתו גם
+   הקו שמתחת לכותרת. עכשיו הוא כלל עצמאי. */
++'#tu-face{flex:0 0 auto;line-height:0;display:inline-block;'
++'filter:drop-shadow(0 5px 12px rgba(23,51,60,.22));'
++'animation:tu-float 3.6s ease-in-out infinite}'
++'@keyframes tu-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}'
++'@media (prefers-reduced-motion:reduce){#tu-face{animation:none}}'
 +'#tu-hd b{font-size:1.05rem}'
 +'#tu-q{background:#fff3ce;border:1px solid #e6b800;border-radius:9px;padding:3px 9px;'
 +'font-weight:600;direction:ltr;unicode-bidi:isolate;font-size:.95rem}'
@@ -570,7 +589,7 @@ function build(){
        במקום השורה הזאת — שורה אחת, לשני הכיוונים. */
     JOSHFACE.look("robot");
     var fw = ov.querySelector("#tu-face");
-    if(fw){ fw.innerHTML = JOSHFACE.markup(46); JOSHFACE.attach() }
+    if(fw){ fw.innerHTML = JOSHFACE.markup(68); JOSHFACE.attach() }
   }
 
   EL = {
