@@ -162,6 +162,7 @@ const FIELDS = {
   18: { he: 'שמונה־עשר', ar: 'ثمانية عشر', ru: 'восемнадцать', en: 'eighteen' },
   19: { he: 'תשעה־עשר',  ar: 'تسعة عشر',  ru: 'девятнадцать', en: 'nineteen' },
   20: { he: 'עשרים',     ar: 'عشرون',     ru: 'двадцать',     en: 'twenty' },
+  21: { he: 'עשרים ואחד', ar: 'واحد وعشرون', ru: 'двадцать одна', en: 'twenty-one' },
 };
 
 const dataDir = path.join(ROOT, 'lomda', 'data');
