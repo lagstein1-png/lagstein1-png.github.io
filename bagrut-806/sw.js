@@ -27,6 +27,7 @@ const PRE = [
   "./img/icon-192.png", "./img/icon-512.png", "./img/icon-maskable-512.png",
   "./img/apple-touch-icon.png", "./vendor/katex/katex.min.css", "./vendor/katex/katex.min.js",
   "/img/josh.jpg",
+  "/img/josh-bot.jpg",
   "/tutor/josh-face.js",
   "/tutor/josh-local.js","/tutor/tutor.js",
   "/legal/terms.js", "/legal/protect.js",

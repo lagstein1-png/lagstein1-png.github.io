@@ -66,6 +66,8 @@ var base = "idle", cur = "idle", nodes = [], moTimer = null, blTimer = null;
 
 /* נתיב לדיוקן. ריק = הפנים המצוירות. ראו `photo()` למטה. */
 var photoURL = "";
+/* כיול המסכות של הדיוקן הנוכחי. `null` = ברירות המחדל של josh.jpg. */
+var photoMarks = null;
 
 /* **איזה פרצוף נבנה כשאין תצלום — "robot" או "human".**
 
@@ -220,16 +222,25 @@ var CSS = [
    פיקסלים במקור — המרחק בין קו הריסים לקפל שמעליו. */
 ".jf__plid{opacity:0}",
 ".jf__plid>i{transform:translateY(3.1%)}",
-".jf__plid--a{-webkit-mask-image:radial-gradient(ellipse 7% 2.6% at 59% 28.4%,#000 55%,transparent 100%);",
-"  mask-image:radial-gradient(ellipse 7% 2.6% at 59% 28.4%,#000 55%,transparent 100%)}",
-".jf__plid--b{-webkit-mask-image:radial-gradient(ellipse 7.5% 2.8% at 83% 32.2%,#000 55%,transparent 100%);",
-"  mask-image:radial-gradient(ellipse 7.5% 2.8% at 83% 32.2%,#000 55%,transparent 100%)}",
+/* **הקואורדינטות הן משתנים מאז 14.9.2026, ולא מספרים קשיחים.**
+
+   `FACE.md` הזהיר במפורש: ארבעת המספרים האלה מכוילים לחתך של
+   `josh.jpg` בלבד, ותצלום אחר מנחית את העפעפיים על הלחי. הבעלים
+   שלח דיוקן שני, ולכן הכיול עבר אל הקורא — וברירות המחדל כאן הן
+   בדיוק המספרים הישנים, כך ש-`josh.jpg` אינו משתנה בפיקסל.
+
+   מי שמוסיף דיוקן שלישי מודד ומעביר; מי שלא מעביר מקבל את
+   ברירות המחדל, וזה גלוי מיד כי העפעף לא יהיה על העין. */
+".jf__plid--a{-webkit-mask-image:radial-gradient(ellipse var(--jf-ew,7%) var(--jf-eh,2.6%) at var(--jf-ax,59%) var(--jf-ay,28.4%),#000 55%,transparent 100%);",
+"  mask-image:radial-gradient(ellipse var(--jf-ew,7%) var(--jf-eh,2.6%) at var(--jf-ax,59%) var(--jf-ay,28.4%),#000 55%,transparent 100%)}",
+".jf__plid--b{-webkit-mask-image:radial-gradient(ellipse var(--jf-ew2,7.5%) var(--jf-eh2,2.8%) at var(--jf-bx,83%) var(--jf-by,32.2%),#000 55%,transparent 100%);",
+"  mask-image:radial-gradient(ellipse var(--jf-ew2,7.5%) var(--jf-eh2,2.8%) at var(--jf-bx,83%) var(--jf-by,32.2%),#000 55%,transparent 100%)}",
 ".jf--photo.is-blink .jf__plid{opacity:1}",
 /* הלסת: אזור הפה, נמתח אנכית סביב ציר שמתחת לאף. כשהאנימציה
    עומדת השכבה זהה למה שמתחתיה, ולכן אינה נראית כלל. */
-".jf__pjaw{-webkit-mask-image:radial-gradient(ellipse 13% 6% at 65% 47.5%,#000 45%,transparent 100%);",
-"  mask-image:radial-gradient(ellipse 13% 6% at 65% 47.5%,#000 45%,transparent 100%)}",
-".jf__pjaw>i{transform-origin:65% 41%}",
+".jf__pjaw{-webkit-mask-image:radial-gradient(ellipse var(--jf-jw,13%) var(--jf-jh,6%) at var(--jf-jx,65%) var(--jf-jy,47.5%),#000 45%,transparent 100%);",
+"  mask-image:radial-gradient(ellipse var(--jf-jw,13%) var(--jf-jh,6%) at var(--jf-jx,65%) var(--jf-jy,47.5%),#000 45%,transparent 100%)}",
+".jf__pjaw>i{transform-origin:var(--jf-jx,65%) var(--jf-jo,41%)}",
 '.jf--photo[data-state="speaking"] .jf__pjaw>i{animation:jf-jaw .22s ease-in-out infinite alternate}',
 "@keyframes jf-jaw{from{transform:scaleY(1)}to{transform:scaleY(1.05)}}",
 
@@ -276,6 +287,17 @@ var CSS = [
   "  .jf--photo .jf__plid{opacity:0!important}",
 "}"
 ].join("");
+
+/* המשתנים של הכיול, כמחרוזת שנכנסת ל-`style`. ריק כשאין כיול,
+   ואז ברירות המחדל שב-CSS תקפות. */
+function markVars() {
+  if (!photoMarks) return "";
+  var s = "", k;
+  for (k in photoMarks)
+    if (Object.prototype.hasOwnProperty.call(photoMarks, k))
+      s += ";--jf-" + k + ":" + photoMarks[k];
+  return s;
+}
 
 function injectCSS() {
   if (document.getElementById("jf-css")) return;
@@ -628,7 +650,7 @@ var JOSHFACE = {
          הציור הראשון של האפליקציה. `alt=""` כי זה קישוט — מה שיש
          לג׳וש לומר יושב בטקסט שלידו. */
       return '<span class="jf jf--photo" data-state="' + cur + '" style="width:' + px +
-               "px;--jf-ph:url('" + photoURL + "')\">" +
+               "px;--jf-ph:url('" + photoURL + "')" + markVars() + "\">" +
                '<span class="jf__fx">' +
                  '<img class="jf__ph" src="' + photoURL + '" alt="" decoding="async" loading="lazy">' +
                  /* שלוש שכבות התנועה. `aria-hidden` מיותר — `<i>` ריק
@@ -645,6 +667,27 @@ var JOSHFACE = {
       return '<span class="jf jf--bot" data-state="' + cur + '" style="width:' + px +
              'px">' + robotSVG(px) + '</span>';
     return '<span class="jf" data-state="' + cur + '" style="width:' + px + 'px">' + faceSVG(px) + '</span>';
+  },
+
+  /* **הכיול של `img/josh-bot.jpg`, נמדד ולא נוחש.**
+
+     שיטת המדידה, 14.9.2026: החתך צויר ל-canvas בגודל 200×300,
+     ונסרקו בו הפיקסלים הכחולים־רוויים בפס הגובה של העיניים
+     (`b>140`, `b-r>50`, `g>90`). שני האשכולות שיצאו הם האישונים:
+
+         עין ימין   38.7, 126.1  →  19.4% , 42.0%
+         עין שמאל  102.1, 125.2  →  51.1% , 41.7%
+
+     **וזה נבדק בעין ולא רק במספרים** — הצלבות צוירו על החתך
+     והתמונה נצפתה. הניסיון הראשון תפס את פסי הציאן שבכתר
+     והשני את פוד האוזן; רק התיחום הצר נחת על העיניים.
+
+     הפה נקרא מרשת אחוזים שהונחה על אותו חתך: מרכז ב-39%, 64%,
+     ורוחב שנמתח מ-25% ל-53%. בסיס האף ב-58%, והוא ציר הלסת. */
+  MARKS_BOT: {
+    ax: "19.4%", ay: "42%",   ew: "6.5%", eh: "2.8%",
+    bx: "51.1%", by: "41.7%", ew2: "6.5%", eh2: "2.8%",
+    jx: "39%",   jy: "64%",   jw: "14%",  jh: "5.5%", jo: "58%"
   },
 
   /**
@@ -677,13 +720,27 @@ var JOSHFACE = {
    *
    * קריאה בלי ארגומנט מחזירה לפנים המצוירות.
    */
-  photo: function (url) {
-    if (url === undefined || url === null || url === "") { photoURL = ""; return true }
+  photo: function (url, marks) {
+    if (url === undefined || url === null || url === "") { photoURL = ""; photoMarks = null; return true }
     if (/^[a-z]+:/i.test(String(url)) || String(url).indexOf("//") === 0) return false;
     /* הנתיב נכנס גם ל-`url('…')` שבתוך style, ולכן גרש, מירכאות,
        סוגר או רווח פוסלים אותו. נתיב אמיתי אינו מכיל אותם. */
     if (/['"()\s\\]/.test(String(url))) return false;
     photoURL = String(url);
+    /* כיול אופציונלי. ערך שאינו אחוז/פיקסל נזרק — הוא נכנס
+       לתוך `style`, ולכן זו בדיקת קלט ולא נוי. */
+    photoMarks = null;
+    if (marks && typeof marks === "object") {
+      var out = {}, k, v, any = false;
+      for (k in marks) {
+        if (!Object.prototype.hasOwnProperty.call(marks, k)) continue;
+        if (!/^[a-z0-9]{2,4}$/.test(k)) continue;
+        v = String(marks[k]);
+        if (!/^-?\d+(\.\d+)?(%|px)$/.test(v)) continue;
+        out[k] = v; any = true;
+      }
+      if (any) photoMarks = out;
+    }
     return true;
   },
 

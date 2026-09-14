@@ -14,6 +14,7 @@ const CACHE = "reader-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
              "/img/josh.jpg",
+             "/img/josh-bot.jpg",
              "/tutor/josh-face.js",
              "/tutor/josh-local.js","/tutor/tutor.js",
              "/legal/terms.js","/legal/protect.js"];

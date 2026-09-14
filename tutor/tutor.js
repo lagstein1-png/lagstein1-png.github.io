@@ -587,7 +587,7 @@ function build(){
   if(typeof JOSHFACE !== "undefined"){
     /* הרובוט, 14.9.2026. חזרה לדיוקן: `JOSHFACE.photo("/img/josh.jpg")`
        במקום השורה הזאת — שורה אחת, לשני הכיוונים. */
-    JOSHFACE.look("robot");
+    JOSHFACE.photo("/img/josh-bot.jpg", JOSHFACE.MARKS_BOT);
     var fw = ov.querySelector("#tu-face");
     if(fw){ fw.innerHTML = JOSHFACE.markup(68); JOSHFACE.attach() }
   }
