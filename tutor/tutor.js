@@ -649,14 +649,15 @@ function build(){
      `index.html`. זה בדיוק ההיגיון שבגללו הבוט עצמו יושב בקובץ
      אחד ולא בשנים־עשר עותקים.
 
-     הדיוקן מגיע מ-`/img/josh.jpg` — נתיב מוחלט, קובץ אחד לכל
+     הדיוקן מגיע מ-`/img/paula.jpg` — נתיב מוחלט, קובץ אחד לכל
      האתר. `photo()` דוחה כתובת עם סכימה, ונתיב שמתחיל בלוכסן
      יחיד עובר.
      --------------------------------------------------------------- */
   if(typeof JOSHFACE !== "undefined"){
-    /* הרובוט, 14.9.2026. חזרה לדיוקן: `JOSHFACE.photo("/img/josh.jpg")`
-       במקום השורה הזאת — שורה אחת, לשני הכיוונים. */
-    JOSHFACE.photo("/img/josh-bot.jpg", JOSHFACE.MARKS_BOT);
+    /* פאולה, 14.9.2026 — מהתמונה שהבעלים יצר. שני הקודמים נשארו
+       בעץ ומחווטים לשורה אחת: `photo("/img/josh-bot.jpg",
+       JOSHFACE.MARKS_BOT)` או `photo("/img/josh.jpg")`. */
+    JOSHFACE.photo("/img/paula.jpg", JOSHFACE.MARKS_PAULA);
     var fw = ov.querySelector("#tu-face");
     if(fw){ fw.innerHTML = JOSHFACE.markup(68); JOSHFACE.attach() }
   }
