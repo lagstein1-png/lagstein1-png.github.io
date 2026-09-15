@@ -353,12 +353,46 @@ import(WORKER).then(async W => {
     }
   });
   console.log('✓ הגוף תקין בכל שלושת המודלים');
-  /* והמודל שנבחר בפועל חייב להיות ברשימה — אחרת הוא מקבל
-     גוף מינימלי בשקט, וזה עלול להיות תקין אבל לא מכוון. */
-  t('המודל שנבחר מוכר לטבלת היכולות',
+  /* **15.9.2026: המנוע הוא Gemini, ו-Claude דרך חזרה.** `MODEL` הוא
+     מודל Gemini, ומודל Claude של דרך החזרה חייב להיות בטבלת
+     היכולות — אחרת הוא מקבל גוף מינימלי בשקט, וזה עלול להיות
+     תקין אבל לא מכוון. */
+  t('המודל שנבחר הוא Gemini', /^gemini-/.test(W.MODEL), true);
+  t('מודל דרך החזרה מוכר לטבלת היכולות',
     Object.prototype.hasOwnProperty.call(
       { 'claude-opus-5':1, 'claude-opus-4-8':1, 'claude-sonnet-5':1, 'claude-haiku-4-5':1 },
-      W.MODEL), true);
+      W.CLAUDE_MODEL), true);
+
+  /* ---------- 5b·1. הגוף של Gemini, והמתג ----------
+     שלוש נקודות ההמרה: אין `system` — יש `systemInstruction`;
+     `assistant` הופך ל-`model`; והכותרת היא `x-goog-api-key` בלבד.
+     והמתג: ריק = Gemini, `anthropic` = Claude, וכל מנוע נבדק על
+     המפתח שלו בלבד. */
+  const gmsgs = [{ role: 'user', content: 'היי' }, { role: 'assistant', content: 'שלום' },
+                 { role: 'user', content: 'שאלה' }];
+  const gb = W.buildBody(W.MODEL, 'ctx', gmsgs, 'extra');
+  t('gemini — אין system ואין messages', [gb.system, gb.messages], [undefined, undefined]);
+  t('gemini — systemInstruction פותח בגוף המשותף',
+    gb.systemInstruction.parts[0].text.indexOf(W.CORE) === 0, true);
+  t('gemini — ההקשר וה-nudge אחרי הגוף המשותף',
+    gb.systemInstruction.parts[0].text.endsWith('\nctx\nextra'), true);
+  t('gemini — assistant הופך ל-model', gb.contents.map(c => c.role), ['user', 'model', 'user']);
+  t('gemini — maxOutputTokens ו-thinkingBudget 0',
+    gb.generationConfig, { maxOutputTokens: W.MAX_TOKENS, thinkingConfig: { thinkingBudget: 0 } });
+  t('gemini — כותרות: x-goog-api-key בלבד',
+    Object.keys(W.buildHeaders(W.MODEL, 'k')).sort(), ['Content-Type', 'x-goog-api-key']);
+  t('המתג — ריק הוא Gemini', W.engineOf({}).key, 'GEMINI_API_KEY');
+  t('המתג — anthropic הוא Claude', W.engineOf({ PROVIDER: 'anthropic' }).key, 'ANTHROPIC_API_KEY');
+  t('המתג — מודל Claude נשאר ' + W.CLAUDE_MODEL, W.engineOf({ PROVIDER: 'anthropic' }).model, W.CLAUDE_MODEL);
+  t('gemini — blockReason הוא סירוב',
+    W.parseReply(W.MODEL, { promptFeedback: { blockReason: 'SAFETY' }, candidates: [] }).err, 'refusal');
+  t('gemini — אין מועמדים הוא סירוב', W.parseReply(W.MODEL, { candidates: [] }).err, 'refusal');
+  t('gemini — finishReason SAFETY הוא סירוב',
+    W.parseReply(W.MODEL, { candidates: [{ finishReason: 'SAFETY', content: { parts: [] } }] }).err, 'refusal');
+  t('gemini — הטקסט נקרא מ-candidates[0].content.parts',
+    W.parseReply(W.MODEL, { candidates: [{ finishReason: 'STOP', content: { parts: [{ text: ' רמז ' }] } }] }).text, 'רמז');
+  t('claude — stop_reason refusal הוא סירוב',
+    W.parseReply(W.CLAUDE_MODEL, { stop_reason: 'refusal', content: [] }).err, 'refusal');
 
   /* ---------- 5b·2. מגדר הקול ----------
      **ג׳וש מדבר בקול נשי (הוראת הבעלים, 13.9.2026), אבל לא על

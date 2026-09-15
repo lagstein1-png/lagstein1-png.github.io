@@ -122,18 +122,46 @@ const ROLE = {
 const LANGNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנגלית" };
 const TARGETNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנגלית" };
 
-/* המודל. השורה הזאת היא רוב העלות.
+/* ---------- המנוע: Gemini, ו-Claude כדרך חזרה ----------
 
-   נבחר `claude-haiku-4-5` להשקה, בבקשת הבעלים: התפקיד כאן הוא
-   רמז קצר ושאלה אחת, לא ניתוח. אם התשובות יימצאו רדודות מדי —
-   `claude-sonnet-5` ואז `claude-opus-5`, ואז כבר יהיו מספרי
-   שימוש אמיתיים מדף ה-Cost שבקונסולה במקום ניחוש.
+   **15.9.2026 הבעלים הכריע: ג׳מיני.** זו ההוראה המפורשת שביטלה
+   את `O-33` (״ויתור על ג׳מיני״, 14.9) ופתחה את הנעילה על `MODEL`,
+   `buildBody` ו-`buildHeaders`. הנימוק: עלות — Claude API בתשלום,
+   Gemini בשכבה חינמית. המעבר הוא **בשרת בלבד**: `tutor/tutor.js`
+   נשאר עם `var API = ""`, והלומד עדיין מקבל את המוח המקומי.
 
-   **מחליפים כאן — CAP למטה כבר מטפל בהפרשים בין המודלים.**
-   בלי זה `effort` היה נשלח ל-haiku ומחזיר 400. */
-const MODEL = "claude-haiku-4-5";
+   המתג הוא משתנה הסביבה `PROVIDER`: ריק או `gemini` — Gemini;
+   `anthropic` — Claude כמו קודם. מסלול Claude נשאר שלם בקוד
+   כדרך חזרה, ו-`CAP` למטה עדיין מטפל בהפרשים בין מודלי Claude.
+
+   **`env.PROVIDER` אינו `PROVIDER` שלמטה.** הקבוע `PROVIDER` הוא
+   ספק *החיפוש* (חוזה שלב 5, `SEARCH.md`), והוא `null`; משתנה
+   הסביבה הוא *מנוע השפה*. שם המשתנה נקבע בהוראת הבעלים, והקבוע
+   נבדק ב-`search.js` בשמו — ולכן אף אחד מהם לא שונה.
+
+   המפתח של כל מנוע נקרא מהסוד ששמו ב-`key`, ורק הוא נבדק:
+   חסר המפתח של המנוע הפעיל — 500. הסוד של המנוע השני אינו
+   נדרש ואינו נמחק. */
+const MODEL = "gemini-2.5-flash";
+const CLAUDE_MODEL = "claude-haiku-4-5";   /* דרך החזרה: PROVIDER=anthropic */
 const MAX_TOKENS = 700;          /* תשובה קצרה. גבוה מספיק כדי לא להיחתך באמצע משפט */
-const API = "https://api.anthropic.com/v1/messages";
+const ENGINES = {
+  gemini: {
+    model: MODEL,
+    url: "https://generativelanguage.googleapis.com/v1beta/models/" + MODEL + ":generateContent",
+    key: "GEMINI_API_KEY"
+  },
+  anthropic: {
+    model: CLAUDE_MODEL,
+    url: "https://api.anthropic.com/v1/messages",
+    key: "ANTHROPIC_API_KEY"
+  }
+};
+function engineOf(env) {
+  return String((env && env.PROVIDER) || "gemini").trim().toLowerCase() === "anthropic"
+    ? ENGINES.anthropic : ENGINES.gemini;
+}
+function isGemini(model) { return /^gemini/.test(String(model)) }
 
 /* ---------- חיפוש: אין ספק, ויש חוזה — שלב 5 ----------
 
@@ -513,7 +541,32 @@ const CAP = {
 };
 function capOf(model) { return CAP[model] || { effort: false, fallbacks: false } }
 
+/* ---------- הגוף של Gemini ----------
+   שלושה הבדלים מ-Claude, ושלושתם כאן ולא במקום אחר:
+   1. אין `system` — הוראות המערכת עוברות ל-`systemInstruction`,
+      הגוף המשותף ראשון ואחריו ההקשר, בדיוק כפי שנבנה ל-Claude.
+   2. תפקיד העוזר נקרא `model` ולא `assistant`, בכל ההיסטוריה.
+   3. `thinkingBudget: 0` — רמז קצר ושאלה אחת, בלי חשיבה.
+      אם ה-API ידחה את השדה — להסיר אותו בלבד.
+   אין `temperature`: לא היה כזה במסלול Claude, ואין להמציא מספר. */
+function geminiBody(ctx, msgs, extra) {
+  return {
+    systemInstruction: {
+      parts: [ { text: CORE + "\n" + ctx + (extra ? "\n" + extra : "") } ]
+    },
+    contents: msgs.map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [ { text: m.content } ]
+    })),
+    generationConfig: {
+      maxOutputTokens: MAX_TOKENS,
+      thinkingConfig: { thinkingBudget: 0 }
+    }
+  };
+}
+
 function buildBody(model, ctx, msgs, extra) {
+  if (isGemini(model)) return geminiBody(ctx, msgs, extra);
   const cap = capOf(model);
   const body = {
     model: model,
@@ -536,6 +589,7 @@ function buildBody(model, ctx, msgs, extra) {
 }
 
 function buildHeaders(model, key) {
+  if (isGemini(model)) return { "Content-Type": "application/json", "x-goog-api-key": key };
   const h = {
     "Content-Type": "application/json",
     "x-api-key": key,
@@ -547,16 +601,17 @@ function buildHeaders(model, key) {
 }
 
 async function ask(env, ctx, msgs, extra) {
-  const body = buildBody(MODEL, ctx, msgs, extra);
-  const r = await fetch(API, {
+  const eng = engineOf(env);
+  const body = buildBody(eng.model, ctx, msgs, extra);
+  const r = await fetch(eng.url, {
     method: "POST",
-    headers: buildHeaders(MODEL, env.ANTHROPIC_API_KEY),
+    headers: buildHeaders(eng.model, env[eng.key]),
     body: JSON.stringify(body)
   });
   if (!r.ok) {
     /* **הצד השני של O-42.** הסטטוס נתפס כאן ונזרק, ולכן 502 היה
        חסר פשר: מפתח שגוי, אין יתרה ועומס חולף נראים זהים. גוף
-       השגיאה של Anthropic נושא את `type` ואת `message` ו**אינו
+       השגיאה של הספק נושא את סוג השגיאה ואת ההודעה ו**אינו
        נושא את המפתח**, ולכן אפשר לכתוב אותו ללוג כמות שהוא.
        נראה ב-`npx wrangler tail tutor`. */
     let why = "";
@@ -564,7 +619,22 @@ async function ask(env, ctx, msgs, extra) {
     console.error("[tutor] upstream " + r.status + " " + why);
     return { err: r.status };
   }
-  const d = await r.json();
+  return parseReply(eng.model, await r.json());
+}
+
+/* התשובה, לפי המנוע. חסימה נחשבת סירוב בשני המנועים ומחזירה 502:
+   ב-Gemini — אין מועמדים, `promptFeedback.blockReason`, או
+   `finishReason` שהוא SAFETY; ב-Claude — `stop_reason` של refusal. */
+function parseReply(model, d) {
+  if (isGemini(model)) {
+    if (d.promptFeedback && d.promptFeedback.blockReason) return { err: "refusal" };
+    const c = Array.isArray(d.candidates) ? d.candidates[0] : null;
+    if (!c || c.finishReason === "SAFETY") return { err: "refusal" };
+    const text = ((c.content && c.content.parts) || [])
+      .filter(p => p && typeof p.text === "string" && !p.thought)
+      .map(p => p.text).join("").trim();
+    return { text };
+  }
   /* stop_reason נבדק לפני content — בסירוב content יכול לחזור ריק */
   if (d.stop_reason === "refusal") return { err: "refusal" };
   const text = (d.content || [])
@@ -577,7 +647,7 @@ export default {
     const org = pickOrigin(env, request.headers.get("Origin"));
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env, org) });
     if (request.method !== "POST") return json({ error: "method" }, 405, env, org);
-    if (!env.ANTHROPIC_API_KEY) return json({ error: "server" }, 500, env, org);
+    if (!env[engineOf(env).key]) return json({ error: "server" }, 500, env, org);
     /* אין מונה יומי ואין הצהרה — לא מתחילים. עדיף בוט שאינו עונה
        על חשבון שאינו חסום. */
     if (noCounter(env))
@@ -626,4 +696,5 @@ export default {
 export { revealsAnswer, badEquation, readBody, contextBlock, LIM, CORE, ROLE, LANGS,
          overLimit,
          SIGNS, ADAPT, PROVIDER,
-         buildBody, buildHeaders, capOf, noCounter, MODEL, MAX_TOKENS };
+         buildBody, buildHeaders, capOf, noCounter, MODEL, MAX_TOKENS,
+         CLAUDE_MODEL, ENGINES, engineOf, geminiBody, parseReply };
