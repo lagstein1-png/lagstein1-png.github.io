@@ -249,19 +249,19 @@
 
 **עברית — עליי:** אני יהושע לגשטיין. בניתי את הכלים האלה מתוך עבודה עם לומדים שהחומר הקיים לא מדבר אליהם — מי שקורא לאט, מי שלומד בשפה שאינה שפת אמו, ומי שצריך לשמוע כדי להבין. כל אפליקציה כאן נבנתה סביב שאלה אחת: מה מוריד עומס מהלומד.
 
-**צרו קשר:** לשאלות, הצעות ותקלות: lagstein1@gmail.com
+**צרו קשר:** לשאלות, הצעות ותקלות: lemida.bekol@gmail.com
 
 **ערבית — عنّي:** أنا يهوشع لچشطاين. بنيت هذه الأدوات من عمل مع متعلّمين لا تخاطبهم المواد القائمة — من يقرأ ببطء، ومن يتعلّم بلغة ليست لغته الأمّ، ومن يحتاج أن يسمع كي يفهم. كلّ تطبيق هنا بُني حول سؤال واحد: ما الذي يخفّف العبء عن المتعلّم.
 
-**اتّصلوا بنا:** للأسئلة والاقتراحات والأعطال: lagstein1@gmail.com
+**اتّصلوا بنا:** للأسئلة والاقتراحات والأعطال: lemida.bekol@gmail.com
 
 **רוסית — Обо мне:** Я Иехошуа Лагштейн. Эти инструменты выросли из работы с учениками, к которым существующие материалы не обращаются: с теми, кто читает медленно, кто учится не на родном языке, кому нужно услышать, чтобы понять. Каждое приложение здесь построено вокруг одного вопроса: что снимает нагрузку с учащегося.
 
-**Связаться:** Вопросы, предложения и неполадки: lagstein1@gmail.com
+**Связаться:** Вопросы, предложения и неполадки: lemida.bekol@gmail.com
 
 **אנגלית — About:** I am Joshua Lagstein. These tools came out of working with learners the existing material does not speak to — people who read slowly, people studying in a language that is not their first, and people who need to hear something to understand it. Every app here was built around one question: what takes load off the learner.
 
-**Contact:** Questions, suggestions and faults: lagstein1@gmail.com
+**Contact:** Questions, suggestions and faults: lemida.bekol@gmail.com
 
 ## הוספה למסך הבית
 
@@ -327,7 +327,7 @@
 
 **דין ושיפוט.** על תנאים אלה יחולו דיני מדינת ישראל. סמכות השיפוט הבלעדית נתונה לבתי המשפט המוסמכים בתל אביב–יפו.
 
-**רישיון ויצירת קשר.** רוצים להשתמש בתוכן מעבר למה שמותר כאן — בבית ספר, בחוברת, במערכת אחרת? אפשר וכדאי לבקש רשות. כותבים ל-lagstein1@gmail.com ונדבר.
+**רישיון ויצירת קשר.** רוצים להשתמש בתוכן מעבר למה שמותר כאן — בבית ספר, בחוברת, במערכת אחרת? אפשר וכדאי לבקש רשות. כותבים ל-lemida.bekol@gmail.com ונדבר.
 
 ### ערבית — شروط الاستخدام وحقوق النشر
 
@@ -357,7 +357,7 @@
 
 **القانون والاختصاص.** تخضع هذه الشروط لقوانين دولة إسرائيل. والاختصاص القضائي الحصري لمحاكم تل أبيب–يافا المختصّة.
 
-**الترخيص والتواصل.** هل تريد استخدام المحتوى خارج ما هو مسموح هنا — في مدرسة أو كرّاسة أو منظومة أخرى؟ يمكنك بل يُستحسن طلب الإذن. اكتب إلى lagstein1@gmail.com ولنتحدّث.
+**الترخيص والتواصل.** هل تريد استخدام المحتوى خارج ما هو مسموح هنا — في مدرسة أو كرّاسة أو منظومة أخرى؟ يمكنك بل يُستحسن طلب الإذن. اكتب إلى lemida.bekol@gmail.com ولنتحدّث.
 
 ### רוסית — Условия использования и авторские права
 
@@ -387,7 +387,7 @@
 
 **Право и подсудность.** К настоящим условиям применяется право Государства Израиль. Исключительная подсудность — компетентным судам Тель-Авива–Яффо.
 
-**Лицензия и связь.** Хотите использовать содержимое сверх разрешённого здесь — в школе, в пособии, в другой системе? Можно и нужно попросить разрешение. Напишите на lagstein1@gmail.com, и мы обсудим.
+**Лицензия и связь.** Хотите использовать содержимое сверх разрешённого здесь — в школе, в пособии, в другой системе? Можно и нужно попросить разрешение. Напишите на lemida.bekol@gmail.com, и мы обсудим.
 
 ### אנגלית — Terms of Use and Copyright
 
@@ -417,5 +417,5 @@ Before you start — briefly, and in plain language. Using this app depends on y
 
 **Law and jurisdiction.** These terms are governed by the laws of the State of Israel. Exclusive jurisdiction lies with the competent courts of Tel Aviv–Yafo.
 
-**Licensing and contact.** Want to use the content beyond what is permitted here — in a school, a workbook, another system? You can and should ask. Write to lagstein1@gmail.com and let us talk.
+**Licensing and contact.** Want to use the content beyond what is permitted here — in a school, a workbook, another system? You can and should ask. Write to lemida.bekol@gmail.com and let us talk.
 
