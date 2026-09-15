@@ -96,5 +96,44 @@ if (ran !== null) {
   if (!bad) console.log(`✓ test.js מחזיר ${ran} בדיקות, והתיעוד תואם`);
 }
 
+/* --- 4. התבנית: מניפסט שאפליקציה אמיתית יכולה לצאת ממנו ------
+   **נמדד 16.9.2026, ואיש לא הסתכל על התיקייה הזאת מעולם.**
+   `learning-core/template/manifest.json` הפנה אל
+   `./img/icon-512-maskable.png` — שם שאינו קיים באף אפליקציה
+   במאגר. השם האמיתי הוא `icon-maskable-512.png`, בכל שתים־עשרה.
+   אפליקציה שהייתה נולדת מהתבנית הייתה מקבלת אייקון maskable
+   שבור, ו-`manifest.json` שאין בו `id`, `description`,
+   `orientation`, `categories` ולא `screenshots` — כלומר גם
+   הזהות של ה-PWA וגם חלון ההתקנה העשיר באנדרואיד.
+
+   **וזו בדיוק המלכודת שהקובץ הזה נבנה בשבילה, בכיוון ההפוך.**
+   שלוש הבדיקות למעלה חוסמות אימוץ של `learning-core` כל עוד
+   היא נסחפת מהמנוע החי; הבדיקה הזאת שומרת שהתבנית עצמה לא
+   תהיה שבורה כשמישהו כן יאמץ אותה.
+
+   ההשוואה היא מול מניפסט **אמיתי** ולא מול רשימה שכתובה כאן,
+   ולכן שדה שייכנס לאפליקציות יידרש מהתבנית מאליו. */
+const TPL = path.join(LIB, 'template', 'manifest.json');
+const REF = path.join(ROOT, 'ulpan', 'manifest.json');
+if (fs.existsSync(TPL) && fs.existsSync(REF)) {
+  let t = null, r = null;
+  try { t = JSON.parse(fs.readFileSync(TPL, 'utf8')) } catch (e) { fail('התבנית אינה JSON תקין: ' + e.message) }
+  try { r = JSON.parse(fs.readFileSync(REF, 'utf8')) } catch (e) {}
+  if (t && r) {
+    const miss = Object.keys(r).filter(k => !(k in t));
+    if (miss.length) fail('התבנית חסרה שדות שיש במניפסט אמיתי: ' + miss.join(', '));
+
+    /* כל src בתבנית חייב להיות שם קובץ שקיים באפליקציה אמיתית */
+    const real = new Set(fs.readdirSync(path.join(ROOT, 'ulpan', 'img')));
+    const srcs = [].concat(t.icons || [], t.screenshots || []).map(x => x && x.src).filter(Boolean);
+    for (const src of srcs) {
+      const base = src.split('/').pop();
+      if (!real.has(base))
+        fail(`התבנית מפנה ל-${src}, ואין קובץ בשם ${base} באף אפליקציה`);
+    }
+    if (!bad) console.log(`✓ התבנית: ${Object.keys(t).length} שדות ו-${srcs.length} נכסים, כולם כשל מניפסט אמיתי`);
+  }
+}
+
 console.log(`\n${bad} ממצאים ב-learning-core/`);
 process.exit(bad ? 1 : 0);

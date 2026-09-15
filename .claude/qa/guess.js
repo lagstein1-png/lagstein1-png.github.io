@@ -33,7 +33,15 @@
 const { chromium } = require('./pw.js');
 
 const BASE = process.env.QA_BASE || 'http://127.0.0.1:8099';
-const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3'];
+/* **חמש מתוך תשע — הורחב 16.9.2026.** הרשימה נולדה עם משפחת
+   המתמטיקה בלבד, ומשפחת החידון (ניב, מפנה, אולפן, לומדה) לא
+   נמדדה מעולם — בדיוק המשפחה שבה התוכן **כתוב ביד** ולכן חשופה
+   יותר ל״התשובה הנכונה היא הארוכה״: מסיח שנכתב בחיפזון קצר,
+   והתשובה נושאת את ההסבר. `measure` גנרית מלכתחילה (buildQ +
+   q.options), ויש בה מסלול `skip` לאפליקציה שאין בה את השניים —
+   ולכן ההרחבה אינה קוד חדש אלא רשימה שלא עודכנה. */
+const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
+              'english', 'history', 'ulpan', 'lomda'];
 const PER_CELL = Number(process.env.QA_N || 40);
 const CONFIRM_N = Number(process.env.QA_CONFIRM || PER_CELL * 10);
 

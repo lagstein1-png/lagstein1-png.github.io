@@ -12,7 +12,7 @@ let failed=0;   /* בלי זה הכלי מדפיס JS ERRORS ויוצא 0 */
     /* כמו ב-entropy.js: בלי המשמר הזה אפליקציה בלי מחולל זורקת
        ReferenceError שמפיל את הריצה, וכל מה שאחריה לא נבדק. */
     if(typeof TOPICS==='undefined'||typeof buildQ!=='function') return {na:true};
-    const rows=[];let tot=0,under=0,multi=0,none=0;
+    const rows=[];let tot=0,under=0,over=0,multi=0,none=0;const overEx=[];
     for(const t of TOPICS) for(const lv of LV){
       let n=0,u=0;
       for(let k=0;k<600;k++){
@@ -20,20 +20,32 @@ let failed=0;   /* בלי זה הכלי מדפיס JS ERRORS ויוצא 0 */
         if(!q||!q.options)continue;
         n++;tot++;
         if(q.options.length<4){u++;under++}
+        /* **אפשרות חמישית אינה ״עוד אפשרות״ — היא אפשרות שאי אפשר
+           לבחור במקלדת.** התווית מוקצית 1–4, והחמישית קיבלה
+           undefined. זה קרה בפועל, וההערה ב-buildQ שב-math-teen
+           מתעדת את התיקון — ואיש לא מדד שהוא מחזיק. קו הבסיס
+           כאן הוא אפס, ולכן זה מפיל. */
+        if(q.options.length>4){over++;
+          if(overEx.length<3)overEx.push(t.id+' L'+lv+' → '+q.options.length)}
         const ok=q.options.filter(o=>o.ok).length;
         if(ok>1)multi++; if(ok===0)none++;
       }
       if(u)rows.push({row:t.id+' L'+lv,pct:+(u/n*100).toFixed(1)});
     }
-    return {rows:rows.sort((a,b)=>b.pct-a.pct),tot,under,multi,none,levels:LV.length};
+    return {rows:rows.sort((a,b)=>b.pct-a.pct),tot,under,over,overEx,multi,none,levels:LV.length};
   })}catch(e){failed++;console.log('✗ '+app+': '+String(e.message).split('\n')[0]);await ctx.close();continue}
   if(r.na){console.log('· '+app+': אין TOPICS/buildQ — סכימה אחרת, לא נבדק כאן');await ctx.close();continue}
   /* under4 אינו מפיל: יש לו קו בסיס מתועד שאינו אפס (math-uni 2.2%,
      שתי שורות שנבדקו ונמצאו תקינות — ראו README). multiCorrect,
      noCorrect ושגיאת JS כן: לאלה קו הבסיס הוא אפס. */
-  if(r.multi||r.none||errs.length)failed++;
+  if(r.multi||r.none||r.over||errs.length)failed++;
   console.log('== '+app+'  levels='+r.levels+'  total='+r.tot+
-    '  under4='+r.under+' ('+(r.under/r.tot*100).toFixed(1)+'%)  multiCorrect='+r.multi+'  noCorrect='+r.none);
+    '  under4='+r.under+' ('+(r.under/r.tot*100).toFixed(1)+'%)  over4='+r.over+
+    '  multiCorrect='+r.multi+'  noCorrect='+r.none);
+  if(r.over){
+    console.log('     ✗ over4 — אפשרות חמישית אינה נגישה מהמקלדת (התווית מוקצית 1–4)');
+    (r.overEx||[]).forEach(x=>console.log('       '+x));
+  }
   r.rows.slice(0,8).forEach(x=>console.log('     '+x.row.padEnd(16)+x.pct+'%'));
   if(errs.length)console.log('     JS ERRORS: '+errs[0]);
   await ctx.close();
