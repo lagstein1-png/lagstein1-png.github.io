@@ -125,7 +125,10 @@ import(WORKER).then(async W => {
      `brain.js` שואל מה הדפדפן טוען; כאן נשאל על השרת. */
   const SRV = [['wikipedia.org', /wikipedia\.org/],
                ['_searchProvider', /_searchProvider/],
-               ['googleapis', /googleapis\.com/],
+               /* `generativelanguage.googleapis.com` הוא מנוע השפה (Gemini,
+                  הכרעת הבעלים 15.9.2026) ולא ספק חיפוש; כל googleapis אחר —
+                  customsearch למשל — עדיין נתפס. */
+               ['googleapis', /(?<!generativelanguage\.)googleapis\.com/],
                ['bing', /api\.bing\./]];
   const srvHit = SRV.filter(([, re]) => re.test(wsrc)).map(([n]) => n);
   if (srvHit.length) fail('ספק חיפוש בקוד השרת: ' + srvHit.join(', '));
