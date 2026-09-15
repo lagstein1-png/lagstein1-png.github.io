@@ -58,7 +58,21 @@ var CSS=''+
 '  border:1px solid #d1d5db;background:#fff;color:#111827;min-height:3rem}'+
 '.lg-btn.pri{background:#111827;color:#fff;border-color:#111827;flex:1 1 15rem}'+
 '.lg-btn.link{border:0;background:none;text-decoration:underline;padding:.6rem .2rem;color:#374151}'+
-'.lg-btn:focus-visible{outline:3px solid #2563eb;outline-offset:2px}'+
+/* **טבעת המיקוד לוקחת את צבע המארח — 15.9.2026.**
+
+   `protect.js` מוזרק לכל שלוש־עשרה האפליקציות, ולכן הוא **אינו
+   יכול לדעת** מה צבע המותג של מי שמריץ אותו. עד כאן הוא קבע
+   `#2563eb` קשיח, וכך אפליקציה חומה, טורקיזית או מג׳נטה קיבלה
+   טבעת מיקוד כחולה — גם במצב כהה וגם בניגודיות גבוהה, שבה כל
+   שאר המסך עובר לפלטה אחרת והטבעת נשארת לבדה.
+
+   **`var(--accent, currentColor)` פותר את שני הצדדים בלי צימוד:**
+   עשר אפליקציות מגדירות `--accent` בארבעת המצבים, והטבעת
+   מקבלת את שלהן מאליה. מי שאין לו — `math-app` שקוראת לצבע
+   `--teal`, ועמוד התנאים עצמו — נופל ל-`currentColor`, כלומר
+   לצבע הטקסט של האלמנט שבמיקוד. **זה לעולם אינו בלתי־נראה
+   בהגדרה:** ניגודיות הטבעת שווה לניגודיות הטקסט שלידה. */
+'.lg-btn:focus-visible{outline:3px solid var(--accent,currentColor);outline-offset:2px}'+
 '.lg-install{position:fixed;z-index:2147482000;inset-inline:auto;'+
 '  inset-block-end:calc(14px + env(safe-area-inset-bottom));'+
 '  inset-inline-end:calc(14px + env(safe-area-inset-right));'+
@@ -71,7 +85,7 @@ var CSS=''+
 '.lg-lgs button{font:inherit;font-weight:700;font-size:.9rem;border:1px solid #d1d5db;'+
 '  background:#fff;color:#374151;border-radius:10px;padding:.55rem .8rem;cursor:pointer;min-height:44px}'+
 '.lg-lgs button[aria-pressed="true"]{background:#111827;color:#fff;border-color:#111827}'+
-'.lg-lgs button:focus-visible{outline:3px solid #2563eb;outline-offset:2px}'+
+'.lg-lgs button:focus-visible{outline:3px solid var(--accent,currentColor);outline-offset:2px}'+
 /* Heebo — הראשון במחרוזת של .lg-wrap — אין בו ערבית ואין בו קירילית,
    ולכן "العربية" ו-"Русский" נפלו לגופן ברירת המחדל של המערכת, שהמידות
    שלו אחרות, ושני הלחצנים נראו בגודל אחר משני האחרים. השער הוא המסך
