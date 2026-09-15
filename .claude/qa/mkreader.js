@@ -20,6 +20,7 @@ const DIR = 'marketing';
 
 /* סדר הקריאה, ולא סדר אלפביתי: מה שקוראים ראשון קודם. */
 const ORDER = ['README.md', 'facts.md', 'copy-posts.md', 'outreach-letters.md',
+               'outreach-letters-ar.md',
                'video-scripts.md', 'plan-weekly.md', 'campaign.md',
                'wix-content.md', 'wix-migration.md'];
 
