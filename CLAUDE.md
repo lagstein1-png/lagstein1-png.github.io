@@ -512,6 +512,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/search.js                # חוזה ספק החיפוש — אין ספק, ואין ניסוח שמתיימר לבדוק
     node .claude/qa/claims.js                # חמש הטענות האסורות בשיווק — שלוש בגרפ, ושתיים שהפקודה מריצה
     node .claude/qa/money.js                 # אין מסחר: לא מחיר, לא דף קנייה, ולא הבטחת תשלום באף דף
+    node .claude/qa/letters.js               # אורך המכתב שהכותרת מבטיחה, מול המכתב עצמו
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/content.js               # תוכן: תשע משפחות, דוח PASS/REVIEW/FAIL
     node .claude/qa/fresh.js                 # דוח תוכן שמתאר עץ שכבר אינו קיים
