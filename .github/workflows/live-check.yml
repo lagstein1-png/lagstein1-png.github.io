@@ -78,26 +78,74 @@ jobs:
           echo "| \`home\` | $CODE | – | $GOT | $WANT | $VER |" >> "$GITHUB_STEP_SUMMARY"
           echo "home  HTTP=$CODE  served=$GOT  main=$WANT"
 
-          # ״ג׳וש״ ב-HTML שמוגש בפועל — דף הבית ו-math-app. גרש עברי U+05F3.
-          # ספירה, לא כן/לא: כמה פעמים המחרוזת מופיעה במה שהשרת החזיר.
+          # שם העוזר ב-HTML שמוגש בפועל — דף הבית ו-math-app.
+          # ספירה, לא כן/לא: כמה פעמים השם מופיע במה שהשרת החזיר.
+          #
+          # **השם נגזר מהעץ, מאותה סיבה כמו התווית למטה.** כאן היה
+          # 'ג׳וש' קשיח, והשורה דיווחה 0 · 0 אחרי שהשם הוחלף —
+          # מספר נכון שאינו אומר כלום, שמדווח שהשם שאיננו מחפשים
+          # איננו. עכשיו נמדד השם שבאמת בשימוש.
           curl -s --max-time 30 -H 'Cache-Control: no-cache' "$BASE/math-app/?cb=$GITHUB_RUN_ID" -o /tmp/ma.html
-          JH=$(grep -o 'ג׳וש' /tmp/home.html | wc -l)
-          JM=$(grep -o 'ג׳וש' /tmp/ma.html | wc -l)
-          echo "josh-in-served-html  home=$JH  math-app=$JM"
+          NAME=$(grep -o 'btn:"[^"]*"' tutor/tutor.js | head -1 | sed 's/^btn:"//;s/ *—.*//')
+          JH=$(grep -oF "$NAME" /tmp/home.html | wc -l)
+          JM=$(grep -oF "$NAME" /tmp/ma.html | wc -l)
+          echo "name-in-served-html  name=$NAME  home=$JH  math-app=$JM"
           {
             echo ""
-            echo "**״ג׳וש״ ב-HTML המוגש:** דף הבית $JH · math-app $JM (מופעים)"
+            echo "**\`$NAME\` ב-HTML המוגש:** דף הבית $JH · math-app $JM (מופעים)"
           } >> "$GITHUB_STEP_SUMMARY"
 
-          # הכפתור של ג׳וש — קובץ אחד, משותף לכולן
+          # תווית העוזר — קובץ אחד, משותף לכולן.
+          #
+          # **המחרוזת נגזרת מהעץ ואינה מקודדת כאן.** היא הייתה
+          # 'ג׳וש — עזרה מהמורה' קשיח, והשם הוחלף פעמיים (פאולה,
+          # ואז ברק) — ומאותו רגע הבדיקה החיה נפלה על מחרוזת שכבר
+          # אינה קיימת באף מקום. כישלון על סיבה שגויה גרוע מאין
+          # בדיקה: הוא מלמד להתעלם מהאדום. עכשיו זו אותה השוואה
+          # של מפתח הקאש — מה שבעץ מול מה שמוגש.
           curl -s --max-time 30 "$BASE/tutor/tutor.js?cb=$GITHUB_RUN_ID" -o /tmp/t.js
-          if grep -q 'ג׳וש — עזרה מהמורה' /tmp/t.js; then JOSH="✓"; else JOSH="✗"; FAIL=1; fi
-          echo "tutor.js  josh-label=$JOSH"
+          WANTB=$(grep -o 'btn:"[^"]*"' tutor/tutor.js | head -1 | sed 's/^btn:"//;s/"$//')
+          if [ -n "$WANTB" ] && grep -qF "$WANTB" /tmp/t.js; then JOSH="✓"; else JOSH="✗"; FAIL=1; fi
+          echo "tutor.js  label=$JOSH  want=$WANTB"
           {
             echo ""
-            echo "**תווית ג׳וש ב-\`tutor/tutor.js\` החי:** $JOSH"
+            echo "**תווית העוזר ב-\`tutor/tutor.js\` החי:** $JOSH — \`$WANTB\`"
             echo ""
             echo "**כתובת השרת שמוגשת:** \`$(grep -o 'var API = "[^"]*"' /tmp/t.js | sed 's/.*= //')\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # ״תאוריה מדברת״ — היא בכרטיס בדף הבית, והיא **לא נבדקה
+          # כאן מעולם**. היא בריפו נפרד, ולכן אין לה מפתח קאש
+          # ב-main להשוות מולו; מה שנבדק הוא בדיוק מה שהכרטיס
+          # מבטיח — שהקישור עונה, ושמה שחוזר הוא הדף ולא שגיאת
+          # 404 של GitHub Pages, שחוזרת עם גוף HTML תקין.
+          #
+          # הכתובת נקראת מ-DATA.APPS ואינה מקודדת כאן: שדה `u`
+          # הוא מקור האמת, ושינוי שם הריפו יילקח מאליו.
+          TURL=$(grep -o '"id":"theory","u":"[^"]*"' index.html | sed 's/.*"u":"//;s/"$//')
+          if [ -z "$TURL" ]; then
+            echo "::error::לא נמצא שדה u לרשומת theory ב-DATA.APPS"
+            FAIL=1
+            TSTAT="— (אין כתובת)"
+          else
+            TCODE=$(curl -s -L -o /tmp/th.html -w '%{http_code}' --max-time 30 \
+                    -H 'Cache-Control: no-cache' "$TURL?cb=$GITHUB_RUN_ID")
+            if grep -qi "isn't a GitHub Pages site\|Site not found\|404: Not Found" /tmp/th.html; then
+              TBODY="✗ 404 של Pages"; FAIL=1
+            elif grep -qi '<title' /tmp/th.html; then
+              TBODY="✓"
+            else
+              TBODY="✗ אין דף"; FAIL=1
+            fi
+            [ "$TCODE" = "200" ] || FAIL=1
+            TSTAT="$TCODE · $TBODY"
+            echo "theory  HTTP=$TCODE  body=$TBODY  url=$TURL"
+          fi
+          {
+            echo ""
+            echo "**״תאוריה מדברת״ (ריפו נפרד, אין מפתח להשוות):** $TSTAT"
+            echo ""
+            echo "כתובת מ-\`DATA.APPS\`: \`$TURL\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
           if [ "$FAIL" != "0" ]; then
