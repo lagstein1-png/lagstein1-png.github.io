@@ -357,20 +357,36 @@ function pickVoice(code){
     var all = voicesFor(code), j;
     for(j=0;j<all.length;j++) if(all[j].voiceURI === want) return all[j];
   }
-  var v = voices(), p = code.slice(0,2), i, exact = [], loose = [], l;
+  var v = voices(), p = code.slice(0,2), i, list = [], l;
   for(i=0;i<v.length;i++){
     l = (v[i].lang||"").replace("_","-").toLowerCase();
-    if(l === code.toLowerCase()) exact.push(v[i]);
-    else if(l.slice(0,2) === p) loose.push(v[i]);
+    if(l.slice(0,2) === p) list.push(v[i]);
   }
-  var list = exact.length ? exact : loose;
   if(!list.length) return null;
-  /* `voiceUsable` נשאר מפתח המיון **הראשון**, וזה לא סגנון: קול
-     נוירלי מת שנבחר לפי מגדר הוא שקט, ושקט גרוע מקול גברי. הכלל
-     הזה כתוב ב-CLAUDE.md, והמגדר נכנס אחריו — בדיוק כמו בשאר
-     האפליקציות. */
+  /* **רשימה אחת, ולא ״מדויק ואם אין אז רופף״ — תוקן 15.9.2026.**
+
+     הקוד הקודם בנה שתי רשימות, `exact` ו-`loose`, ובחר
+     `exact.length ? exact : loose`. כלומר תג השפה הוכרע **לפני**
+     המגדר, וקול גברי שרשום `he` נפל מהמועמדים ברגע שהיה ולו קול
+     אחד ב-`he-IL`. נמדד ב-vm על מנוע ההקראה עצמו:
+
+       Carmit (he-IL) + Microsoft Asaf (he)  →  נבחר Carmit
+       כלומר קול גברי היה במכשיר, ולא נשקל.
+
+     היום כולם מועמדים, והדיוק הוא מפתח מיון שלישי:
+
+       1. voiceUsable  — קול מת הוא שקט, ושקט גרוע מכל קול.
+                         הכלל כתוב ב-CLAUDE.md ואינו משתנה.
+       2. מגדר         — ברק גברי, וזו דרישת הדמות.
+       3. תג מדויק     — he-IL לפני he. מכריע רק בין שווים. */
+  var want = code.toLowerCase();
+  function exactness(x){
+    return ((x.lang||"").replace("_","-").toLowerCase() === want) ? 1 : 0;
+  }
   list.sort(function(a,b){
-    return (voiceUsable(b) - voiceUsable(a)) || (femScore(b) - femScore(a));
+    return (voiceUsable(b) - voiceUsable(a))
+        || (femScore(b)    - femScore(a))
+        || (exactness(b)   - exactness(a));
   });
   return list[0];
 }
