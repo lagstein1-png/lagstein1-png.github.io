@@ -510,6 +510,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/joshface.js              # שכבת הפנים נשארת תצוגה — אין מוח, רשת, הקראה או קול
     node .claude/qa/joshstate.js             # גלאי מצב הלומד — 17 תרחישים ב-vm נפרד, וארבע נגיעות החיווט בתשע אפליקציות
     node .claude/qa/search.js                # חוזה ספק החיפוש — אין ספק, ואין ניסוח שמתיימר לבדוק
+    node .claude/qa/claims.js                # חמש הטענות האסורות בשיווק — שלוש בגרפ, ושתיים שהפקודה מריצה
     node .claude/qa/money.js                 # אין מסחר: לא מחיר, לא דף קנייה, ולא הבטחת תשלום באף דף
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/content.js               # תוכן: תשע משפחות, דוח PASS/REVIEW/FAIL

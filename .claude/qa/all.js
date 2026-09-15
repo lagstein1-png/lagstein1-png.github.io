@@ -101,6 +101,7 @@ const SUITE = [
      בארבע שפות. ההסרה ב-10.9 מחקה את המשפט מהעברית בלבד, וחמישה
      ימים שלוש שפות סיפרו ללומד שהאתר סופר בזמן שלא נשלח דבר. */
   { id: 'analytics', args: [] },
+  { id: 'claims',  args: [] },
   { id: 'smoke',    args: PAGES,  needsServer: true },
   { id: 'say',      args: [],     needsServer: true },
   /* מה שבאמת מגיע למנוע ההקראה. content.js מודד שדה שנדגם; זה מריץ
