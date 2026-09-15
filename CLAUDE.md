@@ -514,6 +514,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/money.js                 # אין מסחר: לא מחיר, לא דף קנייה, ולא הבטחת תשלום באף דף
     node .claude/qa/letters.js               # אורך המכתב שהכותרת מבטיחה, מול המכתב עצמו
     node .claude/qa/skill.js                 # דף בניית האפליקציה — אות BUILD, שער השלבים, וטענת מספר־שורה
+    node .claude/qa/srt.js                   # הכתוביות מול טבלאות התסריטים (המחולל: marketing/make-srt.js)
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/content.js               # תוכן: תשע משפחות, דוח PASS/REVIEW/FAIL
     node .claude/qa/fresh.js                 # דוח תוכן שמתאר עץ שכבר אינו קיים
