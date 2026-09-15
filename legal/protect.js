@@ -97,7 +97,7 @@ var CSS=''+
 '.lg-lgs button[lang="ru"]{font-family:"Noto Sans","Heebo",system-ui,sans-serif}'+
 '@media (prefers-color-scheme:dark){'+
 '  .lg-box{background:#141a24;color:#e8ecf4}'+
-'  .lg-lead,.lg-scroll p,.lg-steps{color:#b9c2d4}'+
+'  .lg-lead,.lg-scroll p,.lg-steps,.lg-meta{color:#b9c2d4}'+
 '  .lg-btn{background:#1d2531;color:#e8ecf4;border-color:#2c3648}'+
 '  .lg-btn.pri{background:#e8ecf4;color:#141a24;border-color:#e8ecf4}'+
 '  .lg-btn.link{color:#b9c2d4}'+
