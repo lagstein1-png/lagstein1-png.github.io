@@ -30,7 +30,7 @@
   --ar:"Noto Sans Arabic",system-ui,"Segoe UI",Arial,sans-serif;
   --ru:"Noto Sans",system-ui,"Segoe UI",Arial,sans-serif;   /* קירילית — Heebo אינו מכיל אותה, נמדד 7.9 */
   --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
-  --bg:#f5f7fb; --surface:#ffffff; --surface2:#eef1f7;
+  --bg:#f5f7fb; --btn-ink:#fff; --surface:#ffffff; --surface2:#eef1f7;
   --ink:#101828; --muted:#5b6478; --faint:#687080; --line:#e0e4ee;
   --accent:#6d28d9; --accent-ink:#ffffff; --accent-soft:#ede4fd;
   /* צהוב ההדגשה — אותו צהוב של מקריא קולי, כדי שמעקב ההקראה
@@ -59,7 +59,7 @@ html[lang="ar"] textarea,html[lang="ar"] select{font-family:var(--ar)}
 html[lang="ru"] body,html[lang="ru"] input,html[lang="ru"] button,
 html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
 :root[data-theme="dark"]{
-  --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
+  --bg:#0e1117; --btn-ink:var(--bg); --surface:#161b26; --surface2:#1e2532;
   --ink:#e8ecf4; --muted:#9aa4ba; --faint:#8f99ae; --line:#28313f;
   --accent:#a78bfa; --accent-ink:#0e1117; --accent-soft:#2a1f45;
   --hit:#ffd24d; --hit-ink:#241a00;
@@ -74,7 +74,7 @@ html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
+    --bg:#0e1117; --btn-ink:var(--bg); --surface:#161b26; --surface2:#1e2532;
     --ink:#e8ecf4; --muted:#9aa4ba; --faint:#8f99ae; --line:#28313f;
     --accent:#a78bfa; --accent-ink:#0e1117; --accent-soft:#2a1f45;
     --hit:#ffd24d; --hit-ink:#241a00;
@@ -90,7 +90,7 @@ html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
 }
 /* ניגודיות גבוהה — שחור על לבן, מסגרות מלאות, בלי גוונים רכים */
 :root.hc{
-  --bg:#ffffff; --surface:#ffffff; --surface2:#ffffff;
+  --bg:#ffffff; --btn-ink:#fff; --surface:#ffffff; --surface2:#ffffff;
   --ink:#000000; --muted:#1a1a1a; --faint:#333333; --line:#000000;
   --accent:#00308f; --accent-ink:#ffffff; --accent-soft:#e8edf8;
   --hit:#ffe600; --hit-ink:#000000;
@@ -160,7 +160,11 @@ nav{display:flex;gap:4px;margin-inline-start:auto;flex-wrap:wrap}
 .pad{padding:clamp(14px,3.4vw,22px)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;
   font-weight:700;padding:12px 18px;transition:.15s;border:1px solid transparent;line-height:1.3}
-.btn-p{background:linear-gradient(135deg,var(--accent),var(--c-data));color:#fff}
+/* **--btn-ink ולא #fff — תוקן 16.9.2026.** `--accent` מתהפך בין
+   המצבים: בבהיר הוא כהה (#c026d3 ב-math-uni3) ולבן עליו 4.71:1,
+   ובכהה הוא פסטל (#f0abfc) ולבן עליו **1.76:1** — טקסט שאינו
+   נקרא על כפתור הפעולה הראשי. נמדד בארבע האפליקציות. */
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--c-data));color:var(--btn-ink)}
 .btn-p:hover{filter:brightness(1.1)}
 :root.hc .btn-p{background:var(--accent)}
 .btn-d{background:var(--ink);color:var(--bg)}
@@ -942,7 +946,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u103 · 2026-09-16";
+var BUILD="u104 · 2026-09-16";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -14255,7 +14259,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u103-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u104-pwa1").catch(function(){});
   });
 }
 </script>
