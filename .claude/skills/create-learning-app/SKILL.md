@@ -97,16 +97,20 @@ git checkout 83ddf43        # נקודת החזרה, על origin/main
 ```
 <app>/index.html      מהמשפחה שבחרת
 <app>/manifest.json   name, short_name, description, id, theme_color
-<app>/sw.js           קופי מדויק, ושורה 13 + שורה 25 בלבד משתנות
+<app>/sw.js           קופי מדויק, ושתי מחרוזות בלבד משתנות
 <app>/img/            icon-192, icon-512, icon-maskable-512, apple-touch-icon
 ```
 
 `sw.js` — **שני הבדלים בלבד**, שניהם אותה מחרוזת:
 
 ```js
-const CACHE = "<app>-" + V;                                    // שורה 13
-keys.filter(k => k.startsWith("<app>-") && k !== CACHE)        // שורה 25
+const CACHE = "<app>-" + V;                              // הגדרת שם המטמון
+keys.filter(k => k.startsWith("<app>-") && k !== CACHE)  // הניקוי ב-activate
 ```
+
+*(מספרי שורה היו כאן ונמחקו: הם אמרו ״13 ו-25״, ובפועל השנייה
+יושבת ב-`math-app/sw.js` בשורה 29. מספר שורה מתיישן בכל הערה
+שמישהו מוסיף. חפשו את המחרוזת, לא את השורה.)*
 
 שם המטמון חייב להיות **ייחודי**. תחילית שחוזרת = ה-`activate` של
 אפליקציה אחת מוחק את המטמון של השנייה.
@@ -130,11 +134,46 @@ var GKEY_STORE="<app>-gkey";
 לאות ה-`BUILD` בחר אות שלא בשימוש. בשימוש כרגע:
 `b` (math-app), `t` (math-teen), `u`/`v`/`g` (math-uni/2/3),
 `n` (english), `m` (history), `a` (ulpan), `x` (bagrut-806),
-`l` (lomda).
+`l` (lomda), `k` (kotvim).
+
+**ואל תסמכו על הרשימה הזאת — ספרו.** `k` חסרה בה מאז ש-״כותבים
+ביחד״ נבנתה, ומי שהיה בוחר `k` היה מקבל שתי אפליקציות עם אותה
+אות. הפקודה שסופרת בפועל:
+
+```
+for d in */; do a=${d%/}; grep -ho 'var BUILD *= *"[a-z]' $a/*.html $a/*.js 2>/dev/null | head -1; done | sort -u
+```
+
+`node .claude/qa/skill.js` אוכף שהרשימה כאן תואמת למה שבעץ.
 
 ### 2.3 עד 2.7 — דף הבית
 
-`index.html` בשורש, וכולם בו:
+## ⚠ השער: חמש הנגיעות האלה **אינן** בשלב `build`
+
+**זה הסעיף שהיה חסר כאן, וזו הייתה סתירה ישירה מול `CLAUDE.md`:**
+
+> ״היא מגיעה ללומד אמיתי רק אחרי `approved`. **עד אז היא אינה
+> ב-`DATA.APPS`** שבדף הבית, והיא נושאת את השער הפנימי.״
+
+הצ׳ק־ליסט כאן אמר להוסיף ל-`DATA.APPS` ולעדכן `badge` מיד, ולא
+הזכיר את `stages.json` באף מקום. מי שבנה אפליקציה לפי הדף הזה
+קיבל אחד משניים: אפליקציה שמופיעה ללומד לפני שנבדקה, או
+`node .claude/qa/stage.js` שנופל עם ״מופיעה ב-`DATA.APPS` ואינה
+ב-`stages.json`״.
+
+**מה עושים בשלב `build`:** תיקייה, `manifest.json`, `sw.js`,
+אייקונים, תוכן, **ורשומה ב-`.claude/qa/stages.json` עם
+`stage: "build"`** — ועוד השער הפנימי מ-`.claude/qa/internal-gate.html`.
+דף הבית לא נגעים בו בכלל.
+
+**חמש הנגיעות שלמטה נעשות רק ביציאה ל-`public`**, וכולן יחד —
+`badge` בלי `DATA.APPS` הוא מניין שקרי, ו-`DATA.APPS` בלי מפתח
+הקאש של דף הבית פירושו שאיש לא יראה את הכרטיס. התהליך המלא
+ב-`PIPELINE.md`.
+
+---
+
+`index.html` בשורש, **ביציאה ל-`public` בלבד**:
 
 | # | מה | איפה |
 |---|---|---|
@@ -281,16 +320,17 @@ node .claude/qa/exam.js <app>         # אם יש מבחן כיתתי
 [ ] בדקתי אם זה בכלל צריך אפליקציה, או קובץ ב-lomda/data/
 [ ] משפחה נבחרה, ולא ערבבתי בין שתיים
 [ ] <app>/index.html, manifest.json, sw.js, img/
-[ ] sw.js — CACHE ייחודי, שורה 13 ושורה 25
+[ ] sw.js — CACHE ייחודי, בהגדרה ובניקוי שב-activate
 [ ] BUILD + SKEY + GKEY_STORE ייחודיים, ואות BUILD פנויה
 [ ] BUILD ו-?v= תואמים  ← node .claude/qa/cache.js
-[ ] DATA.APPS  +  ICONS          ← node .claude/qa/apps.js
-[ ] badge ×4  ←  המניין כמילה     ← ותוסיף שורה ל-WORDS שבראש apps.js
-[ ] lead ×4                       ← זה היחיד שאין עליו בדיקה. ידנית.
-[ ] מפתח הקאש של דף הבית עלה
+[ ] רשומה ב-.claude/qa/stages.json   ← stage: "build"
+[ ] שער פנימי מ-.claude/qa/internal-gate.html
+[ ] node .claude/qa/stage.js — עובר
+[ ] ⚠ בשלב build אין נוגעים בארבעת אלה. ראו ״השער״ למטה:
+      DATA.APPS · ICONS · badge ×4 · lead ×4 · מפתח הקאש של דף הבית
 [ ] תוכן בסכימת המשפחה, ארבע שפות
 [ ] מילון שורה־למפתח, לא שורה אחת
-[ ] node .claude/qa/all.js — כל העשר עוברות
+[ ] node .claude/qa/all.js — כולן עוברות
 [ ] נגעתי ב-legal/ ?  →  שלושה־עשר מפתחות
 [ ] git fetch origin main שוב, לפני ה-commit
 ```
