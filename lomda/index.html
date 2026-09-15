@@ -393,6 +393,32 @@ textarea.field{min-height:96px;resize:vertical}
 .tpc .tn{font-weight:700;font-size:.98rem;overflow-wrap:anywhere;color:var(--c,var(--ink))}
 .tpc .td{color:var(--muted);font-size:.8rem;overflow-wrap:anywhere}
 
+/* אינדקס המסלולים ותיבת הסינון.
+
+   נמדד 15.9.2026 על מסך טלפון 390×844: מסך הנושאים היה 11,940
+   פיקסלים — **14.1 מסכים** של גלילה, 23 מסלולים ו-57 נושאים, בלי
+   שום דרך לדלג. ״מיצ״ב וכניסה לחטיבה״ ישב במסך 13.2 ו״קורות חיים
+   וראיון״ במסך 12.5, פשוט מפני שהקבצים שלהם נוספו אחרונים.
+
+   השבבים הם אינדקס ולא קישוט: 23 שמות בשורה מתעטפת אחת הם הרשימה
+   המלאה של מה שיש כאן, במסך אחד. לקהל עם ADHD זה ההבדל בין לראות
+   את הכול לבין לגלול ולקוות.
+
+   `border-radius:999px` מבדיל אותם מ-`.seg`, שהוא בורר מצב ולא
+   ניווט, ו-44 פיקסלים הם אזור המגע של `ACCESSIBILITY.md`. */
+.find{display:flex;gap:8px;align-items:center;margin:1.1rem 0 0}
+.find input{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);
+  border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;padding:10px 13px}
+.find button{min-height:44px;min-width:44px;border:1px solid var(--line);border-radius:10px;
+  background:var(--surface);color:var(--muted);font:inherit;font-size:1.05rem;cursor:pointer}
+.idx{display:flex;gap:6px;flex-wrap:wrap;margin:.7rem 0 0}
+.idx button{min-height:44px;border:1px solid var(--line);background:var(--surface);
+  border-radius:999px;padding:8px 13px;font:inherit;font-weight:600;font-size:.86rem;
+  color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.idx button.on{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.idx button .n{font-size:.78rem;opacity:.75;font-variant-numeric:tabular-nums}
+.fnone{color:var(--muted);text-align:center;padding:2rem 1rem}
+
 /* טקסט על רקע ההדגשה: --accent-ink ולא לבן קבוע. במצב כהה
    ההדגשה בהירה, ולבן עליה יצא 1.5–2.0:1 — כמעט בלתי קריא. */
 /* ---------- מצב מורה ---------- */
@@ -814,6 +840,8 @@ T.he={
   navHome:"נושאים", navProg:"התקדמות", navSet:"הגדרות", navExam:"מבחן", back:"חזרה",
   heroT:"כל נושא נלמד באותה דרך",
   heroP:"כל פריט עם הסבר, סיבה ותוצאה — ועם כפתור השמעה. אפשר להאט, לחזור, ולראות הכול בשפה שלכם. אין טיימר ואין עונש על טעות.",
+  findPh:"חיפוש נושא — פיזיקה, מיצ״ב, קורות חיים…", findAll:"הכול",
+  findNone:"אין נושא בשם הזה. נסו מילה אחרת, או ״הכול״.", findClear:"ניקוי החיפוש",
   start:"התחילו כאן", cont:"המשיכו מאיפה שהפסקתם",
   lv1:"היכרות", lv2:"קשרים", lv3:"טיעון",
   lv1D:"מה זה ומה שמו — הפריט עצמו", lv2D:"סיבה ותוצאה, ומה בא לפני מה", lv3D:"מקורות, מושגים והסבר שלם",
@@ -871,6 +899,8 @@ T.ar={
   navHome:"الموضوعات", navProg:"التقدّم", navSet:"الإعدادات", navExam:"امتحان", back:"رجوع",
   heroT:"كل موضوع يُدرَس بالطريقة نفسها",
   heroP:"كل عنصر بشرحه وسببه ونتيجته — ومع زر استماع. يمكنك الإبطاء والإعادة ورؤية كل شيء بلغتك. بلا مؤقّت وبلا عقاب على الخطأ.",
+  findPh:"ابحث عن موضوع — فيزياء، ميتساف، سيرة ذاتية…", findAll:"الكل",
+  findNone:"لا يوجد موضوع بهذا الاسم. جرّبوا كلمة أخرى، أو «الكل».", findClear:"مسح البحث",
   start:"ابدأ من هنا", cont:"تابع من حيث توقفت",
   lv1:"تعرّف", lv2:"روابط", lv3:"حجّة",
   lv1D:"ما هو وما اسمه — العنصر نفسه", lv2D:"السبب والنتيجة، وما جاء قبل ماذا", lv3D:"مصادر ومفاهيم وشرح كامل",
@@ -928,6 +958,8 @@ T.ru={
   navHome:"Темы", navProg:"Прогресс", navSet:"Настройки", navExam:"Экзамен", back:"Назад",
   heroT:"Каждая тема изучается одинаково",
   heroP:"Каждый пункт с объяснением, причиной и следствием — и с кнопкой прослушивания. Можно замедлить, повторить и увидеть всё на своём языке. Без таймера и без наказания за ошибку.",
+  findPh:"Поиск темы — физика, Мейцав, резюме…", findAll:"Всё",
+  findNone:"Такой темы нет. Попробуйте другое слово или «Всё».", findClear:"Очистить поиск",
   start:"Начать здесь", cont:"Продолжить с места остановки",
   lv1:"Знакомство", lv2:"Связи", lv3:"Аргумент",
   lv1D:"Что это и как называется — сам пункт", lv2D:"Причина и следствие, и что было раньше", lv3D:"Источники, понятия и целое объяснение",
@@ -985,6 +1017,8 @@ T.en={
   navHome:"Topics", navProg:"Progress", navSet:"Settings", navExam:"Exam", back:"Back",
   heroT:"Every topic is learned the same way",
   heroP:"Every item with its explanation, its cause and its consequence — and a play button. Slow it down, repeat it, and see it all in your own language. No timer, and no penalty for a wrong answer.",
+  findPh:"Find a topic — physics, Meitzav, CV…", findAll:"All",
+  findNone:"No topic by that name. Try another word, or \u201cAll\u201d.", findClear:"Clear the search",
   start:"Start here", cont:"Pick up where you left off",
   lv1:"Getting to know", lv2:"Connections", lv3:"Argument",
   lv1D:"What it is and what it is called — the item itself", lv2D:"Cause and effect, and what came before what", lv3D:"Sources, concepts and a full explanation",
@@ -1074,7 +1108,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l83 · 2026-09-15";
+var BUILD="l84 · 2026-09-15";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -2345,14 +2379,62 @@ function vstrip(){
     ' <button class="btn ghost" data-a="set">'+esc(t("setVoice"))+"</button></div>";
 }
 
-function screenHome(){
-  var h='<div class="wrap">';
-  h+='<div class="card" style="margin:1.1rem 0"><h2 style="font-size:1.5rem">'+esc(t("heroT"))+"</h2>"+
-     '<p style="color:var(--muted);margin:.5rem 0 0">'+esc(t("heroP"))+"</p></div>";
-  h+=vstrip();
+/* ============================================================
+   סינון מסך הנושאים — אינדקס ותיבת חיפוש
+
+   **הבעיה, נמדדת.** 15.9.2026, מסך טלפון 390×844: מסך הנושאים
+   היה 11,940 פיקסלים — 14.1 מסכים של גלילה, 23 מסלולים ו-57
+   נושאים, ואפס דרכים לדלג. הסדר הוא סדר טעינת הקבצים, ולכן
+   ״קורות חיים וראיון״ ישב במסך 12.5 ו״מיצ״ב וכניסה לחטיבה״
+   במסך 13.2 — שניהם אחרונים רק מפני שנוספו אחרונים.
+
+   **ולמה אינדקס ולא רק חיפוש.** חיפוש עוזר למי שיודע מה לכתוב;
+   השאלה כאן הפוכה — מי בכלל יודע שהתחומים האלה נמצאים כאן.
+   שורת השבבים היא הרשימה המלאה של 23 המסלולים במסך אחד, ולכן
+   היא עונה על השאלה הזאת. החיפוש הוא הדרך המהירה למי שכבר יודע.
+
+   **המצב אינו נשמר ב-`state` בכוונה.** זו תצוגה ולא התקדמות, ולומד
+   שיחזור מחר אל מסך מסונן יחשוב שהתוכן נעלם. ריענון מחזיר הכול. */
+var HF={q:"",trk:""};
+
+/* הערימה לחיפוש היא כל ארבע השפות של השם ושל התיאור. מי שממשקו
+   רוסי ומחפש "physics" עדיין מוצא, וזה בדיוק הלקח שדף הבית למד
+   ב-14.9 כשעולה דובר רוסית שחיפש "תנ״ך" קיבל אפס. */
+function hfHay(o){
+  var out="",k,nm=o.n||{},d=o.d||{};
+  for(k in nm)out+=" "+nm[k];
+  for(k in d)out+=" "+d[k];
+  return qNorm(out);
+}
+function hfTops(tr){
+  var tops=TOPICS.filter(function(x){return x.trk===tr.id});
+  if(HF.trk&&tr.id!==HF.trk)return [];
+  if(!HF.q)return tops;
+  /* המסלול עצמו תואם — כל נושאיו נכנסים. מי שהקליד "פיזיקה" רוצה
+     את הפיזיקה כולה, ולא רק את הנושא שבמקרה נושא את המילה בשמו. */
+  if(hfHay(tr).indexOf(HF.q)>=0)return tops;
+  return tops.filter(function(tp){return hfHay(tp).indexOf(HF.q)>=0});
+}
+function hfIdx(){
+  var h='<div class="idx" id="hidx">';
+  h+='<button class="'+(HF.trk?"":"on")+'" data-a="idx" data-t="" aria-pressed="'+
+     (HF.trk?"false":"true")+'">'+esc(t("findAll"))+'</button>';
   TRACKS.forEach(function(tr){
-    var tops=TOPICS.filter(function(x){return x.trk===tr.id});
+    var n=TOPICS.filter(function(x){return x.trk===tr.id}).length;
+    if(!n)return;
+    var on=HF.trk===tr.id;
+    h+='<button class="'+(on?"on":"")+'" data-a="idx" data-t="'+esc(tr.id)+
+       '" aria-pressed="'+(on?"true":"false")+'">'+ic(tr.icon,13)+esc(trName(tr))+
+       '<span class="n">'+n+"</span></button>";
+  });
+  return h+"</div>";
+}
+function hfList(){
+  var h='<div id="hlist">',any=false;
+  TRACKS.forEach(function(tr){
+    var tops=hfTops(tr);
     if(!tops.length)return;
+    any=true;
     /* האייקון של המסלול במקום הנקודה. השדה `icon` נכתב ב-21 קובצי
        התוכן ונקרא ל-TRACKS מאז שהם נבנו, אך לא צויר מעולם — זה היה
        `O-14`. הוא תופס את מקום ה-`tdot` ולא נוסף לצידה, כדי שהשורה
@@ -2374,6 +2456,27 @@ function screenHome(){
     });
     h+="</div>";
   });
+  if(!any)h+='<p class="fnone">'+esc(t("findNone"))+"</p>";
+  return h+"</div>";
+}
+/* ציור מחדש של השבבים והרשימה בלבד. `render()` המלא בונה את תיבת
+   הקלט מאפס, והקלדה בה הייתה מאבדת את המיקוד ואת הסמן בכל תו. */
+function hfPaint(){
+  var a=$("#hidx"),b=$("#hlist");
+  if(a)a.outerHTML=hfIdx();
+  if(b)b.outerHTML=hfList();
+}
+
+function screenHome(){
+  var h='<div class="wrap">';
+  h+='<div class="card" style="margin:1.1rem 0"><h2 style="font-size:1.5rem">'+esc(t("heroT"))+"</h2>"+
+     '<p style="color:var(--muted);margin:.5rem 0 0">'+esc(t("heroP"))+"</p></div>";
+  h+=vstrip();
+  h+='<div class="find"><input id="hfq" type="search" autocomplete="off" data-a="find" '+
+     'value="'+esc(HF.q)+'" placeholder="'+esc(t("findPh"))+'" aria-label="'+esc(t("findPh"))+'">'+
+     '<button data-a="findx" aria-label="'+esc(t("findClear"))+'">&#215;</button></div>';
+  h+=hfIdx();
+  h+=hfList();
   return h+"</div>"+fbar();
 }
 
@@ -4286,6 +4389,19 @@ document.addEventListener("click",function(e){
   if(a==="home"){view="";state.screen="home";P.q=null;stopSpeak();save();render();window.scrollTo(0,0);return}
   if(a==="prog"){view="";state.screen="prog";stopSpeak();render();window.scrollTo(0,0);return}
   if(a==="set"){view="";state.screen="set";stopSpeak();gkMsg=null;render();window.scrollTo(0,0);return}
+  /* שבב באינדקס בוחר מסלול ומנקה טקסט שהוקלד: שני מסננים פעילים
+     יחד היו נותנים מסך ריק בלי שהלומד מבין למה. */
+  if(a==="idx"){
+    var tid=el.getAttribute("data-t")||"";
+    HF.trk=(HF.trk===tid)?"":tid; HF.q="";
+    var bx=$("#hfq"); if(bx)bx.value="";
+    hfPaint(); return;
+  }
+  if(a==="findx"){
+    HF.q=""; HF.trk="";
+    var b2=$("#hfq"); if(b2){b2.value="";b2.focus()}
+    hfPaint(); return;
+  }
   if(a==="open"){
     state.topic=el.getAttribute("data-t"); state.screen="prac";
     roundReset(); save(); newQuestion(); window.scrollTo(0,0); return;
@@ -4383,6 +4499,10 @@ document.addEventListener("input",function(e){
       EB.built=null; return;
     }
   }
+  /* הקלדה בתיבת הסינון. `qNorm` הוא אותו נרמול של הקישור מדף הבית,
+     ולכן ״תנ״ך״ עם גרשיים מוצא את ״תנך״ בדיוק כמו שם. */
+  var fx=e.target.closest('[data-a="find"]');
+  if(fx){ HF.q=qNorm(fx.value); HF.trk=""; hfPaint(); return; }
   var el=e.target.closest("[data-a='rate']"); if(!el)return;
   state.rate=clamp(parseFloat(el.value)||0.95,0.6,1.3); save();
 });
@@ -4447,7 +4567,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l83-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l84-pwa1").catch(function(){});
   });
 }
 </script>
