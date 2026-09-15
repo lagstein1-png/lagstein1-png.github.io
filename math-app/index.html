@@ -1388,7 +1388,17 @@ function applyModes(){
 
    JPEG ולא PNG: אין צורך בשקיפות — התצלום ממוסך לעיגול ב-CSS —
    ו-PNG של אותו חתך היה 135,356 בתים, פי תשעה בלי שום רווח. */
-var JF_PHOTO="/img/paula.jpg";
+/* **הדיוקן, ו־`JF_PHOTO` שהיה מת.**
+
+   נמדד 15.9.2026: המשתנה הוצהר כאן ו**מעולם לא הוחל** — אף
+   קריאה ל-`JOSHFACE.photo(JF_PHOTO)` לא הייתה בקובץ. התוצאה:
+   הפנים הגדולות נפלו לפרצוף המצויר, והתמונה שכן הופיעה הגיעה
+   מהקריאה שבתוך חיווט ״עזרה מהמורה״ — כלומר **לפי תזמון**.
+   זה בדיוק מה שהבעלים תיאר: ״פעם ג׳וש וגם פאולה״.
+
+   `jfPhoto()` מחיל אותו במפורש לפני כל הרכבה. */
+var JF_PHOTO="/img/josh.jpg";
+function jfPhoto(){ if(typeof JOSHFACE!=="undefined") JOSHFACE.photo(JF_PHOTO) }
 
 function jfOn(){ return state.pet==="josh" && typeof JOSHFACE!=="undefined" }
 /* מצבי הרוח של האפליקציה קדמו לשכבת הפנים, ולכן זו טבלת תרגום ולא
@@ -1457,7 +1467,7 @@ function petSvg(kind,mood,size){
        מחזיר SVG מוטבע — אפס נכסים, אפס בקשות רשת.
        גיליון הספרייטים נמחק 13.9.2026 (O-52); אם הקובץ לא נטען,
        נופלים לעיגול בצבעי ג׳וש עם הגרש, בלי בקשת רשת. */
-    if(typeof JOSHFACE!=="undefined")return JOSHFACE.markup(size||140);
+    if(typeof JOSHFACE!=="undefined"){jfPhoto();return JOSHFACE.markup(size||140)}
     e='<circle cx="60" cy="60" r="44" fill="'+c.c+'" stroke="'+c.d+'" stroke-width="4"/><text x="60" y="74" text-anchor="middle" font-size="40" font-weight="700" fill="#fff">ג׳</text>';
   }else if(kind==="owl"){
     e='<path d="M30 34 L42 8 L53 31 Z" fill="'+c.d+'"/><path d="M90 34 L78 8 L67 31 Z" fill="'+c.d+'"/><path d="M20 68 Q12 84 25 98 Q30 82 27 68 Z" fill="'+c.d+'"/><path d="M100 68 Q108 84 95 98 Q90 82 93 68 Z" fill="'+c.d+'"/><circle cx="60" cy="66" r="38" fill="'+c.c+'"/><ellipse cx="60" cy="88" rx="21" ry="14" fill="'+c.s+'"/><circle cx="44" cy="54" r="14.5" fill="#fff" stroke="'+c.d+'" stroke-width="2.5"/><circle cx="76" cy="54" r="14.5" fill="#fff" stroke="'+c.d+'" stroke-width="2.5"/>'+eyes().replace(/cy="58"/g,'cy="54"')+'<path d="M60 61 L53 71 L67 71 Z" fill="#ffb020" stroke="#d99a00" stroke-linejoin="round"/>';
@@ -2148,7 +2158,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b102 · 2026-09-14";
+var BUILD="b103 · 2026-09-15";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4198,7 +4208,7 @@ function afterRender(){
   }
   /* הפנים נבנו מחדש יחד עם `#app`, ולכן המודול צריך למצוא את הצומת
      החדש. המצב עצמו חי במודול ולא ב-DOM, ולכן הוא שורד את הציור. */
-  if(jfOn()){JOSHFACE.attach();jfMood(P.mood)}
+  if(jfOn()){jfPhoto();JOSHFACE.attach();jfMood(P.mood)}
 }
 function setBubble(text,mood){
   P.mood=mood||"happy";
@@ -4573,7 +4583,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b102-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b103-pwa1").catch(function(){});
   });
 }
 </script>
@@ -4585,7 +4595,7 @@ if(window.TUTOR){
      ובנקודה ההיא `JOSHFACE` עדיין לא קיים. נמדד — הקריאה נבלעה
      בשקט והפנים נשארו מצוירות. אחרי ההדלקה מציירים מחדש. */
   if(typeof JOSHFACE!=="undefined" && state.pet==="josh"){
-    JOSHFACE.photo("/img/paula.jpg", JOSHFACE.MARKS_PAULA);
+    jfPhoto();
   }
 
   TUTOR.mount({

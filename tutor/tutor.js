@@ -67,16 +67,18 @@ var RATES    = [0.7, 0.85, 0.95, 1, 1.15];
    רך״ יותר מכל שינוי בגובה, והוא גם נכון לקהל: דיסלקציה ו-ADHD.
 
    שניהם ברירת מחדל בלבד — הלומד משנה בבורר, וזה נשמר. */
-var JOSH_PITCH = 1.0;
+/* הריכוך חל תמיד — זה האופי של ברק ולא פיצוי. קול גברי בגובה
+   ברירת־מחדל נשמע נוקשה מול ילד שנתקע. */
+var JOSH_PITCH = 0.94;
 var JOSH_RATE  = 0.95;
 
 var DIR   = { he:"rtl", ar:"rtl", ru:"ltr", en:"ltr" };
 var VOICE = { he:"he-IL", ar:"ar-SA", ru:"ru-RU", en:"en-US" };
 
 var L = {
-he:{ btn:"פאולה — עזרה מהמורה", title:"עזרה מהמורה", close:"סגירה", send:"שליחה",
+he:{ btn:"ברק — עזרה מהמורה", title:"עזרה מהמורה", close:"סגירה", send:"שליחה",
   intro:"אפשר לשאול אותי על מה שעל המסך. אני נותן רמז אחד בכל פעם, ומחכה לתשובה.",
-  nudge:{stuck:"שמתי לב שהשאלה הזאת תופסת זמן. רוצה שנפרק אותה יחד, צעד אחד בכל פעם?",frustrated:"אני רואה שזה לא הולך עכשיו, וזה בסדר גמור. בוא ננסה מכיוון אחר."}, greet:"היי, אני פאולה. אני כאן אם משהו לא ברור. כתוב לי מה, ונעבור על זה יחד.", ph:"מה לא ברור?", hello:"אני צריך עזרה במה שעל המסך.", wait:"רגע, חושבת…",
+  nudge:{stuck:"שמתי לב שהשאלה הזאת תופסת זמן. רוצה שנפרק אותה יחד, צעד אחד בכל פעם?",frustrated:"אני רואה שזה לא הולך עכשיו, וזה בסדר גמור. בוא ננסה מכיוון אחר."}, greet:"היי, אני ברק. אני כאן אם משהו לא ברור. כתוב לי מה, ונעבור על זה יחד.", ph:"מה לא ברור?", hello:"אני צריך עזרה במה שעל המסך.", wait:"רגע, חושב…",
   err:"לא הצלחתי להתחבר. אפשר לנסות שוב עוד רגע.",
   setup:"העזרה עוד לא מוכנה. אפשר לנסות מאוחר יותר.",
   limit:"מספיק להיום — נמשיך מחר.",
@@ -85,12 +87,12 @@ he:{ btn:"פאולה — עזרה מהמורה", title:"עזרה מהמורה", 
   privacy:"אל תכתבו כאן שם מלא, כתובת או טלפון.",
   play:"הקראה", stop:"עצירה", rate:"מהירות", off:"אין קול בשפה הזאת במכשיר הזה",
   voice:"קול", voiceAuto:"אוטומטי",
-  mic:"דבר", micOn:"מקשיבהװװ", micNo:"הדפדפן הזה לא נותן לדבר. אפשר להקליד.",
+  mic:"דבר", micOn:"מקשיב…", micNo:"הדפדפן הזה לא נותן לדבר. אפשר להקליד.",
   micDeny:"אין הרשאה למיקרופון. אפשר לאשר בהגדרות הדפדפן, או פשוט להקליד.",
-  manNote:"אין במכשיר הזה קול נשי בשפה הזאת, ולכן גובה הקול הוגבה. זה לא קול נשי אמיתי." },
-ar:{ btn:"باولا — مساعدة من المعلّم", title:"مساعدة من المعلّم", close:"إغلاق", send:"إرسال",
+  manNote:"אין במכשיר הזה קול גברי בשפה הזאת, ולכן גובה הקול הונמך. זה לא קול גברי אמיתי." },
+ar:{ btn:"باراك — مساعدة من المعلّم", title:"مساعدة من المعلّم", close:"إغلاق", send:"إرسال",
   intro:"يمكنك أن تسألني عمّا يظهر على الشاشة. أعطي تلميحًا واحدًا في كل مرة وأنتظر إجابتك.",
-  nudge:{stuck:"لاحظت أن هذا السؤال يأخذ وقتًا. تريد أن نفكّكه معًا، خطوة واحدة في كل مرة؟",frustrated:"أرى أن الأمر لا يسير الآن، وهذا طبيعي تمامًا. لنجرّب من زاوية أخرى."}, greet:"مرحبًا، أنا باولا. أنا هنا إن كان شيء غير واضح. اكتب لي ما هو، ونمرّ عليه معًا.", ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
+  nudge:{stuck:"لاحظت أن هذا السؤال يأخذ وقتًا. تريد أن نفكّكه معًا، خطوة واحدة في كل مرة؟",frustrated:"أرى أن الأمر لا يسير الآن، وهذا طبيعي تمامًا. لنجرّب من زاوية أخرى."}, greet:"مرحبًا، أنا باراك. أنا هنا إن كان شيء غير واضح. اكتب لي ما هو، ونمرّ عليه معًا.", ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
   err:"لم أتمكّن من الاتصال. حاول مرّة أخرى بعد قليل.",
   setup:"المساعدة ليست جاهزة بعد. حاول لاحقًا.",
   limit:"يكفي لهذا اليوم — نُكمل غدًا.",
@@ -101,10 +103,10 @@ ar:{ btn:"باولا — مساعدة من المعلّم", title:"مساعدة 
   voice:"الصوت", voiceAuto:"تلقائي",
   mic:"تكلّم", micOn:"أسمعك…", micNo:"هذا المتصفّح لا يتيح التكلّم. يمكنك الكتابة.",
   micDeny:"لا يوجد إذن للميكروفون. يمكن السماح في إعدادات المتصفّح، أو الكتابة ببساطة.",
-  manNote:"لا يوجد على هذا الجهاز صوت نسائيّ بهذه اللغة، لذلك رُفعت طبقة الصوت. هذا ليس صوتًا نسائيًّا حقيقيًّا." },
-ru:{ btn:"Паула — помощь учителя", title:"Помощь учителя", close:"Закрыть", send:"Отправить",
+  manNote:"لا يوجد على هذا الجهاز صوت رجاليّ بهذه اللغة، لذلك خُفضت طبقة الصوت. هذا ليس صوتًا رجاليًّا حقيقيًّا." },
+ru:{ btn:"Барак — помощь учителя", title:"Помощь учителя", close:"Закрыть", send:"Отправить",
   intro:"Можешь спросить меня о том, что на экране. Я даю по одной подсказке и жду ответа.",
-  nudge:{stuck:"Я заметила, что этот вопрос отнимает время. Разберём его вместе, по одному шагу?",frustrated:"Вижу, что сейчас не идёт, и это совершенно нормально. Попробуем с другой стороны."}, greet:"Привет, я Паула. Я рядом, если что-то непонятно. Напиши, что именно, и разберём вместе.", ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
+  nudge:{stuck:"Я заметил, что этот вопрос отнимает время. Разберём его вместе, по одному шагу?",frustrated:"Вижу, что сейчас не идёт, и это совершенно нормально. Попробуем с другой стороны."}, greet:"Привет, я Барак. Я рядом, если что-то непонятно. Напиши, что именно, и разберём вместе.", ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
   err:"Не удалось соединиться. Попробуй ещё раз через минуту.",
   setup:"Помощь ещё не готова. Попробуй позже.",
   limit:"На сегодня хватит — продолжим завтра.",
@@ -115,10 +117,10 @@ ru:{ btn:"Паула — помощь учителя", title:"Помощь уч�
   voice:"Голос", voiceAuto:"Автоматически",
   mic:"Говори", micOn:"Слушаю…", micNo:"Этот браузер не позволяет говорить. Можно печатать.",
   micDeny:"Нет разрешения на микрофон. Разрешите в настройках браузера или просто печатайте.",
-  manNote:"На этом устройстве нет женского голоса для этого языка, поэтому тон повышен. Это не настоящий женский голос." },
-en:{ btn:"Paula — ask the teacher", title:"Ask the teacher", close:"Close", send:"Send",
+  manNote:"На этом устройстве нет мужского голоса для этого языка, поэтому тон понижен. Это не настоящий мужской голос." },
+en:{ btn:"Barak — ask the teacher", title:"Ask the teacher", close:"Close", send:"Send",
   intro:"You can ask me about what is on the screen. I give one hint at a time, and wait for your answer.",
-  nudge:{stuck:"I noticed this one is taking a while. Shall we break it down together, one step at a time?",frustrated:"I can see this is not working right now, and that is completely fine. Let us try another way."}, greet:"Hi, I am Paula. I am here if something is unclear. Write what it is, and we will go through it together.", ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
+  nudge:{stuck:"I noticed this one is taking a while. Shall we break it down together, one step at a time?",frustrated:"I can see this is not working right now, and that is completely fine. Let us try another way."}, greet:"Hi, I am Barak. I am here if something is unclear. Write what it is, and we will go through it together.", ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
   err:"I could not connect. Try again in a moment.",
   setup:"The help is not ready yet. Try again later.",
   limit:"That is enough for today — we will carry on tomorrow.",
@@ -129,7 +131,7 @@ en:{ btn:"Paula — ask the teacher", title:"Ask the teacher", close:"Close", se
   voice:"Voice", voiceAuto:"Automatic",
   mic:"Speak", micOn:"Listening…", micNo:"This browser does not allow speaking. You can type instead.",
   micDeny:"No microphone permission. You can allow it in the browser settings, or simply type.",
-  manNote:"This device has no female voice for this language, so the pitch is raised. It is not a real female voice." }
+  manNote:"This device has no male voice for this language, so the pitch is lowered. It is not a real male voice." }
 };
 
 var CFG = null, MSGS = [], BUSY = false, NOTE = "", QID = null, LANGAT = null;
@@ -273,14 +275,22 @@ function ttsWatchdog(alive, onSilent){
    נבחר דווקא כשמבקשים נשי. */
 var VOICE_F=/(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
 var VOICE_M=/(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
-/* פאולה: נשי גבוה, גברי נמוך, ולא־ידוע בין השניים.
-   השם נשאר `femScore` ולא `femScore` — ניקוד ששמו אומר את ההפך
-   ממה שהוא עושה הוא בדיוק סוג הבאג שהמאגר הזה מתעד שוב ושוב. */
+/* **ברק: גברי גבוה, נשי נמוך — 15.9.2026.**
+
+   **והשם `femScore` נשאר, וזה חוב מוצהר ולא נוחות.** הוא מחולץ
+   בשמו ב-`.claude/qa/tutor.js`, ולכן החלפה כאן לבדה שוברת את
+   הבדיקה. ניקוד ששמו אומר את ההפך ממה שהוא עושה הוא בדיוק סוג
+   הבאג שהמאגר הזה מתעד שוב ושוב — מי שנוגע כאן בפעם הבאה
+   יחליף את השם בשני הקבצים יחד.
+
+   **וההעדפה נשארת המפתח השני ולא הראשון.** `voiceUsable` קודם,
+   מפני שקול מת הוא שקט ושקט גרוע מקול במגדר הלא־מבוקש. הכלל
+   הזה כתוב ב-`CLAUDE.md` ואינו משתנה עם הדמות. */
 function femScore(v){
   var n = ((v && v.name) || "") + " " + ((v && v.lang) || "");
   n = n.toLowerCase();
-  if(VOICE_F.test(n)) return 2;
-  if(VOICE_M.test(n)) return 0;
+  if(VOICE_M.test(n)) return 2;
+  if(VOICE_F.test(n)) return 0;
   return 1;                                  /* לא ידוע — בין השניים */
 }
 
@@ -297,7 +307,14 @@ function femScore(v){
    מזיז בשקט את גובה ההקראה של האפליקציה בכל שתים־עשרה.
    נמדד בכרומיום לפני השינוי — `FEM_PITCH` הגלובלי החזיר 1.35
    ולא את הערך שנכתב כאן. */
-var TU_FEM_PITCH = 1.28;
+/* **הנפילה לאחור כשאין קול גברי במכשיר.**
+
+   0.62 ולא 0.88: הפרש התדר הבסיסי בין קול נשי לגברי הוא כפי
+   0.6, והנמכה של 12% אינה משנה מגדר נתפס. **וזה עדיין לא יעזור
+   בכל מכשיר** — ברוב מנועי ההקראה של אנדרואיד `pitch` של
+   Web Speech אינו נאכף כלל, ולכן בורר הקול (`#tu-vc`) הוא
+   התשובה האמיתית שם. */
+var TU_FEM_PITCH = 0.62;
 /* האם האמירה האחרונה נאמרה בנפילה לאחור. מתעדכן ב-speakSeg. */
 var _femFallback = false;
 
@@ -562,8 +579,7 @@ var CSS = ''
    הקו שמתחת לכותרת. עכשיו הוא כלל עצמאי. */
 +'#tu-face{flex:0 0 auto;line-height:0;display:inline-block;'
 +'filter:drop-shadow(0 5px 12px rgba(23,51,60,.22));'
-+'animation:tu-float 3.2s ease-in-out infinite}'
-+'@keyframes tu-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}'
++'}'   /* הציפה עברה ל-josh-face.js וחלה על כל הפנים */
 +'@media (prefers-reduced-motion:reduce){#tu-face{animation:none}}'
 +'#tu-hd b{font-size:1.05rem}'
 +'#tu-q{background:#fff3ce;border:1px solid #e6b800;border-radius:9px;padding:3px 9px;'
@@ -657,7 +673,14 @@ function build(){
     /* פאולה, 14.9.2026 — מהתמונה שהבעלים יצר. שני הקודמים נשארו
        בעץ ומחווטים לשורה אחת: `photo("/img/josh-bot.jpg",
        JOSHFACE.MARKS_BOT)` או `photo("/img/josh.jpg")`. */
-    JOSHFACE.photo("/img/paula.jpg", JOSHFACE.MARKS_PAULA);
+    /* **ברק — הוראת הבעלים, 15.9.2026:** ״אל תחליף את הגבר,
+       תחזיר אותו לכולם, נקרא לו בינתיים ברק״, ואחריה ״לא ג׳וש״.
+
+       **בלי ארגומנט שני בכוונה.** שלוש המסכות של `josh-face.js`
+       מכוילות בברירת המחדל שלהן **לחתך הזה בדיוק** — זה מה
+       ש-`FACE.md` מתעד, וזו הסיבה שהמצמוץ ותנועת הלסת עובדים
+       כאן בלי מדידה חדשה. */
+    JOSHFACE.photo("/img/josh.jpg");
     var fw = ov.querySelector("#tu-face");
     if(fw){ fw.innerHTML = JOSHFACE.markup(68); JOSHFACE.attach() }
   }
