@@ -21,18 +21,21 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const FILE = path.join('marketing', 'outreach-letters.md');
-const full = path.join(ROOT, FILE);
+/* שני קבצים מאז 15.9.2026: המכתבים הראשיים, והמכתבים למגזר הערבי —
+   שם כל מכתב נושא שתי שורות אורך, אחת לגוש העברי ואחת לערבי. */
+const FILES = [path.join('marketing', 'outreach-letters.md'),
+               path.join('marketing', 'outreach-letters-ar.md')];
+const HDR = /\*\*אורך:\*\* (\d+) תווים/g;
 
+let bad = 0, n = 0, m;
+for (const FILE of FILES) {
+const full = path.join(ROOT, FILE);
 if (!fs.existsSync(full)) {
   console.log(`✗ ${FILE} אינו קיים`);
   process.exit(1);
 }
-
 const s = fs.readFileSync(full, 'utf8');
-const HDR = /\*\*אורך:\*\* (\d+) תווים/g;
-
-let bad = 0, n = 0, m;
+HDR.lastIndex = 0;
 while ((m = HDR.exec(s)) !== null) {
   n++;
   const claim = parseInt(m[1], 10);
@@ -59,11 +62,12 @@ while ((m = HDR.exec(s)) !== null) {
     console.log(`✓ ${name} — ${real} תווים`);
   }
 }
+}
 
 if (!n) {
-  console.log(`✗ ${FILE}: אין אף שורת \`**אורך:** N תווים\` — הפורמט השתנה`);
+  console.log(`✗ אין אף שורת \`**אורך:** N תווים\` — הפורמט השתנה`);
   process.exit(1);
 }
 
-console.log(`\n${n} מכתבים, ${bad} שאורכם אינו מה שהכותרת מבטיחה`);
+console.log(`\n${n} גושי מכתב בשני קבצים, ${bad} שאורכם אינו מה שהכותרת מבטיחה`);
 process.exit(bad ? 1 : 0);

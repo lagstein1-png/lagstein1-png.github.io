@@ -119,6 +119,9 @@ const SUITE = [
      ב-video-scripts.md הוא ״כתוביות תמיד״, ותזמון שנשאר מאחור
      הוא כתובית שמופיעה על הפריים הלא נכון. */
   { id: 'srt',     args: [] },
+  /* learning-core/ — ספרייה שאיש אינו טוען, ושחסרים בה שלושה
+     ממנגנוני ההקראה ותיקון pure. חוסמת אימוץ כל עוד הפער קיים. */
+  { id: 'core',    args: [] },
   { id: 'smoke',    args: PAGES,  needsServer: true },
   { id: 'say',      args: [],     needsServer: true },
   /* מה שבאמת מגיע למנוע ההקראה. content.js מודד שדה שנדגם; זה מריץ
