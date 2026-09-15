@@ -948,7 +948,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v104 · 2026-09-15";
+var BUILD="v105 · 2026-09-15";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -4359,7 +4359,13 @@ function genCLT(L){
      ספרות. הרחבת שני הטווחים מפזרת את מספר הספרות ומורידה את
      ההטיה ל-26%. n נשאר ריבוע שלם, כדי ש-√n שבצעד יישאר מספר. */
   mu=ri(20,80);sd=ri(2,20);n=pick([4,9,16,25,36,49,64,100,144,400]);
-  var seq=r2(sd/Math.sqrt(n)), half=r2(1.96*seq);
+  /* **`half` נגזר מהערך המדויק ולא מ-`seq` המעוגל — תוקן 16.9.2026.**
+     `r2(1.96*seq)` הוא עיגול כפול: שגיאת התקן עוגלה לשתי ספרות
+     ולאחר מכן הוכפלה. נמדד ממצה על 190 זוגות (sd,n) לפי הטווחים
+     שבקוד — **באחד־עשר מהם חצי־הרווח יצא שגוי**, כולם ב-n=49.
+     דוגמה: ממוצע 62, σ=8, n=49 — הוצג 2.23, והנכון 1.96·8/7 = 2.24.
+     תלמיד שחישב נכון לא מצא את תשובתו ברשימה. */
+  var seq=r2(sd/Math.sqrt(n)), half=r2(1.96*sd/Math.sqrt(n));
   return {ask:_f("ממוצע מדגם {0}, סטיית תקן {1}, גודל מדגם {2}. מהו רווח סמך של 95 אחוז?", num(mu), num(sd), num(n)),
     expr:"x̄ ± z·"+frac("σ","√n"),
     ans:W(num(mu)+" ± "+num(half)),
@@ -4371,7 +4377,9 @@ function genCLT(L){
     steps:[
       S(_("שגיאת התקן"),"",frac(num(sd),"√"+num(n))+" = "+num(seq)),
       S(_("מקדם הביטחון"),_("ל-95 אחוז המקדם הוא 1.96, כי בין ±1.96 סטיות תקן נמצא 95 אחוז מהשטח."),"z = 1.96"),
-      S(_("הרווח"),"",num(mu)+" ± 1.96·"+num(seq)+" = "+num(mu)+" ± "+num(half))
+      /* הצעד מציג את השבר המדויק ולא את seq המעוגל, אחרת השורה
+         טוענת שוויון שאינו מתקיים (1.96·1.14 אינו 2.24). */
+      S(_("הרווח"),"",num(mu)+" ± 1.96·"+frac(num(sd),"√"+num(n))+" = "+num(mu)+" ± "+num(half))
     ],rule:"ci",hint:_("רווח סמך = ממוצע ± z כפול שגיאת התקן. ל-95 אחוז z שווה 1.96.")};
 }
 
@@ -12756,7 +12764,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v104-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v105-pwa1").catch(function(){});
   });
 }
 </script>

@@ -501,6 +501,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/naming.js                # כלל השם של ״תאוריה מדברת״
     node .claude/qa/a11y.js                  # ששת מצבי הנגישות — מ-applyModes ועד כלל ב-CSS
     node .claude/qa/contrast.js               # יחס הניגודיות בפועל, 14 דפים × שני מצבי צבע
+    node .claude/qa/shadow.js                 # פונקציה גלובלית שנדרסה — מספר פרמטרים במקור מול זמן ריצה
     node .claude/qa/aria.js                  # מצב דו־מצבי קבוע, outline בתוך :focus, tabindex חיובי, מאפיין פיזי
     node .claude/qa/cache.js                 # חמש בדיקות על שלושה־עשר ה-sw.js
     node .claude/qa/storage.js               # מפתח localStorage אחד לאפליקציה אחת

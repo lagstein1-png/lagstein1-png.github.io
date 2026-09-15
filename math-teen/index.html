@@ -1484,7 +1484,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t106 · 2026-09-15";
+var BUILD="t107 · 2026-09-15";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -7819,7 +7819,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t106-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t107-pwa1").catch(function(){});
   });
 }
 </script>
@@ -7827,8 +7827,19 @@ if("serviceWorker" in navigator){
      mount מחזיר false כשאין כתובת שרת, ואז הכפתור אינו נבנה. -->
 <script>
 if(window.TUTOR){
-  /* הניסוח שעל המסך מגיע כ-HTML; לשרת נשלח טקסט בלבד. */
-  var txt=function(x){return String(x==null?"":x).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim()};
+  /* הניסוח שעל המסך מגיע כ-HTML; לשרת נשלח טקסט בלבד.
+
+     **השם הוא `plain` ולא `txt`, וזה לא סגנון.** `var txt=` כאן
+     הוא באותו סקופ כמו `function txt(x,y,s,anchor)` שבונה תוויות
+     SVG (שורה 3771), ו-`var` אינו מוגבל לבלוק — ההשמה הזאת דרסה
+     אותו ברגע ש-`window.TUTOR` קיים, כלומר תמיד. נמדד בדפדפן:
+     `txt.length` היה 1 במקום 4, ו-`txt(140,172,"12")` החזיר
+     `"140"` במקום אלמנט `<text>`.
+
+     התוצאה: **כל תוויות האיורים נמחקו.** בטריגונומטריה רמה 1
+     ה-`expr` ריק והאיור הוא מקור הנתונים היחיד — התלמיד ראה
+     משולש בלי מספרים ונשאל ״מהו cos α?״. שאלה בלי פתרון. */
+  var plain=function(x){return String(x==null?"":x).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim()};
   TUTOR.mount({
     app:"math-teen",
     lang:function(){return (typeof state!=="undefined"&&state.settings&&state.settings.lang)||"he"},
@@ -7838,18 +7849,18 @@ if(window.TUTOR){
          משפחת המתמטיקה: ask / expr / options[].ok
          משפחת החידון:   prompt / subject / opts[].ok / answer */
       var x=(typeof P!=="undefined")?P.q:null; if(!x)return null;
-      var o=x.opts||x.options||[], ok=x.answer!=null?txt(x.answer):null, i;
-      if(!ok)for(i=0;i<o.length;i++)if(o[i].ok)ok=txt(o[i].t||o[i].h);
-      var line=txt(x.prompt||x.ask);
+      var o=x.opts||x.options||[], ok=x.answer!=null?plain(x.answer):null, i;
+      if(!ok)for(i=0;i<o.length;i++)if(o[i].ok)ok=plain(o[i].t||o[i].h);
+      var line=plain(x.prompt||x.ask);
       /* ב-english השדה הזה הוא אובייקט ולא מחרוזת, ובלי הפריקה
          הזאת נשלח לשרת "[object Object]". נמדד בדפדפן. */
       var sb=x.subject;
       if(sb&&typeof sb==="object")sb=sb.h||sb.t||sb.text||sb.w||"";
-      if(sb)line+=" — "+txt(sb);
-      if(x.lead)line+=" "+txt(x.lead);
-      if(x.expr)line+=" "+txt(x.expr);
+      if(sb)line+=" — "+plain(sb);
+      if(x.lead)line+=" "+plain(x.lead);
+      if(x.expr)line+=" "+plain(x.expr);
       return {expr:line.trim()||null, ans:ok||null,
-              topic:txt(x.topicName||x.tid||"")||null,
+              topic:plain(x.topicName||x.tid||"")||null,
               level:(typeof state!=="undefined"&&state.track)?("מסלול "+state.track):
                     (x.level!=null?("רמה "+x.level):null)};
     },
