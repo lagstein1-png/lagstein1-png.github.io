@@ -75,21 +75,35 @@ if (bad) console.log('  הכתיב הוא ג׳וש בגרש עברי U+05F3 — 
    הערות וקוד אינם נסרקים כאן: `josh-face.js` ו-`josh-state.js`
    נשארים בשמם בכוונה, וזה מתועד ב-`CLAUDE.md`.
    ===================================================================== */
-const SHOWN = /(?:^|[,{\s])(btn|greet|title|ph|wait|hello|stuck|frustrated)\s*:\s*"((?:[^"\\]|\\.)*)"/g;
+/* **`petJoshName` נוסף 16.9.2026, והוא הראה שהבדיקה צרה מדי.**
+   השם הישן שרד בארבע שפות ב-`math-app` — החיה שהילד מקבל
+   נקראה ״פאולה״ בזמן שכפתור העזרה באותו מסך אמר ״ברק״, ושלוש
+   זהויות ישבו במסך אחד: ״רובוט״ (התווית), ״פאולה״ (השם המוצע)
+   ו״ברק״ (העוזר). הבדיקה עברה ירוק מפני שסרקה את `tutor.js`
+   בלבד, ו-`SHOWN` לא הכיר את המפתח. */
+const SHOWN = /(?:^|[,{\s])(btn|greet|title|ph|wait|hello|stuck|frustrated|petJoshName)\s*:\s*"((?:[^"\\]|\\.)*)"/g;
 /* **שני שמות ישנים, לא אחד — 15.9.2026.** הבעלים החליף ג׳וש→פאולה
    ב-14.9, ולמחרת פאולה→ברק. שניהם נשמרים כאן: העתקה הבאה עלולה
    להחזיר כל אחד מהם למחרוזת שהלומד רואה. */
 const OLDNAME = /ג׳וש|جوش|Джош|Josh|פאולה|باولا|Паула|Paula/;
 let nameBad = 0, shown = 0;
-const tf = path.join(ROOT, 'tutor', 'tutor.js');
-if (fs.existsSync(tf)) {
+/* **הסריקה אינה על tutor.js בלבד — הורחבה 16.9.2026.** השם הישן
+   שרד ב-math-app/index.html בארבע שפות (`petJoshName:"פאולה"`),
+   והבדיקה עברה ירוק מפני שלא הסתכלה שם. כל HTML שנעקב נסרק
+   עכשיו, ולכן המחבוא הבא מכוסה מאליו. */
+const SRCS = [path.join(ROOT, 'tutor', 'tutor.js')].concat(
+  execFileSync('git', ['ls-files', '*.html'], { cwd: ROOT, encoding: 'utf8' })
+    .split('\n').filter(Boolean).map(f => path.join(ROOT, f)));
+for (const tf of SRCS) {
+  if (!fs.existsSync(tf)) continue;
+  const rel = path.relative(ROOT, tf);
   const src = fs.readFileSync(tf, 'utf8');
   let m; SHOWN.lastIndex = 0;
   while ((m = SHOWN.exec(src))) {
     shown++;
     if (OLDNAME.test(m[2])) {
       nameBad++;
-      console.log(`✗ tutor/tutor.js — ${m[1]} נושא את השם הישן: ${m[2].slice(0, 46)}`);
+      console.log(`✗ ${rel} — ${m[1]} נושא את השם הישן: ${m[2].slice(0, 46)}`);
     }
   }
 }
