@@ -515,6 +515,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/letters.js               # אורך המכתב שהכותרת מבטיחה, מול המכתב עצמו
     node .claude/qa/skill.js                 # דף בניית האפליקציה — אות BUILD, שער השלבים, וטענת מספר־שורה
     node .claude/qa/srt.js                   # הכתוביות מול טבלאות התסריטים (המחולל: marketing/make-srt.js)
+    node .claude/qa/core.js                  # learning-core/ — חוסם אימוץ כל עוד היא נסחפת מהמנוע החי
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/content.js               # תוכן: תשע משפחות, דוח PASS/REVIEW/FAIL
     node .claude/qa/fresh.js                 # דוח תוכן שמתאר עץ שכבר אינו קיים
@@ -700,8 +701,10 @@ commit ודוחף, וגם מי שמוודא בסוף שהגרסה ומפתח ה�
   (`<title>בדיקת קול</title>`), לא אפליקציית לימוד.
 - `legal/` היא עמוד תנאי השימוש, ו-`img/` ו-`marketing/` אינן דפים.
 - `learning-core/` **אינה אפליקציה ואינה נספרת** — ספריית מנוע
-  משותפת (`core.js`, `core.css`, תבנית ו-53 בדיקות ב-`test.js`)
-  ש**אף אפליקציה אינה טוענת**. הפירוט ב-`ARCHITECTURE.md` §9.
+  משותפת (`core.js`, `core.css`, תבנית ו-**70** בדיקות ב-`test.js`)
+  ש**אף אפליקציה אינה טוענת** — וטוב שכך: נמדד 15.9.2026 שחסרים
+  בה שלושה מארבעת מנגנוני ההקראה ותיקון ה-`pure`. `.claude/qa/core.js`
+  חוסם אימוץ כל עוד הפער קיים. הפירוט ב-`ARCHITECTURE.md` §9.
 
 מי שסופר `ls */index.html` ומשווה לשלוש־עשרה — ימצא סתירה שאינה
 קיימת: `legal/` ו-`voice/` אינן אפליקציות לימוד,

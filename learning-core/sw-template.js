@@ -73,11 +73,25 @@ self.addEventListener('fetch', e => {
   if (req.mode === 'navigate' || url.pathname.endsWith('/index.html')) {
     e.respondWith(
       fetch(req).then(r => {
-        const copy = r.clone();
-        caches.open(CACHE).then(c => c.put('./', copy)).catch(() => {});
+        /* **רק תשובה תקינה נשמרת — תוקן 15.9.2026.** בלי הבדיקה,
+           דף 404 של GitHub Pages נשמר כקליפת האפליקציה ומוגש
+           אופליין במקומה. הקוד החי עושה את זה; התבנית לא עשתה. */
+        if (r && r.status === 200) {
+          const copy = r.clone();
+          /* **תחת כתובת הבקשה עצמה ולא תחת './' — תוקן 15.9.2026.**
+             worker אחד מגיש כמה דפים (/legal/, /voice/), ו-'./' היה
+             מקבל את התוכן של האחרון שנטען. */
+          caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+        }
         return r;
       }).catch(() =>
-        caches.match('./index.html').then(r => r || caches.match('./'))
+        /* **caches.match הגלובלי הוסר מכאן — תוקן 15.9.2026.**
+           ההערה שבע שורות למטה אוסרת אותו במפורש, והשורה הזאת
+           הפרה אותה: `caches.match('./index.html')` בלי שם מטמון
+           סורק את **כל** המטמונים של ה-origin, ולכן עותק שאפליקציה
+           אחרת שמרה עלול לענות ראשון. */
+        caches.open(CACHE).then(c =>
+          c.match('./index.html').then(r => r || c.match('./')))
       )
     );
     return;
