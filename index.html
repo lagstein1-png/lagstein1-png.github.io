@@ -232,6 +232,11 @@ html[lang="ru"] .btn,html[lang="ru"] .t{
   box-shadow:var(--shadow)}
 .btn.ghost:hover{border-color:color-mix(in srgb,var(--brand) 45%,var(--line))}
 .noads{margin:14px 0 0; color:var(--text-soft); font-size:.9rem}
+/* **לדף הבית לא היה כלל `a` כללי, ולכן קישור בלי מחלקה קיבל את
+   כחול ברירת המחדל של הדפדפן — `#0000EE`.** במצב כהה זה 2.04:1
+   על `#0b0f17`, ושני קישורים אמיתיים ישבו שם: ״איך מוסיפים למסך
+   הבית״ ו״למה?״. `--brand` נותן 5.28:1 בבהיר ו-7.72:1 בכהה. */
+a{color:var(--brand)}
 
 /* --- מספרים --- */
 /* ארבע קופסאות נפרדות משכו יותר תשומת לב מהאפליקציות עצמן. לוח אחד
@@ -1072,7 +1077,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=90-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=91-pwa1").catch(function(){});
   });
 }
 </script>
