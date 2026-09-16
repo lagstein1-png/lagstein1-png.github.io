@@ -330,6 +330,27 @@ const BODY = extra => Object.assign({ app: 'math-app', lang: 'he', screen: SCREE
   }
   t('הקבצים המשותפים (tutor/, legal/) מתפרסרים', broken, []);
 
+  /* **השם בארבעה כתבים — 16.9.2026, מריצת barak-live 3.**
+     `CORE` נקב בשם בעברית בלבד, ולכן המודל תעתק אותו איך שבא לו:
+     ״أنا ברק״ בערבית ו-״Я ברק״ ברוסית — אותיות עבריות באמצע משפט
+     שלומד ערבי או רוסי קורא — וגם بارق מול باراك, Барк מול Барак,
+     ו-barak באות קטנה. שלוש מהן **עברו** את ההערכות, מפני שהסף שם
+     היה ארבעה תווים עבריים רצופים ו״ברק״ הוא שלושה.
+
+     שתי הבדיקות כאן סטטיות בכוונה: המכסה החינמית של Gemini נגמרת,
+     ו-`barak-live` אינו זמין לפי דרישה. זה אותו דפוס של `josh.js`,
+     שנועל את הכתיב של ג׳וש. */
+  const NAMES = { he: 'ברק', ar: 'باراك', ru: 'Барак', en: 'Barak' };
+  const coreTxt = String(W.CORE || '');
+  t('CORE נוקב בשם בארבעת הכתבים',
+    Object.keys(NAMES).filter(l => !coreTxt.includes(NAMES[l])), []);
+
+  /* והמוח המקומי חייב לומר בדיוק את אותו שם: שני המוחות עונים
+     לאותו לומד, ושם שונה ביניהם הוא שתי דמויות. */
+  const localTxt = fs.readFileSync(path.join(ROOT, 'tutor/josh-local.js'), 'utf8');
+  t('המוח המקומי אומר את אותם ארבעה שמות',
+    Object.keys(NAMES).filter(l => !localTxt.includes(NAMES[l])), []);
+
   console.log(bad ? `✗ barak.js — ${bad} ממצאים` : '✓ מנוע ברק — החוזה, הפעולות והחיווט');
   process.exit(bad ? 1 : 0);
 })().catch(e => { console.error('✗ barak.js נפל: ' + (e && e.stack || e)); process.exit(1) });
