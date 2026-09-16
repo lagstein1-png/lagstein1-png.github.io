@@ -292,13 +292,26 @@ async function run(){
      נספרה כ״לא ידוע״, האפליקציה הודיעה ״אין במכשיר קול נשי״
      והרימה את הגובה ל-1.45 — על קול נשי אמיתי שהיה בחור.
 
-     שמונה עותקים של המילון, וכולם נבדקים: קול נשי חייב לצאת
+     כל עותקי המילון שבמאגר, וכולם נבדקים: קול נשי חייב לצאת
      נשי, גברי גברי, ו-״Google עברית״ חייב להישאר **לא ידוע** —
      הוא שם יצרן ולא מגדר, וזה הכלל שכתוב ליד המילון עצמו.
      --------------------------------------------------------------- */
-  const DICT = ['bagrut-806/speech.js','math-app/index.html','math-teen/index.html',
-                'math-uni/index.html','math-uni2/index.html','math-uni3/index.html',
-                'reader/index.html','tutor/tutor.js'];
+  /* הרשימה נגזרת ואינה קשיחה. רשימה קשיחה של שמונה קבצים החזיקה
+     כאן עד 16.9.2026, והיא החמיצה חמישה עותקים שלמים: english,
+     history, ulpan, lomda ו-kotvim קוראים למילון V_F/V_M ולא
+     VOICE_F/VOICE_M, ולכן הם לא היו ברשימה — ולא נבדקו מעולם.
+     התיקון של 13.9 פסח עליהם בדיוק מאותה סיבה, והבדיקה שנכתבה
+     לתפוס אותו דיווחה ירוק. זה אותו לקח של changedSinceMain
+     ב-cache.js: מה שנספר ידנית מתיישן בעותק הבא. */
+  const ROOT = path.resolve(__dirname, '..', '..');
+  const DICT = require('child_process')
+    .execSync('git ls-files "*.html" "*.js"', { cwd: ROOT, encoding: 'utf8' })
+    .split('\n')
+    .filter(f => f && !f.startsWith('.claude/') && !f.startsWith('marketing/') &&
+                 !f.startsWith('tests/') && !f.startsWith('learning-core/'))
+    .filter(f => /(?:^|[^A-Za-z_])(?:VOICE_F|V_F)\s*=\s*\/\(/
+                   .test(fs.readFileSync(path.join(ROOT, f), 'utf8')))
+    .sort();
   const CASES = [
     ['Microsoft הילה Online (Natural) - Hebrew (Israel)', 'female'],
     ['Microsoft אברי Online (Natural) - Hebrew (Israel)', 'male'],
@@ -310,8 +323,10 @@ async function run(){
   ];
   for(const f of DICT){
     const src = fs.readFileSync(path.resolve(__dirname, '..', '..', f), 'utf8');
-    const mf = src.match(/var VOICE_F\s*=\s*(\/\(.*?\/)\s*[;\n]/s);
-    const mm = src.match(/var VOICE_M\s*=\s*(\/\(.*?\/)\s*[;\n]/s);
+    /* שני שמות לאותו מילון, ושניהם חוקיים: VOICE_F במשפחה אחת,
+       V_F בשנייה. ההבדל הוא היסטורי ולא מהותי. */
+    const mf = src.match(/var (?:VOICE_F|V_F)\s*=\s*(\/\(.*?\/)\s*[;\n]/s);
+    const mm = src.match(/var (?:VOICE_M|V_M)\s*=\s*(\/\(.*?\/)\s*[;\n]/s);
     if(!mf || !mm){ bad++; console.log('✗ ' + f.padEnd(24) + 'לא נמצא מילון המגדר'); continue }
     let RF, RM;
     try{ RF = eval(mf[1]); RM = eval(mm[1]) }
