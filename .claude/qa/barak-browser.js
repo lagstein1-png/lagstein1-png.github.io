@@ -73,6 +73,8 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
         if (mode === 'unknown') { out.action = { name: 'go_to_moon', args: {} }; out.say = 'טס לירח' }
         if (mode === 'bad-go') { out.action = { name: 'go_screen', args: { name: 'nowhere' } }; out.say = 'עוברים למקום שאינו קיים' }
         if (mode === 'highlight') { out.action = { name: 'highlight_option', args: { index: 1 } }; out.say = 'תראה את האפשרות השנייה' }
+        /* ריצה 5 של barak-live: המודל הכריז על מעבר בלי להחזיר קריאת פונקציה. */
+        if (mode === 'claim') { out.action = null; out.say = 'עוברים לשאלה הבאה.' }
         return r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(out) });
       }
       return u.startsWith(BASE) ? r.continue() : r.abort();
@@ -200,6 +202,29 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
       if (!r.res || r.res.source !== 'local-fallback') F('429 — לא נפל למקומי');
       const note = await page.evaluate(() => (document.querySelector('.tu-note') || {}).textContent || '');
       if (note) F('429 — הוצגה הודעת שגיאה: ' + note);
+    }
+    /* 8 — השרת הכריז על מעבר ולא החזיר פעולה (barak-live ריצה 5).
+       או שהמסך התחלף באמת, או שהטקסט אינו מכריז — שלישית אין. */
+    if (ENTER[app] && actions.indexOf('next_question') >= 0) {
+      await page.evaluate(() => window.TUTOR._clear());
+      const before = await page.evaluate(() => window.BARAK.context());
+      const r = await send('תעבור לשאלה הבאה', 'claim');
+      const after = await page.evaluate(() => window.BARAK.context());
+      const moved = before && after && before.id !== after.id;
+      const claims = r.res && /עוברים לשאלה הבאה/.test(String(r.res.say || ''));
+      if (claims && !moved) F('הכרזה בלי ביצוע — נאמר ״עוברים לשאלה הבאה״ והמסך לא התחלף');
+      if (moved && !(r.res && r.res.action && r.res.action.name === 'next_question')) F('המסך התחלף ולא דווחה פעולה');
+    }
+    /* 9 — הצד השני של אותו שומר: הלומד כתב ״הבא״ בתוך שאלה, והמודל
+       ענה תשובה רגילה. שום דבר לא אמור לזוז. תנאי אחד לבדו — כוונת
+       הלומד בלי הכרזת המודל — היה מדלג לשאלה הבאה באמצע הסבר. */
+    if (ENTER[app] && actions.indexOf('next_question') >= 0) {
+      await page.evaluate(() => window.TUTOR._clear());
+      const before = await page.evaluate(() => window.BARAK.context());
+      const r = await send('מה הצעד הבא בפתרון?', 'text');
+      const after = await page.evaluate(() => window.BARAK.context());
+      if (before && after && before.id !== after.id) F('דילג לשאלה הבאה על שאלה שרק הזכירה ״הבא״');
+      if (r.res && r.res.action) F('דווחה פעולה על תשובה שלא הכריזה על אחת: ' + r.res.action.name);
     }
     if (errs.length) F('pageerror: ' + errs.join(' | '));
     if (out.fails.length) { failed++; console.log('✗ ' + app.padEnd(11) + out.fails.join(' · ')) }
