@@ -948,7 +948,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g110 · 2026-09-16";
+var BUILD="g111 · 2026-09-16";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -11739,6 +11739,7 @@ render();
 <script src="/tutor/josh-state.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -11746,7 +11747,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g110-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g111-pwa1").catch(function(){});
   });
 }
 </script>
@@ -11781,6 +11782,86 @@ if(window.TUTOR){
                     (x.level!=null?("רמה "+x.level):null)};
     },
     stopHost:function(){try{stopSpeak()}catch(e){}}
+  });
+  /* ---- מנוע ברק — המתאם של האפליקציה (16.9.2026) ----
+     כמו ב-math-app: getScreenContext מחזיר מה שמוצג עכשיו, ו-actions
+     הן מה שברק רשאי לעשות כאן; כל אחת מחזירה true רק כשבאמת קרה
+     משהו. `txt` הוא העוזר שהוצהר למעלה — אין כאן עוזר שני. */
+  if(window.BARAK)BARAK.register({
+    app:"math-uni3",
+    getScreenContext:function(){
+      var x=(typeof P!=="undefined"&&P)?P.q:null;
+      if(!x||view!=="practice"||P.phase==="done")return null;
+      var o=x.options||[],ok=null,st=null,tr=null,i;
+      for(i=0;i<o.length;i++)if(o[i].ok)ok=txt(o[i].t||o[i].h);
+      /* הבחירה השגויה האחרונה של הלומד, לא כל מה שסומן */
+      for(i=P.picked.length-1;i>=0;i--)if(o[P.picked[i]]&&!o[P.picked[i]].ok){st=txt(o[P.picked[i]].t||o[P.picked[i]].h);break}
+      for(i=0;i<TRACKS.length;i++)if(TRACKS[i].v===state.track)tr=TRACKS[i].t;
+      var line=(txt(x.ask)+" "+txt(x.expr)).trim(),tn=txt(x.topicName||x.topic);
+      return {id:"q"+P.i+"-"+line.slice(0,60), type:P.phase==="ask"?"mcq":"reveal",
+        q:line, options:o.map(function(p){return txt(p.t||p.h)}),
+        correct:ok, student:st, topic:tn||null,
+        level:"רמה "+x.level+" מתוך "+LVL_HE.length+(LVL_HE[x.level-1]?" — "+LVL_HE[x.level-1]:""),
+        curriculum:"מתמטיקה שנה ג׳"+(tr?" — "+tr:"")+(tn?" — "+tn:"")};
+    },
+    actions:{
+      next_question:{desc:"עובר לשאלה הבאה; באמצע שאלה — מחליף אותה בשאלה אחרת באותו מקום בסבב",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase==="done")return false;
+          if(P.phase==="reveal"){advance();return true}
+          /* שאלה שלא נענתה אינה נספרת — אותו מהלך שהאפליקציה עושה
+             כשמחליפים רמה באמצע שאלה. מחולל קטן יכול להחזיר את אותה
+             שאלה, ואז מנסים שוב; אם נשארה זהה, barak-core רואה
+             שהמזהה לא זז ומדווח כישלון. */
+          var was=txt(P.q.ask)+txt(P.q.expr),n=0;
+          do{loadQ();n++}while(n<4&&txt(P.q.ask)+txt(P.q.expr)===was);
+          stopSpeak();window.scrollTo(0,0);render();return true;
+        }},
+      show_hint:{desc:"מציג את הרמז לשאלה שעל המסך ומקריא אותו",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase!=="ask"||!P.q.hint)return false;
+          if(!P.hints){onAction("hint",null);return P.hints>0}
+          /* הרמז כבר פתוח — מפנים אליו */
+          speak(speakProse(P.q.hint));
+          return BARAK.highlight(document.querySelector(".hintbox"));
+        }},
+      read_aloud:{desc:"מקריא את השאלה והאפשרויות בקול",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase==="done"||!state.settings.tts)return false;
+          readQuestion();return true;
+        }},
+      repeat_question:{desc:"מקריא את השאלה עוד פעם",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase==="done"||!state.settings.tts)return false;
+          readQuestion();return true;
+        }},
+      highlight_option:{desc:"מדגיש במסך אחת מהאפשרויות, לפי מקומה (0 עד 3)",
+        params:{index:{type:"integer",min:0,max:3,required:true}},
+        run:function(a){
+          if(view!=="practice"||!P.q||P.phase!=="ask"||a.index>=P.q.options.length)return false;
+          return BARAK.highlight(document.querySelector('[data-a="ans"][data-i="'+a.index+'"]'));
+        }},
+      explain_again:{desc:"מפנה אל הפתרון המודרך ומקריא אותו שוב, אחרי שהשאלה נענתה",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase!=="reveal"||!P.q.steps.length)return false;
+          /* קודם ההקראה ואחריה ההדגשה: ב-math-teen speak מרנדר את המסך
+             מחדש, והדגשה שקדמה לו הייתה נמחקת. */
+          readSteps();BARAK.highlight(document.querySelector(".steps"));return true;
+        }},
+      go_screen:{desc:"עובר למסך אחר של האפליקציה",
+        params:{name:{type:"string",enum:["home","practice","topics","formulas","progress","settings"],required:true}},
+        run:function(a){
+          if(!state.onboarded||view==="sit")return false;
+          goto(a.name);return view===a.name;
+        }},
+      formula_sheet:{desc:"פותח את דף הנוסחאות; אם לשאלה יש נוסחה — מגלגל אליה",
+        run:function(){
+          if(!state.onboarded||view==="sit")return false;
+          if(view==="practice"&&P.q&&P.q.rule){fq="";pendingScroll="f-"+P.q.rule}
+          if(view==="formulas")window.scrollTo(0,0);else goto("formulas");
+          return view==="formulas";
+        }}
+    }
   });
   try{render()}catch(e){}
 }

@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x69 · 2026-09-16";
+  var BUILD = "x70 · 2026-09-16";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -973,6 +973,121 @@
       },
       stopHost: function () { try { window.Speech.stop() } catch (e) {} }
     });
+    /* ---- מנוע ברק — המתאם של האפליקציה (16.9.2026) ----
+       בתרגול כל סעיפי הנושא מוצגים יחד, ולכן ״הסעיף שעל המסך״ הוא
+       TUT_ID — הסעיף שהלומד פתח עליו את המורה — ובלעדיו הסעיף
+       הראשון של הנושא. next_question מזיז את TUT_ID, ולכן q() של
+       הפאנל וההקשר של ברק מדברים על אותו סעיף.
+       בסימולציה אין הקשר ואין פעולות: שם אין רמזים ואין פתרונות,
+       וההקשר נושא את התשובה הנכונה. אין דף נוסחאות באפליקציה,
+       ולכן אין formula_sheet. */
+    if (window.BARAK) {
+      /* סעיפי הנושא הפעיל, בסדר שבו הם על המסך */
+      var bkSubs = function () {
+        var ex = examById(state.examId);
+        return ex ? simSubs(ex).filter(function (it) { return it.q.topic === state.topic; }) : [];
+      };
+      var bkCur = function () {
+        if (state.screen !== "practice") return null;
+        var list = bkSubs();
+        for (var i = 0; i < list.length; i++) if (list[i].id === TUT_ID) return list[i];
+        return list[0] || null;
+      };
+      /* מעבר לסעיף: המזהה, גלילה, ופוקוס על כותרתו — כמו ב-go() */
+      var bkGoto = function (it) {
+        TUT_ID = it.id;
+        var h = elIn("t-" + it.id);
+        if (h) { try { h.scrollIntoView({ block: "start" }); } catch (e) {} focusEl(h); }
+        say("שאלה " + it.q.number + " סעיף " + it.sub.letter);
+      };
+      BARAK.register({
+        app: "bagrut-806",
+        getScreenContext: function () {
+          var it = bkCur();
+          if (!it) return null;
+          var txt = function (x) {
+            return String(x == null ? "" : x).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+          };
+          var st = pOf(it.id);
+          return {
+            id: state.examId + ":" + it.id,
+            type: st.sol || (st.res && st.res.ok) ? "reveal" : "open",
+            /* הגוף של השאלה קודם: הסעיף לבדו (״מצאו את הנגזרת״) אינו
+               אומר של מה. נמדד — הארוך ביותר 290 תווים, מתחת ל-400. */
+            q: txt(it.q.text) + " " + it.sub.letter + ". " + txt(it.sub.text) +
+               (it.sub.latex ? "  " + txt(it.sub.latex) : ""),
+            correct: it.sub.finalAnswer ? txt(answerText(it.sub.finalAnswer)) : null,
+            student: st.val ? txt(st.val) : null,
+            topic: it.q.topic || null,
+            level: "שאלון 806",
+            curriculum: "בגרות במתמטיקה שאלון 806 — " + (it.q.topic || "")
+          };
+        },
+        actions: {
+          next_question: { desc: "עובר לסעיף הבא בתרגול; בסוף הנושא — לנושא הבא",
+            run: function () {
+              var cur = bkCur();
+              if (!cur) return false;
+              var list = bkSubs(), i = 0;
+              while (i < list.length && list[i].id !== cur.id) i++;
+              if (list[i + 1]) { bkGoto(list[i + 1]); return true; }
+              var topics = topicsOf(examById(state.examId));
+              var t = topics[topics.indexOf(state.topic) + 1];
+              if (!t) return false;
+              state.topic = t; renderPractice();
+              var first = bkSubs()[0];
+              if (!first) return false;
+              bkGoto(first); return true;
+            } },
+          show_hint: { desc: "חושף את הרמז הבא של הסעיף שעל המסך",
+            run: function () {
+              var cur = bkCur();
+              if (!cur) return false;
+              var st = pOf(cur.id);
+              if (st.shown >= (cur.sub.steps || []).length) return false;
+              keepVal(cur.id); st.shown++; renderAns(cur.id);
+              focusEl(lastIn(cur.id, ".hint .grow"));
+              say("רמז " + st.shown);
+              return true;
+            } },
+          read_aloud: { desc: "מקריא את הסעיף שעל המסך, עם הנוסחה שלו",
+            run: function () {
+              var cur = bkCur();
+              if (!cur || !window.Speech || !window.Speech.available()) return false;
+              var units = readUnits(cur.id);
+              if (!units.length) return false;
+              window.Speech.speak(units, cur.id); return true;
+            } },
+          repeat_question: { desc: "מקריא שוב את השאלה כולה, על כל סעיפיה",
+            run: function () {
+              var cur = bkCur();
+              if (!cur || !window.Speech || !window.Speech.available()) return false;
+              var id = "q" + cur.q.number + "all";
+              var units = readUnits(id);
+              if (!units.length) return false;
+              window.Speech.speak(units, id); return true;
+            } },
+          explain_again: { desc: "פותח את הפתרון המלא — רק אחרי שהלומד בדק תשובה",
+            run: function () {
+              var cur = bkCur();
+              if (!cur) return false;
+              var st = pOf(cur.id);
+              if (!st.res) return false;
+              keepVal(cur.id); st.sol = true; renderAns(cur.id);
+              if (!elIn("d-" + cur.id)) return false;
+              focusEl(lastIn(cur.id, ".solution .grow"));
+              say("הפתרון המלא נפתח.");
+              return true;
+            } },
+          go_screen: { desc: "עובר למסך אחר של האפליקציה",
+            params: { name: { type: "string", enum: SCREENS.slice(), required: true } },
+            run: function (a) {
+              go(a.name);
+              return state.screen === a.name;
+            } }
+        }
+      });
+    }
   }
 
   function sayClick(el) {
@@ -1201,7 +1316,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x69-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x70-pwa1").catch(function () {});
     });
   }
 

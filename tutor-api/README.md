@@ -9,6 +9,37 @@
 והתיקייה אינה מוגשת ל-GitHub Pages כדף. היא הקוד שרץ במקום אחר —
 בשירות פונקציות — ומחזיק את מפתח ה-API.
 
+## מנוע ברק — `POST /ask` · 16.9.2026
+
+**נקודת קצה אחת לכל האפליקציות ולפרויקטים הבאים.** הגוף:
+
+    { app, lang, target?, sign?, mode: "chat"|"hint"|"explain"|"nudge",
+      screen: { id, type, q, options[], correct, student, topic, curriculum, level },
+      userText, history: [{role, text}] (עד 8 = ארבעה חילופים),
+      actions: [{ name, desc, params: { k: {type, enum?, min?, max?, required?} } }] }
+
+התשובה: `{ say, text, action|null, face, source:"ai", model, checked }`.
+`text` הוא `say` (ללקוח הישן). `face` הוא אחד מעשרת אירועי
+`josh-face.js`. 429 (`scope: "you"|"all"`) ו-503 נושאים
+`fallback: "local"` — הלקוח עונה מהמכשיר. הגוף הישן (`q`,
+`messages`) עדיין מתקבל ב-`/` וב-`/ask`, ומנורמל לאותו מנוע.
+`GET /health` עונה בלי מפתח ובלי פנייה לספק.
+
+- **פעולות** — `ACTION_NAMES` הוא האוצר הקבוע; הבקשה מצהירה תת־קבוצה,
+  ו-`tools` ל-Gemini נבנה ממנה בלבד. `validateAction` זורק שם לא
+  מוכר, פרמטר מסוג שגוי, מחוץ ל-`enum` או לטווח.
+- **שרשרת המודלים** — `discoverModels` מושך `GET /v1beta/models` פעם
+  לשש שעות ומדרג Flash → Flash-Lite (בלי preview/pro); 404/429/5xx
+  מעבירים למודל הבא; נגמרה — 503 ללקוח. שמות אינם נקבעים מהזיכרון.
+- **הגבלת קצב** — לכל IP בזיכרון ה-isolate; הגלובלי צובר ונכתב
+  ל-KV כל 25 פניות או 10 דקות (`FLUSH_EVERY`, `FLUSH_MS`). נמדד:
+  40 כתיבות ל-1,000 פניות. `PER_DAY` ו-`GLOBAL_PER_DAY` כמשתני
+  סביבה דורסים את `LIM`.
+- **סטייג׳ינג** — `wrangler deploy --env staging` → `tutor-staging`
+  עם KV נפרד (`RATE_STAGING`), מ-`.github/workflows/deploy-tutor-staging.yml`.
+- **בדיקות** — `node .claude/qa/barak.js` (מוק), `node tutor-api/local/evals.mjs --mock`
+  (208 תרחישים), ו-`barak-live.yml` (Gemini אמיתי, עד 60 קריאות).
+
 ## למה זה קיים בכלל
 
 האתר מתארח ב-GitHub Pages, שהוא **סטטי**. מפתח API בקובץ סטטי הוא
@@ -22,7 +53,7 @@
 **הוראות המערכת** נמצאות ב-`worker.js` ואינן נשלחות מהדפדפן.
 דפדפן אפשר לערוך; שרת לא. שתי שכבות:
 
-- `CORE` — 32 שורות ההתנהגות, זהות בכל האפליקציות ובכל השפות.
+- `CORE` — 35 שורות ההתנהגות (33, ושתיים של מנוע ברק מ-16.9.2026), זהות בכל האפליקציות ובכל השפות.
   זו האישיות של ג׳וש — מי הוא, איך הוא מדבר, איך הוא מלמד ומה
   אסור לו — והנימוק של כל שורה נמצא ב-`JOSH.md` שבשורש המאגר.
   זה הבלוק שנשלח ראשון ולכן הוא זה שנשמר במטמון.
@@ -38,8 +69,10 @@
 בשפה הנלמדת בסימנים `« »`, והדפדפן מקריא כל קטע כזה בקול של
 אותה שפה — כך שפת ההסבר והשפה הנלמדת אינן מתערבבות.
 
-הדפדפן שולח שלושה דברים בלבד: התרגיל שעל המסך, השפה, וההודעות
-שהתלמיד כתב. לא שם, לא מזהה, ולא ההתקדמות שלו.
+הדפדפן שולח את מה שעל המסך (השאלה, האפשרויות, התשובה הנכונה, מה
+התלמיד ענה, הנושא והתוכנית), השפה, עד ארבעה חילופי דברים, ורשימת
+הפעולות שהאפליקציה מציעה — ראו ״מנוע ברק״ למעלה. לא שם, לא מזהה,
+ולא ההתקדמות שלו; `legal/terms.js` 1.7 אומר את זה בארבע השפות.
 
 ## פריסה — Cloudflare Workers
 
@@ -52,7 +85,7 @@
 
 2. **Settings → Variables and Secrets**, ולהוסיף **שני** שדות:
 
-       ANTHROPIC_API_KEY = המפתח        ← כ-Secret
+       GEMINI_API_KEY = המפתח           ← כ-Secret (Claude: ANTHROPIC_API_KEY עם PROVIDER=anthropic)
        ALLOW_NO_RATE_LIMIT = yes        ← כ-Variable רגיל
 
    **Secret ולא Variable** למפתח: Variable נראה בממשק, Secret לא.

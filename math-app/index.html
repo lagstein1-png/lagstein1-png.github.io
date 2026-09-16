@@ -2168,7 +2168,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b120 · 2026-09-16";
+var BUILD="b121 · 2026-09-16";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4586,6 +4586,7 @@ render();
 <script src="/tutor/josh-state.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -4593,7 +4594,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b120-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b121-pwa1").catch(function(){});
   });
 }
 </script>
@@ -4616,6 +4617,65 @@ if(window.TUTOR){
       return x?{expr:x.expr,ans:x.answer,level:"רמה "+activeLevel()+" מתוך 6"}:null;
     },
     stopHost:function(){try{stopSpeak()}catch(e){}}
+  });
+  /* ---- מנוע ברק — המתאם של האפליקציה (16.9.2026) ----
+     getScreenContext מחזיר מה שמוצג עכשיו; actions הן מה שברק
+     רשאי לעשות כאן, וכל אחת מחזירה true רק כשבאמת קרה משהו.
+     math-app היא התבנית לשאר האפליקציות. */
+  if(window.BARAK)BARAK.register({
+    app:"math-app",
+    getScreenContext:function(){
+      var q=P&&P.ses?P.ses[P.qi]:null;
+      if(!q||view!=="practice"||P.phase==="done")return null;
+      var t=T(),kind={add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[q.kind]||q.kind;
+      return {id:"r"+P.qi+"-"+q.expr, type:P.phase==="ask"?"mcq":"reveal",
+        q:q.text+" ("+q.expr+")", options:q.options.map(String),
+        correct:String(q.answer), student:P.wrong.length?String(P.wrong[P.wrong.length-1]):null,
+        topic:kind, level:"רמה "+activeLevel()+" מתוך 6",
+        curriculum:"חשבון ליסודי, כיתות א׳–ו׳: "+kind+", מספרים עד "+(10+Math.min(activeLevel(),6)*8)};
+    },
+    actions:{
+      next_question:{desc:"עובר לשאלה הבאה; באמצע שאלה — מדלג עליה",
+        run:function(){
+          if(view!=="practice"||P.phase==="done")return false;
+          if(P.phase==="reveal"){advance();return true}
+          onAction("skip",null);return true;
+        }},
+      show_hint:{desc:"מציג את הרמז הבא לשאלה שעל המסך",
+        run:function(){
+          if(view!=="practice"||P.phase!=="ask"||P.hints>=3)return false;
+          var n=P.hints;onAction("hint",null);return P.hints>n;
+        }},
+      read_aloud:{desc:"מקריא את השאלה בקול",
+        run:function(){
+          if(view!=="practice"||!P.ses[P.qi]||P.phase==="done")return false;
+          onAction("listen",null);return true;
+        }},
+      highlight_option:{desc:"מדגיש במסך אחת מארבע האפשרויות, לפי מקומה (0 עד 3)",
+        params:{index:{type:"integer",min:0,max:3,required:true}},
+        run:function(a){
+          var q=P.ses[P.qi];if(!q||P.phase!=="ask")return false;
+          return BARAK.highlight(document.querySelector('[data-o="'+q.options[a.index]+'"]'));
+        }},
+      explain_again:{desc:"מציג ומקריא שוב את ההסבר, אחרי שהשאלה נענתה",
+        run:function(){
+          var q=P.ses[P.qi];if(!q||P.phase!=="reveal")return false;
+          setBubble(q.explain,"think");speak(q.explain);return true;
+        }},
+      go_screen:{desc:"עובר למסך אחר של האפליקציה",
+        params:{name:{type:"string",enum:["practice","progress","records","settings"],required:true}},
+        run:function(a){
+          if(!state.pet||P.brk)return false;
+          stopSpeak();view=a.name;
+          if(view!=="practice")startRound(activeLevel());
+          render();window.scrollTo(0,0);return view===a.name;
+        }},
+      slow_mode:{desc:"פותח את המצב האיטי: אותה שאלה צעד אחר צעד, עם עיגולים",
+        run:function(){
+          var q=P.ses[P.qi];if(!q||P.phase!=="ask"||!SlowMode.can(q))return false;
+          if(state.settings.soundFx)sfxHint();SlowMode.open(q);return true;
+        }}
+    }
   });
   try{render()}catch(e){}
 }

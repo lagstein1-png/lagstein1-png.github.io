@@ -6,6 +6,9 @@
 #
 # **תקרה קשיחה: 60 קריאות לריצה** (LIVE_CAP, מנדט מנוע ברק), כדי לא
 # לשרוף את המכסה החינמית. ריצה שנעצרה בתקרה אומרת זאת בסיכום.
+#
+# **ו-LIVE_GAP_MS אינו נוי:** המכסה שנגמרה בריצות 1 ו-2 הייתה לדקה
+# ולא ליום, ולכן ריצה בלי השהיה אינה מסוגלת להשלים 60 קריאות.
 # ברירת המחדל: math-app ו-english בארבע השפות = 32 תרחישים = עד 64
 # קריאות (ניסיון שני של השומר נספר) — כלומר הריצה תיעצר ב-60.
 #
@@ -42,6 +45,10 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY || secrets.GOOGLE_API_KEY || secrets.GOOGLE_AI_KEY || vars.GEMINI_API_KEY || vars.GEMINI_KEY }}
           LIVE_CAP: '60'
+          # השהיה בין קריאות. ה-429 שנמדד בריצות 1 ו-2 היה מכסה
+          # **לדקה**: 60 קריאות ב-31 שניות נחסמו אחרי כעשר, ושתי
+          # דקות אחר כך שמונה עברו נקי. 4 שניות ≈ 15 לדקה.
+          LIVE_GAP_MS: '4000'
           EVALS_OUT: /tmp/barak-evals.json
           APPS_IN: ${{ github.event.inputs.apps }}
           LANGS_IN: ${{ github.event.inputs.langs }}

@@ -552,9 +552,31 @@ function speakSeg(text, code, r, alive, done){
 
 /* ================= הפאנל ================= */
 var CSS = ''
-+'#tu-ov{position:fixed;inset:0;background:rgba(20,30,35,.55);display:none;'
-+'place-items:center;z-index:9000;padding:16px}'
+/* ---- מנוע ברק, 16.9.2026: הפאנל אינו מסתיר את התרגיל ----
+
+   עד כאן הפאנל היה חלון במרכז המסך מעל רקע מוחשך — כלומר ברק
+   כיסה את השאלה, את האפשרויות ואת הכפתורים בדיוק ברגע שהלומד
+   ביקש עזרה עליהם, ופעולה כמו ״הדגש אפשרות״ הייתה קורית מאחורי
+   וילון. המנדט: ״ברק הוא עזר ולא המטרה. הוא לא מסתיר שאלה,
+   תשובות או כפתורים״.
+
+   **הבחירה השמרנית** (D-17, ממתין לאישור יהושע): אותה קופסה,
+   אותם צבעים, אותו דיוקן — רק המיקום. בטלפון: גיליון תחתון עד
+   46vh, בלי הכהיה, והמסך שמעליו חי ולחיץ; במסך רחב (≥ 900px):
+   עמודה בצד ההתחלה של הכתיבה, ברוחב 400px, לגובה המסך.
+   `#tu-min` מקפל את הגיליון לפס של שורת קלט אחת. הלחיצה מחוץ
+   לקופסה כבר אינה סוגרת — יש X ויש Escape. */
++'#tu-ov{position:fixed;inset:0;background:transparent;display:none;'
++'place-items:end center;z-index:9000;padding:0;pointer-events:none}'
 +'#tu-ov.on{display:grid}'
++'#tu-ov.on>#tu-bx{pointer-events:auto}'
++'#tu-ov.tu-min #tu-log,#tu-ov.tu-min #tu-pv,#tu-ov.tu-min #tu-q{display:none}'
++'#tu-ov.tu-min #tu-bx{max-height:none}'
++'#tu-min{background:transparent;border:1px solid rgba(23,51,60,.25);border-radius:9px;'
++'padding:5px 10px;font:inherit;cursor:pointer;color:#17333c}'
++'@media(min-width:900px){#tu-ov{place-items:stretch start;padding:0}'
++'#tu-bx{max-width:400px;max-height:none;border-radius:0;height:100%;'
++'box-shadow:8px 0 30px rgba(0,0,0,.18)}}'
 /* טיפוגרפיה לדיסלקציה, בהוראת הבעלים 14.9.2026.
 
    הקהל כאן הוא ילדים שמפענחים כל שורה פעמיים, ולכן ארבעת
@@ -571,8 +593,8 @@ var CSS = ''
                      מהקוראים
 
    **ואין נטוי בשום מקום בפאנל** — ראו הכלל מתחת ל-`.tu-m em`. */
-+'#tu-bx{background:#fff;color:#17333c;border-radius:20px;width:100%;max-width:540px;'
-+'max-height:88vh;display:flex;flex-direction:column;overflow:hidden;'
++'#tu-bx{background:#fff;color:#17333c;border-radius:20px 20px 0 0;width:100%;max-width:540px;'
++'max-height:46vh;display:flex;flex-direction:column;overflow:hidden;'
 +'box-shadow:0 18px 50px rgba(0,0,0,.3);font-size:19px;line-height:1.75;'
 +'letter-spacing:.01em;word-spacing:.05em}'
 /* נטוי הוא הצורה שהכי קשה לפענח בדיסלקציה: האותיות נשענות זו על
@@ -666,9 +688,10 @@ function build(){
   document.head.appendChild(st);
   var ov = document.createElement("div"); ov.id = "tu-ov";
   ov.innerHTML =
-    '<div id="tu-bx" role="dialog" aria-modal="true" aria-labelledby="tu-ti">'
+    '<div id="tu-bx" role="dialog" aria-modal="false" aria-labelledby="tu-ti">'
     + '<div id="tu-hd"><span id="tu-face"></span><b id="tu-ti"></b><span id="tu-q" hidden></span>'
     + '<select id="tu-lg" hidden></select>'
+    + '<button id="tu-min" type="button" aria-expanded="true"></button>'
     + '<button id="tu-x" type="button"></button></div>'
     + '<div id="tu-log" aria-live="polite"></div>'
     + '<div id="tu-ft"><div id="tu-row">'
@@ -714,6 +737,12 @@ function build(){
     go: ov.querySelector("#tu-go"), pv: ov.querySelector("#tu-pv")
   };
   EL.x.onclick = close;
+  EL.min = ov.querySelector("#tu-min");
+  EL.min.onclick = function(){
+    var on = ov.classList.toggle("tu-min");
+    EL.min.setAttribute("aria-expanded", on ? "false" : "true");
+    draw();
+  };
   EL.lg.onchange = function(){
     setLang(this.value);
     /* שפה חדשה — שיחה חדשה, אחרת הבוט ממשיך בשפה הקודמת */
@@ -722,7 +751,6 @@ function build(){
   };
   EL.go.onclick = function(){ send(EL.inp.value) };
   wireMic(ov);
-  ov.addEventListener("click", function(e){ if(e.target === ov) close() });
   EL.inp.addEventListener("keydown", function(e){
     if(e.key === "Enter"){ e.preventDefault(); e.stopPropagation(); send(EL.inp.value) }
   });
@@ -756,6 +784,7 @@ function draw(){
   e.bx.setAttribute("dir", d);
   e.ti.textContent = t.title;
   e.x.textContent = t.close;
+  if(e.min) e.min.textContent = e.ov.classList.contains("tu-min") ? "▴" : "▾";
   e.go.textContent = t.send;
   e.inp.placeholder = t.ph;
   e.inp.setAttribute("aria-label", t.ph);
@@ -1130,7 +1159,51 @@ function replyLocal(text, why){
   return true;
 }
 
+/* ---- מנוע ברק, 16.9.2026 ----------------------------------------
+   כשהדף טען את `/tutor/barak-core.js` והאפליקציה רשמה מתאם, הקריאה
+   לשרת עוברת דרכו: הוא אוסף את ההקשר המלא של המסך (שאלה, אפשרויות,
+   תשובה נכונה, מה התלמיד ענה, נושא, תוכנית), שולח את רשימת הפעולות
+   שהאפליקציה מציעה, **מבצע** את הפעולה שהמודל בחר, ונופל למוח
+   המקומי בכל כישלון — בלי שגיאה ללומד. הפאנל הזה נשאר הפאנל:
+   ההודעות, החשיפה ההדרגתית, ההקראה והפנים כולם כאן.
+
+   `sendLegacy` הוא הנתיב הישן, לדף שלא טען את המנוע. */
 function send(text, auto){
+  if(typeof BARAK === "undefined" || !BARAK.ready()) return sendLegacy(text, auto);
+  var t = T();
+  text = String(text || "").trim().slice(0, MAXLEN);
+  if(!text || BUSY) return;
+  if(MSGS.length >= TURNS){ NOTE = t.full; draw(); return }
+  stopReveal();
+  MSGS.push({ role:"user", text:text });
+  if(EL) EL.inp.value = "";
+  BUSY = true; NOTE = ""; draw();
+  /* `online` שלילי — לא מנסים את השרת: אין רשת, או שהמונה במכשיר
+     נגמר. המונה עולה רק כשהשרת מנוסה. */
+  var tryServer = !!API && navigator.onLine !== false && left() > 0;
+  if(tryServer) bump();
+  var hist = (MSGS.length && MSGS[0].role === "assistant") ? MSGS.slice(1, -1) : MSGS.slice(0, -1);
+  BARAK.ask(text, {
+    api: API, lang: lang(), target: CFG.target || null,
+    sign: sign(),
+    q: CFG.q ? CFG.q() : null,
+    history: hist, mode: "chat",
+    online: tryServer,
+    why: !API ? "" : navigator.onLine === false ? "offline" : "quota"
+  }).then(function(res){
+    BUSY = false;
+    if(!res || !res.say){ NOTE = t.err; if(auto) MSGS = []; draw(); return }
+    /* תשובה מקומית מסומנת ללומד — ראו replyLocal. */
+    MSGS.push({ role:"assistant", text:res.say, local: (API && res.source !== "ai") ? (res.why || "local") : "" });
+    startReveal(MSGS.length - 1);
+    draw(); focus();
+  }, function(){
+    BUSY = false;
+    if(!replyLocal(text, "network")){ NOTE = t.err; draw() }
+  });
+}
+
+function sendLegacy(text, auto){
   var t = T();
   text = String(text || "").trim().slice(0, MAXLEN);
   if(!text || BUSY) return;
@@ -1275,6 +1348,13 @@ g.TUTOR = {
   close: close,
   /* לבדיקות בלבד — אינם נקראים מהאפליקציות */
   _state: function(){ return { api:API, msgs:MSGS, playing:PLAYING, lang:lang(), dir:DIR[lang()] } },
+  /* **מאפס את השיחה, ורק לבדיקות.** `barak-browser.js` מריץ שבעה
+     תרחישים על אותה שאלה, וכל אחד מוסיף שני תורים — כלומר התרחיש
+     השביעי נבלם ב-`TURNS` ולא רץ כלל, והבדיקה נראתה עוברת בשישה
+     ונפלה בשביעי על הודעת ״דיברנו על זה הרבה״. זה קרה על הרנר
+     ולא מקומית, מפני שהסף נחצה בדיוק שם (ריצה 617, `english`).
+     לומד אינו קורא לזה: `TURNS` הוא בלם אמיתי ונשאר כפי שהוא. */
+  _clear: function(){ stopReveal(); MSGS = []; NOTE = ""; if(EL) draw(); return true },
   /* בחירת הקול חשופה כדי שאפשר יהיה לבדוק אותה מול רשימת קולות
      מזויפת. בלי זה הכלל ״voiceUsable ראשון, המגדר אחריו״ אינו
      ניתן לבדיקה בלי דפדפן עם קולות מותקנים — ואין כזה כאן. */

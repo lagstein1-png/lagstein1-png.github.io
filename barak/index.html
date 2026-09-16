@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ברק — המורה שרואה את המסך · הדגמה</title>
+<meta name="description" content="דף הדגמה של ברק, העוזר הלימודי של שלוש־עשרה אפליקציות הלימוד: ארבעה מקצועות, ארבע שפות, ופעולות שמתבצעות באמת.">
+<meta name="robots" content="noindex">
+<link rel="license" href="/legal/">
+<meta name="theme-color" content="#f6f7fb" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0b0f17" media="(prefers-color-scheme:dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   דף התצוגה של מנוע ברק — מנוע ברק, 16.9.2026 (D-14, D-15).
+   הבחירה השמרנית: אותם צבעים ואותו גופן של דף הבית, אותו פאנל
+   של tutor.js, אותו דיוקן. הדף אינו אפליקציית לימוד ואינו נמנה
+   ב-badge; הוא רשום ב-stages.json תחת notApps.
+   ============================================================ */
+:root{
+  --bg:#f6f7fb; --bg-elev:#ffffff; --text:#14181f; --text-soft:#4a5464;
+  --line:#dfe4ee; --accent:#0a8f8f; --accent-soft:#e3f4f4; --ok:#2f8f4e; --no:#b3261e;
+}
+:root[data-theme="dark"]{
+  --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6;
+  --line:#2a3448; --accent:#5cc7c7; --accent-soft:#12303d;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6;
+    --line:#2a3448; --accent:#5cc7c7; --accent-soft:#12303d;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font-family:"Noto Sans Arabic",Heebo,"Segoe UI",system-ui,Arial,sans-serif;font-size:19px;line-height:1.75;letter-spacing:.01em}
+:lang(ru),:lang(en){font-family:"Noto Sans",Heebo,"Segoe UI",system-ui,Arial,sans-serif}
+.skip{position:absolute;inset-inline-start:8px;top:-60px;background:var(--accent);color:#fff;padding:8px 14px;border-radius:10px;z-index:99999}
+.skip:focus{top:8px}
+.wrap{max-width:760px;margin:0 auto;padding:18px 16px 48px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-block-end:8px}
+h1{font-size:1.5rem;margin:0}
+.lead{color:var(--text-soft);margin:6px 0 18px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-block-end:14px}
+.chip{border:1px solid var(--line);background:var(--bg-elev);color:var(--text);border-radius:999px;padding:8px 14px;font:inherit;font-size:.95rem;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.card{background:var(--bg-elev);border:1px solid var(--line);border-radius:18px;padding:18px;margin-block-end:14px}
+.q{font-size:1.25rem;font-weight:700;margin:0 0 12px}
+.opts{display:grid;gap:10px}
+.opt{border:2px solid var(--line);background:var(--bg-elev);color:var(--text);border-radius:14px;padding:12px 14px;font:inherit;font-size:1.05rem;text-align:start;cursor:pointer;min-height:48px}
+.opt.right{border-color:var(--ok)} .opt.wrong{border-color:var(--no)}
+.opt[disabled]{opacity:.7;cursor:default}
+.hint{background:var(--accent-soft);border-radius:12px;padding:10px 14px;margin-block-start:12px}
+.fb{margin-block-start:12px;font-weight:600}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-block-start:14px}
+.btn{border:1px solid var(--line);background:var(--bg-elev);color:var(--text);border-radius:12px;padding:12px 16px;font:inherit;cursor:pointer;min-height:48px}
+.btn.pri{background:var(--accent);color:#fff;border-color:var(--accent)}
+.note{color:var(--text-soft);font-size:.9rem}
+.log{font-size:.92rem;color:var(--text-soft);border-inline-start:3px solid var(--accent);padding-inline-start:12px;margin-block-start:10px;min-height:1.5em}
+a{color:inherit}
+button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+footer{text-align:center;color:var(--text-soft);font-size:.85rem;margin-block-start:28px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">דילוג לתוכן</a>
+<div class="wrap">
+<header>
+  <h1 id="ttl">ברק — המורה שרואה את המסך</h1>
+</header>
+<p class="lead" id="lead">כאן אפשר לנסות את ברק על שאלה אמיתית, בארבעה מקצועות ובארבע שפות. הוא רואה את השאלה, את האפשרויות ומה ענית, נותן רמז בלי לגלות את התשובה, ויכול לבצע פעולות במסך: להציג רמז, להדגיש אפשרות, לעבור לשאלה הבאה.</p>
+
+<div class="row" id="langs" role="group" aria-label="שפה"></div>
+<div class="row" id="subs" role="group" aria-label="מקצוע"></div>
+
+<main id="main" tabindex="-1">
+  <section class="card" id="screen" aria-live="polite">
+    <p class="q" id="q"></p>
+    <div class="opts" id="opts"></div>
+    <div id="hint"></div>
+    <div class="fb" id="fb"></div>
+    <div class="btns">
+      <button class="btn pri" id="btnAsk" type="button"></button>
+      <button class="btn" id="btnHint" type="button"></button>
+      <button class="btn" id="btnNext" type="button"></button>
+    </div>
+    <div class="log" id="log"></div>
+  </section>
+  <p class="note" id="note"></p>
+</main>
+<footer><span dir="ltr">© 2026</span> · <a href="/legal/">תנאי שימוש ופרטיות</a> · <a href="/">כל האפליקציות</a></footer>
+</div>
+
+<!-- ״עזרה מהמורה״: הפנים, המוח המקומי, הפאנל, ומנוע ברק — אותם
+     קבצים שכל האפליקציות טוענות. אין כאן מוח שני. -->
+<script src="/tutor/josh-face.js"></script>
+<script src="/tutor/josh-local.js"></script>
+<script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
+<script>
+(function(){
+"use strict";
+/* ---------- ארבע שפות ---------- */
+var UI = {
+  he:{ ttl:"ברק — המורה שרואה את המסך", lead:"כאן אפשר לנסות את ברק על שאלה אמיתית, בארבעה מקצועות ובארבע שפות. הוא רואה את השאלה, את האפשרויות ומה ענית, נותן רמז בלי לגלות את התשובה, ויכול לבצע פעולות במסך: להציג רמז, להדגיש אפשרות, לעבור לשאלה הבאה.",
+       ask:"ברק — עזרה מהמורה", hint:"רמז", next:"שאלה הבאה", ok:"נכון.", no:"לא נורא, בוא ננסה שוב.", note:"מה שנשלח לשרת כתוב בתנאי השימוש. בלי רשת ברק עונה מהמכשיר.", did:"ברק ביצע: ", subs:{math:"חשבון",english:"אנגלית",history:"היסטוריה",theory:"תאוריה"} },
+  ar:{ ttl:"باراك — المعلّم الذي يرى الشاشة", lead:"هنا يمكنك تجربة باراك على سؤال حقيقي، في أربعة مواضيع وأربع لغات. يرى السؤال والخيارات وما أجبت، يعطي تلميحًا دون كشف الجواب، ويستطيع تنفيذ إجراءات على الشاشة: عرض تلميح، تمييز خيار، الانتقال إلى السؤال التالي.",
+       ask:"باراك — مساعدة من المعلّم", hint:"تلميح", next:"السؤال التالي", ok:"صحيح.", no:"لا بأس، لنجرّب مرة أخرى.", note:"ما يُرسَل إلى الخادم مكتوب في شروط الاستخدام. بلا إنترنت يجيب باراك من الجهاز.", did:"نفّذ باراك: ", subs:{math:"حساب",english:"إنجليزية",history:"تاريخ",theory:"نظرية القيادة"} },
+  ru:{ ttl:"Барак — учитель, который видит экран", lead:"Здесь можно попробовать Барака на настоящем вопросе, по четырём предметам и на четырёх языках. Он видит вопрос, варианты и ваш ответ, даёт подсказку, не раскрывая ответ, и умеет выполнять действия на экране: показать подсказку, выделить вариант, перейти к следующему вопросу.",
+       ask:"Барак — помощь учителя", hint:"Подсказка", next:"Следующий вопрос", ok:"Верно.", no:"Ничего страшного, попробуем ещё раз.", note:"Что отправляется на сервер, написано в условиях использования. Без интернета Барак отвечает с устройства.", did:"Барак выполнил: ", subs:{math:"Арифметика",english:"Английский",history:"История",theory:"Теория вождения"} },
+  en:{ ttl:"Barak — the teacher who sees the screen", lead:"Try Barak on a real question, in four subjects and four languages. He sees the question, the options and what you answered, gives a hint without revealing the answer, and can act on the screen: show a hint, highlight an option, move to the next question.",
+       ask:"Barak — ask the teacher", hint:"Hint", next:"Next question", ok:"Correct.", no:"That is fine, let us try again.", note:"What is sent to the server is written in the terms of use. Offline, Barak answers from the device.", did:"Barak did: ", subs:{math:"Arithmetic",english:"English",history:"History",theory:"Driving theory"} }
+};
+var DIR = { he:"rtl", ar:"rtl", ru:"ltr", en:"ltr" };
+/* ---------- השאלות: מקצוע × שפה. תשובה נכונה, שלושה מסיחים, רמז ---------- */
+function Q(q, ans, wrong, hint, topic){ return { q:q, ans:ans, wrong:wrong, hint:hint, topic:topic } }
+var BANK = {
+  math:{ app:"math-app", he:[ Q("כמה זה 8 + 7?", "15", ["14","16","17"], "קודם תשלים את 8 לעשר. כמה נשאר מה-7?", "חיבור"),
+                             Q("כמה זה 6 × 4?", "24", ["20","18","28"], "6 × 4 זה 6 + 6 + 6 + 6. תספור בקפיצות של שש.", "כפל") ],
+         ar:[ Q("كم يساوي 8 + 7؟", "15", ["14","16","17"], "أكمل 8 إلى عشرة أولًا. كم يبقى من 7؟", "جمع"),
+              Q("كم يساوي 6 × 4؟", "24", ["20","18","28"], "6 × 4 هو 6 + 6 + 6 + 6. عُدّ بقفزات من ستة.", "ضرب") ],
+         ru:[ Q("Сколько будет 8 + 7?", "15", ["14","16","17"], "Сначала дополни 8 до десяти. Сколько останется от 7?", "сложение"),
+              Q("Сколько будет 6 × 4?", "24", ["20","18","28"], "6 × 4 — это 6 + 6 + 6 + 6. Считай шагами по шесть.", "умножение") ],
+         en:[ Q("What is 8 + 7?", "15", ["14","16","17"], "First make 8 up to ten. How much of the 7 is left?", "addition"),
+              Q("What is 6 × 4?", "24", ["20","18","28"], "6 × 4 is 6 + 6 + 6 + 6. Count in jumps of six.", "multiplication") ] },
+  english:{ app:"english", he:[ Q("מה המשמעות של «apple»?", "תפוח", ["שולחן","ספר","דלת"], "זה פרי, אדום או ירוק.", "אוצר מילים"),
+                               Q("השלימו: She «___» to school every day.", "goes", ["go","going","gone"], "היא — גוף שלישי יחיד, בהווה פשוט.", "הווה פשוט") ],
+           ar:[ Q("ما معنى «apple»؟", "تفاحة", ["طاولة","كتاب","باب"], "إنها فاكهة، حمراء أو خضراء.", "مفردات"),
+                Q("أكمل: She «___» to school every day.", "goes", ["go","going","gone"], "هي — الشخص الثالث المفرد، في المضارع البسيط.", "المضارع البسيط") ],
+           ru:[ Q("Что значит «apple»?", "яблоко", ["стол","книга","дверь"], "Это фрукт, красный или зелёный.", "лексика"),
+                Q("Дополни: She «___» to school every day.", "goes", ["go","going","gone"], "Она — третье лицо единственного числа, в простом настоящем.", "простое настоящее") ],
+           en:[ Q("Which word is a fruit?", "apple", ["table","book","door"], "It is red or green, and you can eat it.", "vocabulary"),
+                Q("Complete: She ___ to school every day.", "goes", ["go","going","gone"], "She is third person singular, in the present simple.", "present simple") ] },
+  history:{ app:"history", he:[ Q("באיזו שנה הוכרזה מדינת ישראל?", "1948", ["1917","1939","1967"], "זה קרה שלוש שנים אחרי סוף מלחמת העולם השנייה.", "הקמת המדינה"),
+                               Q("מה המציא גוטנברג?", "דפוס באותיות מתחלפות", ["הטלפון","המנוע הקיטור","המצפן"], "בזכות זה ספרים הפכו לזולים ונפוצים.", "העת החדשה") ],
+           ar:[ Q("في أيّ سنة أُعلنت دولة إسرائيل؟", "1948", ["1917","1939","1967"], "حدث ذلك بعد ثلاث سنوات من نهاية الحرب العالمية الثانية.", "قيام الدولة"),
+                Q("ماذا اخترع غوتنبرغ؟", "الطباعة بالحروف المتحركة", ["الهاتف","المحرّك البخاري","البوصلة"], "بفضل ذلك صارت الكتب رخيصة ومنتشرة.", "العصر الحديث") ],
+           ru:[ Q("В каком году было провозглашено Государство Израиль?", "1948", ["1917","1939","1967"], "Это случилось через три года после конца Второй мировой войны.", "образование государства"),
+                Q("Что изобрёл Гутенберг?", "книгопечатание подвижными литерами", ["телефон","паровую машину","компас"], "Благодаря этому книги стали дешёвыми и распространёнными.", "Новое время") ],
+           en:[ Q("In which year was the State of Israel declared?", "1948", ["1917","1939","1967"], "It happened three years after the end of the Second World War.", "founding of the state"),
+                Q("What did Gutenberg invent?", "printing with movable type", ["the telephone","the steam engine","the compass"], "Thanks to it, books became cheap and common.", "early modern period") ] },
+  theory:{ app:"theory", he:[ Q("מהו מרחק העצירה של רכב?", "מרחק התגובה ועוד מרחק הבלימה", ["מרחק הבלימה בלבד","מרחק התגובה בלבד","אורך הרכב"], "מה קורה בשניות שבין הרגע שראית מכשול ועד שהרגל לחצה על הדוושה?", "בלימה ומרחקים"),
+                              Q("מה עושים כשמתקרבים לתמרור ״עצור״?", "עוצרים עצירה מלאה ונותנים זכות קדימה", ["מאטים וממשיכים אם הדרך פנויה","צופרים וממשיכים","מגבירים מהירות"], "לתמרור הזה יש מילה אחת, והיא בדיוק מה שהוא דורש.", "תמרורים") ],
+          ar:[ Q("ما هي مسافة توقّف المركبة؟", "مسافة ردّ الفعل زائد مسافة الكبح", ["مسافة الكبح فقط","مسافة ردّ الفعل فقط","طول المركبة"], "ما الذي يحدث في الثواني بين رؤية العائق وضغط القدم على الدوّاسة؟", "الكبح والمسافات"),
+               Q("ماذا تفعل عند الاقتراب من إشارة ״قف״؟", "تتوقّف توقّفًا كاملًا وتعطي حقّ الأولوية", ["تبطئ وتتابع إن كان الطريق خاليًا","تزمّر وتتابع","تزيد السرعة"], "لهذه الإشارة كلمة واحدة، وهي بالضبط ما تطلبه.", "الإشارات") ],
+          ru:[ Q("Что такое остановочный путь автомобиля?", "путь реакции плюс тормозной путь", ["только тормозной путь","только путь реакции","длина автомобиля"], "Что происходит в секунды между тем, как ты увидел препятствие, и нажатием на педаль?", "торможение и расстояния"),
+               Q("Что делать, приближаясь к знаку «Стоп»?", "полностью остановиться и уступить дорогу", ["замедлиться и продолжить, если путь свободен","посигналить и продолжить","ускориться"], "На этом знаке одно слово, и оно и есть требование.", "знаки") ],
+          en:[ Q("What is a vehicle's stopping distance?", "reaction distance plus braking distance", ["braking distance only","reaction distance only","the length of the vehicle"], "What happens in the seconds between seeing an obstacle and your foot pressing the pedal?", "braking and distances"),
+               Q("What do you do when approaching a Stop sign?", "come to a complete stop and give way", ["slow down and continue if the road is clear","honk and continue","speed up"], "The sign has one word, and that word is exactly what it asks.", "signs") ] }
+};
+var CURR = { math:"חשבון ליסודי, כיתות א׳–ו׳", english:"אנגלית — אוצר מילים ודקדוק בסיסי", history:"היסטוריה לחטיבת הביניים", theory:"תאוריה בנהיגה" };
+
+var S = { lang:"he", sub:"math", i:0, picked:null, done:false, hint:false, opts:[] };
+function T(){ return UI[S.lang] }
+function cur(){ return BANK[S.sub][S.lang][S.i] }
+function $(id){ return document.getElementById(id) }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;") }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=a[i]; a[i]=a[j]; a[j]=t } return a }
+function load(){ var q=cur(); S.opts = shuffle([q.ans].concat(q.wrong)); S.picked=null; S.done=false; S.hint=false; }
+
+function render(){
+  var t=T(), q=cur();
+  document.documentElement.lang = S.lang; document.documentElement.dir = DIR[S.lang];
+  $("ttl").textContent=t.ttl; $("lead").textContent=t.lead; $("note").textContent=t.note;
+  var lh=""; ["he","ar","ru","en"].forEach(function(l){ lh+='<button class="chip" type="button" data-l="'+l+'" aria-pressed="'+(l===S.lang)+'" lang="'+l+'">'+({he:"עברית",ar:"العربية",ru:"Русский",en:"English"})[l]+'</button>' });
+  $("langs").innerHTML=lh;
+  var sh=""; ["math","english","history","theory"].forEach(function(k){ sh+='<button class="chip" type="button" data-s="'+k+'" aria-pressed="'+(k===S.sub)+'">'+esc(t.subs[k])+'</button>' });
+  $("subs").innerHTML=sh;
+  $("q").textContent=q.q.replace(/«|»/g,"");
+  var oh=""; S.opts.forEach(function(o,i){
+    var cls="opt"+(S.done&&o===q.ans?" right":"")+(S.picked===o&&o!==q.ans?" wrong":"");
+    oh+='<button class="'+cls+'" type="button" data-i="'+i+'"'+(S.done?" disabled":"")+'>'+esc(o)+'</button>';
+  });
+  $("opts").innerHTML=oh;
+  $("hint").innerHTML = S.hint ? '<div class="hint">'+esc(q.hint)+'</div>' : "";
+  $("fb").textContent = S.done ? t.ok : (S.picked ? t.no : "");
+  $("btnAsk").textContent = (window.TUTOR && TUTOR.on()) ? TUTOR.label() : t.ask;
+  $("btnHint").textContent=t.hint; $("btnHint").disabled = S.hint || S.done;
+  $("btnNext").textContent=t.next;
+}
+function pick(o){
+  if(S.done) return;
+  S.picked=o;
+  if(o===cur().ans) S.done=true;
+  render();
+}
+function next(){ S.i=(S.i+1)%BANK[S.sub][S.lang].length; load(); render(); }
+document.addEventListener("click", function(e){
+  var b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.l){ S.lang=b.dataset.l; load(); render(); return }
+  if(b.dataset.s){ S.sub=b.dataset.s; S.i=0; load(); render(); return }
+  if(b.classList.contains("opt")){ pick(S.opts[+b.dataset.i]); return }
+  if(b.id==="btnHint"){ S.hint=true; render(); return }
+  if(b.id==="btnNext"){ next(); return }
+  if(b.id==="btnAsk"){ if(window.TUTOR) TUTOR.open(); }
+});
+load(); render();
+
+/* ---------- ברק ---------- */
+if(window.TUTOR){
+  TUTOR.mount({
+    app: BANK[S.sub].app,
+    lang: function(){ return S.lang },
+    q: function(){ var q=cur(); return { expr:q.q.replace(/«|»/g,""), ans:q.ans, topic:q.topic, level:CURR[S.sub] } }
+  });
+}
+function log(name, ok){ var t=T(); $("log").textContent = t.did + name + (ok ? " ✓" : " ✗"); }
+if(window.BARAK) BARAK.register({
+  /* המזהה משתנה עם המקצוע — התפקיד בשרת נבחר לפי app. `app` נקרא
+     בזמן הבקשה דרך getter, ולכן החלפת מקצוע מחליפה תפקיד. */
+  get app(){ return BANK[S.sub].app },
+  getScreenContext: function(){
+    var q=cur();
+    return { id: S.sub+"-"+S.lang+"-"+S.i, type: S.done ? "reveal" : "mcq",
+             q: q.q.replace(/«|»/g,""), options: S.opts.slice(), correct: q.ans,
+             student: (S.picked && S.picked!==q.ans) ? S.picked : null,
+             topic: q.topic, level: CURR[S.sub], curriculum: CURR[S.sub]+" — "+q.topic };
+  },
+  actions: {
+    next_question: { desc:"עובר לשאלה הבאה", run:function(){ next(); log("next_question", true); return true } },
+    show_hint: { desc:"מציג את הרמז של השאלה", run:function(){ if(S.hint||S.done){ log("show_hint", false); return false } S.hint=true; render(); log("show_hint", true); return true } },
+    highlight_option: { desc:"מדגיש אפשרות לפי מקומה (0 עד 3)", params:{ index:{ type:"integer", min:0, max:3, required:true } },
+      run:function(a){ var ok=BARAK.highlight(document.querySelectorAll("#opts .opt")[a.index]); log("highlight_option "+a.index, ok); return ok } },
+    explain_again: { desc:"מציג שוב את הרמז וההסבר אחרי שנענתה", run:function(){ if(!S.done){ log("explain_again", false); return false } S.hint=true; render(); log("explain_again", true); return true } }
+  }
+});
+})();
+</script>
+</body>
+</html>

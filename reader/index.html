@@ -1626,6 +1626,7 @@ function refreshDynamic(){
 <script src="/tutor/josh-face.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -1633,7 +1634,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=76-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=77-pwa1").catch(function(){});
   });
 }
 </script>
@@ -1664,6 +1665,59 @@ if(window.TUTOR){
         setTimeout(function(){btnTu.textContent=TUTOR.label()},0);
     });
   }
+  /* מנוע ברק — המתאם של האפליקציה. כאן אין שאלה ואין תשובה נכונה:
+     ״המסך״ הוא המשפט הנוכחי, והפעולות הן מה שכפתורי ההקראה עושים —
+     הקרא, שוב, המשפט הבא, ומילה אחת (כמו לחיצה על מילה). הטקסט כולו
+     אינו נשלח — הוא של המשתמש. */
+  if(window.BARAK)BARAK.register({
+    app:"reader",
+    getScreenContext:function(){
+      if(typeof W==="undefined"||!W.length)return null;
+      var scr=document.getElementById("screenRead");
+      if(!scr||scr.classList.contains("hidden"))return null;
+      var out=[];
+      for(var i=0;i<W.length;i++)if(W[i].sent===SENT)out.push(W[i].plain||W[i].word||"");
+      var line=out.join(" ").replace(/\s+/g," ").trim();
+      if(!line)return null;
+      return {id:"s"+SENT+"-"+line.slice(0,30), type:"text", q:line,
+        level:"משפט "+(SENT+1)+" מתוך "+SENTS,
+        curriculum:"קריאה — הקראת טקסט מודבק"};
+    },
+    actions:{
+      read_aloud:{desc:"מקריא את המשפט הנוכחי בקול",
+        run:function(){
+          if(!W.length||$("#screenRead").classList.contains("hidden"))return false;
+          play();return speaking===true;
+        }},
+      repeat_question:{desc:"מקריא שוב את אותו משפט מההתחלה",
+        run:function(){
+          if(!W.length||$("#screenRead").classList.contains("hidden"))return false;
+          play();return speaking===true;
+        }},
+      next_sentence:{desc:"עובר למשפט הבא; בסוף הטקסט — אין",
+        run:function(){
+          if(!W.length||$("#screenRead").classList.contains("hidden"))return false;
+          if(SENT+1>=SENTS)return false;
+          var n=SENT;go(SENT+1);return SENT!==n;
+        }},
+      read_word:{desc:"מקריא מילה אחת מהמשפט הנוכחי, לאט, ומסמן אותה",
+        params:{word:{type:"string",required:true}},
+        run:function(a){
+          if(!W.length||$("#screenRead").classList.contains("hidden"))return false;
+          /* השוואה בלי ניקוד ובלי פיסוק — המודל כותב את המילה נקייה */
+          var norm=function(s){return String(s||"").replace(/[\u0591-\u05C7]/g,"").replace(/[^\u05D0-\u05EA0-9A-Za-z]/g,"")};
+          var want=norm(a.word);if(!want)return false;
+          for(var i=0;i<W.length;i++){
+            if(W[i].sent!==SENT||!W[i].word||norm(W[i].plain)!==want)continue;
+            var el=document.querySelector('#text .w[data-i="'+i+'"]');
+            if(!el)return false;
+            el.click();               /* אותו מסלול כמו לחיצת אצבע על המילה */
+            return true;
+          }
+          return false;
+        }}
+    }
+  });
 }
 </script>
 <!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש

@@ -1050,7 +1050,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="k48 · 2026-09-16";
+var BUILD="k49 · 2026-09-16";
 var SKEY="kotvim-state-v1";
 var GKEY_STORE="kotvim-gkey";
 
@@ -3091,6 +3091,7 @@ boot();
 <script src="/tutor/josh-face.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -3098,7 +3099,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=k48-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=k49-pwa1").catch(function(){});
   });
 }
 </script>
@@ -3127,6 +3128,52 @@ if(window.TUTOR){
       return {expr:body, ans:null, topic:tp||null, level:ty||null};
     },
     stopHost:function(){try{stopSpeak()}catch(e){}}
+  });
+  /* מנוע ברק — המתאם של האפליקציה. אין כאן שאלה הבאה: הכפתור
+     היחיד שמתקדם (`kdone`) נעול עד שכל ארבעת החלקים נבחרו, ובצעד
+     הרביעי אין ״הבא״ — ולכן `next_question` אינה רשומה, וברק אינו
+     מבטיח מעבר שאינו קיים. */
+  if(window.BARAK)BARAK.register({
+    app:"kotvim",
+    getScreenContext:function(){
+      /* ההתקדמות וההגדרות הן מסכי מעטפת — הטקסט אינו על המסך שם */
+      if(typeof W==="undefined"||!W.type||state.screen!=="home")return null;
+      var t0=TYPES.filter(function(x){return x.id===W.type})[0];
+      var p0=W.topic?topicById(W.type,W.topic):null;
+      var ty=t0?txt(gl(t0.n)):"", tp=p0?txt(gl(p0.n)):"";
+      var body=W.txt?txt(W.txt):txt(wText());
+      if(!body)return null;
+      return {id:"k"+W.type+"-"+(W.topic||"")+"-"+W.step, type:"text", q:body,
+        topic:tp||null, level:ty||null, curriculum:"כתיבה — "+ty};
+    },
+    actions:{
+      read_aloud:{desc:"מקריא את הטקסט שעל המסך — המוכן, או מה שכבר נבנה",
+        run:function(){
+          if(!W.type||state.screen!=="home")return false;
+          var body=W.step===4?W.txt:wText();
+          if(!txt(body))return false;
+          speak(body,state.lang);return true;
+        }},
+      explain_again:{desc:"מציג ומקריא שוב את ההנחיה של הצעד הנוכחי — ומה עוד חסר",
+        run:function(){
+          if(!W.type||state.screen!=="home")return false;
+          var m=document.getElementById("main");if(!m)return false;
+          var parts=[],els=m.querySelectorAll(".h2,.lead,.fb"),i;
+          for(i=0;i<els.length;i++)parts.push(txt(els[i].textContent));
+          var g=parts.join(". ");if(!g)return false;
+          announce(g);speak(g,state.lang);
+          BARAK.highlight(m.querySelector(".fb")||m.querySelector(".h2"));
+          return true;
+        }},
+      go_screen:{desc:"עובר למסך אחר: home — הכתיבה, prog — התקדמות, set — הגדרות",
+        params:{name:{type:"string",enum:["home","prog","set"],required:true}},
+        run:function(a){
+          stopSpeak();state.screen=a.name;
+          if(a.name==="home")save();
+          if(a.name==="set")gkMsg=null;
+          render();window.scrollTo(0,0);return state.screen===a.name;
+        }}
+    }
   });
   try{render()}catch(e){}
 }
