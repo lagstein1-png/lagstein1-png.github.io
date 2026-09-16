@@ -163,14 +163,30 @@ function modelUrl(model) { return GEMINI_BASE + "/" + model + ":generateContent"
    ב-16.9 (״no longer available to new users״), ולכן הרשימה נמשכת
    מה-API עצמו — `GET /v1beta/models` — פעם אחת ל-isolate ולשש
    שעות, ומסוננת: Flash שאינו Lite ואינו preview קודם, ואחריו
-   Flash-Lite, ורק מודלים שתומכים ב-`generateContent`. הרשימה
-   הקבועה `[MODEL]` היא הנפילה כשהבקשה לרשימה לא נענתה, ולא
-   ברירת המחדל: `MODEL` הוא השם שגוגל עצמה החזירה ב-404.
+   Flash-Lite, ורק מודלים שתומכים ב-`generateContent`.
 
-   סדר הנפילה בפנייה: הראשון בשרשרת; 404/429/5xx — הבא; נגמרה
-   השרשרת — הלקוח מקבל `fallback: "local"` ועונה מהמכשיר. */
+   **ו-`MODEL` הקבוע הוא הראשון בשרשרת, לא האחרון — תוקן
+   16.9.2026 אחרי מדידה.** הניסוח הראשון שם את ״החדש ביותר״
+   בראש, וזה בדיוק המודל העמוס ביותר: `barak-live` ריצות 1 ו-2
+   מדדו `gemini-3.8-flash` מחזיר `503 UNAVAILABLE: high demand`
+   ב-6 מתוך 10 הקריאות, בזמן ש-`gemini-3.6-flash` — השם הקבוע —
+   ענה 200 ב-3 מתוך 3 באותו יום (`tutor-compare` ריצה 4,
+   `deploy-tutor` ריצה 6). כלומר הגילוי הפך שירות עובד לשירות
+   שנופל למוח המקומי ברוב הפניות.
+
+   הסדר היום עונה על שתי הסכנות יחד: **`MODEL` ראשון** מגן על
+   היום — הוא השם שנמדד עונה; **והגילוי אחריו** מגן על היום שבו
+   `MODEL` ימות, בדיוק כמו `gemini-2.5-flash` — 404 מעביר לבא
+   בתור בלי שאיש יגע בקוד.
+
+   סדר הנפילה בפנייה: הראשון בשרשרת; 400 — ניסיון שני עם גוף
+   מינימלי (ראו `ask`); 404/429/5xx — הבא; נגמרה השרשרת —
+   הלקוח מקבל `fallback: "local"` ועונה מהמכשיר. */
 const MODELS_TTL = 6 * 60 * 60 * 1000;
 let MODELS_CACHE = { at: 0, list: null };
+/* לבדיקות בלבד: המטמון חי ברמת המודול ושורד בין תרחישים, ובלי
+   איפוס תרחיש שני מקבל את השרשרת של הראשון ונראה עובר בטעות. */
+const _models = { reset() { MODELS_CACHE = { at: 0, list: null } }, peek() { return MODELS_CACHE.list } };
 function rankModels(names) {
   const gen = names.filter(n => /flash/i.test(n) && !/preview|exp|tts|image|live|audio|native|thinking/i.test(n));
   const ver = n => +((n.match(/gemini-(\d+(?:\.\d+)?)/) || [0, 0])[1]);
@@ -199,9 +215,11 @@ async function discoverModels(env, fetchFn) {
       if (ranked.length) list = ranked;
     }
   } catch (e) {}
-  if (!list) list = [MODEL];
-  MODELS_CACHE = { at: now, list };
-  return list;
+  /* `MODEL` ראשון תמיד, והגילוי אחריו בלי כפילות. גם כשהבקשה
+     לרשימה לא נענתה נשארת שרשרת באורך אחד לפחות. */
+  const chain = [MODEL].concat((list || []).filter(n => n !== MODEL));
+  MODELS_CACHE = { at: now, list: chain };
+  return chain;
 }
 const ENGINES = {
   gemini: {
@@ -865,7 +883,21 @@ function capOf(model) { return CAP[model] || { effort: false, fallbacks: false }
       אם ה-API ידחה את השדה — להסיר אותו בלבד.
    אין `temperature`: לא היה כזה במסלול Claude, ואין להמציא מספר.
    `tools` נכנס רק כשהאפליקציה הצהירה על פעולות — ורק הן. */
-function geminiBody(ctx, msgs, extra, tools) {
+/* `minimal` מוריד את שני השדות הרשות — `thinkingConfig` ו-`toolConfig`.
+
+   **למה זה קיים: 400 שנמדד, וסיבה שלא בודדה.** `barak-live` ריצות
+   1 ו-2 מדדו `gemini-3.5-flash-lite` מחזיר `400 INVALID_ARGUMENT`
+   ב-**18 מתוך 18** הקריאות שהגיעו אליו. הגוף נבנה אחד לשני
+   המודלים, ואי אפשר לדעת מכאן איזה שדה פסול: הסביבה חסומה מול
+   גוגל, ולכן אין דרך לבודד את השדה בלי קריאה חיה.
+
+   **מה שנעשה במקום לנחש:** 400 מפעיל ניסיון שני על **אותו מודל**
+   עם הגוף המינימלי. שני השדות שיורדים הם אופטימיזציה ולא דרישה —
+   `thinkingBudget: 0` חוסך טוקנים, ו-`mode: "AUTO"` הוא ברירת
+   המחדל ממילא — ולכן תשובה מהגוף המינימלי טובה בדיוק כמו מהמלא.
+   `tools` **אינו** יורד: בלעדיו ברק מאבד את הפעולות, וזה הדבר
+   שהמנוע הזה נבנה בשבילו. נשאר 400 — עוברים למודל הבא. */
+function geminiBody(ctx, msgs, extra, tools, minimal) {
   const body = {
     systemInstruction: {
       parts: [ { text: CORE + "\n" + ctx + (extra ? "\n" + extra : "") } ]
@@ -874,20 +906,18 @@ function geminiBody(ctx, msgs, extra, tools) {
       role: m.role === "assistant" ? "model" : "user",
       parts: [ { text: m.content } ]
     })),
-    generationConfig: {
-      maxOutputTokens: MAX_TOKENS,
-      thinkingConfig: { thinkingBudget: 0 }
-    }
+    generationConfig: { maxOutputTokens: MAX_TOKENS }
   };
+  if (!minimal) body.generationConfig.thinkingConfig = { thinkingBudget: 0 };
   if (tools) {
     body.tools = tools;
-    body.toolConfig = { functionCallingConfig: { mode: "AUTO" } };
+    if (!minimal) body.toolConfig = { functionCallingConfig: { mode: "AUTO" } };
   }
   return body;
 }
 
-function buildBody(model, ctx, msgs, extra, tools) {
-  if (isGemini(model)) return geminiBody(ctx, msgs, extra, tools);
+function buildBody(model, ctx, msgs, extra, tools, minimal) {
+  if (isGemini(model)) return geminiBody(ctx, msgs, extra, tools, minimal);
   const cap = capOf(model);
   const body = {
     model: model,
@@ -932,12 +962,14 @@ async function ask(env, ctx, msgs, extra, tools, fetchFn) {
   const models = eng === ENGINES.gemini ? await discoverModels(env, F) : [eng.model];
   let last = null;
   for (const model of models) {
-    const body = buildBody(model, ctx, msgs, extra, tools);
+   /* ניסיון שני על אותו מודל, עם הגוף המינימלי, ורק על 400. */
+   for (let minimal = 0; minimal < 2; minimal++) {
+    const body = buildBody(model, ctx, msgs, extra, tools, !!minimal);
     const url = isGemini(model) ? modelUrl(model) : eng.url;
     let r;
     try {
       r = await F(url, { method: "POST", headers: buildHeaders(model, env[eng.key]), body: JSON.stringify(body) });
-    } catch (e) { last = { err: "network" }; continue }
+    } catch (e) { last = { err: "network" }; break }
     if (!r.ok) {
       /* **הצד השני של O-42.** הסטטוס נתפס כאן ונזרק, ולכן 502 היה
          חסר פשר: מפתח שגוי, אין יתרה ועומס חולף נראים זהים. גוף
@@ -946,14 +978,21 @@ async function ask(env, ctx, msgs, extra, tools, fetchFn) {
          נראה ב-`npx wrangler tail tutor`. */
       let why = "";
       try { why = (await r.text()).slice(0, 300) } catch (e) {}
-      console.error("[tutor] upstream " + model + " " + r.status + " " + why);
+      console.error("[tutor] upstream " + model + (minimal ? " (minimal)" : "") + " " + r.status + " " + why);
       last = { err: r.status };
-      if (RETRY_STATUS.indexOf(r.status) >= 0) continue;
+      /* 400 בגוף המלא — מנסים מינימלי על **אותו** מודל; 400 גם
+         במינימלי — למודל הבא. זה היה באג: `400` אינו ב-`RETRY_STATUS`,
+         ולכן המינימלי שנפל החזיר 502 מיד במקום להמשיך בשרשרת —
+         כלומר Lite שבור היה מפיל את כל הפנייה. נתפס ב-`barak.js`. */
+      if (r.status === 400) { if (!minimal) continue; break }
+      if (RETRY_STATUS.indexOf(r.status) >= 0) break;
       return last;
     }
     const out = parseReply(model, await r.json());
     out.model = model;
+    if (minimal) out.minimal = true;
     return out;
+   }
   }
   return { err: "exhausted", last: last && last.err };
 }
@@ -993,6 +1032,30 @@ function parseReply(model, d) {
 const ACTION_SAY = {
   he: "בסדר, עושה את זה.", ar: "حسنًا، أفعل ذلك.", ru: "Хорошо, делаю.", en: "Okay, doing that."
 };
+/* **ומשפט לכל פעולה, ולא אחד לכולן — 16.9.2026.** `barak-live`
+   מדד שבתרחיש ״תעביר אותי לשאלה הבאה״ המודל מחזיר קריאת פונקציה
+   **בלי טקסט**, ב-2 מתוך 2. ״בסדר, עושה את זה״ אינו שקר, אבל הוא
+   גם אינו אומר ללומד מה קרה — וקהל היעד כאן הוא דיסלקציה ו-ADHD,
+   שבשבילם ״עוברים לשאלה הבאה״ הוא המשפט שמסביר את המסך שהתחלף.
+   מה שאין כאן נופל ל-`ACTION_SAY`. */
+const ACTION_LINE = {
+  next_question:   { he: "עוברים לשאלה הבאה.", ar: "ننتقل إلى السؤال التالي.", ru: "Переходим к следующему вопросу.", en: "Moving on to the next question." },
+  next_sentence:   { he: "עוברים למשפט הבא.", ar: "ننتقل إلى الجملة التالية.", ru: "Переходим к следующему предложению.", en: "Moving on to the next sentence." },
+  show_hint:       { he: "הנה רמז.", ar: "إليك تلميحًا.", ru: "Вот подсказка.", en: "Here is a hint." },
+  read_aloud:      { he: "מקריא.", ar: "أقرأ.", ru: "Читаю.", en: "Reading it out." },
+  read_word:       { he: "מקריא את המילה.", ar: "أقرأ الكلمة.", ru: "Читаю слово.", en: "Reading the word." },
+  repeat_question: { he: "עוד פעם.", ar: "مرة أخرى.", ru: "Ещё раз.", en: "Once more." },
+  explain_again:   { he: "אסביר שוב, בדרך אחרת.", ar: "سأشرح مرة أخرى بطريقة مختلفة.", ru: "Объясню ещё раз, по-другому.", en: "Let me explain again, another way." },
+  highlight_option:{ he: "הסתכל על האפשרות המסומנת.", ar: "انظر إلى الخيار المحدَّد.", ru: "Посмотри на выделенный вариант.", en: "Look at the highlighted option." },
+  go_screen:       { he: "עוברים.", ar: "ننتقل.", ru: "Переходим.", en: "Going there." },
+  slow_mode:       { he: "נעשה את זה לאט.", ar: "سنفعل ذلك ببطء.", ru: "Сделаем это медленно.", en: "Let us do this slowly." },
+  formula_sheet:   { he: "הנה דף הנוסחאות.", ar: "إليك ورقة الصيغ.", ru: "Вот лист формул.", en: "Here is the formula sheet." },
+  show_sign_image: { he: "הנה התמרור.", ar: "إليك الإشارة.", ru: "Вот знак.", en: "Here is the sign." }
+};
+function actionLine(name, lang) {
+  const row = ACTION_LINE[name];
+  return (row && (row[lang] || row.he)) || ACTION_SAY[lang] || ACTION_SAY.he;
+}
 
 /* ---------- הבקשה עצמה, משני הנתיבים ---------- */
 async function handleAsk(request, env, ctx, org, fetchFn) {
@@ -1032,7 +1095,7 @@ async function handleAsk(request, env, ctx, org, fetchFn) {
 
   const action = validateAction(out.call, inp.actions);
   let say = out.text || "";
-  if (!say) say = action ? (ACTION_SAY[inp.lang] || ACTION_SAY.he) : (FALLBACK[inp.lang] || FALLBACK.he);
+  if (!say) say = action ? actionLine(action.name, inp.lang) : (FALLBACK[inp.lang] || FALLBACK.he);
 
   /* `checked` — ראו בלוק החיפוש למעלה. `!!PROVIDER` ולא `false`
      קשיח: ביום שבו ספק יותקן, השדה יאמר את האמת מעצמו במקום
@@ -1070,9 +1133,10 @@ export default {
 /* מיוצאים בנפרד כדי ש-node .claude/qa/tutor.js יוכל לבדוק אותם.
    Cloudflare קורא רק את ה-default, וייצוא נוסף אינו מפריע לו. */
 export { revealsAnswer, badEquation, readBody, contextBlock, LIM, CORE, ROLE, LANGS,
-         overLimit, _rate,
+         overLimit, _rate, _models,
          SIGNS, ADAPT, PROVIDER,
          buildBody, buildHeaders, capOf, noCounter, MODEL, MAX_TOKENS,
          CLAUDE_MODEL, ENGINES, engineOf, geminiBody, parseReply,
          ACTION_NAMES, readActions, toolsOf, validateAction, faceFor, FACES,
+         ACTION_LINE, actionLine,
          rankModels, discoverModels, ask, handleAsk, MODES };

@@ -29,6 +29,14 @@ const argv = process.argv.slice(2);
 const opt = (k, d) => { const i = argv.indexOf(k); return i >= 0 && argv[i + 1] ? argv[i + 1] : d };
 const LIVE = argv.includes("--live");
 const LIVE_CAP = Math.min(60, +(process.env.LIVE_CAP || 60));
+/* **השהיה בין קריאות חיות — 16.9.2026, אחרי מדידה.** `barak-live`
+   ריצה 1 ירתה 60 קריאות ב-31 שניות וקיבלה 429 אחרי כעשר; שתי דקות
+   אחר כך שמונה קריאות עברו בלי 429 אחד. כלומר המכסה שנגמרה היא
+   **לדקה ולא ליום**, והריצה בלי השהיה לא תשלים 60 לעולם. השהיה
+   ברירת מחדל של 4 שניות מחזיקה כ-15 קריאות לדקה. `LIVE_GAP_MS=0`
+   מבטל אותה. אינה חלה על המוק, שאינו פונה לרשת. */
+const LIVE_GAP_MS = LIVE ? Math.max(0, +(process.env.LIVE_GAP_MS ?? 4000)) : 0;
+const sleep = ms => ms > 0 ? new Promise(r => setTimeout(r, ms)) : Promise.resolve();
 const APPS = (opt("--apps", "") || Object.keys(ROLE).join(",")).split(",").filter(Boolean);
 const LANGS = (opt("--langs", "he,ar,ru,en")).split(",");
 const OUT = opt("--out", process.env.EVALS_OUT || "");
@@ -89,7 +97,12 @@ function judge(scn, lang, screen, d, turn) {
   if (lang !== "he" && lang !== "en" && /[֐-׿]{4,}/.test(say)) f.push("עברית בתוך תשובה ב-" + lang);
   if (scn === "hint" && screen.correct && revealsAnswer(say, screen.correct)) f.push("הרמז גילה את התשובה");
   if (scn === "next" && !(d.action && d.action.name === "next_question")) f.push("״נעבור״ בלי פעולה next_question");
-  if (scn === "next" && d.action && !/הבא|التالي|следующ|next/i.test(say)) f.push("פעולה בלי משפט קצר שמלווה אותה");
+  /* **הטענה תוקנה 16.9.2026.** הניסוח הראשון דרש שהמילה ״הבא״
+     תופיע בטקסט, והפיל 2 מתוך 2 ב-`barak-live` — בזמן שהמוצר היה
+     תקין: המודל החזיר קריאת פונקציה בלי טקסט, והשרת השלים משפט.
+     החוזה האמיתי הוא ״פעולה אינה חוזרת בלי משפט שמלווה אותה״,
+     והמשפט לכל פעולה יושב ב-`ACTION_LINE` שב-worker.js. */
+  if (scn === "next" && d.action && !say.trim()) f.push("פעולה בלי משפט קצר שמלווה אותה");
   if (scn === "wrong" && /נכשלת|فشلت|провалил|you failed/i.test(say)) f.push("״נכשלת״");
   if (scn === "wrong" && d.face !== "encourage") f.push("face אינו encourage אחרי טעות");
   if (turn < 2 && say.split("\n").filter(Boolean).length > 6) f.push("ארוך מדי לתור ראשון (" + say.split("\n").length + " שורות)");
@@ -116,6 +129,7 @@ function judge(scn, lang, screen, d, turn) {
       if (scn === "wrong" && screen.options) body.screen.student = screen.options.find(o => o !== screen.correct);
       if (scn === "wrong") body.sign = "frustrated";
       _rate.reset();
+      if (ran) await sleep(LIVE_GAP_MS);
       const F = LIVE ? undefined : mockFetch(scn, lang);
       const t0 = Date.now();
       const r = await handleAsk(new Request("https://x/ask", { method: "POST", headers: { "Content-Type": "application/json", "CF-Connecting-IP": "1.1.1.1" }, body: JSON.stringify(body) }),
@@ -130,7 +144,8 @@ function judge(scn, lang, screen, d, turn) {
       console.log((fails.length ? "✗ " : "✓ ") + app.padEnd(11) + lang + " " + scn.padEnd(8) + (fails.length ? fails.join(" · ") : (d.model || "") + " " + String(d.say || "").replace(/\n/g, " ").slice(0, 70)));
     }
   }
-  const summary = { mode: LIVE ? "live" : "mock", ran, bad, calls, cap: LIVE ? LIVE_CAP : null, capped, when: new Date().toISOString() };
+  const summary = { mode: LIVE ? "live" : "mock", ran, bad, calls, cap: LIVE ? LIVE_CAP : null, capped,
+                    gapMs: LIVE_GAP_MS, when: new Date().toISOString() };
   console.log(JSON.stringify(summary));
   if (OUT) fs.writeFileSync(OUT, JSON.stringify({ summary, rows }, null, 1));
   console.log(bad ? `✗ הערכות ברק — ${bad} מתוך ${ran} נכשלו` : `✓ הערכות ברק — ${ran} תרחישים עברו` + (capped ? " (נעצר בתקרה " + LIVE_CAP + ")" : ""));
