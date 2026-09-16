@@ -282,6 +282,49 @@ async function run(){
     else console.log('✓ ' + app.id.padEnd(11) + 'בחירה, שומר-ער, שומר זמן ונפילה — כולם עובדים');
   }
   await browser.close();
+
+/* ---------------------------------------------------------------
+     מילון המגדר — בכתב שבו המכשיר באמת מציג את הקול
+
+     **נמדד אצל הבעלים, 13.9.2026, בצילום מסך.** Edge בממשק עברי
+     מציג ״Microsoft הילה Online (Natural)״ — השם מתורגם לשפת
+     הממשק. המילון היה לטיני בלבד, ולכן `hila` לא נמצא, הילה
+     נספרה כ״לא ידוע״, האפליקציה הודיעה ״אין במכשיר קול נשי״
+     והרימה את הגובה ל-1.45 — על קול נשי אמיתי שהיה בחור.
+
+     שמונה עותקים של המילון, וכולם נבדקים: קול נשי חייב לצאת
+     נשי, גברי גברי, ו-״Google עברית״ חייב להישאר **לא ידוע** —
+     הוא שם יצרן ולא מגדר, וזה הכלל שכתוב ליד המילון עצמו.
+     --------------------------------------------------------------- */
+  const DICT = ['bagrut-806/speech.js','math-app/index.html','math-teen/index.html',
+                'math-uni/index.html','math-uni2/index.html','math-uni3/index.html',
+                'reader/index.html','tutor/tutor.js'];
+  const CASES = [
+    ['Microsoft הילה Online (Natural) - Hebrew (Israel)', 'female'],
+    ['Microsoft אברי Online (Natural) - Hebrew (Israel)', 'male'],
+    ['Microsoft Hila Online (Natural) - Hebrew (Israel)', 'female'],
+    ['Microsoft Asaf - Hebrew (Israel)',                  'male'],
+    ['Microsoft زارية Online (Natural)',                  'female'],
+    ['Microsoft Светлана Online (Natural)',               'female'],
+    ['Google עברית',                                      'unknown']
+  ];
+  for(const f of DICT){
+    const src = fs.readFileSync(path.resolve(__dirname, '..', '..', f), 'utf8');
+    const mf = src.match(/var VOICE_F\s*=\s*(\/\(.*?\/)\s*[;\n]/s);
+    const mm = src.match(/var VOICE_M\s*=\s*(\/\(.*?\/)\s*[;\n]/s);
+    if(!mf || !mm){ bad++; console.log('✗ ' + f.padEnd(24) + 'לא נמצא מילון המגדר'); continue }
+    let RF, RM;
+    try{ RF = eval(mf[1]); RM = eval(mm[1]) }
+    catch(e){ bad++; console.log('✗ ' + f.padEnd(24) + 'מילון שאינו נקרא: ' + e.message); continue }
+    const miss = [];
+    for(const [name, want] of CASES){
+      const n2 = (name + ' x').toLowerCase();
+      const got = RF.test(n2) ? 'female' : RM.test(n2) ? 'male' : 'unknown';
+      if(got !== want) miss.push(name.slice(0, 34) + ' → ' + got + ' (צריך ' + want + ')');
+    }
+    if(miss.length){ bad++; console.log('✗ ' + f.padEnd(24) + miss.join(' · ')) }
+    else console.log('✓ ' + f.padEnd(24) + CASES.length + ' שמות, בעברית ובלטינית');
+  }
   if(bad){ console.log('\n' + bad + ' אפליקציות נכשלו'); process.exit(1); }
   console.log('\n' + APPS.length + ' אפליקציות, מנוע ההקראה מתאושש בכולן');
 }
