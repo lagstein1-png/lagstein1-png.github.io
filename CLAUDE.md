@@ -527,6 +527,9 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/skill.js                 # דף בניית האפליקציה — אות BUILD, שער השלבים, וטענת מספר־שורה
     node .claude/qa/srt.js                   # הכתוביות מול טבלאות התסריטים (המחולל: marketing/make-srt.js)
     node .claude/qa/core.js                  # learning-core/ — חוסם אימוץ כל עוד היא נסחפת מהמנוע החי
+    node .claude/qa/barak.js                 # מנוע ברק — חוזה ה-Worker מול מודל מדומה, פעולות, פרטיות, תקציב KV, והחיווט ב-13 דפים
+    node .claude/qa/barak-browser.js         # מנוע ברק בדפדפן אמיתי מול Worker מדומה — פעולה שמתבצעת, שנכשלת, אופליין, 429
+    node tutor-api/local/evals.mjs --mock    # הערכות ברק: 13 אפליקציות × 4 שפות × 4 תרחישים; --live רק מרנר (barak-live.yml)
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/mkreader.js --check       # marketing/index.html מול קובצי ה-md שהוא מרנדר
     node .claude/qa/counts.js                 # מספר תוכן שמצוטט בשיווק מול banks.js ומול TOPICS
@@ -1013,6 +1016,37 @@ tutor/tutor.js`; הכלל ״קוראים את הקוד לפני שמשערים״
 אחרי הצעה מצטט את מה שעל המסך (`ask`, `expr` — ולעולם לא `ans`)
 ואחריו הצעד הראשון; `node .claude/qa/offer.js` אוכף בארבע השפות,
 והוכח אדום לפני שהוכח ירוק.
+
+## מנוע ברק (BARAK-CORE) — 16.9.2026
+
+**מוח אחד לכל האפליקציות ולפרויקטים הבאים, ושני הכשלים שהוא סוגר:**
+״ברק לא יודע כלום״ — `POST /ask` ב-`tutor-api/worker.js` מקבל את
+המסך כולו (`screen`: מזהה, סוג, שאלה, אפשרויות, תשובה נכונה, מה
+התלמיד ענה, נושא, תוכנית); ו״אומר ׳נעבור למסך׳ ולא מעביר״ — המודל
+מקבל רשימה סגורה של פעולות (function calling) שהאפליקציה הצהירה,
+מחזיר אחת, ו-`tutor/barak-core.js` **מבצע** אותה דרך המתאם של
+האפליקציה. הטקסט שמלווה פעולה מוצג רק אחרי שהיא הצליחה.
+
+- **המתאם** — `BARAK.register({app, getScreenContext(), actions})`
+  בכל אפליקציה, מיד אחרי `TUTOR.mount`. `math-app` היא התבנית.
+  `run` מחזירה `true` רק כשבאמת קרה משהו; `next_question` מאומת
+  בשינוי `id` של המסך.
+- **אוצר הפעולות** קבוע בשרת (`ACTION_NAMES`): משותפות
+  (`next_question`, `show_hint`, `read_aloud`, `highlight_option`,
+  `explain_again`, `go_screen`, `repeat_question`) וייחודיות
+  (`slow_mode`, `formula_sheet`, `show_sign_image`, `next_sentence`,
+  `read_word`). פעולה חדשה נכנסת בשני המקומות.
+- **הנפילה המקומית** — כל כישלון (רשת, 8 שניות, 429, 5xx,
+  `fallback:"local"`) עונה מ-`josh-local.js`, וגם מזהה ״הבא״/״רמז״/
+  ״תקריא״ בארבע שפות ומבצע מקומית.
+- **הפאנל אינו מסתיר את התרגיל** — גיליון תחתון בטלפון, עמודה
+  במסך רחב (D-17, ממתין לאישור).
+- **KV**: לכל IP בזיכרון; גלובלי נכתב ל-KV כל 25 פניות או 10
+  דקות — נמדד 40 כתיבות ל-1,000 פניות.
+- **סטייג׳ינג**: `tutor-staging` (`[env.staging]`), `deploy-tutor-staging.yml`.
+  הייצור (`tutor`) נפרס רק אחרי ״יאללה״.
+- **מסמכים**: `docs/barak-core-progress.md`, `docs/barak-core-decisions.md`,
+  `docs/barak-core-report.md`. הדגמה ציבורית: `/barak/` (notApps).
 
 ## אפליקציית התאוריה
 

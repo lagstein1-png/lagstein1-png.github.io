@@ -1096,7 +1096,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a71 · 2026-09-16";
+var BUILD="a72 · 2026-09-16";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -5462,6 +5462,7 @@ render();
 <script src="/tutor/josh-state.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -5469,7 +5470,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a71-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a72-pwa1").catch(function(){});
   });
 }
 </script>
@@ -5505,6 +5506,82 @@ if(window.TUTOR){
                     (x.level!=null?("רמה "+x.level):null)};
     },
     stopHost:function(){try{stopSpeak()}catch(e){}}
+  });
+  /* ---- מנוע ברק — המתאם של האפליקציה (16.9.2026) ----
+     getScreenContext מחזיר מה שמוצג עכשיו; actions הן מה שברק
+     רשאי לעשות כאן, וכל אחת מחזירה true רק כשבאמת קרה משהו.
+     הועתק מהתבנית של math-app והותאם למשפחת החידון: P.q / opts /
+     answer, המסכים home·prog·set·prac, ו-newQuestion לדילוג. */
+  if(window.BARAK)BARAK.register({
+    app:"ulpan",
+    getScreenContext:function(){
+      var q=(typeof P!=="undefined")?P.q:null;
+      if(!q||view||state.screen!=="prac"||P.sum)return null;
+      var tp=topicOf(state.topic); if(!tp)return null;
+      var tr=trackOf(tp.trk), o=q.opts||[], ok=q.answer!=null?txt(q.answer):null, i;
+      if(!ok)for(i=0;i<o.length;i++)if(o[i].ok)ok=txt(o[i].t||o[i].h);
+      var line=txt(q.prompt), sb=q.subject;
+      if(sb&&typeof sb==="object")sb=sb.h||sb.t||sb.text||sb.w||"";
+      if(sb)line+=" — "+txt(sb);
+      if(q.qtext)line+=" "+txt(q.qtext);
+      if(q.lead)line+=" "+txt(q.lead);
+      if(q.expr)line+=" "+txt(q.expr);
+      var pk=(P.done&&!P.ok&&P.picked>=0&&o[P.picked])?txt(o[P.picked].t||o[P.picked].h):null;
+      return {id:q.id+"|"+q.type+"|"+line, type:P.done?"reveal":(q.type==="order"?"order":"mcq"),
+        q:line.trim(), options:o.map(function(x){return txt(x.t||x.h)}),
+        correct:ok, student:pk,
+        topic:tName(tp), level:"מסלול "+t(tr.nk)+" · רמה "+q.lv+" מתוך 3",
+        curriculum:"עברית לעולים — "+tName(tp)};
+    },
+    actions:{
+      next_question:{desc:"עובר לשאלה הבאה; באמצע שאלה — מדלג עליה בלי לספור טעות",
+        run:function(){
+          if(!BARAK.context())return false;
+          if(P.done){var b=document.querySelector('[data-a="next"]');if(!b)return false;b.click();return true}
+          stopSpeak();newQuestion();return true;
+        }},
+      show_hint:{desc:"מציג ומקריא את הרמז לשאלה שעל המסך",
+        run:function(){
+          if(!BARAK.context()||P.done||P.hint)return false;
+          var b=document.querySelector('[data-a="hint"]');if(!b)return false;
+          b.click();return P.hint===true;
+        }},
+      read_aloud:{desc:"מקריא את השאלה בקול",
+        run:function(){
+          if(!BARAK.context())return false;
+          var s=sayAsk(P.q);if(!s||!s.t)return false;speak(s.t,s.lg);return true;
+        }},
+      repeat_question:{desc:"מקריא את השאלה שוב",
+        run:function(){
+          if(!BARAK.context())return false;
+          var s=sayAsk(P.q);if(!s||!s.t)return false;speak(s.t,s.lg);return true;
+        }},
+      highlight_option:{desc:"מדגיש במסך אחת מהאפשרויות, לפי מקומה (0 עד 3)",
+        params:{index:{type:"integer",min:0,max:3,required:true}},
+        run:function(a){
+          if(!BARAK.context()||P.done)return false;
+          var b=document.querySelectorAll('#opts [data-a="pick"]');
+          return BARAK.highlight(b[a.index]||null);
+        }},
+      explain_again:{desc:"מסמן ומקריא שוב את ההסבר, אחרי שהשאלה נענתה",
+        run:function(){
+          if(!BARAK.context()||!P.done)return false;
+          var fb=document.querySelector(".fb");if(!fb)return false;
+          var s=txt(fb.innerHTML);if(!s)return false;
+          BARAK.highlight(fb);speak(s,state.lang);return true;
+        }},
+      go_screen:{desc:"עובר למסך אחר של האפליקציה: בית, התקדמות, הגדרות או תרגול",
+        params:{name:{type:"string",enum:["home","prog","set","prac"],required:true}},
+        run:function(a){
+          if(view==="sit")return false;
+          if(a.name==="prac"){if(!topicOf(state.topic))return false}
+          view="";stopSpeak();
+          if(a.name==="home"){P.q=null;save()}
+          state.screen=a.name;
+          if(a.name==="prac"&&!P.q)newQuestion();else render();
+          window.scrollTo(0,0);return state.screen===a.name;
+        }}
+    }
   });
   try{render()}catch(e){}
 }

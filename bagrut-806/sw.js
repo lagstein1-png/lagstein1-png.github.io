@@ -29,7 +29,7 @@ const PRE = [
   "/img/paula.jpg","/img/josh.jpg",
   "/img/josh-bot.jpg",
   "/tutor/josh-face.js",
-  "/tutor/josh-local.js","/tutor/tutor.js",
+  "/tutor/josh-local.js","/tutor/tutor.js","/tutor/barak-core.js",
   "/legal/terms.js", "/legal/protect.js",
   "./vendor/katex/fonts/KaTeX_AMS-Regular.woff2", "./vendor/katex/fonts/KaTeX_Caligraphic-Bold.woff2", "./vendor/katex/fonts/KaTeX_Caligraphic-Regular.woff2",
   "./vendor/katex/fonts/KaTeX_Fraktur-Bold.woff2", "./vendor/katex/fonts/KaTeX_Fraktur-Regular.woff2", "./vendor/katex/fonts/KaTeX_Main-Bold.woff2",

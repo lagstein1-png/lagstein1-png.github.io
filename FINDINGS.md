@@ -54,6 +54,59 @@
 | O-60 | **`marketing/index.html` נסחף מקובצי המקור, והפער היה כתוב בדף עצמו.** המחולל `mkreader.js` היה קיים ולא מתועד, ואיש לא בדק שהריצו אותו. נסגר עם `--check` — ראו למטה — אבל **הדפוס פתוח**: כל נכס נגזר שנוצר בפקודה ידנית חשוף לאותו דבר. `marketing/srt/` נוצר מ-`make-srt.js` ונבדק ב-`srt.js`; `wix-content.md` ו-`STATUS.md` נבדקים ב-`--check`; `.claude/qa/reports/` נבדק ב-`fresh.js`. **כולם מכוסים היום** — הממצא הוא שהכיסוי נבנה אחד־אחד ובדיעבד, ואין כלל שאומר ״נגזר חדש מגיע עם `--check`״ | זניח | הרצת `mkreader.js --check` על העץ שלפני התיקון | שורה ב-`CLAUDE.md` שמחייבת `--check` לכל מחולל חדש |
 ## נסגר — עם ההוכחה
 
+### מנוע ברק (BARAK-CORE) — מוח אחד, המסך כולו, ופעולות שמתבצעות · 16.9.2026
+
+**המנדט של הבעלים:** מוח AI משותף לברק שסוגר שני כשלים — ״ברק לא
+יודע כלום״ ו״אומר ׳נעבור למסך׳ ולא מעביר״ — על הענף
+`claude/barak-core-full-build-2gyyk4`, בלי מיזוג ל-`main` ובלי
+פריסת `tutor` בייצור עד ״יאללה״. היומן המלא: `docs/barak-core-progress.md`;
+ההחלטות: `docs/barak-core-decisions.md`; הדוח: `docs/barak-core-report.md`.
+
+**מה נבנה, בקבצים:** `tutor-api/worker.js` (`POST /ask`, function
+calling, `validateAction`, `discoverModels`, מונה בזיכרון עם flush
+ל-KV, `/health`, `[env.staging]`), `tutor/barak-core.js` (חדש),
+`tutor/tutor.js` (`send()` מאציל; פאנל שאינו מסתיר), 12 מתאמים
+(`BARAK.register` בכל `index.html` וב-`bagrut-806/app.js`), 13
+`sw.js` (`PRE`), 13 מפתחות, `legal/terms.js` 1.7, `JOSH.md` (35
+שורות), `/barak/` (notApps), שלושה וורקפלואים
+(`deploy-tutor-staging.yml`, `barak-live.yml`; `deploy-tutor.yml` לא
+נגע), ובריפו הנפרד של ״תאוריה מדברת״: v100 עם עותק מקומי של
+`barak-core.js`, `privacy.html`, ו-`tests/baraktest.js`.
+
+**מה לא נמצא, ולכן לא נבנה עליו:** `docs/barak-lesson-engine-spec.md`
+ו-״barak-player״ אינם קיימים באף ריפו (`find`, `grep -rl` — ריק).
+D-1: רשם הפעולות נבנה פעם אחת ב-`barak-core.js`.
+
+**הוכחות נפילה, בדיקה־בדיקה:**
+
+| בדיקה | שבור → אדום | תוקן → ירוק |
+|---|---|---|
+| `barak.js` | `validateAction` מקבל כל שם → ״פעולה לא מוכרת — action null״ ✗; שורת ״אל תאמר שאתה עובר למסך״ מוסרת מ-CORE → ״CORE: יושרת פעולות״ ✗; ולפני שלב 2, חצי הלקוח: 5 ✗ | 37 + 8 ✓ (`node .claude/qa/barak.js`) |
+| `barak-browser.js` | `math-app` לפני `validArgs` בלקוח: ״פעולה שנכשלה — הוצג טקסט המודל״ ✗, ו-״הבא״ אופליין לא זוהה (`\b` אחרי עברית) ✗ | 13 דפים ✓ (`/tmp/bb-all.txt` + הרצה חוזרת ל-`ulpan` אחרי תיקון ENTER) |
+| `evals.mjs` | השומר ב-Worker כובה והמוק גילה ״15״ → ״הרמז גילה את התשובה״ ✗ (1 מתוך 4) | 208 מתוך 208 ✓ (`--mock`) |
+| `tutor.js` (המונה) | אחרי המעבר לזיכרון: ״תקרת הלומד נגמרה״ ו״חסם העלות נגמר״ ✗ (2) — הבדיקות תיארו KV לכל בקשה | עודכנו לחוזה החדש + תקציב הכתיבות: 1,000 פניות → **40 כתיבות** (`node -e` על `overLimit`) |
+| `baraktest.js` (הריפו הנפרד) | `cachetest`: ״CHANGELOG פותח ב-v99 ואילו BUILD הוא v100״ ✗ | 17 מתוך 17 ✓ (`node tests/run-all.js --quiet`) |
+| `barak.js` — פרסור הקבצים המשותפים | **באג אמיתי שנתפס בדרך:** גרשיים ASCII בתוך מחרוזת אנגלית ב-`legal/terms.js` 1.7 → `pageerror: Unexpected identifier 'hint'` ב-12 אפליקציות (`all.js` מלא, ריצה ראשונה), בזמן ש-`all.js --static` היה ירוק — `parse.js` בודק רק `index.html`. הבדיקה החדשה על הקובץ השבור: ✗ | תוקן (״hint״ בגרשיים טיפוגרפיים), ✓; `tutor/*.js` ו-`legal/*.js` מתפרסרים ב-`vm.Script` מעכשיו |
+
+**מה נמדד בדפדפן אמיתי** (`barak-browser.js`, כרומיום, 390×844, Worker
+מדומה ב-`page.route`): בכל אחד משלושה־עשר הדפים — הגוף נושא `screen`
+עם אפשרויות ו-`actions`; `next_question` מחליפה מסך (id שונה);
+`show_hint` פותחת רמז; `go_screen` ליעד לא קיים מציגה
+`ACTION_FAILED` ולא את טקסט המודל; `highlight_option` מדגישה;
+אופליין (`route.abort`) → מקומי, ״הבא״ מבוצע מקומית, אפס `.tu-note`;
+429 → מקומי בלי שגיאה; אפס `pageerror`. בריפו הנפרד: אותו דבר על
+מסך הרצף, ועוד `show_sign_image`, ואין כפתור ואין הקשר בבחינה.
+
+**מה נשאר פתוח:**
+- **הפריסה לסטייג׳ינג לא רצה** — Cloudflare חסום מכאן. Actions →
+  `deploy-tutor-staging` → `STAGING` היא הריצה הראשונה, והיא בודקת
+  `/health` ו-`/ask` בסופה. **`GEMINI_API_KEY` קיים** (deploy-tutor
+  ריצה 6 החזירה 200).
+- **המודל האמיתי לא נמדד** מכאן — `barak-live.yml` (≤60 קריאות).
+- D-17 (הפאנל) ו-D-15 (דף `/barak/`) ממתינים לאישור הבעלים.
+- O-9 מתקדם: `theory.patch` נוצר מחדש מה-diff האמיתי, והחיווט יושב
+  על הענף של הריפו הנפרד — נבדק בדפדפן דרך `page.route`; **לא מוזג**.
+
 ### סגירת הסשן — ומה שהתהפך בזמן שהוא רץ · 16.9.2026
 
 **קראו את זה לפני שמאמינים למדידה מוקדמת בקובץ הזה על ברק.**
