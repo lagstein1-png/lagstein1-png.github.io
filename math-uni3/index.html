@@ -948,7 +948,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g109 · 2026-09-16";
+var BUILD="g110 · 2026-09-16";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -7623,7 +7623,12 @@ var TR_KEYS=[
 /* שלוש מחרוזות של cr רמה 2 — המשפחה השלישית והסימן בשנייה (O-41). בסוף בלבד. */
 "טעות סימן. המשוואה השנייה נותנת v לפי x שווה למינוס u לפי y, וזה מה שקובע את הסימן של x².",
 "טעות סימן בשתי המשוואות יחד — זו מינוס v, ולא v.",
-"טעות סימן באיבר y³. הוא יוצא מהאינטגרל לפי y של האיבר עם y² ב-u לפי x, ושומר על הסימן שלו."
+"טעות סימן באיבר y³. הוא יוצא מהאינטגרל לפי y של האיבר עם y² ב-u לפי x, ושומר על הסימן שלו.",
+/* מחרוזות ההקראה של ״מתמטיקה מדוברת״ שלא היו במילון כלל, ולכן
+   נאמרו בעברית בתוך הקראה ערבית או רוסית (O-59). בסוף המערך בלבד. */
+" מימין ",
+" משמאל ",
+" בחזקת מינוס $1 "
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -7654,6 +7659,20 @@ function trMissing(lang){
   for(i=0;i<TR_KEYS.length;i++)if(!d[TR_KEYS[i]])n++;
   return n;
 }
+
+/* התרגומים למחרוזות ההקראה שנוספו בסוף TR_KEYS (O-59). */
+trAt("ar",1328,[
+" من اليمين ",
+" من اليسار ",
+" مرفوعة للقوة ناقص $1 "]);
+trAt("ru",1328,[
+" справа ",
+" слева ",
+" в степени минус $1 "]);
+trAt("en",1328,[
+" from the right ",
+" from the left ",
+" to the power minus $1 "]);
 
 /* מחרוזות הקול שנוספו אחרי הבנייה הראשונה של המילון. */
 trAt("ar",904,[
@@ -11727,7 +11746,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g109-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g110-pwa1").catch(function(){});
   });
 }
 </script>
