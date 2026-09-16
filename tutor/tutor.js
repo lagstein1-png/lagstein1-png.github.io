@@ -80,6 +80,7 @@ he:{ btn:"ברק — עזרה מהמורה", title:"עזרה מהמורה", clos
   intro:"אפשר לשאול אותי על מה שעל המסך. אני נותן רמז אחד בכל פעם, ומחכה לתשובה.",
   nudge:{stuck:"שמתי לב שהשאלה הזאת תופסת זמן. רוצה שנפרק אותה יחד, צעד אחד בכל פעם?",frustrated:"אני רואה שזה לא הולך עכשיו, וזה בסדר גמור. בוא ננסה מכיוון אחר."}, greet:"היי, אני ברק. אני כאן אם משהו לא ברור. כתוב לי מה, ונעבור על זה יחד.", ph:"מה לא ברור?", hello:"אני צריך עזרה במה שעל המסך.", wait:"רגע, חושב…",
   err:"לא הצלחתי להתחבר. אפשר לנסות שוב עוד רגע.",
+  local:"התשובה מהמכשיר, לא מהשרת",
   setup:"העזרה עוד לא מוכנה. אפשר לנסות מאוחר יותר.",
   limit:"מספיק להיום — נמשיך מחר.",
   limitAll:"זה לא אתה — הגעתי לגבול היומי שלי. אפשר לנסות שוב מחר, וכל השאר באפליקציה עובד.",
@@ -94,6 +95,7 @@ ar:{ btn:"باراك — مساعدة من المعلّم", title:"مساعدة 
   intro:"يمكنك أن تسألني عمّا يظهر على الشاشة. أعطي تلميحًا واحدًا في كل مرة وأنتظر إجابتك.",
   nudge:{stuck:"لاحظت أن هذا السؤال يأخذ وقتًا. تريد أن نفكّكه معًا، خطوة واحدة في كل مرة؟",frustrated:"أرى أن الأمر لا يسير الآن، وهذا طبيعي تمامًا. لنجرّب من زاوية أخرى."}, greet:"مرحبًا، أنا باراك. أنا هنا إن كان شيء غير واضح. اكتب لي ما هو، ونمرّ عليه معًا.", ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
   err:"لم أتمكّن من الاتصال. حاول مرّة أخرى بعد قليل.",
+  local:"الجواب من الجهاز، لا من الخادم",
   setup:"المساعدة ليست جاهزة بعد. حاول لاحقًا.",
   limit:"يكفي لهذا اليوم — نُكمل غدًا.",
   limitAll:"ليست غلطتك — وصلتُ إلى حدّي اليوميّ. جرّب غدًا، وكلّ شيء آخر في التطبيق يعمل.",
@@ -108,6 +110,7 @@ ru:{ btn:"Барак — помощь учителя", title:"Помощь уч�
   intro:"Можешь спросить меня о том, что на экране. Я даю по одной подсказке и жду ответа.",
   nudge:{stuck:"Я заметил, что этот вопрос отнимает время. Разберём его вместе, по одному шагу?",frustrated:"Вижу, что сейчас не идёт, и это совершенно нормально. Попробуем с другой стороны."}, greet:"Привет, я Барак. Я рядом, если что-то непонятно. Напиши, что именно, и разберём вместе.", ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
   err:"Не удалось соединиться. Попробуй ещё раз через минуту.",
+  local:"Ответ с устройства, не с сервера",
   setup:"Помощь ещё не готова. Попробуй позже.",
   limit:"На сегодня хватит — продолжим завтра.",
   limitAll:"Это не ты — я достиг своего дневного предела. Попробуй завтра, остальное в приложении работает.",
@@ -122,6 +125,7 @@ en:{ btn:"Barak — ask the teacher", title:"Ask the teacher", close:"Close", se
   intro:"You can ask me about what is on the screen. I give one hint at a time, and wait for your answer.",
   nudge:{stuck:"I noticed this one is taking a while. Shall we break it down together, one step at a time?",frustrated:"I can see this is not working right now, and that is completely fine. Let us try another way."}, greet:"Hi, I am Barak. I am here if something is unclear. Write what it is, and we will go through it together.", ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
   err:"I could not connect. Try again in a moment.",
+  local:"Answered on the device, not by the server",
   setup:"The help is not ready yet. Try again later.",
   limit:"That is enough for today — we will carry on tomorrow.",
   limitAll:"It is not you — I have reached my daily limit. Try again tomorrow; everything else in the app still works.",
@@ -604,6 +608,7 @@ var CSS = ''
 +'.tu-m{max-width:88%;border-radius:15px;padding:10px 14px;white-space:pre-wrap;word-break:break-word}'
 +'.tu-me{align-self:flex-end;background:#dff1fa;border:2px solid rgba(88,183,224,.45)}'
 +'.tu-bot{align-self:flex-start;background:#d9f2ec;border:2px solid rgba(14,156,141,.4)}'
++'.tu-src{align-self:flex-start;font-size:.78em;color:#5b6770;margin:-4px 8px 0}'
 +'.tu-m p{margin:0 0 .45em}.tu-m p:last-child{margin-bottom:0}'
 +'.tu-l{margin:.2em 0 .45em;padding-inline-start:1.25em}.tu-l li{margin:.15em 0}'
 +'.tu-m>*:last-child{margin-bottom:0}'
@@ -713,7 +718,7 @@ function build(){
     setLang(this.value);
     /* שפה חדשה — שיחה חדשה, אחרת הבוט ממשיך בשפה הקודמת */
     MSGS = []; NOTE = ""; LANGAT = lang();
-    stopSay(); draw(); send(T().hello, true);
+    stopSay(); draw(); greetLocal();   /* ברכה מקומית — ראו open() */
   };
   EL.go.onclick = function(){ send(EL.inp.value) };
   wireMic(ov);
@@ -782,6 +787,7 @@ function draw(){
     }
     var sp = splitSugg(i === REV ? m.text.slice(0, REVN) : m.text);
     h += '<div class="tu-m tu-bot">' + fmt(sp.body) + '</div>';
+    if(m.local) h += '<div class="tu-src">' + esc(t.local) + ' · ' + esc(m.local) + '</div>';
     h += ctl(i);
     /* ההצעות מופיעות רק כשהתשובה כולה על המסך, ורק על האחרונה —
        שרשרת של הצעות ישנות היא רעש, ולחיצה עליהן שולחת שאלה
@@ -949,8 +955,12 @@ function open(auto){
   draw();
   /* פתיחה אוטומטית אינה גונבת מיקוד. הפאנל הוא דיאלוג, ומיקוד
      שקופץ אליו בלי שהלומד ביקש מקפיץ גם קורא מסך באמצע משפט. */
-  if(!MSGS.length){ if(auto) greetLocal(); else send(T().hello, true) }
-  else if(!auto) focus();
+  /* **הברכה תמיד מקומית — 16.9.2026.** פתיחה ידנית שלחה ״אני צריך
+     עזרה במה שעל המסך״ לשרת, כלומר כל פתיחת פאנל עלתה בקשה אחת
+     מתוך 10 ליום ל-IP (`perDay` ב-worker.js) — לפני שהלומד כתב
+     מילה. הברכה היא טקסט קבוע, ואין סיבה לשלם עליה. */
+  if(!MSGS.length) greetLocal();
+  if(!auto) focus();
 }
 function close(){
   micStop();
@@ -1095,7 +1105,14 @@ function sign(){
    על תקציב, ומוח מקומי אינו עולה דבר — לומד שמדבר עם ג׳וש חמישים
    פעם ביום אינו עולה יותר מלומד שמדבר איתו פעם אחת. תקרה כאן
    הייתה מגבילה בלי שום דבר להגן עליו. */
-function replyLocal(text){
+/* `why` — למה לא השרת: "offline", "quota" (המונה במכשיר), או
+   הסיבה מה-`catch` (limit / limitAll / setup / http / err / empty).
+   **כשיש כתובת שרת, התשובה המקומית מסומנת ללומד** בשורה קטנה
+   ואפורה, ״התשובה מהמכשיר, לא מהשרת״ + הסיבה. זו אינה שגיאה —
+   התשובה כן הגיעה — אלא יושר: הבעלים בדק מ-`localhost` ב-16.9.2026,
+   קיבל ״אני מוח קטן… בלי חיבור לאינטרנט״ בכל אפליקציה, ולא הייתה
+   דרך לדעת מהמסך אם השרת נפל, נחסם, או שהמכסה (10 ליום ל-IP) נגמרה. */
+function replyLocal(text, why){
   if(typeof JOSHLOCAL === "undefined") return false;
   var out;
   try{
@@ -1107,7 +1124,7 @@ function replyLocal(text){
   }catch(e){ return false }
   if(!out || !out.text) return false;
 
-  MSGS.push({ role:"assistant", text:out.text });
+  MSGS.push({ role:"assistant", text:out.text, local: API ? (why || "local") : "" });
   startReveal(MSGS.length - 1);
   BUSY = false; draw(); focus();
   return true;
@@ -1135,7 +1152,8 @@ function send(text, auto){
     /* השהיה קצרה כדי שהפאנל יספיק לצייר את תור הלומד לפני
        התשובה. בלעדיה שתי השורות מופיעות יחד וזה נראה כמו טופס. */
     BUSY = true; draw();
-    setTimeout(function(){ if(!replyLocal(text)){ BUSY = false; NOTE = t.err; draw() } }, 420);
+    var why = !API ? "" : navigator.onLine === false ? "offline" : "quota";
+    setTimeout(function(){ if(!replyLocal(text, why)){ BUSY = false; NOTE = t.err; draw() } }, 420);
     return;
   }
 
@@ -1215,7 +1233,13 @@ function send(text, auto){
        בקונסולה (נכתבה למעלה, לפי הסטטוס) למי שמקים את השירות.
        ״מספיק להיום״ ו״לא הצלחתי להתחבר״ מוצגים רק כשגם המוח
        המקומי אינו קיים — כלומר בדף שלא טען את `josh-local.js`. */
-    if(replyLocal(text)){ NOTE = ""; draw(); return }
+    /* שגיאת רשת של הדפדפן נושאת הודעה חופשית (״Failed to fetch״);
+       ללומד מציגים מילה אחת קבועה. */
+    if(!/^(limit|limitAll|setup|http|empty)$/.test(why)) why = "network";
+    /* שגיאת רשת של הדפדפן נושאת הודעה חופשית (״Failed to fetch״);
+       ללומד מציגים מילה אחת קבועה. */
+    if(!/^(limit|limitAll|setup|http|empty)$/.test(why)) why = "network";
+    if(replyLocal(text, why)){ NOTE = ""; draw(); return }
     /* ההודעה הפותחת נכשלה — מסירים אותה, אחרת השיחה מתחילה
        מתור של הילד שהוא בעצם שלנו */
     if(auto) MSGS = [];
