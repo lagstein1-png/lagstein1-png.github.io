@@ -113,9 +113,14 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
     if (!actions.length) F('אין פעולות');
 
     /* עוזר: שולח דרך הפאנל ומחכה לתשובה */
+    /* כל תרחיש מתחיל משיחה נקייה. בלי זה שבעת התרחישים צוברים
+       ארבעה־עשר תורים על אותה שאלה, האחרון נבלם ב-`TURNS` ואינו
+       רץ כלל — והבדיקה מדווחת על הודעת אורך השיחה כאילו הייתה
+       שגיאה. נמדד על הרנר בריצה 617 (`english`). */
     async function send(txt, m) {
       mode = m;
       const n = seen.length;
+      await page.evaluate(() => { try { TUTOR._clear() } catch (e) {} });
       await page.evaluate(() => { try { TUTOR.open() } catch (e) {} });
       await page.waitForTimeout(150);
       await page.fill('#tu-in', txt);
