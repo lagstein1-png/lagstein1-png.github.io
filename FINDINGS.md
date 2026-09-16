@@ -8202,7 +8202,7 @@ g109 l97 n103 m108 a71 k47 x69`, בית `96`, reader `76`.
 **מה מוגש בפועל:** הפריסה האחרונה ל-Pages היא ריצה 464 על
 `ec86d35` (14:25 UTC). כל מה שנבנה אחרי כן יושב בענפים בלבד:
 `claude/barak-core-full-build-2gyyk4` בריפו הזה (69 קבצים, 3,654+
-/ 246−, `git diff --stat origin/main`) וב-`drivewise` (v100, 6
+/ 246−, `git diff --stat origin/main`) וב-הריפו הנפרד של ״תאוריה מדברת״ (v100, 6
 קבצים), שלושה ענפים ב-`learning-app` ואחד ב-`arthur-orchestrator`.
 אין PR פתוח באף אחד. `main` היה אדום ריצה אחת (602, `markers.js`)
 ותוקן ב-604.
