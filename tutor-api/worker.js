@@ -393,7 +393,17 @@ function badEquation(text) {
    את המקור של הבקשה אם הוא ברשימה. מקור שאינו ברשימה מקבל את
    הראשון, כלומר נחסם — זו התנהגות סגורה, לא פתוחה. */
 const ORIGINS = "https://lagstein1-png.github.io,https://lagstein-hub.onrender.com";
+/* **והשרת המקומי של הבדיקות — 16.9.2026.** הבעלים פתח את
+   `localhost:8099` (`.claude/qa/serve.js`), שאל את ברק ״מה שלומך״
+   וקיבל ״אני מוח קטן… בלי חיבור לאינטרנט״: הבקשה יצאה, השרת ענה,
+   והדפדפן **בלע** את התשובה מפני שהמקור לא ברשימה — ואז `send()`
+   נפל למוח המקומי בלי שגיאה, בדיוק כמתוכנן. מבחוץ זה נראה כאילו
+   השרת מנותק. שני המקורות האלה מותרים תמיד, גם כש-`ALLOW_ORIGIN`
+   מוגדר בענן: הם אינם נגישים מהאינטרנט, והתקרות (`RATE`) חלות
+   עליהם כמו על כולם. */
+const LOCAL_ORIGINS = ["http://localhost:8099", "http://127.0.0.1:8099"];
 function pickOrigin(env, reqOrigin) {
+  if (LOCAL_ORIGINS.indexOf(reqOrigin) >= 0) return reqOrigin;
   const list = String(env.ALLOW_ORIGIN || ORIGINS).split(",").map(function (s) { return s.trim() }).filter(Boolean);
   return list.indexOf(reqOrigin) >= 0 ? reqOrigin : list[0];
 }
