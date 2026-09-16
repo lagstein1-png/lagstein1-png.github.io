@@ -7746,3 +7746,34 @@ n67 m72 a36 l55 k11`. `STATUS.md` רוענן, ותשעה דוחות תוכן נ�
 `fetch(\`data/questions.${S.lang}.json\`)` (`index.html:902`).
 מה שלא נמדד מכאן: שהדף החי נטען — הרשת חסומה, וזה `live-check`.
 **ריצות `main` אחרי הדחיפה:** 550 (`ae51ea2`) ירוקה, 552 ירוקה.
+
+### 16.9.2026 — סקירת ברק: התיעוד אמר ״דלוק ושולח״, הקוד אומר ״דלוק ומקומי״; והטלאי של תאוריה היה מקולקל
+
+**מה נמדד.** `grep -n 'var API' tutor/tutor.js` → `40:var API = "";`,
+זהה ב-`origin/main`. `CLAUDE.md` (הפסקה ״ופאולה דלוקה״) ציטט
+`32:var API = "https://tutor.lagstein1.workers.dev/"` וטען שהבוט
+שולח ל-Cloudflare ול-Anthropic — נכון ל-13.9, לא מאז המיזוג
+`1338a5f` (14.9). הפסקה נכתבה מחדש לפי המצב הנמדד: `BRAIN` אמת
+דרך `josh-local.js`, המענה במכשיר, `terms.js` הוא `1.5`, בדיקה 8
+של `qa/tutor.js` דורשת שהתנאים לא ינקבו בספק כשהכתובת ריקה.
+
+**`tutor-api/theory.patch` לא היה ניתן להחלה.** `git apply --check`
+מול `drivewise` (`80b1565d`): `corrupt patch at line 22` — ההיתוך
+הראשון הצהיר `+350,15` ונשא עשר תוספות (תגיות `josh-state.js`
+ו-`josh-local.js` נוספו לגוף בלי הכותרת), וההיתוך של `sw.js` אותו
+דבר (`+17,15` מול 11 תוספות). וגם `BUILD`: הריפו ההוא כבר `v99`,
+והטלאי ניסה `v98 → v99`. **תוקן:** הטלאי נוצר מחדש כ-`git diff`
+על עותק של `index.html` ו-`sw.js` מ-`80b1565d` עם אותן חמש
+נגיעות, `v99 → v100`; `git apply --check` מול `drivewise` עובר
+(קריאה בלבד — לא הוחל שם). `THEORY.md` עודכן: סעיף ״`josh-state.js`
+אינו שם״ סתר את הטלאי עצמו ונכתב מחדש.
+
+**מה לא נמדד:** תשובות חיות מ-Gemini או מ-Claude — אין מפתח
+בסביבה, `generativelanguage.googleapis.com` ו-`workers.dev`
+חסומים (403). 12 גופי הבקשה (4 תצורות × 3 שאלות) נבנו על ידי
+ה-handler האמיתי עם `fetch` מדומה ונמסרו לבעלים; אף שינוי
+בתצורה לא נכנס לקוד. `deploy-tutor.yml` עדיין פורס עם
+`ANTHROPIC_API_KEY` בלבד ומאמת `sk-ant-` — פריסה דרכו תיתן Worker
+עם Gemini כברירת מחדל ובלי `GEMINI_API_KEY`, כלומר 500. **פתוח.**
+
+`node .claude/qa/all.js --static`: 35, כולן עברו.

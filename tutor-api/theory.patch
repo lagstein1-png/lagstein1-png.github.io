@@ -1,8 +1,8 @@
 diff --git a/index.html b/index.html
-index 953f785..66bec06 100644
+index da999b9..6fb3f33 100644
 --- a/index.html
 +++ b/index.html
-@@ -350,6 +350,15 @@ button:disabled{cursor:default}
+@@ -350,6 +350,16 @@ button:disabled{cursor:default}
  
  </div>
  
@@ -19,16 +19,16 @@ index 953f785..66bec06 100644
  <script>
  /* =====================================================================
     תאוריה מדברת · כל הקוד בתוך IIFE
-@@ -809,7 +818,7 @@ const DEV = (()=>{
+@@ -809,7 +819,7 @@ const DEV = (()=>{
  })();
  
  /* מספר גרסה גלוי — כדי שתמיד נדע איזו גרסה באמת רצה */
--const BUILD = 'v98';
-+const BUILD = 'v99';
+-const BUILD = 'v99';
++const BUILD = 'v100';
  
  const HEBREW_PRAISE = ["מעולה! 👏", "כל הכבוד! 🔥", "יפה מאוד! 🎯"];
  let lastPraiseIndex = -1;
-@@ -3056,6 +3065,7 @@ function renderFlow(){
+@@ -3058,6 +3068,7 @@ function renderFlow(){
      ${q.o.map((o,i)=>`<button class="opt" type="button" data-flow="${i}"><b class="optnum" aria-hidden="true">${i+1}</b><span aria-live="polite">${escapeHTML(o)}</span></button>`).join('')}
      ${q.h1 || q.h2 ? `<button class="hintbtn" id="btnHint" type="button">${t('hint')}</button>` : ''}
      <button class="hintbtn" id="btnSkip" type="button">${t('skipQ')}</button>
@@ -36,7 +36,7 @@ index 953f785..66bec06 100644
      ${EXPLAIN.enabled ? `<button class="explainbtn" id="btnExplain" type="button">${t('explain')}</button>` : ''}
      <div id="explainBox"></div>
      <div id="after"></div>`;
-@@ -3557,6 +3567,11 @@ screen.addEventListener('click', e => {
+@@ -3559,6 +3570,11 @@ screen.addEventListener('click', e => {
    }
    const fa = e.target.closest('[data-flow]');
    if(fa && !fa.disabled){ flowAnswer(+fa.dataset.flow); return; }
@@ -48,14 +48,15 @@ index 953f785..66bec06 100644
    if(e.target.closest('#btnHint')){
      S.screen === 'flow' ? flowHint(S.hint + 1) : showHint(S.hint + 1, true);
      return;
-@@ -3607,6 +3622,28 @@ loadBank().then(() => {
+@@ -3609,6 +3625,29 @@ loadBank().then(() => {
    buildQueue();
    if(S.screen === 'home' || (S.screen === 'flow' && !S.answered)) render();
  });
 +
 +/* ״עזרה מהמורה״ — מחובר מכאן, מתוך ה-IIFE. מחוצה לו S, FLOW
 +   ו-stopSpeech אינם קיימים, וה-catch היה מחזיר ברירת מחדל בשקט.
-+   mount מחזיר false כשאין כתובת שרת, ואז הכפתור אינו נבנה. */
++   mount מחזיר false כשאין מוח — לא שרת ולא josh-local — ואז
++   הכפתור אינו נבנה. */
 +if(window.TUTOR){
 +  TUTOR.mount({
 +    app: "theory",
@@ -78,15 +79,15 @@ index 953f785..66bec06 100644
  </script>
  </body>
 diff --git a/sw.js b/sw.js
-index 61a215b..db866aa 100644
+index 61a215b..4e08930 100644
 --- a/sw.js
 +++ b/sw.js
-@@ -17,6 +17,15 @@ const CACHE = 'theory-' + V;
+@@ -17,6 +17,17 @@ const CACHE = 'theory-' + V;
  const PRECACHE = [
    './',
    './index.html',
 +  /* התשתית של ״עזרה מהמורה״ — מגיעה מהריפו הראשי, אותו מקור.
-+     ארבעתם נתיבים מוחלטים ולכן הם אותם קבצים שכל שתים־עשרה
++     נתיבים מוחלטים, ולכן הם אותם קבצים שכל שתים־עשרה
 +     האפליקציות מצרפות מראש; בלעדיהם הבוט עובד ברשת ונשבר
 +     אופליין, וזה נכשל בשקט. */
 +  '/tutor/josh-face.js',
