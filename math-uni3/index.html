@@ -948,7 +948,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g112 · 2026-09-16";
+var BUILD="g113 · 2026-09-16";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -7628,7 +7628,8 @@ var TR_KEYS=[
    נאמרו בעברית בתוך הקראה ערבית או רוסית (O-59). בסוף המערך בלבד. */
 " מימין ",
 " משמאל ",
-" בחזקת מינוס $1 "
+" בחזקת מינוס $1 ",
+"עיגלתם לספרה אחת יותר מדי. החסם נגזר ממספר הספרות שבשאלה, ולא מאחת מעבר לו."
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -11567,6 +11568,17 @@ trAt("en",1278,[
 "Microsoft Edge has natural voices for this language, female and male — nothing to install, with an internet connection.",
 "Open the app in Edge"
 ]);
+/* המסיח שהחליף את ״זה מספר הספרות, לא החסם״ (ראו ההערה ליד W)
+   נכנס בלי מפתח, ושלוש שפות ראו אותו בעברית. i18n.js תופס את זה. */
+trAt("ar",TR_KEYS.indexOf("עיגלתם לספרה אחת יותר מדי. החסם נגזר ממספר הספרות שבשאלה, ולא מאחת מעבר לו."),[
+"قرّبتم إلى خانة واحدة زائدة. الحدّ يُشتقّ من عدد الخانات في السؤال، لا من خانة تتجاوزه."
+]);
+trAt("ru",TR_KEYS.indexOf("עיגלתם לספרה אחת יותר מדי. החסם נגזר ממספר הספרות שבשאלה, ולא מאחת מעבר לו."),[
+"Вы округлили на один знак больше, чем нужно. Граница выводится из числа знаков в вопросе, а не из ещё одного за ним."
+]);
+trAt("en",TR_KEYS.indexOf("עיגלתם לספרה אחת יותר מדי. החסם נגזר ממספר הספרות שבשאלה, ולא מאחת מעבר לו."),[
+"You rounded to one digit too many. The bound comes from the number of digits in the question, not from one beyond it."
+]);
 /* מסיחים וצעדים שנוספו בסבב סגירת האפשרויות המתות. העוגן הוא המפתח
    הראשון בבלוק, ולכן הוספה בסוף TR_KEYS אינה מזיזה שום אינדקס. */
 trAt("ar",TR_KEYS.indexOf("אנליטית בכל נקודה שבה u ו-v גזירות"),[
@@ -11747,7 +11759,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g112-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g113-pwa1").catch(function(){});
   });
 }
 </script>
