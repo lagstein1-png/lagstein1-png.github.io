@@ -7942,9 +7942,19 @@ n67 m72 a36 l55 k11`. `STATUS.md` רוענן, ותשעה דוחות תוכן נ�
 — התרגיל שעל המסך, מצוטט. `smoke.js math-app`: clean, 18
 פקדים. `all.js --static`: 36, כולן עברו (35 + `offer`).
 
-**מה לא נמדד:** תשובה חיה מ-Gemini — `workers.dev`
-ו-`generativelanguage.googleapis.com` חסומים מכאן. הפריסה מופעלת
-ב-Actions אחרי המיזוג; התוצאה שם (200 או 500) נרשמת למטה.
+**הפריסה — `deploy-tutor` ריצה 3, על `e17b7e4`.** המפתח נמצא
+ב-GitHub (תחת אחד השמות; ה-Worker עלה עם `GEMINI_API_KEY`
+ו-`ANTHROPIC_API_KEY` שניהם, גרסה `8d000760`). הבדיקה החיה: שש
+פעמים 502 `{"error":"upstream"}`. האבחון מהרנר, ישירות מול גוגל
+עם אותו מפתח — **404**:
+
+    "This model models/gemini-2.5-flash is no longer available to
+     new users. Please update your code to use models/gemini-3.6-flash"
+
+כלומר המפתח תקין והשם מיושן. `MODEL` ב-`worker.js` הוחלף
+ל-`gemini-3.6-flash` — השם שגוגל נקבה בו, לא ניחוש — וגם קריאת
+האבחון ב-`deploy-tutor.yml`. `qa/tutor.js` ו-`search.js` ירוקים.
+התוצאה של הפריסה החוזרת נרשמת למטה.
 
 **שלב 3 — הקול הנשי: לא בוצע.** ההודעה אמרה ״ראה את ההחלטה שאני
 שולח בהודעה הנפרדת״, וההודעה לא הגיעה. זו החלטה של הבעלים, לא

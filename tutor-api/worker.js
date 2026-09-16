@@ -142,7 +142,12 @@ const TARGETNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנ
    המפתח של כל מנוע נקרא מהסוד ששמו ב-`key`, ורק הוא נבדק:
    חסר המפתח של המנוע הפעיל — 500. הסוד של המנוע השני אינו
    נדרש ואינו נמחק. */
-const MODEL = "gemini-2.5-flash";
+/* **`gemini-3.6-flash` ולא `gemini-2.5-flash` — 16.9.2026.** הפריסה
+   הראשונה עם Gemini (deploy-tutor ריצה 3) החזירה 502, והאבחון
+   מהרנר קיבל מגוגל 404: ״This model models/gemini-2.5-flash is no
+   longer available to new users. Please update your code to use
+   models/gemini-3.6-flash״. השם הזה הוא של גוגל, לא ניחוש. */
+const MODEL = "gemini-3.6-flash";
 const CLAUDE_MODEL = "claude-haiku-4-5";   /* דרך החזרה: PROVIDER=anthropic */
 const MAX_TOKENS = 700;          /* תשובה קצרה. גבוה מספיק כדי לא להיחתך באמצע משפט */
 const ENGINES = {
