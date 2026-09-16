@@ -70,6 +70,11 @@ const ASK = {
   wrong:   { he: "טעיתי שוב, אני גרוע בזה", ar: "أخطأت مرة أخرى، أنا سيّئ في هذا", ru: "Я снова ошибся, я плох в этом", en: "I got it wrong again, I am bad at this" }
 };
 const SCRIPT = { he: /[֐-׿]/, ar: /[؀-ۿ]/, ru: /[Ѐ-ӿ]/, en: /[A-Za-z]/ };
+/* השם כפי שכל המאגר כותב אותו — tutor/tutor.js, tutor/josh-local.js,
+   barak/index.html — ומ-16.9.2026 גם CORE שבשרת. NAME_ALT תופס
+   תעתיק שנראה כמו השם ואינו הוא. */
+const NAME     = { he: "ברק",  ar: "باراك",        ru: "Барак",      en: "Barak" };
+const NAME_ALT = { he: "ברק",  ar: "بار[اقئ]ق?|باراق", ru: "Бар[а-я]?к", en: "\\bbarak\\b" };
 
 /* ---------- המודל המדומה ---------- */
 const MOCK_SAY = {
@@ -95,6 +100,16 @@ function judge(scn, lang, screen, d, turn) {
   if (!say) f.push("אין say");
   if (!SCRIPT[lang].test(say)) f.push("לא בשפת הממשק (" + lang + ")");
   if (lang !== "he" && lang !== "en" && /[֐-׿]{4,}/.test(say)) f.push("עברית בתוך תשובה ב-" + lang);
+  /* **השם, בארבע כתבים — 16.9.2026.** ריצת barak-live 3 החזירה
+     ״أنا ברק״ בערבית ו-״Я ברק״ ברוסית, ושלושתן **עברו**: הסף למעלה
+     הוא ארבעה תווים עבריים רצופים, ו״ברק״ הוא שלושה. באותה ריצה
+     המודל גם המציא תעתיקים — بارق מול باراك, Барк מול Барак,
+     ו-barak באות קטנה — מפני ש-CORE נקב בשם בעברית בלבד.
+     הטענה כאן מדויקת ולכן אין לה שגויי־חיוב: השם עצמו, באותיות
+     הנכונות לשפת התשובה. */
+  if (lang !== "he" && /ברק/.test(say)) f.push("השם באותיות עבריות בתשובה ב-" + lang);
+  if (NAME[lang] && new RegExp(NAME_ALT[lang]).test(say) && !say.includes(NAME[lang]))
+    f.push("תעתיק אחר של השם ב-" + lang + " (הנכון: " + NAME[lang] + ")");
   if (scn === "hint" && screen.correct && revealsAnswer(say, screen.correct)) f.push("הרמז גילה את התשובה");
   if (scn === "next" && !(d.action && d.action.name === "next_question")) f.push("״נעבור״ בלי פעולה next_question");
   /* **הטענה תוקנה 16.9.2026.** הניסוח הראשון דרש שהמילה ״הבא״
