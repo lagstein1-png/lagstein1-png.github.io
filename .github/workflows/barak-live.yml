@@ -27,6 +27,10 @@ on:
         description: 'שפות (ברירת מחדל: he,ar,ru,en)'
         required: false
         default: 'he,ar,ru,en'
+      scns:
+        description: 'תרחישים, מופרדים בפסיק (hint,explain,next,wrong,simplify). ריק — הכול'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -40,7 +44,7 @@ jobs:
         with:
           node-version: '22'
       - name: קודם המוק — אם הצינור שבור, אין טעם לשלם על קריאות
-        run: node tutor-api/local/evals.mjs --mock --apps "${{ github.event.inputs.apps }}" --langs "${{ github.event.inputs.langs }}"
+        run: node tutor-api/local/evals.mjs --mock --apps "${{ github.event.inputs.apps }}" --langs "${{ github.event.inputs.langs }}" --scns "${{ github.event.inputs.scns }}"
       - name: המודל האמיתי, עד 60 קריאות
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY || secrets.GOOGLE_API_KEY || secrets.GOOGLE_AI_KEY || vars.GEMINI_API_KEY || vars.GEMINI_KEY }}
@@ -52,12 +56,13 @@ jobs:
           EVALS_OUT: /tmp/barak-evals.json
           APPS_IN: ${{ github.event.inputs.apps }}
           LANGS_IN: ${{ github.event.inputs.langs }}
+          SCNS_IN: ${{ github.event.inputs.scns }}
         run: |
           if [ -z "${GEMINI_API_KEY:-}" ]; then
             echo "::error::אין מפתח Gemini ב-Secrets (GEMINI_API_KEY)."
             exit 1
           fi
-          node tutor-api/local/evals.mjs --live --apps "$APPS_IN" --langs "$LANGS_IN" --out /tmp/barak-evals.json | tee /tmp/evals.txt || true
+          node tutor-api/local/evals.mjs --live --apps "$APPS_IN" --langs "$LANGS_IN" --scns "$SCNS_IN" --out /tmp/barak-evals.json | tee /tmp/evals.txt || true
           {
             echo "## ברק — הערכות מול Gemini"
             echo ""

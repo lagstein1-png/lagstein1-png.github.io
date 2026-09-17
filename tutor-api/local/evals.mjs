@@ -40,6 +40,10 @@ const sleep = ms => ms > 0 ? new Promise(r => setTimeout(r, ms)) : Promise.resol
 const APPS = (opt("--apps", "") || Object.keys(ROLE).join(",")).split(",").filter(Boolean);
 const LANGS = (opt("--langs", "he,ar,ru,en")).split(",");
 const OUT = opt("--out", process.env.EVALS_OUT || "");
+/* --scns hint,simplify — רק התרחישים האלה. ריצה חיה על תרחיש אחד
+   בארבע שפות היא 8 קריאות ולא 40, וזה ההבדל בין ״נבדוק שוב״
+   לבין מכסה שנגמרה. ריק — הכול. */
+const SCNS = (opt("--scns", "")).split(",").filter(Boolean);
 
 /* ---------- המסכים, אפליקציה־אפליקציה ---------- */
 const SCREENS = {
@@ -166,7 +170,7 @@ function judge(scn, lang, screen, d, turn) {
     const screen = SCREENS[app];
     if (!screen) { console.log("· " + app + ": אין מסך בסט"); continue }
     /* reader מקבלת תרחיש חמישי — הטקסט המודבק, בלי מסך ובלי פעולות */
-    const appScns = app === "reader" ? scns.concat("simplify") : scns;
+    const appScns = (app === "reader" ? scns.concat("simplify") : scns).filter(s => !SCNS.length || SCNS.includes(s));
     for (const lang of LANGS) for (const scn of appScns) {
       if (LIVE && calls >= LIVE_CAP) { capped = true; break outer }
       const body = scn === "simplify"
@@ -187,7 +191,9 @@ function judge(scn, lang, screen, d, turn) {
       const fails = r.status === 200 ? judge(scn, lang, screen, d, 0) : ["HTTP " + r.status + " " + JSON.stringify(d)];
       if (fails.length) bad++;
       rows.push({ app, lang, scn, ok: !fails.length, fails, ms: Date.now() - t0, model: d.model || null, say: String(d.say || "").slice(0, 160), action: d.action || null });
-      console.log((fails.length ? "✗ " : "✓ ") + app.padEnd(11) + lang + " " + scn.padEnd(9) + (fails.length ? fails.join(" · ") : (d.model || "") + " " + String(d.say || "").replace(/\n/g, " ").slice(0, 70)));
+      /* גם בנפילה מדפיסים את תחילת התשובה: הארטיפקט אינו נגיש מכל
+         סביבה, והלוג הוא מה שקוראים. */
+      console.log((fails.length ? "✗ " : "✓ ") + app.padEnd(11) + lang + " " + scn.padEnd(9) + (fails.length ? fails.join(" · ") + "  ‹" + (d.model || "") + " " + String(d.say || "").replace(/\n/g, " ").slice(0, 120) + "›" : (d.model || "") + " " + String(d.say || "").replace(/\n/g, " ").slice(0, 70)));
     }
   }
   const summary = { mode: LIVE ? "live" : "mock", ran, bad, calls, cap: LIVE ? LIVE_CAP : null, capped,

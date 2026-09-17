@@ -39,7 +39,10 @@ function t(name, got, want) {
   t('doc נחתך ב-LIM.doc', W.readBody({ app: 'reader', mode: 'simplify', doc: 'א'.repeat(W.LIM.doc + 500), userText: 'x' }).doc.length, W.LIM.doc);
   const c = ok ? W.contextBlock(ok, 0) : '';
   t('ההוראה נוקבת בשפת הממשק', /ברוסית/.test(c), true);
-  t('הטקסט המודבק אחרון בבלוק', c.trimEnd().endsWith('זה טקסט.'), true);
+  /* הטקסט אחרי כל ההוראות, ואחריו רק התזכורת — שורה אחת שאינה
+     יכולה להכיל הוראה מהטקסט עצמו (barak-live ריצה 6). */
+  t('הטקסט המודבק אחרי ההוראות', c.indexOf('זה טקסט.') > c.indexOf('אל תוסיף מידע'), true);
+  t('ואחריו רק התזכורת', /\nתזכורת: [^\n]*$/.test(c.trimEnd()) && c.indexOf('זה טקסט.') < c.lastIndexOf('תזכורת:'), true);
   t('אין הצגה עצמית במצב simplify', /שמך, ומיד/.test(c), false);
   t('אין ״כתוב את התרגיל״ במצב simplify', /בקש מהתלמיד לכתוב/.test(c), false);
   t('ההוראה אוסרת להוסיף מידע', /אל תוסיף מידע/.test(c), true);
