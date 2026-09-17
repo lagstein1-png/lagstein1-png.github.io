@@ -1089,7 +1089,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n119 · 2026-09-17";
+var BUILD="n120 · 2026-09-17";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3218,6 +3218,35 @@ function wordDistract(it,pool,n,needGloss){
 }
 function O(html,ok,why){return {h:html,ok:!!ok,why:why||""}}
 
+/* הסבר למסיח שאין לו משמעות משלו.
+   ------------------------------------------------------------
+   **הלומד טעה ולא קיבל דבר, וזה נמדד — 17.9.2026.**
+   שלושת המחוללים בנו את ההסבר כ-`d.g ? (d.w+" = "+gl(d.g)) : ""`,
+   ו-`wordDistract` יוצר זוג מינימום מתוך `it.near` — כשהמילה
+   אינה קיימת בבנק היא נבנית שם כ-`{w:nw, g:null}`. כלומר
+   **דווקא המסיח החינוכי ביותר, זוג המינימום, היה זה בלי הסבר.**
+
+   נמדד על 360 שאלות (כל נושא × ארבע רמות × שש הגרלות):
+
+       gap    144 מתוך 144   (100%)
+       hear    35 מתוך 213   (16%)
+       back    23 מתוך 132   (17%)
+       mean, use, comp        אפס — שלמים
+
+   מה שיש כאן בוודאות הוא **המילה הנכונה ומשמעותה**, וזו גם
+   נקודת הלימוד של התרגיל: ההבחנה בין השתיים. ההסבר נוקב בשתי
+   המילים ובמשמעות האמיתית, ולכן הוא ייחודי לשאלה ואינו טקסט
+   גנרי — וזה ההבדל בין הסבר לבין מילוי מקום.
+
+   שמות המילים נשארים באנגלית בכל שפה, כמו בכל האפליקציה;
+   המשמעות עוברת ב-`gl()` ולכן היא בשפת הלומד בארבע השפות.
+   ההסבר מוצג **אחרי** המענה, ולכן אין בו הסגרה. */
+function whyWrong(d,it){
+  if(d&&d.g)return d.w+" = "+gl(d.g);
+  var right=it.w+(it.g?" = "+gl(it.g):"");
+  return d.w+" ≠ "+right;
+}
+
 /* בורר מסיחים.
    ------------------------------------------------------------
    מסיח שיוצא במקרה זהה לתשובה או למסיח קודם *אינו* נזרק כדי
@@ -3271,7 +3300,7 @@ function formBack(tp,lv,pool,idx){
   var opts=fillOpts([O('<span class="en-b" lang="en">'+esc(it.w)+"</span>",true)],ds,4,
     function(d){return d.w.toLowerCase()},
     function(d){return O('<span class="en-b" lang="en">'+esc(d.w)+"</span>",false,
-      d.g?(d.w+" = "+gl(d.g)):"")},
+      whyWrong(d,it))},
     it.w.toLowerCase());
   return {type:"back",prompt:t("qSay"),lead:ml(lv,it.g),subject:null,
     opts:shuffle(opts),answer:it.w,say:it.w,reveal:it};
@@ -3287,7 +3316,7 @@ function formHear(tp,lv,pool,idx){
   var opts=fillOpts([O('<span class="en-b" lang="en">'+esc(it.w)+"</span>",true)],ds,4,
     function(d){return d.w.toLowerCase()},
     function(d){return O('<span class="en-b" lang="en">'+esc(d.w)+"</span>",false,
-      d.g?(d.w+" = "+gl(d.g)):"")},
+      whyWrong(d,it))},
     it.w.toLowerCase());
   return {type:"hear",prompt:t("qHear"),subject:null,hidden:it,
     opts:shuffle(opts),answer:it.w,say:it.w,reveal:it,auto:true};
@@ -3368,10 +3397,40 @@ function formGap(tp,lv,pool,idx){
   });
   var backup=shuffle(allWords()).map(function(x){return x.w.replace(/[^A-Za-z']/g,"")})
     .filter(function(b){return b.length>=3&&!STOP_GAP.test(b)});
-  var cands=shuffle(others).concat(backup);
+  /* **מסיח שכבר כתוב במשפט אינו מסיח.**
+     נמדד 17.9.2026, 80 שאלות השלמה: ב-**26 מהן (33%)** אפשרות
+     שגויה אחת לפחות הופיעה כבר בתוך המשפט שעל המסך —
+     "Could you _____ a bit more slowly?" עם "Could" כאפשרות.
+     הלומד פוסל אותה **בלי לדעת אנגלית**, וארבע אפשרויות הופכות
+     בשקט לשלוש: ניחוש עיוור עולה מ-25% ל-33%. `guess.js` בודק
+     אורך ומיקום ואינו רואה את זה.
+
+     הסינון נעשה **אחרי** שני ה-`shuffle`, ולכן מספר קריאות
+     ההגרלה אינו משתנה — וזה חובה כאן: המבחן הכיתתי נבנה מזרע
+     אצל המורה ואצל התלמיד, וכל שינוי בצריכת ה-RNG היה מפצל
+     את המבחן לשניים. ראו `docs/claude/class-exam.md`.
+
+     `shown[gi]` מחזיק `_____` ולכן המילה שהוסרה אינה נכנסת
+     לכאן, והיא ממילא נדחית ב-`ownKey` של `fillOpts`. */
+  var inShown={};
+  shown.join(" ").split(/[^A-Za-z']+/).forEach(function(b){
+    if(b)inShown[b.toLowerCase()]=1;
+  });
+  var cands=shuffle(others).concat(backup)
+    .filter(function(b){return b&&!inShown[b.toLowerCase()]});
   var opts=fillOpts([O('<span class="en-b" lang="en">'+esc(gone)+"</span>",true)],cands,4,
     function(w){return w.toLowerCase()},
-    function(w){return O('<span class="en-b" lang="en">'+esc(w)+"</span>",false)},
+    /* כאן המסיח הוא מילה עירומה והפריט הוא **משפט**, ולכן
+       `whyWrong` אינו מתאים: ל-`it` אין `w`. מילה שקיימת בבנק
+       מקבלת את משמעותה — וזה כבר אומר ללומד שהיא משהו אחר; מילה
+       שנשלפה ממשפט אחר ואינה בבנק מקבלת את **המשפט השלם**, שהוא
+       הדבר שמראה בדיוק למה היא אינה מתאימה שם. */
+    function(w){
+      var kn=wordByText(w);
+      return O('<span class="en-b" lang="en">'+esc(w)+"</span>",false,
+        (kn&&kn.g)?(w+" = "+gl(kn.g))
+                  :(w+" ≠ "+gone+" · "+it.s));
+    },
     gone.toLowerCase());
   return {type:"gap",prompt:t("qGap"),gapHtml:'<span class="en-b" lang="en">'+esc(shown.join(" "))+"</span>",
     lead:gl(it.g),subject:null,opts:shuffle(opts),answer:gone,say:it.s,reveal:it};
@@ -5548,7 +5607,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n119-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n120-pwa1").catch(function(){});
   });
 }
 </script>

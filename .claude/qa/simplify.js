@@ -29,7 +29,13 @@ function t(name, got, want) {
 
 (async () => {
   /* ---------- 1. השרת ---------- */
-  const W = await import(path.join(ROOT, 'tutor-api', 'worker.js'));
+  /* `pathToFileURL` ולא נתיב גולמי: בווינדוס `import()` מקבל נתיב
+     כמו `C:\…` ודוחה אותו — ״Received protocol 'c:'״. זה בדיוק
+     מה שקרה ל-`barak.js` (ראו שם שורה 77), והבדיקה הזאת נחתה
+     עם אותו באג והפילה את `all.js` מקומית. על הרנר, שהוא לינוקס,
+     היא עברה — ולכן אין לסמוך על ריצת ה-Actions לבדה כאן. */
+  const W = await import(require('url').pathToFileURL(
+    path.join(ROOT, 'tutor-api', 'worker.js')).href);
   t('simplify הוא מצב בשרת', (W.MODES || []).includes('simplify'), true);
   t('LIM.doc קיים', typeof W.LIM.doc, 'number');
   const ok = W.readBody({ app: 'reader', lang: 'ru', mode: 'simplify', doc: 'שלום.\r\n\r\n\r\nזה  טקסט.', userText: 'x' });

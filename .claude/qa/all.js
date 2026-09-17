@@ -180,6 +180,7 @@ const SUITE = [
      דבר כ-REVIEW — כלומר כשאלה שאפשר לדלג עליה — ושני תאים הגיעו
      ככה ל-100% ונשארו בייצור. כאן זה שער חוסם. */
   { id: 'guess',    args: [],     needsServer: true },
+  { id: 'visible',  args: [],     needsServer: true },
   { id: 'clicks',   args: [],     needsServer: true },
   { id: 'langbtn',  args: [],     needsServer: true },
   /* מנוע ההקראה מול speechSynthesis מזויף. slow: הוא ממתין 9.8
