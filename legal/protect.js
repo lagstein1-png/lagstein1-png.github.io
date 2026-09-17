@@ -44,7 +44,21 @@ var CSS=''+
 '.lg-wrap{position:fixed;inset:0;z-index:2147483000;background:rgba(8,12,20,.72);'+
 '  backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px;'+
 '  overflow-y:auto;font-family:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif}'+
-'.lg-box{background:#fff;color:#111827;max-width:44rem;width:100%;border-radius:18px;'+
+/* **טבעת המיקוד של השער היא של השער, ולא של האפליקציה המארחת.**
+   ב-12.9 היא הייתה `#2563eb` קשיח, ובצלאל סימן אותה כצבע קשיח;
+   התיקון שלי החליף אותה ב-`var(--accent)` של המארח — וזו הייתה
+   טעות בעיקרון, מפני שהתיבה הזאת מחזיקה רקע משלה (`#fff` בבהיר,
+   `#141a24` בכהה) ואינה נצבעת עם המארח. כלומר נמשך צבע שכויל
+   לרקע אחר לגמרי.
+
+   נמדד ב-`reader`, שה-`--accent` שלו `#5aa9e6` ומיועד לרקע כהה:
+   **2.54 מול לבן**, מתחת ל-3:1 שדורש WCAG 2.1 SC 1.4.11. שאר
+   שתים־עשרה האפליקציות היו 3.41–8.72.
+
+   אז טוקן של השער, עם וריאנט כהה שלא היה לגרסה הקשיחה:
+   `#1d4ed8` על לבן = 6.70, `#93b4fd` על `#141a24` = 8.47.
+   (הקשיח הישן נתן 3.38 בכהה — עבר בקושי.) */
+'.lg-box{background:#fff;color:#111827;--lg-ring:#1d4ed8;max-width:44rem;width:100%;border-radius:18px;'+
 '  box-shadow:0 24px 70px -20px rgba(0,0,0,.6);padding:clamp(18px,4vw,30px);'+
 '  max-height:92vh;display:flex;flex-direction:column;font-size:16px;line-height:1.65}'+
 '.lg-box h2{margin:0 0 6px;font-size:1.5rem;line-height:1.25;font-weight:800}'+
@@ -66,13 +80,17 @@ var CSS=''+
    טבעת מיקוד כחולה — גם במצב כהה וגם בניגודיות גבוהה, שבה כל
    שאר המסך עובר לפלטה אחרת והטבעת נשארת לבדה.
 
-   **`var(--accent, currentColor)` פותר את שני הצדדים בלי צימוד:**
-   עשר אפליקציות מגדירות `--accent` בארבעת המצבים, והטבעת
-   מקבלת את שלהן מאליה. מי שאין לו — `math-app` שקוראת לצבע
-   `--teal`, ועמוד התנאים עצמו — נופל ל-`currentColor`, כלומר
-   לצבע הטקסט של האלמנט שבמיקוד. **זה לעולם אינו בלתי־נראה
-   בהגדרה:** ניגודיות הטבעת שווה לניגודיות הטקסט שלידה. */
-'.lg-btn:focus-visible{outline:3px solid var(--accent,currentColor);outline-offset:2px}'+
+   **`var(--accent, currentColor)` נוסה ב-16.9 ונפסל ב-17.9.**
+   הוא נראה כמו הפתרון הנכון — הטבעת מקבלת את צבע המותג מאליה —
+   אבל הוא מצמיד את הטבעת לצבע של **המארח** בזמן שהרקע שמאחוריה
+   הוא של **התיבה**, שהיא `#fff` קבוע. ב-`reader`, שה-`--accent`
+   שלו כחול בהיר לרקע כהה, זה נתן 2.54:1 — כשל.
+
+   מה שנשאר: `--lg-ring`, טוקן של השער בלבד, מוגדר על `.lg-box`
+   בשני המצבים (ראו למעלה). הוא אינו קשיח ואינו מצומד — הוא
+   מוגדר **ליד הרקע שהוא נמדד מולו**, וזה הדבר היחיד שקובע
+   ניגודיות. `currentColor` נשאר כנפילה לאחור. */
+'.lg-btn:focus-visible{outline:3px solid var(--lg-ring,currentColor);outline-offset:2px}'+
 '.lg-install{position:fixed;z-index:2147482000;inset-inline:auto;'+
 '  inset-block-end:calc(14px + env(safe-area-inset-bottom));'+
 '  inset-inline-end:calc(14px + env(safe-area-inset-right));'+
@@ -85,7 +103,7 @@ var CSS=''+
 '.lg-lgs button{font:inherit;font-weight:700;font-size:.9rem;border:1px solid #d1d5db;'+
 '  background:#fff;color:#374151;border-radius:10px;padding:.55rem .8rem;cursor:pointer;min-height:44px}'+
 '.lg-lgs button[aria-pressed="true"]{background:#111827;color:#fff;border-color:#111827}'+
-'.lg-lgs button:focus-visible{outline:3px solid var(--accent,currentColor);outline-offset:2px}'+
+'.lg-lgs button:focus-visible{outline:3px solid var(--lg-ring,currentColor);outline-offset:2px}'+
 /* Heebo — הראשון במחרוזת של .lg-wrap — אין בו ערבית ואין בו קירילית,
    ולכן "العربية" ו-"Русский" נפלו לגופן ברירת המחדל של המערכת, שהמידות
    שלו אחרות, ושני הלחצנים נראו בגודל אחר משני האחרים. השער הוא המסך
@@ -96,7 +114,7 @@ var CSS=''+
 '.lg-lgs button[lang="ar"]{font-family:"Noto Sans Arabic","Heebo",system-ui,sans-serif}'+
 '.lg-lgs button[lang="ru"]{font-family:"Noto Sans","Heebo",system-ui,sans-serif}'+
 '@media (prefers-color-scheme:dark){'+
-'  .lg-box{background:#141a24;color:#e8ecf4}'+
+'  .lg-box{background:#141a24;color:#e8ecf4;--lg-ring:#93b4fd}'+
 '  .lg-lead,.lg-scroll p,.lg-steps,.lg-meta{color:#b9c2d4}'+
 '  .lg-btn{background:#1d2531;color:#e8ecf4;border-color:#2c3648}'+
 '  .lg-btn.pri{background:#e8ecf4;color:#141a24;border-color:#e8ecf4}'+
@@ -176,7 +194,8 @@ function wireStrip(){
 function fullText(){
   var t=T();
   return t.sections.map(function(s){
-    return "<h3>"+esc(fill(s[0]))+"</h3><p>"+esc(fill(s[1]))+"</p>";
+    /* `LEGAL.body` מדגיש ומפצל לפסקאות — מעצב אחד לשני המרנדרים. */
+    return "<h3>"+esc(fill(s[0]))+"</h3>"+L.body(esc(fill(s[1])));
   }).join("");
 }
 

@@ -146,7 +146,77 @@ if (fs.existsSync(LOCAL)) {
 }
 console.log(`${localBad ? '✗' : '✓'} tutor/josh-local.js — ${localSeen} מחרוזות, ${localBad} עם השם הישן`);
 
+/* =====================================================================
+   בדיקה 2ג: **כל פרוזה במאגר, ולא רשימת מפתחות.**
+
+   `SHOWN` שלמעלה היא רשימה־שמתירה, והיא החמיצה **שלוש
+   פעמים רצופות** את אותו דבר בדיוק: `petJoshName` (16.9),
+   המוח המקומי (16.9), ו-`joshNote` בדף הבית (17.9) —
+   "…The face shown here is a photograph only — Josh himself speaks
+   in there." באנגלית, בזמן שעברית, ערבית ורוסית
+   כבר אמרו ברק.
+
+   **שלוש הרחבות של אותה רשימה הן הוכחה שהגישה שגויה.**
+   רשימה שמונה מפתחות מכסה את מה שכבר נמצא, והמחבוא
+   הבא הוא תמיד מפתח שלא חשבנו עליו. לכן היפוך: סורקים
+   **כל** מחרוזת, ומחריגים מפורשות מה שאינו פרוזה.
+
+   **מה נחשב פרוזה:** מחרוזת שיש בה רווח, ואין בה תו
+   שמסגיר נתיב, סלקטור או קוד — לוכסן, סוגריים מסולסלים,
+   נקודה־פסיק, סולמית או שווה. ולכן `/img/josh.jpg`,
+   `josh-face.js` ו-`section#josh` אינם נספרים: אלה שמות קבצים
+   ומזהים, והשם של קובץ אינו מה שהלומד שומע.
+
+   **ושני חריגים מפורשים, שניהם אינם מגיעים ללומד:**
+   `josh-engine.js` — מוח מת שאף דף אינו טוען, ו-`brain.js`
+   הוא ששומר שזה יישאר כך; ו-`tutor-api/` — קוד צד השרת
+   וכלי פיתוח מקומי. שניהם **מודדים ומדווחים** כדי שלא
+   ייעלמו מהראייה, אבל אינם מפילים.
+   ===================================================================== */
+/* **גבול מילה חובה כאן, ולא ב-`OLDNAME`.** הסריקה הרחבה תפסה
+   בהרצה הראשונה שלוש־עשרה שורות, וכולן תקינות: **״Joshua
+   Lagstein״ — שמו של הבעלים עצמו**, בפוטר של עשר אפליקציות
+   ובפסקת ה״מי אני״ שבדף הבית, ו״The book of Joshua״ בתוכן
+   התנ״ך. `OLDNAME` בלי גבולות מתאימה לרשימת המפתחות, שבה
+   הערך הוא שם ולא משפט; פרוזה דורשת גבול. */
+const OLDPROSE = /(?:^|[^A-Za-z])(?:Josh|Paula)(?![A-Za-z])|ג׳וש|جوش|Джош|פאולה|باولا|Паула/;
+const PROSE = /"(?:[^"\\]|\\.)*"/g;
+const NOTPROSE = /[\/{};#=]/;
+const DEAD = /^(josh-engine\.js|tutor-api\/)/;
+let proseBad = 0, proseSeen = 0, proseDead = 0;
+/* **ו-`marketing/*.md` נכללים — 17.9.2026.** השם הישן שרד שם
+   בשישה־עשר מופעים אחרי שהמוצר כולו כבר עבר, מפני שהסריקה
+   הביטה ב-`html` וב-`js` בלבד. `marketing/` אינו ב-`Disallow`
+   שב-`robots.txt`, כלומר זה חומר ציבורי.
+
+   **שאר ה-`.md` מוחרגים בכוונה** — `CLAUDE.md`, `FINDINGS.md`,
+   `JOSH.md` ו-`docs/` מתעדים את ההחלפה עצמה, ולכן הם **חייבים**
+   להיות רשאיים לנקוב בשם הישן. תיעוד שאסור לו לצטט את מה
+   שהוא מתעד הוא תיעוד שקרי. */
+const TRACKED = execFileSync('git', ['ls-files', '*.html', '*.js', 'marketing/*.md'],
+  { cwd: ROOT, encoding: 'utf8' })
+  .split('\n').filter(Boolean).filter(f => !f.startsWith('.claude/'));
+for (const rel of TRACKED) {
+  const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  /* **ב-Markdown הפרוזה היא הקובץ עצמו.** אין בו מחרוזות במרכאות,
+     ולכן `PROSE` החזירה כמעט כלום ממנו — הבדיקה הורחבה ל-`.md`
+     ועדיין לא הייתה תופסת. שם: שורה שורה, פרט לגדר קוד. */
+  const units = rel.endsWith('.md')
+    ? src.split('\n').filter(ln => !/^\s*(?:```|    )/.test(ln))
+    : (src.match(PROSE) || []).map(q => q.slice(1, -1))
+        .filter(b => /\s/.test(b) && !NOTPROSE.test(b));
+  for (const body of units) {
+    proseSeen++;
+    if (!OLDPROSE.test(body)) continue;
+    if (DEAD.test(rel)) { proseDead++; continue; }
+    proseBad++;
+    console.log(`✗ ${rel} — השם הישן בפרוזה: ${body.trim().slice(0, 60)}`);
+  }
+}
+console.log(`${proseBad ? '✗' : '✓'} ${proseSeen} מחרוזות פרוזה במאגר, ${proseBad} עם השם הישן` +
+  (proseDead ? ` (ועוד ${proseDead} בקוד מת שאינו מגיע ללומד)` : ''));
+
 console.log(`${nameBad ? '✗' : '✓'} ${shown} מחרוזות שהלומד רואה, ${nameBad} עם השם הישן`);
 if (nameBad) console.log('  השם הוא ברק · باراك · Барак · Barak — ראו JOSH.md');
 
-process.exit(bad || nameBad || localBad ? 1 : 0);
+process.exit(bad || nameBad || localBad || proseBad ? 1 : 0);

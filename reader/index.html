@@ -1641,6 +1641,19 @@ function refreshDynamic(){
   try{ if(SENTS) $('#pos').textContent = _('משפט ') + (SENT + 1) + _(' מתוך ') + SENTS; }catch(e){}
   try{ var nn = $('#nikudNote'); if(nn.textContent) nn.textContent = _('· בלי ניקוד'); }catch(e){}
   try{ renderVoices(); }catch(e){}
+  /* **תווית כפתור ברק, 17.9.2026.** היא ישבה במאזין `click` על
+     `document` שבדק `e.target.closest("#langbar")` — אבל
+     `renderLangBar()` עושה `bar.innerHTML = h` ובכך **מוחק את
+     הכפתור שנלחץ** לפני שהאירוע מטפס. נמדד: `e.target.isConnected`
+     הוא `false`, ולכן `closest` מחזיר `null` והתנאי לא התקיים
+     מעולם. התוצאה — `TUTOR.label()` כבר החזיר ״باراك״ והכפתור
+     על המסך עדיין אמר ״ברק״.
+
+     כאן זה עובד מפני ש-`setLang` קורא ל-`refreshDynamic` **אחרי**
+     שהסרגל נבנה מחדש, וזו נקודת ההרחבה שכבר קיימת לכל שאר
+     התוויות בדף. */
+  try{ var bt = document.getElementById('btnTutor');
+       if(bt && window.TUTOR && TUTOR.label) bt.textContent = TUTOR.label(); }catch(e){}
 }
 
 /* השפה נטענת אחרי שכל הדף נבנה: הכותרת התחתונה יושבת אחרי הסקריפט
@@ -1669,7 +1682,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=86-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=87-pwa1").catch(function(){});
   });
 }
 </script>
@@ -1694,11 +1707,8 @@ if(window.TUTOR){
     btnTu.textContent=TUTOR.label();
     btnTu.classList.remove("hidden");
     btnTu.onclick=function(){try{stop()}catch(e){}TUTOR.open()};
-    /* תווית הכפתור הולכת אחרי בורר השפה הקיים */
-    document.addEventListener("click",function(e){
-      if(e.target&&e.target.closest&&e.target.closest("#langbar"))
-        setTimeout(function(){btnTu.textContent=TUTOR.label()},0);
-    });
+    /* התווית מתעדכנת ב-`refreshDynamic`, שרץ בסוף `setLang` —
+       ראו הנימוק שם. המאזין שישב כאן לא פעל מעולם. */
   }
   /* מנוע ברק — המתאם של האפליקציה. כאן אין שאלה ואין תשובה נכונה:
      ״המסך״ הוא המשפט הנוכחי, והפעולות הן מה שכפתורי ההקראה עושים —

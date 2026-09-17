@@ -16,7 +16,7 @@ const PRE = ["./","./index.html","./manifest.json",
              "/legal/terms.js","/legal/protect.js",
              /* ג׳וש — שכבת הפנים והתמונה. שתיהן בנתיבים משותפים
                 (/tutor/, /img/) ולכן עותק אחד לכל האתר. */
-             "/tutor/he-speech.js","/tutor/josh-face.js","/img/paula.jpg","/img/josh.jpg","/img/josh-bot.jpg"];
+             "/tutor/he-speech.js","/tutor/josh-face.js","/img/josh.jpg"];
 
 self.addEventListener("install", e => {
   self.skipWaiting();

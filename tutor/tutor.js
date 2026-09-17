@@ -88,6 +88,7 @@ he:{ btn:"ברק — עזרה מהמורה", title:"עזרה מהמורה", clos
   privacy:"אל תכתבו כאן שם מלא, כתובת או טלפון.",
   play:"הקראה", stop:"עצירה", rate:"מהירות", off:"אין קול בשפה הזאת במכשיר הזה",
   voice:"קול", voiceAuto:"אוטומטי",
+  vSample:"שלום, אני ברק. כך אשמע במכשיר שלך.",
   mic:"דבר", micOn:"מקשיב…", micNo:"הדפדפן הזה לא נותן לדבר. אפשר להקליד.",
   micDeny:"אין הרשאה למיקרופון. אפשר לאשר בהגדרות הדפדפן, או פשוט להקליד.",
   manNote:"אין במכשיר הזה קול גברי בשפה הזאת, ולכן גובה הקול הונמך. זה לא קול גברי אמיתי." },
@@ -103,6 +104,7 @@ ar:{ btn:"باراك — مساعدة من المعلّم", title:"مساعدة 
   privacy:"لا تكتب هنا اسمك الكامل أو عنوانك أو رقم هاتفك.",
   play:"استماع", stop:"إيقاف", rate:"السرعة", off:"لا يوجد صوت بهذه اللغة على هذا الجهاز",
   voice:"الصوت", voiceAuto:"تلقائي",
+  vSample:"مرحبًا، أنا باراك. هكذا سأبدو على جهازك.",
   mic:"تكلّم", micOn:"أسمعك…", micNo:"هذا المتصفّح لا يتيح التكلّم. يمكنك الكتابة.",
   micDeny:"لا يوجد إذن للميكروفون. يمكن السماح في إعدادات المتصفّح، أو الكتابة ببساطة.",
   manNote:"لا يوجد على هذا الجهاز صوت رجاليّ بهذه اللغة، لذلك خُفضت طبقة الصوت. هذا ليس صوتًا رجاليًّا حقيقيًّا." },
@@ -118,6 +120,7 @@ ru:{ btn:"Барак — помощь учителя", title:"Помощь уч�
   privacy:"Не пиши здесь полное имя, адрес или телефон.",
   play:"Прочитать", stop:"Стоп", rate:"Скорость", off:"На этом устройстве нет голоса для этого языка",
   voice:"Голос", voiceAuto:"Автоматически",
+  vSample:"Привет, я Барак. Вот как я звучу на вашем устройстве.",
   mic:"Говори", micOn:"Слушаю…", micNo:"Этот браузер не позволяет говорить. Можно печатать.",
   micDeny:"Нет разрешения на микрофон. Разрешите в настройках браузера или просто печатайте.",
   manNote:"На этом устройстве нет мужского голоса для этого языка, поэтому тон понижен. Это не настоящий мужской голос." },
@@ -133,6 +136,7 @@ en:{ btn:"Barak — ask the teacher", title:"Ask the teacher", close:"Close", se
   privacy:"Do not write your full name, address or phone number here.",
   play:"Read aloud", stop:"Stop", rate:"Speed", off:"This device has no voice for this language",
   voice:"Voice", voiceAuto:"Automatic",
+  vSample:"Hi, I am Barak. This is how I sound on your device.",
   mic:"Speak", micOn:"Listening…", micNo:"This browser does not allow speaking. You can type instead.",
   micDeny:"No microphone permission. You can allow it in the browser settings, or simply type.",
   manNote:"This device has no male voice for this language, so the pitch is lowered. It is not a real male voice." }
@@ -861,9 +865,14 @@ function build(){
      `index.html`. זה בדיוק ההיגיון שבגללו הבוט עצמו יושב בקובץ
      אחד ולא בשנים־עשר עותקים.
 
-     הדיוקן מגיע מ-`/img/paula.jpg` — נתיב מוחלט, קובץ אחד לכל
+     הדיוקן מגיע מ-`/img/josh.jpg` — נתיב מוחלט, קובץ אחד לכל
      האתר. `photo()` דוחה כתובת עם סכימה, ונתיב שמתחיל בלוכסן
      יחיד עובר.
+
+     **ההערה הזאת אמרה `/img/paula.jpg` עד 17.9.2026**, בזמן
+     שהקריאה שלושים שורות מתחתיה טוענת את `josh.jpg`. מי שקרא
+     אותה הסיק דבר שגוי — אותה מלכודת שה-`CLAUDE.md` מתעד
+     לגבי ״ג׳וש כבוי״.
      --------------------------------------------------------------- */
   if(typeof JOSHFACE !== "undefined"){
     /* פאולה, 14.9.2026 — מהתמונה שהבעלים יצר. שני הקודמים נשארו
@@ -924,7 +933,10 @@ function build(){
       setVoice(VOICE[lang()] || "he-IL", e.target.value);
       if(PLAYING>=0) stopSay();
       /* מדגם קצר, כדי שהבחירה תישמע מיד ולא רק בהודעה הבאה. */
-      try{ speakSeg(T().mic, VOICE[lang()] || "he-IL", rate(), function(){return true}, function(){}) }catch(err){}
+      /* `T().mic` הוא **תווית כפתור המיקרופון** — ״דבר״. הלומד
+         בחר קול כדי לשמוע אותו, והקול אמר לו ״דבר״: הוראה, לא
+         הדגמה. `vSample` היא משפט מדגם אמיתי בארבע השפות. */
+      try{ speakSeg(T().vSample || T().mic, VOICE[lang()] || "he-IL", rate(), function(){return true}, function(){}) }catch(err){}
     }
   });
   return EL;

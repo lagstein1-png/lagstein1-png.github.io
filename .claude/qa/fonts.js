@@ -56,9 +56,20 @@ const SCRIPTS = {
   },
 };
 
+/* **הרשימה נגזרת ואינה כתובה ביד — 17.9.2026.**
+   היא מנתה `pricing`, תיקייה שנמחקה, ו**לא** מנתה `kotvim`,
+   אפליקציה מפורסמת ב-`DATA.APPS`. `node .claude/qa/fonts.js kotvim`
+   במפורש עובר ירוק — כלומר זו הייתה פרצת כיסוי ולא באג חי: עריכת
+   גופנים ב-kotvim פשוט לא נבדקה.
+
+   רשימה שנכתבת ביד מתיישנת בכל אפליקציה שנוספת או נמחקת, ולכן
+   המקור הוא `stages.json` — אותו מקור אמת ש-`stage.js` אוכף. */
+const STAGES = require('./stages.json');
+const LOCAL = Object.entries(STAGES.apps || {})
+  .filter(([, v]) => !(v && v.external))
+  .map(([k]) => k);
 const PAGES = process.argv.slice(2).length ? process.argv.slice(2)
-  : ['.', 'pricing', 'math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-     'english', 'history', 'ulpan', 'lomda', 'reader', 'bagrut-806'];
+  : ['.'].concat(LOCAL);
 
 let checked = 0, findings = 0;
 
