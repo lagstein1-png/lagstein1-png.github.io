@@ -946,7 +946,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u117 · 2026-09-16";
+var BUILD="u118 · 2026-09-17";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -1470,9 +1470,16 @@ function femLift(v){
 
 /* גובה הבסיס של כל אמירה — 1.12, הפריסט ״נשי רגוע״ של math-app, שהבעלים
    בחר אחרי האזנה (13.9.2026). femLift נשאר מכפיל: קול גברי מורם עוד,
-   והתקרה 1.45 היא זו של math-app. voicePitch הוא מה שמושם ב-u.pitch. */
+   והתקרה 1.35 הועתקה מ״תאוריה מדברת״ 17.9.2026, בהוראת הבעלים
+   (״קול נשי עדין כמו בתאוריה מדברת, תעתיק משם״). שם: u.pitch =
+   male ? Math.min(2, tune.pitch * 1.35) : tune.pitch, ו-tune.pitch
+   בעברית הוא 1.0 — כלומר קול גברי מורם ל-1.35 בדיוק. כאן הייתה
+   תקרה 1.45, ולכן Asaf יצא 1.45: 1.12×1.35=1.512, חתוך ל-1.45.
+   העשירית הזאת היא ההבדל בין ״מורם״ ל״צווחני״. קול נשי אמיתי אינו
+   נוגע בתקרה — 1.12 הוא הפריסט ״נשי רגוע״ שהבעלים בחר, והוא נשאר.
+   voicePitch הוא מה שמושם ב-u.pitch. */
 var PITCH_BASE=1.12;
-function voicePitch(v){return Math.min(1.45,PITCH_BASE*femLift(v))}
+function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 
 
 /* הודעה כשאין קול נשי בשפה — עם ההוראות למערכת ההפעלה שהמשתמש
@@ -14346,7 +14353,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u117-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u118-pwa1").catch(function(){});
   });
 }
 </script>

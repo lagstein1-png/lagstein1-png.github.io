@@ -340,6 +340,45 @@ async function run(){
     if(miss.length){ bad++; console.log('✗ ' + f.padEnd(24) + miss.join(' · ')) }
     else console.log('✓ ' + f.padEnd(24) + CASES.length + ' שמות, בעברית ובלטינית');
   }
+/* ---------------------------------------------------------------
+     תקרת גובה הקול — מספר אחד לכל העותקים
+
+     **למה זו בדיקה ולא הערה.** ההרמה חיה בשלוש־עשרה העתקות של
+     אותו קוד, ועד 17.9.2026 הן הסכימו על 1.45 רק מפני שהן הועתקו
+     באותו יום. ברגע שמישהו יגע באחת — והבעלים ביקש בדיוק את זה,
+     ״קול נשי עדין כמו בתאוריה מדברת, תעתיק משם״ — עשר האחרות
+     יישארו מאחור בלי שגיאה ובלי שאיש ישמע, מפני שלכל אפליקציה
+     מכשיר אחר ולומד אחר.
+
+     הבדיקה אינה נועלת מספר: היא דורשת שכל העותקים יאמרו **אותו**
+     מספר. מי שמשנה את התקרה משנה אותה בכולם, וזה כל העניין.
+     --------------------------------------------------------------- */
+  const CEIL = require('child_process')
+    .execSync('git ls-files "*.html" "*.js"', { cwd: ROOT, encoding: 'utf8' })
+    .split('\n').filter(Boolean)
+    .filter(f => !f.startsWith('.claude/') && !f.startsWith('tests/'))
+    .map(f => {
+      const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+      const hits = [];
+      let m;
+      const reMin = /Math\.min\(\s*([0-9.]+)\s*,[^;\n]*femLift\s*\(/g;
+      while((m = reMin.exec(src))) hits.push(m[1]);
+      const reClamp = /clamp\(\s*PITCH_BASE[^;\n]*,\s*0\.5\s*,\s*([0-9.]+)\s*\)/g;
+      while((m = reClamp.exec(src))) hits.push(m[1]);
+      return hits.length ? [f, hits] : null;
+    })
+    .filter(Boolean);
+  const VALS = new Set(CEIL.flatMap(([, h]) => h));
+  if(!CEIL.length){ bad++; console.log('✗ תקרת הגובה — לא נמצאה באף קובץ; הביטוי השתנה') }
+  else if(VALS.size !== 1){
+    bad++;
+    console.log('✗ תקרת הגובה — ' + VALS.size + ' ערכים שונים: ' + [...VALS].join(', '));
+    for(const [f, h] of CEIL) console.log('    ' + f.padEnd(26) + h.join(' '));
+  } else {
+    console.log('✓ ' + 'תקרת גובה הקול'.padEnd(24) +
+                CEIL.length + ' קבצים, כולם ' + [...VALS][0]);
+  }
+
   if(bad){ console.log('\n' + bad + ' אפליקציות נכשלו'); process.exit(1); }
   console.log('\n' + APPS.length + ' אפליקציות, מנוע ההקראה מתאושש בכולן');
 }

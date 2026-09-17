@@ -1747,6 +1747,13 @@ function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild
    מיד ובלי שינוי הגובה.
    ------------------------------------------------------------ */
 var FEM_PITCH=1.35;
+/* **והתקרה היא 1.35 מ-17.9.2026, ולא 1.45** — הועתקה מ״תאוריה
+   מדברת״ בהוראת הבעלים (״קול נשי עדין כמו בתאוריה מדברת, תעתיק
+   משם״). שם קול גברי מורם ל-1.35 בדיוק, כי גובה הבסיס שלו בעברית
+   הוא 1.0. כאן הבסיס הוא הפריסט שנבחר, ולכן ״נשי רגוע״ עם Asaf
+   נתן 1.12×1.35=1.512 שנחתך ל-1.45 — גבוה מספיק כדי להישמע צווחני
+   ולא רך. הפריסטים עצמם לא זזו: ״גברי״ נשאר 0.82 ו״איטי וברור״ 1.0,
+   מפני ש-femLift מחזיר 1 לשניהם ואינו נוגע בתקרה. */
 /* ההרמה שייכת לבקשה ולא לקול לבדו. עד כאן היא חושבה בלי לדעת מה
    ביקשו, ונכפלה בגובה של כל פריסט — ושתי הטעויות נבעו מזה:
    בכיוון אחד, מי שבחר דווקא "גברי" עם Asaf קיבל 0.82 כפול 1.35,
@@ -2004,7 +2011,7 @@ function speakLocal(text,preset,rate,pitch,langCode,isRetry){
         try{ u.voice=v }catch(e2){}
         u.lang=v.lang||langCode||"he-IL";
       }
-      u.rate=rate;u.pitch=Math.min(1.45,pitch*femLift(v,preset.prefer));
+      u.rate=rate;u.pitch=Math.min(1.35,pitch*femLift(v,preset.prefer));
       /* לא היה כאן מטפל שגיאות בכלל: כשהמנוע נכשל, האפליקציה
          פשוט השתתקה בלי שאיש ידע למה. */
       u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(e.charIndex)};
@@ -2181,7 +2188,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b124 · 2026-09-16";
+var BUILD="b125 · 2026-09-17";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4459,7 +4466,7 @@ function onAction(a,el){
         /* אותה הרמה שההקראה עצמה עושה. בלעדיה הדוגמה נשמעה אחרת
            מהשאלות, ומי שבדק בה את הקול הנשי שמע דווקא את הקול שבלי
            ההרמה — כלומר בדק משהו שהאפליקציה לא משמיעה. */
-        ut.pitch=Math.min(1.45,state.settings.pitch*femLift(vv,_pf));
+        ut.pitch=Math.min(1.35,state.settings.pitch*femLift(vv,_pf));
         speechSynthesis.speak(ut);
       }catch(e){}
     });
@@ -4608,7 +4615,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b124-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b125-pwa1").catch(function(){});
   });
 }
 </script>

@@ -671,11 +671,12 @@
 
   /* גובה הבסיס של כל אמירה. אין קול נשי בשפה הזאת במכשיר? מרימים
      עוד — לא קול נשי אמיתי, אבל זו הדרך היחידה בדפדפן להתקרב בלי
-     הקלטות. התקרה 1.45 היא זו של math-app. */
+     הקלטות. התקרה 1.35 הועתקה מ״תאוריה מדברת״ 17.9.2026 — שם קול
+     גברי מורם ל-1.35 בדיוק, ו-1.45 נשמע צווחני ולא רך. */
   var PITCH_BASE = 1.12; /* ״נשי רגוע״ של math-app, 13.9.2026 */
   function voicePitch(v) {
     var male = v && MALE_VOICE.test(v.name || '') && !FEMALE_VOICE.test(v.name || '');
-    return clamp(PITCH_BASE * (male ? 1.35 : 1), 0.5, 1.45);
+    return clamp(PITCH_BASE * (male ? 1.35 : 1), 0.5, 1.35);
   }
 
   function speakDevice(text, opts) {
