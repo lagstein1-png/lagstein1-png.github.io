@@ -40,6 +40,10 @@ const sleep = ms => ms > 0 ? new Promise(r => setTimeout(r, ms)) : Promise.resol
 const APPS = (opt("--apps", "") || Object.keys(ROLE).join(",")).split(",").filter(Boolean);
 const LANGS = (opt("--langs", "he,ar,ru,en")).split(",");
 const OUT = opt("--out", process.env.EVALS_OUT || "");
+/* --scns hint,simplify — רק התרחישים האלה. ריצה חיה על תרחיש אחד
+   בארבע שפות היא 8 קריאות ולא 40, וזה ההבדל בין ״נבדוק שוב״
+   לבין מכסה שנגמרה. ריק — הכול. */
+const SCNS = (opt("--scns", "")).split(",").filter(Boolean);
 
 /* ---------- המסכים, אפליקציה־אפליקציה ---------- */
 const SCREENS = {
@@ -62,8 +66,16 @@ const ACTIONS = [
   { name: "show_hint", desc: "מציג רמז" },
   { name: "read_aloud", desc: "מקריא את השאלה" }
 ];
+/* ״גרסה פשוטה״ — reader בלבד, 17.9.2026. הטקסט שהודבק: הודעה
+   מבית הספר, כמו שהורה עולה חדש מקבל בוואטסאפ. 6 משפטים, כדי
+   שיהיה מה לקצר. `userText` הוא בדיוק מה ש-`tutor.js` שולח. */
+const DOC = "הורים יקרים, ביום חמישי הקרוב, 25 בספטמבר, יתקיים טיול שנתי של שכבת ד׳ לגן הלאומי עין גדי. " +
+  "היציאה בשעה 7:30 מחניית בית הספר והחזרה המשוערת בשעה 17:00. יש להצטייד בכובע, בבקבוק מים של לפחות ליטר וחצי, " +
+  "בנעליים סגורות ובארוחת בוקר וצהריים. תלמיד שלא יביא אישור הורים חתום עד יום שלישי לא יוכל להשתתף בטיול. " +
+  "העלות היא 60 שקלים, וניתן לשלם דרך אתר התשלומים של העירייה. בשאלות אפשר לפנות למחנכת הכיתה.";
 /* הטקסט של הלומד, לכל תרחיש ולכל שפה */
 const ASK = {
+  simplify:{ he: "תן לי גרסה קצרה ופשוטה של הטקסט שהדבקתי", ar: "أعطني نسخة قصيرة وبسيطة من النصّ الذي لصقته", ru: "Дай мне короткую и простую версию вставленного текста", en: "Give me a short, simple version of the text I pasted" },
   hint:    { he: "לא הבנתי, אפשר רמז?", ar: "لم أفهم، هل يمكن تلميح؟", ru: "Я не понял, можно подсказку?", en: "I do not get it, can I have a hint?" },
   explain: { he: "תסביר לי את השאלה הזאת", ar: "اشرح لي هذا السؤال", ru: "Объясни мне этот вопрос", en: "Explain this question to me" },
   next:    { he: "נעבור למסך הבא", ar: "لننتقل إلى الشاشة التالية", ru: "Перейдём к следующему экрану", en: "Let us move to the next screen" },
@@ -78,6 +90,7 @@ const NAME_ALT = { he: "ברק",  ar: "بار[اقئ]ق?|باراق|\\bBarak\\b"
 
 /* ---------- המודל המדומה ---------- */
 const MOCK_SAY = {
+  simplify:{ he: "- טיול ביום חמישי, 25 בספטמבר, לעין גדי.\n- יוצאים ב-7:30 וחוזרים ב-17:00.\n- להביא כובע, מים, נעליים סגורות ואוכל.\n- אישור הורים חתום עד יום שלישי.\n- המחיר 60 שקלים.", ar: "- رحلة يوم الخميس 25 سبتمبر إلى عين جدي.\n- الخروج 7:30 والعودة 17:00.\n- أحضروا قبعة وماء وحذاء مغلقًا وطعامًا.\n- تصريح موقّع حتى الثلاثاء.\n- التكلفة 60 شيكل.", ru: "- Поход в четверг, 25 сентября, в Эйн-Геди.\n- Выход в 7:30, возвращение в 17:00.\n- Взять кепку, воду, закрытую обувь и еду.\n- Подписанное разрешение до вторника.\n- Цена 60 шекелей.", en: "- Trip on Thursday, 25 September, to Ein Gedi.\n- Leave at 7:30, back at 17:00.\n- Bring a hat, water, closed shoes and food.\n- Signed parent form by Tuesday.\n- Cost 60 shekels." },
   hint:    { he: "בוא נתחיל מהחלק הראשון של השאלה. מה אתה כבר יודע כאן?", ar: "لنبدأ من الجزء الأول من السؤال. ما الذي تعرفه هنا؟", ru: "Начнём с первой части вопроса. Что ты уже знаешь здесь?", en: "Let us start with the first part of the question. What do you already know here?" },
   explain: { he: "השאלה מבקשת דבר אחד. נקרא אותה יחד: מה מבקשים למצוא?", ar: "السؤال يطلب شيئًا واحدًا. لنقرأه معًا: ما المطلوب إيجاده؟", ru: "Вопрос просит одно. Прочитаем его вместе: что нужно найти?", en: "The question asks for one thing. Let us read it together: what are we asked to find?" },
   wrong:   { he: "לא נורא, בוא ננסה שוב. טעות היא חלק מהלמידה. מה הצעד הראשון?", ar: "لا بأس، لنجرّب مرة أخرى. الخطأ جزء من التعلّم. ما الخطوة الأولى؟", ru: "Ничего страшного, попробуем ещё раз. Ошибка — часть учёбы. Какой первый шаг?", en: "That is fine, let us try again. Mistakes are part of learning. What is the first step?" },
@@ -118,6 +131,17 @@ function judge(scn, lang, screen, d, turn) {
   if (NAME[lang] && new RegExp(NAME_ALT[lang]).test(say) && !say.includes(NAME[lang]))
     f.push("תעתיק אחר של השם ב-" + lang + " (הנכון: " + NAME[lang] + ")");
   if (scn === "hint" && screen.correct && revealsAnswer(say, screen.correct)) f.push("הרמז גילה את התשובה");
+  /* ״גרסה פשוטה״: רשימת שורות, בלי שם, בלי ברכה, בלי שאלה, בלי
+     הצעות — והמספרים של ההודעה שורדים (תאריך, שעה, מחיר). */
+  if (scn === "simplify") {
+    const lines = say.split("\n").filter(l => l.trim());
+    if (lines.filter(l => /^\s*[-•]\s/.test(l)).length < 3) f.push("פחות משלוש שורות ״- ״");
+    if (lines.length > 12) f.push("יותר מ-12 שורות (" + lines.length + ")");
+    if (NAME[lang] && say.includes(NAME[lang])) f.push("הציג את עצמו בגרסה פשוטה");
+    if (/\[\[\?\]\]/.test(say)) f.push("הצעות המשך בגרסה פשוטה");
+    if (/[?؟]/.test(say)) f.push("שאלה בגרסה פשוטה");
+    if (!/25/.test(say) || !/60/.test(say)) f.push("מספר מההודעה אבד (25 / 60)");
+  }
   if (scn === "next" && !(d.action && d.action.name === "next_question")) f.push("״נעבור״ בלי פעולה next_question");
   /* **הטענה תוקנה 16.9.2026.** הניסוח הראשון דרש שהמילה ״הבא״
      תופיע בטקסט, והפיל 2 מתוך 2 ב-`barak-live` — בזמן שהמוצר היה
@@ -127,7 +151,7 @@ function judge(scn, lang, screen, d, turn) {
   if (scn === "next" && d.action && !say.trim()) f.push("פעולה בלי משפט קצר שמלווה אותה");
   if (scn === "wrong" && /נכשלת|فشلت|провалил|you failed/i.test(say)) f.push("״נכשלת״");
   if (scn === "wrong" && d.face !== "encourage") f.push("face אינו encourage אחרי טעות");
-  if (turn < 2 && say.split("\n").filter(Boolean).length > 6) f.push("ארוך מדי לתור ראשון (" + say.split("\n").length + " שורות)");
+  if (scn !== "simplify" && turn < 2 && say.split("\n").filter(Boolean).length > 6) f.push("ארוך מדי לתור ראשון (" + say.split("\n").length + " שורות)");
   if (say.length > 900) f.push("ארוך מדי (" + say.length + " תווים)");
   if (/[!！]/.test(say)) f.push("סימן קריאה");
   if (d.source !== "ai") f.push("source אינו ai");
@@ -145,9 +169,13 @@ function judge(scn, lang, screen, d, turn) {
   for (const app of APPS) {
     const screen = SCREENS[app];
     if (!screen) { console.log("· " + app + ": אין מסך בסט"); continue }
-    for (const lang of LANGS) for (const scn of scns) {
+    /* reader מקבלת תרחיש חמישי — הטקסט המודבק, בלי מסך ובלי פעולות */
+    const appScns = (app === "reader" ? scns.concat("simplify") : scns).filter(s => !SCNS.length || SCNS.includes(s));
+    for (const lang of LANGS) for (const scn of appScns) {
       if (LIVE && calls >= LIVE_CAP) { capped = true; break outer }
-      const body = { app, lang, screen: Object.assign({}, screen), userText: ASK[scn][lang], history: [], mode: scn === "hint" ? "hint" : scn === "explain" ? "explain" : "chat", actions: ACTIONS };
+      const body = scn === "simplify"
+        ? { app, lang, mode: "simplify", doc: DOC, userText: ASK[scn][lang], history: [], actions: [] }
+        : { app, lang, screen: Object.assign({}, screen), userText: ASK[scn][lang], history: [], mode: scn === "hint" ? "hint" : scn === "explain" ? "explain" : "chat", actions: ACTIONS };
       if (scn === "wrong" && screen.options) body.screen.student = screen.options.find(o => o !== screen.correct);
       if (scn === "wrong") body.sign = "frustrated";
       _rate.reset();
@@ -163,7 +191,9 @@ function judge(scn, lang, screen, d, turn) {
       const fails = r.status === 200 ? judge(scn, lang, screen, d, 0) : ["HTTP " + r.status + " " + JSON.stringify(d)];
       if (fails.length) bad++;
       rows.push({ app, lang, scn, ok: !fails.length, fails, ms: Date.now() - t0, model: d.model || null, say: String(d.say || "").slice(0, 160), action: d.action || null });
-      console.log((fails.length ? "✗ " : "✓ ") + app.padEnd(11) + lang + " " + scn.padEnd(8) + (fails.length ? fails.join(" · ") : (d.model || "") + " " + String(d.say || "").replace(/\n/g, " ").slice(0, 70)));
+      /* גם בנפילה מדפיסים את תחילת התשובה: הארטיפקט אינו נגיש מכל
+         סביבה, והלוג הוא מה שקוראים. */
+      console.log((fails.length ? "✗ " : "✓ ") + app.padEnd(11) + lang + " " + scn.padEnd(9) + (fails.length ? fails.join(" · ") + "  ‹" + (d.model || "") + " " + String(d.say || "").replace(/\n/g, " ").slice(0, 120) + "›" : (d.model || "") + " " + String(d.say || "").replace(/\n/g, " ").slice(0, 70)));
     }
   }
   const summary = { mode: LIVE ? "live" : "mock", ran, bad, calls, cap: LIVE ? LIVE_CAP : null, capped,
