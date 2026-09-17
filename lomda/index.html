@@ -1108,7 +1108,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l104 · 2026-09-17";
+var BUILD="l105 · 2026-09-17";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -1310,6 +1310,20 @@ function edgeNote(){
   if(!isWinNotEdge())return "";
   return " "+esc(t("edgeHas"))+' <a href="microsoft-edge:'+esc(location.href.split("#")[0])+'" style="font-weight:700;color:inherit">'+esc(t("openEdge"))+"</a>";
 }
+
+/* ההוראה שעובדת קודמת להוראה שאולי לא — 17.9.2026.
+   הבעלים צילם את הכרטיס הצהוב בשלב, בכרום על ווינדוס, ושאל למה אין
+   קול נשי. הכרטיס ענה לו בסדר ההפוך: קודם ״בווינדוס: הגדרות ← שעה
+   ושפה ← דיבור ← ניהול קולות ← הוספת קולות״, ורק **אחריו** הקישור
+   ל-Edge. וההערה שמעל isWinNotEdge אומרת במפורש שהמסלול הראשון הוא
+   מבוי סתום בעברית: למיקרוסופט אין קול עברי נשי להתקנה, ואילו Edge
+   נושא את הילה הנוירלית בלי התקנה ובלי הגדרות.
+   כלומר מה שעובד נקרא אחרון, אחרי משפט שנגמר במבוי סתום. כאן הוא
+   ראשון. אין מחרוזת חדשה ואין מפתח תרגום שזז — רק הסדר. */
+function femNoteHTML(txt){
+  var e=edgeNote();
+  return e ? e.replace(/^\s+/,"")+"<br>"+esc(txt) : esc(txt);
+}
 function femNote(pool){
   if(!pool||!pool.length)return "";
   for(var i=0;i<pool.length;i++)if(vGender(pool[i])==="f")return "";
@@ -1340,7 +1354,7 @@ function devPicker(lgs){
        הזה הקול הגברי נראה כמו בחירה של האפליקציה ולא כמו מה שיש
        במכשיר, ואין שום רמז שאפשר להתקין קול נשי ולקבל אותו מיד. */
     var fnote=femNote(pool);
-    if(fnote)out+='<p class="sub" style="margin:.4rem 0;line-height:1.5">'+esc(fnote)+edgeNote()+"</p>";
+    if(fnote)out+='<p class="sub" style="margin:.4rem 0;line-height:1.5">'+femNoteHTML(fnote)+"</p>";
     var cur=(state.devVoice||{})[code]||"";
     function row(v){
       var on=v?cur===v.voiceURI:!cur;
@@ -4605,7 +4619,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l104-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l105-pwa1").catch(function(){});
   });
 }
 </script>

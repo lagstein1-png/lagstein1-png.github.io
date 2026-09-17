@@ -948,7 +948,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v117 · 2026-09-17";
+var BUILD="v118 · 2026-09-17";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -1499,6 +1499,20 @@ function edgeNote(){
   return " "+esc(_("בדפדפן Microsoft Edge יש קולות טבעיים בשפה הזאת, נשיים וגבריים — בלי התקנה, בחיבור לאינטרנט."))+
     ' <a href="microsoft-edge:'+esc(location.href.split("#")[0])+'" style="font-weight:700;color:inherit">'+
     esc(_("לפתוח את האפליקציה ב-Edge"))+"</a>";
+}
+
+/* ההוראה שעובדת קודמת להוראה שאולי לא — 17.9.2026.
+   הבעלים צילם את הכרטיס הצהוב בשלב, בכרום על ווינדוס, ושאל למה אין
+   קול נשי. הכרטיס ענה לו בסדר ההפוך: קודם ״בווינדוס: הגדרות ← שעה
+   ושפה ← דיבור ← ניהול קולות ← הוספת קולות״, ורק **אחריו** הקישור
+   ל-Edge. וההערה שמעל isWinNotEdge אומרת במפורש שהמסלול הראשון הוא
+   מבוי סתום בעברית: למיקרוסופט אין קול עברי נשי להתקנה, ואילו Edge
+   נושא את הילה הנוירלית בלי התקנה ובלי הגדרות.
+   כלומר מה שעובד נקרא אחרון, אחרי משפט שנגמר במבוי סתום. כאן הוא
+   ראשון. אין מחרוזת חדשה ואין מפתח תרגום שזז — רק הסדר. */
+function femNoteHTML(txt){
+  var e=edgeNote();
+  return e ? e.replace(/^\s+/,"")+"<br>"+esc(txt) : esc(txt);
 }
 function femNote(){
   var mine=hebVoices(),i,has=false;
@@ -5077,7 +5091,7 @@ function viewSettings(){
        והכפתור שלידם אינו משמיע אלא בוחר — כך נשמר קול אנגלי
        כקול שמקריא עברית. מה שלא יכול להיבחר, לא מוצג. */
     var _fn=femNote();
-    if(_fn)h+='<div class="hintbox" style="margin-top:14px"><div class="sm">'+esc(_fn)+edgeNote()+'</div></div>';
+    if(_fn)h+='<div class="hintbox" style="margin-top:14px"><div class="sm">'+femNoteHTML(_fn)+'</div></div>';
     /* אותו סדר שבו האפליקציה באמת בוחרת. רשימה שמסודרת אחרת מציגה
        למשתמש משהו אחר ממה שהוא ישמע. */
     var vl=voiceOrder(hebVoices());
@@ -12844,7 +12858,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v117-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v118-pwa1").catch(function(){});
   });
 }
 </script>
