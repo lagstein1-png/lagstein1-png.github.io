@@ -148,6 +148,29 @@ jobs:
             echo "כתובת מ-\`DATA.APPS\`: \`$TURL\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
+          # קובצי החיפוש — מפת האתר, robots.txt וקובץ האימות של
+          # Search Console. נוסף 17.9.2026 כש-Search Console אמר
+          # ״Sitemap could not be read״ על קובץ שבעץ הוא XML תקין:
+          # ההבדל בין ״הקובץ שבור״ ל״הקובץ לא מוגש״ נראה רק מכאן.
+          # נמדד: סטטוס, Content-Type, ומספר ה-<loc> שחוזר בפועל.
+          {
+            echo ""
+            echo "| קובץ | HTTP | Content-Type | `<loc>` מוגש | `<loc>` ב-main |"
+            echo "|---|---|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          for f in sitemap.xml robots.txt $(ls google*.html 2>/dev/null); do
+            CODE=$(curl -s -o /tmp/f.out -D /tmp/f.hdr -w '%{http_code}' --max-time 30 \
+                   -H 'Cache-Control: no-cache' "$BASE/$f?cb=$GITHUB_RUN_ID")
+            CT=$(grep -i '^content-type:' /tmp/f.hdr | tr -d '\r' | sed 's/^[^:]*: *//' | head -1)
+            GOT=$(grep -c '<loc>' /tmp/f.out || true)
+            WANT=$(grep -c '<loc>' "$f" || true)
+            [ "$CODE" = "200" ] || FAIL=1
+            if [ "$f" = "sitemap.xml" ] && [ "$GOT" != "$WANT" ]; then FAIL=1; fi
+            echo "| \`$f\` | $CODE | $CT | $GOT | $WANT |" >> "$GITHUB_STEP_SUMMARY"
+            echo "$f  HTTP=$CODE  type=$CT  loc_served=$GOT  loc_main=$WANT"
+            echo "--- $f (first 5 lines as served) ---"; head -5 /tmp/f.out; echo "---"
+          done
+
           if [ "$FAIL" != "0" ]; then
             echo "::error::הבדיקה החיה נכשלה. ראה את הטבלה בסיכום."
             exit 1
