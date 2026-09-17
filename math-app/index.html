@@ -2188,7 +2188,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b129 · 2026-09-17";
+var BUILD="b130 · 2026-09-17";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2290,7 +2290,7 @@ function onboarding(){
   '<div style="max-width:1100px;margin:0 auto;display:grid;gap:44px;width:100%">'+
   /* בורר שפה — כדי שאפשר יהיה להחליף שפה כבר במסך הפתיחה */
   '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'+Object.keys(LANGS).map(function(l){
-    return '<button class="oblang'+(state.settings.lang===l?" on":"")+'" data-a="lang" data-l="'+l+'"><span style="font-size:1.25rem">'+LANGS[l].flag+'</span>'+esc(LANGS[l].label)+'</button>';
+    return '<button class="oblang'+(state.settings.lang===l?" on":"")+'" data-a="lang" data-l="'+l+'" aria-label="'+esc(LANGS[l].label)+'"><span aria-hidden="true" style="font-size:1.25rem">'+LANGS[l].flag+'</span>'+esc(LANGS[l].label)+'</button>';
   }).join("")+'</div>'+'<div class="cols ob-hero" style="align-items:center">'+
   '<div>'+
     '<span class="fd" style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--paper);font-weight:500;font-size:.85rem;padding:7px 16px;border-radius:99px;transform:rotate(-1deg)">'+ic("sparkle",15)+' '+esc(t.obBadge)+'</span>'+
@@ -2873,7 +2873,10 @@ function settingsView(){
   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px">'+
   Object.keys(LANGS).map(function(l){
     var m=LANGS[l],on=lang===l;
-    return '<button class="pick'+(on?" on":"")+'" data-a="lang" data-l="'+l+'"><span style="font-size:1.9rem">'+m.flag+'</span><span style="flex:1;text-align:start"><b class="fd" style="font-size:1.15rem;display:block">'+esc(m.label)+'</b><span style="color:var(--ink-faint);font-size:.72rem">'+m.tts+' · '+m.dir.toUpperCase()+'</span></span>'+(on?ic("check",18):"")+'</button>';
+    /* השם בלבד ב-`aria-label`: בלעדיו `sayClick` קרא את תוכן הכפתור,
+       כלומר את הדגל ואת "ar-SA · RTL" — קוד מנוע וכיוון כתיבה,
+       שנועדו לעין ולא לאוזן. */
+    return '<button class="pick'+(on?" on":"")+'" data-a="lang" data-l="'+l+'" aria-label="'+esc(m.label)+'"><span aria-hidden="true" style="font-size:1.9rem">'+m.flag+'</span><span style="flex:1;text-align:start"><b class="fd" style="font-size:1.15rem;display:block">'+esc(m.label)+'</b><span style="color:var(--ink-faint);font-size:.72rem">'+m.tts+' · '+m.dir.toUpperCase()+'</span></span>'+(on?ic("check",18):"")+'</button>';
   }).join("")+'</div></div>';
   /* theme */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--amber-soft);color:var(--amber-deep)">'+ic("star",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.themeTitle)+'</h2></div>'+
@@ -4615,7 +4618,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b129-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b130-pwa1").catch(function(){});
   });
 }
 </script>

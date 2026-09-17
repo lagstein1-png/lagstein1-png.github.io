@@ -29,10 +29,18 @@ const path = require('path');
 
 const ROOT = process.cwd();
 
-/* תשע אפליקציות הלימוד שיש בהן applyModes. reader ו-voice הם כלים
-   ולא אפליקציות לימוד, ול-bagrut-806 שלד משלו — הם אינם נבדקים כאן. */
+/* עשר אפליקציות הלימוד. reader ו-voice הם כלים ולא אפליקציות
+   לימוד, ולכן אינם נבדקים כאן.
+
+   **ל-bagrut-806 שלד מודולרי, והיא הייתה מוחרגת בגללו עד
+   17.9.2026.** ה-CSS שלה ב-`index.html` וה-JS ב-`app.js`, והפונקציה
+   נקראת `applyPrefs`. ההחרגה לא הייתה פטור מהדרישה אלא מגבלה של
+   הבדיקה — וכשהיא הוסרה נמצא שארבעה מששת המצבים באמת חסרו שם.
+   מפה של צורה, ולא רשימת פטורים: אפליקציה שתפצל קובץ מחר תתווסף
+   כאן בשורה אחת. */
 const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-              'english', 'history', 'ulpan', 'lomda'];
+              'english', 'history', 'ulpan', 'lomda', 'bagrut-806', 'kotvim'];
+const SHAPE = { 'bagrut-806': { js: 'app.js', fn: 'applyPrefs' } };
 
 /* יכולת → כל השמות שראינו לה בפועל. שם חדש מתווסף כאן, ולא בקוד. */
 const CAPS = [
@@ -75,9 +83,14 @@ for (const app of list) {
   const file = path.join(ROOT, app, 'index.html');
   if (!fs.existsSync(file)) { console.log(`✗ ${app}: אין index.html`); findings++; continue; }
 
-  const src = fs.readFileSync(file, 'utf8');
-  const am = body(src, 'applyModes');
-  if (!am) { console.log(`✗ ${app}: אין applyModes`); findings++; continue; }
+  const shape = SHAPE[app] || {};
+  const src = fs.readFileSync(file, 'utf8');          /* ה-CSS */
+  const jsFile = shape.js ? path.join(ROOT, app, shape.js) : file;
+  if (!fs.existsSync(jsFile)) { console.log(`✗ ${app}: אין ${shape.js}`); findings++; continue; }
+  const js = shape.js ? fs.readFileSync(jsFile, 'utf8') : src;
+  const fn = shape.fn || 'applyModes';
+  const am = body(js, fn);
+  if (!am) { console.log(`✗ ${app}: אין ${fn}`); findings++; continue; }
   checked++;
 
   /* מה applyModes מדליק בפועל */

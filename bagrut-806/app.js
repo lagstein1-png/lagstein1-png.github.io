@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x77 · 2026-09-17";
+  var BUILD = "x78 · 2026-09-17";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -53,6 +53,7 @@
     data: null,
     blank: function () {
       return { fs: 1, theme: "auto", rate: 1, say: true, examId: null,
+               clearFont: false, contrast: false, spaced: false, reduceMotion: false,
                solved: {}, sims: [], weak: {}, att: {} };
     },
     load: function () {
@@ -84,6 +85,17 @@
     document.documentElement.style.setProperty("--fs", (1.06 * d.fs).toFixed(3) + "rem");
     if (d.theme === "auto") document.documentElement.removeAttribute("data-theme");
     else document.documentElement.setAttribute("data-theme", d.theme);
+    /* ארבעת מצבי הנגישות. אותן מחלקות בדיוק כמו בתשע האחרות —
+       השם הוא מה שמזהה את היכולת, גם בבדיקה וגם ב-CSS. */
+    var r = document.documentElement;
+    r.classList.toggle("clear-font", !!d.clearFont);
+    r.classList.toggle("hi-contrast", !!d.contrast);
+    r.classList.toggle("spaced", !!d.spaced);
+    r.classList.toggle("reduce-motion", !!d.reduceMotion);
+    $$("[data-a11y]").forEach(function (b) {
+      var k = b.getAttribute("data-a11y");
+      b.setAttribute("aria-pressed", String((b.getAttribute("data-val") === "1") === !!d[k]));
+    });
     $$("[data-fs]").forEach(function (b) {
       b.setAttribute("aria-pressed", String(Number(b.getAttribute("data-fs")) === d.fs));
     });
@@ -1099,7 +1111,7 @@
   }
   document.addEventListener("click", function (e) {
     var el = e.target.closest ? e.target.closest(
-      "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate],[data-say]," +
+      "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate],[data-say],[data-a11y]," +
       "[data-read],[data-read-el],[data-check],[data-hint],[data-sol],[data-hclear],[data-tutor]," +
       "[data-simstart],[data-simend]," +
       "#btn-reset,#btn-stop,#btn-try," +
@@ -1242,6 +1254,12 @@
     var th = el.tagName === "BUTTON" ? el.getAttribute("data-theme") : null;
     if (th) { store.data.theme = th; store.save(); applyPrefs(); return; }
 
+    var a11y = el.getAttribute("data-a11y");
+    if (a11y) {
+      store.data[a11y] = el.getAttribute("data-val") === "1";
+      store.save(); applyPrefs(); return;
+    }
+
     if (el.id === "btn-reset") {
       if (!window.confirm("למחוק את כל מה שנשמר במכשיר הזה?")) return;
       store.reset(); applyPrefs(); state.examId = null;
@@ -1316,7 +1334,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x77-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x78-pwa1").catch(function () {});
     });
   }
 

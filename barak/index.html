@@ -76,11 +76,14 @@ footer{text-align:center;color:var(--text-soft);font-size:.85rem;margin-block-st
 <div class="row" id="subs" role="group" aria-label="מקצוע"></div>
 
 <main id="main" tabindex="-1">
-  <section class="card" id="screen" aria-live="polite">
+  <!-- `aria-live` ישב כאן על הכרטיס כולו, ולכן כל לחיצה הקריאה
+       מחדש את השאלה ואת ארבע האפשרויות. הוא יורד למה שבאמת משתנה
+       בתגובה לפעולה: הרמז והמשוב. -->
+  <section class="card" id="screen">
     <p class="q" id="q"></p>
     <div class="opts" id="opts"></div>
-    <div id="hint"></div>
-    <div class="fb" id="fb"></div>
+    <div id="hint" aria-live="polite"></div>
+    <div class="fb" id="fb" aria-live="polite"></div>
     <div class="btns">
       <button class="btn pri" id="btnAsk" type="button"></button>
       <button class="btn" id="btnHint" type="button"></button>
@@ -157,6 +160,21 @@ function T(){ return UI[S.lang] }
 function cur(){ return BANK[S.sub][S.lang][S.i] }
 function $(id){ return document.getElementById(id) }
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;") }
+/* רצף לטיני בתוך משפט עברי, ערבי או רוסי — קורא מסך מבטא אותו
+   בפונמות של שפת המסמך, ו-"apple" נשמע כמו אותיות עבריות. עוטפים
+   בדיוק את הרצף, ולא את המשפט. באנגלית עצמה אין מה לסמן.
+   הבריחה נעשית לכל חלק בנפרד — בריחה תחילה הייתה מכניסה את
+   `amp` שב-`&amp;` לתוך הרצף הלטיני. */
+function lat(s){
+  s = String(s);
+  if (S.lang === "en") return esc(s);
+  var re = /[A-Za-z](?:[A-Za-z’'_\- ]*[A-Za-z])?/g, out = "", last = 0, m;
+  while ((m = re.exec(s))) {
+    out += esc(s.slice(last, m.index)) + '<span lang="en">' + esc(m[0]) + '</span>';
+    last = m.index + m[0].length;
+  }
+  return out + esc(s.slice(last));
+}
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=a[i]; a[i]=a[j]; a[j]=t } return a }
 function load(){ var q=cur(); S.opts = shuffle([q.ans].concat(q.wrong)); S.picked=null; S.done=false; S.hint=false; }
 
@@ -168,13 +186,13 @@ function render(){
   $("langs").innerHTML=lh;
   var sh=""; ["math","english","history","theory"].forEach(function(k){ sh+='<button class="chip" type="button" data-s="'+k+'" aria-pressed="'+(k===S.sub)+'">'+esc(t.subs[k])+'</button>' });
   $("subs").innerHTML=sh;
-  $("q").textContent=q.q.replace(/«|»/g,"");
+  $("q").innerHTML=lat(q.q.replace(/«|»/g,""));
   var oh=""; S.opts.forEach(function(o,i){
     var cls="opt"+(S.done&&o===q.ans?" right":"")+(S.picked===o&&o!==q.ans?" wrong":"");
-    oh+='<button class="'+cls+'" type="button" data-i="'+i+'"'+(S.done?" disabled":"")+'>'+esc(o)+'</button>';
+    oh+='<button class="'+cls+'" type="button" data-i="'+i+'"'+(S.done?" disabled":"")+'>'+lat(o)+'</button>';
   });
   $("opts").innerHTML=oh;
-  $("hint").innerHTML = S.hint ? '<div class="hint">'+esc(q.hint)+'</div>' : "";
+  $("hint").innerHTML = S.hint ? '<div class="hint">'+lat(q.hint)+'</div>' : "";
   $("fb").textContent = S.done ? t.ok : (S.picked ? t.no : "");
   $("btnAsk").textContent = (window.TUTOR && TUTOR.on()) ? TUTOR.label() : t.ask;
   $("btnHint").textContent=t.hint; $("btnHint").disabled = S.hint || S.done;
