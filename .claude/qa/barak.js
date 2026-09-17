@@ -313,6 +313,7 @@ const BODY = extra => Object.assign({ app: 'math-app', lang: 'he', screen: SCREE
     const c3 = W.contextBlock({ app: 'math-app', lang: 'he', q: null }, 3);
     t('תור ראשון — מבקשים הצגה', /תשובתך הראשונה בשיחה/.test(c0), true);
     t('תור ראשון — בלי איסור', /אל תאמר את שמך שוב/.test(c0), false);
+    t('תור ראשון — ברכה אחת בלבד', /ברכה אחת בלבד/.test(c0), true);
     t('תור שלישי — אוסרים הצגה', /אל תאמר את שמך שוב/.test(c3), true);
     t('תור שלישי — בלי בקשת הצגה', /תשובתך הראשונה בשיחה/.test(c3), false);
     t('ההוראה אינה ב-CORE', /תשובתך הראשונה בשיחה|אל תאמר את שמך שוב/.test(W.CORE), false);
