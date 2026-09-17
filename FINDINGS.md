@@ -76,6 +76,23 @@ successfully״ על `/sitemap.xml` — הקובץ שכבר היה בריפו, 14
 `main` אחרי הדחיפה: פריסת Pages 485 ירוקה; `qa` 668 רץ ברגע
 הבדיקה, על קומיט שאינו נוגע בקוד.
 
+**ואז Search Console אמר ״Sitemap could not be read״** — Last read
+17.9, Discovered pages 0. בעץ הקובץ תקין (`xml.dom.minidom` עובר,
+אין BOM, `.nojekyll` קיים), אבל ״תקין בעץ״ אינו ״מוגש״, והסביבה
+כאן חסומה מול האתר (גם `WebFetch`: `EGRESS_BLOCKED`). לכן
+`live-check` קיבל שלב שמודד את קובצי החיפוש, וריצה 14 על
+`1213290` החזירה:
+
+    sitemap.xml                  HTTP=200  type=application/xml            loc_served=14  loc_main=14
+    robots.txt                   HTTP=200  type=text/plain; charset=utf-8
+    googlee01bfb5b026c2a29.html  HTTP=200  type=text/html; charset=utf-8
+
+השרת מגיש את המפה נכון, בסוג התוכן הנכון ובמלואה. מה שגוגל ראה
+אינו ניתן למדידה מכאן; **מה לעשות:** להמתין יום ולפתוח שוב את
+עמוד ה-Sitemaps. אם עדיין אדום — למחוק את ההגשה ולהגיש מחדש
+(⋮ → Remove, ואז Submit שוב). זו הפעולה היחידה שנשארה, והיא של
+הבעלים.
+
 ### ההודעה על קול גברי אמרה ״אין״ ולא אמרה ״איך״ · 17.9.2026
 
 **דיווח הבעלים מהטלפון:** ״הקול של ברק לא של גבר״.
