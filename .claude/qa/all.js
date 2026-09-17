@@ -185,6 +185,7 @@ const SUITE = [
   /* מנוע ההקראה מול speechSynthesis מזויף. slow: הוא ממתין 9.8
      שניות לכל אפליקציה כדי לראות את שומר-הער פועם. */
   { id: 'voice',    args: [],     needsServer: true, slow: true },
+  { id: 'netpin',   args: [] },
   { id: 'exam',     args: [],     needsServer: true },
   { id: 'entropy',  args: APPS,   needsServer: true, slow: true },
   { id: 'options',  args: APPS,   needsServer: true, slow: true },

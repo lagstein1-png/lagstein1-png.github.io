@@ -375,7 +375,25 @@ function pickVoice(code){
   var want = savedVoice(code);
   if(want){
     var all = voicesFor(code), j;
-    for(j=0;j<all.length;j++) if(all[j].voiceURI === want) return all[j];
+    for(j=0;j<all.length;j++) if(all[j].voiceURI === want){
+      /* **מנגנון 4 גובר על הבחירה הידנית, ורק עליה ורק אחרי כישלון.**
+         הבחירה המפורשת עקפה את `voiceUsable` לגמרי, ולכן לומד
+         שנעץ קול רשת ואיבד אינטרנט קיבל אותו קול מת גם בניסיון
+         החוזר — כלומר מנגנון ״נפילה מקול רשת״ היה מחזיר את מה
+         שזה עתה שתק, והבלם היחיד היה `retried`. התוצאה ללומד
+         היא שקט מוחלט, בדיוק מה שארבעת המנגנונים קיימים למנוע.
+
+         **קול מקומי שנבחר ביד נשאר תמיד** — `voiceUsable` מחזיר
+         לו 1 תמיד. וכשהרשת חוזרת והדגל נדלק, הבחירה חוזרת מאליה.
+
+         **והתנאי הוא `voiceUsable` עצמו ולא חצי ממנו.** בגרסה
+         הראשונה כתבתי כאן `_netVoiceOK` בלבד, ובדיקה מול
+         `speechSynthesis` מזויף הראתה שקול רשת נעוץ עדיין נבחר
+         כשהרשת מנותקת — מפני ש-`voiceUsable` בודק **שני** דברים,
+         את הדגל ואת `navigator.onLine`. מקור אמת אחד. */
+      if(voiceUsable(all[j])) return all[j];
+      break;
+    }
   }
   var v = voices(), p = code.slice(0,2), i, list = [], l;
   for(i=0;i<v.length;i++){
