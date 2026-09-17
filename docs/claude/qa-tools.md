@@ -44,6 +44,7 @@
     node .claude/qa/stage.js                 # שער השלבים — מי מותר ללומד
     node .claude/qa/deployed.js              # מסלול הלומד על הבתים שנפרסו — ביד בלבד
     Actions → live-check → Run workflow      # מה באמת מוגש מהאתר החי (הסוכן חסום)
+    node .claude/qa/keyboard.js              # הפאנל של ברק כשהמקלדת פתוחה — visualViewport מזויף, 360/412, עברית וערבית, חזקות, אופליין
     node .claude/qa/all.js                   # הכול, ופסק דין אחד
     node .claude/qa/all.js --static          # רק מה שאינו דורש דפדפן
     node .claude/qa/extract.js /tmp/js …     # מחלץ סקריפטים ל-eslint

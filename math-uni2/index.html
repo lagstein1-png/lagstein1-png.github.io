@@ -958,7 +958,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v120 · 2026-09-17";
+var BUILD="v121 · 2026-09-17";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -12868,7 +12868,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v120-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v121-pwa1").catch(function(){});
   });
 }
 </script>
@@ -12877,7 +12877,7 @@ if("serviceWorker" in navigator){
 <script>
 if(window.TUTOR){
   /* הניסוח שעל המסך מגיע כ-HTML; לשרת נשלח טקסט בלבד. */
-  var txt=function(x){return String(x==null?"":x).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim()};
+  var txt=TUTOR.plain; /* חזקות נשמרות: <sup>2</sup> → ² (tutor.js, 17.9.2026) */
   TUTOR.mount({
     app:"math-uni2",
     lang:function(){return (typeof state!=="undefined"&&state.settings&&state.settings.lang)||"he"},

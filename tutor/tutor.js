@@ -505,7 +505,7 @@ function say(i){
       _activeU = null; maybeStopKeepAlive(); return;
     }
     var s = segs[n++], code = VOICE[s.l] || VOICE.he;
-    speakSeg(s.t, code, r, function(){ return PLAYING === i }, next);
+    speakSeg(spoken(s.t, s.l), code, r, function(){ return PLAYING === i }, next);
   })();
 }
 
@@ -561,6 +561,87 @@ function speakSeg(text, code, r, alive, done){
   })();
 }
 
+/* ================= חזקות, כיוון, ומה נאמר =================
+   ``2x<sup>2</sup> + 4x`` הגיע לבועת השאלה כ-״2x 2 + 4x״: המתאם
+   של כל אפליקציה מחק תגיות HTML לרווח לפני ששלח את התרגיל
+   לכאן ולשרת (הצילום של הבעלים, 17.9.2026). `plain` הוא המחליף
+   של אותו עוזר — אותה מחיקה, אבל `<sup>` ו-`<sub>` הופכים קודם
+   לכתב עילי ותחתי ביוניקוד (``2x²``, ``a₁``), ומה שאין לו תו
+   כזה נכתב ``^(…)``. הפלט הוא טקסט חלק, ולכן הוא טוב לבועה,
+   לשרת ולמוח המקומי כאחד. */
+var SUP = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",
+            "+":"⁺","-":"⁻","−":"⁻","(":"⁽",")":"⁾","n":"ⁿ","x":"ˣ","i":"ⁱ"," ":"" };
+var SUB = { "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅","6":"₆","7":"₇","8":"₈","9":"₉",
+            "+":"₊","-":"₋","−":"₋","(":"₍",")":"₎","n":"ₙ","x":"ₓ","i":"ᵢ"," ":"" };
+function script(inner, map, mark){
+  var out = "", i, c;
+  for(i = 0; i < inner.length; i++){
+    c = inner.charAt(i);
+    if(!map.hasOwnProperty(c)) return mark + (inner.length > 1 ? "(" + inner + ")" : inner);
+    out += map[c];
+  }
+  return out;
+}
+function plain(x){
+  return String(x == null ? "" : x)
+    .replace(/<sup\b[^>]*>([^<]*)<\/sup>/gi, function(_, v){ return script(v, SUP, "^") })
+    .replace(/<sub\b[^>]*>([^<]*)<\/sub>/gi, function(_, v){ return script(v, SUB, "_") })
+    .replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ").trim();
+}
+/* הבועה: הכיוון הוא של הפאנל, וכל רצף בלי אות עברית או ערבית
+   שיש בו ספרה, אות לטינית או סימן חשבון נעטף ב-`<bdi dir="ltr">`.
+   כך משפט עברי נקרא מימין לשמאל והנוסחה שבתוכו משמאל לימין.
+   רץ אחרי `esc`, ולכן אין כאן דרך להזריק HTML. */
+function mathHTML(s){
+  return esc(s).replace(/[^\u0590-\u05FF\u0600-\u06FF\n]+/g, function(run){
+    if(!/[0-9A-Za-z\u00B2\u00B3\u00B9\u2070-\u209F=+\u2212\u00D7\u00F7\u221A\^]/.test(run)) return run;
+    var m = run.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    return m[1] + '<bdi dir="ltr">' + m[2] + '</bdi>' + m[3];
+  });
+}
+/* מה נאמר: כתב עילי אינו נקרא במנוע ההקראה, ולכן ``x²`` נאמר
+   ״x בריבוע״ ו-``xⁿ⁻¹`` ״x בחזקת n-1״, בשפת הקטע. כתב תחתי
+   חוזר לתו הרגיל. אותה טבלה בדיוק כמו במשפחת המתמטיקה. */
+var POW = { he:[" בריבוע "," בשלישית "," בחזקת "], ar:[" تربيع "," تكعيب "," أس "],
+            ru:[" в квадрате "," в кубе "," в степени "], en:[" squared "," cubed "," to the power of "] };
+var SUPCH = "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁽⁾ⁿˣⁱ", SUBCH = "₀₁₂₃₄₅₆₇₈₉₊₋₍₎ₙₓᵢ", PLAINCH = "0123456789+-()nxi";
+function spoken(text, lg){
+  var w = POW[lg] || POW.he;
+  return String(text)
+    .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁽⁾ⁿˣⁱ]+/g, function(run){
+      var p = "", i;
+      for(i = 0; i < run.length; i++) p += PLAINCH.charAt(SUPCH.indexOf(run.charAt(i)));
+      return p === "2" ? w[0] : p === "3" ? w[1] : w[2] + p + " ";
+    })
+    .replace(/[₀₁₂₃₄₅₆₇₈₉₊₋₍₎ₙₓᵢ]/g, function(c){ return " " + PLAINCH.charAt(SUBCH.indexOf(c)) + " " });
+}
+
+/* ================= המקלדת ================= */
+/* כרום באנדרואיד אינו מכווץ את `innerHeight` כשהמקלדת נפתחת —
+   רק `visualViewport` מתכווץ (ראו ההערה ליד `tu-kb` ב-CSS).
+   ההפרש ביניהם הוא המקלדת; 120px ומעלה נחשב פתוחה. `scale` > 1
+   הוא זום־צביטה ולא מקלדת, ואינו נחשב. */
+var VV = g.visualViewport || null, KB = false, QX = false;
+function kbOpen(){
+  if(!VV) return false;
+  if(VV.scale && VV.scale > 1.01) return false;
+  return ((g.innerHeight || 0) - VV.height) >= 120;
+}
+function kbSync(){
+  if(!EL) return;
+  var on = kbOpen();
+  if(on){
+    EL.ov.style.top = Math.max(0, VV.offsetTop) + "px";
+    EL.ov.style.height = VV.height + "px";
+  } else { EL.ov.style.top = ""; EL.ov.style.height = "" }
+  if(on === KB) return;
+  KB = on;
+  if(!on) QX = false;
+  EL.ov.classList.toggle("tu-kb", on);
+  draw();
+}
+
 /* ================= הפאנל ================= */
 var CSS = ''
 /* ---- מנוע ברק, 16.9.2026: הפאנל אינו מסתיר את התרגיל ----
@@ -583,6 +664,41 @@ var CSS = ''
 +'#tu-ov.on>#tu-bx{pointer-events:auto}'
 +'#tu-ov.tu-min #tu-log,#tu-ov.tu-min #tu-pv,#tu-ov.tu-min #tu-q{display:none}'
 +'#tu-ov.tu-min #tu-bx{max-height:none}'
+/* ---- מקלדת פתוחה — מצב קומפקטי, 17.9.2026 ----
+
+   הבעלים צילם באנדרואיד: כשהמקלדת נפתחת הכותרת, הדיוקן ובועת
+   השאלה תפסו כמעט את כל מה שנשאר מהמסך, ואזור השיחה התכווץ
+   לאפס (נמדד ב-`keyboard.js` על הקוד הישן: 28px). הסיבה: כרום
+   באנדרואיד (מגרסה 108, `resizes-visual`) **אינו מכווץ** את
+   `innerHeight` ואת `position:fixed;inset:0` כשהמקלדת נפתחת —
+   רק `window.visualViewport` מתכווץ. הפאנל נשאר בגובה של המסך
+   המלא, והמקלדת כיסתה את חציו.
+
+   לכן: `kbSync` קורא את `visualViewport`, וכשהמקלדת פתוחה הוא
+   מציב את `#tu-ov` **בתוך החלון הנראה** (top/height בשורה,
+   מהמדידה) ומדליק `tu-kb`. במצב הזה הפאנל ממלא את החלון הנראה
+   כולו, הכותרת שורה אחת — דיוקן 56px בעיגול, ▾ ו-✕ כאייקונים —
+   בועת השאלה שורה אחת שנפתחת בלחיצה, ואזור השיחה מקבל את כל
+   מה שנשאר וגולל בפנים. המקלדת נסגרת — הכול חוזר. */
++'#tu-ov.tu-kb{inset:auto;left:0;right:0}'
++'#tu-ov.tu-kb #tu-bx{height:100%;max-height:100%;border-radius:0}'
++'#tu-ov.tu-kb.tu-min #tu-bx{height:auto}'
++'#tu-ov.tu-kb #tu-hd{flex-wrap:nowrap;padding:6px 10px;gap:8px}'
+/* הדיוקן: אותו DOM, אותן שכבות תנועה — רק חלון עגול של 56px
+   על החלק העליון של התצלום (2:3, ולכן 56×84; העיניים ב-28%
+   והלסת ב-47.5% מהגובה, שתיהן בתוך העיגול). הציפה כבויה כאן
+   כי היא הייתה מזיזה את הפנים אל מחוץ לחלון. */
++'#tu-ov.tu-kb #tu-face{display:block;width:56px;height:56px;overflow:hidden;border-radius:50%}'
++'#tu-ov.tu-kb #tu-face .jf{width:56px!important;animation:none}'
++'#tu-ov.tu-kb #tu-ti{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:1rem}'
++'#tu-ov.tu-kb #tu-lg{font-size:.8rem;padding:3px 4px;max-width:96px}'
++'#tu-ov.tu-kb #tu-min,#tu-ov.tu-kb #tu-x{flex:0 0 auto;width:36px;height:36px;padding:0;'
++'display:inline-grid;place-items:center;border-radius:50%;font-size:1.05rem}'
++'#tu-ov.tu-kb #tu-q{margin:6px 10px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}'
++'#tu-ov.tu-kb #tu-q.tu-qx{white-space:normal;overflow-y:auto;max-height:5.6em}'
++'#tu-ov.tu-kb #tu-log{padding:8px 10px}'
++'#tu-ov.tu-kb #tu-ft{padding:6px 10px}'
++'#tu-ov.tu-kb #tu-pv{display:none}'
 +'#tu-min{background:transparent;border:1px solid rgba(23,51,60,.25);border-radius:9px;'
 +'padding:5px 10px;font:inherit;cursor:pointer;color:#17333c}'
 +'@media(min-width:900px){#tu-ov{place-items:stretch start;padding:0}'
@@ -605,14 +721,14 @@ var CSS = ''
 
    **ואין נטוי בשום מקום בפאנל** — ראו הכלל מתחת ל-`.tu-m em`. */
 +'#tu-bx{background:#fff;color:#17333c;border-radius:20px 20px 0 0;width:100%;max-width:540px;'
-+'max-height:46vh;display:flex;flex-direction:column;overflow:hidden;'
++'max-height:46vh;max-height:46dvh;display:flex;flex-direction:column;overflow:hidden;'
 +'box-shadow:0 18px 50px rgba(0,0,0,.3);font-size:19px;line-height:1.75;'
 +'letter-spacing:.01em;word-spacing:.05em}'
 /* נטוי הוא הצורה שהכי קשה לפענח בדיסלקציה: האותיות נשענות זו על
    זו והמרווח ביניהן מתכווץ. כל הדגשה בפאנל היא משקל, לא הטיה. */
 +'#tu-bx em,#tu-bx i,#tu-bx cite{font-style:normal;font-weight:700}'
 +'#tu-hd{display:flex;align-items:center;gap:10px;padding:14px 18px;'
-+'border-bottom:2px solid rgba(23,51,60,.12);flex-wrap:wrap}'
++'border-bottom:2px solid rgba(23,51,60,.12);flex-wrap:wrap;flex:0 0 auto}'
 
 /* הפנים בכותרת.
 
@@ -635,9 +751,20 @@ var CSS = ''
 +'}'   /* הציפה עברה ל-josh-face.js וחלה על כל הפנים */
 +'@media (prefers-reduced-motion:reduce){#tu-face{animation:none}}'
 +'#tu-hd b{font-size:1.05rem}'
-+'#tu-q{background:#fff3ce;border:1px solid #e6b800;border-radius:9px;padding:3px 9px;'
-+'font-weight:600;direction:ltr;unicode-bidi:isolate;font-size:.95rem}'
-+'#tu-log{padding:14px 18px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px}'
+/* בועת השאלה — שורה משלה מתחת לכותרת, ולא פריט בתוכה: בתוך
+   הכותרת היא דחפה את ▾ ו״סגירה״ לשורה שלישית כמעט ריקה.
+   `<button>` כדי שאפשר יהיה להרחיב אותה במקלדת במצב הקומפקטי;
+   במצב המלא היא מוצגת בשלמותה ואינה לחיצה (`disabled`).
+   הכיוון הוא של הפאנל, והנוסחה עצמה עטופה ב-`<bdi dir="ltr">`
+   (`mathHTML`) — כך ״מצא את הנגזרת של f(x) = 2x² + 4x״ נקרא
+   מימין לשמאל, והנוסחה בתוכו משמאל לימין. */
++'#tu-q{display:block;flex:0 0 auto;margin:8px 18px 0;background:#fff3ce;border:1px solid #e6b800;'
++'border-radius:9px;padding:3px 9px;font:inherit;font-weight:600;font-size:.95rem;color:#17333c;'
++'text-align:start;unicode-bidi:isolate;cursor:default;max-width:calc(100% - 36px);box-sizing:border-box}'
++'#tu-q[hidden]{display:none}'
++'#tu-q:disabled{opacity:1;color:#17333c}'
++'#tu-q bdi{unicode-bidi:isolate}'
++'#tu-log{padding:14px 18px;overflow-y:auto;flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}'
 +'.tu-m{max-width:88%;border-radius:15px;padding:10px 14px;white-space:pre-wrap;word-break:break-word}'
 +'.tu-me{align-self:flex-end;background:#dff1fa;border:2px solid rgba(88,183,224,.45)}'
 +'.tu-bot{align-self:flex-start;background:#d9f2ec;border:2px solid rgba(14,156,141,.4)}'
@@ -646,9 +773,18 @@ var CSS = ''
 +'.tu-l{margin:.2em 0 .45em;padding-inline-start:1.25em}.tu-l li{margin:.15em 0}'
 +'.tu-m>*:last-child{margin-bottom:0}'
 /* ההצעות אינן בועה: הן פעולה, ולכן הן נראות ככפתורים ולא כטקסט. */
-+'.tu-sg{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start;max-width:88%}'
-+'.tu-sg button{font:inherit;font-size:.92em;border-radius:999px;cursor:pointer;'
+/* שורה אחת שגוללת אופקית — בטלפון עם מקלדת פתוחה שורה שנייה
+   של הצעות נחתכה באמצע (הצילום מ-17.9.2026). במסך רחב אין
+   מקלדת ואין גלגלת אופקית נוחה, ולכן שם הן עוטפות כמו קודם.
+   `flex:0 0 auto` חובה: פריט עם `overflow` בתוך עמודת flex מאבד
+   את `min-height:auto`, וכשהשיחה גולשת הוא היחיד שמתכווץ —
+   נמדד 3px, והכפתורים יצאו ממנו. */
++'.tu-sg{display:flex;flex:0 0 auto;flex-wrap:nowrap;gap:6px;align-self:stretch;max-width:100%;'
++'overflow-x:auto;overflow-y:hidden;padding-bottom:3px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}'
++'.tu-sg button{flex:0 0 auto;white-space:nowrap;font:inherit;font-size:.92em;border-radius:999px;cursor:pointer;'
 +'padding:6px 13px;background:#eef8fb;color:#17333c;border:2px solid rgba(88,183,224,.55)}'
++'@media(min-width:900px){.tu-sg{flex-wrap:wrap;overflow:visible;align-self:flex-start;max-width:88%}'
++'.tu-sg button{white-space:normal}}'
 +'.tu-sg button:hover{background:#dff1fa}'
 +'.tu-sys{color:#4c666e;font-size:.92rem}'
 +'.tu-note{background:#fff3ce;border:2px solid rgba(230,184,0,.55);border-radius:13px;padding:10px 14px}'
@@ -658,7 +794,7 @@ var CSS = ''
 +'.tu-ctl button[aria-pressed="true"]{background:#0e9c8d;color:#fff;border-color:#0b7568}'
 +'.tu-ctl select{border:1px solid rgba(23,51,60,.28);border-radius:9px;padding:4px 8px;'
 +'font:inherit;font-size:.85rem;min-height:32px;background:#fff;color:#17333c}'
-+'#tu-ft{padding:12px 18px;border-top:2px solid rgba(23,51,60,.12)}'
++'#tu-ft{padding:12px 18px;border-top:2px solid rgba(23,51,60,.12);flex:0 0 auto}'
 +'#tu-row{display:flex;gap:8px}'
 /* כפתור הדיבור. אותו גובה כמו התיבה, ומרובע — הוא פעולה ולא טקסט. */
 +'#tu-mic{flex:0 0 auto;background:#fff;color:#17333c;border:2px solid rgba(23,51,60,.2);'
@@ -678,6 +814,7 @@ var CSS = ''
 +'#tu-x{margin-inline-start:auto;background:transparent;border:1px solid rgba(23,51,60,.25);'
 +'border-radius:9px;padding:5px 12px;font:inherit;cursor:pointer;color:#17333c}'
 +'@media(prefers-color-scheme:dark){#tu-bx{background:#16232a;color:#eef5f7}'
++'#tu-q,#tu-q:disabled{background:#3d3410;border-color:#8a6d00;color:#fff3ce}'
 +'#tu-in,.tu-ctl button,.tu-ctl select,#tu-lg,#tu-x{background:#1e2f38;color:#eef5f7;'
 +'border-color:rgba(238,245,247,.3)}'
 +'.tu-me{background:#1d3b4a;border-color:#2f6a86}.tu-bot{background:#14403a;border-color:#1c7e70}'
@@ -700,14 +837,18 @@ function build(){
   var ov = document.createElement("div"); ov.id = "tu-ov";
   ov.innerHTML =
     '<div id="tu-bx" role="dialog" aria-modal="false" aria-labelledby="tu-ti">'
-    + '<div id="tu-hd"><span id="tu-face"></span><b id="tu-ti"></b><span id="tu-q" hidden></span>'
+    + '<div id="tu-hd"><span id="tu-face"></span><b id="tu-ti"></b>'
     + '<select id="tu-lg" hidden></select>'
     + '<button id="tu-min" type="button" aria-expanded="true"></button>'
     + '<button id="tu-x" type="button"></button></div>'
+    + '<button id="tu-q" type="button" hidden disabled></button>'
     + '<div id="tu-log" aria-live="polite"></div>'
     + '<div id="tu-ft"><div id="tu-row">'
     + '<button id="tu-mic" type="button" hidden aria-pressed="false"></button>'
-    + '<input id="tu-in" type="text" autocomplete="off" maxlength="' + MAXLEN + '" />'
+    /* `enterkeyhint="send"`: המקש הראשי במקלדת אומר ״שליחה״ ולא
+       ״ירידת שורה״. `autocomplete="off"` — אין כאן מה להשלים,
+       וזה גם מה שמבקש מכרום לא להציג פס מילוי מעל המקלדת. */
+    + '<input id="tu-in" type="text" autocomplete="off" enterkeyhint="send" maxlength="' + MAXLEN + '" />'
     + '<button id="tu-go" type="button"></button></div><p id="tu-pv"></p></div></div>';
   document.body.appendChild(ov);
 
@@ -748,6 +889,8 @@ function build(){
     go: ov.querySelector("#tu-go"), pv: ov.querySelector("#tu-pv")
   };
   EL.x.onclick = close;
+  EL.q.onclick = function(){ QX = !QX; draw() };
+  if(VV){ VV.addEventListener("resize", kbSync); VV.addEventListener("scroll", kbSync) }
   EL.min = ov.querySelector("#tu-min");
   EL.min.onclick = function(){
     var on = ov.classList.toggle("tu-min");
@@ -794,7 +937,10 @@ function draw(){
   e.bx.setAttribute("lang", lg);
   e.bx.setAttribute("dir", d);
   e.ti.textContent = t.title;
-  e.x.textContent = t.close;
+  /* במצב הקומפקטי ״סגירה״ הוא אייקון; השם נשאר לקורא המסך. */
+  e.x.textContent = KB ? "✕" : t.close;
+  e.x.setAttribute("aria-label", t.close);
+  e.x.title = t.close;
   if(e.min) e.min.textContent = e.ov.classList.contains("tu-min") ? "▴" : "▾";
   e.go.textContent = t.send;
   e.inp.placeholder = t.ph;
@@ -812,7 +958,16 @@ function draw(){
   faceState();
 
   var q = CFG && CFG.q ? CFG.q() : null;
-  if(q && q.expr){ e.q.hidden = false; e.q.textContent = q.expr }
+  if(q && q.expr){
+    e.q.hidden = false;
+    var qh = mathHTML(q.expr);
+    if(e.q.innerHTML !== qh) e.q.innerHTML = qh;
+    /* לחיץ ומתרחב רק כשהמקלדת פתוחה; במצב המלא הוא מוצג בשלמותו */
+    e.q.disabled = !KB;
+    e.q.classList.toggle("tu-qx", KB && QX);
+    if(KB) e.q.setAttribute("aria-expanded", QX ? "true" : "false");
+    else e.q.removeAttribute("aria-expanded");
+  }
   else e.q.hidden = true;
 
   var h = '<p class="tu-sys">' + esc(t.intro) + '</p>';
@@ -1025,6 +1180,7 @@ function open(auto){
      שהילד החליף את שפת האפליקציה. נמדד: הפאנל התחלף, הבוט לא. */
   if(QID !== id || LANGAT !== lg){ MSGS = []; NOTE = ""; QID = id; LANGAT = lg }
   build().ov.classList.add("on");
+  kbSync();
   draw();
   /* פתיחה אוטומטית אינה גונבת מיקוד. הפאנל הוא דיאלוג, ומיקוד
      שקופץ אליו בלי שהלומד ביקש מקפיץ גם קורא מסך באמצע משפט. */
@@ -1390,6 +1546,9 @@ g.TUTOR = {
   },
   open: open,
   close: close,
+  /* טקסט חלק מתוך HTML של תרגיל, עם חזקות שנשמרות — המתאמים של
+     משפחת המתמטיקה קוראים לזה במקום עוזר מקומי. ראו `plain`. */
+  plain: plain,
   /* לבדיקות בלבד — אינם נקראים מהאפליקציות */
   _state: function(){ return { api:API, msgs:MSGS, playing:PLAYING, lang:lang(), dir:DIR[lang()] } },
   /* **מאפס את השיחה, ורק לבדיקות.** `barak-browser.js` מריץ שבעה
