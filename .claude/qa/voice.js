@@ -379,6 +379,43 @@ async function run(){
                 CEIL.length + ' קבצים, כולם ' + [...VALS][0]);
   }
 
+/* ---------------------------------------------------------------
+     סדר ההודעה: מה שעובד קודם
+
+     בווינדוס בעברית ״הוספת קולות״ הוא מבוי סתום — למיקרוסופט אין
+     קול עברי נשי להתקנה, וזה כתוב בהערה שמעל `isWinNotEdge` בכל
+     אחד־עשר הקבצים. Edge נושא את הילה הנוירלית בלי התקנה. עד
+     17.9.2026 הקישור ל-Edge ישב **אחרי** המשפט שנגמר במבוי הסתום,
+     והבעלים צילם בדיוק את זה ושאל למה אין קול נשי.
+
+     הבדיקה נגזרת ואינה רשימה: מאתרת את המשתנה שמקבל את `femNote(`
+     בכל קובץ, ודורשת שהוא ייעטף ב-`femNoteHTML` ולא ייבנה כ-
+     `esc(<var>)+edgeNote()`. אתר ״אין קולות בכלל״ אינו נוגע בזה —
+     שם אין הוראת מערכת שקודמת לקישור. */
+  const ORDER = require('child_process')
+    .execSync('git ls-files "*.html"', { cwd: ROOT, encoding: 'utf8' })
+    .split('\n').filter(Boolean)
+    .filter(f => !f.startsWith('.claude/'))
+    .map(f => {
+      const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+      if(!/function femNote\s*\(/.test(src) || !/function edgeNote\s*\(/.test(src)) return null;
+      const m = src.match(/(?:var\s+)?([A-Za-z_$][\w$]*)\s*=\s*femNote\(/);
+      if(!m) return [f, 'לא נמצא המשתנה שמקבל את femNote('];
+      const v = m[1].replace(/[$]/g, '\\$&');
+      if(new RegExp('esc\\(\\s*' + v + '\\s*\\)\\s*\\+\\s*edgeNote\\(\\)').test(src))
+        return [f, 'הקישור ל-Edge אחרי הודעת הקול — esc(' + m[1] + ')+edgeNote()'];
+      if(!new RegExp('femNoteHTML\\(\\s*' + v + '\\s*\\)').test(src))
+        return [f, 'הודעת הקול אינה עוברת ב-femNoteHTML'];
+      return null;
+    })
+    .filter(Boolean);
+  if(ORDER.length){
+    bad++;
+    for(const [f, why] of ORDER) console.log('✗ ' + f.padEnd(24) + why);
+  } else {
+    console.log('✓ ' + 'סדר הודעת הקול'.padEnd(24) + 'הקישור ל-Edge ראשון בכל הקבצים');
+  }
+
   if(bad){ console.log('\n' + bad + ' אפליקציות נכשלו'); process.exit(1); }
   console.log('\n' + APPS.length + ' אפליקציות, מנוע ההקראה מתאושש בכולן');
 }

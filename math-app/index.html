@@ -1788,6 +1788,20 @@ function edgeNote(){
   var d=T();
   return " "+esc(d.edgeHas)+' <a href="microsoft-edge:'+esc(location.href.split("#")[0])+'" style="font-weight:700;color:inherit">'+esc(d.openEdge)+"</a>";
 }
+
+/* ההוראה שעובדת קודמת להוראה שאולי לא — 17.9.2026.
+   הבעלים צילם את הכרטיס הצהוב בשלב, בכרום על ווינדוס, ושאל למה אין
+   קול נשי. הכרטיס ענה לו בסדר ההפוך: קודם ״בווינדוס: הגדרות ← שעה
+   ושפה ← דיבור ← ניהול קולות ← הוספת קולות״, ורק **אחריו** הקישור
+   ל-Edge. וההערה שמעל isWinNotEdge אומרת במפורש שהמסלול הראשון הוא
+   מבוי סתום בעברית: למיקרוסופט אין קול עברי נשי להתקנה, ואילו Edge
+   נושא את הילה הנוירלית בלי התקנה ובלי הגדרות.
+   כלומר מה שעובד נקרא אחרון, אחרי משפט שנגמר במבוי סתום. כאן הוא
+   ראשון. אין מחרוזת חדשה ואין מפתח תרגום שזז — רק הסדר. */
+function femNoteHTML(txt){
+  var e=edgeNote();
+  return e ? e.replace(/^\s+/,"")+"<br>"+esc(txt) : esc(txt);
+}
 function femNote(){
   /* ההודעה מדברת על גובה שהורם, וההרמה קורית רק כשמבקשים קול נשי.
      כשהפריסט הוא "גברי" או "איטי וברור" לא הורם כלום, והודעה על
@@ -2855,7 +2869,7 @@ function settingsView(){
     if(!hv.length)h+='<p class="note warn" style="margin-top:10px">'+esc(isWinNotEdge()?t.noVoices:t.noHeVoices)+edgeNote()+'</p>';
     if(_srt.length>hv.length)h+='<button class="btn btn-ghost" data-a="vmore" style="margin-top:10px;padding:10px 18px;font-size:.9rem">'+esc(String(t.moreVoices).replace("{n}",_srt.length-hv.length))+'</button>';
     var _fn=femNote();
-    if(_fn)h+='<p class="note warn" style="margin-top:10px">'+esc(_fn)+edgeNote()+'</p>';
+    if(_fn)h+='<p class="note warn" style="margin-top:10px">'+femNoteHTML(_fn)+'</p>';
     /* sliders */
     h+='<div class="cols" style="margin-top:22px;gap:20px"><div><div style="display:flex;justify-content:space-between;align-items:center"><label class="fd" style="font-weight:600" for="rate">'+esc(t.rate)+'</label><b class="fd" style="color:var(--teal-deep)" id="ratev">'+s.rate.toFixed(2)+'x</b></div><input id="rate" type="range" min="0.6" max="1.25" step="0.05" value="'+s.rate+'" data-slide="rate"><div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--ink-faint)"><span>'+esc(t.slow)+'</span><span>'+esc(t.fast)+'</span></div></div>'+
     '<div><div style="display:flex;justify-content:space-between;align-items:center"><label class="fd" style="font-weight:600" for="pitch">'+esc(t.pitch)+'</label><b class="fd" style="color:var(--teal-deep)" id="pitchv">'+s.pitch.toFixed(2)+'</b></div><input id="pitch" type="range" min="0.7" max="1.6" step="0.05" value="'+s.pitch+'" data-slide="pitch"><div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--ink-faint)"><span>'+esc(t.low)+'</span><span>'+esc(t.high)+'</span></div></div></div>'+
