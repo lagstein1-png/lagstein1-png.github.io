@@ -591,6 +591,7 @@ HTML גלוי. הוא מונע מלומד להיתקל באפליקציה לא �
     node .claude/qa/hespeech.js              # מנוע ההגייה העברי — חיווט, כללים, והומוגרפים שנפסלו
     node .claude/qa/barak.js                 # מנוע ברק — חוזה ה-Worker מול מודל מדומה, פעולות, פרטיות, תקציב KV, והחיווט ב-13 דפים
     node .claude/qa/barak-browser.js         # מנוע ברק בדפדפן אמיתי מול Worker מדומה — פעולה שמתבצעת, שנכשלת, אופליין, 429
+    node .claude/qa/keyboard.js              # הפאנל של ברק כשהמקלדת פתוחה — visualViewport מזויף, 360/412, עברית וערבית, חזקות, אופליין
     node tutor-api/local/evals.mjs --mock    # הערכות ברק: 13 אפליקציות × 4 שפות × 4 תרחישים; --live רק מרנר (barak-live.yml)
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
     node .claude/qa/mkreader.js --check       # marketing/index.html מול קובצי ה-md שהוא מרנדר
