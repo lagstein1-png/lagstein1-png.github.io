@@ -800,7 +800,7 @@ T.he={
   trkRead:"ספרותית", trkReadD:"קריאה, ניבים וטקסט שלם",
   lv1:"בסיס", lv2:"בנייה", lv3:"שוטף",
   lv1D:"מילה אחת בכל פעם, עם תרגום", lv2D:"משפטים קצרים, פחות תרגום", lv3D:"אנגלית בלבד",
-  qMean:"מה המשמעות?", qHear:"איזו מילה שמעתם?", qGap:"מה חסר במשפט?",
+  qMean:"מה המשמעות?", qHear:"איזו מילה שמעתם?", qGap:"מה חסר במשפט?", qGapFrom:"המילה הזאת שייכת למשפט:",
   qOrder:"סדרו את המשפט", qSay:"איך אומרים את זה באנגלית?", qRead:"לפי הקטע:",
   qUse:"איזה משפט מתאים למצב?",
   hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט", hearOpt:"השמיעו את האפשרות",
@@ -866,7 +866,7 @@ T.ar={
   trkRead:"أدبية", trkReadD:"قراءة وتعابير ونصّ كامل",
   lv1:"أساس", lv2:"بناء", lv3:"طلاقة",
   lv1D:"كلمة واحدة كل مرة، مع ترجمة", lv2D:"جمل قصيرة، ترجمة أقل", lv3D:"إنجليزية فقط",
-  qMean:"ما المعنى؟", qHear:"أي كلمة سمعت؟", qGap:"ما الناقص في الجملة؟",
+  qMean:"ما المعنى؟", qHear:"أي كلمة سمعت؟", qGap:"ما الناقص في الجملة؟", qGapFrom:"هذه الكلمة تنتمي إلى الجملة:",
   qOrder:"رتّب الجملة", qSay:"كيف تقول ذلك بالإنجليزية؟", qRead:"حسب النص:",
   qUse:"أي جملة تناسب الموقف؟",
   hear:"استمع", hearSlow:"ببطء", hearWord:"استمع للكلمة", hearSent:"استمع للجملة", hearOpt:"استمع للخيار",
@@ -932,7 +932,7 @@ T.ru={
   trkRead:"Литературный", trkReadD:"Чтение, идиомы и цельный текст",
   lv1:"Основа", lv2:"Сборка", lv3:"Свободно",
   lv1D:"По одному слову, с переводом", lv2D:"Короткие фразы, меньше перевода", lv3D:"Только английский",
-  qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?",
+  qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?", qGapFrom:"Это слово из другой фразы:",
   qOrder:"Соберите предложение", qSay:"Как сказать это по-английски?", qRead:"По тексту:",
   qUse:"Какая фраза подходит к ситуации?",
   hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать слово", hearSent:"Послушать фразу", hearOpt:"Послушать вариант",
@@ -998,7 +998,7 @@ T.en={
   trkRead:"Literary", trkReadD:"Reading, idiom and whole text",
   lv1:"Foundation", lv2:"Building", lv3:"Fluent",
   lv1D:"One word at a time, with a translation", lv2D:"Short sentences, less translation", lv3D:"English only",
-  qMean:"What does it mean?", qHear:"Which word did you hear?", qGap:"What is missing?",
+  qMean:"What does it mean?", qHear:"Which word did you hear?", qGap:"What is missing?", qGapFrom:"This word belongs in:",
   qOrder:"Put the sentence in order", qSay:"How do you say this in English?", qRead:"According to the passage:",
   qUse:"Which sentence fits the situation?",
   hear:"Play", hearSlow:"Slowly", hearWord:"Play the word", hearSent:"Play the sentence", hearOpt:"Play this option",
@@ -1089,7 +1089,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n119 · 2026-09-17";
+var BUILD="n120 · 2026-09-17";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -2003,6 +2003,110 @@ function W(w,ipa,g,near){return {k:"w",w:w,ipa:ipa||"",g:g,near:near||[]}}
 function S(s,g,u){return {k:"s",s:s,g:g,u:u||null}}
 function PARA(lines,words,qs){return {k:"p",lines:lines,words:words||[],qs:qs||[]}}
 function Q(q,ans,wrongs,whys){return {q:q,a:ans,w:wrongs,y:whys||[]}}
+
+/* ------------------------------------------------------------
+   משמעות למסיח שאינו ערך W.
+
+   מסיח ב-hear וב-back נלקח מ-near של המילה הנכונה, ו-85 מתוך
+   המחרוזות האלה אינן ערך W ולכן אין להן gloss. התוצאה: הלומד
+   בחר מילה שגויה וקיבל "עוד לא" בלי לדעת מה המילה בכלל אומרת —
+   נמדד 19-20% מהמסיחים בשתי הצורות.
+
+   הן אינן נכנסות ל-W בכוונה: allWords() הוא מה שהאפליקציה
+   *מלמדת*, ו-"a", "or" ו-"do" אינם פריטי לימוד. המילון הזה נקרא
+   רק כשבונים מסיח, ואינו מוסיף שאלה אחת לאף נושא.
+
+   הניסוח מחקה את ערכי ה-W: he/ar/ru קצרים, ו-en הוא הגדרה
+   קצרה באנגלית ולא תרגום.
+   ------------------------------------------------------------ */
+var NEAR_G={
+ "tin":{he:"פח, קופסת שימורים",ar:"علبة صفيح",ru:"жестянка, банка",en:"a metal container"},
+ "sin":{he:"חטא",ar:"خطيئة",ru:"грех",en:"a wrong act, in religion"},
+ "added":{he:"הוסיף",ar:"أضاف",ru:"добавил",en:"put one thing with another"},
+ "counted":{he:"ספר",ar:"عدّ",ru:"посчитал",en:"said the numbers of things"},
+ "our":{he:"שלנו",ar:"لنا",ru:"наш",en:"belonging to us"},
+ "ireland":{he:"אירלנד",ar:"أيرلندا",ru:"Ирландия",en:"a country west of Britain"},
+ "present (verb)":{he:"להציג, להגיש",ar:"يقدّم، يعرض",ru:"представлять, показывать",en:"to show or give something formally"},
+ "record (verb)":{he:"להקליט, לרשום",ar:"يسجّل",ru:"записывать",en:"to store sound, or write down"},
+ "a":{he:"א׳ — תווית ליחיד לא מסוים",ar:"أداة نكرة للمفرد",ru:"неопределённый артикль",en:"the article before one thing, not a known one"},
+ "this":{he:"זה, זאת",ar:"هذا، هذه",ru:"этот, эта",en:"the one here"},
+ "or":{he:"או",ar:"أو",ru:"или",en:"gives a choice between two"},
+ "hear":{he:"לשמוע",ar:"يسمع",ru:"слышать",en:"to take in sound with your ears"},
+ "their":{he:"שלהם",ar:"لهم",ru:"их",en:"belonging to them"},
+ "new":{he:"חדש",ar:"جديد",ru:"новый",en:"made or got a short time ago"},
+ "every":{he:"כל אחד",ar:"كل",ru:"каждый",en:"all of them, one by one"},
+ "before":{he:"לפני",ar:"قبل",ru:"до, перед",en:"earlier than"},
+ "above":{he:"מעל",ar:"فوق",ru:"выше, над",en:"higher than"},
+ "ever":{he:"אי פעם",ar:"في أي وقت",ru:"когда-либо",en:"at any time"},
+ "sometimes":{he:"לפעמים",ar:"أحيانًا",ru:"иногда",en:"on some occasions, not all"},
+ "through":{he:"דרך",ar:"عبر، خلال",ru:"через, сквозь",en:"in one side and out the other"},
+ "most":{he:"רוב",ar:"معظم",ru:"большинство",en:"almost all of them"},
+ "another":{he:"עוד אחד, אחר",ar:"آخر، واحد إضافي",ru:"ещё один, другой",en:"one more, or a different one"},
+ "within":{he:"בתוך, בתוך פרק זמן",ar:"خلال، ضمن",ru:"в пределах",en:"inside a limit of time or space"},
+ "inside":{he:"בפנים",ar:"في الداخل",ru:"внутри",en:"in the inner part"},
+ "also":{he:"גם",ar:"أيضًا",ru:"тоже, также",en:"in addition"},
+ "whatever":{he:"מה שלא יהיה",ar:"مهما كان",ru:"что бы ни",en:"anything at all, it does not matter which"},
+ "beside":{he:"לצד, ליד",ar:"بجانب",ru:"рядом с",en:"next to"},
+ "meaning":{he:"משמעות",ar:"معنى",ru:"значение",en:"what something says or stands for"},
+ "useless":{he:"חסר תועלת",ar:"عديم الفائدة",ru:"бесполезный",en:"of no use at all"},
+ "weather":{he:"מזג אוויר",ar:"طقس",ru:"погода",en:"rain, sun, wind and heat outside"},
+ "other":{he:"אחר",ar:"آخر",ru:"другой",en:"not this one, a different one"},
+ "usually":{he:"בדרך כלל",ar:"عادةً",ru:"обычно",en:"most of the time"},
+ "do":{he:"לעשות",ar:"يفعل",ru:"делать",en:"to carry out an action"},
+ "no":{he:"לא, אין",ar:"لا، ليس",ru:"нет, никакой",en:"not any, or the answer that refuses"},
+ "kept":{he:"שמר",ar:"احتفظ",ru:"хранил, держал",en:"held on to, or did not give back"},
+ "answer":{he:"תשובה, לענות",ar:"جواب، يجيب",ru:"ответ, отвечать",en:"what you say back to a question"},
+ "so":{he:"לכן, כל כך",ar:"لذلك، جدًا",ru:"поэтому, так",en:"for that reason, or to that degree"},
+ "offer":{he:"הצעה, להציע",ar:"عرض، يعرض",ru:"предложение, предлагать",en:"to say you are willing to give something"},
+ "damage":{he:"נזק",ar:"ضرر",ru:"повреждение, ущерб",en:"harm that makes something worse"},
+ "realistic":{he:"מציאותי",ar:"واقعي",ru:"реалистичный",en:"possible in the real world"},
+ "success":{he:"הצלחה",ar:"نجاح",ru:"успех",en:"getting the result you wanted"},
+ "avoidable":{he:"שאפשר למנוע",ar:"يمكن تجنّبه",ru:"которого можно избежать",en:"able to be kept from happening"},
+ "find":{he:"למצוא",ar:"يجد",ru:"находить",en:"to get something you were looking for"},
+ "own":{he:"עצמו, שלו; להחזיק בבעלות",ar:"خاصّ به؛ يملك",ru:"собственный; владеть",en:"belonging to that person, or to have it"},
+ "lend":{he:"להשאיל",ar:"يُعير",ru:"одалживать (кому-то)",en:"to give for a short time, then get it back"},
+ "quite":{he:"די, למדי",ar:"إلى حدٍّ ما",ru:"довольно",en:"to a fair degree, but not fully"},
+ "unclear":{he:"לא ברור",ar:"غير واضح",ru:"неясный",en:"hard to understand"},
+ "strong":{he:"חזק",ar:"قوي",ru:"сильный",en:"having a lot of power"},
+ "unreliable":{he:"לא אמין",ar:"غير موثوق",ru:"ненадёжный",en:"you cannot count on it"},
+ "worse":{he:"גרוע יותר",ar:"أسوأ",ru:"хуже",en:"more bad than something else"},
+ "away":{he:"הרחק, משם",ar:"بعيدًا",ru:"прочь, в сторону",en:"to or at a distance from here"},
+ "lonely":{he:"בודד",ar:"وحيد",ru:"одинокий",en:"sad because you are alone"},
+ "waiting":{he:"ממתין",ar:"ينتظر",ru:"ожидающий",en:"staying until something happens"},
+ "upside":{he:"הצד העליון; היתרון",ar:"الجانب العلوي؛ الميزة",ru:"верхняя сторона; плюс",en:"the top side, or the good part of a situation"},
+ "proved":{he:"הוכיח",ar:"أثبت",ru:"доказал",en:"showed that it is true"},
+ "far":{he:"רחוק",ar:"بعيد",ru:"далеко",en:"a long distance away"},
+ "fare":{he:"דמי נסיעה",ar:"أجرة السفر",ru:"плата за проезд",en:"the money you pay to travel"},
+ "four":{he:"ארבע",ar:"أربعة",ru:"четыре",en:"the number 4"},
+ "while":{he:"בזמן ש־",ar:"بينما",ru:"пока, в то время как",en:"during the time that"},
+ "till":{he:"עד",ar:"حتى",ru:"до",en:"up to the time of"},
+ "buy":{he:"לקנות",ar:"يشتري",ru:"покупать",en:"to get something by paying"},
+ "again":{he:"שוב",ar:"مرة أخرى",ru:"снова",en:"one more time"},
+ "toward":{he:"לכיוון",ar:"نحو",ru:"к, по направлению к",en:"in the direction of"},
+ "a part of":{he:"חלק מ־",ar:"جزء من",ru:"часть чего-то",en:"one piece of a larger whole"},
+ "depending on":{he:"תלוי ב־",ar:"اعتمادًا على",ru:"в зависимости от",en:"changing according to"},
+ "regarding":{he:"בנוגע ל־",ar:"بخصوص",ru:"относительно",en:"about, on the subject of"},
+ "give in":{he:"להיכנע, לוותר",ar:"يستسلم",ru:"уступить, сдаться",en:"to stop fighting and accept it"},
+ "give out":{he:"לחלק; לאזול",ar:"يوزّع؛ ينفد",ru:"раздавать; кончаться",en:"to hand out, or to run out"},
+ "look at":{he:"להסתכל על",ar:"ينظر إلى",ru:"смотреть на",en:"to turn your eyes to something"},
+ "run into":{he:"להיתקל ב־",ar:"يصادف",ru:"столкнуться с, встретить случайно",en:"to meet by chance, or hit a problem"},
+ "put on":{he:"ללבוש, להדליק",ar:"يلبس، يشغّل",ru:"надевать, включать",en:"to dress in it, or switch it on"},
+ "put up":{he:"להקים; לארח",ar:"ينصب؛ يستضيف",ru:"поставить; приютить",en:"to build or raise, or let someone stay"},
+ "get on":{he:"לעלות (לרכב); להסתדר",ar:"يصعد؛ ينسجم",ru:"садиться (в транспорт); ладить",en:"to board a bus or train, or to manage"},
+ "come over":{he:"לקפוץ לביקור",ar:"يمرّ للزيارة",ru:"зайти в гости",en:"to visit someone's place"},
+ "turn up":{he:"להגיע; להגביר",ar:"يصل؛ يرفع الصوت",ru:"появиться; сделать громче",en:"to arrive, or to make it louder"},
+ "turn off":{he:"לכבות",ar:"يطفئ",ru:"выключать",en:"to stop a machine or a light"},
+ "bring back":{he:"להחזיר",ar:"يعيد",ru:"возвращать, приносить обратно",en:"to return something to where it was"},
+ "make up":{he:"להמציא; להתפייס",ar:"يختلق؛ يتصالح",ru:"выдумать; помириться",en:"to invent a story, or to become friends again"},
+ "stand up":{he:"לקום",ar:"يقف",ru:"вставать",en:"to get to your feet"},
+ "once a month":{he:"פעם בחודש",ar:"مرة في الشهر",ru:"раз в месяц",en:"one time in every month"},
+ "in the blue":{he:"צירוף שגוי — הנכון הוא out of the blue",ar:"تركيب خاطئ — الصواب out of the blue",ru:"неверное сочетание — правильно out of the blue",en:"not an English phrase; the real one is out of the blue"},
+ "the last word":{he:"המילה האחרונה — מי שמסיים ויכוח",ar:"الكلمة الأخيرة — من ينهي الجدال",ru:"последнее слово — тот, кто заканчивает спор",en:"the final say in an argument"},
+ "bite your tongue":{he:"לנשוך את הלשון — להתאפק מלומר",ar:"يعضّ لسانه — يمتنع عن الكلام",ru:"прикусить язык — промолчать",en:"to stop yourself from saying something"},
+ "call it off":{he:"לבטל",ar:"يلغي",ru:"отменить",en:"to cancel something that was planned"},
+ "beat the clock":{he:"להספיק לפני הזמן",ar:"ينهي قبل انتهاء الوقت",ru:"успеть до срока",en:"to finish before time runs out"}
+};
+function nearGloss(w){return NEAR_G[String(w).toLowerCase()]||NEAR_G[String(w)]||null}
 
 var TRACKS=[
   {id:"sound",cls:"t-sound",nk:"trkSound",dk:"trkSoundD",icon:"spark"},
@@ -3208,7 +3312,9 @@ function wordDistract(it,pool,n,needGloss){
   }
   seen[it.w.toLowerCase()]=1;
   (it.near||[]).forEach(function(nw){
-    add(wordByText(nw)||{k:"w",w:nw,ipa:"",g:null,near:[]});
+    /* g:null היה כאן, ואיתו מסיח בלי הסבר. NEAR_G נותן משמעות
+       ל-85 המחרוזות שאינן ערך W, בלי להכניס אותן ל-allWords(). */
+    add(wordByText(nw)||{k:"w",w:nw,ipa:"",g:nearGloss(nw),near:[]});
   });
   var rest=shuffle(pool.filter(function(x){return x.k==="w"}));
   for(i=0;i<rest.length&&out.length<n;i++)add(rest[i]);
@@ -3358,20 +3464,33 @@ function formGap(tp,lv,pool,idx){
   /* מסיחים: מילים מהמשפטים והמילים של אותה רמה, ואם הבנק דל —
      מילים שנלמדו באפליקציה. מועמד שכבר הופיע נדחה וממשיכים
      הלאה, כדי שיישארו ארבע אפשרויות ולא שלוש. */
+  /* כל אסימון נושא איתו את הפריט שממנו נלקח. בלי זה אין מאיפה
+     לבנות why: רוב אסימוני ההשלמה הם מילים מתוך משפטים ואינם
+     ערכי W, ולכן allWords() אינו מכיר אותם ואין להם gloss. המקור
+     הוא המשפט עצמו, והוא אמיתי — לא המצאה. */
   var others=[],seen={};seen[gone.toLowerCase()]=1;
   pool.forEach(function(x){
     var src=x.k==="s"?x.s:(x.k==="w"?x.w:"");
     src.split(" ").forEach(function(p){
       var b=p.replace(/[^A-Za-z']/g,"");
-      if(b.length>=3&&!STOP_GAP.test(b)&&!seen[b.toLowerCase()]){seen[b.toLowerCase()]=1;others.push(b)}
+      if(b.length>=3&&!STOP_GAP.test(b)&&!seen[b.toLowerCase()]){
+        seen[b.toLowerCase()]=1;others.push({b:b,from:x})}
     });
   });
-  var backup=shuffle(allWords()).map(function(x){return x.w.replace(/[^A-Za-z']/g,"")})
-    .filter(function(b){return b.length>=3&&!STOP_GAP.test(b)});
+  var backup=shuffle(allWords()).map(function(x){return {b:x.w.replace(/[^A-Za-z']/g,""),from:x}})
+    .filter(function(o){return o.b.length>=3&&!STOP_GAP.test(o.b)});
   var cands=shuffle(others).concat(backup);
   var opts=fillOpts([O('<span class="en-b" lang="en">'+esc(gone)+"</span>",true)],cands,4,
-    function(w){return w.toLowerCase()},
-    function(w){return O('<span class="en-b" lang="en">'+esc(w)+"</span>",false)},
+    function(o){return o.b.toLowerCase()},
+    /* למה יש כאן why בכלל: הלומד בחר מילה שגויה, ובלי הסבר הוא
+       יודע רק שטעה. שתי צורות, ושתיהן נקראות מהבנק ולא מומצאות —
+       מילה שיש לה ערך W מוסברת כמו בכל שאר הצורות ('word = gloss'),
+       ואסימון מתוך משפט מוסבר במשפט שבו הוא כן יושב. */
+    function(o){var d=wordByText(o.b),w=o.b,y="";
+      if(d&&d.g)y=d.w+" = "+gl(d.g);
+      else if(o.from&&o.from.k==="s")y=t("qGapFrom")+" "+o.from.s+(o.from.g?" — "+gl(o.from.g):"");
+      else if(o.from&&o.from.k==="w"&&o.from.g)y=o.from.w+" = "+gl(o.from.g);
+      return O('<span class="en-b" lang="en">'+esc(w)+"</span>",false,y)},
     gone.toLowerCase());
   return {type:"gap",prompt:t("qGap"),gapHtml:'<span class="en-b" lang="en">'+esc(shown.join(" "))+"</span>",
     lead:gl(it.g),subject:null,opts:shuffle(opts),answer:gone,say:it.s,reveal:it};
@@ -5548,7 +5667,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n119-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n120-pwa1").catch(function(){});
   });
 }
 </script>
