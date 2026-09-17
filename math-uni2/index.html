@@ -958,7 +958,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v121 · 2026-09-17";
+var BUILD="v122 · 2026-09-17";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -3793,7 +3793,10 @@ function genLinear1(L){
                  :_f("המקדמים מתפוצצים רק ב-x = {0}, ונקודת תנאי ההתחלה רחוקה משם. יש קטע שמכיל אותה ושבו הכול רציף.", num(lcp));
     };
     return {ask:_f("האם משפט הקיום והיחידות של המשוואה הלינארית מסדר ראשון מבטיח פתרון יחיד בסביבת תנאי ההתחלה y({0}) = {1}?", num(lx0), num(lbv)),
-      expr:"(x"+sgn(-lcp)+")y′ + "+coef(lav,lnl?"y²":"y")+" = "+num(lbv),
+      /* `" + "+coef(...)` הפיק "+ −4y" כשהמקדם שלילי — ״ועוד מינוס
+         ארבע״. `term` כבר קיים כאן (שורה 819) וכותב " − 4y".
+         המתמטיקה הייתה נכונה; רק הכתיב. */
+      expr:"(x"+sgn(-lcp)+")y′"+term(lav,lnl?"y²":"y")+" = "+num(lbv),
       ans:W(corrL4),
       wrong:[oL41,oL42,oL43,oL44].filter(function(v){return v!==corrL4})
         .map(function(v){return W(v,whyL4(v))}),
@@ -12868,7 +12871,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v121-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v122-pwa1").catch(function(){});
   });
 }
 </script>

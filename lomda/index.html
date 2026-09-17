@@ -1112,7 +1112,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l108 · 2026-09-17";
+var BUILD="l109 · 2026-09-17";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -4623,7 +4623,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l108-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l109-pwa1").catch(function(){});
   });
 }
 </script>
@@ -4635,7 +4635,11 @@ if(window.TUTOR){
   var txt=function(x){return String(x==null?"":x).replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim()};
   TUTOR.mount({
     app:"lomda",
-    lang:function(){return (typeof state!=="undefined"&&state.settings&&state.settings.lang)||"he"},
+    /* `state.settings.lang` לא היה קיים כאן מעולם — שפת הממשק
+       יושבת ב-`state.lang`, ו-`xlg()` הוא הקורא שלה. הביטוי הישן
+       נפל תמיד ל-"he", והשדה הזה נשלח לשרת בגוף הבקשה: ברק ענה
+       בעברית ללומד ערבי, רוסי ואנגלי. `kotvim` עשתה את זה נכון. */
+    lang:function(){return (typeof xlg==="function"&&xlg())||"he"},
     q:function(){
       /* מיפוי אחד לשתי המשפחות. השדות נמדדו בדפדפן, ולא הועתקו
          מ-buildQ של בונה המבחן — שם הם אחרים.
