@@ -619,7 +619,49 @@ function screenQ(q) {
   return ask && ex ? ask + "\n" + ex : (ask || ex);
 }
 
+/* ---------------------------------------------------------------
+   ״גרסה פשוטה״ בלי שרת — reader, 17.9.2026.
+
+   הלומד הדביק טקסט וביקש אותו קצר ופשוט, ואין רשת או שהמכסה
+   נגמרה. מוח מקומי **אינו יכול לקצר או לפשט** — לקצר פירושו
+   להחליט מה חשוב, ולפשט פירושו לנסח מחדש, ושניהם ניחוש שהילד
+   יקרא כאמת. מה שכן אפשר בלי לנחש: לחלק את הטקסט למשפטים,
+   משפט בכל שורה. לקהל של דיסלקציה זה כבר עוזר — השורה קצרה,
+   והעין לא קופצת — והוא נאמר ללומד במפורש: זה חילוק, לא קיצור.
+
+   `SIMPLE_MAX` משפטים ולא הכול: הפאנל הוא גיליון של 46vh, וטקסט
+   ארוך היה נהיה גלילה שאין בה תועלת. השורה האחרונה אומרת כמה
+   משפטים נשארו בטקסט המלא — המספר נספר, לא מוערך.
+
+   בלי lookbehind בביטוי הרגולרי: ספארי ישן נופל על התחביר בזמן
+   הטעינה, ואיתו כל הקובץ, כלומר כל המוח המקומי. */
+var SIMPLE_MAX = 8;
+var SIMPLE = {
+  he: { head: "בלי חיבור לשרת אני לא יכול לקצר או לפשט את הטקסט, ואני לא ממציא. מה שכן: חילקתי אותו למשפטים קצרים, משפט בכל שורה.",
+        more: "ויש עוד {n} משפטים בטקסט המלא." },
+  ar: { head: "بلا اتصال بالخادم لا أستطيع اختصار النصّ أو تبسيطه، ولا أخترع. ما أستطيعه: قسّمته إلى جمل قصيرة، جملة في كلّ سطر.",
+        more: "وهناك {n} جمل أخرى في النصّ الكامل." },
+  ru: { head: "Без связи с сервером я не могу сократить или упростить текст, и я не выдумываю. Что я могу: разбил его на короткие предложения, по одному в строке.",
+        more: "И ещё {n} предложений в полном тексте." },
+  en: { head: "Without the server I cannot shorten or simplify the text, and I do not make things up. What I can do: I split it into short sentences, one per line.",
+        more: "And there are {n} more sentences in the full text." }
+};
+function sentences(text) {
+  var out = [], m, re = /[^.!?؟׃\n]+[.!?؟׃]*/g;
+  text = String(text || "").replace(/\r\n?/g, "\n").replace(/[ \t]+/g, " ");
+  while ((m = re.exec(text))) { var t = m[0].trim(); if (t) out.push(t) }
+  return out;
+}
+
 g.JOSHLOCAL = {
+  /* text = הטקסט שהודבק, lang = שפת הממשק → { text, kind:"simplify" } */
+  simplify: function (text, lang) {
+    var L = SIMPLE[lang] || SIMPLE.he, all = sentences(text);
+    if (!all.length) return null;
+    var body = L.head + "\n\n" + all.slice(0, SIMPLE_MAX).map(function (t) { return "- " + t }).join("\n");
+    if (all.length > SIMPLE_MAX) body += "\n\n" + L.more.replace("{n}", String(all.length - SIMPLE_MAX));
+    return { text: body, kind: "simplify" };
+  },
   /* ctx = { lang:"he", q:{...}|null, sign:"stuck"|null } */
   reply: function (text, ctx) {
     ctx = ctx || {};
@@ -669,6 +711,7 @@ g.JOSHLOCAL = {
   /* לבדיקות — אינם נקראים מהאפליקציות */
   _detect: detect,
   _intents: function () { return INTENTS.map(function (x) { return x.id }) },
+  _sentences: sentences,
   _langs: function () { return Object.keys(R) }
 };
 })(window);

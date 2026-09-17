@@ -91,7 +91,10 @@ he:{ btn:"ברק — עזרה מהמורה", title:"עזרה מהמורה", clos
   vSample:"שלום, אני ברק. כך אשמע במכשיר שלך.",
   mic:"דבר", micOn:"מקשיב…", micNo:"הדפדפן הזה לא נותן לדבר. אפשר להקליד.",
   micDeny:"אין הרשאה למיקרופון. אפשר לאשר בהגדרות הדפדפן, או פשוט להקליד.",
-  manNote:"אין במכשיר הזה קול גברי בשפה הזאת, ולכן גובה הקול הונמך. זה לא קול גברי אמיתי." },
+  manNote:"אין במכשיר הזה קול גברי בשפה הזאת, ולכן גובה הקול הונמך. זה לא קול גברי אמיתי.",
+  simplifyBtn:"ברק — גרסה פשוטה", simplifyAsk:"תן לי גרסה קצרה ופשוטה של הטקסט שהדבקתי",
+  simplifyEmpty:"קודם הדביקו טקסט, ואז אבקש מברק גרסה פשוטה שלו.",
+  simplifyCut:"הטקסט ארוך, ולכן נשלחה רק תחילתו — {n} תווים." },
 ar:{ btn:"باراك — مساعدة من المعلّم", title:"مساعدة من المعلّم", close:"إغلاق", send:"إرسال",
   intro:"يمكنك أن تسألني عمّا يظهر على الشاشة. أعطي تلميحًا واحدًا في كل مرة وأنتظر إجابتك.",
   nudge:{stuck:"لاحظت أن هذا السؤال يأخذ وقتًا. تريد أن نفكّكه معًا، خطوة واحدة في كل مرة؟",frustrated:"أرى أن الأمر لا يسير الآن، وهذا طبيعي تمامًا. لنجرّب من زاوية أخرى."}, greet:"مرحبًا، أنا باراك. أنا هنا إن كان شيء غير واضح. اكتب لي ما هو، ونمرّ عليه معًا.", ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
@@ -107,7 +110,10 @@ ar:{ btn:"باراك — مساعدة من المعلّم", title:"مساعدة 
   vSample:"مرحبًا، أنا باراك. هكذا سأبدو على جهازك.",
   mic:"تكلّم", micOn:"أسمعك…", micNo:"هذا المتصفّح لا يتيح التكلّم. يمكنك الكتابة.",
   micDeny:"لا يوجد إذن للميكروفون. يمكن السماح في إعدادات المتصفّح، أو الكتابة ببساطة.",
-  manNote:"لا يوجد على هذا الجهاز صوت رجاليّ بهذه اللغة، لذلك خُفضت طبقة الصوت. هذا ليس صوتًا رجاليًّا حقيقيًّا." },
+  manNote:"لا يوجد على هذا الجهاز صوت رجاليّ بهذه اللغة، لذلك خُفضت طبقة الصوت. هذا ليس صوتًا رجاليًّا حقيقيًّا.",
+  simplifyBtn:"باراك — نسخة مبسّطة", simplifyAsk:"أعطني نسخة قصيرة وبسيطة من النصّ الذي لصقته",
+  simplifyEmpty:"الصقوا نصًّا أولًا، ثم أطلب من باراك نسخة مبسّطة منه.",
+  simplifyCut:"النصّ طويل، لذلك أُرسل أوّله فقط — {n} حرفًا." },
 ru:{ btn:"Барак — помощь учителя", title:"Помощь учителя", close:"Закрыть", send:"Отправить",
   intro:"Можешь спросить меня о том, что на экране. Я даю по одной подсказке и жду ответа.",
   nudge:{stuck:"Я заметил, что этот вопрос отнимает время. Разберём его вместе, по одному шагу?",frustrated:"Вижу, что сейчас не идёт, и это совершенно нормально. Попробуем с другой стороны."}, greet:"Привет, я Барак. Я рядом, если что-то непонятно. Напиши, что именно, и разберём вместе.", ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
@@ -123,7 +129,10 @@ ru:{ btn:"Барак — помощь учителя", title:"Помощь уч�
   vSample:"Привет, я Барак. Вот как я звучу на вашем устройстве.",
   mic:"Говори", micOn:"Слушаю…", micNo:"Этот браузер не позволяет говорить. Можно печатать.",
   micDeny:"Нет разрешения на микрофон. Разрешите в настройках браузера или просто печатайте.",
-  manNote:"На этом устройстве нет мужского голоса для этого языка, поэтому тон понижен. Это не настоящий мужской голос." },
+  manNote:"На этом устройстве нет мужского голоса для этого языка, поэтому тон понижен. Это не настоящий мужской голос.",
+  simplifyBtn:"Барак — простая версия", simplifyAsk:"Дай мне короткую и простую версию вставленного текста",
+  simplifyEmpty:"Сначала вставьте текст, и тогда я попрошу у Барака его простую версию.",
+  simplifyCut:"Текст длинный, поэтому отправлено только его начало — {n} знаков." },
 en:{ btn:"Barak — ask the teacher", title:"Ask the teacher", close:"Close", send:"Send",
   intro:"You can ask me about what is on the screen. I give one hint at a time, and wait for your answer.",
   nudge:{stuck:"I noticed this one is taking a while. Shall we break it down together, one step at a time?",frustrated:"I can see this is not working right now, and that is completely fine. Let us try another way."}, greet:"Hi, I am Barak. I am here if something is unclear. Write what it is, and we will go through it together.", ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
@@ -139,7 +148,10 @@ en:{ btn:"Barak — ask the teacher", title:"Ask the teacher", close:"Close", se
   vSample:"Hi, I am Barak. This is how I sound on your device.",
   mic:"Speak", micOn:"Listening…", micNo:"This browser does not allow speaking. You can type instead.",
   micDeny:"No microphone permission. You can allow it in the browser settings, or simply type.",
-  manNote:"This device has no male voice for this language, so the pitch is lowered. It is not a real male voice." }
+  manNote:"This device has no male voice for this language, so the pitch is lowered. It is not a real male voice.",
+  simplifyBtn:"Barak — simple version", simplifyAsk:"Give me a short, simple version of the text I pasted",
+  simplifyEmpty:"Paste a text first, and then I will ask Barak for a simple version of it.",
+  simplifyCut:"The text is long, so only its beginning was sent — {n} characters." }
 };
 
 var CFG = null, MSGS = [], BUSY = false, NOTE = "", QID = null, LANGAT = null;
@@ -1534,6 +1546,58 @@ function sendLegacy(text, auto){
   });
 }
 
+/* ================= ״גרסה פשוטה״ — reader, 17.9.2026 =================
+   הלומד הדביק טקסט — הודעה מבית הספר, פרק, מאמר — ורוצה אותו קצר
+   ופשוט בשפת הממשק. הקהל כאן הוא דיסלקציה ועולים חדשים, ומסמך
+   ארוך בעברית הוא מכשול לפני שהלמידה בכלל התחילה.
+
+   **אותו פאנל, אותה שיחה, אותו סדר מוחות.** התשובה נכנסת ל-MSGS
+   כמו כל תשובה: החשיפה ההדרגתית, ההקראה בארבעת המנגנונים, בורר
+   הקול והסימון ״מהמכשיר, לא מהשרת״ — הכול כבר כאן, ואין שכבת
+   תצוגה שנייה. `BARAK.ask` במצב `simplify` שולח את הטקסט בשדה
+   `doc` (עד `BARAK.DOC_MAX`), ובלי שרת — `JOSHLOCAL.simplify`
+   מחלק למשפטים ואומר ללומד שזה חילוק ולא קיצור.
+
+   **הטקסט יוצא מהמכשיר רק בלחיצה על הכפתור הזה, ורק אז.** השיחה
+   הרגילה של reader שולחת את המשפט הנוכחי בלבד, וזה נשאר כך; מה
+   שנשלח כאן כתוב ב-`legal/terms.js`, ״עזרה מהמורה״.
+
+   `simplify(doc)` מחזירה true אם הבקשה יצאה לדרך. טקסט ריק פותח
+   את הפאנל עם ההסבר במקום שגיאה בדף — מקום אחד להודעות. */
+function simplify(doc){
+  if(!BRAIN || !CFG) return false;
+  var t = T();
+  doc = String(doc || "").replace(/\r\n?/g, "\n").trim();
+  if(!EL || !EL.ov.classList.contains("on")) open(true);
+  if(!doc){ NOTE = t.simplifyEmpty; draw(); return false }
+  if(typeof BARAK === "undefined" || !BARAK.ready()) return false;
+  if(BUSY) return false;
+  if(MSGS.length >= TURNS){ NOTE = t.full; draw(); return false }
+  stopReveal();
+  MSGS.push({ role:"user", text:t.simplifyAsk });
+  BUSY = true; NOTE = "";
+  var max = BARAK.DOC_MAX || 3000;
+  if(doc.length > max) NOTE = t.simplifyCut.replace("{n}", String(max));
+  draw();
+  var tryServer = !!API && navigator.onLine !== false && left() > 0;
+  if(tryServer) bump();
+  BARAK.ask(t.simplifyAsk, {
+    api: API, lang: lang(), target: null, sign: null, q: null,
+    history: [], mode: "simplify", doc: doc.slice(0, max),
+    online: tryServer,
+    why: !API ? "" : navigator.onLine === false ? "offline" : "quota"
+  }).then(function(res){
+    BUSY = false;
+    if(!res || !res.say){ NOTE = t.err; draw(); return }
+    MSGS.push({ role:"assistant", text:res.say, local: (API && res.source !== "ai") ? (res.why || "local") : "" });
+    startReveal(MSGS.length - 1);
+    draw(); focus();
+  }, function(){
+    BUSY = false; NOTE = t.err; draw();
+  });
+  return true;
+}
+
 /* ================= הממשק לאפליקציה =================
    mount(cfg) מחזיר true אם הבוט פעיל. אפליקציה בונה את הכפתור
    רק כשהתשובה חיובית, ולכן בלי כתובת שרת אין כפתור בשום מקום.
@@ -1558,6 +1622,10 @@ g.TUTOR = {
   },
   open: open,
   close: close,
+  /* ״גרסה פשוטה״ — reader בלבד היום. התווית מכאן, מאותה סיבה
+     כמו `label`. */
+  simplify: simplify,
+  simplifyLabel: function(){ return T().simplifyBtn },
   /* טקסט חלק מתוך HTML של תרגיל, עם חזקות שנשמרות — המתאמים של
      משפחת המתמטיקה קוראים לזה במקום עוזר מקומי. ראו `plain`. */
   plain: plain,

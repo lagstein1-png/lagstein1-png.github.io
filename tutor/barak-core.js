@@ -37,6 +37,7 @@
 var BARAK_CORE_VERSION = "2026-09-16.1";   /* העותק בריפו של ״תאוריה מדברת״ נושא את אותו ערך */
 var TIMEOUT_MS = 8000;       /* המנדט: כ-8 שניות, ואז המוח המקומי */
 var HISTORY_MAX = 8;         /* ארבעה חילופי דברים */
+var DOC_MAX = 3000;          /* ״גרסה פשוטה״: הטקסט שהודבק. אותו מספר כמו LIM.doc בשרת */
 var ADAPTER = null;
 var LAST = null;             /* התוצאה האחרונה — לבדיקות ולדף התצוגה */
 
@@ -193,6 +194,15 @@ function local(text, opts, why) {
   var face = opts.sign === "frustrated" ? "encourage" : opts.sign === "stuck" ? "stuck" : opts.sign === "slow" ? "slow" : "speaking";
   var intent = localIntent(text);
   var base = { source: "local-fallback", why: why || "local", face: face, model: null };
+  /* ״גרסה פשוטה״ בלי שרת: המוח המקומי מחלק למשפטים ואומר שזה
+     חילוק ולא קיצור — ראו `JOSHLOCAL.simplify`. לא זיהוי כוונה
+     ולא שיחה: הבקשה ידועה, והטקסט הוא `opts.doc`. */
+  if (opts.mode === "simplify") {
+    var simp = (typeof g.JOSHLOCAL !== "undefined" && typeof g.JOSHLOCAL.simplify === "function")
+      ? safe(function () { return g.JOSHLOCAL.simplify(String(opts.doc || "").slice(0, DOC_MAX), lang) }, null) : null;
+    if (!simp || !simp.text) return Promise.resolve(null);
+    return Promise.resolve(Object.assign(base, { say: simp.text, action: null, kind: "simplify" }));
+  }
   if (intent) {
     return runAction(intent).then(function (ok) {
       var tbl = ACTION_DONE[intent.name] || {};
@@ -275,6 +285,10 @@ function ask(text, opts) {
       return { role: m.role === "assistant" ? "assistant" : "user", text: trunc(m.text, 300) };
     })
   };
+  /* הטקסט שהודבק יוצא מהמכשיר **רק** במצב simplify — בכל מצב אחר
+     השדה אינו קיים בגוף, גם אם נמסר. השרת זורק אותו ממילא
+     (`readBody`), אבל מה שלא נשלח לא צריך שיזרקו אותו. */
+  if (opts.mode === "simplify") body.doc = String(opts.doc || "").slice(0, DOC_MAX);
   return fetchWithTimeout(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
     .then(function (r) {
       return r.json().catch(function () { return {} }).then(function (d) {
@@ -337,7 +351,7 @@ g.BARAK = {
   last: function () { return LAST },
   /* לבדיקות ולדף התצוגה */
   _local: local, _intent: localIntent, _endpoint: endpoint,
-  VERSION: BARAK_CORE_VERSION, TIMEOUT_MS: TIMEOUT_MS, ACTION_FAILED: ACTION_FAILED, ACTION_DONE: ACTION_DONE
+  VERSION: BARAK_CORE_VERSION, TIMEOUT_MS: TIMEOUT_MS, DOC_MAX: DOC_MAX, ACTION_FAILED: ACTION_FAILED, ACTION_DONE: ACTION_DONE
 };
 /* `barakAsk` — נקודת הכניסה בשם שהמנדט ביקש. `joshAsk` לא הייתה
    קיימת במאגר, ולכן אין לה כינוי לאחור (D-16). */
