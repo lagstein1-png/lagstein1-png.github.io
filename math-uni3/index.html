@@ -948,7 +948,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g113 · 2026-09-16";
+var BUILD="g114 · 2026-09-16";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -1587,6 +1587,14 @@ function speakDevice(text){
     }catch(e){}
   })(0);
 }
+/* מנוע ההגייה העברי — /tutor/he-speech.js, 17.9.2026.
+   **עברית בלבד**, בהוראת הבעלים. ערבית, רוסית ואנגלית עוברות
+   כמות שהן. הקובץ לא נטען — הטקסט חוזר כמות שהוא, ואין שגיאה. */
+function heSpoken(t,code){
+  var l=code?String(code).slice(0,2):(typeof LG!=="undefined"?LG:"he");
+  if(l!=="he"||typeof HESPEECH==="undefined")return t;
+  try{ return HESPEECH.spoken(t) }catch(e){ return t }
+}
 function speak(text){
   if(!state.settings.tts||!text)return;
   /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
@@ -1595,7 +1603,7 @@ function speak(text){
      שמע "span class frac" באמצע השאלה. */
   text=plainOf(String(text));
   stopSpeak();
-  speakDevice(text);
+  speakDevice(heSpoken(text));
 }
 function stopSpeak(){
   _sayGen++;   /* כל מקטע שממתין ב-setTimeout שייך מעכשיו לדור ישן */
@@ -11748,6 +11756,7 @@ render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
+<script src="/tutor/he-speech.js"></script>
 <script src="/tutor/josh-state.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
@@ -11759,7 +11768,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g113-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g114-pwa1").catch(function(){});
   });
 }
 </script>

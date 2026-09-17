@@ -1,0 +1,72 @@
+#!/usr/bin/env node
+/* מנוע ההגייה העברי — /tutor/he-speech.js.
+   הועתק מ״תאוריה מדברת״ 17.9.2026 בהוראת הבעלים: ״בתאוריה מדברת
+   יש מנוע דיבור העתק אותו לשאר״, ואחריה ״רק בעברית״.
+
+   ארבע בדיקות, ושתיים מהן הן העיקר:
+
+   1. החיווט — תגית ו-PRE בשתים־עשרה האפליקציות ובשורש.
+   2. הכללים עובדים על מה שהבעלים שמע.
+   3. **ההומוגרפים נשארים בחוץ.** אחת־עשרה כניסות בקובץ המקור
+      בטוחות בנהיגה ושגויות בלומדה — ״עגול״ במספר עגול, ״החד״
+      במשולש חד-זווית, ״הרוח״ בבעיית פיזיקה. מי שיוסיף אותן
+      ״כדי להשלים את ההעתקה״ ייצר שגיאות חדשות.
+   4. **מספר האסימונים נשמר.** עליו נשענת ההדגשה מילה-במילה
+      בכל האפליקציות — `charIndex` מצביע לתוך הנאמר, והמפה
+      נמדדת עליו. אסימון שיתפצל ישבור הדגשה בלי שום שגיאה. */
+const fs = require('fs'), path = require('path');
+const ROOT = path.resolve(__dirname, '..', '..');
+let bad = 0;
+function t(name, got, want) {
+  const g = JSON.stringify(got), w = JSON.stringify(want);
+  if (g === w) { console.log('✓ ' + name); return }
+  bad++; console.log('✗ ' + name + '\n    קיבלנו: ' + g + '\n    ציפינו: ' + w);
+}
+
+require(path.join(ROOT, 'tutor', 'he-speech.js'));
+const H = globalThis.HESPEECH;
+
+/* 1 — החיווט */
+const APPS = ['math-app','math-teen','math-uni','math-uni2','math-uni3','english',
+              'history','ulpan','lomda','kotvim','reader','bagrut-806'];
+const missTag = [], missPre = [];
+for (const a of APPS) {
+  const html = fs.readFileSync(path.join(ROOT, a, 'index.html'), 'utf8');
+  const sw   = fs.readFileSync(path.join(ROOT, a, 'sw.js'), 'utf8');
+  if (!/<script src="\/tutor\/he-speech\.js">/.test(html)) missTag.push(a);
+  if (sw.indexOf('/tutor/he-speech.js') < 0) missPre.push(a);
+}
+t('תגית בשתים־עשרה האפליקציות', missTag, []);
+t('PRE בשתים־עשרה האפליקציות', missPre, []);
+t('PRE בשורש', fs.readFileSync(path.join(ROOT,'sw.js'),'utf8').indexOf('/tutor/he-speech.js') >= 0, true);
+
+/* 2 — מה שהבעלים שמע */
+t('משלש → משולש',  H.spoken('שטח המשלש'), 'שטח המשולש');
+t('נטייה: במשלש',   H.spoken('זווית במשלש'), 'זווית במשולש');
+t('מתמן → מתומן',   H.spoken('מתמן משוכלל'), 'מתומן משוכלל');
+t('מאד → מאוד',     H.spoken('זה מאד קל'), 'זה מאוד קל');
+t('מלה → מילה',     H.spoken('המלה הזאת'), 'המילה הזאת');
+
+/* 3 — ההומוגרפים נשארים בחוץ */
+const HOMO = ['עגול','החד','הרוח','כוון','לכוון','לעבר','רטב','ברטב','עבר'];
+t('הומוגרפים אינם במילון', HOMO.filter(w => H._ktiv[w]), []);
+t('מספר עגול נשאר',   H.spoken('מספר עגול'), 'מספר עגול');
+t('חד-זווית נשאר',    H.spoken('משולש חד-זווית'), 'משולש חד-זווית');
+t('הרוח נשארת רוח',   H.spoken('הרוח נושבת'), 'הרוח נושבת');
+
+/* 4 — מספר האסימונים נשמר, ועליו נשענת ההדגשה */
+const drift = [];
+for (const s of ['שטח המשלש מאד מצין','המלה במשלש','זה מתמן, ולא משלש',
+                 'a b c','שלום עולם','המשלשים והמתמנים']) {
+  const a = s.split(/\s+/).filter(Boolean).length;
+  const b = H.spoken(s).split(/\s+/).filter(Boolean).length;
+  if (a !== b) drift.push(s + ' (' + a + '→' + b + ')');
+}
+t('מספר האסימונים נשמר', drift, []);
+
+/* 5 — עברית בלבד: מה שאין בו עברית חוזר כמות שהוא */
+t('אנגלית עוברת כמות שהיא', H.spoken('The area of the triangle'), 'The area of the triangle');
+t('רוסית עוברת כמות שהיא',  H.spoken('Площадь треугольника'), 'Площадь треугольника');
+
+console.log(bad ? `✗ hespeech.js — ${bad} ממצאים` : '✓ מנוע ההגייה העברי — חיווט, כללים, הומוגרפים ואסימונים');
+process.exit(bad ? 1 : 0);

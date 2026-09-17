@@ -1541,6 +1541,13 @@ function numHeb(n){
   if(two>0){if(two<20)p.push(ONES[two]);else{var tt=Math.floor(two/10),o=two%10;p.push(o===0?TENS[tt]:TENS[tt]+" וְ"+ONES[o])}}
   return p.join(" ");
 }
+/* מנוע ההגייה העברי — /tutor/he-speech.js, 17.9.2026.
+   **עברית בלבד**, בהוראת הבעלים. הקובץ לא נטען — הטקסט חוזר
+   כמות שהוא, ואין שגיאה. */
+function heSpoken(t){
+  if(typeof HESPEECH==="undefined")return t;
+  try{ return HESPEECH.spoken(t) }catch(e){ return t }
+}
 function toSpoken(text,lang){
   if(lang!=="he")return text;
   var s=text;
@@ -1549,6 +1556,12 @@ function toSpoken(text,lang){
   /* פסיק נכנס למספר רק בין ספרות ("1,250"). קודם הביטוי בלע גם פסיק
      שאחרי מספר — "מ־5, והגענו" נאמר בלי ההפסקה. */
   s=s.replace(/\d(?:[\d,]*\d)?/g,function(m){return numHeb(parseInt(m.replace(/,/g,""),10))});
+  /* שכבת ההגייה העברית נכנסת **כאן**, בתוך toSpoken, ולא ליד
+     האמירה: hlAlign מתרגם כל מילה מוצגת לחוד ומשווה לתרגום המשפט
+     השלם, ושכבה שרצה רק באחד מהשניים הייתה מפרקת את ההשוואה.
+     HESPEECH פועל על אסימון בודד, ולכן שני המסלולים מקבלים אותו
+     דבר וההדגשה נשארת מיושרת. */
+  s=heSpoken(s);
   return s.replace(/\s{2,}/g," ").replace(/\s+([,.!?])/g,"$1").trim();
 }
 
@@ -2168,7 +2181,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b122 · 2026-09-16";
+var BUILD="b123 · 2026-09-16";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4583,6 +4596,7 @@ render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
+<script src="/tutor/he-speech.js"></script>
 <script src="/tutor/josh-state.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
@@ -4594,7 +4608,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b122-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b123-pwa1").catch(function(){});
   });
 }
 </script>

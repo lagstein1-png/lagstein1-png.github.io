@@ -28,6 +28,14 @@
   "use strict";
 
   var LANG = "he-IL";
+
+  /* מנוע ההגייה העברי — /tutor/he-speech.js, 17.9.2026.
+     **עברית בלבד.** כאן אין `onboundary` ואין `charIndex` — ההדגשה
+     היא פר-פריט בתור — ולכן החלפת טקסט אינה נוגעת בה כלל. */
+  function heSpoken(t){
+    if(LANG.slice(0,2)!=="he"||typeof HESPEECH==="undefined")return t;
+    try{ return HESPEECH.spoken(t) }catch(e){ return t }
+  }
   /* הקצב והגובה שנשלחים למנוע — 0.95 ו-1.12, הפריסט ״נשי רגוע״ של
      math-app, שהבעלים שמע ב-13.9.2026 ואמר עליו ״נעים ומדויק, להכניס
      לכל האפליקציות״. עד אז "רגיל" כאן היה 0.82 בגובה 1, כמו
@@ -293,7 +301,7 @@
     text = String(text || "").trim();
     if (!text || !supported() || api.speaking) return;
     try { if (speechSynthesis.speaking || speechSynthesis.pending) return; } catch (e) {}
-    var v = bestVoice(), u = new SpeechSynthesisUtterance(text);
+    var v = bestVoice(), u = new SpeechSynthesisUtterance(heSpoken(text));
     if (v) u.voice = v;
     u.lang = v ? normLang(v.lang) : LANG;
     u.rate = Math.max(0.5, Math.min(2, RATE_BASE * api.rate));
@@ -306,7 +314,7 @@
     if (qi >= queue.length) { stop(); return; }
     var item = queue[qi++];
     mark(item);
-    var u = new SpeechSynthesisUtterance(item.text);
+    var u = new SpeechSynthesisUtterance(heSpoken(item.text));
     var v = bestVoice();
     if (v) u.voice = v;
     /* מנורמל: "he_IL" ו-"iw-IL" אינם תגיות BCP47 חוקיות, ויש מנועים
