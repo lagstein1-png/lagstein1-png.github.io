@@ -1201,6 +1201,13 @@ function femNote(){
   return "אין במכשיר הזה קול עברי נשי, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו. "+how;
 }
 
+/* מנוע ההגייה העברי — /tutor/he-speech.js, 17.9.2026.
+   **עברית בלבד**, בהוראת הבעלים. הקובץ לא נטען — הטקסט חוזר
+   כמות שהוא, ואין שגיאה. */
+function heSpoken(t){
+  if(typeof HESPEECH==="undefined")return t;
+  try{ return HESPEECH.spoken(t) }catch(e){ return t }
+}
 function speakSentence(n){
   if(!('speechSynthesis' in window)) return;
   var full = sentencePlain(n), text = full.trim();
@@ -1211,15 +1218,21 @@ function speakSentence(n){
   }
 
   /* מפה ממיקום־תו למילה, כדי לדעת איזו מילה להדגיש בכל רגע */
-  var map = [], pos = 0;
+  /* **המפה והמחרוזת הנאמרת נבנות מאותם אסימונים — 17.9.2026.**
+     מנוע ההגייה העברי משנה אורכי מילים (״משלש״→״משולש״), ו-charIndex
+     מצביע לתוך מה שנאמר. לכן הנאמר מורכב כאן מאותם `w.plain`
+     שהמפה נמדדת עליהם, והיא זזה איתו. בלי תרגום — התוצאה זהה
+     בתו לתו למה שהיה. */
+  var map = [], pos = 0, said = '';
   W.forEach(function(w, i){
     if(w.sent !== n) return;
-    if(w.word) map.push({ from:pos, to:pos + w.plain.length, i:i });
-    pos += w.plain.length;
+    var sp = heSpoken(w.plain);
+    if(w.word) map.push({ from:pos, to:pos + sp.length, i:i });
+    pos += sp.length; said += sp;
   });
-  var lead = full.length - full.replace(/^\s+/, '').length;
+  var lead = said.length - said.replace(/^\s+/, '').length;
 
-  var u = new SpeechSynthesisUtterance(text);
+  var u = new SpeechSynthesisUtterance(said.trim() || text);
   var tok = SEQ;                             /* האמירה הזאת שייכת לסבב הזה */
   u.lang = 'he-IL';
   var chosen = heVoices.filter(function(v){ return v.voiceURI === VOICE; })[0] || heVoice;
@@ -1623,6 +1636,7 @@ function refreshDynamic(){
 
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
+<script src="/tutor/he-speech.js"></script>
 <script src="/tutor/josh-face.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
@@ -1634,7 +1648,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=78-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=79-pwa1").catch(function(){});
   });
 }
 </script>

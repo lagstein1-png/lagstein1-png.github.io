@@ -28,7 +28,7 @@ const PRE = [
   "./img/apple-touch-icon.png", "./vendor/katex/katex.min.css", "./vendor/katex/katex.min.js",
   "/img/paula.jpg","/img/josh.jpg",
   "/img/josh-bot.jpg",
-  "/tutor/josh-face.js",
+  "/tutor/he-speech.js","/tutor/josh-face.js",
   "/tutor/josh-local.js","/tutor/tutor.js","/tutor/barak-core.js",
   "/legal/terms.js", "/legal/protect.js",
   "./vendor/katex/fonts/KaTeX_AMS-Regular.woff2", "./vendor/katex/fonts/KaTeX_Caligraphic-Bold.woff2", "./vendor/katex/fonts/KaTeX_Caligraphic-Regular.woff2",

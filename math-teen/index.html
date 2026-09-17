@@ -1484,7 +1484,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t114 · 2026-09-16";
+var BUILD="t115 · 2026-09-16";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -1700,7 +1700,7 @@ function hlWhole(el){
   HL.el=el; HL.raw=el.innerHTML; HL.added=true;
   el.classList.add("now");
 }
-function hlPrep(el,text){
+function hlPrep(el,text,spokenText){
   hlClear();
   if(!el||!text)return;
   /* אם המחרוזת הנאמרת אינה זהה למוצגת — אין מיפוי, ומדגישים הכול. */
@@ -1708,16 +1708,29 @@ function hlPrep(el,text){
   var said=String(text).replace(/\s+/g," ").trim();
   if(shown!==said){hlWhole(el);return}
   HL.el=el; HL.raw=el.innerHTML;
-  var parts=String(text).split(/(\s+)/),html="",pos=0,idx=0;
+  var parts=String(text).split(/(\s+)/),html="",idx=0;
+  /* **המפה נמדדת על המחרוזת הנאמרת, ולא על המוצגת — 17.9.2026.**
+     `e.charIndex` מגיע ממנוע ההקראה ומצביע לתוך מה שנאמר, ומנוע
+     ההגייה העברי משנה אורכי מילים (״משלש״→״משולש״). מספר האסימונים
+     נשמר — `HESPEECH.spoken` מטפל באסימון בודד ואינו מפצל — ולכן
+     האסימון ה-i שנאמר הוא ה-span ה-i שמוצג, גם כשהאורך נבדל.
+     נבדלו מספרי האסימונים — נופלים להדגשת הכול, ולא להדגשה שגויה. */
+  var sp=String(spokenText==null?text:spokenText).split(/(\s+)/),spos=0,sidx=0;
   HL.map=[];
-  for(var i=0;i<parts.length;i++){
-    var pt=parts[i];
-    if(!pt.length)continue;
-    if(/^\s+$/.test(pt)){html+=pt;pos+=pt.length;continue}
-    HL.map.push({from:pos,to:pos+pt.length,i:idx});
-    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
-    pos+=pt.length; idx++;
+  for(var i=0;i<sp.length;i++){
+    if(!sp[i].length)continue;
+    if(/^\s+$/.test(sp[i])){spos+=sp[i].length;continue}
+    HL.map.push({from:spos,to:spos+sp[i].length,i:sidx});
+    spos+=sp[i].length; sidx++;
   }
+  for(var j=0;j<parts.length;j++){
+    var pt=parts[j];
+    if(!pt.length)continue;
+    if(/^\s+$/.test(pt)){html+=pt;continue}
+    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
+    idx++;
+  }
+  if(idx!==sidx){hlClear();hlWhole(el);return}
   if(!HL.map.length){hlClear();return}
   el.innerHTML=html;
   HL.spans=el.querySelectorAll(".wd");
@@ -2128,6 +2141,13 @@ function speakDevice(text){
     }catch(e){}
   })(0);
 }
+/* מנוע ההגייה העברי — /tutor/he-speech.js, 17.9.2026.
+   **עברית בלבד**, בהוראת הבעלים. ערבית, רוסית ואנגלית עוברות
+   כמות שהן. הקובץ לא נטען — הטקסט חוזר כמות שהוא, ואין שגיאה. */
+function heSpoken(t){
+  if(LG!=="he"||typeof HESPEECH==="undefined")return t;
+  try{ return HESPEECH.spoken(t) }catch(e){ return t }
+}
 function speak(text){
   if(!state.settings.tts||!text)return;
   /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
@@ -2138,7 +2158,7 @@ function speak(text){
   stopSpeak();
   /* מדברים — וכפתור ההקראה בכרטיס מתחלף לעצירה */
   saying=true; if(view==="practice")render();
-  speakDevice(text);
+  speakDevice(heSpoken(text));
 }
 function stopSpeak(){
   hlClear();
@@ -6276,7 +6296,7 @@ function onAction(a,el){
       var hsay=speakProse(P.q.hint);
       speak(hsay);
       /* אחרי speak — הוא קורא ל-stopSpeak שמנקה הדגשה קודמת. */
-      hlPrep(document.querySelector(".hintxt"),hsay);
+      hlPrep(document.querySelector(".hintxt"),hsay,heSpoken(hsay));
     }
     return;
   }
@@ -7809,6 +7829,7 @@ render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
+<script src="/tutor/he-speech.js"></script>
 <script src="/tutor/josh-state.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
@@ -7820,7 +7841,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t114-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t115-pwa1").catch(function(){});
   });
 }
 </script>
