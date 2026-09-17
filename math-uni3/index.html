@@ -431,6 +431,16 @@ footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface
 .xq-b[aria-pressed="true"]{background:var(--line)}
 .xq-q{margin-top:8px;line-height:1.5;overflow-wrap:anywhere}
 .xq-e{margin-top:5px;font-weight:700;overflow-wrap:anywhere}
+/* **הביטוי במסך המבחן, בכיוון שלו — נוסף 17.9.2026.**
+
+   שש האפליקציות האחרות מחזיקות את השורה הזאת; ארבע אפליקציות
+   המתמטיקה לא — **ודווקא בהן הביטוי הוא כל השאלה.** בלעדיה
+   `2x + 5 = 13` מוצג הפוך במסמך RTL: הדפדפן מסדר את המספרים
+   והסימנים לפי כיוון המסמך, ולא לפי כיוון הנוסחה.
+
+   `text-align:right` נשמר בכוונה — הביטוי יושב מתחת לשאלה
+   העברית, לא בקצה השמאלי. */
+[dir="rtl"] .xq-e{direction:ltr;unicode-bidi:isolate;text-align:right}
 .xq-a{margin-top:7px;font-size:.92rem;color:var(--ok);overflow-wrap:anywhere}
 .xq-add{margin-top:12px;gap:8px}
 .xq-add .sub{margin:0}
@@ -948,7 +958,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g118 · 2026-09-17";
+var BUILD="g120 · 2026-09-17";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -11775,7 +11785,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g118-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g120-pwa1").catch(function(){});
   });
 }
 </script>

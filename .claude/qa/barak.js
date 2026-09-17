@@ -74,7 +74,11 @@ const BODY = extra => Object.assign({ app: 'math-app', lang: 'he', screen: SCREE
                                       userText: 'לא הבנתי', history: [] }, extra || {});
 
 (async () => {
-  const W = await import(path.join(ROOT, 'tutor-api', 'worker.js'));
+  /* `pathToFileURL` ולא נתיב גולמי: בווינדוס `import()` מקבל נתיב
+     מוחלט כמו `C:\…` ומפרש את `c:` כסכימת URL, ונופל על
+     `ERR_UNSUPPORTED_ESM_URL_SCHEME`. הבדיקה כולה לא רצה. */
+  const W = await import(require('url').pathToFileURL(
+    path.join(ROOT, 'tutor-api', 'worker.js')).href);
   const ORG = 'https://lagstein1-png.github.io';
   const ctx = { waitUntil() {} };
 
