@@ -869,7 +869,30 @@ function md(app,R){
   }
   try{ await page.goto('http://127.0.0.1:8099/'+app+'/',{waitUntil:'domcontentloaded'}) }
   catch(e){ console.log(app,'SKIP — הדף לא נטען'); await ctx.close(); continue }
-  await page.waitForTimeout(1200);
+  /* **המתנה לתנאי ולא לשעון — 17.9.2026.**
+
+     כאן ישב `waitForTimeout(1200)`, ו-`O-38` נסגר בהצהרה ״אותו
+     עץ, אותו פסק דין״. **היא לא התקיימה:** בהרצה אחת `math-uni3`
+     החזיר `2 REVIEW` ובהם `lang-untranslated ×12`, ובחמש הרצות
+     שאחריה על אותו עץ בדיוק — `1 REVIEW` ו-`heb:0` בכל ארבע
+     השפות. מדידה של סוכן התוכן, ולא שחזור מכוון.
+
+     1,200 מילישניות הן ניחוש: במכונה עמוסה הדף עדיין לא סיים
+     לחווט את `TOPICS` ואת המילונים, והסורק קרא מצב חלקי. לכן
+     ממתינים למה שהסורק **באמת** צריך, והשעון נשאר רק כתקרה.
+
+     8 שניות ולא 1.2 — תקרה אינה השהיה: מי שמוכן ב-300 ממתין
+     300, ומי שאיטי לא נקרא מוקדם מדי. */
+  try{
+    await page.waitForFunction(function(){
+      return typeof buildQ === 'function' &&
+             typeof TOPICS !== 'undefined' && TOPICS && TOPICS.length > 0;
+    }, { timeout: 8000 });
+  }catch(e){
+    /* אפליקציה שאינה חושפת אותם תיפול ממילא בבדיקה שאחרי, עם
+       הודעה מדויקת יותר ממה שהמתנה שפגה יכולה לתת. */
+  }
+  await page.waitForTimeout(250);
 
   const R=await scan(page);
   R.langsRun=[];

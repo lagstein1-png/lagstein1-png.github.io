@@ -274,6 +274,7 @@ async function run(){
         if(!after.length) fails.push('נפילה: קול הרשת נכשל וההקראה נשברה — לא הייתה חזרה בקול מקומי');
         else if(NET.indexOf(after[0]) >= 0) fails.push('נפילה: אחרי הכישלון נבחר שוב קול רשת');
       }
+
     }catch(e){
       fails.push('חריגה: ' + e.message);
     }
