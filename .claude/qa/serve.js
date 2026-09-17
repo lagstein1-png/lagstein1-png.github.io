@@ -28,7 +28,11 @@ http.createServer((req,res)=>{
   }
   fs.readFile(f,(e,d)=>{
     if(e){res.writeHead(404);return res.end('not found')}
-    res.writeHead(200,{'Content-Type':mime[path.extname(f)]||'application/octet-stream'});
+    /* no-store — 16.9.2026. בלי כותרת, כרום שומר קבצים לפי היוריסטיקה,
+       וה-service worker החדש שמתקין מושך את josh-local.js הישן מה-HTTP
+       cache. הבעלים עשה git pull וראה את אותו מסך. שרת בדיקות אינו
+       צריך מטמון דפדפן בכלל. */
+    res.writeHead(200,{'Content-Type':mime[path.extname(f)]||'application/octet-stream','Cache-Control':'no-store'});
     res.end(d);
   });
 }).listen(PORT,'127.0.0.1',()=>console.log('serving '+root+' on http://127.0.0.1:'+PORT));

@@ -1,0 +1,162 @@
+# פריסת ברק ל-**סטייג׳ינג** — Worker בשם tutor-staging.
+#
+# מנוע ברק, 16.9.2026. אותו worker.js, אותם סודות, מרחב KV נפרד
+# (RATE_STAGING). זה מה שהענף נבדק מולו; הייצור (`tutor`) נפרס
+# ב-deploy-tutor.yml בלבד, ורק אחרי ״יאללה״ של הבעלים.
+#
+# **המפתח אינו מודבק ביד.** GEMINI_API_KEY כבר ב-Secrets של GitHub
+# (deploy-tutor ריצה 6, 16.9.2026, החזירה 200 מהבדיקה החיה — וזה
+# בלתי אפשרי בלי מפתח). --secrets-file מעלה אותו לסטייג׳ינג באותה
+# גרסה של הפריסה. אין ערך שמודפס.
+#
+# הפעלה ידנית בלבד — workflow_dispatch, ועם שדה אישור.
+
+name: deploy-tutor-staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'הקלד STAGING כדי לאשר. יוצר Worker בשם tutor-staging ומרחב KV.'
+        required: true
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: אישור מפורש
+        env:
+          CONFIRM: ${{ github.event.inputs.confirm }}
+        run: |
+          if [ "$CONFIRM" != "STAGING" ]; then
+            echo "::error::לא אושר. יש להקליד STAGING בשדה האישור."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: הבדיקות הסטטיות של ברק לפני פריסה
+        run: |
+          node .claude/qa/tutor.js
+          node .claude/qa/barak.js
+
+      - name: מוצא או יוצר את מרחב ה-KV בשם RATE_STAGING
+        id: kv
+        working-directory: tutor-api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4 kv namespace list > /tmp/kv.out 2> /tmp/kv.err || {
+            echo "::error::kv namespace list נכשל. בדוק את הרשאת Workers KV Storage בטוקן."
+            cat /tmp/kv.err; exit 1;
+          }
+          ID=$(node -e '
+            const fs=require("fs");
+            const raw=fs.readFileSync("/tmp/kv.out","utf8");
+            const hit=t=>/(^|[-_])RATE_STAGING$/i.test(t||"");
+            try{
+              const l=JSON.parse(raw);
+              const m=(Array.isArray(l)?l:[]).find(n=>hit(n.title)||hit(n.name));
+              if(m&&m.id){ process.stdout.write(m.id); process.exit(0) }
+            }catch(e){}
+            const line=raw.split("\n").find(hit);
+            const id=line&&line.match(/[0-9a-f]{32}/);
+            process.stdout.write(id?id[0]:"");
+          ')
+          if [ -z "$ID" ]; then
+            echo "אין מרחב בשם RATE_STAGING — יוצר אחד."
+            npx --yes wrangler@4 kv namespace create RATE_STAGING | tee /tmp/kvnew.txt
+            ID=$(grep -oE '[0-9a-f]{32}' /tmp/kvnew.txt | head -1)
+          fi
+          if [ -z "$ID" ]; then
+            echo "::error::לא הצלחתי להשיג מזהה KV מהפלט של wrangler."
+            exit 1
+          fi
+          echo "kv_id=$ID" >> "$GITHUB_OUTPUT"
+
+      - name: מזריק את מזהי ה-KV ל-wrangler.toml
+        working-directory: tutor-api
+        env:
+          KV_ID: ${{ steps.kv.outputs.kv_id }}
+        run: |
+          set -euo pipefail
+          case "$KV_ID" in
+            *[!0-9a-f]* | "") echo "::error::מזהה KV אינו הקסדצימלי: לא מזריק."; exit 1 ;;
+          esac
+          # מזהה הייצור נדרש רק כדי שהקובץ ייקרא; הוא אינו נפרס כאן.
+          sed -i "s/KV_STAGING_ID_PLACEHOLDER/$KV_ID/; s/KV_ID_PLACEHOLDER/$KV_ID/" wrangler.toml
+          grep -B1 -A2 'env.staging.kv' wrangler.toml
+
+      - name: פורס ל-tutor-staging — הקוד והמפתח יחד
+        id: deploy
+        working-directory: tutor-api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY || secrets.GOOGLE_API_KEY || secrets.GOOGLE_AI_KEY || vars.GEMINI_API_KEY || vars.GEMINI_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          : > /tmp/.secrets.env
+          trap 'shred -u /tmp/.secrets.env 2>/dev/null || rm -f /tmp/.secrets.env' EXIT
+          GKEY=$(printf '%s' "${GEMINI_API_KEY:-}" | tr -d '[:space:]')
+          if [ -z "$GKEY" ]; then
+            echo "::error::אין GEMINI_API_KEY ב-Secrets. זו העצירה היחידה: להדביק את המפתח ב-Settings → Secrets → Actions בשם GEMINI_API_KEY ולהריץ שוב."
+            exit 1
+          fi
+          echo "GEMINI_API_KEY: ${#GKEY} תווים אחרי גזימה (הערך עצמו אינו מודפס)"
+          printf 'GEMINI_API_KEY=%s\n' "$GKEY" >> /tmp/.secrets.env
+          npx --yes wrangler@4 deploy --env staging --secrets-file /tmp/.secrets.env 2>&1 | tee /tmp/deploy.txt
+          URL=$(grep -oE 'https://tutor-staging[a-z0-9.-]*\.workers\.dev' /tmp/deploy.txt | head -1)
+          if [ -z "$URL" ]; then
+            echo "::error::הפריסה רצה אבל לא נמצאה כתובת tutor-staging…workers.dev בפלט."
+            exit 1
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: בדיקה חיה — /health, ואז /ask עם פעולה
+        env:
+          URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          set -euo pipefail
+          CODE=000
+          for i in 1 2 3 4 5 6; do
+            CODE=$(curl -s -o /tmp/h.json -w '%{http_code}' --max-time 30 "$URL/health" || echo 000)
+            [ "$CODE" = "200" ] && break
+            sleep 5
+          done
+          echo "/health — HTTP $CODE"; cat /tmp/h.json || true; echo
+          BODY='{"app":"math-app","lang":"he",
+                 "screen":{"id":"q1","type":"mcq","q":"8 + 7 =","options":["14","15","16","17"],"correct":"15","topic":"חיבור","curriculum":"כיתה ב"},
+                 "actions":[{"name":"next_question","desc":"עובר לשאלה הבאה"},{"name":"show_hint","desc":"מציג רמז"}],
+                 "userText":"לא הבנתי, אפשר רמז?","history":[],"mode":"hint"}'
+          A=$(curl -s -o /tmp/r.json -w '%{http_code}' --max-time 45 -X POST "$URL/ask" \
+              -H 'Content-Type: application/json' -H "Origin: https://lagstein1-png.github.io" -d "$BODY" || echo 000)
+          echo "/ask — HTTP $A"; cat /tmp/r.json || true; echo
+          {
+            echo "## ברק — סטייג׳ינג"
+            echo ""
+            echo "**כתובת:** \`$URL\`"
+            echo ""
+            echo "**/health:** HTTP $CODE · **/ask:** HTTP $A"
+            echo ""
+            echo '```json'; cat /tmp/r.json 2>/dev/null || echo '(אין גוף)'; echo; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "$CODE" = "200" ] && [ "$A" = "200" ] || { echo "::error::הסטייג׳ינג אינו עונה 200."; exit 1; }
+          node -e '
+            const d=require("/tmp/r.json");
+            if(typeof d.say!=="string"||!d.say) { console.error("אין say"); process.exit(1) }
+            if(/\b15\b/.test(d.say)) { console.error("הרמז חשף את התשובה"); process.exit(1) }
+            if(d.source!=="ai") { console.error("source אינו ai"); process.exit(1) }
+            console.log("say תקין, בלי התשובה, source=ai, model="+d.model);
+          '

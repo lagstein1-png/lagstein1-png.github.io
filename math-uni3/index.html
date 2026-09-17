@@ -30,9 +30,9 @@
   --ar:"Noto Sans Arabic",system-ui,"Segoe UI",Arial,sans-serif;
   --ru:"Noto Sans",system-ui,"Segoe UI",Arial,sans-serif;   /* קירילית — Heebo אינו מכיל אותה, נמדד 7.9 */
   --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
-  --bg:#f5f7fb; --surface:#ffffff; --surface2:#eef1f7;
+  --bg:#f5f7fb; --btn-ink:#fff; --surface:#ffffff; --surface2:#eef1f7;
   --ink:#101828; --muted:#5b6478; --faint:#687080; --line:#e0e4ee;
-  --accent:#c026d3; --accent-ink:#ffffff; --accent-soft:#fce4fe;
+  --accent:#a21caf; --accent-ink:#ffffff; --accent-soft:#fce4fe;
   /* צהוב ההדגשה — אותו צהוב של מקריא קולי, כדי שמעקב ההקראה
      ייראה אותו דבר בכל האתר. */
   --hit:#f5c451; --hit-ink:#1a1300;
@@ -59,7 +59,7 @@ html[lang="ar"] textarea,html[lang="ar"] select{font-family:var(--ar)}
 html[lang="ru"] body,html[lang="ru"] input,html[lang="ru"] button,
 html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
 :root[data-theme="dark"]{
-  --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
+  --bg:#0e1117; --btn-ink:var(--bg); --surface:#161b26; --surface2:#1e2532;
   --ink:#e8ecf4; --muted:#9aa4ba; --faint:#8f99ae; --line:#28313f;
   --accent:#f0abfc; --accent-ink:#0e1117; --accent-soft:#3d1642;
   --hit:#ffd24d; --hit-ink:#241a00;
@@ -74,7 +74,7 @@ html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#0e1117; --surface:#161b26; --surface2:#1e2532;
+    --bg:#0e1117; --btn-ink:var(--bg); --surface:#161b26; --surface2:#1e2532;
     --ink:#e8ecf4; --muted:#9aa4ba; --faint:#8f99ae; --line:#28313f;
     --accent:#f0abfc; --accent-ink:#0e1117; --accent-soft:#3d1642;
     --hit:#ffd24d; --hit-ink:#241a00;
@@ -90,7 +90,7 @@ html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
 }
 /* ניגודיות גבוהה — שחור על לבן, מסגרות מלאות, בלי גוונים רכים */
 :root.hc{
-  --bg:#ffffff; --surface:#ffffff; --surface2:#ffffff;
+  --bg:#ffffff; --btn-ink:#fff; --surface:#ffffff; --surface2:#ffffff;
   --ink:#000000; --muted:#1a1a1a; --faint:#333333; --line:#000000;
   --accent:#00308f; --accent-ink:#ffffff; --accent-soft:#e8edf8;
   --hit:#ffe600; --hit-ink:#000000;
@@ -160,7 +160,11 @@ nav{display:flex;gap:4px;margin-inline-start:auto;flex-wrap:wrap}
 .pad{padding:clamp(14px,3.4vw,22px)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;
   font-weight:700;padding:12px 18px;transition:.15s;border:1px solid transparent;line-height:1.3}
-.btn-p{background:linear-gradient(135deg,var(--accent),var(--c-data));color:#fff}
+/* **--btn-ink ולא #fff — תוקן 16.9.2026.** `--accent` מתהפך בין
+   המצבים: בבהיר הוא כהה (#c026d3 ב-math-uni3) ולבן עליו 4.71:1,
+   ובכהה הוא פסטל (#f0abfc) ולבן עליו **1.76:1** — טקסט שאינו
+   נקרא על כפתור הפעולה הראשי. נמדד בארבע האפליקציות. */
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--c-data));color:var(--btn-ink)}
 .btn-p:hover{filter:brightness(1.1)}
 :root.hc .btn-p{background:var(--accent)}
 .btn-d{background:var(--ink);color:var(--bg)}
@@ -944,7 +948,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g99 · 2026-09-15";
+var BUILD="g118 · 2026-09-17";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -1071,8 +1075,8 @@ function pickList(){
 /* אין שדה מגדר ב-Web Speech API. השם הוא הרמז היחיד, ולכן אלה
    שמות הקולות שהמערכות באמת מתקינות — ולא ניחוש לפי צליל.
    "google" הוא שם יצרן ולא מגדר, ומכוון אינו מופיע כאן. */
-var VOICE_F=/(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/
-var VOICE_M=/(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/
+var VOICE_F=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/
+var VOICE_M=/(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/
 function guessGender(v){
   var n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
   if(VOICE_F.test(n))return "f";
@@ -1468,9 +1472,16 @@ function femLift(v){
 
 /* גובה הבסיס של כל אמירה — 1.12, הפריסט ״נשי רגוע״ של math-app, שהבעלים
    בחר אחרי האזנה (13.9.2026). femLift נשאר מכפיל: קול גברי מורם עוד,
-   והתקרה 1.45 היא זו של math-app. voicePitch הוא מה שמושם ב-u.pitch. */
+   והתקרה 1.35 הועתקה מ״תאוריה מדברת״ 17.9.2026, בהוראת הבעלים
+   (״קול נשי עדין כמו בתאוריה מדברת, תעתיק משם״). שם: u.pitch =
+   male ? Math.min(2, tune.pitch * 1.35) : tune.pitch, ו-tune.pitch
+   בעברית הוא 1.0 — כלומר קול גברי מורם ל-1.35 בדיוק. כאן הייתה
+   תקרה 1.45, ולכן Asaf יצא 1.45: 1.12×1.35=1.512, חתוך ל-1.45.
+   העשירית הזאת היא ההבדל בין ״מורם״ ל״צווחני״. קול נשי אמיתי אינו
+   נוגע בתקרה — 1.12 הוא הפריסט ״נשי רגוע״ שהבעלים בחר, והוא נשאר.
+   voicePitch הוא מה שמושם ב-u.pitch. */
 var PITCH_BASE=1.12;
-function voicePitch(v){return Math.min(1.45,PITCH_BASE*femLift(v))}
+function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 
 
 /* הודעה כשאין קול נשי בשפה — עם ההוראות למערכת ההפעלה שהמשתמש
@@ -1583,6 +1594,14 @@ function speakDevice(text){
     }catch(e){}
   })(0);
 }
+/* מנוע ההגייה העברי — /tutor/he-speech.js, 17.9.2026.
+   **עברית בלבד**, בהוראת הבעלים. ערבית, רוסית ואנגלית עוברות
+   כמות שהן. הקובץ לא נטען — הטקסט חוזר כמות שהוא, ואין שגיאה. */
+function heSpoken(t,code){
+  var l=code?String(code).slice(0,2):(typeof LG!=="undefined"?LG:"he");
+  if(l!=="he"||typeof HESPEECH==="undefined")return t;
+  try{ return HESPEECH.spoken(t) }catch(e){ return t }
+}
 function speak(text){
   if(!state.settings.tts||!text)return;
   /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
@@ -1591,7 +1610,7 @@ function speak(text){
      שמע "span class frac" באמצע השאלה. */
   text=plainOf(String(text));
   stopSpeak();
-  speakDevice(text);
+  speakDevice(heSpoken(text));
 }
 function stopSpeak(){
   _sayGen++;   /* כל מקטע שממתין ב-setTimeout שייך מעכשיו לדור ישן */
@@ -5921,7 +5940,7 @@ var pendingScroll=null;
 /* ==== כותרת תחתונה וקישור הדילוג בשפת הממשק ====
    שניהם HTML סטטי שאינו עובר דרך render, ולכן נשארו עבריים בכל שפה. */
 var LGFOOT={he:"© 2026 יהושע לגשטיין",ar:"© 2026 يهوشع لچشطاين",ru:"© 2026 Иехошуа Лагштейн",en:"© 2026 Joshua Lagstein"};
-var LGTERMS={he:"תנאי שימוש וזכויות יוצרים",ar:"شروط الاستخدام وحقوق النشر",ru:"Условия использования и авторские права",en:"Terms of use and copyright"};
+var LGTERMS={he:"תנאי שימוש, פרטיות וזכויות יוצרים",ar:"شروط الاستخدام والخصوصية وحقوق النشر",ru:"Условия использования, конфиденциальность и авторские права",en:"Terms of use, privacy and copyright"};
 var LGHOME={"he":"כל האפליקציות","ar":"كل التطبيقات","ru":"Все приложения","en":"All apps"};
 var LGSKIP={he:"דילוג לתוכן",ar:"تخطّي إلى المحتوى",ru:"Перейти к содержимому",en:"Skip to content"};
 function lgChrome(){
@@ -7619,7 +7638,13 @@ var TR_KEYS=[
 /* שלוש מחרוזות של cr רמה 2 — המשפחה השלישית והסימן בשנייה (O-41). בסוף בלבד. */
 "טעות סימן. המשוואה השנייה נותנת v לפי x שווה למינוס u לפי y, וזה מה שקובע את הסימן של x².",
 "טעות סימן בשתי המשוואות יחד — זו מינוס v, ולא v.",
-"טעות סימן באיבר y³. הוא יוצא מהאינטגרל לפי y של האיבר עם y² ב-u לפי x, ושומר על הסימן שלו."
+"טעות סימן באיבר y³. הוא יוצא מהאינטגרל לפי y של האיבר עם y² ב-u לפי x, ושומר על הסימן שלו.",
+/* מחרוזות ההקראה של ״מתמטיקה מדוברת״ שלא היו במילון כלל, ולכן
+   נאמרו בעברית בתוך הקראה ערבית או רוסית (O-59). בסוף המערך בלבד. */
+" מימין ",
+" משמאל ",
+" בחזקת מינוס $1 ",
+"עיגלתם לספרה אחת יותר מדי. החסם נגזר ממספר הספרות שבשאלה, ולא מאחת מעבר לו."
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -7650,6 +7675,20 @@ function trMissing(lang){
   for(i=0;i<TR_KEYS.length;i++)if(!d[TR_KEYS[i]])n++;
   return n;
 }
+
+/* התרגומים למחרוזות ההקראה שנוספו בסוף TR_KEYS (O-59). */
+trAt("ar",1328,[
+" من اليمين ",
+" من اليسار ",
+" مرفوعة للقوة ناقص $1 "]);
+trAt("ru",1328,[
+" справа ",
+" слева ",
+" в степени минус $1 "]);
+trAt("en",1328,[
+" from the right ",
+" from the left ",
+" to the power minus $1 "]);
 
 /* מחרוזות הקול שנוספו אחרי הבנייה הראשונה של המילון. */
 trAt("ar",904,[
@@ -11544,6 +11583,17 @@ trAt("en",1278,[
 "Microsoft Edge has natural voices for this language, female and male — nothing to install, with an internet connection.",
 "Open the app in Edge"
 ]);
+/* המסיח שהחליף את ״זה מספר הספרות, לא החסם״ (ראו ההערה ליד W)
+   נכנס בלי מפתח, ושלוש שפות ראו אותו בעברית. i18n.js תופס את זה. */
+trAt("ar",TR_KEYS.indexOf("עיגלתם לספרה אחת יותר מדי. החסם נגזר ממספר הספרות שבשאלה, ולא מאחת מעבר לו."),[
+"قرّبتم إلى خانة واحدة زائدة. الحدّ يُشتقّ من عدد الخانات في السؤال، لا من خانة تتجاوزه."
+]);
+trAt("ru",TR_KEYS.indexOf("עיגלתם לספרה אחת יותר מדי. החסם נגזר ממספר הספרות שבשאלה, ולא מאחת מעבר לו."),[
+"Вы округлили на один знак больше, чем нужно. Граница выводится из числа знаков в вопросе, а не из ещё одного за ним."
+]);
+trAt("en",TR_KEYS.indexOf("עיגלתם לספרה אחת יותר מדי. החסם נגזר ממספר הספרות שבשאלה, ולא מאחת מעבר לו."),[
+"You rounded to one digit too many. The bound comes from the number of digits in the question, not from one beyond it."
+]);
 /* מסיחים וצעדים שנוספו בסבב סגירת האפשרויות המתות. העוגן הוא המפתח
    הראשון בבלוק, ולכן הוספה בסוף TR_KEYS אינה מזיזה שום אינדקס. */
 trAt("ar",TR_KEYS.indexOf("אנליטית בכל נקודה שבה u ו-v גזירות"),[
@@ -11711,11 +11761,13 @@ window.addEventListener("hashchange",function(){
 try{if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){if(view==="settings")render()}}catch(e){}
 render();
 </script>
-<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
+<script src="/tutor/he-speech.js"></script>
 <script src="/tutor/josh-state.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -11723,7 +11775,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g99-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g118-pwa1").catch(function(){});
   });
 }
 </script>
@@ -11758,6 +11810,86 @@ if(window.TUTOR){
                     (x.level!=null?("רמה "+x.level):null)};
     },
     stopHost:function(){try{stopSpeak()}catch(e){}}
+  });
+  /* ---- מנוע ברק — המתאם של האפליקציה (16.9.2026) ----
+     כמו ב-math-app: getScreenContext מחזיר מה שמוצג עכשיו, ו-actions
+     הן מה שברק רשאי לעשות כאן; כל אחת מחזירה true רק כשבאמת קרה
+     משהו. `txt` הוא העוזר שהוצהר למעלה — אין כאן עוזר שני. */
+  if(window.BARAK)BARAK.register({
+    app:"math-uni3",
+    getScreenContext:function(){
+      var x=(typeof P!=="undefined"&&P)?P.q:null;
+      if(!x||view!=="practice"||P.phase==="done")return null;
+      var o=x.options||[],ok=null,st=null,tr=null,i;
+      for(i=0;i<o.length;i++)if(o[i].ok)ok=txt(o[i].t||o[i].h);
+      /* הבחירה השגויה האחרונה של הלומד, לא כל מה שסומן */
+      for(i=P.picked.length-1;i>=0;i--)if(o[P.picked[i]]&&!o[P.picked[i]].ok){st=txt(o[P.picked[i]].t||o[P.picked[i]].h);break}
+      for(i=0;i<TRACKS.length;i++)if(TRACKS[i].v===state.track)tr=TRACKS[i].t;
+      var line=(txt(x.ask)+" "+txt(x.expr)).trim(),tn=txt(x.topicName||x.topic);
+      return {id:"q"+P.i+"-"+line.slice(0,60), type:P.phase==="ask"?"mcq":"reveal",
+        q:line, options:o.map(function(p){return txt(p.t||p.h)}),
+        correct:ok, student:st, topic:tn||null,
+        level:"רמה "+x.level+" מתוך "+LVL_HE.length+(LVL_HE[x.level-1]?" — "+LVL_HE[x.level-1]:""),
+        curriculum:"מתמטיקה שנה ג׳"+(tr?" — "+tr:"")+(tn?" — "+tn:"")};
+    },
+    actions:{
+      next_question:{desc:"עובר לשאלה הבאה; באמצע שאלה — מחליף אותה בשאלה אחרת באותו מקום בסבב",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase==="done")return false;
+          if(P.phase==="reveal"){advance();return true}
+          /* שאלה שלא נענתה אינה נספרת — אותו מהלך שהאפליקציה עושה
+             כשמחליפים רמה באמצע שאלה. מחולל קטן יכול להחזיר את אותה
+             שאלה, ואז מנסים שוב; אם נשארה זהה, barak-core רואה
+             שהמזהה לא זז ומדווח כישלון. */
+          var was=txt(P.q.ask)+txt(P.q.expr),n=0;
+          do{loadQ();n++}while(n<4&&txt(P.q.ask)+txt(P.q.expr)===was);
+          stopSpeak();window.scrollTo(0,0);render();return true;
+        }},
+      show_hint:{desc:"מציג את הרמז לשאלה שעל המסך ומקריא אותו",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase!=="ask"||!P.q.hint)return false;
+          if(!P.hints){onAction("hint",null);return P.hints>0}
+          /* הרמז כבר פתוח — מפנים אליו */
+          speak(speakProse(P.q.hint));
+          return BARAK.highlight(document.querySelector(".hintbox"));
+        }},
+      read_aloud:{desc:"מקריא את השאלה והאפשרויות בקול",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase==="done"||!state.settings.tts)return false;
+          readQuestion();return true;
+        }},
+      repeat_question:{desc:"מקריא את השאלה עוד פעם",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase==="done"||!state.settings.tts)return false;
+          readQuestion();return true;
+        }},
+      highlight_option:{desc:"מדגיש במסך אחת מהאפשרויות, לפי מקומה (0 עד 3)",
+        params:{index:{type:"integer",min:0,max:3,required:true}},
+        run:function(a){
+          if(view!=="practice"||!P.q||P.phase!=="ask"||a.index>=P.q.options.length)return false;
+          return BARAK.highlight(document.querySelector('[data-a="ans"][data-i="'+a.index+'"]'));
+        }},
+      explain_again:{desc:"מפנה אל הפתרון המודרך ומקריא אותו שוב, אחרי שהשאלה נענתה",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase!=="reveal"||!P.q.steps.length)return false;
+          /* קודם ההקראה ואחריה ההדגשה: ב-math-teen speak מרנדר את המסך
+             מחדש, והדגשה שקדמה לו הייתה נמחקת. */
+          readSteps();BARAK.highlight(document.querySelector(".steps"));return true;
+        }},
+      go_screen:{desc:"עובר למסך אחר של האפליקציה",
+        params:{name:{type:"string",enum:["home","practice","topics","formulas","progress","settings"],required:true}},
+        run:function(a){
+          if(!state.onboarded||view==="sit")return false;
+          goto(a.name);return view===a.name;
+        }},
+      formula_sheet:{desc:"פותח את דף הנוסחאות; אם לשאלה יש נוסחה — מגלגל אליה",
+        run:function(){
+          if(!state.onboarded||view==="sit")return false;
+          if(view==="practice"&&P.q&&P.q.rule){fq="";pendingScroll="f-"+P.q.rule}
+          if(view==="formulas")window.scrollTo(0,0);else goto("formulas");
+          return view==="formulas";
+        }}
+    }
   });
   try{render()}catch(e){}
 }

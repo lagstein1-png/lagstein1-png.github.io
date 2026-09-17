@@ -1050,7 +1050,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="k38 · 2026-09-15";
+var BUILD="k55 · 2026-09-17";
 var SKEY="kotvim-state-v1";
 var GKEY_STORE="kotvim-gkey";
 
@@ -1196,8 +1196,16 @@ var LANG_HINT={he:/עברית|hebrew|ivrit/i,ar:/العربية|arabic/i,ru:/р�
    ואז שניהם חזרו "לא ידוע" — איש מהם לא קיבל את בונוס המגדר,
    וההכרעה נפלה על התאמת אזור מדויקת. כך נבחר קול גברי כשקיים
    קול נשי באותה שפה. */
-var V_F=/(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/
-var V_M=/(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/
+/* שלושה כתבים ולא אחד. Edge בממשק עברי מציג ״Microsoft הילה
+   Online (Natural)״ — השם מתורגם לשפת הממשק — ולכן מילון לטיני
+   בלבד החזיר ״לא ידוע״ על הקול הנשי היחיד שבמכשיר, והמיון נפל
+   על מי שאינו מתאים. נמדד אצל הבעלים בצילום מסך 13.9.
+   התיקון נעשה אז בשמונת העותקים של VOICE_F/VOICE_M ופסח על
+   חמשת אלה, מפני ששמם כאן V_F/V_M — והבדיקה שנכתבה לתפוס
+   אותו החזיקה רשימה קשיחה של אותם שמונה ודיווחה ירוק.
+   השמות נשלפו מהעותק המתוקן בקוד ולא הוקלדו מחדש. */
+var V_F=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/
+var V_M=/(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/
 function vGender(v){var n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
   return V_F.test(n)?"f":V_M.test(n)?"m":"?"}
 function voicesFor(code){
@@ -1430,20 +1438,32 @@ function hlWhole(el){
   HL.el=el; HL.raw=el.innerHTML; HL.added=true;
   el.classList.add("now");
 }
-function hlPrep(el,text){
+function hlPrep(el,text,spokenText){
   hlClear();
   if(!el||!text)return;
   HL.el=el; HL.raw=el.innerHTML;
-  var parts=String(text).split(/(\s+)/),html="",pos=0,idx=0;
+  var parts=String(text).split(/(\s+)/),html="",idx=0;
+  /* **המפה נמדדת על המחרוזת הנאמרת, ולא על המוצגת — 17.9.2026.**
+     `e.charIndex` מצביע לתוך מה שנאמר, ומנוע ההגייה העברי משנה
+     אורכי מילים (״משלש״→״משולש״). מספר האסימונים נשמר, ולכן
+     האסימון ה-i שנאמר הוא ה-span ה-i שמוצג. נבדלו המספרים —
+     נופלים להדגשת הכול, ולא להדגשה שגויה. */
+  var sp=String(spokenText==null?text:spokenText).split(/(\s+)/),spos=0,sidx=0;
   HL.map=[];
-  for(var i=0;i<parts.length;i++){
-    var pt=parts[i];
-    if(!pt.length)continue;
-    if(/^\s+$/.test(pt)){html+=pt;pos+=pt.length;continue}
-    HL.map.push({from:pos,to:pos+pt.length,i:idx});
-    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
-    pos+=pt.length; idx++;
+  for(var i=0;i<sp.length;i++){
+    if(!sp[i].length)continue;
+    if(/^\s+$/.test(sp[i])){spos+=sp[i].length;continue}
+    HL.map.push({from:spos,to:spos+sp[i].length,i:sidx});
+    spos+=sp[i].length; sidx++;
   }
+  for(var j=0;j<parts.length;j++){
+    var pt=parts[j];
+    if(!pt.length)continue;
+    if(/^\s+$/.test(pt)){html+=pt;continue}
+    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
+    idx++;
+  }
+  if(idx!==sidx){hlClear();return}
   if(!HL.map.length){hlClear();return}
   el.innerHTML=html;
   HL.spans=el.querySelectorAll(".wd");
@@ -1667,9 +1687,16 @@ function femLift(v){
 
 /* גובה הבסיס של כל אמירה — 1.12, הפריסט ״נשי רגוע״ של math-app, שהבעלים
    בחר אחרי האזנה (13.9.2026). femLift נשאר מכפיל: קול גברי מורם עוד,
-   והתקרה 1.45 היא זו של math-app. voicePitch הוא מה שמושם ב-u.pitch. */
+   והתקרה 1.35 הועתקה מ״תאוריה מדברת״ 17.9.2026, בהוראת הבעלים
+   (״קול נשי עדין כמו בתאוריה מדברת, תעתיק משם״). שם: u.pitch =
+   male ? Math.min(2, tune.pitch * 1.35) : tune.pitch, ו-tune.pitch
+   בעברית הוא 1.0 — כלומר קול גברי מורם ל-1.35 בדיוק. כאן הייתה
+   תקרה 1.45, ולכן Asaf יצא 1.45: 1.12×1.35=1.512, חתוך ל-1.45.
+   העשירית הזאת היא ההבדל בין ״מורם״ ל״צווחני״. קול נשי אמיתי אינו
+   נוגע בתקרה — 1.12 הוא הפריסט ״נשי רגוע״ שהבעלים בחר, והוא נשאר.
+   voicePitch הוא מה שמושם ב-u.pitch. */
 var PITCH_BASE=1.12;
-function voicePitch(v){return Math.min(1.45,PITCH_BASE*femLift(v))}
+function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 
 
 /* ------------------------------------------------------------
@@ -1719,8 +1746,17 @@ function voiceCheck(){
    מבשאר האפליקציות, כי קטע קריאה מנוקד מתפצל להרבה מקטעים.
    ------------------------------------------------------------ */
 var _sayGen=0;
+/* מנוע ההגייה העברי — /tutor/he-speech.js, 17.9.2026.
+   **עברית בלבד**, בהוראת הבעלים. ערבית, רוסית ואנגלית עוברות
+   כמות שהן. הקובץ לא נטען — הטקסט חוזר כמות שהוא, ואין שגיאה. */
+function heSpoken(t,code){
+  var l=code?String(code).slice(0,2):(typeof LG!=="undefined"?LG:"he");
+  if(l!=="he"||typeof HESPEECH==="undefined")return t;
+  try{ return HESPEECH.spoken(t) }catch(e){ return t }
+}
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
+  text=heSpoken(text,code);
   try{speechSynthesis.cancel()}catch(e){}
   var my=++_sayGen;
   /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
@@ -2614,7 +2650,7 @@ function screenSet(){
 /* ==== כותרת תחתונה וקישור הדילוג בשפת הממשק ====
    שניהם HTML סטטי שאינו עובר דרך render, ולכן נשארו עבריים בכל שפה. */
 var LGFOOT={he:"© 2026 יהושע לגשטיין",ar:"© 2026 يهوشع لچشطاين",ru:"© 2026 Иехошуа Лагштейн",en:"© 2026 Joshua Lagstein"};
-var LGTERMS={he:"תנאי שימוש וזכויות יוצרים",ar:"شروط الاستخدام وحقوق النشر",ru:"Условия использования и авторские права",en:"Terms of use and copyright"};
+var LGTERMS={he:"תנאי שימוש, פרטיות וזכויות יוצרים",ar:"شروط الاستخدام والخصوصية وحقوق النشر",ru:"Условия использования, конфиденциальность и авторские права",en:"Terms of use, privacy and copyright"};
 var LGHOME={"he":"כל האפליקציות","ar":"كل التطبيقات","ru":"Все приложения","en":"All apps"};
 var LGSKIP={he:"דילוג לתוכן",ar:"تخطّي إلى المحتوى",ru:"Перейти к содержимому",en:"Skip to content"};
 function lgChrome(){
@@ -2946,7 +2982,7 @@ document.addEventListener("click",function(e){
        האמירה נוצרת אסינכרונית אחרי שרשימת הקולות עולה, ולכן ההכנה
        כאן תמיד מקדימה אותה. */
     var tgt=a==="sayline"?el:hlFind(el,txt);
-    if(tgt)hlPrep(tgt,txt);
+    if(tgt)hlPrep(tgt,txt,heSpoken(txt));
     else hlWhole(el.closest&&el.closest(".fb,.qcard,.card"));
     return;
   }
@@ -3079,10 +3115,12 @@ function boot(){
 }
 boot();
 </script>
-<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
+<footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
 <script src="/tutor/josh-local.js"></script>
+<script src="/tutor/he-speech.js"></script>
 <script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
 <script src="/legal/terms.js"></script>
 <script src="/legal/protect.js"></script>
 <script>
@@ -3090,7 +3128,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=k38-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=k55-pwa1").catch(function(){});
   });
 }
 </script>
@@ -3119,6 +3157,52 @@ if(window.TUTOR){
       return {expr:body, ans:null, topic:tp||null, level:ty||null};
     },
     stopHost:function(){try{stopSpeak()}catch(e){}}
+  });
+  /* מנוע ברק — המתאם של האפליקציה. אין כאן שאלה הבאה: הכפתור
+     היחיד שמתקדם (`kdone`) נעול עד שכל ארבעת החלקים נבחרו, ובצעד
+     הרביעי אין ״הבא״ — ולכן `next_question` אינה רשומה, וברק אינו
+     מבטיח מעבר שאינו קיים. */
+  if(window.BARAK)BARAK.register({
+    app:"kotvim",
+    getScreenContext:function(){
+      /* ההתקדמות וההגדרות הן מסכי מעטפת — הטקסט אינו על המסך שם */
+      if(typeof W==="undefined"||!W.type||state.screen!=="home")return null;
+      var t0=TYPES.filter(function(x){return x.id===W.type})[0];
+      var p0=W.topic?topicById(W.type,W.topic):null;
+      var ty=t0?txt(gl(t0.n)):"", tp=p0?txt(gl(p0.n)):"";
+      var body=W.txt?txt(W.txt):txt(wText());
+      if(!body)return null;
+      return {id:"k"+W.type+"-"+(W.topic||"")+"-"+W.step, type:"text", q:body,
+        topic:tp||null, level:ty||null, curriculum:"כתיבה — "+ty};
+    },
+    actions:{
+      read_aloud:{desc:"מקריא את הטקסט שעל המסך — המוכן, או מה שכבר נבנה",
+        run:function(){
+          if(!W.type||state.screen!=="home")return false;
+          var body=W.step===4?W.txt:wText();
+          if(!txt(body))return false;
+          speak(body,state.lang);return true;
+        }},
+      explain_again:{desc:"מציג ומקריא שוב את ההנחיה של הצעד הנוכחי — ומה עוד חסר",
+        run:function(){
+          if(!W.type||state.screen!=="home")return false;
+          var m=document.getElementById("main");if(!m)return false;
+          var parts=[],els=m.querySelectorAll(".h2,.lead,.fb"),i;
+          for(i=0;i<els.length;i++)parts.push(txt(els[i].textContent));
+          var g=parts.join(". ");if(!g)return false;
+          announce(g);speak(g,state.lang);
+          BARAK.highlight(m.querySelector(".fb")||m.querySelector(".h2"));
+          return true;
+        }},
+      go_screen:{desc:"עובר למסך אחר: home — הכתיבה, prog — התקדמות, set — הגדרות",
+        params:{name:{type:"string",enum:["home","prog","set"],required:true}},
+        run:function(a){
+          stopSpeak();state.screen=a.name;
+          if(a.name==="home")save();
+          if(a.name==="set")gkMsg=null;
+          render();window.scrollTo(0,0);return state.screen===a.name;
+        }}
+    }
   });
   try{render()}catch(e){}
 }

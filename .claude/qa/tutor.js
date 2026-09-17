@@ -233,7 +233,11 @@ import(WORKER).then(async W => {
     const swPart = pt.slice(pt.indexOf('+++ b/sw.js'));
     const pre = new Set();
     for (const m of swPart.matchAll(/^\+\s*["']([^"']+)["']\s*,/gm)) pre.add(m[1]);
-    const missing = shared.filter(k => !pre.has(k));
+    /* **עותק מקומי נחשב** — מנוע ברק, D-10 (16.9.2026): הריפו הנפרד
+       נושא את `barak-core.js` כעותק בשורש שלו, לפי המנדט, ולכן
+       `./barak-core.js` ב-PRECACHE שלו מכסה את `/tutor/barak-core.js`
+       המשותף. כל נתיב אחר עדיין חייב להגיע מ-`/tutor/`. */
+    const missing = shared.filter(k => !pre.has(k) && !pre.has('./' + k.split('/').pop()));
     t('התיקון מצרף מראש את כל הנתיבים המשותפים', missing, []);
     /* וסדר הטעינה: `tutor.js` קורא ל-JOSHFACE, ולכן הפנים לפניו.
        בסדר הפוך אין שגיאה — הקריאה מוגנת ב-typeof — ופשוט אין
@@ -499,22 +503,38 @@ import(WORKER).then(async W => {
      `overLimit` מחזיר מילה ולא בוליאני, מפני שההבדל מגיע ללומד:
      ״מספיק להיום״ נכון כשהוא מילא את שלו, ושקר כשמישהו אחר מילא
      את הגלובלית. בוליאני אחד לשני מצבים הוא הכשל השקט. */
+  /* **מנוע ברק, 16.9.2026 — המונה עבר לזיכרון עם flush ל-KV.**
+     התקרה של הלומד נספרת בזיכרון ה-isolate בלבד, והגלובלית נקראת
+     מ-KV פעם ב-10 דקות ונכתבת אליו כל 25 פניות או 10 דקות. לכן
+     ה-KV המזויף כאן מחזיק מפתח אחד — `g:<יום>` — ולומד ״שמילא״
+     הוא מי שפנה perDay פעמים. `_rate.reset()` בין תרחישים. */
   const kv = (map) => ({ RATE: {
     get: async k => (k in map ? String(map[k]) : null),
-    put: async () => {}
+    put: async (k, v) => { map[k] = v; map.__writes = (map.__writes || 0) + 1 }
   } });
   const day = new Date().toISOString().slice(0, 10);
-  const K = ip => 'd:' + day + ':' + ip;
+  const G = 'g:' + day;
   await (async () => {
+    W._rate.reset();
     t('יש מקום — overLimit מחזיר null', await W.overLimit(kv({}), '1.2.3.4'), null);
-    t('תקרת הלומד נגמרה — "you"',
-      await W.overLimit(kv({ [K('1.2.3.4')]: W.LIM.perDay }), '1.2.3.4'), 'you');
-    t('חסם העלות נגמר — "all"',
-      await W.overLimit(kv({ [K('ALL')]: W.LIM.globalPerDay }), '1.2.3.4'), 'all');
+    W._rate.reset();
+    const full = kv({});
+    for (let i = 0; i < W.LIM.perDay; i++) await W.overLimit(full, '1.2.3.4');
+    t('תקרת הלומד נגמרה — "you"', await W.overLimit(full, '1.2.3.4'), 'you');
     /* לומד אחר, שהגלובלית פנויה והשלו ריקה — עובד. זו כל
        הנקודה של הפיצול: מי שמילא את שלו אינו חוסם את השני. */
-    t('לומד שמילא אינו חוסם לומד אחר',
-      await W.overLimit(kv({ [K('1.2.3.4')]: W.LIM.perDay }), '5.6.7.8'), null);
+    t('לומד שמילא אינו חוסם לומד אחר', await W.overLimit(full, '5.6.7.8'), null);
+    W._rate.reset();
+    t('חסם העלות נגמר — "all"',
+      await W.overLimit(kv({ [G]: W.LIM.globalPerDay }), '1.2.3.4'), 'all');
+    /* תקציב הכתיבות: 1,000 פניות מ-40 כתובות (בתקרת לומד 10 ו-perDay
+       שמועלה בסביבה) חייבות להסתיים בהרבה פחות מ-700 כתיבות. */
+    W._rate.reset();
+    const m = {}; const env = Object.assign(kv(m), { PER_DAY: '1000', GLOBAL_PER_DAY: '100000' });
+    for (let i = 0; i < 1000; i++) await W.overLimit(env, '10.0.0.' + (i % 40));
+    t('1,000 פניות — פחות מ-700 כתיבות KV', (m.__writes || 0) < 700, true);
+    t('1,000 פניות — לכל היותר 1000/25 כתיבות לפי המניין', (m.__writes || 0) <= 1000 / W._rate.FLUSH_EVERY + 1, true);
+    W._rate.reset();
   })();
   /* בלי KV אין מונה, ובלי מונה אין תקרה יומית — כלומר כל ההגנה
      על העלות תלויה בקישור אחד שקל לשכוח בהקמה. נכשל־סגור. */
@@ -596,6 +616,29 @@ import(WORKER).then(async W => {
 
        זה בדיוק מה ש-CLAUDE.md מתעד על הקובץ הזה בכיוון ההפוך:
        מי שקרא "אין כפתור" הסיק שאין מה לספר ללומד, וטעה. */
+    /* --- והתנאים חייבים לתאר את מה שקורה, לא את מה שקרה פעם ---
+
+       נמדד 16.9.2026, והיה שקר בארבע שפות: `legal/terms.js` 1.4
+       אמר ללומד שהתרגיל, שפת הממשק ומה שכתב **נשלחים** לשרת
+       ב-Cloudflare Workers ומשם ״אל המודל של Anthropic״ — בזמן
+       ש-`var API = ""`, המענה מקומי לגמרי, ואף בקשה אינה יוצאת.
+       ובנוסף: הקומיט 4ccc6ce החליף את ברירת המחדל של השרת ל-Gemini,
+       כך שגם אילו היה נשלח — השם היה שגוי.
+
+       **הצהרת־יתר על איסוף מידע אינה פגם קוסמטי במוצר הזה.** כל
+       ההבטחה שלו היא ״ההתקדמות אינה נשלחת לשום שרת״, וההורה או
+       המורה שקורא את התנאים ורואה סתירה אינו בודק מי צודק — הוא
+       פשוט לא מאשר. */
+    const T = fs.readFileSync(path.join(ROOT, 'legal', 'terms.js'), 'utf8');
+    const SENT = /(נשלח|יُرسَل|يُرسَل|отправля|is sent)/;
+    const VENDOR = /Anthropic|Gemini|OpenAI/;
+    /* הפסקה של המיקרופון מדברת על הקלטה שכן יוצאת, ולכן "נשלח"
+       לבדו אינו ממצא. מה שאסור הוא שם ספק מודל לצד "נשלח". */
+    if (VENDOR.test(T))
+      t('התנאים אינם נוקבים בספק מודל כשכתובת השרת ריקה',
+        false, true) || console.log(
+        '    התנאים מזכירים ספק מודל, אבל var API ריקה והמענה מקומי.');
+
     const local = APPS.filter(a =>
       fs.readFileSync(path.join(ROOT, a, 'index.html'), 'utf8').indexOf('josh-local') >= 0);
     if (local.length) {

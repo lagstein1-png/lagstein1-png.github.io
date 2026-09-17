@@ -22,3 +22,16 @@ id = "KV_ID_PLACEHOLDER"
 # ANTHROPIC_API_KEY אינו כאן — הוא Secret, ונכנס בנפרד.
 [vars]
 ALLOW_ORIGIN = "https://lagstein1-png.github.io,https://lagstein-hub.onrender.com"
+
+# ---------- סטייג׳ינג — מנוע ברק, 16.9.2026 ----------
+# אותו worker.js בדיוק, בשם tutor-staging ועם מרחב KV משלו. כל
+# העבודה על הענף נבדקת מולו; `tutor` (הייצור) נפרס רק ב״יאללה״.
+# הפריסה: .github/workflows/deploy-tutor-staging.yml — הוא מוצא או
+# יוצר מרחב בשם RATE_STAGING ומחליף את מציין המיקום.
+[env.staging]
+name = "tutor-staging"
+[[env.staging.kv_namespaces]]
+binding = "RATE"
+id = "KV_STAGING_ID_PLACEHOLDER"
+[env.staging.vars]
+ALLOW_ORIGIN = "https://lagstein1-png.github.io,https://lagstein-hub.onrender.com"

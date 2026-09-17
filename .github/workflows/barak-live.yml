@@ -1,0 +1,77 @@
+# הערכות מנוע ברק מול Gemini **אמיתי** — מרנר של GitHub.
+#
+# למה ורקפלו: סביבת הפיתוח של הסוכן חסומה מול googleapis. הרנרים
+# אינם חסומים. tutor-api/local/evals.mjs מייבא את worker.js ומריץ
+# אותו כאן, ברנר — ה-Worker החי אינו נוגע, ואין פריסה.
+#
+# **תקרה קשיחה: 60 קריאות לריצה** (LIVE_CAP, מנדט מנוע ברק), כדי לא
+# לשרוף את המכסה החינמית. ריצה שנעצרה בתקרה אומרת זאת בסיכום.
+#
+# **ו-LIVE_GAP_MS אינו נוי:** המכסה שנגמרה בריצות 1 ו-2 הייתה לדקה
+# ולא ליום, ולכן ריצה בלי השהיה אינה מסוגלת להשלים 60 קריאות.
+# ברירת המחדל: math-app ו-english בארבע השפות = 32 תרחישים = עד 64
+# קריאות (ניסיון שני של השומר נספר) — כלומר הריצה תיעצר ב-60.
+#
+# הפעלה ידנית בלבד. המפתח מ-Secrets דרך env:, ואין ערך שמודפס.
+
+name: barak-live
+
+on:
+  workflow_dispatch:
+    inputs:
+      apps:
+        description: 'אפליקציות, מופרדות בפסיק (ברירת מחדל: math-app,english)'
+        required: false
+        default: 'math-app,english'
+      langs:
+        description: 'שפות (ברירת מחדל: he,ar,ru,en)'
+        required: false
+        default: 'he,ar,ru,en'
+
+permissions:
+  contents: read
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: קודם המוק — אם הצינור שבור, אין טעם לשלם על קריאות
+        run: node tutor-api/local/evals.mjs --mock --apps "${{ github.event.inputs.apps }}" --langs "${{ github.event.inputs.langs }}"
+      - name: המודל האמיתי, עד 60 קריאות
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY || secrets.GOOGLE_API_KEY || secrets.GOOGLE_AI_KEY || vars.GEMINI_API_KEY || vars.GEMINI_KEY }}
+          LIVE_CAP: '60'
+          # השהיה בין קריאות. ה-429 שנמדד בריצות 1 ו-2 היה מכסה
+          # **לדקה**: 60 קריאות ב-31 שניות נחסמו אחרי כעשר, ושתי
+          # דקות אחר כך שמונה עברו נקי. 4 שניות ≈ 15 לדקה.
+          LIVE_GAP_MS: '4000'
+          EVALS_OUT: /tmp/barak-evals.json
+          APPS_IN: ${{ github.event.inputs.apps }}
+          LANGS_IN: ${{ github.event.inputs.langs }}
+        run: |
+          if [ -z "${GEMINI_API_KEY:-}" ]; then
+            echo "::error::אין מפתח Gemini ב-Secrets (GEMINI_API_KEY)."
+            exit 1
+          fi
+          node tutor-api/local/evals.mjs --live --apps "$APPS_IN" --langs "$LANGS_IN" --out /tmp/barak-evals.json | tee /tmp/evals.txt || true
+          {
+            echo "## ברק — הערכות מול Gemini"
+            echo ""
+            echo '```'
+            cat /tmp/evals.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          node -e '
+            const d=require("/tmp/barak-evals.json");
+            console.log(JSON.stringify(d.summary));
+            if(d.summary.bad) process.exit(1);
+          '
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: barak-evals
+          path: /tmp/barak-evals.json

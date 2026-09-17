@@ -1,0 +1,66 @@
+# השוואה מבוקרת של ברק — ארבע תצורות × שלוש שאלות, מרנר של GitHub.
+#
+# למה ורקפלו: סביבת הפיתוח של הסוכן חסומה מול
+# generativelanguage.googleapis.com ומול workers.dev (403 מהשער),
+# ולכן אי אפשר להריץ שם השוואה חיה. הרנרים אינם חסומים.
+#
+# **מה זה אינו: פריסה.** tutor-api/local/compare.mjs מייבא את
+# worker.js ומריץ אותו כאן, ברנר. ה-Worker החי אינו נוגע.
+#
+# **הפעלה ידנית בלבד.** permissions: contents: read. המפתחות
+# מגיעים מ-Secrets דרך env: ולא בתוך גוף run; GitHub ממסך אותם
+# בלוג, ובכל מקרה הפלט מדפיס שמות כותרות ולא ערכים.
+#
+# סודות: GEMINI_API_KEY (חובה), ANTHROPIC_API_KEY (תצורה 4; חסר —
+# התצורה מדולגת ונאמר כך).
+
+name: tutor-compare
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: ארבע תצורות, שלוש שאלות
+        # ריצות 1 ו-2 (16.9.2026) נפלו עם GEMINI_API_KEY ריק בזמן
+        # ש-ANTHROPIC_API_KEY מלא — הסוד הוזן תחת שם אחר או כ-Variable.
+        # לכן שרשרת נפילה על השמות הסבירים, ובסוף Variable — עם אזהרה,
+        # כי Variable נראה בממשק ומקומו ב-Secrets. אין ערך שמודפס.
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY || secrets.GOOGLE_API_KEY || secrets.GOOGLE_AI_KEY || vars.GEMINI_API_KEY || vars.GEMINI_KEY }}
+          GEMINI_FROM_VAR: ${{ (secrets.GEMINI_API_KEY == '' && secrets.GEMINI_KEY == '' && secrets.GOOGLE_API_KEY == '' && secrets.GOOGLE_AI_KEY == '' && (vars.GEMINI_API_KEY != '' || vars.GEMINI_KEY != '')) && 'yes' || 'no' }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          COMPARE_OUT: /tmp/tutor-compare.txt
+        run: |
+          if [ -z "${GEMINI_API_KEY:-}" ]; then
+            echo "::error::לא נמצא מפתח Gemini באף אחד מהשמות: GEMINI_API_KEY, GEMINI_KEY, GOOGLE_API_KEY, GOOGLE_AI_KEY (Secrets), GEMINI_API_KEY, GEMINI_KEY (Variables)."
+            exit 1
+          fi
+          if [ "$GEMINI_FROM_VAR" = "yes" ]; then
+            echo "::warning::המפתח נקרא מ-Variable ולא מ-Secret. Variable נראה בממשק — להעביר ל-Secrets בשם GEMINI_API_KEY."
+          fi
+          echo "אורך המפתח: ${#GEMINI_API_KEY} תווים (הערך עצמו אינו מודפס)"
+          node tutor-api/local/compare.mjs
+          {
+            echo "## ברק — השוואה מבוקרת"
+            echo ""
+            echo '```'
+            cat /tmp/tutor-compare.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tutor-compare
+          path: /tmp/tutor-compare.txt

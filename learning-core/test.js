@@ -66,7 +66,7 @@ eq('מקטע יחיד לטקסט קצר', LC.tts.segments('שלום.').length, 1
 eq('קצב ברירת מחדל בעברית — 0.95', LC.tts.tuneRate('he-IL'), 0.95);
 eq('קצב ברירת מחדל באנגלית — 0.95', LC.tts.tuneRate('en-US'), 0.95);
 eq('גובה בסיס על קול נשי — 1.12', LC.tts.voicePitch({ name: 'Microsoft Hila Online (Natural) - Hebrew' }), 1.12);
-eq('קול גברי מורם עד התקרה 1.45', LC.tts.voicePitch({ name: 'Microsoft Asaf - Hebrew' }), 1.45);
+eq('קול גברי מורם עד התקרה 1.35', LC.tts.voicePitch({ name: 'Microsoft Asaf - Hebrew' }), 1.35);
 eq('בלי קול — גובה הבסיס', LC.tts.voicePitch(null), 1.12);
 /* מילה אחת ארוכה מהסף נשארת שלמה ולא נחתכת באמצע */
 var word = new Array(200).join('א');

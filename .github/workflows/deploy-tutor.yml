@@ -9,10 +9,15 @@
 #
 # **מה הוא לא עושה: הוא אינו מחבר את הכתובת לאפליקציות.**
 # החיבור הוא node .claude/qa/enable-tutor.js, והוא מעלה את
-# LEGAL.version ל-1.1 ואת שלושה־עשר מפתחות הקאש — שינוי שנראה
-# לכל לומד ומחייב אותו לאשר את התנאים מחדש. זה לא שייך לג׳וב
-# של פריסה, והוא נשאר צעד נפרד ומכוון. הוורקפלו רק מדפיס את
-# הפקודה בסיכום.
+# LEGAL.version ואת שלושה־עשר מפתחות הקאש — שינוי שנראה לכל
+# לומד ומחייב אותו לאשר את התנאים מחדש. זה לא שייך לג׳וב של
+# פריסה. **מאז 16.9.2026 הכתובת כבר בקובץ** (`tutor/tutor.js`,
+# `var API`), ולכן הפריסה כאן היא מה שמחליף מוח מקומי במוח שבשרת
+# — בלי לגעת במאגר.
+#
+# **המנוע הוא Gemini מ-15.9.2026** (`tutor-api/worker.js`, `MODEL`),
+# בשכבה החינמית של גוגל. Claude נשאר דרך חזרה — PROVIDER=anthropic
+# כמשתנה סביבה ב-Cloudflare — ואינו נדרש לפריסה.
 #
 # מה צריך פעם אחת, ב-Settings → Secrets and variables → Actions:
 #   CLOUDFLARE_API_TOKEN    טוקן עם ארבע הרשאות בלבד:
@@ -21,9 +26,15 @@
 #                             Account: Account Settings: Read
 #                             User:    User Details: Read
 #   CLOUDFLARE_ACCOUNT_ID   מזהה החשבון, מדף ה-Workers
-#   ANTHROPIC_API_KEY       מפתח Anthropic
+#   GEMINI_API_KEY          מפתח Gemini (Google AI Studio, מתחיל ב-AIza)
+#   ANTHROPIC_API_KEY       רשות — רק לדרך החזרה
 #
-# שלושתם נכנסים בממשק של GitHub, ואינם עוברים בצ׳אט או במאגר.
+# **ומפתח שכבר יושב ב-Cloudflare נשאר שם.** wrangler deploy בלי
+# --secrets-file אינו מוחק סודות קיימים, ולכן כשאין מפתח ב-GitHub
+# הפריסה רצה בלי הקובץ, וה-Worker ממשיך עם מה שהוזן בלוח של
+# Cloudflare. הבדיקה החיה בסוף היא הפסק: 200 — יש מפתח; 500 — אין.
+#
+# כולם נכנסים בממשק של GitHub, ואינם עוברים בצ׳אט או במאגר.
 #
 # הערה על סודות: אין כאן אף `${{ secrets.* }}` בתוך גוף `run`.
 # ביטוי כזה מוצב לתוך הסקריפט שנכתב לדיסק על הרנר לפני ההרצה;
@@ -112,22 +123,28 @@ jobs:
           case "$KV_ID" in
             *[!0-9a-f]* | "") echo "::error::מזהה KV אינו הקסדצימלי: לא מזריק."; exit 1 ;;
           esac
-          sed -i "s/KV_ID_PLACEHOLDER/$KV_ID/" wrangler.toml
+          # **שני מציינים, ולא אחד — מנוע ברק, 16.9.2026.** מאז ש-[env.staging]
+          # נוסף לקובץ יש בו גם KV_STAGING_ID_PLACEHOLDER, והוא **אינו** מוכל
+          # ב-KV_ID_PLACEHOLDER — כלומר החלפה אחת משאירה מחרוזת שאינה מזהה
+          # הקסדצימלי בתוך הקובץ ש-wrangler פורס. הסביבה הזאת אינה נפרסת
+          # כאן, ולכן אותו מזהה בשתיהן אינו משנה דבר; מה שחשוב הוא שלא
+          # יישאר מציין מיקום.
+          sed -i "s/KV_ID_PLACEHOLDER/$KV_ID/; s/KV_STAGING_ID_PLACEHOLDER/$KV_ID/" wrangler.toml
           grep -A2 kv_namespaces wrangler.toml
 
       - name: פורס — הקוד והמפתח יחד
         id: deploy
         working-directory: tutor-api
+        # המפתח נקרא גם תחת השמות החלופיים, כמו ב-tutor-compare.yml:
+        # ריצות 1–3 שם (16.9.2026) נפלו על GEMINI_API_KEY ריק בזמן
+        # שהבעלים אמר שהמפתח הוזן. אין ערך שמודפס.
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY || secrets.GOOGLE_API_KEY || secrets.GOOGLE_AI_KEY || vars.GEMINI_API_KEY || vars.GEMINI_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           set -euo pipefail
-          if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
-            echo "::error::ANTHROPIC_API_KEY חסר. בלעדיו ג׳וש יעלה ויחזיר 500."
-            exit 1
-          fi
           # --secrets-file מעלה את המפתח **באותה גרסה** של הפריסה.
           # בלעדיו הייתה נוצרת חלון שבו ה-Worker חי בלי מפתח.
           # **גוזמים רווח ושורה חדשה.** מפתח שהודבק לשדה הסוד ב-GitHub
@@ -135,16 +152,30 @@ jobs:
           # עם התו העודף, וכל פנייה הייתה חוזרת 401 — בלי שום רמז
           # שזו הסיבה. זה התרחיש הראשון בסבירותו אחרי פריסה שנראית
           # מוצלחת ואינה עונה.
-          KEY=$(printf '%s' "$ANTHROPIC_API_KEY" | tr -d '[:space:]')
-          case "$KEY" in
-            sk-ant-*) : ;;
-            *) echo "::error::המפתח אינו מתחיל ב-sk-ant-. בדוק את הסוד ANTHROPIC_API_KEY."; exit 1 ;;
-          esac
-          echo "אורך המפתח אחרי גזימה: ${#KEY} תווים (הערך עצמו אינו מודפס)"
           umask 077
-          printf 'ANTHROPIC_API_KEY=%s\n' "$KEY" > /tmp/.secrets.env
+          : > /tmp/.secrets.env
           trap 'shred -u /tmp/.secrets.env 2>/dev/null || rm -f /tmp/.secrets.env' EXIT
-          npx --yes wrangler@4 deploy --secrets-file /tmp/.secrets.env 2>&1 | tee /tmp/deploy.txt
+          N=0
+          GKEY=$(printf '%s' "${GEMINI_API_KEY:-}" | tr -d '[:space:]')
+          if [ -n "$GKEY" ]; then
+            case "$GKEY" in
+              AIza*) : ;;
+              *) echo "::warning::מפתח Gemini אינו מתחיל ב-AIza — ייתכן שהודבק מפתח של ספק אחר." ;;
+            esac
+            echo "GEMINI_API_KEY: ${#GKEY} תווים אחרי גזימה (הערך עצמו אינו מודפס)"
+            printf 'GEMINI_API_KEY=%s\n' "$GKEY" >> /tmp/.secrets.env; N=$((N+1))
+          fi
+          AKEY=$(printf '%s' "${ANTHROPIC_API_KEY:-}" | tr -d '[:space:]')
+          if [ -n "$AKEY" ]; then
+            echo "ANTHROPIC_API_KEY: ${#AKEY} תווים אחרי גזימה (דרך החזרה בלבד)"
+            printf 'ANTHROPIC_API_KEY=%s\n' "$AKEY" >> /tmp/.secrets.env; N=$((N+1))
+          fi
+          if [ "$N" -eq 0 ]; then
+            echo "::warning::אין מפתח ב-GitHub. פורס בלי --secrets-file — ה-Worker שומר את הסודות שכבר ב-Cloudflare. הבדיקה החיה תגיד אם יש שם GEMINI_API_KEY."
+            npx --yes wrangler@4 deploy 2>&1 | tee /tmp/deploy.txt
+          else
+            npx --yes wrangler@4 deploy --secrets-file /tmp/.secrets.env 2>&1 | tee /tmp/deploy.txt
+          fi
           URL=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' /tmp/deploy.txt | head -1)
           if [ -z "$URL" ]; then
             echo "::error::הפריסה רצה אבל לא נמצאה כתובת workers.dev בפלט."
@@ -183,46 +214,47 @@ jobs:
             echo ""
             echo '```'
             echo ""
-            echo "### ג׳וש עדיין אינו מחובר לאפליקציות"
+            echo "### החיבור לאפליקציות"
             echo ""
-            echo "הפריסה אינה נוגעת במאגר. החיבור הוא צעד נפרד, והוא"
-            echo "מעלה את תנאי השימוש ל-1.1 ואת שלושה־עשר מפתחות הקאש:"
-            echo ""
-            echo '```'
-            echo "node .claude/qa/enable-tutor.js $URL"
-            echo "node .claude/qa/all.js"
-            echo '```'
+            echo "הכתובת יושבת ב-\`tutor/tutor.js\` (\`var API\`) מאז 16.9.2026."
+            echo "200 כאן פירושו שהלומד מקבל את המוח שבשרת; כל דבר אחר —"
+            echo "האפליקציות נופלות למוח המקומי בלי שגיאה, והתיקון הוא כאן."
           } >> "$GITHUB_STEP_SUMMARY"
           if [ "$CODE" != "200" ]; then
             echo "::error::הפריסה הצליחה אבל הבדיקה החיה החזירה $CODE. ראה את האבחון בצעד הבא."
             exit 1
           fi
 
-      - name: אבחון — מה Anthropic עונה למפתח הזה
-        # רץ רק כשהבדיקה החיה נפלה. 502 מה-Worker פירושו ש-Anthropic
-        # החזירה משהו שאינו 2xx, וה-Worker לבדו אינו אומר מה. כאן
-        # פונים ל-Anthropic **ישירות מהרנר** עם אותו מפתח, ומדפיסים
-        # את הסטטוס ואת גוף השגיאה.
+      - name: אבחון — מה Gemini עונה למפתח הזה
+        # רץ רק כשהבדיקה החיה נפלה. 502 מה-Worker פירושו שהספק
+        # החזיר משהו שאינו 2xx, וה-Worker לבדו אינו אומר מה. כאן
+        # פונים ל-Gemini **ישירות מהרנר** עם אותו מפתח, ומדפיסים
+        # את הסטטוס ואת גוף השגיאה. 500 מה-Worker פירושו שאין
+        # מפתח בכלל — לא ב-GitHub ולא ב-Cloudflare.
         #
-        # גוף השגיאה של Anthropic נושא `type` ו-`message` ואינו
+        # גוף השגיאה של גוגל נושא `error.status` ו-`message` ואינו
         # נושא את המפתח, ולכן מותר להדפיס אותו. המפתח עצמו אינו
         # מודפס, וגם אם היה — GitHub ממסך סודות בלוג.
         if: failure() && steps.live.outputs.code != '200'
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY || secrets.GOOGLE_API_KEY || secrets.GOOGLE_AI_KEY || vars.GEMINI_API_KEY || vars.GEMINI_KEY }}
         run: |
+          if [ -z "$(printf '%s' "${GEMINI_API_KEY:-}" | tr -d '[:space:]')" ]; then
+            echo "אין מפתח Gemini ב-GitHub — אין למה לפנות מהרנר. אם ה-Worker החזיר 500, המפתח חסר גם ב-Cloudflare."
+            { echo ""; echo "### אבחון"; echo ""; echo "אין מפתח Gemini ב-Secrets של GitHub (GEMINI_API_KEY). אם הבדיקה החיה החזירה 500 — הוא חסר גם ב-Cloudflare."; } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           CODE=$(curl -s -o /tmp/a.json -w '%{http_code}' --max-time 45 \
-            https://api.anthropic.com/v1/messages \
-            -H "x-api-key: $(printf '%s' "$ANTHROPIC_API_KEY" | tr -d '[:space:]')" \
-            -H 'anthropic-version: 2023-06-01' \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent" \
+            -H "x-goog-api-key: $(printf '%s' "$GEMINI_API_KEY" | tr -d '[:space:]')" \
             -H 'content-type: application/json' \
-            -d '{"model":"claude-haiku-4-5","max_tokens":16,
-                 "messages":[{"role":"user","content":"hi"}]}' || echo 000)
-          echo "Anthropic ענתה: HTTP $CODE"
+            -d '{"contents":[{"role":"user","parts":[{"text":"hi"}]}],
+                 "generationConfig":{"maxOutputTokens":16,"thinkingConfig":{"thinkingBudget":0}}}' || echo 000)
+          echo "Gemini ענתה: HTTP $CODE"
           cat /tmp/a.json || true
           {
             echo ""
-            echo "### אבחון — פנייה ישירה ל-Anthropic מהרנר"
+            echo "### אבחון — פנייה ישירה ל-Gemini מהרנר"
             echo ""
             echo "**HTTP $CODE**"
             echo ""
@@ -233,9 +265,8 @@ jobs:
             echo ""
             case "$CODE" in
               200) echo "המפתח תקין. הבעיה אינה במפתח — ראה \`npx wrangler tail tutor\`." ;;
-              401) echo "**המפתח שגוי או בוטל.** החלף את הסוד ANTHROPIC_API_KEY והרץ שוב." ;;
-              400) echo "**בקשה נדחתה** — לרוב יתרה אפסית. ראה \`message\` למעלה." ;;
-              429) echo "**מכסה** — חריגה מקצב או מתקרת שימוש." ;;
+              400|403) echo "**המפתח שגוי, בוטל, או שה-API לא הופעל בפרויקט.** ראה \`error.status\` למעלה (API_KEY_INVALID / PERMISSION_DENIED). החלף את הסוד GEMINI_API_KEY והרץ שוב." ;;
+              429) echo "**מכסה** — השכבה החינמית מוגבלת לדקה וליום; הלומד נופל למוח המקומי." ;;
               *)   echo "סטטוס לא צפוי. ה-\`message\` למעלה הוא המקור." ;;
             esac
           } >> "$GITHUB_STEP_SUMMARY"

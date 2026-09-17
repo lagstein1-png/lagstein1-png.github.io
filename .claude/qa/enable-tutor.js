@@ -57,7 +57,13 @@ console.log((OFF ? '· כובה: ' : '· כתובת: ') + (URL || '(ריק)'));
 let lg = R('legal/terms.js');
 const vm = lg.match(/version:\s*"([^"]+)"/);
 if (!vm) { console.log('✗ לא נמצא version ב-legal/terms.js'); process.exit(1) }
-const want = OFF ? '1.0' : '1.1';
+/* **עולה, ולא ״1.1״ — תוקן 16.9.2026.** הערך היה קשיח: הפעלה
+   כתבה 1.1 וכיבוי 1.0, וזה היה נכון ביום שבו התנאים היו 1.0.
+   מאז הם עלו (1.5 ב-15.9), ו-1.1 היה **מוריד** אותם — ומי שכבר
+   אישר 1.5 לא היה מתבקש לאשר שוב את השינוי שמתחיל לשלוח מידע
+   מהמכשיר. כל שינוי בכתובת, לשני הכיוונים, משנה מה יוצא
+   מהמכשיר, ולכן הגרסה עולה תמיד. */
+const want = (Math.round(parseFloat(vm[1]) * 10) / 10 + 0.1).toFixed(1);
 if (vm[1] !== want) {
   lg = lg.replace(vm[0], 'version: "' + want + '"');
   W('legal/terms.js', lg);

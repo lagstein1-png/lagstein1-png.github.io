@@ -282,6 +282,103 @@ async function run(){
     else console.log('✓ ' + app.id.padEnd(11) + 'בחירה, שומר-ער, שומר זמן ונפילה — כולם עובדים');
   }
   await browser.close();
+
+/* ---------------------------------------------------------------
+     מילון המגדר — בכתב שבו המכשיר באמת מציג את הקול
+
+     **נמדד אצל הבעלים, 13.9.2026, בצילום מסך.** Edge בממשק עברי
+     מציג ״Microsoft הילה Online (Natural)״ — השם מתורגם לשפת
+     הממשק. המילון היה לטיני בלבד, ולכן `hila` לא נמצא, הילה
+     נספרה כ״לא ידוע״, האפליקציה הודיעה ״אין במכשיר קול נשי״
+     והרימה את הגובה ל-1.45 — על קול נשי אמיתי שהיה בחור.
+
+     כל עותקי המילון שבמאגר, וכולם נבדקים: קול נשי חייב לצאת
+     נשי, גברי גברי, ו-״Google עברית״ חייב להישאר **לא ידוע** —
+     הוא שם יצרן ולא מגדר, וזה הכלל שכתוב ליד המילון עצמו.
+     --------------------------------------------------------------- */
+  /* הרשימה נגזרת ואינה קשיחה. רשימה קשיחה של שמונה קבצים החזיקה
+     כאן עד 16.9.2026, והיא החמיצה חמישה עותקים שלמים: english,
+     history, ulpan, lomda ו-kotvim קוראים למילון V_F/V_M ולא
+     VOICE_F/VOICE_M, ולכן הם לא היו ברשימה — ולא נבדקו מעולם.
+     התיקון של 13.9 פסח עליהם בדיוק מאותה סיבה, והבדיקה שנכתבה
+     לתפוס אותו דיווחה ירוק. זה אותו לקח של changedSinceMain
+     ב-cache.js: מה שנספר ידנית מתיישן בעותק הבא. */
+  const ROOT = path.resolve(__dirname, '..', '..');
+  const DICT = require('child_process')
+    .execSync('git ls-files "*.html" "*.js"', { cwd: ROOT, encoding: 'utf8' })
+    .split('\n')
+    .filter(f => f && !f.startsWith('.claude/') && !f.startsWith('marketing/') &&
+                 !f.startsWith('tests/') && !f.startsWith('learning-core/'))
+    .filter(f => /(?:^|[^A-Za-z_])(?:VOICE_F|V_F)\s*=\s*\/\(/
+                   .test(fs.readFileSync(path.join(ROOT, f), 'utf8')))
+    .sort();
+  const CASES = [
+    ['Microsoft הילה Online (Natural) - Hebrew (Israel)', 'female'],
+    ['Microsoft אברי Online (Natural) - Hebrew (Israel)', 'male'],
+    ['Microsoft Hila Online (Natural) - Hebrew (Israel)', 'female'],
+    ['Microsoft Asaf - Hebrew (Israel)',                  'male'],
+    ['Microsoft زارية Online (Natural)',                  'female'],
+    ['Microsoft Светлана Online (Natural)',               'female'],
+    ['Google עברית',                                      'unknown']
+  ];
+  for(const f of DICT){
+    const src = fs.readFileSync(path.resolve(__dirname, '..', '..', f), 'utf8');
+    /* שני שמות לאותו מילון, ושניהם חוקיים: VOICE_F במשפחה אחת,
+       V_F בשנייה. ההבדל הוא היסטורי ולא מהותי. */
+    const mf = src.match(/var (?:VOICE_F|V_F)\s*=\s*(\/\(.*?\/)\s*[;\n]/s);
+    const mm = src.match(/var (?:VOICE_M|V_M)\s*=\s*(\/\(.*?\/)\s*[;\n]/s);
+    if(!mf || !mm){ bad++; console.log('✗ ' + f.padEnd(24) + 'לא נמצא מילון המגדר'); continue }
+    let RF, RM;
+    try{ RF = eval(mf[1]); RM = eval(mm[1]) }
+    catch(e){ bad++; console.log('✗ ' + f.padEnd(24) + 'מילון שאינו נקרא: ' + e.message); continue }
+    const miss = [];
+    for(const [name, want] of CASES){
+      const n2 = (name + ' x').toLowerCase();
+      const got = RF.test(n2) ? 'female' : RM.test(n2) ? 'male' : 'unknown';
+      if(got !== want) miss.push(name.slice(0, 34) + ' → ' + got + ' (צריך ' + want + ')');
+    }
+    if(miss.length){ bad++; console.log('✗ ' + f.padEnd(24) + miss.join(' · ')) }
+    else console.log('✓ ' + f.padEnd(24) + CASES.length + ' שמות, בעברית ובלטינית');
+  }
+/* ---------------------------------------------------------------
+     תקרת גובה הקול — מספר אחד לכל העותקים
+
+     **למה זו בדיקה ולא הערה.** ההרמה חיה בשלוש־עשרה העתקות של
+     אותו קוד, ועד 17.9.2026 הן הסכימו על 1.45 רק מפני שהן הועתקו
+     באותו יום. ברגע שמישהו יגע באחת — והבעלים ביקש בדיוק את זה,
+     ״קול נשי עדין כמו בתאוריה מדברת, תעתיק משם״ — עשר האחרות
+     יישארו מאחור בלי שגיאה ובלי שאיש ישמע, מפני שלכל אפליקציה
+     מכשיר אחר ולומד אחר.
+
+     הבדיקה אינה נועלת מספר: היא דורשת שכל העותקים יאמרו **אותו**
+     מספר. מי שמשנה את התקרה משנה אותה בכולם, וזה כל העניין.
+     --------------------------------------------------------------- */
+  const CEIL = require('child_process')
+    .execSync('git ls-files "*.html" "*.js"', { cwd: ROOT, encoding: 'utf8' })
+    .split('\n').filter(Boolean)
+    .filter(f => !f.startsWith('.claude/') && !f.startsWith('tests/'))
+    .map(f => {
+      const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+      const hits = [];
+      let m;
+      const reMin = /Math\.min\(\s*([0-9.]+)\s*,[^;\n]*femLift\s*\(/g;
+      while((m = reMin.exec(src))) hits.push(m[1]);
+      const reClamp = /clamp\(\s*PITCH_BASE[^;\n]*,\s*0\.5\s*,\s*([0-9.]+)\s*\)/g;
+      while((m = reClamp.exec(src))) hits.push(m[1]);
+      return hits.length ? [f, hits] : null;
+    })
+    .filter(Boolean);
+  const VALS = new Set(CEIL.flatMap(([, h]) => h));
+  if(!CEIL.length){ bad++; console.log('✗ תקרת הגובה — לא נמצאה באף קובץ; הביטוי השתנה') }
+  else if(VALS.size !== 1){
+    bad++;
+    console.log('✗ תקרת הגובה — ' + VALS.size + ' ערכים שונים: ' + [...VALS].join(', '));
+    for(const [f, h] of CEIL) console.log('    ' + f.padEnd(26) + h.join(' '));
+  } else {
+    console.log('✓ ' + 'תקרת גובה הקול'.padEnd(24) +
+                CEIL.length + ' קבצים, כולם ' + [...VALS][0]);
+  }
+
   if(bad){ console.log('\n' + bad + ' אפליקציות נכשלו'); process.exit(1); }
   console.log('\n' + APPS.length + ' אפליקציות, מנוע ההקראה מתאושש בכולן');
 }

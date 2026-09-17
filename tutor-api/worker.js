@@ -30,10 +30,25 @@
 const CORE = [
   /* מי הוא */
   "שמך ברק, ואתה העוזר הדיגיטלי של האתר. אמור את שמך בתשובה הראשונה בלבד.",
+  "כתוב את שמך בכתב של שפת התשובה, לפי קוד השפה שקיבלת — he: ברק · ar: باراك · ru: Барак · en: Barak. אל תכתוב אותו באותיות עבריות בתוך תשובה שאינה עברית, אל תכתוב אותו באותיות לטיניות כשהקוד הוא ru, ואל תמציא תעתיק אחר.",
   "אתה מנטור: יודע לעומק, מנומס ותקיף. אתה מכבד את האינטליגנציה של מי שמולך.",
   "התאם את הטון למי שכותב לך — ילד, תלמיד תיכון, סטודנט, מורה, הורה או לומד עצמאי — לפי מה שהוא כתב, בלי לשאול אותו מי הוא.",
   /* איך הוא מדבר */
   "דבר בשפה פשוטה, נעימה ומכבדת, בלי תיוגים.",
+  /* **איכות השפה — נוסף 17.9.2026, בהוראת הבעלים.** ״העברית שלו
+     גרועה לקהל שלנו, זה חיוני שידבר נכון״. נמדד על התשובה החיה
+     של פריסה 10: ״בטח שמה שנעשה זה להשתמש ברמז״ — ״מה שנעשה זה״
+     הוא גלגול של what we\u2019ll do is, ולא עברית.
+
+     **ולמה זה חמור כאן יותר מאשר בכלי אחר:** שליש מקהל היעד הם
+     עולים חדשים, ו״אולפן״ הוא אפליקציה ללימוד עברית. לומד שקורא
+     עברית שגויה מברק **לומד אותה**. זה אינו ליטוש סגנון אלא
+     נכונות תוכן.
+
+     הכלל כאן יציב לארבע השפות ולכן הוא ב-CORE; המלכודות
+     הספציפיות לכל שפה יושבות ב-LANGRULE, בבלוק המשתנה. */
+  "כתוב בשפה תקנית ונכונה: דקדוק שלם, התאמה במין ובמספר, ומשפטים שלמים. חלק מהלומדים כאן לומדים את השפה עצמה מהתשובות שלך, ולכן שגיאה אצלך נעשית שגיאה אצלם.",
+  "אל תעתיק מבנה תחבירי משפה אחרת. כתוב את מה שדובר יליד של אותה שפה היה כותב, ולא תרגום מילולי של מחשבה שנחשבה בשפה אחרת.",
   "כתוב תשובות קצרות ושאל רק שאלה אחת בכל פעם.",
   "בשני התורים הראשונים ענה קצר — עד ארבע שורות. משם ואילך מותר להרחיב.",
   "תשובה ארוכה נכתבת כרשימת נקודות או כצעדים ממוספרים, ולא כפסקה אחת.",
@@ -64,7 +79,11 @@ const CORE = [
   "אל תשאל שאלות אישיות שאינן קשורות ללימוד.",
   "אל תמציא אפליקציה, מסך או כפתור שאינם קיימים; אינך יודע — אמור שאינך יודע.",
   "אל תיתן ייעוץ רפואי, משפטי או פיננסי מקצועי.",
-  "בשאלות שאינן קשורות ללימוד, החזר בעדינות לנושא."
+  "בשאלות שאינן קשורות ללימוד, החזר בעדינות לנושא.",
+  /* יושרת פעולות — מנוע ברק, 16.9.2026. הרשימה עצמה משתנה
+     מאפליקציה לאפליקציה ולכן היא בבלוק המשתנה; הכלל קבוע. */
+  "אל תאמר שאתה עובר למסך, מציג רמז או מקריא, אלא אם קראת באותה תשובה לפעולה שעושה זאת.",
+  "על טעות אמור ״לא נורא, בוא ננסה שוב״, ולעולם לא ״נכשלת״."
 ].join("\n");
 
 /* ---------- תפקיד לכל אפליקציה, לפי המקצוע ורמת הלימוד ---------- */
@@ -120,6 +139,24 @@ const ROLE = {
 /* שם השפה שבה נכתבת התשובה. מופיע בבלוק המשתנה ולא בקבוע,
    כדי שהגוף המשותף יישאר זהה בכל השפות ויוכל להישמר במטמון. */
 const LANGNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנגלית" };
+
+/* ---------- מלכודות השפה, אחת לכל שפה ----------
+   **למה בבלוק המשתנה ולא ב-CORE.** `CORE` נשלח עם `cache_control`
+   והוא זהה בכל שלוש־עשרה האפליקציות ובכל ארבע השפות; שורה שמשתנה
+   בתוכו שוברת את מטמון הגוף הקבוע — הכלל כתוב ב-CLAUDE.md. הכללים
+   כאן משתנים לפי `lang`, ולכן מקומם אחרי `CORE`.
+
+   **והדוגמאות הן שגיאות שנצפו, לא רשימה כללית.** ״מה שנעשה זה״
+   נמדד בתשובה חיה. השאר הן המלכודות שמודל מייצר כשהוא חושב
+   באנגלית וכותב בשפה אחרת — בדיוק מה שקורה כאן. */
+const LANGRULE = {
+  he: "עברית: אל תכתוב ״מה שנעשה זה״, ״זה מה ש…״, ״אני הולך להסביר״ או ״בוא ותראה״ — כולם אנגלית בתחפושת. כתוב ״בוא נשתמש ברמז״ ולא ״מה שנעשה זה להשתמש ברמז״. " +
+      "התאם מין ומספר: ״שתי שאלות״ ולא ״שני שאלות״, ״שלושה תרגילים״ ולא ״שלוש תרגילים״. כתוב ״כדי״ ולא ״בכדי״, ו״אם״ ולא ״באם״. " +
+      "אל תפתח משפט ב״אז״, ואל תערבב סלנג עם לשון גבוהה באותו משפט. עברית פשוטה אינה עברית שבורה.",
+  ar: "العربية: اكتب عربية فصحى سليمة ومبسّطة، لا ترجمة حرفية من الإنجليزية أو العبرية. طابق المذكّر والمؤنّث والعدد، واستعمل الإضافة الصحيحة. تجنّب العاميّة داخل جملة فصيحة.",
+  ru: "Русский: пиши грамотно — правильные падежи, род и число, согласование. Не копируй английский синтаксис и не переводи дословно с иврита. Простой язык — это не безграмотный язык.",
+  en: "English: write clean, correct English. Match tense and number, avoid literal translation from Hebrew, and keep sentences complete. Simple English is not broken English."
+};
 const TARGETNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנגלית" };
 
 /* ---------- המנוע: Gemini, ו-Claude כדרך חזרה ----------
@@ -142,13 +179,85 @@ const TARGETNAME = { he:"עברית", ar:"ערבית", ru:"רוסית", en:"אנ
    המפתח של כל מנוע נקרא מהסוד ששמו ב-`key`, ורק הוא נבדק:
    חסר המפתח של המנוע הפעיל — 500. הסוד של המנוע השני אינו
    נדרש ואינו נמחק. */
-const MODEL = "gemini-2.5-flash";
+/* **`gemini-3.6-flash` ולא `gemini-2.5-flash` — 16.9.2026.** הפריסה
+   הראשונה עם Gemini (deploy-tutor ריצה 3) החזירה 502, והאבחון
+   מהרנר קיבל מגוגל 404: ״This model models/gemini-2.5-flash is no
+   longer available to new users. Please update your code to use
+   models/gemini-3.6-flash״. השם הזה הוא של גוגל, לא ניחוש. */
+const MODEL = "gemini-3.6-flash";
 const CLAUDE_MODEL = "claude-haiku-4-5";   /* דרך החזרה: PROVIDER=anthropic */
 const MAX_TOKENS = 700;          /* תשובה קצרה. גבוה מספיק כדי לא להיחתך באמצע משפט */
+const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
+function modelUrl(model) { return GEMINI_BASE + "/" + model + ":generateContent" }
+
+/* ---------- שרשרת המודלים — מנוע ברק, 16.9.2026 ----------
+
+   **שמות אינם נקבעים מהזיכרון.** `gemini-2.5-flash` נפל על 404
+   ב-16.9 (״no longer available to new users״), ולכן הרשימה נמשכת
+   מה-API עצמו — `GET /v1beta/models` — פעם אחת ל-isolate ולשש
+   שעות, ומסוננת: Flash שאינו Lite ואינו preview קודם, ואחריו
+   Flash-Lite, ורק מודלים שתומכים ב-`generateContent`.
+
+   **ו-`MODEL` הקבוע הוא הראשון בשרשרת, לא האחרון — תוקן
+   16.9.2026 אחרי מדידה.** הניסוח הראשון שם את ״החדש ביותר״
+   בראש, וזה בדיוק המודל העמוס ביותר: `barak-live` ריצות 1 ו-2
+   מדדו `gemini-3.8-flash` מחזיר `503 UNAVAILABLE: high demand`
+   ב-6 מתוך 10 הקריאות, בזמן ש-`gemini-3.6-flash` — השם הקבוע —
+   ענה 200 ב-3 מתוך 3 באותו יום (`tutor-compare` ריצה 4,
+   `deploy-tutor` ריצה 6). כלומר הגילוי הפך שירות עובד לשירות
+   שנופל למוח המקומי ברוב הפניות.
+
+   הסדר היום עונה על שתי הסכנות יחד: **`MODEL` ראשון** מגן על
+   היום — הוא השם שנמדד עונה; **והגילוי אחריו** מגן על היום שבו
+   `MODEL` ימות, בדיוק כמו `gemini-2.5-flash` — 404 מעביר לבא
+   בתור בלי שאיש יגע בקוד.
+
+   סדר הנפילה בפנייה: הראשון בשרשרת; 400 — ניסיון שני עם גוף
+   מינימלי (ראו `ask`); 404/429/5xx — הבא; נגמרה השרשרת —
+   הלקוח מקבל `fallback: "local"` ועונה מהמכשיר. */
+const MODELS_TTL = 6 * 60 * 60 * 1000;
+let MODELS_CACHE = { at: 0, list: null };
+/* לבדיקות בלבד: המטמון חי ברמת המודול ושורד בין תרחישים, ובלי
+   איפוס תרחיש שני מקבל את השרשרת של הראשון ונראה עובר בטעות. */
+const _models = { reset() { MODELS_CACHE = { at: 0, list: null } }, peek() { return MODELS_CACHE.list } };
+function rankModels(names) {
+  const gen = names.filter(n => /flash/i.test(n) && !/preview|exp|tts|image|live|audio|native|thinking/i.test(n));
+  const ver = n => +((n.match(/gemini-(\d+(?:\.\d+)?)/) || [0, 0])[1]);
+  const full = gen.filter(n => !/lite/i.test(n)).sort((a, b) => ver(b) - ver(a));
+  const lite = gen.filter(n =>  /lite/i.test(n)).sort((a, b) => ver(b) - ver(a));
+  const out = [];
+  if (full[0]) out.push(full[0]);
+  if (lite[0]) out.push(lite[0]);
+  return out;
+}
+async function discoverModels(env, fetchFn) {
+  const now = Date.now();
+  if (MODELS_CACHE.list && now - MODELS_CACHE.at < MODELS_TTL) return MODELS_CACHE.list;
+  let list = null;
+  try {
+    const r = await (fetchFn || fetch)(GEMINI_BASE + "?pageSize=200", {
+      headers: { "x-goog-api-key": env.GEMINI_API_KEY }
+    });
+    if (r.ok) {
+      const d = await r.json();
+      const names = (Array.isArray(d.models) ? d.models : [])
+        .filter(m => Array.isArray(m.supportedGenerationMethods)
+                     ? m.supportedGenerationMethods.indexOf("generateContent") >= 0 : true)
+        .map(m => String(m.name || "").replace(/^models\//, ""));
+      const ranked = rankModels(names);
+      if (ranked.length) list = ranked;
+    }
+  } catch (e) {}
+  /* `MODEL` ראשון תמיד, והגילוי אחריו בלי כפילות. גם כשהבקשה
+     לרשימה לא נענתה נשארת שרשרת באורך אחד לפחות. */
+  const chain = [MODEL].concat((list || []).filter(n => n !== MODEL));
+  MODELS_CACHE = { at: now, list: chain };
+  return chain;
+}
 const ENGINES = {
   gemini: {
     model: MODEL,
-    url: "https://generativelanguage.googleapis.com/v1beta/models/" + MODEL + ":generateContent",
+    url: modelUrl(MODEL),
     key: "GEMINI_API_KEY"
   },
   anthropic: {
@@ -258,7 +367,16 @@ const LIM = {
      אוטומטית מכובה** — זה נקבע בקונסולה, לא כאן, ורק הוא
      מבטיח שלא ייגבה סנט מעבר למה שהוטען. */
   perDay: 10,          /* פניות ליום לכל כתובת IP — התקרה של הלומד */
-  globalPerDay: 100    /* חסם העלות של השירות כולו, ולא תקרת שימוש */
+  globalPerDay: 100,   /* חסם העלות של השירות כולו, ולא תקרת שימוש */
+  /* מנוע ברק — גבולות המסך והפעולות (16.9.2026). כל אחד הוא גם
+     תקרת טוקנים: מסך של 8 אפשרויות × 160 תווים הוא כ-1,300 תווים
+     לכל היותר, ורשימת 12 פעולות עם 6 פרמטרים כל אחת נסגרת
+     בפחות מזה. */
+  options: 8,        /* אפשרויות על המסך */
+  optChars: 160,     /* אורך אפשרות אחת */
+  actions: 12,       /* פעולות שהאפליקציה מציעה */
+  params: 6,         /* פרמטרים לפעולה */
+  history: 8         /* ארבעה חילופי דברים — 8 הודעות — ב-/ask */
 };
 
 const LANGS = ["he", "ar", "ru", "en"];
@@ -388,7 +506,17 @@ function badEquation(text) {
    את המקור של הבקשה אם הוא ברשימה. מקור שאינו ברשימה מקבל את
    הראשון, כלומר נחסם — זו התנהגות סגורה, לא פתוחה. */
 const ORIGINS = "https://lagstein1-png.github.io,https://lagstein-hub.onrender.com";
+/* **והשרת המקומי של הבדיקות — 16.9.2026.** הבעלים פתח את
+   `localhost:8099` (`.claude/qa/serve.js`), שאל את ברק ״מה שלומך״
+   וקיבל ״אני מוח קטן… בלי חיבור לאינטרנט״: הבקשה יצאה, השרת ענה,
+   והדפדפן **בלע** את התשובה מפני שהמקור לא ברשימה — ואז `send()`
+   נפל למוח המקומי בלי שגיאה, בדיוק כמתוכנן. מבחוץ זה נראה כאילו
+   השרת מנותק. שני המקורות האלה מותרים תמיד, גם כש-`ALLOW_ORIGIN`
+   מוגדר בענן: הם אינם נגישים מהאינטרנט, והתקרות (`RATE`) חלות
+   עליהם כמו על כולם. */
+const LOCAL_ORIGINS = ["http://localhost:8099", "http://127.0.0.1:8099"];
 function pickOrigin(env, reqOrigin) {
+  if (LOCAL_ORIGINS.indexOf(reqOrigin) >= 0) return reqOrigin;
   const list = String(env.ALLOW_ORIGIN || ORIGINS).split(",").map(function (s) { return s.trim() }).filter(Boolean);
   return list.indexOf(reqOrigin) >= 0 ? reqOrigin : list[0];
 }
@@ -420,35 +548,218 @@ function noCounter(env) {
   return !env.RATE && String(env.ALLOW_NO_RATE_LIMIT || "").toLowerCase() !== "yes";
 }
 
-/* מחזיר `null` כשיש מקום, `"you"` כשהתקרה של הלומד נגמרה,
-   ו-`"all"` כשחסם העלות של השירות נגמר. **ההבדל הזה מגיע ללומד**:
-   ״נמשיך מחר״ נכון כשהוא מילא את שלו, ושקר כשמישהו אחר מילא את
-   הגלובלית — ואז הוא צריך לדעת שזה לא הוא, ושכדאי לנסות שוב
-   מאוחר יותר. שגיאה אחת לשני מצבים היא בדיוק הכשל השקט שהבעלים
-   ביקש למנוע. */
-async function overLimit(env, ip) {
-  if (!env.RATE) return null;                     /* הוצהר במפורש — ראו noCounter */
-  const day = new Date().toISOString().slice(0, 10);
-  const keys = ["d:" + day + ":" + ip, "d:" + day + ":ALL"];
-  const caps = [LIM.perDay, LIM.globalPerDay];
-  const who = ["you", "all"];
-  const now = [];
-  for (let i = 0; i < keys.length; i++) {
-    const v = +(await env.RATE.get(keys[i]) || 0);
-    if (v >= caps[i]) return who[i];
-    now.push(v);
+/* ---------- הגבלת קצב — מנוע ברק, 16.9.2026 ----------
+
+   **הבעיה שהמימוש הקודם יצר:** שתי כתיבות KV לכל בקשה. Cloudflare
+   בשכבה החינמית מתיר 1,000 כתיבות ליום, כלומר 500 פניות היו
+   סוגרות את השירות — לפני שהגענו לחסם העלות בכלל. היעד שנקבע:
+   פחות מ-700 כתיבות ביום בפועל.
+
+   **שתי שכבות, ושתי כתיבות אינן נדרשות:**
+
+   · **לכל IP — בזיכרון ה-isolate בלבד.** `Map` של כתובת → מניין
+     היום. אינו נכתב ל-KV כלל. זו הגבלה בסיסית: isolate חדש
+     מתחיל מאפס, וזה מקובל — התקרה של הלומד היא בלם מפני לחיצה
+     חוזרת, וחסם העלות האמיתי הוא הגלובלי. המפה חסומה ל-5,000
+     כתובות, ואחריהן מתאפסת, כדי שלא תגדל בלי גבול.
+
+   · **גלובלי — צובר בזיכרון, ונכתב ל-KV לכל היותר פעם ב-10
+     דקות** או כל 25 פניות, המוקדם מביניהם. חשבון: 144 כתיבות
+     ליום ל-isolate לפי הזמן, ובתקרה של 100 פניות ביום — 4 לפי
+     המניין. גם עם כמה isolates במקביל זה רחוק מ-700.
+
+   **מה זה עולה בדיוק:** בין שני flush-ים ה-isolate אינו רואה
+   פניות של isolate אחר, ולכן החסם הגלובלי יכול לחרוג בעד 25
+   לכל isolate. זו תקרת עלות ולא מונה חיוב, והחריגה חסומה.
+
+   `overLimit` שומר על החוזה הישן: `null` כשיש מקום, `"you"`
+   כשהתקרה של הלומד נגמרה, `"all"` כשחסם העלות נגמר — ההבדל
+   מגיע ללומד (״נמשיך מחר״ מול ״זה לא אתה״). */
+const FLUSH_MS = 10 * 60 * 1000;
+const FLUSH_EVERY = 25;
+const IP_MAP_MAX = 5000;
+function dayKey() { return new Date().toISOString().slice(0, 10) }
+const RATE_MEM = { day: "", ip: new Map(), g: { base: 0, pending: 0, readAt: 0, flushAt: 0 }, writes: 0 };
+function rollDay() {
+  const d = dayKey();
+  if (RATE_MEM.day !== d) {
+    RATE_MEM.day = d; RATE_MEM.ip.clear();
+    RATE_MEM.g = { base: 0, pending: 0, readAt: 0, flushAt: 0 };
   }
-  /* נשמר ליומיים, כדי שמפתח של אתמול ייעלם לבד */
-  for (let i = 0; i < keys.length; i++)
-    await env.RATE.put(keys[i], String(now[i] + 1), { expirationTtl: 172800 });
+}
+function capOfEnv(env, name, dflt) {
+  const v = env && env[name] != null ? parseInt(env[name], 10) : NaN;
+  return v > 0 ? v : dflt;
+}
+function flushGlobal(env, ctx, force) {
+  if (!env.RATE) return null;
+  const now = Date.now();
+  if (!force && RATE_MEM.g.pending < FLUSH_EVERY && now - RATE_MEM.g.flushAt < FLUSH_MS) return null;
+  const add = RATE_MEM.g.pending, key = "g:" + RATE_MEM.day;
+  RATE_MEM.g.pending = 0; RATE_MEM.g.flushAt = now;
+  const p = (async () => {
+    const cur = +(await env.RATE.get(key) || 0);
+    const val = cur + add;
+    RATE_MEM.writes++;
+    await env.RATE.put(key, String(val), { expirationTtl: 172800 });
+    RATE_MEM.g.base = val; RATE_MEM.g.readAt = Date.now();
+  })().catch(() => { RATE_MEM.g.pending += add });
+  if (ctx && typeof ctx.waitUntil === "function") ctx.waitUntil(p);
+  return p;
+}
+async function overLimit(env, ip, ctx) {
+  if (!env.RATE) return null;                     /* הוצהר במפורש — ראו noCounter */
+  rollDay();
+  const perDay = capOfEnv(env, "PER_DAY", LIM.perDay);
+  const globalPerDay = capOfEnv(env, "GLOBAL_PER_DAY", LIM.globalPerDay);
+  const n = RATE_MEM.ip.get(ip) || 0;
+  if (n >= perDay) return "you";
+  const now = Date.now();
+  if (!RATE_MEM.g.readAt || now - RATE_MEM.g.readAt > FLUSH_MS) {
+    try {
+      const base = +(await env.RATE.get("g:" + RATE_MEM.day) || 0);
+      if (base > RATE_MEM.g.base) RATE_MEM.g.base = base;
+    } catch (e) {}
+    RATE_MEM.g.readAt = now;
+  }
+  if (RATE_MEM.g.base + RATE_MEM.g.pending >= globalPerDay) return "all";
+  if (RATE_MEM.ip.size >= IP_MAP_MAX) RATE_MEM.ip.clear();
+  RATE_MEM.ip.set(ip, n + 1);
+  RATE_MEM.g.pending++;
+  flushGlobal(env, ctx, false);
   return null;
 }
+/* לבדיקות בלבד: איפוס הזיכרון בין תרחישים, ומניין הכתיבות. */
+const _rate = {
+  reset() { RATE_MEM.day = ""; RATE_MEM.ip.clear(); RATE_MEM.g = { base: 0, pending: 0, readAt: 0, flushAt: 0 }; RATE_MEM.writes = 0 },
+  mem: RATE_MEM, FLUSH_MS, FLUSH_EVERY, flush: flushGlobal
+};
 
-function clean(v) {
-  return v === null || v === undefined ? null : String(v).trim().slice(0, LIM.ctx) || null;
+function clean(v, max) {
+  return v === null || v === undefined ? null : String(v).trim().slice(0, max || LIM.ctx) || null;
 }
 
-/* ---------- אימות הגוף שהגיע מהדפדפן ---------- */
+/* ---------- הפעולות — מנוע ברק, 16.9.2026 ----------
+
+   **המודל אינו מבצע כלום.** הוא מקבל רשימה סגורה של פעולות שהאפליקציה
+   הצהירה עליהן בבקשה הזאת בלבד, ורשאי להחזיר קריאה לאחת מהן; הקוד
+   של האפליקציה הוא שמבצע, ורק אחרי שהצליח מוצג הטקסט. זה מה שסוגר
+   את ״נעבור למסך״ שלא מעביר.
+
+   **רשימה סגורה בשני מובנים:** השם חייב להיות ברשימה שהגיעה
+   מהאפליקציה, **וגם** באוצר הקבוע שלמטה — שם שאינו כאן אינו פעולה
+   גם אם אפליקציה תשלח אותו. האוצר הוא החוזה בין השרת ללקוח, ומי
+   שמוסיף פעולה מוסיף אותה בשני המקומות. `theory:` היא הקידומת של
+   הפעולות הייחודיות (`app:`) — למשל `show_sign_image` בריפו הנפרד של ״תאוריה מדברת״
+   ו-`formula_sheet` בשלב וב-806.
+
+   פרמטר מוצהר כ-`{ type, enum?, min?, max? }`; ערך שאינו מהסוג
+   נזרק, ואיתו הפעולה כולה (`validateAction`). מה שנזרק אינו שגיאה
+   ללומד — התשובה ממשיכה עם `action: null`. */
+const ACTION_NAMES = [
+  /* משותפות */
+  "next_question", "show_hint", "read_aloud", "highlight_option",
+  "explain_again", "go_screen", "repeat_question",
+  /* ייחודיות */
+  "slow_mode", "formula_sheet", "show_sign_image", "next_sentence", "read_word"
+];
+const PARAM_TYPES = ["string", "number", "integer", "boolean"];
+const ACTION_RE = /^[a-z][a-z0-9_]{1,31}$/;
+
+function readActions(list) {
+  if (!Array.isArray(list)) return [];
+  const out = [], seen = {};
+  for (const a of list.slice(0, LIM.actions)) {
+    if (!a || typeof a !== "object") continue;
+    const name = String(a.name || "").trim();
+    if (!ACTION_RE.test(name) || ACTION_NAMES.indexOf(name) < 0 || seen[name]) continue;
+    seen[name] = 1;
+    const desc = clean(a.desc || a.description, 160) || name;
+    const params = {};
+    const src = a.params && typeof a.params === "object" ? a.params : {};
+    let n = 0;
+    for (const k of Object.keys(src)) {
+      if (n++ >= LIM.params || !ACTION_RE.test(k)) continue;
+      const d = src[k] && typeof src[k] === "object" ? src[k] : { type: String(src[k] || "string") };
+      const type = PARAM_TYPES.indexOf(d.type) >= 0 ? d.type : "string";
+      const pd = { type };
+      if (Array.isArray(d.enum)) pd.enum = d.enum.slice(0, 12).map(x => String(x).slice(0, 40));
+      if (typeof d.min === "number") pd.min = d.min;
+      if (typeof d.max === "number") pd.max = d.max;
+      if (d.required === true) pd.required = true;
+      if (typeof d.desc === "string") pd.desc = d.desc.slice(0, 120);
+      params[k] = pd;
+    }
+    out.push({ name, desc, params });
+  }
+  return out;
+}
+
+/* הגוף של `tools` ל-Gemini — נבנה מהרשימה של הבקשה הזאת בלבד. */
+function toolsOf(actions) {
+  if (!actions || !actions.length) return null;
+  const TYPE = { string: "STRING", number: "NUMBER", integer: "INTEGER", boolean: "BOOLEAN" };
+  return [{
+    functionDeclarations: actions.map(a => {
+      const props = {}, req = [];
+      for (const k of Object.keys(a.params)) {
+        const p = a.params[k];
+        const o = { type: TYPE[p.type] || "STRING" };
+        if (p.desc) o.description = p.desc;
+        if (p.enum) { o.enum = p.enum; o.type = "STRING" }
+        props[k] = o;
+        if (p.required) req.push(k);
+      }
+      const fd = { name: a.name, description: a.desc };
+      if (Object.keys(props).length) {
+        fd.parameters = { type: "OBJECT", properties: props };
+        if (req.length) fd.parameters.required = req;
+      }
+      return fd;
+    })
+  }];
+}
+
+/* פעולה שחזרה מהמודל מול הרשימה: שם לא מוכר — `null`; פרמטר מסוג
+   שגוי, מחוץ ל-enum או לטווח — `null`; פרמטר שלא הוצהר — נזרק
+   בשקט. מספר במחרוזת (״2״) מתקבל כמספר — מודלים עושים את זה. */
+function validateAction(call, actions) {
+  if (!call || typeof call !== "object" || !call.name) return null;
+  const spec = (actions || []).filter(a => a.name === call.name)[0];
+  if (!spec) return null;
+  const args = call.args && typeof call.args === "object" ? call.args : {};
+  const out = {};
+  for (const k of Object.keys(spec.params)) {
+    const p = spec.params[k];
+    let v = args[k];
+    if (v === undefined || v === null) { if (p.required) return null; continue }
+    if (p.type === "boolean") {
+      if (typeof v === "string") v = v === "true" ? true : v === "false" ? false : v;
+      if (typeof v !== "boolean") return null;
+    } else if (p.type === "number" || p.type === "integer") {
+      if (typeof v === "string" && /^-?\d+(\.\d+)?$/.test(v.trim())) v = +v;
+      if (typeof v !== "number" || !isFinite(v)) return null;
+      if (p.type === "integer" && v !== Math.floor(v)) return null;
+      if (typeof p.min === "number" && v < p.min) return null;
+      if (typeof p.max === "number" && v > p.max) return null;
+    } else {
+      if (typeof v !== "string") v = String(v);
+      v = v.slice(0, 120);
+      if (p.enum && p.enum.indexOf(v) < 0) return null;
+    }
+    out[k] = v;
+  }
+  return { name: spec.name, args: out };
+}
+
+/* ---------- אימות הגוף שהגיע מהדפדפן ----------
+
+   **שני גופים, מנוע אחד.** הגוף הישן — `q` ו-`messages` — הוא מה
+   ש-״תאוריה מדברת״ החיה ואפליקציה במטמון ישן עדיין שולחות, והוא
+   מנורמל כאן לאותו מבנה שהגוף החדש (`screen`, `userText`, `history`,
+   `actions`, `mode`) מייצר. `readBody` מחזיר צורה אחת, וכל מה
+   שאחריו אינו יודע איזה גוף הגיע. */
+const MODES = ["chat", "hint", "explain", "nudge"];
 function readBody(b) {
   if (!b || typeof b !== "object") return null;
   const app = ROLE[b.app] ? b.app : null;
@@ -458,21 +769,45 @@ function readBody(b) {
   /* סימן הלמידה. `null` כשאין, כשהוא `ok`, וכשהוא משהו אחר —
      שלושת המקרים אומרים אותו דבר: אל תתאים. */
   const sign = SIGNS.indexOf(b.sign) >= 0 ? b.sign : null;
+  const mode = MODES.indexOf(b.mode) >= 0 ? b.mode : "chat";
 
   /* התרגיל אינו חובה: ההוראות אומרות לבקש מהתלמיד לכתוב אותו
-     כשהוא אינו ידוע, וזה בדיוק המצב הזה. */
+     כשהוא אינו ידוע, וזה בדיוק המצב הזה. `screen` הוא הצורה
+     החדשה; `q` הישנה. שניהם נופלים לאותו אובייקט. */
   let q = null;
-  if (b.q && typeof b.q === "object") {
-    const expr = clean(b.q.expr), ans = clean(b.q.ans),
-          topic = clean(b.q.topic), level = clean(b.q.level);
-    if (expr || topic) q = { expr, ans, topic, level };
+  const sc = b.screen && typeof b.screen === "object" ? b.screen
+           : b.q && typeof b.q === "object" ? b.q : null;
+  if (sc) {
+    const expr = clean(sc.q || sc.expr), ans = clean(sc.correct != null ? sc.correct : sc.ans),
+          topic = clean(sc.topic), level = clean(sc.level),
+          id = clean(sc.id, 80), type = clean(sc.type, 40),
+          curriculum = clean(sc.curriculum, 200),
+          student = clean(sc.student, LIM.optChars);
+    let options = null;
+    if (Array.isArray(sc.options)) {
+      options = sc.options.slice(0, LIM.options)
+        .map(o => clean(typeof o === "object" && o ? (o.text || o.t || o.h) : o, LIM.optChars))
+        .filter(Boolean);
+      if (!options.length) options = null;
+    }
+    if (expr || topic) q = { expr, ans, topic, level, id, type, options, student, curriculum };
   }
 
-  const src = Array.isArray(b.messages) ? b.messages.slice(-LIM.msgs) : [];
+  const actions = readActions(b.actions);
+
+  /* ההיסטוריה: הגוף החדש שולח `history` (עד ארבעה חילופים) ואת
+     `userText` בנפרד; הישן שולח `messages` שהאחרונה בהן היא של
+     הלומד. שניהם הופכים לרשימה אחת שנגמרת בתור של הלומד. */
+  let src;
+  if (Array.isArray(b.history) || typeof b.userText === "string") {
+    src = (Array.isArray(b.history) ? b.history : []).slice(-LIM.history)
+      .map(m => ({ role: m && m.role, text: m && (m.text || m.content) }));
+    if (typeof b.userText === "string") src.push({ role: "user", text: b.userText });
+  } else src = Array.isArray(b.messages) ? b.messages.slice(-LIM.msgs) : [];
   const msgs = [];
   let total = 0;
   for (const m of src) {
-    const role = m && m.role === "assistant" ? "assistant" : "user";
+    const role = m && (m.role === "assistant" || m.role === "model") ? "assistant" : "user";
     const text = String((m && m.text) || "").trim().slice(0, LIM.chars);
     if (!text) continue;
     total += text.length;
@@ -482,7 +817,7 @@ function readBody(b) {
   /* Claude דורש שהתור הראשון והאחרון יהיו של המשתמש */
   while (msgs.length && msgs[0].role === "assistant") msgs.shift();
   if (!msgs.length || msgs[msgs.length - 1].role !== "user") return null;
-  return { app, lang, target, sign, q, msgs };
+  return { app, lang, target, sign, q, msgs, actions, mode };
 }
 
 /* ---------- ההקשר המשתנה. אחרי הגוף הקבוע, כדי לא לשבור את המטמון ---------- */
@@ -490,6 +825,24 @@ function contextBlock(inp, turn) {
   const q = inp.q, out = [];
   out.push(ROLE[inp.app]);
   out.push("כתוב את כל תשובתך ב" + (LANGNAME[inp.lang] || LANGNAME.he) + ", ורק בה.");
+  /* מלכודות השפה של אותה שפה, מיד אחרי ההוראה על השפה עצמה */
+  out.push(LANGRULE[inp.lang] || LANGRULE.he);
+
+  /* ---------- ההצגה העצמית: פעם אחת, ולא בכל תשובה ----------
+     **נמדד אצל הבעלים, 17.9.2026:** ״הוא מציג את עצמו בכל פעם
+     מחדש״. `CORE` אומר ״אמור את שמך בתשובה הראשונה בלבד״ מאז
+     ומתמיד, אבל הוא הבלוק **הקבוע** — הוא נשלח מילה במילה זהה
+     בתשובה הראשונה ובעשירית, ולכן המודל אינו יודע באיזו מהן הוא
+     עומד. הוראה שתלויה בתור חייבת לשבת בבלוק המשתנה, שרואה את
+     `turn`.
+
+     `turn` הוא מספר תורות ה-assistant שבהיסטוריה שהלקוח שלח —
+     אפס בתשובה הראשונה. ולכן גם: לקוח שלא ישלח היסטוריה יקבל
+     ״הצג את עצמך״ בכל פעם, וזה נכון — בלי היסטוריה זו באמת שיחה
+     חדשה מבחינתו. */
+  out.push(turn === 0
+    ? "זו תשובתך הראשונה בשיחה: פתח במשפט אחד קצר שבו שמך, ומיד אחריו גש לעניין. ברכה אחת בלבד בכל התשובה — אל תכתוב ״שלום״ פעמיים, ואל תברך שוב אחרי שהצגת את עצמך."
+    : "כבר הצגת את עצמך בשיחה הזאת. אל תאמר את שמך שוב, אל תפתח ב״שלום״ ואל תברך מחדש — המשך ישירות מאיפה שהפסקתם.");
 
   /* לימודי שפה: שפת ההסבר אינה השפה הנלמדת, ואסור לערבב ביניהן.
      הסימון « » הוא מה שמאפשר לדפדפן להקריא כל קטע בקול שלו. */
@@ -505,19 +858,50 @@ function contextBlock(inp, turn) {
      שנתקע ואז הקליד שאלה חופשית הוא אותו לומד. */
   if (inp.sign && ADAPT[inp.sign]) out.push(ADAPT[inp.sign]);
 
+  /* הפעולות של המסך הזה. הרשימה משתנה מאפליקציה לאפליקציה ולכן
+     היא כאן ולא ב-CORE; הכלל שאוסר להכריז על פעולה בלי לקרוא לה
+     יושב ב-CORE, ואינו משתנה. */
+  if (inp.actions && inp.actions.length) {
+    out.push("פעולות שאתה יכול לבצע במסך הזה, ורק הן: " +
+      inp.actions.map(a => a.name + " — " + a.desc).join("; ") + ". " +
+      "כשהלומד מבקש דבר שפעולה עושה — קרא לפעולה, וכתוב משפט קצר אחד. " +
+      "פעולה שאינה ברשימה אינה קיימת; אל תבטיח אותה.");
+  }
+
+  if (inp.mode === "hint")
+    out.push("הלומד ביקש רמז. תן רמז אחד בלבד, קצר, בלי התשובה, ושאל שאלה אחת.");
+  else if (inp.mode === "explain")
+    out.push("הלומד ביקש הסבר. הסבר את הדרך צעד אחד בכל פעם, בלשון פשוטה, ובדרך שונה מזו שכבר ניסה.");
+
   if (!q) {
     out.push("מה שעל המסך אינו ידוע לך. בקש מהתלמיד לכתוב את התרגיל או את השאלה.");
     return out.join("\n");
   }
   if (q.expr)  out.push("מה שעל המסך: " + q.expr);
+  if (q.options) out.push("האפשרויות שהלומד רואה: " + q.options.map((o, i) => (i + 1) + ") " + o).join(" · "));
+  if (q.student) out.push("הלומד ענה: " + q.student + (q.ans && q.student !== q.ans ? " — וזו טעות. הסבר למה בלי לומר את התשובה הנכונה." : "."));
   if (q.topic) out.push("הנושא: " + q.topic);
+  if (q.curriculum) out.push("בתוכנית הלימודים: " + q.curriculum);
   if (q.level) out.push("רמת הלימוד: " + q.level);
   if (q.ans) {
     out.push("התשובה הנכונה היא: " + q.ans + ". היא נתונה לך כדי שלא תטעה, ולא כדי שתמסור אותה.");
-    if (turn < 2)
+    if (turn < 2 || inp.mode === "hint")
       out.push("זו תחילת השיחה: אל תכתוב את התשובה הזאת. תן רמז אחד ושאל שאלה אחת.");
   }
   return out.join("\n");
+}
+
+/* ---------- הפנים — אחד מעשרת האירועים של josh-face.js ----------
+   ההחלטה כאן, לא במודל: אין טעם לשלם טוקנים על מילה שנגזרת ממה
+   שכבר ידוע. הסימן קודם לטעות, מפני שהוא מתאר את הרגע. */
+const FACES = ["idle", "listening", "thinking", "speaking", "correct", "wrong",
+               "encourage", "frustrated", "stuck", "slow"];
+function faceFor(inp, action) {
+  if (inp.sign === "frustrated") return "encourage";
+  if (inp.sign === "stuck") return "stuck";
+  if (inp.sign === "slow") return "slow";
+  if (inp.q && inp.q.student && inp.q.ans && inp.q.student !== inp.q.ans) return "encourage";
+  return "speaking";
 }
 
 /* ============ מה מותר לשלוח לאיזה מודל ============
@@ -548,9 +932,24 @@ function capOf(model) { return CAP[model] || { effort: false, fallbacks: false }
    2. תפקיד העוזר נקרא `model` ולא `assistant`, בכל ההיסטוריה.
    3. `thinkingBudget: 0` — רמז קצר ושאלה אחת, בלי חשיבה.
       אם ה-API ידחה את השדה — להסיר אותו בלבד.
-   אין `temperature`: לא היה כזה במסלול Claude, ואין להמציא מספר. */
-function geminiBody(ctx, msgs, extra) {
-  return {
+   אין `temperature`: לא היה כזה במסלול Claude, ואין להמציא מספר.
+   `tools` נכנס רק כשהאפליקציה הצהירה על פעולות — ורק הן. */
+/* `minimal` מוריד את שני השדות הרשות — `thinkingConfig` ו-`toolConfig`.
+
+   **למה זה קיים: 400 שנמדד, וסיבה שלא בודדה.** `barak-live` ריצות
+   1 ו-2 מדדו `gemini-3.5-flash-lite` מחזיר `400 INVALID_ARGUMENT`
+   ב-**18 מתוך 18** הקריאות שהגיעו אליו. הגוף נבנה אחד לשני
+   המודלים, ואי אפשר לדעת מכאן איזה שדה פסול: הסביבה חסומה מול
+   גוגל, ולכן אין דרך לבודד את השדה בלי קריאה חיה.
+
+   **מה שנעשה במקום לנחש:** 400 מפעיל ניסיון שני על **אותו מודל**
+   עם הגוף המינימלי. שני השדות שיורדים הם אופטימיזציה ולא דרישה —
+   `thinkingBudget: 0` חוסך טוקנים, ו-`mode: "AUTO"` הוא ברירת
+   המחדל ממילא — ולכן תשובה מהגוף המינימלי טובה בדיוק כמו מהמלא.
+   `tools` **אינו** יורד: בלעדיו ברק מאבד את הפעולות, וזה הדבר
+   שהמנוע הזה נבנה בשבילו. נשאר 400 — עוברים למודל הבא. */
+function geminiBody(ctx, msgs, extra, tools, minimal) {
+  const body = {
     systemInstruction: {
       parts: [ { text: CORE + "\n" + ctx + (extra ? "\n" + extra : "") } ]
     },
@@ -558,15 +957,18 @@ function geminiBody(ctx, msgs, extra) {
       role: m.role === "assistant" ? "model" : "user",
       parts: [ { text: m.content } ]
     })),
-    generationConfig: {
-      maxOutputTokens: MAX_TOKENS,
-      thinkingConfig: { thinkingBudget: 0 }
-    }
+    generationConfig: { maxOutputTokens: MAX_TOKENS }
   };
+  if (!minimal) body.generationConfig.thinkingConfig = { thinkingBudget: 0 };
+  if (tools) {
+    body.tools = tools;
+    if (!minimal) body.toolConfig = { functionCallingConfig: { mode: "AUTO" } };
+  }
+  return body;
 }
 
-function buildBody(model, ctx, msgs, extra) {
-  if (isGemini(model)) return geminiBody(ctx, msgs, extra);
+function buildBody(model, ctx, msgs, extra, tools, minimal) {
+  if (isGemini(model)) return geminiBody(ctx, msgs, extra, tools, minimal);
   const cap = capOf(model);
   const body = {
     model: model,
@@ -600,53 +1002,174 @@ function buildHeaders(model, key) {
   return h;
 }
 
-async function ask(env, ctx, msgs, extra) {
+/* פנייה אחת למנוע. ב-Gemini המודל נבחר משרשרת: 404 (השם מת),
+   429 (המכסה של המודל הזה) ו-5xx מעבירים לבא בתור; נגמרה השרשרת —
+   `{ err: "exhausted" }`, והלקוח נופל למוח המקומי. Claude נשאר
+   מודל אחד, כמו קודם. */
+const RETRY_STATUS = [404, 429, 500, 502, 503, 504];
+async function ask(env, ctx, msgs, extra, tools, fetchFn) {
   const eng = engineOf(env);
-  const body = buildBody(eng.model, ctx, msgs, extra);
-  const r = await fetch(eng.url, {
-    method: "POST",
-    headers: buildHeaders(eng.model, env[eng.key]),
-    body: JSON.stringify(body)
-  });
-  if (!r.ok) {
-    /* **הצד השני של O-42.** הסטטוס נתפס כאן ונזרק, ולכן 502 היה
-       חסר פשר: מפתח שגוי, אין יתרה ועומס חולף נראים זהים. גוף
-       השגיאה של הספק נושא את סוג השגיאה ואת ההודעה ו**אינו
-       נושא את המפתח**, ולכן אפשר לכתוב אותו ללוג כמות שהוא.
-       נראה ב-`npx wrangler tail tutor`. */
-    let why = "";
-    try { why = (await r.text()).slice(0, 300) } catch (e) {}
-    console.error("[tutor] upstream " + r.status + " " + why);
-    return { err: r.status };
+  const F = fetchFn || fetch;
+  const models = eng === ENGINES.gemini ? await discoverModels(env, F) : [eng.model];
+  let last = null;
+  for (const model of models) {
+   /* ניסיון שני על אותו מודל, עם הגוף המינימלי, ורק על 400. */
+   for (let minimal = 0; minimal < 2; minimal++) {
+    const body = buildBody(model, ctx, msgs, extra, tools, !!minimal);
+    const url = isGemini(model) ? modelUrl(model) : eng.url;
+    let r;
+    try {
+      r = await F(url, { method: "POST", headers: buildHeaders(model, env[eng.key]), body: JSON.stringify(body) });
+    } catch (e) { last = { err: "network" }; break }
+    if (!r.ok) {
+      /* **הצד השני של O-42.** הסטטוס נתפס כאן ונזרק, ולכן 502 היה
+         חסר פשר: מפתח שגוי, אין יתרה ועומס חולף נראים זהים. גוף
+         השגיאה של הספק נושא את סוג השגיאה ואת ההודעה ו**אינו
+         נושא את המפתח**, ולכן אפשר לכתוב אותו ללוג כמות שהוא.
+         נראה ב-`npx wrangler tail tutor`. */
+      let why = "";
+      try { why = (await r.text()).slice(0, 300) } catch (e) {}
+      console.error("[tutor] upstream " + model + (minimal ? " (minimal)" : "") + " " + r.status + " " + why);
+      last = { err: r.status };
+      /* 400 בגוף המלא — מנסים מינימלי על **אותו** מודל; 400 גם
+         במינימלי — למודל הבא. זה היה באג: `400` אינו ב-`RETRY_STATUS`,
+         ולכן המינימלי שנפל החזיר 502 מיד במקום להמשיך בשרשרת —
+         כלומר Lite שבור היה מפיל את כל הפנייה. נתפס ב-`barak.js`. */
+      if (r.status === 400) { if (!minimal) continue; break }
+      if (RETRY_STATUS.indexOf(r.status) >= 0) break;
+      return last;
+    }
+    const out = parseReply(model, await r.json());
+    out.model = model;
+    if (minimal) out.minimal = true;
+    return out;
+   }
   }
-  return parseReply(eng.model, await r.json());
+  return { err: "exhausted", last: last && last.err };
 }
 
 /* התשובה, לפי המנוע. חסימה נחשבת סירוב בשני המנועים ומחזירה 502:
    ב-Gemini — אין מועמדים, `promptFeedback.blockReason`, או
-   `finishReason` שהוא SAFETY; ב-Claude — `stop_reason` של refusal. */
+   `finishReason` שהוא SAFETY; ב-Claude — `stop_reason` של refusal.
+   קריאה לפעולה חוזרת ב-`call` — השם והארגומנטים כפי שהמודל כתב,
+   **לפני** אימות. */
 function parseReply(model, d) {
   if (isGemini(model)) {
     if (d.promptFeedback && d.promptFeedback.blockReason) return { err: "refusal" };
     const c = Array.isArray(d.candidates) ? d.candidates[0] : null;
     if (!c || c.finishReason === "SAFETY") return { err: "refusal" };
-    const text = ((c.content && c.content.parts) || [])
+    const parts = (c.content && c.content.parts) || [];
+    const text = parts
       .filter(p => p && typeof p.text === "string" && !p.thought)
       .map(p => p.text).join("").trim();
-    return { text };
+    const fc = parts.filter(p => p && p.functionCall && p.functionCall.name)[0];
+    const out = { text };
+    if (fc) out.call = { name: String(fc.functionCall.name), args: fc.functionCall.args || {} };
+    if (c.finishReason === "MAX_TOKENS") out.cut = true;
+    return out;
   }
   /* stop_reason נבדק לפני content — בסירוב content יכול לחזור ריק */
   if (d.stop_reason === "refusal") return { err: "refusal" };
   const text = (d.content || [])
     .filter(c => c.type === "text").map(c => c.text).join("").trim();
-  return { text };
+  const tu = (d.content || []).filter(c => c.type === "tool_use")[0];
+  const out = { text };
+  if (tu) out.call = { name: String(tu.name), args: tu.input || {} };
+  return out;
+}
+
+/* נוסח קצר כשהמודל החזיר פעולה בלי מילה. הלקוח מציג אותו רק אחרי
+   שהפעולה הצליחה — כמו כל `say` שמלווה פעולה. */
+const ACTION_SAY = {
+  he: "בסדר, עושה את זה.", ar: "حسنًا، أفعل ذلك.", ru: "Хорошо, делаю.", en: "Okay, doing that."
+};
+/* **ומשפט לכל פעולה, ולא אחד לכולן — 16.9.2026.** `barak-live`
+   מדד שבתרחיש ״תעביר אותי לשאלה הבאה״ המודל מחזיר קריאת פונקציה
+   **בלי טקסט**, ב-2 מתוך 2. ״בסדר, עושה את זה״ אינו שקר, אבל הוא
+   גם אינו אומר ללומד מה קרה — וקהל היעד כאן הוא דיסלקציה ו-ADHD,
+   שבשבילם ״עוברים לשאלה הבאה״ הוא המשפט שמסביר את המסך שהתחלף.
+   מה שאין כאן נופל ל-`ACTION_SAY`. */
+const ACTION_LINE = {
+  next_question:   { he: "עוברים לשאלה הבאה.", ar: "ننتقل إلى السؤال التالي.", ru: "Переходим к следующему вопросу.", en: "Moving on to the next question." },
+  next_sentence:   { he: "עוברים למשפט הבא.", ar: "ننتقل إلى الجملة التالية.", ru: "Переходим к следующему предложению.", en: "Moving on to the next sentence." },
+  show_hint:       { he: "הנה רמז.", ar: "إليك تلميحًا.", ru: "Вот подсказка.", en: "Here is a hint." },
+  read_aloud:      { he: "מקריא.", ar: "أقرأ.", ru: "Читаю.", en: "Reading it out." },
+  read_word:       { he: "מקריא את המילה.", ar: "أقرأ الكلمة.", ru: "Читаю слово.", en: "Reading the word." },
+  repeat_question: { he: "עוד פעם.", ar: "مرة أخرى.", ru: "Ещё раз.", en: "Once more." },
+  explain_again:   { he: "אסביר שוב, בדרך אחרת.", ar: "سأشرح مرة أخرى بطريقة مختلفة.", ru: "Объясню ещё раз, по-другому.", en: "Let me explain again, another way." },
+  highlight_option:{ he: "הסתכל על האפשרות המסומנת.", ar: "انظر إلى الخيار المحدَّد.", ru: "Посмотри на выделенный вариант.", en: "Look at the highlighted option." },
+  go_screen:       { he: "עוברים.", ar: "ننتقل.", ru: "Переходим.", en: "Going there." },
+  slow_mode:       { he: "נעשה את זה לאט.", ar: "سنفعل ذلك ببطء.", ru: "Сделаем это медленно.", en: "Let us do this slowly." },
+  formula_sheet:   { he: "הנה דף הנוסחאות.", ar: "إليك ورقة الصيغ.", ru: "Вот лист формул.", en: "Here is the formula sheet." },
+  show_sign_image: { he: "הנה התמרור.", ar: "إليك الإشارة.", ru: "Вот знак.", en: "Here is the sign." }
+};
+function actionLine(name, lang) {
+  const row = ACTION_LINE[name];
+  return (row && (row[lang] || row.he)) || ACTION_SAY[lang] || ACTION_SAY.he;
+}
+
+/* ---------- הבקשה עצמה, משני הנתיבים ---------- */
+async function handleAsk(request, env, ctx, org, fetchFn) {
+  let body;
+  try { body = await request.json() } catch (e) { return json({ error: "bad" }, 400, env, org) }
+  const inp = readBody(body);
+  if (!inp) return json({ error: "bad" }, 400, env, org);
+
+  const ip = request.headers.get("CF-Connecting-IP") || "0";
+  /* `scope` הוא מה שמאפשר ללקוח לומר ללומד אם זה הוא או השירות.
+     `fallback: "local"` הוא ההוראה ללקוח לעבור לשכבה המקומית. */
+  const hit = await overLimit(env, ip, ctx);
+  if (hit) return json({ error: "limit", scope: hit, fallback: "local" }, 429, env, org);
+
+  const turn = inp.msgs.filter(m => m.role === "assistant").length;
+  const ans = inp.q ? inp.q.ans : null;
+  const sys = contextBlock(inp, turn);
+  const tools = toolsOf(inp.actions);
+
+  let out = await ask(env, sys, inp.msgs, "", tools, fetchFn);
+  if (out.err) {
+    /* נגמרה השרשרת, או שהספק נפל — הלקוח עונה מהמכשיר. */
+    return json({ error: "upstream", fallback: "local" }, out.err === "exhausted" ? 503 : 502, env, org);
+  }
+
+  /* הבדיקה, ואחריה ניסיון שני אחד ולא יותר. רמז — תמיד בלי התשובה. */
+  const guard = turn < 2 || inp.mode === "hint";
+  const bad = t => (guard && revealsAnswer(t, ans)) || badEquation(t);
+  if (bad(out.text)) {
+    const nudge = guard && ans
+      ? "התשובה הקודמת שלך חשפה את הפתרון או הכילה חישוב שגוי. כתוב מחדש: " +
+        "רמז אחד בלבד, בלי לכתוב את התשובה הנכונה, ובלי משוואה מלאה."
+      : "התשובה הקודמת שלך הכילה חישוב שגוי. כתוב מחדש, ובדוק כל חישוב לפני שאתה כותב אותו.";
+    const again = await ask(env, sys, inp.msgs, nudge, tools, fetchFn);
+    out = (again.err || bad(again.text)) ? { text: "", call: out.call, model: out.model } : again;
+  }
+
+  const action = validateAction(out.call, inp.actions);
+  let say = out.text || "";
+  if (!say) say = action ? actionLine(action.name, inp.lang) : (FALLBACK[inp.lang] || FALLBACK.he);
+
+  /* `checked` — ראו בלוק החיפוש למעלה. `!!PROVIDER` ולא `false`
+     קשיח: ביום שבו ספק יותקן, השדה יאמר את האמת מעצמו במקום
+     להישאר שקר שנשכח. היום `PROVIDER` הוא `null`, ולכן `false`.
+     `text` ו-`say` הם אותו ערך: `text` ללקוח הישן, `say` לחדש. */
+  return json({ say, text: say, action, face: faceFor(inp, action),
+                source: "ai", model: out.model || null,
+                checked: !!PROVIDER }, 200, env, org);
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const org = pickOrigin(env, request.headers.get("Origin"));
+    const url = new URL(request.url);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env, org) });
+    /* בריאות — בלי מפתח, בלי מונה, בלי פנייה לספק. */
+    if (request.method === "GET" && url.pathname === "/health")
+      return json({ ok: true, key: env[engineOf(env).key] ? "present" : "missing",
+                    counter: env.RATE ? "kv" : (noCounter(env) ? "missing" : "declared-off"),
+                    apps: Object.keys(ROLE), actions: ACTION_NAMES, limits: LIM }, 200, env, org);
     if (request.method !== "POST") return json({ error: "method" }, 405, env, org);
+    if (url.pathname !== "/" && url.pathname !== "/ask" && !/\/(?:ask|api\/josh\/chat)\/?$/.test(url.pathname))
+      return json({ error: "path" }, 404, env, org);
     if (!env[engineOf(env).key]) return json({ error: "server" }, 500, env, org);
     /* אין מונה יומי ואין הצהרה — לא מתחילים. עדיף בוט שאינו עונה
        על חשבון שאינו חסום. */
@@ -654,47 +1177,18 @@ export default {
       return json({ error: "no-rate-limit",
         detail: "חסר קישור KV בשם RATE. בלעדיו אין תקרה יומית. " +
                 "לקשור אותו, או להצהיר ALLOW_NO_RATE_LIMIT=yes." }, 503, env, org);
-
-    let body;
-    try { body = await request.json() } catch (e) { return json({ error: "bad" }, 400, env, org) }
-    const inp = readBody(body);
-    if (!inp) return json({ error: "bad" }, 400, env, org);
-
-    const ip = request.headers.get("CF-Connecting-IP") || "0";
-    /* `scope` הוא מה שמאפשר ללקוח לומר ללומד אם זה הוא או השירות. */
-    const hit = await overLimit(env, ip);
-    if (hit) return json({ error: "limit", scope: hit }, 429, env, org);
-
-    const turn = inp.msgs.filter(m => m.role === "assistant").length;
-    const ans = inp.q ? inp.q.ans : null;
-    const ctx = contextBlock(inp, turn);
-
-    let out = await ask(env, ctx, inp.msgs, "");
-    if (out.err) return json({ error: "upstream" }, 502, env, org);
-
-    /* הבדיקה, ואחריה ניסיון שני אחד ולא יותר */
-    const bad = t => (turn < 2 && revealsAnswer(t, ans)) || badEquation(t);
-    if (bad(out.text)) {
-      const nudge = turn < 2 && ans
-        ? "התשובה הקודמת שלך חשפה את הפתרון או הכילה חישוב שגוי. כתוב מחדש: " +
-          "רמז אחד בלבד, בלי לכתוב את התשובה הנכונה, ובלי משוואה מלאה."
-        : "התשובה הקודמת שלך הכילה חישוב שגוי. כתוב מחדש, ובדוק כל חישוב לפני שאתה כותב אותו.";
-      const again = await ask(env, ctx, inp.msgs, nudge);
-      out = (again.err || bad(again.text)) ? { text: "" } : again;
-    }
-
-    /* `checked` — ראו בלוק החיפוש למעלה. `!!PROVIDER` ולא `false`
-       קשיח: ביום שבו ספק יותקן, השדה יאמר את האמת מעצמו במקום
-       להישאר שקר שנשכח. היום `PROVIDER` הוא `null`, ולכן `false`. */
-    return json({ text: out.text || FALLBACK[inp.lang] || FALLBACK.he,
-                  checked: !!PROVIDER }, 200, env, org);
+    return handleAsk(request, env, ctx, org);
   }
 };
 
 /* מיוצאים בנפרד כדי ש-node .claude/qa/tutor.js יוכל לבדוק אותם.
    Cloudflare קורא רק את ה-default, וייצוא נוסף אינו מפריע לו. */
 export { revealsAnswer, badEquation, readBody, contextBlock, LIM, CORE, ROLE, LANGS,
-         overLimit,
+         LANGRULE,
+         overLimit, _rate, _models,
          SIGNS, ADAPT, PROVIDER,
          buildBody, buildHeaders, capOf, noCounter, MODEL, MAX_TOKENS,
-         CLAUDE_MODEL, ENGINES, engineOf, geminiBody, parseReply };
+         CLAUDE_MODEL, ENGINES, engineOf, geminiBody, parseReply,
+         ACTION_NAMES, readActions, toolsOf, validateAction, faceFor, FACES,
+         ACTION_LINE, actionLine,
+         rankModels, discoverModels, ask, handleAsk, MODES };

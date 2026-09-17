@@ -37,7 +37,7 @@
    הוא גם הרגע שבו `LEGAL.version` חייב לעלות —
    `node .claude/qa/tutor.js` נופל אם עשו את האחד בלי השני.
    --------------------------------------------------------------- */
-var API = "";
+var API = "https://tutor.lagstein1.workers.dev/";
 
 /* **יש מוח, ולכן יש כפתור.** עד 14.9 השאלה ״האם ג׳וש קיים״ הייתה
    ״האם יש כתובת שרת״. מאז יש שני מוחות אפשריים, והשאלה היא האם
@@ -80,6 +80,7 @@ he:{ btn:"ברק — עזרה מהמורה", title:"עזרה מהמורה", clos
   intro:"אפשר לשאול אותי על מה שעל המסך. אני נותן רמז אחד בכל פעם, ומחכה לתשובה.",
   nudge:{stuck:"שמתי לב שהשאלה הזאת תופסת זמן. רוצה שנפרק אותה יחד, צעד אחד בכל פעם?",frustrated:"אני רואה שזה לא הולך עכשיו, וזה בסדר גמור. בוא ננסה מכיוון אחר."}, greet:"היי, אני ברק. אני כאן אם משהו לא ברור. כתוב לי מה, ונעבור על זה יחד.", ph:"מה לא ברור?", hello:"אני צריך עזרה במה שעל המסך.", wait:"רגע, חושב…",
   err:"לא הצלחתי להתחבר. אפשר לנסות שוב עוד רגע.",
+  local:"התשובה מהמכשיר, לא מהשרת",
   setup:"העזרה עוד לא מוכנה. אפשר לנסות מאוחר יותר.",
   limit:"מספיק להיום — נמשיך מחר.",
   limitAll:"זה לא אתה — הגעתי לגבול היומי שלי. אפשר לנסות שוב מחר, וכל השאר באפליקציה עובד.",
@@ -94,6 +95,7 @@ ar:{ btn:"باراك — مساعدة من المعلّم", title:"مساعدة 
   intro:"يمكنك أن تسألني عمّا يظهر على الشاشة. أعطي تلميحًا واحدًا في كل مرة وأنتظر إجابتك.",
   nudge:{stuck:"لاحظت أن هذا السؤال يأخذ وقتًا. تريد أن نفكّكه معًا، خطوة واحدة في كل مرة؟",frustrated:"أرى أن الأمر لا يسير الآن، وهذا طبيعي تمامًا. لنجرّب من زاوية أخرى."}, greet:"مرحبًا، أنا باراك. أنا هنا إن كان شيء غير واضح. اكتب لي ما هو، ونمرّ عليه معًا.", ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
   err:"لم أتمكّن من الاتصال. حاول مرّة أخرى بعد قليل.",
+  local:"الجواب من الجهاز، لا من الخادم",
   setup:"المساعدة ليست جاهزة بعد. حاول لاحقًا.",
   limit:"يكفي لهذا اليوم — نُكمل غدًا.",
   limitAll:"ليست غلطتك — وصلتُ إلى حدّي اليوميّ. جرّب غدًا، وكلّ شيء آخر في التطبيق يعمل.",
@@ -108,6 +110,7 @@ ru:{ btn:"Барак — помощь учителя", title:"Помощь уч�
   intro:"Можешь спросить меня о том, что на экране. Я даю по одной подсказке и жду ответа.",
   nudge:{stuck:"Я заметил, что этот вопрос отнимает время. Разберём его вместе, по одному шагу?",frustrated:"Вижу, что сейчас не идёт, и это совершенно нормально. Попробуем с другой стороны."}, greet:"Привет, я Барак. Я рядом, если что-то непонятно. Напиши, что именно, и разберём вместе.", ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
   err:"Не удалось соединиться. Попробуй ещё раз через минуту.",
+  local:"Ответ с устройства, не с сервера",
   setup:"Помощь ещё не готова. Попробуй позже.",
   limit:"На сегодня хватит — продолжим завтра.",
   limitAll:"Это не ты — я достиг своего дневного предела. Попробуй завтра, остальное в приложении работает.",
@@ -122,6 +125,7 @@ en:{ btn:"Barak — ask the teacher", title:"Ask the teacher", close:"Close", se
   intro:"You can ask me about what is on the screen. I give one hint at a time, and wait for your answer.",
   nudge:{stuck:"I noticed this one is taking a while. Shall we break it down together, one step at a time?",frustrated:"I can see this is not working right now, and that is completely fine. Let us try another way."}, greet:"Hi, I am Barak. I am here if something is unclear. Write what it is, and we will go through it together.", ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
   err:"I could not connect. Try again in a moment.",
+  local:"Answered on the device, not by the server",
   setup:"The help is not ready yet. Try again later.",
   limit:"That is enough for today — we will carry on tomorrow.",
   limitAll:"It is not you — I have reached my daily limit. Try again tomorrow; everything else in the app still works.",
@@ -273,8 +277,8 @@ function ttsWatchdog(alive, onSilent){
    ו-"google" אינו מגדר אלא שם יצרן. הוא אינו ברשימה בכוונה —
    כשהוא נספר כנשי, ״Google עברית״, שהוא גברי בחלק מהמכשירים,
    נבחר דווקא כשמבקשים נשי. */
-var VOICE_F=/(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
-var VOICE_M=/(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
+var VOICE_F=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
+var VOICE_M=/(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
 /* **ברק: גברי גבוה, נשי נמוך — 15.9.2026.**
 
    **והשם `femScore` נשאר, וזה חוב מוצהר ולא נוחות.** הוא מחולץ
@@ -548,9 +552,31 @@ function speakSeg(text, code, r, alive, done){
 
 /* ================= הפאנל ================= */
 var CSS = ''
-+'#tu-ov{position:fixed;inset:0;background:rgba(20,30,35,.55);display:none;'
-+'place-items:center;z-index:9000;padding:16px}'
+/* ---- מנוע ברק, 16.9.2026: הפאנל אינו מסתיר את התרגיל ----
+
+   עד כאן הפאנל היה חלון במרכז המסך מעל רקע מוחשך — כלומר ברק
+   כיסה את השאלה, את האפשרויות ואת הכפתורים בדיוק ברגע שהלומד
+   ביקש עזרה עליהם, ופעולה כמו ״הדגש אפשרות״ הייתה קורית מאחורי
+   וילון. המנדט: ״ברק הוא עזר ולא המטרה. הוא לא מסתיר שאלה,
+   תשובות או כפתורים״.
+
+   **הבחירה השמרנית** (D-17, ממתין לאישור יהושע): אותה קופסה,
+   אותם צבעים, אותו דיוקן — רק המיקום. בטלפון: גיליון תחתון עד
+   46vh, בלי הכהיה, והמסך שמעליו חי ולחיץ; במסך רחב (≥ 900px):
+   עמודה בצד ההתחלה של הכתיבה, ברוחב 400px, לגובה המסך.
+   `#tu-min` מקפל את הגיליון לפס של שורת קלט אחת. הלחיצה מחוץ
+   לקופסה כבר אינה סוגרת — יש X ויש Escape. */
++'#tu-ov{position:fixed;inset:0;background:transparent;display:none;'
++'place-items:end center;z-index:9000;padding:0;pointer-events:none}'
 +'#tu-ov.on{display:grid}'
++'#tu-ov.on>#tu-bx{pointer-events:auto}'
++'#tu-ov.tu-min #tu-log,#tu-ov.tu-min #tu-pv,#tu-ov.tu-min #tu-q{display:none}'
++'#tu-ov.tu-min #tu-bx{max-height:none}'
++'#tu-min{background:transparent;border:1px solid rgba(23,51,60,.25);border-radius:9px;'
++'padding:5px 10px;font:inherit;cursor:pointer;color:#17333c}'
++'@media(min-width:900px){#tu-ov{place-items:stretch start;padding:0}'
++'#tu-bx{max-width:400px;max-height:none;border-radius:0;height:100%;'
++'box-shadow:8px 0 30px rgba(0,0,0,.18)}}'
 /* טיפוגרפיה לדיסלקציה, בהוראת הבעלים 14.9.2026.
 
    הקהל כאן הוא ילדים שמפענחים כל שורה פעמיים, ולכן ארבעת
@@ -567,8 +593,8 @@ var CSS = ''
                      מהקוראים
 
    **ואין נטוי בשום מקום בפאנל** — ראו הכלל מתחת ל-`.tu-m em`. */
-+'#tu-bx{background:#fff;color:#17333c;border-radius:20px;width:100%;max-width:540px;'
-+'max-height:88vh;display:flex;flex-direction:column;overflow:hidden;'
++'#tu-bx{background:#fff;color:#17333c;border-radius:20px 20px 0 0;width:100%;max-width:540px;'
++'max-height:46vh;display:flex;flex-direction:column;overflow:hidden;'
 +'box-shadow:0 18px 50px rgba(0,0,0,.3);font-size:19px;line-height:1.75;'
 +'letter-spacing:.01em;word-spacing:.05em}'
 /* נטוי הוא הצורה שהכי קשה לפענח בדיסלקציה: האותיות נשענות זו על
@@ -604,6 +630,7 @@ var CSS = ''
 +'.tu-m{max-width:88%;border-radius:15px;padding:10px 14px;white-space:pre-wrap;word-break:break-word}'
 +'.tu-me{align-self:flex-end;background:#dff1fa;border:2px solid rgba(88,183,224,.45)}'
 +'.tu-bot{align-self:flex-start;background:#d9f2ec;border:2px solid rgba(14,156,141,.4)}'
++'.tu-src{align-self:flex-start;font-size:.78em;color:#5b6770;margin:-4px 8px 0}'
 +'.tu-m p{margin:0 0 .45em}.tu-m p:last-child{margin-bottom:0}'
 +'.tu-l{margin:.2em 0 .45em;padding-inline-start:1.25em}.tu-l li{margin:.15em 0}'
 +'.tu-m>*:last-child{margin-bottom:0}'
@@ -661,9 +688,10 @@ function build(){
   document.head.appendChild(st);
   var ov = document.createElement("div"); ov.id = "tu-ov";
   ov.innerHTML =
-    '<div id="tu-bx" role="dialog" aria-modal="true" aria-labelledby="tu-ti">'
+    '<div id="tu-bx" role="dialog" aria-modal="false" aria-labelledby="tu-ti">'
     + '<div id="tu-hd"><span id="tu-face"></span><b id="tu-ti"></b><span id="tu-q" hidden></span>'
     + '<select id="tu-lg" hidden></select>'
+    + '<button id="tu-min" type="button" aria-expanded="true"></button>'
     + '<button id="tu-x" type="button"></button></div>'
     + '<div id="tu-log" aria-live="polite"></div>'
     + '<div id="tu-ft"><div id="tu-row">'
@@ -709,15 +737,20 @@ function build(){
     go: ov.querySelector("#tu-go"), pv: ov.querySelector("#tu-pv")
   };
   EL.x.onclick = close;
+  EL.min = ov.querySelector("#tu-min");
+  EL.min.onclick = function(){
+    var on = ov.classList.toggle("tu-min");
+    EL.min.setAttribute("aria-expanded", on ? "false" : "true");
+    draw();
+  };
   EL.lg.onchange = function(){
     setLang(this.value);
     /* שפה חדשה — שיחה חדשה, אחרת הבוט ממשיך בשפה הקודמת */
     MSGS = []; NOTE = ""; LANGAT = lang();
-    stopSay(); draw(); send(T().hello, true);
+    stopSay(); draw(); greetLocal();   /* ברכה מקומית — ראו open() */
   };
   EL.go.onclick = function(){ send(EL.inp.value) };
   wireMic(ov);
-  ov.addEventListener("click", function(e){ if(e.target === ov) close() });
   EL.inp.addEventListener("keydown", function(e){
     if(e.key === "Enter"){ e.preventDefault(); e.stopPropagation(); send(EL.inp.value) }
   });
@@ -751,6 +784,7 @@ function draw(){
   e.bx.setAttribute("dir", d);
   e.ti.textContent = t.title;
   e.x.textContent = t.close;
+  if(e.min) e.min.textContent = e.ov.classList.contains("tu-min") ? "▴" : "▾";
   e.go.textContent = t.send;
   e.inp.placeholder = t.ph;
   e.inp.setAttribute("aria-label", t.ph);
@@ -782,6 +816,7 @@ function draw(){
     }
     var sp = splitSugg(i === REV ? m.text.slice(0, REVN) : m.text);
     h += '<div class="tu-m tu-bot">' + fmt(sp.body) + '</div>';
+    if(m.local) h += '<div class="tu-src">' + esc(t.local) + ' · ' + esc(m.local) + '</div>';
     h += ctl(i);
     /* ההצעות מופיעות רק כשהתשובה כולה על המסך, ורק על האחרונה —
        שרשרת של הצעות ישנות היא רעש, ולחיצה עליהן שולחת שאלה
@@ -836,8 +871,41 @@ function ctl(i){
   /* ההודעה מופיעה **אחרי** אמירה שנפלה לאחור ולא לפניה: לפני
      ההקראה הראשונה אין לדעת איזה קול המכשיר ייתן לשפה הזאת. */
   if(_femFallback && i === MSGS.length - 1)
-    h += '<span class="tu-sys tu-man">' + esc(t.manNote) + '</span>';
+    h += '<span class="tu-sys tu-man">' + esc(t.manNote) + ' ' + esc(voiceHow()) + '</span>';
   return h + '</div>';
+}
+
+/* **איך משיגים קול גברי — 17.9.2026.**
+   `manNote` אמרה עד כה ״אין קול גברי, לכן הגובה הונמך״ ולא אמרה
+   מה לעשות. הבעלים דיווח מהטלפון ״הקול של ברק לא של גבר״, ובורר
+   הקול (`#tu-vc`) **מוסתר כשיש קול אחד בשפה** — כלומר מי שיש לו
+   קול עברי יחיד ונשי נשאר בלי בורר, בלי הסבר מעשי, ובלי דרך.
+
+   הנוסח מועתק מ-`reader`, ששם הוא כבר מדויק עד רמת סמסונג
+   (באנדרואיד של גוגל ההגדרה תחת ״נגישות״, בסמסונג תחת ״ניהול
+   כללי״), והופך מ״קול נשי״ ל״קול גברי״. */
+function voiceHow(){
+  var ua = navigator.userAgent || "", L = lang();
+  var A = { he:"באנדרואיד: הגדרות ← נגישות ← טקסט לדיבור (בסמסונג: הגדרות ← ניהול כללי ← טקסט לדיבור) ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט גברי.",
+            ar:"في أندرويد: الإعدادات ← إمكانية الوصول ← النص إلى كلام (في سامسونج: الإعدادات ← الإدارة العامة ← النص إلى كلام) ← الترس بجانب المحرّك ← تثبيت بيانات الصوت ← اختيار نسخة رجاليّة.",
+            ru:"На Android: Настройки ← Специальные возможности ← Синтез речи (в Samsung: Настройки ← Общие настройки ← Синтез речи) ← шестерёнка рядом с движком ← Установка голосовых данных ← выбрать мужской вариант.",
+            en:"On Android: Settings → Accessibility → Text-to-speech (on Samsung: Settings → General management → Text-to-speech) → the gear next to the engine → Install voice data → pick a male variant." };
+  var I = { he:"באייפון או באייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול גברי ולהוריד.",
+            ar:"في آيفون أو آيباد: الإعدادات ← إمكانية الوصول ← المحتوى المنطوق ← الأصوات ← اختيار صوت رجاليّ وتنزيله.",
+            ru:"На iPhone или iPad: Настройки ← Универсальный доступ ← Устный контент ← Голоса ← выбрать мужской голос и загрузить.",
+            en:"On iPhone or iPad: Settings → Accessibility → Spoken Content → Voices → pick a male voice and download it." };
+  var M = { he:"במק: הגדרות המערכת ← נגישות ← תוכן מדובר ← קול המערכת ← ניהול קולות ← להוריד קול גברי בעברית.",
+            ar:"في ماك: إعدادات النظام ← إمكانية الوصول ← المحتوى المنطوق ← صوت النظام ← إدارة الأصوات ← تنزيل صوت رجاليّ.",
+            ru:"На Mac: Системные настройки ← Универсальный доступ ← Устный контент ← Системный голос ← Управление голосами ← загрузить мужской голос.",
+            en:"On Mac: System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → download a male voice." };
+  var W = { he:"בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.",
+            ar:"في ويندوز: الإعدادات ← الوقت واللغة ← الكلام ← إدارة الأصوات ← إضافة أصوات.",
+            ru:"В Windows: Параметры ← Время и язык ← Речь ← Управление голосами ← Добавить голоса.",
+            en:"On Windows: Settings → Time & language → Speech → Manage voices → Add voices." };
+  var tbl = /Android/i.test(ua) ? A
+          : (/iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1)) ? I
+          : /Mac OS X|Macintosh/i.test(ua) ? M : W;
+  return tbl[L] || tbl.he;
 }
 
 /* ================= לדבר במקום להקליד =================
@@ -949,8 +1017,12 @@ function open(auto){
   draw();
   /* פתיחה אוטומטית אינה גונבת מיקוד. הפאנל הוא דיאלוג, ומיקוד
      שקופץ אליו בלי שהלומד ביקש מקפיץ גם קורא מסך באמצע משפט. */
-  if(!MSGS.length){ if(auto) greetLocal(); else send(T().hello, true) }
-  else if(!auto) focus();
+  /* **הברכה תמיד מקומית — 16.9.2026.** פתיחה ידנית שלחה ״אני צריך
+     עזרה במה שעל המסך״ לשרת, כלומר כל פתיחת פאנל עלתה בקשה אחת
+     מתוך 10 ליום ל-IP (`perDay` ב-worker.js) — לפני שהלומד כתב
+     מילה. הברכה היא טקסט קבוע, ואין סיבה לשלם עליה. */
+  if(!MSGS.length) greetLocal();
+  if(!auto) focus();
 }
 function close(){
   micStop();
@@ -1084,16 +1156,25 @@ function sign(){
   }catch(e){ return null }
 }
 
-/* המוח המקומי — התשובה כשאין שרת.
+/* המוח המקומי — התשובה כשאין שרת, אין רשת, או שהמכסה נגמרה.
 
-   הכרעת הבעלים 14.9.2026: ג׳וש לא יוציא כסף. `API` ריקה, וכל
-   תשובה נבנית ב-`tutor/josh-local.js` בלי בקשה יוצאת אחת.
+   הכרעת הבעלים 14.9.2026 הייתה ״ג׳וש לא יוציא כסף״ ו-`API` ריקה;
+   ב-15.9 השרת עבר ל-Gemini בשכבה החינמית, וב-16.9 הבעלים הורה
+   לחבר: ``API`` מלאה, והקובץ הזה הוא **הנפילה לאחור** — ראו
+   `send()`.
 
    **המונה היומי אינו נספר כאן במתכוון.** `bump()` קיים כדי להגן
    על תקציב, ומוח מקומי אינו עולה דבר — לומד שמדבר עם ג׳וש חמישים
    פעם ביום אינו עולה יותר מלומד שמדבר איתו פעם אחת. תקרה כאן
    הייתה מגבילה בלי שום דבר להגן עליו. */
-function replyLocal(text){
+/* `why` — למה לא השרת: "offline", "quota" (המונה במכשיר), או
+   הסיבה מה-`catch` (limit / limitAll / setup / http / err / empty).
+   **כשיש כתובת שרת, התשובה המקומית מסומנת ללומד** בשורה קטנה
+   ואפורה, ״התשובה מהמכשיר, לא מהשרת״ + הסיבה. זו אינה שגיאה —
+   התשובה כן הגיעה — אלא יושר: הבעלים בדק מ-`localhost` ב-16.9.2026,
+   קיבל ״אני מוח קטן… בלי חיבור לאינטרנט״ בכל אפליקציה, ולא הייתה
+   דרך לדעת מהמסך אם השרת נפל, נחסם, או שהמכסה (10 ליום ל-IP) נגמרה. */
+function replyLocal(text, why){
   if(typeof JOSHLOCAL === "undefined") return false;
   var out;
   try{
@@ -1105,21 +1186,71 @@ function replyLocal(text){
   }catch(e){ return false }
   if(!out || !out.text) return false;
 
-  MSGS.push({ role:"assistant", text:out.text });
+  MSGS.push({ role:"assistant", text:out.text, local: API ? (why || "local") : "" });
   startReveal(MSGS.length - 1);
   BUSY = false; draw(); focus();
   return true;
 }
 
+/* ---- מנוע ברק, 16.9.2026 ----------------------------------------
+   כשהדף טען את `/tutor/barak-core.js` והאפליקציה רשמה מתאם, הקריאה
+   לשרת עוברת דרכו: הוא אוסף את ההקשר המלא של המסך (שאלה, אפשרויות,
+   תשובה נכונה, מה התלמיד ענה, נושא, תוכנית), שולח את רשימת הפעולות
+   שהאפליקציה מציעה, **מבצע** את הפעולה שהמודל בחר, ונופל למוח
+   המקומי בכל כישלון — בלי שגיאה ללומד. הפאנל הזה נשאר הפאנל:
+   ההודעות, החשיפה ההדרגתית, ההקראה והפנים כולם כאן.
+
+   `sendLegacy` הוא הנתיב הישן, לדף שלא טען את המנוע. */
 function send(text, auto){
+  if(typeof BARAK === "undefined" || !BARAK.ready()) return sendLegacy(text, auto);
+  var t = T();
+  text = String(text || "").trim().slice(0, MAXLEN);
+  if(!text || BUSY) return;
+  if(MSGS.length >= TURNS){ NOTE = t.full; draw(); return }
+  stopReveal();
+  MSGS.push({ role:"user", text:text });
+  if(EL) EL.inp.value = "";
+  BUSY = true; NOTE = ""; draw();
+  /* `online` שלילי — לא מנסים את השרת: אין רשת, או שהמונה במכשיר
+     נגמר. המונה עולה רק כשהשרת מנוסה. */
+  var tryServer = !!API && navigator.onLine !== false && left() > 0;
+  if(tryServer) bump();
+  var hist = (MSGS.length && MSGS[0].role === "assistant") ? MSGS.slice(1, -1) : MSGS.slice(0, -1);
+  BARAK.ask(text, {
+    api: API, lang: lang(), target: CFG.target || null,
+    sign: sign(),
+    q: CFG.q ? CFG.q() : null,
+    history: hist, mode: "chat",
+    online: tryServer,
+    why: !API ? "" : navigator.onLine === false ? "offline" : "quota"
+  }).then(function(res){
+    BUSY = false;
+    if(!res || !res.say){ NOTE = t.err; if(auto) MSGS = []; draw(); return }
+    /* תשובה מקומית מסומנת ללומד — ראו replyLocal. */
+    MSGS.push({ role:"assistant", text:res.say, local: (API && res.source !== "ai") ? (res.why || "local") : "" });
+    startReveal(MSGS.length - 1);
+    draw(); focus();
+  }, function(){
+    BUSY = false;
+    if(!replyLocal(text, "network")){ NOTE = t.err; draw() }
+  });
+}
+
+function sendLegacy(text, auto){
   var t = T();
   text = String(text || "").trim().slice(0, MAXLEN);
   if(!text || BUSY) return;
   if(MSGS.length >= TURNS){ NOTE = t.full; draw(); return }
 
-  /* אין שרת — עונים מקומית. זה הנתיב הרגיל מ-14.9.2026, ולא
-     נפילה־אחורה: `API` ריקה בכוונה. */
-  if(!API){
+  /* **שני מוחות, סדר אחד — 16.9.2026, בהוראת הבעלים.** יש רשת
+     ויש מכסה — השאלה הולכת ל-`API` (Gemini Flash בשכבה החינמית,
+     דרך ה-Worker). אין שרת, אין רשת, או שהמכסה היומית של המכשיר
+     נגמרה — עונים מ-`josh-local.js`, **בלי שגיאה ללומד**. זה
+     התנאי השלישי בסעיף 1 של `CLAUDE.md`: ״חריגה מהמכסה נופלת
+     בחזרה למוח המקומי, בלי שגיאה ללומד״. `navigator.onLine`
+     אינו אמין לחיוב (״מחובר״ לרשת בלי אינטרנט), ולכן הוא רק
+     מקצר כשהוא **שלילי**; כל כישלון אחר נתפס ב-`catch` למטה. */
+  if(!API || navigator.onLine === false || left() <= 0){
     stopReveal();
     MSGS.push({ role:"user", text:text });
     if(EL) EL.inp.value = "";
@@ -1127,11 +1258,10 @@ function send(text, auto){
     /* השהיה קצרה כדי שהפאנל יספיק לצייר את תור הלומד לפני
        התשובה. בלעדיה שתי השורות מופיעות יחד וזה נראה כמו טופס. */
     BUSY = true; draw();
-    setTimeout(function(){ if(!replyLocal(text)){ BUSY = false; NOTE = t.err; draw() } }, 420);
+    var why = !API ? "" : navigator.onLine === false ? "offline" : "quota";
+    setTimeout(function(){ if(!replyLocal(text, why)){ BUSY = false; NOTE = t.err; draw() } }, 420);
     return;
   }
-
-  if(left() <= 0){ NOTE = t.limit; draw(); return }
 
   stopReveal();
   MSGS.push({ role:"user", text:text });
@@ -1202,10 +1332,23 @@ function send(text, auto){
   })
   .catch(function(err){
     BUSY = false;
+    var why = String(err && err.message);
+    /* **הנפילה למוח המקומי.** רשת שנפלה, 429 של הלומד או של
+       השירות, 500/503 של הקמה, 502 מהספק, גוף ריק — לכולם אותה
+       תשובה: עונים מהמכשיר, והלומד אינו רואה שגיאה. הסיבה נשארת
+       בקונסולה (נכתבה למעלה, לפי הסטטוס) למי שמקים את השירות.
+       ״מספיק להיום״ ו״לא הצלחתי להתחבר״ מוצגים רק כשגם המוח
+       המקומי אינו קיים — כלומר בדף שלא טען את `josh-local.js`. */
+    /* שגיאת רשת של הדפדפן נושאת הודעה חופשית (״Failed to fetch״);
+       ללומד מציגים מילה אחת קבועה. */
+    if(!/^(limit|limitAll|setup|http|empty)$/.test(why)) why = "network";
+    /* שגיאת רשת של הדפדפן נושאת הודעה חופשית (״Failed to fetch״);
+       ללומד מציגים מילה אחת קבועה. */
+    if(!/^(limit|limitAll|setup|http|empty)$/.test(why)) why = "network";
+    if(replyLocal(text, why)){ NOTE = ""; draw(); return }
     /* ההודעה הפותחת נכשלה — מסירים אותה, אחרת השיחה מתחילה
        מתור של הילד שהוא בעצם שלנו */
     if(auto) MSGS = [];
-    var why = String(err && err.message);
     NOTE = why === "limitAll" ? t.limitAll :
            why === "limit" ? t.limit : why === "setup" ? t.setup : t.err;
     draw();
@@ -1238,6 +1381,13 @@ g.TUTOR = {
   close: close,
   /* לבדיקות בלבד — אינם נקראים מהאפליקציות */
   _state: function(){ return { api:API, msgs:MSGS, playing:PLAYING, lang:lang(), dir:DIR[lang()] } },
+  /* **מאפס את השיחה, ורק לבדיקות.** `barak-browser.js` מריץ שבעה
+     תרחישים על אותה שאלה, וכל אחד מוסיף שני תורים — כלומר התרחיש
+     השביעי נבלם ב-`TURNS` ולא רץ כלל, והבדיקה נראתה עוברת בשישה
+     ונפלה בשביעי על הודעת ״דיברנו על זה הרבה״. זה קרה על הרנר
+     ולא מקומית, מפני שהסף נחצה בדיוק שם (ריצה 617, `english`).
+     לומד אינו קורא לזה: `TURNS` הוא בלם אמיתי ונשאר כפי שהוא. */
+  _clear: function(){ stopReveal(); MSGS = []; NOTE = ""; if(EL) draw(); return true },
   /* בחירת הקול חשופה כדי שאפשר יהיה לבדוק אותה מול רשימת קולות
      מזויפת. בלי זה הכלל ״voiceUsable ראשון, המגדר אחריו״ אינו
      ניתן לבדיקה בלי דפדפן עם קולות מותקנים — ואין כזה כאן. */

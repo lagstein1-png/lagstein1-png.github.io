@@ -28,6 +28,14 @@
   "use strict";
 
   var LANG = "he-IL";
+
+  /* מנוע ההגייה העברי — /tutor/he-speech.js, 17.9.2026.
+     **עברית בלבד.** כאן אין `onboundary` ואין `charIndex` — ההדגשה
+     היא פר-פריט בתור — ולכן החלפת טקסט אינה נוגעת בה כלל. */
+  function heSpoken(t){
+    if(LANG.slice(0,2)!=="he"||typeof HESPEECH==="undefined")return t;
+    try{ return HESPEECH.spoken(t) }catch(e){ return t }
+  }
   /* הקצב והגובה שנשלחים למנוע — 0.95 ו-1.12, הפריסט ״נשי רגוע״ של
      math-app, שהבעלים שמע ב-13.9.2026 ואמר עליו ״נעים ומדויק, להכניס
      לכל האפליקציות״. עד אז "רגיל" כאן היה 0.82 בגובה 1, כמו
@@ -94,8 +102,8 @@
   }
   /* מגדר הקול, לפי השם — אותם שני ביטויים שבאחת־עשרה האפליקציות
      האחרות (english/index.html, V_F ו-V_M). ״?״ = לא זוהה. */
-  var VOICE_F = /(female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
-  var VOICE_M = /(\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
+  var VOICE_F = /(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
+  var VOICE_M = /(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
   function vGender(v) {
     var n = ((v.name || "") + " " + (v.lang || "")).toLowerCase();
     return VOICE_F.test(n) ? "f" : VOICE_M.test(n) ? "m" : "?";
@@ -293,7 +301,7 @@
     text = String(text || "").trim();
     if (!text || !supported() || api.speaking) return;
     try { if (speechSynthesis.speaking || speechSynthesis.pending) return; } catch (e) {}
-    var v = bestVoice(), u = new SpeechSynthesisUtterance(text);
+    var v = bestVoice(), u = new SpeechSynthesisUtterance(heSpoken(text));
     if (v) u.voice = v;
     u.lang = v ? normLang(v.lang) : LANG;
     u.rate = Math.max(0.5, Math.min(2, RATE_BASE * api.rate));
@@ -306,7 +314,7 @@
     if (qi >= queue.length) { stop(); return; }
     var item = queue[qi++];
     mark(item);
-    var u = new SpeechSynthesisUtterance(item.text);
+    var u = new SpeechSynthesisUtterance(heSpoken(item.text));
     var v = bestVoice();
     if (v) u.voice = v;
     /* מנורמל: "he_IL" ו-"iw-IL" אינם תגיות BCP47 חוקיות, ויש מנועים
