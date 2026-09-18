@@ -34,8 +34,15 @@
    של התסריט כפי שהיה בהקלטה. שינוי בתסריט בלי הקלטה מחדש =
    כישלון, בדיוק כמו `fresh.js` על דוחות התוכן.
 
+   ועם `--flow teacher` — תסריט 3 של `video-scripts.md` (מצב מורה),
+   שאף DEMO_SCRIPT אינו מכסה: המקליט עצמו לוחץ על המסלול האמיתי
+   ב-math-teen — הגדרות, קוד מורה, בונה המבחן, התלמיד פותר, הקוד
+   נקלט במסך הציונים — והכתוביות הן שורות הטבלה של התסריט,
+   מ-`video-scripts.md`, אותן שורות שמהן נוצר `srt/script-3.srt`.
+
    הרצה:
      node marketing/media/record.js              כל האפליקציות
+     node marketing/media/record.js --flow teacher  תסריט 3 — מצב מורה
      node marketing/media/record.js reader ulpan  אפליקציות נבחרות
      node marketing/media/record.js --shots       צילומי מסך בארבע שפות
      node marketing/media/record.js --check       חתימות מול התסריטים, וקיום הצילומים
@@ -125,6 +132,13 @@ function check() {
     else shots++;
   }
   console.log(`✓ ${shots} צילומי מסך, ${want.length} דפים × ${LANGS.length} שפות`);
+  for (const name of Object.keys(FLOWS)) {
+    const have = (man.flows || {})[name], f = FLOWS[name];
+    if (!have) { console.log(`✗ תסריט ${f.script} (${name}): אין הקלטה — הרץ node marketing/media/record.js --flow ${name}`); bad++; continue; }
+    if (have.sig !== flowSig(f)) { console.log(`✗ תסריט ${f.script} (${name}): הטבלה או המסלול השתנו — הסרטון מיושן`); bad++; continue; }
+    if (!fs.existsSync(path.join(ROOT, have.file || ''))) { console.log(`✗ תסריט ${f.script}: הקובץ חסר — ${have.file}`); bad++; continue; }
+    console.log(`✓ תסריט ${f.script} (${name}) — ${have.seconds}s, ${have.steps} שורות, ${f.app}`);
+  }
   console.log(`\n${demoApps().length} אפליקציות עם הדגמה, ${bad} ממצאים`);
   process.exit(bad ? 1 : 0);
 }
@@ -302,6 +316,191 @@ async function record(browser, app, ffmpeg, legalVer) {
     recorded: new Date().toISOString().slice(0, 10) };
 }
 
+/* ---- תסריטים ידניים — מה שאין ב-DEMO_SCRIPT ------------------------- */
+/* שורות הטבלה של תסריט N ב-video-scripts.md, כמו make-srt.js קורא אותן */
+function scriptRows(n) {
+  const doc = fs.readFileSync(path.join(ROOT, 'marketing', 'video-scripts.md'), 'utf8');
+  const m = doc.match(new RegExp('^## תסריט ' + n + '[^\\n]*$([\\s\\S]*?)(?=^## |(?![\\s\\S]))', 'm'));
+  if (!m) return [];
+  return [...m[1].matchAll(/^\| *(\d+)[–-](\d+) *\|([^|]*)\|([^|]*)\|/gm)]
+    .map(r => ({ a: +r[1], b: +r[2], seen: r[3].trim(), text: r[4].trim() }));
+}
+const SUB_CSS = 'position:fixed;z-index:2147481000;inset-inline:0;bottom:0;display:flex;justify-content:center;' +
+  'padding:0 10px 12px;pointer-events:none';
+async function sub(page, text, i, n) {
+  await page.evaluate(([text, i, n, css]) => {
+    let bar = document.getElementById('rec-sub');
+    if (!bar) {
+      bar = document.createElement('div'); bar.id = 'rec-sub'; bar.setAttribute('dir', 'rtl'); bar.style.cssText = css;
+      bar.innerHTML = '<div style="max-width:46rem;width:100%;background:rgba(9,13,22,.93);color:#f4f7ff;border-radius:14px;' +
+        'box-shadow:0 8px 30px rgba(0,0,0,.35);font:600 clamp(1rem,2.6vw,1.22rem)/1.45 system-ui,sans-serif;overflow:hidden">' +
+        '<p id="rec-txt" style="margin:0;padding:14px 18px 10px;text-align:center"></p>' +
+        '<div id="rec-step" style="padding:0 18px 8px;font-size:.78rem;opacity:.7;text-align:left;direction:ltr"></div>' +
+        '<div style="height:3px;background:rgba(255,255,255,.12)"><i id="rec-fill" style="display:block;height:100%;width:0;background:#ffd23f"></i></div></div>';
+      document.body.appendChild(bar);
+    }
+    document.getElementById('rec-txt').textContent = text;
+    document.getElementById('rec-step').textContent = i + ' / ' + n;
+    const f = document.getElementById('rec-fill'); f.style.transition = 'none'; f.style.width = '0'; void f.offsetWidth;
+  }, [text, i, n, SUB_CSS]);
+}
+async function fill(page, sel, text) { await page.click(sel); await page.type(sel, text, { delay: 90 }); }
+async function tap(page, sel) {
+  const e = page.locator(sel).first();
+  await e.waitFor({ timeout: 8000 });
+  await e.scrollIntoViewIfNeeded().catch(() => {});
+  await e.evaluate(el => { el.style.outline = '3px solid #ffd23f'; el.style.outlineOffset = '3px'; });
+  await page.waitForTimeout(450);
+  await e.click();
+  await page.waitForTimeout(250);
+}
+
+const FLOWS = {
+  /* תסריט 3 — מצב מורה, ב-math-teen (שבוע 3 בלוח: קבוצת מורי מתמטיקה) */
+  teacher: { app: 'math-teen', script: 3, file: 'teacher-math-teen', steps: [
+    async (page) => {                               /* בכל אפליקציה יש מצב מורה */
+      /* פתיחה ראשונה = שלושה מסכי היכרות, כמו אצל הלומד */
+      for (let k = 0; k < 3 && await page.locator('[data-a="obnext"]').count(); k++) await tap(page, '[data-a="obnext"]');
+      await tap(page, '[data-a="go"][data-v="settings"]');
+      await page.locator('[data-a="teask"]').first().scrollIntoViewIfNeeded();
+    },
+    async (page) => {                               /* מאחורי קוד */
+      await tap(page, '[data-a="teask"]');
+      await fill(page, '#te-pin', '2468');
+      await fill(page, '#te-pin2', '2468');
+      await tap(page, '#te-ok');
+      await page.waitForTimeout(600);
+      await tap(page, '[data-a="go"][data-v="marks"]');
+      await tap(page, '[data-a="go"][data-v="exam"]');
+    },
+    async (page) => {                               /* בונים מבחן */
+      const tops = page.locator('[data-a="extopic"]');
+      await tap(page, '[data-a="extopic"] >> nth=0');
+      if (await tops.count() > 1) await tap(page, '[data-a="extopic"] >> nth=1');
+      await tap(page, '[data-a="exlvl"][data-l="2"]');
+      /* הכותרת אחרונה: כל לחיצה מציירת את המסך מחדש מתוך EB, והשדה
+         נקרא רק בבנייה — כותרת שהוקלדה לפני הנושאים נמחקה. */
+      await fill(page, '#exTitle', 'מבחן אלגברה — ט׳2');
+      await tap(page, '[data-a="exbuild"]');
+      await page.waitForSelector('[data-a="excopy"]', { timeout: 8000 });
+      await page.locator('[data-a="excopy"]').scrollIntoViewIfNeeded();
+    },
+    async (page, st) => {                           /* התלמיד פותר במכשיר */
+      st.url = await page.getAttribute('[data-a="excopy"]', 'data-v');
+      await page.goto(st.url, { waitUntil: 'load' });
+      await sub(page, st.text, st.i, st.n);
+      await fill(page, '#sitName', 'נועה לוי');
+      await tap(page, '[data-a="sitstart"]');
+      /* שתי נכונות ואחת שגויה — ציון שנראה כמו של תלמיד, לא 0 ולא 100 */
+      for (let k = 0; k < 3; k++) {
+        const okIdx = await page.evaluate(() => { const q = SIT.qs[SIT.i]; return q ? q.options.findIndex(o => o.ok) : 0; });
+        const pick = k < 2 ? okIdx : (okIdx + 1) % 4;
+        await tap(page, '[data-a="sitans"] >> nth=' + Math.max(0, pick));
+        if (await page.locator('[data-a="sitfwd"]').count()) await tap(page, '[data-a="sitfwd"]');
+      }
+      if (await page.locator('[data-a="sitfinish"]').count()) await tap(page, '[data-a="sitfinish"]');
+      else await page.evaluate(() => sitFinish());
+      await page.waitForTimeout(400);
+      st.code = await page.evaluate(() => SIT.code);
+    },
+    async (page, st) => {                           /* והציונים נאספים כאן */
+      await page.goto(`${BASE}/${st.app}/`, { waitUntil: 'load' });
+      await sub(page, st.text, st.i, st.n);
+      await tap(page, '[data-a="go"][data-v="marks"]');
+      await tap(page, '[data-a="mkopen"]');
+      await page.fill('#mkPaste', st.code);
+      await page.waitForTimeout(500);
+      await tap(page, '[data-a="mkadd"]');
+      await page.waitForTimeout(500);
+    },
+    async (page, st) => {                           /* בדפדפן, בלי התקנה */
+      await page.goto(`${BASE}/`, { waitUntil: 'load' });
+      await sub(page, st.text, st.i, st.n);
+    },
+    async () => {}                                  /* הכתובת — כרטיס הסיום */
+  ] }
+};
+const flowSig = f => sha(scriptRows(f.script).map(r => `${r.a}-${r.b}|${r.text}`).join('\n') + f.steps.map(String).join('\n'));
+
+async function recordFlow(browser, name, ffmpeg, legalVer) {
+  const f = FLOWS[name];
+  const rows = scriptRows(f.script);
+  if (!rows.length) throw new Error('אין טבלה לתסריט ' + f.script + ' ב-video-scripts.md');
+  const tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'flow-'));
+  const ctx = await browser.newContext({
+    viewport: VIEW, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'he-IL',
+    userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    recordVideo: { dir: tmp, size: SIZE },
+  });
+  const page = await ctx.newPage();
+  await page.addInitScript(FAKE_TTS);
+  await page.addInitScript((ver) => {
+    try { localStorage.setItem('legal-accepted-v' + ver,
+      JSON.stringify({ v: ver, at: new Date().toISOString(), lang: 'he' })); } catch (e) {}
+  }, legalVer);
+  await page.route('**', r => r.request().url().startsWith(BASE) ? r.continue() : r.abort());
+  const t0 = Date.now();
+  await page.goto(`${BASE}/${f.app}/`, { waitUntil: 'load' });
+  await page.waitForTimeout(800);
+  const tStart = Date.now() - t0;
+  const st = { app: f.app, n: rows.length };
+  const late = [];
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    st.i = i + 1; st.text = r.text;
+    await sub(page, r.text, i + 1, rows.length);
+    await page.evaluate(ms => { const el = document.getElementById('rec-fill'); if (el) { el.style.transition = 'width ' + ms + 'ms linear'; el.style.width = '100%'; } }, (r.b - r.a) * 1000);
+    const stepStart = Date.now();
+    if (i === rows.length - 1) break;              /* השורה האחרונה היא כרטיס הסיום */
+    try { await f.steps[i](page, st); }
+    catch (e) {
+      const shot = path.join(require('os').tmpdir(), `flow-${name}-step${i + 1}.png`);
+      await page.screenshot({ path: shot }).catch(() => {});
+      await ctx.close().catch(() => {});
+      throw new Error(`צעד ${i + 1} (${r.text}): ${e.message.split('\n')[0]} — צילום ב-${shot}`);
+    }
+    const took = (Date.now() - stepStart) / 1000;
+    if (took > r.b - r.a) late.push(`${i + 1}: ${took.toFixed(1)}s > ${r.b - r.a}s`);
+    const until = tStart + r.b * 1000 - (Date.now() - t0);
+    if (until > 0) await page.waitForTimeout(until);
+  }
+  await page.evaluate(() => {
+    const d = document.createElement('div'); d.setAttribute('dir', 'rtl');
+    d.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;align-items:center;' +
+      'justify-content:center;gap:18px;background:#0b1220;color:#f4f7ff;font:700 30px/1.35 system-ui,sans-serif;text-align:center;padding:40px';
+    d.innerHTML = '<div style="font-size:26px;opacity:.85">חינם · בלי הרשמה · בלי פרסומות</div>' +
+      '<div style="font-size:34px;direction:ltr;color:#ffd23f">lagstein1-png.github.io</div>' +
+      '<div style="font-size:22px;opacity:.75">מצב מורה בתשע אפליקציות · בלי חשבון לתלמיד</div>';
+    document.body.appendChild(d);
+  });
+  await page.waitForTimeout(3200);
+  const tEnd = Date.now() - t0;
+  const video = page.video();
+  await ctx.close();
+  const webm = await video.path();
+  fs.mkdirSync(VID, { recursive: true });
+  fs.copyFileSync(path.join(ROOT, 'marketing', 'srt', `script-${f.script}.srt`), path.join(VID, f.file + '.srt'));
+  let out = path.join(VID, f.file + '.webm'), stretch = null;
+  if (ffmpeg) {
+    out = path.join(VID, f.file + '.mp4');
+    const probe = spawnSync(ffmpeg, ['-hide_banner', '-i', webm], { encoding: 'utf8' });
+    const dm = (probe.stderr || '').match(/Duration: (\d+):(\d+):(\d+\.\d+)/);
+    const webmSec = dm ? (+dm[1]) * 3600 + (+dm[2]) * 60 + (+dm[3]) : 0;
+    const wall = tEnd / 1000;
+    const k = webmSec > 0 && wall > 0 ? Math.min(1.3, Math.max(0.8, wall / webmSec)) : 1;
+    stretch = webmSec && wall ? +(webmSec / wall).toFixed(3) : null;
+    const r = spawnSync(ffmpeg, ['-y', '-loglevel', 'error', '-ss', (tStart / 1000 * k).toFixed(2), '-i', webm,
+      '-vf', `setpts=PTS*${k.toFixed(4)},fps=25,format=yuv420p`, '-c:v', 'libx264', '-preset', 'slow', '-crf', '26',
+      '-movflags', '+faststart', '-an', out], { encoding: 'utf8' });
+    if (r.status !== 0) { console.log(`✗ ${name}: ffmpeg נכשל\n${r.stderr}`); out = null; }
+    else spawnSync(ffmpeg, ['-y', '-loglevel', 'error', '-ss', '14', '-i', out, '-frames:v', '1', '-q:v', '3', path.join(THUMB, f.file + '.jpg')]);
+  } else fs.copyFileSync(webm, out);
+  fs.rmSync(tmp, { recursive: true, force: true });
+  if (late.length) console.log(`! ${name}: צעדים שחרגו מזמן השורה — ${late.join(' · ')}`);
+  return { app: f.app, script: f.script, steps: rows.length, seconds: rows[rows.length - 1].b, sig: flowSig(f), stretch,
+    file: out ? path.relative(ROOT, out) : null, bytes: out ? fs.statSync(out).size : 0, recorded: new Date().toISOString().slice(0, 10) };
+}
+
 /* ---- צילומי מסך בארבע שפות ---------------------------------------- */
 const START = {
   he: ['התחלה', 'להתחיל', 'תרגול', 'המשך', 'קדימה'],
@@ -392,7 +591,7 @@ async function shots(browser) {
 async function main() {
   const args = process.argv.slice(2);
   if (args.includes('--check')) return check();
-  const want = args.filter(a => !a.startsWith('-'));
+  const want = args.filter((a, i) => !a.startsWith('-') && args[i - 1] !== '--flow');
   const apps = want.length ? want : demoApps();
   for (const a of apps) if (!scriptOf(a)) { console.log(`✗ ${a}: אין DEMO_SCRIPT`); process.exit(1); }
 
@@ -415,6 +614,21 @@ async function main() {
     try { bad = await shots(browser); } finally { await browser.close(); if (server) server.kill(); }
     console.log(`\n${bad} כישלונות`);
     process.exit(bad ? 1 : 0);
+  }
+  const flowArg = args.indexOf('--flow');
+  if (flowArg >= 0) {
+    const name = args[flowArg + 1];
+    if (!FLOWS[name]) { console.log(`✗ אין תסריט בשם ${name}. יש: ${Object.keys(FLOWS).join(', ')}`); await browser.close(); if (server) server.kill(); process.exit(1); }
+    const man = readManifest(); man.flows = man.flows || {};
+    let ok = false;
+    try {
+      const r = await recordFlow(browser, name, ffmpeg, legalVer);
+      if (r.file) { man.flows[name] = r; ok = true;
+        console.log(`✓ תסריט ${r.script} (${name}) — ${r.seconds}s, ${(r.bytes / 1048576).toFixed(1)} MB → ${r.file}`); }
+    } catch (e) { console.log(`✗ ${name}: ${e.message.split('\n')[0]}`); }
+    finally { await browser.close(); if (server) server.kill(); }
+    fs.writeFileSync(MANIFEST, JSON.stringify(man, null, 2) + '\n');
+    process.exit(ok ? 0 : 1);
   }
   const man = readManifest();
   man.videos = man.videos || {};
