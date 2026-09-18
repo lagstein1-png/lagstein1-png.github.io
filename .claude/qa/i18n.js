@@ -13,13 +13,15 @@
 
    הבדיקה, בשלוש אפליקציות האוניברסיטה:
      1. כל מחרוזת בתוך _("…") או _f("…") קיימת ב-TR_KEYS  ← מפיל
-     2. כמה מפתחות ב-TR_KEYS חסרי תרגום בכל שפה              ← מידע בלבד
-   הסעיף השני אינו מפיל: הוא מונה חוב תרגום קיים (שם האפליקציה,
-   הוראות התקנת קול, וקבוצה של הסברים) שאינו נולד משינוי מפתח,
-   והוא נרשם ב-FINDINGS כפתוח. הסעיף הראשון הוא מה שהכלל מבטיח.
-   סטטית, בלי דפדפן.
+     2. כל מפתח ב-TR_KEYS מתורגם לערבית, לרוסית ולאנגלית     ← מפיל
+   הסעיף השני היה ״מידע בלבד״ ומנה 155 מפתחות חסרים (O-69). הם לא
+   היו חסרים: הספירה פענחה את trAt בביטוי רגולרי שנשבר על פסיק בתוך
+   TR_KEYS.indexOf("…"). נמדד 18.9.2026 — כשהקריאות מורצות, החוב
+   הוא אפס בשלוש האפליקציות, ולכן הסעיף הפך למפיל. סטטית, בלי דפדפן.
 
-   הוכחת נפילה: על 308786f — math-uni3, מפתח אחד. אחרי התיקון — 0.
+   הוכחת נפילה: סעיף 1 — על 308786f, math-uni3, מפתח אחד; אחרי התיקון 0.
+   סעיף 2 — תרגום ערבי אחד שרוקן ב-math-uni2, ומפתח חדש בלי תרגום
+   ב-math-uni: שניהם אדומים; העץ עצמו ירוק. הפלט ב-FINDINGS.
    ===================================================================== */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -48,18 +50,38 @@ for (const app of APPS) {
   if (miss) bad++;
   else console.log(`✓ ${app}: ${lits.size} מחרוזות ב-_(), כולן ב-TR_KEYS (${KEYS.length} מפתחות)`);
 
-  /* 2 — חוב תרגום קיים, לספירה בלבד */
+  /* 2 — כל מפתח מתורגם בשלוש השפות  ← מפיל
+     הקריאות ל-trAt מורצות כקוד ולא מפוענחות בביטוי רגולרי. הגרסה
+     הקודמת קראה את הארגומנט השני ב-([^,]+), ומפתח שנמסר כ-
+     TR_KEYS.indexOf("…, …") — עם פסיק בתוך המחרוזת — נשבר באמצעו
+     ולא נספר. כך נרשמו 155 מפתחות ״בלי תרגום״ (O-69) שכולם מתורגמים. */
   const D = { ar: {}, ru: {}, en: {} };
-  const ctx = { TR_KEYS: KEYS };
-  for (const m of src.matchAll(/trAt\("(ar|ru|en)",([^,]+),(\[[\s\S]*?\])\);/g)) {
-    const start = vm.runInNewContext(m[2], ctx), arr = vm.runInNewContext(m[3]);
-    arr.forEach((v, i) => { if (v) D[m[1]][KEYS[start + i]] = v; });
+  const ctx = vm.createContext({
+    TR_KEYS: KEYS,
+    trAt(l, start, arr) { if (start >= 0) arr.forEach((v, i) => { if (v) D[l][KEYS[start + i]] = v; }); },
+    trPart(l, arr) { ctx.trAt(l, 0, arr); },
+  });
+  let calls = 0, broken = 0;
+  for (const m of src.matchAll(/^[ \t]*tr(?:At|Part)\("(?:ar|ru|en)"/gm)) {
+    let end = m.index, ok = false;
+    while ((end = src.indexOf(']);', end)) !== -1) {
+      end += 3;
+      try { vm.runInContext(src.slice(m.index, end), ctx); ok = true; break; }
+      catch (e) { if (!(e instanceof SyntaxError)) throw e; }
+    }
+    if (ok) calls++; else broken++;
   }
-  for (const m of src.matchAll(/trPart\("(ar|ru|en)",(\[[\s\S]*?\])\);/g)) {
-    vm.runInNewContext(m[2]).forEach((v, i) => { if (v) D[m[1]][KEYS[i]] = v; });
+  const debt = LANGS.map(l => [l, KEYS.filter(k => !D[l][k])]);
+  const total = debt.reduce((n, [, ks]) => n + ks.length, 0);
+  if (total || broken || !calls) {
+    bad++;
+    console.log(`✗ ${app}: מפתחות בלי תרגום — ${debt.map(([l, ks]) => `${l} ${ks.length}`).join(' · ')}` +
+      (broken ? ` · ${broken} קריאות trAt שלא נקראו` : ''));
+    for (const [l, ks] of debt) for (const k of ks.slice(0, 5))
+      console.log(`    ${l} #${KEYS.indexOf(k)}: ${k.slice(0, 60)}`);
+  } else {
+    console.log(`✓ ${app}: ${calls} קריאות trAt, כל ${KEYS.length} המפתחות מתורגמים לשלוש השפות`);
   }
-  const debt = LANGS.map(l => `${l} ${KEYS.filter(k => !D[l][k]).length}`).join(' · ');
-  console.log(`· ${app}: מפתחות בלי תרגום — ${debt}`);
 }
-console.log(`${bad ? '✗' : '✓'} ${APPS.length} אפליקציות, ${bad} עם מחרוזת שאינה מפתח`);
+console.log(`${bad ? '✗' : '✓'} ${APPS.length} אפליקציות, ${bad} כשלים (מחרוזת שאינה מפתח, או מפתח בלי תרגום)`);
 process.exit(bad ? 1 : 0);
