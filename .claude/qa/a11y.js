@@ -39,7 +39,9 @@ const ROOT = process.cwd();
    מפה של צורה, ולא רשימת פטורים: אפליקציה שתפצל קובץ מחר תתווסף
    כאן בשורה אחת. */
 const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-              'english', 'history', 'ulpan', 'lomda', 'bagrut-806', 'kotvim'];
+              'english', 'history', 'ulpan', 'lomda', 'bagrut-806', 'kotvim',
+              /* רקיע — אינה אפליקציית לימוד, אבל אותו קהל ואותם שישה מצבים. 18.9.2026 */
+              'rakia'];
 const SHAPE = { 'bagrut-806': { js: 'app.js', fn: 'applyPrefs' } };
 
 /* יכולת → כל השמות שראינו לה בפועל. שם חדש מתווסף כאן, ולא בקוד. */

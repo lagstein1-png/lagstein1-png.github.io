@@ -39,7 +39,7 @@ const PAGES = APPS.concat(['bagrut-806', 'reader', '.']);
 /* הבדיקות, לפי הסדר שבו כדאי לראות אותן: המהירות קודם, כדי
    שכישלון זול יעצור לפני שמחכים לדפדפן. */
 const SUITE = [
-  { id: 'parse',    args: PAGES.filter(p => p !== '.').map(a => a + '/index.html').concat(['index.html']) },
+  { id: 'parse',    args: PAGES.filter(p => p !== '.').map(a => a + '/index.html').concat(['index.html', 'rakia/index.html']) },
   { id: 'cache',    args: [] },
   { id: 'storage',  args: [] },
   { id: 'naming',   args: [] },
@@ -174,7 +174,16 @@ const SUITE = [
      מודלים, פרטיות, תקציב הכתיבות) והחיווט בשלושה־עשר הדפים. */
   { id: 'barak',   args: [] },
   { id: 'hespeech', args: [] },
-  { id: 'smoke',    args: PAGES,  needsServer: true },
+  /* רקיע — מפת לידה, 18.9.2026. גלילאו מודד את המנוע מול Swiss
+     Ephemeris; content ו-safety את 469 הטקסטים; deps את אפס התלות;
+     שני המחוללים את הטבלאות שאסור לערוך ביד. */
+  { id: 'galileo',       args: [] },
+  { id: 'rakia-content', args: [] },
+  { id: 'rakia-safety',  args: [] },
+  { id: 'deps',          args: [] },
+  { id: 'rakia/mk-ephem',  args: ['--check'] },
+  { id: 'rakia/mk-places', args: ['--check'] },
+  { id: 'smoke',    args: PAGES.concat(['rakia']),  needsServer: true },
   /* מנוע ברק בדפדפן אמיתי מול Worker מדומה: ההקשר שנשלח, פעולה
      שמתבצעת באמת, פעולה שנכשלת ולא מוכרזת, אופליין ו-429. */
   { id: 'barak-browser', args: [], needsServer: true },
