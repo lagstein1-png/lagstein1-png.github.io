@@ -357,7 +357,7 @@ async function tap(page, sel) {
 
 const FLOWS = {
   /* תסריט 3 — מצב מורה, ב-math-teen (שבוע 3 בלוח: קבוצת מורי מתמטיקה) */
-  teacher: { app: 'math-teen', script: 3, file: 'teacher-math-teen', steps: [
+  teacher: { app: 'math-teen', script: 3, file: 'teacher-math-teen', tail: 'מצב מורה בתשע אפליקציות · בלי חשבון לתלמיד', steps: [
     async (page) => {                               /* בכל אפליקציה יש מצב מורה */
       /* פתיחה ראשונה = שלושה מסכי היכרות, כמו אצל הלומד */
       for (let k = 0; k < 3 && await page.locator('[data-a="obnext"]').count(); k++) await tap(page, '[data-a="obnext"]');
@@ -420,6 +420,45 @@ const FLOWS = {
     async () => {}                                  /* הכתובת — כרטיס הסיום */
   ] }
 };
+FLOWS.shlav = {                                   /* תסריט 2 — ״שלב״, מתמטיקה לתיכון */
+  app: 'math-teen', script: 2, file: 'shlav-math-teen', steps: [
+    async (page) => {                               /* 24 נושאים */
+      for (let k = 0; k < 3 && await page.locator('[data-a="obnext"]').count(); k++) await tap(page, '[data-a="obnext"]');
+      await tap(page, '[data-a="go"][data-v="topics"]');
+      for (let k = 0; k < 3; k++) { await page.evaluate(() => window.scrollBy({ top: 400, behavior: 'smooth' })); await page.waitForTimeout(450); }
+    },
+    async (page) => {                               /* לפי 3, 4 או 5 יחידות — בורר המסלול שבראש מסך הנושאים */
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      await page.waitForTimeout(700);
+      await tap(page, '[data-a="track"][data-t="4"]');
+    },
+    async (page) => {                               /* כל שאלה נקראת בקול */
+      await tap(page, '[data-a="go"][data-v="home"]');
+      if (await page.locator('[data-a="lvl"][data-l="2"]').count()) await tap(page, '[data-a="lvl"][data-l="2"]');
+      await tap(page, '[data-a="start"]');
+      await page.waitForSelector('[data-a="ans"]', { timeout: 8000 });
+      if (await page.locator('[data-a="read"]').count()) await tap(page, '[data-a="read"]');
+    },
+    async (page) => {                               /* וכשטועים */
+      const i = await page.evaluate(() => P.q.options.findIndex(o => !o.ok));
+      await tap(page, `[data-a="ans"][data-i="${i}"]`);
+    },
+    async (page) => {                               /* איפה בדיוק הייתה הטעות */
+      const e = page.locator('[data-a="ans"][aria-pressed="true"], .opt.picked, .opt.bad').first();
+      if (await e.count()) await e.scrollIntoViewIfNeeded().catch(() => {});
+    },
+    async (page) => {                               /* דף נוסחאות */
+      await tap(page, '[data-a="go"][data-v="formulas"]');
+      for (let k = 0; k < 2; k++) { await page.evaluate(() => window.scrollBy({ top: 260, behavior: 'smooth' })); await page.waitForTimeout(900); }
+    },
+    async (page) => {                               /* פתרון נכון, בלי שעון */
+      await tap(page, '[data-a="go"][data-v="practice"]');
+      await page.waitForSelector('[data-a="ans"]', { timeout: 8000 });
+      const i = await page.evaluate(() => P.q.options.findIndex(o => o.ok));
+      await tap(page, `[data-a="ans"][data-i="${i}"]`);
+    },
+    async () => {}                                  /* הכתובת */
+  ] };
 const flowSig = f => sha(scriptRows(f.script).map(r => `${r.a}-${r.b}|${r.text}`).join('\n') + f.steps.map(String).join('\n'));
 
 async function recordFlow(browser, name, ffmpeg, legalVer) {
@@ -464,15 +503,15 @@ async function recordFlow(browser, name, ffmpeg, legalVer) {
     const until = tStart + r.b * 1000 - (Date.now() - t0);
     if (until > 0) await page.waitForTimeout(until);
   }
-  await page.evaluate(() => {
+  await page.evaluate((tail) => {
     const d = document.createElement('div'); d.setAttribute('dir', 'rtl');
     d.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;align-items:center;' +
       'justify-content:center;gap:18px;background:#0b1220;color:#f4f7ff;font:700 30px/1.35 system-ui,sans-serif;text-align:center;padding:40px';
     d.innerHTML = '<div style="font-size:26px;opacity:.85">חינם · בלי הרשמה · בלי פרסומות</div>' +
       '<div style="font-size:34px;direction:ltr;color:#ffd23f">lagstein1-png.github.io</div>' +
-      '<div style="font-size:22px;opacity:.75">מצב מורה בתשע אפליקציות · בלי חשבון לתלמיד</div>';
+      '<div style="font-size:22px;opacity:.75">' + tail + '</div>';
     document.body.appendChild(d);
-  });
+  }, f.tail || 'כל שאלה מוקראת · ארבע שפות · עובד גם בלי אינטרנט');
   await page.waitForTimeout(3200);
   const tEnd = Date.now() - t0;
   const video = page.video();
