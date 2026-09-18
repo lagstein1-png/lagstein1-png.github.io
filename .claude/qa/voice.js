@@ -68,9 +68,9 @@ const APPS = [
       await page.locator('[data-a="kdone"]').first().click();
       await page.waitForTimeout(400);
     }, speak:'[data-a="ksay"]' },
-  /* רקיע — שלב internal, נפתחת עם מפתח השער. ההקראה היא של טקסט
+  /* רקיע — approved, בלי שער. ההקראה היא של טקסט
      הסבר, ולכן קודם מחשבים מפה ואז לוחצים ״הקראה״ במסך ההסברים. */
-  { id:'rakia', url:'/rakia/?internal=shlav-internal-rakia',
+  { id:'rakia', url:'/rakia/',
     open:async page => {
       const ok = page.locator('#lg-ok');
       await ok.waitFor({ timeout: 8000 }).catch(() => {});

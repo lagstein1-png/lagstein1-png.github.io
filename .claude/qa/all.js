@@ -183,7 +183,7 @@ const SUITE = [
   { id: 'deps',          args: [] },
   { id: 'rakia/mk-ephem',  args: ['--check'] },
   { id: 'rakia/mk-places', args: ['--check'] },
-  { id: 'smoke',    args: PAGES.concat(['rakia/?internal=shlav-internal-rakia']),  needsServer: true },
+  { id: 'smoke',    args: PAGES.concat(['rakia']),  needsServer: true },
   /* מנוע ברק בדפדפן אמיתי מול Worker מדומה: ההקשר שנשלח, פעולה
      שמתבצעת באמת, פעולה שנכשלת ולא מוכרזת, אופליין ו-429. */
   { id: 'barak-browser', args: [], needsServer: true },

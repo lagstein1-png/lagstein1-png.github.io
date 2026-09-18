@@ -16,18 +16,6 @@
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="theme-color" content="#f7f5ff" media="(prefers-color-scheme:light)" />
 <meta name="theme-color" content="#12101f" media="(prefers-color-scheme:dark)" />
-<meta name="robots" content="noindex,nofollow">
-<script>
-/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html */
-var INTERNAL_KEY="shlav-internal-rakia";
-var INTERNAL_OK=(function(){
-  try{
-    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
-    if(q) localStorage.setItem("shlav-internal", decodeURIComponent(q));
-    return localStorage.getItem("shlav-internal")===INTERNAL_KEY;
-  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
-})();
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -157,19 +145,6 @@ dl.gloss dd{margin:0}
 <link rel="license" href="/legal/">
 </head>
 <body>
-<style>#gate[hidden]{display:none!important}</style>
-<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
-     align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
-     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
-  <div style="max-width:32rem">
-    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
-    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
-    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר.
-       אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
-    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;
-       background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a>
-  </div>
-</div>
 <a class="skip" href="#main">דילוג לתוכן</a>
 <header class="top">
   <h1>רקיע <small>מפת לידה · גרסת עבודה</small></h1>
@@ -951,15 +926,7 @@ function boot(){
   if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r1-pwa1") }catch(e){} }
 }
 </script>
-<script>
-/* INTERNAL-GATE — לא נטענת בלי מפתח. */
-if(!INTERNAL_OK){
-  document.getElementById("gate").hidden=false;
-  document.title="לא פורסם";
-}else{
-  boot();
-}
-</script>
+<script>boot();</script>
 <script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
