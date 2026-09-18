@@ -22,6 +22,9 @@
    עם זרע קבוע, ולכן ארבע השפות מקבלות את אותה שאלה בדיוק — אחרת
    כל צילום היה מגריל שאלה משלו, והפוסט היה משקר.
 
+   **מוזיקת רקע** — `audio.js`, מסונתזת כאן, נכנסת לכל mp4 בסוף
+   ההקלטה (הכרעת הבעלים 18.9.2026, שהחליפה את ״בלי מוזיקה״).
+
    **מה זה אינו.** אין כאן קול. הדפדפן חסר־הראש אינו מנגן הקראה,
    ולכן מנוע הדיבור מוחלף במנוע מדומה שמדווח גבולות מילים — כך
    ההדגשה של המילה הנאמרת זזה על המסך כמו באמת, אבל הרצועה
@@ -55,6 +58,7 @@
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const { spawn, spawnSync } = require('child_process');
 const net = require('net');
+const { addMusic } = require('./audio.js');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const OUT  = __dirname;
@@ -306,6 +310,8 @@ async function record(browser, app, ffmpeg, legalVer) {
           '-vf', 'fps=12,scale=360:-1:flags=lanczos,split[a][b];[a]palettegen[p];[b][p]paletteuse',
           path.join(gif, 'reader-8s.gif')]);
       }
+      /* מוזיקת רקע — הכרעת הבעלים 18.9.2026 (audio.js) */
+      const m = addMusic(ffmpeg, out); if (!m.ok) console.log(`! ${app}: בלי מוזיקה — ${String(m.err).split('\n')[0]}`);
     }
   } else {
     fs.copyFileSync(webm, out);
@@ -591,7 +597,10 @@ async function recordFlow(browser, name, ffmpeg, legalVer) {
       '-vf', `setpts=PTS*${k.toFixed(4)},fps=25,format=yuv420p`, '-c:v', 'libx264', '-preset', 'slow', '-crf', '26',
       '-movflags', '+faststart', '-an', out], { encoding: 'utf8' });
     if (r.status !== 0) { console.log(`✗ ${name}: ffmpeg נכשל\n${r.stderr}`); out = null; }
-    else spawnSync(ffmpeg, ['-y', '-loglevel', 'error', '-ss', '14', '-i', out, '-frames:v', '1', '-q:v', '3', path.join(THUMB, f.file + '.jpg')]);
+    else {
+      spawnSync(ffmpeg, ['-y', '-loglevel', 'error', '-ss', '14', '-i', out, '-frames:v', '1', '-q:v', '3', path.join(THUMB, f.file + '.jpg')]);
+      const m = addMusic(ffmpeg, out); if (!m.ok) console.log(`! ${name}: בלי מוזיקה — ${String(m.err).split('\n')[0]}`);
+    }
   } else fs.copyFileSync(webm, out);
   fs.rmSync(tmp, { recursive: true, force: true });
   if (late.length) console.log(`! ${name}: צעדים שחרגו מזמן השורה — ${late.join(' · ')}`);

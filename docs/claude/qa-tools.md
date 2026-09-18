@@ -23,7 +23,7 @@
     node .claude/qa/clicks.js                # כל לחיצה מושמעת, והמתג שמשתיק אותה — בשתים־עשרה האפליקציות
     node .claude/qa/fonts.js                 # ערבית ורוסית בגופן שיש בו את הכתב
     node .claude/qa/langbtn.js               # כפתור השפה עצמו — "العربية" גם כשהממשק עברי
-    node .claude/qa/teentr.js                # math-teen — שלושת מילוני התרגום מחזיקים אותם מפתחות
+    node .claude/qa/teen-i18n.js             # ״שלב״ בארבע שפות בפועל — המסך, ההקראה, והרווח לפני מספר; בדפדפן
     node .claude/qa/banks.js                 # החיווט של lomda/data/, וארבע השפות בתוכן
     node .claude/qa/kotvim.js                # התוכן של ״כותבים ביחד״ — ארבע שפות, ואין קטע גנרי
     node .claude/qa/leaks.js                 # תיאור של פריט בלומדה אינו מצטט את כותרתו (ההקראה לא מסגירה)
