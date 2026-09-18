@@ -106,24 +106,35 @@ jobs:
           ONLY: ${{ github.event.inputs.only }}
         run: node marketing/media/voice.js ${ONLY:-}
 
+      # **סופרים קבצים, לא תיקיות.** ריצה 4 נפלה כאן בדיוק על זה:
+      # `voice.js` יוצר תיקייה לכל סרטון **לפני** הפנייה הראשונה,
+      # ולכן `ls -A voice` החזיר שמות תיקיות גם כשלא נוצר אף קובץ.
+      # השומר עבר, `git stash` אמר ״No local changes to save״
+      # (תיקייה ריקה אינה קיימת ל-git), ו-`stash pop` נפל על
+      # ״No stash entries found״. `find -type f` הוא השאלה הנכונה.
       - name: שומר התקדמות ב-voice-build
         run: |
           set -euo pipefail
-          if [ -z "$(ls -A marketing/media/voice 2>/dev/null)" ]; then
-            echo "אין מה לשמור."; exit 0
+          if [ -z "$(find marketing/media/voice -type f 2>/dev/null | head -1)" ]; then
+            echo "לא נוצר אף קובץ קול — אין מה לשמור."
+            exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git stash push -u -- marketing/media/voice
+          # מעבירים את התיקייה הצדה בעצמנו. stash על נתיב שאינו
+          # מוכר ל-git הוא בדיוק המלכודת שהפילה את ריצה 4.
+          mv marketing/media/voice "$RUNNER_TEMP/voice"
           git checkout -B voice-build
-          git stash pop
+          mkdir -p marketing/media
+          rm -rf marketing/media/voice
+          mv "$RUNNER_TEMP/voice" marketing/media/voice
           git add marketing/media/voice
           if git diff --cached --quiet; then
             echo "אין קבצים חדשים."; exit 0
           fi
           git commit -q -m "קריינות: התקדמות (המכסה החינמית נגמרת ומתחדשת)"
           git push -f origin voice-build
-          echo "נדחף ל-voice-build."
+          echo "נדחף ל-voice-build: $(find marketing/media/voice -type f | wc -l) קבצים."
 
       - name: כיסוי
         run: node marketing/media/voice.js --check
