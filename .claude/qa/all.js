@@ -84,6 +84,8 @@ const SUITE = [
   { id: 'engine',   args: [] },
   { id: 'exam806',  args: [] },
   { id: 'tutor',    args: [] },
+  { id: 'hebrew',   args: [] },
+  { id: 'langretry', args: [], ext: '.mjs' },
   /* הכתיב של ג׳וש. `JOSH.md` מחייב גרש עברי מהיום שהבוט נבנה, ואיש
      לא אכף — דף הבית נשא את שתי הצורות יחד. */
   { id: 'josh',     args: [] },
@@ -216,7 +218,12 @@ let failed = 0;
 
 for (const t of plan) {
   process.stdout.write(`── ${t.id} `.padEnd(72, '─') + '\n');
-  const r = spawnSync(process.execPath, [path.join(QA, t.id + '.js')].concat(t.args),
+  /* **`ext` — סיומת, ולא `.js` קשיח.** בדיקה שמייבאת את
+     `worker.js` חייבת להיות ESM (`import` ו-`await` ברמה
+     העליונה), והמוסכמה כאן היא `.mjs` — כמו `evals.mjs`.
+     בלי השדה הזה הרַנר היה מחפש `langretry.js` שאינו קיים,
+     והבדיקה הייתה ״נכשלת״ מפני שלא הורצה. */
+  const r = spawnSync(process.execPath, [path.join(QA, t.id + (t.ext || '.js'))].concat(t.args),
                       { cwd: process.cwd(), stdio: 'inherit' });
   const code = r.status === null ? 1 : r.status;
   results.push([t.id, code]);

@@ -28,6 +28,8 @@
     node .claude/qa/leaks.js                 # תיאור של פריט בלומדה אינו מצטט את כותרתו (ההקראה לא מסגירה)
     node .claude/qa/markers.js               # סמני התנגשות מיזוג שנשארו בקובץ שנעקב
     node .claude/qa/guide.js                 # שם כפתור שהמדריך מבטיח, וכבר אינו בממשק
+    node .claude/qa/hebrew.js                # העברית של ברק — תרגום מילולי בשלושת קובצי הלקוח
+    node .claude/qa/langretry.mjs            # הניסיון החוזר — handleAsk עם fetch מוזרק, שלושה מצבים
     node .claude/qa/josh.js                  # הכתיב של ג׳וש (גרש עברי U+05F3), ושהשם שהלומד רואה הוא ברק
     node .claude/qa/brain.js                 # מוח אחד — אין מוח ג׳וש שני שדף טוען, ואין חיפוש מהדפדפן
     node .claude/qa/joshface.js              # שכבת הפנים נשארת תצוגה — אין מוח, רשת, הקראה או קול
