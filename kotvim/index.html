@@ -237,6 +237,17 @@ html[lang="ru"] body{font-family:var(--ru)}
 .opt.bad{border-color:var(--bad);background:var(--bad-soft)}
 .opt.bad .k{background:var(--bad);color:#fff}
 .opt[disabled]{cursor:default}
+/* שורת קטע: הטקסט והרמקול לידו. שני הכללים קיימים ב-english,
+   ב-history וב-lomda, ולא הועתקו לכאן — ולכן עד k64 הרמקול נפל
+   לשורה משלו מתחת לקטע, ונראה כמו כפתור פתיחה שאינו פותח כלום. */
+.orow{display:flex;gap:.45rem;align-items:center;min-width:0}
+.orow .opt{flex:1;min-width:0}
+/* קטע שנבחר. render הוסיף on מהיום הראשון, אבל לא היה כלל שמראה
+   אותו — הלומד לחץ, המצב נשמר, ובעין לא קרה דבר. הסימן ולא רק
+   הצבע, כדי שגם במצב ניגודיות ובעיוורון צבעים רואים מה נבחר. */
+.opt.on{border-color:var(--accent);background:var(--accent-soft)}
+.opt.on::after{content:"\2713";margin-inline-start:auto;padding-inline-start:.5rem;
+  font-weight:800;color:var(--accent);flex:none}
 /* נסיגה בצבע ולא בשקיפות: opacity:.55 הוריד את הטקסט ל-3.87:1
    ואת אות הסימון ל-2.37:1, ואחרי המענה קריאת המסיח היא הלמידה. */
 .opt.dim{color:var(--muted);border-color:var(--line);box-shadow:none}
@@ -1054,7 +1065,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="k64 · 2026-09-18";
+var BUILD="k65 · 2026-09-18";
 var SKEY="kotvim-state-v1";
 var GKEY_STORE="kotvim-gkey";
 
@@ -2512,7 +2523,7 @@ function screenTopic(){
 /* שורת קטע: הטקסט עצמו ורמקול לידו. ההקראה כאן אינה מותרות —
    זה בדיוק הקהל שקורא לאט, והקטע נבחר לפי מה שנשמע נכון. */
 function kOpt(txt,act,on){
-  return '<div class="orow"><button class="opt'+(on?" on":"")+'" '+act+'>'+esc(txt)+"</button>"+
+  return '<div class="orow"><button class="opt'+(on?" on":"")+'" aria-pressed="'+(on?"true":"false")+'" '+act+'>'+esc(txt)+"</button>"+
     '<button class="spk sm" data-a="say" data-say="'+esc(txt)+'" data-lang="'+esc(state.lang)+
     '" aria-label="'+esc(t("kHear"))+'">'+ic("play",15)+"</button></div>";
 }
@@ -3152,7 +3163,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=k64-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=k65-pwa1").catch(function(){});
   });
 }
 </script>
