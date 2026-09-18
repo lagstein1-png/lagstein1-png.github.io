@@ -21,6 +21,18 @@
 #
 # **הרצה חוזרת בטוחה ואף רצויה:** `voice.js` מדלג על קובץ שכבר
 # קיים, ולכן ריצה שנעצרה באמצע המכסה נמשכת בריצה הבאה.
+#
+# **והמכסה אכן נגמרת — נמדד בריצה 3:** `gemini 429 You exceeded
+# your current quota`. השכבה החינמית של מודל ה-TTS קטנה, ו-192
+# שורות אינן נכנסות בה ביום אחד. **ולכן ההתקדמות חייבת לשרוד את
+# הריצה**, אחרת ״מתחדש״ הוא מילה ריקה: ריצה שנופלת על מכסה מדלגת
+# על שאר הצעדים, והקבצים שכבר הופקו הולכים לאיבוד עם הרנר.
+#
+# הפתרון: ענף צדדי `voice-build`. כל ריצה מושכת ממנו את מה שכבר
+# הופק, מוסיפה מה שהמכסה מרשה, ודוחפת אליו בחזרה — **בלי לגעת
+# ב-main**. קריינות חלקית ב-main הייתה מפילה את `all.js` בצדק
+# (סרטון שמדבר בחציו), ולכן היא יושבת בצד עד שהיא שלמה.
+# מריצים כל יום עד שהכיסוי מלא, ואז פעם אחת עם `YES`.
 
 name: voice
 
@@ -72,15 +84,51 @@ jobs:
             exit 1
           fi
 
+      # מה שכבר הופק בריצות קודמות. הענף אולי אינו קיים עדיין —
+      # בפעם הראשונה זה תקין, ולא שגיאה.
+      - name: מושך התקדמות מ-voice-build
+        run: |
+          set -euo pipefail
+          if git fetch origin voice-build 2>/dev/null; then
+            git checkout FETCH_HEAD -- marketing/media/voice || true
+            echo "נמשכה התקדמות קודמת:"
+            node marketing/media/voice.js --check || true
+          else
+            echo "אין עדיין ענף voice-build — זו הריצה הראשונה."
+          fi
+
+      # נופל על מכסה? ההתקדמות עדיין נשמרת בצעדים שאחריו, ולכן
+      # הצעד הזה אינו מפיל את הג׳וב. ״כיסוי״ למטה הוא זה שקובע.
       - name: מפיק קריינות
+        continue-on-error: true
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ONLY: ${{ github.event.inputs.only }}
         run: node marketing/media/voice.js ${ONLY:-}
 
+      - name: שומר התקדמות ב-voice-build
+        run: |
+          set -euo pipefail
+          if [ -z "$(ls -A marketing/media/voice 2>/dev/null)" ]; then
+            echo "אין מה לשמור."; exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git stash push -u -- marketing/media/voice
+          git checkout -B voice-build
+          git stash pop
+          git add marketing/media/voice
+          if git diff --cached --quiet; then
+            echo "אין קבצים חדשים."; exit 0
+          fi
+          git commit -q -m "קריינות: התקדמות (המכסה החינמית נגמרת ומתחדשת)"
+          git push -f origin voice-build
+          echo "נדחף ל-voice-build."
+
       - name: כיסוי
         run: node marketing/media/voice.js --check
 
+      # רק כאן — ״כיסוי״ למעלה כבר הפיל את הג׳וב אם הקריינות חלקית.
       - name: מערבל לסרטונים
         run: node marketing/media/audio.js
 
