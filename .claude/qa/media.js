@@ -16,6 +16,14 @@ try {
     if (/אין ffmpeg/.test((e.stdout || '') + (e.stderr || ''))) process.stdout.write('· audio: אין ffmpeg כאן — בדיקת רצועת השמע דולגה\n');
     else throw e;
   }
+  /* והקריינות — קובץ קול לכל שורת כתובית (voice.js). אין רשת
+     כאן ואין מפתח, ולכן `--check` בלבד: הוא אינו דורש ffmpeg
+     ואינו פונה לשום מקום, רק סופר קבצים מול שורות ה-.srt.
+     **קריינות חלקית היא כשל**, וסרטון בלי קריינות כלל הוא מידע:
+     כך זה היה עד שהוורקפלו `voice` רץ בפעם הראשונה. */
+  process.stdout.write(execFileSync(process.execPath,
+    [path.resolve(__dirname, '..', '..', 'marketing', 'media', 'voice.js'), '--check'],
+    { encoding: 'utf8' }));
 } catch (e) {
   process.stdout.write((e.stdout || '') + (e.stderr || ''));
   process.exit(1);

@@ -1,0 +1,129 @@
+# קריינות לסרטוני השיווק — מופקת על הרנר, לא בסביבת הפיתוח.
+#
+# **למה ורקפלו ולא פקודה מקומית.** שלוש דרכים להפיק קול נוסו
+# בסביבת הפיתוח ב-18.9.2026 ונמדדו כנכשלות (`marketing/media/README.md`):
+# הקולות הנוירליים של Edge — הפרוקסי מסרב ל-WebSocket; ההקראה של
+# גוגל — הכתובת חסומה במדיניות הרשת; `espeak-ng` — קורא עברית בלי
+# ניקוד כרצף עיצורים. **הרנרים של GitHub אינם חסומים**, וזה אותו
+# נימוק שעליו עומדים `live-check` ו-`deploy-tutor`.
+#
+# **ולמה בכלל קריינות.** הבעלים, 18.9.2026: ״אתה אולי לא זוכר את
+# הקהל שלנו, אני זקוק לקריינות״. הקהל הוא דיסלקציה, ADHD ועולים
+# חדשים; סרטון על אפליקציה שמקריאה, שמוגש כטקסט לקריאה, מבקש
+# מהצופה בדיוק את מה שקשה לו. הכתוביות נשארות — הן אינן תחליף.
+#
+# מה צריך, ב-Settings → Secrets and variables → Actions:
+#   GEMINI_API_KEY   אותו מפתח של ברק, בשכבה החינמית של גוגל.
+#                    אין מפתח — הוורקפלו נעצר ואומר זאת.
+#
+# הערה על סודות: אין כאן `${{ secrets.* }}` בתוך גוף `run` — ביטוי
+# כזה מוצב לתוך הסקריפט שנכתב לדיסק לפני ההרצה. ההעברה היא ב-`env:`.
+#
+# **הרצה חוזרת בטוחה ואף רצויה:** `voice.js` מדלג על קובץ שכבר
+# קיים, ולכן ריצה שנעצרה באמצע המכסה נמשכת בריצה הבאה.
+
+name: voice
+
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'שם סרטון אחד (reader, math-app…), או ריק לכולם'
+        required: false
+        default: ''
+      commit:
+        description: 'הקלד YES כדי לדחוף את הקריינות ל-main. ריק — רק מפיק ומצרף כ-artifact.'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  voice:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # **ffmpeg אינו מותקן על ubuntu-latest.** ההנחה שכן נמדדה
+      # כשגויה בריצה 1: `ffmpeg: command not found`. וגרוע מזה —
+      # הצעד הזה נכתב אז כ-`ffmpeg -version | head -1`, וצינור
+      # מסתיר את קוד היציאה של האיבר הראשון, ולכן הוא **דיווח
+      # הצלחה** על אותה שורה בדיוק. שתי תקנות: מתקינים, ובודקים
+      # בלי צינור.
+      - name: מתקין ffmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: ffmpeg קיים
+        run: ffmpeg -version
+
+      - name: יש מפתח
+        env:
+          KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -z "${KEY:-}" ]; then
+            echo "::error::חסר GEMINI_API_KEY ב-Secrets. בלעדיו אין מה להפיק."
+            exit 1
+          fi
+
+      - name: מפיק קריינות
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ONLY: ${{ github.event.inputs.only }}
+        run: node marketing/media/voice.js ${ONLY:-}
+
+      - name: כיסוי
+        run: node marketing/media/voice.js --check
+
+      - name: מערבל לסרטונים
+        run: node marketing/media/audio.js
+
+      - name: לכל סרטון יש רצועת שמע
+        run: node marketing/media/audio.js --check
+
+      # בלי YES הקריינות יוצאת כ-artifact בלבד. אפשר להאזין לה
+      # לפני שהיא נכנסת ל-main — מה שנדחף ל-main מוגש מהאתר החי.
+      - name: מצרף להורדה
+        uses: actions/upload-artifact@v4
+        with:
+          name: voice
+          path: |
+            marketing/media/voice/
+            marketing/media/video/*.mp4
+          retention-days: 7
+
+      - name: דוחף ל-main
+        if: ${{ github.event.inputs.commit == 'YES' }}
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add marketing/media/voice marketing/media/video
+          if git diff --cached --quiet; then
+            echo "אין שינוי — לא נדחף דבר."
+            exit 0
+          fi
+          git commit -m "קריינות לסרטוני השיווק — Gemini TTS, קול Kore
+
+          הבעלים: ״אתה אולי לא זוכר את הקהל שלנו, אני זקוק לקריינות״.
+          קובץ קול לכל שורת כתובית, מעורבל ב-audio.js עם הנמכת
+          המוזיקה בזמן דיבור. הופק על רנר — הרשת בסביבת הפיתוח
+          חסומה מול ספקי הדיבור.
+
+          Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
+          git push origin HEAD:main
+
+      - name: סיכום
+        if: always()
+        run: |
+          {
+            echo "### קריינות"
+            echo ""
+            node marketing/media/voice.js --check || true
+          } >> "$GITHUB_STEP_SUMMARY"

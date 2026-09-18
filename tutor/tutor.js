@@ -716,7 +716,7 @@ var CSS = ''
 
    **הבחירה השמרנית** (D-17, ממתין לאישור יהושע): אותה קופסה,
    אותם צבעים, אותו דיוקן — רק המיקום. בטלפון: גיליון תחתון עד
-   46vh, בלי הכהיה, והמסך שמעליו חי ולחיץ; במסך רחב (≥ 900px):
+   60vh, בלי הכהיה, והמסך שמעליו חי ולחיץ; במסך רחב (≥ 900px):
    עמודה בצד ההתחלה של הכתיבה, ברוחב 400px, לגובה המסך.
    `#tu-min` מקפל את הגיליון לפס של שורת קלט אחת. הלחיצה מחוץ
    לקופסה כבר אינה סוגרת — יש X ויש Escape. */
@@ -783,7 +783,12 @@ var CSS = ''
 
    **ואין נטוי בשום מקום בפאנל** — ראו הכלל מתחת ל-`.tu-m em`. */
 +'#tu-bx{background:#fff;color:#17333c;border-radius:20px 20px 0 0;width:100%;max-width:540px;'
-+'max-height:46vh;max-height:46dvh;display:flex;flex-direction:column;overflow:hidden;'
+/* 60 ולא 46 — 18.9.2026. הבעלים צילם תשובה שממנה נראתה שורה
+   אחת. נמדד ב-`keyboard.js` על 46dvh בטלפון בגובה 740: הכותרת
+   132px, בועת השאלה, והפוטר 115px השאירו לשיחה 39–52px — פחות
+   מבועה אחת. הגובה חל רק כשיש מה לקרוא: ברכה קצרה נשארת קופסה
+   קטנה, ו-`#tu-min` מקפל תמיד. */
++'max-height:60vh;max-height:60dvh;display:flex;flex-direction:column;overflow:hidden;'
 +'box-shadow:0 18px 50px rgba(0,0,0,.3);font-size:19px;line-height:1.75;'
 +'letter-spacing:.01em;word-spacing:.05em}'
 /* נטוי הוא הצורה שהכי קשה לפענח בדיסלקציה: האותיות נשענות זו על
@@ -1070,7 +1075,26 @@ function draw(){
   if(BUSY) h += '<div class="tu-sys">' + esc(t.wait) + '</div>';
   if(NOTE) h += '<div class="tu-note">' + esc(NOTE) + '</div>';
   e.log.innerHTML = h;
-  e.log.scrollTop = e.log.scrollHeight;
+  scrollLog(e);
+}
+
+/* לאן גוללים אחרי ציור. עד 18.9.2026 — תמיד לתחתית, וזה הסתיר את
+   התשובה: הבעלים צילם ב-lomda תשובה של ארבע שורות שממנה נראתה
+   השורה האחרונה בלבד, ומתחתיה כפתורי ההקראה. נמדד ב-390×844:
+   אזור השיחה 141px, הבועה 323px, נראו 50px. לכן כשההודעה
+   האחרונה היא של ברק — ראש הבועה שלו בראש אזור השיחה, והלומד
+   קורא מההתחלה וגולל למטה אל ההמשך, ההקראה וההצעות. כשהילד
+   שלח, כשברק עדיין חושב, או כשיש הערה — התחתית, כמו קודם.
+   הגלילה מוגבלת ממילא: תשובה קצרה שנכנסת כולה נשארת עם הכפתורים
+   על המסך. */
+function scrollLog(e){
+  var m = MSGS[MSGS.length - 1];
+  var bots = e.log.querySelectorAll(".tu-bot"), last = bots[bots.length - 1];
+  if(m && m.role !== "user" && !BUSY && !NOTE && last){
+    var pad = parseFloat(getComputedStyle(e.log).paddingTop) || 0;
+    e.log.scrollTop += last.getBoundingClientRect().top - e.log.getBoundingClientRect().top - pad;
+  }
+  else e.log.scrollTop = e.log.scrollHeight;
 }
 
 function ctl(i){
