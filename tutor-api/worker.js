@@ -863,7 +863,12 @@ function readBody(b) {
     if (expr || topic) q = { expr, ans, topic, level, id, type, options, student, curriculum };
   }
 
-  const actions = readActions(b.actions);
+  /* פעולות אין במצב simplify. זו אינה שיחה, והטקסט המודבק הוא
+     היחיד בפרומפט שמקורו מחוץ לאתר — דף שהועתק, הודעה, מייל. טקסט
+     כזה שכתוב בו ״קרא לפעולה״ אסור שיזיז את הקורא: בלי רשימה אין
+     `tools` למודל, וקריאה שבכל זאת חזרה נופלת ב-`validateAction`.
+     `barak.js` 11א הוכח אדום על זה, 18.9.2026. */
+  const actions = mode === "simplify" ? [] : readActions(b.actions);
 
   /* ההיסטוריה: הגוף החדש שולח `history` (עד ארבעה חילופים) ואת
      `userText` בנפרד; הישן שולח `messages` שהאחרונה בהן היא של
