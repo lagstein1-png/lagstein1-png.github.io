@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>רקיע — מפת לידה בעברית פשוטה</title>
+<meta name="description" content="מפת לידה מחושבת במכשיר שלך, בלי שרת: השמש, הירח, הפלנטות, העולה והבתים, עם הסברים קצרים בעברית פשוטה והקראה. גרסת עבודה." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="רקיע — מפת לידה בעברית פשוטה" />
+<meta property="og:description" content="מפת לידה מחושבת במכשיר, בלי שרת ובלי הרשמה. הסברים קצרים בעברית פשוטה, עם הקראה." />
+<link rel="canonical" href="https://lagstein1-png.github.io/rakia/" />
+<meta property="og:url" content="https://lagstein1-png.github.io/rakia/" />
+<meta property="og:image" content="https://lagstein1-png.github.io/rakia/img/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#f7f5ff" media="(prefers-color-scheme:light)" />
+<meta name="theme-color" content="#12101f" media="(prefers-color-scheme:dark)" />
+<meta name="robots" content="noindex,nofollow">
+<script>
+/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html */
+var INTERNAL_KEY="shlav-internal-rakia";
+var INTERNAL_OK=(function(){
+  try{
+    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
+    if(q) localStorage.setItem("shlav-internal", decodeURIComponent(q));
+    return localStorage.getItem("shlav-internal")===INTERNAL_KEY;
+  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   רקיע — מפת לידה. קהל היעד: דיסלקציה, ADHD, קוראים מבוגרים.
+   · הכול בעברית, בלי סמלים אסטרולוגיים כטקסט ראשי — שם הפלנטה
+     כתוב, והסמל הוא קישוט בלבד.
+   · כל מידה ב-rem: הגדלת טקסט מגדילה הכול יחד.
+   · ששת מצבי הנגישות — clear-font, hc, rm, spaced, --fs, data-theme.
+   ============================================================ */
+:root{
+  --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
+  --fs:17px;
+  --bg:#f7f5ff; --card:#ffffff; --ink:#1c1a2e; --muted:#5b5877; --line:#dcd8f0;
+  --acc:#4c3d99; --acc-ink:#ffffff; --soft:#ece8fb; --warn:#8a4b00; --warn-bg:#fff3e0;
+  --fire:#b3261e; --earth:#3a6b1f; --air:#1f5f8b; --water:#4b3a99;
+  --ok:#1f6b3a;
+  --r:14px; --shadow:0 8px 28px rgba(28,26,46,.08);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#12101f; --card:#1c1930; --ink:#f1efff; --muted:#b4b0d0; --line:#35315a;
+    --acc:#b9aaff; --acc-ink:#15122a; --soft:#2a2649; --warn:#ffcc80; --warn-bg:#3a2a12;
+    --fire:#ff8a80; --earth:#a5d68a; --air:#8ec9ff; --water:#c4b5ff; --ok:#8fd9a8;
+    --shadow:0 8px 28px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12101f; --card:#1c1930; --ink:#f1efff; --muted:#b4b0d0; --line:#35315a;
+  --acc:#b9aaff; --acc-ink:#15122a; --soft:#2a2649; --warn:#ffcc80; --warn-bg:#3a2a12;
+  --fire:#ff8a80; --earth:#a5d68a; --air:#8ec9ff; --water:#c4b5ff; --ok:#8fd9a8;
+  --shadow:0 8px 28px rgba(0,0,0,.35);
+}
+html.hc{ --bg:#000; --card:#000; --ink:#fff; --muted:#fff; --line:#fff; --acc:#ffff00; --acc-ink:#000; --soft:#1a1a1a; --warn:#ffd54f; --warn-bg:#000; --fire:#ff7b7b; --earth:#9be27f; --air:#8fd3ff; --water:#d3c4ff; --ok:#8fd9a8; --shadow:none }
+html.clear-font{ --font:"Arial","Verdana",system-ui,sans-serif }
+html.spaced body{ letter-spacing:.06em; word-spacing:.16em; line-height:1.9 }
+html.rm *{ animation:none!important; transition:none!important; scroll-behavior:auto!important }
+*{box-sizing:border-box}
+html{font-size:var(--fs,17px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.65 var(--font);-webkit-text-size-adjust:100%}
+.skip{position:absolute;inset-inline-start:-9999px}
+.skip:focus{position:static;display:inline-flex;align-items:center;min-height:44px;padding:0 1rem;background:var(--acc);color:var(--acc-ink)}
+:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
+button{font:inherit;color:inherit}
+header.top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding:.5rem .8rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+header.top h1{font-size:1.25rem;margin:0;flex:1;font-weight:800}
+header.top h1 small{font-weight:500;color:var(--muted);font-size:.8rem;margin-inline-start:.4rem}
+.tabs{display:flex;gap:.35rem;flex-wrap:wrap;padding:.5rem .8rem;border-bottom:1px solid var(--line);background:var(--bg)}
+.tabs button, .btn{min-height:44px;padding:.45rem .95rem;border-radius:999px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font-weight:600}
+.tabs button[aria-selected="true"]{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.btn.primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.btn.small{min-height:38px;padding:.3rem .75rem;font-size:.9rem}
+.btn:disabled{opacity:.5;cursor:default}
+main{max-width:64rem;margin:0 auto;padding:1rem .8rem 3rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:1rem;margin-block-end:1rem}
+.card h2{margin:0 0 .6rem;font-size:1.2rem}
+.card h3{margin:1rem 0 .4rem;font-size:1.05rem}
+label{display:block;font-weight:600;margin-block-end:.25rem}
+.field{margin-block-end:.9rem}
+input[type=text],input[type=number],input[type=time],input[type=date],select{font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:10px;min-height:46px;padding:.4rem .7rem;width:100%}
+.row{display:grid;gap:.7rem;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))}
+.hint{color:var(--muted);font-size:.9rem;margin:.2rem 0 0}
+.chk{display:flex;align-items:center;gap:.6rem;min-height:44px;font-weight:600}
+.chk input{width:1.4rem;height:1.4rem}
+.suggest{position:relative}
+.suggest ul{list-style:none;margin:0;padding:.25rem;position:absolute;inset-inline:0;top:100%;z-index:30;background:var(--card);border:1.5px solid var(--line);border-radius:10px;box-shadow:var(--shadow);max-height:16rem;overflow:auto}
+.suggest li{padding:.55rem .7rem;border-radius:8px;cursor:pointer;min-height:44px;display:flex;justify-content:space-between;gap:.5rem;align-items:center}
+.suggest li[aria-selected="true"],.suggest li:hover{background:var(--soft)}
+.suggest li small{color:var(--muted)}
+.moment{font-size:1.15rem;line-height:1.7;font-weight:500}
+.moment b{color:var(--acc)}
+.wheel-wrap{display:flex;justify-content:center}
+svg.wheel{width:100%;max-width:34rem;height:auto;display:block}
+svg.wheel text{font-family:var(--font)}
+table{width:100%;border-collapse:collapse;font-size:1rem}
+th,td{padding:.55rem .5rem;border-bottom:1px solid var(--line);text-align:start;vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:.9rem}
+tr.body{cursor:pointer}
+tr.body:hover td{background:var(--soft)}
+.glyph{font-family:"Segoe UI Symbol","Noto Sans Symbols","Apple Symbols",sans-serif;color:var(--muted);margin-inline-end:.3rem}
+.tag{display:inline-block;padding:.05rem .5rem;border-radius:999px;background:var(--soft);font-size:.85rem;font-weight:600}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+.retro{color:var(--warn);font-weight:700}
+.el-fire{color:var(--fire)} .el-earth{color:var(--earth)} .el-air{color:var(--air)} .el-water{color:var(--water)}
+.text-block{padding:.8rem 0;border-bottom:1px solid var(--line)}
+.text-block:last-child{border-bottom:0}
+.text-block h4{margin:0 0 .3rem;font-size:1.05rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.text-block p{margin:0;font-size:1.02rem}
+.speak{min-height:38px;min-width:38px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);padding:.2rem .7rem;cursor:pointer;font-weight:600;font-size:.9rem}
+.speak[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink)}
+.sheet-back{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;display:none}
+.sheet-back.on{display:block}
+.sheet{position:fixed;inset-inline:0;bottom:0;z-index:41;background:var(--card);border-radius:18px 18px 0 0;max-height:82vh;overflow:auto;padding:1rem 1rem 2rem;box-shadow:0 -10px 40px rgba(0,0,0,.25);transform:translateY(105%);transition:transform .25s ease}
+.sheet.on{transform:none}
+.sheet .grip{width:3rem;height:.3rem;border-radius:3px;background:var(--line);margin:0 auto .8rem}
+.sheet h2{margin:.2rem 0 .6rem}
+.notice{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:.6rem .8rem;margin:.5rem 0;font-weight:600}
+.ok{color:var(--ok);font-weight:700}
+.people li{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px solid var(--line)}
+.people li span.name{flex:1;font-weight:600}
+.people ul{list-style:none;padding:0;margin:0}
+.a11y{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr))}
+.a11y button{min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);padding:.4rem .6rem;cursor:pointer;text-align:start;font-weight:600}
+.a11y button[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.actions{display:flex;gap:.5rem;flex-wrap:wrap;margin:.6rem 0}
+.foot{text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78}
+.foot a{color:inherit}
+dl.gloss dt{font-weight:700;margin-top:.8rem}
+dl.gloss dd{margin:0}
+.vis-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#today .grid{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr))}
+.tcard{border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem}
+.tcard b{display:block}
+@media (max-width:560px){ main{padding:.6rem .5rem 3rem} .card{padding:.8rem} th,td{padding:.45rem .3rem;font-size:.95rem} header.top h1{flex:1 1 100%} header.top h1 small{display:block;margin:0} }
+@media print{
+  header.top,.tabs,.actions,.speak,.sheet,.sheet-back,.a11y,.foot .noprint,#v-form,#v-people,#v-glossary,#v-accuracy,#v-privacy{display:none!important}
+  body{background:#fff;color:#000} .card{box-shadow:none;border-color:#999;break-inside:avoid}
+  #v-chart,#chart-tab-wheel,#chart-tab-table,#chart-tab-texts{display:block!important}
+  svg.wheel{max-width:16cm}
+}
+</style>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+<link rel="license" href="/legal/">
+</head>
+<body>
+<style>#gate[hidden]{display:none!important}</style>
+<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
+     align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
+     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
+  <div style="max-width:32rem">
+    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
+    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
+    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר.
+       אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
+    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;
+       background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a>
+  </div>
+</div>
+<a class="skip" href="#main">דילוג לתוכן</a>
+<header class="top">
+  <h1>רקיע <small>מפת לידה · גרסת עבודה</small></h1>
+  <button class="btn small" type="button" data-a="nav" data-v="form">מפה חדשה</button>
+  <button class="btn small" type="button" data-a="nav" data-v="people">האנשים שלי</button>
+  <button class="btn small" type="button" data-a="nav" data-v="settings" aria-label="נגישות והגדרות">נגישות</button>
+</header>
+<nav class="tabs" id="chart-tabs" role="tablist" aria-label="חלקי המפה" hidden>
+  <button type="button" role="tab" data-a="ctab" data-v="wheel" aria-selected="true">הגלגל</button>
+  <button type="button" role="tab" data-a="ctab" data-v="table" aria-selected="false">הטבלה</button>
+  <button type="button" role="tab" data-a="ctab" data-v="texts" aria-selected="false">ההסברים</button>
+  <button type="button" role="tab" data-a="ctab" data-v="today" aria-selected="false">היום בשמיים</button>
+</nav>
+<main id="main" tabindex="-1">
+
+<section id="v-form" class="view">
+  <div class="card">
+    <h2>מתי ואיפה?</h2>
+    <p class="hint">המפה מחושבת כאן, במכשיר. שום דבר לא נשלח לשרת. פרטים במסך <a href="#" data-a="nav" data-v="privacy">פרטיות</a>.</p>
+    <form id="form" autocomplete="off" novalidate>
+      <div class="field"><label for="f-name">שם (לא חובה)</label><input id="f-name" type="text" maxlength="40" placeholder="למשל: דנה"></div>
+      <div class="field">
+        <span id="lbl-date" style="display:block;font-weight:600;margin-bottom:.25rem">תאריך לידה</span>
+        <div class="row" role="group" aria-labelledby="lbl-date">
+          <div><label for="f-day">יום</label><input id="f-day" type="number" inputmode="numeric" min="1" max="31" required></div>
+          <div><label for="f-month">חודש</label><select id="f-month" required>
+            <option value="1">ינואר</option><option value="2">פברואר</option><option value="3">מרץ</option><option value="4">אפריל</option><option value="5">מאי</option><option value="6">יוני</option><option value="7">יולי</option><option value="8">אוגוסט</option><option value="9">ספטמבר</option><option value="10">אוקטובר</option><option value="11">נובמבר</option><option value="12">דצמבר</option></select></div>
+          <div><label for="f-year">שנה</label><input id="f-year" type="number" inputmode="numeric" min="1900" max="2100" placeholder="1990" required></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-time">שעת לידה</label>
+        <div class="row">
+          <div><input id="f-time" type="time" step="60" value="12:00"></div>
+          <div><label class="chk"><input id="f-notime" type="checkbox"> השעה לא ידועה</label></div>
+        </div>
+        <p class="hint">בלי שעה אין עולה ואין בתים, והירח עלול להיות במזל שכן.</p>
+      </div>
+      <div class="field suggest">
+        <label for="f-place">מקום לידה</label>
+        <input id="f-place" type="text" placeholder="התחילו להקליד: תל אביב, Moscow…" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="place-list" required>
+        <ul id="place-list" role="listbox" hidden></ul>
+        <p class="hint" id="place-hint">אזור הזמן ושעון הקיץ נקבעים לפי המקום והתאריך.</p>
+      </div>
+      <div class="field" id="tz-manual-wrap" hidden>
+        <label for="f-tz">קיזוז ידני מגריניץ׳ (שעות)</label>
+        <input id="f-tz" type="number" step="0.5" min="-12" max="14" placeholder="למשל 2 בחורף, 3 בקיץ">
+        <p class="hint">המכשיר הזה לא יודע להמיר שעה מקומית לפי אזור זמן. הזינו את הקיזוז של אותו יום.</p>
+      </div>
+      <div class="field"><label for="f-houses">שיטת בתים</label><select id="f-houses"><option value="placidus">פלסידוס (ברירת המחדל באתרים)</option><option value="whole">מזל שלם</option><option value="equal">בתים שווים</option></select></div>
+      <div class="actions"><button type="submit" class="btn primary">חשבו את המפה</button><button type="button" class="btn" data-a="nav" data-v="accuracy">על הדיוק</button></div>
+      <p id="form-err" class="notice" role="alert" hidden></p>
+    </form>
+  </div>
+</section>
+
+<section id="v-chart" class="view" hidden>
+  <div class="card"><h2 id="moment-title">הרגע האחד</h2><p class="moment" id="moment"></p><div id="chart-notes"></div>
+    <div class="actions">
+      <button type="button" class="btn small" data-a="save">שמירה לאנשים שלי</button>
+      <button type="button" class="btn small" data-a="share">תמונה לשיתוף</button>
+      <button type="button" class="btn small" data-a="print">הדפסה</button>
+      <button type="button" class="btn small" data-a="sayall">הקראת ההסברים</button>
+    </div>
+  </div>
+  <div id="chart-tab-wheel" class="card"><h2>הגלגל</h2><div class="wheel-wrap" id="wheel"></div><p class="hint">לחיצה על שם פלנטה בגלגל או בטבלה פותחת את ההסבר שלה.</p></div>
+  <div id="chart-tab-table" class="card" hidden><h2>הטבלה</h2><div id="table"></div><h3>אספקטים</h3><div id="aspects"></div></div>
+  <div id="chart-tab-texts" class="card" hidden><h2>ההסברים</h2><p class="hint">תיאור של נטיות, לא תחזית. הפירוט במסך <a href="#" data-a="nav" data-v="accuracy">על הדיוק</a>.</p><div id="texts"></div></div>
+  <div id="chart-tab-today" class="card" hidden><h2>היום בשמיים שלך</h2><div id="today"></div></div>
+</section>
+
+<section id="v-people" class="view" hidden>
+  <div class="card people"><h2>האנשים שלי</h2><p class="hint">נשמר במכשיר הזה בלבד. ייצוא שומר קובץ אצלכם; ייבוא קורא אותו בחזרה.</p>
+    <ul id="people-list"></ul>
+    <div class="actions"><button type="button" class="btn small" data-a="export">ייצוא לקובץ</button><button type="button" class="btn small" data-a="import">ייבוא מקובץ</button><input id="import-file" type="file" accept="application/json,.json" class="vis-hidden" aria-label="בחירת קובץ לייבוא"></div>
+  </div>
+</section>
+
+<section id="v-settings" class="view" hidden>
+  <div class="card"><h2>נגישות</h2>
+    <div class="a11y">
+      <button type="button" data-a="mode" data-v="clear-font" aria-pressed="false">גופן פשוט</button>
+      <button type="button" data-a="mode" data-v="hc" aria-pressed="false">ניגודיות גבוהה</button>
+      <button type="button" data-a="mode" data-v="spaced" aria-pressed="false">ריווח אותיות</button>
+      <button type="button" data-a="mode" data-v="rm" aria-pressed="false">בלי תנועה</button>
+      <button type="button" data-a="fs" data-v="0" aria-pressed="true">טקסט רגיל</button>
+      <button type="button" data-a="fs" data-v="1" aria-pressed="false">טקסט גדול</button>
+      <button type="button" data-a="fs" data-v="2" aria-pressed="false">טקסט ענק</button>
+      <button type="button" data-a="theme" data-v="auto" aria-pressed="true">צבע לפי המכשיר</button>
+      <button type="button" data-a="theme" data-v="light" aria-pressed="false">בהיר</button>
+      <button type="button" data-a="theme" data-v="dark" aria-pressed="false">כהה</button>
+    </div>
+    <h3>הקראה</h3>
+    <div class="actions"><button type="button" class="btn small" data-a="vcheck">בדיקת קול</button><span id="vchk" aria-live="polite"></span></div>
+    <h3>עוד</h3>
+    <div class="actions">
+      <button type="button" class="btn small" data-a="nav" data-v="glossary">מילון</button>
+      <button type="button" class="btn small" data-a="nav" data-v="accuracy">על הדיוק</button>
+      <button type="button" class="btn small" data-a="nav" data-v="privacy">פרטיות</button>
+      <button type="button" class="btn small" data-a="terms">תנאי שימוש</button>
+    </div>
+  </div>
+</section>
+
+<section id="v-glossary" class="view" hidden><div class="card"><h2>מילון</h2><dl class="gloss" id="gloss"></dl></div></section>
+
+<section id="v-accuracy" class="view" hidden>
+  <div class="card" id="accuracy" data-claim-planets="10" data-claim-node="60" data-claim-cusp="15">
+    <h2>על הדיוק</h2>
+    <h3>מה מדויק</h3>
+    <p>מקומות השמש, הירח והפלנטות מחושבים במכשיר מנוסחאות אסטרונומיות: VSOP87 מקוצר לפלנטות, סדרת מיאוס לירח, ונוסחאות סטנדרטיות לזמן הכוכבים, לעולה ולבתים. הם נמדדו מול Swiss Ephemeris, המנוע שמאחורי רוב אתרי המפות: הסטייה בקו האורך של השמש, הירח ושמונה הפלנטות קטנה מ-<b>10 שניות קשת</b>, ראש הדרקון האמיתי קטן מ-<b>דקת קשת</b>, וגבולות הבתים קטנים מ-<b>15 שניות קשת</b>. מעלה אחת היא 3,600 שניות קשת, ולכן ההבדל מול אתר אחר יהיה בדקות בלבד, ואינו מזיז מזל או בית.</p>
+    <h3>מה יכול להיות שונה בכל זאת</h3>
+    <ul>
+      <li><b>שעת לידה.</b> העולה עובר מזל בערך כל שעתיים, והירח כל יומיים וחצי. שעה משוערת נותנת עולה משוער. בלי שעה אין עולה ואין בתים.</li>
+      <li><b>אזור הזמן.</b> ההמרה לשעון גריניץ׳ נעשית לפי אזור הזמן של המקום וההיסטוריה של שעון הקיץ, כפי שהמכשיר מכיר אותה. האפליקציה בודקת בטעינה שהמכשיר יודע את זה, ואם לא, מבקשת קיזוז ידני.</li>
+      <li><b>שיטת בתים.</b> ברירת המחדל היא פלסידוס, כמו ברוב האתרים. שיטה אחרת נותנת גבולות אחרים לבתים, וזו בחירה ולא טעות.</li>
+      <li><b>פלוטו.</b> הנוסחה תקפה לשנים 1885 עד 2099. מחוץ לטווח הזה פלוטו מסומן ״דיוק נמוך״, והסטייה שנמדדה שם מגיעה עד כשליש מעלה ב-2150.</li>
+      <li><b>ראש הדרקון.</b> מוצג הראש האמיתי, כמו ברוב האתרים. יש אתרים שמציגים את הממוצע, והפער ביניהם מגיע לכמעלה וחצי.</li>
+    </ul>
+    <h3>מה זה לא</h3>
+    <p>האסטרונומיה כאן מדויקת. האסטרולוגיה, כלומר הטקסטים, היא מסורת של פירוש ולא מדע: ההסברים מתארים נטיות בלשון של אפשרות, ואינם תחזית, אבחנה או עצה. הם נכתבו בעברית פשוטה, בלי הבטחות, ובלי לגעת בגוף, בכסף או במשפט. מה שכתוב כאן נועד להיות מעניין, לא מחייב.</p>
+    <p class="hint">מקור המספרים: <code>node .claude/qa/galileo.js</code> על 60 מקרים בין 1850 ל-2150.</p>
+  </div>
+</section>
+
+<section id="v-privacy" class="view" hidden>
+  <div class="card"><h2>פרטיות</h2>
+    <p><b>שום דבר לא נשלח לשרת.</b> תאריך הלידה, השעה, המקום והשם נשארים במכשיר הזה. החישוב נעשה בדפדפן, ורשימת המקומות ואזורי הזמן כלולה באפליקציה.</p>
+    <p><b>מה נשמר במכשיר:</b> המפה האחרונה, רשימת ״האנשים שלי״ והגדרות הנגישות, באחסון המקומי של הדפדפן, תחת המפתחות שמתחילים ב-<code>rakia:</code>. מחיקת נתוני האתר בדפדפן מוחקת אותם.</p>
+    <p><b>ייצוא ושיתוף:</b> קובץ הייצוא ותמונת השיתוף נוצרים במכשיר ונשמרים או נשלחים רק אם בוחרים בכך.</p>
+    <p><b>ספירת כניסות:</b> האתר סופר כניסות באופן אנונימי, ללא עוגיות, כמו בשאר האפליקציות באתר. הספירה אינה כוללת שום פרט מהמפה.</p>
+    <p><b>גופנים:</b> גופן Heebo נטען מ-Google Fonts, כמו בכל האפליקציות באתר. זו הבקשה החיצונית היחידה מלבד הספירה.</p>
+    <p>התנאים המלאים: <a href="/legal/">תנאי שימוש, פרטיות וזכויות יוצרים</a>.</p>
+  </div>
+</section>
+</main>
+
+<div class="sheet-back" id="sheet-back"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+  <div class="grip" aria-hidden="true"></div>
+  <h2 id="sheet-title"></h2>
+  <div id="sheet-body"></div>
+  <div class="actions"><button type="button" class="btn small" data-a="closesheet">סגירה</button></div>
+</div>
+
+<footer class="foot"><span id="build-line"></span> · <span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/">כל האפליקציות</a> · <span class="noprint">מקומות: GeoNames (CC BY 4.0)</span></footer>
+
+<script src="data/schema.js"></script>
+<script src="data/texts-signs-1.js"></script>
+<script src="data/texts-signs-2.js"></script>
+<script src="data/texts-houses.js"></script>
+<script src="data/texts-aspects-1.js"></script>
+<script src="data/texts-aspects-2.js"></script>
+<script src="data/glossary.js"></script>
+<script src="data/places.js"></script>
+<script src="ephem-data.js"></script>
+<script src="astro.js"></script>
+<script src="/tutor/he-speech.js"></script>
+<script src="/legal/terms.js"></script>
+<script src="/legal/protect.js"></script>
+<script>
+/* =====================================================================
+   רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
+   ===================================================================== */
+var BUILD="r1 · 2026-09-18";
+/* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
+var PREF_KEY="rakia:prefs";
+var PEOPLE_KEY="rakia:people";
+var LAST_KEY="rakia:last";
+
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function T(o){return (o&&(o.he||o.en))||""}
+var N=RAKIA.NAMES;
+var GLYPH={sun:"☉",moon:"☽",mercury:"☿",venus:"♀",mars:"♂",jupiter:"♃",saturn:"♄",uranus:"♅",neptune:"♆",pluto:"♇",trueNode:"☊"};
+var SIGN_EL=["fire","earth","air","water"];  /* טלה אש, שור אדמה, תאומים אוויר, סרטן מים… בסבב */
+function elOf(sign){return SIGN_EL[sign%4]}
+var MONTHS=["","ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+function two(n){return (n<10?"0":"")+n}
+function fmtDeg(d){ var w=Math.floor(d), m=Math.floor((d-w)*60); return w+"°"+two(m)+"′" }
+function fmtLon(lon){ var s=Math.floor(lon/30), d=lon%30; return fmtDeg(d)+" "+N.sign[RAKIA.SIGNS[s]] }
+
+/* ---------- העדפות וששת מצבי הנגישות ---------- */
+var prefs={modes:{},fs:0,theme:"auto",rate:0.95};
+function loadPrefs(){ try{ var p=JSON.parse(localStorage.getItem(PREF_KEY)||"{}"); if(p&&typeof p==="object"){ prefs.modes=p.modes||{}; prefs.fs=p.fs||0; prefs.theme=p.theme||"auto"; } }catch(e){} }
+function savePrefs(){ try{ localStorage.setItem(PREF_KEY,JSON.stringify(prefs)) }catch(e){} }
+function applyModes(){
+  var h=document.documentElement;
+  h.classList.toggle("clear-font",!!prefs.modes["clear-font"]);
+  h.classList.toggle("hc",!!prefs.modes.hc);
+  h.classList.toggle("rm",!!prefs.modes.rm);
+  h.classList.toggle("spaced",!!prefs.modes.spaced);
+  h.style.setProperty("--fs",[17,20,24][prefs.fs||0]+"px");
+  if(prefs.theme==="auto")h.removeAttribute("data-theme"); else h.setAttribute("data-theme",prefs.theme);
+  $$('[data-a="mode"]').forEach(function(b){b.setAttribute("aria-pressed",String(!!prefs.modes[b.dataset.v]))});
+  $$('[data-a="fs"]').forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.v===(prefs.fs||0)))});
+  $$('[data-a="theme"]').forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.v===prefs.theme))});
+}
+
+/* ---------- ניווט ---------- */
+var VIEWS=["form","chart","people","settings","glossary","accuracy","privacy"];
+var view="form", ctab="wheel";
+function nav(v){
+  if(v==="chart"&&!current)v="form";
+  view=v;
+  VIEWS.forEach(function(k){ var el=$("#v-"+k); if(el)el.hidden=(k!==v) });
+  $("#chart-tabs").hidden=(v!=="chart");
+  if(v==="chart")showTab(ctab);
+  if(v==="people")renderPeople();
+  if(v==="glossary")renderGloss();
+  stopSpeak();
+  try{ $("#main").focus({preventScroll:true}) }catch(e){}
+  window.scrollTo(0,0);
+}
+function showTab(t){
+  ctab=t;
+  ["wheel","table","texts","today"].forEach(function(k){ $("#chart-tab-"+k).hidden=(k!==t) });
+  $$('[data-a="ctab"]').forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.v===t))});
+  if(t==="today")renderToday();
+}
+
+/* ---------- חיפוש מקום ---------- */
+var placeSel=null, sugIdx=-1, sugList=[];
+function normQ(s){return String(s||"").toLowerCase().replace(/[’'`"״׳]/g,"").replace(/\s+/g," ").trim()}
+function searchPlaces(q){
+  q=normQ(q); if(q.length<2)return [];
+  var out=[],i,p,he,en;
+  for(i=0;i<PLACES.length&&out.length<8;i++){
+    p=PLACES[i]; he=normQ(p[0]); en=normQ(p[1]);
+    if((he&&he.indexOf(q)===0)||en.indexOf(q)===0||(he&&he.indexOf(" "+q)>0)||en.indexOf(" "+q)>0)out.push(p);
+  }
+  return out;
+}
+var COUNTRY={IL:"ישראל",PS:"יהודה, שומרון ועזה",US:"ארה״ב",RU:"רוסיה",UA:"אוקראינה",FR:"צרפת",GB:"בריטניה",DE:"גרמניה",AR:"ארגנטינה",BR:"ברזיל",CA:"קנדה",ET:"אתיופיה",MA:"מרוקו",IN:"הודו",TR:"טורקיה",IT:"איטליה",ES:"ספרד",BY:"בלארוס",MD:"מולדובה",GE:"גאורגיה",UZ:"אוזבקיסטן",KZ:"קזחסטן",MX:"מקסיקו",AU:"אוסטרליה",ZA:"דרום אפריקה",NL:"הולנד",BE:"בלגיה",CH:"שווייץ",AT:"אוסטריה",PL:"פולין",HU:"הונגריה",RO:"רומניה",CZ:"צ׳כיה",GR:"יוון",EG:"מצרים",IR:"איראן",IQ:"עיראק",YE:"תימן",TN:"תוניסיה",DZ:"אלג׳יריה",LY:"לוב",SY:"סוריה",LB:"לבנון",JO:"ירדן",CN:"סין",JP:"יפן",KR:"קוריאה",TH:"תאילנד",AZ:"אזרבייג׳ן",AM:"ארמניה",LT:"ליטא",LV:"לטביה",EE:"אסטוניה",SE:"שוודיה",NO:"נורווגיה",DK:"דנמרק",FI:"פינלנד",IE:"אירלנד",PT:"פורטוגל"};
+function placeLabel(p){ return (p[0]||p[1])+(p[0]&&p[0]!==p[1]?" · "+p[1]:"") }
+function renderSuggest(){
+  var ul=$("#place-list"), inp=$("#f-place");
+  if(!sugList.length){ ul.hidden=true; ul.innerHTML=""; inp.setAttribute("aria-expanded","false"); return }
+  ul.innerHTML=sugList.map(function(p,i){ return '<li role="option" id="opt-'+i+'" data-i="'+i+'" aria-selected="'+(i===sugIdx)+'"><span>'+esc(placeLabel(p))+'</span><small>'+esc(COUNTRY[p[2]]||p[2])+'</small></li>' }).join("");
+  ul.hidden=false; inp.setAttribute("aria-expanded","true");
+  inp.setAttribute("aria-activedescendant",sugIdx>=0?"opt-"+sugIdx:"");
+}
+function pickPlace(p){ placeSel=p; $("#f-place").value=placeLabel(p); sugList=[]; sugIdx=-1; renderSuggest();
+  $("#place-hint").textContent="אזור זמן: "+p[5]+" · "+p[3]+"°, "+p[4]+"°"; }
+
+/* ---------- חישוב ---------- */
+var current=null;   /* {who, y,m,d,hh,mi,timeKnown,place,tz,offset,houseSystem,chart} */
+function readForm(){
+  var y=+$("#f-year").value, m=+$("#f-month").value, d=+$("#f-day").value;
+  var notime=$("#f-notime").checked, t=$("#f-time").value||"12:00";
+  var hh=+t.split(":")[0], mi=+t.split(":")[1];
+  var err=[];
+  if(!(y>=1900&&y<=2100))err.push("שנה בין 1900 ל-2100");
+  if(!(m>=1&&m<=12))err.push("חודש");
+  var dim=new Date(Date.UTC(y,m,0)).getUTCDate();
+  if(!(d>=1&&d<=dim))err.push("יום בין 1 ל-"+dim);
+  if(!placeSel){ var s=searchPlaces($("#f-place").value); if(s.length===1)placeSel=s[0]; }
+  if(!placeSel)err.push("מקום מהרשימה");
+  if(notime){hh=12;mi=0}
+  if(err.length)return {err:"חסר או לא תקין: "+err.join(", ")};
+  return {who:$("#f-name").value.trim(),y:y,m:m,d:d,hh:hh,mi:mi,timeKnown:!notime,place:placeSel,houseSystem:$("#f-houses").value};
+}
+var INTL_OK=true;
+function computeFrom(o){
+  var utcMs, off;
+  var manual=$("#f-tz").value;
+  if(!INTL_OK&&manual!==""){ off=Math.round(+manual*60); utcMs=Date.UTC(o.y,o.m-1,o.d,o.hh,o.mi)-off*60000; }
+  else { var r=ASTRO.localToUtc(o.y,o.m,o.d,o.hh,o.mi,o.place[5]); utcMs=r.utcMs; off=r.offsetMinutes; }
+  var jd=ASTRO.jdFromMs(utcMs);
+  var ch=ASTRO.chart({jdUt:jd,lat:o.place[3],lon:o.place[4],houseSystem:o.houseSystem,timeKnown:o.timeKnown});
+  o.utcMs=utcMs; o.offset=off; o.chart=ch; o.tz=o.place[5];
+  return o;
+}
+function onSubmit(e){
+  e.preventDefault();
+  var o=readForm(), errEl=$("#form-err");
+  if(o.err){ errEl.textContent=o.err; errEl.hidden=false; return }
+  errEl.hidden=true;
+  current=computeFrom(o);
+  try{ localStorage.setItem(LAST_KEY,JSON.stringify(serialize(current))) }catch(e2){}
+  renderChart(); nav("chart"); showTab("wheel");
+}
+function serialize(o){ return {who:o.who,y:o.y,m:o.m,d:o.d,hh:o.hh,mi:o.mi,timeKnown:o.timeKnown,place:o.place,houseSystem:o.houseSystem} }
+function fillForm(o){
+  $("#f-name").value=o.who||""; $("#f-year").value=o.y; $("#f-month").value=o.m; $("#f-day").value=o.d;
+  $("#f-time").value=two(o.hh)+":"+two(o.mi); $("#f-notime").checked=!o.timeKnown; $("#f-houses").value=o.houseSystem||"placidus";
+  if(o.place)pickPlace(o.place);
+}
+
+/* ---------- הרגע האחד ---------- */
+function bodyOf(ch,id){ for(var i=0;i<ch.bodies.length;i++)if(ch.bodies[i].id===id)return ch.bodies[i]; return null }
+function signName(lon){ return N.sign[RAKIA.SIGNS[Math.floor(lon/30)]] }
+function renderMoment(){
+  var o=current, ch=o.chart, sun=bodyOf(ch,"sun"), moon=bodyOf(ch,"moon");
+  var who=o.who?esc(o.who)+" — ":"";
+  var when=o.d+" ב"+MONTHS[o.m]+" "+o.y+(o.timeKnown?", בשעה "+two(o.hh)+":"+two(o.mi):", שעה לא ידועה");
+  var where=esc(o.place[0]||o.place[1]);
+  var s=who+when+", "+where+". השמש ב<b>"+signName(sun.lon)+"</b>, הירח ב<b>"+signName(moon.lon)+"</b>";
+  if(ch.houses)s+=", ובמזרח עלה <b>"+signName(ch.houses.asc)+"</b>";
+  s+=".";
+  $("#moment").innerHTML=s;
+  var notes=[];
+  notes.push('<p class="hint">זמן אוניברסלי: '+esc(new Date(o.utcMs).toISOString().replace("T"," ").slice(0,16))+' · קיזוז '+(o.offset>=0?"+":"")+(o.offset/60)+' שעות ('+esc(o.tz)+') · שיטת בתים: '+({placidus:"פלסידוס",whole:"מזל שלם",equal:"בתים שווים"})[ch.houses?ch.houses.system:o.houseSystem]+'</p>');
+  if(!o.timeKnown)notes.push('<p class="notice">בלי שעת לידה: אין עולה ואין בתים, והמפה חושבה לצהריים.</p>');
+  if(ch.houses&&ch.houses.fallback)notes.push('<p class="notice">ברוחב גיאוגרפי כזה שיטת פלסידוס אינה מוגדרת, ולכן הבתים חושבו לפי מזל שלם.</p>');
+  var pl=bodyOf(ch,"pluto"); if(pl&&pl.lowPrecision)notes.push('<p class="notice">פלוטו מחוץ לטווח הנוסחה (1885–2099) — דיוק נמוך, עד כשליש מעלה.</p>');
+  $("#chart-notes").innerHTML=notes.join("");
+  $("#moment-title").textContent="הרגע האחד"+(o.who?" של "+o.who:"");
+}
+
+/* ---------- הגלגל ---------- */
+var SHORT={sun:"שמש",moon:"ירח",mercury:"מרק׳",venus:"ונוס",mars:"מאדים",jupiter:"יופ׳",saturn:"סטורן",uranus:"אור׳",neptune:"נפט׳",pluto:"פלוטו",trueNode:"ראש"};
+var ASPECT_COLOR={conjunction:"var(--muted)",opposition:"var(--fire)",square:"var(--fire)",trine:"var(--air)",sextile:"var(--earth)"};
+function wheelSVG(ch,size,forImage){
+  var S=size||600, c=S/2, rOut=c-6, rSign=rOut-38, rHouse=rSign-14, rPl=rSign-56, rIn=rPl-46;
+  var asc=ch.houses?ch.houses.asc:0;
+  function ang(lon){ return (180+(lon-asc))*Math.PI/180 }   /* עולה משמאל, נגד כיוון השעון */
+  function pt(lon,r){ var a=ang(lon); return [c+r*Math.cos(a), c-r*Math.sin(a)] }
+  var col=forImage?{ink:"#1c1a2e",muted:"#5b5877",line:"#c9c4e6",acc:"#4c3d99",bg:"#ffffff",fire:"#b3261e",earth:"#3a6b1f",air:"#1f5f8b",water:"#4b3a99"}:null;
+  function v(name){ return col?col[name]:"var(--"+name+")" }
+  var s='<svg class="wheel" viewBox="0 0 '+S+' '+S+'" role="img" aria-label="גלגל המפה" xmlns="http://www.w3.org/2000/svg">';
+  if(forImage)s+='<rect width="'+S+'" height="'+S+'" fill="'+col.bg+'"/>';
+  s+='<circle cx="'+c+'" cy="'+c+'" r="'+rOut+'" fill="none" stroke="'+v("line")+'" stroke-width="2"/>';
+  s+='<circle cx="'+c+'" cy="'+c+'" r="'+rSign+'" fill="none" stroke="'+v("line")+'" stroke-width="1.5"/>';
+  s+='<circle cx="'+c+'" cy="'+c+'" r="'+rIn+'" fill="none" stroke="'+v("line")+'" stroke-width="1"/>';
+  var i,p,q;
+  for(i=0;i<12;i++){
+    p=pt(i*30,rOut); q=pt(i*30,rSign);
+    s+='<line x1="'+p[0]+'" y1="'+p[1]+'" x2="'+q[0]+'" y2="'+q[1]+'" stroke="'+v("line")+'" stroke-width="1.5"/>';
+    var m=pt(i*30+15,(rOut+rSign)/2), el=elOf(i);
+    s+='<text x="'+m[0]+'" y="'+m[1]+'" font-size="'+(S*0.024)+'" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="'+v(el)+'">'+N.sign[RAKIA.SIGNS[i]]+'</text>';
+  }
+  if(ch.houses){
+    for(i=1;i<=12;i++){
+      var cu=ch.houses.cusps[i], big=(i===1||i===4||i===7||i===10);
+      p=pt(cu,rSign); q=pt(cu,rIn);
+      s+='<line x1="'+p[0]+'" y1="'+p[1]+'" x2="'+q[0]+'" y2="'+q[1]+'" stroke="'+v(big?"acc":"line")+'" stroke-width="'+(big?3:1)+'"/>';
+      var nx=ASTRO.norm(ch.houses.cusps[i===12?1:i+1]-cu), hm=pt(cu+nx/2,rIn-16);
+      s+='<text x="'+hm[0]+'" y="'+hm[1]+'" font-size="'+(S*0.022)+'" text-anchor="middle" dominant-baseline="middle" fill="'+v("muted")+'">'+i+'</text>';
+    }
+    var A=pt(asc,rOut+2); s+='<text x="'+(A[0]-4)+'" y="'+(A[1]-8)+'" font-size="'+(S*0.024)+'" font-weight="800" text-anchor="end" fill="'+v("acc")+'">עולה</text>';
+    var M=pt(ch.houses.mc,rOut+2); s+='<text x="'+M[0]+'" y="'+(M[1]-4)+'" font-size="'+(S*0.024)+'" font-weight="800" text-anchor="middle" fill="'+v("acc")+'">רום</text>';
+  }
+  /* אספקטים בפנים */
+  ch.aspects.forEach(function(a){
+    var b1=bodyOf(ch,a.a), b2=bodyOf(ch,a.b); if(!b1||!b2)return;
+    p=pt(b1.lon,rIn-4); q=pt(b2.lon,rIn-4);
+    var cc=col?({conjunction:col.muted,opposition:col.fire,square:col.fire,trine:col.air,sextile:col.earth})[a.type]:ASPECT_COLOR[a.type];
+    s+='<line x1="'+p[0]+'" y1="'+p[1]+'" x2="'+q[0]+'" y2="'+q[1]+'" stroke="'+cc+'" stroke-width="'+(a.type==="conjunction"?0:1.4)+'" stroke-dasharray="'+(a.type==="sextile"||a.type==="trine"?"":"5 3")+'" opacity=".8"/>';
+  });
+  /* פלנטות, עם דחיפה קלה כשהן צפופות */
+  var placed=[], sorted=ch.bodies.slice().sort(function(x,y){return x.lon-y.lon});
+  sorted.forEach(function(b){
+    var lon=b.lon, tries=0;
+    while(tries<12&&placed.some(function(o){return Math.abs(ASTRO.norm180(o-lon))<8.5})){ lon=ASTRO.norm(lon+8.5); tries++; }
+    placed.push(lon);
+    var P=pt(lon,rPl), tick=pt(b.lon,rSign), tick2=pt(b.lon,rSign-8);
+    s+='<line x1="'+tick[0]+'" y1="'+tick[1]+'" x2="'+tick2[0]+'" y2="'+tick2[1]+'" stroke="'+v("ink")+'" stroke-width="2"/>';
+    s+='<g class="pl" data-a="pl" data-v="'+b.id+'" role="button" tabindex="0" aria-label="'+esc(N.planet[b.id==="trueNode"?"node":b.id])+' '+esc(fmtLon(b.lon))+'" style="cursor:pointer">';
+    s+='<circle cx="'+P[0]+'" cy="'+P[1]+'" r="'+(S*0.034)+'" fill="'+v("bg")+'" stroke="'+v("acc")+'" stroke-width="1.5"/>';
+    s+='<text x="'+P[0]+'" y="'+(P[1]-1)+'" font-size="'+(S*0.022)+'" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="'+v("ink")+'">'+SHORT[b.id]+'</text>';
+    s+='<text x="'+P[0]+'" y="'+(P[1]+S*0.02)+'" font-size="'+(S*0.016)+'" text-anchor="middle" dominant-baseline="middle" fill="'+v("muted")+'">'+Math.floor(b.deg)+'°'+(b.retro?" נ׳":"")+'</text></g>';
+  });
+  s+='</svg>';
+  return s;
+}
+function renderWheel(){ $("#wheel").innerHTML=wheelSVG(current.chart,600,false) }
+
+/* ---------- הטבלה ---------- */
+function renderTable(){
+  var ch=current.chart, rows=ch.bodies.map(function(b){
+    var nm=N.planet[b.id==="trueNode"?"node":b.id];
+    return '<tr class="body" data-a="pl" data-v="'+b.id+'" tabindex="0"><td><span class="glyph" aria-hidden="true">'+GLYPH[b.id]+'</span>'+esc(nm)+(b.lowPrecision?' <span class="tag warn">דיוק נמוך</span>':'')+'</td><td class="el-'+elOf(b.sign)+'">'+esc(N.sign[RAKIA.SIGNS[b.sign]])+'</td><td dir="ltr" style="text-align:end">'+fmtDeg(b.deg)+'</td><td>'+(ch.houses?b.house:"—")+'</td><td>'+(b.retro?'<span class="retro" title="נסיגה">נ׳</span>':'')+'</td></tr>';
+  });
+  if(ch.houses){
+    rows.push('<tr><td>עולה</td><td class="el-'+elOf(Math.floor(ch.houses.asc/30))+'">'+esc(signName(ch.houses.asc))+'</td><td dir="ltr" style="text-align:end">'+fmtDeg(ch.houses.asc%30)+'</td><td>1</td><td></td></tr>');
+    rows.push('<tr><td>רום השמיים</td><td class="el-'+elOf(Math.floor(ch.houses.mc/30))+'">'+esc(signName(ch.houses.mc))+'</td><td dir="ltr" style="text-align:end">'+fmtDeg(ch.houses.mc%30)+'</td><td>10</td><td></td></tr>');
+  }
+  $("#table").innerHTML='<table><thead><tr><th>גוף</th><th>מזל</th><th>מעלה</th><th>בית</th><th><span class="vis-hidden">נסיגה</span></th></tr></thead><tbody>'+rows.join("")+'</tbody></table>'+
+    (ch.houses?'<h3>גבולות הבתים</h3><table><thead><tr><th>בית</th><th>מתחיל ב</th></tr></thead><tbody>'+ch.houses.cusps.slice(1).map(function(c,i){return '<tr><td>'+(i+1)+'</td><td>'+esc(fmtLon(c))+'</td></tr>'}).join("")+'</tbody></table>':'');
+  $("#aspects").innerHTML=ch.aspects.length?'<table><thead><tr><th>בין</th><th>אספקט</th><th>אורב</th></tr></thead><tbody>'+ch.aspects.map(function(a){
+    return '<tr><td>'+esc(N.planet[a.a])+' – '+esc(N.planet[a.b])+'</td><td>'+esc(N.aspect[a.type])+' ('+a.angle+'°)</td><td dir="ltr" style="text-align:end">'+a.orb.toFixed(1)+'°</td></tr>'}).join("")+'</tbody></table>':'<p class="hint">אין אספקטים בתוך האורבים.</p>';
+}
+
+/* ---------- ההסברים ---------- */
+function txt(fam,a,b){ var f=RAKIA.TEXTS[fam]; var o=f&&f[a]&&f[a][b]; return o?T(o):"" }
+function elementCounts(ch){
+  var c={fire:0,earth:0,air:0,water:0};
+  ch.bodies.forEach(function(b){ if(b.id==="trueNode")return; c[elOf(b.sign)]+=(b.id==="sun"||b.id==="moon")?2:1 });
+  if(ch.houses)c[elOf(Math.floor(ch.houses.asc/30))]+=2;
+  return c;
+}
+function block(title,text,cls){
+  if(!text)return "";
+  return '<div class="text-block"><h4><span class="'+(cls||"")+'">'+esc(title)+'</span><button type="button" class="speak" data-a="say" data-text="'+esc(title+". "+text)+'">הקראה</button></h4><p>'+esc(text)+'</p></div>';
+}
+function chartTexts(ch){
+  var out=[], ec=elementCounts(ch), top=Object.keys(ec).sort(function(a,b){return ec[b]-ec[a]})[0];
+  out.push({title:"היסוד הבולט: "+N.element[top],text:txt("element",top),cls:"el-"+top});
+  ch.bodies.forEach(function(b){
+    if(b.id==="trueNode")return;
+    var sg=RAKIA.SIGNS[b.sign];
+    out.push({title:N.planet[b.id]+" ב"+N.sign[sg],text:txt("planetSign",b.id,sg),cls:"el-"+elOf(b.sign)});
+    if(ch.houses)out.push({title:N.planet[b.id]+" ב"+N.house[b.house],text:txt("planetHouse",b.id,b.house)});
+  });
+  ch.aspects.forEach(function(a){ out.push({title:N.aspect[a.type]+" בין "+N.planet[a.a]+" ל"+N.planet[a.b],text:txt("aspect",RAKIA.pairKey(a.a,a.b),a.type)}) });
+  return out.filter(function(x){return x.text});
+}
+function renderTexts(){ $("#texts").innerHTML=chartTexts(current.chart).map(function(x){return block(x.title,x.text,x.cls)}).join("") }
+
+/* ---------- הגיליון התחתון ---------- */
+function openSheet(id){
+  var ch=current.chart, b=bodyOf(ch,id); if(!b)return;
+  var nm=N.planet[id==="trueNode"?"node":id], sg=RAKIA.SIGNS[b.sign], html="";
+  html+='<p class="moment">'+esc(nm)+' ב<b class="el-'+elOf(b.sign)+'">'+esc(N.sign[sg])+'</b>, '+fmtDeg(b.deg)+(ch.houses?', '+esc(N.house[b.house]):'')+(b.retro?' · <span class="retro">בנסיגה</span>':'')+'</p>';
+  if(id==="trueNode")html+='<p>'+esc(T(RAKIA.GLOSSARY.filter(function(g){return g.term==="ראש הדרקון"})[0].def))+'</p>';
+  else{
+    html+=block(nm+" ב"+N.sign[sg],txt("planetSign",id,sg),"el-"+elOf(b.sign));
+    if(ch.houses)html+=block(nm+" ב"+N.house[b.house],txt("planetHouse",id,b.house));
+    ch.aspects.filter(function(a){return a.a===id||a.b===id}).forEach(function(a){
+      var other=a.a===id?a.b:a.a;
+      html+=block(N.aspect[a.type]+" עם "+N.planet[other],txt("aspect",RAKIA.pairKey(a.a,a.b),a.type));
+    });
+  }
+  $("#sheet-title").textContent=nm; $("#sheet-body").innerHTML=html;
+  $("#sheet").hidden=false; $("#sheet-back").classList.add("on");
+  requestAnimationFrame(function(){ $("#sheet").classList.add("on") });
+  $('[data-a="closesheet"]').focus();
+}
+function closeSheet(){ stopSpeak(); $("#sheet").classList.remove("on"); $("#sheet-back").classList.remove("on"); setTimeout(function(){ $("#sheet").hidden=true },250) }
+
+/* ---------- היום בשמיים ---------- */
+function renderToday(){
+  if(!current)return;
+  var now=new Date(), jd=ASTRO.jdFromMs(now.getTime());
+  var tr=ASTRO.chart({jdUt:jd,lat:current.place[3],lon:current.place[4],houseSystem:current.houseSystem,timeKnown:false});
+  var natal=current.chart, html='<p class="hint">מקומות הפלנטות עכשיו ('+esc(now.toLocaleString("he-IL"))+') מול מפת הלידה. מעבר הוא רגע, לא גזרה.</p><div class="grid">';
+  tr.bodies.forEach(function(b){
+    if(b.id==="trueNode")return;
+    var h=natal.houses?ASTRO.houseOf(b.lon,natal.houses.cusps):0;
+    html+='<div class="tcard"><b>'+esc(N.planet[b.id])+' היום ב'+esc(N.sign[RAKIA.SIGNS[b.sign]])+' '+fmtDeg(b.deg)+(b.retro?' <span class="retro">נ׳</span>':'')+'</b>'+(h?'<span>עובר ב'+esc(N.house[h])+' של המפה</span>':'')+'</div>';
+  });
+  html+='</div><h3>מה נוגע במפה עכשיו</h3>';
+  var hits=[];
+  tr.bodies.forEach(function(t){ if(t.id==="trueNode")return; natal.bodies.forEach(function(n){ if(n.id==="trueNode")return;
+    var sep=Math.abs(ASTRO.norm180(t.lon-n.lon));
+    ASTRO.ASPECTS.forEach(function(A){ var d=Math.abs(sep-A[1]); if(d<=3)hits.push({t:t.id,n:n.id,type:A[0],orb:d}) });
+  })});
+  hits.sort(function(a,b){return a.orb-b.orb});
+  if(!hits.length)html+='<p class="hint">אין היום אספקט הדוק (עד שלוש מעלות) בין השמיים למפה.</p>';
+  hits.slice(0,8).forEach(function(h){
+    var same=h.t===h.n, title=N.planet[h.t]+" בשמיים "+(same?"חוזר למקומו במפה":N.aspect[h.type]+" ל"+N.planet[h.n]+" שבמפה");
+    var text=same?"הפלנטה חוזרת למקום שבו הייתה בלידה. זה זמן שבו הנושא של הפלנטה הזאת מבקש תשומת לב מחודשת.":txt("aspect",RAKIA.pairKey(h.t,h.n),h.type);
+    html+=block(title+" ("+h.orb.toFixed(1)+"°)",text);
+  });
+  $("#today").innerHTML=html;
+}
+
+/* ---------- האנשים שלי ---------- */
+function people(){ try{ var p=JSON.parse(localStorage.getItem(PEOPLE_KEY)||"[]"); return Array.isArray(p)?p:[] }catch(e){ return [] } }
+function setPeople(list){ try{ localStorage.setItem(PEOPLE_KEY,JSON.stringify(list)) }catch(e){} }
+function savePerson(){
+  if(!current)return;
+  var list=people(), rec=serialize(current); rec.id=Date.now(); rec.who=rec.who||"ללא שם";
+  list.push(rec); setPeople(list); toast("נשמר ב״האנשים שלי״");
+}
+function renderPeople(){
+  var list=people(), ul=$("#people-list");
+  ul.innerHTML=list.length?list.map(function(p){ return '<li><span class="name">'+esc(p.who||"ללא שם")+'</span><span class="hint">'+p.d+'.'+p.m+'.'+p.y+(p.timeKnown?' '+two(p.hh)+':'+two(p.mi):'')+' · '+esc(p.place[0]||p.place[1])+'</span><button type="button" class="btn small" data-a="open" data-v="'+p.id+'">פתיחה</button><button type="button" class="btn small" data-a="del" data-v="'+p.id+'">מחיקה</button></li>' }).join(""):'<li class="hint">עדיין אין אף אחד. חשבו מפה ולחצו ״שמירה לאנשים שלי״.</li>';
+}
+function openPerson(id){ var p=people().filter(function(x){return String(x.id)===String(id)})[0]; if(!p)return; fillForm(p); current=computeFrom(serialize(p)); renderChart(); nav("chart") }
+function delPerson(id){ if(!confirm("למחוק מהרשימה?"))return; setPeople(people().filter(function(x){return String(x.id)!==String(id)})); renderPeople() }
+function exportPeople(){
+  var data={app:"rakia",version:1,exported:new Date().toISOString(),people:people()};
+  var blob=new Blob([JSON.stringify(data,null,1)],{type:"application/json"});
+  var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="rakia-people.json"; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
+}
+function importPeople(file){
+  var rd=new FileReader();
+  rd.onload=function(){ try{
+    var d=JSON.parse(rd.result), inc=Array.isArray(d)?d:(d&&d.people)||[];
+    var ok=inc.filter(function(p){return p&&p.y&&p.m&&p.d&&Array.isArray(p.place)&&p.place.length>=6});
+    var cur=people(), ids={}; cur.forEach(function(p){ids[p.id]=1});
+    ok.forEach(function(p){ if(!p.id||ids[p.id])p.id=Date.now()+Math.floor(Math.random()*1000); cur.push(p) });
+    setPeople(cur); renderPeople(); toast(ok.length+" נוספו");
+  }catch(e){ toast("הקובץ אינו קובץ ייצוא של רקיע") } };
+  rd.readAsText(file);
+}
+
+/* ---------- תמונת שיתוף והדפסה ---------- */
+function shareImage(){
+  if(!current)return;
+  var S=1080, svg=wheelSVG(current.chart,S,true);
+  var img=new Image(), canvas=document.createElement("canvas"); canvas.width=S; canvas.height=S+220;
+  var ctx=canvas.getContext("2d");
+  img.onload=function(){
+    ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,S,S);
+    ctx.fillStyle="#1c1a2e"; ctx.textAlign="center"; ctx.direction="rtl";
+    ctx.font="bold 44px Heebo, Arial, sans-serif"; ctx.fillText($("#moment-title").textContent,S/2,S+70);
+    ctx.font="34px Heebo, Arial, sans-serif"; ctx.fillText($("#moment").textContent.slice(0,70),S/2,S+130);
+    ctx.font="26px Heebo, Arial, sans-serif"; ctx.fillStyle="#5b5877"; ctx.fillText("רקיע · lagstein1-png.github.io/rakia",S/2,S+185);
+    canvas.toBlob(function(blob){
+      var file=new File([blob],"rakia.png",{type:"image/png"});
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:"רקיע"}).catch(function(){}) }
+      else{ var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="rakia.png"; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500); }
+    },"image/png");
+  };
+  img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+}
+function toast(m){ var t=document.createElement("div"); t.setAttribute("role","status"); t.textContent=m; t.style.cssText="position:fixed;bottom:16px;inset-inline-start:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:.6rem 1rem;border-radius:999px;z-index:60;font-weight:600"; document.body.appendChild(t); setTimeout(function(){t.remove()},2200) }
+function renderChart(){ renderMoment(); renderWheel(); renderTable(); renderTexts(); if(ctab==="today")renderToday(); }
+function renderGloss(){ $("#gloss").innerHTML=RAKIA.GLOSSARY.map(function(g){ return '<dt>'+esc(g.term)+' <button type="button" class="speak" data-a="say" data-text="'+esc(g.term+". "+T(g.def))+'">הקראה</button></dt><dd>'+esc(T(g.def))+'</dd>' }).join("") }
+</script>
+<script>
+/* =====================================================================
+   מנוע ההקראה של "תאוריה מדברת" — ארבעה מנגנונים
+   ---------------------------------------------------------------------
+   הועתק מ-kotvim/index.html (ושם מ"תאוריה מדברת"), עברית בלבד. ארבעה
+   כשלים שקטים של Web Speech, שכולם נראים למשתמש אותו דבר — הקול
+   מפסיק באמצע: 1 שומר-ער, 2 הפניה חיה ל-utterance, 3 שומר זמן,
+   4 נפילה מקול רשת. voiceUsable הוא מפתח המיון הראשון, והמגדר
+   קודם לאיכות. node .claude/qa/voice.js בודק את ארבעתם.
+   ===================================================================== */
+var state={rate:0.95};
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+/* 1 · שומר-ער. Chrome ו-Edge בשולחן העבודה חותכים אחרי כ-15 שניות;
+   pause+resume כל תשע שניות מחזיק את המנוע ער. במובייל אין את הבאג. */
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+/* 2 · הפניה חיה ל-utterance — בלעדיה Chrome אוסף אותו עם onend */
+var _activeU=null;
+/* 3 · קול רשת שנכשל. הדגל נכבה ומאותו רגע נבחר קול מקומי */
+var _netVoiceOK=true;
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+/* 4 · שומר זמן. onend שלא נורה — ארבע שניות של שקט משחררות את התור */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+var SEG_MAX=90, SEG_GAP=260;
+function insideNumber(str,i){ return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]) }
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){ merged[merged.length-1].text+=out[i].text; continue }
+    if(out[i].text.trim().length<12&&i+1<out.length){ out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
+var VOICE_TUNE={he:1.0};
+function tuneRate(lang,rate){ var t=VOICE_TUNE[String(lang||"he").split("-")[0].toLowerCase()]||0.88; return Math.max(0.5,Math.min(1.6,Math.round(t*(rate||1)*100)/100)) }
+var FEM_PITCH=1.35, PITCH_BASE=1.12;
+function femLift(v){ if(!v)return 1; try{ return vGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 } }
+function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
+function allVoices(){ try{ return speechSynthesis.getVoices()||[] }catch(e){ return [] } }
+var LANG_HINT={he:/עברית|hebrew|ivrit/i};
+var V_F=/(הילה|כרמית|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b)/;
+var V_M=/(אברי|אסף|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b)/;
+function vGender(v){var n=((v.name||"")+" "+(v.lang||"")).toLowerCase(); return V_F.test(n)?"f":V_M.test(n)?"m":"?"}
+function voicesFor(code){
+  var base=String(code).split("-")[0].toLowerCase(),hint=LANG_HINT[base];
+  return allVoices().filter(function(v){
+    var l=String(v.lang||"").replace("_","-").toLowerCase();
+    if(l.split("-")[0]===base)return true;
+    return !l&&hint?hint.test(v.name||""):false;
+  });
+}
+function bestVoice(code){
+  var pool=voicesFor(code); if(!pool.length)return null;
+  var want=String(code).toLowerCase(), pref="f";
+  function score(v){
+    var s=0,n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
+    if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
+    if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
+    if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    if(v.localService===false&&voiceUsable(v))s+=6;
+    if(/espeak|compact|pico/.test(n))s-=40;
+    if(v.default)s+=4;
+    return s;
+  }
+  /* המגדר הוא המיון שאחרי voiceUsable, לא סעיף בניקוד — החלטה של הריפו הזה */
+  function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
+  return pool.slice().sort(function(a,b){
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||score(b)-score(a);
+  })[0];
+}
+var _sayGen=0, _speakBtn=null;
+function heSpoken(t){ if(typeof HESPEECH==="undefined")return t; try{ return HESPEECH.spoken(t) }catch(e){ return t } }
+var _ttsBar=null;
+function ttsFail(err){
+  if(err==="interrupted"||err==="canceled")return;
+  if(_ttsBar)return;
+  var m=document.createElement("div"); m.setAttribute("role","alert"); m.dir="rtl";
+  m.style.cssText="position:fixed;inset-inline:10px;bottom:10px;z-index:99999;background:#7f1d1d;color:#fff;padding:13px 15px;border-radius:12px;font:600 15px/1.55 system-ui,Arial,sans-serif;display:flex;gap:10px;align-items:flex-start";
+  m.innerHTML='<div style="flex:1">ההקראה נכשלה במכשיר הזה ('+esc(err||"לא ידוע")+'). אפשר לבדוק את הקול במסך הנגישות.</div><button type="button" style="min-height:40px;border:0;border-radius:8px;padding:0 12px;font:inherit;background:#fff;color:#7f1d1d">סגירה</button>';
+  m.querySelector("button").onclick=ttsOK; document.body.appendChild(m); _ttsBar=m;
+}
+function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
+function setSpeakBtn(b,on){ if(_speakBtn&&_speakBtn!==b){_speakBtn.setAttribute("aria-pressed","false");_speakBtn.textContent="הקראה"} _speakBtn=on?b:null; if(b){b.setAttribute("aria-pressed",String(!!on));b.textContent=on?"עצירה":"הקראה"} }
+function speakDevice(text,code,rate){
+  if(!("speechSynthesis" in window))return false;
+  text=heSpoken(text);
+  try{speechSynthesis.cancel()}catch(e){}
+  var my=++_sayGen;
+  (function(){
+    try{
+      var v=bestVoice(code), lang=(v&&v.lang)||code;
+      var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
+      var pit=voicePitch(v), retried=false;
+      function alive(){return my===_sayGen}
+      function allDone(){ maybeStopKeepAlive(); ttsOK(); setSpeakBtn(_speakBtn,false) }
+      (function sayseg(k){
+        if(!alive())return;
+        if(k>=segs.length){ allDone(); return }
+        var seg=segs[k], moved=false, disarm=null;
+        function next(){
+          if(moved||!alive())return;
+          moved=true; if(disarm)disarm();
+          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+          else allDone();
+        }
+        var u=new SpeechSynthesisUtterance(seg.text);
+        u.lang=lang;
+        if(v){ try{ u.voice=v }catch(e2){} }
+        u.rate=rt; u.pitch=pit; u.volume=1;
+        u.onend=next;
+        u.onerror=function(e){
+          if(moved||!alive())return;
+          var err=(e&&e.error)||"";
+          if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+          if(!retried&&v&&v.localService===false){
+            retried=true; _netVoiceOK=false; moved=true;
+            if(disarm)disarm(); _activeU=null;
+            v=bestVoice(code); lang=(v&&v.lang)||code; pit=voicePitch(v);
+            setTimeout(function(){sayseg(k)},SEG_GAP);
+            return;
+          }
+          moved=true; if(disarm)disarm(); maybeStopKeepAlive(); ttsFail(err);
+        };
+        _activeU=u;
+        try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
+        speechSynthesis.speak(u);
+        startKeepAlive();
+        disarm=ttsWatchdog(function(){return alive()&&!moved},next);
+      })(0);
+    }catch(e){}
+  })();
+  return true;
+}
+function plainOf(h){ var d=document.createElement("div"); d.innerHTML=String(h||""); return (d.textContent||"").replace(/\s+/g," ").trim() }
+function speak(text,btn){
+  text=plainOf(String(text||"")).trim(); if(!text)return;
+  stopSpeak(); setSpeakBtn(btn||null,!!btn);
+  speakDevice(text,"he-IL",clamp(state.rate,0.55,1.4));
+}
+function stopSpeak(){_sayGen++;stopKeepAlive();_activeU=null;setSpeakBtn(_speakBtn,false);try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+try{document.addEventListener("visibilitychange",function(){ if(document.hidden)stopSpeak() })}catch(e){}
+function voiceCheck(){
+  var out=$("#vchk"); out.textContent="…";
+  if(!("speechSynthesis" in window)){ out.textContent="✗ הדפדפן הזה לא תומך בהקראה"; return }
+  var list=allVoices(), he=voicesFor("he-IL").length, u;
+  try{ speechSynthesis.cancel(); u=new SpeechSynthesisUtterance("שלום, זו בדיקת קול") }catch(e){ out.textContent="✗ "+e.message; return }
+  u.lang="he-IL"; var done=false;
+  u.onstart=function(){ done=true; out.textContent="✓ הקול פועל — "+he+" קולות בעברית מתוך "+list.length+" במכשיר" };
+  u.onerror=function(e){ done=true; var er=(e&&e.error)||""; out.textContent=(er==="interrupted"||er==="canceled")?"✓ הקול פועל":"✗ המנוע החזיר "+er+" — תקלה במכשיר, לא באפליקציה" };
+  try{ speechSynthesis.speak(u) }catch(e){ out.textContent="✗ "+e.message; return }
+  setTimeout(function(){ if(!done)out.textContent="✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר" },2000);
+}
+
+/* ---------- אירועים ---------- */
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-a]"); if(!el)return;
+  var a=el.dataset.a, v=el.dataset.v;
+  if(a==="nav"){ e.preventDefault(); nav(v) }
+  else if(a==="ctab")showTab(v);
+  else if(a==="pl")openSheet(v);
+  else if(a==="closesheet")closeSheet();
+  else if(a==="say"){ if(el.getAttribute("aria-pressed")==="true")stopSpeak(); else speak(el.dataset.text,el) }
+  else if(a==="sayall"){ if(!current)return; var all=chartTexts(current.chart).map(function(x){return x.title+". "+x.text}).join(" "); showTab("texts"); speak(all,null) }
+  else if(a==="save")savePerson();
+  else if(a==="share")shareImage();
+  else if(a==="print")window.print();
+  else if(a==="open")openPerson(v);
+  else if(a==="del")delPerson(v);
+  else if(a==="export")exportPeople();
+  else if(a==="import")$("#import-file").click();
+  else if(a==="mode"){ prefs.modes[v]=!prefs.modes[v]; savePrefs(); applyModes() }
+  else if(a==="fs"){ prefs.fs=+v; savePrefs(); applyModes() }
+  else if(a==="theme"){ prefs.theme=v; savePrefs(); applyModes() }
+  else if(a==="vcheck")voiceCheck();
+  else if(a==="terms"){ try{ window.LEGAL.show() }catch(e2){ location.href="/legal/" } }
+});
+document.addEventListener("keydown",function(e){
+  var el=e.target;
+  if(el&&el.matches&&el.matches('[data-a="pl"]')&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); openSheet(el.dataset.v) }
+  if(e.key==="Escape"&&!$("#sheet").hidden)closeSheet();
+  if(el&&el.id==="f-place"){
+    if(e.key==="ArrowDown"){ e.preventDefault(); if(sugList.length){ sugIdx=(sugIdx+1)%sugList.length; renderSuggest() } }
+    else if(e.key==="ArrowUp"){ e.preventDefault(); if(sugList.length){ sugIdx=(sugIdx-1+sugList.length)%sugList.length; renderSuggest() } }
+    else if(e.key==="Enter"){ if(sugList.length){ e.preventDefault(); pickPlace(sugList[sugIdx>=0?sugIdx:0]) } }
+    else if(e.key==="Escape"){ sugList=[]; renderSuggest() }
+  }
+});
+$("#sheet-back").addEventListener("click",closeSheet);
+$("#f-place").addEventListener("input",function(){ placeSel=null; sugList=searchPlaces(this.value); sugIdx=-1; renderSuggest(); $("#place-hint").textContent="אזור הזמן ושעון הקיץ נקבעים לפי המקום והתאריך." });
+$("#f-place").addEventListener("blur",function(){ setTimeout(function(){ sugList=[]; renderSuggest() },200) });
+$("#place-list").addEventListener("mousedown",function(e){ var li=e.target.closest("li"); if(li)pickPlace(sugList[+li.dataset.i]) });
+$("#f-notime").addEventListener("change",function(){ $("#f-time").disabled=this.checked });
+$("#import-file").addEventListener("change",function(){ if(this.files[0])importPeople(this.files[0]); this.value="" });
+$("#form").addEventListener("submit",onSubmit);
+
+/* ---------- אתחול ---------- */
+function boot(){
+  loadPrefs(); applyModes();
+  $("#build-line").textContent="גרסה "+BUILD;
+  /* O-2: ה-Intl של המכשיר הזה */
+  var st=ASTRO.selfTest(); INTL_OK=st.ok;
+  if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
+  try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
+  if(location.hash==="#people")nav("people"); else nav("form");
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r1-pwa1") }catch(e){} }
+}
+</script>
+<script>
+/* INTERNAL-GATE — לא נטענת בלי מפתח. */
+if(!INTERNAL_OK){
+  document.getElementById("gate").hidden=false;
+  document.title="לא פורסם";
+}else{
+  boot();
+}
+</script>
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
