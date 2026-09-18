@@ -44,7 +44,9 @@
 מתי — `marketing/schedule.md`.
 
 **ארבעת התסריטים כאן אינם אחת־עשרה ההדגמות.** תסריט 1 (מקריא
-קולי) ≈ הדגמת `reader`; תסריט 2 (״שלב״) ≈ הדגמת `math-teen`;
+קולי) ≈ הדגמת `reader`; תסריט 2 (״שלב״) הוקלט כלשונו —
+`node marketing/media/record.js --flow shlav` →
+`media/video/shlav-math-teen.mp4`, עם שמונה שורות הטבלה שלמטה;
 תסריט 3 (מצב מורה) — אף `DEMO_SCRIPT` אינו נכנס למצב מורה, ולכן
 המקליט עצמו עובר את המסלול האמיתי ב-`math-teen` עם הכתוביות
 מהטבלה שלמטה: `node marketing/media/record.js --flow teacher` →
