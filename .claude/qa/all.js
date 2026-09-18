@@ -189,6 +189,10 @@ const SUITE = [
   { id: 'visible',  args: [],     needsServer: true },
   { id: 'clicks',   args: [],     needsServer: true },
   { id: 'langbtn',  args: [],     needsServer: true },
+  /* ״שלב״ בארבע שפות בפועל (O-58): כל שדה שמוצג עובר trHTML, ההקראה
+     בלי אות עברית, ומילה מתורגמת אינה צמודה לספרה. 18.9.2026 —
+     ar 9 · ru 13 · en 15 שברי פיצול, ו-״10 процентов מתוך 40״ בקול. */
+  { id: 'teen-i18n', args: [], needsServer: true },
   /* מנוע ההקראה מול speechSynthesis מזויף. slow: הוא ממתין 9.8
      שניות לכל אפליקציה כדי לראות את שומר-הער פועם. */
   { id: 'voice',    args: [],     needsServer: true, slow: true },
