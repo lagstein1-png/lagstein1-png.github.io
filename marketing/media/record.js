@@ -42,7 +42,7 @@
 
    הרצה:
      node marketing/media/record.js              כל האפליקציות
-     node marketing/media/record.js --flow teacher  תסריט 3 — מצב מורה
+     node marketing/media/record.js --flow teacher  תסריט 3 — מצב מורה (וגם reader · shlav · langs)
      node marketing/media/record.js reader ulpan  אפליקציות נבחרות
      node marketing/media/record.js --shots       צילומי מסך בארבע שפות
      node marketing/media/record.js --check       חתימות מול התסריטים, וקיום הצילומים
@@ -456,6 +456,65 @@ FLOWS.shlav = {                                   /* תסריט 2 — ״שלב״
       await page.waitForSelector('[data-a="ans"]', { timeout: 8000 });
       const i = await page.evaluate(() => P.q.options.findIndex(o => o.ok));
       await tap(page, `[data-a="ans"][data-i="${i}"]`);
+    },
+    async () => {}                                  /* הכתובת */
+  ] };
+FLOWS.reader = {                                  /* תסריט 1 — המקריא הקולי */
+  app: 'reader', script: 1, file: 'reader-script1', tail: 'מקריא כל טקסט שמדביקים · המילה שנאמרת מודגשת', steps: [
+    async (page) => {                               /* יש טקסט שהילד צריך לקרוא */
+      await page.click('#input').catch(() => {});
+    },
+    async (page) => {                               /* מדביקים אותו כאן */
+      await tap(page, '#btnSample');
+      await tap(page, '#btnGo');
+      /* הניקוד יוצא לרשת, והרשת חסומה כאן — נתיב מציע להמשיך בלעדיו */
+      const noNik = page.locator('#btnNoNikud');
+      await noNik.waitFor({ timeout: 15000 }).catch(() => {});
+      if (await noNik.count()) await tap(page, '#btnNoNikud');
+      await page.waitForSelector('#text', { timeout: 8000 });
+    },
+    async (page) => {                               /* והוא נקרא בקול */
+      await tap(page, '#btnPlay');
+    },
+    async (page) => {                               /* המילה שנשמעת — מודגשת */
+      await page.locator('#text').scrollIntoViewIfNeeded().catch(() => {});
+    },
+    async (page) => {                               /* אפשר להגדיל, ולהרחיב שורות */
+      await tap(page, '#toolsHandle');
+      await tap(page, '#segSize [data-v="1.95"]');
+      await tap(page, '#segSpace [data-v="2"]');
+    },
+    async (page) => {                               /* ולהאט, משפט אחד בכל פעם */
+      await tap(page, '#segFocus [data-v="1"]');
+      await tap(page, '#segRate [data-v="0.75"]');
+    },
+    async () => {}                                  /* הכתובת */
+  ] };
+/* ארבע השפות — כמו שהאפליקציה עושה: היא בונה שאלה חדשה בכל החלפת
+   שפה (במתכוון — שאלה נבנית פעם אחת בשפה שהייתה פעילה, והחלפה
+   באמצע הייתה משאירה מסך חצי מתורגם), ולכן הסרטון מראה ארבע
+   שאלות שונות מאותו נושא. הבעלים הכריע 18.9.2026: בלי איפוס זרע. */
+const switchLang = async (page, lg) => {
+  await tap(page, '[data-a="go"][data-v="settings"]');
+  await tap(page, `[data-a="lang"][data-n="${lg}"]`);
+  await tap(page, '[data-a="go"][data-v="practice"]');
+};
+FLOWS.langs = {                                   /* תסריט 4 — ארבע השפות, ב״אקסיומה״ */
+  app: 'math-uni', script: 4, file: 'langs-math-uni', tail: 'ארבע שפות · השאלות, הרמזים וההסברים', steps: [
+    async (page) => {                               /* שאלה במתמטיקה בעברית */
+      /* ההיכרות אינה חלק מהתסריט הזה — לחיצות מהירות, כדי שהשאלה בעברית תישאר על המסך */
+      for (let k = 0; k < 3 && await page.locator('[data-a="obnext"]').count(); k++) { await page.click('[data-a="obnext"]'); await page.waitForTimeout(150); }
+      if (await page.locator('[data-a="lvl"][data-l="2"]').count()) await page.click('[data-a="lvl"][data-l="2"]');
+      await page.click('[data-a="start"]');
+      await page.waitForSelector('[data-a="ans"]', { timeout: 8000 });
+    },
+    async (page) => { await switchLang(page, 'ar'); },   /* בערבית */
+    async (page) => { await switchLang(page, 'ru'); },   /* ברוסית */
+    async (page) => { await switchLang(page, 'en'); },   /* ובאנגלית */
+    async (page) => {                               /* לא רק התפריט — גם השאלות וההסברים */
+      const i = await page.evaluate(() => P.q.options.findIndex(o => o.ok));
+      await tap(page, `[data-a="ans"][data-i="${i}"]`);
+      if (await page.locator('[data-a="guide"]').count()) await tap(page, '[data-a="guide"]');
     },
     async () => {}                                  /* הכתובת */
   ] };
