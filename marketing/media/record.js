@@ -490,28 +490,22 @@ FLOWS.reader = {                                  /* תסריט 1 — המקרי
     },
     async () => {}                                  /* הכתובת */
   ] };
-/* ״אותה שאלה״ — האפליקציה בונה שאלה חדשה בכל החלפת שפה (במתכוון:
-   שאלה נבנית פעם אחת בשפה שהייתה פעילה, והחלפה באמצע הייתה משאירה
-   מסך חצי מתורגם). לכן הזרע מאופס לפני כל החלפה, והמחולל מגריל
-   את אותה שאלה בשפה החדשה — אותו מנגנון כמו בצילומי המסך. */
-const reseed = page => page.evaluate(() => { if (window.__reseed) window.__reseed(); });
+/* ארבע השפות — כמו שהאפליקציה עושה: היא בונה שאלה חדשה בכל החלפת
+   שפה (במתכוון — שאלה נבנית פעם אחת בשפה שהייתה פעילה, והחלפה
+   באמצע הייתה משאירה מסך חצי מתורגם), ולכן הסרטון מראה ארבע
+   שאלות שונות מאותו נושא. הבעלים הכריע 18.9.2026: בלי איפוס זרע. */
 const switchLang = async (page, lg) => {
   await tap(page, '[data-a="go"][data-v="settings"]');
-  await reseed(page);
   await tap(page, `[data-a="lang"][data-n="${lg}"]`);
   await tap(page, '[data-a="go"][data-v="practice"]');
 };
 FLOWS.langs = {                                   /* תסריט 4 — ארבע השפות, ב״אקסיומה״ */
-  app: 'math-uni', script: 4, file: 'langs-math-uni', seed: true, tail: 'אותה שאלה · ארבע שפות · גם ההסבר', steps: [
+  app: 'math-uni', script: 4, file: 'langs-math-uni', tail: 'ארבע שפות · השאלות, הרמזים וההסברים', steps: [
     async (page) => {                               /* שאלה במתמטיקה בעברית */
       /* ההיכרות אינה חלק מהתסריט הזה — לחיצות מהירות, כדי שהשאלה בעברית תישאר על המסך */
       for (let k = 0; k < 3 && await page.locator('[data-a="obnext"]').count(); k++) { await page.click('[data-a="obnext"]'); await page.waitForTimeout(150); }
       if (await page.locator('[data-a="lvl"][data-l="2"]').count()) await page.click('[data-a="lvl"][data-l="2"]');
       await page.click('[data-a="start"]');
-      await page.waitForSelector('[data-a="ans"]', { timeout: 8000 });
-      /* השאלה הראשונה מוגרלת מאותו זרע שהחלפות השפה יאפסו אליו */
-      await reseed(page);
-      await page.evaluate(() => { P.lastWhy = ''; loadQ(); render(); window.scrollTo(0, 0); });
       await page.waitForSelector('[data-a="ans"]', { timeout: 8000 });
     },
     async (page) => { await switchLang(page, 'ar'); },   /* בערבית */
@@ -542,18 +536,6 @@ async function recordFlow(browser, name, ffmpeg, legalVer) {
     try { localStorage.setItem('legal-accepted-v' + ver,
       JSON.stringify({ v: ver, at: new Date().toISOString(), lang: 'he' })); } catch (e) {}
   }, legalVer);
-  /* זרע קבוע עם איפוס — לתסריטים שצריכים את אותה שאלה פעמיים
-     (ארבע השפות: האפליקציה בונה שאלה חדשה בכל החלפת שפה) */
-  if (f.seed) await page.addInitScript(() => {
-    let a = 0x5EED2026;
-    window.__reseed = () => { a = 0x5EED2026; };
-    Math.random = function () {
-      a |= 0; a = a + 0x6D2B79F5 | 0;
-      let t = Math.imul(a ^ a >>> 15, 1 | a);
-      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-      return ((t ^ t >>> 14) >>> 0) / 4294967296;
-    };
-  });
   await page.route('**', r => r.request().url().startsWith(BASE) ? r.continue() : r.abort());
   const t0 = Date.now();
   await page.goto(`${BASE}/${f.app}/`, { waitUntil: 'load' });
