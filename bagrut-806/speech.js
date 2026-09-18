@@ -263,6 +263,46 @@
   var dog = null;     /* שומר הזמן של המקטע הנוכחי */
   function disarmDog() { if (dog) { clearInterval(dog); dog = null; } }
 
+  /* --- התרעה כשההקראה נכשלה בשקט ----------------------------------
+     `onerror` שאינו רשת מתקדם למקטע הבא — וזה נכון, שגיאה אחת אינה
+     סיבה לשתוק עד הסוף. אבל מכשיר שכל המקטעים שלו נכשלים נראה
+     ללומד כמו כפתור שלא עושה כלום, וההודעה היחידה ישבה בהגדרות.
+     לכן: תור שהגיע לסופו בלי שמקטע אחד התחיל (`onstart`) או נגמר
+     (`onend`) מציג התרעה ליד הכפתור שנלחץ — ואותה התרעה, פעם אחת
+     בביקור, כשיש במכשיר קולות אבל אף אחד מהם עברי.
+     עברית בלבד: האפליקציה חד־לשונית. */
+  var spoke = false;        /* האם מקטע כלשהו בתור הנוכחי באמת נאמר */
+  var warnedNoHe = false;   /* התרעת ״אין קול עברי״ — פעם אחת בביקור */
+  var MSG_ENGINE = "מנוע הדיבור של המכשיר לא הצליח להקריא. זו תקלה במכשיר, לא באפליקציה.";
+  var MSG_NOHE = "במכשיר אין קול עברי, ולכן ההקראה תישמע בקול של שפה אחרת או תשתוק. זו הגדרה במכשיר, לא באפליקציה.";
+  function ttsAlert(kind, text) {
+    var old = document.getElementById("tts-fail");
+    if (old) {
+      if (old.getAttribute("data-kind") === kind) return;
+      if (old.parentNode) old.parentNode.removeChild(old);
+    }
+    var box = document.createElement("div");
+    box.id = "tts-fail"; box.className = "ttsfail";
+    box.setAttribute("role", "alert"); box.setAttribute("data-kind", kind);
+    var t = document.createElement("span"); t.textContent = text + " ";
+    var a = document.createElement("a"); a.href = "/voice/"; a.textContent = "בדיקה והוראות תיקון";
+    var x = document.createElement("button");
+    x.type = "button"; x.textContent = "✕"; x.setAttribute("aria-label", "סגירה");
+    x.onclick = function () { if (box.parentNode) box.parentNode.removeChild(box); };
+    box.appendChild(t); box.appendChild(a); box.appendChild(x);
+    /* ליד הכפתור שנלחץ: הוא מסומן `on` כל עוד התור חי, ולכן זה
+       נקרא לפני stop(). הכפתור יושב בשורה גמישה, ומתחתיה ההתרעה. */
+    var btn = null, host = null;
+    try { btn = document.querySelector("[data-read].on,[data-read-el].on"); } catch (e) {}
+    if (btn) host = (btn.closest && btn.closest(".saybar,.qhead")) || btn;
+    if (host && host.parentNode) host.parentNode.insertBefore(box, host.nextSibling);
+    else { box.classList.add("float"); document.body.appendChild(box); }
+  }
+  function ttsAlertClear(kind) {
+    var old = document.getElementById("tts-fail");
+    if (old && old.getAttribute("data-kind") === kind && old.parentNode) old.parentNode.removeChild(old);
+  }
+
   function clearMarks() {
     var els = document.querySelectorAll(".is-reading,.sent.on");
     Array.prototype.forEach.call(els, function (e) {
@@ -311,7 +351,12 @@
 
   function step(my) {
     if (my !== token) return;
-    if (qi >= queue.length) { stop(); return; }
+    if (qi >= queue.length) {
+      /* ההתרעה לפני stop(): stop מוריד את סימון `on` מהכפתור, וההתרעה
+         נכנסת לידו. */
+      if (!spoke && queue.length) ttsAlert("engine", MSG_ENGINE);
+      stop(); return;
+    }
     var item = queue[qi++];
     mark(item);
     var u = new SpeechSynthesisUtterance(heSpoken(item.text));
@@ -333,7 +378,10 @@
       if (paused) { held = function () { step(my); }; return; }
       setTimeout(function () { if (!paused) step(my); else held = function () { step(my); }; }, gap);
     }
-    u.onend = function () { advance(SEG_GAP); };
+    /* מקטע שהתחיל או נגמר הוא מקטע שהמנוע לקח: מרגע זה שתיקה בסוף
+       התור אינה תקלת מנוע, וההתרעה מהפעם הקודמת יורדת. */
+    u.onstart = function () { if (my === token) { spoke = true; ttsAlertClear("engine"); } };
+    u.onend = function () { if (my === token) spoke = true; advance(SEG_GAP); };
     /* שגיאה באמצע רצף אינה סיבה לשתוק עד הסוף: ממשיכים למקטע הבא,
        ורק אם כולם נכשלו המשתמש רואה שדבר לא קרה. */
     u.onerror = function (ev) {
@@ -392,7 +440,13 @@
           chunks(spoken).forEach(function (c) { queue.push({ text: c, unit: u, sent: si }); });
         });
       });
+      spoke = false;
       api.speaking = true; fire();
+      /* יש קולות, ואף אחד מהם עברי — אחרי fire(), כדי שהכפתור כבר
+         יהיה מסומן וההתרעה תיכנס לידו. */
+      if (!warnedNoHe && allVoices().length && !hebrewVoices().length) {
+        warnedNoHe = true; ttsAlert("nohe", MSG_NOHE);
+      }
       if (keep) { clearInterval(keep); keep = null; }
       /* הפינג הזה פותר באג של Chrome ושל Edge בשולחן העבודה בלבד.
          במובייל אין את הבאג, ו-pause+resume דווקא מקרטע שם — עד

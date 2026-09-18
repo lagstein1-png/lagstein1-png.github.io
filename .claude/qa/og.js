@@ -2,7 +2,7 @@
    מחולל תמונת שיתוף. אותו דגם של `icon.js`: מריצים ביד, הצייר הוא
    הכרומיום שכבר מותקן לבדיקות, ואין npm ואין שלב בנייה.
 
-     node .claude/qa/og.js <תיקייה> <רקע> '<כותרת>' '<path d=…>'
+     node .claude/qa/og.js <תיקייה> <רקע> '<כותרת>' '<path d=…>' ['<כותרת משנה>']
 
    הפריסה נמדדה מ-`english/img/og.png` הקיימת: 1200×630, רקע בצבע
    המותג, כותרת RTL, שורת ״למידה שנשמעת״ מתחתיה, ואריח מעוגל עם
@@ -18,7 +18,11 @@
 const { chromium } = require('./pw.js');
 const fs = require('fs'), path = require('path');
 
-const [dir, bg, title, d] = process.argv.slice(2);
+const [dir, bg, title, d, sub] = process.argv.slice(2);
+/* כותרת המשנה: ״למידה שנשמעת״ באפליקציות, ״אפליקציות לימוד בהקראה״ בשורש
+   בלבד. עד 18.9.2026 המחרוזת הייתה קשיחה לשורש, ו-12 תמונות האפליקציות
+   באוויר נשאו את הנוסח האחר — מגרסה קודמת של המחולל. */
+const subtitle = sub || 'למידה שנשמעת';
 if (!dir || !bg || !title || !d) {
   console.error("שימוש: node .claude/qa/og.js <תיקייה> <רקע> '<כותרת>' '<path…>'");
   process.exit(1);
@@ -42,7 +46,7 @@ p{margin-top:26px;font-size:34px;font-weight:400;opacity:.86}
   display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.10)}
 svg{width:172px;height:172px}
 </style>
-<div class="t"><h1>${title}</h1><p>אפליקציות לימוד בהקראה</p></div>
+<div class="t"><h1>${title}</h1><p>${subtitle}</p></div>
 <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"
   stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg></div>`;
 

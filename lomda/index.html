@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>לומדה — מדע, אזרחות, תנ״ך, לשון ובטיחות, הכול בהקראה</title>
-<meta name="description" content="לומדה — לימוד לפי נושא, למי שלומד אחרת: כל פריט עם הסבר, סיבה ותוצאה, עם מושגים וקטעי מקור — בעברית, ערבית, רוסית ואנגלית, והכול מוקרא." />
+<title>לומדה — מדע, אזרחות, תנ״ך, לשון ומיצ״ב בהקראה, בארבע שפות</title>
+<meta name="description" content="לימוד לפי נושא למי שלומד אחרת: מדע, אזרחות, תנ״ך, לשון, בטיחות, מיצ״ב וערבית מדוברת — כל פריט עם רמז, בעברית, ערבית, רוסית ואנגלית, והכול מוקרא. חינם." />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="לומדה — לימוד לפי נושא" />
-<meta property="og:description" content="לומדה — לימוד לפי נושא, למי שלומד אחרת: כל פריט עם הסבר, סיבה ותוצאה, עם מושגים וקטעי מקור — בעברית, ערבית, רוסית ואנגלית, והכול מוקרא." />
+<meta property="og:description" content="לימוד לפי נושא למי שלומד אחרת: מדע, אזרחות, תנ״ך, לשון, בטיחות, מיצ״ב וערבית מדוברת — כל פריט עם רמז, בעברית, ערבית, רוסית ואנגלית, והכול מוקרא. חינם." />
 <link rel="canonical" href="https://lagstein1-png.github.io/lomda/" />
 <meta property="og:url" content="https://lagstein1-png.github.io/lomda/" />
 <meta property="og:image" content="https://lagstein1-png.github.io/lomda/img/og.png" />
@@ -1112,7 +1112,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l114 · 2026-09-18";
+var BUILD="l116 · 2026-09-18";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -1584,13 +1584,28 @@ function hlAt(c){
    הגיע מהמערכת. שגיאה שנבלעת עולה יום של חיפוש.
    ------------------------------------------------------------ */
 var TTSMSG={
-  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה"},
-  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق"},
-  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть"},
-  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close"}
+  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה",
+      noLang:"במכשיר אין קול בשפה הזאת, ולכן ההקראה תישמע בקול של שפה אחרת או תשתוק. זו הגדרה במכשיר, לא באפליקציה."},
+  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق",
+      noLang:"لا يوجد في الجهاز صوت بهذه اللغة، لذلك ستُسمَع القراءة بصوت لغة أخرى أو تصمت. هذا إعداد في الجهاز، لا في التطبيق."},
+  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть",
+      noLang:"На устройстве нет голоса для этого языка, поэтому чтение прозвучит голосом другого языка или будет молчать. Это настройка устройства, а не приложения."},
+  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close",
+      noLang:"This device has no voice for this language, so reading will use another language's voice or stay silent. This is a device setting, not the app."}
 };
 var _ttsBar=null;
-function ttsFail(err){
+/* יש קולות במכשיר, ואף אחד בשפה: bestVoice מחזיר null, וההקראה
+   יוצאת בקול של שפה אחרת או שותקת — בלי מילה. אותו פס, פעם אחת
+   לשפה בכל ביקור; הוא נשאר עד שסוגרים אותו, כי הקראה "שהצליחה"
+   בקול זר אינה מבטלת את הסיבה. רשימה ריקה אינה המקרה הזה — יש
+   מכשירים שמחזירים אותה לצמיתות ומדברים היטב. */
+var _ttsNoLangSaid={};
+function ttsNoLang(){
+  var _g="he"; try{_g=state.lang||"he"}catch(e){} if(!TTSMSG[_g])_g="he";
+  if(_ttsNoLangSaid[_g])return; _ttsNoLangSaid[_g]=true;
+  ttsFail("",TTSMSG[_g].noLang);
+}
+function ttsFail(err,noLang){
   /* "interrupted" ו-"canceled" אינן תקלות: זה מה שהמנוע מדווח על
      אמירה שבוטלה כדי לפנות מקום לאמירה הבאה — כלומר מהלך תקין
      לגמרי, שקורה בכל לחיצה שנייה. הצגתן כשגיאה הבהילה משתמש
@@ -1613,9 +1628,9 @@ function ttsFail(err){
     "display:flex;gap:10px;align-items:flex-start";
   var t=document.createElement("div");
   t.style.cssText="flex:1;min-width:0";
-  t.innerHTML=TT.msg+
+  t.innerHTML=(noLang?noLang+" ":TT.msg+
     (err?" <span dir=ltr>("+String(err)+")</span>":"")+
-    TT.tail+
+    TT.tail)+
     '<a href="/voice/" style="color:#fff">'+TT.link+'</a>';
   var x=document.createElement("button");
   x.type="button"; x.textContent="✕"; x.setAttribute("aria-label",TT.close);
@@ -1623,10 +1638,12 @@ function ttsFail(err){
     "background:rgba(255,255,255,.16);color:#fff;font-size:16px;cursor:pointer";
   x.onclick=function(){ if(_ttsBar&&_ttsBar.parentNode)_ttsBar.parentNode.removeChild(_ttsBar); _ttsBar=null };
   m.appendChild(t); m.appendChild(x);
+  if(noLang)m.setAttribute("data-nolang","1");
   document.body.appendChild(m); _ttsBar=m;
 }
-/* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
-function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
+/* הקראה שהצליחה מסירה את ההודעה — המצב השתנה. פס "אין קול בשפה"
+   אינו מוסר כך: ההקראה "מצליחה" בקול זר, והסיבה במקומה. */
+function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode&&!_ttsBar.getAttribute("data-nolang")){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
 
 
 /* ------------------------------------------------------------
@@ -1893,6 +1910,7 @@ function speakDevice(text,code,rate){
   (function(){
     try{
       var v=bestVoice(code), lang=(v&&v.lang)||code;
+      if(!v&&allVoices().length)ttsNoLang();
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
       var pit=voicePitch(v);
       var retried=false;
@@ -2176,7 +2194,16 @@ function _rom(n){return ROM[n]||String(n)}
    להזיק, מירכאה שנשארה כן.
    ------------------------------------------------------------ */
 function saySpell(x){
-  return String(x==null?"":x).replace(/(^|[^A-Za-z])([IVXLC]+)(?![A-Za-z])/g,function(m,p,r){
+  return String(x==null?"":x).replace(/(^|[^A-Za-z])([IVXLC]+)(?![A-Za-z])/g,function(m,p,r,off,str){
+    /* אות בודדת עומדת בפני עצמה גם כשאינה ספרה: "קרני X" נהגה
+       "קרני 10", ו-"what I think" נהגה "what 1 think". רצף של
+       שתיים ומעלה הוא תמיד ספרה; אות אחת היא ספרה רק אחרי שם
+       פרטי לטיני או קירילי — מילה שמתחילה באות גדולה ואחריה
+       קטנות, כמו "Albrecht V" או "Иван IV". */
+    if(r.length===1){
+      var before=str.slice(0,off+p.length).replace(/\s+$/,"");
+      if(!/[A-ZА-Я][a-zа-я]+$/.test(before))return m;
+    }
     var i=ROM.indexOf(r);
     return i>0?p+String(i):m;
   }).replace(/״/g,function(m,i,str){
@@ -2594,7 +2621,7 @@ function screenPractice(){
   h+=vstrip();
   if(!q)return h+"</div></div>"+fbar();
 
-  h+='<div class="card qcard">';
+  h+='<div class="card qcard" tabindex="-1">';
   h+='<div class="qtop"><span class="chip">'+esc(q.prompt)+"</span>"+
      '<span class="chip">'+(P.done?P.rres.length:P.rres.length+1)+" "+esc(t("ofN"))+" "+ROUND+"</span>"+
      '<span class="chip" style="margin-inline-start:auto">'+esc(t("todayL"))+" "+(state.day.n||0)+"</span></div>";
@@ -4356,6 +4383,13 @@ function newQuestion(){
   P.jsT0=Date.now();
   P.picked=-1; P.done=false; P.ok=false; P.hint=false;
   render();
+  /* render כותב את המסך מחדש, וכפתור "הבא" שהיה במוקד נעלם — המוקד
+     נפל ל-body, וקורא מסך שתק. מעבירים אותו לכרטיס השאלה החדש,
+     ורק כשאין למי לגזול אותו (המוקד כבר ב-body). */
+  try{
+    var qc=$(".qcard");
+    if(qc&&(!document.activeElement||document.activeElement===document.body))qc.focus();
+  }catch(e){}
 }
 function record(ok){
   var q=P.q; if(!q)return;
@@ -4623,7 +4657,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l114-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l116-pwa1").catch(function(){});
   });
 }
 </script>

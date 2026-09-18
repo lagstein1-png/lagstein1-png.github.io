@@ -4,6 +4,7 @@
      node .claude/qa/wix.js            הגוש לטרמינל
      node .claude/qa/wix.js --md       אותו גוש, להדבקה ב-wix-content.md
      node .claude/qa/wix.js --check    האם wix-content.md מסונכרן
+     node .claude/qa/wix.js --write    מחליף את שני הגושים במסמך במקום
 
    למה זה קיים
    -----------
@@ -149,6 +150,20 @@ if (check) {
   console.log("· בקוד:  " + (wl[i] === undefined ? "(נגמר)" : wl[i]));
   console.log("\nרענון: node .claude/qa/wix.js --md");
   process.exit(1);
+}
+
+/* --write — מחליף את שני הגושים במקום, במקום הדבקה ידנית (18.9.2026:
+   הגוש נסחף פעמיים ביום אחד כי --md מדפיס בלבד). */
+if (process.argv.includes("--write")) {
+  let doc = fs.readFileSync(DOC, "utf8");
+  const hb = homeBounds(doc);
+  if (hb) doc = doc.slice(0, hb.start) + home().trim() + "\n" + doc.slice(hb.end);
+  const b = bounds(doc);
+  if (!b) { console.log("לא נמצא גוש כרטיסי האפליקציות ב-wix-content.md"); process.exit(1); }
+  doc = doc.slice(0, b.start) + block() + "\n" + doc.slice(b.end);
+  fs.writeFileSync(DOC, doc);
+  console.log("wix-content.md עודכן משני הגושים");
+  process.exit(0);
 }
 
 if (process.argv.includes("--home")) {
