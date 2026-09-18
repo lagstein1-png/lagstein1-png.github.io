@@ -44,14 +44,17 @@
 מתי — `marketing/schedule.md`.
 
 **ארבעת התסריטים כאן אינם אחת־עשרה ההדגמות.** תסריט 1 (מקריא
-קולי) ≈ הדגמת `reader`; תסריט 2 (״שלב״) הוקלט כלשונו —
+קולי) הוקלט כלשונו — `--flow reader` → `media/video/reader-script1.mp4`
+(והדגמת `reader.mp4` היא הגרסה הארוכה); תסריט 2 (״שלב״) הוקלט כלשונו —
 `node marketing/media/record.js --flow shlav` →
 `media/video/shlav-math-teen.mp4`, עם שמונה שורות הטבלה שלמטה;
 תסריט 3 (מצב מורה) — אף `DEMO_SCRIPT` אינו נכנס למצב מורה, ולכן
 המקליט עצמו עובר את המסלול האמיתי ב-`math-teen` עם הכתוביות
 מהטבלה שלמטה: `node marketing/media/record.js --flow teacher` →
-`media/video/teacher-math-teen.mp4`; תסריט 4 (ארבע שפות) קיבל
-במקום סרטון **ארבעה צילומי מסך** לכל אפליקציה, `media/shots/`.
+`media/video/teacher-math-teen.mp4`; תסריט 4 (ארבע שפות) הוקלט
+ב״אקסיומה״ — `--flow langs` → `media/video/langs-math-uni.mp4`, עם
+כתוביות בעברית בלבד (הכפולות נשארות לעורך הרשת) — ובנוסף
+**ארבעה צילומי מסך** לכל אפליקציה, `media/shots/`.
 
 ---
 
