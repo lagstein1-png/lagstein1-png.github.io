@@ -136,7 +136,14 @@ async function speak(ffmpeg, text) {
     const j = await r.json();
     const parts = (((j.candidates || [])[0] || {}).content || {}).parts || [];
     const inline = parts.map(p => p.inlineData).filter(Boolean)[0];
-    if (!inline || !inline.data) throw new Error('תשובה בלי אודיו');
+    /* **תשובה 200 בלי אודיו — נמדד, וזה חולף.** בריצה 2 של
+       `voice` שורה 11 מתוך 12 ב-reader חזרה כך, ואחת־עשרה
+       אחיותיה עברו באותה שנייה. זו אינה שגיאת קלט אלא רעש של
+       השירות, ולכן מנסים שוב — בדיוק כמו 429, ולא זורקים. */
+    if (!inline || !inline.data) {
+      if (attempt < 2) { await sleep(2000 * (attempt + 1)); continue }
+      throw new Error('תשובה בלי אודיו בשלושה ניסיונות');
+    }
     const rate = Number((/rate=(\d+)/.exec(inline.mimeType || '') || [])[1]) || 24000;
     return pcmToMp3(ffmpeg, Buffer.from(inline.data, 'base64'), rate);
   }
