@@ -1125,7 +1125,25 @@ async function ask(env, ctx, msgs, extra, tools, fetchFn) {
          נושא את המפתח**, ולכן אפשר לכתוב אותו ללוג כמות שהוא.
          נראה ב-`npx wrangler tail tutor`. */
       let why = "";
-      try { why = (await r.text()).slice(0, 300) } catch (e) {}
+      /* **המכסה, במלואה — 18.9.2026.** 300 תווים חתכו את גוף ה-429 של
+         Gemini בדיוק לפני החלק שאומר מה נגמר: `details` נושא
+         `QuotaFailure` עם `quotaId` ו-`quotaValue` (התקרה עצמה — ואפס
+         פירושו שהמודל אינו בשכבה החינמית כלל) ו-`RetryInfo`. שלוש
+         ריצות `barak-live` הראו ״Quota ex…״ ולא יותר (O-69). ההודעה
+         נשארת קצרה, והמכסות מודפסות אחריה בשורה אחת. */
+      try {
+        const raw = await r.text();
+        why = raw.slice(0, 300);
+        try {
+          const det = (JSON.parse(raw).error || {}).details || [];
+          const q = [];
+          for (const d of det) {
+            for (const v of (d.violations || [])) q.push((v.quotaId || v.quotaMetric || "?") + "=" + (v.quotaValue ?? "?"));
+            if (d.retryDelay) q.push("retry=" + d.retryDelay);
+          }
+          if (q.length) why += " | quota: " + q.join(" · ");
+        } catch (e) {}
+      } catch (e) {}
       console.error("[tutor] upstream " + model + (minimal ? " (minimal)" : "") + " " + r.status + " " + why);
       last = { err: r.status };
       /* 400 בגוף המלא — מנסים מינימלי על **אותו** מודל; 400 גם
