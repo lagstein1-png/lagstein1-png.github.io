@@ -14,7 +14,14 @@
 # טועה, ולכן היא לא נבנתה.
 
 set -uo pipefail
-cd "$CLAUDE_PROJECT_DIR" 2>/dev/null || exit 0
+# **הריפו נגזר מהמיקום של הקובץ הזה, ולא מ-CLAUDE_PROJECT_DIR בלבד —
+# 18.9.2026.** נמדד: בסביבת הענן המשתנה ריק, ותיקיית העבודה חוזרת
+# ל-`/home/user` בין פקודות. `cd ""` נכשל בשקט, `exit 0`, והשער
+# **אישר** דחיפה של דוח תוכן מיושן — שלוש פעמים בשבוע (687–689,
+# 715). שער שמשחרר כשאינו מוצא את הריפו אינו שער.
+ROOT="${CLAUDE_PROJECT_DIR:-}"
+[[ -n "$ROOT" && -d "$ROOT/.git" ]] || ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT" || exit 0
 git rev-parse --git-dir >/dev/null 2>&1 || exit 0
 [[ -n "$(git remote 2>/dev/null)" ]] || exit 0
 
