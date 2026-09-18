@@ -200,6 +200,31 @@ async function scenario(b, app, width, lang) {
     await page.evaluate(() => { const o = document.getElementById('tu-ov'); return !o.classList.contains('tu-kb') && !o.style.height })
     && face2 && Math.abs(face2.w - 68) <= 2, face2 && ('face.w=' + face2.w));
   t(`${tag}: אין שגיאות JS`, errs.length === 0, errs.join(' | '));
+  /* ---- תשובה ארוכה: ראש התשובה נראה, ולא רק סופה (18.9.2026) ----
+     הבעלים צילם ב-lomda תשובה של ארבע שורות שממנה נראתה השורה
+     האחרונה בלבד, ומתחתיה כפתורי ההקראה: הפאנל גלל תמיד לתחתית.
+     נמדד ב-390×844 לפני התיקון: אזור השיחה 141px, הבועה 323px,
+     נראו 50px. הבדיקה דוחפת תשובה גבוהה מאזור השיחה ומודדת שראש
+     הבועה בתוכו; ואחרי הודעה של הילד — שההודעה שלו נראית בתחתית. */
+  const long = await page.evaluate(() => {
+    const st = TUTOR._state();
+    st.msgs.push({ role: 'user', text: 'מה פירוש המושג?' });
+    st.msgs.push({ role: 'assistant', text: 'משפט ראשון של תשובה ארוכה שממשיכה עוד ועוד. '.repeat(14) });
+    TUTOR.open();
+    const log = document.getElementById('tu-log'), bots = log.querySelectorAll('.tu-bot'), last = bots[bots.length - 1];
+    const L = log.getBoundingClientRect(), B = last.getBoundingClientRect();
+    return { logH: Math.round(L.height), bubH: Math.round(B.height), top: Math.round(B.top - L.top),
+      topIn: B.top >= L.top - 1 && B.top < L.bottom };
+  });
+  t(`${tag}: התשובה גבוהה מאזור השיחה (אחרת אין מה לבדוק)`, long.bubH > long.logH, JSON.stringify(long));
+  t(`${tag}: ראש התשובה של ברק נראה, ולא רק סופה`, long.topIn, JSON.stringify(long));
+  const mine = await page.evaluate(() => {
+    const st = TUTOR._state(); st.msgs.push({ role: 'user', text: 'ומה עכשיו?' }); TUTOR.open();
+    const log = document.getElementById('tu-log'), me = [...log.querySelectorAll('.tu-me')].pop();
+    const L = log.getBoundingClientRect(), M = me.getBoundingClientRect();
+    return { ok: M.bottom <= L.bottom + 1 && M.top >= L.top - 1, top: Math.round(M.top - L.top), bottom: Math.round(L.bottom - M.bottom) };
+  });
+  t(`${tag}: אחרי שהילד שולח — ההודעה שלו נראית בתחתית`, mine.ok, JSON.stringify(mine));
 
   /* ---- חזקות ו-bdi (פעם אחת, בעברית) ---- */
   if (app === 'math-uni' && width === 360) {
