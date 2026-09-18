@@ -205,6 +205,13 @@ const SUITE = [
   { id: 'visible',  args: [],     needsServer: true },
   { id: 'clicks',   args: [],     needsServer: true },
   { id: 'langbtn',  args: [],     needsServer: true },
+  /* שלושת מילוני התרגום של math-teen. i18n.js אוכף את אותו כלל
+     בשלוש אפליקציות האוניברסיטה בלבד — המנגנון שם אחר, ו-math-teen
+     לא היה מכוסה בכלל. שם נולד O-58: 479 מפתחות נכנסו לערבית בלבד,
+     ו-293 מחרוזות ברוסית ו-298 באנגלית נשארו עברית על המסך בשקט.
+     דורש דפדפן מפני שהמילונים נקראים אחרי מיזוג ה-BAG; פרסינג
+     סטטי נוסה, החטיא 30 מפתחות וייצר פער מומצא. */
+  { id: 'teentr',   args: [],     needsServer: true },
   /* מנוע ההקראה מול speechSynthesis מזויף. slow: הוא ממתין 9.8
      שניות לכל אפליקציה כדי לראות את שומר-הער פועם. */
   { id: 'voice',    args: [],     needsServer: true, slow: true },
