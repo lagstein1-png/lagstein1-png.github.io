@@ -800,6 +800,21 @@ T.he={
   trkRead:"ספרותית", trkReadD:"קריאה, ניבים וטקסט שלם",
   lv1:"בסיס", lv2:"בנייה", lv3:"שוטף",
   lv1D:"מילה אחת בכל פעם, עם תרגום", lv2D:"משפטים קצרים, פחות תרגום", lv3D:"אנגלית בלבד",
+  /* **הסבר הטעות נכתב כמשפט, ולא כנוסחה — 18.9.2026.**
+     הוראת הבעלים: הטעות חייבת להיות ברורה ומובנת לקהל
+     שלנו. עד כאן הלומד שטעה קיבל דברים כמו ״sit = לשבת״
+     ו-״again ≠ Nice · Nice to meet you.״ — השני הוא שלי, מאתמול,
+     ואין בו **אף מילה בשפה של הלומד** וגם סימן מתמטי בתוך
+     שיעור אנגלית.
+
+     **הרף היה כבר בקובץ**, בשאלות הקטע (`comp`): שם ההסברים
+     נכתבו ביד והם משפטים שלמים — ״שמות רחובות אינם
+     נזכרים בקטע כלל״. ארבע המחרוזות האלה מיישרות את
+     המחוללים אל אותו רף. */
+  whyWord:"המשמעות של ״{0}״ היא {1}.",
+  whyNear:"התשובה היא ״{0}״ — {1}. ״{2}״ דומה לה, אבל היא מילה אחרת.",
+  whyGap:"המילה שחסרה היא ״{0}״. המשפט המלא: ״{1}״",
+  whyUse:"המשפט הזה אומר: {0}",
   qMean:"מה המשמעות?", qHear:"איזו מילה שמעתם?", qGap:"מה חסר במשפט?",
   qOrder:"סדרו את המשפט", qSay:"איך אומרים את זה באנגלית?", qRead:"לפי הקטע:",
   qUse:"איזה משפט מתאים למצב?",
@@ -866,6 +881,10 @@ T.ar={
   trkRead:"أدبية", trkReadD:"قراءة وتعابير ونصّ كامل",
   lv1:"أساس", lv2:"بناء", lv3:"طلاقة",
   lv1D:"كلمة واحدة كل مرة، مع ترجمة", lv2D:"جمل قصيرة، ترجمة أقل", lv3D:"إنجليزية فقط",
+  whyWord:"معنى «{0}» هو {1}.",
+  whyNear:"الجواب هو «{0}» — {1}. «{2}» تشبهها، لكنّها كلمة أخرى.",
+  whyGap:"الكلمة الناقصة هي «{0}». الجملة الكاملة: «{1}»",
+  whyUse:"هذه الجملة تعني: {0}",
   qMean:"ما المعنى؟", qHear:"أي كلمة سمعت؟", qGap:"ما الناقص في الجملة؟",
   qOrder:"رتّب الجملة", qSay:"كيف تقول ذلك بالإنجليزية؟", qRead:"حسب النص:",
   qUse:"أي جملة تناسب الموقف؟",
@@ -932,6 +951,10 @@ T.ru={
   trkRead:"Литературный", trkReadD:"Чтение, идиомы и цельный текст",
   lv1:"Основа", lv2:"Сборка", lv3:"Свободно",
   lv1D:"По одному слову, с переводом", lv2D:"Короткие фразы, меньше перевода", lv3D:"Только английский",
+  whyWord:"«{0}» — это {1}.",
+  whyNear:"Ответ — «{0}» ({1}). «{2}» звучит похоже, но это другое слово.",
+  whyGap:"Пропущенное слово — «{0}». Вся фраза: «{1}»",
+  whyUse:"Эта фраза значит: {0}",
   qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?",
   qOrder:"Соберите предложение", qSay:"Как сказать это по-английски?", qRead:"По тексту:",
   qUse:"Какая фраза подходит к ситуации?",
@@ -998,6 +1021,10 @@ T.en={
   trkRead:"Literary", trkReadD:"Reading, idiom and whole text",
   lv1:"Foundation", lv2:"Building", lv3:"Fluent",
   lv1D:"One word at a time, with a translation", lv2D:"Short sentences, less translation", lv3D:"English only",
+  whyWord:"“{0}” means {1}.",
+  whyNear:"The answer is “{0}” — {1}. “{2}” is close to it, but it is a different word.",
+  whyGap:"The missing word is “{0}”. The full sentence: “{1}”",
+  whyUse:"This sentence means: {0}",
   qMean:"What does it mean?", qHear:"Which word did you hear?", qGap:"What is missing?",
   qOrder:"Put the sentence in order", qSay:"How do you say this in English?", qRead:"According to the passage:",
   qUse:"Which sentence fits the situation?",
@@ -1089,7 +1116,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n123 · 2026-09-18";
+var BUILD="n124 · 2026-09-17";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3324,34 +3351,39 @@ function wordDistract(it,pool,n,needGloss){
 }
 function O(html,ok,why){return {h:html,ok:!!ok,why:why||""}}
 
-/* הסבר למסיח שאין לו משמעות משלו.
+/* הסבר הטעות — משפט בשפת הלומד.
    ------------------------------------------------------------
-   **הלומד טעה ולא קיבל דבר, וזה נמדד — 17.9.2026.**
-   שלושת המחוללים בנו את ההסבר כ-`d.g ? (d.w+" = "+gl(d.g)) : ""`,
-   ו-`wordDistract` יוצר זוג מינימום מתוך `it.near` — כשהמילה
-   אינה קיימת בבנק היא נבנית שם כ-`{w:nw, g:null}`. כלומר
-   **דווקא המסיח החינוכי ביותר, זוג המינימום, היה זה בלי הסבר.**
+   **שתי גרסאות, ושנייה נולדה מהוראת הבעלים ב-18.9.2026:**
+   ״הטעות חייבת להיות ברורה ומובנת לקהל שלנו״.
 
-   נמדד על 360 שאלות (כל נושא × ארבע רמות × שש הגרלות):
+   הגרסה הראשונה (17.9) פתרה את הבעיה הנכונה — מסיח בלי הסבר —
+   ופתרה אותה **בנוסחה**: `sit = לשבת`, ו-`sin ≠ sing = петь`.
+   זה נכון ואינו קריא. לומד בן 12 עם דיסלקציה אינו קורא נוסחה,
+   ו-`≠` הוא סימן מתמטי בתוך שיעור אנגלית.
 
-       gap    144 מתוך 144   (100%)
-       hear    35 מתוך 213   (16%)
-       back    23 מתוך 132   (17%)
-       mean, use, comp        אפס — שלמים
+   **והרף היה כבר בקובץ**, בשאלות הקטע: שם ההסברים נכתבו ביד
+   והם משפטים שלמים — ״שמות רחובות אינם נזכרים בקטע כלל״.
+   ארבע מחרוזות הממשק (`whyWord`, `whyNear`, `whyGap`, `whyUse`)
+   מיישרות את המחוללים אל אותו רף, בארבע השפות.
 
-   מה שיש כאן בוודאות הוא **המילה הנכונה ומשמעותה**, וזו גם
-   נקודת הלימוד של התרגיל: ההבחנה בין השתיים. ההסבר נוקב בשתי
-   המילים ובמשמעות האמיתית, ולכן הוא ייחודי לשאלה ואינו טקסט
-   גנרי — וזה ההבדל בין הסבר לבין מילוי מקום.
-
-   שמות המילים נשארים באנגלית בכל שפה, כמו בכל האפליקציה;
-   המשמעות עוברת ב-`gl()` ולכן היא בשפת הלומד בארבע השפות.
-   ההסבר מוצג **אחרי** המענה, ולכן אין בו הסגרה. */
+   **`wordDistract` יוצר זוג מינימום** מתוך `it.near`, וכשהמילה
+   אינה בבנק היא נבנית בלי `g` — ואז אין לה משמעות להציג. שם
+   ההסבר אומר מה **כן** נכון: המילה הנכונה, משמעותה, והעובדה
+   שהמסיח דומה לה ואינו היא. זו גם נקודת הלימוד של התרגיל. */
 function whyWrong(d,it){
-  if(d&&d.g)return d.w+" = "+gl(d.g);
-  var right=it.w+(it.g?" = "+gl(it.g):"");
-  return d.w+" ≠ "+right;
+  if(d && d.g) return t("whyWord").replace("{0}", d.w).replace("{1}", gl(d.g));
+  return t("whyNear").replace("{0}", it.w)
+                     .replace("{1}", it.g ? gl(it.g) : "")
+                     .replace("{2}", d.w)
+                     /* פריט בלי משמעות: ב-he/ar/en נשאר מקף תלוי,
+                        וברוסית סוגריים ריקים. שני הניקויים כאן ולא
+                        מחרוזת חמישית בארבע שפות — הם טיפוגרפיה, לא
+                        ניסוח. נמדד בארבע השפות על פריט בלי `g`. */
+                     .replace(/\s*—\s*\./, ".")
+                     .replace(/\s*\(\s*\)\s*\./, ".")
+                     .replace(/\s{2,}/g, " ");
 }
+
 
 /* בורר מסיחים.
    ------------------------------------------------------------
@@ -3394,7 +3426,8 @@ function formMean(tp,lv,pool,idx){
      לתלמיד כשתי אפשרויות זהות. */
   var opts=fillOpts([O(esc(ml(lv,it.g)),true)],ds,4,
     function(d){return ml(lv,d.g)},
-    function(d){return O(esc(ml(lv,d.g)),false,d.w+" = "+gl(d.g))},
+    function(d){return O(esc(ml(lv,d.g)),false,
+      t("whyWord").replace("{0}", d.w).replace("{1}", gl(d.g)))},
     ml(lv,it.g));
   return {type:"mean",prompt:t("qMean"),subject:it,opts:shuffle(opts),
     answer:ml(lv,it.g),say:it.w};
@@ -3438,7 +3471,10 @@ function formUse(tp,lv,pool,idx){
     .concat(shuffle(allSents().filter(function(x){return x!==it})));
   var opts=fillOpts([O('<span class="en-b" lang="en">'+esc(it.s)+"</span>",true)],others,4,
     function(d){return d.s},
-    function(d){return O('<span class="en-b" lang="en">'+esc(d.s)+"</span>",false,gl(d.g))},
+    /* המשמעות לבדה הייתה משפט עברי ערום מול משפט אנגלי שגוי,
+       בלי לומר מה הקשר ביניהם. `whyUse` ממסגר אותה. */
+    function(d){return O('<span class="en-b" lang="en">'+esc(d.s)+"</span>",false,
+      t("whyUse").replace("{0}", gl(d.g)))},
     it.s);
   return {type:"use",prompt:t("qUse"),lead:it.u?gl(it.u):gl(it.g),subject:null,
     opts:shuffle(opts),answer:it.s,say:it.s,reveal:it};
@@ -3532,10 +3568,13 @@ function formGap(tp,lv,pool,idx){
        שנשלפה ממשפט אחר ואינה בבנק מקבלת את **המשפט השלם**, שהוא
        הדבר שמראה בדיוק למה היא אינה מתאימה שם. */
     function(w){
+      /* מילה שקיימת בבנק — משמעותה אומרת ללומד שהיא משהו אחר.
+         מילה שנשלפה ממשפט אחר — ההסבר אומר מה המילה שחסרה ומה
+         המשפט המלא, וזה מה שמראה למה היא אינה מתאימה שם. */
       var kn=wordByText(w);
       return O('<span class="en-b" lang="en">'+esc(w)+"</span>",false,
-        (kn&&kn.g)?(w+" = "+gl(kn.g))
-                  :(w+" ≠ "+gone+" · "+it.s));
+        (kn&&kn.g) ? t("whyWord").replace("{0}", w).replace("{1}", gl(kn.g))
+                   : t("whyGap").replace("{0}", gone).replace("{1}", it.s));
     },
     gone.toLowerCase());
   return {type:"gap",prompt:t("qGap"),gapHtml:'<span class="en-b" lang="en">'+esc(shown.join(" "))+"</span>",
@@ -5713,7 +5752,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n123-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n124-pwa1").catch(function(){});
   });
 }
 </script>

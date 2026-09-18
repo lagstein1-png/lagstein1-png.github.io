@@ -203,6 +203,7 @@ const SUITE = [
      ככה ל-100% ונשארו בייצור. כאן זה שער חוסם. */
   { id: 'guess',    args: [],     needsServer: true },
   { id: 'visible',  args: [],     needsServer: true },
+  { id: 'clearwhy', args: [],     needsServer: true },
   { id: 'clicks',   args: [],     needsServer: true },
   { id: 'langbtn',  args: [],     needsServer: true },
   /* ״שלב״ בארבע שפות בפועל (O-58): כל שדה שמוצג עובר trHTML, ההקראה

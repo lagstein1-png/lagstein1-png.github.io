@@ -798,6 +798,12 @@ T.he={
   trkRead:"שלטים וטפסים", trkReadD:"לקרוא שלט, טופס ומכתב רשמי",
   lv1:"בסיס", lv2:"בנייה", lv3:"שוטף",
   lv1D:"מילה אחת בכל פעם, עם תרגום", lv2D:"משפטים קצרים, פחות תרגום", lv3D:"עברית בלבד",
+  /* **הסבר הטעות כמשפט — 18.9.2026, הוראת הבעלים.**
+     עד כאן הלומד שטעה קיבל ״דּוֹד = дядя״. באולפן,
+     שקהל היעד שלו הוא **עולה חדש שלומד לקרוא עברית**,
+     נוסחה היא בדיוק מה שקשה לו לקרוא. אותה מחרוזת
+     בדיוק כמו ב-`english`, ו-`.claude/qa/clearwhy.js` אוכף. */
+  whyWord:"המשמעות של ״{0}״ היא {1}.",
   qMean:"מה המשמעות?", qHear:"איזו מילה שמעתם?", qGap:"מה חסר במשפט?",
   qOrder:"סדרו את המשפט", qSay:"איך אומרים את זה בעברית?", qRead:"לפי הקטע:",
   qUse:"איזה משפט מתאים למצב?",
@@ -864,6 +870,7 @@ T.ar={
   trkRead:"لافتات واستمارات", trkReadD:"قراءة لافتة واستمارة ورسالة رسمية",
   lv1:"أساس", lv2:"بناء", lv3:"طلاقة",
   lv1D:"كلمة واحدة كل مرة، مع ترجمة", lv2D:"جمل قصيرة، ترجمة أقل", lv3D:"عبرية فقط",
+  whyWord:"معنى «{0}» هو {1}.",
   qMean:"ما المعنى؟", qHear:"أي كلمة سمعت؟", qGap:"ما الناقص في الجملة؟",
   qOrder:"رتّب الجملة", qSay:"كيف تقول ذلك بالعبرية؟", qRead:"حسب النص:",
   qUse:"أي جملة تناسب الموقف؟",
@@ -930,6 +937,7 @@ T.ru={
   trkRead:"Вывески и бланки", trkReadD:"Прочитать вывеску, бланк и официальное письмо",
   lv1:"Основа", lv2:"Сборка", lv3:"Свободно",
   lv1D:"По одному слову, с переводом", lv2D:"Короткие фразы, меньше перевода", lv3D:"Только иврит",
+  whyWord:"«{0}» — это {1}.",
   qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?",
   qOrder:"Соберите предложение", qSay:"Как сказать это на иврите?", qRead:"По тексту:",
   qUse:"Какая фраза подходит к ситуации?",
@@ -996,6 +1004,7 @@ T.en={
   trkRead:"Signs and forms", trkReadD:"Reading a sign, a form and an official letter",
   lv1:"Foundation", lv2:"Building", lv3:"Fluent",
   lv1D:"One word at a time, with a translation", lv2D:"Short sentences, less translation", lv3D:"Hebrew only",
+  whyWord:"“{0}” means {1}.",
   qMean:"What does it mean?", qHear:"Which word did you hear?", qGap:"What is missing?",
   qOrder:"Put the sentence in order", qSay:"How do you say this in Hebrew?", qRead:"According to the passage:",
   qUse:"Which sentence fits the situation?",
@@ -1100,7 +1109,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a89 · 2026-09-18";
+var BUILD="a90 · 2026-09-17";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -2182,7 +2191,7 @@ function bankGloss(){
    ריק עדיף על נימוק כללי: "המילה לא מתאימה" אינו מלמד דבר. */
 function whyWord(txt){
   var g=bankGloss()[whyKey(txt)];
-  return g?(hebBare(txt)+" = "+gl(g)):"";
+  return g?t("whyWord").replace("{0}",hebBare(txt)).replace("{1}",gl(g)):"";
 }
 
 var TRACKS=[
@@ -3160,7 +3169,8 @@ function formMean(tp,lv,pool,idx){
      לתלמיד כשתי אפשרויות זהות. */
   var opts=fillOpts([O(esc(ml(lv,it.g)),true)],ds,4,
     function(d){return ml(lv,d.g)},
-    function(d){return O(esc(ml(lv,d.g)),false,d.w+" = "+gl(d.g))},
+    function(d){return O(esc(ml(lv,d.g)),false,
+      t("whyWord").replace("{0}",d.w).replace("{1}",gl(d.g)))},
     ml(lv,it.g));
   return {type:"mean",prompt:t("qMean"),subject:it,opts:shuffle(opts),
     answer:ml(lv,it.g),say:it.w};
@@ -3174,7 +3184,7 @@ function formBack(tp,lv,pool,idx){
     /* מסיח מ-near שאין לו פריט בבנק אין לו g, ואז הנימוק יצא ריק.
        WHYG נותן לו משמעות במקום שורה חסרה. */
     function(d){return O(lrn(d.w),false,
-      d.g?(d.w+" = "+gl(d.g)):whyWord(d.w))},
+      d.g?t("whyWord").replace("{0}",d.w).replace("{1}",gl(d.g)):whyWord(d.w))},
     it.w.toLowerCase());
   return {type:"back",prompt:t("qSay"),lead:ml(lv,it.g),subject:null,
     opts:shuffle(opts),answer:it.w,say:it.w,reveal:it};
@@ -3190,7 +3200,7 @@ function formHear(tp,lv,pool,idx){
   var opts=fillOpts([O(lrn(it.w),true)],ds,4,
     function(d){return d.w.toLowerCase()},
     function(d){return O(lrn(d.w),false,
-      d.g?(d.w+" = "+gl(d.g)):whyWord(d.w))},
+      d.g?t("whyWord").replace("{0}",d.w).replace("{1}",gl(d.g)):whyWord(d.w))},
     it.w.toLowerCase());
   return {type:"hear",prompt:t("qHear"),subject:null,hidden:it,
     opts:shuffle(opts),answer:it.w,say:it.w,reveal:it,auto:true};
@@ -5531,7 +5541,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a89-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a90-pwa1").catch(function(){});
   });
 }
 </script>
