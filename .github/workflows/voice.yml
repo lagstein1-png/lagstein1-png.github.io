@@ -49,9 +49,19 @@ jobs:
         with:
           node-version: '22'
 
-      # ffmpeg מותקן מראש על ubuntu-latest, אבל הנחה אינה מדידה.
+      # **ffmpeg אינו מותקן על ubuntu-latest.** ההנחה שכן נמדדה
+      # כשגויה בריצה 1: `ffmpeg: command not found`. וגרוע מזה —
+      # הצעד הזה נכתב אז כ-`ffmpeg -version | head -1`, וצינור
+      # מסתיר את קוד היציאה של האיבר הראשון, ולכן הוא **דיווח
+      # הצלחה** על אותה שורה בדיוק. שתי תקנות: מתקינים, ובודקים
+      # בלי צינור.
+      - name: מתקין ffmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: ffmpeg קיים
-        run: ffmpeg -version | head -1
+        run: ffmpeg -version
 
       - name: יש מפתח
         env:
