@@ -134,7 +134,7 @@ var GKEY_STORE="<app>-gkey";
 לאות ה-`BUILD` בחר אות שלא בשימוש. בשימוש כרגע:
 `b` (math-app), `t` (math-teen), `u`/`v`/`g` (math-uni/2/3),
 `n` (english), `m` (history), `a` (ulpan), `x` (bagrut-806),
-`l` (lomda), `k` (kotvim).
+`l` (lomda), `k` (kotvim), `r` (rakia).
 
 **ואל תסמכו על הרשימה הזאת — ספרו.** `k` חסרה בה מאז ש-״כותבים
 ביחד״ נבנתה, ומי שהיה בוחר `k` היה מקבל שתי אפליקציות עם אותה

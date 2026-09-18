@@ -73,6 +73,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.65 var(--fon
 .skip:focus{position:static;display:inline-flex;align-items:center;min-height:44px;padding:0 1rem;background:var(--acc);color:var(--acc-ink)}
 :focus-visible{outline:3px solid var(--acc);outline-offset:3px}
 button{font:inherit;color:inherit}
+main a{color:var(--acc);font-weight:600}
 header.top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding:.5rem .8rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 header.top h1{font-size:1.25rem;margin:0;flex:1;font-weight:800}
 header.top h1 small{font-weight:500;color:var(--muted);font-size:.8rem;margin-inline-start:.4rem}
@@ -306,6 +307,7 @@ dl.gloss dd{margin:0}
 </section>
 </main>
 
+<button type="button" id="stopsay" class="btn primary" data-a="stopsay" hidden style="position:fixed;bottom:14px;inset-inline-start:14px;z-index:45">עצירת הקראה</button>
 <div class="sheet-back" id="sheet-back"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
   <div class="grip" aria-hidden="true"></div>
@@ -473,7 +475,7 @@ function renderMoment(){
   s+=".";
   $("#moment").innerHTML=s;
   var notes=[];
-  notes.push('<p class="hint">זמן אוניברסלי: '+esc(new Date(o.utcMs).toISOString().replace("T"," ").slice(0,16))+' · קיזוז '+(o.offset>=0?"+":"")+(o.offset/60)+' שעות ('+esc(o.tz)+') · שיטת בתים: '+({placidus:"פלסידוס",whole:"מזל שלם",equal:"בתים שווים"})[ch.houses?ch.houses.system:o.houseSystem]+'</p>');
+  notes.push('<p class="hint">זמן אוניברסלי: '+esc(new Date(o.utcMs).toISOString().replace("T"," ").slice(0,16))+' · '+(ch.houses?'שיטת בתים: '+({placidus:"פלסידוס",whole:"מזל שלם",equal:"בתים שווים"})[ch.houses.system]:'ללא בתים')+'</p>');
   if(!o.timeKnown)notes.push('<p class="notice">בלי שעת לידה: אין עולה ואין בתים, והמפה חושבה לצהריים.</p>');
   if(ch.houses&&ch.houses.fallback)notes.push('<p class="notice">ברוחב גיאוגרפי כזה שיטת פלסידוס אינה מוגדרת, ולכן הבתים חושבו לפי מזל שלם.</p>');
   var pl=bodyOf(ch,"pluto"); if(pl&&pl.lowPrecision)notes.push('<p class="notice">פלוטו מחוץ לטווח הנוסחה (1885–2099) — דיוק נמוך, עד כשליש מעלה.</p>');
@@ -778,8 +780,8 @@ function femLift(v){ if(!v)return 1; try{ return vGender(v)==="m"?FEM_PITCH:1 }c
 function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 function allVoices(){ try{ return speechSynthesis.getVoices()||[] }catch(e){ return [] } }
 var LANG_HINT={he:/עברית|hebrew|ivrit/i};
-var V_F=/(הילה|כרמית|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b)/;
-var V_M=/(אברי|אסף|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b)/;
+var V_F=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/
+var V_M=/(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/
 function vGender(v){var n=((v.name||"")+" "+(v.lang||"")).toLowerCase(); return V_F.test(n)?"f":V_M.test(n)?"m":"?"}
 function voicesFor(code){
   var base=String(code).split("-")[0].toLowerCase(),hint=LANG_HINT[base];
@@ -821,7 +823,9 @@ function ttsFail(err){
   m.querySelector("button").onclick=ttsOK; document.body.appendChild(m); _ttsBar=m;
 }
 function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
-function setSpeakBtn(b,on){ if(_speakBtn&&_speakBtn!==b){_speakBtn.setAttribute("aria-pressed","false");_speakBtn.textContent="הקראה"} _speakBtn=on?b:null; if(b){b.setAttribute("aria-pressed",String(!!on));b.textContent=on?"עצירה":"הקראה"} }
+/* הכפתור מסמן מי מדבר; העצירה היא כפתור נפרד שמופיע רק בזמן הקראה —
+   כך לחיצה חוזרת על ״הקראה״ תמיד מקריאה, גם כשהמנוע נתקע בשקט. */
+function setSpeakBtn(b,on){ if(_speakBtn&&_speakBtn!==b)_speakBtn.setAttribute("aria-pressed","false"); _speakBtn=on?b:null; if(b)b.setAttribute("aria-pressed",String(!!on)); var st=$("#stopsay"); if(st)st.hidden=!on }
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
   text=heSpoken(text);
@@ -900,7 +904,8 @@ document.addEventListener("click",function(e){
   else if(a==="ctab")showTab(v);
   else if(a==="pl")openSheet(v);
   else if(a==="closesheet")closeSheet();
-  else if(a==="say"){ if(el.getAttribute("aria-pressed")==="true")stopSpeak(); else speak(el.dataset.text,el) }
+  else if(a==="say")speak(el.dataset.text,el);
+  else if(a==="stopsay")stopSpeak();
   else if(a==="sayall"){ if(!current)return; var all=chartTexts(current.chart).map(function(x){return x.title+". "+x.text}).join(" "); showTab("texts"); speak(all,null) }
   else if(a==="save")savePerson();
   else if(a==="share")shareImage();

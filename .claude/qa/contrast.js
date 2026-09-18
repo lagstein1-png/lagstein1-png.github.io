@@ -41,7 +41,7 @@ const { chromium } = require('./pw.js');
 const BASE = process.env.QA_BASE || 'http://127.0.0.1:8099';
 const APPS = process.argv.slice(2).length ? process.argv.slice(2) :
   ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'bagrut-806',
-   'ulpan', 'english', 'history', 'lomda', 'reader', 'kotvim', 'legal', '.'];
+   'ulpan', 'english', 'history', 'lomda', 'reader', 'kotvim', 'rakia', 'legal', '.'];
 
 const SCAN = () => {
   /* --- WCAG 2.2 --- */

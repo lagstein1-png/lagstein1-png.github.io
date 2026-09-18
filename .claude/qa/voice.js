@@ -68,6 +68,20 @@ const APPS = [
       await page.locator('[data-a="kdone"]').first().click();
       await page.waitForTimeout(400);
     }, speak:'[data-a="ksay"]' },
+  /* רקיע — שלב internal, נפתחת עם מפתח השער. ההקראה היא של טקסט
+     הסבר, ולכן קודם מחשבים מפה ואז לוחצים ״הקראה״ במסך ההסברים. */
+  { id:'rakia', url:'/rakia/?internal=shlav-internal-rakia',
+    open:async page => {
+      const ok = page.locator('#lg-ok');
+      await ok.waitFor({ timeout: 8000 }).catch(() => {});
+      if(await ok.count()) await ok.click().catch(() => {});
+      await page.waitForTimeout(300);
+      await page.fill('#f-day','1'); await page.selectOption('#f-month','7'); await page.fill('#f-year','1990');
+      await page.fill('#f-place','תל אב'); await page.waitForTimeout(200);
+      await page.locator('#place-list li').first().click();
+      await page.click('#form button[type=submit]'); await page.waitForTimeout(400);
+      await page.click('[data-a="ctab"][data-v="texts"]'); await page.waitForTimeout(200);
+    }, speak:'#texts [data-a="say"]' },
   /* נתיב אינו מתחיל בשאלה אלא בטקסט שמדביקים, ולכן הוא צריך
      פתיחה משלו. הוא גם האפליקציה שקוראת הכי הרבה ברצף — כלומר
      זו שבה חיתוך אחרי חמש־עשרה שניות מורגש יותר מכל. */

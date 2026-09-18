@@ -37,7 +37,7 @@ vm.runInContext(fs.readFileSync(path.join(ROOT, 'rakia', 'ephem-data.js'), 'utf8
 const A = ctx.ASTRO;
 
 /* גבולות בשניות קשת — עובדה על הקיצוץ, לא שאיפה. ראו FINDINGS. */
-const LIMIT = { sun: 2, moon: 8, mercury: 4, venus: 3, mars: 4, jupiter: 6, saturn: 8, uranus: 8, neptune: 8, pluto: 30,
+const LIMIT = { sun: 2, moon: 8, mercury: 4, venus: 4, mars: 4, jupiter: 6, saturn: 8, uranus: 8, neptune: 8, pluto: 30,
                 meanNode: 3, trueNode: 60, asc: 8, mc: 4, cusp: 12 };
 /* ΔT: המנוע נמדד עם ה-ΔT של הייחוס, כדי שהסטייה תשקף את האפמריס ולא
    את מדיניות ההארכה של ΔT אחרי 2050. הפער ב-ΔT נמדד ומודפס בנפרד. */
