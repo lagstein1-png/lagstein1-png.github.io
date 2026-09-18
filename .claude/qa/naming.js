@@ -41,7 +41,7 @@ const EXEMPT = new Set(['NAMING.md', path.join('.claude', 'qa', 'naming.js')]);
    משני המקומות. אותו נימוק בדיוק חל עליה: זו כתובת ולא שם. */
 const SANCTIONED = /"u":"(?:\/|https:\/\/lagstein1-png\.github\.io\/)drivewise\/"/g;
 const SKIP_DIR = new Set(['.git', 'img', 'vendor', 'node_modules', '.well-known']);
-const TEXT = /\.(html|js|json|md|css|svg|txt|webmanifest)$/i;
+const TEXT = /\.(html|js|json|md|css|svg|txt|webmanifest|patch|diff)$/i;
 
 /* השם הרשמי, ארבע שפות. מקור: NAMING.md */
 const OFFICIAL = { he: 'תאוריה מדברת', ar: 'نظرية ناطقة', ru: 'Говорящая теория', en: 'Talking Theory' };
