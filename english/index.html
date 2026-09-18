@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>לימוד אנגלית בהקראה — אוצר מילים, שיחה והבנת הנקרא · ניב</title>
-<meta name="description" content="לימוד אנגלית למי שלומד אחרת: כל מילה נשמעת לפני שהיא נקראת, זוגות צלילים קרובים, מצבים מהחיים וקטעי קריאה. בעברית, ערבית, רוסית ואנגלית." />
+<title>ניב — לימוד אנגלית בהקראה לילדים ולמי שלומד אחרת · חינם</title>
+<meta name="description" content="לימוד אנגלית למי שלומד אחרת, גם עם דיסלקציה: כל מילה נשמעת לפני שהיא נקראת, זוגות צלילים קרובים, שיחה והבנת הנקרא. הסברים בעברית, ערבית ורוסית. חינם." />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="ניב — אנגלית מדוברת וספרותית" />
-<meta property="og:description" content="לימוד אנגלית למי שלומד אחרת: כל מילה נשמעת לפני שהיא נקראת, זוגות צלילים קרובים, מצבים מהחיים וקטעי קריאה. בעברית, ערבית, רוסית ואנגלית." />
+<meta property="og:description" content="לימוד אנגלית למי שלומד אחרת, גם עם דיסלקציה: כל מילה נשמעת לפני שהיא נקראת, זוגות צלילים קרובים, שיחה והבנת הנקרא. הסברים בעברית, ערבית ורוסית. חינם." />
 <link rel="canonical" href="https://lagstein1-png.github.io/english/" />
 <meta property="og:url" content="https://lagstein1-png.github.io/english/" />
 <meta property="og:image" content="https://lagstein1-png.github.io/english/img/og.png" />
@@ -1116,7 +1116,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n124 · 2026-09-17";
+var BUILD="n125 · 2026-09-18";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -1586,10 +1586,10 @@ function hlAt(c){
    הגיע מהמערכת. שגיאה שנבלעת עולה יום של חיפוש.
    ------------------------------------------------------------ */
 var TTSMSG={
-  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה"},
-  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق"},
-  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть"},
-  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close"}
+  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה",noLang:"במכשיר אין קול בשפה הזאת, ולכן ההקראה תישמע בקול של שפה אחרת או תשתוק. זו הגדרה במכשיר, לא באפליקציה."},
+  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق",noLang:"لا يوجد في الجهاز صوت بهذه اللغة، لذلك ستُسمَع القراءة بصوت لغة أخرى أو تصمت. هذا إعداد في الجهاز، لا في التطبيق."},
+  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть",noLang:"На устройстве нет голоса для этого языка, поэтому чтение прозвучит голосом другого языка или будет молчать. Это настройка устройства, а не приложения."},
+  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close",noLang:"This device has no voice for this language, so reading will use another language's voice or stay silent. This is a device setting, not the app."}
 };
 var _ttsBar=null;
 function ttsFail(err){
@@ -1602,9 +1602,40 @@ function ttsFail(err){
      שלה, וניקוי כאן מחק אותה מיד. */
   if(err==="interrupted"||err==="canceled")return;
   try{ hlClear() }catch(e){}
+  /* תקלה אמיתית דוחקת את פס "אין קול בשפה": הוא מידע, וזו שבירה. */
+  if(_ttsBar&&_ttsBar.noLang){ try{_ttsBar.parentNode.removeChild(_ttsBar)}catch(e){} _ttsBar=null }
   if(_ttsBar)return;
+  var TT=ttsMsgs();
+  ttsBar(TT.msg+
+    (err?" <span dir=ltr>("+String(err)+")</span>":"")+
+    TT.tail+
+    '<a href="/voice/" style="color:#fff">'+TT.link+'</a>',TT);
+}
+function ttsMsgs(){
   var _g="he"; try{_g=state.lang||"he"}catch(e){} if(!TTSMSG[_g])_g="he";
-  var TT=TTSMSG[_g];
+  return TTSMSG[_g];
+}
+/* ------------------------------------------------------------
+   יש קולות במכשיר, אבל אף אחד בשפה שמבקשים — למשל ערבית בכרום על
+   ווינדוס בלי חבילת השפה. bestVoice מחזיר null, וההקראה יוצאת עם
+   u.lang בלבד: המכשיר בוחר קול של שפה אחרת, או שותק. עד כאן זה קרה
+   בלי מילה, והלומד חשב שהאפליקציה שבורה. הפס אומר שזו הגדרה במכשיר,
+   פעם אחת לכל שפה בביקור. בניב השאלה נקראת באנגלית וההסבר בשפת
+   הממשק, ולכן "השפה הזאת" היא שפת הקטע שלא נמצא לה קול.
+   רשימת קולות ריקה אינה המקרה הזה: יש מכשירים שמחזירים רשימה ריקה
+   לצמיתות ומדברים היטב. ------------------------------------------- */
+var _ttsNoLangSeen={};
+function ttsNoLang(code){
+  var base=String(code||"").split("-")[0].toLowerCase()||"?";
+  if(_ttsNoLangSeen[base])return;
+  if(_ttsBar)return;            /* תקלה אמיתית כבר מוצגת — לא מעליה */
+  _ttsNoLangSeen[base]=true;
+  var TT=ttsMsgs();
+  var m=ttsBar(TT.noLang+' <a href="/voice/" style="color:#fff">'+TT.link+'</a>',TT);
+  if(m)m.noLang=true;
+}
+/* בונה את הפס ומציג אותו. מחזיר את האלמנט. */
+function ttsBar(html,TT){
   var m=document.createElement("div");
   m.setAttribute("role","alert");
   m.id="tts-fail";
@@ -1615,10 +1646,7 @@ function ttsFail(err){
     "display:flex;gap:10px;align-items:flex-start";
   var t=document.createElement("div");
   t.style.cssText="flex:1;min-width:0";
-  t.innerHTML=TT.msg+
-    (err?" <span dir=ltr>("+String(err)+")</span>":"")+
-    TT.tail+
-    '<a href="/voice/" style="color:#fff">'+TT.link+'</a>';
+  t.innerHTML=html;
   var x=document.createElement("button");
   x.type="button"; x.textContent="✕"; x.setAttribute("aria-label",TT.close);
   x.style.cssText="min-width:44px;min-height:44px;border:0;border-radius:9px;"+
@@ -1626,9 +1654,11 @@ function ttsFail(err){
   x.onclick=function(){ if(_ttsBar&&_ttsBar.parentNode)_ttsBar.parentNode.removeChild(_ttsBar); _ttsBar=null };
   m.appendChild(t); m.appendChild(x);
   document.body.appendChild(m); _ttsBar=m;
+  return m;
 }
-/* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
-function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
+/* הקראה שהצליחה מסירה את ההודעה — המצב השתנה. פס "אין קול בשפה"
+   נשאר: ההקראה "הצליחה" בקול של שפה אחרת, וזה בדיוק מה שהוא מסביר. */
+function ttsOK(){ if(_ttsBar&&!_ttsBar.noLang&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
 
 
 /* ------------------------------------------------------------
@@ -1895,6 +1925,7 @@ function speakDevice(text,code,rate){
   (function(){
     try{
       var v=bestVoice(code), lang=(v&&v.lang)||code;
+      if(!v){var all=[];try{all=speechSynthesis.getVoices()||[]}catch(e){} if(all.length) ttsNoLang(code);}
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
       var pit=voicePitch(v);
       var retried=false;
@@ -3786,7 +3817,7 @@ function screenPractice(){
   h+=vstrip();
   if(!q)return h+"</div></div>"+fbar();
 
-  h+='<div class="card qcard">';
+  h+='<div class="card qcard" tabindex="-1">';
   h+='<div class="qtop"><span class="chip">'+esc(q.prompt)+"</span>"+
      '<span class="chip">'+(P.done?P.rres.length:P.rres.length+1)+" "+esc(t("ofN"))+" "+ROUND+"</span>"+
      '<span class="chip" style="margin-inline-start:auto">'+esc(t("todayL"))+" "+(state.day.n||0)+"</span></div>";
@@ -5489,6 +5520,13 @@ function newQuestion(){
   P.jsT0=Date.now();
   P.picked=-1; P.done=false; P.ok=false; P.hint=false; P.slot=[]; P.used=[];
   render();
+  /* render מחליף את כל ה-DOM, וכפתור "הבא" שהיה ממוקד נמחק — הפוקוס
+     נפל ל-body, וקורא מסך ומקלדת התחילו מראש הדף. הכרטיס של השאלה
+     החדשה מקבל את המיקוד (tabindex="-1", כמו main). */
+  try{
+    var qc=document.querySelector(".qcard");
+    if(qc&&(document.activeElement===document.body||!document.body.contains(document.activeElement)))qc.focus();
+  }catch(e){}
   /* בתרגיל האזנה המילה אינה מוצגת, ולכן שמיעה אחת אוטומטית היא
      לא נוחות אלא תנאי לכך שיש בכלל שאלה. */
   /* P.q נבדק כאן אבל נקרא רבע שנייה אחר כך, ובינתיים יציאה
@@ -5752,7 +5790,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n124-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n125-pwa1").catch(function(){});
   });
 }
 </script>

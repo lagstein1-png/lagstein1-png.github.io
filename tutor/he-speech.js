@@ -77,9 +77,19 @@
     return new RegExp("^(?:" + CODES.join("|") + ")$").test(t);
   }
 
+  /* ״מהר״ לפני שם הר הוא מֵהַר ולא מַהֵר — ״המסע מהר סיני״ (bible.js)
+     נשמע ״המסע מַהֵר סיני״ עד 18.9.2026. הכלל ב-KTIV חל על המילה
+     לבדה; כאן מביטים באסימון הבא. */
+  var MOUNTAINS = /^(סיני|הבית|הזיתים|הכרמל|נבו|ציון|גריזים|עיבל|המוריה|תבור|הצופים|מירון|חרמון|הגלבוע|הנגב|אפרים|חורב)(?![\u05D0-\u05EA])/;
+  function nextBare(parts, i) {
+    for (var j = i + 1; j < parts.length; j++) if (!/^\s*$/.test(parts[j])) return parts[j].replace(NIQQUD, "");
+    return "";
+  }
+
   /* אסימון אחד. הראשון שמכריע מנצח — בדיוק סדר השכבות שבמקור. */
-  function token(tk, code) {
+  function token(tk, code, next) {
     var bare = tk.replace(NIQQUD, "");
+    if (bare === "מהר" && next && MOUNTAINS.test(next)) return "מֵהַר";
     if (code && /[0-9]/.test(bare)) return spellDigits(bare);
     if (KTIV[bare]) return KTIV[bare];
     /* סימני פיסוק דבוקים: ״משולש,״ — מטפלים בגזע ומחזירים את הזנב */
@@ -95,7 +105,7 @@
     var code = wholeIsCode(src);
     var parts = src.split(SPLIT), out = "", i;
     for (i = 0; i < parts.length; i++) {
-      out += /^\s*$/.test(parts[i]) ? parts[i] : token(parts[i], code);
+      out += /^\s*$/.test(parts[i]) ? parts[i] : token(parts[i], code, nextBare(parts, i));
     }
     return out;
   }
@@ -108,7 +118,7 @@
     var parts = src.split(SPLIT), out = [], i;
     for (i = 0; i < parts.length; i++) {
       if (/^\s*$/.test(parts[i])) continue;
-      out.push({ d: parts[i], s: HEB.test(src) ? token(parts[i], code) : parts[i] });
+      out.push({ d: parts[i], s: HEB.test(src) ? token(parts[i], code, nextBare(parts, i)) : parts[i] });
     }
     return out;
   }

@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x85 · 2026-09-17";
+  var BUILD = "x86 · 2026-09-18";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -1334,7 +1334,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x85-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x86-pwa1").catch(function () {});
     });
   }
 

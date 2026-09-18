@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>כותבים ביחד — כתיבת חיבור, מייל וסיפור צעד אחר צעד</title>
-<meta name="description" content="בונים טקסט צעד אחר צעד: פתיחה, טענה, דוגמה וסיכום — ושומעים את מה שנכתב. בעברית, ערבית, רוסית ואנגלית." />
+<title>כותבים ביחד — כתיבת חיבור, מייל רשמי וסיפור, צעד אחר צעד</title>
+<meta name="description" content="גרסת ניסיון: בונים חיבור, מייל רשמי או סיפור אישי צעד אחר צעד — פתיחה, טענה, דוגמה וסיכום — ושומעים את מה שנכתב. בעברית, ערבית, רוסית ואנגלית. חינם." />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="כותבים ביחד — פיגום כתיבה" />
-<meta property="og:description" content="בונים טקסט צעד אחר צעד: פתיחה, טענה, דוגמה וסיכום — ושומעים את מה שנכתב. בעברית, ערבית, רוסית ואנגלית." />
+<meta property="og:description" content="גרסת ניסיון: בונים חיבור, מייל רשמי או סיפור אישי צעד אחר צעד — פתיחה, טענה, דוגמה וסיכום — ושומעים את מה שנכתב. בעברית, ערבית, רוסית ואנגלית. חינם." />
 <link rel="canonical" href="https://lagstein1-png.github.io/kotvim/" />
 <meta property="og:url" content="https://lagstein1-png.github.io/kotvim/" />
 <meta property="og:image" content="https://lagstein1-png.github.io/kotvim/img/og.png" />
@@ -1065,7 +1065,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="k66 · 2026-09-17";
+var BUILD="k67 · 2026-09-18";
 var SKEY="kotvim-state-v1";
 var GKEY_STORE="kotvim-gkey";
 
@@ -1518,10 +1518,14 @@ function hlAt(c){
    הגיע מהמערכת. שגיאה שנבלעת עולה יום של חיפוש.
    ------------------------------------------------------------ */
 var TTSMSG={
-  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה"},
-  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق"},
-  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть"},
-  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close"}
+  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה",
+      noLang:"במכשיר אין קול בשפה הזאת, ולכן ההקראה תישמע בקול של שפה אחרת או תשתוק. זו הגדרה במכשיר, לא באפליקציה."},
+  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق",
+      noLang:"لا يوجد في الجهاز صوت بهذه اللغة، لذلك ستُسمَع القراءة بصوت لغة أخرى أو تصمت. هذا إعداد في الجهاز، لا في التطبيق."},
+  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть",
+      noLang:"На устройстве нет голоса для этого языка, поэтому чтение прозвучит голосом другого языка или будет молчать. Это настройка устройства, а не приложения."},
+  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close",
+      noLang:"This device has no voice for this language, so reading will use another language's voice or stay silent. This is a device setting, not the app."}
 };
 var _ttsBar=null;
 function ttsFail(err){
@@ -1537,6 +1541,22 @@ function ttsFail(err){
   if(_ttsBar)return;
   var _g="he"; try{_g=state.lang||"he"}catch(e){} if(!TTSMSG[_g])_g="he";
   var TT=TTSMSG[_g];
+  ttsBarShow(TT, TT.msg+(err?" <span dir=ltr>("+String(err)+")</span>":"")+TT.tail+
+    '<a href="/voice/" style="color:#fff">'+TT.link+'</a>', "fail");
+}
+/* אין קול בשפה המבוקשת — לומר את זה, פעם אחת לשפה בביקור. זה אינו
+   כישלון (ההקראה תצא בקול אחר או תשתוק), ולכן ttsOK אינו מסיר את הפס. */
+var _noLangSeen={};
+function ttsNoLang(code){
+  var k=String(code||"").split("-")[0].toLowerCase();
+  if(_noLangSeen[k])return; _noLangSeen[k]=1;
+  if(_ttsBar)return;
+  var _g="he"; try{_g=state.lang||"he"}catch(e){} if(!TTSMSG[_g])_g="he";
+  ttsBarShow(TTSMSG[_g], TTSMSG[_g].noLang, "nolang");
+}
+var _ttsBarKind="";
+function ttsBarShow(TT,html,kind){
+  _ttsBarKind=kind;
   var m=document.createElement("div");
   m.setAttribute("role","alert");
   m.id="tts-fail";
@@ -1547,10 +1567,7 @@ function ttsFail(err){
     "display:flex;gap:10px;align-items:flex-start";
   var t=document.createElement("div");
   t.style.cssText="flex:1;min-width:0";
-  t.innerHTML=TT.msg+
-    (err?" <span dir=ltr>("+String(err)+")</span>":"")+
-    TT.tail+
-    '<a href="/voice/" style="color:#fff">'+TT.link+'</a>';
+  t.innerHTML=html;
   var x=document.createElement("button");
   x.type="button"; x.textContent="✕"; x.setAttribute("aria-label",TT.close);
   x.style.cssText="min-width:44px;min-height:44px;border:0;border-radius:9px;"+
@@ -1559,8 +1576,9 @@ function ttsFail(err){
   m.appendChild(t); m.appendChild(x);
   document.body.appendChild(m); _ttsBar=m;
 }
-/* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
-function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
+/* הקראה שהצליחה מסירה את הודעת הכישלון — המצב השתנה. פס ״אין קול
+   בשפה״ נשאר: ההקראה שהצליחה היא בדיוק זו שיצאה בקול של שפה אחרת. */
+function ttsOK(){ if(_ttsBarKind==="fail"&&_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
 
 
 /* ------------------------------------------------------------
@@ -1798,6 +1816,9 @@ function speakDevice(text,code,rate){
   (function(){
     try{
       var v=bestVoice(code), lang=(v&&v.lang)||code;
+      /* רשימת קולות מלאה ובלי קול לשפה — זו הגדרה במכשיר, ואומרים את זה.
+         רשימה ריקה אינה ראיה: יש מכשירים שמחזירים ריק ומדברים היטב. */
+      if(!v){var all=[];try{all=speechSynthesis.getVoices()||[]}catch(e){} if(all.length) ttsNoLang(code);}
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
       var pit=voicePitch(v);
       var retried=false;
@@ -2466,6 +2487,7 @@ function wMissing(){
   return m;
 }
 function wReady(){ return wMissing().length===0 }
+function kMissText(miss){ return miss.length?t("kMiss")+" "+miss.join(" · "):t("kAllSet") }
 
 /* ============================================================
    9. מסכים
@@ -2544,10 +2566,12 @@ function screenBuild(){
   h+=kGroup(t("kClaims"),t("kClaimsD"),tp.cl,"cl",-1);
   h+=kGroup(t("kEx"),"",tp.ex,"ex",W.ex);
   h+=kGroup(t("kConc"),"",tp.cn,"cn",W.cn);
-  h+='<div class="fb '+(miss.length?"warn":"ok")+'" style="margin-top:16px">'+
-     (miss.length?esc(t("kMiss"))+" "+esc(miss.join(", ")):esc(t("kAllSet")))+"</div>";
-  h+='<button class="btn btn-p" style="width:100%;margin-top:12px" data-a="kdone"'+
-     (miss.length?" disabled":"")+">"+ic("book",18)+" "+esc(t("kShow"))+"</button>";
+  /* #kmiss אומר מה חסר, והכפתור שמתחתיו אינו נעול: לחיצה כשחסר
+     חלק חוזרת לכאן (kdone), ולא לכפתור מת. */
+  h+='<div id="kmiss" class="fb '+(miss.length?"warn":"ok")+'" style="margin-top:16px" aria-live="polite">'+
+     esc(kMissText(miss))+"</div>";
+  h+='<button class="btn btn-p" style="width:100%;margin-top:12px" data-a="kdone">'+
+     ic("book",18)+" "+esc(t("kShow"))+"</button>";
   /* ״עזרה מהמורה״ בזמן ההרכבה. `q()` שב-mount מחזיר כאן את מה שכבר
      נבחר, ולכן ג׳וש רואה טקסט חלקי ויכול לעזור לנסח את ההמשך. */
   if(window.TUTOR&&TUTOR.on())
@@ -2578,8 +2602,9 @@ function screenProg(){
 function screenSet(){
   var h='<div class="wrap"><h2 style="margin:1.1rem 0 .6rem;font-size:1.4rem">'+esc(t("setT"))+"</h2>";
 
-  /* מצב מורה. הכרטיס הוא גם הדרך היחידה לגלות שהתכונה קיימת. */
-  h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
+  /* מצב מורה. הכרטיס הוא גם הדרך היחידה לגלות שהתכונה קיימת —
+     ומוצג רק כשיש מסך מורה לנעול (TE_SCREENS, ראו ״מצב מורה״). */
+  if(TE_SCREENS) h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
      esc(xt("teHideT"))+'</h3><p class="sub" style="margin:0 0 .6rem">'+esc(xt("teHideNote"))+'</p>'+
      '<div class="lvls">'+
      (!teHas()
@@ -2736,6 +2761,11 @@ function render(){ try{lgChrome()}catch(e){}
 }
 /* ============================================================
    מצב מורה.
+   **ב-kotvim אין מסכי מורה**: אין בונה מבחן ואין מסך ציונים, ושום
+   מסך אינו בודק teOpen(). הקוד והמחרוזות הועתקו עם השלד ונשארים,
+   אבל הכרטיס וחלון ?teacher=1 אינם מוצגים (TE_SCREENS) — קוד
+   שאינו נועל דבר היה מבטיח ללומד ולמורה משהו שאינו קיים.
+   ההערה מכאן ומטה מתארת את המנגנון כפי שנולד באפליקציות המבחן.
    בונה המבחן ומסך הציונים נועדו למורה. על טאבלט כיתתי, או על
    טלפון שהילד לוקח לעצמו, אין סיבה שהם יהיו במרחק הקשה אחת:
    ילד יכול למחוק מבחן, לראות ציונים של חברים, או לפתוח מבחן
@@ -2758,6 +2788,7 @@ function xf(k){var s=xt(k),a=arguments,i;
   for(i=1;i<a.length;i++)s=s.split("{"+(i-1)+"}").join(String(a[i]));
   return s}
 var TE={ask:false,mode:"",msg:"",busy:false};
+var TE_SCREENS=false;   /* יהפוך ל-true רק כשיהיה כאן מסך מורה לנעול */
 function teRead(){try{return JSON.parse(localStorage.getItem("kotvim-teacher")||"null")}catch(e){return null}}
 function teWrite(o){try{o===null?localStorage.removeItem("kotvim-teacher"):localStorage.setItem("kotvim-teacher",JSON.stringify(o))}catch(e){}}
 function teHas(){var r=teRead();return !!(r&&r.h)}
@@ -2922,6 +2953,7 @@ try{
     if(u.searchParams.get("teacher")==="1"){
       u.searchParams.delete("teacher");
       history.replaceState(null,"",u.pathname+(u.searchParams.toString()?"?"+u.searchParams:"")+u.hash);
+      if(!TE_SCREENS)return;   /* אין כאן מסך לנעול — הפרמטר הוסר, וחלון אינו נפתח */
       /* שער התנאים יושב מעל הכול, וכך צריך להיות: אי־אפשר להשתמש
          באפליקציה לפני שהוסכם עליהם. חלון הקוד ממתין לו במקום
          להיפתח מתחתיו ולהיראות תקוע. */
@@ -3051,7 +3083,14 @@ document.addEventListener("click",function(e){
     render(); return;
   }
   if(a==="kdone"){
-    if(!wReady())return;
+    if(!wReady()){
+      /* לא נועלים — מסבירים: מה חסר נכתב ב-#kmiss, נמסר לקורא המסך ומוקרא */
+      var km=$("#kmiss"), msg=kMissText(wMissing());
+      if(km){ km.textContent=msg; try{km.scrollIntoView({block:"nearest"})}catch(e){} }
+      announce(msg);
+      try{ if(state.sayBtn!==false) speak(msg,state.lang) }catch(e){}
+      return;
+    }
     W.txt=wText(); W.step=4; stopSpeak(); render(); window.scrollTo(0,0);
     announce(t("kStep4"));
     return;
@@ -3163,7 +3202,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=k66-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=k67-pwa1").catch(function(){});
   });
 }
 </script>

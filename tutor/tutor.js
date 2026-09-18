@@ -49,7 +49,8 @@ var VOICE_KEY = "tutor-voice-v1"; /* הקול שהלומד בחר, מפתח לכ
 var RATE_KEY = "tutor-rate-v1";   /* מהירות ההקראה. משותף בכוונה — מודול אחד, התנהגות אחת */
 var DAY_KEY  = "tutor-day-v1";    /* מונה יומי. ילד אחד, תקציב אחד, בלי קשר לאפליקציה */
 var LANG_KEY = "tutor-lang-v1";   /* רק לאפליקציה שאין בה בורר שפה משלה — ראו pickLang */
-var DAY_MAX  = 20;                /* תקרה מקומית. החסם האמיתי בשרת */
+var LEGACY_TIMEOUT_MS = 8000;      /* O-72 — כמו TIMEOUT_MS ב-barak-core.js */
+var DAY_MAX  = 10;                /* תקרה מקומית, כמו perDay בשרת. החסם האמיתי בשרת */
 var TURNS    = 12;                /* הודעות לשיחה אחת */
 var MAXLEN   = 300;               /* תווים בהודעה של הילד */
 /* 0.95 נוסף כברירת המחדל של ג׳וש — ראו JOSH_RATE. 1 נשאר
@@ -1057,7 +1058,13 @@ function draw(){
     }
     var sp = splitSugg(i === REV ? m.text.slice(0, REVN) : m.text);
     h += '<div class="tu-m tu-bot">' + fmt(sp.body) + '</div>';
-    if(m.local) h += '<div class="tu-src">' + esc(t.local) + ' · ' + esc(m.local) + '</div>';
+    /* השורה האפורה אומרת למה התשובה מהמכשיר — במילים של השפה,
+       לא באסימון (״· limit״ הופיע כך בממשק עברי, נמדד 18.9.2026).
+       רק לסיבות שיש להן משפט מוכן; לכל השאר די ב-t.local. */
+    if(m.local){
+      var whyT = (m.local === "limit" || m.local === "limitAll" || m.local === "setup") ? t[m.local] : "";
+      h += '<div class="tu-src">' + esc(t.local) + (whyT ? ' · ' + esc(whyT) : '') + '</div>';
+    }
     h += ctl(i);
     /* ההצעות מופיעות רק כשהתשובה כולה על המסך, ורק על האחרונה —
        שרשרת של הצעות ישנות היא רעש, ולחיצה עליהן שולחת שאלה
@@ -1531,7 +1538,14 @@ function sendLegacy(text, auto){
   bump();
 
   var q = CFG.q ? CFG.q() : null;
+  /* O-72 — אותו timeout כמו fetchWithTimeout ב-barak-core.js:227:
+     8 שניות ואז AbortError, שנופל ל-catch למטה ומשם למוח המקומי.
+     בלי זה ספק שתולה השאיר את הפאנל ב-״רגע, חושב…״ לנצח — נמדד
+     18.9.2026: 13,329 ms ועדיין BUSY. */
+  var ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+  var timer = setTimeout(function(){ if(ctl) ctl.abort() }, LEGACY_TIMEOUT_MS);
   fetch(API, {
+    signal: ctl ? ctl.signal : undefined,
     method:"POST",
     headers:{ "Content-Type":"application/json" },
     body: JSON.stringify({
@@ -1548,6 +1562,7 @@ function sendLegacy(text, auto){
     })
   })
   .then(function(r){
+    clearTimeout(timer);
     /* 429 נושא scope: "you" = התקרה של הלומד, "all" = חסם העלות
        של השירות. שתיהן 429, ולכן צריך לקרוא את הגוף כדי לדעת מה
        לומר — ובלי הקריאה הזאת לומד שמישהו אחר מילא את הגלובלית
@@ -1592,6 +1607,7 @@ function sendLegacy(text, auto){
     draw(); focus();
   })
   .catch(function(err){
+    clearTimeout(timer);
     BUSY = false;
     var why = String(err && err.message);
     /* **הנפילה למוח המקומי.** רשת שנפלה, 429 של הלומד או של
