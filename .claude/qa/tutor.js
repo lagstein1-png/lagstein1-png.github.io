@@ -527,13 +527,29 @@ import(WORKER).then(async W => {
     W._rate.reset();
     t('חסם העלות נגמר — "all"',
       await W.overLimit(kv({ [G]: W.LIM.globalPerDay }), '1.2.3.4'), 'all');
-    /* תקציב הכתיבות: 1,000 פניות מ-40 כתובות (בתקרת לומד 10 ו-perDay
-       שמועלה בסביבה) חייבות להסתיים בהרבה פחות מ-700 כתיבות. */
+    /* תקציב הכתיבות — הוקשח 19.9.2026. עד אז ה-IP נספר בזיכרון
+       ה-isolate בלבד ואינו נכתב ל-KV כלל, ולכן תקציב הכתיבות היה
+       תלוי רק בגלובלית. **וזה בדיוק הבאג שהוקשח:** isolate חדש
+       שכח כל IP, ולומד יכול היה לעקוף את תקרת ה-`perDay` שלו
+       פשוט על ידי פגיעה ב-isolate אחר. אחרי ההקשחה כל בקשה
+       שמתקבלת כותבת גם רשומת IP, ולכן תקציב הכתיבות נגזר עכשיו
+       מ-`globalPerDay` עצמו — התקרה שמגבילה כמה בקשות בכלל
+       יכולות להתקבל ביום — ולא ממספר הפניות שמנסים לשלוח.
+       הבדיקה כאן משתמשת ב-LIM האמיתי (לא מוגבר בסביבה), עם
+       כתובת ייחודית לכל בקשה כדי שרק החסם הגלובלי יעצור, ומוודאת
+       שגם ככה רחוק מ-1,000 הכתיבות החינמיות ליום של Cloudflare. */
     W._rate.reset();
-    const m = {}; const env = Object.assign(kv(m), { PER_DAY: '1000', GLOBAL_PER_DAY: '100000' });
-    for (let i = 0; i < 1000; i++) await W.overLimit(env, '10.0.0.' + (i % 40));
-    t('1,000 פניות — פחות מ-700 כתיבות KV', (m.__writes || 0) < 700, true);
-    t('1,000 פניות — לכל היותר 1000/25 כתיבות לפי המניין', (m.__writes || 0) <= 1000 / W._rate.FLUSH_EVERY + 1, true);
+    const m = {}; const env = kv(m);
+    let accepted = 0;
+    for (let i = 0; i < W.LIM.globalPerDay + 50; i++) {
+      if (!(await W.overLimit(env, '10.0.' + Math.floor(i / 250) + '.' + (i % 250)))) accepted++;
+    }
+    t('חסם העלות עוצר בדיוק ב-globalPerDay, לא לפני ולא אחרי',
+      accepted, W.LIM.globalPerDay);
+    t('כתיבות ה-KV נגזרות מ-globalPerDay (כתיבת IP אחת לבקשה מתקבלת, ועוד הגלובליות המצטברות)',
+      (m.__writes || 0) <= W.LIM.globalPerDay + Math.ceil(W.LIM.globalPerDay / W._rate.FLUSH_EVERY) + 2, true);
+    t('ורחוק מ-1,000 הכתיבות החינמיות ליום של Cloudflare',
+      (m.__writes || 0) < 1000, true);
     W._rate.reset();
   })();
   /* בלי KV אין מונה, ובלי מונה אין תקרה יומית — כלומר כל ההגנה
