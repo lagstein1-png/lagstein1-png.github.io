@@ -1,0 +1,61 @@
+# smoke test חד-פעמי אחרי הקשחת מנוע ברק — 19.9.2026.
+#
+# למה ורקפלו: סביבת הפיתוח של הסוכן חסומה מול workers.dev (אותה
+# חסימה שכבר מתועדת ב-deploy-tutor.yml ו-tutor-compare.yml).
+# הרנרים של GitHub אינם חסומים.
+#
+# בלי סודות, בלי כתיבה — שלוש קריאות ציבוריות בלבד ל-Worker החי,
+# בודקות את שלוש ההקשחות מה-19.9.2026: /health מדווח counter:"kv",
+# preflight ממקור מותר מקבל 204, ובקשה עם Origin זר מפורש נדחית
+# ב-403 לפני שהיא נוגעת במונה או במודל. קובץ זמני — מוסר אחרי
+# שהריצה הראשונה נרשמת ב-FINDINGS.md.
+
+name: smoke-tutor-once
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: שלוש בדיקות ציבוריות מול tutor.lagstein1.workers.dev
+        run: |
+          set -uo pipefail
+          URL=https://tutor.lagstein1.workers.dev
+          FAIL=0
+          { echo "## smoke test — מנוע ברק אחרי הקשחה"; echo ""; echo "| בדיקה | תוצאה | פרט |"; echo "|---|---|---|"; } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "--- 1. GET /health ---"
+          H=$(curl -s -w '\n%{http_code}' --max-time 30 "$URL/health")
+          HCODE=$(echo "$H" | tail -1); HBODY=$(echo "$H" | sed '$d')
+          echo "$HBODY"; echo "HTTP $HCODE"
+          if echo "$HBODY" | grep -q '"counter":"kv"'; then CNT="✓ kv"; else CNT="✗"; FAIL=1; fi
+          [ "$HCODE" = "200" ] || { FAIL=1; }
+          echo "| GET /health | HTTP $HCODE | counter: $CNT |" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "--- 2. OPTIONS ממקור מותר ---"
+          OCODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 -X OPTIONS "$URL" \
+                  -H 'Origin: https://lagstein1-png.github.io' -H 'Access-Control-Request-Method: POST')
+          echo "HTTP $OCODE"
+          [ "$OCODE" = "204" ] || FAIL=1
+          echo "| OPTIONS ממקור מותר | HTTP $OCODE | ציפייה: 204 |" >> "$GITHUB_STEP_SUMMARY"
+
+          echo "--- 3. POST עם Origin זר מפורש (אינו אמור לגעת במודל) ---"
+          F=$(curl -s -w '\n%{http_code}' --max-time 30 -X POST "$URL" \
+              -H 'Content-Type: application/json' -H 'Origin: https://evil.example' \
+              -d '{"app":"math-app","lang":"he","messages":[{"role":"user","text":"smoke"}]}')
+          FCODE=$(echo "$F" | tail -1); FBODY=$(echo "$F" | sed '$d')
+          echo "$FBODY"; echo "HTTP $FCODE"
+          if echo "$FBODY" | grep -q '"error":"origin"'; then EORIGIN="✓ error:origin"; else EORIGIN="✗"; FAIL=1; fi
+          [ "$FCODE" = "403" ] || FAIL=1
+          echo "| POST ממקור זר מפורש | HTTP $FCODE | $EORIGIN |" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$FAIL" != "0" ]; then
+            echo "::error::smoke test נכשל — ראה את הטבלה בסיכום."
+            exit 1
+          fi
+          echo "smoke test עבר במלואו."
