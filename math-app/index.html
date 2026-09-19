@@ -2032,6 +2032,58 @@ function ttsWatchdog(alive,onSilent){
   return function(){clearInterval(dog)};
 }
 
+/* מקטעים במקום אמירה אחת ארוכה — כמו ב-11 האחיות וב״תאוריה מדברת״.
+   מעל ~90 תווים מנועי מכשיר מאיצים ובולעים סופי מילים, ו-math-app
+   הייתה היחידה שעוד שלחה הסבר שלם באמירה אחת (נמדד 19.9.2026).
+   seg.start הוא ההיסט של המקטע במחרוזת הנאמרת: charIndex מתאפס
+   בכל אמירה, ובלעדיו ההדגשה הייתה קופצת לתחילת המשפט בכל מקטע. */
+var SEG_MAX=90, SEG_GAP=260;
+/* סימן פיסוק בין שתי ספרות הוא חלק מהמספר ולא מקום לחתוך בו:
+   בלי הבדיקה הזאת "3,500" נשבר והמנוע קורא "שלוש, חמש מאות". */
+function insideNumber(str,i){
+  return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]);
+}
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  /* מקטע זעיר — "12." או ")" — עם הפסקה של רבע שנייה אחריו נשמע
+     כמו גמגום. מאחדים אותו לזה שאחריו. */
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&
+       merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){
+      merged[merged.length-1].text+=out[i].text; continue;
+    }
+    if(out[i].text.trim().length<12&&i+1<out.length){
+      out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue;
+    }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
 function speakLocal(text,preset,rate,pitch,langCode,isRetry){
   if(!("speechSynthesis" in window))return;
   try{speechSynthesis.cancel()}catch(e){}
@@ -2043,58 +2095,72 @@ function speakLocal(text,preset,rate,pitch,langCode,isRetry){
      שתיקה, ויש מכשירים שמחזירים רשימה ריקה לצמיתות ומדברים היטב.
      voicesReady נשאר בשימוש למסך בחירת הקול, שם ההמתנה במקומה. */
   (function(){
-    var tok=_hlTok, retried=!!isRetry, done=false, disarm=null;
+    var tok=_hlTok, retried=!!isRetry;
     function alive(){return tok===_hlTok}
-    function finish(){
-      if(done||!alive())return;
-      done=true; if(disarm)disarm();
+    function allDone(){
+      if(!alive())return;
       maybeStopKeepAlive();
       if(HL.tok===tok)hlClear();
       try{jfSay(false)}catch(e5){}
       ttsOK();
     }
+    function pick(){ return pickVoice(preset.prefer,state.settings.voiceURI,state.settings.lang||"he") }
     try{
-      var u=new SpeechSynthesisUtterance(text);
-      u.lang=langCode||"he-IL";
-      var v=pickVoice(preset.prefer,state.settings.voiceURI,state.settings.lang||"he");
+      var v=pick();
       /* השמה של u.voice זורקת אם הערך אינו SpeechSynthesisVoice אמיתי,
          והיא ישבה בתוך ה-try הגדול — כלומר חריגה כאן ביטלה את כל
          האמירה והאפליקציה השתתקה בלי שום סימן. השפה נקבעת בכל מקרה. */
-      if(v){
-        try{ u.voice=v }catch(e2){}
-        u.lang=v.lang||langCode||"he-IL";
-      }
+      var lang=(v&&v.lang)||langCode||"he-IL";
       /* יש קולות ואף אחד בשפה — אומרים זאת. רשימה ריקה אינה נספרת. */
       if(!v){var all=[];try{all=speechSynthesis.getVoices()||[]}catch(e6){} if(all.length)ttsNoLang();}
-      u.rate=rate;u.pitch=Math.min(1.35,pitch*femLift(v,preset.prefer));
-      /* לא היה כאן מטפל שגיאות בכלל: כשהמנוע נכשל, האפליקציה
-         פשוט השתתקה בלי שאיש ידע למה. */
-      u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(e.charIndex)};
-      u.onerror=function(e){
-        if(done||!alive())return;
-        var err=(e&&e.error)||"";
-        /* ביטול יזום אינו תקלה — stopSpeak כבר ניקה אחריו */
-        if(err==="canceled"||err==="interrupted"){done=true;if(disarm)disarm();return}
-        /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול
-           מקומי וחוזרים על אותו משפט, פעם אחת, כדי שההקראה לא
-           תישבר בשקט באמצע שאלה. */
-        if(!retried&&v&&v.localService===false){
-          retried=true; _netVoiceOK=false; done=true;
-          if(disarm)disarm(); _activeU=null;
-          speakLocal(text,preset,rate,pitch,langCode,true);
-          return;
+      var pit=Math.min(1.35,pitch*femLift(v,preset.prefer));
+      var segs=segments(String(text));
+      (function sayseg(k){
+        if(!alive())return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
+        if(k>=segs.length){ allDone(); return }
+        /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
+           יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+        var seg=segs[k], moved=false, disarm=null;
+        function next(){
+          if(moved||!alive())return;
+          moved=true; if(disarm)disarm();
+          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+          else allDone();
         }
-        done=true; if(disarm)disarm(); maybeStopKeepAlive(); ttsFail(err);
-      };
-      u.onend=finish;
-      _activeU=u;                        /* מגן מפני איסוף זבל */
-      try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e3){}
-      speechSynthesis.speak(u);
-      /* הודעה לשכבת הפנים, ותו לא. המנוע כאן אינו משתנה: אין קול
-         חדש, אין בחירת קול, ואף אחד מארבעת המנגנונים לא נגע. */
-      try{jfSay(true)}catch(e4){}
-      startKeepAlive();
-      disarm=ttsWatchdog(function(){return alive()&&!done},finish);
+        var u=new SpeechSynthesisUtterance(seg.text);
+        u.lang=lang;
+        if(v){ try{ u.voice=v }catch(e2){} }
+        u.rate=rate;u.pitch=pit;
+        u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
+        /* לא היה כאן מטפל שגיאות בכלל: כשהמנוע נכשל, האפליקציה
+           פשוט השתתקה בלי שאיש ידע למה. */
+        u.onerror=function(e){
+          if(moved||!alive())return;
+          var err=(e&&e.error)||"";
+          /* ביטול יזום אינו תקלה — stopSpeak כבר ניקה אחריו */
+          if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+          /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול
+             מקומי וחוזרים על אותו מקטע, פעם אחת, כדי שההקראה לא
+             תישבר בשקט באמצע שאלה. */
+          if(!retried&&v&&v.localService===false){
+            retried=true; _netVoiceOK=false; moved=true;
+            if(disarm)disarm(); _activeU=null;
+            v=pick(); lang=(v&&v.lang)||langCode||"he-IL"; pit=Math.min(1.35,pitch*femLift(v,preset.prefer));
+            setTimeout(function(){sayseg(k)},SEG_GAP);
+            return;
+          }
+          moved=true; if(disarm)disarm(); maybeStopKeepAlive(); ttsFail(err);
+        };
+        u.onend=next;
+        _activeU=u;                        /* מגן מפני איסוף זבל */
+        try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e3){}
+        speechSynthesis.speak(u);
+        /* הודעה לשכבת הפנים, ותו לא. המנוע כאן אינו משתנה: אין קול
+           חדש, אין בחירת קול, ואף אחד מארבעת המנגנונים לא נגע. */
+        if(k===0){ try{jfSay(true)}catch(e4){} }
+        startKeepAlive();
+        disarm=ttsWatchdog(function(){return alive()&&!moved},next);
+      })(0);
     }catch(e){}
   })();
 }
@@ -2243,7 +2309,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b139 · 2026-09-18";
+var BUILD="b140 · 2026-09-19";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4673,7 +4739,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b139-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b140-pwa1").catch(function(){});
   });
 }
 </script>

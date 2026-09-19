@@ -310,7 +310,7 @@ dl.gloss dd{margin:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r1 · 2026-09-18";
+var BUILD="r2 · 2026-09-19";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -859,6 +859,22 @@ function speak(text,btn){
 }
 function stopSpeak(){_sayGen++;stopKeepAlive();_activeU=null;setSpeakBtn(_speakBtn,false);try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 try{document.addEventListener("visibilitychange",function(){ if(document.hidden)stopSpeak() })}catch(e){}
+/* iOS לא ישמיע כלום עד שאמירה אחת יצאה מתוך handler של מגע אמיתי.
+   אמירה אוטומטית בטעינת הדף נבלעת בשקט — בלי חריגה, בלי לוג, בלי
+   דרך לדעת. משחררים פעם אחת עם אמירה ריקה — המנגנון החמישי של
+   ״תאוריה מדברת״, שרקיע נולדה בלעדיו (voice.js בדיקה 0, 19.9.2026).
+   חשוב: קריאה ישירה, בלי המתנה לקולות — הבטחה שוברת את שרשרת המגע
+   ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
+try{document.addEventListener("pointerdown",function(){
+  try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+},{once:true});}catch(e){}
+/* getVoices מחזיר רשימה ריקה עד שהמנוע נטען, ורק אז נורה voiceschanged.
+   קריאה אחת בטעינה מחממת את הרשימה, כדי שהלחיצה הראשונה על ״הקראה״
+   כבר תמצא קול עברי ולא תיפול לברירת המחדל של הדפדפן. */
+if(window.speechSynthesis){
+  try{ speechSynthesis.getVoices() }catch(e){}
+  try{ speechSynthesis.addEventListener("voiceschanged",function(){ try{ speechSynthesis.getVoices() }catch(e){} }) }catch(e){}
+}
 function voiceCheck(){
   var out=$("#vchk"); out.textContent="…";
   if(!("speechSynthesis" in window)){ out.textContent="✗ הדפדפן הזה לא תומך בהקראה"; return }
@@ -923,7 +939,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r1-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r2-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>
