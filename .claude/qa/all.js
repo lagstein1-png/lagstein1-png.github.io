@@ -2,7 +2,7 @@
    מריץ את כל חבילת הבדיקות ונותן פסק דין אחד.
 
      node .claude/qa/all.js           הכול
-     node .claude/qa/all.js --fast    בלי entropy ו-options (הכי איטיות)
+     node .claude/qa/all.js --fast    בלי הבדיקות המסומנות slow (הכי איטיות)
      node .claude/qa/all.js --static  רק מה שאינו דורש דפדפן (שניות)
 
    הוא מרים את השרת המקומי בעצמו וסוגר אותו בסוף, כי שלוש מהבדיקות
@@ -272,7 +272,7 @@ for (const [id, code] of results) {
   console.log(`  ${code ? '✗' : '✓'} ${id.padEnd(10)} ${code ? 'exit ' + code : ''}`);
 }
 if (STATIC) console.log('  · כל הבדיקות שדורשות דפדפן — דולגו (--static)');
-else if (FAST) console.log('  · entropy, options — דולגו (--fast)');
+else if (FAST) console.log(`  · ${SUITE.filter(t => t.slow).map(t => t.id).join(', ')} — דולגו (--fast)`);
 console.log('═'.repeat(72));
 console.log(failed
   ? `${failed} מתוך ${results.length} נכשלו`
