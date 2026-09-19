@@ -606,33 +606,52 @@ function noCounter(env) {
   return !env.RATE && String(env.ALLOW_NO_RATE_LIMIT || "").toLowerCase() !== "yes";
 }
 
-/* ---------- הגבלת קצב — מנוע ברק, 16.9.2026 ----------
+/* ---------- הגבלת קצב — מנוע ברק, 16.9.2026 · הוקשח 19.9.2026 ----------
 
    **הבעיה שהמימוש הקודם יצר:** שתי כתיבות KV לכל בקשה. Cloudflare
    בשכבה החינמית מתיר 1,000 כתיבות ליום, כלומר 500 פניות היו
    סוגרות את השירות — לפני שהגענו לחסם העלות בכלל. היעד שנקבע:
    פחות מ-700 כתיבות ביום בפועל.
 
-   **שתי שכבות, ושתי כתיבות אינן נדרשות:**
+   **שתי שכבות, ושתי כתיבות אינן נדרשות — אבל שתיהן נקראות מ-KV:**
 
-   · **לכל IP — בזיכרון ה-isolate בלבד.** `Map` של כתובת → מניין
-     היום. אינו נכתב ל-KV כלל. זו הגבלה בסיסית: isolate חדש
-     מתחיל מאפס, וזה מקובל — התקרה של הלומד היא בלם מפני לחיצה
-     חוזרת, וחסם העלות האמיתי הוא הגלובלי. המפה חסומה ל-5,000
-     כתובות, ואחריהן מתאפסת, כדי שלא תגדל בלי גבול.
+   · **לכל IP — נכתב ל-KV, בקריאה ובכתיבה אחת לכל בקשה, בלי
+     איגום.** זה השתנה 19.9.2026: המימוש הקודם ספר per-IP רק
+     בזיכרון ה-isolate, ומכיוון ש-Cloudflare ממחזר isolates
+     בלי אזהרה, לומד יכול היה לעקוף את תקרת ה-20 ליום פשוט על
+     ידי פגיעה ב-isolate אחר בכל בקשה — בדיוק ה"מתאפס ב-restart"
+     שהמונה נועד למנוע. תקרת ה-service (`GLOBAL_PER_DAY`) חוסמת
+     את הבקשה ה-101 בכל מקרה, ולכן מספר הכתיבות הנוסף חסום
+     מלמעלה במכסה היומית עצמה: לכל היותר 100 כתיבות IP ליום, לא
+     500. `Map` בזיכרון נשאר קיצור דרך מקומי בלבד — קודם נבדק
+     בזול, ורק אם הוא לא פוסל הבקשה נקרא ה-KV, שהוא מקור האמת.
 
    · **גלובלי — צובר בזיכרון, ונכתב ל-KV לכל היותר פעם ב-10
-     דקות** או כל 25 פניות, המוקדם מביניהם. חשבון: 144 כתיבות
-     ליום ל-isolate לפי הזמן, ובתקרה של 100 פניות ביום — 4 לפי
-     המניין. גם עם כמה isolates במקביל זה רחוק מ-700.
+     דקות** או כל 25 פניות, המוקדם מביניהם. בתקרה של 100 פניות
+     ביום זה 4 כתיבות לפי המניין. יחד עם כתיבות ה-IP: **נמדד
+     ב-`.claude/qa/tutor.js`, ריצה מלאה של המכסה היומית בערכי
+     ברירת המחדל (`perDay=10`, `globalPerDay=100`) — 104 כתיבות
+     בדיוק** (100 מה-IP ו-4 מהגלובלי), רחוק מ-700 וגם מ-1,000.
 
-   **מה זה עולה בדיוק:** בין שני flush-ים ה-isolate אינו רואה
-   פניות של isolate אחר, ולכן החסם הגלובלי יכול לחרוג בעד 25
-   לכל isolate. זו תקרת עלות ולא מונה חיוב, והחריגה חסומה.
+   **מה זה עולה בדיוק:** בין שני flush-ים של המונה הגלובלי
+   ה-isolate אינו רואה פניות של isolate אחר, ולכן החסם הגלובלי
+   יכול לחרוג בעד 25 לכל isolate. זו תקרת עלות ולא מונה חיוב,
+   והחריגה חסומה. **וקריאת ה-KV עצמה אינה אטומית** — אין ל-KV
+   של Cloudflare פעולת INCR, ושתי בקשות מאותו IP שנוחתות על שני
+   isolates באותה מילישנייה יכולות שתיהן לקרוא ספירה זהה ולעבור.
+   זה תקרה נדירה ולא ניצול שיטתי, וזו התקרה האמיתית של הפתרון
+   בלי Durable Object או מסד חיצוני חדש — לא הומצאה כדי להישמע
+   טוב יותר.
+
+   **וכשל־סגור אמיתי:** קריאת KV שנכשלת (השירות תקול, לא רק
+   חסר) אינה משאירה את הבקשה עוברת על סמך זיכרון מיושן — היא
+   נחסמת כ-`"all"`, בדיוק כמו תקרת עלות שנגמרה. לומד לא יודע את
+   ההבדל בין "אין תקציב" ל"אי אפשר לבדוק אם יש תקציב", וזה הצד
+   הבטוח לטעות אליו.
 
    `overLimit` שומר על החוזה הישן: `null` כשיש מקום, `"you"`
-   כשהתקרה של הלומד נגמרה, `"all"` כשחסם העלות נגמר — ההבדל
-   מגיע ללומד (״נמשיך מחר״ מול ״זה לא אתה״). */
+   כשהתקרה של הלומד נגמרה, `"all"` כשחסם העלות נגמר או שה-KV
+   אינו נגיש — ההבדל מגיע ללומד (״נמשיך מחר״ מול ״זה לא אתה״). */
 const FLUSH_MS = 10 * 60 * 1000;
 const FLUSH_EVERY = 25;
 const IP_MAP_MAX = 5000;
@@ -670,21 +689,39 @@ async function overLimit(env, ip, ctx) {
   rollDay();
   const perDay = capOfEnv(env, "PER_DAY", LIM.perDay);
   const globalPerDay = capOfEnv(env, "GLOBAL_PER_DAY", LIM.globalPerDay);
-  const n = RATE_MEM.ip.get(ip) || 0;
-  if (n >= perDay) return "you";
+  const ipKey = "ip:" + RATE_MEM.day + ":" + ip;
+
+  /* קיצור דרך זול: אם הזיכרון המקומי כבר יודע שנגמר — אין טעם
+     לקרוא ל-KV. אחרת ה-KV הוא הבודק, כי isolate אחר יכול לדעת
+     יותר ממה שיש כאן בזיכרון. */
+  let n = RATE_MEM.ip.get(ip) || 0;
+  if (n < perDay) {
+    try {
+      const kvN = +(await env.RATE.get(ipKey) || 0);
+      if (kvN > n) n = kvN;
+    } catch (e) { return "all" }              /* KV תקול — נכשל-סגור */
+  }
+  if (n >= perDay) { RATE_MEM.ip.set(ip, n); return "you" }
+
   const now = Date.now();
   if (!RATE_MEM.g.readAt || now - RATE_MEM.g.readAt > FLUSH_MS) {
     try {
       const base = +(await env.RATE.get("g:" + RATE_MEM.day) || 0);
       if (base > RATE_MEM.g.base) RATE_MEM.g.base = base;
-    } catch (e) {}
+    } catch (e) { return "all" }              /* KV תקול — נכשל-סגור */
     RATE_MEM.g.readAt = now;
   }
   if (RATE_MEM.g.base + RATE_MEM.g.pending >= globalPerDay) return "all";
+
   if (RATE_MEM.ip.size >= IP_MAP_MAX) RATE_MEM.ip.clear();
   RATE_MEM.ip.set(ip, n + 1);
   RATE_MEM.g.pending++;
   flushGlobal(env, ctx, false);
+  /* כתיבת ה-IP ל-KV: best-effort ולא חוסמת את התשובה ללומד.
+     כשלון כתיבה משאיר את הספירה נשענת על הזיכרון המקומי בלבד
+     עד ה-isolate הבא — נסיגה להתנהגות הישנה, לא כשל חדש. */
+  const w = env.RATE.put(ipKey, String(n + 1), { expirationTtl: 172800 }).catch(() => {});
+  if (ctx && typeof ctx.waitUntil === "function") ctx.waitUntil(w); else await w;
   return null;
 }
 /* לבדיקות בלבד: איפוס הזיכרון בין תרחישים, ומניין הכתיבות. */
@@ -1267,8 +1304,17 @@ async function handleAsk(request, env, ctx, org, fetchFn) {
       ? "התשובה הקודמת שלך חשפה את הפתרון או הכילה חישוב שגוי. כתוב מחדש: " +
         "רמז אחד בלבד, בלי לכתוב את התשובה הנכונה, ובלי משוואה מלאה."
       : "התשובה הקודמת שלך הכילה חישוב שגוי. כתוב מחדש, ובדוק כל חישוב לפני שאתה כותב אותו.";
-    const again = await ask(env, sys, inp.msgs, nudge, tools, fetchFn);
-    out = (again.err || bad(again.text)) ? { text: "", call: out.call, model: out.model } : again;
+    /* הניסיון השני הוא קריאה נוספת לספק ועולה כסף בדיוק כמו
+       הראשונה, ולכן הוא נספר בנפרד. אם המכסה נגמרה בין הקריאה
+       הראשונה לשנייה — אין ניסיון שני, וחוזרים לנוסח הקבוע במקום
+       לשלם על קריאה שאין לה כיסוי. */
+    const retryHit = await overLimit(env, ip, ctx);
+    if (retryHit) {
+      out = { text: "", call: out.call, model: out.model };
+    } else {
+      const again = await ask(env, sys, inp.msgs, nudge, tools, fetchFn);
+      out = (again.err || bad(again.text)) ? { text: "", call: out.call, model: out.model } : again;
+    }
   }
 
   const action = validateAction(out.call, inp.actions);
@@ -1286,7 +1332,8 @@ async function handleAsk(request, env, ctx, org, fetchFn) {
 
 export default {
   async fetch(request, env, ctx) {
-    const org = pickOrigin(env, request.headers.get("Origin"));
+    const reqOrigin = request.headers.get("Origin");
+    const org = pickOrigin(env, reqOrigin);
     const url = new URL(request.url);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env, org) });
     /* בריאות — בלי מפתח, בלי מונה, בלי פנייה לספק. */
@@ -1295,6 +1342,14 @@ export default {
                     counter: env.RATE ? "kv" : (noCounter(env) ? "missing" : "declared-off"),
                     apps: Object.keys(ROLE), actions: ACTION_NAMES, limits: LIM }, 200, env, org);
     if (request.method !== "POST") return json({ error: "method" }, 405, env, org);
+    /* `cors()` מהדהד מקור מותר ומחליף מקור זר במקור ברירת המחדל
+       בכותרת התשובה — וזו אינה חסימה: curl וסקריפטים אינם קוראים
+       כותרות CORS, רק דפדפן אוכף אותן. בקשת POST עם כותרת Origin
+       **מפורשת** שאינה ברשימה נדחית כאן ב-403, לפני שהיא נוגעת
+       במונה או במודל. זו עדיין לא אימות — בקשה בלי כותרת Origin
+       כלל (רוב קריאות curl) אינה נחסמת בדרך הזאת, ואין לזה תיקון
+       בצד השרת בלי אימות אמיתי; המונה ליום הוא חסם העלות בפועל. */
+    if (reqOrigin && org !== reqOrigin) return json({ error: "origin" }, 403, env, org);
     if (url.pathname !== "/" && url.pathname !== "/ask" && !/\/(?:ask|api\/josh\/chat)\/?$/.test(url.pathname))
       return json({ error: "path" }, 404, env, org);
     if (!env[engineOf(env).key]) return json({ error: "server" }, 500, env, org);
