@@ -157,6 +157,13 @@ en:{ btn:"Barak — ask the teacher", title:"Ask the teacher", close:"Close", se
 
 var CFG = null, MSGS = [], BUSY = false, NOTE = "", QID = null, LANGAT = null;
 var EL = null, PLAYING = -1;
+/* ההסבר ״אפשר לשאול אותי...״ הוא אוריינטציה חד־פעמית, לא כותרת קבועה.
+   draw() נקרא מחדש בכל הודעה ובכל תרגיל חדש (MSGS מתאפס), ובלי הדגל
+   הזה הוא היה חוזר בכל פעם — נראה כאילו ברק מציג את עצמו כל פעם
+   שפונים אליו, ולא רק בתחילת השימוש באפליקציה. נכבה לצמיתות רק אחרי
+   שהילד באמת כתב הודעה ראשונה — עד אז הוא עדיין ״בהתחלה״, גם אם
+   הפתיחה שלו ל-Barak נמשכת כמה ציורים (חשיפת ההודעה תו־אחר־תו). */
+var INTRO_SEEN = false;
 
 function T(){ return L[lang()] || L.he }
 function lang(){
@@ -1046,7 +1053,11 @@ function draw(){
   }
   else e.q.hidden = true;
 
-  var h = '<p class="tu-sys">' + esc(t.intro) + '</p>';
+  var h = "";
+  if(!INTRO_SEEN){
+    h += '<p class="tu-sys">' + esc(t.intro) + '</p>';
+    if(MSGS.some(function(m){ return m.role === "user" })) INTRO_SEEN = true;
+  }
   MSGS.forEach(function(m, i){
     /* ההודעה הפותחת נשלחת על ידי האפליקציה ולא על ידי הילד */
     if(i === 0 && m.role === "user") return;
