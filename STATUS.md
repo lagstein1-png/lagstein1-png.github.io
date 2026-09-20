@@ -32,9 +32,10 @@
 | `lomda` | l116 · 2026-09-18 | l116-pwa1 | תואם |
 | `kotvim` | k67 · 2026-09-18 | k67-pwa1 | תואם |
 | `reader` | — | 93-pwa1 | מפתח בלבד |
+| `rakia` | r3 · 2026-09-20 | r3-pwa1 | תואם |
 | `theory` | — | — | אינה בריפו הזה |
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-19.
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-20.
 
 
 
