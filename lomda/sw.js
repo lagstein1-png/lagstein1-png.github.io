@@ -19,7 +19,7 @@ const PRE = ["./","./index.html","./manifest.json",
              "./data/bible.js","./data/bio.js","./data/chem.js","./data/edu.js","./data/eng.js","./data/geo.js","./data/lashon.js","./data/lit.js","./data/media.js","./data/med.js","./data/phys.js","./data/heat.js","./data/tech.js","./data/safety.js","./data/work.js","./data/arabic.js","./data/career.js","./data/meitzav.js",
              "./img/icon-192.png","./img/icon-512.png",
              "/img/josh.jpg",
-             "/tutor/he-speech.js","/tutor/josh-face.js",
+             "/tutor/he-speech.js","/speech/recorded.js","/tutor/josh-face.js",
              "/tutor/josh-state.js",
              "/tutor/josh-local.js","/tutor/tutor.js","/tutor/barak-core.js",
              "/legal/terms.js","/legal/protect.js"];
