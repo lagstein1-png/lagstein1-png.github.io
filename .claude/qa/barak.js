@@ -342,6 +342,122 @@ const BODY = extra => Object.assign({ app: 'math-app', lang: 'he', screen: SCREE
   /* ו-CORE נשאר יציב: אסור שהכלל התלוי-שפה ידלוף לתוכו */
   t('CORE אינו נושא מלכודת תלוית-שפה', /מה שנעשה זה|بكدي|падеж/.test(W.CORE), false);
 
+  console.log('— א2. הגבלת קצב, retry ו-CORS — הוקשח 19.9.2026 —');
+  /* בקשה עם IP קבוע, לא אקראי — כדי ששני `overLimit` באותו
+     `handleAsk` (הראשון והחוזר) יספרו על אותה כתובת. */
+  const reqIP = (body, ip, p) => new Request('https://tutor.example' + (p || '/ask'), {
+    method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json', 'CF-Connecting-IP': ip }),
+    body: JSON.stringify(body) });
+
+  /* 1. הניסיון השני (nudge) נספר. נגמרה המכסה אחרי הניסיון
+     הראשון — אין ניסיון שני, ואין קריאה שנייה לספק. */
+  {
+    W._rate.reset(); W._models.reset();
+    const F = fakeGemini({ script: [{ text: 'התשובה היא 15.' }, { text: 'לא אמור להיקרא' }] });
+    const r = await W.handleAsk(reqIP(BODY(), '1.1.1.1'), ENV({ PER_DAY: '1' }), ctx, ORG, F);
+    const d = await r.json();
+    t('המכסה (PER_DAY=1) נגמרת אחרי הקריאה הראשונה — אין קריאה שנייה',
+      F.calls.length, 1);
+    t('התשובה חוזרת בנוסח קבוע ולא בטקסט שחשף את הפתרון',
+      d.say === 'התשובה היא 15.', false);
+  }
+
+  /* 2. המונה למד לכתובת שורד איפוס זיכרון (מדמה isolate חדש),
+     כי הוא נקרא מ-KV ולא רק מהמפה המקומית. זו ההוכחה למה
+     שהממצא ביקש: "המונה מתאפס ב-restart" — ואחרי התיקון, לא. */
+  {
+    const kv = KV();
+    const envKV = Object.assign({ GEMINI_API_KEY: 'test-key', PER_DAY: '1' }, kv);
+    const ip = '2.2.2.2';
+    W._rate.reset(); W._models.reset();
+    const F1 = fakeGemini({ script: [{ text: 'תשובה תקינה' }] });
+    const r1 = await W.handleAsk(reqIP(BODY(), ip), envKV, ctx, ORG, F1);
+    t('isolate 1: הבקשה הראשונה עוברת', r1.status, 200);
+
+    /* "restart" — מאפסים את המפה והצבירה בזיכרון, ה-KV נשאר */
+    W._rate.reset();
+    const F2 = fakeGemini({ script: [{ text: 'לא אמור להיקרא' }] });
+    const r2 = await W.handleAsk(reqIP(BODY(), ip), envKV, ctx, ORG, F2);
+    const d2 = await r2.json();
+    t('isolate 2 (אחרי איפוס זיכרון) — ה-KV עדיין זוכר את הכתובת וחוסם',
+      [r2.status, d2.scope, F2.calls.length], [429, 'you', 0]);
+  }
+
+  /* 3. KV תקול (לא רק חסר) בייצור — נכשל-סגור, לא נכשל-פתוח. */
+  {
+    W._rate.reset(); W._models.reset();
+    const brokenKV = { RATE: { get: async () => { throw new Error('kv down') }, put: async () => { throw new Error('kv down') } } };
+    const F = fakeGemini({ script: [{ text: 'לא אמור להיקרא' }] });
+    const r = await W.handleAsk(reqIP(BODY(), '3.3.3.3'), Object.assign({ GEMINI_API_KEY: 'test-key' }, brokenKV), ctx, ORG, F);
+    const d = await r.json();
+    t('KV תקול — נכשל-סגור (429, לא קריאה למודל)', [r.status, d.scope, F.calls.length], [429, 'all', 0]);
+  }
+
+  /* 4. ייצור בלי RATE כלל, ובלי ALLOW_NO_RATE_LIMIT — נכשל-סגור
+     דרך ה-fetch() המלא, ואין קריאת רשת בכלל (לא רק לא נספרת —
+     לא יוצאת). */
+  {
+    W._rate.reset(); W._models.reset();
+    let netCalls = 0;
+    const origFetch = global.fetch;
+    global.fetch = async () => { netCalls++; throw new Error('אסור להגיע לרשת') };
+    try {
+      const env = { GEMINI_API_KEY: 'test-key' };   /* אין RATE, אין ALLOW_NO_RATE_LIMIT */
+      const r = await W.default.fetch(reqIP(BODY(), '4.4.4.4'), env, ctx);
+      const d = await r.json();
+      t('ייצור בלי RATE — 503 ולא 200, ואין קריאת רשת בכלל',
+        [r.status, d.error, netCalls], [503, 'no-rate-limit', 0]);
+    } finally { global.fetch = origFetch }
+  }
+
+  /* 5. מקור (Origin) זר מפורש נדחה ב-403 לפני שהוא נוגע במונה
+     או במודל. עדיין לא אימות: בלי כותרת Origin כלל (curl רגיל)
+     אינו נחסם בדרך הזאת, ומקור מהרשימה ממשיך כרגיל. */
+  {
+    W._rate.reset(); W._models.reset();
+    let netCalls = 0;
+    const origFetch = global.fetch;
+    global.fetch = async () => { netCalls++; throw new Error('אסור להגיע לרשת') };
+    try {
+      const foreign = new Request('https://tutor.example/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'CF-Connecting-IP': '5.5.5.5', 'Origin': 'https://evil.example' },
+        body: JSON.stringify(BODY()) });
+      const r = await W.default.fetch(foreign, ENV(), ctx);
+      const d = await r.json();
+      t('מקור זר מפורש — 403 לפני מונה ולפני קריאת רשת',
+        [r.status, d.error, netCalls], [403, 'origin', 0]);
+    } finally { global.fetch = origFetch }
+  }
+  {
+    W._rate.reset(); W._models.reset();
+    const F = fakeGemini({ script: [{ text: 'תשובה תקינה' }] });
+    const origFetch = global.fetch;
+    global.fetch = F;
+    try {
+      const good = new Request('https://tutor.example/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'CF-Connecting-IP': '6.6.6.6', 'Origin': ORG },
+        body: JSON.stringify(BODY()) });
+      const r = await W.default.fetch(good, ENV(), ctx);
+      t('מקור מהרשימה — לא נחסם', r.status, 200);
+    } finally { global.fetch = origFetch }
+  }
+  {
+    W._rate.reset(); W._models.reset();
+    const F = fakeGemini({ script: [{ text: 'תשובה תקינה' }] });
+    const origFetch = global.fetch;
+    global.fetch = F;
+    try {
+      const noOrigin = new Request('https://tutor.example/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'CF-Connecting-IP': '7.7.7.7' },
+        body: JSON.stringify(BODY()) });
+      const r = await W.default.fetch(noOrigin, ENV(), ctx);
+      t('בלי כותרת Origin כלל — אינו נחסם (curl רגיל; זו לא בדיקת אימות)', r.status, 200);
+    } finally { global.fetch = origFetch }
+  }
+
   console.log('— ב. הלקוח —');
   const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: ROOT }).toString().split('\0').filter(Boolean);
   const PAGES = ['.', 'math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'lomda',

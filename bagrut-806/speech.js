@@ -539,6 +539,11 @@
       speechSynthesis.speak(u);
     } catch (e) {}
   }
+  /* pointerdown הוא האירוע שכל שתים־עשרה האחיות ו״תאוריה מדברת״
+     משחררות בו, והוא נורה לפני touchend ולפני mousedown. בלעדיו
+     voice.js בדיקה 0 (19.9.2026) לא ראתה כאן שחרור. השניים האחרים
+     נשארים למכשיר שאין בו PointerEvent. */
+  document.addEventListener("pointerdown", unlock, { once: true });
   document.addEventListener("touchend", unlock, { once: true, passive: true });
   document.addEventListener("mousedown", unlock, { once: true });
 

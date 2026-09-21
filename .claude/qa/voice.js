@@ -7,8 +7,12 @@
 
    הדרך היחידה לבדוק אותם היא להחליף את speechSynthesis האמיתי במנוע
    מזויף שאפשר לומר לו להיכשל בדיוק כמו המכשיר הבעייתי — ואז לשאול
-   את האפליקציה מה היא עשתה. ארבע בדיקות לכל אפליקציה:
+   את האפליקציה מה היא עשתה. חמש בדיקות לכל אפליקציה:
 
+     · שחרור   — המגע הראשון בדף מוציא אמירה ריקה. בלעדיה iOS בולע
+                 בשקט כל אמירה שיוצאת אחרי await (voicesReady, fetch),
+                 וזה ״אין קול בטלפון״ של תאוריה מדברת (025ac051 שם).
+                 נוסף 19.9.2026, ונפל על rakia ועל bagrut-806.
      · בחירה   — מתוך ארבעה קולות באותה שפה, נבחר הטוב ולא הראשון,
                  והוא הקול הנשי הטבעי, בקצב 0.95 ובגובה 1.12 (״נשי רגוע״)
      · שומר-ער — pause+resume נורה כדי שההקראה לא תיחתך
@@ -184,6 +188,16 @@ async function openApp(browser, app){
   await page.goto(app.url ? `${BASE}${app.url}` : `${BASE}/${app.id}/`,
                   { waitUntil:'domcontentloaded' });
   await page.waitForTimeout(700);
+  /* --- 0 · שחרור במגע ---
+     לפני כל לחיצה של הבדיקה עצמה: המאזין הוא once, ולחיצת ״התחלה״
+     הייתה צורכת אותו והבדיקה לא הייתה יודעת אם הוא קיים. האירוע
+     נשלח על body ומבעבע ל-document — בלי hit-testing, ולכן שער
+     התנאים שמכסה את המסך אינו משנה כאן. */
+  await page.evaluate(() => { window.__tts.spoke = []; });
+  await page.dispatchEvent('body', 'pointerdown').catch(() => {});
+  await page.waitForTimeout(150);
+  /* אמירה ריקה, או רווח בעוצמה אפס (bagrut-806) — שתיהן ״חימום״ ולא דיבור */
+  const unlocked = await page.evaluate(() => window.__tts.spoke.some(t => String(t).trim() === ''));
   if(app.open){ await app.open(page); }
   else {
     /* עוברים למסך תרגול: לוחצים על מה שנראה ככפתור התחלה */
@@ -193,7 +207,7 @@ async function openApp(browser, app){
     }
   }
   await page.waitForTimeout(600);
-  return { ctx, page };
+  return { ctx, page, unlocked };
 }
 
 /* לוחץ על כפתור ההקראה. מחזיר false אם לא נמצא. */
@@ -224,9 +238,12 @@ async function run(){
   const browser = await chromium.launch();
   let bad = 0;
   for(const app of APPS){
-    const { ctx, page } = await openApp(browser, app);
+    const { ctx, page, unlocked } = await openApp(browser, app);
     const fails = [];
     try{
+      /* --- 0 · שחרור במגע (נמדד ב-openApp, לפני הלחיצות) --- */
+      if(!unlocked) fails.push('שחרור: המגע הראשון לא הוציא אמירה ריקה — ב-iOS ההקראה תישאר שקטה');
+
       /* --- 1 · בחירת הקול --- */
       await page.evaluate(() => { window.__mode('ok'); window.__tts.spoke = []; window.__tts.voices = []; window.__tts.tune = []; });
       if(!await pressSpeak(page, app)) throw new Error('לא נמצא כפתור הקראה');
@@ -294,7 +311,7 @@ async function run(){
     }
     await ctx.close();
     if(fails.length){ bad++; console.log('✗ ' + app.id.padEnd(11) + fails.join(' · ')); }
-    else console.log('✓ ' + app.id.padEnd(11) + 'בחירה, שומר-ער, שומר זמן ונפילה — כולם עובדים');
+    else console.log('✓ ' + app.id.padEnd(11) + 'שחרור, בחירה, שומר-ער, שומר זמן ונפילה — כולם עובדים');
   }
   await browser.close();
 
