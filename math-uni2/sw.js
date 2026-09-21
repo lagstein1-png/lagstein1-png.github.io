@@ -14,7 +14,7 @@ const CACHE = "math-uni2-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
              "/img/josh.jpg",
-             "/tutor/he-speech.js","/tutor/josh-face.js",
+             "/tutor/he-speech.js","/speech/recorded.js","/tutor/josh-face.js",
              "/tutor/josh-state.js",
              "/tutor/josh-local.js","/tutor/tutor.js","/tutor/barak-core.js",
              "/legal/terms.js","/legal/protect.js"];
