@@ -81,7 +81,9 @@
   }
   try { document.addEventListener("pointerdown", unlock, { once: true }); } catch (e) {}
 
-  /* טוען את רשימת המזהים. אין קובץ — השכבה כבויה, בשקט. */
+  /* טוען את רשימת המזהים. מניפסט ריק יושב בכל אפליקציה מראש — 404
+     נרשם בקונסולה כשגיאה, ובדיקות הדפדפן סופרות אותה. אין קובץ בכל
+     זאת — השכבה כבויה, בשקט. */
   function setup(opts) {
     opts = opts || {};
     if (opts.base) R.base = String(opts.base).replace(/\/+$/, "");
