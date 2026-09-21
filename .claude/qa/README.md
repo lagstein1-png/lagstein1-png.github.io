@@ -6,7 +6,7 @@
 **הרצה: פקודה אחת.**
 
     node .claude/qa/all.js              # הכול, ופסק דין אחד
-    node .claude/qa/all.js --fast       # בלי entropy ו-options
+    node .claude/qa/all.js --fast       # בלי הבדיקות המסומנות slow (ארבע, 21.9.2026)
     node .claude/qa/all.js --static     # רק מה שאינו דורש דפדפן
 
 `all.js` מרים את השרת בעצמו וסוגר אותו בסוף. להרצה של כלי בודד:

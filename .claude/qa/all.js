@@ -57,6 +57,9 @@ const SUITE = [
   { id: 'kotvim',   args: [] },
   { id: 'leaks',    args: [] },
   { id: 'markers',  args: [] },
+  /* רשימת הכלים ב-qa-tools.md מול SUITE הזה — מחולל עם --check,
+     כפי שהכלל דורש. נמדד 19.9.2026: 24 מזהים חסרו במסמך. */
+  { id: 'suite',    args: ['--check'] },
   /* שלושה כללים שהיו כתובים ב-CLAUDE.md בלבד, ונאכפים מ-16.9.2026.
      כל אחד מצא משהו ביום שנכתב: pure — לולאת הנפילה של תרגיל
      הסידור ב-english וב-ulpan שקלה לפי state.item בתוך המבחן;

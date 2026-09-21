@@ -56,6 +56,31 @@
     node .claude/qa/deployed.js              # מסלול הלומד על הבתים שנפרסו — ביד בלבד
     Actions → live-check → Run workflow      # מה באמת מוגש מהאתר החי (הסוכן חסום)
     node .claude/qa/keyboard.js              # הפאנל של ברק כשהמקלדת פתוחה — visualViewport מזויף, 360/412, עברית וערבית, חזקות, אופליין
+    node .claude/qa/apps.js              # שבעת המקומות שאפליקציה חדשה נוגעת בהם — האם כולם עודכנו
+    node .claude/qa/status.js --check    # STATUS.md מול המדידה — הטבלה לא נכתבת ביד
+    node .claude/qa/pure.js              # המבחן הכיתתי: כל קריאה ל-buildQuestion מתוך buildQ מעבירה pure=true
+    node .claude/qa/i18n.js              # האוניברסיטה — כל _("…") מפתח ב-TR_KEYS, וכל מפתח מתורגם
+    node .claude/qa/agents.js            # סוכן אינו קורא לסוכן — אין כלי סוכנים בשורת tools ואין הבטחה כזאת
+    node .claude/qa/century.js           # המאה בארבע השפות — על הפונקציה האמיתית שבאפליקציה
+    node .claude/qa/content806.js        # סריקת התוכן של bagrut-806 (הבנק הסטטי) — כותב את הדוח
+    node .claude/qa/engine.js            # המנוע המשותף — האם העותקים בכל האפליקציות עדיין זהים
+    node .claude/qa/tutor.js             # ״עזרה מהמורה״ — השומרים בשרת, החיווט בלקוח, ושער התנאים
+    node .claude/qa/offer.js             # הצעה שברק מציע (״נעבור ל…״) מתקיימת בפועל
+    node .claude/qa/simplify.js          # ״גרסה פשוטה״ ב-reader — רק בלחיצה, רק במצב simplify, ובלי שרת
+    node .claude/qa/analytics.js         # GoatCounter: בכל הדפים או באף אחד, והתנאים זהים בארבע שפות
+    node .claude/qa/mkreader.js --check  # marketing/index.html לא נערך ביד (המחולל: אותו קובץ)
+    node .claude/qa/media.js             # סרטוני ההדגמה — חתימת כל סרטון מול DEMO_SCRIPT, וצילומי המסך בארבע שפות
+    node .claude/qa/counts.js            # מספר תוכן שמצוטט בחומר שיווקי מול המדידה של היום
+    node .claude/qa/barak.js             # מנוע ברק — חוזה ה-Worker מול מודל מדומה, והחיווט בלקוח; בלי רשת
+    node .claude/qa/hespeech.js          # מנוע ההגייה העברי — /tutor/he-speech.js
+    node .claude/qa/barak-browser.js     # ברק בדפדפן אמיתי מול שרת מדומה, בכל אפליקציה
+    node .claude/qa/tutor-timeout.js     # ספק שתולה — הפאנל של ברק אינו נתקע (O-72)
+    node .claude/qa/contrast.js          # האם הטקסט בכלל נראה — ניגודיות מול הסף
+    node .claude/qa/shadow.js            # פונקציה גלובלית שנדרסה בשקט
+    node .claude/qa/voice.js             # מנוע ההקראה מול speechSynthesis מזויף — ארבעת המנגנונים מתאוששים
+    node .claude/qa/netpin.js            # מנגנון 4 מול בחירת קול ידנית — tutor/tutor.js
+    node .claude/qa/exam.js              # המבחן מהקישור — השאלה שהמורה רואה היא שהתלמיד מקבל
+    node .claude/qa/suite.js --check     # הרשימה הזאת מול SUITE שב-all.js — מזהה חסר או שורה מתה נופלים
     node .claude/qa/all.js                   # הכול, ופסק דין אחד
     node .claude/qa/all.js --static          # רק מה שאינו דורש דפדפן
     node .claude/qa/extract.js /tmp/js …     # מחלץ סקריפטים ל-eslint
