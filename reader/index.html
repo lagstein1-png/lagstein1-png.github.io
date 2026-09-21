@@ -1293,7 +1293,10 @@ function speakSentence(n){
     ttsOK();
     if(!speaking) return;
     if(SENT + 1 < SENTS){ SENT++; markSentence(); speakSentence(SENT); }
-    else stop();
+    /* O-93: בלי לאפס כאן, ▶ אחרי סוף ההקראה היה קורא שוב רק את
+       המשפט האחרון — SENT נשאר תקוע על SENTS-1 לנצח, בלי קשר
+       למספר הלחיצות. */
+    else { SENT = 0; markSentence(); stop(); }
   }
   u.onend = advance;
   /* המנוע נכשל — לומר את זה במקום להיעצר בשקט.
@@ -1708,7 +1711,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=94-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=95-pwa1").catch(function(){});
   });
 }
 </script>

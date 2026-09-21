@@ -109,7 +109,11 @@ const APPS = [
 
 /* מנוע דיבור מזויף. mode קובע איך הוא נכשל:
      'ok'      — מתנהג יפה
-     'silent'  — בולע את האמירה ולא יורה onend לעולם
+     'silent'  — בולע את האמירה ולא יורה onend לעולם, וגם לא מוריד
+                 speaking — בדיוק מה ששומר-הער (בדיקה 2) בודק
+     'lostend' — מדמה את המכשיר שבדיקה 3 קיימת בשבילו: onend לא
+                 נורה, אבל speaking כן חוזר ל-false אחרי שהמנוע
+                 "גמר" — ורק אז לשומר הזמן יש מה לתפוס
      'neterr'  — קול רשת נכשל ב-synthesis-failed */
 const FAKE = `(function(){
   const V = [
@@ -123,7 +127,7 @@ const FAKE = `(function(){
     { name:'Samantha',             lang:'en-US', voiceURI:'samantha',   localService:true,  default:false },
     { name:'Microsoft Aria Online (Natural) - English (United States)', lang:'en-US', voiceURI:'aria-net', localService:false, default:false }
   ];
-  const log = { spoke:[], pauseResume:0, voices:[], tune:[] };
+  const log = { spoke:[], pauseResume:0, voices:[], tune:[], cancels:0 };
   window.__tts = log;
   let mode = 'ok';
   window.__mode = m => { mode = m; };
@@ -131,11 +135,20 @@ const FAKE = `(function(){
     constructor(t){ super(); this.text = t; this.lang=''; this.rate=1; this.pitch=1; this.volume=1;
       this.voice=null; this.onend=null; this.onerror=null; this.onboundary=null; this.onstart=null; }
   }
+  let current = null;    /* האמירה שעדיין לא נסגרה — onend/onerror/cancel */
   const synth = {
     speaking:false, pending:false, paused:false,
     getVoices(){ return V; },
     addEventListener(){}, removeEventListener(){},
-    cancel(){ this.speaking = false; },
+    /* דפדפן אמיתי מודיע לאמירה שבוטלה — 'canceled'/'interrupted' — וכל
+       העותקים כאן סומכים על זה כדי לנקות moved ולפרק את השומר. בלי זה
+       ביטול משאיר את האפליקציה חושבת שהיא עדיין "מדברת", ולחיצה הבאה
+       על הכפתור עוצרת את מה שכבר לא באמת רץ במקום להתחיל הקראה חדשה. */
+    cancel(){
+      const u = current; current = null;
+      this.speaking = false; log.cancels++;
+      if(u && u.onerror) u.onerror({ error:'canceled' });
+    },
     pause(){ this.paused = true; },
     resume(){ this.paused = false; },
     speak(u){
@@ -144,16 +157,24 @@ const FAKE = `(function(){
       /* קצב וגובה — מה שבאמת נשלח למנוע, ולא מה שכתוב בהגדרות.
          volume נרשם כדי לדלג על אמירת חימום שקטה (בגרות 806). */
       log.tune.push({ rate:u.rate, pitch:u.pitch, volume:u.volume });
-      this.speaking = true;
+      this.speaking = true; current = u;
+      const done = () => { if(current === u) current = null; };
       if(mode === 'silent'){ return; }          /* לא יורה כלום, לנצח */
+      if(mode === 'lostend'){
+        /* speaking כן חוזר ל-false — בלי זה שומר-ער (בדיקה 2) ולא
+           שומר-זמן (בדיקה 3) יכולים להבחין בין המצבים. onend, לעומת
+           זאת, לא נורה לעולם — וזה בדיוק מה ששומר הזמן נועד לתפוס. */
+        setTimeout(() => { this.speaking = false; done(); }, 30);
+        return;
+      }
       if(mode === 'neterr' && u.voice && u.voice.localService === false){
-        setTimeout(() => { this.speaking = false;
+        setTimeout(() => { this.speaking = false; done();
           const e = { error:'synthesis-failed' };
           if(u.onerror) u.onerror(e);
         }, 30);
         return;
       }
-      setTimeout(() => { this.speaking = false; if(u.onend) u.onend({}); }, 30);
+      setTimeout(() => { this.speaking = false; done(); if(u.onend) u.onend({}); }, 30);
     }
   };
   const rp = synth.pause.bind(synth), rr = synth.resume.bind(synth);
@@ -227,9 +248,15 @@ async function pressSpeak(page, app){
     const b = page.locator(sel).first();
     if(await b.count() && await b.isVisible()){ await b.click().catch(()=>{}); return true; }
   }
-  /* נפילה לאחור: קוראים ל-speak של האפליקציה ישירות */
+  /* נפילה לאחור: קוראים ל-speak של האפליקציה ישירות. שני משפטים
+     ולא אחד — כדי שבדיקה 3 (שומר זמן) תוכל להבחין בין "מקטע הבא
+     יצא" ל"התור נתקע", גם באפליקציה שהמקטע האחרון שלה לא קורא
+     ל-cancel כשהוא מסתיים. */
   return page.evaluate(() => {
-    if(typeof speak === 'function'){ speak('משפט בדיקה ארוך מספיק כדי להיחתך באמצע, ועוד קצת.'); return true; }
+    if(typeof speak === 'function'){
+      speak('משפט בדיקה ראשון, ארוך מספיק כדי להיחתך באמצע. ומשפט שני שסוגר את הבדיקה.');
+      return true;
+    }
     return false;
   }).catch(() => false);
 }
@@ -273,19 +300,38 @@ async function run(){
       await page.waitForTimeout(9800);
       const pr = await page.evaluate(() => window.__tts.pauseResume);
       if(pr < 1) fails.push('שומר-ער: pause+resume לא נורה — ההקראה תיחתך אחרי 15 שניות');
+      /* בדיקה 2 משאירה את המנוע "מדבר" לנצח בכוונה — זה מה שהיא
+         בודקת. מבטלים ישירות ולא דרך הכפתור: לחיצה על אותו כפתור
+         כשהאפליקציה עדיין חושבת שהיא מדברת הייתה עוצרת ולא מתחילה
+         הקראה חדשה, ובדיקה 3 הייתה נכשלת בלי שום קשר לשומר שלה. */
+      await page.evaluate(() => { try{ speechSynthesis.cancel(); }catch(e){} });
+      await page.waitForTimeout(200);
 
-      /* --- 3 · שומר זמן --- */
-      await page.evaluate(() => { window.__mode('silent'); window.__tts.spoke = []; });
+      /* --- 3 · שומר זמן ---
+         'silent' לא הוכיח כלום כאן: הוא לא מוריד speaking לעולם,
+         ולכן השומר (שבודק speechSynthesis.speaking) לא יכול להבחין
+         בין "עדיין מדבר" ל"תקוע" — ה-if שלו לא היה יורה אף פעם.
+         מה שהבדיקה הישנה מדדה בפועל היה שלחיצה חוזרת על הכפתור
+         עובדת — וזו עובדה על כל לחיצה, גם כששומר הזמן כבוי לגמרי,
+         כי speak() של האפליקציה תמיד מבטל (cancel) לפני שהוא מתחיל
+         מחדש — כולל הלחיצה הראשונה עצמה, שמבטלת כל מה שנשאר "מדבר"
+         מבדיקה 2. לכן לא בודקים cancels/spoke כמספר מוחלט: לוקחים
+         בסיס מיד אחרי שהלחיצה עצמה נרגעה, ובודקים רק אם *נוסף*
+         עוד cancel או עוד אמירה בלי שנגענו בכלום — זה לבדו יכול
+         להעיד שהשומר קידם את התור מעצמו. 'lostend' מדמה את המכשיר
+         האמיתי: onend לא נורה, אבל speaking כן חוזר ל-false. */
+      await page.evaluate(() => {
+        window.__mode('lostend'); window.__tts.spoke = []; window.__tts.cancels = 0;
+      });
       await pressSpeak(page, app);
-      await page.waitForTimeout(6500);
-      const n = await page.evaluate(() => window.__tts.spoke.length);
-      /* טקסט קצר יוצא במקטע אחד; מה שנבדק הוא שהתור לא קפא לנצח —
-         כלומר שהשומר שחרר אותו ואפשר להקריא שוב. */
-      await page.evaluate(() => { window.__mode('ok'); window.__tts.spoke = []; });
-      await pressSpeak(page, app);
-      await page.waitForTimeout(500);
-      if(await page.evaluate(() => window.__tts.spoke.length) === 0)
-        fails.push('שומר זמן: אחרי onend שלא נורה, ההקראה הבאה לא יצאה');
+      await page.waitForTimeout(200);
+      const base = await page.evaluate(() =>
+        ({ spoke: window.__tts.spoke.length, cancels: window.__tts.cancels }));
+      await page.waitForTimeout(6000);
+      const advanced = await page.evaluate(b =>
+        window.__tts.spoke.length > b.spoke || window.__tts.cancels > b.cancels, base);
+      await page.evaluate(() => { window.__mode('ok'); });
+      if(!advanced) fails.push('שומר זמן: onend לא נורה, וגם אחרי 6 שניות התור לא זז לבד — קפא');
 
       /* --- 4 · נפילה מקול רשת --- */
       await page.evaluate(() => {

@@ -31,11 +31,11 @@
 | `history` | m128 · 2026-09-20 | m128-pwa1 | תואם |
 | `lomda` | l117 · 2026-09-20 | l117-pwa1 | תואם |
 | `kotvim` | k68 · 2026-09-20 | k68-pwa1 | תואם |
-| `reader` | — | 94-pwa1 | מפתח בלבד |
+| `reader` | — | 95-pwa1 | מפתח בלבד |
 | `rakia` | r4 · 2026-09-20 | r4-pwa1 | תואם |
 | `theory` | — | — | אינה בריפו הזה |
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-20.
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-21.
 
 
 
