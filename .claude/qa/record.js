@@ -138,7 +138,9 @@ function check() {
   let bad = 0;
   for (const app of Object.keys(SOURCES)) {
     const m = readManifest(app), disk = onDisk(app);
-    if (!m && !disk.size) { console.log('· ' + app.padEnd(9) + 'אין הקלטות עדיין — קול המכשיר'); continue; }
+    /* מניפסט ריק יושב בכל אפליקציה מהיום הראשון: 404 על manifest.json
+       נרשם בקונסולה כשגיאה, ו-smoke/exam נפלו על זה ב-main (ריצה 814). */
+    if ((!m || !(((m.langs || {})[LANG] || {}).ids || []).length) && !disk.size) { console.log('· ' + app.padEnd(9) + 'אין הקלטות עדיין — קול המכשיר'); continue; }
     if (!m || m.broken) { bad++; console.log('✗ ' + app.padEnd(9) + 'יש קבצים ואין manifest.json תקין — ' + disk.size + ' קבצים לא ינוגנו'); continue; }
     const ids = ((m.langs || {})[LANG] || {}).ids || [];
     const set = new Set(ids);
