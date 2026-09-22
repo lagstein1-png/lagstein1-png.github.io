@@ -19,7 +19,13 @@
 
 name: record
 
+# **רץ לבד כל בוקר** (הבעלים, 22.9.2026: ״רוץ״). המכסה היומית של
+# המפתח מתאפסת בחצות בשעון פסיפיק — 07:00 UTC (נמדד ב-O-71) — ולכן
+# 07:30. כל ריצה מקליטה מה שהמכסה מרשה, באפליקציה שהכי הרבה חסר
+# בה (`record.js --next`), ונעצרת על 429. הרצה ידנית בוחרת אפליקציה.
 on:
+  schedule:
+    - cron: '30 7 * * *'
   workflow_dispatch:
     inputs:
       app:
@@ -69,23 +75,36 @@ jobs:
             exit 1
           fi
 
+      # ריצה מתוזמנת — אין קלט: בוחרים את האפליקציה שהכי הרבה חסר בה.
+      - name: איזו אפליקציה
+        id: pick
+        run: |
+          APP="${{ github.event.inputs.app }}"
+          if [ -z "$APP" ]; then APP="$(node .claude/qa/record.js --next)"; fi
+          if [ -z "$APP" ]; then echo "הכול מוקלט — אין מה להריץ."; fi
+          echo "app=$APP" >> "$GITHUB_OUTPUT"
+          echo "max=${{ github.event.inputs.max || '300' }}" >> "$GITHUB_OUTPUT"
+
       - name: תכנון
-        run: node .claude/qa/record.js --plan "${{ github.event.inputs.app }}"
+        if: steps.pick.outputs.app != ''
+        run: node .claude/qa/record.js --plan "${{ steps.pick.outputs.app }}"
 
       # נופל על מכסה? מה שהוקלט נשמר, והצעדים שאחריו דוחפים אותו.
       - name: מקליט
+        if: steps.pick.outputs.app != ''
         continue-on-error: true
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: node .claude/qa/record.js "${{ github.event.inputs.app }}" --max "${{ github.event.inputs.max }}"
+        run: node .claude/qa/record.js "${{ steps.pick.outputs.app }}" --max "${{ steps.pick.outputs.max }}"
 
       - name: המניפסט תואם לדיסק
         run: node .claude/qa/record.js --check
 
       - name: דוחף ל-main
+        if: steps.pick.outputs.app != ''
         run: |
           set -euo pipefail
-          APP="${{ github.event.inputs.app }}"
+          APP="${{ steps.pick.outputs.app }}"
           if [ -z "$(find "$APP/audio" -type f -name '*.mp3' 2>/dev/null | head -1)" ]; then
             echo "לא נוצר אף קובץ — אין מה לדחוף."
             exit 0

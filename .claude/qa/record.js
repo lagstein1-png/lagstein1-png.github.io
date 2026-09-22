@@ -13,6 +13,7 @@
 
      node .claude/qa/record.js --plan [app...]     כמה מחרוזות, כמה תווים, כיסוי — בלי רשת
      node .claude/qa/record.js --check             המניפסט תואם לקבצים — נכנס ל-all.js
+     node .claude/qa/record.js --next              מי הכי חסרה — לריצה המתוזמנת
      GEMINI_API_KEY=… node .claude/qa/record.js english [--max 300]   מקליט מה שחסר
 
    **מה מוקלט.** כל מחרוזת `he:"…"` בת שתי מילים ומעלה במאגר של
@@ -261,6 +262,17 @@ async function build(app, max) {
   }
   if (args.includes('--manifest')) {
     for (const app of apps.length ? apps : Object.keys(SOURCES)) console.log(app + ': ' + writeManifest(app) + ' במניפסט');
+    process.exit(0);
+  }
+  /* --next: האפליקציה שהכי הרבה חסר בה — לריצה המתוזמנת, שאין לה קלט */
+  if (args.includes('--next')) {
+    let best = null, most = -1;
+    for (const app of Object.keys(SOURCES)) {
+      const c = corpus(app), have = onDisk(app);
+      const missing = [...c.keys()].filter(x => !have.has(x)).length;
+      if (missing > most) { most = missing; best = app; }
+    }
+    console.log(most > 0 ? best : '');
     process.exit(0);
   }
   if (args.includes('--plan') || !apps.length) { plan(apps.length ? apps : Object.keys(SOURCES)); process.exit(0); }
