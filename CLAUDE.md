@@ -4,7 +4,7 @@
 
 - Vanilla JS בלבד. אין React, אין Vue, אין Firebase, אין npm, אין build step, אין TypeScript.
 - PWA עם manifest ו-service worker. עברית RTL, לעיתים גם ערבית / אנגלית / רוסית.
-- אירוח: GitHub Pages תחת `lagstein1-png.github.io`. Netlify לא קיים יותר.
+- אירוח: GitHub Pages, בדומיין `bekol.co.il` (מ-22.9.2026, ״האתר שלנו״ — הבעלים). הריפו נשאר `lagstein1-png.github.io`, והכתובת הישנה מפנה לדומיין. Netlify לא קיים יותר.
 - קהל היעד: דיסלקציה, ADHD, עולים חדשים, נהגים מבוגרים.
   בין פתרון חכם לפתרון קריא — בוחרים קריא.
 - קוראים את הקוד לפני שמשערים. השינוי הקטן ביותר שפותר את הבעיה.

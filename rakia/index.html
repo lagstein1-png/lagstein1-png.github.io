@@ -8,9 +8,9 @@
 <meta property="og:type" content="website" />
 <meta property="og:title" content="הורוסקופ — מפת לידה בעברית פשוטה" />
 <meta property="og:description" content="מפת לידה מחושבת במכשיר, בלי שרת ובלי הרשמה. הסברים קצרים בעברית פשוטה, עם הקראה." />
-<link rel="canonical" href="https://lagstein1-png.github.io/rakia/" />
-<meta property="og:url" content="https://lagstein1-png.github.io/rakia/" />
-<meta property="og:image" content="https://lagstein1-png.github.io/rakia/img/og.png" />
+<link rel="canonical" href="https://bekol.co.il/rakia/" />
+<meta property="og:url" content="https://bekol.co.il/rakia/" />
+<meta property="og:image" content="https://bekol.co.il/rakia/img/og.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -311,7 +311,7 @@ dl.gloss dd{margin:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r6 · 2026-09-21";
+var BUILD="r7 · 2026-09-22";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -650,7 +650,7 @@ function shareImage(){
     ctx.fillStyle="#1c1a2e"; ctx.textAlign="center"; ctx.direction="rtl";
     ctx.font="bold 44px Heebo, Arial, sans-serif"; ctx.fillText($("#moment-title").textContent,S/2,S+70);
     ctx.font="34px Heebo, Arial, sans-serif"; ctx.fillText($("#moment").textContent.slice(0,70),S/2,S+130);
-    ctx.font="26px Heebo, Arial, sans-serif"; ctx.fillStyle="#5b5877"; ctx.fillText("הורוסקופ · lagstein1-png.github.io/rakia",S/2,S+185);
+    ctx.font="26px Heebo, Arial, sans-serif"; ctx.fillStyle="#5b5877"; ctx.fillText("הורוסקופ · bekol.co.il/rakia",S/2,S+185);
     canvas.toBlob(function(blob){
       var file=new File([blob],"rakia.png",{type:"image/png"});
       if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:"הורוסקופ"}).catch(function(){}) }
@@ -940,7 +940,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r6-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r7-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>
