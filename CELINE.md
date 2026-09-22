@@ -58,7 +58,7 @@
 
 ## פקודה 2 · אחרי M1 · בדיקת קבלה על האתר החי
 
-https://lagstein1-png.github.io
+https://bekol.co.il
 
 כשה-M1 נגמר, את עוברת על **הכול** — לא על הקוד, על האתר החי,
 כמו משתמש. ההוראה הזאת ניתנה על ידי המנהל וזו המשימה שסוגרת
@@ -90,7 +90,7 @@ https://lagstein1-png.github.io
              bagrut-806 ulpan english history lomda reader; do
       printf "%-14s %s\n" "${p:-home}" \
         "$(curl -s -o /dev/null -w '%{http_code} %{size_download}' \
-           https://lagstein1-png.github.io/$p/)"
+           https://bekol.co.il/$p/)"
     done
 
 את הנתיב של "תאוריה מדברת" בודקים בלחיצה על הכרטיס, לא בפקודה —
@@ -324,7 +324,7 @@ https://lagstein1-png.github.io
 | מה | איפה |
 |---|---|
 | הריפו | https://github.com/lagstein1-png/lagstein1-png.github.io |
-| האתר החי | https://lagstein1-png.github.io/ |
+| האתר החי | https://bekol.co.il/ |
 | כללי העבודה (חובה לפני הכול) | [`CLAUDE.md`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/CLAUDE.md) |
 | תמונת מצב נמדדת | [`STATUS.md`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/STATUS.md) |
 | מבנה הקוד | [`ARCHITECTURE.md`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/ARCHITECTURE.md) |
@@ -337,17 +337,17 @@ https://lagstein1-png.github.io
 
 | אפליקציה | חי | קוד |
 |---|---|---|
-| חשבון ליסודי | https://lagstein1-png.github.io/math-app/ | [`math-app/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-app/index.html) |
-| שלב — תיכון | https://lagstein1-png.github.io/math-teen/ | [`math-teen/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-teen/index.html) |
-| אקסיומה — שנה א׳ | https://lagstein1-png.github.io/math-uni/ | [`math-uni/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-uni/index.html) |
-| אקסיומה ב׳ | https://lagstein1-png.github.io/math-uni2/ | [`math-uni2/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-uni2/index.html) |
-| אקסיומה ג׳ | https://lagstein1-png.github.io/math-uni3/ | [`math-uni3/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-uni3/index.html) |
-| 806 — בגרות | https://lagstein1-png.github.io/bagrut-806/ | [`bagrut-806/`](https://github.com/lagstein1-png/lagstein1-png.github.io/tree/main/bagrut-806) |
-| אולפן | https://lagstein1-png.github.io/ulpan/ | [`ulpan/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/ulpan/index.html) |
-| ניב — אנגלית | https://lagstein1-png.github.io/english/ | [`english/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/english/index.html) |
-| מפנה — היסטוריה | https://lagstein1-png.github.io/history/ | [`history/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/history/index.html) |
-| לומדה | https://lagstein1-png.github.io/lomda/ | [`lomda/`](https://github.com/lagstein1-png/lagstein1-png.github.io/tree/main/lomda) |
-| מקריא קולי | https://lagstein1-png.github.io/reader/ | [`reader/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/reader/index.html) |
+| חשבון ליסודי | https://bekol.co.il/math-app/ | [`math-app/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-app/index.html) |
+| שלב — תיכון | https://bekol.co.il/math-teen/ | [`math-teen/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-teen/index.html) |
+| אקסיומה — שנה א׳ | https://bekol.co.il/math-uni/ | [`math-uni/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-uni/index.html) |
+| אקסיומה ב׳ | https://bekol.co.il/math-uni2/ | [`math-uni2/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-uni2/index.html) |
+| אקסיומה ג׳ | https://bekol.co.il/math-uni3/ | [`math-uni3/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/math-uni3/index.html) |
+| 806 — בגרות | https://bekol.co.il/bagrut-806/ | [`bagrut-806/`](https://github.com/lagstein1-png/lagstein1-png.github.io/tree/main/bagrut-806) |
+| אולפן | https://bekol.co.il/ulpan/ | [`ulpan/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/ulpan/index.html) |
+| ניב — אנגלית | https://bekol.co.il/english/ | [`english/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/english/index.html) |
+| מפנה — היסטוריה | https://bekol.co.il/history/ | [`history/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/history/index.html) |
+| לומדה | https://bekol.co.il/lomda/ | [`lomda/`](https://github.com/lagstein1-png/lagstein1-png.github.io/tree/main/lomda) |
+| מקריא קולי | https://bekol.co.il/reader/ | [`reader/index.html`](https://github.com/lagstein1-png/lagstein1-png.github.io/blob/main/reader/index.html) |
 | תאוריה מדברת | הקישור שבכרטיס בדף הבית — השדה `u` ב-`DATA.APPS` | ריפו נפרד, ו**שמו טרם שונה**: נמדד ב-5.9.2026 שבחשבון שני ריפוזיטוריז בלבד, ואין ביניהם `theory`. הכתובת `/theory/` אינה קיימת. אין תיקייה כאן, וזה תקין. השם האנגלי הישן אסור בכל מקום חוץ מאותו שדה — `naming.js` אוכף. |
 
 ---
@@ -620,7 +620,7 @@ https://lagstein1-png.github.io
 
 **מה לעשות.** אחרי D3: תיאור בשורה אחת מתוך `badge` בדף הבית
 ("שתים־עשרה אפליקציות לימוד · חינם לגמרי · בארבע שפות"),
-הכתובת `https://lagstein1-png.github.io/`, וכמה topics
+הכתובת `https://bekol.co.il/`, וכמה topics
 (`pwa`, `hebrew`, `education`, `accessibility`, `vanilla-js`).
 
 **סיום.** צילום מסך של דף הריפו בדוח.

@@ -186,7 +186,7 @@
 ## הכתובת החיה
 
 אחרי מיזוג ל-`main` כל קובץ כאן מוגש מהאתר, למשל
-`https://lagstein1-png.github.io/marketing/media/video/reader.mp4` —
+`https://bekol.co.il/marketing/media/video/reader.mp4` —
 אפשר להוריד אותו לטלפון משם ולהעלות לפייסבוק, בלי לגעת בריפו.
 ה-`sw.js` של השורש אינו שומר את `marketing/` במטמון, ולכן אין
 כאן מפתח קאש שצריך להעלות.
