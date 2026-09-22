@@ -16,7 +16,7 @@ const PRE = ["./","./index.html","./manifest.json","./astro.js","./ephem-data.js
              "./data/texts-houses.js","./data/texts-aspects-1.js","./data/texts-aspects-2.js",
              "./data/glossary.js","./data/places.js",
              "./img/icon-192.png","./img/icon-512.png",
-             "/tutor/he-speech.js",
+             "/tutor/he-speech.js","/speech/recorded.js",
              "/legal/terms.js","/legal/protect.js"];
 
 self.addEventListener("install", e => {
