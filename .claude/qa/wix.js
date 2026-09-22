@@ -28,11 +28,12 @@ const check = process.argv.includes("--check");
 
        node .claude/qa/wix.js --base https://<המארח החדש>
 
-   ברירת המחדל היא המארח הנוכחי, כדי שהקובץ יישאר נכון היום. */
+   ברירת המחדל היא המארח הנוכחי, כדי שהקובץ יישאר נכון היום —
+   ומ-22.9.2026 זה הדומיין `bekol.co.il`. */
 const bi = process.argv.indexOf("--base");
 const BASE = bi >= 0 && process.argv[bi + 1]
   ? process.argv[bi + 1].replace(/\/+$/, "")
-  : "https://lagstein1-png.github.io";
+  : "https://bekol.co.il";
 const LANGS = [["he", "עברית"], ["ar", "ערבית"], ["ru", "רוסית"], ["en", "אנגלית"]];
 const CATS = ["math", "lang", "life"];
 
@@ -157,7 +158,9 @@ if (check) {
 if (process.argv.includes("--write")) {
   let doc = fs.readFileSync(DOC, "utf8");
   const hb = homeBounds(doc);
-  if (hb) doc = doc.slice(0, hb.start) + home().trim() + "\n" + doc.slice(hb.end);
+  /* hb.start הוא ה-"\n" שלפני "### " — ולכן שבירת השורה שאחרי
+     הכותרת חייבת להיכתב כאן, אחרת ״## עמוד הבית### עברית״ (22.9.2026). */
+  if (hb) doc = doc.slice(0, hb.start) + "\n" + home().trim() + "\n" + doc.slice(hb.end);
   const b = bounds(doc);
   if (!b) { console.log("לא נמצא גוש כרטיסי האפליקציות ב-wix-content.md"); process.exit(1); }
   doc = doc.slice(0, b.start) + block() + "\n" + doc.slice(b.end);

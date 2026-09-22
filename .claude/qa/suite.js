@@ -22,8 +22,11 @@ const CHECK = process.argv.includes('--check');
 const MISSING = process.argv.includes('--missing');
 
 const all = fs.readFileSync(path.join(QA, 'all.js'), 'utf8');
+/* מזהה יכול להופיע פעמיים ב-SUITE (למשל `recorded` סטטי ו-`recorded --browser`) — קובץ אחד, שורה אחת. */
+const seen = new Set();
 const suite = [...all.matchAll(/^\s*\{ id: '([^']+)'(?:[^\n]*ext: '([^']+)')?/gm)]
-  .map(m => ({ id: m[1], ext: m[2] || '.js' }));
+  .map(m => ({ id: m[1], ext: m[2] || '.js' }))
+  .filter(t => !seen.has(t.id) && seen.add(t.id));
 
 const doc = fs.readFileSync(DOC, 'utf8');
 const listed = new Set([...doc.matchAll(/^ {4}node \.claude\/qa\/([A-Za-z0-9_\/-]+)\.(m?js)\b/gm)].map(m => m[1]));

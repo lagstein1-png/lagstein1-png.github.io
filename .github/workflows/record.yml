@@ -1,0 +1,131 @@
+# השכבה המוקלטת — הקלטת המאגרים ב-Gemini TTS, על הרנר, לא בסביבת הפיתוח.
+#
+# **מה זה.** המנוע של ״תאוריה מדברת״: קובץ MP3 לכל משפט במאגר,
+# מוגש כקובץ סטטי, וקול המכשיר רק כשקובץ חסר. הבעלים, 21.9.2026:
+# ״תעתיק את המנוע, כבר שילמנו, ותיישם כמנוע שממנו לוקחים בעתיד״.
+#
+# **למה רנר.** המפתח יושב ב-Secrets בלבד (GEMINI_API_KEY, אותו
+# מפתח של ברק), לעולם לא בדף; הרשת בסביבת הפיתוח חסומה; ffmpeg
+# נדרש להמרת ה-PCM שג׳מיני מחזיר.
+#
+# **הקצב נמדד בריפו הנפרד:** כ-5 בקשות לדקה גם במדרגה בתשלום.
+# ריצה אחת מקליטה מאות. ההרצה מתחדשת — קובץ קיים אינו מופק שוב —
+# ולכן מריצים שוב ושוב עד שהכיסוי מלא. הקלטה חלקית ב-main תקינה:
+# משפט בלי קובץ נופל לקול המכשיר, בדיוק כמו היום.
+#
+# **התוצר נדחף ל-main ישירות**, אחרי `record.js --check`. הקבצים
+# הם תוכן, לא קוד: `qa.yml` ירוץ עליהם ויעבור כל עוד המניפסט
+# תואם לדיסק.
+
+name: record
+
+# **רץ לבד כל בוקר** (הבעלים, 22.9.2026: ״רוץ״). המכסה היומית של
+# המפתח מתאפסת בחצות בשעון פסיפיק — 07:00 UTC (נמדד ב-O-71) — ולכן
+# 07:30. כל ריצה מקליטה מה שהמכסה מרשה, באפליקציה שהכי הרבה חסר
+# בה (`record.js --next`), ונעצרת על 429. הרצה ידנית בוחרת אפליקציה.
+on:
+  schedule:
+    - cron: '30 7 * * *'
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'איזו אפליקציה (english, history, ulpan, lomda)'
+        required: true
+        default: 'english'
+      max:
+        description: 'כמה מחרוזות לכל היותר בריצה הזאת'
+        required: false
+        default: '300'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: record
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # ffmpeg אינו מותקן על ubuntu-latest (נמדד ב-voice, ריצה 1).
+      - name: מתקין ffmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: ffmpeg קיים
+        run: ffmpeg -version
+
+      - name: יש מפתח
+        env:
+          KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -z "${KEY:-}" ]; then
+            echo "::error::חסר GEMINI_API_KEY ב-Secrets. בלעדיו אין מה להקליט."
+            exit 1
+          fi
+
+      # ריצה מתוזמנת — אין קלט: בוחרים את האפליקציה שהכי הרבה חסר בה.
+      - name: איזו אפליקציה
+        id: pick
+        run: |
+          APP="${{ github.event.inputs.app }}"
+          if [ -z "$APP" ]; then APP="$(node .claude/qa/record.js --next)"; fi
+          if [ -z "$APP" ]; then echo "הכול מוקלט — אין מה להריץ."; fi
+          echo "app=$APP" >> "$GITHUB_OUTPUT"
+          echo "max=${{ github.event.inputs.max || '300' }}" >> "$GITHUB_OUTPUT"
+
+      - name: תכנון
+        if: steps.pick.outputs.app != ''
+        run: node .claude/qa/record.js --plan "${{ steps.pick.outputs.app }}"
+
+      # נופל על מכסה? מה שהוקלט נשמר, והצעדים שאחריו דוחפים אותו.
+      - name: מקליט
+        if: steps.pick.outputs.app != ''
+        continue-on-error: true
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node .claude/qa/record.js "${{ steps.pick.outputs.app }}" --max "${{ steps.pick.outputs.max }}"
+
+      - name: המניפסט תואם לדיסק
+        run: node .claude/qa/record.js --check
+
+      - name: דוחף ל-main
+        if: steps.pick.outputs.app != ''
+        run: |
+          set -euo pipefail
+          APP="${{ steps.pick.outputs.app }}"
+          if [ -z "$(find "$APP/audio" -type f -name '*.mp3' 2>/dev/null | head -1)" ]; then
+            echo "לא נוצר אף קובץ — אין מה לדחוף."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$APP/audio"
+          if git diff --cached --quiet; then echo "אין קבצים חדשים."; exit 0; fi
+          N=$(find "$APP/audio/he" -type f -name '*.mp3' | wc -l)
+          git commit -q -m "הקלטות: $APP — $N קבצים במניפסט (record.yml)"
+          # main זז בזמן הריצה? מושכים ומנסים שוב, פעם אחת.
+          git pull --rebase -q origin main || true
+          git push origin HEAD:main
+          echo "נדחף: $APP, $N הקלטות."
+
+      - name: כיסוי
+        run: |
+          {
+            echo "### השכבה המוקלטת"
+            echo ""
+            echo '```'
+            node .claude/qa/record.js --plan
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

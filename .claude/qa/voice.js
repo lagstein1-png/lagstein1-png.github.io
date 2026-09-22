@@ -211,6 +211,10 @@ async function openApp(browser, app){
   }, LEGAL_VER);
   await page.route('**', r => {
     const u = r.request().url();
+    /* השכבה המוקלטת חסומה כאן בכוונה: הבדיקה מודדת את קול המכשיר,
+       וברגע שיש קובץ מוקלט לשאלה שעל המסך האפליקציה מנגנת אותו
+       ואינה פונה ל-speechSynthesis כלל. */
+    if(/\/audio\//.test(u)) return r.abort();
     return u.startsWith(BASE) ? r.continue() : r.abort();
   });
   /* השעון המזויף נכנס לפני הטעינה, כדי שהטיימרים שהאפליקציה יוצרת

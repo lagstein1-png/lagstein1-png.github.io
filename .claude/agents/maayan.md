@@ -25,7 +25,7 @@ tools: Bash, Read, Grep, Glob, Edit
   אותה שם.
 - Vanilla JS בלבד. אין React, אין Vue, אין Firebase, אין npm, אין build step, אין TypeScript.
 - PWA עם manifest ו-service worker. עברית RTL, לעיתים גם ערבית / אנגלית / רוסית.
-- אירוח: GitHub Pages תחת `lagstein1-png.github.io`. Netlify לא קיים יותר.
+- אירוח: GitHub Pages, בדומיין `bekol.co.il`. הריפו נשאר `lagstein1-png.github.io`. Netlify לא קיים יותר.
 - קהל היעד: דיסלקציה, ADHD, עולים חדשים, נהגים מבוגרים.
   בין פתרון חכם לפתרון קריא — בוחרים קריא.
 - קוראים את הקוד לפני שמשערים. השינוי הקטן ביותר שפותר את הבעיה.

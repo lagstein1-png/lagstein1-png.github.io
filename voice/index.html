@@ -84,7 +84,16 @@ details table{margin-top:6px}
 </section>
 
 <section>
-  <h2>6 · יומן</h2>
+  <h2>6 · קצב וגובה — אותו משפט, שלוש כוונונים</h2>
+  <p class="sub">אותו קול עברי, אותו טקסט, בלי מילון הגייה. רק <code>rate</code> ו-<code>pitch</code>
+  משתנים. האפליקציות שולחות היום 0.95 / 1.12 (״נשי רגוע״, נבחר 13.9.2026 על Edge);
+  קול המכשיר ב״תאוריה מדברת״ מקבל 0.82 / 1.0. אם ב׳ נשמע מדויק יותר מ-א׳ בטלפון —
+  הכוונון הוא מה שצריך לזוז, לא המילון.</p>
+  <div class="row" id="tune"></div>
+</section>
+
+<section>
+  <h2>7 · יומן</h2>
   <div class="row">
     <button id="clear">ניקוי</button>
     <button id="copy">העתקת היומן</button>
@@ -212,8 +221,8 @@ function say(opts){
   } else if(opts.wantVoice){
     log("  voice = לא נמצא קול לשפה הזאת — משאירים לדפדפן","warn");
   }
-  u.volume=1; u.rate=1; u.pitch=1;
-  log("  volume=1 rate=1 pitch=1");
+  u.volume=1; u.rate=opts.rate||1; u.pitch=opts.pitch||1;
+  log("  volume=1 rate="+u.rate+" pitch="+u.pitch);
   var started=false;
   u.onstart=function(){ started=true; audioHeard.speech=true; log("  ✔ onstart","ok"); verdict() };
   u.onend=function(){ log("  ✔ onend"+(started?"":" — בלי onstart לפניו!"),started?"ok":"warn") };
@@ -265,6 +274,21 @@ LANGS.forEach(function(L){
     say({label:"4 · "+L[0]+" — עם קול תואם", text:TXT[L[0]], lang:L[0], voice:v, wantVoice:true});
   });
   document.getElementById("langsVoice").appendChild(b2);
+});
+
+/* --- 6 · קצב וגובה — השוואה ---
+   הטקסט הוא משפטי לימוד ולא ״שלום, זו בדיקת קול״: שגיאת הגייה
+   נשמעת במילים כמו ״משולש״ ו״מפלס״, לא בברכה. */
+var TUNE_TXT="שטח המשולש שווה למחצית מכפלת הבסיס בגובה. לפי הקטע, המפלס ירד ולא עלה, והמחיר עלה בעשרה אחוזים.";
+[["א׳ · האפליקציות היום — 0.95 / 1.12",0.95,1.12],
+ ["ב׳ · קול המכשיר בתאוריה מדברת — 0.82 / 1.0",0.82,1.0],
+ ["ג׳ · ניטרלי — 1.0 / 1.0",1.0,1.0]].forEach(function(T){
+  var b=document.createElement("button"); b.className="g"; b.textContent="▶ "+T[0];
+  b.addEventListener("click",function(){
+    var v=pick("he-IL");
+    say({label:"6 · "+T[0], text:TUNE_TXT, lang:"he-IL", voice:v, wantVoice:true, rate:T[1], pitch:T[2]});
+  });
+  document.getElementById("tune").appendChild(b);
 });
 
 /* --- 5 · אחרי המתנה, מחוץ ללחיצה --- */

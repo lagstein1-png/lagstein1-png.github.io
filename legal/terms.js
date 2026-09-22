@@ -5,8 +5,8 @@
 (function(g){
 "use strict";
 g.LEGAL = {
-  version: "1.9",
-  updated: "2026-09-18",
+  version: "2.0",
+  updated: "2026-09-22",
   owner:   "יהושע לגשטיין",
   ownerEn: "Yehoshua Lagstein",
   /* **כתובת הפרויקט, ולא האישית — 15.9.2026, בהוראת הבעלים.**
@@ -17,7 +17,9 @@ g.LEGAL = {
      בשישה קבצים אחרים (דף הבית, המדריך, וארבעה חומרי שיווק),
      וזה היה המופע היחיד שנשאר עם הכתובת האישית. */
   email:   "lemida.bekol@gmail.com",
-  site:    "lagstein1-png.github.io",
+  /* הדומיין של הבעלים, 22.9.2026 — ״bekol.co.il האתר שלנו״. הריפו
+     `lagstein1-png.github.io` נשאר הכתובת הישנה, ו-GitHub מפנה ממנה. */
+  site:    "bekol.co.il",
 
   he:{
     dir:"rtl",
