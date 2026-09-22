@@ -71,6 +71,13 @@ jobs:
           echo "zone id: $ZID"
           R=$(curl -s --max-time 30 -H "Authorization: Bearer $TOKEN" "$API/zones/$ZID/dns_records?per_page=100")
           echo "records: $(echo "$R" | jq -c '{success, count: (.result|length), errors}')"
+          # ריצה 2 (22.9.2026) הייתה ירוקה בטעות: set +e בלע את ה-Authentication
+          # error של רשימת הרשומות. טוקן שרואה את הזון ואינו קורא רשומות
+          # אינו יכול גם לכתוב אותן — וזה כישלון, לא הצלחה.
+          if [ "$(echo "$R" | jq -r .success)" != "true" ]; then
+            echo "::error::הטוקן רואה את הזון אבל אין לו הרשאת DNS (Zone:DNS:Edit). צריך טוקן כזה ב-Secret בשם CLOUDFLARE_DNS_TOKEN, או להוסיף את הרשומות בלוח של Cloudflare."
+            exit 1
+          fi
           echo "$R" | jq -r '.result[] | "  \(.type)\t\(.name)\t\(.content)\tproxied=\(.proxied)"'
           echo "$R" > /tmp/records.json
           echo "zid=$ZID" >> "$GITHUB_OUTPUT"
