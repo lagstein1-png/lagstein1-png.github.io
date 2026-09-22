@@ -38,8 +38,17 @@ jobs:
           BASE=https://bekol.co.il
           APPS="math-app math-teen math-uni math-uni2 math-uni3 english ulpan history lomda kotvim reader bagrut-806"
           FAIL=0
+          # HTTP 000 על הכול יכול להיות DNS שלא הופנה, או תעודה שעוד לא
+          # הונפקה. השורה הזאת מבדילה: אין כתובת = DNS; יש כתובת = תעודה.
+          HOST=${BASE#https://}
+          DNS=$(getent ahosts "$HOST" | awk '{print $1}' | sort -u | tr '\n' ' ')
+          OLD=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 30 "https://lagstein1-png.github.io/?cb=$GITHUB_RUN_ID")
+          echo "DNS מהרנר: $HOST → ${DNS:-(אין כתובת)}"
+          echo "הכתובת הישנה: $OLD"
           {
             echo "## בדיקה חיה — $BASE"
+            echo ""
+            echo "DNS מהרנר: \`$HOST\` → ${DNS:-**אין כתובת** — ה-DNS לא הופנה}  ·  הכתובת הישנה עונה: \`$OLD\`"
             echo ""
             echo "| אפליקציה | HTTP | קישור לבית | מפתח מוגש | מפתח ב-main | |"
             echo "|---|---|---|---|---|---|"
