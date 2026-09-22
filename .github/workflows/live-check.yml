@@ -33,22 +33,28 @@ jobs:
           set +e
           set -uo pipefail
           set +e
-          # הדומיין מ-22.9.2026 (CNAME בשורש). הכתובת הישנה עונה 301 לכאן,
-          # ו-curl בלי -L היה מדווח 301 על כל דף.
-          BASE=https://bekol.co.il
+          # הכתובת שנבדקת עוקבת אחרי הקובץ CNAME (22.9.2026): יש קובץ —
+          # הדומיין שבו, והכתובת הישנה עונה 301 אליו (curl בלי -L היה
+          # מדווח 301 על כל דף); אין קובץ — הכתובת הישנה מוגשת ישירות.
+          # כך הבדיקה נכונה גם כש-CNAME מוסר זמנית עד שה-DNS מוכן.
+          DOMAIN=bekol.co.il
+          if [ -s CNAME ]; then BASE="https://$(tr -d '[:space:]' < CNAME)"; else BASE=https://lagstein1-png.github.io; fi
           APPS="math-app math-teen math-uni math-uni2 math-uni3 english ulpan history lomda kotvim reader bagrut-806"
           FAIL=0
           # HTTP 000 על הכול יכול להיות DNS שלא הופנה, או תעודה שעוד לא
-          # הונפקה. השורה הזאת מבדילה: אין כתובת = DNS; יש כתובת = תעודה.
-          HOST=${BASE#https://}
-          DNS=$(getent ahosts "$HOST" | awk '{print $1}' | sort -u | tr '\n' ' ')
+          # הונפקה. השורות האלה מבדילות: אין כתובת = DNS; יש כתובת = תעודה.
+          # NS ו-SOA אומרים מי מחזיק את ה-DNS של הדומיין — שם מגדירים.
+          DNS=$(getent ahosts "$DOMAIN" | awk '{print $1}' | sort -u | tr '\n' ' ')
+          NS=$(dig +short NS "$DOMAIN" 2>/dev/null | tr '\n' ' ')
+          SOA=$(dig +short SOA "$DOMAIN" 2>/dev/null | awk '{print $1}')
           OLD=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 30 "https://lagstein1-png.github.io/?cb=$GITHUB_RUN_ID")
-          echo "DNS מהרנר: $HOST → ${DNS:-(אין כתובת)}"
+          echo "CNAME בעץ: $( [ -s CNAME ] && tr -d '[:space:]' < CNAME || echo '(אין)' )  →  BASE=$BASE"
+          echo "DNS מהרנר: $DOMAIN → ${DNS:-(אין כתובת)}  ·  NS: ${NS:-(אין)}  ·  SOA: ${SOA:-(אין)}"
           echo "הכתובת הישנה: $OLD"
           {
             echo "## בדיקה חיה — $BASE"
             echo ""
-            echo "DNS מהרנר: \`$HOST\` → ${DNS:-**אין כתובת** — ה-DNS לא הופנה}  ·  הכתובת הישנה עונה: \`$OLD\`"
+            echo "DNS מהרנר: \`$DOMAIN\` → ${DNS:-**אין כתובת** — ה-DNS לא הופנה}  ·  NS: \`${NS:-(אין)}\`  ·  SOA: \`${SOA:-(אין)}\`  ·  הכתובת הישנה עונה: \`$OLD\`"
             echo ""
             echo "| אפליקציה | HTTP | קישור לבית | מפתח מוגש | מפתח ב-main | |"
             echo "|---|---|---|---|---|---|"
