@@ -16,32 +16,63 @@ on:
   push:
   pull_request:
 
+# 22.9.2026 (O-88): 5 מתוך 15 הריצות האחרונות היו כפולות על אותו
+# קומיט — הענף נדחף ורץ, ואז אותו SHA נדחף ל-main (fast-forward)
+# ורץ שוב, ~14.5 דקות כל אחת. שני שומרים:
+#   · concurrency — דחיפה חדשה לאותו ענף מבטלת ריצה שעוד רצה עליו.
+#   · "already green" — אם על ה-SHA הזה כבר יש ריצה ירוקה של
+#     החבילה (בענף אחר), החבילה אינה רצה שוב. הקוד זהה, התוצאה זהה.
+#     ריצה אדומה או ריצה שעדיין רצה אינן נספרות, ולכן כישלון
+#     תמיד נבדק מחדש.
+concurrency:
+  group: qa-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   qa:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
+      - name: already green on this SHA?
+        id: dup
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/qa.yml/runs?head_sha=${GITHUB_SHA}&status=success&per_page=5" --jq '.total_count' 2>/dev/null || echo 0)
+          echo "green runs on ${GITHUB_SHA}: ${n}"
+          if [ "${n}" -gt 0 ]; then echo "skip=true" >> "$GITHUB_OUTPUT"; else echo "skip=false" >> "$GITHUB_OUTPUT"; fi
+
       - uses: actions/checkout@v4
+        if: steps.dup.outputs.skip != 'true'
         with:
           fetch-depth: 0
 
       - name: origin/main for cache.js
+        if: steps.dup.outputs.skip != 'true'
         run: git fetch origin main:refs/remotes/origin/main || true
 
       - uses: actions/setup-node@v4
+        if: steps.dup.outputs.skip != 'true'
         with:
           node-version: 22
 
       - name: Playwright
+        if: steps.dup.outputs.skip != 'true'
         run: |
           npm init -y >/dev/null
           npm i --no-save playwright@1.56.1
           npx playwright install --with-deps chromium
 
       - name: QA suite
+        if: steps.dup.outputs.skip != 'true'
         run: node .claude/qa/all.js
 
       - name: keep the tree clean
+        if: steps.dup.outputs.skip != 'true'
         run: |
           rm -f package.json package-lock.json
           rm -rf node_modules

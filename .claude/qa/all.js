@@ -2,7 +2,7 @@
    מריץ את כל חבילת הבדיקות ונותן פסק דין אחד.
 
      node .claude/qa/all.js           הכול
-     node .claude/qa/all.js --fast    בלי entropy ו-options (הכי איטיות)
+     node .claude/qa/all.js --fast    בלי הבדיקות המסומנות slow (הכי איטיות)
      node .claude/qa/all.js --static  רק מה שאינו דורש דפדפן (שניות)
 
    הוא מרים את השרת המקומי בעצמו וסוגר אותו בסוף, כי שלוש מהבדיקות
@@ -57,6 +57,11 @@ const SUITE = [
   { id: 'kotvim',   args: [] },
   { id: 'leaks',    args: [] },
   { id: 'markers',  args: [] },
+  /* רשימת הכלים ב-qa-tools.md מול SUITE הזה — מחולל עם --check,
+     כפי שהכלל דורש. נמדד 19.9.2026: 24 מזהים חסרו במסמך. */
+  { id: 'suite',    args: ['--check'] },
+  /* FINDINGS.md מחזיק שבוע; הישן בארכיון (O-85). --archive מעביר. */
+  { id: 'findings', args: ['--check'] },
   /* שלושה כללים שהיו כתובים ב-CLAUDE.md בלבד, ונאכפים מ-16.9.2026.
      כל אחד מצא משהו ביום שנכתב: pure — לולאת הנפילה של תרגיל
      הסידור ב-english וב-ulpan שקלה לפי state.item בתוך המבחן;
@@ -280,7 +285,7 @@ for (const [id, code] of results) {
   console.log(`  ${code ? '✗' : '✓'} ${id.padEnd(10)} ${code ? 'exit ' + code : ''}`);
 }
 if (STATIC) console.log('  · כל הבדיקות שדורשות דפדפן — דולגו (--static)');
-else if (FAST) console.log('  · entropy, options — דולגו (--fast)');
+else if (FAST) console.log(`  · ${SUITE.filter(t => t.slow).map(t => t.id).join(', ')} — דולגו (--fast)`);
 console.log('═'.repeat(72));
 console.log(failed
   ? `${failed} מתוך ${results.length} נכשלו`

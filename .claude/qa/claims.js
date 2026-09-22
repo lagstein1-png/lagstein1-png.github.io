@@ -180,12 +180,29 @@ if (fs.existsSync(facts)) {
     .filter(x => x.hit && !quoted(x.l, x.hit[0]))
     .map(x => x.hit)[0];
   if (m) {
-    let out = '';
+    /* 21.9.2026: `all.js` כבר הריץ את `clicks.js` (46 שניות, דפדפן)
+       רגע לפני הבדיקה הזאת, והריצה השנייה כאן הכפילה אותו. עכשיו
+       `clicks.js` משאיר סיכום ב-`.clicks-last.json`, וכאן משתמשים
+       בו אם הוא מהשעה האחרונה. אין סיכום, או ישן — מריצים כמו
+       קודם. המדידה נשארת מדידה; רק הכפילות הלכה. */
+    let real = null;
+    const LAST = path.join(__dirname, '.clicks-last.json');
+    const MAX_AGE = 60 * 60 * 1000;
     try {
-      out = execFileSync(process.execPath, [path.join(__dirname, 'clicks.js')],
-                         { encoding: 'utf8', cwd: ROOT });
-    } catch (e) { out = (e.stdout || '') + (e.stderr || '') }
-    const real = out.match(/(\d+)\s*מתוך\s*(\d+)\s*לא מקריאות/);
+      const j = JSON.parse(fs.readFileSync(LAST, 'utf8'));
+      if (j && Date.now() - j.at < MAX_AGE && Number.isInteger(j.failed) && Number.isInteger(j.total)) {
+        real = [null, String(j.failed), String(j.total)];
+        console.log('· clicks.js — מהריצה שלפני ' + Math.round((Date.now() - j.at) / 1000) + ' שניות, לא הורץ שוב');
+      }
+    } catch (e) { /* אין סיכום — מריצים */ }
+    if (!real) {
+      let out = '';
+      try {
+        out = execFileSync(process.execPath, [path.join(__dirname, 'clicks.js')],
+                           { encoding: 'utf8', cwd: ROOT });
+      } catch (e) { out = (e.stdout || '') + (e.stderr || '') }
+      real = out.match(/(\d+)\s*מתוך\s*(\d+)\s*לא מקריאות/);
+    }
     if (!real) { stale++; console.log('✗ clicks.js לא החזיר מספר שאפשר להשוות') }
     else if (real[1] !== m[1] || real[2] !== m[2]) {
       stale++;
