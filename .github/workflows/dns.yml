@@ -69,6 +69,10 @@ jobs:
             exit 1
           fi
           echo "zone id: $ZID"
+          # ה-NS שהרשם מצביע אליהם השתנו ב-23.9.2026 (bob/aria → alexa/ridge).
+          # השורה הזאת אומרת אם הזון שהטוקן רואה הוא זה שהדומיין באמת מוגש
+          # ממנו: NS שונים = הדומיין עבר לחשבון Cloudflare אחר.
+          echo "zone: $(echo "$Z" | jq -c '.result[0] | {status, name_servers, original_name_servers, account: .account.name, modified_on}')"
           R=$(curl -s --max-time 30 -H "Authorization: Bearer $TOKEN" "$API/zones/$ZID/dns_records?per_page=100")
           echo "records: $(echo "$R" | jq -c '{success, count: (.result|length), errors}')"
           # ריצה 2 (22.9.2026) הייתה ירוקה בטעות: set +e בלע את ה-Authentication
