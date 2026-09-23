@@ -92,6 +92,7 @@ he:{ btn:"ברק — עזרה מהמורה", title:"עזרה מהמורה", clos
   vSample:"שלום, אני ברק. כך אני נשמע במכשיר שלך.",
   mic:"דבר", micOn:"מקשיב…", micNo:"הדפדפן הזה לא נותן לדבר. אפשר להקליד.",
   micDeny:"אין הרשאה למיקרופון. אפשר לאשר בהגדרות הדפדפן, או פשוט להקליד.",
+  edgeNote:"הקול במחשב הזה בסיסי ונשמע רובוטי. בדפדפן Microsoft Edge, שמותקן בכל Windows, ברק מדבר בקול טבעי — פותחים את אותו הדף שם.",
   manNote:"אין במכשיר הזה קול גברי בשפה הזאת, ולכן גובה הקול הונמך. זה לא קול גברי אמיתי.",
   simplifyBtn:"ברק — גרסה פשוטה", simplifyAsk:"תן לי גרסה קצרה ופשוטה של הטקסט שהדבקתי",
   simplifyEmpty:"קודם הדביקו טקסט, ואז אבקש מברק גרסה פשוטה שלו.",
@@ -111,6 +112,7 @@ ar:{ btn:"باراك — مساعدة من المعلّم", title:"مساعدة 
   vSample:"مرحبًا، أنا باراك. هكذا سأبدو على جهازك.",
   mic:"تكلّم", micOn:"أسمعك…", micNo:"هذا المتصفّح لا يتيح التكلّم. يمكنك الكتابة.",
   micDeny:"لا يوجد إذن للميكروفون. يمكن السماح في إعدادات المتصفّح، أو الكتابة ببساطة.",
+  edgeNote:"الصوت على هذا الحاسوب بسيط ويبدو آليًّا. في متصفّح Microsoft Edge، المثبّت في كل Windows، يتكلّم باراك بصوت طبيعي — افتحوا الصفحة نفسها هناك.",
   manNote:"لا يوجد على هذا الجهاز صوت رجاليّ بهذه اللغة، لذلك خُفضت طبقة الصوت. هذا ليس صوتًا رجاليًّا حقيقيًّا.",
   simplifyBtn:"باراك — نسخة مبسّطة", simplifyAsk:"أعطني نسخة قصيرة وبسيطة من النصّ الذي لصقته",
   simplifyEmpty:"الصقوا نصًّا أولًا، ثم أطلب من باراك نسخة مبسّطة منه.",
@@ -130,6 +132,7 @@ ru:{ btn:"Барак — помощь учителя", title:"Помощь уч�
   vSample:"Привет, я Барак. Вот как я звучу на вашем устройстве.",
   mic:"Говори", micOn:"Слушаю…", micNo:"Этот браузер не позволяет говорить. Можно печатать.",
   micDeny:"Нет разрешения на микрофон. Разрешите в настройках браузера или просто печатайте.",
+  edgeNote:"Голос на этом компьютере простой и звучит как робот. В браузере Microsoft Edge, который есть в каждом Windows, Барак говорит естественным голосом — откройте эту же страницу там.",
   manNote:"На этом устройстве нет мужского голоса для этого языка, поэтому тон понижен. Это не настоящий мужской голос.",
   simplifyBtn:"Барак — простая версия", simplifyAsk:"Дай мне короткую и простую версию вставленного текста",
   simplifyEmpty:"Сначала вставьте текст, и тогда я попрошу у Барака его простую версию.",
@@ -149,6 +152,7 @@ en:{ btn:"Barak — ask the teacher", title:"Ask the teacher", close:"Close", se
   vSample:"Hi, I am Barak. This is how I sound on your device.",
   mic:"Speak", micOn:"Listening…", micNo:"This browser does not allow speaking. You can type instead.",
   micDeny:"No microphone permission. You can allow it in the browser settings, or simply type.",
+  edgeNote:"The voice on this computer is basic and sounds robotic. In Microsoft Edge, which comes with every Windows, Barak speaks in a natural voice — open this same page there.",
   manNote:"This device has no male voice for this language, so the pitch is lowered. It is not a real male voice.",
   simplifyBtn:"Barak — simple version", simplifyAsk:"Give me a short, simple version of the text I pasted",
   simplifyEmpty:"Paste a text first, and then I will ask Barak for a simple version of it.",
@@ -424,7 +428,14 @@ function pickVoice(code){
        1. voiceUsable  — קול מת הוא שקט, ושקט גרוע מכל קול.
                          הכלל כתוב ב-CLAUDE.md ואינו משתנה.
        2. מגדר         — ברק גברי, וזו דרישת הדמות.
-       3. תג מדויק     — he-IL לפני he. מכריע רק בין שווים. */
+       3. איכות        — קול טבעי לפני קול בסיסי (23.9.2026).
+       4. תג מדויק     — he-IL לפני he. מכריע רק בין שווים.
+
+     **איכות נוספה אחרי שהבעלים שמע ״קול מאוד רובוטי״.** ב-Edge
+     יושבים שני קולות גבריים בעברית: Microsoft Asaf (מקומי, סינתזה
+     ישנה) ו-Microsoft Avri Online (Natural). שניהם 2 במגדר ושניהם
+     he-IL, ולכן הסדר של `getVoices` הכריע — והמקומי רשום ראשון.
+     המפתח יושב **אחרי** המגדר, כמו שהכלל ב-CLAUDE.md דורש. */
   var want = code.toLowerCase();
   function exactness(x){
     return ((x.lang||"").replace("_","-").toLowerCase() === want) ? 1 : 0;
@@ -432,11 +443,27 @@ function pickVoice(code){
   list.sort(function(a,b){
     return (voiceUsable(b) - voiceUsable(a))
         || (femScore(b)    - femScore(a))
+        || (natural(b)     - natural(a))
         || (exactness(b)   - exactness(a));
   });
   return list[0];
 }
 function hasVoice(code){ return !!pickVoice(code) }
+/* קול טבעי — נוירלי של Microsoft, משופר של Apple, רשת של Google. */
+function natural(v){
+  return /natural|online|neural|premium|enhanced|wavenet/i.test((v && v.name) || "") ? 1 : 0;
+}
+/* **הקול במחשב הזה בסיסי — 23.9.2026.** ב-Chrome על Windows הקול
+   העברי היחיד הוא Microsoft Asaf, סינתזה מקומית ישנה שנשמעת
+   רובוטית, ובורר הקול מוסתר מפני שאין מה לבחור. הקולות הטבעיים
+   של Microsoft זמינים ל-Web Speech רק ב-Edge, ו-Edge מותקן בכל
+   Windows. לכן ההודעה אומרת את הדבר האחד שעובד. */
+var _basicVoice = false;
+function basicVoice(v){
+  var ua = navigator.userAgent || "";
+  return !!v && /Windows/i.test(ua) && !/Edg\//.test(ua)
+      && /^Microsoft /i.test(v.name || "") && !natural(v);
+}
 
 function segments(text){
   /* מפצל לקטעים לפי « », ומסמן לכל אחד את השפה שלו */
@@ -585,6 +612,7 @@ function speakSeg(text, code, r, alive, done){
        הנתיב הרגיל שם.** */
     if(femScore(v) === 0){ u.pitch = TU_FEM_PITCH; _femFallback = true }
     else _femFallback = false;
+    _basicVoice = basicVoice(v);
     u.onend = fin;
     u.onerror = function(){
       /* 4 · קול רשת ששתק. מכבים את הדגל, ואותו טקסט נאמר שוב פעם
@@ -1150,6 +1178,8 @@ function ctl(i){
      ההקראה הראשונה אין לדעת איזה קול המכשיר ייתן לשפה הזאת. */
   if(_femFallback && i === MSGS.length - 1)
     h += '<span class="tu-sys tu-man">' + esc(t.manNote) + ' ' + esc(voiceHow()) + '</span>';
+  else if(_basicVoice && i === MSGS.length - 1)
+    h += '<span class="tu-sys tu-man">' + esc(t.edgeNote) + '</span>';
   return h + '</div>';
 }
 
