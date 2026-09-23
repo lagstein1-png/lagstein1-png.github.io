@@ -504,8 +504,16 @@ function splitSugg(text){
   }
   return { body: String(text).slice(0, i).replace(/\s+$/, ""), sugg: out };
 }
+/* **סימני LaTeX — 23.9.2026.** המודל כותב לפעמים ״$(5, 0)$״ למרות
+   ההנחיה, והבעלים צילם את זה בחלון. מסירים זוג $ שעוטף ביטוי — בלי
+   רווח מיד אחרי הפותח ומיד לפני הסוגר, כדי ש״$5 and $10״ יישאר.
+   בלי lookbehind בכוונה: Safari ישן זורק עליו שגיאת תחביר, והקובץ
+   כולו — ברק בכל שלוש־עשרה — לא היה נטען. */
+function noTex(text){
+  return String(text).replace(/\$\$?([^\s$][^$\n]*?[^\s$]|[^\s$])\$\$?/g, "$1");
+}
 function stripMd(text){
-  return String(text)
+  return noTex(text)
     .replace(/\*\*/g, "")
     .replace(/^\s*[-•]\s+/gm, "")
     .replace(/^\s*\d+[.)]\s+/gm, "")
@@ -513,7 +521,7 @@ function stripMd(text){
 }
 function bold(s){ return s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>") }
 function fmt(text){
-  var lines = esc(String(text).replace(/«|»/g, "")).split("\n"),
+  var lines = esc(noTex(text).replace(/«|»/g, "")).split("\n"),
       out = [], list = null;
   function shut(){ if(list){ out.push("</" + list + ">"); list = null } }
   lines.forEach(function(ln){
@@ -1057,6 +1065,10 @@ function draw(){
   e.inp.placeholder = t.ph;
   e.inp.setAttribute("aria-label", t.ph);
   e.pv.textContent = t.privacy;
+  /* **המיקרופון בשפה של עכשיו — 23.9.2026.** התווית נכתבה רק ב-`micState`,
+     כלומר בבנייה ובלחיצה. מי שעבר מערבית לאנגלית קיבל ״تكلّم״ במסך
+     אנגלי (צילום הבעלים). */
+  if(e.mic) e.mic.textContent = "● " + (RECON ? t.micOn : t.mic);
   if(CFG && CFG.pickLang){
     e.lg.hidden = false;
     var opt = "";
