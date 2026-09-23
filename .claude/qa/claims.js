@@ -41,7 +41,13 @@ const fail = m => { bad++; console.log('✗ ' + m) };
    היסטוריה. `ACCESSIBILITY.md` הוא מפרט פנימי שמפנה לסעיפי
    WCAG כמקור, ולא מצהיר עמידה. והרשימה עצמה ב-`facts.md`
    מצטטת את הטענות כדי לאסור אותן.
+
+   **ו-`docs/claude/findings-archive.md` — 23.9.2026.** הוא
+   `FINDINGS.md` עצמו, רשומה־רשומה כלשונה (`findings.js --archive`),
+   ולכן יומן בדיוק כמוהו. בלי השורה הזאת הטקסט שעבר בבוקר הפיל
+   את `main` על ציטוט שעבר כאן בשלום יום קודם.
    --------------------------------------------------------------- */
+const LOGS = /^docs\/claude\/findings-archive\.md$/;
 const SKIP = /^(FINDINGS|CHANGELOG|ACCESSIBILITY|BRANDING|JOSH|FACE|PIPELINE|NAMING|STATUS|GUIDE|ARCHITECTURE|ARTHUR|CLAUDE|README)\.md$/;
 const files = [];
 (function walk(dir, depth) {
@@ -52,6 +58,7 @@ const files = [];
     if (e.isDirectory()) { walk(p, depth + 1); continue }
     if (!/\.(md|html)$/.test(e.name)) continue;
     if (depth === 0 && SKIP.test(e.name)) continue;
+    if (LOGS.test(path.relative(ROOT, p).split(path.sep).join('/'))) continue;
     files.push(p);
   }
 })(ROOT, 0);
