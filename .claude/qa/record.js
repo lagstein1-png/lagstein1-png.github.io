@@ -14,7 +14,8 @@
      node .claude/qa/record.js --plan [app...]     כמה מחרוזות, כמה תווים, כיסוי — בלי רשת
      node .claude/qa/record.js --check             המניפסט תואם לקבצים — נכנס ל-all.js
      node .claude/qa/record.js --next              מי הכי חסרה — לריצה המתוזמנת
-     GEMINI_API_KEY=… node .claude/qa/record.js english [--max 300]   מקליט מה שחסר
+     GEMINI_API_KEY=… node .claude/qa/record.js english [--max 300]   מקליט מה שחסר (gemini)
+     TTS_PROVIDER=gcloud TTS_KEY=… TTS_VOICE=he-IL-Chirp3-HD-Kore node .claude/qa/record.js english [--replace]
 
    **מה מוקלט.** כל מחרוזת `he:"…"` בת שתי מילים ומעלה במאגר של
    האפליקציה — שאלה, תשובות, הסברים, רמזים — אחרי אותו ניקוי
@@ -43,10 +44,25 @@ require(path.join(ROOT, 'speech', 'recorded.js'));
 require(path.join(ROOT, 'tutor', 'he-speech.js'));
 const R = globalThis.RECORDED, H = globalThis.HESPEECH;
 
-const KEY   = process.env.GEMINI_API_KEY || process.env.GEMINI_KEY || '';
-const MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-3.1-flash-tts-preview';
-const VOICE = process.env.GEMINI_TTS_VOICE || 'Kore';
+/* שני ספקים, כמו ב-tools/tts-build.js שם: gemini (ברירת מחדל, PCM
+   דרך ffmpeg) ו-gcloud (Cloud Text-to-Speech, מחזיר MP3 מוכן).
+   הבעלים העלה 23.9.2026 חמש דוגמאות ״לדיבור נכון״: 32 kbps, 24 kHz,
+   מונו, בלי ID3 ובלי Info — לא הצינור שלנו (ffmpeg מוסיף את שניהם)
+   ולא ההקלטות שבריפו הנפרד; מתאים ל-MP3 שמחזיר Cloud TTS. לכן
+   הספק הזה נכנס, ובוחרים אותו ב-TTS_PROVIDER=gcloud עם TTS_KEY. */
+const PROVIDER = (process.env.TTS_PROVIDER || 'gemini').toLowerCase();
+const KEY   = PROVIDER === 'gcloud'
+  ? (process.env.TTS_KEY || '')
+  : (process.env.GEMINI_API_KEY || process.env.GEMINI_KEY || '');
+const MODEL = PROVIDER === 'gcloud' ? 'cloud-tts' : (process.env.GEMINI_TTS_MODEL || 'gemini-3.1-flash-tts-preview');
+const VOICE = process.env.TTS_VOICE || process.env.GEMINI_TTS_VOICE ||
+              (PROVIDER === 'gcloud' ? 'he-IL-Chirp3-HD-Kore' : 'Kore');
 const API   = 'https://generativelanguage.googleapis.com/v1beta';
+const GCLOUD = 'https://texttospeech.googleapis.com/v1/text:synthesize';
+/* מחיר למיליון תווים, כפי שכתוב ב-tools/tts-build.js של הריפו הנפרד
+   (gcloud 30, azure 16, elevenlabs 150; gemini ״לא נמדד״). אומדן, לא
+   חשבונית — המחיר של היום נמצא בדף התמחור של גוגל. */
+const PRICE_PER_M = { gcloud: 30, gemini: null };
 const KBPS  = 32;                 /* כמו 6,823 ההקלטות שבריפו הנפרד */
 const LANG  = 'he';
 const MIN_BYTES = 512;            /* קובץ קטן מזה הוא תשובה ריקה, לא דיבור */
@@ -132,6 +148,9 @@ function plan(apps) {
                 (c.size ? Math.round(got / c.size * 100) : 0) + '%)');
   }
   console.log('\nסה״כ ' + tot + ' מחרוזות · ' + totChars + ' תווים · מוקלטות ' + totHave);
+  const pr = PRICE_PER_M.gcloud;
+  console.log('אומדן חד־פעמי ב-Cloud TTS לפי $' + pr + ' למיליון תווים (tts-build.js שם): $' +
+              (totChars / 1e6 * pr).toFixed(2) + ' · gemini: המחיר לא נמדד');
 }
 
 /* --- check -------------------------------------------------------- */
@@ -215,23 +234,66 @@ async function synth(ffmpeg, text) {
   throw new Error('תשובה בלי אודיו שש פעמים');
 }
 
+/* Cloud Text-to-Speech: בקשה אחת, MP3 חוזר בתשובה, בלי ffmpeg. */
+async function synthGcloud(text) {
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const r = await fetch(GCLOUD, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY },
+      body: JSON.stringify({ input: { text }, voice: { languageCode: 'he-IL', name: VOICE },
+                             audioConfig: { audioEncoding: 'MP3', speakingRate: 1.0, pitch: 0 } })
+    });
+    if (r.status === 429 || r.status >= 500) {
+      PACE.ok = 0; PACE.gap = Math.min(PACE.max, Math.round(PACE.gap * 1.5));
+      const body = await r.text();
+      if (attempt === 5) throw new Error('gcloud ' + r.status + ' ' + body.replace(/\s+/g, ' ').slice(0, 160));
+      await sleep(PACE.gap); continue;
+    }
+    if (!r.ok) {
+      const body = await r.text(); let msg = body;
+      try { msg = JSON.parse(body).error.message; } catch (e) {}
+      throw new Error('gcloud ' + r.status + ' ' + String(msg).replace(/\s+/g, ' ').slice(0, 160));
+    }
+    const j = await r.json();
+    if (!j.audioContent) throw new Error('gcloud החזיר תשובה בלי אודיו');
+    if (++PACE.ok >= 8) { PACE.ok = 0; PACE.gap = Math.max(PACE.min, Math.round(PACE.gap * 0.8)); }
+    return Buffer.from(j.audioContent, 'base64');
+  }
+  throw new Error('gcloud — שש פעמים בלי אודיו');
+}
+
 async function build(app, max) {
   const c = corpus(app);
   if (!c) { console.log('✗ ' + app + ' — אין מאגר קבוע להקלטה'); return 1; }
-  const ffmpeg = findFfmpeg();
+  const ffmpeg = PROVIDER === 'gcloud' ? 'none' : findFfmpeg();
   if (!ffmpeg) { console.log('✗ אין ffmpeg — FFMPEG=<נתיב> או ffmpeg ב-PATH'); return 1; }
-  if (!KEY) { console.log('✗ חסר GEMINI_API_KEY'); return 1; }
+  if (!KEY) { console.log('✗ חסר ' + (PROVIDER === 'gcloud' ? 'TTS_KEY' : 'GEMINI_API_KEY')); return 1; }
+  /* קול אחד לאפליקציה. מניפסט שנוצר בקול אחר — עוצרים, אלא אם ביקשו
+     להחליף: אז הקבצים הישנים נמחקים ומקליטים מחדש. ערבוב שני קולות
+     באותה אפליקציה נשמע כמו שני קריינים באותה שאלה. */
+  const m = readManifest(app);
+  const oldVoice = m && m.voice, oldProv = m && m.model;
+  if (m && (((m.langs || {})[LANG] || {}).count || 0) > 0 && (oldVoice !== VOICE || oldProv !== MODEL)) {
+    if (!process.argv.includes('--replace')) {
+      console.log('✗ ' + app + ' הוקלטה בקול ' + oldVoice + ' (' + oldProv + ') ועכשיו מבקשים ' + VOICE +
+                  ' (' + MODEL + '). להחלפה: --replace (מוחק את הישנים ומקליט מחדש).');
+      return 1;
+    }
+    const d = path.join(dirOf(app), LANG);
+    let n = 0;
+    for (const f of fs.readdirSync(d)) if (f.endsWith('.mp3')) { fs.unlinkSync(path.join(d, f)); n++; }
+    console.log('  --replace: ' + n + ' הקלטות בקול ' + oldVoice + ' נמחקו');
+  }
   const have = onDisk(app);
   const todo = [...c].filter(([id]) => !have.has(id)).slice(0, max);
   const outDir = path.join(dirOf(app), LANG);
   fs.mkdirSync(outDir, { recursive: true });
   console.log(app + ': ' + c.size + ' מחרוזות · מוקלטות ' + have.size + ' · בריצה הזאת עד ' + todo.length +
-              ' · מודל ' + MODEL + ' · קול ' + VOICE);
+              ' · ספק ' + PROVIDER + ' · מודל ' + MODEL + ' · קול ' + VOICE);
   let made = 0, failed = 0, quota = false;
   const t0 = Date.now();
   for (const [id, text] of todo) {
     try {
-      const mp3 = await synth(ffmpeg, H.spoken(text));
+      const mp3 = PROVIDER === 'gcloud' ? await synthGcloud(H.spoken(text)) : await synth(ffmpeg, H.spoken(text));
       if (mp3.length < MIN_BYTES) throw new Error('קובץ ריק');
       fs.writeFileSync(path.join(outDir, id + '.mp3'), mp3);
       made++;

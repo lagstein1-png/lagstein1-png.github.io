@@ -36,6 +36,18 @@ on:
         description: 'כמה מחרוזות לכל היותר בריצה הזאת'
         required: false
         default: '300'
+      provider:
+        description: 'gemini (GEMINI_API_KEY) או gcloud (TTS_KEY, Cloud Text-to-Speech). ריק — משתנה הריפו TTS_PROVIDER, ואם אין — gemini'
+        required: false
+        default: ''
+      voice:
+        description: 'שם הקול. ריק — משתנה הריפו TTS_VOICE, ואם אין — Kore / he-IL-Chirp3-HD-Kore'
+        required: false
+        default: ''
+      replace:
+        description: 'YES — למחוק הקלטות בקול אחר ולהקליט מחדש'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -66,11 +78,28 @@ jobs:
       - name: ffmpeg קיים
         run: ffmpeg -version
 
+      # הספק והקול: קלט ידני → משתנה ריפו (Settings → Variables) → ברירת מחדל.
+      # כך הריצה המתוזמנת מקבלת את הבחירה בלי לגעת בקוד.
+      - name: ספק וקול
+        id: prov
+        run: |
+          P="${{ github.event.inputs.provider || vars.TTS_PROVIDER || 'gemini' }}"
+          V="${{ github.event.inputs.voice || vars.TTS_VOICE }}"
+          echo "provider=$P" >> "$GITHUB_OUTPUT"
+          echo "voice=$V" >> "$GITHUB_OUTPUT"
+          echo "ספק: $P · קול: ${V:-ברירת מחדל}"
+
       - name: יש מפתח
         env:
-          KEY: ${{ secrets.GEMINI_API_KEY }}
+          GKEY: ${{ secrets.GEMINI_API_KEY }}
+          TKEY: ${{ secrets.TTS_KEY }}
+          P: ${{ steps.prov.outputs.provider }}
         run: |
-          if [ -z "${KEY:-}" ]; then
+          if [ "$P" = "gcloud" ] && [ -z "${TKEY:-}" ]; then
+            echo "::error::הספק gcloud דורש TTS_KEY ב-Secrets (מפתח Cloud Text-to-Speech)."
+            exit 1
+          fi
+          if [ "$P" != "gcloud" ] && [ -z "${GKEY:-}" ]; then
             echo "::error::חסר GEMINI_API_KEY ב-Secrets. בלעדיו אין מה להקליט."
             exit 1
           fi
@@ -95,7 +124,14 @@ jobs:
         continue-on-error: true
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: node .claude/qa/record.js "${{ steps.pick.outputs.app }}" --max "${{ steps.pick.outputs.max }}"
+          TTS_KEY: ${{ secrets.TTS_KEY }}
+          TTS_PROVIDER: ${{ steps.prov.outputs.provider }}
+          TTS_VOICE: ${{ steps.prov.outputs.voice }}
+          REPLACE: ${{ github.event.inputs.replace }}
+        run: |
+          EXTRA=""
+          if [ "${REPLACE:-}" = "YES" ]; then EXTRA="--replace"; fi
+          node .claude/qa/record.js "${{ steps.pick.outputs.app }}" --max "${{ steps.pick.outputs.max }}" $EXTRA
 
       - name: המניפסט תואם לדיסק
         run: node .claude/qa/record.js --check
