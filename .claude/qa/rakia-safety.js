@@ -27,7 +27,7 @@ const DIR = path.join(ROOT, 'rakia', 'data');
 const args = process.argv.slice(2);
 const fi = args.indexOf('--file');
 const files = fi >= 0 ? [path.resolve(args[fi + 1])]
-  : fs.existsSync(DIR) ? fs.readdirSync(DIR).filter(f => /^texts-.*\.js$/.test(f)).sort().map(f => path.join(DIR, f)) : [];
+  : fs.existsSync(DIR) ? fs.readdirSync(DIR).filter(f => /^texts-.*\.js$/.test(f) || f === 'learn.js').sort().map(f => path.join(DIR, f)) : [];
 
 /* ארבע הגדרות. כל ביטוי נבדק על הטקסט כפי שהוא. */
 /* \b אינו עובד עם עברית — אות עברית אינה "תו מילה" ב-JS, ולכן
@@ -59,7 +59,8 @@ function load(f) {
   const ctx = vm.createContext(sb);
   vm.runInContext(fs.readFileSync(path.join(DIR, 'schema.js'), 'utf8'), ctx, { filename: 'schema.js' });
   vm.runInContext(fs.readFileSync(f, 'utf8'), ctx, { filename: path.basename(f) });
-  return sb.window.RAKIA.TEXTS;
+  /* learn.js — ״איך זה עובד״ — נסרק באותן גדרות; RAKIA.LEARN ולא RAKIA.TEXTS */
+  return path.basename(f) === 'learn.js' ? { learn: sb.window.RAKIA.LEARN } : sb.window.RAKIA.TEXTS;
 }
 function walk(o, pathArr, out) {
   if (o && typeof o === 'object') {
