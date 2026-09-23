@@ -130,44 +130,57 @@ async function scan(page, per) {
   }, { per, splitSrc: String(SPLIT) });
 }
 
+/* אפליקציה אחת: context משלה, והתוצאה חוזרת כשורות להדפסה.
+   21.9.2026: היה לולאה סדרתית — 123 שניות. הסריקה של כל אפליקציה
+   רצה בתוך הדף שלה ואינה תלויה באחרות, ולכן כולן רצות במקביל
+   באותו דפדפן, וההדפסה נשארת בסדר הקבוע של APPS. */
+async function one(browser, app) {
+  const out = { lines: [], bad: 0, checked: 0 };
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  await page.route('**', r =>
+    r.request().url().startsWith(BASE) ? r.continue() : r.abort());
+  try {
+    await page.goto(`${BASE}/${app}/`, { waitUntil: 'domcontentloaded' });
+    /* המתנה לתנאי ולא לשעון — אותו תיקון שנעשה ב-`content.js`:
+       שעון קבוע קרא מצב חלקי במכונה עמוסה. */
+    await page.waitForFunction(
+      () => (typeof buildQuestion === 'function' || typeof buildQ === 'function') &&
+            typeof TOPICS !== 'undefined' && TOPICS && TOPICS.length > 0,
+      { timeout: 8000 }).catch(() => {});
+  } catch (e) {
+    out.lines.push(`✗ ${app.padEnd(11)} הדף לא נטען — ${e.message}`);
+    out.bad++; await ctx.close(); return out;
+  }
+
+  const r = await scan(page, PER_CELL);
+  await ctx.close();
+
+  if (r.skip) { out.lines.push(`· ${app.padEnd(11)}אין buildQ/TOPICS — דולג`); return out }
+  /* אפליקציה בלי שאלות חסר אינה כשל — רוב האפליקציות כאלה.
+     הכשל היחיד שנשאר הוא ״אין buildQ/TOPICS״ שמעלה `skip`. */
+  if (!r.n)   { out.lines.push(`· ${app.padEnd(11)}אין שאלות חסר — דולג`); return out }
+
+  out.checked++;
+  if (r.bad) {
+    out.bad += r.bad;
+    out.lines.push(`✗ ${app.padEnd(11)}${r.bad} מתוך ${r.n} שאלות חסר עם מסיח שכבר גלוי במשפט`);
+    for (const e of r.ex) out.lines.push('     ' + e);
+  } else {
+    out.lines.push(`✓ ${app.padEnd(11)}${r.n} שאלות חסר, אף מסיח אינו גלוי במשפט`);
+  }
+  return out;
+}
+
 (async () => {
   const browser = await chromium.launch();
   let bad = 0, checked = 0;
 
-  for (const app of APPS) {
-    const ctx = await browser.newContext();
-    const page = await ctx.newPage();
-    await page.route('**', r =>
-      r.request().url().startsWith(BASE) ? r.continue() : r.abort());
-    try {
-      await page.goto(`${BASE}/${app}/`, { waitUntil: 'domcontentloaded' });
-      /* המתנה לתנאי ולא לשעון — אותו תיקון שנעשה ב-`content.js`:
-         שעון קבוע קרא מצב חלקי במכונה עמוסה. */
-      await page.waitForFunction(
-        () => (typeof buildQuestion === 'function' || typeof buildQ === 'function') &&
-              typeof TOPICS !== 'undefined' && TOPICS && TOPICS.length > 0,
-        { timeout: 8000 }).catch(() => {});
-    } catch (e) {
-      console.log(`✗ ${app.padEnd(11)} הדף לא נטען — ${e.message}`);
-      bad++; await ctx.close(); continue;
-    }
-
-    const r = await scan(page, PER_CELL);
-    await ctx.close();
-
-    if (r.skip) { console.log(`· ${app.padEnd(11)}אין buildQ/TOPICS — דולג`); continue }
-    /* אפליקציה בלי שאלות חסר אינה כשל — רוב האפליקציות כאלה.
-       הכשל היחיד שנשאר הוא ״אין buildQ/TOPICS״ שמעלה `skip`. */
-    if (!r.n)   { console.log(`· ${app.padEnd(11)}אין שאלות חסר — דולג`); continue }
-
-    checked++;
-    if (r.bad) {
-      bad += r.bad;
-      console.log(`✗ ${app.padEnd(11)}${r.bad} מתוך ${r.n} שאלות חסר עם מסיח שכבר גלוי במשפט`);
-      for (const e of r.ex) console.log('     ' + e);
-    } else {
-      console.log(`✓ ${app.padEnd(11)}${r.n} שאלות חסר, אף מסיח אינו גלוי במשפט`);
-    }
+  const results = await Promise.all(APPS.map(app =>
+    one(browser, app).catch(e => ({ lines: [`✗ ${app.padEnd(11)} ${e.message}`], bad: 1, checked: 0 }))));
+  for (const r of results) {
+    for (const l of r.lines) console.log(l);
+    bad += r.bad; checked += r.checked;
   }
 
   await browser.close();

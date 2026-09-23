@@ -38,8 +38,12 @@ const EXEMPT = new Set(['NAMING.md', path.join('.claude', 'qa', 'naming.js')]);
    **וגם הצורה המוחלטת, מ-10.9.2026.** דף הבית מוגש גם ממראה
    ב-Render, ומשם נתיב יחסי `/drivewise/` מצביע אל מקור המראה —
    שאין בו את הריפו הנפרד, ולכן הכרטיס נשבר. הכתובת המלאה עובדת
-   משני המקומות. אותו נימוק בדיוק חל עליה: זו כתובת ולא שם. */
-const SANCTIONED = /"u":"(?:\/|https:\/\/lagstein1-png\.github\.io\/)drivewise\/"/g;
+   משני המקומות. אותו נימוק בדיוק חל עליה: זו כתובת ולא שם.
+
+   **ומ-22.9.2026 הדומיין `bekol.co.il`** (`CNAME` בשורש): פרויקט של
+   אותו חשבון מוגש תחת הדומיין של אתר המשתמש, והכתובת הישנה מפנה
+   אליו. הצורה הישנה נשארת מותרת, כדי שמיזוג ישן לא ייפול עליה. */
+const SANCTIONED = /"u":"(?:\/|https:\/\/(?:bekol\.co\.il|lagstein1-png\.github\.io)\/)drivewise\/"/g;
 const SKIP_DIR = new Set(['.git', 'img', 'vendor', 'node_modules', '.well-known']);
 const TEXT = /\.(html|js|json|md|css|svg|txt|webmanifest|patch|diff)$/i;
 
