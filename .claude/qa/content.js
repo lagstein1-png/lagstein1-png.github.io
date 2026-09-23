@@ -929,6 +929,12 @@ function md(app,R){
   /* חתימת התוכן שנסרק. `fresh.js` מחשב אותה מחדש ונופל אם היא
      זזה — דוח שמתאר עץ אחר אינו ידיעה. ההסבר ב-`sig.js`. */
   R.sig=require('./sig.js').sigOf(app);
+  /* 21.9.2026, כמו ב-content806.js: אותה חתימה — אותו תאריך, כדי
+     שריצה על עץ שלא זז לא תלכלך את הדוח בשורת תאריך בלבד. */
+  try{
+    const prev=JSON.parse(fs.readFileSync(path.join(OUT,app+'.json'),'utf8'));
+    if(prev.sig===R.sig&&prev.generated) R.generated=prev.generated;
+  }catch(e){}
   /* מול איזה קוד נמדד הדוח. בלי זה דוח שנשמר בגיט מתיישן בשקט
      ומטעה את מי שקורא אותו: ב-9.9.2026 בריף נשען על דוח שנוצר
      שתי קומיטות אחורה, דיבר על 13 תאים כשנשאר אחד, וניפח את
@@ -942,6 +948,15 @@ function md(app,R){
       return h+(d?' (dirty)':'');
     }catch(e){ return null }
   })();
+  /* 21.9.2026: כשהחתימה לא זזה, גם `head` נשאר של המדידה הקודמת —
+     אחרת כל קומיט שאינו נוגע בתוכן משנה את הדוח בשורה אחת, וזה
+     בדיוק הרעש שהוליד את התנגשויות ה-`reports/`. `sig` הוא שמזהה
+     את מה שנמדד; `head` רק אומר מתי. נמדד: על אותו עץ הדוח זהה
+     בייט לבייט מלבד השורה הזאת. */
+  try{
+    const prev=JSON.parse(fs.readFileSync(path.join(OUT,app+'.json'),'utf8'));
+    if(prev.sig===R.sig&&prev.head) R.head=prev.head;
+  }catch(e){}
   fs.writeFileSync(path.join(OUT,app+'.json'),JSON.stringify(R,null,1));
   fs.writeFileSync(path.join(OUT,app+'.md'),md(app,R));
   summary.push({app:app,verdict:v.verdict,fail:v.fail,review:v.review,

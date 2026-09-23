@@ -56,6 +56,35 @@
     node .claude/qa/deployed.js              # מסלול הלומד על הבתים שנפרסו — ביד בלבד
     Actions → live-check → Run workflow      # מה באמת מוגש מהאתר החי (הסוכן חסום)
     node .claude/qa/keyboard.js              # הפאנל של ברק כשהמקלדת פתוחה — visualViewport מזויף, 360/412, עברית וערבית, חזקות, אופליין
+    node .claude/qa/apps.js              # שבעת המקומות שאפליקציה חדשה נוגעת בהם — האם כולם עודכנו
+    node .claude/qa/status.js --check    # STATUS.md מול המדידה — הטבלה לא נכתבת ביד
+    node .claude/qa/pure.js              # המבחן הכיתתי: כל קריאה ל-buildQuestion מתוך buildQ מעבירה pure=true
+    node .claude/qa/i18n.js              # האוניברסיטה — כל _("…") מפתח ב-TR_KEYS, וכל מפתח מתורגם
+    node .claude/qa/agents.js            # סוכן אינו קורא לסוכן — אין כלי סוכנים בשורת tools ואין הבטחה כזאת
+    node .claude/qa/century.js           # המאה בארבע השפות — על הפונקציה האמיתית שבאפליקציה
+    node .claude/qa/content806.js        # סריקת התוכן של bagrut-806 (הבנק הסטטי) — כותב את הדוח
+    node .claude/qa/engine.js            # המנוע המשותף — האם העותקים בכל האפליקציות עדיין זהים
+    node .claude/qa/tutor.js             # ״עזרה מהמורה״ — השומרים בשרת, החיווט בלקוח, ושער התנאים
+    node .claude/qa/offer.js             # הצעה שברק מציע (״נעבור ל…״) מתקיימת בפועל
+    node .claude/qa/simplify.js          # ״גרסה פשוטה״ ב-reader — רק בלחיצה, רק במצב simplify, ובלי שרת
+    node .claude/qa/analytics.js         # GoatCounter: בכל הדפים או באף אחד, והתנאים זהים בארבע שפות
+    node .claude/qa/mkreader.js --check  # marketing/index.html לא נערך ביד (המחולל: אותו קובץ)
+    node .claude/qa/media.js             # סרטוני ההדגמה — חתימת כל סרטון מול DEMO_SCRIPT, וצילומי המסך בארבע שפות
+    node .claude/qa/counts.js            # מספר תוכן שמצוטט בחומר שיווקי מול המדידה של היום
+    node .claude/qa/barak.js             # מנוע ברק — חוזה ה-Worker מול מודל מדומה, והחיווט בלקוח; בלי רשת
+    node .claude/qa/hespeech.js          # מנוע ההגייה העברי — /tutor/he-speech.js
+    node .claude/qa/barak-browser.js     # ברק בדפדפן אמיתי מול שרת מדומה, בכל אפליקציה
+    node .claude/qa/tutor-timeout.js     # ספק שתולה — הפאנל של ברק אינו נתקע (O-72)
+    node .claude/qa/tutor-lang.js        # השאלה שברק מקבל כתובה בשפת המסך — בכל אפליקציה עם מחולל
+    node .claude/qa/contrast.js          # האם הטקסט בכלל נראה — ניגודיות מול הסף
+    node .claude/qa/shadow.js            # פונקציה גלובלית שנדרסה בשקט
+    node .claude/qa/voice.js             # מנוע ההקראה מול speechSynthesis מזויף — ארבעת המנגנונים מתאוששים
+    node .claude/qa/netpin.js            # מנגנון 4 מול בחירת קול ידנית — tutor/tutor.js
+    node .claude/qa/exam.js              # המבחן מהקישור — השאלה שהמורה רואה היא שהתלמיד מקבל
+    node .claude/qa/recorded.js          # השכבה המוקלטת — המודול והחיווט; עם --browser גם הניגון בדפדפן
+    node .claude/qa/record.js --check    # ההקלטות מול המניפסט — המחולל: אותו קובץ (record.yml מריץ אותו כל בוקר)
+    node .claude/qa/findings.js --check  # FINDINGS.md מחזיק שבוע, הישן בארכיון — --archive מעביר (O-85)
+    node .claude/qa/suite.js --check     # הרשימה הזאת מול SUITE שב-all.js — מזהה חסר או שורה מתה נופלים
     node .claude/qa/all.js                   # הכול, ופסק דין אחד
     node .claude/qa/all.js --static          # רק מה שאינו דורש דפדפן
     node .claude/qa/extract.js /tmp/js …     # מחלץ סקריפטים ל-eslint
@@ -64,7 +93,7 @@
 
 **ויש שער שיעצור אותך בסוף.** `.claude/hooks/qa-gate.sh`, מחובר
 כ-`Stop` hook ב-`.claude/settings.json`, מריץ `all.js --static`
-כשסשן מנסה להסתיים — עשרים ושמונה בדיקות, בערך שתי שניות — ו**חוסם את
+כשסשן מנסה להסתיים — 52 בדיקות, 12 שניות (נמדד 19.9.2026) — ו**חוסם את
 הסיום** אם אחת נכשלה. הוא שותק כשלא נגעת בקוד (שינוי ב-`.md`,
 ב-`.json` או ב-`qa/reports/` אינו מפעיל אותו), והוא אינו מתקן
 כלום — רק אומר מה נשבר. עקיפה מכוונת: `QA_GATE=0`.
@@ -104,8 +133,8 @@ commit`** ובשער שמסונן עליו — מביא שינוי תוכן של
 מריץ דפדפן — נמדד, חמש הרצות: 163–206 מילישניות. עקיפה
 מכוונת: `QA_GATE=0`, אותה מילה כמו ב-`qa-gate.sh`.
 
-**הרשת חסומה בסביבת הפיתוח.** אי אפשר להגיע ל-`lagstein1-png.github.io`
-מכאן. בדיקה מול השרת המקומי היא בדיקה מקומית — לא קוראים לה "בדיקה חיה".
+**הרשת חסומה בסביבת הפיתוח.** אי אפשר להגיע ל-`bekol.co.il` (וגם לא
+לכתובת הישנה `lagstein1-png.github.io`) מכאן. בדיקה מול השרת המקומי היא בדיקה מקומית — לא קוראים לה "בדיקה חיה".
 
 **אבל יש דרך אחת לבדוק את האתר החי, והיא לא ידנית:**
 `.github/workflows/live-check.yml`, שנוסף 11.9.2026. הרנרים של

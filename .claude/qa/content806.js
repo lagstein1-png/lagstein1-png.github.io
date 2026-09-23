@@ -176,6 +176,14 @@ const R = {
   /* חתימת `data/exams.js` שנסרק. ראו `sig.js`. */
   sig: require('./sig.js').sigOf(APP)
 };
+/* 19.9.2026: הסורק רץ בכל `all.js --static`, כלומר בכל שער סיום, וכתב
+   תאריך חדש גם כשהתוכן לא זז — עץ מלוכלך בכל יום, ושני קומיטים
+   שכל תוכנם ״תאריך בלבד״ (8f6890c, 14a1a66). אותה חתימה — אותו
+   תאריך, והקובץ נשאר זהה בייט לבייט. */
+try {
+  const prev = JSON.parse(fs.readFileSync(path.join(OUT, APP + '.json'), 'utf8'));
+  if (prev.sig === R.sig && prev.generated) R.generated = prev.generated;
+} catch (e) { /* אין דוח קודם — נכתב חדש */ }
 
 function md() {
   const L = [];

@@ -137,5 +137,16 @@ async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.
   }
   await b.close();
   console.log(`\n${failed} מתוך ${TARGET.length} לא מקריאות את הכפתור שנלחץ`);
+  /* 21.9.2026: סיכום הריצה נשמר ל-`claims.js`, שהשווה את המספר הזה
+     למה שמצוטט ב-`facts.md` **על ידי הרצה שנייה של הקובץ הזה** —
+     46 שניות כפולות בכל `all.js`. רק ריצה מלאה (בלי ארגומנטים)
+     נשמרת: מספר על חלק מהאפליקציות אינו בר־השוואה. הקובץ אינו
+     נעקב בגיט (`.gitignore`), ו-`claims.js` מריץ מחדש כשהוא ישן. */
+  if (!argv.length) {
+    try {
+      require('fs').writeFileSync(require('path').join(__dirname, '.clicks-last.json'),
+        JSON.stringify({ failed, total: TARGET.length, at: Date.now() }));
+    } catch (e) { /* לא קריטי — claims.js יריץ מחדש */ }
+  }
   process.exit(failed ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1) });

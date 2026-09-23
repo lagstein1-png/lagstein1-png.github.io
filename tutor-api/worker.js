@@ -562,8 +562,12 @@ function badLang(text, lang) {
 
    לכן `ALLOW_ORIGIN` הוא רשימה מופרדת בפסיקים, והשרת **מהדהד**
    את המקור של הבקשה אם הוא ברשימה. מקור שאינו ברשימה מקבל את
-   הראשון, כלומר נחסם — זו התנהגות סגורה, לא פתוחה. */
-const ORIGINS = "https://lagstein1-png.github.io,https://lagstein-hub.onrender.com";
+   הראשון, כלומר נחסם — זו התנהגות סגורה, לא פתוחה.
+
+   **הדומיין `bekol.co.il` נוסף 22.9.2026** (״האתר שלנו״ — הבעלים),
+   עם `www`, מפני ש-GitHub Pages עונה לשניהם. הכתובת הישנה נשארת:
+   GitHub מפנה ממנה, אבל דף שכבר פתוח בה שולח את המקור הישן. */
+const ORIGINS = "https://bekol.co.il,https://www.bekol.co.il,https://lagstein1-png.github.io,https://lagstein-hub.onrender.com";
 /* **והשרת המקומי של הבדיקות — 16.9.2026.** הבעלים פתח את
    `localhost:8099` (`.claude/qa/serve.js`), שאל את ברק ״מה שלומך״
    וקיבל ״אני מוח קטן… בלי חיבור לאינטרנט״: הבקשה יצאה, השרת ענה,

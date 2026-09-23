@@ -47,11 +47,19 @@ const LANGS = ['he', 'ar', 'ru', 'en'];
 /* גבול מילה ולא תת־מחרוזת: `ion` יושב בתוך `solution`, `הר` בתוך
    `הרבה`. \b של JS הוא ASCII בלבד ואינו מכיר עברית, ערבית וקירילית,
    ולכן הגבול נכתב במפורש כ"תחילת מחרוזת או תו שאינו אות". */
-function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+/* 19.9.2026: היה כאן `new RegExp(..., 'iu')` לכל זוג (מושג, הגדרה) —
+   3,732 קימפולים, 3.8 שניות מתוך 12 של `all.js --static`, בכל שער
+   סיום. עכשיו: חיפוש מחרוזת, ורגקס קבוע אחד לשני תווי הגבול. אותה
+   תוצאה בדיוק על כל הזוגות במאגר (הושווה לפני ההחלפה). */
+const LETTER = /\p{L}/u;
 function hasWord(hay, needle) {
-  try {
-    return new RegExp('(^|[^\\p{L}])' + esc(needle) + '($|[^\\p{L}])', 'iu').test(hay);
-  } catch (e) { return hay.indexOf(needle) >= 0; }
+  const h = hay.toLowerCase(), n = needle.toLowerCase();
+  for (let i = h.indexOf(n); i >= 0; i = h.indexOf(n, i + 1)) {
+    const before = i === 0 || !LETTER.test(h[i - 1]);
+    const after = i + n.length >= h.length || !LETTER.test(h[i + n.length]);
+    if (before && after) return true;
+  }
+  return false;
 }
 
 const ctx = { window: { BANKS: [] }, console };

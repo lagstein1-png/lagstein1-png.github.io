@@ -1,0 +1,115 @@
+# ה-DNS של bekol.co.il — בדיקה, ובאישור מפורש גם יצירת הרשומות.
+#
+# למה ורקפלו: ה-DNS של הדומיין יושב ב-Cloudflare (נמדד ב-live-check
+# ריצה 22, 22.9.2026: NS = bob.ns.cloudflare.com, aria.ns.cloudflare.com),
+# וסביבת הפיתוח של הסוכן חסומה מול api.cloudflare.com. הרנרים של
+# GitHub אינם חסומים, והטוקן כבר יושב ב-Secrets בשביל deploy-tutor.
+#
+# מה נדרש כדי שהאתר יעלה בדומיין (GitHub Pages, דומיין apex):
+#   A     bekol.co.il      185.199.108.153 / .109.153 / .110.153 / .111.153
+#   CNAME www.bekol.co.il  lagstein1-png.github.io
+# כולן DNS only (proxied=false): מאחורי הפרוקסי של Cloudflare, GitHub
+# אינו יכול לאמת את הדומיין ולהנפיק תעודה.
+#
+# שני מצבים:
+#   apply ריק / לא "APPLY"  — קריאה בלבד: מה הטוקן רואה, ומה יש בזון.
+#   apply = APPLY           — יוצר את הרשומות שחסרות. לא מוחק דבר.
+#
+# הטוקן: CLOUDFLARE_DNS_TOKEN אם קיים (Zone:DNS:Edit על הזון), ואם לא —
+# CLOUDFLARE_API_TOKEN של deploy-tutor, שלפי התיעוד שלו נושא הרשאות
+# Workers בלבד; הבדיקה אומרת אם זה נכון.
+#
+# אין `${{ secrets.* }}` בתוך גוף run — הכול דרך env:.
+
+name: dns
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'הקלד APPLY כדי ליצור את הרשומות החסרות. ריק = בדיקה בלבד.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  dns:
+    runs-on: ubuntu-latest
+    env:
+      DOMAIN: bekol.co.il
+      TARGET: lagstein1-png.github.io
+      CF_DNS_TOKEN: ${{ secrets.CLOUDFLARE_DNS_TOKEN }}
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      APPLY: ${{ github.event.inputs.apply }}
+    steps:
+      - name: מה ה-DNS אומר עכשיו
+        run: |
+          echo "NS:  $(dig +short NS "$DOMAIN" | tr '\n' ' ')"
+          echo "A:   $(dig +short A "$DOMAIN" | tr '\n' ' ')"
+          echo "www: $(dig +short "www.$DOMAIN" | tr '\n' ' ')"
+
+      - name: הטוקן והזון
+        id: zone
+        run: |
+          set +e
+          if [ -n "$CF_DNS_TOKEN" ]; then TOKEN="$CF_DNS_TOKEN"; WHICH=CLOUDFLARE_DNS_TOKEN;
+          elif [ -n "$CF_API_TOKEN" ]; then TOKEN="$CF_API_TOKEN"; WHICH=CLOUDFLARE_API_TOKEN;
+          else echo "::error::אין טוקן — לא CLOUDFLARE_DNS_TOKEN ולא CLOUDFLARE_API_TOKEN"; exit 1; fi
+          echo "טוקן: $WHICH"
+          API=https://api.cloudflare.com/client/v4
+          V=$(curl -s --max-time 30 -H "Authorization: Bearer $TOKEN" "$API/user/tokens/verify")
+          echo "verify: $(echo "$V" | jq -c '{success, status: .result.status, errors}')"
+          Z=$(curl -s --max-time 30 -H "Authorization: Bearer $TOKEN" "$API/zones?name=$DOMAIN")
+          ZID=$(echo "$Z" | jq -r '.result[0].id // empty')
+          echo "zones: $(echo "$Z" | jq -c '{success, count: (.result|length), errors}')"
+          if [ -z "$ZID" ]; then
+            echo "::error::הטוקן אינו רואה את הזון $DOMAIN. צריך טוקן עם Zone:DNS:Edit על הזון, ב-Secret בשם CLOUDFLARE_DNS_TOKEN (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+          echo "zone id: $ZID"
+          # ה-NS שהרשם מצביע אליהם השתנו ב-23.9.2026 (bob/aria → alexa/ridge).
+          # השורה הזאת אומרת אם הזון שהטוקן רואה הוא זה שהדומיין באמת מוגש
+          # ממנו: NS שונים = הדומיין עבר לחשבון Cloudflare אחר.
+          echo "zone: $(echo "$Z" | jq -c '.result[0] | {status, name_servers, original_name_servers, account: .account.name, modified_on}')"
+          R=$(curl -s --max-time 30 -H "Authorization: Bearer $TOKEN" "$API/zones/$ZID/dns_records?per_page=100")
+          echo "records: $(echo "$R" | jq -c '{success, count: (.result|length), errors}')"
+          # ריצה 2 (22.9.2026) הייתה ירוקה בטעות: set +e בלע את ה-Authentication
+          # error של רשימת הרשומות. טוקן שרואה את הזון ואינו קורא רשומות
+          # אינו יכול גם לכתוב אותן — וזה כישלון, לא הצלחה.
+          if [ "$(echo "$R" | jq -r .success)" != "true" ]; then
+            echo "::error::הטוקן רואה את הזון אבל אין לו הרשאת DNS (Zone:DNS:Edit). צריך טוקן כזה ב-Secret בשם CLOUDFLARE_DNS_TOKEN, או להוסיף את הרשומות בלוח של Cloudflare."
+            exit 1
+          fi
+          echo "$R" | jq -r '.result[] | "  \(.type)\t\(.name)\t\(.content)\tproxied=\(.proxied)"'
+          echo "$R" > /tmp/records.json
+          echo "zid=$ZID" >> "$GITHUB_OUTPUT"
+          echo "$TOKEN" > /tmp/token; chmod 600 /tmp/token
+
+      - name: יצירת הרשומות החסרות
+        if: ${{ github.event.inputs.apply == 'APPLY' }}
+        run: |
+          set +e
+          TOKEN=$(cat /tmp/token); ZID="${{ steps.zone.outputs.zid }}"
+          API=https://api.cloudflare.com/client/v4
+          FAIL=0
+          have() { jq -e --arg t "$1" --arg n "$2" --arg c "$3" '.result[] | select(.type==$t and .name==$n and .content==$c)' /tmp/records.json >/dev/null; }
+          mk() {
+            if have "$1" "$2" "$3"; then echo "✓ קיים: $1 $2 → $3"; return; fi
+            OUT=$(curl -s --max-time 30 -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+                  "$API/zones/$ZID/dns_records" \
+                  -d "{\"type\":\"$1\",\"name\":\"$2\",\"content\":\"$3\",\"ttl\":1,\"proxied\":false}")
+            if [ "$(echo "$OUT" | jq -r .success)" = "true" ]; then echo "✓ נוצר: $1 $2 → $3 (DNS only)";
+            else echo "✗ נכשל: $1 $2 → $3 — $(echo "$OUT" | jq -c .errors)"; FAIL=1; fi
+          }
+          for ip in 185.199.108.153 185.199.109.153 185.199.110.153 185.199.111.153; do mk A "$DOMAIN" "$ip"; done
+          mk CNAME "www.$DOMAIN" "$TARGET"
+          # רשומה קיימת שמצביעה למקום אחר על אותו שם — לא נוגעים, רק מדווחים.
+          jq -r --arg n "$DOMAIN" '.result[] | select(.name==$n and (.type=="A" or .type=="AAAA" or .type=="CNAME")) | select(.content|startswith("185.199.")|not) | "! רשומה אחרת על \(.name): \(.type) \(.content) proxied=\(.proxied) — לא נמחקה"' /tmp/records.json
+          rm -f /tmp/token
+          echo ""
+          echo "אחרי היצירה, מהרנר:"
+          echo "A:   $(dig +short A "$DOMAIN" @bob.ns.cloudflare.com | tr '\n' ' ')"
+          echo "www: $(dig +short "www.$DOMAIN" @bob.ns.cloudflare.com | tr '\n' ' ')"
+          exit $FAIL

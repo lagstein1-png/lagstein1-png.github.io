@@ -41,7 +41,13 @@ const fail = m => { bad++; console.log('✗ ' + m) };
    היסטוריה. `ACCESSIBILITY.md` הוא מפרט פנימי שמפנה לסעיפי
    WCAG כמקור, ולא מצהיר עמידה. והרשימה עצמה ב-`facts.md`
    מצטטת את הטענות כדי לאסור אותן.
+
+   **ו-`docs/claude/findings-archive.md` — 23.9.2026.** הוא
+   `FINDINGS.md` עצמו, רשומה־רשומה כלשונה (`findings.js --archive`),
+   ולכן יומן בדיוק כמוהו. בלי השורה הזאת הטקסט שעבר בבוקר הפיל
+   את `main` על ציטוט שעבר כאן בשלום יום קודם.
    --------------------------------------------------------------- */
+const LOGS = /^docs\/claude\/findings-archive\.md$/;
 const SKIP = /^(FINDINGS|CHANGELOG|ACCESSIBILITY|BRANDING|JOSH|FACE|PIPELINE|NAMING|STATUS|GUIDE|ARCHITECTURE|ARTHUR|CLAUDE|README)\.md$/;
 const files = [];
 (function walk(dir, depth) {
@@ -52,6 +58,7 @@ const files = [];
     if (e.isDirectory()) { walk(p, depth + 1); continue }
     if (!/\.(md|html)$/.test(e.name)) continue;
     if (depth === 0 && SKIP.test(e.name)) continue;
+    if (LOGS.test(path.relative(ROOT, p).split(path.sep).join('/'))) continue;
     files.push(p);
   }
 })(ROOT, 0);
@@ -180,12 +187,29 @@ if (fs.existsSync(facts)) {
     .filter(x => x.hit && !quoted(x.l, x.hit[0]))
     .map(x => x.hit)[0];
   if (m) {
-    let out = '';
+    /* 21.9.2026: `all.js` כבר הריץ את `clicks.js` (46 שניות, דפדפן)
+       רגע לפני הבדיקה הזאת, והריצה השנייה כאן הכפילה אותו. עכשיו
+       `clicks.js` משאיר סיכום ב-`.clicks-last.json`, וכאן משתמשים
+       בו אם הוא מהשעה האחרונה. אין סיכום, או ישן — מריצים כמו
+       קודם. המדידה נשארת מדידה; רק הכפילות הלכה. */
+    let real = null;
+    const LAST = path.join(__dirname, '.clicks-last.json');
+    const MAX_AGE = 60 * 60 * 1000;
     try {
-      out = execFileSync(process.execPath, [path.join(__dirname, 'clicks.js')],
-                         { encoding: 'utf8', cwd: ROOT });
-    } catch (e) { out = (e.stdout || '') + (e.stderr || '') }
-    const real = out.match(/(\d+)\s*מתוך\s*(\d+)\s*לא מקריאות/);
+      const j = JSON.parse(fs.readFileSync(LAST, 'utf8'));
+      if (j && Date.now() - j.at < MAX_AGE && Number.isInteger(j.failed) && Number.isInteger(j.total)) {
+        real = [null, String(j.failed), String(j.total)];
+        console.log('· clicks.js — מהריצה שלפני ' + Math.round((Date.now() - j.at) / 1000) + ' שניות, לא הורץ שוב');
+      }
+    } catch (e) { /* אין סיכום — מריצים */ }
+    if (!real) {
+      let out = '';
+      try {
+        out = execFileSync(process.execPath, [path.join(__dirname, 'clicks.js')],
+                           { encoding: 'utf8', cwd: ROOT });
+      } catch (e) { out = (e.stdout || '') + (e.stderr || '') }
+      real = out.match(/(\d+)\s*מתוך\s*(\d+)\s*לא מקריאות/);
+    }
     if (!real) { stale++; console.log('✗ clicks.js לא החזיר מספר שאפשר להשוות') }
     else if (real[1] !== m[1] || real[2] !== m[2]) {
       stale++;

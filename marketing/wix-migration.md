@@ -92,18 +92,18 @@
 
 | אפליקציה | כתובת | index.html (בתים) |
 |---|---|---|
-| חשבון ליסודי | `https://lagstein1-png.github.io/math-app/` | 327,748 |
-| שלב — מתמטיקה לתיכון | `https://lagstein1-png.github.io/math-teen/` | 1,077,997 |
-| אקסיומה — תואר, שנה א׳ | `https://lagstein1-png.github.io/math-uni/` | 1,001,288 |
-| אקסיומה ב׳ — שנה שנייה | `https://lagstein1-png.github.io/math-uni2/` | 900,450 |
-| אקסיומה ג׳ — שנה שלישית | `https://lagstein1-png.github.io/math-uni3/` | 784,544 |
-| 806 — בגרות במתמטיקה, 3–4 ו-5 יח״ל | `https://lagstein1-png.github.io/bagrut-806/` | 22,274 |
-| אולפן — עברית מעשית לעולים חדשים | `https://lagstein1-png.github.io/ulpan/` | 368,134 |
-| ניב — אנגלית מדוברת וספרותית | `https://lagstein1-png.github.io/english/` | 444,136 |
-| מפנה — היסטוריה לחטיבה | `https://lagstein1-png.github.io/history/` | 1,085,583 |
-| לומדה — לימוד לפי נושא | `https://lagstein1-png.github.io/lomda/` | 261,723 |
-| מקריא קולי | `https://lagstein1-png.github.io/reader/` | 96,815 |
-| תאוריה מדברת | `https://lagstein1-png.github.io/theory/` | ריפו נפרד |
+| חשבון ליסודי | `https://bekol.co.il/math-app/` | 327,748 |
+| שלב — מתמטיקה לתיכון | `https://bekol.co.il/math-teen/` | 1,077,997 |
+| אקסיומה — תואר, שנה א׳ | `https://bekol.co.il/math-uni/` | 1,001,288 |
+| אקסיומה ב׳ — שנה שנייה | `https://bekol.co.il/math-uni2/` | 900,450 |
+| אקסיומה ג׳ — שנה שלישית | `https://bekol.co.il/math-uni3/` | 784,544 |
+| 806 — בגרות במתמטיקה, 3–4 ו-5 יח״ל | `https://bekol.co.il/bagrut-806/` | 22,274 |
+| אולפן — עברית מעשית לעולים חדשים | `https://bekol.co.il/ulpan/` | 368,134 |
+| ניב — אנגלית מדוברת וספרותית | `https://bekol.co.il/english/` | 444,136 |
+| מפנה — היסטוריה לחטיבה | `https://bekol.co.il/history/` | 1,085,583 |
+| לומדה — לימוד לפי נושא | `https://bekol.co.il/lomda/` | 261,723 |
+| מקריא קולי | `https://bekol.co.il/reader/` | 96,815 |
+| תאוריה מדברת | `https://bekol.co.il/theory/` | ריפו נפרד |
 
 סה"כ index.html בריפו הזה: 6,370,692 בתים
 
@@ -119,7 +119,10 @@
 הוא תת־דומיין: הדומיין הראשי לוויקס, ותת־דומיין לאפליקציות. זו
 החלטה שדורשת קניית דומיין, ולכן היא של הבעלים ולא שלי.
 
-עד שיש דומיין — הקישורים ל-`lagstein1-png.github.io` עובדים כפי שהם.
+**יש דומיין — 22.9.2026.** הבעלים: ״bekol.co.il האתר שלנו״. הוא
+מחובר ל-GitHub Pages (הקובץ `CNAME` בשורש), כלומר האפליקציות
+יושבות על הדומיין הראשי, ולא בוויקס. הקישורים הישנים
+ל-`lagstein1-png.github.io` ממשיכים לעבוד: GitHub מפנה מהם לדומיין.
 
 ## מה עוד צריך להיבדק מול ויקס האמיתי
 

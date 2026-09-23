@@ -260,7 +260,7 @@ async function record(browser, app, ffmpeg, legalVer) {
       'align-items:center;justify-content:center;gap:18px;background:#0b1220;color:#f4f7ff;' +
       'font:700 30px/1.35 system-ui,sans-serif;text-align:center;padding:40px';
     d.innerHTML = '<div style="font-size:26px;opacity:.85">חינם · בלי הרשמה · בלי פרסומות</div>' +
-      '<div style="font-size:34px;direction:ltr;color:#ffd23f">lagstein1-png.github.io</div>' +
+      '<div style="font-size:34px;direction:ltr;color:#ffd23f">bekol.co.il</div>' +
       '<div style="font-size:22px;opacity:.75">כל שאלה מוקראת · ארבע שפות · עובד גם בלי אינטרנט</div>';
     document.body.appendChild(d);
   });
@@ -573,7 +573,7 @@ async function recordFlow(browser, name, ffmpeg, legalVer) {
     d.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;align-items:center;' +
       'justify-content:center;gap:18px;background:#0b1220;color:#f4f7ff;font:700 30px/1.35 system-ui,sans-serif;text-align:center;padding:40px';
     d.innerHTML = '<div style="font-size:26px;opacity:.85">חינם · בלי הרשמה · בלי פרסומות</div>' +
-      '<div style="font-size:34px;direction:ltr;color:#ffd23f">lagstein1-png.github.io</div>' +
+      '<div style="font-size:34px;direction:ltr;color:#ffd23f">bekol.co.il</div>' +
       '<div style="font-size:22px;opacity:.75">' + tail + '</div>';
     document.body.appendChild(d);
   }, f.tail || 'כל שאלה מוקראת · ארבע שפות · עובד גם בלי אינטרנט');
