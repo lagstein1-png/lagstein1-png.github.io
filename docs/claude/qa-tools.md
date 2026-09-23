@@ -75,6 +75,7 @@
     node .claude/qa/hespeech.js          # מנוע ההגייה העברי — /tutor/he-speech.js
     node .claude/qa/barak-browser.js     # ברק בדפדפן אמיתי מול שרת מדומה, בכל אפליקציה
     node .claude/qa/tutor-timeout.js     # ספק שתולה — הפאנל של ברק אינו נתקע (O-72)
+    node .claude/qa/tutor-lang.js        # השאלה שברק מקבל כתובה בשפת המסך — בכל אפליקציה עם מחולל
     node .claude/qa/contrast.js          # האם הטקסט בכלל נראה — ניגודיות מול הסף
     node .claude/qa/shadow.js            # פונקציה גלובלית שנדרסה בשקט
     node .claude/qa/voice.js             # מנוע ההקראה מול speechSynthesis מזויף — ארבעת המנגנונים מתאוששים

@@ -2504,7 +2504,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t139 · 2026-09-23";
+var BUILD="t140 · 2026-09-23";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -8938,7 +8938,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t139-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t140-pwa1").catch(function(){});
   });
 }
 </script>
@@ -8979,7 +8979,9 @@ if(window.TUTOR){
       if(sb&&typeof sb==="object")sb=sb.h||sb.t||sb.text||sb.w||"";
       if(sb)line+=" — "+plain(sb);
       if(x.lead)line+=" "+plain(x.lead);
-      if(x.expr)line+=" "+plain(x.expr);
+      /* גם הביטוי עצמו: ״50% מתוך 40״ נושא מילה עברית, והמסך מתרגם
+         אותה ב-trHTML. tutor-lang.js תפס — ״Compute 50% מתוך 40״. */
+      if(x.expr)line+=" "+plain(typeof _==="function"?_(x.expr):x.expr);
       return {expr:line.trim()||null, ans:ok||null,
               topic:plain(x.topicName||x.tid||"")||null,
               level:(typeof state!=="undefined"&&state.track)?("מסלול "+state.track):
@@ -9001,7 +9003,7 @@ if(window.TUTOR){
       /* הבחירה השגויה האחרונה של הלומד, לא כל מה שסומן */
       for(i=P.picked.length-1;i>=0;i--)if(o[P.picked[i]]&&!o[P.picked[i]].ok){st=plain(o[P.picked[i]].t||o[P.picked[i]].h);break}
       for(i=0;i<TRACKS.length;i++)if(TRACKS[i].v===state.track)tr=TRACKS[i].t;
-      var line=(plain(typeof _==="function"?_(x.ask):x.ask)+" "+plain(x.expr)).trim(),tn=plain(x.topicName||x.topic);
+      var line=(plain(typeof _==="function"?_(x.ask):x.ask)+" "+plain(typeof _==="function"?_(x.expr):x.expr)).trim(),tn=plain(x.topicName||x.topic);
       return {id:"q"+P.i+"-"+line.slice(0,60), type:P.phase==="ask"?"mcq":"reveal",
         q:line, options:o.map(function(p){return plain(p.t||p.h)}),
         correct:ok, student:st, topic:tn||null,
