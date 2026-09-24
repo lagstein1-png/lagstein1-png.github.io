@@ -77,7 +77,11 @@ var DIR   = { he:"rtl", ar:"rtl", ru:"ltr", en:"ltr" };
 var VOICE = { he:"he-IL", ar:"ar-SA", ru:"ru-RU", en:"en-US" };
 
 var L = {
-he:{ btn:"ברק — עזרה מהמורה", title:"עזרה מהמורה", close:"סגירה", send:"שליחה",
+/* **״מהמוֹרֶה״ בניקוד — 24.9.2026.** הבעלים: ״ברק אומר עזרה מהמורָה במקום
+   מהמורֶה זכר״. בכתב בלי ניקוד המילה זהה לזכר ולנקבה, ומנוע ההקראה
+   וקורא המסך בחרו בנקבה. ניקוד על מילה אחת מכריע גם בעין וגם באוזן,
+   ושם התכונה — ״עזרה מהמורה״ בתנאים ובמדריך — אינו משתנה. */
+he:{ btn:"ברק — עזרה מהמוֹרֶה", title:"עזרה מהמוֹרֶה", close:"סגירה", send:"שליחה",
   intro:"אפשר לשאול אותי על מה שעל המסך. אני נותן רמז אחד בכל פעם, ומחכה לתשובה.",
   nudge:{stuck:"שמתי לב שהשאלה הזאת לוקחת זמן. רוצה שנפרק אותה יחד, צעד אחד בכל פעם?",frustrated:"אני רואה שזה לא הולך עכשיו, וזה בסדר גמור. בוא ננסה מכיוון אחר."}, greet:"היי, אני ברק. אני כאן אם משהו לא ברור. כתוב לי מה בדיוק, ונעבור על זה יחד.", ph:"מה לא ברור?", hello:"אני צריך עזרה במה שעל המסך.", wait:"רגע, חושב…",
   err:"לא הצלחתי להתחבר. אפשר לנסות שוב עוד רגע.",
@@ -922,16 +926,22 @@ var CSS = ''
 +'#tu-pv{color:#5a7178;font-size:.78rem;margin:7px 0 0}'
 +'#tu-lg{border:1px solid rgba(23,51,60,.28);border-radius:9px;padding:5px 8px;'
 +'font:inherit;font-size:.85rem;background:#fff;color:#17333c;margin-inline-start:auto}'
-+'#tu-x{margin-inline-start:auto;background:transparent;border:1px solid rgba(23,51,60,.25);'
-+'border-radius:9px;padding:5px 12px;font:inherit;cursor:pointer;color:#17333c}'
+/* **סגירה בצבע משלה — 24.9.2026, הבעלים: ״הכפתור סגירה בצבע אחר״.**
+   שקוף ודק היה נראה כמו תווית ולא ככפתור. #b03a2e עם לבן — 5.9:1. */
++'#tu-x{margin-inline-start:auto;background:#b03a2e;border:1px solid #b03a2e;'
++'border-radius:9px;padding:5px 12px;font:inherit;font-weight:700;cursor:pointer;color:#fff}'
++'#tu-x:hover{background:#8f2d23;border-color:#8f2d23}'
+/* ״זה צריך להיות מודגש ובכתב גדול יותר״ (הבעלים, 24.9.2026) — ההודעה
+   היחידה בחלון שאומרת ללומד לעשות משהו כדי לשמוע טוב יותר. */
++'.tu-edge{display:block;font-weight:700;font-size:1.05rem;color:#17333c;line-height:1.5}'
 +'@media(prefers-color-scheme:dark){#tu-bx{background:#16232a;color:#eef5f7}'
 +'#tu-q,#tu-q:disabled{background:#3d3410;border-color:#8a6d00;color:#fff3ce}'
-+'#tu-in,.tu-ctl button,.tu-ctl select,#tu-lg,#tu-x{background:#1e2f38;color:#eef5f7;'
++'#tu-in,.tu-ctl button,.tu-ctl select,#tu-lg{background:#1e2f38;color:#eef5f7;'
 +'border-color:rgba(238,245,247,.3)}'
 +'.tu-me{background:#1d3b4a;border-color:#2f6a86}.tu-bot{background:#14403a;border-color:#1c7e70}'
 +'.tu-sg button{background:#12303d;color:#eaf6fa;border-color:#2f6a86}'
 +'.tu-sg button:hover{background:#1d3b4a}'
-+'.tu-sys{color:#a9c2ca}#tu-pv{color:#93aeb7}}';
++'.tu-sys{color:#a9c2ca}#tu-pv{color:#93aeb7}.tu-edge{color:#fff3ce}}';
 
 /* שלושת המצבים שהפאנל באמת יודע עליהם, ותו לא:
    ממתין לשרת → חושב · מקריא → מדבר · אחרת → מקשיב.
@@ -1191,7 +1201,7 @@ function ctl(i){
   if(_femFallback && i === MSGS.length - 1)
     h += '<span class="tu-sys tu-man">' + esc(t.manNote) + ' ' + esc(voiceHow()) + '</span>';
   else if(_basicVoice && i === MSGS.length - 1)
-    h += '<span class="tu-sys tu-man">' + esc(t.edgeNote) + '</span>';
+    h += '<span class="tu-sys tu-man tu-edge">' + esc(t.edgeNote) + '</span>';
   return h + '</div>';
 }
 
