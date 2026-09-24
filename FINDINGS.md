@@ -101,13 +101,21 @@ remaining}`, ונכשל בעדינות ל-`{used: null, error}` כשה-KV תקו
                   מהסביבה, KV שזורק (used:null + error), ו-GET /health
                   מלא דרך W.default.fetch
 
-**ולמדוד את המספר בפועל — עדיין דורש רנר.** נוסף `tutor-status.yml`
-(`Actions → tutor-status → Run workflow`): `curl /health` ומדפיס
-`usage` לתקציר הריצה. לא הרצתי אותו — הוא מריץ מהרנר של GitHub,
-לא מכאן, וזו בדיוק הנקודה שהחסימה מ-1 מלמדת | חשוב | `curl` שנחסם
-פעמיים ב-`__agentproxy/status`; `node .claude/qa/tutor.js`, הריצה
-נגד `worker.js` המקורי לעומת המתוקן; `docs/claude/barak.md` | הרצה
-ידנית של `tutor-status` תיתן את המספר האמיתי לראשונה
+**ונמדד בפועל, אותו יום.** `tutor-status.yml` הורץ (`Actions →
+tutor-status → Run workflow`, דרך ה-API של GitHub) ו-`/health`
+החזיר **בלי** שדה `usage` בכלל — כי הקוד שהיה פרוס ב-Cloudflare
+היה עדיין הגרסה הישנה: `deploy-tutor.yml` הוא ורקפלו נפרד וידני
+(`confirm: DEPLOY`), ופריסה ל-`main` אינה פורסת אליו לבד. הורץ
+גם הוא, ואחריו `tutor-status` שוב — ועכשיו כן:
+
+    {"day":"2026-09-24","used":2,"cap":100,"remaining":98}
+
+שני שימושים בלבד היום (`used:2`) מתוך תקרת העלות (`cap:100`).
+המקור: תשובת `/health` בלוג הריצה השנייה, HTTP 200,
+`tutor.lagstein1.workers.dev` | חשוב | `curl` מקומי שנחסם פעמיים
+ב-`__agentproxy/status`; `node .claude/qa/tutor.js`; ריצות
+`tutor-status` #1 (בלי `usage` — הגרסה הישנה) ו-#2 (עם `usage`,
+אחרי `deploy-tutor` ריצה 19); `docs/claude/barak.md` | —
 ### כרטיס הסיום בסרטונים הראה את הכתובת הישנה — כל 15 הוקלטו מחדש · 24.9.2026
 
 **הממצא (חשוב), מצילום של הבעלים:** בכרטיס הסיום של הסרטונים הופיעה הכתובת
