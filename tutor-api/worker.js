@@ -692,6 +692,23 @@ function flushGlobal(env, ctx, force) {
   if (ctx && typeof ctx.waitUntil === "function") ctx.waitUntil(p);
   return p;
 }
+/* קריאה בלבד, בלי לכתוב ובלי לצרוך מהתקרה — הבעלים שאל "מה יש
+   ב-KV עכשיו", ולנקודת הקצה שהייתה כאן (`/health`) לא היה מה
+   לענות: היא ידעה רק אם RATE מחובר, לא כמה נוצל. קריאת KV אחת,
+   טרייה בכל פעם — לא נשענת על RATE_MEM, כי isolate טרי (זה
+   שמקבל את בקשת /health עצמה) לא בהכרח ראה עדיין אף /ask וה-
+   base שלו נשאר 0 גם כשה-KV האמיתי כבר גבוה יותר. */
+async function currentUsage(env) {
+  if (!env.RATE) return null;
+  const day = dayKey();
+  const cap = capOfEnv(env, "GLOBAL_PER_DAY", LIM.globalPerDay);
+  try {
+    const used = +(await env.RATE.get("g:" + day) || 0);
+    return { day, used, cap, remaining: Math.max(0, cap - used) };
+  } catch (e) {
+    return { day, used: null, cap, error: "kv-read-failed" };
+  }
+}
 async function overLimit(env, ip, ctx) {
   if (!env.RATE) return null;                     /* הוצהר במפורש — ראו noCounter */
   rollDay();
@@ -1344,11 +1361,15 @@ export default {
     const org = pickOrigin(env, reqOrigin);
     const url = new URL(request.url);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(env, org) });
-    /* בריאות — בלי מפתח, בלי מונה, בלי פנייה לספק. */
+    /* בריאות — בלי מפתח ובלי פנייה לספק. `usage` קורא את המונה
+       (`g:<יום>` ב-KV) אבל לא נוגע בו — לא כותב, לא מקדם, ואינו
+       חלק מהתקרה שהוא מדווח עליה. שדה מצטבר ליום שלם, לא לפי IP:
+       אין כאן שום דבר שמזהה לומד. */
     if (request.method === "GET" && url.pathname === "/health")
       return json({ ok: true, key: env[engineOf(env).key] ? "present" : "missing",
                     counter: env.RATE ? "kv" : (noCounter(env) ? "missing" : "declared-off"),
-                    apps: Object.keys(ROLE), actions: ACTION_NAMES, limits: LIM }, 200, env, org);
+                    apps: Object.keys(ROLE), actions: ACTION_NAMES, limits: LIM,
+                    usage: await currentUsage(env) }, 200, env, org);
     if (request.method !== "POST") return json({ error: "method" }, 405, env, org);
     /* `cors()` מהדהד מקור מותר ומחליף מקור זר במקור ברירת המחדל
        בכותרת התשובה — וזו אינה חסימה: curl וסקריפטים אינם קוראים
@@ -1375,7 +1396,7 @@ export default {
    Cloudflare קורא רק את ה-default, וייצוא נוסף אינו מפריע לו. */
 export { revealsAnswer, badEquation, badLang, HE_CALQUE, readBody, contextBlock, cleanDoc, LIM, CORE, ROLE, LANGS,
          LANGRULE,
-         overLimit, _rate, _models,
+         overLimit, currentUsage, _rate, _models,
          SIGNS, ADAPT, PROVIDER,
          buildBody, buildHeaders, capOf, noCounter, MODEL, MAX_TOKENS,
          CLAUDE_MODEL, ENGINES, engineOf, geminiBody, parseReply,
