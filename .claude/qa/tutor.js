@@ -559,6 +559,41 @@ import(WORKER).then(async W => {
   t('הצהרה מפורשת מתירה בלי KV',      W.noCounter({ ALLOW_NO_RATE_LIMIT: 'yes' }), false);
   t('הצהרה חלקית אינה מתירה',         W.noCounter({ ALLOW_NO_RATE_LIMIT: 'true' }), true);
 
+  /* ---------- 5e. /health חושף את המונה — לא רק אם הוא מחובר ----------
+     ״תבדוק את המכסה הגלובלית ב-KV עכשיו״, הבעלים 24.9.2026 —
+     ולפני התיקון הזה לא הייתה דרך: `/health` ידע רק `counter:"kv"`,
+     לא כמה נוצל. `currentUsage` קורא את `g:<יום>` בעצמו, טרי בכל
+     קריאה, ולא דרך `_rate` — isolate שרק קיבל /health לא ראה
+     בהכרח /ask קודם, וה-base שבזיכרון שלו עדיין 0. */
+  await (async () => {
+    t('בלי RATE — usage הוא null', await W.currentUsage({}), null);
+    W._rate.reset();
+    t('RATE בלי כתיבה עדיין — used 0, cap אמיתי, remaining מלא',
+      await W.currentUsage(kv({})),
+      { day, used: 0, cap: W.LIM.globalPerDay, remaining: W.LIM.globalPerDay });
+    t('RATE עם ערך קיים — נקרא כמו שהוא, לא מוסתר ולא מעוגל',
+      await W.currentUsage(kv({ [G]: 37 })),
+      { day, used: 37, cap: W.LIM.globalPerDay, remaining: W.LIM.globalPerDay - 37 });
+    t('used מעבר לתקרה — remaining לא יורד מתחת לאפס',
+      await W.currentUsage(kv({ [G]: W.LIM.globalPerDay + 9 })),
+      { day, used: W.LIM.globalPerDay + 9, cap: W.LIM.globalPerDay, remaining: 0 });
+    t('תקרה שהוגדרה בסביבה (GLOBAL_PER_DAY) — usage משתמש בה ולא בברירת המחדל',
+      await W.currentUsage(Object.assign(kv({ [G]: 5 }), { GLOBAL_PER_DAY: '12' })),
+      { day, used: 5, cap: 12, remaining: 7 });
+    const broken = { RATE: { get: async () => { throw new Error('kv down') } } };
+    t('KV תקול — used null עם error, לא נכשל בשקט ולא זורק',
+      await W.currentUsage(broken), { day, used: null, cap: W.LIM.globalPerDay, error: 'kv-read-failed' });
+
+    /* ואיך זה נראה דרך /health עצמו, בדיוק כפי שהרנר יקבל אותו */
+    const env = Object.assign(kv({ [G]: 4 }), { GEMINI_API_KEY: 'x' });
+    const req = new Request('https://tutor.lagstein1.workers.dev/health', { method: 'GET' });
+    const res = await W.default.fetch(req, env, {});
+    const body = await res.json();
+    t('GET /health: 200 ו-usage.used תואם ל-KV', [res.status, body.usage],
+      [200, { day, used: 4, cap: W.LIM.globalPerDay, remaining: W.LIM.globalPerDay - 4 }]);
+    W._rate.reset();
+  })();
+
   /* ---------- 6. התשתית בדפדפן ---------- */
   LANGS.forEach(l => {
     const re = new RegExp('^' + l + ':\\{', 'm');

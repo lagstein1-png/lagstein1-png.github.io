@@ -12,6 +12,14 @@
 ו-`tutor-api/local/server.js` מריץ את ה-Worker מקומית — **מייבא
 אותו, לא מעתיק אותו.** אין תלות ואין `npm install`.
 
+**`GET /health` חושף את המכסה הגלובלית עצמה, לא רק אם היא מחוברת
+— נוסף 24.9.2026.** `currentUsage(env)` קורא `g:<יום>` מ-KV, טרי
+בכל קריאה (לא דרך `_rate`, כי isolate שרק קיבל את הבקשה לא בהכרח
+ראה `/ask` קודם), ומחזיר `{day, used, cap, remaining}` — קריאה
+בלבד, בלי לכתוב ובלי לגעת בתקרה. הסוכן חסום מול הכתובת החיה
+(כמו `bekol.co.il`), ולכן הבדיקה היא `Actions → tutor-status →
+Run workflow`, לא סקריפט מקומי.
+
 **והפנים שלו יושבות בקובץ נפרד, שאינו מוח.** `tutor/josh-face.js`
 היא שכבת תצוגה טהורה: עשרה אירועים (`idle`, `listening`, `thinking`,
 `speaking`, `correct`, `wrong`, `encourage`, `frustrated`, `stuck`,

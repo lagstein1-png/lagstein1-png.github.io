@@ -55,6 +55,7 @@
     node .claude/qa/stage.js                 # שער השלבים — מי מותר ללומד
     node .claude/qa/deployed.js              # מסלול הלומד על הבתים שנפרסו — ביד בלבד
     Actions → live-check → Run workflow      # מה באמת מוגש מהאתר החי (הסוכן חסום)
+    Actions → tutor-status → Run workflow    # /health של ברק, כולל המכסה הגלובלית ב-KV (הסוכן חסום)
     node .claude/qa/keyboard.js              # הפאנל של ברק כשהמקלדת פתוחה — visualViewport מזויף, 360/412, עברית וערבית, חזקות, אופליין
     node .claude/qa/apps.js              # שבעת המקומות שאפליקציה חדשה נוגעת בהם — האם כולם עודכנו
     node .claude/qa/status.js --check    # STATUS.md מול המדידה — הטבלה לא נכתבת ביד
