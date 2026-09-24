@@ -96,6 +96,7 @@ he:{ btn:"ברק — עזרה מהמוֹרֶה", title:"עזרה מהמוֹרֶ�
   vSample:"שלום, אני ברק. כך אני נשמע במכשיר שלך.",
   mic:"דבר", micOn:"מקשיב…", micNo:"הדפדפן הזה לא נותן לדבר. אפשר להקליד.",
   micDeny:"אין הרשאה למיקרופון. אפשר לאשר בהגדרות הדפדפן, או פשוט להקליד.",
+  edgeBtn:"לפתוח ב-Edge",
   edgeNote:"הקול במחשב הזה בסיסי ונשמע רובוטי. בדפדפן Microsoft Edge, שמותקן בכל Windows, ברק מדבר בקול טבעי — פותחים את אותו הדף שם.",
   manNote:"אין במכשיר הזה קול גברי בשפה הזאת, ולכן גובה הקול הונמך. זה לא קול גברי אמיתי.",
   simplifyBtn:"ברק — גרסה פשוטה", simplifyAsk:"תן לי גרסה קצרה ופשוטה של הטקסט שהדבקתי",
@@ -116,6 +117,7 @@ ar:{ btn:"باراك — مساعدة من المعلّم", title:"مساعدة 
   vSample:"مرحبًا، أنا باراك. هكذا سأبدو على جهازك.",
   mic:"تكلّم", micOn:"أسمعك…", micNo:"هذا المتصفّح لا يتيح التكلّم. يمكنك الكتابة.",
   micDeny:"لا يوجد إذن للميكروفون. يمكن السماح في إعدادات المتصفّح، أو الكتابة ببساطة.",
+  edgeBtn:"افتحوا في Edge",
   edgeNote:"الصوت على هذا الحاسوب بسيط ويبدو آليًّا. في متصفّح Microsoft Edge، المثبّت في كل Windows، يتكلّم باراك بصوت طبيعي — افتحوا الصفحة نفسها هناك.",
   manNote:"لا يوجد على هذا الجهاز صوت رجاليّ بهذه اللغة، لذلك خُفضت طبقة الصوت. هذا ليس صوتًا رجاليًّا حقيقيًّا.",
   simplifyBtn:"باراك — نسخة مبسّطة", simplifyAsk:"أعطني نسخة قصيرة وبسيطة من النصّ الذي لصقته",
@@ -136,6 +138,7 @@ ru:{ btn:"Барак — помощь учителя", title:"Помощь уч�
   vSample:"Привет, я Барак. Вот как я звучу на вашем устройстве.",
   mic:"Говори", micOn:"Слушаю…", micNo:"Этот браузер не позволяет говорить. Можно печатать.",
   micDeny:"Нет разрешения на микрофон. Разрешите в настройках браузера или просто печатайте.",
+  edgeBtn:"Открыть в Edge",
   edgeNote:"Голос на этом компьютере простой и звучит как робот. В браузере Microsoft Edge, который есть в каждом Windows, Барак говорит естественным голосом — откройте эту же страницу там.",
   manNote:"На этом устройстве нет мужского голоса для этого языка, поэтому тон понижен. Это не настоящий мужской голос.",
   simplifyBtn:"Барак — простая версия", simplifyAsk:"Дай мне короткую и простую версию вставленного текста",
@@ -156,6 +159,7 @@ en:{ btn:"Barak — ask the teacher", title:"Ask the teacher", close:"Close", se
   vSample:"Hi, I am Barak. This is how I sound on your device.",
   mic:"Speak", micOn:"Listening…", micNo:"This browser does not allow speaking. You can type instead.",
   micDeny:"No microphone permission. You can allow it in the browser settings, or simply type.",
+  edgeBtn:"Open in Edge",
   edgeNote:"The voice on this computer is basic and sounds robotic. In Microsoft Edge, which comes with every Windows, Barak speaks in a natural voice — open this same page there.",
   manNote:"This device has no male voice for this language, so the pitch is lowered. It is not a real male voice.",
   simplifyBtn:"Barak — simple version", simplifyAsk:"Give me a short, simple version of the text I pasted",
@@ -675,11 +679,20 @@ function plain(x){
    שיש בו ספרה, אות לטינית או סימן חשבון נעטף ב-`<bdi dir="ltr">`.
    כך משפט עברי נקרא מימין לשמאל והנוסחה שבתוכו משמאל לימין.
    רץ אחרי `esc`, ולכן אין כאן דרך להזריק HTML. */
+/* **הפיסוק של המשפט נשאר מחוץ לקופסה — 24.9.2026.** צילום: ״ש-21 אוהבים
+   קפה, 10 אוהבים תה״ הוצג ״ש21- … קפה10 ,״. הריצה שבין שתי אותיות עבריות
+   כללה את המקף ואת הפסיק, ו-`dir="ltr"` הפך את מקומם. מקף מיד אחרי אות
+   עברית הוא מקף עברי (״ש-21״) ולא סימן מינוס, ולכן הוא יוצא החוצה; פסיק
+   ונקודה בקצוות — גם. מינוס בתחילת ביטוי (״-3 + 5״) נשאר בפנים. */
 function mathHTML(s){
-  return esc(s).replace(/[^\u0590-\u05FF\u0600-\u06FF\n]+/g, function(run){
+  return esc(s).replace(/[^\u0590-\u05FF\u0600-\u06FF\n]+/g, function(run, at, all){
     if(!/[0-9A-Za-z\u00B2\u00B3\u00B9\u2070-\u209F=+\u2212\u00D7\u00F7\u221A\^]/.test(run)) return run;
-    var m = run.match(/^(\s*)([\s\S]*?)(\s*)$/);
-    return m[1] + '<bdi dir="ltr">' + m[2] + '</bdi>' + m[3];
+    var m = run.match(/^([\s,.;:]*)([\s\S]*?)([\s,.;:?!]*)$/), lead = m[1], mid = m[2];
+    if(at > 0 && /[\u05D0-\u05EA]/.test(all.charAt(at - 1)) && /^-/.test(mid)){
+      lead += "-"; mid = mid.slice(1);
+    }
+    if(!mid) return run;
+    return lead + '<bdi dir="ltr">' + mid + '</bdi>' + m[3];
   });
 }
 /* מה נאמר: כתב עילי אינו נקרא במנוע ההקראה, ולכן ``x²`` נאמר
@@ -927,13 +940,20 @@ var CSS = ''
 +'#tu-lg{border:1px solid rgba(23,51,60,.28);border-radius:9px;padding:5px 8px;'
 +'font:inherit;font-size:.85rem;background:#fff;color:#17333c;margin-inline-start:auto}'
 /* **סגירה בצבע משלה — 24.9.2026, הבעלים: ״הכפתור סגירה בצבע אחר״.**
-   שקוף ודק היה נראה כמו תווית ולא ככפתור. #b03a2e עם לבן — 5.9:1. */
+   שקוף ודק היה נראה כמו תווית ולא ככפתור. #b03a2e עם לבן — 6.02:1 (חושב לפי WCAG). */
 +'#tu-x{margin-inline-start:auto;background:#b03a2e;border:1px solid #b03a2e;'
 +'border-radius:9px;padding:5px 12px;font:inherit;font-weight:700;cursor:pointer;color:#fff}'
 +'#tu-x:hover{background:#8f2d23;border-color:#8f2d23}'
 /* ״זה צריך להיות מודגש ובכתב גדול יותר״ (הבעלים, 24.9.2026) — ההודעה
    היחידה בחלון שאומרת ללומד לעשות משהו כדי לשמוע טוב יותר. */
-+'.tu-edge{display:block;font-weight:700;font-size:1.05rem;color:#17333c;line-height:1.5}'
++'#tu-edge{background:#fff3ce;border:1px solid #d9b44a;border-radius:10px;padding:8px 10px;margin:0 0 8px;'
++'display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}'
++'#tu-edge[hidden]{display:none}'
++'#tu-ov.tu-kb #tu-edge{display:none}'
++'.tu-edge{flex:1 1 14rem;font-weight:700;font-size:1.05rem;color:#17333c;line-height:1.5}'
++'.tu-edgebtn{display:inline-block;background:#0f6b8a;color:#fff;font-weight:700;'
++'font-size:1.05rem;text-decoration:none;border-radius:10px;padding:8px 16px}'
++'.tu-edgebtn:hover{background:#0b5570}'
 +'@media(prefers-color-scheme:dark){#tu-bx{background:#16232a;color:#eef5f7}'
 +'#tu-q,#tu-q:disabled{background:#3d3410;border-color:#8a6d00;color:#fff3ce}'
 +'#tu-in,.tu-ctl button,.tu-ctl select,#tu-lg{background:#1e2f38;color:#eef5f7;'
@@ -941,7 +961,8 @@ var CSS = ''
 +'.tu-me{background:#1d3b4a;border-color:#2f6a86}.tu-bot{background:#14403a;border-color:#1c7e70}'
 +'.tu-sg button{background:#12303d;color:#eaf6fa;border-color:#2f6a86}'
 +'.tu-sg button:hover{background:#1d3b4a}'
-+'.tu-sys{color:#a9c2ca}#tu-pv{color:#93aeb7}.tu-edge{color:#fff3ce}}';
++'.tu-sys{color:#a9c2ca}#tu-pv{color:#93aeb7}.tu-edge{color:#fff3ce}'
++'#tu-edge{background:#3d3410;border-color:#8a6d00}}';
 
 /* שלושת המצבים שהפאנל באמת יודע עליהם, ותו לא:
    ממתין לשרת → חושב · מקריא → מדבר · אחרת → מקשיב.
@@ -964,7 +985,7 @@ function build(){
     + '<button id="tu-x" type="button"></button></div>'
     + '<button id="tu-q" type="button" hidden disabled></button>'
     + '<div id="tu-log" aria-live="polite"></div>'
-    + '<div id="tu-ft"><div id="tu-row">'
+    + '<div id="tu-ft"><div id="tu-edge" hidden></div><div id="tu-row">'
     + '<button id="tu-mic" type="button" hidden aria-pressed="false"></button>'
     /* `enterkeyhint="send"`: המקש הראשי במקלדת אומר ״שליחה״ ולא
        ״ירידת שורה״. `autocomplete="off"` — אין כאן מה להשלים,
@@ -1012,7 +1033,8 @@ function build(){
     q: ov.querySelector("#tu-q"), x: ov.querySelector("#tu-x"),
     lg: ov.querySelector("#tu-lg"),
     log: ov.querySelector("#tu-log"), inp: ov.querySelector("#tu-in"),
-    go: ov.querySelector("#tu-go"), pv: ov.querySelector("#tu-pv")
+    go: ov.querySelector("#tu-go"), pv: ov.querySelector("#tu-pv"),
+    edge: ov.querySelector("#tu-edge")
   };
   EL.x.onclick = close;
   EL.q.onclick = function(){ QX = !QX; draw() };
@@ -1075,6 +1097,21 @@ function draw(){
   e.inp.placeholder = t.ph;
   e.inp.setAttribute("aria-label", t.ph);
   e.pv.textContent = t.privacy;
+  /* **ההודעה על Edge, עם כפתור — מעל שדה הקלט ולא בתוך השיחה (24.9.2026).**
+     בתוך השיחה היא ישבה מתחת לתשובה האחרונה, והחלון גולל אל ראש
+     התשובה בכוונה — ולכן הכפתור נחתך מחוץ לתצוגה (נמדד בצילום).
+     כאן היא תמיד נראית. `_basicVoice` נקבע ב-`speakSeg`, ולכן היא
+     מופיעה אחרי ההקראה הראשונה ולא לפניה — עד אז לא ידוע איזה קול.
+     הכפתור — אותה סכימה כמו `edgeNote()` בהגדרות של כל אפליקציה:
+     `microsoft-edge:` פותחת את אותה כתובת ב-Edge מכל דפדפן בווינדוס.
+     אוטומטית אי אפשר: דפדפן אינו מעביר לדפדפן אחר בלי לחיצה. */
+  if(e.edge){
+    e.edge.hidden = !_basicVoice;
+    var eh = _basicVoice ? '<span class="tu-edge">' + esc(t.edgeNote) + '</span>'
+      + '<a class="tu-edgebtn" href="microsoft-edge:' + esc(location.href.split("#")[0]) + '">'
+      + esc(t.edgeBtn) + '</a>' : "";
+    if(e.edge.innerHTML !== eh) e.edge.innerHTML = eh;
+  }
   /* **המיקרופון בשפה של עכשיו — 23.9.2026.** התווית נכתבה רק ב-`micState`,
      כלומר בבנייה ובלחיצה. מי שעבר מערבית לאנגלית קיבל ״تكلّم״ במסך
      אנגלי (צילום הבעלים). */
@@ -1200,8 +1237,6 @@ function ctl(i){
      ההקראה הראשונה אין לדעת איזה קול המכשיר ייתן לשפה הזאת. */
   if(_femFallback && i === MSGS.length - 1)
     h += '<span class="tu-sys tu-man">' + esc(t.manNote) + ' ' + esc(voiceHow()) + '</span>';
-  else if(_basicVoice && i === MSGS.length - 1)
-    h += '<span class="tu-sys tu-man tu-edge">' + esc(t.edgeNote) + '</span>';
   return h + '</div>';
 }
 
