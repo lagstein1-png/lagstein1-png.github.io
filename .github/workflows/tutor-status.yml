@@ -1,0 +1,64 @@
+# מצב ברק החי — /health, כולל המכסה הגלובלית שב-KV.
+#
+# למה ורקפלו: סביבת הפיתוח של הסוכן חסומה מול tutor.lagstein1.workers.dev
+# (בדיוק כמו bekol.co.il — CLAUDE.md), ולכן שאלה כמו "כמה נוצל
+# היום מהמכסה הגלובלית" אי אפשר לענות עליה מהסביבה הזאת. הרנר
+# של GitHub אינו חסום.
+#
+# **קריאה בלבד.** /health אינו כותב ל-KV ואינו נוגע בתקרה — ראו
+# `currentUsage` ב-worker.js. אין כאן /ask, אין מפתח נדרש, ואין
+# סודות בקובץ הזה.
+#
+# הרצה: Actions → tutor-status → Run workflow
+
+name: tutor-status
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  URL: https://tutor.lagstein1.workers.dev
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "/health"
+        id: health
+        run: |
+          set -euo pipefail
+          CODE=$(curl -s -o /tmp/h.json -w '%{http_code}' --max-time 30 "$URL/health" || echo 000)
+          echo "HTTP $CODE"
+          cat /tmp/h.json 2>/dev/null || true
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+
+      - name: תקציר
+        if: always()
+        run: |
+          CODE="${{ steps.health.outputs.code }}"
+          {
+            echo "## מצב ברק החי"
+            echo ""
+            echo "**כתובת:** \`$URL/health\` · **HTTP $CODE**"
+            echo ""
+            if [ "$CODE" = "200" ]; then
+              node -e '
+                const u = (JSON.parse(require("fs").readFileSync("/tmp/h.json", "utf8"))).usage;
+                if (!u) console.log("אין usage בתשובה — RATE (KV) אינו מחובר.");
+                else if (u.used == null) console.log("קריאת KV נכשלה: " + (u.error || "סיבה לא ידועה") + ".");
+                else console.log("**" + u.day + "**: נוצלו " + u.used + " מתוך " + u.cap +
+                                  " (חסם העלות הגלובלי) · נותרו " + u.remaining + ".");
+              ' || echo "לא הצלחתי לפענח את usage — הגוף המלא למטה."
+              echo ""
+            fi
+            echo '```json'
+            cat /tmp/h.json 2>/dev/null || echo '(אין גוף תשובה)'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$CODE" != "200" ]; then
+            echo "::error::תשובת /health אינה 200 — $CODE."
+            exit 1
+          fi
