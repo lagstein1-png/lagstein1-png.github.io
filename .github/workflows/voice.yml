@@ -36,7 +36,16 @@
 
 name: voice
 
+# **רץ לבד כל בוקר ב-07:05 UTC — הכרעת הבעלים 24.9.2026: ״קריינות קודם״.**
+# המכסה היומית של GEMINI_API_KEY מתאפסת ב-07:00 UTC (O-71), ו-`record.yml`
+# רץ ב-07:30 על אותו מפתח. הקריינות לוקחת ראשונה, וההקלטות לאפליקציות
+# מקבלות את מה שנשאר, עד ש-192 השורות מוכנות. ריצת בוקר שנעצרה על
+# המכסה אינה ״נכשלה״ — היא התקדמה; ולכן בריצה מתוזמנת ״כיסוי״ חלקי
+# ירוק, והמערבל, ההעלאה והדחיפה רצים רק כשהכיסוי מלא.
+# כשהכיסוי מלא — מוחקים את ה-schedule (הריצה כבר לא מפיקה דבר).
 on:
+  schedule:
+    - cron: '5 7 * * *'
   workflow_dispatch:
     inputs:
       only:
@@ -50,6 +59,11 @@ on:
 
 permissions:
   contents: write
+
+# ריצה ידנית ומתוזמנת באותו זמן היו דוחפות -f ל-voice-build זו על זו.
+concurrency:
+  group: voice
+  cancel-in-progress: false
 
 jobs:
   voice:
@@ -137,18 +151,23 @@ jobs:
           echo "נדחף ל-voice-build: $(find marketing/media/voice -type f | wc -l) קבצים."
 
       - name: כיסוי
+        id: cover
+        continue-on-error: ${{ github.event_name == 'schedule' }}
         run: node marketing/media/voice.js --check
 
       # רק כאן — ״כיסוי״ למעלה כבר הפיל את הג׳וב אם הקריינות חלקית.
       - name: מערבל לסרטונים
+        if: ${{ steps.cover.outcome == 'success' }}
         run: node marketing/media/audio.js
 
       - name: לכל סרטון יש רצועת שמע
+        if: ${{ steps.cover.outcome == 'success' }}
         run: node marketing/media/audio.js --check
 
       # בלי YES הקריינות יוצאת כ-artifact בלבד. אפשר להאזין לה
       # לפני שהיא נכנסת ל-main — מה שנדחף ל-main מוגש מהאתר החי.
       - name: מצרף להורדה
+        if: ${{ steps.cover.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: voice
