@@ -23,11 +23,11 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const WORKER = 'file://' + path.join(ROOT, 'tutor-api', 'worker.js');
 const CLIENT = path.join(ROOT, 'tutor', 'tutor.js');
 
-/* שתים־עשרה. דף הבית אינו אפליקציית לימוד, ו״תאוריה מדברת״
+/* שתים־עשרה, ועוד electric שבשלב build (24.9.2026). דף הבית אינו אפליקציית לימוד, ו״תאוריה מדברת״
    יושבת בריפו נפרד — ראו FINDINGS. */
 const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
               'lomda', 'english', 'history', 'ulpan', 'bagrut-806', 'reader',
-              'kotvim'];
+              'kotvim', 'electric'];
 /* ״תאוריה מדברת״ אינה בריפו הזה, אבל היא באותו מקור וטוענת את
    /tutor/tutor.js מכאן — ולכן התפקיד שלה חייב להיות בשרת.
    החיווט שלה עצמו נבדק בריפו שלה, לא כאן. */

@@ -203,6 +203,9 @@ for (const rel of FILES) {
   if (/function lgChrome\(/.test(src)) {
     const body = src.slice(Math.max(0, src.indexOf('<body')))
       .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      /* השער הפנימי (internal-gate.html) הוא מסך לפני פרסום, ומוסר
+         בשלב approved — הוא אינו חלק מהממשק שלומד רואה בשפה שבחר. */
+      .replace(/<div id="gate"[\s\S]*?<\/div>\s*<\/div>/, ' ')
       .replace(/<style[\s\S]*?<\/style>/gi, ' ')
       .replace(/<!--[\s\S]*?-->/g, ' ')
       .replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();

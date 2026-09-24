@@ -95,11 +95,20 @@ function scriptOf(app) {
 }
 const sha = s => crypto.createHash('sha256').update(s).digest('hex').slice(0, 12);
 
+/* רק אפליקציה ב-public. אפליקציה שעוד מאחורי השער הפנימי יורשת את
+   DEMO_SCRIPT מהאפליקציה שממנה הועתקה, אבל סרטון שיווקי שלה מקדים
+   את האישור — electric, 24.9.2026. */
+function isPublic(a) {
+  try {
+    const st = JSON.parse(fs.readFileSync(path.join(ROOT, '.claude', 'qa', 'stages.json'), 'utf8')).apps[a];
+    return !st || st.stage === 'public';
+  } catch (e) { return true; }
+}
 function demoApps() {
   return fs.readdirSync(ROOT, { withFileTypes: true })
     .filter(d => d.isDirectory() && !d.name.startsWith('.'))
     .map(d => d.name)
-    .filter(a => scriptOf(a))
+    .filter(a => scriptOf(a) && isPublic(a))
     .sort();
 }
 
