@@ -1,5 +1,5 @@
 /* =====================================================================
-   הפאנל של ברק כשהמקלדת פתוחה — 17.9.2026.
+   הפאנל של לימור כשהמקלדת פתוחה — 17.9.2026.
 
    הבעלים צילם באנדרואיד (כרום, שאלת נגזרת): כשהמקלדת נפתחת
    הכותרת, הדיוקן ובועת השאלה תופסים כמעט את כל מה שנשאר מהמסך,
@@ -217,7 +217,7 @@ async function scenario(b, app, width, lang) {
       topIn: B.top >= L.top - 1 && B.top < L.bottom };
   });
   t(`${tag}: התשובה גבוהה מאזור השיחה (אחרת אין מה לבדוק)`, long.bubH > long.logH, JSON.stringify(long));
-  t(`${tag}: ראש התשובה של ברק נראה, ולא רק סופה`, long.topIn, JSON.stringify(long));
+  t(`${tag}: ראש התשובה של לימור נראה, ולא רק סופה`, long.topIn, JSON.stringify(long));
   const mine = await page.evaluate(() => {
     const st = TUTOR._state(); st.msgs.push({ role: 'user', text: 'ומה עכשיו?' }); TUTOR.open();
     const log = document.getElementById('tu-log'), me = [...log.querySelectorAll('.tu-me')].pop();

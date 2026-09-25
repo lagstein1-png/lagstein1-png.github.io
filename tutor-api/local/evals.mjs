@@ -85,8 +85,8 @@ const SCRIPT = { he: /[֐-׿]/, ar: /[؀-ۿ]/, ru: /[Ѐ-ӿ]/, en: /[A-Za-z]/ };
 /* השם כפי שכל המאגר כותב אותו — tutor/tutor.js, tutor/josh-local.js,
    barak/index.html — ומ-16.9.2026 גם CORE שבשרת. NAME_ALT תופס
    תעתיק שנראה כמו השם ואינו הוא. */
-const NAME     = { he: "ברק",  ar: "باراك",        ru: "Барак",      en: "Barak" };
-const NAME_ALT = { he: "ברק",  ar: "بار[اقئ]ق?|باراق|\\bBarak\\b", ru: "Бар[а-я]?к|\\bBarak\\b", en: "\\bbarak\\b" };
+const NAME     = { he: "לימור", ar: "ليمور",       ru: "Лимор",     en: "Limor" };
+const NAME_ALT = { he: "לימור", ar: "ليم[و]?ر|\\bLimor\\b", ru: "Лим[а-я]?р|\\bLimor\\b", en: "\\blimor\\b" };
 
 /* ---------- המודל המדומה ---------- */
 const MOCK_SAY = {
@@ -127,7 +127,7 @@ function judge(scn, lang, screen, d, turn) {
      לנחש איזו צורה שייכת לאיזו שפה — חד־משמעי בכתב הערבי, ולא
      ברוסית. היום כל צורה קשורה לקוד השפה, ו-NAME_ALT תופס גם
      ״Barak״ הלטיני בתוך תשובה ברוסית או ערבית. */
-  if (lang !== "he" && /ברק/.test(say)) f.push("השם באותיות עבריות בתשובה ב-" + lang);
+  if (lang !== "he" && /לימור/.test(say)) f.push("השם באותיות עבריות בתשובה ב-" + lang);
   if (NAME[lang] && new RegExp(NAME_ALT[lang]).test(say) && !say.includes(NAME[lang]))
     f.push("תעתיק אחר של השם ב-" + lang + " (הנכון: " + NAME[lang] + ")");
   if (scn === "hint" && screen.correct && revealsAnswer(say, screen.correct)) f.push("הרמז גילה את התשובה");
@@ -200,6 +200,6 @@ function judge(scn, lang, screen, d, turn) {
                     gapMs: LIVE_GAP_MS, when: new Date().toISOString() };
   console.log(JSON.stringify(summary));
   if (OUT) fs.writeFileSync(OUT, JSON.stringify({ summary, rows }, null, 1));
-  console.log(bad ? `✗ הערכות ברק — ${bad} מתוך ${ran} נכשלו` : `✓ הערכות ברק — ${ran} תרחישים עברו` + (capped ? " (נעצר בתקרה " + LIVE_CAP + ")" : ""));
+  console.log(bad ? `✗ הערכות לימור — ${bad} מתוך ${ran} נכשלו` : `✓ הערכות לימור — ${ran} תרחישים עברו` + (capped ? " (נעצר בתקרה " + LIVE_CAP + ")" : ""));
   process.exit(bad ? 1 : 0);
 })().catch(e => { console.error("✗ evals נפל: " + (e && e.stack || e)); process.exit(1) });

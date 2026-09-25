@@ -45,7 +45,7 @@ const VOICES = [
 /* חלון מינימלי. `tutor.js` נוגע בהרבה דברים בטעינה, וכל מה שהוא
    צריך כאן הוא שלא ייפול — הבדיקה שואלת רק את בחירת הקול. */
 function fakeWindow(pin) {
-  const store = { 'tutor-voice-v1': JSON.stringify({ 'he-IL': pin }) };
+  const store = { 'tutor-voice-v2': JSON.stringify({ 'he-IL': pin }) };
   const el = () => ({
     style: {}, classList: { add(){}, remove(){}, toggle(){}, contains: () => false },
     appendChild(){}, setAttribute(){}, removeAttribute(){}, addEventListener(){},
