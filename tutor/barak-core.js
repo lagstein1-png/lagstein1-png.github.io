@@ -267,16 +267,14 @@ function ask(text, opts) {
   text = String(text || "").trim();
   var lang = opts.lang || "he";
   var api = endpoint(opts.api);
-  var face = function (f) { if (typeof g.JOSHFACE !== "undefined") safe(function () { g.JOSHFACE.emit(f) }) };
   function finish(res) {
     if (!res) return null;
-    LAST = res; face(res.face || "speaking");
+    LAST = res;
     return res;
   }
   if (!text) return Promise.resolve(null);
   if (!api || opts.online === false) return local(text, opts, opts.why || (!api ? "local" : "offline")).then(finish);
 
-  face("thinking");
   var body = {
     app: ADAPTER ? ADAPTER.app : opts.app, lang: lang,
     target: opts.target || null, sign: opts.sign || null, mode: opts.mode || "chat",

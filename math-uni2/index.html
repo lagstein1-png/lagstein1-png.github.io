@@ -958,7 +958,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v138 · 2026-09-24";
+var BUILD="v139 · 2026-09-25";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -4749,9 +4749,9 @@ function viewOnboard(){
   var step=P.obStep||1;
   return '<div class="wrap" style="padding-block:clamp(24px,7vw,60px);max-width:760px">'+
    '<div class="rise">'+
-_f("{0}{1} לשנה א׳ באוניברסיטה</span>", '<span class="chip a">', ic("target",14))+
-   '<h1 class="h1" style="margin-top:14px">'+_('חדו״א, לינארית והסתברות — צעד אחר צעד.')+'</h1>'+
-   '<p class="sub" style="font-size:1.05rem;max-width:34rem">'+_('בשנה א׳ ההרצאה רצה והתרגול מניח שהבנתם. כאן כל שאלה נפתחת לשלבים — כולל השורה שהמרצה דילג עליה — וכל תשובה שגויה אומרת בדיוק איזו טעות היא. דף נוסחאות פתוח תמיד, והקראה בקול.')+'</p>'+
+_f("{0}{1} לשנה ב׳ באוניברסיטה</span>", '<span class="chip a">', ic("target",14))+
+   '<h1 class="h1" style="margin-top:14px">'+_('חדו״א 2, לינארית 2, משוואות דיפרנציאליות והסתברות — צעד אחר צעד.')+'</h1>'+
+   '<p class="sub" style="font-size:1.05rem;max-width:34rem">'+_('בשנה ב׳ מתקדמים לאינטגרלים כפולים, טורים, מרחבים וקטוריים, משוואות דיפרנציאליות והסתברות רציפה. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד.')+'</p>'+
    '<div class="grid g3" style="margin-top:22px">'+
      [["steps",_("פתרון מודרך"),_("כל שאלה נפתחת לשלבים, כולל המעברים שמדלגים עליהם")],
       ["target",_("זיהוי הטעות"),_("תשובה שגויה אומרת איזו טעות היא, לא רק שהיא שגויה")],
@@ -8330,8 +8330,13 @@ var TR_KEYS=[
 "הוספתם איבר מעורב שאינו קיים. באי־תלות Cov = 0, ולכן האיבר 2ab·Cov נעלם ואין מה להוסיף.",
 "מרחב הפולינומים ממעלה שאינה עולה על {0}",
 "מרחב המטריצות {0}×{1}",
-"{0} כיוונים בלתי תלויים קיימים בהחלט: למשל איברי הבסיס הסטנדרטי."
+"{0} כיוונים בלתי תלויים קיימים בהחלט: למשל איברי הבסיס הסטנדרטי.",
+/* Year-specific intro keys, appended so positional translations stay aligned. */
+"{0}{1} לשנה ב׳ באוניברסיטה</span>",
+"חדו״א 2, לינארית 2, משוואות דיפרנציאליות והסתברות — צעד אחר צעד.",
+"בשנה ב׳ מתקדמים לאינטגרלים כפולים, טורים, מרחבים וקטוריים, משוואות דיפרנציאליות והסתברות רציפה. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד."
 ];
+
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
 TRACKS.forEach(function(t){lazyTr(t,["t"])});
@@ -12920,6 +12925,11 @@ trAt("en",TR_KEYS.indexOf("מוגדר עבור −∞ < x < {0}"),[
 "No — n = {0} is small and the population is not normal, and neither of the two ways to justify a normal approximation applies here",
 "No — the central limit theorem applies only when the population itself is normal, so the sample size n = {0} does not matter at all"]);
 
+
+/* Translations for the new year-specific onboarding. */
+trAt("ar",TR_KEYS.length-3,["{0}{1} السنة الثانية في الجامعة</span>", "التفاضل والتكامل 2، الجبر الخطي 2، المعادلات التفاضلية والاحتمالات — خطوة بخطوة.", "في السنة الثانية ندرس التكاملات المزدوجة والمتسلسلات والفضاءات المتجهة والمعادلات التفاضلية والاحتمالات المستمرة. كل سؤال يُحل خطوة بخطوة، مع شرح للأخطاء وصيغ متاحة وقراءة صوتية."]);
+trAt("ru",TR_KEYS.length-3,["{0}{1} Второй курс университета</span>", "Матанализ 2, линейная алгебра 2, дифференциальные уравнения и вероятность — шаг за шагом.", "На втором курсе изучают двойные интегралы, ряды, векторные пространства, дифференциальные уравнения и непрерывные распределения. Каждая задача разбирается по шагам с объяснением ошибок, формулами и озвучиванием."]);
+trAt("en",TR_KEYS.length-3,["{0}{1} For second-year university students</span>", "Calculus 2, linear algebra 2, differential equations and probability — step by step.", "In the second year, work through double integrals, series, vector spaces, differential equations and continuous probability. Each problem has guided steps, explanations for mistakes, a formula sheet and read-aloud."]);
 trBuild();
 exLoad();
 applyModes();
@@ -12949,7 +12959,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v138-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v139-pwa1").catch(function(){});
   });
 }
 </script>

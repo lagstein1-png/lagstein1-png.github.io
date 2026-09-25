@@ -958,7 +958,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g137 · 2026-09-24";
+var BUILD="g138 · 2026-09-25";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -4285,9 +4285,9 @@ function viewOnboard(){
   var step=P.obStep||1;
   return '<div class="wrap" style="padding-block:clamp(24px,7vw,60px);max-width:760px">'+
    '<div class="rise">'+
-_f("{0}{1} לשנה א׳ באוניברסיטה</span>", '<span class="chip a">', ic("target",14))+
-   '<h1 class="h1" style="margin-top:14px">'+_('חדו״א, לינארית והסתברות — צעד אחר צעד.')+'</h1>'+
-   '<p class="sub" style="font-size:1.05rem;max-width:34rem">'+_('בשנה א׳ ההרצאה רצה והתרגול מניח שהבנתם. כאן כל שאלה נפתחת לשלבים — כולל השורה שהמרצה דילג עליה — וכל תשובה שגויה אומרת בדיוק איזו טעות היא. דף נוסחאות פתוח תמיד, והקראה בקול.')+'</p>'+
+_f("{0}{1} לשנה ג׳ באוניברסיטה</span>", '<span class="chip a">', ic("target",14))+
+   '<h1 class="h1" style="margin-top:14px">'+_('אנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית — צעד אחר צעד.')+'</h1>'+
+   '<p class="sub" style="font-size:1.05rem;max-width:34rem">'+_('בשנה ג׳ מעמיקים באנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד.')+'</p>'+
    '<div class="grid g3" style="margin-top:22px">'+
      [["steps",_("פתרון מודרך"),_("כל שאלה נפתחת לשלבים, כולל המעברים שמדלגים עליהם")],
       ["target",_("זיהוי הטעות"),_("תשובה שגויה אומרת איזו טעות היא, לא רק שהיא שגויה")],
@@ -7707,8 +7707,13 @@ var TR_KEYS=[
 "המספר הזה מחלק את φ(n), ולכן לגראנז׳ מתיר אותו — אבל בחזקה הזאת עדיין לא מתקבל 1. הסדר הוא החזקה הראשונה שנותנת 1.",
 "סופרים ספרות",
 "ב-{0} יש {1} ספרות אחרי הנקודה, וזה דיוק העיגול.",
-"המספר {0} הוא תוצאה של עיגול. מהו חסם שגיאת העיגול?"
+"המספר {0} הוא תוצאה של עיגול. מהו חסם שגיאת העיגול?",
+/* Year-specific intro keys, appended so positional translations stay aligned. */
+"{0}{1} לשנה ג׳ באוניברסיטה</span>",
+"אנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית — צעד אחר צעד.",
+"בשנה ג׳ מעמיקים באנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד."
 ];
+
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
 TRACKS.forEach(function(t){lazyTr(t,["t"])});
@@ -11829,6 +11834,11 @@ trAt("en",TR_KEYS.indexOf("זה חסם מלעיל, אבל לא הקטן שבהם
 "Count the digits",
 "{0} has {1} digits after the point, and that is the rounding precision.",
 "The number {0} is the result of rounding. What is the rounding error bound?"]);
+
+/* Translations for the new year-specific onboarding. */
+trAt("ar",TR_KEYS.length-3,["{0}{1} السنة الثالثة في الجامعة</span>", "التحليل والدوال المركبة والجبر المجرّد والتحليل العددي — خطوة بخطوة.", "في السنة الثالثة نتعمق في التحليل والدوال المركبة والجبر المجرّد والتحليل العددي. كل سؤال يُحل خطوة بخطوة، مع شرح للأخطاء وصيغ متاحة وقراءة صوتية."]);
+trAt("ru",TR_KEYS.length-3,["{0}{1} Третий курс университета</span>", "Анализ, комплексные функции, абстрактная алгебра и численные методы — шаг за шагом.", "На третьем курсе углубляются в анализ, комплексные функции, абстрактную алгебру и численные методы. Каждая задача разбирается по шагам с объяснением ошибок, формулами и озвучиванием."]);
+trAt("en",TR_KEYS.length-3,["{0}{1} For third-year university students</span>", "Analysis, complex functions, abstract algebra and numerical analysis — step by step.", "In the third year, go deeper into analysis, complex functions, abstract algebra and numerical analysis. Each problem has guided steps, explanations for mistakes, a formula sheet and read-aloud."]);
 trBuild();
 exLoad();
 applyModes();
@@ -11858,7 +11868,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g137-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g138-pwa1").catch(function(){});
   });
 }
 </script>

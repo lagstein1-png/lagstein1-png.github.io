@@ -98,7 +98,7 @@ he:{ btn:"ברק — עזרה מהמוֹרֶה", title:"עזרה מהמוֹרֶ�
   micDeny:"אין הרשאה למיקרופון. אפשר לאשר בהגדרות הדפדפן, או פשוט להקליד.",
   edgeBtn:"לפתוח ב-Edge",
   edgeNote:"הקול במחשב הזה בסיסי ונשמע רובוטי. בדפדפן Microsoft Edge, שמותקן בכל Windows, ברק מדבר בקול טבעי — פותחים את אותו הדף שם.",
-  manNote:"אין במכשיר הזה קול גברי בשפה הזאת, ולכן גובה הקול הונמך. זה לא קול גברי אמיתי.",
+  manNote:"לא זוהה כאן קול גברי בשפה הזאת. אם נשמע קול נשי, אפשר להתקין קול גברי במכשיר או לבחור אותו מרשימת הקולות.",
   simplifyBtn:"ברק — גרסה פשוטה", simplifyAsk:"תן לי גרסה קצרה ופשוטה של הטקסט שהדבקתי",
   simplifyEmpty:"קודם הדביקו טקסט, ואז אבקש מברק גרסה פשוטה שלו.",
   simplifyCut:"הטקסט ארוך, ולכן נשלחה רק תחילתו — {n} תווים." },
@@ -119,7 +119,7 @@ ar:{ btn:"باراك — مساعدة من المعلّم", title:"مساعدة 
   micDeny:"لا يوجد إذن للميكروفون. يمكن السماح في إعدادات المتصفّح، أو الكتابة ببساطة.",
   edgeBtn:"افتحوا في Edge",
   edgeNote:"الصوت على هذا الحاسوب بسيط ويبدو آليًّا. في متصفّح Microsoft Edge، المثبّت في كل Windows، يتكلّم باراك بصوت طبيعي — افتحوا الصفحة نفسها هناك.",
-  manNote:"لا يوجد على هذا الجهاز صوت رجاليّ بهذه اللغة، لذلك خُفضت طبقة الصوت. هذا ليس صوتًا رجاليًّا حقيقيًّا.",
+  manNote:"لم يُعثر على صوت رجاليّ لهذه اللغة. إذا بدا الصوت نسائيًّا، ثبّت صوتًا رجاليًّا على الجهاز أو اختره من قائمة الأصوات.",
   simplifyBtn:"باراك — نسخة مبسّطة", simplifyAsk:"أعطني نسخة قصيرة وبسيطة من النصّ الذي لصقته",
   simplifyEmpty:"الصقوا نصًّا أولًا، ثم أطلب من باراك نسخة مبسّطة منه.",
   simplifyCut:"النصّ طويل، لذلك أُرسل أوّله فقط — {n} حرفًا." },
@@ -140,7 +140,7 @@ ru:{ btn:"Барак — помощь учителя", title:"Помощь уч�
   micDeny:"Нет разрешения на микрофон. Разрешите в настройках браузера или просто печатайте.",
   edgeBtn:"Открыть в Edge",
   edgeNote:"Голос на этом компьютере простой и звучит как робот. В браузере Microsoft Edge, который есть в каждом Windows, Барак говорит естественным голосом — откройте эту же страницу там.",
-  manNote:"На этом устройстве нет мужского голоса для этого языка, поэтому тон понижен. Это не настоящий мужской голос.",
+  manNote:"Мужской голос для этого языка не найден. Если голос звучит женским, установите мужской голос на устройстве или выберите его в списке.",
   simplifyBtn:"Барак — простая версия", simplifyAsk:"Дай мне короткую и простую версию вставленного текста",
   simplifyEmpty:"Сначала вставьте текст, и тогда я попрошу у Барака его простую версию.",
   simplifyCut:"Текст длинный, поэтому отправлено только его начало — {n} знаков." },
@@ -161,14 +161,15 @@ en:{ btn:"Barak — ask the teacher", title:"Ask the teacher", close:"Close", se
   micDeny:"No microphone permission. You can allow it in the browser settings, or simply type.",
   edgeBtn:"Open in Edge",
   edgeNote:"The voice on this computer is basic and sounds robotic. In Microsoft Edge, which comes with every Windows, Barak speaks in a natural voice — open this same page there.",
-  manNote:"This device has no male voice for this language, so the pitch is lowered. It is not a real male voice.",
+  manNote:"No male voice was identified for this language. If the voice sounds female, install a male voice on your device or choose one from the voice list.",
   simplifyBtn:"Barak — simple version", simplifyAsk:"Give me a short, simple version of the text I pasted",
   simplifyEmpty:"Paste a text first, and then I will ask Barak for a simple version of it.",
   simplifyCut:"The text is long, so only its beginning was sent — {n} characters." }
 };
 
 var CFG = null, MSGS = [], BUSY = false, NOTE = "", QID = null, LANGAT = null;
-var EL = null, PLAYING = -1;
+var EL = null, PLAYING = -1, PREVIEWING = false, VOICE_STARTED = false;
+var FACE_MOMENT = null, faceTimer = null, requestId = 0;
 /* ההסבר ״אפשר לשאול אותי...״ הוא אוריינטציה חד־פעמית, לא כותרת קבועה.
    draw() נקרא מחדש בכל הודעה ובכל תרגיל חדש (MSGS מתאפס), ובלי הדגל
    הזה הוא היה חוזר בכל פעם — נראה כאילו ברק מציג את עצמו כל פעם
@@ -571,7 +572,7 @@ function startReveal(i){
 }
 
 function stopSay(){
-  PLAYING = -1;
+  PLAYING = -1; PREVIEWING = false; VOICE_STARTED = false;
   stopKeepAlive(); _activeU = null;
   try{ speechSynthesis.cancel() }catch(e){}
   draw();
@@ -583,10 +584,10 @@ function say(i){
   try{ speechSynthesis.cancel() }catch(e){}
   var segs = segments(stripMd(splitSugg(m.text).body)), r = rate(), n = 0;
   if(!segs.length) return;
-  PLAYING = i; draw();
+  PLAYING = i; VOICE_STARTED = false; draw();
   (function next(){
     if(PLAYING !== i || n >= segs.length){
-      if(PLAYING === i){ PLAYING = -1; draw() }
+      if(PLAYING === i){ PLAYING = -1; VOICE_STARTED = false; draw() }
       _activeU = null; maybeStopKeepAlive(); return;
     }
     var s = segs[n++], code = VOICE[s.l] || VOICE.he;
@@ -601,6 +602,7 @@ function speakSeg(text, code, r, alive, done){
   function fin(){
     if(moved) return;
     moved = true;
+    if(alive()){ VOICE_STARTED = false; faceState() }
     if(disarm){ disarm(); disarm = null }
     done();
   }
@@ -629,6 +631,7 @@ function speakSeg(text, code, r, alive, done){
     if(femScore(v) === 0){ u.pitch = TU_FEM_PITCH; _femFallback = true }
     else _femFallback = false;
     _basicVoice = basicVoice(v);
+    u.onstart = function(){ if(alive()){ VOICE_STARTED = true; faceState() } };
     u.onend = fin;
     u.onerror = function(){
       /* 4 · קול רשת ששתק. מכבים את הדגל, ואותו טקסט נאמר שוב פעם
@@ -967,9 +970,28 @@ var CSS = ''
 /* שלושת המצבים שהפאנל באמת יודע עליהם, ותו לא:
    ממתין לשרת → חושב · מקריא → מדבר · אחרת → מקשיב.
    `josh-face.js` הוא שכבת תצוגה; ההחלטה מה נכון היא כאן. */
+function clearFaceMoment(){
+  if(faceTimer){ clearTimeout(faceTimer); faceTimer = null }
+  FACE_MOMENT = null;
+}
+function answerFace(face){
+  clearFaceMoment();
+  /* Speaking belongs to actual TTS, not to a text reply. Other response
+     expressions may be shown briefly, then return to the real activity. */
+  if(face === "encourage" || face === "stuck" || face === "slow" || face === "frustrated" || face === "correct" || face === "wrong"){
+    FACE_MOMENT = face;
+    faceState();
+    faceTimer = setTimeout(function(){ FACE_MOMENT = null; faceTimer = null; faceState() }, 1400);
+  } else faceState();
+}
 function faceState(){
   if(typeof JOSHFACE === "undefined") return;
-  JOSHFACE.emit(BUSY ? "thinking" : PLAYING >= 0 ? "speaking" : "listening");
+  var visible = EL && EL.ov && EL.ov.classList.contains("on");
+  var state = !visible ? "idle" : RECON ? "listening" :
+    VOICE_STARTED && (PLAYING >= 0 || PREVIEWING) ? "speaking" :
+    BUSY ? "thinking" : FACE_MOMENT || "idle";
+  /* Do not restart a short response expression on every draw. */
+  if(JOSHFACE.state().current !== state) JOSHFACE.emit(state);
 }
 
 function build(){
@@ -1070,12 +1092,16 @@ function build(){
     if(e.target.id === "tu-rate"){ setRate(parseFloat(e.target.value)); if(PLAYING>=0) stopSay() }
     else if(e.target.id === "tu-vc"){
       setVoice(VOICE[lang()] || "he-IL", e.target.value);
-      if(PLAYING>=0) stopSay();
+      if(PLAYING>=0 || PREVIEWING) stopSay();
       /* מדגם קצר, כדי שהבחירה תישמע מיד ולא רק בהודעה הבאה. */
       /* `T().mic` הוא **תווית כפתור המיקרופון** — ״דבר״. הלומד
          בחר קול כדי לשמוע אותו, והקול אמר לו ״דבר״: הוראה, לא
          הדגמה. `vSample` היא משפט מדגם אמיתי בארבע השפות. */
-      try{ speakSeg(T().vSample || T().mic, VOICE[lang()] || "he-IL", rate(), function(){return true}, function(){}) }catch(err){}
+      PREVIEWING = true; VOICE_STARTED = false;
+      try{ speakSeg(T().vSample || T().mic, VOICE[lang()] || "he-IL", rate(),
+        function(){ return PREVIEWING },
+        function(){ PREVIEWING = false; VOICE_STARTED = false; faceState() }) }
+      catch(err){ PREVIEWING = false; VOICE_STARTED = false; faceState() }
     }
   });
   return EL;
@@ -1218,14 +1244,15 @@ function ctl(i){
       h += '<option value="' + v + '"' + (v === r ? " selected" : "") + '>' + v + '×</option>';
     });
     h += '</select></label>';
-    /* בורר הקול. מוצג רק כשיש יותר מקול אחד בשפה — במכשיר עם
-       קול יחיד הוא תפריט בן פריט אחד, וזה רעש. */
+    /* Show the voice menu for multiple voices, or for a single known
+     female voice so the fallback and installation guidance are visible. */
     var vl = voicesFor(VOICE[lang()] || "he-IL");
-    if(vl.length > 1){
+    if(vl.length > 1 || (vl.length === 1 && femScore(vl[0]) === 0)){
       var cur = savedVoice(VOICE[lang()] || "he-IL");
       h += '<label class="tu-sys">' + esc(t.voice) + ' '
          + '<select id="tu-vc" aria-label="' + esc(t.voice) + '">'
          + '<option value=""' + (cur ? "" : " selected") + '>' + esc(t.voiceAuto) + '</option>';
+      vl.sort(function(a,b){ return femScore(b) - femScore(a) });
       vl.forEach(function(v){
         h += '<option value="' + esc(v.voiceURI) + '"' + (v.voiceURI === cur ? " selected" : "")
            + '>' + esc(v.name) + '</option>';
@@ -1233,9 +1260,9 @@ function ctl(i){
       h += '</select></label>';
     }
   }
-  /* ההודעה מופיעה **אחרי** אמירה שנפלה לאחור ולא לפניה: לפני
-     ההקראה הראשונה אין לדעת איזה קול המכשיר ייתן לשפה הזאת. */
-  if(_femFallback && i === MSGS.length - 1)
+  /* ההודעה מופיעה כשברשימת הקולות של השפה אין קול גברי שעובד —
+     כבר לפני ההקראה הראשונה, כדי שהלומד ידע מה לבחור או להתקין. */
+  if(i === MSGS.length - 1 && vl.length && !vl.some(function(v){ return voiceUsable(v) && femScore(v) === 2 }))
     h += '<span class="tu-sys tu-man">' + esc(t.manNote) + ' ' + esc(voiceHow()) + '</span>';
   return h + '</div>';
 }
@@ -1304,9 +1331,11 @@ function micState(on){
   var t = T();
   b.setAttribute("aria-pressed", on ? "true" : "false");
   b.textContent = on ? ("● " + t.micOn) : ("● " + t.mic);
+  faceState();
 }
 function micStop(){
-  if(REC){ try{ REC.stop() }catch(e){} }
+  var old = REC; REC = null;
+  if(old){ old.onend = null; old.onerror = null; old.onresult = null; try{ old.stop() }catch(e){} }
   micState(false);
 }
 function wireMic(ov){
@@ -1326,10 +1355,12 @@ function wireMic(ov){
     REC.continuous = false;
     REC.interimResults = false;
     REC.maxAlternatives = 1;
+    var currentRec = REC;
     REC.onresult = function(ev){
+      if(REC !== currentRec) return;
       var txt = "";
       try{ txt = ev.results[0][0].transcript || "" }catch(e){}
-      micState(false);
+      REC = null; micState(false);
       txt = String(txt).trim();
       if(!txt) return;
       /* נכנס לתיבה **ונשלח** — מי שדיבר לא רוצה ללחוץ אחר כך. */
@@ -1337,15 +1368,16 @@ function wireMic(ov){
       send(txt);
     };
     REC.onerror = function(ev){
-      micState(false);
+      if(REC !== currentRec) return;
+      REC = null; micState(false);
       var e = ev && ev.error;
       if(e === "not-allowed" || e === "service-not-allowed") NOTE = T().micDeny;
       else if(e !== "aborted" && e !== "no-speech") NOTE = T().micNo;
       draw();
     };
-    REC.onend = function(){ micState(false) };
+    REC.onend = function(){ if(REC === currentRec){ REC = null; micState(false) } };
     try{ REC.start(); micState(true) }
-    catch(e){ micState(false); NOTE = T().micNo; draw() }
+    catch(e){ REC = null; micState(false); NOTE = T().micNo; draw() }
   };
 }
 
@@ -1391,6 +1423,7 @@ function open(auto){
   if(!auto) focus();
 }
 function close(){
+  requestId++; BUSY = false; clearFaceMoment();
   micStop();
   stopSay(); stopReveal(); NOTE = "";
   if(EL) EL.ov.classList.remove("on");
@@ -1576,7 +1609,9 @@ function send(text, auto){
   stopReveal();
   MSGS.push({ role:"user", text:text });
   if(EL) EL.inp.value = "";
+  clearFaceMoment();
   BUSY = true; NOTE = ""; draw();
+  var thisRequest = ++requestId;
   /* `online` שלילי — לא מנסים את השרת: אין רשת, או שהמונה במכשיר
      נגמר. המונה עולה רק כשהשרת מנוסה. */
   var tryServer = !!API && navigator.onLine !== false && left() > 0;
@@ -1590,13 +1625,15 @@ function send(text, auto){
     online: tryServer,
     why: !API ? "" : navigator.onLine === false ? "offline" : "quota"
   }).then(function(res){
+    if(thisRequest !== requestId) return;
     BUSY = false;
     if(!res || !res.say){ NOTE = t.err; if(auto) MSGS = []; draw(); return }
     /* תשובה מקומית מסומנת ללומד — ראו replyLocal. */
     MSGS.push({ role:"assistant", text:res.say, local: (API && res.source !== "ai") ? (res.why || "local") : "" });
     startReveal(MSGS.length - 1);
-    draw(); focus();
+    draw(); answerFace(res.face); focus();
   }, function(){
+    if(thisRequest !== requestId) return;
     BUSY = false;
     if(!replyLocal(text, "network")){ NOTE = t.err; draw() }
   });
@@ -1759,7 +1796,8 @@ function simplify(doc){
   if(MSGS.length >= TURNS){ NOTE = t.full; draw(); return false }
   stopReveal();
   MSGS.push({ role:"user", text:t.simplifyAsk });
-  BUSY = true; NOTE = "";
+  clearFaceMoment(); BUSY = true; NOTE = "";
+  var thisRequest = ++requestId;
   var max = BARAK.DOC_MAX || 3000;
   if(doc.length > max) NOTE = t.simplifyCut.replace("{n}", String(max));
   draw();
@@ -1771,12 +1809,14 @@ function simplify(doc){
     online: tryServer,
     why: !API ? "" : navigator.onLine === false ? "offline" : "quota"
   }).then(function(res){
+    if(thisRequest !== requestId) return;
     BUSY = false;
     if(!res || !res.say){ NOTE = t.err; draw(); return }
     MSGS.push({ role:"assistant", text:res.say, local: (API && res.source !== "ai") ? (res.why || "local") : "" });
     startReveal(MSGS.length - 1);
-    draw(); focus();
+    draw(); answerFace(res.face); focus();
   }, function(){
+    if(thisRequest !== requestId) return;
     BUSY = false; NOTE = t.err; draw();
   });
   return true;
