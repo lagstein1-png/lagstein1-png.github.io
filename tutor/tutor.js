@@ -922,8 +922,9 @@ function build(){
      לגבי ״ג׳וש כבוי״.
      --------------------------------------------------------------- */
   if(typeof JOSHFACE !== "undefined"){
-    /* לימור מצוירת עד שתמונה מאושרת ומכוילת תחליף אותה. */
-    JOSHFACE.photo("");
+    /* הדיוקן המאושר של לימור; אותם סימוני עיניים ופה בכל האפליקציות. */
+    JOSHFACE.photo("/img/limor.jpg", {ax:"47%",ay:"27.5%",bx:"64%",by:"29.2%",
+      jx:"54.5%",jy:"42%",jo:"37%",jw:"17%",jh:"5.5%"});
     JOSHFACE.look("human");
     var fw = ov.querySelector("#tu-face");
     if(fw){ fw.innerHTML = JOSHFACE.markup(68); JOSHFACE.attach() }

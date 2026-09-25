@@ -26,7 +26,7 @@ const PRE = [
   "./speech.js", "./data/exams.js", "./manifest.json",
   "./img/icon-192.png", "./img/icon-512.png", "./img/icon-maskable-512.png",
   "./img/apple-touch-icon.png", "./vendor/katex/katex.min.css", "./vendor/katex/katex.min.js",
-  "/img/josh.jpg",
+  "/img/limor.jpg","/img/josh.jpg",
   "/tutor/he-speech.js","/speech/recorded.js","/tutor/josh-face.js",
   "/tutor/josh-local.js","/tutor/tutor.js","/tutor/barak-core.js",
   "/legal/terms.js", "/legal/protect.js",

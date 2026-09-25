@@ -13,7 +13,7 @@ const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "english-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
-             "/img/josh.jpg",
+             "/img/limor.jpg","/img/josh.jpg",
              "/tutor/he-speech.js","/speech/recorded.js","/tutor/josh-face.js",
              "/tutor/josh-state.js",
              "/tutor/josh-local.js","/tutor/tutor.js","/tutor/barak-core.js",
