@@ -86,7 +86,7 @@ function t(name, got, want) {
     Array.from({ length: 30 }, (_, i) => 'S' + i + '.').join(' '), 'ru');
   t('רוסית, שארית 22 — צורת 2–4 ולא רבים',
     !!sr && /22 предложения/.test(sr.text), true);
-  t('ואומר שזה חילוק ולא קיצור', !!s && /לא יכול לקצר/.test(s.text), true);
+  t('ואומר שזה חילוק ולא קיצור', !!s && /לא יכולה לקצר/.test(s.text), true);
   for (const lg of ['ar', 'ru', 'en']) {
     const o = win.JOSHLOCAL.simplify('A. B.', lg);
     t('המוח המקומי ב-' + lg + ' — כותרת בשפה ושורות', !!o && o.text.indexOf('- A.') > 0 && !/לא יכול/.test(o.text), true);

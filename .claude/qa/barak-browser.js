@@ -1,5 +1,5 @@
 /* =====================================================================
-   barak-browser.js — מנוע ברק בדפדפן אמיתי, מול שרת מדומה
+   barak-browser.js — מנוע לימור בדפדפן אמיתי, מול שרת מדומה
 
    לכל אפליקציה: פותחים את הדף (שער התנאים, אונבורדינג), מיירטים את
    הכתובת של ה-Worker ב-`page.route` ועונים תשובות מתוסרטות — כלומר
@@ -88,7 +88,7 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
     await page.goto(BASE + '/' + app + '/' + qs, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(700);
     /* בדפדפן ללא קולות האפליקציה מציגה פס ״אין קול״ שתופס לחיצות — הוא
-       עניין של המכשיר, לא של ברק. */
+       עניין של המכשיר, לא של לימור. */
     await page.addStyleTag({ content: '#tts-fail{display:none !important}' });
     await click(page, '#lg-ok');
     for (let i = 0; i < 8; i++) {
@@ -232,6 +232,6 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
     await ctx.close();
   }
   await b.close();
-  console.log(failed ? `✗ barak-browser — ${failed} אפליקציות נכשלו` : '✓ מנוע ברק בדפדפן — כל האפליקציות שנבדקו');
+  console.log(failed ? `✗ barak-browser — ${failed} אפליקציות נכשלו` : '✓ מנוע לימור בדפדפן — כל האפליקציות שנבדקו');
   process.exit(failed ? 1 : 0);
 })().catch(e => { console.error('✗ barak-browser נפל: ' + (e && e.stack || e)); process.exit(1) });

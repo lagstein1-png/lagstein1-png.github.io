@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x96 · 2026-09-25";
+  var BUILD = "x97 · 2026-09-25";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -985,11 +985,11 @@
       },
       stopHost: function () { try { window.Speech.stop() } catch (e) {} }
     });
-    /* ---- מנוע ברק — המתאם של האפליקציה (16.9.2026) ----
+    /* ---- מנוע לימור — המתאם של האפליקציה (16.9.2026) ----
        בתרגול כל סעיפי הנושא מוצגים יחד, ולכן ״הסעיף שעל המסך״ הוא
        TUT_ID — הסעיף שהלומד פתח עליו את המורה — ובלעדיו הסעיף
        הראשון של הנושא. next_question מזיז את TUT_ID, ולכן q() של
-       הפאנל וההקשר של ברק מדברים על אותו סעיף.
+       הפאנל וההקשר של לימור מדברים על אותו סעיף.
        בסימולציה אין הקשר ואין פעולות: שם אין רמזים ואין פתרונות,
        וההקשר נושא את התשובה הנכונה. אין דף נוסחאות באפליקציה,
        ולכן אין formula_sheet. */
@@ -1334,7 +1334,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x96-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x97-pwa2").catch(function () {});
     });
   }
 
