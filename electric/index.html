@@ -983,7 +983,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="e6 · 2026-09-25";
+var BUILD="e7 · 2026-09-25";
 var KEY="electric-state-v1";
 
 function blankState(){
@@ -2369,7 +2369,7 @@ function genAC(L){
   if(L===3){
     if(Math.random()<0.5){
       Lm=pick([10,20,50,100,200]);f=pick([50,100,1000]);x=2*Math.PI*f*Lm/1000;
-      return {ask:_("מהי ההיגב (הריאקטנס) של הסליל?"),expr:"L = "+U(Lm,"mH")+" ,  f = "+U(f,"Hz"),
+      return {ask:_("מהו ההיגב (הריאקטנס) של הסליל?"),expr:"L = "+U(Lm,"mH")+" ,  f = "+U(f,"Hz"),
         ans:W(U(x,"Ω")),
         wrong:[W(U(f*Lm/1000,"Ω"),_("שכחתם את 2π. ההיגב של סליל הוא 2π כפול התדר כפול ההשראות.")),
                W(U(x*1000,"Ω"),_("לא המרתם מילי־הנרי להנרי. צריך לחלק ב-1000 לפני שמציבים.")),
@@ -2379,7 +2379,7 @@ function genAC(L){
         rule:"xl",hint:_("X<sub>L</sub> = 2π · f · L, וההשראות בהנרי.")};
     }
     C=pick([10,47,100]);f=pick([50,1000]);x=1e6/(2*Math.PI*f*C);
-    return {ask:_("מהי ההיגב (הריאקטנס) של הקבל?"),expr:"C = "+U(C,"µF")+" ,  f = "+U(f,"Hz"),
+    return {ask:_("מהו ההיגב (הריאקטנס) של הקבל?"),expr:"C = "+U(C,"µF")+" ,  f = "+U(f,"Hz"),
       ans:W(U(x,"Ω")),
       wrong:[W(U(1e6/(f*C),"Ω"),_("שכחתם את 2π במכנה.")),
              W(U(1e6/(Math.PI*f*C),"Ω"),_("בנוסחה יש 2π, ולא π.")),
@@ -2572,25 +2572,25 @@ function genLoad(L){
   if(L===2){
     do{P=ri(8,70)*100;x=P/230;for(i=0;i<BREAKERS.length&&BREAKERS[i]<x;i++);}while(i<1||i>BREAKERS.length-3||BREAKERS[i]-x<0.3);
     b=BREAKERS[i];
-    return {ask:_("העומס כולו התנגדותי, ומחובר למעגל אחד של 230 V. איזה מפסק זרם מתאים?"),
+    return {ask:_("העומס כולו התנגדותי ומחובר למעגל 230 V. בהנחה שהכבל ותנאי ההתקנה מתאימים, מהו דירוג הזרם התקני הקטן ביותר שאינו קטן מזרם העומס?"),
       expr:"P = "+U(P,"W"),
       ans:W(U(b,"A")),
       wrong:[W(U(BREAKERS[i-1],"A"),_f("המפסק קטן מזרם העומס, {0}, ולכן ינתק גם בלי תקלה.",U(x,"A"))),
-             W(U(BREAKERS[i+1],"A"),_("גם הוא גדול מהזרם, אבל בוחרים את הקטן שמעל זרם העומס, כדי להגן על הכבל.")),
-             W(U(BREAKERS[i+2],"A"),_("מפסק גדול מדי לא ינתק בזמן, והכבל עלול להתחמם."))],
+             W(U(BREAKERS[i+1],"A"),_("גם הוא גדול מזרם העומס, אך בשאלה מבקשים את הדירוג התקני הקטן ביותר. התאמת המפסק להגנת הכבל מחייבת לדעת גם את כושר נשיאת הזרם של הכבל.")),
+             W(U(BREAKERS[i+2],"A"),_("זה דירוג גבוה יותר מהדירוג המינימלי המבוקש. בלי נתוני הכבל וההתקנה אי אפשר לקבוע שהוא מתאים להגנה על הכבל."))],
       steps:[S(_("זרם העומס"),"","I = "+P+" ÷ 230 = "+U(x,"A")),
-             S(_("בחירה"),_("בוחרים את הערך התקני הקטן ביותר שאינו קטן מזרם העומס. הכבל חייב להתאים למפסק."),"I<sub>B</sub> ≤ I<sub>n</sub>"),
+             S(_("בחירה"),_("לצורך התרגיל בוחרים את הדירוג התקני הקטן ביותר שאינו קטן מזרם העומס. בבחירה בפועל בודקים גם את כושר נשיאת הזרם של הכבל ותנאי ההתקנה."),"I<sub>B</sub> ≤ I<sub>n</sub>"),
              S(_("התוצאה"),"",U(b,"A"))],
       rule:"breaker",hint:_("קודם זרם העומס, ואז הערך התקני הקרוב שמעליו: 6, 10, 16, 20, 25, 32, 40 A.")};
   }
   if(L===3){
     P=pick([5,7.5,11,15,22,30]);cf=pick([0.8,0.85,0.9]);x=P*1000/(SQ3*400*cf);
-    return {ask:_("מה הזרם בכל פאזה של מנוע תלת־פאזי?"),expr:"P = "+U(P,"kW")+" ,  V = 400 V ,  cos φ = "+num(cf),
+    return {ask:_("מנוע תלת־פאזי צורך מהרשת הספק חשמלי P. מה הזרם בכל פאזה?"),expr:"P = "+U(P,"kW")+" ,  V = 400 V ,  cos φ = "+num(cf),
       ans:W(U(x,"A")),
       wrong:[W(U(P*1000/(400*cf),"A"),_("שכחתם את \u200E√3. בתלת־פאזי מחלקים ב-\u200E√3 כפול המתח בין הפאזות.")),
              W(U(P*1000/(SQ3*230*cf),"A"),_("בנוסחה עם \u200E√3 משתמשים במתח בין הפאזות, 400 V.")),
              W(U(P*1000/(SQ3*400),"A"),_("שכחתם את מקדם ההספק. כשהוא קטן מ-1, הזרם גדל."))],
-      steps:[S(_("הספק תלת־פאזי"),"","P = \u200E√3 · V · I · cos φ"),
+      steps:[S(_("הספק חשמלי נכנס בתלת־פאזי"),"","P = \u200E√3 · V · I · cos φ"),
              S(_("מבודדים את I"),"","I = P ÷ (\u200E√3 · V · cos φ)"),
              S(_("מציבים"),"","I = "+(P*1000)+" ÷ (\u200E√3 · 400 · "+num(cf)+") = "+U(x,"A"))],
       rule:"load3",hint:_("I = P ÷ (\u200E√3 · V · cos φ).")};
@@ -2603,7 +2603,7 @@ function genLoad(L){
     wrong:[W(r1(400*I/1000),_("חסר \u200E√3. בתלת־פאזי מכפילים ב-\u200E√3.")),
            W(r1(SQ3*400*I*0.8/1000),_("הכפלתם במקדם הספק 0.8, אבל בשאלה הוא 1.")),
            W(r1(230*I/1000),_("זה ההספק של פאזה אחת בלבד."))],
-    steps:[S(_("הספק תלת־פאזי"),"","P = \u200E√3 · V · I · cos φ"),
+    steps:[S(_("הספק חשמלי נכנס בתלת־פאזי"),"","P = \u200E√3 · V · I · cos φ"),
            S(_("מציבים"),"","P = \u200E√3 · 400 · "+I+" · 1 ≈ "+r1(x))],
     rule:"load3",hint:_("P = \u200E√3 · V · I · cos φ.")};
 }
@@ -2719,12 +2719,12 @@ function genSafety(L){
       rule:"rcd",hint:_("מה ממסר פחת בעצם משווה?")};
   }
   return {ask:_("למה מחברים את הגוף המתכתי של מכשיר להארקה?"),expr:"",
-    ans:W(_("כדי שזרם תקלה יזרום לאדמה וינתק")),
-    wrong:[W(_("כדי להוריד את הצריכה של המכשיר"),_("הארקה אינה משנה את הצריכה. היא מסלול לזרם בזמן תקלה.")),
+    ans:W(_("כדי לספק מסלול לזרם תקלה ולאפשר להגנה לנתק")),
+    wrong:[W(_("כדי להוריד את הצריכה של המכשיר"),_("הארקת הגנה אינה מיועדת להפחית צריכת חשמל; מוליך ההגנה מספק מסלול תקלה.")),
            W(_("כדי לשפר את מקדם ההספק של המכשיר"),_("מקדם הספק משפרים בקבלים. הארקה נועדה לבטיחות.")),
            W(_("כדי שהמכשיר יוכל לעבוד על 400 V"),_("הארקה אינה משנה את מתח העבודה."))],
     steps:[S(_("תקלה"),_("פאזה נוגעת בגוף המתכתי."),""),
-           S(_("הארקה"),_("הזרם זורם לאדמה במקום דרך אדם, וההגנה מנתקת."),"")],
+           S(_("הארקה"),_("מוליך ההגנה מספק לזרם התקלה מסלול. אמצעי ההגנה המתאים צריך לנתק את המעגל בתנאים שנקבעו."),"")],
     rule:"rcd",hint:_("מה קורה כשפאזה נוגעת בגוף של מכשיר?")};
 }
 
@@ -2973,9 +2973,9 @@ var FORMULAS=[
   {id:"contacts",g:"switch",t:"מגעים ולוגיקה",m:"מגעים בטור = AND   ·   מגעים במקביל = OR   ·   מגע סגור במצב רגיל = NOT",n:"כך נבנית לוגיקה בממסרים, וכך היא מצוירת בשפת סולם בבקר."},
   {id:"demorgan",g:"switch",t:"כללי דה־מורגן",m:"NOT (A AND B) = NOT A OR NOT B   ·   NOT (A OR B) = NOT A AND NOT B",n:"מתהפכות גם הכניסות וגם השער."},
   {id:"bin",g:"switch",t:"בסיס 2",m:"ערכי המקום: 1 , 2 , 4 , 8 , 16 , 32 , 64 , 128",n:"n כניסות נותנות 2 בחזקת n צירופים."},
-  {id:"load1",g:"inst",t:"זרם חד־פאזי",m:"I = P ÷ V ,  V = 230 V",n:"לעומס התנגדותי. במנוע מחלקים גם במקדם ההספק."},
-  {id:"load3",g:"inst",t:"זרם והספק תלת־פאזי",m:"P = \u200E√3 · V · I · cos φ ,  V = 400 V",n:"V הוא המתח בין הפאזות. \u200E√3 ≈ 1.73."},
-  {id:"breaker",g:"inst",t:"בחירת מפסק",m:"I<sub>B</sub> ≤ I<sub>n</sub>",n:"המפסק לא קטן מזרם העומס, והכבל חייב לשאת את זרם המפסק. ערכים: 6, 10, 16, 20, 25, 32, 40, 50, 63, 80 A."},
+  {id:"load1",g:"inst",t:"זרם חד־פאזי",m:"I = P ÷ V ,  V = 230 V",n:"לעומס התנגדותי. במנוע יש להתחשב במקדם ההספק; אם נתון הספק מכני ביציאה, גם בנצילות."},
+  {id:"load3",g:"inst",t:"זרם והספק תלת־פאזי",m:"P = \u200E√3 · V · I · cos φ ,  V = 400 V",n:"V הוא המתח בין הפאזות. \u200E√3 ≈ 1.73. P הוא ההספק החשמלי הנצרך מהרשת; אם נתון הספק מכני ביציאה, צריך להתחשב גם בנצילות המנוע."},
+  {id:"breaker",g:"inst",t:"בחירת מפסק",m:"I<sub>B</sub> ≤ I<sub>n</sub> ≤ I<sub>Z</sub>",n:"I<sub>B</sub> הוא זרם העומס, I<sub>n</sub> דירוג המפסק, ו-I<sub>Z</sub> כושר נשיאת הזרם המותר לכבל. נדרשות גם בדיקות הגנה נוספות. ערכים: 6, 10, 16, 20, 25, 32, 40, 50, 63, 80 A."},
   {id:"rho",g:"inst",t:"התנגדות מוליך",m:"R = ρ · L ÷ A ,  ρ<sub>נחושת</sub> = 0.0175 Ω·mm²/m",n:"אורך במטרים, שטח חתך בממ״ר."},
   {id:"vdrop",g:"inst",t:"מפל מתח חד־פאזי",m:"ΔV = 2 · I · ρ · L ÷ A   ·   ΔV% = ΔV ÷ 230 · 100",n:"כופלים ב-2 כי הזרם עובר בפאזה ובאפס."},
   {id:"body",g:"inst",t:"זרם דרך הגוף",m:"I = V ÷ R",n:"גם עשרות מיליאמפר מסוכנים."},
@@ -3446,7 +3446,7 @@ function viewFormulas(){
   h+='<h1 class="h1">'+_('דף נוסחאות')+'</h1>'+
      '<p class="sub">'+_('להשתמש בדף נוסחאות זו לא רמאות. מי שלא מבזבז זיכרון עבודה על שינון, פנוי לחשוב על השאלה עצמה.')+'</p>';
   h+='<div class="row" style="margin-top:14px">'+
-     _('<input class="field" style="flex:1;min-width:min(100%,220px)" placeholder="חיפוש נוסחה — למשל: נגזרת, דטרמיננטה, בייס" value="')+esc(fq)+'" data-bind="fq" />'+
+     _('<input class="field" style="flex:1;min-width:min(100%,220px)" placeholder="חיפוש נוסחה — למשל: חוק אוהם, מפל מתח, נצילות" value="')+esc(fq)+'" data-bind="fq" />'+
      (q?'<button class="btn btn-g" data-a="fclear">'+ic("x",16)+'</button>':"")+'</div>';
   if(!list.length)h+=_f("{0}{1}״.</p>", '<p class="sub" style="margin-top:20px">'+_('לא נמצאה נוסחה עם ״'), esc(q));
   /* לפי רשימת התחומים של האפליקציה, ולא לפי רשימה קבועה —
@@ -3894,10 +3894,10 @@ var EB={title:"",n:10,mins:0,level:2,topics:[],phone:"",tts:true,formulas:true,b
    כמו שהוא, וכל אחת מהן מתרגמת בדרך אחרת. כך ההעתקה נשארת
    העתקה, ותלמיד שלומד בערבית או ברוסית לא מקבל מבחן בעברית.
    ------------------------------------------------------------ */
-var XK={"exam":"מבחן","student":"תלמיד","qs":"שאלות","minutes":"דקות","none":"ללא","outOf":"מתוך","exTitle":"מבחן כיתתי","exLead":"בונים מבחן, שולחים קישור בוואטסאפ, ומקבלים בחזרה קוד תשובות לכל תלמיד. אין שרת ואין חשבון — הכול עובר דרך הקישור ודרך וואטסאפ.","exName":"שם המבחן","exNamePh":"למשל: מבחן אלגברה — כיתה ט׳2","exUnits":"יחידות","exUnitSuf":"יח״ל","exLevel":"רמה","exCount":"מספר שאלות","exTime":"הגבלת זמן","exTimeNote":"אפס פירושו בלי טיימר. בתום הזמן המבחן מוגש מעצמו.","exTopics":"נושאים","exTopicsNote":"השאלות מתחלקות שווה בשווה בין הנושאים שנבחרו.","exAcc":"התאמות לנבחנים","exAccNote":"מה שמותר בבחינה עצמה. ההקראה ודף הנוסחאות אינם רמז — הם כלי נגישות.","exTts":"הקראה קולית","exTtsSub":"כל שאלה נקראת בקול לפי בקשה","exForm":"דף נוסחאות","exFormSub":"נגיש מתוך המבחן, כמו בבגרות","exPhone":"מספר הוואטסאפ שלכם (לא חובה)","exPhoneNote":"אם תמלאו — כפתור השליחה אצל התלמיד ייפתח ישר לצ׳אט איתכם. שימו לב: המספר יופיע בתוך הקישור שאתם משתפים.","exBuild":"צרו את המבחן","exShareMsg":"{0} שאלות. נכנסים לקישור, פותרים, ובסוף שולחים לי את הקוד.","exReady":"המבחן מוכן","exWa":"שליחה בוואטסאפ","exCopyUrl":"העתקת הקישור","exToMarks":"לציונים","exUrlCopied":"הקישור הועתק","mkTitle":"ציונים","mkLead":"לוחצים על הקישור שהתלמיד שלח בוואטסאפ, או מדביקים כאן את הקוד. הציון מחושב מחדש מהתשובות עצמן, ולא נלקח ממה שהתלמיד כתב.","mkNew":"מבחן חדש","mkEmpty":"עוד לא יצרתם מבחן. אפשר להתחיל מ״מבחן חדש״.","mkSubs":"הגשות","mkAvg":"ממוצע","mkPaste":"הדבקת קוד תשובות","mkPastePh":"מדביקים כאן את הקוד מהוואטסאפ","mkTake":"קליטה","mkResend":"שליחה שוב","mkCopyTbl":"העתקת טבלה","mkDelQ":"למחוק את המבחן ואת {0} ההגשות?","mkDelYes":"כן, למחוק","mkCancel":"ביטול","mkDel":"מחיקת המבחן","mkByStudent":"לפי תלמיד","mkNoName":"ללא שם","mkFell":"נפל ב:","mkAllOk":"הכול נכון","mkBadCode":"הקוד לא תואם לעצמו","mkByTopic":"לפי נושא — מה כדאי ללמד שוב","mkByTopicNote":"אחוז ההצלחה של כל הכיתה יחד.","mkRight":"תשובות נכונות מתוך","mkTblHead":"תלמיד\tציון\tנכונות\tנפל ב","mkTblCopied":"הטבלה הועתקה","mkErrRead":"לא הצלחנו לקרוא את הקוד. נסו להעתיק אותו שוב, במלואו.","mkErrOther":"הקוד הזה שייך למבחן „{0}”.","mkErrUnknown":"הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה.","mkErrCount":"מספר התשובות בקוד אינו תואם למבחן.","mkTaken":"נקלט","mkNoteBad":"שימו לב: הקוד לא תואם לעצמו","stNoTime":"בלי הגבלת זמן.","stTimed":"יש הגבלת זמן: {0} דקות. בסופן המבחן מוגש מעצמו.","stNoTimer":"אין טיימר. אפשר לקחת את הזמן.","stNoNeg":"אין ניקוד שלילי — תשובה לא נכונה לא גורעת.","stReadOn":"אפשר לבקש הקראה של כל שאלה.","stReadOff":"ההקראה כבויה במבחן הזה.","stFormOn":"דף הנוסחאות פתוח לאורך כל המבחן.","stFormOff":"דף הנוסחאות סגור במבחן הזה.","stCodeEnd":"בסוף תקבלו קוד — שולחים אותו למורה בוואטסאפ.","stYourName":"השם שלכם","stNameNote":"כדי שהמורה יידע מי ענה. השם לא נשלח לשום שרת — הוא נכנס לתוך הקוד.","stNamePh":"שם פרטי ושם משפחה","stStart":"מתחילים","stQn":"שאלה {0} מתוך {1}","stRead":"הקראה","stFormulas":"דף נוסחאות","stPrev":"קודמת","stDunno":"לא יודע/ת","stFlagged":"✓ מסומנת לחזרה","stFlag":"לחזור אליה","stNext":"הבאה","stReview":"לפני ההגשה","stReviewNote":"אפשר לחזור לכל שאלה ולשנות. אחרי ההגשה נוצר הקוד.","stUnanswered":"{0} שאלות בלי תשובה","stAllAnswered":"כל השאלות נענו","stPicked":"סימנתם:","stNotYet":"עוד לא עניתם","stChange":"שינוי","stFill":"למלא","stDone":"סיימתי — ליצירת הקוד","stFinished":"סיימתם","stScoreLine":"{0} נכונות מתוך {1}","stSendNow":"עכשיו שולחים את הקוד למורה.","stSendNote":"הקוד מכיל את השם ואת התשובות שסימנתם — המורה מחשב את הציון אצלו מחדש.","stToTeacher":"למורה","stCopyCode":"העתקת הקוד","stCodeCopied":"הקוד הועתק","stWhatRight":"מה היה נכון","stWhatRightNote":"בשביל ללמוד מזה, לא בשביל הציון.","stOk":"נכון","stCorrect":"התשובה הנכונה:","stToApp":"לאפליקציה עצמה — לתרגול חופשי","stGrade":"ציון:","stCode":"קוד:","stLinkNote":"לקליטת התוצאה אצל המורה — לוחצים על הקישור:","badLink":"המבחן לא נפתח","toApp":"לאפליקציה","exOld":"המבחן הזה נוצר בגרסה קודמת של האפליקציה, ולכן השאלות בו כבר לא זהות. בקשו מהמורה לשלוח מבחן חדש.","exBroken":"אולי המבחן שייך לאפליקציה אחרת, ואולי הקישור נקטע בדרך. בקשו מהמורה לשלוח את הקישור שוב, ופתחו אותו ישר מההודעה.","stBackTo":"חזרה למבחן — שאלה {0} מתוך {1}","mkCsv":"הורדת CSV","mkCsvName":"שם","mkCsvPct":"ציון","mkCsvOk":"נכונות","mkCsvTotal":"שאלות","mkCsvDate":"תאריך","mkCsvValid":"קוד תקין","mkCsvQ":"שאלה {0}","mkCsvYes":"כן","mkCsvNo":"לא","mkCsvDone":"הקובץ ירד","teTitle":"קוד מורה","teSet":"בחירת קוד מורה","teEnter":"מסכי המורה נעולים. הקלידו את הקוד כדי לפתוח אותם.","teLead":"בונה המבחן ומסך הציונים ייעלמו מהתפריט, וייפתחו רק עם הקוד הזה.","teWarn":"זו אינה אבטחה. היא עוצרת יד סקרנית, לא מישהו שמבין במחשבים.","tePin":"קוד — 4 עד 8 ספרות","teAgain":"שוב, לוודא","teRemember":"לזכור במכשיר הזה","teRememberNote":"בלי זה הקוד יידרש שוב בכל פתיחה של האפליקציה. על טאבלט כיתתי — עדיף בלי.","teOk":"אישור","teCancel":"ביטול","teBad":"הקוד שגוי.","teMismatch":"שני הקודים אינם זהים.","teShort":"צריך בין 4 ל-8 ספרות, בלי אותיות.","teWaitN":"יותר מדי ניסיונות. נסו שוב בעוד {0} שניות.","teForgot":"שכחתי את הקוד","teForgotHow":"אין דרך לשחזר קוד — הוא לא נשמר בשום מקום. מחיקת נתוני האתר בדפדפן מסירה אותו, ואיתם גם ההתקדמות והמבחנים.","teHideT":"להסתיר את מסכי המורה","teHideNote":"על מכשיר שהילד משתמש בו, בונה המבחן ומסך הציונים יכולים לשבת מאחורי קוד. לפתיחה מאוחר יותר: להוסיף ?teacher=1 לכתובת.","teHideBtn":"בחירת קוד","teOpenNow":"מצב מורה פתוח","teLockBtn":"יציאה ממצב מורה","teChangeBtn":"שינוי הקוד","teRemoveBtn":"ביטול הקוד","teLocked":"מסכי המורה נעולים במכשיר הזה.","teUnlock":"פתיחה","stParent":"שליחה להורה","stParentMsg":"{0} סיים/ה את המבחן ״{1}״: {2} נכונות מתוך {3}, ציון {4}."};
-var XT={ar:{"exam":"امتحان","student":"طالب","qs":"أسئلة","minutes":"دقيقة","none":"بلا","outOf":"من أصل","exTitle":"امتحان صفّي","exLead":"تُعِدّ الامتحان، ترسل رابطًا في واتساب، وتستلم من كلّ طالب رمز إجابات. لا خادم ولا حساب — كلّ شيء يمرّ عبر الرابط وواتساب.","exName":"اسم الامتحان","exNamePh":"مثلًا: امتحان جبر — الصف التاسع/2","exUnits":"وحدات","exUnitSuf":"وحدات","exLevel":"المستوى","exCount":"عدد الأسئلة","exTime":"تحديد الوقت","exTimeNote":"صفر يعني بلا مؤقّت. عند انتهاء الوقت يُسلَّم الامتحان تلقائيًا.","exTopics":"المواضيع","exTopicsNote":"تُوزَّع الأسئلة بالتساوي بين المواضيع المختارة.","exAcc":"تسهيلات للممتحَنين","exAccNote":"ما هو مسموح في الامتحان نفسه. القراءة الصوتية وورقة القوانين ليستا تلميحًا — بل وسيلتا إتاحة.","exTts":"قراءة صوتية","exTtsSub":"كل سؤال يُقرأ بصوت عند الطلب","exForm":"ورقة قوانين","exFormSub":"متاحة داخل الامتحان، كما في البجروت","exPhone":"رقم واتساب الخاص بك (اختياري)","exPhoneNote":"إذا عبّأته — يفتح زرّ الإرسال عند الطالب محادثة معك مباشرة. انتبه: الرقم يظهر داخل الرابط الذي تشاركه.","exBuild":"أنشئ الامتحان","exShareMsg":"{0} أسئلة. ادخل إلى الرابط، حُلّ، وفي النهاية أرسل لي الرمز.","exReady":"الامتحان جاهز","exWa":"إرسال في واتساب","exCopyUrl":"نسخ الرابط","exToMarks":"إلى العلامات","exUrlCopied":"نُسخ الرابط","mkTitle":"العلامات","mkLead":"اضغط على الرابط الذي أرسله الطالب في واتساب، أو الصق هنا الرمز. تُحتسب العلامة من جديد من الإجابات نفسها، لا مما كتبه الطالب.","mkNew":"امتحان جديد","mkEmpty":"لم تُنشئ امتحانًا بعد. ابدأ من «امتحان جديد».","mkSubs":"تسليمات","mkAvg":"المعدّل","mkPaste":"لصق رمز الإجابات","mkPastePh":"الصق هنا الرمز من واتساب","mkTake":"استلام","mkResend":"إرسال مرّة أخرى","mkCopyTbl":"نسخ الجدول","mkDelQ":"حذف الامتحان و{0} من التسليمات؟","mkDelYes":"نعم، احذف","mkCancel":"إلغاء","mkDel":"حذف الامتحان","mkByStudent":"حسب الطالب","mkNoName":"بلا اسم","mkFell":"أخفق في:","mkAllOk":"كل الإجابات صحيحة","mkBadCode":"الرمز غير متطابق مع نفسه","mkByTopic":"حسب الموضوع — ما يستحقّ إعادة التدريس","mkByTopicNote":"نسبة نجاح الصفّ كلّه معًا.","mkRight":"إجابات صحيحة من أصل","mkTblHead":"الطالب\tالعلامة\tالصحيحة\tأخفق في","mkTblCopied":"نُسخ الجدول","mkErrRead":"تعذّرت قراءة الرمز. حاول نسخه من جديد، كاملًا.","mkErrOther":"هذا الرمز يعود لامتحان «{0}».","mkErrUnknown":"هذا الرمز يعود لامتحان آخر غير موجود على هذا الجهاز.","mkErrCount":"عدد الإجابات في الرمز لا يطابق الامتحان.","mkTaken":"استُلم","mkNoteBad":"انتبه: الرمز غير متطابق مع نفسه","stNoTime":"بلا تحديد وقت.","stTimed":"هناك تحديد للوقت: {0} دقيقة. عند انتهائها يُسلَّم الامتحان تلقائيًا.","stNoTimer":"لا مؤقّت. خذ وقتك.","stNoNeg":"لا علامات سالبة — الإجابة الخاطئة لا تخصم.","stReadOn":"يمكنك طلب قراءة أي سؤال بصوت.","stReadOff":"القراءة الصوتية مغلقة في هذا الامتحان.","stFormOn":"ورقة القوانين مفتوحة طوال الامتحان.","stFormOff":"ورقة القوانين مغلقة في هذا الامتحان.","stCodeEnd":"في النهاية تحصل على رمز — أرسله للمعلّم في واتساب.","stYourName":"اسمك","stNameNote":"كي يعرف المعلّم من أجاب. الاسم لا يُرسل إلى أي خادم — يدخل داخل الرمز.","stNamePh":"الاسم الشخصي واسم العائلة","stStart":"لنبدأ","stQn":"سؤال {0} من أصل {1}","stRead":"قراءة","stFormulas":"ورقة قوانين","stPrev":"السابق","stDunno":"لا أعرف","stFlagged":"✓ مُعلَّم للعودة","stFlag":"للعودة إليه","stNext":"التالي","stReview":"قبل التسليم","stReviewNote":"يمكنك العودة إلى أي سؤال وتغييره. بعد التسليم يُنشأ الرمز.","stUnanswered":"{0} أسئلة بلا إجابة","stAllAnswered":"أُجيبت كل الأسئلة","stPicked":"اخترت:","stNotYet":"لم تُجب بعد","stChange":"تغيير","stFill":"للتعبئة","stDone":"أنهيت — أنشئ الرمز","stFinished":"أنهيت","stScoreLine":"{0} صحيحة من أصل {1}","stSendNow":"الآن أرسل الرمز إلى المعلّم.","stSendNote":"الرمز يحوي الاسم والإجابات التي اخترتها — والمعلّم يحتسب العلامة عنده من جديد.","stToTeacher":"إلى المعلّم","stCopyCode":"نسخ الرمز","stCodeCopied":"نُسخ الرمز","stWhatRight":"ما كان صحيحًا","stWhatRightNote":"للتعلّم منه، لا من أجل العلامة.","stOk":"صحيح","stCorrect":"الإجابة الصحيحة:","stToApp":"إلى التطبيق نفسه — للتدرّب الحرّ","stGrade":"العلامة:","stCode":"الرمز:","stLinkNote":"لاستلام النتيجة عند المعلّم — اضغط على الرابط:","badLink":"تعذّر فتح الامتحان","toApp":"إلى التطبيق","exOld":"أُنشئ هذا الامتحان بنسخة سابقة من التطبيق، ولذلك لم تعد أسئلته مطابقة. اطلب من المعلّم إرسال امتحان جديد.","exBroken":"ربما يعود الامتحان إلى تطبيق آخر، وربما انقطع الرابط في الطريق. اطلب من المعلّم إرسال الرابط من جديد، وافتحه مباشرة من الرسالة.","stBackTo":"العودة إلى الامتحان — سؤال {0} من أصل {1}","mkCsv":"تنزيل CSV","mkCsvName":"الاسم","mkCsvPct":"العلامة","mkCsvOk":"الصحيحة","mkCsvTotal":"الأسئلة","mkCsvDate":"التاريخ","mkCsvValid":"الرمز سليم","mkCsvQ":"سؤال {0}","mkCsvYes":"نعم","mkCsvNo":"لا","mkCsvDone":"نُزّل الملف","teTitle":"رمز المعلّم","teSet":"اختيار رمز المعلّم","teEnter":"شاشات المعلّم مقفلة. أدخلوا الرمز لفتحها.","teLead":"سيختفي بانِي الامتحان وشاشة العلامات من القائمة، ولن يُفتحا إلّا بهذا الرمز.","teWarn":"هذه ليست حماية. إنّها توقف يدًا فضولية، لا شخصًا يفهم في الحواسيب.","tePin":"الرمز — من ٤ إلى ٨ أرقام","teAgain":"مرّة أخرى، للتأكيد","teRemember":"التذكّر في هذا الجهاز","teRememberNote":"بدون ذلك سيُطلب الرمز في كلّ فتح للتطبيق. على لوح صفّيّ — الأفضل بدونه.","teOk":"تأكيد","teCancel":"إلغاء","teBad":"الرمز غير صحيح.","teMismatch":"الرمزان غير متطابقين.","teShort":"يلزم بين ٤ و‑٨ أرقام، بلا حروف.","teWaitN":"محاولات كثيرة. حاولوا مجدّدًا بعد {0} ثانية.","teForgot":"نسيت الرمز","teForgotHow":"لا توجد طريقة لاستعادة الرمز — فهو غير محفوظ في أيّ مكان. مسح بيانات الموقع من المتصفّح يزيله، ومعه التقدّم والامتحانات.","teHideT":"إخفاء شاشات المعلّم","teHideNote":"على جهاز يستخدمه الطفل، يمكن وضع بانِي الامتحان وشاشة العلامات خلف رمز. للفتح لاحقًا: أضيفوا ?teacher=1 إلى العنوان.","teHideBtn":"اختيار رمز","teOpenNow":"وضع المعلّم مفتوح","teLockBtn":"الخروج من وضع المعلّم","teChangeBtn":"تغيير الرمز","teRemoveBtn":"إلغاء الرمز","teLocked":"شاشات المعلّم مقفلة في هذا الجهاز.","teUnlock":"فتح","stParent":"إرسال إلى وليّ الأمر","stParentMsg":"{0} أنهى/أنهت الامتحان «{1}»: {2} صحيحة من {3}، العلامة {4}."},
- ru:{"exam":"Экзамен","student":"Ученик","qs":"вопросов","minutes":"минут","none":"нет","outOf":"из","exTitle":"Классный экзамен","exLead":"Составьте экзамен, отправьте ссылку в WhatsApp и получите обратно код ответов от каждого ученика. Ни сервера, ни аккаунта — всё идёт через ссылку и WhatsApp.","exName":"Название экзамена","exNamePh":"например: экзамен по алгебре — 9-й класс, группа 2","exUnits":"Уровень программы","exUnitSuf":"ед.","exLevel":"Сложность","exCount":"Число вопросов","exTime":"Ограничение времени","exTimeNote":"Ноль означает без таймера. По истечении времени экзамен сдаётся сам.","exTopics":"Темы","exTopicsNote":"Вопросы делятся поровну между выбранными темами.","exAcc":"Условия для сдающих","exAccNote":"Что разрешено на самом экзамене. Озвучивание и лист формул — не подсказка, а средство доступности.","exTts":"Озвучивание","exTtsSub":"Каждый вопрос читается вслух по запросу","exForm":"Лист формул","exFormSub":"Доступен во время экзамена, как на настоящем","exPhone":"Ваш номер WhatsApp (необязательно)","exPhoneNote":"Если заполните — кнопка отправки у ученика откроет чат прямо с вами. Учтите: номер виден внутри ссылки, которой вы делитесь.","exBuild":"Создать экзамен","exShareMsg":"{0} вопросов. Откройте ссылку, решите, а в конце пришлите мне код.","exReady":"Экзамен готов","exWa":"Отправить в WhatsApp","exCopyUrl":"Скопировать ссылку","exToMarks":"К оценкам","exUrlCopied":"Ссылка скопирована","mkTitle":"Оценки","mkLead":"Нажмите на ссылку, которую ученик прислал в WhatsApp, или вставьте сюда код. Оценка пересчитывается по самим ответам, а не по тому, что написал ученик.","mkNew":"Новый экзамен","mkEmpty":"Вы ещё не создали экзамен. Начните с «Новый экзамен».","mkSubs":"сдач","mkAvg":"среднее","mkPaste":"Вставка кода ответов","mkPastePh":"Вставьте сюда код из WhatsApp","mkTake":"Принять","mkResend":"Отправить снова","mkCopyTbl":"Скопировать таблицу","mkDelQ":"Удалить экзамен и {0} сдач?","mkDelYes":"Да, удалить","mkCancel":"Отмена","mkDel":"Удалить экзамен","mkByStudent":"По ученикам","mkNoName":"Без имени","mkFell":"ошибся в:","mkAllOk":"всё верно","mkBadCode":"код не сходится сам с собой","mkByTopic":"По темам — что стоит объяснить заново","mkByTopicNote":"Доля верных ответов по всему классу.","mkRight":"верных ответов из","mkTblHead":"Ученик\tОценка\tВерно\tОшибся в","mkTblCopied":"Таблица скопирована","mkErrRead":"Не удалось прочитать код. Попробуйте скопировать его заново, целиком.","mkErrOther":"Этот код относится к экзамену «{0}».","mkErrUnknown":"Этот код относится к другому экзамену, которого нет на этом устройстве.","mkErrCount":"Число ответов в коде не совпадает с экзаменом.","mkTaken":"принят","mkNoteBad":"Внимание: код не сходится сам с собой","stNoTime":"без ограничения времени.","stTimed":"Есть ограничение: {0} минут. По их истечении экзамен сдаётся сам.","stNoTimer":"Таймера нет. Можно не спешить.","stNoNeg":"Штрафа за ошибку нет — неверный ответ ничего не отнимает.","stReadOn":"Любой вопрос можно попросить прочитать вслух.","stReadOff":"Озвучивание в этом экзамене отключено.","stFormOn":"Лист формул открыт весь экзамен.","stFormOff":"Лист формул в этом экзамене закрыт.","stCodeEnd":"В конце вы получите код — отправьте его учителю в WhatsApp.","stYourName":"Ваше имя","stNameNote":"Чтобы учитель знал, кто отвечал. Имя не уходит ни на какой сервер — оно входит внутрь кода.","stNamePh":"Имя и фамилия","stStart":"Начинаем","stQn":"Вопрос {0} из {1}","stRead":"Прочитать","stFormulas":"Лист формул","stPrev":"Предыдущий","stDunno":"Не знаю","stFlagged":"✓ отмечен для возврата","stFlag":"Вернуться к нему","stNext":"Следующий","stReview":"Перед сдачей","stReviewNote":"Можно вернуться к любому вопросу и изменить ответ. После сдачи создаётся код.","stUnanswered":"{0} вопросов без ответа","stAllAnswered":"Отвечены все вопросы","stPicked":"Вы выбрали:","stNotYet":"Ещё не отвечено","stChange":"Изменить","stFill":"Заполнить","stDone":"Готово — создать код","stFinished":"Готово","stScoreLine":"{0} верных из {1}","stSendNow":"Теперь отправьте код учителю.","stSendNote":"Код содержит имя и выбранные вами ответы — учитель пересчитывает оценку у себя.","stToTeacher":"учителю","stCopyCode":"Скопировать код","stCodeCopied":"Код скопирован","stWhatRight":"Как было правильно","stWhatRightNote":"Чтобы научиться, а не ради оценки.","stOk":"верно","stCorrect":"Правильный ответ:","stToApp":"К самому приложению — свободная практика","stGrade":"Оценка:","stCode":"Код:","stLinkNote":"Чтобы учитель получил результат — нажмите на ссылку:","badLink":"Экзамен не открылся","toApp":"К приложению","exOld":"Этот экзамен создан в прежней версии приложения, и вопросы в нём уже не те же самые. Попросите учителя прислать новый.","exBroken":"Возможно, экзамен относится к другому приложению, а возможно, ссылка оборвалась по пути. Попросите учителя прислать ссылку ещё раз и откройте её прямо из сообщения.","stBackTo":"Назад к экзамену — вопрос {0} из {1}","mkCsv":"Скачать CSV","mkCsvName":"Имя","mkCsvPct":"Оценка","mkCsvOk":"Верно","mkCsvTotal":"Вопросов","mkCsvDate":"Дата","mkCsvValid":"Код цел","mkCsvQ":"Вопрос {0}","mkCsvYes":"да","mkCsvNo":"нет","mkCsvDone":"Файл загружен","teTitle":"Код учителя","teSet":"Выбор кода учителя","teEnter":"Экраны учителя закрыты. Введите код, чтобы открыть их.","teLead":"Конструктор экзамена и экран оценок исчезнут из меню и будут открываться только по этому коду.","teWarn":"Это не защита. Она останавливает любопытную руку, а не того, кто разбирается в компьютерах.","tePin":"Код — от 4 до 8 цифр","teAgain":"Ещё раз, для проверки","teRemember":"Запомнить на этом устройстве","teRememberNote":"Без этого код будет запрашиваться при каждом открытии приложения. На классном планшете лучше без этого.","teOk":"Готово","teCancel":"Отмена","teBad":"Неверный код.","teMismatch":"Коды не совпадают.","teShort":"Нужно от 4 до 8 цифр, без букв.","teWaitN":"Слишком много попыток. Повторите через {0} с.","teForgot":"Я забыл код","teForgotHow":"Восстановить код нельзя — он нигде не хранится. Очистка данных сайта в браузере удалит его, а вместе с ним прогресс и экзамены.","teHideT":"Скрыть экраны учителя","teHideNote":"На устройстве, которым пользуется ребёнок, конструктор экзамена и экран оценок можно закрыть кодом. Чтобы открыть их потом, добавьте ?teacher=1 к адресу.","teHideBtn":"Выбрать код","teOpenNow":"Режим учителя открыт","teLockBtn":"Выйти из режима учителя","teChangeBtn":"Изменить код","teRemoveBtn":"Убрать код","teLocked":"Экраны учителя закрыты на этом устройстве.","teUnlock":"Открыть","stParent":"Отправить родителю","stParentMsg":"{0} завершил(а) экзамен «{1}»: {2} верных из {3}, оценка {4}."},
- en:{"exam":"Exam","student":"Student","qs":"questions","minutes":"minutes","none":"none","outOf":"of","exTitle":"Class exam","exLead":"Build an exam, send the link on WhatsApp, and get an answer code back from every student. No server and no account — it all travels through the link and WhatsApp.","exName":"Exam name","exNamePh":"for example: Algebra exam — class 9/2","exUnits":"Units","exUnitSuf":"units","exLevel":"Level","exCount":"Number of questions","exTime":"Time limit","exTimeNote":"Zero means no timer. When the time is up the exam submits itself.","exTopics":"Topics","exTopicsNote":"The questions are split evenly between the topics you choose.","exAcc":"Access arrangements","exAccNote":"What is allowed during the exam itself. Read-aloud and the formula sheet are not a hint — they are access tools.","exTts":"Read aloud","exTtsSub":"Every question is read out on request","exForm":"Formula sheet","exFormSub":"Open during the exam, as in a state exam","exPhone":"Your WhatsApp number (optional)","exPhoneNote":"Fill it in and the student's send button opens a chat straight to you. Note: the number appears inside the link you share.","exBuild":"Create the exam","exShareMsg":"{0} questions. Open the link, answer, and send me the code at the end.","exReady":"The exam is ready","exWa":"Send on WhatsApp","exCopyUrl":"Copy the link","exToMarks":"To the marks","exUrlCopied":"Link copied","mkTitle":"Marks","mkLead":"Tap the link the student sent on WhatsApp, or paste the code here. The grade is recomputed from the answers themselves, not from what the student wrote.","mkNew":"New exam","mkEmpty":"You have not created an exam yet. Start from “New exam”.","mkSubs":"submissions","mkAvg":"average","mkPaste":"Paste an answer code","mkPastePh":"Paste the code from WhatsApp here","mkTake":"Take it in","mkResend":"Send again","mkCopyTbl":"Copy the table","mkDelQ":"Delete the exam and its {0} submissions?","mkDelYes":"Yes, delete","mkCancel":"Cancel","mkDel":"Delete the exam","mkByStudent":"By student","mkNoName":"No name","mkFell":"tripped on:","mkAllOk":"all correct","mkBadCode":"the code does not match itself","mkByTopic":"By topic — what is worth teaching again","mkByTopicNote":"How the whole class did, together.","mkRight":"correct answers out of","mkTblHead":"Student\tMark\tCorrect\tTripped on","mkTblCopied":"Table copied","mkErrRead":"We could not read the code. Try copying it again, in full.","mkErrOther":"This code belongs to the exam “{0}”.","mkErrUnknown":"This code belongs to another exam, which is not on this device.","mkErrCount":"The number of answers in the code does not match the exam.","mkTaken":"taken in","mkNoteBad":"Note: the code does not match itself","stNoTime":"no time limit.","stTimed":"There is a time limit: {0} minutes. When it runs out the exam submits itself.","stNoTimer":"No timer. Take your time.","stNoNeg":"No negative marking — a wrong answer takes nothing away.","stReadOn":"You can ask for any question to be read aloud.","stReadOff":"Read-aloud is off in this exam.","stFormOn":"The formula sheet is open throughout the exam.","stFormOff":"The formula sheet is closed in this exam.","stCodeEnd":"At the end you get a code — send it to your teacher on WhatsApp.","stYourName":"Your name","stNameNote":"So the teacher knows who answered. The name is not sent to any server — it goes inside the code.","stNamePh":"First name and surname","stStart":"Let's start","stQn":"Question {0} of {1}","stRead":"Read aloud","stFormulas":"Formula sheet","stPrev":"Previous","stDunno":"I don't know","stFlagged":"✓ marked to come back","stFlag":"Come back to it","stNext":"Next","stReview":"Before you submit","stReviewNote":"You can go back to any question and change it. The code is created after you submit.","stUnanswered":"{0} questions with no answer","stAllAnswered":"Every question is answered","stPicked":"You chose:","stNotYet":"Not answered yet","stChange":"Change","stFill":"Fill in","stDone":"Finished — create the code","stFinished":"Finished","stScoreLine":"{0} correct out of {1}","stSendNow":"Now send the code to your teacher.","stSendNote":"The code holds your name and the answers you chose — the teacher works the mark out again at their end.","stToTeacher":"to the teacher","stCopyCode":"Copy the code","stCodeCopied":"Code copied","stWhatRight":"What the answers were","stWhatRightNote":"To learn from it, not for the mark.","stOk":"correct","stCorrect":"The correct answer:","stToApp":"To the app itself — free practice","stGrade":"Mark:","stCode":"Code:","stLinkNote":"For the teacher to receive the result — tap the link:","badLink":"The exam did not open","toApp":"To the app","exOld":"This exam was made with an earlier version of the app, so its questions are no longer the same. Ask your teacher to send a new one.","exBroken":"The exam may belong to a different app, or the link may have been cut short. Ask your teacher to send the link again, and open it straight from the message.","stBackTo":"Back to the exam — question {0} of {1}","mkCsv":"Download CSV","mkCsvName":"Name","mkCsvPct":"Mark","mkCsvOk":"Correct","mkCsvTotal":"Questions","mkCsvDate":"Date","mkCsvValid":"Code intact","mkCsvQ":"Question {0}","mkCsvYes":"yes","mkCsvNo":"no","mkCsvDone":"The file downloaded","teTitle":"Teacher code","teSet":"Choose a teacher code","teEnter":"The teacher screens are locked. Enter the code to open them.","teLead":"The exam builder and the marks screen leave the menu, and open only with this code.","teWarn":"This is not security. It stops a curious hand, not somebody who knows computers.","tePin":"Code — 4 to 8 digits","teAgain":"Again, to be sure","teRemember":"Remember on this device","teRememberNote":"Without it the code is asked for every time the app opens. On a class tablet, better without.","teOk":"Confirm","teCancel":"Cancel","teBad":"That code is wrong.","teMismatch":"The two codes are not the same.","teShort":"It needs 4 to 8 digits, no letters.","teWaitN":"Too many tries. Try again in {0} seconds.","teForgot":"I forgot the code","teForgotHow":"There is no way to recover the code — it is not stored anywhere. Clearing the site data in the browser removes it, and the progress and exams with it.","teHideT":"Hide the teacher screens","teHideNote":"On a device a child uses, the exam builder and the marks screen can sit behind a code. To open them later, add ?teacher=1 to the address.","teHideBtn":"Choose a code","teOpenNow":"Teacher mode is open","teLockBtn":"Leave teacher mode","teChangeBtn":"Change the code","teRemoveBtn":"Remove the code","teLocked":"The teacher screens are locked on this device.","teUnlock":"Open","stParent":"Send to a parent","stParentMsg":"{0} finished the exam “{1}”: {2} right out of {3}, score {4}."}};
+var XK={"exam":"מבחן","student":"תלמיד","qs":"שאלות","minutes":"דקות","none":"ללא","outOf":"מתוך","exTitle":"מבחן כיתתי","exLead":"בונים מבחן, שולחים קישור בוואטסאפ, ומקבלים בחזרה קוד תשובות לכל תלמיד. אין שרת ואין חשבון — הכול עובר דרך הקישור ודרך וואטסאפ.","exName":"שם המבחן","exNamePh":"למשל: מבחן חוק אוהם — כיתה י׳2","exUnits":"יחידות","exUnitSuf":"יח״ל","exLevel":"רמה","exCount":"מספר שאלות","exTime":"הגבלת זמן","exTimeNote":"אפס פירושו בלי טיימר. בתום הזמן המבחן מוגש מעצמו.","exTopics":"נושאים","exTopicsNote":"השאלות מתחלקות שווה בשווה בין הנושאים שנבחרו.","exAcc":"התאמות לנבחנים","exAccNote":"מה שמותר בבחינה עצמה. ההקראה ודף הנוסחאות אינם רמז — הם כלי נגישות.","exTts":"הקראה קולית","exTtsSub":"כל שאלה נקראת בקול לפי בקשה","exForm":"דף נוסחאות","exFormSub":"נגיש מתוך המבחן, כמו בבגרות","exPhone":"מספר הוואטסאפ שלכם (לא חובה)","exPhoneNote":"אם תמלאו — כפתור השליחה אצל התלמיד ייפתח ישר לצ׳אט איתכם. שימו לב: המספר יופיע בתוך הקישור שאתם משתפים.","exBuild":"צרו את המבחן","exShareMsg":"{0} שאלות. נכנסים לקישור, פותרים, ובסוף שולחים לי את הקוד.","exReady":"המבחן מוכן","exWa":"שליחה בוואטסאפ","exCopyUrl":"העתקת הקישור","exToMarks":"לציונים","exUrlCopied":"הקישור הועתק","mkTitle":"ציונים","mkLead":"לוחצים על הקישור שהתלמיד שלח בוואטסאפ, או מדביקים כאן את הקוד. הציון מחושב מחדש מהתשובות עצמן, ולא נלקח ממה שהתלמיד כתב.","mkNew":"מבחן חדש","mkEmpty":"עוד לא יצרתם מבחן. אפשר להתחיל מ״מבחן חדש״.","mkSubs":"הגשות","mkAvg":"ממוצע","mkPaste":"הדבקת קוד תשובות","mkPastePh":"מדביקים כאן את הקוד מהוואטסאפ","mkTake":"קליטה","mkResend":"שליחה שוב","mkCopyTbl":"העתקת טבלה","mkDelQ":"למחוק את המבחן ואת {0} ההגשות?","mkDelYes":"כן, למחוק","mkCancel":"ביטול","mkDel":"מחיקת המבחן","mkByStudent":"לפי תלמיד","mkNoName":"ללא שם","mkFell":"נפל ב:","mkAllOk":"הכול נכון","mkBadCode":"הקוד לא תואם לעצמו","mkByTopic":"לפי נושא — מה כדאי ללמד שוב","mkByTopicNote":"אחוז ההצלחה של כל הכיתה יחד.","mkRight":"תשובות נכונות מתוך","mkTblHead":"תלמיד\tציון\tנכונות\tנפל ב","mkTblCopied":"הטבלה הועתקה","mkErrRead":"לא הצלחנו לקרוא את הקוד. נסו להעתיק אותו שוב, במלואו.","mkErrOther":"הקוד הזה שייך למבחן „{0}”.","mkErrUnknown":"הקוד הזה שייך למבחן אחר, שלא נמצא במכשיר הזה.","mkErrCount":"מספר התשובות בקוד אינו תואם למבחן.","mkTaken":"נקלט","mkNoteBad":"שימו לב: הקוד לא תואם לעצמו","stNoTime":"בלי הגבלת זמן.","stTimed":"יש הגבלת זמן: {0} דקות. בסופן המבחן מוגש מעצמו.","stNoTimer":"אין טיימר. אפשר לקחת את הזמן.","stNoNeg":"אין ניקוד שלילי — תשובה לא נכונה לא גורעת.","stReadOn":"אפשר לבקש הקראה של כל שאלה.","stReadOff":"ההקראה כבויה במבחן הזה.","stFormOn":"דף הנוסחאות פתוח לאורך כל המבחן.","stFormOff":"דף הנוסחאות סגור במבחן הזה.","stCodeEnd":"בסוף תקבלו קוד — שולחים אותו למורה בוואטסאפ.","stYourName":"השם שלכם","stNameNote":"כדי שהמורה יידע מי ענה. השם לא נשלח לשום שרת — הוא נכנס לתוך הקוד.","stNamePh":"שם פרטי ושם משפחה","stStart":"מתחילים","stQn":"שאלה {0} מתוך {1}","stRead":"הקראה","stFormulas":"דף נוסחאות","stPrev":"קודמת","stDunno":"לא יודע/ת","stFlagged":"✓ מסומנת לחזרה","stFlag":"לחזור אליה","stNext":"הבאה","stReview":"לפני ההגשה","stReviewNote":"אפשר לחזור לכל שאלה ולשנות. אחרי ההגשה נוצר הקוד.","stUnanswered":"{0} שאלות בלי תשובה","stAllAnswered":"כל השאלות נענו","stPicked":"סימנתם:","stNotYet":"עוד לא עניתם","stChange":"שינוי","stFill":"למלא","stDone":"סיימתי — ליצירת הקוד","stFinished":"סיימתם","stScoreLine":"{0} נכונות מתוך {1}","stSendNow":"עכשיו שולחים את הקוד למורה.","stSendNote":"הקוד מכיל את השם ואת התשובות שסימנתם — המורה מחשב את הציון אצלו מחדש.","stToTeacher":"למורה","stCopyCode":"העתקת הקוד","stCodeCopied":"הקוד הועתק","stWhatRight":"מה היה נכון","stWhatRightNote":"בשביל ללמוד מזה, לא בשביל הציון.","stOk":"נכון","stCorrect":"התשובה הנכונה:","stToApp":"לאפליקציה עצמה — לתרגול חופשי","stGrade":"ציון:","stCode":"קוד:","stLinkNote":"לקליטת התוצאה אצל המורה — לוחצים על הקישור:","badLink":"המבחן לא נפתח","toApp":"לאפליקציה","exOld":"המבחן הזה נוצר בגרסה קודמת של האפליקציה, ולכן השאלות בו כבר לא זהות. בקשו מהמורה לשלוח מבחן חדש.","exBroken":"אולי המבחן שייך לאפליקציה אחרת, ואולי הקישור נקטע בדרך. בקשו מהמורה לשלוח את הקישור שוב, ופתחו אותו ישר מההודעה.","stBackTo":"חזרה למבחן — שאלה {0} מתוך {1}","mkCsv":"הורדת CSV","mkCsvName":"שם","mkCsvPct":"ציון","mkCsvOk":"נכונות","mkCsvTotal":"שאלות","mkCsvDate":"תאריך","mkCsvValid":"קוד תקין","mkCsvQ":"שאלה {0}","mkCsvYes":"כן","mkCsvNo":"לא","mkCsvDone":"הקובץ ירד","teTitle":"קוד מורה","teSet":"בחירת קוד מורה","teEnter":"מסכי המורה נעולים. הקלידו את הקוד כדי לפתוח אותם.","teLead":"בונה המבחן ומסך הציונים ייעלמו מהתפריט, וייפתחו רק עם הקוד הזה.","teWarn":"זו אינה אבטחה. היא עוצרת יד סקרנית, לא מישהו שמבין במחשבים.","tePin":"קוד — 4 עד 8 ספרות","teAgain":"שוב, לוודא","teRemember":"לזכור במכשיר הזה","teRememberNote":"בלי זה הקוד יידרש שוב בכל פתיחה של האפליקציה. על טאבלט כיתתי — עדיף בלי.","teOk":"אישור","teCancel":"ביטול","teBad":"הקוד שגוי.","teMismatch":"שני הקודים אינם זהים.","teShort":"צריך בין 4 ל-8 ספרות, בלי אותיות.","teWaitN":"יותר מדי ניסיונות. נסו שוב בעוד {0} שניות.","teForgot":"שכחתי את הקוד","teForgotHow":"אין דרך לשחזר קוד — הוא לא נשמר בשום מקום. מחיקת נתוני האתר בדפדפן מסירה אותו, ואיתם גם ההתקדמות והמבחנים.","teHideT":"להסתיר את מסכי המורה","teHideNote":"על מכשיר שהילד משתמש בו, בונה המבחן ומסך הציונים יכולים לשבת מאחורי קוד. לפתיחה מאוחר יותר: להוסיף ?teacher=1 לכתובת.","teHideBtn":"בחירת קוד","teOpenNow":"מצב מורה פתוח","teLockBtn":"יציאה ממצב מורה","teChangeBtn":"שינוי הקוד","teRemoveBtn":"ביטול הקוד","teLocked":"מסכי המורה נעולים במכשיר הזה.","teUnlock":"פתיחה","stParent":"שליחה להורה","stParentMsg":"{0} סיים/ה את המבחן ״{1}״: {2} נכונות מתוך {3}, ציון {4}."};
+var XT={ar:{"exam":"امتحان","student":"طالب","qs":"أسئلة","minutes":"دقيقة","none":"بلا","outOf":"من أصل","exTitle":"امتحان صفّي","exLead":"تُعِدّ الامتحان، ترسل رابطًا في واتساب، وتستلم من كلّ طالب رمز إجابات. لا خادم ولا حساب — كلّ شيء يمرّ عبر الرابط وواتساب.","exName":"اسم الامتحان","exNamePh":"مثلًا: امتحان قانون أوم — الصف العاشر/2","exUnits":"وحدات","exUnitSuf":"وحدات","exLevel":"المستوى","exCount":"عدد الأسئلة","exTime":"تحديد الوقت","exTimeNote":"صفر يعني بلا مؤقّت. عند انتهاء الوقت يُسلَّم الامتحان تلقائيًا.","exTopics":"المواضيع","exTopicsNote":"تُوزَّع الأسئلة بالتساوي بين المواضيع المختارة.","exAcc":"تسهيلات للممتحَنين","exAccNote":"ما هو مسموح في الامتحان نفسه. القراءة الصوتية وورقة القوانين ليستا تلميحًا — بل وسيلتا إتاحة.","exTts":"قراءة صوتية","exTtsSub":"كل سؤال يُقرأ بصوت عند الطلب","exForm":"ورقة قوانين","exFormSub":"متاحة داخل الامتحان، كما في البجروت","exPhone":"رقم واتساب الخاص بك (اختياري)","exPhoneNote":"إذا عبّأته — يفتح زرّ الإرسال عند الطالب محادثة معك مباشرة. انتبه: الرقم يظهر داخل الرابط الذي تشاركه.","exBuild":"أنشئ الامتحان","exShareMsg":"{0} أسئلة. ادخل إلى الرابط، حُلّ، وفي النهاية أرسل لي الرمز.","exReady":"الامتحان جاهز","exWa":"إرسال في واتساب","exCopyUrl":"نسخ الرابط","exToMarks":"إلى العلامات","exUrlCopied":"نُسخ الرابط","mkTitle":"العلامات","mkLead":"اضغط على الرابط الذي أرسله الطالب في واتساب، أو الصق هنا الرمز. تُحتسب العلامة من جديد من الإجابات نفسها، لا مما كتبه الطالب.","mkNew":"امتحان جديد","mkEmpty":"لم تُنشئ امتحانًا بعد. ابدأ من «امتحان جديد».","mkSubs":"تسليمات","mkAvg":"المعدّل","mkPaste":"لصق رمز الإجابات","mkPastePh":"الصق هنا الرمز من واتساب","mkTake":"استلام","mkResend":"إرسال مرّة أخرى","mkCopyTbl":"نسخ الجدول","mkDelQ":"حذف الامتحان و{0} من التسليمات؟","mkDelYes":"نعم، احذف","mkCancel":"إلغاء","mkDel":"حذف الامتحان","mkByStudent":"حسب الطالب","mkNoName":"بلا اسم","mkFell":"أخفق في:","mkAllOk":"كل الإجابات صحيحة","mkBadCode":"الرمز غير متطابق مع نفسه","mkByTopic":"حسب الموضوع — ما يستحقّ إعادة التدريس","mkByTopicNote":"نسبة نجاح الصفّ كلّه معًا.","mkRight":"إجابات صحيحة من أصل","mkTblHead":"الطالب\tالعلامة\tالصحيحة\tأخفق في","mkTblCopied":"نُسخ الجدول","mkErrRead":"تعذّرت قراءة الرمز. حاول نسخه من جديد، كاملًا.","mkErrOther":"هذا الرمز يعود لامتحان «{0}».","mkErrUnknown":"هذا الرمز يعود لامتحان آخر غير موجود على هذا الجهاز.","mkErrCount":"عدد الإجابات في الرمز لا يطابق الامتحان.","mkTaken":"استُلم","mkNoteBad":"انتبه: الرمز غير متطابق مع نفسه","stNoTime":"بلا تحديد وقت.","stTimed":"هناك تحديد للوقت: {0} دقيقة. عند انتهائها يُسلَّم الامتحان تلقائيًا.","stNoTimer":"لا مؤقّت. خذ وقتك.","stNoNeg":"لا علامات سالبة — الإجابة الخاطئة لا تخصم.","stReadOn":"يمكنك طلب قراءة أي سؤال بصوت.","stReadOff":"القراءة الصوتية مغلقة في هذا الامتحان.","stFormOn":"ورقة القوانين مفتوحة طوال الامتحان.","stFormOff":"ورقة القوانين مغلقة في هذا الامتحان.","stCodeEnd":"في النهاية تحصل على رمز — أرسله للمعلّم في واتساب.","stYourName":"اسمك","stNameNote":"كي يعرف المعلّم من أجاب. الاسم لا يُرسل إلى أي خادم — يدخل داخل الرمز.","stNamePh":"الاسم الشخصي واسم العائلة","stStart":"لنبدأ","stQn":"سؤال {0} من أصل {1}","stRead":"قراءة","stFormulas":"ورقة قوانين","stPrev":"السابق","stDunno":"لا أعرف","stFlagged":"✓ مُعلَّم للعودة","stFlag":"للعودة إليه","stNext":"التالي","stReview":"قبل التسليم","stReviewNote":"يمكنك العودة إلى أي سؤال وتغييره. بعد التسليم يُنشأ الرمز.","stUnanswered":"{0} أسئلة بلا إجابة","stAllAnswered":"أُجيبت كل الأسئلة","stPicked":"اخترت:","stNotYet":"لم تُجب بعد","stChange":"تغيير","stFill":"للتعبئة","stDone":"أنهيت — أنشئ الرمز","stFinished":"أنهيت","stScoreLine":"{0} صحيحة من أصل {1}","stSendNow":"الآن أرسل الرمز إلى المعلّم.","stSendNote":"الرمز يحوي الاسم والإجابات التي اخترتها — والمعلّم يحتسب العلامة عنده من جديد.","stToTeacher":"إلى المعلّم","stCopyCode":"نسخ الرمز","stCodeCopied":"نُسخ الرمز","stWhatRight":"ما كان صحيحًا","stWhatRightNote":"للتعلّم منه، لا من أجل العلامة.","stOk":"صحيح","stCorrect":"الإجابة الصحيحة:","stToApp":"إلى التطبيق نفسه — للتدرّب الحرّ","stGrade":"العلامة:","stCode":"الرمز:","stLinkNote":"لاستلام النتيجة عند المعلّم — اضغط على الرابط:","badLink":"تعذّر فتح الامتحان","toApp":"إلى التطبيق","exOld":"أُنشئ هذا الامتحان بنسخة سابقة من التطبيق، ولذلك لم تعد أسئلته مطابقة. اطلب من المعلّم إرسال امتحان جديد.","exBroken":"ربما يعود الامتحان إلى تطبيق آخر، وربما انقطع الرابط في الطريق. اطلب من المعلّم إرسال الرابط من جديد، وافتحه مباشرة من الرسالة.","stBackTo":"العودة إلى الامتحان — سؤال {0} من أصل {1}","mkCsv":"تنزيل CSV","mkCsvName":"الاسم","mkCsvPct":"العلامة","mkCsvOk":"الصحيحة","mkCsvTotal":"الأسئلة","mkCsvDate":"التاريخ","mkCsvValid":"الرمز سليم","mkCsvQ":"سؤال {0}","mkCsvYes":"نعم","mkCsvNo":"لا","mkCsvDone":"نُزّل الملف","teTitle":"رمز المعلّم","teSet":"اختيار رمز المعلّم","teEnter":"شاشات المعلّم مقفلة. أدخلوا الرمز لفتحها.","teLead":"سيختفي بانِي الامتحان وشاشة العلامات من القائمة، ولن يُفتحا إلّا بهذا الرمز.","teWarn":"هذه ليست حماية. إنّها توقف يدًا فضولية، لا شخصًا يفهم في الحواسيب.","tePin":"الرمز — من ٤ إلى ٨ أرقام","teAgain":"مرّة أخرى، للتأكيد","teRemember":"التذكّر في هذا الجهاز","teRememberNote":"بدون ذلك سيُطلب الرمز في كلّ فتح للتطبيق. على لوح صفّيّ — الأفضل بدونه.","teOk":"تأكيد","teCancel":"إلغاء","teBad":"الرمز غير صحيح.","teMismatch":"الرمزان غير متطابقين.","teShort":"يلزم بين ٤ و‑٨ أرقام، بلا حروف.","teWaitN":"محاولات كثيرة. حاولوا مجدّدًا بعد {0} ثانية.","teForgot":"نسيت الرمز","teForgotHow":"لا توجد طريقة لاستعادة الرمز — فهو غير محفوظ في أيّ مكان. مسح بيانات الموقع من المتصفّح يزيله، ومعه التقدّم والامتحانات.","teHideT":"إخفاء شاشات المعلّم","teHideNote":"على جهاز يستخدمه الطفل، يمكن وضع بانِي الامتحان وشاشة العلامات خلف رمز. للفتح لاحقًا: أضيفوا ?teacher=1 إلى العنوان.","teHideBtn":"اختيار رمز","teOpenNow":"وضع المعلّم مفتوح","teLockBtn":"الخروج من وضع المعلّم","teChangeBtn":"تغيير الرمز","teRemoveBtn":"إلغاء الرمز","teLocked":"شاشات المعلّم مقفلة في هذا الجهاز.","teUnlock":"فتح","stParent":"إرسال إلى وليّ الأمر","stParentMsg":"{0} أنهى/أنهت الامتحان «{1}»: {2} صحيحة من {3}، العلامة {4}."},
+ ru:{"exam":"Экзамен","student":"Ученик","qs":"вопросов","minutes":"минут","none":"нет","outOf":"из","exTitle":"Классный экзамен","exLead":"Составьте экзамен, отправьте ссылку в WhatsApp и получите обратно код ответов от каждого ученика. Ни сервера, ни аккаунта — всё идёт через ссылку и WhatsApp.","exName":"Название экзамена","exNamePh":"например: экзамен по закону Ома — 10-й класс, группа 2","exUnits":"Уровень программы","exUnitSuf":"ед.","exLevel":"Сложность","exCount":"Число вопросов","exTime":"Ограничение времени","exTimeNote":"Ноль означает без таймера. По истечении времени экзамен сдаётся сам.","exTopics":"Темы","exTopicsNote":"Вопросы делятся поровну между выбранными темами.","exAcc":"Условия для сдающих","exAccNote":"Что разрешено на самом экзамене. Озвучивание и лист формул — не подсказка, а средство доступности.","exTts":"Озвучивание","exTtsSub":"Каждый вопрос читается вслух по запросу","exForm":"Лист формул","exFormSub":"Доступен во время экзамена, как на настоящем","exPhone":"Ваш номер WhatsApp (необязательно)","exPhoneNote":"Если заполните — кнопка отправки у ученика откроет чат прямо с вами. Учтите: номер виден внутри ссылки, которой вы делитесь.","exBuild":"Создать экзамен","exShareMsg":"{0} вопросов. Откройте ссылку, решите, а в конце пришлите мне код.","exReady":"Экзамен готов","exWa":"Отправить в WhatsApp","exCopyUrl":"Скопировать ссылку","exToMarks":"К оценкам","exUrlCopied":"Ссылка скопирована","mkTitle":"Оценки","mkLead":"Нажмите на ссылку, которую ученик прислал в WhatsApp, или вставьте сюда код. Оценка пересчитывается по самим ответам, а не по тому, что написал ученик.","mkNew":"Новый экзамен","mkEmpty":"Вы ещё не создали экзамен. Начните с «Новый экзамен».","mkSubs":"сдач","mkAvg":"среднее","mkPaste":"Вставка кода ответов","mkPastePh":"Вставьте сюда код из WhatsApp","mkTake":"Принять","mkResend":"Отправить снова","mkCopyTbl":"Скопировать таблицу","mkDelQ":"Удалить экзамен и {0} сдач?","mkDelYes":"Да, удалить","mkCancel":"Отмена","mkDel":"Удалить экзамен","mkByStudent":"По ученикам","mkNoName":"Без имени","mkFell":"ошибся в:","mkAllOk":"всё верно","mkBadCode":"код не сходится сам с собой","mkByTopic":"По темам — что стоит объяснить заново","mkByTopicNote":"Доля верных ответов по всему классу.","mkRight":"верных ответов из","mkTblHead":"Ученик\tОценка\tВерно\tОшибся в","mkTblCopied":"Таблица скопирована","mkErrRead":"Не удалось прочитать код. Попробуйте скопировать его заново, целиком.","mkErrOther":"Этот код относится к экзамену «{0}».","mkErrUnknown":"Этот код относится к другому экзамену, которого нет на этом устройстве.","mkErrCount":"Число ответов в коде не совпадает с экзаменом.","mkTaken":"принят","mkNoteBad":"Внимание: код не сходится сам с собой","stNoTime":"без ограничения времени.","stTimed":"Есть ограничение: {0} минут. По их истечении экзамен сдаётся сам.","stNoTimer":"Таймера нет. Можно не спешить.","stNoNeg":"Штрафа за ошибку нет — неверный ответ ничего не отнимает.","stReadOn":"Любой вопрос можно попросить прочитать вслух.","stReadOff":"Озвучивание в этом экзамене отключено.","stFormOn":"Лист формул открыт весь экзамен.","stFormOff":"Лист формул в этом экзамене закрыт.","stCodeEnd":"В конце вы получите код — отправьте его учителю в WhatsApp.","stYourName":"Ваше имя","stNameNote":"Чтобы учитель знал, кто отвечал. Имя не уходит ни на какой сервер — оно входит внутрь кода.","stNamePh":"Имя и фамилия","stStart":"Начинаем","stQn":"Вопрос {0} из {1}","stRead":"Прочитать","stFormulas":"Лист формул","stPrev":"Предыдущий","stDunno":"Не знаю","stFlagged":"✓ отмечен для возврата","stFlag":"Вернуться к нему","stNext":"Следующий","stReview":"Перед сдачей","stReviewNote":"Можно вернуться к любому вопросу и изменить ответ. После сдачи создаётся код.","stUnanswered":"{0} вопросов без ответа","stAllAnswered":"Отвечены все вопросы","stPicked":"Вы выбрали:","stNotYet":"Ещё не отвечено","stChange":"Изменить","stFill":"Заполнить","stDone":"Готово — создать код","stFinished":"Готово","stScoreLine":"{0} верных из {1}","stSendNow":"Теперь отправьте код учителю.","stSendNote":"Код содержит имя и выбранные вами ответы — учитель пересчитывает оценку у себя.","stToTeacher":"учителю","stCopyCode":"Скопировать код","stCodeCopied":"Код скопирован","stWhatRight":"Как было правильно","stWhatRightNote":"Чтобы научиться, а не ради оценки.","stOk":"верно","stCorrect":"Правильный ответ:","stToApp":"К самому приложению — свободная практика","stGrade":"Оценка:","stCode":"Код:","stLinkNote":"Чтобы учитель получил результат — нажмите на ссылку:","badLink":"Экзамен не открылся","toApp":"К приложению","exOld":"Этот экзамен создан в прежней версии приложения, и вопросы в нём уже не те же самые. Попросите учителя прислать новый.","exBroken":"Возможно, экзамен относится к другому приложению, а возможно, ссылка оборвалась по пути. Попросите учителя прислать ссылку ещё раз и откройте её прямо из сообщения.","stBackTo":"Назад к экзамену — вопрос {0} из {1}","mkCsv":"Скачать CSV","mkCsvName":"Имя","mkCsvPct":"Оценка","mkCsvOk":"Верно","mkCsvTotal":"Вопросов","mkCsvDate":"Дата","mkCsvValid":"Код цел","mkCsvQ":"Вопрос {0}","mkCsvYes":"да","mkCsvNo":"нет","mkCsvDone":"Файл загружен","teTitle":"Код учителя","teSet":"Выбор кода учителя","teEnter":"Экраны учителя закрыты. Введите код, чтобы открыть их.","teLead":"Конструктор экзамена и экран оценок исчезнут из меню и будут открываться только по этому коду.","teWarn":"Это не защита. Она останавливает любопытную руку, а не того, кто разбирается в компьютерах.","tePin":"Код — от 4 до 8 цифр","teAgain":"Ещё раз, для проверки","teRemember":"Запомнить на этом устройстве","teRememberNote":"Без этого код будет запрашиваться при каждом открытии приложения. На классном планшете лучше без этого.","teOk":"Готово","teCancel":"Отмена","teBad":"Неверный код.","teMismatch":"Коды не совпадают.","teShort":"Нужно от 4 до 8 цифр, без букв.","teWaitN":"Слишком много попыток. Повторите через {0} с.","teForgot":"Я забыл код","teForgotHow":"Восстановить код нельзя — он нигде не хранится. Очистка данных сайта в браузере удалит его, а вместе с ним прогресс и экзамены.","teHideT":"Скрыть экраны учителя","teHideNote":"На устройстве, которым пользуется ребёнок, конструктор экзамена и экран оценок можно закрыть кодом. Чтобы открыть их потом, добавьте ?teacher=1 к адресу.","teHideBtn":"Выбрать код","teOpenNow":"Режим учителя открыт","teLockBtn":"Выйти из режима учителя","teChangeBtn":"Изменить код","teRemoveBtn":"Убрать код","teLocked":"Экраны учителя закрыты на этом устройстве.","teUnlock":"Открыть","stParent":"Отправить родителю","stParentMsg":"{0} завершил(а) экзамен «{1}»: {2} верных из {3}, оценка {4}."},
+ en:{"exam":"Exam","student":"Student","qs":"questions","minutes":"minutes","none":"none","outOf":"of","exTitle":"Class exam","exLead":"Build an exam, send the link on WhatsApp, and get an answer code back from every student. No server and no account — it all travels through the link and WhatsApp.","exName":"Exam name","exNamePh":"for example: Ohm's law exam — class 10/2","exUnits":"Units","exUnitSuf":"units","exLevel":"Level","exCount":"Number of questions","exTime":"Time limit","exTimeNote":"Zero means no timer. When the time is up the exam submits itself.","exTopics":"Topics","exTopicsNote":"The questions are split evenly between the topics you choose.","exAcc":"Access arrangements","exAccNote":"What is allowed during the exam itself. Read-aloud and the formula sheet are not a hint — they are access tools.","exTts":"Read aloud","exTtsSub":"Every question is read out on request","exForm":"Formula sheet","exFormSub":"Open during the exam, as in a state exam","exPhone":"Your WhatsApp number (optional)","exPhoneNote":"Fill it in and the student's send button opens a chat straight to you. Note: the number appears inside the link you share.","exBuild":"Create the exam","exShareMsg":"{0} questions. Open the link, answer, and send me the code at the end.","exReady":"The exam is ready","exWa":"Send on WhatsApp","exCopyUrl":"Copy the link","exToMarks":"To the marks","exUrlCopied":"Link copied","mkTitle":"Marks","mkLead":"Tap the link the student sent on WhatsApp, or paste the code here. The grade is recomputed from the answers themselves, not from what the student wrote.","mkNew":"New exam","mkEmpty":"You have not created an exam yet. Start from “New exam”.","mkSubs":"submissions","mkAvg":"average","mkPaste":"Paste an answer code","mkPastePh":"Paste the code from WhatsApp here","mkTake":"Take it in","mkResend":"Send again","mkCopyTbl":"Copy the table","mkDelQ":"Delete the exam and its {0} submissions?","mkDelYes":"Yes, delete","mkCancel":"Cancel","mkDel":"Delete the exam","mkByStudent":"By student","mkNoName":"No name","mkFell":"tripped on:","mkAllOk":"all correct","mkBadCode":"the code does not match itself","mkByTopic":"By topic — what is worth teaching again","mkByTopicNote":"How the whole class did, together.","mkRight":"correct answers out of","mkTblHead":"Student\tMark\tCorrect\tTripped on","mkTblCopied":"Table copied","mkErrRead":"We could not read the code. Try copying it again, in full.","mkErrOther":"This code belongs to the exam “{0}”.","mkErrUnknown":"This code belongs to another exam, which is not on this device.","mkErrCount":"The number of answers in the code does not match the exam.","mkTaken":"taken in","mkNoteBad":"Note: the code does not match itself","stNoTime":"no time limit.","stTimed":"There is a time limit: {0} minutes. When it runs out the exam submits itself.","stNoTimer":"No timer. Take your time.","stNoNeg":"No negative marking — a wrong answer takes nothing away.","stReadOn":"You can ask for any question to be read aloud.","stReadOff":"Read-aloud is off in this exam.","stFormOn":"The formula sheet is open throughout the exam.","stFormOff":"The formula sheet is closed in this exam.","stCodeEnd":"At the end you get a code — send it to your teacher on WhatsApp.","stYourName":"Your name","stNameNote":"So the teacher knows who answered. The name is not sent to any server — it goes inside the code.","stNamePh":"First name and surname","stStart":"Let's start","stQn":"Question {0} of {1}","stRead":"Read aloud","stFormulas":"Formula sheet","stPrev":"Previous","stDunno":"I don't know","stFlagged":"✓ marked to come back","stFlag":"Come back to it","stNext":"Next","stReview":"Before you submit","stReviewNote":"You can go back to any question and change it. The code is created after you submit.","stUnanswered":"{0} questions with no answer","stAllAnswered":"Every question is answered","stPicked":"You chose:","stNotYet":"Not answered yet","stChange":"Change","stFill":"Fill in","stDone":"Finished — create the code","stFinished":"Finished","stScoreLine":"{0} correct out of {1}","stSendNow":"Now send the code to your teacher.","stSendNote":"The code holds your name and the answers you chose — the teacher works the mark out again at their end.","stToTeacher":"to the teacher","stCopyCode":"Copy the code","stCodeCopied":"Code copied","stWhatRight":"What the answers were","stWhatRightNote":"To learn from it, not for the mark.","stOk":"correct","stCorrect":"The correct answer:","stToApp":"To the app itself — free practice","stGrade":"Mark:","stCode":"Code:","stLinkNote":"For the teacher to receive the result — tap the link:","badLink":"The exam did not open","toApp":"To the app","exOld":"This exam was made with an earlier version of the app, so its questions are no longer the same. Ask your teacher to send a new one.","exBroken":"The exam may belong to a different app, or the link may have been cut short. Ask your teacher to send the link again, and open it straight from the message.","stBackTo":"Back to the exam — question {0} of {1}","mkCsv":"Download CSV","mkCsvName":"Name","mkCsvPct":"Mark","mkCsvOk":"Correct","mkCsvTotal":"Questions","mkCsvDate":"Date","mkCsvValid":"Code intact","mkCsvQ":"Question {0}","mkCsvYes":"yes","mkCsvNo":"no","mkCsvDone":"The file downloaded","teTitle":"Teacher code","teSet":"Choose a teacher code","teEnter":"The teacher screens are locked. Enter the code to open them.","teLead":"The exam builder and the marks screen leave the menu, and open only with this code.","teWarn":"This is not security. It stops a curious hand, not somebody who knows computers.","tePin":"Code — 4 to 8 digits","teAgain":"Again, to be sure","teRemember":"Remember on this device","teRememberNote":"Without it the code is asked for every time the app opens. On a class tablet, better without.","teOk":"Confirm","teCancel":"Cancel","teBad":"That code is wrong.","teMismatch":"The two codes are not the same.","teShort":"It needs 4 to 8 digits, no letters.","teWaitN":"Too many tries. Try again in {0} seconds.","teForgot":"I forgot the code","teForgotHow":"There is no way to recover the code — it is not stored anywhere. Clearing the site data in the browser removes it, and the progress and exams with it.","teHideT":"Hide the teacher screens","teHideNote":"On a device a child uses, the exam builder and the marks screen can sit behind a code. To open them later, add ?teacher=1 to the address.","teHideBtn":"Choose a code","teOpenNow":"Teacher mode is open","teLockBtn":"Leave teacher mode","teChangeBtn":"Change the code","teRemoveBtn":"Remove the code","teLocked":"The teacher screens are locked on this device.","teUnlock":"Open","stParent":"Send to a parent","stParentMsg":"{0} finished the exam “{1}”: {2} right out of {3}, score {4}."}};
 /* מילות בחירת השאלות. בלוק נפרד ולא תוספת לשורות שמעליו —
    הן ארוכות מכדי לערוך אותן ביד, וכל שינוי בהן מתנגש במלואו. */
 var XQK={"exQs":"השאלות במבחן",
@@ -5053,7 +5053,7 @@ function advance(){
   window.scrollTo(0,0);
   render();
 }
-var VOICE_SAMPLE="פותרים את המשוואה: שלוש איקס ועוד חמש שווה עשרים. מעבירים את החמש לצד השני, ומחלקים בשלוש.";
+var VOICE_SAMPLE="חוק אוהם: המתח שווה לזרם כפול ההתנגדות. אם הזרם שני אמפר וההתנגדות חמישה אוהם, המתח הוא עשרה וולט.";
 function onAction(a,el){
   if(examAction(a,el))return;
   var s=state.settings;
@@ -5336,7 +5336,7 @@ var TR_KEYS=[
 "1–4 לבחירה, רווח להקראה, H רמז, S פתרון",
 "2. מה אתם לומדים?",
 "3. איך נוח לכם לקרוא?",
-"<input class=\"field\" style=\"flex:1;min-width:min(100%,220px)\" placeholder=\"חיפוש נוסחה — למשל: נגזרת, דטרמיננטה, בייס\" value=\"",
+"<input class=\"field\" style=\"flex:1;min-width:min(100%,220px)\" placeholder=\"חיפוש נוסחה — למשל: חוק אוהם, מפל מתח, נצילות\" value=\"",
 "<input id=\"nm\" class=\"field\" style=\"margin-top:12px\" maxlength=\"18\" placeholder=\"שם או כינוי\" value=\"",
 "{0} מתחילים סבב</button>",
 "{0} נבחרו",
@@ -5495,7 +5495,7 @@ var TR_KEYS=[
 "ענק",
 "ערכת צבע",
 "פונט ברור לקריאה",
-"פותרים את המשוואה: שלוש איקס ועוד חמש שווה עשרים. מעבירים את החמש לצד השני, ומחלקים בשלוש.",
+"חוק אוהם: המתח שווה לזרם כפול ההתנגדות. אם הזרם שני אמפר וההתנגדות חמישה אוהם, המתח הוא עשרה וולט.",
 "פרטים",
 "פתוח תמיד — כמו בכל מבחן שנותנים בו דף",
 "פתרון מודרך",
@@ -5834,14 +5834,14 @@ var TR_KEYS=[
 "זה מתח שיא לשיא. הערך האפקטיבי קטן מהשיא.",
 "ערך אפקטיבי",
 "בגל סינוס, הערך האפקטיבי הוא ערך השיא חלקי ‎√2.",
-"מהי ההיגב (הריאקטנס) של הסליל?",
+"מהו ההיגב (הריאקטנס) של הסליל?",
 "שכחתם את 2π. ההיגב של סליל הוא 2π כפול התדר כפול ההשראות.",
 "לא המרתם מילי־הנרי להנרי. צריך לחלק ב-1000 לפני שמציבים.",
 "זו צורה של נוסחת הקבל. בסליל התדר וההשראות במונה.",
 "היגב של סליל",
 "ההיגב גדל עם התדר.",
 "X<sub>L</sub> = 2π · f · L, וההשראות בהנרי.",
-"מהי ההיגב (הריאקטנס) של הקבל?",
+"מהו ההיגב (הריאקטנס) של הקבל?",
 "שכחתם את 2π במכנה.",
 "בנוסחה יש 2π, ולא π.",
 "המרתם מיקרו כאילו היה מילי. מיקרו־פאראד הוא מיליונית, ולא אלפית.",
@@ -5955,19 +5955,19 @@ var TR_KEYS=[
 "זרם מהספק",
 "בעומס התנגדותי, הזרם הוא ההספק חלקי המתח.",
 "I = P ÷ V, והמתח החד־פאזי 230 V.",
-"העומס כולו התנגדותי, ומחובר למעגל אחד של 230 V. איזה מפסק זרם מתאים?",
+"העומס כולו התנגדותי ומחובר למעגל 230 V. בהנחה שהכבל ותנאי ההתקנה מתאימים, מהו דירוג הזרם התקני הקטן ביותר שאינו קטן מזרם העומס?",
 "המפסק קטן מזרם העומס, {0}, ולכן ינתק גם בלי תקלה.",
-"גם הוא גדול מהזרם, אבל בוחרים את הקטן שמעל זרם העומס, כדי להגן על הכבל.",
-"מפסק גדול מדי לא ינתק בזמן, והכבל עלול להתחמם.",
+"גם הוא גדול מזרם העומס, אך בשאלה מבקשים את הדירוג התקני הקטן ביותר. התאמת המפסק להגנת הכבל מחייבת לדעת גם את כושר נשיאת הזרם של הכבל.",
+"זה דירוג גבוה יותר מהדירוג המינימלי המבוקש. בלי נתוני הכבל וההתקנה אי אפשר לקבוע שהוא מתאים להגנה על הכבל.",
 "זרם העומס",
 "בחירה",
-"בוחרים את הערך התקני הקטן ביותר שאינו קטן מזרם העומס. הכבל חייב להתאים למפסק.",
+"לצורך התרגיל בוחרים את הדירוג התקני הקטן ביותר שאינו קטן מזרם העומס. בבחירה בפועל בודקים גם את כושר נשיאת הזרם של הכבל ותנאי ההתקנה.",
 "קודם זרם העומס, ואז הערך התקני הקרוב שמעליו: 6, 10, 16, 20, 25, 32, 40 A.",
-"מה הזרם בכל פאזה של מנוע תלת־פאזי?",
+"מנוע תלת־פאזי צורך מהרשת הספק חשמלי P. מה הזרם בכל פאזה?",
 "שכחתם את ‎√3. בתלת־פאזי מחלקים ב-‎√3 כפול המתח בין הפאזות.",
 "בנוסחה עם ‎√3 משתמשים במתח בין הפאזות, 400 V.",
 "שכחתם את מקדם ההספק. כשהוא קטן מ-1, הזרם גדל.",
-"הספק תלת־פאזי",
+"הספק חשמלי נכנס בתלת־פאזי",
 "מבודדים את I",
 "חיבור תלת־פאזי למבנה. מה ההספק המרבי שאפשר לצרוך ממנו, כשמקדם ההספק הוא 1?",
 "חסר ‎√3. בתלת־פאזי מכפילים ב-‎√3.",
@@ -6040,13 +6040,13 @@ var TR_KEYS=[
 "הגוף משמש כצרכן בין פאזה לאפס, וכל הזרם חוזר. ההפרש אפס.",
 "מה ממסר פחת בעצם משווה?",
 "למה מחברים את הגוף המתכתי של מכשיר להארקה?",
-"הארקה אינה משנה את הצריכה. היא מסלול לזרם בזמן תקלה.",
+"הארקת הגנה אינה מיועדת להפחית צריכת חשמל; מוליך ההגנה מספק מסלול תקלה.",
 "מקדם הספק משפרים בקבלים. הארקה נועדה לבטיחות.",
 "הארקה אינה משנה את מתח העבודה.",
 "תקלה",
 "פאזה נוגעת בגוף המתכתי.",
 "הארקה",
-"הזרם זורם לאדמה במקום דרך אדם, וההגנה מנתקת.",
+"מוליך ההגנה מספק לזרם התקלה מסלול. אמצעי ההגנה המתאים צריך לנתק את המעגל בתנאים שנקבעו.",
 "מה קורה כשפאזה נוגעת בגוף של מכשיר?",
 "מהי הנצילות של המנוע?",
 "הפכתם את השבר. נצילות היא מה שיוצא חלקי מה שנכנס, ולכן תמיד מתחת ל-100%.",
@@ -6218,11 +6218,11 @@ var TR_KEYS=[
 "n כניסות נותנות 2 בחזקת n צירופים.",
 "ערכי המקום: 1 , 2 , 4 , 8 , 16 , 32 , 64 , 128",
 "זרם חד־פאזי",
-"לעומס התנגדותי. במנוע מחלקים גם במקדם ההספק.",
+"לעומס התנגדותי. במנוע יש להתחשב במקדם ההספק; אם נתון הספק מכני ביציאה, גם בנצילות.",
 "זרם והספק תלת־פאזי",
-"V הוא המתח בין הפאזות. ‎√3 ≈ 1.73.",
+"V הוא המתח בין הפאזות. ‎√3 ≈ 1.73. P הוא ההספק החשמלי הנצרך מהרשת; אם נתון הספק מכני ביציאה, צריך להתחשב גם בנצילות המנוע.",
 "בחירת מפסק",
-"המפסק לא קטן מזרם העומס, והכבל חייב לשאת את זרם המפסק. ערכים: 6, 10, 16, 20, 25, 32, 40, 50, 63, 80 A.",
+"I<sub>B</sub> הוא זרם העומס, I<sub>n</sub> דירוג המפסק, ו-I<sub>Z</sub> כושר נשיאת הזרם המותר לכבל. נדרשות גם בדיקות הגנה נוספות. ערכים: 6, 10, 16, 20, 25, 32, 40, 50, 63, 80 A.",
 "אורך במטרים, שטח חתך בממ״ר.",
 "R = ρ · L ÷ A ,  ρ<sub>נחושת</sub> = 0.0175 Ω·mm²/m",
 "מפל מתח חד־פאזי",
@@ -6309,7 +6309,7 @@ var TR_KEYS=[
 "הזרם קטן מדי כדי שהממסר ירגיש בו",
 "הממסר מגן רק על מכשירים, ולא על אנשים",
 "המתח בין פאזה לאפס נמוך מדי",
-"כדי שזרם תקלה יזרום לאדמה וינתק",
+"כדי לספק מסלול לזרם תקלה ולאפשר להגנה לנתק",
 "כדי להוריד את הצריכה של המכשיר",
 "כדי לשפר את מקדם ההספק של המכשיר",
 "כדי שהמכשיר יוכל לעבוד על 400 V",
@@ -6447,7 +6447,7 @@ trAt("en",0,[
 "1–4 to choose, space to read aloud, H for a hint, S for the solution",
 "2. What are you studying?",
 "3. How do you read most comfortably?",
-"<input class=\"field\" style=\"flex:1;min-width:min(100%,220px)\" placeholder=\"Search the formula sheet — derivative, determinant, Bayes\" value=\"",
+"<input class=\"field\" style=\"flex:1;min-width:min(100%,220px)\" placeholder=\"Search the formula sheet — Ohm's law, voltage drop, efficiency\" value=\"",
 "<input id=\"nm\" class=\"field\" style=\"margin-top:12px\" maxlength=\"18\" placeholder=\"name or nickname\" value=\"",
 "{0} Start a round</button>",
 "{0} selected",
@@ -6607,7 +6607,7 @@ trAt("en",150,[
 "Huge",
 "Colour scheme",
 "A readable font",
-"Solving the equation: three x plus five equals twenty. Move the five to the other side, then divide by three.",
+"Ohm's law: voltage equals current times resistance. If the current is two amperes and the resistance is five ohms, the voltage is ten volts.",
 "Details",
 "Always open — as in any exam that gives you a sheet",
 "Guided solution",
@@ -7070,19 +7070,19 @@ trAt("en",600,[
 "Current from power",
 "In a resistive load, the current is the power divided by the voltage.",
 "I = P ÷ V, and the single-phase voltage is 230 V.",
-"The whole load is resistive and connected to one 230 V circuit. Which circuit breaker is suitable?",
+"The load is purely resistive and connected to a 230 V circuit. Assuming the cable and installation conditions are suitable, what is the smallest standard current rating that is not less than the load current?",
 "The breaker is smaller than the load current, {0}, so it will trip even without a fault.",
-"It is also larger than the current, but we choose the smallest one above the load current, to protect the cable.",
-"A breaker that is too large will not trip in time, and the cable may overheat.",
+"It is also larger than the load current, but the question asks for the smallest standard rating. Matching a breaker to protect the cable also requires knowing the cable's current-carrying capacity.",
+"This is a higher rating than the requested minimum. Without cable and installation data, one cannot determine that it is suitable for protecting the cable.",
 "Load current",
 "Choice",
-"Choose the smallest standard value that is not smaller than the load current. The cable must match the breaker.",
+"For this exercise, choose the smallest standard rating that is not less than the load current. In practice, one also checks the cable's current-carrying capacity and installation conditions.",
 "First the load current, then the nearest standard value above it: 6, 10, 16, 20, 25, 32, 40 A.",
-"What is the current in each phase of a three-phase motor?",
+"A three-phase motor draws electrical power P from the grid. What is the current in each phase?",
 "You forgot ‎√3. In three-phase, divide by ‎√3 times the voltage between phases.",
 "In the formula with ‎√3, use the voltage between phases, 400 V.",
 "You forgot the power factor. When it is less than 1, the current increases.",
-"Three-phase power",
+"Electrical input power in three-phase",
 "Isolate I",
 "A three-phase supply to a building. What is the maximum power you can draw from it when the power factor is 1?",
 "‎√3 is missing. In three-phase, multiply by ‎√3.",
@@ -7156,13 +7156,13 @@ trAt("en",750,[
 "The body acts as a load between phase and neutral, and all the current returns. The difference is zero.",
 "What does an RCD actually compare?",
 "Why is the metal body of a device connected to earth?",
-"Earthing does not change consumption. It is a path for current during a fault.",
+"Protective earthing is not meant to reduce electricity consumption; the protective conductor provides a fault path.",
 "The power factor is improved with capacitors. Earthing is for safety.",
 "Earthing does not change the operating voltage.",
 "Fault",
 "The phase touches the metal body.",
 "Earthing",
-"The current flows to earth instead of through a person, and the protection trips.",
+"The protective conductor gives the fault current a path. The suitable protective device must disconnect the circuit under the specified conditions.",
 "What happens when the phase touches the body of a device?",
 "What is the efficiency of the motor?",
 "You flipped the fraction. Efficiency is what comes out divided by what goes in, so it is always below 100%.",
@@ -7335,11 +7335,11 @@ trAt("en",900,[
 "n inputs give 2 to the power of n combinations.",
 "Place values: 1 , 2 , 4 , 8 , 16 , 32 , 64 , 128",
 "Single-phase current",
-"For a resistive load. For a motor, also divide by the power factor.",
+"For a resistive load. For a motor, account for the power factor; if the given power is mechanical output, account for efficiency too.",
 "Three-phase current and power",
-"V is the voltage between phases. ‎√3 ≈ 1.73.",
+"V is the line-to-line voltage. √3 ≈ 1.73. P is the electrical power drawn from the grid; if mechanical output power is given, the motor efficiency must also be considered.",
 "Choosing a breaker",
-"The breaker is not smaller than the load current, and the cable must carry the breaker current. Values: 6, 10, 16, 20, 25, 32, 40, 50, 63, 80 A.",
+"I<sub>B</sub> is the load current, I<sub>n</sub> the breaker rating, and I<sub>Z</sub> the cable's permissible current-carrying capacity. Additional protection checks are also required. Values: 6, 10, 16, 20, 25, 32, 40, 50, 63, 80 A.",
 "Length in meters, cross-section in mm².",
 "R = ρ · L ÷ A ,  ρ<sub>copper</sub> = 0.0175 Ω·mm²/m",
 "Single-phase voltage drop",
@@ -7427,7 +7427,7 @@ trAt("en",1050,[
 "The current is too small for the RCD to sense",
 "The RCD protects only appliances, not people",
 "The voltage between phase and neutral is too low",
-"So that fault current flows to earth and trips the supply",
+"To provide a path for fault current and allow the protection to disconnect",
 "To reduce the appliance's consumption",
 "To improve the appliance's power factor",
 "So that the appliance can run on 400 V",
@@ -7533,7 +7533,7 @@ trAt("ru",0,[
 "1–4 — выбор, пробел — озвучить, H — подсказка, S — решение",
 "2. Что вы изучаете?",
 "3. Как вам удобнее читать?",
-"<input class=\"field\" style=\"flex:1;min-width:min(100%,220px)\" placeholder=\"Поиск формулы — производная, определитель, Байес\" value=\"",
+"<input class=\"field\" style=\"flex:1;min-width:min(100%,220px)\" placeholder=\"Поиск формулы — закон Ома, падение напряжения, КПД\" value=\"",
 "<input id=\"nm\" class=\"field\" style=\"margin-top:12px\" maxlength=\"18\" placeholder=\"имя или прозвище\" value=\"",
 "{0} Начать круг</button>",
 "выбрано: {0}",
@@ -7693,7 +7693,7 @@ trAt("ru",150,[
 "Огромный",
 "Цветовая схема",
 "Читаемый шрифт",
-"Решаем уравнение: три икс плюс пять равно двадцати. Переносим пятёрку в другую сторону и делим на три.",
+"Закон Ома: напряжение равно току, умноженному на сопротивление. Если ток два ампера, а сопротивление пять ом, напряжение — десять вольт.",
 "Подробности",
 "Всегда открыт — как на любом экзамене, где выдают справочник",
 "Разбор решения",
@@ -8156,19 +8156,19 @@ trAt("ru",600,[
 "Ток через мощность",
 "При активной (резистивной) нагрузке ток равен мощности, делённой на напряжение.",
 "I = P ÷ V, а однофазное напряжение 230 V.",
-"Вся нагрузка активная и подключена к одной цепи 230 V. Какой автоматический выключатель подходит?",
+"Нагрузка чисто активная и подключена к цепи 230 В. Если кабель и условия прокладки подходят, каково наименьшее стандартное номинальное значение тока, не меньшее тока нагрузки?",
 "Автомат меньше тока нагрузки, {0}, поэтому он отключится даже без неисправности.",
-"Он тоже больше тока, но выбирают самый маленький выше тока нагрузки, чтобы защитить кабель.",
-"Слишком большой автомат не отключится вовремя, и кабель может перегреться.",
+"Он тоже больше тока нагрузки, но в вопросе просят наименьший стандартный номинал. Чтобы автомат защищал кабель, нужно знать также допустимый ток кабеля.",
+"Это номинал выше требуемого минимального. Без данных о кабеле и прокладке нельзя утверждать, что он подходит для защиты кабеля.",
 "Ток нагрузки",
 "Выбор",
-"Выбирают самое маленькое стандартное значение, которое не меньше тока нагрузки. Кабель должен соответствовать автомату.",
+"Для упражнения выбираем наименьший стандартный номинал, не меньший тока нагрузки. На практике проверяют также допустимый ток кабеля и условия прокладки.",
 "Сначала ток нагрузки, потом ближайшее стандартное значение выше него: 6, 10, 16, 20, 25, 32, 40 A.",
-"Какой ток в каждой фазе трёхфазного двигателя?",
+"Трёхфазный двигатель потребляет из сети электрическую мощность P. Каков ток в каждой фазе?",
 "Вы забыли ‎√3. В трёхфазной сети делят на ‎√3, умноженный на линейное напряжение.",
 "В формуле с ‎√3 используют напряжение между фазами, 400 V.",
 "Вы забыли коэффициент мощности. Когда он меньше 1, ток растёт.",
-"Трёхфазная мощность",
+"Входная электрическая мощность в трёхфазной цепи",
 "Выражаем I",
 "Трёхфазное подключение здания. Какую наибольшую мощность можно от него потреблять, если коэффициент мощности равен 1?",
 "Не хватает ‎√3. В трёхфазной сети умножают на ‎√3.",
@@ -8242,13 +8242,13 @@ trAt("ru",750,[
 "Тело работает как потребитель между фазой и нулём, и весь ток возвращается. Разница равна нулю.",
 "Что на самом деле сравнивает УЗО?",
 "Зачем металлический корпус прибора подключают к заземлению?",
-"Заземление не меняет потребление. Это путь для тока при неисправности.",
+"Защитное заземление не предназначено для снижения потребления; защитный проводник обеспечивает путь току повреждения.",
 "Коэффициент мощности улучшают конденсаторами. Заземление нужно для безопасности.",
 "Заземление не меняет рабочее напряжение.",
 "Неисправность",
 "Фаза касается металлического корпуса.",
 "Заземление",
-"Ток уходит в землю, а не через человека, и защита отключает.",
+"Защитный проводник даёт току повреждения путь. Соответствующее защитное устройство должно отключить цепь при заданных условиях.",
 "Что происходит, когда фаза касается корпуса прибора?",
 "Каков КПД двигателя?",
 "Вы перевернули дробь. КПД — это то, что выходит, делённое на то, что входит, поэтому он всегда меньше 100%.",
@@ -8421,11 +8421,11 @@ trAt("ru",900,[
 "n входов дают 2 в степени n комбинаций.",
 "Веса разрядов: 1 , 2 , 4 , 8 , 16 , 32 , 64 , 128",
 "Однофазный ток",
-"Для активной нагрузки. Для двигателя делим ещё и на коэффициент мощности.",
+"Для активной нагрузки. Для двигателя учитывайте коэффициент мощности; если дана механическая мощность на валу — также КПД.",
 "Трёхфазный ток и мощность",
-"V — это напряжение между фазами. ‎√3 ≈ 1.73.",
+"V — линейное напряжение. √3 ≈ 1,73. P — электрическая мощность, потребляемая из сети; если дана механическая мощность на валу, нужно учесть и КПД двигателя.",
 "Выбор автомата",
-"Автомат не меньше тока нагрузки, а кабель должен выдерживать ток автомата. Значения: 6, 10, 16, 20, 25, 32, 40, 50, 63, 80 A.",
+"I<sub>B</sub> — ток нагрузки, I<sub>n</sub> — номинал автомата, I<sub>Z</sub> — допустимый ток кабеля. Требуются и дополнительные проверки защиты. Значения: 6, 10, 16, 20, 25, 32, 40, 50, 63, 80 A.",
 "Длина в метрах, сечение в мм².",
 "R = ρ · L ÷ A ,  ρ<sub>меди</sub> = 0.0175 Ω·mm²/m",
 "Однофазное падение напряжения",
@@ -8513,7 +8513,7 @@ trAt("ru",1050,[
 "Ток слишком мал, чтобы УЗО его почувствовало",
 "УЗО защищает только приборы, а не людей",
 "Напряжение между фазой и нулём слишком низкое",
-"Чтобы ток повреждения ушёл в землю и сработало отключение",
+"Чтобы дать току повреждения путь и позволить защите отключить цепь",
 "Чтобы уменьшить потребление прибора",
 "Чтобы улучшить коэффициент мощности прибора",
 "Чтобы прибор мог работать от 400 V",
@@ -8619,7 +8619,7 @@ trAt("ar",0,[
 "1–4 للاختيار، مسافة للاستماع، H تلميح، S الحل",
 "2. ماذا تدرس؟",
 "3. كيف يريحك أن تقرأ؟",
-"<input class=\"field\" style=\"flex:1;min-width:min(100%,220px)\" placeholder=\"بحث في ورقة القوانين — مشتقة، محدّد، بايز\" value=\"",
+"<input class=\"field\" style=\"flex:1;min-width:min(100%,220px)\" placeholder=\"بحث في ورقة القوانين — قانون أوم، هبوط الجهد، الكفاءة\" value=\"",
 "<input id=\"nm\" class=\"field\" style=\"margin-top:12px\" maxlength=\"18\" placeholder=\"اسم أو لقب\" value=\"",
 "{0} ابدأ جولة</button>",
 "{0} مُختارة",
@@ -8779,7 +8779,7 @@ trAt("ar",150,[
 "ضخم",
 "نظام الألوان",
 "خطّ واضح للقراءة",
-"نحلّ المعادلة: ثلاثة إكس زائد خمسة يساوي عشرين. ننقل الخمسة إلى الطرف الآخر ثم نقسم على ثلاثة.",
+"قانون أوم: الجهد يساوي التيار مضروبًا في المقاومة. إذا كان التيار أمبيرين والمقاومة خمسة أوم، فالجهد عشرة فولت.",
 "تفاصيل",
 "مفتوحة دائمًا — كما في كل امتحان يُعطى فيه ورقة",
 "حلّ موجَّه",
@@ -9242,19 +9242,19 @@ trAt("ar",600,[
 "التيار من القدرة",
 "في حمل مقاوم، التيار هو القدرة مقسومة على الجهد.",
 "I = P ÷ V، والجهد أحادي الطور 230 V.",
-"الحمل كله مقاوم، وموصول بدائرة واحدة 230 V. أي قاطع تيار مناسب؟",
+"الحمل مقاوميّ بالكامل وموصول بدائرة 230 فولت. بافتراض أن الكابل وظروف التركيب مناسبة، ما هو أصغر تصنيف تيار قياسي لا يقلّ عن تيار الحمل؟",
 "القاطع أصغر من تيار الحمل، {0}، لذلك سيفصل حتى بدون عطل.",
-"هو أيضًا أكبر من التيار، لكننا نختار الأصغر الذي فوق تيار الحمل، لحماية الكابل.",
-"القاطع الكبير جدًا لن يفصل في الوقت المناسب، وقد يسخن الكابل.",
+"هو أيضًا أكبر من تيار الحمل، لكن السؤال يطلب أصغر تصنيف قياسي. مطابقة القاطع لحماية الكابل تتطلب أيضًا معرفة قدرة الكابل على حمل التيار.",
+"هذا تصنيف أعلى من الحد الأدنى المطلوب. من دون بيانات الكابل والتركيب لا يمكن الجزم بأنه مناسب لحماية الكابل.",
 "تيار الحمل",
 "الاختيار",
-"نختار أصغر قيمة قياسية ليست أصغر من تيار الحمل. يجب أن يلائم الكابل القاطع.",
+"لغرض التمرين نختار أصغر تصنيف قياسي لا يقلّ عن تيار الحمل. في الاختيار الفعلي نتحقق أيضًا من قدرة الكابل على حمل التيار وظروف التركيب.",
 "أولًا تيار الحمل، ثم القيمة القياسية الأقرب فوقه: 6، 10، 16، 20، 25، 32، 40 A.",
-"ما التيار في كل طور لمحرك ثلاثي الأطوار؟",
+"محرك ثلاثي الأطوار يستهلك من الشبكة قدرة كهربائية P. ما هو التيار في كل طور؟",
 "نسيتم ‎√3. في ثلاثي الأطوار نقسم على ‎√3 مضروبًا في الجهد بين الأطوار.",
 "في المعادلة مع ‎√3 نستخدم الجهد بين الأطوار، 400 V.",
 "نسيتم معامل القدرة. عندما يكون أصغر من 1، يزداد التيار.",
-"قدرة ثلاثية الأطوار",
+"القدرة الكهربائية الداخلة في نظام ثلاثي الأطوار",
 "نعزل I",
 "توصيل ثلاثي الأطوار لمبنى. ما القدرة القصوى التي يمكن استهلاكها منه، عندما يكون معامل القدرة 1؟",
 "ينقص ‎√3. في ثلاثي الأطوار نضرب في ‎√3.",
@@ -9328,13 +9328,13 @@ trAt("ar",750,[
 "الجسم يعمل كمستهلك بين الطور والمحايد، وكل التيار يعود. الفرق صفر.",
 "ماذا يقارن مرحّل التسرب في الواقع؟",
 "لماذا نوصل الهيكل المعدني للجهاز بالتأريض؟",
-"التأريض لا يغيّر الاستهلاك. هو مسار للتيار وقت العطل.",
+"التأريض الوقائي لا يهدف إلى تقليل استهلاك الكهرباء؛ الموصل الوقائي يوفّر مسارًا لتيار العطل.",
 "معامل القدرة يُحسَّن بالمكثفات. التأريض مخصص للسلامة.",
 "التأريض لا يغيّر جهد التشغيل.",
 "عطل",
 "الطور يلمس الهيكل المعدني.",
 "التأريض",
-"التيار يتدفق إلى الأرض بدلًا من المرور عبر إنسان، والحماية تفصل.",
+"الموصل الوقائي يوفّر مسارًا لتيار العطل. وعلى جهاز الحماية المناسب فصل الدائرة ضمن الشروط المحددة.",
 "ماذا يحدث عندما يلمس الطور هيكل الجهاز؟",
 "ما كفاءة المحرك؟",
 "عكستم الكسر. الكفاءة هي ما يخرج مقسومًا على ما يدخل، لذلك هي دائمًا أقل من 100%.",
@@ -9507,11 +9507,11 @@ trAt("ar",900,[
 "n مداخل تعطي 2 أس n تركيبة.",
 "قيم الخانات: 1 , 2 , 4 , 8 , 16 , 32 , 64 , 128",
 "تيار أحادي الطور",
-"لحمل مقاومي. في المحرك نقسم أيضًا على معامل القدرة.",
+"لحمل مقاومي. في المحرك يجب مراعاة معامل القدرة؛ وإذا كانت القدرة المعطاة ميكانيكية في الخرج، فراعِ الكفاءة أيضًا.",
 "التيار والقدرة ثلاثي الأطوار",
-"V هو الجهد بين الأطوار. ‎√3 ≈ 1.73.",
+"V هو الجهد بين الأطوار. √3 ≈ 1.73. P هو القدرة الكهربائية المستهلكة من الشبكة؛ إذا أعطيت قدرة ميكانيكية في الخرج، فيجب مراعاة كفاءة المحرك أيضًا.",
 "اختيار القاطع",
-"القاطع لا يكون أصغر من تيار الحمل، والكابل يجب أن يحتمل تيار القاطع. القيم: 6، 10، 16، 20، 25، 32، 40، 50، 63، 80 A.",
+"I<sub>B</sub> هو تيار الحمل، وI<sub>n</sub> تصنيف القاطع، وI<sub>Z</sub> قدرة الكابل المسموح بها على حمل التيار. وهناك حاجة أيضًا إلى فحوص حماية إضافية. القيم: 6، 10، 16، 20، 25، 32، 40، 50، 63، 80 A.",
 "الطول بالمتر، مساحة المقطع بالمليمتر المربع.",
 "R = ρ · L ÷ A ,  ρ<sub>النحاس</sub> = 0.0175 Ω·mm²/m",
 "هبوط الجهد أحادي الطور",
@@ -9599,7 +9599,7 @@ trAt("ar",1050,[
 "التيار صغير جدًا فلا يشعر به القاطع",
 "القاطع يحمي الأجهزة فقط، وليس الأشخاص",
 "الجهد بين الطور والمحايد منخفض جدًا",
-"كي يتدفق تيار العطل إلى الأرض ويُفصل",
+"لتوفير مسار لتيار العطل وتمكين الحماية من الفصل",
 "لتقليل استهلاك الجهاز",
 "لتحسين معامل قدرة الجهاز",
 "كي يستطيع الجهاز العمل على 400 V",
@@ -9648,7 +9648,7 @@ if(!INTERNAL_OK){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=e6-pwa2").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=e7-pwa1").catch(function(){});
   });
 }
 </script>
