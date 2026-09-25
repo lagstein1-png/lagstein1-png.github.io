@@ -1,0 +1,13 @@
+# עברית בדרך שלך - שער עברית מאוחד
+
+Sandbox folder only; no publishing. The new `/hebrew/` home organizes existing public site capabilities by level: middle school, high school/bagrut 281 and 282, and new immigrants/274. It links to `/ulpan/`, `/kotvim/`, `/reader/` instead of copying them. Existing URLs and existing apps are unchanged. Practice, concepts and writing live inside the new hub. Entry URL after any later publication: `/hebrew/?internal=shlav-internal-hebrew`. This is a client-side discoverability gate only, **not a security boundary**; never use it for private student data.
+
+Seeded from `lomda/data/lashon.js` at Git revision 0af1764: 46 concepts, two short passages and four comprehension questions, plus 9 newly written questions. The question source remains Hebrew; the original 46 concept question/answer explanations and 18 new concept aids have translations in Arabic, Russian and English. Twelve writing prompts (three per stage/track) remain Hebrew and UI and concept aids switch among four languages. The app uses no paid service or network tutor endpoint. The added practice questions are original and include stage-specific passages; see counts below. The 'ask the teacher' button displays the authored question hint locally. Browser speech synthesis reads Hebrew, subject to installed voices. Progress uses only `hebrew-practice-v1` in localStorage; writing draft lives in memory until tab close. `hebrew-access-v1` is separate from the electric and civics keys.
+
+The additional bank has 64 stage-specific questions, 18 concept cards and 12 writing tasks. The middle-school track has its own question selection across three levels rather than reusing bagrut material.
+
+This is not a faithful simulation of any official exam or its scoring, and topic coverage is illustrative rather than exhaustive. It should be reviewed by a Hebrew teacher and updated against current Ministry focus before students use it. See SOURCES.md.
+
+To inspect locally: `python3 -m http.server 8766` from the folder *above* `hebrew/`, then visit `http://localhost:8766/hebrew/?internal=shlav-internal-hebrew`. The relative CSS and scripts load without site dependencies.
+
+Integration caveat: the current shared `/tutor/tutor.js` and `/tutor/josh-local.js` in the cloned repository still contain the former tutor's identity. This package deliberately does **not** load them or turn on a paid endpoint. Its "teacher help" action displays only the question's authored local hint; after the separately planned Limor tutor update is published, adapt and verify the shared tutor mount here. The old URLs still retain their current tutor identity until their own patch lands.
