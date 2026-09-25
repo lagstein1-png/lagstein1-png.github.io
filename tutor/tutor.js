@@ -163,6 +163,22 @@ var FACE_MOMENT = null, faceTimer = null, requestId = 0;
    הפתיחה שלו ל-Limor נמשכת כמה ציורים (חשיפת ההודעה תו־אחר־תו). */
 var INTRO_SEEN = false;
 
+/* A deployed Worker can lag behind the shared Limor panel. Fix only a first-person
+   introduction inherited from the former persona; do not change mentions of Barak
+   as a person, a surname, or a student's question. Keep this at the display boundary
+   so the spoken reply and the visible reply always use the same words. */
+function teacherIdentity(text, lg){
+  text = String(text || "");
+  if(lg === "he") return text.replace(/(^|[\s,.:!?״"'־-])((?:שמי|קוראים לי|אני)\s+)ברק(?=$|[\s,.,!?;:״"'־-])/g,
+    function(_, before, intro){ return before + intro + "לימור" });
+  if(lg === "ar") return text.replace(/(^|[\s,.:!?"'])((?:اسمي|أنا)\s+)(?:باراك|برק)(?=$|[\s,.,!?;:"'])/g,
+    function(_, before, intro){ return before + intro + "ليمور" });
+  if(lg === "ru") return text.replace(/(^|[\s,.:!?"'])((?:меня зовут|я)\s+)(?:Барак|Barak)(?=$|[\s,.,!?;:"'])/gi,
+    function(_, before, intro){ return before + intro + "Лимор" });
+  if(lg === "en") return text.replace(/(^|[\s,.:!?"'])((?:my name is|i(?:'|’)m|i am)\s+)Barak(?=$|[\s,.,!?;:"'])/gi,
+    function(_, before, intro){ return before + intro + "Limor" });
+  return text;
+}
 function T(){ return L[lang()] || L.he }
 function lang(){
   /* אפליקציה שיש בה בורר שפה — הבוט הולך אחריו, וזו הדרישה.
@@ -1502,7 +1518,7 @@ function send(text, auto){
     BUSY = false;
     if(!res || !res.say){ NOTE = t.err; if(auto) MSGS = []; draw(); return }
     /* תשובה מקומית מסומנת ללומד — ראו replyLocal. */
-    MSGS.push({ role:"assistant", text:res.say, local: (API && res.source !== "ai") ? (res.why || "local") : "" });
+    MSGS.push({ role:"assistant", text:teacherIdentity(res.say, lang()), local: (API && res.source !== "ai") ? (res.why || "local") : "" });
     startReveal(MSGS.length - 1);
     draw(); answerFace(res.face); focus();
   }, function(){
@@ -1610,7 +1626,7 @@ function sendLegacy(text, auto){
     BUSY = false;
     var reply = String((d && d.text) || "").trim();
     if(!reply) throw new Error("empty");
-    MSGS.push({ role:"assistant", text:reply });
+    MSGS.push({ role:"assistant", text:teacherIdentity(reply, lang()) });
     startReveal(MSGS.length - 1);
     draw(); focus();
   })
