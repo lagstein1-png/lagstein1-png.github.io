@@ -428,6 +428,9 @@ footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface
 /* שאלת מקור נושאת קטע שלם. בלי תקרה הוא דוחף את שאר הרשימה
    אל מחוץ למסך. */
 .xq .passage{max-height:11rem;overflow:auto}
+.hlang{display:flex;gap:4px;flex:none;align-items:center}
+.hlang button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;padding:3px 9px;font:inherit;font-size:.82rem;cursor:pointer;min-height:36px}
+.hlang button.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:700}
 /* בורר השפה מציג ״العربية״ ו-״Русский״ גם כשהממשק עברי — זה כל
    תפקידו — ולכן `html[lang]` אינו חל עליהם והם יורשים את `--font`,
    שאין בו לא ערבית ולא קירילית. הגופן נקבע לפי השפה שהכפתור מציע,
@@ -2508,7 +2511,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t153 · 2026-09-26";
+var BUILD="t154 · 2026-09-26";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -6573,13 +6576,21 @@ function header(){
            ["formulas","נוסחאות","book"],["progress","התקדמות","chart"],
            ["settings","הגדרות","gear"]];
   if(teOpen())nav.splice(nav.length-1,0,["marks","מבחן","share"]);
-  return '<header><div class="wrap hbar">'+
-    '<button class="brand" data-a="go" data-v="home" aria-label="לדף הבית"><svg class="sitemark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg>'+
-      '<span class="mk">'+({ar:"ش",ru:"Ш",en:"S"}[LG]||"ש")+'</span><span><b>'+esc(_("שלב"))+'</b><small>'+esc(_("מתמטיקה לתיכון"))+'</small></span></button>'+
+  /* בורר שפה גלוי בשורה העליונה (26.9.2026) — לא רק בהגדרות. */
+  var lang='<span class="hlang" role="group" aria-label="'+esc(_("שפה"))+'">'+
+    Object.keys(LANGS).map(function(k){
+      return '<button class="'+(LG===k?"on":"")+'" data-a="lang" data-n="'+k+
+        '" lang="'+k+'" dir="'+LANGS[k].dir+'">'+esc(LANGS[k].name)+'</button>';
+    }).join("")+'</span>';
+  var brand='<button class="brand" data-a="go" data-v="home" aria-label="לדף הבית"><svg class="sitemark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg>'+
+      '<span class="mk">'+({ar:"ش",ru:"Ш",en:"S"}[LG]||"ש")+'</span><span><b>'+esc(_("שלב"))+'</b><small>'+esc(_("מתמטיקה לתיכון"))+'</small></span></button>';
+  /* מסך הפתיחה מקבל שורה צרה: מותג ובורר שפה, בלי ניווט (26.9.2026). */
+  if(!state.onboarded) return '<header><div class="wrap hbar">'+brand+lang+'</div></header>';
+  return '<header><div class="wrap hbar">'+brand+
     '<a class="nb" href="./?bagrut3=1" style="text-decoration:none"><span>'+esc(_("בגרות 3 יח״ל"))+'</span></a>'+
     '<nav>'+nav.map(function(n){
       return '<button class="nb'+(view===n[0]?" on":"")+'" data-a="go" data-v="'+n[0]+'" title="'+n[1]+'" aria-current="'+(view===n[0]?"page":"false")+'">'+ic(n[2],17)+'<span>'+n[1]+'</span></button>';
-    }).join("")+'</nav>'+
+    }).join("")+'</nav>'+lang+
   '</div></header>';
 }
 
@@ -6676,6 +6687,8 @@ function viewHome(){
        ic("pencil",19)+' מתחילים סבב</button>'+
      (wt?'<button class="btn btn-g w" style="margin-top:9px" data-a="starttopic" data-t="'+wt.id+'">'+
        ic("target",17)+' <span><span>תרגול ממוקד</span>: <span>'+wt.name+'</span></span></button>':"")+
+     (window.TUTOR&&TUTOR.on()?'<button class="btn ghost w" style="margin-top:9px" data-a="tutor">'+
+       esc(TUTOR.label())+'</button>':"")+
      '</div>';
   if(wt&&mastery(wt.id).seen){
     var pre=wt.pre&&wt.pre.length?topicById(wt.pre[0]):null;
@@ -7263,7 +7276,7 @@ function render(){ if(window.BAGRUT3){ window.BAGRUT3.mount(); return } try{lgCh
     afterRender(); return;
   }
   if(!state.onboarded){
-    html=wrapMain(viewOnboard());
+    html=header()+wrapMain(viewOnboard());
   }else{
     html=header()+'<main id="main" tabindex="-1">';
     if(view==="home")html+=viewHome();
@@ -8943,7 +8956,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t153-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t154-pwa1").catch(function(){});
   });
 }
 </script>

@@ -459,6 +459,9 @@ footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface
 /* שאלת מקור נושאת קטע שלם. בלי תקרה הוא דוחף את שאר הרשימה
    אל מחוץ למסך. */
 .xq .passage{max-height:11rem;overflow:auto}
+.hlang{display:flex;gap:4px;flex:none;align-items:center}
+.hlang button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;padding:3px 9px;font:inherit;font-size:.82rem;cursor:pointer;min-height:36px}
+.hlang button.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:700}
 /* בורר השפה מציג ״العربية״ ו-״Русский״ גם כשהממשק עברי — זה כל
    תפקידו — ולכן `html[lang]` אינו חל עליהם והם יורשים את `--font`,
    שאין בו לא ערבית ולא קירילית. הגופן נקבע לפי השפה שהכפתור מציע,
@@ -989,7 +992,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="e14 · 2026-09-26";
+var BUILD="e15 · 2026-09-26";
 var KEY="electric-state-v1";
 
 function blankState(){
@@ -3189,12 +3192,19 @@ function header(){
            ["formulas",_("נוסחאות"),"book"],["progress",_("התקדמות"),"chart"],
            ["settings",_("הגדרות"),"gear"]];
   if(teOpen())nav.splice(nav.length-1,0,["marks",xt("exam"),"share"]);
-  return '<header><div class="wrap hbar">'+
-    '<button class="brand" data-a="go" data-v="home" aria-label="'+esc(_('לדף הבית'))+'"><svg class="sitemark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg>'+
-      '<span class="mk">'+_('מ')+'</span><span><b>'+_('מתח')+'</b><small>'+_('חשמל לתיכון')+'</small></span></button>'+
+  /* בורר שפה גלוי בשורה העליונה (26.9.2026) — לא רק בהגדרות. */
+  var lang='<span class="hlang" role="group">'+Object.keys(LANGS).map(function(k){
+      return '<button class="'+(LG===k?"on":"")+'" data-a="lang" data-n="'+k+
+        '" lang="'+k+'" dir="'+LANGS[k].dir+'">'+esc(LANGS[k].name)+'</button>';
+    }).join("")+'</span>';
+    var brand='<button class="brand" data-a="go" data-v="home" aria-label="'+esc(_('לדף הבית'))+'"><svg class="sitemark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg>'+
+      '<span class="mk">'+_('מ')+'</span><span><b>'+_('מתח')+'</b><small>'+_('חשמל לתיכון')+'</small></span></button>';
+  /* מסך הפתיחה מקבל שורה צרה: מותג ובורר שפה, בלי ניווט (26.9.2026). */
+  if(!state.onboarded) return '<header><div class="wrap hbar">'+brand+lang+'</div></header>';
+  return '<header><div class="wrap hbar">'+brand+
     '<nav>'+nav.map(function(n){
       return '<button class="nb'+(view===n[0]?" on":"")+'" data-a="go" data-v="'+n[0]+'" title="'+n[1]+'" aria-current="'+(view===n[0]?"page":"false")+'">'+ic(n[2],17)+'<span>'+n[1]+'</span></button>';
-    }).join("")+'</nav>'+
+    }).join("")+'</nav>'+lang+
   '</div></header>';
 }
 
@@ -5015,7 +5025,7 @@ function render(){ try{lgChrome()}catch(e){}
     afterRender(); return;
   }
   if(!state.onboarded){
-    html=wrapMain(viewOnboard());
+    html=header()+wrapMain(viewOnboard());
   }else{
     html=header()+'<main id="main" tabindex="-1">';
     if(view==="home")html+=viewHome();
@@ -9845,7 +9855,7 @@ if(!INTERNAL_OK){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=e14-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=e15-pwa1").catch(function(){});
   });
 }
 </script>

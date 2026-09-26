@@ -826,7 +826,7 @@ function cancelSpeech(){
 }
 
 var P = {              /* העדפות תצוגה */
-  nikud:1, size:1.5, space:1, focus:0, rate:0.95, light:0, voice:'browser',
+  nikud:1, size:1.5, space:1, focus:0, rate:0.95, light:'auto', voice:'browser',
   say:1                /* כפתורים מדברים (O-29) */
 };
 
@@ -1448,13 +1448,17 @@ function loadPrefs(){
   }catch(e){}
   applyPrefs();
 }
+function effLight(){ /* 'auto' = מעקב אחרי מערכת ההפעלה; 0/1 = בחירה ידנית */
+  if(P.light==='auto'||P.light===null||typeof P.light==='undefined'){ try{ return window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 1 : 0; }catch(e){ return 1; } }
+  return P.light ? 1 : 0;
+}
 function applyPrefs(){
   var r = document.documentElement.style;
   r.setProperty('--size', P.size + 'rem');
   var sp = [[1.7,'0','0.06em'],[2.1,'0.02em','0.16em'],[2.6,'0.05em','0.3em']][P.space] || [2.1,'0.02em','0.16em'];
   r.setProperty('--lh', sp[0]); r.setProperty('--ls', sp[1]); r.setProperty('--ws', sp[2]);
-  document.documentElement.classList.toggle('light', !!P.light);
-  $('#btnTheme').textContent = P.light ? _('מצב כהה') : _('מצב בהיר');
+  document.documentElement.classList.toggle('light', !!effLight());
+  $('#btnTheme').textContent = effLight() ? _('מצב כהה') : _('מצב בהיר');
   try{ var bs=$('#btnSay'); bs.setAttribute('aria-pressed', P.say ? 'true' : 'false'); bs.classList.toggle('solid', !!P.say); }catch(e){}
   $('#screenRead').classList.toggle('focusing', !!P.focus);
   VOICE = String(P.voice || 'browser');
@@ -1624,7 +1628,7 @@ $('#toolsHandle').addEventListener('keydown', function(e){
 /* כפתורים מדברים — המתג (O-29). דולק כברירת מחדל; כבוי — הלחיצות שותקות. */
 $('#btnSay').addEventListener('click', function(){ P.say = P.say ? 0 : 1; savePrefs(); applyPrefs(); });
 $('#btnTheme').addEventListener('click', function(){
-  P.light = P.light ? 0 : 1;
+  P.light = effLight() ? 0 : 1;
   document.documentElement.classList.toggle('light', !!P.light);
   this.textContent = P.light ? _('מצב כהה') : _('מצב בהיר');
   savePrefs();
@@ -1661,7 +1665,7 @@ function refreshDynamic(){
      שהצילום אינו מכיר. בזמן ניקוד הכפתור מושבת ומציג התקדמות; לא נוגעים. */
   try{ var g = $('#btnGo'); if(g && !g.disabled) g.textContent = _('נקדו והתחילו'); }catch(e){}
   try{ if(LAST_NIKUD_ERR && !$('#warn').classList.contains('hidden')) renderNikudWarn(); }catch(e){}
-  try{ $('#btnTheme').textContent = P.light ? _('מצב כהה') : _('מצב בהיר'); }catch(e){}
+  try{ $('#btnTheme').textContent = effLight() ? _('מצב כהה') : _('מצב בהיר'); }catch(e){}
   try{ $('#toolsLabel').textContent =
         document.querySelector('#tools').classList.contains('open') ? _('▼ סגירה') : _('▲ תצוגה'); }catch(e){}
   try{
@@ -1716,7 +1720,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=107-pwa2").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=108-pwa1").catch(function(){});
   });
 }
 </script>

@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x98 · 2026-09-25";
+  var BUILD = "x100 · 2026-09-26";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -370,7 +370,14 @@
         "הבחינות יושבות ב־<code>data/exams.js</code>.</div>";
       return;
     }
-    box.innerHTML = all.map(function (ex, i) {
+    /* ״עזרה מהמורה״ גם ממסך הבית (26.9.2026): בלי הקשר של סעיף —
+       TUT_ID נשאר null והפאנל נפתח לשיחה כללית. */
+    var tutCard = (window.TUTOR && TUTOR.on())
+      ? '<div class="card"><h3>' + esc(TUTOR.label()) + "</h3>" +
+        '<p class="meta">נתקעתם לפני שהתחלתם? אפשר לשאול את המורה כל שאלה על החומר.</p>' +
+        '<button class="btn ghost" id="btn-tutor-home" type="button">♫ " + esc(TUTOR.label()) + "</button></div>'
+      : "";
+    box.innerHTML = tutCard + all.map(function (ex, i) {
       var demo = ex.season === "הדגמה"
         ? ' <span class="chip warn">בחינת הדגמה — לא בחינה אמיתית</span>' : "";
       /* רמת האוסף על הכרטיס. האפליקציה משרתת 3–4 יחידות וגם 5, ותלמיד
@@ -1135,6 +1142,12 @@
     }
 
     /* ״עזרה מהמורה״. מזהה הסעיף נשמר, ו-q() קורא אותו. */
+    if (el.id === "btn-tutor-home") {
+      TUT_ID = null;
+      try { window.Speech.stop() } catch (e) {}
+      if (window.TUTOR) TUTOR.open();
+      return;
+    }
     var tut = el.getAttribute("data-tutor");
     if (tut) {
       TUT_ID = tut;
@@ -1334,7 +1347,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x99-pwa2").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x100-pwa1").catch(function () {});
     });
   }
 
