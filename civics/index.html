@@ -219,6 +219,10 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 .spk.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 
 .opts{display:grid;gap:.6rem;margin-top:.9rem}
+.orow{display:flex;gap:.45rem;align-items:center;min-width:0}
+/* min-width:0 — פריט grid נולד עם min-width:auto, ולכן משפט ארוך
+   באפשרות היה מרחיב את השורה מעבר למכל ודוחף את הרמקול מחוץ למסך. */
+.orow .opt{flex:1;min-width:0}
 @media(min-width:560px){.opts.two{grid-template-columns:1fr 1fr}}
 .opt{display:flex;align-items:center;gap:.6rem;text-align:start;width:100%;
   border:2px solid var(--line);background:var(--surface);border-radius:12px;
@@ -778,7 +782,7 @@ T.he={
   lv1:"ידע", lv2:"הבנה", lv3:"ניתוח",
   lv1D:"מושג והגדרה — מה זה אומר", lv2D:"מקרה קונקרטי — איזה עיקרון פועל כאן", lv3D:"דילמה, איזון וטיעון נגדי",
   qPick:"בחרו את התשובה הנכונה",
-  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו", hearSent:"השמיעו את הקטע",
+  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו", hearSent:"השמיעו את הקטע", hearOpt:"השמיעו את האפשרות",
   check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", hintB:"רמז", hintTopicL:"מהתחום",
   showAll:"הראו הכול",
   correct:"נכון!", wrong:"עוד לא", answerIs:"התשובה:", why:"למה",
@@ -837,7 +841,7 @@ T.ar={
   lv1:"معرفة", lv2:"فهم", lv3:"تحليل",
   lv1D:"مفهوم وتعريف — ماذا يعني", lv2D:"حالة عينية — أيّ مبدأ يعمل هنا", lv3D:"معضلة وموازنة وحجّة مضادّة",
   qPick:"اختاروا الإجابة الصحيحة",
-  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع", hearSent:"استمع للنص",
+  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع", hearSent:"استمع للنص", hearOpt:"استمع للخيار",
   check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", hintB:"تلميح", hintTopicL:"من المجال",
   showAll:"أظهر الكل",
   correct:"صحيح!", wrong:"ليس بعد", answerIs:"الإجابة:", why:"لماذا",
@@ -896,7 +900,7 @@ T.ru={
   lv1:"Знание", lv2:"Понимание", lv3:"Анализ",
   lv1D:"Понятие и определение — что это значит", lv2D:"Конкретный случай — какой принцип здесь работает", lv3D:"Дилемма, равновесие и контраргумент",
   qPick:"Выберите верный ответ",
-  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать", hearSent:"Послушать отрывок",
+  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать", hearSent:"Послушать отрывок", hearOpt:"Послушать вариант",
   check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", hintB:"Подсказка", hintTopicL:"Из области",
   showAll:"Показать всё",
   correct:"Верно!", wrong:"Пока нет", answerIs:"Ответ:", why:"Почему",
@@ -955,7 +959,7 @@ T.en={
   lv1:"Knowledge", lv2:"Understanding", lv3:"Analysis",
   lv1D:"A concept and its definition — what it means", lv2D:"A concrete case — which principle is at work", lv3D:"A dilemma, a balance and a counter-argument",
   qPick:"Choose the correct answer",
-  hear:"Play", hearSlow:"Slowly", hearWord:"Play", hearSent:"Play the passage",
+  hear:"Play", hearSlow:"Slowly", hearWord:"Play", hearSent:"Play the passage", hearOpt:"Play this option",
   check:"Check", next:"Next", again:"Again", dunno:"I don't know", hintB:"Hint", hintTopicL:"From",
   showAll:"Show all",
   correct:"Correct!", wrong:"Not yet", answerIs:"Answer:", why:"Why",
@@ -5723,6 +5727,9 @@ function screenPractice(){
 
   {
     h+='<div class="opts'+(q.opts.length>3?"":" two")+'" id="opts">';
+    /* רמקול לכל אפשרות, כמו באנגלית: מי שאינו יודע לקרוא את הניסוח
+       לא יכול לבחור בו. הקראת אפשרות אינה הסגרת תשובה — היא זמינה
+       על כל ארבע במידה שווה, והמעקב הצהוב עובד כמו בנוסח השאלה. */
     q.opts.forEach(function(o,i){
       var cls="opt";
       if(P.done){
@@ -5730,8 +5737,11 @@ function screenPractice(){
         else if(i===P.picked)cls+=" bad";
         else cls+=" dim";
       }
-      h+='<button class="'+cls+'" data-a="pick" data-i="'+i+'"'+(P.done?" disabled":"")+'>'+
+      var ob='<button class="'+cls+'" data-a="pick" data-i="'+i+'"'+(P.done?" disabled":"")+'>'+
         '<span class="k">'+String.fromCharCode(65+i)+"</span><span>"+o.h+"</span></button>";
+      h+='<div class="orow">'+ob+
+        '<button class="spk sm" data-a="say" data-say="'+esc(plainOf(o.h))+'" data-lang="'+esc(state.lang)+
+        '" aria-label="'+esc(t("hearOpt"))+'">'+ic("play",15)+"</button></div>";
     });
     h+="</div>";
   }
@@ -7776,7 +7786,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=c1-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=c2-pwa1").catch(function(){});
   });
 }
 </script>
