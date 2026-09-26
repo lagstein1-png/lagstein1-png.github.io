@@ -1294,22 +1294,22 @@ st1:"الخطوة الأولى",st2:"الجولة الأولى",st3:"عشر صح
 errTitle:"حدث خطأ صغير",errMsg:"جرّب تحديث الصفحة.",errBtn:"تحديث الصفحة"
 };
 /* --- מדע: מפתחות מסך היחידות (ארבע שפות; ar/ru/en תרגום מכונה, מסומן באתר) --- */
-STR.he.navUnits="יחידות";STR.he.unitsTitle="מדע וטכנולוגיה לכיתות ג׳–ו׳";
+STR.he.uHear="השמיעו";STR.he.uHint="רמז מלימור";STR.he.navUnits="יחידות";STR.he.unitsTitle="מדע וטכנולוגיה לכיתות ג׳–ו׳";
 STR.he.unitsIntro="היחידות בנויות לפי מיקוד הלמידה במדע וטכנולוגיה של משרד החינוך. התוכן נכתב במקור במיוחד לאתר, וכל שיעור מוקרא בעברית מדוברת.";
 STR.he.gradeA="כיתה ג׳";STR.he.gradeB="כיתה ד׳";STR.he.gradeC="כיתה ה׳";STR.he.gradeD="כיתה ו׳";
 STR.he.comingSoon="בקרוב";STR.he.startLesson="לשיעור";STR.he.mikudLink="מיקוד הלמידה של משרד החינוך (PDF)";
 STR.he.uBio="מערכות ותהליכים ביצורים חיים";STR.he.uEco="מערכות אקולוגיות";STR.he.uMat="חומרים";STR.he.uErg="אנרגיה";
-STR.en.navUnits="Units";STR.en.unitsTitle="Science and technology for grades 3-6";
+STR.en.uHear="Listen";STR.en.uHint="Hint from Limor";STR.en.navUnits="Units";STR.en.unitsTitle="Science and technology for grades 3-6";
 STR.en.unitsIntro="Units follow the Ministry of Education science and technology learning-focus document. Content is written originally for this site, and every lesson is read aloud in spoken Hebrew.";
 STR.en.gradeA="Grade 3";STR.en.gradeB="Grade 4";STR.en.gradeC="Grade 5";STR.en.gradeD="Grade 6";
 STR.en.comingSoon="Coming soon";STR.en.startLesson="To the lesson";STR.en.mikudLink="MoE learning-focus document (PDF)";
 STR.en.uBio="Systems and processes in living organisms";STR.en.uEco="Ecological systems";STR.en.uMat="Materials";STR.en.uErg="Energy";
-STR.ru.navUnits="Разделы";STR.ru.unitsTitle="Наука и технология для 3-6 классов";
+STR.ru.uHear="Слушать";STR.ru.uHint="Подсказка от Лимор";STR.ru.navUnits="Разделы";STR.ru.unitsTitle="Наука и технология для 3-6 классов";
 STR.ru.unitsIntro="Разделы построены по документу Министерства просвещения о фокусе обучения естествознанию и технологии. Материал написан специально для сайта, и каждый урок озвучен на разговорном иврите.";
 STR.ru.gradeA="3 класс";STR.ru.gradeB="4 класс";STR.ru.gradeC="5 класс";STR.ru.gradeD="6 класс";
 STR.ru.comingSoon="Скоро";STR.ru.startLesson="К уроку";STR.ru.mikudLink="Документ Минпроса о фокусе обучения (PDF)";
 STR.ru.uBio="Системы и процессы в живых организмах";STR.ru.uEco="Экологические системы";STR.ru.uMat="Вещества";STR.ru.uErg="Энергия";
-STR.ar.navUnits="الوحدات";STR.ar.unitsTitle="العلوم والتكنولوجيا للصفوف الثالث حتى السادس";
+STR.ar.uHear="استمعوا";STR.ar.uHint="تلميح من ليمور";STR.ar.navUnits="الوحدات";STR.ar.unitsTitle="العلوم والتكنولوجيا للصفوف الثالث حتى السادس";
 STR.ar.unitsIntro="الوحدات مبنية وفق وثيقة ميكود التعلّم في العلوم والتكنولوجيا لوزارة التربية والتعليم. المحتوى مكتوب أصلًا خصيصًا للموقع، وكل درس يُسمع بالعبرية المنطوقة.";
 STR.ar.gradeA="الصف الثالث";STR.ar.gradeB="الصف الرابع";STR.ar.gradeC="الصف الخامس";STR.ar.gradeD="الصف السادس";
 STR.ar.comingSoon="قريبًا";STR.ar.startLesson="إلى الدرس";STR.ar.mikudLink="وثيقة ميكود التعلّم لوزارة التربية (PDF)";
@@ -2387,7 +2387,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s115 · 2026-09-26";
+var BUILD="s116 · 2026-09-26";
 var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2467,22 +2467,28 @@ var UNITS=[
   {grade:"gradeC",topics:["uBio","uMat"],pdf:"Grade5"},
   {grade:"gradeD",topics:["uEco","uBio","uErg"],pdf:"Grade6"}
 ];
+function uHearBtn(text){return '<button class="btn btn-g" data-a="usay" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px;flex:none">🔊 '+esc(T().uHear)+'</button>'}
+function uStepBtn(){return '<button class="btn btn-g" data-a="ustep" style="min-height:46px;padding:10px 16px">🔊 '+esc(T().uHear)+'</button>'}
+function uHintBtn(text){return '<div style="margin-top:10px"><button class="btn" data-a="uhint" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px;background:#b45309;color:#fff;font-weight:700">💡 '+esc(T().uHint)+'</button><p class="hintxt" hidden style="margin:10px 0 0;padding:12px 14px;border-radius:12px;background:#fdf3dd;border:2px solid #b45309;color:#6b5109;line-height:1.7;font-weight:600">'+esc(text)+'</p></div>'}
 function unitsView(){
   var t=T();
   var h='<div class="wrap" style="padding-top:22px;padding-bottom:40px;max-width:820px;margin:0 auto">'+
     '<h1 class="fd" style="font-size:1.7rem;margin:0 0 10px">'+esc(t.unitsTitle)+'</h1>'+
-    '<p style="color:var(--ink-soft);margin:0 0 24px;line-height:1.7">'+esc(t.unitsIntro)+'</p>';
+    '<p style="color:var(--ink-soft);margin:0 0 16px;line-height:1.7">'+esc(t.unitsIntro)+'</p>'+
+    '<div style="margin:0 0 24px">'+uHearBtn(t.unitsTitle+'. '+t.unitsIntro)+'</div>';
   UNITS.forEach(function(u,ui){
-    h+='<h2 class="fd" style="font-size:1.2rem;margin:22px 0 10px">'+esc(t[u.grade])+'</h2><div style="display:grid;gap:10px">';
+    h+='<h2 class="fd" style="font-size:1.2rem;margin:22px 0 10px;display:flex;align-items:center;gap:10px"><span>'+esc(t[u.grade])+'</span>'+uHearBtn(t[u.grade])+'</h2><div style="display:grid;gap:10px">';
     u.topics.forEach(function(tp,ti){
       var lid=({'0:0':'1','0:1':'4','0:2':'5','0:3':'6','1:0':'8','1:1':'7','2:0':'9','2:1':'10','3:0':'11','3:1':'12','3:2':'13'})[ui+':'+ti];
       if(lid){
-        h+='<a href="?internal=shlav-internal-science&lesson=sci'+lid+'" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
-          '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
-          '<span class="chip" style="font-size:.8rem;background:var(--teal);color:#fff">'+esc(t.startLesson)+'</span></a>';
+        h+='<div class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px">'+
+          '<a href="?lesson=sci'+lid+'" style="flex:1;font-weight:600;text-decoration:none;color:inherit">'+esc(t[tp])+'</a>'+
+          uHearBtn(t[tp])+
+          '<a href="?lesson=sci'+lid+'" class="chip" style="font-size:.8rem;background:var(--teal);color:#fff;text-decoration:none">'+esc(t.startLesson)+'</a></div>';
       }else{
       h+='<div class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;opacity:.75">'+
         '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
+        uHearBtn(t[tp])+
         '<span class="chip warn" style="font-size:.8rem">'+esc(t.comingSoon)+'</span></div>';
       }
     });
@@ -4648,6 +4654,9 @@ function onAction(a,el){
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
     render();window.scrollTo(0,0)}
   else if(a==="copylink")copyLink();
+  else if(a==="usay"){speak(el.getAttribute("data-say"))}
+  else if(a==="ustep"){var uc=el.closest(".card");if(uc){var ucl=uc.cloneNode(true);[].slice.call(ucl.querySelectorAll("button,script,style")).forEach(function(x){x.remove()});speak(ucl.textContent.replace(/\s+/g," ").trim())}}
+  else if(a==="uhint"){var hp=el.parentNode.querySelector(".hintxt");if(hp){hp.hidden=!hp.hidden;if(!hp.hidden)speak(el.getAttribute("data-say"))}}
   else if(a==="selpet"){P.selPet=el.getAttribute("data-p");render()}
   else if(a==="takesugg"){var sg={fox:t.petFoxName,josh:t.petJoshName,owl:t.petOwlName}[P.selPet]||"";state.petName=sg;state.petAuto=true;save();render()}
   else if(a==="startpet"){
@@ -4888,7 +4897,7 @@ function lsOpts(list,answered,correctIdx,act){
       if(i===correctIdx){bg='#0e9c8d';bd='#0e9c8d';fg='#fff'}
       else if(i===answered){bg='#bf4426';bd='#bf4426';fg='#fff'}
     }
-    return '<button class="btn" data-a="'+act+'" data-i="'+i+'" style="min-height:46px;font-weight:700;font-size:1.05rem;background:'+bg+';border:2px solid '+bd+';color:'+fg+'">'+esc(o)+'</button>';
+    return '<div style="display:flex;gap:8px;align-items:stretch"><button class="btn" data-a="'+act+'" data-i="'+i+'" style="flex:1;min-height:46px;font-weight:700;font-size:1.05rem;background:'+bg+';border:2px solid '+bd+';color:'+fg+'">'+esc(o)+'</button><button class="btn btn-g" data-a="usay" data-say="'+esc(o)+'" aria-label="'+esc(T().uHear)+'" style="min-height:46px;min-width:52px;padding:10px 12px;flex:none">🔊</button></div>';
   }).join("")+'</div>';
 }
 function lessonView(){
@@ -5002,7 +5011,7 @@ ar:{slTitle:"درس: كيف نعرف أن شيئًا ما حي؟",slGoal:"اله
     slSum:"انتهيتم! اليوم تعلمنا: الكائن الحي ينمو، يحتاج إلى الغذاء والماء، يتكاثر ويتفاعل مع بيئته. غير الحي لا يفعل ذلك.",
     slAgain:"من البداية",slNext:"التالي",slHear:"استمعوا",slCorrect:"صحيح!",slWrong:"ليس بعد. يمكن المحاولة مرة أخرى.",slCheck:"فحص الفهم",
     slPlant:"نبتة",slCat:"قطة",slRock:"حجر",slAlive:"حي",slStill:"غير حي"}};
-SLSTR.he.slNextLesson="לשיעור הבא";SLSTR.en.slNextLesson="Next lesson";SLSTR.ru.slNextLesson="Следующий урок";SLSTR.ar.slNextLesson="الدرس التالي";
+SLSTR.he.slHintQ="מה שני היצורים האלה חייבים לקבל כדי להישאר בחיים? חשבו על אוכל ועל שתייה.";SLSTR.he.slHintP1="בדקו את הכלל: האם אבן גדלה? האם היא זקוקה למזון?";SLSTR.he.slHintP2="זכרו מה צמח צריך כדי לחיות - מה יקרה לו בלי זה?";SLSTR.he.slNextLesson="לשיעור הבא";SLSTR.en.slHintQ="What must both of these living things get to stay alive? Think about food and drink.";SLSTR.en.slHintP1="Check the rule: does a rock grow? does it need food?";SLSTR.en.slHintP2="Remember what a plant needs to live - what happens without it?";SLSTR.en.slNextLesson="Next lesson";SLSTR.ru.slHintQ="Что нужно обоим этим существам, чтобы жить? Подумайте о еде и воде.";SLSTR.ru.slHintP1="Проверьте правило: растёт ли камень? нужна ли ему еда?";SLSTR.ru.slHintP2="Вспомните, что нужно растению для жизни - что будет без этого?";SLSTR.ru.slNextLesson="Следующий урок";SLSTR.ar.slHintQ="ما الذي يجب أن تحصل عليه هاتان الكائنتان لتبقيا حيّتين؟ فكروا في الطعام والشراب.";SLSTR.ar.slHintP1="افحصوا القاعدة: هل الحجر ينمو؟ هل يحتاج إلى غذاء؟";SLSTR.ar.slHintP2="تذكروا ما تحتاجه النبتة لتعيش - ماذا يحدث لها بدونه؟";SLSTR.ar.slNextLesson="الدرس التالي";
 function slt(k){var d=SLSTR[state.settings.lang||"he"]||SLSTR.he;var v=d[k];return v===undefined?(SLSTR.en[k]||k):v}
 var SLSN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function slScene(revealed){
@@ -5019,6 +5028,7 @@ function sciLessonView(){
   var st=SLSN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
   h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(slt("slStep"),Math.min(st.step+1,5)))+'</div>';
   h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(slt("slTitle"))+'</h1>';
+  h+='<div style="margin:0 0 14px">'+uStepBtn()+'</div>';
   if(st.step===0){
     h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(slt("slGoal"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("slnext",slt("slStart"),'background:#1d4ed8;color:#fff;font-weight:700')+slHearBtn(slt("slGoal"))+'</div>';
@@ -5034,6 +5044,7 @@ function sciLessonView(){
   }else if(st.step===2){
     h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(slt("slCheck"))+'</h2>';
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(slt("slQ"))+'</p>';
+    h+=uHintBtn(slt("slHintQ"));
     h+=slScene(true);
     h+=lsOpts([slt("slA0"),slt("slA1"),slt("slA2")],st.picked,1,"slpick");
     if(st.picked>=0){
@@ -5047,16 +5058,18 @@ function sciLessonView(){
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("slnext",slt("slNext"),'background:#1d4ed8;color:#fff;font-weight:700')+slHearBtn(slt("slRule")+" "+slt("slRuleEx"))+'</div>';
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(slt("slP1"))+'</p>';
+    h+=uHintBtn(slt("slHintP1"));
     h+=lsOpts([slt("slP1a0"),slt("slP1a1"),slt("slP1a2")],st.p1,1,"slp1");
     if(st.p1===1){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(slt("slP2"))+'</p>';
+      h+=uHintBtn(slt("slHintP2"));
       h+=lsOpts([slt("slP2a0"),slt("slP2a1"),slt("slP2a2")],st.p2,2,"slp2");
     }
     if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(slt("slCorrect"))+'</p><div style="margin-top:10px">'+lsBtn("slnext",slt("slNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(slt("slSum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("slagain",slt("slAgain"),'background:#0e9c8d;color:#fff;font-weight:700')+slHearBtn(slt("slSum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci2" style="color:#1d4ed8;font-weight:600">'+esc(slt("slNextLesson"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci2" style="color:#1d4ed8;font-weight:600">'+esc(slt("slNextLesson"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5174,7 +5187,7 @@ function sci2LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s2t("s2Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s2again",s2t("s2Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s2HearBtn(s2t("s2Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci1" style="color:#1d4ed8;font-weight:600">'+esc(s2t("s2NextLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci3" style="color:#1d4ed8;font-weight:600">'+esc(s2t("s2Fwd"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci1" style="color:#1d4ed8;font-weight:600">'+esc(s2t("s2NextLesson"))+'</a> · <a href="?lesson=sci3" style="color:#1d4ed8;font-weight:600">'+esc(s2t("s2Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5293,7 +5306,7 @@ function sci3LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s3t("s3Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s3again",s3t("s3Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s3HearBtn(s3t("s3Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci2" style="color:#1d4ed8;font-weight:600">'+esc(s3t("s3PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci4" style="color:#1d4ed8;font-weight:600">'+esc(s3t("s3Fwd"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci2" style="color:#1d4ed8;font-weight:600">'+esc(s3t("s3PrevLesson"))+'</a> · <a href="?lesson=sci4" style="color:#1d4ed8;font-weight:600">'+esc(s3t("s3Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5412,7 +5425,7 @@ function sci4LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s4t("s4Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s4again",s4t("s4Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s4HearBtn(s4t("s4Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci3" style="color:#1d4ed8;font-weight:600">'+esc(s4t("s4PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci5" style="color:#1d4ed8;font-weight:600">'+esc(s4t("s4Fwd"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci3" style="color:#1d4ed8;font-weight:600">'+esc(s4t("s4PrevLesson"))+'</a> · <a href="?lesson=sci5" style="color:#1d4ed8;font-weight:600">'+esc(s4t("s4Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5530,7 +5543,7 @@ function sci5LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s5t("s5Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s5again",s5t("s5Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s5HearBtn(s5t("s5Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci4" style="color:#1d4ed8;font-weight:600">'+esc(s5t("s5PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci6" style="color:#1d4ed8;font-weight:600">'+esc(s5t("s5Fwd"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci4" style="color:#1d4ed8;font-weight:600">'+esc(s5t("s5PrevLesson"))+'</a> · <a href="?lesson=sci6" style="color:#1d4ed8;font-weight:600">'+esc(s5t("s5Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5651,7 +5664,7 @@ function sci6LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s6t("s6Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s6again",s6t("s6Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s6HearBtn(s6t("s6Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci5" style="color:#1d4ed8;font-weight:600">'+esc(s6t("s6PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci7" style="color:#1d4ed8;font-weight:600">'+esc(s6t("s6Fwd"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci5" style="color:#1d4ed8;font-weight:600">'+esc(s6t("s6PrevLesson"))+'</a> · <a href="?lesson=sci7" style="color:#1d4ed8;font-weight:600">'+esc(s6t("s6Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5767,7 +5780,7 @@ function sci7LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s7t("s7Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s7again",s7t("s7Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s7HearBtn(s7t("s7Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci6" style="color:#1d4ed8;font-weight:600">'+esc(s7t("s7PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci8" style="color:#1d4ed8;font-weight:600">'+esc(s7t("s7Fwd"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci6" style="color:#1d4ed8;font-weight:600">'+esc(s7t("s7PrevLesson"))+'</a> · <a href="?lesson=sci8" style="color:#1d4ed8;font-weight:600">'+esc(s7t("s7Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5883,7 +5896,7 @@ function sci8LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s8t("s8Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s8again",s8t("s8Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s8HearBtn(s8t("s8Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci7" style="color:#1d4ed8;font-weight:600">'+esc(s8t("s8PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci9" style="color:#1d4ed8;font-weight:600">'+esc(s8t("s8Fwd"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci7" style="color:#1d4ed8;font-weight:600">'+esc(s8t("s8PrevLesson"))+'</a> · <a href="?lesson=sci9" style="color:#1d4ed8;font-weight:600">'+esc(s8t("s8Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -6000,7 +6013,7 @@ function sci9LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s9t("s9Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s9again",s9t("s9Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s9HearBtn(s9t("s9Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci8" style="color:#1d4ed8;font-weight:600">'+esc(s9t("s9PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci10" style="color:#1d4ed8;font-weight:600">'+esc(s9t("s9Fwd"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci8" style="color:#1d4ed8;font-weight:600">'+esc(s9t("s9PrevLesson"))+'</a> · <a href="?lesson=sci10" style="color:#1d4ed8;font-weight:600">'+esc(s9t("s9Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -6116,7 +6129,7 @@ function sci10LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s10t("s10Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s10again",s10t("s10Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s10HearBtn(s10t("s10Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci9" style="color:#1d4ed8;font-weight:600">'+esc(s10t("s10PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci11" style="color:#1d4ed8;font-weight:600">'+esc(s10t("s10Fwd"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci9" style="color:#1d4ed8;font-weight:600">'+esc(s10t("s10PrevLesson"))+'</a> · <a href="?lesson=sci11" style="color:#1d4ed8;font-weight:600">'+esc(s10t("s10Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -6232,7 +6245,7 @@ function sci11LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s11t("s11Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s11again",s11t("s11Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s11HearBtn(s11t("s11Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci10" style="color:#1d4ed8;font-weight:600">'+esc(s11t("s11PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci12" style="color:#1d4ed8;font-weight:600">'+esc(s11t("s11Fwd"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci10" style="color:#1d4ed8;font-weight:600">'+esc(s11t("s11PrevLesson"))+'</a> · <a href="?lesson=sci12" style="color:#1d4ed8;font-weight:600">'+esc(s11t("s11Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -6351,7 +6364,7 @@ function sci12LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s12t("s12Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s12again",s12t("s12Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s12HearBtn(s12t("s12Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci11" style="color:#1d4ed8;font-weight:600">'+esc(s12t("s12PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci13" style="color:#1d4ed8;font-weight:600">'+esc(s12t("s12Fwd"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci11" style="color:#1d4ed8;font-weight:600">'+esc(s12t("s12PrevLesson"))+'</a> · <a href="?lesson=sci13" style="color:#1d4ed8;font-weight:600">'+esc(s12t("s12Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -6467,7 +6480,7 @@ function sci13LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s13t("s13Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s13again",s13t("s13Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s13HearBtn(s13t("s13Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci12" style="color:#1d4ed8;font-weight:600">'+esc(s13t("s13PrevLesson"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=sci12" style="color:#1d4ed8;font-weight:600">'+esc(s13t("s13PrevLesson"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -6523,7 +6536,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s115-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s116-pwa1").catch(function(){});
   });
 }
 </script>
