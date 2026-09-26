@@ -677,6 +677,7 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
    בלי שימוש, לא נרשם אף מאזין אירועים, ולא נוסף דבר למסך.
    ============================================================ */
 var DEMO_ON=/(^|[?&])demo=1(&|$)/.test(location.search||"");
+var LESSON_ON=/(^|[?&])internal=shlav-lesson-fract(&|$)/.test(location.search||"");
 
 /* בוחר אפשרות לפי נכונותה. התסריט לא מקודד תשובה: הוא שואל את
    השאלה שעל המסך עכשיו, ולכן הוא עובד גם כשההגרלה שינתה אותה. */
@@ -2342,7 +2343,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b158 · 2026-09-26";
+var BUILD="b159 · 2026-09-26";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2417,6 +2418,7 @@ function header(){
   var nav=[["practice",t.navPractice,"pencil"],["progress",t.navProgress,"chart"],["records",t.navRecords,"trophy"],
              ["settings",t.navSettings,"gear"]];
   if(teOpen())nav.splice(nav.length-1,0,["marks",t.navExam,"share"]);
+  if(LESSON_ON)nav.splice(nav.length-1,0,["lesson",lt("navLesson"),"book"]);
   return '<header><div class="wrap hbar">'+
     '<button class="logo" data-a="go" data-v="practice" aria-label="'+esc(t.appName)+'"><span class="mark">'+ic("pi",26)+'</span><span class="fd"><b>'+esc(t.obTitle1)+'</b><small>'+esc(t.appShort)+'</small></span></button>'+
     '<nav>'+nav.map(function(n){return '<button class="'+lc("nb"+(view===n[0]?" on":""))+'" data-a="go" data-v="'+n[0]+'">'+ic(n[2],18)+'<span>'+esc(n[1])+'</span></button>'}).join("")+'</nav>'+
@@ -4373,6 +4375,7 @@ function render(){ try{lgChrome()}catch(e){}
     if(view==="practice")html+=practice();
     else if(view==="progress")html+=progressView();
     else if(view==="records")html+=recordsView();
+    else if(view==="lesson"&&LESSON_ON)html+=lessonView();
     else if(view==="settings")html+=settingsView();
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
@@ -4536,6 +4539,7 @@ function setBubbleNow(text){BT.text=text;BT.shown=text.length;if(BT.timer){clear
 function onAction(a,el){
   var t=T();
   if(examAction(a,el))return;
+  if(/^ls/.test(a)&&LESSON_ON){lessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -4732,6 +4736,119 @@ window.addEventListener("error",function(){
   var t=T();
   $("#app").innerHTML='<main id="main" tabindex="-1" class="wrap" style="display:grid;place-items:center;min-height:90vh"><div class="card rise" style="padding:36px;text-align:center;max-width:420px"><p style="font-size:3rem">🤔</p><h1 class="fd" style="font-size:1.6rem">'+esc(t.errTitle)+'</h1><p style="color:var(--ink-soft);margin-top:8px">'+esc(t.errMsg)+'</p><button class="btn btn-teal" style="margin-top:18px;padding:13px 30px" onclick="location.reload()">'+esc(t.errBtn)+'</button></div></main>';
 });
+
+/* ================= שיעור אב-טיפוס: שברים חזותיים =================
+   מוסתר: נפתח רק עם ?internal=shlav-lesson-fract. תבנית לפי סגנון
+   יחידות ההוראה של משרד החינוך: מטרה, שלב חזותי אינטראקטיבי,
+   אישור הבנה לפני הכלל, כלל, ותרגול קצר. ההקראה בכל שלב. */
+var LSTR={
+he:{navLesson:"שיעור",lsTitle:"שיעור: שברים — הרחבה",lsGoal:"המטרה: להבין ששבר לא משתנה כשמכפילים את המונה והמכנה באותו מספר — רק החלוקה של הציור משתנה.",lsStart:"מתחילים",lsStep:"שלב {0} מתוך 5",
+    lsV1:"כאן רואים חצי: צבענו חלק אחד מתוך שניים.",lsV1b:"לחצו על הכפתור ופצלו כל חצי לשני חלקים. מה קורה לחלק הצבוע?",lsSplit:"פצלו כל חצי לשניים",lsV2:"עכשיו יש ארבעה חלקים, ושניים מהם צבועים. החלק הצבוע לא השתנה — רק החלוקה השתנתה.",
+    lsQ:"אחרי הפיצול — כמה חלקים צבועים מתוך כמה?",lsWhy0:"ספרו רק את החלקים הצבועים.",lsWhy2:"נכון — אבל שימו לב מתוך כמה חלקים סופרים.",lsWhy4:"כמעט. זו כמות החלקים הכוללת, לא הצבועים.",
+    lsRule:"הכלל: כשמכפילים גם את המונה וגם את המכנה באותו מספר, השבר לא משתנה.",lsRuleEx:"1/2 = 2/4 — הרחבה פי 2.",
+    lsP1:"הרחיבו את השבר 1/3 פי 2. מהו השבר החדש?",lsP2:"הרחיבו את השבר 2/5 פי 3. מהו המכנה החדש?",
+    lsSum:"סיימתם. היום למדנו: הרחבה משנה את החלוקה, לא את הכמות.",lsAgain:"מההתחלה",lsNext:"הבא",lsBack:"חזרה",lsHear:"השמיעו",lsCorrect:"נכון!",lsWrong:"עוד לא. אפשר לנסות שוב.",lsCheck:"בדיקת הבנה"},
+ar:{navLesson:"درس",lsTitle:"درس: كسور — التوسيع",lsGoal:"الهدف: أن نفهم أن الكسر لا يتغير عندما نضرب البسط والمقام بنفس العدد — يتغير فقط تقسيم الرسم.",lsStart:"نبدأ",lsStep:"الخطوة {0} من 5",
+    lsV1:"هنا نرى نصفًا: لوّنّا جزءًا واحدًا من اثنين.",lsV1b:"اضغطوا على الزر وقسّموا كل نصف إلى جزأين. ماذا يحدث للجزء الملوَّن؟",lsSplit:"قسّموا كل نصف إلى اثنين",lsV2:"الآن هناك أربعة أجزاء، اثنان منها ملوَّنان. الجزء الملوَّن لم يتغير — فقط التقسيم تغير.",
+    lsQ:"بعد التقسيم — كم جزءًا ملوَّنًا من كم؟",lsWhy0:"عُدّوا فقط الأجزاء الملوَّنة.",lsWhy2:"صحيح — لكن انتبهوا من كم جزء نعدّ.",lsWhy4:"قريب. هذا عدد الأجزاء كلها، وليس الملوَّنة.",
+    lsRule:"القاعدة: عند ضرب البسط والمقام بنفس العدد، الكسر لا يتغير.",lsRuleEx:"1/2 = 2/4 — توسيع بضرب 2.",
+    lsP1:"وسّعوا الكسر 1/3 بضرب 2. ما هو الكسر الجديد؟",lsP2:"وسّعوا الكسر 2/5 بضرب 3. ما هو المقام الجديد؟",
+    lsSum:"انتهيتم. اليوم تعلمنا: التوسيع يغيّر التقسيم، لا الكمية.",lsAgain:"من البداية",lsNext:"التالي",lsBack:"رجوع",lsHear:"استمعوا",lsCorrect:"صحيح!",lsWrong:"ليس بعد. يمكن المحاولة مرة أخرى.",lsCheck:"فحص الفهم"},
+ru:{navLesson:"Урок",lsTitle:"Урок: дроби — расширение",lsGoal:"Цель: понять, что дробь не меняется, когда числитель и знаменатель умножают на одно и то же число — меняется только деление рисунка.",lsStart:"Начинаем",lsStep:"Шаг {0} из 5",
+    lsV1:"Здесь видна половина: закрашена одна часть из двух.",lsV1b:"Нажмите кнопку и разделите каждую половину на две части. Что происходит с закрашенной частью?",lsSplit:"Разделить каждую половину на две",lsV2:"Теперь четыре части, и две из них закрашены. Закрашенная часть не изменилась — изменилось только деление.",
+    lsQ:"После деления — сколько частей закрашено из скольких?",lsWhy0:"Посчитайте только закрашенные части.",lsWhy2:"Верно — но заметьте, из скольких частей мы считаем.",lsWhy4:"Почти. Это общее число частей, а не закрашенных.",
+    lsRule:"Правило: когда числитель и знаменатель умножают на одно и то же число, дробь не меняется.",lsRuleEx:"1/2 = 2/4 — расширение в 2 раза.",
+    lsP1:"Расширьте дробь 1/3 в 2 раза. Какова новая дробь?",lsP2:"Расширьте дробь 2/5 в 3 раза. Каков новый знаменатель?",
+    lsSum:"Готово. Сегодня мы узнали: расширение меняет деление, а не величину.",lsAgain:"Сначала",lsNext:"Дальше",lsBack:"Назад",lsHear:"Слушать",lsCorrect:"Верно!",lsWrong:"Пока нет. Можно попробовать ещё.",lsCheck:"Проверка понимания"},
+en:{navLesson:"Lesson",lsTitle:"Lesson: fractions — expanding",lsGoal:"The goal: understand that a fraction does not change when numerator and denominator are multiplied by the same number — only the division of the picture changes.",lsStart:"Start",lsStep:"Step {0} of 5",
+    lsV1:"Here we see a half: one part out of two is shaded.",lsV1b:"Press the button and split each half into two. What happens to the shaded part?",lsSplit:"Split each half into two",lsV2:"Now there are four parts, and two of them are shaded. The shaded part did not change — only the division changed.",
+    lsQ:"After the split — how many parts are shaded out of how many?",lsWhy0:"Count only the shaded parts.",lsWhy2:"Right — but notice out of how many parts we count.",lsWhy4:"Almost. That is the total number of parts, not the shaded ones.",
+    lsRule:"The rule: when numerator and denominator are multiplied by the same number, the fraction does not change.",lsRuleEx:"1/2 = 2/4 — expanding by 2.",
+    lsP1:"Expand 1/3 by 2. What is the new fraction?",lsP2:"Expand 2/5 by 3. What is the new denominator?",
+    lsSum:"Done. Today we learned: expanding changes the division, not the amount.",lsAgain:"From the start",lsNext:"Next",lsBack:"Back",lsHear:"Listen",lsCorrect:"Correct!",lsWrong:"Not yet. You can try again.",lsCheck:"Understanding check"}};
+function lt(k){var d=LSTR[state.settings.lang||"he"]||LSTR.he;var v=d[k];return v===undefined?(LSTR.en[k]||k):v}
+var LSN={step:0,split:false,picked:-1,ok:false,p1:-1,p2:-1};
+function fmt0(s,v){return s.replace("{0}",v)}
+function lsBar(parts,shaded){
+  var w=300,h=56,cw=w/parts,h2='';
+  for(var i=0;i<parts;i++){
+    h2+='<rect x="'+(i*cw+1)+'" y="1" width="'+(cw-2)+'" height="'+(h-2)+'" rx="6" fill="'+(i<shaded?'#1d4ed8':'#fff')+'" stroke="#334155" stroke-width="2"/>';
+  }
+  return '<svg viewBox="0 0 '+w+' '+h+'" role="img" width="100%" style="max-width:340px;display:block;margin:0 auto" aria-label="'+shaded+'/'+parts+'">'+h2+'</svg>';
+}
+function lsBtn(a,label,style){return '<button class="btn" data-a="'+a+'" style="min-height:46px;font-size:1.05rem;padding:12px 22px;'+(style||'')+'">'+esc(label)+'</button>'}
+function lsHearBtn(text){return '<button class="btn btn-g" data-a="lshear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(lt("lsHear"))+'</button>'}
+function lsOpts(list,answered,correctIdx,act){
+  return '<div style="display:grid;gap:10px;margin-top:12px">'+list.map(function(o,i){
+    var bg='#fff',bd='#334155',fg='#0f172a';
+    if(answered>=0){
+      if(i===correctIdx){bg='#0e9c8d';bd='#0e9c8d';fg='#fff'}
+      else if(i===answered){bg='#bf4426';bd='#bf4426';fg='#fff'}
+    }
+    return '<button class="btn" data-a="'+act+'" data-i="'+i+'" style="min-height:46px;font-weight:700;font-size:1.05rem;background:'+bg+';border:2px solid '+bd+';color:'+fg+'">'+esc(o)+'</button>';
+  }).join("")+'</div>';
+}
+function lessonView(){
+  var st=LSN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(lt("lsStep"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(lt("lsTitle"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(lt("lsGoal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("lsnext",lt("lsStart"),'background:#1d4ed8;color:#fff;font-weight:700')+lsHearBtn(lt("lsGoal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(lt(st.split?"lsV2":"lsV1"))+'</p>';
+    h+='<div style="margin:14px 0">'+lsBar(st.split?4:2,st.split?2:1)+'</div>';
+    if(!st.split){
+      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(lt("lsV1b"))+'</p>';
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("lssplit",lt("lsSplit"),'background:#b45309;color:#fff;font-weight:700')+lsHearBtn(lt("lsV1")+" "+lt("lsV1b"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+lsHearBtn(lt("lsV2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(lt("lsCheck"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(lt("lsQ"))+'</p>';
+    h+='<div style="margin:10px 0">'+lsBar(4,2)+'</div>';
+    h+=lsOpts(["1/4","2/4","4/4"],st.picked,1,"lspick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":lt({0:"lsWhy0",2:"lsWhy4"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?lt("lsCorrect"):lt("lsWrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(lt("lsRule"))+'</p>';
+    h+='<p style="font-size:1.3rem;font-weight:800;text-align:center;margin:14px 0;direction:ltr">1/2 = 2/4</p>';
+    h+='<p style="font-size:1.02rem;color:#475569">'+esc(lt("lsRuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+lsHearBtn(lt("lsRule")+" "+lt("lsRuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(lt("lsP1"))+'</p>';
+    h+=lsOpts(["1/6","2/6","3/6"],st.p1,1,"lsans1");
+    if(st.p1===1){
+      h+='<p style="margin-top:14px;font-size:1.08rem;line-height:1.7">'+esc(lt("lsP2"))+'</p>';
+      h+=lsOpts(["10","12","15"],st.p2,2,"lsans2");
+    }
+    if(st.p1>=0&&st.p1!==1)h+='<p style="margin-top:12px;font-weight:700;color:#bf4426">'+esc(lt("lsWrong"))+'</p>';
+    if(st.p2>=0&&st.p2!==2)h+='<p style="margin-top:12px;font-weight:700;color:#bf4426">'+esc(lt("lsWrong"))+'</p>';
+    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(lt("lsCorrect"))+'</p><div style="margin-top:10px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.75">'+esc(lt("lsSum"))+'</p>';
+    h+='<div style="margin:12px 0">'+lsBar(4,2)+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("lsagain",lt("lsAgain"),'background:#0e9c8d;color:#fff;font-weight:700')+lsHearBtn(lt("lsSum"))+'</div>';
+  }
+  if(st.step>0&&st.step<5)h+='<div style="margin-top:14px">'+lsBtn("lsback",lt("lsBack"),'color:#475569')+'</div>';
+  return h+'</div>';
+}
+function lessonAction(a,el){
+  var st=LSN;
+  if(a==="lsnext"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="lsback"){st.step=Math.max(st.step-1,0);render()}
+  else if(a==="lssplit"){st.split=true;render();speak(lt("lsV2"))}
+  else if(a==="lspick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="lsans1"){var i1=parseInt(el.getAttribute("data-i"),10);if(st.p1!==1)st.p1=i1;render()}
+  else if(a==="lsans2"){var i2=parseInt(el.getAttribute("data-i"),10);if(st.p2!==2)st.p2=i2;render()}
+  else if(a==="lsagain"){LSN={step:0,split:false,picked:-1,ok:false,p1:-1,p2:-1};render()}
+  else if(a==="lshear"){speak(el.getAttribute("data-say"))}
+}
+
 /* ================= boot ================= */
 applyModes();
 if(view==="practice")startRound(activeLevel());
@@ -4773,7 +4890,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b158-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b159-pwa1").catch(function(){});
   });
 }
 </script>
