@@ -2394,8 +2394,8 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s106 · 2026-09-26";
-var view=/[?&]lesson=sci[123](&|$)/.test(location.search||"")?"lesson":"units";
+var BUILD="s107 · 2026-09-26";
+var view=/[?&]lesson=sci[1-4](&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
 var confirmReset=false,vMore=false;
@@ -2482,8 +2482,8 @@ function unitsView(){
   UNITS.forEach(function(u,ui){
     h+='<h2 class="fd" style="font-size:1.2rem;margin:22px 0 10px">'+esc(t[u.grade])+'</h2><div style="display:grid;gap:10px">';
     u.topics.forEach(function(tp,ti){
-      if(ui===0&&ti===0){
-        h+='<a href="?internal=shlav-internal-science&lesson=sci1" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
+      if(ui===0&&(ti===0||ti===1)){
+        h+='<a href="?internal=shlav-internal-science&lesson=sci'+(ti===0?'1':'4')+'" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
           '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
           '<span class="chip" style="font-size:.8rem;background:var(--teal);color:#fff">'+esc(t.startLesson)+'</span></a>';
       }else{
@@ -4462,6 +4462,7 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="lesson"&&SCI_LESSON_ON)html+=sciLessonView();
     else if(view==="lesson"&&SCI2_ON)html+=sci2LessonView();
     else if(view==="lesson"&&SCI3_ON)html+=sci3LessonView();
+    else if(view==="lesson"&&SCI4_ON)html+=sci4LessonView();
     else if(view==="settings")html+=settingsView();
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
@@ -4629,6 +4630,7 @@ function onAction(a,el){
   if(/^sl/.test(a)&&SCI_LESSON_ON){sciLessonAction(a,el);return}
   if(/^s2/.test(a)&&SCI2_ON){sci2LessonAction(a,el);return}
   if(/^s3/.test(a)&&SCI3_ON){sci3LessonAction(a,el);return}
+  if(/^s4/.test(a)&&SCI4_ON){sci4LessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -5225,6 +5227,7 @@ ar:{s3Title:"درس: جسم الإنسان - من يفعل ماذا؟",s3Goal:"�
     s3Sum:"انتهيتم! اليوم تعلمنا: لكل عضو في الجسم وظيفة - القلب يضخ الدم، الرئتان تتنفسان، والعضلات تحرّك - وكلها تعمل معًا.",
     s3Again:"من البداية",s3Next:"التالي",s3Hear:"استمعوا",s3Correct:"صحيح!",s3Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s3Check:"فحص الفهم",
     s3Heart:"قلب",s3Lungs:"رئتان",s3Muscles:"عضلات",s3HeartJob:"يضخ الدم إلى كل الجسم",s3LungsJob:"تساعدان على التنفس",s3MusclesJob:"تحرّك الجسم",s3PrevLesson:"الدرس السابق"}};
+S3STR.he.s3Fwd="לשיעור הבא";S3STR.en.s3Fwd="Next lesson";S3STR.ru.s3Fwd="Следующий урок";S3STR.ar.s3Fwd="الدرس التالي";
 function s3t(k){var d=S3STR[state.settings.lang||"he"]||S3STR.he;var v=d[k];return v===undefined?(S3STR.en[k]||k):v}
 var S3SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function s3Scene(revealed){
@@ -5278,7 +5281,7 @@ function sci3LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s3t("s3Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s3again",s3t("s3Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s3HearBtn(s3t("s3Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci2" style="color:#1d4ed8;font-weight:600">'+esc(s3t("s3PrevLesson"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci2" style="color:#1d4ed8;font-weight:600">'+esc(s3t("s3PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci4" style="color:#1d4ed8;font-weight:600">'+esc(s3t("s3Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5291,6 +5294,124 @@ function sci3LessonAction(a,el){
   else if(a==="s3p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
   else if(a==="s3again"){S3SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
   else if(a==="s3hear"){speak(el.getAttribute("data-say"))}
+}
+
+
+/* ================= שיעור מדע 4: בית לכולם (כיתה ג׳, יחידה uEco) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ג׳ (מערכות אקולוגיות).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI4_ON=/(^|[?&])lesson=sci4(&|$)/.test(location.search||"");
+var S4STR={
+he:{s4Title:"שיעור: בית לכולם — איפה יצורים חיים?",s4Goal:"המטרה: לדעת שכל יצור חי חי במקום שמתאים לצרכים שלו, ושם הוא מוצא מזון, מים ומחסה.",s4Start:"מתחילים",s4Step:"שלב {0} מתוך 5",
+    s4V1:"דג, גמל וציפור. לכל אחד מהם יש בית בטבע. מי גר איפה?",s4V1b:"לחצו על הכפתור וגלו איפה כל יצור חי.",s4Reveal:"גלו מי גר איפה",
+    s4V2:"הדג חי במים, הגמל חי במדבר, והציפור חיה בשמיים ובעצים. לכל יצור יש מקום שמתאים לו בדיוק.",
+    s4Q:"איפה הדג יכול לחיות?",s4A0:"במדבר",s4A1:"במים",s4A2:"על הר גבוה",
+    s4Why0:"במדבר אין מים, ודג חייב מים.",s4Why2:"על הר גבוה אין מים לדג.",
+    s4Rule:"הכלל: כל יצור חי חי בסביבה שיש בה את מה שהוא צריך — מזון, מים ומחסה.",s4RuleEx:"המקום שבו יצור חי נקרא בית הגידול שלו.",
+    s4P1:"מה יקרה לדג שיוצאים לו מהמים?",s4P1a0:"יגדל יותר מהר",s4P1a1:"לא יוכל לחיות — הוא חייב מים",s4P1a2:"יהפוך לציפור",
+    s4P2:"איזה יצור מתאים לחיים במדבר?",s4P2a0:"גמל",s4P2a1:"דג",s4P2a2:"דוב קוטב",
+    s4Sum:"סיימתם! היום למדנו: כל יצור חי חי בבית גידול שמתאים לצרכים שלו — שם יש לו מזון, מים ומחסה.",
+    s4Again:"מההתחלה",s4Next:"הבא",s4Hear:"השמיעו",s4Correct:"נכון!",s4Wrong:"עוד לא. אפשר לנסות שוב.",s4Check:"בדיקת הבנה",
+    s4Fish:"דג",s4Camel:"גמל",s4Bird:"ציפור",s4FishHome:"חי במים",s4CamelHome:"חי במדבר",s4BirdHome:"חיה בשמיים ובעצים",s4PrevLesson:"לשיעור הקודם"},
+en:{s4Title:"Lesson: a home for everyone - where do living things live?",s4Goal:"The goal: know that every living thing lives in a place that fits its needs, where it finds food, water and shelter.",s4Start:"Start",s4Step:"Step {0} of 5",
+    s4V1:"A fish, a camel and a bird. Each of them has a home in nature. Who lives where?",s4V1b:"Press the button and discover where each one lives.",s4Reveal:"Reveal who lives where",
+    s4V2:"The fish lives in water, the camel lives in the desert, and the bird lives in the sky and trees. Every living thing has a place that fits it exactly.",
+    s4Q:"Where can the fish live?",s4A0:"In the desert",s4A1:"In water",s4A2:"On a high mountain",
+    s4Why0:"The desert has no water, and a fish must have water.",s4Why2:"A high mountain has no water for a fish.",
+    s4Rule:"The rule: every living thing lives in an environment that has what it needs - food, water and shelter.",s4RuleEx:"The place where a living thing lives is called its habitat.",
+    s4P1:"What happens to a fish taken out of water?",s4P1a0:"It grows faster",s4P1a1:"It cannot live - it must have water",s4P1a2:"It turns into a bird",
+    s4P2:"Which animal fits desert life?",s4P2a0:"A camel",s4P2a1:"A fish",s4P2a2:"A polar bear",
+    s4Sum:"Done! Today we learned: every living thing lives in a habitat that fits its needs - with food, water and shelter.",
+    s4Again:"From the start",s4Next:"Next",s4Hear:"Listen",s4Correct:"Correct!",s4Wrong:"Not yet. You can try again.",s4Check:"Understanding check",
+    s4Fish:"fish",s4Camel:"camel",s4Bird:"bird",s4FishHome:"lives in water",s4CamelHome:"lives in the desert",s4BirdHome:"lives in the sky and trees",s4PrevLesson:"Previous lesson"},
+ru:{s4Title:"Урок: дом для каждого - где живут живые существа?",s4Goal:"Цель: узнать, что каждое живое существо живёт в месте, подходящем его потребностям, где есть еда, вода и укрытие.",s4Start:"Начинаем",s4Step:"Шаг {0} из 5",
+    s4V1:"Рыба, верблюд и птица. У каждого есть дом в природе. Кто где живёт?",s4V1b:"Нажмите кнопку и узнайте, где живёт каждый.",s4Reveal:"Узнать, кто где живёт",
+    s4V2:"Рыба живёт в воде, верблюд в пустыне, а птица в небе и на деревьях. У каждого существа есть место, которое подходит именно ему.",
+    s4Q:"Где может жить рыба?",s4A0:"В пустыне",s4A1:"В воде",s4A2:"На высокой горе",
+    s4Why0:"В пустыне нет воды, а рыбе вода необходима.",s4Why2:"На высокой горе нет воды для рыбы.",
+    s4Rule:"Правило: каждое живое существо живёт в среде, где есть то, что ему нужно - еда, вода и укрытие.",s4RuleEx:"Место, где живёт существо, называется его средой обитания.",
+    s4P1:"Что будет с рыбой, которую достали из воды?",s4P1a0:"Она вырастет быстрее",s4P1a1:"Она не сможет жить - ей нужна вода",s4P1a2:"Она превратится в птицу",
+    s4P2:"Какое животное подходит для жизни в пустыне?",s4P2a0:"Верблюд",s4P2a1:"Рыба",s4P2a2:"Белый медведь",
+    s4Sum:"Готово! Сегодня мы узнали: каждое живое существо живёт в среде обитания, подходящей его потребностям - с едой, водой и укрытием.",
+    s4Again:"Сначала",s4Next:"Дальше",s4Hear:"Слушать",s4Correct:"Верно!",s4Wrong:"Пока нет. Можно ещё раз.",s4Check:"Проверка понимания",
+    s4Fish:"рыба",s4Camel:"верблюд",s4Bird:"птица",s4FishHome:"живёт в воде",s4CamelHome:"живёт в пустыне",s4BirdHome:"живёт в небе и на деревьях",s4PrevLesson:"Прошлый урок"},
+ar:{s4Title:"درس: بيت للجميع - أين تعيش الكائنات؟",s4Goal:"الهدف: أن نعرف أن كل كائن حي يعيش في مكان يناسب احتياجاته، وفيه يجد الغذاء والماء والمأوى.",s4Start:"نبدأ",s4Step:"الخطوة {0} من 5",
+    s4V1:"سمكة وجمل وطائر. لكل واحد منها بيت في الطبيعة. من يعيش أين؟",s4V1b:"اضغطوا على الزر واكتشفوا أين يعيش كل واحد.",s4Reveal:"اكتشفوا من يعيش أين",
+    s4V2:"السمكة تعيش في الماء، الجمل يعيش في الصحراء، والطائر يعيش في السماء وعلى الأشجار. لكل كائن مكان يناسبه تمامًا.",
+    s4Q:"أين تستطيع السمكة أن تعيش؟",s4A0:"في الصحراء",s4A1:"في الماء",s4A2:"على جبل عالٍ",
+    s4Why0:"لا ماء في الصحراء، والسمكة تحتاج إلى الماء.",s4Why2:"على الجبل العالي لا ماء للسمكة.",
+    s4Rule:"القاعدة: كل كائن حي يعيش في بيئة فيها ما يحتاجه - غذاء وماء ومأوى.",s4RuleEx:"المكان الذي يعيش فيه الكائن يسمى موطنه الطبيعي.",
+    s4P1:"ماذا يحدث لسمكة أُخرجت من الماء؟",s4P1a0:"تنمو أسرع",s4P1a1:"لا تستطيع العيش - هي تحتاج إلى الماء",s4P1a2:"تتحول إلى طائر",
+    s4P2:"أي حيوان يناسب الحياة في الصحراء؟",s4P2a0:"الجمل",s4P2a1:"السمكة",s4P2a2:"الدب القطبي",
+    s4Sum:"انتهيتم! اليوم تعلمنا: كل كائن حي يعيش في موطن يناسب احتياجاته - وفيه الغذاء والماء والمأوى.",
+    s4Again:"من البداية",s4Next:"التالي",s4Hear:"استمعوا",s4Correct:"صحيح!",s4Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s4Check:"فحص الفهم",
+    s4Fish:"سمكة",s4Camel:"جمل",s4Bird:"طائر",s4FishHome:"تعيش في الماء",s4CamelHome:"يعيش في الصحراء",s4BirdHome:"يعيش في السماء وعلى الأشجار",s4PrevLesson:"الدرس السابق"}};
+function s4t(k){var d=S4STR[state.settings.lang||"he"]||S4STR.he;var v=d[k];return v===undefined?(S4STR.en[k]||k):v}
+var S4SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+function s4Scene(revealed){
+  var items=[["🐟","s4Fish","s4FishHome"],["🐪","s4Camel","s4CamelHome"],["🐦","s4Bird","s4BirdHome"]];
+  return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
+    return '<div class="card" style="text-align:center;padding:18px 22px;min-width:110px;max-width:160px">'+
+      '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(s4t(it[1]))+'</div>'+
+      (revealed?'<div style="margin-top:8px;font-weight:600;color:#0e9c8d;font-size:.95rem">'+esc(s4t(it[2]))+'</div>':'')+
+      '</div>';
+  }).join("")+'</div>';
+}
+function s4HearBtn(text){return '<button class="btn btn-g" data-a="s4hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s4t("s4Hear"))+'</button>'}
+function sci4LessonView(){
+  var st=S4SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s4t("s4Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s4t("s4Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s4t("s4Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s4next",s4t("s4Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s4HearBtn(s4t("s4Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s4t(st.revealed?"s4V2":"s4V1"))+'</p>';
+    h+=s4Scene(st.revealed);
+    if(!st.revealed){
+      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(s4t("s4V1b"))+'</p>';
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s4reveal",s4t("s4Reveal"),'background:#b45309;color:#fff;font-weight:700')+s4HearBtn(s4t("s4V1")+" "+s4t("s4V1b"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s4next",s4t("s4Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s4HearBtn(s4t("s4V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s4t("s4Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s4t("s4Q"))+'</p>';
+    h+=s4Scene(true);
+    h+=lsOpts([s4t("s4A0"),s4t("s4A1"),s4t("s4A2")],st.picked,1,"s4pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s4t({0:"s4Why0",2:"s4Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s4t("s4Correct"):s4t("s4Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s4next",s4t("s4Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s4t("s4Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(s4t("s4RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s4next",s4t("s4Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s4HearBtn(s4t("s4Rule")+" "+s4t("s4RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s4t("s4P1"))+'</p>';
+    h+=lsOpts([s4t("s4P1a0"),s4t("s4P1a1"),s4t("s4P1a2")],st.p1,1,"s4p1");
+    if(st.p1===1){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s4t("s4P2"))+'</p>';
+      h+=lsOpts([s4t("s4P2a0"),s4t("s4P2a1"),s4t("s4P2a2")],st.p2,0,"s4p2");
+    }
+    if(st.p1===1&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s4t("s4Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s4next",s4t("s4Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s4t("s4Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s4again",s4t("s4Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s4HearBtn(s4t("s4Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci3" style="color:#1d4ed8;font-weight:600">'+esc(s4t("s4PrevLesson"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci4LessonAction(a,el){
+  var st=S4SN;
+  if(a==="s4next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s4reveal"){st.revealed=true;render();speak(s4t("s4V2"))}
+  else if(a==="s4pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s4p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s4p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s4again"){S4SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s4hear"){speak(el.getAttribute("data-say"))}
 }
 
 /* ================= boot ================= */
@@ -5334,7 +5455,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s106-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s107-pwa1").catch(function(){});
   });
 }
 </script>
