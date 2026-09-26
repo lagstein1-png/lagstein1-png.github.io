@@ -2394,8 +2394,8 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s110 · 2026-09-26";
-var view=/[?&]lesson=sci[1-7](&|$)/.test(location.search||"")?"lesson":"units";
+var BUILD="s111 · 2026-09-26";
+var view=/[?&]lesson=sci[1-8](&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
 var confirmReset=false,vMore=false;
@@ -2482,7 +2482,7 @@ function unitsView(){
   UNITS.forEach(function(u,ui){
     h+='<h2 class="fd" style="font-size:1.2rem;margin:22px 0 10px">'+esc(t[u.grade])+'</h2><div style="display:grid;gap:10px">';
     u.topics.forEach(function(tp,ti){
-      var lid=({'0:0':'1','0:1':'4','0:2':'5','0:3':'6','1:1':'7'})[ui+':'+ti];
+      var lid=({'0:0':'1','0:1':'4','0:2':'5','0:3':'6','1:0':'8','1:1':'7'})[ui+':'+ti];
       if(lid){
         h+='<a href="?internal=shlav-internal-science&lesson=sci'+lid+'" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
           '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
@@ -4467,6 +4467,7 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="lesson"&&SCI5_ON)html+=sci5LessonView();
     else if(view==="lesson"&&SCI6_ON)html+=sci6LessonView();
     else if(view==="lesson"&&SCI7_ON)html+=sci7LessonView();
+    else if(view==="lesson"&&SCI8_ON)html+=sci8LessonView();
     else if(view==="settings")html+=settingsView();
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
@@ -4638,6 +4639,7 @@ function onAction(a,el){
   if(/^s5/.test(a)&&SCI5_ON){sci5LessonAction(a,el);return}
   if(/^s6/.test(a)&&SCI6_ON){sci6LessonAction(a,el);return}
   if(/^s7/.test(a)&&SCI7_ON){sci7LessonAction(a,el);return}
+  if(/^s8/.test(a)&&SCI8_ON){sci8LessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -5710,6 +5712,7 @@ ar:{s7Title:"درس: صلب، سائل، غاز",s7Goal:"الهدف: أن نتع
     s7Sum:"انتهيتم! اليوم تعلمنا: للمواد ثلاث حالات - صلبة وسائلة وغازية - والتسخين والتبريد ينقلان المادة بينها.",
     s7Again:"من البداية",s7Next:"التالي",s7Hear:"استمعوا",s7Correct:"صحيح!",s7Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s7Check:"فحص الفهم",
     s7Ice:"ثلج - صلب",s7Water:"ماء - سائل",s7Steam:"بخار - غاز",s7PrevLesson:"الدرس السابق"}};
+S7STR.he.s7Fwd="לשיעור הבא";S7STR.en.s7Fwd="Next lesson";S7STR.ru.s7Fwd="Следующий урок";S7STR.ar.s7Fwd="الدرس التالي";
 function s7t(k){var d=S7STR[state.settings.lang||"he"]||S7STR.he;var v=d[k];return v===undefined?(S7STR.en[k]||k):v}
 var S7SN={step:0,heat:0,picked:-1,p1:-1,p2:-1};
 function s7Scene(heat){
@@ -5761,7 +5764,7 @@ function sci7LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s7t("s7Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s7again",s7t("s7Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s7HearBtn(s7t("s7Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci6" style="color:#1d4ed8;font-weight:600">'+esc(s7t("s7PrevLesson"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci6" style="color:#1d4ed8;font-weight:600">'+esc(s7t("s7PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci8" style="color:#1d4ed8;font-weight:600">'+esc(s7t("s7Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5774,6 +5777,121 @@ function sci7LessonAction(a,el){
   else if(a==="s7p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
   else if(a==="s7again"){S7SN={step:0,heat:0,picked:-1,p1:-1,p2:-1};render()}
   else if(a==="s7hear"){speak(el.getAttribute("data-say"))}
+}
+
+/* ================= שיעור מדע 8: בעלי חוליות (כיתה ד׳, יחידה uBio) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ד׳ (מערכות ותהליכים ביצורים חיים - המגוון בטבע).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI8_ON=/(^|[?&])lesson=sci8(&|$)/.test(location.search||"");
+var S8STR={
+he:{s8Title:"שיעור: מי הם בעלי החוליות?",s8Goal:"המטרה: לדעת שלבעלי חוליות יש שלד עם עמוד שדרה, ולהכיר קבוצות של בעלי חוליות: דגים, זוחלים, עופות ויונקים.",s8Start:"מתחילים",s8Step:"שלב {0} מתוך 5",
+    s8V1:"ארבעה בעלי חיים שונים מאוד: דג, צב, ציפור וכלב. מה משותף לכולם? לחצו על הכפתור וגלו.",s8Reveal:"גלו מה משותף",
+    s8V2:"לכולם יש שלד ועמוד שדרה - הם בעלי חוליות! כל אחד שייך לקבוצה אחרת: דגים, זוחלים, עופות ויונקים.",
+    s8Q:"מה משותף לכל בעלי החוליות?",s8A0:"לכולם יש פרווה",s8A1:"לכולם יש שלד ועמוד שדרה",s8A2:"כולם חיים במים",
+    s8Why0:"לדגים ולציפורים אין פרווה - אבל יש להם עמוד שדרה.",s8Why2:"כלבים וציפורים לא חיים במים.",
+    s8Rule:"הכלל: בעלי חוליות הם בעלי חיים שיש להם שלד ועמוד שדרה. הקבוצות הגדולות: דגים חיים במים, זוחלים מכוסים קשקשים, לעופות יש נוצות, וליונקים יש פרווה והאם מניקה את הגור.",s8RuleEx:"האדם הוא יונק - גם לנו יש שלד ועמוד שדרה.",
+    s8P1:"נחש הוא בעל חוליות מאיזו קבוצה?",s8P1a0:"זוחלים - גופו מכוסה קשקשים",s8P1a1:"דגים - הוא ארוך",s8P1a2:"עופות - הוא זז מהר",
+    s8P2:"מה מיוחד ביונקים?",s8P2a0:"יש להם פרווה והאם מניקה את הגור",s8P2a1:"יש להם נוצות",s8P2a2:"הם חיים רק במים",
+    s8Sum:"סיימתם! היום למדנו: לבעלי חוליות יש שלד ועמוד שדרה, והם מתחלקים לקבוצות כמו דגים, זוחלים, עופות ויונקים.",
+    s8Again:"מההתחלה",s8Next:"הבא",s8Hear:"השמיעו",s8Correct:"נכון!",s8Wrong:"עוד לא. אפשר לנסות שוב.",s8Check:"בדיקת הבנה",
+    s8Fish:"דג",s8Turtle:"צב",s8Bird:"ציפור",s8Dog:"כלב",s8FishG:"דגים",s8TurtleG:"זוחלים",s8BirdG:"עופות",s8DogG:"יונקים",s8PrevLesson:"לשיעור הקודם"},
+en:{s8Title:"Lesson: who are the vertebrates?",s8Goal:"The goal: know that vertebrates have a skeleton with a backbone, and meet groups of vertebrates: fish, reptiles, birds and mammals.",s8Start:"Start",s8Step:"Step {0} of 5",
+    s8V1:"Four very different animals: a fish, a turtle, a bird and a dog. What do they all share? Press the button and find out.",s8Reveal:"Reveal what they share",
+    s8V2:"They all have a skeleton and a backbone - they are vertebrates! Each belongs to a different group: fish, reptiles, birds and mammals.",
+    s8Q:"What do all vertebrates share?",s8A0:"They all have fur",s8A1:"They all have a skeleton and a backbone",s8A2:"They all live in water",
+    s8Why0:"Fish and birds have no fur - but they do have a backbone.",s8Why2:"Dogs and birds do not live in water.",
+    s8Rule:"The rule: vertebrates are animals that have a skeleton and a backbone. The big groups: fish live in water, reptiles are covered in scales, birds have feathers, and mammals have fur and the mother nurses her young.",s8RuleEx:"Humans are mammals - we also have a skeleton and a backbone.",
+    s8P1:"A snake is a vertebrate from which group?",s8P1a0:"Reptiles - its body is covered in scales",s8P1a1:"Fish - it is long",s8P1a2:"Birds - it moves fast",
+    s8P2:"What is special about mammals?",s8P2a0:"They have fur and the mother nurses her young",s8P2a1:"They have feathers",s8P2a2:"They live only in water",
+    s8Sum:"Done! Today we learned: vertebrates have a skeleton and a backbone, and they are divided into groups like fish, reptiles, birds and mammals.",
+    s8Again:"From the start",s8Next:"Next",s8Hear:"Listen",s8Correct:"Correct!",s8Wrong:"Not yet. You can try again.",s8Check:"Understanding check",
+    s8Fish:"fish",s8Turtle:"turtle",s8Bird:"bird",s8Dog:"dog",s8FishG:"fish",s8TurtleG:"reptiles",s8BirdG:"birds",s8DogG:"mammals",s8PrevLesson:"Previous lesson"},
+ru:{s8Title:"Урок: кто такие позвоночные?",s8Goal:"Цель: узнать, что у позвоночных есть скелет с позвоночником, и познакомиться с группами позвоночных: рыбы, рептилии, птицы и млекопитающие.",s8Start:"Начинаем",s8Step:"Шаг {0} из 5",
+    s8V1:"Четыре очень разных животных: рыба, черепаха, птица и собака. Что у всех общего? Нажмите кнопку и узнайте.",s8Reveal:"Узнать, что общего",
+    s8V2:"У всех есть скелет и позвоночник - они позвоночные! Каждый относится к своей группе: рыбы, рептилии, птицы и млекопитающие.",
+    s8Q:"Что общего у всех позвоночных?",s8A0:"У всех есть шерсть",s8A1:"У всех есть скелет и позвоночник",s8A2:"Все живут в воде",
+    s8Why0:"У рыб и птиц нет шерсти - но позвоночник есть.",s8Why2:"Собаки и птицы не живут в воде.",
+    s8Rule:"Правило: позвоночные - это животные, у которых есть скелет и позвоночник. Большие группы: рыбы живут в воде, рептилии покрыты чешуёй, у птиц есть перья, а у млекопитающих шерсть, и мать кормит детёныша молоком.",s8RuleEx:"Человек - млекопитающее: у нас тоже есть скелет и позвоночник.",
+    s8P1:"Змея - позвоночное из какой группы?",s8P1a0:"Рептилии - её тело покрыто чешуёй",s8P1a1:"Рыбы - она длинная",s8P1a2:"Птицы - она быстро двигается",
+    s8P2:"Что особенного у млекопитающих?",s8P2a0:"У них шерсть, и мать кормит детёныша молоком",s8P2a1:"У них перья",s8P2a2:"Они живут только в воде",
+    s8Sum:"Готово! Сегодня мы узнали: у позвоночных есть скелет и позвоночник, и они делятся на группы: рыбы, рептилии, птицы и млекопитающие.",
+    s8Again:"Сначала",s8Next:"Дальше",s8Hear:"Слушать",s8Correct:"Верно!",s8Wrong:"Пока нет. Можно ещё раз.",s8Check:"Проверка понимания",
+    s8Fish:"рыба",s8Turtle:"черепаха",s8Bird:"птица",s8Dog:"собака",s8FishG:"рыбы",s8TurtleG:"рептилии",s8BirdG:"птицы",s8DogG:"млекопитающие",s8PrevLesson:"Прошлый урок"},
+ar:{s8Title:"درس: من هي الفقاريات؟",s8Goal:"الهدف: أن نعرف أن للفقاريات هيكلًا عظميًا مع عمود فقري، ونتعرف على مجموعات الفقاريات: الأسماك والزواحف والطيور والثدييات.",s8Start:"نبدأ",s8Step:"الخطوة {0} من 5",
+    s8V1:"أربعة حيوانات مختلفة جدًا: سمكة وسلحفاة وطائر وكلب. ما المشترك بينها؟ اضغطوا على الزر واكتشفوا.",s8Reveal:"اكتشفوا المشترك",
+    s8V2:"جميعها لها هيكل عظمي وعمود فقري - إنها فقاريات! كل واحد ينتمي لمجموعة مختلفة: أسماك وزواحف وطيور وثدييات.",
+    s8Q:"ما المشترك بين كل الفقاريات؟",s8A0:"جميعها لها فراء",s8A1:"جميعها لها هيكل عظمي وعمود فقري",s8A2:"جميعها تعيش في الماء",
+    s8Why0:"الأسماك والطيور ليس لها فراء - لكن لها عمود فقري.",s8Why2:"الكلاب والطيور لا تعيش في الماء.",
+    s8Rule:"القاعدة: الفقاريات هي حيوانات لها هيكل عظمي وعمود فقري. المجموعات الكبيرة: الأسماك تعيش في الماء، الزواحف مغطاة بالحراشف، للطيور ريش، وللثدييات فراء والأم ترضع صغارها.",s8RuleEx:"الإنسان من الثدييات - لدينا أيضًا هيكل عظمي وعمود فقري.",
+    s8P1:"الثعبان فقاري من أي مجموعة؟",s8P1a0:"الزواحف - جسمه مغطى بالحراشف",s8P1a1:"الأسماك - لأنه طويل",s8P1a2:"الطيور - لأنه يتحرك بسرعة",
+    s8P2:"ما المميز في الثدييات؟",s8P2a0:"لها فراء والأم ترضع صغارها",s8P2a1:"لها ريش",s8P2a2:"تعيش فقط في الماء",
+    s8Sum:"انتهيتم! اليوم تعلمنا: للفقاريات هيكل عظمي وعمود فقري، وهي تنقسم إلى مجموعات مثل الأسماك والزواحف والطيور والثدييات.",
+    s8Again:"من البداية",s8Next:"التالي",s8Hear:"استمعوا",s8Correct:"صحيح!",s8Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s8Check:"فحص الفهم",
+    s8Fish:"سمكة",s8Turtle:"سلحفاة",s8Bird:"طائر",s8Dog:"كلب",s8FishG:"أسماك",s8TurtleG:"زواحف",s8BirdG:"طيور",s8DogG:"ثدييات",s8PrevLesson:"الدرس السابق"}};
+function s8t(k){var d=S8STR[state.settings.lang||"he"]||S8STR.he;var v=d[k];return v===undefined?(S8STR.en[k]||k):v}
+var S8SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+function s8Scene(revealed){
+  var items=[["🐟","s8Fish","s8FishG"],["🐢","s8Turtle","s8TurtleG"],["🐦","s8Bird","s8BirdG"],["🐕","s8Dog","s8DogG"]];
+  return '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
+    return '<div class="card" style="text-align:center;padding:16px 18px;min-width:100px;max-width:140px">'+
+      '<div style="font-size:2.6rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(s8t(it[1]))+'</div>'+
+      (revealed?'<div style="margin-top:8px;font-weight:600;color:#0e9c8d;font-size:.92rem">🦴 '+esc(s8t(it[2]))+'</div>':'')+
+      '</div>';
+  }).join("")+'</div>';
+}
+function s8HearBtn(text){return '<button class="btn btn-g" data-a="s8hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s8t("s8Hear"))+'</button>'}
+function sci8LessonView(){
+  var st=S8SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s8t("s8Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s8t("s8Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s8t("s8Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s8next",s8t("s8Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s8HearBtn(s8t("s8Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s8t(st.revealed?"s8V2":"s8V1"))+'</p>';
+    h+=s8Scene(st.revealed);
+    if(!st.revealed){
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s8reveal",s8t("s8Reveal"),'background:#b45309;color:#fff;font-weight:700')+s8HearBtn(s8t("s8V1"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s8next",s8t("s8Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s8HearBtn(s8t("s8V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s8t("s8Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s8t("s8Q"))+'</p>';
+    h+=lsOpts([s8t("s8A0"),s8t("s8A1"),s8t("s8A2")],st.picked,1,"s8pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s8t({0:"s8Why0",2:"s8Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s8t("s8Correct"):s8t("s8Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s8next",s8t("s8Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s8t("s8Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(s8t("s8RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s8next",s8t("s8Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s8HearBtn(s8t("s8Rule")+" "+s8t("s8RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s8t("s8P1"))+'</p>';
+    h+=lsOpts([s8t("s8P1a0"),s8t("s8P1a1"),s8t("s8P1a2")],st.p1,0,"s8p1");
+    if(st.p1===0){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s8t("s8P2"))+'</p>';
+      h+=lsOpts([s8t("s8P2a0"),s8t("s8P2a1"),s8t("s8P2a2")],st.p2,0,"s8p2");
+    }
+    if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s8t("s8Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s8next",s8t("s8Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s8t("s8Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s8again",s8t("s8Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s8HearBtn(s8t("s8Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci7" style="color:#1d4ed8;font-weight:600">'+esc(s8t("s8PrevLesson"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci8LessonAction(a,el){
+  var st=S8SN;
+  if(a==="s8next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s8reveal"){st.revealed=true;render();speak(s8t("s8V2"))}
+  else if(a==="s8pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s8p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s8p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s8again"){S8SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s8hear"){speak(el.getAttribute("data-say"))}
 }
 
 /* ================= boot ================= */
@@ -5817,7 +5935,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s110-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s111-pwa1").catch(function(){});
   });
 }
 </script>
