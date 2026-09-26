@@ -1303,22 +1303,22 @@ errTitle:"حدث خطأ صغير",errMsg:"جرّب تحديث الصفحة.",err
 STR.he.navUnits="יחידות";STR.he.unitsTitle="גאוגרפיה - אדם וסביבה, כיתות ה׳–ו׳";
 STR.he.unitsIntro="היחידות בנויות לפי תכנית הלימודים בגאוגרפיה - אדם וסביבה של משרד החינוך לכיתות ה׳–ו׳. התוכן נכתב במקור במיוחד לאתר, וכל שיעור מוקרא בעברית מדוברת.";
 STR.he.gradeA="כיתה ה׳";STR.he.gradeB="כיתה ו׳";
-STR.he.comingSoon="בקרוב";STR.he.startLesson="לשיעור";STR.he.mikudLink="מיקוד הלמידה של משרד החינוך (PDF)";
+STR.he.comingSoon="בקרוב";STR.he.startLesson="לשיעור";STR.he.mikudLink="תכנית הלימודים של משרד החינוך (PDF)";
 STR.he.uMaps="מפות — כלי להכרת העולם";STR.he.uMed="אדם וסביבה באגן הים התיכון";STR.he.uRegions="הארץ לאזוריה";STR.he.uJeru="ירושלים בירת ישראל";
 STR.en.navUnits="Units";STR.en.unitsTitle="Geography - People and Environment, grades 5-6";
 STR.en.unitsIntro="The units follow the Israeli Ministry of Education geography curriculum (People and Environment) for grades 5-6. The content was written originally for this site, and every lesson is read aloud in spoken Hebrew.";
 STR.en.gradeA="Grade 5";STR.en.gradeB="Grade 6";
-STR.en.comingSoon="Coming soon";STR.en.startLesson="To the lesson";STR.en.mikudLink="MoE learning-focus document (PDF)";
+STR.en.comingSoon="Coming soon";STR.en.startLesson="To the lesson";STR.en.mikudLink="MoE curriculum (PDF)";
 STR.en.uMaps="Maps - a tool for exploring the world";STR.en.uMed="People and environment in the Mediterranean basin";STR.en.uRegions="The Land of Israel and its regions";STR.en.uJeru="Jerusalem, capital of Israel";
 STR.ru.navUnits="Разделы";STR.ru.unitsTitle="География - человек и среда, 5-6 классы";
 STR.ru.unitsIntro="Разделы построены по учебной программе Минпроса Израиля по географии (человек и среда) для 5-6 классов. Материал написан специально для сайта, каждый урок озвучен на иврите.";
 STR.ru.gradeA="5 класс";STR.ru.gradeB="6 класс";
-STR.ru.comingSoon="Скоро";STR.ru.startLesson="К уроку";STR.ru.mikudLink="Документ Минпроса о фокусе обучения (PDF)";
+STR.ru.comingSoon="Скоро";STR.ru.startLesson="К уроку";STR.ru.mikudLink="Учебная программа Минпроса (PDF)";
 STR.ru.uMaps="Карты - инструмент познания мира";STR.ru.uMed="Человек и среда в Средиземноморском бассейне";STR.ru.uRegions="Земля Израиля и её районы";STR.ru.uJeru="Иерусалим - столица Израиля";
 STR.ar.navUnits="الوحدات";STR.ar.unitsTitle="الجغرافيا - الإنسان والبيئة، الصفَّان الخامس والسادس";
 STR.ar.unitsIntro="الوحدات مبنية وفق برنامج وزارة التربية في الجغرافيا - الإنسان والبيئة للصفَّين الخامس والسادس. المحتوى مكتوب خصيصًا للموقع، وكل درس مقروء بالعبرية المحكية.";
 STR.ar.gradeA="الصف الخامس";STR.ar.gradeB="الصف السادس";
-STR.ar.comingSoon="قريبًا";STR.ar.startLesson="إلى الدرس";STR.ar.mikudLink="وثيقة ميكود التعلّم لوزارة التربية (PDF)";
+STR.ar.comingSoon="قريبًا";STR.ar.startLesson="إلى الدرس";STR.ar.mikudLink="برنامج وزارة التربية (PDF)";
 STR.ar.uMaps="الخرائط - أداة للتعرف على العالم";STR.ar.uMed="الإنسان والبيئة في حوض البحر المتوسط";STR.ar.uRegions="أرض إسرائيل وأقاليمها";STR.ar.uJeru="القدس عاصمة إسرائيل";
 function T(){return STR[state.settings.lang||"he"]||STR.he}
 
@@ -2393,8 +2393,8 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="g100 · 2026-09-26";
-var view="units";
+var BUILD="g101 · 2026-09-26";
+var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
 var confirmReset=false,vMore=false;
@@ -2479,9 +2479,16 @@ function unitsView(){
   UNITS.forEach(function(u,ui){
     h+='<h2 class="fd" style="font-size:1.2rem;margin:22px 0 10px">'+esc(t[u.grade])+'</h2><div style="display:grid;gap:10px">';
     u.topics.forEach(function(tp,ti){
-      h+='<div class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;opacity:.75">'+
-        '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
-        '<span class="chip warn" style="font-size:.8rem">'+esc(t.comingSoon)+'</span></div>';
+      var lid=({'0:0':'geo1'})[ui+':'+ti];
+      if(lid){
+        h+='<a href="?internal=shlav-internal-geography-elem&lesson='+lid+'" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
+          '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
+          '<span class="chip" style="font-size:.8rem;background:var(--teal);color:#fff">'+esc(t.startLesson)+'</span></a>';
+      }else{
+        h+='<div class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;opacity:.75">'+
+          '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
+          '<span class="chip warn" style="font-size:.8rem">'+esc(t.comingSoon)+'</span></div>';
+      }
     });
     h+='</div><p style="margin:8px 0 0;font-size:.82rem"><a href="'+MOE_PDF+'" target="_blank" rel="noopener" style="color:var(--ink-faint)">'+esc(t.mikudLink)+'</a></p>';
   });
@@ -4446,6 +4453,7 @@ function render(){ try{lgChrome()}catch(e){}
   else{
     html=header()+'<main id="main" tabindex="-1">';
     if(view==="units")html+=unitsView();
+    else if(view==="lesson"&&GEO1_ON)html+=geo1LessonView();
     else if(view==="practice")html+=practice();
     else if(view==="progress")html+=progressView();
     else if(view==="records")html+=recordsView();
@@ -4612,6 +4620,7 @@ function setBubbleNow(text){BT.text=text;BT.shown=text.length;if(BT.timer){clear
 function onAction(a,el){
   var t=T();
   if(examAction(a,el))return;
+  if(/^g1/.test(a)&&GEO1_ON){geo1LessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -4922,6 +4931,126 @@ function lessonAction(a,el){
 }
 
 
+/* ================= שיעור גאוגרפיה 1: איך קוראים מפה? (כיתה ה׳, יחידה uMaps) ================= */
+/* תוכן מקורי שנכתב לאתר לפי תכנית הלימודים בגאוגרפיה - אדם וסביבה כיתה ה׳
+   (נושא 1: מפות - כלי להכרת העולם; שפת המפה: כותרת, מקרא, קנה מידה, שושנת רוחות).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var GEO1_ON=/(^|[?&])lesson=geo1(&|$)/.test(location.search||"");
+var G1STR={
+he:{g1Title:"שיעור: איך קוראים מפה?",g1Goal:"המטרה: לגלות מהי מפה, ולהכיר ארבעה חלקים שעוזרים לקרוא כל מפה — כותרת, מקרא, קנה מידה ושושנת רוחות.",g1Start:"מתחילים",g1Step:"שלב {0} מתוך 5",
+    g1V1:"מפה היא ציור מיוחד של מקום, ממבט על — כמו שציפור רואה מהשמיים. כדי לקרוא מפה צריך להכיר ארבעה חלקים חשובים.",g1V1b:"לחצו על הכפתור וגלו מהם ארבעת החלקים — ומה כל אחד עושה.",g1Reveal:"גלו את ארבעת החלקים",
+    g1V2:"אלה ארבעת החלקים של המפה. כל אחד מהם עושה משהו אחר. איזה חלק מסביר את משמעות הסימנים במפה?",
+    g1Q:"איזה חלק במפה מסביר את משמעות הסימנים והצבעים?",g1A0:"הכותרת",g1A1:"המקרא",g1A2:"שושנת הרוחות",
+    g1Why0:"הכותרת מספרת על מה המפה, אבל לא מסבירה את הסימנים.",g1Why2:"שושנת הרוחות מראה כיוונים, לא את משמעות הסימנים.",
+    g1Rule:"הכלל: כדי לקרוא מפה מחפשים ארבעה דברים — כותרת שאומרת על מה המפה, מקרא שמסביר את הסימנים, קנה מידה שמראה כמה המפה מקטינה את המציאות, ושושנת רוחות שמראה את הכיוונים.",g1RuleEx:"מפה בלי מקרא היא כמו סיפור בשפה שלא מכירים — רואים את הסימנים, אבל לא מבינים אותם.",
+    g1P1:"מה תפקידו של קנה המידה?",g1P1a0:"לספר על מה המפה",g1P1a1:"להראות כמה המפה מקטינה את המציאות",g1P1a2:"להראות איפה צפון",
+    g1P2:"דנה רואה במפה חץ קטן עם האות צ׳. איזה חלק של המפה עוזר לה להתמצא בכיוונים?",g1P2a0:"המקרא",g1P2a1:"הכותרת",g1P2a2:"שושנת הרוחות",
+    g1Sum:"סיימתם! היום למדנו: מפה היא ציור של מקום ממבט על, וארבעה חלקים עוזרים לקרוא אותה — כותרת, מקרא, קנה מידה ושושנת רוחות.",
+    g1Again:"מההתחלה",g1Next:"הבא",g1Hear:"השמיעו",g1Correct:"נכון!",g1Wrong:"עוד לא. אפשר לנסות שוב.",g1Check:"בדיקת הבנה",
+    g1C1:"כותרת",g1C1r:"מספרת על מה המפה",g1C2:"מקרא",g1C2r:"מסביר את סימני המפה",g1C3:"קנה מידה",g1C3r:"כמה המפה מקטינה",g1C4:"שושנת רוחות",g1C4r:"מראה את הכיוונים"},
+en:{g1Title:"Lesson: how do we read a map?",g1Goal:"The goal: discover what a map is, and learn four parts that help us read any map - title, legend, scale and compass rose.",g1Start:"Start",g1Step:"Step {0} of 5",
+    g1V1:"A map is a special drawing of a place, from above - the way a bird sees from the sky. To read a map you need to know four important parts.",g1V1b:"Press the button to reveal the four parts - and what each one does.",g1Reveal:"Reveal the four parts",
+    g1V2:"These are the four parts of a map. Each one does something different. Which part explains the meaning of the symbols on the map?",
+    g1Q:"Which part of a map explains the meaning of the symbols and colors?",g1A0:"The title",g1A1:"The legend",g1A2:"The compass rose",
+    g1Why0:"The title tells what the map is about, but does not explain the symbols.",g1Why2:"The compass rose shows directions, not the meaning of symbols.",
+    g1Rule:"The rule: to read a map, look for four things - a title that says what the map is about, a legend that explains the symbols, a scale that shows how much the map shrinks reality, and a compass rose that shows directions.",g1RuleEx:"A map without a legend is like a story in a language you don't know - you see the symbols, but you don't understand them.",
+    g1P1:"What does a scale do?",g1P1a0:"Tells what the map is about",g1P1a1:"Shows how much the map shrinks reality",g1P1a2:"Shows where north is",
+    g1P2:"Dana sees a small arrow with the letter N on the map. Which part of the map helps her with directions?",g1P2a0:"The legend",g1P2a1:"The title",g1P2a2:"The compass rose",
+    g1Sum:"Done! Today we learned: a map is a drawing of a place from above, and four parts help us read it - title, legend, scale and compass rose.",
+    g1Again:"From the start",g1Next:"Next",g1Hear:"Listen",g1Correct:"Correct!",g1Wrong:"Not yet. You can try again.",g1Check:"Understanding check",
+    g1C1:"Title",g1C1r:"Tells what the map is about",g1C2:"Legend",g1C2r:"Explains the map symbols",g1C3:"Scale",g1C3r:"How much the map shrinks",g1C4:"Compass rose",g1C4r:"Shows the directions"},
+ru:{g1Title:"Урок: как читать карту?",g1Goal:"Цель: узнать, что такое карта, и познакомиться с четырьмя частями, которые помогают читать любую карту - заголовок, легенда, масштаб и роза ветров.",g1Start:"Начинаем",g1Step:"Шаг {0} из 5",
+    g1V1:"Карта - это особый рисунок места, вид сверху, как птица видит с неба. Чтобы читать карту, нужно знать четыре важные части.",g1V1b:"Нажмите кнопку и узнайте, какие это четыре части - и что делает каждая.",g1Reveal:"Узнать четыре части",
+    g1V2:"Это четыре части карты. Каждая делает что-то своё. Какая часть объясняет значение знаков на карте?",
+    g1Q:"Какая часть карты объясняет значение знаков и цветов?",g1A0:"Заголовок",g1A1:"Легенда",g1A2:"Роза ветров",
+    g1Why0:"Заголовок говорит, о чём карта, но не объясняет знаки.",g1Why2:"Роза ветров показывает направления, а не значение знаков.",
+    g1Rule:"Правило: чтобы читать карту, ищут четыре вещи - заголовок, который говорит, о чём карта, легенду, которая объясняет знаки, масштаб, который показывает, во сколько раз карта уменьшает реальность, и розу ветров, которая показывает направления.",g1RuleEx:"Карта без легенды - как рассказ на незнакомом языке: знаки видишь, но не понимаешь.",
+    g1P1:"Что делает масштаб?",g1P1a0:"Говорит, о чём карта",g1P1a1:"Показывает, во сколько раз карта уменьшает реальность",g1P1a2:"Показывает, где север",
+    g1P2:"Дана видит на карте маленькую стрелку с буквой С. Какая часть карты помогает ей с направлениями?",g1P2a0:"Легенда",g1P2a1:"Заголовок",g1P2a2:"Роза ветров",
+    g1Sum:"Готово! Сегодня мы узнали: карта - это рисунок места сверху, и четыре части помогают её читать - заголовок, легенда, масштаб и роза ветров.",
+    g1Again:"Сначала",g1Next:"Дальше",g1Hear:"Слушать",g1Correct:"Верно!",g1Wrong:"Пока нет. Можно ещё раз.",g1Check:"Проверка понимания",
+    g1C1:"Заголовок",g1C1r:"Говорит, о чём карта",g1C2:"Легенда",g1C2r:"Объясняет знаки карты",g1C3:"Масштаб",g1C3r:"Во сколько раз уменьшает",g1C4:"Роза ветров",g1C4r:"Показывает направления"},
+ar:{g1Title:"درس: كيف نقرأ الخريطة؟",g1Goal:"الهدف: أن نكتشف ما هي الخريطة، وأن نتعرف على أربعة أجزاء تساعدنا على قراءة أي خريطة - العنوان، مفتاح الخريطة، مقياس الرسم ووردة الرياح.",g1Start:"نبدأ",g1Step:"الخطوة {0} من 5",
+    g1V1:"الخريطة هي رسم خاص لمكان، من الأعلى - كما يرى العصفور من السماء. لكي نقرأ الخريطة نحتاج أن نعرف أربعة أجزاء مهمة.",g1V1b:"اضغطوا على الزر واكتشفوا الأجزاء الأربعة - وماذا يفعل كل منها.",g1Reveal:"اكتشفوا الأجزاء الأربعة",
+    g1V2:"هذه هي أجزاء الخريطة الأربعة. كل جزء يفعل شيئًا مختلفًا. أي جزء يشرح معنى الرموز في الخريطة؟",
+    g1Q:"أي جزء في الخريطة يشرح معنى الرموز والألوان؟",g1A0:"العنوان",g1A1:"مفتاح الخريطة",g1A2:"وردة الرياح",
+    g1Why0:"العنوان يخبر عن موضوع الخريطة، لكنه لا يشرح الرموز.",g1Why2:"وردة الرياح تُظهر الاتجاهات، لا معنى الرموز.",
+    g1Rule:"القاعدة: لكي نقرأ الخريطة نبحث عن أربعة أشياء - عنوان يقول عن ماذا تتحدث الخريطة، مفتاح يشرح الرموز، مقياس رسم يُظهر كم تصغّر الخريطة الواقع، ووردة رياح تُظهر الاتجاهات.",g1RuleEx:"الخريطة بلا مفتاح مثل قصة بلغة لا نعرفها - نرى الرموز لكننا لا نفهمها.",
+    g1P1:"ما وظيفة مقياس الرسم؟",g1P1a0:"يخبر عن موضوع الخريطة",g1P1a1:"يُظهر كم تصغّر الخريطة الواقع",g1P1a2:"يُظهر أين الشمال",
+    g1P2:"ترى دانة في الخريطة سهمًا صغيرًا مع حرف ش. أي جزء من الخريطة يساعدها في الاتجاهات؟",g1P2a0:"مفتاح الخريطة",g1P2a1:"العنوان",g1P2a2:"وردة الرياح",
+    g1Sum:"انتهيتم! اليوم تعلمنا: الخريطة هي رسم لمكان من الأعلى، وأربعة أجزاء تساعدنا على قراءتها - العنوان، مفتاح الخريطة، مقياس الرسم ووردة الرياح.",
+    g1Again:"من البداية",g1Next:"التالي",g1Hear:"استمعوا",g1Correct:"صحيح!",g1Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",g1Check:"فحص الفهم",
+    g1C1:"العنوان",g1C1r:"يخبر عن موضوع الخريطة",g1C2:"مفتاح الخريطة",g1C2r:"يشرح رموز الخريطة",g1C3:"مقياس الرسم",g1C3r:"كم تصغّر الخريطة",g1C4:"وردة الرياح",g1C4r:"تُظهر الاتجاهات"}};
+G1STR.he.g1BackUnits="חזרה ליחידות";G1STR.en.g1BackUnits="Back to units";G1STR.ru.g1BackUnits="К разделам";G1STR.ar.g1BackUnits="عودة إلى الوحدات";
+function g1t(k){var d=G1STR[state.settings.lang||"he"]||G1STR.he;var v=d[k];return v===undefined?(G1STR.en[k]||k):v}
+var G1SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+function g1Scene(revealed){
+  var items=[["🗺️","g1C1","g1C1r"],["📜","g1C2","g1C2r"],["📏","g1C3","g1C3r"],["🧭","g1C4","g1C4r"]];
+  return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
+    return '<div class="card" style="text-align:center;padding:18px 22px;min-width:120px">'+
+      '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(g1t(it[1]))+'</div>'+
+      (revealed?'<div style="margin-top:8px;font-weight:700;color:#0e9c8d;font-size:.95rem">'+esc(g1t(it[2]))+'</div>':'')+
+      '</div>';
+  }).join("")+'</div>';
+}
+function g1HearBtn(text){return '<button class="btn btn-g" data-a="g1hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(g1t("g1Hear"))+'</button>'}
+function geo1LessonView(){
+  var st=G1SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(g1t("g1Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(g1t("g1Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(g1t("g1Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("g1next",g1t("g1Start"),'background:#1d4ed8;color:#fff;font-weight:700')+g1HearBtn(g1t("g1Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g1t(st.revealed?"g1V2":"g1V1"))+'</p>';
+    h+=g1Scene(st.revealed);
+    if(!st.revealed){
+      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(g1t("g1V1b"))+'</p>';
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g1reveal",g1t("g1Reveal"),'background:#b45309;color:#fff;font-weight:700')+g1HearBtn(g1t("g1V1")+" "+g1t("g1V1b"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g1next",g1t("g1Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g1HearBtn(g1t("g1V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(g1t("g1Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g1t("g1Q"))+'</p>';
+    h+=g1Scene(true);
+    h+=lsOpts([g1t("g1A0"),g1t("g1A1"),g1t("g1A2")],st.picked,1,"g1pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":g1t({0:"g1Why0",2:"g1Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?g1t("g1Correct"):g1t("g1Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("g1next",g1t("g1Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(g1t("g1Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(g1t("g1RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("g1next",g1t("g1Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g1HearBtn(g1t("g1Rule")+" "+g1t("g1RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g1t("g1P1"))+'</p>';
+    h+=lsOpts([g1t("g1P1a0"),g1t("g1P1a1"),g1t("g1P1a2")],st.p1,1,"g1p1");
+    if(st.p1===1){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(g1t("g1P2"))+'</p>';
+      h+=lsOpts([g1t("g1P2a0"),g1t("g1P2a1"),g1t("g1P2a2")],st.p2,2,"g1p2");
+    }
+    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(g1t("g1Correct"))+'</p><div style="margin-top:10px">'+lsBtn("g1next",g1t("g1Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g1t("g1Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g1again",g1t("g1Again"),'background:#0e9c8d;color:#fff;font-weight:700')+g1HearBtn(g1t("g1Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-geography-elem" style="color:#1d4ed8;font-weight:600">'+esc(g1t("g1BackUnits"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function geo1LessonAction(a,el){
+  var st=G1SN;
+  if(a==="g1next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="g1reveal"){st.revealed=true;render();speak(g1t("g1V2"))}
+  else if(a==="g1pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="g1p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="g1p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="g1again"){G1SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="g1hear"){speak(el.getAttribute("data-say"))}
+}
+
+
 /* ================= boot ================= */
 applyModes();
 if(view==="practice")startRound(activeLevel());
@@ -4963,7 +5092,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g100-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g101-pwa1").catch(function(){});
   });
 }
 </script>
