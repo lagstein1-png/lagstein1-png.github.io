@@ -726,7 +726,14 @@ document.addEventListener("click",function(e){
     try{if(speaking||speechSynthesis.speaking||speechSynthesis.pending)return}catch(err){}
     var u=new SpeechSynthesisUtterance(label);
     u.lang=SAY_LANG[LG]||"he-IL";
-    if(LG==="he"&&heVoice){u.voice=heVoice;u.pitch=voicePitch(heVoice)}
+    /* קול לפי שפת התווית: נשי תחילה גם ב-ar/ru/en, לא ברירת המכשיר */
+    var _cv=heVoice;
+    if(LG!=="he"){
+      var _base=(SAY_LANG[LG]||"he-IL").split("-")[0].toLowerCase();
+      var _pool=(speechSynthesis.getVoices()||[]).filter(function(x){return String(x.lang||"").replace("_","-").toLowerCase().split("-")[0]===_base});
+      _cv=_pool.filter(function(x){return voiceGender(x)==="f"})[0]||_pool.filter(function(x){return voiceGender(x)===""})[0]||_pool[0]||null;
+    }
+    if(_cv){u.voice=_cv;u.pitch=voicePitch(_cv)}
     u.rate=P.rate;
     try{speechSynthesis.speak(u)}catch(err){}
   },500);
@@ -1021,7 +1028,7 @@ function pickVoice(){
    הקולות שהמערכות באמת מתקינות. מי שלא זוהה אינו מקבל תווית — עדיף
    בלי מאשר תווית שגויה. "google" הוא שם יצרן ולא מגדר. */
 var VOICE_F = /(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/
-var VOICE_M = /(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/
+var VOICE_M = /(google[^a-z]{0,15}(arabic|العربية)|אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/
 function voiceGender(v){
   var n = ((v.name || '') + ' ' + (v.lang || '')).toLowerCase();
   if (VOICE_F.test(n)) return 'f';
@@ -1709,7 +1716,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=106-pwa2").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=107-pwa2").catch(function(){});
   });
 }
 </script>
