@@ -411,7 +411,7 @@
     ru: /русский|russian/i
   };
   var FEMALE_VOICE = /(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|irina|milena|svetlana|\belena\b|katja|ekaterina|tatyana|hoda|salma|amina|\bhala\b|noura|laila|layla|fatima|zeina|maryam|asma|heera|raveena|neerja)/i;
-  var MALE_VOICE = /(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|liam|william|george|james|\bthomas\b|benjamin|dmitry|pavel|\byuri\b|maxim|nikolai|maged|tarik|hamed|shakir|\bomar\b|tarek|\bali\b|saleh|abdullah|yasser|hemant|madhur)/i;
+  var MALE_VOICE = /(google[^a-z]{0,15}(arabic|العربية)|אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|liam|william|george|james|\bthomas\b|benjamin|dmitry|pavel|\byuri\b|maxim|nikolai|maged|tarik|hamed|shakir|\bomar\b|tarek|\bali\b|saleh|abdullah|yasser|hemant|madhur)/i;
   var PREFER_FEMALE = true;
   /* נכבה ברגע שקול רשת נכשל, ואז הדירוג מעדיף מקומי לשארית הסשן. */
   var netVoiceOK = true;
