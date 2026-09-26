@@ -154,6 +154,8 @@ button{font:inherit;color:inherit}
   min-height:2.9rem;font-size:1rem}
 .btn:hover{border-color:var(--accent)}
 .btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.readBig{background:#0e9c8d;border-color:#0b7c71;color:#fff;font-weight:600;min-height:46px;padding:10px 20px;font-size:1.05rem}
+.btn.stopBig{background:#bf4426;border-color:#a03a20;color:#fff;font-weight:600;min-height:46px;padding:10px 20px;font-size:1.05rem}
 .btn.ghost{background:transparent;box-shadow:none}
 .btn[disabled]{opacity:.45;cursor:default}
 .btn.wide{width:100%}
@@ -826,7 +828,7 @@ T.he={
   qMean:"מה המשמעות?", qHear:"איזו מילה שמעתם?", qGap:"מה חסר במשפט?",
   qOrder:"סדרו את המשפט", qSay:"איך אומרים את זה באנגלית?", qRead:"לפי הקטע:",
   qUse:"איזה משפט מתאים למצב?",
-  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט", hearOpt:"השמיעו את האפשרות",
+  hear:"השמיעו", hearSlow:"לאט", stopB:"עצירה", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט", hearOpt:"השמיעו את האפשרות",
   check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", showAll:"הראו הכול",
   hintB:"רמז",
   hintMean:"חשבו באיזה מצב שומעים את המילה הזאת.",
@@ -896,7 +898,7 @@ T.ar={
   qMean:"ما المعنى؟", qHear:"أي كلمة سمعت؟", qGap:"ما الناقص في الجملة؟",
   qOrder:"رتّب الجملة", qSay:"كيف تقول ذلك بالإنجليزية؟", qRead:"حسب النص:",
   qUse:"أي جملة تناسب الموقف؟",
-  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع للكلمة", hearSent:"استمع للجملة", hearOpt:"استمع للخيار",
+  hear:"استمع", hearSlow:"ببطء", stopB:"إيقاف", hearWord:"استمع للكلمة", hearSent:"استمع للجملة", hearOpt:"استمع للخيار",
   check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", showAll:"أظهر الكل",
   hintB:"تلميح",
   hintMean:"فكّروا في أي موقف تُسمع هذه الكلمة.",
@@ -966,7 +968,7 @@ T.ru={
   qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?",
   qOrder:"Соберите предложение", qSay:"Как сказать это по-английски?", qRead:"По тексту:",
   qUse:"Какая фраза подходит к ситуации?",
-  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать слово", hearSent:"Послушать фразу", hearOpt:"Послушать вариант",
+  hear:"Послушать", hearSlow:"Медленно", stopB:"Стоп", hearWord:"Послушать слово", hearSent:"Послушать фразу", hearOpt:"Послушать вариант",
   check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", showAll:"Показать всё",
   hintB:"Подсказка",
   hintMean:"Подумайте, в какой ситуации звучит это слово.",
@@ -1036,7 +1038,7 @@ T.en={
   qMean:"What does it mean?", qHear:"Which word did you hear?", qGap:"What is missing?",
   qOrder:"Put the sentence in order", qSay:"How do you say this in English?", qRead:"According to the passage:",
   qUse:"Which sentence fits the situation?",
-  hear:"Play", hearSlow:"Slowly", hearWord:"Play the word", hearSent:"Play the sentence", hearOpt:"Play this option",
+  hear:"Play", hearSlow:"Slowly", stopB:"Stop", hearWord:"Play the word", hearSent:"Play the sentence", hearOpt:"Play this option",
   check:"Check", next:"Next", again:"Again", dunno:"I don't know", showAll:"Show all",
   hintB:"Hint",
   hintMean:"Think about when you would hear this word.",
@@ -1124,7 +1126,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n140 · 2026-09-26";
+var BUILD="n141 · 2026-09-26";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3911,8 +3913,10 @@ function screenPractice(){
   }
   else if(q.type==="hear"){
     h+='<div class="subject"><span class="word" style="letter-spacing:.35em">? ? ?</span>'+
-       '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
-       spkBtn(q.say,"en",false,t("hearWord"))+spkBtn(q.say,"en",true,t("hearSlow"))+"</span></div>";
+       '<span style="margin-inline-start:auto;display:flex;gap:.4rem;flex-wrap:wrap">'+
+       '<button class="btn readBig" data-a="say" data-say="'+esc(q.say)+'" data-lang="en">\u266b '+esc(t("hearWord"))+"</button>"+
+       '<button class="btn" data-a="say" data-say="'+esc(q.say)+'" data-lang="en" data-slow="1">'+esc(t("hearSlow"))+"</button>"+
+       '<button class="btn stopBig" data-a="stop">'+esc(t("stopB"))+"</button></span></div>";
     h+='<p class="qhint">'+esc(t("qHear"))+"</p>";
   }
   else if(q.type==="mean"){
@@ -3989,7 +3993,9 @@ function screenPractice(){
       h+='<div class="why">'+esc(q.opts[P.picked].why)+"</div>";
     h+="</div>";
     h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+
-       spkBtn(q.say,"en",false,t("hearSent"))+spkBtn(q.say,"en",true,t("hearSlow"))+
+       '<button class="btn readBig" data-a="say" data-say="'+esc(q.say)+'" data-lang="en">\u266b '+esc(t("hearSent"))+"</button>"+
+       '<button class="btn" data-a="say" data-say="'+esc(q.say)+'" data-lang="en" data-slow="1">'+esc(t("hearSlow"))+"</button>"+
+       '<button class="btn stopBig" data-a="stop">'+esc(t("stopB"))+"</button>"+
        '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
        esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
   } else if(q.type!=="order"){
@@ -5681,6 +5687,7 @@ document.addEventListener("click",function(e){
   if(a==="go"){view=(v==="exam"||v==="marks"||v==="sit")?v:"";if(!view)state.screen="home";stopSpeak();render();window.scrollTo(0,0);return}
   if(a==="marks"){view="marks";stopSpeak();render();window.scrollTo(0,0);return}
   if(a==="track"){state.track=el.getAttribute("data-t")||"";/* נושא שנבחר במסלול הקודם אינו מוצג עוד, ולכן גם אי אפשר לבטלו — הוא היה נשאר במבחן בלי שהמורה רואה אותו. */var trk=trackSel();EB.topics=EB.topics.filter(function(id){var tp=topicOf(id);return tp&&tp.trk===trk});if(!EB.topics.length)EB.topics=topicsForTrack(trk).slice(0,4).map(function(t){return t.id});/* משבצות השאלות נשמרות ב-EB.q, ובלי האיפוס הזה מבחן שנבנה אחרי החלפת מסלול היה נארז מהשאלות של המסלול הקודם — בדיוק כמו ב-extopic וב-exlvl. */EB.q=null;EB.built=null;render();return}
+  if(a==="stop"){stopSpeak();return}
   if(a==="say"||a==="sayline"){
     var txt=el.getAttribute("data-say")||"";
     var lg=el.getAttribute("data-lang")||"en";
@@ -5860,7 +5867,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n140-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n141-pwa1").catch(function(){});
   });
 }
 </script>
