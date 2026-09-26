@@ -5224,4 +5224,85 @@ if("serviceWorker" in navigator){
 if(window.TUTOR){
   /* הדיוקן נדלק כאן ולא בסקריפט הראשי: `josh-face.js` נטען אחריו,
      ובנקודה ההיא `JOSHFACE` עדיין לא קיים. נמדד — הקריאה נבלעה
-     בשקט והפנים נשארו מצוירות. אחרי ההדלקה מציירים 
+     בשקט והפנים נשארו מצוירות. אחרי ההדלקה מציירים מחדש. */
+  if(typeof JOSHFACE!=="undefined" && state.pet==="josh"){
+    jfPhoto();
+  }
+
+  TUTOR.mount({
+    app:"math-app",
+    lang:function(){return (state&&state.settings&&state.settings.lang)||"he"},
+    q:function(){
+      var x=P&&P.ses?P.ses[P.qi]:null;
+      return x?{expr:x.expr,ans:x.answer,level:"רמה "+activeLevel()+" מתוך 6"}:null;
+    },
+    stopHost:function(){try{stopSpeak()}catch(e){}}
+  });
+  /* ---- מנוע לימור — המתאם של האפליקציה (16.9.2026) ----
+     getScreenContext מחזיר מה שמוצג עכשיו; actions הן מה שלימור
+     רשאי לעשות כאן, וכל אחת מחזירה true רק כשבאמת קרה משהו.
+     math-app היא התבנית לשאר האפליקציות. */
+  if(window.BARAK)BARAK.register({
+    app:"math-app",
+    getScreenContext:function(){
+      var q=P&&P.ses?P.ses[P.qi]:null;
+      if(!q||view!=="practice"||P.phase==="done")return null;
+      var t=T(),kind={add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[q.kind]||q.kind;
+      return {id:"r"+P.qi+"-"+q.expr, type:P.phase==="ask"?"mcq":"reveal",
+        q:q.text+" ("+q.expr+")", options:q.options.map(String),
+        correct:String(q.answer), student:P.wrong.length?String(P.wrong[P.wrong.length-1]):null,
+        topic:kind, level:"רמה "+activeLevel()+" מתוך 6",
+        curriculum:"גאוגרפיה - אדם וסביבה ליסודי, כיתות ה׳–ו׳: "+kind};
+    },
+    actions:{
+      next_question:{desc:"עובר לשאלה הבאה; באמצע שאלה — מדלג עליה",
+        run:function(){
+          if(view!=="practice"||P.phase==="done")return false;
+          if(P.phase==="reveal"){advance();return true}
+          onAction("skip",null);return true;
+        }},
+      show_hint:{desc:"מציג את הרמז הבא לשאלה שעל המסך",
+        run:function(){
+          if(view!=="practice"||P.phase!=="ask"||P.hints>=3)return false;
+          var n=P.hints;onAction("hint",null);return P.hints>n;
+        }},
+      read_aloud:{desc:"מקריא את השאלה בקול",
+        run:function(){
+          if(view!=="practice"||!P.ses[P.qi]||P.phase==="done")return false;
+          onAction("listen",null);return true;
+        }},
+      highlight_option:{desc:"מדגיש במסך אחת מארבע האפשרויות, לפי מקומה (0 עד 3)",
+        params:{index:{type:"integer",min:0,max:3,required:true}},
+        run:function(a){
+          var q=P.ses[P.qi];if(!q||P.phase!=="ask")return false;
+          return BARAK.highlight(document.querySelector('[data-o="'+q.options[a.index]+'"]'));
+        }},
+      explain_again:{desc:"מציג ומקריא שוב את ההסבר, אחרי שהשאלה נענתה",
+        run:function(){
+          var q=P.ses[P.qi];if(!q||P.phase!=="reveal")return false;
+          setBubble(q.explain,"think");speak(q.explain);return true;
+        }},
+      go_screen:{desc:"עובר למסך אחר של האפליקציה",
+        params:{name:{type:"string",enum:["practice","progress","records","settings"],required:true}},
+        run:function(a){
+          if(!state.pet||P.brk)return false;
+          stopSpeak();view=a.name;
+          if(view!=="practice")startRound(activeLevel());
+          render();window.scrollTo(0,0);return view===a.name;
+        }},
+      slow_mode:{desc:"פותח את המצב האיטי: אותה שאלה צעד אחר צעד, עם עיגולים",
+        run:function(){
+          var q=P.ses[P.qi];if(!q||P.phase!=="ask"||!SlowMode.can(q))return false;
+          if(state.settings.soundFx)sfxHint();SlowMode.open(q);return true;
+        }}
+    }
+  });
+  try{render()}catch(e){}
+}
+</script>
+<!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
+     (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
+     נמדדת בנפרד. הוסר 10.9.2026 והוחזר 15.9.2026, שניהם בהחלטת הבעלים. -->
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
