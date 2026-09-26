@@ -8942,7 +8942,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t147-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t148-pwa1").catch(function(){});
   });
 }
 </script>
@@ -8965,12 +8965,13 @@ if(window.TUTOR){
   var plain=TUTOR.plain; /* חזקות נשמרות: <sup>2</sup> → ² (tutor.js, 17.9.2026) */
   TUTOR.mount({
     app:"math-teen",
-    lang:function(){return (typeof state!=="undefined"&&state.settings&&state.settings.lang)||"he"},
+    lang:function(){if(window.BAGRUT3&&BAGRUT3.lang)return BAGRUT3.lang();return (typeof state!=="undefined"&&state.settings&&state.settings.lang)||"he"},
     q:function(){
       /* מיפוי אחד לשתי המשפחות. השדות נמדדו בדפדפן, ולא הועתקו
          מ-buildQ של בונה המבחן — שם הם אחרים.
          משפחת המתמטיקה: ask / expr / options[].ok
          משפחת החידון:   prompt / subject / opts[].ok / answer */
+      if(window.BAGRUT3&&BAGRUT3.current){var c3=BAGRUT3.current();if(c3)return c3;}
       var x=(typeof P!=="undefined")?P.q:null; if(!x)return null;
       var o=x.opts||x.options||[], ok=x.answer!=null?plain(x.answer):null, i;
       if(!ok)for(i=0;i<o.length;i++)if(o[i].ok)ok=plain(o[i].t||o[i].h);
@@ -8991,8 +8992,11 @@ if(window.TUTOR){
               level:(typeof state!=="undefined"&&state.track)?("מסלול "+state.track):
                     (x.level!=null?("רמה "+x.level):null)};
     },
-    stopHost:function(){try{stopSpeak()}catch(e){}}
+    stopHost:function(){try{stopSpeak()}catch(e){}try{if(window.BAGRUT3&&BAGRUT3.stop)BAGRUT3.stop()}catch(e){}}
   });
+  /* ?bagrut3=1 מצייר את המסך לפני ש-tutor.js נטען, ואז כפתור המורה חסר
+     עד הפעולה הבאה. ציור מחדש אחרי ה-mount מחזיר אותו מיד. */
+  if(window.BAGRUT3){try{BAGRUT3.mount()}catch(e){}}
   /* ---- מנוע לימור — המתאם של האפליקציה (16.9.2026) ----
      כמו ב-math-app: getScreenContext מחזיר מה שמוצג עכשיו, ו-actions
      הן מה שלימור רשאי לעשות כאן; כל אחת מחזירה true רק כשבאמת קרה
