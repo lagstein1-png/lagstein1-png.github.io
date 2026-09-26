@@ -828,6 +828,7 @@ T.he={
   qMean:"מה המשמעות?", qHear:"איזו מילה שמעתם?", qGap:"מה חסר במשפט?",
   qOrder:"סדרו את המשפט", qSay:"איך אומרים את זה באנגלית?", qRead:"לפי הקטע:",
   qUse:"איזה משפט מתאים למצב?",
+  qFill:"הקלידו את המילה החסרה",qOpen:"תרגמו את המשפט לאנגלית",typeHere:"כותבים כאן…",showModel:"הראו תשובה לדוגמה",modelIs:"תשובה לדוגמה:",yourAns:"מה שכתבתם:",selfOk:"צדקתי",selfBad:"טעיתי",
   hear:"השמיעו", hearSlow:"לאט", stopB:"עצירה", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט", hearOpt:"השמיעו את האפשרות",
   check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", showAll:"הראו הכול",
   hintB:"רמז",
@@ -898,6 +899,7 @@ T.ar={
   qMean:"ما المعنى؟", qHear:"أي كلمة سمعت؟", qGap:"ما الناقص في الجملة؟",
   qOrder:"رتّب الجملة", qSay:"كيف تقول ذلك بالإنجليزية؟", qRead:"حسب النص:",
   qUse:"أي جملة تناسب الموقف؟",
+  qFill:"اكتبوا الكلمة الناقصة",qOpen:"ترجموا الجملة إلى الإنجليزية",typeHere:"اكتبوا هنا…",showModel:"أظهروا إجابة نموذجية",modelIs:"إجابة نموذجية:",yourAns:"ما كتبتموه:",selfOk:"أصبت",selfBad:"أخطأت",
   hear:"استمع", hearSlow:"ببطء", stopB:"إيقاف", hearWord:"استمع للكلمة", hearSent:"استمع للجملة", hearOpt:"استمع للخيار",
   check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", showAll:"أظهر الكل",
   hintB:"تلميح",
@@ -968,6 +970,7 @@ T.ru={
   qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?",
   qOrder:"Соберите предложение", qSay:"Как сказать это по-английски?", qRead:"По тексту:",
   qUse:"Какая фраза подходит к ситуации?",
+  qFill:"Впишите пропущенное слово",qOpen:"Переведите предложение на английский",typeHere:"Пишите здесь…",showModel:"Показать образец ответа",modelIs:"Образец ответа:",yourAns:"Ваш ответ:",selfOk:"Я ответил верно",selfBad:"Я ошибся",
   hear:"Послушать", hearSlow:"Медленно", stopB:"Стоп", hearWord:"Послушать слово", hearSent:"Послушать фразу", hearOpt:"Послушать вариант",
   check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", showAll:"Показать всё",
   hintB:"Подсказка",
@@ -1038,6 +1041,7 @@ T.en={
   qMean:"What does it mean?", qHear:"Which word did you hear?", qGap:"What is missing?",
   qOrder:"Put the sentence in order", qSay:"How do you say this in English?", qRead:"According to the passage:",
   qUse:"Which sentence fits the situation?",
+  qFill:"Type the missing word",qOpen:"Translate the sentence into English",typeHere:"Type here…",showModel:"Show model answer",modelIs:"Model answer:",yourAns:"Your answer:",selfOk:"I got it right",selfBad:"I got it wrong",
   hear:"Play", hearSlow:"Slowly", stopB:"Stop", hearWord:"Play the word", hearSent:"Play the sentence", hearOpt:"Play this option",
   check:"Check", next:"Next", again:"Again", dunno:"I don't know", showAll:"Show all",
   hintB:"Hint",
@@ -1126,7 +1130,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n142 · 2026-09-26";
+var BUILD="n143 · 2026-09-26";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3629,6 +3633,44 @@ function formGap(tp,lv,pool,idx){
   return {type:"gap",prompt:t("qGap"),gapHtml:'<span class="en-b" lang="en">'+esc(shown.join(" "))+"</span>",
     lead:gl(it.g),subject:null,opts:shuffle(opts),answer:gone,say:it.s,reveal:it};
 }
+/* --- צורה 7: השלמה בהקלדה ---
+   אותו חסר של formGap, אבל בלי ארבע אפשרויות: התלמיד מקליד את המילה.
+   בחירת המילה שנגרעת זהה בדיוק לבחירה של formGap (אותו מבחן כיתתי),
+   ולכן הלוגיקה משוכפלת כפי שהיא ולא מופשטת לפונקציה משותפת. */
+function formFill(tp,lv,pool,idx){
+  var it=pool[idx];
+  var parts=it.s.split(" ");
+  var leadTxt=String((it.g&&it.g.en)||"").toLowerCase();
+  var promptTxt=String((T.en&&T.en.qGap)||"").toLowerCase();
+  var leadW={},lw=(leadTxt+" "+promptTxt).match(/[a-z']+/g)||[];
+  lw.forEach(function(w){leadW[w]=1});
+  var cand=[],free=[];
+  for(var i=0;i<parts.length;i++){
+    var bare=parts[i].replace(/[^A-Za-z']/g,"");
+    if(bare.length>=3&&!STOP_GAP.test(bare)){
+      cand.push(i);
+      var bl=bare.toLowerCase();
+      if(!leadW[bl]&&(leadTxt+" "+promptTxt).indexOf(bl)<0)free.push(i);
+    }
+  }
+  if(free.length)cand=free;
+  var inner=cand.filter(function(i){return i>0});
+  if(inner.length)cand=inner;
+  if(!cand.length)return formUse(tp,lv,pool,idx);
+  var gi=pick(cand),gone=parts[gi].replace(/[^A-Za-z']/g,"");
+  var shown=parts.slice();
+  shown[gi]=parts[gi].replace(gone,"_____");
+  return {type:"fillin",prompt:t("qFill"),gapHtml:'<span class="en-b" lang="en">'+esc(shown.join(" "))+"</span>",
+    lead:gl(it.g),subject:null,opts:[],answer:gone,say:it.s,reveal:it};
+}
+/* --- צורה 8: תרגום חופשי ---
+   המשפט בשפת האם, התלמיד כותב אותו באנגלית ומשווה לתשובה לדוגמה.
+   אין ציון אוטומטי לטקסט חופשי — התלמיד מסמן בעצמו אם צדק. */
+function formOpen(tp,lv,pool,idx){
+  var it=pool[idx];
+  return {type:"open",prompt:t("qOpen"),lead:gl(it.g),subject:null,opts:[],
+    answer:it.s,say:it.s,reveal:it};
+}
 /* --- צורה 6: בניית משפט מאריחים --- */
 function formOrder(tp,lv,pool,idx){
   var it=pool[idx];
@@ -3683,6 +3725,8 @@ function hintFor(q){
     case "hear":  return t("hintHear");
     case "use":   return t("hintUse");
     case "gap":   return t("hintGap");
+    case "fillin":return t("hintGap");
+    case "open":  return t("hintUse");
     default:      return t("hintMean");
   }
 }
@@ -3704,9 +3748,9 @@ function buildQuestion(tid,lv,avoid,pure){
   var q;
   if(it.k==="p")q=formComp(tp,lv,pool,idx);
   else if(it.k==="s"){
-    var sForms=lv===1?["use","gap"]:lv===2?["use","gap","order"]:["gap","order","use"];
+    var sForms=lv===1?["use","gap","fillin"]:lv===2?["use","gap","order","fillin","open"]:["gap","order","use","fillin","open"];
     var f=pick(sForms);
-    q=f==="gap"?formGap(tp,lv,pool,idx):f==="order"?formOrder(tp,lv,pool,idx):formUse(tp,lv,pool,idx);
+    q=f==="gap"?formGap(tp,lv,pool,idx):f==="order"?formOrder(tp,lv,pool,idx):f==="fillin"?formFill(tp,lv,pool,idx):f==="open"?formOpen(tp,lv,pool,idx):formUse(tp,lv,pool,idx);
   } else {
     var wForms=lv===1?["mean","mean","hear"]:lv===2?["mean","back","hear"]:["back","hear","hear","mean"];
     var f2=pick(wForms);
@@ -3861,7 +3905,7 @@ function spkBtn(text,lang,slow,label){
 function sayAsk(q){
   if(!q)return {t:"",lg:"en"};
   if(q.type==="hear"||q.type==="mean")return {t:q.say,lg:"en"};
-  if(q.type==="gap")return {t:plainOf(q.gapHtml||"").replace(/_+/g," , "),lg:"en"};
+  if(q.type==="gap"||q.type==="fillin")return {t:plainOf(q.gapHtml||"").replace(/_+/g," , "),lg:"en"};
   if(q.type==="comp")return {t:q.qtext||"",lg:state.lang};
   /* back מציג את המשמעות באנגלית ברמה 3 ובשפת האם מתחתיה */
   return {t:q.lead||"",lg:(q.type==="back"&&state.level>=3)?"en":state.lang};
@@ -3946,11 +3990,43 @@ function screenPractice(){
        '<button class="btn pri" data-a="checkorder"'+(P.slot.length?"":" disabled")+'>'+
        ic("check",16)+" "+esc(t("check"))+"</button></div>"+hintBox(q);
   }
+  else if(q.type==="fillin"){
+    h+='<div class="subject"><span class="word" style="font-size:1.25rem">'+q.gapHtml+"</span>"+
+       '<span style="margin-inline-start:auto">'+spkBtn(P.done?q.say:sayAsk(q).t,"en",true,t("hearSlow"))+"</span></div>";
+    if(state.level<3&&q.lead)h+='<p class="qhint">'+esc(q.lead)+"</p>";
+    if(!P.done){
+      h+='<div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap">'+
+         '<input id="fillin" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" dir="ltr" '+
+         'placeholder="'+esc(t("typeHere"))+'" style="flex:1;min-width:12rem;font:inherit;padding:.6rem .8rem;border:2px solid var(--line);border-radius:12px">'+
+         '<button class="btn pri" data-a="checkfill">'+ic("check",16)+" "+esc(t("check"))+"</button>"+
+         hintBtn()+
+         '<button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button></div>"+hintBox(q);
+    }
+  }
+  else if(q.type==="open"){
+    h+='<p class="qtext">'+esc(q.lead||"")+"</p>";
+    if(!P.done&&!P.shown){
+      h+='<div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap">'+
+         '<input id="openans" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" dir="ltr" '+
+         'placeholder="'+esc(t("typeHere"))+'" style="flex:1;min-width:12rem;font:inherit;padding:.6rem .8rem;border:2px solid var(--line);border-radius:12px">'+
+         '<button class="btn pri" data-a="checkopen">'+esc(t("showModel"))+"</button>"+
+         hintBtn()+
+         '<button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button></div>"+hintBox(q);
+    } else if(!P.done&&P.shown){
+      h+='<p class="qhint">'+esc(t("yourAns"))+' <span class="en-b" lang="en">'+esc(P.typed||"")+"</span></p>";
+      h+='<div class="fb ok"><b>'+esc(t("modelIs"))+'</b>'+
+         '<div class="body"><span class="en-b" lang="en"><b>'+esc(q.answer)+"</b></span></div></div>";
+      h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+
+         '<button class="btn pri" data-a="selfok">'+esc(t("selfOk"))+"</button>"+
+         '<button class="btn ghost" data-a="selfbad">'+esc(t("selfBad"))+"</button>"+
+         spkBtn(q.say,"en",false,t("hearSent"))+"</div>";
+    }
+  }
   else { /* back · use */
     h+='<p class="qtext">'+esc(q.lead||"")+"</p>";
   }
 
-  if(q.type!=="order"){
+  if(q.type!=="order"&&q.type!=="fillin"&&q.type!=="open"){
     h+='<div class="opts'+(q.opts.length>3?"":" two")+'" id="opts">';
     /* רמקול לכל אפשרות. זו אפליקציה ללימוד אנגלית, וארבע המילים
        שבוחרים ביניהן היו אילמות — מי שאינו יודע לקרוא את המילה לא
@@ -3999,7 +4075,7 @@ function screenPractice(){
        '<button class="btn stopBig" data-a="stop">'+esc(t("stopB"))+"</button>"+
        '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
        esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
-  } else if(q.type!=="order"){
+  } else if(q.type!=="order"&&q.type!=="fillin"&&q.type!=="open"){
     h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+hintBtn()+
        '<button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button>"+
        (window.TUTOR&&TUTOR.on()?'<button class="btn ghost" data-a="tutor">'+esc(TUTOR.label())+"</button>":"")+
@@ -5594,7 +5670,7 @@ function newQuestion(){
   var prev=P.q?P.q.idx:undefined;
   P.q=buildQuestion(state.topic,state.level,prev);
   P.jsT0=Date.now();
-  P.picked=-1; P.done=false; P.ok=false; P.hint=false; P.slot=[]; P.used=[];
+  P.picked=-1; P.done=false; P.ok=false; P.hint=false; P.slot=[]; P.used=[]; P.shown=false; P.typed="";
   render();
   /* render מחליף את כל ה-DOM, וכפתור "הבא" שהיה ממוקד נמחק — הפוקוס
      נפל ל-body, וקורא מסך ומקלדת התחילו מראש הדף. הכרטיס של השאלה
@@ -5717,6 +5793,32 @@ document.addEventListener("click",function(e){
   }
   if(a==="lvl"){state.level=clamp(parseInt(v,10)||1,1,3);roundReset();save();newQuestion();return}
   if(a==="pick"){answer(parseInt(el.getAttribute("data-i"),10));return}
+  if(a==="checkfill"){
+    var q=P.q; if(!q||P.done)return;
+    var inp=document.getElementById("fillin");
+    var v=(inp?inp.value:"").trim();
+    var norm=function(x){return String(x).toLowerCase().replace(/[^a-z']/g,"")};
+    P.typed=v; P.done=true; P.picked=-1;
+    P.ok=norm(v)===norm(q.answer);
+    record(P.ok); render();
+    announce(P.ok?t("correct"):t("wrong")+". "+t("answerIs")+" "+q.answer);
+    setTimeout(function(){speak(q.say,"en")},P.ok?200:420);
+    return;
+  }
+  if(a==="checkopen"){
+    var q=P.q; if(!q||P.done||P.shown)return;
+    var inp=document.getElementById("openans");
+    P.typed=(inp?inp.value:"").trim(); P.shown=true; render();
+    return;
+  }
+  if(a==="selfok"||a==="selfbad"){
+    var q=P.q; if(!q||P.done)return;
+    P.done=true; P.picked=-1; P.ok=(a==="selfok");
+    record(P.ok); render();
+    announce(P.ok?t("correct"):t("wrong"));
+    setTimeout(function(){speak(q.say,"en")},P.ok?200:420);
+    return;
+  }
   if(a==="next"){
     /* עשר שאלות הן סבב. אחרי העשירית "הבא" מוביל לסיכום ולא לשאלה
        אחת־עשרה — בלי סיום אין מה לקחת מהתרגול ואין סיבה לחזור. */
@@ -5868,7 +5970,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n142-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n143-pwa1").catch(function(){});
   });
 }
 </script>
