@@ -2393,7 +2393,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="g102 · 2026-09-26";
+var BUILD="g103 · 2026-09-26";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -5057,7 +5057,7 @@ function geo1LessonAction(a,el){
 /* תוכן מקורי שנכתב לאתר לפי תכנית הלימודים בגאוגרפיה - אדם וסביבה כיתה ה׳
    (נושא 1: מפות - כלי להכרת העולם; סוגי מפות: גלובוס, מפה פיזית, מדינית, נושאית).
    ar/ru/en תרגום מכונה, מסומן באתר. */
-var GEO1_ON=/(^|[?&])lesson=geo1(&|$)/.test(location.search||"");
+var GEO2_ON=/(^|[?&])lesson=geo2(&|$)/.test(location.search||"");
 var G2STR={
 he:{g2Title:"שיעור: לכל שאלה — מפה אחרת",g2Goal:"המטרה: לגלות שיש סוגים שונים של מפות, ושבוחרים מפה לפי מה שרוצים לדעת.",g2Start:"מתחילים",g2Step:"שלב {0} מתוך 5",
     g2V1:"יוסי רוצה לדעת איפה יש הרים, דנה מחפשת את הגבול בין שתי מדינות, ואמא בודקת איפה ירד גשם. האם כולם צריכים את אותה מפה?",g2V1b:"לחצו על הכפתור וגלו ארבעה סוגים של מפות — ומה כל אחת מראה.",g2Reveal:"גלו את סוגי המפות",
@@ -5116,7 +5116,7 @@ function g2Scene(revealed){
   }).join("")+'</div>';
 }
 function g2HearBtn(text){return '<button class="btn btn-g" data-a="g2hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(g2t("g2Hear"))+'</button>'}
-function geo1LessonView(){
+function geo2LessonView(){
   var st=G2SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
   h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(g2t("g2Step"),Math.min(st.step+1,5)))+'</div>';
   h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(g2t("g2Title"))+'</h1>';
@@ -5161,7 +5161,7 @@ function geo1LessonView(){
   }
   return h+'</div>';
 }
-function geo1LessonAction(a,el){
+function geo2LessonAction(a,el){
   var st=G2SN;
   if(a==="g2next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
   else if(a==="g2reveal"){st.revealed=true;render();speak(g2t("g2V2"))}
@@ -5214,7 +5214,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g102-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g103-pwa1").catch(function(){});
   });
 }
 </script>
