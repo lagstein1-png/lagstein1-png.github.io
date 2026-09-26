@@ -796,6 +796,7 @@ T.he={
   app:"אולפן", tagline:"עברית מעשית לעולים חדשים",
   navHome:"מסלולים", navProg:"התקדמות", navSet:"הגדרות", navExam:"מבחן", back:"חזרה",
   heroT:"עברית שנשמעת לפני שהיא נקראת",
+  hebT:"ממשיכים לתרגול?",hebP:"באפליקציית העברית מחכה מסלול שלם לעולים — הבנת הנקרא, כתיבה ולשון, בהתאמה לשאלון 274.",hebB:"פתחו את אפליקציית העברית",
   heroP:"כל מילה, כל משפט וכל טופס — עם כפתור השמעה. אפשר להאט, לחזור, ולראות את המשמעות בשפה שלכם. אין טיימר ואין עונש על טעות.",
   start:"התחילו כאן", cont:"המשיכו מאיפה שהפסקתם",
   trkSound:"אות וצליל", trkSoundD:"אותיות שנראות דומה, וניקוד שמשנה מילה",
@@ -868,6 +869,7 @@ T.ar={
   app:"أولبان", tagline:"عبرية عملية للقادمين الجدد",
   navHome:"المسارات", navProg:"التقدّم", navSet:"الإعدادات", navExam:"امتحان", back:"رجوع",
   heroT:"عبرية تُسمَع قبل أن تُقرأ",
+  hebT:"تريدون مواصلة التدريب؟",hebP:"في تطبيق العبرية ينتظركم مسار كامل للوافدين الجدد — فهم المقروء والكتابة والقواعد، بما يناسب النموذج 274.",hebB:"افتحوا تطبيق العبرية",
   heroP:"كل كلمة وكل جملة وكل استمارة — مع زر استماع. يمكنك الإبطاء والإعادة ورؤية المعنى بلغتك. بلا مؤقّت وبلا عقاب على الخطأ.",
   start:"ابدأ من هنا", cont:"تابع من حيث توقفت",
   trkSound:"الحرف والصوت", trkSoundD:"حروف تتشابه في الشكل، وتشكيل يغيّر الكلمة",
@@ -935,6 +937,7 @@ T.ru={
   app:"Ульпан", tagline:"Практический иврит для новых репатриантов",
   navHome:"Направления", navProg:"Прогресс", navSet:"Настройки", navExam:"Экзамен", back:"Назад",
   heroT:"Иврит, который слышно раньше, чем читаешь",
+  hebT:"Хотите продолжить практику?",hebP:"В приложении иврита вас ждёт целый трек для новых репатриантов — понимание прочитанного, письмо и грамматика по экзамену 274.",hebB:"Открыть приложение иврита",
   heroP:"Каждое слово, каждая фраза и каждый бланк — с кнопкой прослушивания. Можно замедлить, повторить и увидеть значение на своём языке. Без таймера и без наказания за ошибку.",
   start:"Начать здесь", cont:"Продолжить с места остановки",
   trkSound:"Буква и звук", trkSoundD:"Похожие на вид буквы и огласовки, меняющие слово",
@@ -1002,6 +1005,7 @@ T.en={
   app:"Ulpan", tagline:"Practical Hebrew for new arrivals",
   navHome:"Tracks", navProg:"Progress", navSet:"Settings", navExam:"Exam", back:"Back",
   heroT:"Hebrew you hear before you read it",
+  hebT:"Want to keep practicing?",hebP:"The Hebrew app has a full track for new immigrants — reading comprehension, writing and grammar, matched to exam 274.",hebB:"Open the Hebrew app",
   heroP:"Every word, every sentence and every form comes with a play button. Slow it down, repeat it, and see the meaning in your own language. No timer, and no penalty for a wrong answer.",
   start:"Start here", cont:"Pick up where you left off",
   trkSound:"Letter and sound", trkSoundD:"Letters that look alike, and vowel points that change a word",
@@ -1115,7 +1119,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a106 · 2026-09-26";
+var BUILD="a107 · 2026-09-26";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -3589,6 +3593,10 @@ function screenHome(){
     });
     h+="</div>";
   });
+  h+='<div class="card" style="margin:1.4rem 0;background:#eef4ff;border-inline-start:5px solid #3b5bdb">'+
+     '<h2 style="font-size:1.1rem">'+esc(t("hebT"))+'</h2>'+
+     '<p style="color:var(--muted);margin:.4rem 0;font-size:.95rem">'+esc(t("hebP"))+'</p>'+
+     '<p style="margin:.3rem 0 0"><a class="btn pri" style="display:inline-block;text-decoration:none" href="/hebrew/?internal=shlav-internal-hebrew">'+esc(t("hebB"))+'</a></p></div>';
   return h+"</div>"+fbar();
 }
 
@@ -5589,7 +5597,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a106-pwa2").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a107-pwa2").catch(function(){});
   });
 }
 </script>
