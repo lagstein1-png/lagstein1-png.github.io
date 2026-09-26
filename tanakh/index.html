@@ -811,7 +811,7 @@ T.he={
   trk1261:"שאלון 1261 — בחינה חיצונית", trk1261D:"70% מהציון · המסלול הותיק",
   trk1262:"שאלון 1262 — בחינה חיצונית מקוצרת", trk1262D:"30% מהציון · המסלול הותיק",
   
-  lv1:"ידע", lv2:"הבנה", lv3:"ניתוח",
+  lv1:"ידע", lv2:"הבנה", lv3:"ניתוח", lvC:"אתגר", chMixed:"שאלות מכל הנושאים והרמות, בלי רמזים", chTimer:"טיימר לשאלה", chOff:"כבוי", chSec:"{0} שנ׳", chTimeUp:"הזמן נגמר — התשובה נספרת כטעות",
   lv1D:"מושג והגדרה — מה זה אומר", lv2D:"מקרה קונקרטי — איזה עיקרון פועל כאן", lv3D:"דילמה, איזון וטיעון נגדי",
   qPick:"בחרו את התשובה הנכונה",
   hear:"השמיעו", hearSlow:"לאט",stopB:"עצירה", hearWord:"השמיעו", hearSent:"השמיעו את הקטע", hearOpt:"השמיעו את האפשרות",
@@ -870,7 +870,7 @@ T.ar={
   trk1261:"امتحان 1261 — خارجي", trk1261D:"70% من العلامة · المسار القديم",
   trk1262:"امتحان 1262 — خارجي مقصّر", trk1262D:"30% من العلامة · المسار القديم",
   
-  lv1:"معرفة", lv2:"فهم", lv3:"تحليل",
+  lv1:"معرفة", lv2:"فهم", lv3:"تحليل", lvC:"تحدٍّ", chMixed:"أسئلة من كل المواضيع والمستويات، بلا تلميحات", chTimer:"مؤقت لكل سؤال", chOff:"مطفأ", chSec:"{0} ث", chTimeUp:"انتهى الوقت — تُحسب الإجابة خطأ",
   lv1D:"مفهوم وتعريف — ماذا يعني", lv2D:"حالة عينية — أيّ مبدأ يعمل هنا", lv3D:"معضلة وموازنة وحجّة مضادّة",
   qPick:"اختاروا الإجابة الصحيحة",
   hear:"استمع", hearSlow:"ببطء",stopB:"إيقاف", hearWord:"استمع", hearSent:"استمع للنص", hearOpt:"استمع للخيار",
@@ -929,7 +929,7 @@ T.ru={
   trk1261:"Экзамен 1261 — внешний", trk1261D:"70% оценки · старый трек",
   trk1262:"Экзамен 1262 — сокращенный внешний", trk1262D:"30% оценки · старый трек",
   
-  lv1:"Знание", lv2:"Понимание", lv3:"Анализ",
+  lv1:"Знание", lv2:"Понимание", lv3:"Анализ", lvC:"Вызов", chMixed:"вопросы из всех тем и уровней, без подсказок", chTimer:"таймер на вопрос", chOff:"выкл", chSec:"{0} сек", chTimeUp:"время вышло — ответ засчитан как ошибка",
   lv1D:"Понятие и определение — что это значит", lv2D:"Конкретный случай — какой принцип здесь работает", lv3D:"Дилемма, равновесие и контраргумент",
   qPick:"Выберите верный ответ",
   hear:"Послушать", hearSlow:"Медленно",stopB:"Стоп", hearWord:"Послушать", hearSent:"Послушать отрывок", hearOpt:"Послушать вариант",
@@ -988,7 +988,7 @@ T.en={
   trk1261:"Exam 1261 — external", trk1261D:"70% of the grade · old track",
   trk1262:"Exam 1262 — short external", trk1262D:"30% of the grade · old track",
   
-  lv1:"Knowledge", lv2:"Understanding", lv3:"Analysis",
+  lv1:"Knowledge", lv2:"Understanding", lv3:"Analysis", lvC:"Challenge", chMixed:"questions from all topics and levels, no hints", chTimer:"timer per question", chOff:"off", chSec:"{0}s", chTimeUp:"time is up - the answer counts as wrong",
   lv1D:"A concept and its definition — what it means", lv2D:"A concrete case — which principle is at work", lv3D:"A dilemma, a balance and a counter-argument",
   qPick:"Choose the correct answer",
   hear:"Play", hearSlow:"Slowly",stopB:"Stop", hearWord:"Play", hearSent:"Play the passage", hearOpt:"Play this option",
@@ -1072,7 +1072,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="bib2 · 2026-09-26";
+var BUILD="bib3 · 2026-09-26";
 var SKEY="ezrach-state-v1";
 var GKEY_STORE="ezrach-gkey";
 
@@ -1080,6 +1080,7 @@ function blankState(){
   return {
     lang:null,            /* נקבע לפי שפת הדפדפן בהפעלה הראשונה */
     screen:"home", topic:null, level:1,
+    challenge:false, chSecs:0,
     voiceMode:"device",   /* "device" | "gem" */
     gemVoice:"Kore",
     devVoice:{},          /* קוד שפה → voiceURI שנבחר ידנית */
@@ -2213,6 +2214,7 @@ function viewFormulas(){
 /* ============================================================
    9. מסכים
    ============================================================ */
+var CH_GATE=/[?&]internal=/.test(location.search||"");
 var P={q:null,picked:-1,done:false,slot:[],used:[],ok:false,hint:false};
 
 function hdr(){
@@ -2284,11 +2286,23 @@ function levelBar(tp){
   var h='<div class="lvls">',i;
   for(i=1;i<=3;i++){
     var m=mastery(tp.id,i);
-    h+='<button class="lvl'+(state.level===i?" on":"")+'" data-a="lvl" data-v="'+i+'">'+
+    h+='<button class="lvl'+(state.level===i&&!state.challenge?" on":"")+'" data-a="lvl" data-v="'+i+'">'+
       esc(t("lv"+i))+' <span class="bar '+barCls(m)+'" style="width:2.6rem;flex:none">'+
       '<i style="width:'+Math.round(m*100)+'%"></i></span></button>';
   }
-  return h+"</div>";
+  if(CH_GATE){
+    h+='<button class="lvl'+(state.challenge?" on":"")+'" data-a="chal"'+(state.challenge?' style="background:#6d28d9;color:#fff;border-color:#6d28d9;font-weight:700"':"")+'>'+esc(t("lvC"))+'</button>';
+  }
+  h+="</div>";
+  if(CH_GATE&&state.challenge){
+    h+='<div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.4rem 0">'+
+       '<span style="font-size:.88rem;color:var(--muted)">'+esc(t("chMixed"))+'</span>'+
+       '<span style="font-size:.88rem;color:var(--muted)">· '+esc(t("chTimer"))+':</span>'+
+       [0,30,60].map(function(s){
+         return '<button class="lvl'+(state.chSecs===s?" on":"")+'" data-a="chsec" data-v="'+s+'" style="min-height:46px">'+(s===0?esc(t("chOff")):esc(t("chSec").replace("{0}",s)))+'</button>';
+       }).join("")+'</div>';
+  }
+  return h;
 }
 
 function spkBtn(text,lang,slow,label){
@@ -2367,6 +2381,7 @@ function screenPractice(){
     var it=q.reveal;
     h+='<div class="fb '+(P.ok?"ok":"bad")+'"><b>'+(P.ok?esc(t("correct")):esc(t("wrong")))+"</b>";
     if(!P.ok){h+='<div class="body">'+esc(t("answerIs"))+" <b>"+esc(q.answer)+"</b></div>";
+      if(P.timeUp)h+='<div class="body" style="color:#b45309;font-weight:700">'+esc(t("chTimeUp"))+'</div>';
       var wp=P.picked>=0&&q.opts[P.picked]?q.opts[P.picked].why:"";
       if(wp)h+='<div class="why"><b>'+esc(t("whyNot"))+":</b> "+esc(wp)+"</div>";}
     /* ההסבר נפתח גם כשצדקו. תשובה נכונה שנוחשה נראית בדיוק כמו
@@ -2378,8 +2393,9 @@ function screenPractice(){
        '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
        esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
   } else {
-    h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+
-       (P.hint?"":'<button class="btn ghost" data-a="hint">'+esc(t("hintB"))+"</button>")+
+    h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap;align-items:center">'+
+       (state.challenge&&state.chSecs>0?'<span id="chtimer" style="font-weight:800;color:#b45309;min-width:2.6rem;font-size:1.1rem">'+state.chSecs+'</span>':"")+
+       (P.hint||state.challenge?"":'<button class="btn ghost" data-a="hint">'+esc(t("hintB"))+"</button>")+
        '<button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button></div>";
     if(P.hint&&q.hint)h+='<div class="qhint" style="margin-top:.6rem">'+esc(q.hint)+"</div>";
   }
@@ -4020,9 +4036,32 @@ function viewBadExam(msg){
    ============================================================ */
 function newQuestion(){
   var prev=P.q?P.q.idx:undefined;
-  P.q=buildQuestion(state.topic,state.level,prev);
-  P.picked=-1; P.done=false; P.ok=false; P.hint=false;
+  if(state.challenge){
+    /* אתגר: שאלה מנושא ורמה אקראיים, בלי רמז. ההקראה נשארת. */
+    var tp=pick(TOPICS),lv=1+Math.floor(Math.random()*3);
+    P.q=buildQuestion(tp.id,lv,prev);
+  }else{
+    P.q=buildQuestion(state.topic,state.level,prev);
+  }
+  P.picked=-1; P.done=false; P.ok=false; P.hint=false; P.timeUp=false;
   render();
+  chArm();
+}
+function chArm(){
+  if(window.__chT){clearInterval(window.__chT);window.__chT=null}
+  if(!state.challenge||!state.chSecs)return;
+  var left=state.chSecs;
+  window.__chT=setInterval(function(){
+    if(P.done||!state.challenge){clearInterval(window.__chT);window.__chT=null;return}
+    left--;
+    var el=document.getElementById("chtimer");
+    if(el)el.textContent=left;
+    if(left<=0){
+      clearInterval(window.__chT);window.__chT=null;
+      if(!P.done&&P.q){P.timeUp=true;P.done=true;P.ok=false;P.picked=-1;record(false);render();
+        setTimeout(function(){speak(saySpell(P.q.say),state.lang)},260)}
+    }
+  },1000);
 }
 /* רישום תשובה אחת: סטטיסטיקה, חזרה מרווחת ובנק הטעויות.
    נקרא גם מהתרגול וגם מהגשת המבחן המדומה, ולכן הוא מקבל את
@@ -4162,7 +4201,9 @@ document.addEventListener("click",function(e){
     state.topic=el.getAttribute("data-t"); state.screen="prac";
     save(); newQuestion(); window.scrollTo(0,0); return;
   }
-  if(a==="lvl"){state.level=clamp(parseInt(v,10)||1,1,3);save();newQuestion();return}
+  if(a==="lvl"){state.level=clamp(parseInt(v,10)||1,1,3);state.challenge=false;save();newQuestion();return}
+  if(a==="chal"){state.challenge=!state.challenge;save();newQuestion();return}
+  if(a==="chsec"){state.chSecs=parseInt(v,10)||0;save();newQuestion();return}
   if(a==="pick"){answer(parseInt(el.getAttribute("data-i"),10));return}
   if(a==="next"){newQuestion();return}
   if(a==="hint"){
@@ -4407,7 +4448,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=bib2-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=bib3-pwa1").catch(function(){});
   });
 }
 </script>
