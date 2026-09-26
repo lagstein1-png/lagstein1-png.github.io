@@ -2393,7 +2393,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="g101 · 2026-09-26";
+var BUILD="g102 · 2026-09-26";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4454,6 +4454,7 @@ function render(){ try{lgChrome()}catch(e){}
     html=header()+'<main id="main" tabindex="-1">';
     if(view==="units")html+=unitsView();
     else if(view==="lesson"&&GEO1_ON)html+=geo1LessonView();
+    else if(view==="lesson"&&GEO2_ON)html+=geo2LessonView();
     else if(view==="practice")html+=practice();
     else if(view==="progress")html+=progressView();
     else if(view==="records")html+=recordsView();
@@ -4621,6 +4622,7 @@ function onAction(a,el){
   var t=T();
   if(examAction(a,el))return;
   if(/^g1/.test(a)&&GEO1_ON){geo1LessonAction(a,el);return}
+  if(/^g2/.test(a)&&GEO2_ON){geo2LessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -4981,7 +4983,7 @@ ar:{g1Title:"درس: كيف نقرأ الخريطة؟",g1Goal:"الهدف: أن 
     g1Sum:"انتهيتم! اليوم تعلمنا: الخريطة هي رسم لمكان من الأعلى، وأربعة أجزاء تساعدنا على قراءتها - العنوان، مفتاح الخريطة، مقياس الرسم ووردة الرياح.",
     g1Again:"من البداية",g1Next:"التالي",g1Hear:"استمعوا",g1Correct:"صحيح!",g1Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",g1Check:"فحص الفهم",
     g1C1:"العنوان",g1C1r:"يخبر عن موضوع الخريطة",g1C2:"مفتاح الخريطة",g1C2r:"يشرح رموز الخريطة",g1C3:"مقياس الرسم",g1C3r:"كم تصغّر الخريطة",g1C4:"وردة الرياح",g1C4r:"تُظهر الاتجاهات"}};
-G1STR.he.g1BackUnits="חזרה ליחידות";G1STR.en.g1BackUnits="Back to units";G1STR.ru.g1BackUnits="К разделам";G1STR.ar.g1BackUnits="عودة إلى الوحدات";
+G1STR.he.g1NextLesson="לשיעור הבא";G1STR.en.g1NextLesson="Next lesson";G1STR.ru.g1NextLesson="Следующий урок";G1STR.ar.g1NextLesson="الدرس التالي";
 function g1t(k){var d=G1STR[state.settings.lang||"he"]||G1STR.he;var v=d[k];return v===undefined?(G1STR.en[k]||k):v}
 var G1SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function g1Scene(revealed){
@@ -5035,7 +5037,7 @@ function geo1LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g1t("g1Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g1again",g1t("g1Again"),'background:#0e9c8d;color:#fff;font-weight:700')+g1HearBtn(g1t("g1Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-geography-elem" style="color:#1d4ed8;font-weight:600">'+esc(g1t("g1BackUnits"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-geography-elem&lesson=geo2" style="color:#1d4ed8;font-weight:600">'+esc(g1t("g1NextLesson"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5048,6 +5050,126 @@ function geo1LessonAction(a,el){
   else if(a==="g1p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
   else if(a==="g1again"){G1SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
   else if(a==="g1hear"){speak(el.getAttribute("data-say"))}
+}
+
+
+/* ================= שיעור גאוגרפיה 2: סוגי מפות (כיתה ה׳, יחידה uMaps) ================= */
+/* תוכן מקורי שנכתב לאתר לפי תכנית הלימודים בגאוגרפיה - אדם וסביבה כיתה ה׳
+   (נושא 1: מפות - כלי להכרת העולם; סוגי מפות: גלובוס, מפה פיזית, מדינית, נושאית).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var GEO1_ON=/(^|[?&])lesson=geo1(&|$)/.test(location.search||"");
+var G2STR={
+he:{g2Title:"שיעור: לכל שאלה — מפה אחרת",g2Goal:"המטרה: לגלות שיש סוגים שונים של מפות, ושבוחרים מפה לפי מה שרוצים לדעת.",g2Start:"מתחילים",g2Step:"שלב {0} מתוך 5",
+    g2V1:"יוסי רוצה לדעת איפה יש הרים, דנה מחפשת את הגבול בין שתי מדינות, ואמא בודקת איפה ירד גשם. האם כולם צריכים את אותה מפה?",g2V1b:"לחצו על הכפתור וגלו ארבעה סוגים של מפות — ומה כל אחת מראה.",g2Reveal:"גלו את סוגי המפות",
+    g2V2:"אלה ארבעה סוגים שונים. לכל שאלה מתאימה מפה אחרת. אז באיזו מפה דנה תמצא את הגבול בין המדינות?",
+    g2Q:"דנה רוצה לראות איפה עובר הגבול בין ישראל לירדן. איזו מפה תעזור לה?",g2A0:"מפה פיזית",g2A1:"מפה מדינית",g2A2:"גלובוס",
+    g2Why0:"מפה פיזית מראה צורות נוף כמו הרים ונהרות, לא גבולות בין מדינות.",g2Why2:"הגלובוס מראה את כדור הארץ כולו, בלי פירוט של גבולות קטנים.",
+    g2Rule:"הכלל: קודם שואלים מה רוצים לדעת, ואז בוחרים מפה — פיזית לצורות נוף, מדינית למדינות וגבולות, נושאית לנושא אחד מסוים, וגלובוס כשרוצים לראות את כדור הארץ כולו.",g2RuleEx:"אין מפה אחת שטובה לכל דבר — כל מפה בוחרת מה להראות.",
+    g2P1:"מה מראה מפה פיזית?",g2P1a0:"גבולות בין מדינות",g2P1a1:"צורות נוף כמו הרים, ימים ונהרות",g2P1a2:"מסלולי אוטובוסים",
+    g2P2:"בחדשות מראים מפה שצובעת כל אזור לפי כמות הגשם שירדה בו. איזה סוג מפה זו?",g2P2a0:"מפה מדינית",g2P2a1:"גלובוס",g2P2a2:"מפה נושאית",
+    g2Sum:"סיימתם! היום למדנו: יש סוגים שונים של מפות — פיזית, מדינית, נושאית וגלובוס — ובוחרים מפה לפי מה שרוצים לדעת.",
+    g2Again:"מההתחלה",g2Next:"הבא",g2Hear:"השמיעו",g2Correct:"נכון!",g2Wrong:"עוד לא. אפשר לנסות שוב.",g2Check:"בדיקת הבנה",
+    g2C1:"גלובוס",g2C1r:"דגם עגול של כדור הארץ",g2C2:"מפה פיזית",g2C2r:"מראה צורות נוף",g2C3:"מפה מדינית",g2C3r:"מראה מדינות וגבולות",g2C4:"מפה נושאית",g2C4r:"מראה נושא אחד"},
+en:{g2Title:"Lesson: a different map for every question",g2Goal:"The goal: discover that there are different types of maps, and that we choose a map according to what we want to know.",g2Start:"Start",g2Step:"Step {0} of 5",
+    g2V1:"Yossi wants to know where there are mountains, Dana is looking for the border between two countries, and Mom checks where it rained. Do they all need the same map?",g2V1b:"Press the button to reveal four types of maps - and what each one shows.",g2Reveal:"Reveal the map types",
+    g2V2:"These are four different types. A different map fits each question. So in which map will Dana find the border between the countries?",
+    g2Q:"Dana wants to see where the border between Israel and Jordan runs. Which map will help her?",g2A0:"A physical map",g2A1:"A political map",g2A2:"A globe",
+    g2Why0:"A physical map shows landforms like mountains and rivers, not borders between countries.",g2Why2:"A globe shows the whole Earth, without details of small borders.",
+    g2Rule:"The rule: first ask what you want to know, then choose a map - physical for landforms, political for countries and borders, thematic for one special topic, and a globe when you want to see the whole Earth.",g2RuleEx:"No single map is good for everything - every map chooses what to show.",
+    g2P1:"What does a physical map show?",g2P1a0:"Borders between countries",g2P1a1:"Landforms like mountains, seas and rivers",g2P1a2:"Bus routes",
+    g2P2:"The news shows a map coloring each area by how much rain fell there. What type of map is it?",g2P2a0:"A political map",g2P2a1:"A globe",g2P2a2:"A thematic map",
+    g2Sum:"Done! Today we learned: there are different types of maps - physical, political, thematic and globes - and we choose a map according to what we want to know.",
+    g2Again:"From the start",g2Next:"Next",g2Hear:"Listen",g2Correct:"Correct!",g2Wrong:"Not yet. You can try again.",g2Check:"Understanding check",
+    g2C1:"Globe",g2C1r:"A round model of the Earth",g2C2:"Physical map",g2C2r:"Shows landforms",g2C3:"Political map",g2C3r:"Shows countries and borders",g2C4:"Thematic map",g2C4r:"Shows one topic"},
+ru:{g2Title:"Урок: для каждого вопроса - своя карта",g2Goal:"Цель: узнать, что бывают разные типы карт, и что карту выбирают по тому, что хотим узнать.",g2Start:"Начинаем",g2Step:"Шаг {0} из 5",
+    g2V1:"Йоси хочет знать, где есть горы, Дана ищет границу между двумя странами, а мама проверяет, где шёл дождь. Нужна ли им всем одна и та же карта?",g2V1b:"Нажмите кнопку и узнайте четыре типа карт - и что показывает каждая.",g2Reveal:"Узнать типы карт",
+    g2V2:"Это четыре разных типа. Для каждого вопроса подходит своя карта. Так на какой карте Дана найдёт границу между странами?",
+    g2Q:"Дана хочет увидеть, где проходит граница между Израилем и Иорданией. Какая карта ей поможет?",g2A0:"Физическая карта",g2A1:"Политическая карта",g2A2:"Глобус",
+    g2Why0:"Физическая карта показывает формы рельефа, как горы и реки, а не границы стран.",g2Why2:"Глобус показывает всю Землю, без деталей маленьких границ.",
+    g2Rule:"Правило: сначала спрашиваем, что хотим узнать, а потом выбираем карту - физическую для форм рельефа, политическую для стран и границ, тематическую для одной особой темы, и глобус, когда хотим увидеть всю Землю.",g2RuleEx:"Нет одной карты, которая хороша для всего - каждая карта выбирает, что показать.",
+    g2P1:"Что показывает физическая карта?",g2P1a0:"Границы между странами",g2P1a1:"Формы рельефа, как горы, моря и реки",g2P1a2:"Автобусные маршруты",
+    g2P2:"В новостях показывают карту, раскрашивающую каждый район по количеству выпавшего дождя. Какой это тип карты?",g2P2a0:"Политическая карта",g2P2a1:"Глобус",g2P2a2:"Тематическая карта",
+    g2Sum:"Готово! Сегодня мы узнали: есть разные типы карт - физические, политические, тематические и глобусы - и карту выбирают по тому, что хотим узнать.",
+    g2Again:"Сначала",g2Next:"Дальше",g2Hear:"Слушать",g2Correct:"Верно!",g2Wrong:"Пока нет. Можно ещё раз.",g2Check:"Проверка понимания",
+    g2C1:"Глобус",g2C1r:"Круглая модель Земли",g2C2:"Физическая карта",g2C2r:"Показывает формы рельефа",g2C3:"Политическая карта",g2C3r:"Показывает страны и границы",g2C4:"Тематическая карта",g2C4r:"Показывает одну тему"},
+ar:{g2Title:"درس: لكل سؤال - خريطة مختلفة",g2Goal:"الهدف: أن نكتشف أن هناك أنواعًا مختلفة من الخرائط، وأننا نختار الخريطة حسب ما نريد معرفته.",g2Start:"نبدأ",g2Step:"الخطوة {0} من 5",
+    g2V1:"يوسي يريد أن يعرف أين توجد جبال، ودانا تبحث عن الحدود بين دولتين، وأمها تتحقق أين هطل المطر. هل يحتاجون جميعًا إلى الخريطة نفسها؟",g2V1b:"اضغطوا على الزر واكتشفوا أربعة أنواع من الخرائط - وماذا تُظهر كل واحدة.",g2Reveal:"اكتشفوا أنواع الخرائط",
+    g2V2:"هذه أربعة أنواع مختلفة. لكل سؤال تناسب خريطة مختلفة. إذن في أي خريطة ستجد دانا الحدود بين الدولتين؟",
+    g2Q:"تريد دانا أن ترى أين يمر الحد بين إسرائيل والأردن. أي خريطة ستساعدها؟",g2A0:"خريطة طبيعية",g2A1:"خريطة سياسية",g2A2:"كرة أرضية",
+    g2Why0:"الخريطة الطبيعية تُظهر أشكال التضاريس مثل الجبال والأنهار، لا الحدود بين الدول.",g2Why2:"الكرة الأرضية تُظهر الأرض كلها، دون تفاصيل الحدود الصغيرة.",
+    g2Rule:"القاعدة: أولًا نسأل ماذا نريد أن نعرف، ثم نختار خريطة - طبيعية لأشكال التضاريس، سياسية للدول والحدود، موضوعية لموضوع واحد معين، وكرة أرضية عندما نريد رؤية الأرض كلها.",g2RuleEx:"لا توجد خريطة واحدة جيدة لكل شيء - كل خريطة تختار ماذا تُظهر.",
+    g2P1:"ماذا تُظهر الخريطة الطبيعية؟",g2P1a0:"الحدود بين الدول",g2P1a1:"أشكال التضاريس مثل الجبال والبحار والأنهار",g2P1a2:"مسارات الحافلات",
+    g2P2:"في الأخبار يعرضون خريطة تلوّن كل منطقة حسب كمية المطر التي هطلت فيها. أي نوع من الخرائط هي؟",g2P2a0:"خريطة سياسية",g2P2a1:"كرة أرضية",g2P2a2:"خريطة موضوعية",
+    g2Sum:"انتهيتم! اليوم تعلمنا: هناك أنواع مختلفة من الخرائط - طبيعية، سياسية، موضوعية وكرة أرضية - ونختار الخريطة حسب ما نريد معرفته.",
+    g2Again:"من البداية",g2Next:"التالي",g2Hear:"استمعوا",g2Correct:"صحيح!",g2Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",g2Check:"فحص الفهم",
+    g2C1:"كرة أرضية",g2C1r:"نموذج دائري للأرض",g2C2:"خريطة طبيعية",g2C2r:"تُظهر أشكال التضاريس",g2C3:"خريطة سياسية",g2C3r:"تُظهر الدول والحدود",g2C4:"خريطة موضوعية",g2C4r:"تُظهر موضوعًا واحدًا"}};
+G2STR.he.g2BackUnits="חזרה ליחידות";G2STR.en.g2BackUnits="Back to units";G2STR.ru.g2BackUnits="К разделам";G2STR.ar.g2BackUnits="عودة إلى الوحدات";
+function g2t(k){var d=G2STR[state.settings.lang||"he"]||G2STR.he;var v=d[k];return v===undefined?(G2STR.en[k]||k):v}
+var G2SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+function g2Scene(revealed){
+  var items=[["🌍","g2C1","g2C1r"],["🏔️","g2C2","g2C2r"],["🗺️","g2C3","g2C3r"],["🌧️","g2C4","g2C4r"]];
+  return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
+    return '<div class="card" style="text-align:center;padding:18px 22px;min-width:120px">'+
+      '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(g2t(it[1]))+'</div>'+
+      (revealed?'<div style="margin-top:8px;font-weight:700;color:#0e9c8d;font-size:.95rem">'+esc(g2t(it[2]))+'</div>':'')+
+      '</div>';
+  }).join("")+'</div>';
+}
+function g2HearBtn(text){return '<button class="btn btn-g" data-a="g2hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(g2t("g2Hear"))+'</button>'}
+function geo1LessonView(){
+  var st=G2SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(g2t("g2Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(g2t("g2Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(g2t("g2Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("g2next",g2t("g2Start"),'background:#1d4ed8;color:#fff;font-weight:700')+g2HearBtn(g2t("g2Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g2t(st.revealed?"g2V2":"g2V1"))+'</p>';
+    h+=g2Scene(st.revealed);
+    if(!st.revealed){
+      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(g2t("g2V1b"))+'</p>';
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g2reveal",g2t("g2Reveal"),'background:#b45309;color:#fff;font-weight:700')+g2HearBtn(g2t("g2V1")+" "+g2t("g2V1b"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g2next",g2t("g2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g2HearBtn(g2t("g2V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(g2t("g2Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g2t("g2Q"))+'</p>';
+    h+=g2Scene(true);
+    h+=lsOpts([g2t("g2A0"),g2t("g2A1"),g2t("g2A2")],st.picked,1,"g2pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":g2t({0:"g2Why0",2:"g2Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?g2t("g2Correct"):g2t("g2Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("g2next",g2t("g2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(g2t("g2Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(g2t("g2RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("g2next",g2t("g2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g2HearBtn(g2t("g2Rule")+" "+g2t("g2RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g2t("g2P1"))+'</p>';
+    h+=lsOpts([g2t("g2P1a0"),g2t("g2P1a1"),g2t("g2P1a2")],st.p1,1,"g2p1");
+    if(st.p1===1){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(g2t("g2P2"))+'</p>';
+      h+=lsOpts([g2t("g2P2a0"),g2t("g2P2a1"),g2t("g2P2a2")],st.p2,2,"g2p2");
+    }
+    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(g2t("g2Correct"))+'</p><div style="margin-top:10px">'+lsBtn("g2next",g2t("g2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g2t("g2Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g2again",g2t("g2Again"),'background:#0e9c8d;color:#fff;font-weight:700')+g2HearBtn(g2t("g2Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-geography-elem" style="color:#1d4ed8;font-weight:600">'+esc(g2t("g2BackUnits"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function geo1LessonAction(a,el){
+  var st=G2SN;
+  if(a==="g2next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="g2reveal"){st.revealed=true;render();speak(g2t("g2V2"))}
+  else if(a==="g2pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="g2p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="g2p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="g2again"){G2SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="g2hear"){speak(el.getAttribute("data-say"))}
 }
 
 
@@ -5092,7 +5214,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g101-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g102-pwa1").catch(function(){});
   });
 }
 </script>
@@ -5102,85 +5224,4 @@ if("serviceWorker" in navigator){
 if(window.TUTOR){
   /* הדיוקן נדלק כאן ולא בסקריפט הראשי: `josh-face.js` נטען אחריו,
      ובנקודה ההיא `JOSHFACE` עדיין לא קיים. נמדד — הקריאה נבלעה
-     בשקט והפנים נשארו מצוירות. אחרי ההדלקה מציירים מחדש. */
-  if(typeof JOSHFACE!=="undefined" && state.pet==="josh"){
-    jfPhoto();
-  }
-
-  TUTOR.mount({
-    app:"math-app",
-    lang:function(){return (state&&state.settings&&state.settings.lang)||"he"},
-    q:function(){
-      var x=P&&P.ses?P.ses[P.qi]:null;
-      return x?{expr:x.expr,ans:x.answer,level:"רמה "+activeLevel()+" מתוך 6"}:null;
-    },
-    stopHost:function(){try{stopSpeak()}catch(e){}}
-  });
-  /* ---- מנוע לימור — המתאם של האפליקציה (16.9.2026) ----
-     getScreenContext מחזיר מה שמוצג עכשיו; actions הן מה שלימור
-     רשאי לעשות כאן, וכל אחת מחזירה true רק כשבאמת קרה משהו.
-     math-app היא התבנית לשאר האפליקציות. */
-  if(window.BARAK)BARAK.register({
-    app:"math-app",
-    getScreenContext:function(){
-      var q=P&&P.ses?P.ses[P.qi]:null;
-      if(!q||view!=="practice"||P.phase==="done")return null;
-      var t=T(),kind={add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[q.kind]||q.kind;
-      return {id:"r"+P.qi+"-"+q.expr, type:P.phase==="ask"?"mcq":"reveal",
-        q:q.text+" ("+q.expr+")", options:q.options.map(String),
-        correct:String(q.answer), student:P.wrong.length?String(P.wrong[P.wrong.length-1]):null,
-        topic:kind, level:"רמה "+activeLevel()+" מתוך 6",
-        curriculum:"גאוגרפיה - אדם וסביבה ליסודי, כיתות ה׳–ו׳: "+kind};
-    },
-    actions:{
-      next_question:{desc:"עובר לשאלה הבאה; באמצע שאלה — מדלג עליה",
-        run:function(){
-          if(view!=="practice"||P.phase==="done")return false;
-          if(P.phase==="reveal"){advance();return true}
-          onAction("skip",null);return true;
-        }},
-      show_hint:{desc:"מציג את הרמז הבא לשאלה שעל המסך",
-        run:function(){
-          if(view!=="practice"||P.phase!=="ask"||P.hints>=3)return false;
-          var n=P.hints;onAction("hint",null);return P.hints>n;
-        }},
-      read_aloud:{desc:"מקריא את השאלה בקול",
-        run:function(){
-          if(view!=="practice"||!P.ses[P.qi]||P.phase==="done")return false;
-          onAction("listen",null);return true;
-        }},
-      highlight_option:{desc:"מדגיש במסך אחת מארבע האפשרויות, לפי מקומה (0 עד 3)",
-        params:{index:{type:"integer",min:0,max:3,required:true}},
-        run:function(a){
-          var q=P.ses[P.qi];if(!q||P.phase!=="ask")return false;
-          return BARAK.highlight(document.querySelector('[data-o="'+q.options[a.index]+'"]'));
-        }},
-      explain_again:{desc:"מציג ומקריא שוב את ההסבר, אחרי שהשאלה נענתה",
-        run:function(){
-          var q=P.ses[P.qi];if(!q||P.phase!=="reveal")return false;
-          setBubble(q.explain,"think");speak(q.explain);return true;
-        }},
-      go_screen:{desc:"עובר למסך אחר של האפליקציה",
-        params:{name:{type:"string",enum:["practice","progress","records","settings"],required:true}},
-        run:function(a){
-          if(!state.pet||P.brk)return false;
-          stopSpeak();view=a.name;
-          if(view!=="practice")startRound(activeLevel());
-          render();window.scrollTo(0,0);return view===a.name;
-        }},
-      slow_mode:{desc:"פותח את המצב האיטי: אותה שאלה צעד אחר צעד, עם עיגולים",
-        run:function(){
-          var q=P.ses[P.qi];if(!q||P.phase!=="ask"||!SlowMode.can(q))return false;
-          if(state.settings.soundFx)sfxHint();SlowMode.open(q);return true;
-        }}
-    }
-  });
-  try{render()}catch(e){}
-}
-</script>
-<!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
-     (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
-     נמדדת בנפרד. הוסר 10.9.2026 והוחזר 15.9.2026, שניהם בהחלטת הבעלים. -->
-<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
-</body>
-</html>
+     בשקט והפנים נשארו מצוירות. אחרי ההדלקה מציירים 
