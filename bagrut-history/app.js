@@ -14,7 +14,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "h104 · 2026-09-26";
+  var BUILD = "h105 · 2026-09-26";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -400,7 +400,7 @@
        TUT_ID נשאר null והפאנל נפתח לשיחה כללית. */
     var tutCard = (window.TUTOR && TUTOR.on())
       ? '<div class="card"><h3>' + esc(TUTOR.label()) + "</h3>" +
-        '<p class="meta">נתקעתם לפני שהתחלתם? אפשר לשאול את המורה כל שאלה על החומר.</p>' +
+        '<p class="meta">' + I18N.t("tutorHomeP") + '</p>' +
         '<button class="btn ghost" id="btn-tutor-home" type="button">♫ ' + esc(TUTOR.label()) + '</button></div>'
       : "";
     var order = Object.keys(groups).sort();
@@ -409,17 +409,19 @@
       var info = QINFO[k] || null;
       var head = info
         ? "<h2>" + esc(info.name) + '</h2><p class="meta">' + esc(info.sub) + ' · ' +
-          '<a href="' + info.link + '" target="_blank" rel="noopener">בחינות בגרות אמיתיות באתר משרד החינוך</a></p>'
+          '<a href="' + info.link + '" target="_blank" rel="noopener">' + I18N.t("moelink") + '</a></p>'
         : "";
       return head + exs.map(function (ex) {
         var i = all.indexOf(ex);
         var demo = ex.season === "הדגמה"
-          ? ' <span class="chip warn">בחינת הדגמה — לא בחינה אמיתית</span>' : "";
+          ? ' <span class="chip warn">' + I18N.t("demoChip") + '</span>' : "";
         var lvl = ex.level
           ? ' <span class="chip">' + esc(ex.level) + "</span>" : "";
         var choice = (ex.chapters || [])
-          .map(function (c) { return c.choose + " מתוך " +
-            ex.questions.filter(function (q) { return q.chapter === c.id; }).length; })
+          .map(function (c) {
+            var n = ex.questions.filter(function (q) { return q.chapter === c.id; }).length;
+            return I18N.fmt("choice", { c: c.choose, n: n }) || (c.choose + " מתוך " + n);
+          })
           .join(" · ");
         return '<button class="card pick" data-exam="' + esc(ex.id) + '">' +
           "<h3>" + esc(examTitle(ex) + examSerial(ex, i, all)) + lvl + demo + "</h3>" +
@@ -1025,16 +1027,17 @@
     if (!ex) return;
     $("#mode-title").textContent = examTitle(ex);
     $("#mode-meta").textContent =
-      plural(ex.questions.length, "שאלה אחת", "שתי שאלות", "שאלות") + " · " +
-      plural(countSubs(ex), "סעיף אחד", "שני סעיפים", "סעיפים") + " · " +
-      ex.durationMinutes + " דקות";
+      I18N.fmt("meta", { q: ex.questions.length, s: countSubs(ex), m: ex.durationMinutes }) ||
+      (plural(ex.questions.length, "שאלה אחת", "שתי שאלות", "שאלות") + " · " +
+       plural(countSubs(ex), "סעיף אחד", "שני סעיפים", "סעיפים") + " · " +
+       ex.durationMinutes + " דקות");
   }
 
   /* --- ניווט ----------------------------------------------------- */
   var SCREENS = ["home", "mode", "sim", "practice", "prog", "settings"];
   var TITLES = {
-    home: "היסטוריה לבגרות", mode: "בחירת מצב", sim: "סימולציית בחינה",
-    practice: "תרגול מודרך", prog: "ההתקדמות שלכם", settings: "הגדרות"
+    home: "titleBrand", mode: "modeH1", sim: "simH2",
+    practice: "pracH2", prog: "progH1", settings: "setH1"
   };
   function go(screen) {
     if (SCREENS.indexOf(screen) < 0) screen = "home";
@@ -1056,7 +1059,7 @@
     SCREENS.forEach(function (s) { $("#scr-" + s).hidden = s !== screen; });
     var back = $("#btn-home");
     back.hidden = screen === "home";
-    back.textContent = screen === "settings" && state.back !== "home" ? "חזרה" : "לבחינות";
+    back.textContent = screen === "settings" && state.back !== "home" ? I18N.t("back") : I18N.t("toExams");
     back.setAttribute("data-go", screen === "settings" ? state.back : "home");
     if (screen === "home") renderHome();
     if (screen === "mode") renderMode();
@@ -1079,8 +1082,8 @@
        הכריז אותו, ושני ערוצים על אותו משפט פירושם לשמוע את שם
        המסך פעמיים בכל מעבר. הכותרת מוסיפה מידע במקום לחזור עליו —
        היא זו שנקראת בהחלפת לשונית ובחזרה לאפליקציה. */
-    document.title = TITLES[screen] +
-      (screen === "home" ? " — בגרות בהיסטוריה, שאלונים 22261 ו-22262" : " · היסטוריה לבגרות");
+    document.title = I18N.t(TITLES[screen]) +
+      (screen === "home" ? " — " + I18N.t("titleHomeSuffix") : " · " + I18N.t("titleBrand"));
   }
 
   /* --- אירועים. האזנה אחת על המסמך, ולא מאזין לכל כפתור --------- */
@@ -1464,7 +1467,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=h104-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=h105-pwa1").catch(function () {});
     });
   }
 
@@ -1481,6 +1484,8 @@
     document.title = "לא פורסם";
     return;
   }
+  I18N.apply(I18N.cur());
+  document.addEventListener("langchange", function () { go(state.screen); });
   if (store.data.examId && examById(store.data.examId)) state.examId = store.data.examId;
   go("home");
 })();

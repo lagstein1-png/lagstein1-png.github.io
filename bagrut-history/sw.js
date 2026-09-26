@@ -22,7 +22,7 @@
 const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "shehis-" + V;
 const PRE = [
-  "./", "./index.html", "./app.js",
+  "./", "./index.html", "./app.js", "./lang.js",
   "./speech.js", "./data/exams.js", "./manifest.json",
   "./img/icon-192.png", "./img/icon-512.png", "./img/icon-maskable-512.png",
   "./img/apple-touch-icon.png", "./vendor/katex/katex.min.css", "./vendor/katex/katex.min.js",
