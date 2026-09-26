@@ -1,5 +1,5 @@
 /* =====================================================================
-   806 — לוגיקה.
+   שיא 5 יח״ל — לוגיקה.
 
    מה כאן ומה עוד לא:
      שלב 1  שלד, טעינת EXAMS, ניווט, הגדרות, שמירה במכשיר.
@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x100 · 2026-09-26";
+  var BUILD = "x101 · 2026-09-26";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -343,7 +343,8 @@
     return null;
   }
   function examTitle(ex) {
-    return ex.season + " " + ex.year + (ex.moed && ex.moed !== "—" ? " · מועד " + ex.moed : "");
+    var q = ex.questionnaire ? "שאלון " + ex.questionnaire + " — " : "";
+    return q + ex.season + " " + ex.year + (ex.moed && ex.moed !== "—" ? " · מועד " + ex.moed : "");
   }
   /* שלוש בחינות ההדגמה נושאות את אותו season ואת אותה שנה, ולכן
      examTitle מחזיר לשלושתן מחרוזת זהה — ושני כרטיסים שנבדלים רק
@@ -362,6 +363,15 @@
     return n;
   }
 
+  /* שני השאלונים מוצגים בקבוצות נפרדות: 35571 (60% מהציון) ו-35572
+     (40%). תלמיד שלומד למבנה החדש צריך לראות מיד לאיזה שאלון כל
+     הדגמה שייכת — הציון הסופי הוא שקלול של השניים. */
+  var QINFO = {
+    "35571": { name: "שאלון 35571", sub: "60% מהציון · 3 שעות ו-45 דקות · ארבעה פרקים, חלקם בבחירה",
+               link: "https://meyda.education.gov.il/sheeloney_bagrut/35571/HEB" },
+    "35572": { name: "שאלון 35572", sub: "40% מהציון · שעתיים וחצי · שני פרקים, בחירה בכל פרק",
+               link: "https://meyda.education.gov.il/sheeloney_bagrut/35572/HEB" }
+  };
   function renderHome() {
     var all = window.EXAMS || [];
     var box = $("#exam-list");
@@ -370,6 +380,8 @@
         "הבחינות יושבות ב־<code>data/exams.js</code>.</div>";
       return;
     }
+    var groups = {};
+    all.forEach(function (ex) { var k = ex.questionnaire || ""; (groups[k] = groups[k] || []).push(ex); });
     /* ״עזרה מהמורה״ גם ממסך הבית (26.9.2026): בלי הקשר של סעיף —
        TUT_ID נשאר null והפאנל נפתח לשיחה כללית. */
     var tutCard = (window.TUTOR && TUTOR.on())
@@ -377,20 +389,31 @@
         '<p class="meta">נתקעתם לפני שהתחלתם? אפשר לשאול את המורה כל שאלה על החומר.</p>' +
         '<button class="btn ghost" id="btn-tutor-home" type="button">♫ " + esc(TUTOR.label()) + "</button></div>'
       : "";
-    box.innerHTML = tutCard + all.map(function (ex, i) {
-      var demo = ex.season === "הדגמה"
-        ? ' <span class="chip warn">בחינת הדגמה — לא בחינה אמיתית</span>' : "";
-      /* רמת האוסף על הכרטיס. האפליקציה משרתת 3–4 יחידות וגם 5, ותלמיד
-         שנכנס לאוסף שאינו ברמה שלו מגלה זאת אחרי שהתחיל. אוסף בלי
-         level אינו מציג תווית — לא מנחשים רמה שלא נקבעה. */
-      var lvl = ex.level
-        ? ' <span class="chip">' + esc(ex.level) + "</span>" : "";
-      return '<button class="card pick" data-exam="' + esc(ex.id) + '">' +
-        "<h3>" + esc(examTitle(ex) + examSerial(ex, i, all)) + lvl + demo + "</h3>" +
-        '<p class="meta">' +
-        plural(ex.questions.length, "שאלה אחת", "שתי שאלות", "שאלות") + " · " +
-        plural(countSubs(ex), "סעיף אחד", "שני סעיפים", "סעיפים") + " · " +
-        ex.durationMinutes + " דקות</p></button>";
+    var order = Object.keys(groups).sort();
+    box.innerHTML = tutCard + order.map(function (k) {
+      var exs = groups[k];
+      var info = QINFO[k] || null;
+      var head = info
+        ? "<h2>" + esc(info.name) + '</h2><p class="meta">' + esc(info.sub) + ' · ' +
+          '<a href="' + info.link + '" target="_blank" rel="noopener">בחינות בגרות אמיתיות באתר משרד החינוך</a></p>'
+        : "";
+      return head + exs.map(function (ex) {
+        var i = all.indexOf(ex);
+        var demo = ex.season === "הדגמה"
+          ? ' <span class="chip warn">בחינת הדגמה — לא בחינה אמיתית</span>' : "";
+        var lvl = ex.level
+          ? ' <span class="chip">' + esc(ex.level) + "</span>" : "";
+        var choice = (ex.chapters || [])
+          .map(function (c) { return c.choose + " מתוך " +
+            ex.questions.filter(function (q) { return q.chapter === c.id; }).length; })
+          .join(" · ");
+        return '<button class="card pick" data-exam="' + esc(ex.id) + '">' +
+          "<h3>" + esc(examTitle(ex) + examSerial(ex, i, all)) + lvl + demo + "</h3>" +
+          '<p class="meta">' +
+          plural(ex.questions.length, "שאלה אחת", "שתי שאלות", "שאלות") + " · " +
+          plural(countSubs(ex), "סעיף אחד", "שני סעיפים", "סעיפים") + " · " +
+          ex.durationMinutes + " דקות" + (choice ? " · בחירה: " + choice : "") + "</p></button>";
+      }).join("");
     }).join("");
   }
 
@@ -643,7 +666,7 @@
      שלושה מצבים באותו מסך: לפני, תוך כדי, ואחרי. אין רמזים ואין
      פתרונות עד הסיום — זו כל ההבחנה בין המצב הזה לבין התרגול,
      ובלעדיה שני המצבים היו אותו דבר בשני שמות. */
-  var SIM = { on: false, done: false, endsAt: 0, ans: {}, res: null, timer: null };
+  var SIM = { on: false, done: false, endsAt: 0, ans: {}, res: null, timer: null, chosen: null };
 
   function simStop() {
     if (SIM.timer) { clearInterval(SIM.timer); SIM.timer = null; }
@@ -655,9 +678,13 @@
     function two(n) { return (n < 10 ? "0" : "") + n; }
     return (h ? h + ":" : "") + two(m) + ":" + two(sec);
   }
+  function simQuestions(ex) {
+    if (!SIM.chosen) return ex.questions;
+    return ex.questions.filter(function (q) { return SIM.chosen[q.number]; });
+  }
   function simSubs(ex) {
     var out = [];
-    ex.questions.forEach(function (q) {
+    simQuestions(ex).forEach(function (q) {
       (q.subQuestions || []).forEach(function (sub, si) {
         out.push({ q: q, sub: sub, id: "q" + q.number + "s" + si });
       });
@@ -665,6 +692,27 @@
     return out;
   }
   function simStart(ex) {
+    /* בחירה לפי פרקים: כל checkbox מסומן הוא שאלה שהתלמיד לוקח לבחינה.
+       בלי פרקים (מבנה ישן) כל השאלות נכנסות. */
+    SIM.chosen = null;
+    if (ex.chapters && ex.chapters.length) {
+      var chosen = {};
+      $$("input[data-choose]").forEach(function (cb) {
+        if (cb.checked) chosen[cb.getAttribute("data-choose")] = true;
+      });
+      for (var ci = 0; ci < ex.chapters.length; ci++) {
+        var c = ex.chapters[ci];
+        var n = ex.questions.filter(function (q) {
+          return q.chapter === c.id && chosen[q.number];
+        }).length;
+        if (n !== c.choose) {
+          window.alert("בפרק «" + c.title + "» צריך לבחור בדיוק " + c.choose +
+            (c.choose === 1 ? " שאלה" : " שאלות") + ". כרגע נבחרו " + n + ".");
+          return;
+        }
+      }
+      SIM.chosen = chosen;
+    }
     SIM.on = true; SIM.done = false; SIM.res = null; SIM.ans = {};
     SIM.endsAt = Date.now() + ex.durationMinutes * 60000;
     renderSim();
@@ -698,7 +746,22 @@
     SIM.done = true; SIM.on = false;
     var ex = examById(state.examId);
     if (!ex) return;
-    var got = 0, max = 0, byTopic = {}, rows = [];
+    var got = 0, max = 0, byTopic = {}, rows = [], byChapter = {};
+    var subPts = {};
+    simSubs(ex).forEach(function (it) { subPts[it.id] = Number(it.sub.points) || 0; });
+    if (ex.chapters && ex.chapters.length) {
+      /* ציון הבחינה מתוך 100: לכל פרק משקל קבוע (pointsEach), ומה
+         שהתלמיד עשה בתוך הפרק נמתח למשקל הזה. כך בחירת שאלות קשות
+         יותר אינה מענישה, וכל בחינה מסתיימת בציון אחד מתוך 100. */
+      ex.chapters.forEach(function (c) {
+        var cg = 0, cm = 0;
+        simSubs(ex).forEach(function (it) {
+          if (it.q.chapter !== c.id) return;
+          cm += subPts[it.id];
+        });
+        byChapter[c.id] = { def: c, got: 0, max: cm, weight: c.pointsEach };
+      });
+    }
     simSubs(ex).forEach(function (it) {
       var r = checkAnswer(it.sub.finalAnswer, SIM.ans[it.id] || "");
       var pts = Number(it.sub.points) || 0;
@@ -712,11 +775,21 @@
          ובחינה שנגמר בה הזמן הייתה מוסיפה לנושא כישלון לכל סעיף
          שהתלמיד לא הספיק להגיע אליו. */
       if (String(SIM.ans[it.id] || "").trim()) recordResult(it.q, it.id, r.ok);
+      if (byChapter[it.q.chapter] && r.ok) byChapter[it.q.chapter].got += pts;
       rows.push({ id: it.id, letter: it.sub.letter, number: it.q.number,
                   topic: it.q.topic, ok: r.ok, pts: pts,
                   given: SIM.ans[it.id] || "", want: answerText(it.sub.finalAnswer) });
     });
-    SIM.res = { got: got, max: max, byTopic: byTopic, rows: rows, byTime: !!byTime };
+    if (ex.chapters && ex.chapters.length) {
+      var g100 = 0;
+      Object.keys(byChapter).forEach(function (k) {
+        var ch = byChapter[k];
+        ch.scaled = ch.max ? Math.round((ch.got / ch.max) * ch.weight * 100) / 100 : 0;
+        g100 += ch.scaled;
+      });
+      got = Math.round(g100 * 100) / 100; max = 100;
+    }
+    SIM.res = { got: got, max: max, byTopic: byTopic, byChapter: byChapter, rows: rows, byTime: !!byTime };
     var d = store.data;
     if (!d.sims) d.sims = [];
     d.sims.push({ examId: ex.id, at: Date.now(), got: got, max: max });
@@ -784,6 +857,16 @@
       "<div>" + r.got + " מתוך " + r.max + " נקודות</div></div>";
 
     var topics = Object.keys(r.byTopic);
+    if (r.byChapter && Object.keys(r.byChapter).length) {
+      h += "<h2>לפי פרק</h2><table class=\"tbl\"><thead><tr>" +
+        "<th>פרק</th><th>משקל</th><th>הושגו</th></tr></thead><tbody>";
+      Object.keys(r.byChapter).forEach(function (k) {
+        var ch = r.byChapter[k];
+        h += "<tr><td>" + esc(ch.def.title) + "</td><td>" + ch.weight + "</td><td>" +
+          ch.scaled + "</td></tr>";
+      });
+      h += "</tbody></table>";
+    }
     h += "<h2>לפי נושא</h2><table class=\"tbl\"><thead><tr>" +
       "<th>נושא</th><th>סעיפים</th><th>נקודות</th><th></th></tr></thead><tbody>";
     topics.forEach(function (t) {
@@ -833,12 +916,29 @@
     if (SIM.done && SIM.res) { box.innerHTML = simReportHtml(ex); markOverflow(box); return; }
 
     if (!SIM.on) {
+      var chooseHtml = "";
+      if (ex.chapters && ex.chapters.length) {
+        chooseHtml = "<h2>בחרו שאלות לכל פרק</h2><p class=\"meta\">כמו בבחינה האמיתית: " +
+          "בכל פרק בוחרים חלק מהשאלות. אפשר להשאיר את ברירת המחדל.</p>" +
+          ex.chapters.map(function (c, ci) {
+            var qs = ex.questions.filter(function (q) { return q.chapter === c.id; });
+            return '<div class="card"><h3>' + esc(c.title) + '</h3>' +
+              (c.note ? '<p class="meta">' + esc(c.note) + "</p>" : "") +
+              qs.map(function (q, qi) {
+                return '<label style="display:flex;gap:.5rem;align-items:flex-start;margin:.35rem 0">' +
+                  '<input type="checkbox" data-choose="' + q.number + '"' +
+                  (qi < c.choose ? " checked" : "") + ' style="margin-top:.3rem">' +
+                  "<span>" + esc(q.topic) + " — " + esc(q.text) + "</span></label>";
+              }).join("") + "</div>";
+          }).join("");
+      }
       box.innerHTML = '<p class="note">בסימולציה אין רמזים ואין פתרונות עד הסיום, ' +
         "והשעון רץ. ההקראה עובדת כרגיל — היא אינה עזרה חיצונית אלא הדרך " +
         "שבה האפליקציה הזאת מוגשת.</p>" +
         '<div class="card"><h2>' + esc(examTitle(ex)) + "</h2>" +
         '<p class="meta">' + plural(countSubs(ex), "סעיף אחד", "שני סעיפים", "סעיפים") +
         " · " + ex.durationMinutes + " דקות</p>" +
+        chooseHtml +
         '<button class="btn pri" data-simstart="1" type="button">התחילו את הבחינה</button></div>';
       return;
     }
@@ -850,7 +950,7 @@
       '<span class="bar"><i style="width:' +
       Math.max(0, Math.min(100, (left / total) * 100)).toFixed(2) + '%"></i></span>' +
       '<button class="btn" data-simend="1" type="button">סיימתי</button></div>';
-    ex.questions.forEach(function (q) { h += simQuestionHtml(q); });
+    simQuestions(ex).forEach(function (q) { h += simQuestionHtml(q); });
     h += '<button class="btn pri" data-simend="1" type="button" ' +
          'style="width:100%">סיימתי — הגישו את הבחינה</button>';
     box.innerHTML = h;
@@ -916,7 +1016,7 @@
   /* --- ניווט ----------------------------------------------------- */
   var SCREENS = ["home", "mode", "sim", "practice", "prog", "settings"];
   var TITLES = {
-    home: "שאלון 806", mode: "בחירת מצב", sim: "סימולציית בחינה",
+    home: "מתמטיקה 5 יח״ל", mode: "בחירת מצב", sim: "סימולציית בחינה",
     practice: "תרגול מודרך", prog: "ההתקדמות שלכם", settings: "הגדרות"
   };
   function go(screen) {
@@ -963,7 +1063,7 @@
        המסך פעמיים בכל מעבר. הכותרת מוסיפה מידע במקום לחזור עליו —
        היא זו שנקראת בהחלפת לשונית ובחזרה לאפליקציה. */
     document.title = TITLES[screen] +
-      (screen === "home" ? " — בגרות במתמטיקה, 3–4 ו-5 יח״ל" : " · שאלון 806");
+      (screen === "home" ? " — בגרות במתמטיקה, שאלונים 35571 ו-35572" : " · שיא — מתמטיקה 5 יח״ל");
   }
 
   /* --- אירועים. האזנה אחת על המסמך, ולא מאזין לכל כפתור --------- */
@@ -974,7 +1074,7 @@
   var TUT_ID = null;
   if (window.TUTOR) {
     TUTOR.mount({
-      app: "bagrut-806",
+      app: "advanced-math",
       pickLang: true,                 /* אין בורר באפליקציה — הפאנל מביא אחד */
       lang: function () { return "he" },
       q: function () {
@@ -987,7 +1087,7 @@
           expr: txt(r.sub.text) + (r.sub.latex ? "  " + txt(r.sub.latex) : ""),
           ans: r.sub.finalAnswer ? txt(answerText(r.sub.finalAnswer)) : null,
           topic: r.q.topic || null,
-          level: "שאלון 806"
+          level: "מתמטיקה 5 יח״ל"
         };
       },
       stopHost: function () { try { window.Speech.stop() } catch (e) {} }
@@ -1020,7 +1120,7 @@
         say("שאלה " + it.q.number + " סעיף " + it.sub.letter);
       };
       BARAK.register({
-        app: "bagrut-806",
+        app: "advanced-math",
         getScreenContext: function () {
           var it = bkCur();
           if (!it) return null;
@@ -1038,8 +1138,8 @@
             correct: it.sub.finalAnswer ? txt(answerText(it.sub.finalAnswer)) : null,
             student: st.val ? txt(st.val) : null,
             topic: it.q.topic || null,
-            level: "שאלון 806",
-            curriculum: "בגרות במתמטיקה שאלון 806 — " + (it.q.topic || "")
+            level: "מתמטיקה 5 יח״ל",
+            curriculum: "בגרות במתמטיקה 5 יח״ל (35571/35572) — " + (it.q.topic || "")
           };
         },
         actions: {
@@ -1347,7 +1447,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x100-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x101-pwa1").catch(function () {});
     });
   }
 

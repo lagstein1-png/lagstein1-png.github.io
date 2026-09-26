@@ -20,7 +20,7 @@
       כדי למנוע. 604K, פעם אחת, בהתקנה.
    ===================================================================== */
 const V = new URL(self.location).searchParams.get("v") || "dev";
-const CACHE = "bagrut806-" + V;
+const CACHE = "shea5-" + V;
 const PRE = [
   "./", "./index.html", "./app.js",
   "./speech.js", "./data/exams.js", "./manifest.json",
