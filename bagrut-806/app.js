@@ -196,11 +196,11 @@
      בקובץ התוכן במבנה שאפשר לשלוף לפי מזהה, ולכן הוא נקרא מהמסך. */
   function spkElBtn(elId, label) {
     return '<button class="spk" data-read-el="' + esc(elId) + '" type="button" ' +
-           'aria-label="' + esc(label) + '" title="' + esc(label) + '">🔊</button>';
+           'aria-label="' + esc(label) + '" title="' + esc(label) + '">\u266b ' + esc(label) + '</button>';
   }
   function spkBtn(id, label) {
     return '<button class="spk" data-read="' + esc(id) + '" type="button" ' +
-           'aria-label="' + esc(label) + '" title="' + esc(label) + '">🔊</button>';
+           'aria-label="' + esc(label) + '" title="' + esc(label) + '">\u266b ' + esc(label) + '</button>';
   }
 
   /* --- בדיקת התשובה הסופית (שלב 3) -------------------------------
@@ -1334,7 +1334,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x98-pwa2").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x99-pwa2").catch(function () {});
     });
   }
 
