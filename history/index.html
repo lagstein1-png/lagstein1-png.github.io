@@ -486,6 +486,12 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
    `currentColor` ולכן הוא נצבע מעצמו בכל מצב נגישות. */
 .brand .sitemark{inline-size:1.15em;block-size:1.15em;flex:none;
   vertical-align:-.16em;margin-inline-end:.4em;opacity:.9}
+
+/* כפתורי הקראה גדולים וצבעוניים — התקן המשותף (ירוק הקראה, אדום עצירה) */
+.spk:not(.sm){border-radius:12px;background:#0e9c8d;border-color:#0b7c71;color:#fff;font-weight:700;min-height:46px;width:auto;height:auto;padding:8px 18px;font-size:1.02rem;gap:.4rem}
+.spk:not(.sm):hover{background:#0b7c71;color:#fff}
+.spkStop{background:#bf4426!important;border-color:#a03a20!important;color:#fff!important}
+.spkStop:hover{background:#a03a20!important;color:#fff!important}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -794,7 +800,7 @@ T.he={
   qWhen:"מתי זה קרה?", qWhat:"מה קרה?", qWhy:"מה הביא לזה?",
   qEff:"מה הייתה התוצאה?", qFirst:"מה קרה קודם?", qTerm:"מה פירוש המושג?",
   qName:"על איזה אירוע מדובר?", qRead:"לפי המקור:",
-  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו", hearSent:"השמיעו את הקטע", hearOpt:"השמיעו את האפשרות",
+  hear:"השמיעו", hearSlow:"לאט",stopB:"עצירה", hearWord:"השמיעו", hearSent:"השמיעו את הקטע", hearOpt:"השמיעו את האפשרות",
   check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", hintB:"רמז", hintYearL:"השנה", hintTopicL:"מהתחום",
   hintSrcL:"התשובה נמצאת בקטע שלמעלה", hintOrderL:"השוו את השנים של האפשרויות", showAll:"הראו הכול",
   correct:"נכון!", wrong:"עוד לא", answerIs:"התשובה:", why:"למה",
@@ -855,7 +861,7 @@ T.ar={
   qWhen:"متى حدث ذلك؟", qWhat:"ماذا حدث؟", qWhy:"ما الذي أدّى إلى ذلك؟",
   qEff:"ما كانت النتيجة؟", qFirst:"ما الذي حدث أولًا؟", qTerm:"ما معنى المصطلح؟",
   qName:"عن أي حدث يدور الحديث؟", qRead:"حسب المصدر:",
-  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع", hearSent:"استمع للنص", hearOpt:"استمع للخيار",
+  hear:"استمع", hearSlow:"ببطء",stopB:"إيقاف", hearWord:"استمع", hearSent:"استمع للنص", hearOpt:"استمع للخيار",
   check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", hintB:"تلميح", hintYearL:"السنة", hintTopicL:"من المجال",
   hintSrcL:"الإجابة موجودة في المقطع أعلاه", hintOrderL:"قارنوا سنوات الخيارات", showAll:"أظهر الكل",
   correct:"صحيح!", wrong:"ليس بعد", answerIs:"الإجابة:", why:"لماذا",
@@ -916,7 +922,7 @@ T.ru={
   qWhen:"Когда это произошло?", qWhat:"Что произошло?", qWhy:"Что к этому привело?",
   qEff:"Каким было следствие?", qFirst:"Что произошло раньше?", qTerm:"Что означает понятие?",
   qName:"О каком событии идёт речь?", qRead:"По источнику:",
-  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать", hearSent:"Послушать отрывок", hearOpt:"Послушать вариант",
+  hear:"Послушать", hearSlow:"Медленно",stopB:"Стоп", hearWord:"Послушать", hearSent:"Послушать отрывок", hearOpt:"Послушать вариант",
   check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", hintB:"Подсказка", hintYearL:"Год", hintTopicL:"Из области",
   hintSrcL:"Ответ есть в отрывке выше", hintOrderL:"Сравните годы вариантов", showAll:"Показать всё",
   correct:"Верно!", wrong:"Пока нет", answerIs:"Ответ:", why:"Почему",
@@ -977,7 +983,7 @@ T.en={
   qWhen:"When did this happen?", qWhat:"What happened?", qWhy:"What led to it?",
   qEff:"What was the consequence?", qFirst:"Which came first?", qTerm:"What does the term mean?",
   qName:"Which event is this?", qRead:"According to the source:",
-  hear:"Play", hearSlow:"Slowly", hearWord:"Play", hearSent:"Play the passage", hearOpt:"Play this option",
+  hear:"Play", hearSlow:"Slowly",stopB:"Stop", hearWord:"Play", hearSent:"Play the passage", hearOpt:"Play this option",
   check:"Check", next:"Next", again:"Again", dunno:"I don't know", hintB:"Hint", hintYearL:"Year", hintTopicL:"From",
   hintSrcL:"The answer is in the passage above", hintOrderL:"Compare the years of the options", showAll:"Show all",
   correct:"Correct!", wrong:"Not yet", answerIs:"Answer:", why:"Why",
@@ -1060,7 +1066,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m141 · 2026-09-26";
+var BUILD="m142 · 2026-09-26";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -7722,7 +7728,10 @@ function levelBar(tp){
 function spkBtn(text,lang,slow,label){
   return '<button class="spk'+(slow?" sm":"")+'" data-a="say" data-say="'+esc(text)+
     '" data-lang="'+esc(lang)+'"'+(slow?' data-slow="1"':"")+
-    ' aria-label="'+esc(label||t("hear"))+'">'+ic(slow?"slow":"play",slow?15:18)+"</button>";
+    ' aria-label="'+esc(label||t("hear"))+'">'+(slow?ic("slow",15):'\u266b '+esc(label||t("hear")))+"</button>";
+}
+function spkStop(){
+  return '<button class="spk spkStop" data-a="stop" aria-label="'+esc(t("stopB"))+'">'+esc(t("stopB"))+"</button>";
 }
 
 /* כרטיס הנושא: מה שמוצג מעל האפשרויות. בהיסטוריה זו כותרת
@@ -7753,7 +7762,7 @@ function leadBox(txt,sub){
   return '<div class="subject"><span class="word" style="font-size:1.15rem">'+esc(txt)+"</span>"+
     (sub?'<span class="ipa">'+esc(sub)+"</span>":"")+
     '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
-    spkBtn(txt,state.lang,false,t("hearWord"))+spkBtn(txt,state.lang,true,t("hearSlow"))+"</span></div>";
+    spkBtn(txt,state.lang,false,t("hearWord"))+spkBtn(txt,state.lang,true,t("hearSlow"))+spkStop()+"</span></div>";
 }
 
 function screenPractice(){
@@ -7782,7 +7791,7 @@ function screenPractice(){
        '<span class="chip">'+esc(t("source"))+"</span>"+
        '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
        spkBtn(full,state.lang,false,t("hearSent"))+
-       spkBtn(full,state.lang,true,t("hearSlow"))+"</span></div>";
+       spkBtn(full,state.lang,true,t("hearSlow"))+spkStop()+"</span></div>";
     h+='<div class="passage">';
     lines.forEach(function(ln){
       h+='<span class="s" data-a="sayline" data-say="'+esc(ln)+'">'+esc(ln)+"</span> ";
@@ -7830,7 +7839,7 @@ function screenPractice(){
       h+='<div class="why">'+esc(q.opts[P.picked].why)+"</div>";
     h+="</div>";
     h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+
-       spkBtn(saySpell(q.say),state.lang,false,t("hearSent"))+spkBtn(saySpell(q.say),state.lang,true,t("hearSlow"))+
+       spkBtn(saySpell(q.say),state.lang,false,t("hearSent"))+spkBtn(saySpell(q.say),state.lang,true,t("hearSlow"))+spkStop()+
        '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
        esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
   } else {
@@ -9544,7 +9553,7 @@ document.addEventListener("click",function(e){
   if(a==="go"){view=(v==="exam"||v==="marks"||v==="sit")?v:"";if(!view)state.screen="home";stopSpeak();render();window.scrollTo(0,0);return}
   if(a==="marks"){view="marks";stopSpeak();render();window.scrollTo(0,0);return}
   if(a==="track"){state.track=el.getAttribute("data-t")||"";/* נושא שנבחר במסלול הקודם אינו מוצג עוד, ולכן גם אי אפשר לבטלו — הוא היה נשאר במבחן בלי שהמורה רואה אותו. */var trk=trackSel();EB.topics=EB.topics.filter(function(id){var tp=topicOf(id);return tp&&tp.trk===trk});if(!EB.topics.length)EB.topics=topicsForTrack(trk).slice(0,4).map(function(t){return t.id});/* משבצות השאלות נשמרות ב-EB.q, ובלי האיפוס הזה מבחן שנבנה אחרי החלפת מסלול היה נארז מהשאלות של המסלול הקודם — בדיוק כמו ב-extopic וב-exlvl. */EB.q=null;EB.built=null;render();return}
-  if(a==="say"||a==="sayline"){
+  if(a==="stop"){stopSpeak();return}if(a==="say"||a==="sayline"){
     var txt=el.getAttribute("data-say")||"";
     var lg=el.getAttribute("data-lang")||state.lang;
     var slow=el.getAttribute("data-slow")==="1";
@@ -9724,7 +9733,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m141-pwa2").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m142-pwa2").catch(function(){});
   });
 }
 </script>

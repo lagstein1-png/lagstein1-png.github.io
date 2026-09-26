@@ -468,7 +468,13 @@ textarea.field{min-height:96px;resize:vertical}
 <link rel="license" href="/legal/">
 </head>
 <body>
-<style>#gate[hidden]{display:none!important}</style>
+<style>#gate[hidden]{display:none!important}
+/* כפתורי הקראה גדולים וצבעוניים — התקן המשותף (ירוק הקראה, אדום עצירה) */
+.spk:not(.sm){border-radius:12px;background:#0e9c8d;border-color:#0b7c71;color:#fff;font-weight:700;min-height:46px;width:auto;height:auto;padding:8px 18px;font-size:1.02rem;gap:.4rem}
+.spk:not(.sm):hover{background:#0b7c71;color:#fff}
+.spkStop{background:#bf4426!important;border-color:#a03a20!important;color:#fff!important}
+.spkStop:hover{background:#a03a20!important;color:#fff!important}
+</style>
 <div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
      align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
      font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
@@ -782,7 +788,7 @@ T.he={
   lv1:"ידע", lv2:"הבנה", lv3:"ניתוח",
   lv1D:"מושג והגדרה — מה זה אומר", lv2D:"מקרה קונקרטי — איזה עיקרון פועל כאן", lv3D:"דילמה, איזון וטיעון נגדי",
   qPick:"בחרו את התשובה הנכונה",
-  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו", hearSent:"השמיעו את הקטע", hearOpt:"השמיעו את האפשרות",
+  hear:"השמיעו", hearSlow:"לאט",stopB:"עצירה", hearWord:"השמיעו", hearSent:"השמיעו את הקטע", hearOpt:"השמיעו את האפשרות",
   check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", hintB:"רמז", hintTopicL:"מהתחום",
   showAll:"הראו הכול",
   correct:"נכון!", wrong:"עוד לא", answerIs:"התשובה:", why:"למה",
@@ -841,7 +847,7 @@ T.ar={
   lv1:"معرفة", lv2:"فهم", lv3:"تحليل",
   lv1D:"مفهوم وتعريف — ماذا يعني", lv2D:"حالة عينية — أيّ مبدأ يعمل هنا", lv3D:"معضلة وموازنة وحجّة مضادّة",
   qPick:"اختاروا الإجابة الصحيحة",
-  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع", hearSent:"استمع للنص", hearOpt:"استمع للخيار",
+  hear:"استمع", hearSlow:"ببطء",stopB:"إيقاف", hearWord:"استمع", hearSent:"استمع للنص", hearOpt:"استمع للخيار",
   check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", hintB:"تلميح", hintTopicL:"من المجال",
   showAll:"أظهر الكل",
   correct:"صحيح!", wrong:"ليس بعد", answerIs:"الإجابة:", why:"لماذا",
@@ -900,7 +906,7 @@ T.ru={
   lv1:"Знание", lv2:"Понимание", lv3:"Анализ",
   lv1D:"Понятие и определение — что это значит", lv2D:"Конкретный случай — какой принцип здесь работает", lv3D:"Дилемма, равновесие и контраргумент",
   qPick:"Выберите верный ответ",
-  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать", hearSent:"Послушать отрывок", hearOpt:"Послушать вариант",
+  hear:"Послушать", hearSlow:"Медленно",stopB:"Стоп", hearWord:"Послушать", hearSent:"Послушать отрывок", hearOpt:"Послушать вариант",
   check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", hintB:"Подсказка", hintTopicL:"Из области",
   showAll:"Показать всё",
   correct:"Верно!", wrong:"Пока нет", answerIs:"Ответ:", why:"Почему",
@@ -959,7 +965,7 @@ T.en={
   lv1:"Knowledge", lv2:"Understanding", lv3:"Analysis",
   lv1D:"A concept and its definition — what it means", lv2D:"A concrete case — which principle is at work", lv3D:"A dilemma, a balance and a counter-argument",
   qPick:"Choose the correct answer",
-  hear:"Play", hearSlow:"Slowly", hearWord:"Play", hearSent:"Play the passage", hearOpt:"Play this option",
+  hear:"Play", hearSlow:"Slowly",stopB:"Stop", hearWord:"Play", hearSent:"Play the passage", hearOpt:"Play this option",
   check:"Check", next:"Next", again:"Again", dunno:"I don't know", hintB:"Hint", hintTopicL:"From",
   showAll:"Show all",
   correct:"Correct!", wrong:"Not yet", answerIs:"Answer:", why:"Why",
@@ -1040,7 +1046,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="c5 · 2026-09-26";
+var BUILD="c6 · 2026-09-26";
 var SKEY="ezrach-state-v1";
 var GKEY_STORE="ezrach-gkey";
 
@@ -5680,7 +5686,10 @@ function levelBar(tp){
 function spkBtn(text,lang,slow,label){
   return '<button class="spk'+(slow?" sm":"")+'" data-a="say" data-say="'+esc(text)+
     '" data-lang="'+esc(lang)+'"'+(slow?' data-slow="1"':"")+
-    ' aria-label="'+esc(label||t("hear"))+'">'+ic(slow?"slow":"play",slow?15:18)+"</button>";
+    ' aria-label="'+esc(label||t("hear"))+'">'+(slow?ic("slow",15):'\u266b '+esc(label||t("hear")))+"</button>";
+}
+function spkStop(){
+  return '<button class="spk spkStop" data-a="stop" aria-label="'+esc(t("stopB"))+'">'+esc(t("stopB"))+"</button>";
 }
 
 /* כרטיס הנושא: מה שמוצג מעל האפשרויות. בהיסטוריה זו כותרת
@@ -5690,7 +5699,7 @@ function leadBox(txt,sub){
   return '<div class="subject"><span class="word" style="font-size:1.15rem">'+esc(txt)+"</span>"+
     (sub?'<span class="ipa">'+esc(sub)+"</span>":"")+
     '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
-    spkBtn(txt,state.lang,false,t("hearWord"))+spkBtn(txt,state.lang,true,t("hearSlow"))+"</span></div>";
+    spkBtn(txt,state.lang,false,t("hearWord"))+spkBtn(txt,state.lang,true,t("hearSlow"))+spkStop()+"</span></div>";
 }
 
 /* נוסח השאלה, ולצידו כפתורי השמעה. באזרחות השאלה היא משפט שלם
@@ -5700,7 +5709,7 @@ function askBox(txt){
   return '<div class="subject" style="align-items:flex-start">'+
     '<span class="qtext" style="flex:1;margin:0">'+esc(txt)+"</span>"+
     '<span style="display:flex;gap:.4rem;flex:none">'+
-    spkBtn(txt,state.lang,false,t("hearWord"))+spkBtn(txt,state.lang,true,t("hearSlow"))+"</span></div>";
+    spkBtn(txt,state.lang,false,t("hearWord"))+spkBtn(txt,state.lang,true,t("hearSlow"))+spkStop()+"</span></div>";
 }
 
 function screenPractice(){
@@ -5755,7 +5764,7 @@ function screenPractice(){
     if(it&&it.ex)h+='<div class="why"><b>'+esc(t("whyT"))+":</b> "+esc(gl(it.ex))+"</div>";
     h+="</div>";
     h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+
-       spkBtn(saySpell(q.say),state.lang,false,t("hearSent"))+spkBtn(saySpell(q.say),state.lang,true,t("hearSlow"))+
+       spkBtn(saySpell(q.say),state.lang,false,t("hearSent"))+spkBtn(saySpell(q.say),state.lang,true,t("hearSlow"))+spkStop()+
        '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
        esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
   } else {
@@ -5916,7 +5925,7 @@ function screenSim(){
       h+="</div>";
       h+='<div style="display:flex;gap:.5rem;margin-top:.6rem">'+
          spkBtn(saySpell(q.say),state.lang,false,t("hearSent"))+
-         spkBtn(saySpell(q.say),state.lang,true,t("hearSlow"))+"</div>";
+         spkBtn(saySpell(q.say),state.lang,true,t("hearSlow"))+spkStop()+"</div>";
       h+="</div>";
     });
     return h+"</div>"+fbar();
@@ -7485,7 +7494,7 @@ document.addEventListener("click",function(e){
   if(a==="go"){view=(v==="exam"||v==="marks"||v==="sit")?v:"";if(!view)state.screen="home";stopSpeak();render();window.scrollTo(0,0);return}
   if(a==="marks"){view="marks";stopSpeak();render();window.scrollTo(0,0);return}
   if(a==="track"){state.track=el.getAttribute("data-t")||"";render();return}
-  if(a==="say"||a==="sayline"){
+  if(a==="stop"){stopSpeak();return}if(a==="say"||a==="sayline"){
     var txt=el.getAttribute("data-say")||"";
     var lg=el.getAttribute("data-lang")||state.lang;
     var slow=el.getAttribute("data-slow")==="1";
@@ -7786,7 +7795,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=c5-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=c6-pwa1").catch(function(){});
   });
 }
 </script>

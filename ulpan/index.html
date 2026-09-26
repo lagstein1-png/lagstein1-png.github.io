@@ -471,6 +471,12 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
    `currentColor` ולכן הוא נצבע מעצמו בכל מצב נגישות. */
 .brand .sitemark{inline-size:1.15em;block-size:1.15em;flex:none;
   vertical-align:-.16em;margin-inline-end:.4em;opacity:.9}
+
+/* כפתורי הקראה גדולים וצבעוניים — התקן המשותף (ירוק הקראה, אדום עצירה) */
+.spk:not(.sm){border-radius:12px;background:#0e9c8d;border-color:#0b7c71;color:#fff;font-weight:700;min-height:46px;width:auto;height:auto;padding:8px 18px;font-size:1.02rem;gap:.4rem}
+.spk:not(.sm):hover{background:#0b7c71;color:#fff}
+.spkStop{background:#bf4426!important;border-color:#a03a20!important;color:#fff!important}
+.spkStop:hover{background:#a03a20!important;color:#fff!important}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -807,7 +813,7 @@ T.he={
   qMean:"מה המשמעות?", qHear:"איזו מילה שמעתם?", qGap:"מה חסר במשפט?",
   qOrder:"סדרו את המשפט", qSay:"איך אומרים את זה בעברית?", qRead:"לפי הקטע:",
   qUse:"איזה משפט מתאים למצב?",
-  hear:"השמיעו", hearSlow:"לאט", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט",
+  hear:"השמיעו", hearSlow:"לאט",stopB:"עצירה", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט",
   check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", showAll:"הראו הכול",
   hintB:"רמז",
   hintMean:"חשבו באיזה מצב שומעים את המילה הזאת.",
@@ -874,7 +880,7 @@ T.ar={
   qMean:"ما المعنى؟", qHear:"أي كلمة سمعت؟", qGap:"ما الناقص في الجملة؟",
   qOrder:"رتّب الجملة", qSay:"كيف تقول ذلك بالعبرية؟", qRead:"حسب النص:",
   qUse:"أي جملة تناسب الموقف؟",
-  hear:"استمع", hearSlow:"ببطء", hearWord:"استمع للكلمة", hearSent:"استمع للجملة",
+  hear:"استمع", hearSlow:"ببطء",stopB:"إيقاف", hearWord:"استمع للكلمة", hearSent:"استمع للجملة",
   check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", showAll:"أظهر الكل",
   hintB:"تلميح",
   hintMean:"فكّروا في أي موقف تُسمع هذه الكلمة.",
@@ -941,7 +947,7 @@ T.ru={
   qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?",
   qOrder:"Соберите предложение", qSay:"Как сказать это на иврите?", qRead:"По тексту:",
   qUse:"Какая фраза подходит к ситуации?",
-  hear:"Послушать", hearSlow:"Медленно", hearWord:"Послушать слово", hearSent:"Послушать фразу",
+  hear:"Послушать", hearSlow:"Медленно",stopB:"Стоп", hearWord:"Послушать слово", hearSent:"Послушать фразу",
   check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", showAll:"Показать всё",
   hintB:"Подсказка",
   hintMean:"Подумайте, в какой ситуации звучит это слово.",
@@ -1008,7 +1014,7 @@ T.en={
   qMean:"What does it mean?", qHear:"Which word did you hear?", qGap:"What is missing?",
   qOrder:"Put the sentence in order", qSay:"How do you say this in Hebrew?", qRead:"According to the passage:",
   qUse:"Which sentence fits the situation?",
-  hear:"Play", hearSlow:"Slowly", hearWord:"Play the word", hearSent:"Play the sentence",
+  hear:"Play", hearSlow:"Slowly",stopB:"Stop", hearWord:"Play the word", hearSent:"Play the sentence",
   check:"Check", next:"Next", again:"Again", dunno:"I don't know", showAll:"Show all",
   hintB:"Hint",
   hintMean:"Think about when you would hear this word.",
@@ -1109,7 +1115,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a105 · 2026-09-26";
+var BUILD="a106 · 2026-09-26";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -3600,7 +3606,10 @@ function levelBar(tp){
 function spkBtn(text,lang,slow,label){
   return '<button class="spk'+(slow?" sm":"")+'" data-a="say" data-say="'+esc(text)+
     '" data-lang="'+esc(lang)+'"'+(slow?' data-slow="1"':"")+
-    ' aria-label="'+esc(label||t("hear"))+'">'+ic(slow?"slow":"play",slow?15:18)+"</button>";
+    ' aria-label="'+esc(label||t("hear"))+'">'+(slow?ic("slow",15):'\u266b '+esc(label||t("hear")))+"</button>";
+}
+function spkStop(){
+  return '<button class="spk spkStop" data-a="stop" aria-label="'+esc(t("stopB"))+'">'+esc(t("stopB"))+"</button>";
 }
 
 /* מה נאמר **לפני** שעונים.
@@ -3630,7 +3639,7 @@ function subjectBox(it){
   return '<div class="subject"><span class="word" lang="he" dir="rtl">'+esc(w)+"</span>"+
     (it.ipa?'<span class="ipa">'+esc(it.ipa)+"</span>":"")+
     '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
-    spkBtn(w,LEARN,false,t("hearWord"))+spkBtn(w,LEARN,true,t("hearSlow"))+"</span></div>";
+    spkBtn(w,LEARN,false,t("hearWord"))+spkBtn(w,LEARN,true,t("hearSlow"))+spkStop()+"</span></div>";
 }
 
 function screenPractice(){
@@ -3653,7 +3662,7 @@ function screenPractice(){
   if(q.type==="comp"){
     h+='<div style="display:flex;gap:.4rem;margin-bottom:.4rem">'+
        spkBtn(q.passage.lines.join(" "),LEARN,false,t("hearSent"))+
-       spkBtn(q.passage.lines.join(" "),LEARN,true,t("hearSlow"))+"</div>";
+       spkBtn(q.passage.lines.join(" "),LEARN,true,t("hearSlow"))+spkStop()+"</div>";
     h+='<div class="passage" lang="he" dir="rtl">';
     q.passage.lines.forEach(function(ln,i){
       h+='<span class="s" role="button" tabindex="0" data-a="sayline" data-say="'+esc(ln)+'">'+esc(ln)+"</span> ";
@@ -3672,7 +3681,7 @@ function screenPractice(){
   else if(q.type==="hear"){
     h+='<div class="subject"><span class="word" style="letter-spacing:.35em">? ? ?</span>'+
        '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
-       spkBtn(q.say,LEARN,false,t("hearWord"))+spkBtn(q.say,LEARN,true,t("hearSlow"))+"</span></div>";
+       spkBtn(q.say,LEARN,false,t("hearWord"))+spkBtn(q.say,LEARN,true,t("hearSlow"))+spkStop()+"</span></div>";
     h+='<p class="qhint">'+esc(t("qHear"))+"</p>";
   }
   else if(q.type==="mean"){
@@ -3680,7 +3689,7 @@ function screenPractice(){
   }
   else if(q.type==="gap"){
     h+='<div class="subject"><span class="word" style="font-size:1.25rem">'+q.gapHtml+"</span>"+
-       '<span style="margin-inline-start:auto">'+spkBtn(P.done?q.say:sayAsk(q).t,LEARN,true,t("hearSlow"))+"</span></div>";
+       '<span style="margin-inline-start:auto">'+spkBtn(P.done?q.say:sayAsk(q).t,LEARN,true,t("hearSlow"))+spkStop()+"</span></div>";
     if(state.level<3&&q.lead)h+='<p class="qhint">'+esc(q.lead)+"</p>";
   }
   else if(q.type==="order"){
@@ -3732,7 +3741,7 @@ function screenPractice(){
       h+='<div class="why">'+esc(q.opts[P.picked].why)+"</div>";
     h+="</div>";
     h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+
-       spkBtn(q.say,LEARN,false,t("hearSent"))+spkBtn(q.say,LEARN,true,t("hearSlow"))+
+       spkBtn(q.say,LEARN,false,t("hearSent"))+spkBtn(q.say,LEARN,true,t("hearSlow"))+spkStop()+
        '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
        esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
   } else if(q.type!=="order"){
@@ -5388,7 +5397,7 @@ document.addEventListener("click",function(e){
   if(a==="go"){view=(v==="exam"||v==="marks"||v==="sit")?v:"";if(!view)state.screen="home";stopSpeak();render();window.scrollTo(0,0);return}
   if(a==="marks"){view="marks";stopSpeak();render();window.scrollTo(0,0);return}
   if(a==="track"){state.track=el.getAttribute("data-t")||"";/* נושא שנבחר במסלול הקודם אינו מוצג עוד, ולכן גם אי אפשר לבטלו — הוא היה נשאר במבחן בלי שהמורה רואה אותו. */var trk=trackSel();EB.topics=EB.topics.filter(function(id){var tp=topicOf(id);return tp&&tp.trk===trk});if(!EB.topics.length)EB.topics=topicsForTrack(trk).slice(0,4).map(function(t){return t.id});/* משבצות השאלות נשמרות ב-EB.q, ובלי האיפוס הזה מבחן שנבנה אחרי החלפת מסלול היה נארז מהשאלות של המסלול הקודם — בדיוק כמו ב-extopic וב-exlvl. */EB.q=null;EB.built=null;render();return}
-  if(a==="say"||a==="sayline"){
+  if(a==="stop"){stopSpeak();return}if(a==="say"||a==="sayline"){
     var txt=el.getAttribute("data-say")||"";
     var lg=el.getAttribute("data-lang")||LEARN;
     var slow=el.getAttribute("data-slow")==="1";
@@ -5580,7 +5589,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a105-pwa2").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a106-pwa2").catch(function(){});
   });
 }
 </script>
