@@ -2394,8 +2394,8 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s109 · 2026-09-26";
-var view=/[?&]lesson=sci[1-6](&|$)/.test(location.search||"")?"lesson":"units";
+var BUILD="s110 · 2026-09-26";
+var view=/[?&]lesson=sci[1-7](&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
 var confirmReset=false,vMore=false;
@@ -2482,8 +2482,9 @@ function unitsView(){
   UNITS.forEach(function(u,ui){
     h+='<h2 class="fd" style="font-size:1.2rem;margin:22px 0 10px">'+esc(t[u.grade])+'</h2><div style="display:grid;gap:10px">';
     u.topics.forEach(function(tp,ti){
-      if(ui===0&&ti<=3){
-        h+='<a href="?internal=shlav-internal-science&lesson=sci'+({0:'1',1:'4',2:'5',3:'6'})[ti]+'" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
+      var lid=({'0:0':'1','0:1':'4','0:2':'5','0:3':'6','1:1':'7'})[ui+':'+ti];
+      if(lid){
+        h+='<a href="?internal=shlav-internal-science&lesson=sci'+lid+'" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
           '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
           '<span class="chip" style="font-size:.8rem;background:var(--teal);color:#fff">'+esc(t.startLesson)+'</span></a>';
       }else{
@@ -4465,6 +4466,7 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="lesson"&&SCI4_ON)html+=sci4LessonView();
     else if(view==="lesson"&&SCI5_ON)html+=sci5LessonView();
     else if(view==="lesson"&&SCI6_ON)html+=sci6LessonView();
+    else if(view==="lesson"&&SCI7_ON)html+=sci7LessonView();
     else if(view==="settings")html+=settingsView();
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
@@ -4635,6 +4637,7 @@ function onAction(a,el){
   if(/^s4/.test(a)&&SCI4_ON){sci4LessonAction(a,el);return}
   if(/^s5/.test(a)&&SCI5_ON){sci5LessonAction(a,el);return}
   if(/^s6/.test(a)&&SCI6_ON){sci6LessonAction(a,el);return}
+  if(/^s7/.test(a)&&SCI7_ON){sci7LessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -5586,6 +5589,7 @@ ar:{s6Title:"درس: الدائرة الكهربائية",s6Goal:"الهدف: أ
     s6Sum:"انتهيتم! اليوم تعلمنا: الدائرة الكهربائية فيها بطارية وأسلاك ومفتاح ومصباح - والمصباح يضيء فقط عندما تكون الدائرة مغلقة.",
     s6Again:"من البداية",s6Next:"التالي",s6Hear:"استمعوا",s6Correct:"صحيح!",s6Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s6Check:"فحص الفهم",
     s6Bat:"بطارية",s6Switch:"مفتاح",s6Bulb:"مصباح",s6Open:"مفتوح",s6Closed:"مغلق",s6Off:"مطفأ",s6On:"يضيء!",s6PrevLesson:"الدرس السابق"}};
+S6STR.he.s6Fwd="לשיעור הבא";S6STR.en.s6Fwd="Next lesson";S6STR.ru.s6Fwd="Следующий урок";S6STR.ar.s6Fwd="الدرس التالي";
 function s6t(k){var d=S6STR[state.settings.lang||"he"]||S6STR.he;var v=d[k];return v===undefined?(S6STR.en[k]||k):v}
 var S6SN={step:0,closed:false,picked:-1,p1:-1,p2:-1};
 function s6Scene(closed){
@@ -5642,7 +5646,7 @@ function sci6LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s6t("s6Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s6again",s6t("s6Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s6HearBtn(s6t("s6Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci5" style="color:#1d4ed8;font-weight:600">'+esc(s6t("s6PrevLesson"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci5" style="color:#1d4ed8;font-weight:600">'+esc(s6t("s6PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci7" style="color:#1d4ed8;font-weight:600">'+esc(s6t("s6Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5655,6 +5659,121 @@ function sci6LessonAction(a,el){
   else if(a==="s6p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
   else if(a==="s6again"){S6SN={step:0,closed:false,picked:-1,p1:-1,p2:-1};render()}
   else if(a==="s6hear"){speak(el.getAttribute("data-say"))}
+}
+
+/* ================= שיעור מדע 7: מוצק, נוזל, גז (כיתה ד׳, יחידה uMat) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ד׳ (חומרים - מצבי צבירה).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI7_ON=/(^|[?&])lesson=sci7(&|$)/.test(location.search||"");
+var S7STR={
+he:{s7Title:"שיעור: מוצק, נוזל, גז",s7Goal:"המטרה: להכיר את שלושת מצבי הצבירה - מוצק, נוזל וגז - ולדעת שחימום וקירור משנים את מצב הצבירה של חומר.",s7Start:"מתחילים",s7Step:"שלב {0} מתוך 5",
+    s7V1:"קרחון אחד קטן. מה יקרה לו כשנחמם אותו לאט לאט? לחצו על הכפתור וגלו.",s7Heat:"חממו עוד",
+    s7V2:"הקרח נמס למים, והמים התחממו והפכו לאדים. אותו חומר - שלושה מצבים!",
+    s7Q:"מה קורה לקרח כשמחממים אותו?",s7A0:"הוא נשאר קרח לתמיד",s7A1:"הוא נמס והופך למים",s7A2:"הוא הופך לאבן",
+    s7Why0:"כשמחממים קרח מעל אפס מעלות הוא נמס.",s7Why2:"קרח נמס למים - הוא לא הופך לאבן.",
+    s7Rule:"הכלל: לחומרים יש שלושה מצבי צבירה - מוצק (כמו קרח), נוזל (כמו מים) וגז (כמו אדים). חימום מעביר ממוצק לנוזל ומנוזל לגז, וקירור מחזיר אחורה.",s7RuleEx:"גם להפך: כשמקררים מים במקפיא הם קופאים לקרח.",
+    s7P1:"שמנו כוס מים במקפיא. מה יקרה למים?",s7P1a0:"הם יקפאו ויהפכו לקרח",s7P1a1:"הם יהפכו לאדים",s7P1a2:"לא יקרה כלום",
+    s7P2:"אדים הם מים במצב צבירה של...",s7P2a0:"גז",s7P2a1:"נוזל",s7P2a2:"מוצק",
+    s7Sum:"סיימתם! היום למדנו: לחומרים יש שלושה מצבי צבירה - מוצק, נוזל וגז - וחימום וקירור מעבירים את החומר ביניהם.",
+    s7Again:"מההתחלה",s7Next:"הבא",s7Hear:"השמיעו",s7Correct:"נכון!",s7Wrong:"עוד לא. אפשר לנסות שוב.",s7Check:"בדיקת הבנה",
+    s7Ice:"קרח - מוצק",s7Water:"מים - נוזל",s7Steam:"אדים - גז",s7PrevLesson:"לשיעור הקודם"},
+en:{s7Title:"Lesson: solid, liquid, gas",s7Goal:"The goal: know the three states of matter - solid, liquid and gas - and that heating and cooling change the state of a material.",s7Start:"Start",s7Step:"Step {0} of 5",
+    s7V1:"One small ice cube. What will happen to it if we heat it slowly? Press the button and find out.",s7Heat:"Heat more",
+    s7V2:"The ice melted into water, and the water heated up and turned into steam. The same material - three states!",
+    s7Q:"What happens to ice when we heat it?",s7A0:"It stays ice forever",s7A1:"It melts and becomes water",s7A2:"It turns into a stone",
+    s7Why0:"When ice is heated above zero degrees it melts.",s7Why2:"Ice melts into water - it does not become a stone.",
+    s7Rule:"The rule: materials have three states of matter - solid (like ice), liquid (like water) and gas (like steam). Heating moves from solid to liquid and from liquid to gas, and cooling moves back.",s7RuleEx:"The other way too: when we cool water in a freezer it freezes into ice.",
+    s7P1:"We put a cup of water in the freezer. What will happen to the water?",s7P1a0:"It will freeze and become ice",s7P1a1:"It will become steam",s7P1a2:"Nothing will happen",
+    s7P2:"Steam is water in the state of...",s7P2a0:"gas",s7P2a1:"liquid",s7P2a2:"solid",
+    s7Sum:"Done! Today we learned: materials have three states of matter - solid, liquid and gas - and heating and cooling move the material between them.",
+    s7Again:"From the start",s7Next:"Next",s7Hear:"Listen",s7Correct:"Correct!",s7Wrong:"Not yet. You can try again.",s7Check:"Understanding check",
+    s7Ice:"ice - solid",s7Water:"water - liquid",s7Steam:"steam - gas",s7PrevLesson:"Previous lesson"},
+ru:{s7Title:"Урок: твёрдое, жидкое, газ",s7Goal:"Цель: узнать три состояния вещества - твёрдое, жидкое и газообразное - и что нагревание и охлаждение меняют состояние вещества.",s7Start:"Начинаем",s7Step:"Шаг {0} из 5",
+    s7V1:"Один маленький кубик льда. Что с ним будет, если нагревать его медленно? Нажмите кнопку и узнайте.",s7Heat:"Нагреть ещё",
+    s7V2:"Лёд растаял и стал водой, а вода нагрелась и превратилась в пар. То же вещество - три состояния!",
+    s7Q:"Что происходит со льдом, когда его нагревают?",s7A0:"Он остаётся льдом навсегда",s7A1:"Он тает и становится водой",s7A2:"Он превращается в камень",
+    s7Why0:"Когда лёд нагревают выше нуля градусов, он тает.",s7Why2:"Лёд тает и становится водой - он не превращается в камень.",
+    s7Rule:"Правило: у веществ есть три состояния - твёрдое (как лёд), жидкое (как вода) и газообразное (как пар). Нагревание переводит из твёрдого в жидкое и из жидкого в газ, а охлаждение возвращает обратно.",s7RuleEx:"И наоборот: когда воду охлаждают в морозилке, она замерзает и становится льдом.",
+    s7P1:"Мы поставили стакан воды в морозилку. Что будет с водой?",s7P1a0:"Она замёрзнет и станет льдом",s7P1a1:"Она станет паром",s7P1a2:"Ничего не будет",
+    s7P2:"Пар - это вода в состоянии...",s7P2a0:"газ",s7P2a1:"жидкость",s7P2a2:"твёрдое тело",
+    s7Sum:"Готово! Сегодня мы узнали: у веществ есть три состояния - твёрдое, жидкое и газообразное - и нагревание и охлаждение переводят вещество между ними.",
+    s7Again:"Сначала",s7Next:"Дальше",s7Hear:"Слушать",s7Correct:"Верно!",s7Wrong:"Пока нет. Можно ещё раз.",s7Check:"Проверка понимания",
+    s7Ice:"лёд - твёрдое",s7Water:"вода - жидкость",s7Steam:"пар - газ",s7PrevLesson:"Прошлый урок"},
+ar:{s7Title:"درس: صلب، سائل، غاز",s7Goal:"الهدف: أن نتعرف على حالات المادة الثلاث - الصلبة والسائلة والغازية - ونعرف أن التسخين والتبريد يغيّران حالة المادة.",s7Start:"نبدأ",s7Step:"الخطوة {0} من 5",
+    s7V1:"مكعب ثلج صغير واحد. ماذا سيحدث له إذا سخّنّاه ببطء؟ اضغطوا على الزر واكتشفوا.",s7Heat:"سخّنوا أكثر",
+    s7V2:"الثلج ذاب وصار ماءً، والماء سخن وتحوّل إلى بخار. نفس المادة - ثلاث حالات!",
+    s7Q:"ماذا يحدث للثلج عندما نسخّنه؟",s7A0:"يبقى ثلجًا إلى الأبد",s7A1:"يذوب ويصبح ماءً",s7A2:"يتحول إلى حجر",
+    s7Why0:"عندما نسخّن الثلج فوق درجة الصفر فهو يذوب.",s7Why2:"الثلج يذوب ويصبح ماءً - لا يتحول إلى حجر.",
+    s7Rule:"القاعدة: للمواد ثلاث حالات - صلبة (مثل الثلج)، سائلة (مثل الماء) وغازية (مثل البخار). التسخين ينقل من صلب إلى سائل ومن سائل إلى غاز، والتبريد يعيد إلى الوراء.",s7RuleEx:"والعكس أيضًا: عندما نبرّد الماء في المجمّد فهو يتجمد ويصبح ثلجًا.",
+    s7P1:"وضعنا كوب ماء في المجمّد. ماذا سيحدث للماء؟",s7P1a0:"سيتجمد ويصبح ثلجًا",s7P1a1:"سيصبح بخارًا",s7P1a2:"لن يحدث شيء",
+    s7P2:"البخار هو ماء في حالة...",s7P2a0:"غازية",s7P2a1:"سائلة",s7P2a2:"صلبة",
+    s7Sum:"انتهيتم! اليوم تعلمنا: للمواد ثلاث حالات - صلبة وسائلة وغازية - والتسخين والتبريد ينقلان المادة بينها.",
+    s7Again:"من البداية",s7Next:"التالي",s7Hear:"استمعوا",s7Correct:"صحيح!",s7Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s7Check:"فحص الفهم",
+    s7Ice:"ثلج - صلب",s7Water:"ماء - سائل",s7Steam:"بخار - غاز",s7PrevLesson:"الدرس السابق"}};
+function s7t(k){var d=S7STR[state.settings.lang||"he"]||S7STR.he;var v=d[k];return v===undefined?(S7STR.en[k]||k):v}
+var S7SN={step:0,heat:0,picked:-1,p1:-1,p2:-1};
+function s7Scene(heat){
+  var stages=[["🧊","s7Ice"],["💧","s7Water"],["💨","s7Steam"]];
+  return '<div class="card" style="padding:22px;margin:16px auto;max-width:460px;text-align:center">'+
+    '<div style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap">'+stages.map(function(sg,i){
+      return (i>0?'<span style="font-size:1.3rem;color:'+(i<=heat?'#ea580c':'#cbd5e1')+'">'+(document.documentElement.dir==="rtl"?"◀":"▶")+'</span>':"")+
+        '<div style="opacity:'+(i===heat?'1':'.35')+';transition:opacity .3s"><div style="font-size:2.6rem">'+sg[0]+'</div>'+
+        '<div style="font-size:.85rem;font-weight:700;margin-top:4px">'+esc(s7t(sg[1]))+'</div></div>';
+    }).join("")+'</div></div>';
+}
+function s7HearBtn(text){return '<button class="btn btn-g" data-a="s7hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s7t("s7Hear"))+'</button>'}
+function sci7LessonView(){
+  var st=S7SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s7t("s7Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s7t("s7Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s7t("s7Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s7next",s7t("s7Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s7HearBtn(s7t("s7Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s7t(st.heat>=2?"s7V2":"s7V1"))+'</p>';
+    h+=s7Scene(st.heat);
+    if(st.heat<2){
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s7heat",s7t("s7Heat"),'background:#b45309;color:#fff;font-weight:700')+s7HearBtn(s7t("s7V1"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s7next",s7t("s7Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s7HearBtn(s7t("s7V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s7t("s7Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s7t("s7Q"))+'</p>';
+    h+=lsOpts([s7t("s7A0"),s7t("s7A1"),s7t("s7A2")],st.picked,1,"s7pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s7t({0:"s7Why0",2:"s7Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s7t("s7Correct"):s7t("s7Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s7next",s7t("s7Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s7t("s7Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(s7t("s7RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s7next",s7t("s7Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s7HearBtn(s7t("s7Rule")+" "+s7t("s7RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s7t("s7P1"))+'</p>';
+    h+=lsOpts([s7t("s7P1a0"),s7t("s7P1a1"),s7t("s7P1a2")],st.p1,0,"s7p1");
+    if(st.p1===0){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s7t("s7P2"))+'</p>';
+      h+=lsOpts([s7t("s7P2a0"),s7t("s7P2a1"),s7t("s7P2a2")],st.p2,0,"s7p2");
+    }
+    if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s7t("s7Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s7next",s7t("s7Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s7t("s7Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s7again",s7t("s7Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s7HearBtn(s7t("s7Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci6" style="color:#1d4ed8;font-weight:600">'+esc(s7t("s7PrevLesson"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci7LessonAction(a,el){
+  var st=S7SN;
+  if(a==="s7next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s7heat"){st.heat=Math.min(st.heat+1,2);render();if(st.heat===2)speak(s7t("s7V2"))}
+  else if(a==="s7pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s7p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s7p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s7again"){S7SN={step:0,heat:0,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s7hear"){speak(el.getAttribute("data-say"))}
 }
 
 /* ================= boot ================= */
@@ -5698,7 +5817,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s109-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s110-pwa1").catch(function(){});
   });
 }
 </script>
