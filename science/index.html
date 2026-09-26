@@ -1304,22 +1304,22 @@ errTitle:"حدث خطأ صغير",errMsg:"جرّب تحديث الصفحة.",err
 STR.he.navUnits="יחידות";STR.he.unitsTitle="מדע וטכנולוגיה לכיתות ג׳–ו׳";
 STR.he.unitsIntro="היחידות בנויות לפי מיקוד הלמידה במדע וטכנולוגיה של משרד החינוך. התוכן נכתב במקור במיוחד לאתר, וכל שיעור מוקרא בעברית מדוברת.";
 STR.he.gradeA="כיתה ג׳";STR.he.gradeB="כיתה ד׳";STR.he.gradeC="כיתה ה׳";STR.he.gradeD="כיתה ו׳";
-STR.he.comingSoon="בקרוב";STR.he.mikudLink="מיקוד הלמידה של משרד החינוך (PDF)";
+STR.he.comingSoon="בקרוב";STR.he.startLesson="לשיעור";STR.he.mikudLink="מיקוד הלמידה של משרד החינוך (PDF)";
 STR.he.uBio="מערכות ותהליכים ביצורים חיים";STR.he.uEco="מערכות אקולוגיות";STR.he.uMat="חומרים";STR.he.uErg="אנרגיה";
 STR.en.navUnits="Units";STR.en.unitsTitle="Science and technology for grades 3-6";
 STR.en.unitsIntro="Units follow the Ministry of Education science and technology learning-focus document. Content is written originally for this site, and every lesson is read aloud in spoken Hebrew.";
 STR.en.gradeA="Grade 3";STR.en.gradeB="Grade 4";STR.en.gradeC="Grade 5";STR.en.gradeD="Grade 6";
-STR.en.comingSoon="Coming soon";STR.en.mikudLink="MoE learning-focus document (PDF)";
+STR.en.comingSoon="Coming soon";STR.en.startLesson="To the lesson";STR.en.mikudLink="MoE learning-focus document (PDF)";
 STR.en.uBio="Systems and processes in living organisms";STR.en.uEco="Ecological systems";STR.en.uMat="Materials";STR.en.uErg="Energy";
 STR.ru.navUnits="Разделы";STR.ru.unitsTitle="Наука и технология для 3-6 классов";
 STR.ru.unitsIntro="Разделы построены по документу Министерства просвещения о фокусе обучения естествознанию и технологии. Материал написан специально для сайта, и каждый урок озвучен на разговорном иврите.";
 STR.ru.gradeA="3 класс";STR.ru.gradeB="4 класс";STR.ru.gradeC="5 класс";STR.ru.gradeD="6 класс";
-STR.ru.comingSoon="Скоро";STR.ru.mikudLink="Документ Минпроса о фокусе обучения (PDF)";
+STR.ru.comingSoon="Скоро";STR.ru.startLesson="К уроку";STR.ru.mikudLink="Документ Минпроса о фокусе обучения (PDF)";
 STR.ru.uBio="Системы и процессы в живых организмах";STR.ru.uEco="Экологические системы";STR.ru.uMat="Вещества";STR.ru.uErg="Энергия";
 STR.ar.navUnits="الوحدات";STR.ar.unitsTitle="العلوم والتكنولوجيا للصفوف الثالث حتى السادس";
 STR.ar.unitsIntro="الوحدات مبنية وفق وثيقة ميكود التعلّم في العلوم والتكنولوجيا لوزارة التربية والتعليم. المحتوى مكتوب أصلًا خصيصًا للموقع، وكل درس يُسمع بالعبرية المنطوقة.";
 STR.ar.gradeA="الصف الثالث";STR.ar.gradeB="الصف الرابع";STR.ar.gradeC="الصف الخامس";STR.ar.gradeD="الصف السادس";
-STR.ar.comingSoon="قريبًا";STR.ar.mikudLink="وثيقة ميكود التعلّم لوزارة التربية (PDF)";
+STR.ar.comingSoon="قريبًا";STR.ar.startLesson="إلى الدرس";STR.ar.mikudLink="وثيقة ميكود التعلّم لوزارة التربية (PDF)";
 STR.ar.uBio="الأنظمة والعمليات في الكائنات الحية";STR.ar.uEco="أنظمة بيئية";STR.ar.uMat="المواد";STR.ar.uErg="الطاقة";
 function T(){return STR[state.settings.lang||"he"]||STR.he}
 
@@ -2394,8 +2394,8 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s103 · 2026-09-26";
-var view="units";
+var BUILD="s104 · 2026-09-26";
+var view=/[?&]lesson=sci1(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
 var confirmReset=false,vMore=false;
@@ -2479,12 +2479,18 @@ function unitsView(){
   var h='<div class="wrap" style="padding-top:22px;padding-bottom:40px;max-width:820px;margin:0 auto">'+
     '<h1 class="fd" style="font-size:1.7rem;margin:0 0 10px">'+esc(t.unitsTitle)+'</h1>'+
     '<p style="color:var(--ink-soft);margin:0 0 24px;line-height:1.7">'+esc(t.unitsIntro)+'</p>';
-  UNITS.forEach(function(u){
+  UNITS.forEach(function(u,ui){
     h+='<h2 class="fd" style="font-size:1.2rem;margin:22px 0 10px">'+esc(t[u.grade])+'</h2><div style="display:grid;gap:10px">';
-    u.topics.forEach(function(tp){
+    u.topics.forEach(function(tp,ti){
+      if(ui===0&&ti===0){
+        h+='<a href="?internal=shlav-internal-science&lesson=sci1" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
+          '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
+          '<span class="chip" style="font-size:.8rem;background:var(--teal);color:#fff">'+esc(t.startLesson)+'</span></a>';
+      }else{
       h+='<div class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;opacity:.75">'+
         '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
         '<span class="chip warn" style="font-size:.8rem">'+esc(t.comingSoon)+'</span></div>';
+      }
     });
     h+='</div><p style="margin:8px 0 0;font-size:.82rem"><a href="https://meyda.education.gov.il/files/popCharedi/files/science/'+u.pdf+'-mikud-tashpag.pdf" target="_blank" rel="noopener" style="color:var(--ink-faint)">'+esc(t.mikudLink)+'</a></p>';
   });
@@ -4453,6 +4459,7 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="progress")html+=progressView();
     else if(view==="records")html+=recordsView();
     else if(view==="lesson"&&LESSON_ON)html+=lessonView();
+    else if(view==="lesson"&&SCI_LESSON_ON)html+=sciLessonView();
     else if(view==="settings")html+=settingsView();
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
@@ -4617,6 +4624,7 @@ function onAction(a,el){
   var t=T();
   if(examAction(a,el))return;
   if(/^ls/.test(a)&&LESSON_ON){lessonAction(a,el);return}
+  if(/^sl/.test(a)&&SCI_LESSON_ON){sciLessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -4926,6 +4934,123 @@ function lessonAction(a,el){
   else if(a==="lshear"){speak(el.getAttribute("data-say"))}
 }
 
+
+/* ================= שיעור מדע 1: חי ודומם (כיתה ג׳, יחידה uBio) ================= */
+/* תוכן מקורי שנכתב לאתר לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ג׳
+   (מאפייני החיים, צרכים לקיום יצורים). ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI_LESSON_ON=/(^|[?&])lesson=sci1(&|$)/.test(location.search||"");
+var SLSTR={
+he:{slTitle:"שיעור: איך יודעים שמשהו חי?",slGoal:"המטרה: לגלות מה משותף לכל היצורים החיים, ואיך מבדילים בין חי לדומם.",slStart:"מתחילים",slStep:"שלב {0} מתוך 5",
+    slV1:"בחצר יש צמח, חתול ואבן. מי מהם חי?",slV1b:"לחצו על הכפתור וגלו מי חי — ונסו לחשוב למה.",slReveal:"גלו מי חי",
+    slV2:"הצמח והחתול חיים. האבן דומם — הוא לא חי. אז מה משותף לצמח ולחתול?",
+    slQ:"מה משותף לצמח ולחתול?",slA0:"שניהם גדולים",slA1:"שניהם זקוקים למזון ולמים כדי לחיות",slA2:"שניהם יודעים לרוץ",
+    slWhy0:"גודל לא קובע — גם נמלה קטנה היא יצור חי.",slWhy2:"צמח לא רץ, אבל הוא בכל זאת חי.",
+    slRule:"הכלל: כל יצור חי גדל, זקוק למזון ולמים, מעלה צאצאים ומגיב לסביבה.",slRuleEx:"דומם, כמו אבן או כיסא, לא עושה אף אחד מהדברים האלה.",
+    slP1:"האם אבן היא יצור חי?",slP1a0:"כן, כי היא קשה",slP1a1:"לא, כי היא לא גדלה ולא זקוקה למזון",slP1a2:"כן, כי היא בחוץ",
+    slP2:"מה קורה לצמח שלא משקים זמן רב?",slP2a0:"הוא גדל מהר יותר",slP2a1:"לא קורה כלום",slP2a2:"הוא נובל, כי הוא זקוק למים",
+    slSum:"סיימתם! היום למדנו: יצור חי גדל, זקוק למזון ולמים, מעלה צאצאים ומגיב לסביבה. דומם לא עושה את הדברים האלה.",
+    slAgain:"מההתחלה",slNext:"הבא",slHear:"השמיעו",slCorrect:"נכון!",slWrong:"עוד לא. אפשר לנסות שוב.",slCheck:"בדיקת הבנה",
+    slPlant:"צמח",slCat:"חתול",slRock:"אבן",slAlive:"חי",slStill:"דומם"},
+en:{slTitle:"Lesson: how do we know something is alive?",slGoal:"The goal: discover what all living things share, and how to tell living from non-living.",slStart:"Start",slStep:"Step {0} of 5",
+    slV1:"In the yard there is a plant, a cat and a rock. Which of them is alive?",slV1b:"Press the button to reveal who is alive - and try to think why.",slReveal:"Reveal who is alive",
+    slV2:"The plant and the cat are alive. The rock is non-living. So what do the plant and the cat share?",
+    slQ:"What do the plant and the cat share?",slA0:"Both are big",slA1:"Both need food and water to live",slA2:"Both can run",
+    slWhy0:"Size does not decide - a tiny ant is alive too.",slWhy2:"A plant does not run, but it is still alive.",
+    slRule:"The rule: every living thing grows, needs food and water, has offspring and responds to its surroundings.",slRuleEx:"A non-living thing, like a rock or a chair, does none of these.",
+    slP1:"Is a rock a living thing?",slP1a0:"Yes, because it is hard",slP1a1:"No, because it does not grow and does not need food",slP1a2:"Yes, because it is outside",
+    slP2:"What happens to a plant that is not watered for a long time?",slP2a0:"It grows faster",slP2a1:"Nothing happens",slP2a2:"It wilts, because it needs water",
+    slSum:"Done! Today we learned: a living thing grows, needs food and water, has offspring and responds to its surroundings. A non-living thing does not.",
+    slAgain:"From the start",slNext:"Next",slHear:"Listen",slCorrect:"Correct!",slWrong:"Not yet. You can try again.",slCheck:"Understanding check",
+    slPlant:"plant",slCat:"cat",slRock:"rock",slAlive:"alive",slStill:"non-living"},
+ru:{slTitle:"Урок: как понять, что что-то живое?",slGoal:"Цель: узнать, что общего у всех живых существ, и как отличить живое от неживого.",slStart:"Начинаем",slStep:"Шаг {0} из 5",
+    slV1:"Во дворе есть растение, кошка и камень. Кто из них живой?",slV1b:"Нажмите кнопку и узнайте, кто живой - и попробуйте подумать почему.",slReveal:"Узнать, кто живой",
+    slV2:"Растение и кошка живые. Камень неживой. Так что общего у растения и кошки?",
+    slQ:"Что общего у растения и кошки?",slA0:"Оба большие",slA1:"Оба нуждаются в еде и воде, чтобы жить",slA2:"Оба умеют бегать",
+    slWhy0:"Размер не решает - маленький муравей тоже живой.",slWhy2:"Растение не бегает, но оно всё равно живое.",
+    slRule:"Правило: каждое живое существо растёт, нуждается в еде и воде, имеет потомство и реагирует на окружение.",slRuleEx:"Неживой предмет, как камень или стул, не делает ничего из этого.",
+    slP1:"Является ли камень живым существом?",slP1a0:"Да, потому что он твёрдый",slP1a1:"Нет, потому что он не растёт и не нуждается в еде",slP1a2:"Да, потому что он на улице",
+    slP2:"Что будет с растением, которое долго не поливают?",slP2a0:"Оно вырастет быстрее",slP2a1:"Ничего не случится",slP2a2:"Оно завянет, потому что ему нужна вода",
+    slSum:"Готово! Сегодня мы узнали: живое существо растёт, нуждается в еде и воде, имеет потомство и реагирует на окружение. Неживое этого не делает.",
+    slAgain:"Сначала",slNext:"Дальше",slHear:"Слушать",slCorrect:"Верно!",slWrong:"Пока нет. Можно ещё раз.",slCheck:"Проверка понимания",
+    slPlant:"растение",slCat:"кошка",slRock:"камень",slAlive:"живое",slStill:"неживое"},
+ar:{slTitle:"درس: كيف نعرف أن شيئًا ما حي؟",slGoal:"الهدف: أن نكتشف ما المشترك بين كل الكائنات الحية، وكيف نميّز بين الحي وغير الحي.",slStart:"نبدأ",slStep:"الخطوة {0} من 5",
+    slV1:"في الساحة نبتة وقطة وحجر. مَن منها حي؟",slV1b:"اضغطوا على الزر واكتشفوا من هو الحي - وحاولوا أن تفكروا لماذا.",slReveal:"اكتشفوا من هو الحي",
+    slV2:"النبتة والقطة حيّان. الحجر غير حي. إذن ما المشترك بين النبتة والقطة؟",
+    slQ:"ما المشترك بين النبتة والقطة؟",slA0:"كلاهما كبير",slA1:"كلاهما يحتاج إلى الغذاء والماء ليعيش",slA2:"كلاهما يستطيع الجري",
+    slWhy0:"الحجم لا يقرر - فالنملة الصغيرة حية أيضًا.",slWhy2:"النبتة لا تجري، لكنها حية مع ذلك.",
+    slRule:"القاعدة: كل كائن حي ينمو، يحتاج إلى الغذاء والماء، يتكاثر ويتفاعل مع بيئته.",slRuleEx:"غير الحي، مثل الحجر أو الكرسي، لا يفعل أيًّا من هذه الأشياء.",
+    slP1:"هل الحجر كائن حي؟",slP1a0:"نعم، لأنه صلب",slP1a1:"لا، لأنه لا ينمو ولا يحتاج إلى الغذاء",slP1a2:"نعم، لأنه في الخارج",
+    slP2:"ماذا يحدث لنبتة لا تُسقى مدة طويلة؟",slP2a0:"تنمو أسرع",slP2a1:"لا يحدث شيء",slP2a2:"تذبل، لأنها تحتاج إلى الماء",
+    slSum:"انتهيتم! اليوم تعلمنا: الكائن الحي ينمو، يحتاج إلى الغذاء والماء، يتكاثر ويتفاعل مع بيئته. غير الحي لا يفعل ذلك.",
+    slAgain:"من البداية",slNext:"التالي",slHear:"استمعوا",slCorrect:"صحيح!",slWrong:"ليس بعد. يمكن المحاولة مرة أخرى.",slCheck:"فحص الفهم",
+    slPlant:"نبتة",slCat:"قطة",slRock:"حجر",slAlive:"حي",slStill:"غير حي"}};
+function slt(k){var d=SLSTR[state.settings.lang||"he"]||SLSTR.he;var v=d[k];return v===undefined?(SLSTR.en[k]||k):v}
+var SLSN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+function slScene(revealed){
+  var items=[["🌱","slPlant",true],["🐈","slCat",true],["🪨","slRock",false]];
+  return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
+    return '<div class="card" style="text-align:center;padding:18px 22px;min-width:110px">'+
+      '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(slt(it[1]))+'</div>'+
+      (revealed?'<div style="margin-top:8px;font-weight:800;color:'+(it[2]?'#0e9c8d':'#bf4426')+'">'+esc(slt(it[2]?"slAlive":"slStill"))+'</div>':'')+
+      '</div>';
+  }).join("")+'</div>';
+}
+function slHearBtn(text){return '<button class="btn btn-g" data-a="slhear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(slt("slHear"))+'</button>'}
+function sciLessonView(){
+  var st=SLSN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(slt("slStep"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(slt("slTitle"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(slt("slGoal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("slnext",slt("slStart"),'background:#1d4ed8;color:#fff;font-weight:700')+slHearBtn(slt("slGoal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(slt(st.revealed?"slV2":"slV1"))+'</p>';
+    h+=slScene(st.revealed);
+    if(!st.revealed){
+      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(slt("slV1b"))+'</p>';
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("slreveal",slt("slReveal"),'background:#b45309;color:#fff;font-weight:700')+slHearBtn(slt("slV1")+" "+slt("slV1b"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("slnext",slt("slNext"),'background:#1d4ed8;color:#fff;font-weight:700')+slHearBtn(slt("slV2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(slt("slCheck"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(slt("slQ"))+'</p>';
+    h+=slScene(true);
+    h+=lsOpts([slt("slA0"),slt("slA1"),slt("slA2")],st.picked,1,"slpick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":slt({0:"slWhy0",2:"slWhy2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?slt("slCorrect"):slt("slWrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("slnext",slt("slNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(slt("slRule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(slt("slRuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("slnext",slt("slNext"),'background:#1d4ed8;color:#fff;font-weight:700')+slHearBtn(slt("slRule")+" "+slt("slRuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(slt("slP1"))+'</p>';
+    h+=lsOpts([slt("slP1a0"),slt("slP1a1"),slt("slP1a2")],st.p1,1,"slp1");
+    if(st.p1===1){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(slt("slP2"))+'</p>';
+      h+=lsOpts([slt("slP2a0"),slt("slP2a1"),slt("slP2a2")],st.p2,2,"slp2");
+    }
+    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(slt("slCorrect"))+'</p><div style="margin-top:10px">'+lsBtn("slnext",slt("slNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(slt("slSum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("slagain",slt("slAgain"),'background:#0e9c8d;color:#fff;font-weight:700')+slHearBtn(slt("slSum"))+'</div>';
+  }
+  return h+'</div>';
+}
+function sciLessonAction(a,el){
+  var st=SLSN;
+  if(a==="slnext"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="slreveal"){st.revealed=true;render();speak(slt("slV2"))}
+  else if(a==="slpick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="slp1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="slp2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="slagain"){SLSN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="slhear"){speak(el.getAttribute("data-say"))}
+}
+
 /* ================= boot ================= */
 applyModes();
 if(view==="practice")startRound(activeLevel());
@@ -4967,7 +5092,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s103-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s104-pwa1").catch(function(){});
   });
 }
 </script>
