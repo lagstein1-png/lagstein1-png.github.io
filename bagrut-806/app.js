@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x102 · 2026-09-26";
+  var BUILD = "x103 · 2026-09-26";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -1447,7 +1447,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x102-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x103-pwa1").catch(function () {});
     });
   }
 

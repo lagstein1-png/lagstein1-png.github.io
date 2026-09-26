@@ -221,6 +221,17 @@ function rate(){
 }
 function setRate(v){ try{ localStorage.setItem(RATE_KEY, String(v)) }catch(e){} }
 
+/* סגירת הודעת ״לא זוהה קול נשי״ — נשמרת לשפה, במכשיר הזה. */
+var MAN_KEY = "tutor-man-note-v1";
+function manDismissed(){
+  try{ var m = JSON.parse(localStorage.getItem(MAN_KEY) || "{}") || {};
+       return !!m[VOICE[lang()] || "he-IL"] }catch(e){ return false }
+}
+function manDismiss(){
+  try{ var m = JSON.parse(localStorage.getItem(MAN_KEY) || "{}") || {};
+       m[VOICE[lang()] || "he-IL"] = 1; localStorage.setItem(MAN_KEY, JSON.stringify(m)) }catch(e){}
+}
+
 /* ================= הקראה =================
    מנוע משלה, ולא ה-speak של האפליקציה המארחת. שלוש סיבות:
    הדרישה היא כפתורי הקראה/עצירה/מהירות על תשובת הבוט עצמה;
@@ -758,6 +769,13 @@ var CSS = ''
 +'max-height:60vh;max-height:60dvh;display:flex;flex-direction:column;overflow:hidden;'
 +'box-shadow:0 18px 50px rgba(0,0,0,.3);font-size:19px;line-height:1.75;'
 +'letter-spacing:.01em;word-spacing:.05em}'
+/* **גובה מלא בטלפון — 26.9.2026, הבעלים באנדרואיד:** ״כל הדרך
+   של המורה מסרבל אולי שיהיה על כל האורך״. הגיליון על 60dvh
+   השאיר לאזור השיחה פחות משתי בועות, והבועה הצהובה של הקול
+   מילאה את רובו. בטלפון הפאנל תופס את כל הגובה; ״צמצום״ עדיין
+   מקפל לפס קלט אחד, ומצב מקלדת (`tu-kb`) גובר בספציפיות. */
++'@media(max-width:899px){#tu-bx{max-height:none;height:100vh;height:100dvh;border-radius:0}'
++'#tu-ov.tu-min #tu-bx{height:auto}}'
 /* נטוי הוא הצורה שהכי קשה לפענח בדיסלקציה: האותיות נשענות זו על
    זו והמרווח ביניהן מתכווץ. כל הדגשה בפאנל היא משקל, לא הטיה. */
 +'#tu-bx em,#tu-bx i,#tu-bx cite{font-style:normal;font-weight:700}'
@@ -821,6 +839,14 @@ var CSS = ''
 +'.tu-sg button{white-space:normal}}'
 +'.tu-sg button:hover{background:#dff1fa}'
 +'.tu-sys{color:#4c666e;font-size:.92rem}'
+/* הודעת ״לא זוהה קול נשי״ — שורה קטנה עם ×, לא גוש צהוב שממלא
+   את השיחה (הצילום של הבעלים, 26.9.2026). */
++'.tu-man{display:flex;gap:6px;align-items:flex-start;margin-top:9px;background:#fff3ce;'
++'border:1px solid #e6b800;border-radius:10px;padding:6px 10px;font-size:.8rem;line-height:1.55;'
++'color:#17333c;align-self:stretch}'
++'.tu-man span{flex:1 1 auto;min-width:0}'
++'.tu-man button{flex:0 0 auto;background:transparent;border:0;color:inherit;font:inherit;'
++'font-size:1.15rem;line-height:1;cursor:pointer;padding:2px 8px;min-height:0}'
 +'.tu-note{background:#fff3ce;border:2px solid rgba(230,184,0,.55);border-radius:13px;padding:10px 14px}'
 +'.tu-ctl{display:flex;gap:9px;align-items:center;margin-top:9px;flex-wrap:wrap}'
 /* כפתורים גדולים וצבעוניים — גובה 46px כמו שאר כפתורי המגע
@@ -874,6 +900,7 @@ var CSS = ''
 +'.tu-sg button{background:#12303d;color:#eaf6fa;border-color:#2f6a86}'
 +'.tu-sg button:hover{background:#1d3b4a}'
 +'.tu-sys{color:#a9c2ca}#tu-pv{color:#93aeb7}.tu-edge{color:#fff3ce}'
++'.tu-man{background:#3d3410;border-color:#8a6d00;color:#fff3ce}'
 +'#tu-edge{background:#3d3410;border-color:#8a6d00}}';
 
 /* שלושת המצבים שהפאנל באמת יודע עליהם, ותו לא:
@@ -988,6 +1015,7 @@ function build(){
     var a = b.getAttribute("data-tu"), i = +b.getAttribute("data-i");
     if(a === "say") say(i);
     else if(a === "stop") stopSay();
+    else if(a === "manx"){ manDismiss(); draw() }
     else if(a === "sugg") send(b.getAttribute("data-s"));
   });
   EL.log.addEventListener("change", function(e){
@@ -1163,8 +1191,9 @@ function ctl(i){
   }
   /* ההודעה מופיעה כשברשימת הקולות של השפה אין קול נשי שעובד —
      כבר לפני ההקראה הראשונה, כדי שהלומד ידע מה לבחור או להתקין. */
-  if(i === MSGS.length - 1 && vl.length && !vl.some(function(v){ return voiceUsable(v) && femScore(v) === 2 }))
-    h += '<span class="tu-sys tu-man">' + esc(t.manNote) + ' ' + esc(voiceHow()) + '</span>';
+  if(i === MSGS.length - 1 && vl.length && !vl.some(function(v){ return voiceUsable(v) && femScore(v) === 2 }) && !manDismissed())
+    h += '<div class="tu-man"><span>' + esc(t.manNote) + ' ' + esc(voiceHow()) + '</span>'
+       + '<button type="button" data-tu="manx" aria-label="' + esc(t.close) + '">×</button></div>';
   return h + '</div>';
 }
 
