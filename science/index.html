@@ -2394,8 +2394,8 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s105 · 2026-09-26";
-var view=/[?&]lesson=sci[12](&|$)/.test(location.search||"")?"lesson":"units";
+var BUILD="s106 · 2026-09-26";
+var view=/[?&]lesson=sci[123](&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
 var confirmReset=false,vMore=false;
@@ -4461,6 +4461,7 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="lesson"&&LESSON_ON)html+=lessonView();
     else if(view==="lesson"&&SCI_LESSON_ON)html+=sciLessonView();
     else if(view==="lesson"&&SCI2_ON)html+=sci2LessonView();
+    else if(view==="lesson"&&SCI3_ON)html+=sci3LessonView();
     else if(view==="settings")html+=settingsView();
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
@@ -4627,6 +4628,7 @@ function onAction(a,el){
   if(/^ls/.test(a)&&LESSON_ON){lessonAction(a,el);return}
   if(/^sl/.test(a)&&SCI_LESSON_ON){sciLessonAction(a,el);return}
   if(/^s2/.test(a)&&SCI2_ON){sci2LessonAction(a,el);return}
+  if(/^s3/.test(a)&&SCI3_ON){sci3LessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -5105,6 +5107,7 @@ ar:{s2Title:"درس: ماذا نحتاج لنعيش؟",s2Goal:"الهدف: أن 
     s2Sum:"انتهيتم! اليوم تعلمنا: كل كائن حي يحتاج إلى الغذاء والماء والهواء - والنباتات تحتاج أيضًا إلى ضوء الشمس.",
     s2Again:"من البداية",s2Next:"التالي",s2Hear:"استمعوا",s2Correct:"صحيح!",s2Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s2Check:"فحص الفهم",
     s2With:"مع ماء وضوء",s2Without:"بدون ماء وضوء",s2NextLesson:"الدرس السابق"}};
+S2STR.he.s2Fwd="לשיעור הבא";S2STR.en.s2Fwd="Next lesson";S2STR.ru.s2Fwd="Следующий урок";S2STR.ar.s2Fwd="الدرس التالي";
 function s2t(k){var d=S2STR[state.settings.lang||"he"]||S2STR.he;var v=d[k];return v===undefined?(S2STR.en[k]||k):v}
 var S2SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function s2Scene(revealed){
@@ -5157,7 +5160,7 @@ function sci2LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s2t("s2Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s2again",s2t("s2Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s2HearBtn(s2t("s2Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci1" style="color:#1d4ed8;font-weight:600">'+esc(s2t("s2NextLesson"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci1" style="color:#1d4ed8;font-weight:600">'+esc(s2t("s2NextLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci3" style="color:#1d4ed8;font-weight:600">'+esc(s2t("s2Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5170,6 +5173,124 @@ function sci2LessonAction(a,el){
   else if(a==="s2p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
   else if(a==="s2again"){S2SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
   else if(a==="s2hear"){speak(el.getAttribute("data-say"))}
+}
+
+
+/* ================= שיעור מדע 3: תפקידי חלקי הגוף (כיתה ג׳, יחידה uBio) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ג׳ (תפקודים של מערכות
+   ותהליכים ביצורים חיים). ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI3_ON=/(^|[?&])lesson=sci3(&|$)/.test(location.search||"");
+var S3STR={
+he:{s3Title:"שיעור: גוף האדם — מי עושה מה?",s3Goal:"המטרה: להכיר את התפקיד של חלקי הגוף — הלב, הריאות והשרירים — ולהבין שהם עובדים ביחד.",s3Start:"מתחילים",s3Step:"שלב {0} מתוך 5",
+    s3V1:"בגוף שלנו יש חלקים, וכל אחד מהם עושה עבודה אחרת. מי עושה מה?",s3V1b:"לחצו על הכפתור וגלו מה התפקיד של כל חלק.",s3Reveal:"גלו מי עושה מה",
+    s3V2:"הלב שואב דם לכל הגוף, הריאות עוזרות לנו לנשום, והשרירים מזיזים אותנו.",
+    s3Q:"מה התפקיד של הלב?",s3A0:"לעכל אוכל",s3A1:"לשאוב דם לכל הגוף",s3A2:"לעזור לנו לראות",
+    s3Why0:"את האוכל מעכלת הקיבה, לא הלב.",s3Why2:"את הראייה עושות העיניים.",
+    s3Rule:"הכלל: לכל חלק בגוף יש תפקיד משלו, וכל החלקים עובדים ביחד כדי שנחיה.",s3RuleEx:"הלב שואב דם, הריאות נושמות, הקיבה מעכלת, והשרירים מזיזים.",
+    s3P1:"מה עוזר לנו לנשום?",s3P1a0:"הקיבה",s3P1a1:"הריאות",s3P1a2:"השרירים",
+    s3P2:"מה מזיז את הגוף כשרצים?",s3P2a0:"השרירים",s3P2a1:"הלב",s3P2a2:"הריאות",
+    s3Sum:"סיימתם! היום למדנו: לכל חלק בגוף יש תפקיד — הלב שואב דם, הריאות נושמות, והשרירים מזיזים — וכולם עובדים ביחד.",
+    s3Again:"מההתחלה",s3Next:"הבא",s3Hear:"השמיעו",s3Correct:"נכון!",s3Wrong:"עוד לא. אפשר לנסות שוב.",s3Check:"בדיקת הבנה",
+    s3Heart:"לב",s3Lungs:"ריאות",s3Muscles:"שרירים",s3HeartJob:"שואב דם לכל הגוף",s3LungsJob:"עוזרות לנשום",s3MusclesJob:"מזיזים את הגוף",s3PrevLesson:"לשיעור הקודם"},
+en:{s3Title:"Lesson: the human body - who does what?",s3Goal:"The goal: learn the job of body parts - the heart, the lungs and the muscles - and understand that they work together.",s3Start:"Start",s3Step:"Step {0} of 5",
+    s3V1:"Our body has parts, and each one does a different job. Who does what?",s3V1b:"Press the button and discover the job of each part.",s3Reveal:"Reveal who does what",
+    s3V2:"The heart pumps blood to the whole body, the lungs help us breathe, and the muscles move us.",
+    s3Q:"What is the job of the heart?",s3A0:"Digesting food",s3A1:"Pumping blood to the whole body",s3A2:"Helping us see",
+    s3Why0:"The stomach digests food, not the heart.",s3Why2:"The eyes do the seeing.",
+    s3Rule:"The rule: every body part has its own job, and all the parts work together so we can live.",s3RuleEx:"The heart pumps blood, the lungs breathe, the stomach digests, and the muscles move.",
+    s3P1:"What helps us breathe?",s3P1a0:"The stomach",s3P1a1:"The lungs",s3P1a2:"The muscles",
+    s3P2:"What moves the body when we run?",s3P2a0:"The muscles",s3P2a1:"The heart",s3P2a2:"The lungs",
+    s3Sum:"Done! Today we learned: every body part has a job - the heart pumps blood, the lungs breathe, and the muscles move - and they all work together.",
+    s3Again:"From the start",s3Next:"Next",s3Hear:"Listen",s3Correct:"Correct!",s3Wrong:"Not yet. You can try again.",s3Check:"Understanding check",
+    s3Heart:"heart",s3Lungs:"lungs",s3Muscles:"muscles",s3HeartJob:"pumps blood to the whole body",s3LungsJob:"help us breathe",s3MusclesJob:"move the body",s3PrevLesson:"Previous lesson"},
+ru:{s3Title:"Урок: тело человека - кто что делает?",s3Goal:"Цель: узнать задачу частей тела - сердца, лёгких и мышц - и понять, что они работают вместе.",s3Start:"Начинаем",s3Step:"Шаг {0} из 5",
+    s3V1:"В нашем теле есть части, и каждая делает свою работу. Кто что делает?",s3V1b:"Нажмите кнопку и узнайте задачу каждой части.",s3Reveal:"Узнать, кто что делает",
+    s3V2:"Сердце качает кровь по всему телу, лёгкие помогают нам дышать, а мышцы двигают нас.",
+    s3Q:"Какая задача у сердца?",s3A0:"Переваривать еду",s3A1:"Качать кровь по всему телу",s3A2:"Помогать нам видеть",
+    s3Why0:"Еду переваривает желудок, а не сердце.",s3Why2:"Видеть помогают глаза.",
+    s3Rule:"Правило: у каждой части тела своя задача, и все части работают вместе, чтобы мы жили.",s3RuleEx:"Сердце качает кровь, лёгкие дышат, желудок переваривает, а мышцы двигают.",
+    s3P1:"Что помогает нам дышать?",s3P1a0:"Желудок",s3P1a1:"Лёгкие",s3P1a2:"Мышцы",
+    s3P2:"Что двигает тело, когда мы бежим?",s3P2a0:"Мышцы",s3P2a1:"Сердце",s3P2a2:"Лёгкие",
+    s3Sum:"Готово! Сегодня мы узнали: у каждой части тела есть задача - сердце качает кровь, лёгкие дышат, мышцы двигают - и все работают вместе.",
+    s3Again:"Сначала",s3Next:"Дальше",s3Hear:"Слушать",s3Correct:"Верно!",s3Wrong:"Пока нет. Можно ещё раз.",s3Check:"Проверка понимания",
+    s3Heart:"сердце",s3Lungs:"лёгкие",s3Muscles:"мышцы",s3HeartJob:"качает кровь по всему телу",s3LungsJob:"помогают дышать",s3MusclesJob:"двигают тело",s3PrevLesson:"Прошлый урок"},
+ar:{s3Title:"درس: جسم الإنسان - من يفعل ماذا؟",s3Goal:"الهدف: أن نتعرف على وظيفة أعضاء الجسم - القلب والرئتين والعضلات - ونفهم أنها تعمل معًا.",s3Start:"نبدأ",s3Step:"الخطوة {0} من 5",
+    s3V1:"في جسمنا أعضاء، وكل واحد منها يقوم بعمل مختلف. من يفعل ماذا؟",s3V1b:"اضغطوا على الزر واكتشفوا وظيفة كل عضو.",s3Reveal:"اكتشفوا من يفعل ماذا",
+    s3V2:"القلب يضخ الدم إلى كل الجسم، الرئتان تساعداننا على التنفس، والعضلات تحرّكنا.",
+    s3Q:"ما وظيفة القلب؟",s3A0:"هضم الطعام",s3A1:"ضخ الدم إلى كل الجسم",s3A2:"مساعدتنا على الرؤية",
+    s3Why0:"المعدة هي التي تهضم الطعام، وليس القلب.",s3Why2:"العينان تقومان بالرؤية.",
+    s3Rule:"القاعدة: لكل عضو في الجسم وظيفة خاصة به، وكل الأعضاء تعمل معًا لكي نعيش.",s3RuleEx:"القلب يضخ الدم، الرئتان تتنفسان، المعدة تهضم، والعضلات تحرّك.",
+    s3P1:"ما الذي يساعدنا على التنفس؟",s3P1a0:"المعدة",s3P1a1:"الرئتان",s3P1a2:"العضلات",
+    s3P2:"ما الذي يحرّك الجسم عندما نركض؟",s3P2a0:"العضلات",s3P2a1:"القلب",s3P2a2:"الرئتان",
+    s3Sum:"انتهيتم! اليوم تعلمنا: لكل عضو في الجسم وظيفة - القلب يضخ الدم، الرئتان تتنفسان، والعضلات تحرّك - وكلها تعمل معًا.",
+    s3Again:"من البداية",s3Next:"التالي",s3Hear:"استمعوا",s3Correct:"صحيح!",s3Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s3Check:"فحص الفهم",
+    s3Heart:"قلب",s3Lungs:"رئتان",s3Muscles:"عضلات",s3HeartJob:"يضخ الدم إلى كل الجسم",s3LungsJob:"تساعدان على التنفس",s3MusclesJob:"تحرّك الجسم",s3PrevLesson:"الدرس السابق"}};
+function s3t(k){var d=S3STR[state.settings.lang||"he"]||S3STR.he;var v=d[k];return v===undefined?(S3STR.en[k]||k):v}
+var S3SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+function s3Scene(revealed){
+  var items=[["❤️","s3Heart","s3HeartJob"],["🫁","s3Lungs","s3LungsJob"],["💪","s3Muscles","s3MusclesJob"]];
+  return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
+    return '<div class="card" style="text-align:center;padding:18px 22px;min-width:110px;max-width:160px">'+
+      '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(s3t(it[1]))+'</div>'+
+      (revealed?'<div style="margin-top:8px;font-weight:600;color:#0e9c8d;font-size:.95rem">'+esc(s3t(it[2]))+'</div>':'')+
+      '</div>';
+  }).join("")+'</div>';
+}
+function s3HearBtn(text){return '<button class="btn btn-g" data-a="s3hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s3t("s3Hear"))+'</button>'}
+function sci3LessonView(){
+  var st=S3SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s3t("s3Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s3t("s3Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s3t("s3Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s3next",s3t("s3Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s3HearBtn(s3t("s3Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s3t(st.revealed?"s3V2":"s3V1"))+'</p>';
+    h+=s3Scene(st.revealed);
+    if(!st.revealed){
+      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(s3t("s3V1b"))+'</p>';
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s3reveal",s3t("s3Reveal"),'background:#b45309;color:#fff;font-weight:700')+s3HearBtn(s3t("s3V1")+" "+s3t("s3V1b"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s3next",s3t("s3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s3HearBtn(s3t("s3V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s3t("s3Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s3t("s3Q"))+'</p>';
+    h+=s3Scene(true);
+    h+=lsOpts([s3t("s3A0"),s3t("s3A1"),s3t("s3A2")],st.picked,1,"s3pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s3t({0:"s3Why0",2:"s3Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s3t("s3Correct"):s3t("s3Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s3next",s3t("s3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s3t("s3Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(s3t("s3RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s3next",s3t("s3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s3HearBtn(s3t("s3Rule")+" "+s3t("s3RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s3t("s3P1"))+'</p>';
+    h+=lsOpts([s3t("s3P1a0"),s3t("s3P1a1"),s3t("s3P1a2")],st.p1,1,"s3p1");
+    if(st.p1===1){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s3t("s3P2"))+'</p>';
+      h+=lsOpts([s3t("s3P2a0"),s3t("s3P2a1"),s3t("s3P2a2")],st.p2,0,"s3p2");
+    }
+    if(st.p1===1&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s3t("s3Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s3next",s3t("s3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s3t("s3Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s3again",s3t("s3Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s3HearBtn(s3t("s3Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci2" style="color:#1d4ed8;font-weight:600">'+esc(s3t("s3PrevLesson"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci3LessonAction(a,el){
+  var st=S3SN;
+  if(a==="s3next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s3reveal"){st.revealed=true;render();speak(s3t("s3V2"))}
+  else if(a==="s3pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s3p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s3p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s3again"){S3SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s3hear"){speak(el.getAttribute("data-say"))}
 }
 
 /* ================= boot ================= */
@@ -5213,7 +5334,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s105-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s106-pwa1").catch(function(){});
   });
 }
 </script>
