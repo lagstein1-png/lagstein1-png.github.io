@@ -2394,8 +2394,8 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s107 · 2026-09-26";
-var view=/[?&]lesson=sci[1-4](&|$)/.test(location.search||"")?"lesson":"units";
+var BUILD="s108 · 2026-09-26";
+var view=/[?&]lesson=sci[1-5](&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
 var confirmReset=false,vMore=false;
@@ -2482,8 +2482,8 @@ function unitsView(){
   UNITS.forEach(function(u,ui){
     h+='<h2 class="fd" style="font-size:1.2rem;margin:22px 0 10px">'+esc(t[u.grade])+'</h2><div style="display:grid;gap:10px">';
     u.topics.forEach(function(tp,ti){
-      if(ui===0&&(ti===0||ti===1)){
-        h+='<a href="?internal=shlav-internal-science&lesson=sci'+(ti===0?'1':'4')+'" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
+      if(ui===0&&ti<=2){
+        h+='<a href="?internal=shlav-internal-science&lesson=sci'+({0:'1',1:'4',2:'5'})[ti]+'" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
           '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
           '<span class="chip" style="font-size:.8rem;background:var(--teal);color:#fff">'+esc(t.startLesson)+'</span></a>';
       }else{
@@ -4463,6 +4463,7 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="lesson"&&SCI2_ON)html+=sci2LessonView();
     else if(view==="lesson"&&SCI3_ON)html+=sci3LessonView();
     else if(view==="lesson"&&SCI4_ON)html+=sci4LessonView();
+    else if(view==="lesson"&&SCI5_ON)html+=sci5LessonView();
     else if(view==="settings")html+=settingsView();
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
@@ -4631,6 +4632,7 @@ function onAction(a,el){
   if(/^s2/.test(a)&&SCI2_ON){sci2LessonAction(a,el);return}
   if(/^s3/.test(a)&&SCI3_ON){sci3LessonAction(a,el);return}
   if(/^s4/.test(a)&&SCI4_ON){sci4LessonAction(a,el);return}
+  if(/^s5/.test(a)&&SCI5_ON){sci5LessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -5346,6 +5348,7 @@ ar:{s4Title:"درس: بيت للجميع - أين تعيش الكائنات؟",s
     s4Sum:"انتهيتم! اليوم تعلمنا: كل كائن حي يعيش في موطن يناسب احتياجاته - وفيه الغذاء والماء والمأوى.",
     s4Again:"من البداية",s4Next:"التالي",s4Hear:"استمعوا",s4Correct:"صحيح!",s4Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s4Check:"فحص الفهم",
     s4Fish:"سمكة",s4Camel:"جمل",s4Bird:"طائر",s4FishHome:"تعيش في الماء",s4CamelHome:"يعيش في الصحراء",s4BirdHome:"يعيش في السماء وعلى الأشجار",s4PrevLesson:"الدرس السابق"}};
+S4STR.he.s4Fwd="לשיעור הבא";S4STR.en.s4Fwd="Next lesson";S4STR.ru.s4Fwd="Следующий урок";S4STR.ar.s4Fwd="الدرس التالي";
 function s4t(k){var d=S4STR[state.settings.lang||"he"]||S4STR.he;var v=d[k];return v===undefined?(S4STR.en[k]||k):v}
 var S4SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function s4Scene(revealed){
@@ -5399,7 +5402,7 @@ function sci4LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s4t("s4Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s4again",s4t("s4Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s4HearBtn(s4t("s4Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci3" style="color:#1d4ed8;font-weight:600">'+esc(s4t("s4PrevLesson"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci3" style="color:#1d4ed8;font-weight:600">'+esc(s4t("s4PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci5" style="color:#1d4ed8;font-weight:600">'+esc(s4t("s4Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5412,6 +5415,123 @@ function sci4LessonAction(a,el){
   else if(a==="s4p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
   else if(a==="s4again"){S4SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
   else if(a==="s4hear"){speak(el.getAttribute("data-say"))}
+}
+
+
+/* ================= שיעור מדע 5: ממה העולם עשוי? (כיתה ג׳, יחידה uMat) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ג׳ (חומרים).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI5_ON=/(^|[?&])lesson=sci5(&|$)/.test(location.search||"");
+var S5STR={
+he:{s5Title:"שיעור: ממה העולם עשוי?",s5Goal:"המטרה: לדעת שהחפצים סביבנו עשויים מחומרים שונים, ושלכל חומר יש תכונות משלו.",s5Start:"מתחילים",s5Step:"שלב {0} מתוך 5",
+    s5V1:"כיסא מעץ, כף ממתכת ובקבוק מפלסטיק. שלושתם חפצים — אבל כל אחד עשוי מחומר אחר.",s5V1b:"לחצו על הכפתור וגלו מה מיוחד בכל חומר.",s5Reveal:"גלו את התכונות",
+    s5V2:"עץ קל וחם למגע, מתכת קשה ומבריקה, ופלסטיק קל ולא נשבר בקלות.",
+    s5Q:"איזה חומר שקוף — אפשר לראות דרכו?",s5A0:"עץ",s5A1:"זכוכית",s5A2:"מתכת",
+    s5Why0:"דרך עץ אי אפשר לראות.",s5Why2:"מתכת לא שקופה — אי אפשר לראות דרכה.",
+    s5Rule:"הכלל: לכל חומר יש תכונות — קשה או רך, שקוף או אטום, כבד או קל — ובוחרים חומר לפי התכונות שלו.",s5RuleEx:"חלון עשוי מזכוכית כי היא שקופה, וכפית ממתכת כי היא קשה ולא נשברת.",
+    s5P1:"למה החלון עשוי מזכוכית?",s5P1a0:"כי זכוכית שקופה ואפשר לראות דרכה",s5P1a1:"כי זכוכית חמה למגע",s5P1a2:"כי זכוכית לא נשברת אף פעם",
+    s5P2:"איזה חומר מתאים לכפית לאכילה?",s5P2a0:"מתכת — קשה ולא נשברת",s5P2a1:"נייר — קל מאוד",s5P2a2:"זכוכית — שקופה",
+    s5Sum:"סיימתם! היום למדנו: החפצים עשויים מחומרים שונים, ובוחרים את החומר לפי התכונות שלו — קשה, שקוף, קל ועוד.",
+    s5Again:"מההתחלה",s5Next:"הבא",s5Hear:"השמיעו",s5Correct:"נכון!",s5Wrong:"עוד לא. אפשר לנסות שוב.",s5Check:"בדיקת הבנה",
+    s5Wood:"עץ",s5Metal:"מתכת",s5Plastic:"פלסטיק",s5WoodProp:"קל וחם למגע",s5MetalProp:"קשה ומבריקה",s5PlasticProp:"קל ולא נשבר בקלות",s5PrevLesson:"לשיעור הקודם"},
+en:{s5Title:"Lesson: what is the world made of?",s5Goal:"The goal: know that the objects around us are made of different materials, and each material has its own properties.",s5Start:"Start",s5Step:"Step {0} of 5",
+    s5V1:"A wooden chair, a metal spoon and a plastic bottle. All three are objects - but each is made of a different material.",s5V1b:"Press the button and discover what is special about each material.",s5Reveal:"Reveal the properties",
+    s5V2:"Wood is light and warm to touch, metal is hard and shiny, and plastic is light and does not break easily.",
+    s5Q:"Which material is transparent - you can see through it?",s5A0:"Wood",s5A1:"Glass",s5A2:"Metal",
+    s5Why0:"You cannot see through wood.",s5Why2:"Metal is not transparent.",
+    s5Rule:"The rule: every material has properties - hard or soft, transparent or not, heavy or light - and we choose a material by its properties.",s5RuleEx:"A window is made of glass because it is transparent, and a spoon is made of metal because it is hard and does not break.",
+    s5P1:"Why is the window made of glass?",s5P1a0:"Because glass is transparent and you can see through it",s5P1a1:"Because glass is warm to touch",s5P1a2:"Because glass never breaks",
+    s5P2:"Which material fits an eating spoon?",s5P2a0:"Metal - hard and does not break",s5P2a1:"Paper - very light",s5P2a2:"Glass - transparent",
+    s5Sum:"Done! Today we learned: objects are made of different materials, and we choose the material by its properties - hard, transparent, light and more.",
+    s5Again:"From the start",s5Next:"Next",s5Hear:"Listen",s5Correct:"Correct!",s5Wrong:"Not yet. You can try again.",s5Check:"Understanding check",
+    s5Wood:"wood",s5Metal:"metal",s5Plastic:"plastic",s5WoodProp:"light and warm to touch",s5MetalProp:"hard and shiny",s5PlasticProp:"light, does not break easily",s5PrevLesson:"Previous lesson"},
+ru:{s5Title:"Урок: из чего сделан мир?",s5Goal:"Цель: узнать, что предметы вокруг нас сделаны из разных материалов, и у каждого материала свои свойства.",s5Start:"Начинаем",s5Step:"Шаг {0} из 5",
+    s5V1:"Деревянный стул, металлическая ложка и пластиковая бутылка. Все три - предметы, но каждый сделан из другого материала.",s5V1b:"Нажмите кнопку и узнайте, что особенного в каждом материале.",s5Reveal:"Узнать свойства",
+    s5V2:"Дерево лёгкое и тёплое на ощупь, металл твёрдый и блестящий, а пластик лёгкий и не ломается легко.",
+    s5Q:"Какой материал прозрачный - через него видно?",s5A0:"Дерево",s5A1:"Стекло",s5A2:"Металл",
+    s5Why0:"Через дерево не видно.",s5Why2:"Металл не прозрачный.",
+    s5Rule:"Правило: у каждого материала есть свойства - твёрдый или мягкий, прозрачный или нет, тяжёлый или лёгкий - и материал выбирают по его свойствам.",s5RuleEx:"Окно делают из стекла, потому что оно прозрачное, а ложку из металла, потому что он твёрдый и не ломается.",
+    s5P1:"Почему окно сделано из стекла?",s5P1a0:"Потому что стекло прозрачное и через него видно",s5P1a1:"Потому что стекло тёплое на ощупь",s5P1a2:"Потому что стекло никогда не бьётся",
+    s5P2:"Какой материал подходит для ложки?",s5P2a0:"Металл - твёрдый и не ломается",s5P2a1:"Бумага - очень лёгкая",s5P2a2:"Стекло - прозрачное",
+    s5Sum:"Готово! Сегодня мы узнали: предметы сделаны из разных материалов, и материал выбирают по его свойствам - твёрдость, прозрачность, лёгкость и другие.",
+    s5Again:"Сначала",s5Next:"Дальше",s5Hear:"Слушать",s5Correct:"Верно!",s5Wrong:"Пока нет. Можно ещё раз.",s5Check:"Проверка понимания",
+    s5Wood:"дерево",s5Metal:"металл",s5Plastic:"пластик",s5WoodProp:"лёгкое и тёплое на ощупь",s5MetalProp:"твёрдый и блестящий",s5PlasticProp:"лёгкий, не ломается легко",s5PrevLesson:"Прошлый урок"},
+ar:{s5Title:"درس: ممّ صُنع العالم؟",s5Goal:"الهدف: أن نعرف أن الأشياء من حولنا مصنوعة من مواد مختلفة، ولكل مادة خصائص خاصة بها.",s5Start:"نبدأ",s5Step:"الخطوة {0} من 5",
+    s5V1:"كرسي من الخشب وملعقة من المعدن وقنينة من البلاستيك. الثلاثة أشياء - لكن كل واحد مصنوع من مادة مختلفة.",s5V1b:"اضغطوا على الزر واكتشفوا ما المميز في كل مادة.",s5Reveal:"اكتشفوا الخصائص",
+    s5V2:"الخشب خفيف ودافئ الملمس، المعدن صلب ولامع، والبلاستيك خفيف ولا ينكسر بسهولة.",
+    s5Q:"أي مادة شفافة - يمكن الرؤية من خلالها؟",s5A0:"الخشب",s5A1:"الزجاج",s5A2:"المعدن",
+    s5Why0:"لا يمكن الرؤية من خلال الخشب.",s5Why2:"المعدن ليس شفافًا.",
+    s5Rule:"القاعدة: لكل مادة خصائص - صلبة أو طرية، شفافة أو غير شفافة، ثقيلة أو خفيفة - ونختار المادة حسب خصائصها.",s5RuleEx:"الشباك مصنوع من الزجاج لأنه شفاف، والملعقة من المعدن لأنه صلب ولا ينكسر.",
+    s5P1:"لماذا الشباك مصنوع من الزجاج؟",s5P1a0:"لأن الزجاج شفاف ويمكن الرؤية من خلاله",s5P1a1:"لأن الزجاج دافئ الملمس",s5P1a2:"لأن الزجاج لا ينكسر أبدًا",
+    s5P2:"أي مادة تناسب ملعقة الأكل؟",s5P2a0:"المعدن - صلب ولا ينكسر",s5P2a1:"الورق - خفيف جدًا",s5P2a2:"الزجاج - شفاف",
+    s5Sum:"انتهيتم! اليوم تعلمنا: الأشياء مصنوعة من مواد مختلفة، ونختار المادة حسب خصائصها - صلبة، شفافة، خفيفة وغيرها.",
+    s5Again:"من البداية",s5Next:"التالي",s5Hear:"استمعوا",s5Correct:"صحيح!",s5Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s5Check:"فحص الفهم",
+    s5Wood:"خشب",s5Metal:"معدن",s5Plastic:"بلاستيك",s5WoodProp:"خفيف ودافئ الملمس",s5MetalProp:"صلب ولامع",s5PlasticProp:"خفيف ولا ينكسر بسهولة",s5PrevLesson:"الدرس السابق"}};
+function s5t(k){var d=S5STR[state.settings.lang||"he"]||S5STR.he;var v=d[k];return v===undefined?(S5STR.en[k]||k):v}
+var S5SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+function s5Scene(revealed){
+  var items=[["🪵","s5Wood","s5WoodProp"],["🥄","s5Metal","s5MetalProp"],["🧴","s5Plastic","s5PlasticProp"]];
+  return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
+    return '<div class="card" style="text-align:center;padding:18px 22px;min-width:110px;max-width:160px">'+
+      '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(s5t(it[1]))+'</div>'+
+      (revealed?'<div style="margin-top:8px;font-weight:600;color:#0e9c8d;font-size:.95rem">'+esc(s5t(it[2]))+'</div>':'')+
+      '</div>';
+  }).join("")+'</div>';
+}
+function s5HearBtn(text){return '<button class="btn btn-g" data-a="s5hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s5t("s5Hear"))+'</button>'}
+function sci5LessonView(){
+  var st=S5SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s5t("s5Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s5t("s5Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s5t("s5Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s5next",s5t("s5Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s5HearBtn(s5t("s5Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s5t(st.revealed?"s5V2":"s5V1"))+'</p>';
+    h+=s5Scene(st.revealed);
+    if(!st.revealed){
+      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(s5t("s5V1b"))+'</p>';
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s5reveal",s5t("s5Reveal"),'background:#b45309;color:#fff;font-weight:700')+s5HearBtn(s5t("s5V1")+" "+s5t("s5V1b"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s5next",s5t("s5Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s5HearBtn(s5t("s5V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s5t("s5Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s5t("s5Q"))+'</p>';
+    h+=lsOpts([s5t("s5A0"),s5t("s5A1"),s5t("s5A2")],st.picked,1,"s5pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s5t({0:"s5Why0",2:"s5Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s5t("s5Correct"):s5t("s5Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s5next",s5t("s5Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s5t("s5Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(s5t("s5RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s5next",s5t("s5Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s5HearBtn(s5t("s5Rule")+" "+s5t("s5RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s5t("s5P1"))+'</p>';
+    h+=lsOpts([s5t("s5P1a0"),s5t("s5P1a1"),s5t("s5P1a2")],st.p1,0,"s5p1");
+    if(st.p1===0){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s5t("s5P2"))+'</p>';
+      h+=lsOpts([s5t("s5P2a0"),s5t("s5P2a1"),s5t("s5P2a2")],st.p2,0,"s5p2");
+    }
+    if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s5t("s5Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s5next",s5t("s5Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s5t("s5Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s5again",s5t("s5Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s5HearBtn(s5t("s5Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci4" style="color:#1d4ed8;font-weight:600">'+esc(s5t("s5PrevLesson"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci5LessonAction(a,el){
+  var st=S5SN;
+  if(a==="s5next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s5reveal"){st.revealed=true;render();speak(s5t("s5V2"))}
+  else if(a==="s5pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s5p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s5p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s5again"){S5SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s5hear"){speak(el.getAttribute("data-say"))}
 }
 
 /* ================= boot ================= */
@@ -5455,7 +5575,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s107-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s108-pwa1").catch(function(){});
   });
 }
 </script>
