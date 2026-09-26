@@ -1126,7 +1126,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n141 · 2026-09-26";
+var BUILD="n142 · 2026-09-26";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3941,6 +3941,7 @@ function screenPractice(){
     h+="</div>";
     h+='<div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap">'+
        (P.done?"":hintBtn())+
+       (P.done||!(window.TUTOR&&TUTOR.on())?"":'<button class="btn ghost" data-a="tutor">'+esc(TUTOR.label())+"</button>")+
        '<button class="btn" data-a="clear">'+esc(t("clearSlot"))+"</button>"+
        '<button class="btn pri" data-a="checkorder"'+(P.slot.length?"":" disabled")+'>'+
        ic("check",16)+" "+esc(t("check"))+"</button></div>"+hintBox(q);
@@ -5867,7 +5868,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n141-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n142-pwa1").catch(function(){});
   });
 }
 </script>
