@@ -901,7 +901,7 @@ STR.he={
 appName:"חשבון ליסודי",appShort:"ליסודי",
 navPractice:"תרגול",navProgress:"התקדמות",navRecords:"שיאנים",navExam:"מבחן",navSettings:"הגדרות",
 level:"רמה",copyLink:"הקישור",copied:"הועתק!",
-footerLove:"נבנה באהבה לכל ילד שלומד אחרת",footerSaved:"ההתקדמות נשמרת אוטומטית במכשיר הזה",
+footerLove:"נבנה באהבה לכל ילד שלומד אחרת",footerMoe:"תוכנית הלימודים של משרד החינוך",footerSaved:"ההתקדמות נשמרת אוטומטית במכשיר הזה",
 obBadge:"למתקשים, למי שקשה לו לקרוא — ולכל מי שלומד אחרת",
 obTitle1:"חשבון",obTitle2:"לבית הספר",obTitle3:"היסודי",
 obIntro:"לא צריך להיות גאון כדי להצליח במתמטיקה — צריך את הקצב הנכון, את הרמז הנכון, וחבר שלא מוותר עליכם.",
@@ -989,7 +989,7 @@ STR.en={
 appName:"Arithmetic for Primary School",appShort:"for primary school",
 navPractice:"Practice",navProgress:"Progress",navRecords:"Leaders",navExam:"Test",navSettings:"Settings",
 level:"Level",copyLink:"Link",copied:"Copied!",
-footerLove:"Built with love for every child who learns differently",footerSaved:"Progress is saved automatically on this device",
+footerLove:"Built with love for every child who learns differently",footerMoe:"Ministry of Education curriculum",footerSaved:"Progress is saved automatically on this device",
 obBadge:"For strugglers, for anyone who finds reading hard — everyone who learns differently",
 obTitle1:"Arithmetic",obTitle2:"for primary",obTitle3:"school",
 obIntro:"You don't have to be a genius to succeed in math — you need the right pace, the right hint, and a buddy who never gives up on you.",
@@ -1073,7 +1073,7 @@ STR.ru={
 appName:"Арифметика для начальной школы",appShort:"для начальной школы",
 navPractice:"Тренировка",navProgress:"Прогресс",navRecords:"Рекорды",navExam:"Контрольная",navSettings:"Настройки",
 level:"Уровень",copyLink:"Ссылка",copied:"Скопировано!",
-footerLove:"Сделано с любовью для каждого ребёнка, который учится иначе",footerSaved:"Прогресс сохраняется автоматически на этом устройстве",
+footerLove:"Сделано с любовью для каждого ребёнка, который учится иначе",footerMoe:"Программа Министерства просвещения",footerSaved:"Прогресс сохраняется автоматически на этом устройстве",
 obBadge:"Для тех, кому трудно, кому тяжело читать — и всех, кто учится иначе",
 obTitle1:"Арифметика",obTitle2:"для начальной",obTitle3:"школы",
 obIntro:"Не нужно быть гением, чтобы преуспеть в математике — нужен правильный темп, правильная подсказка и друг, который в тебя верит.",
@@ -1157,7 +1157,7 @@ STR.ar={
 appName:"الحساب للمرحلة الابتدائية",appShort:"للمرحلة الابتدائية",
 navPractice:"تدريب",navProgress:"تقدمي",navRecords:"الأبطال",navExam:"امتحان",navSettings:"الإعدادات",
 level:"مستوى",copyLink:"الرابط",copied:"تم النسخ!",
-footerLove:"صُنع بحب لكل طفل يتعلم بطريقة مختلفة",footerSaved:"يُحفظ التقدم تلقائيًا على هذا الجهاز",
+footerLove:"صُنع بحب لكل طفل يتعلم بطريقة مختلفة",footerMoe:"منهج وزارة التربية والتعليم",footerSaved:"يُحفظ التقدم تلقائيًا على هذا الجهاز",
 obBadge:"لمن يجد صعوبة، ولمن تصعب عليه القراءة — ولكلّ من يتعلّم بشكل مختلف",
 obTitle1:"الحساب",obTitle2:"للمرحلة",obTitle3:"الابتدائية",
 obIntro:"لا تحتاج أن تكون عبقريًا لتنجح في الرياضيات — تحتاج الوتيرة الصحيحة والتلميح الصحيح وصديقًا لا يستسلم.",
@@ -2310,7 +2310,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b155 · 2026-09-26";
+var BUILD="b156 · 2026-09-26";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4344,7 +4344,7 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
     var t=T();
-    html+='</main><footer><div class="wrap fbar"><span style="display:inline-flex;align-items:center;gap:8px">'+esc(t.footerLove)+' <span style="color:var(--coral)">'+ic("heart",15)+'</span></span><span style="color:var(--ink-faint)">'+esc(t.footerSaved)+' · '+BUILD+'</span></div></footer>';
+    html+='</main><footer><div class="wrap fbar"><span style="display:inline-flex;align-items:center;gap:8px">'+esc(t.footerLove)+' <span style="color:var(--coral)">'+ic("heart",15)+'</span></span><span style="color:var(--ink-faint)">'+esc(t.footerSaved)+' · '+BUILD+'</span><a href="https://pop.education.gov.il/tchumey_daat/matmatika/yesodi/oraat-math/tohnit-limudim/" target="_blank" rel="noopener" style="color:var(--ink-faint)">'+esc(t.footerMoe)+'</a></div></footer>';
   }
   $("#app").innerHTML=html;
   afterRender();
@@ -4739,7 +4739,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b155-pwa2").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b156-pwa2").catch(function(){});
   });
 }
 </script>
