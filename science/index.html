@@ -2394,8 +2394,8 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s104 · 2026-09-26";
-var view=/[?&]lesson=sci1(&|$)/.test(location.search||"")?"lesson":"units";
+var BUILD="s105 · 2026-09-26";
+var view=/[?&]lesson=sci[12](&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
 var confirmReset=false,vMore=false;
@@ -4460,6 +4460,7 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="records")html+=recordsView();
     else if(view==="lesson"&&LESSON_ON)html+=lessonView();
     else if(view==="lesson"&&SCI_LESSON_ON)html+=sciLessonView();
+    else if(view==="lesson"&&SCI2_ON)html+=sci2LessonView();
     else if(view==="settings")html+=settingsView();
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
@@ -4625,6 +4626,7 @@ function onAction(a,el){
   if(examAction(a,el))return;
   if(/^ls/.test(a)&&LESSON_ON){lessonAction(a,el);return}
   if(/^sl/.test(a)&&SCI_LESSON_ON){sciLessonAction(a,el);return}
+  if(/^s2/.test(a)&&SCI2_ON){sci2LessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -4984,6 +4986,7 @@ ar:{slTitle:"درس: كيف نعرف أن شيئًا ما حي؟",slGoal:"اله
     slSum:"انتهيتم! اليوم تعلمنا: الكائن الحي ينمو، يحتاج إلى الغذاء والماء، يتكاثر ويتفاعل مع بيئته. غير الحي لا يفعل ذلك.",
     slAgain:"من البداية",slNext:"التالي",slHear:"استمعوا",slCorrect:"صحيح!",slWrong:"ليس بعد. يمكن المحاولة مرة أخرى.",slCheck:"فحص الفهم",
     slPlant:"نبتة",slCat:"قطة",slRock:"حجر",slAlive:"حي",slStill:"غير حي"}};
+SLSTR.he.slNextLesson="לשיעור הבא";SLSTR.en.slNextLesson="Next lesson";SLSTR.ru.slNextLesson="Следующий урок";SLSTR.ar.slNextLesson="الدرس التالي";
 function slt(k){var d=SLSTR[state.settings.lang||"he"]||SLSTR.he;var v=d[k];return v===undefined?(SLSTR.en[k]||k):v}
 var SLSN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function slScene(revealed){
@@ -5037,6 +5040,7 @@ function sciLessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(slt("slSum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("slagain",slt("slAgain"),'background:#0e9c8d;color:#fff;font-weight:700')+slHearBtn(slt("slSum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci2" style="color:#1d4ed8;font-weight:600">'+esc(slt("slNextLesson"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5049,6 +5053,123 @@ function sciLessonAction(a,el){
   else if(a==="slp2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
   else if(a==="slagain"){SLSN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
   else if(a==="slhear"){speak(el.getAttribute("data-say"))}
+}
+
+
+/* ================= שיעור מדע 2: צרכי יצורים (כיתה ג׳, יחידה uBio) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ג׳ (צרכים לקיום יצורים).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI2_ON=/(^|[?&])lesson=sci2(&|$)/.test(location.search||"");
+var S2STR={
+he:{s2Title:"שיעור: מה צריך כדי לחיות?",s2Goal:"המטרה: לדעת מה כל יצור חי צריך כדי לחיות — מזון, מים ואוויר, ומה הצמחים צריכים בנוסף.",s2Start:"מתחילים",s2Step:"שלב {0} מתוך 5",
+    s2V1:"שני צמחים זהים: אחד מקבל מים ואור שמש, והשני לא. מה יקרה להם אחרי שבוע?",s2V1b:"לחצו על הכפתור וגלו מה קרה לשני הצמחים.",s2Reveal:"גלו מה קרה אחרי שבוע",
+    s2V2:"הצמח שקיבל מים ואור גדל וירוק. הצמח השני נבל. גם חיות זקוקות למזון, מים ואוויר.",
+    s2Q:"מה קרה לצמח שלא קיבל מים ואור?",s2A0:"הוא גדל גבוה יותר",s2A1:"הוא נבל, כי חסרים לו מים ואור",s2A2:"הוא הפך לאבן",
+    s2Why0:"בלי מים ואור צמח לא יכול לגדול.",s2Why2:"צמח לא הופך לאבן — הוא פשוט נובל.",
+    s2Rule:"הכלל: כל יצור חי זקוק למזון, למים ולאוויר. צמחים זקוקים גם לאור שמש.",s2RuleEx:"כשאחד הצרכים חסר, היצור החי נחלש ולא יכול לחיות.",
+    s2P1:"מה אתם צריכים כדי לחיות?",s2P1a0:"רק ממתקים",s2P1a1:"מזון, מים ואוויר",s2P1a2:"רק שינה",
+    s2P2:"מה צמח צריך, שחתול לא צריך?",s2P2a0:"אור שמש",s2P2a1:"מים",s2P2a2:"אוויר",
+    s2Sum:"סיימתם! היום למדנו: כל יצור חי זקוק למזון, מים ואוויר — וצמחים זקוקים גם לאור שמש.",
+    s2Again:"מההתחלה",s2Next:"הבא",s2Hear:"השמיעו",s2Correct:"נכון!",s2Wrong:"עוד לא. אפשר לנסות שוב.",s2Check:"בדיקת הבנה",
+    s2With:"עם מים ואור",s2Without:"בלי מים ואור",s2NextLesson:"לשיעור הקודם"},
+en:{s2Title:"Lesson: what do you need to live?",s2Goal:"The goal: know what every living thing needs to live - food, water and air - and what plants need in addition.",s2Start:"Start",s2Step:"Step {0} of 5",
+    s2V1:"Two identical plants: one gets water and sunlight, the other does not. What will happen to them after a week?",s2V1b:"Press the button and discover what happened to the two plants.",s2Reveal:"Reveal what happened after a week",
+    s2V2:"The plant that got water and light grew green. The other plant wilted. Animals also need food, water and air.",
+    s2Q:"What happened to the plant that got no water and light?",s2A0:"It grew taller",s2A1:"It wilted, because it lacks water and light",s2A2:"It turned into a rock",
+    s2Why0:"Without water and light a plant cannot grow.",s2Why2:"A plant does not turn into a rock - it simply wilts.",
+    s2Rule:"The rule: every living thing needs food, water and air. Plants also need sunlight.",s2RuleEx:"When one need is missing, the living thing weakens and cannot live.",
+    s2P1:"What do you need to live?",s2P1a0:"Only candy",s2P1a1:"Food, water and air",s2P1a2:"Only sleep",
+    s2P2:"What does a plant need that a cat does not?",s2P2a0:"Sunlight",s2P2a1:"Water",s2P2a2:"Air",
+    s2Sum:"Done! Today we learned: every living thing needs food, water and air - and plants also need sunlight.",
+    s2Again:"From the start",s2Next:"Next",s2Hear:"Listen",s2Correct:"Correct!",s2Wrong:"Not yet. You can try again.",s2Check:"Understanding check",
+    s2With:"with water and light",s2Without:"without water and light",s2NextLesson:"Previous lesson"},
+ru:{s2Title:"Урок: что нужно, чтобы жить?",s2Goal:"Цель: узнать, что нужно каждому живому существу для жизни - еда, вода и воздух, и что нужно растениям ещё.",s2Start:"Начинаем",s2Step:"Шаг {0} из 5",
+    s2V1:"Два одинаковых растения: одно получает воду и солнечный свет, другое нет. Что с ними будет через неделю?",s2V1b:"Нажмите кнопку и узнайте, что случилось с двумя растениями.",s2Reveal:"Узнать, что было через неделю",
+    s2V2:"Растение, которое получало воду и свет, выросло зелёным. Второе завяло. Животным тоже нужны еда, вода и воздух.",
+    s2Q:"Что случилось с растением без воды и света?",s2A0:"Оно выросло выше",s2A1:"Оно завяло, потому что ему не хватает воды и света",s2A2:"Оно превратилось в камень",
+    s2Why0:"Без воды и света растение не может расти.",s2Why2:"Растение не превращается в камень - оно просто вянет.",
+    s2Rule:"Правило: каждому живому существу нужны еда, вода и воздух. Растениям нужен ещё и солнечный свет.",s2RuleEx:"Когда чего-то не хватает, живое существо слабеет и не может жить.",
+    s2P1:"Что нужно вам, чтобы жить?",s2P1a0:"Только конфеты",s2P1a1:"Еда, вода и воздух",s2P1a2:"Только сон",
+    s2P2:"Что нужно растению, а кошке нет?",s2P2a0:"Солнечный свет",s2P2a1:"Вода",s2P2a2:"Воздух",
+    s2Sum:"Готово! Сегодня мы узнали: каждому живому существу нужны еда, вода и воздух - а растениям ещё и солнечный свет.",
+    s2Again:"Сначала",s2Next:"Дальше",s2Hear:"Слушать",s2Correct:"Верно!",s2Wrong:"Пока нет. Можно ещё раз.",s2Check:"Проверка понимания",
+    s2With:"с водой и светом",s2Without:"без воды и света",s2NextLesson:"Прошлый урок"},
+ar:{s2Title:"درس: ماذا نحتاج لنعيش؟",s2Goal:"الهدف: أن نعرف ما يحتاجه كل كائن حي ليعيش - الغذاء والماء والهواء - وما تحتاجه النباتات بالإضافة إلى ذلك.",s2Start:"نبدأ",s2Step:"الخطوة {0} من 5",
+    s2V1:"نبتتان متماثلتان: واحدة تحصل على الماء وضوء الشمس، والثانية لا. ماذا سيحدث لهما بعد أسبوع؟",s2V1b:"اضغطوا على الزر واكتشفوا ما حدث للنبتتين.",s2Reveal:"اكتشفوا ما حدث بعد أسبوع",
+    s2V2:"النبتة التي حصلت على الماء والضوء نمت خضراء. النبتة الثانية ذبلت. الحيوانات أيضًا تحتاج إلى الغذاء والماء والهواء.",
+    s2Q:"ماذا حدث للنبتة التي لم تحصل على ماء وضوء؟",s2A0:"نمت أطول",s2A1:"ذبلت، لأنها تفتقر إلى الماء والضوء",s2A2:"تحوّلت إلى حجر",
+    s2Why0:"بدون ماء وضوء لا تستطيع النبتة أن تنمو.",s2Why2:"النبتة لا تتحول إلى حجر - هي ببساطة تذبل.",
+    s2Rule:"القاعدة: كل كائن حي يحتاج إلى الغذاء والماء والهواء. النباتات تحتاج أيضًا إلى ضوء الشمس.",s2RuleEx:"عندما ينقص أحد الاحتياجات، يضعف الكائن الحي ولا يستطيع العيش.",
+    s2P1:"ماذا تحتاجون لتعيشوا؟",s2P1a0:"حلويات فقط",s2P1a1:"غذاء وماء وهواء",s2P1a2:"نوم فقط",
+    s2P2:"ما الذي تحتاجه النبتة ولا تحتاجه القطة؟",s2P2a0:"ضوء الشمس",s2P2a1:"الماء",s2P2a2:"الهواء",
+    s2Sum:"انتهيتم! اليوم تعلمنا: كل كائن حي يحتاج إلى الغذاء والماء والهواء - والنباتات تحتاج أيضًا إلى ضوء الشمس.",
+    s2Again:"من البداية",s2Next:"التالي",s2Hear:"استمعوا",s2Correct:"صحيح!",s2Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s2Check:"فحص الفهم",
+    s2With:"مع ماء وضوء",s2Without:"بدون ماء وضوء",s2NextLesson:"الدرس السابق"}};
+function s2t(k){var d=S2STR[state.settings.lang||"he"]||S2STR.he;var v=d[k];return v===undefined?(S2STR.en[k]||k):v}
+var S2SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+function s2Scene(revealed){
+  var items=revealed?[["🌱","s2With","#0e9c8d"],["🥀","s2Without","#bf4426"]]:[["🌱","s2With","#64748b"],["🌱","s2Without","#64748b"]];
+  return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
+    return '<div class="card" style="text-align:center;padding:18px 22px;min-width:110px">'+
+      '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px;color:'+it[2]+'">'+esc(s2t(it[1]))+'</div>'+
+      '</div>';
+  }).join("")+'</div>';
+}
+function s2HearBtn(text){return '<button class="btn btn-g" data-a="s2hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s2t("s2Hear"))+'</button>'}
+function sci2LessonView(){
+  var st=S2SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s2t("s2Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s2t("s2Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s2t("s2Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s2next",s2t("s2Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s2HearBtn(s2t("s2Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s2t(st.revealed?"s2V2":"s2V1"))+'</p>';
+    h+=s2Scene(st.revealed);
+    if(!st.revealed){
+      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(s2t("s2V1b"))+'</p>';
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s2reveal",s2t("s2Reveal"),'background:#b45309;color:#fff;font-weight:700')+s2HearBtn(s2t("s2V1")+" "+s2t("s2V1b"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s2next",s2t("s2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s2HearBtn(s2t("s2V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s2t("s2Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s2t("s2Q"))+'</p>';
+    h+=s2Scene(true);
+    h+=lsOpts([s2t("s2A0"),s2t("s2A1"),s2t("s2A2")],st.picked,1,"s2pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s2t({0:"s2Why0",2:"s2Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s2t("s2Correct"):s2t("s2Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s2next",s2t("s2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s2t("s2Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(s2t("s2RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s2next",s2t("s2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s2HearBtn(s2t("s2Rule")+" "+s2t("s2RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s2t("s2P1"))+'</p>';
+    h+=lsOpts([s2t("s2P1a0"),s2t("s2P1a1"),s2t("s2P1a2")],st.p1,1,"s2p1");
+    if(st.p1===1){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s2t("s2P2"))+'</p>';
+      h+=lsOpts([s2t("s2P2a0"),s2t("s2P2a1"),s2t("s2P2a2")],st.p2,0,"s2p2");
+    }
+    if(st.p1===1&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s2t("s2Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s2next",s2t("s2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s2t("s2Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s2again",s2t("s2Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s2HearBtn(s2t("s2Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci1" style="color:#1d4ed8;font-weight:600">'+esc(s2t("s2NextLesson"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci2LessonAction(a,el){
+  var st=S2SN;
+  if(a==="s2next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s2reveal"){st.revealed=true;render();speak(s2t("s2V2"))}
+  else if(a==="s2pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s2p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s2p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s2again"){S2SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s2hear"){speak(el.getAttribute("data-say"))}
 }
 
 /* ================= boot ================= */
@@ -5092,7 +5213,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s104-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s105-pwa1").catch(function(){});
   });
 }
 </script>
