@@ -1306,7 +1306,7 @@ function speakSentence(n){
     ttsOK();
     if(!speaking) return;
     if(SENT + 1 < SENTS){ SENT++; markSentence(); speakSentence(SENT); }
-    else stop();
+    else{ stop(); SENT = 0; markSentence(); syncNav(); }   /* O-93: נגמר — ▶ הבא מתחיל מההתחלה, לא מהמשפט האחרון */
   }
   u.onend = advance;
   /* המנוע נכשל — לומר את זה במקום להיעצר בשקט.
@@ -1726,7 +1726,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=111-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=112-pwa1").catch(function(){});
   });
 }
 </script>

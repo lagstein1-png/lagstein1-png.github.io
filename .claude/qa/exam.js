@@ -22,7 +22,7 @@ const BASE="http://127.0.0.1:8099";
       errs.push("console: "+t);
     });
     await page.route("**/*",r=>r.request().url().startsWith(BASE)?r.continue():r.abort());
-    await page.goto(BASE+"/"+app+"/",{waitUntil:"domcontentloaded"});
+    await page.goto(BASE+"/"+app+"/?internal=shlav-internal-"+app,{waitUntil:"domcontentloaded"});   /* O-101: שער פנימי — למשפחות עם שער; לאפליקציה בלי שער הפרמטר מתעלם */
     await page.waitForTimeout(700);
     /* שער התנאים יושב מעל הכול וחוסם כל לחיצה. סוגרים אותו, ואז
        עוברים את האונבורדינג אם יש. */
