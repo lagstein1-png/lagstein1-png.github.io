@@ -1736,7 +1736,9 @@ g.TUTOR = {
   mount: function(cfg){
     CFG = cfg || null;
     var ok = BRAIN && !!CFG;
-    if(ok){ autoOpen(); startNudge() }
+    /* הפאנל נפתח רק בלחיצה (26.9.2026) — אין פתיחה אוטומטית בטעינה
+       ואין nudge שקופץ לבד; open() נקרא מכפתורי האפליקציה בלבד. */
+    if(ok){}
     return ok;
   },
   open: open,
