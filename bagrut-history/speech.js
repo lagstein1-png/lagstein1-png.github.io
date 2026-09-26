@@ -1,0 +1,559 @@
+/* =====================================================================
+   806 — מנוע ההקראה. שלב 2.
+
+   Web Speech API בלבד. אין שירות ענן, אין מפתח, אין בקשה לרשת —
+   ולכן ההקראה עובדת גם אופליין וגם בטיסה, ואינה עולה דבר.
+
+   ארבע תקלות שכבר נלמדו ביוקר באפליקציות האחרות בריפו, וכולן
+   מטופלות כאן במפורש:
+
+   1. הקולות נטענים אסינכרונית. מי שמקריא לפני שהרשימה הגיעה מקבל
+      את ברירת המחדל של הדפדפן — לרוב קול אנגלי שמקריא עברית.
+      `voiceschanged` לבדו אינו מספיק: ספארי לא תמיד יורה אותו.
+      לכן גם דגימה, וגם תקרת זמן — יש מכשירים שמחזירים רשימה ריקה
+      לצמיתות ומדברים מצוין, ועדיף לדבר בקול ברירת מחדל מלשתוק.
+   2. אמירה ארוכה נבלעת. מנועי מכשיר מאיצים ובולעים סופי מילים
+      אחרי כמאה תווים, ולכן הטקסט נשלח במקטעים קצרים.
+   3. פיסוק בין שתי ספרות אינו מקום לחתוך בו. בלי הבדיקה הזאת
+      "3,500" נשבר והמנוע קורא "שלוש, חמש מאות".
+   4. כרום עוצר הקראה ארוכה אחרי כחמש־עשרה שניות. פינג של
+      pause/resume כל כמה שניות מחזיק אותה.
+
+   ולכלל אחד של האפליקציה הזאת: **לעולם לא מקריאים LaTeX גולמי.**
+   מי שקורא נוסחה שולח לכאן את השדה `speech`, ואם אין כזה — שותק.
+   תלמיד ששומע "backslash frac" מפסיק להקשיב, וזו בדיוק האוכלוסייה
+   שהאפליקציה נבנתה בשבילה.
+   ===================================================================== */
+(function () {
+  "use strict";
+
+  var LANG = "he-IL";
+
+  /* מנוע ההגייה העברי — /tutor/he-speech.js, 17.9.2026.
+     **עברית בלבד.** כאן אין `onboundary` ואין `charIndex` — ההדגשה
+     היא פר-פריט בתור — ולכן החלפת טקסט אינה נוגעת בה כלל. */
+  function heSpoken(t){
+    if(LANG.slice(0,2)!=="he"||typeof HESPEECH==="undefined")return t;
+    try{ return HESPEECH.spoken(t) }catch(e){ return t }
+  }
+  /* הקצב והגובה שנשלחים למנוע — 0.95 ו-1.12, הפריסט ״נשי רגוע״ של
+     math-app, שהבעלים שמע ב-13.9.2026 ואמר עליו ״נעים ומדויק, להכניס
+     לכל האפליקציות״. עד אז "רגיל" כאן היה 0.82 בגובה 1, כמו
+     VOICE_TUNE שבאפליקציות האחיות — והוא הועלה שם באותו יום. אותו
+     מנוע, אותם קולות, ואותו קהל: "רגיל" כאן חייב להישמע כמו שם.
+     המשתמש עדיין בוחר לאט/רגיל/מהר, וזה מכפיל את הבסיס. */
+  var RATE_BASE = 0.95;
+  var PITCH_BASE = 1.12;
+  var SEG_MAX = 90;      /* תווים לאמירה אחת */
+  var SEG_GAP = 240;     /* מילישניות בין אמירות — נשימה, לא גמגום */
+  var KEEPALIVE = 4000;  /* פינג נגד עצירת כרום */
+
+  var api = {
+    rate: 1,
+    speaking: false,
+    tag: null,        /* מי ביקש את ההקראה — כדי שה-UI ידע איזה כפתור פעיל */
+    onstate: null        /* נקרא בכל שינוי מצב, כדי שה-UI יתעדכן */
+  };
+
+  function supported() {
+    try { return "speechSynthesis" in window && "SpeechSynthesisUtterance" in window; }
+    catch (e) { return false; }
+  }
+  function allVoices() {
+    try { return (window.speechSynthesis.getVoices() || []); } catch (e) { return []; }
+  }
+
+  /* --- המתנה לרשימת הקולות ------------------------------------- */
+  var voicesP = null;
+  function voicesReady() {
+    if (voicesP) return voicesP;
+    voicesP = new Promise(function (done) {
+      if (!supported()) { done(); return; }
+      if (allVoices().length) { done(); return; }
+      var poll = null, cap = null, fired = false;
+      function finish() {
+        if (fired) return;
+        fired = true;
+        clearInterval(poll); clearTimeout(cap);
+        try { speechSynthesis.removeEventListener("voiceschanged", finish); } catch (e) {}
+        done();
+      }
+      try { speechSynthesis.addEventListener("voiceschanged", finish); } catch (e) {}
+      poll = setInterval(function () { if (allVoices().length) finish(); }, 120);
+      cap = setTimeout(finish, 4000);
+    });
+    return voicesP;
+  }
+
+  /* --- בחירת הקול העברי -----------------------------------------
+     קול מותג (גוגל, מיקרוסופט, אפל) נשמע אחרת לגמרי מ-espeak,
+     והפער הזה גדול יותר מכל הבדל אחר במסך הזה. */
+  /* תגית השפה חוזרת מהמכשיר בשלוש צורות: "he-IL", "he_IL" עם קו
+     תחתון באנדרואיד, ו-"iw-IL" — הקוד הישן של עברית, שעדיין מוחזר
+     ממנועי אנדרואיד ותיקים. בלי הנרמול הזה מכשיר עם קול עברי מצוין
+     דיווח "אין במכשיר קול עברי", וההקראה יצאה בקול אנגלי. */
+  function normLang(l) {
+    return String(l || "").replace("_", "-").replace(/^iw/i, "he");
+  }
+  function hebrewVoices() {
+    return allVoices().filter(function (v) {
+      return /^he/i.test(normLang(v.lang));
+    });
+  }
+  /* מגדר הקול, לפי השם — אותם שני ביטויים שבאחת־עשרה האפליקציות
+     האחרות (english/index.html, V_F ו-V_M). ״?״ = לא זוהה. */
+  var VOICE_F = /(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
+  var VOICE_M = /(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
+  function vGender(v) {
+    var n = ((v.name || "") + " " + (v.lang || "")).toLowerCase();
+    return VOICE_F.test(n) ? "f" : VOICE_M.test(n) ? "m" : "?";
+  }
+  function bestVoice() {
+    var pool = hebrewVoices();
+    if (!pool.length) return null;
+    function score(v) {
+      var s = 0, n = ((v.name || "") + " " + (v.lang || "")).toLowerCase();
+      if (normLang(v.lang).toLowerCase() === LANG.toLowerCase()) s += 12;
+      if (/\b(google|microsoft|apple)\b/.test(n)) s += 30;
+      if (/natural|neural|enhanced|premium|siri/.test(n)) s += 22;
+      if (/espeak|compact|pico/.test(n)) s -= 40;
+      /* קול רשת — הנוירליים של Edge הם כאלה — נשמע טוב יותר, אבל
+         שותק בלי אינטרנט. עד כאן מקומי קיבל בונוס קבוע והקול הטוב
+         שבמכשירי ווינדוס הפסיד לו תמיד.
+         כשאין רשת, או אחרי שקול רשת כבר נכשל בסשן, הוא אינו "פחות
+         טוב" אלא לא יעבוד — ולכן הקנס גדול מסך כל הבונוסים כאן
+         (74 לכל היותר), כדי שיכריע תמיד. כשזה הקול היחיד הוא עדיין
+         נבחר: מיון של רשימה בת אחד מחזיר אותה כמו שהיא. */
+      if (v.localService === false) s += (netVoiceOK && navigator.onLine !== false) ? 6 : -200;
+      if (v.default) s += 4;
+      return s;
+    }
+    /* קול שלא יעבוד (רשת בלי רשת) יורד לתחתית לפני הכול; אחריו המגדר —
+       נשי קודם, לא־מזוהה אחריו, גברי אחרון — ורק בתוך כל קבוצה מכריעה
+       האיכות. עד 9.9.2026 האיכות לבדה הכריעה כאן, ו-Asaf של מיקרוסופט
+       ניצח קול נשי שהותקן לידו — מה שאחת־עשרה האפליקציות האחרות
+       כבר מנעו. */
+    function usable(v) {
+      return v.localService === false ? (netVoiceOK && navigator.onLine !== false) : true;
+    }
+    function grank(v) { var g = vGender(v); return g === "f" ? 2 : g === "?" ? 1 : 0; }
+    return pool.slice().sort(function (a, b) {
+      var d = usable(b) - usable(a); if (d) return d;
+      d = grank(b) - grank(a); return d || score(b) - score(a);
+    })[0];
+  }
+  api.hasHebrewVoice = function () { return hebrewVoices().length > 0; };
+  api.voiceName = function () { var v = bestVoice(); return v ? v.name : ""; };
+
+  /* --- פיצול לאמירות --------------------------------------------
+     שתי רמות: משפט, שהוא יחידת ההדגשה, ומקטע, שהוא יחידת האמירה.
+     משפט ארוך נאמר בכמה מקטעים ונשאר מודגש לכל אורכם. */
+  function insideNumber(str, i) {
+    return i > 0 && i + 1 < str.length &&
+           /[0-9]/.test(str[i - 1]) && /[0-9]/.test(str[i + 1]);
+  }
+  /* גבולות המשפט. נקודה־פסיק וירידת שורה הם עצירה מלאה לכל דבר,
+     ובלעדיהם משפט מורכב יצא באמירה אחת ארוכה ונחתך באמצע מילה.
+     נקודתיים אינן ברשימה בכוונה: בעברית הן פותחות מנייה — "הנושאים
+     החלשים: הסתברות, גיאומטריה" — וחיתוך שם שובר את הרצף. */
+  var BREAKS = ".!?;\n";
+  function sentences(text) {
+    var out = [], from = 0, i, j;
+    for (i = 0; i < text.length; i++) {
+      if (BREAKS.indexOf(text[i]) < 0) continue;
+      if (insideNumber(text, i)) continue;
+      j = i + 1;
+      while (j < text.length && /\s/.test(text[j])) j++;
+      out.push(text.slice(from, j));
+      from = j; i = j - 1;
+    }
+    if (from < text.length) out.push(text.slice(from));
+    return out.filter(function (s) { return s.trim(); });
+  }
+  function chunks(sentence) {
+    if (sentence.length <= SEG_MAX) return [sentence];
+    var out = [], rest = sentence;
+    while (rest.length > SEG_MAX) {
+      var cut = rest.lastIndexOf(",", SEG_MAX);
+      while (cut > 0 && insideNumber(rest, cut)) cut = rest.lastIndexOf(",", cut - 1);
+      if (cut < SEG_MAX * 0.4) cut = rest.lastIndexOf(" ", SEG_MAX);
+      if (cut <= 0) break;
+      out.push(rest.slice(0, cut + 1));
+      rest = rest.slice(cut + 1);
+    }
+    if (rest.trim()) out.push(rest);
+    /* מקטע זעיר עם רבע שנייה אחריו נשמע כמו גמגום — מאחדים אחורה.
+       עם תקרה: איחוד בלי גבול היה יכול להחזיר מקטע ארוך מהמקסימום,
+       כלומר בדיוק את האמירה הנבלעת שהחלוקה נועדה למנוע. */
+    for (var k = out.length - 1; k > 0; k--) {
+      if (out[k].trim().length < 12 &&
+          out[k - 1].length + out[k].length <= SEG_MAX * 1.4) {
+        out[k - 1] += out[k]; out.splice(k, 1);
+      }
+    }
+    return out.length ? out : [sentence];
+  }
+
+  /* --- מילון ההגייה ----------------------------------------------
+     הטקסט של השאלות הוא עברית רגילה שמשובצים בה סימנים ואותיות
+     לטיניות בודדות: "מסמנים ב-A את המאורע", "גודל A הוא 15".
+     המנוע העברי מועד עליהם — ותלמיד ששומע את השדה speech אומר
+     "איי" ואת ההסבר אומר משהו אחר לומד ששני אלה אינם אותו דבר.
+     הטבלה היא PROSE_MAP של math-teen, שעברה שם האזנה, ועליה
+     שכבה אחת שהאפליקציה הזאת מוסיפה: שמות האותיות הבודדות.
+     שם האות ולא משמעותה — המשמעות ("שיפוע", "רדיוס") שייכת לשדה
+     speech שכותב התוכן כותב ביד, ולא לניחוש של המנוע. */
+  var PROSE = [
+    [/²/g, " בריבוע "], [/³/g, " בשלישית "],
+    [/₀/g, " אפס "], [/₁/g, " אחת "], [/₂/g, " שתיים "], [/₃/g, " שלוש "], [/ₙ/g, " אן "],
+    [/⁻/g, " מינוס "], [/⁺/g, " ועוד "], [/⁰/g, " אפס "], [/¹/g, " אחת "],
+    [/√/g, " שורש של "], [/π/g, " פאי "], [/°/g, " מעלות "], [/%/g, " אחוז "],
+    [/∞/g, " אינסוף "], [/∫/g, " אינטגרל של "], [/∑/g, " סכום של "],
+    [/∪/g, " איחוד "], [/∩/g, " חיתוך "], [/∈/g, " שייך ל "], [/∅/g, " הקבוצה הריקה "],
+    [/α/g, " אלפא "], [/β/g, " בטא "], [/θ/g, " תטא "], [/Δ/g, " דלתא "],
+    [/[×·]/g, " כפול "], [/÷/g, " חלקי "], [/≈/g, " בערך "], [/→/g, " ולכן "],
+    /* ± לפני כלל הפלוס, וסימני אי-השוויון לפני כלל השוויון */
+    [/±/g, " פלוס מינוס "], [/≠/g, " לא שווה "],
+    [/≤/g, " קטן או שווה "], [/≥/g, " גדול או שווה "],
+    /* מינוס טיפוגרפי ו-en dash אינם מופיעים בעברית, ולכן בטוח
+       לתרגם אותם. מקף רגיל נשאר מקף: "ל-12" הוא לא חיסור. */
+    [/[−–]/g, " מינוס "], [/=/g, " שווה "], [/\+/g, " ועוד "], [/\//g, " חלקי "],
+    [/\bsin/gi, " סינוס "], [/\bcos/gi, " קוסינוס "], [/\btan/gi, " טנגנס "],
+    /* גרש וגרשיים עבריים משמשים בטקסט הזה כמירכאות ("המאורע ״לומד
+       פיזיקה״"), ומנוע שמפרש אותם כסימן ראשי תיבות מבטא את המילה
+       שאחריהם כרצף אותיות. מירכאות אינן נאמרות ממילא. */
+    [/[״׳"']/g, " "],
+    /* אות לטינית בודדת, ורק בודדת: \b שומר על sin, על ABC ועל כל
+       מילה אנגלית שלמה. */
+    [/\b[aA]\b/g, " איי "], [/\b[bB]\b/g, " בי "], [/\b[cC]\b/g, " סי "],
+    [/\b[dD]\b/g, " די "], [/\b[eE]\b/g, " אי "], [/\b[fF]\b/g, " אף "],
+    [/\b[gG]\b/g, " ג׳י "], [/\b[hH]\b/g, " אייץ׳ "], [/\b[kK]\b/g, " קיי "],
+    [/\b[mM]\b/g, " אם "], [/\b[nN]\b/g, " אן "], [/\b[pP]\b/g, " פי "],
+    [/\b[qQ]\b/g, " קיו "], [/\b[rR]\b/g, " אר "], [/\b[sS]\b/g, " אס "],
+    [/\b[tT]\b/g, " טי "], [/\b[uU]\b/g, " יו "], [/\b[vV]\b/g, " וי "],
+    [/\b[xX]\b/g, " איקס "], [/\b[yY]\b/g, " וואי "], [/\b[zZ]\b/g, " זי "],
+    /* אחרי המרת האות נשאר "ב- איי": מקף עברי שאחריו רווח. תחילית
+       עברית מנותקת נקראת בקול כשם האות — "בֵּית" — ולא כתחילית.
+       מדביקים אותה חזרה למה שהיא מחוברת אליו. */
+    [/([א-ת])-\s+/g, "$1-"]
+  ];
+  /* מופעל על כל משפט בנפרד, אחרי הפיצול ולפני החלוקה למקטעים:
+     כך מספר המשפטים שהמנוע אומר זהה למספר המשפטים שהמסך מדגיש,
+     גם כשהמילון מוסיף או מוריד תווים. */
+  function sayable(s) {
+    var t = String(s), i;
+    for (i = 0; i < PROSE.length; i++) t = t.replace(PROSE[i][0], PROSE[i][1]);
+    return t.replace(/\s+/g, " ").trim();
+  }
+  api.sayable = sayable;
+
+  /* --- מצב ההשמעה ------------------------------------------------ */
+  var queue = [];     /* [{text, unit, sent}] — מקטע, היחידה והמשפט שבו */
+  var qi = 0;
+  var current = null;
+  var keep = null;
+  var paused = false;
+  var held = null;    /* הצעד שממתין להמשך, כשהמנוע התעלם מ-pause */
+  var token = 0;      /* עולה בכל עצירה — אמירה ישנה שמסתיימת מאוחר לא תמשיך */
+  /* נכבה ברגע שקול רשת נכשל, ואז הדירוג מעדיף מקומי לשארית הסשן. */
+  var NEEDS_KEEPALIVE = /Chrome|Chromium|Edg\//.test(navigator.userAgent) &&
+                        !/Android|Mobile/i.test(navigator.userAgent);
+  var netVoiceOK = true;
+  var netRetried = false;
+  var dog = null;     /* שומר הזמן של המקטע הנוכחי */
+  function disarmDog() { if (dog) { clearInterval(dog); dog = null; } }
+
+  /* --- התרעה כשההקראה נכשלה בשקט ----------------------------------
+     `onerror` שאינו רשת מתקדם למקטע הבא — וזה נכון, שגיאה אחת אינה
+     סיבה לשתוק עד הסוף. אבל מכשיר שכל המקטעים שלו נכשלים נראה
+     ללומד כמו כפתור שלא עושה כלום, וההודעה היחידה ישבה בהגדרות.
+     לכן: תור שהגיע לסופו בלי שמקטע אחד התחיל (`onstart`) או נגמר
+     (`onend`) מציג התרעה ליד הכפתור שנלחץ — ואותה התרעה, פעם אחת
+     בביקור, כשיש במכשיר קולות אבל אף אחד מהם עברי.
+     עברית בלבד: האפליקציה חד־לשונית. */
+  var spoke = false;        /* האם מקטע כלשהו בתור הנוכחי באמת נאמר */
+  var warnedNoHe = false;   /* התרעת ״אין קול עברי״ — פעם אחת בביקור */
+  var MSG_ENGINE = "מנוע הדיבור של המכשיר לא הצליח להקריא. זו תקלה במכשיר, לא באפליקציה.";
+  var MSG_NOHE = "במכשיר אין קול עברי, ולכן ההקראה תישמע בקול של שפה אחרת או תשתוק. זו הגדרה במכשיר, לא באפליקציה.";
+  function ttsAlert(kind, text) {
+    var old = document.getElementById("tts-fail");
+    if (old) {
+      if (old.getAttribute("data-kind") === kind) return;
+      if (old.parentNode) old.parentNode.removeChild(old);
+    }
+    var box = document.createElement("div");
+    box.id = "tts-fail"; box.className = "ttsfail";
+    box.setAttribute("role", "alert"); box.setAttribute("data-kind", kind);
+    var t = document.createElement("span"); t.textContent = text + " ";
+    var a = document.createElement("a"); a.href = "/voice/"; a.textContent = "בדיקה והוראות תיקון";
+    var x = document.createElement("button");
+    x.type = "button"; x.textContent = "✕"; x.setAttribute("aria-label", "סגירה");
+    x.onclick = function () { if (box.parentNode) box.parentNode.removeChild(box); };
+    box.appendChild(t); box.appendChild(a); box.appendChild(x);
+    /* ליד הכפתור שנלחץ: הוא מסומן `on` כל עוד התור חי, ולכן זה
+       נקרא לפני stop(). הכפתור יושב בשורה גמישה, ומתחתיה ההתרעה. */
+    var btn = null, host = null;
+    try { btn = document.querySelector("[data-read].on,[data-read-el].on"); } catch (e) {}
+    if (btn) host = (btn.closest && btn.closest(".saybar,.qhead")) || btn;
+    if (host && host.parentNode) host.parentNode.insertBefore(box, host.nextSibling);
+    else { box.classList.add("float"); document.body.appendChild(box); }
+  }
+  function ttsAlertClear(kind) {
+    var old = document.getElementById("tts-fail");
+    if (old && old.getAttribute("data-kind") === kind && old.parentNode) old.parentNode.removeChild(old);
+  }
+
+  function clearMarks() {
+    var els = document.querySelectorAll(".is-reading,.sent.on");
+    Array.prototype.forEach.call(els, function (e) {
+      e.classList.remove("is-reading"); e.classList.remove("on");
+    });
+  }
+  function mark(item) {
+    clearMarks();
+    if (!item || !item.unit || !item.unit.el) return;
+    var el = item.unit.el;
+    var spans = el.querySelectorAll(".sent");
+    /* יש משפטים — מסמנים את המשפט. אין — מסמנים את היחידה כולה,
+       וזה המקרה של תיבת הנוסחה, שאין בה טקסט לחלק. */
+    if (spans.length && item.sent < spans.length) spans[item.sent].classList.add("on");
+    else el.classList.add("is-reading");
+  }
+  function fire() { if (typeof api.onstate === "function") api.onstate(api.speaking); }
+
+  function stop() {
+    token++;
+    queue = []; qi = 0; current = null; api.tag = null;
+    paused = false; held = null;
+    if (keep) { clearInterval(keep); keep = null; }
+    disarmDog(); current = null;
+    try { speechSynthesis.cancel(); } catch (e) {}
+    clearMarks();
+    if (api.speaking) { api.speaking = false; fire(); }
+  }
+  api.stop = stop;
+
+  /* --- אמירה קצרה, בלי תור --------------------------------------
+     תווית של כפתור (O-28): אותו קול ואותו קצב כמו בהקראה, אבל בלי
+     stopbar, בלי keepalive ובלי סימון "on" — משפט אחד וזהו. שותקת
+     כשההקראה עצמה מדברת. */
+  api.say = function (text) {
+    text = String(text || "").trim();
+    if (!text || !supported() || api.speaking) return;
+    try { if (speechSynthesis.speaking || speechSynthesis.pending) return; } catch (e) {}
+    var v = bestVoice(), u = new SpeechSynthesisUtterance(heSpoken(text));
+    if (v) u.voice = v;
+    u.lang = v ? normLang(v.lang) : LANG;
+    u.rate = Math.max(0.5, Math.min(2, RATE_BASE * api.rate));
+    u.pitch = PITCH_BASE;
+    try { speechSynthesis.speak(u); } catch (e) {}
+  };
+
+  function step(my) {
+    if (my !== token) return;
+    if (qi >= queue.length) {
+      /* ההתרעה לפני stop(): stop מוריד את סימון `on` מהכפתור, וההתרעה
+         נכנסת לידו. */
+      if (!spoke && queue.length) ttsAlert("engine", MSG_ENGINE);
+      stop(); return;
+    }
+    var item = queue[qi++];
+    mark(item);
+    var u = new SpeechSynthesisUtterance(heSpoken(item.text));
+    var v = bestVoice();
+    if (v) u.voice = v;
+    /* מנורמל: "he_IL" ו-"iw-IL" אינם תגיות BCP47 חוקיות, ויש מנועים
+       שמתעלמים מתגית שאינה חוקית וחוזרים לשפת ברירת המחדל. */
+    u.lang = v ? normLang(v.lang) : LANG;
+    u.rate = Math.max(0.5, Math.min(2, RATE_BASE * api.rate));
+    u.pitch = PITCH_BASE;
+    /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
+       יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+    var moved = false;
+    function advance(gap) {
+      if (moved || my !== token) return;
+      moved = true; disarmDog();
+      /* אנדרואיד מתעלם מ-pause. לכן גם דגל משלנו: מנוע שמכבד
+         יישתק מיד, ומי שלא — יסיים את המקטע הנוכחי ויעצור כאן. */
+      if (paused) { held = function () { step(my); }; return; }
+      setTimeout(function () { if (!paused) step(my); else held = function () { step(my); }; }, gap);
+    }
+    /* מקטע שהתחיל או נגמר הוא מקטע שהמנוע לקח: מרגע זה שתיקה בסוף
+       התור אינה תקלת מנוע, וההתרעה מהפעם הקודמת יורדת. */
+    u.onstart = function () { if (my === token) { spoke = true; ttsAlertClear("engine"); } };
+    u.onend = function () { if (my === token) spoke = true; advance(SEG_GAP); };
+    /* שגיאה באמצע רצף אינה סיבה לשתוק עד הסוף: ממשיכים למקטע הבא,
+       ורק אם כולם נכשלו המשתמש רואה שדבר לא קרה. */
+    u.onerror = function (ev) {
+      if (moved || my !== token) return;
+      var err = (ev && ev.error) || "";
+      if (err === "canceled" || err === "interrupted") { moved = true; disarmDog(); return; }
+      /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. מכבים אותו
+         וחוזרים על אותו מקטע, פעם אחת בסשן, במקום לדלג עליו —
+         דילוג כזה בולע משפט שלם והתלמיד לא יודע שהוא פספס אותו. */
+      if (!netRetried && v && v.localService === false) {
+        netRetried = true; netVoiceOK = false;
+        moved = true; disarmDog(); current = null;
+        qi--;                          /* אותו מקטע, קול אחר */
+        setTimeout(function () { step(my); }, 60);
+        return;
+      }
+      advance(60);
+    };
+    current = u;                       /* מגן מפני איסוף זבל */
+    try { if (speechSynthesis.paused && !paused) speechSynthesis.resume(); } catch (e) {}
+    try { speechSynthesis.speak(u); } catch (e) { stop(); return; }
+    /* שומר זמן: יש מכשירים שבהם onend פשוט לא נורה, והתור נתקע
+       עם כפתור שנשאר על "עצירה". ארבע שניות שבהן המנוע לא מדבר
+       ולא ממתין — והשהיה מכוונת אינה נספרת — נחשבות סוף. */
+    disarmDog();
+    var idle = 0;
+    dog = setInterval(function () {
+      if (moved || my !== token) { disarmDog(); return; }
+      if (paused) { idle = 0; return; }
+      var busy = false;
+      try { busy = !!(speechSynthesis.speaking || speechSynthesis.pending); } catch (e) {}
+      if (busy) { idle = 0; return; }
+      if (++idle >= 4) advance(0);
+    }, 1000);
+  }
+
+  /* --- ההפעלה מבחוץ ---------------------------------------------
+     units = [{ text, el }] — טקסט לומר, ואלמנט להדגיש בזמן שהוא
+     נאמר. יחידה בלי טקסט נזרקת בשקט: כך "הקריאו את הסעיף" עובד
+     גם כשאין לו נוסחה, בלי שהקורא צריך לדעת. */
+  api.speak = function (units, tag) {
+    if (!supported()) return;
+    stop();
+    api.tag = tag || null;
+    var list = (units || []).filter(function (u) { return u && String(u.text || "").trim(); });
+    if (!list.length) return;
+    var my = ++token;
+    voicesReady().then(function () {
+      if (my !== token) return;
+      queue = []; qi = 0;
+      list.forEach(function (u) {
+        var ss = sentences(String(u.text));
+        ss.forEach(function (s, si) {
+          var spoken = sayable(s);
+          if (!spoken) return;   /* משפט שכולו סימני פיסוק אינו אמירה */
+          chunks(spoken).forEach(function (c) { queue.push({ text: c, unit: u, sent: si }); });
+        });
+      });
+      spoke = false;
+      api.speaking = true; fire();
+      /* יש קולות, ואף אחד מהם עברי — אחרי fire(), כדי שהכפתור כבר
+         יהיה מסומן וההתרעה תיכנס לידו. */
+      if (!warnedNoHe && allVoices().length && !hebrewVoices().length) {
+        warnedNoHe = true; ttsAlert("nohe", MSG_NOHE);
+      }
+      if (keep) { clearInterval(keep); keep = null; }
+      /* הפינג הזה פותר באג של Chrome ושל Edge בשולחן העבודה בלבד.
+         במובייל אין את הבאג, ו-pause+resume דווקא מקרטע שם — עד
+         כאן הוא רץ גם שם. */
+      if (NEEDS_KEEPALIVE) keep = setInterval(function () {
+        /* כרום עוצר הקראה ארוכה. resume על תור פעיל אינו מזיק.
+           אבל כשהמשתמש השהה בעצמו — הפינג הזה היה מחזיר את הקול
+           תוך ארבע שניות, כלומר מבטל את הכפתור שהוא הרגע לחץ. */
+        if (paused) return;
+        try { if (speechSynthesis.speaking) { speechSynthesis.pause(); speechSynthesis.resume(); } }
+        catch (e) {}
+      }, KEEPALIVE);
+      step(my);
+    });
+  };
+
+  /* --- השהיה וניווט במשפטים -------------------------------------
+     הקהל של האפליקציה הזאת מאבד את השאלה באמצע. "עצרו" לבדו מחייב
+     אותו להתחיל את השאלה מהתחלה, וזה בדיוק מה שגרם לו לוותר. */
+  api.paused = function () { return paused; };
+  api.pause = function () {
+    if (!api.speaking || paused) return;
+    paused = true;
+    try { speechSynthesis.pause(); } catch (e) {}
+    fire();
+  };
+  api.resume = function () {
+    if (!api.speaking || !paused) return;
+    paused = false;
+    try { speechSynthesis.resume(); } catch (e) {}
+    if (held) { var f = held; held = null; f(); }
+    fire();
+  };
+  /* המקטע הראשון של המשפט שהמקטע במקום `i` שייך אליו */
+  function sentStart(i) {
+    var it = queue[i];
+    if (!it) return 0;
+    var k = i;
+    while (k > 0 && queue[k - 1].unit === it.unit && queue[k - 1].sent === it.sent) k--;
+    return k;
+  }
+  function jump(i) {
+    if (!api.speaking) return;
+    if (i < 0) i = 0;
+    if (i >= queue.length) { stop(); return; }
+    var my = ++token;
+    paused = false; held = null;
+    try { speechSynthesis.cancel(); } catch (e) {}
+    qi = i;
+    fire();
+    step(my);
+  }
+  /* "אחורה" מהמקטע הראשון של משפט חוזר למשפט הקודם; מאמצעו הוא
+     חוזר לתחילת אותו משפט — כמו כל נגן, ובלי להסביר. */
+  api.back = function () {
+    var cur = sentStart(qi - 1);
+    jump(qi - 1 > cur ? cur : sentStart(cur - 1));
+  };
+  api.fwd = function () {
+    var i = qi;
+    var it = queue[qi - 1];
+    while (i < queue.length && it && queue[i].unit === it.unit && queue[i].sent === it.sent) i++;
+    jump(i);
+  };
+
+  api.setRate = function (r) {
+    r = Number(r) || 1;
+    api.rate = r;
+    /* שינוי קצב באמצע אמירה אינו משפיע על אמירה שכבר יצאה. עוצרים,
+       כדי שלא ייווצר רושם שהבורר שבור. */
+    if (api.speaking) stop();
+  };
+  api.available = supported;
+  api.ready = voicesReady;
+  /* מיוצא כדי שהמסך יעטוף בדיוק את אותם משפטים שהמנוע אומר.
+     שני מפצלים נפרדים היו נפרדים ביום שמישהו יגע באחד מהם,
+     וההדגשה הייתה מסמנת משפט אחד בזמן שנאמר אחר. */
+  api.sentences = sentences;
+
+  /* --- שחרור ההשמעה ב-iOS ---------------------------------------
+     ספארי בנייד מתיר דיבור רק אחרי מגע. אמירה ריקה במגע הראשון
+     פותחת את הערוץ, ומאותו רגע כפתור הקראה עובד כרגיל. */
+  var unlocked = false;
+  function unlock() {
+    if (unlocked || !supported()) return;
+    unlocked = true;
+    try {
+      var u = new SpeechSynthesisUtterance(" ");
+      u.volume = 0; u.rate = 1;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  /* pointerdown הוא האירוע שכל שתים־עשרה האחיות ו״תאוריה מדברת״
+     משחררות בו, והוא נורה לפני touchend ולפני mousedown. בלעדיו
+     voice.js בדיקה 0 (19.9.2026) לא ראתה כאן שחרור. השניים האחרים
+     נשארים למכשיר שאין בו PointerEvent. */
+  document.addEventListener("pointerdown", unlock, { once: true });
+  document.addEventListener("touchend", unlock, { once: true, passive: true });
+  document.addEventListener("mousedown", unlock, { once: true });
+
+  /* יציאה מהדף בזמן הקראה משאירה קול שממשיך לדבר מעל אפליקציה
+     אחרת. עוצרים גם על הסתרה וגם על עזיבה. */
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) stop();
+  });
+  window.addEventListener("pagehide", stop);
+
+  if (supported()) voicesReady();
+  window.Speech = api;
+})();

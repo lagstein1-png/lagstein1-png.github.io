@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow">
+<script>
+/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html.
+   המפתח נשמר במגירה משל האפליקציה (shlav-internal-bagrut-history) ולא
+   במגירה המשותפת shlav-internal, כדי שפתיחת אזרח לא תסגור את
+   מתח ולהפך. */
+var INTERNAL_KEY="shlav-internal-bagrut-history";
+var INTERNAL_OK=(function(){
+  try{
+    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
+    if(q) localStorage.setItem("shlav-internal-bagrut-history", decodeURIComponent(q));
+    return localStorage.getItem("shlav-internal-bagrut-history")===INTERNAL_KEY;
+  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>היסטוריה לבגרות בהקראה — שאלוני משרד החינוך 22261 ו-22262, סימולציה ותרגול מודרך · חינם</title>
+<meta name="description" content="תרגול לבגרות בהיסטוריה על שאלונים רשמיים של משרד החינוך (22261 ו-22262, חורף תשפ״ה): כל שאלה וכל מקור מוקראים, סימולציית בחינה עם שעון ובחירת שאלות לפי פרקים כמו בבחינה האמיתית. חינם ובלי הרשמה." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="שיא — בגרות בהיסטוריה, שאלוני משרד החינוך 22261 ו-22262" />
+<meta property="og:description" content="תרגול לבגרות בהיסטוריה על שאלונים רשמיים של משרד החינוך (22261 ו-22262, חורף תשפ״ה): הקראה מלאה, סימולציה עם שעון ובחירת שאלות לפי פרקים. חינם ובלי הרשמה." />
+<link rel="canonical" href="https://bekol.co.il/bagrut-history/" />
+<meta property="og:url" content="https://bekol.co.il/bagrut-history/" />
+<meta property="og:image" content="https://bekol.co.il/bagrut-history/img/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#f6f7fb" media="(prefers-color-scheme:light)" />
+<meta name="theme-color" content="#0d1425" media="(prefers-color-scheme:dark)" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png" />
+<link rel="stylesheet" href="vendor/katex/katex.min.css" />
+<style>
+/* ============================================================
+   שיא — בגרות בהיסטוריה (שאלוני משרד החינוך)
+   קהל היעד אינו "לא יודע היסטוריה". הוא יודע, ומאבד את השאלה
+   בקריאה שלה — בעברית, בריכוז, או בשורת נוסחה שאין לה קול.
+   לכן כל החלטה כאן נמדדת בשאלה אחת: האם היא מורידה עומס.
+
+   · שום נוסחה אינה מוצגת בלי שאפשר לשמוע אותה בעברית מדוברת.
+   · אזור נגיעה מינימלי 48 פיקסלים. אצבע רועדת אינה שגיאת משתמש.
+   · כל המידות ב-rem וגזורות מ---fs, כדי שהגדלת טקסט תגדיל את
+     הכול יחד ולא תשבור את הפריסה.
+   · אין גופן חיצוני ואין CDN. מה שאינו בריפו לא ייטען לעולם.
+   ============================================================ */
+:root{
+  /* **״Heebo״ ו-״Rubik״ עמדו כאן בראש המחסנית עד 17.9.2026, והאתר
+     הזה אינו טוען אותם כאן.** עשר האפליקציות האחרות מושכות אותם
+     מ-Google Fonts; הקובץ הזה מצהיר בראשו ״אין גופן חיצוני ואין
+     CDN״, וזו החלטה ולא השמטה. שני השמות לא עשו דבר — הם נופלים
+     דרך המחסנית בכל מכשיר שבו הם אינם מותקנים, כלומר כמעט בכולם —
+     אבל מי שקרא את השורה הסיק שהעמוד מוצג ב-Heebo.
+
+     המחסנית אומרת עכשיו מה באמת קורה. **החלופה — לטעון Heebo
+     כמו בעשר האחרות — היא שינוי של ההחלטה שבראש הקובץ, ולכן
+     היא של הבעלים.** */
+  --font:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+  --bg:#f6f7fb; --surface:#ffffff; --surface2:#eceff7;
+  /* --faint היה #6b7a90, ונמדד 4.08:1 מול רקע הדף ו-4.37:1 מול לבן —
+     מתחת ל-4.5 שהתקן דורש. הוא נושא את הפוטר ואת טקסט הרמז שבשדה
+     התשובה ("מספר — למשל 0.8"), שהוא הדבר היחיד שאומר לתלמיד מה
+     מותר לכתוב שם. הכהיה מינימלית: 4.76:1 מול הרקע, 5.09:1 מול לבן. */
+  --ink:#0f1729; --muted:#4a5568; --faint:#616f85; --line:#dbe1ec;
+  --accent:#1e40af; --accent-ink:#ffffff; --accent-soft:#dde5fb;
+  --ok:#15803d; --ok-soft:#dcfce7; --bad:#b91c1c; --bad-soft:#fee2e2;
+  --warn:#b45309; --warn-soft:#fef3c7;
+  --hit:#ffe08a; --hit-ink:#0f1729;
+  --shadow:0 1px 2px rgba(15,23,41,.05),0 8px 24px -14px rgba(15,23,41,.25);
+  --r:14px;
+  --fs:1.06rem;
+}
+:root[data-theme="dark"]{
+  --bg:#0d1425; --surface:#151d33; --surface2:#1d2743;
+  --ink:#e8edf7; --muted:#9fb0c9; --faint:#7d8da8; --line:#2a3552;
+  --accent:#93b4fd; --accent-ink:#0d1425; --accent-soft:#1c2a4d;
+  --ok:#4ade80; --ok-soft:#122a1b; --bad:#fca5a5; --bad-soft:#3a1a1a;
+  --warn:#fbbf24; --warn-soft:#33260f;
+  --hit:#4a3c0d; --hit-ink:#e8edf7;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -16px rgba(0,0,0,.75);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1425; --surface:#151d33; --surface2:#1d2743;
+    --ink:#e8edf7; --muted:#9fb0c9; --faint:#7d8da8; --line:#2a3552;
+    --accent:#93b4fd; --accent-ink:#0d1425; --accent-soft:#1c2a4d;
+    --ok:#4ade80; --ok-soft:#122a1b; --bad:#fca5a5; --bad-soft:#3a1a1a;
+    --warn:#fbbf24; --warn-soft:#33260f;
+    --hit:#4a3c0d; --hit-ink:#e8edf7;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -16px rgba(0,0,0,.75);
+  }
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font:400 var(--fs)/1.7 var(--font);
+  -webkit-text-size-adjust:100%;
+}
+h1,h2,h3{line-height:1.3;margin:0 0 .5rem}
+h1{font-size:1.5em;font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.22em;font-weight:700}
+h3{font-size:1.06em;font-weight:700}
+p{margin:0 0 .8rem}
+.wrap{max-width:46rem;margin:0 auto;padding:0 clamp(.9rem,4vw,1.4rem)}
+
+/* --- סרגל עליון --- */
+.top{
+  position:sticky;top:0;z-index:30;background:var(--surface);
+  border-bottom:1px solid var(--line);
+}
+/* שלושה כפתורים ושם המותג אינם נכנסים ב-320 פיקסלים. בלי wrap
+   הכפתור השלישי נדחף מחוץ למסך ומרחיב את הדף כולו — וכל הדף
+   מתחיל להיגרר לצדדים, לא רק הסרגל. */
+.toprow{display:flex;align-items:center;gap:.6rem;min-height:56px;flex-wrap:wrap;
+  padding-block:.35rem}
+.brand{font-weight:800;font-size:1.12em;margin-inline-end:auto;
+  display:flex;align-items:baseline;gap:.45rem}
+.brand small{font-size:.7em;font-weight:600;color:var(--muted)}
+@media (max-width:26rem){.brand small{display:none}}
+
+/* --- כפתורים. 48 פיקסלים אינם המלצה --- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.45rem;
+  min-height:48px;padding:.55rem 1rem;border-radius:999px;cursor:pointer;
+  font:inherit;font-weight:700;font-size:.95em;
+  background:var(--surface);color:var(--ink);border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{box-shadow:none;background:transparent}
+.btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:focus-visible,a:focus-visible,[tabindex]:focus-visible{
+  outline:3px solid var(--accent);outline-offset:2px}
+
+/* --- כרטיסים --- */
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);padding:1rem;margin:0 0 .9rem;
+}
+.pick{
+  display:block;width:100%;text-align:start;cursor:pointer;font:inherit;
+  color:inherit;min-height:48px;
+}
+.pick:hover{border-color:var(--accent)}
+.meta{color:var(--muted);font-size:.9em}
+.chip{
+  display:inline-block;padding:.15rem .6rem;border-radius:999px;
+  background:var(--surface2);color:var(--muted);font-size:.82em;font-weight:600;
+}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+
+/* --- מסכים --- */
+main{padding:1.1rem 0 3rem}
+[hidden]{display:none !important}
+
+/* --- שלד: הודעה שמסך עוד לא נבנה. מוסרת בשלב שכתוב בה --- */
+.stub{
+  border:2px dashed var(--line);border-radius:var(--r);
+  padding:1.2rem;text-align:center;color:var(--muted);background:var(--surface2);
+}
+.stub b{color:var(--ink);display:block;margin-bottom:.3rem;font-size:1.06em}
+
+/* --- תצוגת השאלה --- */
+.qhead{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.4rem}
+.qnum{
+  background:var(--accent);color:var(--accent-ink);font-weight:800;
+  border-radius:10px;padding:.1rem .6rem;font-size:.92em;
+}
+.sub{border-top:1px solid var(--line);padding-top:.85rem;margin-top:.85rem}
+.letter{font-weight:800;color:var(--accent)}
+/* נוסחה אינה נשברת לשתי שורות, ולכן על מסך צר היא חייבת או להתכווץ
+   או לגלול. התכווצות פוגעת בדיוק בקהל שהאפליקציה נבנתה בשבילו, ולכן
+   היא גולשת — ומקבלת את כל רוחב המסך לפני כן, וסימן שאפשר להזיז. */
+.formula{
+  background:var(--surface2);border-radius:10px;padding:.7rem .8rem;
+  margin:.6rem 0;overflow-x:auto;direction:ltr;text-align:center;
+  overscroll-behavior-x:contain;
+}
+@media (max-width:30rem){
+  .formula{
+    margin-inline:calc(-1 * clamp(.9rem,4vw,1.4rem));
+    border-radius:0;padding-inline:.25rem;
+  }
+}
+.formula.over{
+  background:
+    linear-gradient(to left,var(--surface2) 70%,rgba(0,0,0,0)) left/2.2rem 100% no-repeat,
+    linear-gradient(to right,var(--surface2) 70%,rgba(0,0,0,0)) right/2.2rem 100% no-repeat,
+    var(--accent-soft);
+}
+.formula.over::after{
+  content:"↔ אפשר להזיז";display:block;direction:rtl;
+  font:600 .74em/1 var(--font);color:var(--muted);padding-top:.45rem;
+}
+.saytxt{
+  color:var(--muted);font-size:.9em;border-inline-start:3px solid var(--line);
+  padding-inline-start:.7rem;margin:.4rem 0 0;
+}
+
+/* --- הקראה ---
+   כפתור ההקראה יושב בשורה של הכותרת ולא מתחתיה: מי שמחפש אותו
+   מחפש אותו ליד הטקסט, לא בסוף הכרטיס. */
+.spk{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:48px;min-height:48px;flex:none;cursor:pointer;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:999px;box-shadow:var(--shadow);font:inherit;font-size:1.1em;
+}
+.spk:hover{border-color:var(--accent);color:var(--accent)}
+.spk:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.spk.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+/* "השאלה כולה" יורד לשורה משלו על מסך צר, במקום לדחוס את שם הנושא */
+.btn.wide{padding:.45rem .85rem;font-size:.88em;margin-inline-start:auto}
+@media (max-width:26rem){.btn.wide{margin-inline-start:0;width:100%}}
+.saytxt.bad{border-inline-start-color:var(--bad);color:var(--bad)}
+.saybar{display:flex;align-items:flex-start;gap:.6rem}
+.saybar>.grow{min-width:0}
+
+/* המשפט הנקרא כרגע. רקע ולא צבע טקסט: שינוי צבע האות פוגע
+   בניגודיות בדיוק אצל מי שזקוק לה, ורקע שומר עליה — כאן 13.86
+   בבהיר ו-9.20 בכהה. הצהוב אינו קישוט: הוא נבדל מכחול המותג,
+   ולכן "מה נקרא עכשיו" ו"מה נבחר" אינם נראים אותו דבר. */
+.sent.on{
+  background:var(--hit);color:var(--hit-ink);
+  border-radius:4px;box-shadow:0 0 0 3px var(--hit);
+}
+/* מסגרת על היחידה כולה רק כשאין בה משפטים לסמן — נוסחה, למשל.
+   שתי סימוני מיקום על אותו טקסט הם רעש, לא הדגשה. */
+.is-reading{outline:3px solid var(--hit);outline-offset:3px;border-radius:8px}
+
+/* סרגל עצירה. צף למטה כדי שאפשר יהיה לעצור בלי לגלול חזרה. */
+.stopbar{
+  position:fixed;inset-inline:0;bottom:0;z-index:50;
+  background:var(--surface);border-top:1px solid var(--line);
+  padding:.5rem clamp(.9rem,4vw,1.4rem);
+  display:flex;gap:.6rem;align-items:center;justify-content:center;
+  box-shadow:0 -6px 20px -14px rgba(0,0,0,.5);
+}
+.stopbar .lbl{color:var(--muted);font-size:.9em}
+
+/* התרעת הקראה. נולדת ב-speech.js רק כשכל המקטעים נכשלו ואף אחד לא
+   נאמר, או כשבמכשיר אין קול עברי — ונכנסת מתחת לשורת הכפתור שנלחץ,
+   כדי שמי שלחץ ושמע שתיקה יראה למה. */
+.ttsfail{
+  display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;
+  margin:.5rem 0 .8rem;padding:.7rem .9rem;border-radius:10px;
+  background:var(--warn-soft);color:var(--ink);border:1px solid var(--warn);
+  font-weight:600;font-size:.95em;
+}
+.ttsfail a{color:inherit;text-decoration:underline;font-weight:700}
+.ttsfail button{
+  min-width:44px;min-height:44px;margin-inline-start:auto;border:0;border-radius:9px;
+  background:transparent;color:inherit;font:inherit;font-size:1.1em;cursor:pointer;
+}
+.ttsfail button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.ttsfail.float{position:fixed;inset-inline:.6rem;bottom:.6rem;z-index:60;box-shadow:var(--shadow)}
+
+/* --- רמזים, תשובה ומשוב (שלב 3) ---
+   הרמז אינו הפתרון, והפתרון אינו נחשף בטעות: כל אחד מהם דורש
+   לחיצה משלו, ולתלמיד יש תמיד דרך אחורה. */
+.ansbox{
+  border-top:1px solid var(--line);margin-top:.85rem;padding-top:.85rem;
+  display:flex;flex-direction:column;gap:.6rem;
+}
+.ansrow{display:flex;gap:.5rem;align-items:stretch;flex-wrap:wrap}
+/* מסגרת השדה ב---faint ולא ב---line: לשדה יש בדיוק אותו רקע כמו
+   לכרטיס שהוא יושב בו, ולכן המסגרת היא כל מה שאומר "כאן כותבים".
+   --line נותן 1.31:1 מול לבן — התקן דורש 3:1 לגבול של רכיב קלט,
+   ומי שרואה בניגודיות נמוכה פשוט לא ראה שיש כאן שדה. עכשיו 5.09:1
+   בבהיר ו-4.98:1 בכהה. */
+.ansrow input{
+  flex:1 1 8rem;min-width:0;min-height:48px;padding:.5rem .8rem;
+  font:inherit;font-size:1.05em;text-align:start;
+  border:2px solid var(--faint);border-radius:12px;
+  background:var(--surface);color:var(--ink);
+}
+.ansrow input:focus-visible{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.ansrow input::placeholder{color:var(--faint)}
+
+/* שורה אחת ולא שתי עמודות: כשהמשוב היה flex, "עוד לא." הקצר
+   והסבר ארוך לצידו נשברו לשתי עמודות מקבילות, ומי שקורא לאט
+   קרא אותן לסירוגין. */
+.verdict{border-radius:12px;padding:.7rem .85rem;font-weight:800}
+.verdict.ok{background:var(--ok-soft);color:var(--ok)}
+.verdict.no{background:var(--bad-soft);color:var(--bad)}
+.verdict .why{display:block;font-weight:400;font-size:.94em;margin-top:.3rem;color:var(--ink)}
+
+/* רמז שנחשף. המספר בצד אינו קישוט: הוא אומר לתלמיד כמה נשארו,
+   וזה ההבדל בין "אני תקוע" לבין "אני בשלב שני מתוך שלושה". */
+.hint{
+  background:var(--surface2);border-inline-start:4px solid var(--accent);
+  border-radius:0 12px 12px 0;padding:.65rem .85rem;
+}
+:root[dir="rtl"] .hint{border-radius:12px 0 0 12px}
+.hint .n{
+  flex:none;align-self:flex-start;background:var(--accent);color:var(--accent-ink);
+  border-radius:8px;padding:.1rem .55rem;font-weight:800;font-size:.85em;
+}
+.solution{background:var(--ok-soft);border-inline-start:4px solid var(--ok);
+  border-radius:12px;padding:.7rem .9rem}
+.solution h4{margin:0 0 .5rem;font-size:1em;color:var(--ok)}
+.solution ol{margin:0;padding-inline-start:1.2rem}
+.solution li{margin-bottom:.5rem}
+.solution li:last-child{margin-bottom:0}
+.hintbar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.hintbar .left{color:var(--muted);font-size:.9em;margin-inline-start:auto}
+
+/* --- סימולציה (שלב 4) ---
+   השעון דבוק מתחת לסרגל העליון. תלמיד שצריך לגלול כדי לדעת כמה
+   זמן נשאר מפסיק לגלול ומתחיל לדאוג. */
+.clock{
+  position:sticky;top:56px;z-index:25;background:var(--surface);
+  border-bottom:1px solid var(--line);padding:.5rem 0;margin-bottom:.9rem;
+  display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;
+}
+.clock .t{
+  font-variant-numeric:tabular-nums;font-weight:800;font-size:1.25em;
+  direction:ltr;unicode-bidi:isolate;
+}
+.clock.low .t{color:var(--bad)}
+.clock .bar{
+  flex:1 1 6rem;min-width:4rem;height:8px;border-radius:999px;
+  background:var(--surface2);overflow:hidden;
+}
+.clock .bar i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.clock.low .bar i{background:var(--bad)}
+
+/* --- דוח --- */
+.score{
+  background:var(--accent-soft);border-radius:var(--r);padding:1rem;
+  text-align:center;margin-bottom:.9rem;
+}
+.score .big{font-size:2.1em;font-weight:800;line-height:1.1;color:var(--accent)}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th,.tbl td{text-align:start;padding:.55rem .4rem;border-bottom:1px solid var(--line)}
+.tbl th{font-size:.9em;color:var(--muted);font-weight:700}
+.tbl tr:last-child td{border-bottom:0}
+.bar2{height:10px;border-radius:999px;background:var(--surface2);overflow:hidden;min-width:4rem}
+.bar2 i{display:block;height:100%;border-radius:999px;background:var(--ok)}
+.bar2.weak i{background:var(--bad)}
+.tag{font-weight:700;font-size:.85em;padding:.1rem .5rem;border-radius:999px}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.no{background:var(--bad-soft);color:var(--bad)}
+
+.note{
+  background:var(--warn-soft);color:var(--warn);border-radius:10px;
+  padding:.7rem .85rem;font-size:.92em;font-weight:600;margin:0 0 .9rem;
+}
+
+/* --- הגדרות --- */
+.row{
+  display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;
+  padding:.75rem 0;border-bottom:1px solid var(--line);
+}
+.row:last-child{border-bottom:0}
+.row .lab{font-weight:700}
+.row .desc{color:var(--muted);font-size:.9em}
+.grow{margin-inline-end:auto}
+.group{display:flex;gap:.4rem;flex-wrap:wrap}
+
+.sr{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0;
+}
+
+/* קישור דילוג — נסתר עד ש-Tab מגיע אליו. הראשון במסמך, ולכן מי
+   שמנווט במקלדת מדלג על ארבעת כפתורי הסרגל בכל מסך מחדש. */
+.skip{
+  position:absolute;inset-inline-start:.6rem;top:-4rem;z-index:60;
+  background:var(--accent);color:var(--accent-ink);font-weight:700;
+  padding:.6rem .9rem;border-radius:10px;text-decoration:none;
+  transition:top .12s ease;
+}
+.skip:focus{top:.6rem}
+
+/* --- ארבעת מצבי הנגישות שחסרו כאן, 17.9.2026 ------------------
+   תשע האפליקציות האחרות מחזיקות אותם ב-`applyModes`; כאן הם
+   ב-`applyPrefs` שב-`app.js`, באותן מחלקות בדיוק. שמות המחלקות
+   זהים בכוונה — `.claude/qa/a11y.js` מזהה יכולת לפי השם. */
+html.clear-font{--font:Tahoma,Verdana,Arial,sans-serif}
+html.spaced body{letter-spacing:.015em;word-spacing:.12em;line-height:1.85}
+html.reduce-motion *{animation:none !important;transition:none !important}
+
+/* ניגודיות גבוהה: דיו שחור על לבן, גבול מלא לכל משטח, ובלי צל.
+   הצל הוא מה שמפריד כרטיס מרקע במצב הרגיל — כשהוא יורד, הגבול
+   הוא הדבר היחיד שנשאר לסמן היכן נגמר הכרטיס. */
+html.hi-contrast{
+  --bg:#ffffff; --surface:#ffffff; --surface2:#f0f0f0;
+  --ink:#000000; --muted:#000000; --faint:#000000; --line:#000000;
+  --accent:#00008b; --accent-ink:#ffffff; --accent-soft:#e6e6ff;
+  --ok:#005a20; --ok-soft:#e6f5ea; --bad:#8b0000; --bad-soft:#ffe6e6;
+  --warn:#6b3a00; --warn-soft:#fff2d9;
+  --hit:#ffe08a; --hit-ink:#000000;
+  --shadow:none;
+}
+html.hi-contrast .card,html.hi-contrast .btn,html.hi-contrast .tag,
+html.hi-contrast .note,html.hi-contrast .top,html.hi-contrast .stopbar,
+html.hi-contrast .ansrow input{border:2px solid #000}
+html.hi-contrast .bar2{border:1px solid #000}
+footer{color:var(--faint);font-size:.85em;padding:1.2rem 0 2rem;text-align:center}
+#build{unicode-bidi:isolate}
+
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+
+/* סמל האתר בשורה העליונה — אותו סמל בכל שלושה־עשר הדפים.
+   `currentColor` ולכן הוא נצבע מעצמו בכל מצב נגישות. */
+.brand .sitemark{inline-size:1.15em;block-size:1.15em;flex:none;
+  vertical-align:-.16em;margin-inline-end:.4em;opacity:.9}
+
+/* כפתורי הקראה בולטים — ירוק עם תווית, כמו בשאר האפליקציות */
+.spk{border-radius:12px;background:#0e9c8d;border-color:#0b7c71;color:#fff;font-weight:700;font-size:1rem;padding:8px 16px;min-width:0}
+.spk:hover{background:#0b7c71;color:#fff}
+.spk.on{background:#0b7c71;color:#fff;border-color:#0b7c71}
+
+.srcp{margin:.35rem 0}
+.qimg{display:block;max-width:100%;height:auto;margin:.6rem auto;
+  border:1px solid #c9d2e0;border-radius:.5rem;background:#fff}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">דילוג לתוכן</a>
+
+<header class="top">
+  <div class="wrap toprow">
+    <span class="brand"><svg class="sitemark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg>שיא <small>בגרות בהיסטוריה · 22261/22262</small></span>
+    <button class="btn ghost" data-go="home" id="btn-home" hidden>לבחינות</button>
+    <button class="btn ghost" data-go="prog">התקדמות</button>
+    <button class="btn ghost" data-go="settings">הגדרות</button>
+  </div>
+</header>
+
+<main class="wrap" id="main" tabindex="-1">
+
+  <!-- ================= מסך פתיחה ================= -->
+  <section id="scr-home">
+    <h1>היסטוריה לבגרות, בהקראה</h1>
+    <p>השאלות והמקורות מועתקים כלשונם משאלוני הבגרות הרשמיים של משרד
+       החינוך, וכל אחד מהם נשמע בעברית מדוברת לפני שקוראים אותו.
+       בלי פרסומות, וההתקדמות נשמרת במכשיר שלכם בלבד.</p>
+    <h2>בחרו בחינה</h2>
+    <div id="exam-list"></div>
+  </section>
+
+  <!-- ================= בחירת מצב ================= -->
+  <section id="scr-mode" hidden>
+    <h1 id="mode-title">בחירת מצב</h1>
+    <p class="meta" id="mode-meta"></p>
+    <button class="card pick" data-go="sim">
+      <h2>סימולציית בחינה</h2>
+      <p class="meta">בחינה מלאה עם שעון שסופר לאחור. אין רמזים ואין
+         פתרונות עד הסיום, ובסופה דוח לפי נושא.</p>
+    </button>
+    <button class="card pick" data-go="practice">
+      <h2>תרגול מודרך</h2>
+      <p class="meta">שאלה אחת בכל פעם. הרמזים נחשפים אחד־אחד בלחיצה,
+         והפתרון המלא אחרון.</p>
+    </button>
+  </section>
+
+  <!-- ================= סימולציה ================= -->
+  <section id="scr-sim" hidden>
+    <h1>סימולציית בחינה</h1>
+    <p class="meta" id="sim-meta"></p>
+    <div id="sim-body"></div>
+  </section>
+
+  <!-- ================= התקדמות ================= -->
+  <section id="scr-prog" hidden>
+    <h1>ההתקדמות שלכם</h1>
+    <div id="prog-body"></div>
+  </section>
+
+  <!-- ================= תרגול מודרך ================= -->
+  <section id="scr-practice" hidden>
+    <h1>תרגול מודרך</h1>
+    <p class="meta" id="prac-meta"></p>
+    <p class="note">בתרגול המודרך אין שעון ואין עונש. הרמזים נחשפים
+      רק כשמבקשים אותם, אחד־אחד, והפתרון המלא אחרון. מה שפותרים כאן
+      נספר בדוח הנושאים החלשים, והתרגול עובד גם בלי אינטרנט.</p>
+    <h2>בחרו נושא</h2>
+    <div class="group" id="topic-list" style="margin-bottom:1rem"></div>
+    <div id="prac-preview"></div>
+  </section>
+
+  <!-- ================= הגדרות ================= -->
+  <section id="scr-settings" hidden>
+    <h1>הגדרות</h1>
+    <div class="card">
+      <div class="row">
+        <div class="grow">
+          <div class="lab">גודל טקסט</div>
+          <div class="desc">מגדיל את כל המסך יחד, לא רק את השאלה</div>
+        </div>
+        <div class="group" role="group" aria-label="גודל טקסט">
+          <button class="btn" data-fs="1">רגיל</button>
+          <button class="btn" data-fs="1.15">גדול</button>
+          <button class="btn" data-fs="1.32">גדול מאוד</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="grow">
+          <div class="lab">מהירות ההקראה</div>
+          <div class="desc">שינוי באמצע עוצר את ההקראה הנוכחית, והבאה תישמע בקצב החדש</div>
+        </div>
+        <div class="group" role="group" aria-label="מהירות ההקראה">
+          <button class="btn" data-rate="0.7">לאט</button>
+          <button class="btn" data-rate="1">רגיל</button>
+          <button class="btn" data-rate="1.3">מהר</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="grow">
+          <div class="lab">כפתורים מדברים</div>
+          <div class="desc">כל כפתור שנלחץ מוקרא בשמו</div>
+        </div>
+        <div class="group" role="group" aria-label="כפתורים מדברים">
+          <button class="btn" data-say="1">כן</button>
+          <button class="btn" data-say="0">לא</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="grow">
+          <div class="lab">קול ההקראה</div>
+          <div class="desc" id="voice-state">בודקים…</div>
+        </div>
+        <button class="btn" id="btn-try">שמעו דוגמה</button>
+      </div>
+      <div class="row">
+        <div class="grow">
+          <div class="lab">מראה</div>
+          <div class="desc">ברירת המחדל הולכת אחרי המכשיר</div>
+        </div>
+        <div class="group" role="group" aria-label="מראה">
+          <button class="btn" data-theme="auto">אוטומטי</button>
+          <button class="btn" data-theme="light">בהיר</button>
+          <button class="btn" data-theme="dark">כהה</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="grow">
+          <div class="lab">פונט קריא</div>
+          <div class="desc">אותיות פשוטות יותר, בלי קצוות מעוגלים</div>
+        </div>
+        <div class="group" role="group" aria-label="פונט קריא">
+          <button class="btn" data-a11y="clearFont" data-val="1">כן</button>
+          <button class="btn" data-a11y="clearFont" data-val="0">לא</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="grow">
+          <div class="lab">ניגודיות גבוהה</div>
+          <div class="desc">שחור על לבן, וגבול מלא לכל כרטיס</div>
+        </div>
+        <div class="group" role="group" aria-label="ניגודיות גבוהה">
+          <button class="btn" data-a11y="contrast" data-val="1">כן</button>
+          <button class="btn" data-a11y="contrast" data-val="0">לא</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="grow">
+          <div class="lab">ריווח מוגדל</div>
+          <div class="desc">רווח גדול יותר בין אותיות, מילים ושורות</div>
+        </div>
+        <div class="group" role="group" aria-label="ריווח מוגדל">
+          <button class="btn" data-a11y="spaced" data-val="1">כן</button>
+          <button class="btn" data-a11y="spaced" data-val="0">לא</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="grow">
+          <div class="lab">תנועה מופחתת</div>
+          <div class="desc">עוצר אנימציות ומעברים</div>
+        </div>
+        <div class="group" role="group" aria-label="תנועה מופחתת">
+          <button class="btn" data-a11y="reduceMotion" data-val="1">כן</button>
+          <button class="btn" data-a11y="reduceMotion" data-val="0">לא</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="grow">
+          <div class="lab">איפוס נתונים</div>
+          <div class="desc">מוחק את כל מה שנשמר במכשיר הזה</div>
+        </div>
+        <button class="btn" id="btn-reset">איפוס</button>
+      </div>
+    </div>
+    <p class="meta">ההתקדמות נשמרת ב־<code>localStorage</code> של הדפדפן,
+       במכשיר הזה בלבד, ואינה נשלחת לשום מקום.</p>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  גרסה <span id="build" dir="ltr"></span> · בלי פרסומות ·
+  <a href="/legal/" style="color:inherit">תנאי שימוש</a> · <a href="/" style="color:inherit">כל האפליקציות</a>
+</footer>
+
+<div class="stopbar" id="stopbar" hidden role="group" aria-label="שליטה בהקראה">
+  <span class="lbl">קורא…</span>
+  <button class="btn" id="btn-back" type="button" aria-label="משפט אחורה">
+    <span aria-hidden="true">⏮</span></button>
+  <button class="btn" id="btn-pause" type="button">השהו</button>
+  <button class="btn" id="btn-fwd" type="button" aria-label="משפט קדימה">
+    <span aria-hidden="true">⏭</span></button>
+  <button class="btn pri" id="btn-stop" type="button">עצרו</button>
+</div>
+
+<p class="sr" aria-live="polite" id="live"></p>
+
+<!-- שער התנאים, כמו בעשר האפליקציות האחרות. אפליקציה שמתפרסמת
+     בדף הבית בלי השער הזה היא פער שהבעלים לא בחר בו. -->
+<script src="/tutor/he-speech.js"></script>
+<script src="/speech/recorded.js"></script>
+<script src="/tutor/josh-face.js"></script>
+<script src="/tutor/josh-local.js"></script>
+<script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
+<script src="/legal/terms.js"></script>
+<script src="/legal/protect.js"></script>
+<script src="vendor/katex/katex.min.js"></script>
+<script src="data/exams.js"></script>
+<script src="speech.js"></script>
+<script src="app.js"></script>
+<!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
+     (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
+     נמדדת בנפרד. הוסר 10.9.2026 והוחזר 15.9.2026, שניהם בהחלטת הבעלים. -->
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<style>#gate[hidden]{display:none!important}</style>
+<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
+     align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
+     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
+  <div style="max-width:32rem">
+    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
+    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
+    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר.
+       אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
+    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;
+       background:#2f5fd8;color:#fff;text-decoration:none">כל האפליקציות</a>
+  </div>
+</div>
+</body>
+</html>
