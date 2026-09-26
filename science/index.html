@@ -2394,8 +2394,8 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s111 · 2026-09-26";
-var view=/[?&]lesson=sci[1-8](&|$)/.test(location.search||"")?"lesson":"units";
+var BUILD="s112 · 2026-09-26";
+var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
 var confirmReset=false,vMore=false;
@@ -2482,7 +2482,7 @@ function unitsView(){
   UNITS.forEach(function(u,ui){
     h+='<h2 class="fd" style="font-size:1.2rem;margin:22px 0 10px">'+esc(t[u.grade])+'</h2><div style="display:grid;gap:10px">';
     u.topics.forEach(function(tp,ti){
-      var lid=({'0:0':'1','0:1':'4','0:2':'5','0:3':'6','1:0':'8','1:1':'7'})[ui+':'+ti];
+      var lid=({'0:0':'1','0:1':'4','0:2':'5','0:3':'6','1:0':'8','1:1':'7','2:0':'9','2:1':'10','3:0':'11','3:1':'12','3:2':'13'})[ui+':'+ti];
       if(lid){
         h+='<a href="?internal=shlav-internal-science&lesson=sci'+lid+'" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
           '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
@@ -4468,6 +4468,11 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="lesson"&&SCI6_ON)html+=sci6LessonView();
     else if(view==="lesson"&&SCI7_ON)html+=sci7LessonView();
     else if(view==="lesson"&&SCI8_ON)html+=sci8LessonView();
+    else if(view==="lesson"&&SCI9_ON)html+=sci9LessonView();
+    else if(view==="lesson"&&SCI10_ON)html+=sci10LessonView();
+    else if(view==="lesson"&&SCI11_ON)html+=sci11LessonView();
+    else if(view==="lesson"&&SCI12_ON)html+=sci12LessonView();
+    else if(view==="lesson"&&SCI13_ON)html+=sci13LessonView();
     else if(view==="settings")html+=settingsView();
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
@@ -4640,6 +4645,11 @@ function onAction(a,el){
   if(/^s6/.test(a)&&SCI6_ON){sci6LessonAction(a,el);return}
   if(/^s7/.test(a)&&SCI7_ON){sci7LessonAction(a,el);return}
   if(/^s8/.test(a)&&SCI8_ON){sci8LessonAction(a,el);return}
+  if(/^s9/.test(a)&&SCI9_ON){sci9LessonAction(a,el);return}
+  if(/^s10/.test(a)&&SCI10_ON){sci10LessonAction(a,el);return}
+  if(/^s11/.test(a)&&SCI11_ON){sci11LessonAction(a,el);return}
+  if(/^s12/.test(a)&&SCI12_ON){sci12LessonAction(a,el);return}
+  if(/^s13/.test(a)&&SCI13_ON){sci13LessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -5828,6 +5838,7 @@ ar:{s8Title:"درس: من هي الفقاريات؟",s8Goal:"الهدف: أن ن
     s8Sum:"انتهيتم! اليوم تعلمنا: للفقاريات هيكل عظمي وعمود فقري، وهي تنقسم إلى مجموعات مثل الأسماك والزواحف والطيور والثدييات.",
     s8Again:"من البداية",s8Next:"التالي",s8Hear:"استمعوا",s8Correct:"صحيح!",s8Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s8Check:"فحص الفهم",
     s8Fish:"سمكة",s8Turtle:"سلحفاة",s8Bird:"طائر",s8Dog:"كلب",s8FishG:"أسماك",s8TurtleG:"زواحف",s8BirdG:"طيور",s8DogG:"ثدييات",s8PrevLesson:"الدرس السابق"}};
+S8STR.he.s8Fwd="לשיעור הבא";S8STR.en.s8Fwd="Next lesson";S8STR.ru.s8Fwd="Следующий урок";S8STR.ar.s8Fwd="الدرس التالي";
 function s8t(k){var d=S8STR[state.settings.lang||"he"]||S8STR.he;var v=d[k];return v===undefined?(S8STR.en[k]||k):v}
 var S8SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function s8Scene(revealed){
@@ -5879,7 +5890,7 @@ function sci8LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s8t("s8Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s8again",s8t("s8Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s8HearBtn(s8t("s8Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci7" style="color:#1d4ed8;font-weight:600">'+esc(s8t("s8PrevLesson"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci7" style="color:#1d4ed8;font-weight:600">'+esc(s8t("s8PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci9" style="color:#1d4ed8;font-weight:600">'+esc(s8t("s8Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5892,6 +5903,590 @@ function sci8LessonAction(a,el){
   else if(a==="s8p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
   else if(a==="s8again"){S8SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
   else if(a==="s8hear"){speak(el.getAttribute("data-say"))}
+}
+
+/* ================= שיעור מדע 9: מערכת הנשימה (כיתה ה׳, יחידה uBio) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ה׳ (מערכות ותהליכים ביצורים חיים - מערכת הנשימה).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI9_ON=/(^|[?&])lesson=sci9(&|$)/.test(location.search||"");
+var S9STR={
+he:{s9Title:"שיעור: איך אנחנו נושמים?",s9Goal:"המטרה: להכיר את מערכת הנשימה ולהבין שהיא מכניסה חמצן מהאוויר לגוף.",s9Start:"מתחילים",s9Step:"שלב {0} מתוך 5",
+    s9V1:"כל רגע אנחנו נושמים - גם בלי לשים לב. לאן הולך האוויר שאנחנו שואפים? לחצו על הכפתור ונשמו נשימה עמוקה.",s9Breathe:"שאפו אוויר",
+    s9V2:"האוויר נכנס דרך האף, עובר בקנה הנשימה ומגיע לריאות. הריאות מעבירות את החמצן לדם, והדם מוביל אותו לכל הגוף.",
+    s9Q:"מה הריאות מעבירות לדם?",s9A0:"מים",s9A1:"חמצן מהאוויר",s9A2:"מזון",
+    s9Why0:"מים אנחנו שותים - לא שואפים.",s9Why2:"מזון מגיע לקיבה דרך ושט האוכל, לא דרך הריאות.",
+    s9Rule:"הכלל: מערכת הנשימה כוללת את האף, קנה הנשימה והריאות. בשאיפה נכנס אוויר עם חמצן, ובנשיפה יוצא אוויר עם פחמן דו-חמצני שהגוף לא צריך.",s9RuleEx:"בזמן מאמץ, למשל ריצה, השרירים צריכים יותר חמצן - ולכן קצב הנשימה עולה.",
+    s9P1:"רצנו במהירות במדרגות. מה יקרה לקצב הנשימה?",s9P1a0:"יעלה - השרירים צריכים יותר חמצן",s9P1a1:"ירד לאפס",s9P1a2:"לא ישתנה בכלל",
+    s9P2:"באיזו דרך עובר האוויר בגוף?",s9P2a0:"אף ← קנה הנשימה ← ריאות",s9P2a1:"קיבה ← לב ← ריאות",s9P2a2:"ריאות ← אף ← קנה הנשימה",
+    s9Sum:"סיימתם! היום למדנו: מערכת הנשימה מכניסה חמצן מהאוויר לריאות ולדם, ומוציאה פחמן דו-חמצני. במאמץ קצב הנשימה עולה.",
+    s9Again:"מההתחלה",s9Next:"הבא",s9Hear:"השמיעו",s9Correct:"נכון!",s9Wrong:"עוד לא. אפשר לנסות שוב.",s9Check:"בדיקת הבנה",
+    s9Nose:"אף",s9Trachea:"קנה הנשימה",s9Lungs:"ריאות",s9PrevLesson:"לשיעור הקודם"},
+en:{s9Title:"Lesson: how do we breathe?",s9Goal:"The goal: know the respiratory system and understand that it brings oxygen from the air into the body.",s9Start:"Start",s9Step:"Step {0} of 5",
+    s9V1:"Every moment we breathe - even without noticing. Where does the air we inhale go? Press the button and take a deep breath.",s9Breathe:"Inhale",
+    s9V2:"Air enters through the nose, passes through the windpipe and reaches the lungs. The lungs pass the oxygen to the blood, and the blood carries it to the whole body.",
+    s9Q:"What do the lungs pass to the blood?",s9A0:"Water",s9A1:"Oxygen from the air",s9A2:"Food",
+    s9Why0:"We drink water - we do not inhale it.",s9Why2:"Food reaches the stomach through the food pipe, not through the lungs.",
+    s9Rule:"The rule: the respiratory system includes the nose, the windpipe and the lungs. When we inhale, air with oxygen enters; when we exhale, air with carbon dioxide that the body does not need leaves.",s9RuleEx:"During effort, like running, the muscles need more oxygen - so the breathing rate goes up.",
+    s9P1:"We ran quickly up the stairs. What will happen to the breathing rate?",s9P1a0:"It will rise - the muscles need more oxygen",s9P1a1:"It will drop to zero",s9P1a2:"It will not change at all",
+    s9P2:"Which path does air take in the body?",s9P2a0:"Nose → windpipe → lungs",s9P2a1:"Stomach → heart → lungs",s9P2a2:"Lungs → nose → windpipe",
+    s9Sum:"Done! Today we learned: the respiratory system brings oxygen from the air into the lungs and the blood, and removes carbon dioxide. During effort the breathing rate rises.",
+    s9Again:"From the start",s9Next:"Next",s9Hear:"Listen",s9Correct:"Correct!",s9Wrong:"Not yet. You can try again.",s9Check:"Understanding check",
+    s9Nose:"nose",s9Trachea:"windpipe",s9Lungs:"lungs",s9PrevLesson:"Previous lesson"},
+ru:{s9Title:"Урок: как мы дышим?",s9Goal:"Цель: познакомиться с дыхательной системой и понять, что она доставляет кислород из воздуха в тело.",s9Start:"Начинаем",s9Step:"Шаг {0} из 5",
+    s9V1:"Мы дышим каждое мгновение - даже не замечая этого. Куда идёт воздух, который мы вдыхаем? Нажмите кнопку и сделайте глубокий вдох.",s9Breathe:"Вдохнуть",
+    s9V2:"Воздух входит через нос, проходит по дыхательному горлу и попадает в лёгкие. Лёгкие передают кислород в кровь, а кровь разносит его по всему телу.",
+    s9Q:"Что лёгкие передают крови?",s9A0:"Воду",s9A1:"Кислород из воздуха",s9A2:"Еду",
+    s9Why0:"Воду мы пьём - не вдыхаем.",s9Why2:"Еда попадает в желудок через пищевод, а не через лёгкие.",
+    s9Rule:"Правило: дыхательная система включает нос, дыхательное горло (трахею) и лёгкие. На вдохе входит воздух с кислородом, а на выдохе выходит воздух с углекислым газом, который телу не нужен.",s9RuleEx:"При нагрузке, например при беге, мышцам нужно больше кислорода - поэтому дыхание учащается.",
+    s9P1:"Мы быстро поднялись по лестнице. Что будет с дыханием?",s9P1a0:"Участится - мышцам нужно больше кислорода",s9P1a1:"Остановится",s9P1a2:"Не изменится совсем",
+    s9P2:"Какой путь проходит воздух в теле?",s9P2a0:"Нос → трахея → лёгкие",s9P2a1:"Желудок → сердце → лёгкие",s9P2a2:"Лёгкие → нос → трахея",
+    s9Sum:"Готово! Сегодня мы узнали: дыхательная система доставляет кислород из воздуха в лёгкие и кровь и выводит углекислый газ. При нагрузке дыхание учащается.",
+    s9Again:"Сначала",s9Next:"Дальше",s9Hear:"Слушать",s9Correct:"Верно!",s9Wrong:"Пока нет. Можно ещё раз.",s9Check:"Проверка понимания",
+    s9Nose:"нос",s9Trachea:"трахея",s9Lungs:"лёгкие",s9PrevLesson:"Прошлый урок"},
+ar:{s9Title:"درس: كيف نتنفس؟",s9Goal:"الهدف: أن نتعرف على الجهاز التنفسي ونفهم أنه يُدخل الأكسجين من الهواء إلى الجسم.",s9Start:"نبدأ",s9Step:"الخطوة {0} من 5",
+    s9V1:"نحن نتنفس كل لحظة - حتى دون أن ننتبه. أين يذهب الهواء الذي نستنشقه؟ اضغطوا على الزر وخذوا نفسًا عميقًا.",s9Breathe:"استنشقوا",
+    s9V2:"يدخل الهواء من الأنف، يمر في القصبة الهوائية ويصل إلى الرئتين. تنقل الرئتان الأكسجين إلى الدم، والدم يحمله إلى كل الجسم.",
+    s9Q:"ماذا تنقل الرئتان إلى الدم؟",s9A0:"الماء",s9A1:"الأكسجين من الهواء",s9A2:"الطعام",
+    s9Why0:"الماء نشربه - لا نستنشقه.",s9Why2:"الطعام يصل إلى المعدة عبر المريء، وليس عبر الرئتين.",
+    s9Rule:"القاعدة: يشمل الجهاز التنفسي الأنف والقصبة الهوائية والرئتين. في الشهيق يدخل هواء مع أكسجين، وفي الزفير يخرج هواء مع ثاني أكسيد الكربون الذي لا يحتاجه الجسم.",s9RuleEx:"أثناء الجهد، مثل الركض، تحتاج العضلات إلى أكسجين أكثر - لذلك يزداد معدل التنفس.",
+    s9P1:"ركضنا بسرعة على الدرج. ماذا سيحدث لمعدل التنفس؟",s9P1a0:"سيرتفع - العضلات تحتاج أكسجين أكثر",s9P1a1:"سينخفض إلى الصفر",s9P1a2:"لن يتغير أبدًا",
+    s9P2:"أي طريق يسلكه الهواء في الجسم؟",s9P2a0:"أنف ← قصبة هوائية ← رئتان",s9P2a1:"معدة ← قلب ← رئتان",s9P2a2:"رئتان ← أنف ← قصبة هوائية",
+    s9Sum:"انتهيتم! اليوم تعلمنا: الجهاز التنفسي يُدخل الأكسجين من الهواء إلى الرئتين والدم، ويُخرج ثاني أكسيد الكربون. أثناء الجهد يرتفع معدل التنفس.",
+    s9Again:"من البداية",s9Next:"التالي",s9Hear:"استمعوا",s9Correct:"صحيح!",s9Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s9Check:"فحص الفهم",
+    s9Nose:"أنف",s9Trachea:"قصبة هوائية",s9Lungs:"رئتان",s9PrevLesson:"الدرس السابق"}};
+S9STR.he.s9Fwd="לשיעור הבא";S9STR.en.s9Fwd="Next lesson";S9STR.ru.s9Fwd="Следующий урок";S9STR.ar.s9Fwd="الدرس التالي";
+function s9t(k){var d=S9STR[state.settings.lang||"he"]||S9STR.he;var v=d[k];return v===undefined?(S9STR.en[k]||k):v}
+var S9SN={step:0,breathed:false,picked:-1,p1:-1,p2:-1};
+function s9Scene(breathed){
+  var parts=[["👃","s9Nose"],["🌬️","s9Trachea"],["🫁","s9Lungs"]];
+  return '<div class="card" style="padding:22px;margin:16px auto;max-width:460px;text-align:center">'+
+    '<div style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap">'+parts.map(function(pt,i){
+      return (i>0?'<span style="font-size:1.4rem;color:'+(breathed?'#0e9c8d':'#cbd5e1')+'">'+(document.documentElement.dir==="rtl"?"◀":"▶")+'</span>':"")+
+        '<div><div style="font-size:2.4rem;'+(i===2&&breathed?'transform:scale(1.2);transition:transform .4s;filter:drop-shadow(0 0 8px #0e9c8d)':'transition:transform .4s')+'">'+pt[0]+'</div>'+
+        '<div style="font-size:.82rem;font-weight:700;margin-top:4px">'+esc(s9t(pt[1]))+'</div></div>';
+    }).join("")+'</div>'+
+    (breathed?'<div style="margin-top:12px;font-weight:700;color:#0e9c8d">O₂ → 🩸</div>':'')+'</div>';
+}
+function s9HearBtn(text){return '<button class="btn btn-g" data-a="s9hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s9t("s9Hear"))+'</button>'}
+function sci9LessonView(){
+  var st=S9SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s9t("s9Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s9t("s9Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s9t("s9Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s9next",s9t("s9Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s9HearBtn(s9t("s9Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s9t(st.breathed?"s9V2":"s9V1"))+'</p>';
+    h+=s9Scene(st.breathed);
+    if(!st.breathed){
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s9breathe",s9t("s9Breathe"),'background:#b45309;color:#fff;font-weight:700')+s9HearBtn(s9t("s9V1"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s9next",s9t("s9Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s9HearBtn(s9t("s9V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s9t("s9Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s9t("s9Q"))+'</p>';
+    h+=lsOpts([s9t("s9A0"),s9t("s9A1"),s9t("s9A2")],st.picked,1,"s9pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s9t({0:"s9Why0",2:"s9Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s9t("s9Correct"):s9t("s9Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s9next",s9t("s9Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s9t("s9Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(s9t("s9RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s9next",s9t("s9Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s9HearBtn(s9t("s9Rule")+" "+s9t("s9RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s9t("s9P1"))+'</p>';
+    h+=lsOpts([s9t("s9P1a0"),s9t("s9P1a1"),s9t("s9P1a2")],st.p1,0,"s9p1");
+    if(st.p1===0){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s9t("s9P2"))+'</p>';
+      h+=lsOpts([s9t("s9P2a0"),s9t("s9P2a1"),s9t("s9P2a2")],st.p2,0,"s9p2");
+    }
+    if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s9t("s9Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s9next",s9t("s9Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s9t("s9Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s9again",s9t("s9Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s9HearBtn(s9t("s9Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci8" style="color:#1d4ed8;font-weight:600">'+esc(s9t("s9PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci10" style="color:#1d4ed8;font-weight:600">'+esc(s9t("s9Fwd"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci9LessonAction(a,el){
+  var st=S9SN;
+  if(a==="s9next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s9breathe"){st.breathed=true;render();speak(s9t("s9V2"))}
+  else if(a==="s9pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s9p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s9p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s9again"){S9SN={step:0,breathed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s9hear"){speak(el.getAttribute("data-say"))}
+}
+/* ================= שיעור מדע 10: משאבי טבע (כיתה ה׳, יחידה uMat) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ה׳ (חומרים - שימוש בחומרים, משאבי טבע).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI10_ON=/(^|[?&])lesson=sci10(&|$)/.test(location.search||"");
+var S10STR={
+he:{s10Title:"שיעור: משאבי טבע - מתכלים או מתחדשים?",s10Goal:"המטרה: לדעת שהטבע נותן לנו משאבים, ולמיין אותם למשאבים מתכלים ולמשאבים מתחדשים.",s10Start:"מתחילים",s10Step:"שלב {0} מתוך 5",
+    s10V1:"נפט, פחם, שמש ורוח - כולם משאבי טבע שהאדם משתמש בהם. אבל יש ביניהם הבדל גדול. לחצו על הכפתור וגלו.",s10Reveal:"גלו את ההבדל",
+    s10V2:"נפט ופחם הם משאבים מתכלים - כמותם מוגבלת והם נגמרים. שמש ורוח הם משאבים מתחדשים - הם לא נגמרים.",
+    s10Q:"איזה משאב הוא מתחדש - לא נגמר?",s10A0:"נפט",s10A1:"שמש",s10A2:"פחם",
+    s10Why0:"הנפט נגמר כשמשתמשים בו - הוא משאב מתכלה.",s10Why2:"הפחם נגמר כששורפים אותו - הוא משאב מתכלה.",
+    s10Rule:"הכלל: משאב מתכלה נמצא בכמות מוגבלת ונגמר אחרי שימוש, כמו נפט ופחם. משאב מתחדש לא נגמר, כמו שמש ורוח. לכן חשוב לחסוך במשאבים מתכלים ולהשתמש יותר במשאבים מתחדשים.",s10RuleEx:"שריפת נפט ופחם גם מזהמת את האוויר - עוד סיבה להעדיף שמש ורוח.",
+    s10P1:"פחם הוא משאב...",s10P1a0:"מתכלה - הוא נגמר אחרי ששורפים אותו",s10P1a1:"מתחדש - הוא לא נגמר אף פעם",s10P1a2:"מלאכותי - האדם מייצר אותו במפעל",
+    s10P2:"למה כדאי להשתמש באנרגיית שמש?",s10P2a0:"כי היא לא נגמרת ולא מזהמת",s10P2a1:"כי היא נגמרת מהר",s10P2a2:"כי היא מזהמת את האוויר",
+    s10Sum:"סיימתם! היום למדנו: משאבי טבע מתחלקים למתכלים (נפט, פחם) ולמתחדשים (שמש, רוח) - וכדאי להשתמש יותר במתחדשים.",
+    s10Again:"מההתחלה",s10Next:"הבא",s10Hear:"השמיעו",s10Correct:"נכון!",s10Wrong:"עוד לא. אפשר לנסות שוב.",s10Check:"בדיקת הבנה",
+    s10Oil:"נפט",s10Coal:"פחם",s10Sun:"שמש",s10Wind:"רוח",s10Used:"מתכלה",s10Renew:"מתחדש",s10PrevLesson:"לשיעור הקודם"},
+en:{s10Title:"Lesson: natural resources - exhaustible or renewable?",s10Goal:"The goal: know that nature gives us resources, and sort them into exhaustible and renewable resources.",s10Start:"Start",s10Step:"Step {0} of 5",
+    s10V1:"Oil, coal, sun and wind - all are natural resources that people use. But there is a big difference between them. Press the button and find out.",s10Reveal:"Reveal the difference",
+    s10V2:"Oil and coal are exhaustible resources - their amount is limited and they run out. Sun and wind are renewable resources - they never run out.",
+    s10Q:"Which resource is renewable - never runs out?",s10A0:"Oil",s10A1:"Sun",s10A2:"Coal",
+    s10Why0:"Oil runs out when we use it - it is an exhaustible resource.",s10Why2:"Coal runs out when we burn it - it is an exhaustible resource.",
+    s10Rule:"The rule: an exhaustible resource exists in a limited amount and runs out after use, like oil and coal. A renewable resource never runs out, like sun and wind. So it is important to save exhaustible resources and use more renewable ones.",s10RuleEx:"Burning oil and coal also pollutes the air - another reason to prefer sun and wind.",
+    s10P1:"Coal is a resource that is...",s10P1a0:"Exhaustible - it runs out after we burn it",s10P1a1:"Renewable - it never runs out",s10P1a2:"Man-made - people produce it in a factory",
+    s10P2:"Why should we use solar energy?",s10P2a0:"Because it never runs out and does not pollute",s10P2a1:"Because it runs out quickly",s10P2a2:"Because it pollutes the air",
+    s10Sum:"Done! Today we learned: natural resources are divided into exhaustible (oil, coal) and renewable (sun, wind) - and it is better to use more renewable ones.",
+    s10Again:"From the start",s10Next:"Next",s10Hear:"Listen",s10Correct:"Correct!",s10Wrong:"Not yet. You can try again.",s10Check:"Understanding check",
+    s10Oil:"oil",s10Coal:"coal",s10Sun:"sun",s10Wind:"wind",s10Used:"exhaustible",s10Renew:"renewable",s10PrevLesson:"Previous lesson"},
+ru:{s10Title:"Урок: природные ресурсы - исчерпаемые или возобновимые?",s10Goal:"Цель: узнать, что природа даёт нам ресурсы, и разделить их на исчерпаемые и возобновимые.",s10Start:"Начинаем",s10Step:"Шаг {0} из 5",
+    s10V1:"Нефть, уголь, солнце и ветер - все это природные ресурсы, которые использует человек. Но между ними есть большая разница. Нажмите кнопку и узнайте.",s10Reveal:"Узнать разницу",
+    s10V2:"Нефть и уголь - исчерпаемые ресурсы: их количество ограничено и они заканчиваются. Солнце и ветер - возобновимые ресурсы: они не заканчиваются.",
+    s10Q:"Какой ресурс возобновимый - не заканчивается?",s10A0:"Нефть",s10A1:"Солнце",s10A2:"Уголь",
+    s10Why0:"Нефть заканчивается, когда мы её используем - это исчерпаемый ресурс.",s10Why2:"Уголь заканчивается, когда мы его сжигаем - это исчерпаемый ресурс.",
+    s10Rule:"Правило: исчерпаемый ресурс существует в ограниченном количестве и заканчивается после использования, как нефть и уголь. Возобновимый ресурс не заканчивается, как солнце и ветер. Поэтому важно беречь исчерпаемые ресурсы и больше использовать возобновимые.",s10RuleEx:"Сжигание нефти и угля ещё и загрязняет воздух - ещё одна причина выбирать солнце и ветер.",
+    s10P1:"Уголь - это ресурс...",s10P1a0:"Исчерпаемый - он заканчивается после сжигания",s10P1a1:"Возобновимый - он не заканчивается никогда",s10P1a2:"Искусственный - человек производит его на заводе",
+    s10P2:"Почему стоит использовать энергию солнца?",s10P2a0:"Потому что она не заканчивается и не загрязняет",s10P2a1:"Потому что она быстро заканчивается",s10P2a2:"Потому что она загрязняет воздух",
+    s10Sum:"Готово! Сегодня мы узнали: природные ресурсы делятся на исчерпаемые (нефть, уголь) и возобновимые (солнце, ветер) - и лучше больше использовать возобновимые.",
+    s10Again:"Сначала",s10Next:"Дальше",s10Hear:"Слушать",s10Correct:"Верно!",s10Wrong:"Пока нет. Можно ещё раз.",s10Check:"Проверка понимания",
+    s10Oil:"нефть",s10Coal:"уголь",s10Sun:"солнце",s10Wind:"ветер",s10Used:"исчерпаемый",s10Renew:"возобновимый",s10PrevLesson:"Прошлый урок"},
+ar:{s10Title:"درس: الموارد الطبيعية - نافدة أم متجددة؟",s10Goal:"الهدف: أن نعرف أن الطبيعة تعطينا موارد، ونصنّفها إلى موارد نافدة وموارد متجددة.",s10Start:"نبدأ",s10Step:"الخطوة {0} من 5",
+    s10V1:"النفط والفحم والشمس والرياح - كلها موارد طبيعية يستخدمها الإنسان. لكن هناك فرق كبير بينها. اضغطوا على الزر واكتشفوا.",s10Reveal:"اكتشفوا الفرق",
+    s10V2:"النفط والفحم موارد نافدة - كميتها محدودة وتنتهي. الشمس والرياح موارد متجددة - لا تنتهي أبدًا.",
+    s10Q:"أي مورد متجدد - لا ينتهي؟",s10A0:"النفط",s10A1:"الشمس",s10A2:"الفحم",
+    s10Why0:"النفط ينتهي عندما نستخدمه - إنه مورد نافد.",s10Why2:"الفحم ينتهي عندما نحرقه - إنه مورد نافد.",
+    s10Rule:"القاعدة: المورد النافد موجود بكمية محدودة وينتهي بعد الاستخدام، مثل النفط والفحم. المورد المتجدد لا ينتهي، مثل الشمس والرياح. لذلك من المهم توفير الموارد النافدة واستخدام المتجددة أكثر.",s10RuleEx:"حرق النفط والفحم يلوّث الهواء أيضًا - سبب إضافي لتفضيل الشمس والرياح.",
+    s10P1:"الفحم مورد...",s10P1a0:"نافد - ينتهي بعد حرقه",s10P1a1:"متجدد - لا ينتهي أبدًا",s10P1a2:"صناعي - الإنسان يصنعه في المصنع",
+    s10P2:"لماذا يجدر استخدام طاقة الشمس؟",s10P2a0:"لأنها لا تنتهي ولا تلوّث",s10P2a1:"لأنها تنتهي بسرعة",s10P2a2:"لأنها تلوّث الهواء",
+    s10Sum:"انتهيتم! اليوم تعلمنا: الموارد الطبيعية تنقسم إلى نافدة (النفط، الفحم) ومتجددة (الشمس، الرياح) - ومن الأفضل استخدام المتجددة أكثر.",
+    s10Again:"من البداية",s10Next:"التالي",s10Hear:"استمعوا",s10Correct:"صحيح!",s10Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s10Check:"فحص الفهم",
+    s10Oil:"نفط",s10Coal:"فحم",s10Sun:"شمس",s10Wind:"رياح",s10Used:"نافد",s10Renew:"متجدد",s10PrevLesson:"الدرس السابق"}};
+S10STR.he.s10Fwd="לשיעור הבא";S10STR.en.s10Fwd="Next lesson";S10STR.ru.s10Fwd="Следующий урок";S10STR.ar.s10Fwd="الدرس التالي";
+function s10t(k){var d=S10STR[state.settings.lang||"he"]||S10STR.he;var v=d[k];return v===undefined?(S10STR.en[k]||k):v}
+var S10SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+function s10Scene(revealed){
+  var items=[["🛢️","s10Oil","s10Used"],["🪨","s10Coal","s10Used"],["☀️","s10Sun","s10Renew"],["💨","s10Wind","s10Renew"]];
+  return '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
+    var renew=it[2]==="s10Renew";
+    return '<div class="card" style="text-align:center;padding:16px 18px;min-width:100px;max-width:140px">'+
+      '<div style="font-size:2.4rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(s10t(it[1]))+'</div>'+
+      (revealed?'<div style="margin-top:8px;font-weight:600;color:'+(renew?'#0e9c8d':'#bf4426')+';font-size:.92rem">'+esc(s10t(it[2]))+'</div>':'')+
+      '</div>';
+  }).join("")+'</div>';
+}
+function s10HearBtn(text){return '<button class="btn btn-g" data-a="s10hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s10t("s10Hear"))+'</button>'}
+function sci10LessonView(){
+  var st=S10SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s10t("s10Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s10t("s10Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s10t("s10Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s10next",s10t("s10Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s10HearBtn(s10t("s10Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s10t(st.revealed?"s10V2":"s10V1"))+'</p>';
+    h+=s10Scene(st.revealed);
+    if(!st.revealed){
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s10reveal",s10t("s10Reveal"),'background:#b45309;color:#fff;font-weight:700')+s10HearBtn(s10t("s10V1"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s10next",s10t("s10Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s10HearBtn(s10t("s10V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s10t("s10Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s10t("s10Q"))+'</p>';
+    h+=lsOpts([s10t("s10A0"),s10t("s10A1"),s10t("s10A2")],st.picked,1,"s10pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s10t({0:"s10Why0",2:"s10Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s10t("s10Correct"):s10t("s10Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s10next",s10t("s10Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s10t("s10Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(s10t("s10RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s10next",s10t("s10Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s10HearBtn(s10t("s10Rule")+" "+s10t("s10RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s10t("s10P1"))+'</p>';
+    h+=lsOpts([s10t("s10P1a0"),s10t("s10P1a1"),s10t("s10P1a2")],st.p1,0,"s10p1");
+    if(st.p1===0){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s10t("s10P2"))+'</p>';
+      h+=lsOpts([s10t("s10P2a0"),s10t("s10P2a1"),s10t("s10P2a2")],st.p2,0,"s10p2");
+    }
+    if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s10t("s10Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s10next",s10t("s10Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s10t("s10Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s10again",s10t("s10Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s10HearBtn(s10t("s10Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci9" style="color:#1d4ed8;font-weight:600">'+esc(s10t("s10PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci11" style="color:#1d4ed8;font-weight:600">'+esc(s10t("s10Fwd"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci10LessonAction(a,el){
+  var st=S10SN;
+  if(a==="s10next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s10reveal"){st.revealed=true;render();speak(s10t("s10V2"))}
+  else if(a==="s10pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s10p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s10p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s10again"){S10SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s10hear"){speak(el.getAttribute("data-say"))}
+}
+/* ================= שיעור מדע 11: שרשרת מזון (כיתה ו׳, יחידה uEco) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ו׳ (מערכות אקולוגיות - יחסי גומלין, שרשרות מזון).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI11_ON=/(^|[?&])lesson=sci11(&|$)/.test(location.search||"");
+var S11STR={
+he:{s11Title:"שיעור: שרשרת המזון",s11Goal:"המטרה: להבין שבטבע יצורים קשורים זה לזה בשרשרת מזון, ושהאנרגיה מתחילה בשמש.",s11Start:"מתחילים",s11Step:"שלב {0} מתוך 5",
+    s11V1:"דשא, ארנב ושועל. מה הקשר ביניהם? לחצו על הכפתור וגלו את השרשרת.",s11Reveal:"גלו את השרשרת",
+    s11V2:"הדשא מייצר מזון מאור השמש. הארנב אוכל את הדשא, והשועל אוכל את הארנב. זו שרשרת מזון - האנרגיה עוברת מיצור ליצור.",
+    s11Q:"מאיפה מתחילה שרשרת מזון?",s11A0:"מהשועל - הוא החזק ביותר",s11A1:"מצמח - הוא מייצר מזון מאור השמש",s11A2:"מהאדם",
+    s11Why0:"השועל נמצא בסוף השרשרת, לא בתחילתה.",s11Why2:"בשרשרת הזו אין אדם - היא מתחילה בצמח.",
+    s11Rule:"הכלל: שרשרת מזון מתחילה בצמח (היצרן) שמייצר מזון מאור השמש, ממשיכה בבעל חיים שאוכל את הצמח (צרכן), ומסתיימת בטורף שאוכל בעלי חיים אחרים.",s11RuleEx:"אם ייעלמו הצמחים - לא יהיה מזון לארנבים, ובלי ארנבים גם השועלים יתקשו למצוא מזון. כל חוליה בשרשרת חשובה.",
+    s11P1:"מה תפקיד הצמח בשרשרת המזון?",s11P1a0:"יצרן - הוא מייצר מזון מאור השמש",s11P1a1:"טורף - הוא צד בעלי חיים",s11P1a2:"אין לו תפקיד בשרשרת",
+    s11P2:"מה יקרה אם ייעלמו כל הצמחים באזור?",s11P2a0:"לא יהיה מזון לבעלי החיים שאוכלים צמחים",s11P2a1:"דבר לא ישתנה",s11P2a2:"יהיו יותר שועלים",
+    s11Sum:"סיימתם! היום למדנו: שרשרת מזון מתחילה בצמח שמייצר מזון מהשמש, והאנרגיה עוברת מיצור ליצור. כל חוליה בשרשרת חשובה.",
+    s11Again:"מההתחלה",s11Next:"הבא",s11Hear:"השמיעו",s11Correct:"נכון!",s11Wrong:"עוד לא. אפשר לנסות שוב.",s11Check:"בדיקת הבנה",
+    s11Grass:"דשא",s11Rabbit:"ארנב",s11Fox:"שועל",s11Eats:"נאכל על ידי",s11PrevLesson:"לשיעור הקודם"},
+en:{s11Title:"Lesson: the food chain",s11Goal:"The goal: understand that in nature organisms are connected in a food chain, and the energy starts from the sun.",s11Start:"Start",s11Step:"Step {0} of 5",
+    s11V1:"Grass, a rabbit and a fox. What connects them? Press the button and discover the chain.",s11Reveal:"Reveal the chain",
+    s11V2:"The grass makes food from sunlight. The rabbit eats the grass, and the fox eats the rabbit. This is a food chain - energy passes from one organism to another.",
+    s11Q:"Where does a food chain start?",s11A0:"From the fox - it is the strongest",s11A1:"From a plant - it makes food from sunlight",s11A2:"From humans",
+    s11Why0:"The fox is at the end of the chain, not the start.",s11Why2:"There is no human in this chain - it starts with a plant.",
+    s11Rule:"The rule: a food chain starts with a plant (the producer) that makes food from sunlight, continues with an animal that eats the plant (a consumer), and ends with a predator that eats other animals.",s11RuleEx:"If the plants disappear - the rabbits will have no food, and without rabbits the foxes will also struggle to find food. Every link in the chain matters.",
+    s11P1:"What is the plant's role in the food chain?",s11P1a0:"Producer - it makes food from sunlight",s11P1a1:"Predator - it hunts animals",s11P1a2:"It has no role in the chain",
+    s11P2:"What will happen if all the plants in an area disappear?",s11P2a0:"The plant-eating animals will have no food",s11P2a1:"Nothing will change",s11P2a2:"There will be more foxes",
+    s11Sum:"Done! Today we learned: a food chain starts with a plant that makes food from the sun, and energy passes from one organism to another. Every link in the chain matters.",
+    s11Again:"From the start",s11Next:"Next",s11Hear:"Listen",s11Correct:"Correct!",s11Wrong:"Not yet. You can try again.",s11Check:"Understanding check",
+    s11Grass:"grass",s11Rabbit:"rabbit",s11Fox:"fox",s11Eats:"is eaten by",s11PrevLesson:"Previous lesson"},
+ru:{s11Title:"Урок: пищевая цепь",s11Goal:"Цель: понять, что в природе организмы связаны в пищевую цепь, и энергия начинается от солнца.",s11Start:"Начинаем",s11Step:"Шаг {0} из 5",
+    s11V1:"Трава, заяц и лиса. Что их связывает? Нажмите кнопку и откройте цепь.",s11Reveal:"Открыть цепь",
+    s11V2:"Трава производит пищу из солнечного света. Заяц ест траву, а лиса ест зайца. Это пищевая цепь - энергия переходит от одного организма к другому.",
+    s11Q:"С чего начинается пищевая цепь?",s11A0:"С лисы - она самая сильная",s11A1:"С растения - оно производит пищу из солнечного света",s11A2:"С человека",
+    s11Why0:"Лиса находится в конце цепи, а не в начале.",s11Why2:"В этой цепи нет человека - она начинается с растения.",
+    s11Rule:"Правило: пищевая цепь начинается с растения (производителя), которое производит пищу из солнечного света, продолжается животным, которое ест растение (потребителем), и заканчивается хищником, который ест других животных.",s11RuleEx:"Если растения исчезнут - зайцам нечего будет есть, а без зайцев и лисам будет трудно найти пищу. Каждое звено цепи важно.",
+    s11P1:"Какова роль растения в пищевой цепи?",s11P1a0:"Производитель - оно производит пищу из солнечного света",s11P1a1:"Хищник - оно охотится на животных",s11P1a2:"У него нет роли в цепи",
+    s11P2:"Что будет, если все растения в районе исчезнут?",s11P2a0:"Животным, которые едят растения, нечего будет есть",s11P2a1:"Ничего не изменится",s11P2a2:"Лис станет больше",
+    s11Sum:"Готово! Сегодня мы узнали: пищевая цепь начинается с растения, которое производит пищу от солнца, и энергия переходит от одного организма к другому. Каждое звено цепи важно.",
+    s11Again:"Сначала",s11Next:"Дальше",s11Hear:"Слушать",s11Correct:"Верно!",s11Wrong:"Пока нет. Можно ещё раз.",s11Check:"Проверка понимания",
+    s11Grass:"трава",s11Rabbit:"заяц",s11Fox:"лиса",s11Eats:"съедено кем",s11PrevLesson:"Прошлый урок"},
+ar:{s11Title:"درس: السلسلة الغذائية",s11Goal:"الهدف: أن نفهم أن الكائنات في الطبيعة مرتبطة بسلسلة غذائية، وأن الطاقة تبدأ من الشمس.",s11Start:"نبدأ",s11Step:"الخطوة {0} من 5",
+    s11V1:"عشب وأرنب وثعلب. ما الرابط بينها؟ اضغطوا على الزر واكتشفوا السلسلة.",s11Reveal:"اكتشفوا السلسلة",
+    s11V2:"العشب يصنع الغذاء من ضوء الشمس. الأرنب يأكل العشب، والثعلب يأكل الأرنب. هذه سلسلة غذائية - الطاقة تنتقل من كائن إلى كائن.",
+    s11Q:"من أين تبدأ السلسلة الغذائية؟",s11A0:"من الثعلب - هو الأقوى",s11A1:"من النبات - هو يصنع الغذاء من ضوء الشمس",s11A2:"من الإنسان",
+    s11Why0:"الثعلب في نهاية السلسلة وليس في بدايتها.",s11Why2:"لا يوجد إنسان في هذه السلسلة - هي تبدأ بنبات.",
+    s11Rule:"القاعدة: تبدأ السلسلة الغذائية بنبات (المنتج) يصنع الغذاء من ضوء الشمس، ثم حيوان يأكل النبات (مستهلك)، وتنتهي بمفترس يأكل حيوانات أخرى.",s11RuleEx:"إذا اختفت النباتات - لن يكون للأرانب غذاء، وبدون أرانب سيجد الثعالب صعوبة في إيجاد الغذاء. كل حلقة في السلسلة مهمة.",
+    s11P1:"ما دور النبات في السلسلة الغذائية؟",s11P1a0:"منتج - يصنع الغذاء من ضوء الشمس",s11P1a1:"مفترس - يصطاد الحيوانات",s11P1a2:"ليس له دور في السلسلة",
+    s11P2:"ماذا سيحدث إذا اختفت كل النباتات في منطقة ما؟",s11P2a0:"لن يكون للحيوانات الآكلة للنباتات غذاء",s11P2a1:"لن يتغير شيء",s11P2a2:"ستزداد الثعالب",
+    s11Sum:"انتهيتم! اليوم تعلمنا: السلسلة الغذائية تبدأ بنبات يصنع الغذاء من الشمس، والطاقة تنتقل من كائن إلى كائن. كل حلقة في السلسلة مهمة.",
+    s11Again:"من البداية",s11Next:"التالي",s11Hear:"استمعوا",s11Correct:"صحيح!",s11Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s11Check:"فحص الفهم",
+    s11Grass:"عشب",s11Rabbit:"أرنب",s11Fox:"ثعلب",s11Eats:"يُؤكل من قِبل",s11PrevLesson:"الدرس السابق"}};
+S11STR.he.s11Fwd="לשיעור הבא";S11STR.en.s11Fwd="Next lesson";S11STR.ru.s11Fwd="Следующий урок";S11STR.ar.s11Fwd="الدرس التالي";
+function s11t(k){var d=S11STR[state.settings.lang||"he"]||S11STR.he;var v=d[k];return v===undefined?(S11STR.en[k]||k):v}
+var S11SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+function s11Scene(revealed){
+  var items=[["🌱","s11Grass"],["🐇","s11Rabbit"],["🦊","s11Fox"]];
+  var rtl=document.documentElement.dir==="rtl";
+  return '<div class="card" style="padding:22px;margin:16px auto;max-width:480px;text-align:center">'+
+    '<div style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap">'+items.map(function(it,i){
+      return (i>0?'<span style="font-size:1.1rem;color:'+(revealed?'#b45309':'#cbd5e1')+';text-align:center">'+(rtl?"◀":"▶")+(revealed?'<div style="font-size:.68rem;font-weight:600;max-width:64px">'+esc(s11t("s11Eats"))+'</div>':'')+'</span>':"")+
+        '<div><div style="font-size:2.6rem">'+it[0]+'</div><div style="font-size:.85rem;font-weight:700;margin-top:4px">'+esc(s11t(it[1]))+'</div></div>';
+    }).join("")+'</div>'+
+    (revealed?'<div style="margin-top:12px;font-weight:700;color:#b45309">☀️ → 🌱</div>':'')+'</div>';
+}
+function s11HearBtn(text){return '<button class="btn btn-g" data-a="s11hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s11t("s11Hear"))+'</button>'}
+function sci11LessonView(){
+  var st=S11SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s11t("s11Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s11t("s11Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s11t("s11Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s11next",s11t("s11Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s11HearBtn(s11t("s11Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s11t(st.revealed?"s11V2":"s11V1"))+'</p>';
+    h+=s11Scene(st.revealed);
+    if(!st.revealed){
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s11reveal",s11t("s11Reveal"),'background:#b45309;color:#fff;font-weight:700')+s11HearBtn(s11t("s11V1"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s11next",s11t("s11Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s11HearBtn(s11t("s11V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s11t("s11Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s11t("s11Q"))+'</p>';
+    h+=lsOpts([s11t("s11A0"),s11t("s11A1"),s11t("s11A2")],st.picked,1,"s11pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s11t({0:"s11Why0",2:"s11Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s11t("s11Correct"):s11t("s11Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s11next",s11t("s11Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s11t("s11Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(s11t("s11RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s11next",s11t("s11Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s11HearBtn(s11t("s11Rule")+" "+s11t("s11RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s11t("s11P1"))+'</p>';
+    h+=lsOpts([s11t("s11P1a0"),s11t("s11P1a1"),s11t("s11P1a2")],st.p1,0,"s11p1");
+    if(st.p1===0){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s11t("s11P2"))+'</p>';
+      h+=lsOpts([s11t("s11P2a0"),s11t("s11P2a1"),s11t("s11P2a2")],st.p2,0,"s11p2");
+    }
+    if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s11t("s11Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s11next",s11t("s11Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s11t("s11Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s11again",s11t("s11Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s11HearBtn(s11t("s11Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci10" style="color:#1d4ed8;font-weight:600">'+esc(s11t("s11PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci12" style="color:#1d4ed8;font-weight:600">'+esc(s11t("s11Fwd"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci11LessonAction(a,el){
+  var st=S11SN;
+  if(a==="s11next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s11reveal"){st.revealed=true;render();speak(s11t("s11V2"))}
+  else if(a==="s11pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s11p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s11p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s11again"){S11SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s11hear"){speak(el.getAttribute("data-say"))}
+}
+/* ================= שיעור מדע 12: הלב ומחזור הדם (כיתה ו׳, יחידה uBio) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ו׳ (מערכות ותהליכים ביצורים חיים - הובלה באדם).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI12_ON=/(^|[?&])lesson=sci12(&|$)/.test(location.search||"");
+var S12STR={
+he:{s12Title:"שיעור: הלב ומחזור הדם",s12Goal:"המטרה: לדעת שהלב שואב דם לכל חלקי הגוף, ושהדם מוביל חמצן ומזון לתאים.",s12Start:"מתחילים",s12Step:"שלב {0} מתוך 5",
+    s12V1:"הלב שלנו פועם כל הזמן - בלי הפסקה אפילו רגע. למה? לחצו על הכפתור וגרמו ללב לפעום.",s12Beat:"פעמו",
+    s12V2:"בכל פעימה הלב שואב דם דרך כלי הדם לכל חלקי הגוף. הדם מוביל לתאים חמצן ומזון, ובחזרה אוסף פסולת.",
+    s12Q:"מה תפקיד הלב?",s12A0:"לעכל את המזון",s12A1:"לשאוב דם לכל הגוף",s12A2:"לנקות את האוויר",
+    s12Why0:"עיכול המזון הוא תפקיד הקיבה, לא של הלב.",s12Why2:"את האוויר מטפלת מערכת הנשימה, לא הלב.",
+    s12Rule:"הכלל: הלב הוא שריר שפועם ושואב דם דרך כלי הדם - עורקים וורידים - לכל חלקי הגוף ובחזרה. הדם מוביל לתאים חמצן ומזון שהם צריכים כדי לחיות.",s12RuleEx:"בזמן מאמץ השרירים צריכים יותר חמצן, ולכן הלב פועם מהר יותר. נסו למוש את הדופק אחרי ריצה!",
+    s12P1:"מה הדם מוביל לתאי הגוף?",s12P1a0:"חמצן ומזון",s12P1a1:"רק מים",s12P1a2:"אור שמש",
+    s12P2:"למה הלב פועם מהר יותר בריצה?",s12P2a0:"כי השרירים צריכים יותר חמצן",s12P2a1:"כי הלב עייף",s12P2a2:"אין סיבה - זה מקרי",
+    s12Sum:"סיימתם! היום למדנו: הלב שואב דם דרך כלי הדם לכל הגוף, והדם מוביל חמצן ומזון לתאים. במאמץ הלב פועם מהר יותר.",
+    s12Again:"מההתחלה",s12Next:"הבא",s12Hear:"השמיעו",s12Correct:"נכון!",s12Wrong:"עוד לא. אפשר לנסות שוב.",s12Check:"בדיקת הבנה",
+    s12Heart:"לב",s12Blood:"דם",s12Body:"כל הגוף",s12PrevLesson:"לשיעור הקודם"},
+en:{s12Title:"Lesson: the heart and blood circulation",s12Goal:"The goal: know that the heart pumps blood to all parts of the body, and that blood carries oxygen and food to the cells.",s12Start:"Start",s12Step:"Step {0} of 5",
+    s12V1:"Our heart beats all the time - without stopping even for a moment. Why? Press the button and make the heart beat.",s12Beat:"Beat",
+    s12V2:"With every beat the heart pumps blood through the blood vessels to all parts of the body. The blood brings the cells oxygen and food, and collects waste on the way back.",
+    s12Q:"What is the heart's job?",s12A0:"To digest food",s12A1:"To pump blood to the whole body",s12A2:"To clean the air",
+    s12Why0:"Digesting food is the stomach's job, not the heart's.",s12Why2:"The respiratory system handles the air, not the heart.",
+    s12Rule:"The rule: the heart is a muscle that beats and pumps blood through the blood vessels - arteries and veins - to all parts of the body and back. The blood carries oxygen and food that the cells need to live.",s12RuleEx:"During effort the muscles need more oxygen, so the heart beats faster. Try feeling your pulse after a run!",
+    s12P1:"What does the blood carry to the body's cells?",s12P1a0:"Oxygen and food",s12P1a1:"Only water",s12P1a2:"Sunlight",
+    s12P2:"Why does the heart beat faster when running?",s12P2a0:"Because the muscles need more oxygen",s12P2a1:"Because the heart is tired",s12P2a2:"No reason - it is random",
+    s12Sum:"Done! Today we learned: the heart pumps blood through the blood vessels to the whole body, and the blood carries oxygen and food to the cells. During effort the heart beats faster.",
+    s12Again:"From the start",s12Next:"Next",s12Hear:"Listen",s12Correct:"Correct!",s12Wrong:"Not yet. You can try again.",s12Check:"Understanding check",
+    s12Heart:"heart",s12Blood:"blood",s12Body:"whole body",s12PrevLesson:"Previous lesson"},
+ru:{s12Title:"Урок: сердце и кровообращение",s12Goal:"Цель: узнать, что сердце качает кровь ко всем частям тела, и что кровь несёт клеткам кислород и питание.",s12Start:"Начинаем",s12Step:"Шаг {0} из 5",
+    s12V1:"Наше сердце бьётся всё время - ни на мгновение не останавливаясь. Зачем? Нажмите кнопку и заставьте сердце биться.",s12Beat:"Бейся",
+    s12V2:"С каждым ударом сердце качает кровь по сосудам ко всем частям тела. Кровь приносит клеткам кислород и питание, а обратно собирает отходы.",
+    s12Q:"Какова работа сердца?",s12A0:"Переваривать еду",s12A1:"Качать кровь по всему телу",s12A2:"Очищать воздух",
+    s12Why0:"Переваривание еды - работа желудка, а не сердца.",s12Why2:"Воздухом занимается дыхательная система, а не сердце.",
+    s12Rule:"Правило: сердце - это мышца, которая бьётся и качает кровь по сосудам - артериям и венам - ко всем частям тела и обратно. Кровь несёт клеткам кислород и питание, нужные им для жизни.",s12RuleEx:"При нагрузке мышцам нужно больше кислорода, поэтому сердце бьётся быстрее. Попробуйте пощупать пульс после пробежки!",
+    s12P1:"Что кровь несёт клеткам тела?",s12P1a0:"Кислород и питание",s12P1a1:"Только воду",s12P1a2:"Солнечный свет",
+    s12P2:"Почему сердце бьётся быстрее при беге?",s12P2a0:"Потому что мышцам нужно больше кислорода",s12P2a1:"Потому что сердце устало",s12P2a2:"Без причины - случайно",
+    s12Sum:"Готово! Сегодня мы узнали: сердце качает кровь по сосудам ко всему телу, а кровь несёт клеткам кислород и питание. При нагрузке сердце бьётся быстрее.",
+    s12Again:"Сначала",s12Next:"Дальше",s12Hear:"Слушать",s12Correct:"Верно!",s12Wrong:"Пока нет. Можно ещё раз.",s12Check:"Проверка понимания",
+    s12Heart:"сердце",s12Blood:"кровь",s12Body:"всё тело",s12PrevLesson:"Прошлый урок"},
+ar:{s12Title:"درس: القلب والدورة الدموية",s12Goal:"الهدف: أن نعرف أن القلب يضخ الدم إلى كل أجزاء الجسم، وأن الدم يحمل الأكسجين والغذاء إلى الخلايا.",s12Start:"نبدأ",s12Step:"الخطوة {0} من 5",
+    s12V1:"قلبنا ينبض طوال الوقت - دون توقف ولو للحظة. لماذا؟ اضغطوا على الزر واجعلوا القلب ينبض.",s12Beat:"انبضوا",
+    s12V2:"مع كل نبضة يضخ القلب الدم عبر الأوعية الدموية إلى كل أجزاء الجسم. الدم يجلب للخلايا الأكسجين والغذاء، وفي طريق العودة يجمع الفضلات.",
+    s12Q:"ما وظيفة القلب؟",s12A0:"هضم الطعام",s12A1:"ضخ الدم إلى كل الجسم",s12A2:"تنظيف الهواء",
+    s12Why0:"هضم الطعام وظيفة المعدة، وليس القلب.",s12Why2:"الجهاز التنفسي يتعامل مع الهواء، وليس القلب.",
+    s12Rule:"القاعدة: القلب عضلة تنبض وتضخ الدم عبر الأوعية الدموية - الشرايين والأوردة - إلى كل أجزاء الجسم وعودة. الدم يحمل الأكسجين والغذاء الذي تحتاجه الخلايا لتعيش.",s12RuleEx:"أثناء الجهد تحتاج العضلات إلى أكسجين أكثر، لذلك ينبض القلب أسرع. جربوا جسّ النبض بعد الجري!",
+    s12P1:"ماذا يحمل الدم إلى خلايا الجسم؟",s12P1a0:"الأكسجين والغذاء",s12P1a1:"الماء فقط",s12P1a2:"ضوء الشمس",
+    s12P2:"لماذا ينبض القلب أسرع عند الجري؟",s12P2a0:"لأن العضلات تحتاج أكسجين أكثر",s12P2a1:"لأن القلب متعب",s12P2a2:"بلا سبب - هذا عشوائي",
+    s12Sum:"انتهيتم! اليوم تعلمنا: القلب يضخ الدم عبر الأوعية الدموية إلى كل الجسم، والدم يحمل الأكسجين والغذاء إلى الخلايا. أثناء الجهد ينبض القلب أسرع.",
+    s12Again:"من البداية",s12Next:"التالي",s12Hear:"استمعوا",s12Correct:"صحيح!",s12Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s12Check:"فحص الفهم",
+    s12Heart:"قلب",s12Blood:"دم",s12Body:"كل الجسم",s12PrevLesson:"الدرس السابق"}};
+S12STR.he.s12Fwd="לשיעור הבא";S12STR.en.s12Fwd="Next lesson";S12STR.ru.s12Fwd="Следующий урок";S12STR.ar.s12Fwd="الدرس التالي";
+function s12t(k){var d=S12STR[state.settings.lang||"he"]||S12STR.he;var v=d[k];return v===undefined?(S12STR.en[k]||k):v}
+var S12SN={step:0,beat:false,picked:-1,p1:-1,p2:-1};
+function s12Scene(beat){
+  return '<div class="card" style="padding:22px;margin:16px auto;max-width:460px;text-align:center">'+
+    '<div style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap">'+
+      '<div><div style="font-size:2.8rem;'+(beat?'transform:scale(1.15);transition:transform .3s;filter:drop-shadow(0 0 8px #dc2626)':'transition:transform .3s')+'">❤️</div>'+
+      '<div style="font-size:.85rem;font-weight:700;margin-top:4px">'+esc(s12t("s12Heart"))+'</div></div>'+
+      '<div style="font-size:1.5rem;color:'+(beat?'#dc2626':'#cbd5e1')+'">'+(document.documentElement.dir==="rtl"?"◀":"▶")+'</div>'+
+      '<div><div style="font-size:2.4rem;'+(beat?'':'opacity:.5')+'">🩸</div>'+
+      '<div style="font-size:.85rem;font-weight:700;margin-top:4px">'+esc(s12t("s12Blood"))+'</div></div>'+
+      '<div style="font-size:1.5rem;color:'+(beat?'#dc2626':'#cbd5e1')+'">'+(document.documentElement.dir==="rtl"?"◀":"▶")+'</div>'+
+      '<div><div style="font-size:2.4rem;'+(beat?'':'opacity:.5')+'">🧍</div>'+
+      '<div style="font-size:.85rem;font-weight:700;margin-top:4px">'+esc(s12t("s12Body"))+'</div></div>'+
+    '</div></div>';
+}
+function s12HearBtn(text){return '<button class="btn btn-g" data-a="s12hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s12t("s12Hear"))+'</button>'}
+function sci12LessonView(){
+  var st=S12SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s12t("s12Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s12t("s12Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s12t("s12Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s12next",s12t("s12Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s12HearBtn(s12t("s12Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s12t(st.beat?"s12V2":"s12V1"))+'</p>';
+    h+=s12Scene(st.beat);
+    if(!st.beat){
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s12beat",s12t("s12Beat"),'background:#b45309;color:#fff;font-weight:700')+s12HearBtn(s12t("s12V1"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s12next",s12t("s12Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s12HearBtn(s12t("s12V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s12t("s12Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s12t("s12Q"))+'</p>';
+    h+=lsOpts([s12t("s12A0"),s12t("s12A1"),s12t("s12A2")],st.picked,1,"s12pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s12t({0:"s12Why0",2:"s12Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s12t("s12Correct"):s12t("s12Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s12next",s12t("s12Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s12t("s12Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(s12t("s12RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s12next",s12t("s12Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s12HearBtn(s12t("s12Rule")+" "+s12t("s12RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s12t("s12P1"))+'</p>';
+    h+=lsOpts([s12t("s12P1a0"),s12t("s12P1a1"),s12t("s12P1a2")],st.p1,0,"s12p1");
+    if(st.p1===0){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s12t("s12P2"))+'</p>';
+      h+=lsOpts([s12t("s12P2a0"),s12t("s12P2a1"),s12t("s12P2a2")],st.p2,0,"s12p2");
+    }
+    if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s12t("s12Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s12next",s12t("s12Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s12t("s12Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s12again",s12t("s12Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s12HearBtn(s12t("s12Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci11" style="color:#1d4ed8;font-weight:600">'+esc(s12t("s12PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci13" style="color:#1d4ed8;font-weight:600">'+esc(s12t("s12Fwd"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci12LessonAction(a,el){
+  var st=S12SN;
+  if(a==="s12next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s12beat"){st.beat=true;render();speak(s12t("s12V2"))}
+  else if(a==="s12pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s12p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s12p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s12again"){S12SN={step:0,beat:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s12hear"){speak(el.getAttribute("data-say"))}
+}
+/* ================= שיעור מדע 13: מאיפה מגיע החשמל? (כיתה ו׳, יחידה uErg) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ו׳ (אנרגיה - משאבי אנרגיה והפקת חשמל).
+   ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI13_ON=/(^|[?&])lesson=sci13(&|$)/.test(location.search||"");
+var S13STR={
+he:{s13Title:"שיעור: מאיפה מגיע החשמל?",s13Goal:"המטרה: לדעת שהחשמל מופק בתחנות כוח ממקורות אנרגיה שונים, ולהבדיל בין מקורות מתחדשים למזהמים.",s13Start:"מתחילים",s13Step:"שלב {0} מתוך 5",
+    s13V1:"אור בחדר, מקרר, מחשב - כולם צריכים חשמל. אבל מאיפה הוא מגיע? לחצו על הכפתור ועקבו אחרי המסע של החשמל.",s13Reveal:"הפיקו חשמל",
+    s13V2:"בתחנת הכוח ממירים אנרגיה ממקורות שונים - שמש, רוח, מים או דלקים - לאנרגיה חשמלית, והיא מגיעה בחוטים אל הבית.",
+    s13Q:"איזה מקור אנרגיה מתחדש ולא מזהם?",s13A0:"שריפת נפט",s13A1:"אנרגיית שמש",s13A2:"שריפת פחם",
+    s13Why0:"שריפת נפט מזהמת את האוויר והנפט נגמר.",s13Why2:"שריפת פחם מזהמת את האוויר והפחם נגמר.",
+    s13Rule:"הכלל: חשמל מופק בתחנות כוח. אפשר להפיק חשמל ממקורות מתחדשים כמו שמש, רוח ומים - או משריפת דלקים כמו נפט ופחם, שמזהמת את האוויר ומחממת את כדור הארץ.",s13RuleEx:"ככל שנשתמש יותר במקורות מתחדשים, כך האוויר יהיה נקי יותר והאקלים ייפגע פחות.",
+    s13P1:"איזה מקור אנרגיה מתחדש?",s13P1a0:"רוח",s13P1a1:"נפט",s13P1a2:"פחם",
+    s13P2:"מה החיסרון של הפקת חשמל משריפת דלקים?",s13P2a0:"מזהמת את האוויר ומחממת את כדור הארץ",s13P2a1:"החשמל לא מגיע לבתים",s13P2a2:"אין שום חיסרון",
+    s13Sum:"סיימתם! היום למדנו: חשמל מופק בתחנות כוח ממקורות אנרגיה שונים - מתחדשים כמו שמש ורוח, או דלקים מזהמים כמו נפט ופחם.",
+    s13Again:"מההתחלה",s13Next:"הבא",s13Hear:"השמיעו",s13Correct:"נכון!",s13Wrong:"עוד לא. אפשר לנסות שוב.",s13Check:"בדיקת הבנה",
+    s13Station:"תחנת כוח",s13Home:"הבית",s13PrevLesson:"לשיעור הקודם"},
+en:{s13Title:"Lesson: where does electricity come from?",s13Goal:"The goal: know that electricity is generated at power stations from different energy sources, and tell renewable sources from polluting ones.",s13Start:"Start",s13Step:"Step {0} of 5",
+    s13V1:"Room light, fridge, computer - they all need electricity. But where does it come from? Press the button and follow the journey of electricity.",s13Reveal:"Generate electricity",
+    s13V2:"At the power station, energy from different sources - sun, wind, water or fuels - is converted into electric energy, and it reaches the house through wires.",
+    s13Q:"Which energy source is renewable and does not pollute?",s13A0:"Burning oil",s13A1:"Solar energy",s13A2:"Burning coal",
+    s13Why0:"Burning oil pollutes the air and oil runs out.",s13Why2:"Burning coal pollutes the air and coal runs out.",
+    s13Rule:"The rule: electricity is generated at power stations. Electricity can be made from renewable sources like sun, wind and water - or from burning fuels like oil and coal, which pollutes the air and warms the Earth.",s13RuleEx:"The more we use renewable sources, the cleaner the air will be and the less the climate will be harmed.",
+    s13P1:"Which energy source is renewable?",s13P1a0:"Wind",s13P1a1:"Oil",s13P1a2:"Coal",
+    s13P2:"What is the disadvantage of generating electricity by burning fuels?",s13P2a0:"It pollutes the air and warms the Earth",s13P2a1:"The electricity does not reach houses",s13P2a2:"There is no disadvantage",
+    s13Sum:"Done! Today we learned: electricity is generated at power stations from different energy sources - renewable ones like sun and wind, or polluting fuels like oil and coal.",
+    s13Again:"From the start",s13Next:"Next",s13Hear:"Listen",s13Correct:"Correct!",s13Wrong:"Not yet. You can try again.",s13Check:"Understanding check",
+    s13Station:"power station",s13Home:"the house",s13PrevLesson:"Previous lesson"},
+ru:{s13Title:"Урок: откуда берётся электричество?",s13Goal:"Цель: узнать, что электричество производят на электростанциях из разных источников энергии, и отличать возобновимые источники от загрязняющих.",s13Start:"Начинаем",s13Step:"Шаг {0} из 5",
+    s13V1:"Свет в комнате, холодильник, компьютер - всем нужно электричество. Но откуда оно берётся? Нажмите кнопку и проследите путь электричества.",s13Reveal:"Произвести электричество",
+    s13V2:"На электростанции энергия из разных источников - солнца, ветра, воды или топлива - превращается в электрическую, и по проводам она доходит до дома.",
+    s13Q:"Какой источник энергии возобновимый и не загрязняет?",s13A0:"Сжигание нефти",s13A1:"Солнечная энергия",s13A2:"Сжигание угля",
+    s13Why0:"Сжигание нефти загрязняет воздух, и нефть заканчивается.",s13Why2:"Сжигание угля загрязняет воздух, и уголь заканчивается.",
+    s13Rule:"Правило: электричество производят на электростанциях. Его можно получать из возобновимых источников - солнца, ветра и воды - или сжигая топливо, как нефть и уголь, что загрязняет воздух и нагревает Землю.",s13RuleEx:"Чем больше мы используем возобновимые источники, тем чище воздух и меньше вред климату.",
+    s13P1:"Какой источник энергии возобновимый?",s13P1a0:"Ветер",s13P1a1:"Нефть",s13P1a2:"Уголь",
+    s13P2:"Какой недостаток у производства электричества сжиганием топлива?",s13P2a0:"Оно загрязняет воздух и нагревает Землю",s13P2a1:"Электричество не доходит до домов",s13P2a2:"Никакого недостатка нет",
+    s13Sum:"Готово! Сегодня мы узнали: электричество производят на электростанциях из разных источников энергии - возобновимых, как солнце и ветер, или загрязняющего топлива, как нефть и уголь.",
+    s13Again:"Сначала",s13Next:"Дальше",s13Hear:"Слушать",s13Correct:"Верно!",s13Wrong:"Пока нет. Можно ещё раз.",s13Check:"Проверка понимания",
+    s13Station:"электростанция",s13Home:"дом",s13PrevLesson:"Прошлый урок"},
+ar:{s13Title:"درس: من أين تأتي الكهرباء؟",s13Goal:"الهدف: أن نعرف أن الكهرباء تُنتَج في محطات الطاقة من مصادر طاقة مختلفة، ونميّز بين المصادر المتجددة والملوِّثة.",s13Start:"نبدأ",s13Step:"الخطوة {0} من 5",
+    s13V1:"ضوء الغرفة والثلاجة والحاسوب - كلها تحتاج كهرباء. لكن من أين تأتي؟ اضغطوا على الزر وتتبعوا رحلة الكهرباء.",s13Reveal:"أنتجوا كهرباء",
+    s13V2:"في محطة الطاقة تُحوَّل الطاقة من مصادر مختلفة - شمس أو رياح أو ماء أو وقود - إلى طاقة كهربائية، وتصل إلى البيت عبر الأسلاك.",
+    s13Q:"أي مصدر طاقة متجدد ولا يلوّث؟",s13A0:"حرق النفط",s13A1:"طاقة الشمس",s13A2:"حرق الفحم",
+    s13Why0:"حرق النفط يلوّث الهواء والنفط ينتهي.",s13Why2:"حرق الفحم يلوّث الهواء والفحم ينتهي.",
+    s13Rule:"القاعدة: الكهرباء تُنتَج في محطات الطاقة. يمكن إنتاجها من مصادر متجددة مثل الشمس والرياح والماء - أو من حرق وقود مثل النفط والفحم، مما يلوّث الهواء ويسخّن الأرض.",s13RuleEx:"كلما استخدمنا مصادر متجددة أكثر، كان الهواء أنظف وتضرر المناخ أقل.",
+    s13P1:"أي مصدر طاقة متجدد؟",s13P1a0:"الرياح",s13P1a1:"النفط",s13P1a2:"الفحم",
+    s13P2:"ما عيب إنتاج الكهرباء بحرق الوقود؟",s13P2a0:"يلوّث الهواء ويسخّن الأرض",s13P2a1:"الكهرباء لا تصل إلى البيوت",s13P2a2:"لا يوجد أي عيب",
+    s13Sum:"انتهيتم! اليوم تعلمنا: الكهرباء تُنتَج في محطات الطاقة من مصادر طاقة مختلفة - متجددة مثل الشمس والرياح، أو وقود ملوِّث مثل النفط والفحم.",
+    s13Again:"من البداية",s13Next:"التالي",s13Hear:"استمعوا",s13Correct:"صحيح!",s13Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s13Check:"فحص الفهم",
+    s13Station:"محطة طاقة",s13Home:"البيت",s13PrevLesson:"الدرس السابق"}};
+function s13t(k){var d=S13STR[state.settings.lang||"he"]||S13STR.he;var v=d[k];return v===undefined?(S13STR.en[k]||k):v}
+var S13SN={step:0,gen:false,picked:-1,p1:-1,p2:-1};
+function s13Scene(gen){
+  var rtl=document.documentElement.dir==="rtl";
+  var arrow='<span style="font-size:1.4rem;color:'+(gen?'#b45309':'#cbd5e1')+'">'+(rtl?"◀":"▶")+'</span>';
+  return '<div class="card" style="padding:22px;margin:16px auto;max-width:480px;text-align:center">'+
+    '<div style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap">'+
+      '<div style="font-size:1.9rem;letter-spacing:2px">☀️💨🌊🛢️</div>'+arrow+
+      '<div><div style="font-size:2.4rem;'+(gen?'':'opacity:.5')+'">🏭</div><div style="font-size:.82rem;font-weight:700;margin-top:4px">'+esc(s13t("s13Station"))+'</div></div>'+arrow+
+      '<div style="font-size:2rem;'+(gen?'filter:drop-shadow(0 0 8px #fbbf24)':'opacity:.4')+'">⚡</div>'+arrow+
+      '<div><div style="font-size:2.4rem;'+(gen?'':'opacity:.5')+'">🏠</div><div style="font-size:.82rem;font-weight:700;margin-top:4px">'+esc(s13t("s13Home"))+'</div></div>'+
+    '</div></div>';
+}
+function s13HearBtn(text){return '<button class="btn btn-g" data-a="s13hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s13t("s13Hear"))+'</button>'}
+function sci13LessonView(){
+  var st=S13SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s13t("s13Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s13t("s13Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s13t("s13Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s13next",s13t("s13Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s13HearBtn(s13t("s13Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s13t(st.gen?"s13V2":"s13V1"))+'</p>';
+    h+=s13Scene(st.gen);
+    if(!st.gen){
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s13gen",s13t("s13Reveal"),'background:#b45309;color:#fff;font-weight:700')+s13HearBtn(s13t("s13V1"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s13next",s13t("s13Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s13HearBtn(s13t("s13V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s13t("s13Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s13t("s13Q"))+'</p>';
+    h+=lsOpts([s13t("s13A0"),s13t("s13A1"),s13t("s13A2")],st.picked,1,"s13pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s13t({0:"s13Why0",2:"s13Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s13t("s13Correct"):s13t("s13Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s13next",s13t("s13Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s13t("s13Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(s13t("s13RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s13next",s13t("s13Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s13HearBtn(s13t("s13Rule")+" "+s13t("s13RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s13t("s13P1"))+'</p>';
+    h+=lsOpts([s13t("s13P1a0"),s13t("s13P1a1"),s13t("s13P1a2")],st.p1,0,"s13p1");
+    if(st.p1===0){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s13t("s13P2"))+'</p>';
+      h+=lsOpts([s13t("s13P2a0"),s13t("s13P2a1"),s13t("s13P2a2")],st.p2,0,"s13p2");
+    }
+    if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s13t("s13Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s13next",s13t("s13Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s13t("s13Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s13again",s13t("s13Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s13HearBtn(s13t("s13Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci12" style="color:#1d4ed8;font-weight:600">'+esc(s13t("s13PrevLesson"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci13LessonAction(a,el){
+  var st=S13SN;
+  if(a==="s13next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s13gen"){st.gen=true;render();speak(s13t("s13V2"))}
+  else if(a==="s13pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s13p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s13p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s13again"){S13SN={step:0,gen:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s13hear"){speak(el.getAttribute("data-say"))}
 }
 
 /* ================= boot ================= */
@@ -5935,7 +6530,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s111-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s112-pwa1").catch(function(){});
   });
 }
 </script>
