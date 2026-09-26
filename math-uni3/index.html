@@ -983,7 +983,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g146 · 2026-09-26";
+var BUILD="g147 · 2026-09-26";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -4460,8 +4460,9 @@ _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style
       else if(wasPicked)cls+=calm?" gone":" wrong";
       else cls+=" dim";
     }else if(wasPicked){cls+=calm?" gone":" wrong";dis=" disabled"}
-    return '<button class="'+cls+'"'+dis+' data-a="ans" data-i="'+i+'">'+
-      '<span class="k">'+keys[i]+'</span><span class="m">'+o.h+'</span></button>';
+    return '<div class="orow"><button class="'+cls+'"'+dis+' data-a="ans" data-i="'+i+'">'+
+      '<span class="k">'+keys[i]+'</span><span class="m">'+o.h+'</span></button>'+
+      (state.settings.tts?'<button type="button" class="optspk" data-a="sayopt" data-i="'+i+'" aria-label="'+esc(_("השמעת התשובה"))+'">'+ic("speaker",15)+'</button>':"")+'</div>';
   }).join("")+'</div>';
   /* אבחון הטעות האחרונה */
   if(P.lastWhy&&P.phase!=="reveal"){
@@ -6213,6 +6214,7 @@ function onAction(a,el){
   if(a==="start"){startRound();view="practice";window.scrollTo(0,0);render();return}
   if(a==="starttopic"){var tid=el.getAttribute("data-t");startRound(tid);view="practice";window.scrollTo(0,0);render();return}
   if(a==="ans"){onAnswer(parseInt(el.getAttribute("data-i"),10));return}
+  if(a==="sayopt"){var oi=parseInt(el.getAttribute("data-i"),10);if(P.q&&P.q.options[oi])speak(P.q.options[oi].h);return}
   if(a==="next"){advance();return}
   if(a==="stop"){
     if(P.results.length===0){goto("home");return}
@@ -7743,7 +7745,8 @@ var TR_KEYS=[
 /* Year-specific intro keys, appended so positional translations stay aligned. */
 "{0}{1} לשנה ג׳ באוניברסיטה</span>",
 "אנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית — צעד אחר צעד.",
-"בשנה ג׳ מעמיקים באנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד."
+"בשנה ג׳ מעמיקים באנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד.",
+"השמעת התשובה"
 ];
 
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
@@ -11871,6 +11874,10 @@ trAt("en",TR_KEYS.indexOf("זה חסם מלעיל, אבל לא הקטן שבהם
 trAt("ar",TR_KEYS.length-3,["{0}{1} السنة الثالثة في الجامعة</span>", "التحليل والدوال المركبة والجبر المجرّد والتحليل العددي — خطوة بخطوة.", "في السنة الثالثة نتعمق في التحليل والدوال المركبة والجبر المجرّد والتحليل العددي. كل سؤال يُحل خطوة بخطوة، مع شرح للأخطاء وصيغ متاحة وقراءة صوتية."]);
 trAt("ru",TR_KEYS.length-3,["{0}{1} Третий курс университета</span>", "Анализ, комплексные функции, абстрактная алгебра и численные методы — шаг за шагом.", "На третьем курсе углубляются в анализ, комплексные функции, абстрактную алгебру и численные методы. Каждая задача разбирается по шагам с объяснением ошибок, формулами и озвучиванием."]);
 trAt("en",TR_KEYS.length-3,["{0}{1} For third-year university students</span>", "Analysis, complex functions, abstract algebra and numerical analysis — step by step.", "In the third year, go deeper into analysis, complex functions, abstract algebra and numerical analysis. Each problem has guided steps, explanations for mistakes, a formula sheet and read-aloud."]);
+/* הרמקול של כל תשובה — התווית נוספה בסוף TR_KEYS. */
+trAt("ar",TR_KEYS.indexOf("השמעת התשובה"),["قراءة الإجابة"]);
+trAt("ru",TR_KEYS.indexOf("השמעת התשובה"),["Озвучить ответ"]);
+trAt("en",TR_KEYS.indexOf("השמעת התשובה"),["Read the answer aloud"]);
 trBuild();
 exLoad();
 applyModes();
@@ -11900,7 +11907,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g146-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g147-pwa1").catch(function(){});
   });
 }
 </script>

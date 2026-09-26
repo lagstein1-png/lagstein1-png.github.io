@@ -983,7 +983,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v147 · 2026-09-26";
+var BUILD="v148 · 2026-09-26";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -4924,8 +4924,9 @@ _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style
       else if(wasPicked)cls+=calm?" gone":" wrong";
       else cls+=" dim";
     }else if(wasPicked){cls+=calm?" gone":" wrong";dis=" disabled"}
-    return '<button class="'+cls+'"'+dis+' data-a="ans" data-i="'+i+'">'+
-      '<span class="k">'+keys[i]+'</span><span class="m">'+o.h+'</span></button>';
+    return '<div class="orow"><button class="'+cls+'"'+dis+' data-a="ans" data-i="'+i+'">'+
+      '<span class="k">'+keys[i]+'</span><span class="m">'+o.h+'</span></button>'+
+      (state.settings.tts?'<button type="button" class="optspk" data-a="sayopt" data-i="'+i+'" aria-label="'+esc(_("השמעת התשובה"))+'">'+ic("speaker",15)+'</button>':"")+'</div>';
   }).join("")+'</div>';
   /* אבחון הטעות האחרונה */
   if(P.lastWhy&&P.phase!=="reveal"){
@@ -6677,6 +6678,7 @@ function onAction(a,el){
   if(a==="start"){startRound();view="practice";window.scrollTo(0,0);render();return}
   if(a==="starttopic"){var tid=el.getAttribute("data-t");startRound(tid);view="practice";window.scrollTo(0,0);render();return}
   if(a==="ans"){onAnswer(parseInt(el.getAttribute("data-i"),10));return}
+  if(a==="sayopt"){var oi=parseInt(el.getAttribute("data-i"),10);if(P.q&&P.q.options[oi])speak(P.q.options[oi].h);return}
   if(a==="next"){advance();return}
   if(a==="stop"){
     if(P.results.length===0){goto("home");return}
@@ -8366,7 +8368,8 @@ var TR_KEYS=[
 /* Year-specific intro keys, appended so positional translations stay aligned. */
 "{0}{1} לשנה ב׳ באוניברסיטה</span>",
 "חדו״א 2, לינארית 2, משוואות דיפרנציאליות והסתברות — צעד אחר צעד.",
-"בשנה ב׳ מתקדמים לאינטגרלים כפולים, טורים, מרחבים וקטוריים, משוואות דיפרנציאליות והסתברות רציפה. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד."
+"בשנה ב׳ מתקדמים לאינטגרלים כפולים, טורים, מרחבים וקטוריים, משוואות דיפרנציאליות והסתברות רציפה. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד.",
+"השמעת התשובה"
 ];
 
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
@@ -12962,6 +12965,10 @@ trAt("en",TR_KEYS.indexOf("מוגדר עבור −∞ < x < {0}"),[
 trAt("ar",TR_KEYS.length-3,["{0}{1} السنة الثانية في الجامعة</span>", "التفاضل والتكامل 2، الجبر الخطي 2، المعادلات التفاضلية والاحتمالات — خطوة بخطوة.", "في السنة الثانية ندرس التكاملات المزدوجة والمتسلسلات والفضاءات المتجهة والمعادلات التفاضلية والاحتمالات المستمرة. كل سؤال يُحل خطوة بخطوة، مع شرح للأخطاء وصيغ متاحة وقراءة صوتية."]);
 trAt("ru",TR_KEYS.length-3,["{0}{1} Второй курс университета</span>", "Матанализ 2, линейная алгебра 2, дифференциальные уравнения и вероятность — шаг за шагом.", "На втором курсе изучают двойные интегралы, ряды, векторные пространства, дифференциальные уравнения и непрерывные распределения. Каждая задача разбирается по шагам с объяснением ошибок, формулами и озвучиванием."]);
 trAt("en",TR_KEYS.length-3,["{0}{1} For second-year university students</span>", "Calculus 2, linear algebra 2, differential equations and probability — step by step.", "In the second year, work through double integrals, series, vector spaces, differential equations and continuous probability. Each problem has guided steps, explanations for mistakes, a formula sheet and read-aloud."]);
+/* הרמקול של כל תשובה — התווית נוספה בסוף TR_KEYS. */
+trAt("ar",TR_KEYS.indexOf("השמעת התשובה"),["قراءة الإجابة"]);
+trAt("ru",TR_KEYS.indexOf("השמעת התשובה"),["Озвучить ответ"]);
+trAt("en",TR_KEYS.indexOf("השמעת התשובה"),["Read the answer aloud"]);
 trBuild();
 exLoad();
 applyModes();
@@ -12991,7 +12998,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v147-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v148-pwa1").catch(function(){});
   });
 }
 </script>

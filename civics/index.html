@@ -215,7 +215,9 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
   width:2.7rem;height:2.7rem;display:inline-flex;align-items:center;justify-content:center;
   cursor:pointer;flex:none;box-shadow:var(--shadow)}
 .spk:hover{border-color:var(--accent);color:var(--accent)}
-.spk.sm{width:2.1rem;height:2.1rem}
+.spk.sm{width:2.1rem;height:2.1rem;background:#0e9c8d;border-color:#0b7c71;color:#fff}
+/* הרמקול הקטן — אותו ירוק של כפתור ההקראה הגדול, התקן המשותף */
+.spk.sm:hover{background:#0b7c71;border-color:#0b7c71;color:#fff}
 .spk.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 
 .opts{display:grid;gap:.6rem;margin-top:.9rem}
@@ -1074,7 +1076,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="c10 · 2026-09-26";
+var BUILD="c11 · 2026-09-26";
 var SKEY="ezrach-state-v1";
 var GKEY_STORE="ezrach-gkey";
 
@@ -1166,7 +1168,7 @@ function applyModes(){
   /* הכותרת נשארה עברית קשיחה מה-HTML גם אחרי החלפת שפה: הכיווניות
      והכותרת שעל המסך התחלפו, אבל לשונית הדפדפן, הסימנייה ושם
      האפליקציה המותקנת נשארו בעברית. השם והתיאור כבר מתורגמים. */
-  try{ document.title=t("app")+" — "+t("tagline") }catch(e){}
+  try{ if(INTERNAL_OK) document.title=t("app")+" — "+t("tagline") }catch(e){}
 }
 function announce(m){var e=$("#live");if(e)e.textContent=m}
 
@@ -7831,7 +7833,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=c10-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=c11-pwa1").catch(function(){});
   });
 }
 </script>

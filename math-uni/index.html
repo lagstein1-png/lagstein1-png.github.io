@@ -981,7 +981,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u148 · 2026-09-26";
+var BUILD="u149 · 2026-09-26";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -5343,8 +5343,9 @@ _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style
       else if(wasPicked)cls+=calm?" gone":" wrong";
       else cls+=" dim";
     }else if(wasPicked){cls+=calm?" gone":" wrong";dis=" disabled"}
-    return '<button class="'+cls+'"'+dis+' data-a="ans" data-i="'+i+'">'+
-      '<span class="k">'+keys[i]+'</span><span class="m">'+o.h+'</span></button>';
+    return '<div class="orow"><button class="'+cls+'"'+dis+' data-a="ans" data-i="'+i+'">'+
+      '<span class="k">'+keys[i]+'</span><span class="m">'+o.h+'</span></button>'+
+      (state.settings.tts?'<button type="button" class="optspk" data-a="sayopt" data-i="'+i+'" aria-label="'+esc(_("השמעת התשובה"))+'">'+ic("speaker",15)+'</button>':"")+'</div>';
   }).join("")+'</div>';
   /* אבחון הטעות האחרונה */
   if(P.lastWhy&&P.phase!=="reveal"){
@@ -7096,6 +7097,7 @@ function onAction(a,el){
   if(a==="start"){startRound();view="practice";window.scrollTo(0,0);render();return}
   if(a==="starttopic"){var tid=el.getAttribute("data-t");startRound(tid);view="practice";window.scrollTo(0,0);render();return}
   if(a==="ans"){onAnswer(parseInt(el.getAttribute("data-i"),10));return}
+  if(a==="sayopt"){var oi=parseInt(el.getAttribute("data-i"),10);if(P.q&&P.q.options[oi])speak(P.q.options[oi].h);return}
   if(a==="next"){advance();return}
   if(a==="stop"){
     if(P.results.length===0){goto("home");return}
@@ -9034,7 +9036,8 @@ var TR_KEYS=[
 " תשע ",
 "לקחתם את הרכיב הגדול. האורך תמיד גדול מכל רכיב, אלא אם השני אפס.",
 "חילקתם את הזנב בשניים. הסימטריה אומרת שהזנב השמאלי שווה לזנב הימני כולו, 1 − Φ(z), ולא לחצי ממנו.",
-"שגיאת גדר בכיוון השני: מ-{0} ל-{1} יש {2} הכפלות ב-{0}, וגם ההכפלה הראשונה, מ-1 ל-{0}, נספרת."
+"שגיאת גדר בכיוון השני: מ-{0} ל-{1} יש {2} הכפלות ב-{0}, וגם ההכפלה הראשונה, מ-1 ל-{0}, נספרת.",
+"השמעת התשובה"
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -14417,6 +14420,10 @@ trAt("en",TR_KEYS.indexOf("לקחתם את הרכיב הגדול. האורך ת�
  "You halved the tail. Symmetry says the left tail equals the whole right tail, 1 − Φ(z), not half of it.",
  "Off-by-one the other way: from {0} to {1} there are {2} multiplications by {0}, and the first one, from 1 to {0}, counts too."
 ]);
+/* הרמקול של כל תשובה — התווית נוספה בסוף TR_KEYS. */
+trAt("ar",TR_KEYS.indexOf("השמעת התשובה"),["قراءة الإجابة"]);
+trAt("ru",TR_KEYS.indexOf("השמעת התשובה"),["Озвучить ответ"]);
+trAt("en",TR_KEYS.indexOf("השמעת התשובה"),["Read the answer aloud"]);
 trBuild();
 exLoad();
 applyModes();
@@ -14446,7 +14453,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u148-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u149-pwa1").catch(function(){});
   });
 }
 </script>

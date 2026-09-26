@@ -623,6 +623,38 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 <meta name="theme-color" content="#101a1c" media="(prefers-color-scheme:dark)">
 </head>
 <body>
+<style>
+/* כפתורי הקראה גדולים וצבעוניים — התקן המשותף (ירוק הקראה, אדום עצירה) */
+.spk:not(.sm){border-radius:12px;background:#0e9c8d;border-color:#0b7c71;color:#fff;font-weight:700;min-height:46px;width:auto;height:auto;padding:8px 18px;font-size:1.02rem;gap:.4rem}
+.spk:not(.sm):hover{background:#0b7c71;color:#fff}
+.spkStop{background:#bf4426!important;border-color:#a03a20!important;color:#fff!important}
+.spkStop:hover{background:#a03a20!important;color:#fff!important}
+/* כפתורי העזר הצבעוניים — התקן המשותף המלא (26.9.2026). ירוק הקראה, אדום עצירה,
+   כתום רמז, סגול לימור, כחול פתרון מודרך, אפור־כחלחל נוסחה — אותם
+   צבעים בדיוק בכל האפליקציות (מקור האמת: math-teen, docs/STYLE-STANDARD.md). */
+.btn[data-a="read"],.btn[data-a="readsteps"]{background:#0e9c8d!important;border-color:#0b7c71!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
+.btn[data-a="read"]:hover,.btn[data-a="readsteps"]:hover{background:#0b7c71!important;color:#fff!important}
+.btn[data-a="hush"],.btn[data-a="stop"]{background:#bf4426!important;border-color:#a03a20!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
+.btn[data-a="hush"]:hover,.btn[data-a="stop"]:hover{background:#a03a20!important;color:#fff!important}
+.btn[data-a="hint"]{background:#b45309!important;border-color:#92400e!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
+.btn[data-a="hint"]:hover{background:#92400e!important;color:#fff!important}
+.btn[data-a="tutor"],.btn[data-a="tutor"].ghost{background:#6d28d9!important;border-color:#5b21b6!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
+.btn[data-a="tutor"]:hover,.btn[data-a="tutor"].ghost:hover{background:#5b21b6!important;color:#fff!important}
+.btn[data-a="guide"]{background:#1d4ed8!important;border-color:#1e40af!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
+.btn[data-a="guide"]:hover{background:#1e40af!important;color:#fff!important}
+.btn[data-a="rule"]{background:#334155!important;border-color:#1e293b!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
+.btn[data-a="rule"]:hover{background:#1e293b!important;color:#fff!important}
+/* רמקול לכל תשובה — מי שקורא בקושי בוחר באוזן (אותו תקן של history) */
+.opts .orow{display:flex;gap:6px;align-items:stretch}
+.opts .orow .opt{flex:1 1 auto}
+.optspk{flex:0 0 auto;min-width:46px;min-height:46px;border:2px solid #0b7c71;border-radius:12px;background:#0e9c8d;color:#fff;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:8px 10px}
+.optspk:hover{background:#0b7c71}
+/* התאמה לתקן בעיצוב הילדים: הרמז בכתום התקני, רמקול ליד כל תשובה */
+.hintpill{background:#b45309;color:#fff}
+.hintpill:hover{background:#92400e;color:#fff}
+.optwrap{display:flex;gap:8px;align-items:stretch}
+.optwrap>.opt{flex:1 1 auto}
+</style>
 <a class="skip" href="#main">דילוג לתוכן</a>
 <div class="bg" id="bg" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
 <div id="live" class="sr" aria-live="polite"></div>
@@ -917,7 +949,7 @@ hello:"היי! אני {name}. בואו נתרגל מתמטיקה ביחד — ב
 qOf:"שאלה {a} מתוך {b}",listen:"תקריא לי",
 kindAdd:"חיבור",kindSub:"חיסור",kindMul:"כפל",kindDiv:"חילוק",
 weakTitle:"שמתי לב למשהו",weakMsg:"{op} קצת מאתגר עכשיו. בואו נתרגל את זה ביחד — חמש שאלות קלות יותר.",weakNear:"אתם ממש קרובים בכל פעם! ב{op} חסר רק חידוד קטן. בואו ננסה ביחד.",weakBtn:"יאללה, בואו נתרגל",weakLater:"אולי אחר כך",focusBadge:"תרגול ממוקד",focusDone:"רואה? זה לא כזה קשה! 💪",focusSub:"סיימתם תרגול ממוקד ב{op}",
-hintBtn:"קשה? קחו רמז",skip:"מדלגים",breakBtn:"הפסקה קטנה",next:"ממשיכים הלאה",
+hintBtn:"קשה? קחו רמז",sayOpt:"תקריאו לי את התשובה",skip:"מדלגים",breakBtn:"הפסקה קטנה",next:"ממשיכים הלאה",
 praise:"מעולה! ההתמדה שלכם השתלמה!",effort:"נכון! ראיתי כמה התאמצתם — וזה עבד!",
 enc:"כמעט! בואו נחשוב על זה ביחד עוד פעם",calmMsg:"כל הכבוד על הניסיון! בואו נראה ביחד את הפתרון",
 revealPre:"התשובה היא {a}.",
@@ -1005,7 +1037,7 @@ hello:"Hi! I'm {name}. Let's practice math together — at your pace, no rush.",
 qOf:"Question {a} of {b}",listen:"Read it to me",
 kindAdd:"Addition",kindSub:"Subtraction",kindMul:"Multiplication",kindDiv:"Division",
 weakTitle:"I noticed something",weakMsg:"{op} is a bit tricky right now. Let's practise it together — five easier questions.",weakNear:"You are so close every time! {op} just needs a little sharpening. Let's try together.",weakBtn:"Sure, let's practise",weakLater:"Maybe later",focusBadge:"Focused practice",focusDone:"See? It's not that hard! 💪",focusSub:"You finished focused practice in {op}",
-hintBtn:"Hard? Take a hint",skip:"Skip",breakBtn:"Short break",next:"Keep going",
+hintBtn:"Hard? Take a hint",sayOpt:"Read the answer to me",skip:"Skip",breakBtn:"Short break",next:"Keep going",
 praise:"Awesome! Your persistence paid off!",effort:"Yes! I saw how hard you tried — it worked!",
 enc:"Almost! Let's think it through together again",calmMsg:"Great try! Let's look at the solution together",
 revealPre:"The answer is {a}.",
@@ -1089,7 +1121,7 @@ hello:"Привет! Я {name}. Давай заниматься математи
 qOf:"Вопрос {a} из {b}",listen:"Прочитай мне",
 kindAdd:"Сложение",kindSub:"Вычитание",kindMul:"Умножение",kindDiv:"Деление",
 weakTitle:"Я кое-что заметил",weakMsg:"{op} сейчас даётся непросто. Давай потренируем вместе — пять вопросов полегче.",weakNear:"Ты каждый раз совсем рядом! В теме «{op}» не хватает одной мелочи. Давай попробуем вместе.",weakBtn:"Давай потренируемся",weakLater:"Может, позже",focusBadge:"Целевая тренировка",focusDone:"Видишь? Это не так сложно! 💪",focusSub:"Ты закончил тренировку по теме «{op}»",
-hintBtn:"Трудно? Подсказка",skip:"Пропустить",breakBtn:"Пауза",next:"Дальше",
+hintBtn:"Трудно? Подсказка",sayOpt:"Прочитайте ответ вслух",skip:"Пропустить",breakBtn:"Пауза",next:"Дальше",
 praise:"Отлично! Упорство окупилось!",effort:"Да! Ты очень старался — и получилось!",
 enc:"Почти! Давай подумаем ещё раз вместе",calmMsg:"Отличная попытка! Посмотрим решение вместе",
 revealPre:"Ответ — {a}.",
@@ -1173,7 +1205,7 @@ hello:"مرحبًا! أنا {name}. لنتدرب على الرياضيات مع�
 qOf:"سؤال {a} من {b}",listen:"اقرأ لي",
 kindAdd:"جمع",kindSub:"طرح",kindMul:"ضرب",kindDiv:"قسمة",
 weakTitle:"لاحظت شيئًا",weakMsg:"{op} صعب قليلًا الآن. هيا نتدرّب عليه معًا — خمسة أسئلة أسهل.",weakNear:"أنتم قريبون جدًا في كل مرة! {op} يحتاج لمسة صغيرة فقط. هيا نجرّب معًا.",weakBtn:"هيا نتدرّب",weakLater:"ربما لاحقًا",focusBadge:"تدريب مركّز",focusDone:"أرأيت؟ ليس صعبًا هكذا! 💪",focusSub:"أنهيتم تدريبًا مركّزًا في {op}",
-hintBtn:"صعب؟ خذ تلميحًا",skip:"تخطٍّ",breakBtn:"استراحة قصيرة",next:"نواصل",
+hintBtn:"صعب؟ خذ تلميحًا",sayOpt:"اقرأوا الإجابة",skip:"تخطٍّ",breakBtn:"استراحة قصيرة",next:"نواصل",
 praise:"ممتاز! مثابرتكم أثمرت!",effort:"نعم! رأيت كم حاولتم — وقد نجح!",
 enc:"تقريبًا! لنفكر معًا مرة أخرى",calmMsg:"محاولة رائعة! لنرَ الحل معًا",
 revealPre:"الجواب هو {a}.",
@@ -2310,7 +2342,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="b156 · 2026-09-26";
+var BUILD="b157 · 2026-09-26";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2726,7 +2758,8 @@ function practice(){
     else if(P.wrong.indexOf(opt)>=0)cls+=" wrong";
     else if(P.flash===opt)cls+=" flash shake";
     if(P.wrong.indexOf(opt)>=0||P.phase==="reveal")dis=" disabled";
-    h+='<button class="'+lc(cls)+'"'+dis+' data-a="ans" data-o="'+opt+'"><span style="direction:ltr">'+opt+'</span></button>';
+    h+='<div class="optwrap"><button class="'+lc(cls)+'"'+dis+' data-a="ans" data-o="'+opt+'"><span style="direction:ltr">'+opt+'</span></button>'+
+      (state.settings.tts?'<button type="button" class="optspk" data-a="sayopt" data-o="'+opt+'" aria-label="'+esc(t.sayOpt)+'">'+ic("speaker",15)+'</button>':"")+'</div>';
   });
   h+='</div>';
   if(P.visual&&P.phase==="ask")h+=visualHint(q);
@@ -4521,6 +4554,7 @@ function onAction(a,el){
   }
   else if(a==="changepet"){view="onboarding";P.selPet=state.pet;render()}
   else if(a==="ans")onAns(parseInt(el.getAttribute("data-o"),10));
+  else if(a==="sayopt")speak(el.getAttribute("data-o"));
   else if(a==="hint"){
     var q=P.ses[P.qi];
     if(P.phase!=="ask")return;
@@ -4739,7 +4773,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b156-pwa2").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b157-pwa2").catch(function(){});
   });
 }
 </script>
