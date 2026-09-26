@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x101 · 2026-09-26";
+  var BUILD = "x102 · 2026-09-26";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -387,7 +387,7 @@
     var tutCard = (window.TUTOR && TUTOR.on())
       ? '<div class="card"><h3>' + esc(TUTOR.label()) + "</h3>" +
         '<p class="meta">נתקעתם לפני שהתחלתם? אפשר לשאול את המורה כל שאלה על החומר.</p>' +
-        '<button class="btn ghost" id="btn-tutor-home" type="button">♫ " + esc(TUTOR.label()) + "</button></div>'
+        '<button class="btn ghost" id="btn-tutor-home" type="button">♫ ' + esc(TUTOR.label()) + '</button></div>'
       : "";
     var order = Object.keys(groups).sort();
     box.innerHTML = tutCard + order.map(function (k) {
@@ -1447,7 +1447,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x101-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x102-pwa1").catch(function () {});
     });
   }
 
