@@ -29,7 +29,7 @@ on:
   workflow_dispatch:
     inputs:
       app:
-        description: 'איזו אפליקציה (english, history, ulpan, lomda)'
+        description: 'english, history, ulpan, lomda, or pilot (staging-only artifact)'
         required: true
         default: 'english'
       max:
@@ -50,7 +50,7 @@ on:
         default: ''
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: record
@@ -58,6 +58,9 @@ concurrency:
 
 jobs:
   record:
+    if: ${{ github.event_name == 'schedule' || github.event.inputs.app != 'pilot' }}
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 340
     steps:
@@ -165,3 +168,36 @@ jobs:
             node .claude/qa/record.js --plan
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+  # Manual staging-branch trial only. `app: pilot` is an existing dispatch input
+  # on the default branch, so dispatch with `ref` set to the reviewed staging branch.
+  pilot:
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.app == 'pilot' && github.ref != 'refs/heads/main' }}
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install ffmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Validate 32 pilot selections without API calls
+        run: node .claude/qa/pilot-hebrew.js --check
+      - name: Make 32 clips, stop on first error or quota response
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node .claude/qa/pilot-hebrew.js
+      - name: Store samples and usage report privately as a run artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hebrew-pilot-${{ github.run_id }}
+          path: ${{ runner.temp }}/hebrew-pilot/
+          if-no-files-found: warn
+          retention-days: 7
