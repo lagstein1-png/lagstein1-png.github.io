@@ -2394,8 +2394,8 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s108 · 2026-09-26";
-var view=/[?&]lesson=sci[1-5](&|$)/.test(location.search||"")?"lesson":"units";
+var BUILD="s109 · 2026-09-26";
+var view=/[?&]lesson=sci[1-6](&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
 var confirmReset=false,vMore=false;
@@ -2482,8 +2482,8 @@ function unitsView(){
   UNITS.forEach(function(u,ui){
     h+='<h2 class="fd" style="font-size:1.2rem;margin:22px 0 10px">'+esc(t[u.grade])+'</h2><div style="display:grid;gap:10px">';
     u.topics.forEach(function(tp,ti){
-      if(ui===0&&ti<=2){
-        h+='<a href="?internal=shlav-internal-science&lesson=sci'+({0:'1',1:'4',2:'5'})[ti]+'" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
+      if(ui===0&&ti<=3){
+        h+='<a href="?internal=shlav-internal-science&lesson=sci'+({0:'1',1:'4',2:'5',3:'6'})[ti]+'" class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
           '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
           '<span class="chip" style="font-size:.8rem;background:var(--teal);color:#fff">'+esc(t.startLesson)+'</span></a>';
       }else{
@@ -4464,6 +4464,7 @@ function render(){ try{lgChrome()}catch(e){}
     else if(view==="lesson"&&SCI3_ON)html+=sci3LessonView();
     else if(view==="lesson"&&SCI4_ON)html+=sci4LessonView();
     else if(view==="lesson"&&SCI5_ON)html+=sci5LessonView();
+    else if(view==="lesson"&&SCI6_ON)html+=sci6LessonView();
     else if(view==="settings")html+=settingsView();
     else if(view==="exam")html+=teOpen()?viewExamNew():viewLocked();
     else if(view==="marks")html+=teOpen()?viewMarks():viewLocked();
@@ -4633,6 +4634,7 @@ function onAction(a,el){
   if(/^s3/.test(a)&&SCI3_ON){sci3LessonAction(a,el);return}
   if(/^s4/.test(a)&&SCI4_ON){sci4LessonAction(a,el);return}
   if(/^s5/.test(a)&&SCI5_ON){sci5LessonAction(a,el);return}
+  if(/^s6/.test(a)&&SCI6_ON){sci6LessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -5467,6 +5469,7 @@ ar:{s5Title:"درس: ممّ صُنع العالم؟",s5Goal:"الهدف: أن ن
     s5Sum:"انتهيتم! اليوم تعلمنا: الأشياء مصنوعة من مواد مختلفة، ونختار المادة حسب خصائصها - صلبة، شفافة، خفيفة وغيرها.",
     s5Again:"من البداية",s5Next:"التالي",s5Hear:"استمعوا",s5Correct:"صحيح!",s5Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s5Check:"فحص الفهم",
     s5Wood:"خشب",s5Metal:"معدن",s5Plastic:"بلاستيك",s5WoodProp:"خفيف ودافئ الملمس",s5MetalProp:"صلب ولامع",s5PlasticProp:"خفيف ولا ينكسر بسهولة",s5PrevLesson:"الدرس السابق"}};
+S5STR.he.s5Fwd="לשיעור הבא";S5STR.en.s5Fwd="Next lesson";S5STR.ru.s5Fwd="Следующий урок";S5STR.ar.s5Fwd="الدرس التالي";
 function s5t(k){var d=S5STR[state.settings.lang||"he"]||S5STR.he;var v=d[k];return v===undefined?(S5STR.en[k]||k):v}
 var S5SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function s5Scene(revealed){
@@ -5519,7 +5522,7 @@ function sci5LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s5t("s5Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s5again",s5t("s5Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s5HearBtn(s5t("s5Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci4" style="color:#1d4ed8;font-weight:600">'+esc(s5t("s5PrevLesson"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci4" style="color:#1d4ed8;font-weight:600">'+esc(s5t("s5PrevLesson"))+'</a> · <a href="?internal=shlav-internal-science&lesson=sci6" style="color:#1d4ed8;font-weight:600">'+esc(s5t("s5Fwd"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5532,6 +5535,126 @@ function sci5LessonAction(a,el){
   else if(a==="s5p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
   else if(a==="s5again"){S5SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
   else if(a==="s5hear"){speak(el.getAttribute("data-say"))}
+}
+
+/* ================= שיעור מדע 6: המעגל החשמלי (כיתה ג׳, יחידה uEnergy) ================= */
+/* תוכן מקורי לפי מיקוד הלמידה במדע וטכנולוגיה כיתה ג׳ (אנרגיה - מרכיבי המעגל החשמלי).
+   בטיחות: התנסות בחשמל רק עם סוללות. ar/ru/en תרגום מכונה, מסומן באתר. */
+var SCI6_ON=/(^|[?&])lesson=sci6(&|$)/.test(location.search||"");
+var S6STR={
+he:{s6Title:"שיעור: המעגל החשמלי",s6Goal:"המטרה: להכיר את חלקי המעגל החשמלי ולדעת שהנורה מאירה רק כשהמעגל סגור.",s6Start:"מתחילים",s6Step:"שלב {0} מתוך 5",
+    s6V1:"סוללה, חוטים, מתג ונורה. כשהמתג פתוח - הנורה כבויה. מה יקרה כשנסגור את המתג?",s6V1b:"לחצו על הכפתור וסגרו את המעגל.",s6Close:"סגרו את המעגל",
+    s6V2:"המעגל נסגר והנורה מאירה! החשמל עובר מהסוללה, דרך החוטים, לנורה ובחזרה.",
+    s6Q:"מה צריך כדי שהנורה תאיר?",s6A0:"מעגל פתוח - מתג פתוח",s6A1:"מעגל סגור - בלי הפסקה בדרך",s6A2:"בלי סוללה בכלל",
+    s6Why0:"כשהמתג פתוח יש הפסקה בדרך והחשמל לא עובר.",s6Why2:"בלי סוללה אין אנרגיה חשמלית במעגל.",
+    s6Rule:"הכלל: נורה מאירה רק במעגל סגור - דרך שלמה בלי הפסקה מהסוללה לנורה ובחזרה.",s6RuleEx:"בטיחות: מתנסים בחשמל רק עם סוללות. אף פעם לא נוגעים בשקע שבקיר - החשמל שם מסוכן מאוד.",
+    s6P1:"המתג במעגל פתוח. מה תעשה הנורה?",s6P1a0:"לא תאיר - יש הפסקה בדרך",s6P1a1:"תאיר חזק מאוד",s6P1a2:"תאיר רק אם נגע בה",
+    s6P2:"איזה רכיב נותן את האנרגיה החשמלית למעגל?",s6P2a0:"הסוללה",s6P2a1:"המתג",s6P2a2:"הנורה",
+    s6Sum:"סיימתם! היום למדנו: למעגל חשמלי יש סוללה, חוטים, מתג ונורה - והנורה מאירה רק כשהמעגל סגור.",
+    s6Again:"מההתחלה",s6Next:"הבא",s6Hear:"השמיעו",s6Correct:"נכון!",s6Wrong:"עוד לא. אפשר לנסות שוב.",s6Check:"בדיקת הבנה",
+    s6Bat:"סוללה",s6Switch:"מתג",s6Bulb:"נורה",s6Open:"פתוח",s6Closed:"סגור",s6Off:"כבויה",s6On:"מאירה!",s6PrevLesson:"לשיעור הקודם"},
+en:{s6Title:"Lesson: the electric circuit",s6Goal:"The goal: know the parts of an electric circuit and that the bulb lights only when the circuit is closed.",s6Start:"Start",s6Step:"Step {0} of 5",
+    s6V1:"A battery, wires, a switch and a bulb. When the switch is open - the bulb is off. What happens when we close the switch?",s6V1b:"Press the button and close the circuit.",s6Close:"Close the circuit",
+    s6V2:"The circuit is closed and the bulb lights! Electricity flows from the battery, through the wires, to the bulb and back.",
+    s6Q:"What is needed for the bulb to light?",s6A0:"An open circuit - the switch open",s6A1:"A closed circuit - no break in the path",s6A2:"No battery at all",
+    s6Why0:"When the switch is open there is a break in the path and electricity cannot flow.",s6Why2:"Without a battery there is no electric energy in the circuit.",
+    s6Rule:"The rule: a bulb lights only in a closed circuit - a complete path with no break from the battery to the bulb and back.",s6RuleEx:"Safety: experiment with electricity only with batteries. Never touch a wall socket - that electricity is very dangerous.",
+    s6P1:"The switch in the circuit is open. What will the bulb do?",s6P1a0:"It will not light - there is a break in the path",s6P1a1:"It will shine very brightly",s6P1a2:"It will light only if we touch it",
+    s6P2:"Which part gives the electric energy to the circuit?",s6P2a0:"The battery",s6P2a1:"The switch",s6P2a2:"The bulb",
+    s6Sum:"Done! Today we learned: an electric circuit has a battery, wires, a switch and a bulb - and the bulb lights only when the circuit is closed.",
+    s6Again:"From the start",s6Next:"Next",s6Hear:"Listen",s6Correct:"Correct!",s6Wrong:"Not yet. You can try again.",s6Check:"Understanding check",
+    s6Bat:"battery",s6Switch:"switch",s6Bulb:"bulb",s6Open:"open",s6Closed:"closed",s6Off:"off",s6On:"lights!",s6PrevLesson:"Previous lesson"},
+ru:{s6Title:"Урок: электрическая цепь",s6Goal:"Цель: узнать части электрической цепи и то, что лампочка горит только когда цепь замкнута.",s6Start:"Начинаем",s6Step:"Шаг {0} из 5",
+    s6V1:"Батарейка, провода, выключатель и лампочка. Когда выключатель разомкнут - лампочка не горит. Что будет, когда мы замкнём цепь?",s6V1b:"Нажмите кнопку и замкните цепь.",s6Close:"Замкнуть цепь",
+    s6V2:"Цепь замкнута и лампочка горит! Электричество идёт от батарейки, по проводам, к лампочке и обратно.",
+    s6Q:"Что нужно, чтобы лампочка загорелась?",s6A0:"Разомкнутая цепь - выключатель открыт",s6A1:"Замкнутая цепь - путь без разрыва",s6A2:"Вообще без батарейки",
+    s6Why0:"Когда выключатель разомкнут, в пути есть разрыв и ток не идёт.",s6Why2:"Без батарейки в цепи нет электрической энергии.",
+    s6Rule:"Правило: лампочка горит только в замкнутой цепи - целый путь без разрыва от батарейки к лампочке и обратно.",s6RuleEx:"Безопасность: опыты с электричеством только с батарейками. Никогда не трогайте розетку в стене - это очень опасно.",
+    s6P1:"Выключатель в цепи разомкнут. Что будет с лампочкой?",s6P1a0:"Не загорится - в пути разрыв",s6P1a1:"Загорится очень ярко",s6P1a2:"Загорится, только если её потрогать",
+    s6P2:"Какая часть даёт цепи электрическую энергию?",s6P2a0:"Батарейка",s6P2a1:"Выключатель",s6P2a2:"Лампочка",
+    s6Sum:"Готово! Сегодня мы узнали: в электрической цепи есть батарейка, провода, выключатель и лампочка - и лампочка горит только когда цепь замкнута.",
+    s6Again:"Сначала",s6Next:"Дальше",s6Hear:"Слушать",s6Correct:"Верно!",s6Wrong:"Пока нет. Можно ещё раз.",s6Check:"Проверка понимания",
+    s6Bat:"батарейка",s6Switch:"выключатель",s6Bulb:"лампочка",s6Open:"разомкнут",s6Closed:"замкнут",s6Off:"не горит",s6On:"горит!",s6PrevLesson:"Прошлый урок"},
+ar:{s6Title:"درس: الدائرة الكهربائية",s6Goal:"الهدف: أن نتعرف على أجزاء الدائرة الكهربائية ونعرف أن المصباح يضيء فقط عندما تكون الدائرة مغلقة.",s6Start:"نبدأ",s6Step:"الخطوة {0} من 5",
+    s6V1:"بطارية وأسلاك ومفتاح ومصباح. عندما يكون المفتاح مفتوحًا - المصباح مطفأ. ماذا يحدث عندما نغلق المفتاح؟",s6V1b:"اضغطوا على الزر وأغلقوا الدائرة.",s6Close:"أغلقوا الدائرة",
+    s6V2:"الدائرة مغلقة والمصباح يضيء! الكهرباء تمر من البطارية، عبر الأسلاك، إلى المصباح وتعود.",
+    s6Q:"ما الذي يلزم لكي يضيء المصباح؟",s6A0:"دائرة مفتوحة - المفتاح مفتوح",s6A1:"دائرة مغلقة - بلا انقطاع في الطريق",s6A2:"بدون بطارية أصلًا",
+    s6Why0:"عندما يكون المفتاح مفتوحًا هناك انقطاع في الطريق والكهرباء لا تمر.",s6Why2:"بدون بطارية لا توجد طاقة كهربائية في الدائرة.",
+    s6Rule:"القاعدة: المصباح يضيء فقط في دائرة مغلقة - طريق كامل بلا انقطاع من البطارية إلى المصباح وعودة.",s6RuleEx:"الأمان: نتجرب مع الكهرباء فقط بالبطاريات. لا نلمس أبدًا مقبس الحائط - كهرباء خطيرة جدًا.",
+    s6P1:"المفتاح في الدائرة مفتوح. ماذا سيفعل المصباح؟",s6P1a0:"لن يضيء - هناك انقطاع في الطريق",s6P1a1:"سيضيء بقوة كبيرة",s6P1a2:"سيضيء فقط إذا لمسناه",
+    s6P2:"أي جزء يعطي الطاقة الكهربائية للدائرة؟",s6P2a0:"البطارية",s6P2a1:"المفتاح",s6P2a2:"المصباح",
+    s6Sum:"انتهيتم! اليوم تعلمنا: الدائرة الكهربائية فيها بطارية وأسلاك ومفتاح ومصباح - والمصباح يضيء فقط عندما تكون الدائرة مغلقة.",
+    s6Again:"من البداية",s6Next:"التالي",s6Hear:"استمعوا",s6Correct:"صحيح!",s6Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",s6Check:"فحص الفهم",
+    s6Bat:"بطارية",s6Switch:"مفتاح",s6Bulb:"مصباح",s6Open:"مفتوح",s6Closed:"مغلق",s6Off:"مطفأ",s6On:"يضيء!",s6PrevLesson:"الدرس السابق"}};
+function s6t(k){var d=S6STR[state.settings.lang||"he"]||S6STR.he;var v=d[k];return v===undefined?(S6STR.en[k]||k):v}
+var S6SN={step:0,closed:false,picked:-1,p1:-1,p2:-1};
+function s6Scene(closed){
+  return '<div class="card" style="padding:22px;margin:16px auto;max-width:460px;text-align:center">'+
+    '<div style="display:flex;justify-content:center;align-items:center;gap:8px;font-size:2.4rem;flex-wrap:wrap">'+
+      '<span>🔋</span><span style="font-size:1.6rem;color:#64748b">➖</span>'+
+      '<span>'+(closed?'➡️':'⏸️')+'</span>'+
+      '<span style="font-size:1.6rem;color:#64748b">➖</span>'+
+      '<span style="'+(closed?'filter:drop-shadow(0 0 10px #fbbf24)':'opacity:.4')+'">💡</span>'+
+    '</div>'+
+    '<div style="margin-top:10px;font-weight:700">'+
+      esc(s6t("s6Switch"))+': <span style="color:'+(closed?'#0e9c8d':'#bf4426')+'">'+esc(s6t(closed?"s6Closed":"s6Open"))+'</span> · '+
+      esc(s6t("s6Bulb"))+': <span style="color:'+(closed?'#0e9c8d':'#475569')+'">'+esc(s6t(closed?"s6On":"s6Off"))+'</span>'+
+    '</div></div>';
+}
+function s6HearBtn(text){return '<button class="btn btn-g" data-a="s6hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s6t("s6Hear"))+'</button>'}
+function sci6LessonView(){
+  var st=S6SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(s6t("s6Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(s6t("s6Title"))+'</h1>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(s6t("s6Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("s6next",s6t("s6Start"),'background:#1d4ed8;color:#fff;font-weight:700')+s6HearBtn(s6t("s6Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s6t(st.closed?"s6V2":"s6V1"))+'</p>';
+    h+=s6Scene(st.closed);
+    if(!st.closed){
+      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(s6t("s6V1b"))+'</p>';
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s6close",s6t("s6Close"),'background:#b45309;color:#fff;font-weight:700')+s6HearBtn(s6t("s6V1")+" "+s6t("s6V1b"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("s6next",s6t("s6Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s6HearBtn(s6t("s6V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s6t("s6Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s6t("s6Q"))+'</p>';
+    h+=lsOpts([s6t("s6A0"),s6t("s6A1"),s6t("s6A2")],st.picked,1,"s6pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":s6t({0:"s6Why0",2:"s6Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?s6t("s6Correct"):s6t("s6Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s6next",s6t("s6Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(s6t("s6Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#bf4426;font-weight:600;margin-top:10px">'+esc(s6t("s6RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("s6next",s6t("s6Next"),'background:#1d4ed8;color:#fff;font-weight:700')+s6HearBtn(s6t("s6Rule")+" "+s6t("s6RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s6t("s6P1"))+'</p>';
+    h+=lsOpts([s6t("s6P1a0"),s6t("s6P1a1"),s6t("s6P1a2")],st.p1,0,"s6p1");
+    if(st.p1===0){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s6t("s6P2"))+'</p>';
+      h+=lsOpts([s6t("s6P2a0"),s6t("s6P2a1"),s6t("s6P2a2")],st.p2,0,"s6p2");
+    }
+    if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s6t("s6Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s6next",s6t("s6Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s6t("s6Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s6again",s6t("s6Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s6HearBtn(s6t("s6Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-science&lesson=sci5" style="color:#1d4ed8;font-weight:600">'+esc(s6t("s6PrevLesson"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function sci6LessonAction(a,el){
+  var st=S6SN;
+  if(a==="s6next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="s6close"){st.closed=true;render();speak(s6t("s6V2"))}
+  else if(a==="s6pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s6p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s6p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="s6again"){S6SN={step:0,closed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="s6hear"){speak(el.getAttribute("data-say"))}
 }
 
 /* ================= boot ================= */
@@ -5575,7 +5698,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s108-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s109-pwa1").catch(function(){});
   });
 }
 </script>
