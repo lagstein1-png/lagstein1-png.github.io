@@ -849,7 +849,7 @@ T.he={
   yes:"כן, מחקו", no:"לא",
   savedNote:"ההתקדמות נשמרת אוטומטית במכשיר הזה בלבד.",
   ofN:"מתוך", newWord:"פריט חדש", review:"חזרה",
-  whyT:"למה זו התשובה", topicW:"נושא", levelW:"רמה",
+  whyT:"למה זו התשובה", whyNot:"למה זו לא התשובה", topicW:"נושא", levelW:"רמה",
   simT:"מבחן מדומה", simD:"עשרים שאלות מכל הנושאים, בלי רמזים ובלי הסברים — עד ההגשה.",
   simStart:"התחילו מבחן", simSubmit:"הגישו", simAgain:"מבחן חדש", simScore:"הציון שלכם",
   simQ:"שאלה", simLeft:"בלי תשובה", simReview:"סקירת התשובות", simBack:"חזרה למבחן",
@@ -908,7 +908,7 @@ T.ar={
   yes:"نعم، امحُ", no:"لا",
   savedNote:"يُحفظ التقدّم تلقائيًا على هذا الجهاز فقط.",
   ofN:"من", newWord:"عنصر جديد", review:"مراجعة",
-  whyT:"لماذا هذه هي الإجابة", topicW:"موضوع", levelW:"مستوى",
+  whyT:"لماذا هذه هي الإجابة", whyNot:"لماذا ليست هي الإجابة", topicW:"موضوع", levelW:"مستوى",
   simT:"امتحان محاكاة", simD:"عشرون سؤالًا من كلّ المواضيع، بلا تلميحات وبلا شروح — حتى التسليم.",
   simStart:"ابدأوا الامتحان", simSubmit:"سلّموا", simAgain:"امتحان جديد", simScore:"علامتكم",
   simQ:"سؤال", simLeft:"بلا إجابة", simReview:"مراجعة الإجابات", simBack:"العودة للامتحان",
@@ -967,7 +967,7 @@ T.ru={
   yes:"Да, удалить", no:"Нет",
   savedNote:"Прогресс сохраняется автоматически только на этом устройстве.",
   ofN:"из", newWord:"новый элемент", review:"повторение",
-  whyT:"Почему это верный ответ", topicW:"Тема", levelW:"Уровень",
+  whyT:"Почему это верный ответ", whyNot:"Почему это не ответ", topicW:"Тема", levelW:"Уровень",
   simT:"Пробный экзамен", simD:"Двадцать вопросов по всем темам, без подсказок и объяснений — до сдачи.",
   simStart:"Начать экзамен", simSubmit:"Сдать", simAgain:"Новый экзамен", simScore:"Ваш результат",
   simQ:"Вопрос", simLeft:"без ответа", simReview:"Разбор ответов", simBack:"Вернуться к экзамену",
@@ -1026,7 +1026,7 @@ T.en={
   yes:"Yes, delete", no:"No",
   savedNote:"Progress is saved automatically on this device only.",
   ofN:"of", newWord:"new item", review:"review",
-  whyT:"Why this is the answer", topicW:"Topic", levelW:"Level",
+  whyT:"Why this is the answer", whyNot:"Why this is not the answer", topicW:"Topic", levelW:"Level",
   simT:"Mock exam", simD:"Twenty questions from every topic, with no hints and no explanations — until you submit.",
   simStart:"Start the exam", simSubmit:"Submit", simAgain:"New exam", simScore:"Your score",
   simQ:"Question", simLeft:"unanswered", simReview:"Review your answers", simBack:"Back to the exam",
@@ -1072,7 +1072,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="bib1 · 2026-09-26";
+var BUILD="bib2 · 2026-09-26";
 var SKEY="ezrach-state-v1";
 var GKEY_STORE="ezrach-gkey";
 
@@ -2368,7 +2368,7 @@ function screenPractice(){
     h+='<div class="fb '+(P.ok?"ok":"bad")+'"><b>'+(P.ok?esc(t("correct")):esc(t("wrong")))+"</b>";
     if(!P.ok){h+='<div class="body">'+esc(t("answerIs"))+" <b>"+esc(q.answer)+"</b></div>";
       var wp=P.picked>=0&&q.opts[P.picked]?q.opts[P.picked].why:"";
-      if(wp)h+='<div class="why"><b>'+esc(t("whyT"))+":</b> "+esc(wp)+"</div>";}
+      if(wp)h+='<div class="why"><b>'+esc(t("whyNot"))+":</b> "+esc(wp)+"</div>";}
     /* ההסבר נפתח גם כשצדקו. תשובה נכונה שנוחשה נראית בדיוק כמו
        תשובה נכונה שנודעה, ורק ההסבר מבדיל ביניהן. */
     if(it&&it.ex)h+='<div class="why"><b>'+esc(t("whyT"))+":</b> "+esc(gl(it.ex))+"</div>";
@@ -4407,7 +4407,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=bib1-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=bib2-pwa1").catch(function(){});
   });
 }
 </script>
