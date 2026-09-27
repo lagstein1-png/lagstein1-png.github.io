@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>פינת מורים | bekol.co.il</title>
+<link rel="canonical" href="https://bekol.co.il/teachers/" />
+<meta name="description" content="פינת מורים: מדריך קצר לעבודה עם תלמיד שמתקשה בקריאה בעזרת הקראה, קישורים לחומרי רמ״ה לפי כיתה וקישורים רשמיים של משרד החינוך למורים." />
+<meta name="theme-color" content="#111827" />
+<meta name="copyright" content="© 2026 יהושע לגשטיין. כל הזכויות שמורות." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#111827;--muted:#4b5563;--line:#e5e7eb;--brand:#2f5fd8;--brand-ink:#fff}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#0e1117;--card:#161b26;--ink:#e8ecf4;--muted:#9aa4ba;--line:#28313f;--brand:#7ba2ff;--brand-ink:#0b0f17}}
+*{box-sizing:border-box}
+html[lang="he"] body{font-family:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif}
+html[lang="ar"] body{font-family:"Noto Sans Arabic","Heebo",system-ui,"Segoe UI",Arial,sans-serif}
+html[lang="ru"] body,html[lang="en"] body{font-family:"Noto Sans","Heebo",system-ui,"Segoe UI",Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px}
+.wrap{max-width:46rem;margin:0 auto;padding:clamp(18px,4vw,40px)}
+h1{font-size:clamp(1.5rem,5vw,2rem);margin:0 0 .3rem;line-height:1.25}
+h2{font-size:1.15rem;margin:0 0 .4rem}
+p{margin:0 0 .2rem;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:clamp(16px,3.5vw,28px);margin-top:16px}
+.langs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0 0}
+.langs button{font:inherit;font-weight:700;cursor:pointer;border:1px solid var(--line);
+  background:var(--card);color:var(--ink);border-radius:999px;padding:.5rem 1rem;min-height:2.8rem}
+.langs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.meta{font-size:.85rem;color:var(--muted);margin-top:1.4rem;
+  border-top:1px solid var(--line);padding-top:1rem}
+a{color:var(--brand)}
+/* כפתור ההקראה: הדבר שהופך את בקול לשימושי לתלמיד שמתקשה בקריאה.
+   מוצמד לכל בלוק טקסט בדף, כדי שגם המורה וגם התלמיד יוכלו לשמוע. */
+.say{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;
+  width:2rem;height:2rem;margin-inline-start:.4rem;border:1px solid var(--line);
+  border-radius:999px;background:var(--card);color:var(--brand);cursor:pointer;padding:0}
+.say svg{width:1.05rem;height:1.05rem;fill:currentColor}
+.say[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.steps{margin:.6rem 0 0;padding:0;list-style:none;counter-reset:st}
+.steps li{position:relative;margin:0 0 .7rem;padding-inline-start:2.1rem;color:var(--muted)}
+.steps li::before{counter-increment:st;content:counter(st);position:absolute;
+  inset-inline-start:0;top:.1rem;width:1.5rem;height:1.5rem;border-radius:999px;
+  background:var(--brand);color:var(--brand-ink);font-weight:700;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center}
+.steps li b{color:var(--ink);font-weight:700}
+.lks{display:grid;gap:.6rem;margin-top:.7rem}
+.lk{display:block;text-decoration:none;background:var(--bg);border:1px solid var(--line);
+  border-radius:12px;padding:.7rem .9rem;color:var(--ink)}
+.lk b{display:block;font-size:1rem}
+.lk span{display:block;color:var(--muted);font-size:.92rem}
+.lk:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.note{font-size:.9rem;margin-top:.7rem}
+.vchk{display:inline-block;margin-top:.4rem;font-weight:700}
+.credit{font-size:.9rem;margin-top:1rem}
+:focus-visible{outline:3px solid currentColor;outline-offset:2px;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="ttl"></h1>
+  <p id="intro"></p>
+  <div class="langs" id="langs"></div>
+  <section class="card" id="guide" aria-live="off"></section>
+  <section class="card" id="rama"></section>
+  <section class="card" id="moe"></section>
+  <p class="credit" id="credit"></p>
+  <p class="meta" id="meta"></p>
+</div>
+<script>
+(function(){
+"use strict";
+/* הכתובות הרשמיות. כולן אומתו (HTTP 200) ב-27.9.2026 לפני הפרסום.
+   אין כאן העתקה של חומרים: קישור בלבד, והקרדיט מופיע בגוף הדף. */
+var U={
+  mivhanim:"https://pop.education.gov.il/tchumey_daat/ivrit_chinhch_leshony/yesodi/mivhanim-umesimot/",
+  ramaTools:"https://rama.gov.il/tools",
+  pop:"https://pop.education.gov.il/",
+  plans:"https://pop.education.gov.il/learning-plans/",
+  tools:"https://pop.education.gov.il/tools-and-services/",
+  kolkore:"https://pop.education.gov.il/tchumey_daat/ivrit_chinhch_leshony/yesodi/promote-reading-fluency/",
+  meyda:"https://meyda.education.gov.il/",
+  rama:"https://rama.gov.il/",
+  voice:"/voice/",
+  home:"/",
+  legal:"/legal/"
+};
+var S={
+he:{dir:"rtl",title:"פינת מורים",
+ intro:"דף אחד למורה: איך נותנים לתלמיד שמתקשה בקריאה אפליקציה עם הקראה, קישורים לחומרי רמ״ה לפי כיתה, וקישורים רשמיים של משרד החינוך למורים.",
+ guideH:"המדריך הקצר: תלמיד שמתקשה בקריאה + הקראה",
+ guideLead:"חמש דקות עבודה, והתלמיד שומע כל שאלה וכל הסבר בלחיצה אחת. הכול חינם ובלי הרשמה.",
+ steps:[
+  "פותחים את bekol.co.il בדפדפן בטלפון, בטאבלט או במחשב של התלמיד. לא צריך להירשם ולא צריך פרטים.",
+  "בוחרים אפליקציה במקצוע שהתלמיד אוהב: מדעים, גאוגרפיה, מתמטיקה, אנגלית, עברית ועוד. טיפ: מתחילים שלב אחד מתחת לרמת הכיתה, כדי לבנות ביטחון.",
+  "מראים לתלמיד את כפתור ההקראה (רמקול קטן) שליד כל שאלה, תשובה והסבר. לוחצים, שומעים, ואז קוראים לבד.",
+  "בכיתה עדיף עם אוזניות. בבית אפשר בקול.",
+  "אין ציונים ואין תחרות. האפליקציה מעודדת גם אחרי טעות, וטעות היא חלק מהלמידה.",
+  "תלמיד ששפת הבית שלו אינה עברית יכול לעבור לערבית, לרוסית או לאנגלית בתפריט השפות (תרגום מכונה).",
+  "שומעים הכי טוב בדפדפן Edge במחשב ובכרום בטלפון."],
+ vchk:"בדיקת קול: איך שומע הדפדפן שלכם",
+ ramaH:"חומרי רמ״ה להערכה, לפי כיתה",
+ ramaLead:"קישורים רשמיים לחומרי ההערכה של משרד החינוך ושל ראמ״ה.",
+ grades:[
+  {t:"כיתות א׳-ב׳",d:"מבדק שטף קריאה, מבדקי כתיבה ומבחני מיצ״ב כיתה ב׳.",u:"mivhanim"},
+  {t:"כיתה ד׳",d:"מבחני אסי״ף בהבנת הנקרא, כולל טקסטים ומחוונים.",u:"mivhanim"},
+  {t:"כיתות ה׳-ו׳",d:"מבחני מיצ״ב בהבנת הנקרא משנים קודמות.",u:"mivhanim"},
+  {t:"כל הכיתות",d:"מאגר כלי ההערכה הפנימיים של ראמ״ה למורים ולמנהלים.",u:"ramaTools"}],
+ ramaNote:"שימו לב: חלק מהחומרים מוגנים ופתוחים לעובדי הוראה בלבד, אחרי הזדהות באתר משרד החינוך.",
+ moeH:"קישורים רשמיים של משרד החינוך",
+ links:[
+  {t:"מרחב פדגוגי",d:"הבית המקצועי של עובדי ההוראה: תוכניות, כלים וחדשות מקצועיות.",u:"pop"},
+  {t:"תוכניות לימודים",d:"כל תוכניות הלימודים של משרד החינוך, לפי מקצוע וכיתה.",u:"plans"},
+  {t:"כלים ושירותים",d:"כלים דיגיטליים ושירותים מקוונים למורה.",u:"tools"},
+  {t:"קול קורא!",d:"תוכנית משרד החינוך לקידום שטף הקריאה: חומרי הדרכה ומבדקים.",u:"kolkore"},
+  {t:"מיידע | ספריית התכנים",d:"מצגות, דפי עבודה ומבחנים בכל מקצוע, מסודרים לפי כיתה.",u:"meyda"},
+  {t:"ראמ״ה",d:"הרשות הארצית למדידה והערכה בחינוך: מבחנים, סקרים ופרסומים.",u:"rama"}],
+ credit:"הקישורים בדף זה מובילים לאתרים הרשמיים של משרד החינוך ושל ראמ״ה. כל הזכויות על החומרים שמורות למשרד החינוך. בקול מקשר אל החומרים בלבד ואינו מעתיק אותם.",
+ mt:"הדף זמין גם בערבית, ברוסית ובאנגלית בתרגום מכונה.",
+ back:"חזרה לדף הבית",terms:"תנאי שימוש",say:"הקראה",stop:"עצירת ההקראה"},
+ar:{dir:"rtl",title:"ركن المعلّمين",
+ intro:"صفحة واحدة للمعلّم: كيف تعطي تلميذًا يجد صعوبة في القراءة تطبيقًا مع قراءة صوتيّة، وروابط لمواد راماه حسب الصفّ، وروابط رسميّة من وزارة التربية والتعليم للمعلّمين.",
+ guideH:"الدليل القصير: تلميذ يجد صعوبة في القراءة + القراءة الصوتيّة",
+ guideLead:"خمس دقائق عمل، ويسمع التلميذ كلّ سؤال وكلّ شرح بضغطة واحدة. كلّ شيء مجّانيّ وبدون تسجيل.",
+ steps:[
+  "افتحوا bekol.co.il في متصفّح هاتف التلميذ أو جهازه اللوحيّ أو حاسوبه. لا حاجة إلى تسجيل ولا إلى أيّ تفاصيل.",
+  "اختاروا تطبيقًا في موضوع يحبّه التلميذ: العلوم، الجغرافيا، الرياضيّات، الإنجليزيّة، العبريّة وغيرها. نصيحة: ابدأوا درجة واحدة تحت مستوى الصفّ لبناء الثقة.",
+  "أرِوا التلميذ زرّ القراءة الصوتيّة (مكبّر صوت صغير) بجانب كلّ سؤال وجواب وشرح. نضغط، نسمع، ثمّ نقرأ بأنفسنا.",
+  "في الصفّ يُفضَّل استخدام سمّاعات. في البيت يمكن الاستماع بصوت عالٍ.",
+  "لا علامات ولا تنافس. التطبيق يشجّع حتى بعد الخطأ، والخطأ جزء من التعلّم.",
+  "تلميذ لغة بيته ليست العبريّة يمكنه الانتقال إلى العربيّة أو الروسيّة أو الإنجليزيّة من قائمة اللغات (ترجمة آليّة).",
+  "أفضل استماع في متصفّح Edge على الحاسوب وفي Chrome على الهاتف."],
+ vchk:"فحص الصوت: كيف يسمع متصفّحكم",
+ ramaH:"مواد راماه للتقييم، حسب الصفّ",
+ ramaLead:"روابط رسميّة لمواد التقييم من وزارة التربية والتعليم ومن راماه.",
+ grades:[
+  {t:"صفّا أوّل وثانٍ",d:"فحص طلاقة القراءة، فحوص الكتابة وامتحانات ميتساف للصفّ الثاني.",u:"mivhanim"},
+  {t:"الصفّ الرابع",d:"امتحانات أسيف في فهم المقروء، مع النصوص ودليل التصحيح.",u:"mivhanim"},
+  {t:"صفّا خامس وسادس",d:"امتحانات ميتساف في فهم المقروء من سنوات سابقة.",u:"mivhanim"},
+  {t:"كلّ الصفوف",d:"بنك أدوات التقييم الداخليّة من راماه للمعلّمين والمديرين.",u:"ramaTools"}],
+ ramaNote:"انتبهوا: جزء من الموادّ محميّ ومتاح لمربّي التعليم فقط، بعد تسجيل الدخول في موقع وزارة التربية والتعليم.",
+ moeH:"روابط رسميّة من وزارة التربية والتعليم",
+ links:[
+  {t:"الفضاء التربويّ",d:"البيت المهنيّ لمربّي التعليم: برامج، أدوات وأخبار مهنيّة.",u:"pop"},
+  {t:"برامج التعليم",d:"جميع برامج التعليم في وزارة التربية والتعليم، حسب الموضوع والصفّ.",u:"plans"},
+  {t:"أدوات وخدمات",d:"أدوات رقميّة وخدمات عبر الإنترنت للمعلّم.",u:"tools"},
+  {t:"صوت قارئ!",d:"برنامج وزارة التربية والتعليم لتعزيز طلاقة القراءة: موادّ إرشاد وفحوص.",u:"kolkore"},
+  {t:"ميدع | مكتبة المضامين",d:"عروض، أوراق عمل وامتحانات في كلّ موضوع، مرتّبة حسب الصفّ.",u:"meyda"},
+  {t:"راماه",d:"الهيئة القطريّة للقياس والتقييم في التربية: امتحانات، استطلاعات ومنشورات.",u:"rama"}],
+ credit:"الروابط في هذه الصفحة تؤدّي إلى المواقع الرسميّة لوزارة التربية والتعليم وراماه. جميع الحقوق على الموادّ محفوظة لوزارة التربية والتعليم. بكول يشير إلى الموادّ فقط ولا ينسخها.",
+ mt:"هذه الصفحة مترجمة آليًّا. النصّ الأصليّ بالعبريّة.",
+ back:"عودة إلى الصفحة الرئيسيّة",terms:"شروط الاستخدام",say:"استماع",stop:"إيقاف الاستماع"},
+ru:{dir:"ltr",title:"Уголок учителя",
+ intro:"Одна страница для учителя: как дать ученику с трудностями чтения приложение с озвучиванием, ссылки на материалы РАМА по классам и официальные ссылки Министерства просвещения для учителей.",
+ guideH:"Короткое руководство: ученик с трудностями чтения + озвучивание",
+ guideLead:"Пять минут работы, и ученик слышит каждый вопрос и каждое объяснение одним нажатием. Всё бесплатно и без регистрации.",
+ steps:[
+  "Откройте bekol.co.il в браузере телефона, планшета или компьютера ученика. Регистрация и личные данные не нужны.",
+  "Выберите приложение по предмету, который любит ученик: естествознание, география, математика, английский, иврит и другие. Совет: начните на одну ступень ниже уровня класса, чтобы укрепить уверенность.",
+  "Покажите ученику кнопку озвучивания (маленький динамик) рядом с каждым вопросом, ответом и объяснением. Нажимаем, слушаем, а затем читаем сами.",
+  "В классе лучше с наушниками. Дома можно слушать вслух.",
+  "Нет оценок и нет соревнований. Приложение поддерживает даже после ошибки, а ошибка это часть обучения.",
+  "Ученик, чей домашний язык не иврит, может переключиться на арабский, русский или английский в меню языков (машинный перевод).",
+  "Лучше всего звучит в браузере Edge на компьютере и в Chrome на телефоне."],
+ vchk:"Проверка звука: как звучит ваш браузер",
+ ramaH:"Оценочные материалы РАМА по классам",
+ ramaLead:"Официальные ссылки на оценочные материалы Министерства просвещения и РАМА.",
+ grades:[
+  {t:"1-2 классы",d:"Проверка беглости чтения, проверки письма и экзамены Мейцав для 2 класса.",u:"mivhanim"},
+  {t:"4 класс",d:"Экзамены Асиф на понимание прочитанного, с текстами и ключами.",u:"mivhanim"},
+  {t:"5-6 классы",d:"Экзамены Мейцав на понимание прочитанного за прошлые годы.",u:"mivhanim"},
+  {t:"Все классы",d:"Банк внутренних оценочных инструментов РАМА для учителей и директоров.",u:"ramaTools"}],
+ ramaNote:"Внимание: часть материалов защищена и доступна только работникам образования после входа на сайте Министерства просвещения.",
+ moeH:"Официальные ссылки Министерства просвещения",
+ links:[
+  {t:"Педагогическое пространство",d:"Профессиональный дом работников образования: программы, инструменты и профессиональные новости.",u:"pop"},
+  {t:"Учебные программы",d:"Все учебные программы Министерства просвещения по предметам и классам.",u:"plans"},
+  {t:"Инструменты и сервисы",d:"Цифровые инструменты и онлайн-сервисы для учителя.",u:"tools"},
+  {t:"Коль корэ!",d:"Программа Министерства просвещения по развитию беглости чтения: методические материалы и проверки.",u:"kolkore"},
+  {t:"Мейда | Библиотека материалов",d:"Презентации, рабочие листы и экзамены по всем предметам, по классам.",u:"meyda"},
+  {t:"РАМА",d:"Национальное управление измерения и оценки в образовании: экзамены, опросы и публикации.",u:"rama"}],
+ credit:"Ссылки на этой странице ведут на официальные сайты Министерства просвещения и РАМА. Все права на материалы принадлежат Министерству просвещения. Беколь только ссылается на материалы и не копирует их.",
+ mt:"Эта страница переведена машиной. Оригинал на иврите.",
+ back:"Назад на главную",terms:"Условия использования",say:"Слушать",stop:"Остановить озвучивание"},
+en:{dir:"ltr",title:"Teachers' corner",
+ intro:"One page for the teacher: how to give a struggling reader an app with read-aloud, links to Rama assessment materials by grade, and official Ministry of Education links for teachers.",
+ guideH:"The short guide: a struggling reader + read-aloud",
+ guideLead:"Five minutes of setup, and the student hears every question and explanation with one tap. Everything is free, no sign-up.",
+ steps:[
+  "Open bekol.co.il in the browser on the student's phone, tablet or computer. No registration, no personal details.",
+  "Pick an app in a subject the student loves: science, geography, math, English, Hebrew and more. Tip: start one level below grade level to build confidence.",
+  "Show the student the read-aloud button (a small speaker) next to every question, answer and explanation. Tap, listen, then read on your own.",
+  "In class, headphones are best. At home, listening out loud is fine.",
+  "No grades and no competition. The app encourages even after a mistake, and mistakes are part of learning.",
+  "A student whose home language is not Hebrew can switch to Arabic, Russian or English in the language menu (machine translation).",
+  "It sounds best in Edge on a computer and in Chrome on a phone."],
+ vchk:"Sound check: how your browser sounds",
+ ramaH:"Rama assessment materials by grade",
+ ramaLead:"Official links to assessment materials from the Ministry of Education and Rama.",
+ grades:[
+  {t:"Grades 1-2",d:"Reading fluency check, writing checks and Meitzav exams for grade 2.",u:"mivhanim"},
+  {t:"Grade 4",d:"Asif reading-comprehension exams, with texts and scoring guides.",u:"mivhanim"},
+  {t:"Grades 5-6",d:"Meitzav reading-comprehension exams from past years.",u:"mivhanim"},
+  {t:"All grades",d:"Rama's bank of internal assessment tools for teachers and principals.",u:"ramaTools"}],
+ ramaNote:"Note: some materials are protected and open to education staff only, after signing in on the Ministry of Education site.",
+ moeH:"Official Ministry of Education links",
+ links:[
+  {t:"Pedagogical Portal",d:"The professional home of education staff: programs, tools and professional news.",u:"pop"},
+  {t:"Curricula",d:"All Ministry of Education curricula, by subject and grade.",u:"plans"},
+  {t:"Tools and services",d:"Digital tools and online services for the teacher.",u:"tools"},
+  {t:"Kol Kore!",d:"The Ministry's reading-fluency program: guidance materials and checks.",u:"kolkore"},
+  {t:"Meyda | Content library",d:"Presentations, worksheets and exams for every subject, arranged by grade.",u:"meyda"},
+  {t:"Rama",d:"The National Authority for Measurement and Evaluation in Education: exams, surveys and publications.",u:"rama"}],
+ credit:"The links on this page lead to the official sites of the Ministry of Education and Rama. All rights to the materials belong to the Ministry of Education. bekol only links to the materials and does not copy them.",
+ mt:"This page is machine-translated. The original is in Hebrew.",
+ back:"Back to homepage",terms:"Terms of use",say:"Listen",stop:"Stop reading"}
+};
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+var SPK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3z"/><path d="M16.5 12a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/><path d="M14 3.2v2.1a6.8 6.8 0 0 1 0 13.4v2.1a8.8 8.8 0 0 0 0-17.6z"/></svg>';
+var cur="he";
+function T(){return S[cur]}
+var speakingBtn=null;
+function stopSpeak(){
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  if(speakingBtn){speakingBtn.setAttribute("aria-pressed","false");speakingBtn=null}
+}
+function speak(txt,btn){
+  if(!window.speechSynthesis)return;
+  if(speakingBtn===btn){stopSpeak();return}
+  stopSpeak();
+  var langMap={he:"he-IL",ar:"ar-SA",ru:"ru-RU",en:"en-US"};
+  var u=new SpeechSynthesisUtterance(txt);
+  u.lang=langMap[cur]||"he-IL";
+  var vs=speechSynthesis.getVoices();
+  for(var i=0;i<vs.length;i++){
+    if(vs[i].lang&&vs[i].lang.toLowerCase().indexOf(u.lang.slice(0,2))===0){u.voice=vs[i];break}
+  }
+  u.rate=0.95;
+  u.onend=function(){if(speakingBtn===btn){btn.setAttribute("aria-pressed","false");speakingBtn=null}};
+  speakingBtn=btn;
+  btn.setAttribute("aria-pressed","true");
+  speechSynthesis.speak(u);
+}
+function sayBtn(txt){
+  return '<button class="say" type="button" data-say="'+esc(txt)+'" aria-label="'+esc(T().say)+'" aria-pressed="false">'+SPK+'</button>';
+}
+function lk(o){
+  var txt=o.t+". "+o.d;
+  return '<a class="lk" href="'+U[o.u]+'"><b>'+esc(o.t)+'</b><span>'+esc(o.d)+'</span></a>'+sayBtn(txt);
+}
+function draw(){
+  stopSpeak();
+  var t=T();
+  document.documentElement.lang=cur;
+  document.documentElement.dir=t.dir;
+  document.title=t.title+" | bekol.co.il";
+  document.getElementById("ttl").innerHTML=esc(t.title)+sayBtn(t.title);
+  document.getElementById("intro").innerHTML=esc(t.intro)+sayBtn(t.intro);
+  var g=document.getElementById("guide");
+  g.innerHTML='<h2>'+esc(t.guideH)+sayBtn(t.guideH)+'</h2>'+
+    '<p>'+esc(t.guideLead)+sayBtn(t.guideLead)+'</p>'+
+    '<ol class="steps">'+t.steps.map(function(s){
+      return '<li>'+esc(s)+sayBtn(s)+'</li>';
+    }).join("")+'</ol>'+
+    '<a class="vchk" href="'+U.voice+'">'+esc(t.vchk)+'</a>'+sayBtn(t.vchk);
+  var r=document.getElementById("rama");
+  r.innerHTML='<h2>'+esc(t.ramaH)+sayBtn(t.ramaH)+'</h2>'+
+    '<p>'+esc(t.ramaLead)+'</p>'+
+    '<div class="lks">'+t.grades.map(lk).join("")+'</div>'+
+    '<p class="note">'+esc(t.ramaNote)+sayBtn(t.ramaNote)+'</p>';
+  var m=document.getElementById("moe");
+  m.innerHTML='<h2>'+esc(t.moeH)+sayBtn(t.moeH)+'</h2>'+
+    '<div class="lks">'+t.links.map(lk).join("")+'</div>';
+  document.getElementById("credit").innerHTML=esc(t.credit)+sayBtn(t.credit);
+  document.getElementById("meta").innerHTML=esc(t.mt)+'<br>'+
+    '<a href="'+U.home+'">'+esc(t.back)+'</a> · <a href="'+U.legal+'">'+esc(t.terms)+'</a>';
+  var lg=document.getElementById("langs");
+  lg.innerHTML=[["he","עברית"],["ar","العربية"],["ru","Русский"],["en","English"]].map(function(x){
+    return '<button type="button" data-l="'+x[0]+'" lang="'+x[0]+'" aria-pressed="'+(x[0]===cur)+'">'+x[1]+'</button>';
+  }).join("");
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest("button"); if(!b)return;
+  if(b.dataset.l){cur=b.dataset.l;try{localStorage.setItem("bekol-teachers-lang",cur)}catch(_){} draw();return}
+  if(b.classList.contains("say")){speak(b.dataset.say||"",b)}
+});
+if(window.speechSynthesis)speechSynthesis.getVoices();
+try{
+  var saved=localStorage.getItem("bekol-teachers-lang");
+  if(saved&&S[saved])cur=saved;
+  else{
+    /* שפת הדפדפן קודם, כדי שמי שאינו קורא עברית לא ייתקל בעברית */
+    var pref=(navigator.languages||[navigator.language||"he"]);
+    for(var i=0;i<pref.length;i++){
+      var c=String(pref[i]).toLowerCase().split("-")[0];
+      if(c==="iw")c="he";
+      if(S[c]){cur=c;break}
+    }
+  }
+}catch(_){}
+draw();
+})();
+</script>
+</body>
+</html>
