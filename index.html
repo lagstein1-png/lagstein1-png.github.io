@@ -269,6 +269,12 @@ a{color:var(--brand)}
 
 /* --- מקטע --- */
 section.blk{padding-block:clamp(26px,5vw,48px); scroll-margin-block-start:78px}
+.tbanner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  background:var(--bg-elev);border:1px solid var(--line);border-radius:16px;
+  padding:clamp(14px,3vw,22px) clamp(16px,3.5vw,26px);margin-block-start:18px}
+.tbanner .h2{margin:0}
+.tbanner .prose{margin-block-start:6px}
+.tbanner-txt{flex:1;min-inline-size:min(100%,280px)}
 .h2{margin:0; font-size:clamp(1.5rem,4vw,2.05rem); font-weight:800;
   letter-spacing:-.025em; position:relative; padding-block-start:18px}
 .h2::before{content:""; position:absolute; inset-block-start:2px; inset-inline-start:0;
@@ -476,6 +482,16 @@ a:focus-visible,button:focus-visible,input:focus-visible{
       <aside class="start-card" aria-labelledby="start-title"><h2 id="start-title"></h2><p id="start-lead"></p><nav class="start-links" id="start-links"></nav></aside>
     </div></header>
 
+    <!-- פינת המורים עולה לראש הדף: ההנחיה של יהושע (27.9.2026) —
+         למעלה, עם כפתור כניסה בולט בסגנון .btn ושורת הסבר אחת. -->
+    <section class="tbanner" id="teachers">
+      <div class="tbanner-txt">
+        <h2 class="h2" id="teachersT"></h2>
+        <p class="prose" id="teachersLead"></p>
+      </div>
+      <a class="btn" href="/teachers/" id="teachersA"></a>
+    </section>
+
     <section class="stats" id="stats"></section>
 
     <section class="blk" id="apps">
@@ -538,12 +554,6 @@ a:focus-visible,button:focus-visible,input:focus-visible{
       <!-- הלחצן יושב ב-.cta ולא ב-.prose: הכלל .prose a צובע קישור בצבע
            המותג, ועל לחצן בצבע המותג הטקסט היה נעלם. -->
       <div class="cta" id="voicesCta" hidden></div>
-    </section>
-
-    <section class="blk" id="teachers">
-      <h2 class="h2" id="teachersT"></h2>
-      <p class="prose" id="teachersLead"></p>
-      <p class="prose"><a href="/teachers/" id="teachersA"></a></p>
     </section>
 
     <section class="blk" id="about">
@@ -1164,7 +1174,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=136-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=137-pwa1").catch(function(){});
   });
 }
 </script>
