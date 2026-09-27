@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x105 · 2026-09-27";
+  var BUILD = "x106 · 2026-09-27";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -856,13 +856,26 @@
     return n > 0 && (wrong >= 2 || wrong === n);
   }
 
+  /* שורת שבח אחת, שקטה ומכבדת, בסוף בחינה. בלי קונפטי ובלי צלילים:
+     קהל הבגרות מקבל הכרה בתוצאה, לא מסיבה. מתחת ל-60 אין שורה,
+     כי הדוח עצמו כבר מכוון את העבודה הבאה. */
+  function calmPraise(pct) {
+    var msg = "";
+    if (pct >= 90) msg = "מרשים מאד. זו הכנה רצינית, והיא נראית.";
+    else if (pct >= 75) msg = "כל הכבוד. תוצאה כזאת לא באה לבד.";
+    else if (pct >= 60) msg = "התקדמות טובה. הטבלאות למטה מראות איפה עוד אפשר להתחזק.";
+    return msg ? '<p class="calm-praise">' + msg + "</p>" : "";
+  }
+
   function simReportHtml(ex) {
     var r = SIM.res;
     var pct = r.max ? Math.round((r.got / r.max) * 100) : 0;
     var h = "";
     if (r.byTime) h += '<p class="note">הזמן נגמר, והבחינה הוגשה כפי שהייתה.</p>';
-    h += '<div class="score"><div class="big">' + pct + "</div>" +
+    var glow = pct >= 75 && !(store.data && store.data.a11y && store.data.a11y.reduceMotion);
+    h += '<div class="score' + (glow ? " calm-glow" : "") + '"><div class="big">' + pct + "</div>" +
       "<div>" + r.got + " מתוך " + r.max + " נקודות</div></div>";
+    h += calmPraise(pct);
 
     var topics = Object.keys(r.byTopic);
     if (r.byChapter && Object.keys(r.byChapter).length) {
@@ -1455,7 +1468,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x105-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x106-pwa1").catch(function () {});
     });
   }
 
