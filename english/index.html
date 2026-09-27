@@ -833,7 +833,7 @@ var T={};
 T.he={
   app:"ניב", tagline:"אנגלית מדוברת וספרותית",
   navHome:"מסלולים", navProg:"התקדמות", navSet:"הגדרות", navExam:"מבחן", back:"חזרה",
-  heroT:"אנגלית שנשמעת לפני שהיא נקראת",
+  heroT:"אנגלית שנשמעת לפני שהיא נקראת",mtNote:"שפת העזר (ערבית, רוסית, אנגלית) מוצגת בתרגום מכונה.",
   heroP:"כל מילה, כל משפט וכל קטע — עם כפתור השמעה. אפשר להאט, לחזור, ולראות את המשמעות בשפה שלכם. אין טיימר ואין עונש על טעות.",
   start:"התחילו כאן", cont:"המשיכו מאיפה שהפסקתם",
   trkSound:"צליל ואות", trkSoundD:"להבחין בין צלילים קרובים באנגלית",
@@ -915,7 +915,7 @@ T.he={
 T.ar={
   app:"نِيف", tagline:"إنجليزية محكيّة وأدبيّة",
   navHome:"المسارات", navProg:"التقدّم", navSet:"الإعدادات", navExam:"امتحان", back:"رجوع",
-  heroT:"إنجليزية تُسمَع قبل أن تُقرأ",
+  heroT:"إنجليزية تُسمَع قبل أن تُقرأ",mtNote:"لغة المساعدة (العربية والروسية والإنجليزية) معروضة بترجمة آلية.",
   heroP:"كل كلمة وكل جملة وكل نص — مع زر استماع. يمكنك الإبطاء والإعادة ورؤية المعنى بلغتك. بلا مؤقّت وبلا عقاب على الخطأ.",
   start:"ابدأ من هنا", cont:"تابع من حيث توقفت",
   trkSound:"الصوت والحرف", trkSoundD:"التمييز بين الأصوات المتقاربة",
@@ -986,7 +986,7 @@ T.ar={
 T.ru={
   app:"Нив", tagline:"Английский разговорный и книжный",
   navHome:"Направления", navProg:"Прогресс", navSet:"Настройки", navExam:"Экзамен", back:"Назад",
-  heroT:"Английский, который слышно раньше, чем читаешь",
+  heroT:"Английский, который слышно раньше, чем читаешь",mtNote:"Язык поддержки (арабский, русский, английский) показан в машинном переводе.",
   heroP:"Каждое слово, каждая фраза и каждый текст — с кнопкой прослушивания. Можно замедлить, повторить и увидеть значение на своём языке. Без таймера и без наказания за ошибку.",
   start:"Начать здесь", cont:"Продолжить с места остановки",
   trkSound:"Звук и буква", trkSoundD:"Различать близкие английские звуки",
@@ -1057,7 +1057,7 @@ T.ru={
 T.en={
   app:"Niv", tagline:"Spoken and written English",
   navHome:"Tracks", navProg:"Progress", navSet:"Settings", navExam:"Exam", back:"Back",
-  heroT:"English you hear before you read it",
+  heroT:"English you hear before you read it",mtNote:"The support languages (Arabic, Russian, English) are shown as machine translation.",
   heroP:"Every word, every sentence and every passage comes with a play button. Slow it down, repeat it, and see the meaning in your own language. No timer, and no penalty for a wrong answer.",
   start:"Start here", cont:"Pick up where you left off",
   trkSound:"Sound and letter", trkSoundD:"Telling close English sounds apart",
@@ -1162,7 +1162,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n147 · 2026-09-26";
+var BUILD="n148 · 2026-09-27";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3798,7 +3798,7 @@ function buildQuestion(tid,lv,avoid,pure){
    ============================================================ */
 /* Internal English Bagrut practice, never added to public navigation without explicit flag. */
 var BGFLAG='shlav-internal-english-bagrut', BGKEY='niv-bagrut-state-v1';
-var BGON=(function(){try{if(new URLSearchParams(location.search).get('internal')===BGFLAG)sessionStorage.setItem(BGFLAG,'1');return sessionStorage.getItem(BGFLAG)==='1'}catch(e){return false}})();
+var BGON=true; /* PUBLISHED 27.9.2026 - gate removed, bagrut track is public */
 var BGT={
 he:{title:'בגרות באנגלית · תרגול מודרך',intro:'3 יחידות תחילה: A קריאה, C קריאה וכתיבה. אפשר להמשיך ל-4 ול-5 יחידות. תרגול מקורי, לא שאלון רשמי ולא ציון בגרות.',path:'בחירת מסלול',u3:'3 יחידות · מתחילים',u4:'4 יחידות · ממשיכים',u5:'5 יחידות · מתקדמים',read:'קראו בקצב שלכם',listen:'השמעת הקטע',slow:'השמעה איטית',q:'שאלת הבנה',yes:'נכון!',no:'נסו שוב בסבב הבא. חפשו את המשפט בקטע.',why:'הסבר',next:'לשאלה הבאה',sheet:'דף מילים',write:'תרגול כתיבה',draft:'כתבו טיוטה באנגלית. היא נשמרת במכשיר בלבד. אין בדיקה אוטומטית: עברו עליה עם מורה לפי המחוון הרשמי.',save:'שמירת טיוטה',saved:'נשמר במכשיר',words:'מילים',lit:'ספרות: למדו עם מורה את היצירות המאושרות, ובכל יצירה זהו רעיון מרכזי, ראיה מהטקסט ותגובה אישית. זה אינו מבחן מדומה.',source:'מקורות משרד החינוך · בדקו עדכונים לפני הבחינה',back:'חזרה למסלולים',correct:'תשובות נכונות',of:'מתוך',p3:'כתבו 70–90 מילים: תארו מקום שעוזר לכם ללמוד, והסבירו מדוע.',p4:'תרגלו פסקת דעה: האם תלמידים צריכים לבחור חלק מהנושאים בבית הספר? נמקו ודגמו.',p5:'תרגלו פסקת דעה: האם טכנולוגיה יכולה להחליף שיחה עם מורה? נמקו ודגמו.'},
 ar:{title:'البجروت في الإنجليزية · تدريب موجّه',intro:'ابدأوا بثلاث وحدات: القراءة في A، والقراءة والكتابة في C. ثم تابعوا إلى أربع أو خمس وحدات. تدريب أصلي وليس امتحانًا رسميًا أو علامة بجروت.',path:'اختيار المسار',u3:'3 وحدات · البداية',u4:'4 وحدات · متابعة',u5:'5 وحدات · تقدم',read:'اقرأوا بوتيرتكم',listen:'الاستماع للنص',slow:'الاستماع ببطء',q:'سؤال فهم',yes:'صحيح!',no:'حاولوا في الجولة التالية. ابحثوا عن الجملة في النص.',why:'الشرح',next:'السؤال التالي',sheet:'ورقة كلمات',write:'تدريب كتابة',draft:'اكتبوا مسودة بالإنجليزية. تحفظ على هذا الجهاز فقط. لا توجد علامة تلقائية: راجعوها مع المعلم وفق السلم الرسمي.',save:'حفظ المسودة',saved:'حفظت على الجهاز',words:'كلمات',lit:'الأدب: ادرسوا الأعمال المعتمدة مع المعلم، وحددوا الفكرة الرئيسة ودليلا من النص ورأيكم. هذا ليس امتحانًا تجريبيًا.',source:'مصادر وزارة التعليم · راجعوا التحديثات قبل الامتحان',back:'العودة للمسارات',correct:'إجابات صحيحة',of:'من',p3:'اكتبوا 70–90 كلمة: صفوا مكانًا يساعدكم على التعلّم وفسّروا لماذا.',p4:'تدرّبوا على الرأي: هل ينبغي للطلاب اختيار بعض مواضيع الدراسة؟ عللوا ومثلوا.',p5:'تدرّبوا على الرأي: هل يمكن للتقنية أن تحل محل الحديث مع المعلم؟ عللوا ومثلوا.'},
@@ -3837,15 +3837,15 @@ function bgPage(){var h='<div class="wrap bgwrap"><section class="card bgcard"><
 bgMods().forEach(function(m){h+='<button class="btn '+(BG.module===m?'pri':'')+'" data-bg="module" data-v="'+m+'" aria-pressed="'+(BG.module===m)+'">Module '+m.toUpperCase()+'</button>'});h+='</div><p>'+esc(bgT('correct'))+': '+BG.correct+' '+esc(bgT('of'))+' '+BG.total+'</p>';
 var p=bgPass();if(p){var all=BGP.filter(function(item){return item.m===BG.module});h+='<section class="card bgcard"><h3>'+esc((BGL[state.lang]||BGL.en)[0])+'</h3><div class="bgrow">';all.forEach(function(item,i){h+='<button class="btn '+(i===BG.passage?'pri':'')+'" data-bg="passage" data-v="'+i+'" aria-pressed="'+(i===BG.passage)+'">'+(i+1)+'. '+esc(item.title)+'</button>'});h+='</div></section>';var q=p.questions[BG.q%p.questions.length],order=[2,0,3,1],shift=BG.q%4;
 h+='<section class="card bgcard"><h3>'+esc(bgT('read'))+' · <span lang="en">'+esc(p.title)+'</span></h3><div class="bgrow"><button class="btn" data-bg="listen">'+esc(bgT('listen'))+'</button><button class="btn" data-bg="slow">'+esc(bgT('slow'))+'</button></div><p class="bgtext" lang="en" dir="ltr">'+esc(p.text)+'</p><h3>'+esc(bgT('q'))+' '+(BG.q+1)+' / '+p.questions.length+'</h3><p lang="en" dir="ltr">'+esc(q.q)+'</p><div class="bgoptions">';
-for(var i=0;i<4;i++){var n=order[(i+shift)%4];h+='<button class="btn" lang="en" dir="ltr" data-bg="answer" data-v="'+n+'" '+(BG.done?'disabled':'')+'>'+esc(n?q.w[n-1]:q.a)+'</button>'}h+='</div>';
+for(var i=0;i<4;i++){var n=order[(i+shift)%4];var otxt=n?q.w[n-1]:q.a;h+='<div class="bgrow" style="align-items:stretch"><button class="btn" lang="en" dir="ltr" data-bg="answer" data-v="'+n+'" '+(BG.done?'disabled':'')+' style="flex:1">'+esc(otxt)+'</button><button class="btn" data-bg="say" data-v="'+encodeURIComponent(otxt)+'" aria-label="'+esc(bgT('listen'))+'" style="flex:0 0 auto">&#128266;</button></div>'}h+='</div>';
 if(BG.done)h+='<div class="bgfeedback" role="status"><strong>'+esc(bgT(BG.choice===0?'yes':'no'))+'</strong><p>'+esc(bgT('why'))+': <span lang="en" dir="ltr">'+esc(q.why)+'</span></p><button class="btn pri" data-bg="next">'+esc(bgT('next'))+'</button></div>';h+='</section>';
 }else h+='<section class="card bgcard"><p>'+esc(bgT('lit'))+'</p><p>'+esc((BGL[state.lang]||BGL.en)[3])+'</p><p>'+esc(((BGL[state.lang]||BGL.en)[4]||{})[BG.module]||'')+'</p></section>';
 h+='<section class="card bgcard"><h3>'+esc(bgT('sheet'))+'</h3><div class="bgvocab">';BGW.concat(BGWX[BG.module]||[]).forEach(function(w){var ix={he:1,ar:2,ru:3,en:0}[state.lang]||0;h+='<button class="bgword" data-bg="word" data-v="'+esc(w[0])+'"><b lang="en">'+esc(w[0])+'</b><span>'+esc(w[ix])+'</span></button>'});h+='</div></section>';if(BG.module==='e')h+='<p class="bgfeedback">'+esc((BGL[state.lang]||BGL.en)[5])+'</p>';
 if(BG.module==='c'||BG.module==='g')h+='<section class="card bgcard"><h3>'+esc(bgT('write'))+'</h3><p>'+esc((BGL[state.lang]||BGL.en)[1])+'</p><div class="bgrow">'+BGWP[BG.unit].map(function(task,i){return '<button class="btn '+(BG.prompt===i?'pri':'')+'" data-bg="prompt" data-v="'+i+'">'+(i+1)+'</button>'}).join('')+'</div><p lang="en" dir="ltr">'+esc(BGWP[BG.unit][BG.prompt])+'</p><label for="bgdraft">'+esc(bgT('draft'))+'</label><textarea id="bgdraft" lang="en" dir="ltr" rows="8">'+esc(BG.drafts[bgDraftKey()]||'')+'</textarea><div class="bgrow"><span id="bgcount">'+bgCount()+' '+esc(bgT('words'))+'</span><button class="btn pri" data-bg="save">'+esc(bgT('save'))+'</button></div><p id="bgstatus" role="status"></p><p>'+esc((BGL[state.lang]||BGL.en)[2])+'</p></section>';
-h+='<section class="card bgcard"><h3>'+esc(bgT('source'))+'</h3><a target="_blank" rel="noopener" href="https://pop.education.gov.il/tchumey_daat/english/chativa-elyona/bagrut-exam/table-of-specifications/">Bagrut handbooks</a> · <a target="_blank" rel="noopener" href="https://pop.education.gov.il/tchumey_daat/english/chativa-elyona/bagrut-exam/bagrut-archives/">Exam archive</a></section><button class="btn" data-bg="back">'+esc(bgT('back'))+'</button></div>'+fbar();return h}
+h+='<p style="color:var(--muted);font-size:.85rem">'+esc(t('mtNote'))+'</p>';h+='<section class="card bgcard"><h3>'+esc(bgT('source'))+'</h3><a target="_blank" rel="noopener" href="https://pop.education.gov.il/tchumey_daat/english/chativa-elyona/bagrut-exam/table-of-specifications/">Bagrut handbooks</a> · <a target="_blank" rel="noopener" href="https://pop.education.gov.il/tchumey_daat/english/chativa-elyona/bagrut-exam/bagrut-archives/">Exam archive</a></section><button class="btn" data-bg="back">'+esc(bgT('back'))+'</button></div>'+fbar();return h}
 document.addEventListener('input',function(e){if(!BGON||e.target.id!=='bgdraft')return;BG.drafts[bgDraftKey()]=e.target.value;bgSave();var c=document.getElementById('bgcount');if(c)c.textContent=bgCount()+' '+bgT('words')});
 document.addEventListener('click',function(e){if(!BGON)return;var el=e.target.closest('[data-bg]');if(!el)return;var a=el.dataset.bg,v=el.dataset.v;
-if(a==='open'){state.screen='bagrut';render()}else if(a==='unit'){BG.unit=Number(v);BG.module=bgMods()[0];BG.q=0;BG.passage=0;BG.done=false;render()}else if(a==='module'){if(bgMods().indexOf(v)<0)return;BG.module=v;BG.q=0;BG.passage=0;BG.done=false;render()}else if(a==='passage'){BG.passage=Number(v);BG.q=0;BG.done=false;render()}else if(a==='prompt'){BG.prompt=Number(v);render()}else if(a==='answer'&&!BG.done){BG.choice=Number(v);BG.done=true;BG.total++;if(BG.choice===0)BG.correct++;bgSave();render()}else if(a==='next'){BG.q=(BG.q+1)%bgPass().questions.length;BG.done=false;render()}else if(a==='listen'||a==='slow')speak(bgPass().text,'en',a==='slow'?.72:1);else if(a==='word')speak(v,'en');else if(a==='save'){bgSave();document.getElementById('bgstatus').textContent=bgT('saved')}else if(a==='back'){state.screen='home';render()}if(a!=='listen'&&a!=='slow'&&a!=='word')window.scrollTo(0,0)});
+if(a==='open'){state.screen='bagrut';render()}else if(a==='unit'){BG.unit=Number(v);BG.module=bgMods()[0];BG.q=0;BG.passage=0;BG.done=false;render()}else if(a==='module'){if(bgMods().indexOf(v)<0)return;BG.module=v;BG.q=0;BG.passage=0;BG.done=false;render()}else if(a==='passage'){BG.passage=Number(v);BG.q=0;BG.done=false;render()}else if(a==='prompt'){BG.prompt=Number(v);render()}else if(a==='answer'&&!BG.done){BG.choice=Number(v);BG.done=true;BG.total++;if(BG.choice===0)BG.correct++;bgSave();render()}else if(a==='next'){BG.q=(BG.q+1)%bgPass().questions.length;BG.done=false;render()}else if(a==='listen'||a==='slow')speak(bgPass().text,'en',a==='slow'?.72:1);else if(a==='word')speak(v,'en');else if(a==='say')speak(decodeURIComponent(v),'en');else if(a==='save'){bgSave();document.getElementById('bgstatus').textContent=bgT('saved')}else if(a==='back'){state.screen='home';render()}if(a!=='listen'&&a!=='slow'&&a!=='word')window.scrollTo(0,0)});
 
 var P={q:null,picked:-1,done:false,slot:[],used:[],ok:false,hint:false,rres:[],sum:false};
 /* rres — תוצאות הסבב הנוכחי: ok / hp (נכון עם רמז) / no. sum — מסך הסיכום פתוח. */
@@ -3884,6 +3884,7 @@ function screenHome(){
   h+='<div class="card" style="margin:1.1rem 0"><h2 style="font-size:1.5rem">'+esc(t("heroT"))+"</h2>"+
      '<p style="color:var(--muted);margin:.5rem 0 0">'+esc(t("heroP"))+"</p></div>";
   h+=vstrip();
+  h+='<p style="color:var(--muted);font-size:.85rem;margin:.2rem 0 0">'+esc(t("mtNote"))+'</p>';
   if(BGON)h+='<button class="card bgentry" data-bg="open"><strong>'+esc(bgT('title'))+'</strong><span>'+esc(bgT('u3'))+' → '+esc(bgT('u4'))+' → '+esc(bgT('u5'))+'</span></button>';
   TRACKS.forEach(function(tr){
     var tops=TOPICS.filter(function(x){return x.trk===tr.id});
@@ -6006,7 +6007,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n147-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n148-pwa1").catch(function(){});
   });
 }
 </script>

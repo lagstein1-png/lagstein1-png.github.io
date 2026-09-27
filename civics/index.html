@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="robots" content="noindex,nofollow">
+<meta name="robots" content="index,follow">
 <script>
 /* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html.
    המפתח נשמר במגירה משל האפליקציה (shlav-internal-civics) ולא
@@ -13,7 +13,7 @@ var INTERNAL_OK=(function(){
   try{
     var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
     if(q) localStorage.setItem("shlav-internal-civics", decodeURIComponent(q));
-    return localStorage.getItem("shlav-internal-civics")===INTERNAL_KEY;
+    return true; /* PUBLISHED 27.9.2026 - gate removed, app is public */
   }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
 })();
 </script>
@@ -822,7 +822,7 @@ T.he={
   tapOrder:"לחצו על המילים לפי הסדר", clearSlot:"נקו",
   progT:"ההתקדמות שלכם", progNone:"עוד לא התחלתם. כל מסלול נפתח מיד — אין נעילות.",
   seen:"נראו", mastered:"נשלטות", streakL:"רצף", todayL:"היום", accL:"דיוק",
-  setT:"הגדרות", setVoice:"קול והקראה", setRead:"קריאות", setLang:"שפת הממשק",
+  setT:"הגדרות", langNote:"שים לב: התרגום לערבית, רוסית ואנגלית הוא תרגום מכונה.", setVoice:"קול והקראה", setRead:"קריאות", setLang:"שפת הממשק",
   vEngine:"מנוע הקול", vGem:"קול טבעי (ג׳מיני)", vDev:"קול המכשיר",
   vGemD:"נשמע כמו אדם. דורש אינטרנט ומפתח חינמי.", vDevD:"עובד תמיד, גם בלי רשת.",
   vFemale:"קולות נשיים", vMale:"קולות גבריים", vSample:"דוגמה",
@@ -882,7 +882,7 @@ T.ar={
   tapOrder:"اضغط الكلمات بالترتيب", clearSlot:"مسح",
   progT:"تقدّمك", progNone:"لم تبدأ بعد. كل مسار مفتوح فورًا — بلا أقفال.",
   seen:"شوهدت", mastered:"مُتقنة", streakL:"تتابع", todayL:"اليوم", accL:"الدقة",
-  setT:"الإعدادات", setVoice:"الصوت والقراءة", setRead:"سهولة القراءة", setLang:"لغة الواجهة",
+  setT:"الإعدادات", langNote:"ملاحظة: الترجمة إلى العربية والروسية والإنجليزية هي ترجمة آلية.", setVoice:"الصوت والقراءة", setRead:"سهولة القراءة", setLang:"لغة الواجهة",
   vEngine:"محرّك الصوت", vGem:"صوت طبيعي (جيميني)", vDev:"صوت الجهاز",
   vGemD:"يبدو كإنسان. يحتاج إنترنت ومفتاحًا مجانيًا.", vDevD:"يعمل دائمًا، حتى بلا شبكة.",
   vFemale:"أصوات نسائية", vMale:"أصوات رجالية", vSample:"عيّنة",
@@ -942,7 +942,7 @@ T.ru={
   tapOrder:"Нажимайте слова по порядку", clearSlot:"Очистить",
   progT:"Ваш прогресс", progNone:"Вы ещё не начинали. Все направления открыты сразу — без замков.",
   seen:"Просмотрено", mastered:"Освоено", streakL:"Серия", todayL:"Сегодня", accL:"Точность",
-  setT:"Настройки", setVoice:"Голос и чтение", setRead:"Читаемость", setLang:"Язык интерфейса",
+  setT:"Настройки", langNote:"Обратите внимание: перевод на арабский, русский и английский - машинный.", setVoice:"Голос и чтение", setRead:"Читаемость", setLang:"Язык интерфейса",
   vEngine:"Голосовой движок", vGem:"Естественный голос (Gemini)", vDev:"Голос устройства",
   vGemD:"Звучит как человек. Нужен интернет и бесплатный ключ.", vDevD:"Работает всегда, даже без сети.",
   vFemale:"Женские голоса", vMale:"Мужские голоса", vSample:"Пример",
@@ -1002,7 +1002,7 @@ T.en={
   tapOrder:"Tap the words in order", clearSlot:"Clear",
   progT:"Your progress", progNone:"You have not started yet. Every track is open right away — nothing is locked.",
   seen:"Seen", mastered:"Mastered", streakL:"Streak", todayL:"Today", accL:"Accuracy",
-  setT:"Settings", setVoice:"Voice and reading", setRead:"Readability", setLang:"Interface language",
+  setT:"Settings", langNote:"Note: the Arabic, Russian and English translations are machine translation.", setVoice:"Voice and reading", setRead:"Readability", setLang:"Interface language",
   vEngine:"Voice engine", vGem:"Natural voice (Gemini)", vDev:"Device voice",
   vGemD:"Sounds human. Needs the internet and a free key.", vDevD:"Always works, even offline.",
   vFemale:"Female voices", vMale:"Male voices", vSample:"Sample",
@@ -1076,7 +1076,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="c13 · 2026-09-26";
+var BUILD="c14 · 2026-09-26";
 var SKEY="ezrach-state-v1";
 var GKEY_STORE="ezrach-gkey";
 
@@ -1983,10 +1983,10 @@ topic("princ","dem",
      ru:"Разделение между центральной властью и местным самоуправлением.",
      en:"A separation between central government and local authorities."}],
    2,
-   {he:"שלוש. חשבו מי מחוקק, מי מבצע ומי שופט.",
-    ar:"ثلاث. فكّروا مَن يشرّع، ومَن ينفّذ، ومَن يقضي.",
-    ru:"Их три. Подумайте, кто издаёт законы, кто исполняет и кто судит.",
-    en:"There are three. Think about who legislates, who executes and who judges."},
+   {he:"המטרה היא שאף אחד לא יחזיק את כל הכוח. איך מחלקים אותו כדי שכל צד ירסן את האחר?",
+    ar:"الهدف ألا يمسك أحدٌ بكل السلطة. كيف نوزّعها كي يردع كل طرفٍ الآخر؟",
+    ru:"Цель - чтобы никто не держал всю власть. Как её разделить, чтобы каждая сторона сдерживала другую?",
+    en:"The goal is that no one holds all the power. How can it be divided so each side checks the other?"},
    {he:"ההפרדה אינה נתק: הרשויות מפקחות זו על זו. הכנסת מפקחת על הממשלה, בית המשפט בוחן את חוקיות מעשיה, והממשלה מציעה חוקים. זו מערכת של איזונים ובלמים.",
     ar:"الفصل ليس انفصالًا: السلطات تراقب بعضها. الكنيست تراقب الحكومة، والمحكمة تفحص قانونية أفعالها، والحكومة تقترح القوانين. هذه منظومة ضوابط وتوازنات.",
     ru:"Разделение — не разрыв: власти контролируют друг друга. Кнессет контролирует правительство, суд проверяет законность его действий, правительство предлагает законы. Это система сдержек и противовесов.",
@@ -2830,10 +2830,10 @@ topic("basic","rig",
      ru:"Потому что первый Кнессет распустился, не успев завершить текст конституции.",
      en:"Because the first Knesset dissolved before it finished drafting the constitution."}],
    2,
-   {he:"החלטה משנת 1950 קבעה פשרה: לא לוותר על חוקה, אבל גם לא לכתוב אותה בבת אחת.",
-    ar:"قرار من ١٩٥٠ أرسى تسوية: لا التنازل عن دستور ولا كتابته دفعة واحدة.",
-    ru:"Решение 1950 года закрепило компромисс: от конституции не отказываться, но и не писать её разом.",
-    en:"A 1950 decision set a compromise: not to give up a constitution, but not to write it all at once either."},
+   {he:"בשביל חוקה צריכים הסכמה רחבה מאוד. על מה הכי קשה להסכים בחברה הישראלית?",
+    ar:"لكي يكون دستور نحتاج إلى توافق واسع جدًا. ما الأصعب اتفاقًا عليه في المجتمع الإسرائيلي؟",
+    ru:"Для конституции нужно очень широкое согласие. О чём труднее всего договориться в израильском обществе?",
+    en:"A constitution needs very broad agreement. What is hardest to agree on in Israeli society?"},
    {he:"עד היום התקבלו כתריסר חוקי יסוד. שניים מהם — כבוד האדם וחירותו, וחופש העיסוק — הם “חוקי היסוד של הזכויות”, ורק הם כוללים פסקת הגבלה. חוקי יסוד אחרים עוסקים במוסדות: הכנסת, הממשלה, השפיטה.",
     ar:"حتى اليوم أُقرّ نحو اثني عشر قانون أساس. اثنان منها — كرامة الإنسان وحرّيته، وحرّية العمل — هما “قانونا أساس الحقوق”، وهما وحدهما يتضمّنان فقرة تقييد. أما البقية فتتناول المؤسّسات: الكنيست، الحكومة، القضاء.",
     ru:"К сегодняшнему дню принято около дюжины основных законов. Два из них — о достоинстве и свободе человека и о свободе занятий — «основные законы прав», и лишь они содержат ограничительную оговорку. Остальные касаются институтов: Кнессета, правительства, судебной власти.",
@@ -2861,10 +2861,10 @@ topic("basic","rig",
      ru:"Статья, ограничивающая срок судей десятью годами.",
      en:"A section limiting judges' tenure to ten years."}],
    1,
-   {he:"היא לא אוסרת פגיעה — היא קובעת תנאים לפגיעה. ארבעה.",
-    ar:"لا تمنع المساس بل تشترط له شروطًا. أربعة.",
-    ru:"Она не запрещает ограничение — она ставит условия. Их четыре.",
-    en:"It does not forbid infringement — it sets conditions for it. Four of them."},
+   {he:"חשבו: האם מותר לפגוע בזכות בלי כללים בכלל? מה הסעיף דורש כדי שפגיעה תהיה מותרת?",
+    ar:"فكروا: هل يجوز المساس بحق دون أي قواعد؟ ماذا يشترط البند كي يكون المساس جائزًا؟",
+    ru:"Подумайте: можно ли нарушать право без всяких правил? Что требует статья, чтобы нарушение было допустимым?",
+    en:"Think: may a right be harmed with no rules at all? What does the clause require for a harm to be allowed?"},
    {he:"פסקת ההגבלה היא הכלי המרכזי של הביקורת השיפוטית על חקיקה בישראל. היא מבטאת את התפיסה שזכויות אינן מוחלטות אך גם אינן הפקר: אפשר לפגוע, אך רק בדרך שנקבעה מראש ובמידה הנחוצה.",
     ar:"فقرة التقييد هي الأداة المركزية للرقابة القضائية على التشريع في إسرائيل. تعبّر عن أن الحقوق ليست مطلقة ولا مستباحة: يجوز المساس، لكن بالطريقة المحدّدة سلفًا وبالقدر اللازم.",
     ru:"Ограничительная оговорка — главный инструмент судебного контроля над законодательством в Израиле. Она выражает мысль, что права не абсолютны, но и не беззащитны: ограничить можно, но лишь заранее установленным путём и в необходимой мере.",
@@ -3780,10 +3780,10 @@ topic("jewdem","isr",
      ru:"Спор лишь о размере пошлины МВД.",
      en:"The dispute is only about the fee charged by the interior ministry."}],
    2,
-   {he:"שאלה שנויה במחלוקת אינה שאלה בלי תשובה — אבל התשובה הנכונה כאן היא זו שמציגה את שני הצדדים כפי שהם.",
-    ar:"مسألة خلافية ليست بلا جواب — لكن الجواب الصحيح هنا هو الذي يعرض الطرفين كما هما.",
-    ru:"Спорный вопрос — не вопрос без ответа, но верный ответ здесь тот, что излагает обе стороны как есть.",
-    en:"A contested question is not a question without an answer — but the right answer here is the one that states both sides as they are."},
+   {he:"חוק השבות משרת מטרה מסוימת, והוא גם פוגע במישהו. מהי המטרה? ומי נפגע?",
+    ar:"قانون العودة يخدم غاية معينة وهو يمسّ بأحدهم أيضًا. ما الغاية؟ ومن يتضرر؟",
+    ru:"Закон о возвращении служит определённой цели и при этом кого-то задевает. Какая цель? И кто страдает?",
+    en:"The Law of Return serves a certain purpose, and it also harms someone. What is the purpose? And who is harmed?"},
    {he:"תוכנית הלימודים מלמדת את המתח הזה כמתח, ולא כתשובה אחת. מדינות לאום רבות מפעילות קריטריון לאומי בהגירה; היקף ההשלכה שלו על שוויון אזרחי הוא בדיוק נקודת המחלוקת.",
     ar:"يعلّم المنهاج هذا التوتّر كتوتّر لا كجواب واحد. دول قومية كثيرة تُعمل معيارًا قوميًّا في الهجرة؛ ومدى أثره على المساواة المدنية هو بالضبط موضع الخلاف.",
     ru:"Учебная программа преподаёт это напряжение как напряжение, а не как единственный ответ. Многие национальные государства применяют национальный критерий в иммиграции; мера его влияния на гражданское равенство и есть точка спора.",
@@ -5683,7 +5683,8 @@ function vstrip(){
 function screenHome(){
   var h='<div class="wrap">';
   h+='<div class="card" style="margin:1.1rem 0"><h2 style="font-size:1.5rem">'+esc(t("heroT"))+"</h2>"+
-     '<p style="color:var(--muted);margin:.5rem 0 0">'+esc(t("heroP"))+"</p></div>";
+     '<p style="color:var(--muted);margin:.5rem 0 0">'+esc(t("heroP"))+"</p>"+
+     '<div style="margin-top:.5rem">'+spkBtn(plainOf(t("heroT")+" "+t("heroP")),state.lang,false,t("hear"))+"</div></div>";
   h+=vstrip();
   h+='<div class="card" style="margin:1.1rem 0;background:#fff5db;border-inline-start:5px solid #aa6c0c"><h2 style="font-size:1.1rem">'+esc(t("bgT"))+'</h2>'+
      '<p style="color:var(--muted);margin:.4rem 0;font-size:.95rem">'+esc(t("bgP"))+'</p>'+
@@ -5694,18 +5695,20 @@ function screenHome(){
     if(!tops.length)return;
     h+='<div class="trk '+tr.cls+'" style="margin:1.4rem 0 .6rem">'+
        '<div class="thead"><span class="tdot"></span><h2 style="font-size:1.15rem">'+
-       esc(t(tr.nk))+'</h2><span class="tpill">'+tops.length+"</span></div>"+
+       esc(t(tr.nk))+'</h2><span class="tpill">'+tops.length+"</span>"+
+       spkBtn(plainOf(t(tr.nk)+" "+t(tr.dk)),state.lang,true,t("hear"))+"</div>"+
        '<p style="color:var(--muted);font-size:.9rem;margin:.25rem 0 0">'+esc(t(tr.dk))+"</p></div>";
     h+='<div class="grid g2">';
     tops.forEach(function(tp){
       var best=0,li;
       for(li=1;li<=3;li++)best=Math.max(best,mastery(tp.id,li));
-      h+='<button class="card tcard trk '+tr.cls+'" data-a="open" data-t="'+esc(tp.id)+'">'+
+      h+='<div style="display:flex;gap:.4rem;align-items:stretch"><button class="card tcard trk '+tr.cls+'" data-a="open" data-t="'+esc(tp.id)+'" style="flex:1">'+
         "<h3>"+esc(tName(tp))+"</h3>"+
         '<div class="sub">'+esc(tDesc(tp))+"</div>"+
         '<div style="display:flex;align-items:center;gap:.5rem;margin-top:.35rem">'+
         '<span class="bar '+barCls(best)+'"><i style="width:'+Math.round(best*100)+'%"></i></span>'+
-        '<span class="chip">'+Math.round(best*100)+"%</span></div></button>";
+        '<span class="chip">'+Math.round(best*100)+"%</span></div></button>"+
+        spkBtn(plainOf(tName(tp)+" "+tDesc(tp)),state.lang,true,t("hear"))+"</div>";
     });
     h+="</div>";
   });
@@ -6060,7 +6063,7 @@ function screenSet(){
     h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'" lang="'+k+'" dir="'+LANGS[k].dir+'"'+
       esc(LANGS[k].name)+"</button>";
   });
-  h+="</div></div>";
+  h+='<p class="sub" style="margin:.5rem 0 0;opacity:.85">'+esc(t("langNote"))+"</p></div></div>";
 
   /* --- קול --- */
   h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem">'+esc(t("setVoice"))+"</h3>";
@@ -7874,7 +7877,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=c13-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=c14-pwa1").catch(function(){});
   });
 }
 </script>
