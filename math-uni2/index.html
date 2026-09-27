@@ -489,6 +489,12 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 .opts .orow .opt{flex:1 1 auto}
 .optspk{flex:0 0 auto;min-width:46px;min-height:46px;border:2px solid #0b7c71;border-radius:12px;background:#0e9c8d;color:#fff;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:8px 10px}
 .optspk:hover{background:#0b7c71}
+.calm-praise{text-align:center;font-weight:600;color:#7c5e10;margin:16px 0 0}
+:root[data-theme="dark"] .calm-praise{color:#d9b84a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .calm-praise{color:#d9b84a}}
+@keyframes calmGlow{0%{box-shadow:0 0 0 0 rgba(180,140,40,0)}35%{box-shadow:0 0 26px 6px rgba(180,140,40,.45)}100%{box-shadow:0 0 0 0 rgba(180,140,40,0)}}
+.card.calm-glow{animation:calmGlow 2.6s ease-out 1}
+@media (prefers-reduced-motion:reduce){.card.calm-glow{animation:none}}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -983,7 +989,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v150 · 2026-09-26";
+var BUILD="v151 · 2026-09-26";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -4968,6 +4974,15 @@ _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style
 }
 
 /* ---------- סיכום סבב ---------- */
+/* שורת שבח אחת ושקטה בסוף סבב. בלי קונפטי ובלי צלילים,
+   ומתחת ל-60 אין שורה כי הסיכום עצמו מכוון את העבודה הבאה. */
+function calmPraise(pct){
+  var msg="";
+  if(pct>=90)msg=_("מרשים מאד. שליטה כזאת לא באה לבד.");
+  else if(pct>=75)msg=_("כל הכבוד. סבב כזה דורש ריכוז אמיתי.");
+  else if(pct>=60)msg=_("התקדמות טובה. הנושאים למטה מראים איפה לחדד.");
+  return msg?'<p class="calm-praise">'+msg+'</p>':"";
+}
 function viewSummary(){
   var ok=P.results.filter(function(r){return r==="ok"}).length;
   var hp=P.results.filter(function(r){return r==="hp"}).length;
@@ -4981,19 +4996,20 @@ function viewSummary(){
   }
   var worst=null;
   for(var k in byTopic)if(byTopic[k].n>=2&&(!worst||byTopic[k].ok/byTopic[k].n<byTopic[worst].ok/byTopic[worst].n))worst=k;
-  var title=pct>=85?_("סבב חזק."):pct>=60?_("סבב טוב."):pct>=35?_("סבב עם עבודה."):_("סבב קשה — וזה בסדר.");
+  var title=pct>=85?_("סבב חזק."):pct>=60?_("סבב טוב."):pct>=35?_("סבב עם עבודה."):_("סבב קשה, וזה בסדר.");
   var sub=pct>=85?_("אתם שולטים ברוב מה שתרגלתם כאן.")
        :pct>=60?_("רוב הדברים במקום. יש נקודה אחת או שתיים שכדאי לחדד.")
        :pct>=35?_("חלק מהחומר עוד לא יושב. זה בדיוק מה שמדידה כזאת נועדה להראות.")
        :_("סבב כזה לא אומר עליכם כלום חוץ מזה שהחומר הזה חדש. שווה לרדת רמה ולבנות מלמטה.");
   var h='<div class="wrap" style="padding-top:26px;padding-bottom:44px;max-width:760px">';
-  h+='<div class="card pad rise"><h1 class="h1">'+title+'</h1><p class="sub">'+sub+'</p>'+
+  h+='<div class="card pad rise'+(pct>=75?" calm-glow":"")+'"><h1 class="h1">'+title+'</h1><p class="sub">'+sub+'</p>'+
      '<div class="grid g4" style="margin-top:18px">'+
 _f("{0}{1}</b><span>נכון לבד</span></div>", '<div class="tile" style="--c:var(--ok)"><b>', ok)+
 _f("{0}{1}</b><span>עם פתרון מודרך</span></div>", '<div class="tile" style="--c:var(--c-alg)"><b>', hp)+
 _f("{0}{1}</b><span>לא נפתרו</span></div>", '<div class="tile" style="--c:var(--bad)"><b>', no)+
 _f("{0}{1}%</b><span>דיוק</span></div>", '<div class="tile" style="--c:var(--c-geo)"><b>', pct)+
      '</div>';
+  h+=calmPraise(pct);
   h+='<hr class="sep"><div class="h2">'+_('לפי נושא')+'</div><div class="grid" style="margin-top:10px">'+
      Object.keys(byTopic).map(function(id){
        var b=byTopic[id],tp=topicById(id);
@@ -7672,7 +7688,7 @@ var TR_KEYS=[
 "סבב טוב.",
 "סבב כזה לא אומר עליכם כלום חוץ מזה שהחומר הזה חדש. שווה לרדת רמה ולבנות מלמטה.",
 "סבב עם עבודה.",
-"סבב קשה — וזה בסדר.",
+"סבב קשה, וזה בסדר.",
 "סוכמים",
 "סופרים שורות שאינן אפס",
 "סטיית התקן שווה לתוחלת — תכונה שאין להתפלגויות אחרות.",
@@ -9325,7 +9341,7 @@ trAt("en",750,["Cancel",
 "A good round.",
 "A round like this says nothing about you except that the material is new. Worth dropping a level and building from the bottom.",
 "A round with real work in it.",
-"A hard round — and that is fine.",
+"A hard round, and that is fine.",
 "Sum up",
 "Count the non-zero rows",
 "The standard deviation equals the mean — a property no other distribution has.",
@@ -10313,7 +10329,7 @@ trAt("ru",750,["Сокращаем",
 "Хороший круг.",
 "Такой круг не говорит о вас ничего, кроме того, что материал новый. Стоит спуститься на уровень и строить снизу.",
 "Круг с настоящей работой.",
-"Тяжёлый круг — и это нормально.",
+"Тяжёлый круг, и это нормально.",
 "Суммируют",
 "Считают ненулевые строки",
 "Стандартное отклонение равно математическому ожиданию — свойство, которого нет у других распределений.",
@@ -11301,7 +11317,7 @@ trAt("ar",750,["نختصر",
 "جولة جيدة.",
 "جولة كهذه لا تقول عنك شيئًا سوى أنّ المادة جديدة. يُستحسن النزول مستوى والبناء من الأسفل.",
 "جولة فيها عمل حقيقي.",
-"جولة صعبة — ولا بأس.",
+"جولة صعبة، ولا بأس.",
 "نجمع",
 "نعدّ الصفوف غير الصفرية",
 "الانحراف المعياري يساوي التوقع — خاصية لا توجد في توزيعات أخرى.",
@@ -12979,6 +12995,10 @@ trAt("en",TR_KEYS.indexOf("חדו״א 2, לינארית 2, משוואות דיפ
 trAt("ar",TR_KEYS.indexOf("בשנה ב׳ מתקדמים לאינטגרלים כפולים, טורים, מרחבים וקטוריים, משוואות דיפרנציאליות והסתברות רציפה. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד."),["في السنة الثانية نتقدم إلى التكاملات المزدوجة والمتسلسلات والفضاءات الشعاعية والمعادلات التفاضلية والاحتمال المستمر. كل سؤال يُفتح إلى خطوات، وكل خطأ يحصل على شرح، وورقة القوانين والقراءة الصوتية متاحتان دائمًا."]);
 trAt("ru",TR_KEYS.indexOf("בשנה ב׳ מתקדמים לאינטגרלים כפולים, טורים, מרחבים וקטוריים, משוואות דיפרנציאליות והסתברות רציפה. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד."),["На втором курсе переходят к двойным интегралам, рядам, векторным пространствам, дифференциальным уравнениям и непрерывной вероятности. Каждый вопрос раскладывается на шаги, каждая ошибка получает объяснение, а лист формул и озвучка доступны всегда."]);
 trAt("en",TR_KEYS.indexOf("בשנה ב׳ מתקדמים לאינטגרלים כפולים, טורים, מרחבים וקטוריים, משוואות דיפרנציאליות והסתברות רציפה. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד."),["Second year moves on to double integrals, series, vector spaces, differential equations and continuous probability. Every question opens into steps, every mistake gets an explanation, and the formula sheet and read-aloud are always available."]);
+TR_KEYS.push("מרשים מאד. שליטה כזאת לא באה לבד.","כל הכבוד. סבב כזה דורש ריכוז אמיתי.","התקדמות טובה. הנושאים למטה מראים איפה לחדד.");
+trAt("ar",TR_KEYS.length-3,["ممتاز حقًا. إتقان كهذا لا يأتي بالصدفة.","أحسنتم. جولة كهذه تتطلب تركيزًا حقيقيًا.","تقدم جيد. المواضيع أدناه تُظهر أين تُركّزون."]);
+trAt("ru",TR_KEYS.length-3,["Впечатляет. Такое мастерство не появляется само.","Молодцы. Такой раунд требует настоящей концентрации.","Хороший прогресс. Темы ниже показывают, что подтянуть."]);
+trAt("en",TR_KEYS.length-3,["Impressive. Mastery like this does not happen by itself.","Well done. A round like this takes real focus.","Good progress. The topics below show where to sharpen."]);
 trBuild();
 exLoad();
 applyModes();
@@ -13008,7 +13028,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v150-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v151-pwa1").catch(function(){});
   });
 }
 </script>
