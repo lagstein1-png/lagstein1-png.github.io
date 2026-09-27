@@ -479,6 +479,12 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
    `currentColor` ולכן הוא נצבע מעצמו בכל מצב נגישות. */
 .brand .sitemark{inline-size:1.15em;block-size:1.15em;flex:none;
   vertical-align:-.16em;margin-inline-end:.4em;opacity:.9}
+.calm-praise{text-align:center;font-weight:600;color:#7c5e10;margin:16px 0 0}
+:root[data-theme="dark"] .calm-praise{color:#d9b84a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .calm-praise{color:#d9b84a}}
+@keyframes calmGlow{0%{box-shadow:0 0 0 0 rgba(180,140,40,0)}35%{box-shadow:0 0 26px 6px rgba(180,140,40,.45)}100%{box-shadow:0 0 0 0 rgba(180,140,40,0)}}
+.card.calm-glow{animation:calmGlow 2.6s ease-out 1}
+@media (prefers-reduced-motion:reduce){.card.calm-glow{animation:none}}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1008,7 +1014,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="e19 · 2026-09-27";
+var BUILD="e20 · 2026-09-27";
 var KEY="electric-state-v1";
 
 function blankState(){
@@ -3438,6 +3444,15 @@ _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style
 }
 
 /* ---------- סיכום סבב ---------- */
+/* שורת שבח אחת ושקטה בסוף סבב. בלי קונפטי ובלי צלילים,
+   ומתחת ל-60 אין שורה כי הסיכום עצמו מכוון את העבודה הבאה. */
+function calmPraise(pct){
+  var msg="";
+  if(pct>=90)msg=_("מרשים מאד. שליטה כזאת לא באה לבד.");
+  else if(pct>=75)msg=_("כל הכבוד. סבב כזה דורש ריכוז אמיתי.");
+  else if(pct>=60)msg=_("התקדמות טובה. הנושאים למטה מראים איפה לחדד.");
+  return msg?'<p class="calm-praise">'+msg+'</p>':"";
+}
 function viewSummary(){
   var ok=P.results.filter(function(r){return r==="ok"}).length;
   var hp=P.results.filter(function(r){return r==="hp"}).length;
@@ -3457,13 +3472,14 @@ function viewSummary(){
        :pct>=35?_("חלק מהחומר עוד לא יושב. זה בדיוק מה שמדידה כזאת נועדה להראות.")
        :_("סבב כזה לא אומר עליכם כלום חוץ מזה שהחומר הזה חדש. שווה לרדת רמה ולבנות מלמטה.");
   var h='<div class="wrap" style="padding-top:26px;padding-bottom:44px;max-width:760px">';
-  h+='<div class="card pad rise"><h1 class="h1">'+title+'</h1><p class="sub">'+sub+'</p>'+
+  h+='<div class="card pad rise'+(pct>=75?" calm-glow":"")+'"><h1 class="h1">'+title+'</h1><p class="sub">'+sub+'</p>'+
      '<div class="grid g4" style="margin-top:18px">'+
 _f("{0}{1}</b><span>נכון לבד</span></div>", '<div class="tile" style="--c:var(--ok)"><b>', ok)+
 _f("{0}{1}</b><span>עם פתרון מודרך</span></div>", '<div class="tile" style="--c:var(--c-alg)"><b>', hp)+
 _f("{0}{1}</b><span>לא נפתרו</span></div>", '<div class="tile" style="--c:var(--bad)"><b>', no)+
 _f("{0}{1}%</b><span>דיוק</span></div>", '<div class="tile" style="--c:var(--c-geo)"><b>', pct)+
      '</div>';
+  h+=calmPraise(pct);
   h+='<hr class="sep"><div class="h2">'+_('לפי נושא')+'</div><div class="grid" style="margin-top:10px">'+
      Object.keys(byTopic).map(function(id){
        var b=byTopic[id],tp=topicById(id);
@@ -9840,6 +9856,10 @@ trAt("ar",1050,[
    ההגדרות ומפתח הקול נכתבו ל-localStorage ומעולם לא נקראו משם.
    שתי האחיות קוראות להן (math-uni:11402, math-uni2:10145). */
 load();
+TR_KEYS.push("מרשים מאד. שליטה כזאת לא באה לבד.","כל הכבוד. סבב כזה דורש ריכוז אמיתי.","התקדמות טובה. הנושאים למטה מראים איפה לחדד.");
+trAt("ar",TR_KEYS.length-3,["ممتاز حقًا. إتقان كهذا لا يأتي بالصدفة.","أحسنتم. جولة كهذه تتطلب تركيزًا حقيقيًا.","تقدم جيد. المواضيع أدناه تُظهر أين تُركّزون."]);
+trAt("ru",TR_KEYS.length-3,["Впечатляет. Такое мастерство не появляется само.","Молодцы. Такой раунд требует настоящей концентрации.","Хороший прогресс. Темы ниже показывают, что подтянуть."]);
+trAt("en",TR_KEYS.length-3,["Impressive. Mastery like this does not happen by itself.","Well done. A round like this takes real focus.","Good progress. The topics below show where to sharpen."]);
 trBuild();
 exLoad();
 applyModes();
@@ -9875,7 +9895,7 @@ if(!INTERNAL_OK){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=e19-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=e20-pwa1").catch(function(){});
   });
 }
 </script>
