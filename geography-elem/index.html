@@ -2,19 +2,7 @@
 <html lang="he" dir="rtl" data-theme="ocean">
 <head>
 <meta charset="UTF-8" />
-<script>
-/* INTERNAL-GATE — שער פנימי. האפליקציה מוסתרת עד אישור הבעלים.
-   המפתח נשמר במגירה משלה (shlav-internal-geography-elem). */
-var INTERNAL_KEY="shlav-internal-geography-elem";
-var INTERNAL_OK=(function(){
-  try{
-    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
-    if(q) localStorage.setItem("shlav-internal-geography-elem", decodeURIComponent(q));
-    return localStorage.getItem("shlav-internal-geography-elem")===INTERNAL_KEY;
-  }catch(e){ return false }
-})();
-if(!INTERNAL_OK) document.documentElement.className+=" locked";
-</script>
+<!-- השער הפנימי הוסר ב-27.9.2026 באישור הבעלים; האפליקציה פומבית. -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>גאוגרפיה ליסודי בהקראה — גאוגרפיה אדם וסביבה לכיתות ה׳–ו׳ · חינם</title>
 <meta name="description" content="שיעורי גאוגרפיה לכיתות ה׳–ו׳ לפי תכנית הלימודים בגאוגרפיה - אדם וסביבה של משרד החינוך: כל שיעור מוקרא, עם שלב חזותי, בדיקת הבנה ותרגול קצר. חינם, בלי הרשמה, גם בלי אינטרנט." />
@@ -22,7 +10,6 @@ if(!INTERNAL_OK) document.documentElement.className+=" locked";
 <meta property="og:title" content="גאוגרפיה ליסודי — גאוגרפיה אדם וסביבה לכיתות ה׳–ו׳" />
 <meta property="og:description" content="שיעורי גאוגרפיה לכיתות ה׳–ו׳ לפי תכנית הלימודים בגאוגרפיה - אדם וסביבה של משרד החינוך: הקראה מלאה, שלב חזותי, בדיקת הבנה ותרגול. חינם ובלי הרשמה." />
 <link rel="canonical" href="https://bekol.co.il/geography-elem/" />
-<meta name="robots" content="noindex,nofollow">
 <meta property="og:url" content="https://bekol.co.il/geography-elem/" />
 <meta property="og:image" content="https://bekol.co.il/geography-elem/img/og.png" />
 <meta property="og:image:width" content="1200" />
@@ -2457,7 +2444,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="g108 · 2026-09-27";
+var BUILD="g109 · 2026-09-27";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2552,7 +2539,7 @@ function unitsView(){
     u.topics.forEach(function(tp,ti){
       var lid=({'0:0':'geo1'})[ui+':'+ti];
       if(lid){
-        h+='<div style="display:flex;gap:8px;align-items:stretch"><a href="?internal=shlav-internal-geography-elem&lesson='+lid+'" class="card" style="flex:1;display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
+        h+='<div style="display:flex;gap:8px;align-items:stretch"><a href="?lesson='+lid+'" class="card" style="flex:1;display:flex;align-items:center;gap:12px;padding:14px 18px;text-decoration:none;color:inherit">'+
           '<span style="flex:1;font-weight:600">'+esc(t[tp])+'</span>'+
           '<span class="chip" style="font-size:.8rem;background:var(--teal);color:#fff">'+esc(t.startLesson)+'</span></a>'+gHearBtn(t[tp])+'</div>';
       }else{
@@ -5121,7 +5108,7 @@ function geo1LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g1t("g1Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g1again",g1t("g1Again"),'background:#0e9c8d;color:#fff;font-weight:700')+g1HearBtn(g1t("g1Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-geography-elem&lesson=geo2" style="color:#1d4ed8;font-weight:600">'+esc(g1t("g1NextLesson"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=geo2" style="color:#1d4ed8;font-weight:600">'+esc(g1t("g1NextLesson"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5246,8 +5233,8 @@ function geo2LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g2t("g2Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g2again",g2t("g2Again"),'background:#0e9c8d;color:#fff;font-weight:700')+g2HearBtn(g2t("g2Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-geography-elem&lesson=geo3" style="color:#1d4ed8;font-weight:600">'+esc(g2t("g2NextLesson"))+'</a></p>';
-    h+='<p style="margin-top:8px"><a href="?internal=shlav-internal-geography-elem" style="color:#1d4ed8;font-weight:600">'+esc(g2t("g2BackUnits"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=geo3" style="color:#1d4ed8;font-weight:600">'+esc(g2t("g2NextLesson"))+'</a></p>';
+    h+='<p style="margin-top:8px"><a href="./" style="color:#1d4ed8;font-weight:600">'+esc(g2t("g2BackUnits"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5406,7 +5393,7 @@ function geo3LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g3t("g3Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g3again",g3t("g3Again"),'background:#0e9c8d;color:#fff;font-weight:700')+g3HearBtn(g3t("g3Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-geography-elem" style="color:#1d4ed8;font-weight:600">'+esc(g3t("g3BackUnits"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="./" style="color:#1d4ed8;font-weight:600">'+esc(g3t("g3BackUnits"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5462,7 +5449,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g108-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g109-pwa1").catch(function(){});
   });
 }
 </script>
