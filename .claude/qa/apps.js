@@ -37,10 +37,14 @@ const WORDS = {
   13: { he: 'שלוש־עשרה',  ar: 'ثلاثة عشر', ru: 'Тринадцать',  en: 'Thirteen' },
   14: { he: 'ארבע־עשרה',  ar: 'أربعة عشر', ru: 'Четырнадцать', en: 'Fourteen' },
   15: { he: 'חמש־עשרה',   ar: 'خمسة عشر', ru: 'Пятнадцать',   en: 'Fifteen' },
+  16: { he: 'שש־עשרה',    ar: 'ستة عشر',    ru: 'Шестнадцать',  en: 'Sixteen' },
+  17: { he: 'שבע־עשרה',   ar: 'سبعة عشر',   ru: 'Семнадцать',   en: 'Seventeen' },
+  18: { he: 'שמונה־עשרה', ar: 'ثمانية عشر', ru: 'Восемнадцать', en: 'Eighteen' },
+  19: { he: 'תשע־עשרה',   ar: 'تسعة عشر',   ru: 'Девятнадцать', en: 'Nineteen' },
 };
 
 /* אפליקציות שנספרות בדף הבית אך אין להן תיקייה כאן — הן בריפו נפרד */
-const EXTERNAL = new Set(['theory']);
+const EXTERNAL = new Set(['theory','english-bagrut','math-bagrut3']);
 
 let findings = 0;
 const bad = (m) => { console.log('✗ ' + m); findings++; };

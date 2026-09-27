@@ -3,20 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="robots" content="index,follow">
-<script>
-/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html.
-   המפתח נשמר במגירה משל האפליקציה (shlav-internal-civics) ולא
-   במגירה המשותפת shlav-internal, כדי שפתיחת אזרח לא תסגור את
-   מתח ולהפך. */
-var INTERNAL_KEY="shlav-internal-civics";
-var INTERNAL_OK=(function(){
-  try{
-    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
-    if(q) localStorage.setItem("shlav-internal-civics", decodeURIComponent(q));
-    return true; /* PUBLISHED 27.9.2026 - gate removed, app is public */
-  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
-})();
-</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>אזרח — אזרחות לבגרות: דמוקרטיה, זכויות, חוקי יסוד ורשויות השלטון</title>
 <meta name="description" content="תרגול אזרחות לבגרות למי שלומד אחרת: כל שאלה עם רמז, הסבר והקראה — עקרונות הדמוקרטיה, זכויות אדם ואזרח, חוקי יסוד, בחירות, רשויות השלטון וחברה בישראל. בעברית, ערבית, רוסית ואנגלית. חינם ובלי הרשמה." />
@@ -473,6 +459,7 @@ textarea.field{min-height:96px;resize:vertical}
 <link rel="license" href="/legal/">
 </head>
 <body>
+<a class="skip" href="#main" style="position:absolute;inset-inline-start:-9999px">דילוג לתוכן</a>
 <style>#gate[hidden]{display:none!important}
 /* כפתורי הקראה גדולים וצבעוניים — התקן המשותף (ירוק הקראה, אדום עצירה) */
 .spk:not(.sm){border-radius:12px;background:#0e9c8d;border-color:#0b7c71;color:#fff;font-weight:700;min-height:46px;width:auto;height:auto;padding:8px 18px;font-size:1.02rem;gap:.4rem}
@@ -514,7 +501,7 @@ textarea.field{min-height:96px;resize:vertical}
   </div>
 </div>
 <div id="live" class="sr" aria-live="polite"></div>
-<div id="app"></div>
+<main id="main"><div id="app"></div></main>
 <script>
 /* ============================================================
    מצב הדגמה — נכנס אך ורק דרך ?demo=1 בכתובת.
@@ -1076,7 +1063,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="c14 · 2026-09-26";
+var BUILD="c15 · 2026-09-27";
 var SKEY="ezrach-state-v1";
 var GKEY_STORE="ezrach-gkey";
 
@@ -1169,7 +1156,7 @@ function applyModes(){
   /* הכותרת נשארה עברית קשיחה מה-HTML גם אחרי החלפת שפה: הכיווניות
      והכותרת שעל המסך התחלפו, אבל לשונית הדפדפן, הסימנייה ושם
      האפליקציה המותקנת נשארו בעברית. השם והתיאור כבר מתורגמים. */
-  try{ if(INTERNAL_OK) document.title=t("app")+" — "+t("tagline") }catch(e){}
+  try{ document.title=t("app")+" — "+t("tagline") }catch(e){}
 }
 function announce(m){var e=$("#live");if(e)e.textContent=m}
 
@@ -7757,13 +7744,7 @@ load();
 touchDay();
 booted=true;
 applyModes();
-/* INTERNAL-GATE — לא נטענת בלי מפתח. */
-if(!INTERNAL_OK){
-  document.getElementById("gate").hidden=false;
-  document.title="לא פורסם";
-}else{
-  render();
-}
+render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
@@ -7877,9 +7858,10 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=c14-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=c15-pwa1").catch(function(){});
   });
 }
 </script>
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
