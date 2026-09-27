@@ -39,8 +39,10 @@
 | `civics` | c17 · 2026-09-27 | c17-pwa1 | תואם |
 | `hebrew` | i10 · 2026-09-27 | i10-pwa1 | תואם |
 | `english-bagrut` | — | — | אינה בריפו הזה |
+| `literature` | j9 · 2026-09-28 | j9-pwa1 | תואם |
+| `tanakh` | p10 · 2026-09-28 | p10-pwa1 | תואם |
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-09-25.
+נוצר ב-`node .claude/qa/status.js --md`, 2026-09-27.
 
 
 
