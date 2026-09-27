@@ -503,6 +503,10 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 .opts .orow .opt{flex:1 1 auto}
 .optspk{flex:0 0 auto;min-width:46px;min-height:46px;border:2px solid #0b7c71;border-radius:12px;background:#0e9c8d;color:#fff;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:8px 10px}
 .optspk:hover{background:#0b7c71}
+@keyframes calmGlow{0%{box-shadow:0 0 0 0 rgba(180,140,40,0)}35%{box-shadow:0 0 26px 6px rgba(180,140,40,.45)}100%{box-shadow:0 0 0 0 rgba(180,140,40,0)}}
+.card.calm-glow{animation:calmGlow 2.6s ease-out 1}
+.calm-praise{text-align:center;font-weight:600;color:#7c5e10;margin:14px 0 0}
+:root[data-theme="dark"] .calm-praise{color:#d9b84a}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -889,14 +893,15 @@ T.he={
   sumS4:"סבב כזה אומר רק שהחומר עדיין חדש. עוד סבב, בקצב שלכם.",
   sumOk:"נכון לבד", sumHp:"נכון עם רמז", sumNo:"לא נכון", sumAcc:"דיוק",
   sumAgain:"סבב נוסף", sumUp:"לרמה הבאה", sumDown:"רמה אחת למטה", sumShare:"שליחה בוואטסאפ",
-  sumShareTxt:"{app} — {topic}, {lv}: {ok} מתוך {n} נכון.", sumStreak:"{n} ימים ברצף"
+  sumShareTxt:"{app} — {topic}, {lv}: {ok} מתוך {n} נכון.", sumStreak:"{n} ימים ברצף",
+  cp90:"מרשים מאד. שליטה כזאת לא באה לבד.",cp75:"כל הכבוד. סבב כזה דורש ריכוז אמיתי.",cp60:"התקדמות טובה. הפירוט למטה מראה מה כבר יושב."
 };
 T.ar={
   app:"أولبان", tagline:"عبرية عملية للقادمين الجدد",
   navHome:"المسارات", navProg:"التقدّم", navSet:"الإعدادات", navExam:"امتحان", back:"رجوع",
   heroT:"عبرية تُسمَع قبل أن تُقرأ",
-  hebT:"تريدون مواصلة التدريب؟",hebP:"في تطبيق العبرية ينتظركم مسار كامل للوافدين الجدد — فهم المقروء والكتابة والقواعد، بما يناسب النموذج 274.",hebB:"افتحوا تطبيق العبرية",
-  heroP:"كل كلمة وكل جملة وكل استمارة — مع زر استماع. يمكنك الإبطاء والإعادة ورؤية المعنى بلغتك. بلا مؤقّت وبلا عقاب على الخطأ.",
+  hebT:"تريدون مواصلة التدريب؟",hebP:"في تطبيق العبرية ينتظركم مسار كامل للوافدين الجدد: فهم المقروء والكتابة والقواعد، بما يناسب النموذج 274.",hebB:"افتحوا تطبيق العبرية",
+  heroP:"كل كلمة وكل جملة وكل استمارة، مع زر استماع. يمكنك الإبطاء والإعادة ورؤية المعنى بلغتك. بلا مؤقّت وبلا عقاب على الخطأ.",
   start:"ابدأ من هنا", cont:"تابع من حيث توقفت",
   trkSound:"الحرف والصوت", trkSoundD:"حروف تتشابه في الشكل، وتشكيل يغيّر الكلمة",
   trkWords:"مفردات", trkWordsD:"الكلمات التي تتكرّر كلّ يوم",
@@ -912,15 +917,15 @@ T.ar={
   check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", showAll:"أظهر الكل",
   hintB:"تلميح",
   hintMean:"فكّروا في أي موقف تُسمع هذه الكلمة.",
-  hintBack:"اضغطوا على مكبّر الصوت بجانب كل خيار — أيّها يبدو صحيحًا؟",
+  hintBack:"اضغطوا على مكبّر الصوت بجانب كل خيار. أيّها يبدو صحيحًا؟",
   hintHear:"اسمعوا مرة أخرى، ببطء. الزر الثاني يبطّئ القراءة.",
   hintUse:"اقرأوا كل خيار بصوت عالٍ. ماذا كنتم تقولون في الموقف أعلاه؟",
-  hintGap:"اقرأوا الجملة بصوت عالٍ وأكملوها بأفواهكم — المناسبة ستبدو صحيحة.",
+  hintGap:"اقرأوا الجملة بصوت عالٍ وأكملوها بأفواهكم. المناسبة ستبدو صحيحة.",
   hintOrder:"ابدأوا بالكلمة التي تفتح الجملة.",
   hintSrc:"الإجابة موجودة في المقطع أعلاه.",
   correct:"صحيح!", wrong:"ليس بعد", answerIs:"الإجابة:", why:"لماذا",
   tapOrder:"اضغط الكلمات بالترتيب", clearSlot:"مسح",
-  progT:"تقدّمك", progNone:"لم تبدأ بعد. كل مسار مفتوح فورًا — بلا أقفال.",
+  progT:"تقدّمك", progNone:"لم تبدأ بعد. كل مسار مفتوح فورًا، بلا أقفال.",
   seen:"شوهدت", mastered:"مُتقنة", streakL:"تتابع", todayL:"اليوم", accL:"الدقة",
   setT:"الإعدادات", setVoice:"الصوت والقراءة", setRead:"سهولة القراءة", setLang:"لغة الواجهة",
   vEngine:"محرّك الصوت", vGem:"صوت طبيعي (جيميني)", vDev:"صوت الجهاز",
@@ -928,12 +933,12 @@ T.ar={
   vFemale:"أصوات نسائية", vMale:"أصوات رجالية", vSample:"عيّنة",
   vDevList:"أصوات الجهاز", vAuto:"اختيار تلقائي",
   vNoneLang:"لا يوجد صوت بهذه اللغة في الجهاز",
-  femNone:"لا يوجد في هذا الجهاز صوت نسائي بهذه اللغة، لذلك رُفعت طبقة الصوت. هذا ليس صوتًا نسائيًا حقيقيًا — للحصول على واحد يجب تثبيته.",
+  femNone:"لا يوجد في هذا الجهاز صوت نسائي بهذه اللغة، لذلك رُفعت طبقة الصوت. هذا ليس صوتًا نسائيًا حقيقيًا. للحصول على واحد يجب تثبيته.",
   femAndroid:"في أندرويد: الإعدادات ← إمكانية الوصول ← تحويل النص إلى كلام (في سامسونغ: الإعدادات ← الإدارة العامة ← تحويل النص إلى كلام) ← الترس بجانب المحرّك ← تثبيت بيانات الصوت ← اختيار نسخة نسائية.",
   femIos:"في آيفون أو آيباد: الإعدادات ← إمكانية الوصول ← المحتوى المنطوق ← الأصوات ← اختيار صوت نسائي وتنزيله.",
   femMac:"في ماك: إعدادات النظام ← إمكانية الوصول ← المحتوى المنطوق ← صوت النظام ← إدارة الأصوات ← تنزيل صوت نسائي.",
   femWin:"في ويندوز: الإعدادات ← الوقت واللغة ← الكلام ← إدارة الأصوات ← إضافة أصوات.",
-  edgeHas:"في متصفح Microsoft Edge أصوات طبيعية لهذه اللغة، نسائية ورجالية — دون تثبيت، مع اتصال بالإنترنت.",openEdge:"افتح التطبيق في Edge",
+  edgeHas:"في متصفح Microsoft Edge أصوات طبيعية لهذه اللغة، نسائية ورجالية، دون تثبيت، مع اتصال بالإنترنت.",openEdge:"افتح التطبيق في Edge",
   vKey:"مفتاح Gemini", vKeyPh:"يبدأ بـ AIza…", vSave:"حفظ", vShow:"إظهار", vHide:"إخفاء",
   vSaved:"حُفظ المفتاح على هذا الجهاز فقط، ولا يُرسل إلى أي مكان آخر.",
   vRemoved:"حُذف المفتاح.", vChecking:"جارٍ الفحص…", vOk:"المفتاح يعمل.",
@@ -951,20 +956,21 @@ T.ar={
   yes:"نعم، امحُ", no:"لا",
   savedNote:"يُحفظ التقدّم تلقائيًا على هذا الجهاز فقط.",
   ofN:"من", newWord:"كلمة جديدة", review:"مراجعة",
-  sumT1:"جولة قوية.", sumT2:"جولة جيّدة.", sumT3:"جولة فيها عمل.", sumT4:"جولة صعبة — ولا بأس.",
+  sumT1:"جولة قوية.", sumT2:"جولة جيّدة.", sumT3:"جولة فيها عمل.", sumT4:"جولة صعبة، ولا بأس.",
   sumS1:"معظم ما تدرّبتم عليه هنا ثابت.", sumS2:"معظم الأمور في مكانها. جولة أخرى تصقل ما تبقّى.",
   sumS3:"جزء من المادّة لم يثبت بعد، وهذا بالضبط ما تُظهره الجولة. جولة أخرى في المستوى نفسه.",
   sumS4:"جولة كهذه تعني فقط أنّ المادّة ما زالت جديدة. جولة أخرى، على إيقاعكم.",
   sumOk:"صحيح وحدكم", sumHp:"صحيح مع تلميح", sumNo:"غير صحيح", sumAcc:"الدقّة",
   sumAgain:"جولة أخرى", sumUp:"إلى المستوى التالي", sumDown:"مستوى واحد أدنى", sumShare:"إرسال عبر واتساب",
-  sumShareTxt:"{app} — {topic}، {lv}: {ok} من {n} صحيحة.", sumStreak:"{n} أيام متتالية"
+  sumShareTxt:"{app}، {topic}، {lv}: {ok} من {n} صحيحة.", sumStreak:"{n} أيام متتالية",
+  cp90:"مذهل حقاً. تحكم كهذا لا يأتي من تلقاء نفسه.",cp75:"أحسنت. جولة كهذه تتطلب تركيزاً حقيقياً.",cp60:"تقدم جيد. التفاصيل أدناه تُظهر ما ترسّخ بالفعل."
 };
 T.ru={
   app:"Ульпан", tagline:"Практический иврит для новых репатриантов",
   navHome:"Направления", navProg:"Прогресс", navSet:"Настройки", navExam:"Экзамен", back:"Назад",
   heroT:"Иврит, который слышно раньше, чем читаешь",
-  hebT:"Хотите продолжить практику?",hebP:"В приложении иврита вас ждёт целый трек для новых репатриантов — понимание прочитанного, письмо и грамматика по экзамену 274.",hebB:"Открыть приложение иврита",
-  heroP:"Каждое слово, каждая фраза и каждый бланк — с кнопкой прослушивания. Можно замедлить, повторить и увидеть значение на своём языке. Без таймера и без наказания за ошибку.",
+  hebT:"Хотите продолжить практику?",hebP:"В приложении иврита вас ждёт целый трек для новых репатриантов: понимание прочитанного, письмо и грамматика по экзамену 274.",hebB:"Открыть приложение иврита",
+  heroP:"Каждое слово, каждая фраза и каждый бланк, с кнопкой прослушивания. Можно замедлить, повторить и увидеть значение на своём языке. Без таймера и без наказания за ошибку.",
   start:"Начать здесь", cont:"Продолжить с места остановки",
   trkSound:"Буква и звук", trkSoundD:"Похожие на вид буквы и огласовки, меняющие слово",
   trkWords:"Слова", trkWordsD:"Слова, которые нужны каждый день",
@@ -972,7 +978,7 @@ T.ru={
   trkRead:"Вывески и бланки", trkReadD:"Прочитать вывеску, бланк и официальное письмо",
   lv1:"Основа", lv2:"Сборка", lv3:"Свободно",
   lv1D:"По одному слову, с переводом", lv2D:"Короткие фразы, меньше перевода", lv3D:"Только иврит",
-  whyWord:"«{0}» — это {1}.",
+  whyWord:"«{0}»: это {1}.",
   qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?",
   qOrder:"Соберите предложение", qSay:"Как сказать это на иврите?", qRead:"По тексту:",
   qUse:"Какая фраза подходит к ситуации?",
@@ -980,15 +986,15 @@ T.ru={
   check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", showAll:"Показать всё",
   hintB:"Подсказка",
   hintMean:"Подумайте, в какой ситуации звучит это слово.",
-  hintBack:"Нажмите на динамик рядом с каждым вариантом — какой звучит верно?",
+  hintBack:"Нажмите на динамик рядом с каждым вариантом. Какой звучит верно?",
   hintHear:"Послушайте снова, медленно. Вторая кнопка замедляет чтение.",
   hintUse:"Прочитайте каждый вариант вслух. Что бы вы сказали в ситуации выше?",
-  hintGap:"Прочитайте предложение вслух и договорите — подходящее прозвучит верно.",
+  hintGap:"Прочитайте предложение вслух и договорите. Подходящее прозвучит верно.",
   hintOrder:"Начните со слова, которое открывает предложение.",
   hintSrc:"Ответ есть в отрывке выше.",
   correct:"Верно!", wrong:"Пока нет", answerIs:"Ответ:", why:"Почему",
   tapOrder:"Нажимайте слова по порядку", clearSlot:"Очистить",
-  progT:"Ваш прогресс", progNone:"Вы ещё не начинали. Все направления открыты сразу — без замков.",
+  progT:"Ваш прогресс", progNone:"Вы ещё не начинали. Все направления открыты сразу, без замков.",
   seen:"Просмотрено", mastered:"Освоено", streakL:"Серия", todayL:"Сегодня", accL:"Точность",
   setT:"Настройки", setVoice:"Голос и чтение", setRead:"Читаемость", setLang:"Язык интерфейса",
   vEngine:"Голосовой движок", vGem:"Естественный голос (Gemini)", vDev:"Голос устройства",
@@ -996,12 +1002,12 @@ T.ru={
   vFemale:"Женские голоса", vMale:"Мужские голоса", vSample:"Пример",
   vDevList:"Голоса устройства", vAuto:"Автоматически",
   vNoneLang:"На устройстве нет голоса для этого языка",
-  femNone:"На этом устройстве нет женского голоса для этого языка, поэтому тон голоса повышен. Это не настоящий женский голос — чтобы получить его, его нужно установить.",
+  femNone:"На этом устройстве нет женского голоса для этого языка, поэтому тон голоса повышен. Это не настоящий женский голос. Чтобы получить его, его нужно установить.",
   femAndroid:"В Android: Настройки → Спец. возможности → Синтез речи (в Samsung: Настройки → Общие настройки → Синтез речи) → шестерёнка рядом с движком → Установить голосовые данные → выбрать женский вариант.",
   femIos:"В iPhone или iPad: Настройки → Универсальный доступ → Устный контент → Голоса → выбрать женский голос и загрузить.",
   femMac:"В Mac: Системные настройки → Универсальный доступ → Устный контент → Системный голос → Управление голосами → загрузить женский голос.",
   femWin:"В Windows: Параметры → Время и язык → Речь → Управление голосами → Добавить голоса.",
-  edgeHas:"В браузере Microsoft Edge есть естественные голоса для этого языка, женские и мужские — без установки, при подключении к интернету.",openEdge:"Открыть приложение в Edge",
+  edgeHas:"В браузере Microsoft Edge есть естественные голоса для этого языка, женские и мужские, без установки, при подключении к интернету.",openEdge:"Открыть приложение в Edge",
   vKey:"Ключ Gemini", vKeyPh:"начинается с AIza…", vSave:"Сохранить", vShow:"Показать", vHide:"Скрыть",
   vSaved:"Ключ сохранён только на этом устройстве и никуда не отправляется.",
   vRemoved:"Ключ удалён.", vChecking:"Проверяем…", vOk:"Ключ работает.",
@@ -1019,19 +1025,20 @@ T.ru={
   yes:"Да, удалить", no:"Нет",
   savedNote:"Прогресс сохраняется автоматически только на этом устройстве.",
   ofN:"из", newWord:"новое слово", review:"повторение",
-  sumT1:"Сильный круг.", sumT2:"Хороший круг.", sumT3:"Круг с работой.", sumT4:"Трудный круг — и это нормально.",
+  sumT1:"Сильный круг.", sumT2:"Хороший круг.", sumT3:"Круг с работой.", sumT4:"Трудный круг, и это нормально.",
   sumS1:"Большая часть того, что вы здесь отрабатывали, усвоена.", sumS2:"Почти всё на месте. Ещё один круг отточит остальное.",
   sumS3:"Часть материала ещё не усвоена, и именно это круг и должен показать. Ещё один круг на том же уровне.",
   sumS4:"Такой круг значит только одно: материал ещё новый. Ещё один круг, в своём темпе.",
   sumOk:"Верно сами", sumHp:"Верно с подсказкой", sumNo:"Неверно", sumAcc:"Точность",
   sumAgain:"Ещё круг", sumUp:"На уровень выше", sumDown:"На уровень ниже", sumShare:"Отправить в WhatsApp",
-  sumShareTxt:"{app} — {topic}, {lv}: {ok} из {n} верно.", sumStreak:"{n} дней подряд"
+  sumShareTxt:"{app}, {topic}, {lv}: {ok} из {n} верно.", sumStreak:"{n} дней подряд",
+  cp90:"Потрясающе. Такое владение материалом не приходит само.",cp75:"Молодцы. Такой круг требует настоящей сосредоточенности.",cp60:"Хороший прогресс. Разбор ниже показывает, что уже усвоено."
 };
 T.en={
   app:"Ulpan", tagline:"Practical Hebrew for new arrivals",
   navHome:"Tracks", navProg:"Progress", navSet:"Settings", navExam:"Exam", back:"Back",
   heroT:"Hebrew you hear before you read it",
-  hebT:"Want to keep practicing?",hebP:"The Hebrew app has a full track for new immigrants — reading comprehension, writing and grammar, matched to exam 274.",hebB:"Open the Hebrew app",
+  hebT:"Want to keep practicing?",hebP:"The Hebrew app has a full track for new immigrants: reading comprehension, writing and grammar, matched to exam 274.",hebB:"Open the Hebrew app",
   heroP:"Every word, every sentence and every form comes with a play button. Slow it down, repeat it, and see the meaning in your own language. No timer, and no penalty for a wrong answer.",
   start:"Start here", cont:"Pick up where you left off",
   trkSound:"Letter and sound", trkSoundD:"Letters that look alike, and vowel points that change a word",
@@ -1048,15 +1055,15 @@ T.en={
   check:"Check", next:"Next", again:"Again", dunno:"I don't know", showAll:"Show all",
   hintB:"Hint",
   hintMean:"Think about when you would hear this word.",
-  hintBack:"Tap the speaker beside each option — which one sounds right?",
+  hintBack:"Tap the speaker beside each option. Which one sounds right?",
   hintHear:"Listen again, slowly. The second button slows the reading down.",
   hintUse:"Read each option out loud. What would you say in the situation above?",
-  hintGap:"Read the sentence aloud and finish it by mouth — the right one will sound right.",
+  hintGap:"Read the sentence aloud and finish it by mouth. The right one will sound right.",
   hintOrder:"Start with the word that opens the sentence.",
   hintSrc:"The answer is in the passage above.",
   correct:"Correct!", wrong:"Not yet", answerIs:"Answer:", why:"Why",
   tapOrder:"Tap the words in order", clearSlot:"Clear",
-  progT:"Your progress", progNone:"You have not started yet. Every track is open right away — nothing is locked.",
+  progT:"Your progress", progNone:"You have not started yet. Every track is open right away. Nothing is locked.",
   seen:"Seen", mastered:"Mastered", streakL:"Streak", todayL:"Today", accL:"Accuracy",
   setT:"Settings", setVoice:"Voice and reading", setRead:"Readability", setLang:"Interface language",
   vEngine:"Voice engine", vGem:"Natural voice (Gemini)", vDev:"Device voice",
@@ -1064,12 +1071,12 @@ T.en={
   vFemale:"Female voices", vMale:"Male voices", vSample:"Sample",
   vDevList:"Device voices", vAuto:"Automatic",
   vNoneLang:"No voice for this language on this device",
-  femNone:"This device has no female voice for this language, so the pitch is raised. It is not a real female voice — to get one it has to be installed.",
+  femNone:"This device has no female voice for this language, so the pitch is raised. It is not a real female voice. To get one it has to be installed.",
   femAndroid:"On Android: Settings → Accessibility → Text-to-speech (on Samsung: Settings → General management → Text-to-speech) → the gear next to the engine → Install voice data → pick a female variant.",
   femIos:"On iPhone or iPad: Settings → Accessibility → Spoken Content → Voices → pick a female voice and download it.",
   femMac:"On Mac: System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → download a female voice.",
   femWin:"On Windows: Settings → Time & language → Speech → Manage voices → Add voices.",
-  edgeHas:"Microsoft Edge has natural voices for this language, female and male — nothing to install, with an internet connection.",openEdge:"Open the app in Edge",
+  edgeHas:"Microsoft Edge has natural voices for this language, female and male, nothing to install, with an internet connection.",openEdge:"Open the app in Edge",
   vKey:"Gemini key", vKeyPh:"starts with AIza…", vSave:"Save", vShow:"Show", vHide:"Hide",
   vSaved:"The key is stored on this device only. It is not sent anywhere else.",
   vRemoved:"Key removed.", vChecking:"Checking…", vOk:"The key works.",
@@ -1087,13 +1094,14 @@ T.en={
   yes:"Yes, delete", no:"No",
   savedNote:"Progress is saved automatically on this device only.",
   ofN:"of", newWord:"new word", review:"review",
-  sumT1:"A strong round.", sumT2:"A good round.", sumT3:"A round with work in it.", sumT4:"A hard round — and that's fine.",
+  sumT1:"A strong round.", sumT2:"A good round.", sumT3:"A round with work in it.", sumT4:"A hard round, and that's fine.",
   sumS1:"Most of what you practised here has stuck.", sumS2:"Most of it is in place. One more round will sharpen the rest.",
   sumS3:"Some of it hasn't settled yet, which is exactly what a round is for. Another round at the same level.",
   sumS4:"A round like this only means the material is still new. Another round, at your pace.",
   sumOk:"Right on your own", sumHp:"Right with a hint", sumNo:"Not right", sumAcc:"Accuracy",
   sumAgain:"Another round", sumUp:"Next level", sumDown:"One level down", sumShare:"Send on WhatsApp",
-  sumShareTxt:"{app} — {topic}, {lv}: {ok} of {n} right.", sumStreak:"{n} days in a row"
+  sumShareTxt:"{app}, {topic}, {lv}: {ok} of {n} right.", sumStreak:"{n} days in a row",
+  cp90:"Remarkable. Mastery like this does not come on its own.",cp75:"Well done. A round like this takes real focus.",cp60:"Good progress. The breakdown below shows what is already in place."
 };
 function t(k){var d=T[state.lang]||T.he;return d[k]!==undefined?d[k]:(T.he[k]!==undefined?T.he[k]:k)}
 /* המשמעות בשפת האם. נופלים לאנגלית ולא לעברית: מי שלמד ברוסית וחסר
@@ -1145,7 +1153,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a112 · 2026-09-26";
+var BUILD="a113 · 2026-09-27";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -3805,6 +3813,12 @@ function sumStats(){
 }
 function sumTier(){var p=sumStats().pct;return p>=85?1:p>=60?2:p>=35?3:4}
 function sumFmt(s,m){return String(s).replace(/\{(\w+)\}/g,function(_,k){return m[k]!==undefined?String(m[k]):"{"+k+"}"})}
+function calmPraise(pct){
+  if(pct>=90)return '<p class="calm-praise">'+esc(t("cp90"))+'</p>';
+  if(pct>=75)return '<p class="calm-praise">'+esc(t("cp75"))+'</p>';
+  if(pct>=60)return '<p class="calm-praise">'+esc(t("cp60"))+'</p>';
+  return "";
+}
 function screenSum(){
   var tp=topicOf(state.topic); if(!tp){state.screen="home";return screenHome()}
   var tr=trackOf(tp.trk), s=sumStats(), tier=sumTier(), lv=state.level;
@@ -3812,13 +3826,14 @@ function screenSum(){
   h+='<div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin:1rem 0 .6rem">'+
      '<span class="tdot"></span><h2 style="font-size:1.2rem">'+esc(tName(tp))+"</h2>"+
      '<span class="tpill">'+esc(t(tr.nk))+"</span></div>";
-  h+='<div class="card qcard">';
+  h+='<div class="card qcard'+(s.pct>=75?" calm-glow":"")+'">';
   h+='<div class="qtop"><span class="chip">'+s.n+" "+esc(t("ofN"))+" "+ROUND+"</span>"+
      '<span class="chip">'+esc(t("lv"+lv))+"</span>"+
      (state.streak>1?'<span class="chip ok" style="margin-inline-start:auto">'+
        esc(sumFmt(t("sumStreak"),{n:state.streak}))+"</span>":"")+"</div>";
   h+='<h2 class="qtext" style="font-size:1.35rem;margin-top:.6rem">'+esc(t("sumT"+tier))+"</h2>"+
      '<p class="qhint" style="font-size:.98rem">'+esc(t("sumS"+tier))+"</p>";
+  h+=calmPraise(s.pct);
   var tiles=[[s.ok,t("sumOk"),"var(--ok)"]];
   /* מאז 10.9.2026 יש רמז גם כאן, ולכן האריח נמנה. הוא נשאר
      מותנה כדי שאפליקציה שאין בה רמז לא תציג אפס. */
@@ -5627,7 +5642,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a112-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a113-pwa1").catch(function(){});
   });
 }
 </script>
