@@ -1299,21 +1299,25 @@ STR.he.unitsIntro="היחידות בנויות לפי מיקוד הלמידה ב
 STR.he.gradeA="כיתה ג׳";STR.he.gradeB="כיתה ד׳";STR.he.gradeC="כיתה ה׳";STR.he.gradeD="כיתה ו׳";
 STR.he.comingSoon="בקרוב";STR.he.startLesson="לשיעור";STR.he.mikudLink="מיקוד הלמידה של משרד החינוך (PDF)";
 STR.he.uBio="מערכות ותהליכים ביצורים חיים";STR.he.uEco="מערכות אקולוגיות";STR.he.uMat="חומרים";STR.he.uErg="אנרגיה";
+STR.he.uBioNeeds="מה צריך כדי לחיות?";STR.he.uBioBody="גוף האדם — מי עושה מה?";
 STR.en.uHear="Listen";STR.en.uHint="Hint from Limor";STR.en.navUnits="Units";STR.en.unitsTitle="Science and technology for grades 3-6";
 STR.en.unitsIntro="Units follow the Ministry of Education science and technology learning-focus document. Content is written originally for this site, and every lesson is read aloud in spoken Hebrew.";
 STR.en.gradeA="Grade 3";STR.en.gradeB="Grade 4";STR.en.gradeC="Grade 5";STR.en.gradeD="Grade 6";
 STR.en.comingSoon="Coming soon";STR.en.startLesson="To the lesson";STR.en.mikudLink="MoE learning-focus document (PDF)";
 STR.en.uBio="Systems and processes in living organisms";STR.en.uEco="Ecological systems";STR.en.uMat="Materials";STR.en.uErg="Energy";
+STR.en.uBioNeeds="What do we need to live?";STR.en.uBioBody="The human body - who does what?";
 STR.ru.uHear="Слушать";STR.ru.uHint="Подсказка от Лимор";STR.ru.navUnits="Разделы";STR.ru.unitsTitle="Наука и технология для 3-6 классов";
 STR.ru.unitsIntro="Разделы построены по документу Министерства просвещения о фокусе обучения естествознанию и технологии. Материал написан специально для сайта, и каждый урок озвучен на разговорном иврите.";
 STR.ru.gradeA="3 класс";STR.ru.gradeB="4 класс";STR.ru.gradeC="5 класс";STR.ru.gradeD="6 класс";
 STR.ru.comingSoon="Скоро";STR.ru.startLesson="К уроку";STR.ru.mikudLink="Документ Минпроса о фокусе обучения (PDF)";
 STR.ru.uBio="Системы и процессы в живых организмах";STR.ru.uEco="Экологические системы";STR.ru.uMat="Вещества";STR.ru.uErg="Энергия";
+STR.ru.uBioNeeds="Что нужно, чтобы жить?";STR.ru.uBioBody="Тело человека - кто что делает?";
 STR.ar.uHear="استمعوا";STR.ar.uHint="تلميح من ليمور";STR.ar.navUnits="الوحدات";STR.ar.unitsTitle="العلوم والتكنولوجيا للصفوف الثالث حتى السادس";
 STR.ar.unitsIntro="الوحدات مبنية وفق وثيقة ميكود التعلّم في العلوم والتكنولوجيا لوزارة التربية والتعليم. المحتوى مكتوب أصلًا خصيصًا للموقع، وكل درس يُسمع بالعبرية المنطوقة.";
 STR.ar.gradeA="الصف الثالث";STR.ar.gradeB="الصف الرابع";STR.ar.gradeC="الصف الخامس";STR.ar.gradeD="الصف السادس";
 STR.ar.comingSoon="قريبًا";STR.ar.startLesson="إلى الدرس";STR.ar.mikudLink="وثيقة ميكود التعلّم لوزارة التربية (PDF)";
 STR.ar.uBio="الأنظمة والعمليات في الكائنات الحية";STR.ar.uEco="أنظمة بيئية";STR.ar.uMat="المواد";STR.ar.uErg="الطاقة";
+STR.ar.uBioNeeds="ما الذي نحتاجه لنعيش؟";STR.ar.uBioBody="جسم الإنسان - من يفعل ماذا؟";
 function T(){return STR[state.settings.lang||"he"]||STR.he}
 
 /* ================= meta ================= */
@@ -2387,7 +2391,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s119 · 2026-09-26";
+var BUILD="s120 · 2026-09-27";
 var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2462,7 +2466,7 @@ startRound(activeLevel());
    התוכן עצמו נכתב במקור — המסמך משמש מבנה בלבד, עם קרדיט
    וקישור בבירור. */
 var UNITS=[
-  {grade:"gradeA",topics:["uBio","uEco","uMat","uErg"],pdf:"Grade3"},
+  {grade:"gradeA",topics:["uBio","uBioNeeds","uBioBody","uEco","uMat","uErg"],pdf:"Grade3"},
   {grade:"gradeB",topics:["uBio","uMat"],pdf:"Grade4"},
   {grade:"gradeC",topics:["uBio","uMat"],pdf:"Grade5"},
   {grade:"gradeD",topics:["uEco","uBio","uErg"],pdf:"Grade6"}
@@ -2479,7 +2483,7 @@ function unitsView(){
   UNITS.forEach(function(u,ui){
     h+='<h2 class="fd" style="font-size:1.2rem;margin:22px 0 10px;display:flex;align-items:center;gap:10px"><span>'+esc(t[u.grade])+'</span>'+uHearBtn(t[u.grade])+'</h2><div style="display:grid;gap:10px">';
     u.topics.forEach(function(tp,ti){
-      var lid=({'0:0':'1','0:1':'4','0:2':'5','0:3':'6','1:0':'8','1:1':'7','2:0':'9','2:1':'10','3:0':'11','3:1':'12','3:2':'13'})[ui+':'+ti];
+      var lid=({'0:0':'1','0:1':'2','0:2':'3','0:3':'4','0:4':'5','0:5':'6','1:0':'8','1:1':'7','2:0':'9','2:1':'10','3:0':'11','3:1':'12','3:2':'13'})[ui+':'+ti];
       if(lid){
         h+='<div class="card" style="display:flex;align-items:center;gap:12px;padding:14px 18px">'+
           '<a href="?lesson=sci'+lid+'" style="flex:1;font-weight:600;text-decoration:none;color:inherit">'+esc(t[tp])+'</a>'+
@@ -2956,16 +2960,19 @@ function progressView(){
   var t=T(),s=state.stats;
   var acc=s.attempts>0?Math.round(s.correct/s.attempts*100):0;
   var ops=[["add",t.kindAdd],["sub",t.kindSub],["mul",t.kindMul],["div",t.kindDiv]].map(function(o){var d=s.ops[o[0]];return{key:o[0],label:o[1],ok:d.ok,total:d.total}});
+  var opsSay=t.progOpsTitle+". "+ops.map(function(o){var pc=o.total>0?Math.round(o.ok/o.total*100):0;return o.label+" "+(o.total>0?pc+"%":"—")}).join(". ");
+  var lastS=state.sessionHistory[state.sessionHistory.length-1];
+  var sesSay=t.progSesTitle+(lastS?". "+lastS.correct+" / "+lastS.total:"");
   var withD=ops.filter(function(o){return o.total>=3});
   var strongest=withD.length?withD.slice().sort(function(a,b){return b.ok/b.total-a.ok/a.total})[0]:null;
   var weakest=withD.length?withD.slice().sort(function(a,b){return a.ok/a.total-b.ok/b.total})[0]:null;
   var h='<div class="wrap rise" style="padding-top:34px;padding-bottom:60px;max-width:980px">'+
-  '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(-3deg)">'+ic("chart",30)+'</span><span><h1 class="fd">'+esc(t.progTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.progSub)+'</p></span></div>'+
+  '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(-3deg)">'+ic("chart",30)+'</span><span><h1 class="fd">'+esc(t.progTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.progSub)+'</p></span><span style="margin-inline-start:auto">'+uHearBtn(t.progTitle+". "+t.progSub)+'</span></div>'+
   '<div class="cols4" style="margin-top:26px">'+
   [["check",s.correct,t.progTotal,"var(--teal-soft)","var(--teal-deep)"],["star",acc+"%",t.progAcc,"var(--amber-soft)","var(--amber-deep)"],["flame",s.bestStreak,t.progBest,"var(--coral-soft)","var(--coral-deep)"],["trophy",s.sessions,t.progSessions,"var(--sky-soft)","var(--sky-deep)"]].map(function(x){
     return '<div class="tile"><span class="ic" style="background:'+x[3]+';color:'+x[4]+'">'+ic(x[0],20)+'</span><b>'+x[1]+'</b><span>'+esc(x[2])+'</span></div>';
   }).join("")+'</div>'+
-  '<div class="cols" style="margin-top:22px"><div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progOpsTitle)+'</h2>';
+  '<div class="cols" style="margin-top:22px"><div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progOpsTitle)+'</h2><div style="margin-top:12px">'+uHearBtn(opsSay)+'</div>';
   if(s.attempts===0)h+='<p style="color:var(--ink-soft);margin-top:14px">'+esc(t.progOpsEmpty)+'</p>';
   else{
     h+='<div style="margin-top:18px;display:grid;gap:16px">';
@@ -2978,7 +2985,7 @@ function progressView(){
     if(weakest&&strongest&&weakest.key!==strongest.key)h+='<div class="note warn" style="margin-top:10px;display:flex;gap:10px;align-items:flex-start">'+ic("eye",18)+'<span>'+esc(fmt(t.progWeak,{name:weakest.label}))+'</span></div>';
   }
   h+='</div><div style="display:flex;flex-direction:column;gap:22px">'+
-  '<div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progSesTitle)+'</h2>';
+  '<div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progSesTitle)+'</h2><div style="margin-top:12px">'+uHearBtn(sesSay)+'</div>';
   if(!state.sessionHistory.length)h+='<p style="color:var(--ink-soft);margin-top:14px">'+esc(t.progOpsEmpty)+'</p>';
   else{
     h+='<div class="hbar2" style="margin-top:16px">';
@@ -2988,7 +2995,7 @@ function progressView(){
     });
     h+='</div>';
   }
-  h+='</div><div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progWeekTitle)+'</h2><div class="wk" style="margin-top:16px">';
+  h+='</div><div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progWeekTitle)+'</h2><div style="margin-top:10px">'+uHearBtn(t.progWeekTitle+". "+t.progDailies+": "+s.dailies)+'</div><div class="wk" style="margin-top:16px">';
   for(var i=6;i>=0;i--){
     var d=new Date();d.setDate(d.getDate()-i);
     var iso=d.toISOString().slice(0,10);
@@ -2998,7 +3005,7 @@ function progressView(){
   h+='</div><p style="color:var(--ink-soft);font-size:.88rem;margin-top:14px">'+esc(t.progDailies)+': <b class="fd" style="color:var(--ink)">'+s.dailies+'</b></p></div></div></div>'+
   '<div class="card" style="margin-top:22px;padding:24px;background:var(--ink);color:var(--paper);border-color:var(--ink);display:flex;align-items:center;gap:18px;flex-wrap:wrap">'+
   '<span class="bob">'+petSvg(state.pet,"cheer",84)+'</span>'+
-  '<p class="fd" style="font-weight:700;font-size:1.25rem;flex:1;min-width:200px">'+esc(t.progParentNote)+'</p>'+
+  '<p class="fd" style="font-weight:700;font-size:1.25rem;flex:1;min-width:200px">'+esc(t.progParentNote)+'</p>'+uHearBtn(t.progParentNote)+
   '<button class="btn btn-amber" data-a="go" data-v="practice" style="padding:13px 26px;font-size:1.1rem">'+esc(t.progGoPractice)+'</button>'+
   '</div></div>';
   return h;
@@ -3011,7 +3018,7 @@ function recordsView(){
   var all=RIVALS.map(function(r){return{name:rivalName(r),pet:r.pet,ok:r.ok,acc:r.acc}}).concat([me]).sort(function(a,b){return b.ok-a.ok});
   var myRank=all.indexOf(me)+1;
   var h='<div class="wrap rise" style="padding-top:34px;padding-bottom:60px;max-width:860px">'+
-  '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(3deg)">'+ic("trophy",30)+'</span><span><h1 class="fd">'+esc(t.recTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.recSub)+'</p></span></div>'+
+  '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(3deg)">'+ic("trophy",30)+'</span><span><h1 class="fd">'+esc(t.recTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.recSub)+'</p></span><span style="margin-inline-start:auto">'+uHearBtn(t.recTitle+". "+t.recSub)+'</span></div>'+
   '<div class="pod">';
   [1,0,2].forEach(function(idx,place){
     var r=all[idx];if(!r)return;
@@ -3030,7 +3037,7 @@ function recordsView(){
     h+='<tr'+(r.me?' class="me"':'')+'><td class="fd" style="font-weight:700">'+(i+1)+'</td><td style="display:flex;align-items:center;gap:10px">'+petSvg(r.pet,"happy",30)+'<span>'+esc(r.name)+(r.me?'<span class="you">'+esc(t.yourRow||"")+'</span>':"")+'</span></td><td class="fd">'+r.ok+'</td><td><span class="badge '+(r.acc>=80?"b-teal":r.acc>=60?"b-gold":"b-mut")+'">'+r.acc+'%</span></td></tr>';
   });
   h+='</tbody></table></div>'+
-  '<div class="note ok" style="margin-top:18px;text-align:center;font-size:1rem">'+esc(t.yourPlace)+': <b class="fd" style="font-size:1.25rem">#'+myRank+'</b> 🎉</div></div>';
+  '<div class="note ok" style="margin-top:18px;text-align:center;font-size:1rem">'+esc(t.yourPlace)+': <b class="fd" style="font-size:1.25rem">#'+myRank+'</b> 🎉 <span style="display:inline-block;vertical-align:middle;margin-inline-start:10px">'+uHearBtn(t.yourPlace+": "+myRank)+'</span></div></div>';
   return h;
 }
 /* ================= settings ================= */
@@ -3044,7 +3051,7 @@ function settingsView(){
   '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--teal-deep);color:var(--teal-ink);box-shadow:0 6px 0 var(--teal-deep);transform:rotate(3deg)">'+ic("gear",30)+'</span><span><h1 class="fd">'+esc(t.setTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.setSub)+'</p></span></div>';
   /* מצב מורה. הכרטיס הוא גם הדרך היחידה לגלות שהתכונה קיימת. */
   h+='<div class="card" style="padding:24px;margin-top:26px"><h2 class="fd" style="font-size:1.45rem">'+esc(xt("teHideT"))+'</h2>'+
-  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(xt("teHideNote"))+'</p>'+
+  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(xt("teHideNote"))+'</p><div style="margin-top:12px">'+uHearBtn(xt("teHideT")+". "+xt("teHideNote"))+'</div>'+
   '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+
   (!teHas()
     ? '<button class="pick" data-a="teask">'+esc(xt("teHideBtn"))+'</button>'
@@ -3056,12 +3063,12 @@ function settingsView(){
   '</div></div>';
 
   /* learning style */
-  h+='<div class="card" style="padding:24px;margin-top:26px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.lsTitle)+'</h2><div style="margin-top:14px">'+
+  h+='<div class="card" style="padding:24px;margin-top:26px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.lsTitle)+'</h2><div style="margin-top:12px">'+uHearBtn(t.lsTitle+". "+t.lsCalm+". "+t.lsCalmD)+'</div><div style="margin-top:14px">'+
   tog("calmMode",t.lsCalm,t.lsCalmD,t.lsCalmBadge)+tog("soundFx",t.sfxTitle,t.sfxDesc)+
   '</div></div>';
   /* sound */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--teal-soft);color:var(--teal-deep)">'+ic("speaker",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.sndTitle)+'</h2></div>'+
-  '<div style="margin-top:14px">'+tog("tts",t.sndTts,t.sndTtsD)+'</div>';
+  '<div style="margin-top:12px">'+uHearBtn(t.sndTitle+". "+t.sndTts+". "+t.sndTtsD)+'</div><div style="margin-top:14px">'+tog("tts",t.sndTts,t.sndTtsD)+'</div>';
   if(s.tts){
     h+='<p class="fd" style="font-weight:600;font-size:1.1rem;margin-top:20px">'+esc(t.sndType)+'</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:10px">';
     PRESETS.forEach(function(p){
@@ -3101,12 +3108,12 @@ function settingsView(){
   h+='</div>';
   /* link */
   h+='<div class="card" style="padding:24px;margin-top:22px;background:var(--ink);color:var(--paper);border-color:var(--ink)"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--amber);color:var(--ink);transform:rotate(-6deg)">'+ic("link",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.linkTitle)+'</h2></div>'+
-  '<p style="color:rgba(255,255,255,.75);margin-top:10px">'+esc(t.linkDesc)+'</p>'+
+  '<p style="color:rgba(255,255,255,.75);margin-top:10px">'+esc(t.linkDesc)+'</p><div style="margin-top:12px">'+uHearBtn(t.linkTitle+". "+t.linkDesc)+'</div>'+
   '<div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;align-items:center"><span class="kbd" style="flex:1;min-width:220px">'+esc(location.href)+'</span>'+
   '<button class="btn btn-amber" data-a="copylink" id="copybtn" style="padding:12px 22px;font-size:1rem">'+ic("link",17)+' '+esc(t.linkCopy)+'</button></div></div>';
   /* language */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--sky-soft);color:var(--sky-deep)">'+ic("globe",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.langTitle)+'</h2></div>'+
-  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(t.langDesc)+'</p>'+
+  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(t.langDesc)+'</p><div style="margin-top:12px">'+uHearBtn(t.langTitle+". "+t.langDesc)+'</div>'+
   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px">'+
   Object.keys(LANGS).map(function(l){
     var m=LANGS[l],on=lang===l;
@@ -3117,7 +3124,7 @@ function settingsView(){
   }).join("")+'</div></div>';
   /* theme */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--amber-soft);color:var(--amber-deep)">'+ic("star",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.themeTitle)+'</h2></div>'+
-  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(t.themeDesc)+'</p>'+
+  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(t.themeDesc)+'</p><div style="margin-top:12px">'+uHearBtn(t.themeTitle+". "+t.themeDesc)+'</div>'+
   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px">'+
   [["ocean",t.themeOcean],["grape",t.themeGrape],["berry",t.themeBerry]].map(function(th){
     var on=s.theme===th[0];
@@ -3126,7 +3133,7 @@ function settingsView(){
   /* display */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--sky-soft);color:var(--sky-deep)">'+ic("eye",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.dispTitle)+'</h2></div>'+
   /* בורר גודל טקסט — שלוש מדרגות */
-  '<p class="fd" style="font-weight:600;margin-top:16px">'+esc(t.sizeTitle)+'</p>'+
+  '<div style="margin-top:12px">'+uHearBtn(t.dispTitle+". "+t.sizeTitle)+'</div><p class="fd" style="font-weight:600;margin-top:16px">'+esc(t.sizeTitle)+'</p>'+
   '<div style="display:flex;gap:9px;margin-top:9px;flex-wrap:wrap">'+
   [[1,t.size1,"1rem"],[2,t.size2,"1.2rem"],[3,t.size3,"1.45rem"]].map(function(z){
     var on=(s.textSize||1)===z[0];
@@ -6584,7 +6591,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s119-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s120-pwa1").catch(function(){});
   });
 }
 </script>
