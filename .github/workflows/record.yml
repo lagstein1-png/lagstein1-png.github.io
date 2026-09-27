@@ -176,7 +176,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -187,9 +187,9 @@ jobs:
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-      - name: Validate 32 pilot selections without API calls
+      - name: Validate pilot selections without API calls
         run: node .claude/qa/pilot-hebrew.js --check
-      - name: Make 32 clips, stop on first error or quota response
+      - name: Make pilot clips, stop on first error or quota response
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node .claude/qa/pilot-hebrew.js
