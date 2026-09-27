@@ -48,6 +48,10 @@ on:
         description: 'YES — למחוק הקלטות בקול אחר ולהקליט מחדש'
         required: false
         default: ''
+      voices:
+        description: 'pilot בלבד: מטריצת קולות מופרדת בפסיקים (ברירת מחדל Kore,Charon,Aoede,Leda)'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -192,6 +196,7 @@ jobs:
       - name: Make pilot clips, stop on first error or quota response
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          VOICES: ${{ github.event.inputs.voices }}
         run: node .claude/qa/pilot-hebrew.js
       - name: Store samples and usage report privately as a run artifact
         if: always()
