@@ -44,7 +44,7 @@ const WORDS = {
 };
 
 /* אפליקציות שנספרות בדף הבית אך אין להן תיקייה כאן — הן בריפו נפרד */
-const EXTERNAL = new Set(['theory','english-bagrut','math-bagrut3']);
+const EXTERNAL = new Set(['theory','english-bagrut']);
 
 let findings = 0;
 const bad = (m) => { console.log('✗ ' + m); findings++; };

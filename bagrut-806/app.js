@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x104 · 2026-09-27";
+  var BUILD = "x105 · 2026-09-27";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -384,13 +384,21 @@
     all.forEach(function (ex) { var k = ex.questionnaire || ""; (groups[k] = groups[k] || []).push(ex); });
     /* ״עזרה מהמורה״ גם ממסך הבית (26.9.2026): בלי הקשר של סעיף —
        TUT_ID נשאר null והפאנל נפתח לשיחה כללית. */
+    /* בחירת מסלול (27.9.2026): הכרטיס המאוחד בדף הבית מוביל לכאן.
+       מסלול 3 יח״ל חי בתוך math-teen; מסלול 5 יח״ל הוא האפליקציה הזאת. */
+    var trackPick = '<div class="card track-pick"><h2>בגרות במתמטיקה — בוחרים מסלול</h2>' +
+      '<p class="meta">כאן מתאמנים ל־5 יח״ל (שאלונים 35571/35572). לומדים 3 יח״ל? התרגול המודרך שלכם נמצא באפליקציית שלב.</p>' +
+      '<div class="track-row">' +
+      '<a class="btn ghost" href="/math-teen/?bagrut3=1">3 יח״ל — לתרגול המודרך ←</a>' +
+      '<span class="chip">5 יח״ל — הסימולציה והתרגול כאן למטה</span>' +
+      "</div></div>";
     var tutCard = (window.TUTOR && TUTOR.on())
       ? '<div class="card"><h3>' + esc(TUTOR.label()) + "</h3>" +
         '<p class="meta">נתקעתם לפני שהתחלתם? אפשר לשאול את המורה כל שאלה על החומר.</p>' +
         '<button class="btn ghost" id="btn-tutor-home" type="button">♫ ' + esc(TUTOR.label()) + '</button></div>'
       : "";
     var order = Object.keys(groups).sort();
-    box.innerHTML = tutCard + order.map(function (k) {
+    box.innerHTML = trackPick + tutCard + order.map(function (k) {
       var exs = groups[k];
       var info = QINFO[k] || null;
       var head = info
@@ -1447,7 +1455,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x104-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x105-pwa1").catch(function () {});
     });
   }
 
