@@ -2393,7 +2393,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="g105 · 2026-09-26";
+var BUILD="g106 · 2026-09-27";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4462,6 +4462,7 @@ function render(){ try{lgChrome()}catch(e){}
     if(view==="units")html+=unitsView();
     else if(view==="lesson"&&GEO1_ON)html+=geo1LessonView();
     else if(view==="lesson"&&GEO2_ON)html+=geo2LessonView();
+    else if(view==="lesson"&&GEO3_ON)html+=geo3LessonView();
     else if(view==="practice")html+=practice();
     else if(view==="progress")html+=progressView();
     else if(view==="records")html+=recordsView();
@@ -4630,6 +4631,7 @@ function onAction(a,el){
   if(examAction(a,el))return;
   if(/^g1/.test(a)&&GEO1_ON){geo1LessonAction(a,el);return}
   if(/^g2/.test(a)&&GEO2_ON){geo2LessonAction(a,el);return}
+  if(/^g3/.test(a)&&GEO3_ON){geo3LessonAction(a,el);return}
   if(a==="go"){stopSpeak();view=el.getAttribute("data-v");
     /* מסכי המורה אינם מסך תרגול ואין להתחיל בהם סבב. */
     if(view!=="practice"&&view!=="exam"&&view!=="marks")startRound(activeLevel());
@@ -5071,6 +5073,7 @@ function geo1LessonAction(a,el){
    (נושא 1: מפות - כלי להכרת העולם; סוגי מפות: גלובוס, מפה פיזית, מדינית, נושאית).
    ar/ru/en תרגום מכונה, מסומן באתר. */
 var GEO2_ON=/(^|[?&])lesson=geo2(&|$)/.test(location.search||"");
+var GEO3_ON=/(^|[?&])lesson=geo3(&|$)/.test(location.search||"");
 var G2STR={
 he:{g2Title:"שיעור: לכל שאלה — מפה אחרת",g2Goal:"המטרה: לגלות שיש סוגים שונים של מפות, ושבוחרים מפה לפי מה שרוצים לדעת.",g2Start:"מתחילים",g2Step:"שלב {0} מתוך 5",
     g2V1:"יוסי רוצה לדעת איפה יש הרים, דנה מחפשת את הגבול בין שתי מדינות, ואמא בודקת איפה ירד גשם. האם כולם צריכים את אותה מפה?",g2V1b:"לחצו על הכפתור וגלו ארבעה סוגים של מפות — ומה כל אחת מראה.",g2Reveal:"גלו את סוגי המפות",
@@ -5116,7 +5119,7 @@ ar:{g2Title:"درس: لكل سؤال - خريطة مختلفة",g2Goal:"الهد
     g2Sum:"انتهيتم! اليوم تعلمنا: هناك أنواع مختلفة من الخرائط - طبيعية، سياسية، موضوعية وكرة أرضية - ونختار الخريطة حسب ما نريد معرفته.",
     g2Again:"من البداية",g2Next:"التالي",g2Hear:"استمعوا",g2Correct:"صحيح!",g2Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",g2Check:"فحص الفهم",
     g2C1:"كرة أرضية",g2C1r:"نموذج دائري للأرض",g2C2:"خريطة طبيعية",g2C2r:"تُظهر أشكال التضاريس",g2C3:"خريطة سياسية",g2C3r:"تُظهر الدول والحدود",g2C4:"خريطة موضوعية",g2C4r:"تُظهر موضوعًا واحدًا"}};
-G2STR.he.g2HintQ="מפה פיזית מראה נוף - הרים ונהרות. גלובוס מראה את כל כדור הארץ. מי נשאר?";G2STR.en.g2HintQ="A physical map shows landscape - mountains and rivers. A globe shows the whole Earth. Who is left?";G2STR.ru.g2HintQ="Физическая карта показывает природу - горы и реки. Глобус показывает всю Землю. Что остаётся?";G2STR.ar.g2HintQ="الخريطة الطبيعية تُظهر التضاريس - الجبال والأنهار. والكرة الأرضية تُظهر الأرض كلها. ما الذي يتبقى؟";G2STR.he.g2HintP1="גבולות בין מדינות החליטו בני אדם - מה נשאר שהטבע עצמו יצר?";G2STR.en.g2HintP1="Borders between countries were decided by people - what is left that nature itself created?";G2STR.ru.g2HintP1="Границы между странами решили люди - что остаётся из того, что создала сама природа?";G2STR.ar.g2HintP1="الحدود بين الدول قررها البشر - ما الذي يتبقى مما خلقته الطبيعة نفسها؟";G2STR.he.g2HintP2="מפה מדינית עוסקת בגבולות, וגלובוס הוא כדור של כדור הארץ - מי נשאר?";G2STR.en.g2HintP2="A political map is about borders, and a globe is a ball of the Earth - who is left?";G2STR.ru.g2HintP2="Политическая карта - про границы, а глобус - шар Земли. Что остаётся?";G2STR.ar.g2HintP2="الخريطة السياسية تتعلق بالحدود، والكرة الأرضية هي مجسّم للأرض - ما الذي يتبقى؟";G2STR.he.g2BackUnits="חזרה ליחידות";G2STR.en.g2BackUnits="Back to units";G2STR.ru.g2BackUnits="К разделам";G2STR.ar.g2BackUnits="عودة إلى الوحدات";
+G2STR.he.g2HintQ="מפה פיזית מראה נוף - הרים ונהרות. גלובוס מראה את כל כדור הארץ. מי נשאר?";G2STR.en.g2HintQ="A physical map shows landscape - mountains and rivers. A globe shows the whole Earth. Who is left?";G2STR.ru.g2HintQ="Физическая карта показывает природу - горы и реки. Глобус показывает всю Землю. Что остаётся?";G2STR.ar.g2HintQ="الخريطة الطبيعية تُظهر التضاريس - الجبال والأنهار. والكرة الأرضية تُظهر الأرض كلها. ما الذي يتبقى؟";G2STR.he.g2HintP1="גבולות בין מדינות החליטו בני אדם - מה נשאר שהטבע עצמו יצר?";G2STR.en.g2HintP1="Borders between countries were decided by people - what is left that nature itself created?";G2STR.ru.g2HintP1="Границы между странами решили люди - что остаётся из того, что создала сама природа?";G2STR.ar.g2HintP1="الحدود بين الدول قررها البشر - ما الذي يتبقى مما خلقته الطبيعة نفسها؟";G2STR.he.g2HintP2="מפה מדינית עוסקת בגבולות, וגלובוס הוא כדור של כדור הארץ - מי נשאר?";G2STR.en.g2HintP2="A political map is about borders, and a globe is a ball of the Earth - who is left?";G2STR.ru.g2HintP2="Политическая карта - про границы, а глобус - шар Земли. Что остаётся?";G2STR.ar.g2HintP2="الخريطة السياسية تتعلق بالحدود، والكرة الأرضية هي مجسّم للأرض - ما الذي يتبقى؟";G2STR.he.g2BackUnits="חזרה ליחידות";G2STR.en.g2BackUnits="Back to units";G2STR.ru.g2BackUnits="К разделам";G2STR.ar.g2BackUnits="عودة إلى الوحدات";G2STR.he.g2NextLesson="לשיעור הבא";G2STR.en.g2NextLesson="Next lesson";G2STR.ru.g2NextLesson="Следующий урок";G2STR.ar.g2NextLesson="الدرس التالي";
 function g2t(k){var d=G2STR[state.settings.lang||"he"]||G2STR.he;var v=d[k];return v===undefined?(G2STR.en[k]||k):v}
 var G2SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function g2Scene(revealed){
@@ -5174,7 +5177,8 @@ function geo2LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g2t("g2Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g2again",g2t("g2Again"),'background:#0e9c8d;color:#fff;font-weight:700')+g2HearBtn(g2t("g2Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-geography-elem" style="color:#1d4ed8;font-weight:600">'+esc(g2t("g2BackUnits"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-geography-elem&lesson=geo3" style="color:#1d4ed8;font-weight:600">'+esc(g2t("g2NextLesson"))+'</a></p>';
+    h+='<p style="margin-top:8px"><a href="?internal=shlav-internal-geography-elem" style="color:#1d4ed8;font-weight:600">'+esc(g2t("g2BackUnits"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5189,6 +5193,164 @@ function geo2LessonAction(a,el){
   else if(a==="g2hear"){speak(el.getAttribute("data-say"))}
 }
 
+
+/* ================= geo3: כיוונים וקווי אורך ורוחב ================= */
+var G3STR={
+he:{g3Title:"שיעור: כיוונים וקווי אורך ורוחב",g3Goal:"המטרה: להכיר את שושנת הרוחות ואת הרשת הגאוגרפית - קווי אורך וקווי רוחב - ולדעת איך מוצאים מקום במפה.",g3Step:"שלב {0} מתוך 5",g3Start:"מתחילים",g3Hear:"השמיעו",
+g3V1:"שושנת הרוחות מראה את ארבעת הכיוונים: צפון, דרום, מזרח ומערב. במפות מסמנים אותם באותיות לועזיות: N צפון, S דרום, E מזרח, W מערב.",
+g3V1b:"גלו את שושנת הרוחות וראו לאן פונה כל כיוון.",g3Reveal:"גלו את שושנת הרוחות",
+g3V2:"ככה נראית שושנת הרוחות: צפון למעלה, דרום למטה, מזרח בצד אחד ומערב בצד השני. בכל מפה נחפש קודם את שושנת הרוחות או חץ צפון.",
+g3Next:"הבא",g3Check:"בדיקת הבנה",
+g3Q:"דנה עומדת בתל אביב ורוצה לנסוע לחיפה. איפה חיפה ביחס לתל אביב?",g3A0:"דרומית לתל אביב",g3A1:"צפונית לתל אביב",g3A2:"מזרחית לתל אביב",
+g3Why0:"דרום זה למטה במפה - חיפה לא שם.",g3Why2:"מזרח זה הצד שבו זורחת השמש - חיפה על החוף, לא שם.",
+g3Correct:"נכון!",g3Wrong:"עוד לא. אפשר לנסות שוב.",
+g3Rule:"הכלל: קווי הרוחב מקיפים את כדור הארץ במקביל לקו המשווה, וקווי האורך עוברים מקוטב לקוטב. יחד הם יוצרים רשת גאוגרפית שעוזרת למצוא כל מקום.",
+g3RuleEx:"קו המשווה הוא קו הרוחב הראשי - מעלה 0. קו גריניץ' הוא קו האורך הראשי - גם הוא מעלה 0.",
+g3P1:"מה נכון לגבי קווי הרוחב?",g3P1a0:"הם עוברים מקוטב לקוטב",g3P1a1:"הם מקבילים לקו המשווה",g3P1a2:"הם מתחילים בקו גריניץ'",
+g3P2:"ירושלים נמצאת בערך בקו רוחב 32 צפון ובקו אורך 35 מזרח. איזה מספר מודד את המרחק שלה מקו גריניץ'?",g3P2a0:"32",g3P2a1:"0",g3P2a2:"35",
+g3Sum:"סיימתם! היום למדנו: שושנת הרוחות מראה כיוונים, וקווי אורך ורוחב יוצרים רשת שעוזרת למצוא מקומות במפה.",
+g3Again:"מההתחלה",g3BackUnits:"חזרה ליחידות",
+g3HintQ:"זכרו את הכלל של שושנת הרוחות: איזה כיוון נמצא בחלק העליון של המפה? ואיפה חיפה ביחס לתל אביב?",
+g3HintP1:"מקוטב לקוטב עוברים קווי האורך, וגריניץ' הוא קו אורך - מי נשאר?",
+g3HintP2:"קו גריניץ' הוא קו אורך - אז איזה מספר מודד מרחק ממנו: המספר של קו הרוחב או של קו האורך?",
+g3D_N:"צפון",g3D_S:"דרום",g3D_E:"מזרח",g3D_W:"מערב",g3Grid:"הרשת הגאוגרפית: קווי רוחב וקווי אורך"},
+en:{g3Title:"Lesson: directions and lines of longitude and latitude",g3Goal:"The goal: get to know the compass rose and the geographic grid - lines of longitude and latitude - and learn how to find a place on a map.",g3Step:"Step {0} of 5",g3Start:"Start",g3Hear:"Listen",
+g3V1:"The compass rose shows the four directions: north, south, east and west. On maps they are marked with Latin letters: N for north, S for south, E for east, W for west.",
+g3V1b:"Reveal the compass rose and see where each direction points.",g3Reveal:"Reveal the compass rose",
+g3V2:"This is what the compass rose looks like: north at the top, south at the bottom, east on one side and west on the other. On every map we first look for the compass rose or a north arrow.",
+g3Next:"Next",g3Check:"Understanding check",
+g3Q:"Dana is in Tel Aviv and wants to travel to Haifa. Where is Haifa relative to Tel Aviv?",g3A0:"South of Tel Aviv",g3A1:"North of Tel Aviv",g3A2:"East of Tel Aviv",
+g3Why0:"South is at the bottom of the map - Haifa is not there.",g3Why2:"East is the side where the sun rises - Haifa is on the coast, not there.",
+g3Correct:"Correct!",g3Wrong:"Not yet. You can try again.",
+g3Rule:"The rule: lines of latitude circle the Earth parallel to the equator, and lines of longitude run from pole to pole. Together they form a geographic grid that helps find any place.",
+g3RuleEx:"The equator is the main line of latitude - 0 degrees. The Greenwich line is the main line of longitude - also 0 degrees.",
+g3P1:"What is true about lines of latitude?",g3P1a0:"They run from pole to pole",g3P1a1:"They are parallel to the equator",g3P1a2:"They start at the Greenwich line",
+g3P2:"Jerusalem is at about latitude 32 north and longitude 35 east. Which number measures its distance from the Greenwich line?",g3P2a0:"32",g3P2a1:"0",g3P2a2:"35",
+g3Sum:"Done! Today we learned: the compass rose shows directions, and lines of longitude and latitude form a grid that helps find places on a map.",
+g3Again:"From the start",g3BackUnits:"Back to units",
+g3HintQ:"Remember the compass rose rule: which direction is at the top of the map? And where is Haifa relative to Tel Aviv?",
+g3HintP1:"Lines of longitude run from pole to pole, and Greenwich is a line of longitude - who is left?",
+g3HintP2:"The Greenwich line is a line of longitude - so which number measures distance from it: the latitude number or the longitude number?",
+g3D_N:"North",g3D_S:"South",g3D_E:"East",g3D_W:"West",g3Grid:"The geographic grid: lines of latitude and longitude"},
+ru:{g3Title:"Урок: направления и линии долготы и широты",g3Goal:"Цель: познакомиться с розой ветров и географической сеткой - линиями долготы и широты - и научиться находить место на карте.",g3Step:"Шаг {0} из 5",g3Start:"Начать",g3Hear:"Слушать",
+g3V1:"Роза ветров показывает четыре направления: север, юг, восток и запад. На картах их отмечают латинскими буквами: N - север, S - юг, E - восток, W - запад.",
+g3V1b:"Откройте розу ветров и посмотрите, куда указывает каждое направление.",g3Reveal:"Открыть розу ветров",
+g3V2:"Вот как выглядит роза ветров: север вверху, юг внизу, восток с одной стороны и запад с другой. На любой карте сначала ищем розу ветров или стрелку севера.",
+g3Next:"Дальше",g3Check:"Проверка понимания",
+g3Q:"Дана находится в Тель-Авиве и хочет поехать в Хайфу. Где находится Хайфа по отношению к Тель-Авиву?",g3A0:"К югу от Тель-Авива",g3A1:"К северу от Тель-Авива",g3A2:"К востоку от Тель-Авива",
+g3Why0:"Юг - это низ карты, Хайфа не там.",g3Why2:"Восток - это сторона, где встаёт солнце, Хайфа на побережье, не там.",
+g3Correct:"Верно!",g3Wrong:"Пока нет. Можно ещё раз.",
+g3Rule:"Правило: линии широты окружают Землю параллельно экватору, а линии долготы проходят от полюса к полюсу. Вместе они образуют географическую сетку, которая помогает найти любое место.",
+g3RuleEx:"Экватор - главная линия широты, 0 градусов. Гринвичский меридиан - главная линия долготы, тоже 0 градусов.",
+g3P1:"Что верно о линиях широты?",g3P1a0:"Они проходят от полюса к полюсу",g3P1a1:"Они параллельны экватору",g3P1a2:"Они начинаются на Гринвичском меридиане",
+g3P2:"Иерусалим находится примерно на широте 32 северной и долготе 35 восточной. Какое число измеряет его расстояние от Гринвичского меридиана?",g3P2a0:"32",g3P2a1:"0",g3P2a2:"35",
+g3Sum:"Готово! Сегодня мы узнали: роза ветров показывает направления, а линии долготы и широты образуют сетку, которая помогает находить места на карте.",
+g3Again:"Сначала",g3BackUnits:"К урокам",
+g3HintQ:"Вспомните правило розы ветров: какое направление находится в верхней части карты? И где Хайфа по отношению к Тель-Авиву?",
+g3HintP1:"От полюса к полюсу проходят линии долготы, а Гринвич - линия долготы. Что остаётся?",
+g3HintP2:"Гринвичский меридиан - линия долготы. Какое число измеряет расстояние от него: число широты или число долготы?",
+g3D_N:"Север",g3D_S:"Юг",g3D_E:"Восток",g3D_W:"Запад",g3Grid:"Географическая сетка: линии широты и долготы"},
+ar:{g3Title:"درس: الاتجاهات وخطوط الطول والعرض",g3Goal:"الهدف: التعرف على وردة الرياح والشبكة الجغرافية - خطوط الطول والعرض - ومعرفة كيفية إيجاد مكان على الخريطة.",g3Step:"الخطوة {0} من 5",g3Start:"ابدأوا",g3Hear:"استمعوا",
+g3V1:"تُظهر وردة الرياح الاتجاهات الأربعة: الشمال والجنوب والشرق والغرب. في الخرائط تُرمز إليها بحروف لاتينية: N للشمال، S للجنوب، E للشرق، W للغرب.",
+g3V1b:"اكشفوا وردة الرياح وشاهدوا إلى أين يتجه كل اتجاه.",g3Reveal:"اكشفوا وردة الرياح",
+g3V2:"هكذا تبدو وردة الرياح: الشمال في الأعلى، الجنوب في الأسفل، الشرق في جهة والغرب في الجهة الأخرى. في كل خريطة نبحث أولًا عن وردة الرياح أو سهم الشمال.",
+g3Next:"التالي",g3Check:"فحص الفهم",
+g3Q:"دانا في تل أبيب وتريد السفر إلى حيفا. أين تقع حيفا بالنسبة إلى تل أبيب؟",g3A0:"جنوب تل أبيب",g3A1:"شمال تل أبيب",g3A2:"شرق تل أبيب",
+g3Why0:"الجنوب في أسفل الخريطة - حيفا ليست هناك.",g3Why2:"الشرق هو الجهة التي تشرق منها الشمس - حيفا على الساحل، ليست هناك.",
+g3Correct:"صحيح!",g3Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",
+g3Rule:"القاعدة: خطوط العرض تطوّق الأرض بالتوازي مع خط الاستواء، وخطوط الطول تمتد من القطب إلى القطب. معًا تكوّن شبكة جغرافية تساعد على إيجاد أي مكان.",
+g3RuleEx:"خط الاستواء هو خط العرض الرئيسي - الدرجة 0. خط غرينيتش هو خط الطول الرئيسي - وهو أيضًا الدرجة 0.",
+g3P1:"ما الصحيح عن خطوط العرض؟",g3P1a0:"تمتد من القطب إلى القطب",g3P1a1:"إنها موازية لخط الاستواء",g3P1a2:"تبدأ من خط غرينيتش",
+g3P2:"تقع القدس تقريبًا على خط عرض 32 شمالًا وخط طول 35 شرقًا. أي رقم يقيس بُعدها عن خط غرينيتش؟",g3P2a0:"32",g3P2a1:"0",g3P2a2:"35",
+g3Sum:"انتهيتم! اليوم تعلمنا: وردة الرياح تُظهر الاتجاهات، وخطوط الطول والعرض تكوّن شبكة تساعد على إيجاد الأماكن على الخريطة.",
+g3Again:"من البداية",g3BackUnits:"العودة إلى الوحدات",
+g3HintQ:"تذكروا قاعدة وردة الرياح: أي اتجاه يقع في الجزء العلوي من الخريطة؟ وأين حيفا بالنسبة إلى تل أبيب؟",
+g3HintP1:"من القطب إلى القطب تمتد خطوط الطول، وغرينيتش خط طول - ما الذي يتبقى؟",
+g3HintP2:"خط غرينيتش هو خط طول - فأي رقم يقيس البعد عنه: رقم خط العرض أم رقم خط الطول؟",
+g3D_N:"شمال",g3D_S:"جنوب",g3D_E:"شرق",g3D_W:"غرب",g3Grid:"الشبكة الجغرافية: خطوط العرض والطول"}};
+function g3t(k){var d=G3STR[state.settings.lang||"he"]||G3STR.he;var v=d[k];return v===undefined?(G3STR.en[k]||k):v}
+var G3SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+function g3StepText(st){if(st.step===0)return g3t("g3Goal");if(st.step===1)return g3t(st.revealed?"g3V2":"g3V1")+(st.revealed?"":" "+g3t("g3V1b"));if(st.step===2)return g3t("g3Check")+". "+g3t("g3Q");if(st.step===3)return g3t("g3Rule")+" "+g3t("g3RuleEx");if(st.step===4)return g3t("g3P1")+(st.p1===1?" "+g3t("g3P2"):"");return g3t("g3Sum")}
+function g3Scene(revealed){
+  var items=[["N","g3D_N"],["E","g3D_E"],["S","g3D_S"],["W","g3D_W"]];
+  var h='<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
+    return '<div class="card" style="text-align:center;padding:18px 22px;min-width:104px">'+
+      '<div style="font-size:2.4rem;font-weight:800;color:#1d4ed8">'+it[0]+'</div>'+
+      (revealed?'<div style="margin-top:8px;font-weight:700;color:#0e9c8d;font-size:1rem">'+esc(g3t(it[1]))+'</div>':'<div style="margin-top:8px;font-weight:700;color:#94a3b8">?</div>')+
+      '</div>';
+  }).join("")+'</div>';
+  if(revealed){
+    h+='<div style="text-align:center;margin:6px 0 2px"><svg viewBox="0 0 220 150" width="220" height="150" role="img" aria-label="'+esc(g3t("g3Grid"))+'" style="max-width:100%">'+
+      '<rect x="10" y="10" width="200" height="130" rx="12" fill="#eaf3fb" stroke="#94b8d8" stroke-width="2"/>'+
+      '<line x1="10" y1="53" x2="210" y2="53" stroke="#1d4ed8" stroke-width="1.6"/><line x1="10" y1="97" x2="210" y2="97" stroke="#1d4ed8" stroke-width="1.6"/>'+
+      '<line x1="77" y1="10" x2="77" y2="140" stroke="#0e9c8d" stroke-width="1.6"/><line x1="143" y1="10" x2="143" y2="140" stroke="#0e9c8d" stroke-width="1.6"/>'+
+      '<circle cx="110" cy="75" r="5" fill="#b45309"/>'+
+      '<path d="M118 12 L118 34 M112 26 L118 34 L124 26" stroke="#b45309" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'+
+      '<text x="126" y="30" font-size="14" font-weight="800" fill="#b45309">N</text>'+
+      '</svg><div style="font-size:.9rem;color:#475569;margin-top:4px">'+esc(g3t("g3Grid"))+'</div></div>';
+  }
+  return h;
+}
+function g3HearBtn(text){return '<button class="btn btn-g" data-a="g3hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(g3t("g3Hear"))+'</button>'}
+function geo3LessonView(){
+  var st=G3SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
+  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(g3t("g3Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(g3t("g3Title"))+'</h1>';
+  h+='<div style="margin:-6px 0 12px">'+gStepBtn(g3StepText(st))+'</div>';
+  if(st.step===0){
+    h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(g3t("g3Goal"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+lsBtn("g3next",g3t("g3Start"),'background:#1d4ed8;color:#fff;font-weight:700')+g3HearBtn(g3t("g3Goal"))+'</div>';
+  }else if(st.step===1){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g3t(st.revealed?"g3V2":"g3V1"))+'</p>';
+    h+=g3Scene(st.revealed);
+    if(!st.revealed){
+      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(g3t("g3V1b"))+'</p>';
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g3reveal",g3t("g3Reveal"),'background:#b45309;color:#fff;font-weight:700')+g3HearBtn(g3t("g3V1")+" "+g3t("g3V1b"))+'</div>';
+    }else{
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g3next",g3t("g3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g3HearBtn(g3t("g3V2"))+'</div>';
+    }
+  }else if(st.step===2){
+    h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(g3t("g3Check"))+'</h2>';
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g3t("g3Q"))+'</p>';
+    h+=gHintBtn(g3t("g3HintQ"));
+    h+=g3Scene(true);
+    h+=lsOpts([g3t("g3A0"),g3t("g3A1"),g3t("g3A2")],st.picked,1,"g3pick");
+    if(st.picked>=0){
+      var why=st.picked===1?"":g3t({0:"g3Why0",2:"g3Why2"}[st.picked]);
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?g3t("g3Correct"):g3t("g3Wrong"))+' '+esc(why)+'</p>';
+      if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("g3next",g3t("g3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    }
+  }else if(st.step===3){
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(g3t("g3Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(g3t("g3RuleEx"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("g3next",g3t("g3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g3HearBtn(g3t("g3Rule")+" "+g3t("g3RuleEx"))+'</div>';
+  }else if(st.step===4){
+    h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g3t("g3P1"))+'</p>';
+    h+=gHintBtn(g3t("g3HintP1"));
+    h+=lsOpts([g3t("g3P1a0"),g3t("g3P1a1"),g3t("g3P1a2")],st.p1,1,"g3p1");
+    if(st.p1===1){
+      h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(g3t("g3P2"))+'</p>';
+      h+=gHintBtn(g3t("g3HintP2"));
+      h+=lsOpts([g3t("g3P2a0"),g3t("g3P2a1"),g3t("g3P2a2")],st.p2,2,"g3p2");
+    }
+    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(g3t("g3Correct"))+'</p><div style="margin-top:10px">'+lsBtn("g3next",g3t("g3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+  }else{
+    h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g3t("g3Sum"))+'</p>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g3again",g3t("g3Again"),'background:#0e9c8d;color:#fff;font-weight:700')+g3HearBtn(g3t("g3Sum"))+'</div>';
+    h+='<p style="margin-top:16px"><a href="?internal=shlav-internal-geography-elem" style="color:#1d4ed8;font-weight:600">'+esc(g3t("g3BackUnits"))+'</a></p>';
+  }
+  return h+'</div>';
+}
+function geo3LessonAction(a,el){
+  var st=G3SN;
+  if(a==="g3next"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  else if(a==="g3reveal"){st.revealed=true;render();speak(g3t("g3V2"))}
+  else if(a==="g3pick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="g3p1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="g3p2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
+  else if(a==="g3again"){G3SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="g3hear"){speak(el.getAttribute("data-say"))}
+}
 
 /* ================= boot ================= */
 applyModes();
@@ -5231,7 +5393,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g105-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g106-pwa1").catch(function(){});
   });
 }
 </script>
