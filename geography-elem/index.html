@@ -76,10 +76,10 @@ html[lang="ru"] body,html[lang="ru"] input,html[lang="ru"] button,
 html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
 /* לכל פעולת חשבון יש צבע קבוע. ילד לומד את הצבע לפני שהוא
    קורא את המילה, וזה עוזר במיוחד למי שהקריאה עצמה מאמצת אותו. */
-.op-add{--op:var(--teal);--op-d:var(--teal-deep);--op-s:var(--teal-soft)}
-.op-sub{--op:var(--coral);--op-d:var(--coral-deep);--op-s:var(--coral-soft)}
-.op-mul{--op:var(--amber);--op-d:var(--amber-deep);--op-s:var(--amber-soft)}
-.op-div{--op:var(--sky);--op-d:var(--sky-deep);--op-s:var(--sky-soft)}
+.op-maps{--op:var(--teal);--op-d:var(--teal-deep);--op-s:var(--teal-soft)}
+.op-med{--op:var(--coral);--op-d:var(--coral-deep);--op-s:var(--coral-soft)}
+.op-regions{--op:var(--amber);--op-d:var(--amber-deep);--op-s:var(--amber-soft)}
+.op-jeru{--op:var(--sky);--op-d:var(--sky-deep);--op-s:var(--sky-soft)}
 .opdot{display:inline-block;width:13px;height:13px;border-radius:5px;background:var(--op);
   border:2px solid var(--op-d);flex-shrink:0;vertical-align:-2px}
 .opchip{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.88rem;
@@ -161,7 +161,7 @@ html.hi-contrast{
   --hit:#ffe600;--hit-ink:#000000;
 }
 html.hi-contrast .bg{display:none}
-html.hi-contrast .op-add,html.hi-contrast .op-sub,html.hi-contrast .op-mul,html.hi-contrast .op-div{
+html.hi-contrast .op-maps,html.hi-contrast .op-med,html.hi-contrast .op-regions,html.hi-contrast .op-jeru{
   --op:#000;--op-d:#000;--op-s:#fff}
 html.hi-contrast .lvl{--lv:#000}
 html.hi-contrast .lvl .n{background:#000;color:#fff}
@@ -432,6 +432,8 @@ footer{border-top:3px solid rgba(23,51,60,.08);background:color-mix(in srgb,var(
 .qask{font-family:var(--font-display);font-weight:600;font-size:1.35rem;text-align:center;color:var(--ink-soft);margin-top:28px}
 .qbig{font-family:var(--font-display);font-weight:700;font-size:3rem;text-align:center;margin-top:6px;direction:ltr;unicode-bidi:isolate;letter-spacing:3px}
 @media(max-width:640px){.qask{font-size:1.1rem}.qbig{font-size:2.3rem}.opt{font-size:1.6rem;padding:16px 8px}}
+.qbig.qtext{font-size:1.3rem;letter-spacing:0;line-height:1.5;font-weight:600;unicode-bidi:plaintext;text-align:start}
+@media(max-width:640px){.qbig.qtext{font-size:1.1rem}}
 /* ===== בורר שפה במסך הפתיחה ===== */
 .oblang{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:99px;border:2px solid rgba(23,51,60,.12);background:var(--card);font-family:var(--font-display);font-weight:600;font-size:.95rem;color:var(--ink-soft);transition:all .15s}
 .oblang:hover{border-color:#2f5fd8;color:var(--ink)}
@@ -966,38 +968,38 @@ appName:"גאוגרפיה ליסודי",appShort:"ליסודי",
 navPractice:"תרגול",navProgress:"התקדמות",navRecords:"שיאנים",navExam:"מבחן",navSettings:"הגדרות",
 level:"רמה",copyLink:"הקישור",copied:"הועתק!",
 footerLove:"נבנה באהבה לכל ילד שלומד אחרת",footerMoe:"תוכנית הלימודים של משרד החינוך",footerSaved:"ההתקדמות נשמרת אוטומטית במכשיר הזה",
-obBadge:"למתקשים, למי שקשה לו לקרוא — ולכל מי שלומד אחרת",
+obBadge:"למי שקשה לקרוא, ולכל מי שלומד אחרת",
 obTitle1:"גאוגרפיה",obTitle2:"לבית הספר",obTitle3:"היסודי",
-obIntro:"לא צריך להיות חוקר מפות כדי לאהוב גאוגרפיה — צריך את הקצב הנכון, את הרמז הנכון, וחבר שלא מוותר עליכם.",
-feat1t:"הכול מוקרא בקול",feat1d:"כל שאלה, רמז ומחמאה — בקול נעים שבחרתם",
-feat2t:"רמזים בדיוק כשקשה",feat2d:"רמזים מדורגים + ציורים ברורים, בלי לפתור במקומכם",
+obIntro:"לא צריך להיות חוקר מפות כדי לאהוב גאוגרפיה. צריך את הקצב הנכון, את הרמז הנכון, וחבר שלא מוותר עליכם.",
+feat1t:"הכול מוקרא בקול",feat1d:"כל שאלה, רמז ומחמאה, בקול נעים שבחרתם",
+feat2t:"רמזים בדיוק כשקשה",feat2d:"רמזים מדורגים וציורים ברורים, בלי לפתור במקומכם",
 feat3t:"חברה שמעודדת",feat3d:"לימור חוגגת איתכם כל הצלחה, ומלווה כל טעות בסבלנות",
 step1:"זו לימור, החברה שלכם ללמידה",step2:"אפשר לתת לה שם אחר",
-namePh:"קודם בוחרים חבר למעלה",takeSugg:"קח את",start:"יאללה, מתחילים!",
-obNote:"אפשר לשנות הכול אחר כך בהגדרות — גם את החבר, גם את הקול",
+namePh:"קודם בוחרים חבר למעלה",takeSugg:"קחו את",start:"יאללה, מתחילים!",
+obNote:"אפשר לשנות הכול אחר כך בהגדרות, גם את החבר וגם את הקול",
 petFox:"שועל",petJosh:"רובוט",petOwl:"ינשוף",
 petFoxName:"ג׳ינג׳י",petJoshName:"לימור",petOwlName:"חוגית",
-hello:"היי! אני {name}. בואו נגלו גאוגרפיה ביחד — בקצב שלכם, בלי למהר.",
-qOf:"שאלה {a} מתוך {b}",listen:"תקריא לי",
-kindAdd:"חיבור",kindSub:"חיסור",kindMul:"כפל",kindDiv:"חילוק",
-weakTitle:"שמתי לב למשהו",weakMsg:"{op} קצת מאתגר עכשיו. בואו נתרגל את זה ביחד — חמש שאלות קלות יותר.",weakNear:"אתם ממש קרובים בכל פעם! ב{op} חסר רק חידוד קטן. בואו ננסה ביחד.",weakBtn:"יאללה, בואו נתרגל",weakLater:"אולי אחר כך",focusBadge:"תרגול ממוקד",focusDone:"רואה? זה לא כזה קשה! 💪",focusSub:"סיימתם תרגול ממוקד ב{op}",
+hello:"היי! אני {name}. בואו נגלו גאוגרפיה ביחד, בקצב שלכם, בלי למהר.",
+qOf:"שאלה {a} מתוך {b}",listen:"תקריאו לי",
+kindMaps:"מפות",kindMed:"אגן הים התיכון",kindRegions:"אזורי הארץ",kindJeru:"ירושלים",challenge:"אתגר",
+weakTitle:"שמתי לב למשהו",weakMsg:"{op} קצת מאתגר עכשיו. בואו נתרגל את זה ביחד, חמש שאלות קלות יותר.",weakNear:"אתם ממש קרובים בכל פעם! ב{op} חסר רק חידוד קטן. בואו ננסה ביחד.",weakBtn:"יאללה, בואו נתרגל",weakLater:"אולי אחר כך",focusBadge:"תרגול ממוקד",focusDone:"רואה? זה לא כזה קשה! 💪",focusSub:"סיימתם תרגול ממוקד ב{op}",
 hintBtn:"קשה? קחו רמז",sayOpt:"תקריאו לי את התשובה",skip:"מדלגים",breakBtn:"הפסקה קטנה",next:"ממשיכים הלאה",
-praise:"מעולה! ההתמדה שלכם השתלמה!",effort:"נכון! ראיתי כמה התאמצתם — וזה עבד!",
+praise:"מעולה! ההתמדה שלכם השתלמה!",effort:"נכון! ראיתי כמה התאמצתם, וזה עבד!",
 enc:"כמעט! בואו נחשוב על זה ביחד עוד פעם",calmMsg:"כל הכבוד על הניסיון! בואו נראה ביחד את הפתרון",
 revealPre:"התשובה היא {a}.",
-doneTitle:"סיבוב מושלם של התמדה!",doneSub:"{a} מתוך {b} — והחבר שלכם גאה בכם מאוד",
-doneLow:"היה קשה היום — וזה בסדר גמור",subLow:"{a} מתוך {b} — הכי חשוב שלא ויתרתם",
-doneMid:"התקדמתם יפה!",subMid:"{a} מתוך {b} — והחבר שלכם גאה בכם",
-doneHigh:"סיבוב מעולה!",subHigh:"{a} מתוך {b} — והחבר שלכם גאה בכם מאוד",
+doneTitle:"סיבוב מושלם של התמדה!",doneSub:"{a} מתוך {b}. והחבר שלכם גאה בכם מאוד",
+doneLow:"היה קשה היום, וזה בסדר גמור",subLow:"{a} מתוך {b}. הכי חשוב שלא ויתרתם",
+doneMid:"התקדמתם יפה!",subMid:"{a} מתוך {b}. והחבר שלכם גאה בכם",
+doneHigh:"סיבוב מעולה!",subHigh:"{a} מתוך {b}. והחבר שלכם גאה בכם מאוד",
 doneOk:"תשובות נכונות",doneXp:"נקודות בסיבוב",streak:"רצף נוכחי",doneBtn:"עוד סיבוב",
 breatheTitle:"הפסקה קטנה",breatheIn:"שואפים לאט...",breatheOut:"ונושפים לאט...",breatheClose:"חוזרים לתרגול",
 dailyTag:"השאלה של היום!",dailyDesc:"עונים נכון ומקבלים בונוס של 25 נקודות",
 levelAuto:"אוטומטי",lvl1:"מתחילים",lvl2:"קל",lvl3:"בינוני",lvl4:"מתקדם",lvl5:"אתגר",lvl6:"אלופים",
 levelChange:"עוברים לרמת {name}! אני איתכם",skipMsg:"מדלגים הלאה! השאלה הבאה כבר מחכה",
-noHints:"נתתי את כל הרמזים שלי — נסו, אני מאמין בכם!",
+noHints:"נתתי את כל הרמזים שלי. נסו, אני מאמינה בכם!",
 visualTitle:"נסו לספור את הנקודות",
-slowBtn:"עזרה מלאה — צעד־צעד",slowAdd:"בואו נספור ביחד!",slowSub:"בואו נספור אחורה!",slowHave:"יש לנו {a}",slowPlus:"עכשיו נוסיף {b}",slowMinus:"עכשיו נוריד {b}",slowGotAdd:"הגענו ל־{r}! 🎉",slowGotSub:"נשאר לנו {r}! 🎉",slowNext:"הצעד הבא",slowBack:"אחורה",slowAgain:"שוב מהתחלה",slowPlay:"הפעלה",slowStop:"עצירה",
-slowMul:"בואו נספור בקבוצות!",slowByTens:"קודם קופצים {n} קפיצות של עשר",slowByOnes:"ועכשיו {n} צעדים של אחד",slowGroups:"נסדר {a} קבוצות",slowEach:"בכל קבוצה נשים {b}",slowGotMul:"{a} קבוצות של {b} — יחד {r}! 🎉",slowDiv:"בואו נחלק שווה בשווה!",slowSplit:"נחלק את ה־{a} ל־{b} קבוצות שוות",slowRound:"לכל קבוצה נתנו {n}",slowGotDiv:"בכל קבוצה יצאו {r}! 🎉",
+slowBtn:"עזרה מלאה, צעד־צעד",slowAdd:"בואו נספור ביחד!",slowSub:"בואו נספור אחורה!",slowHave:"יש לנו {a}",slowPlus:"עכשיו נוסיף {b}",slowMinus:"עכשיו נוריד {b}",slowGotAdd:"הגענו ל־{r}! 🎉",slowGotSub:"נשאר לנו {r}! 🎉",slowNext:"הצעד הבא",slowBack:"אחורה",slowAgain:"שוב מהתחלה",slowPlay:"הפעלה",slowStop:"עצירה",
+slowMul:"בואו נספור בקבוצות!",slowByTens:"קודם קופצים {n} קפיצות של עשר",slowByOnes:"ועכשיו {n} צעדים של אחד",slowGroups:"נסדר {a} קבוצות",slowEach:"בכל קבוצה נשים {b}",slowGotMul:"{a} קבוצות של {b}, יחד {r}! 🎉",slowDiv:"בואו נחלק שווה בשווה!",slowSplit:"נחלק את ה־{a} ל־{b} קבוצות שוות",slowRound:"לכל קבוצה נתנו {n}",slowGotDiv:"בכל קבוצה יצאו {r}! 🎉",
 qAdd:"כמה זה {a} + {b}?",qSub:"כמה זה {a} − {b}?",qMul:"כמה זה {a} × {b}?",qDiv:"כמה זה {a} ÷ {b}?",ask:"כמה זה?",
 explain:"ספרנו {b} צעדים קדימה מ־{a}, והגענו ל־{ans}.",
 hint1:"דמיינו {a} סוכריות, ועוד {b} כאלה. כמה יש ביחד?",hint2:"התחילו מהמספר הגדול וספרו ממנו קדימה.",
@@ -1006,307 +1008,307 @@ hint1Add:"דמיינו {a} סוכריות, ועוד {b} כאלה. כמה יש ב
 /* חיסור */
 hint1Sub:"יש לכם {a} סוכריות, ולוקחים מהן {b}. כמה נשארו?",hint2Sub:"התחילו מ־{a} וספרו אחורה {b} צעדים.",explainSub:"ספרנו {b} צעדים אחורה מ־{a}, ונשארנו עם {ans}.",
 /* כפל */
-hint1Mul:"זה {a} קבוצות, ובכל אחת {b}. כמה יש בסך הכול?",hint2Mul:"אפשר לחבר {b} אל עצמו {a} פעמים.",explainMul:"{a} קבוצות של {b} — יחד זה {ans}.",
+hint1Mul:"זה {a} קבוצות, ובכל אחת {b}. כמה יש בסך הכול?",hint2Mul:"אפשר לחבר {b} אל עצמו {a} פעמים.",explainMul:"{a} קבוצות של {b}, יחד זה {ans}.",
 /* חילוק */
 hint1Div:"יש {a} סוכריות, ומחלקים אותן שווה בשווה ל־{b} ילדים. כמה יקבל כל אחד?",hint2Div:"שאלו את עצמכם: כמה פעמים {b} נכנס בתוך {a}?",explainDiv:"חילקנו {a} ל־{b} קבוצות שוות, ובכל קבוצה יצאו {ans}.",
-progTitle:"ההתקדמות שלי",progSub:"כל מה שהשגתם — במקום אחד",
+progTitle:"ההתקדמות שלי",progSub:"כל מה שהשגתם, במקום אחד",
 progTotal:"תשובות נכונות",progAcc:"דיוק",progBest:"הרצף הכי ארוך",progSessions:"סיבובים שהושלמו",
 progDailies:"אתגרים יומיים",progOpsTitle:"במה התאמנתם?",
-progOpsEmpty:"עוד אין נתונים — אחרי כמה שאלות יופיעו כאן גרפים",
+progOpsEmpty:"עוד אין נתונים. אחרי כמה שאלות יופיעו כאן גרפים",
 progSesTitle:"הסיבובים האחרונים",progWeekTitle:"השבוע שלכם",
-progStrength:"{name} הולך לכם מצוין — המשיכו כך!",progWeak:"כדאי להתאמן קצת על {name}",
+progStrength:"{name} הולך לכם מצוין! המשיכו כך!",progWeak:"כדאי להתאמן קצת על {name}",
 progParentNote:"מסך מצוין להראות להורים ולמורים",progGoPractice:"בואו נתרגל!",
-recTitle:"לוח השיאנים",recSub:"תחרות בריאה — כולם מתקדמים, כולם מרוויחים",
+recTitle:"לוח השיאנים",recSub:"תחרות בריאה: כולם מתקדמים, כולם מרוויחים",
 yourRow:"זה אתם",yourPlace:"המקום שלכם",colRank:"מקום",colName:"שם",colCorrect:"נכונות",colAccuracy:"דיוק",you:"אתם",
 setTitle:"הגדרות",setSub:"מכוונים את האפליקציה בדיוק בשבילכם",
 lsTitle:"סגנון למידה",lsCalm:"מצב רגוע",lsCalmBadge:"מומלץ",
-lsCalmD:"אחרי טעות אחת מקבלים רמז מיד ועוד ניסיון — הפתרון המלא רק אחרי הטעות השנייה",
-sfxTitle:"אפקטי סאונד",sfxDesc:"צלילי דינג, ניצוצות ועידוד — משוב מיידי באוזן",
+lsCalmD:"אחרי טעות אחת מקבלים רמז מיד ועוד ניסיון. הפתרון המלא רק אחרי הטעות השנייה",
+sfxTitle:"אפקטי סאונד",sfxDesc:"צלילי דינג, ניצוצות ועידוד, משוב מיידי באוזן",
 sndTitle:"קול והקראה",sndTts:"הקראה קולית",sndTtsD:"כל השאלות, הרמזים והמחמאות נקראים בקול",
-sndType:"סוג הקול",devVoices:"הקולות של המכשיר — לחצו להשמיע ולהשוות",
+sndType:"סוג הקול",devVoices:"הקולות של המכשיר. לחצו להשמיע ולהשוות",
 autoPick:"בחירה אוטומטית (מומלץ)",play:"להשמיע",
 naturalTag:"קול טבעי",femaleTag:"נשי",maleTag:"גברי",autoTag:"נבחר אוטומטית",
-moreVoices:"עוד {n} קולות מהמכשיר",noHeVoices:"לא נמצאו קולות עברית — פתחו ב־Edge או Chrome לקולות טבעיים",femNone:"אין במכשיר הזה קול נשי בשפה הנוכחית, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו.",femAndroid:"באנדרואיד: הגדרות ← נגישות ← טקסט לדיבור (בסמסונג: הגדרות ← ניהול כללי ← טקסט לדיבור) ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי.",femIos:"באייפון או באייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.",femMac:"במק: הגדרות המערכת ← נגישות ← תוכן מדובר ← קול המערכת ← ניהול קולות ← להוריד קול נשי.",femWin:"בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.", noVoices:"לא נמצאו קולות עברית במכשיר הזה.",edgeHas:"בדפדפן Microsoft Edge יש קולות טבעיים בשפה הזאת, נשיים וגבריים — בלי התקנה, בחיבור לאינטרנט.",openEdge:"לפתוח את האפליקציה ב-Edge",
+moreVoices:"עוד {n} קולות מהמכשיר",noHeVoices:"לא נמצאו קולות עברית. פתחו ב־Edge או Chrome לקולות טבעיים",femNone:"אין במכשיר הזה קול נשי בשפה הנוכחית, ולכן גובה הקול הורם. זה לא קול נשי אמיתי. כדי לקבל אחד צריך להתקין אותו.",femAndroid:"באנדרואיד: הגדרות ← נגישות ← טקסט לדיבור (בסמסונג: הגדרות ← ניהול כללי ← טקסט לדיבור) ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי.",femIos:"באייפון או באייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.",femMac:"במק: הגדרות המערכת ← נגישות ← תוכן מדובר ← קול המערכת ← ניהול קולות ← להוריד קול נשי.",femWin:"בווינדוס: הגדרות ← שעה ושפה ← דיבור ← ניהול קולות ← הוספת קולות.", noVoices:"לא נמצאו קולות עברית במכשיר הזה.",edgeHas:"בדפדפן Microsoft Edge יש קולות טבעיים בשפה הזאת, נשיים וגבריים, בלי התקנה, בחיבור לאינטרנט.",openEdge:"לפתוח את האפליקציה ב-Edge",
 rate:"מהירות הקראה",pitch:"גובה הצליל",slow:"לאט",fast:"מהר",low:"נמוך",high:"גבוה",sample:"השמע דוגמה",
 gSample:"שלום! ככה אני נשמעת. בואו נלמד גאוגרפיה ביחד!",
 linkTitle:"הקישור לאפליקציה",
-linkDesc:"הכתובת של הבית שלכם — למועדפים, לוואטסאפ, או לפתיחה ב־Edge לקולות הטבעיים.",
+linkDesc:"הכתובת של הבית שלכם: למועדפים, לוואטסאפ, או לפתיחה ב־Edge לקולות הטבעיים.",
 linkCopy:"העתקת הקישור",linkCopied:"הקישור הועתק!",
-langTitle:"שפת האפליקציה",langDesc:"הכול מתורגם — כולל הקול של לימור והשאלות",
-themeTitle:"הצבע שלכם",themeDesc:"בוחרים צבע לאפליקציה — הכול נשמר",
+langTitle:"שפת האפליקציה",langDesc:"הכול מתורגם, כולל הקול של לימור והשאלות. ערבית, רוסית ואנגלית: תרגום מכונה.",
+themeTitle:"הצבע שלכם",themeDesc:"בוחרים צבע לאפליקציה. הכול נשמר",
 themeOcean:"ים ירוק",themeGrape:"ענבים",themeBerry:"תות",
-largeText:"אותיות גדולות",largeTextD:"מגדיל את כל הטקסט — קל יותר לקריאה",
+largeText:"אותיות גדולות",largeTextD:"מגדיל את כל הטקסט. קל יותר לקריאה",
 dispTitle:"תצוגה ונוחות קריאה",sizeTitle:"גודל האותיות",size1:"רגיל",size2:"גדול",size3:"ענק",
-clearFont:"פונט ברור",clearFontD:"אותיות פשוטות ומרווחות יותר — נוח יותר לקריאה",
-contrast:"ניגודיות גבוהה",contrastD:"שחור על לבן, בלי רקעים רכים — לראייה חלשה או אור חזק",
+clearFont:"פונט ברור",clearFontD:"אותיות פשוטות ומרווחות יותר. נוח יותר לקריאה",
+contrast:"ניגודיות גבוהה",contrastD:"שחור על לבן, בלי רקעים רכים. לראייה חלשה או אור חזק",
 keysTitle:"מקשי קיצור",keysSpace:"שמיעת השאלה שוב",keysEnter:"ממשיכים הלאה",keysNum:"בחירת תשובה",
-spaced:"מרווחים נדיבים",spacedD:"יותר אוויר בין אותיות ומילים — קל יותר לעקוב אחרי השורה",
+spaced:"מרווחים נדיבים",spacedD:"יותר אוויר בין אותיות ומילים. קל יותר לעקוב אחרי השורה",
 reduceMotion:"הפחתת תנועה",reduceMotionD:"מכבה אנימציות וקונפטי למי שמעדיף מסך רגוע",
 compTitle:"החבר שלכם",compChange:"להחליף חבר או שם",compTogether:"תשובות נכונות ביחד",
 reset:"איפוס כל ההתקדמות",resetSure:"בטוחים? כל הנקודות, הרצפים, המדבקות וההישגים יימחקו לגמרי.",
 resetYes:"כן, מאפסים",resetNo:"ביטול",savedNote:"כל ההגדרות נשמרות אוטומטית במכשיר שלכם",
-stickerTitle:"המדבקות של {name}",stickerEmpty:"עדיין אין מדבקות — הן מחכות לכם בסיבוב הראשון!",
+stickerTitle:"המדבקות של {name}",stickerEmpty:"עדיין אין מדבקות. הן מחכות לכם בסיבוב הראשון!",
 st1:"הצעד הראשון",st2:"סיבוב ראשון",st3:"עשר נכונות",st4:"רצף של 5",st5:"רמה 3",st6:"חמישים!",st7:"מאה נכונות",st8:"אתגר יומי ראשון",st9:"שבוע של אתגרים",
-errTitle:"משהו קטן השתבש",errMsg:"נסו לרענן את הדף. אם זה ממשיך — פתחו את הקישור מחדש.",errBtn:"לרענון הדף"
+errTitle:"משהו קטן השתבש",errMsg:"נסו לרענן את הדף. אם זה ממשיך, פתחו את הקישור מחדש.",errBtn:"לרענון הדף"
 };
 STR.en={
 appName:"Geography for Primary School",appShort:"for primary school",
 navPractice:"Practice",navProgress:"Progress",navRecords:"Leaders",navExam:"Test",navSettings:"Settings",
 level:"Level",copyLink:"Link",copied:"Copied!",
 footerLove:"Built with love for every child who learns differently",footerMoe:"Ministry of Education curriculum",footerSaved:"Progress is saved automatically on this device",
-obBadge:"For strugglers, for anyone who finds reading hard — everyone who learns differently",
+obBadge:"For anyone who finds reading hard, and for everyone who learns differently",
 obTitle1:"Geography",obTitle2:"for primary",obTitle3:"school",
-obIntro:"You don't have to be an explorer to love geography — you need the right pace, the right hint, and a buddy who never gives up on you.",
-feat1t:"Everything read aloud",feat1d:"Every question, hint and compliment — in a voice you chose",
-feat2t:"Hints right when it's hard",feat2d:"Stepped hints + clear pictures, never solving for you",
+obIntro:"You don't have to be an explorer to love geography. You need the right pace, the right hint, and a buddy who never gives up on you.",
+feat1t:"Everything read aloud",feat1d:"Every question, hint and bit of praise, in a pleasant voice you chose",
+feat2t:"Hints right when it's hard",feat2d:"Step-by-step hints and clear pictures, without solving it for you",
 feat3t:"A friend who cheers",feat3d:"Limor celebrates every win with you, and stays patient with every mistake",
 step1:"This is Limor, your learning buddy",step2:"You can give her another name",
 namePh:"Pick a buddy above first",takeSugg:"Take",start:"Let's go!",
-obNote:"You can change everything later in Settings — even the buddy",
+obNote:"You can change everything later in Settings, both the buddy and the voice",
 petFox:"Fox",petJosh:"Robot",petOwl:"Owl",
 petFoxName:"Ginger",petJoshName:"Limor",petOwlName:"Hootie",
-hello:"Hi! I'm {name}. Let's explore geography together — at your pace, no rush.",
-qOf:"Question {a} of {b}",listen:"Read it to me",
-kindAdd:"Addition",kindSub:"Subtraction",kindMul:"Multiplication",kindDiv:"Division",
-weakTitle:"I noticed something",weakMsg:"{op} is a bit tricky right now. Let's practise it together — five easier questions.",weakNear:"You are so close every time! {op} just needs a little sharpening. Let's try together.",weakBtn:"Sure, let's practise",weakLater:"Maybe later",focusBadge:"Focused practice",focusDone:"See? It's not that hard! 💪",focusSub:"You finished focused practice in {op}",
+hello:"Hi! I'm {name}. Let's explore geography together, at your pace, no rush.",
+qOf:"Question {a} of {b}",listen:"Read to me",
+kindMaps:"Maps",kindMed:"The Mediterranean basin",kindRegions:"Regions of the Land",kindJeru:"Jerusalem",challenge:"Challenge",
+weakTitle:"I noticed something",weakMsg:"{op} is a bit challenging right now. Let's practice it together, five easier questions.",weakNear:"You are so close every time! {op} just needs a little sharpening. Let's try together.",weakBtn:"Sure, let's practise",weakLater:"Maybe later",focusBadge:"Focused practice",focusDone:"See? It's not that hard! 💪",focusSub:"You finished focused practice in {op}",
 hintBtn:"Hard? Take a hint",sayOpt:"Read the answer to me",skip:"Skip",breakBtn:"Short break",next:"Keep going",
-praise:"Awesome! Your persistence paid off!",effort:"Yes! I saw how hard you tried — it worked!",
+praise:"Awesome! Your persistence paid off!",effort:"Correct! I saw how hard you tried, and it worked!",
 enc:"Almost! Let's think it through together again",calmMsg:"Great try! Let's look at the solution together",
 revealPre:"The answer is {a}.",
-doneTitle:"A perfect round of persistence!",doneSub:"{a} out of {b} — your buddy is so proud",
-doneLow:"That was a hard one — and that is completely OK",subLow:"{a} out of {b} — what matters is you did not give up",
-doneMid:"Nice progress!",subMid:"{a} out of {b} — your buddy is proud of you",
-doneHigh:"Great round!",subHigh:"{a} out of {b} — your buddy is so proud",
+doneTitle:"A perfect round of persistence!",doneSub:"{a} out of {b}. And your buddy is very proud of you",
+doneLow:"Today was hard, and that's completely okay",subLow:"{a} out of {b}. The most important thing is you didn't give up",
+doneMid:"Nice progress!",subMid:"{a} out of {b}. And your buddy is proud of you",
+doneHigh:"Great round!",subHigh:"{a} out of {b}. And your buddy is very proud of you",
 doneOk:"Correct answers",doneXp:"Points this round",streak:"Current streak",doneBtn:"Another round",
 breatheTitle:"Short break",breatheIn:"Breathe in slowly...",breatheOut:"and out slowly...",breatheClose:"Back to practice",
 dailyTag:"Today's question!",dailyDesc:"Answer correctly for a 25 point bonus",
 levelAuto:"Auto",lvl1:"Starters",lvl2:"Easy",lvl3:"Medium",lvl4:"Advanced",lvl5:"Challenge",lvl6:"Champions",
 levelChange:"Moving to {name} level! I'm with you",skipMsg:"Skipping ahead! The next question is waiting",
-noHints:"I've given all my hints — try it, I believe in you!",
+noHints:"I've given all my hints. Try, I believe in you!",
 visualTitle:"Try counting the dots",
-slowBtn:"Full help — step by step",slowAdd:"Let's count together!",slowSub:"Let's count backwards!",slowHave:"We have {a}",slowPlus:"Now we add {b}",slowMinus:"Now we take away {b}",slowGotAdd:"We reached {r}! 🎉",slowGotSub:"We are left with {r}! 🎉",slowNext:"Next step",slowBack:"Back",slowAgain:"Start again",slowPlay:"Play",slowStop:"Stop",
-slowMul:"Let's count in groups!",slowByTens:"First we jump {n} times by ten",slowByOnes:"And now {n} single steps",slowGroups:"Let's lay out {a} groups",slowEach:"We put {b} in each group",slowGotMul:"{a} groups of {b} — together {r}! 🎉",slowDiv:"Let's share it out equally!",slowSplit:"We share the {a} into {b} equal groups",slowRound:"Each group got {n}",slowGotDiv:"Each group ended up with {r}! 🎉",
+slowBtn:"Full help, step by step",slowAdd:"Let's count together!",slowSub:"Let's count backwards!",slowHave:"We have {a}",slowPlus:"Now we add {b}",slowMinus:"Now we take away {b}",slowGotAdd:"We reached {r}! 🎉",slowGotSub:"We are left with {r}! 🎉",slowNext:"Next step",slowBack:"Back",slowAgain:"Start again",slowPlay:"Play",slowStop:"Stop",
+slowMul:"Let's count in groups!",slowByTens:"First we jump {n} times by ten",slowByOnes:"And now {n} single steps",slowGroups:"Let's lay out {a} groups",slowEach:"We put {b} in each group",slowGotMul:"{a} groups of {b}, together {r}! 🎉",slowDiv:"Let's share it out equally!",slowSplit:"We share the {a} into {b} equal groups",slowRound:"Each group got {n}",slowGotDiv:"Each group ended up with {r}! 🎉",
 qAdd:"How much is {a} + {b}?",qSub:"How much is {a} − {b}?",qMul:"How much is {a} × {b}?",qDiv:"How much is {a} ÷ {b}?",ask:"How much is?",
 explain:"We counted {b} steps forward from {a} and reached {ans}.",
 hint1:"Imagine {a} candies, plus {b} more. How many together?",hint2:"Start from the bigger number and count forward from there.",
 hint1Add:"Imagine {a} candies, plus {b} more. How many together?",hint2Add:"Start from the bigger number and count forward from there.",explainAdd:"We counted {b} steps forward from {a} and reached {ans}.",
 hint1Sub:"You have {a} candies and someone takes {b} away. How many are left?",hint2Sub:"Start at {a} and count backwards {b} steps.",explainSub:"We counted {b} steps back from {a} and were left with {ans}.",
-hint1Mul:"That's {a} groups, with {b} in each one. How many altogether?",hint2Mul:"You can add {b} to itself {a} times.",explainMul:"{a} groups of {b} — together that's {ans}.",
+hint1Mul:"That's {a} groups, with {b} in each one. How many altogether?",hint2Mul:"You can add {b} to itself {a} times.",explainMul:"{a} groups of {b}, together that's {ans}.",
 hint1Div:"There are {a} candies shared equally between {b} kids. How many does each one get?",hint2Div:"Ask yourself: how many times does {b} fit inside {a}?",explainDiv:"We split {a} into {b} equal groups, and each group got {ans}.",
-progTitle:"My progress",progSub:"Everything you've achieved — in one place",
+progTitle:"My progress",progSub:"Everything you've achieved, in one place",
 progTotal:"Correct answers",progAcc:"Accuracy",progBest:"Longest streak",progSessions:"Rounds finished",
 progDailies:"Daily challenges",progOpsTitle:"What have you practiced?",
-progOpsEmpty:"No data yet — graphs appear after a few questions",
+progOpsEmpty:"No data yet. After a few questions, charts will appear here",
 progSesTitle:"Recent rounds",progWeekTitle:"Your week",
-progStrength:"{name} is going great — keep it up!",progWeak:"Worth practicing a bit more: {name}",
+progStrength:"You're doing great at {name}! Keep it up!",progWeak:"Worth practicing a bit more: {name}",
 progParentNote:"A great screen to show parents and teachers",progGoPractice:"Let's practice!",
-recTitle:"Leaders board",recSub:"Healthy competition — everyone advances, everyone wins",
+recTitle:"Leaders board",recSub:"Healthy competition: everyone improves, everyone wins",
 yourRow:"You",yourPlace:"Your place",colRank:"Rank",colName:"Name",colCorrect:"Correct",colAccuracy:"Accuracy",you:"You",
 setTitle:"Settings",setSub:"Tune the app to fit you perfectly",
 lsTitle:"Learning style",lsCalm:"Calm mode",lsCalmBadge:"Recommended",
-lsCalmD:"After one mistake you get a hint right away and another try — the full solution only after the second mistake",
-sfxTitle:"Sound effects",sfxDesc:"Dings, sparkles and cheers — instant feedback for the ear",
+lsCalmD:"After one mistake you get a hint right away and another try. The full solution only after the second mistake",
+sfxTitle:"Sound effects",sfxDesc:"Ding sounds, sparkles and encouragement, instant feedback in your ear",
 sndTitle:"Voice & read-aloud",sndTts:"Read aloud",sndTtsD:"All questions, hints and compliments are spoken",
-sndType:"Voice type",devVoices:"Device voices — tap to play and compare",
+sndType:"Voice type",devVoices:"The device voices. Press to play and compare",
 autoPick:"Automatic pick (recommended)",play:"Play",
 naturalTag:"Natural",femaleTag:"Female",maleTag:"Male",autoTag:"Auto-selected",
-moreVoices:"{n} more device voices",noHeVoices:"No Hebrew voices found — open in Edge or Chrome for natural voices",femNone:"This device has no female voice for the current language, so the pitch is raised. It is not a real female voice — to get one it has to be installed.",femAndroid:"On Android: Settings → Accessibility → Text-to-speech (on Samsung: Settings → General management → Text-to-speech) → the gear next to the engine → Install voice data → pick a female variant.",femIos:"On iPhone or iPad: Settings → Accessibility → Spoken Content → Voices → pick a female voice and download it.",femMac:"On Mac: System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → download a female voice.",femWin:"On Windows: Settings → Time & language → Speech → Manage voices → Add voices.", noVoices:"No Hebrew voices found on this device.",edgeHas:"Microsoft Edge has natural voices for this language, female and male — nothing to install, with an internet connection.",openEdge:"Open the app in Edge",
+moreVoices:"{n} more device voices",noHeVoices:"No Hebrew voices found. Open in Edge or Chrome for natural voices",femNone:"This device has no female voice in the current language, so the pitch was raised. It's not a real female voice. To get one, you need to install it.",femAndroid:"On Android: Settings → Accessibility → Text-to-speech (on Samsung: Settings → General management → Text-to-speech) → the gear next to the engine → Install voice data → pick a female variant.",femIos:"On iPhone or iPad: Settings → Accessibility → Spoken Content → Voices → pick a female voice and download it.",femMac:"On Mac: System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → download a female voice.",femWin:"On Windows: Settings → Time & language → Speech → Manage voices → Add voices.", noVoices:"No Hebrew voices found on this device.",edgeHas:"Microsoft Edge has natural voices in this language, female and male, with no installation, over an internet connection.",openEdge:"Open the app in Edge",
 rate:"Speaking rate",pitch:"Pitch",slow:"Slow",fast:"Fast",low:"Low",high:"High",sample:"Play a sample",
 gSample:"Hello! This is how I sound. Let's learn geography together!",
 linkTitle:"The app link",
-linkDesc:"Your home address — for favorites, WhatsApp, or opening in Edge for natural voices.",
+linkDesc:"Your home address: for favorites, for WhatsApp, or to open in Edge for the natural voices.",
 linkCopy:"Copy the link",linkCopied:"Link copied!",
-langTitle:"App language",langDesc:"Everything is translated — including Limor's voice and the questions",
-themeTitle:"Your color",themeDesc:"Pick a color for the app — it's saved",
+langTitle:"App language",langDesc:"Everything is translated, including Limor's voice and the questions. Arabic, Russian and English: machine translation.",
+themeTitle:"Your color",themeDesc:"Pick a color for the app. Everything is saved",
 themeOcean:"Green ocean",themeGrape:"Grape",themeBerry:"Berry",
-largeText:"Large letters",largeTextD:"Enlarges all text — easier to read",
+largeText:"Large letters",largeTextD:"Makes all text bigger. Easier to read",
 dispTitle:"Display & reading comfort",sizeTitle:"Text size",size1:"Normal",size2:"Large",size3:"Huge",
-clearFont:"Clear font",clearFontD:"Simpler, wider letters — easier to read",
-contrast:"High contrast",contrastD:"Black on white, no soft backgrounds — for low vision or bright light",
+clearFont:"Clear font",clearFontD:"Simpler, more spaced letters. More comfortable to read",
+contrast:"High contrast",contrastD:"Black on white, no soft backgrounds. For low vision or bright light",
 keysTitle:"Keyboard shortcuts",keysSpace:"Hear the question again",keysEnter:"Keep going",keysNum:"Pick an answer",
-spaced:"Generous spacing",spacedD:"More air between letters and words — easier to follow the line",
+spaced:"Generous spacing",spacedD:"More air between letters and words. Easier to follow the line",
 reduceMotion:"Reduce motion",reduceMotionD:"Turns off animations and confetti for a calmer screen",
 compTitle:"Your buddy",compChange:"Change buddy or name",compTogether:"correct answers together",
 reset:"Reset all progress",resetSure:"Sure? All points, streaks, stickers and achievements will be wiped.",
 resetYes:"Yes, reset",resetNo:"Cancel",savedNote:"All settings are saved automatically on your device",
-stickerTitle:"{name}'s stickers",stickerEmpty:"No stickers yet — they're waiting in the first round!",
+stickerTitle:"{name}'s stickers",stickerEmpty:"No stickers yet. They're waiting for you in the first round!",
 st1:"First step",st2:"First round",st3:"Ten correct",st4:"Streak of 5",st5:"Level 3",st6:"Fifty!",st7:"Hundred correct",st8:"First daily challenge",st9:"A week of challenges",
-errTitle:"Something small went wrong",errMsg:"Try refreshing the page. If it continues — reopen the link.",errBtn:"Refresh the page"
+errTitle:"Something small went wrong",errMsg:"Try refreshing the page. If it keeps happening, open the link again.",errBtn:"Refresh the page"
 };
 STR.ru={
 appName:"География для начальной школы",appShort:"для начальной школы",
 navPractice:"Тренировка",navProgress:"Прогресс",navRecords:"Рекорды",navExam:"Контрольная",navSettings:"Настройки",
 level:"Уровень",copyLink:"Ссылка",copied:"Скопировано!",
 footerLove:"Сделано с любовью для каждого ребёнка, который учится иначе",footerMoe:"Программа Министерства просвещения",footerSaved:"Прогресс сохраняется автоматически на этом устройстве",
-obBadge:"Для тех, кому трудно, кому тяжело читать — и всех, кто учится иначе",
+obBadge:"Для тех, кому трудно читать, и для всех, кто учится иначе",
 obTitle1:"География",obTitle2:"для начальной",obTitle3:"школы",
-obIntro:"Не нужно быть путешественником, чтобы полюбить географию — нужен правильный темп, правильная подсказка и друг, который в тебя верит.",
-feat1t:"Всё читается вслух",feat1d:"Каждый вопрос и подсказка — приятным голосом",
-feat2t:"Подсказки, когда трудно",feat2d:"Пошаговые подсказки + наглядные картинки, без решения за тебя",
+obIntro:"Не нужно быть путешественником, чтобы полюбить географию. Нужны правильный темп, правильная подсказка и друг, который в тебя верит.",
+feat1t:"Всё читается вслух",feat1d:"Каждый вопрос, подсказка и похвала приятным голосом по вашему выбору",
+feat2t:"Подсказки, когда трудно",feat2d:"Постепенные подсказки и понятные картинки, без готового решения",
 feat3t:"Друг, который болеет за тебя",feat3d:"Лимор радуется каждой победе вместе с тобой и терпелива к ошибкам",
 step1:"Это Лимор, твоя подруга для учёбы",step2:"Можно дать ей другое имя",
-namePh:"Сначала выбери друга",takeSugg:"Взять",start:"Поехали!",
-obNote:"Всё можно изменить позже в настройках",
+namePh:"Сначала выбери друга",takeSugg:"Возьмите",start:"Поехали!",
+obNote:"Всё можно изменить позже в настройках: и друга, и голос",
 petFox:"Лис",petJosh:"Робот",petOwl:"Сова",
 petFoxName:"Рыжик",petJoshName:"Лимор",petOwlName:"Умка",
-hello:"Привет! Я {name}. Давай открывать географию вместе — в твоём темпе.",
-qOf:"Вопрос {a} из {b}",listen:"Прочитай мне",
-kindAdd:"Сложение",kindSub:"Вычитание",kindMul:"Умножение",kindDiv:"Деление",
-weakTitle:"Я кое-что заметил",weakMsg:"{op} сейчас даётся непросто. Давай потренируем вместе — пять вопросов полегче.",weakNear:"Ты каждый раз совсем рядом! В теме «{op}» не хватает одной мелочи. Давай попробуем вместе.",weakBtn:"Давай потренируемся",weakLater:"Может, позже",focusBadge:"Целевая тренировка",focusDone:"Видишь? Это не так сложно! 💪",focusSub:"Ты закончил тренировку по теме «{op}»",
+hello:"Привет! Я {name}. Давайте откроем географию вместе, в вашем темпе, без спешки.",
+qOf:"Вопрос {a} из {b}",listen:"Прочитайте мне",
+kindMaps:"Карты",kindMed:"Средиземноморье",kindRegions:"Районы страны",kindJeru:"Иерусалим",challenge:"Вызов",
+weakTitle:"Я кое-что заметил",weakMsg:"{op} сейчас немного трудно. Давайте потренируемся вместе: пять вопросов попроще.",weakNear:"Ты каждый раз совсем рядом! В теме «{op}» не хватает одной мелочи. Давай попробуем вместе.",weakBtn:"Давай потренируемся",weakLater:"Может, позже",focusBadge:"Целевая тренировка",focusDone:"Видишь? Это не так сложно! 💪",focusSub:"Ты закончил тренировку по теме «{op}»",
 hintBtn:"Трудно? Подсказка",sayOpt:"Прочитайте ответ вслух",skip:"Пропустить",breakBtn:"Пауза",next:"Дальше",
-praise:"Отлично! Упорство окупилось!",effort:"Да! Ты очень старался — и получилось!",
+praise:"Отлично! Упорство окупилось!",effort:"Верно! Я видела, как вы старались, и это сработало!",
 enc:"Почти! Давай подумаем ещё раз вместе",calmMsg:"Отличная попытка! Посмотрим решение вместе",
-revealPre:"Ответ — {a}.",
-doneTitle:"Идеальный раунд упорства!",doneSub:"{a} из {b} — твой друг очень гордится тобой",
-doneLow:"Сегодня было трудно — и это совершенно нормально",subLow:"{a} из {b} — главное, что ты не сдался",
-doneMid:"Хороший прогресс!",subMid:"{a} из {b} — твой друг гордится тобой",
-doneHigh:"Отличный раунд!",subHigh:"{a} из {b} — твой друг очень гордится тобой",
+revealPre:"Ответ: {a}.",
+doneTitle:"Идеальный раунд упорства!",doneSub:"{a} из {b}. И ваш друг очень вами гордится",
+doneLow:"Сегодня было трудно, и это совершенно нормально",subLow:"{a} из {b}. Главное, что вы не сдались",
+doneMid:"Хороший прогресс!",subMid:"{a} из {b}. И ваш друг гордится вами",
+doneHigh:"Отличный раунд!",subHigh:"{a} из {b}. И ваш друг очень вами гордится",
 doneOk:"Правильных",doneXp:"Очков за раунд",streak:"Текущая серия",doneBtn:"Ещё раунд",
 breatheTitle:"Короткая пауза",breatheIn:"Вдох медленно...",breatheOut:"и выдох медленно...",breatheClose:"Вернуться",
-dailyTag:"Вопрос дня!",dailyDesc:"Ответь правильно — бонус 25 очков",
+dailyTag:"Вопрос дня!",dailyDesc:"Ответь правильно: бонус 25 очков",
 levelAuto:"Авто",lvl1:"Новички",lvl2:"Легко",lvl3:"Средне",lvl4:"Сложно",lvl5:"Вызов",lvl6:"Чемпионы",
 levelChange:"Переходим на уровень {name}! Я с тобой",skipMsg:"Пропускаем! Следующий вопрос ждёт",
-noHints:"Все подсказки кончились — попробуй, я в тебя верю!",
+noHints:"Я дала все свои подсказки. Попробуйте, я в вас верю!",
 visualTitle:"Попробуй сосчитать точки",
-slowBtn:"Полная помощь — шаг за шагом",slowAdd:"Давай считать вместе!",slowSub:"Давай считать назад!",slowHave:"У нас {a}",slowPlus:"Теперь прибавим {b}",slowMinus:"Теперь уберём {b}",slowGotAdd:"Получилось {r}! 🎉",slowGotSub:"Осталось {r}! 🎉",slowNext:"Следующий шаг",slowBack:"Назад",slowAgain:"Сначала",slowPlay:"Пуск",slowStop:"Стоп",
-slowMul:"Давай считать группами!",slowByTens:"Сначала прыгаем {n} раз по десять",slowByOnes:"А теперь {n} шагов по одному",slowGroups:"Разложим {a} групп",slowEach:"В каждую группу кладём {b}",slowGotMul:"{a} групп по {b} — вместе {r}! 🎉",slowDiv:"Давай разделим поровну!",slowSplit:"Делим {a} на {b} равных групп",slowRound:"Каждой группе дали {n}",slowGotDiv:"В каждой группе получилось {r}! 🎉",
+slowBtn:"Полная помощь, шаг за шагом",slowAdd:"Давай считать вместе!",slowSub:"Давай считать назад!",slowHave:"У нас {a}",slowPlus:"Теперь прибавим {b}",slowMinus:"Теперь уберём {b}",slowGotAdd:"Получилось {r}! 🎉",slowGotSub:"Осталось {r}! 🎉",slowNext:"Следующий шаг",slowBack:"Назад",slowAgain:"Сначала",slowPlay:"Пуск",slowStop:"Стоп",
+slowMul:"Давай считать группами!",slowByTens:"Сначала прыгаем {n} раз по десять",slowByOnes:"А теперь {n} шагов по одному",slowGroups:"Разложим {a} групп",slowEach:"В каждую группу кладём {b}",slowGotMul:"{a} групп по {b}, вместе {r}! 🎉",slowDiv:"Давай разделим поровну!",slowSplit:"Делим {a} на {b} равных групп",slowRound:"Каждой группе дали {n}",slowGotDiv:"В каждой группе получилось {r}! 🎉",
 qAdd:"Сколько будет {a} + {b}?",qSub:"Сколько будет {a} − {b}?",qMul:"Сколько будет {a} × {b}?",qDiv:"Сколько будет {a} ÷ {b}?",ask:"Сколько будет?",
 explain:"Мы отсчитали {b} шагов вперёд от {a} и получили {ans}.",
 hint1:"Представь {a} конфет, плюс ещё {b}. Сколько всего?",hint2:"Начни с большего числа и считай вперёд.",
 hint1Add:"Представь {a} конфет, плюс ещё {b}. Сколько всего?",hint2Add:"Начни с большего числа и считай вперёд.",explainAdd:"Мы отсчитали {b} шагов вперёд от {a} и получили {ans}.",
 hint1Sub:"У тебя {a} конфет, и {b} забрали. Сколько осталось?",hint2Sub:"Начни с {a} и отсчитай {b} шагов назад.",explainSub:"Мы отсчитали {b} шагов назад от {a}, и осталось {ans}.",
-hint1Mul:"Это {a} групп, и в каждой по {b}. Сколько всего?",hint2Mul:"Можно прибавить {b} к себе {a} раз.",explainMul:"{a} групп по {b} — вместе это {ans}.",
+hint1Mul:"Это {a} групп, и в каждой по {b}. Сколько всего?",hint2Mul:"Можно прибавить {b} к себе {a} раз.",explainMul:"{a} групп по {b}, вместе это {ans}.",
 hint1Div:"Есть {a} конфет, их делят поровну между {b} детьми. Сколько получит каждый?",hint2Div:"Спроси себя: сколько раз {b} помещается в {a}?",explainDiv:"Мы разделили {a} на {b} равных групп, и в каждой получилось {ans}.",
-progTitle:"Мой прогресс",progSub:"Всё, чего ты достиг — в одном месте",
+progTitle:"Мой прогресс",progSub:"Все ваши достижения в одном месте",
 progTotal:"Правильных ответов",progAcc:"Точность",progBest:"Самая длинная серия",progSessions:"Раундов завершено",
 progDailies:"Ежедневных вызовов",progOpsTitle:"Что ты тренировал?",
-progOpsEmpty:"Пока нет данных — графики появятся после нескольких вопросов",
+progOpsEmpty:"Данных пока нет. После нескольких вопросов здесь появятся графики",
 progSesTitle:"Последние раунды",progWeekTitle:"Твоя неделя",
-progStrength:"{name} идёт отлично — так держать!",progWeak:"Стоит потренировать ещё: {name}",
+progStrength:"У вас отлично получается: {name}! Так держать!",progWeak:"Стоит потренировать ещё: {name}",
 progParentNote:"Отличный экран, чтобы показать родителям и учителям",progGoPractice:"Потренируемся!",
-recTitle:"Доска рекордов",recSub:"Здоровое соперничество — продвигаются все",
+recTitle:"Доска рекордов",recSub:"Здоровое соревнование: все прогрессируют, все выигрывают",
 yourRow:"Это ты",yourPlace:"Твоё место",colRank:"Место",colName:"Имя",colCorrect:"Верно",colAccuracy:"Точность",you:"Ты",
 setTitle:"Настройки",setSub:"Настрой приложение под себя",
 lsTitle:"Стиль обучения",lsCalm:"Спокойный режим",lsCalmBadge:"Рекомендуем",
-lsCalmD:"После одной ошибки сразу подсказка и ещё одна попытка — полное решение только после второй ошибки",
-sfxTitle:"Звуковые эффекты",sfxDesc:"Динь, искры и аплодисменты — мгновенная обратная связь",
+lsCalmD:"После первой ошибки вы сразу получаете подсказку и ещё одну попытку. Полное решение только после второй ошибки",
+sfxTitle:"Звуковые эффекты",sfxDesc:"Звуки динь, искры и поддержка, мгновенный отклик в ухо",
 sndTitle:"Голос и озвучка",sndTts:"Озвучка",sndTtsD:"Все вопросы и подсказки читаются вслух",
-sndType:"Тип голоса",devVoices:"Голоса устройства — нажми, чтобы послушать",
+sndType:"Тип голоса",devVoices:"Голоса устройства. Нажмите, чтобы послушать и сравнить",
 autoPick:"Автовыбор (рекомендуем)",play:"Слушать",
 naturalTag:"Естественный",femaleTag:"Женский",maleTag:"Мужской",autoTag:"Выбран автоматически",
-moreVoices:"Ещё {n} голосов",noHeVoices:"Русские голоса не найдены — открой в Edge или Chrome",femNone:"На этом устройстве нет женского голоса для текущего языка, поэтому тон голоса повышен. Это не настоящий женский голос — чтобы получить его, его нужно установить.",femAndroid:"В Android: Настройки → Спец. возможности → Синтез речи (в Samsung: Настройки → Общие настройки → Синтез речи) → шестерёнка рядом с движком → Установить голосовые данные → выбрать женский вариант.",femIos:"В iPhone или iPad: Настройки → Универсальный доступ → Устный контент → Голоса → выбрать женский голос и загрузить.",femMac:"В Mac: Системные настройки → Универсальный доступ → Устный контент → Системный голос → Управление голосами → загрузить женский голос.",femWin:"В Windows: Параметры → Время и язык → Речь → Управление голосами → Добавить голоса.", noVoices:"Русские голоса на этом устройстве не найдены.",edgeHas:"В браузере Microsoft Edge есть естественные голоса для этого языка, женские и мужские — без установки, при подключении к интернету.",openEdge:"Открыть приложение в Edge",
+moreVoices:"Ещё {n} голосов",noHeVoices:"Голоса иврита не найдены. Откройте в Edge или Chrome для естественных голосов",femNone:"На этом устройстве нет женского голоса для текущего языка, поэтому тон был повышен. Это не настоящий женский голос. Чтобы получить его, нужно установить голос.",femAndroid:"В Android: Настройки → Спец. возможности → Синтез речи (в Samsung: Настройки → Общие настройки → Синтез речи) → шестерёнка рядом с движком → Установить голосовые данные → выбрать женский вариант.",femIos:"В iPhone или iPad: Настройки → Универсальный доступ → Устный контент → Голоса → выбрать женский голос и загрузить.",femMac:"В Mac: Системные настройки → Универсальный доступ → Устный контент → Системный голос → Управление голосами → загрузить женский голос.",femWin:"В Windows: Параметры → Время и язык → Речь → Управление голосами → Добавить голоса.", noVoices:"Русские голоса на этом устройстве не найдены.",edgeHas:"В браузере Microsoft Edge есть естественные голоса на этом языке, женские и мужские, без установки, при подключении к интернету.",openEdge:"Открыть приложение в Edge",
 rate:"Скорость речи",pitch:"Высота",slow:"Медленно",fast:"Быстро",low:"Низко",high:"Высоко",sample:"Послушать пример",
 gSample:"Привет! Вот как я звучу. Давай учить географию вместе!",
 linkTitle:"Ссылка на приложение",
-linkDesc:"Твой домашний адрес — для закладок или WhatsApp.",
+linkDesc:"Адрес вашего дома: в избранное, в WhatsApp или чтобы открыть в Edge для естественных голосов.",
 linkCopy:"Скопировать ссылку",linkCopied:"Ссылка скопирована!",
-langTitle:"Язык приложения",langDesc:"Переведено всё — включая голос Лимор",
-themeTitle:"Твой цвет",themeDesc:"Выбери цвет приложения — он сохранится",
+langTitle:"Язык приложения",langDesc:"Всё переведено, включая голос Лимор и вопросы. Арабский, русский и английский: машинный перевод.",
+themeTitle:"Твой цвет",themeDesc:"Выберите цвет приложения. Всё сохраняется",
 themeOcean:"Зелёный океан",themeGrape:"Виноград",themeBerry:"Ягода",
-largeText:"Крупные буквы",largeTextD:"Увеличивает весь текст",
+largeText:"Крупные буквы",largeTextD:"Увеличивает весь текст. Читать легче",
 dispTitle:"Отображение и удобство чтения",sizeTitle:"Размер текста",size1:"Обычный",size2:"Крупный",size3:"Очень крупный",
-clearFont:"Чёткий шрифт",clearFontD:"Более простые и широкие буквы — читать легче",
-contrast:"Высокий контраст",contrastD:"Чёрное на белом, без мягких фонов",
+clearFont:"Чёткий шрифт",clearFontD:"Простые, более разреженные буквы. Читать удобнее",
+contrast:"Высокий контраст",contrastD:"Чёрное на белом, без мягких фонов. Для слабого зрения или яркого света",
 keysTitle:"Горячие клавиши",keysSpace:"Прослушать вопрос снова",keysEnter:"Дальше",keysNum:"Выбрать ответ",
-spaced:"Щедрые интервалы",spacedD:"Больше воздуха между буквами",
+spaced:"Щедрые интервалы",spacedD:"Больше воздуха между буквами и словами. Легче следить за строкой",
 reduceMotion:"Меньше движения",reduceMotionD:"Отключает анимации и конфетти",
 compTitle:"Твой друг",compChange:"Сменить друга или имя",compTogether:"правильных ответов вместе",
 reset:"Сбросить весь прогресс",resetSure:"Точно? Все очки, серии и наклейки будут удалены.",
 resetYes:"Да, сбросить",resetNo:"Отмена",savedNote:"Все настройки сохраняются автоматически",
-stickerTitle:"Наклейки {name}",stickerEmpty:"Пока нет наклеек — они ждут в первом раунде!",
+stickerTitle:"Наклейки {name}",stickerEmpty:"Наклеек пока нет. Они ждут вас в первом раунде!",
 st1:"Первый шаг",st2:"Первый раунд",st3:"Десять верных",st4:"Серия из 5",st5:"Уровень 3",st6:"Пятьдесят!",st7:"Сто верных",st8:"Первый вызов дня",st9:"Неделя вызовов",
-errTitle:"Что-то пошло не так",errMsg:"Попробуй обновить страницу.",errBtn:"Обновить страницу"
+errTitle:"Что-то пошло не так",errMsg:"Попробуйте обновить страницу. Если не поможет, откройте ссылку заново.",errBtn:"Обновить страницу"
 };
 STR.ar={
 appName:"الجغرافيا للمرحلة الابتدائية",appShort:"للمرحلة الابتدائية",
 navPractice:"تدريب",navProgress:"تقدمي",navRecords:"الأبطال",navExam:"امتحان",navSettings:"الإعدادات",
 level:"مستوى",copyLink:"الرابط",copied:"تم النسخ!",
 footerLove:"صُنع بحب لكل طفل يتعلم بطريقة مختلفة",footerMoe:"منهج وزارة التربية والتعليم",footerSaved:"يُحفظ التقدم تلقائيًا على هذا الجهاز",
-obBadge:"لمن يجد صعوبة، ولمن تصعب عليه القراءة — ولكلّ من يتعلّم بشكل مختلف",
+obBadge:"لمن تصعب عليه القراءة، ولكل من يتعلم بطريقة مختلفة",
 obTitle1:"الجغرافيا",obTitle2:"للمرحلة",obTitle3:"الابتدائية",
-obIntro:"لا تحتاج أن تكون رحّالة لتحب الجغرافيا — تحتاج الوتيرة الصحيحة والتلميح الصحيح وصديقًا لا يستسلم.",
-feat1t:"كل شيء يُقرأ بصوت عالٍ",feat1d:"كل سؤال وتلميح بصوت جميل اخترتموه",
-feat2t:"تلميحات عندما يصعب الأمر",feat2d:"تلميحات متدرجة + صور واضحة، دون الحل عنكم",
+obIntro:"لا تحتاج أن تكون رحّالة لتحب الجغرافيا. تحتاج الوتيرة الصحيحة والتلميح الصحيح وصديقًا لا يستسلم.",
+feat1t:"كل شيء يُقرأ بصوت عالٍ",feat1d:"كل سؤال وتلميح وكلمة تشجيع، بصوت لطيف اخترتموه",
+feat2t:"تلميحات عندما يصعب الأمر",feat2d:"تلميحات متدرجة ورسوم واضحة، من دون حلّ مكانكم",
 feat3t:"صديق يشجع",feat3d:"ليمور تحتفل معكم بكل نجاح، وترافق كل خطأ بصبر",
 step1:"هذه ليمور، صديقتكم للتعلم",step2:"يمكن أن تعطوها اسمًا آخر",
-namePh:"اختر صديقًا أولًا",takeSugg:"خذ",start:"هيا نبدأ!",
-obNote:"يمكن تغيير كل شيء لاحقًا في الإعدادات",
+namePh:"اختر صديقًا أولًا",takeSugg:"خذوا",start:"هيا نبدأ!",
+obNote:"يمكن تغيير كل شيء لاحقًا في الإعدادات، الصديق والصوت معًا",
 petFox:"ثعلب",petJosh:"روبوت",petOwl:"بومة",
 petFoxName:"زنجبيل",petJoshName:"ليمور",petOwlName:"هوتة",
-hello:"مرحبًا! أنا {name}. لنكتشف الجغرافيا معًا — بوتيرتكم، دون استعجال.",
-qOf:"سؤال {a} من {b}",listen:"اقرأ لي",
-kindAdd:"جمع",kindSub:"طرح",kindMul:"ضرب",kindDiv:"قسمة",
-weakTitle:"لاحظت شيئًا",weakMsg:"{op} صعب قليلًا الآن. هيا نتدرّب عليه معًا — خمسة أسئلة أسهل.",weakNear:"أنتم قريبون جدًا في كل مرة! {op} يحتاج لمسة صغيرة فقط. هيا نجرّب معًا.",weakBtn:"هيا نتدرّب",weakLater:"ربما لاحقًا",focusBadge:"تدريب مركّز",focusDone:"أرأيت؟ ليس صعبًا هكذا! 💪",focusSub:"أنهيتم تدريبًا مركّزًا في {op}",
+hello:"مرحبًا! أنا {name}. لنكتشف الجغرافيا معًا، بإيقاعكم، من دون استعجال.",
+qOf:"سؤال {a} من {b}",listen:"اقرأوا لي",
+kindMaps:"الخرائط",kindMed:"حوض البحر المتوسط",kindRegions:"أقاليم البلاد",kindJeru:"القدس",challenge:"تحدٍ",
+weakTitle:"لاحظت شيئًا",weakMsg:"{op} صعب بعض الشيء الآن. لنتدرّب عليه معًا، خمسة أسئلة أسهل.",weakNear:"أنتم قريبون جدًا في كل مرة! {op} يحتاج لمسة صغيرة فقط. هيا نجرّب معًا.",weakBtn:"هيا نتدرّب",weakLater:"ربما لاحقًا",focusBadge:"تدريب مركّز",focusDone:"أرأيت؟ ليس صعبًا هكذا! 💪",focusSub:"أنهيتم تدريبًا مركّزًا في {op}",
 hintBtn:"صعب؟ خذ تلميحًا",sayOpt:"اقرأوا الإجابة",skip:"تخطٍّ",breakBtn:"استراحة قصيرة",next:"نواصل",
-praise:"ممتاز! مثابرتكم أثمرت!",effort:"نعم! رأيت كم حاولتم — وقد نجح!",
+praise:"ممتاز! مثابرتكم أثمرت!",effort:"صحيح! رأيت كم اجتهدتم، وقد نجح الأمر!",
 enc:"تقريبًا! لنفكر معًا مرة أخرى",calmMsg:"محاولة رائعة! لنرَ الحل معًا",
 revealPre:"الجواب هو {a}.",
-doneTitle:"جولة مثالية من المثابرة!",doneSub:"{a} من {b} — صديقكم فخور بكم جدًا",
-doneLow:"كان صعبًا اليوم — وهذا طبيعي تمامًا",subLow:"{a} من {b} — الأهم أنكم لم تستسلموا",
-doneMid:"تقدّم جميل!",subMid:"{a} من {b} — صديقكم فخور بكم",
-doneHigh:"جولة رائعة!",subHigh:"{a} من {b} — صديقكم فخور بكم جدًا",
+doneTitle:"جولة مثالية من المثابرة!",doneSub:"{a} من {b}. وصديقكم فخور بكم جدًا",
+doneLow:"كان اليوم صعبًا، وهذا أمر طبيعي تمامًا",subLow:"{a} من {b}. الأهم أنكم لم تستسلموا",
+doneMid:"تقدّم جميل!",subMid:"{a} من {b}. وصديقكم فخور بكم",
+doneHigh:"جولة رائعة!",subHigh:"{a} من {b}. وصديقكم فخور بكم جدًا",
 doneOk:"إجابات صحيحة",doneXp:"نقاط الجولة",streak:"السلسلة الحالية",doneBtn:"جولة أخرى",
 breatheTitle:"استراحة قصيرة",breatheIn:"استنشقوا ببطء...",breatheOut:"وازفروا ببطء...",breatheClose:"العودة للتدريب",
 dailyTag:"سؤال اليوم!",dailyDesc:"أجب بشكل صحيح واحصل على مكافأة 25 نقطة",
 levelAuto:"تلقائي",lvl1:"مبتدئون",lvl2:"سهل",lvl3:"متوسط",lvl4:"متقدم",lvl5:"تحدٍّ",lvl6:"أبطال",
 levelChange:"ننتقل إلى مستوى {name}! أنا معكم",skipMsg:"نتخطى! السؤال التالي بانتظاركم",
-noHints:"أعطيت كل تلميحاتي — جربوا، أنا أؤمن بكم!",
+noHints:"أعطيت كل تلميحاتي. حاولوا، أنا أثق بكم!",
 visualTitle:"حاولوا عدّ النقاط",
-slowBtn:"مساعدة كاملة — خطوة بخطوة",slowAdd:"هيا نعدّ معًا!",slowSub:"هيا نعدّ إلى الوراء!",slowHave:"لدينا {a}",slowPlus:"الآن نضيف {b}",slowMinus:"الآن نطرح {b}",slowGotAdd:"وصلنا إلى {r}! 🎉",slowGotSub:"بقي لدينا {r}! 🎉",slowNext:"الخطوة التالية",slowBack:"رجوع",slowAgain:"من البداية",slowPlay:"تشغيل",slowStop:"إيقاف",
-slowMul:"هيا نعدّ بالمجموعات!",slowByTens:"أولًا نقفز {n} قفزات بمقدار عشرة",slowByOnes:"والآن {n} خطوات بمقدار واحد",slowGroups:"نرتّب {a} مجموعات",slowEach:"نضع {b} في كل مجموعة",slowGotMul:"{a} مجموعات من {b} — معًا {r}! 🎉",slowDiv:"هيا نقسّم بالتساوي!",slowSplit:"نقسّم الـ{a} إلى {b} مجموعات متساوية",slowRound:"أعطينا كل مجموعة {n}",slowGotDiv:"في كل مجموعة صار {r}! 🎉",
+slowBtn:"مساعدة كاملة، خطوة بخطوة",slowAdd:"هيا نعدّ معًا!",slowSub:"هيا نعدّ إلى الوراء!",slowHave:"لدينا {a}",slowPlus:"الآن نضيف {b}",slowMinus:"الآن نطرح {b}",slowGotAdd:"وصلنا إلى {r}! 🎉",slowGotSub:"بقي لدينا {r}! 🎉",slowNext:"الخطوة التالية",slowBack:"رجوع",slowAgain:"من البداية",slowPlay:"تشغيل",slowStop:"إيقاف",
+slowMul:"هيا نعدّ بالمجموعات!",slowByTens:"أولًا نقفز {n} قفزات بمقدار عشرة",slowByOnes:"والآن {n} خطوات بمقدار واحد",slowGroups:"نرتّب {a} مجموعات",slowEach:"نضع {b} في كل مجموعة",slowGotMul:"{a} مجموعات من {b}، معًا {r}! 🎉",slowDiv:"هيا نقسّم بالتساوي!",slowSplit:"نقسّم الـ{a} إلى {b} مجموعات متساوية",slowRound:"أعطينا كل مجموعة {n}",slowGotDiv:"في كل مجموعة صار {r}! 🎉",
 qAdd:"كم يساوي {a} + {b}؟",qSub:"كم يساوي {a} − {b}؟",qMul:"كم يساوي {a} × {b}؟",qDiv:"كم يساوي {a} ÷ {b}؟",ask:"كم يساوي؟",
 explain:"عددنا {b} خطوات للأمام من {a} ووصلنا إلى {ans}.",
 hint1:"تخيلوا {a} حلوى، و{b} أخرى. كم المجموع؟",hint2:"ابدأوا من الرقم الأكبر وعدّوا منه للأمام.",
 hint1Add:"تخيلوا {a} حلوى، و{b} أخرى. كم المجموع؟",hint2Add:"ابدأوا من الرقم الأكبر وعدّوا منه للأمام.",explainAdd:"عددنا {b} خطوات للأمام من {a} ووصلنا إلى {ans}.",
 hint1Sub:"لديكم {a} حبّات حلوى وأخذوا منها {b}. كم بقي؟",hint2Sub:"ابدأوا من {a} وعدّوا {b} خطوات إلى الوراء.",explainSub:"عددنا {b} خطوات إلى الوراء من {a} وبقي لدينا {ans}.",
-hint1Mul:"هذه {a} مجموعات، في كل واحدة {b}. كم المجموع؟",hint2Mul:"يمكن جمع {b} مع نفسه {a} مرات.",explainMul:"{a} مجموعات من {b} — معًا تساوي {ans}.",
+hint1Mul:"هذه {a} مجموعات، في كل واحدة {b}. كم المجموع؟",hint2Mul:"يمكن جمع {b} مع نفسه {a} مرات.",explainMul:"{a} مجموعات من {b}، معًا هذا {ans}.",
 hint1Div:"هناك {a} حبّة حلوى تُقسَّم بالتساوي على {b} أطفال. كم ينال كل واحد؟",hint2Div:"اسألوا أنفسكم: كم مرة يدخل {b} داخل {a}؟",explainDiv:"قسّمنا {a} إلى {b} مجموعات متساوية، وفي كل مجموعة {ans}.",
-progTitle:"تقدمي",progSub:"كل ما أنجزته — في مكان واحد",
+progTitle:"تقدمي",progSub:"كل ما حققتموه في مكان واحد",
 progTotal:"إجابات صحيحة",progAcc:"دقة",progBest:"أطول سلسلة",progSessions:"جولات مكتملة",
 progDailies:"تحديات يومية",progOpsTitle:"بماذا تدربت؟",
-progOpsEmpty:"لا توجد بيانات بعد — ستظهر الرسوم بعد عدة أسئلة",
+progOpsEmpty:"لا توجد بيانات بعد. بعد بضعة أسئلة ستظهر رسوم بيانية هنا",
 progSesTitle:"الجولات الأخيرة",progWeekTitle:"أسبوعك",
-progStrength:"{name} يسير معك بشكل ممتاز — واصل!",progWeak:"يستحق المزيد من التدريب: {name}",
+progStrength:"أداؤكم ممتاز في {name}! واصلوا هكذا!",progWeak:"يستحق المزيد من التدريب: {name}",
 progParentNote:"شاشة رائعة لعرضها على الأهل والمعلمين",progGoPractice:"لنتدرب!",
-recTitle:"لوحة الأبطال",recSub:"منافسة صحية — الجميع يتقدم والجميع يربح",
+recTitle:"لوحة الأبطال",recSub:"منافسة صحية: الجميع يتقدم، والجميع يستفيد",
 yourRow:"هذا أنت",yourPlace:"مكانك",colRank:"الترتيب",colName:"الاسم",colCorrect:"صحيحة",colAccuracy:"دقة",you:"أنتم",
 setTitle:"الإعدادات",setSub:"اضبط التطبيق ليناسبك تمامًا",
 lsTitle:"أسلوب التعلم",lsCalm:"الوضع الهادئ",lsCalmBadge:"موصى به",
-lsCalmD:"بعد خطأ واحد تحصل على تلميح فورًا ومحاولة أخرى — الحل الكامل فقط بعد الخطأ الثاني",
-sfxTitle:"مؤثرات صوتية",sfxDesc:"أصوات تشجيع ولمعان — تغذية راجعة فورية",
+lsCalmD:"بعد خطأ واحد تحصلون على تلميح فورًا وعلى محاولة أخرى. الحل الكامل فقط بعد الخطأ الثاني",
+sfxTitle:"مؤثرات صوتية",sfxDesc:"أصوات تنبيه وشرارات وتشجيع، استجابة فورية في الأذن",
 sndTitle:"الصوت والقراءة",sndTts:"قراءة صوتية",sndTtsD:"كل الأسئلة والتلميحات تُقرأ بصوت عالٍ",
-sndType:"نوع الصوت",devVoices:"أصوات الجهاز — اضغط للتشغيل والمقارنة",
+sndType:"نوع الصوت",devVoices:"أصوات الجهاز. اضغطوا للاستماع والمقارنة",
 autoPick:"اختيار تلقائي (موصى به)",play:"تشغيل",
 naturalTag:"صوت طبيعي",femaleTag:"نسائي",maleTag:"رجالي",autoTag:"اختير تلقائيًا",
-moreVoices:"{n} أصوات أخرى",noHeVoices:"لم تُعثر على أصوات عربية — افتح في Edge أو Chrome",femNone:"لا يوجد في هذا الجهاز صوت نسائي باللغة الحالية، لذلك رُفعت طبقة الصوت. هذا ليس صوتًا نسائيًا حقيقيًا — للحصول على واحد يجب تثبيته.",femAndroid:"في أندرويد: الإعدادات ← إمكانية الوصول ← تحويل النص إلى كلام (في سامسونغ: الإعدادات ← الإدارة العامة ← تحويل النص إلى كلام) ← الترس بجانب المحرّك ← تثبيت بيانات الصوت ← اختيار نسخة نسائية.",femIos:"في آيفون أو آيباد: الإعدادات ← إمكانية الوصول ← المحتوى المنطوق ← الأصوات ← اختيار صوت نسائي وتنزيله.",femMac:"في ماك: إعدادات النظام ← إمكانية الوصول ← المحتوى المنطوق ← صوت النظام ← إدارة الأصوات ← تنزيل صوت نسائي.",femWin:"في ويندوز: الإعدادات ← الوقت واللغة ← الكلام ← إدارة الأصوات ← إضافة أصوات.", noVoices:"لم تُعثر على أصوات عربية في هذا الجهاز.",edgeHas:"في متصفح Microsoft Edge أصوات طبيعية لهذه اللغة، نسائية ورجالية — دون تثبيت، مع اتصال بالإنترنت.",openEdge:"افتح التطبيق في Edge",
+moreVoices:"{n} أصوات أخرى",noHeVoices:"لم يتم العثور على أصوات عبرية. افتحوا في Edge أو Chrome للحصول على أصوات طبيعية",femNone:"لا يوجد في هذا الجهاز صوت أنثوي باللغة الحالية، لذلك تم رفع طبقة الصوت. هذا ليس صوتًا أنثويًا حقيقيًا. للحصول عليه يجب تثبيته.",femAndroid:"في أندرويد: الإعدادات ← إمكانية الوصول ← تحويل النص إلى كلام (في سامسونغ: الإعدادات ← الإدارة العامة ← تحويل النص إلى كلام) ← الترس بجانب المحرّك ← تثبيت بيانات الصوت ← اختيار نسخة نسائية.",femIos:"في آيفون أو آيباد: الإعدادات ← إمكانية الوصول ← المحتوى المنطوق ← الأصوات ← اختيار صوت نسائي وتنزيله.",femMac:"في ماك: إعدادات النظام ← إمكانية الوصول ← المحتوى المنطوق ← صوت النظام ← إدارة الأصوات ← تنزيل صوت نسائي.",femWin:"في ويندوز: الإعدادات ← الوقت واللغة ← الكلام ← إدارة الأصوات ← إضافة أصوات.", noVoices:"لم تُعثر على أصوات عربية في هذا الجهاز.",edgeHas:"في متصفح Microsoft Edge أصوات طبيعية بهذه اللغة، أنثوية وذكورية، من دون تثبيت، مع اتصال بالإنترنت.",openEdge:"افتح التطبيق في Edge",
 rate:"سرعة الكلام",pitch:"طبقة الصوت",slow:"بطيء",fast:"سريع",low:"منخفض",high:"عالٍ",sample:"شغّل عينة",
 gSample:"مرحبًا! هكذا أبدو. لنتعلم الجغرافيا معًا!",
 linkTitle:"رابط التطبيق",
-linkDesc:"عنوان بيتكم — للمفضلة أو واتساب.",
+linkDesc:"عنوان بيتكم: للمفضلة، أو لواتساب، أو للفتح في Edge للأصوات الطبيعية.",
 linkCopy:"نسخ الرابط",linkCopied:"نُسخ الرابط!",
-langTitle:"لغة التطبيق",langDesc:"كل شيء مترجم — بما فيه صوت ليمور",
-themeTitle:"لونك",themeDesc:"اختر لونًا للتطبيق — سيُحفظ",
+langTitle:"لغة التطبيق",langDesc:"كل شيء مترجم، بما فيه صوت ليمور والأسئلة. العربية والروسية والإنجليزية: ترجمة آلية.",
+themeTitle:"لونك",themeDesc:"اختاروا لونًا للتطبيق. كل شيء يُحفظ",
 themeOcean:"محيط أخضر",themeGrape:"عنب",themeBerry:"توت",
-largeText:"حروف كبيرة",largeTextD:"تكبير كل النصوص",
+largeText:"حروف كبيرة",largeTextD:"يكبّر كل النص. أسهل للقراءة",
 dispTitle:"العرض وراحة القراءة",sizeTitle:"حجم النص",size1:"عادي",size2:"كبير",size3:"كبير جدًا",
-clearFont:"خط واضح",clearFontD:"حروف أبسط وأوسع — أسهل في القراءة",
-contrast:"تباين عالٍ",contrastD:"أسود على أبيض، بلا خلفيات ناعمة",
+clearFont:"خط واضح",clearFontD:"حروف أبسط وأكثر تباعدًا. أكثر راحة للقراءة",
+contrast:"تباين عالٍ",contrastD:"أسود على أبيض، من دون خلفيات ناعمة. لضعف النظر أو الضوء القوي",
 keysTitle:"اختصارات لوحة المفاتيح",keysSpace:"سماع السؤال مرة أخرى",keysEnter:"نواصل",keysNum:"اختيار إجابة",
-spaced:"تباعد واسع",spacedD:"هواء أكثر بين الحروف والكلمات",
+spaced:"تباعد واسع",spacedD:"مساحة أكبر بين الحروف والكلمات. أسهل لتتبع السطر",
 reduceMotion:"تقليل الحركة",reduceMotionD:"إيقاف الرسوم المتحركة",
 compTitle:"صديقكم",compChange:"تغيير الصديق أو الاسم",compTogether:"إجابات صحيحة معًا",
 reset:"تصفير كل التقدم",resetSure:"متأكدون؟ ستمحى كل النقاط والسلاسل والملصقات.",
 resetYes:"نعم، صفّر",resetNo:"إلغاء",savedNote:"تُحفظ كل الإعدادات تلقائيًا",
-stickerTitle:"ملصقات {name}",stickerEmpty:"لا ملصقات بعد — إنها بانتظاركم في الجولة الأولى!",
+stickerTitle:"ملصقات {name}",stickerEmpty:"لا توجد ملصقات بعد. إنها تنتظركم في الجولة الأولى!",
 st1:"الخطوة الأولى",st2:"الجولة الأولى",st3:"عشر صحيحة",st4:"سلسلة من 5",st5:"المستوى 3",st6:"خمسون!",st7:"مئة صحيحة",st8:"التحدي اليومي الأول",st9:"أسبوع من التحديات",
-errTitle:"حدث خطأ صغير",errMsg:"جرّب تحديث الصفحة.",errBtn:"تحديث الصفحة"
+errTitle:"حدث خطأ صغير",errMsg:"حاولوا تحديث الصفحة. إذا استمر الأمر، افتحوا الرابط من جديد.",errBtn:"تحديث الصفحة"
 };
 /* --- גאוגרפיה: מפתחות מסך היחידות (ארבע שפות; ar/ru/en תרגום מכונה, מסומן באתר) --- */
 STR.he.navUnits="יחידות";STR.he.unitsTitle="גאוגרפיה - אדם וסביבה, כיתות ה׳–ו׳";
 STR.he.unitsIntro="היחידות בנויות לפי תכנית הלימודים בגאוגרפיה - אדם וסביבה של משרד החינוך לכיתות ה׳–ו׳. התוכן נכתב במקור במיוחד לאתר, וכל שיעור מוקרא בעברית מדוברת.";
 STR.he.gradeA="כיתה ה׳";STR.he.gradeB="כיתה ו׳";
 STR.he.comingSoon="בקרוב";STR.he.startLesson="לשיעור";STR.he.mikudLink="תכנית הלימודים של משרד החינוך (PDF)";
-STR.he.uMaps="מפות — כלי להכרת העולם";STR.he.uMed="אדם וסביבה באגן הים התיכון";STR.he.uRegions="הארץ לאזוריה";STR.he.uJeru="ירושלים בירת ישראל";
+STR.he.uMaps="מפות: כלי להכרת העולם";STR.he.uMed="אדם וסביבה באגן הים התיכון";STR.he.uRegions="הארץ לאזוריה";STR.he.uJeru="ירושלים בירת ישראל";
 STR.en.navUnits="Units";STR.en.unitsTitle="Geography - People and Environment, grades 5-6";
 STR.en.unitsIntro="The units follow the Israeli Ministry of Education geography curriculum (People and Environment) for grades 5-6. The content was written originally for this site, and every lesson is read aloud in spoken Hebrew.";
 STR.en.gradeA="Grade 5";STR.en.gradeB="Grade 6";
@@ -1402,10 +1404,10 @@ var PETSUGG={fox:"petFoxName",josh:"petJoshName",owl:"petOwlName"};
 function defaults(){
   return {
     pet:"josh",petName:"",petAuto:true,level:null,stickers:[],sessionHistory:[],dailyDates:[],
-    stats:{xp:0,correct:0,attempts:0,streak:0,bestStreak:0,sessions:0,dailies:0,days:[],ops:{add:{ok:0,total:0},sub:{ok:0,total:0},mul:{ok:0,total:0},div:{ok:0,total:0}}},
+    stats:{xp:0,correct:0,attempts:0,streak:0,bestStreak:0,sessions:0,dailies:0,days:[],ops:{maps:{ok:0,total:0},med:{ok:0,total:0},regions:{ok:0,total:0},jeru:{ok:0,total:0}}},
     /* מעקב טעויות חוזרות. r = תוצאות השאלות האחרונות בכל פעולה (1 = נכון, 0 = טעות).
        near = טעויות שהיו קרובות לתשובה, far = טעויות רחוקות. */
-    weak:{add:{r:[],near:0,far:0},sub:{r:[],near:0,far:0},mul:{r:[],near:0,far:0},div:{r:[],near:0,far:0}},
+    weak:{maps:{r:[],near:0,far:0},med:{r:[],near:0,far:0},regions:{r:[],near:0,far:0},jeru:{r:[],near:0,far:0}},
     settings:{tts:true,preset:"calm-female",voiceURI:null,rate:0.95,pitch:1.12,largeText:false,textSize:1,clearFont:false,contrast:false,spaced:false,reduceMotion:false,calmMode:true,soundFx:true,lang:null,theme:"ocean"}
   };
 }
@@ -1431,10 +1433,10 @@ function load(){
     var ps=p.stats||{};
     d.stats={xp:ps.xp||0,correct:ps.correct||0,attempts:ps.attempts||0,streak:ps.streak||0,bestStreak:ps.bestStreak||0,sessions:ps.sessions||0,dailies:ps.dailies||0,
       days:Array.isArray(ps.days)?ps.days:[],
-      ops:(function(){var o={add:{ok:0,total:0},sub:{ok:0,total:0},mul:{ok:0,total:0},div:{ok:0,total:0}};if(ps.ops){["add","sub","mul","div"].forEach(function(k){if(ps.ops[k])o[k]={ok:ps.ops[k].ok||0,total:ps.ops[k].total||0}})}return o})()};
+      ops:(function(){var o={maps:{ok:0,total:0},med:{ok:0,total:0},regions:{ok:0,total:0},jeru:{ok:0,total:0}};if(ps.ops){["maps","med","regions","jeru"].forEach(function(k){if(ps.ops[k])o[k]={ok:ps.ops[k].ok||0,total:ps.ops[k].total||0}})}return o})()};
     d.weak=(function(){
-      var w={add:{r:[],near:0,far:0},sub:{r:[],near:0,far:0},mul:{r:[],near:0,far:0},div:{r:[],near:0,far:0}};
-      if(p.weak)["add","sub","mul","div"].forEach(function(k){
+      var w={maps:{r:[],near:0,far:0},med:{r:[],near:0,far:0},regions:{r:[],near:0,far:0},jeru:{r:[],near:0,far:0}};
+      if(p.weak)["maps","med","regions","jeru"].forEach(function(k){
         var o=p.weak[k];if(!o)return;
         w[k]={r:Array.isArray(o.r)?o.r.slice(-8):[],near:o.near||0,far:o.far||0};
       });
@@ -1584,38 +1586,80 @@ function petSvg(kind,mood,size){
 
 /* ================= questions ================= */
 function diffForXp(xp){return Math.min(6,Math.floor(xp/120)+1)}
+const GEOBANK=[
+["maps",1,{"he":["דנה פתחה מפה של העיר שלה. מהי מפה?","ציור של מקום כפי שהוא נראה מלמעלה","ספר סיפורים על מקומות רחוקים","תמונה שצולמה מתוך בית","רשימה של שמות רחובות בלבד","חשבו: איך נראית העיר לציפור שעפה מעליה? מה המפה מנסה להראות לנו?","על המפה רואים רחובות וגני משחקים כאילו אנחנו מסתכלים עליהם מהשמיים.","מפה היא ציור מיוחד של מקום כפי שהוא נראה מלמעלה. בעזרתה מוצאים דרכים ומקומות."],"en":["Dana opened a map of her city. What is a map?","A drawing of a place as it looks from above","A storybook about faraway places","A photo taken from inside a house","Just a list of street names","Think: how does the city look to a bird flying over it? What is the map trying to show us?","On the map we see streets and playgrounds as if we are looking at them from the sky.","A map is a special drawing of a place as it looks from above. It helps us find ways and places."],"ru":["Дана открыла карту своего города. Что такое карта?","Рисунок места так, как оно выглядит сверху","Книга рассказов о далёких местах","Фотография, сделанная из дома","Просто список названий улиц","Подумайте: как город выглядит для птицы, летящей над ним? Что карта пытается нам показать?","На карте мы видим улицы и детские площадки так, словно смотрим на них с неба.","Карта: это особый рисунок места так, как оно выглядит сверху. С её помощью находят дороги и места."],"ar":["فتحت دانا خريطة لمدينتها. ما الخريطة؟","رسم لمكان كما يبدو من الأعلى","كتاب قصص عن أماكن بعيدة","صورة التقطت من داخل بيت","مجرد قائمة بأسماء الشوارع","فكروا: كيف تبدو المدينة لطائر يحلق فوقها؟ ماذا تحاول الخريطة أن تريانا؟","على الخريطة نرى الشوارع وساحات الألعاب كأننا ننظر إليها من السماء.","الخريطة هي رسم خاص لمكان كما يبدو من الأعلى. بمساعدتها نجد الطرق والأماكن."]}],
+["maps",1,{"he":["בפינת המפה יש ריבוע קטן שמסביר מה אומר כל סימן. איך קוראים לו?","מקרא","מצפן","קנה מידה","כותרת","לכל חלק במפה תפקיד אחר. איזה חלק עונה על השאלה מה הסימנים אומרים?","חפשו בריבוע הקטן סימנים של ממש, וליד כל אחד מהם מילה קצרה.","המקרא הוא מילון קטן של המפה: הוא מראה כל סימן ומסביר מה משמעותו."],"en":["In the corner of the map there is a small box that explains what every symbol says. What is it called?","The legend","The compass","The scale","The title","Every part of the map has a different job. Which part answers the question: what do the symbols say?","Look in the small box for real symbols, with a short word next to each one.","The legend is the map's small dictionary: it shows every symbol and explains its meaning."],"ru":["В углу карты есть маленький квадратик, объясняющий, что говорит каждый знак. Как он называется?","Легенда","Компас","Масштаб","Заголовок","У каждой части карты своя задача. Какая часть отвечает на вопрос: что говорят знаки?","Поищите в маленьком квадратике настоящие знаки, а рядом с каждым короткое слово.","Легенда: это маленький словарь карты. Она показывает каждый знак и объясняет его значение."],"ar":["في زاوية الخريطة مربع صغير يشرح ماذا تقول كل علامة. ما اسمه؟","مفتاح الخريطة","البوصلة","مقياس الرسم","العنوان","لكل جزء من الخريطة دور آخر. أي جزء يجيب عن السؤال: ماذا تقول العلامات؟","ابحثوا في المربع الصغير عن علامات حقيقية وبجانب كل واحدة كلمة قصيرة.","مفتاح الخريطة هو قاموسها الصغير: يعرض كل علامة ويشرح معناها."]}],
+["maps",1,{"he":["מה מראה לנו המצפן שעל המפה?","את כיווני השמיים: צפון, דרום, מזרח ומערב","את מזג האוויר בעיר","את מספר התושבים בעיר","את שעות הפתיחה של החנויות","בלי כיוונים אי אפשר לדעת מה ימין ומה שמאל על מפה. מה נותן לנו את הכיוונים?","האות נ' מסמנת צפון. איזו קבוצת מילים מדברת על כיוונים כמו צפון?","המצפן על המפה מראה את כיווני השמיים. בעזרתו אנחנו יודעים באיזה צד נמצא כל מקום."],"en":["What does the compass on the map show us?","The directions: north, south, east and west","The weather in the city","How many people live in the city","The opening hours of the shops","Without directions we cannot tell right from left on a map. What gives us the directions?","The letter N marks north. Which group of words talks about directions like north?","The compass on the map shows the directions. With it we know on which side every place is."],"ru":["Что показывает нам компас на карте?","Стороны света: север, юг, восток и запад","Погоду в городе","Сколько жителей в городе","Часы работы магазинов","Без направлений нельзя понять, где право и где лево на карте. Что даёт нам направления?","Буква С обозначает север. Какая группа слов говорит о направлениях вроде севера?","Компас на карте показывает стороны света. С ним мы знаем, с какой стороны находится каждое место."],"ar":["ماذا تريانا البوصلة على الخريطة؟","الاتجاهات: الشمال والجنوب والشرق والغرب","حالة الطقس في المدينة","عدد سكان المدينة","ساعات فتح المحلات","من دون اتجاهات لا نعرف اليمين من اليسار على الخريطة. ما الذي يعطينا الاتجاهات؟","حرف ن يدل على الشمال. أي مجموعة كلمات تتحدث عن اتجاهات مثل الشمال؟","البوصلة على الخريطة تُظهر الاتجاهات. بمساعدتها نعرف في أي جهة يقع كل مكان."]}],
+["maps",1,{"he":["מה מספרת לנו הכותרת של המפה?","מה המפה מראה ואיזה מקום היא מתארת","מי צייר את המפה ובאיזו שנה","כמה עמודים יש בספר המפות","מה מזג האוויר היום","לפני שקוראים ספר מסתכלים על השם שלו. איפה אותו רעיון במפה?","כותרת כמו מפת ירושלים אומרת מיד איזו עיר נראה על הדף.","הכותרת אומרת בקצרה מה רואים במפה: איזה מקום ואיזה סוג מידע."],"en":["What does the title of the map tell us?","What the map shows and which place it describes","Who drew the map and in which year","How many pages are in the atlas","What the weather is today","Before reading a book we look at its name. Where is the same idea on a map?","A title like Map of Jerusalem says right away which city we will see on the page.","The title says briefly what the map shows: which place and which kind of information."],"ru":["Что рассказывает нам заголовок карты?","Что показывает карта и какое место она описывает","Кто нарисовал карту и в каком году","Сколько страниц в атласе","Какая сегодня погода","Перед чтением книги мы смотрим на её название. Где та же идея на карте?","Заголовок вроде Карта Иерусалима сразу говорит, какой город мы увидим на странице.","Заголовок кратко говорит, что показывает карта: какое место и какой вид сведений."],"ar":["ماذا يخبرنا عنوان الخريطة؟","ماذا تعرض الخريطة وأي مكان تصف","من رسم الخريطة وفي أي سنة","كم صفحة في كتاب الخرائط","ما حالة الطقس اليوم","قبل قراءة كتاب ننظر إلى اسمه. أين الفكرة نفسها في الخريطة؟","عنوان مثل خريطة القدس يقول فورًا أي مدينة سنرى على الصفحة.","العنوان يقول باختصار ماذا تعرض الخريطة: أي مكان وأي نوع من المعلومات."]}],
+["maps",1,{"he":["על המפה כתוב: סנטימטר אחד במפה שווה לקילומטר אחד במציאות. איזה חלק של המפה אומר לנו את זה?","קנה מידה","מקרא","מסגרת המפה","שם העיר","איזה חלק מחבר בין גודל קטן על הנייר לבין גודל גדול במציאות?","חשבו על סרגל: איזה חלק במפה עובד בערך כמו סרגל?","קנה המידה מתרגם מרחקים: הוא אומר כמה במציאות שווה כל סנטימטר על הנייר."],"en":["The map says: one centimeter on the map equals one kilometer in reality. Which part of the map tells us that?","The scale","The legend","The map frame","The city name","Which part connects a small size on paper with a big size in reality?","Think about a ruler: which part of the map works a bit like a ruler?","The scale translates distances: it says how much in reality every centimeter on the paper is worth."],"ru":["На карте написано: один сантиметр на карте равен одному километру в реальности. Какая часть карты говорит нам это?","Масштаб","Легенда","Рамка карты","Название города","Какая часть связывает маленький размер на бумаге с большим размером в реальности?","Подумайте о линейке: какая часть карты работает примерно как линейка?","Масштаб переводит расстояния: он говорит, сколько в реальности стоит каждый сантиметр на бумаге."],"ar":["مكتوب على الخريطة: سنتيمتر واحد على الخريطة يساوي كيلومترًا واحدًا في الواقع. أي جزء من الخريطة يخبرنا بذلك؟","مقياس الرسم","مفتاح الخريطة","إطار الخريطة","اسم المدينة","أي جزء يربط بين حجم صغير على الورق وحجم كبير في الواقع؟","فكروا في المسطرة: أي جزء من الخريطة يعمل تقريبًا مثل المسطرة؟","مقياس الرسم يترجم المسافات: يقول كم يساوي في الواقع كل سنتيمتر على الورق."]}],
+["maps",1,{"he":["ברוב המפות, לאיזה צד של המפה מסמן הכיוון צפון?","לראש המפה, למעלה","לתחתית המפה, למטה","תמיד לצד שמאל","תמיד לצד ימין","זכרו את הכלל שמורים מלמדים: למעלה במפה זה איזה כיוון?","האות נ' על המצפן מצביעה לצד מסוים של הדף. בדקו לאיזה צד.","מוסכמה של מפות: צפון נמצא בראש המפה. לכן מסתכלים קודם על המצפן ואז קוראים את המפה."],"en":["On most maps, which side of the map does north point to?","The top of the map, upward","The bottom of the map, downward","Always to the left","Always to the right","Remember the rule teachers teach: up on a map is which direction?","The letter N on the compass points to a certain side of the page. Check which side.","A map convention: north is at the top of the map. So we look at the compass first and then read the map."],"ru":["На большинстве карт на какую сторону карты указывает север?","На верх карты, вверх","На низ карты, вниз","Всегда влево","Всегда вправо","Вспомните правило, которому учат учителя: вверх на карте это какое направление?","Буква С на компасе указывает на определённую сторону страницы. Проверьте на какую.","Соглашение карт: север находится вверху карты. Поэтому сначала смотрим на компас, а потом читаем карту."],"ar":["في معظم الخرائط، إلى أي جهة من الخريطة يشير اتجاه الشمال؟","إلى رأس الخريطة، إلى الأعلى","إلى أسفل الخريطة","دائمًا إلى اليسار","دائمًا إلى اليمين","تذكروا القاعدة التي يعلمها المعلمون: الأعلى في الخريطة هو أي اتجاه؟","حرف ن على البوصلة يشير إلى جهة معينة من الصفحة. تحققوا إلى أي جهة.","قاعدة متفق عليها في الخرائط: الشمال في رأس الخريطة. لذلك ننظر أولًا إلى البوصلة ثم نقرأ الخريطة."]}],
+["maps",1,{"he":["יוסי רואה על המפה סימן קטן בצורת עץ. איך הוא ידע מה הסימן אומר?","יסתכל במקרא שעל המפה","ינחש לפי הצבע האהוב עליו","ישאל את הכותרת של המפה","יספור כמה עצים יש על המפה","במפה יש מילון קטן שמסביר סימנים. איפה הוא נמצא?","אותו חלק שמראה סימן ליד הסבר עונה בדיוק על השאלה של יוסי.","את הסימנים על המפה מבינים בעזרת המקרא: מוצאים בו את הסימן וקוראים את ההסבר."],"en":["Yossi sees a small tree-shaped symbol on the map. How will he know what the symbol says?","He will look at the map legend","He will guess by his favorite color","He will ask the map's title","He will count how many trees are on the map","The map has a small dictionary that explains symbols. Where is it?","The same part that shows a symbol next to an explanation answers Yossi's question exactly.","Map symbols are understood with the legend: find the symbol in it and read the explanation."],"ru":["Йосси видит на карте маленький знак в виде дерева. Как он узнает, что знак говорит?","Посмотрит в легенду карты","Угадает по любимому цвету","Спросит у заголовка карты","Посчитает, сколько деревьев на карте","У карты есть маленький словарь, объясняющий знаки. Где он находится?","Та самая часть, что показывает знак рядом с объяснением, отвечает ровно на вопрос Йосси.","Знаки на карте понимают с помощью легенды: находят в ней знак и читают объяснение."],"ar":["يرى يوسي علامة صغيرة على شكل شجرة على الخريطة. كيف سيعرف ماذا تقول العلامة؟","سينظر في مفتاح الخريطة","سيخمن حسب لونه المفضل","سيسأل عنوان الخريطة","سيعد كم شجرة على الخريطة","في الخريطة قاموس صغير يشرح العلامات. أين يوجد؟","الجزء نفسه الذي يعرض علامة بجانب شرح يجيب تمامًا عن سؤال يوسي.","تُفهم علامات الخريطة بمساعدة مفتاحها: نجد فيه العلامة ونقرأ الشرح."]}],
+["maps",2,{"he":["משפחה מתכננת נסיעה ברכב מחיפה לבאר שבע. איזו מפה תעזור לה ביותר?","מפת דרכים, שמראה כבישים בין ערים","מפת מזג אוויר","מפת אוכלוסייה","מפת אוצרות מפורסמים","חשבו מה המשפחה צריכה לדעת בדרך: אילו כבישים ואילו ערים. איזו מפה מראה את זה?","לכל שאלה יש מפה אחרת. שאלה של נסיעה ברכב צריכה מפה של נסיעות.","יש סוגים שונים של מפות. לנסיעה ברכב בוחרים מפת דרכים, כי היא מראה כבישים וערים."],"en":["A family is planning a car trip from Haifa to Be'er Sheva. Which map will help it most?","A road map, which shows roads between cities","A weather map","A population map","A map of famous treasures","Think about what the family needs to know on the way: which roads and which cities. Which map shows that?","Every question has a different map. A car-trip question needs a travel map.","There are different kinds of maps. For a car trip we choose a road map, because it shows roads and cities."],"ru":["Семья планирует поездку на машине из Хайфы в Беэр-Шеву. Какая карта поможет ей больше всего?","Дорожная карта, показывающая дороги между городами","Карта погоды","Карта населения","Карта знаменитых сокровищ","Подумайте, что семье нужно знать в пути: какие дороги и какие города. Какая карта это показывает?","Для каждого вопроса своя карта. Вопросу о поездке на машине нужна карта поездок.","Есть разные виды карт. Для поездки на машине выбирают дорожную карту, потому что она показывает дороги и города."],"ar":["عائلة تخطط لرحلة بالسيارة من حيفا إلى بئر السبع. أي خريطة ستساعدها أكثر؟","خريطة طرق، تعرض الشوارع بين المدن","خريطة طقس","خريطة سكان","خريطة كنوز مشهورة","فكروا ماذا تحتاج العائلة أن تعرف في الطريق: أي شوارع وأي مدن. أي خريطة تعرض ذلك؟","لكل سؤال خريطة أخرى. سؤال عن رحلة بالسيارة يحتاج خريطة سفر.","هناك أنواع مختلفة من الخرائط. لرحلة بالسيارة نختار خريطة طرق، لأنها تعرض الشوارع والمدن."]}],
+["maps",2,{"he":["בשיעור קיבלתם מפה שקוראים לה מפה פיזית. מה היא תראה בעיקר?","הרים, נחלים ומדבריות, את צורת פני השטח","גבולות בין מדינות בלבד","קניונים וחנויות","כבישים ומספרי בתים","המילה פיזית מזכירה גוף וטבע. מה הטבע של הארץ: ההרים והעמקים או הגבולות?","חשבו על טיול בטבע: אילו דברים רואים בלי שבני אדם בנו אותם?","מפה פיזית מראה את פני השטח: הרים, עמקים, נחלים ומדבריות. מפה מדינית מראה גבולות וערים."],"en":["In class you got a map called a physical map. What will it mainly show?","Mountains, streams and deserts, the shape of the land","Only borders between countries","Malls and shops","Roads and house numbers","The word physical reminds us of body and nature. What is the nature of the land: mountains and valleys, or borders?","Think about a hike in nature: which things do we see that people did not build?","A physical map shows the surface: mountains, valleys, streams and deserts. A political map shows borders and cities."],"ru":["На уроке вы получили карту под названием физическая карта. Что она в основном покажет?","Горы, ручьи и пустыни, форму поверхности земли","Только границы между странами","Торговые центры и магазины","Дороги и номера домов","Слово физическая напоминает тело и природу. Что является природой страны: горы и долины или границы?","Подумайте о походе на природу: какие вещи мы видим, что их не строили люди?","Физическая карта показывает поверхность: горы, долины, ручьи и пустыни. Политическая карта показывает границы и города."],"ar":["في الدرس حصلتم على خريطة تسمى خريطة طبيعية. ماذا ستعرض أساسًا؟","جبالًا ووديانًا وصحاري، شكل سطح الأرض","حدودًا بين الدول فقط","مراكز تسوق ومحلات","شوارع وأرقام بيوت","كلمة طبيعية تذكرنا بالجسم والطبيعة. ما طبيعة الأرض: الجبال والوديان أم الحدود؟","فكروا في رحلة في الطبيعة: أي أشياء نراها لم يبنها الناس؟","الخريطة الطبيعية تعرض سطح الأرض: جبال ووديان ومجاري مياه وصحاري. الخريطة السياسية تعرض الحدود والمدن."]}],
+["maps",2,{"he":["איזו מפה מראה את הגבולות בין המדינות ואת הערים הגדולות?","מפה מדינית","מפה פיזית","מפת שבילים לטיולים","מפת כוכבים","חשבו: גבול בין מדינות הוא דבר של הטבע או דבר שבני אדם החליטו עליו?","לכל מפה יש שם שמתאים לתוכן שלה. איזה שם מתאים למפה שעוסקת במדינות?","המפה המדינית מראה גבולות בין מדינות ואת הערים. המפה הפיזית מראה הרים ונחלים."],"en":["Which map shows the borders between countries and the big cities?","A political map","A physical map","A hiking trail map","A star map","Think: is a border between countries something from nature, or something people decided on?","Every map has a name that fits its content. Which name fits a map about states?","The political map shows borders between countries and the cities. The physical map shows mountains and streams."],"ru":["Какая карта показывает границы между странами и большие города?","Политическая карта","Физическая карта","Карта туристических троп","Карта звёзд","Подумайте: граница между странами это что-то от природы или что-то, о чём решили люди?","У каждой карты есть имя, подходящее её содержанию. Какое имя подходит карте о государствах?","Политическая карта показывает границы между странами и города. Физическая карта показывает горы и ручьи."],"ar":["أي خريطة تعرض الحدود بين الدول والمدن الكبيرة؟","خريطة سياسية","خريطة طبيعية","خريطة مسارات للرحلات","خريطة نجوم","فكروا: الحدود بين الدول شيء من الطبيعة أم شيء قرره الناس؟","لكل خريطة اسم يناسب محتواها. أي اسم يناسب خريطة عن الدول؟","الخريطة السياسية تعرض الحدود بين الدول والمدن. الخريطة الطبيعية تعرض الجبال ومجاري المياه."]}],
+["maps",3,{"he":["על המפה כתוב שסנטימטר אחד שווה עשרה קילומטרים במציאות. המרחק על המפה בין שתי ערים הוא שלושה סנטימטרים. מה המרחק במציאות?","שלושים קילומטרים","שלושה קילומטרים","עשרה קילומטרים","שלוש מאות קילומטרים","חשבו: כל סנטימטר אחד על הנייר שווה עשרה. כמה שוות שלוש פעמים סנטימטר?","כפל קטן: שלוש כפול עשר.","קנה המידה אומר שכל סנטימטר במפה שווה עשרה קילומטרים. שלושה סנטימטרים הם שלוש פעמים עשרה, כלומר שלושים."],"en":["The map says one centimeter equals ten kilometers in reality. The distance on the map between two cities is three centimeters. What is the distance in reality?","Thirty kilometers","Three kilometers","Ten kilometers","Three hundred kilometers","Think: every one centimeter on paper is worth ten. How much are three times a centimeter worth?","A small multiplication: three times ten.","The scale says every centimeter on the map equals ten kilometers. Three centimeters are three times ten, that is thirty."],"ru":["На карте написано, что один сантиметр равен десяти километрам в реальности. Расстояние на карте между двумя городами три сантиметра. Каково расстояние в реальности?","Тридцать километров","Три километра","Десять километров","Триста километров","Подумайте: каждый сантиметр на бумаге стоит десять. Сколько стоят три раза по сантиметру?","Маленькое умножение: трижды десять.","Масштаб говорит, что каждый сантиметр на карте равен десяти километрам. Три сантиметра это трижды десять, то есть тридцать."],"ar":["مكتوب على الخريطة أن سنتيمترًا واحدًا يساوي عشرة كيلومترات في الواقع. المسافة على الخريطة بين مدينتين هي ثلاثة سنتيمترات. ما المسافة في الواقع؟","ثلاثون كيلومترًا","ثلاثة كيلومترات","عشرة كيلومترات","ثلاثمئة كيلومتر","فكروا: كل سنتيمتر واحد على الورق يساوي عشرة. كم تساوي ثلاث مرات سنتيمتر؟","ضرب صغير: ثلاثة ضرب عشرة.","مقياس الرسم يقول إن كل سنتيمتر على الخريطة يساوي عشرة كيلومترات. ثلاثة سنتيمترات هي ثلاث مرات عشرة، أي ثلاثون."]}],
+["maps",3,{"he":["קווי הרוחב על הגלובוס נמתחים ממזרח למערב. מה הם מודדים?","כמה רחוק אנחנו צפונה או דרומה מקו המשווה","כמה רחוק אנחנו מים המלח","את מספר המדינות בעולם","את שעות היום והלילה","קו הרוחב הכי מפורסם הוא קו המשווה. שאר הקווים מודדים מרחק ממנו. לאיזה כיוון?","חשבו על סרגל שמודד למעלה ולמטה על הגלובוס, ולא לצדדים.","קווי הרוחב מודדים כמה אנחנו צפונית או דרומית לקו המשווה. קווי האורך מודדים מזרחה ומערבה."],"en":["The lines of latitude on the globe stretch from east to west. What do they measure?","How far we are north or south of the equator","How far we are from the Dead Sea","The number of countries in the world","The hours of day and night","The most famous latitude line is the equator. The other lines measure distance from it. In which direction?","Think of a ruler that measures up and down on the globe, not sideways.","Lines of latitude measure how far we are north or south of the equator. Lines of longitude measure east and west."],"ru":["Линии широты на глобусе тянутся с востока на запад. Что они измеряют?","Как далеко мы к северу или к югу от экватора","Как далеко мы от Мёртвого моря","Число стран в мире","Часы дня и ночи","Самая известная линия широты это экватор. Остальные линии измеряют расстояние от него. В каком направлении?","Подумайте о линейке, которая измеряет вверх и вниз на глобусе, а не в стороны.","Линии широты измеряют, как далеко мы к северу или к югу от экватора. Линии долготы измеряют к востоку и к западу."],"ar":["خطوط العرض على الكرة الأرضية تمتد من الشرق إلى الغرب. ماذا تقيس؟","كم نحن بعيدون شمالًا أو جنوبًا عن خط الاستواء","كم نحن بعيدون عن البحر الميت","عدد دول العالم","ساعات النهار والليل","أشهر خط عرض هو خط الاستواء. باقي الخطوط تقيس المسافة منه. بأي اتجاه؟","فكروا في مسطرة تقيس إلى الأعلى والأسفل على الكرة، وليس إلى الجانبين.","خطوط العرض تقيس كم نحن شمال أو جنوب خط الاستواء. خطوط الطول تقيس شرقًا وغربًا."]}],
+["maps",3,{"he":["למה על מפה משתמשים בסימנים קטנים במקום לצייר את הדברים האמיתיים?","כי אי אפשר לצייר עיר שלמה על דף אחד, והסימנים שומרים על מפה ברורה","כי ציירי מפות לא יודעים לצייר","כי ילדים אוהבים רק ציורים קטנים","כי אסור לצייר בתים אמיתיים","דמיינו שמציירים את כל בתי העיר בגודל אמיתי על דף. מה יקרה לדף?","מה קורה כששמים אלף ציורים זה על זה בדף אחד? מה הסימנים הקטנים פותרים?","מפה מכווצת עולם גדול לדף קטן. סימנים קטנים ומוסכמים שומרים על סדר, והמקרא מסביר כל אחד מהם."],"en":["Why does a map use small symbols instead of drawing the real things?","Because you cannot draw a whole city on one page, and the symbols keep the map clear","Because map makers do not know how to draw","Because children only like small drawings","Because it is forbidden to draw real houses","Imagine drawing all the city's houses at real size on a page. What will happen to the page?","What happens when a thousand drawings are piled on one page? What do the small symbols solve?","A map shrinks a big world onto a small page. Small agreed symbols keep order, and the legend explains each one."],"ru":["Почему на карте используют маленькие знаки вместо того, чтобы рисовать настоящие вещи?","Потому что нельзя нарисовать целый город на одной странице, и знаки сохраняют карту понятной","Потому что картографы не умеют рисовать","Потому что дети любят только маленькие рисунки","Потому что запрещено рисовать настоящие дома","Представьте, что все дома города рисуют в настоящий размер на странице. Что будет со страницей?","Что происходит, когда тысячу рисунков кладут друг на друга на одной странице? Что решают маленькие знаки?","Карта сжимает большой мир на маленькой странице. Маленькие условные знаки сохраняют порядок, а легенда объясняет каждый из них."],"ar":["لماذا تستخدم الخريطة علامات صغيرة بدل رسم الأشياء الحقيقية؟","لأنه لا يمكن رسم مدينة كاملة على صفحة واحدة، والعلامات تحافظ على خريطة واضحة","لأن رسامي الخرائط لا يعرفون الرسم","لأن الأولاد يحبون فقط الرسومات الصغيرة","لأنه يُمنع رسم بيوت حقيقية","تخيلوا أننا نرسم كل بيوت المدينة بالحجم الحقيقي على صفحة. ماذا سيحدث للصفحة؟","ماذا يحدث عندما توضع ألف رسمة فوق بعضها على صفحة واحدة؟ ماذا تحل العلامات الصغيرة؟","الخريطة تضغط عالمًا كبيرًا على صفحة صغيرة. علامات صغيرة متفق عليها تحافظ على النظام، ومفتاح الخريطة يشرح كل واحدة منها."]}],
+["med",1,{"he":["איזה ים גדול נמצא מערבית לישראל, ואליו יוצאים לרחוץ בקיץ?","הים התיכון","ים המלח","הכנרת","הים האדום","חשבו על מפת ישראל: איזה גוף מים גדול נמצא בצד מערב, ליד תל אביב?","ים המלח והכנרת נמצאים במזרח הארץ. איפה נשאר לחפש?","הים התיכון גובל בישראל ממערב. ערים גדולות כמו תל אביב וחיפה יושבות על חופו."],"en":["Which big sea lies west of Israel, where people go swimming in summer?","The Mediterranean Sea","The Dead Sea","The Sea of Galilee","The Red Sea","Think about the map of Israel: which big body of water is on the western side, next to Tel Aviv?","The Dead Sea and the Sea of Galilee are in the east of the country. Where is left to look?","The Mediterranean Sea borders Israel on the west. Big cities like Tel Aviv and Haifa sit on its shore."],"ru":["Какое большое море находится к западу от Израиля, и в нём купаются летом?","Средиземное море","Мёртвое море","Кинерет","Красное море","Подумайте о карте Израиля: какой большой водоём находится на западной стороне, рядом с Тель-Авивом?","Мёртвое море и Кинерет находятся на востоке страны. Где осталось искать?","Средиземное море граничит с Израилем на западе. Большие города вроде Тель-Авива и Хайфы стоят на его берегу."],"ar":["أي بحر كبير يقع غرب إسرائيل، ويخرج الناس للسباحة فيه صيفًا؟","البحر المتوسط","البحر الميت","بحيرة طبريا","البحر الأحمر","فكروا في خريطة إسرائيل: أي مسطح مائي كبير يقع في الجهة الغربية، بجانب تل أبيب؟","البحر الميت وبحيرة طبريا في شرق البلاد. أين يبقى البحث؟","البحر المتوسط يحد إسرائيل غربًا. مدن كبيرة مثل تل أبيب وحيفا تقع على شاطئه."]}],
+["med",1,{"he":["איך נראה הקיץ בארצות הים התיכון, גם בישראל?","חם ויבש, כמעט בלי גשם","קר ומושלג רוב הזמן","גשום כל יום","חם וגשום ביחד כל בוקר","זכרו קיץ אחד בישראל: כמה פעמים ירד גשם ביולי ובאוגוסט?","חשבו על חופשת הקיץ: שמש, חום וים. איפה הגשם נכנס לתמונה?","באקלים הים תיכוני הקיץ חם ויבש. הגשמים מחכים לחורף."],"en":["What does summer look like in the Mediterranean lands, including Israel?","Hot and dry, almost no rain","Cold and snowy most of the time","Rainy every day","Hot and rainy together every morning","Remember one summer in Israel: how many times did it rain in July and August?","Think about summer vacation: sun, heat and the sea. Where does rain fit into the picture?","In the Mediterranean climate summer is hot and dry. The rains wait for winter."],"ru":["Как выглядит лето в странах Средиземноморья, в том числе в Израиле?","Жаркое и сухое, почти без дождя","Холодное и снежное большую часть времени","Дождливое каждый день","Жаркое и дождливое вместе каждое утро","Вспомните одно лето в Израиле: сколько раз шёл дождь в июле и августе?","Подумайте о летних каникулах: солнце, жара и море. Куда дождь входит в картину?","В средиземноморском климате лето жаркое и сухое. Дожди ждут зимы."],"ar":["كيف يبدو الصيف في بلدان البحر المتوسط، ومنها إسرائيل؟","حار وجاف، تقريبًا بلا مطر","بارد ومثلج معظم الوقت","ممطر كل يوم","حار وممطر معًا كل صباح","تذكروا صيفًا واحدًا في إسرائيل: كم مرة نزل المطر في يوليو وأغسطس؟","فكروا في العطلة الصيفية: شمس وحر وبحر. أين يدخل المطر في الصورة؟","في المناخ المتوسطي الصيف حار وجاف. الأمطار تنتظر الشتاء."]}],
+["med",1,{"he":["מה מיוחד בחורף הים תיכוני?","הוא מתון וגשום, לא קפוא","הוא החורף הקר ביותר בעולם","בחורף יורד שלג כל יום","אין בו גשם בכלל","השוו לחורף במקומות קרים מאוד: האם אצלנו הכול קופא?","חשבו על חורף בישראל: יש גשמים, אבל לא צריך את המעיל הכי עבה בארון.","החורף הים תיכוני מתון: קריר וגשום אבל בלי קור קיצוני. לכן אפשר לגדל פירות כמעט כל השנה."],"en":["What is special about the Mediterranean winter?","It is mild and rainy, not freezing","It is the coldest winter in the world","In winter it snows every day","It has no rain at all","Compare it with winter in very cold places: does everything freeze here?","Think about winter in Israel: there are rains, but you do not need the thickest coat in the closet.","The Mediterranean winter is mild: cool and rainy but without extreme cold. That is why fruit can grow almost all year."],"ru":["Что особенного в средиземноморской зиме?","Она мягкая и дождливая, не ледяная","Это самая холодная зима в мире","Зимой снег идёт каждый день","В ней вообще нет дождя","Сравните с зимой в очень холодных местах: у нас всё замерзает?","Подумайте о зиме в Израиле: есть дожди, но не нужно самое толстое пальто из шкафа.","Средиземноморская зима мягкая: прохладная и дождливая, но без сильного мороза. Поэтому фрукты можно выращивать почти весь год."],"ar":["ما المميز في الشتاء المتوسطي؟","هو معتدل وممطر، ليس متجمدًا","هو أبرد شتاء في العالم","في الشتاء تتساقط الثلوج كل يوم","لا مطر فيه إطلاقًا","قارنوه بالشتاء في أماكن شديدة البرودة: هل كل شيء يتجمد عندنا؟","فكروا في الشتاء في إسرائيل: توجد أمطار، لكن لا حاجة لأسمك معطف في الخزانة.","الشتاء المتوسطي معتدل: بارد وممطر لكن بلا برد شديد. لذلك يمكن زراعة الفواكه معظم السنة."]}],
+["med",1,{"he":["איזה עץ הוא סמל של אגן הים התיכון, ועושים מן הפירות שלו שמן?","הזית","הדקל","האלון","האקליפטוס","חשבו על שמן שמטגנים בו ומדליקים איתו נרות בחג החנוכה.","אותו שמן נמצא גם בסלט וגם בסיפור על הנס של המנורה.","עץ הזית אוהב את האקלים הים תיכוני: הרבה שמש ומעט גשם בקיץ. מן הפירות שלו מפיקים שמן זית."],"en":["Which tree is a symbol of the Mediterranean basin, and oil is made from its fruits?","The olive","The date palm","The oak","The eucalyptus","Think about an oil used for frying and for lighting candles on Hanukkah.","The same oil is in the salad and in the story of the menorah miracle.","The olive tree loves the Mediterranean climate: lots of sun and little summer rain. Olive oil is made from its fruits."],"ru":["Какое дерево является символом Средиземноморья, и из его плодов делают масло?","Маслина","Финиковая пальма","Дуб","Эвкалипт","Подумайте о масле, на котором жарят и которым зажигают свечи на Хануку.","То же масло есть и в салате, и в рассказе о чуде меноры.","Оливковое дерево любит средиземноморский климат: много солнца и мало летнего дождя. Из его плодов получают оливковое масло."],"ar":["أي شجرة هي رمز لحوض البحر المتوسط، ويُصنع من ثمارها الزيت؟","الزيتون","النخيل","البلوط","الكينا","فكروا في زيت يُقلى به وتُشعل به الشموع في عيد الحانوكا.","الزيت نفسه موجود في السلطة وفي قصة معجزة الشمعدان.","شجرة الزيتون تحب المناخ المتوسطي: كثير من الشمس وقليل من مطر الصيف. من ثمارها يُستخرج زيت الزيتون."]}],
+["med",1,{"he":["למה הרבה ערים עתיקות קמו ליד חוף הים התיכון?","כי הים נתן דגים, מסחר בספינות ודרך לנסוע בין עמים","כי שם היו הכי הרבה הרים","כי אסור היה לבנות בתוך הארץ","כי ליד הים תמיד קר וקריר","חשבו מה הים נותן לאנשים: אוכל מהמים, ודרך להפליג למקומות אחרים.","בעולם העתיק לא היו משאיות ומטוסים. איך הובילו סחורות בין ערים?","הים היה כביש של ספינות: הוא נתן דגים לאוכל ודרך לסחור ולהיפגש עם עמים אחרים. לכן פרחו ערי נמל."],"en":["Why did many ancient cities rise near the Mediterranean shore?","Because the sea gave fish, trade by ships and a way to travel between peoples","Because there were the most mountains there","Because it was forbidden to build inland","Because near the sea it is always cold and chilly","Think about what the sea gives people: food from the water, and a way to sail to other places.","In the ancient world there were no trucks and no planes. How were goods carried between cities?","The sea was a road for ships: it gave fish for food and a way to trade and meet other peoples. That is why port cities bloomed."],"ru":["Почему многие древние города возникли у берега Средиземного моря?","Потому что море давало рыбу, торговлю на кораблях и путь путешествовать между народами","Потому что там было больше всего гор","Потому что было запрещено строить внутри страны","Потому что у моря всегда холодно и прохладно","Подумайте, что море даёт людям: еду из воды и путь уплыть в другие места.","В древнем мире не было грузовиков и самолётов. Как перевозили товары между городами?","Море было дорогой для кораблей: оно давало рыбу в еду и путь торговать и встречаться с другими народами. Поэтому расцветали портовые города."],"ar":["لماذا قامت مدن قديمة كثيرة قرب شاطئ البحر المتوسط؟","لأن البحر أعطى سمكًا وتجارة بالسفن وطريقًا للسفر بين الشعوب","لأن هناك كانت أكثر الجبال","لأنه كان ممنوعًا البناء داخل البلاد","لأن قرب البحر الجو بارد دائمًا","فكروا ماذا يعطي البحر للناس: طعامًا من الماء، وطريقًا للإبحار إلى أماكن أخرى.","في العالم القديم لم تكن شاحنات ولا طائرات. كيف كانت تُنقل البضائع بين المدن؟","كان البحر طريقًا للسفن: أعطى سمكًا للطعام وطريقًا للتجارة ولقاء شعوب أخرى. لذلك ازدهرت مدن الموانئ."]}],
+["med",1,{"he":["איזו עיר ישראלית גדולה היא עיר נמל חשובה על הים התיכון, וגם יושבת על הר הכרמל?","חיפה","באר שבע","ירושלים","אילת","חפשו על המפה עיר גדולה בצפון, על החוף, ליד הר ירוק.","אילת נמצאת על ים אחר, ובאר שבע במדבר. איזו עיר נשארה על הים התיכון?","חיפה היא עיר הנמל הגדולה של צפון הארץ. הנמל שלה על הים התיכון, והשכונות מטפסות על הר הכרמל."],"en":["Which big Israeli city is an important port on the Mediterranean, and also sits on Mount Carmel?","Haifa","Be'er Sheva","Jerusalem","Eilat","Look on the map for a big city in the north, on the shore, next to a green mountain.","Eilat is on a different sea, and Be'er Sheva is in the desert. Which city is left on the Mediterranean?","Haifa is the big port city of the north. Its port is on the Mediterranean, and its neighborhoods climb Mount Carmel."],"ru":["Какой большой израильский город является важным портом на Средиземном море и также стоит на горе Кармель?","Хайфа","Беэр-Шева","Иерусалим","Эйлат","Поищите на карте большой город на севере, на берегу, рядом с зелёной горой.","Эйлат находится на другом море, а Беэр-Шева в пустыне. Какой город остался на Средиземном море?","Хайфа это большой портовый город севера страны. Её порт на Средиземном море, а кварталы поднимаются на гору Кармель."],"ar":["أي مدينة إسرائيلية كبيرة هي ميناء مهم على البحر المتوسط، وتقع أيضًا على جبل الكرمل؟","حيفا","بئر السبع","القدس","إيلات","ابحثوا على الخريطة عن مدينة كبيرة في الشمال، على الشاطئ، بجانب جبل أخضر.","إيلات على بحر آخر، وبئر السبع في الصحراء. أي مدينة بقيت على البحر المتوسط؟","حيفا هي مدينة الميناء الكبيرة في شمال البلاد. ميناؤها على البحر المتوسط، وأحياؤها تصعد على جبل الكرمل."]}],
+["med",1,{"he":["מה האקלים הים תיכוני נותן לאנשים החיים בו?","אפשרות לגדל פירות וירקות כמעט כל השנה ולדוג בים","שלג לכל המשפחה בכל חורף","קרח על הנהרות בכל בוקר","זהב שצף על פני הים","חשבו אילו דברים טובים מקבלים משמש רבה, מחורף מתון ומים קרוב.","מה אפשר לעשות בחוץ כמעט כל ימות השנה כשאין קור קיצוני?","אקלים נוח הוא משאב: שמש רבה וחורף מתון מאפשרים חקלאות כמעט כל השנה, והים הקרוב נותן דגים ונמלים."],"en":["What does the Mediterranean climate give the people living in it?","The chance to grow fruits and vegetables almost all year and to fish in the sea","Snow for the whole family every winter","Ice on the rivers every morning","Gold floating on the sea","Think about what good things come from lots of sun, a mild winter and a nearby sea.","What can you do outside almost every day of the year when there is no extreme cold?","A comfortable climate is a resource: lots of sun and a mild winter allow farming almost all year, and the nearby sea gives fish and ports."],"ru":["Что средиземноморский климат даёт людям, живущим в нём?","Возможность выращивать фрукты и овощи почти весь год и ловить рыбу в море","Снег для всей семьи каждую зиму","Лёд на реках каждое утро","Золото, плавающее на море","Подумайте, какие хорошие вещи получают от большого количества солнца, мягкой зимы и близкого моря.","Что можно делать на улице почти каждый день года, когда нет сильного холода?","Удобный климат это ресурс: много солнца и мягкая зима позволяют заниматься сельским хозяйством почти весь год, а близкое море даёт рыбу и порты."],"ar":["ماذا يعطي المناخ المتوسطي للناس الذين يعيشون فيه؟","إمكانية زراعة الفواكه والخضروات معظم السنة وصيد السمك في البحر","ثلج لكل العائلة كل شتاء","جليد على الأنهار كل صباح","ذهب يطفو على وجه البحر","فكروا أي أشياء جيدة نحصل عليها من شمس كثيرة وشتاء معتدل وبحر قريب.","ماذا يمكن فعله في الخارج تقريبًا كل أيام السنة عندما لا يوجد برد شديد؟","المناخ المريح هو مورد: شمس كثيرة وشتاء معتدل يسمحان بالزراعة معظم السنة، والبحر القريب يعطي سمكًا وموانئ."]}],
+["med",2,{"he":["למה עצי הזית והגפן מצליחים כל כך טוב באגן הים התיכון?","כי הם אוהבים שמש רבה ומסתדרים עם מעט גשם בקיץ","כי הם צריכים שלג כדי לגדול","כי הם גדלים רק בתוך מים","כי אין שם חיות בכלל","חשבו על קיץ יבש וארוך: אילו צמחים שורדים בלי הרבה מים?","בדקו מה משותף לזית ולגפן: שורשים עמוקים ועלים ששומרים על מים.","זית וגפן הם צמחים ים תיכוניים קלאסיים: הם חזקים בקיץ היבש ונותנים פירות טובים."],"en":["Why do olive trees and grapevines do so well in the Mediterranean basin?","Because they love lots of sun and manage with little summer rain","Because they need snow to grow","Because they grow only inside water","Because there are no animals there at all","Think about a long dry summer: which plants survive without much water?","Check what the olive and the vine share: deep roots and leaves that keep water in.","Olive and vine are classic Mediterranean plants: they are strong in the dry summer and give good fruit."],"ru":["Почему оливковые деревья и виноградная лоза так хорошо растут в Средиземноморье?","Потому что они любят много солнца и обходятся малым летним дождём","Потому что им нужен снег, чтобы расти","Потому что они растут только внутри воды","Потому что там вообще нет животных","Подумайте о длинном сухом лете: какие растения выживают без большого количества воды?","Проверьте, что общего у маслины и лозы: глубокие корни и листья, сохраняющие воду.","Маслина и лоза это классические средиземноморские растения: они сильны в сухое лето и дают хорошие плоды."],"ar":["لماذا تنجح أشجار الزيتون وكروم العنب كثيرًا في حوض البحر المتوسط؟","لأنها تحب كثرة الشمس وتدبر أمرها مع قليل من مطر الصيف","لأنها تحتاج الثلج لتنمو","لأنها تنمو فقط داخل الماء","لأنه لا توجد هناك حيوانات إطلاقًا","فكروا في صيف جاف وطويل: أي نباتات تصمد بلا ماء كثير؟","تحققوا مما هو مشترك بين الزيتون والكرمة: جذور عميقة وأوراق تحفظ الماء.","الزيتون والكرمة نباتات متوسطية كلاسيكية: قوية في الصيف الجاف وتعطي ثمارًا جيدة."]}],
+["med",2,{"he":["איך הים התיכון משפיע על מזג האוויר של הערים שעל חופו?","הוא ממתין: מקרר מעט בקיץ ומחמם מעט בחורף","הוא גורם לסופות שלג יומיות","הוא הופך את האוויר ליבש כמו במדבר","אין לו שום השפעה על מזג האוויר","מים מתחממים ומתקררים לאט. מה שכנות כזאת עושה לעיר?","חשבו על סיר מים על אש קטנה: לוקח זמן עד שהוא רותח, וזמן עד שהוא מתקרר.","הים הוא כמו שמיכה גדולה: הוא אוגר חום ומשחרר אותו לאט. לכן ערי החוף פחות קיצוניות מערי המדבר."],"en":["How does the Mediterranean Sea affect the weather of the cities on its shore?","It softens it: cools a little in summer and warms a little in winter","It causes daily snow storms","It makes the air dry like a desert","It has no effect on the weather at all","Water heats up and cools down slowly. What does such a neighbor do to a city?","Think about a pot of water on a small flame: it takes time to boil, and time to cool.","The sea is like a big blanket: it stores heat and releases it slowly. That is why shore cities are less extreme than desert cities."],"ru":["Как Средиземное море влияет на погоду городов на его берегу?","Оно смягчает: немного охлаждает летом и немного согревает зимой","Оно вызывает ежедневные снежные бури","Оно делает воздух сухим, как в пустыне","Оно вообще не влияет на погоду","Вода нагревается и остывает медленно. Что такое соседство делает с городом?","Подумайте о кастрюле с водой на маленьком огне: нужно время, чтобы закипеть, и время, чтобы остыть.","Море как большое одеяло: оно запасает тепло и отдаёт его медленно. Поэтому прибрежные города менее экстремальны, чем города пустыни."],"ar":["كيف يؤثر البحر المتوسط في طقس المدن الواقعة على شاطئه؟","يُلطفه: يبرّد قليلًا في الصيف ويدفئ قليلًا في الشتاء","يسبب عواصف ثلجية يومية","يجعل الهواء جافًا كالصحراء","ليس له أي تأثير في الطقس","الماء يسخن ويبرد ببطء. ماذا تفعل جيرة كهذه بالمدينة؟","فكروا في قدر ماء على نار صغيرة: يحتاج وقتًا ليغلي، ووقتًا ليبرد.","البحر كبطانية كبيرة: يخزن الحرارة ويطلقها ببطء. لذلك مدن الشاطئ أقل تطرفًا من مدن الصحراء."]}],
+["med",2,{"he":["שתי ערים נמצאות באותה ארץ: אחת על חוף הים ואחת עמוק במדבר. איפה הקיץ יהיה בדרך כלל נוח יותר בערב?","בעיר שעל חוף הים, כי הים ממתין את החום","בעיר המדברית, כי שם יש יותר חול","בשתיהן בדיוק אותו דבר תמיד","אי אפשר לדעת בלי לבקר בשתיהן","זכרו מה הים עושה לערים שלידו בקיץ ובחורף.","חשבו איפה נושבת בערב רוח ים נעימה.","הים ממתין את מזג האוויר. ערי חוף נהנות מקיץ פחות חריף ומחורף פחות קר מערי המדבר."],"en":["Two cities are in the same country: one on the seashore and one deep in the desert. Where will summer usually be more pleasant in the evening?","In the city on the seashore, because the sea softens the heat","In the desert city, because there is more sand there","In both, exactly the same, always","There is no way to know without visiting both","Remember what the sea does to the cities next to it in summer and in winter.","Think about where a pleasant sea breeze blows in the evening.","The sea softens the weather. Shore cities enjoy a less harsh summer and a less cold winter than desert cities."],"ru":["Два города находятся в одной стране: один на берегу моря, а другой глубоко в пустыне. Где лето обычно приятнее вечером?","В городе на берегу моря, потому что море смягчает жару","В городе пустыни, потому что там больше песка","В обоих ровно одинаково, всегда","Нельзя узнать, не побывав в обоих","Вспомните, что море делает с городами рядом с ним летом и зимой.","Подумайте, где вечером дует приятный морской бриз.","Море смягчает погоду. Прибрежные города наслаждаются менее суровым летом и менее холодной зимой, чем города пустыни."],"ar":["مدينتان في البلد نفسه: واحدة على شاطئ البحر وواحدة في عمق الصحراء. أين يكون الصيف عادة ألطف في المساء؟","في المدينة التي على شاطئ البحر، لأن البحر يلطف الحر","في المدينة الصحراوية، لأن هناك رمالًا أكثر","في كلتيهما الشيء نفسه تمامًا دائمًا","لا يمكن المعرفة من دون زيارة كلتيهما","تذكروا ماذا يفعل البحر بالمدن المجاورة له في الصيف والشتاء.","فكروا أين تهب نسمة بحر لطيفة في المساء.","البحر يلطف الطقس. مدن الشاطئ تتمتع بصيف أقل حدة وشتاء أقل بردًا من مدن الصحراء."]}],
+["med",3,{"he":["השם ים תיכון מסביר שהים נמצא בתוך ארצות. למה העובדה הזאת הייתה טובה לעמים העתיקים?","כי ספינות יכלו להפליג בין ארצות רבות בלי לצאת לאוקיינוס הפתוח","כי אי אפשר היה לטבוע בו אף פעם","כי בו מצאו דגי זהב","כי הוא היה קפוא ואפשר היה ללכת עליו","דמיינו ספינה קטנה ועתיקה: מה בטוח לה יותר, ים מוקף ארצות או אוקיינוס ענק?","חשבו על בריכה מוקפת גדר לעומת ים פתוח. איפה קל יותר להפליג?","הים התיכון כמעט סגור בארצות מכל צד. ספינות עתיקות הפליגו בין חופים בבטחה יחסית, וכך עברו סחורות ורעיונות בין עמים."],"en":["The name Mediterranean Sea says the sea sits inside lands. Why was that fact good for the ancient peoples?","Because ships could sail between many lands without going out to the open ocean","Because nobody could ever drown in it","Because goldfish were found in it","Because it was frozen and people could walk on it","Imagine a small ancient ship: what is safer for it, a sea ringed by lands or a giant ocean?","Think about a pool with a fence around it versus an open sea. Where is it easier to sail?","The Mediterranean is almost closed in by lands on every side. Ancient ships sailed between shores in relative safety, and so goods and ideas moved between peoples."],"ru":["Название Средиземное море говорит, что море находится внутри земель. Почему этот факт был хорош для древних народов?","Потому что корабли могли плыть между многими землями, не выходя в открытый океан","Потому что в нём нельзя было утонуть никогда","Потому что в нём находили золотых рыбок","Потому что оно было замёрзшим и по нему можно было ходить","Представьте маленький древний корабль: что для него безопаснее, море, окружённое землями, или гигантский океан?","Подумайте о бассейне с оградой по сравнению с открытым морем. Где легче плавать?","Средиземное море почти закрыто землями со всех сторон. Древние корабли плавали между берегами в относительной безопасности, и так товары и идеи переходили между народами."],"ar":["اسم البحر المتوسط يشرح أن البحر يقع داخل أراضٍ. لماذا كانت هذه الحقيقة جيدة للشعوب القديمة؟","لأن السفن استطاعت الإبحار بين أراضٍ كثيرة من دون الخروج إلى المحيط المفتوح","لأنه لم يكن ممكنًا الغرق فيه أبدًا","لأنه وُجدت فيه أسماك ذهبية","لأنه كان متجمدًا ويمكن المشي عليه","تخيلوا سفينة صغيرة قديمة: ما الأكثر أمانًا لها، بحر تحيط به الأراضي أم محيط هائل؟","فكروا في بركة محاطة بسور مقابل بحر مفتوح. أين الإبحار أسهل؟","البحر المتوسط شبه مغلق بالأراضي من كل جهة. السفن القديمة أبحرت بين الشواطئ بأمان نسبي، وهكذا انتقلت البضائع والأفكار بين الشعوب."]}],
+["med",3,{"he":["איך עזר הים התיכון לעמים שונים להכיר אחד את השני?","סוחרים הפליגו בין חופים, ואיתם עברו סחורות, רעיונות וסיפורים","הם שלחו אחד לשני יוני דואר מעל הים","הם בנו גשר עץ מצד לצד","הם דיברו בטלפון ימי עתיק","לפני המטוס והרכבת, מה הייתה הדרך הכי מהירה לנסוע בין ארצות?","חשבו מה נוסע בספינת סוחר חוץ מסחורות: אנשים, ומה יש לאנשים בראש.","הספינה הייתה הכביש המהיר של העולם העתיק. סוחרים הביאו לא רק סחורות אלא גם שפות, אוכל ורעיונות, וכך העמים השפיעו אחד על השני."],"en":["How did the Mediterranean Sea help different peoples get to know each other?","Traders sailed between shores, and with them moved goods, ideas and stories","They sent each other carrier pigeons over the sea","They built a wooden bridge from side to side","They talked on an ancient sea telephone","Before the plane and the train, what was the fastest way to travel between lands?","Think about what travels on a trading ship besides goods: people, and what people have in their heads.","The ship was the highway of the ancient world. Traders brought not only goods but also languages, food and ideas, and so the peoples influenced each other."],"ru":["Как Средиземное море помогло разным народам узнать друг друга?","Купцы плавали между берегами, и вместе с ними переходили товары, идеи и рассказы","Они посылали друг другу почтовых голубей над морем","Они построили деревянный мост с одной стороны на другую","Они разговаривали по древнему морскому телефону","До самолёта и поезда, какой был самый быстрый способ путешествовать между странами?","Подумайте, что путешествует на торговом корабле кроме товаров: люди, и что есть у людей в голове.","Корабль был скоростной дорогой древнего мира. Купцы привозили не только товары, но и языки, еду и идеи, и так народы влияли друг на друга."],"ar":["كيف ساعد البحر المتوسط شعوبًا مختلفة على التعارف؟","أبحار التجار بين الشواطئ، ومعهم انتقلت البضائع والأفكار والقصص","أرسلوا بعضهم لبعض حمامًا زاجلًا فوق البحر","بنوا جسرًا خشبيًا من طرف إلى طرف","تحدثوا عبر هاتف بحري قديم","قبل الطائرة والقطار، ما أسرع طريقة للسفر بين البلدان؟","فكروا ماذا يسافر في سفينة تاجر غير البضائع: الناس، وماذا في رؤوس الناس.","كانت السفينة الطريق السريع للعالم القديم. جلب التجار ليس فقط البضائع بل أيضًا اللغات والطعام والأفكار، وهكذا أثرت الشعوب بعضها في بعض."]}],
+["med",3,{"he":["באגן הים התיכון יש מקומות עם מעט מים, כמו אצלנו בארץ. מה עוזר לישראל לחיות בנוחות בלי הרבה גשם?","חיסכון במים, השקיה חכמה והתפלת מי ים","העברת הכנרת לתוך הים","יבוא שלג מחו\"ל","בניית סכרים על ים המלח","חשבו על שלוש דרכים: לבזבז פחות, להשקות בדיוק, ולייצר מים מתוקים ממים מלוחים.","איזה דבר יש לנו הרבה ממנו ליד הבית, אבל הוא מלוח מדי לשתייה?","ישראל מתמודדת עם מחסור במים בחוכמה: חיסכון, השקיה בטפטוף והתפלה שהופכת מי ים למי שתייה."],"en":["In the Mediterranean basin there are places with little water, like our country. What helps Israel live comfortably without much rain?","Saving water, smart irrigation and desalination of sea water","Moving the Sea of Galilee into the sea","Importing snow from abroad","Building dams on the Dead Sea","Think about three ways: waste less, water exactly, and make fresh water from salty water.","What do we have a lot of next to our home, but it is too salty to drink?","Israel deals with water shortage cleverly: saving, drip irrigation and desalination that turns sea water into drinking water."],"ru":["В Средиземноморье есть места с малым количеством воды, как в нашей стране. Что помогает Израилю жить удобно без большого количества дождя?","Экономия воды, умное орошение и опреснение морской воды","Перемещение Кинерета в море","Импорт снега из-за границы","Строительство дамб на Мёртвом море","Подумайте о трёх путях: тратить меньше, поливать точно, и делать пресную воду из солёной.","Чего у нас много рядом с домом, но это слишком солёное, чтобы пить?","Израиль справляется с нехваткой воды с умом: экономия, капельное орошение и опреснение, превращающее морскую воду в питьевую."],"ar":["في حوض البحر المتوسط أماكن قليلة الماء، مثل بلدنا. ما الذي يساعد إسرائيل على العيش براحة من دون مطر كثير؟","توفير الماء والري الذكي وتحلية ماء البحر","نقل بحيرة طبريا إلى داخل البحر","استيراد الثلج من الخارج","بناء سدود على البحر الميت","فكروا في ثلاث طرق: هدر أقل، وسقي بدقة، وصناعة ماء عذب من ماء مالح.","أي شيء لدينا منه الكثير قرب البيت، لكنه مالح أكثر من اللازم للشرب؟","تواجه إسرائيل نقص الماء بذكاء: توفير، وري بالتنقيط، وتحلية تحول ماء البحر إلى ماء شرب."]}],
+["regions",1,{"he":["איזה אזור גדול ויבש משתרע בדרום ישראל?","הנגב","הגליל","מישור החוף","בקעת הירדן","חשבו על מפת ישראל: הצפון ירוק והדרום צהוב ויבש. איך קוראים לדרום היבש?","זכרו: איפה יורד מעט גשם, בצפון או בדרום? האזור היבש נמצא שם.","הנגב הוא אזור מדברי גדול בדרום הארץ. הוא מכסה יותר ממחצית שטח ישראל, וגרים בו יחסית מעט אנשים."],"en":["Which big dry region stretches across the south of Israel?","The Negev","The Galilee","The coastal plain","The Jordan Valley","Think about the map of Israel: the north is green and the south is yellow and dry. What is the dry south called?","Remember: where does little rain fall, in the north or in the south? The dry region is there.","The Negev is a big desert region in the south of the country. It covers more than half of Israel, and relatively few people live in it."],"ru":["Какой большой сухой район раскинулся на юге Израиля?","Негев","Галилея","Прибрежная равнина","Иорданская долина","Подумайте о карте Израиля: север зелёный, а юг жёлтый и сухой. Как называется сухой юг?","Вспомните: где выпадает мало дождя, на севере или на юге? Сухой район находится там.","Негев это большой пустынный район на юге страны. Он покрывает больше половины площади Израиля, а живёт в нём относительно мало людей."],"ar":["أي منطقة كبيرة وجافة تمتد في جنوب إسرائيل؟","النقب","الجليل","السهل الساحلي","غور الأردن","فكروا في خريطة إسرائيل: الشمال أخضر والجنوب أصفر جاف. ما اسم الجنوب الجاف؟","تذكروا: أين ينزل مطر قليل، في الشمال أم في الجنوب؟ المنطقة الجافة موجودة هناك.","النقب منطقة صحراوية كبيرة في جنوب البلاد. يغطي أكثر من نصف مساحة إسرائيل، ويسكن فيه قليل من الناس نسبيًا."]}],
+["regions",1,{"he":["מהו המקום הנמוך ביותר בעולם, והוא נמצא בארץ שלנו?","ים המלח וחופו","פסגת החרמון","עמק יזרעאל","חופי אילת","נמוך ביותר פירושו הכי מתחת לפני הים. המים זורמים לשם ונאספים, כי אין להם לאן להמשיך.","בדקו על המפה איזה גוף מים בארץ יושב בשקע עמוק, עמוק מכולם.","ים המלח נמצא כארבע מאות ושלושים מטרים מתחת לפני הים, והוא המקום הנמוך ביותר בעולם. המים שלו מלוחים מאוד."],"en":["What is the lowest place in the world, and it is in our country?","The Dead Sea and its shore","The peak of Mount Hermon","The Jezreel Valley","The beaches of Eilat","Lowest means the farthest below sea level. Water flows there and collects, because it has nowhere to go on.","Check on the map which body of water in the country sits in a deep hollow, the deepest of all.","The Dead Sea lies about four hundred and thirty meters below sea level, and it is the lowest place in the world. Its water is very salty."],"ru":["Какое самое низкое место в мире, и оно находится в нашей стране?","Мёртвое море и его берег","Вершина Хермона","Изреельская долина","Пляжи Эйлата","Самое низкое значит самое далёкое ниже уровня моря. Вода течёт туда и собирается, потому что ей некуда идти дальше.","Проверьте на карте, какой водоём в стране лежит в глубокой впадине, глубже всех.","Мёртвое море находится примерно на четыреста тридцать метров ниже уровня моря, и это самое низкое место в мире. Его вода очень солёная."],"ar":["ما أكثر مكان انخفاضًا في العالم، وهو موجود في بلادنا؟","البحر الميت وشاطئه","قمة جبل الشيخ","مرج ابن عامر","شواطئ إيلات","الأكثر انخفاضًا يعني الأكثر تحت مستوى البحر. المياه تجري إلى هناك وتتجمع، لأنه لا مكان لها لتواصل.","تحققوا على الخريطة أي مسطح مائي في البلاد يقع في منخفض عميق، الأعمق بين الكل.","البحر الميت يقع نحو أربعمئة وثلاثين مترًا تحت مستوى البحر، وهو أكثر مكان منخفضًا في العالم. مياهه شديدة الملوحة."]}],
+["regions",1,{"he":["איזה אזור בישראל ירוק במיוחד, עם הרבה גשמים בחורף ונחלים?","הגליל שבצפון","הנגב שבדרום","מדבר יהודה","בקעת ים המלח","חשבו על גשם: איפה יורד הרבה גשם, בצפון או בדרום?","ירוק צריך מים. איזה אזור בארץ מקבל יותר מים מהשמיים?","הצפון, ובמיוחד הגליל, מקבל הרבה גשם בחורף. לכן הוא ירוק, מלא נחלים ופרדסים."],"en":["Which region in Israel is especially green, with lots of winter rain and streams?","The Galilee in the north","The Negev in the south","The Judean Desert","The Dead Sea valley","Think about rain: where does a lot of rain fall, in the north or in the south?","Green needs water. Which region in the country gets more water from the sky?","The north, and especially the Galilee, gets a lot of winter rain. That is why it is green, full of streams and orchards."],"ru":["Какой район в Израиле особенно зелёный, с большим количеством зимних дождей и ручьёв?","Галилея на севере","Негев на юге","Иудейская пустыня","Долина Мёртвого моря","Подумайте о дожде: где выпадает много дождя, на севере или на юге?","Зелени нужна вода. Какой район в стране получает больше воды с неба?","Север, и особенно Галилея, получает много зимнего дождя. Поэтому он зелёный, полный ручьёв и садов."],"ar":["أي منطقة في إسرائيل خضراء بشكل خاص، مع أمطار شتوية كثيرة ومجاري مياه؟","الجليل في الشمال","النقب في الجنوب","صحراء يهودا","غور البحر الميت","فكروا في المطر: أين ينزل مطر كثير، في الشمال أم في الجنوب؟","الخضرة تحتاج ماء. أي منطقة في البلاد تحصل على ماء أكثر من السماء؟","الشمال، وخاصة الجليل، يحصل على مطر شتوي كثير. لذلك هو أخضر، مليء بمجاري المياه والبساتين."]}],
+["regions",1,{"he":["מה שמו של האגם הגדול בצפון ישראל, שמימיו מתוקים וחשובים לשתייה?","הכנרת","ים המלח","הים התיכון","מפרץ אילת","חשבו על מים מתוקים בצפון: מהם שותים, ולא מתרחצים במלח.","האגם הזה נראה על המפה כמו טיפה כחולה גדולה מעל בקעת הירדן.","הכנרת היא האגם המתוק הגדול של ישראל. היא בצפון, ומימיה חשובים לשתייה ולחקלאות."],"en":["What is the name of the big lake in the north of Israel, whose fresh water is important for drinking?","The Sea of Galilee","The Dead Sea","The Mediterranean Sea","The Gulf of Eilat","Think about fresh water in the north: people drink it, not bathe in salt.","This lake looks on the map like a big blue drop above the Jordan Valley.","The Sea of Galilee is Israel's big freshwater lake. It is in the north, and its water is important for drinking and farming."],"ru":["Как называется большое озеро на севере Израиля, чья пресная вода важна для питья?","Кинерет","Мёртвое море","Средиземное море","Эйлатский залив","Подумайте о пресной воде на севере: её пьют, а не купаются в соли.","Это озеро выглядит на карте как большая синяя капля над Иорданской долиной.","Кинерет это большое пресное озеро Израиля. Оно на севере, и его вода важна для питья и сельского хозяйства."],"ar":["ما اسم البحيرة الكبيرة في شمال إسرائيل، التي مياهها العذبة مهمة للشرب؟","بحيرة طبريا","البحر الميت","البحر المتوسط","خليج إيلات","فكروا في ماء عذب في الشمال: يُشرب ولا يُستحم في ملح.","هذه البحيرة تبدو على الخريطة كنقطة زرقاء كبيرة فوق غور الأردن.","بحيرة طبريا هي البحيرة العذبة الكبيرة في إسرائيل. هي في الشمال، ومياهها مهمة للشرب والزراعة."]}],
+["regions",1,{"he":["איפה גרים רוב תושבי ישראל?","במישור החוף, ליד הים התיכון","בנגב הדרומי","ברמת הגולן","במדבר יהודה","חשבו איפה נמצאות רוב הערים הגדולות שאתם מכירים, כמו תל אביב ונתניה.","מצאו על המפה את תל אביב ואת נתניה, ובדקו איך קוראים לרצועה שביניהן לבין הים.","מישור החוף לאורך הים התיכון הוא האזור המאוכלס ביותר בישראל: הוא שטוח, נוח לבנייה וקרוב לנמלים."],"en":["Where do most of Israel's people live?","In the coastal plain, next to the Mediterranean Sea","In the southern Negev","In the Golan Heights","In the Judean Desert","Think about where most of the big cities you know are, like Tel Aviv and Netanya.","Find Tel Aviv and Netanya on the map, and check what the strip between them and the sea is called.","The coastal plain along the Mediterranean is the most crowded region in Israel: it is flat, easy to build on and close to ports."],"ru":["Где живёт большинство жителей Израиля?","На прибрежной равнине, рядом со Средиземным морем","В южном Негеве","На Голанских высотах","В Иудейской пустыне","Подумайте, где находятся большинство больших городов, которые вы знаете, вроде Тель-Авива и Нетании.","Найдите на карте Тель-Авив и Нетанию и проверьте, как называется полоса между ними и морем.","Прибрежная равнина вдоль Средиземного моря это самый населённый район Израиля: она плоская, удобная для строительства и близкая к портам."],"ar":["أين يسكن معظم سكان إسرائيل؟","في السهل الساحلي، بجانب البحر المتوسط","في النقب الجنوبي","في هضبة الجولان","في صحراء يهودا","فكروا أين توجد معظم المدن الكبيرة التي تعرفونها، مثل تل أبيب ونتانيا.","جدوا على الخريطة تل أبيب ونتانيا، وتحققوا ما اسم الشريط بينهما وبين البحر.","السهل الساحلي على طول البحر المتوسط هو أكثر مناطق إسرائيل سكانًا: هو مستوٍ، ومريح للبناء وقريب من الموانئ."]}],
+["regions",1,{"he":["על אילו הרים יושבת ירושלים?","הרי יהודה","הרי הגליל","הרי הגולן","הרי הנגב","חשבו איפה ירושלים על המפה: במרכז הארץ, בצפונה או בדרומה?","מצאו את ירושלים על מפה פיזית ובדקו מה שם רכס ההרים סביבה.","ירושלים יושבת על הרי יהודה, כשמונה מאות מטרים מעל פני הים. הגובה נותן לה אוויר קריר יותר מאשר בחוף."],"en":["On which mountains does Jerusalem sit?","The Judean Mountains","The Galilee mountains","The Golan heights","The Negev mountains","Think about where Jerusalem is on the map: in the center of the country, in its north or in its south?","Find Jerusalem on a physical map and check the name of the mountain ridge around it.","Jerusalem sits on the Judean Mountains, about eight hundred meters above sea level. The height gives it cooler air than the coast."],"ru":["На каких горах стоит Иерусалим?","Иудейские горы","Галилейские горы","Голанские высоты","Горы Негева","Подумайте, где Иерусалим на карте: в центре страны, на севере или на юге?","Найдите Иерусалим на физической карте и проверьте название горного хребта вокруг него.","Иерусалим стоит на Иудейских горах, примерно восемьсот метров над уровнем моря. Высота даёт ему более прохладный воздух, чем на побережье."],"ar":["على أي جبال تقع القدس؟","جبال يهودا","جبال الجليل","هضبة الجولان","جبال النقب","فكروا أين القدس على الخريطة: في وسط البلاد، في شمالها أم في جنوبها؟","جدوا القدس على خريطة طبيعية وتحققوا ما اسم سلسلة الجبال حولها.","تقع القدس على جبال يهودا، نحو ثمانمئة متر فوق مستوى البحر. الارتفاع يعطيها هواء أبرد من الساحل."]}],
+["regions",2,{"he":["למה צפון הארץ ירוק יותר מדרומה?","כי בצפון יורד הרבה יותר גשם מאשר בדרום","כי בדרום אסור לשתול עצים","כי הצפון קרוב יותר לירח","כי בדרום השמש לא זורחת","חשבו מה צמחים צריכים כדי להיות ירוקים, ומאיפה זה מגיע.","השוו כמות גשם בחורף בין מטולה בצפון לבאר שבע בדרום.","כמות הגשם יורדת מצפון לדרום. בגליל יורדים מאות מילימטרים בשנה, ובנגב רק מעט. לכן הצבע משתנה על המפה."],"en":["Why is the north of the country greener than its south?","Because much more rain falls in the north than in the south","Because planting trees is forbidden in the south","Because the north is closer to the moon","Because the sun does not rise in the south","Think about what plants need to be green, and where it comes from.","Compare the amount of winter rain between Metula in the north and Be'er Sheva in the south.","The amount of rain drops from north to south. In the Galilee hundreds of millimeters fall each year, and in the Negev only a little. That is why the color changes on the map."],"ru":["Почему север страны зеленее её юга?","Потому что на севере выпадает намного больше дождя, чем на юге","Потому что на юге запрещено сажать деревья","Потому что север ближе к луне","Потому что на юге солнце не восходит","Подумайте, что нужно растениям, чтобы быть зелёными, и откуда это приходит.","Сравните количество зимнего дождя между Метулой на севере и Беэр-Шевой на юге.","Количество дождя уменьшается с севера на юг. В Галилее выпадают сотни миллиметров в год, а в Негеве лишь немного. Поэтому цвет меняется на карте."],"ar":["لماذا شمال البلاد أكثر خضرة من جنوبها؟","لأن في الشمال ينزل مطر أكثر بكثير مما في الجنوب","لأن في الجنوب يُمنع غرس الأشجار","لأن الشمال أقرب إلى القمر","لأن في الجنوب الشمس لا تشرق","فكروا ماذا تحتاج النباتات لتكون خضراء، ومن أين يأتي ذلك.","قارنوا كمية مطر الشتاء بين المطلة في الشمال وبئر السبع في الجنوب.","كمية المطر تقل من الشمال إلى الجنوب. في الجليل تنزل مئات المليمترات في السنة، وفي النقب القليل فقط. لذلك يتغير اللون على الخريطة."]}],
+["regions",2,{"he":["אילו שני גופי מים מחבר נהר הירדן?","את הכנרת ואת ים המלח","את הים התיכון ואת הים האדום","את הכנרת ואת הים התיכון","את ים המלח ואת מפרץ אילת","חשבו על מסלול של נהר: מהמקור בצפון, דרך אגם, ועד השפך בדרום.","עקבו על המפה אחרי הקו הכחול של הירדן מצפון לדרום.","הירדן זורם מהחרמון, נכנס לכנרת ויוצא ממנה דרומה אל ים המלח."],"en":["Which two bodies of water does the Jordan River connect?","The Sea of Galilee and the Dead Sea","The Mediterranean and the Red Sea","The Sea of Galilee and the Mediterranean","The Dead Sea and the Gulf of Eilat","Think about a river's path: from the source in the north, through a lake, to the mouth in the south.","Follow the blue line of the Jordan on the map from north to south.","The Jordan flows from the Hermon, enters the Sea of Galilee and leaves it southward to the Dead Sea."],"ru":["Какие два водоёма соединяет река Иордан?","Кинерет и Мёртвое море","Средиземное и Красное моря","Кинерет и Средиземное море","Мёртвое море и Эйлатский залив","Подумайте о пути реки: от истока на севере, через озеро, до устья на юге.","Проследите на карте синюю линию Иордана с севера на юг.","Иордан течёт от Хермона, входит в Кинерет и выходит из него на юг к Мёртвому морю."],"ar":["أي مسطحين مائيين يربط نهر الأردن؟","بحيرة طبريا والبحر الميت","البحر المتوسط والبحر الأحمر","بحيرة طبريا والبحر المتوسط","البحر الميت وخليج إيلات","فكروا في مسار النهر: من المنبع في الشمال، عبر بحيرة، إلى المصب في الجنوب.","تتبعوا على الخريطة الخط الأزرق لنهر الأردن من الشمال إلى الجنوب.","يجري الأردن من جبل الشيخ، يدخل بحيرة طبريا ويخرج منها جنوبًا إلى البحر الميت."]}],
+["regions",2,{"he":["למה בנגב גרים פחות אנשים מאשר במרכז הארץ?","כי שם יבש ומעט מים, וקשה יותר לגור ולעבוד","כי שם קר מדי כל השנה","כי אסור לבנות שם בתים","כי אין שם שמש","חשבו על הצרכים הבסיסיים של עיר: מים, עבודה ואוכל. מה קשה למצוא במדבר?","מה משותף לכל עיר גדולה שאתם מכירים, ומה חסר לאזור יבש?","המדבר יפה אבל קשה למגורים: מעט מים, מעט גשם וחום גדול. לכן רוב האנשים מתרכזים במרכז ובצפון."],"en":["Why do fewer people live in the Negev than in the center of the country?","Because it is dry with little water, and living and working are harder","Because it is too cold there all year","Because building houses there is forbidden","Because there is no sun there","Think about the basic needs of a city: water, work and food. What is hard to find in a desert?","What do all the big cities you know share, and what is a dry region missing?","The desert is beautiful but hard to live in: little water, little rain and great heat. That is why most people gather in the center and the north."],"ru":["Почему в Негеве живёт меньше людей, чем в центре страны?","Потому что там сухо и мало воды, и жить и работать труднее","Потому что там слишком холодно весь год","Потому что строить там дома запрещено","Потому что там нет солнца","Подумайте об основных нуждах города: вода, работа и еда. Что трудно найти в пустыне?","Что общего у всех больших городов, которые вы знаете, и чего не хватает сухому району?","Пустыня красива, но жить в ней трудно: мало воды, мало дождя и сильная жара. Поэтому большинство людей собирается в центре и на севере."],"ar":["لماذا يسكن في النقب أشخاص أقل مما في وسط البلاد؟","لأنه جاف وقليل الماء، والسكن والعمل أصعب","لأنه بارد أكثر من اللازم كل السنة","لأنه يُمنع بناء بيوت هناك","لأنه لا توجد فيه شمس","فكروا في الاحتياجات الأساسية لمدينة: ماء وعمل وطعام. ما الصعب إيجاده في الصحراء؟","ما المشترك بين كل مدينة كبيرة تعرفونها، وما الناقص في منطقة جافة؟","الصحراء جميلة لكن السكن فيها صعب: ماء قليل ومطر قليل وحر شديد. لذلك يتجمع معظم الناس في الوسط والشمال."]}],
+["regions",2,{"he":["מהם הגולן והחרמון?","רמה והר גבוהים בצפון מזרח הארץ","שני איים בים התיכון","ערי נמל בדרום","מדבריות במערב הארץ","חשבו על מקום גבוה וקריר, שבו יורד שלג בחורף ואפשר לגלוש.","חפשו על המפה את הפינה הצפון מזרחית של ישראל.","רמת הגולן היא רמה גבוהה בצפון מזרח הארץ, והחרמון הוא ההר הגבוה ביותר בישראל, עם שלג בחורף."],"en":["What are the Golan and the Hermon?","A high plateau and mountain in the northeast of the country","Two islands in the Mediterranean","Port cities in the south","Deserts in the west of the country","Think about a high cool place, where snow falls in winter and people can ski.","Look on the map for the northeastern corner of Israel.","The Golan Heights is a high plateau in the northeast, and the Hermon is the highest mountain in Israel, with snow in winter."],"ru":["Что такое Голан и Хермон?","Высокое плато и гора на северо-востоке страны","Два острова в Средиземном море","Портовые города на юге","Пустыни на западе страны","Подумайте о высоком прохладном месте, где зимой выпадает снег и можно кататься на лыжах.","Поищите на карте северо-восточный угол Израиля.","Голанские высоты это высокое плато на северо-востоке, а Хермон самая высокая гора в Израиле, со снегом зимой."],"ar":["ما هما الجولان وجبل الشيخ؟","هضبة وجبل مرتفعان في شمال شرق البلاد","جزيرتان في البحر المتوسط","مدن موانئ في الجنوب","صحاري في غرب البلاد","فكروا في مكان مرتفع وبارد، ينزل فيه الثلج شتاء ويمكن التزلج.","ابحثوا على الخريطة عن الزاوية الشمالية الشرقية لإسرائيل.","هضبة الجولان هي هضبة مرتفعة في الشمال الشرقي، وجبل الشيخ هو أعلى جبل في إسرائيل، وفيه ثلج في الشتاء."]}],
+["regions",3,{"he":["ישראל ארץ קטנה, אבל יש בה מדבר, הרים ירוקים ובקעה חמה. איך זה שבארץ אחת קטנה יש אקלימים כל כך שונים?","כי הארץ ארוכה מצפון לדרום, הגשם פוחת דרומה והגבהים משתנים","כי כל עיר בוחרת לה אקלים משלה","כי הים מתחלק לשלושה ימים","כי ככה זה בכל ארץ קטנה","חשבו על שני דברים שמשתנים מצפון לדרום: כמה גשם יורד, וכמה גבוה המקום מעל הים.","השוו שלושה מקומות על המפה: הגליל, מישור החוף והנגב. מה משתנה ביניהם?","גשם וגובה יוצרים אקלים: הצפון הגבוה מקבל הרבה גשם, החוף מתון ליד הים, והדרום הופך מדברי."],"en":["Israel is a small country, but it has a desert, green mountains and a hot valley. How can one small country have such different climates?","Because the country is long from north to south, the rain lessens southward and the heights change","Because every city chooses its own climate","Because the sea splits into three seas","Because that is how it is in every small country","Think about two things that change from north to south: how much rain falls, and how high the place is above the sea.","Compare three places on the map: the Galilee, the coastal plain and the Negev. What changes between them?","Rain and height create climate: the high north gets lots of rain, the coast is mild next to the sea, and the south becomes desert."],"ru":["Израиль маленькая страна, но в ней есть пустыня, зелёные горы и жаркая долина. Как в одной маленькой стране могут быть такие разные климаты?","Потому что страна длинная с севера на юг, дождь уменьшается к югу и высоты меняются","Потому что каждый город выбирает себе свой климат","Потому что море делится на три моря","Потому что так в любой маленькой стране","Подумайте о двух вещах, которые меняются с севера на юг: сколько дождя выпадает и как высоко место над морем.","Сравните три места на карте: Галилею, прибрежную равнину и Негев. Что меняется между ними?","Дождь и высота создают климат: высокий север получает много дождя, побережье мягкое рядом с морем, а юг становится пустыней."],"ar":["إسرائيل بلد صغير، لكن فيها صحراء وجبال خضراء وغور حار. كيف يكون في بلد واحد صغير مناخات مختلفة جدًا هكذا؟","لأن البلاد طويلة من الشمال إلى الجنوب، والمطر يقل جنوبًا والارتفاعات تتغير","لأن كل مدينة تختار لنفسها مناخها","لأن البحر ينقسم إلى ثلاثة بحار","لأن هكذا الأمر في كل بلد صغير","فكروا في شيئين يتغيران من الشمال إلى الجنوب: كم مطر ينزل، وكم ارتفاع المكان فوق البحر.","قارنوا ثلاثة أماكن على الخريطة: الجليل والسهل الساحلي والنقب. ما الذي يتغير بينها؟","المطر والارتفاع يصنعان المناخ: الشمال المرتفع يحصل على مطر كثير، والساحل معتدل بجانب البحر، والجنوب يصبح صحراويًا."]}],
+["regions",3,{"he":["למה המים של ים המלח כל כך מלוחים?","כי מים נכנסים אליו ולא יוצאים, האדים עפים לשמיים והמלח נשאר","כי ספינות שופכות שם מלח","כי החרמון עשוי מלח","כי ככה נוצר כל ים","חשבו על סיר מים מלוחים על האש: המים מתאדים, ומה נשאר בתחתית?","לים המלח יש רק כניסת מים, בלי יציאה. לאן המים נעלמים?","ים המלח הוא שקע סגור: הירדן מזרים מים פנימה, השמש מאדה אותם, והמלח נשאר ומצטבר. לכן קל לצוף בו."],"en":["Why is the water of the Dead Sea so salty?","Because water flows in and does not flow out, the vapor flies to the sky and the salt stays","Because ships dump salt there","Because the Hermon is made of salt","Because that is how every sea is made","Think about a pot of salty water on the flame: the water evaporates, and what stays at the bottom?","The Dead Sea has only a water entrance, with no exit. Where does the water disappear to?","The Dead Sea is a closed hollow: the Jordan pours water in, the sun evaporates it, and the salt stays and collects. That is why floating in it is easy."],"ru":["Почему вода Мёртвого моря такая солёная?","Потому что вода втекает в него и не вытекает, пар улетает в небо, а соль остаётся","Потому что корабли высыпают там соль","Потому что Хермон сделан из соли","Потому что так создаётся каждое море","Подумайте о кастрюле с солёной водой на огне: вода испаряется, и что остаётся на дне?","У Мёртвого моря есть только вход воды, без выхода. Куда вода исчезает?","Мёртвое море это закрытая впадина: Иордан вливает воду внутрь, солнце испаряет её, а соль остаётся и накапливается. Поэтому плавать в нём легко."],"ar":["لماذا مياه البحر الميت مالحة جدًا؟","لأن الماء يدخل إليه ولا يخرج، والبخار يطير إلى السماء والملح يبقى","لأن السفن تفرغ هناك الملح","لأن جبل الشيخ مصنوع من الملح","لأن هكذا يتكون كل بحر","فكروا في قدر ماء مالح على النار: الماء يتبخر، وماذا يبقى في القاع؟","للبحر الميت مدخل ماء فقط، بلا مخرج. إلى أين يختفي الماء؟","البحر الميت هو منخفض مغلق: الأردن يضخ الماء إلى الداخل، والشمس تبخره، والملح يبقى ويتراكم. لذلك الطفو فيه سهل."]}],
+["regions",3,{"he":["חקלאי רוצה לגדל תפוזים, שצריכים הרבה מים. איזה אזור ידרוש הכי הרבה השקיה?","הנגב, כי שם יורד הכי מעט גשם","הגליל, כי שם יש הרבה גשם","מישור החוף, כי שם קרוב לים","בקעת הכנרת, כי שם יש אגם","חשבו מה השמיים נותנים בחינם ומה החקלאי חייב להוסיף לבד במקום יבש.","ככל שיורד פחות גשם, צריך יותר השקיה. איזה אזור הכי יבש?","תפוזים צמאים למים. בגליל הגשם עוזר, אבל בנגב היבש כמעט כל המים חייבים לבוא מהשקיה."],"en":["A farmer wants to grow oranges, which need a lot of water. Which region will need the most irrigation?","The Negev, because the least rain falls there","The Galilee, because there is a lot of rain there","The coastal plain, because it is close to the sea","The Sea of Galilee valley, because there is a lake there","Think about what the sky gives for free and what the farmer must add alone in a dry place.","The less rain falls, the more irrigation is needed. Which region is the driest?","Oranges are thirsty for water. In the Galilee the rain helps, but in the dry Negev almost all the water must come from irrigation."],"ru":["Фермер хочет выращивать апельсины, которым нужно много воды. Какой район потребует больше всего орошения?","Негев, потому что там выпадает меньше всего дождя","Галилея, потому что там много дождя","Прибрежная равнина, потому что она близко к морю","Долина Кинерета, потому что там есть озеро","Подумайте, что небо даёт бесплатно, а что фермер должен добавить сам в сухом месте.","Чем меньше дождя выпадает, тем больше нужно орошения. Какой район самый сухой?","Апельсины жаждут воды. В Галилее дождь помогает, но в сухом Негеве почти вся вода должна прийти из орошения."],"ar":["مزارع يريد زراعة البرتقال، الذي يحتاج ماء كثيرًا. أي منطقة ستحتاج أكثر ري؟","النقب، لأن فيه ينزل أقل مطر","الجليل، لأن فيه مطر كثير","السهل الساحلي، لأنه قريب من البحر","غور طبريا، لأن فيه بحيرة","فكروا ماذا تعطي السماء مجانًا وماذا يجب على المزارع أن يضيف وحده في مكان جاف.","كلما نزل مطر أقل، احتجنا ريًا أكثر. أي منطقة هي الأكثر جفافًا؟","البرتقال عطشان للماء. في الجليل المطر يساعد، لكن في النقب الجاف كل الماء تقريبًا يجب أن يأتي من الري."]}],
+["jeru",1,{"he":["מהי בירת ישראל?","ירושלים","תל אביב","חיפה","באר שבע","חשבו איפה יושבת הכנסת, בית הנבחרים של המדינה.","שמה של העיר מופיע בהמנון, בתפילות ובחדשות על הממשלה.","ירושלים היא בירת ישראל: בה יושבים הכנסת, משכן הנשיא ומשרדי הממשלה."],"en":["What is the capital of Israel?","Jerusalem","Tel Aviv","Haifa","Be'er Sheva","Think about where the Knesset sits, the parliament of the state.","The city's name appears in the anthem, in prayers and in the news about the government.","Jerusalem is the capital of Israel: the Knesset, the President's Residence and the government offices sit there."],"ru":["Что является столицей Израиля?","Иерусалим","Тель-Авив","Хайфа","Беэр-Шева","Подумайте, где заседает Кнессет, парламент государства.","Название города встречается в гимне, в молитвах и в новостях о правительстве.","Иерусалим это столица Израиля: там находятся Кнессет, резиденция президента и правительственные учреждения."],"ar":["ما عاصمة إسرائيل؟","القدس","تل أبيب","حيفا","بئر السبع","فكروا أين تقع الكنيست، برلمان الدولة.","اسم المدينة يظهر في النشيد، وفي الصلوات وفي أخبار الحكومة.","القدس هي عاصمة إسرائيل: فيها الكنيست ومقر الرئيس ومكاتب الحكومة."]}],
+["jeru",1,{"he":["איזה אתר בעיר העתיקה קדוש במיוחד ליהודים, ואליו באים להתפלל?","הכותל המערבי","שוק מחנה יהודה","גן החיות התנכי","מגדל דוד","חשבו על המקום הקדוש ביותר ליהודים, שקשור לבית המקדש העתיק.","בדקו איזו מהאפשרויות היא חומה עתיקה, ולא שוק, גן חיות או מגדל.","הכותל המערבי הוא שריד החומה של הר הבית. הוא המקום הקדוש ביותר שבו יהודים מתפללים."],"en":["Which site in the Old City is especially holy to Jews, and people come to it to pray?","The Western Wall","Mahane Yehuda market","The Biblical Zoo","The Tower of David","Think about the holiest place for Jews, connected to the ancient Temple.","Check which of the options is an ancient wall, and not a market, a zoo or a tower.","The Western Wall is a remnant of the Temple Mount wall. It is the holiest place where Jews pray."],"ru":["Какое место в Старом городе особенно свято для евреев, и к нему приходят молиться?","Западная стена","Рынок Махане Иегуда","Библейский зоопарк","Башня Давида","Подумайте о самом святом месте для евреев, связанном с древним Храмом.","Проверьте, какой из вариантов является древней стеной, а не рынком, зоопарком или башней.","Западная стена это остаток стены Храмовой горы. Это самое святое место, где евреи молятся."],"ar":["أي موقع في البلدة القديمة مقدس بشكل خاص لليهود، ويأتون إليه للصلاة؟","حائط المبكى (الحائط الغربي)","سوق محانيه يهودا","حديقة الحيوانات التوراتية","برج داود","فكروا في المكان الأقدس لليهود، المرتبط بالهيكل القديم.","تحققوا أي من الخيارات هو سور قديم، وليس سوقًا أو حديقة حيوانات أو برجًا.","الحائط الغربي هو بقية سور جبل الهيكل. هو أقدس مكان يصلي فيه اليهود."]}],
+["jeru",1,{"he":["מה מקיף את העיר העתיקה של ירושלים עד היום?","חומת אבן עתיקה עם שערים","גדר תיל מודרנית","נהר עמוק","קיר ענק מזכוכית","חשבו איך הגנו על עיר לפני מאות שנים: מה בונים סביבה?","נכנסים לעיר העתיקה דרך שערים מפורסמים כמו שער יפו. דרך מה עוברים בשער?","העיר העתיקה מוקפת חומת אבן שנבנתה לפני מאות שנים. נכנסים אליה דרך שערים, כמו שער יפו ושער האשפות."],"en":["What surrounds the Old City of Jerusalem to this day?","An ancient stone wall with gates","A modern wire fence","A deep river","A giant glass wall","Think about how a city was defended hundreds of years ago: what do you build around it?","People enter the Old City through famous gates like Jaffa Gate. What does a gate pass through?","The Old City is surrounded by a stone wall built hundreds of years ago. People enter it through gates, like Jaffa Gate and Damascus Gate."],"ru":["Что окружает Старый город Иерусалима до сегодняшнего дня?","Древняя каменная стена с воротами","Современный проволочный забор","Глубокая река","Гигантская стеклянная стена","Подумайте, как защищали город сотни лет назад: что строят вокруг него?","В Старый город входят через знаменитые ворота вроде Яффских ворот. Через что проходит ворота?","Старый город окружён каменной стеной, построенной сотни лет назад. Входят в него через ворота, как Яффские ворота и Дамасские ворота."],"ar":["ما الذي يحيط بالبلدة القديمة في القدس حتى اليوم؟","سور حجري قديم له بوابات","سياج سلكي حديث","نهر عميق","جدار زجاجي ضخم","فكروا كيف كانت تُحمى المدينة قبل مئات السنين: ماذا يُبنى حولها؟","يدخل الناس البلدة القديمة عبر بوابات مشهورة مثل باب الخليل (يافا). عبر ماذا تمر البوابة؟","البلدة القديمة محاطة بسور حجري بُني قبل مئات السنين. يدخل إليها الناس عبر بوابات، مثل باب الخليل وباب العامود."]}],
+["jeru",1,{"he":["איזה שוק מפורסם בירושלים מלא בפירות, תבלינים ומאפים?","שוק מחנה יהודה","הבורסה ליהלומים","הקניון הגדול","שוק הדגים של אילת","חשבו איפה קונים פירות טריים, חלה ותבלינים בשישי בבוקר בירושלים.","בדקו איזו אפשרות היא שוק אוכל ירושלמי, ולא בורסה, קניון או שוק דגים.","שוק מחנה יהודה הוא השוק המפורסם של ירושלים, מלא דוכני פירות, תבלינים ומאפים טריים."],"en":["Which famous market in Jerusalem is full of fruits, spices and pastries?","Mahane Yehuda market","The diamond exchange","The big mall","The fish market of Eilat","Think about where people buy fresh fruit, challah and spices on Friday morning in Jerusalem.","Check which option is a Jerusalem food market, and not an exchange, a mall or a fish market.","Mahane Yehuda is Jerusalem's famous market, full of fruit stalls, spices and fresh pastries."],"ru":["Какой знаменитый рынок в Иерусалиме полон фруктов, специй и выпечки?","Рынок Махане Иегуда","Алмазная биржа","Большой торговый центр","Рыбный рынок Эйлата","Подумайте, где покупают свежие фрукты, халу и специи в пятницу утром в Иерусалиме.","Проверьте, какой вариант является иерусалимским продовольственным рынком, а не биржей, торговым центром или рыбным рынком.","Махане Иегуда это знаменитый рынок Иерусалима, полный прилавков с фруктами, специями и свежей выпечкой."],"ar":["أي سوق مشهور في القدس مليء بالفواكه والتوابل والمخبوزات؟","سوق محانيه يهودا","بورصة الألماس","المركز التجاري الكبير","سوق السمك في إيلات","فكروا أين يشترون فواكه طازجة وخبزًا وتوابل صباح الجمعة في القدس.","تحققوا أي خيار هو سوق طعام مقدسي، وليس بورصة أو مركزًا تجاريًا أو سوق سمك.","سوق محانيه يهودا هو السوق المشهور في القدس، مليء بأكشاك الفواكه والتوابل والمخبوزات الطازجة."]}],
+["jeru",1,{"he":["מהי הכנסת?","בית הנבחרים של ישראל, שם עושים את החוקים","תחנת משטרה גדולה","בית החולים של העיר","מוזיאון למטוסים","חשבו מי מחליט על חוקי המדינה ואיפה הם מתכנסים.","בדקו איזו אפשרות קשורה לחוקים ולהצבעות, ולא למשטרה, לרפואה או למטוסים.","הכנסת היא בית הנבחרים: מאה ועשרים חברי כנסת שנבחרו על ידי העם מחוקקים בה את חוקי המדינה."],"en":["What is the Knesset?","Israel's parliament, where the laws are made","A big police station","The city's hospital","A museum of airplanes","Think about who decides on the state's laws and where they gather.","Check which option is connected to laws and votes, and not to police, medicine or airplanes.","The Knesset is the parliament: one hundred and twenty elected members make the state's laws there."],"ru":["Что такое Кнессет?","Парламент Израиля, где принимают законы","Большой полицейский участок","Городская больница","Музей самолётов","Подумайте, кто решает законы государства и где они собираются.","Проверьте, какой вариант связан с законами и голосованиями, а не с полицией, медициной или самолётами.","Кнессет это парламент: сто двадцать избранных народом депутатов принимают в нём законы государства."],"ar":["ما هي الكنيست؟","برلمان إسرائيل، حيث تُصنع القوانين","مركز شرطة كبير","مستشفى المدينة","متحف للطائرات","فكروا من يقرر قوانين الدولة وأين يجتمعون.","تحققوا أي خيار مرتبط بالقوانين والتصويت، وليس بالشرطة أو الطب أو الطائرات.","الكنيست هي البرلمان: مئة وعشرون عضوًا منتخبون من الشعب يسنّون فيها قوانين الدولة."]}],
+["jeru",1,{"he":["בירושלים יש רכבת שנוסעת על פסים ברחובות העיר. איך קוראים לה?","הרכבת הקלה","רכבת הים המהירה","הרכבת התת קרקעית","הרכבת המעופפת","חשבו על רכבת שנוסעת על פסים ברחוב, לא תחת האדמה.","בדקו איזו אפשרות אמיתית: בירושלים אין רכבת תת קרקעית, ובטח לא מעופפת.","הרכבת הקלה של ירושלים נוסעת על פסים ברחובות העיר ומחברת שכונות למרכז."],"en":["Jerusalem has a train that runs on tracks in the city streets. What is it called?","The light rail","The fast sea train","The subway","The flying train","Think about a train that runs on tracks in the street, not under the ground.","Check which option is real: Jerusalem has no subway, and certainly no flying train.","Jerusalem's light rail runs on tracks in the city streets and connects neighborhoods to the center."],"ru":["В Иерусалиме есть поезд, который ездит на рельсах по улицам города. Как он называется?","Лёгкий трамвай","Быстрый морской поезд","Метро","Летающий поезд","Подумайте о поезде, который едет на рельсах по улице, а не под землёй.","Проверьте, какой вариант настоящий: в Иерусалиме нет метро, и уж точно нет летающего поезда.","Лёгкий трамвай Иерусалима ездит на рельсах по улицам города и соединяет кварталы с центром."],"ar":["في القدس قطار يسير على قضبان في شوارع المدينة. ما اسمه؟","القطار الخفيف","قطار البحر السريع","القطار تحت الأرضي","القطار الطائر","فكروا في قطار يسير على قضبان في الشارع، ليس تحت الأرض.","تحققوا أي خيار حقيقي: في القدس لا يوجد قطار تحت أرضي، وبالتأكيد لا يوجد طائر.","القطار الخفيف في القدس يسير على قضبان في شوارع المدينة ويربط الأحياء بالمركز."]}],
+["jeru",2,{"he":["לשלוש דתות יש מקומות קדושים בירושלים. אילו שלוש דתות?","יהדות, נצרות ואסלאם","יהדות, בודהיזם ואסלאם","נצרות, הינדואיזם ויהדות","אסלאם, שינטו ונצרות","חשבו על הכותל, על כנסיית הקבר ועל מסגד אל אקצא. לאילו דתות הם שייכים?","שתיים מהדתות נולדו כאן בארץ, ואחת הגיעה מחצי האי ערב.","בירושלים קדושים ליהודים הכותל והר הבית, לנוצרים כנסיית הקבר, ולמוסלמים אל אקצא וכיפת הסלע."],"en":["Three religions have holy places in Jerusalem. Which three?","Judaism, Christianity and Islam","Judaism, Buddhism and Islam","Christianity, Hinduism and Judaism","Islam, Shinto and Christianity","Think about the Western Wall, the Church of the Holy Sepulchre and the Al-Aqsa Mosque. Which religions do they belong to?","Two of the religions were born here in this land, and one came from the Arabian Peninsula.","In Jerusalem the Western Wall and Temple Mount are holy to Jews, the Church of the Holy Sepulchre to Christians, and Al-Aqsa and the Dome of the Rock to Muslims."],"ru":["У трёх религий есть святые места в Иерусалиме. Какие три религии?","Иудаизм, христианство и ислам","Иудаизм, буддизм и ислам","Христианство, индуизм и иудаизм","Ислам, синтоизм и христианство","Подумайте о Западной стене, о храме Гроба Господня и о мечети Аль-Акса. Каким религиям они принадлежат?","Две из религий родились здесь, в этой стране, а одна пришла с Аравийского полуострова.","В Иерусалиме евреям святы Западная стена и Храмовая гора, христианам храм Гроба Господня, а мусульманам Аль-Акса и Купол Скалы."],"ar":["لثلاث ديانات أماكن مقدسة في القدس. أي ثلاث ديانات؟","اليهودية والمسيحية والإسلام","اليهودية والبوذية والإسلام","المسيحية والهندوسية واليهودية","الإسلام والشنتو والمسيحية","فكروا في الحائط الغربي وكنيسة القيامة ومسجد الأقصى. لأي ديانات ينتمون؟","ديانة ولدتا هنا في هذه البلاد، وواحدة جاءت من شبه الجزيرة العربية.","في القدس تُقدس لليهود الحائط الغربي وجبل الهيكل، وللمسيحيين كنيسة القيامة، وللمسلمين الأقصى وقبة الصخرة."]}],
+["jeru",2,{"he":["לעיר העתיקה ארבעה רובעים. איזה רובע לא קיים בה?","הרובע הסיני","הרובע היהודי","הרובע המוסלמי","הרובע הנוצרי","זכרו את ארבעת הרובעים: יהודי, מוסלמי, נוצרי ועוד אחד קטן. מי נשאר בחוץ?","הרובע הרביעי והקטן הוא הארמני. עכשיו בדקו מי לא ברשימה.","העיר העתיקה מחולקת לארבעה רובעים: יהודי, מוסלמי, נוצרי וארמני. רובע סיני אין בה."],"en":["The Old City has four quarters. Which quarter does not exist in it?","The Chinese Quarter","The Jewish Quarter","The Muslim Quarter","The Christian Quarter","Remember the four quarters: Jewish, Muslim, Christian and one more small one. Who is left out?","The fourth and smallest quarter is the Armenian one. Now check who is not on the list.","The Old City is divided into four quarters: Jewish, Muslim, Christian and Armenian. There is no Chinese quarter in it."],"ru":["В Старом городе четыре квартала. Какого квартала в нём не существует?","Китайский квартал","Еврейский квартал","Мусульманский квартал","Христианский квартал","Вспомните четыре квартала: еврейский, мусульманский, христианский и ещё один маленький. Кто остался за бортом?","Четвёртый и самый маленький квартал это армянский. Теперь проверьте, кого нет в списке.","Старый город делится на четыре квартала: еврейский, мусульманский, христианский и армянский. Китайского квартала в нём нет."],"ar":["للبلدة القديمة أربعة أحياء. أي حي لا يوجد فيها؟","الحي الصيني","حي اليهود","حي المسلمين","حي النصارى","تذكروا الأحياء الأربعة: اليهودي والإسلامي والمسيحي وواحد صغير آخر. من بقي خارجًا؟","الحي الرابع والأصغر هو الأرمني. الآن تحققوا من ليس في القائمة.","البلدة القديمة مقسمة إلى أربعة أحياء: اليهودي والإسلامي والمسيحي والأرمني. لا يوجد فيها حي صيني."]}],
+["jeru",2,{"he":["למה אנשים מכל העולם מתפללים ומטיילים דווקא בירושלים?","כי יש בה מקומות קדושים לשלוש דתות שונות","כי יש בה את הים הכי כחול","כי יש בה את הקניון הכי גדול בעולם","כי בה נמצאת העיר הכי קרה","חשבו מה מיוחד בעיר הזאת לעומת ערים אחרות בארץ.","חשבו על הכותל, על כנסיית הקבר ועל כיפת הסלע: מה משותף לשלושתם?","ירושלים קדושה ליהדות, לנצרות ולאסלאם. מיליוני אנשים מגיעים להתפלל ולראות את המקומות הקדושים להם."],"en":["Why do people from all over the world pray and tour in Jerusalem of all places?","Because it has holy places for three different religions","Because it has the bluest sea","Because it has the biggest mall in the world","Because the coldest city is in it","Think about what is special about this city compared with other cities in the country.","Think about the Western Wall, the Church of the Holy Sepulchre and the Dome of the Rock: what do all three share?","Jerusalem is holy to Judaism, Christianity and Islam. Millions of people come to pray and see the places holy to them."],"ru":["Почему люди со всего мира молятся и путешествуют именно в Иерусалиме?","Потому что в нём есть святые места для трёх разных религий","Потому что в нём самое синее море","Потому что в нём самый большой торговый центр в мире","Потому что в нём находится самый холодный город","Подумайте, что особенного в этом городе по сравнению с другими городами страны.","Подумайте о Западной стене, о храме Гроба Господня и о Куполе Скалы: что общего у всех троих?","Иерусалим свят для иудаизма, христианства и ислама. Миллионы людей приезжают молиться и видеть святые для них места."],"ar":["لماذا يصلي ويتجول أناس من كل العالم في القدس تحديدًا؟","لأن فيها أماكن مقدسة لثلاث ديانات مختلفة","لأن فيها أكثر بحر زرقة","لأن فيها أكبر مركز تجاري في العالم","لأن فيها أكثر مدينة برودة","فكروا ما المميز في هذه المدينة مقارنة بمدن أخرى في البلاد.","فكروا في الحائط الغربي وكنيسة القيامة وقبة الصخرة: ما المشترك بين الثلاثة؟","القدس مقدسة لليهودية والمسيحية والإسلام. ملايين الناس يأتون للصلاة ورؤية الأماكن المقدسة لديهم."]}],
+["jeru",2,{"he":["מהם הר הזיתים ומגדל דוד?","מקומות מפורסמים בירושלים: הר עם בתי עלמין עתיק, ומצודה ליד העיר העתיקה","שני איים בים התיכון","הרים בצפון הארץ הרחוק","קניונים בדרום","חשבו על מקומות שתיירים מצלמים כשהם מסתכלים על העיר העתיקה.","בדקו על המפה: שני המקומות האלה נמצאים ממש ליד חומות העיר העתיקה.","הר הזיתים הוא הר עתיק ממזרח לעיר העתיקה, ומגדל דוד הוא מצודה עתיקה ליד שער יפו. שניהם סמלים של ירושלים."],"en":["What are the Mount of Olives and the Tower of David?","Famous places in Jerusalem: a mountain with an ancient cemetery, and a citadel next to the Old City","Two islands in the Mediterranean","Mountains in the far north of the country","Malls in the south","Think about places tourists photograph when they look at the Old City.","Check on the map: both these places are right next to the walls of the Old City.","The Mount of Olives is an ancient mountain east of the Old City, and the Tower of David is an ancient citadel next to Jaffa Gate. Both are symbols of Jerusalem."],"ru":["Что такое Елеонская гора и Башня Давида?","Знаменитые места в Иерусалиме: гора с древним кладбищем и крепость рядом со Старым городом","Два острова в Средиземном море","Горы на далёком севере страны","Торговые центры на юге","Подумайте о местах, которые туристы фотографируют, глядя на Старый город.","Проверьте на карте: оба эти места находятся прямо у стен Старого города.","Елеонская гора это древняя гора к востоку от Старого города, а Башня Давида древняя крепость у Яффских ворот. Обе являются символами Иерусалима."],"ar":["ما هما جبل الزيتون وبرج داود؟","مكانان مشهوران في القدس: جبل فيه مقبرة قديمة، وقلعة بجانب البلدة القديمة","جزيرتان في البحر المتوسط","جبال في شمال البلاد البعيد","مراكز تسوق في الجنوب","فكروا في أماكن يصورها السياح عندما ينظرون إلى البلدة القديمة.","تحققوا على الخريطة: كلا المكانين يقعان مباشرة بجانب أسوار البلدة القديمة.","جبل الزيتون هو جبل قديم شرق البلدة القديمة، وبرج داود قلعة قديمة بجانب باب الخليل. كلاهما رمزان للقدس."]}],
+["jeru",3,{"he":["למה דווקא על ההרים נבנתה ירושלים העתיקה, ולא במישור?","כי על ההר היה קל יותר להגן על העיר, ולידה היה מעיין מים","כי על ההרים יש יותר חנויות","כי במישור אסור היה לבנות","כי ההרים קרובים יותר לשמש","חשבו על שני דברים שעיר עתיקה חייבת: הגנה מפני אויבים, ומים לשתייה.","מי עומד גבוה רואה רחוק. מה זה נותן לשומרי עיר?","ערים עתיקות נבנו על גבעות כדי לראות את האויב מרחוק ולהגן על עצמן. מעיין הגיחון נתן לירושלים מים."],"en":["Why was ancient Jerusalem built on the mountains, and not on the plain?","Because on the hill it was easier to defend the city, and next to it was a water spring","Because the mountains have more shops","Because building on the plain was forbidden","Because the mountains are closer to the sun","Think about two things an ancient city must have: defense from enemies, and water to drink.","Whoever stands high sees far. What does that give the city guards?","Ancient cities were built on hills to see the enemy from afar and defend themselves. The Gihon Spring gave Jerusalem water."],"ru":["Почему древний Иерусалим был построен именно на горах, а не на равнине?","Потому что на холме было легче защищать город, и рядом был источник воды","Потому что в горах больше магазинов","Потому что на равнине строить было запрещено","Потому что горы ближе к солнцу","Подумайте о двух вещах, которые нужны древнему городу: защита от врагов и вода для питья.","Кто стоит высоко, видит далеко. Что это даёт стражам города?","Древние города строились на холмах, чтобы видеть врага издалека и защищаться. Источник Гихон давал Иерусалиму воду."],"ar":["لماذا بُنيت القدس القديمة على الجبال تحديدًا، وليس في السهل؟","لأنه على التل كان أسهل الدفاع عن المدينة، وبجانبها كان نبع ماء","لأن في الجبال محلات أكثر","لأنه كان يُمنع البناء في السهل","لأن الجبال أقرب إلى الشمس","فكروا في شيئين تحتاجهما مدينة قديمة: الدفاع عن الأعداء وماء للشرب.","من يقف عاليًا يرى بعيدًا. ماذا يعطي ذلك لحراس المدينة؟","بُنيت المدن القديمة على التلال لترى العدو من بعيد وتدافع عن نفسها. نبع الجيحون أعطى القدس الماء."]}],
+["jeru",3,{"he":["מה ההבדל בין העיר העתיקה לבין ירושלים החדשה?","העתיקה עתיקה ומוקפת חומה עם מקומות קדושים, והחדשה נבנתה מחוץ לחומה עם שכונות, כנסת ומוזיאונים","אין שום הבדל, זו אותה עיר בדיוק","העתיקה גדולה יותר מהחדשה","החדשה מוקפת חומה והעתיקה לא","חשבו על משפחה שגדלה: הבית הישן נשאר, וסביבו בונים חדרים חדשים.","חפשו במפה את החומה: מה בתוכה עתיק, ומה בחוץ נבנה אחר כך?","העיר העתיקה היא הלב העתיק בין החומות. ירושלים החדשה גדלה מחוץ לחומה במאה וחמישים השנים האחרונות, עם שכונות, הכנסת ומוזיאונים."],"en":["What is the difference between the Old City and the new Jerusalem?","The old one is ancient and walled with holy places, and the new one was built outside the wall with neighborhoods, the Knesset and museums","There is no difference, it is exactly the same city","The old one is bigger than the new one","The new one is walled and the old one is not","Think about a family that grows: the old house stays, and new rooms are built around it.","Look for the wall on the map: what inside it is ancient, and what outside was built later?","The Old City is the ancient heart inside the walls. The new Jerusalem grew outside the wall in the last hundred and fifty years, with neighborhoods, the Knesset and museums."],"ru":["В чём разница между Старым городом и новым Иерусалимом?","Старый древний и окружён стеной со святыми местами, а новый построен вне стены с кварталами, Кнессетом и музеями","Нет никакой разницы, это ровно тот же город","Старый больше нового","Новый окружён стеной, а старый нет","Подумайте о семье, которая растёт: старый дом остаётся, а вокруг строят новые комнаты.","Поищите на карте стену: что внутри неё древнее, а что снаружи построено позже?","Старый город это древнее сердце внутри стен. Новый Иерусалим вырос вне стены за последние сто пятьдесят лет, с кварталами, Кнессетом и музеями."],"ar":["ما الفرق بين البلدة القديمة والقدس الجديدة؟","القديمة عتيقة ومحاطة بسور مع أماكن مقدسة، والجديدة بُنيت خارج السور مع أحياء وكنيست ومتاحف","لا يوجد أي فرق، هي المدينة نفسها تمامًا","القديمة أكبر من الجديدة","الجديدة محاطة بسور والقديمة لا","فكروا في عائلة تكبر: البيت القديم يبقى، وحوله تُبنى غرف جديدة.","ابحثوا في الخريطة عن السور: ما داخله قديم، وما خارجه بُني لاحقًا؟","البلدة القديمة هي القلب القديم داخل الأسوار. القدس الجديدة نمت خارج السور في المئة والخمسين سنة الأخيرة، مع أحياء والكنيست ومتاحف."]}],
+["jeru",3,{"he":["מבקר רוצה לראות ביום אחד מקום קדוש ליהודים, למוסלמים ולנוצרים. למה דווקא ירושלים מאפשרת את זה?","כי המקומות הקדושים לשלוש הדתות קרובים אחד לשני בעיר העתיקה ובסביבתה","כי בירושלים יש הכי הרבה מטוסים","כי בערים אחרות אין מקומות קדושים בכלל בעולם","כי בירושלים יום אחד ארוך יותר","חשבו כמה רחוק הכותל מכנסיית הקבר ומכיפת הסלע.","בדקו על מפת העיר העתיקה: כמה זמן הליכה יש בין שלושת המקומות?","בירושלים המקומות הקדושים לשלוש הדתות צפופים וקרובים: אפשר ללכת ברגל מהכותל לכנסיית הקבר ולכיפת הסלע ביום אחד."],"en":["A visitor wants to see in one day a place holy to Jews, to Muslims and to Christians. Why does Jerusalem of all places make that possible?","Because the holy places of the three religions are close to each other in the Old City and around it","Because Jerusalem has the most airplanes","Because other cities have no holy places at all in the world","Because in Jerusalem one day is longer","Think about how far the Western Wall is from the Church of the Holy Sepulchre and the Dome of the Rock.","Check the Old City map: how much walking time is there between the three places?","In Jerusalem the holy places of the three religions are dense and close: you can walk from the Western Wall to the Church of the Holy Sepulchre and the Dome of the Rock in one day."],"ru":["Посетитель хочет за один день увидеть место, святое для евреев, для мусульман и для христиан. Почему именно Иерусалим делает это возможным?","Потому что святые места трёх религий близки друг к другу в Старом городе и его окрестностях","Потому что в Иерусалиме больше всего самолётов","Потому что в других городах мира вообще нет святых мест","Потому что в Иерусалиме один день длиннее","Подумайте, как далеко Западная стена от храма Гроба Господня и от Купола Скалы.","Проверьте на карте Старого города: сколько времени пешком между тремя местами?","В Иерусалиме святые места трёх религий плотные и близкие: можно пройти пешком от Западной стены к храму Гроба Господня и Куполу Скалы за один день."],"ar":["زائر يريد أن يرى في يوم واحد مكانًا مقدسًا لليهود وللمسلمين وللمسيحيين. لماذا القدس تحديدًا تتيح ذلك؟","لأن الأماكن المقدسة للديانات الثلاث قريبة بعضها من بعض في البلدة القديمة وما حولها","لأن في القدس أكثر طائرات","لأن في مدن أخرى لا توجد أماكن مقدسة إطلاقًا في العالم","لأن في القدس اليوم الواحد أطول","فكروا كم بعيد الحائط الغربي عن كنيسة القيامة وعن قبة الصخرة.","تحققوا على خريطة البلدة القديمة: كم وقت المشي بين الأماكن الثلاثة؟","في القدس الأماكن المقدسة للديانات الثلاث متقاربة: يمكن المشي من الحائط الغربي إلى كنيسة القيامة وقبة الصخرة في يوم واحد."]}]
+]
 function genQ(id,d,lang,force){
-  var t=STR[lang]||STR.he,roll=Math.random(),kind;
-  if(force)kind=force;            /* תרגול ממוקד — כופה סוג פעולה אחד */
-  else if(d<=1)kind="add";
-  else if(d===2)kind=roll<0.5?"add":"sub";
-  else if(d===3)kind=roll<0.35?"add":roll<0.65?"sub":"mul";
-  else if(d===4)kind=roll<0.25?"add":roll<0.5?"sub":roll<0.8?"mul":"div";
-  else kind=roll<0.2?"add":roll<0.45?"sub":roll<0.75?"mul":"div";
-  var a=0,b=0,ans=0,text="";
-  var maxN=10+d*8;
-  if(kind==="add"){a=ri(2,maxN);b=ri(2,maxN);ans=a+b;text=fmt(t.qAdd,{a:a,b:b})}
-  else if(kind==="sub"){a=ri(5,maxN+5);b=ri(2,Math.max(2,a-1));ans=a-b;text=fmt(t.qSub,{a:a,b:b})}
-  else if(kind==="mul"){a=ri(2,4+d);b=ri(2,4+d);ans=a*b;text=fmt(t.qMul,{a:a,b:b})}
-  else{b=ri(2,4+d);ans=ri(2,4+d);a=b*ans;text=fmt(t.qDiv,{a:a,b:b})}
-  var opts=[ans],guard=0;
-  while(opts.length<4&&guard++<99){var cand=ans+ri(1,Math.max(3,Math.round(ans/3)+2))*(Math.random()<0.5?-1:1);if(cand>=0&&opts.indexOf(cand)<0)opts.push(cand)}
-  /* ערבוב פישר־ייטס. הערבוב הקודם היה sort עם משווה אקראי — משווה
-     לא עקבי, ולכן הפיזור לא היה אחיד: התשובה הנכונה נחתה במקום
-     הראשון בכ-36% מהשאלות ובאחרון בכ-31%, לעומת כ-16% באמצע.
-     ילד לומד את זה מהר יותר מכפי שהוא לומד לחשב. */
+  var kind;
+  if(force)kind=force;            /* תרגול ממוקד — כופה יחידה אחת */
+  else{var ks=["maps","med","regions","jeru"];kind=ks[Math.floor(Math.random()*ks.length)];}
+  var bucket=d<=2?1:(d<=4?2:3);
+  if(!P.usedRows)P.usedRows={};
+  var i,pool=[];
+  for(i=0;i<GEOBANK.length;i++)if(GEOBANK[i][0]===kind&&GEOBANK[i][1]===bucket&&!P.usedRows[i])pool.push(i);
+  if(!pool.length)for(i=0;i<GEOBANK.length;i++)if(GEOBANK[i][0]===kind&&!P.usedRows[i])pool.push(i);
+  if(!pool.length){P.usedRows={};for(i=0;i<GEOBANK.length;i++)if(GEOBANK[i][0]===kind)pool.push(i);}
+  var idx=pool[Math.floor(Math.random()*pool.length)];
+  P.usedRows[idx]=1;
+  var row=GEOBANK[idx],L=row[2][lang]||row[2].he;
+  var opts=[L[1],L[2],L[3],L[4]];
+  /* ערבוב פישר־ייטס של מחרוזות האפשרויות — אותו עיקרון כמו במספרים:
+     התשובה הנכונה לא נוחתת תמיד באותו מקום. */
   for(var si=opts.length-1;si>0;si--){var sj=Math.floor(Math.random()*(si+1)),st=opts[si];opts[si]=opts[sj];opts[sj]=st}
-  /* רמז והסבר לפי סוג הפעולה. add -> hint1Add / explainAdd וכו'.
-     אם משום מה חסר טקסט לפעולה מסוימת — נופלים חזרה לטקסט הכללי הישן. */
-  var K=kind.charAt(0).toUpperCase()+kind.slice(1);
-  var h1=t["hint1"+K]||t.hint1, h2=t["hint2"+K]||t.hint2, ex=t["explain"+K]||t.explain;
-  var exTxt=fmt(ex,{a:a,b:b,ans:ans});
-  /* התרגיל לבד, בלי מילים — כך אפשר להציג אותו תמיד משמאל לימין
-     ובלי שהעברית תהפוך את סדר המספרים. q.text נשאר לשימוש ההקראה. */
-  var expr=a+" "+({add:"+",sub:"−",mul:"×",div:"÷"}[kind])+" "+b;
-  return {id:id,text:text,expr:expr,answer:ans,a:a,b:b,kind:kind,options:opts,
-    hints:[fmt(h1,{a:a,b:b,ans:ans}),fmt(h2,{a:a,b:b,ans:ans}),exTxt],
-    explain:exTxt};
+  return {id:id,text:L[0],expr:null,answer:L[1],a:0,b:0,kind:row[0],d:row[1],options:opts,
+    hints:[L[5],L[6],L[7]],
+    explain:L[7]};
 }
 function genSession(n,d,lang){var arr=[];for(var i=0;i<n;i++)arr.push(genQ(i,d,lang));return arr}
 
@@ -2413,7 +2457,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="g107 · 2026-09-27";
+var BUILD="g108 · 2026-09-27";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2847,7 +2891,7 @@ function practice(){
   for(var L=1;L<=6;L++)h+='<button class="'+lc("lvl l"+L+(state.level===L?" on":""))+'" data-a="lvl" data-l="'+L+'" title="'+esc(names[L-1])+'"><span class="n">'+L+'</span>'+esc(names[L-1])+'</button>';
   h+='</div>';
   /* status strip */
-  h+='<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px"><span class="fd" style="font-weight:700;font-size:1.1rem">'+fmt(t.qOf,{a:P.qi+1,b:P.ses.length})+'</span>'+(P.focus?'<span class="'+lc("chip op-"+P.focus)+'" style="background:var(--op-s);border-color:var(--op);color:var(--op-d)">'+ic("sparkle",14)+' '+esc(t.focusBadge)+' · '+esc({add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[P.focus]||"")+'</span>':"")+'<span class="dots">';
+  h+='<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px"><span class="fd" style="font-weight:700;font-size:1.1rem">'+fmt(t.qOf,{a:P.qi+1,b:P.ses.length})+'</span>'+(P.focus?'<span class="'+lc("chip op-"+P.focus)+'" style="background:var(--op-s);border-color:var(--op);color:var(--op-d)">'+ic("sparkle",14)+' '+esc(t.focusBadge)+' · '+esc(tName({id:P.focus}))+'</span>':"")+'<span class="dots">';
   P.ses.forEach(function(_,i){var cls=i<P.results.length?(P.results[i]==="ok"?"ok":P.results[i]==="sk"?"sk":"no"):"";h+='<span class="'+lc("dot "+cls)+'"></span>'});
   h+='</span><span style="margin-inline-start:auto;display:flex;gap:8px"><button class="chip" data-a="break">'+ic("heart",15)+' '+esc(t.breakBtn)+'</button>';
   if(s.streak>0)h+='<span class="chip" style="border-color:rgba(255,111,97,.4);color:var(--coral-deep)">'+ic("flame",15)+' '+s.streak+'</span>';
@@ -2856,22 +2900,22 @@ function practice(){
   if(isDaily)h+='<div class="rise" style="display:flex;align-items:center;gap:12px;margin-top:14px;background:var(--amber-soft);border:2px solid rgba(255,197,49,.55);border-radius:18px;padding:12px 18px">'+ic("star",22)+'<span><b class="fd" style="color:var(--amber-deep)">'+esc(t.dailyTag)+'</b><br><span style="font-size:.78rem;color:var(--amber-deep)">'+esc(t.dailyDesc)+'</span></span></div>';
   /* main grid */
   h+='<div class="cols pr-cols" style="margin-top:18px;padding-bottom:60px"><div class="'+lc("card opcard op-"+q.kind)+'" style="padding:26px">';
-  h+='<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><span class="fd opchip"><span class="opdot"></span>'+esc({add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[q.kind])+' · '+esc(names[al-1])+'</span><button class="chip" data-a="listen" style="color:var(--sky-deep);background:var(--sky-soft);border-color:rgba(88,183,224,.4)">'+ic("speaker",16)+' '+esc(t.listen)+'</button></div>';
+  h+='<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><span class="fd opchip"><span class="opdot"></span>'+esc(tName({id:q.kind}))+(q.d===3?' <span style="background:#b45309;color:#fff;border-radius:8px;padding:1px 8px;font-weight:700">'+esc(t.challenge)+'</span>':"")+' · '+esc(names[al-1])+'</span><button class="chip" data-a="listen" style="color:var(--sky-deep);background:var(--sky-soft);border-color:rgba(88,183,224,.4)">'+ic("speaker",16)+' '+esc(t.listen)+'</button></div>';
   /* שורה 1: המשפט, בכיוון השפה. שורה 2: התרגיל לבדו, תמיד משמאל לימין. */
-  h+='<p class="qask">'+esc(t.ask)+'</p>';
-  h+='<p class="qbig" dir="ltr">'+esc(q.expr||q.text)+'</p>';
-  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:32px">';
+  if(q.expr)h+='<p class="qask">'+esc(t.ask)+'</p>';
+  h+=q.expr?'<p class="qbig" dir="ltr">'+esc(q.expr)+'</p>':'<p class="qbig qtext" dir="auto">'+esc(q.text)+'</p>';
+  h+='<div style="display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px">';
   q.options.forEach(function(opt){
     var cls="opt",dis="";
     if(P.phase==="reveal"&&opt===q.answer)cls+=" right pop";
     else if(P.wrong.indexOf(opt)>=0)cls+=" wrong";
     else if(P.flash===opt)cls+=" flash shake";
     if(P.wrong.indexOf(opt)>=0||P.phase==="reveal")dis=" disabled";
-    h+='<div class="optwrap"><button class="'+lc(cls)+'"'+dis+' data-a="ans" data-o="'+opt+'"><span style="direction:ltr">'+opt+'</span></button>'+
-      (state.settings.tts?'<button type="button" class="optspk" data-a="sayopt" data-o="'+opt+'" aria-label="'+esc(t.sayOpt)+'">'+ic("speaker",15)+'</button>':"")+'</div>';
+    h+='<div class="optwrap"><button class="'+lc(cls)+'"'+dis+' data-a="ans" data-o="'+esc(opt)+'"><span dir="auto" style="font-size:1.05rem;line-height:1.35">'+esc(opt)+'</span></button>'+
+      (state.settings.tts?'<button type="button" class="optspk" data-a="sayopt" data-o="'+esc(opt)+'" aria-label="'+esc(t.sayOpt)+'">'+ic("speaker",15)+'</button>':"")+'</div>';
   });
   h+='</div>';
-  if(P.visual&&P.phase==="ask")h+=visualHint(q);
+  if(P.visual&&q.expr&&P.phase==="ask")h+=visualHint(q);
   if(P.phase==="reveal"){
     /* אותו מסך משמש היום גם לתשובה נכונה וגם לשגויה, ולכן הוא נשען
        על התוצאה האחרונה ולא מניח כישלון. עד שהתשובה הנכונה נעצרה
@@ -2911,7 +2955,7 @@ function practice(){
   h+='</div>'+(state.stickers.length===0?'<p style="color:var(--ink-faint);font-size:.75rem;margin-top:6px">'+esc(t.stickerEmpty)+'</p>':"")+'</div>';
   h+='</div>';
   /* hint + skip */
-  if(SlowMode.can(q))h+='<button class="sm-btn" data-a="slow" '+(P.phase!=="ask"?"disabled":"")+'>'+ic("sparkle",20)+' '+esc(t.slowBtn)+'</button>';
+  if(q.expr&&SlowMode.can(q))h+='<button class="sm-btn" data-a="slow" '+(P.phase!=="ask"?"disabled":"")+'>'+ic("sparkle",20)+' '+esc(t.slowBtn)+'</button>';
   h+='<button class="hintpill" data-a="hint" style="width:100%" '+(P.phase!=="ask"?"disabled":"")+'><span class="bulb">'+ic("bulb",24)+'</span>'+esc(t.hintBtn)+'<span class="cnt">'+Math.max(0,3-P.hints)+'</span></button>';
   /* המורה הוא שכבה שלישית: אחרי הרמזים, לא במקומם. בלי כתובת שרת אין כפתור. */
   if(window.TUTOR&&TUTOR.on())h+='<button class="btn btn-ghost" data-a="tutor" style="width:100%;padding:13px;font-size:1.05rem" '+(P.phase!=="ask"?"disabled":"")+'>'+ic("bulb",20)+' '+esc(TUTOR.label())+'</button>';
@@ -2937,13 +2981,12 @@ function doneLines(){
 
 function doneScreen(){
   var t=T(),DL=doneLines(),stars=DL.stars;
-  var opName={add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv};
   var extra="";
   if(P.focus){
     /* סיימנו סבב תרגול ממוקד — מעודדים ומראים מה השגנו */
     extra='<div class="rise" style="margin-top:24px;background:var(--teal-soft);border:2px solid rgba(14,156,141,.3);border-radius:20px;padding:18px 22px">'+
       '<p class="fd" style="font-weight:700;font-size:1.35rem;color:var(--teal-deep)">'+esc(t.focusDone)+'</p>'+
-      '<p style="color:var(--ink-soft);margin-top:4px">'+esc(fmt(t.focusSub,{op:opName[P.focus]||""}))+'</p>'+
+      '<p style="color:var(--ink-soft);margin-top:4px">'+esc(fmt(t.focusSub,{op:tName({id:P.focus})}))+'</p>'+
       '</div>';
   }else{
     /* אין סבב ממוקד — בודקים אם יש נושא שחוזר בו קושי */
@@ -2951,7 +2994,7 @@ function doneScreen(){
     if(wk){
       extra='<div class="rise" style="margin-top:24px;background:var(--amber-soft);border:2px solid rgba(255,197,49,.55);border-radius:20px;padding:20px 22px;text-align:start">'+
         '<p class="fd" style="font-weight:700;font-size:1.2rem;color:var(--amber-deep);display:flex;align-items:center;gap:8px">'+ic("bulb",20)+' '+esc(t.weakTitle)+'</p>'+
-        '<p style="color:var(--ink-soft);margin-top:8px;line-height:1.7">'+esc(fmt(weakIsNear(wk)?t.weakNear:t.weakMsg,{op:opName[wk]}))+'</p>'+
+        '<p style="color:var(--ink-soft);margin-top:8px;line-height:1.7">'+esc(fmt(weakIsNear(wk)?t.weakNear:t.weakMsg,{op:tName({id:wk})}))+'</p>'+
         '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">'+
         '<button class="btn btn-teal" data-a="focus" data-k="'+wk+'" style="padding:12px 24px;font-size:1.05rem">'+esc(t.weakBtn)+'</button>'+
         '<button class="btn btn-ghost" data-a="newround" style="padding:12px 20px;font-size:1.02rem">'+esc(t.weakLater)+'</button>'+
@@ -2980,17 +3023,20 @@ function doneScreen(){
 function progressView(){
   var t=T(),s=state.stats;
   var acc=s.attempts>0?Math.round(s.correct/s.attempts*100):0;
-  var ops=[["add",t.kindAdd],["sub",t.kindSub],["mul",t.kindMul],["div",t.kindDiv]].map(function(o){var d=s.ops[o[0]];return{key:o[0],label:o[1],ok:d.ok,total:d.total}});
+  var ops=TOPICS.map(function(tp){var d=s.ops[tp.id]||{ok:0,total:0};return{key:tp.id,label:tName(tp),ok:d.ok,total:d.total}});
+  var opsSay=t.progOpsTitle+". "+ops.map(function(o){var pc=o.total>0?Math.round(o.ok/o.total*100):0;return o.label+" "+(o.total>0?pc+"%":"—")}).join(". ");
+  var lastS=state.sessionHistory[state.sessionHistory.length-1];
+  var sesSay=t.progSesTitle+(lastS?". "+lastS.correct+" / "+lastS.total:"");
   var withD=ops.filter(function(o){return o.total>=3});
   var strongest=withD.length?withD.slice().sort(function(a,b){return b.ok/b.total-a.ok/a.total})[0]:null;
   var weakest=withD.length?withD.slice().sort(function(a,b){return a.ok/a.total-b.ok/b.total})[0]:null;
   var h='<div class="wrap rise" style="padding-top:34px;padding-bottom:60px;max-width:980px">'+
-  '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(-3deg)">'+ic("chart",30)+'</span><span><h1 class="fd">'+esc(t.progTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.progSub)+'</p></span></div>'+
+  '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(-3deg)">'+ic("chart",30)+'</span><span><h1 class="fd">'+esc(t.progTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.progSub)+'</p></span><span style="margin-inline-start:auto">'+gHearBtn(t.progTitle+". "+t.progSub)+'</span></div>'+
   '<div class="cols4" style="margin-top:26px">'+
   [["check",s.correct,t.progTotal,"var(--teal-soft)","var(--teal-deep)"],["star",acc+"%",t.progAcc,"var(--amber-soft)","var(--amber-deep)"],["flame",s.bestStreak,t.progBest,"var(--coral-soft)","var(--coral-deep)"],["trophy",s.sessions,t.progSessions,"var(--sky-soft)","var(--sky-deep)"]].map(function(x){
     return '<div class="tile"><span class="ic" style="background:'+x[3]+';color:'+x[4]+'">'+ic(x[0],20)+'</span><b>'+x[1]+'</b><span>'+esc(x[2])+'</span></div>';
   }).join("")+'</div>'+
-  '<div class="cols" style="margin-top:22px"><div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progOpsTitle)+'</h2>';
+  '<div class="cols" style="margin-top:22px"><div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progOpsTitle)+'</h2><div style="margin-top:12px">'+gHearBtn(opsSay)+'</div>';
   if(s.attempts===0)h+='<p style="color:var(--ink-soft);margin-top:14px">'+esc(t.progOpsEmpty)+'</p>';
   else{
     h+='<div style="margin-top:18px;display:grid;gap:16px">';
@@ -3003,7 +3049,7 @@ function progressView(){
     if(weakest&&strongest&&weakest.key!==strongest.key)h+='<div class="note warn" style="margin-top:10px;display:flex;gap:10px;align-items:flex-start">'+ic("eye",18)+'<span>'+esc(fmt(t.progWeak,{name:weakest.label}))+'</span></div>';
   }
   h+='</div><div style="display:flex;flex-direction:column;gap:22px">'+
-  '<div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progSesTitle)+'</h2>';
+  '<div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progSesTitle)+'</h2><div style="margin-top:12px">'+gHearBtn(sesSay)+'</div>';
   if(!state.sessionHistory.length)h+='<p style="color:var(--ink-soft);margin-top:14px">'+esc(t.progOpsEmpty)+'</p>';
   else{
     h+='<div class="hbar2" style="margin-top:16px">';
@@ -3013,7 +3059,7 @@ function progressView(){
     });
     h+='</div>';
   }
-  h+='</div><div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progWeekTitle)+'</h2><div class="wk" style="margin-top:16px">';
+  h+='<div class="card" style="padding:24px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.progWeekTitle)+'</h2><div style="margin-top:10px">'+gHearBtn(t.progWeekTitle+". "+t.progDailies+": "+s.dailies)+'</div><div class="wk" style="margin-top:16px">';
   for(var i=6;i>=0;i--){
     var d=new Date();d.setDate(d.getDate()-i);
     var iso=d.toISOString().slice(0,10);
@@ -3023,7 +3069,7 @@ function progressView(){
   h+='</div><p style="color:var(--ink-soft);font-size:.88rem;margin-top:14px">'+esc(t.progDailies)+': <b class="fd" style="color:var(--ink)">'+s.dailies+'</b></p></div></div></div>'+
   '<div class="card" style="margin-top:22px;padding:24px;background:var(--ink);color:var(--paper);border-color:var(--ink);display:flex;align-items:center;gap:18px;flex-wrap:wrap">'+
   '<span class="bob">'+petSvg(state.pet,"cheer",84)+'</span>'+
-  '<p class="fd" style="font-weight:700;font-size:1.25rem;flex:1;min-width:200px">'+esc(t.progParentNote)+'</p>'+
+  '<p class="fd" style="font-weight:700;font-size:1.25rem;flex:1;min-width:200px">'+esc(t.progParentNote)+'</p>'+gHearBtn(t.progParentNote)+
   '<button class="btn btn-amber" data-a="go" data-v="practice" style="padding:13px 26px;font-size:1.1rem">'+esc(t.progGoPractice)+'</button>'+
   '</div></div>';
   return h;
@@ -3036,7 +3082,7 @@ function recordsView(){
   var all=RIVALS.map(function(r){return{name:rivalName(r),pet:r.pet,ok:r.ok,acc:r.acc}}).concat([me]).sort(function(a,b){return b.ok-a.ok});
   var myRank=all.indexOf(me)+1;
   var h='<div class="wrap rise" style="padding-top:34px;padding-bottom:60px;max-width:860px">'+
-  '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(3deg)">'+ic("trophy",30)+'</span><span><h1 class="fd">'+esc(t.recTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.recSub)+'</p></span></div>'+
+  '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--amber);color:var(--ink);box-shadow:0 6px 0 var(--amber-deep);transform:rotate(3deg)">'+ic("trophy",30)+'</span><span><h1 class="fd">'+esc(t.recTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.recSub)+'</p></span><span style="margin-inline-start:auto">'+gHearBtn(t.recTitle+". "+t.recSub)+'</span></div>'+
   '<div class="pod">';
   [1,0,2].forEach(function(idx,place){
     var r=all[idx];if(!r)return;
@@ -3055,7 +3101,7 @@ function recordsView(){
     h+='<tr'+(r.me?' class="me"':'')+'><td class="fd" style="font-weight:700">'+(i+1)+'</td><td style="display:flex;align-items:center;gap:10px">'+petSvg(r.pet,"happy",30)+'<span>'+esc(r.name)+(r.me?'<span class="you">'+esc(t.yourRow||"")+'</span>':"")+'</span></td><td class="fd">'+r.ok+'</td><td><span class="badge '+(r.acc>=80?"b-teal":r.acc>=60?"b-gold":"b-mut")+'">'+r.acc+'%</span></td></tr>';
   });
   h+='</tbody></table></div>'+
-  '<div class="note ok" style="margin-top:18px;text-align:center;font-size:1rem">'+esc(t.yourPlace)+': <b class="fd" style="font-size:1.25rem">#'+myRank+'</b> 🎉</div></div>';
+  '<div class="note ok" style="margin-top:18px;text-align:center;font-size:1rem">'+esc(t.yourPlace)+': <b class="fd" style="font-size:1.25rem">#'+myRank+'</b> 🎉 <span style="display:inline-block;vertical-align:middle;margin-inline-start:10px">'+gHearBtn(t.yourPlace+": "+myRank)+'</span></div></div>';
   return h;
 }
 /* ================= settings ================= */
@@ -3069,7 +3115,7 @@ function settingsView(){
   '<div class="phead"><span class="ic" style="width:56px;height:56px;border-radius:18px;background:var(--teal-deep);color:var(--teal-ink);box-shadow:0 6px 0 var(--teal-deep);transform:rotate(3deg)">'+ic("gear",30)+'</span><span><h1 class="fd">'+esc(t.setTitle)+'</h1><p style="color:var(--ink-soft)">'+esc(t.setSub)+'</p></span></div>';
   /* מצב מורה. הכרטיס הוא גם הדרך היחידה לגלות שהתכונה קיימת. */
   h+='<div class="card" style="padding:24px;margin-top:26px"><h2 class="fd" style="font-size:1.45rem">'+esc(xt("teHideT"))+'</h2>'+
-  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(xt("teHideNote"))+'</p>'+
+  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(xt("teHideNote"))+'</p><div style="margin-top:12px">'+gHearBtn(xt("teHideT")+". "+xt("teHideNote"))+'</div>'+
   '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+
   (!teHas()
     ? '<button class="pick" data-a="teask">'+esc(xt("teHideBtn"))+'</button>'
@@ -3081,12 +3127,12 @@ function settingsView(){
   '</div></div>';
 
   /* learning style */
-  h+='<div class="card" style="padding:24px;margin-top:26px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.lsTitle)+'</h2><div style="margin-top:14px">'+
+  h+='<div class="card" style="padding:24px;margin-top:26px"><h2 class="fd" style="font-size:1.45rem">'+esc(t.lsTitle)+'</h2><div style="margin-top:12px">'+gHearBtn(t.lsTitle+". "+t.lsCalm+". "+t.lsCalmD)+'</div><div style="margin-top:14px">'+
   tog("calmMode",t.lsCalm,t.lsCalmD,t.lsCalmBadge)+tog("soundFx",t.sfxTitle,t.sfxDesc)+
   '</div></div>';
   /* sound */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--teal-soft);color:var(--teal-deep)">'+ic("speaker",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.sndTitle)+'</h2></div>'+
-  '<div style="margin-top:14px">'+tog("tts",t.sndTts,t.sndTtsD)+'</div>';
+  '<div style="margin-top:12px">'+gHearBtn(t.sndTitle+". "+t.sndTts+". "+t.sndTtsD)+'</div><div style="margin-top:14px">'+tog("tts",t.sndTts,t.sndTtsD)+'</div>';
   if(s.tts){
     h+='<p class="fd" style="font-weight:600;font-size:1.1rem;margin-top:20px">'+esc(t.sndType)+'</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:10px">';
     PRESETS.forEach(function(p){
@@ -3126,12 +3172,12 @@ function settingsView(){
   h+='</div>';
   /* link */
   h+='<div class="card" style="padding:24px;margin-top:22px;background:var(--ink);color:var(--paper);border-color:var(--ink)"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--amber);color:var(--ink);transform:rotate(-6deg)">'+ic("link",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.linkTitle)+'</h2></div>'+
-  '<p style="color:rgba(255,255,255,.75);margin-top:10px">'+esc(t.linkDesc)+'</p>'+
+  '<p style="color:rgba(255,255,255,.75);margin-top:10px">'+esc(t.linkDesc)+'</p><div style="margin-top:12px">'+gHearBtn(t.linkTitle+". "+t.linkDesc)+'</div>'+
   '<div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;align-items:center"><span class="kbd" style="flex:1;min-width:220px">'+esc(location.href)+'</span>'+
   '<button class="btn btn-amber" data-a="copylink" id="copybtn" style="padding:12px 22px;font-size:1rem">'+ic("link",17)+' '+esc(t.linkCopy)+'</button></div></div>';
   /* language */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--sky-soft);color:var(--sky-deep)">'+ic("globe",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.langTitle)+'</h2></div>'+
-  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(t.langDesc)+'</p>'+
+  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(t.langDesc)+'</p><div style="margin-top:12px">'+gHearBtn(t.langTitle+". "+t.langDesc)+'</div>'+
   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px">'+
   Object.keys(LANGS).map(function(l){
     var m=LANGS[l],on=lang===l;
@@ -3142,7 +3188,7 @@ function settingsView(){
   }).join("")+'</div></div>';
   /* theme */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--amber-soft);color:var(--amber-deep)">'+ic("star",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.themeTitle)+'</h2></div>'+
-  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(t.themeDesc)+'</p>'+
+  '<p style="color:var(--ink-soft);margin-top:8px">'+esc(t.themeDesc)+'</p><div style="margin-top:12px">'+gHearBtn(t.themeTitle+". "+t.themeDesc)+'</div>'+
   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px">'+
   [["ocean",t.themeOcean],["grape",t.themeGrape],["berry",t.themeBerry]].map(function(th){
     var on=s.theme===th[0];
@@ -3151,7 +3197,7 @@ function settingsView(){
   /* display */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--sky-soft);color:var(--sky-deep)">'+ic("eye",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.dispTitle)+'</h2></div>'+
   /* בורר גודל טקסט — שלוש מדרגות */
-  '<p class="fd" style="font-weight:600;margin-top:16px">'+esc(t.sizeTitle)+'</p>'+
+  '<div style="margin-top:12px">'+gHearBtn(t.dispTitle+". "+t.sizeTitle)+'</div><p class="fd" style="font-weight:600;margin-top:16px">'+esc(t.sizeTitle)+'</p>'+
   '<div style="display:flex;gap:9px;margin-top:9px;flex-wrap:wrap">'+
   [[1,t.size1,"1rem"],[2,t.size2,"1.2rem"],[3,t.size3,"1.45rem"]].map(function(z){
     var on=(s.textSize||1)===z[0];
@@ -3182,7 +3228,7 @@ var lastBubble="";
    מתאם למסכי המבחן
    ------------------------------------------------------------
    האפליקציה הזאת בנויה אחרת מכל השאר: אין בה נושאים ומסלולים
-   אלא ארבע פעולות חשבון, ואין שלוש רמות אלא שש. המסכים מדברים
+   אלא ארבע יחידות גאוגרפיה, ואין שלוש רמות אלא שש. המסכים מדברים
    בשפה של נושא/רמה, ולכן פעולה מוצגת להם כנושא ושש הרמות
    נמסרות כפי שהן.
    ============================================================ */
@@ -3193,8 +3239,8 @@ function shuffle(a){var r=a.slice(),i,j,x;
 function uniq(a){var o=[],i;for(i=0;i<a.length;i++)if(o.indexOf(a[i])<0)o.push(a[i]);return o}
 var HAS_FORMULAS=(typeof viewFormulas==="function");
 var TRACKS=[{id:"ops",cls:"t-ops"}];
-var TOPICS=[{id:"add",trk:"ops"},{id:"sub",trk:"ops"},
-            {id:"mul",trk:"ops"},{id:"div",trk:"ops"}];
+var TOPICS=[{id:"maps",trk:"ops"},{id:"med",trk:"ops"},
+            {id:"regions",trk:"ops"},{id:"jeru",trk:"ops"}];
 function topicOf(id){for(var i=0;i<TOPICS.length;i++)if(TOPICS[i].id===id)return TOPICS[i];return null}
 function topicById(id){return topicOf(id)}
 function topicsForTrack(){return TOPICS}
@@ -3235,7 +3281,7 @@ function buildQ(topicId,level){
           /* השאלה מכילה את התרגיל בתוך משפט עברי, ושם הכיוון הופך את
              סדר המספרים: "כמה זה 29 − 7?" נראה "כמה זה 7 − 29?". התרגיל
              עצמו זהה למחרוזת expr, ולכן עוטפים בדיוק אותו בקטע שמאל־לימין. */
-          ask:esc(q.text||"").split(esc(q.expr||"")).join('<span dir="ltr">'+esc(q.expr||"")+'</span>'),
+          ask:q.expr?esc(q.text||"").split(esc(q.expr||"")).join('<span dir="ltr">'+esc(q.expr||"")+'</span>'):esc(q.text||""),
           expr:esc(q.expr||""), fig:"",
           say:q.text||"", options:opts};
 }
@@ -4618,7 +4664,7 @@ function onAns(opt){
       recordAnswer(false,q.kind);
       /* כאן, ולא בלחיצה הראשונה: השאלה נסגרה עכשיו. */
       jsAnswer(false);
-      noteResult(q.kind,false,Math.abs(opt-q.answer));
+      noteResult(q.kind,false,typeof opt==="number"&&typeof q.answer==="number"?Math.abs(opt-q.answer):0);
       P.results.push("no");P.phase="reveal";P.mood="happy";
       setBubble(q.explain,"happy");
       announce(fmt(t.revealPre,{a:q.answer})+" "+q.explain);
@@ -4672,7 +4718,7 @@ function onAction(a,el){
     setBubble(fmt(t.hello,{name:petName()}),"happy");speak(fmt(t.hello,{name:petName()}));
   }
   else if(a==="changepet"){view="onboarding";P.selPet=state.pet;render()}
-  else if(a==="ans")onAns(parseInt(el.getAttribute("data-o"),10));
+  else if(a==="ans")onAns(el.getAttribute("data-o"));
   else if(a==="sayopt")speak(el.getAttribute("data-o"));
   else if(a==="ghear")speak(el.getAttribute("data-say"));
   else if(a==="ghint"){var hx=el.nextElementSibling;if(hx&&hx.classList.contains("hintxt"))hx.hidden=!hx.hidden;speak(el.getAttribute("data-say"))}
@@ -4683,7 +4729,7 @@ function onAction(a,el){
     var hint=q.hints[P.hints];P.hints++;
     if(jsOn())JOSHSTATE.hint();
     if(state.settings.soundFx)sfxHint();
-    if(P.hints===2)P.visual=true;
+    if(P.hints===2&&q.expr)P.visual=true;
     setBubble(hint,"think");speak(hint);render();
   }
   else if(a==="tutor"){ if(P.phase!=="ask")return; stopSpeak(); TUTOR.open(); }
@@ -4707,7 +4753,7 @@ function onAction(a,el){
     var fk=el.getAttribute("data-k");
     startFocus(fk);
     render();window.scrollTo(0,0);
-    var nm={add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[fk]||"";
+    var nm=tName({id:fk});
     setBubble(fmt(t.weakMsg,{op:nm}),"happy");speak(fmt(t.weakMsg,{op:nm}));
   }
   else if(a==="newround"){startRound(activeLevel());render();setBubble(fmt(t.hello,{name:petName()}),"cheer")}
@@ -5416,7 +5462,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g107-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g108-pwa1").catch(function(){});
   });
 }
 </script>
@@ -5432,7 +5478,7 @@ if(window.TUTOR){
   }
 
   TUTOR.mount({
-    app:"math-app",
+    app:"geography-elem",
     lang:function(){return (state&&state.settings&&state.settings.lang)||"he"},
     q:function(){
       var x=P&&P.ses?P.ses[P.qi]:null;
@@ -5445,13 +5491,13 @@ if(window.TUTOR){
      רשאי לעשות כאן, וכל אחת מחזירה true רק כשבאמת קרה משהו.
      math-app היא התבנית לשאר האפליקציות. */
   if(window.BARAK)BARAK.register({
-    app:"math-app",
+    app:"geography-elem",
     getScreenContext:function(){
       var q=P&&P.ses?P.ses[P.qi]:null;
       if(!q||view!=="practice"||P.phase==="done")return null;
-      var t=T(),kind={add:t.kindAdd,sub:t.kindSub,mul:t.kindMul,div:t.kindDiv}[q.kind]||q.kind;
-      return {id:"r"+P.qi+"-"+q.expr, type:P.phase==="ask"?"mcq":"reveal",
-        q:q.text+" ("+q.expr+")", options:q.options.map(String),
+      var t=T(),kind=tName({id:q.kind})||q.kind;
+      return {id:"r"+P.qi+"-"+(q.expr||q.text).slice(0,24), type:P.phase==="ask"?"mcq":"reveal",
+        q:q.expr?q.text+" ("+q.expr+")":q.text, options:q.options.map(String),
         correct:String(q.answer), student:P.wrong.length?String(P.wrong[P.wrong.length-1]):null,
         topic:kind, level:"רמה "+activeLevel()+" מתוך 6",
         curriculum:"גאוגרפיה - אדם וסביבה ליסודי, כיתות ה׳–ו׳: "+kind};
