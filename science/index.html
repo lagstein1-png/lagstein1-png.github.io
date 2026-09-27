@@ -2455,7 +2455,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s125 · 2026-09-27";
+var BUILD="s126 · 2026-09-27";
 var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -5030,7 +5030,7 @@ ar:{"slTitle":"درس: كيف نعرف أن شيئًا ما حي؟","slGoal":"ا
 
 function slt(k){var d=SLSTR[state.settings.lang||"he"]||SLSTR.he;var v=d[k];return v===undefined?(SLSTR.en[k]||k):v}
 var SLSN={step:0,revealed:false,picked:-1,p1:-1,p2:-1,peek:-1};
-function slItems(){return [["🌱","slPlant",true],["🐈","slCat",true],["🪨","slRock",false]]}
+function slItems(){return [["🌱","slPlant",true],["🐈","slCat",true],["⛰️","slRock",false]]}
 function slScene(revealed){
   /* הכרטיסים נראים לחיצים, ולכן הם באמת לחיצים (27.9.2026): לחיצה
      על כרטיס בוחרת אותו, מקריאה את שמו ומציגה אם הוא חי או דומם.
@@ -5202,7 +5202,7 @@ ar:{"s3Title":"درس: جسم الإنسان - من يفعل ماذا؟","s3Goal
 function s3t(k){var d=S3STR[state.settings.lang||"he"]||S3STR.he;var v=d[k];return v===undefined?(S3STR.en[k]||k):v}
 var S3SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function s3Scene(revealed){
-  var items=[["❤️","s3Heart","s3HeartJob"],["🫁","s3Lungs","s3LungsJob"],["💪","s3Muscles","s3MusclesJob"]];
+  var items=[["❤️","s3Heart","s3HeartJob"],["🎈","s3Lungs","s3LungsJob"],["💪","s3Muscles","s3MusclesJob"]];
   return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
     return '<div class="card" style="text-align:center;padding:18px 22px;min-width:110px;max-width:160px">'+
       '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(s3t(it[1]))+'</div>'+
@@ -5368,7 +5368,7 @@ ar:{"s5Title":"درس: ممّ صُنع العالم؟","s5Goal":"الهدف: أ�
 function s5t(k){var d=S5STR[state.settings.lang||"he"]||S5STR.he;var v=d[k];return v===undefined?(S5STR.en[k]||k):v}
 var S5SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function s5Scene(revealed){
-  var items=[["🪵","s5Wood","s5WoodProp"],["🥄","s5Metal","s5MetalProp"],["🧴","s5Plastic","s5PlasticProp"]];
+  var items=[["🌳","s5Wood","s5WoodProp"],["🥄","s5Metal","s5MetalProp"],["🧴","s5Plastic","s5PlasticProp"]];
   return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
     return '<div class="card" style="text-align:center;padding:18px 22px;min-width:110px;max-width:160px">'+
       '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(s5t(it[1]))+'</div>'+
@@ -5694,14 +5694,14 @@ ar:{"s9Title":"درس: كيف نتنفس؟","s9Goal":"الهدف: أن نتعر�
 function s9t(k){var d=S9STR[state.settings.lang||"he"]||S9STR.he;var v=d[k];return v===undefined?(S9STR.en[k]||k):v}
 var S9SN={step:0,breathed:false,picked:-1,p1:-1,p2:-1};
 function s9Scene(breathed){
-  var parts=[["👃","s9Nose"],["🌬️","s9Trachea"],["🫁","s9Lungs"]];
+  var parts=[["👃","s9Nose"],["🌬️","s9Trachea"],["🎈","s9Lungs"]];
   return '<div class="card" style="padding:22px;margin:16px auto;max-width:460px;text-align:center">'+
     '<div style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap">'+parts.map(function(pt,i){
       return (i>0?'<span style="font-size:1.4rem;color:'+(breathed?'#0e9c8d':'#cbd5e1')+'">'+(document.documentElement.dir==="rtl"?"◀":"▶")+'</span>':"")+
         '<div><div style="font-size:2.4rem;'+(i===2&&breathed?'transform:scale(1.2);transition:transform .4s;filter:drop-shadow(0 0 8px #0e9c8d)':'transition:transform .4s')+'">'+pt[0]+'</div>'+
         '<div style="font-size:.82rem;font-weight:700;margin-top:4px">'+esc(s9t(pt[1]))+'</div></div>';
     }).join("")+'</div>'+
-    (breathed?'<div style="margin-top:12px;font-weight:700;color:#0e9c8d">O₂ → 🩸</div>':'')+'</div>';
+    (breathed?'<div style="margin-top:12px;font-weight:700;color:#0e9c8d">O₂ → 🔴</div>':'')+'</div>';
 }
 function s9HearBtn(text){return '<button class="btn btn-g" data-a="s9hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(s9t("s9Hear"))+'</button>'}
 function sci9LessonView(){
@@ -5774,7 +5774,7 @@ ar:{"s10Title":"درس: الموارد الطبيعية - نافدة أم متج
 function s10t(k){var d=S10STR[state.settings.lang||"he"]||S10STR.he;var v=d[k];return v===undefined?(S10STR.en[k]||k):v}
 var S10SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function s10Scene(revealed){
-  var items=[["🛢️","s10Oil","s10Used"],["🪨","s10Coal","s10Used"],["☀️","s10Sun","s10Renew"],["💨","s10Wind","s10Renew"]];
+  var items=[["🛢️","s10Oil","s10Used"],["⚫","s10Coal","s10Used"],["☀️","s10Sun","s10Renew"],["💨","s10Wind","s10Renew"]];
   return '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
     var renew=it[2]==="s10Renew";
     return '<div class="card" style="text-align:center;padding:16px 18px;min-width:100px;max-width:140px">'+
@@ -5939,7 +5939,7 @@ function s12Scene(beat){
       '<div><div style="font-size:2.8rem;'+(beat?'transform:scale(1.15);transition:transform .3s;filter:drop-shadow(0 0 8px #dc2626)':'transition:transform .3s')+'">❤️</div>'+
       '<div style="font-size:.85rem;font-weight:700;margin-top:4px">'+esc(s12t("s12Heart"))+'</div></div>'+
       '<div style="font-size:1.5rem;color:'+(beat?'#dc2626':'#cbd5e1')+'">'+(document.documentElement.dir==="rtl"?"◀":"▶")+'</div>'+
-      '<div><div style="font-size:2.4rem;'+(beat?'':'opacity:.5')+'">🩸</div>'+
+      '<div><div style="font-size:2.4rem;'+(beat?'':'opacity:.5')+'">🔴</div>'+
       '<div style="font-size:.85rem;font-weight:700;margin-top:4px">'+esc(s12t("s12Blood"))+'</div></div>'+
       '<div style="font-size:1.5rem;color:'+(beat?'#dc2626':'#cbd5e1')+'">'+(document.documentElement.dir==="rtl"?"◀":"▶")+'</div>'+
       '<div><div style="font-size:2.4rem;'+(beat?'':'opacity:.5')+'">🧍</div>'+
@@ -6126,7 +6126,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s125-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s126-pwa1").catch(function(){});
   });
 }
 </script>
