@@ -14,7 +14,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "h108 · 2026-09-27";
+  var BUILD = "h109 · 2026-09-27";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -49,7 +49,7 @@
   /* --- שמירה במכשיר ---------------------------------------------
      מפתח אחד, עם מספר גרסה. שינוי מבנה עתידי מעלה את המספר ומתעלם
      ממה שנשמר, במקום להתרסק על צורה שכבר לא קיימת. */
-  var SKEY = "bagrut806-v1";
+  var SKEY = "bagrut-history-v1";
   var store = {
     data: null,
     blank: function () {
@@ -1480,7 +1480,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=h108-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=h109-pwa1").catch(function () {});
     });
   }
 

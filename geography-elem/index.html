@@ -2444,7 +2444,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="g111 · 2026-09-27";
+var BUILD="g112 · 2026-09-27";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -3844,20 +3844,20 @@ function csvRow(a){ return a.map(csvCell).join(",") }
    כל עוד לא נבחר קוד, שום דבר לא משתנה והמסכים גלויים כתמיד.
    ============================================================ */
 var TE={ask:false,mode:"",msg:"",busy:false};
-function teRead(){try{return JSON.parse(localStorage.getItem("sciapp-teacher")||"null")}catch(e){return null}}
-function teWrite(o){try{o===null?localStorage.removeItem("sciapp-teacher"):localStorage.setItem("sciapp-teacher",JSON.stringify(o))}catch(e){}}
+function teRead(){try{return JSON.parse(localStorage.getItem("geo-elem-teacher")||"null")}catch(e){return null}}
+function teWrite(o){try{o===null?localStorage.removeItem("geo-elem-teacher"):localStorage.setItem("geo-elem-teacher",JSON.stringify(o))}catch(e){}}
 function teHas(){var r=teRead();return !!(r&&r.h)}
 function teOpen(){
   if(!teHas())return true;
-  try{if(sessionStorage.getItem("mathapp-teacher"+"-open")==="1")return true}catch(e){}
-  try{if(localStorage.getItem("sciapp-teacher"+"-open")==="1")return true}catch(e){}
+  try{if(sessionStorage.getItem("geo-elem-teacher"+"-open")==="1")return true}catch(e){}
+  try{if(localStorage.getItem("geo-elem-teacher"+"-open")==="1")return true}catch(e){}
   return false;
 }
 function teSetOpen(on,remember){
-  try{sessionStorage.removeItem("mathapp-teacher"+"-open")}catch(e){}
-  try{localStorage.removeItem("sciapp-teacher"+"-open")}catch(e){}
+  try{sessionStorage.removeItem("geo-elem-teacher"+"-open")}catch(e){}
+  try{localStorage.removeItem("geo-elem-teacher"+"-open")}catch(e){}
   if(!on)return;
-  try{(remember?localStorage:sessionStorage).setItem("mathapp-teacher"+"-open","1")}catch(e){}
+  try{(remember?localStorage:sessionStorage).setItem("geo-elem-teacher"+"-open","1")}catch(e){}
 }
 /* גיבוב חלש כגיבוי בלבד. SubtleCrypto קיים בכל דפדפן מודרני
    בהקשר מאובטח, ו-GitHub Pages הוא כזה. */
@@ -3993,9 +3993,9 @@ try{
     var away=Date.now()-TE_HID; TE_HID=0;
     if(away<120000)return;
     var kept=false;
-    try{ kept=localStorage.getItem("sciapp-teacher"+"-open")==="1" }catch(e){}
+    try{ kept=localStorage.getItem("geo-elem-teacher"+"-open")==="1" }catch(e){}
     if(kept)return;
-    try{ if(sessionStorage.getItem("mathapp-teacher"+"-open")!=="1")return }catch(e){ return }
+    try{ if(sessionStorage.getItem("geo-elem-teacher"+"-open")!=="1")return }catch(e){ return }
     teSetOpen(false); render();
   });
 }catch(e){}
@@ -5454,7 +5454,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g111-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g112-pwa1").catch(function(){});
   });
 }
 </script>

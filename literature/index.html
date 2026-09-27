@@ -1072,9 +1072,9 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="lit3 · 2026-09-26";
-var SKEY="ezrach-state-v1";
-var GKEY_STORE="ezrach-gkey";
+var BUILD="lit4 · 2026-09-27";
+var SKEY="lit-state-v1";
+var GKEY_STORE="lit-gkey";
 
 function blankState(){
   return {
@@ -3367,20 +3367,20 @@ function csvRow(a){ return a.map(csvCell).join(",") }
    כל עוד לא נבחר קוד, שום דבר לא משתנה והמסכים גלויים כתמיד.
    ============================================================ */
 var TE={ask:false,mode:"",msg:"",busy:false};
-function teRead(){try{return JSON.parse(localStorage.getItem("ezrach-teacher")||"null")}catch(e){return null}}
-function teWrite(o){try{o===null?localStorage.removeItem("ezrach-teacher"):localStorage.setItem("ezrach-teacher",JSON.stringify(o))}catch(e){}}
+function teRead(){try{return JSON.parse(localStorage.getItem("lit-teacher")||"null")}catch(e){return null}}
+function teWrite(o){try{o===null?localStorage.removeItem("lit-teacher"):localStorage.setItem("lit-teacher",JSON.stringify(o))}catch(e){}}
 function teHas(){var r=teRead();return !!(r&&r.h)}
 function teOpen(){
   if(!teHas())return true;
-  try{if(sessionStorage.getItem("ezrach-teacher"+"-open")==="1")return true}catch(e){}
-  try{if(localStorage.getItem("ezrach-teacher"+"-open")==="1")return true}catch(e){}
+  try{if(sessionStorage.getItem("lit-teacher"+"-open")==="1")return true}catch(e){}
+  try{if(localStorage.getItem("lit-teacher"+"-open")==="1")return true}catch(e){}
   return false;
 }
 function teSetOpen(on,remember){
-  try{sessionStorage.removeItem("ezrach-teacher"+"-open")}catch(e){}
-  try{localStorage.removeItem("ezrach-teacher"+"-open")}catch(e){}
+  try{sessionStorage.removeItem("lit-teacher"+"-open")}catch(e){}
+  try{localStorage.removeItem("lit-teacher"+"-open")}catch(e){}
   if(!on)return;
-  try{(remember?localStorage:sessionStorage).setItem("ezrach-teacher"+"-open","1")}catch(e){}
+  try{(remember?localStorage:sessionStorage).setItem("lit-teacher"+"-open","1")}catch(e){}
 }
 /* גיבוב חלש כגיבוי בלבד. SubtleCrypto קיים בכל דפדפן מודרני
    בהקשר מאובטח, ו-GitHub Pages הוא כזה. */
@@ -3516,9 +3516,9 @@ try{
     var away=Date.now()-TE_HID; TE_HID=0;
     if(away<120000)return;
     var kept=false;
-    try{ kept=localStorage.getItem("ezrach-teacher"+"-open")==="1" }catch(e){}
+    try{ kept=localStorage.getItem("lit-teacher"+"-open")==="1" }catch(e){}
     if(kept)return;
-    try{ if(sessionStorage.getItem("ezrach-teacher"+"-open")!=="1")return }catch(e){ return }
+    try{ if(sessionStorage.getItem("lit-teacher"+"-open")!=="1")return }catch(e){ return }
     teSetOpen(false); render();
   });
 }catch(e){}
@@ -4448,9 +4448,10 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=lit3-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=lit4-pwa1").catch(function(){});
   });
 }
 </script>
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

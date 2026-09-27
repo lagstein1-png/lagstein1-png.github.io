@@ -2455,7 +2455,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s128 · 2026-09-27";
+var BUILD="s129 · 2026-09-27";
 var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -3312,8 +3312,9 @@ function buildQ(topicId,level){
 var GENV=2;                 /* גרסת המחוללים. מבחן שנוצר בגרסה אחרת
                                אינו נפתח — עדיף הודעה ברורה מאשר
                                עשרים שאלות אחרות בשקט. */
-var EKEY="shlav-exams-math-app-v1";   /* מפתח לאפליקציה הזאת בלבד */
+var EKEY="shlav-exams-science-v1";   /* מפתח לאפליקציה הזאת בלבד */
 var EKEY_OLD="shlav-exams-v1";  /* המפתח המשותף הישן. לקריאה בלבד, לא נמחק. */
+var EKEY_OLD2="shlav-exams-math-app-v1";  /* המגירה ששותפה עם math-app עד s129. לקריאה בלבד, לא נמחק. */
 
 /* --- מחולל מזורע. mulberry32: קצר, מהיר, ופיזור טוב דיו --- */
 function withSeed(seed,fn){
@@ -3500,8 +3501,9 @@ function exSpecKnown(spec){
 function exAdoptLegacy(){
   var added=0;
   try{
-    var raw=localStorage.getItem(EKEY_OLD); if(!raw)return;
-    var old=JSON.parse(raw); if(!old||!old.list||!old.list.length)return;
+    for(var k=0;k<2;k++){
+    var raw=localStorage.getItem(k?EKEY_OLD2:EKEY_OLD); if(!raw)continue;
+    var old=JSON.parse(raw); if(!old||!old.list||!old.list.length)continue;
     var have={},i,ex;
     for(i=0;i<EX.list.length;i++)have[EX.list[i].id]=1;
     for(i=0;i<old.list.length;i++){
@@ -3509,6 +3511,7 @@ function exAdoptLegacy(){
       if(!ex||!ex.id||have[ex.id])continue;
       if(!exSpecKnown(ex.spec))continue;
       EX.list.push(ex); have[ex.id]=1; added++;
+    }
     }
   }catch(e){return}
   if(added)exSave();
@@ -3857,15 +3860,15 @@ function teWrite(o){try{o===null?localStorage.removeItem("sciapp-teacher"):local
 function teHas(){var r=teRead();return !!(r&&r.h)}
 function teOpen(){
   if(!teHas())return true;
-  try{if(sessionStorage.getItem("mathapp-teacher"+"-open")==="1")return true}catch(e){}
+  try{if(sessionStorage.getItem("sciapp-teacher"+"-open")==="1")return true}catch(e){}
   try{if(localStorage.getItem("sciapp-teacher"+"-open")==="1")return true}catch(e){}
   return false;
 }
 function teSetOpen(on,remember){
-  try{sessionStorage.removeItem("mathapp-teacher"+"-open")}catch(e){}
+  try{sessionStorage.removeItem("sciapp-teacher"+"-open")}catch(e){}
   try{localStorage.removeItem("sciapp-teacher"+"-open")}catch(e){}
   if(!on)return;
-  try{(remember?localStorage:sessionStorage).setItem("mathapp-teacher"+"-open","1")}catch(e){}
+  try{(remember?localStorage:sessionStorage).setItem("sciapp-teacher"+"-open","1")}catch(e){}
 }
 /* גיבוב חלש כגיבוי בלבד. SubtleCrypto קיים בכל דפדפן מודרני
    בהקשר מאובטח, ו-GitHub Pages הוא כזה. */
@@ -4003,7 +4006,7 @@ try{
     var kept=false;
     try{ kept=localStorage.getItem("sciapp-teacher"+"-open")==="1" }catch(e){}
     if(kept)return;
-    try{ if(sessionStorage.getItem("mathapp-teacher"+"-open")!=="1")return }catch(e){ return }
+    try{ if(sessionStorage.getItem("sciapp-teacher"+"-open")!=="1")return }catch(e){ return }
     teSetOpen(false); render();
   });
 }catch(e){}
@@ -6126,7 +6129,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s128-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s129-pwa1").catch(function(){});
   });
 }
 </script>
