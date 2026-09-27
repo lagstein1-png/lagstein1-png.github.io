@@ -2382,7 +2382,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s122 · 2026-09-27";
+var BUILD="s123 · 2026-09-27";
 var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -5011,14 +5011,19 @@ ar:{slTitle:"درس: كيف نعرف أن شيئًا ما حي؟",slGoal:"اله
     slPlant:"نبتة",slCat:"قطة",slRock:"حجر",slAlive:"حي",slStill:"غير حي"}};
 SLSTR.he.slHintQ="חשבו: מה כל יצור חי - גם צמח וגם חיה - חייב לקבל כדי להישאר בחיים?";SLSTR.he.slHintP1="בדקו את הכלל: האם אבן גדלה? האם היא זקוקה למזון?";SLSTR.he.slHintP2="זכרו מה צמח צריך כדי לחיות - מה יקרה לו בלי זה?";SLSTR.he.slNextLesson="לשיעור הבא";SLSTR.en.slHintQ="Think: what must every living thing - plant and animal - get to stay alive?";SLSTR.en.slHintP1="Check the rule: does a rock grow? does it need food?";SLSTR.en.slHintP2="Remember what a plant needs to live - what happens without it?";SLSTR.en.slNextLesson="Next lesson";SLSTR.ru.slHintQ="Подумайте: что каждое живое существо - и растение, и животное - должно получать, чтобы остаться в живых?";SLSTR.ru.slHintP1="Проверьте правило: растёт ли камень? нужна ли ему еда?";SLSTR.ru.slHintP2="Вспомните, что нужно растению для жизни - что будет без этого?";SLSTR.ru.slNextLesson="Следующий урок";SLSTR.ar.slHintQ="فكروا: ماذا يجب أن يحصل عليه كل كائن حي - نباتًا كان أم حيوانًا - ليبقى على قيد الحياة؟";SLSTR.ar.slHintP1="افحصوا القاعدة: هل الحجر ينمو؟ هل يحتاج إلى غذاء؟";SLSTR.ar.slHintP2="تذكروا ما تحتاجه النبتة لتعيش - ماذا يحدث لها بدونه؟";SLSTR.ar.slNextLesson="الدرس التالي";
 function slt(k){var d=SLSTR[state.settings.lang||"he"]||SLSTR.he;var v=d[k];return v===undefined?(SLSTR.en[k]||k):v}
-var SLSN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
+var SLSN={step:0,revealed:false,picked:-1,p1:-1,p2:-1,peek:-1};
+function slItems(){return [["🌱","slPlant",true],["🐈","slCat",true],["🪨","slRock",false]]}
 function slScene(revealed){
-  var items=[["🌱","slPlant",true],["🐈","slCat",true],["🪨","slRock",false]];
-  return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
-    return '<div class="card" style="text-align:center;padding:18px 22px;min-width:110px">'+
-      '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(slt(it[1]))+'</div>'+
-      (revealed?'<div style="margin-top:8px;font-weight:800;color:'+(it[2]?'#0e9c8d':'#bf4426')+'">'+esc(slt(it[2]?"slAlive":"slStill"))+'</div>':'')+
-      '</div>';
+  /* הכרטיסים נראים לחיצים, ולכן הם באמת לחיצים (27.9.2026): לחיצה
+     על כרטיס בוחרת אותו, מקריאה את שמו ומציגה אם הוא חי או דומם.
+     קודם היו div דומים שלא הגיבו ללחיצה — יהושע דיווח שאצלו ב-Edge
+     "שלוחצים על התשובה כלום לא קורה". */
+  return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+slItems().map(function(it,ix){
+    var inner='<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(slt(it[1]))+'</div>'+
+      ((revealed||SLSN.peek===ix)?'<div style="margin-top:8px;font-weight:800;color:'+(it[2]?'#0e9c8d':'#bf4426')+'">'+esc(slt(it[2]?"slAlive":"slStill"))+'</div>':'');
+    if(revealed)return '<div class="card" style="text-align:center;padding:18px 22px;min-width:110px">'+inner+'</div>';
+    var sel=SLSN.peek===ix;
+    return '<button type="button" class="card" data-a="slpeek" data-i="'+ix+'" aria-pressed="'+(sel?'true':'false')+'" style="font:inherit;color:inherit;text-align:center;padding:18px 22px;min-width:110px;cursor:pointer;'+(sel?'outline:3px solid '+(it[2]?'#0e9c8d':'#bf4426')+';outline-offset:-3px;':'')+'">'+inner+'</button>';
   }).join("")+'</div>';
 }
 function slHearBtn(text){return '<button class="btn btn-g" data-a="slhear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(slt("slHear"))+'</button>'}
@@ -5073,12 +5078,13 @@ function sciLessonView(){
 }
 function sciLessonAction(a,el){
   var st=SLSN;
-  if(a==="slnext"){st.step=Math.min(st.step+1,5);st.picked=-1;render();window.scrollTo(0,0)}
+  if(a==="slnext"){st.step=Math.min(st.step+1,5);st.picked=-1;st.peek=-1;render();window.scrollTo(0,0)}
   else if(a==="slreveal"){st.revealed=true;render();speak(slt("slV2"))}
+  else if(a==="slpeek"){var pi=parseInt(el.getAttribute("data-i"),10);st.peek=pi;var pit=slItems()[pi];speak(slt(pit[1])+". "+slt(pit[2]?"slAlive":"slStill"));render()}
   else if(a==="slpick"){st.picked=parseInt(el.getAttribute("data-i"),10);render()}
   else if(a==="slp1"){st.p1=parseInt(el.getAttribute("data-i"),10);render()}
   else if(a==="slp2"){st.p2=parseInt(el.getAttribute("data-i"),10);render()}
-  else if(a==="slagain"){SLSN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};render()}
+  else if(a==="slagain"){SLSN={step:0,revealed:false,picked:-1,p1:-1,p2:-1,peek:-1};render()}
   else if(a==="slhear"){speak(el.getAttribute("data-say"))}
 }
 
@@ -6582,7 +6588,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s122-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s123-pwa1").catch(function(){});
   });
 }
 </script>
