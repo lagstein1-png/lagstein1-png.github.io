@@ -1,183 +1,189 @@
 {
-  "_": "רישום השלבים. מקור האמת היחיד לשאלה 'מי מותר ללומדים אמיתיים'.",
-  "_pipeline": "build → internal → content-qa → approved → public. אפליקציה עולה שלב אחד בכל פעם, ביד, אחרי שהשלב הקודם נסגר. node .claude/qa/stage.js אוכף.",
-  "_stages": {
-    "build": "נבנית. עדיין לא נטענת בלי שגיאות, או שחסרים בה מסכים.",
-    "internal": "נטענת ועוברת smoke/parse/cache. נגישה רק דרך שער פנימי, ולא רשומה בדף הבית.",
-    "content-qa": "עברה בדיקה טכנית, ועכשיו נסרקת ב-content.js. עדיין פנימית.",
-    "approved": "הבעלים עבר על ממצאי ה-REVIEW ואישר. עדיין לא בדף הבית — כאן מסירים את השער הפנימי.",
-    "public": "רשומה ב-DATA.APPS שבדף הבית, בלי שער פנימי, ונמנית ב-badge."
-  },
-  "_contentQA": {
-    "not-run": "content.js עוד לא רץ עליה",
-    "pass": "אפס FAIL ואפס REVIEW",
-    "review": "אפס FAIL, יש ממצאים שדורשים עין אנושית",
-    "fail": "יש ממצא שחוסם",
-    "cleared": "היו ממצאי REVIEW, והבעלים עבר עליהם ואישר",
-    "legacy-published": "פורסמה לפני שהשער הזה נבנה. אינה חוסמת, אבל מדווחת כאזהרה עד שתיסרק"
-  },
-  "badge": {
-    "_": "מספר האפליקציות בכותרת דף הבית. אינו נגזר מ-DATA.APPS ולכן נשמר כאן, ו-stage.js משווה. הוסיפו אפליקציה — עדכנו את הארבע ביד ואת המספר כאן.",
-    "count": 21,
-    "words": {
-      "he": "עשרים ואחת",
-      "ar": "واحد وعشرون",
-      "ru": "Двадцать одно",
-      "en": "Twenty-one"
-    }
-  },
-  "notApps": {
-    "legal": "עמוד תנאי השימוש",
-    "teachers": "פינת מורים — דף תוכן למורים: מדריך הקראה לתלמיד שמתקשה בקריאה, חומרי רמ״ה לפי כיתה וקישורי משרד החינוך עם קרדיט. לא אפליקציית לימוד (27.9.2026)",
-    "limor": "דף ההדגמה של לימור (בעבר /barak/) — הדגמת מורה דיגיטלית, לא אפליקציית לימוד",
-    "voice": "דף אבחון של מנוע ההקראה, לא אפליקציית לימוד",
-    "img": "נכסים",
-    "marketing": "דף קריאה לקובצי השיווק שב-marketing/*.md — כלי פנימי, לא אפליקציית לימוד",
-    "tutor-api": "קוד צד השרת של ״עזרה מהמורה״ — אינו מוגש כדף",
-    "tutor": "התשתית המשותפת של ״עזרה מהמורה״ — קובץ סקריפט, לא דף",
-    ".well-known": "assetlinks",
-    ".claude": "כלים",
-    "barak": "דף תצוגה של מנוע ברק — הדגמה לציבור, לא אפליקציית לימוד (מנוע ברק, 16.9.2026)"
-  },
-  "apps": {
-    "math-app": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "buildQ"
-    },
-    "math-teen": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "buildQ"
-    },
-    "math-uni": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "buildQ"
-    },
-    "math-uni2": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "buildQ"
-    },
-    "math-uni3": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "buildQ"
-    },
-    "english": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "buildQ"
-    },
-    "history": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "buildQ"
-    },
-    "lomda": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "buildQ",
-      "note": "התוכן ב-lomda/data/*.js ולא בתוך index.html. banks.js בודק את החיווט."
-    },
-    "ulpan": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "buildQ"
-    },
-    "bagrut-806": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "data/exams.js",
-      "note": "בנק סטטי בקבצים נפרדים, לא buildQ. content.js אינו סורק אותו — content806.js כן, והוא כותב את אותו דוח."
-    },
-    "reader": {
-      "stage": "public",
-      "contentQA": "none",
-      "bank": "none",
-      "note": "אין בנק שאלות — הטקסט מגיע מהמשתמש. אין מה לסרוק."
-    },
-    "theory": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "external",
-      "external": true,
-      "note": "אינה בריפו הזה. רשומה כאן כי היא בדף הבית ונמנית בשתים־עשרה. הנתיב נלקח משדה u שב-DATA.APPS ואינו נכפל כאן."
-    },
-    "kotvim": {
-      "stage": "public",
-      "contentQA": "cleared",
-      "bank": "none",
-      "note": "פיגום כתיבה — אין buildQ ואין שאלות, ולכן content.js אינו סורק אותה. הסורק שלה הוא .claude/qa/kotvim.js, והוא עבר נקי 10.9.2026: 3 סוגים, 9 נושאים, 111 קטעים, ארבע שפות מלאות, אין קטע חוזר. הבעלים אישר פרסום כגרסת ניסיון באותו יום, השער הפנימי הוסר, והיא נכנסה ל-DATA.APPS."
-    },
-    "rakia": {
-      "stage": "public",
-      "contentQA": "pass",
-      "bank": "rakia-texts",
-      "_": "מפת לידה. התוכן: 469 טקסטים ב-rakia/data/texts-*.js, נסרק ב-rakia-content.js ו-rakia-safety.js (0 ממצאים) ולא ב-content.js. approved 18.9.2026, public 20.9.2026 בהוראת הבעלים (״רוץ״ על כרטיס בדף הבית)."
-    },
-    "electric": {
-      "stage": "build",
-      "contentQA": "not-run",
-      "bank": "buildQ",
-      "note": "מתח — חשמל לתיכון, מגמת חשמל. הועתקה מ-math-uni3 ב-24.9.2026 בהוראת הבעלים (״אפליקציה חדשה לתיכון מגמת חשמל״). מחולל: התשובה מחושבת. פתיחה: ?internal=shlav-internal-electric"
-    },
-    "science": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "buildQ"
-    },
-    "civics": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "none",
-      "note": "בנק החידון בתוך index.html"
-    },
-    "hebrew": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "none",
-      "note": "הבנק ב-hebrew/bank.json"
-    },
-    "english-bagrut": {
-      "stage": "public",
-      "contentQA": "legacy-published",
-      "bank": "none",
-      "external": true,
-      "note": "כרטיס-כינוי למסלול הבגרות בתוך /english/ — אין תיקייה משלו"
-    },
-    "bagrut-history": {
-      "stage": "internal",
-      "contentQA": "not-run"
-    },
-    "geography": {
-      "stage": "internal",
-      "contentQA": "not-run"
-    },
-    "geography-elem": {
-      "stage": "public",
-      "contentQA": "cleared",
-      "bank": "GEOBANK",
-      "note": "בנק סטטי GEOBANK (52 שאלות מקוריות), לא buildQ — content.js מחוץ להיקף. 27.9.2026 נכתבה מחדש כולה: מנוע בנק, שאלות מקוריות לארבע יחידות משרד החינוך, סריקות תוכנתיות נקיות (רמזים, כפילויות, כתיב זר). הבעלים אישר דוגמאות לפני/אחרי עם צילומי מסך, וביקש פרסום לכולם."
-    },
-    "literature": {
-      "stage": "public",
-      "contentQA": "cleared",
-      "bank": "buildQ",
-      "note": "שאלוני ספרות 8281/8282 לפי מבנה משרד החינוך: שישה נושאים (סיפור קצר, שירה, דרמה, רומאן וספרי קריאה), 3/3/3 שאלות לנושא, ארבע שפות. 28.9.2026: הרחבה מ-48 שאלות חדשות, סריקות תוכן עם אפס FAIL, ושני REVIEW הוחלטו במודע (הקראת תשובה: חיובי שגוי, ההקראה פועלת רק אחרי שהתשובה נקבעה; מגוון נמוך 3 ברמה, כמו באפליקציות public אחרות). שולבה בדף הבית לפי הכלל הקבוע מ-27.9 (15:50: ״אם בדקת אז תעלה לא צריך אישור שלי״) והכיוון מאותו ערב (23:54) לבנות ולהאיץ, והשער הפנימי הוסר."
-    },
-    "tanakh": {
-      "stage": "public",
-      "contentQA": "cleared",
-      "bank": "buildQ",
-      "note": "שאלוני תנ״ך 1261/1262 לפי מבנה משרד החינוך: שישה נושאים (בראשית, שמות, נושאי בחירה וקטע הבנה), 3/3/3 שאלות לנושא, ארבע שפות. 28.9.2026: הרחבה מ-30 שאלות חדשות, סריקות תוכן עם אפס FAIL, ושני REVIEW הוחלטו במודע (הקראת תשובה: חיובי שגוי; מגוון נמוך 3 ברמה, כמו באפליקציות public אחרות). שולבה בדף הבית לפי הכלל הקבוע מ-27.9 (15:50: ״אם בדקת אז תעלה לא צריך אישור שלי״) והכיוון מאותו ערב (23:54) לבנות ולהאיץ, והשער הפנימי הוסר."
-    },
-    "motal": {
-      "stage": "build",
-      "contentQA": "not-run",
-      "bank": "buildQ",
-      "note": "פיגום מוט״ל (שאלון 704182, אוריינות מדעית טכנולוגית שלב א׳) לפי התור שאושר ב-27.9 (23:54). הועתקה מ-literature ב-28.9.2026; התוכן עדיין של ספרות ויוחלף בתוכן מקורי לפי מבנה משרד החינוך. פתיחה: ?internal=shlav-internal-motal"
-    }
+ "_": "רישום השלבים. מקור האמת היחיד לשאלה 'מי מותר ללומדים אמיתיים'.",
+ "_pipeline": "build → internal → content-qa → approved → public. אפליקציה עולה שלב אחד בכל פעם, ביד, אחרי שהשלב הקודם נסגר. node .claude/qa/stage.js אוכף.",
+ "_stages": {
+  "build": "נבנית. עדיין לא נטענת בלי שגיאות, או שחסרים בה מסכים.",
+  "internal": "נטענת ועוברת smoke/parse/cache. נגישה רק דרך שער פנימי, ולא רשומה בדף הבית.",
+  "content-qa": "עברה בדיקה טכנית, ועכשיו נסרקת ב-content.js. עדיין פנימית.",
+  "approved": "הבעלים עבר על ממצאי ה-REVIEW ואישר. עדיין לא בדף הבית — כאן מסירים את השער הפנימי.",
+  "public": "רשומה ב-DATA.APPS שבדף הבית, בלי שער פנימי, ונמנית ב-badge."
+ },
+ "_contentQA": {
+  "not-run": "content.js עוד לא רץ עליה",
+  "pass": "אפס FAIL ואפס REVIEW",
+  "review": "אפס FAIL, יש ממצאים שדורשים עין אנושית",
+  "fail": "יש ממצא שחוסם",
+  "cleared": "היו ממצאי REVIEW, והבעלים עבר עליהם ואישר",
+  "legacy-published": "פורסמה לפני שהשער הזה נבנה. אינה חוסמת, אבל מדווחת כאזהרה עד שתיסרק"
+ },
+ "badge": {
+  "_": "מספר האפליקציות בכותרת דף הבית. אינו נגזר מ-DATA.APPS ולכן נשמר כאן, ו-stage.js משווה. הוסיפו אפליקציה — עדכנו את הארבע ביד ואת המספר כאן.",
+  "count": 21,
+  "words": {
+   "he": "עשרים ואחת",
+   "ar": "واحد وعشرون",
+   "ru": "Двадцать одно",
+   "en": "Twenty-one"
   }
+ },
+ "notApps": {
+  "legal": "עמוד תנאי השימוש",
+  "teachers": "פינת מורים — דף תוכן למורים: מדריך הקראה לתלמיד שמתקשה בקריאה, חומרי רמ״ה לפי כיתה וקישורי משרד החינוך עם קרדיט. לא אפליקציית לימוד (27.9.2026)",
+  "limor": "דף ההדגמה של לימור (בעבר /barak/) — הדגמת מורה דיגיטלית, לא אפליקציית לימוד",
+  "voice": "דף אבחון של מנוע ההקראה, לא אפליקציית לימוד",
+  "img": "נכסים",
+  "marketing": "דף קריאה לקובצי השיווק שב-marketing/*.md — כלי פנימי, לא אפליקציית לימוד",
+  "tutor-api": "קוד צד השרת של ״עזרה מהמורה״ — אינו מוגש כדף",
+  "tutor": "התשתית המשותפת של ״עזרה מהמורה״ — קובץ סקריפט, לא דף",
+  ".well-known": "assetlinks",
+  ".claude": "כלים",
+  "barak": "דף תצוגה של מנוע ברק — הדגמה לציבור, לא אפליקציית לימוד (מנוע ברק, 16.9.2026)"
+ },
+ "apps": {
+  "math-app": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "buildQ"
+  },
+  "math-teen": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "buildQ"
+  },
+  "math-uni": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "buildQ"
+  },
+  "math-uni2": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "buildQ"
+  },
+  "math-uni3": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "buildQ"
+  },
+  "english": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "buildQ"
+  },
+  "history": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "buildQ"
+  },
+  "lomda": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "buildQ",
+   "note": "התוכן ב-lomda/data/*.js ולא בתוך index.html. banks.js בודק את החיווט."
+  },
+  "ulpan": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "buildQ"
+  },
+  "bagrut-806": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "data/exams.js",
+   "note": "בנק סטטי בקבצים נפרדים, לא buildQ. content.js אינו סורק אותו — content806.js כן, והוא כותב את אותו דוח."
+  },
+  "reader": {
+   "stage": "public",
+   "contentQA": "none",
+   "bank": "none",
+   "note": "אין בנק שאלות — הטקסט מגיע מהמשתמש. אין מה לסרוק."
+  },
+  "theory": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "external",
+   "external": true,
+   "note": "אינה בריפו הזה. רשומה כאן כי היא בדף הבית ונמנית בשתים־עשרה. הנתיב נלקח משדה u שב-DATA.APPS ואינו נכפל כאן."
+  },
+  "kotvim": {
+   "stage": "public",
+   "contentQA": "cleared",
+   "bank": "none",
+   "note": "פיגום כתיבה — אין buildQ ואין שאלות, ולכן content.js אינו סורק אותה. הסורק שלה הוא .claude/qa/kotvim.js, והוא עבר נקי 10.9.2026: 3 סוגים, 9 נושאים, 111 קטעים, ארבע שפות מלאות, אין קטע חוזר. הבעלים אישר פרסום כגרסת ניסיון באותו יום, השער הפנימי הוסר, והיא נכנסה ל-DATA.APPS."
+  },
+  "rakia": {
+   "stage": "public",
+   "contentQA": "pass",
+   "bank": "rakia-texts",
+   "_": "מפת לידה. התוכן: 469 טקסטים ב-rakia/data/texts-*.js, נסרק ב-rakia-content.js ו-rakia-safety.js (0 ממצאים) ולא ב-content.js. approved 18.9.2026, public 20.9.2026 בהוראת הבעלים (״רוץ״ על כרטיס בדף הבית)."
+  },
+  "electric": {
+   "stage": "build",
+   "contentQA": "not-run",
+   "bank": "buildQ",
+   "note": "מתח — חשמל לתיכון, מגמת חשמל. הועתקה מ-math-uni3 ב-24.9.2026 בהוראת הבעלים (״אפליקציה חדשה לתיכון מגמת חשמל״). מחולל: התשובה מחושבת. פתיחה: ?internal=shlav-internal-electric"
+  },
+  "science": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "buildQ"
+  },
+  "civics": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "none",
+   "note": "בנק החידון בתוך index.html"
+  },
+  "hebrew": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "none",
+   "note": "הבנק ב-hebrew/bank.json"
+  },
+  "english-bagrut": {
+   "stage": "public",
+   "contentQA": "legacy-published",
+   "bank": "none",
+   "external": true,
+   "note": "כרטיס-כינוי למסלול הבגרות בתוך /english/ — אין תיקייה משלו"
+  },
+  "bagrut-history": {
+   "stage": "internal",
+   "contentQA": "not-run"
+  },
+  "geography": {
+   "stage": "internal",
+   "contentQA": "not-run"
+  },
+  "geography-elem": {
+   "stage": "public",
+   "contentQA": "cleared",
+   "bank": "GEOBANK",
+   "note": "בנק סטטי GEOBANK (52 שאלות מקוריות), לא buildQ — content.js מחוץ להיקף. 27.9.2026 נכתבה מחדש כולה: מנוע בנק, שאלות מקוריות לארבע יחידות משרד החינוך, סריקות תוכנתיות נקיות (רמזים, כפילויות, כתיב זר). הבעלים אישר דוגמאות לפני/אחרי עם צילומי מסך, וביקש פרסום לכולם."
+  },
+  "literature": {
+   "stage": "public",
+   "contentQA": "cleared",
+   "bank": "buildQ",
+   "note": "שאלוני ספרות 8281/8282 לפי מבנה משרד החינוך: שישה נושאים (סיפור קצר, שירה, דרמה, רומאן וספרי קריאה), 3/3/3 שאלות לנושא, ארבע שפות. 28.9.2026: הרחבה מ-48 שאלות חדשות, סריקות תוכן עם אפס FAIL, ושני REVIEW הוחלטו במודע (הקראת תשובה: חיובי שגוי, ההקראה פועלת רק אחרי שהתשובה נקבעה; מגוון נמוך 3 ברמה, כמו באפליקציות public אחרות). שולבה בדף הבית לפי הכלל הקבוע מ-27.9 (15:50: ״אם בדקת אז תעלה לא צריך אישור שלי״) והכיוון מאותו ערב (23:54) לבנות ולהאיץ, והשער הפנימי הוסר."
+  },
+  "tanakh": {
+   "stage": "public",
+   "contentQA": "cleared",
+   "bank": "buildQ",
+   "note": "שאלוני תנ״ך 1261/1262 לפי מבנה משרד החינוך: שישה נושאים (בראשית, שמות, נושאי בחירה וקטע הבנה), 3/3/3 שאלות לנושא, ארבע שפות. 28.9.2026: הרחבה מ-30 שאלות חדשות, סריקות תוכן עם אפס FAIL, ושני REVIEW הוחלטו במודע (הקראת תשובה: חיובי שגוי; מגוון נמוך 3 ברמה, כמו באפליקציות public אחרות). שולבה בדף הבית לפי הכלל הקבוע מ-27.9 (15:50: ״אם בדקת אז תעלה לא צריך אישור שלי״) והכיוון מאותו ערב (23:54) לבנות ולהאיץ, והשער הפנימי הוסר."
+  },
+  "motal": {
+   "stage": "build",
+   "contentQA": "not-run",
+   "bank": "buildQ",
+   "note": "פיגום מוט״ל (שאלון 704182, אוריינות מדעית טכנולוגית שלב א׳) לפי התור שאושר ב-27.9 (23:54). הועתקה מ-literature ב-28.9.2026; התוכן עדיין של ספרות ויוחלף בתוכן מקורי לפי מבנה משרד החינוך. פתיחה: ?internal=shlav-internal-motal"
+  },
+  "hebrew-arab": {
+   "stage": "build",
+   "contentQA": "not-run",
+   "bank": "buildQ",
+   "note": "פיגום עברית לדוברי ערבית (שאלונים 014381/014281) לפי התור שאושר ב-27.9 (23:54). הועתקה מ-literature ב-28.9.2026; התוכן עדיין של ספרות ויוחלף בתוכן מקורי לפי מבנה משרד החינוך. פתיחה: ?internal=shlav-internal-hebrew-arab"
+  }
+ }
 }
