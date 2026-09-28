@@ -35,7 +35,7 @@ on:
       max:
         description: 'כמה מחרוזות לכל היותר בריצה הזאת'
         required: false
-        default: '300'
+        default: '700'
       provider:
         description: 'gemini (GEMINI_API_KEY) או gcloud (TTS_KEY, Cloud Text-to-Speech). ריק — משתנה הריפו TTS_PROVIDER, ואם אין — gemini'
         required: false
@@ -46,6 +46,10 @@ on:
         default: ''
       replace:
         description: 'YES — למחוק הקלטות בקול אחר ולהקליט מחדש'
+        required: false
+        default: ''
+      batch:
+        description: 'NO — הקלטה מחרוזת־מחרוזת (הישן). ריק/YES — אצווה של ~40 מחרוזות לבקשה (ברירת מחדל)'
         required: false
         default: ''
 
@@ -112,7 +116,7 @@ jobs:
           if [ -z "$APP" ]; then APP="$(node .claude/qa/record.js --next)"; fi
           if [ -z "$APP" ]; then echo "הכול מוקלט — אין מה להריץ."; fi
           echo "app=$APP" >> "$GITHUB_OUTPUT"
-          echo "max=${{ github.event.inputs.max || '300' }}" >> "$GITHUB_OUTPUT"
+          echo "max=${{ github.event.inputs.max || '700' }}" >> "$GITHUB_OUTPUT"
 
       - name: תכנון
         if: steps.pick.outputs.app != ''
@@ -131,6 +135,8 @@ jobs:
         run: |
           EXTRA=""
           if [ "${REPLACE:-}" = "YES" ]; then EXTRA="--replace"; fi
+          BATCH="${{ github.event.inputs.batch }}"
+          if [ "$BATCH" != "NO" ]; then EXTRA="$EXTRA --batch"; fi
           node .claude/qa/record.js "${{ steps.pick.outputs.app }}" --max "${{ steps.pick.outputs.max }}" $EXTRA
 
       - name: המניפסט תואם לדיסק
