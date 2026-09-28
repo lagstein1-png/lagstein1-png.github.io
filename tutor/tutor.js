@@ -48,6 +48,16 @@ var API = "https://tutor.lagstein1.workers.dev/";
    אף אחד מהם הוא כפתור שבור, וזו הייתה הכוונה המקורית של השער. */
 var BRAIN = !!API || typeof JOSHLOCAL !== "undefined";
 
+/* ---- הדמות הצפה של לימור (28.9.2026) ----
+   המפרט של הבעלים, בלי מרכאות: דמות עם תמונה, בלי המסגרת
+   העגולה, צפה על הדף ואפשר להזיז אותה מצד לצד. לחיצה עליה
+   פותחת את חלון המורה שמלווה את השאלה, ובטקסט שלה יש מילים
+   לחיצות שעושות פעולות: נגיעה במילה מחזירה למסך, והמורה
+   חוזרת לצוף. נבנה מאחורי השער `?limor2=1` עד לאישור
+   ההתנהגות החיה: בלי הפרמטר לא נוצר אלמנט, לא משתנה טקסט
+   ולא מתווסף מאזין, והאתר נראה ומתנהג בדיוק כמו אתמול. */
+var FLOAT = /[?&]limor2=1(?:&|$)/.test(location.search);
+
 var VOICE_KEY = "tutor-voice-v2"; /* דמות לימור: לא יורשים בחירת קול גברי של ברק; חדש לכל שפה */
 var RATE_KEY = "tutor-rate-v1";   /* מהירות ההקראה. משותף בכוונה — מודול אחד, התנהגות אחת */
 var DAY_KEY  = "tutor-day-v1";    /* מונה יומי. ילד אחד, תקציב אחד, בלי קשר לאפליקציה */
@@ -71,7 +81,7 @@ var L = {
 /* ״מהמוֹרָה״ מנוקד כדי שהקראה וקורא מסך יאמרו את הלשון הנכונה. */
 he:{ btn:"לימור — עזרה מהמוֹרָה", title:"עזרה מהמוֹרָה", close:"סגירה", send:"שליחה",
   intro:"אפשר לשאול אותי על מה שעל המסך. אני נותנת רמז אחד בכל פעם, ומחכה לתשובה.",
-  nudge:{stuck:"שמתי לב שהשאלה הזאת לוקחת זמן. רוצה שנפרק אותה יחד, צעד אחד בכל פעם?",frustrated:"אני רואה שזה לא הולך עכשיו, וזה בסדר גמור. בוא ננסה מכיוון אחר."}, greet:"היי, אני לימור. אני כאן אם משהו לא ברור. כתוב לי מה בדיוק, ונעבור על זה יחד.", ph:"מה לא ברור?", hello:"אני רוצה עזרה במה שעל המסך.", wait:"רגע, חושבת…",
+  nudge:{stuck:"שמתי לב שהשאלה הזאת לוקחת זמן. רוצה שנפרק אותה יחד, צעד אחד בכל פעם?",frustrated:"אני רואה שזה לא הולך עכשיו, וזה בסדר גמור. בוא ננסה מכיוון אחר."}, greet:"היי, אני לימור. אני כאן אם משהו לא ברור. כתוב לי מה בדיוק, ונעבור על זה יחד.", bubble:"שלום! אני לימור", greetFloat:"\nנגיעה במילה [[act:close|מסך]] סוגרת את החלון, ואני חוזרת לצוף לידך.", ph:"מה לא ברור?", hello:"אני רוצה עזרה במה שעל המסך.", wait:"רגע, חושבת…",
   err:"לא הצלחתי להתחבר. אפשר לנסות שוב עוד רגע.",
   local:"התשובה מהמכשיר, לא מהשרת",
   setup:"העזרה עוד לא מוכנה. אפשר לנסות מאוחר יותר.",
@@ -92,7 +102,7 @@ he:{ btn:"לימור — עזרה מהמוֹרָה", title:"עזרה מהמוֹ�
   simplifyCut:"הטקסט ארוך, ולכן נשלחה רק תחילתו — {n} תווים." },
 ar:{ btn:"ليمور — مساعدة من المعلّمة", title:"مساعدة من المعلّمة", close:"إغلاق", send:"إرسال",
   intro:"يمكنك أن تسألني عمّا يظهر على الشاشة. أعطي تلميحًا واحدًا في كل مرة وأنتظر إجابتك.",
-  nudge:{stuck:"لاحظت أن هذا السؤال يأخذ وقتًا. تريد أن نفكّكه معًا، خطوة واحدة في كل مرة؟",frustrated:"أرى أن الأمر لا يسير الآن، وهذا طبيعي تمامًا. لنجرّب من زاوية أخرى."}, greet:"مرحبًا، أنا ليمور. أنا هنا إن كان شيء غير واضح. اكتب لي ما هو، ونمرّ عليه معًا.", ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
+  nudge:{stuck:"لاحظت أن هذا السؤال يأخذ وقتًا. تريد أن نفكّكه معًا، خطوة واحدة في كل مرة؟",frustrated:"أرى أن الأمر لا يسير الآن، وهذا طبيعي تمامًا. لنجرّب من زاوية أخرى."}, greet:"مرحبًا، أنا ليمور. أنا هنا إن كان شيء غير واضح. اكتب لي ما هو، ونمرّ عليه معًا.", bubble:"مرحبًا! أنا ليمور", greetFloat:"\nلمسة على كلمة [[act:close|الشاشة]] تُغلق النافذة، وأعود لأحوم بجانبك.", ph:"ما الذي ليس واضحًا؟", hello:"أحتاج مساعدة فيما يظهر على الشاشة.", wait:"لحظة، أفكّر…",
   err:"لم أتمكّن من الاتصال. حاول مرّة أخرى بعد قليل.",
   local:"الجواب من الجهاز، لا من الخادم",
   setup:"المساعدة ليست جاهزة بعد. حاول لاحقًا.",
@@ -113,7 +123,7 @@ ar:{ btn:"ليمور — مساعدة من المعلّمة", title:"مساعد�
   simplifyCut:"النصّ طويل، لذلك أُرسل أوّله فقط — {n} حرفًا." },
 ru:{ btn:"Лимор — помощь учительницы", title:"Помощь учительницы", close:"Закрыть", send:"Отправить",
   intro:"Можешь спросить меня о том, что на экране. Я даю по одной подсказке и жду ответа.",
-  nudge:{stuck:"Я заметила, что этот вопрос отнимает время. Разберём его вместе, по одному шагу?",frustrated:"Вижу, что сейчас не идёт, и это совершенно нормально. Попробуем с другой стороны."}, greet:"Привет, я Лимор. Я рядом, если что-то непонятно. Напиши, что именно, и разберём вместе.", ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
+  nudge:{stuck:"Я заметила, что этот вопрос отнимает время. Разберём его вместе, по одному шагу?",frustrated:"Вижу, что сейчас не идёт, и это совершенно нормально. Попробуем с другой стороны."}, greet:"Привет, я Лимор. Я рядом, если что-то непонятно. Напиши, что именно, и разберём вместе.", bubble:"Привет! Я Лимор", greetFloat:"\nНажатие на слово [[act:close|экран]] закрывает окно, и я снова парю рядом.", ph:"Что непонятно?", hello:"Мне нужна помощь с тем, что на экране.", wait:"Минутку, думаю…",
   err:"Не удалось соединиться. Попробуй ещё раз через минуту.",
   local:"Ответ с устройства, не с сервера",
   setup:"Помощь ещё не готова. Попробуй позже.",
@@ -134,7 +144,7 @@ ru:{ btn:"Лимор — помощь учительницы", title:"Помощ
   simplifyCut:"Текст длинный, поэтому отправлено только его начало — {n} знаков." },
 en:{ btn:"Limor — ask the teacher", title:"Ask the teacher", close:"Close", send:"Send",
   intro:"You can ask me about what is on the screen. I give one hint at a time, and wait for your answer.",
-  nudge:{stuck:"I noticed this one is taking a while. Shall we break it down together, one step at a time?",frustrated:"I can see this is not working right now, and that is completely fine. Let us try another way."}, greet:"Hi, I am Limor. I am here if something is unclear. Write what it is, and we will go through it together.", ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
+  nudge:{stuck:"I noticed this one is taking a while. Shall we break it down together, one step at a time?",frustrated:"I can see this is not working right now, and that is completely fine. Let us try another way."}, greet:"Hi, I am Limor. I am here if something is unclear. Write what it is, and we will go through it together.", bubble:"Hi! I am Limor", greetFloat:"\nTapping the word [[act:close|screen]] closes the window, and I go back to floating beside you.", ph:"What is unclear?", hello:"I need help with what is on the screen.", wait:"One moment, thinking…",
   err:"I could not connect. Try again in a moment.",
   local:"Answered on the device, not by the server",
   setup:"The help is not ready yet. Try again later.",
@@ -516,7 +526,7 @@ function say(i){
   /* עוצרים גם את ההקראה של האפליקציה עצמה, אם יש לה כזאת */
   if(CFG && CFG.stopHost) try{ CFG.stopHost() }catch(e){}
   try{ speechSynthesis.cancel() }catch(e){}
-  var segs = segments(stripMd(splitSugg(m.text).body)), r = rate(), n = 0;
+  var segs = segments(stripMd(actStrip(splitSugg(m.text).body))), r = rate(), n = 0;
   if(!segs.length) return;
   PLAYING = i; VOICE_STARTED = false; draw();
   (function next(){
@@ -933,6 +943,32 @@ function faceState(){
   if(JOSHFACE.state().current !== state) JOSHFACE.emit(state);
 }
 
+/* ---- הדמות הצפה + מילים לחיצות (שער limor2) ----
+   הכרטיס אינו עיגול: מסגרת מרובעת מעוגלת עם פס־שם, בדיוק
+   כמו בהדמיה שאושרה. הצבע הסגול הוא סגול לימור הקבוע של
+   הכפתורים, והמילה הלחיצה צהובה כמו בהדמיה. */
+CSS += ''
++'#tu-fl{position:fixed;left:12px;bottom:12px;z-index:8900;display:flex;flex-direction:column;align-items:flex-start}'
++'#tu-fl[hidden]{display:none}'
++'#tu-flb{position:relative;display:flex;flex-direction:column;align-items:center;width:76px;padding:5px 5px 8px;'
++'background:#fff;border:2px solid #6d28d9;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,.25);'
++'cursor:grab;touch-action:none;transform:rotate(-4deg);font:inherit}'
++'#tu-flb:active{cursor:grabbing}'
++'#tu-flb:focus-visible{outline:3px solid #6d28d9;outline-offset:2px}'
++'#tu-fli{width:64px;height:80px;object-fit:cover;object-position:top;border-radius:12px;pointer-events:none}'
++'#tu-fln{margin-top:-9px;background:#6d28d9;color:#fff;border-radius:999px;padding:1px 12px;'
++'font-size:.85rem;font-weight:700;pointer-events:none;white-space:nowrap}'
++'#tu-fld{position:absolute;top:-9px;inset-inline-end:-9px;width:22px;height:22px;display:grid;place-items:center;'
++'background:#fef08a;border:1px solid #eab308;border-radius:999px;font-size:.75rem;pointer-events:none}'
++'#tu-flw{position:absolute;bottom:calc(100% + 10px);inset-inline-start:0;max-width:70vw;background:#fff;'
++'border:2px solid #6d28d9;border-radius:14px;padding:6px 12px;font-size:.95rem;font-weight:700;color:#17333c;'
++'box-shadow:0 8px 20px rgba(0,0,0,.22);white-space:nowrap;pointer-events:none}'
++'#tu-flw[hidden]{display:none}'
++'.tu-act{font:inherit;font-weight:700;color:#17333c;background:#fef08a;border:1px solid #eab308;'
++'border-radius:8px;padding:0 6px;margin:0 1px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}'
++'.tu-act:hover{background:#fde047}'
++'.tu-act:focus-visible{outline:2px solid #6d28d9;outline-offset:1px}';
+
 function build(){
   if(EL) return EL;
   var st = document.createElement("style"); st.textContent = CSS;
@@ -1020,6 +1056,7 @@ function build(){
     else if(a === "stop") stopSay();
     else if(a === "manx"){ manDismiss(); draw() }
     else if(a === "sugg") send(b.getAttribute("data-s"));
+    else if(a === "act") actChip(b.getAttribute("data-act"), b.getAttribute("data-arg"));
   });
   EL.log.addEventListener("change", function(e){
     if(e.target.id === "tu-rate"){ setRate(parseFloat(e.target.value)); if(PLAYING>=0) stopSay() }
@@ -1113,8 +1150,9 @@ function draw(){
       h += '<div class="tu-m tu-me">' + esc(m.text.replace(/«|»/g, "")) + '</div>';
       return;
     }
-    var sp = splitSugg(i === REV ? m.text.slice(0, REVN) : m.text);
-    h += '<div class="tu-m tu-bot">' + fmt(sp.body) + '</div>';
+    var mtxt = i === REV ? m.text.slice(0, REVN).replace(/\[\[[^\]]*$/, "") : m.text;
+    var sp = splitSugg(mtxt);
+    h += '<div class="tu-m tu-bot">' + chipHTML(fmt(sp.body)) + '</div>';
     /* השורה האפורה אומרת למה התשובה מהמכשיר — במילים של השפה,
        לא באסימון (״· limit״ הופיע כך בממשק עברי, נמדד 18.9.2026).
        רק לסיבות שיש להן משפט מוכן; לכל השאר די ב-t.local. */
@@ -1325,7 +1363,7 @@ function qid(){
    היא נכנסת ל-MSGS כדי שתיראה בשיחה, ו-`send` מסיר הודעת בוט
    פותחת לפני השליחה — שיחה חייבת להתחיל בתור של הלומד. */
 function greetLocal(){
-  MSGS.push({ role:"assistant", text:T().greet });
+  MSGS.push({ role:"assistant", text:T().greet + (FLOAT && T().greetFloat ? T().greetFloat : "") });
   startReveal(MSGS.length - 1);
   draw();
 }
@@ -1338,6 +1376,7 @@ function open(auto){
      שהילד החליף את שפת האפליקציה. נמדד: הפאנל התחלף, הבוט לא. */
   if(QID !== id || LANGAT !== lg){ MSGS = []; NOTE = ""; QID = id; LANGAT = lg }
   build().ov.classList.add("on");
+  floatHide();
   kbSync();
   draw();
   /* פתיחה אוטומטית אינה גונבת מיקוד. הפאנל הוא דיאלוג, ומיקוד
@@ -1354,6 +1393,7 @@ function close(){
   micStop();
   stopSay(); stopReveal(); NOTE = "";
   if(EL) EL.ov.classList.remove("on");
+  floatShow();
   if(typeof JOSHFACE !== "undefined") JOSHFACE.emit("idle");
 }
 function focus(){ try{ EL.inp.focus() }catch(e){} }
@@ -1749,6 +1789,132 @@ function simplify(doc){
   return true;
 }
 
+/* ================= הדמות הצפה ומילים לחיצות =================
+   שתיהן מאחורי שער `limor2` (ראו למעלה). הדמות נוצרת ב-`mount`,
+   נסתרת כשהחלון פתוח וחוזרת כשהוא נסגר. המיקום נשמר במכשיר
+   לכל אפליקציה בנפרד, לפי כלל מפתחות ה-localStorage ב-CLAUDE.md.
+
+   תחביר המילים הלחיצות בטקסט שלה:
+     [[act:close|מסך]]               - סוגר את החלון; היא חוזרת לצוף
+     [[act:go_screen:practice|מסך]]  - מבצע פעולה רשומה במתאם של
+                                       האפליקציה דרך BARAK.run, עם
+                                       הפרמטר הנדרש הראשון שלה
+   מילה של פעולה שאינה רשומה באפליקציה נשארת טקסט רגיל, וההקראה
+   שומעת את המילה בלבד (actStrip). פעולה שנכשלה אינה מתחזה
+   לבוצעה: מוצג אותו נוסח קבוע שבו המנוע משתמש. */
+var FL = null;
+var FL_POS = "tutor-float-v1:";
+var FL_HI  = "tutor-float-hi:";
+
+function floatInit(){
+  if(!FLOAT || FL || !CFG) return;
+  if(!document.body){ document.addEventListener("DOMContentLoaded", floatInit); return }
+  var fl = document.createElement("div");
+  fl.id = "tu-fl";
+  fl.innerHTML = '<div id="tu-flw" hidden></div>'
+    + '<button id="tu-flb" type="button">'
+    + '<img id="tu-fli" alt="" draggable="false">'
+    + '<span id="tu-fln">לימור</span>'
+    + '<span id="tu-fld" aria-hidden="true">⇔</span>'
+    + '</button>';
+  document.body.appendChild(fl);
+  FL = fl;
+  fl.querySelector("#tu-fli").src = "/img/limor.jpg";
+  var bw = fl.querySelector("#tu-flw");
+  bw.textContent = T().bubble || "";
+  var btn = fl.querySelector("#tu-flb");
+  btn.setAttribute("aria-label", T().btn);
+  var pos = null;
+  try{ pos = JSON.parse(localStorage.getItem(FL_POS + CFG.app) || "null") }catch(e){}
+  if(pos && isFinite(pos.x) && isFinite(pos.y)){
+    fl.style.left = Math.min(Math.max(0, pos.x), Math.max(0, innerWidth - 90)) + "px";
+    fl.style.top  = Math.min(Math.max(0, pos.y), Math.max(0, innerHeight - 130)) + "px";
+    fl.style.bottom = "auto";
+  }
+  /* הבועה מופיעה פעם אחת בכל ביקור, ונעלמת בגרירה או בפתיחה */
+  var hiSeen = true;
+  try{ hiSeen = sessionStorage.getItem(FL_HI + CFG.app) === "1" }catch(e){}
+  if(!hiSeen && bw.textContent) bw.hidden = false;
+  function bye(){
+    if(bw.hidden) return;
+    bw.hidden = true;
+    try{ sessionStorage.setItem(FL_HI + CFG.app, "1") }catch(e){}
+  }
+  function save(){
+    try{ localStorage.setItem(FL_POS + CFG.app, JSON.stringify({ x:fl.offsetLeft, y:fl.offsetTop })) }catch(e){}
+  }
+  var drag = null, suppressClick = false;
+  btn.addEventListener("pointerdown", function(e){
+    try{ btn.setPointerCapture(e.pointerId) }catch(err){}
+    drag = { x:e.clientX, y:e.clientY, l:fl.offsetLeft, t:fl.offsetTop, moved:false };
+  });
+  btn.addEventListener("pointermove", function(e){
+    if(!drag) return;
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if(!drag.moved && Math.abs(dx) + Math.abs(dy) < 8) return;
+    drag.moved = true;
+    fl.style.bottom = "auto";
+    var nx = Math.min(Math.max(0, drag.l + dx), Math.max(0, innerWidth - fl.offsetWidth));
+    var ny = Math.min(Math.max(0, drag.t + dy), Math.max(0, innerHeight - fl.offsetHeight));
+    fl.style.left = nx + "px"; fl.style.top = ny + "px";
+  });
+  btn.addEventListener("pointerup", function(){
+    if(!drag) return;
+    suppressClick = drag.moved; drag = null;
+    if(suppressClick){ bye(); save() }
+  });
+  btn.addEventListener("pointercancel", function(){ drag = null });
+  /* הפתיחה ב-click ולא ב-pointerup: כך גם Enter ורווח פותחים,
+     וגרירה ששחררה את האצבע אינה פותחת בטעות (suppressClick). */
+  btn.addEventListener("click", function(){
+    if(suppressClick){ suppressClick = false; return }
+    bye(); open();
+  });
+}
+function floatHide(){ if(FL) FL.hidden = true }
+function floatShow(){ if(FL) FL.hidden = false }
+
+function actAvail(name){
+  if(name === "close") return true;
+  if(typeof BARAK === "undefined" || typeof BARAK.actions !== "function") return false;
+  var list = [];
+  try{ list = BARAK.actions() }catch(e){ return false }
+  for(var i = 0; i < list.length; i++) if(list[i].name === name) return true;
+  return false;
+}
+function chipHTML(html){
+  if(!FLOAT) return html;
+  return html.replace(/\[\[act:([a-z_]+)(?::([^|\]]+))?\|([^\]]+)\]\]/g,
+    function(all, name, arg, label){
+      if(!actAvail(name)) return label;
+      return '<button type="button" class="tu-act" data-tu="act" data-act="' + name + '"'
+        + (arg ? ' data-arg="' + arg + '"' : '') + '>' + label + '</button>';
+    });
+}
+function actStrip(text){
+  return String(text).replace(/\[\[act:[a-z_]+(?::[^|\]]+)?\|([^\]]+)\]\]/g, "$1");
+}
+function actChip(name, arg){
+  if(!name) return;
+  if(name === "close"){ close(); return }
+  if(typeof BARAK === "undefined" || typeof BARAK.run !== "function" || !actAvail(name)) return;
+  var args = {}, spec = null, list = [];
+  try{ list = BARAK.actions() }catch(e){}
+  for(var i = 0; i < list.length; i++) if(list[i].name === name) spec = list[i];
+  if(arg != null && spec && spec.params){
+    for(var k in spec.params){
+      if(Object.prototype.hasOwnProperty.call(spec.params, k) && spec.params[k] && spec.params[k].required){ args[k] = arg; break }
+    }
+  }
+  stopSay(); stopReveal();
+  Promise.resolve(BARAK.run({ name:name, args:args })).then(function(ok){
+    if(ok){ close(); return }
+    var af = (typeof BARAK !== "undefined" && BARAK.ACTION_FAILED) || {};
+    MSGS.push({ role:"assistant", text: af[lang()] || af.he || T().err });
+    draw();
+  });
+}
+
 /* ================= הממשק לאפליקציה =================
    mount(cfg) מחזיר true אם הבוט פעיל. אפליקציה בונה את הכפתור
    רק כשהתשובה חיובית, ולכן בלי כתובת שרת אין כפתור בשום מקום.
@@ -1770,7 +1936,7 @@ g.TUTOR = {
     var ok = BRAIN && !!CFG;
     /* הפאנל נפתח רק בלחיצה (26.9.2026) — אין פתיחה אוטומטית בטעינה
        ואין nudge שקופץ לבד; open() נקרא מכפתורי האפליקציה בלבד. */
-    if(ok){}
+    if(ok) floatInit();
     return ok;
   },
   open: open,

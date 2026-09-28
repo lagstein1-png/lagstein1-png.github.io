@@ -1,3 +1,66 @@
+�ת — אותו מהלך שהאפליקציה עושה
+             כשמחליפים רמה באמצע שאלה. מחולל קטן יכול להחזיר את אותה
+             שאלה, ואז מנסים שוב; אם נשארה זהה, barak-core רואה
+             שהמזהה לא זז ומדווח כישלון. */
+          var was=txt(P.q.ask)+txt(P.q.expr),n=0;
+          do{loadQ();n++}while(n<12&&txt(P.q.ask)+txt(P.q.expr)===was);
+          stopSpeak();window.scrollTo(0,0);render();return true;
+        }},
+      show_hint:{desc:"מציג את הרמז לשאלה שעל המסך ומקריא אותו",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase!=="ask"||!P.q.hint)return false;
+          if(!P.hints){onAction("hint",null);return P.hints>0}
+          /* הרמז כבר פתוח — מפנים אליו */
+          speak(speakProse(P.q.hint));
+          return BARAK.highlight(document.querySelector(".hintbox"));
+        }},
+      read_aloud:{desc:"מקריא את השאלה והאפשרויות בקול",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase==="done"||!state.settings.tts)return false;
+          readQuestion();return true;
+        }},
+      repeat_question:{desc:"מקריא את השאלה עוד פעם",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase==="done"||!state.settings.tts)return false;
+          readQuestion();return true;
+        }},
+      highlight_option:{desc:"מדגיש במסך אחת מהאפשרויות, לפי מקומה (0 עד 3)",
+        params:{index:{type:"integer",min:0,max:3,required:true}},
+        run:function(a){
+          if(view!=="practice"||!P.q||P.phase!=="ask"||a.index>=P.q.options.length)return false;
+          return BARAK.highlight(document.querySelector('[data-a="ans"][data-i="'+a.index+'"]'));
+        }},
+      explain_again:{desc:"מפנה אל הפתרון המודרך ומקריא אותו שוב, אחרי שהשאלה נענתה",
+        run:function(){
+          if(view!=="practice"||!P.q||P.phase!=="reveal"||!P.q.steps.length)return false;
+          /* קודם ההקראה ואחריה ההדגשה: ב-math-teen speak מרנדר את המסך
+             מחדש, והדגשה שקדמה לו הייתה נמחקת. */
+          readSteps();BARAK.highlight(document.querySelector(".steps"));return true;
+        }},
+      go_screen:{desc:"עובר למסך אחר של האפליקציה",
+        params:{name:{type:"string",enum:["home","practice","topics","formulas","progress","settings"],required:true}},
+        run:function(a){
+          if(!state.onboarded||view==="sit")return false;
+          goto(a.name);return view===a.name;
+        }},
+      formula_sheet:{desc:"פותח את דף הנוסחאות; אם לשאלה יש נוסחה: מגלגל אליה",
+        run:function(){
+          if(!state.onboarded||view==="sit")return false;
+          if(view==="practice"&&P.q&&P.q.rule){fq="";pendingScroll="f-"+P.q.rule}
+          if(view==="formulas")window.scrollTo(0,0);else goto("formulas");
+          return view==="formulas";
+        }}
+    }
+  });
+  try{render()}catch(e){}
+}
+</script>
+<!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
+     (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
+     נמדדת בנפרד. הוסר 10.9.2026 והוחזר 15.9.2026, שניהם בהחלטת הבעלים. -->
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -989,7 +1052,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g153 · 2026-09-27";
+var BUILD="g154 · 2026-09-28";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -11940,7 +12003,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g153-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g154-pwa1").catch(function(){});
   });
 }
 </script>
@@ -12004,66 +12067,4 @@ if(window.TUTOR){
         run:function(){
           if(view!=="practice"||!P.q||P.phase==="done")return false;
           if(P.phase==="reveal"){advance();return true}
-          /* שאלה שלא נענתה אינה נספרת — אותו מהלך שהאפליקציה עושה
-             כשמחליפים רמה באמצע שאלה. מחולל קטן יכול להחזיר את אותה
-             שאלה, ואז מנסים שוב; אם נשארה זהה, barak-core רואה
-             שהמזהה לא זז ומדווח כישלון. */
-          var was=txt(P.q.ask)+txt(P.q.expr),n=0;
-          do{loadQ();n++}while(n<12&&txt(P.q.ask)+txt(P.q.expr)===was);
-          stopSpeak();window.scrollTo(0,0);render();return true;
-        }},
-      show_hint:{desc:"מציג את הרמז לשאלה שעל המסך ומקריא אותו",
-        run:function(){
-          if(view!=="practice"||!P.q||P.phase!=="ask"||!P.q.hint)return false;
-          if(!P.hints){onAction("hint",null);return P.hints>0}
-          /* הרמז כבר פתוח — מפנים אליו */
-          speak(speakProse(P.q.hint));
-          return BARAK.highlight(document.querySelector(".hintbox"));
-        }},
-      read_aloud:{desc:"מקריא את השאלה והאפשרויות בקול",
-        run:function(){
-          if(view!=="practice"||!P.q||P.phase==="done"||!state.settings.tts)return false;
-          readQuestion();return true;
-        }},
-      repeat_question:{desc:"מקריא את השאלה עוד פעם",
-        run:function(){
-          if(view!=="practice"||!P.q||P.phase==="done"||!state.settings.tts)return false;
-          readQuestion();return true;
-        }},
-      highlight_option:{desc:"מדגיש במסך אחת מהאפשרויות, לפי מקומה (0 עד 3)",
-        params:{index:{type:"integer",min:0,max:3,required:true}},
-        run:function(a){
-          if(view!=="practice"||!P.q||P.phase!=="ask"||a.index>=P.q.options.length)return false;
-          return BARAK.highlight(document.querySelector('[data-a="ans"][data-i="'+a.index+'"]'));
-        }},
-      explain_again:{desc:"מפנה אל הפתרון המודרך ומקריא אותו שוב, אחרי שהשאלה נענתה",
-        run:function(){
-          if(view!=="practice"||!P.q||P.phase!=="reveal"||!P.q.steps.length)return false;
-          /* קודם ההקראה ואחריה ההדגשה: ב-math-teen speak מרנדר את המסך
-             מחדש, והדגשה שקדמה לו הייתה נמחקת. */
-          readSteps();BARAK.highlight(document.querySelector(".steps"));return true;
-        }},
-      go_screen:{desc:"עובר למסך אחר של האפליקציה",
-        params:{name:{type:"string",enum:["home","practice","topics","formulas","progress","settings"],required:true}},
-        run:function(a){
-          if(!state.onboarded||view==="sit")return false;
-          goto(a.name);return view===a.name;
-        }},
-      formula_sheet:{desc:"פותח את דף הנוסחאות; אם לשאלה יש נוסחה: מגלגל אליה",
-        run:function(){
-          if(!state.onboarded||view==="sit")return false;
-          if(view==="practice"&&P.q&&P.q.rule){fq="";pendingScroll="f-"+P.q.rule}
-          if(view==="formulas")window.scrollTo(0,0);else goto("formulas");
-          return view==="formulas";
-        }}
-    }
-  });
-  try{render()}catch(e){}
-}
-</script>
-<!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
-     (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
-     נמדדת בנפרד. הוסר 10.9.2026 והוחזר 15.9.2026, שניהם בהחלטת הבעלים. -->
-<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
-</body>
-</html>
+          /* שאלה שלא נענתה אינה נספ�
