@@ -1073,7 +1073,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="h3 · 2026-09-29";
+var BUILD="h4 · 2026-09-29";
 var SKEY="hebrew-arab-state-v1";
 var GKEY_STORE="hebrew-arab-gkey";
 
@@ -4292,7 +4292,13 @@ load();
 touchDay();
 booted=true;
 applyModes();
-render();
+/* חוזרים לאפליקציה באמצע תרגול: השאלה עצמה אינה נשמרת, רק
+   המסך. בלי שורה זו המסך נפתח עם כותרת בלבד, בלי שאלה ובלי
+   דרך להתחיל — מי שסגר את הדפדפן באמצע תרגול חזר למסך מת. */
+if(state.screen==="prac"&&!P.q){
+  if(!state.topic||!topicOf(state.topic))state.topic=TOPICS[0].id;
+  newQuestion();
+}else render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
@@ -4406,7 +4412,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=h3-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=h4-pwa1").catch(function(){});
   });
 }
 </script>
