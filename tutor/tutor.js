@@ -969,10 +969,18 @@ CSS += ''
 +'.tu-act:hover{background:#fde047}'
 +'.tu-act:focus-visible{outline:2px solid #6d28d9;outline-offset:1px}';
 
+/* הזרקת ה-CSS פעם אחת. build() אינו המזריק היחיד: הדמות הצפה
+   נוצרת ב-mount, לפני פתיחת החלון הראשונה, ובלי הזרקה כאן היא
+   הייתה נשארת div בלי סגנון (נמדד חי, 28.9: רוחב מלא בסוף העמוד). */
+function ensureCss(){
+  if(document.getElementById("tu-css")) return;
+  var st = document.createElement("style"); st.id = "tu-css";
+  st.textContent = CSS;
+  document.head.appendChild(st);
+}
 function build(){
   if(EL) return EL;
-  var st = document.createElement("style"); st.textContent = CSS;
-  document.head.appendChild(st);
+  ensureCss();
   var ov = document.createElement("div"); ov.id = "tu-ov";
   ov.innerHTML =
     '<div id="tu-bx" role="dialog" aria-modal="false" aria-labelledby="tu-ti">'
@@ -1809,6 +1817,7 @@ var FL_HI  = "tutor-float-hi:";
 function floatInit(){
   if(!FLOAT || FL || !CFG) return;
   if(!document.body){ document.addEventListener("DOMContentLoaded", floatInit); return }
+  ensureCss();
   var fl = document.createElement("div");
   fl.id = "tu-fl";
   fl.innerHTML = '<div id="tu-flw" hidden></div>'
