@@ -57,6 +57,12 @@ var BRAIN = !!API || typeof JOSHLOCAL !== "undefined";
    ההתנהגות החיה: בלי הפרמטר לא נוצר אלמנט, לא משתנה טקסט
    ולא מתווסף מאזין, והאתר נראה ומתנהג בדיוק כמו אתמול. */
 var FLOAT = /[?&]limor2=1(?:&|$)/.test(location.search);
+/* תנועת הדמות — חלק מאותו שער: ?limor2=1&motion=1|2|3 (0 = דומם).
+   שלוש אפשרויות לבחירת ג׳וש. כולן keyframes ב-CSS בלבד (transform על
+   ה-GPU), בלי נכסים חדשים ובלי ספריות, ומכבדות prefers-reduced-motion
+   במדיה־שאילתה בסוף הבלוק. fldemo=1 מריץ מחזור תגובות להדגמה בלבד. */
+var MOTION = (location.search.match(/[?&]motion=([0-3])(?:&|$)/) || [])[1] || "1";
+var FLDEMO = /[?&]fldemo=1(?:&|$)/.test(location.search);
 
 var VOICE_KEY = "tutor-voice-v2"; /* דמות לימור: לא יורשים בחירת קול גברי של ברק; חדש לכל שפה */
 var RATE_KEY = "tutor-rate-v1";   /* מהירות ההקראה. משותף בכוונה — מודול אחד, התנהגות אחת */
@@ -967,7 +973,31 @@ CSS += ''
 +'.tu-act{font:inherit;font-weight:700;color:#17333c;background:#fef08a;border:1px solid #eab308;'
 +'border-radius:8px;padding:0 6px;margin:0 1px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}'
 +'.tu-act:hover{background:#fde047}'
-+'.tu-act:focus-visible{outline:2px solid #6d28d9;outline-offset:1px}';
++'.tu-act:focus-visible{outline:2px solid #6d28d9;outline-offset:1px}'
+/* תנועה (שער limor2). האפשרות נבחרת ב-class tu-m1/2/3 על #tu-fl.
+   הטilt הבסיסי rotate(-4deg) אפוה לתוך כל keyframes, כי אנימציה
+   דורסת את ה-transform הסטטי בזמן שהיא רצה. */
++'/* אפשרות 1 — נושמת: ציפה עדינה + נשימה, ומצמוץ על הדיוקן */'
++'#tu-fl.tu-m1 #tu-flb{animation:tu-bob 3.6s ease-in-out infinite}'
++'@keyframes tu-bob{0%,100%{transform:rotate(-4deg) translateY(0) scale(1)}50%{transform:rotate(-4deg) translateY(-4px) scale(1.02)}}'
++'.tu-lid{position:absolute;width:11px;height:8px;background:#ffb98a;border-radius:50%;transform:scaleY(0);pointer-events:none}'
++'@keyframes tu-blink{0%,91%,100%{transform:scaleY(0)}93.5%,95.5%{transform:scaleY(1)}}'
++'#tu-fl.tu-m1 .tu-lid,#tu-fl.tu-m3 .tu-lid{animation:tu-blink 4.8s linear infinite}'
++'/* אפשרות 2 — מגיבה: נדנוד קבוע קטן + תגובות (מחיאה, קפיצת שמחה, הטיית ראש) */'
++'#tu-fl.tu-m2 #tu-flb{animation:tu-sway 4.2s ease-in-out infinite}'
++'@keyframes tu-sway{0%,100%{transform:rotate(-6.5deg)}50%{transform:rotate(-1.5deg)}}'
++'#tu-fl.tu-m2 #tu-flb.tu-rw{animation:tu-rwave .55s ease-in-out 4}'
++'@keyframes tu-rwave{0%,100%{transform:rotate(-4deg)}25%{transform:rotate(9deg)}75%{transform:rotate(-13deg)}}'
++'#tu-fl.tu-m2 #tu-flb.tu-rh{animation:tu-rhop .6s ease-out 2}'
++'@keyframes tu-rhop{0%,100%{transform:rotate(-4deg) translateY(0)}45%{transform:rotate(-4deg) translateY(-13px) scale(1.06)}}'
++'#tu-fl.tu-m2 #tu-flb.tu-rt{animation:tu-rtilt 1.1s ease-in-out 1}'
++'@keyframes tu-rtilt{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(8deg) translateY(2px)}}'
++'/* אפשרות 3 — צפה במסלול: סחיפה איטית במסלול קטן + נדנוד ומצמוץ */'
++'#tu-fl.tu-m3{animation:tu-drift 9s ease-in-out infinite}'
++'@keyframes tu-drift{0%,100%{transform:translate(0,0)}25%{transform:translate(5px,-6px)}50%{transform:translate(0,-9px)}75%{transform:translate(-5px,-5px)}}'
++'#tu-fl.tu-m3 #tu-flb{animation:tu-sway2 7s ease-in-out infinite}'
++'@keyframes tu-sway2{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(-1deg)}}'
++'@media (prefers-reduced-motion: reduce){#tu-fl.tu-m1 #tu-flb,#tu-fl.tu-m2 #tu-flb,#tu-fl.tu-m3,#tu-fl.tu-m3 #tu-flb,.tu-lid{animation:none!important}}';
 
 /* הזרקת ה-CSS פעם אחת. build() אינו המזריק היחיד: הדמות הצפה
    נוצרת ב-mount, לפני פתיחת החלון הראשונה, ובלי הזרקה כאן היא
@@ -1828,11 +1858,38 @@ function floatInit(){
     + '</button>';
   document.body.appendChild(fl);
   FL = fl;
+  if(MOTION !== "0") fl.classList.add("tu-m" + MOTION);
   fl.querySelector("#tu-fli").src = "/img/limor.jpg";
   var bw = fl.querySelector("#tu-flw");
   bw.textContent = T().bubble || "";
   var btn = fl.querySelector("#tu-flb");
   btn.setAttribute("aria-label", T().btn);
+  /* עפעפיים על עוגני העיניים של הדיוקן (אפשרויות 1 ו-3). הצבע
+     נדגם מהתמונה עצמה סביב העפעף; הם סגורים ברירת־מחדל ונפתחים
+     לכיסוי קצר במחזור המצמוץ. */
+  if(MOTION === "1" || MOTION === "3"){
+    var lids = [[30, 27], [41, 29]];
+    for(var li = 0; li < 2; li++){
+      var lid = document.createElement("span");
+      lid.className = "tu-lid"; lid.setAttribute("aria-hidden", "true");
+      lid.style.left = lids[li][0] + "px"; lid.style.top = lids[li][1] + "px";
+      btn.appendChild(lid);
+    }
+  }
+  /* תגובות (אפשרות 2): מחלקה חד־פעמית שמוחקת את עצמה. החשיפה
+     ב-fl._react כדי ש-floatShow, שמוגדר מחוץ לכאן, תברך בחזרה. */
+  function react(cls){
+    if(MOTION !== "2") return;
+    btn.classList.remove("tu-rw", "tu-rh", "tu-rt");
+    void btn.offsetWidth;   /* איפוס כדי שהאנימציה תרוץ גם ברצף */
+    btn.classList.add(cls);
+    setTimeout(function(){ btn.classList.remove(cls) }, 2600);
+  }
+  fl._react = react;
+  if(FLDEMO && MOTION === "2"){
+    var seq = ["tu-rw", "tu-rh", "tu-rt"], si = 0;
+    setInterval(function(){ react(seq[si % 3]); si++ }, 4000);
+  }
   var pos = null;
   try{ pos = JSON.parse(localStorage.getItem(FL_POS + CFG.app) || "null") }catch(e){}
   if(pos && isFinite(pos.x) && isFinite(pos.y)){
@@ -1881,7 +1938,11 @@ function floatInit(){
   });
 }
 function floatHide(){ if(FL) FL.hidden = true }
-function floatShow(){ if(FL) FL.hidden = false }
+function floatShow(){
+  if(!FL) return;
+  FL.hidden = false;
+  if(FL._react) FL._react("tu-rw");
+}
 
 function actAvail(name){
   if(name === "close") return true;
