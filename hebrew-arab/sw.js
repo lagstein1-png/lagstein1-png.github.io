@@ -10,7 +10,7 @@
    המטמון. עדכנת אחד — עדכן את השני.
    ===================================================================== */
 const V = new URL(self.location).searchParams.get("v") || "dev";
-const CACHE = "hebrew-arab-" + V;
+const CACHE = "hebrewarab-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
              "/legal/terms.js","/legal/protect.js"];
@@ -22,7 +22,7 @@ self.addEventListener("install", e => {
 });
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => k.startsWith("literature-") && k !== CACHE).map(k => caches.delete(k))
+    keys.filter(k => k.startsWith("hebrewarab-") && k !== CACHE).map(k => caches.delete(k))
   )).then(() => self.clients.claim()));
 });
 self.addEventListener("fetch", e => {
