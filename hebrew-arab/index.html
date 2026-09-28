@@ -770,6 +770,9 @@ if(DEMO_ON){
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
   .replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+/* מחרוזות התוכן שלנו משתמשות ב-<br> לשבירת פסקה (קטעי קריאה).
+   הכול מסונן ב-esc, ורק התגית הזאת חוזרת לתגית אמיתית. */
+function brOk(h){return String(h).replace(/&lt;br\s*\/?&gt;/gi,"<br>")}
 function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){var i,j,t;for(i=a.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));
@@ -1070,7 +1073,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="h2 · 2026-09-29";
+var BUILD="h3 · 2026-09-29";
 var SKEY="hebrew-arab-state-v1";
 var GKEY_STORE="hebrew-arab-gkey";
 
@@ -2288,7 +2291,7 @@ function leadBox(txt,sub){
 function askBox(txt){
   if(!txt)return "";
   return '<div class="subject" style="align-items:flex-start">'+
-    '<span class="qtext" style="flex:1;margin:0">'+esc(txt)+"</span>"+
+    '<span class="qtext" style="flex:1;margin:0">'+brOk(esc(txt))+"</span>"+
     '<span style="display:flex;gap:.4rem;flex:none">'+
     spkBtn(txt,state.lang,false,t("hearWord"))+spkBtn(txt,state.lang,true,t("hearSlow"))+spkStop()+"</span></div>";
 }
@@ -2776,7 +2779,7 @@ function buildQ(tid,lv){
      התלמיד; ראו את ההסבר בראש סעיף 8. */
   var q=buildQuestion(tid,lv,undefined,true); if(!q)return null;
   var tp=topicOf(tid);
-  return {topic:tid, topicName:tp?tName(tp):"", ask:esc(q.lead||""), expr:"", fig:q.fig||"",
+  return {topic:tid, topicName:tp?tName(tp):"", ask:brOk(esc(q.lead||"")), expr:"", fig:q.fig||"",
           options:(q.opts||[]).map(function(o){
             return {h:o.h,t:plainOf(o.h),ok:!!o.ok,why:o.why||""}}),
           say:q.say||"", hint:q.hint||""};
@@ -4403,7 +4406,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=h2-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=h3-pwa1").catch(function(){});
   });
 }
 </script>
