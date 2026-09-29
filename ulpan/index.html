@@ -1153,7 +1153,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a117 · 2026-09-28";
+var BUILD="a118 · 2026-09-29";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -4087,7 +4087,7 @@ function render(){ try{lgChrome()}catch(e){}
   }
   var body=state.screen==="prog"?screenProg():
            state.screen==="set" ?screenSet():
-           state.screen==="prac"?(P.sum?screenSum():screenPractice()):screenHome();
+           state.screen==="prac"?(P.sum?screenSum():(P.q?screenPractice():screenHome())):screenHome();
   $("#app").innerHTML=hdr()+wrapMain(body);
 }
 
@@ -5625,6 +5625,8 @@ load();
 touchDay();
 booted=true;
 applyModes();
+/* משחזר שאלה פתוחה אחרי טעינה מחדש - בלי זה המסך נשאר ריק */
+if(state.screen==="prac"&&!P.sum&&!P.q){try{newQuestion()}catch(e){state.screen="home";save();}}
 render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
@@ -5642,7 +5644,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a117-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a118-pwa1").catch(function(){});
   });
 }
 </script>
