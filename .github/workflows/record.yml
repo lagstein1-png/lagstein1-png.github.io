@@ -176,7 +176,7 @@ jobs:
           if [ -f /tmp/rec.log ]; then tail -n 120 /tmp/rec.log > .claude/qa/last-record.log; else echo "אין יומן מהריצה." > .claude/qa/last-record.log; fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .claude/qa/last-record.log
+          git add -f .claude/qa/last-record.log
           if git diff --cached --quiet; then echo "היומן לא השתנה."; exit 0; fi
           git commit -q -m "יומן הקלטה: ריצה בלי קבצים חדשים (record.yml)"
           git pull --rebase -q origin main || true
