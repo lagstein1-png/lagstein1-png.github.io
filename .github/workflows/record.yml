@@ -135,16 +135,18 @@ jobs:
           TTS_VOICE: ${{ steps.prov.outputs.voice }}
           REPLACE: ${{ github.event.inputs.replace }}
         run: |
+          set -o pipefail
           EXTRA=""
           if [ "${REPLACE:-}" = "YES" ]; then EXTRA="--replace"; fi
           BATCH="${{ github.event.inputs.batch }}"
           if [ "$BATCH" != "NO" ]; then EXTRA="$EXTRA --batch"; fi
-          node .claude/qa/record.js "${{ steps.pick.outputs.app }}" --max "${{ steps.pick.outputs.max }}" $EXTRA
+          node .claude/qa/record.js "${{ steps.pick.outputs.app }}" --max "${{ steps.pick.outputs.max }}" $EXTRA 2>&1 | tee /tmp/rec.log
 
       - name: המניפסט תואם לדיסק
         run: node .claude/qa/record.js --check
 
       - name: דוחף ל-main
+        id: push
         if: steps.pick.outputs.app != ''
         run: |
           set -euo pipefail
@@ -162,7 +164,23 @@ jobs:
           # main זז בזמן הריצה? מושכים ומנסים שוב, פעם אחת.
           git pull --rebase -q origin main || true
           git push origin HEAD:main
+          echo "pushed=1" >> "$GITHUB_OUTPUT"
           echo "נדחף: $APP, $N הקלטות."
+
+      # ריצה בלי תוצר (מכסה או כישלון)? היומן עולה לריפו כדי שאפשר
+      # יהיה לראות למה - בלי גישה ללוגים של Actions.
+      - name: שומר יומן ריצה ריקה
+        if: steps.pick.outputs.app != '' && steps.push.outputs.pushed != '1'
+        run: |
+          set -euo pipefail
+          if [ -f /tmp/rec.log ]; then tail -n 120 /tmp/rec.log > .claude/qa/last-record.log; else echo "אין יומן מהריצה." > .claude/qa/last-record.log; fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .claude/qa/last-record.log
+          if git diff --cached --quiet; then echo "היומן לא השתנה."; exit 0; fi
+          git commit -q -m "יומן הקלטה: ריצה בלי קבצים חדשים (record.yml)"
+          git pull --rebase -q origin main || true
+          git push origin HEAD:main
 
       - name: כיסוי
         run: |
