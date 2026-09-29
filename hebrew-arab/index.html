@@ -1058,7 +1058,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="h5 · 2026-09-29";
+var BUILD="h6 · 2026-09-29";
 var SKEY="hebrew-arab-state-v1";
 var GKEY_STORE="hebrew-arab-gkey";
 
@@ -4327,6 +4327,9 @@ if(window.TUTOR){
     },
     stopHost:function(){try{stopSpeak()}catch(e){}}
   });
+  /* חזרה מאמצע תרגול: הרנדר הראשון קודם ל-mount, אז מרנדרים שוב כדי
+     שכפתור לימור יופיע גם במסך שאלה משוחזר. */
+  if(state.screen==="prac"&&P.q)render();
   /* ---- מנוע המורה — המתאם של האפליקציה ----
      getScreenContext מחזיר מה שמוצג עכשיו, ו-actions הן מה שהמורה
      רשאית לעשות כאן; כל אחת מחזירה true רק כשבאמת קרה משהו. */
@@ -4411,7 +4414,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=h5-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=h6-pwa1").catch(function(){});
   });
 }
 </script>
