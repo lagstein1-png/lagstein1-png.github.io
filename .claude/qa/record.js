@@ -298,18 +298,26 @@ function splitBatch(ffmpeg, pcm, rate, k) {
     hdr.writeUInt32LE(rate, 24); hdr.writeUInt32LE(rate * 2, 28); hdr.writeUInt16LE(2, 32);
     hdr.writeUInt16LE(16, 34); hdr.write('data', 36); hdr.writeUInt32LE(pcm.length, 40);
     fs.writeFileSync(wav, Buffer.concat([hdr, pcm]));
-    const det = spawnSync(ffmpeg, ['-hide_banner', '-i', wav, '-af', 'silencedetect=noise=-35dB:d=1.6', '-f', 'null', '-'], { encoding: 'utf8' });
-    const starts = [], ends = [];
-    for (const m of String(det.stderr).matchAll(/silence_start: ([\d.]+)/g)) starts.push(Number(m[1]));
-    for (const m of String(det.stderr).matchAll(/silence_end: ([\d.]+)/g)) ends.push(Number(m[1]));
+    /* זיהוי שקט אדפטיבי (29.9, אחרי שהפיצול של Gacrux נכשל על הפרוג
+       של Kore): כל קול עוצר אחרת בין פריטים. מנסים שלושה ספים על אותו
+       PCM בלי עלות API, ומקבלים רק מעבר שמחזיר בדיוק k מקטעים. */
+    const PASSES = [['-35dB', 1.6], ['-45dB', 1.0], ['-50dB', 0.7]];
     const dur = pcm.length / 2 / rate;
-    const bounds = [];
-    let cur = 0;
-    for (let i = 0; i < starts.length && i < ends.length; i++) { bounds.push([cur, starts[i]]); cur = ends[i]; }
-    bounds.push([cur, dur]);
-    /* מקטע אפסי או חריגה מהסדר — הפיצול לא אמין */
-    const segs = bounds.filter(b => b[1] - b[0] > 0.15);
-    if (segs.length !== k) return null;
+    let segs = null;
+    for (const [noise, mind] of PASSES) {
+      const det = spawnSync(ffmpeg, ['-hide_banner', '-i', wav, '-af', 'silencedetect=noise=' + noise + ':d=' + mind, '-f', 'null', '-'], { encoding: 'utf8' });
+      const starts = [], ends = [];
+      for (const m of String(det.stderr).matchAll(/silence_start: ([\d.]+)/g)) starts.push(Number(m[1]));
+      for (const m of String(det.stderr).matchAll(/silence_end: ([\d.]+)/g)) ends.push(Number(m[1]));
+      const bounds = [];
+      let cur = 0;
+      for (let i = 0; i < starts.length && i < ends.length; i++) { bounds.push([cur, starts[i]]); cur = ends[i]; }
+      bounds.push([cur, dur]);
+      /* מקטע אפסי או חריגה מהסדר — הפיצול לא אמין */
+      const cand = bounds.filter(b => b[1] - b[0] > 0.15);
+      if (cand.length === k) { segs = cand; break; }
+    }
+    if (!segs) return null;
     /* לא ממירים דרך PCM כפול: חותכים ישר מה-WAV */
     const out = [];
     for (let i = 0; i < segs.length; i++) {
@@ -415,12 +423,30 @@ async function build(app, max) {
         console.log('  ' + made + '/' + todo.length + ' · בקשה ' + requests + ' (' + model + ') · ' + Math.round((Date.now() - t0) / 1000) + 'ש');
         return;
       }
-      if (batch.length >= 8 && depth === 0) {
+      if (batch.length > 1 && depth < 6) {
+        /* שרשרת חלוקה (29.9): 40 → 20 → 10 → 5 → 2 → 1. כישלון פיצול
+           כבר שילם בקשה — אין שחרור לפני שמגיעים למחרוזת בודדת. */
         const half = Math.ceil(batch.length / 2);
-        console.log('  הפיצול לא החזיר ' + batch.length + ' מקטעים — מתחלק לשתי אצוות ומנסה שוב');
-        await doBatch(batch.slice(0, half), model, 1);
-        await doBatch(batch.slice(half), model, 1);
+        console.log('  הפיצול לא החזיר ' + batch.length + ' מקטעים — מתחלק לשתי אצוות ומנסה שוב (עומק ' + (depth + 1) + ')');
+        await doBatch(batch.slice(0, half), model, depth + 1);
+        await doBatch(batch.slice(half), model, depth + 1);
         return;
+      }
+      if (batch.length === 1) {
+        /* נתיב אחרון: הקלטה ישירה של מחרוזת בודדת, בלי אצווה ובלי
+           פיצול בכלל. שגיאת מכסה עולה ללולאה הראשית כרגיל. */
+        try {
+          requests++;
+          const mp3 = PROVIDER === 'gcloud' ? await synthGcloud(H.spoken(batch[0][1])) : await synth(ffmpeg, H.spoken(batch[0][1]));
+          if (mp3.length >= MIN_BYTES) {
+            const f = path.join(outDir, batch[0][0] + '.mp3');
+            if (!fs.existsSync(f)) { fs.writeFileSync(f, mp3); made++; }
+            console.log('  ' + made + '/' + todo.length + ' · מחרוזת בודדת אחרי כישלון פיצול (' + model + ')');
+            return;
+          }
+        } catch (e2) {
+          if (e2 instanceof QuotaError || /429|RESOURCE_EXHAUSTED|quota/i.test(e2.message)) throw e2;
+        }
       }
       failed += batch.length;
       console.log('  ✗ אצווה של ' + batch.length + ' הושחרת: הפיצול לא החזיר ' + batch.length + ' מקטעים (יוקלטו בריצה אחרת)');
