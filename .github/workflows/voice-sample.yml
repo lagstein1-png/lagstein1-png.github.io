@@ -1,0 +1,96 @@
+# דגימות קול לאישור הבעלים לפני הקלטת המאגר (29.9.2026).
+# מקליט משפט אחד בכמה קולות מועמדים ומעלה ארטיפקט — בלי לגעת
+# במאגרים, בלי לדחוף ל-main. אחרי שהבעלים בוחר קול, הקול נקבע
+# במשתנה הריפו TTS_VOICE וההקלטה המרכזית חוזרת לרוץ.
+
+name: voice-sample
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: 'המשפט להקלטה'
+        required: true
+        default: 'שלום ילדים, אני לימור והיום אנחנו לומדים ביחד על מערכת הצירים.'
+      voices:
+        description: 'רשימת קולות מופרדת בפסיקים (למשל Kore,Gacrux,Sulafat)'
+        required: true
+        default: 'Kore,Gacrux,Sulafat'
+      model:
+        description: 'מודל ה-TTS'
+        required: false
+        default: 'gemini-2.5-flash-preview-tts'
+
+permissions:
+  contents: read
+
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: מתקין ffmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: מקליט דגימות
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TEXT: ${{ github.event.inputs.text }}
+          VOICES: ${{ github.event.inputs.voices }}
+          MODEL: ${{ github.event.inputs.model }}
+        run: |
+          set -euo pipefail
+          mkdir -p samples
+          node <<'NODE'
+          const fs = require('fs');
+          const { spawnSync } = require('child_process');
+          const KEY = process.env.GEMINI_API_KEY;
+          const TEXT = process.env.TEXT;
+          const MODEL = process.env.MODEL || 'gemini-2.5-flash-preview-tts';
+          const VOICES = (process.env.VOICES || 'Kore').split(',').map(s => s.trim()).filter(Boolean);
+          if (!KEY) { console.error('חסר GEMINI_API_KEY'); process.exit(1); }
+          (async () => {
+            for (const v of VOICES) {
+              const prompt = 'הקרא בקול ברור, חם וטבעי את המשפט הבא, בדיוק כפי שהוא כתוב:\n' + TEXT;
+              let pcm = null, rate = 24000;
+              for (let attempt = 0; attempt < 2 && !pcm; attempt++) {
+                const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + MODEL + ':generateContent?key=' + encodeURIComponent(KEY), {
+                  method: 'POST', headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { responseModalities: ['AUDIO'],
+                      speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: v } } } } })
+                });
+                if (!r.ok) { const b = await r.text(); console.error(v + ': HTTP ' + r.status + ' ' + b.replace(/\s+/g,' ').slice(0,150)); break; }
+                const j = await r.json();
+                const parts = (((j.candidates || [])[0] || {}).content || {}).parts || [];
+                const inline = parts.map(p => p.inlineData).filter(Boolean)[0];
+                if (!inline || !inline.data) { console.error(v + ': תשובה בלי אודיו, ניסיון ' + (attempt + 1)); continue; }
+                rate = Number((/rate=(\d+)/.exec(inline.mimeType || '') || [])[1]) || 24000;
+                pcm = Buffer.from(inline.data, 'base64');
+              }
+              if (!pcm) { console.error(v + ': נכשל'); continue; }
+              const hdr = Buffer.alloc(44);
+              hdr.write('RIFF', 0); hdr.writeUInt32LE(36 + pcm.length, 4); hdr.write('WAVEfmt ', 8);
+              hdr.writeUInt32LE(16, 16); hdr.writeUInt16LE(1, 20); hdr.writeUInt16LE(1, 22);
+              hdr.writeUInt32LE(rate, 24); hdr.writeUInt32LE(rate * 2, 28); hdr.writeUInt16LE(2, 32);
+              hdr.writeUInt16LE(16, 34); hdr.write('data', 36); hdr.writeUInt32LE(pcm.length, 40);
+              const wav = 'samples/' + v + '.wav';
+              fs.writeFileSync(wav, Buffer.concat([hdr, pcm]));
+              const conv = spawnSync('ffmpeg', ['-y', '-v', 'error', '-i', wav, '-ac', '1', '-ar', '24000', '-b:a', '32k', 'samples/' + v + '.mp3']);
+              if (conv.status !== 0) { console.error(v + ': ffmpeg נכשל'); process.exit(1); }
+              fs.unlinkSync(wav);
+              console.log(v + ': samples/' + v + '.mp3 (' + fs.statSync('samples/' + v + '.mp3').size + ' bytes)');
+            }
+          })().catch(e => { console.error(e.message); process.exit(1); });
+          NODE
+      - name: מעלה ארטיפקט
+        uses: actions/upload-artifact@v4
+        with:
+          name: voice-samples
+          path: samples/*.mp3
+          retention-days: 14
