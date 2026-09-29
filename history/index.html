@@ -1096,7 +1096,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="m151 · 2026-09-28";
+var BUILD="m152 · 2026-09-29";
 var SKEY="mifne-state-v1";
 var GKEY_STORE="mifne-gkey";
 
@@ -10036,6 +10036,8 @@ load();
 touchDay();
 booted=true;
 applyModes();
+/* שחזור שאלה פתוחה אחרי טעינה מחדש - בלי זה המסך נשאר ריק (אותה תקלה שתוקנה באולפן a118) */
+if(state.screen==="prac"&&!P.sum&&!P.q){if(!state.topic||!topicOf(state.topic))state.topic=TOPICS[0].id;try{newQuestion()}catch(e){state.screen="home";save();}}
 render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
@@ -10053,7 +10055,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=m151-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=m152-pwa1").catch(function(){});
   });
 }
 </script>
