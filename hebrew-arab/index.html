@@ -1073,7 +1073,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="h4 · 2026-09-29";
+var BUILD="h5 · 2026-09-29";
 var SKEY="hebrew-arab-state-v1";
 var GKEY_STORE="hebrew-arab-gkey";
 
@@ -2078,20 +2078,32 @@ function O(html,ok,why){return {h:html,ok:!!ok,why:why||""}}
 
 /* בונה שאלה מפריט אחד. סדר האפשרויות מעורבב בכל בנייה, ולכן
    האינדקס ok שבתוכן אינו מגיע למסך לעולם. */
+/* קטע הקריאה נשאר בעברית בכל שפת ממשק: המיומנות הנבחנת היא הבנת
+   הנקרא בעברית, והבעלים אישר (29.9) שהקטע לא יתורגם. ההוראה והשאלה
+   מסביב מתורגמות. רק שאלות ha-read בנויות הוראה<br>קטע<br>שאלה. */
+function leadFor(it){
+  var s=gl(it.q);
+  if(state.lang==="he")return s;
+  var he=it.q&&it.q.he;
+  if(!he||he.indexOf("<br>")<0||s.indexOf("<br>")<0)return s;
+  var a=s.split("<br>"), b=he.split("<br>");
+  if(a.length<3||a.length!==b.length)return s;
+  return a[0]+"<br>"+b.slice(1,b.length-1).join("<br>")+"<br>"+a[a.length-1];
+}
 function buildFromItem(it){
   var opts=it.o.map(function(o,i){return O(esc(gl(o)),i===it.ok,it.wrong&&it.wrong[i]?gl(it.wrong[i]):"")});
   var ans=gl(it.o[it.ok]);
   return {
     type:"mcq",
     prompt:t("qPick"),
-    lead:gl(it.q),
+    lead:leadFor(it),
     fig:figHtml(it.fig),
     opts:shuffle(opts),
     answer:ans,
     /* מה שנאמר אחרי המענה: השאלה, התשובה הנכונה, וההסבר.
        תשובה בלי ההסבר נשמעת כמו עובדה לשינון, וזה בדיוק מה
        שהאפליקציה הזאת קיימת כדי להחליף. */
-    say:gl(it.q)+" "+ans+". "+gl(it.ex),
+    say:leadFor(it)+" "+ans+". "+gl(it.ex),
     reveal:it
   };
 }
@@ -2358,7 +2370,8 @@ function screenPractice(){
     h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap;align-items:center">'+
        (state.challenge&&state.chSecs>0?'<span id="chtimer" style="font-weight:800;color:#b45309;min-width:2.6rem;font-size:1.1rem">'+state.chSecs+'</span>':"")+
        (P.hint||state.challenge?"":'<button class="btn ghost" data-a="hint">'+esc(t("hintB"))+"</button>")+
-       '<button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button></div>";
+       '<button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button>"+
+       (window.TUTOR&&TUTOR.on()?'<button class="btn ghost" data-a="tutor">'+esc(TUTOR.label())+"</button>":"")+"</div>";
     if(P.hint&&q.hint)h+='<div class="qhint" style="margin-top:.6rem">'+esc(q.hint)+"</div>";
   }
   h+="</div></div></div>"+fbar();
@@ -4177,6 +4190,7 @@ document.addEventListener("click",function(e){
     if(P.q.hint)speak(saySpell(P.q.hint),state.lang);
     return;
   }
+  if(a==="tutor"){ try{stopSpeak()}catch(e){} if(window.TUTOR)TUTOR.open(); return }
   if(a==="dunno"){
     /* "לא יודע" אינו דילוג: הוא נספר כטעות, ומיד מראה ומשמיע את
        התשובה. מי שמנחש לומד פחות ממי שמודה. */
@@ -4412,7 +4426,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=h4-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=h5-pwa1").catch(function(){});
   });
 }
 </script>
