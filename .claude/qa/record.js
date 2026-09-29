@@ -72,7 +72,7 @@ const BATCH_MAX_CHARS = 16000;
    בעברית + 2.2 שניות שקט בין פריטים. */
 const BATCH_MAX_SEC = 600;
 const VOICE = process.env.TTS_VOICE || process.env.GEMINI_TTS_VOICE ||
-              (PROVIDER === 'gcloud' ? 'he-IL-Chirp3-HD-Kore' : 'Kore');
+              (PROVIDER === 'gcloud' ? 'he-IL-Chirp3-HD-Kore' : 'Gacrux');
 const API   = 'https://generativelanguage.googleapis.com/v1beta';
 const GCLOUD = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 /* מחיר למיליון תווים, כפי שכתוב ב-tools/tts-build.js של הריפו הנפרד
