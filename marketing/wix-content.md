@@ -245,6 +245,16 @@
 - **רוסית:** География для начальной школы — Уроки географии «Человек и окружающая среда» для 5-6 классов по программе Министерства просвещения: озвучка, наглядный этап и проверка понимания.
 - **אנגלית:** Elementary Geography — Geography (man and environment) lessons for grades 5-6 following the Ministry of Education curriculum, with read-aloud, a visual step and comprehension checks.
 
+#### מוט״ל - מדע וטכנולוגיה לכל
+
+- **קישור:** https://bekol.co.il/motal/
+- **התקנה ישירה:** https://bekol.co.il/motal/?install=1
+- **תוויות:** הקראה · מצב מורה · 4 שפות
+- **עברית:** מוט״ל - מדע וטכנולוגיה לכל: אוריינות מדעית טכנולוגית שלב א׳ (שאלון 704182). כוחות, תנועה ואנרגיה לצד סוגיות עכשוויות, כל שאלה עם רמז, הסבר והקראה.
+- **ערבית:** موتّل - العلوم والتكنولوجيا للجميع: محو الأمية العلمية التكنولوجية للمرحلة الأولى (الاستمارة 704182). قوى وحركة وطاقة إلى جانب قضايا معاصرة، كل سؤال مع تلميح وشرح وقراءة صوتية.
+- **רוסית:** МОТАЛ - наука и технологии для всех: научно-технологическая грамотность, ступень А (бланк 704182). Силы, движение и энергия наряду с современными вопросами, каждый вопрос с подсказкой, объяснением и озвучкой.
+- **אנגלית:** MOTAL - Science and Technology for All: scientific and technological literacy, stage A (questionnaire 704182). Forces, motion and energy alongside current issues, every question with a hint, an explanation and read-aloud.
+
 #### אזרחות
 
 - **קישור:** https://bekol.co.il/civics/

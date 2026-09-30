@@ -2,21 +2,6 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="robots" content="noindex,nofollow">
-<script>
-/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html.
-   המפתח נשמר במגירה משל האפליקציה (shlav-internal-motal) ולא
-   במגירה המשותפת shlav-internal, כדי שפתיחת אזרח לא תסגור את
-   מתח ולהפך. */
-var INTERNAL_KEY="shlav-internal-motal";
-var INTERNAL_OK=(function(){
-  try{
-    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
-    if(q) localStorage.setItem("shlav-internal-motal", decodeURIComponent(q));
-    return localStorage.getItem("shlav-internal-motal")===INTERNAL_KEY;
-  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
-})();
-</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>מדע וטכנולוגיה לכל (מוט״ל): שלב א׳ אוריינות מדעית טכנולוגית</title>
 <meta name="description" content="תרגול מוט״ל (שאלון 704182) למי שלומד אחרת: כל שאלה עם רמז, הסבר והקראה. כוחות, תנועה ואנרגיה לצד סוגיות מדעיות טכנולוגיות עכשוויות. בעברית, ערבית, רוסית ואנגלית. חינם ובלי הרשמה." />
@@ -506,18 +491,6 @@ textarea.field{min-height:96px;resize:vertical}
 .optspk:hover{background:#0b7c71}
 </style>
 <div id="live" class="sr" aria-live="polite"></div>
-<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
-     align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
-     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
-  <div style="max-width:32rem">
-    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
-    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
-    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר.
-       אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
-    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;
-       background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a>
-  </div>
-</div>
 <a class="skip" href="#main">דילוג לתוכן</a>
 <main id="main" tabindex="-1"><div id="app"></div></main>
 <script>
@@ -1077,7 +1050,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="d5 · 2026-09-30";
+var BUILD="d6 · 2026-09-30";
 var SKEY="motal-state-v1";
 var GKEY_STORE="motal-gkey";
 
@@ -1170,7 +1143,7 @@ function applyModes(){
   /* הכותרת נשארה עברית קשיחה מה-HTML גם אחרי החלפת שפה: הכיווניות
      והכותרת שעל המסך התחלפו, אבל לשונית הדפדפן, הסימנייה ושם
      האפליקציה המותקנת נשארו בעברית. השם והתיאור כבר מתורגמים. */
-  try{ if(INTERNAL_OK) document.title=t("app")+" — "+t("tagline") }catch(e){}
+  try{ document.title=t("app")+" — "+t("tagline") }catch(e){}
 }
 function announce(m){var e=$("#live");if(e)e.textContent=m}
 
@@ -4218,13 +4191,7 @@ load();
 touchDay();
 booted=true;
 applyModes();
-/* INTERNAL-GATE — לא נטענת בלי מפתח. */
-if(!INTERNAL_OK){
-  document.getElementById("gate").hidden=false;
-  document.title="לא פורסם";
-}else{
-  render();
-}
+render();
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
@@ -4338,7 +4305,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=d5-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=d6-pwa1").catch(function(){});
   });
 }
 </script>
