@@ -79,7 +79,7 @@ const GCLOUD = 'https://texttospeech.googleapis.com/v1/text:synthesize';
    (gcloud 30, azure 16, elevenlabs 150; gemini ״לא נמדד״). אומדן, לא
    חשבונית — המחיר של היום נמצא בדף התמחור של גוגל. */
 const PRICE_PER_M = { gcloud: 30, gemini: null };
-const KBPS  = 32;                 /* כמו 6,823 ההקלטות שבריפו הנפרד */
+const KBPS  = 64;                 /* אושר דרך Main 30.9: נקי יותר ללומד; ה-6,823 של הריפו הנפרד נשארות 32k */
 const LANG  = 'he';
 const MIN_BYTES = 512;            /* קובץ קטן מזה הוא תשובה ריקה, לא דיבור */
 
