@@ -93,7 +93,13 @@ const SOURCES = {
   history: ['history/index.html'],
   ulpan:   ['ulpan/index.html'],
   lomda:   () => fs.readdirSync(path.join(ROOT, 'lomda', 'data'))
-                   .filter(f => f.endsWith('.js')).sort().map(f => 'lomda/data/' + f)
+                   .filter(f => f.endsWith('.js')).sort().map(f => 'lomda/data/' + f),
+  /* מבדק חוסרים 30.9 סעיף 4 - חמש האפליקציות שחוטמו לשכבה. */
+  civics: ['civics/index.html'],
+  hebrew: ['hebrew/bank.json'],
+  literature: ['literature/index.html'],
+  tanakh: ['tanakh/index.html'],
+  'hebrew-arab': ['hebrew-arab/index.html']
 };
 
 /* בדיוק מה ש-plainOf עושה באפליקציה: תגיות יורדות, ישויות נפתחות,

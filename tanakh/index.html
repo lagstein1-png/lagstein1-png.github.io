@@ -1712,6 +1712,12 @@ function speak(text,lang,rateMul){
   var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
   stopSpeak();
   var my=_sayGen;   /* גם תשובת רשת שמגיעה אחרי עצירה לא תושמע */
+  /* שכבה 1 - קובץ מוקלט (המנוע של תאוריה מדברת). יש קובץ:
+     מנגנים וזהו; אין: קול המכשיר כרגיל. מבדק חוסרים 30.9 סעיף 4. */
+  if(typeof RECORDED!=="undefined"&&RECORDED.play(text,lang,{rate:state.rate,
+      onError:function(){ if(my===_sayGen)speakDevice(text,code,rate) }})){
+    return;
+  }
   if(gemOn()){
     var vid=gvOf(state.gemVoice).id;
     var ck=lang+"|"+vid+"|"+rate.toFixed(2)+"|"+text;
@@ -1734,7 +1740,7 @@ function playUrl(url,text,code,rate){
   gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){_sayGen++;gStop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -4326,6 +4332,7 @@ render();
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
 <script src="/tutor/he-speech.js"></script>
+<script src="/speech/recorded.js"></script>
 <script src="/tutor/josh-state.js"></script>
 <script src="/tutor/josh-local.js"></script>
 <script src="/tutor/tutor.js"></script>
@@ -4435,7 +4442,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=p13-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=p14-pwa1").catch(function(){});
   });
 }
 </script>
