@@ -816,7 +816,7 @@ var CSS = ''
    השאיר לאזור השיחה פחות משתי בועות, והבועה הצהובה של הקול
    מילאה את רובו. בטלפון הפאנל תופס את כל הגובה; ״צמצום״ עדיין
    מקפל לפס קלט אחד, ומצב מקלדת (`tu-kb`) גובר בספציפיות. */
-+'@media(max-width:899px){#tu-bx{max-height:none;height:100vh;height:100dvh;border-radius:0}'
++'@media(max-width:899px){#tu-bx{max-height:none;height:100dvh;border-radius:0}'
 +'#tu-ov.tu-min #tu-bx{height:auto}}'
 /* נטוי הוא הצורה שהכי קשה לפענח בדיסלקציה: האותיות נשענות זו על
    זו והמרווח ביניהן מתכווץ. כל הדגשה בפאנל היא משקל, לא הטיה. */

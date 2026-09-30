@@ -151,6 +151,8 @@ html.hi-contrast .op-add,html.hi-contrast .op-sub,html.hi-contrast .op-mul,html.
   --op:#000;--op-d:#000;--op-s:#fff}
 html.hi-contrast .lvl{--lv:#000}
 html.hi-contrast .lvl .n{background:#000;color:#fff}
+/* ענבר ואלמוג כהים בניגודיות גבוהה — הדיו הכהה הקבוע (למטה) מתחלף בלבן */
+html.hi-contrast .lvl.on,html.hi-contrast .hintpill .cnt{color:#fff}
 html.hi-contrast .card.opcard{box-shadow:none}
 html.hi-contrast .card,html.hi-contrast .opt,html.hi-contrast .tog,
 html.hi-contrast .chip,html.hi-contrast .pick,html.hi-contrast .tile{border:2px solid #000}
@@ -261,16 +263,18 @@ html.reduce-motion *{animation:none!important;transition:none!important}
 @media (max-width:48rem){.lvlbar{flex-wrap:wrap;overflow-x:visible}}
 .lvl{display:inline-flex;align-items:center;gap:7px;flex-shrink:0;font-family:var(--font-display);font-weight:600;font-size:.88rem;border-radius:999px;border:2.5px solid rgba(23,51,60,.15);background:var(--card);color:var(--ink-soft);padding:7px 14px;transition:all .15s}
 .lvl:hover{border-color:var(--amber);color:var(--amber-deep)}
-.lvl.on{border-color:var(--ink);background:var(--amber);color:var(--ink);box-shadow:0 4px 0 var(--amber-deep);transform:rotate(-1deg)}
+.lvl.on{border-color:var(--ink);background:var(--amber);color:#17333c;box-shadow:0 4px 0 var(--amber-deep);transform:rotate(-1deg)}
 .lvl .n{width:20px;height:20px;border-radius:50%;background:var(--lv,rgba(23,51,60,.08));
   color:#fff;display:grid;place-items:center;font-size:.72rem;font-weight:700}
 /* צבעי הרמות קבועים ולא נגזרים מהערכה, כי ערכת ״ענבים״ מחליפה
    את הטורקיז בסגול — ואז שתי רמות היו מקבלות אותו צבע בדיוק.
-   חוץ מזה, ״רמה 5 היא סגולה״ עדיף שיישאר נכון בכל ערכה. */
-.lvl.l1{--lv:#2e86ad}
+   חוץ מזה, ״רמה 5 היא סגולה״ עדיף שיישאר נכון בכל ערכה.
+   הספרה עליהם לבנה, ולכן כל צבע כאן 4.5:1 לפחות מול לבן (contrast.js,
+   30.9.2026: 1 היה 4.09, 3 היה 2.45, 4 היה 4.08 — הוכהו באותו גוון). */
+.lvl.l1{--lv:#256f90}
 .lvl.l2{--lv:#0b7568}
-.lvl.l3{--lv:#d99a00}
-.lvl.l4{--lv:#d94f42}
+.lvl.l3{--lv:#8a6100}
+.lvl.l4{--lv:#c0392b}
 .lvl.l5{--lv:#6a45b0}
 .lvl.l6{--lv:#17333c}
 .lvl.l6 .n{color:var(--amber)}
@@ -303,7 +307,7 @@ html.reduce-motion *{animation:none!important;transition:none!important}
 .opts .opt.right .k{background:var(--paper);color:var(--teal-deep)}
 .hintpill{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;background:var(--amber);color:var(--ink);font-family:var(--font-display);font-weight:700;font-size:1.15rem;border-radius:18px;padding:15px 24px;box-shadow:0 6px 0 var(--amber-deep);transition:all .15s}
 .hintpill:hover{background:var(--amber-deep);color:#fff;transform:translateY(-2px)}
-.hintpill .cnt{position:absolute;top:-9px;inset-inline-start:-9px;background:var(--coral);color:#fff;font-size:.72rem;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--card)}
+.hintpill .cnt{position:absolute;top:-9px;inset-inline-start:-9px;background:var(--coral);color:#17333c;font-size:.72rem;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--card)}
 .bubble{position:relative;background:var(--card);border:3px solid var(--ink);border-radius:22px;padding:16px 20px;box-shadow:0 7px 0 rgba(23,51,60,.13);font-size:1.05rem;font-weight:500;line-height:1.65}
 .bubble::after{content:"";position:absolute;bottom:-10px;inset-inline-start:40px;width:16px;height:16px;background:var(--card);border-inline-start:3px solid var(--ink);border-bottom:3px solid var(--ink);transform:rotate(-45deg)}
 [dir="ltr"] .bubble::after{transform:rotate(45deg);border:none;border-inline-end:3px solid var(--ink);border-bottom:3px solid var(--ink)}
@@ -2363,7 +2367,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="b167 · 2026-09-30";
+var BUILD="b168 · 2026-09-30";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4913,7 +4917,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b167-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b168-pwa1").catch(function(){});
   });
 }
 </script>

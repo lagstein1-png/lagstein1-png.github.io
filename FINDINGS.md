@@ -69,6 +69,32 @@
 | O-103 | **ברק ב-`electric` — התפקיד בקוד, לא בשרת.** נוסף `ROLE["electric"]` ב-`tutor-api/worker.js`; עד פריסה (`deploy-tutor.yml`, ידני) השרת דוחה את האפליקציה ב-400 והלומד מקבל את המוח המקומי | זניח | `readBody` ב-`worker.js:871` | הרצת `deploy-tutor.yml` בפריסה הבאה |
 ## נסגר — עם ההוכחה
 
+### `main` אדום על `keyboard`, `contrast`, `voice` — תיקון רוחבי, 26 מפתחות · 30.9.2026
+
+**מקור.** qa ריצה 1124 על `6b9b2b2`: 5 מתוך 77 (`wix`, `media`, `keyboard`, `contrast`, `voice`). `wix` נסגר ב-`90d4f8e`.
+
+1. **`keyboard`** — ״גובה הפאנל ב-dvh, ואין 100vh״: `tutor/tutor.js` החזיק `height:100vh;height:100dvh` (גיבוי לדפדפן ישן).
+   `100vh` בטלפון מסתיר את תחתית הפאנל מאחורי המקלדת — הגיבוי הוסר; דפדפן בלי `dvh` מקבל גובה טבעי. לפני ✗, אחרי 87 בדיקות, 0 ממצאים.
+2. **`voice`** — ״hebrew/app.js — לא נמצא מילון המגדר״: המילון קיים (`const V_F=`), החילוץ ב-`voice.js` דרש `var`.
+   תוקן הבודק (`var|let|const`), לא האפליקציה. אחרי: ״7 שמות, בעברית ובלטינית״, 13/13.
+3. **`contrast`** — 24 ממצאים ב-15 הדפים ⇒ 0. שישה אשכולות:
+   - סרגל השפות `.hlang button{color:#475569}` בלי גרסה כהה (2.33–2.49:1) ⇒ `color:inherit`, ב-16 האפליקציות שנושאות אותו.
+     בשבע שמחוץ לרשימת `contrast.js` (civics, electric, geography, hebrew-arab, literature, motal, tanakh): 38 → 32 שורות, 6 ממצאי השפה נעלמו, אפס חדשים.
+   - `.brand .mk` במשפחת math-uni: לבן על פסטל בכהה (1.67:1) ⇒ `var(--btn-ink)` (לבן בבהיר, `--bg` בכהה).
+   - math-app: צבעי רמות 1/3/4 מתחת ל-4.5 מול הספרה הלבנה (4.09, 2.45, 4.08) ⇒ אותו גוון, כהה יותר (5.4–5.6);
+     `.lvl.on` ו-`.hintpill .cnt` — דיו כהה קבוע, ולבן בניגודיות גבוהה.
+   - bagrut-806: קישור בלי צבע (#0000ee, 1.95:1) ⇒ `.meta a{color:var(--accent)}`.
+   - ulpan: כרטיס עם רקע קבוע `#eef4ff` וטקסט של הערכה הכהה (1.06:1) ⇒ `var(--surface2)`.
+   - reader: `#0b1017` קבוע על `--accent` שבבהיר כחול כהה (3.01:1) ⇒ `--on-accent` (כהה בכהה, לבן בבהיר), בשלושה מקומות.
+
+**נשאר.** `media` (הקלטות מסך — נוצרות בדפדפן). בשבע האפליקציות שמחוץ לרשימת `contrast.js` יש 32 ממצאים
+ישנים (a.skip, spk, tpill, כרטיס ״מבנה הבגרות״ בכהה) — לא נמדדו מעולם; `contrast.js` אינו מכסה אותן.
+
+**המפתחות.** `/tutor/tutor.js` ⇒ כל 26 (`cache.js`: 0 ממצאים): שורש 147, reader 119, bagrut-806 x111, bagrut-history h114,
+barak f7, civics c23, electric e27, english n159, geography q14, geography-elem w120, hebrew-arab y2, history m156, kotvim k92,
+literature j15, lomda l144, math-app b168, math-teen t167, math-uni u160, math-uni2 v160, math-uni3 g159, motal d9, rakia r27,
+science s137, tanakh p16, ulpan a123. 14 דוחות תוכן נסרקו מחדש — רק `sig`/`head`/תאריך השתנו.
+
 ### כפתורי המורה בבגרות, בשיעורים, ברקיע ובמוטל — וההקשר נחתך לפני השרת, בגבול משפט · 30.9.2026
 
 **מקור.** ה-diff החסר מהרשומה הקודמת (כפתורי המורה), הוחל כמו שהוא על `main` `90d4f8e`, בלי התנגשויות.
