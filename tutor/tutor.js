@@ -271,6 +271,9 @@ function voices(){ try{ return speechSynthesis.getVoices()||[] }catch(e){ return
 try{
   if(window.speechSynthesis && typeof speechSynthesis.addEventListener === "function")
     speechSynthesis.addEventListener("voiceschanged", function(){
+      /* רשימה חלקית בפתיחה יכולה לנעול קול גרוע — מאפסים רק בחלון
+         ההסתכלות הראשון. איפוס מאוחר יותר יחזיר את הרעידה המקורית. */
+      if(Date.now() - _voiceBornAt < 15000) _voicePin = {};
       if(EL && EL.ov.classList.contains("on")) draw();
     });
 }catch(e){}
@@ -289,7 +292,7 @@ try{
    תשובה של ג׳וש היא עד 700 טוקנים, כלומר בקלות מעל 15 שניות. */
 var NEEDS_KEEPALIVE = /Chrome|Chromium|Edg\//.test(navigator.userAgent)
                    && !/Android|Mobile/i.test(navigator.userAgent);
-var _kaTimer = null, _activeU = null, _netVoiceOK = true;
+var _kaTimer = null, _activeU = null, _netVoiceOK = true, _voicePin = {}, _voiceBornAt = Date.now();
 
 function startKeepAlive(){
   if(!NEEDS_KEEPALIVE || !("speechSynthesis" in window) || _kaTimer) return;
@@ -348,6 +351,7 @@ function savedVoices(){
 }
 function savedVoice(code){ var m = savedVoices(); return m[code] || "" }
 function setVoice(code, uri){
+  delete _voicePin[code];
   var m = savedVoices();
   if(uri) m[code] = uri; else delete m[code];
   try{ localStorage.setItem(VOICE_KEY, JSON.stringify(m)) }catch(e){}
@@ -387,6 +391,19 @@ function pickVoice(code){
       break;
     }
   }
+  /* נעילת סשן — 30.9.2026. הקול הראשון שדיבר בשפה נשאר הקול שלה
+     עד סוף הסשן: בלעדיו כל אמירה ממיינת מחדש, וקול רשת שנופל וחוזר
+     (הילה Online) החליף לבד נשי↔גברי באמצע שימוש, בדיוק מה שהבעלים
+     שמע ודיווח. הנעול אינו שמיש: המיון הרגיל (נשי תחילה) בוחר מחליף
+     והמחליף ננעל — לכל היותר החלפה אחת בסשן, ולמגדר זהה כשיש. */
+  var pin = _voicePin[code];
+  if(pin){
+    var pall = voicesFor(code), pj;
+    for(pj=0;pj<pall.length;pj++) if(pall[pj].voiceURI === pin){
+      if(voiceUsable(pall[pj])) return pall[pj];
+      break;
+    }
+  }
   var v = voices(), p = code.slice(0,2), i, list = [], l;
   for(i=0;i<v.length;i++){
     l = (v[i].lang||"").replace("_","-").toLowerCase();
@@ -405,7 +422,9 @@ function pickVoice(code){
         || (natural(b)     - natural(a))
         || (exactness(b)   - exactness(a));
   });
-  return list[0];
+  var chosen = list[0];
+  if(chosen) _voicePin[code] = chosen.voiceURI;
+  return chosen;
 }
 function hasVoice(code){ return !!pickVoice(code) }
 /* קול טבעי — נוירלי של Microsoft, משופר של Apple, רשת של Google. */

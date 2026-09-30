@@ -1153,7 +1153,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a119 · 2026-09-30";
+var BUILD="a120 · 2026-09-30";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -1430,12 +1430,17 @@ function devPicker(lgs){
   });
   return out;
 }
+var _voicePin={}, _voiceBornAt=Date.now();
 function bestVoice(code){
   var pool=voicesFor(code); if(!pool.length)return null;
   /* בחירה ידנית גוברת על הניקוד. היא נשמרת לכל שפה בנפרד:
      קול שנבחר לרוסית אינו רלוונטי כשמקריאים עברית. */
   var want0=(state.devVoice||{})[code];
   if(want0){var hit=pool.filter(function(v){return v.voiceURI===want0})[0]; if(hit)return hit}
+  /* נעילת סשן כמו ב-/tutor/tutor.js (30.9): הקול הראשון שדיבר בשפה
+     נשאר, כדי שקול רשת מתנודד לא יחליף לבד נשי↔גברי באמצע שימוש. */
+  var pin=_voicePin[code];
+  if(pin){var pv=pool.filter(function(v){return v.voiceURI===pin})[0]; if(pv&&voiceUsable(pv))return pv}
   var want=String(code).toLowerCase();
   var pref=state.gemVoice&&gvOf(state.gemVoice).g==="m"?"m":"f";
   function score(v){
@@ -1457,12 +1462,14 @@ function bestVoice(code){
      קודם הקולות במגדר המבוקש, אחריהם מי שלא זוהה, ורק אז ההפוך;
      ובתוך כל קבוצה מכריעה האיכות. */
   function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
-  return pool.slice().sort(function(a,b){
+  var chosen=pool.slice().sort(function(a,b){
     /* קול שלא יעבוד יורד לתחתית לפני כל שיקול אחר — גם לפני המגדר,
        שאם לא כן קול נשי מת מנצח קול גברי חי. */
     var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
     d=grank(b)-grank(a); return d||score(b)-score(a);
   })[0];
+  if(chosen)_voicePin[code]=chosen.voiceURI;
+  return chosen;
 }
 function hasLearnVoice(){return voicesFor(LEARN_TTS).length>0}
 
@@ -5537,6 +5544,7 @@ document.addEventListener("click",function(e){
     var uri=el.getAttribute("data-u")||"";
     if(a==="devvoice"){
       if(!state.devVoice)state.devVoice={};
+      delete _voicePin[code];
       if(uri)state.devVoice[code]=uri; else delete state.devVoice[code];
       save(); render();
     }
@@ -5544,7 +5552,7 @@ document.addEventListener("click",function(e){
     speak(lg==="en"?'Hello. This is the reading voice.':t("heroT"),lg);
     return;
   }
-  if(a==="gvoice"){state.gemVoice=gvOf(v).id;save();render();return}
+  if(a==="gvoice"){state.gemVoice=gvOf(v).id;_voicePin={};save();render();return}
   if(a==="gsample"){
     if(!hasKey()){gkMsg={ok:false,m:t("vNeed")};render();return}
     var vid=gvOf(el.getAttribute("data-v")).id, old=state.gemVoice;
@@ -5620,6 +5628,9 @@ if(window.speechSynthesis){
   speechSynthesis.onvoiceschanged=function(){
     /* הרשימה יכולה להגיע לפני שהמצב נטען. רינדור אז מצייר מסך של
        אפליקציה שעדיין לא קיימת. */
+    /* רשימה חלקית בפתיחה יכולה לנעול קול גרוע — מאפסים רק בחלון
+       ההסתכלות הראשון. איפוס מאוחר יותר יחזיר את הרעידה המקורית. */
+    if(Date.now()-_voiceBornAt<15000)_voicePin={};
     if(booted)render();
   };
 }
@@ -5652,7 +5663,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a119-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a120-pwa1").catch(function(){});
   });
 }
 </script>
