@@ -47,7 +47,7 @@ on:
         required: false
         default: ''
       replace:
-        description: 'YES — למחוק הקלטות בקול אחר ולהקליט מחדש'
+        description: 'לא בשימוש: החלפת קול באפליקציה עם הקלטות עדיין אינה נתמכת (record.js עוצר בלי למחוק)'
         required: false
         default: ''
       batch:
@@ -118,7 +118,14 @@ jobs:
           if [ -z "$APP" ]; then APP="$(node .claude/qa/record.js --next)"; fi
           if [ -z "$APP" ]; then echo "הכול מוקלט — אין מה להריץ."; fi
           echo "app=$APP" >> "$GITHUB_OUTPUT"
-          echo "max=${{ github.event.inputs.max || '700' }}" >> "$GITHUB_OUTPUT"
+          MAX="${{ github.event.inputs.max || '700' }}"
+          # ריצה מתוזמנת שמשדרגת את אנגלית: MAX הוא מספר הקליפים שבאמת
+          # ממתינים (מתחת ל-KBPS ולא מיצו ניסיונות), לא מספר כל הקבצים.
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$APP" = "english" ]; then
+            N=$(node .claude/qa/record.js --pending english)
+            if [ "$N" -gt 0 ]; then MAX="$N"; fi
+          fi
+          echo "max=$MAX" >> "$GITHUB_OUTPUT"
 
       - name: תכנון
         if: steps.pick.outputs.app != ''
@@ -133,11 +140,9 @@ jobs:
           TTS_KEY: ${{ secrets.TTS_KEY }}
           TTS_PROVIDER: ${{ steps.prov.outputs.provider }}
           TTS_VOICE: ${{ steps.prov.outputs.voice }}
-          REPLACE: ${{ github.event.inputs.replace }}
         run: |
           set -o pipefail
           EXTRA=""
-          if [ "${REPLACE:-}" = "YES" ]; then EXTRA="--replace"; fi
           BATCH="${{ github.event.inputs.batch }}"
           if [ "$BATCH" != "NO" ]; then EXTRA="$EXTRA --batch"; fi
           node .claude/qa/record.js "${{ steps.pick.outputs.app }}" --max "${{ steps.pick.outputs.max }}" $EXTRA 2>&1 | tee /tmp/rec.log
@@ -161,8 +166,8 @@ jobs:
           if git diff --cached --quiet; then echo "אין קבצים חדשים."; exit 0; fi
           N=$(find "$APP/audio/he" -type f -name '*.mp3' | wc -l)
           git commit -q -m "הקלטות: $APP — $N קבצים במניפסט (record.yml)"
-          # main זז בזמן הריצה? מושכים ומנסים שוב, פעם אחת.
-          git pull --rebase -q origin main || true
+          # main זז בזמן הריצה? מושכים (rebase) ודוחפים. קונפליקט עוצר את הצעד בגלוי.
+          git pull --rebase -q origin main
           git push origin HEAD:main
           echo "pushed=1" >> "$GITHUB_OUTPUT"
           echo "נדחף: $APP, $N הקלטות."
@@ -177,9 +182,12 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f .claude/qa/last-record.log
+          # מונה הניסיונות עולה גם בריצה בלי קבצים — אחרת קליפ תקול לא ייצא מהתור לעולם
+          APP="${{ steps.pick.outputs.app }}"
+          if [ -f "$APP/audio/attempts.json" ]; then git add "$APP/audio/attempts.json"; fi
           if git diff --cached --quiet; then echo "היומן לא השתנה."; exit 0; fi
           git commit -q -m "יומן הקלטה: ריצה בלי קבצים חדשים (record.yml)"
-          git pull --rebase -q origin main || true
+          git pull --rebase -q origin main
           git push origin HEAD:main
 
       - name: כיסוי

@@ -29,7 +29,7 @@
    גם במדרגה בתשלום (הערת `pace` ב-`tts-build.js` שם: 12 שניות,
    עובד אחד, ״התשלום פתח את החסימה, הוא לא הרים את התקרה לדקה״).
    לכן ריצה אחת מקליטה מאות, לא אלפים, וההרצה מתחדשת: קובץ קיים
-   אינו מופק שוב.
+   אינו מופק שוב אם הוא כבר באיכות היעד. קליפ ישן נשמר עד שתחליף תקין מוכן.
 
    **המניפסט נגזר מהדיסק בסוף כל ריצה** — קובץ שקיים ואינו במניפסט
    לא ינוגן, ומזהה במניפסט בלי קובץ היה מנגן שקט במקום ליפול לקול
@@ -43,9 +43,10 @@ const ROOT = path.resolve(__dirname, '..', '..');
 require(path.join(ROOT, 'speech', 'recorded.js'));
 require(path.join(ROOT, 'tutor', 'he-speech.js'));
 const R = globalThis.RECORDED, H = globalThis.HESPEECH;
+const QUALITY = require('./record-quality.js');
 
 /* שני ספקים, כמו ב-tools/tts-build.js שם: gemini (ברירת מחדל, PCM
-   דרך ffmpeg) ו-gcloud (Cloud Text-to-Speech, מחזיר MP3 מוכן).
+   דרך ffmpeg) ו-gcloud (Cloud Text-to-Speech, LINEAR16 דרך אותו ffmpeg — ראו synthGcloud).
    הבעלים העלה 23.9.2026 חמש דוגמאות ״לדיבור נכון״: 32 kbps, 24 kHz,
    מונו, בלי ID3 ובלי Info — לא הצינור שלנו (ffmpeg מוסיף את שניהם)
    ולא ההקלטות שבריפו הנפרד; מתאים ל-MP3 שמחזיר Cloud TTS. לכן
@@ -148,9 +149,18 @@ function readManifest(app) {
   try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch (e) { return { broken: true }; }
 }
 function modelLabel() { return BATCH && PROVIDER !== 'gcloud' ? 'batch(' + MODELS.join('+') + ')' : MODEL; }
-function writeManifest(app) {
+/* הקול במניפסט הוא הקול שבו הקבצים שעל הדיסק הוקלטו בפועל. build
+   מעביר אותו (הוא יודע אם התחיל מדיסק ריק). בלי פרמטר (--manifest):
+   דיסק ריק — הקול הנוכחי; יש קבצים — מה שהמניפסט כבר אומר עליהם. */
+function writeManifest(app, voice) {
   const ids = [...onDisk(app)].sort();
-  const m = { voice: VOICE, model: modelLabel(), kbps: KBPS, generated: new Date().toISOString().slice(0, 10),
+  const old = readManifest(app);
+  const fresh = !ids.length || !(old && old.voice);
+  const kbpsById = Object.fromEntries(ids.map(id => [id, QUALITY.bitrate(path.join(dirOf(app), LANG, id + '.mp3'))]));
+  const rates = Object.values(kbpsById);
+  const m = { voice: voice || (ids.length ? (old && old.voice) || null : VOICE),
+              model: fresh ? modelLabel() : old.model || modelLabel(),
+              kbps: rates.length ? Math.min(...rates) : KBPS, targetKbps: KBPS, kbpsById, generated: new Date().toISOString().slice(0, 10),
               langs: { [LANG]: { count: ids.length, ids } } };
   fs.mkdirSync(dirOf(app), { recursive: true });
   fs.writeFileSync(path.join(dirOf(app), 'manifest.json'), JSON.stringify(m, null, 0) + '\n');
@@ -340,13 +350,27 @@ function splitBatch(ffmpeg, pcm, rate, k) {
   } finally { for (const f of [wav, full]) { try { fs.unlinkSync(f); } catch (e) {} } }
 }
 
-/* Cloud Text-to-Speech: בקשה אחת, MP3 חוזר בתשובה, בלי ffmpeg. */
-async function synthGcloud(text) {
+/* Cloud Text-to-Speech: בקשה אחת. MP3 של Cloud TTS יוצא ב-32 kbps
+   (ההערה למעלה, דוגמאות הבעלים 23.9), והיעד כאן KBPS — לכן מבקשים
+   LINEAR16 (PCM בתוך WAV) ומקודדים באותו pcmToMp3 של gemini: שני
+   הספקים יוצאים מאותו צינור, באותו קצב, בלי דחיסה כפולה. */
+function wavToPcm(buf) {
+  if (buf.slice(0, 4).toString() !== 'RIFF') return { pcm: buf, rate: 24000 };
+  let rate = 24000, i = 12;
+  while (i + 8 <= buf.length) {
+    const id = buf.slice(i, i + 4).toString(), size = buf.readUInt32LE(i + 4);
+    if (id === 'fmt ') rate = buf.readUInt32LE(i + 12);
+    if (id === 'data') return { pcm: buf.slice(i + 8, i + 8 + size), rate };
+    i += 8 + size + (size & 1);
+  }
+  throw new Error('gcloud החזיר WAV בלי data');
+}
+async function synthGcloud(ffmpeg, text) {
   for (let attempt = 0; attempt < 6; attempt++) {
     const r = await fetch(GCLOUD, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY },
       body: JSON.stringify({ input: { text }, voice: { languageCode: 'he-IL', name: VOICE },
-                             audioConfig: { audioEncoding: 'MP3', speakingRate: 1.0, pitch: 0 } })
+                             audioConfig: { audioEncoding: 'LINEAR16', sampleRateHertz: 24000, speakingRate: 1.0, pitch: 0 } })
     });
     if (r.status === 429 || r.status >= 500) {
       PACE.ok = 0; PACE.gap = Math.min(PACE.max, Math.round(PACE.gap * 1.5));
@@ -362,7 +386,8 @@ async function synthGcloud(text) {
     const j = await r.json();
     if (!j.audioContent) throw new Error('gcloud החזיר תשובה בלי אודיו');
     if (++PACE.ok >= 8) { PACE.ok = 0; PACE.gap = Math.max(PACE.min, Math.round(PACE.gap * 0.8)); }
-    return Buffer.from(j.audioContent, 'base64');
+    const w = wavToPcm(Buffer.from(j.audioContent, 'base64'));
+    return pcmToMp3(ffmpeg, w.pcm, w.rate);
   }
   throw new Error('gcloud — שש פעמים בלי אודיו');
 }
@@ -370,29 +395,34 @@ async function synthGcloud(text) {
 async function build(app, max) {
   const c = corpus(app);
   if (!c) { console.log('✗ ' + app + ' — אין מאגר קבוע להקלטה'); return 1; }
-  const ffmpeg = PROVIDER === 'gcloud' ? 'none' : findFfmpeg();
+  const ffmpeg = findFfmpeg();
   if (!ffmpeg) { console.log('✗ אין ffmpeg — FFMPEG=<נתיב> או ffmpeg ב-PATH'); return 1; }
+  if (!QUALITY.probeOk()) { console.log('✗ אין ffprobe — FFPROBE=<נתיב> או ffprobe ב-PATH (בלעדיו אין בדיקת קצב)'); return 1; }
   if (!KEY) { console.log('✗ חסר ' + (PROVIDER === 'gcloud' ? 'TTS_KEY' : 'GEMINI_API_KEY')); return 1; }
-  /* קול אחד לאפליקציה. מניפסט שנוצר בקול אחר — עוצרים, אלא אם ביקשו
-     להחליף: אז הקבצים הישנים נמחקים ומקליטים מחדש. ערבוב שני קולות
-     באותה אפליקציה נשמע כמו שני קריינים באותה שאלה. הדגם רשום
-     במניפסט ליידע בלבד ואינו חוסם: דור דגם חדש באותו קול (Kore)
-     מותר, והקלטות מדגם קודם נמחקות ידנית כשהדגם מוחלף. */
+  /* קול אחד לאפליקציה: ערבוב שני קולות נשמע כמו שני קריינים באותה
+     שאלה. החלפת קול באפליקציה שיש בה הקלטות עדיין אינה נתמכת —
+     עוצרים בלי למחוק דבר. אפליקציה בלי קבצים מוקלטת בקול הנוכחי,
+     והוא שנרשם במניפסט (גם אם המניפסט הריק נשא קול אחר). */
   const m = readManifest(app);
-  const oldVoice = m && m.voice;
-  if (m && (((m.langs || {})[LANG] || {}).count || 0) > 0 && oldVoice !== VOICE) {
-    if (!process.argv.includes('--replace')) {
-      console.log('✗ ' + app + ' הוקלטה בקול ' + oldVoice + ' (' + oldProv + ') ועכשיו מבקשים ' + VOICE +
-                  ' (' + modelLabel() + '). להחלפה: --replace (מוחק את הישנים ומקליט מחדש).');
-      return 1;
-    }
-    const d = path.join(dirOf(app), LANG);
-    let n = 0;
-    for (const f of fs.readdirSync(d)) if (f.endsWith('.mp3')) { fs.unlinkSync(path.join(d, f)); n++; }
-    console.log('  --replace: ' + n + ' הקלטות בקול ' + oldVoice + ' נמחקו');
-  }
   const have = onDisk(app);
-  const todo = [...c].filter(([id]) => !have.has(id)).slice(0, max);
+  const oldVoice = m && m.voice;
+  if (have.size && oldVoice !== VOICE) {
+    console.log('✗ ' + app + ' הוקלטה בקול ' + (oldVoice || 'לא ידוע') + ' ועכשיו מבקשים ' + VOICE +
+                '. החלפת קול באפליקציה עם הקלטות עדיין אינה נתמכת; אף קובץ לא נמחק.' +
+                (oldVoice ? ' להמשך בקול הקיים: TTS_VOICE=' + oldVoice : ' חסר מניפסט תקין: node .claude/qa/record.js --manifest ' + app));
+    return 1;
+  }
+  const liveVoice = have.size ? oldVoice : VOICE;
+  const attempts = QUALITY.loadAttempts(dirOf(app));
+  const current = id => QUALITY.ready(path.join(dirOf(app), LANG, id + '.mp3'), KBPS);
+  /* קודם משדרגים קליפים קיימים שמתחת ליעד, אחר כך ממלאים חסרים.
+     קליפ שמיצה MAX_TRIES ניסיונות יוצא מהתור (attempts.json). */
+  const all = [...c].filter(([id]) => !current(id));
+  const candidates = all.filter(([id]) => !QUALITY.exhausted(attempts, id));
+  if (all.length > candidates.length) console.log('  מוצו ' + (all.length - candidates.length) + ' קליפים (' + QUALITY.MAX_TRIES + ' ניסיונות) — מחוץ לתור, ראו ' + app + '/audio/attempts.json');
+  candidates.sort((a, b) => Number(have.has(b[0])) - Number(have.has(a[0])));
+  const todo = candidates.slice(0, max);
+  const installed = new Set();
   const outDir = path.join(dirOf(app), LANG);
   fs.mkdirSync(outDir, { recursive: true });
   console.log(app + ': ' + c.size + ' מחרוזות · מוקלטות ' + have.size + ' · בריצה הזאת עד ' + todo.length +
@@ -422,8 +452,11 @@ async function build(app, max) {
       if (segs) {
         for (let i = 0; i < batch.length; i++) {
           const f = path.join(outDir, batch[i][0] + '.mp3');
-          if (fs.existsSync(f)) continue;
-          fs.writeFileSync(f, segs[i]);
+          if (installed.has(batch[i][0]) || current(batch[i][0])) continue;
+          /* קליפ שנדחה נספר ככישלון אחד, ואינו מפיל את שאר האצווה */
+          try { QUALITY.install(f, segs[i], KBPS, ffmpeg); }
+          catch (e) { failed++; QUALITY.fail(attempts, batch[i][0], e.message); console.log('  ✗ ' + batch[i][0] + ' ' + e.message); continue; }
+          installed.add(batch[i][0]); delete attempts[batch[i][0]];
           made++;
         }
         console.log('  ' + made + '/' + todo.length + ' · בקשה ' + requests + ' (' + model + ') · ' + Math.round((Date.now() - t0) / 1000) + 'ש');
@@ -443,17 +476,21 @@ async function build(app, max) {
            פיצול בכלל. שגיאת מכסה עולה ללולאה הראשית כרגיל. */
         try {
           requests++;
-          const mp3 = PROVIDER === 'gcloud' ? await synthGcloud(H.spoken(batch[0][1])) : await synth(ffmpeg, H.spoken(batch[0][1]));
+          const mp3 = PROVIDER === 'gcloud' ? await synthGcloud(ffmpeg, H.spoken(batch[0][1])) : await synth(ffmpeg, H.spoken(batch[0][1]));
           if (mp3.length >= MIN_BYTES) {
             const f = path.join(outDir, batch[0][0] + '.mp3');
-            if (!fs.existsSync(f)) { fs.writeFileSync(f, mp3); made++; }
+            if (!installed.has(batch[0][0]) && !current(batch[0][0])) { QUALITY.install(f, mp3, KBPS, ffmpeg); installed.add(batch[0][0]); delete attempts[batch[0][0]]; made++; }
             console.log('  ' + made + '/' + todo.length + ' · מחרוזת בודדת אחרי כישלון פיצול (' + model + ')');
             return;
           }
         } catch (e2) {
           if (e2 instanceof QuotaError || /429|RESOURCE_EXHAUSTED|quota/i.test(e2.message)) throw e2;
+          QUALITY.fail(attempts, batch[0][0], e2.message);
         }
       }
+      /* מחרוזת בודדת שגם ההקלטה הישירה שלה נכשלה — נספרת לה. אצווה
+         שלמה שנכשלה אינה נספרת לכל אחת מ-40 המחרוזות: זו לא אשמתן. */
+      if (batch.length === 1 && !attempts[batch[0][0]]) QUALITY.fail(attempts, batch[0][0], 'split');
       failed += batch.length;
       console.log('  ✗ אצווה של ' + batch.length + ' הושחרת: הפיצול לא החזיר ' + batch.length + ' מקטעים (יוקלטו בריצה אחרת)');
     };
@@ -476,7 +513,8 @@ async function build(app, max) {
       }
       await sleep(3000);
     }
-    const n = writeManifest(app);
+    QUALITY.saveAttempts(dirOf(app), attempts);
+    const n = writeManifest(app, liveVoice);
     console.log('\nנוצרו ' + made + ', נכשלו/הושחרו ' + failed + ' · בקשות ' + requests + ' · במניפסט ' + n + ' · ' +
                 Math.round((Date.now() - t0) / 60000) + ' דק׳');
     return quota && !made ? 1 : 0;
@@ -484,19 +522,22 @@ async function build(app, max) {
   /* --- מצב רגיל: בקשה לכל מחרוזת --- */
   for (const [id, text] of todo) {
     try {
-      const mp3 = PROVIDER === 'gcloud' ? await synthGcloud(H.spoken(text)) : await synth(ffmpeg, H.spoken(text));
+      const mp3 = PROVIDER === 'gcloud' ? await synthGcloud(ffmpeg, H.spoken(text)) : await synth(ffmpeg, H.spoken(text));
       if (mp3.length < MIN_BYTES) throw new Error('קובץ ריק');
-      fs.writeFileSync(path.join(outDir, id + '.mp3'), mp3);
+      QUALITY.install(path.join(outDir, id + '.mp3'), mp3, KBPS, ffmpeg);
+      delete attempts[id];
       made++;
       if (made % 10 === 0) console.log('  ' + made + '/' + todo.length + ' · ' + Math.round((Date.now() - t0) / 1000) + 'ש · מרווח ' + PACE.gap + 'ms');
     } catch (e) {
       failed++;
       console.log('  ✗ ' + id + ' ' + e.message.slice(0, 140));
+      if (!/429|RESOURCE_EXHAUSTED|quota/i.test(e.message)) QUALITY.fail(attempts, id, e.message);
       if (/429|RESOURCE_EXHAUSTED|quota/i.test(e.message)) { quota = true; console.log('  המכסה נגמרה. מה שנכתב נשמר; הרצה חוזרת תמשיך מכאן.'); break; }
     }
     await sleep(PACE.gap);
   }
-  const n = writeManifest(app);
+  QUALITY.saveAttempts(dirOf(app), attempts);
+  const n = writeManifest(app, liveVoice);
   console.log('\nנוצרו ' + made + ', נכשלו ' + failed + ' · במניפסט ' + n + ' · ' +
               Math.round((Date.now() - t0) / 60000) + ' דק׳');
   return quota && !made ? 1 : 0;
@@ -517,12 +558,27 @@ async function build(app, max) {
     for (const app of apps.length ? apps : Object.keys(SOURCES)) console.log(app + ': ' + writeManifest(app) + ' במניפסט');
     process.exit(0);
   }
+  /* קליפים קיימים שעדיין מתחת ל-KBPS ולא מיצו את הניסיונות */
+  const pending = app => {
+    const a = QUALITY.loadAttempts(dirOf(app));
+    return [...onDisk(app)].filter(id => !QUALITY.exhausted(a, id) &&
+      !QUALITY.ready(path.join(dirOf(app), LANG, id + '.mp3'), KBPS));
+  };
+  if (args.includes('--next') || args.includes('--pending')) {
+    if (!QUALITY.probeOk()) { console.error('✗ אין ffprobe — אי אפשר לבדוק קצב'); process.exit(1); }
+  }
+  /* --pending <app>: כמה קליפים קיימים ממתינים לשדרוג (ל-MAX של record.yml) */
+  if (args.includes('--pending')) { console.log(pending(apps[0] || 'english').length); process.exit(0); }
   /* --next: האפליקציה שהכי הרבה חסר בה — לריצה המתוזמנת, שאין לה קלט */
   if (args.includes('--next')) {
+    /* קודם משדרגים את הקליפים הקיימים של אנגלית ל-KBPS, ואז התור הכללי.
+       קליפ שמיצה את הניסיונות אינו נספר, ולכן אינו יכול לנעול את התור. */
+    if (pending('english').length) { console.log('english'); process.exit(0); }
     let best = null, most = -1;
     for (const app of Object.keys(SOURCES)) {
-      const c = corpus(app), have = onDisk(app);
-      const missing = [...c.keys()].filter(x => !have.has(x)).length;
+      const c = corpus(app), a = QUALITY.loadAttempts(dirOf(app));
+      const missing = [...c.keys()].filter(x => !QUALITY.exhausted(a, x) &&
+        !QUALITY.ready(path.join(dirOf(app), LANG, x + '.mp3'), KBPS)).length;
       if (missing > most) { most = missing; best = app; }
     }
     console.log(most > 0 ? best : '');

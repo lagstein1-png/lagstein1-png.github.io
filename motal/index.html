@@ -1050,7 +1050,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="d6 · 2026-09-30";
+var BUILD="d7 · 2026-09-30";
 var SKEY="motal-state-v1";
 var GKEY_STORE="motal-gkey";
 
@@ -2603,9 +2603,28 @@ window.addEventListener("legal:lang",function(e){
   try{ state.lang=k;save();render(); }catch(err){}
 });
 
+/* אתגר: שאלה פתוחה בלי רמז — ולכן גם בלי המורה. אותו תנאי שמסתיר
+   את כפתור הרמז ב-screenPractice. הכפתור הצף נבנה ב-/tutor/tutor.js
+   (#tu-fl, עם [hidden]{display:none}); הוא מוסתר מכאן ולא משם, כדי
+   לא לגעת בקובץ המשותף. פאנל שנפתח לפני האתגר נסגר. אחרי המענה
+   המורה חוזר, כמו ההסבר. */
+function tutorGate(){
+  var off=state.screen==="prac"&&state.challenge&&!(P&&P.done)&&!view;
+  var fl=document.getElementById("tu-fl");
+  if(!fl)return;
+  if(off){
+    /* הכפתור מוסתר גם כשהפאנל פתוח (floatHide ב-tutor.js); מוסתר בלי
+       הסימון שלנו = הפאנל פתוח. close מחזיר את הכפתור, ולכן קודם. */
+    if(fl.hidden&&fl.getAttribute("data-gate")!=="1"&&window.TUTOR&&TUTOR.close)try{TUTOR.close()}catch(e){}
+    fl.hidden=true; fl.setAttribute("data-gate","1");
+  }else if(fl.getAttribute("data-gate")==="1"){
+    fl.hidden=false; fl.removeAttribute("data-gate");
+  }
+}
 function render(){ try{lgChrome()}catch(e){}
   applyModes();
   lvlSync();
+  try{tutorGate()}catch(e){}
   /* מבחן שהגיע מקישור עוקף הכול, כולל מסך הפתיחה: מי שנכנס
      להיבחן לא בהכרח פתח את האפליקציה הזאת אי פעם. */
   /* תלמיד שפתח את דף המושגים באמצע מבחן חייב דרך חזרה מפורשת.
@@ -4221,6 +4240,8 @@ if(window.TUTOR){
     },
     stopHost:function(){try{stopSpeak()}catch(e){}}
   });
+  /* הכפתור הצף נבנה ב-mount, אחרי הציור הראשון — השער חל גם עליו */
+  try{tutorGate()}catch(e){}
   /* ---- מנוע המורה — המתאם של האפליקציה ----
      getScreenContext מחזיר מה שמוצג עכשיו, ו-actions הן מה שהמורה
      רשאית לעשות כאן; כל אחת מחזירה true רק כשבאמת קרה משהו. */
@@ -4305,7 +4326,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=d6-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=d7-pwa1").catch(function(){});
   });
 }
 </script>

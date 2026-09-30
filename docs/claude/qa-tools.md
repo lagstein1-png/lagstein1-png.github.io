@@ -84,6 +84,7 @@
     node .claude/qa/exam.js              # המבחן מהקישור — השאלה שהמורה רואה היא שהתלמיד מקבל
     node .claude/qa/recorded.js          # השכבה המוקלטת — המודול והחיווט; עם --browser גם הניגון בדפדפן
     node .claude/qa/record.js --check    # ההקלטות מול המניפסט — המחולל: אותו קובץ (record.yml מריץ אותו כל בוקר)
+    node .claude/qa/record-safety.js     # ההקלטה אינה מוחקת, אינה ננעלת ואינה נופלת על gcloud — ffmpeg/ffprobe/fetch מדומים
     node .claude/qa/findings.js --check  # FINDINGS.md מחזיק שבוע, הישן בארכיון — --archive מעביר (O-85)
     node .claude/qa/suite.js --check     # הרשימה הזאת מול SUITE שב-all.js — מזהה חסר או שורה מתה נופלים
     node .claude/qa/all.js                   # הכול, ופסק דין אחד
