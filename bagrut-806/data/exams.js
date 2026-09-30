@@ -24,7 +24,8 @@ window.EXAMS = [
     "questionnaire": "35571",
     "level": "5 יח״ל",
     "season": "הדגמה",
-    "year": "מבנה חדש",
+    "year": 2026,
+    "moed": "הדגמה",
     "durationMinutes": 225,
     "weight": "60%",
     "chapters": [
@@ -59,7 +60,7 @@ window.EXAMS = [
     ],
     "questions": [
       {
-        "topic": "שאלות קצרות",
+        "topic": "גדילה ודעיכה",
         "text": "פתרו את המשוואה.",
         "latex": "2^{x}=32",
         "speech": "שתיים בחזקת איקס שווה שלושים ושתיים",
@@ -76,14 +77,8 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "4",
-                "note": "2^4=16, לא 32"
-              },
-              {
-                "match": "16",
-                "note": "זה 2^4; בדקו שוב"
-              }
+              "4",
+              "16"
             ],
             "steps": [
               {
@@ -101,7 +96,7 @@ window.EXAMS = [
         "chapter": "short"
       },
       {
-        "topic": "שאלות קצרות",
+        "topic": "חשבון דיפרנציאלי",
         "text": "נתונה הפונקציה f(x) = x³ − 4x. חשבו את f'(1).",
         "latex": "f(x)=x^{3}-4x",
         "speech": "אף של איקס שווה איקס בשלישית פחות ארבע איקס",
@@ -118,10 +113,7 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "1",
-                "note": "הצבתם x=1 בפונקציה עצמה; התבקשתם לגזור קודם"
-              }
+              "1"
             ],
             "steps": [
               {
@@ -139,7 +131,7 @@ window.EXAMS = [
         "chapter": "short"
       },
       {
-        "topic": "שאלות קצרות",
+        "topic": "סדרות",
         "text": "בסדרה הנדסית a₁=3 והמנה q=2. מצאו את a₅.",
         "latex": "a_{1}=3,\\;q=2",
         "speech": "סדרה הנדסית, איי אחד שווה שלוש, קיו שווה שתיים",
@@ -156,14 +148,8 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "96",
-                "note": "זה a₆; שימו לב שהחזקה היא n−1"
-              },
-              {
-                "match": "12",
-                "note": "הכפלתם במקום להעלות בחזקה"
-              }
+              "96",
+              "12"
             ],
             "steps": [
               {
@@ -181,7 +167,7 @@ window.EXAMS = [
         "chapter": "short"
       },
       {
-        "topic": "שאלות קצרות",
+        "topic": "טריגונומטריה",
         "text": "חשבו: cos 60°.",
         "latex": "\\cos 60^{\\circ}",
         "speech": "קוסינוס שישים מעלות",
@@ -198,10 +184,7 @@ window.EXAMS = [
               "tolerance": 0.001
             },
             "reject": [
-              {
-                "match": "0.866",
-                "note": "זה cos 30° (או sin 60°)"
-              }
+              "0.866"
             ],
             "steps": [
               {
@@ -728,7 +711,8 @@ window.EXAMS = [
     "questionnaire": "35571",
     "level": "5 יח״ל",
     "season": "הדגמה",
-    "year": "מבנה חדש",
+    "year": 2026,
+    "moed": "הדגמה",
     "durationMinutes": 225,
     "weight": "60%",
     "chapters": [
@@ -763,7 +747,7 @@ window.EXAMS = [
     ],
     "questions": [
       {
-        "topic": "שאלות קצרות",
+        "topic": "גדילה ודעיכה",
         "text": "חשבו: log₂ 8.",
         "latex": "\\log_{2}8",
         "speech": "לוגאריתם של שמונה על בסיס שתיים",
@@ -780,10 +764,7 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "4",
-                "note": "2^4=16, לא 8"
-              }
+              "4"
             ],
             "steps": [
               {
@@ -793,11 +774,11 @@ window.EXAMS = [
             ]
           }
         ],
-        "number": 2,
+        "number": 1,
         "chapter": "short"
       },
       {
-        "topic": "שאלות קצרות",
+        "topic": "גאומטריה אנליטית",
         "text": "נתונים הווקטורים u=(1,2) ו-v=(3,−1). חשבו את המכפלה הסקלרית u·v.",
         "latex": "\\vec{u}=(1,2),\\;\\vec{v}=(3,-1)",
         "speech": "יו שווה אחת פסיק שתיים; וי שווה שלוש פסיק מינוס אחת",
@@ -814,10 +795,7 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "5",
-                "note": "חיברתם במקום לחבר אלגברית: 3 + (−2) = 1"
-              }
+              "5"
             ],
             "steps": [
               {
@@ -831,7 +809,7 @@ window.EXAMS = [
         "chapter": "short"
       },
       {
-        "topic": "שאלות קצרות",
+        "topic": "מספרים מרוכבים",
         "text": "נתון המספר המרוכב z = 3 + 4i. חשבו את |z|.",
         "latex": "z=3+4i",
         "speech": "זד שווה שלוש ועוד ארבע איי",
@@ -848,14 +826,8 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "7",
-                "note": "חיברתם; צריך שורש של סכום הריבועים"
-              },
-              {
-                "match": "25",
-                "note": "שכחתם את השורש"
-              }
+              "7",
+              "25"
             ],
             "steps": [
               {
@@ -869,7 +841,7 @@ window.EXAMS = [
         "chapter": "short"
       },
       {
-        "topic": "שאלות קצרות",
+        "topic": "הסתברות",
         "text": "המאורעות A ו-B בלתי תלויים, P(A)=0.3 ו-P(B)=0.5. חשבו את P(A∩B).",
         "latex": "P(A)=0.3,\\;P(B)=0.5",
         "speech": "פי של איי שווה אפס נקודה שלוש, פי של בי שווה אפס נקודה חמש",
@@ -886,10 +858,7 @@ window.EXAMS = [
               "tolerance": 0.0001
             },
             "reject": [
-              {
-                "match": "0.8",
-                "note": "חיברתם; במאורעות בלתי תלויים כופלים"
-              }
+              "0.8"
             ],
             "steps": [
               {
@@ -920,10 +889,7 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "0",
-                "note": "אגף ימין ב-n=1 הוא 1·2/2 = 1"
-              }
+              "0"
             ],
             "steps": [
               {
@@ -967,10 +933,7 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "10",
-                "note": "זה k(k+1)/2 ב-k=4; הציבו ב-(k+1)(k+2)/2"
-              }
+              "10"
             ],
             "steps": [
               {
@@ -1498,7 +1461,8 @@ window.EXAMS = [
     "questionnaire": "35571",
     "level": "5 יח״ל",
     "season": "הדגמה",
-    "year": "מבנה חדש",
+    "year": 2026,
+    "moed": "הדגמה",
     "durationMinutes": 225,
     "weight": "60%",
     "chapters": [
@@ -1533,7 +1497,7 @@ window.EXAMS = [
     ],
     "questions": [
       {
-        "topic": "שאלות קצרות",
+        "topic": "גדילה ודעיכה",
         "text": "פתרו את המשוואה.",
         "latex": "2^{x}=32",
         "speech": "שתיים בחזקת איקס שווה שלושים ושתיים",
@@ -1550,14 +1514,8 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "4",
-                "note": "2^4=16, לא 32"
-              },
-              {
-                "match": "16",
-                "note": "זה 2^4; בדקו שוב"
-              }
+              "4",
+              "16"
             ],
             "steps": [
               {
@@ -1575,7 +1533,7 @@ window.EXAMS = [
         "chapter": "short"
       },
       {
-        "topic": "שאלות קצרות",
+        "topic": "גדילה ודעיכה",
         "text": "חשבו: log₂ 8.",
         "latex": "\\log_{2}8",
         "speech": "לוגאריתם של שמונה על בסיס שתיים",
@@ -1592,10 +1550,7 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "4",
-                "note": "2^4=16, לא 8"
-              }
+              "4"
             ],
             "steps": [
               {
@@ -1609,7 +1564,7 @@ window.EXAMS = [
         "chapter": "short"
       },
       {
-        "topic": "שאלות קצרות",
+        "topic": "סדרות",
         "text": "בסדרה הנדסית a₁=3 והמנה q=2. מצאו את a₅.",
         "latex": "a_{1}=3,\\;q=2",
         "speech": "סדרה הנדסית, איי אחד שווה שלוש, קיו שווה שתיים",
@@ -1626,14 +1581,8 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "96",
-                "note": "זה a₆; שימו לב שהחזקה היא n−1"
-              },
-              {
-                "match": "12",
-                "note": "הכפלתם במקום להעלות בחזקה"
-              }
+              "96",
+              "12"
             ],
             "steps": [
               {
@@ -1651,7 +1600,7 @@ window.EXAMS = [
         "chapter": "short"
       },
       {
-        "topic": "שאלות קצרות",
+        "topic": "הסתברות",
         "text": "המאורעות A ו-B בלתי תלויים, P(A)=0.3 ו-P(B)=0.5. חשבו את P(A∩B).",
         "latex": "P(A)=0.3,\\;P(B)=0.5",
         "speech": "פי של איי שווה אפס נקודה שלוש, פי של בי שווה אפס נקודה חמש",
@@ -1668,10 +1617,7 @@ window.EXAMS = [
               "tolerance": 0.0001
             },
             "reject": [
-              {
-                "match": "0.8",
-                "note": "חיברתם; במאורעות בלתי תלויים כופלים"
-              }
+              "0.8"
             ],
             "steps": [
               {
@@ -2224,7 +2170,8 @@ window.EXAMS = [
     "questionnaire": "35572",
     "level": "5 יח״ל",
     "season": "הדגמה",
-    "year": "מבנה חדש",
+    "year": 2026,
+    "moed": "הדגמה",
     "durationMinutes": 150,
     "weight": "40%",
     "chapters": [
@@ -2350,10 +2297,7 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "-2",
-                "note": "סדר החיסור הפוך: AB = B − A"
-              }
+              "-2"
             ],
             "steps": [
               {
@@ -2374,10 +2318,7 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "9",
-                "note": "שכחתם את השורש"
-              }
+              "9"
             ],
             "steps": [
               {
@@ -2408,14 +2349,8 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "25",
-                "note": "שכחתם את השורש"
-              },
-              {
-                "match": "7",
-                "note": "אין מחברים; זה שורש של סכום ריבועים"
-              }
+              "25",
+              "7"
             ],
             "steps": [
               {
@@ -2436,14 +2371,8 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "5",
-                "note": "זה המודולוס; המכפלה בצמוד היא הריבוע שלו"
-              },
-              {
-                "match": "-7",
-                "note": "פתחו את הסוגריים: (3+4i)(3−4i) = 9+16"
-              }
+              "5",
+              "-7"
             ],
             "steps": [
               {
@@ -2613,7 +2542,8 @@ window.EXAMS = [
     "questionnaire": "35572",
     "level": "5 יח״ל",
     "season": "הדגמה",
-    "year": "מבנה חדש",
+    "year": 2026,
+    "moed": "הדגמה",
     "durationMinutes": 150,
     "weight": "40%",
     "chapters": [
@@ -2739,10 +2669,7 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "10",
-                "note": "בדקו את הסימנים: 2·1 + (−1)·5 + 3·1"
-              }
+              "10"
             ],
             "steps": [
               {
@@ -2806,10 +2733,7 @@ window.EXAMS = [
               ]
             },
             "reject": [
-              {
-                "match": "אין",
-                "note": "בממשיים אין פתרון, אבל במרוכבים יש"
-              }
+              "אין"
             ],
             "steps": [
               {
@@ -2830,10 +2754,7 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "4",
-                "note": "זכרו: i² = −1"
-              }
+              "4"
             ],
             "steps": [
               {
@@ -2990,7 +2911,8 @@ window.EXAMS = [
     "questionnaire": "35572",
     "level": "5 יח״ל",
     "season": "הדגמה",
-    "year": "מבנה חדש",
+    "year": 2026,
+    "moed": "הדגמה",
     "durationMinutes": 150,
     "weight": "40%",
     "chapters": [
@@ -3166,14 +3088,8 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "25",
-                "note": "שכחתם את השורש"
-              },
-              {
-                "match": "7",
-                "note": "אין מחברים; זה שורש של סכום ריבועים"
-              }
+              "25",
+              "7"
             ],
             "steps": [
               {
@@ -3194,14 +3110,8 @@ window.EXAMS = [
               "tolerance": 0
             },
             "reject": [
-              {
-                "match": "5",
-                "note": "זה המודולוס; המכפלה בצמוד היא הריבוע שלו"
-              },
-              {
-                "match": "-7",
-                "note": "פתחו את הסוגריים: (3+4i)(3−4i) = 9+16"
-              }
+              "5",
+              "-7"
             ],
             "steps": [
               {

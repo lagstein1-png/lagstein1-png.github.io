@@ -51,6 +51,19 @@ self.addEventListener("fetch", e => {
      של אפליקציה אחרת שמר. שנים־עשר ה-sw מקדימים-קאשינג את legal/terms.js,
      וה-activate של כל אחת מוחק רק את התחילית שלה — כך שתיקון שם היה
      נתקע לצמיתות מאחורי עותק זר. */
+  /* המניפסט של ההקלטות חייב להישאר טרי: ריצת ההקלטה היומית מוסיפה
+     קבצים, ומטמון-קודם כאן היה משאיר אצל הלקוח מניפסט ישן לצמיתות
+     (מבדק חוסרים 30.9 סעיף 4). רשת קודם, והמטמון גיבוי אופליין. */
+  if (url.pathname.indexOf("/audio/manifest.json") !== -1) {
+    e.respondWith(fetch(req).then(r => {
+      if (r && r.status === 200) {
+        const copy = r.clone();
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+      }
+      return r;
+    }).catch(() => caches.open(CACHE).then(c => c.match(req))));
+    return;
+  }
   e.respondWith(caches.open(CACHE).then(c => c.match(req).then(hit => hit || fetch(req).then(r => {
     if (r && r.status === 200) {
       const copy = r.clone();

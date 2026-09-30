@@ -61,7 +61,7 @@ var FLOAT = /[?&]limor2=1(?:&|$)/.test(location.search);
    שלוש אפשרויות לבחירת ג׳וש. כולן keyframes ב-CSS בלבד (transform על
    ה-GPU), בלי נכסים חדשים ובלי ספריות, ומכבדות prefers-reduced-motion
    במדיה־שאילתה בסוף הבלוק. fldemo=1 מריץ מחזור תגובות להדגמה בלבד. */
-var MOTION = (location.search.match(/[?&]motion=([0-3])(?:&|$)/) || [])[1] || "1";
+var MOTION = ((location.search || "").match(/[?&]motion=([0-3])(?:&|$)/) || [])[1] || "1";
 var FLDEMO = /[?&]fldemo=1(?:&|$)/.test(location.search);
 
 var VOICE_KEY = "tutor-voice-v2"; /* דמות לימור: לא יורשים בחירת קול גברי של ברק; חדש לכל שפה */
@@ -273,7 +273,7 @@ try{
     speechSynthesis.addEventListener("voiceschanged", function(){
       /* רשימה חלקית בפתיחה יכולה לנעול קול גרוע — מאפסים רק בחלון
          ההסתכלות הראשון. איפוס מאוחר יותר יחזיר את הרעידה המקורית. */
-      if(Date.now() - _voiceBornAt < 15000) _voicePin = {};
+      if(Date.now() - _voiceBornAt < 15000) pickVoice._pin = {};
       if(EL && EL.ov.classList.contains("on")) draw();
     });
 }catch(e){}
@@ -292,7 +292,7 @@ try{
    תשובה של ג׳וש היא עד 700 טוקנים, כלומר בקלות מעל 15 שניות. */
 var NEEDS_KEEPALIVE = /Chrome|Chromium|Edg\//.test(navigator.userAgent)
                    && !/Android|Mobile/i.test(navigator.userAgent);
-var _kaTimer = null, _activeU = null, _netVoiceOK = true, _voicePin = {}, _voiceBornAt = Date.now();
+var _kaTimer = null, _activeU = null, _netVoiceOK = true, _voiceBornAt = Date.now();
 
 function startKeepAlive(){
   if(!NEEDS_KEEPALIVE || !("speechSynthesis" in window) || _kaTimer) return;
@@ -351,7 +351,7 @@ function savedVoices(){
 }
 function savedVoice(code){ var m = savedVoices(); return m[code] || "" }
 function setVoice(code, uri){
-  delete _voicePin[code];
+  if(pickVoice._pin) delete pickVoice._pin[code];
   var m = savedVoices();
   if(uri) m[code] = uri; else delete m[code];
   try{ localStorage.setItem(VOICE_KEY, JSON.stringify(m)) }catch(e){}
@@ -396,7 +396,11 @@ function pickVoice(code){
      (הילה Online) החליף לבד נשי↔גברי באמצע שימוש, בדיוק מה שהבעלים
      שמע ודיווח. הנעול אינו שמיש: המיון הרגיל (נשי תחילה) בוחר מחליף
      והמחליף ננעל — לכל היותר החלפה אחת בסשן, ולמגדר זהה כשיש. */
-  var pin = _voicePin[code];
+  /* הנעילה יושבת על הפונקציה עצמה ולא במשתנה מודול — בדיקות
+     המעבדה מחלצות את pickVoice לבדה ל-vm, ומשתנה חיצוני היה
+     מפיל אותן על ReferenceError מסיבה שאינה הבאג. */
+  var P = pickVoice._pin || (pickVoice._pin = {});
+  var pin = P[code];
   if(pin){
     var pall = voicesFor(code), pj;
     for(pj=0;pj<pall.length;pj++) if(pall[pj].voiceURI === pin){
@@ -423,7 +427,7 @@ function pickVoice(code){
         || (exactness(b)   - exactness(a));
   });
   var chosen = list[0];
-  if(chosen) _voicePin[code] = chosen.voiceURI;
+  if(chosen) P[code] = chosen.voiceURI;
   return chosen;
 }
 function hasVoice(code){ return !!pickVoice(code) }

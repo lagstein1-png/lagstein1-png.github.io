@@ -137,7 +137,8 @@ var GKEY_STORE="<app>-gkey";
 `h` (bagrut-history), `c` (civics), `s` (science), `q` (geography),
 `w` (geography-elem), `i` (hebrew), `j` (literature), `p` (tanakh),
 `l` (lomda), `k` (kotvim), `r` (rakia), `e` (electric), `z` (limor),
-`f` (barak). אותיות פנויות: `d`, `o`, `y`.
+`f` (barak), `d` (motal), `y` (hebrew-arab). אותיות פנויות: `o`.
+hebrew-arab עברה מ-`h` ל-`y` ב-30.9.2026 — `h` שותפה עם bagrut-history.
 
 **ואל תסמכו על הרשימה הזאת — ספרו.** `k` חסרה בה מאז ש-״כותבים
 ביחד״ נבנתה, ומי שהיה בוחר `k` היה מקבל שתי אפליקציות עם אותה

@@ -478,6 +478,10 @@ textarea.field{min-height:96px;resize:vertical}
 </head>
 <body>
 <style>#gate[hidden]{display:none!important}
+/* קישור דילוג לתוכן — התקן המשותף, מוסתר עד מוקד מקלדת */
+.skip{position:absolute;inset-inline-start:-9999px}
+.skip:focus{position:static;display:inline-flex;align-items:center;min-height:44px;
+  margin:8px;padding:8px 14px;background:#0e9c8d;color:#fff;border-radius:10px;font-weight:700}
 /* כפתורי הקראה גדולים וצבעוניים — התקן המשותף (ירוק הקראה, אדום עצירה) */
 .spk:not(.sm){border-radius:12px;background:#0e9c8d;border-color:#0b7c71;color:#fff;font-weight:700;min-height:46px;width:auto;height:auto;padding:8px 18px;font-size:1.02rem;gap:.4rem}
 .spk:not(.sm):hover{background:#0b7c71;color:#fff}
@@ -518,7 +522,8 @@ textarea.field{min-height:96px;resize:vertical}
   </div>
 </div>
 <div id="live" class="sr" aria-live="polite"></div>
-<div id="app"></div>
+<a class="skip" href="#main">דילוג לתוכן</a>
+<main id="main" tabindex="-1"><div id="app"></div></main>
 <script>
 /* ============================================================
    מצב הדגמה — נכנס אך ורק דרך ?demo=1 בכתובת.
@@ -1080,7 +1085,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="q12 · 2026-09-27";
+var BUILD="q13 · 2026-09-30";
 var SKEY="geography-state-v1";
 var GKEY_STORE="geography-gkey";
 
@@ -4186,7 +4191,7 @@ function viewSit(){
   }
   if(SIT.phase==="ask"){
     var q=SIT.qs[SIT.i];
-    var h2='<main class="wrap" style="padding-block:18px">';
+    var h2='<div class="wrap" style="padding-block:18px">';
     h2+='<div class="spread"><div class="row">'+
         '<span class="chip area '+topicCls(q.topic)+'">'+esc(q.topicName)+'</span>'+
         '<span class="chip">'+esc(xf("stQn",SIT.i+1,SIT.qs.length))+'</span>'+
@@ -4217,7 +4222,7 @@ function viewSit(){
         esc(SIT.flags[SIT.i]?xt("stFlagged"):xt("stFlag"))+'</button>'+
         (cur>=0?'<button class="btn btn-g" data-a="sitfwd">'+esc(xt("stNext"))+' '+ic("arrow",16)+'</button>':"")+
         '</div>';
-    h2+='</div></main>';
+    h2+='</div></div>';
     return h2;
   }
   if(SIT.phase==="review"){
@@ -4870,7 +4875,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=q12-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=q13-pwa1").catch(function(){});
   });
 }
 </script>
