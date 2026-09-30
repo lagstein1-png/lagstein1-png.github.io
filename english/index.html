@@ -1167,7 +1167,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n157 · 2026-09-30";
+var BUILD="n158 · 2026-09-30";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3836,10 +3836,35 @@ if(BGON)try{var bo=JSON.parse(localStorage.getItem(BGKEY)||'null');if(bo){BG.cor
 function bgSave(){if(BGON)try{localStorage.setItem(BGKEY,JSON.stringify({correct:BG.correct,total:BG.total,drafts:BG.drafts}))}catch(e){}}
 function bgT(k){return (BGT[state.lang]||BGT.he)[k]||BGT.en[k]||k}
 function bgMods(){return BG.unit===3?['a','b','c']:BG.unit===4?['c','d','e']:['e','f','g']}
+/* השרת של המורה חותך כל שדה הקשר ל-400 תווים (tutor-api/worker.js,
+   LIM.ctx) — באמצע מילה, ובלי לדעת מה חשוב. כאן חותכים לפני, בגבול
+   משפט, מתחת ל-400. משפט ראשון ארוך מהתקרה נחתך בגבול מילה עם ״…״. */
+function tutorCut(t,max){t=String(t||"").replace(/\s+/g," ").trim();max=max||380;if(t.length<=max)return t;
+  var s=t.match(/[^.!?]+[.!?]+["״”'’)]*\s*/g)||[],o="";
+  for(var i=0;i<s.length;i++){if((o+s[i]).trim().length>max)break;o+=s[i]}
+  o=o.trim();if(!o){o=t.slice(0,max-1);var k=o.lastIndexOf(" ");if(k>max*0.6)o=o.slice(0,k);o+="…"}
+  return o}
+/* בגרות: השאלה קודם — היא מה שהתלמיד שואל עליו — ואחריה המשפטים
+   מהקטע שבהם נמצאת התשובה. הקטע (709–1,031 תווים) הוא פסקה אחת,
+   ולכן ״הפסקה של התשובה״ היא המשפט שהכי קרוב לתשובה ולהסבר שלה
+   (מילים משותפות), והשכנים שלו כל עוד יש מקום. */
+function bgTutorText(bp,bq){
+  var S=String(bp.text||"").match(/[^.!?]+[.!?]+["”'’)]*\s*/g)||[bp.text||""];
+  var key={};(String(bq.a||"")+" "+String(bq.why||"")).toLowerCase().replace(/[^a-z0-9' ]/g," ").split(/\s+/).forEach(function(w){if(w.length>2)key[w]=1});
+  var best=0,top=-1;S.forEach(function(x,i){var n=0;x.toLowerCase().replace(/[^a-z0-9' ]/g," ").split(/\s+/).forEach(function(w){if(key[w])n++});if(n>top){top=n;best=i}});
+  var q=String(bq.q||"").trim(),room=380-q.length-3,lo=best,hi=best,out=S[best].trim();
+  if(out.length>room)return q+" — "+tutorCut(out,room);
+  for(var step=0;step<S.length;step++){
+    var grew=false;
+    if(hi+1<S.length&&(out+" "+S[hi+1].trim()).length<=room){hi++;out=out+" "+S[hi].trim();grew=true}
+    if(lo-1>=0&&(S[lo-1].trim()+" "+out).length<=room){lo--;out=S[lo].trim()+" "+out;grew=true}
+    if(!grew)break;
+  }
+  return q+" — "+out}
 function bgPass(){var pp=BGP.filter(function(p){return p.m===BG.module});return pp[BG.passage%pp.length]}
 function bgDraftKey(){return BG.prompt?BG.unit+':'+BG.prompt:BG.unit}
 function bgCount(){var s=(BG.drafts[bgDraftKey()]||'').trim();return s?s.split(/\s+/).length:0}
-function bgPage(){var h='<div class="wrap bgwrap"><section class="card bgcard"><h2>'+esc(bgT('title'))+'</h2><p>'+esc(bgT('intro'))+'</p><p>'+esc((BGL[state.lang]||BGL.en)[6])+'</p></section><h3>'+esc(bgT('path'))+'</h3><div class="bgrow">';
+function bgPage(){var h='<div class="wrap bgwrap">'+(window.TUTOR&&TUTOR.on()?'<div style="margin:12px 0"><button class="btn ghost" data-a="tutor">'+esc(TUTOR.label())+'</button></div>':'')+'<section class="card bgcard"><h2>'+esc(bgT('title'))+'</h2><p>'+esc(bgT('intro'))+'</p><p>'+esc((BGL[state.lang]||BGL.en)[6])+'</p></section><h3>'+esc(bgT('path'))+'</h3><div class="bgrow">';
 [3,4,5].forEach(function(u){h+='<button class="btn '+(BG.unit===u?'pri':'')+'" data-bg="unit" data-v="'+u+'" aria-pressed="'+(BG.unit===u)+'">'+esc(bgT('u'+u))+'</button>'});h+='</div><div class="bgrow">';
 bgMods().forEach(function(m){h+='<button class="btn '+(BG.module===m?'pri':'')+'" data-bg="module" data-v="'+m+'" aria-pressed="'+(BG.module===m)+'">Module '+m.toUpperCase()+'</button>'});h+='</div><p>'+esc(bgT('correct'))+': '+BG.correct+' '+esc(bgT('of'))+' '+BG.total+'</p>';
 var p=bgPass();if(p){var all=BGP.filter(function(item){return item.m===BG.module});h+='<section class="card bgcard"><h3>'+esc((BGL[state.lang]||BGL.en)[0])+'</h3><div class="bgrow">';all.forEach(function(item,i){h+='<button class="btn '+(i===BG.passage?'pri':'')+'" data-bg="passage" data-v="'+i+'" aria-pressed="'+(i===BG.passage)+'">'+(i+1)+'. '+esc(item.title)+'</button>'});h+='</div></section>';var q=p.questions[BG.q%p.questions.length],order=[2,0,3,1],shift=BG.q%4;
@@ -6082,7 +6107,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n157-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n158-pwa1").catch(function(){});
   });
 }
 </script>
@@ -6101,6 +6126,7 @@ if(window.TUTOR){
        בעברית ללומד ערבי, רוסי ואנגלי. `kotvim` עשתה את זה נכון. */
     lang:function(){return (typeof xlg==="function"&&xlg())||"he"},
     q:function(){
+      if(state.screen==="bagrut"){var bp=bgPass();if(!bp)return null;var bq=bp.questions[BG.q%bp.questions.length];return {expr:bgTutorText(bp,bq),ans:bq.a,topic:bp.title,level:"Module "+BG.module.toUpperCase()}}
       /* מיפוי אחד לשתי המשפחות. השדות נמדדו בדפדפן, ולא הועתקו
          מ-buildQ של בונה המבחן — שם הם אחרים.
          משפחת המתמטיקה: ask / expr / options[].ok
@@ -6131,6 +6157,7 @@ if(window.TUTOR){
   if(window.BARAK)BARAK.register({
     app:"english",
     getScreenContext:function(){
+      if(state.screen==="bagrut"){var bp=bgPass();if(!bp)return null;var bq=bp.questions[BG.q%bp.questions.length];return {id:"bg|"+BG.module+"|"+BG.passage+"|"+BG.q,type:BG.done?"reveal":"mcq",q:bgTutorText(bp,bq),options:[bq.a].concat(bq.w),correct:bq.a,student:BG.done&&BG.choice?bq.w[BG.choice-1]:null,topic:bp.title,level:"Module "+BG.module.toUpperCase(),curriculum:"English bagrut"}}
       var q=(typeof P!=="undefined")?P.q:null;
       if(!q||view||state.screen!=="prac"||P.sum)return null;
       var tp=topicOf(state.topic); if(!tp)return null;

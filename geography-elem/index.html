@@ -2444,7 +2444,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="w118 · 2026-09-30";
+var BUILD="w119 · 2026-09-30";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4502,6 +4502,22 @@ function wrapMain(h){return '<main id="main" tabindex="-1">'+(h||"")+'</main>'}
    יצאו שונות בין המורה לתלמיד, ושני המסכים היו תקינים.
    הפירוט ב-`tutor/josh-state.js`. */
 var JS_OFF={sit:1,exam:1,marks:1,badexam:1,oldexam:1};
+/* השרת של המורה חותך כל שדה הקשר ל-400 תווים (tutor-api/worker.js,
+   LIM.ctx) — באמצע מילה, ובלי לדעת מה חשוב. כאן חותכים לפני, בגבול
+   משפט, מתחת ל-400. משפט ראשון ארוך מהתקרה נחתך בגבול מילה עם ״…״. */
+function tutorCut(t,max){t=String(t||"").replace(/\s+/g," ").trim();max=max||380;if(t.length<=max)return t;
+  var s=t.match(/[^.!?]+[.!?]+["״”'’)]*\s*/g)||[],o="";
+  for(var i=0;i<s.length;i++){if((o+s[i]).trim().length>max)break;o+=s[i]}
+  o=o.trim();if(!o){o=t.slice(0,max-1);var k=o.lastIndexOf(" ");if(k>max*0.6)o=o.slice(0,k);o+="…"}
+  return o}
+function lessonTutorButton(){return window.TUTOR&&TUTOR.on()?'<div class="wrap" style="margin:12px auto;max-width:820px"><button class="btn" data-a="tutor">'+esc(TUTOR.label())+'</button></div>':""}
+function lessonTutorContext(){
+  var e=document.querySelector('#main .card');if(!e)return null;
+  var c=e.cloneNode(true);[].slice.call(c.querySelectorAll('button,script,style,[hidden],.hintxt')).forEach(function(x){x.remove()});
+  [].slice.call(c.querySelectorAll('p,h1,h2,h3,li,div')).forEach(function(x){x.appendChild(document.createTextNode(' '))});
+  var text=c.textContent.replace(/\s+/g,' ').trim();
+  return {expr:tutorCut(text,380),ans:null,topic:(document.querySelector('#main h1')||{}).textContent||null,level:null};
+}
 function render(){ try{lgChrome()}catch(e){}
   var html="";
   lvlSync();
@@ -4517,6 +4533,7 @@ function render(){ try{lgChrome()}catch(e){}
   if(view==="onboarding")html=wrapMain(onboarding());
   else{
     html=header()+'<main id="main" tabindex="-1">';
+    if(view==="lesson")html+=lessonTutorButton();
     if(view==="units")html+=unitsView();
     else if(view==="lesson"&&GEO1_ON)html+=geo1LessonView();
     else if(view==="lesson"&&GEO2_ON)html+=geo2LessonView();
@@ -4724,7 +4741,7 @@ function onAction(a,el){
     if(P.hints===2&&q.expr)P.visual=true;
     setBubble(hint,"think");speak(hint);render();
   }
-  else if(a==="tutor"){ if(P.phase!=="ask")return; stopSpeak(); TUTOR.open(); }
+  else if(a==="tutor"){ if(view!=="lesson"&&P.phase!=="ask")return; stopSpeak(); TUTOR.open(); }
   else if(a==="slow"){
     var qsl=P.ses[P.qi];
     if(P.phase!=="ask"||!qsl)return;
@@ -5454,7 +5471,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=w118-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=w119-pwa1").catch(function(){});
   });
 }
 </script>
@@ -5473,6 +5490,7 @@ if(window.TUTOR){
     app:"geography-elem",
     lang:function(){return (state&&state.settings&&state.settings.lang)||"he"},
     q:function(){
+      if(view==="lesson")return lessonTutorContext();
       var x=P&&P.ses?P.ses[P.qi]:null;
       return x?{expr:x.expr,ans:x.answer,level:"רמה "+activeLevel()+" מתוך 6"}:null;
     },
@@ -5485,6 +5503,7 @@ if(window.TUTOR){
   if(window.BARAK)BARAK.register({
     app:"geography-elem",
     getScreenContext:function(){
+      if(view==="lesson"){var c=lessonTutorContext();return c?{id:location.search+"|"+c.expr,type:"lesson",q:c.expr,options:[],correct:null,topic:c.topic}:null}
       var q=P&&P.ses?P.ses[P.qi]:null;
       if(!q||view!=="practice"||P.phase==="done")return null;
       var t=T(),kind=tName({id:q.kind})||q.kind;

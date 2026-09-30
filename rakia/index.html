@@ -164,6 +164,7 @@ dl.gloss dd{margin:0}
   <button class="btn small" type="button" data-a="nav" data-v="form">מפה חדשה</button>
   <button class="btn small" type="button" data-a="nav" data-v="people">האנשים שלי</button>
   <button class="btn small" type="button" data-a="nav" data-v="learn">איך זה עובד</button>
+  <button class="btn small" type="button" data-a="limor" id="btn-limor-global" hidden></button>
   <button class="btn small" type="button" data-a="nav" data-v="settings" aria-label="נגישות והגדרות">נגישות</button>
 </header>
 <nav class="tabs" id="chart-tabs" role="tablist" aria-label="חלקי המפה" hidden>
@@ -333,7 +334,7 @@ dl.gloss dd{margin:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r25 · 2026-09-30";
+var BUILD="r26 · 2026-09-30";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -1069,7 +1070,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r25-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r26-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>
@@ -1083,6 +1084,7 @@ if(window.TUTOR){
     app:"rakia",
     lang:function(){return "he"},
     q:function(){
+      if(view!=="chart"){var e=document.querySelector('#main');if(!e)return null;var c=e.cloneNode(true);[].slice.call(c.querySelectorAll('button,input,select,textarea,[hidden],script,style,svg')).forEach(function(x){x.remove()});[].slice.call(c.querySelectorAll('p,h1,h2,h3,li,div')).forEach(function(x){x.appendChild(document.createTextNode(' '))});return {expr:c.textContent.replace(/\s+/g,' ').trim().slice(0,350),ans:null,topic:"אסטרולוגיה",level:null}}
       if(typeof current==="undefined"||!current||!current.chart)return null;
       var nm=current.who||"";
       var titles=[];
@@ -1094,6 +1096,7 @@ if(window.TUTOR){
   })){
     btnLi.textContent=TUTOR.label();
     btnLi.hidden=false;
+    var globalLi=document.getElementById("btn-limor-global");if(globalLi){globalLi.textContent=TUTOR.label();globalLi.hidden=false}
   }
   /* מנוע המורה - המתאם של האפליקציה. */
   var TUTORENG=window.BARAK||window.LIMOR;

@@ -1050,7 +1050,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="d7 · 2026-09-30";
+var BUILD="d8 · 2026-09-30";
 var SKEY="motal-state-v1";
 var GKEY_STORE="motal-gkey";
 
@@ -2258,7 +2258,8 @@ function screenPractice(){
     h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap;align-items:center">'+
        (state.challenge&&state.chSecs>0?'<span id="chtimer" style="font-weight:800;color:#b45309;min-width:2.6rem;font-size:1.1rem">'+state.chSecs+'</span>':"")+
        (P.hint||state.challenge?"":'<button class="btn ghost" data-a="hint">'+esc(t("hintB"))+"</button>")+
-       '<button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button></div>";
+       '<button class="btn ghost" data-a="dunno">'+esc(t("dunno"))+"</button>"+
+       (!state.challenge&&window.TUTOR&&TUTOR.on()?'<button class="btn ghost" data-a="tutor">'+esc(TUTOR.label())+"</button>":"")+"</div>";
     if(P.hint&&q.hint)h+='<div class="qhint" style="margin-top:.6rem">'+esc(q.hint)+"</div>";
   }
   h+="</div></div></div>"+fbar();
@@ -4088,6 +4089,7 @@ document.addEventListener("click",function(e){
   if(a==="chsec"){state.chSecs=parseInt(v,10)||0;save();newQuestion();return}
   if(a==="pick"){answer(parseInt(el.getAttribute("data-i"),10));return}
   if(a==="next"){newQuestion();return}
+  if(a==="tutor"){try{stopSpeak()}catch(e){}if(window.TUTOR)TUTOR.open();return}
   if(a==="hint"){
     /* רמז אינו טעות ואינו נספר ככזו. מי שנעזר בו עדיין עונה בעצמו. */
     if(!P.q||P.done)return;
@@ -4326,7 +4328,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=d7-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=d8-pwa1").catch(function(){});
   });
 }
 </script>
