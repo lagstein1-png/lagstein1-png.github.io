@@ -11,17 +11,17 @@
 | `history` | m156 · 2026-09-30 | m156-pwa1 | תואם |
 | `lomda` | l144 · 2026-09-30 | l144-pwa1 | תואם |
 | `kotvim` | k92 · 2026-09-30 | k92-pwa1 | תואם |
-| `science` | s137 · 2026-09-30 | s137-pwa1 | תואם |
-| `geography-elem` | w120 · 2026-09-30 | w120-pwa1 | תואם |
+| `science` | s138 · 2026-09-30 | s138-pwa1 | תואם |
+| `geography-elem` | w121 · 2026-09-30 | w121-pwa1 | תואם |
 | `reader` | — | 119-pwa1 | מפתח בלבד |
 | `rakia` | r27 · 2026-09-30 | r27-pwa1 | תואם |
 | `theory` | — | — | אינה בריפו הזה |
-| `civics` | c23 · 2026-09-30 | c23-pwa1 | תואם |
+| `civics` | c24 · 2026-09-30 | c24-pwa1 | תואם |
 | `hebrew` | i17 · 2026-09-30 | i17-pwa1 | תואם |
 | `english-bagrut` | — | — | אינה בריפו הזה |
-| `literature` | j15 · 2026-09-30 | j15-pwa1 | תואם |
-| `tanakh` | p16 · 2026-09-30 | p16-pwa1 | תואם |
-| `hebrew-arab` | y2 · 2026-09-30 | y2-pwa1 | תואם |
-| `motal` | d9 · 2026-09-30 | d9-pwa1 | תואם |
+| `literature` | j16 · 2026-09-30 | j16-pwa1 | תואם |
+| `tanakh` | p17 · 2026-09-30 | p17-pwa1 | תואם |
+| `hebrew-arab` | y3 · 2026-09-30 | y3-pwa1 | תואם |
+| `motal` | d10 · 2026-09-30 | d10-pwa1 | תואם |
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-09-30.

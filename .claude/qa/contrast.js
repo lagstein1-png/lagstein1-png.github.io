@@ -41,7 +41,12 @@ const { chromium } = require('./pw.js');
 const BASE = process.env.QA_BASE || 'http://127.0.0.1:8099';
 const APPS = process.argv.slice(2).length ? process.argv.slice(2) :
   ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'bagrut-806',
-   'ulpan', 'english', 'history', 'lomda', 'reader', 'kotvim', 'rakia', 'legal', '.'];
+   'ulpan', 'english', 'history', 'lomda', 'reader', 'kotvim', 'rakia', 'legal', '.',
+   /* 30.9.2026: תשע אפליקציות שלא נמדדו מעולם — 31 ממצאים כשנוספו
+      (civics, geography, hebrew-arab, literature, motal, tanakh, science,
+      geography-elem; electric נקייה). */
+   'civics', 'electric', 'geography', 'geography-elem', 'hebrew-arab',
+   'literature', 'motal', 'science', 'tanakh'];
 
 const SCAN = () => {
   /* --- WCAG 2.2 --- */

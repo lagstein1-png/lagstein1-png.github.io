@@ -69,6 +69,26 @@
 | O-103 | **ברק ב-`electric` — התפקיד בקוד, לא בשרת.** נוסף `ROLE["electric"]` ב-`tutor-api/worker.js`; עד פריסה (`deploy-tutor.yml`, ידני) השרת דוחה את האפליקציה ב-400 והלומד מקבל את המוח המקומי | זניח | `readBody` ב-`worker.js:871` | הרצת `deploy-tutor.yml` בפריסה הבאה |
 ## נסגר — עם ההוכחה
 
+### `contrast.js` מכסה עכשיו 24 דפים — 31 ממצאים שלא נמדדו מעולם, ו-civics שקישור הדילוג שלה לא הופיע · 30.9.2026
+
+**למה.** רשימת `APPS` ב-`contrast.js` כיסתה 15 דפים. תשע אפליקציות נוספו (civics, electric, geography, geography-elem,
+hebrew-arab, literature, motal, science, tanakh). ״32״ שנמסר קודם היה ספירת שורות עם שורת הסיכום — 31 ממצאים,
+27 בשבע ו-4 ב-science/geography-elem; electric נקייה.
+
+**האדום** (`contrast.js` עם הרשימה החדשה, לפני התיקון): `✗ 24 דפים × 2 מצבי צבע · 5580 אלמנטים … · 31 מתחת לסף`.
+**הירוק:** `✓ 24 דפים × 2 מצבי צבע · 5580 אלמנטים עם טקסט נמדדו · 412 לא רונדרו · 0 מתחת לסף`.
+
+- ירוק ההקראה `#0e9c8d` עם טקסט לבן (3.41:1) — `.skip:focus`, `.spk`, `.optspk`, `[data-a=read]` ⇒ `#0b7c71` (5.08:1, צבע המסגרת שלהם) בשש אפליקציות.
+- **civics — קישור הדילוג לא הופיע אף פעם:** `style` מוטבע דחף אותו מחוץ למסך גם בפוקוס (נמדד: x=11200 בפוקוס).
+  הוחלף בכללי `.skip`/`.skip:focus` של המשפחה; אחרי — x=1156, נראה.
+- `--c-talk` `#c2410c` על `--cs-talk` (4.28:1) ⇒ `#b43a0a` (4.89) בשש. kotvim נושאת אותו אסימון, לא נמדדה כנכשלת, לא נגעה.
+- כרטיס ״מבנה הבגרות״ עם רקע קבוע `#fff5db` וטקסט של הערכה הכהה (1.08:1) ⇒ `var(--gold-soft)`; הקישור שבתוכו
+  (כחול ברירת מחדל, 1.55:1 על הרקע הכהה החדש) ⇒ `.gcard a{color:var(--accent)}`.
+- שבב ״לשיעור״ ב-science/geography-elem, `var(--teal)` עם לבן (3.41 / 1.71) ⇒ `var(--teal-deep)` + `var(--teal-ink)` — 4.80–13.56 בשבע הערכות.
+
+smoke נקי בתשע, `visible`, `clicks`, `langbtn`, `barak-browser` ירוקים. המפתחות: civics c24, geography q15, geography-elem w121,
+hebrew-arab y3, literature j16, motal d10, science s138, tanakh p17 (electric לא השתנתה). ארבעה דוחות תוכן — `sig`/תאריך בלבד.
+
 ### `main` אדום על `keyboard`, `contrast`, `voice` — תיקון רוחבי, 26 מפתחות · 30.9.2026
 
 **מקור.** qa ריצה 1124 על `6b9b2b2`: 5 מתוך 77 (`wix`, `media`, `keyboard`, `contrast`, `voice`). `wix` נסגר ב-`90d4f8e`.
@@ -87,8 +107,7 @@
    - ulpan: כרטיס עם רקע קבוע `#eef4ff` וטקסט של הערכה הכהה (1.06:1) ⇒ `var(--surface2)`.
    - reader: `#0b1017` קבוע על `--accent` שבבהיר כחול כהה (3.01:1) ⇒ `--on-accent` (כהה בכהה, לבן בבהיר), בשלושה מקומות.
 
-**נשאר.** `media` (הקלטות מסך — נוצרות בדפדפן). בשבע האפליקציות שמחוץ לרשימת `contrast.js` יש 32 ממצאים
-ישנים (a.skip, spk, tpill, כרטיס ״מבנה הבגרות״ בכהה) — לא נמדדו מעולם; `contrast.js` אינו מכסה אותן.
+**נשאר.** `media` (הקלטות מסך — נוצרות בדפדפן). הממצאים שמחוץ לרשימת `contrast.js` נסגרו ברשומה שמעל.
 
 **המפתחות.** `/tutor/tutor.js` ⇒ כל 26 (`cache.js`: 0 ממצאים): שורש 147, reader 119, bagrut-806 x111, bagrut-history h114,
 barak f7, civics c23, electric e27, english n159, geography q14, geography-elem w120, hebrew-arab y2, history m156, kotvim k92,
