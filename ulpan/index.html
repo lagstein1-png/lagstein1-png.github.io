@@ -844,7 +844,7 @@ T.he={
   qMean:"מה המשמעות?", qHear:"איזו מילה שמעתם?", qGap:"מה חסר במשפט?",
   qOrder:"סדרו את המשפט", qSay:"איך אומרים את זה בעברית?", qRead:"לפי הקטע:",
   qUse:"איזה משפט מתאים למצב?",
-  hear:"השמיעו", hearSlow:"לאט",stopB:"עצירה", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט",
+  hear:"השמיעו", hearSlow:"לאט",stopB:"עצירה", hearWord:"השמיעו את המילה", hearSent:"השמיעו את המשפט", hearOpt:"השמיעו את התשובה",
   check:"בדקו", next:"הבא", again:"שוב", dunno:"לא יודע/ת", showAll:"הראו הכול",
   hintB:"רמז",
   hintMean:"חשבו באיזה מצב שומעים את המילה הזאת.",
@@ -913,7 +913,7 @@ T.ar={
   qMean:"ما المعنى؟", qHear:"أي كلمة سمعت؟", qGap:"ما الناقص في الجملة؟",
   qOrder:"رتّب الجملة", qSay:"كيف تقول ذلك بالعبرية؟", qRead:"حسب النص:",
   qUse:"أي جملة تناسب الموقف؟",
-  hear:"استمع", hearSlow:"ببطء",stopB:"إيقاف", hearWord:"استمع للكلمة", hearSent:"استمع للجملة",
+  hear:"استمع", hearSlow:"ببطء",stopB:"إيقاف", hearWord:"استمع للكلمة", hearSent:"استمع للجملة", hearOpt:"استمع للإجابة",
   check:"تحقّق", next:"التالي", again:"مرة أخرى", dunno:"لا أعرف", showAll:"أظهر الكل",
   hintB:"تلميح",
   hintMean:"فكّروا في أي موقف تُسمع هذه الكلمة.",
@@ -982,7 +982,7 @@ T.ru={
   qMean:"Что это значит?", qHear:"Какое слово вы услышали?", qGap:"Чего не хватает во фразе?",
   qOrder:"Соберите предложение", qSay:"Как сказать это на иврите?", qRead:"По тексту:",
   qUse:"Какая фраза подходит к ситуации?",
-  hear:"Послушать", hearSlow:"Медленно",stopB:"Стоп", hearWord:"Послушать слово", hearSent:"Послушать фразу",
+  hear:"Послушать", hearSlow:"Медленно",stopB:"Стоп", hearWord:"Послушать слово", hearSent:"Послушать фразу", hearOpt:"Послушать ответ",
   check:"Проверить", next:"Дальше", again:"Ещё раз", dunno:"Не знаю", showAll:"Показать всё",
   hintB:"Подсказка",
   hintMean:"Подумайте, в какой ситуации звучит это слово.",
@@ -1051,7 +1051,7 @@ T.en={
   qMean:"What does it mean?", qHear:"Which word did you hear?", qGap:"What is missing?",
   qOrder:"Put the sentence in order", qSay:"How do you say this in Hebrew?", qRead:"According to the passage:",
   qUse:"Which sentence fits the situation?",
-  hear:"Play", hearSlow:"Slowly",stopB:"Stop", hearWord:"Play the word", hearSent:"Play the sentence",
+  hear:"Play", hearSlow:"Slowly",stopB:"Stop", hearWord:"Play the word", hearSent:"Play the sentence", hearOpt:"Play the answer",
   check:"Check", next:"Next", again:"Again", dunno:"I don't know", showAll:"Show all",
   hintB:"Hint",
   hintMean:"Think about when you would hear this word.",
@@ -1153,7 +1153,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a118 · 2026-09-29";
+var BUILD="a119 · 2026-09-30";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -3758,6 +3758,11 @@ function screenPractice(){
   }
   else { /* back · use */
     h+='<p class="qtext">'+esc(q.lead||"")+"</p>";
+    /* הקראה למסך השאלה גם בצורות back/use (מסלולי היכרות ובנק נשארו בלי) —
+       מוקרא ה-lead המוצג, לעולם לא התשובה. ב-order לא מקריאים: ספוילר. */
+    var sa=sayAsk(q);
+    if(sa.t)h+='<div style="display:flex;gap:.4rem;justify-content:flex-end">'+
+      spkBtn(sa.t,sa.lg,false,t("hearSent"))+spkBtn(sa.t,sa.lg,true,t("hearSlow"))+spkStop()+"</div>";
   }
 
   if(q.type!=="order"){
@@ -3769,8 +3774,11 @@ function screenPractice(){
         else if(i===P.picked)cls+=" bad";
         else cls+=" dim";
       }
-      h+='<button class="'+cls+'" data-a="pick" data-i="'+i+'"'+(P.done?" disabled":"")+'>'+
-        '<span class="k">'+String.fromCharCode(65+i)+"</span><span>"+o.h+"</span></button>";
+      var oTxt=plainOf(o.h), oLg=/[\u0590-\u05FF]/.test(oTxt)?LEARN:state.lang;
+      h+='<div class="orow"><button class="'+cls+'" data-a="pick" data-i="'+i+'"'+(P.done?" disabled":"")+'>'+
+        '<span class="k">'+String.fromCharCode(65+i)+"</span><span>"+o.h+"</span></button>"+
+        '<button class="optspk" data-a="say" data-say="'+esc(oTxt)+'" data-lang="'+oLg+
+        '" aria-label="'+esc(t("hearOpt"))+'">'+ic("speaker",15)+"</button></div>";
     });
     h+="</div>";
   }
@@ -5644,7 +5652,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a118-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a119-pwa1").catch(function(){});
   });
 }
 </script>
