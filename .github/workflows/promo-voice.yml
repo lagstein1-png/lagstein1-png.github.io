@@ -1,4 +1,4 @@
-# קריינות חד-פעמית לסרטון הפרסומי (הוזמן דרך Main ב-30.9.2026).
+# קריינות חד-פעמית לסרטון הפרסומי (הוזמן דרך Main ב-30.9.2026; הפרומפט עודכן לאנגלית באותו יום אחרי שהתמליל העברי בוטל).
 # מקליט תמליל חופשי בקול אחד (ברירת מחדל Gacrux) ודוחף WAV ל-promo/.
 # כישלון (429 וכדומה): היומן נדחף ל-.claude/qa/last-promo.log כדי
 # שאפשר יהיה לראות למה בלי גישה ללוגים של Actions.
@@ -50,7 +50,7 @@ jobs:
           if (!KEY) { console.error('חסר GEMINI_API_KEY'); process.exit(1); }
           if (!TEXT.trim()) { console.error('תמליל ריק'); process.exit(1); }
           (async () => {
-            const prompt = 'הקראי בקול קריינית נשית בוגרת וחמה, בעברית ישראלית טבעית, בקצב שיחה ברור ורגוע, עם השהיה קצרה בין כל פסקה לפסקה. בלי מוזיקה, בלי אפקטים, רק דיבור נקי. הקראי בדיוק את הטקסט הבא כפי שהוא כתוב, מילה במילה:\n\n' + TEXT;
+            const prompt = 'Warm mature female narrator. Natural conversational English, clear articulation, moderate pace, short pauses between paragraphs. No Hebrew accent direction. No music. Read the following text exactly as written, word for word:\n\n' + TEXT;
             let pcm = null, rate = 24000;
             for (let attempt = 0; attempt < 2 && !pcm; attempt++) {
               const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + MODEL + ':generateContent?key=' + encodeURIComponent(KEY), {
