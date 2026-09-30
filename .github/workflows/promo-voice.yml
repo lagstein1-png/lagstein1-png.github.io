@@ -1,0 +1,106 @@
+# קריינות חד-פעמית לסרטון הפרסומי (הוזמן דרך Main ב-30.9.2026).
+# מקליט תמליל חופשי בקול אחד (ברירת מחדל Gacrux) ודוחף WAV ל-promo/.
+# כישלון (429 וכדומה): היומן נדחף ל-.claude/qa/last-promo.log כדי
+# שאפשר יהיה לראות למה בלי גישה ללוגים של Actions.
+
+name: promo-voice
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: 'התמליל להקלטה (פסקאות מופרדות בשורה ריקה)'
+        required: true
+      voice:
+        description: 'קול'
+        required: true
+        default: 'Gacrux'
+      outfile:
+        description: 'נתיב ה-WAV בריפו'
+        required: true
+        default: 'promo/bekol-promo-he.wav'
+
+permissions:
+  contents: write
+
+jobs:
+  promo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: מקליט את התמליל
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TEXT: ${{ github.event.inputs.text }}
+          VOICE: ${{ github.event.inputs.voice }}
+          OUTFILE: ${{ github.event.inputs.outfile }}
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const KEY = process.env.GEMINI_API_KEY;
+          const TEXT = process.env.TEXT || '';
+          const VOICE = process.env.VOICE || 'Gacrux';
+          const OUT = process.env.OUTFILE || 'promo/bekol-promo-he.wav';
+          const MODEL = 'gemini-2.5-flash-preview-tts';
+          if (!KEY) { console.error('חסר GEMINI_API_KEY'); process.exit(1); }
+          if (!TEXT.trim()) { console.error('תמליל ריק'); process.exit(1); }
+          (async () => {
+            const prompt = 'הקראי בקול קריינית נשית בוגרת וחמה, בעברית ישראלית טבעית, בקצב שיחה ברור ורגוע, עם השהיה קצרה בין כל פסקה לפסקה. בלי מוזיקה, בלי אפקטים, רק דיבור נקי. הקראי בדיוק את הטקסט הבא כפי שהוא כתוב, מילה במילה:\n\n' + TEXT;
+            let pcm = null, rate = 24000;
+            for (let attempt = 0; attempt < 2 && !pcm; attempt++) {
+              const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + MODEL + ':generateContent?key=' + encodeURIComponent(KEY), {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }],
+                  generationConfig: { responseModalities: ['AUDIO'],
+                    speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: VOICE } } } } })
+              });
+              if (!r.ok) { const b = await r.text(); console.error('HTTP ' + r.status + ' ' + b.replace(/\s+/g,' ').slice(0,300)); process.exit(2); }
+              const j = await r.json();
+              const parts = (((j.candidates || [])[0] || {}).content || {}).parts || [];
+              const inline = parts.map(p => p.inlineData).filter(Boolean)[0];
+              if (!inline || !inline.data) { console.error('תשובה בלי אודיו, ניסיון ' + (attempt + 1)); continue; }
+              rate = Number((/rate=(\d+)/.exec(inline.mimeType || '') || [])[1]) || 24000;
+              pcm = Buffer.from(inline.data, 'base64');
+            }
+            if (!pcm) { console.error('נכשל אחרי שני ניסיונות'); process.exit(2); }
+            const hdr = Buffer.alloc(44);
+            hdr.write('RIFF', 0); hdr.writeUInt32LE(36 + pcm.length, 4); hdr.write('WAVEfmt ', 8);
+            hdr.writeUInt32LE(16, 16); hdr.writeUInt16LE(1, 20); hdr.writeUInt16LE(1, 22);
+            hdr.writeUInt32LE(rate, 24); hdr.writeUInt32LE(rate * 2, 28); hdr.writeUInt16LE(2, 32);
+            hdr.writeUInt16LE(16, 34); hdr.write('data', 36); hdr.writeUInt32LE(pcm.length, 40);
+            fs.mkdirSync(require('path').dirname(OUT), { recursive: true });
+            fs.writeFileSync(OUT, Buffer.concat([hdr, pcm]));
+            console.log('OK ' + OUT + ' · ' + pcm.length + ' bytes PCM · ' + rate + 'Hz · ~' + Math.round(pcm.length / rate / 2) + 's');
+          })().catch(e => { console.error(e.message); process.exit(1); });
+          NODE
+      - name: דוחף את ה-WAV
+        id: push
+        if: success()
+        run: |
+          set -euo pipefail
+          OUT="${{ github.event.inputs.outfile }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f "$OUT"
+          if git diff --cached --quiet; then echo "אין שינוי."; exit 0; fi
+          git commit -q -m "קריינות פרסומית: $OUT בקול ${{ github.event.inputs.voice }} (promo-voice.yml)"
+          git pull --rebase -q origin main || true
+          git push origin HEAD:main
+          echo "pushed=1" >> "$GITHUB_OUTPUT"
+      - name: שומר יומן כישלון
+        if: failure()
+        run: |
+          set -euo pipefail
+          echo "promo-voice נכשל. בדקו את לוג הצעד 'מקליט את התמליל' (שורת HTTP/שגיאה מודפסת שם)." > .claude/qa/last-promo.log
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f .claude/qa/last-promo.log
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -q -m "יומן קריינות פרסומית: כישלון (promo-voice.yml)"
+          git pull --rebase -q origin main || true
+          git push origin HEAD:main
