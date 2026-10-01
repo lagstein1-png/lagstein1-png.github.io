@@ -50,6 +50,9 @@ const SUITE = [
      באדום לתמיד. מריצים אותו ביד, כמתואר ב-README. */
   { id: 'stage',    args: [] },
   { id: 'status',   args: ['--check'] },
+  /* sitemap.xml נגזר מ-stages.json, מ-noindex שבדף ומ-git (lastmod).
+     נכתב ביד עד 1.10.2026, ו-motal חסרה בו יומיים. */
+  { id: 'sitemap',  args: ['--check'] },
   { id: 'wix',      args: ['--check'] },
   { id: 'banks',    args: [] },
   /* התוכן של ״כותבים ביחד״. content.js אינו סורק אותה — כל תשע

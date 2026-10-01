@@ -8,6 +8,10 @@
 <meta property="og:type" content="website" />
 <meta property="og:title" content="הורוסקופ — מפת לידה בעברית פשוטה" />
 <meta property="og:description" content="מפת לידה מחושבת במכשיר, בלי שרת ובלי הרשמה. הסברים קצרים בעברית פשוטה, עם הקראה." />
+<!-- noindex — 1.10.2026, הכרעת הבעלים: מפת לידה היא אפליקציה אישית ולא
+     אפליקציית לימוד, ואינה מתפרסמת בחיפוש תחת המותג החינוכי. הכרטיס
+     בדף הבית נשאר. sitemap.js קורא את התגית הזאת ומשאיר אותה מחוץ למפה. -->
+<meta name="robots" content="noindex" />
 <link rel="canonical" href="https://bekol.co.il/rakia/" />
 <meta property="og:url" content="https://bekol.co.il/rakia/" />
 <meta property="og:image" content="https://bekol.co.il/rakia/img/og.png" />
@@ -334,7 +338,7 @@ dl.gloss dd{margin:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r27 · 2026-09-30";
+var BUILD="r28 · 2026-10-01";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -1070,7 +1074,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r27-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r28-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>

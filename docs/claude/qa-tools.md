@@ -59,6 +59,7 @@
     node .claude/qa/keyboard.js              # הפאנל של ברק כשהמקלדת פתוחה — visualViewport מזויף, 360/412, עברית וערבית, חזקות, אופליין
     node .claude/qa/apps.js              # שבעת המקומות שאפליקציה חדשה נוגעת בהם — האם כולם עודכנו
     node .claude/qa/status.js --check    # STATUS.md מול המדידה — הטבלה לא נכתבת ביד
+    node .claude/qa/sitemap.js --check   # sitemap.xml מול stages.json, noindex ו-git (המחולל: אותו קובץ בלי --check)
     node .claude/qa/pure.js              # המבחן הכיתתי: כל קריאה ל-buildQuestion מתוך buildQ מעבירה pure=true
     node .claude/qa/i18n.js              # האוניברסיטה — כל _("…") מפתח ב-TR_KEYS, וכל מפתח מתורגם
     node .claude/qa/agents.js            # סוכן אינו קורא לסוכן — אין כלי סוכנים בשורת tools ואין הבטחה כזאת
