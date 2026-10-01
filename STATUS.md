@@ -22,6 +22,6 @@
 | `literature` | j18 · 2026-10-01 | j18-pwa1 | תואם |
 | `tanakh` | p19 · 2026-10-01 | p19-pwa1 | תואם |
 | `hebrew-arab` | y5 · 2026-10-01 | y5-pwa1 | תואם |
-| `motal` | d12 · 2026-10-01 | d12-pwa1 | תואם |
+| `motal` | d13 · 2026-10-01 | d13-pwa1 | תואם |
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-10-01.
