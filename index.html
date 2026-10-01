@@ -576,9 +576,12 @@ a:focus-visible,button:focus-visible,input:focus-visible{
 </main>
 
 <!-- שכבת הפנים של ג׳וש. תצוגה בלבד, בלי רשת ובלי הקראה — ראו
-     ההערה שליד section#josh למעלה. חייבת להיטען לפני הסקריפט
-     הבא, מפני ש-paint() קורא ל-JOSHFACE. -->
-<script src="/tutor/josh-face.js"></script>
+     ההערה שליד section#josh למעלה.
+     **defer, מ-1.10.2026.** כשהייתה חוסמת, הדפדפן צייר את הדף לפני
+     שהגיע אליה — סרגל עליון ריק בגובה 77px שקפץ ל-165px אחרי paint(),
+     והזיז את כל הדף (CLS 0.99 ב-390px). עכשיו paint() רץ לפני הציור
+     הראשון, והפנים נכנסות ב-DOMContentLoaded דרך mountFace(). -->
+<script defer src="/tutor/josh-face.js"></script>
 
 <script>
 /* ============================================================
@@ -1104,11 +1107,7 @@ function paint(){
   $("#joshT").textContent=S.joshT;
   $("#joshLead").textContent=S.joshLead;
   $("#joshNote").textContent=S.joshNote;
-  if(typeof JOSHFACE!=="undefined"){
-    JOSHFACE.photo("/img/limor.jpg", {ax:"47%",ay:"27.5%",bx:"64%",by:"29.2%",jx:"54.5%",jy:"42%",jo:"37%",jw:"17%",jh:"5.5%"});
-    var jf=$("#joshFace");
-    if(jf&&!jf.firstChild){ jf.innerHTML=JOSHFACE.markup(120); JOSHFACE.attach(jf.firstChild) }
-  }
+  mountFace();
   $("#aboutT").textContent=S.aboutT;
   $("#aboutP").textContent=S.about;
   $("#teachersT").textContent=S.teachersT;
@@ -1145,6 +1144,15 @@ $("#install").addEventListener("click",function(){
   var L=window.LEGAL; if(L&&L.install)L.install();
   showInstall();
 });
+
+function mountFace(){
+  if(typeof JOSHFACE==="undefined")return;
+  JOSHFACE.photo("/img/limor.jpg", {ax:"47%",ay:"27.5%",bx:"64%",by:"29.2%",jx:"54.5%",jy:"42%",jo:"37%",jw:"17%",jh:"5.5%"});
+  var jf=$("#joshFace");
+  if(jf&&!jf.firstChild){ jf.innerHTML=JOSHFACE.markup(120); JOSHFACE.attach(jf.firstChild) }
+}
+/* josh-face.js נטען ב-defer, ולכן ב-paint() הראשון הוא עוד לא כאן. */
+document.addEventListener("DOMContentLoaded",mountFace);
 
 function boot(){
   document.addEventListener("click",function(e){
@@ -1184,7 +1192,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=148-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=149-pwa1").catch(function(){});
   });
 }
 </script>
