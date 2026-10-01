@@ -452,6 +452,16 @@ textarea.field{min-height:96px;resize:vertical}
 .hlang{display:flex;gap:4px;flex:none;align-items:center;flex-wrap:wrap}
 .hlang button{border:1px solid #d4dbe7;background:transparent;color:inherit;border-radius:10px;padding:3px 9px;font:inherit;font-size:.82rem;cursor:pointer;min-height:36px}
 .hlang button.on{border-color:#2f5fd8;color:#fff;background:#2f5fd8;font-weight:700}
+
+/* ---------- יעדי מגע ≥44px — 1.10.2026 ----------
+   נמדד בדפדפן ב-390px וב-360px, בדף הפתיחה ובשני צעדי לחיצה ממנו.
+   הבלוק אחרון ב-style כדי לגבור על ההגדרות שמעליו. מגדילים בריפוד
+   ובגובה מינימלי, לא בגובה קשיח — ערבית ורוסית ארוכות יותר. */
+.hlang button{min-height:44px;padding-block:6px}
+input[type=range]{min-height:44px}
+.spk.sm{min-width:44px;min-height:44px}
+.lvl{min-width:44px}
+a[href*="education.gov.il"]{display:inline-flex;align-items:center;min-height:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1052,7 +1062,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="d10 · 2026-09-30";
+var BUILD="d11 · 2026-10-01";
 var SKEY="motal-state-v1";
 var GKEY_STORE="motal-gkey";
 
@@ -2496,7 +2506,7 @@ function screenSet(){
   h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
      esc(t("setLang"))+"</h3><div class=\"lvls\">";
   Object.keys(LANGS).forEach(function(k){
-    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'" lang="'+k+'" dir="'+LANGS[k].dir+'"'+
+    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'" lang="'+k+'" dir="'+LANGS[k].dir+'">'+
       esc(LANGS[k].name)+"</button>";
   });
   h+='<p style="color:var(--muted);font-size:.85rem;margin:.4rem 0 0">'+esc(t("setLangD"))+"</p>";
@@ -4330,7 +4340,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=d10-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=d11-pwa1").catch(function(){});
   });
 }
 </script>

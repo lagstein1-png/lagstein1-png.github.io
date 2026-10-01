@@ -489,6 +489,15 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 .bgvocab{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.55rem}.bgword{display:flex;justify-content:space-between;gap:.4rem;align-items:center;min-height:48px;padding:.6rem;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}.bgword b{font-family:var(--en)}
 #bgdraft{box-sizing:border-box;display:block;width:100%;padding:.8rem;margin-top:.6rem;border:2px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);font:1rem/1.7 var(--en);resize:vertical}
 @media(max-width:540px){.bgoptions{grid-template-columns:1fr}.bgwrap{padding-inline:.75rem}.bgcard{padding:1rem}}
+
+/* ---------- יעדי מגע ≥44px — 1.10.2026 ----------
+   נמדד בדפדפן ב-390px וב-360px, בדף הפתיחה ובשני צעדי לחיצה ממנו.
+   הבלוק אחרון ב-style כדי לגבור על ההגדרות שמעליו. מגדילים בריפוד
+   ובגובה מינימלי, לא בגובה קשיח — ערבית ורוסית ארוכות יותר. */
+.hlang button{min-height:44px;padding-block:6px}
+input[type=range]{min-height:44px}
+.spk.sm{min-width:44px;min-height:44px}
+.lvl{min-width:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1167,7 +1176,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n159 · 2026-09-30";
+var BUILD="n160 · 2026-10-01";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -6107,7 +6116,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n159-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n160-pwa1").catch(function(){});
   });
 }
 </script>

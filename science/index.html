@@ -611,6 +611,15 @@ button[data-a="lang"][lang="ar"]{font-family:var(--ar)}
 button[data-a="lang"][data-v="ru"],button[data-a="lang"][data-n="ru"],
 button[data-a="lang"][data-l="ru"],button[data-a="lang"][data-l="ru"] .fd,
 button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
+
+/* ---------- יעדי מגע ≥44px — 1.10.2026 ----------
+   נמדד בדפדפן ב-390px וב-360px, בדף הפתיחה ובשני צעדי לחיצה ממנו.
+   הבלוק אחרון ב-style כדי לגבור על ההגדרות שמעליו. מגדילים בריפוד
+   ובגובה מינימלי, לא בגובה קשיח — ערבית ורוסית ארוכות יותר. */
+input[type=range]{min-height:44px}
+.fbar a,a[href*="education.gov.il"]{display:inline-flex;align-items:center;min-height:44px}
+.card>a[href^="?lesson"]{display:flex;align-items:center;min-height:44px}
+a.chip{min-height:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -2454,7 +2463,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s139 · 2026-10-01";
+var BUILD="s140 · 2026-10-01";
 var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -6145,7 +6154,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s139-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s140-pwa1").catch(function(){});
   });
 }
 </script>

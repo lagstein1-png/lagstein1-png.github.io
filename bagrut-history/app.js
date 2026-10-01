@@ -14,7 +14,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "h114 · 2026-09-30";
+  var BUILD = "h115 · 2026-10-01";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -1480,7 +1480,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=h114-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=h115-pwa1").catch(function () {});
     });
   }
 

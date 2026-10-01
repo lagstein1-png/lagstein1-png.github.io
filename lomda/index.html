@@ -552,6 +552,15 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 .opts .orow .opt{flex:1 1 auto}
 .optspk{flex:0 0 auto;min-width:46px;min-height:46px;border:2px solid #0b7c71;border-radius:12px;background:#0e9c8d;color:#fff;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:8px 10px}
 .optspk:hover{background:#0b7c71}
+
+/* ---------- יעדי מגע ≥44px — 1.10.2026 ----------
+   נמדד בדפדפן ב-390px וב-360px, בדף הפתיחה ובשני צעדי לחיצה ממנו.
+   הבלוק אחרון ב-style כדי לגבור על ההגדרות שמעליו. מגדילים בריפוד
+   ובגובה מינימלי, לא בגובה קשיח — ערבית ורוסית ארוכות יותר. */
+.hlang button{min-height:44px;padding-block:6px}
+input[type=range]{min-height:44px}
+.spk.sm{min-width:44px;min-height:44px}
+.lvl{min-width:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1144,7 +1153,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l144 · 2026-09-30";
+var BUILD="l145 · 2026-10-01";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -4707,7 +4716,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l144-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l145-pwa1").catch(function(){});
   });
 }
 </script>

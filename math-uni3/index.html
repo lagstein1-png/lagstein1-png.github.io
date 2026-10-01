@@ -495,6 +495,13 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 @keyframes calmGlow{0%{box-shadow:0 0 0 0 rgba(180,140,40,0)}35%{box-shadow:0 0 26px 6px rgba(180,140,40,.45)}100%{box-shadow:0 0 0 0 rgba(180,140,40,0)}}
 .card.calm-glow{animation:calmGlow 2.6s ease-out 1}
 @media (prefers-reduced-motion:reduce){.card.calm-glow{animation:none}}
+
+/* ---------- יעדי מגע ≥44px — 1.10.2026 ----------
+   נמדד בדפדפן ב-390px וב-360px, בדף הפתיחה ובשני צעדי לחיצה ממנו.
+   הבלוק אחרון ב-style כדי לגבור על ההגדרות שמעליו. מגדילים בריפוד
+   ובגובה מינימלי, לא בגובה קשיח — ערבית ורוסית ארוכות יותר. */
+.hlang button{min-height:44px;padding-block:6px}
+input[type=range]{min-height:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -989,7 +996,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g159 · 2026-09-30";
+var BUILD="g160 · 2026-10-01";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -11940,7 +11947,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g159-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g160-pwa1").catch(function(){});
   });
 }
 </script>

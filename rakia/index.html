@@ -73,7 +73,7 @@ header.top h1 small{font-weight:500;color:var(--muted);font-size:.8rem;margin-in
 .tabs button, .btn{min-height:44px;padding:.45rem .95rem;border-radius:999px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font-weight:600}
 .tabs button[aria-selected="true"]{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
 .btn.primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
-.btn.small{min-height:38px;padding:.3rem .75rem;font-size:.9rem}
+.btn.small{min-height:44px;padding:.3rem .75rem;font-size:.9rem}
 .btn:disabled{opacity:.5;cursor:default}
 main{max-width:64rem;margin:0 auto;padding:1rem .8rem 3rem}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:1rem;margin-block-end:1rem}
@@ -110,7 +110,7 @@ tr.body:hover td{background:var(--soft)}
 .text-block:last-child{border-bottom:0}
 .text-block h4{margin:0 0 .3rem;font-size:1.05rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .text-block p{margin:0;font-size:1.02rem}
-.speak{min-height:38px;min-width:38px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);padding:.2rem .7rem;cursor:pointer;font-weight:600;font-size:.9rem}
+.speak{min-height:44px;min-width:44px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);padding:.2rem .7rem;cursor:pointer;font-weight:600;font-size:.9rem}
 .speak[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink)}
 .sheet-back{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;display:none}
 .sheet-back.on{display:block}
@@ -338,7 +338,7 @@ dl.gloss dd{margin:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r28 · 2026-10-01";
+var BUILD="r29 · 2026-10-01";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -928,7 +928,7 @@ function ttsFail(err){
   if(_ttsBar)return;
   var m=document.createElement("div"); m.setAttribute("role","alert"); m.dir="rtl";
   m.style.cssText="position:fixed;inset-inline:10px;bottom:10px;z-index:99999;background:#7f1d1d;color:#fff;padding:13px 15px;border-radius:12px;font:600 15px/1.55 system-ui,Arial,sans-serif;display:flex;gap:10px;align-items:flex-start";
-  m.innerHTML='<div style="flex:1">ההקראה נכשלה במכשיר הזה ('+esc(err||"לא ידוע")+'). אפשר לבדוק את הקול במסך הנגישות.</div><button type="button" style="min-height:40px;border:0;border-radius:8px;padding:0 12px;font:inherit;background:#fff;color:#7f1d1d">סגירה</button>';
+  m.innerHTML='<div style="flex:1">ההקראה נכשלה במכשיר הזה ('+esc(err||"לא ידוע")+'). אפשר לבדוק את הקול במסך הנגישות.</div><button type="button" style="min-height:44px;border:0;border-radius:8px;padding:0 12px;font:inherit;background:#fff;color:#7f1d1d">סגירה</button>';
   m.querySelector("button").onclick=ttsOK; document.body.appendChild(m); _ttsBar=m;
 }
 function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
@@ -1074,7 +1074,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r28-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r29-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>

@@ -458,6 +458,15 @@ textarea.field{min-height:96px;resize:vertical}
 .card.calm-glow{animation:calmGlow 2.6s ease-out 1}
 .calm-praise{text-align:center;font-weight:600;color:#7c5e10;margin:16px 0 0}
 @media (prefers-reduced-motion:reduce){.card.calm-glow{animation:none}}
+
+/* ---------- יעדי מגע ≥44px — 1.10.2026 ----------
+   נמדד בדפדפן ב-390px וב-360px, בדף הפתיחה ובשני צעדי לחיצה ממנו.
+   הבלוק אחרון ב-style כדי לגבור על ההגדרות שמעליו. מגדילים בריפוד
+   ובגובה מינימלי, לא בגובה קשיח — ערבית ורוסית ארוכות יותר. */
+.hlang button{min-height:44px;padding-block:6px}
+input[type=range]{min-height:44px}
+.spk.sm{min-width:44px;min-height:44px}
+.lvl{min-width:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1074,7 +1083,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="c24 · 2026-09-30";
+var BUILD="c25 · 2026-10-01";
 var SKEY="ezrach-state-v1";
 var GKEY_STORE="ezrach-gkey";
 
@@ -6065,7 +6074,7 @@ function screenSet(){
   h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
      esc(t("setLang"))+"</h3><div class=\"lvls\">";
   Object.keys(LANGS).forEach(function(k){
-    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'" lang="'+k+'" dir="'+LANGS[k].dir+'"'+
+    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'" lang="'+k+'" dir="'+LANGS[k].dir+'">'+
       esc(LANGS[k].name)+"</button>";
   });
   h+='<p class="sub" style="margin:.5rem 0 0;opacity:.85">'+esc(t("langNote"))+"</p></div></div>";
@@ -7887,7 +7896,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=c24-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=c25-pwa1").catch(function(){});
   });
 }
 </script>
