@@ -15,9 +15,12 @@
    1. דף הבית.
    2. כל אפליקציה ש-stages.json אומר עליה "public", בסדר של DATA.APPS
       בדף הבית — **חוץ מ:**
-      - `external` — אינה בריפו הזה (״תאוריה מדברת״, וכרטיס-הכינוי
-        english-bagrut). המפה של הריפו הנפרד באחריותו, וכתובתו נושאת
-        את המחרוזת ש-naming.js אוסר.
+      - `external` בלי כתובת משלה — כרטיס-הכינוי english-bagrut.
+        **external עם כתובת (״תאוריה מדברת״) — נכנסת**, בהכרעת הבעלים
+        1.10.2026 (״רוץ — תוסיף את תאוריה מדברת למפת האתר״). הכתובת
+        נלקחת משדה `u` בכרטיס שב-DATA.APPS — המופע החוקי היחיד של שם
+        הריפו — ולא נכתבת כאן. בלי lastmod: ההיסטוריה שלה בריפו הנפרד.
+        naming.js מתיר בדיוק את שורת ה-<loc> הזאת ב-sitemap.xml.
       - דף שיש בו <meta name="robots" content="noindex…"> — הדף עצמו
         הוא מקור האמת לשאלה אם לאנדקס אותו. כך יצאה rakia.
    3. EXTRA — דפים שאינם אפליקציה ומיועדים לציבור.
@@ -80,18 +83,27 @@ function homeOrder() {
   const home = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   const m = home.match(/var DATA=(\{"APPS".*?\});\s*\nvar APPS/s);
   if (!m) throw new Error('לא נמצא בלוק DATA ב-index.html');
-  return JSON.parse(m[1]).APPS.map(a => a.id);
+  return JSON.parse(m[1]).APPS;
 }
 
 const apps = STAGES.apps;
-const order = homeOrder();
+const CARDS = homeOrder();
+const order = CARDS.map(a => a.id);
+/* כתובת מפורשת מהכרטיס — רק כשהיא על הדומיין הזה. */
+const URL_OF = {};
+for (const a of CARDS) if (a.u && a.u.startsWith(SITE)) URL_OF[a.id] = a.u;
+const locOf = id => URL_OF[id] || SITE + (id ? id + '/' : '');
 /* public שאינה בדף הבית — בסוף, לפי stages.json, כדי שלא תיעלם בשקט. */
 const pub = order.concat(Object.keys(apps).filter(k => !order.includes(k)))
   .filter(id => apps[id] && apps[id].stage === 'public');
 const skipped = [];
 const ids = [''];
 for (const id of pub) {
-  if (apps[id].external) { skipped.push(`${id} — external (ריפו נפרד / כינוי)`); continue; }
+  if (apps[id].external) {
+    if (URL_OF[id]) ids.push(id);
+    else skipped.push(`${id} — external בלי כתובת משלה (כינוי)`);
+    continue;
+  }
   const src = page(id);
   if (!src) { skipped.push(`${id} — אין ${id}/index.html`); continue; }
   if (NOINDEX.test(src)) { skipped.push(`${id} — noindex בדף`); continue; }
@@ -109,8 +121,9 @@ function build() {
   (public), הסדר של DATA.APPS, ו-noindex בדף עצמו. lastmod = הקומיט
   האחרון שנגע בתיקייה.
 
-  **מה לא כאן, ובכוונה:** ״תאוריה מדברת״ יושבת בריפו נפרד, והכתובת
-  שלה נושאת את המחרוזת ש-naming.js אוסר. rakia — מפת לידה, לא
+  ״תאוריה מדברת״ יושבת בריפו נפרד ונכנסת לכאן בהכרעת הבעלים
+  (1.10.2026), בלי lastmod — ההיסטוריה שלה שם. **מה לא כאן, ובכוונה:**
+  rakia — מפת לידה, לא
   אפליקציית לימוד — נושאת noindex (הכרעת הבעלים 1.10.2026). אפליקציות
   מאחורי השער הפנימי — noindex, ואינן כאן. /voice/ חסום ב-robots.txt.
 -->
@@ -119,9 +132,8 @@ function build() {
   const body = ids.map(id => {
     const m = Object.assign({}, DEF, META[id] || {});
     return `  <url>
-    <loc>${SITE}${id ? id + '/' : ''}</loc>
-    <lastmod>${lastmod(id)}</lastmod>
-    <changefreq>${m.changefreq}</changefreq>
+    <loc>${locOf(id)}</loc>
+${URL_OF[id] ? '' : `    <lastmod>${lastmod(id)}</lastmod>\n`}    <changefreq>${m.changefreq}</changefreq>
     <priority>${m.priority}</priority>
   </url>
 `;
@@ -167,11 +179,11 @@ if (SHALLOW) {
   const strip = s => s.replace(/<lastmod>[^<]*<\/lastmod>/g, '<lastmod/>');
   want = strip(want); have = strip(have);
 }
-const wantLocs = ids.map(id => SITE + (id ? id + '/' : ''));
+const wantLocs = ids.map(locOf);
 for (const l of wantLocs) if (!locs.includes(l)) bad.push(`${l} — חסרה במפה`);
 for (const l of locs) if (!wantLocs.includes(l)) bad.push(`${l} — במפה, ואינה אמורה להיות`);
-if (!SHALLOW) for (const id of ids) {
-  const l = SITE + (id ? id + '/' : '');
+if (!SHALLOW) for (const id of ids.filter(i => !URL_OF[i])) {
+  const l = locOf(id);
   const blk = (cur.split('<url>').find(b => b.includes(`<loc>${l}</loc>`)) || '');
   const lm = (blk.match(/<lastmod>([^<]+)<\/lastmod>/) || [])[1];
   if (locs.includes(l) && lm !== lastmod(id)) bad.push(`${l} — lastmod ${lm || 'חסר'}, הקומיט האחרון ${lastmod(id)}`);

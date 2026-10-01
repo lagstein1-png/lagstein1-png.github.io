@@ -44,8 +44,14 @@ const EXEMPT = new Set(['NAMING.md', path.join('.claude', 'qa', 'naming.js')]);
    אותו חשבון מוגש תחת הדומיין של אתר המשתמש, והכתובת הישנה מפנה
    אליו. הצורה הישנה נשארת מותרת, כדי שמיזוג ישן לא ייפול עליה. */
 const SANCTIONED = /"u":"(?:\/|https:\/\/(?:bekol\.co\.il|lagstein1-png\.github\.io)\/)drivewise\/"/g;
+/* **ומופע שני, מ-1.10.2026 — שורת <loc> אחת ב-sitemap.xml.** הבעלים
+   הכריע ״רוץ — תוסיף את תאוריה מדברת למפת האתר״. sitemap.js לוקח
+   את הכתובת משדה `u` שלמעלה ואינו כותב אותה בעצמו, ולכן זו אותה
+   כתובת ולא שם חדש. **xml נסרק מאותו יום** — עד אז מפת האתר לא נבדקה
+   בכלל, וכל מופע אחר בה היה עובר בשקט. */
+const SANCTIONED_LOC = /<loc>https:\/\/bekol\.co\.il\/drivewise\/<\/loc>/g;
 const SKIP_DIR = new Set(['.git', 'img', 'vendor', 'node_modules', '.well-known']);
-const TEXT = /\.(html|js|json|md|css|svg|txt|webmanifest|patch|diff)$/i;
+const TEXT = /\.(html|js|json|md|css|svg|txt|webmanifest|patch|diff|xml)$/i;
 
 /* השם הרשמי, ארבע שפות. מקור: NAMING.md */
 const OFFICIAL = { he: 'תאוריה מדברת', ar: 'نظرية ناطقة', ru: 'Говорящая теория', en: 'Talking Theory' };
@@ -63,6 +69,7 @@ function walk(dir) {
     scanned++;
     let text = fs.readFileSync(full, 'utf8');
     if (rel === 'index.html') text = text.replace(SANCTIONED, '"u":"<נתיב>"');
+    if (rel === 'sitemap.xml') text = text.replace(SANCTIONED_LOC, '<loc><נתיב></loc>');
     const lines = text.split('\n');
     lines.forEach((ln, i) => {
       if (BANNED.test(ln)) {
