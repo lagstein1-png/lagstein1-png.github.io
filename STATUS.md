@@ -19,7 +19,7 @@
 | `civics` | c26 · 2026-10-01 | c26-pwa1 | תואם |
 | `hebrew` | i20 · 2026-10-01 | i20-pwa1 | תואם |
 | `english-bagrut` | — | — | אינה בריפו הזה |
-| `literature` | j18 · 2026-10-01 | j18-pwa1 | תואם |
+| `literature` | j19 · 2026-10-01 | j19-pwa1 | תואם |
 | `tanakh` | p20 · 2026-10-01 | p20-pwa1 | תואם |
 | `hebrew-arab` | y5 · 2026-10-01 | y5-pwa1 | תואם |
 | `motal` | d13 · 2026-10-01 | d13-pwa1 | תואם |
