@@ -31,9 +31,7 @@ var INTERNAL_OK=(function(){
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme:light)" />
 <meta name="theme-color" content="#0e1425" media="(prefers-color-scheme:dark)" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="/fonts/fonts.css" rel="stylesheet" />
 <style>
 /* ============================================================
    אזרח — אזרחות לבגרות
@@ -465,6 +463,15 @@ textarea.field{min-height:96px;resize:vertical}
 .card.calm-glow{animation:calmGlow 2.6s ease-out 1}
 .calm-praise{text-align:center;font-weight:600;color:#7c5e10;margin:16px 0 0}
 @media (prefers-reduced-motion:reduce){.card.calm-glow{animation:none}}
+
+/* ---------- יעדי מגע ≥44px — 1.10.2026 (O-105) ----------
+   אותו בלוק כמו בשאר האפליקציות. נמדד בדפדפן ב-390px וב-360px.
+   הבלוק אחרון ב-style כדי לגבור על ההגדרות שמעליו. מגדילים בריפוד
+   ובגובה מינימלי, לא בגובה קשיח — ערבית ורוסית ארוכות יותר. */
+.hlang button{min-height:44px;padding-block:6px}
+input[type=range]{min-height:44px}
+.spk.sm{min-width:44px;min-height:44px}
+.lvl{min-width:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1087,7 +1094,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="q15 · 2026-09-30";
+var BUILD="q16 · 2026-10-01";
 var SKEY="geography-state-v1";
 var GKEY_STORE="geography-gkey";
 
@@ -3053,7 +3060,7 @@ function screenSet(){
   h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
      esc(t("setLang"))+"</h3><div class=\"lvls\">";
   Object.keys(LANGS).forEach(function(k){
-    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'" lang="'+k+'" dir="'+LANGS[k].dir+'"'+
+    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'" lang="'+k+'" dir="'+LANGS[k].dir+'">'+
       esc(LANGS[k].name)+"</button>";
   });
   h+="</div></div>";
@@ -4877,7 +4884,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=q15-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=q16-pwa1").catch(function(){});
   });
 }
 </script>
