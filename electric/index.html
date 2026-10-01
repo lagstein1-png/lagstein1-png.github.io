@@ -28,9 +28,7 @@ var INTERNAL_OK=(function(){
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme:light)" />
 <meta name="theme-color" content="#0e1117" media="(prefers-color-scheme:dark)" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="/fonts/fonts.css" rel="stylesheet" />
 <style>
 /* ============================================================
    מתח — חשמל לתיכון
@@ -485,6 +483,15 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
 @keyframes calmGlow{0%{box-shadow:0 0 0 0 rgba(180,140,40,0)}35%{box-shadow:0 0 26px 6px rgba(180,140,40,.45)}100%{box-shadow:0 0 0 0 rgba(180,140,40,0)}}
 .card.calm-glow{animation:calmGlow 2.6s ease-out 1}
 @media (prefers-reduced-motion:reduce){.card.calm-glow{animation:none}}
+
+/* ---------- יעדי מגע ≥44px — 1.10.2026 (O-105) ----------
+   אותו בלוק כמו בשאר האפליקציות. נמדד בדפדפן ב-390px וב-360px.
+   הבלוק אחרון ב-style כדי לגבור על ההגדרות שמעליו. מגדילים בריפוד
+   ובגובה מינימלי, לא בגובה קשיח — ערבית ורוסית ארוכות יותר. */
+.hlang button{min-height:44px;padding-block:6px}
+input[type=range]{min-height:44px}
+.spk.sm{min-width:44px;min-height:44px}
+.lvl{min-width:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1014,7 +1021,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="e29 · 2026-10-01";
+var BUILD="e30 · 2026-10-01";
 var KEY="electric-state-v1";
 
 function blankState(){
@@ -9895,7 +9902,7 @@ if(!INTERNAL_OK){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=e29-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=e30-pwa1").catch(function(){});
   });
 }
 </script>
