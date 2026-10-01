@@ -84,7 +84,27 @@ for (const page of PAGES) {
      מבקשת הגופנים והבדיקה עברה. שם משפחה בלי טעינה עובד רק אם
      היא מותקנת במכשיר, וזו הנחה שאי אפשר לסמוך עליה. */
   const linkHrefs = (src.match(/<link[^>]*href="[^"]*"[^>]*>/gi) || []).join(' ');
-  const faces = (src.match(/@font-face\s*\{[^}]*\}/gi) || []).join(' ');
+  let faces = (src.match(/@font-face\s*\{[^}]*\}/gi) || []).join(' ');
+
+  /* **גופנים מקומיים — 1.10.2026.** הדפים מקשרים ל-/fonts/fonts.css
+     (תגית link או @import) במקום לגוגל. שם המשפחה כבר אינו בכתובת,
+     ולכן קוראים את הקובץ עצמו ולוקחים ממנו את ה-@font-face. ולצד זה —
+     הקבצים של הכתב חייבים להיות ב-PRE של ה-worker של אותה אפליקציה:
+     גופן שאינו מצורף מראש אינו מגיע אופליין, וזו כל הסיבה שהועברו לכאן. */
+  const localCss = [...src.matchAll(/(?:href="|@import url\(['"]?)(\/fonts\/[^"')]+\.css)/g)].map(m => m[1]);
+  const faceFiles = {};
+  for (const css of localCss) {
+    const f = css.slice(1);
+    if (!fs.existsSync(f)) { console.log(`✗ ${page.padEnd(11)} ${css} — הקובץ אינו קיים`); findings++; continue; }
+    for (const ff of fs.readFileSync(f, 'utf8').match(/@font-face\s*\{[^}]*\}/gi) || []) {
+      faces += ' ' + ff;
+      const fam = (ff.match(/font-family:\s*['"]?([^'";]+)/) || [])[1];
+      const url = (ff.match(/url\(([^)]+)\)/) || [])[1];
+      if (fam && url) (faceFiles[fam] = faceFiles[fam] || []).push({ url: url.replace(/['"]/g, ''), range: (ff.match(/unicode-range:\s*([^;]+)/) || [])[1] || '' });
+    }
+  }
+  const swFile = page === '.' ? 'sw.js' : page + '/sw.js';
+  const pre = fs.existsSync(swFile) ? ((fs.readFileSync(swFile, 'utf8').match(/const PRE = \[([\s\S]*?)\];/) || [])[1] || '') : null;
 
   for (const [lg, sc] of Object.entries(SCRIPTS)) {
     /* יש כאן ממשק בשפה הזאת בכלל? דף בלי המילון אינו ממצא. */
@@ -114,8 +134,26 @@ for (const page of PAGES) {
       if (new RegExp('var\\(\\s*' + sc.varName + '\\b').test(body) && varOk) { applies = true; break; }
     }
 
+    /* הקובץ שמכסה את הכתב (unicode-range מכיל את התו הראשון שלו)
+       של משפחה שמתאימה — חייב להיות ב-PRE. */
+    let offline = true, offMsg = '';
+    if (localCss.length && pre !== null) {
+      const first = { ar: 0x0627, ru: 0x0430 }[lg];
+      const inRange = r => r.split(',').some(x => { const m = x.trim().match(/U\+([0-9A-F]+)(?:-([0-9A-F]+))?/i);
+        if (!m) return false; const a = parseInt(m[1], 16), b = m[2] ? parseInt(m[2], 16) : a; return first >= a && first <= b; });
+      const need = Object.entries(faceFiles).filter(([fam]) => sc.ok.test(fam))
+        .flatMap(([, fl]) => fl.filter(x => inRange(x.range)).map(x => x.url));
+      const missing = need.filter(u => !pre.includes('"' + u + '"'));
+      if (!need.length || missing.length) { offline = false; offMsg = need.length ? 'חסר ב-PRE של sw.js: ' + missing.join(', ') : 'אין קובץ גופן לכתב הזה ב-' + localCss.join(', '); }
+      if (!pre.includes('"' + localCss[0] + '"')) { offline = false; offMsg += (offMsg ? '; ' : '') + localCss[0] + ' חסר ב-PRE של sw.js'; }
+    }
+    if (loads && applies && !offline) {
+      findings++;
+      console.log(`✗ ${page.padEnd(11)} ${lg}: הגופן ל${sc.name} נטען, אבל לא יגיע אופליין — ${offMsg}`);
+      continue;
+    }
     if (loads && applies) {
-      console.log(`✓ ${page.padEnd(11)} ${lg}: נטענת משפחה ל${sc.name} ומוחלת על lang="${lg}"`);
+      console.log(`✓ ${page.padEnd(11)} ${lg}: נטענת משפחה ל${sc.name} ומוחלת על lang="${lg}"` + (localCss.length && pre !== null ? ' · מקומית ובמטמון' : ''));
       continue;
     }
     findings++;

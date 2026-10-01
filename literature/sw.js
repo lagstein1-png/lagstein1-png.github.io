@@ -13,7 +13,9 @@ const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "literature-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
-             "/legal/terms.js","/legal/protect.js"];
+             "/legal/terms.js","/legal/protect.js",
+             /* גופנים מקומיים — /fonts/fonts.css (1.10.2026) */
+             "/fonts/fonts.css","/fonts/heebo-hebrew.woff2","/fonts/heebo-math.woff2","/fonts/heebo-latin.woff2","/fonts/lexend-latin.woff2","/fonts/noto-sans-arabic-arabic.woff2","/fonts/noto-sans-cyrillic.woff2","/fonts/noto-sans-greek.woff2","/fonts/noto-sans-latin.woff2"];
 
 self.addEventListener("install", e => {
   self.skipWaiting();

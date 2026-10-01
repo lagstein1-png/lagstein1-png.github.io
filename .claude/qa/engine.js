@@ -79,7 +79,13 @@ const normCache   = s => s.replace(/"[a-z0-9-]+-"\s*\+\s*V/g, '"APP-"+V')
                              **מתי זה נמחק:** ביום שבו גם לשתיים האלה
                              יהיה נכון/לא־נכון. עד אז הוא נשאר, ואינו
                              no-op. */
-                          .replace(/\s*"\/tutor\/josh-state\.js",?/g, '');
+                          .replace(/\s*"\/tutor\/josh-state\.js",?/g, '')
+                          /* קובצי הגופן — 1.10.2026. כל אפליקציה מצרפת
+                             את המשפחות שהדף שלה משתמש בהן (english
+                             ו-history גם Lexend, reader את Assistant),
+                             וזה הבדל מוצדק. `/fonts/fonts.css` עצמו נשאר
+                             תחת שמירה; שהרשימה נכונה — `fonts.js` בודק. */
+                          .replace(/"\/fonts\/[^"]+\.woff2",?/g, '');
 const normTeacher = s => s.replace(/"[a-z0-9-]+-teacher"/g, '"APP-teacher"');
 
 /* שער התנאים נכתב פעם אחת והועתק, ושלושה דברים בו נקשרים לאפליקציה

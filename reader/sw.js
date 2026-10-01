@@ -16,7 +16,9 @@ const PRE = ["./","./index.html","./manifest.json",
              "/img/limor.jpg","/img/josh.jpg",
              "/tutor/he-speech.js","/speech/recorded.js","/tutor/josh-face.js",
              "/tutor/josh-local.js","/tutor/tutor.js","/tutor/barak-core.js",
-             "/legal/terms.js","/legal/protect.js"];
+             "/legal/terms.js","/legal/protect.js",
+             /* גופנים מקומיים — /fonts/fonts.css (1.10.2026) */
+             "/fonts/fonts.css","/fonts/assistant-hebrew.woff2","/fonts/assistant-latin.woff2","/fonts/noto-sans-arabic-arabic.woff2","/fonts/noto-sans-cyrillic.woff2","/fonts/noto-sans-greek.woff2","/fonts/noto-sans-latin.woff2"];
 
 self.addEventListener("install", e => {
   self.skipWaiting();

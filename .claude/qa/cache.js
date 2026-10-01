@@ -132,7 +132,7 @@ function lineOf(src, idx) { return src.slice(0, idx).split('\n').length; }
    הרשימה חייבת להיות זהה לזו שבשומר שבתוך sw.js של השורש.
    `tutor` נוספה 12.9.2026: דף הבית טוען /tutor/josh-face.js, ובלי
    השומר העותק שב-PRE נשמר ולא מוגש לעולם. */
-const ROOT_OWNS = ['img', 'legal', 'voice', 'tutor'];
+const ROOT_OWNS = ['img', 'legal', 'voice', 'tutor', 'fonts'];
 
 /* כל תיקייה שיש בה sw.js. "." הוא דף הבית. */
 function allApps() {

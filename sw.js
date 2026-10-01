@@ -16,7 +16,9 @@ const PRE = ["./","./index.html","./manifest.json",
              "/legal/terms.js","/legal/protect.js",
              /* ג׳וש — שכבת הפנים והתמונה. שתיהן בנתיבים משותפים
                 (/tutor/, /img/) ולכן עותק אחד לכל האתר. */
-             "/tutor/he-speech.js","/tutor/josh-face.js","/img/limor.jpg","/img/josh.jpg"];
+             "/tutor/he-speech.js","/tutor/josh-face.js","/img/limor.jpg","/img/josh.jpg",
+             /* גופנים מקומיים — /fonts/fonts.css (1.10.2026) */
+             "/fonts/fonts.css","/fonts/heebo-hebrew.woff2","/fonts/heebo-math.woff2","/fonts/heebo-latin.woff2","/fonts/noto-sans-arabic-arabic.woff2","/fonts/noto-sans-cyrillic.woff2","/fonts/noto-sans-greek.woff2","/fonts/noto-sans-latin.woff2"];
 
 self.addEventListener("install", e => {
   self.skipWaiting();
@@ -44,8 +46,10 @@ self.addEventListener("fetch", e => {
      את שכבת הפנים של ג׳וש. אפליקציה חדשה נופלת מכאן החוצה
      מאליה, בלי שצריך לגעת בקובץ. */
   const seg = url.pathname.split("/");
+  /* "fonts" — 1.10.2026: הגופנים המקומיים (/fonts/) שדף הבית טוען. בלי
+     השם כאן הם נשמרים ב-PRE ואינם מוגשים ממנו לעולם — המלכודת של tutor. */
   if (seg.length > 2 && seg[1] !== "img" && seg[1] !== "legal" &&
-      seg[1] !== "voice" && seg[1] !== "tutor") return;
+      seg[1] !== "voice" && seg[1] !== "tutor" && seg[1] !== "fonts") return;
   /* ניווט: רשת קודם כדי שגרסה חדשה תגיע מיד, ומטמון כשאין רשת */
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).then(r => {

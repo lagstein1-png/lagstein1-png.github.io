@@ -81,7 +81,7 @@
 - **`BUILD` ו-`sw.js?v=` תואמים, שניהם, יחד** (ב-`bagrut-806` ב-`app.js`). דף הבית
   ו-`reader` נושאים `?v=` בלבד. **מספר הגרסה מוקצה במיזוג מול `main`, לא
   בבנייה.** `cache.js` אוכף גם מול `origin/main`.
-- נגעת ב-`legal/`, `/tutor/`, `/img/josh.jpg` — כל 13 המפתחות עולים יחד. `cache-traps.md`.
+- נגעת ב-`legal/`, `/tutor/`, `/img/josh.jpg`, `/fonts/` — כל המפתחות עולים יחד. `cache-traps.md`.
 - `localStorage`: מפתח שהועתק הוא מגירה משותפת — כל אפליקציה שם משלה. `storage.js`.
 - הקראה: ארבעה מנגנונים ועוד חמישי (שחרור במגע, בלעדיו iOS שותק), `voiceUsable` מפתח
   מיון ראשון, **מגדר קודם לאיכות**. `voice.js`, `netpin.js`, `hespeech.js`. **והשכבה המוקלטת**
