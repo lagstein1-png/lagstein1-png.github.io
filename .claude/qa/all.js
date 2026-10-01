@@ -58,6 +58,9 @@ const SUITE = [
   /* התוכן של ״כותבים ביחד״. content.js אינו סורק אותה — כל תשע
      המשפחות שלו מודדות שאלה, ואין שם שאלה. */
   { id: 'kotvim',   args: [] },
+  /* GEOBANK של geography-elem — content.js אינו סורק אותו. 1.10.2026,
+     כשהמחסן גדל מ-52 ל-156. */
+  { id: 'geobank',  args: [] },
   { id: 'leaks',    args: [] },
   { id: 'markers',  args: [] },
   /* רשימת הכלים ב-qa-tools.md מול SUITE הזה — מחולל עם --check,

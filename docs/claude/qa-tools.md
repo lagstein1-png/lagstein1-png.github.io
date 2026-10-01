@@ -27,6 +27,7 @@
     node .claude/qa/teen-i18n.js             # ״שלב״ בארבע שפות בפועל — המסך, ההקראה, והרווח לפני מספר; בדפדפן
     node .claude/qa/banks.js                 # החיווט של lomda/data/, וארבע השפות בתוכן
     node .claude/qa/kotvim.js                # התוכן של ״כותבים ביחד״ — ארבע שפות, ואין קטע גנרי
+    node .claude/qa/geobank.js               # המחסן של geography-elem — מבנה, שפות, רמז שמסגיר, אורך שמסגיר, ≥13 בתא
     node .claude/qa/leaks.js                 # תיאור של פריט בלומדה אינו מצטט את כותרתו (ההקראה לא מסגירה)
     node .claude/qa/markers.js               # סמני התנגשות מיזוג שנשארו בקובץ שנעקב
     node .claude/qa/guide.js                 # שם כפתור שהמדריך מבטיח, וכבר אינו בממשק
