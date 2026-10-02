@@ -105,13 +105,19 @@ function fresh(manifest, audioBehaviour) {
      האפליקציות חייב להישאר זהה (engine.js). מנגן רק במי שיש לה
      מאגר קבוע. */
   const ALL = ['math-app','math-teen','math-uni','math-uni2','math-uni3','english',
-               'history','ulpan','lomda','kotvim','reader','rakia','bagrut-806'];
+               'history','ulpan','lomda','kotvim','reader','rakia','bagrut-806',
+               /* 2.10.2026: חמש שחוטמו 30.9 בלי PRE (אופליין — בלי המודול), ושתיים בלי כלום */
+               'civics','hebrew','literature','tanakh','hebrew-arab','geography','motal'];
   for (const app of ALL) {
     const html = fs.readFileSync(path.join(ROOT, app, 'index.html'), 'utf8');
     const sw = fs.readFileSync(path.join(ROOT, app, 'sw.js'), 'utf8');
     t(app + ' — תגית ו-PRE', [/<script src="\/speech\/recorded\.js">/.test(html), sw.indexOf('/speech/recorded.js') >= 0], [true, true]);
   }
-  const APPS = ['english', 'history', 'ulpan', 'lomda'];
+  /* כל מי שב-SOURCES של record.js (יש לה מאגר קבוע), ושתיים שהבעלים
+     ביקש 2.10.2026 — אין להן מאגר קבוע עדיין, אבל speak מוכן לו */
+  /* hebrew בנויה אחרת (app.js, speakParts) ומחווטת שם — מחוץ לבדיקת התבנית */
+  const APPS = ['english', 'history', 'ulpan', 'lomda', 'civics', 'literature', 'tanakh', 'hebrew-arab',
+                'geography', 'motal'];
   for (const app of APPS) {
     const html = fs.readFileSync(path.join(ROOT, app, 'index.html'), 'utf8');
     const sw = fs.readFileSync(path.join(ROOT, app, 'sw.js'), 'utf8');

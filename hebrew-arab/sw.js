@@ -14,6 +14,8 @@ const CACHE = "hebrewarab-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
              "/legal/terms.js","/legal/protect.js",
+             /* השכבה המוקלטת — /speech/recorded.js (2.10.2026) */
+             "/speech/recorded.js",
              /* גופנים מקומיים — /fonts/fonts.css (1.10.2026) */
              "/fonts/fonts.css","/fonts/heebo-hebrew.woff2","/fonts/heebo-math.woff2","/fonts/heebo-latin.woff2","/fonts/lexend-latin.woff2","/fonts/noto-sans-arabic-arabic.woff2","/fonts/noto-sans-cyrillic.woff2","/fonts/noto-sans-greek.woff2","/fonts/noto-sans-latin.woff2"];
 

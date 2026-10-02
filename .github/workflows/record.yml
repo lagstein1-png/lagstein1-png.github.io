@@ -24,14 +24,15 @@ name: record
 # 07:30. כל ריצה מקליטה מה שהמכסה מרשה, באפליקציה שהכי הרבה חסר
 # בה (`record.js --next`), ונעצרת על 429. הרצה ידנית בוחרת אפליקציה.
 on:
-  # הבעלים אישר 29.9.2026 את הקול Gacrux (דגימות voice-sample.yml) —
-  # ה-cron חזר, וברירת המחדל של record.js היא Gacrux.
+  # הבעלים אישר 29.9.2026 את הקול Gacrux, ו-2.10.2026 החליף ל-Kore
+  # בכל האתר (כמו תאוריה מדברת), במודל 2.5 Flash, עם תקרת
+  # הוצאה מצטברת של $25 (TTS_BUDGET_USD, record-spend.json).
   schedule:
     - cron: '30 7 * * *'
   workflow_dispatch:
     inputs:
       app:
-        description: 'איזו אפליקציה (english, history, ulpan, lomda)'
+        description: 'איזו אפליקציה (english, history, ulpan, lomda…) או all — כל המאגרים, עד התקרה'
         required: true
         default: 'english'
       max:
@@ -43,7 +44,7 @@ on:
         required: false
         default: ''
       voice:
-        description: 'שם הקול. ריק — משתנה הריפו TTS_VOICE, ואם אין — Kore / he-IL-Chirp3-HD-Kore'
+        description: 'שם הקול. ריק — משתנה הריפו TTS_VOICE, ואם אין — Kore (gemini) / he-IL-Chirp3-HD-Kore (gcloud)'
         required: false
         default: ''
       replace:
@@ -129,7 +130,9 @@ jobs:
 
       - name: תכנון
         if: steps.pick.outputs.app != ''
-        run: node .claude/qa/record.js --plan "${{ steps.pick.outputs.app }}"
+        run: |
+          APP="${{ steps.pick.outputs.app }}"
+          if [ "$APP" = "all" ]; then node .claude/qa/record.js --plan; else node .claude/qa/record.js --plan "$APP"; fi
 
       # נופל על מכסה? מה שהוקלט נשמר, והצעדים שאחריו דוחפים אותו.
       - name: מקליט
@@ -140,12 +143,15 @@ jobs:
           TTS_KEY: ${{ secrets.TTS_KEY }}
           TTS_PROVIDER: ${{ steps.prov.outputs.provider }}
           TTS_VOICE: ${{ steps.prov.outputs.voice }}
+          TTS_BUDGET_USD: ${{ vars.TTS_BUDGET_USD || '25' }}
         run: |
           set -o pipefail
           EXTRA=""
           BATCH="${{ github.event.inputs.batch }}"
           if [ "$BATCH" != "NO" ]; then EXTRA="$EXTRA --batch"; fi
-          node .claude/qa/record.js "${{ steps.pick.outputs.app }}" --max "${{ steps.pick.outputs.max }}" $EXTRA 2>&1 | tee /tmp/rec.log
+          APP="${{ steps.pick.outputs.app }}"
+          if [ "$APP" = "all" ]; then APP="--all"; fi
+          node .claude/qa/record.js "$APP" --max "${{ steps.pick.outputs.max }}" $EXTRA 2>&1 | tee /tmp/rec.log
 
       - name: המניפסט תואם לדיסק
         run: node .claude/qa/record.js --check
@@ -156,16 +162,18 @@ jobs:
         run: |
           set -euo pipefail
           APP="${{ steps.pick.outputs.app }}"
-          if [ -z "$(find "$APP/audio" -type f -name '*.mp3' 2>/dev/null | head -1)" ]; then
+          if [ -z "$(find */audio -type f -name '*.mp3' 2>/dev/null | head -1)" ]; then
             echo "לא נוצר אף קובץ — אין מה לדחוף."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$APP/audio"
+          # all מקליט כמה אפליקציות; ההוצאה המצטברת עולה תמיד יחד עם הקבצים
+          git add -- '*/audio/*'
+          if [ -f .claude/qa/record-spend.json ]; then git add .claude/qa/record-spend.json; fi
           if git diff --cached --quiet; then echo "אין קבצים חדשים."; exit 0; fi
-          N=$(find "$APP/audio/he" -type f -name '*.mp3' | wc -l)
-          git commit -q -m "הקלטות: $APP — $N קבצים במניפסט (record.yml)"
+          N=$(git diff --cached --name-only | grep -c '\.mp3$' || true)
+          git commit -q -m "הקלטות: $APP — $N קבצים חדשים או מוחלפים (record.yml)"
           # main זז בזמן הריצה? מושכים (rebase) ודוחפים. קונפליקט עוצר את הצעד בגלוי.
           git pull --rebase -q origin main
           git push origin HEAD:main
@@ -184,7 +192,8 @@ jobs:
           git add -f .claude/qa/last-record.log
           # מונה הניסיונות עולה גם בריצה בלי קבצים — אחרת קליפ תקול לא ייצא מהתור לעולם
           APP="${{ steps.pick.outputs.app }}"
-          if [ -f "$APP/audio/attempts.json" ]; then git add "$APP/audio/attempts.json"; fi
+          git add -- '*/audio/attempts.json' 2>/dev/null || true
+          if [ -f .claude/qa/record-spend.json ]; then git add .claude/qa/record-spend.json; fi
           if git diff --cached --quiet; then echo "היומן לא השתנה."; exit 0; fi
           git commit -q -m "יומן הקלטה: ריצה בלי קבצים חדשים (record.yml)"
           git pull --rebase -q origin main

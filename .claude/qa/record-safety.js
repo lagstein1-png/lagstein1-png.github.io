@@ -79,7 +79,8 @@ globalThis.fetch = async (url, o) => {
   const text = b.contents[0].parts[0].text;
   const k = /^הקרא בקול/.test(text) ? Number(/את (\\d+) הפריטים/.exec(text)[1]) : 0;
   const data = k ? pcm(k) : pcm(1, text.includes('תקול') ? 'CORRUPT' : '');
-  return ok({ candidates: [{ content: { parts: [{ inlineData: { mimeType: 'audio/L16;rate=24000', data: data.toString('base64') } }] } }] });
+  const usage = process.env.FAKE_USAGE ? { usageMetadata: { promptTokenCount: 1000, candidatesTokenCount: 50000 } } : {};
+  return ok(Object.assign({ candidates: [{ content: { parts: [{ inlineData: { mimeType: 'audio/L16;rate=24000', data: data.toString('base64') } }] } }] }, usage));
 };
 `);
 
@@ -187,6 +188,27 @@ const S = ['שלום לכולם היום', 'אנחנו לומדים יחד', 'ז
   check('5. שלוש ריצות 429: אין ניסיון שנספר, והמחרוזת עדיין בתור', n === 0 && app === 'english', 'ניסיונות ' + n + ', --next ' + app);
 }
 
+/* 6. תקרת ההוצאה (הבעלים, 2.10.2026: ״עלות מקסימלית $25״). מחרוזת
+   של 16 תווים ב-Pro עולה באומדן כ-$0.00094 — תקרה של $0.0015 מרשה
+   בקשה אחת בלבד, ו---all אינו ממשיך לאפליקציה הבאה. */
+{
+  const T = tree('budget', { english: S, history: ['היסטוריה של העם', 'עוד משפט בהיסטוריה'] });
+  manifest(T, 'english', 'Kore', []); manifest(T, 'history', 'Kore', []);
+  const r = run(T, ['--all', '--max', '5'], { TTS_BUDGET_USD: '0.0015', GEMINI_TTS_MODEL: 'gemini-2.5-pro-preview-tts' });
+  const made = S.filter(s => fs.existsSync(path.join(T, 'english', 'audio', 'he', R.id(s) + '.mp3'))).length;
+  const hist = fs.existsSync(path.join(T, 'history', 'audio', 'he')) ? fs.readdirSync(path.join(T, 'history', 'audio', 'he')).length : 0;
+  let sp = {}; try { sp = JSON.parse(fs.readFileSync(path.join(T, '.claude/qa/record-spend.json'), 'utf8')); } catch (e) {}
+  check('6א. תקרה של בקשה אחת: קובץ אחד, ההיסטוריה לא נגעה, ההוצאה נרשמה מתחת לתקרה',
+        made === 1 && hist === 0 && sp.requests === 1 && sp.usd > 0 && sp.usd <= 0.0015,
+        'נוצרו ' + made + ', היסטוריה ' + hist + ', ' + JSON.stringify(sp) + ' · ' + r.out.split('\n').filter(l => /תקרת|✗/.test(l)).slice(0, 2).join(' | '));
+  /* ההוצאה נספרת לפי usageMetadata כשהיא קיימת: 1,000 קלט + 50,000 פלט ב-Pro = $1.001 */
+  const T2 = tree('usage', { english: S });
+  manifest(T2, 'english', 'Kore', []);
+  run(T2, ['english', '--max', '5'], { TTS_BUDGET_USD: '1.0005', FAKE_USAGE: '1', GEMINI_TTS_MODEL: 'gemini-2.5-pro-preview-tts' });
+  let sp2 = {}; try { sp2 = JSON.parse(fs.readFileSync(path.join(T2, '.claude/qa/record-spend.json'), 'utf8')); } catch (e) {}
+  check('6ב. המחיר נרשם מהאסימונים האמיתיים, והבקשה שאחריה נחסמת', sp2.usd === 1.001 && sp2.requests === 1, JSON.stringify(sp2));
+}
+
 fs.rmSync(BASE, { recursive: true, force: true });
-console.log(bad ? '\n✗ ' + bad + ' תרחישים נפלו' : '\n✓ ההקלטה בטוחה: חמישה תרחישים');
+console.log(bad ? '\n✗ ' + bad + ' תרחישים נפלו' : '\n✓ ההקלטה בטוחה: שישה תרחישים');
 process.exit(bad ? 1 : 0);

@@ -55,12 +55,14 @@ const PROVIDER = (process.env.TTS_PROVIDER || 'gemini').toLowerCase();
 const KEY   = PROVIDER === 'gcloud'
   ? (process.env.TTS_KEY || '')
   : (process.env.GEMINI_API_KEY || process.env.GEMINI_KEY || '');
-const MODEL = PROVIDER === 'gcloud' ? 'cloud-tts' : (process.env.GEMINI_TTS_MODEL || 'gemini-3.1-flash-tts-preview');
+const MODEL = PROVIDER === 'gcloud' ? 'cloud-tts' : (process.env.GEMINI_TTS_MODEL || 'gemini-2.5-flash-preview-tts');
 /* מצב אצווה (--batch): בקשה אחת מקליטה ~40 מחרוזות. המכסה היומית
    במדרגה החינמית היא לבקשה ולמודל (O-71: כ-15 בקשות ליום), ולכן
    אצווה מכפילה את התפוקה פי גודל האצווה, וסבב בין שני מודלי 2.5
-   מכפיל אותה שוב. הקול זהה (Kore) כדי שכל הקבצים יישמעו אחיד. */
-const MODELS = (process.env.GEMINI_TTS_MODELS || 'gemini-2.5-flash-preview-tts,gemini-2.5-pro-preview-tts')
+   מכפיל אותה שוב. הקול זהה (Kore) כדי שכל הקבצים יישמעו אחיד.
+   הבעלים, 2.10.2026: מודל אחד, 2.5 Flash, ותקרה של $25 — Pro ו-3.1 Flash
+   עולים פי שניים לאסימון אודיו ולא היו נכנסים בתקרה (`--plan`). */
+const MODELS = (process.env.GEMINI_TTS_MODELS || 'gemini-2.5-flash-preview-tts')
   .split(',').map(x => x.trim()).filter(Boolean);
 const BATCH = process.argv.includes('--batch') || /^(1|YES|true)$/i.test(process.env.TTS_BATCH || '');
 const BATCH_SIZE = (() => { const i = process.argv.indexOf('--batch-size');
@@ -73,13 +75,62 @@ const BATCH_MAX_CHARS = 16000;
    בעברית + 2.2 שניות שקט בין פריטים. */
 const BATCH_MAX_SEC = 600;
 const VOICE = process.env.TTS_VOICE || process.env.GEMINI_TTS_VOICE ||
-              (PROVIDER === 'gcloud' ? 'he-IL-Chirp3-HD-Kore' : 'Gacrux');
+              (PROVIDER === 'gcloud' ? 'he-IL-Chirp3-HD-Kore' : 'Kore');   /* הבעלים, 2.10.2026: Kore בכל האתר, כמו בתאוריה מדברת */
 const API   = 'https://generativelanguage.googleapis.com/v1beta';
 const GCLOUD = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 /* מחיר למיליון תווים, כפי שכתוב ב-tools/tts-build.js של הריפו הנפרד
    (gcloud 30, azure 16, elevenlabs 150; gemini ״לא נמדד״). אומדן, לא
    חשבונית — המחיר של היום נמצא בדף התמחור של גוגל. */
 const PRICE_PER_M = { gcloud: 30, gemini: null };
+
+/* --- תקרת הוצאה (2.10.2026) ----------------------------------------
+   הבעלים: ״עלות מקסימלית $25 חד פעמי״. עד היום שום דבר בקוד לא
+   עצר כסף — רק מכסה (429). עכשיו כל בקשה נבדקת לפני שהיא יוצאת:
+   אם האומדן שלה יחצה את התקרה, עוצרים כמו על מכסה, ומה שהוקלט נשמר.
+   אחרי התשובה נרשם המחיר לפי usageMetadata (אסימונים אמיתיים).
+   ההוצאה מצטברת בין ריצות ב-record-spend.json, ש-record.yml דוחף.
+   המחיר בדולר למיליון אסימונים [קלט טקסט, פלט אודיו] — מ-cloudprice.net
+   ומחיפוש, 2.10.2026, **לא מדף התמחור של גוגל ולא מחשבונית**. מודל
+   שאינו בטבלה מחויב במחיר היקר שבה. התקרה: TTS_BUDGET_USD (ברירת מחדל 25). */
+const PRICES = { 'gemini-2.5-pro-preview-tts': [1, 20], 'gemini-2.5-flash-preview-tts': [0.5, 10],
+                 'gemini-3.1-flash-tts-preview': [1, 20] };
+const BUDGET = Number(process.env.TTS_BUDGET_USD || 25);
+const SPEND_FILE = path.join(ROOT, '.claude', 'qa', 'record-spend.json');
+const SPEND = (() => { try { return JSON.parse(fs.readFileSync(SPEND_FILE, 'utf8')); }
+                       catch (e) { return { budgetUsd: BUDGET, usd: 0, requests: 0, byModel: {} }; } })();
+class BudgetError extends Error {}
+function costOf(model, inTok, outTok) {
+  if (model === 'cloud-tts') return 0;
+  const [i, o] = PRICES[model] || [1, 20];
+  return (inTok * i + outTok * o) / 1e6;
+}
+/* אומדן לפני הבקשה: ~11 תווים לשניית דיבור, 2.2 שניות שקט בין
+   פריטי אצווה, 25 אסימוני אודיו לשנייה (ההערות על BATCH_MAX_SEC);
+   אסימון קלט ≈ 3 תווים, ועוד 200 להנחיה. gcloud — לפי תווים. */
+function estimate(model, chars, n) {
+  if (model === 'cloud-tts') return chars / 1e6 * PRICE_PER_M.gcloud;
+  const sec = chars / 11 + (n > 1 ? 2.2 * n : 0);
+  return costOf(model, chars / 3 + 200 * Math.ceil(n / BATCH_SIZE), sec * 25);
+}
+const guess = (model, texts) => estimate(model, texts.reduce((s, t) => s + t.length, 0), texts.length);
+function spendGate(model, texts) {
+  const g = guess(model, texts);
+  if (SPEND.usd + g > BUDGET) throw new BudgetError('תקרת ההוצאה $' + BUDGET + ': הוצאו $' + SPEND.usd.toFixed(2) +
+    ', והבקשה הבאה (' + model + ') עולה כ-$' + g.toFixed(2));
+}
+function spendAdd(model, texts, usage) {
+  const u = usage || {};
+  const c = model !== 'cloud-tts' && u.promptTokenCount != null && u.candidatesTokenCount != null
+    ? costOf(model, u.promptTokenCount, u.candidatesTokenCount) : guess(model, texts);
+  SPEND.usd = Math.round((SPEND.usd + c) * 1e4) / 1e4;
+  SPEND.requests = (SPEND.requests || 0) + 1;
+  SPEND.byModel = SPEND.byModel || {};
+  SPEND.byModel[model] = Math.round(((SPEND.byModel[model] || 0) + c) * 1e4) / 1e4;
+  SPEND.budgetUsd = BUDGET;
+  fs.writeFileSync(SPEND_FILE, JSON.stringify(SPEND, null, 1) + '\n');
+}
+/* מכסה או תקרה: אין טעם לעבור לאפליקציה הבאה ב---all */
+let STOPPED = '';
 const KBPS  = 64;                 /* אושר דרך Main 30.9: נקי יותר ללומד; ה-6,823 של הריפו הנפרד נשארות 32k */
 const LANG  = 'he';
 const MIN_BYTES = 512;            /* קובץ קטן מזה הוא תשובה ריקה, לא דיבור */
@@ -183,7 +234,14 @@ function plan(apps) {
   console.log('\nסה״כ ' + tot + ' מחרוזות · ' + totChars + ' תווים · מוקלטות ' + totHave);
   const pr = PRICE_PER_M.gcloud;
   console.log('אומדן חד־פעמי ב-Cloud TTS לפי $' + pr + ' למיליון תווים (tts-build.js שם): $' +
-              (totChars / 1e6 * pr).toFixed(2) + ' · gemini: המחיר לא נמדד');
+              (totChars / 1e6 * pr).toFixed(2));
+  /* gemini באצווה: אותו אומדן ש-spendGate עושה, על כל מה שעוד חסר */
+  let missChars = 0, missN = 0;
+  for (const app of apps) { const c = corpus(app); if (!c) continue; const have = onDisk(app);
+    for (const [id, text] of c) if (!have.has(id)) { missChars += text.length; missN++; } }
+  for (const m of MODELS) console.log('אומדן gemini ל-' + missN + ' החסרות, הכול ב-' + m + ' ($' + (PRICES[m] || [1, 20]).join('/$') +
+    ' למיליון אסימונים, cloudprice.net): $' + estimate(m, missChars, missN).toFixed(2));
+  console.log('תקרה $' + BUDGET + ' · הוצאו עד היום $' + (SPEND.usd || 0).toFixed(2) + ' (record-spend.json)');
 }
 
 /* --- check -------------------------------------------------------- */
@@ -239,6 +297,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const PACE = { gap: 12000, min: 5000, max: 60000, ok: 0 };
 async function synth(ffmpeg, text) {
   for (let attempt = 0; attempt < 6; attempt++) {
+    spendGate(MODEL, [text]);
     const r = await fetch(API + '/models/' + MODEL + ':generateContent?key=' + encodeURIComponent(KEY), {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text }] }],
@@ -259,6 +318,7 @@ async function synth(ffmpeg, text) {
     const j = await r.json();
     const parts = (((j.candidates || [])[0] || {}).content || {}).parts || [];
     const inline = parts.map(p => p.inlineData).filter(Boolean)[0];
+    spendAdd(MODEL, [text], j.usageMetadata);
     if (!inline || !inline.data) { await sleep(2000); continue; }   /* 200 בלי אודיו — רעש חולף, נמדד ב-voice.js */
     if (++PACE.ok >= 8) { PACE.ok = 0; PACE.gap = Math.max(PACE.min, Math.round(PACE.gap * 0.8)); }
     const rate = Number((/rate=(\d+)/.exec(inline.mimeType || '') || [])[1]) || 24000;
@@ -279,6 +339,7 @@ async function synthBatch(model, texts) {
     'בין פריט לפריט עצור לשתי שניות של שקט מוחלט. אל תקרא את מספרי הפריטים ואל תוסיף דבר משלך.\n' +
     texts.map((t, i) => (i + 1) + '. ' + t).join('\n');
   for (let attempt = 0; attempt < 2; attempt++) {
+    spendGate(model, texts);
     const r = await fetch(API + '/models/' + model + ':generateContent?key=' + encodeURIComponent(KEY), {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }],
@@ -295,6 +356,7 @@ async function synthBatch(model, texts) {
     const j = await r.json();
     const parts = (((j.candidates || [])[0] || {}).content || {}).parts || [];
     const inline = parts.map(p => p.inlineData).filter(Boolean)[0];
+    spendAdd(model, texts, j.usageMetadata);
     if (!inline || !inline.data) { if (attempt === 0) { await sleep(2000); continue; } throw new Error(model + ' החזיר תשובה בלי אודיו'); }
     const rate = Number((/rate=(\d+)/.exec(inline.mimeType || '') || [])[1]) || 24000;
     return Buffer.from(inline.data, 'base64');
@@ -367,6 +429,7 @@ function wavToPcm(buf) {
 }
 async function synthGcloud(ffmpeg, text) {
   for (let attempt = 0; attempt < 6; attempt++) {
+    spendGate('cloud-tts', [text]);
     const r = await fetch(GCLOUD, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY },
       body: JSON.stringify({ input: { text }, voice: { languageCode: 'he-IL', name: VOICE },
@@ -384,6 +447,7 @@ async function synthGcloud(ffmpeg, text) {
       throw new Error('gcloud ' + r.status + ' ' + String(msg).replace(/\s+/g, ' ').slice(0, 160));
     }
     const j = await r.json();
+    spendAdd('cloud-tts', [text]);
     if (!j.audioContent) throw new Error('gcloud החזיר תשובה בלי אודיו');
     if (++PACE.ok >= 8) { PACE.ok = 0; PACE.gap = Math.max(PACE.min, Math.round(PACE.gap * 0.8)); }
     const w = wavToPcm(Buffer.from(j.audioContent, 'base64'));
@@ -484,7 +548,7 @@ async function build(app, max) {
             return;
           }
         } catch (e2) {
-          if (e2 instanceof QuotaError || /429|RESOURCE_EXHAUSTED|quota/i.test(e2.message)) throw e2;
+          if (e2 instanceof QuotaError || e2 instanceof BudgetError || /429|RESOURCE_EXHAUSTED|quota/i.test(e2.message)) throw e2;
           QUALITY.fail(attempts, batch[0][0], e2.message);
         }
       }
@@ -497,10 +561,11 @@ async function build(app, max) {
     const tired = new Set();
     for (const batch of batches) {
       const model = MODELS.find(m => !tired.has(m));
-      if (!model) { quota = true; console.log('  כל המודלים נגמרו להיום. מה שנכתב נשמר; הרצה מחר ממשיכה.'); break; }
+      if (!model) { quota = true; STOPPED = 'quota'; console.log('  כל המודלים נגמרו להיום. מה שנכתב נשמר; הרצה מחר ממשיכה.'); break; }
       try {
         await doBatch(batch, model, 0);
       } catch (e) {
+        if (e instanceof BudgetError) { quota = true; STOPPED = 'budget'; console.log('  ' + e.message + ' — עוצרים. מה שנכתב נשמר.'); break; }
         if (e instanceof QuotaError || /429|RESOURCE_EXHAUSTED|quota/i.test(e.message)) {
           tired.add(model);
           console.log('  מכסת ' + model + ' נגמרה (' + e.message.slice(0, 100) + ') — עוברים למודל הבא');
@@ -529,10 +594,11 @@ async function build(app, max) {
       made++;
       if (made % 10 === 0) console.log('  ' + made + '/' + todo.length + ' · ' + Math.round((Date.now() - t0) / 1000) + 'ש · מרווח ' + PACE.gap + 'ms');
     } catch (e) {
+      if (e instanceof BudgetError) { quota = true; STOPPED = 'budget'; console.log('  ' + e.message + ' — עוצרים. מה שנכתב נשמר.'); break; }
       failed++;
       console.log('  ✗ ' + id + ' ' + e.message.slice(0, 140));
       if (!/429|RESOURCE_EXHAUSTED|quota/i.test(e.message)) QUALITY.fail(attempts, id, e.message);
-      if (/429|RESOURCE_EXHAUSTED|quota/i.test(e.message)) { quota = true; console.log('  המכסה נגמרה. מה שנכתב נשמר; הרצה חוזרת תמשיך מכאן.'); break; }
+      if (/429|RESOURCE_EXHAUSTED|quota/i.test(e.message)) { quota = true; STOPPED = 'quota'; console.log('  המכסה נגמרה. מה שנכתב נשמר; הרצה חוזרת תמשיך מכאן.'); break; }
     }
     await sleep(PACE.gap);
   }
@@ -548,7 +614,8 @@ async function build(app, max) {
   const args = process.argv.slice(2);
   const maxI = args.indexOf('--max');
   const max = maxI >= 0 ? Math.max(1, parseInt(args[maxI + 1], 10) || 300) : 300;
-  const apps = args.filter(a => !a.startsWith('--') && !(maxI >= 0 && a === args[maxI + 1]));
+  const apps = args.includes('--all') ? Object.keys(SOURCES)
+    : args.filter(a => !a.startsWith('--') && !(maxI >= 0 && a === args[maxI + 1]));
   if (args.includes('--check')) {
     const bad = check();
     console.log(bad ? '\n' + bad + ' אפליקציות עם מניפסט שאינו תואם לדיסק' : '\nהשכבה המוקלטת: המניפסטים תואמים לדיסק');
@@ -586,6 +653,9 @@ async function build(app, max) {
   }
   if (args.includes('--plan') || !apps.length) { plan(apps.length ? apps : Object.keys(SOURCES)); process.exit(0); }
   let code = 0;
-  for (const app of apps) code = Math.max(code, await build(app, max));
+  for (const app of apps) {
+    if (STOPPED) { console.log('· ' + app + ' — דילוג (' + (STOPPED === 'budget' ? 'תקרת ההוצאה' : 'המכסה') + ')'); continue; }
+    code = Math.max(code, await build(app, max));
+  }
   process.exit(code);
 })();
