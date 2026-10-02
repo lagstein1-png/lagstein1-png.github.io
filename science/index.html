@@ -618,6 +618,16 @@ input[type=range]{min-height:44px}
 .fbar a,a[href*="education.gov.il"]{display:inline-flex;align-items:center;min-height:44px}
 .card>a[href^="?lesson"]{display:flex;align-items:center;min-height:44px}
 a.chip{min-height:44px}
+
+/* ---------- קישור בתוך טקסט — אזור נגיעה ≥44px · 2.10.2026 (O-110) ----------
+   שני מקרים, ונמדדו שניהם ב-390px וב-360px:
+   - קישור בתוך שורת טקסט רצה: ריפוד אנכי בלבד. ב-inline הוא מגדיל את
+     אזור הנגיעה ואינו נכנס לגובה השורה — אף אלמנט לא זז.
+   - קישורים זה מתחת לזה (<br>), וקישור בתוך פס ההקראה הקבוע: שם הריפוד
+     חרג מהשורה וכיסה את הקישור או הכפתור שלידו, ולכן inline-flex
+     בגובה 44 — כמו `.lg-foot a`. השורה גדלה, ואין חפיפה.
+   לא `a` כללי: `.lg-foot a` ודומיו כבר 44px בבנייה אחרת. */
+#tts-fail a{display:inline-flex;align-items:center;min-height:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -2461,7 +2471,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s141 · 2026-10-01";
+var BUILD="s142 · 2026-10-02";
 var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -6152,7 +6162,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s141-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s142-pwa1").catch(function(){});
   });
 }
 </script>

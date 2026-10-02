@@ -465,6 +465,16 @@ textarea.field{min-height:96px;resize:vertical}
 input[type=range]{min-height:44px}
 .spk.sm{min-width:44px;min-height:44px}
 .lvl{min-width:44px}
+
+/* ---------- קישור בתוך טקסט — אזור נגיעה ≥44px · 2.10.2026 (O-110) ----------
+   שני מקרים, ונמדדו שניהם ב-390px וב-360px:
+   - קישור בתוך שורת טקסט רצה: ריפוד אנכי בלבד. ב-inline הוא מגדיל את
+     אזור הנגיעה ואינו נכנס לגובה השורה — אף אלמנט לא זז.
+   - קישורים זה מתחת לזה (<br>), וקישור בתוך פס ההקראה הקבוע: שם הריפוד
+     חרג מהשורה וכיסה את הקישור או הכפתור שלידו, ולכן inline-flex
+     בגובה 44 — כמו `.lg-foot a`. השורה גדלה, ואין חפיפה.
+   לא `a` כללי: `.lg-foot a` ודומיו כבר 44px בבנייה אחרת. */
+#tts-fail a,a[href*="education.gov.il"]{display:inline-flex;align-items:center;min-height:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -1081,7 +1091,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="c27 · 2026-10-01";
+var BUILD="c28 · 2026-10-02";
 var SKEY="ezrach-state-v1";
 var GKEY_STORE="ezrach-gkey";
 
@@ -7990,7 +8000,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=c27-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=c28-pwa1").catch(function(){});
   });
 }
 </script>

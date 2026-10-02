@@ -411,6 +411,17 @@ footer{color:var(--faint);font-size:.85em;padding:1.2rem 0 2rem;text-align:cente
 .spk{border-radius:12px;background:#0e9c8d;border-color:#0b7c71;color:#fff;font-weight:700;font-size:1rem;padding:8px 16px;min-width:0}
 .spk:hover{background:#0b7c71;color:#fff}
 .spk.on{background:#0b7c71;color:#fff;border-color:#0b7c71}
+
+/* ---------- קישור בתוך טקסט — אזור נגיעה ≥44px · 2.10.2026 (O-110) ----------
+   שני מקרים, ונמדדו שניהם ב-390px וב-360px:
+   - קישור בתוך שורת טקסט רצה: ריפוד אנכי בלבד. ב-inline הוא מגדיל את
+     אזור הנגיעה ואינו נכנס לגובה השורה — אף אלמנט לא זז.
+   - קישורים זה מתחת לזה (<br>), וקישור בתוך פס ההקראה הקבוע: שם הריפוד
+     חרג מהשורה וכיסה את הקישור או הכפתור שלידו, ולכן inline-flex
+     בגובה 44 — כמו `.lg-foot a`. השורה גדלה, ואין חפיפה.
+   לא `a` כללי: `.lg-foot a` ודומיו כבר 44px בבנייה אחרת. */
+footer a,.meta a{padding-block:14px}
+.ttsfail a{display:inline-flex;align-items:center;min-height:44px}
 </style>
 </head>
 <body>

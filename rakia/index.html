@@ -153,6 +153,16 @@ dl.gloss dd{margin:0}
   #v-chart,#chart-tab-wheel,#chart-tab-table,#chart-tab-texts{display:block!important}
   svg.wheel{max-width:16cm}
 }
+
+/* ---------- קישור בתוך טקסט — אזור נגיעה ≥44px · 2.10.2026 (O-110) ----------
+   שני מקרים, ונמדדו שניהם ב-390px וב-360px:
+   - קישור בתוך שורת טקסט רצה: ריפוד אנכי בלבד. ב-inline הוא מגדיל את
+     אזור הנגיעה ואינו נכנס לגובה השורה — אף אלמנט לא זז.
+   - קישורים זה מתחת לזה (<br>), וקישור בתוך פס ההקראה הקבוע: שם הריפוד
+     חרג מהשורה וכיסה את הקישור או הכפתור שלידו, ולכן inline-flex
+     בגובה 44 — כמו `.lg-foot a`. השורה גדלה, ואין חפיפה.
+   לא `a` כללי: `.lg-foot a` ודומיו כבר 44px בבנייה אחרת. */
+.foot a,.hint a{padding-block:14px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -336,7 +346,7 @@ dl.gloss dd{margin:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r30 · 2026-10-01";
+var BUILD="r31 · 2026-10-02";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -1072,7 +1082,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r30-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r31-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>

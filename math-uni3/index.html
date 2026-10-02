@@ -500,6 +500,16 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
    ובגובה מינימלי, לא בגובה קשיח — ערבית ורוסית ארוכות יותר. */
 .hlang button{min-height:44px;padding-block:6px}
 input[type=range]{min-height:44px}
+
+/* ---------- קישור בתוך טקסט — אזור נגיעה ≥44px · 2.10.2026 (O-110) ----------
+   שני מקרים, ונמדדו שניהם ב-390px וב-360px:
+   - קישור בתוך שורת טקסט רצה: ריפוד אנכי בלבד. ב-inline הוא מגדיל את
+     אזור הנגיעה ואינו נכנס לגובה השורה — אף אלמנט לא זז.
+   - קישורים זה מתחת לזה (<br>), וקישור בתוך פס ההקראה הקבוע: שם הריפוד
+     חרג מהשורה וכיסה את הקישור או הכפתור שלידו, ולכן inline-flex
+     בגובה 44 — כמו `.lg-foot a`. השורה גדלה, ואין חפיפה.
+   לא `a` כללי: `.lg-foot a` ודומיו כבר 44px בבנייה אחרת. */
+#tts-fail a{display:inline-flex;align-items:center;min-height:44px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -994,7 +1004,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g161 · 2026-10-01";
+var BUILD="g162 · 2026-10-02";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -11945,7 +11955,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g161-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g162-pwa1").catch(function(){});
   });
 }
 </script>
