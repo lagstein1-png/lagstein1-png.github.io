@@ -29,7 +29,7 @@ Instinct מסייע גם בתחזוקת אתר בקול. בזמן ש-Claude Code
 | מלכודות הקאש — `legal/`, נתיבים משותפים וה-`sw.js` של השורש | `docs/claude/cache-traps.md` |
 | המבחן הכיתתי אינו מביט בהתקדמות הלומד | `docs/claude/class-exam.md` |
 | אפליקציה חדשה או נושא ב-`lomda` | `docs/claude/new-app-or-topic.md` |
-| ברק — מוח אחד, ואין שני | `docs/claude/barak.md` |
+| לימור — מוח אחד, ואין שני | `docs/claude/barak.md` |
 | כלי בדיקה | `docs/claude/qa-tools.md` |
 | מרגל הסשן | `docs/claude/session-spy.md` |
 | הצוות | `docs/claude/team.md` |
@@ -98,7 +98,7 @@ Instinct מסייע גם בתחזוקת אתר בקול. בזמן ש-Claude Code
 - שער השלבים: `build → internal → content-qa → approved → public`; `stages.json` הוא האמת. `stage.js`.
 - מניין האפליקציות: `DATA.APPS` הוא האמת, `badge` בארבע שפות כמילה. `apps.js`. שבע נקודות מגע לאפליקציה חדשה — `new-app-or-topic.md`.
 - `lomda`: נושא חדש = שלוש נגיעות. `banks.js`. אפליקציה חדשה מוצדקת רק במחולל או באינטראקציה שאין במנוע.
-- ברק: מוח אחד, `tutor-api/worker.js`. `brain.js`, `joshface.js`, `joshstate.js`, `tutor.js`.
+- לימור: מוח אחד, `tutor-api/worker.js`. `brain.js`, `joshface.js`, `joshstate.js`, `tutor.js`.
 - ״תאוריה מדברת״: ריפו נפרד, השם האנגלי הישן אסור. `naming.js`. המופע החוקי היחיד: השדה `u` (נתיב).
 - רקיע: הדיוק נמדד מול Swiss Ephemeris — `galileo.js`; הטקסטים — `rakia-content.js`, `rakia-safety.js`.
 - `learning-core/` — אף אפליקציה אינה טוענת אותה, ו-`core.js` חוסם אימוץ. גופנים לערבית/רוסית — `fonts.js`; המבחן מהקישור — `exam.js`.
