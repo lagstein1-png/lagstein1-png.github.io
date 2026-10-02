@@ -74,6 +74,28 @@
 
 ## נסגר — עם ההוכחה
 
+### המכסה הגלובלית נבדקה שוב לפני עדכון ה-README — tutor-api/README.md תועד · 2.10.2026
+
+הבעלים, 24.9.2026: ״תבדוק שוב מחר, לפני עדכון ה-README״. הענף
+כבר היה ממוזג ב-`main` (238 קומיטים זזו בינתיים — אפליקציות
+חדשות, נגישות, גופנים מקומיים), אז נפתח מחדש מ-`main` העדכני.
+
+**נבדק:** `worker.js` עדיין נושא `currentUsage`/`usage` (לא נדרס
+בשום קומיט מהשבוע), ו-`deploy-tutor` לא רץ מאז ריצה 19 (24.9) —
+כלומר הגרסה החיה היא זו שנפרסה אז. `tutor-status.yml` הורץ שוב
+(`Actions → tutor-status → Run workflow`):
+
+    {"day":"2026-10-02","used":0,"cap":100,"remaining":100}
+
+אפס שימושים היום, מול 2/100 ב-24.9. התקרות (`perDay:10`,
+`globalPerDay:100`) זהות לאלה שב-README — אין סחיפה.
+
+**מה נוסף ל-`tutor-api/README.md`:** שדה `usage` תחת `GET
+/health`, איך `node .claude/qa/tutor.js` בודק אותו מקומית,
+ואיך `tutor-status.yml` בודק אותו חיה — עם המספר הטרי כדוגמה
+ותאריך המדידה, לא מספר קבוע | זניח | `node .claude/qa/tutor.js`;
+ריצת `tutor-status` #3; `tutor-api/README.md` | —
+
 ### rakia — מסך הפרטיות אמר ״Heebo נטען מ-Google Fonts״ · 2.10.2026
 
 נמצא בדרך ל-O-110. מאז הגופנים המקומיים (1.10, `97c30d1`) המשפט שגוי: rakia טוענת את `/fonts/fonts.css`, וקובצי Heebo
