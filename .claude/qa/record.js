@@ -89,16 +89,31 @@ const PRICE_PER_M = { gcloud: 40, gemini: null };
    עצר כסף — רק מכסה (429). עכשיו כל בקשה נבדקת לפני שהיא יוצאת:
    אם האומדן שלה יחצה את התקרה, עוצרים כמו על מכסה, ומה שהוקלט נשמר.
    אחרי התשובה נרשם המחיר לפי usageMetadata (אסימונים אמיתיים).
-   ההוצאה מצטברת בין ריצות ב-record-spend.json, ש-record.yml דוחף.
+   ההוצאה מצטברת בין ריצות (record-spend.json ו-record-spend/, ראו למטה).
    המחיר בדולר למיליון אסימונים [קלט טקסט, פלט אודיו] — מ-cloudprice.net
    ומחיפוש, 2.10.2026, **לא מדף התמחור של גוגל ולא מחשבונית**. מודל
    שאינו בטבלה מחויב במחיר היקר שבה. התקרה: TTS_BUDGET_USD (ברירת מחדל 25). */
 const PRICES = { 'gemini-2.5-pro-preview-tts': [1, 20], 'gemini-2.5-flash-preview-tts': [0.5, 10],
                  'gemini-3.1-flash-tts-preview': [1, 20] };
 const BUDGET = Number(process.env.TTS_BUDGET_USD || 25);
+/* ריצות במקביל (הבעלים, 3.10.2026: ״רוץ בכמה חזיתות״): קובץ אחד משותף
+   היה מתנגש בכל דחיפה. לכן כל ריצה כותבת רק לקובץ משלה,
+   record-spend/<GITHUB_RUN_ID>.json, וההוצאה הכוללת היא record-spend.json
+   (הבסיס, עד הריצות המקבילות) ועוד כל הקבצים בתיקייה. ריצות שרצות
+   באותו זמן לא רואות זו את זו, ולכן התקרה יכולה לעבור בסכום שלהן. */
 const SPEND_FILE = path.join(ROOT, '.claude', 'qa', 'record-spend.json');
-const SPEND = (() => { try { return JSON.parse(fs.readFileSync(SPEND_FILE, 'utf8')); }
-                       catch (e) { return { budgetUsd: BUDGET, usd: 0, requests: 0, byModel: {} }; } })();
+const SPEND_DIR = path.join(ROOT, '.claude', 'qa', 'record-spend');
+const RUN_FILE = path.join(SPEND_DIR, (process.env.GITHUB_RUN_ID || 'local') + '.json');
+const readJson = f => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return null; } };
+const SPEND = readJson(RUN_FILE) || { usd: 0, requests: 0, byModel: {} };
+const OTHERS = (() => {
+  let usd = (readJson(SPEND_FILE) || {}).usd || 0;
+  try { for (const f of fs.readdirSync(SPEND_DIR))
+    if (f.endsWith('.json') && path.join(SPEND_DIR, f) !== RUN_FILE) usd += (readJson(path.join(SPEND_DIR, f)) || {}).usd || 0; }
+  catch (e) {}
+  return usd;
+})();
+const spent = () => OTHERS + SPEND.usd;
 class BudgetError extends Error {}
 function costOf(model, inTok, outTok) {
   if (model === 'cloud-tts') return 0;
@@ -116,7 +131,7 @@ function estimate(model, chars, n) {
 const guess = (model, texts) => estimate(model, texts.reduce((s, t) => s + t.length, 0), texts.length);
 function spendGate(model, texts) {
   const g = guess(model, texts);
-  if (SPEND.usd + g > BUDGET) throw new BudgetError('תקרת ההוצאה $' + BUDGET + ': הוצאו $' + SPEND.usd.toFixed(2) +
+  if (spent() + g > BUDGET) throw new BudgetError('תקרת ההוצאה $' + BUDGET + ': הוצאו $' + spent().toFixed(2) +
     ', והבקשה הבאה (' + model + ') עולה כ-$' + g.toFixed(2));
 }
 function spendAdd(model, texts, usage) {
@@ -128,7 +143,8 @@ function spendAdd(model, texts, usage) {
   SPEND.byModel = SPEND.byModel || {};
   SPEND.byModel[model] = Math.round(((SPEND.byModel[model] || 0) + c) * 1e4) / 1e4;
   SPEND.budgetUsd = BUDGET;
-  fs.writeFileSync(SPEND_FILE, JSON.stringify(SPEND, null, 1) + '\n');
+  fs.mkdirSync(SPEND_DIR, { recursive: true });
+  fs.writeFileSync(RUN_FILE, JSON.stringify(SPEND, null, 1) + '\n');
 }
 /* מכסה או תקרה: אין טעם לעבור לאפליקציה הבאה ב---all */
 let STOPPED = '';
@@ -378,7 +394,7 @@ function plan(apps) {
     for (const [id, text] of c) if (!have.has(id)) { missChars += text.length; missN++; } }
   for (const m of MODELS) console.log('אומדן gemini ל-' + missN + ' החסרות, הכול ב-' + m + ' ($' + (PRICES[m] || [1, 20]).join('/$') +
     ' למיליון אסימונים, cloudprice.net): $' + estimate(m, missChars, missN).toFixed(2));
-  console.log('תקרה $' + BUDGET + ' · הוצאו עד היום $' + (SPEND.usd || 0).toFixed(2) + ' (record-spend.json)');
+  console.log('תקרה $' + BUDGET + ' · הוצאו עד היום $' + spent().toFixed(2) + ' (record-spend.json + record-spend/)');
 }
 
 /* --- check -------------------------------------------------------- */

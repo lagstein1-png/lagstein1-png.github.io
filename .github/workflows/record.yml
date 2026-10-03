@@ -61,8 +61,11 @@ on:
 permissions:
   contents: write
 
+# קבוצה לכל אפליקציה (הבעלים, 3.10.2026: ״רוץ בכמה חזיתות״) — ריצות
+# של אפליקציות שונות רצות במקביל; שתי ריצות של אותה אפליקציה עדיין
+# בתור (אחרת שתיהן היו מקליטות את אותם משפטים וכותבות לאותו מניפסט).
 concurrency:
-  group: record
+  group: record-${{ github.event.inputs.app || 'next' }}
   cancel-in-progress: false
 
 jobs:
@@ -180,12 +183,21 @@ jobs:
             cat /tmp/app.log >> /tmp/rec.log
             if ! node .claude/qa/record.js --check; then echo "::error::המניפסט של $APP אינו תואם לדיסק — לא דוחפים"; exit 1; fi
             git add -- '*/audio/*'
-            if [ -f .claude/qa/record-spend.json ]; then git add .claude/qa/record-spend.json; fi
+            if [ -d .claude/qa/record-spend ]; then git add .claude/qa/record-spend; fi
             if ! git diff --cached --quiet; then
               N=$(git diff --cached --name-only | grep -c '\.mp3$' || true)
               git commit -q -m "הקלטות: $APP — $N קבצים חדשים או מוחלפים (record.yml)"
-              if ! { git pull --rebase -q origin main && git push -q origin HEAD:main; }; then
-                echo "::error::הדחיפה של $APP נכשלה — עוצרים, כדי לא להקליט עוד מה שלא יישמר"; exit 1
+              # ריצות במקביל דוחפות זו ליד זו: דחיפה שנדחתה (main זז) מנסה שוב.
+              # כל ריצה נוגעת רק בתיקיית האפליקציה שלה ובקובץ ההוצאה שלה,
+              # ולכן ה-rebase נקי; כישלון אחרי שישה ניסיונות הוא אמיתי.
+              OK=""
+              for TRY in 1 2 3 4 5 6; do
+                if git pull --rebase -q origin main && git push -q origin HEAD:main; then OK=1; break; fi
+                git rebase --abort 2>/dev/null || true
+                sleep $(( TRY * 7 + RANDOM % 10 ))
+              done
+              if [ -z "$OK" ]; then
+                echo "::error::הדחיפה של $APP נכשלה שש פעמים — עוצרים, כדי לא להקליט עוד מה שלא יישמר"; exit 1
               fi
               echo "pushed=1" >> "$GITHUB_OUTPUT"
               echo "נדחף: $APP, $N הקלטות."
@@ -200,18 +212,24 @@ jobs:
         if: steps.pick.outputs.app != '' && steps.push.outputs.pushed != '1'
         run: |
           set -euo pipefail
-          if [ -f /tmp/rec.log ]; then tail -n 120 /tmp/rec.log > .claude/qa/last-record.log; else echo "אין יומן מהריצה." > .claude/qa/last-record.log; fi
+          # יומן לכל אפליקציה: ריצות במקביל לא כותבות לאותו קובץ
+          APP="${{ steps.pick.outputs.app }}"
+          LOG=".claude/qa/last-record-$(echo "$APP" | tr ',' '-').log"
+          if [ -f /tmp/rec.log ]; then tail -n 120 /tmp/rec.log > "$LOG"; else echo "אין יומן מהריצה." > "$LOG"; fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f .claude/qa/last-record.log
+          git add -f "$LOG"
           # מונה הניסיונות עולה גם בריצה בלי קבצים — אחרת קליפ תקול לא ייצא מהתור לעולם
-          APP="${{ steps.pick.outputs.app }}"
           git add -- '*/audio/attempts.json' 2>/dev/null || true
-          if [ -f .claude/qa/record-spend.json ]; then git add .claude/qa/record-spend.json; fi
+          if [ -d .claude/qa/record-spend ]; then git add .claude/qa/record-spend; fi
           if git diff --cached --quiet; then echo "היומן לא השתנה."; exit 0; fi
           git commit -q -m "יומן הקלטה: ריצה בלי קבצים חדשים (record.yml)"
-          git pull --rebase -q origin main
-          git push origin HEAD:main
+          for TRY in 1 2 3 4 5 6; do
+            if git pull --rebase -q origin main && git push -q origin HEAD:main; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $(( TRY * 7 + RANDOM % 10 ))
+          done
+          echo "::error::היומן לא נדחף שש פעמים"; exit 1
 
       - name: כיסוי
         run: |

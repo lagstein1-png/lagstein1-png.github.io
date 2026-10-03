@@ -121,7 +121,7 @@ function run(T, args, env) {
   const r = spawnSync(process.execPath, ['-r', PRE, path.join(T, '.claude/qa/record.js')].concat(args), {
     cwd: T, encoding: 'utf8', timeout: 60000,
     env: Object.assign({}, process.env, { FFMPEG: path.join(BIN, 'ffmpeg'), FFPROBE: path.join(BIN, 'ffprobe'),
-      GEMINI_API_KEY: 'fake', TTS_KEY: 'fake', TTS_BATCH: '', TTS_PROVIDER: '', TTS_VOICE: 'Kore' }, env || {}) });
+      GEMINI_API_KEY: 'fake', TTS_KEY: 'fake', TTS_BATCH: '', TTS_PROVIDER: '', TTS_VOICE: 'Kore', GITHUB_RUN_ID: 'test' }, env || {}) });
   return { code: r.status, out: (r.stdout || '') + (r.stderr || '') };
 }
 const kbpsOf = f => { const m = fs.existsSync(f) && /kbps=(\d+)/.exec(fs.readFileSync(f).toString('latin1')); return m ? +m[1] : 0; };
@@ -202,7 +202,7 @@ const S = ['שלום לכולם היום', 'אנחנו לומדים יחד', 'ז
   const r = run(T, ['--all', '--max', '5'], { TTS_BUDGET_USD: '0.0015', GEMINI_TTS_MODEL: 'gemini-2.5-pro-preview-tts' });
   const made = S.filter(s => fs.existsSync(path.join(T, 'english', 'audio', 'he', R.id(s) + '.mp3'))).length;
   const hist = fs.existsSync(path.join(T, 'history', 'audio', 'he')) ? fs.readdirSync(path.join(T, 'history', 'audio', 'he')).length : 0;
-  let sp = {}; try { sp = JSON.parse(fs.readFileSync(path.join(T, '.claude/qa/record-spend.json'), 'utf8')); } catch (e) {}
+  let sp = {}; try { sp = JSON.parse(fs.readFileSync(path.join(T, '.claude/qa/record-spend/test.json'), 'utf8')); } catch (e) {}
   check('6א. תקרה של בקשה אחת: קובץ אחד, ההיסטוריה לא נגעה, ההוצאה נרשמה מתחת לתקרה',
         made === 1 && hist === 0 && sp.requests === 1 && sp.usd > 0 && sp.usd <= 0.0015,
         'נוצרו ' + made + ', היסטוריה ' + hist + ', ' + JSON.stringify(sp) + ' · ' + r.out.split('\n').filter(l => /תקרת|✗/.test(l)).slice(0, 2).join(' | '));
@@ -210,7 +210,7 @@ const S = ['שלום לכולם היום', 'אנחנו לומדים יחד', 'ז
   const T2 = tree('usage', { english: S });
   manifest(T2, 'english', 'Kore', []);
   run(T2, ['english', '--max', '5'], { TTS_BUDGET_USD: '1.0005', FAKE_USAGE: '1', GEMINI_TTS_MODEL: 'gemini-2.5-pro-preview-tts' });
-  let sp2 = {}; try { sp2 = JSON.parse(fs.readFileSync(path.join(T2, '.claude/qa/record-spend.json'), 'utf8')); } catch (e) {}
+  let sp2 = {}; try { sp2 = JSON.parse(fs.readFileSync(path.join(T2, '.claude/qa/record-spend/test.json'), 'utf8')); } catch (e) {}
   check('6ב. המחיר נרשם מהאסימונים האמיתיים, והבקשה שאחריה נחסמת', sp2.usd === 1.001 && sp2.requests === 1, JSON.stringify(sp2));
 }
 
@@ -224,12 +224,12 @@ const S = ['שלום לכולם היום', 'אנחנו לומדים יחד', 'ז
   const r = spawnSync(process.execPath, ['-r', PRE, path.join(T, '.claude/qa/record.js'), 'english', '--max', '12'], {
     cwd: T, encoding: 'utf8', timeout: 1500, killSignal: 'SIGINT',
     env: Object.assign({}, process.env, { FFMPEG: path.join(BIN, 'ffmpeg'), FFPROBE: path.join(BIN, 'ffprobe'),
-      GEMINI_API_KEY: 'fake', TTS_BATCH: '', TTS_PROVIDER: '', TTS_VOICE: 'Kore', FAKE_DELAY: '400' }) });
+      GEMINI_API_KEY: 'fake', TTS_BATCH: '', TTS_PROVIDER: '', TTS_VOICE: 'Kore', FAKE_DELAY: '400', GITHUB_RUN_ID: 'test' }) });
   const out = (r.stdout || '') + (r.stderr || '');
   const disk = fs.readdirSync(path.join(T, 'english', 'audio', 'he')).filter(f => f.endsWith('.mp3')).length;
   let m = {}; try { m = JSON.parse(fs.readFileSync(path.join(T, 'english', 'audio', 'manifest.json'), 'utf8')); } catch (e) {}
   const inMan = ((m.langs || {}).he || {}).count || 0;
-  let sp = {}; try { sp = JSON.parse(fs.readFileSync(path.join(T, '.claude/qa/record-spend.json'), 'utf8')); } catch (e) {}
+  let sp = {}; try { sp = JSON.parse(fs.readFileSync(path.join(T, '.claude/qa/record-spend/test.json'), 'utf8')); } catch (e) {}
   check('7. SIGINT: מה שנוצר נכנס למניפסט, ההוצאה רשומה, ולא הוקלט הכול',
         disk > 0 && disk < 12 && inMan === disk && sp.requests >= disk && m.voice === 'Kore',
         'בדיסק ' + disk + ', במניפסט ' + inMan + ', ' + JSON.stringify(sp) + ' · ' + out.split('\n').slice(-3).join(' | '));
@@ -250,6 +250,25 @@ const S = ['שלום לכולם היום', 'אנחנו לומדים יחד', 'ז
         'קיימים ' + have.join(',') + ', prompted ' + JSON.stringify(pr) + ' · ' + r.out.split('\n').filter(l => /✗|↺/.test(l)).slice(0, 2).join(' | '));
 }
 
+/* 9. ריצות במקביל (3.10.2026): כל ריצה כותבת רק לקובץ ההוצאה שלה, כדי
+   ששתי דחיפות לא יתנגשו; הבסיס record-spend.json אינו נוגע, והסך נספר
+   מכולם: 5 בבסיס + שתי בקשות של $1.001 = $7.00. */
+{
+  const T = tree('parallel', { english: S.slice(0, 1), history: ['היסטוריה של העם'] });
+  manifest(T, 'english', 'Kore', []); manifest(T, 'history', 'Kore', []);
+  const base = path.join(T, '.claude/qa/record-spend.json');
+  fs.writeFileSync(base, JSON.stringify({ usd: 5, requests: 10 }));
+  run(T, ['english', '--max', '1'], { GITHUB_RUN_ID: 'r1', FAKE_USAGE: '1', GEMINI_TTS_MODEL: 'gemini-2.5-pro-preview-tts' });
+  run(T, ['history', '--max', '1'], { GITHUB_RUN_ID: 'r2', FAKE_USAGE: '1', GEMINI_TTS_MODEL: 'gemini-2.5-pro-preview-tts' });
+  const f1 = fs.existsSync(path.join(T, '.claude/qa/record-spend/r1.json'));
+  const f2 = fs.existsSync(path.join(T, '.claude/qa/record-spend/r2.json'));
+  const baseUsd = JSON.parse(fs.readFileSync(base, 'utf8')).usd;
+  const plan = run(T, ['--plan']).out;
+  const total = Number((/הוצאו עד היום \$([\d.]+)/.exec(plan) || [])[1]);
+  check('9. במקביל: קובץ לכל ריצה, הבסיס לא השתנה, והסך כולל את שלושתם',
+        f1 && f2 && baseUsd === 5 && total === 7, 'r1 ' + f1 + ', r2 ' + f2 + ', בסיס ' + baseUsd + ', סך ' + total);
+}
+
 fs.rmSync(BASE, { recursive: true, force: true });
-console.log(bad ? '\n✗ ' + bad + ' תרחישים נפלו' : '\n✓ ההקלטה בטוחה: שמונה תרחישים');
+console.log(bad ? '\n✗ ' + bad + ' תרחישים נפלו' : '\n✓ ההקלטה בטוחה: תשעה תרחישים');
 process.exit(bad ? 1 : 0);
