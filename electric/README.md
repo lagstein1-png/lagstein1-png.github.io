@@ -33,6 +33,6 @@
 
 - **התוכן לא נבדק בידי מורה לחשמל.** הערכים והנוסחאות נבדקו בקוד
   ובקריאה, ולא מול תכנית הלימודים של משרד החינוך.
-- ברק מקבל תפקיד `electric` ב-`tutor-api/worker.js`, אבל השרת צריך
+- לימור מקבלת תפקיד `electric` ב-`tutor-api/worker.js`, אבל השרת צריך
   פריסה (`deploy-tutor.yml`, ידני) לפני שהתפקיד חי.
 - `content.js`: 0 FAIL, REVIEW — `.claude/qa/reports/electric.md`.

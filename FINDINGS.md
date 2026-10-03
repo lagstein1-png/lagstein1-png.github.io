@@ -102,12 +102,13 @@
 `FINDINGS.md` (O-103 ושורה פתוחה אחת), `docs/claude/{barak,qa-tools,tts-engine,cache-traps}.md`,
 `.claude/qa/README.md`, `.claude/qa/stages.json` (תיאור בלבד), `tutor-api/README.md`,
 `marketing/media/README.md`, `marketing/media/voice.js` (הערה).
+בסבב שני (״רוץ״ של הבעלים, 3.10.2026): `electric/README.md:36`, ועימו מפתח `electric` e31 ⇒ e32 — `cache.js` דורש מפתח חדש לכל שינוי בתיקיית אפליקציה.
 המין הדקדוקי תוקן (״מציעה״, ״מקבלת״, ״צריכה״).
 
 **לא נגעו, בכוונה.** שמות קבצים ונתיבים (`barak.js`, `barak-browser.js`,
 `docs/claude/barak.md`, המפתח `barak` ב-`stages.json`); המסנן ב-`tutor/tutor.js:191`,
 שמחליף ״שמי ברק״ ב״שמי לימור״ בתשובת שרת ישן, ולכן חייב להכיל את השם הישן;
-`electric/README.md:36` — שינוי בתיקיית אפליקציה מחייב מפתח קאש (`cache.js`), והקאש לא בתחום הסבב; רשומות היסטוריה (`CHANGELOG.md`, `docs/claude/history.md`, `findings-archive.md`,
+רשומות היסטוריה (`CHANGELOG.md`, `docs/claude/history.md`, `findings-archive.md`,
 `docs/barak-core-*.md`, רשומות ״נסגר״, O-63 שמצטט דיווח); ומילים אחרות:
 ״ברקע״, ״מברק״, ״הברקה״, ברק כתופעת טבע, ״בני ברק״, ״דבורה וברק״.
 
