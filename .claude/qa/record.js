@@ -79,9 +79,10 @@ const VOICE = process.env.TTS_VOICE || process.env.GEMINI_TTS_VOICE ||
 const API   = 'https://generativelanguage.googleapis.com/v1beta';
 const GCLOUD = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 /* מחיר למיליון תווים, כפי שכתוב ב-tools/tts-build.js של הריפו הנפרד
-   (gcloud 30, azure 16, elevenlabs 150; gemini ״לא נמדד״). אומדן, לא
-   חשבונית — המחיר של היום נמצא בדף התמחור של גוגל. */
-const PRICE_PER_M = { gcloud: 30, gemini: null };
+   (gcloud 40, azure 16, elevenlabs 150; gemini ״לא נמדד״). אומדן, לא
+   חשבונית — המחיר של היום נמצא בדף התמחור של גוגל. תוקן 3.10.2026:
+   הבעלים — הגג הוא 40, לא 30. */
+const PRICE_PER_M = { gcloud: 40, gemini: null };
 
 /* --- תקרת הוצאה (2.10.2026) ----------------------------------------
    הבעלים: ״עלות מקסימלית $25 חד פעמי״. עד היום שום דבר בקוד לא
