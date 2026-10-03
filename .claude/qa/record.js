@@ -334,7 +334,10 @@ function pcmToMp3(ffmpeg, pcm, rate) {
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* ויסות כמו שם: מרווח שמתארך על 429 ומתקצר בזהירות אחרי רצף הצלחות */
-const PACE = { gap: 12000, min: 5000, max: 60000, ok: 0 };
+/* TTS_PACE_MIN_MS (3.10.2026): המפתח עבר ל-Tier 2, והבעלים ביקש לסיים
+   ״עד הסוף״ — המרווח המינימלי יורד, ו-429 עדיין מאריך אותו (×1.5). */
+const PACE_MIN = Math.max(500, Number(process.env.TTS_PACE_MIN_MS) || 5000);
+const PACE = { gap: Math.max(PACE_MIN, Math.min(12000, PACE_MIN * 2)), min: PACE_MIN, max: 60000, ok: 0 };
 /* הוראת הקראה (הבעלים, 3.10.2026: ״תקן את ה-7.5%״). בריצת המדידה 30
    נכשלו 15 מתוך 200 משפטים ב-ulpan: 11 ב-400 ״Model tried to generate
    text״ (המודל קרא את המשפט כהוראה וענה לו) ו-4 ב-200 בלי אודיו שש
