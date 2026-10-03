@@ -335,12 +335,21 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* ויסות כמו שם: מרווח שמתארך על 429 ומתקצר בזהירות אחרי רצף הצלחות */
 const PACE = { gap: 12000, min: 5000, max: 60000, ok: 0 };
+/* הוראת הקראה (הבעלים, 3.10.2026: ״תקן את ה-7.5%״). בריצת המדידה 30
+   נכשלו 15 מתוך 200 משפטים ב-ulpan: 11 ב-400 ״Model tried to generate
+   text״ (המודל קרא את המשפט כהוראה וענה לו) ו-4 ב-200 בלי אודיו שש
+   פעמים. רק אז — לא לכל משפט — אותו משפט נשלח שוב עם ההוראה לפניו,
+   בנוסח של הנחיית האצווה שכבר עובדת. המזהים נרשמים ב-prompted.json
+   ליד המניפסט, כדי שאפשר יהיה לבדוק באוזן שההוראה עצמה לא נשמעת. */
+const READ_PROMPT = 'הקרא בקול ברור את המשפט הבא, בדיוק כפי שהוא כתוב, ואל תוסיף דבר:\n';
+let lastPrompted = false;
 async function synth(ffmpeg, text) {
+  let prompted = false;
   for (let attempt = 0; attempt < 6; attempt++) {
     spendGate(MODEL, [text]);
     const r = await fetch(API + '/models/' + MODEL + ':generateContent?key=' + encodeURIComponent(KEY), {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text }] }],
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompted ? READ_PROMPT + text : text }] }],
         generationConfig: { responseModalities: ['AUDIO'],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: VOICE } } } } })
     });
@@ -353,15 +362,18 @@ async function synth(ffmpeg, text) {
     if (!r.ok) {
       const body = await r.text(); let msg = body;
       try { msg = JSON.parse(body).error.message; } catch (e) {}
+      if (r.status === 400 && !prompted && /generate text/i.test(String(msg))) { prompted = true; continue; }
       throw new Error('gemini ' + r.status + ' ' + String(msg).replace(/\s+/g, ' ').slice(0, 160));
     }
     const j = await r.json();
     const parts = (((j.candidates || [])[0] || {}).content || {}).parts || [];
     const inline = parts.map(p => p.inlineData).filter(Boolean)[0];
     spendAdd(MODEL, [text], j.usageMetadata);
-    if (!inline || !inline.data) { await sleep(2000); continue; }   /* 200 בלי אודיו — רעש חולף, נמדד ב-voice.js */
+    /* 200 בלי אודיו — רעש חולף (voice.js); שלוש פעמים ברצף — עוברים להוראה */
+    if (!inline || !inline.data) { if (attempt >= 2) prompted = true; await sleep(2000); continue; }
     if (++PACE.ok >= 8) { PACE.ok = 0; PACE.gap = Math.max(PACE.min, Math.round(PACE.gap * 0.8)); }
     const rate = Number((/rate=(\d+)/.exec(inline.mimeType || '') || [])[1]) || 24000;
+    lastPrompted = prompted;
     return pcmToMp3(ffmpeg, Buffer.from(inline.data, 'base64'), rate);
   }
   throw new Error('תשובה בלי אודיו שש פעמים');
@@ -496,6 +508,12 @@ async function synthGcloud(ffmpeg, text) {
   throw new Error('gcloud — שש פעמים בלי אודיו');
 }
 
+/* prompted.json: המזהים שהוקלטו עם READ_PROMPT — לבדיקת אוזן */
+function notePrompted(app, id) {
+  const f = path.join(dirOf(app), 'prompted.json');
+  let list = []; try { list = JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) {}
+  if (!list.includes(id)) { list.push(id); fs.writeFileSync(f, JSON.stringify(list.sort(), null, 0) + '\n'); }
+}
 async function build(app, max) {
   const c = corpus(app);
   if (!c) { console.log('✗ ' + app + ' — אין מאגר קבוע להקלטה'); return 1; }
@@ -581,10 +599,12 @@ async function build(app, max) {
            פיצול בכלל. שגיאת מכסה עולה ללולאה הראשית כרגיל. */
         try {
           requests++;
+          lastPrompted = false;
           const mp3 = PROVIDER === 'gcloud' ? await synthGcloud(ffmpeg, H.spoken(batch[0][1])) : await synth(ffmpeg, H.spoken(batch[0][1]));
           if (mp3.length >= MIN_BYTES) {
             const f = path.join(outDir, batch[0][0] + '.mp3');
             if (!installed.has(batch[0][0]) && !current(batch[0][0])) { QUALITY.install(f, mp3, KBPS, ffmpeg); installed.add(batch[0][0]); delete attempts[batch[0][0]]; made++; }
+            if (lastPrompted) notePrompted(app, batch[0][0]);
             console.log('  ' + made + '/' + todo.length + ' · מחרוזת בודדת אחרי כישלון פיצול (' + model + ')');
             return;
           }
@@ -630,9 +650,11 @@ async function build(app, max) {
   for (const [id, text] of todo) {
     if (STOPPED === 'time') break;
     try {
+      lastPrompted = false;
       const mp3 = PROVIDER === 'gcloud' ? await synthGcloud(ffmpeg, H.spoken(text)) : await synth(ffmpeg, H.spoken(text));
       if (mp3.length < MIN_BYTES) throw new Error('קובץ ריק');
       QUALITY.install(path.join(outDir, id + '.mp3'), mp3, KBPS, ffmpeg);
+      if (lastPrompted) { notePrompted(app, id); console.log('  ↺ ' + id + ' הוקלט עם הוראת הקראה'); }
       delete attempts[id];
       made++;
       if (made % 10 === 0) console.log('  ' + made + '/' + todo.length + ' · ' + Math.round((Date.now() - t0) / 1000) + 'ש · מרווח ' + PACE.gap + 'ms');

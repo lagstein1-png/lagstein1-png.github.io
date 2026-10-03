@@ -79,7 +79,10 @@ globalThis.fetch = async (url, o) => {
     return ok({ audioContent: out.toString('base64') });
   }
   const text = b.contents[0].parts[0].text;
-  const k = /^הקרא בקול/.test(text) ? Number(/את (\\d+) הפריטים/.exec(text)[1]) : 0;
+  const k = /את (\\d+) הפריטים/.test(text) ? Number(/את (\\d+) הפריטים/.exec(text)[1]) : 0;
+  /* ״Model tried to generate text״ (ריצה 30): משפט שנראה כמו שאלה נדחה, אלא אם יש לפניו הוראת הקראה */
+  if (process.env.FAKE_TEXTGEN && !k && text.includes('שאלה') && !/^הקרא בקול ברור את המשפט/.test(text))
+    return { status: 400, ok: false, text: async () => JSON.stringify({ error: { message: 'Model tried to generate text, but it should only be used for TTS.' } }) };
   const data = k ? pcm(k) : pcm(1, text.includes('תקול') ? 'CORRUPT' : '');
   const usage = process.env.FAKE_USAGE ? { usageMetadata: { promptTokenCount: 1000, candidatesTokenCount: 50000 } } : {};
   return ok(Object.assign({ candidates: [{ content: { parts: [{ inlineData: { mimeType: 'audio/L16;rate=24000', data: data.toString('base64') } }] } }] }, usage));
@@ -232,6 +235,21 @@ const S = ['שלום לכולם היום', 'אנחנו לומדים יחד', 'ז
         'בדיסק ' + disk + ', במניפסט ' + inMan + ', ' + JSON.stringify(sp) + ' · ' + out.split('\n').slice(-3).join(' | '));
 }
 
+/* 8. ״Model tried to generate text״ (ריצה 30, 11 מתוך 200 ב-ulpan): המשפט
+   שנדחה מוקלט בניסיון חוזר עם הוראת הקראה ונרשם ב-prompted.json; משפט
+   רגיל נשלח בלי הוראה. */
+{
+  const ask = ['מה שאלה טובה לשאול היום', 'זה משפט רגיל לגמרי'];
+  const T = tree('prompt', { english: ask });
+  manifest(T, 'english', 'Kore', []);
+  const r = run(T, ['english', '--max', '5'], { FAKE_TEXTGEN: '1' });
+  const have = ask.map(s => fs.existsSync(path.join(T, 'english', 'audio', 'he', R.id(s) + '.mp3')));
+  let pr = []; try { pr = JSON.parse(fs.readFileSync(path.join(T, 'english', 'audio', 'prompted.json'), 'utf8')); } catch (e) {}
+  check('8. 400 ״generate text״: הוקלט עם הוראה ונרשם, והמשפט הרגיל בלי',
+        have[0] && have[1] && pr.length === 1 && pr[0] === R.id(ask[0]) && !attemptsOf(T, 'english')[R.id(ask[0])],
+        'קיימים ' + have.join(',') + ', prompted ' + JSON.stringify(pr) + ' · ' + r.out.split('\n').filter(l => /✗|↺/.test(l)).slice(0, 2).join(' | '));
+}
+
 fs.rmSync(BASE, { recursive: true, force: true });
-console.log(bad ? '\n✗ ' + bad + ' תרחישים נפלו' : '\n✓ ההקלטה בטוחה: שבעה תרחישים');
+console.log(bad ? '\n✗ ' + bad + ' תרחישים נפלו' : '\n✓ ההקלטה בטוחה: שמונה תרחישים');
 process.exit(bad ? 1 : 0);
