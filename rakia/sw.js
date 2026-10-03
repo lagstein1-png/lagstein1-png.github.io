@@ -14,7 +14,7 @@ const CACHE = "rakia-" + V;
 const PRE = ["./","./index.html","./manifest.json","./astro.js","./ephem-data.js",
              "./data/schema.js","./data/texts-signs-1.js","./data/texts-signs-2.js",
              "./data/texts-houses.js","./data/texts-aspects-1.js","./data/texts-aspects-2.js",
-             "./data/glossary.js","./data/learn.js","./data/places.js",
+             "./data/glossary.js","./data/learn.js","./data/en-texts.js","./data/en-glossary.js","./data/en-ui.js","./data/places.js",
              "./img/icon-192.png","./img/icon-512.png",
              "/tutor/he-speech.js","/speech/recorded.js","/tutor/josh-face.js",
              "/tutor/josh-local.js","/tutor/tutor.js","/tutor/barak-core.js",
