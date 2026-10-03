@@ -68,8 +68,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 340
     steps:
+      # ref: main ולא הקומיט שבו הריצה נכנסה לתור: ריצה שחיכתה מאחורי
+      # אחרת (concurrency) חייבת לראות את מה שהקודמת הקליטה והוציאה
+      # (record-spend.json), אחרת היא מקליטה שוב ומשלמת שוב.
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
