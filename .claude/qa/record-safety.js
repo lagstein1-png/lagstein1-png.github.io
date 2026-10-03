@@ -90,7 +90,7 @@ globalThis.fetch = async (url, o) => {
 `);
 
 /* --- עץ זמני ------------------------------------------------------ */
-const APPS = ['english', 'history', 'ulpan', 'civics', 'literature', 'tanakh', 'hebrew-arab', 'islam'];
+const APPS = ['english', 'history', 'ulpan', 'civics', 'literature', 'tanakh', 'hebrew-arab', 'islam', 'russian'];
 function tree(name, strings) {
   const T = path.join(BASE, name);
   for (const [rel, from] of [['.claude/qa/record.js', SRC], ['.claude/qa/record-quality.js', SRC],
