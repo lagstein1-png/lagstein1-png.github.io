@@ -32,6 +32,9 @@ const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
    /tutor/tutor.js מכאן — ולכן התפקיד שלה חייב להיות בשרת.
    החיווט שלה עצמו נבדק בריפו שלה, לא כאן. */
 const EXTERNAL = ['theory'];
+/* 3.10.2026: תפקידים שנוספו ב-worker.js לאפליקציות חדשות. הכפתור שלהן עדיין לא מחווט
+   (מחוץ לבדיקת החיווט), אבל לכל אחת כבר יש ROLE. */
+const ROLE_ONLY = ['science', 'math-elem', 'hebrew-lit', 'teacher-material'];
 const LANGS = ['he', 'ar', 'ru', 'en'];
 
 let bad = 0;
@@ -260,9 +263,9 @@ import(WORKER).then(async W => {
 
   /* ---------- 5. תפקיד לכל אפליקציה ---------- */
   t('לכל שתים־עשרה האפליקציות יש תפקיד',
-    Object.keys(W.ROLE).sort(), APPS.concat(EXTERNAL).sort());
+    Object.keys(W.ROLE).sort(), APPS.concat(EXTERNAL, ROLE_ONLY).sort());
   const dup = new Set(Object.values(W.ROLE));
-  t('אין שני תפקידים זהים', dup.size, APPS.length + EXTERNAL.length);
+  t('אין שני תפקידים זהים', dup.size, APPS.length + EXTERNAL.length + ROLE_ONLY.length);
   APPS.concat(EXTERNAL).forEach(a => {
     const c = W.contextBlock({ app: a, lang: 'he', q: null }, 0);
     if (c.indexOf(W.ROLE[a]) !== 0) { bad++; console.log(`✗ ${a}: התפקיד אינו נשלח בראש ההקשר`) }

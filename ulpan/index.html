@@ -1170,7 +1170,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a126 · 2026-10-02";
+var BUILD="a127 · 2026-10-03";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -5131,9 +5131,14 @@ function viewSit(){
       tools.push('<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="sitform">'+ic("book",16)+' '+esc(xt("stFormulas"))+'</button>');
     if(tools.length)h2+='<div class="row" style="margin-top:16px;gap:8px">'+tools.join("")+'</div>';
     var cur=SIT.answers[SIT.i];
+    var optRead=(sp.r!==false||q.audioOnly)&&state.settings.tts;
     h2+='<div class="opts">'+q.options.map(function(o,i){
-      return '<button class="opt'+(cur===i?" right":"")+'" data-a="sitans" data-i="'+i+'">'+
+      var ob='<button class="opt'+(cur===i?" right":"")+'" data-a="sitans" data-i="'+i+'">'+
         '<span class="k">'+(i+1)+'</span><span class="m">'+o.h+'</span></button>';
+      if(!optRead)return ob;
+      var oT=plainOf(o.h), oL=/[\u0590-\u05FF]/.test(oT)?LEARN:state.lang;
+      return '<div class="orow">'+ob+'<button class="optspk" data-a="say" data-say="'+esc(oT)+'" data-lang="'+oL+
+        '" aria-label="'+esc(t("hearOpt"))+'">'+ic("speaker",15)+'</button></div>';
     }).join("")+'</div>';
     /* "לא יודע/ת" הוא תשובה לגיטימית ולא דילוג. היא נספרת כשגויה,
        אבל היא מגלה למורה משהו שניחוש מסתיר. */
@@ -5680,7 +5685,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a126-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a127-pwa1").catch(function(){});
   });
 }
 </script>

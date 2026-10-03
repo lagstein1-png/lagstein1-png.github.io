@@ -95,7 +95,7 @@ he:{ btn:"לימור — עזרה מהמוֹרָה", title:"עזרה מהמוֹ�
   limitAll:"זה לא אתה — הגעתי לגבול היומי שלי. אפשר לנסות שוב מחר, וכל השאר באפליקציה עובד.",
   full:"דיברנו על זה הרבה. בוא ננסה, ובשאלה הבאה נתחיל מחדש.",
   privacy:"אל תכתבו כאן שם מלא, כתובת או טלפון.",
-  play:"הקראה", stop:"עצירה", rate:"מהירות", off:"אין קול בשפה הזאת במכשיר הזה",
+  auto:"הקראה אוטומטית", play:"הקראה", stop:"עצירה", rate:"מהירות", off:"אין קול בשפה הזאת במכשיר הזה",
   voice:"קול", voiceAuto:"אוטומטי",
   vSample:"שלום, אני לימור. כך אני נשמעת במכשיר שלך.",
   mic:"דבר", micOn:"מקשיבה…", micNo:"הדפדפן הזה לא נותן לדבר. אפשר להקליד.",
@@ -116,7 +116,7 @@ ar:{ btn:"ليمور — مساعدة من المعلّمة", title:"مساعد�
   limitAll:"ليست غلطتك — وصلتُ إلى حدّي اليوميّ. جرّب غدًا، وكلّ شيء آخر في التطبيق يعمل.",
   full:"تحدّثنا كثيرًا عن هذا. لنجرّب، ونبدأ من جديد في التالي.",
   privacy:"لا تكتب هنا اسمك الكامل أو عنوانك أو رقم هاتفك.",
-  play:"استماع", stop:"إيقاف", rate:"السرعة", off:"لا يوجد صوت بهذه اللغة على هذا الجهاز",
+  auto:"قراءة تلقائية", play:"استماع", stop:"إيقاف", rate:"السرعة", off:"لا يوجد صوت بهذه اللغة على هذا الجهاز",
   voice:"الصوت", voiceAuto:"تلقائي",
   vSample:"مرحبًا، أنا ليمور. هكذا سأبدو على جهازك.",
   mic:"تكلّم", micOn:"أسمعك…", micNo:"هذا المتصفّح لا يتيح التكلّم. يمكنك الكتابة.",
@@ -137,7 +137,7 @@ ru:{ btn:"Лимор — помощь учительницы", title:"Помощ
   limitAll:"Это не ты — я достигла своего дневного предела. Попробуй завтра, остальное в приложении работает.",
   full:"Мы много об этом говорили. Давай попробуем, а дальше начнём заново.",
   privacy:"Не пиши здесь полное имя, адрес или телефон.",
-  play:"Прочитать", stop:"Стоп", rate:"Скорость", off:"На этом устройстве нет голоса для этого языка",
+  auto:"Читать автоматически", play:"Прочитать", stop:"Стоп", rate:"Скорость", off:"На этом устройстве нет голоса для этого языка",
   voice:"Голос", voiceAuto:"Автоматически",
   vSample:"Привет, я Лимор. Вот как я звучу на вашем устройстве.",
   mic:"Говори", micOn:"Слушаю…", micNo:"Этот браузер не позволяет говорить. Можно печатать.",
@@ -158,7 +158,7 @@ en:{ btn:"Limor — ask the teacher", title:"Ask the teacher", close:"Close", se
   limitAll:"It is not you — I have reached my daily limit. Try again tomorrow; everything else in the app still works.",
   full:"We have talked about this a lot. Let's try, and start fresh on the next one.",
   privacy:"Do not write your full name, address or phone number here.",
-  play:"Read aloud", stop:"Stop", rate:"Speed", off:"This device has no voice for this language",
+  auto:"Read aloud automatically", play:"Read aloud", stop:"Stop", rate:"Speed", off:"This device has no voice for this language",
   voice:"Voice", voiceAuto:"Automatic",
   vSample:"Hi, I am Limor. This is how I sound on your device.",
   mic:"Speak", micOn:"Listening…", micNo:"This browser does not allow speaking. You can type instead.",
@@ -239,6 +239,12 @@ function rate(){
   catch(e){ return 1 }
 }
 function setRate(v){ try{ localStorage.setItem(RATE_KEY, String(v)) }catch(e){} }
+
+/* הקראה אוטומטית של תשובות לימור — ברירת מחדל: פועלת. ילד עם דיסלקציה
+   לא אמור לחפש כפתור כדי לשמוע אותה; מי שמעדיף שקט מכבה בתיבה. */
+var AUTO_KEY = "tutor-auto-v1";
+function autoOn(){ try{ return localStorage.getItem(AUTO_KEY) !== "0" }catch(e){ return true } }
+function setAuto(v){ try{ localStorage.setItem(AUTO_KEY, v ? "1" : "0") }catch(e){} }
 
 /* סגירת הודעת ״לא זוהה קול נשי״ — נשמרת לשפה, במכשיר הזה. */
 var MAN_KEY = "tutor-man-note-v1";
@@ -1123,7 +1129,8 @@ function build(){
     else if(a === "act") actChip(b.getAttribute("data-act"), b.getAttribute("data-arg"));
   });
   EL.log.addEventListener("change", function(e){
-    if(e.target.id === "tu-rate"){ setRate(parseFloat(e.target.value)); if(PLAYING>=0) stopSay() }
+    if(e.target.id === "tu-auto"){ setAuto(e.target.checked); if(!e.target.checked && PLAYING>=0) stopSay() }
+    else if(e.target.id === "tu-rate"){ setRate(parseFloat(e.target.value)); if(PLAYING>=0) stopSay() }
     else if(e.target.id === "tu-vc"){
       setVoice(VOICE[lang()] || "he-IL", e.target.value);
       if(PLAYING>=0 || PREVIEWING) stopSay();
@@ -1242,6 +1249,16 @@ function draw(){
   if(NOTE) h += '<div class="tu-note">' + esc(NOTE) + '</div>';
   e.log.innerHTML = h;
   scrollLog(e);
+  /* הקראה אוטומטית: התשובה החדשה של לימור (וגם הברכה) נאמרת פעם אחת,
+     באותו קול ובאותו מנגנון של כפתור ״הקראה״. הפאנל נפתח רק בלחיצה
+     של הלומד, ולכן הדפדפן מרשה שמע. מוקטן, עסוק או בלי קול — שקט. */
+  var li = MSGS.length - 1, lm = MSGS[li];
+  if(lm && lm.role !== "user" && !lm._auto && !BUSY && PLAYING < 0 && autoOn()
+     && e.ov.classList.contains("on") && !e.ov.classList.contains("tu-min")
+     && hasVoice(VOICE[lg] || "he-IL")){
+    lm._auto = true;
+    say(li);
+  }
 }
 
 /* לאן גוללים אחרי ציור. עד 18.9.2026 — תמיד לתחתית, וזה הסתיר את
@@ -1279,6 +1296,8 @@ function ctl(i){
       h += '<option value="' + v + '"' + (v === r ? " selected" : "") + '>' + v + '×</option>';
     });
     h += '</select></label>';
+    h += '<label class="tu-sys"><input type="checkbox" id="tu-auto"' + (autoOn() ? " checked" : "") + '> '
+       + esc(t.auto) + '</label>';
     /* הצג את בורר הקול אם יש כמה קולות, או קול יחיד המזוהה כגברי. */
     var vl = voicesFor(VOICE[lang()] || "he-IL");
     if(vl.length > 1 || (vl.length === 1 && femScore(vl[0]) === 0)){
