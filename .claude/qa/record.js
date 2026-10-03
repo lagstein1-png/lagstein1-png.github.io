@@ -158,6 +158,7 @@ const SOURCES = {
   literature: ['literature/index.html'],
   tanakh: ['tanakh/index.html'],
   'hebrew-arab': ['hebrew-arab/index.html'],
+  islam: ['islam/index.html'],
   /* מדע (3.10.2026): המאגר SCIBANK ב-index.html הוא מערכים ("he":[...]),
      לא מחרוזות, ולכן corpus קורא אותו במסלול נפרד (sciBank). */
   science: ['science/index.html'],

@@ -28,5 +28,6 @@
 | `hebrew-arab` | y9 · 2026-10-02 | y9-pwa1 | תואם |
 | `motal` | d15 · 2026-10-02 | d15-pwa1 | תואם |
 | `domino` | dm1 · 2026-10-03 | dm1-pwa1 | תואם |
+| `islam` | is1 · 2026-10-03 | is1-pwa1 | תואם |
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-10-03.
