@@ -154,7 +154,9 @@ jobs:
           TTS_KEY: ${{ secrets.TTS_KEY }}
           TTS_PROVIDER: ${{ steps.prov.outputs.provider }}
           TTS_VOICE: ${{ steps.prov.outputs.voice }}
-          TTS_BUDGET_USD: ${{ vars.TTS_BUDGET_USD || '25' }}
+          # התקרה: $40 (הבעלים, 3.10.2026). ריצה 30 קיבלה כאן 25 — המשתנה
+          # שהוגדר אינו מגיע ל-vars (אולי נשמר כ-Secret), ולכן נקרא גם משם.
+          TTS_BUDGET_USD: ${{ vars.TTS_BUDGET_USD || secrets.TTS_BUDGET_USD || '40' }}
         run: |
           set -uo pipefail
           EXTRA=""
