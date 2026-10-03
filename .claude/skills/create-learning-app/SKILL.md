@@ -1,6 +1,6 @@
 ---
 name: create-learning-app
-description: Build a new learning app in this portfolio by cloning the existing engine — picking the right family to copy from, wiring the seven places a new app must touch, and bumping the eleven cache keys that legal/ forces. Use when adding a new learning app, a new subject, or a new question bank as its own app, and when asked to reuse or extract the engine (TTS, hints, progress, exam mode, accessibility, four-language support) without breaking the apps that already ship.
+description: Build a new learning app in this portfolio by cloning the existing engine — picking the right family to copy from, wiring the eight places a new app must touch (including the recorded-voice layer), and bumping the eleven cache keys that legal/ forces. Use when adding a new learning app, a new subject, or a new question bank as its own app, and when asked to reuse or extract the engine (TTS, hints, progress, exam mode, accessibility, four-language support) without breaking the apps that already ship.
 ---
 
 # בניית אפליקציית לימוד חדשה
@@ -87,10 +87,11 @@ git checkout 83ddf43        # נקודת החזרה, על origin/main
 
 ---
 
-## שלב 2 — שבעה מקומות, לא אחד
+## שלב 2 — שמונה מקומות, לא שבעה
 
-אפליקציה חדשה נוגעת בשבעה מקומות. **החמצת אחד = אפליקציה שלא
-מופיעה, לא נטענת, או לא מתעדכנת.**
+אפליקציה חדשה נוגעת בשמונה מקומות (השמיני, §2.8, נוסף 3.10.2026
+אחרי ששתי אפליקציות פורסמו בלי השכבה המוקלטת). **החמצת אחד =
+אפליקציה שלא מופיעה, לא נטענת, לא מתעדכנת, או שותקת בלי ההקלטות.**
 
 ### 2.1 התיקייה
 
@@ -191,6 +192,52 @@ for d in */; do a=${d%/}; grep -ho 'var BUILD *= *"[a-z]' $a/*.html $a/*.js 2>/d
 ואינו נגזר מ-`DATA.APPS`. ארבע מחרוזות, ידנית, בכל אחת מהן.
 
 לדף הבית אין `BUILD` — רק מפתח קאש. זה תקין.
+
+---
+
+### 2.8 — שכבת הקול המוקלט (בשלב `build`, כמו 2.1)
+
+**נמצא 3.10.2026:** שתי אפליקציות (`math-elem`, `hebrew-lit`) פורסמו
+עם `<script src="/speech/recorded.js">` בדף — כי זה כבר בשלד
+שמעתיקים — **אבל בלי שום קריאה ל-`RECORDED.play`/`RECORDED.stop`**
+בפונקציית ההקראה עצמה. התגית בלי הקריאה אינה עושה כלום: השכבה
+המוקלטת לא נכנסת לפעולה לעולם, בשקט, בלי שגיאה — בדיוק כמו המלכודת
+ב-§0.5 עם תגית ה-`<script>` של לומדה שיושבת במקום הלא נכון.
+
+**מה שחייב להיכנס לפונקציית ההקראה של האפליקציה** (`speak`/`stopSpeak`
+או מקבילותיהן בשם אחר — ראו את המשפחה שהעתקת: `tanakh/index.html`
+הוא תבנית נקייה):
+
+```js
+function stopSpeak(){ /* …הקוד הקיים… */ if(typeof RECORDED!=="undefined")RECORDED.stop(); }
+function speak(text, lang /* …שאר הפרמטרים… */){
+  stopSpeak();
+  if(typeof RECORDED!=="undefined"&&RECORDED.play(text, lang, {rate: /* ... */,
+      onEnd:function(){ /* ... */ },
+      onError:function(){ /* נפילה לקול המכשיר — הקוד הקיים */ }})){
+    return;
+  }
+  /* קול המכשיר כרגיל — הקוד הקיים */
+}
+```
+
+`text` חייב להיות **בדיוק** מה ש-`.claude/qa/record.js`'s `corpus()`
+חולץ מהמקור (`plainOf`, בלי אמוג׳י) — אחרת ה-`id()` (גיבוב) לא יתאים
+לקובץ שהוקלט, וההקלטה לעולם לא תנוגן. אין הדגשה מילה־מילה על קובץ
+מוקלט (אין `onboundary`) — זה תקין, לא חוסר.
+
+**ורישום ב-`SOURCES`:** `.claude/qa/record.js` חייב לדעת לחלץ את
+המחרוזות העבריות של האפליקציה. אם התוכן בתבנית `"he":"..."` רגילה —
+שורה אחת ב-`SOURCES` מספיקה (ראו `tanakh`). תבנית אחרת (מערכים,
+קריאות `L(he,ar,ru,en)`, שדות ניקוד נפרדים) — צריך פענוח ייעודי, כמו
+`sciBank()` שנכתב ל-`science` (3.10.2026). **אל תמציא פענוח בחיפזון
+בלי לבדוק שהוא תופס את כל התוכן ולא רק חלק ממנו** — פענוח שגוי מייצר
+הקלטות על טקסט לא נכון, וההוצאה עליהן הולכת לאיבוד.
+
+בדיקה: `node .claude/qa/record-safety.js` ו-`node .claude/qa/cache.js`
+אחרי כל שינוי. `node .claude/qa/record.js --plan <app>` אחרי הוספה
+ל-`SOURCES` — אמור להראות מספר מחרוזות שנראה נכון, לא אפס ולא ריבוי
+כפול.
 
 ---
 
@@ -327,6 +374,8 @@ node .claude/qa/exam.js <app>         # אם יש מבחן כיתתי
 [ ] sw.js — CACHE ייחודי, בהגדרה ובניקוי שב-activate
 [ ] BUILD + SKEY + GKEY_STORE ייחודיים, ואות BUILD פנויה
 [ ] BUILD ו-?v= תואמים  ← node .claude/qa/cache.js
+[ ] שכבת הקול המוקלט חווטה בפועל (RECORDED.play/stop בפונקציית ההקראה,
+    לא רק תגית <script> — ראו §2.8), ואם אפשר — נרשם ב-SOURCES שב-record.js
 [ ] רשומה ב-.claude/qa/stages.json   ← stage: "build"
 [ ] שער פנימי מ-.claude/qa/internal-gate.html
 [ ] node .claude/qa/stage.js — עובר

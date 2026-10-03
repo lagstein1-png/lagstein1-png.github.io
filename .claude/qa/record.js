@@ -160,7 +160,13 @@ const SOURCES = {
   'hebrew-arab': ['hebrew-arab/index.html'],
   /* מדע (3.10.2026): המאגר SCIBANK ב-index.html הוא מערכים ("he":[...]),
      לא מחרוזות, ולכן corpus קורא אותו במסלול נפרד (sciBank). */
-  science: ['science/index.html']
+  science: ['science/index.html'],
+  /* math-elem (3.10.2026): התוכן הסטטי עטוף ב-L(he,ar,ru,en) — ראה L()
+     ב-math-elem/index.html. corpus קורא כל קריאת L בנפרד (mathElemBank).
+     בכוונה לא כולל: STR (תוויות ממשק/שבחים) ואת מחרוזות optSay שחלקן
+     נבנות בזמן ריצה ממספרים (שברים, זמן, יחידות) — בדיוק הסיבה ששאר
+     משפחת math-* אינה ב-SOURCES בכלל. */
+  'math-elem': ['math-elem/index.html']
 };
 
 /* בדיוק מה ש-plainOf עושה באפליקציה: תגיות יורדות, ישויות נפתחות,
@@ -195,11 +201,35 @@ function sciBank(text) {
   return JSON.parse(text.slice(i, j));
 }
 
+/* math-elem/index.html: תוכן סטטי עטוף ב-L("he",...). קוראים כל
+   קריאת L בנפרד — בלי eval, רק רג׳קס על הארגומנט הראשון (מחרוזת).
+   חייבים פסיק מיד אחרי המרכאות הסוגרות: L("איזה מספר בא אחרי "+n+"?",…)
+   הוא שרשור בזמן ריצה, לא מחרוזת סטטית — בלעדי התנאי הזה חולצת כאן
+   רק את התחילית הקטועה ("איזה מספר בא אחרי "), מקליטה אותה, ואף
+   RECORDED.play בזמן ריצה לא יתאים לה לעולם (ה-id תלוי במספר) —
+   הוצאה בלי תועלת. נמצא ותוקן 3.10.2026, לפני ההקלטה הראשונה. */
+function mathElemBank(text) {
+  const seen = new Map();
+  for (const m of text.matchAll(/\bL\(\s*"((?:[^"\\]|\\.)*)"\s*,/g)) {
+    const t = plainOf(unquote(m[1]));
+    if (!/[א-ת]/.test(t)) continue;
+    if (t.split(' ').length < 2) continue;
+    const id = R.id(t);
+    if (!seen.has(id)) seen.set(id, t);
+  }
+  return seen;
+}
+
 function corpus(app) {
   const src = SOURCES[app];
   if (!src) return null;
   const files = typeof src === 'function' ? src() : src;
   const seen = new Map();       /* id → text, בסדר ההופעה */
+  if (app === 'math-elem') {
+    const sf = path.join(ROOT, files[0]);
+    if (!fs.existsSync(sf)) return seen;
+    return mathElemBank(fs.readFileSync(sf, 'utf8'));
+  }
   if (app === 'science') {
     const sf = path.join(ROOT, files[0]);
     if (!fs.existsSync(sf)) return seen;

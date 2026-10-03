@@ -28,6 +28,7 @@ function clearHl(){
 function stopSpeech(){
   SP.tok++;SP.playing=false;clearHl();
   try{speechSynthesis.cancel()}catch(e){}
+  if(typeof RECORDED!=="undefined")RECORDED.stop();
   var p=document.getElementById("playBtn");if(p)p.classList.remove("on");
 }
 function rate(){return state.slow?0.62:(state.speed==="slow"?0.75:0.92)}
@@ -48,6 +49,18 @@ function speakSeq(segs,done){
 function speakOne(s,tok,cb){
   var root=s.el?document.querySelector(s.el):null, ws=root?root.querySelectorAll(".w"):[];
   var box=s.box?document.querySelector(s.box):null; if(box)box.classList.add("hl");
+  /* שכבה 1 - קובץ מוקלט (המנוע של תאוריה מדברת, 3.10.2026). יש קובץ:
+     מנגנים וזהו — בלי הדגשה מילה־מילה (אין onboundary בקובץ), הקופסה
+     כולה נשארת מודגשת עד הסוף. אין קובץ, או שהקובץ נכשל: ממשיכים
+     לקול המכשיר (speakDevice_) עם ההדגשה מילה־מילה הרגילה. */
+  if(typeof RECORDED!=="undefined"&&RECORDED.play(s.t,s.lang||"he",{rate:rate(),
+      onEnd:function(){if(tok!==SP.tok)return;if(box)box.classList.remove("hl");cb()},
+      onError:function(){speakDevice_(s,tok,cb,ws,box)}})){
+    return;
+  }
+  speakDevice_(s,tok,cb,ws,box);
+}
+function speakDevice_(s,tok,cb,ws,box){
   var words=s.t.split(/\s+/).filter(Boolean), starts=[],p=0;
   words.forEach(function(w){var k=s.t.indexOf(w,p);starts.push(k);p=k+w.length});
   var cur=-1,got=false,u=new SpeechSynthesisUtterance(s.t);

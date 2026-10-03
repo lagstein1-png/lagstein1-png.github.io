@@ -6,11 +6,31 @@
 <title>מתמטיקה מעבר לחשבון ליסודי: צורות, מדידות, שברים ועוד · חינם</title>
 <meta name="description" content="שיעורים ותרגול במתמטיקה ליסודי, כיתות א׳–ב׳: מספרים, צורות, מדידות, זמן, כסף, חוקיות, שברים ונתונים. הכול מוקרא, בארבע שפות, בלי הרשמה ובלי ציונים." />
 <link rel="canonical" href="https://bekol.co.il/math-elem/" />
-<meta name="theme-color" content="#0e9c8d" />
+<meta name="theme-color" content="#0e9c8d" media="(prefers-color-scheme:light)" />
+<meta name="theme-color" content="#101a1c" media="(prefers-color-scheme:dark)" />
+<script>try{var __s=JSON.parse(localStorage.getItem("mathelem-v1")||"{}"),__m=__s.theme||"auto",__d=__m==="dark"||(__m!=="light"&&window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches);document.documentElement.setAttribute("data-theme",__d?"dark":"light")}catch(e){}</script>
 <link rel="manifest" href="./manifest.json" />
 <link href="/fonts/fonts.css" rel="stylesheet" />
 <style>
 :root{--paper:#f3f8f4;--card:#fff;--ink:#17333c;--ink-soft:#4c666e;--teal:#0e9c8d;--teal-deep:#0b7568;--teal-soft:#d9f2ec;--amber:#ffc531;--amber-soft:#fff3ce;--amber-deep:#8a6100;--coral:#ff6f61;--coral-soft:#ffe3de;--coral-deep:#ba3826;--sky:#58b7e0;--sky-soft:#dff1fa;--sky-deep:#246c8c;--violet:#8a63d2;--violet-soft:#ece4fa;--violet-deep:#6a45b0;--green:#1f9d4d;--green-deep:#157a3a;--red:#d93a3a;--red-deep:#a82626;--accent:var(--teal);--ar:"Noto Sans Arabic",system-ui,Arial,sans-serif;--ru:"Noto Sans",system-ui,Arial,sans-serif}
+html[data-theme=dark]{color-scheme:dark;--paper:#101a1c;--card:#1b2a2e;--ink:#e8f1ef;--ink-soft:#a9bfc0;--teal-soft:#16413c;--amber-soft:#3a2f10;--amber-deep:#ffd66b;--coral-soft:#4a2520;--sky-soft:#173543;--violet-soft:#2a2144}
+html[data-theme=dark] .brand,html[data-theme=dark] .btn.ghost,html[data-theme=dark] .credit a{color:#7fe0d3}
+html[data-theme=dark] .btn.tut{color:#d9c8ff}
+html[data-theme=dark] .unit .nm,html[data-theme=dark] .opt .ob,html[data-theme=dark] .band,html[data-theme=dark] .tog,html[data-theme=dark] .langs button,html[data-theme=dark] .lvl small{color:var(--ink)}
+html[data-theme=dark] .langs button[aria-pressed=true],html[data-theme=dark] .band[aria-pressed=true],html[data-theme=dark] .tog[aria-pressed=true]{color:#fff}
+html[data-theme=dark] .card{box-shadow:0 2px 10px rgba(0,0,0,.4)}
+html[data-theme=dark] .opt.good,html[data-theme=dark] .ok-box{background:#173a25;color:var(--ink)}
+html[data-theme=dark] .opt .mk{color:var(--ink)}
+html[data-theme=dark] .opt.good .mk{color:#7be59a}
+html[data-theme=dark] .hintbox,html[data-theme=dark] .tbox{color:var(--ink)}
+html[data-theme=dark] .prog{background:#2a3d41}
+html[data-theme=dark] .dots i{background:#3a4f53}
+html[data-theme=dark] .dots i.on{background:var(--teal)}
+html[data-theme=dark] .dots i.cur{background:var(--amber)}
+html[data-theme=dark] .set{border-bottom-color:#2a3d41}
+html[data-theme=dark] .vis svg,html[data-theme=dark] .vis .nl,html[data-theme=dark] .stepcard svg{background:#f3f8f4;border-radius:16px}
+html[data-theme=dark] .vis svg text,html[data-theme=dark] .vis .nl text{fill:#17333c}
+html[data-theme=dark] .unit .ds{color:var(--ink-soft)}
 *{box-sizing:border-box}
 html{font-size:20px}
 html.big{font-size:24px}
@@ -22,9 +42,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .top{display:flex;align-items:center;gap:6px;margin-bottom:10px}
 .brand{font-weight:800;font-size:.85rem;line-height:1.15;flex:1;min-width:0;color:var(--teal-deep);background:none;border:0;text-align:start;padding:6px 0}
 .langs{display:flex;gap:4px}
-.langs button{min-width:46px;min-height:50px;padding:0 4px;border-radius:14px;border:2px solid var(--teal);background:#fff;font-weight:700;font-size:.9rem}
+.langs button{min-width:46px;min-height:50px;padding:0 4px;border-radius:14px;border:2px solid var(--teal);background:var(--card);font-weight:700;font-size:.9rem}
 .langs button[aria-pressed=true]{background:var(--teal);color:#fff}
-.gear{min-width:46px;padding:0;min-height:50px;border-radius:14px;border:2px solid var(--violet);background:#fff}
+.gear{min-width:46px;padding:0;min-height:50px;border-radius:14px;border:2px solid var(--violet);background:var(--card)}
 h1{font-size:1.6rem;margin:.2em 0 .1em;line-height:1.25}
 h2{font-size:1.25rem;margin:.2em 0}
 .sub{color:var(--ink-soft);margin:0 0 12px}
@@ -38,18 +58,18 @@ h2{font-size:1.25rem;margin:.2em 0}
 .btn.hint{background:var(--amber);color:#1a1300}
 .btn.ex{background:var(--violet)}
 .btn.next{background:var(--teal-deep);font-size:1.15rem;min-height:62px}
-.btn.tut{background:#fff;color:var(--violet-deep);border:3px solid var(--violet);width:100%;box-shadow:none;justify-content:flex-start}
+.btn.tut{background:var(--card);color:var(--violet-deep);border:3px solid var(--violet);width:100%;box-shadow:none;justify-content:flex-start}
 .btn.tut img{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:47% 27%}
-.btn.ghost{background:#fff;color:var(--teal-deep);border:2px solid var(--teal);box-shadow:none}
+.btn.ghost{background:var(--card);color:var(--teal-deep);border:2px solid var(--teal);box-shadow:none}
 .btn[disabled]{opacity:.45}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .bands{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
-.band{flex:1;min-width:150px;min-height:62px;border-radius:16px;border:3px solid var(--sky);background:#fff;font-weight:800;font-size:1rem;padding:8px}
+.band{flex:1;min-width:150px;min-height:62px;border-radius:16px;border:3px solid var(--sky);background:var(--card);font-weight:800;font-size:1rem;padding:8px}
 .band[aria-pressed=true]{background:var(--sky);color:#fff}
 .band.soon{opacity:.6;border-style:dashed}
 .band small{display:block;font-weight:500;font-size:.75rem}
 .units{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
-.unit{display:flex;gap:12px;align-items:center;text-align:start;background:#fff;border:3px solid var(--c);border-radius:20px;padding:12px;min-height:96px;position:relative}
+.unit{display:flex;gap:12px;align-items:center;text-align:start;background:var(--card);border:3px solid var(--c);border-radius:20px;padding:12px;min-height:96px;position:relative}
 .unit .ico{flex:none;width:68px;height:68px;border-radius:18px;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;overflow:hidden}
 .unit .nm{font-weight:800;font-size:1.15rem;line-height:1.2}
 .unit .ds{font-size:.82rem;color:var(--ink-soft);line-height:1.3}
@@ -64,7 +84,7 @@ h2{font-size:1.25rem;margin:.2em 0}
 .opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .opts.wide{grid-template-columns:minmax(0,1fr)}
 @media(max-width:420px){.opts{grid-template-columns:1fr}}
-.opt{display:flex;align-items:center;gap:8px;background:#fff;border:3px solid var(--sky);border-radius:18px;padding:6px;min-height:72px}
+.opt{display:flex;align-items:center;gap:8px;background:var(--card);border:3px solid var(--sky);border-radius:18px;padding:6px;min-height:72px}
 .opt .ob{flex:1;min-width:0;overflow-wrap:anywhere;min-height:58px;border:0;background:none;font-size:1.35rem;font-weight:800;text-align:center;border-radius:12px;padding:6px}
 .opt .sp{flex:none;width:50px;height:50px;border-radius:50%;border:0;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center}
 .opt.good{border-color:var(--green);background:#e4f7ea}
@@ -82,7 +102,7 @@ h2{font-size:1.25rem;margin:.2em 0}
 .dots i.on{background:var(--teal)}
 .dots i.cur{background:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
 .set{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #e4eeea}
-.tog{min-width:92px;min-height:50px;border-radius:14px;border:2px solid var(--teal);background:#fff;font-weight:800}
+.tog{min-width:92px;min-height:50px;border-radius:14px;border:2px solid var(--teal);background:var(--card);font-weight:800}
 .tog[aria-pressed=true]{background:var(--teal);color:#fff}
 .credit{font-size:.8rem;color:var(--ink-soft);text-align:center;margin-top:20px}
 .credit a{color:var(--sky-deep)}
@@ -763,7 +783,7 @@ LESSONS.coord=[{t:L("כדי למצוא נקודה על הרשת: קודם הול
 LESSONS.mon2=[{t:L("בבעיה בשני צעדים עושים צעד אחד, ואז צעד שני עם התוצאה.","في المسألة بخطوتين نفعل خطوة ثم خطوة ثانية بالنتيجة.","В задаче в два шага делаем один шаг, потом второй с результатом.","In a two-step problem you do one step, then a second step with the result."),v:function(){return ""}},
  {t:L("כשקונים כמה דברים שווים, קודם כופלים: מחיר אחד כפול כמות.","عند شراء عدة أشياء متساوية نضرب أولًا: السعر × العدد.","Если покупаем несколько одинаковых вещей, сначала умножаем: цена × количество.","When you buy several equal things, multiply first: price × amount."),v:function(){return ""}},
  {t:L("עודף הוא מה ששילמנו פחות המחיר. מחסרים את המחיר מהתשלום.","الباقي هو ما دفعناه ناقص الثمن. نطرح الثمن من المبلغ المدفوع.","Сдача — это то, что заплатили, минус цена. Вычитаем цену из суммы.","Change is what you paid minus the price. Subtract the price from the payment."),v:function(){return ""}}];
-var BUILD="o1 · 2026-10-03";
+var BUILD="o3 · 2026-10-03";
 /* ===== UI strings ===== */
 var STR={
 he:{brand:"מתמטיקה מעבר לחשבון",title:"מתמטיקה ליסודי",tag:"צורות, מדידות, כסף, שברים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -772,7 +792,7 @@ he:{brand:"מתמטיקה מעבר לחשבון",title:"מתמטיקה ליסו�
  qOf:"שאלה {a} מתוך {b}",right:["יפה מאוד!","נכון!","מצוין!","כל הכבוד על החשיבה!","בדיוק כך!","איזה כיף, נכון!"],streak:["שלוש ברצף! אתם על גל!","ועוד אחת! איזו התמדה!"],
  wrong:"כמעט. בואו נבדוק יחד.",ans:"התשובה: ",finT:"סיימתם את הסבב!",finX:"עבודה יפה. מי שרוצה יכול לתרגל עוד או לבחור נושא אחר. שאלות שהיו קשות יחזרו בפעם הבאה.",
  stepOf:"שלב {a} מתוך {b}",prev:"הקודם",done:"סיימתי",lessonEnd:"עכשיו אפשר לתרגל!",
- setSlow:"הקראה איטית",setSfx:"צלילים",setBig:"אותיות גדולות",on:"פועל",off:"כבוי",reset:"מחיקת ההתקדמות מהמכשיר",resetAsk:"למחוק את כל ההתקדמות בנושאים?",
+ setSlow:"הקראה איטית",setSfx:"צלילים",setBig:"אותיות גדולות",setTheme:"ערכת נושא",thAuto:"אוטומטי",thLight:"בהיר",thDark:"כהה",on:"פועל",off:"כבוי",reset:"מחיקת ההתקדמות מהמכשיר",resetAsk:"למחוק את כל ההתקדמות בנושאים?",
  credit:"התוכן נכתב במיוחד לאתר. הנושאים לפי תכנית הלימודים במתמטיקה של משרד החינוך (יסודי).",crediL:"מקור: משרד החינוך",privacy:"בלי הרשמה. ההתקדמות נשמרת רק במכשיר שלכם.",
  loadingNoVoice:"אין קול בעברית במכשיר הזה. אפשר להתקין קול בהגדרות המכשיר.",ok:"✓"},
 ar:{brand:"رياضيات ما بعد الحساب",title:"رياضيات للمرحلة الابتدائية",tag:"أشكال وقياس ونقود وكسور وأكثر. كل شيء مقروء بصوت عالٍ، بلا علامات وبلا ضغط.",pick:"اختاروا موضوعًا",band1:"الصفان الأول والثاني",band2:"الصفان الثالث والرابع",band3:"الصفان الخامس والسادس",soon:"قريبًا",
@@ -781,7 +801,7 @@ ar:{brand:"رياضيات ما بعد الحساب",title:"رياضيات للم
  qOf:"السؤال {a} من {b}",right:["جميل جدًّا!","صحيح!","ممتاز!","أحسنتم التفكير!","هكذا تمامًا!","ما أجمل هذا!"],streak:["ثلاث إجابات متتالية! أنتم رائعون!","وأخرى! ما أجمل المثابرة!"],
  wrong:"تقريبًا. لنتحقّق معًا.",ans:"الجواب: ",finT:"أنهيتم الجولة!",finX:"عمل جميل. يمكنكم التدرّب أكثر أو اختيار موضوع آخر. الأسئلة التي كانت صعبة ستعود لاحقًا.",
  stepOf:"الخطوة {a} من {b}",prev:"السابق",done:"انتهيت",lessonEnd:"والآن يمكننا التدرّب!",
- setSlow:"قراءة بطيئة",setSfx:"أصوات",setBig:"حروف كبيرة",on:"يعمل",off:"متوقف",reset:"مسح التقدّم من الجهاز",resetAsk:"هل تريدون مسح كل التقدّم؟",
+ setSlow:"قراءة بطيئة",setSfx:"أصوات",setBig:"حروف كبيرة",setTheme:"المظهر",thAuto:"تلقائي",thLight:"فاتح",thDark:"داكن",on:"يعمل",off:"متوقف",reset:"مسح التقدّم من الجهاز",resetAsk:"هل تريدون مسح كل التقدّم؟",
  credit:"كُتب المحتوى خصيصًا لهذا الموقع. المواضيع حسب منهاج الرياضيات لوزارة التربية والتعليم (الابتدائي).",crediL:"المصدر: وزارة التربية والتعليم",privacy:"بلا تسجيل. التقدّم يُحفظ على جهازكم فقط.",
  loadingNoVoice:"لا يوجد صوت عربي في هذا الجهاز.",ok:"✓"},
 ru:{brand:"Математика не только счёт",title:"Математика для начальной школы",tag:"Фигуры, измерения, деньги, дроби и другое. Всё озвучено, без оценок и без спешки.",pick:"Выберите тему",band1:"1–2 классы",band2:"3–4 классы",band3:"5–6 классы",soon:"Скоро",
@@ -790,7 +810,7 @@ ru:{brand:"Математика не только счёт",title:"Матема�
  qOf:"Вопрос {a} из {b}",right:["Очень хорошо!","Верно!","Отлично!","Здорово подумал!","Именно так!","Как здорово!"],streak:["Три подряд! Ты в ударе!","И ещё один! Какое упорство!"],
  wrong:"Почти. Давай проверим вместе.",ans:"Ответ: ",finT:"Раунд закончен!",finX:"Хорошая работа. Можно потренироваться ещё или выбрать другую тему. Трудные вопросы вернутся в следующий раз.",
  stepOf:"Шаг {a} из {b}",prev:"Назад",done:"Готово",lessonEnd:"Теперь можно тренироваться!",
- setSlow:"Медленное чтение",setSfx:"Звуки",setBig:"Крупный шрифт",on:"вкл",off:"выкл",reset:"Стереть прогресс на устройстве",resetAsk:"Стереть весь прогресс?",
+ setSlow:"Медленное чтение",setSfx:"Звуки",setBig:"Крупный шрифт",setTheme:"Тема",thAuto:"Авто",thLight:"Светлая",thDark:"Тёмная",on:"вкл",off:"выкл",reset:"Стереть прогресс на устройстве",resetAsk:"Стереть весь прогресс?",
  credit:"Содержание написано специально для сайта. Темы — по программе по математике Министерства образования Израиля (начальная школа).",crediL:"Источник: Министерство образования",privacy:"Без регистрации. Прогресс хранится только на вашем устройстве.",
  loadingNoVoice:"На этом устройстве нет русского голоса.",ok:"✓"},
 en:{brand:"Math beyond arithmetic",title:"Elementary math",tag:"Shapes, measuring, money, fractions and more. Everything is read aloud, with no scores and no rush.",pick:"Pick a topic",band1:"Grades 1–2",band2:"Grades 3–4",band3:"Grades 5–6",soon:"Soon",
@@ -799,15 +819,17 @@ en:{brand:"Math beyond arithmetic",title:"Elementary math",tag:"Shapes, measurin
  qOf:"Question {a} of {b}",right:["Very nice!","Correct!","Excellent!","Great thinking!","Exactly!","How wonderful!"],streak:["Three in a row! You are on a roll!","And another one! What persistence!"],
  wrong:"Almost. Let us check it together.",ans:"The answer: ",finT:"You finished the round!",finX:"Nice work. Practice more or pick another topic. Questions that felt hard will come back next time.",
  stepOf:"Step {a} of {b}",prev:"Previous",done:"I am done",lessonEnd:"Now we can practice!",
- setSlow:"Slow reading",setSfx:"Sounds",setBig:"Large text",on:"on",off:"off",reset:"Clear progress from this device",resetAsk:"Clear all progress?",
+ setSlow:"Slow reading",setSfx:"Sounds",setBig:"Large text",setTheme:"Theme",thAuto:"Auto",thLight:"Light",thDark:"Dark",on:"on",off:"off",reset:"Clear progress from this device",resetAsk:"Clear all progress?",
  credit:"The content was written for this site. Topics follow the Israeli Ministry of Education math curriculum (elementary).",crediL:"Source: Ministry of Education",privacy:"No sign-up. Progress is saved only on your device.",
  loadingNoVoice:"No voice for this language was found on this device.",ok:"✓"}};
 var LNAME={he:"עב",ar:"عر",ru:"Рус",en:"En"},LDIR={he:"rtl",ar:"rtl",ru:"ltr",en:"ltr"},LCODE={he:"he-IL",ar:"ar-SA",ru:"ru-RU",en:"en-US"};
 var FRDISP={"1/2":"½","1/4":"¼","3/4":"¾","1/3":"⅓"},FRSAY={he:{"1/2":"חצי","1/4":"רבע","3/4":"שלושה רבעים","1/3":"שליש"},ar:{"1/2":"نصف","1/4":"ربع","3/4":"ثلاثة أرباع","1/3":"ثلث"},ru:{"1/2":"одна вторая","1/4":"одна четвёртая","3/4":"три четвёртых","1/3":"одна треть"},en:{"1/2":"one half","1/4":"one quarter","3/4":"three quarters","1/3":"one third"}};
 var CMW={he:"ס״מ",ar:"سم",ru:"см",en:"cm"};
 /* ===== state ===== */
-var KEY="mathelem-v1",S={band:1,lang:"he",done:{},slow:false,sfx:true,big:false},view="home",V={unit:null,lv:2,step:0},P=null;
+var KEY="mathelem-v1",S={theme:"auto",band:1,lang:"he",done:{},slow:false,sfx:true,big:false},view="home",V={unit:null,lv:2,step:0},P=null;
 function loadS(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)for(var k in o)S[k]=o[k]}catch(e){}}
+function applyTheme(){var m=S.theme||"auto",d=m==="dark"||(m!=="light"&&window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches);document.documentElement.setAttribute("data-theme",d?"dark":"light")}
+try{matchMedia("(prefers-color-scheme:dark)").addListener(function(){if((S.theme||"auto")==="auto")applyTheme()})}catch(e){}
 function saveS(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 loadS();
 function $(s){return document.querySelector(s)}
@@ -835,16 +857,27 @@ function hlAt(ci){if(!HL.el)return;var w=-1,i;for(i=0;i<HL.starts.length;i++){if
   var sp=HL.el.querySelectorAll("[data-w]");for(i=0;i<sp.length;i++)sp[i].className=(i===w?"hl":"")}
 function hlFallback(rate){if(!HL.el)return;var n=HL.starts.length,i=0,per=430/rate;
   (function step(){if(!HL.el||HL.got)return;var sp=HL.el.querySelectorAll("[data-w]");for(var k=0;k<sp.length;k++)sp[k].className=(k===i?"hl":"");i++;if(i<=n)HL.timer=setTimeout(step,per)})()}
-function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}_u=null;hlClear();setPlaying(false)}
+function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}if(typeof RECORDED!=="undefined")RECORDED.stop();_u=null;hlClear();setPlaying(false)}
 var _playing=false;function setPlaying(b){_playing=b;var bs=document.querySelectorAll('[data-a="stop"]');bs.forEach(function(x){x.style.opacity=b?1:.55})}
 function speechFix(t){var w={he:"חלקי",ar:"على",ru:"из",en:"over"}[S.lang];return t.replace(/(\d+)\/(\d+)/g,function(m,a,b){return a+" "+w+" "+b}).replace(/×/g,{he:" כפול ",ar:" ضرب ",ru:" умножить на ",en:" times "}[S.lang]).replace(/÷/g,{he:" חלקי ",ar:" قسمة ",ru:" разделить на ",en:" divided by "}[S.lang]).replace(/−/g,{he:" פחות ",ar:" ناقص ",ru:" минус ",en:" minus "}[S.lang]).replace(/\s=\s/g,{he:" שווה ",ar:" يساوي ",ru:" равно ",en:" equals "}[S.lang]).replace(/\?\//g,"?")}
-function speak(text,el,onend){stopSpeak();var raw=text;if(!("speechSynthesis" in window)||!text)return false;
+function speakDevice_(text,el,onend){var raw=text;if(!("speechSynthesis" in window)||!text)return false;
   var rate=S.slow?0.7:0.9,pv=pickVoice(),u=new SpeechSynthesisUtterance(speechFix(text));u.lang=LCODE[S.lang];if(pv.v)u.voice=pv.v;u.rate=rate;u.pitch=pv.fem?1.05:1.3;
   var spoken=el&&el.dataset&&el.dataset.say===text;HL.noB=false;if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=speechFix(raw)!==raw}
   u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(e.charIndex)};
   u.onend=u.onerror=function(){if(_u===u){hlClear();setPlaying(false);if(onend)onend()}};
   _u=u;setPlaying(true);try{speechSynthesis.speak(u)}catch(e){return false}
   if(HL.el)setTimeout(function(){if(_u===u&&HL.el&&!HL.got)hlFallback(rate)},900);return true}
+/* שכבה 1 - קובץ מוקלט (המנוע של תאוריה מדברת, 3.10.2026). יש קובץ:
+   מנגנים וזהו — בלי הדגשה מילה־מילה (אין onboundary בקובץ). אין
+   קובץ, או שהקובץ נכשל: קול המכשיר כרגיל (speakDevice_). */
+function speak(text,el,onend){stopSpeak();if(!text)return false;
+  if(typeof RECORDED!=="undefined"&&RECORDED.play(text,S.lang,{rate:S.slow?0.7:0.9,
+      onEnd:function(){setPlaying(false);if(onend)onend()},
+      onError:function(){speakDevice_(text,el,onend)}})){
+    setPlaying(true);return true;
+  }
+  return speakDevice_(text,el,onend);
+}
 function qSay(q){return lt(q.q)+". "+q.o.map(function(o,i){return optSay(o)}).join(". ")}
 /* ===== effects ===== */
 var ctx=null;function tone(f,d,t,v){if(!S.sfx)return;try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();var o=ctx.createOscillator(),g=ctx.createGain();o.type=t||"sine";o.frequency.value=f;g.gain.value=v||.08;o.connect(g);g.connect(ctx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+d);o.stop(ctx.currentTime+d)}catch(e){}}
@@ -896,8 +929,8 @@ function practiceView(){var t=T(),q=P.list[P.i],n=P.list.length,u=unitById(P.uni
   return h+'</div>'}
 function endView(){var t=T();return '<h1 id="et" data-say>'+esc(t.finT)+'</h1><div class="card">'+listenRow("end")+'<p class="qtext" id="ex" data-say>'+esc(t.finX)+'</p><div class="row"><button class="btn next" data-a="start" data-l="'+P.lv+'">'+esc(t.again)+'</button><button class="btn ghost" data-a="home">'+esc(t.home)+'</button></div></div>'}
 function settingsView(){var t=T();function tg(k,l){return '<div class="set"><span>'+esc(l)+'</span><button class="tog" data-a="tog" data-k="'+k+'" aria-pressed="'+!!S[k]+'">'+esc(S[k]?t.on:t.off)+'</button></div>'}
-  return '<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1>'+esc(t.settings)+'</h1><div class="card">'+tg("slow",t.setSlow)+tg("sfx",t.setSfx)+tg("big",t.setBig)+'<div class="set"><button class="btn ghost" data-a="reset">'+esc(t.reset)+'</button></div></div>'}
-function render(){document.documentElement.lang=S.lang;document.documentElement.dir=LDIR[S.lang];document.documentElement.classList.toggle("big",!!S.big);
+  return '<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1>'+esc(t.settings)+'</h1><div class="card">'+tg("slow",t.setSlow)+tg("sfx",t.setSfx)+tg("big",t.setBig)+'<div class="set"><span>'+esc(t.setTheme)+'</span><span class="row">'+[["auto",t.thAuto],["light",t.thLight],["dark",t.thDark]].map(function(x){return '<button class="tog" data-a="theme" data-th="'+x[0]+'" aria-pressed="'+((S.theme||"auto")===x[0])+'">'+esc(x[1])+'</button>'}).join("")+'</span></div>'+'<div class="set"><button class="btn ghost" data-a="reset">'+esc(t.reset)+'</button></div></div>'}
+function render(){applyTheme();document.documentElement.lang=S.lang;document.documentElement.dir=LDIR[S.lang];document.documentElement.classList.toggle("big",!!S.big);
   var h=header();h+=({home:homeView,unit:unitView,lesson:lessonView,practice:practiceView,end:endView,settings:settingsView})[view]();$("#app").innerHTML=h;
   document.title=T().title+" · bekol";if(window.TUTOR&&TUTOR.refresh)try{TUTOR.refresh()}catch(e){}}
 function sayText(w){var q=P&&P.list&&P.list[P.i],t=T();
@@ -910,6 +943,7 @@ function onAct(a,el){var t=T(),q=P&&P.list&&P.list[P.i];
   if(a==="home"){stopSpeak();view="home";render();window.scrollTo(0,0)}
   else if(a==="band"){S.band=+el.dataset.b;saveS();render()}
   else if(a==="lang"){stopSpeak();S.lang=el.dataset.l;saveS();render()}
+  else if(a==="theme"){S.theme=el.dataset.th;saveS();render()}
   else if(a==="settings"){stopSpeak();view="settings";render()}
   else if(a==="unit"){stopSpeak();V.unit=el.dataset.u||V.unit;view="unit";render();window.scrollTo(0,0)}
   else if(a==="lesson"){stopSpeak();V.step=0;view="lesson";render()}
@@ -952,7 +986,7 @@ window.addEventListener("pagehide",function(){stopSpeak()});
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-elem",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o1-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o3-pwa1").catch(function(){})});
 })();
 </script>
 

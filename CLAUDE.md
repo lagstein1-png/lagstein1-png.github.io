@@ -96,7 +96,7 @@ Instinct מסייע גם בתחזוקת אתר בקול. בזמן ש-Claude Code
 - המבחן הכיתתי: `buildQ` מעביר תמיד `pure=true`. `pure.js`.
 - תרגום: **המחרוזת העברית היא המפתח** — משנים עברית ומפתח יחד. `i18n.js`, `teen-i18n.js`.
 - שער השלבים: `build → internal → content-qa → approved → public`; `stages.json` הוא האמת. `stage.js`.
-- מניין האפליקציות: `DATA.APPS` הוא האמת, `badge` בארבע שפות כמילה. `apps.js`. שבע נקודות מגע לאפליקציה חדשה — `new-app-or-topic.md`.
+- מניין האפליקציות: `DATA.APPS` הוא האמת, `badge` בארבע שפות כמילה. `apps.js`. שמונה נקודות מגע לאפליקציה חדשה (השמינית — שכבת הקול המוקלט) — `new-app-or-topic.md`.
 - `lomda`: נושא חדש = שלוש נגיעות. `banks.js`. אפליקציה חדשה מוצדקת רק במחולל או באינטראקציה שאין במנוע.
 - לימור: מוח אחד, `tutor-api/worker.js`. `brain.js`, `joshface.js`, `joshstate.js`, `tutor.js`.
 - ״תאוריה מדברת״: ריפו נפרד, השם האנגלי הישן אסור. `naming.js`. המופע החוקי היחיד: השדה `u` (נתיב).
