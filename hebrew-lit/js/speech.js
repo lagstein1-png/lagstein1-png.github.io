@@ -1,7 +1,8 @@
 /* Read-aloud. Female voice only. Word highlight follows the voice (boundary events, with a timer fallback). */
 var SP={tok:0,playing:false,noVoice:false,timers:[]};
-var VOICE_M=/(\bmale\b|\bman\b|asaf|avri|אסף|אברי|david|mark\b|guy\b|ryan|george|james|daniel|alex\b|fred|naayf|hamed|maged|tarik|tareq|bassel|pavel|dmitry|dmitri|yuri|maxim|nikolay|ivan|rishi|ravi|thomas|oliver)/i;
-var VOICE_F=/(female|woman|hila|carmit|כרמית|הילה|zira|hazel|susan|aria|jenny|libby|sonia|samantha|karen|tessa|moira|victoria|zariyah|hoda|salma|laila|mariam|irina|svetlana|katya|milena|alena|google)/i;
+/* המילון המשותף (כמו math-app), בתוספת /i — כאן בודקים את v.name כמו שהוא. voice.js, 3.10.2026 */
+var VOICE_M=/(google[^a-z]{0,15}(arabic|العربية)|אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/i;
+var VOICE_F=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/i;
 function allVoices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
 function voiceFor(lang){
   var code=LANG_TTS[lang].toLowerCase(), pre=code.slice(0,2);

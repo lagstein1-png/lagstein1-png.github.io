@@ -424,9 +424,11 @@ async function run(){
     /* שני שמות לאותו מילון, ושניהם חוקיים: VOICE_F במשפחה אחת,
        V_F בשנייה. ההבדל הוא היסטורי ולא מהותי. וגם ההצהרה: hebrew/app.js
        כותבת `const V_F=` — המסנן למעלה מצא אותה, והחילוץ דרש `var`
-       ונפל על ״לא נמצא מילון״ כשהמילון קיים (qa ריצה 1124, 30.9.2026). */
-    const mf = src.match(/(?:var|let|const) (?:VOICE_F|V_F)\s*=\s*(\/\(.*?\/)\s*[;\n]/s);
-    const mm = src.match(/(?:var|let|const) (?:VOICE_M|V_M)\s*=\s*(\/\(.*?\/)\s*[;\n]/s);
+       ונפל על ״לא נמצא מילון״ כשהמילון קיים (qa ריצה 1124, 30.9.2026).
+       ודגלים: hebrew-lit כותבת `/…/i;` — בלי `[gimsuy]*` החילוץ רץ עד
+       סוף הקובץ ונפל על ״מילון שאינו נקרא״ (qa ריצה 1198, 3.10.2026). */
+    const mf = src.match(/(?:var|let|const) (?:VOICE_F|V_F)\s*=\s*(\/\(.*?\/[gimsuy]*)\s*[;\n]/s);
+    const mm = src.match(/(?:var|let|const) (?:VOICE_M|V_M)\s*=\s*(\/\(.*?\/[gimsuy]*)\s*[;\n]/s);
     if(!mf || !mm){ bad++; console.log('✗ ' + f.padEnd(24) + 'לא נמצא מילון המגדר'); continue }
     let RF, RM;
     try{ RF = eval(mf[1]); RM = eval(mm[1]) }
