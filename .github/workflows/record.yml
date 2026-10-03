@@ -32,7 +32,7 @@ on:
   workflow_dispatch:
     inputs:
       app:
-        description: 'איזו אפליקציה (english, history, ulpan, lomda…) או all — כל המאגרים, עד התקרה'
+        description: 'אפליקציה, רשימה מופרדת בפסיקים (hebrew,ulpan,civics) או all. כל אחת נדחפת מיד; max — לכל אחת'
         required: true
         default: 'english'
       max:
@@ -136,12 +136,19 @@ jobs:
         if: steps.pick.outputs.app != ''
         run: |
           APP="${{ steps.pick.outputs.app }}"
-          if [ "$APP" = "all" ]; then node .claude/qa/record.js --plan; else node .claude/qa/record.js --plan "$APP"; fi
+          if [ "$APP" = "all" ]; then node .claude/qa/record.js --plan; else node .claude/qa/record.js --plan $(echo "$APP" | tr ',' ' '); fi
 
-      # נופל על מכסה? מה שהוקלט נשמר, והצעדים שאחריו דוחפים אותו.
-      - name: מקליט
+      # **אפליקציה־אפליקציה, דחיפה אחרי כל אחת** (3.10.2026, אחרי ריצה 27):
+      # app=all רץ 3:45 שעות, היה נחתך ב-timeout ומאבד הכול — את הקבצים ואת
+      # רישום ההוצאה, וגוגל גובה בכל זאת. עכשיו app הוא רשימה מופרדת בפסיקים
+      # (או all), כל אפליקציה נעטפת ב-timeout -s INT עד 300 דקות מתחילת הצעד
+      # (40 דקות לפני גבול ה-job), record.js מסיים בעצירה נקייה, וכל אפליקציה
+      # נדחפת מיד. נחתכה אחת — מפסידים לכל היותר את הבקשה שבדרך.
+      # ולמה לא 15 הרצות נפרדות: קבוצת concurrency מחזיקה רצה אחת וממתינה
+      # אחת בלבד; כל הרצה חדשה מבטלת את הממתינה.
+      - name: מקליט ודוחף
+        id: push
         if: steps.pick.outputs.app != ''
-        continue-on-error: true
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TTS_KEY: ${{ secrets.TTS_KEY }}
@@ -149,40 +156,37 @@ jobs:
           TTS_VOICE: ${{ steps.prov.outputs.voice }}
           TTS_BUDGET_USD: ${{ vars.TTS_BUDGET_USD || '25' }}
         run: |
-          set -o pipefail
+          set -uo pipefail
           EXTRA=""
-          BATCH="${{ github.event.inputs.batch }}"
-          if [ "$BATCH" != "NO" ]; then EXTRA="$EXTRA --batch"; fi
-          APP="${{ steps.pick.outputs.app }}"
-          if [ "$APP" = "all" ]; then APP="--all"; fi
-          node .claude/qa/record.js "$APP" --max "${{ steps.pick.outputs.max }}" $EXTRA 2>&1 | tee /tmp/rec.log
-
-      - name: המניפסט תואם לדיסק
-        run: node .claude/qa/record.js --check
-
-      - name: דוחף ל-main
-        id: push
-        if: steps.pick.outputs.app != ''
-        run: |
-          set -euo pipefail
-          APP="${{ steps.pick.outputs.app }}"
-          if [ -z "$(find */audio -type f -name '*.mp3' 2>/dev/null | head -1)" ]; then
-            echo "לא נוצר אף קובץ — אין מה לדחוף."
-            exit 0
-          fi
+          if [ "${{ github.event.inputs.batch }}" != "NO" ]; then EXTRA="--batch"; fi
+          APPS="${{ steps.pick.outputs.app }}"
+          if [ "$APPS" = "all" ]; then APPS="$(node .claude/qa/record.js --list)"; fi
+          APPS="$(echo "$APPS" | tr ',' ' ')"
+          DEADLINE=$(( $(date +%s) + 300 * 60 ))
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # all מקליט כמה אפליקציות; ההוצאה המצטברת עולה תמיד יחד עם הקבצים
-          git add -- '*/audio/*'
-          if [ -f .claude/qa/record-spend.json ]; then git add .claude/qa/record-spend.json; fi
-          if git diff --cached --quiet; then echo "אין קבצים חדשים."; exit 0; fi
-          N=$(git diff --cached --name-only | grep -c '\.mp3$' || true)
-          git commit -q -m "הקלטות: $APP — $N קבצים חדשים או מוחלפים (record.yml)"
-          # main זז בזמן הריצה? מושכים (rebase) ודוחפים. קונפליקט עוצר את הצעד בגלוי.
-          git pull --rebase -q origin main
-          git push origin HEAD:main
-          echo "pushed=1" >> "$GITHUB_OUTPUT"
-          echo "נדחף: $APP, $N הקלטות."
+          : > /tmp/rec.log
+          for APP in $APPS; do
+            LEFT=$(( (DEADLINE - $(date +%s)) / 60 ))
+            if [ "$LEFT" -lt 10 ]; then echo "נשארו $LEFT דקות — לא מתחילים את $APP." | tee -a /tmp/rec.log; break; fi
+            echo "=== $APP · עד $LEFT דקות ===" | tee -a /tmp/rec.log
+            timeout -s INT -k 10m "${LEFT}m" node .claude/qa/record.js "$APP" --max "${{ steps.pick.outputs.max }}" $EXTRA 2>&1 | tee /tmp/app.log
+            cat /tmp/app.log >> /tmp/rec.log
+            if ! node .claude/qa/record.js --check; then echo "::error::המניפסט של $APP אינו תואם לדיסק — לא דוחפים"; exit 1; fi
+            git add -- '*/audio/*'
+            if [ -f .claude/qa/record-spend.json ]; then git add .claude/qa/record-spend.json; fi
+            if ! git diff --cached --quiet; then
+              N=$(git diff --cached --name-only | grep -c '\.mp3$' || true)
+              git commit -q -m "הקלטות: $APP — $N קבצים חדשים או מוחלפים (record.yml)"
+              if ! { git pull --rebase -q origin main && git push -q origin HEAD:main; }; then
+                echo "::error::הדחיפה של $APP נכשלה — עוצרים, כדי לא להקליט עוד מה שלא יישמר"; exit 1
+              fi
+              echo "pushed=1" >> "$GITHUB_OUTPUT"
+              echo "נדחף: $APP, $N הקלטות."
+            fi
+            # מכסה, תקרה או זמן — אין טעם להתחיל את האפליקציה הבאה
+            if grep -qE 'כל המודלים נגמרו|המכסה נגמרה|תקרת ההוצאה|SIGINT' /tmp/app.log; then echo "עוצרים אחרי $APP."; break; fi
+          done
 
       # ריצה בלי תוצר (מכסה או כישלון)? היומן עולה לריפו כדי שאפשר
       # יהיה לראות למה - בלי גישה ללוגים של Actions.

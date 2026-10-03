@@ -66,9 +66,11 @@ const wav = p => { const h = Buffer.alloc(44); h.write('RIFF', 0); h.writeUInt32
   h.writeUInt32LE(48000, 28); h.writeUInt16LE(2, 32); h.writeUInt16LE(16, 34); h.write('data', 36); h.writeUInt32LE(p.length, 40);
   return Buffer.concat([h, p]); };
 const ok = j => ({ status: 200, ok: true, json: async () => j, text: async () => JSON.stringify(j) });
+const realTimeout = globalThis.setTimeout;
 globalThis.setTimeout = f => setImmediate(f);
 globalThis.fetch = async (url, o) => {
   const b = JSON.parse(o.body);
+  if (process.env.FAKE_DELAY) await new Promise(r => realTimeout(r, Number(process.env.FAKE_DELAY)));
   if (process.env.FAKE_QUOTA) return { status: 429, ok: false, text: async () => 'RESOURCE_EXHAUSTED' };
   if (/texttospeech/.test(url)) {
     const enc = b.audioConfig.audioEncoding;
@@ -209,6 +211,27 @@ const S = ['שלום לכולם היום', 'אנחנו לומדים יחד', 'ז
   check('6ב. המחיר נרשם מהאסימונים האמיתיים, והבקשה שאחריה נחסמת', sp2.usd === 1.001 && sp2.requests === 1, JSON.stringify(sp2));
 }
 
+/* 7. עצירה בזמן (ריצה 27, 3.10.2026): SIGINT באמצע ריצה — הקבצים שכבר
+   נוצרו נכנסים למניפסט, ההוצאה רשומה, והריצה אינה ממשיכה לבקשה הבאה.
+   כל בקשה מדומה לוקחת 400ms; SIGINT אחרי 1.5 שניות. */
+{
+  const many = Array.from({ length: 12 }, (_, i) => 'משפט מספר ' + i + ' לבדיקה');
+  const T = tree('time', { english: many });
+  manifest(T, 'english', 'Kore', []);
+  const r = spawnSync(process.execPath, ['-r', PRE, path.join(T, '.claude/qa/record.js'), 'english', '--max', '12'], {
+    cwd: T, encoding: 'utf8', timeout: 1500, killSignal: 'SIGINT',
+    env: Object.assign({}, process.env, { FFMPEG: path.join(BIN, 'ffmpeg'), FFPROBE: path.join(BIN, 'ffprobe'),
+      GEMINI_API_KEY: 'fake', TTS_BATCH: '', TTS_PROVIDER: '', TTS_VOICE: 'Kore', FAKE_DELAY: '400' }) });
+  const out = (r.stdout || '') + (r.stderr || '');
+  const disk = fs.readdirSync(path.join(T, 'english', 'audio', 'he')).filter(f => f.endsWith('.mp3')).length;
+  let m = {}; try { m = JSON.parse(fs.readFileSync(path.join(T, 'english', 'audio', 'manifest.json'), 'utf8')); } catch (e) {}
+  const inMan = ((m.langs || {}).he || {}).count || 0;
+  let sp = {}; try { sp = JSON.parse(fs.readFileSync(path.join(T, '.claude/qa/record-spend.json'), 'utf8')); } catch (e) {}
+  check('7. SIGINT: מה שנוצר נכנס למניפסט, ההוצאה רשומה, ולא הוקלט הכול',
+        disk > 0 && disk < 12 && inMan === disk && sp.requests >= disk && m.voice === 'Kore',
+        'בדיסק ' + disk + ', במניפסט ' + inMan + ', ' + JSON.stringify(sp) + ' · ' + out.split('\n').slice(-3).join(' | '));
+}
+
 fs.rmSync(BASE, { recursive: true, force: true });
-console.log(bad ? '\n✗ ' + bad + ' תרחישים נפלו' : '\n✓ ההקלטה בטוחה: שישה תרחישים');
+console.log(bad ? '\n✗ ' + bad + ' תרחישים נפלו' : '\n✓ ההקלטה בטוחה: שבעה תרחישים');
 process.exit(bad ? 1 : 0);

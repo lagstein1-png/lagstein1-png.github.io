@@ -132,6 +132,11 @@ function spendAdd(model, texts, usage) {
 }
 /* מכסה או תקרה: אין טעם לעבור לאפליקציה הבאה ב---all */
 let STOPPED = '';
+/* עצירה בזמן (3.10.2026): ריצה שנחתכה ב-timeout של Actions מאבדת את
+   כל הקבצים וגם את רישום ההוצאה, וגוגל גובה בכל זאת (ריצה 27).
+   record.yml עוטף כל אפליקציה ב-`timeout -s INT` לפני גבול ה-job;
+   SIGINT מסיים את הבקשה שבדרך, כותב מניפסט כרגיל ויוצא — והקבצים נדחפים. */
+process.on('SIGINT', () => { if (!STOPPED) { STOPPED = 'time'; console.log('  SIGINT — מסיימים את הבקשה הנוכחית וכותבים מניפסט'); } });
 const KBPS  = 64;                 /* אושר דרך Main 30.9: נקי יותר ללומד; ה-6,823 של הריפו הנפרד נשארות 32k */
 const LANG  = 'he';
 const MIN_BYTES = 512;            /* קובץ קטן מזה הוא תשובה ריקה, לא דיבור */
@@ -545,6 +550,7 @@ async function build(app, max) {
        ככה אצווה ארוכה מדי לא נתקעת על אותה צורה כל יום. מקטע שכבר
        נכתב בריצה הזאת לא נכתב שוב (אותה תוכנית, אותו קובץ). */
     const doBatch = async (batch, model, depth) => {
+      if (STOPPED === 'time') return;
       requests++;
       const pcm = await synthBatch(model, batch.map(x => H.spoken(x[1])));
       const segs = splitBatch(ffmpeg, pcm, 24000, batch.length);
@@ -595,6 +601,7 @@ async function build(app, max) {
     };
     const tired = new Set();
     for (const batch of batches) {
+      if (STOPPED === 'time') break;
       const model = MODELS.find(m => !tired.has(m));
       if (!model) { quota = true; STOPPED = 'quota'; console.log('  כל המודלים נגמרו להיום. מה שנכתב נשמר; הרצה מחר ממשיכה.'); break; }
       try {
@@ -621,6 +628,7 @@ async function build(app, max) {
   }
   /* --- מצב רגיל: בקשה לכל מחרוזת --- */
   for (const [id, text] of todo) {
+    if (STOPPED === 'time') break;
     try {
       const mp3 = PROVIDER === 'gcloud' ? await synthGcloud(ffmpeg, H.spoken(text)) : await synth(ffmpeg, H.spoken(text));
       if (mp3.length < MIN_BYTES) throw new Error('קובץ ריק');
@@ -656,6 +664,8 @@ async function build(app, max) {
     console.log(bad ? '\n' + bad + ' אפליקציות עם מניפסט שאינו תואם לדיסק' : '\nהשכבה המוקלטת: המניפסטים תואמים לדיסק');
     process.exit(bad ? 1 : 0);
   }
+  /* --list: כל האפליקציות שיש להן מאגר — ל-app=all ב-record.yml */
+  if (args.includes('--list')) { console.log(Object.keys(SOURCES).join(' ')); process.exit(0); }
   if (args.includes('--manifest')) {
     for (const app of apps.length ? apps : Object.keys(SOURCES)) console.log(app + ': ' + writeManifest(app) + ' במניפסט');
     process.exit(0);
@@ -689,7 +699,7 @@ async function build(app, max) {
   if (args.includes('--plan') || !apps.length) { plan(apps.length ? apps : Object.keys(SOURCES)); process.exit(0); }
   let code = 0;
   for (const app of apps) {
-    if (STOPPED) { console.log('· ' + app + ' — דילוג (' + (STOPPED === 'budget' ? 'תקרת ההוצאה' : 'המכסה') + ')'); continue; }
+    if (STOPPED) { console.log('· ' + app + ' — דילוג (' + ({ budget: 'תקרת ההוצאה', quota: 'המכסה', time: 'הזמן' }[STOPPED]) + ')'); continue; }
     code = Math.max(code, await build(app, max));
   }
   process.exit(code);
