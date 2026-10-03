@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="robots" content="noindex,nofollow">
+<script>
+/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html
+   המפתח נשמר במגירה משל האפליקציה (shlav-internal-domino) ולא במגירה המשותפת shlav-internal. */
+var INTERNAL_KEY="shlav-internal-domino";
+var INTERNAL_OK=(function(){
+  try{
+    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
+    if(q) localStorage.setItem("shlav-internal-domino", decodeURIComponent(q));
+    return localStorage.getItem("shlav-internal-domino")===INTERNAL_KEY;
+  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>דומינו לימודי להדפסה · בקול</title>
+<meta name="description" content="דומינו לימודי להדפסה: 20 קלפים במעגל אחד, עם מפתח למורה. מספרים, חיבור, כפל, שברים ושעון. הכול מוקרא, בארבע שפות." />
+<link rel="canonical" href="https://bekol.co.il/domino/" />
+<meta name="theme-color" content="#f3f8f4" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#101a1c" media="(prefers-color-scheme:dark)">
+<link rel="manifest" href="./manifest.json" />
+<link rel="apple-touch-icon" href="./img/icon-192.png" />
+<link href="/fonts/fonts.css" rel="stylesheet" />
+<style>
+:root{--paper:#f3f8f4;--card:#fff;--ink:#17333c;--ink-soft:#4c666e;--teal:#0e9c8d;--teal-deep:#0b7568;--teal-soft:#d9f2ec;--amber:#ffc531;--amber-soft:#fff3ce;--coral:#ff6f61;--coral-soft:#ffe3de;--sky:#58b7e0;--sky-deep:#246c8c;--violet:#8a63d2;--violet-deep:#6a45b0;--violet-soft:#ece4fa;--green:#1f9d4d;--green-deep:#157a3a;--red:#d93a2f;--line:#dbe7e3;--btn:#0b7568;--on-teal:#fff;--ar:"Noto Sans Arabic","Heebo",system-ui,sans-serif;--ru:"Noto Sans","Heebo",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#101a1c;--card:#17262a;--ink:#e8f1f2;--ink-soft:#a9c0c5;--teal:#5fd9c8;--teal-deep:#3fbfae;--teal-soft:#123833;--amber:#ffd45e;--amber-soft:#3a2e0c;--coral:#ff9186;--coral-soft:#3d1a16;--sky:#7fcbea;--violet:#b49aef;--violet-deep:#8a63d2;--violet-soft:#241a3a;--green:#1f9d4d;--green-deep:#1f9d4d;--red:#d93a2f;--line:#2b4146;--btn:#12857a;--on-teal:#04201c;--sky-deep:#2f86b3}
+}
+*{box-sizing:border-box}
+html{font-size:20px}
+html.big{font-size:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Heebo",system-ui,"Segoe UI",Arial,sans-serif;line-height:1.5;-webkit-text-size-adjust:100%}
+html[lang="ar"] body,html[lang="ar"] button{font-family:var(--ar)}
+html[lang="ru"] body,html[lang="ru"] button{font-family:var(--ru)}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:820px;margin:0 auto;padding:12px 14px 120px}
+.top{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.brand{font-weight:800;font-size:.9rem;line-height:1.15;flex:1;min-width:0;color:var(--teal-deep);background:none;border:0;text-align:start;padding:6px 0}
+.langs{display:flex;gap:4px}
+.langs button{min-width:46px;min-height:50px;padding:0 4px;border-radius:14px;border:2px solid var(--teal);background:var(--card);font-weight:700;font-size:.9rem}
+.langs button[aria-pressed=true]{background:var(--teal);color:var(--on-teal)}
+.gear{min-width:46px;padding:0;min-height:50px;border-radius:14px;border:2px solid var(--violet);background:var(--card);color:var(--violet-deep)}
+h1{font-size:1.6rem;margin:.2em 0 .1em;line-height:1.25}
+h2{font-size:1.25rem;margin:.2em 0 .4em}
+.sub{color:var(--ink-soft);margin:0 0 12px}
+.card{background:var(--card);border-radius:20px;padding:16px;box-shadow:0 2px 10px rgba(23,51,60,.08);margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:10px 20px;border-radius:16px;border:0;font-weight:800;font-size:1rem;color:#fff;background:var(--btn);box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.play{background:var(--green);font-size:1.1rem;min-height:62px;padding:10px 18px}
+.btn.stop{background:var(--red);padding:10px 14px}
+.btn.slow{background:var(--sky-deep);color:#fff;padding:10px 14px}
+.btn.print{flex-direction:column;gap:0;background:var(--violet-deep);font-size:1.1rem;min-height:64px;flex:1;min-width:230px}
+.btn.print small{display:block;font-weight:500;font-size:.75rem;opacity:.95}
+.btn.shuf{background:var(--amber);color:#1a1300}
+.btn.ghost{background:var(--card);color:var(--teal-deep);border:2px solid var(--teal);box-shadow:none}
+.btn.tut{background:var(--card);color:var(--violet-deep);border:3px solid var(--violet);width:100%;box-shadow:none;justify-content:flex-start}
+.btn.tut img{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:47% 27%}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sets{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:6px 0 12px}
+.setb{display:flex;gap:12px;align-items:center;text-align:start;background:var(--card);border:3px solid var(--c);border-radius:20px;padding:10px 12px;min-height:84px}
+.setb{position:relative}
+.setb[aria-pressed=true]{box-shadow:0 0 0 4px var(--c)}
+.setb[aria-pressed=true]::after{content:"✓";position:absolute;top:4px;inset-inline-end:10px;font-weight:900;font-size:1.2rem;color:var(--c)}
+.setb .ico{flex:none;width:56px;height:56px;border-radius:16px;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.25rem}
+.setb .nm{font-weight:800;font-size:1.1rem;line-height:1.2}
+.setb .ds{font-size:.8rem;color:var(--ink-soft);line-height:1.3}
+.lvls{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}
+.lvl{flex:1;min-width:140px;min-height:56px;border-radius:16px;border:3px solid var(--sky);background:var(--card);font-weight:800;padding:6px}
+.lvl[aria-pressed=true]{background:var(--sky-deep);border-color:var(--sky-deep);color:#fff}
+.kits{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 12px}
+.kits .kit{min-width:56px;min-height:50px;border-radius:14px;border:2px solid var(--amber);background:var(--card);font-weight:800}
+.kits .kit[aria-pressed=true]{background:var(--amber);color:#1a1300}
+.hl{background:var(--amber);color:#1a1300;border-radius:6px;padding:0 2px}
+.tbox{background:var(--violet-soft);border:3px solid var(--violet);border-radius:18px;padding:12px 14px;margin:12px 0;display:flex;gap:12px;align-items:flex-start}
+.tbox img{flex:none;width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:47% 27%;border:3px solid var(--violet)}
+.how{margin:0;font-size:1.05rem;white-space:pre-line}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.cwrap{display:flex;flex-direction:column;gap:4px}
+.cap{font-size:.8rem;color:var(--ink-soft);font-weight:700}
+.set .tog,.tog{min-width:92px;min-height:50px;border-radius:14px;border:2px solid var(--teal);background:var(--card);font-weight:800}
+.tog[aria-pressed=true]{background:var(--teal);color:var(--on-teal)}
+.set{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.credit{font-size:.8rem;color:var(--ink-soft);text-align:center;margin-top:20px}
+.srOnly{position:absolute;inset-inline-start:-9999px}
+/* ===== הקלף עצמו — תמיד על נייר לבן, גם במצב כהה ===== */
+.dc{container-type:inline-size;position:relative;width:100%;aspect-ratio:12/5;display:flex;background:#fff;color:#17333c;border:.35cqw dashed #6b7f86;border-radius:1.2cqw;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dc .half{position:relative;flex:1;min-width:0;display:flex;align-items:center;justify-content:center;padding:2.2cqw;background:#fff;border:0;color:#17333c;text-align:center;font-family:inherit}
+.dc .half+.half{border-inline-start:.7cqw solid var(--dcc,#0e9c8d)}
+.dc .half .vis{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.dc .half svg{max-width:100%;max-height:100%;width:100%;height:100%}
+.dc .tx{font-weight:800;line-height:1.1;overflow-wrap:anywhere;unicode-bidi:plaintext}
+.dc .tx.n{direction:ltr}
+.dc .fr{display:inline-flex;flex-direction:column;align-items:center;font-weight:800;line-height:1;font-size:17cqw}
+.dc .fr s{display:block;width:100%;height:.9cqw;background:#17333c;margin:1cqw 0;text-decoration:none}
+.dc .no{position:absolute;inset-inline-start:50%;bottom:1cqw;transform:translateX(-50%);min-width:6cqw;height:6cqw;border-radius:3cqw;background:var(--dcc,#0e9c8d);color:#fff;font-weight:800;font-size:3.6cqw;line-height:6cqw;text-align:center;padding:0 1cqw;z-index:2}
+html[dir=rtl] .dc .no{transform:translateX(50%)}
+.dc .st{position:absolute;top:1.2cqw;inset-inline-start:1.8cqw;font-size:4.6cqw;font-weight:800;color:#b07a00;line-height:1;z-index:2}
+.dc button.half:focus-visible{outline:3px solid #6a45b0;outline-offset:-3px}
+.dc button.half .vis{padding-top:6cqw}
+.dc .spk{position:absolute;top:1cqw;inset-inline-end:1cqw;width:8cqw;height:8cqw;min-width:34px;min-height:34px;border-radius:50%;background:#1f9d4d;display:flex;align-items:center;justify-content:center}
+.dc .spk svg{width:60%;height:60%}
+canvas#cf{display:none}
+/* ===== הדפסה ===== */
+#pc,#pk{display:none}
+.sheet{width:210mm;height:297mm;position:relative;overflow:hidden;background:#fff;color:#17333c;break-after:page;page-break-after:always;font-family:"Heebo",system-ui,sans-serif}
+html[lang="ar"] .sheet{font-family:var(--ar)}
+html[lang="ru"] .sheet{font-family:var(--ru)}
+.sheet .cut{position:absolute;top:9mm;inset-inline:0;text-align:center;font-size:3.4mm;color:#4c666e}
+.sheet .cards{position:absolute;top:23.5mm;left:45mm;width:120mm;display:flex;flex-direction:column}
+.sheet .cards .dc{width:120mm;height:50mm;aspect-ratio:auto}
+.sheet .foot{position:absolute;bottom:7mm;inset-inline:0;text-align:center;font-size:3.2mm;color:#4c666e}
+.sheet.key{padding:12mm 10mm}
+.sheet.key h2{font-size:6.4mm;margin:0 0 1mm}
+.sheet.key .seq{font-size:3.6mm;margin:0 0 3mm;direction:ltr;text-align:start;overflow-wrap:anywhere}
+html[dir=rtl] .sheet.key .seq{text-align:right}
+.sheet.key .kg{display:grid;grid-template-columns:repeat(3,1fr);gap:2.4mm 3mm}
+.sheet.key .kl{font-size:3.1mm;font-weight:700;margin-bottom:.6mm}
+.sheet.key .dc{width:100%;aspect-ratio:12/5}
+@media print{
+  @page{size:A4;margin:0}
+  html,body{background:#fff!important;font-size:16px}
+  .wrap,#cf{display:none!important}
+  html.pc #pc,html.pk #pk{display:block}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<style>#gate[hidden]{display:none!important}</style>
+<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#fff;color:#1a1a1a;font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
+  <div style="max-width:32rem">
+    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
+    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
+    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר. אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
+    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a>
+  </div>
+</div>
+<div class="wrap"><div id="live" class="srOnly" aria-live="polite"></div><div id="app"></div></div>
+<div id="pc"></div><div id="pk"></div>
+<canvas id="cf"></canvas>
+<script>
+/* ===== helpers ===== */
+var LG=["he","ar","ru","en"];
+function L(h,a,r,e){return {he:h,ar:a,ru:r,en:e}}
+var RNG=Math.random;
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function ri(a,b){return Math.floor(RNG()*(b-a+1))+a}
+function pick(a){return a[ri(0,a.length-1)]}
+function shuffle(a){var r=a.slice(),i,j,x;for(i=r.length-1;i>0;i--){j=ri(0,i);x=r[i];r[i]=r[j];r[j]=x}return r}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function svg(w,h,inner,lab){return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+esc(lab||"")+'" preserveAspectRatio="xMidYMid meet">'+inner+'</svg>'}
+var INK="#17333c",C1="#2f7fd8",C2="#f58a1f",SHADE="#ffb04d";
+/* ===== number words 1..20 (he: counting forms) ===== */
+var NW={
+he:["","אחת","שתיים","שלוש","ארבע","חמש","שש","שבע","שמונה","תשע","עשר","אחת עשרה","שתים עשרה","שלוש עשרה","ארבע עשרה","חמש עשרה","שש עשרה","שבע עשרה","שמונה עשרה","תשע עשרה","עשרים"],
+ar:["","واحد","اثنان","ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية","تسعة","عشرة","أحد عشر","اثنا عشر","ثلاثة عشر","أربعة عشر","خمسة عشر","ستة عشر","سبعة عشر","ثمانية عشر","تسعة عشر","عشرون"],
+ru:["","один","два","три","четыре","пять","шесть","семь","восемь","девять","десять","одиннадцать","двенадцать","тринадцать","четырнадцать","пятнадцать","шестнадцать","семнадцать","восемнадцать","девятнадцать","двадцать"],
+en:["","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty"]};
+var OPW={plus:L("ועוד","плюс","плюс","plus"),minus:L("פחות","ناقص","минус","minus"),times:L("כפול","ضرب","умножить на","times"),over:L("מתוך","من","из","out of")};
+OPW.plus.ar="زائد";OPW.plus.ru="плюс";
+/* ===== visuals ===== */
+function dotsSvg(n){var s="",i,rows=Math.ceil(n/5),oy=(82-rows*18)/2+9,ox=(100-Math.min(n,5)*18)/2+9;
+  for(i=0;i<n;i++){var r=Math.floor(i/5),c=i%5;s+='<circle cx="'+(ox+c*18-9+0)+'" cy="'+(oy+r*18)+'" r="7" fill="'+(r%2?C2:C1)+'" stroke="'+INK+'" stroke-width="1.5"/>'}
+  return svg(100,82,s,String(n))}
+function arraySvg(r,c){var sp=Math.min(110/c,72/r),rad=sp*.38,s="",i,j,w=c*sp+6,h=r*sp+6;
+  for(i=0;i<r;i++)for(j=0;j<c;j++)s+='<circle cx="'+(3+sp*(j+.5)).toFixed(1)+'" cy="'+(3+sp*(i+.5)).toFixed(1)+'" r="'+rad.toFixed(1)+'" fill="'+(i%2?C2:C1)+'" stroke="'+INK+'" stroke-width="1"/>';
+  return svg(w.toFixed(0),h.toFixed(0),s,r+"x"+c)}
+function rodsSvg(t,o){var s="",i,j;
+  for(i=0;i<t;i++){var x=4+i*13;s+='<rect x="'+x+'" y="6" width="10" height="64" rx="2" fill="#7fcbea" stroke="'+INK+'" stroke-width="1.4"/>';for(j=1;j<10;j++)s+='<line x1="'+x+'" x2="'+(x+10)+'" y1="'+(6+j*6.4)+'" y2="'+(6+j*6.4)+'" stroke="'+INK+'" stroke-width=".6"/>'}
+  var ox=4+t*13+6;
+  for(i=0;i<o;i++){s+='<rect x="'+(ox+(i%3)*12)+'" y="'+(10+Math.floor(i/3)*14)+'" width="10" height="10" rx="2" fill="#ffc531" stroke="'+INK+'" stroke-width="1.2"/>'}
+  return svg(ox+40,76,s,t+"/"+o)}
+function pieSvg(p,q){var s='<circle cx="50" cy="50" r="42" fill="#fff" stroke="'+INK+'" stroke-width="2.5"/>',i;
+  for(i=0;i<p;i++){var a0=-Math.PI/2+i*2*Math.PI/q,a1=-Math.PI/2+(i+1)*2*Math.PI/q;
+    s+='<path d="M50 50 L'+(50+42*Math.cos(a0)).toFixed(2)+' '+(50+42*Math.sin(a0)).toFixed(2)+' A42 42 0 0 1 '+(50+42*Math.cos(a1)).toFixed(2)+' '+(50+42*Math.sin(a1)).toFixed(2)+' Z" fill="'+SHADE+'"/>'}
+  for(i=0;i<q;i++){var a=-Math.PI/2+i*2*Math.PI/q;s+='<line x1="50" y1="50" x2="'+(50+42*Math.cos(a)).toFixed(2)+'" y2="'+(50+42*Math.sin(a)).toFixed(2)+'" stroke="'+INK+'" stroke-width="2"/>'}
+  s+='<circle cx="50" cy="50" r="42" fill="none" stroke="'+INK+'" stroke-width="2.5"/>';
+  return svg(100,100,s,p+"/"+q)}
+function barSvg(p,q){var w=108/q,s="",i;
+  for(i=0;i<q;i++)s+='<rect x="'+(6+i*w).toFixed(2)+'" y="10" width="'+w.toFixed(2)+'" height="34" fill="'+(i<p?SHADE:"#fff")+'" stroke="'+INK+'" stroke-width="2"/>';
+  return svg(120,54,s,p+"/"+q)}
+function clockSvg(h,m){var s='<circle cx="90" cy="90" r="82" fill="#fff" stroke="'+INK+'" stroke-width="5"/>',i;
+  for(i=1;i<=12;i++){var a=i*Math.PI/6;s+='<text x="'+(90+62*Math.sin(a)).toFixed(1)+'" y="'+(98-62*Math.cos(a)).toFixed(1)+'" text-anchor="middle" font-size="20" font-weight="800" fill="'+INK+'">'+i+'</text>'}
+  var ha=((h%12)+m/60)*Math.PI/6,ma=m*Math.PI/30;
+  s+='<line x1="90" y1="90" x2="'+(90+40*Math.sin(ha)).toFixed(1)+'" y2="'+(90-40*Math.cos(ha)).toFixed(1)+'" stroke="#e8453c" stroke-width="8" stroke-linecap="round"/>';
+  s+='<line x1="90" y1="90" x2="'+(90+60*Math.sin(ma)).toFixed(1)+'" y2="'+(90-60*Math.cos(ma)).toFixed(1)+'" stroke="#2f7fd8" stroke-width="5" stroke-linecap="round"/><circle cx="90" cy="90" r="6" fill="'+INK+'"/>';
+  return svg(180,180,s,hh(h,m))}
+function hh(h,m){return h+":"+(m<10?"0"+m:m)}
+/* ===== representations: a rep is a language-free spec {t, ...}; R() renders it ===== */
+function tx(str,num){var n=String(str).length,sz=n<=3?15:n<=5?12:n<=8?9:n<=11?7:5.6;return '<span class="tx'+(num?' n':'')+'" style="font-size:'+sz+'cqw">'+esc(str)+'</span>'}
+function sayOp(str,lang){return str.replace(/\+/g," "+OPW.plus[lang]+" ").replace(/−/g," "+OPW.minus[lang]+" ").replace(/×/g," "+OPW.times[lang]+" ")}
+function R(sp,lang){var t=sp.t;
+  if(t==="digit")return {h:tx(sp.n,1),s:String(sp.n)};
+  if(t==="word")return {h:tx(NW[lang][sp.n],0),s:NW[lang][sp.n]};
+  if(t==="dots")return {h:dotsSvg(sp.n),s:String(sp.n)};
+  if(t==="sum"){var x=sp.a+"+"+sp.b;return {h:tx(x,1),s:sayOp(x,lang)}}
+  if(t==="diff"){var x2=sp.a+"−"+sp.b;return {h:tx(x2,1),s:sayOp(x2,lang)}}
+  if(t==="mul"){var x3=sp.a+"×"+sp.b;return {h:tx(x3,1),s:sayOp(x3,lang)}}
+  if(t==="rep"){var x4=[],i;for(i=0;i<sp.k;i++)x4.push(sp.a);var tt=x4.join("+");return {h:tx(tt,1),s:sayOp(tt,lang)}}
+  if(t==="array")return {h:arraySvg(sp.r,sp.c),s:sp.r+" "+OPW.times[lang]+" "+sp.c}
+  if(t==="expand"){var x5=sp.t10+"+"+sp.o;return {h:tx(x5,1),s:sayOp(x5,lang)}}
+  if(t==="rods")return {h:rodsSvg(sp.t10/10,sp.o),s:String(sp.t10+sp.o)}
+  if(t==="pie")return {h:pieSvg(sp.p,sp.q),s:sp.p+" "+OPW.over[lang]+" "+sp.q}
+  if(t==="bar")return {h:barSvg(sp.p,sp.q),s:sp.p+" "+OPW.over[lang]+" "+sp.q}
+  if(t==="frac")return {h:'<span class="fr" dir="ltr"><b>'+sp.p+'</b><s></s><b>'+sp.q+'</b></span>',s:sp.p+" "+OPW.over[lang]+" "+sp.q}
+  if(t==="clock")return {h:clockSvg(sp.h,sp.m),s:hh(sp.h,sp.m)}
+  if(t==="dig12")return {h:tx(hh(sp.h,sp.m),1),s:hh(sp.h,sp.m)}
+  if(t==="dig24"){var h24=sp.h+12;return {h:tx(hh(h24,sp.m),1),s:hh(h24,sp.m)}}
+  return {h:"",s:""}}
+/* ===== the generators: each returns 20 items, an item = list of representation specs of ONE value ===== */
+function distinctPick(pool,n){return shuffle(pool).slice(0,n)}
+var SETS={
+nums:{c:"#0e9c8d",ic:"1 2",n:L("מספרים וכמויות","الأعداد والكميات","Числа и количество","Numbers and amounts"),d:L("נקודות, ספרות ומילים","نقاط وأرقام وكلمات","точки, цифры и слова","dots, digits and words"),lv:2,
+ items:function(lv){var out=[],i;
+  if(lv===1){for(i=1;i<=20;i++)out.push([{t:"digit",n:i},{t:"word",n:i},{t:"dots",n:i}])}
+  else{distinctPick(range(21,99).filter(function(v){return v%10}),20).forEach(function(v){var t10=v-v%10,o=v%10;out.push([{t:"digit",n:v},{t:"expand",t10:t10,o:o},{t:"rods",t10:t10,o:o}])})}
+  return out}},
+add:{c:"#2f7fd8",ic:"+ −",n:L("חיבור וחיסור","الجمع والطرح","Сложение и вычитание","Adding and subtracting"),d:L("תרגיל ותוצאה","مسألة ونتيجة","пример и ответ","sum and answer"),lv:2,
+ items:function(lv){var out=[],vals;
+  if(lv===1)vals=range(1,20);else vals=distinctPick(range(20,90),20);
+  vals.forEach(function(v){var reps=[{t:"digit",n:v}];
+   if(lv===1){if(v>=2){var a=ri(1,v-1);reps.push({t:"sum",a:a,b:v-a})}
+     if(v<=19){var b=ri(1,Math.min(9,20-v));reps.push({t:"diff",a:v+b,b:b})}
+     reps.push({t:"dots",n:v})}
+   else{var a2=ri(10,v-10);reps.push({t:"sum",a:a2,b:v-a2});var b2=ri(10,Math.min(40,100-v));reps.push({t:"diff",a:v+b2,b:b2})}
+   out.push(reps)});
+  return out}},
+mul:{c:"#e8453c",ic:"×",n:L("לוח הכפל","جدول الضرب","Таблица умножения","Times table"),d:L("כפל ותוצאה","ضرب ونتيجة","умножение и ответ","times and answer"),lv:2,
+ items:function(lv){var pairs={},f=lv===1?[2,3,4,5,10]:range(2,10),i,j,list=[];
+  f.forEach(function(a){for(j=(lv===1?1:2);j<=10;j++){var p=a*j;(pairs[p]=pairs[p]||[]).push([a,j])}});
+  Object.keys(pairs).forEach(function(p){list.push(+p)});
+  return distinctPick(list,20).map(function(p){var pr=pick(pairs[p]),a=pr[0],b=pr[1],reps=[{t:"digit",n:p},{t:"mul",a:a,b:b},{t:"array",r:a,c:b}];
+    if(a<=5&&b>=2)reps.push({t:"rep",a:b,k:a});
+    return reps})}},
+frac:{c:"#8a63d2",ic:"½",n:L("שברים","الكسور","Дроби","Fractions"),d:L("ציור, עיגול ושבר","رسم ودائرة وكسر","рисунок, круг и дробь","picture, circle and fraction"),lv:1,
+ items:function(){return [[1,2],[1,3],[2,3],[1,4],[3,4],[1,5],[2,5],[3,5],[4,5],[1,6],[5,6],[1,8],[3,8],[5,8],[7,8],[1,10],[3,10],[7,10],[9,10],[1,12]].map(function(f){return [{t:"pie",p:f[0],q:f[1]},{t:"bar",p:f[0],q:f[1]},{t:"frac",p:f[0],q:f[1]}]})}},
+clock:{c:"#f58a1f",tc:"#1a1300",ic:"12",n:L("שעון","الساعة","Часы","Clock"),d:L("שעון ושעה דיגיטלית","ساعة ووقت رقمي","часы и цифровое время","clock and digital time"),lv:2,
+ items:function(lv){var mins=lv===1?[0,30]:[0,15,30,45],all=[],h;
+  for(h=1;h<=12;h++)mins.forEach(function(m){all.push([h,m])});
+  return distinctPick(all,20).map(function(x){var reps=[{t:"clock",h:x[0],m:x[1]},{t:"dig12",h:x[0],m:x[1]}];
+    if(x[0]<12)reps.push({t:"dig24",h:x[0],m:x[1]});return reps})}}
+};
+var SETIDS=["nums","add","mul","frac","clock"];
+function range(a,b){var r=[],i;for(i=a;i<=b;i++)r.push(i);return r}
+function specKey(sp){return JSON.stringify(sp)}
+/* ===== building the circle: card i = [A of item i | B of item i+1] ===== */
+function build(setId,lv,seed){
+  RNG=mulberry(seed);
+  var S0=SETS[setId],N=20,items=shuffle(S0.items(lv)),best=null,bestScore=1e9,att,i;
+  for(att=0;att<300&&bestScore>0;att++){
+    var ta=[],tb=[];
+    for(i=0;i<N;i++){var ix=range(0,items[i].length-1),a=pick(ix),b;do{b=pick(ix)}while(b===a);ta.push(a);tb.push(b)}
+    var sc=0;for(i=0;i<N;i++){if(items[i][ta[i]].t===items[(i+1)%N][tb[(i+1)%N]].t)sc++}
+    if(sc<bestScore){bestScore=sc;best={ta:ta,tb:tb}}}
+  var cards=[];
+  for(i=0;i<N;i++)cards.push({chain:i,a:items[i][best.ta[i]],b:items[(i+1)%N][best.tb[(i+1)%N]]});
+  var perm=shuffle(range(0,N-1)),printed=[],chainIds=[];
+  perm.forEach(function(ci,pos){cards[ci].id=pos+1;printed.push(cards[ci])});
+  for(i=0;i<N;i++)chainIds.push(cards[i].id);
+  var deck={set:setId,lv:lv,seed:seed,cards:printed,chain:chainIds,byChain:cards};
+  RNG=Math.random;return deck}
+/* ===== UI strings ===== */
+var BUILD="dm1 · 2026-10-03";
+var STR={
+he:{brand:"דומינו לימודי",title:"דומינו לימודי להדפסה",tag:"מדפיסים 20 קלפים, גוזרים ומסדרים במעגל. כל קלף מתחבר לקלף שמתאים לו.",
+ howT:"איך משחקים?",limor:"אני לימור. ככה משחקים:",how:"1. מדפיסים את הקלפים וגוזרים לפי הקו המקווקו.\n2. מערבבים את הקלפים על השולחן.\n3. מתחילים בקלף עם הכוכב. מחפשים קלף שהחצי הראשון שלו מתאים לחצי השני של הקלף הקודם.\n4. ממשיכים עד שהמעגל נסגר. הקלף האחרון מתחבר לקלף עם הכוכב.",
+ pick:"בחרו נושא",level:"רמה",l1:"קל",l2:"קצת יותר קשה",kit:"ערכה",kitNew:"ערכה חדשה",kitNo:"מספר ערכה",
+ cardsT:"הקלפים",tapHalf:"לוחצים על חצי קלף כדי לשמוע אותו.",printCards:"הדפסת הקלפים",printCardsD:"4 דפים, 5 קלפים בכל דף",printKey:"הדפסת מפתח למורה",printKeyD:"דף אחד עם הסדר הנכון",
+ showKey:"מפתח למורה: הסדר הנכון",keyT:"מפתח למורה",keyHow:"הסדר הנכון של הקלפים. הקלף האחרון מתחבר לקלף הראשון.",keyOrder:"הסדר (מספרי הקלפים)",start:"התחלה",cardW:"קלף",
+ cut:"גוזרים לפי הקו המקווקו",foot:"בקול · bekol.co.il · דומינו לימודי",back:"חזרה",listen:"הקראה",stop:"עצירה",slow:"לאט",listenHalf:"שמעו את חצי הקלף",
+ settings:"הגדרות",setSlow:"הקראה לאט",setBig:"אותיות גדולות",on:"פועל",off:"כבוי",setNote:"המסך עובר למצב כהה לפי הגדרות המכשיר. ההדפסה תמיד על רקע לבן."},
+ar:{brand:"دومينو تعليمي",title:"دومينو تعليمي للطباعة",tag:"نطبع 20 بطاقة ونقصّها ونرتّبها في دائرة. كل بطاقة تتّصل بالبطاقة المناسبة لها.",
+ howT:"كيف نلعب؟",limor:"أنا ليمور. هكذا نلعب:",how:"1. نطبع البطاقات ونقصّها على الخط المتقطّع.\n2. نخلط البطاقات على الطاولة.\n3. نبدأ بالبطاقة التي عليها نجمة. نبحث عن بطاقة يناسب نصفها الأول النصف الأخير من البطاقة السابقة.\n4. نكمل حتى تُغلق الدائرة. البطاقة الأخيرة تتّصل بالبطاقة التي عليها النجمة.",
+ pick:"اختاروا موضوعًا",level:"المستوى",l1:"سهل",l2:"أصعب قليلًا",kit:"مجموعة",kitNew:"مجموعة جديدة",kitNo:"رقم المجموعة",
+ cardsT:"البطاقات",tapHalf:"اضغطوا على نصف بطاقة لتسمعوه.",printCards:"طباعة البطاقات",printCardsD:"4 صفحات، 5 بطاقات في كل صفحة",printKey:"طباعة مفتاح المعلّم",printKeyD:"صفحة واحدة بالترتيب الصحيح",
+ showKey:"مفتاح المعلّم: الترتيب الصحيح",keyT:"مفتاح المعلّم",keyHow:"الترتيب الصحيح للبطاقات. البطاقة الأخيرة تتّصل بالأولى.",keyOrder:"الترتيب (أرقام البطاقات)",start:"البداية",cardW:"بطاقة",
+ cut:"نقصّ على الخط المتقطّع",foot:"بقول · bekol.co.il · دومينو تعليمي",back:"رجوع",listen:"استماع",stop:"إيقاف",slow:"ببطء",listenHalf:"استمعوا إلى نصف البطاقة",
+ settings:"الإعدادات",setSlow:"قراءة بطيئة",setBig:"حروف كبيرة",on:"يعمل",off:"متوقف",setNote:"تتحوّل الشاشة إلى الوضع الداكن حسب إعدادات الجهاز. الطباعة دائمًا على خلفية بيضاء."},
+ru:{brand:"Учебное домино",title:"Учебное домино для печати",tag:"Печатаем 20 карточек, вырезаем и выкладываем по кругу. Каждая карточка подходит к своей паре.",
+ howT:"Как играть?",limor:"Я Лимор. Играем так:",how:"1. Печатаем карточки и вырезаем по пунктирной линии.\n2. Перемешиваем карточки на столе.\n3. Начинаем с карточки со звёздочкой. Ищем карточку, у которой первая половина подходит ко второй половине предыдущей.\n4. Продолжаем, пока круг не замкнётся. Последняя карточка подходит к карточке со звёздочкой.",
+ pick:"Выберите тему",level:"Уровень",l1:"Легко",l2:"Чуть сложнее",kit:"Набор",kitNew:"Новый набор",kitNo:"Номер набора",
+ cardsT:"Карточки",tapHalf:"Нажмите на половинку карточки, чтобы услышать её.",printCards:"Печать карточек",printCardsD:"4 листа, по 5 карточек на листе",printKey:"Печать ключа для учителя",printKeyD:"Один лист с правильным порядком",
+ showKey:"Ключ для учителя: правильный порядок",keyT:"Ключ для учителя",keyHow:"Правильный порядок карточек. Последняя карточка подходит к первой.",keyOrder:"Порядок (номера карточек)",start:"Старт",cardW:"Карточка",
+ cut:"Вырезаем по пунктирной линии",foot:"Беколь · bekol.co.il · Учебное домино",back:"Назад",listen:"Слушать",stop:"Стоп",slow:"Медленно",listenHalf:"Послушать половинку карточки",
+ settings:"Настройки",setSlow:"Медленное чтение",setBig:"Крупный шрифт",on:"Вкл.",off:"Выкл.",setNote:"Экран становится тёмным по настройкам устройства. Печать всегда на белом фоне."},
+en:{brand:"Learning dominoes",title:"Printable learning dominoes",tag:"Print 20 cards, cut them out and lay them in a circle. Each card connects to the card that matches it.",
+ howT:"How to play",limor:"I'm Limor. Here is how we play:",how:"1. Print the cards and cut along the dashed line.\n2. Mix the cards up on the table.\n3. Start with the card that has the star. Find a card whose first half matches the last half of the card before it.\n4. Keep going until the circle closes. The last card connects to the star card.",
+ pick:"Pick a topic",level:"Level",l1:"Easy",l2:"A bit harder",kit:"Set",kitNew:"New set",kitNo:"Set number",
+ cardsT:"The cards",tapHalf:"Tap half a card to hear it.",printCards:"Print the cards",printCardsD:"4 A4 pages, 5 cards per page",printKey:"Print the teacher key",printKeyD:"One page with the right order",
+ showKey:"Teacher key: the right order",keyT:"Teacher key",keyHow:"The right order of the cards. The last card connects to the first.",keyOrder:"Order (card numbers)",start:"Start",cardW:"Card",
+ cut:"Cut along the dashed line",foot:"bekol · bekol.co.il · Learning dominoes",back:"Back",listen:"Listen",stop:"Stop",slow:"Slow",listenHalf:"Hear this half card",
+ settings:"Settings",setSlow:"Slow reading",setBig:"Large text",on:"On",off:"Off",setNote:"The screen goes dark when your device is set to dark mode. Printing is always on white."}
+};
+var LNAME={he:"עב",ar:"عر",ru:"Рус",en:"En"},LDIR={he:"rtl",ar:"rtl",ru:"ltr",en:"ltr"},LCODE={he:"he-IL",ar:"ar-SA",ru:"ru-RU",en:"en-US"};
+/* ===== state ===== */
+var KEY="domino-state-v1",S={lang:"he",set:"nums",lvl:1,seed:1,slow:false,big:false},view="home",DECK=null,showKey=false;
+function loadS(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)for(var k in o)S[k]=o[k]}catch(e){}}
+function saveS(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+loadS();
+function $(s){return document.querySelector(s)}
+function T(){return STR[S.lang]}
+function lt(o){return o[S.lang]}
+function mkDeck(){if(!SETS[S.set])S.set="nums";if(S.lvl>SETS[S.set].lv)S.lvl=1;DECK=build(S.set,S.lvl,S.seed)}
+/* ===== speech with word highlight (same engine as the other bekol apps) ===== */
+var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null;
+var VF=/(female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
+var VM=/(\bmale\b|david|mark|asaf|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
+function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
+function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
+  var f=vs.filter(function(v){return VF.test(v.name)&&!VM.test(v.name)});if(f.length)return {v:f[0],fem:true};
+  var nm=vs.filter(function(v){return !VM.test(v.name)});if(nm.length)return {v:nm[0],fem:false};
+  return {v:vs[0]||null,fem:false}}
+function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.raw!=null){HL.el.textContent=HL.el.dataset.raw}HL.el=null}
+function hlPrep(el,text){hlClear();if(!el||el.children.length)return;el.dataset.raw=el.textContent;HL.el=el;HL.raw=el.textContent;HL.got=false;
+  var out="",re=/\S+|\s+/g,m,idx=0;HL.starts=[];
+  while((m=re.exec(HL.raw))){if(/\S/.test(m[0])){HL.starts.push(m.index);out+='<span data-w="'+idx+'">'+esc(m[0])+'</span>';idx++}else out+=m[0]}
+  el.innerHTML=out}
+function hlAt(ci){if(!HL.el)return;var w=-1,i;for(i=0;i<HL.starts.length;i++){if(HL.starts[i]<=ci)w=i;else break}
+  var sp=HL.el.querySelectorAll("[data-w]");for(i=0;i<sp.length;i++)sp[i].className=(i===w?"hl":"")}
+function hlFallback(rate){if(!HL.el)return;var n=HL.starts.length,i=0,per=430/rate;
+  (function step(){if(!HL.el||HL.got)return;var sp=HL.el.querySelectorAll("[data-w]");for(var k=0;k<sp.length;k++)sp[k].className=(k===i?"hl":"");i++;if(i<=n)HL.timer=setTimeout(step,per)})()}
+function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}_u=null;hlClear();setPlaying(false)}
+function setPlaying(b){var bs=document.querySelectorAll('[data-a="stop"]');bs.forEach(function(x){x.style.opacity=b?1:.55})}
+function speak(text,el,onend){stopSpeak();var raw=text;if(!("speechSynthesis" in window)||!text)return false;
+  var rate=S.slow?0.7:0.9,pv=pickVoice(),u=new SpeechSynthesisUtterance(text);u.lang=LCODE[S.lang];if(pv.v)u.voice=pv.v;u.rate=rate;u.pitch=pv.fem?1.05:1.3;
+  HL.noB=false;if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw)}
+  u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(e.charIndex)};
+  u.onend=u.onerror=function(){if(_u===u){hlClear();setPlaying(false);if(onend)onend()}};
+  _u=u;setPlaying(true);try{speechSynthesis.speak(u)}catch(e){return false}
+  if(HL.el)setTimeout(function(){if(_u===u&&HL.el&&!HL.got)hlFallback(rate)},900);return true}
+/* ===== card markup ===== */
+var SPKSVG='<svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8c2 2 2 6 0 8" stroke="#fff" fill="none" stroke-width="2"/></svg>';
+function cardHTML(c,inter,opt){opt=opt||{};var a=R(c.a,S.lang),b=R(c.b,S.lang),col=SETS[S.set].c,t=T();
+  function half(r,side){var inner='<span class="vis">'+r.h+'</span>';
+    if(inter)return '<button class="half" data-a="sayhalf" data-c="'+c.id+'" data-s="'+side+'" aria-label="'+esc(t.listenHalf+": "+r.s)+'">'+inner+'<span class="spk">'+SPKSVG+'</span></button>';
+    return '<div class="half">'+inner+'</div>'}
+  var star=(DECK.chain[0]===c.id)?'<span class="st" aria-label="'+esc(t.start)+'">★</span>':'';
+  return '<div class="dc" style="--dcc:'+col+'">'+half(a,"a")+half(b,"b")+(opt.noNo?'':'<span class="no">'+c.id+'</span>')+star+'</div>'}
+function byId(id){return DECK.cards.filter(function(c){return c.id===id})[0]}
+function sheetsHTML(){var t=T(),h="",p,i;
+  for(p=0;p<4;p++){h+='<div class="sheet"><div class="cut">'+esc(t.cut)+'</div><div class="cards">';
+    for(i=0;i<5;i++)h+=cardHTML(DECK.cards[p*5+i],false);
+    h+='</div><div class="foot">'+esc(t.foot+" · "+lt(SETS[S.set].n)+" · "+t.kitNo+" "+S.seed)+'</div></div>'}
+  return h}
+function keyHTML(){var t=T(),h='<div class="sheet key"><h2>'+esc(t.keyT+" · "+lt(SETS[S.set].n))+'</h2><p class="seq"><b>'+esc(t.keyOrder)+':</b> '+DECK.chain.join(" → ")+' → '+DECK.chain[0]+'</p><div class="kg">';
+  DECK.byChain.forEach(function(c,i){h+='<div><div class="kl">'+(i+1)+' · '+esc(t.cardW)+' '+c.id+(i===0?' · ★ '+esc(t.start):'')+'</div>'+cardHTML(c,false,{noNo:true})+'</div>'});
+  return h+'</div><div class="foot">'+esc(t.foot+" · "+t.kitNo+" "+S.seed)+'</div></div>'}
+/* ===== views ===== */
+function header(){var t=T(),h='<div class="top"><button class="brand" data-a="home">'+esc(t.brand)+'</button><div class="langs" role="group">';
+  LG.forEach(function(l){h+='<button data-a="lang" data-l="'+l+'" aria-pressed="'+(S.lang===l)+'" lang="'+l+'">'+LNAME[l]+'</button>'});
+  return h+'</div><button class="gear" data-a="settings" aria-label="'+esc(t.settings)+'"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></div>'}
+function tutorBtn(){return (window.TUTOR&&TUTOR.on&&TUTOR.on())?'<button class="btn tut" data-a="tutor"><img src="/img/limor.jpg" alt="">'+esc(TUTOR.label())+'</button>':''}
+function listenRow(sayId){var t=T();return '<div class="row" style="margin:6px 0 8px"><button class="btn play" data-a="say" data-t="'+sayId+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg>'+esc(t.listen)+'</button><button class="btn stop" data-a="stop"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>'+esc(t.stop)+'</button><button class="btn slow" data-a="slowsay" data-t="'+sayId+'">'+esc(t.slow)+'</button></div>'}
+function homeView(){var t=T(),cur=SETS[S.set],h='<h1 id="h1">'+esc(t.title)+'</h1><p class="sub" id="hs">'+esc(t.tag)+'</p>'+listenRow("home");
+  h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><b>'+esc(t.limor)+'</b>'+'<p class="how" id="how">'+esc(t.how)+'</p></div></div>'+listenRow("how")+tutorBtn();
+  h+='<h2 style="margin-top:14px">'+esc(t.pick)+'</h2><div class="sets">';
+  SETIDS.forEach(function(id){var s=SETS[id];h+='<button class="setb" style="--c:'+s.c+'" data-a="set" data-s="'+id+'" aria-pressed="'+(S.set===id)+'"><span class="ico" style="color:'+(s.tc||"#fff")+'" aria-hidden="true">'+esc(s.ic)+'</span><span><span class="nm">'+esc(lt(s.n))+'</span><br><span class="ds">'+esc(lt(s.d))+'</span></span></button>'});
+  h+='</div>';
+  if(cur.lv>1)h+='<div class="lvls" role="group" aria-label="'+esc(t.level)+'"><button class="lvl" data-a="lvl" data-l="1" aria-pressed="'+(S.lvl===1)+'">'+esc(t.l1)+'</button><button class="lvl" data-a="lvl" data-l="2" aria-pressed="'+(S.lvl===2)+'">'+esc(t.l2)+'</button></div>';
+  h+='<div class="kits" role="group" aria-label="'+esc(t.kit)+'"><b>'+esc(t.kit)+':</b>';
+  [1,2,3].forEach(function(k){h+='<button class="kit" data-a="kit" data-k="'+k+'" aria-pressed="'+(S.seed===k)+'">'+k+'</button>'});
+  h+='<button class="btn shuf" data-a="newkit"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1300" stroke-width="2.4" aria-hidden="true"><path d="M3 7h4l10 10h4M3 17h4l3-3M14 10l3-3h4M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>'+esc(t.kitNew)+'</button><span class="cap">'+esc(t.kitNo)+': '+S.seed+'</span></div>';
+  h+='<div class="row" style="margin:10px 0 14px"><button class="btn print" data-a="printcards">'+esc(t.printCards)+'<small>'+esc(t.printCardsD)+'</small></button><button class="btn print" style="background:var(--sky-deep)" data-a="printkey">'+esc(t.printKey)+'<small>'+esc(t.printKeyD)+'</small></button></div>';
+  h+='<button class="btn ghost" data-a="keyview" style="margin-bottom:14px">'+esc(t.showKey)+'</button>';
+  h+='<h2>'+esc(t.cardsT)+' · '+esc(lt(cur.n))+'</h2><p class="sub">'+esc(t.tapHalf)+'</p><div class="pgrid">';
+  DECK.cards.forEach(function(c){h+='<div class="cwrap">'+cardHTML(c,true)+'</div>'});
+  return h+'</div>'}
+function keyView(){var t=T(),h='<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1 id="kt">'+esc(t.keyT)+'</h1><p class="sub" id="kh">'+esc(t.keyHow)+'</p>'+listenRow("key");
+  h+='<p><b>'+esc(t.keyOrder)+':</b> <span dir="ltr">'+DECK.chain.join(" → ")+' → '+DECK.chain[0]+'</span></p><div class="row" style="margin-bottom:14px"><button class="btn print" style="background:var(--sky-deep)" data-a="printkey">'+esc(t.printKey)+'<small>'+esc(t.printKeyD)+'</small></button></div><div class="kgrid">';
+  DECK.byChain.forEach(function(c,i){h+='<div class="cwrap"><span class="cap">'+(i+1)+' · '+esc(t.cardW)+' '+c.id+(i===0?' · ★ '+esc(t.start):'')+'</span>'+cardHTML(c,true,{noNo:true})+'</div>'});
+  return h+'</div>'}
+function settingsView(){var t=T();function tg(k,l){return '<div class="set"><span>'+esc(l)+'</span><button class="tog" data-a="tog" data-k="'+k+'" aria-pressed="'+!!S[k]+'">'+esc(S[k]?t.on:t.off)+'</button></div>'}
+  return '<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1 id="st">'+esc(t.settings)+'</h1>'+listenRow("settings")+'<div class="card">'+tg("slow",t.setSlow)+tg("big",t.setBig)+'<p class="sub" id="sn" style="margin-top:12px">'+esc(t.setNote)+'</p></div>'}
+function render(){document.documentElement.lang=S.lang;document.documentElement.dir=LDIR[S.lang];document.documentElement.classList.toggle("big",!!S.big);
+  if(!DECK)mkDeck();
+  var h=header();h+=({home:homeView,key:keyView,settings:settingsView})[view]();$("#app").innerHTML=h;
+  $("#pc").innerHTML=sheetsHTML();$("#pk").innerHTML=keyHTML();
+  document.title=T().title+" · bekol";if(window.TUTOR&&TUTOR.refresh)try{TUTOR.refresh()}catch(e){}}
+function sayText(w){var t=T();
+  if(w==="home")return [t.title+". "+t.tag,$("#h1")];
+  if(w==="how")return [t.limor+" "+t.how,$("#how")];
+  if(w==="key")return [t.keyHow,$("#kh")];
+  if(w==="settings")return [t.setNote,$("#sn")];
+  return ["",null]}
+function doPrint(cls){stopSpeak();var r=document.documentElement;r.classList.add(cls);
+  var done=function(){r.classList.remove("pc");r.classList.remove("pk");window.removeEventListener("afterprint",done)};
+  window.addEventListener("afterprint",done);setTimeout(function(){try{window.print()}catch(e){done()}},60)}
+function onAct(a,el){
+  if(a==="home"){stopSpeak();view="home";render();window.scrollTo(0,0)}
+  else if(a==="lang"){stopSpeak();S.lang=el.dataset.l;saveS();render()}
+  else if(a==="settings"){stopSpeak();view="settings";render();window.scrollTo(0,0)}
+  else if(a==="keyview"){stopSpeak();view="key";render();window.scrollTo(0,0)}
+  else if(a==="set"){stopSpeak();S.set=el.dataset.s;if(S.lvl>SETS[S.set].lv)S.lvl=1;saveS();mkDeck();render()}
+  else if(a==="lvl"){stopSpeak();S.lvl=+el.dataset.l;saveS();mkDeck();render()}
+  else if(a==="kit"){stopSpeak();S.seed=+el.dataset.k;saveS();mkDeck();render()}
+  else if(a==="newkit"){stopSpeak();S.seed=Math.floor(Math.random()*9000)+1000;saveS();mkDeck();render()}
+  else if(a==="say"||a==="slowsay"){var r=sayText(el.dataset.t),o=S.slow;if(a==="slowsay")S.slow=true;speak(r[0],r[1]);S.slow=o}
+  else if(a==="sayhalf"){var c=byId(+el.dataset.c),rp=R(el.dataset.s==="a"?c.a:c.b,S.lang);speak(rp.s,null)}
+  else if(a==="stop")stopSpeak();
+  else if(a==="tutor"){stopSpeak();if(window.TUTOR)TUTOR.open()}
+  else if(a==="tog"){var kk=el.dataset.k;S[kk]=!S[kk];saveS();render()}
+  else if(a==="printcards")doPrint("pc");
+  else if(a==="printkey")doPrint("pk")}
+document.addEventListener("click",function(e){var el=e.target.closest("[data-a]");if(!el||el.disabled)return;onAct(el.dataset.a,el)});
+window.addEventListener("pagehide",function(){stopSpeak()});
+</script>
+<script src="/tutor/josh-face.js"></script>
+<script src="/tutor/he-speech.js"></script>
+<script src="/speech/recorded.js"></script>
+<script src="/tutor/josh-state.js"></script>
+<script src="/tutor/josh-local.js"></script>
+<script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
+<script src="/legal/terms.js"></script>
+<script src="/legal/protect.js"></script>
+<script>
+/* INTERNAL-GATE — לא נטענת בלי מפתח. */
+function boot(){var q=new URLSearchParams(location.search),l=q.get("lang");if(l&&STR[l])S.lang=l;
+  var st=q.get("set");if(st&&SETS[st])S.set=st;var lv=q.get("lvl");if(lv)S.lvl=+lv;var sd=q.get("seed");if(sd)S.seed=+sd;
+  mkDeck();var vw=q.get("view");if(vw==="key"||vw==="settings")view=vw;
+  render();
+  var pr=q.get("print");if(pr==="cards")document.documentElement.classList.add("pc");else if(pr==="key")document.documentElement.classList.add("pk");
+  if(window.TUTOR){try{TUTOR.mount({app:"domino",lang:function(){return S.lang},q:function(){return null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm1-pwa1").catch(function(){})})}
+if(!INTERNAL_OK){
+  document.getElementById("gate").hidden=false;
+  document.title="לא פורסם";
+}else{
+  boot();
+}
+</script>
+<!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
+     (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
+     נמדדת בנפרד. הוסר 10.9.2026 והוחזר 15.9.2026, שניהם בהחלטת הבעלים. -->
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body></html>
