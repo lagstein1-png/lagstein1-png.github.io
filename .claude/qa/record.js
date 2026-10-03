@@ -166,7 +166,11 @@ const SOURCES = {
      בכוונה לא כולל: STR (תוויות ממשק/שבחים) ואת מחרוזות optSay שחלקן
      נבנות בזמן ריצה ממספרים (שברים, זמן, יחידות) — בדיוק הסיבה ששאר
      משפחת math-* אינה ב-SOURCES בכלל. */
-  'math-elem': ['math-elem/index.html']
+  'math-elem': ['math-elem/index.html'],
+  /* תנ״ך לילדים (3.10.2026): הנתונים ב-js/data.js כשורות מופרדות ב-| (L משפט, Q שאלה, S כותרת, E ישות/תשובה), קוראים אותם במסלול נפרד (tanakhElem). */
+  'tanakh-elem': ['tanakh-elem/js/data.js'],
+  /* מולדת ואזרחות לילדים (3.10.2026): הנתונים ב-js/data.js כשורות מופרדות ב-| (L משפט, Q שאלה, S כותרת, E ישות/תשובה), קוראים אותם במסלול נפרד (civicsElem). */
+  'civics-elem': ['civics-elem/js/data.js']
 };
 
 /* בדיוק מה ש-plainOf עושה באפליקציה: תגיות יורדות, ישויות נפתחות,
@@ -220,11 +224,71 @@ function mathElemBank(text) {
   return seen;
 }
 
+/* tanakh-elem/js/data.js: RAW הוא טקסט שורות. מוקלט כל הטקסט העברי שהאפליקציה מקריאה:
+   כותרת סיפור (S), משפט (L), שאלה (Q) ותשובה (E). שדה 'he' הוא הראשון אחרי הקידומת. */
+function tanakhElem(text) {
+  const k = text.indexOf('String.raw`');
+  if (k < 0) throw new Error('tanakh-elem: RAW לא נמצא');
+  const out = [];
+  const re = /String\.raw`([^`]*)`/g; let m;
+  while ((m = re.exec(text))) for (const line of m[1].split('\n')) {
+    if (!line.trim()) continue;
+    const kind = line[0], f = line.slice(2).split('|');
+    if (kind === 'S') out.push(f[3]);
+    else if (kind === 'L') out.push(f[0]);
+    else if (kind === 'Q') out.push(f[0]);
+    else if (kind === 'E') out.push(f[2]);
+  }
+  return out;
+}
+
+/* civics-elem/js/data.js: RAW הוא טקסט שורות. מוקלט כל הטקסט העברי שהאפליקציה מקריאה:
+   כותרת נושא (S), משפט (L), שאלה (Q) ותשובה (E). שדה 'he' הוא הראשון אחרי הקידומת. */
+function civicsElem(text) {
+  const k = text.indexOf('String.raw`');
+  if (k < 0) throw new Error('civics-elem: RAW לא נמצא');
+  const out = [];
+  const re = /String\.raw`([^`]*)`/g; let m;
+  while ((m = re.exec(text))) for (const line of m[1].split('\n')) {
+    if (!line.trim()) continue;
+    const kind = line[0], f = line.slice(2).split('|');
+    if (kind === 'S') out.push(f[3]);
+    else if (kind === 'L') out.push(f[0]);
+    else if (kind === 'Q') out.push(f[0]);
+    else if (kind === 'E') out.push(f[2]);
+  }
+  return out;
+}
+
 function corpus(app) {
   const src = SOURCES[app];
   if (!src) return null;
   const files = typeof src === 'function' ? src() : src;
   const seen = new Map();       /* id → text, בסדר ההופעה */
+  if (app === 'civics-elem') {
+    const tf = path.join(ROOT, files[0]);
+    if (!fs.existsSync(tf)) return seen;
+    for (const raw of civicsElem(fs.readFileSync(tf, 'utf8'))) {
+      const text = plainOf(String(raw));
+      if (!/[א-ת]/.test(text)) continue;
+      if (text.split(' ').length < 2) continue;
+      const id = R.id(text);
+      if (!seen.has(id)) seen.set(id, text);
+    }
+    return seen;
+  }
+  if (app === 'tanakh-elem') {
+    const tf = path.join(ROOT, files[0]);
+    if (!fs.existsSync(tf)) return seen;
+    for (const raw of tanakhElem(fs.readFileSync(tf, 'utf8'))) {
+      const text = plainOf(String(raw));
+      if (!/[א-ת]/.test(text)) continue;
+      if (text.split(' ').length < 2) continue;
+      const id = R.id(text);
+      if (!seen.has(id)) seen.set(id, text);
+    }
+    return seen;
+  }
   if (app === 'math-elem') {
     const sf = path.join(ROOT, files[0]);
     if (!fs.existsSync(sf)) return seen;

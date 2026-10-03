@@ -138,7 +138,7 @@ var GKEY_STORE="<app>-gkey";
 `h` (bagrut-history), `c` (civics), `s` (science), `q` (geography),
 `w` (geography-elem), `i` (hebrew), `j` (literature), `p` (tanakh),
 `l` (lomda), `k` (kotvim), `r` (rakia), `e` (electric), `z` (limor),
-`f` (barak), `d` (motal), `y` (hebrew-arab), `o` (math-elem), `hl` (hebrew-lit). אותיות בודדות פנויות: אין — מכאן תחילית של שתי אותיות או יותר (`hl`), וה-QA משווה את כל התחילית האלפביתית ולא את האות הראשונה בלבד. תחילית אינה יכולה להיות זהה לאחרת.
+`f` (barak), `d` (motal), `y` (hebrew-arab), `o` (math-elem), `hl` (hebrew-lit), `te` (tanakh-elem), `mc` (civics-elem). אותיות בודדות פנויות: אין — מכאן תחילית של שתי אותיות או יותר (`hl`, `te`, `mc`), וה-QA משווה את כל התחילית האלפביתית ולא את האות הראשונה בלבד. תחילית אינה יכולה להיות זהה לאחרת.
 hebrew-arab עברה מ-`h` ל-`y` ב-30.9.2026 — `h` שותפה עם bagrut-history.
 
 **ואל תסמכו על הרשימה הזאת — ספרו.** `k` חסרה בה מאז ש-״כותבים

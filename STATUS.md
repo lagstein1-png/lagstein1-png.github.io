@@ -23,6 +23,8 @@
 | `english-bagrut` | — | — | אינה בריפו הזה |
 | `literature` | j22 · 2026-10-02 | j22-pwa1 | תואם |
 | `tanakh` | p22 · 2026-10-02 | p22-pwa1 | תואם |
+| `tanakh-elem` | te1 · 2026-10-03 | te1-pwa1 | תואם |
+| `civics-elem` | mc1 · 2026-10-03 | mc1-pwa1 | תואם |
 | `hebrew-arab` | y9 · 2026-10-02 | y9-pwa1 | תואם |
 | `motal` | d15 · 2026-10-02 | d15-pwa1 | תואם |
 
