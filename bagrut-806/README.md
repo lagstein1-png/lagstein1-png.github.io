@@ -87,3 +87,7 @@
 ---
 
 *נוצר מקריאה בקוד ובדוחות ה-QA, 10.9.2026. כל מספר כאן נמדד בפקודה — אין הערכות.*
+
+## 2026-10-03: 3/4-unit practice tracks
+
+`data/exams.js` now also holds original demonstration collections for 35371, 35372, 35471 and 35472 (6/6/8/5 questions, 50 subquestions). They use the same handwritten schema and scoring engine. These are starter practice collections, not official papers or complete curriculum coverage. Source links and Ministry credit are visible in the track picker. Five-unit data is unchanged. Track selection persists locally; exam changes clear transient answers and prevent a live simulation being silently reassigned. New attempt records include the exam ID to avoid collisions between collections. Legacy unscoped attempt history is retained, not guessed or reassigned.

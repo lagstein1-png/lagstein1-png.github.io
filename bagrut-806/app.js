@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x115 · 2026-10-02";
+  var BUILD = "x116 · 2026-10-03";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -52,7 +52,7 @@
   var store = {
     data: null,
     blank: function () {
-      return { fs: 1, theme: "auto", rate: 1, say: true, examId: null,
+      return { units: 5, fs: 1, theme: "auto", rate: 1, say: true, examId: null,
                clearFont: false, contrast: false, spaced: false, reduceMotion: false,
                solved: {}, sims: [], weak: {}, att: {} };
     },
@@ -327,6 +327,7 @@
     var d = store.data;
     if (!d.solved) d.solved = {};
     if (!d.att) d.att = {};
+    subId = state.examId + ":" + subId;
     var a = d.att[subId];
     if (!a) a = d.att[subId] = { topic: q.topic, ok: false, tries: 0 };
     a.topic = q.topic;
@@ -372,8 +373,11 @@
     "35572": { name: "שאלון 35572", sub: "40% מהציון · שעתיים וחצי · שני פרקים, בחירה בכל פרק",
                link: "https://meyda.education.gov.il/sheeloney_bagrut/35572/HEB" }
   };
+  ["35371", "35372", "35471", "35472"].forEach(function (code) {
+    QINFO[code] = { name: "שאלון " + code + " - אוסף תרגול מקורי", sub: "נושאים לפי תוכנית משרד החינוך; לא בחינה רשמית", link: "https://pop.education.gov.il/tchumey_daat/matmatika/chativa-elyona/teaching-mathematics/examination-evaluation/" };
+  });
   function renderHome() {
-    var all = window.EXAMS || [];
+    var all = (window.EXAMS || []).filter(function (ex) { return (ex.units || 5) === store.data.units; });
     var box = $("#exam-list");
     if (!all.length) {
       box.innerHTML = '<div class="stub"><b>אין עדיין בחינות.</b>' +
@@ -386,12 +390,13 @@
        TUT_ID נשאר null והפאנל נפתח לשיחה כללית. */
     /* בחירת מסלול (27.9.2026): הכרטיס המאוחד בדף הבית מוביל לכאן.
        מסלול 3 יח״ל חי בתוך math-teen; מסלול 5 יח״ל הוא האפליקציה הזאת. */
-    var trackPick = '<div class="card track-pick"><h2>בגרות במתמטיקה — בוחרים מסלול</h2>' +
-      '<p class="meta">כאן מתאמנים ל־5 יח״ל (שאלונים 35571/35572). לומדים 3 יח״ל? התרגול המודרך שלכם נמצא באפליקציית שלב.</p>' +
-      '<div class="track-row">' +
-      '<a class="btn ghost" href="/math-teen/?bagrut3=1">3 יח״ל — לתרגול המודרך ←</a>' +
-      '<span class="chip">5 יח״ל — הסימולציה והתרגול כאן למטה</span>' +
-      "</div></div>";
+    var trackPick = '<div class="card track-pick"><h2>בגרות במתמטיקה - בוחרים מסלול</h2>' +
+      '<p class="meta">3, 4 או 5 יח״ל, באותה אפליקציה. כל אוסף כאן הוא תרגול מקורי, לא שאלון בגרות רשמי ולא כיסוי מלא של חומר הבחינה.</p>' +
+      '<div class="track-row" role="group" aria-label="מסלול לימוד">' +
+      [3, 4, 5].map(function (n) { return '<button class="btn" data-units="' + n + '" aria-pressed="' + (store.data.units === n) + '">' + n + ' יח״ל</button>'; }).join('') +
+      '</div><p class="meta">נושאי התרגול נבחרו לפי תוכנית הלימודים של משרד החינוך. הבחירה והניקוד באוספים הם לצורכי תרגול בלבד. יש לבדוק את הוראות הבחינה הרשמית למועד שלכם.</p>' +
+      '<p class="meta"><a href="https://meyda.education.gov.il/files/Pop/0files/matmatika/Chativa-Elyona/new-curriculum.pdf" target="_blank" rel="noopener">מקור וקרדיט: משרד החינוך - תוכנית הלימודים החדשה</a> · ' +
+      '<a href="https://pop.education.gov.il/tchumey_daat/matmatika/chativa-elyona/teaching-mathematics/examination-evaluation/" target="_blank" rel="noopener">משרד החינוך - היבחנות והערכה</a></p></div>';
     var tutCard = (window.TUTOR && TUTOR.on())
       ? '<div class="card"><h3>' + esc(TUTOR.label()) + "</h3>" +
         '<p class="meta">נתקעתם לפני שהתחלתם? אפשר לשאול את המורה כל שאלה על החומר.</p>' +
@@ -916,8 +921,8 @@
        מבודד את הצירוף ומציג אותו כפי שנכתב, והתא כולו נשאר במקומו. */
     r.rows.forEach(function (x) {
       h += '<tr><td><bdi dir="ltr">' + esc(x.number) + esc(x.letter) + "</bdi></td><td>" +
-        (x.given ? esc(x.given) : '<span class="meta">ריק</span>') + "</td><td>" +
-        esc(x.want) + '</td><td><span class="tag ' + (x.ok ? "ok" : "no") + '">' +
+        (x.given ? '<bdi dir="ltr">' + esc(x.given) + '</bdi>' : '<span class="meta">ריק</span>') + "</td><td>" +
+        '<bdi dir="ltr">' + esc(x.want) + '</bdi>' + '</td><td><span class="tag ' + (x.ok ? "ok" : "no") + '">' +
         (x.ok ? "נכון" : "לא") + "</span></td></tr>";
     });
     h += "</tbody></table>";
@@ -939,7 +944,7 @@
     if (!SIM.on) {
       var chooseHtml = "";
       if (ex.chapters && ex.chapters.length) {
-        chooseHtml = "<h2>בחרו שאלות לכל פרק</h2><p class=\"meta\">כמו בבחינה האמיתית: " +
+        chooseHtml = "<h2>בחרו שאלות לכל פרק</h2><p class=\"meta\">באוסף התרגול הזה: " +
           "בכל פרק בוחרים חלק מהשאלות. אפשר להשאיר את ברירת המחדל.</p>" +
           ex.chapters.map(function (c, ci) {
             var qs = ex.questions.filter(function (q) { return q.chapter === c.id; });
@@ -1037,7 +1042,7 @@
   /* --- ניווט ----------------------------------------------------- */
   var SCREENS = ["home", "mode", "sim", "practice", "prog", "settings"];
   var TITLES = {
-    home: "מתמטיקה 5 יח״ל", mode: "בחירת מצב", sim: "סימולציית בחינה",
+    home: "מתמטיקה 3, 4 ו־5 יח״ל", mode: "בחירת מצב", sim: "סימולציית בחינה",
     practice: "תרגול מודרך", prog: "ההתקדמות שלכם", settings: "הגדרות"
   };
   function go(screen) {
@@ -1084,7 +1089,7 @@
        המסך פעמיים בכל מעבר. הכותרת מוסיפה מידע במקום לחזור עליו —
        היא זו שנקראת בהחלפת לשונית ובחזרה לאפליקציה. */
     document.title = TITLES[screen] +
-      (screen === "home" ? " — בגרות במתמטיקה, שאלונים 35571 ו-35572" : " · שיא — מתמטיקה 5 יח״ל");
+      (screen === "home" ? " — בגרות במתמטיקה, שאלונים 35571 ו-35572" : " · שיא - מתמטיקה 3, 4 ו־5 יח״ל");
   }
 
   /* --- אירועים. האזנה אחת על המסמך, ולא מאזין לכל כפתור --------- */
@@ -1108,7 +1113,7 @@
           expr: txt(r.sub.text) + (r.sub.latex ? "  " + txt(r.sub.latex) : ""),
           ans: r.sub.finalAnswer ? txt(answerText(r.sub.finalAnswer)) : null,
           topic: r.q.topic || null,
-          level: "מתמטיקה 5 יח״ל"
+          level: "מתמטיקה " + ((examById(state.examId) || {}).units || 5) + " יח״ל"
         };
       },
       stopHost: function () { try { window.Speech.stop() } catch (e) {} }
@@ -1159,8 +1164,8 @@
             correct: it.sub.finalAnswer ? txt(answerText(it.sub.finalAnswer)) : null,
             student: st.val ? txt(st.val) : null,
             topic: it.q.topic || null,
-            level: "מתמטיקה 5 יח״ל",
-            curriculum: "בגרות במתמטיקה 5 יח״ל (35571/35572) — " + (it.q.topic || "")
+            level: "מתמטיקה " + ((examById(state.examId) || {}).units || 5) + " יח״ל",
+            curriculum: "בגרות במתמטיקה " + ((examById(state.examId) || {}).units || 5) + " יח״ל - " + (it.q.topic || "")
           };
         },
         actions: {
@@ -1231,7 +1236,7 @@
   }
 
   function sayClick(el) {
-    if (el.matches("[data-read],[data-read-el],[data-tutor],#btn-stop,#btn-pause,#btn-back,#btn-fwd,[data-nosay]")) return;
+    if (el.matches("[data-read-screen],[data-read],[data-read-el],[data-tutor],#btn-stop,#btn-pause,#btn-back,#btn-fwd,[data-nosay]")) return;
     if (store.data && store.data.say === false) return;   /* המתג בהגדרות (O-29) */
     var label = (el.getAttribute("aria-label") || el.textContent || "").replace(/\s+/g, " ").trim();
     if (!label || label.length > 60 || !window.Speech || !window.Speech.say) return;
@@ -1239,8 +1244,8 @@
   }
   document.addEventListener("click", function (e) {
     var el = e.target.closest ? e.target.closest(
-      "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate],[data-say],[data-a11y]," +
-      "[data-read],[data-read-el],[data-check],[data-hint],[data-sol],[data-hclear],[data-tutor]," +
+      "[data-units],[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate],[data-say],[data-a11y]," +
+      "[data-read-screen],[data-read],[data-read-el],[data-check],[data-hint],[data-sol],[data-hclear],[data-tutor]," +
       "[data-simstart],[data-simend]," +
       "#btn-reset,#btn-stop,#btn-try," +
       "#btn-pause,#btn-back,#btn-fwd") : null;
@@ -1332,6 +1337,15 @@
       else focusEl(lastIn(chk, "[data-check]"));
       return;
     }
+    var readScreen = el.getAttribute("data-read-screen");
+    if (readScreen) {
+      var section = $("#scr-" + readScreen);
+      if (!section || !window.Speech) return;
+      var units = Array.prototype.slice.call(section.querySelectorAll("h1,h2,h3,p,button,th,td,label"))
+        .filter(function (node) { return node.offsetParent !== null && !node.closest(".formula,.katex") && !node.matches("[data-read-screen],[data-read],[data-read-el]") && !node.closest(".saybar,.sub,.qhead"); })
+        .map(function (node) { return { text: node.textContent.trim(), el: node }; });
+      window.Speech.speak(units, "screen:" + readScreen); return;
+    }
     var relEl = el.getAttribute("data-read-el");
     if (relEl) {
       if (el.classList.contains("on")) { window.Speech.stop(); return; }
@@ -1376,7 +1390,21 @@
       applyPrefs(); return;
     }
 
+    var unit = el.getAttribute("data-units");
+    if (unit) {
+      if (SIM.on && !window.confirm("מעבר מסלול יסיים את הסימולציה הפעילה בלי הגשה. לעבור?")) return;
+      if (window.Speech) window.Speech.stop();
+      simStop(); SIM = { on: false, done: false, endsAt: 0, ans: {}, res: null, timer: null, chosen: null };
+      P = {}; state.topic = null; state.examId = null;
+      store.data.units = Number(unit); store.data.examId = null; store.save(); renderHome(); return;
+    }
     var exam = el.getAttribute("data-exam");
+    if (exam && exam !== state.examId) {
+      if (SIM.on && !window.confirm("בחירת אוסף אחר תסיים את הסימולציה הפעילה בלי הגשה. להמשיך?")) return;
+      if (window.Speech) window.Speech.stop();
+      simStop(); SIM = { on: false, done: false, endsAt: 0, ans: {}, res: null, timer: null, chosen: null };
+      P = {}; state.topic = null;
+    }
     if (exam) { state.examId = exam; store.data.examId = exam; store.save(); go("mode"); return; }
 
     var topic = el.getAttribute("data-topic");
@@ -1468,11 +1496,12 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x115-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x116-pwa1").catch(function () {});
     });
   }
 
   store.load();
+  if ([3, 4, 5].indexOf(store.data.units) < 0) store.data.units = 5;
   /* מכשיר שנצברה בו הספירה הקודמת — שורה לכל לחיצה — מקבל כאן את
      הספירה החדשה במקומה, כדי שלא יהיו שני בסיסי ספירה באותה טבלה. */
   rebuildWeak();
