@@ -67,7 +67,9 @@ const TODAY = (() => { const d = new Date(); return d.getFullYear() + '-' +
   String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
 
 /* הנתיב שהתאריך שלו קובע: דף הבית — index.html בלבד (שאר השורש אינו הדף). */
-function pathsOf(id) { return id === '' ? ['index.html'] : [id]; }
+/* 3.10.2026: <app>/audio/ (הקלטות record.yml) אינו תוכן הדף — קומיט הקלטה לא
+   מזיז את lastmod. בלי זה כל קומיט הקלטה ביום חדש הפיל את QA (sitemap נסחף). */
+function pathsOf(id) { return id === '' ? ['index.html'] : [id, ':(exclude)' + id + '/audio']; }
 function lastmod(id) {
   const ps = pathsOf(id);
   if (git(['status', '--porcelain', '--', ...ps])) return TODAY;
