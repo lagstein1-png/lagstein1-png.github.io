@@ -151,7 +151,10 @@ const SOURCES = {
   hebrew: ['hebrew/bank.json'],
   literature: ['literature/index.html'],
   tanakh: ['tanakh/index.html'],
-  'hebrew-arab': ['hebrew-arab/index.html']
+  'hebrew-arab': ['hebrew-arab/index.html'],
+  /* מדע (3.10.2026): המאגר SCIBANK ב-index.html הוא מערכים ("he":[...]),
+     לא מחרוזות, ולכן corpus קורא אותו במסלול נפרד (sciBank). */
+  science: ['science/index.html']
 };
 
 /* בדיוק מה ש-plainOf עושה באפליקציה: תגיות יורדות, ישויות נפתחות,
@@ -168,11 +171,42 @@ function unquote(raw) {
   try { return JSON.parse('"' + raw + '"'); } catch (e) { return raw.replace(/\\"/g, '"'); }
 }
 
+/* science/index.html: const SCIBANK=[["bio",1,{"he":[...],"en":[...]}],...].
+   המחרוזות העבריות הן המערכים שבתוך "he". קוראים את המערך בספירת
+   סוגריים (מחרוזות מוגנות) ו-JSON.parse, בלי eval. */
+function sciBank(text) {
+  const k = text.indexOf('const SCIBANK=');
+  if (k < 0) throw new Error('science: SCIBANK לא נמצא');
+  const i = k + 'const SCIBANK='.length;
+  let d = 0, q = null, esc = false, j = i;
+  for (; j < text.length; j++) {
+    const c = text[j];
+    if (q) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === q) q = null; continue; }
+    if (c === '"') { q = c; continue; }
+    if (c === '[') d++;
+    if (c === ']') { d--; if (d === 0) { j++; break; } }
+  }
+  return JSON.parse(text.slice(i, j));
+}
+
 function corpus(app) {
   const src = SOURCES[app];
   if (!src) return null;
   const files = typeof src === 'function' ? src() : src;
   const seen = new Map();       /* id → text, בסדר ההופעה */
+  if (app === 'science') {
+    const sf = path.join(ROOT, files[0]);
+    if (!fs.existsSync(sf)) return seen;
+    const bank = sciBank(fs.readFileSync(sf, 'utf8'));
+    for (const row of bank) for (const raw of (row[2] && row[2].he) || []) {
+      const text = plainOf(String(raw)).replace(/[\u{1F300}-\u{1FAFF}\u{FE0F}\u{200D}]/gu, '').replace(/\s{2,}/g, ' ').trim();
+      if (!/[א-ת]/.test(text)) continue;
+      if (text.split(' ').length < 2) continue;
+      const id = R.id(text);
+      if (!seen.has(id)) seen.set(id, text);
+    }
+    return seen;
+  }
   for (const f of files) {
     const s = fs.readFileSync(path.join(ROOT, f), 'utf8');
     for (const m of s.matchAll(/\b"?he"?\s*:\s*"((?:[^"\\]|\\.)*)"/g)) {

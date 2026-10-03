@@ -2339,11 +2339,25 @@ function speak(text,excited){
   /* הבועה מציגה את מה שנאמר. כשהיא מציגה בדיוק את הטקסט הזה,
      היא גם זו שמודגשת מילה־מילה. */
   var said=hlPrep($("#btxt"),text,lang);
+  /* שכבה 1 - קובץ מוקלט (המנוע של תאוריה מדברת). יש קובץ: מנגנים
+     וזהו, וההדגשה מילה־מילה לא רצה (אין onboundary בקובץ); אין קובץ,
+     או שהקובץ נכשל: קול המכשיר כרגיל. הטקסט כאן הוא בדיוק מה
+     ש-record.js מקליט: plainOf, בלי אמוג׳י. */
+  if(typeof RECORDED!=="undefined"){
+    try{speechSynthesis.cancel()}catch(e0){}
+    var _tok=_hlTok;
+    if(RECORDED.play(text,lang,{rate:state.settings.rate,
+        onEnd:function(){ if(_tok!==_hlTok)return; try{hlClear()}catch(e1){} try{jfSay(false)}catch(e2){} },
+        onError:function(){ if(_tok!==_hlTok)return; speakLocal(said,preset,rate,pitch,LANGS[lang].tts); }})){
+      try{jfSay(true)}catch(e3){}
+      return;
+    }
+  }
   speakLocal(said,preset,rate,pitch,LANGS[lang].tts);
 }
 /* _hlTok++ הוא מה שהופך כל מטפל שממתין לדור ישן: בלעדיו שומר
    הזמן של אמירה שבוטלה עדיין נחשב "חי" ומנקה הדגשה של אמירה חדשה. */
-function stopSpeak(){try{hlClear()}catch(e){}_hlTok++;stopKeepAlive();_activeU=null;if("speechSynthesis" in window)try{speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){try{hlClear()}catch(e){}_hlTok++;if(typeof RECORDED!=="undefined")RECORDED.stop();stopKeepAlive();_activeU=null;if("speechSynthesis" in window)try{speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -2471,7 +2485,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s142 · 2026-10-02";
+var BUILD="s143 · 2026-10-03";
 var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -6162,7 +6176,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s142-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s143-pwa1").catch(function(){});
   });
 }
 </script>
