@@ -26,7 +26,6 @@
 
 | # | ממצא | דרגה | מקור | מה חסר |
 |---|---|---|---|---|
-| O-112 | **החומר השיווקי עדיין סופר 13 אפליקציות** — `marketing/facts.md:11-12`, `marketing/README.md:50`, `marketing/campaign.md:696,749,904`, `marketing/index.html:88,98,2215,2255,2357`. `node .claude/qa/apps.js` מדווח היום `DATA.APPS = 23`. לא עודכן בסשן הזה: השורות הסמוכות (״12 בארבע שפות״, ״9 עם מצב מורה״) נגזרות מאותה רשימה וצריך למדוד אותן מחדש, והמספר החיצוני הוא הכרעת בעלים. | חשוב | `grep -n 13 marketing/*.md` | מדידה מחדש מ-`DATA.APPS` + אישור הבעלים למספר החיצוני |
 | O-90 | **`POWELL.md` אינו קיים** — `CLAUDE.md` מפנה אליו מ-17.9, ואינו ב-`origin/main` ולא בשום ענף (`git ls-tree origin/main`, `git ls-remote --heads`). הפסקה ב-`CLAUDE.md` תוקנה 19.9 לומר זאת | חשוב | דוח עדן, אומת בסשן הראשי | הקובץ מהבעלים, או מחיקת ההפניה |
 | O-98 | **האתר אינו מופיע בחיפוש של גוגל — הנכס ב-Search Console הוא עדיין הכתובת הישנה.** האימות מ-17.9 נעשה על `https://lagstein1-png.github.io/` (רשומת ״Google Search Console — האתר אומת״, 17.9), ושם גם נכתב ״Sitemap could not be read״, 0 דפים. מאז 22.9 `sitemap.xml` מונה 15 כתובות של `bekol.co.il`, והדומיין עונה רק מ-23.9 08:01 UTC (O-84). בצד המאגר אין חוסר: `robots.txt` פתוח, canonical ב-15 דפים, `<title>` ו-description בכל דף במפה, קובץ האימות מוגש (live-check 25). אין מחבר Search Console לסשן (חיפוש ברשימת המחברים, 23.9) | חשוב | הבעלים, 23.9.2026: ״למה האתר לא מופיע בחיפוש בגוגל?״ | **23.9, 17:12 — שלב 1 בוצע: ״Ownership verified · HTML file״ לנכס `https://bekol.co.il/`**, בחשבון Google אחר מזה של 17.9, ולכן בקובץ חדש: `google237c308d4df915a6.html` (`1daa0e5`). **שני קובצי האימות נשארים בשורש** — כל אחד מאמת חשבון אחר, ומחיקה מבטלת. **17:19 — שלב 2 בוצע: Sitemaps → `sitemap.xml` → Status ״Success״, Discovered pages 15** (= `grep -c '<loc>' sitemap.xml`; ב-17.9 על הנכס הישן: ״could not be read״, 0). **17:22 — (3) Request indexing נכשל: ״Oops! Something went wrong… try again later״** (נכס בן דקות). **17:25 — URL Inspection על דף הבית: ״Discovered – currently not indexed״, Sitemaps: `https://bekol.co.il/sitemap.xml`** (ב-17:21 עוד ״URL is unknown to Google״). **17:26 — TEST LIVE URL: ״URL is available to Google · Page can be indexed״** — ההוכחה שבצד האתר אין חסם; זו הבדיקה שהסביבה כאן אינה יכולה להריץ. **17:28 — (3) בוצע: ״Indexing requested — URL was added to a priority crawl queue״**; Indexing allowed: Yes; User-declared canonical: `https://bekol.co.il/`. **ובאותו ערב: JSON-LD `WebSite` בדף הבית** (שם האתר ״למידה שנשמעת״, זהה ל-`og:title`; home `121`) — מפני ש-URL Inspection הראה ״URL has no enhancements״. `all.js --fast` 73/73. **נשאר:** לאמת ב-Rich Results Test (`search.google.com/test/rich-results`) שהבלוק נקרא; חיפוש `site:bekol.co.il` בגוגל. תוצאה ראשונה → הממצא עובר ל״נסגר״ עם צילום. (4) אינו אפשרי מהחשבון הזה — הנכס הישן בחשבון אחר; ההפניה של GitHub מהכתובת הישנה עושה את עבודתו. בדיקה: `site:bekol.co.il` בעוד כמה ימים. (1) Add property → URL prefix → `https://bekol.co.il/` → HTML file → Verify; (2) Sitemaps → `sitemap.xml` → Submit; (3) URL Inspection → דף הבית → Request indexing; (4) בנכס הישן Settings → Change of address → `bekol.co.il`. בדיקה: חיפוש `site:bekol.co.il` |
 | O-93 | **`reader` — אחרי שההקראה הגיעה לסוף, ▶ מקריא רק את המשפט האחרון** (`reader/index.html:1373` — `stop()` אינו מאפס `SENT`). נמצא תוך כדי תיקון `voice.js`; התנהגות ללומד, ייתכן שמכוונת | זניח | דוח נמרוד, 21.9.2026 | הכרעה: באג. **תוקן 26.9.2026 — `advance` מסיימת בסוף הטקסט: `stop(); SENT = 0; markSentence(); syncNav();` ולכן ▶ הבא מנגן שוב מהמשפט הראשון. עצירה ידנית באמצע לא שונתה (ממשיכה מאותו משפט). גרסה 112-pwa1** |
@@ -113,6 +112,30 @@
 ״ברקע״, ״מברק״, ״הברקה״, ברק כתופעת טבע, ״בני ברק״, ״דבורה וברק״.
 
 **ההוכחה.** `node .claude/qa/all.js --fast` — ראו הקומיט.
+
+### O-112 (נסגר) — החומר השיווקי ספר 13 אפליקציות · 3.10.2026
+
+**מה היה.** `marketing/facts.md`, `README.md` ו-`campaign.md` (ו-`index.html` שנגזר מהם)
+אמרו 13 אפליקציות, 12 בארבע שפות ו-9 עם מצב מורה, בזמן ש-`DATA.APPS` מונה 23.
+
+**נמדד ב-3.10.2026, לא נזכר:** 23 כרטיסים ב-`DATA.APPS` ו-22 אפליקציות נבדלות
+(`english-bagrut` מוביל אל `/english/`; `theory` יושבת במאגר אחר).
+19 אפליקציות עם ממשק בארבע שפות, נבדק בדפדפן באתר החי; `bagrut-806` ו-`rakia` בעברית בלבד;
+`theory` לא נבדקה. 17 עם מצב מורה (`tTeacher`), ו-18 עם כפתור ״עזרה מהמורה״ —
+אותן 17 ועוד `kotvim` (מצב מורה בקוד בלי בונה מבחן, אך עם הכפתור); **רק 10
+מוגשות משרת לימור החי** (`GET /health` מונה 14 מזהי אפליקציה, ובהם לא
+`science`, `geography-elem`, `civics`, `hebrew`, `literature`, `tanakh`,
+`hebrew-arab`, `motal` — 8, לא 7: הטיוטה הראשונה פספסה את `hebrew`).
+
+**תוקן.** `facts.md` (המניין ושלושת הנתונים, וכללי הניסוח — כולל תיקון 17⇒18
+על כפתור לימור ו-7⇒8 על האפליקציות שלא מוגשות חי, שנמצא בבדיקה חוזרת של
+`ROLE` ב-`worker.js` מול `tTeacher` ב-`DATA.APPS`), `README.md` (הסעיף על
+המניין), `campaign.md` (כל ״שלוש־עשרה״ ו-״13״, וניסוחי ״ארבע שפות״ שעמדו ליד
+המספר), `index.html` (נוצר מחדש ב-`node .claude/qa/mkreader.js`). לא נגעו:
+`sw.js`, `BUILD`, מפתחות קאש. **נשאר ללא שינוי, ומסומן:** מכתבי הפנייה
+(`outreach-letters*.md`), `copy-posts.md`, `plan-weekly.md`, `publish.md`
+ו-`video-scripts.md` עדיין אומרים ״שתים־עשרה מתוך שלוש־עשרה״ ו-״תשע״ —
+מכתב 7 כבר נשלח ב-15.9, ולכן עדכון שלהם הוא החלטה נפרדת.
 
 ### מניין האפליקציות בתיעוד: 13/14 ⇒ 23 · 2.10.2026
 
