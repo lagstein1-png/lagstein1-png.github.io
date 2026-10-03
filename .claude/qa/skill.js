@@ -42,7 +42,7 @@ for (const d of fs.readdirSync(ROOT, { withFileTypes: true })) {
   for (const f of fs.readdirSync(dir)) {
     if (!/\.(html|js)$/.test(f)) continue;
     const m = fs.readFileSync(path.join(dir, f), 'utf8')
-      .match(/var\s+BUILD\s*=\s*"([a-z])/);
+      .match(/var\s+BUILD\s*=\s*"([a-z]+)/);
     if (m) { used.push({ app: d.name, letter: m[1] }); break; }
   }
 }

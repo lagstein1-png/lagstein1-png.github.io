@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>מתמטיקה מעבר לחשבון ליסודי: צורות, מדידות, שברים ועוד · חינם</title>
+<meta name="description" content="שיעורים ותרגול במתמטיקה ליסודי, כיתות א׳–ב׳: מספרים, צורות, מדידות, זמן, כסף, חוקיות, שברים ונתונים. הכול מוקרא, בארבע שפות, בלי הרשמה ובלי ציונים." />
+<link rel="canonical" href="https://bekol.co.il/math-elem/" />
+<meta name="theme-color" content="#0e9c8d" />
+<link rel="manifest" href="./manifest.json" />
+<link href="/fonts/fonts.css" rel="stylesheet" />
+<style>
+:root{--paper:#f3f8f4;--card:#fff;--ink:#17333c;--ink-soft:#4c666e;--teal:#0e9c8d;--teal-deep:#0b7568;--teal-soft:#d9f2ec;--amber:#ffc531;--amber-soft:#fff3ce;--amber-deep:#8a6100;--coral:#ff6f61;--coral-soft:#ffe3de;--coral-deep:#ba3826;--sky:#58b7e0;--sky-soft:#dff1fa;--sky-deep:#246c8c;--violet:#8a63d2;--violet-soft:#ece4fa;--violet-deep:#6a45b0;--green:#1f9d4d;--green-deep:#157a3a;--red:#d93a3a;--red-deep:#a82626;--accent:var(--teal);--ar:"Noto Sans Arabic",system-ui,Arial,sans-serif;--ru:"Noto Sans",system-ui,Arial,sans-serif}
+*{box-sizing:border-box}
+html{font-size:20px}
+html.big{font-size:24px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Heebo",system-ui,"Segoe UI",Arial,sans-serif;line-height:1.5;-webkit-text-size-adjust:100%}
+html[lang="ar"] body,html[lang="ar"] button{font-family:var(--ar)}
+html[lang="ru"] body,html[lang="ru"] button{font-family:var(--ru)}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:760px;margin:0 auto;padding:12px 14px 120px}
+.top{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.brand{font-weight:800;font-size:.85rem;line-height:1.15;flex:1;min-width:0;color:var(--teal-deep);background:none;border:0;text-align:start;padding:6px 0}
+.langs{display:flex;gap:4px}
+.langs button{min-width:46px;min-height:50px;padding:0 4px;border-radius:14px;border:2px solid var(--teal);background:#fff;font-weight:700;font-size:.9rem}
+.langs button[aria-pressed=true]{background:var(--teal);color:#fff}
+.gear{min-width:46px;padding:0;min-height:50px;border-radius:14px;border:2px solid var(--violet);background:#fff}
+h1{font-size:1.6rem;margin:.2em 0 .1em;line-height:1.25}
+h2{font-size:1.25rem;margin:.2em 0}
+.sub{color:var(--ink-soft);margin:0 0 12px}
+.card{background:var(--card);border-radius:20px;padding:16px;box-shadow:0 2px 10px rgba(23,51,60,.08);margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:10px 20px;border-radius:16px;border:0;font-weight:800;font-size:1rem;color:#fff;background:var(--teal);box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.play{background:var(--green);font-size:1.1rem;min-height:62px;padding:10px 18px}
+.btn.stop,.btn.slow{padding:10px 14px}
+.btn.stop{background:var(--red)}
+.btn.slow{background:var(--sky-deep)}
+.btn.hint{background:var(--amber);color:#1a1300}
+.btn.ex{background:var(--violet)}
+.btn.next{background:var(--teal-deep);font-size:1.15rem;min-height:62px}
+.btn.tut{background:#fff;color:var(--violet-deep);border:3px solid var(--violet);width:100%;box-shadow:none;justify-content:flex-start}
+.btn.tut img{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:47% 27%}
+.btn.ghost{background:#fff;color:var(--teal-deep);border:2px solid var(--teal);box-shadow:none}
+.btn[disabled]{opacity:.45}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.bands{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.band{flex:1;min-width:150px;min-height:62px;border-radius:16px;border:3px solid var(--sky);background:#fff;font-weight:800;font-size:1rem;padding:8px}
+.band[aria-pressed=true]{background:var(--sky);color:#fff}
+.band.soon{opacity:.6;border-style:dashed}
+.band small{display:block;font-weight:500;font-size:.75rem}
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.unit{display:flex;gap:12px;align-items:center;text-align:start;background:#fff;border:3px solid var(--c);border-radius:20px;padding:12px;min-height:96px;position:relative}
+.unit .ico{flex:none;width:68px;height:68px;border-radius:18px;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;overflow:hidden}
+.unit .nm{font-weight:800;font-size:1.15rem;line-height:1.2}
+.unit .ds{font-size:.82rem;color:var(--ink-soft);line-height:1.3}
+.unit .ok{position:absolute;top:6px;inset-inline-end:8px;color:var(--green);font-weight:900;font-size:1.3rem}
+.lvls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lvl{min-height:68px;border-radius:16px;border:0;color:#fff;font-weight:800;font-size:1.05rem}
+.lvl small{display:block;font-weight:500;font-size:.78rem;opacity:.95}
+.qtext{font-size:1.45rem;font-weight:700;line-height:1.4;margin:6px 0 8px}
+.hl{background:var(--amber);color:#1a1300;border-radius:6px;padding:0 2px}
+.vis{display:flex;justify-content:center;margin:8px 0 14px;flex-wrap:wrap}
+.vis svg{max-width:100%;height:auto}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.opts.wide{grid-template-columns:minmax(0,1fr)}
+@media(max-width:420px){.opts{grid-template-columns:1fr}}
+.opt{display:flex;align-items:center;gap:8px;background:#fff;border:3px solid var(--sky);border-radius:18px;padding:6px;min-height:72px}
+.opt .ob{flex:1;min-width:0;overflow-wrap:anywhere;min-height:58px;border:0;background:none;font-size:1.35rem;font-weight:800;text-align:center;border-radius:12px;padding:6px}
+.opt .sp{flex:none;width:50px;height:50px;border-radius:50%;border:0;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center}
+.opt.good{border-color:var(--green);background:#e4f7ea}
+.opt.pick{border-color:var(--amber);background:var(--amber-soft)}
+.opt .mk{font-weight:900;font-size:1.3rem}
+.opt.good .mk{color:var(--green-deep)}
+.hintbox{background:var(--amber-soft);border:3px solid var(--amber);border-radius:18px;padding:12px 14px;margin:12px 0;font-size:1.1rem}
+.tbox{background:var(--violet-soft);border:3px solid var(--violet);border-radius:18px;padding:12px 14px;margin:12px 0;font-size:1.1rem;display:flex;gap:12px;align-items:flex-start}
+.tbox img{flex:none;width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:47% 27%;border:3px solid var(--violet)}
+.ok-box{background:#e4f7ea;border:3px solid var(--green);border-radius:18px;padding:12px 14px;margin:12px 0;font-size:1.15rem;font-weight:700}
+.prog{height:12px;border-radius:8px;background:#dbe7e3;overflow:hidden;margin:6px 0 12px}
+.prog i{display:block;height:100%;background:var(--teal);border-radius:8px}
+.dots{display:flex;gap:6px;justify-content:center;margin:2px 0 8px}
+.dots i{width:14px;height:14px;border-radius:50%;background:#cfe0db}
+.dots i.on{background:var(--teal)}
+.dots i.cur{background:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
+.set{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #e4eeea}
+.tog{min-width:92px;min-height:50px;border-radius:14px;border:2px solid var(--teal);background:#fff;font-weight:800}
+.tog[aria-pressed=true]{background:var(--teal);color:#fff}
+.credit{font-size:.8rem;color:var(--ink-soft);text-align:center;margin-top:20px}
+.credit a{color:var(--sky-deep)}
+canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:50}
+.stepcard svg text{font-family:inherit}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+html[dir=ltr] .qtext,html[dir=ltr] .opt .ob{direction:ltr}
+.nl{direction:ltr}
+.srOnly{position:absolute;inset-inline-start:-9999px}
+</style>
+</head>
+<body>
+<div class="wrap"><div id="live" class="srOnly" aria-live="polite"></div><div id="app"></div></div>
+<canvas id="cf"></canvas>
+<script>
+/* ===== visuals (inline SVG, no emoji fonts) ===== */
+var COL={red:"#e8453c",blue:"#2f7fd8",green:"#2eaa5b",yellow:"#f5b800",orange:"#f58a1f",purple:"#8a63d2"};
+function svg(w,h,inner,lab){return '<svg viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'" role="img" aria-label="'+(lab||"")+'">'+inner+'</svg>'}
+function dotsVis(n,color){color=color||COL.blue;var rows=Math.ceil(n/10),s="",i;
+  for(var r=0;r<rows;r++){for(var c=0;c<10;c++){var k=r*10+c;var x=24+c*30,y=22+r*34;
+    s+='<rect x="'+(x-13)+'" y="'+(y-13)+'" width="26" height="26" rx="5" fill="#eef5f2" stroke="#b9cdc6"/>';
+    if(k<n)s+='<circle cx="'+x+'" cy="'+y+'" r="10" fill="'+color+'"/>'}}
+  return svg(320,rows*34+8,s,"")}
+function rodsVis(tens,ones){var s="",i;
+  for(i=0;i<tens;i++){var x=10+i*34;s+='<rect x="'+x+'" y="8" width="24" height="120" rx="4" fill="#58b7e0" stroke="#246c8c"/>';
+    for(var j=1;j<10;j++)s+='<line x1="'+x+'" x2="'+(x+24)+'" y1="'+(8+j*12)+'" y2="'+(8+j*12)+'" stroke="#246c8c" stroke-width="1"/>'}
+  var ox=10+tens*34+16;
+  for(i=0;i<ones;i++){s+='<rect x="'+(ox+(i%5)*20)+'" y="'+(88+Math.floor(i/5)*24)+'" width="16" height="16" rx="3" fill="#ffc531" stroke="#8a6100"/>'}
+  return svg(Math.max(320,ox+110),136,s,"")}
+function numLine(from,to,step,point,hidePt){var W=330,x0=20,x1=310,s='<line x1="'+x0+'" x2="'+x1+'" y1="60" y2="60" stroke="#17333c" stroke-width="3"/>',v;
+  var px=function(v){return x0+(v-from)/(to-from)*(x1-x0)};
+  for(v=from;v<=to;v+=step){s+='<line x1="'+px(v)+'" x2="'+px(v)+'" y1="50" y2="70" stroke="#17333c" stroke-width="2"/><text x="'+px(v)+'" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#17333c">'+v+'</text>'}
+  if(point!=null)s+='<path d="M'+px(point)+' 54 l-9 -22 h18 z" fill="#e8453c"/><text x="'+px(point)+'" y="22" text-anchor="middle" font-size="18" font-weight="800" fill="#e8453c">'+(hidePt?"?":point)+'</text>';
+  return '<div class="nl">'+svg(W,100,s,"")+'</div>'}
+function polyPts(n,cx,cy,r,rot){var p=[],i;for(i=0;i<n;i++){var a=rot+i*2*Math.PI/n;p.push((cx+r*Math.cos(a)).toFixed(1)+","+(cy+r*Math.sin(a)).toFixed(1))}return p.join(" ")}
+function flatShape(k,color){color=color||COL.orange;var st=' fill="'+color+'" stroke="#17333c" stroke-width="3" stroke-linejoin="round"';var b;
+  if(k==="circle")b='<circle cx="80" cy="70" r="55"'+st+'/>';
+  else if(k==="square")b='<rect x="28" y="18" width="104" height="104"'+st+'/>';
+  else if(k==="rectangle")b='<rect x="12" y="32" width="136" height="76"'+st+'/>';
+  else if(k==="triangle")b='<polygon points="80,12 142,124 18,124"'+st+'/>';
+  else if(k==="pentagon")b='<polygon points="'+polyPts(5,80,72,58,-Math.PI/2)+'"'+st+'/>';
+  else b='<polygon points="'+polyPts(6,80,70,58,0)+'"'+st+'/>';
+  return svg(160,140,b,"")}
+function solidShape(k){var o=' stroke="#17333c" stroke-width="3" stroke-linejoin="round"',b;
+  if(k==="sphere")b='<defs><radialGradient id="gs" cx="35%" cy="30%"><stop offset="0" stop-color="#ffd6d0"/><stop offset="1" stop-color="#e8453c"/></radialGradient></defs><circle cx="80" cy="70" r="55" fill="url(#gs)"'+o+'/>';
+  else if(k==="cube")b='<polygon points="30,48 100,48 100,118 30,118" fill="#58b7e0"'+o+'/><polygon points="30,48 56,22 126,22 100,48" fill="#a9dcf3"'+o+'/><polygon points="100,48 126,22 126,92 100,118" fill="#2f86b3"'+o+'/>';
+  else if(k==="box")b='<polygon points="14,56 108,56 108,112 14,112" fill="#f5b800"'+o+'/><polygon points="14,56 44,28 138,28 108,56" fill="#ffe08a"'+o+'/><polygon points="108,56 138,28 138,84 108,112" fill="#c99200"'+o+'/>';
+  else if(k==="cylinder")b='<path d="M32 36 v76 a48 16 0 0 0 96 0 v-76" fill="#2eaa5b"'+o+'/><ellipse cx="80" cy="36" rx="48" ry="16" fill="#8fe0ac"'+o+'/>';
+  else b='<path d="M80 10 L130 106 a50 16 0 0 1 -100 0 Z" fill="#f58a1f"'+o+'/><ellipse cx="80" cy="106" rx="50" ry="16" fill="none"'+o+'/>';
+  return svg(160,140,b,"")}
+function clockVis(h,m){var s='<circle cx="90" cy="90" r="80" fill="#fff" stroke="#17333c" stroke-width="5"/>',i;
+  for(i=1;i<=12;i++){var a=i*Math.PI/6;s+='<text x="'+(90+62*Math.sin(a)).toFixed(1)+'" y="'+(98-62*Math.cos(a)).toFixed(1)+'" text-anchor="middle" font-size="19" font-weight="800" fill="#17333c">'+i+'</text>'}
+  var ha=((h%12)+m/60)*Math.PI/6,ma=m*Math.PI/30;
+  s+='<line x1="90" y1="90" x2="'+(90+40*Math.sin(ha)).toFixed(1)+'" y2="'+(90-40*Math.cos(ha)).toFixed(1)+'" stroke="#e8453c" stroke-width="8" stroke-linecap="round"/>';
+  s+='<line x1="90" y1="90" x2="'+(90+60*Math.sin(ma)).toFixed(1)+'" y2="'+(90-60*Math.cos(ma)).toFixed(1)+'" stroke="#2f7fd8" stroke-width="5" stroke-linecap="round"/><circle cx="90" cy="90" r="6" fill="#17333c"/>';
+  return svg(180,180,s,"")}
+function barRuler(a,b,max,color){var W=340,x0=14,u=(W-2*x0)/max,s='<rect x="6" y="40" width="'+(W-12)+'" height="34" rx="4" fill="#fff3ce" stroke="#8a6100" stroke-width="2"/>',i;
+  for(i=0;i<=max;i++){var x=x0+i*u;s+='<line x1="'+x+'" x2="'+x+'" y1="40" y2="'+(i%5===0?64:56)+'" stroke="#8a6100" stroke-width="2"/><text x="'+x+'" y="94" text-anchor="middle" font-size="14" font-weight="700" fill="#17333c">'+i+'</text>'}
+  s+='<rect x="'+(x0+a*u)+'" y="8" width="'+((b-a)*u)+'" height="22" rx="5" fill="'+(color||COL.blue)+'" stroke="#17333c" stroke-width="2"/>';
+  return '<div class="nl">'+svg(W,102,s,"")+'</div>'}
+function twoBars(a,b){var W=340,u=(W-30)/12,s='';
+  s+='<rect x="10" y="12" width="'+(a*u)+'" height="26" rx="6" fill="'+COL.red+'" stroke="#17333c" stroke-width="2"/>';
+  s+='<rect x="10" y="52" width="'+(b*u)+'" height="26" rx="6" fill="'+COL.blue+'" stroke="#17333c" stroke-width="2"/>';
+  for(var i=0;i<=12;i++)s+='<line x1="'+(10+i*u)+'" x2="'+(10+i*u)+'" y1="86" y2="96" stroke="#17333c"/>';
+  s+='<line x1="10" x2="'+(10+12*u)+'" y1="86" y2="86" stroke="#17333c"/>';
+  return '<div class="nl">'+svg(W,100,s,"")+'</div>'}
+function fracVis(kind,parts,shaded){var s="",i,col="#ff9f43";
+  if(kind==="circle"){var cx=80,cy=70,r=58;
+    for(i=0;i<parts;i++){var a0=-Math.PI/2+i*2*Math.PI/parts,a1=-Math.PI/2+(i+1)*2*Math.PI/parts;
+      s+='<path d="M'+cx+' '+cy+' L'+(cx+r*Math.cos(a0)).toFixed(1)+' '+(cy+r*Math.sin(a0)).toFixed(1)+' A'+r+' '+r+' 0 0 1 '+(cx+r*Math.cos(a1)).toFixed(1)+' '+(cy+r*Math.sin(a1)).toFixed(1)+' Z" fill="'+(i<shaded?col:"#fff")+'" stroke="#17333c" stroke-width="3" stroke-linejoin="round"/>'}}
+  else{var w=136/parts;for(i=0;i<parts;i++)s+='<rect x="'+(12+i*w)+'" y="26" width="'+w+'" height="88" fill="'+(i<shaded?col:"#fff")+'" stroke="#17333c" stroke-width="3"/>'}
+  return svg(160,140,s,"")}
+function coinSvg(v,x){var note=v>=20,lab="\u20aa"+v;
+  if(v===0.5){return '<circle cx="'+(x+26)+'" cy="34" r="22" fill="#d7d9de" stroke="#6b7078" stroke-width="3"/><text x="'+(x+26)+'" y="40" text-anchor="middle" font-size="15" font-weight="800">50</text>'}
+  if(note){var c=v===20?"#8fd18a":v===50?"#f1a0a0":"#f5d27a";return '<rect x="'+x+'" y="12" width="82" height="44" rx="6" fill="'+c+'" stroke="#17333c" stroke-width="3"/><text x="'+(x+41)+'" y="42" text-anchor="middle" font-size="20" font-weight="800">'+lab+'</text>'}
+  var big=v===10||v===5?24:21,fill=(v===10||v===2)?"#e9c24a":"#d7d9de",str=(v===10||v===2)?"#8a6100":"#6b7078";
+  return '<circle cx="'+(x+26)+'" cy="34" r="'+big+'" fill="'+fill+'" stroke="'+str+'" stroke-width="3"/><text x="'+(x+26)+'" y="41" text-anchor="middle" font-size="19" font-weight="800">'+v+'</text>'}
+function moneyVis(list){var s="",x=4,rows=0,y=0;list.forEach(function(v,i){var w=v>=20?90:56;if(x+w>340){x=4;y+=64}s+='<g transform="translate(0,'+y+')">'+coinSvg(v,x)+'</g>';x+=w+4});
+  return svg(340,y+68,s,"")}
+var CATC=[COL.red,COL.green,COL.blue,COL.yellow];
+function iconStar(x,y,c){return '<polygon transform="translate('+x+','+y+')" points="0,-12 3.5,-4 12,-3.5 5.5,2 7.5,11 0,6 -7.5,11 -5.5,2 -12,-3.5 -3.5,-4" fill="'+c+'" stroke="#17333c" stroke-width="1.5" stroke-linejoin="round"/>'}
+function pictoVis(cats,counts,unit){/* cats: names for current lang */var s="",rowH=40,lw=96;
+  cats.forEach(function(nm,i){var y=24+i*rowH;
+    s+='<text x="'+(lw-6)+'" y="'+(y+5)+'" text-anchor="end" font-size="15" font-weight="800" fill="#17333c">'+nm+'</text>';
+    for(var k=0;k<counts[i];k++)s+=iconStar(lw+14+k*27,y,CATC[i])});
+  return '<div class="nl">'+svg(lw+8+9*27+10,cats.length*rowH+12,s,"")+'</div>'}
+function tallyVis(n){var s="",g=Math.floor(n/5),r=n%5,x=10,i,j;
+  for(i=0;i<g;i++){for(j=0;j<4;j++)s+='<line x1="'+(x+j*10)+'" x2="'+(x+j*10)+'" y1="10" y2="60" stroke="#17333c" stroke-width="4" stroke-linecap="round"/>';s+='<line x1="'+(x-6)+'" x2="'+(x+38)+'" y1="52" y2="18" stroke="#e8453c" stroke-width="4" stroke-linecap="round"/>';x+=62}
+  for(j=0;j<r;j++)s+='<line x1="'+(x+j*10)+'" x2="'+(x+j*10)+'" y1="10" y2="60" stroke="#17333c" stroke-width="4" stroke-linecap="round"/>';
+  return '<div class="nl">'+svg(Math.max(120,x+r*10+20),72,s,"")+'</div>'}
+function seqVis(items){/* items: [{k:'circle'|'square'|'triangle', c:color}|null] */var s="",x=8;items.forEach(function(it){var cx=x+26,cy=34;
+  if(!it)s+='<rect x="'+(cx-24)+'" y="10" width="48" height="48" rx="10" fill="#fff" stroke="#17333c" stroke-width="3" stroke-dasharray="6 5"/><text x="'+cx+'" y="46" text-anchor="middle" font-size="30" font-weight="800">?</text>';
+  else if(it.k==="circle")s+='<circle cx="'+cx+'" cy="'+cy+'" r="22" fill="'+it.c+'" stroke="#17333c" stroke-width="2.5"/>';
+  else if(it.k==="square")s+='<rect x="'+(cx-21)+'" y="'+(cy-21)+'" width="42" height="42" fill="'+it.c+'" stroke="#17333c" stroke-width="2.5"/>';
+  else s+='<polygon points="'+cx+','+(cy-24)+' '+(cx+25)+','+(cy+20)+' '+(cx-25)+','+(cy+20)+'" fill="'+it.c+'" stroke="#17333c" stroke-width="2.5" stroke-linejoin="round"/>';
+  x+=58});return '<div class="nl">'+svg(x+4,68,s,"")+'</div>'}
+function iconSvg(id){var c="#fff";var m={
+ nums:'<text x="34" y="44" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">1 2 3</text>',
+ shapes:'<circle cx="18" cy="42" r="10" fill="#fff"/><rect x="31" y="32" width="20" height="20" fill="#fff"/><polygon points="34,26 44,10 54,26" fill="#fff" transform="translate(-8,0)"/>',
+ length:'<rect x="6" y="26" width="56" height="16" rx="3" fill="#fff"/><g stroke="#17333c" stroke-width="2"><line x1="14" x2="14" y1="26" y2="36"/><line x1="24" x2="24" y1="26" y2="34"/><line x1="34" x2="34" y1="26" y2="36"/><line x1="44" x2="44" y1="26" y2="34"/><line x1="54" x2="54" y1="26" y2="36"/></g>',
+ time:'<circle cx="34" cy="34" r="24" fill="#fff"/><line x1="34" y1="34" x2="34" y2="18" stroke="#17333c" stroke-width="4" stroke-linecap="round"/><line x1="34" y1="34" x2="46" y2="38" stroke="#e8453c" stroke-width="4" stroke-linecap="round"/>',
+ money:'<text x="34" y="46" text-anchor="middle" font-size="36" font-weight="800" fill="#fff">\u20aa</text>',
+ pattern:'<circle cx="12" cy="34" r="8" fill="#fff"/><rect x="24" y="26" width="16" height="16" fill="#fff"/><circle cx="56" cy="34" r="8" fill="#fff"/>',
+ frac:'<circle cx="34" cy="34" r="24" fill="#fff"/><path d="M34 34 L34 10 A24 24 0 0 1 34 58 Z" fill="#ff9f43"/>',
+ data:'<rect x="10" y="36" width="12" height="22" fill="#fff"/><rect x="28" y="18" width="12" height="40" fill="#fff"/><rect x="46" y="28" width="12" height="30" fill="#fff"/>',
+ words:'<text x="34" y="46" text-anchor="middle" font-size="34" font-weight="800" fill="#fff">+ ?</text>'};
+ return '<svg viewBox="0 0 68 68" width="68" height="68" aria-hidden="true">'+m[id]+'</svg>'}
+/* ===== band 2 visuals ===== */
+function gridVis(w,h,showLab){var u=Math.min(30,Math.floor(300/w)),s="",i,j;
+  for(i=0;i<w;i++)for(j=0;j<h;j++)s+='<rect x="'+(20+i*u)+'" y="'+(20+j*u)+'" width="'+u+'" height="'+u+'" fill="#d9f2ec" stroke="#0e9c8d" stroke-width="1.5"/>';
+  s+='<rect x="20" y="20" width="'+w*u+'" height="'+h*u+'" fill="none" stroke="#17333c" stroke-width="3"/>';
+  if(showLab){s+='<text x="'+(20+w*u/2)+'" y="14" text-anchor="middle" font-size="15" font-weight="800">'+w+'</text><text x="12" y="'+(20+h*u/2+5)+'" text-anchor="middle" font-size="15" font-weight="800">'+h+'</text>'}
+  return '<div class="nl">'+svg(40+w*u+10,40+h*u,s,"")+'</div>'}
+function rectLab(w,h){var s='<rect x="40" y="26" width="'+w*22+'" height="'+h*22+'" fill="#ffe3de" stroke="#17333c" stroke-width="3"/><text x="'+(40+w*11)+'" y="18" text-anchor="middle" font-size="16" font-weight="800">'+w+'</text><text x="34" y="'+(26+h*11+5)+'" text-anchor="end" font-size="16" font-weight="800">'+h+'</text>';
+  return '<div class="nl">'+svg(90+w*22,50+h*22,s,"")+'</div>'}
+function angleVis(deg){var r=70,cx=90,cy=110,a=deg*Math.PI/180,x2=cx+r*Math.cos(-a),y2=cy+r*Math.sin(-a),s='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r+10)+'" y2="'+cy+'" stroke="#17333c" stroke-width="4" stroke-linecap="round"/><line x1="'+cx+'" y1="'+cy+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="#17333c" stroke-width="4" stroke-linecap="round"/>';
+  if(deg===90)s+='<path d="M'+(cx+16)+' '+cy+' v-16 h-16" fill="none" stroke="#e8453c" stroke-width="3"/>';
+  else s+='<path d="M'+(cx+24)+' '+cy+' A24 24 0 0 0 '+(cx+24*Math.cos(-a)).toFixed(1)+' '+(cy+24*Math.sin(-a)).toFixed(1)+'" fill="none" stroke="#e8453c" stroke-width="3"/>';
+  return svg(190,125,s,"")}
+function barChart(cats,vals,max){var W=340,H=190,x0=36,u=(H-50)/max,bw=Math.min(54,(W-x0-10)/cats.length-12),s="",i;
+  for(i=0;i<=max;i+=(max>10?5:(max>6?2:1))){var y=H-30-i*u;s+='<line x1="'+x0+'" x2="'+(W-6)+'" y1="'+y+'" y2="'+y+'" stroke="#d6e4df"/><text x="'+(x0-6)+'" y="'+(y+5)+'" text-anchor="end" font-size="13" fill="#4c666e">'+i+'</text>'}
+  cats.forEach(function(c,i){var x=x0+14+i*(bw+12),h=vals[i]*u;s+='<rect x="'+x+'" y="'+(H-30-h)+'" width="'+bw+'" height="'+h+'" rx="4" fill="'+CATC[i%4]+'" stroke="#17333c" stroke-width="2"/><text x="'+(x+bw/2)+'" y="'+(H-12)+'" text-anchor="middle" font-size="13" font-weight="800">'+c+'</text>'});
+  return '<div class="nl">'+svg(W,H,s,"")+'</div>'}
+function fracBars(p1,q1,p2,q2){var s="",i;function bar(y,p,q){var w=300/q,t="";for(i=0;i<q;i++)t+='<rect x="'+(14+i*w)+'" y="'+y+'" width="'+w+'" height="34" fill="'+(i<p?"#ff9f43":"#fff")+'" stroke="#17333c" stroke-width="2.5"/>';return t}
+  s=bar(10,p1,q1)+bar(56,p2,q2);return '<div class="nl">'+svg(330,100,s,"")+'</div>'}
+/* ===== helpers ===== */
+var LG=["he","ar","ru","en"];
+function L(h,a,r,e){return {he:h,ar:a,ru:r,en:e}}
+function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function pick(a){return a[ri(0,a.length-1)]}
+function shuffle(a){var r=a.slice(),i,j,x;for(i=r.length-1;i>0;i--){j=ri(0,i);x=r[i];r[i]=r[j];r[j]=x}return r}
+function uniq(a){var o=[];a.forEach(function(x){if(o.indexOf(x)<0)o.push(x)});return o}
+function plRu(n,a,b,c){var m=n%100,d=n%10;if(m>=11&&m<=14)return c;if(d===1)return a;if(d>=2&&d<=4)return b;return c}
+function oid(x){return (x&&typeof x==="object")?"L:"+x.he:String(x)}
+function mk(t,q,vis,ans,dist,hint,expl,step){
+  var aid=oid(ans),seen={},d=[];seen[aid]=1;
+  dist.forEach(function(x){var k=oid(x);if(!seen[k]){seen[k]=1;d.push(x)}});
+  while(d.length<3){var z=String(ri(0,99));if(!seen[z]){seen[z]=1;d.push(z)}}
+  var all=shuffle([ans].concat(shuffle(d).slice(0,3))).map(function(x){return {id:oid(x),l:(x&&typeof x==="object")?x:String(x)}});
+  return {t:t,q:q,vis:vis||"",o:all,a:aid,h:hint,e:expl,step:step==null?0:step}}
+function near(n,lo,hi){var c=[n+1,n-1,n+2,n-2,n+10,n-10,n+5].filter(function(x){return x>=lo&&x<=hi&&x!==n});return shuffle(c)}
+var NAMES=[
+ {he:"נועה",ar:"نورا",ru:"Маша",ruG:"Маши",en:"Noa",g:"f"},{he:"אורי",ar:"أحمد",ru:"Дима",ruG:"Димы",en:"Uri",g:"m"},
+ {he:"מאיה",ar:"مريم",ru:"Аня",ruG:"Ани",en:"Maya",g:"f"},{he:"אדם",ar:"آدم",ru:"Миша",ruG:"Миши",en:"Adam",g:"m"},
+ {he:"תמר",ar:"سارة",ru:"Лена",ruG:"Лены",en:"Tamar",g:"f"},{he:"יונתן",ar:"يوسف",ru:"Саша",ruG:"Саши",en:"Jonathan",g:"m"}];
+var OBJS=[
+ {he:"תפוחים",ar:"التفاح",ru:["яблоко","яблока","яблок"],en:"apples"},
+ {he:"סוכריות",ar:"الحلوى",ru:["конфета","конфеты","конфет"],en:"candies"},
+ {he:"ספרים",ar:"الكتب",ru:["книга","книги","книг"],en:"books"},
+ {he:"מדבקות",ar:"الملصقات",ru:["наклейка","наклейки","наклеек"],en:"stickers"},
+ {he:"בלונים",ar:"البالونات",ru:["шарик","шарика","шариков"],en:"balloons"},
+ {he:"צדפים",ar:"الأصداف",ru:["ракушка","ракушки","ракушек"],en:"shells"}];
+function two(){var a=pick(NAMES),b;do{b=pick(NAMES)}while(b===a);return [a,b]}
+function ruN(n,o){return n+" "+plRu(n,o.ru[0],o.ru[1],o.ru[2])}
+function vf(n,m,f){return n.g==="f"?f:m}
+var SHN={circle:L("עיגול","دائرة","круг","circle"),square:L("ריבוע","مربع","квадрат","square"),rectangle:L("מלבן","مستطيل","прямоугольник","rectangle"),
+ triangle:L("משולש","مثلث","треугольник","triangle"),pentagon:L("מחומש","مخمس","пятиугольник","pentagon"),hexagon:L("משושה","مسدس","шестиугольник","hexagon"),
+ sphere:L("כדור","كرة","шар","sphere"),cube:L("קובייה","مكعب","куб","cube"),cylinder:L("גליל","أسطوانة","цилиндр","cylinder"),cone:L("חרוט","مخروط","конус","cone"),box:L("תיבה","متوازي مستطيلات","параллелепипед","box")};
+var COLN={red:L("אדום","أحمر","красный","red"),blue:L("כחול","أزرق","синий","blue"),green:L("ירוק","أخضر","зелёный","green"),yellow:L("צהוב","أصفر","жёлтый","yellow")};
+var DAYS=[L("ראשון","الأحد","воскресенье","Sunday"),L("שני","الاثنين","понедельник","Monday"),L("שלישי","الثلاثاء","вторник","Tuesday"),L("רביעי","الأربعاء","среда","Wednesday"),L("חמישי","الخميس","четверг","Thursday"),L("שישי","الجمعة","пятница","Friday"),L("שבת","السبت","суббота","Saturday")];
+/* ===== unit 1: numbers to 100 ===== */
+var G={};
+G.nums=function(lv){
+  var T=[],R=lv===1?20:(lv===2?100:99);
+  T.push(function(){var n=ri(3,lv===1?10:20);
+    return mk("count",L("כמה עיגולים יש כאן?","كم دائرة هنا؟","Сколько здесь кружков?","How many circles are here?"),dotsVis(n),n,near(n,0,25),
+     L("סופרים בקבוצות: כל שורה מלאה היא 10.","عدّ بمجموعات: كل صف ممتلئ يساوي 10.","Считай группами: полный ряд — это 10.","Count in groups: a full row is 10."),
+     L("יש "+n+" עיגולים.","هنا "+n+" دوائر.","Здесь "+n+" "+plRu(n,"кружок","кружка","кружков")+".","There are "+n+" circles."),0)});
+  T.push(function(){var n=ri(1,R-1),up=Math.random()<.5;
+    var a=up?n+1:n-1;if(a<0)a=1;n=up?a-1:a+1;
+    return mk("next",up?L("איזה מספר בא אחרי "+n+"?","ما العدد الذي يأتي بعد "+n+"؟","Какое число идёт после "+n+"?","Which number comes after "+n+"?"):L("איזה מספר בא לפני "+n+"?","ما العدد الذي يأتي قبل "+n+"؟","Какое число идёт перед "+n+"?","Which number comes before "+n+"?"),"",a,[a+1,a-1,a+2,a-2,a+10].filter(function(x){return x>=0}),
+     L("מי שבא אחרי גדול ב-1. מי שבא לפני קטן ב-1.","العدد الذي بعده أكبر بواحد، والذي قبله أصغر بواحد.","Следующее число на 1 больше, предыдущее на 1 меньше.","The next number is 1 more. The one before is 1 less."),
+     L("התשובה היא "+a+".","الجواب "+a+".","Ответ: "+a+".","The answer is "+a+"."),0)});
+  T.push(function(){var big=Math.random()<.5,s=[],mx=lv===1?20:R;
+    while(s.length<4){var v=ri(0,mx);if(s.indexOf(v)<0)s.push(v)}
+    var a=big?Math.max.apply(null,s):Math.min.apply(null,s);
+    return mk("cmp",big?L("איזה מספר הוא הגדול ביותר?","ما أكبر عدد؟","Какое число самое большое?","Which number is the biggest?"):L("איזה מספר הוא הקטן ביותר?","ما أصغر عدد؟","Какое число самое маленькое?","Which number is the smallest?"),"",a,s,
+     L("משווים קודם את מספר העשרות.","قارن عدد العشرات أولًا.","Сначала сравни десятки.","Compare the tens first."),
+     L(a+" הוא "+(big?"הגדול":"הקטן")+" ביותר.",a+(big?" أكبر عدد.":" أصغر عدد."),a+(big?" — самое большое.":" — самое маленькое."),a+" is the "+(big?"biggest.":"smallest.")),1)});
+  if(lv>=2){
+  T.push(function(){var t=ri(1,9),o=ri(0,9),n=t*10+o;
+    return mk("tens",L("כמה עשרות יש במספר "+n+"?","كم عشرة في العدد "+n+"؟","Сколько десятков в числе "+n+"?","How many tens are in the number "+n+"?"),rodsVis(t,o),t,[o,t+1,t-1,t+2,n].filter(function(x){return x>=0}),
+     L("המקלות הכחולים הם עשרות. הקוביות הצהובות הן אחדות.","العصي الزرقاء عشرات والمكعبات الصفراء آحاد.","Синие палочки — десятки. Жёлтые кубики — единицы.","Blue rods are tens. Yellow cubes are ones."),
+     L(n+" = "+t+" עשרות ו-"+o+" אחדות.",n+" = "+t+" عشرات و"+o+" آحاد.",n+" = "+t+" дес. и "+o+" ед.",n+" = "+t+" tens and "+o+" ones."),1)});
+  T.push(function(){var t=ri(1,9),o=ri(0,9),n=t*10+o;
+    return mk("build",L(t+" עשרות ו-"+o+" אחדות. איזה מספר זה?",t+" عشرات و"+o+" آحاد. ما العدد؟",t+" дес. и "+o+" ед. Какое это число?",t+" tens and "+o+" ones. Which number is it?"),rodsVis(t,o),n,[o*10+t,n+10,n-10,n+1,n-1].filter(function(x){return x>9&&x<100}),
+     L("העשרות הן הספרה הראשונה. האחדות הן הספרה השנייה.","العشرات هي الرقم الأول والآحاد هي الرقم الثاني.","Десятки — первая цифра, единицы — вторая.","Tens are the first digit. Ones are the second digit."),
+     L(t+" עשרות הן "+t*10+". ועוד "+o+" זה "+n+".",t+" عشرات = "+t*10+". ومعها "+o+" = "+n+".",t+" дес. = "+t*10+". Ещё "+o+" — это "+n+".",t+" tens is "+t*10+". Plus "+o+" makes "+n+"."),1)});
+  T.push(function(){var ev=Math.random()<.5,s=[],i;var e=ri(1,49)*2,od=function(){return ri(0,49)*2+1};
+    var a;if(ev){a=e;s=[od(),od(),od()]}else{a=od();s=[e,ri(1,49)*2,ri(1,49)*2]}
+    return mk("par",ev?L("איזה מספר זוגי?","أي عدد زوجي؟","Какое число чётное?","Which number is even?"):L("איזה מספר אי־זוגי?","أي عدد فردي؟","Какое число нечётное?","Which number is odd?"),"",a,s,
+     L("מספר זוגי נגמר ב-0, 2, 4, 6 או 8.","العدد الزوجي ينتهي بـ 0 أو 2 أو 4 أو 6 أو 8.","Чётное число заканчивается на 0, 2, 4, 6 или 8.","An even number ends in 0, 2, 4, 6 or 8."),
+     L(a+(ev?" זוגי":" אי־זוגי")+": הספרה האחרונה שלו היא "+(a%10)+".",a+(ev?" زوجي":" فردي")+": رقمه الأخير "+(a%10)+".",a+(ev?" — чётное":" — нечётное")+": последняя цифра "+(a%10)+".",a+(ev?" is even":" is odd")+": its last digit is "+(a%10)+"."),2)});
+  T.push(function(){var p=ri(1,9)*10;
+    return mk("line",L("לאיזה מספר מצביע החץ?","إلى أي عدد يشير السهم؟","На какое число показывает стрелка?","Which number does the arrow point to?"),numLine(0,100,10,p,true),p,[p+10,p-10,p+20,p-20,p/10].filter(function(x){return x>=0&&x<=100}),
+     L("הקווים הם קפיצות של 10. סופרים: 10, 20, 30...","الخطوط قفزات من 10. عدّ: 10، 20، 30...","Деления — шаги по 10. Считай: 10, 20, 30...","The marks jump by 10. Count: 10, 20, 30..."),
+     L("החץ על "+p+".","السهم عند "+p+".","Стрелка на "+p+".","The arrow is at "+p+"."),3)});
+  }
+  if(lv>=3){
+  T.push(function(){var s=ri(0,9)*10,p=s+ri(1,9);
+    return mk("line2",L("לאיזה מספר מצביע החץ?","إلى أي عدد يشير السهم؟","На какое число показывает стрелка?","Which number does the arrow point to?"),numLine(s,s+10,1,p,true),p,near(p,s,s+10),
+     L("סופרים את הקפיצות הקטנות מהמספר הראשון.","عدّ القفزات الصغيرة من العدد الأول.","Считай маленькие шаги от первого числа.","Count the small steps from the first number."),
+     L("החץ על "+p+".","السهم عند "+p+".","Стрелка на "+p+".","The arrow is at "+p+"."),3)});
+  T.push(function(){var n=ri(2,9)*10,c=ri(1,9);var x=n+c;
+    return mk("tn",L("מה המספר שבין "+(x-1)+" ל-"+(x+1)+"?","ما العدد بين "+(x-1)+" و"+(x+1)+"؟","Какое число между "+(x-1)+" и "+(x+1)+"?","Which number is between "+(x-1)+" and "+(x+1)+"?"),"",x,[x+1,x-2,x+2,x-1].filter(function(v){return v!==x}),
+     L("חושבים: איזה מספר בא אחרי "+(x-1)+"?","فكّر: ما العدد الذي بعد "+(x-1)+"؟","Подумай: какое число после "+(x-1)+"?","Think: which number comes after "+(x-1)+"?"),
+     L(x-1+", "+x+", "+(x+1)+".",(x-1)+"، "+x+"، "+(x+1)+".",(x-1)+", "+x+", "+(x+1)+".",(x-1)+", "+x+", "+(x+1)+"."),0)});
+  }
+  return pick(T)()};
+/* ===== unit 2: shapes ===== */
+var FLAT=["circle","square","rectangle","triangle","pentagon","hexagon"],SIDES={circle:0,square:4,rectangle:4,triangle:3,pentagon:5,hexagon:6};
+var SOLID=["sphere","cube","cylinder","cone","box"];
+var REAL=[ // object -> shape
+ {k:"sphere",n:L("כדורגל","كرة القدم","футбольный мяч","a football")},{k:"cube",n:L("קוביית משחק","نرد اللعب","игральная кость","a dice")},
+ {k:"cylinder",n:L("קופסת שימורים","علبة معلّبات","консервная банка","a tin can")},{k:"cone",n:L("כובע מסיבה","قبّعة حفلة","праздничный колпак","a party hat")},
+ {k:"box",n:L("קופסת נעליים","علبة أحذية","коробка из-под обуви","a shoe box")},{k:"circle",n:L("צלחת שטוחה","طبق مسطّح","плоская тарелка","a flat plate")},
+ {k:"rectangle",n:L("דלת","باب","дверь","a door")},{k:"square",n:L("אריח ריבועי","بلاطة مربعة","квадратная плитка","a square tile")}];
+function shapeOpts(correct,pool){var d=shuffle(pool.filter(function(x){return x!==correct}));return d.slice(0,3).map(function(k){return SHN[k]})}
+G.shapes=function(lv){var T=[],pool=lv>=2?FLAT:FLAT.slice(0,4);
+  T.push(function(){var k=pick(pool),c=pick([COL.orange,COL.blue,COL.green,COL.purple]);
+    return mk("flat",L("איזו צורה זו?","ما هذا الشكل؟","Какая это фигура?","What shape is this?"),flatShape(k,c),SHN[k],shapeOpts(k,pool),
+     L("סופרים את הצלעות והפינות.","عدّ الأضلاع والزوايا.","Посчитай стороны и углы.","Count the sides and the corners."),
+     L("זה "+SHN[k].he+".","هذا "+SHN[k].ar+".","Это "+SHN[k].ru+".","This is a "+SHN[k].en+"."),0)});
+  T.push(function(){var k=pick(pool.filter(function(x){return x!=="circle"})),n=SIDES[k];
+    return mk("sides",L("כמה צלעות יש לצורה הזאת?","كم ضلعًا لهذا الشكل؟","Сколько сторон у этой фигуры?","How many sides does this shape have?"),flatShape(k),n,[n+1,n-1,n+2,3,4,5].filter(function(x){return x>0}),
+     L("מסמנים צלע ראשונה וסופרים מסביב.","ضع علامة على ضلع واحد وعدّ حول الشكل.","Отметь одну сторону и считай по кругу.","Mark one side and count all the way around."),
+     L("ל"+SHN[k].he+" יש "+n+" צלעות.","لـ"+SHN[k].ar+" "+n+" أضلاع.","У фигуры «"+SHN[k].ru+"» сторон: "+n+".","A "+SHN[k].en+" has "+n+" sides."),1)});
+  T.push(function(){var k=pick(pool),n=SIDES[k];
+    return mk("corners",L("כמה פינות יש לצורה הזאת?","كم زاوية لهذا الشكل؟","Сколько углов у этой фигуры?","How many corners does this shape have?"),flatShape(k),n,[n+1,n-1,n+2,0,3,4].filter(function(x){return x>=0}),
+     L("פינה היא המקום שבו שתי צלעות נפגשות. לעיגול אין פינות.","الزاوية حيث يلتقي ضلعان. الدائرة بلا زوايا.","Угол — там, где встречаются две стороны. У круга углов нет.","A corner is where two sides meet. A circle has no corners."),
+     L("מספר הפינות שווה למספר הצלעות: "+n+".","عدد الزوايا يساوي عدد الأضلاع: "+n+".","Углов столько же, сколько сторон: "+n+".","Corners match sides: "+n+"."),1)});
+  T.push(function(){var k=pick(SOLID.concat(pool.slice(0,4)));var isS=SOLID.indexOf(k)>=0;
+    return mk("solid",L("איזה גוף זה?","ما هذا المجسّم؟","Какое это тело?","Which solid is this?"),isS?solidShape(k):flatShape(k),SHN[k],shapeOpts(k,isS?SOLID:pool),
+     L("גוף אפשר להחזיק ביד. צורה שטוחה מציירים על דף.","المجسّم يمكن أن تمسكه بيدك. الشكل المسطّح نرسمه على الورقة.","Тело можно взять в руку. Плоскую фигуру рисуют на бумаге.","You can hold a solid. A flat shape is drawn on paper."),
+     L("זה "+SHN[k].he+".","هذا "+SHN[k].ar+".","Это "+SHN[k].ru+".","This is a "+SHN[k].en+"."),2)});
+  T.push(function(){var r=pick(REAL),all=REAL.map(function(x){return x.k}),pl=uniq(all);
+    return mk("real",L("איזו צורה או איזה גוף נראה כמו "+r.n.he+"?","أي شكل أو مجسّم يشبه "+r.n.ar+"؟","На какую фигуру или тело похож предмет: "+r.n.ru+"?","Which shape or solid looks like "+r.n.en+"?"),"",SHN[r.k],shapeOpts(r.k,pl),
+     L("חושבים איך נראה החפץ מכל הצדדים.","فكّر كيف يبدو الشيء من كل الجهات.","Представь предмет со всех сторон.","Picture the object from every side."),
+     L(r.n.he+" נראה כמו "+SHN[r.k].he+".",r.n.ar+" يشبه "+SHN[r.k].ar+".",r.n.ru+" похож на «"+SHN[r.k].ru+"».",r.n.en.charAt(0).toUpperCase()+r.n.en.slice(1)+" looks like a "+SHN[r.k].en+"."),2)});
+  if(lv>=2)T.push(function(){var n=pick([3,4,5,6]),k=n===3?"triangle":n===5?"pentagon":n===6?"hexagon":"square";
+    return mk("whichsides",L("לאיזו צורה יש "+n+" צלעות ו-"+n+" פינות?","أي شكل له "+n+" أضلاع و"+n+" زوايا؟","У какой фигуры "+n+" стороны и "+n+" угла?","Which shape has "+n+" sides and "+n+" corners?"),"",SHN[k],shapeOpts(k,["circle","triangle","square","pentagon","hexagon"]),
+     L("מחשבים: משולש 3, ריבוע 4, מחומש 5, משושה 6.","تذكّر: المثلث 3، المربع 4، المخمس 5، المسدس 6.","Вспомни: треугольник 3, квадрат 4, пятиугольник 5, шестиугольник 6.","Remember: triangle 3, square 4, pentagon 5, hexagon 6."),
+     L("הצורה היא "+SHN[k].he+".","الشكل هو "+SHN[k].ar+".","Это "+SHN[k].ru+".","It is a "+SHN[k].en+"."),1)});
+  return pick(T)()};
+/* ===== unit 3: length ===== */
+var UNI={cm:L("סנטימטר","سنتيمتر","сантиметр","centimeter"),m:L("מטר","متر","метр","meter"),km:L("קילומטר","كيلومتر","километр","kilometer"),kg:L("קילוגרם","كيلوغرام","килограмм","kilogram")};
+var THINGS=[{n:L("אורך עיפרון","طول قلم رصاص","длину карандаша","the length of a pencil"),u:"cm"},{n:L("אורך הכיתה","طول الصف","длину класса","the length of a classroom"),u:"m"},
+ {n:L("המרחק בין שתי ערים","المسافة بين مدينتين","расстояние между двумя городами","the distance between two cities"),u:"km"},{n:L("רוחב מחק","عرض ممحاة","ширину ластика","the width of an eraser"),u:"cm"},
+ {n:L("גובה של דלת","ارتفاع باب","высоту двери","the height of a door"),u:"m"},{n:L("אורך הדרך לירושלים","طول الطريق إلى القدس","длину дороги до Иерусалима","the road length to Jerusalem"),u:"km"}];
+G.length=function(lv){var T=[];
+  T.push(function(){var n=ri(2,lv===1?9:12);
+    return mk("ruler",L("מה אורך הפס הכחול בסנטימטרים?","كم طول الشريط الأزرق بالسنتيمتر؟","Какова длина синей полоски в сантиметрах?","How long is the blue bar in centimeters?"),barRuler(0,n,12),n,near(n,1,12),
+     L("הפס מתחיל ב-0. מסתכלים איפה הוא נגמר.","الشريط يبدأ من 0. انظر أين ينتهي.","Полоска начинается с 0. Смотри, где она заканчивается.","The bar starts at 0. Look where it ends."),
+     L("הפס נגמר ב-"+n+", לכן אורכו "+n+" ס״מ.","ينتهي عند "+n+" فطوله "+n+" سم.","Полоска доходит до "+n+", значит её длина "+n+" см.","The bar ends at "+n+", so it is "+n+" cm long."),0)});
+  T.push(function(){var s=[],mx=12;while(s.length<4){var v=ri(1,mx);if(s.indexOf(v)<0)s.push(v)}var sh=Math.random()<.5,a=sh?Math.min.apply(null,s):Math.max.apply(null,s);
+    return mk("longest",sh?L("איזה אורך הוא הקצר ביותר?","أي طول هو الأقصر؟","Какая длина самая короткая?","Which length is the shortest?"):L("איזה אורך הוא הארוך ביותר?","أي طول هو الأطول؟","Какая длина самая длинная?","Which length is the longest?"),"",a+" cm",s.map(function(v){return v+" cm"}),
+     L("משווים את המספרים.","قارن بين الأعداد.","Сравни числа.","Compare the numbers."),
+     L(a+" ס״מ הוא "+(sh?"הקצר":"הארוך")+" ביותר.",a+" سم "+(sh?"الأقصر.":"الأطول."),a+" см — "+(sh?"самая короткая.":"самая длинная."),a+" cm is the "+(sh?"shortest.":"longest.")),1)});
+  T.push(function(){var t=pick(THINGS);
+    return mk("unit",L("במה מודדים "+t.n.he+"?","بماذا نقيس "+t.n.ar+"؟","В чём измеряют "+t.n.ru+"?","What do we use to measure "+t.n.en+"?"),"",UNI[t.u],["cm","m","km","kg"].filter(function(x){return x!==t.u}).map(function(x){return UNI[x]}),
+     L("קטן: סנטימטר. בינוני: מטר. רחוק מאוד: קילומטר.","للصغير: سنتيمتر. للمتوسط: متر. للبعيد جدًّا: كيلومتر.","Маленькое — сантиметры. Среднее — метры. Очень далёкое — километры.","Small: centimeters. Medium: meters. Very far: kilometers."),
+     L("מודדים ב"+UNI[t.u].he+".","نقيس بـ"+UNI[t.u].ar+".","Измеряем в единицах: "+UNI[t.u].ru+".","We use "+UNI[t.u].en+"s."),2)});
+  if(lv>=2)T.push(function(){var a=ri(4,12),b=ri(2,a-1);
+    return mk("diff",L("הפס האדום ארוך מהכחול. בכמה סנטימטרים?","الشريط الأحمر أطول من الأزرق. بكم سنتيمترًا؟","Красная полоска длиннее синей. На сколько сантиметров?","The red bar is longer than the blue. By how many centimeters?"),twoBars(a,b),a-b,near(a-b,1,11).concat([a,b]),
+     L("סופרים כמה משבצות אדומות יש אחרי הסוף של הכחול.","عدّ المربعات الحمراء بعد نهاية الأزرق.","Посчитай, на сколько красная длиннее синей.","Count how much extra the red bar has."),
+     L("האדום "+a+" והכחול "+b+". ההפרש הוא "+(a-b)+".","الأحمر "+a+" والأزرق "+b+". الفرق "+(a-b)+".","Красная "+a+", синяя "+b+". Разница: "+(a-b)+".","Red is "+a+", blue is "+b+". The difference is "+(a-b)+"."),3)});
+  if(lv>=3){
+  T.push(function(){var s=ri(1,5),n=ri(2,6),e=s+n;
+    return mk("ruler2",L("הפס לא מתחיל ב-0. מה אורכו בסנטימטרים?","الشريط لا يبدأ من 0. كم طوله بالسنتيمتر؟","Полоска не начинается с 0. Какова её длина в сантиметрах?","The bar does not start at 0. How long is it in centimeters?"),barRuler(s,e,12),n,near(n,1,12).concat([e,s]),
+     L("מחסרים: איפה הפס נגמר פחות איפה הוא מתחיל.","اطرح: نهاية الشريط ناقص بدايته.","Вычти: конец минус начало.","Subtract: where it ends minus where it starts."),
+     L("הפס מ-"+s+" עד "+e+": "+e+" − "+s+" = "+n+".","من "+s+" إلى "+e+": "+e+" − "+s+" = "+n+".","От "+s+" до "+e+": "+e+" − "+s+" = "+n+".","From "+s+" to "+e+": "+e+" − "+s+" = "+n+"."),3)});
+  T.push(function(){var n=ri(2,5);
+    return mk("m100",L("מטר אחד הוא 100 סנטימטרים. כמה סנטימטרים יש ב-"+n+" מטרים?","المتر الواحد 100 سنتيمتر. كم سنتيمترًا في "+n+" أمتار؟","В одном метре 100 сантиметров. Сколько сантиметров в "+n+" м?","One meter is 100 centimeters. How many centimeters are in "+n+" meters?"),"",n*100,[n*10,n*100+100,n*100-100,100+n],
+     L("מוסיפים 100 על כל מטר.","أضف 100 لكل متر.","Прибавляй по 100 за каждый метр.","Add 100 for every meter."),
+     L(n+" × 100 = "+n*100+".",n+" × 100 = "+n*100+".",n+" × 100 = "+n*100+".",n+" × 100 = "+n*100+"."),3)});
+  }
+  return pick(T)()};
+/* ===== unit 4: time ===== */
+function hm(h,m){return h+":"+(m<10?"0"+m:m)}
+G.time=function(lv){var T=[];
+  T.push(function(){var h=ri(1,12),mm=lv===1?0:pick([0,30]);
+    return mk("clock",L("מה השעה בשעון?","كم الساعة على الساعة؟","Сколько времени на часах?","What time does the clock show?"),clockVis(h,mm),hm(h,mm),[hm(h===12?1:h+1,mm),hm(h===1?12:h-1,mm),hm(h,mm===0?30:0),hm(mm===0?(h%12)+1:h,mm===0?30:0)],
+     L("המחוג הקצר מראה את השעה והארוך את הדקות.","العقرب القصير للساعات والطويل للدقائق.","Короткая стрелка — часы, длинная — минуты.","The short hand shows the hour. The long hand shows the minutes."),
+     L("המחוג הקצר על "+h+", ולכן השעה "+hm(h,mm)+".","العقرب القصير عند "+h+" فالساعة "+hm(h,mm)+".","Короткая стрелка на "+h+": время "+hm(h,mm)+".","The short hand is on "+h+", so the time is "+hm(h,mm)+"."),0)});
+  T.push(function(){var d=ri(0,6),nx=Math.random()<.5,a=DAYS[(d+(nx?1:6))%7];
+    return mk("day",nx?L("היום יום "+DAYS[d].he+". איזה יום יהיה מחר?","اليوم "+DAYS[d].ar+". ما اليوم غدًا؟","Сегодня "+DAYS[d].ru+". Какой день будет завтра?","Today is "+DAYS[d].en+". What day is tomorrow?"):L("היום יום "+DAYS[d].he+". איזה יום היה אתמול?","اليوم "+DAYS[d].ar+". ما اليوم أمس؟","Сегодня "+DAYS[d].ru+". Какой день был вчера?","Today is "+DAYS[d].en+". What day was yesterday?"),"",a,[DAYS[(d+2)%7],DAYS[(d+5)%7],DAYS[(d+3)%7],DAYS[(d+4)%7],DAYS[d]].filter(function(x){return x!==a}),
+     L("השבוע מתחיל ביום ראשון: ראשון, שני, שלישי, רביעי, חמישי, שישי, שבת.","الأسبوع يبدأ بالأحد: الأحد، الاثنين، الثلاثاء، الأربعاء، الخميس، الجمعة، السبت.","Неделя: воскресенье, понедельник, вторник, среда, четверг, пятница, суббота.","The week: Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday."),
+     L((nx?"אחרי":"לפני")+" "+DAYS[d].he+" בא יום "+a.he+".",(nx?"بعد ":"قبل ")+DAYS[d].ar+" يأتي "+a.ar+".",(nx?"После: ":"Перед: ")+DAYS[d].ru+" — "+a.ru+".",(nx?"After ":"Before ")+DAYS[d].en+" comes "+a.en+"."),1)});
+  T.push(function(){var q=pick([[7,L("כמה ימים יש בשבוע?","كم يومًا في الأسبوع؟","Сколько дней в неделе?","How many days are in a week?")],[12,L("כמה חודשים יש בשנה?","كم شهرًا في السنة؟","Сколько месяцев в году?","How many months are in a year?")],[24,L("כמה שעות יש ביממה?","كم ساعة في اليوم؟","Сколько часов в сутках?","How many hours are in a day?")],[60,L("כמה דקות יש בשעה?","كم دقيقة في الساعة؟","Сколько минут в часе?","How many minutes are in an hour?")]]);
+    return mk("facts",q[1],"",q[0],[7,12,24,60,30,10].filter(function(x){return x!==q[0]}),
+     L("זה עניין של זיכרון: שבוע 7, שנה 12 חודשים, יממה 24 שעות, שעה 60 דקות.","هذه معلومة نحفظها: الأسبوع 7، السنة 12 شهرًا، اليوم 24 ساعة، الساعة 60 دقيقة.","Это нужно запомнить: неделя 7, год 12 месяцев, сутки 24 часа, час 60 минут.","Remember: week 7, year 12 months, day 24 hours, hour 60 minutes."),
+     L("התשובה היא "+q[0]+".","الجواب "+q[0]+".","Ответ: "+q[0]+".","The answer is "+q[0]+"."),2)});
+  if(lv>=2)T.push(function(){var h=ri(1,11),a=ri(1,3);
+    return mk("later",L("עכשיו השעה "+hm(h,0)+". מה תהיה השעה בעוד "+a+" שעות?","الآن الساعة "+hm(h,0)+". كم ستكون الساعة بعد "+a+" ساعات؟","Сейчас "+hm(h,0)+". Сколько будет через "+a+" ч?","It is "+hm(h,0)+" now. What time will it be in "+a+" hours?"),clockVis(h,0),hm(h+a>12?h+a-12:h+a,0),[hm(h+a+1>12?h+a-11:h+a+1,0),hm(h-1<1?12:h-1,0),hm(h,30),hm(h+a>12?h+a-12:h+a,30)],
+     L("מוסיפים שעות על המספר שהמחוג הקצר מראה.","أضف الساعات إلى الرقم الذي يشير إليه العقرب القصير.","Прибавь часы к числу, на которое указывает короткая стрелка.","Add the hours to the number the short hand shows."),
+     L(h+" ועוד "+a+" זה "+(h+a>12?h+a-12:h+a)+".",h+" + "+a+" = "+(h+a>12?h+a-12:h+a)+".",h+" + "+a+" = "+(h+a>12?h+a-12:h+a)+".",h+" + "+a+" = "+(h+a>12?h+a-12:h+a)+"."),3)});
+  if(lv>=3)T.push(function(){var h=ri(1,12),k=pick([15,45]);
+    return mk("quarter",L("מה השעה בשעון?","كم الساعة على الساعة؟","Сколько времени на часах?","What time does the clock show?"),clockVis(h,k),hm(h,k),[hm(h,k===15?45:15),hm(h,0),hm(h,30),hm(h===12?1:h+1,k)],
+     L("המחוג הארוך על 3 הוא רבע אחרי. על 9 הוא רבע לפני.","العقرب الطويل عند 3 يعني والربع. عند 9 يعني إلا ربعًا.","Длинная стрелка на 3 — четверть после. На 9 — без четверти.","Long hand on 3 is quarter past. On 9 it is quarter to."),
+     L("המחוג הארוך על "+(k/5)+", הדקות הן "+k+": "+hm(h,k)+".","العقرب الطويل عند "+(k/5)+"، الدقائق "+k+": "+hm(h,k)+".","Длинная стрелка на "+(k/5)+": минут "+k+": "+hm(h,k)+".","The long hand is on "+(k/5)+", so it is "+k+" minutes: "+hm(h,k)+"."),3)});
+  return pick(T)()};
+/* ===== unit 5: money ===== */
+G.money=function(lv){var T=[];
+  T.push(function(){var coins=lv===1?[1,5,10]:lv===2?[1,2,5,10,20]:[1,2,5,10,20,50],n=ri(2,lv===1?4:5),l=[],t=0,i,v;
+    for(i=0;i<n;i++){v=pick(coins);l.push(v);t+=v}l.sort(function(a,b){return b-a});
+    return mk("count",L("כמה כסף יש כאן, בשקלים?","كم مبلغ المال هنا بالشيكل؟","Сколько здесь денег в шекелях?","How much money is here, in shekels?"),moneyVis(l),t,near(t,1,200).concat([t+5,t-5]),
+     L("מתחילים מהגדול ומוסיפים את הקטנים.","ابدأ بالأكبر وأضف الأصغر.","Начни с большего и прибавляй меньшие.","Start with the biggest and add the smaller ones."),
+     L(l.join(" + ")+" = "+t+" ש״ח.",l.join(" + ")+" = "+t+" شيكل.",l.join(" + ")+" = "+t+" шек.",l.join(" + ")+" = "+t+" shekels."),0)});
+  T.push(function(){var c=pick([2,5,10]),n=ri(2,5),t=c*n;
+    return mk("howmany",L("כמה מטבעות של "+c+" שקלים צריך כדי לקבל "+t+" שקלים?","كم قطعة من "+c+" شيكل نحتاج لنحصل على "+t+" شيكل؟","Сколько монет по "+c+" шекеля нужно, чтобы получить "+t+" шекелей?","How many "+c+"-shekel coins make "+t+" shekels?"),moneyVis([c,c]),n,near(n,1,12),
+     L("סופרים בקפיצות של "+c+" עד "+t+".","عدّ بقفزات "+c+" حتى "+t+".","Считай шагами по "+c+" до "+t+".","Count by "+c+"s up to "+t+"."),
+     L(n+" × "+c+" = "+t+".",n+" × "+c+" = "+t+".",n+" × "+c+" = "+t+".",n+" × "+c+" = "+t+"."),1)});
+  if(lv>=2)T.push(function(){var pay=pick([10,20]),p=ri(2,pay-2),n=pick(NAMES),it=pick([L("עיפרון","قلم رصاص","карандаш","a pencil"),L("מחק","ممحاة","ластик","an eraser"),L("מחברת","دفتر","тетрадь","a notebook"),L("גלידה","بوظة","мороженое","an ice cream")]);
+    return mk("change",L(it.he+" עולה "+p+" שקלים. "+vf(n,"שילם","שילמה")+" "+n.he+" "+pay+" שקלים. כמה עודף מקבלים?","ثمن "+it.ar+" "+p+" شيكل. دفع"+(n.g==="f"?"ت ":" ")+n.ar+" "+pay+" شيكل. كم الباقي؟","Цена: "+it.ru+" — "+p+" шекелей. "+n.ru+" "+vf(n,"заплатил","заплатила")+" "+pay+". Сколько сдачи?","The price of "+it.en+" is "+p+" shekels. "+n.en+" pays "+pay+". How much change?"),"",pay-p,near(pay-p,1,19).concat([p,pay]),
+     L("העודף הוא מה ששילמנו פחות המחיר.","الباقي = ما دفعناه ناقص الثمن.","Сдача = заплатили минус цена.","Change = what you pay minus the price."),
+     L(pay+" − "+p+" = "+(pay-p)+".",pay+" − "+p+" = "+(pay-p)+".",pay+" − "+p+" = "+(pay-p)+".",pay+" − "+p+" = "+(pay-p)+"."),2)});
+  if(lv>=3)T.push(function(){var a=pick([20,50]),n=ri(1,3),c=pick([5,10]),t=a+n*c,l=[a].concat(Array(n).fill(c));
+    return mk("sum2",L("כמה כסף יש כאן בסך הכול?","كم مجموع المال هنا؟","Сколько всего денег?","How much money is there in total?"),moneyVis(l),t,[t+5,t-5,t+10,t-10,a+c],
+     L("מוסיפים את השטר ואת המטבעות.","أضف الورقة النقدية والقطع.","Прибавь купюру и монеты.","Add the note and the coins."),
+     L(l.join(" + ")+" = "+t+".",l.join(" + ")+" = "+t+".",l.join(" + ")+" = "+t+".",l.join(" + ")+" = "+t+"."),0)});
+  return pick(T)()};
+/* ===== unit 6: patterns ===== */
+var PC=[["red",COL.red],["blue",COL.blue],["green",COL.green],["yellow",COL.yellow]];
+G.pattern=function(lv){var T=[];
+  T.push(function(){var cs=shuffle(PC).slice(0,2),len=lv===1?5:6,seq=[],i,mode=lv===1?"ab":pick(["ab","aab"]);
+    var base=mode==="ab"?[0,1]:[0,0,1];for(i=0;i<len;i++)seq.push(base[i%base.length]);
+    var hide=len-1,ans=cs[seq[hide]][0],items=seq.map(function(x,j){return j===hide?null:{k:"circle",c:cs[x][1]}});
+    return mk("pcolor",L("איזה צבע בא במקום סימן השאלה?","أي لون يأتي مكان علامة الاستفهام؟","Какой цвет должен быть вместо вопросительного знака?","Which color goes in place of the question mark?"),seqVis(items),COLN[ans],PC.map(function(p){return COLN[p[0]]}),
+     L("מחפשים את החלק שחוזר על עצמו.","ابحث عن الجزء الذي يتكرر.","Найди часть, которая повторяется.","Find the part that repeats."),
+     L("הדוגמה חוזרת, לכן בא "+COLN[ans].he+".","النمط يتكرر، لذلك يأتي "+COLN[ans].ar+".","Узор повторяется, поэтому нужен цвет: "+COLN[ans].ru+".","The pattern repeats, so "+COLN[ans].en+" comes next."),0)});
+  T.push(function(){var ks=shuffle(["circle","square","triangle"]).slice(0,2),seq=[0,1,0,1,0,pick([1,1])].slice(0,lv===1?5:6),ans=ks[seq.length%2],
+      items=seq.map(function(x){return {k:ks[x],c:COL.orange}}).concat([null]);
+    return mk("pshape",L("איזו צורה באה אחרי הסדרה?","أي شكل يأتي بعد المتتالية؟","Какая фигура будет следующей?","Which shape comes next?"),seqVis(items),SHN[ans],["circle","square","triangle","rectangle"].map(function(k){return SHN[k]}),
+     L("הסדרה חוזרת: צורה אחת, אחרת, אחת, אחרת.","المتتالية تتكرر: شكل ثم آخر ثم الأول وهكذا.","Узор повторяется: одна фигура, другая, снова первая.","The pattern repeats: one shape, another, one, another."),
+     L("אחרי הסדרה בא ה"+SHN[ans].he+".","بعد المتتالية يأتي "+SHN[ans].ar+".","Дальше идёт: "+SHN[ans].ru+".","Next comes the "+SHN[ans].en+"."),0)});
+  T.push(function(){var st=pick(lv===1?[1,2,10]:[2,3,5,10]),s=ri(0,lv===1?5:20)*(st===10?1:1),len=5,seq=[],i;
+    for(i=0;i<len;i++)seq.push(s+i*st);var h=lv===1?len-1:ri(1,len-1),a=seq[h];
+    var txt=seq.map(function(v,j){return j===h?"?":v}).join(", ");
+    return mk("pnum",L("מה המספר החסר? "+txt,"ما العدد الناقص؟ "+txt,"Какое число пропущено? "+txt,"Which number is missing? "+txt),"",a,[a+1,a-1,a+st,a-st,a+2].filter(function(x){return x>=0}),
+     L("בודקים בכמה עולים כל פעם.","اكتشف بكم يزيد العدد كل مرة.","Узнай, на сколько растёт число каждый раз.","Find how much the numbers go up each time."),
+     L("עולים ב-"+st+" כל פעם, לכן המספר הוא "+a+".","يزيد "+st+" كل مرة، فالعدد "+a+".","Каждый раз +"+st+", значит число "+a+".","It goes up by "+st+" each time, so the number is "+a+"."),1)});
+  if(lv>=2)T.push(function(){var st=pick([2,5,10]),down=Math.random()<.4,s=down?ri(5,9)*st:ri(0,5)*st,seq=[0,1,2,3,4].map(function(i){return down?s-i*st:s+i*st});
+    var R=down?"-"+st:"+"+st;
+    return mk("prule",L("מהו החוק של הסדרה? "+seq.join(", "),"ما قاعدة المتتالية؟ "+seq.join("، "),"Каково правило? "+seq.join(", "),"What is the rule? "+seq.join(", ")),"",R,["+2","+5","+10","-2","-5","-10","+1"].filter(function(x){return x!==R}),
+     L("מחסרים מספר מהמספר שאחריו.","اطرح كل عدد من العدد الذي بعده.","Вычти из каждого числа предыдущее.","Subtract each number from the next one."),
+     L("כל פעם "+(down?"יורדים":"עולים")+" ב-"+st+".","كل مرة "+(down?"ينقص":"يزيد")+" "+st+".","Каждый раз "+(down?"минус ":"плюс ")+st+".","Each time it goes "+(down?"down":"up")+" by "+st+"."),2)});
+  return pick(T)()};
+/* ===== unit 7: fractions ===== */
+function fr(p,q){return p+"/"+q}
+G.frac=function(lv){var T=[];
+  T.push(function(){var k=pick(["circle","rect"]),parts=lv===1?pick([2,4]):pick([2,4]),sh=parts===2?1:(lv>=3?pick([1,2,3]):1),txt=sh===parts/2?"1/2":sh+"/"+parts;
+    return mk("shaded",L("איזה חלק צבוע?","ما الجزء الملوّن؟","Какая часть закрашена?","What part is shaded?"),fracVis(k,parts,sh),txt,["1/2","1/4","3/4","1/3","1"],
+     L("סופרים כמה חלקים שווים יש, וכמה צבועים.","عدّ الأجزاء المتساوية وكم منها ملوّن.","Посчитай равные части и сколько из них закрашено.","Count the equal parts and how many are shaded."),
+     L("יש "+parts+" חלקים שווים, צבוע/ים "+sh+": "+txt+".","الأجزاء المتساوية "+parts+" والملوّن "+sh+": "+txt+".","Равных частей: "+parts+", закрашено: "+sh+". Это "+txt+".","There are "+parts+" equal parts and "+sh+" shaded: "+txt+"."),0)});
+  T.push(function(){var n=ri(1,lv===1?8:lv===2?15:20)*2;
+    return mk("half",L("מהו חצי מ-"+n+"?","ما نصف "+n+"؟","Чему равна половина от "+n+"?","What is half of "+n+"?"),n<=20?dotsVis(n):"",n/2,near(n/2,1,45).concat([n,n/2+2]),
+     L("חצי: מחלקים לשתי קבוצות שוות.","النصف: نقسم إلى مجموعتين متساويتين.","Половина: раздели на две равные группы.","Half: split into two equal groups."),
+     L("חצי מ-"+n+" הוא "+n/2+", כי "+n/2+" + "+n/2+" = "+n+".","نصف "+n+" هو "+n/2+" لأن "+n/2+" + "+n/2+" = "+n+".","Половина от "+n+" — это "+n/2+", потому что "+n/2+" + "+n/2+" = "+n+".","Half of "+n+" is "+n/2+", because "+n/2+" + "+n/2+" = "+n+"."),1)});
+  T.push(function(){var n=ri(1,lv===1?3:lv===2?5:10)*2,o=pick(OBJS),nm=two();
+    return mk("share",L(vf(nm[0],"חילק","חילקה")+" "+nm[0].he+" "+n+" "+o.he+" שווה בשווה בין שני ילדים. כמה מקבל כל ילד?",nm[0].ar+" وزّع"+(nm[0].g==="f"?"ت ":" ")+n+" من "+o.ar+" بالتساوي على طفلين. كم يأخذ كل طفل؟",nm[0].ru+" "+vf(nm[0],"раздал","раздала")+" "+ruN(n,o)+" поровну двум детям. Сколько получит каждый?",nm[0].en+" shares "+n+" "+o.en+" equally between two children. How many does each child get?"),"",n/2,near(n/2,1,25).concat([n,n/2+1]),
+     L("מחלקים אחד־אחד לכל ילד עד שנגמר.","وزّع واحدًا لكل طفل حتى ينتهي كل شيء.","Раздавай по одному каждому, пока не кончится.","Hand out one at a time to each child until none are left."),
+     L("כל ילד מקבל חצי מ-"+n+": "+n/2+".","كل طفل يأخذ نصف "+n+": "+n/2+".","Каждый получает половину от "+n+": "+n/2+".","Each child gets half of "+n+": "+n/2+"."),1)});
+  if(lv>=2)T.push(function(){var c=pick([["1/2",2,L("חצאים","أنصاف","половинок","halves")],["1/4",4,L("רבעים","أرباع","четвертей","quarters")]]);
+    return mk("whole",L("כמה "+c[2].he+" שווים שלם אחד?","كم من "+c[2].ar+" تساوي واحدًا صحيحًا؟","Сколько "+c[2].ru+" составляют одно целое?","How many "+c[2].en+" make one whole?"),fracVis("circle",c[1],c[1]),c[1],[2,3,4,8,5].filter(function(x){return x!==c[1]}),
+     L("סופרים כמה חלקים בצורה השלמה.","عدّ الأجزاء في الشكل الكامل.","Посчитай части в целой фигуре.","Count the parts in the whole shape."),
+     L("שלם אחד הוא "+c[1]+" חלקים שווים.","الواحد الصحيح هو "+c[1]+" أجزاء متساوية.","Целое — это "+c[1]+" равные части.","One whole is "+c[1]+" equal parts."),2)});
+  if(lv>=3)T.push(function(){var n=ri(1,10)*4;
+    return mk("quarter",L("מהו רבע מ-"+n+"?","ما ربع "+n+"؟","Чему равна четверть от "+n+"?","What is a quarter of "+n+"?"),"",n/4,near(n/4,1,12).concat([n/2,n]),
+     L("רבע: מחלקים לארבע קבוצות שוות.","الربع: نقسم إلى أربع مجموعات متساوية.","Четверть: раздели на четыре равные группы.","A quarter: split into four equal groups."),
+     L(n+" ÷ 4 = "+n/4+".",n+" ÷ 4 = "+n/4+".",n+" ÷ 4 = "+n/4+".",n+" ÷ 4 = "+n/4+"."),3)});
+  return pick(T)()};
+/* ===== unit 8: data ===== */
+var FRU=[L("תפוחים","التفاح","яблоки","apples"),L("בננות","الموز","бананы","bananas"),L("ענבים","العنب","виноград","grapes"),L("תותים","الفراولة","клубника","strawberries")];
+G.data=function(lv){var T=[],k=lv>=2?3:2;
+  function mkSet(){var c=[],i;for(i=0;i<3;i++)c.push(ri(1,lv===1?6:9));return c}
+  function pv(c){return L(pictoVisL("he",c),pictoVisL("ar",c),pictoVisL("ru",c),pictoVisL("en",c))}
+  function pictoVisL(l,c){return pictoVis(FRU.slice(0,3).map(function(f){return f[l]}),c)}
+  var legend=L("כל כוכב הוא פריט אחד.","كل نجمة تساوي قطعة واحدة.","Одна звёздочка — один предмет.","Each star is one item.");
+  T.push(function(){var c=mkSet(),i=ri(0,2);
+    var m=mk("pcount",L("כמה "+FRU[i].he+" יש בתרשים? "+legend.he,"كم عدد "+FRU[i].ar+" في الرسم؟ "+legend.ar,"Сколько здесь: "+FRU[i].ru+"? "+legend.ru,"How many "+FRU[i].en+" are in the chart? "+legend.en),"",c[i],near(c[i],0,12),
+     L("סופרים את הכוכבים בשורה.","عدّ النجوم في الصف.","Посчитай звёздочки в ряду.","Count the stars in the row."),
+     L("בשורה יש "+c[i]+" כוכבים.","في الصف "+c[i]+" نجوم.","В ряду звёздочек: "+c[i]+".","The row has "+c[i]+" stars."),0);m.visL=pv(c);return m});
+  T.push(function(){var c=mkSet();while(new Set(c).size<3)c=mkSet();var mx=Math.max.apply(null,c),i=c.indexOf(mx);
+    var m=mk("most",L("איזה פרי יש הכי הרבה?","أي فاكهة عددها الأكبر؟","Каких фруктов больше всего?","Which fruit is there the most of?"),"",FRU[i],FRU.map(function(f){return f}).filter(function(f,j){return j!==i}),
+     L("מחפשים את השורה הארוכה ביותר.","ابحث عن أطول صف.","Найди самый длинный ряд.","Find the longest row."),
+     L("השורה הארוכה היא של "+FRU[i].he+".","أطول صف هو "+FRU[i].ar+".","Самый длинный ряд — "+FRU[i].ru+".","The longest row is "+FRU[i].en+"."),1);m.visL=pv(c);return m});
+  if(lv>=2)T.push(function(){var c=mkSet(),i=0,j=1;while(c[0]===c[1])c=mkSet();if(c[0]<c[1]){c=[c[1],c[0],c[2]]}
+    var d=c[0]-c[1];var m=mk("moreth",L("השווה בין השורות "+FRU[0].he+" ו"+FRU[1].he+". בכמה כוכבים יש יותר בשורה הראשונה?","قارن بين صفّي "+FRU[0].ar+" و"+FRU[1].ar+". بكم نجمة يزيد الصف الأول؟","Сравни ряды «"+FRU[0].ru+"» и «"+FRU[1].ru+"». На сколько в первом ряду звёздочек больше?","Compare the rows "+FRU[0].en+" and "+FRU[1].en+". How many more stars does the first row have?"),"",d,near(d,0,10).concat([c[0],c[1]]),
+     L("מחסרים: הגדול פחות הקטן.","اطرح: الأكبر ناقص الأصغر.","Вычти: большее минус меньшее.","Subtract: the bigger minus the smaller."),
+     L(c[0]+" − "+c[1]+" = "+d+".",c[0]+" − "+c[1]+" = "+d+".",c[0]+" − "+c[1]+" = "+d+".",c[0]+" − "+c[1]+" = "+d+"."),2);m.visL=pv(c);return m});
+  if(lv>=3)T.push(function(){var c=mkSet(),t=c[0]+c[1]+c[2];
+    var m=mk("total",L("כמה פירות יש בסך הכול?","كم عدد الفواكه في المجموع؟","Сколько всего фруктов?","How many fruits are there in total?"),"",t,near(t,3,27).concat([c[0]+c[1],t+3]),
+     L("מוסיפים את שלוש השורות.","اجمع الصفوف الثلاثة.","Сложи три ряда.","Add the three rows."),
+     L(c.join(" + ")+" = "+t+".",c.join(" + ")+" = "+t+".",c.join(" + ")+" = "+t+".",c.join(" + ")+" = "+t+"."),2);m.visL=pv(c);return m});
+  T.push(function(){var n=ri(3,lv===1?12:24);
+    return mk("tally",L("כמה סימנים יש כאן? (חמישה בכל חבילה)","كم علامة هنا؟ (خمسة في كل حزمة)","Сколько здесь палочек? (по пять в пучке)","How many tally marks are here? (five in each bundle)"),tallyVis(n),n,near(n,1,30),
+     L("כל חבילה עם קו אלכסוני היא 5.","كل حزمة مع خط مائل تساوي 5.","Пучок с косой чертой — это 5.","A bundle with a slanted line is 5."),
+     L(Math.floor(n/5)+" חבילות של 5 ועוד "+n%5+": "+n+".",Math.floor(n/5)+" حزم من 5 زائد "+n%5+": "+n+".",Math.floor(n/5)+" пучков по 5 и ещё "+n%5+": "+n+".",Math.floor(n/5)+" bundles of 5 plus "+n%5+": "+n+"."),3)});
+  return pick(T)()};
+/* ===== unit 9: word problems ===== */
+G.words=function(lv){var R=lv===1?20:lv===2?50:99,nm=two(),n=nm[0],o=pick(OBJS),T=[],A,B;
+  function sc(h,a,r,e){return L(h,a,r,e)}
+  T.push(function(){A=ri(2,R-2);B=ri(2,Math.min(R-A,lv===1?9:30));if(B<2)B=2;var t=A+B;
+    return mk("add",sc("ל"+n.he+" היו "+A+" "+o.he+". "+n.he+" "+vf(n,"קיבל","קיבלה")+" עוד "+B+". כמה יש עכשיו?","كان مع "+n.ar+" "+A+" من "+o.ar+". "+vf(n,"أخذ","أخذت")+" "+B+" أخرى. كم عددها الآن؟","У "+n.ruG+" было "+ruN(A,o)+". "+n.ru+" "+vf(n,"получил","получила")+" ещё "+B+". Сколько стало?",n.en+" had "+A+" "+o.en+". "+n.en+" got "+B+" more. How many now?"),"",t,near(t,1,R+10).concat([A,B,t+3]),
+     L("יש עוד: מחברים.","وصل المزيد: نجمع.","Стало больше: складываем.","Getting more means adding."),L(A+" + "+B+" = "+t+".",A+" + "+B+" = "+t+".",A+" + "+B+" = "+t+".",A+" + "+B+" = "+t+"."),0)});
+  T.push(function(){A=ri(5,R);B=ri(2,Math.min(A-1,lv===1?9:30));var t=A-B;
+    return mk("sub",sc("ל"+n.he+" היו "+A+" "+o.he+". "+n.he+" "+vf(n,"נתן","נתנה")+" "+B+" לחבר. כמה נשארו?","كان مع "+n.ar+" "+A+" من "+o.ar+". "+vf(n,"أعطى","أعطت")+" "+B+" لصديق. كم بقي؟","У "+n.ruG+" было "+ruN(A,o)+". "+n.ru+" "+vf(n,"отдал","отдала")+" "+B+" другу. Сколько осталось?",n.en+" had "+A+" "+o.en+". "+n.en+" gave "+B+" to a friend. How many are left?"),"",t,near(t,0,R).concat([A+B,B]),
+     L("נתן: פחות. מחסרים.","أعطى: صار أقل. نطرح.","Отдал — стало меньше: вычитаем.","Giving away means less. We subtract."),L(A+" − "+B+" = "+t+".",A+" − "+B+" = "+t+".",A+" − "+B+" = "+t+".",A+" − "+B+" = "+t+"."),0)});
+  T.push(function(){var m=two();A=ri(6,R);B=ri(2,A-1);var d=A-B;
+    return mk("cmp",sc("ל"+m[0].he+" יש "+A+" "+o.he+", ול"+m[1].he+" יש "+B+". כמה יותר יש ל"+m[0].he+"?","مع "+m[0].ar+" "+A+" من "+o.ar+" ومع "+m[1].ar+" "+B+". كم يزيد ما مع "+m[0].ar+"؟","У "+m[0].ruG+" "+ruN(A,o)+", а у "+m[1].ruG+" — "+B+". На сколько больше у "+m[0].ruG+"?",m[0].en+" has "+A+" "+o.en+" and "+m[1].en+" has "+B+". How many more does "+m[0].en+" have?"),"",d,near(d,0,R).concat([A,B,A+B]),
+     L("בכמה יותר: מחסרים את הקטן מהגדול.","كم أكثر: نطرح الأصغر من الأكبر.","На сколько больше: из большего вычитаем меньшее.","How many more: subtract the smaller from the bigger."),L(A+" − "+B+" = "+d+".",A+" − "+B+" = "+d+".",A+" − "+B+" = "+d+".",A+" − "+B+" = "+d+"."),1)});
+  T.push(function(){A=ri(2,R-5);B=ri(A+2,R);var d=B-A;
+    return mk("miss",sc("ל"+n.he+" יש "+A+" "+o.he+". כדי שיהיו "+B+", כמה צריך להוסיף?","مع "+n.ar+" "+A+" من "+o.ar+". كم يلزم أن يضيف ليصبح العدد "+B+"؟","У "+n.ruG+" "+ruN(A,o)+". Сколько нужно добавить, чтобы стало "+B+"?",n.en+" has "+A+" "+o.en+". How many more are needed to have "+B+"?"),"",d,near(d,1,R).concat([A,B,A+B]),
+     L("סופרים קדימה מ-"+A+" עד "+B+".","عدّ إلى الأمام من "+A+" حتى "+B+".","Считай вперёд от "+A+" до "+B+".","Count on from "+A+" up to "+B+"."),L(B+" − "+A+" = "+d+".",B+" − "+A+" = "+d+".",B+" − "+A+" = "+d+".",B+" − "+A+" = "+d+"."),1)});
+  if(lv>=3)T.push(function(){A=ri(10,60);B=ri(5,30);var C=ri(2,Math.min(A+B-1,25)),t=A+B-C;
+    return mk("two",sc("ל"+n.he+" היו "+A+" "+o.he+". "+vf(n,"קיבל","קיבלה")+" עוד "+B+", ואז "+vf(n,"נתן","נתנה")+" "+C+". כמה יש עכשיו?","كان مع "+n.ar+" "+A+" من "+o.ar+". "+vf(n,"أخذ","أخذت")+" "+B+" ثم "+vf(n,"أعطى","أعطت")+" "+C+". كم عددها الآن؟","У "+n.ruG+" было "+ruN(A,o)+". "+n.ru+" "+vf(n,"получил","получила")+" ещё "+B+", потом "+vf(n,"отдал","отдала")+" "+C+". Сколько стало?",n.en+" had "+A+" "+o.en+", got "+B+" more, then gave away "+C+". How many now?"),"",t,near(t,1,150).concat([A+B,A-C,A+B+C]),
+     L("פותרים בשני צעדים: קודם מחברים, אחר כך מחסרים.","نحلّ بخطوتين: نجمع أولًا ثم نطرح.","Решаем в два шага: сначала сложение, потом вычитание.","Two steps: first add, then subtract."),L(A+" + "+B+" = "+(A+B)+". אחר כך "+(A+B)+" − "+C+" = "+t+".",A+" + "+B+" = "+(A+B)+". ثم "+(A+B)+" − "+C+" = "+t+".",A+" + "+B+" = "+(A+B)+". Потом "+(A+B)+" − "+C+" = "+t+".",A+" + "+B+" = "+(A+B)+". Then "+(A+B)+" − "+C+" = "+t+"."),2)});
+  return pick(T)()};
+/* ===== BAND 2 (grades 3-4) ===== */
+function ts(n){return String(n)}
+G.big=function(lv){var T=[],M=lv===1?999:9999;
+  T.push(function(){var n=ri(M>999?1000:100,M),d=pick(M>999?["thousands","hundreds","tens","ones"]:["hundreds","tens","ones"]);
+    var s=String(n),pos=d==="thousands"?s.length-4:d==="hundreds"?s.length-3:d==="tens"?s.length-2:s.length-1,v=+s[pos];
+    var nm={thousands:L("האלפים","الآلاف","тысяч","thousands"),hundreds:L("המאות","المئات","сотен","hundreds"),tens:L("העשרות","العشرات","десятков","tens"),ones:L("האחדות","الآحاد","единиц","ones")}[d];
+    return mk("digit",L("מהי ספרת "+nm.he+" במספר "+n+"?","ما رقم "+nm.ar+" في العدد "+n+"؟","Какая цифра обозначает количество "+nm.ru+" в числе "+n+"?","What is the digit in the "+nm.en+" place of "+n+"?"),"",v,s.split("").map(Number).concat([(v+1)%10,(v+2)%10]),
+     L("כותבים את המספר ומסמנים את המקום: אחדות, עשרות, מאות, אלפים — מהסוף להתחלה.","اكتب العدد وحدّد المنزلة: آحاد، عشرات، مئات، آلاف — من النهاية.","Запиши число и найди разряд: единицы, десятки, сотни, тысячи — с конца.","Write the number and find the place: ones, tens, hundreds, thousands from the right."),
+     L("בספרה במקום ה"+nm.he+" יש "+v+".","الرقم في منزلة "+nm.ar+" هو "+v+".","Цифра в разряде: "+v+".","The digit in that place is "+v+"."),0)});
+  T.push(function(){var a=ri(10,M),b=ri(10,M),c=ri(10,M),e=ri(10,M),s=uniq([a,b,c,e]),big=Math.random()<.5;if(s.length<4)return G.big(lv);
+    var ans=big?Math.max.apply(null,s):Math.min.apply(null,s);
+    return mk("cmp",big?L("איזה מספר הגדול ביותר?","ما أكبر عدد؟","Какое число самое большое?","Which number is the biggest?"):L("איזה מספר הקטן ביותר?","ما أصغر عدد؟","Какое число самое маленькое?","Which number is the smallest?"),"",ans,s,
+     L("משווים קודם את מספר הספרות, ואחר כך מהספרה הגדולה ביותר.","قارن عدد الأرقام أولًا ثم ابدأ من أكبر منزلة.","Сначала сравни количество цифр, потом цифры слева направо.","Compare the number of digits first, then from the left."),L(ans+" הוא "+(big?"הגדול":"הקטן")+" ביותר.",ans+(big?" أكبر عدد.":" أصغر عدد."),ans+(big?" — самое большое.":" — самое маленькое."),ans+" is the "+(big?"biggest.":"smallest.")),1)});
+  T.push(function(){var u=pick(lv===1?[10]:[10,100]),n=ri(11,M-1),r=Math.round(n/u)*u;if(n%u===0)n+=3;r=Math.round(n/u)*u;
+    return mk("round",L("מעגלים את "+n+" לעשרות או למאות השלמות הקרובות: "+u+". מהו המספר המעוגל?","قرّب "+n+" إلى أقرب "+u+". ما العدد بعد التقريب؟","Округли "+n+" до ближайших "+u+". Какое получилось число?","Round "+n+" to the nearest "+u+". What is the rounded number?"),"",r,[r+u,r-u,Math.floor(n/u)*u,Math.ceil(n/u)*u].filter(function(x){return x>0}),
+     L("מסתכלים על הספרה שאחרי: 5 ומעלה מעגלים למעלה.","انظر إلى الرقم الذي بعده: 5 فأكثر نقرّب لأعلى.","Смотри на следующую цифру: 5 и больше — округляем вверх.","Look at the next digit: 5 or more rounds up."),L(n+" קרוב יותר ל-"+r+".",n+" أقرب إلى "+r+".",n+" ближе к "+r+".",n+" is closer to "+r+"."),2)});
+  T.push(function(){var th=ri(1,M>999?9:5),h=ri(0,9),t=ri(0,9),o=ri(0,9),n=th*(M>999?1000:100)+h*(M>999?100:10)+t*(M>999?10:1)+(M>999?o:0);
+    var parts=M>999?[th*1000,h*100,t*10,o]:[th*100,h*10,t];var ans=n;
+    return mk("expand",L("איזה מספר שווה ל-"+parts.join(" + ")+"?","ما العدد الذي يساوي "+parts.join(" + ")+"؟","Какое число равно "+parts.join(" + ")+"?","Which number equals "+parts.join(" + ")+"?"),"",ans,[ans+10,ans-10,ans+100,ans-100,ans+1].filter(function(x){return x>0}),
+     L("מחברים את החלקים: קודם הגדולים.","اجمع الأجزاء: الأكبر أولًا.","Сложи части: сначала самые большие.","Add the parts: biggest first."),L(parts.join(" + ")+" = "+ans+".",parts.join(" + ")+" = "+ans+".",parts.join(" + ")+" = "+ans+".",parts.join(" + ")+" = "+ans+"."),0)});
+  return pick(T)()};
+G.area=function(lv){var T=[];
+  T.push(function(){var w=ri(2,lv===1?6:9),h=ri(2,lv===1?5:7),a=w*h;
+    return mk("grid",L("כמה ריבועי יחידה בתוך המלבן? (אורך "+w+", רוחב "+h+")","كم مربع وحدة داخل المستطيل؟ (الطول "+w+" والعرض "+h+")","Сколько единичных квадратов в прямоугольнике? (длина "+w+", ширина "+h+")","How many unit squares are inside the rectangle? (length "+w+", width "+h+")"),gridVis(w,h,true),a,[a+w,a-h,w+h,2*(w+h),a+1].filter(function(x){return x>0}),
+     L("סופרים שורה אחת ומכפילים במספר השורות.","عدّ صفًّا واحدًا واضرب في عدد الصفوف.","Посчитай один ряд и умножь на число рядов.","Count one row and multiply by the number of rows."),L(w+" × "+h+" = "+a+" ריבועים.",w+" × "+h+" = "+a+" مربعًا.",w+" × "+h+" = "+a+" квадратов.",w+" × "+h+" = "+a+" squares."),0)});
+  T.push(function(){var w=ri(2,12),h=ri(2,10),p=2*(w+h);
+    return mk("per",L("מה ההיקף של המלבן, בסנטימטרים?","ما محيط المستطيل بالسنتيمتر؟","Каков периметр прямоугольника в сантиметрах?","What is the perimeter of the rectangle, in centimeters?"),rectLab(w,h),p,[w*h,w+h,p+2,p-2,p+4].filter(function(x){return x>0}),
+     L("היקף הוא סכום כל הצלעות: מסביב מסביב.","المحيط هو مجموع كل الأضلاع: حول الشكل كله.","Периметр — сумма всех сторон: обойди фигуру по кругу.","Perimeter is the sum of all sides: go all the way around."),L(w+" + "+h+" + "+w+" + "+h+" = "+p+".",w+" + "+h+" + "+w+" + "+h+" = "+p+".",w+" + "+h+" + "+w+" + "+h+" = "+p+".",w+" + "+h+" + "+w+" + "+h+" = "+p+"."),1)});
+  T.push(function(){var w=ri(2,12),h=ri(2,10),a=w*h;
+    return mk("area",L("מה השטח של המלבן, בסנטימטרים רבועים?","ما مساحة المستطيل بالسنتيمتر المربع؟","Какова площадь прямоугольника в квадратных сантиметрах?","What is the area of the rectangle, in square centimeters?"),rectLab(w,h),a,[2*(w+h),w+h,a+w,a-h,a+h].filter(function(x){return x>0}),
+     L("שטח הוא אורך כפול רוחב.","المساحة = الطول × العرض.","Площадь = длина × ширина.","Area = length × width."),L(w+" × "+h+" = "+a+".",w+" × "+h+" = "+a+".",w+" × "+h+" = "+a+".",w+" × "+h+" = "+a+"."),2)});
+  if(lv>=2)T.push(function(){var s=ri(2,12),p=4*s;
+    return mk("sq",L("לריבוע יש היקף של "+p+" ס״מ. מה אורך צלע אחת?","محيط المربع "+p+" سم. كم طول ضلع واحد؟","Периметр квадрата "+p+" см. Чему равна одна сторона?","A square has a perimeter of "+p+" cm. How long is one side?"),"",s,[s*2,s+4,p-4,s*s,s+1],
+     L("בריבוע כל ארבע הצלעות שוות. מחלקים ב-4.","في المربع الأضلاع الأربعة متساوية. اقسم على 4.","У квадрата все четыре стороны равны. Раздели на 4.","In a square all four sides are equal. Divide by 4."),L(p+" ÷ 4 = "+s+".",p+" ÷ 4 = "+s+".",p+" ÷ 4 = "+s+".",p+" ÷ 4 = "+s+"."),1)});
+  return pick(T)()};
+G.angles=function(lv){var T=[],AN={right:L("ישרה","قائمة","прямой","a right angle"),acute:L("חדה","حادة","острый","an acute angle"),obtuse:L("קהה","منفرجة","тупой","an obtuse angle")};
+  T.push(function(){var k=pick(["right","acute","obtuse"]),deg=k==="right"?90:k==="acute"?pick([30,45,60,70]):pick([110,125,140,150]);
+    return mk("kind",L("איזו זווית זו?","أي زاوية هذه؟","Какой это угол?","What kind of angle is this?"),angleVis(deg),AN[k],["right","acute","obtuse"].filter(function(x){return x!==k}).map(function(x){return AN[x]}).concat([L("שטוחה","مستقيمة","развёрнутый","a straight angle")]),
+     L("זווית ישרה היא כמו פינה של דף. חדה קטנה ממנה. קהה גדולה ממנה.","الزاوية القائمة مثل زاوية الورقة. الحادة أصغر منها والمنفرجة أكبر.","Прямой угол — как угол листа. Острый меньше, тупой больше.","A right angle is like the corner of a page. Acute is smaller, obtuse is bigger."),
+     L("זו זווית "+AN[k].he+".","هذه زاوية "+AN[k].ar+".","Это "+AN[k].ru+" угол.","This is "+AN[k].en+"."),0)});
+  T.push(function(){var k=pick([["rectangle",4],["square",4],["triangle",0]]);
+    return mk("rightcount",L("כמה זוויות ישרות יש ב"+SHN[k[0]].he+"?","كم زاوية قائمة في "+SHN[k[0]].ar+"؟","Сколько прямых углов у фигуры «"+SHN[k[0]].ru+"»?","How many right angles does a "+SHN[k[0]].en+" have?"),flatShape(k[0]),k[1],[0,1,2,3,4].filter(function(x){return x!==k[1]}),
+     L("בודקים כל פינה: האם היא כמו פינה של דף?","افحص كل زاوية: هل هي مثل زاوية الورقة؟","Проверь каждый угол: он как угол листа?","Check each corner: is it like the corner of a page?"),L("ב"+SHN[k[0]].he+" יש "+k[1]+" זוויות ישרות.","في "+SHN[k[0]].ar+" "+k[1]+" زوايا قائمة.","Прямых углов: "+k[1]+".","It has "+k[1]+" right angles."),1)});
+  T.push(function(){var d=pick([[30,"acute"],[90,"right"],[120,"obtuse"],[150,"obtuse"],[45,"acute"]]);
+    return mk("deg",L("זווית של "+d[0]+" מעלות. איזו זווית זו?","زاوية قياسها "+d[0]+" درجة. أي زاوية هي؟","Угол в "+d[0]+" градусов. Какой это угол?","An angle of "+d[0]+" degrees. What kind of angle is it?"),"",AN[d[1]],["right","acute","obtuse"].filter(function(x){return x!==d[1]}).map(function(x){return AN[x]}).concat([L("שטוחה","مستقيمة","развёрнутый","a straight angle")]),
+     L("ישרה היא 90°. פחות מ-90 היא חדה. יותר מ-90 היא קהה.","القائمة 90°. أقل من 90 حادة. أكثر من 90 منفرجة.","Прямой — 90°. Меньше 90 — острый. Больше 90 — тупой.","Right is 90°. Less than 90 is acute. More than 90 is obtuse."),L(d[0]+"° היא זווית "+AN[d[1]].he+".",d[0]+"° زاوية "+AN[d[1]].ar+".",d[0]+"° — "+AN[d[1]].ru+" угол.",d[0]+"° is "+AN[d[1]].en+"."),2)});
+  return pick(T)()};
+G.units2=function(lv){var T=[];
+  T.push(function(){var n=ri(2,9),m=pick([["m","cm",100,L("מטרים","أمتار","метров","meters"),L("סנטימטרים","سنتيمترات","сантиметров","centimeters")],["kg","g",1000,L("קילוגרמים","كيلوغرامات","килограммов","kilograms"),L("גרמים","غرامات","граммов","grams")],["l","ml",1000,L("ליטרים","لترات","литров","liters"),L("מיליליטרים","ملليلترات","миллилитров","milliliters")]]),a=n*m[2];
+    return mk("conv",L("כמה "+m[4].he+" יש ב-"+n+" "+m[3].he+"?","كم "+m[4].ar+" في "+n+" "+m[3].ar+"؟","Сколько "+m[4].ru+" в "+n+" "+m[3].ru+"?","How many "+m[4].en+" are in "+n+" "+m[3].en+"?"),"",a,[n*10,a+m[2],a-m[2],n+m[2],a*10].filter(function(x){return x>0}),
+     L("1 "+m[0]+" = "+m[2]+" "+m[1]+". מכפילים.","1 "+m[0]+" = "+m[2]+" "+m[1]+". نضرب.","1 "+m[0]+" = "+m[2]+" "+m[1]+". Умножаем.","1 "+m[0]+" = "+m[2]+" "+m[1]+". Multiply."),L(n+" × "+m[2]+" = "+a+".",n+" × "+m[2]+" = "+a+".",n+" × "+m[2]+" = "+a+".",n+" × "+m[2]+" = "+a+"."),0)});
+  T.push(function(){var h=ri(1,10),m=pick([0,15,30,45]),d=pick([20,30,45,50,60]),eh=h+Math.floor((m+d)/60),em=(m+d)%60;
+    if(eh>12)eh-=12;return mk("elapsed",L("השיעור התחיל ב-"+hm(h,m)+" ונמשך "+d+" דקות. מתי הוא נגמר?","بدأ الدرس الساعة "+hm(h,m)+" واستمر "+d+" دقيقة. متى انتهى؟","Урок начался в "+hm(h,m)+" и шёл "+d+" минут. Когда он закончился?","The lesson began at "+hm(h,m)+" and lasted "+d+" minutes. When did it end?"),clockVis(h,m),hm(eh,em),[hm(eh,(em+10)%60),hm(eh===12?1:eh+1,em),hm(h,(m+d)%60===m?(m+5)%60:(m+d)%60),hm(eh,(em+30)%60)],
+     L("מוסיפים דקות. אם עוברים 60, עוברים לשעה הבאה.","أضف الدقائق. إذا تجاوزت 60 ننتقل إلى الساعة التالية.","Прибавь минуты. Если больше 60 — переходим на следующий час.","Add the minutes. If you pass 60, go to the next hour."),L(hm(h,m)+" + "+d+" דקות = "+hm(eh,em)+".",hm(h,m)+" + "+d+" دقيقة = "+hm(eh,em)+".",hm(h,m)+" + "+d+" мин = "+hm(eh,em)+".",hm(h,m)+" + "+d+" min = "+hm(eh,em)+"."),1)});
+  T.push(function(){var a=ri(2,9),b=pick([250,500,750]),u=a*1000+b;
+    return mk("mix",L(a+" ק״ג ו-"+b+" גרם. כמה גרמים זה בסך הכול?",a+" كغ و"+b+" غرام. كم غرامًا المجموع؟",a+" кг и "+b+" г. Сколько всего граммов?",a+" kg and "+b+" g. How many grams in total?"),"",u,[a*100+b,u+1000,u-1000,a+b,u+100],
+     L("1 ק״ג הוא 1000 גרם. הופכים את הקילוגרמים לגרמים ואז מוסיפים.","1 كغ = 1000 غرام. حوّل الكيلوغرامات إلى غرامات ثم اجمع.","1 кг = 1000 г. Переведи килограммы в граммы и сложи.","1 kg is 1000 g. Turn kilograms into grams, then add."),L(a+"×1000 + "+b+" = "+u+".",a+"×1000 + "+b+" = "+u+".",a+"×1000 + "+b+" = "+u+".",a+"×1000 + "+b+" = "+u+"."),0)});
+  return pick(T)()};
+G.frac2=function(lv){var T=[];
+  T.push(function(){var d=pick([[2,3],[3,4],[2,5],[3,6],[4,8],[2,4]]),p=d[0],q=d[1],big=Math.random()<.5;
+    var a=ri(2,6),b;do{b=ri(2,8)}while(b===a);var x=Math.min(a,b),y=Math.max(a,b);
+    return mk("unitcmp",L("איזה שבר גדול יותר: 1/"+x+" או 1/"+y+"?","أي كسر أكبر: 1/"+x+" أم 1/"+y+"؟","Какая дробь больше: 1/"+x+" или 1/"+y+"?","Which fraction is bigger: 1/"+x+" or 1/"+y+"?"),fracBars(1,x,1,y),"1/"+x,["1/"+y,L("שווים","متساويان","равны","they are equal"),"1/"+(y+1),"1/"+(x>2?x-1:y+2)],
+     L("כשמחלקים לעוד חלקים, כל חלק קטן יותר.","كلما زاد عدد الأجزاء صار كل جزء أصغر.","Чем больше частей, тем меньше каждая часть.","The more parts, the smaller each part."),L("1/"+x+" גדול מ-1/"+y+".","1/"+x+" أكبر من 1/"+y+".","1/"+x+" больше, чем 1/"+y+".","1/"+x+" is bigger than 1/"+y+"."),0)});
+  T.push(function(){var k=pick([2,3,4]),q=pick([2,3,5]),p=1,eq=k*q,n=p*k;
+    return mk("equiv",L("1/"+q+" = ?/"+eq,"1/"+q+" = ؟/"+eq,"1/"+q+" = ?/"+eq,"1/"+q+" = ?/"+eq),fracBars(1,q,k,eq),k,[k+1,k-1,eq,q,k*2].filter(function(x){return x>0}),
+     L("כופלים את המונה ואת המכנה באותו מספר.","اضرب البسط والمقام في العدد نفسه.","Умножь числитель и знаменатель на одно и то же число.","Multiply the top and the bottom by the same number."),L("1×"+k+" = "+k+" ו-"+q+"×"+k+" = "+eq+".","1×"+k+" = "+k+" و"+q+"×"+k+" = "+eq+".","1×"+k+" = "+k+" и "+q+"×"+k+" = "+eq+".","1×"+k+" = "+k+" and "+q+"×"+k+" = "+eq+"."),1)});
+  T.push(function(){var q=pick([2,3,4,5,10]),m=ri(2,6),p=lv>=2?ri(1,q-1):1,n=q*m,a=p*m;
+    return mk("fracof",L("מהו "+p+"/"+q+" מ-"+n+"?","ما "+p+"/"+q+" من "+n+"؟","Чему равна дробь "+p+"/"+q+" от "+n+"?","What is "+p+"/"+q+" of "+n+"?"),"",a,[n,m,a+q,a-1,a+1].filter(function(x){return x>0}),
+     L("מחלקים ל-"+q+" קבוצות שוות, ולוקחים "+p+".","نقسم إلى "+q+" مجموعات متساوية ونأخذ "+p+".","Раздели на "+q+" равных групп и возьми "+p+".","Split into "+q+" equal groups and take "+p+"."),L(n+" ÷ "+q+" = "+m+", ו-"+m+" × "+p+" = "+a+".",n+" ÷ "+q+" = "+m+"، و"+m+" × "+p+" = "+a+".",n+" ÷ "+q+" = "+m+", "+m+" × "+p+" = "+a+".",n+" ÷ "+q+" = "+m+", then "+m+" × "+p+" = "+a+"."),2)});
+  return pick(T)()};
+G.bars=function(lv){var T=[],C=[FRU[0],FRU[1],FRU[2],FRU[3]];
+  function vals(){var v=[],mx=lv===1?10:20,st=lv===1?1:2;for(var i=0;i<4;i++)v.push(ri(1,mx/st)*st);return v}
+  function bv(v){var m=lv===1?10:20;return L(barChart(C.map(function(c){return c.he}),v,m),barChart(C.map(function(c){return c.ar}),v,m),barChart(C.map(function(c){return c.ru}),v,m),barChart(C.map(function(c){return c.en}),v,m))}
+  T.push(function(){var v=vals(),i=ri(0,3),r=mk("read",L("כמה "+C[i].he+" יש לפי התרשים?","كم عدد "+C[i].ar+" حسب الرسم؟","Сколько здесь: "+C[i].ru+" по диаграмме?","How many "+C[i].en+" are there in the chart?"),"",v[i],near(v[i],0,22),
+     L("מסתכלים על גובה העמודה ועל המספרים בצד.","انظر إلى ارتفاع العمود والأعداد على الجانب.","Смотри на высоту столбика и числа сбоку.","Look at the height of the bar and the numbers on the side."),L("העמודה מגיעה ל-"+v[i]+".","العمود يصل إلى "+v[i]+".","Столбик доходит до "+v[i]+".","The bar reaches "+v[i]+"."),0);r.visL=bv(v);return r});
+  T.push(function(){var v=vals();if(uniq(v).length<4)return G.bars(lv);var mx=Math.max.apply(null,v),i=v.indexOf(mx),r=mk("most",L("איזה פרי יש הכי הרבה?","أي فاكهة عددها الأكبر؟","Каких фруктов больше всего?","Which fruit is there the most of?"),"",C[i],C.filter(function(c,j){return j!==i}),
+     L("מחפשים את העמודה הגבוהה ביותר.","ابحث عن أعلى عمود.","Найди самый высокий столбик.","Find the tallest bar."),L("העמודה הגבוהה היא של "+C[i].he+".","أعلى عمود هو "+C[i].ar+".","Самый высокий столбик — "+C[i].ru+".","The tallest bar is "+C[i].en+"."),1);r.visL=bv(v);return r});
+  T.push(function(){var v=vals(),i=0,j=1;if(v[i]===v[j])v[j]+=lv===1?1:2;var d=Math.abs(v[i]-v[j]),r=mk("diff",L("מה ההפרש בין "+C[i].he+" ל"+C[j].he+"?","ما الفرق بين "+C[i].ar+" و"+C[j].ar+"؟","Какая разница между: "+C[i].ru+" и "+C[j].ru+"?","What is the difference between "+C[i].en+" and "+C[j].en+"?"),"",d,near(d,0,22).concat([v[i],v[j]]),
+     L("קוראים שני ערכים ומחסרים את הקטן מהגדול.","اقرأ قيمتين واطرح الأصغر من الأكبر.","Прочитай два значения и вычти меньшее из большего.","Read two values and subtract the smaller from the bigger."),L(Math.max(v[i],v[j])+" − "+Math.min(v[i],v[j])+" = "+d+".",Math.max(v[i],v[j])+" − "+Math.min(v[i],v[j])+" = "+d+".",Math.max(v[i],v[j])+" − "+Math.min(v[i],v[j])+" = "+d+".",Math.max(v[i],v[j])+" − "+Math.min(v[i],v[j])+" = "+d+"."),2);r.visL=bv(v);return r});
+  T.push(function(){var v=vals(),t=v.reduce(function(a,b){return a+b},0),r=mk("sum",L("כמה פירות יש בסך הכול?","كم عدد الفواكه في المجموع؟","Сколько всего фруктов?","How many fruits are there in total?"),"",t,near(t,4,80).concat([t-2,t+2]),
+     L("מוסיפים את כל ארבע העמודות.","اجمع الأعمدة الأربعة كلها.","Сложи все четыре столбика.","Add all four bars."),L(v.join(" + ")+" = "+t+".",v.join(" + ")+" = "+t+".",v.join(" + ")+" = "+t+".",v.join(" + ")+" = "+t+"."),2);r.visL=bv(v);return r});
+  return pick(T)()};
+G.mult=function(lv){var T=[],R=lv===1?6:lv===2?9:12;
+  T.push(function(){var a=ri(2,R),b=ri(2,R),n=pick(NAMES),o=pick(OBJS),t=a*b;
+    return mk("groups",L("ל"+n.he+" יש "+a+" קופסאות. בכל קופסה "+b+" "+o.he+". כמה "+o.he+" יש בסך הכול?","مع "+n.ar+" "+a+" علب. في كل علبة "+b+" من "+o.ar+". كم عددها كلها؟","У "+n.ruG+" "+a+" "+plRu(a,"коробка","коробки","коробок")+". В каждой "+ruN(b,o)+". Сколько всего?",n.en+" has "+a+" boxes. Each box has "+b+" "+o.en+". How many in total?"),"",t,[a+b,t+a,t-b,t+b,(a+1)*b].filter(function(x){return x>0}),
+     L("כמה קבוצות שוות? כמה בכל קבוצה? כופלים.","كم مجموعة متساوية؟ كم في كل مجموعة؟ نضرب.","Сколько равных групп? Сколько в каждой? Умножаем.","How many equal groups? How many in each? Multiply."),L(a+" × "+b+" = "+t+".",a+" × "+b+" = "+t+".",a+" × "+b+" = "+t+".",a+" × "+b+" = "+t+"."),0)});
+  T.push(function(){var a=ri(2,R),b=ri(2,R),t=a*b,o=pick(OBJS);
+    return mk("share",L(t+" "+o.he+" מחולקים שווה בשווה ל-"+a+" ילדים. כמה מקבל כל ילד?",t+" من "+o.ar+" توزّع بالتساوي على "+a+" أطفال. كم يأخذ كل طفل؟",ruN(t,o)+" поровну раздали "+a+" детям. Сколько получил каждый?",t+" "+o.en+" are shared equally among "+a+" children. How many does each child get?"),"",b,[a,t-a,b+1,b-1,t/a+2].filter(function(x){return x>0&&x!==b}),
+     L("חילוק: כמה בכל קבוצה כשמחלקים שווה?","القسمة: كم في كل مجموعة عند التوزيع بالتساوي؟","Деление: сколько в каждой группе при равном разделе?","Division: how many in each group when shared equally?"),L(t+" ÷ "+a+" = "+b+".",t+" ÷ "+a+" = "+b+".",t+" ÷ "+a+" = "+b+".",t+" ÷ "+a+" = "+b+"."),0)});
+  T.push(function(){var a=ri(2,R),b=ri(2,R),t=a*b;
+    return mk("missing",L(a+" × ? = "+t,a+" × ؟ = "+t,a+" × ? = "+t,a+" × ? = "+t),"",b,[b+1,b-1,t-a,a,b+2].filter(function(x){return x>0&&x!==b}),
+     L("חושבים: כמה פעמים "+a+" נכנס ב-"+t+"?","فكّر: كم مرة يدخل "+a+" في "+t+"؟","Подумай: сколько раз "+a+" помещается в "+t+"?","Think: how many times does "+a+" fit into "+t+"?"),L(t+" ÷ "+a+" = "+b+".",t+" ÷ "+a+" = "+b+".",t+" ÷ "+a+" = "+b+".",t+" ÷ "+a+" = "+b+"."),1)});
+  if(lv>=2)T.push(function(){var a=ri(2,6),b=ri(2,6),c=ri(1,9),t=a*b+c;
+    return mk("two",L("קונים "+a+" חבילות של "+b+" מדבקות, ועוד "+c+" מדבקות. כמה מדבקות יש?","نشتري "+a+" رزم في كل منها "+b+" ملصقات، ومعها "+c+" ملصقات. كم الملصقات؟","Купили "+a+" упаковки по "+b+" наклеек и ещё "+c+" наклеек. Сколько наклеек?","We buy "+a+" packs of "+b+" stickers and "+c+" more stickers. How many stickers?"),"",t,[a*b,a+b+c,t+b,t-1,t+1],
+     L("שני צעדים: קודם כפל, אחר כך חיבור.","خطوتان: الضرب أولًا ثم الجمع.","Два шага: сначала умножение, потом сложение.","Two steps: multiply first, then add."),L(a+" × "+b+" = "+a*b+", ועוד "+c+" = "+t+".",a+" × "+b+" = "+a*b+"، ثم + "+c+" = "+t+".",a+" × "+b+" = "+a*b+", затем + "+c+" = "+t+".",a+" × "+b+" = "+a*b+", then + "+c+" = "+t+"."),2)});
+  return pick(T)()};
+/* ===== BAND 2 part 2: decimals, coordinates and symmetry, money problems ===== */
+function tenthsBar(n){var s="",i;for(i=0;i<10;i++)s+='<rect x="'+(14+i*30)+'" y="10" width="30" height="40" fill="'+(i<n?"#ff9f43":"#fff")+'" stroke="#17333c" stroke-width="2"/>';
+  return '<div class="nl">'+svg(330,60,s,"")+'</div>'}
+function decLine(n){var s='<line x1="20" y1="40" x2="320" y2="40" stroke="#17333c" stroke-width="3"/>',i;
+  for(i=0;i<=10;i++){s+='<line x1="'+(20+i*30)+'" y1="32" x2="'+(20+i*30)+'" y2="48" stroke="#17333c" stroke-width="2"/>'}
+  s+='<text x="20" y="72" text-anchor="middle" font-size="16" font-weight="800">0</text><text x="320" y="72" text-anchor="middle" font-size="16" font-weight="800">1</text>';
+  s+='<circle cx="'+(20+n*30)+'" cy="40" r="9" fill="#e8453c" stroke="#17333c" stroke-width="2"/>';
+  return '<div class="nl">'+svg(340,84,s,"")+'</div>'}
+function coordVis(pts,n){var u=30,s="",i;n=n||6;
+  for(i=0;i<=n;i++){s+='<line x1="'+(30+i*u)+'" y1="10" x2="'+(30+i*u)+'" y2="'+(10+n*u)+'" stroke="#d6e4df"/><line x1="30" y1="'+(10+n*u-i*u)+'" x2="'+(30+n*u)+'" y2="'+(10+n*u-i*u)+'" stroke="#d6e4df"/>';
+   s+='<text x="'+(30+i*u)+'" y="'+(10+n*u+18)+'" text-anchor="middle" font-size="13" font-weight="800">'+i+'</text><text x="18" y="'+(10+n*u-i*u+5)+'" text-anchor="middle" font-size="13" font-weight="800">'+i+'</text>'}
+  s+='<line x1="30" y1="10" x2="30" y2="'+(10+n*u)+'" stroke="#17333c" stroke-width="3"/><line x1="30" y1="'+(10+n*u)+'" x2="'+(30+n*u)+'" y2="'+(10+n*u)+'" stroke="#17333c" stroke-width="3"/>';
+  pts.forEach(function(p){s+='<circle cx="'+(30+p[0]*u)+'" cy="'+(10+n*u-p[1]*u)+'" r="8" fill="'+(p[3]||"#e8453c")+'" stroke="#17333c" stroke-width="2"/><text x="'+(30+p[0]*u)+'" y="'+(10+n*u-p[1]*u+4)+'" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">'+(p[2]||"")+'</text>'});
+  return '<div class="nl">'+svg(60+n*u,40+n*u,s,"")+'</div>'}
+function symVis(shape,cut){var s='',w=60;
+  if(cut==="v")s='<polygon points="'+shape+'" fill="#ffe3de" stroke="#17333c" stroke-width="3"/>';
+  s+='<line x1="'+(cut==="v"?w:cut==="h"?10:w)+'" y1="'+(cut==="h"?60:6)+'" x2="'+(cut==="v"?w:cut==="h"?110:w)+'" y2="'+(cut==="h"?60:114)+'" stroke="#e8453c" stroke-width="3" stroke-dasharray="7 5"/>';
+  return svg(120,120,s,"")}
+function fmtD(n){return n.toFixed(1)}
+function dsay(n,l){return fmtD(n)}
+G.dec=function(lv){var T=[];
+  T.push(function(){var n=ri(1,9),d=n/10;
+    return mk("tenth",L("כמה חלקים צבועים? כתבו כמספר עשרוני.","كم جزءًا ملوّنًا؟ اكتب كعدد عشري.","Сколько закрашено? Запиши десятичной дробью.","How much is colored? Write it as a decimal."),tenthsBar(n),fmtD(d),[fmtD(n),fmtD(n+1<10?(n+1)/10:(n-1)/10),n+"/"+10===""?"":fmtD(n*10/100*10>9?0.9:Math.min(9,n+2)/10),"1."+n],
+     L("הצורה מחולקת לעשרה חלקים. כל חלק הוא עשירית: 0.1.","الشكل مقسوم إلى عشرة أجزاء. كل جزء عُشر: 0.1.","Фигура разделена на десять частей. Каждая часть — одна десятая: 0.1.","The shape has ten parts. Each part is one tenth: 0.1."),
+     L(n+" עשיריות הן "+fmtD(d)+".",n+" أعشار تساوي "+fmtD(d)+".",n+" десятых — это "+fmtD(d)+".",n+" tenths is "+fmtD(d)+"."),0)});
+  T.push(function(){var n=ri(1,9);
+    return mk("dline",L("איזה מספר מסומן באדום על ציר המספרים?","أي عدد مُعلَّم بالأحمر على خط الأعداد؟","Какое число отмечено красным на числовой прямой?","Which number is marked in red on the number line?"),decLine(n/10),fmtD(n/10),[fmtD((n+1>9?n-2:n+1)/10),fmtD((n<2?n+2:n-1)/10),fmtD((n>7?n-3:n+3)/10),String(n)],
+     L("בין 0 ל-1 יש עשרה צעדים. סופרים את הצעדים מ-0.","بين 0 و1 عشر خطوات. عُدّ الخطوات من 0.","Между 0 и 1 десять шагов. Считай шаги от 0.","There are ten steps between 0 and 1. Count the steps from 0."),
+     L("אחרי "+n+" צעדים: "+fmtD(n/10)+".","بعد "+n+" خطوات: "+fmtD(n/10)+".","После "+n+" шагов: "+fmtD(n/10)+".","After "+n+" steps: "+fmtD(n/10)+"."),0)});
+  T.push(function(){var s=[],a=ri(0,lv===1?9:39),b,c,e;do{b=ri(0,lv===1?9:39)}while(b===a);do{c=ri(0,lv===1?9:39)}while(c===a||c===b);do{e=ri(0,lv===1?9:39)}while(e===a||e===b||e===c);
+    var v=[a,b,c,e],big=Math.random()<.5,ans=big?Math.max.apply(null,v):Math.min.apply(null,v);
+    return mk("dcmp",big?L("איזה מספר הגדול ביותר?","ما أكبر عدد؟","Какое число самое большое?","Which number is the biggest?"):L("איזה מספר הקטן ביותר?","ما أصغر عدد؟","Какое число самое маленькое?","Which number is the smallest?"),"",fmtD(ans/10),v.map(function(x){return fmtD(x/10)}),
+     L("משווים קודם את השלמים, ואחר כך את העשיריות.","قارن الأعداد الصحيحة أولًا ثم الأعشار.","Сначала сравни целые, потом десятые.","Compare the whole numbers first, then the tenths."),
+     L(fmtD(ans/10)+(big?" הכי גדול.":" הכי קטן."),fmtD(ans/10)+(big?" الأكبر.":" الأصغر."),fmtD(ans/10)+(big?" — самое большое.":" — самое маленькое."),fmtD(ans/10)+(big?" is the biggest.":" is the smallest.")),1)});
+  T.push(function(){var a=ri(1,lv===1?9:49),b=ri(1,lv===1?9:49);if(lv>1&&Math.random()<.5){var s=a+b;return G.dec(lv)}
+    var plus=Math.random()<.6,x=plus?a:Math.max(a,b)+0,y=plus?b:Math.min(a,b);if(!plus&&x===y)x++;var r=plus?x+y:x-y;
+    var sym=plus?"+":"−";
+    return mk("dadd",L("כמה זה "+fmtD(x/10)+" "+sym+" "+fmtD(y/10)+"?","كم يساوي "+fmtD(x/10)+" "+(plus?"+":"−")+" "+fmtD(y/10)+"؟","Сколько будет "+fmtD(x/10)+" "+sym+" "+fmtD(y/10)+"?","What is "+fmtD(x/10)+" "+sym+" "+fmtD(y/10)+"?"),"",fmtD(r/10),[fmtD((r+1)/10),fmtD(Math.max(0,r-1)/10),fmtD((r+10)/10),fmtD(Math.abs(x-y+(plus?0:2))/10)],
+     L("מחברים או מחסרים עשיריות כמו מספרים שלמים, ומחזירים את הנקודה.","اجمع أو اطرح الأعشار كأعداد صحيحة ثم ضع الفاصلة.","Складывай или вычитай десятые как целые числа, потом поставь запятую.","Add or subtract the tenths like whole numbers, then place the point."),
+     L(x+" "+sym+" "+y+" = "+r+" עשיריות = "+fmtD(r/10)+".",x+" "+sym+" "+y+" = "+r+" أعشار = "+fmtD(r/10)+".",x+" "+sym+" "+y+" = "+r+" десятых = "+fmtD(r/10)+".",x+" "+sym+" "+y+" = "+r+" tenths = "+fmtD(r/10)+"."),2)});
+  return pick(T)()};
+G.coord=function(lv){var T=[];
+  T.push(function(){var x=ri(1,6),y=ri(1,6);
+    return mk("cread",L("מהן הקואורדינטות של הנקודה האדומה? (קודם ימינה, אחר כך למעלה)","ما إحداثيات النقطة الحمراء؟ (أولًا يمينًا ثم للأعلى)","Каковы координаты красной точки? (сначала вправо, потом вверх)","What are the coordinates of the red point? (first right, then up)"),coordVis([[x,y]]),"("+x+", "+y+")",["("+y+", "+x+")","("+(x%6+1)+", "+y+")","("+x+", "+(y%6+1)+")","("+(x>1?x-1:x+1)+", "+(y>1?y-1:y+1)+")"],
+     L("הולכים לאורך הציר האופקי עד המספר, ואז עולים.","امشِ على المحور الأفقي حتى العدد ثم اصعد.","Иди по горизонтальной оси до числа, потом вверх.","Go along the horizontal axis to the number, then up."),
+     L("ימינה "+x+", למעלה "+y+": ("+x+", "+y+").","يمينًا "+x+" وللأعلى "+y+": ("+x+", "+y+").","Вправо "+x+", вверх "+y+": ("+x+", "+y+").","Right "+x+", up "+y+": ("+x+", "+y+")."),0)});
+  T.push(function(){var x=ri(1,6),y=ri(1,6),pts=[[x,y,"A"]],bx,by;do{bx=ri(1,6);by=ri(1,6)}while(bx===x&&by===y);pts.push([bx,by,"B","#2f7fd8"]);
+    var which=Math.random()<.5?0:1,p=pts[which],nm=which?"B":"A";
+    return mk("cname",L("מהן הקואורדינטות של הנקודה "+nm+"?","ما إحداثيات النقطة "+nm+"؟","Каковы координаты точки "+nm+"?","What are the coordinates of point "+nm+"?"),coordVis(pts),"("+p[0]+", "+p[1]+")",["("+p[1]+", "+p[0]+")","("+(p[0]%6+1)+", "+p[1]+")","("+p[0]+", "+(p[1]%6+1)+")","("+pts[1-which][0]+", "+pts[1-which][1]+")"],
+     L("המספר הראשון הוא ימינה והשני הוא למעלה.","العدد الأول يمينًا والثاني للأعلى.","Первое число — вправо, второе — вверх.","The first number is right, the second is up."),
+     L("נקודה "+nm+" נמצאת ב-("+p[0]+", "+p[1]+").","النقطة "+nm+" عند ("+p[0]+", "+p[1]+").","Точка "+nm+" находится в ("+p[0]+", "+p[1]+").","Point "+nm+" is at ("+p[0]+", "+p[1]+")."),1)});
+  T.push(function(){var k=pick(["circle","square","heart","triangle","rect","star"]);
+    var D={square:4,rect:2,circle:99,triangle:3,heart:1,star:5},ans=D[k];
+    var N={square:L("ריבוע","مربع","квадрат","a square"),rect:L("מלבן","مستطيل","прямоугольник","a rectangle"),circle:L("עיגול","دائرة","круг","a circle"),triangle:L("משולש שווה צלעות","مثلث متساوي الأضلاع","равносторонний треугольник","an equilateral triangle")};
+    k=pick(["square","rect","triangle"]);var cnt={square:4,rect:2,triangle:3}[k];
+    return mk("symn",L("כמה קווי סימטריה יש ל"+N[k].he+"?","كم محور تماثل لـ"+N[k].ar+"؟","Сколько осей симметрии у фигуры: "+N[k].ru+"?","How many lines of symmetry does "+N[k].en+" have?"),"",cnt,[cnt+1,cnt+2,cnt-1<1?cnt+3:cnt-1,0].filter(function(z){return z!==cnt}),
+     L("קו סימטריה מחלק את הצורה לשני חלקים שמתלכדים כשמקפלים.","محور التماثل يقسم الشكل إلى جزأين ينطبقان عند الطي.","Ось симметрии делит фигуру на две части, которые совпадают при сгибании.","A line of symmetry splits a shape in two parts that match when folded."),
+     L("ל"+N[k].he+" יש "+cnt+" קווי סימטריה.","لـ"+N[k].ar+" "+cnt+" محاور تماثل.",N[k].ru+": осей симметрии — "+cnt+".",N[k].en.charAt(0).toUpperCase()+N[k].en.slice(1)+" has "+cnt+" lines of symmetry."),2)});
+  T.push(function(){var x=ri(1,3),y=ri(1,5),m=7-x;
+    return mk("mirror",L("הנקודה האדומה ב-("+x+", "+y+"). מקפלים לאורך הקו האנכי ב-3.5. איפה הנקודה השנייה?","النقطة الحمراء عند ("+x+", "+y+"). نطوي على الخط العمودي عند 3.5. أين النقطة الأخرى؟","Красная точка в ("+x+", "+y+"). Сгибаем по вертикальной линии на 3,5. Где вторая точка?","The red point is at ("+x+", "+y+"). Fold along the vertical line at 3.5. Where is the matching point?"),coordVis([[x,y]]).replace('</svg>','<line x1="'+(30+3.5*30)+'" y1="10" x2="'+(30+3.5*30)+'" y2="190" stroke="#e8453c" stroke-width="3" stroke-dasharray="7 5"/></svg>'),"("+m+", "+y+")",["("+(m-1>0?m-1:m+1)+", "+y+")","("+x+", "+(y%6+1)+")","("+y+", "+m+")","("+(x+1)+", "+y+")"],
+     L("הנקודה ממול נמצאת באותו גובה ובאותו מרחק מהקו.","النقطة المقابلة على الارتفاع نفسه وبالبعد نفسه عن الخط.","Парная точка на той же высоте и на таком же расстоянии от линии.","The matching point is at the same height and the same distance from the line."),
+     L("הגובה נשאר "+y+", ו-"+x+" ו-"+m+" במרחק שווה מ-3.5.","الارتفاع يبقى "+y+" و"+x+" و"+m+" على بعد متساوٍ من 3.5.","Высота остаётся "+y+", а "+x+" и "+m+" на одинаковом расстоянии от 3,5.","The height stays "+y+", and "+x+" and "+m+" are the same distance from 3.5."),3)});
+  return pick(T)()};
+G.mon2=function(lv){var T=[],IT=[L("מחברת","دفتر","тетрадь","a notebook"),L("עיפרון","قلم رصاص","карандаш","a pencil"),L("מחק","ممحاة","ластик","an eraser"),L("סרגל","مسطرة","линейка","a ruler")];
+  T.push(function(){var a=ri(2,9),b=ri(2,9),n=ri(2,4),pay=Math.ceil((a*n+b)/10)*10;if(pay===a*n+b)pay+=10;var t=a*n+b,ch=pay-t;
+    return mk("buy2",L("מחברת עולה "+a+" שקלים. קונים "+n+" מחברות ועוד מחק ב-"+b+" שקלים. כמה כסף עולה הכול?","الدفتر بـ"+a+" شيكل. نشتري "+n+" دفاتر وممحاة بـ"+b+" شيكل. كم المجموع؟","Тетрадь стоит "+a+" ₪. Покупаем "+n+" тетради и ластик за "+b+" ₪. Сколько всего?","A notebook costs "+a+" shekels. You buy "+n+" notebooks and an eraser for "+b+" shekels. How much is it all?"),"",t,[t+a,a*n,t-1,t+b,a+b+n].filter(function(z){return z>0}),
+     L("קודם כופלים: מחירי המחברות. אחר כך מוסיפים את המחק.","اضرب أولًا لسعر الدفاتر ثم أضف الممحاة.","Сначала умножь: цена тетрадей. Потом прибавь ластик.","First multiply for the notebooks, then add the eraser."),
+     L(n+" × "+a+" = "+(a*n)+", ועוד "+b+" = "+t+".",n+" × "+a+" = "+(a*n)+" وأضف "+b+" = "+t+".",n+" × "+a+" = "+(a*n)+", плюс "+b+" = "+t+".",n+" × "+a+" = "+(a*n)+", plus "+b+" = "+t+"."),0)});
+  T.push(function(){var a=ri(3,9),n=ri(2,4),t=a*n,pay=Math.ceil((t+1)/10)*10,ch=pay-t;
+    return mk("change2",L("עיפרון עולה "+a+" שקלים. קונים "+n+" עפרונות ומשלמים "+pay+" שקלים. כמה עודף מקבלים?","القلم بـ"+a+" شيكل. نشتري "+n+" أقلام وندفع "+pay+" شيكل. كم الباقي؟","Карандаш стоит "+a+" ₪. Покупаем "+n+" и платим "+pay+" ₪. Сколько сдачи?","A pencil costs "+a+" shekels. You buy "+n+" pencils and pay "+pay+" shekels. How much change do you get?"),"",ch,[ch+a,pay-a,t,ch+1,ch-1].filter(function(z){return z>0&&z!==ch}),
+     L("קודם מחשבים כמה עולים כל העפרונות. אחר כך מחסרים מהתשלום.","احسب أولًا ثمن كل الأقلام ثم اطرح من المبلغ المدفوع.","Сначала посчитай стоимость всех карандашей. Потом вычти из суммы.","First find the cost of all the pencils, then subtract from the payment."),
+     L(n+" × "+a+" = "+t+", ו-"+pay+" − "+t+" = "+ch+".",n+" × "+a+" = "+t+" و"+pay+" − "+t+" = "+ch+".",n+" × "+a+" = "+t+", "+pay+" − "+t+" = "+ch+".",n+" × "+a+" = "+t+", and "+pay+" − "+t+" = "+ch+"."),1)});
+  T.push(function(){var a=ri(2,8),b=ri(2,8),c=ri(10,40),n=a+b;
+    return mk("save2",L("דנה חסכה "+c+" שקלים. אחר כך קיבלה "+a+" ועוד "+b+" שקלים. כמה כסף יש לה עכשיו?","ادّخرت دانة "+c+" شيكل. ثم أخذت "+a+" و"+b+" شيكل. كم معها الآن؟","У Даны было "+c+" ₪. Потом она получила "+a+" и ещё "+b+" ₪. Сколько у неё теперь?","Dana saved "+c+" shekels. Then she got "+a+" and "+b+" more shekels. How much does she have now?"),"",c+n,[c+n+1,c+n-1,c+a,n,c+n+10].filter(function(z){return z>0}),
+     L("מחברים את כל הסכומים.","اجمع كل المبالغ.","Сложи все суммы.","Add all the amounts."),L(c+" + "+a+" + "+b+" = "+(c+n)+".",c+" + "+a+" + "+b+" = "+(c+n)+".",c+" + "+a+" + "+b+" = "+(c+n)+".",c+" + "+a+" + "+b+" = "+(c+n)+"."),2)});
+  return pick(T)()};
+/* ===== units + lessons ===== */
+var UNITS=[
+ {id:"nums",c:"#e8453c",n:L("מספרים עד 100","الأعداد حتى 100","Числа до 100","Numbers to 100"),d:L("ספירה, עשרות ואחדות, השוואה וציר המספרים","العدّ والعشرات والآحاد والمقارنة وخط الأعداد","Счёт, десятки и единицы, сравнение, числовой луч","Counting, tens and ones, comparing, the number line")},
+ {id:"shapes",c:"#f58a1f",n:L("צורות וגופים","الأشكال والمجسّمات","Фигуры и тела","Shapes and solids"),d:L("צלעות, פינות, כדור, קובייה, גליל וחרוט","أضلاع وزوايا وكرة ومكعب وأسطوانة ومخروط","Стороны, углы, шар, куб, цилиндр, конус","Sides, corners, sphere, cube, cylinder, cone")},
+ {id:"length",c:"#2f7fd8",n:L("מדידת אורך","قياس الطول","Измерение длины","Measuring length"),d:L("סרגל, סנטימטר ומטר, השוואת אורכים","المسطرة والسنتيمتر والمتر ومقارنة الأطوال","Линейка, сантиметр и метр, сравнение длин","Ruler, centimeters and meters, comparing lengths")},
+ {id:"time",c:"#8a63d2",n:L("שעון וזמן","الساعة والوقت","Часы и время","Clock and time"),d:L("שעות שלמות, חצי שעה, ימי השבוע","الساعات والنصف وأيام الأسبوع","Часы, половина часа, дни недели","Hours, half hours, days of the week")},
+ {id:"money",c:"#1f9d4d",n:L("כסף","النقود","Деньги","Money"),d:L("מטבעות ושטרות, סכום ועודף","القطع والأوراق النقدية والمجموع والباقي","Монеты и купюры, сумма и сдача","Coins and notes, totals and change")},
+ {id:"pattern",c:"#0e9c8d",n:L("חוקיות","الأنماط","Закономерности","Patterns"),d:L("סדרות של צבעים, צורות ומספרים","متتاليات من الألوان والأشكال والأعداد","Узоры из цветов, фигур и чисел","Patterns of colors, shapes and numbers")},
+ {id:"frac",c:"#d94f70",n:L("חצי ורבע","النصف والربع","Половина и четверть","Halves and quarters"),d:L("חלקים שווים, חצי ורבע של כמות","أجزاء متساوية، نصف وربع كمية","Равные части, половина и четверть","Equal parts, half and quarter")},
+ {id:"data",c:"#c99200",n:L("נתונים ותרשימים","البيانات والرسوم","Данные и диаграммы","Data and charts"),d:L("תרשים תמונות וסימוני ספירה","رسم بالصور وعلامات العدّ","Картинные диаграммы и палочки","Picture charts and tally marks")},
+ {id:"words",c:"#246c8c",n:L("בעיות מילוליות","مسائل كلامية","Текстовые задачи","Word problems"),d:L("סיפורים עם חיבור וחיסור","قصص فيها جمع وطرح","Истории со сложением и вычитанием","Stories with adding and subtracting")}];
+var LESSONS={
+ nums:[{t:L("כל מספר עד 100 בנוי מעשרות ומאחדות. המספר 34 הוא 3 עשרות ו-4 אחדות.","كل عدد حتى 100 يتكوّن من عشرات وآحاد. العدد 34 هو 3 عشرات و4 آحاد.","Каждое число до 100 состоит из десятков и единиц. Число 34 — это 3 десятка и 4 единицы.","Every number up to 100 is made of tens and ones. The number 34 is 3 tens and 4 ones."),v:function(){return rodsVis(3,4)}},
+  {t:L("כדי להשוות, מסתכלים קודם על העשרות. 52 גדול מ-47, כי 5 עשרות יותר מ-4 עשרות.","للمقارنة ننظر إلى العشرات أولًا. 52 أكبر من 47 لأن 5 عشرات أكثر من 4 عشرات.","Чтобы сравнить, смотрим сначала на десятки. 52 больше 47, потому что 5 десятков больше, чем 4.","To compare, look at the tens first. 52 is bigger than 47 because 5 tens is more than 4 tens."),v:function(){return numLine(0,100,10,50,false)}},
+  {t:L("מספר זוגי אפשר לחלק לשתי קבוצות שוות. 8 הוא זוגי. 7 הוא אי־זוגי.","العدد الزوجي نقسمه إلى مجموعتين متساويتين. 8 زوجي. 7 فردي.","Чётное число делится на две равные группы. 8 — чётное. 7 — нечётное.","An even number splits into two equal groups. 8 is even. 7 is odd."),v:function(){return dotsVis(8)}},
+  {t:L("על ציר המספרים כל קו הוא קפיצה. אם הקפיצות הן 10, סופרים: 10, 20, 30.","على خط الأعداد كل خط قفزة. إذا كانت القفزات 10 نعدّ: 10، 20، 30.","На числовом луче каждое деление — шаг. Если шаг 10, считаем: 10, 20, 30.","On the number line each mark is a jump. If the jumps are 10, count: 10, 20, 30."),v:function(){return numLine(0,100,10,30,false)}}],
+ shapes:[{t:L("לצורה שטוחה יש צלעות ופינות. למשולש 3 צלעות ו-3 פינות. לריבוע 4 ו-4.","للشكل المسطّح أضلاع وزوايا. للمثلث 3 أضلاع و3 زوايا. وللمربع 4 و4.","У плоской фигуры есть стороны и углы. У треугольника 3 стороны и 3 угла. У квадрата 4 и 4.","A flat shape has sides and corners. A triangle has 3 sides and 3 corners. A square has 4 and 4."),v:function(){return flatShape("triangle")+flatShape("square",COL.blue)}},
+  {t:L("לעיגול אין צלעות ואין פינות. הוא עגול לגמרי.","الدائرة بلا أضلاع وبلا زوايا. هي مستديرة تمامًا.","У круга нет ни сторон, ни углов. Он совсем круглый.","A circle has no sides and no corners. It is completely round."),v:function(){return flatShape("circle",COL.green)}},
+  {t:L("גוף אפשר להחזיק ביד: כדור, קובייה, גליל וחרוט.","المجسّم نمسكه بيدنا: كرة ومكعب وأسطوانة ومخروط.","Тело можно держать в руке: шар, куб, цилиндр, конус.","You can hold a solid: sphere, cube, cylinder, cone."),v:function(){return solidShape("sphere")+solidShape("cube")+solidShape("cylinder")+solidShape("cone")}}],
+ length:[{t:L("מודדים אורך עם סרגל. מניחים את הסימן 0 בתחילת החפץ וקוראים איפה הוא נגמר.","نقيس الطول بالمسطرة. نضع العلامة 0 عند بداية الشيء ونقرأ أين ينتهي.","Длину измеряют линейкой. Ставим 0 в начало предмета и смотрим, где он заканчивается.","We measure length with a ruler. Put 0 at the start of the object and read where it ends."),v:function(){return barRuler(0,7,12)}},
+  {t:L("אורך קטן נמדד בסנטימטרים. אורך גדול יותר נמדד במטרים. 1 מטר הוא 100 סנטימטרים.","الأطوال الصغيرة بالسنتيمتر والأكبر بالمتر. المتر الواحد 100 سنتيمتر.","Небольшую длину измеряют в сантиметрах, большую — в метрах. В 1 метре 100 сантиметров.","Small lengths are in centimeters. Bigger lengths are in meters. 1 meter is 100 centimeters."),v:function(){return barRuler(0,10,12,COL.green)}},
+  {t:L("כשהחפץ לא מתחיל ב-0, מחסרים: איפה נגמר פחות איפה התחיל.","عندما لا يبدأ الشيء من 0 نطرح: نهايته ناقص بدايته.","Если предмет начинается не с 0, вычитаем: конец минус начало.","If the object does not start at 0, subtract: end minus start."),v:function(){return barRuler(3,8,12,COL.orange)}},
+  {t:L("כדי לדעת בכמה אחד ארוך מהשני, מסתכלים כמה נשאר אחרי שהקצר נגמר.","لنعرف بكم يزيد أحدهما على الآخر ننظر كم بقي بعد نهاية الأقصر.","Чтобы узнать, на сколько один длиннее, смотрим, сколько остаётся после конца короткого.","To see how much longer one is, look at what is left after the short one ends."),v:function(){return twoBars(9,5)}}],
+ time:[{t:L("בשעון יש שני מחוגים. המחוג הקצר מראה שעות. המחוג הארוך מראה דקות.","للساعة عقربان. القصير للساعات والطويل للدقائق.","У часов две стрелки. Короткая показывает часы, длинная — минуты.","A clock has two hands. The short hand shows hours. The long hand shows minutes."),v:function(){return clockVis(3,0)}},
+  {t:L("כשהמחוג הארוך על 12, זו שעה עגולה. כשהוא על 6, עברה חצי שעה: 30 דקות.","عندما يكون العقرب الطويل على 12 فالساعة تامة. وعلى 6 مرّت نصف ساعة: 30 دقيقة.","Длинная стрелка на 12 — ровно час. На 6 — половина часа: 30 минут.","Long hand on 12 means o'clock. On 6 means half past: 30 minutes."),v:function(){return clockVis(7,30)}},
+  {t:L("שבעה ימים בשבוע: ראשון, שני, שלישי, רביעי, חמישי, שישי, שבת.","سبعة أيام في الأسبوع: الأحد، الاثنين، الثلاثاء، الأربعاء، الخميس، الجمعة، السبت.","В неделе семь дней: воскресенье, понедельник, вторник, среда, четверг, пятница, суббота.","Seven days in a week: Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday."),v:function(){return ""}},
+  {t:L("רבע שעה הם 15 דקות. המחוג הארוך על 3 הוא רבע אחרי. על 9 הוא רבע לפני.","ربع الساعة 15 دقيقة. العقرب الطويل عند 3 يعني والربع. وعند 9 يعني إلا ربعًا.","Четверть часа — 15 минут. Длинная стрелка на 3 — четверть после. На 9 — без четверти.","A quarter hour is 15 minutes. Long hand on 3 is quarter past. On 9 it is quarter to."),v:function(){return clockVis(4,15)}}],
+ money:[{t:L("בישראל משלמים בשקלים. יש מטבעות של 1, 2, 5 ו-10 שקלים, ושטרות של 20, 50 ו-100.","في إسرائيل ندفع بالشيكل. هناك قطع من 1 و2 و5 و10 شيكل وأوراق من 20 و50 و100.","В Израиле платят шекелями. Есть монеты 1, 2, 5 и 10 шекелей и купюры 20, 50 и 100.","In Israel we pay in shekels. There are coins of 1, 2, 5 and 10, and notes of 20, 50 and 100."),v:function(){return moneyVis([10,5,2,1,20])}},
+  {t:L("כדי לספור כסף, מתחילים מהערך הגדול ומוסיפים עוד ועוד. 10, 15, 17, 18.","لنعدّ النقود نبدأ بالأكبر ونضيف. 10، 15، 17، 18.","Чтобы посчитать деньги, начни с большего и прибавляй. 10, 15, 17, 18.","To count money, start with the biggest and keep adding. 10, 15, 17, 18."),v:function(){return moneyVis([10,5,2,1])}},
+  {t:L("עודף הוא מה ששילמנו פחות המחיר. שילמת 10 על מחיר 6? העודף הוא 4.","الباقي هو ما دفعناه ناقص الثمن. دفعت 10 والثمن 6؟ الباقي 4.","Сдача — это то, что заплатили, минус цена. Заплатил 10, цена 6? Сдача 4.","Change is what you pay minus the price. Paid 10 for a price of 6? The change is 4."),v:function(){return moneyVis([10])}}],
+ pattern:[{t:L("חוקיות היא משהו שחוזר על עצמו. אדום, כחול, אדום, כחול... ואחריו בא אדום.","النمط شيء يتكرر. أحمر، أزرق، أحمر، أزرق... وبعده يأتي الأحمر.","Закономерность — это то, что повторяется. Красный, синий, красный, синий... дальше красный.","A pattern is something that repeats. Red, blue, red, blue... and then comes red."),v:function(){return seqVis([{k:"circle",c:COL.red},{k:"circle",c:COL.blue},{k:"circle",c:COL.red},{k:"circle",c:COL.blue},null])}},
+  {t:L("גם מספרים יכולים להיות חוקיות. 2, 4, 6, 8: עולים ב-2 כל פעם.","حتى الأعداد قد تكوّن نمطًا. 2، 4، 6، 8: يزيد 2 كل مرة.","Числа тоже бывают закономерностью. 2, 4, 6, 8: каждый раз плюс 2.","Numbers can make a pattern too. 2, 4, 6, 8: it goes up by 2 each time."),v:function(){return numLine(0,10,1,8,false)}},
+  {t:L("כדי למצוא את החוק, בודקים בכמה כל מספר שונה מהקודם.","لنجد القاعدة نفحص بكم يختلف كل عدد عن السابق.","Чтобы найти правило, проверь, на сколько каждое число отличается от предыдущего.","To find the rule, check how much each number differs from the one before."),v:function(){return ""}}],
+ frac:[{t:L("חצי הוא אחד משני חלקים שווים. רבע הוא אחד מארבעה חלקים שווים.","النصف جزء من جزأين متساويين. الربع جزء من أربعة أجزاء متساوية.","Половина — одна из двух равных частей. Четверть — одна из четырёх равных частей.","A half is one of two equal parts. A quarter is one of four equal parts."),v:function(){return fracVis("circle",2,1)+fracVis("circle",4,1)}},
+  {t:L("חצי מכמות: מחלקים לשתי קבוצות שוות. חצי מ-8 הוא 4.","نصف كمية: نقسم إلى مجموعتين متساويتين. نصف 8 هو 4.","Половина количества: раздели на две равные группы. Половина от 8 — это 4.","Half of an amount: split into two equal groups. Half of 8 is 4."),v:function(){return dotsVis(8)}},
+  {t:L("שני חצאים הם שלם אחד. ארבעה רבעים הם שלם אחד.","نصفان يساويان واحدًا صحيحًا. أربعة أرباع تساوي واحدًا صحيحًا.","Две половины — это целое. Четыре четверти — это целое.","Two halves make one whole. Four quarters make one whole."),v:function(){return fracVis("rect",2,2)+fracVis("rect",4,4)}},
+  {t:L("רבע מכמות: מחלקים לארבע קבוצות שוות. רבע מ-12 הוא 3.","ربع كمية: نقسم إلى أربع مجموعات متساوية. ربع 12 هو 3.","Четверть количества: раздели на четыре равные группы. Четверть от 12 — это 3.","A quarter of an amount: split into four equal groups. A quarter of 12 is 3."),v:function(){return dotsVis(12)}}],
+ data:[{t:L("תרשים תמונות מראה כמויות בעזרת סימנים. כל כוכב הוא פריט אחד, ואפשר לספור אותם.","الرسم بالصور يعرض الكميات برموز. كل نجمة قطعة واحدة ويمكن عدّها.","Картинная диаграмма показывает количества значками. Одна звёздочка — один предмет, их можно считать.","A picture chart shows amounts with symbols. Each star is one item and you can count them."),v:function(){return pictoVis([FRU[0].he,FRU[1].he,FRU[2].he],[3,5,2])}},
+  {t:L("השורה הארוכה ביותר היא הכמות הגדולה ביותר.","أطول صف هو أكبر كمية.","Самый длинный ряд — самое большое количество.","The longest row is the biggest amount."),v:function(){return ""}},
+  {t:L("כדי לדעת בכמה יש יותר, מחסרים. כדי לדעת כמה בסך הכול, מחברים.","لنعرف بكم أكثر نطرح. ولنعرف المجموع نجمع.","Чтобы узнать, на сколько больше, вычитаем. Чтобы узнать, сколько всего, складываем.","To find how many more, subtract. To find the total, add."),v:function(){return ""}},
+  {t:L("סימני ספירה: ארבעה קווים וקו אלכסוני על ארבעתם הם חבילה של 5.","علامات العدّ: أربعة خطوط وخط مائل عليها تساوي حزمة من 5.","Палочки: четыре чёрточки и одна косая поперёк — это пучок из 5.","Tally marks: four lines with a slanted line across make a bundle of 5."),v:function(){return tallyVis(8)}}],
+ words:[{t:L("קוראים את הסיפור לאט. שואלים: מה יש? מה קורה? מה שואלים?","نقرأ القصة ببطء. نسأل: ماذا عندنا؟ ماذا يحدث؟ ماذا المطلوب؟","Читаем историю медленно. Спрашиваем: что есть? что происходит? что спрашивают?","Read the story slowly. Ask: what do we have? what happens? what is asked?"),v:function(){return ""}},
+  {t:L("אם מקבלים עוד, מחברים. אם נותנים או נשאר פחות, מחסרים.","إذا حصلنا على المزيد نجمع. وإذا أعطينا أو بقي أقل نطرح.","Если прибавилось — складываем. Если отдали или стало меньше — вычитаем.","If we get more, we add. If we give away or have less, we subtract."),v:function(){return ""}},
+  {t:L("כשיש שני צעדים, פותרים אחד־אחד. קודם הצעד הראשון, אחר כך השני.","عندما تكون الخطوات اثنتين نحلّ واحدة بعد الأخرى. الأولى ثم الثانية.","Если шагов два, решаем по очереди: сначала первый, потом второй.","With two steps, solve one at a time. First step first, then the second."),v:function(){return ""}}]
+};
+
+UNITS.forEach(function(u){u.band=1});
+var B2=[
+ {id:"big",c:"#e8453c",n:L("מספרים עד 10,000","الأعداد حتى 10,000","Числа до 10 000","Numbers to 10,000"),d:L("ערך הספרה, השוואה, עיגול והרחבה","قيمة الرقم والمقارنة والتقريب","Разряды, сравнение, округление","Place value, comparing, rounding")},
+ {id:"mult",c:"#1f9d4d",n:L("כפל וחילוק בסיפורים","الضرب والقسمة في القصص","Умножение и деление в задачах","Multiplication and division stories"),d:L("קבוצות שוות, חלוקה ושני צעדים","مجموعات متساوية وتوزيع وخطوتان","Равные группы, раздел, два шага","Equal groups, sharing, two steps")},
+ {id:"frac2",c:"#d94f70",n:L("שברים","الكسور","Дроби","Fractions"),d:L("השוואה, שברים שווים, שבר של כמות","المقارنة والكسور المتكافئة وكسر من كمية","Сравнение, равные дроби, дробь от числа","Comparing, equal fractions, fraction of an amount")},
+ {id:"area",c:"#f58a1f",n:L("היקף ושטח","المحيط والمساحة","Периметр и площадь","Perimeter and area"),d:L("ריבועי יחידה, היקף ושטח של מלבן","مربعات الوحدة ومحيط ومساحة المستطيل","Единичные квадраты, периметр и площадь","Unit squares, perimeter and area of a rectangle")},
+ {id:"angles",c:"#8a63d2",n:L("זוויות","الزوايا","Углы","Angles"),d:L("ישרה, חדה וקהה","قائمة وحادة ومنفرجة","Прямой, острый и тупой","Right, acute and obtuse")},
+ {id:"units2",c:"#2f7fd8",n:L("מדידות וזמן","القياسات والوقت","Измерения и время","Measures and time"),d:L("מטר וסנטימטר, ק״ג וגרם, ליטר, משך זמן","متر وسنتيمتر وكغ وغرام ولتر ومدة زمنية","Метры, граммы, литры, длительность","Meters, grams, liters, time spans")},
+ {id:"bars",c:"#c99200",n:L("תרשים עמודות","الأعمدة البيانية","Столбчатые диаграммы","Bar charts"),d:L("קריאת תרשים, השוואה וסכום","قراءة الرسم والمقارنة والمجموع","Чтение диаграммы, сравнение, сумма","Reading a chart, comparing, adding")},
+ {id:"dec",c:"#d94f70",n:L("מספרים עשרוניים","الأعداد العشرية","Десятичные дроби","Decimals"),d:L("עשיריות, ציר מספרים, חיבור וחיסור","الأعشار وخط الأعداد والجمع والطرح","Десятые, числовая прямая, сложение и вычитание","Tenths, number line, adding and subtracting")},
+ {id:"coord",c:"#0e9c8d",n:L("מערכת צירים וסימטריה","الإحداثيات والتماثل","Координаты и симметрия","Coordinates and symmetry"),d:L("נקודות על רשת וקווי סימטריה","نقاط على الشبكة ومحاور التماثل","Точки на сетке и оси симметрии","Points on a grid and lines of symmetry")},
+ {id:"mon2",c:"#c99200",n:L("בעיות כסף בשני צעדים","مسائل نقود بخطوتين","Задачи про деньги в два шага","Two-step money problems"),d:L("כפל, חיבור ועודף","ضرب وجمع وباقي","Умножение, сложение и сдача","Multiplying, adding and change")}];
+B2.forEach(function(u){u.band=2;UNITS.push(u)});
+LESSONS.big=[{t:L("בכל מספר יש מקומות: אחדות, עשרות, מאות ואלפים. במספר 4,236 יש 4 אלפים, 2 מאות, 3 עשרות ו-6 אחדות.","في كل عدد منازل: آحاد وعشرات ومئات وآلاف. في 4,236: 4 آلاف و2 مئات و3 عشرات و6 آحاد.","В числе есть разряды: единицы, десятки, сотни и тысячи. В числе 4 236: 4 тысячи, 2 сотни, 3 десятка и 6 единиц.","Every number has places: ones, tens, hundreds and thousands. In 4,236 there are 4 thousands, 2 hundreds, 3 tens and 6 ones."),v:function(){return ""}},
+ {t:L("להשוות: קודם כמה ספרות יש, ואחר כך משווים מהספרה השמאלית. 5,200 גדול מ-4,999.","للمقارنة: نعدّ الأرقام أولًا ثم نقارن من اليسار. 5,200 أكبر من 4,999.","Сравнение: сначала число цифр, потом слева направо. 5 200 больше, чем 4 999.","To compare: count the digits first, then compare from the left. 5,200 is bigger than 4,999."),v:function(){return ""}},
+ {t:L("עיגול: מסתכלים על הספרה שאחרי. 5 ומעלה, עולים. 4 ומטה, נשארים. 47 מעוגל לעשרות הוא 50.","التقريب: انظر إلى الرقم التالي. 5 فأكثر نقرّب لأعلى. 4 فأقل نبقى. 47 إلى أقرب عشرة هو 50.","Округление: смотрим на следующую цифру. 5 и больше — вверх, 4 и меньше — остаёмся. 47 до десятков — 50.","Rounding: look at the next digit. 5 or more goes up, 4 or less stays. 47 rounded to tens is 50."),v:function(){return numLine(40,50,1,47,false)}}];
+LESSONS.mult=[{t:L("כפל הוא חיבור של קבוצות שוות. 4 קופסאות עם 3 עוגיות: 3 + 3 + 3 + 3 = 12, וגם 4 × 3 = 12.","الضرب جمع مجموعات متساوية. 4 علب في كل منها 3 كعكات: 3+3+3+3 = 12 وأيضًا 4 × 3 = 12.","Умножение — это сложение равных групп. 4 коробки по 3 печенья: 3+3+3+3 = 12, то есть 4 × 3 = 12.","Multiplication is adding equal groups. 4 boxes with 3 cookies: 3+3+3+3 = 12, and 4 × 3 = 12."),v:function(){return dotsVis(12)}},
+ {t:L("חילוק הוא חלוקה שווה. 12 עוגיות ל-4 ילדים: לכל ילד 3, כי 12 ÷ 4 = 3.","القسمة توزيع بالتساوي. 12 كعكة على 4 أطفال: لكل طفل 3 لأن 12 ÷ 4 = 3.","Деление — это равный раздел. 12 печений на 4 детей: каждому по 3, ведь 12 ÷ 4 = 3.","Division is sharing equally. 12 cookies for 4 children: 3 each, because 12 ÷ 4 = 3."),v:function(){return ""}},
+ {t:L("כפל וחילוק הם זוג: אם 4 × 3 = 12, אז 12 ÷ 3 = 4.","الضرب والقسمة زوج: إذا كان 4 × 3 = 12 فإن 12 ÷ 3 = 4.","Умножение и деление — пара: если 4 × 3 = 12, то 12 ÷ 3 = 4.","Multiplication and division are partners: if 4 × 3 = 12, then 12 ÷ 3 = 4."),v:function(){return ""}}];
+LESSONS.frac2=[{t:L("כשמחלקים לעוד חלקים, כל חלק קטן יותר. לכן שליש גדול מחמישית.","كلما زادت الأجزاء صغر كل جزء. لذلك الثلث أكبر من الخمس.","Чем больше частей, тем меньше каждая. Поэтому треть больше пятой части.","The more parts, the smaller each one. So a third is bigger than a fifth."),v:function(){return fracBars(1,3,1,5)}},
+ {t:L("שברים שווים: חצי הוא 2 חלקים מתוך 4. 1/2 = 2/4.","كسور متكافئة: النصف هو جزءان من 4. 1/2 = 2/4.","Равные дроби: половина — это 2 части из 4. 1/2 = 2/4.","Equal fractions: a half is 2 parts out of 4. 1/2 = 2/4."),v:function(){return fracBars(1,2,2,4)}},
+ {t:L("שבר של כמות: מחלקים במכנה וכופלים במונה. 3/4 מ-12: 12 ÷ 4 = 3, ו-3 × 3 = 9.","كسر من كمية: نقسم على المقام ونضرب في البسط. 3/4 من 12: 12 ÷ 4 = 3 ثم 3 × 3 = 9.","Дробь от числа: делим на знаменатель и умножаем на числитель. 3/4 от 12: 12 ÷ 4 = 3, 3 × 3 = 9.","Fraction of an amount: divide by the bottom, multiply by the top. 3/4 of 12: 12 ÷ 4 = 3, 3 × 3 = 9."),v:function(){return dotsVis(12)}}];
+LESSONS.area=[{t:L("שטח הוא כמה ריבועי יחידה ממלאים את הצורה. מלבן 4 על 3 מכיל 12 ריבועים.","المساحة هي عدد مربعات الوحدة التي تملأ الشكل. مستطيل 4 في 3 فيه 12 مربعًا.","Площадь — сколько единичных квадратов заполняет фигуру. В прямоугольнике 4 на 3 — 12 квадратов.","Area is how many unit squares fill the shape. A 4 by 3 rectangle holds 12 squares."),v:function(){return gridVis(4,3,true)}},
+ {t:L("היקף הוא הדרך מסביב: מחברים את כל הצלעות. מלבן 4 על 3: 4 + 3 + 4 + 3 = 14.","المحيط هو الطريق حول الشكل: نجمع كل الأضلاع. مستطيل 4 في 3: 4+3+4+3 = 14.","Периметр — путь вокруг: складываем все стороны. Прямоугольник 4 на 3: 4+3+4+3 = 14.","Perimeter is the way around: add all the sides. A 4 by 3 rectangle: 4+3+4+3 = 14."),v:function(){return rectLab(4,3)}},
+ {t:L("שטח = אורך × רוחב. היקף = חיבור כל הצלעות. בריבוע כל הצלעות שוות.","المساحة = الطول × العرض. المحيط = مجموع الأضلاع. في المربع كل الأضلاع متساوية.","Площадь = длина × ширина. Периметр = сумма сторон. У квадрата все стороны равны.","Area = length × width. Perimeter = sum of the sides. In a square all sides are equal."),v:function(){return rectLab(5,5)}}];
+LESSONS.angles=[{t:L("זווית נוצרת כששני קווים נפגשים בנקודה. זווית ישרה היא כמו פינה של דף: 90 מעלות.","تتكوّن الزاوية عندما يلتقي خطان في نقطة. الزاوية القائمة مثل زاوية الورقة: 90 درجة.","Угол образуется, когда две линии встречаются в точке. Прямой угол — как угол листа: 90 градусов.","An angle forms when two lines meet at a point. A right angle is like the corner of a page: 90 degrees."),v:function(){return angleVis(90)}},
+ {t:L("זווית חדה קטנה מ-90 מעלות.","الزاوية الحادة أصغر من 90 درجة.","Острый угол меньше 90 градусов.","An acute angle is smaller than 90 degrees."),v:function(){return angleVis(45)}},
+ {t:L("זווית קהה גדולה מ-90 מעלות.","الزاوية المنفرجة أكبر من 90 درجة.","Тупой угол больше 90 градусов.","An obtuse angle is bigger than 90 degrees."),v:function(){return angleVis(130)}}];
+LESSONS.units2=[{t:L("1 מטר הוא 100 סנטימטרים. 1 קילוגרם הוא 1000 גרם. 1 ליטר הוא 1000 מיליליטרים.","1 متر = 100 سنتيمتر. 1 كيلوغرام = 1000 غرام. 1 لتر = 1000 ملليلتر.","1 метр = 100 сантиметров. 1 килограмм = 1000 граммов. 1 литр = 1000 миллилитров.","1 meter is 100 centimeters. 1 kilogram is 1000 grams. 1 liter is 1000 milliliters."),v:function(){return barRuler(0,10,12)}},
+ {t:L("כדי לדעת מתי משהו נגמר, מוסיפים דקות. 2:30 ועוד 45 דקות: 3:15.","لنعرف متى ينتهي شيء نضيف الدقائق. 2:30 + 45 دقيقة = 3:15.","Чтобы узнать, когда всё закончится, прибавляем минуты. 2:30 плюс 45 минут — 3:15.","To know when something ends, add the minutes. 2:30 plus 45 minutes is 3:15."),v:function(){return clockVis(3,15)}},
+ {t:L("כשיש שתי יחידות, הופכים הכול ליחידה הקטנה ומחברים. 2 ק״ג ו-500 גרם = 2500 גרם.","عندما توجد وحدتان نحوّل الكل إلى الأصغر ونجمع. 2 كغ و500 غرام = 2500 غرام.","Если две единицы, переведи всё в меньшую и сложи. 2 кг и 500 г = 2500 г.","With two units, turn everything into the smaller one and add. 2 kg and 500 g = 2500 g."),v:function(){return ""}}];
+LESSONS.bars=[{t:L("בתרשים עמודות כל עמודה מראה כמות. גובה העמודה הוא הכמות, ואת המספרים רואים בצד.","في الرسم بالأعمدة يعرض كل عمود كمية. ارتفاع العمود هو الكمية والأعداد على الجانب.","В столбчатой диаграмме каждый столбик показывает количество. Высота — это количество, числа сбоку.","In a bar chart each bar shows an amount. The height is the amount, and the numbers are on the side."),v:function(){return barChart([FRU[0].he,FRU[1].he,FRU[2].he,FRU[3].he],[4,7,3,6],10)}},
+ {t:L("העמודה הגבוהה ביותר היא הכמות הגדולה ביותר.","أعلى عمود هو أكبر كمية.","Самый высокий столбик — самое большое количество.","The tallest bar is the biggest amount."),v:function(){return ""}},
+ {t:L("כדי לדעת בכמה יש יותר, מחסרים. בסך הכול מחברים את כל העמודות.","لنعرف بكم أكثر نطرح. وللمجموع نجمع كل الأعمدة.","Чтобы узнать, на сколько больше, вычитаем. Для общего числа складываем все столбики.","To see how many more, subtract. For the total, add all the bars."),v:function(){return ""}}];
+
+LESSONS.dec=[{t:L("עשירית היא חלק אחד מעשרה. כותבים אותה 0.1. שלוש עשיריות הן 0.3.","العُشر جزء من عشرة. نكتبه 0.1. ثلاثة أعشار هي 0.3.","Одна десятая — это одна часть из десяти. Пишем 0.1. Три десятых — это 0.3.","A tenth is one part out of ten. We write 0.1. Three tenths is 0.3."),v:function(){return tenthsBar(3)}},
+ {t:L("על ציר המספרים בין 0 ל-1 יש עשרה צעדים. כל צעד הוא 0.1.","على خط الأعداد بين 0 و1 عشر خطوات. كل خطوة 0.1.","На числовой прямой между 0 и 1 десять шагов. Каждый шаг — 0.1.","On the number line between 0 and 1 there are ten steps. Each step is 0.1."),v:function(){return decLine(0.4)}},
+ {t:L("מחברים ומחסרים עשיריות כמו מספרים שלמים: 0.3 + 0.4 זה 3 + 4 = 7 עשיריות, כלומר 0.7.","نجمع ونطرح الأعشار كالأعداد الصحيحة: 0.3 + 0.4 يعني 3 + 4 = 7 أعشار، أي 0.7.","Десятые складываем как целые числа: 0.3 + 0.4 — это 3 + 4 = 7 десятых, то есть 0.7.","Add tenths like whole numbers: 0.3 + 0.4 is 3 + 4 = 7 tenths, so 0.7."),v:function(){return tenthsBar(7)}}];
+LESSONS.coord=[{t:L("כדי למצוא נקודה על הרשת: קודם הולכים ימינה, ואחר כך עולים. כותבים (ימינה, למעלה).","لإيجاد نقطة على الشبكة: نمشي يمينًا ثم نصعد. نكتب (يمينًا، للأعلى).","Чтобы найти точку на сетке: сначала вправо, потом вверх. Пишем (вправо, вверх).","To find a point on the grid: go right first, then up. We write (right, up)."),v:function(){return coordVis([[4,3]])}},
+ {t:L("שתי נקודות עם שמות: כל אחת יש לה שני מספרים.","نقطتان باسمين: لكل واحدة عددان.","Две точки с именами: у каждой по два числа.","Two named points: each one has two numbers."),v:function(){return coordVis([[2,5,"A"],[5,2,"B","#2f7fd8"]])}},
+ {t:L("קו סימטריה הוא קו קיפול: שני החלקים זהים. לריבוע יש ארבעה כאלה.","محور التماثل خط طي: الجزآن متطابقان. للمربع أربعة محاور.","Ось симметрии — линия сгиба: две части одинаковы. У квадрата их четыре.","A line of symmetry is a fold line: both parts match. A square has four of them."),v:function(){return svg(120,120,'<rect x="20" y="20" width="80" height="80" fill="#ffe3de" stroke="#17333c" stroke-width="3"/><line x1="60" y1="10" x2="60" y2="110" stroke="#e8453c" stroke-width="3" stroke-dasharray="7 5"/>',"")}}];
+LESSONS.mon2=[{t:L("בבעיה בשני צעדים עושים צעד אחד, ואז צעד שני עם התוצאה.","في المسألة بخطوتين نفعل خطوة ثم خطوة ثانية بالنتيجة.","В задаче в два шага делаем один шаг, потом второй с результатом.","In a two-step problem you do one step, then a second step with the result."),v:function(){return ""}},
+ {t:L("כשקונים כמה דברים שווים, קודם כופלים: מחיר אחד כפול כמות.","عند شراء عدة أشياء متساوية نضرب أولًا: السعر × العدد.","Если покупаем несколько одинаковых вещей, сначала умножаем: цена × количество.","When you buy several equal things, multiply first: price × amount."),v:function(){return ""}},
+ {t:L("עודף הוא מה ששילמנו פחות המחיר. מחסרים את המחיר מהתשלום.","الباقي هو ما دفعناه ناقص الثمن. نطرح الثمن من المبلغ المدفوع.","Сдача — это то, что заплатили, минус цена. Вычитаем цену из суммы.","Change is what you paid minus the price. Subtract the price from the payment."),v:function(){return ""}}];
+var BUILD="o1 · 2026-10-03";
+/* ===== UI strings ===== */
+var STR={
+he:{brand:"מתמטיקה מעבר לחשבון",title:"מתמטיקה ליסודי",tag:"צורות, מדידות, כסף, שברים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
+ lesson:"שיעור קצר",practice:"תרגול",lvTitle:"בחרו רמה",l1:"קל",l1d:"להתחיל בנחת",l2:"בינוני",l2d:"עוד קצת",l3:"מאתגר",l3d:"לחשוב טוב",l4:"אתגר",l4d:"מעורב וקשה",
+ listen:"הקראה",stop:"עצור",slow:"לאט",hint:"רמז",example:"דוגמה",next:"הבא",back:"חזרה",home:"בית",settings:"הגדרות",again:"עוד סבב",
+ qOf:"שאלה {a} מתוך {b}",right:["יפה מאוד!","נכון!","מצוין!","כל הכבוד על החשיבה!","בדיוק כך!","איזה כיף, נכון!"],streak:["שלוש ברצף! אתם על גל!","ועוד אחת! איזו התמדה!"],
+ wrong:"כמעט. בואו נבדוק יחד.",ans:"התשובה: ",finT:"סיימתם את הסבב!",finX:"עבודה יפה. מי שרוצה יכול לתרגל עוד או לבחור נושא אחר. שאלות שהיו קשות יחזרו בפעם הבאה.",
+ stepOf:"שלב {a} מתוך {b}",prev:"הקודם",done:"סיימתי",lessonEnd:"עכשיו אפשר לתרגל!",
+ setSlow:"הקראה איטית",setSfx:"צלילים",setBig:"אותיות גדולות",on:"פועל",off:"כבוי",reset:"מחיקת ההתקדמות מהמכשיר",resetAsk:"למחוק את כל ההתקדמות בנושאים?",
+ credit:"התוכן נכתב במיוחד לאתר. הנושאים לפי תכנית הלימודים במתמטיקה של משרד החינוך (יסודי).",crediL:"מקור: משרד החינוך",privacy:"בלי הרשמה. ההתקדמות נשמרת רק במכשיר שלכם.",
+ loadingNoVoice:"אין קול בעברית במכשיר הזה. אפשר להתקין קול בהגדרות המכשיר.",ok:"✓"},
+ar:{brand:"رياضيات ما بعد الحساب",title:"رياضيات للمرحلة الابتدائية",tag:"أشكال وقياس ونقود وكسور وأكثر. كل شيء مقروء بصوت عالٍ، بلا علامات وبلا ضغط.",pick:"اختاروا موضوعًا",band1:"الصفان الأول والثاني",band2:"الصفان الثالث والرابع",band3:"الصفان الخامس والسادس",soon:"قريبًا",
+ lesson:"درس قصير",practice:"تدريب",lvTitle:"اختاروا المستوى",l1:"سهل",l1d:"نبدأ بهدوء",l2:"متوسط",l2d:"أكثر قليلًا",l3:"صعب",l3d:"فكّروا جيدًا",l4:"تحدٍّ",l4d:"مزيج وأصعب",
+ listen:"استماع",stop:"إيقاف",slow:"ببطء",hint:"تلميح",example:"مثال",next:"التالي",back:"رجوع",home:"الرئيسية",settings:"الإعدادات",again:"جولة أخرى",
+ qOf:"السؤال {a} من {b}",right:["جميل جدًّا!","صحيح!","ممتاز!","أحسنتم التفكير!","هكذا تمامًا!","ما أجمل هذا!"],streak:["ثلاث إجابات متتالية! أنتم رائعون!","وأخرى! ما أجمل المثابرة!"],
+ wrong:"تقريبًا. لنتحقّق معًا.",ans:"الجواب: ",finT:"أنهيتم الجولة!",finX:"عمل جميل. يمكنكم التدرّب أكثر أو اختيار موضوع آخر. الأسئلة التي كانت صعبة ستعود لاحقًا.",
+ stepOf:"الخطوة {a} من {b}",prev:"السابق",done:"انتهيت",lessonEnd:"والآن يمكننا التدرّب!",
+ setSlow:"قراءة بطيئة",setSfx:"أصوات",setBig:"حروف كبيرة",on:"يعمل",off:"متوقف",reset:"مسح التقدّم من الجهاز",resetAsk:"هل تريدون مسح كل التقدّم؟",
+ credit:"كُتب المحتوى خصيصًا لهذا الموقع. المواضيع حسب منهاج الرياضيات لوزارة التربية والتعليم (الابتدائي).",crediL:"المصدر: وزارة التربية والتعليم",privacy:"بلا تسجيل. التقدّم يُحفظ على جهازكم فقط.",
+ loadingNoVoice:"لا يوجد صوت عربي في هذا الجهاز.",ok:"✓"},
+ru:{brand:"Математика не только счёт",title:"Математика для начальной школы",tag:"Фигуры, измерения, деньги, дроби и другое. Всё озвучено, без оценок и без спешки.",pick:"Выберите тему",band1:"1–2 классы",band2:"3–4 классы",band3:"5–6 классы",soon:"Скоро",
+ lesson:"Короткий урок",practice:"Практика",lvTitle:"Выберите уровень",l1:"Лёгкий",l1d:"начнём спокойно",l2:"Средний",l2d:"чуть сложнее",l3:"Трудный",l3d:"подумай хорошо",l4:"Вызов",l4d:"всё вперемешку",
+ listen:"Слушать",stop:"Стоп",slow:"Медленно",hint:"Подсказка",example:"Пример",next:"Дальше",back:"Назад",home:"Домой",settings:"Настройки",again:"Ещё раунд",
+ qOf:"Вопрос {a} из {b}",right:["Очень хорошо!","Верно!","Отлично!","Здорово подумал!","Именно так!","Как здорово!"],streak:["Три подряд! Ты в ударе!","И ещё один! Какое упорство!"],
+ wrong:"Почти. Давай проверим вместе.",ans:"Ответ: ",finT:"Раунд закончен!",finX:"Хорошая работа. Можно потренироваться ещё или выбрать другую тему. Трудные вопросы вернутся в следующий раз.",
+ stepOf:"Шаг {a} из {b}",prev:"Назад",done:"Готово",lessonEnd:"Теперь можно тренироваться!",
+ setSlow:"Медленное чтение",setSfx:"Звуки",setBig:"Крупный шрифт",on:"вкл",off:"выкл",reset:"Стереть прогресс на устройстве",resetAsk:"Стереть весь прогресс?",
+ credit:"Содержание написано специально для сайта. Темы — по программе по математике Министерства образования Израиля (начальная школа).",crediL:"Источник: Министерство образования",privacy:"Без регистрации. Прогресс хранится только на вашем устройстве.",
+ loadingNoVoice:"На этом устройстве нет русского голоса.",ok:"✓"},
+en:{brand:"Math beyond arithmetic",title:"Elementary math",tag:"Shapes, measuring, money, fractions and more. Everything is read aloud, with no scores and no rush.",pick:"Pick a topic",band1:"Grades 1–2",band2:"Grades 3–4",band3:"Grades 5–6",soon:"Soon",
+ lesson:"Short lesson",practice:"Practice",lvTitle:"Choose a level",l1:"Easy",l1d:"start gently",l2:"Medium",l2d:"a bit more",l3:"Tricky",l3d:"think it through",l4:"Challenge",l4d:"mixed and harder",
+ listen:"Listen",stop:"Stop",slow:"Slow",hint:"Hint",example:"Example",next:"Next",back:"Back",home:"Home",settings:"Settings",again:"Another round",
+ qOf:"Question {a} of {b}",right:["Very nice!","Correct!","Excellent!","Great thinking!","Exactly!","How wonderful!"],streak:["Three in a row! You are on a roll!","And another one! What persistence!"],
+ wrong:"Almost. Let us check it together.",ans:"The answer: ",finT:"You finished the round!",finX:"Nice work. Practice more or pick another topic. Questions that felt hard will come back next time.",
+ stepOf:"Step {a} of {b}",prev:"Previous",done:"I am done",lessonEnd:"Now we can practice!",
+ setSlow:"Slow reading",setSfx:"Sounds",setBig:"Large text",on:"on",off:"off",reset:"Clear progress from this device",resetAsk:"Clear all progress?",
+ credit:"The content was written for this site. Topics follow the Israeli Ministry of Education math curriculum (elementary).",crediL:"Source: Ministry of Education",privacy:"No sign-up. Progress is saved only on your device.",
+ loadingNoVoice:"No voice for this language was found on this device.",ok:"✓"}};
+var LNAME={he:"עב",ar:"عر",ru:"Рус",en:"En"},LDIR={he:"rtl",ar:"rtl",ru:"ltr",en:"ltr"},LCODE={he:"he-IL",ar:"ar-SA",ru:"ru-RU",en:"en-US"};
+var FRDISP={"1/2":"½","1/4":"¼","3/4":"¾","1/3":"⅓"},FRSAY={he:{"1/2":"חצי","1/4":"רבע","3/4":"שלושה רבעים","1/3":"שליש"},ar:{"1/2":"نصف","1/4":"ربع","3/4":"ثلاثة أرباع","1/3":"ثلث"},ru:{"1/2":"одна вторая","1/4":"одна четвёртая","3/4":"три четвёртых","1/3":"одна треть"},en:{"1/2":"one half","1/4":"one quarter","3/4":"three quarters","1/3":"one third"}};
+var CMW={he:"ס״מ",ar:"سم",ru:"см",en:"cm"};
+/* ===== state ===== */
+var KEY="mathelem-v1",S={band:1,lang:"he",done:{},slow:false,sfx:true,big:false},view="home",V={unit:null,lv:2,step:0},P=null;
+function loadS(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)for(var k in o)S[k]=o[k]}catch(e){}}
+function saveS(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+loadS();
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function T(){return STR[S.lang]}
+function lt(o){return typeof o==="string"?o:o[S.lang]}
+function optLabel(o){var l=o.l;if(typeof l==="object")return l[S.lang];l=String(l);return l.replace(/ cm$/," "+CMW[S.lang]).replace(/^-(\d)/,"−$1")}
+function optSay(o){var l=o.l;if(typeof l==="object")return l[S.lang];if(FRSAY[S.lang][l])return FRSAY[S.lang][l];l=String(l);return l.replace(/ cm$/," "+CMW[S.lang]).replace(/^-/,{he:"מינוס ",ar:"ناقص ",ru:"минус ",en:"minus "}[S.lang]).replace(/^\+/,{he:"ועוד ",ar:"زائد ",ru:"плюс ",en:"plus "}[S.lang]).replace(/(\d+):(\d\d)/,function(m,h,mm){return h+" "+(mm==="00"?"":mm)})}
+function unitById(id){return UNITS.filter(function(u){return u.id===id})[0]}
+/* ===== speech with word highlight ===== */
+var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null;
+var VF=/(female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
+var VM=/(\bmale\b|david|mark|asaf|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
+function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
+function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
+  var f=vs.filter(function(v){return VF.test(v.name)&&!VM.test(v.name)});if(f.length)return {v:f[0],fem:true};
+  var nm=vs.filter(function(v){return !VM.test(v.name)});if(nm.length)return {v:nm[0],fem:false};
+  return {v:vs[0]||null,fem:false}}
+function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.raw!=null){HL.el.textContent=HL.el.dataset.raw}HL.el=null}
+function hlPrep(el,text){hlClear();if(!el||el.children.length)return;el.dataset.raw=el.textContent;HL.el=el;HL.raw=el.textContent;HL.got=false;
+  var out="",starts=[],re=/\S+|\s+/g,m,pos=0,idx=0;HL.starts=[];
+  while((m=re.exec(HL.raw))){if(/\S/.test(m[0])){HL.starts.push(m.index);out+='<span data-w="'+idx+'">'+esc(m[0])+'</span>';idx++}else out+=m[0]}
+  el.innerHTML=out}
+function hlAt(ci){if(!HL.el)return;var w=-1,i;for(i=0;i<HL.starts.length;i++){if(HL.starts[i]<=ci)w=i;else break}
+  var sp=HL.el.querySelectorAll("[data-w]");for(i=0;i<sp.length;i++)sp[i].className=(i===w?"hl":"")}
+function hlFallback(rate){if(!HL.el)return;var n=HL.starts.length,i=0,per=430/rate;
+  (function step(){if(!HL.el||HL.got)return;var sp=HL.el.querySelectorAll("[data-w]");for(var k=0;k<sp.length;k++)sp[k].className=(k===i?"hl":"");i++;if(i<=n)HL.timer=setTimeout(step,per)})()}
+function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}_u=null;hlClear();setPlaying(false)}
+var _playing=false;function setPlaying(b){_playing=b;var bs=document.querySelectorAll('[data-a="stop"]');bs.forEach(function(x){x.style.opacity=b?1:.55})}
+function speechFix(t){var w={he:"חלקי",ar:"على",ru:"из",en:"over"}[S.lang];return t.replace(/(\d+)\/(\d+)/g,function(m,a,b){return a+" "+w+" "+b}).replace(/×/g,{he:" כפול ",ar:" ضرب ",ru:" умножить на ",en:" times "}[S.lang]).replace(/÷/g,{he:" חלקי ",ar:" قسمة ",ru:" разделить на ",en:" divided by "}[S.lang]).replace(/−/g,{he:" פחות ",ar:" ناقص ",ru:" минус ",en:" minus "}[S.lang]).replace(/\s=\s/g,{he:" שווה ",ar:" يساوي ",ru:" равно ",en:" equals "}[S.lang]).replace(/\?\//g,"?")}
+function speak(text,el,onend){stopSpeak();var raw=text;if(!("speechSynthesis" in window)||!text)return false;
+  var rate=S.slow?0.7:0.9,pv=pickVoice(),u=new SpeechSynthesisUtterance(speechFix(text));u.lang=LCODE[S.lang];if(pv.v)u.voice=pv.v;u.rate=rate;u.pitch=pv.fem?1.05:1.3;
+  var spoken=el&&el.dataset&&el.dataset.say===text;HL.noB=false;if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=speechFix(raw)!==raw}
+  u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(e.charIndex)};
+  u.onend=u.onerror=function(){if(_u===u){hlClear();setPlaying(false);if(onend)onend()}};
+  _u=u;setPlaying(true);try{speechSynthesis.speak(u)}catch(e){return false}
+  if(HL.el)setTimeout(function(){if(_u===u&&HL.el&&!HL.got)hlFallback(rate)},900);return true}
+function qSay(q){return lt(q.q)+". "+q.o.map(function(o,i){return optSay(o)}).join(". ")}
+/* ===== effects ===== */
+var ctx=null;function tone(f,d,t,v){if(!S.sfx)return;try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();var o=ctx.createOscillator(),g=ctx.createGain();o.type=t||"sine";o.frequency.value=f;g.gain.value=v||.08;o.connect(g);g.connect(ctx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+d);o.stop(ctx.currentTime+d)}catch(e){}}
+function sfxOk(){tone(660,.14);setTimeout(function(){tone(880,.18)},110)}function sfxSoft(){tone(330,.2,"sine",.05)}
+var cv,cx,parts=[],raf=null;
+function confetti(n){cv=$("#cf");if(!cv)return;cv.width=innerWidth;cv.height=innerHeight;cx=cv.getContext("2d");var cols=["#0e9c8d","#ffc531","#ff6f61","#58b7e0","#8a63d2","#1f9d4d"],i;
+  for(i=0;i<n;i++)parts.push({x:innerWidth/2+(Math.random()-.5)*80,y:innerHeight*.35,vx:(Math.random()-.5)*9,vy:-Math.random()*9-3,s:6+Math.random()*7,c:cols[i%6],r:Math.random()*6,l:70+Math.random()*30});
+  if(!raf)(function loop(){cx.clearRect(0,0,cv.width,cv.height);parts=parts.filter(function(p){return p.l>0});parts.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.r+=.2;p.l--;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);cx.restore()});raf=parts.length?requestAnimationFrame(loop):(cx.clearRect(0,0,cv.width,cv.height),null)})()}
+/* ===== views ===== */
+function fmt(s,v){return s.replace(/\{(\w)\}/g,function(m,k){return v[k]})}
+function header(){var t=T(),h='<div class="top"><button class="brand" data-a="home">'+esc(t.brand)+'</button><div class="langs" role="group">';
+  LG.forEach(function(l){h+='<button data-a="lang" data-l="'+l+'" aria-pressed="'+(S.lang===l)+'" lang="'+l+'">'+LNAME[l]+'</button>'});
+  return h+'</div><button class="gear" data-a="settings" aria-label="'+esc(t.settings)+'"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6a45b0" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></div>'}
+function tutorBtn(dis){return (window.TUTOR&&TUTOR.on&&TUTOR.on())?'<button class="btn tut" data-a="tutor" '+(dis?'disabled':'')+'><img src="/img/limor.jpg" alt="">'+esc(TUTOR.label())+'</button>':''}
+function listenRow(sayId){var t=T();return '<div class="row" style="margin:4px 0 8px"><button class="btn play" data-a="say" data-t="'+sayId+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M6 4l14 8-14 8z"/></svg>'+esc(t.listen)+'</button><button class="btn stop" data-a="stop"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>'+esc(t.stop)+'</button><button class="btn slow" data-a="slowsay" data-t="'+sayId+'">'+esc(t.slow)+'</button></div>'}
+function spk(a){return '<button class="sp" data-a="'+a.a+'" '+(a.k!=null?'data-k="'+a.k+'"':'')+' aria-label="'+esc(T().listen)+'"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8c2 2 2 6 0 8" stroke="#fff" fill="none" stroke-width="2"/></svg></button>'}
+function homeView(){var t=T(),h='<h1 data-say id="h1">'+esc(t.title)+'</h1><p class="sub" id="hs">'+esc(t.tag)+'</p>'+listenRow("home");
+  h+='<div class="bands"><button class="band" data-a="band" data-b="1" aria-pressed="'+(S.band===1)+'">'+esc(t.band1)+'</button><button class="band" data-a="band" data-b="2" aria-pressed="'+(S.band===2)+'">'+esc(t.band2)+'</button><button class="band soon" disabled>'+esc(t.band3)+'<small>'+esc(t.soon)+'</small></button></div>';
+  h+='<h2>'+esc(t.pick)+'</h2><div class="units">';
+  UNITS.filter(function(u){return u.band===S.band}).forEach(function(u){h+='<button class="unit" style="--c:'+u.c+'" data-a="unit" data-u="'+u.id+'"><span class="ico">'+iconSvg(u.id==="pattern"?"pattern":u.id==="frac"?"frac":u.id)+'</span><span><span class="nm" style="display:block">'+esc(lt(u.n))+'</span><span class="ds">'+esc(lt(u.d))+'</span></span>'+(S.done[u.id]?'<span class="ok">✓</span>':'')+'</button>'});
+  h+='</div><p class="credit">'+esc(t.credit)+' <a href="https://pop.education.gov.il" target="_blank" rel="noopener">'+esc(t.crediL)+'</a><br>'+esc(t.privacy)+'</p>';return h}
+function unitView(){var t=T(),u=unitById(V.unit),h='<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1 style="color:'+u.c+'">'+esc(lt(u.n))+'</h1><p class="sub">'+esc(lt(u.d))+'</p>';
+  h+='<div class="card"><button class="btn" style="background:'+u.c+';width:100%" data-a="lesson">'+esc(t.lesson)+'</button></div>';
+  h+='<div class="card"><h2>'+esc(t.practice)+": "+esc(t.lvTitle)+'</h2><div class="lvls">';
+  [["l1","#1f9d4d"],["l2","#2f7fd8"],["l3","#f58a1f"],["l4","#8a63d2"]].forEach(function(l,i){h+='<button class="lvl" style="background:'+l[1]+'" data-a="start" data-l="'+(i+1)+'">'+esc(t[l[0]])+'<small>'+esc(t[l[0]+"d"])+'</small></button>'});
+  return h+'</div></div>'}
+function lessonView(){var t=T(),u=unitById(V.unit),ls=LESSONS[V.unit],st=ls[V.step],n=ls.length,txt=lt(st.t);
+  var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="dots" style="margin-top:12px">'+ls.map(function(_,i){return '<i class="'+(i<V.step?"on":i===V.step?"cur":"")+'"></i>'}).join("")+'</div>';
+  h+='<div class="card stepcard"><div class="sub">'+esc(fmt(t.stepOf,{a:V.step+1,b:n}))+'</div>'+listenRow("lesson")+'<div class="qtext" id="lt" data-say>'+esc(txt)+'</div><div class="vis">'+st.v()+'</div></div>';
+  h+='<div style="margin:0 0 12px">'+tutorBtn()+'</div><div class="row">'+(V.step>0?'<button class="btn ghost" data-a="lprev">'+esc(t.prev)+'</button>':'')+(V.step<n-1?'<button class="btn next" data-a="lnext">'+esc(t.next)+'</button>':'<button class="btn next" data-a="start" data-l="1">'+esc(t.lessonEnd)+'</button>')+'</div>';return h}
+function mkQ(unit,lv){var g=G[unit],l=lv===4?pick([1,2,3,3]):lv,q=g(l),n=0,prev=P&&P.list&&P.list[P.list.length-1];
+  while(prev&&n<6&&lt(prev.q)===lt(q.q)&&prev.o.map(function(o){return o.id}).join()===q.o.map(function(o){return o.id}).join()){q=g(l);n++}return q}
+function startRound(lv){P={unit:V.unit,lv:lv,list:[],i:0,picked:null,hints:0,hintShown:false,exShown:false,streak:0,missed:[]};P.list=[];
+  for(var i=0;i<8;i++)P.list.push(mkQ(V.unit,lv));view="practice";P.cur=P.list[0];render()}
+function practiceView(){var t=T(),q=P.list[P.i],n=P.list.length,u=unitById(P.unit);
+  var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="sub" style="margin-top:10px">'+esc(lt(u.n))+" · "+esc(fmt(t.qOf,{a:P.i+1,b:n}))+'</div><div class="prog"><i style="width:'+(P.i/n*100)+'%"></i></div>';
+  h+='<div class="card">'+listenRow("q")+'<div class="qtext" id="qt" data-say>'+esc(lt(q.q))+'</div>';
+  var vis=q.visL?q.visL[S.lang]:q.vis;if(vis)h+='<div class="vis">'+vis+'</div>';
+  var wide=q.o.some(function(o){return optLabel(o).length>7});h+='<div class="opts'+(wide?' wide':'')+'">';q.o.forEach(function(o,i){var cls="opt"+(P.picked!=null?(o.id===q.a?" good":(P.picked===i?" pick":"")):"");
+    h+='<div class="'+cls+'"><button class="ob" data-a="pick" data-k="'+i+'" '+(P.picked!=null?"disabled":"")+'>'+esc(optLabel(o))+'</button>'+(P.picked!=null&&o.id===q.a?'<span class="mk">✓</span>':'')+spk({a:"sayopt",k:i})+'</div>'});
+  h+='</div>';
+  if(P.picked==null){h+='<div class="row" style="margin-top:14px"><button class="btn hint" data-a="hint">'+esc(t.hint)+'</button><button class="btn ex" data-a="example">'+esc(t.example)+'</button></div><div style="margin-top:12px">'+tutorBtn()+'</div>';
+    if(P.hintShown)h+='<div class="hintbox" id="hb">'+esc(lt(q.h))+'</div>';
+    if(P.exShown){var st=LESSONS[P.unit][Math.min(q.step,LESSONS[P.unit].length-1)];h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><div id="ex" data-say>'+esc(lt(st.t))+'</div><div class="vis">'+st.v()+'</div></div></div>'}}
+  else{var ok=P.picked===q.o.map(function(o){return o.id}).indexOf(q.a);
+    h+=ok?'<div class="ok-box" id="rb">'+esc(P.msg)+'</div>':'<div class="tbox"><img src="/img/limor.jpg" alt=""><div><b>'+esc(t.wrong)+'</b></div></div>';
+    h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><div>'+esc(t.ans)+'<b>'+esc(optLabel(q.o.filter(function(o){return o.id===q.a})[0]))+'</b></div><div id="ex" data-say>'+esc(lt(q.e))+'</div></div></div>';
+    h+='<div class="row" style="margin-top:12px"><button class="btn next" data-a="next">'+esc(P.i<n-1?t.next:t.done)+'</button></div>'}
+  return h+'</div>'}
+function endView(){var t=T();return '<h1 id="et" data-say>'+esc(t.finT)+'</h1><div class="card">'+listenRow("end")+'<p class="qtext" id="ex" data-say>'+esc(t.finX)+'</p><div class="row"><button class="btn next" data-a="start" data-l="'+P.lv+'">'+esc(t.again)+'</button><button class="btn ghost" data-a="home">'+esc(t.home)+'</button></div></div>'}
+function settingsView(){var t=T();function tg(k,l){return '<div class="set"><span>'+esc(l)+'</span><button class="tog" data-a="tog" data-k="'+k+'" aria-pressed="'+!!S[k]+'">'+esc(S[k]?t.on:t.off)+'</button></div>'}
+  return '<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1>'+esc(t.settings)+'</h1><div class="card">'+tg("slow",t.setSlow)+tg("sfx",t.setSfx)+tg("big",t.setBig)+'<div class="set"><button class="btn ghost" data-a="reset">'+esc(t.reset)+'</button></div></div>'}
+function render(){document.documentElement.lang=S.lang;document.documentElement.dir=LDIR[S.lang];document.documentElement.classList.toggle("big",!!S.big);
+  var h=header();h+=({home:homeView,unit:unitView,lesson:lessonView,practice:practiceView,end:endView,settings:settingsView})[view]();$("#app").innerHTML=h;
+  document.title=T().title+" · bekol";if(window.TUTOR&&TUTOR.refresh)try{TUTOR.refresh()}catch(e){}}
+function sayText(w){var q=P&&P.list&&P.list[P.i],t=T();
+  if(w==="home")return [t.title+". "+t.tag,$("#h1")];if(w==="lesson")return [$("#lt").textContent,$("#lt")];
+  if(w==="end")return [t.finX,$("#ex")];if(w==="q")return [qSay(q),null];return ["",null]}
+function sayQ(slow){var q=P.list[P.i],old=S.slow;if(slow)S.slow=true;var el=$("#qt");speak(lt(q.q),el,function(){});
+  /* question first (highlighted), then options */var u=_u;if(u){var prev=u.onend;u.onend=function(){if(_u!==u)return;hlClear();var rest=q.o.map(optSay).join(". ");S.slow=slow?true:old;speak(rest,null,function(){S.slow=old});if(slow)S.slow=old}}
+  S.slow=old}
+function onAct(a,el){var t=T(),q=P&&P.list&&P.list[P.i];
+  if(a==="home"){stopSpeak();view="home";render();window.scrollTo(0,0)}
+  else if(a==="band"){S.band=+el.dataset.b;saveS();render()}
+  else if(a==="lang"){stopSpeak();S.lang=el.dataset.l;saveS();render()}
+  else if(a==="settings"){stopSpeak();view="settings";render()}
+  else if(a==="unit"){stopSpeak();V.unit=el.dataset.u||V.unit;view="unit";render();window.scrollTo(0,0)}
+  else if(a==="lesson"){stopSpeak();V.step=0;view="lesson";render()}
+  else if(a==="lnext"){stopSpeak();V.step++;render();window.scrollTo(0,0)}
+  else if(a==="lprev"){stopSpeak();V.step--;render()}
+  else if(a==="start"){stopSpeak();startRound(+el.dataset.l)}
+  else if(a==="say"||a==="slowsay"){var w=el.dataset.t;if(w==="q")sayQ(a==="slowsay");else{var r=sayText(w),o=S.slow;if(a==="slowsay")S.slow=true;speak(r[0],r[1]);S.slow=o}}
+  else if(a==="stop")stopSpeak();
+  else if(a==="tutor"){stopSpeak();if(window.TUTOR)TUTOR.open()}
+  else if(a==="sayopt"){speak(optSay(q.o[+el.dataset.k]),null)}
+  else if(a==="hint"){P.hintShown=true;render();var hb=$("#hb");speak(lt(q.h),hb)}
+  else if(a==="example"){P.exShown=true;render();speak($("#ex").textContent,$("#ex"))}
+  else if(a==="pick"){stopSpeak();var k=+el.dataset.k;P.picked=k;var ok=q.o[k].id===q.a;
+    if(ok){P.streak++;var msg=(P.streak>=3&&P.streak%3===0)?pick(t.streak):pick(t.right);P.msg=msg;sfxOk();confetti(P.streak>=3?120:50)}
+    else{P.streak=0;sfxSoft();if(P.missed.length<3&&q.t&&!q._rq){P.missed.push(q)}}
+    render();if(ok){var rb=$("#rb");speak(P.msg,rb)}else{speak(t.wrong+" "+t.ans+optSay(q.o.filter(function(o){return o.id===q.a})[0])+". "+lt(q.e),null)}}
+  else if(a==="next"){stopSpeak();if(P.i<P.list.length-1){P.i++;P.picked=null;P.hintShown=false;P.exShown=false;render();window.scrollTo(0,0);setTimeout(function(){sayQ(false)},250)}
+    else{S.done[P.unit]=true;saveS();view="end";render();confetti(160);window.scrollTo(0,0)}}
+  else if(a==="tog"){var kk=el.dataset.k;S[kk]=!S[kk];saveS();render()}
+  else if(a==="reset"){if(confirm(t.resetAsk)){S.done={};saveS();render()}}}
+document.addEventListener("click",function(e){var el=e.target.closest("[data-a]");if(!el||el.disabled)return;onAct(el.dataset.a,el)});
+window.addEventListener("pagehide",function(){stopSpeak()});
+</script>
+<script src="/tutor/josh-face.js"></script>
+<script src="/tutor/he-speech.js"></script>
+<script src="/speech/recorded.js"></script>
+<script src="/tutor/josh-state.js"></script>
+<script src="/tutor/josh-local.js"></script>
+<script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
+<script src="/legal/terms.js"></script>
+<script src="/legal/protect.js"></script>
+<script>
+/* ===== boot ===== */
+(function(){var q=new URLSearchParams(location.search),l=q.get("lang");if(l&&STR[l])S.lang=l;
+  render();
+  var go=q.get("go");if(go){var p=go.split(":");V.unit=p[1]||V.unit;
+    if(p[0]==="unit"){view="unit";render()}else if(p[0]==="lesson"){V.step=+(p[2]||0);view="lesson";render()}
+    else if(p[0]==="practice"){startRound(+(p[2]||2));(q.get("act")||"").split(",").forEach(function(a){if(!a)return;
+      if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
+    else if(p[0]==="settings"){view="settings";render()}}
+  if(window.TUTOR){try{TUTOR.mount({app:"math-elem",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o1-pwa1").catch(function(){})});
+})();
+</script>
+
+</script>
+<!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
+     (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
+     נמדדת בנפרד. הוסר 10.9.2026 והוחזר 15.9.2026, שניהם בהחלטת הבעלים. -->
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body></html>
