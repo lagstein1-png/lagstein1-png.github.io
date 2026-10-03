@@ -165,6 +165,9 @@ jobs:
           # Tier 2 (הבעלים, 3.10.2026): 6.6 משפטים לדקה במרווח 5 שניות היו 31 שעות
           TTS_PACE_MIN_MS: ${{ vars.TTS_PACE_MIN_MS || '1500' }}
         run: |
+          # Actions מריץ bash -e: יציאה 1 של record.js (מכסה בלי אף קובץ)
+          # הפילה את הצעד לפני הבדיקה והדחיפה (ריצה 52). השגיאות כאן נבדקות ביד.
+          set +e
           set -uo pipefail
           EXTRA=""
           if [ "${{ github.event.inputs.batch }}" != "NO" ]; then EXTRA="--batch"; fi
