@@ -203,7 +203,7 @@ if(window.TUTOR&&!window.__GATED){
     stopHost:function(){stopSpeech()}});
   if(window.BARAK)BARAK.register({app:"civics-elem",
     getScreenContext:function(){if(view!=="practice"||!R)return null;var q=curQ();
-      return {id:"mc"+R.i+"-"+unit.id,type:"mcq",q:qText(q,"he"),options:q.keys.map(function(k){return optText(k,"he")}),correct:null,student:null,topic:uTitle(unit,"he"),level:"יסודי",curriculum:"תנ״ך, סיפורי המקרא, בית ספר יסודי"}},
+      return {id:"mc"+R.i+"-"+unit.id,type:"mcq",q:qText(q,"he"),options:q.keys.map(function(k){return optText(k,"he")}),correct:null,student:null,topic:uTitle(unit,"he"),level:"יסודי",curriculum:"מולדת ואזרחות, בית ספר יסודי"}},
     actions:{read_aloud:{desc:"מקריא את השאלה בקול",run:function(){if(view!=="practice")return false;speakSeq(practiceSegs());return true}},
       show_hint:{desc:"מציג את הרמז הבא",run:function(){if(view!=="practice"||R.locked)return false;var n=R.hints;hint();return R.hints>n}},
       next_question:{desc:"עובר לשאלה הבאה אחרי שנענתה",run:function(){if(view!=="practice"||!R.locked)return false;nextQ();return true}}}});

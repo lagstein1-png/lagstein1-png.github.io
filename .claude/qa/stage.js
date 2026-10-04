@@ -88,10 +88,12 @@ for(const [id,a] of Object.entries(REG.apps)){
     if(!PUBLIC_OK.includes(a.contentQA))
       F(id,"שלב "+stage+" עם contentQA=\""+a.contentQA+"\" — אישור דורש pass או cleared");
     if(a.contentQA==="legacy-published"&&!scanOf(id))
-      W(id, a.bank==="buildQ"
+      /* O-121: content.js סורק buildQ במסלול הראשי, ו-UNITS / js/data.js
+         במסלול scanUnits (O-113) — אותה רשימה כמו `unitsPath` שם. */
+      W(id, ["buildQ","UNITS","js/data.js"].includes(a.bank)
         ? "פורסמה לפני שהשער נבנה, ו-content.js עוד לא רץ עליה."
         : "פורסמה לפני שהשער נבנה, ו-content.js אינו יכול לסרוק אותה — "+
-          "bank=\""+(a.bank||"—")+"\" ולא buildQ. סקירה ידנית.");
+          "bank=\""+(a.bank||"—")+"\" ולא buildQ / UNITS / js/data.js. סקירה ידנית.");
   }
   /* 6. הדוח האחרון, אם יש. FAIL בדוח אינו מוריד אפליקציה שכבר
         פורסמה — הוא נאמר, והבעלים מחליט. באפליקציה שעדיין לא

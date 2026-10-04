@@ -58,6 +58,17 @@ function sourcesOf(app, root) {
   if (fs.existsSync(dataDir))
     for (const f of fs.readdirSync(dataDir).filter(x => x.endsWith('.js')).sort())
       out.push(path.join(dataDir, f));
+  /* O-121, 4.10.2026: משפחת hebrew-lit (וגם tanakh-elem ו-civics-elem
+     שהועתקו ממנה) מחזיקה את הבנק ב-`js/data.js`, את המחוללים `GEN`
+     ב-`js/engine.js` ואת מפתחות ההסבר ב-`js/i18n.js` — ו-`scanUnits`
+     קורא את שלושתם. בלי השורות האלה שינוי ב-`js/data.js` השאיר את
+     הדוח ✓ (נמדד: הוספת הערה ל-`hebrew-lit/js/data.js` ⇒ fresh ירוק).
+     כל `js/*.js` נכנס, גם `app.js`/`speech.js`: דוח שמסומן מיושן
+     בלי צורך עולה סריקה אחת; דוח שמסומן טרי בלי צדק עולה PASS שקרי. */
+  const jsDir = path.join(R, app, 'js');
+  if (fs.existsSync(jsDir))
+    for (const f of fs.readdirSync(jsDir).filter(x => x.endsWith('.js')).sort())
+      out.push(path.join(jsDir, f));
   return out.filter(f => fs.existsSync(f));
 }
 

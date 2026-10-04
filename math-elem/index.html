@@ -243,6 +243,8 @@ function mk(t,q,vis,ans,dist,hint,expl,step){
   while(d.length<3){var z=String(ri(0,99));if(!seen[z]){seen[z]=1;d.push(z)}}
   var all=shuffle([ans].concat(shuffle(d).slice(0,3))).map(function(x){return {id:oid(x),l:(x&&typeof x==="object")?x:String(x)}});
   return {t:t,q:q,vis:vis||"",o:all,a:aid,h:hint,e:expl,step:step==null?0:step}}
+/* שלושת המסיחים הראשונים ברשימה, שונים זה מזה ומהתשובה. הרשימה מסודרת לפי סדר עדיפות: הטעות הנפוצה ראשונה */
+function top3(ans,c){var o=[],k={};k[oid(ans)]=1;c.forEach(function(x){var i=oid(x);if(o.length<3&&!k[i]){k[i]=1;o.push(x)}});return o}
 function near(n,lo,hi){var c=[n+1,n-1,n+2,n-2,n+10,n-10,n+5].filter(function(x){return x>=lo&&x<=hi&&x!==n});return shuffle(c)}
 var NAMES=[
  {he:"נועה",ar:"نورا",ru:"Маша",ruG:"Маши",en:"Noa",g:"f"},{he:"אורי",ar:"أحمد",ru:"Дима",ruG:"Димы",en:"Uri",g:"m"},
@@ -288,13 +290,16 @@ G.nums=function(lv){
      L("המקלות הכחולים הם עשרות. הקוביות הצהובות הן אחדות.","العصي الزرقاء عشرات والمكعبات الصفراء آحاد.","Синие палочки — десятки. Жёлтые кубики — единицы.","Blue rods are tens. Yellow cubes are ones."),
      L(n+" = "+t+" עשרות ו-"+o+" אחדות.",n+" = "+t+" عشرات و"+o+" آحاد.",n+" = "+t+" дес. и "+o+" ед.",n+" = "+t+" tens and "+o+" ones."),1)});
   T.push(function(){var t=ri(1,9),o=ri(0,9),n=t*10+o;
-    return mk("build",L(t+" עשרות ו-"+o+" אחדות. איזה מספר זה?",t+" عشرات و"+o+" آحاد. ما العدد؟",t+" дес. и "+o+" ед. Какое это число?",t+" tens and "+o+" ones. Which number is it?"),rodsVis(t,o),n,[o*10+t,n+10,n-10,n+1,n-1].filter(function(x){return x>9&&x<100}),
+    return mk("build",L(t+" עשרות ו-"+o+" אחדות. איזה מספר זה?",t+" عشرات و"+o+" آحاد. ما العدد؟",t+" дес. и "+o+" ед. Какое это число?",t+" tens and "+o+" ones. Which number is it?"),rodsVis(t,o),n,top3(n,[o*10+t].concat(shuffle([n+10,n-10,n+1,n-1]),[t+o]).filter(function(x){return x>0&&x<100})),
      L("העשרות הן הספרה הראשונה. האחדות הן הספרה השנייה.","العشرات هي الرقم الأول والآحاد هي الرقم الثاني.","Десятки — первая цифра, единицы — вторая.","Tens are the first digit. Ones are the second digit."),
      L(t+" עשרות הן "+t*10+". ועוד "+o+" זה "+n+".",t+" عشرات = "+t*10+". ومعها "+o+" = "+n+".",t+" дес. = "+t*10+". Ещё "+o+" — это "+n+".",t+" tens is "+t*10+". Plus "+o+" makes "+n+"."),1)});
   T.push(function(){var ev=Math.random()<.5,s=[],i;var e=ri(1,49)*2,od=function(){return ri(0,49)*2+1};
-    var a;if(ev){a=e;s=[od(),od(),od()]}else{a=od();s=[e,ri(1,49)*2,ri(1,49)*2]}
+    /* מסיח נפוץ: הספרה הראשונה מטעה (41 ״נראה זוגי״ בגלל ה-4). שניים כאלה ועוד אחד רגיל, כולם שונים */
+    var lure=function(){return ev?pick([2,4,6,8])*10+pick([1,3,5,7,9]):pick([1,3,5,7,9])*10+pick([0,2,4,6,8])};
+    var a;if(ev){a=e;s=[lure(),lure(),od()]}else{a=od();s=[lure(),lure(),e]}
+    while(uniq(s).length<3)s=[lure(),lure(),s[2]];
     return mk("par",ev?L("איזה מספר זוגי?","أي عدد زوجي؟","Какое число чётное?","Which number is even?"):L("איזה מספר אי־זוגי?","أي عدد فردي؟","Какое число нечётное?","Which number is odd?"),"",a,s,
-     L("מספר זוגי נגמר ב-0, 2, 4, 6 או 8.","العدد الزوجي ينتهي بـ 0 أو 2 أو 4 أو 6 أو 8.","Чётное число заканчивается на 0, 2, 4, 6 или 8.","An even number ends in 0, 2, 4, 6 or 8."),
+     L("מספר זוגי נגמר ב-0, 2, 4, 6 או 8. מסתכלים רק על הספרה האחרונה.","العدد الزوجي ينتهي بـ 0 أو 2 أو 4 أو 6 أو 8. ننظر إلى الرقم الأخير فقط.","Чётное число заканчивается на 0, 2, 4, 6 или 8. Смотри только на последнюю цифру.","An even number ends in 0, 2, 4, 6 or 8. Look only at the last digit."),
      L(a+(ev?" זוגי":" אי־זוגי")+": הספרה האחרונה שלו היא "+(a%10)+".",a+(ev?" زوجي":" فردي")+": رقمه الأخير "+(a%10)+".",a+(ev?" — чётное":" — нечётное")+": последняя цифра "+(a%10)+".",a+(ev?" is even":" is odd")+": its last digit is "+(a%10)+"."),2)});
   T.push(function(){var p=ri(1,9)*10;
     return mk("line",L("לאיזה מספר מצביע החץ?","إلى أي عدد يشير السهم؟","На какое число показывает стрелка?","Which number does the arrow point to?"),numLine(0,100,10,p,true),p,[p+10,p-10,p+20,p-20,p/10].filter(function(x){return x>=0&&x<=100}),
@@ -526,17 +531,22 @@ function ts(n){return String(n)}
 G.big=function(lv){var T=[],M=lv===1?999:9999;
   T.push(function(){var n=ri(M>999?1000:100,M),d=pick(M>999?["thousands","hundreds","tens","ones"]:["hundreds","tens","ones"]);
     var s=String(n),pos=d==="thousands"?s.length-4:d==="hundreds"?s.length-3:d==="tens"?s.length-2:s.length-1,v=+s[pos];
+    /* PV: ערך המקום. טעויות אמיתיות: ספרה של מקום אחר, ערך המקום (800 במקום 8), כמה עשרות יש במספר כולו (84 ב-847), ובאחדות: שתי הספרות האחרונות (10 ב-110) */
+    var PV={thousands:1000,hundreds:100,tens:10,ones:1}[d];
     var nm={thousands:L("האלפים","الآلاف","тысяч","thousands"),hundreds:L("המאות","المئات","сотен","hundreds"),tens:L("העשרות","العشرات","десятков","tens"),ones:L("האחדות","الآحاد","единиц","ones")}[d];
-    return mk("digit",L("מהי ספרת "+nm.he+" במספר "+n+"?","ما رقم "+nm.ar+" في العدد "+n+"؟","Какая цифра обозначает количество "+nm.ru+" в числе "+n+"?","What is the digit in the "+nm.en+" place of "+n+"?"),"",v,s.split("").map(Number).concat([(v+1)%10,(v+2)%10]),
+    return mk("digit",L("מהי ספרת "+nm.he+" במספר "+n+"?","ما رقم "+nm.ar+" في العدد "+n+"؟","Какая цифра обозначает количество "+nm.ru+" в числе "+n+"?","What is the digit in the "+nm.en+" place of "+n+"?"),"",v,top3(v,s.split("").map(Number).concat(PV>1?[v*PV,Math.floor(n/PV)]:[n%100],[(v+1)%10,(v+9)%10,(v+2)%10]).filter(function(x){return x>=0})),
      L("כותבים את המספר ומסמנים את המקום: אחדות, עשרות, מאות, אלפים — מהסוף להתחלה.","اكتب العدد وحدّد المنزلة: آحاد، عشرات، مئات، آلاف — من النهاية.","Запиши число и найди разряд: единицы, десятки, сотни, тысячи — с конца.","Write the number and find the place: ones, tens, hundreds, thousands from the right."),
-     L("בספרה במקום ה"+nm.he+" יש "+v+".","الرقم في منزلة "+nm.ar+" هو "+v+".","Цифра в разряде: "+v+".","The digit in that place is "+v+"."),0)});
+     L("הספרה במקום "+nm.he+" היא "+v+".","الرقم في منزلة "+nm.ar+" هو "+v+".","Цифра в разряде: "+v+".","The digit in that place is "+v+"."),0)});
   T.push(function(){var a=ri(10,M),b=ri(10,M),c=ri(10,M),e=ri(10,M),s=uniq([a,b,c,e]),big=Math.random()<.5;if(s.length<4)return G.big(lv);
     var ans=big?Math.max.apply(null,s):Math.min.apply(null,s);
     return mk("cmp",big?L("איזה מספר הגדול ביותר?","ما أكبر عدد؟","Какое число самое большое?","Which number is the biggest?"):L("איזה מספר הקטן ביותר?","ما أصغر عدد؟","Какое число самое маленькое?","Which number is the smallest?"),"",ans,s,
      L("משווים קודם את מספר הספרות, ואחר כך מהספרה הגדולה ביותר.","قارن عدد الأرقام أولًا ثم ابدأ من أكبر منزلة.","Сначала сравни количество цифр, потом цифры слева направо.","Compare the number of digits first, then from the left."),L(ans+" הוא "+(big?"הגדול":"הקטן")+" ביותר.",ans+(big?" أكبر عدد.":" أصغر عدد."),ans+(big?" — самое большое.":" — самое маленькое."),ans+" is the "+(big?"biggest.":"smallest.")),1)});
-  T.push(function(){var u=pick(lv===1?[10]:[10,100]),n=ri(11,M-1),r=Math.round(n/u)*u;if(n%u===0)n+=3;r=Math.round(n/u)*u;
-    return mk("round",L("מעגלים את "+n+" לעשרות או למאות השלמות הקרובות: "+u+". מהו המספר המעוגל?","قرّب "+n+" إلى أقرب "+u+". ما العدد بعد التقريب؟","Округли "+n+" до ближайших "+u+". Какое получилось число?","Round "+n+" to the nearest "+u+". What is the rounded number?"),"",r,[r+u,r-u,Math.floor(n/u)*u,Math.ceil(n/u)*u].filter(function(x){return x>0}),
-     L("מסתכלים על הספרה שאחרי: 5 ומעלה מעגלים למעלה.","انظر إلى الرقم الذي بعده: 5 فأكثر نقرّب لأعلى.","Смотри на следующую цифру: 5 и больше — округляем вверх.","Look at the next digit: 5 or more rounds up."),L(n+" קרוב יותר ל-"+r+".",n+" أقرب إلى "+r+".",n+" ближе к "+r+".",n+" is closer to "+r+"."),2)});
+  T.push(function(){var u=pick(lv===1?[10]:[10,100]),n=ri(u===100?101:11,M-1),r=Math.round(n/u)*u;if(n%u===0)n+=3;r=Math.round(n/u)*u;
+    /* lo ו-hi: שני המספרים העגולים שמשני הצדדים. טעויות אמיתיות: עיגול לכיוון הלא נכון, עיגול למקום הלא נכון (למאות במקום לעשרות), וקפיצה של עוד צעד */
+    var lo=Math.floor(n/u)*u,hi=lo+u,wr=r===lo?hi:lo,op=u===10?Math.round(n/100)*100:Math.round(n/1000)*1000,mid=n-lo===u/2;
+    return mk("round",L("מעגלים את "+n+(u===10?" לעשרות":" למאות")+". מה המספר אחרי העיגול?","قرّب "+n+" إلى أقرب "+u+". ما العدد بعد التقريب؟","Округли "+n+" до ближайших "+u+". Какое получилось число?","Round "+n+" to the nearest "+u+". What is the rounded number?"),"",r,top3(r,[wr,op,r===hi?hi+u:lo-u,Math.ceil(n/(10*u))*10*u,r+u,r-u,r+2*u].filter(function(x){return x>0})),
+     L("מסתכלים על הספרה שאחרי: 5 ומעלה מעגלים למעלה.","انظر إلى الرقم الذي بعده: 5 فأكثر نقرّب لأعلى.","Смотри на следующую цифру: 5 и больше — округляем вверх.","Look at the next digit: 5 or more rounds up."),mid?L(n+" נמצא בדיוק באמצע בין "+lo+" ל-"+hi+". באמצע מעגלים למעלה, ולכן התשובה היא "+r+".",n+" يقع في المنتصف تمامًا بين "+lo+" و"+hi+". في المنتصف نقرّب لأعلى، لذلك الجواب "+r+".",n+" стоит ровно посередине между "+lo+" и "+hi+". Посередине округляем вверх, поэтому ответ "+r+".",n+" is exactly halfway between "+lo+" and "+hi+". Halfway rounds up, so the answer is "+r+".")
+     :L(n+" נמצא בין "+lo+" ל-"+hi+". הוא קרוב יותר ל-"+r+", ולכן התשובה היא "+r+".",n+" يقع بين "+lo+" و"+hi+". هو أقرب إلى "+r+"، لذلك الجواب "+r+".",n+" стоит между "+lo+" и "+hi+". Оно ближе к "+r+", поэтому ответ "+r+".",n+" is between "+lo+" and "+hi+". It is closer to "+r+", so the answer is "+r+"."),2)});
   T.push(function(){var th=ri(1,M>999?9:5),h=ri(0,9),t=ri(0,9),o=ri(0,9),n=th*(M>999?1000:100)+h*(M>999?100:10)+t*(M>999?10:1)+(M>999?o:0);
     var parts=M>999?[th*1000,h*100,t*10,o]:[th*100,h*10,t];var ans=n;
     return mk("expand",L("איזה מספר שווה ל-"+parts.join(" + ")+"?","ما العدد الذي يساوي "+parts.join(" + ")+"؟","Какое число равно "+parts.join(" + ")+"?","Which number equals "+parts.join(" + ")+"?"),"",ans,[ans+10,ans-10,ans+100,ans-100,ans+1].filter(function(x){return x>0}),
@@ -549,8 +559,9 @@ G.area=function(lv){var T=[];
   T.push(function(){var w=ri(2,12),h=ri(2,10),p=2*(w+h);
     return mk("per",L("מה ההיקף של המלבן, בסנטימטרים?","ما محيط المستطيل بالسنتيمتر؟","Каков периметр прямоугольника в сантиметрах?","What is the perimeter of the rectangle, in centimeters?"),rectLab(w,h),p,[w*h,w+h,p+2,p-2,p+4].filter(function(x){return x>0}),
      L("היקף הוא סכום כל הצלעות: מסביב מסביב.","المحيط هو مجموع كل الأضلاع: حول الشكل كله.","Периметр — сумма всех сторон: обойди фигуру по кругу.","Perimeter is the sum of all sides: go all the way around."),L(w+" + "+h+" + "+w+" + "+h+" = "+p+".",w+" + "+h+" + "+w+" + "+h+" = "+p+".",w+" + "+h+" + "+w+" + "+h+" = "+p+".",w+" + "+h+" + "+w+" + "+h+" = "+p+"."),1)});
+  /* מסיחים: היקף במקום שטח, חיבור הצלעות, שורה אחת יותר או פחות, צלע אחת בלבד */
   T.push(function(){var w=ri(2,12),h=ri(2,10),a=w*h;
-    return mk("area",L("מה השטח של המלבן, בסנטימטרים רבועים?","ما مساحة المستطيل بالسنتيمتر المربع؟","Какова площадь прямоугольника в квадратных сантиметрах?","What is the area of the rectangle, in square centimeters?"),rectLab(w,h),a,[2*(w+h),w+h,a+w,a-h,a+h].filter(function(x){return x>0}),
+    return mk("area",L("מה השטח של המלבן, בסנטימטרים רבועים?","ما مساحة المستطيل بالسنتيمتر المربع؟","Какова площадь прямоугольника в квадратных сантиметрах?","What is the area of the rectangle, in square centimeters?"),rectLab(w,h),a,top3(a,[2*(w+h),w+h,a+w,a+h,a-w,a-h,Math.max(w,h)].filter(function(x){return x>0})),
      L("שטח הוא אורך כפול רוחב.","المساحة = الطول × العرض.","Площадь = длина × ширина.","Area = length × width."),L(w+" × "+h+" = "+a+".",w+" × "+h+" = "+a+".",w+" × "+h+" = "+a+".",w+" × "+h+" = "+a+"."),2)});
   if(lv>=2)T.push(function(){var s=ri(2,12),p=4*s;
     return mk("sq",L("לריבוע יש היקף של "+p+" ס״מ. מה אורך צלע אחת?","محيط المربع "+p+" سم. كم طول ضلع واحد؟","Периметр квадрата "+p+" см. Чему равна одна сторона?","A square has a perimeter of "+p+" cm. How long is one side?"),"",s,[s*2,s+4,p-4,s*s,s+1],
@@ -604,8 +615,9 @@ G.bars=function(lv){var T=[],C=[FRU[0],FRU[1],FRU[2],FRU[3]];
      L("מוסיפים את כל ארבע העמודות.","اجمع الأعمدة الأربعة كلها.","Сложи все четыре столбика.","Add all four bars."),L(v.join(" + ")+" = "+t+".",v.join(" + ")+" = "+t+".",v.join(" + ")+" = "+t+".",v.join(" + ")+" = "+t+"."),2);r.visL=bv(v);return r});
   return pick(T)()};
 G.mult=function(lv){var T=[],R=lv===1?6:lv===2?9:12;
+  /* מסיחים: חיבור במקום כפל, קופסה אחת יותר או פחות, ספירה של קופסה אחת בלבד */
   T.push(function(){var a=ri(2,R),b=ri(2,R),n=pick(NAMES),o=pick(OBJS),t=a*b;
-    return mk("groups",L("ל"+n.he+" יש "+a+" קופסאות. בכל קופסה "+b+" "+o.he+". כמה "+o.he+" יש בסך הכול?","مع "+n.ar+" "+a+" علب. في كل علبة "+b+" من "+o.ar+". كم عددها كلها؟","У "+n.ruG+" "+a+" "+plRu(a,"коробка","коробки","коробок")+". В каждой "+ruN(b,o)+". Сколько всего?",n.en+" has "+a+" boxes. Each box has "+b+" "+o.en+". How many in total?"),"",t,[a+b,t+a,t-b,t+b,(a+1)*b].filter(function(x){return x>0}),
+    return mk("groups",L("ל"+n.he+" יש "+a+" קופסאות. בכל קופסה "+b+" "+o.he+". כמה "+o.he+" יש בסך הכול?","مع "+n.ar+" "+a+" علب. في كل علبة "+b+" من "+o.ar+". كم عددها كلها؟","У "+n.ruG+" "+a+" "+plRu(a,"коробка","коробки","коробок")+". В каждой "+ruN(b,o)+". Сколько всего?",n.en+" has "+a+" boxes. Each box has "+b+" "+o.en+". How many in total?"),"",t,top3(t,[a+b,t+b,t-b,b,t+a,t-a,t+2*b].filter(function(x){return x>0})),
      L("כמה קבוצות שוות? כמה בכל קבוצה? כופלים.","كم مجموعة متساوية؟ كم في كل مجموعة؟ نضرب.","Сколько равных групп? Сколько в каждой? Умножаем.","How many equal groups? How many in each? Multiply."),L(a+" × "+b+" = "+t+".",a+" × "+b+" = "+t+".",a+" × "+b+" = "+t+".",a+" × "+b+" = "+t+"."),0)});
   T.push(function(){var a=ri(2,R),b=ri(2,R),t=a*b,o=pick(OBJS);
     return mk("share",L(t+" "+o.he+" מחולקים שווה בשווה ל-"+a+" ילדים. כמה מקבל כל ילד?",t+" من "+o.ar+" توزّع بالتساوي على "+a+" أطفال. كم يأخذ كل طفل؟",ruN(t,o)+" поровну раздали "+a+" детям. Сколько получил каждый?",t+" "+o.en+" are shared equally among "+a+" children. How many does each child get?"),"",b,[a,t-a,b+1,b-1,t/a+2].filter(function(x){return x>0&&x!==b}),
@@ -665,7 +677,7 @@ G.coord=function(lv){var T=[];
      L("ימינה "+x+", למעלה "+y+": ("+x+", "+y+").","يمينًا "+x+" وللأعلى "+y+": ("+x+", "+y+").","Вправо "+x+", вверх "+y+": ("+x+", "+y+").","Right "+x+", up "+y+": ("+x+", "+y+")."),0)});
   T.push(function(){var x=ri(1,6),y=ri(1,6),pts=[[x,y,"A"]],bx,by;do{bx=ri(1,6);by=ri(1,6)}while(bx===x&&by===y);pts.push([bx,by,"B","#2f7fd8"]);
     var which=Math.random()<.5?0:1,p=pts[which],nm=which?"B":"A";
-    return mk("cname",L("מהן הקואורדינטות של הנקודה "+nm+"?","ما إحداثيات النقطة "+nm+"؟","Каковы координаты точки "+nm+"?","What are the coordinates of point "+nm+"?"),coordVis(pts),"("+p[0]+", "+p[1]+")",["("+p[1]+", "+p[0]+")","("+(p[0]%6+1)+", "+p[1]+")","("+p[0]+", "+(p[1]%6+1)+")","("+pts[1-which][0]+", "+pts[1-which][1]+")"],
+    return mk("cname",L("מהן הקואורדינטות של הנקודה "+nm+"?","ما إحداثيات النقطة "+nm+"؟","Каковы координаты точки "+nm+"?","What are the coordinates of point "+nm+"?"),coordVis(pts),"("+p[0]+", "+p[1]+")",top3("("+p[0]+", "+p[1]+")",shuffle(["("+p[1]+", "+p[0]+")","("+(p[0]%6+1)+", "+p[1]+")","("+p[0]+", "+(p[1]%6+1)+")","("+pts[1-which][0]+", "+pts[1-which][1]+")"]).concat(["("+((p[0]+4)%6+1)+", "+p[1]+")","("+p[0]+", "+((p[1]+4)%6+1)+")"])),
      L("המספר הראשון הוא ימינה והשני הוא למעלה.","العدد الأول يمينًا والثاني للأعلى.","Первое число — вправо, второе — вверх.","The first number is right, the second is up."),
      L("נקודה "+nm+" נמצאת ב-("+p[0]+", "+p[1]+").","النقطة "+nm+" عند ("+p[0]+", "+p[1]+").","Точка "+nm+" находится в ("+p[0]+", "+p[1]+").","Point "+nm+" is at ("+p[0]+", "+p[1]+")."),1)});
   T.push(function(){var k=pick(["circle","square","heart","triangle","rect","star"]);
@@ -675,8 +687,9 @@ G.coord=function(lv){var T=[];
     return mk("symn",L("כמה קווי סימטריה יש ל"+N[k].he+"?","كم محور تماثل لـ"+N[k].ar+"؟","Сколько осей симметрии у фигуры: "+N[k].ru+"?","How many lines of symmetry does "+N[k].en+" have?"),"",cnt,[cnt+1,cnt+2,cnt-1<1?cnt+3:cnt-1,0].filter(function(z){return z!==cnt}),
      L("קו סימטריה מחלק את הצורה לשני חלקים שמתלכדים כשמקפלים.","محور التماثل يقسم الشكل إلى جزأين ينطبقان عند الطي.","Ось симметрии делит фигуру на две части, которые совпадают при сгибании.","A line of symmetry splits a shape in two parts that match when folded."),
      L("ל"+N[k].he+" יש "+cnt+" קווי סימטריה.","لـ"+N[k].ar+" "+cnt+" محاور تماثل.",N[k].ru+": осей симметрии — "+cnt+".",N[k].en.charAt(0).toUpperCase()+N[k].en.slice(1)+" has "+cnt+" lines of symmetry."),2)});
+  /* מסיחים: הנקודה לא זזה, קיפול לאורך 3 או 4 במקום 3.5, החלפת הסדר (y, x), קיפול לאורך קו אופקי */
   T.push(function(){var x=ri(1,3),y=ri(1,5),m=7-x;
-    return mk("mirror",L("הנקודה האדומה ב-("+x+", "+y+"). מקפלים לאורך הקו האנכי ב-3.5. איפה הנקודה השנייה?","النقطة الحمراء عند ("+x+", "+y+"). نطوي على الخط العمودي عند 3.5. أين النقطة الأخرى؟","Красная точка в ("+x+", "+y+"). Сгибаем по вертикальной линии на 3,5. Где вторая точка?","The red point is at ("+x+", "+y+"). Fold along the vertical line at 3.5. Where is the matching point?"),coordVis([[x,y]]).replace('</svg>','<line x1="'+(30+3.5*30)+'" y1="10" x2="'+(30+3.5*30)+'" y2="190" stroke="#e8453c" stroke-width="3" stroke-dasharray="7 5"/></svg>'),"("+m+", "+y+")",["("+(m-1>0?m-1:m+1)+", "+y+")","("+x+", "+(y%6+1)+")","("+y+", "+m+")","("+(x+1)+", "+y+")"],
+    return mk("mirror",L("הנקודה האדומה ב-("+x+", "+y+"). מקפלים לאורך הקו האנכי ב-3.5. איפה הנקודה השנייה?","النقطة الحمراء عند ("+x+", "+y+"). نطوي على الخط العمودي عند 3.5. أين النقطة الأخرى؟","Красная точка в ("+x+", "+y+"). Сгибаем по вертикальной линии на 3,5. Где вторая точка?","The red point is at ("+x+", "+y+"). Fold along the vertical line at 3.5. Where is the matching point?"),coordVis([[x,y]]).replace('</svg>','<line x1="'+(30+3.5*30)+'" y1="10" x2="'+(30+3.5*30)+'" y2="190" stroke="#e8453c" stroke-width="3" stroke-dasharray="7 5"/></svg>'),"("+m+", "+y+")",top3("("+m+", "+y+")",["("+x+", "+y+")","("+(6-x)+", "+y+")"].concat(8-x<=6?["("+(8-x)+", "+y+")"]:[],["("+y+", "+m+")","("+x+", "+(7-y)+")"])),
      L("הנקודה ממול נמצאת באותו גובה ובאותו מרחק מהקו.","النقطة المقابلة على الارتفاع نفسه وبالبعد نفسه عن الخط.","Парная точка на той же высоте и на таком же расстоянии от линии.","The matching point is at the same height and the same distance from the line."),
      L("הגובה נשאר "+y+", ו-"+x+" ו-"+m+" במרחק שווה מ-3.5.","الارتفاع يبقى "+y+" و"+x+" و"+m+" على بعد متساوٍ من 3.5.","Высота остаётся "+y+", а "+x+" и "+m+" на одинаковом расстоянии от 3,5.","The height stays "+y+", and "+x+" and "+m+" are the same distance from 3.5."),3)});
   return pick(T)()};
@@ -783,7 +796,7 @@ LESSONS.coord=[{t:L("כדי למצוא נקודה על הרשת: קודם הול
 LESSONS.mon2=[{t:L("בבעיה בשני צעדים עושים צעד אחד, ואז צעד שני עם התוצאה.","في المسألة بخطوتين نفعل خطوة ثم خطوة ثانية بالنتيجة.","В задаче в два шага делаем один шаг, потом второй с результатом.","In a two-step problem you do one step, then a second step with the result."),v:function(){return ""}},
  {t:L("כשקונים כמה דברים שווים, קודם כופלים: מחיר אחד כפול כמות.","عند شراء عدة أشياء متساوية نضرب أولًا: السعر × العدد.","Если покупаем несколько одинаковых вещей, сначала умножаем: цена × количество.","When you buy several equal things, multiply first: price × amount."),v:function(){return ""}},
  {t:L("עודף הוא מה ששילמנו פחות המחיר. מחסרים את המחיר מהתשלום.","الباقي هو ما دفعناه ناقص الثمن. نطرح الثمن من المبلغ المدفوع.","Сдача — это то, что заплатили, минус цена. Вычитаем цену из суммы.","Change is what you paid minus the price. Subtract the price from the payment."),v:function(){return ""}}];
-var BUILD="o5 · 2026-10-04";
+var BUILD="o6 · 2026-10-04";
 /* ===== UI strings ===== */
 var STR={
 he:{brand:"מתמטיקה מעבר לחשבון",title:"מתמטיקה ליסודי",tag:"צורות, מדידות, כסף, שברים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -986,7 +999,7 @@ window.addEventListener("pagehide",function(){stopSpeak()});
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-elem",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o5-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o6-pwa1").catch(function(){})});
 })();
 </script>
 

@@ -21,8 +21,24 @@
 const { chromium } = require('./pw.js');
 const fs = require('fs'), path = require('path');
 const BASE = 'http://127.0.0.1:8099';
-const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-              'english', 'history', 'ulpan', 'lomda', 'kotvim', 'reader', 'bagrut-806'];
+/* O-125, 4.10.2026: הרשימה נגזרת מ-stages.json ולא נכתבת ביד — הרשימה
+   הידנית דילגה על electric, שנולדה אחריה. הקריטריון הוא מה שהבדיקה
+   בודקת: מתאם לימור רשום (`BARAK.register(`) באחד מקובצי האפליקציה —
+   `index.html`, `app.js` (bagrut-806 ודומותיה) או `js/*.js` (משפחת
+   hebrew-lit). `TUTOR.mount` לבדו אינו מספיק: literature, math-elem
+   ואחרות מציגות את לימור בלי מתאם, ושם הבדיקה הייתה נכשלת על
+   ״אין מתאם רשום״ — שזה חוזה אחר, לא באג של המתאם. */
+const ROOT = path.resolve(__dirname, '..', '..');
+const REG = JSON.parse(fs.readFileSync(path.join(__dirname, 'stages.json'), 'utf8'));
+function appSources(a) {
+  const d = path.join(ROOT, a), out = [];
+  for (const f of ['index.html', 'app.js']) if (fs.existsSync(path.join(d, f))) out.push(path.join(d, f));
+  const js = path.join(d, 'js');
+  if (fs.existsSync(js)) for (const f of fs.readdirSync(js).filter(x => x.endsWith('.js'))) out.push(path.join(js, f));
+  return out;
+}
+const APPS = Object.keys(REG.apps).filter(a =>
+  appSources(a).some(f => /BARAK\.register\(/.test(fs.readFileSync(f, 'utf8'))));
 const argv = process.argv.slice(2);
 const TARGET = argv.length ? argv.map(a => a.replace(/\/$/, '')) : APPS;
 const API_RE = /workers\.dev/;
@@ -35,6 +51,8 @@ const ENTER = {
   'math-uni':   ['[data-a="topic"]', '[data-a="lvl"]', '[data-a="start"]'],
   'math-uni2':  ['[data-a="topic"]', '[data-a="lvl"]', '[data-a="start"]'],
   'math-uni3':  ['[data-a="topic"]', '[data-a="lvl"]', '[data-a="start"]'],
+  /* electric הועתקה מ-math-uni3 (24.9.2026) — אותו מסלול כניסה. O-125 */
+  'electric':   ['[data-a="topic"]', '[data-a="lvl"]', '[data-a="start"]'],
   'english':    ['[data-a="open"]'],
   'history':    ['[data-a="open"]'],
   'ulpan':      ['[data-a="open"]'],
@@ -42,7 +60,40 @@ const ENTER = {
   'kotvim':     ['[data-a="ktype"]', '[data-a="ktopic"]', '[data-a="kpick"]'],
   /* reader: הדוגמה המובנית, ואז ״בלי ניקוד״ כי בקשת הניקוד נחסמת בבדיקה */
   'reader':     ['#btnSample', '#btnGo', '#btnNoNikud'],
-  'bagrut-806': ['[data-topic]', '[data-exam]', '[data-go="practice"]']
+  'bagrut-806': ['[data-topic]', '[data-exam]', '[data-go="practice"]'],
+  /* O-125, 4.10.2026: נכנסו עם הגזירה מ-stages.json. המסלולים נמדדו
+     בדפדפן — BARAK.context() מחזיר שאלת mcq/open אחרי הלחיצה האחרונה. */
+  'bagrut-history': ['[data-exam]', '[data-go="practice"]'],
+  'hebrew-lit':  ['[data-g="1"]', '[data-u]', '#startBtn'],
+  'tanakh-elem': ['[data-u]', '#startBtn'],
+  'civics-elem': ['[data-u]', '#startBtn']
+};
+
+/* **מדולגות בקול, לא בשקט.** יש להן מתאם, אבל הכניסה היא שיעור
+   (`?lesson=…`) ולא שאלה: במסך השיעור `next_question` מחזירה false
+   בצדק, ותרגול נפתח רק אחרי צעדים אינטראקטיביים שמשתנים משיעור
+   לשיעור — אין רצף לחיצות קבוע. כל אחת מודפסת בכל ריצה עם הסיבה.
+   מי שמוסיף להן `ENTER` — מוחק אותה מכאן. O-125. */
+const NO_ENTER = {
+  'science':        'כניסה דרך שיעור (?lesson=) — אין מסלול לחיצות קבוע לתרגול',
+  'geography-elem': 'כניסה דרך שיעור (?lesson=) — אין מסלול לחיצות קבוע לתרגול'
+};
+
+/* **כשל ידוע, מוצהר ומודפס — O-125, 4.10.2026.** הגזירה מ-stages.json
+   הכניסה אפליקציות שאף פעם לא נבדקו כאן, והבדיקה מצאה בהן כשלים
+   אמיתיים במתאם שתיקונם בקובצי האפליקציה ובהכרעת מוצר — לא בכלי.
+   כשל שתואם ל-`re` מודפס `~` ואינו מפיל; כל כשל **אחר** באותה
+   אפליקציה מפיל כרגיל; **וכשל ידוע שנעלם מפיל גם הוא** — כדי
+   שהשורה תימחק מכאן ולא תכסה באג חדש שיגיע במקומו. */
+const KNOWN = {
+  'hebrew-lit':  { re: /^(next_question לא אושרה|next_question — המסך לא התחלף|הטקסט של next לא הוצג)/,
+                   why: 'next_question מסרבת לפני מענה (״אחרי שנענתה״, js/app.js:264) — הבדיקה מצפה לדילוג כמו במתמטיקה. הכרעת מוצר.' },
+  'tanakh-elem': { re: /^(next_question לא אושרה|next_question — המסך לא התחלף|הטקסט של next לא הוצג)/,
+                   why: 'אותו מתאם כמו hebrew-lit (js/app.js:209).' },
+  'civics-elem': { re: /^(next_question לא אושרה|next_question — המסך לא התחלף|הטקסט של next לא הוצג)/,
+                   why: 'אותו מתאם כמו hebrew-lit (js/app.js:209).' },
+  'bagrut-history': { re: /^show_hint לא אושרה/,
+                   why: 'ל-34 מתוך 34 הסעיפים ב-data/exams.js אין steps, ו-show_hint מוצעת למודל ולעולם אינה מצליחה.' }
 };
 
 /* עקיפה לזמן פיתוח: BARAK_ENTER='{"english":["[data-a=\"x\"]"]}' */
@@ -52,6 +103,7 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
   const b = await chromium.launch();
   let failed = 0;
   for (const app of TARGET) {
+    if (NO_ENTER[app] && !ENTER[app]) { console.log('· ' + app.padEnd(11) + 'מדולגת — ' + NO_ENTER[app]); continue }
     const ctx = await b.newContext({ locale: 'he-IL', viewport: { width: 390, height: 844 } });
     const page = await ctx.newPage();
     const errs = [];
@@ -216,10 +268,12 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
        או שהמסך התחלף באמת, או שהטקסט אינו מכריז — שלישית אין. */
     if (ENTER[app] && actions.indexOf('next_question') >= 0) {
       await page.evaluate(() => window.TUTOR._clear());
-      const before = await page.evaluate(() => window.BARAK.context());
+      /* ההקשר הגולמי ולא BARAK.context(), שקוטע id ל-80 תווים — אחרי
+         O-82 שתי שאלות שונות עם הוראה ארוכה נראו שם זהות (O-130). */
+      const before = await raw();
       const r = await send('תעבור לשאלה הבאה', 'claim');
-      const after = await page.evaluate(() => window.BARAK.context());
-      const moved = before && after && before.id !== after.id;
+      const after = await raw();
+      const moved = before && after && (before.id !== after.id || before.q !== after.q);
       const claims = r.res && /עוברים לשאלה הבאה/.test(String(r.res.say || ''));
       if (claims && !moved) F('הכרזה בלי ביצוע — נאמר ״עוברים לשאלה הבאה״ והמסך לא התחלף');
       if (moved && !(r.res && r.res.action && r.res.action.name === 'next_question')) F('המסך התחלף ולא דווחה פעולה');
@@ -236,8 +290,13 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
       if (r.res && r.res.action) F('דווחה פעולה על תשובה שלא הכריזה על אחת: ' + r.res.action.name);
     }
     if (errs.length) F('pageerror: ' + errs.join(' | '));
+    const K = KNOWN[app];
+    const known = K ? out.fails.filter(m => K.re.test(m)) : [];
+    out.fails = out.fails.filter(m => known.indexOf(m) < 0);
+    if (K && !known.length) out.fails.push('כשל ידוע נעלם — למחוק את ' + app + ' מ-KNOWN (' + K.why + ')');
+    if (known.length) console.log('~ ' + app.padEnd(11) + 'ידוע: ' + K.why + ' [' + known.length + ']');
     if (out.fails.length) { failed++; console.log('✗ ' + app.padEnd(11) + out.fails.join(' · ')) }
-    else console.log('✓ ' + app.padEnd(11) + actions.join(',') + (out.ctxSample ? '  · q=' + String(out.ctxSample.q).slice(0, 40) : ''));
+    else if (!known.length) console.log('✓ ' + app.padEnd(11) + actions.join(',') + (out.ctxSample ? '  · q=' + String(out.ctxSample.q).slice(0, 40) : ''));
     await ctx.close();
   }
   await b.close();

@@ -1004,7 +1004,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v165 · 2026-10-04";
+var BUILD="v166 · 2026-10-04";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -1061,6 +1061,9 @@ function dayRec(){
 function applyModes(){
   var h=document.documentElement,s=state.settings;
   if(!LANGS[s.lang])s.lang=guessLang();
+  /* פס ״אין קול בשפה״ שייך לשפה שבה נולד — בשפה החדשה אולי יש קול,
+     וההקראה הבאה תבדוק זאת בעצמה. */
+  if(LG!==s.lang&&typeof _ttsNoLangBar!=="undefined"&&_ttsNoLangBar)ttsBarRemove();
   LG=s.lang;
   h.lang=LG; h.dir=LANGS[LG].dir;
   h.classList.toggle("ts2",s.ts===2);
@@ -1262,10 +1265,10 @@ function hlAt(c){
    הגיע מהמערכת. שגיאה שנבלעת עולה יום של חיפוש.
    ------------------------------------------------------------ */
 var TTSMSG={
-  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה"},
-  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق"},
-  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть"},
-  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close"}
+  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה",noLang:"במכשיר אין קול בשפה הזאת, ולכן ההקראה תישמע בקול של שפה אחרת או תשתוק. זו הגדרה במכשיר, לא באפליקציה."},
+  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق",noLang:"لا يوجد في الجهاز صوت بهذه اللغة، لذلك ستُسمَع القراءة بصوت لغة أخرى أو تصمت. هذا إعداد في الجهاز، لا في التطبيق."},
+  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть",noLang:"На устройстве нет голоса для этого языка, поэтому чтение прозвучит голосом другого языка или будет молчать. Это настройка устройства, а не приложения."},
+  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close",noLang:"This device has no voice for this language, so reading will use another language's voice or stay silent. This is a device setting, not the app."}
 };
 var _ttsBar=null;
 function ttsFail(err){
@@ -1278,9 +1281,20 @@ function ttsFail(err){
      שלה, וניקוי כאן מחק אותה מיד. */
   if(err==="interrupted"||err==="canceled")return;
   try{ hlClear() }catch(e){}
+  /* תקלה אמיתית דוחקת את פס ״אין קול בשפה״ — היא חמורה ממנו */
+  if(_ttsBar&&_ttsNoLangBar)ttsBarRemove();
   if(_ttsBar)return;
   var _g="he"; try{_g=LG||"he"}catch(e){} if(!TTSMSG[_g])_g="he";
   var TT=TTSMSG[_g];
+  _ttsNoLangBar=false;
+  ttsBarShow(TT, TT.msg+
+    (err?" <span dir=ltr>("+String(err)+")</span>":"")+
+    TT.tail+
+    '<a href="/voice/" style="color:#fff">'+TT.link+'</a>');
+}
+/* הפס עצמו — בנאי אחד לשתי ההודעות, כדי ששני הפסים לא יתרחקו
+   זה מזה בעיצוב ובנגישות. */
+function ttsBarShow(TT,html){
   var m=document.createElement("div");
   m.setAttribute("role","alert");
   m.id="tts-fail";
@@ -1291,20 +1305,39 @@ function ttsFail(err){
     "display:flex;gap:10px;align-items:flex-start";
   var t=document.createElement("div");
   t.style.cssText="flex:1;min-width:0";
-  t.innerHTML=TT.msg+
-    (err?" <span dir=ltr>("+String(err)+")</span>":"")+
-    TT.tail+
-    '<a href="/voice/" style="color:#fff">'+TT.link+'</a>';
+  t.innerHTML=html;
   var x=document.createElement("button");
   x.type="button"; x.textContent="✕"; x.setAttribute("aria-label",TT.close);
   x.style.cssText="min-width:44px;min-height:44px;border:0;border-radius:9px;"+
     "background:rgba(255,255,255,.16);color:#fff;font-size:16px;cursor:pointer";
-  x.onclick=function(){ if(_ttsBar&&_ttsBar.parentNode)_ttsBar.parentNode.removeChild(_ttsBar); _ttsBar=null };
+  x.onclick=ttsBarRemove;
   m.appendChild(t); m.appendChild(x);
   document.body.appendChild(m); _ttsBar=m;
 }
-/* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
-function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
+function ttsBarRemove(){ if(_ttsBar&&_ttsBar.parentNode)_ttsBar.parentNode.removeChild(_ttsBar); _ttsBar=null; _ttsNoLangBar=false }
+/* הקראה שהצליחה מסירה את הודעת התקלה — המצב השתנה. פס ״אין קול
+   בשפה״ נשאר: ההקראה ״הצליחה״ בקול של שפה אחרת, וזה בדיוק מה
+   שהפס מסביר. הוא נסגר ב-✕ או בהחלפת שפה. */
+function ttsOK(){ if(_ttsBar&&!_ttsNoLangBar)ttsBarRemove() }
+
+/* ------------------------------------------------------------
+   יש קולות במכשיר, אבל אף אחד בשפה הנוכחית. deviceVoice מחזיר null
+   והדפדפן מקריא בקול ברירת המחדל שלו — עברית במבטא אנגלי, או
+   שתיקה. עד כאן זה נראה כמו תקלה באפליקציה. הפס נאמר פעם אחת
+   לשפה בביקור, ורק כשיש רשימת קולות: רשימה ריקה היא מקרה אחר
+   (יש מכשירים שמחזירים ריק ומדברים היטב) ואינה סיבה להודעה.
+   (O-119 — הועתק ממשפחת math-app)
+   ------------------------------------------------------------ */
+var _ttsNoLangBar=false,_ttsNoLangSeen={};
+function ttsNoLang(){
+  var g="he"; try{g=LG||"he"}catch(e){} if(!TTSMSG[g])g="he";
+  if(_ttsNoLangSeen[g])return;
+  _ttsNoLangSeen[g]=true;
+  if(_ttsBar)return;                 /* הודעת תקלה כבר על המסך — היא קודמת */
+  var TT=TTSMSG[g];
+  _ttsNoLangBar=true;
+  ttsBarShow(TT, TT.noLang+' <a href="/voice/" style="color:#fff">'+TT.link+'</a>');
+}
 
 
 /* ------------------------------------------------------------
@@ -1614,6 +1647,8 @@ function speakDevice(text){
      בשפה הנכונה בקול ברירת המחדל מאשר לשתוק לגמרי. */
   var _v=deviceVoice(), _lang=LANGS[LG].tts;
   if(_v&&_v.lang)_lang=_v.lang;
+  /* יש קולות ואף אחד בשפה — אומרים זאת. רשימה ריקה אינה נספרת. */
+  if(!_v){var _all=voices()||[]; if(_all.length)ttsNoLang();}
   var _segs=segments(String(text)), _rate=tuneRate(_lang,state.settings.rate);
   var _pitch=voicePitch(_v);
   var _retried=false;
@@ -3983,7 +4018,11 @@ function genLinear1(L){
   /* קודם עמדו כאן ארבע משוואות שרק אחת מהן השתנתה בין הגרלה להגרלה,
      ושתיים היו מחרוזות קבועות לגמרי — כלומר רמה שהיא בפועל שאלה
      אחת. עכשיו כל ארבע המשוואות מוגרלות מתוך מאגרים. */
-  a=ri(2,5);
+  /* ועדיין ההוראה והביטוי היו קבועים — "איזו משוואה…" מעל "?" — ו-300
+     מתוך 300 הגרלות נראו אותה שאלה (O-122). המקדם הורחב ל-2..9, ונוספה
+     צורה שנייה באותו רעיון: משוואה אחת מוצגת בביטוי, והלומד מכריע אם
+     היא לינארית מסדר ראשון ואם לא — למה. הצורה הישנה נשארת ברבע מההגרלות. */
+  a=ri(2,9);
   var okP=["y′ + "+num(a)+"y = x²",
            "y′ − "+num(a)+"y = sin x",
            "x·y′ + y = "+num(a),
@@ -4009,6 +4048,45 @@ function genLinear1(L){
       :kind==="fun"?_("y יושב כאן בתוך פונקציה לא לינארית, וזה מוציא את המשוואה מהמשפחה הלינארית.")
       :_("y או נגזרתו מופיעים כאן בחזקה גדולה מ-1, ולכן המשוואה אינה לינארית.");
   };
+  if(Math.random()<0.75){
+    /* מכריעים על משוואה אחת. lin — לינארית מסדר ראשון; pow/prd/fun —
+       הסיבה שאינה לינארית; o2 — לינארית אבל מסדר שני. */
+    var kind3=pick(["lin","lin","pow","prd","fun","o2"]),eq3;
+    if(kind3==="lin")eq3=pick(okP);
+    else if(kind3==="o2")eq3=pick(o2P);
+    else eq3=pick(nlP.filter(function(r){return r[1]===kind3}))[0];
+    var V3={lin:_("כן — y ו-y′ מופיעים בחזקה ראשונה, בלי מכפלה ביניהם"),
+            pow:_("לא — y או נגזרתו מופיעים בחזקה גדולה מ-1"),
+            prd:_("לא — יש בה מכפלה של y ב-y′"),
+            fun:_("לא — y יושב בתוך פונקציה לא לינארית"),
+            o2:_("לא — היא לינארית, אבל מסדר שני")};
+    /* למה האפשרות שנבחרה שגויה *במשוואה הזאת* */
+    var why3=function(k){
+      if(k==="lin")return kind3==="o2"?_("זו לינארית, אבל מסדר שני ולא ראשון."):whyNL(kind3);
+      if(k==="pow")return _("אין כאן חזקה גדולה מ-1 של y או של y′.");
+      if(k==="prd")return _("אין כאן מכפלה של y ב-y′. מכפלה של y′ בפונקציה של x, כמו x·y′, מותרת.");
+      if(k==="fun")return _("y אינו יושב כאן בתוך פונקציה. פונקציה של x בלבד, כמו sin x, מותרת.");
+      return _("הנגזרת הגבוהה כאן היא y′, ולכן המשוואה מסדר ראשון.");
+    };
+    var others3=["lin","pow","prd","fun","o2"].filter(function(k){return k!==kind3});
+    /* כשהתשובה ״לא״, ״כן״ תמיד בין המסיחים — אחרת ארבע אפשרויות של ״לא״
+       ואחת של ״כן״ הסגירו את התשובה. */
+    var keep3=kind3==="lin"?[]:["lin"];
+    var rest3=others3.filter(function(k){return k!=="lin"});
+    while(keep3.length<3){var j3=Math.floor(Math.random()*rest3.length);keep3.push(rest3.splice(j3,1)[0])}
+    var here3=kind3==="lin"?_("y ו-y′ מופיעים כאן בחזקה ראשונה ולא מוכפלים זה בזה, והנגזרת הגבוהה היא y′.")
+             :kind3==="o2"?_("זו לינארית, אבל מסדר שני ולא ראשון."):whyNL(kind3);
+    return {ask:_("האם המשוואה היא לינארית מסדר ראשון?"),
+      expr:eq3,
+      ans:W(V3[kind3]),
+      wrong:keep3.map(function(k){return W(V3[k],why3(k))}),
+      steps:[
+        S(_("מה זו לינאריות"),_("y והנגזרות שלו מופיעים בחזקה ראשונה בלבד, ולא מוכפלים זה בזה."),""),
+        S(_("מה מותר"),_("המקדמים והאגף הימני יכולים להיות כל פונקציה של x. זה לא פוגע בלינאריות."),""),
+        S(_("הצורה"),"","y′ + p(x)y = f(x)"),
+        S(_("ובמשוואה הזאת"),here3,V3[kind3])
+      ],rule:"lin1",hint:_("לינארית פירושה ש-y ונגזרותיו בחזקה ראשונה ולא מוכפלים זה בזה.")};
+  }
   return {ask:_("איזו משוואה היא לינארית מסדר ראשון?"),
     expr:"?",
     ans:W(pick(okP)),
@@ -8405,6 +8483,19 @@ var TR_KEYS=[
 "חדו״א 2, לינארית 2, משוואות דיפרנציאליות והסתברות — צעד אחר צעד.",
 "בשנה ב׳ מתקדמים לאינטגרלים כפולים, טורים, מרחבים וקטוריים, משוואות דיפרנציאליות והסתברות רציפה. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד.",
 "השמעת התשובה",
+/* linear1 רמה 3 — ״האם המשוואה הזאת לינארית מסדר ראשון״ (O-122). לפני שלוש האחרונות, ש-trAt מוצא ב-TR_KEYS.length-3. */
+"האם המשוואה היא לינארית מסדר ראשון?",
+"כן — y ו-y′ מופיעים בחזקה ראשונה, בלי מכפלה ביניהם",
+"לא — y או נגזרתו מופיעים בחזקה גדולה מ-1",
+"לא — יש בה מכפלה של y ב-y′",
+"לא — y יושב בתוך פונקציה לא לינארית",
+"לא — היא לינארית, אבל מסדר שני",
+"אין כאן חזקה גדולה מ-1 של y או של y′.",
+"אין כאן מכפלה של y ב-y′. מכפלה של y′ בפונקציה של x, כמו x·y′, מותרת.",
+"y אינו יושב כאן בתוך פונקציה. פונקציה של x בלבד, כמו sin x, מותרת.",
+"הנגזרת הגבוהה כאן היא y′, ולכן המשוואה מסדר ראשון.",
+"ובמשוואה הזאת",
+"y ו-y′ מופיעים כאן בחזקה ראשונה ולא מוכפלים זה בזה, והנגזרת הגבוהה היא y′.",
 "מרשים מאד. שליטה כזאת לא באה לבד.",
 "כל הכבוד. סבב כזה דורש ריכוז אמיתי.",
 "התקדמות טובה. הנושאים למטה מראים איפה לחדד."
@@ -13003,6 +13094,47 @@ trAt("en",TR_KEYS.indexOf("מוגדר עבור −∞ < x < {0}"),[
 trAt("ar",TR_KEYS.length-3,["{0}{1} السنة الثانية في الجامعة</span>", "التفاضل والتكامل 2، الجبر الخطي 2، المعادلات التفاضلية والاحتمالات، خطوة بخطوة.", "في السنة الثانية ندرس التكاملات المزدوجة والمتسلسلات والفضاءات المتجهة والمعادلات التفاضلية والاحتمالات المستمرة. كل سؤال يُحل خطوة بخطوة، مع شرح للأخطاء وصيغ متاحة وقراءة صوتية."]);
 trAt("ru",TR_KEYS.length-3,["{0}{1} Второй курс университета</span>", "Матанализ 2, линейная алгебра 2, дифференциальные уравнения и вероятность: шаг за шагом.", "На втором курсе изучают двойные интегралы, ряды, векторные пространства, дифференциальные уравнения и непрерывные распределения. Каждая задача разбирается по шагам с объяснением ошибок, формулами и озвучиванием."]);
 trAt("en",TR_KEYS.length-3,["{0}{1} For second-year university students</span>", "Calculus 2, linear algebra 2, differential equations and probability: step by step.", "In the second year, work through double integrals, series, vector spaces, differential equations and continuous probability. Each problem has guided steps, explanations for mistakes, a formula sheet and read-aloud."]);
+
+/* linear1 רמה 3 (O-122) */
+trAt("ar",TR_KEYS.indexOf("האם המשוואה היא לינארית מסדר ראשון?"),[
+"هل المعادلة خطية من الرتبة الأولى؟",
+"نعم — y و y′ يظهران بالقوة الأولى، دون حاصل ضرب بينهما",
+"لا — y أو مشتقته يظهران بقوة أكبر من 1",
+"لا — فيها حاصل ضرب y في y′",
+"لا — y موجود داخل دالة غير خطية",
+"لا — هي خطية، لكنها من الرتبة الثانية",
+"لا توجد هنا قوة أكبر من 1 لـ y أو لـ y′.",
+"لا يوجد هنا حاصل ضرب y في y′. ضرب y′ في دالة لـ x، مثل x·y′، مسموح.",
+"y ليس داخل دالة هنا. الدالة في x وحدها، مثل sin x، مسموحة.",
+"المشتقة العليا هنا هي y′، ولذلك المعادلة من الرتبة الأولى.",
+"وفي هذه المعادلة",
+"y و y′ يظهران هنا بالقوة الأولى ولا يُضربان أحدهما بالآخر، والمشتقة العليا هي y′."]);
+trAt("ru",TR_KEYS.indexOf("האם המשוואה היא לינארית מסדר ראשון?"),[
+"Является ли уравнение линейным первого порядка?",
+"Да — y и y′ входят в первой степени, без произведения между ними",
+"Нет — y или его производная входят в степени больше 1",
+"Нет — в нём есть произведение y на y′",
+"Нет — y стоит внутри нелинейной функции",
+"Нет — оно линейное, но второго порядка",
+"Здесь нет степени больше 1 ни у y, ни у y′.",
+"Здесь нет произведения y на y′. Произведение y′ на функцию от x, например x·y′, допустимо.",
+"Здесь y не стоит внутри функции. Функция только от x, например sin x, допустима.",
+"Старшая производная здесь y′, поэтому уравнение первого порядка.",
+"А в этом уравнении",
+"Здесь y и y′ входят в первой степени и не умножаются друг на друга, а старшая производная — y′."]);
+trAt("en",TR_KEYS.indexOf("האם המשוואה היא לינארית מסדר ראשון?"),[
+"Is the equation linear of first order?",
+"Yes — y and y′ appear to the first power, with no product between them",
+"No — y or its derivative appears to a power greater than 1",
+"No — it contains a product of y and y′",
+"No — y sits inside a non-linear function",
+"No — it is linear, but of second order",
+"There is no power of y or y′ greater than 1 here.",
+"There is no product of y and y′ here. Multiplying y′ by a function of x, like x·y′, is allowed.",
+"y is not inside a function here. A function of x alone, like sin x, is allowed.",
+"The highest derivative here is y′, so the equation is of first order.",
+"And in this equation",
+"Here y and y′ appear to the first power and are not multiplied together, and the highest derivative is y′."]);
 /* הרמקול של כל תשובה — התווית נוספה בסוף TR_KEYS. */
 trAt("ar",TR_KEYS.indexOf("השמעת התשובה"),["قراءة الإجابة"]);
 trAt("ru",TR_KEYS.indexOf("השמעת התשובה"),["Озвучить ответ"]);
@@ -13050,7 +13182,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v165-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v166-pwa1").catch(function(){});
   });
 }
 </script>
