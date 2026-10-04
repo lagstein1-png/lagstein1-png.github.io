@@ -55,6 +55,13 @@
 
 ## נסגר — עם ההוכחה
 
+### ערימת הצהריים נחתה (2869a4e); qa 1257 אדום — barak-browser ו-sitemap תוקנו · 4.10.2026
+
+- **מה נחת:** `bekol-remaining-stack-on-093b9fee` — math-g7, science-mid, biology, voice-consistency, culture-elem, history-elem, science-12, english-elem, band3. `git apply --check` נקי על e9d5bba; הגרסה הקודמת (על 9c585f8) נדחתה — 22 קבצים `patch does not apply`. deploy-tutor 23 הצליח.
+- **barak-browser (חשוב):** הגזירה מ-`stages.json` (O-125) הכניסה את culture-elem, history-elem ו-english-elem בלי מסלול כניסה — `BARAK.context() ריק במסך שאלה`, 3 נכשלו. נוספו ל-`ENTER` ול-`NEXT_AFTER_ANSWER` כמו civics-elem (אותה משפחה). אחרי: ״כל האפליקציות שנבדקו״ ✓.
+- **sitemap (חשוב):** `sitemap.js` הורץ בשיבוט shallow, ו-teachers קיבל שוב 2026-10-03 במקום 2026-10-01 — המלכודת של 2cf239c. אדום (אחרי `--unshallow`): `✗ https://bekol.co.il/teachers/ — lastmod 2026-10-03, הקומיט האחרון 2026-10-01`. ירוק: `✓ sitemap.xml: 26 כתובות, תואם ל-stages.json, ל-noindex ול-git`. **לקח:** מחוללים שקוראים את git מריצים רק בשיבוט מלא.
+- **פתוח:** רשומות FOREIGN/COPIED הזמניות ב-`icon.js` וב-`og.js` לחמש האפליקציות הפנימיות החדשות — לחדש במחולל לפני פרסום.
+
 ### record.yml: דחיפה כל 400 משפטים — ריצה 53 בוטלה ידנית ואיבדה 3:50 שעות · 4.10.2026
 
 **קריטי, נמצא.** ריצה 53 (lomda, מ-10:11 שעון ישראל) **בוטלה ידנית** ב-14:02, כנראה כדי לשחרר את ריצה 62 שהמתינה באותה קבוצה (ראו ״record 62 תקוע ב-pending״ בסשן אחר). הדחיפה הייתה רק בסוף האפליקציה, ולכן כל מה שהוקלט אבד, וההוצאה שלו לא נרשמה. **אל תבטלו ריצת הקלטה פעילה.** ריצה ממתינה עולה לבד כשהפעילה מסתיימת (לכל המאוחר אחרי 300 דקות).
