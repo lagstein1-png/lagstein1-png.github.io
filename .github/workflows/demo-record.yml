@@ -55,8 +55,17 @@ jobs:
       - name: ffmpeg קיים
         run: ffmpeg -version
 
+      # **המודול, ולא רק הדפדפן.** ריצה 1 נכשלה כאן בדיוק:
+      # `npx playwright install` מוריד את הדפדפן אבל אינו מתקין את
+      # חבילת `playwright` לתיקיית העבודה, ו-`.claude/qa/pw.js` מחפש
+      # אותה שם (ואחר כך ב-/opt/node22, שאינו קיים על הרנר). הנוסח
+      # כאן הוא אותו נוסח של `qa.yml`, שעובד.
       - name: דפדפן
-        run: npx --yes playwright@1 install --with-deps chromium
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null
+          npm i --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
 
       - name: מקליט
         env:
