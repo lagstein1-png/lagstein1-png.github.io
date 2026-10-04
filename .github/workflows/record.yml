@@ -178,37 +178,54 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           : > /tmp/rec.log
+          # מקטעים של CHUNK משפטים, דחיפה אחרי כל מקטע (4.10.2026): ריצה 53
+          # (lomda) בוטלה ידנית אחרי 3:50 שעות ואיבדה הכול — הדחיפה הייתה רק
+          # בסוף האפליקציה. עכשיו ביטול, timeout או נפילה מאבדים מקטע אחד לכל היותר.
+          CHUNK=400
+          MAXAPP="${{ steps.pick.outputs.max }}"
+          STOPALL=""
           for APP in $APPS; do
-            LEFT=$(( (DEADLINE - $(date +%s)) / 60 ))
-            if [ "$LEFT" -lt 10 ]; then echo "נשארו $LEFT דקות — לא מתחילים את $APP." | tee -a /tmp/rec.log; break; fi
-            echo "=== $APP · עד $LEFT דקות ===" | tee -a /tmp/rec.log
-            timeout -s INT -k 10m "${LEFT}m" node .claude/qa/record.js "$APP" --max "${{ steps.pick.outputs.max }}" $EXTRA 2>&1 | tee /tmp/app.log
-            cat /tmp/app.log >> /tmp/rec.log
-            if ! node .claude/qa/record.js --check; then echo "::error::המניפסט של $APP אינו תואם לדיסק — לא דוחפים"; exit 1; fi
-            git add -- '*/audio/*'
-            if [ -d .claude/qa/record-spend ]; then git add .claude/qa/record-spend; fi
-            if ! git diff --cached --quiet; then
-              N=$(git diff --cached --name-only | grep -c '\.mp3$' || true)
-              git commit -q -m "הקלטות: $APP — $N קבצים חדשים או מוחלפים (record.yml)"
-              # ריצות במקביל דוחפות זו ליד זו: דחיפה שנדחתה (main זז) מנסה שוב.
-              # כל ריצה נוגעת רק בתיקיית האפליקציה שלה ובקובץ ההוצאה שלה,
-              # ולכן ה-rebase נקי; כישלון אחרי שישה ניסיונות הוא אמיתי.
-              OK=""
-              for TRY in 1 2 3 4 5 6; do
-                if git pull --rebase -q origin main && git push -q origin HEAD:main; then OK=1; break; fi
-                git rebase --abort 2>/dev/null || true
-                sleep $(( TRY * 7 + RANDOM % 10 ))
-              done
-              if [ -z "$OK" ]; then
-                echo "::error::הדחיפה של $APP נכשלה שש פעמים — עוצרים, כדי לא להקליט עוד מה שלא יישמר"; exit 1
+            TOTAL=0
+            while :; do
+              LEFT=$(( (DEADLINE - $(date +%s)) / 60 ))
+              if [ "$LEFT" -lt 10 ]; then echo "נשארו $LEFT דקות — עוצרים לפני מקטע נוסף של $APP." | tee -a /tmp/rec.log; STOPALL=1; break; fi
+              REMAIN=$(( MAXAPP - TOTAL ))
+              if [ "$REMAIN" -le 0 ]; then break; fi
+              CH=$(( REMAIN < CHUNK ? REMAIN : CHUNK ))
+              echo "=== $APP · מקטע עד $CH · עד $LEFT דקות ===" | tee -a /tmp/rec.log
+              timeout -s INT -k 10m "${LEFT}m" node .claude/qa/record.js "$APP" --max "$CH" $EXTRA 2>&1 | tee /tmp/app.log
+              cat /tmp/app.log >> /tmp/rec.log
+              if ! node .claude/qa/record.js --check; then echo "::error::המניפסט של $APP אינו תואם לדיסק — לא דוחפים"; exit 1; fi
+              git add -- '*/audio/*'
+              if [ -d .claude/qa/record-spend ]; then git add .claude/qa/record-spend; fi
+              if ! git diff --cached --quiet; then
+                N=$(git diff --cached --name-only | grep -c '\.mp3$' || true)
+                git commit -q -m "הקלטות: $APP — $N קבצים חדשים או מוחלפים (record.yml)"
+                # ריצות במקביל דוחפות זו ליד זו: דחיפה שנדחתה (main זז) מנסה שוב.
+                # כל ריצה נוגעת רק בתיקיית האפליקציה שלה ובקובץ ההוצאה שלה,
+                # ולכן ה-rebase נקי; כישלון אחרי שישה ניסיונות הוא אמיתי.
+                OK=""
+                for TRY in 1 2 3 4 5 6; do
+                  if git pull --rebase -q origin main && git push -q origin HEAD:main; then OK=1; break; fi
+                  git rebase --abort 2>/dev/null || true
+                  sleep $(( TRY * 7 + RANDOM % 10 ))
+                done
+                if [ -z "$OK" ]; then
+                  echo "::error::הדחיפה של $APP נכשלה שש פעמים — עוצרים, כדי לא להקליט עוד מה שלא יישמר"; exit 1
+                fi
+                echo "pushed=1" >> "$GITHUB_OUTPUT"
+                echo "נדחף: $APP, $N הקלטות."
               fi
-              echo "pushed=1" >> "$GITHUB_OUTPUT"
-              echo "נדחף: $APP, $N הקלטות."
-            fi
-            # מכסה, תקרה או זמן — אין טעם להתחיל את האפליקציה הבאה
-            if grep -qE 'כל המודלים נגמרו|המכסה נגמרה|תקרת ההוצאה|SIGINT' /tmp/app.log; then echo "עוצרים אחרי $APP."; break; fi
+              MADE=$(grep -oE 'נוצרו [0-9]+' /tmp/app.log | tail -1 | grep -oE '[0-9]+' || true)
+              MADE=${MADE:-0}
+              TOTAL=$(( TOTAL + MADE ))
+              # מכסה, תקרה או זמן — אין טעם להמשיך בכלל
+              if grep -qE 'כל המודלים נגמרו|המכסה נגמרה|תקרת ההוצאה|SIGINT' /tmp/app.log; then STOPALL=1; break; fi
+              # מקטע בלי אף קובץ חדש — האפליקציה הושלמה (או שהנותרים מיצו ניסיונות)
+              if [ "$MADE" -eq 0 ]; then break; fi
+            done
+            if [ -n "$STOPALL" ]; then echo "עוצרים אחרי $APP."; break; fi
           done
-
       # ריצה בלי תוצר (מכסה או כישלון)? היומן עולה לריפו כדי שאפשר
       # יהיה לראות למה - בלי גישה ללוגים של Actions.
       - name: שומר יומן ריצה ריקה
