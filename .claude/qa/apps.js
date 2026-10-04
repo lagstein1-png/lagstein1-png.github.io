@@ -114,6 +114,41 @@ while ((im = ire.exec(src))) icons.add(im[1]);
 for (const a of apps) if (!icons.has(a.id)) bad(`${a.id}: אין סמל ב-ICONS`);
 for (const i of icons) if (!apps.some(a => a.id === i)) bad(`ICONS."${i}" — סמל בלי אפליקציה ב-DATA.APPS`);
 
+/* --- 2ב. STAGE_IDS ו-SUBJECT_IDS — שתי נקודות החיווט שנשכחו ---
+
+   נמצא ב-4.10.2026 (בוט 107): אלה שתי הרשימות שבאמת מציירות את
+   הדף, והן לא נבדקו. `STAGE_IDS` קובע באיזו משבצת שלב הכרטיס
+   מופיע, ו-`SUBJECT_IDS` איזו תווית נושא נכתבת עליו. אפליקציה
+   שנוספה ל-`DATA.APPS` ול-`ICONS` בלבד **עוברת את כל הבדיקות
+   בירוק ואינה מוצגת כלל** — `STAGE_IDS.map` לעולם אינו מגיע
+   אליה. וחסר ב-`SUBJECT_IDS` נותן `labels.subjects[undefined]`,
+   כלומר תווית ריקה על הכרטיס.
+
+   שתי הרשימות נקראות מתוך הקובץ בלי `eval` גלובלי: שם זהה
+   שכבר קיים כאן היה מפיל את הבדיקה עצמה. */
+const idsLine = /^var STAGE_IDS=.*$/m.exec(src);
+const subjLine = /^var SUBJECT_IDS=.*$/m.exec(src);
+if (!idsLine) bad('לא נמצא STAGE_IDS ב-index.html');
+if (!subjLine) bad('לא נמצא SUBJECT_IDS ב-index.html');
+if (idsLine && subjLine) {
+  const g = {};
+  try {
+    new Function('g', 'with(g){' + idsLine[0] + subjLine[0] +
+      'g._s = STAGE_IDS; g._j = SUBJECT_IDS}')(g);
+  } catch (e) { bad('STAGE_IDS/SUBJECT_IDS אינם נקראים: ' + e.message); }
+  if (g._s && g._j) {
+    const flat = [].concat.apply([], g._s);
+    const dup = flat.filter((x, i) => flat.indexOf(x) !== i);
+    for (const d of new Set(dup)) bad(`STAGE_IDS: "${d}" מופיע ביותר ממשבצת שלב אחת`);
+    for (const a of apps) {
+      if (!flat.includes(a.id)) bad(`${a.id}: אינו ב-STAGE_IDS — הכרטיס לא ייבנה כלל`);
+      if (!(a.id in g._j)) bad(`${a.id}: אינו ב-SUBJECT_IDS — תווית הנושא תצא ריקה`);
+    }
+    for (const i of flat) if (!apps.some(a => a.id === i)) bad(`STAGE_IDS."${i}" — מזהה בלי אפליקציה ב-DATA.APPS`);
+    for (const i of Object.keys(g._j)) if (!apps.some(a => a.id === i)) bad(`SUBJECT_IDS."${i}" — מזהה בלי אפליקציה ב-DATA.APPS`);
+  }
+}
+
 /* --- 3. שם ותיאור בארבע שפות --- */
 for (const a of apps) {
   for (const lg of ['he', 'ar', 'ru', 'en']) {

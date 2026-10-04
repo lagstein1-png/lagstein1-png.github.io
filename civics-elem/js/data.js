@@ -108,12 +108,12 @@ L כמה שכונות יחד הן עיר. כמה ערים ויישובים יח�
 L בקהילה טובה כל אחד עוזר, ומחליטים דברים ביחד.|في المجتمع الجيد يساعد كل واحد، ونقرّر الأمور معًا.|В хорошем сообществе каждый помогает, и важные вещи решают вместе.|In a good community everyone helps, and we decide things together.
 L כשיש בעיה, לא נשארים לבד. מבקשים עזרה ממבוגר שאפשר לסמוך עליו.|عندما تكون هناك مشكلة، لا نبقى وحدنا. نطلب المساعدة من شخص بالغ نثق به.|Если есть проблема, не остаёмся одни. Просим помощи у взрослого, которому доверяем.|When there is a problem, we are not alone. We ask a grown-up we trust for help.
 Q איך קוראים לכיתה או לשכונה, שבהן אנשים עושים דברים יחד ועוזרים זה לזה?|ماذا نسمّي الصفّ أو الحي، حيث يفعل الناس الأشياء معًا ويساعدون بعضهم؟|Как называется класс или район, где люди делают дела вместе и помогают друг другу?|What do we call a class or a neighborhood, where people do things together and help each other?|e_comm|e_fam,e_town,e_country
-Q איזה מקום גדול יותר מהעיר?|أي مكان أكبر من المدينة؟|Какое место больше города?|Which place is bigger than a city?|e_country|e_nbh,e_class,e_fam
-Q כמה שכונות יחד הן...|عدة أحياء معًا هي...|Несколько районов вместе - это...|Several neighborhoods together are...|e_town|e_class,e_fam,e_nbh
-Q כמה ערים ויישובים יחד הם...|عدة مدن وبلدات معًا هي...|Несколько городов и посёлков вместе - это...|Several cities and towns together are...|e_country|e_class,e_nbh,e_fam
-Q איך עושים בקהילה טובה כל דבר?|كيف نفعل الأشياء في مجتمع جيد؟|Как делают дела в хорошем сообществе?|How do we do things in a good community?|e_together|e_alone,e_quarrel,e_ignore
-Q מה עושים השכנים הטובים?|ماذا يفعل الجيران الطيبون؟|Что делают хорошие соседи?|What do good neighbors do?|e_help|e_ignore,e_quarrel,e_alone
-Q מה עושים כשיש בעיה שקשה לפתור לבד?|ماذا نفعل عندما تكون هناك مشكلة يصعب حلّها وحدنا؟|Что делать, если проблему трудно решить одному?|What do we do when a problem is hard to solve alone?|e_askadult|e_ignore,e_alone,e_quarrel
+Q איזה מקום גדול יותר מהעיר?|أي مكان أكبر من المدينة؟|Какое место больше города?|Which place is bigger than a city?|e_country|e_nbh,e_class,e_street
+Q כמה שכונות יחד הן...|عدة أحياء معًا هي...|Несколько районов вместе - это...|Several neighborhoods together are...|e_town|e_country,e_street,e_class
+Q כמה ערים ויישובים יחד הם...|عدة مدن وبلدات معًا هي...|Несколько городов и посёлков вместе - это...|Several cities and towns together are...|e_country|e_town,e_nbh,e_fam
+Q איך עושים בקהילה טובה כל דבר?|كيف نفعل الأشياء في مجتمع جيد؟|Как делают дела в хорошем сообществе?|How do we do things in a good community?|e_together|e_alone,e_byforce,e_byshout
+Q מה עושים השכנים הטובים?|ماذا يفعل الجيران الطيبون؟|Что делают хорошие соседи?|What do good neighbors do?|e_help|e_quarrel,e_noisenight,e_nohello
+Q מה עושים כשיש בעיה שקשה לפתור לבד?|ماذا نفعل عندما تكون هناك مشكلة يصعب حلّها وحدنا؟|Что делать, если проблему трудно решить одному?|What do we do when a problem is hard to solve alone?|e_askadult|e_tryalone,e_secretprob,e_giveup
 E e_comm|t|קהילה|مجتمع|сообщество|a community
 E e_askadult|t|מבקשים עזרה ממבוגר מהימן|نطلب المساعدة من شخص بالغ موثوق|просим помощи у надёжного взрослого|we ask a trusted grown-up for help
 E e_small|t|קטנה|صغير|маленькое|small
@@ -137,12 +137,12 @@ L לכללים שכל המדינה צריכה לשמור עליהם קוראים
 L את החוקים כותבת הכנסת. השוטרים עוזרים לשמור עליהם.|القوانين يكتبها الكنيست. والشرطة تساعد على الالتزام بها.|Законы пишет Кнессет. Полицейские помогают их соблюдать.|The Knesset writes the laws. Police officers help to keep them.
 L כשמחכים בתור, לא דוחפים. כך כולם מקבלים את הזמן שלהם.|عندما ننتظر في الدور، لا ندفع. هكذا يأخذ الجميع وقتهم.|Когда стоим в очереди, не толкаемся. Так каждый получает своё время.|When we wait in line, we do not push. That way everyone gets a turn.
 L כשמישהו מציק או מכה, לא מחזירים מכה. מספרים למבוגר.|عندما يزعجنا أحد أو يضربنا، لا نردّ الضربة. نخبر شخصًا بالغًا.|Когда кто-то обижает или бьёт, мы не бьём в ответ. Мы рассказываем взрослому.|When someone bothers or hits us, we do not hit back. We tell a grown-up.
-Q למה יש כללים?|لماذا توجد قواعد؟|Зачем нужны правила?|Why do we have rules?|e_safe2|e_boring,e_strong,e_nobody
-Q איך קוראים לכללים שכל המדינה צריכה לשמור עליהם?|ماذا نسمّي القواعد التي يجب على الدولة كلها الالتزام بها؟|Как называются правила, которые должна соблюдать вся страна?|What are the rules that the whole country must follow called?|laws|rules,vote,tree
+Q למה יש כללים?|لماذا توجد قواعد؟|Зачем нужны правила?|Why do we have rules?|e_safe2|e_rulesteacher,e_rulesfast,e_strong
+Q איך קוראים לכללים שכל המדינה צריכה לשמור עליהם?|ماذا نسمّي القواعد التي يجب على الدولة كلها الالتزام بها؟|Как называются правила, которые должна соблюдать вся страна?|What are the rules that the whole country must follow called?|laws|rules,e_customs,e_advice
 Q מי כותב את החוקים?|من يكتب القوانين؟|Кто пишет законы?|Who writes the laws?|knesset|policeb,court,city
 Q מי עוזר לשמור על החוקים?|من يساعد في الحفاظ على القوانين؟|Кто помогает соблюдать законы?|Who helps to keep the laws?|police|teacher,fireman,medic
 Q מה עושים כשהרבה ילדים רוצים לעלות על המגלשה?|ماذا نفعل عندما يريد أولاد كثيرون الصعود إلى الزحليقة؟|Что мы делаем, когда много детей хотят залезть на горку?|What do we do when many children want to go on the slide?|e_wait|e_push,e_cut,e_quarrel2
-Q מה עושים כשמישהו מכה אותנו?|ماذا نفعل عندما يضربنا أحد؟|Что делать, когда кто-то нас бьёт?|What do we do when someone hits us?|e_tell|e_hit,e_hide,e_push
+Q מה עושים כשמישהו מכה אותנו?|ماذا نفعل عندما يضربنا أحد؟|Что делать, когда кто-то нас бьёт?|What do we do when someone hits us?|e_tell|e_hit,e_keepquiet,e_pushback
 S rights|⚖️|#2b8a3e|זכויות וחובות|الحقوق والواجبات|права и обязанности|Rights and Duties
 L לכל ילד יש זכויות. זכות היא דבר שמגיע לנו.|لكل طفل حقوق. الحق هو شيء يحق لنا الحصول عليه.|У каждого ребёнка есть права. Право - это то, что нам положено.|Every child has rights. A right is something we are entitled to.
 L יש לנו זכות ללמוד, לשחק, לקבל טיפול רפואי ולהיות מוגנים.|لدينا الحق في أن نتعلّم ونلعب ونتلقّى علاجًا طبيًا ونكون محميّين.|У нас есть право учиться, играть, получать медицинскую помощь и быть в безопасности.|We have the right to learn, to play, to get medical care and to be protected.
@@ -155,7 +155,7 @@ Q איך קוראים לדבר שאנחנו צריכים לעשות?|ماذا ن
 Q איזו זכות יש לכל ילד?|أي حق يملكه كل طفل؟|Какое право есть у каждого ребёнка?|Which right does every child have?|rlearn|urespect,urules,uclean
 Q איזו מהאפשרויות היא חובה?|أي خيار من هذه واجب؟|Что из этого - обязанность?|Which of these is a duty?|urules|rplay,rheal,rsafe
 Q מה נכון לגבי הזכויות והחובות?|ما الصحيح بشأن الحقوق والواجبات؟|Что верно о правах и обязанностях?|What is true about rights and duties?|equal|e_onlyboys,e_onlystrong,e_onlyadults
-Q איזו זכות מאפשרת לנו להגיד מה אנחנו חושבים?|أي حق يتيح لنا أن نقول ما نفكّر فيه؟|Какое право позволяет нам говорить, что мы думаем?|Which right lets us say what we think?|rsay|rplay,rheal,rsafe
+Q איזו זכות מאפשרת לנו להגיד מה אנחנו חושבים?|أي حق يتيح لنا أن نقول ما نفكّر فيه؟|Какое право позволяет нам говорить, что мы думаем?|Which right lets us say what we think?|rsay|rplay,rheal,rlearn
 E e_right|t|זכות|حق|право|a right
 E e_duty|t|חובה|واجب|обязанность|a duty
 `;
@@ -176,7 +176,7 @@ L ביום העצמאות חוגגים שהמדינה קמה. מניפים דג�
 Q באילו צבעים הדגל של ישראל?|ما ألوان علم إسرائيل؟|Какие цвета у флага Израиля?|What colors is the flag of Israel?|bw|rw,gw,by
 Q איזה סמל נמצא באמצע הדגל?|أي رمز يوجد في وسط العلم؟|Какой символ находится в середине флага?|Which symbol is in the middle of the flag?|star|menorah,olive,emblem
 Q איזה דבר מצויר בסמל המדינה?|ما الذي يظهر في شعار الدولة؟|Что изображено на гербе государства?|What is drawn in the state emblem?|menorah|star,flag,anthem
-Q מה מצויר משני צדי המנורה בסמל?|ما الذي يظهر على جانبي الشمعدان في الشعار؟|Что нарисовано по бокам от меноры на гербе?|What is drawn on both sides of the menorah in the emblem?|olive|star,flag,anthem
+Q מה מצויר משני צדי המנורה בסמל?|ما الذي يظهر على جانبي الشمعدان في الشعار؟|Что нарисовано по бокам от меноры на гербе?|What is drawn on both sides of the menorah in the emblem?|olive|star,e_wheat,e_palm
 Q איך קוראים להמנון של ישראל?|ما اسم النشيد الوطني لإسرائيل؟|Как называется гимн Израиля?|What is Israel's anthem called?|hatikva|flag,emblem,star
 Q מה עושים כששרים את ההמנון?|ماذا نفعل عندما نغنّي النشيد الوطني؟|Что делают, когда поют гимн?|What do we do when the anthem is sung?|e_stand|e_sitdown,e_run2,e_play
 Q מהי בירת ישראל?|ما هي عاصمة إسرائيل؟|Какая столица Израиля?|What is the capital of Israel?|jlm|tlv,haifa,eilat
@@ -192,12 +192,12 @@ L יום העצמאות הוא יום שמח. עושים מנגל, מניפים 
 L יום אחד לפני יום העצמאות הוא יום הזיכרון. זוכרים בו חיילים ואנשים שנהרגו.|اليوم الذي يسبق يوم الاستقلال هو يوم الذكرى. نتذكّر فيه جنودًا وأشخاصًا قُتلوا.|За день до Дня независимости - День памяти. В этот день вспоминают солдат и людей, которые погибли.|The day before Independence Day is Memorial Day. We remember soldiers and people who were killed.
 L ביום הזיכרון נשמעת צפירה. כולם עומדים בדממה ונזכרים.|في يوم الذكرى يُسمع صفّارة الإنذار. يقف الجميع بصمت ويتذكّرون.|В День памяти звучит сирена. Все стоят в тишине и вспоминают.|On Memorial Day a siren sounds. Everyone stands in silence and remembers.
 Q באיזו שנה הוקמה מדינת ישראל?|في أي سنة قامت دولة إسرائيل؟|В каком году было создано государство Израиль?|In which year was the State of Israel founded?|y1948|y1938,y1958,y1968
-Q מי קרא את מגילת העצמאות?|من قرأ وثيقة الاستقلال؟|Кто прочитал Декларацию независимости?|Who read the Declaration of Independence?|bengurion|soldier,teacher,president
+Q מי קרא את מגילת העצמאות?|من قرأ وثيقة الاستقلال؟|Кто прочитал Декларацию независимости?|Who read the Declaration of Independence?|bengurion|soldier,e_herzl,president
 Q באיזו עיר קראו את מגילת העצמאות?|في أي مدينة قُرئت وثيقة الاستقلال؟|В каком городе прочитали Декларацию независимости?|In which city was the Declaration of Independence read?|tlv|jlm,haifa,eilat
 Q איזה יום הוא היום שמח, עם דגלים וזיקוקים?|أي يوم هو اليوم السعيد، مع الأعلام والألعاب النارية؟|Какой день весёлый, с флагами и фейерверками?|Which day is happy, with flags and fireworks?|indep|memor,purim,sukkot
 Q איזה יום זוכרים בו חיילים ואנשים שנהרגו?|في أي يوم نتذكّر الجنود والأشخاص الذين قُتلوا؟|В какой день вспоминают солдат и людей, которые погибли?|On which day do we remember soldiers and people who were killed?|memor|indep,purim,pesach
-Q מה עושים כשנשמעת צפירה ביום הזיכרון?|ماذا نفعل عندما تُسمع الصفّارة في يوم الذكرى؟|Что делают, когда в День памяти звучит сирена?|What do we do when the siren sounds on Memorial Day?|siren|run,e_run2,e_play
-Q מי היה ראש הממשלה הראשון של ישראל?|من كان أول رئيس حكومة في إسرائيل؟|Кто был первым премьер-министром Израиля?|Who was the first Prime Minister of Israel?|bengurion|mayor,president,judge
+Q מה עושים כשנשמעת צפירה ביום הזיכרון?|ماذا نفعل عندما تُسمع الصفّارة في يوم الذكرى؟|Что делают, когда в День памяти звучит сирена?|What do we do when the siren sounds on Memorial Day?|siren|run,e_sirentalk,e_sirensit
+Q מי היה ראש הממשלה הראשון של ישראל?|من كان أول رئيس حكومة في إسرائيل؟|Кто был первым премьер-министром Израиля?|Who was the first Prime Minister of Israel?|bengurion|mayor,president,e_weizmann
 `;
 RAW+=String.raw`
 S map|🗺️|#0b7285|ישראל על המפה|إسرائيل على الخريطة|Израиль на карте|Israel on the Map
@@ -226,8 +226,8 @@ Q מי עומד בראש העירייה?|من يرأس البلدية؟|Кто �
 Q מי בוחר את ראש העיר?|من ينتخب رئيس البلدية؟|Кто выбирает мэра?|Who chooses the mayor?|e_residents|e_teachers,e_soldiers,e_kids
 Q איזה גוף דואג לגינות ולרחובות בעיר?|أي جهة تهتم بالحدائق والشوارع في المدينة؟|Какой орган заботится о парках и улицах города?|Which body takes care of the parks and streets in the city?|city|knesset,court,mda
 Q מה עושה העירייה?|ماذا تفعل البلدية؟|Что делает муниципалитет?|What does the municipality do?|e_gardens|e_laws2,e_judge2,e_army
-Q כדי שהעירייה תעבוד, מה משלמים התושבים?|لكي تعمل البلدية، ماذا يدفع السكان؟|Чтобы муниципалитет работал, что платят жители?|So that the municipality can work, what do the residents pay?|e_taxes|e_games,e_flags,e_candy
-Q מה עוד אנחנו יכולים לעשות למען העיר?|ماذا يمكننا أن نفعل أيضًا من أجل المدينة؟|Что ещё мы можем сделать для города?|What else can we do for the city?|uclean|e_trashthrow,e_breakbench,e_hidehere
+Q כדי שהעירייה תעבוד, מה משלמים התושבים?|لكي تعمل البلدية، ماذا يدفع السكان؟|Чтобы муниципалитет работал, что платят жители?|So that the municipality can work, what do the residents pay?|e_taxes|e_payfines,e_payfree,e_paywater
+Q מה עוד אנחנו יכולים לעשות למען העיר?|ماذا يمكننا أن نفعل أيضًا من أجل المدينة؟|Что ещё мы можем сделать для города?|What else can we do for the city?|uclean|e_cityothers,e_cityhome,e_citycomplain
 E e_residents|t|התושבים|السكان|жители|the residents
 E e_teachers|t|המורים בלבד|المعلّمون فقط|только учителя|only the teachers
 E e_soldiers|t|החיילים|الجنود|солдаты|the soldiers
@@ -254,11 +254,11 @@ L ההצבעה סודית, כדי שכל אחד יבחר מה שהוא רוצה,
 L גם בכיתה אפשר לעשות בחירות, למשל כדי לבחור נציג כיתה.|وفي الصف أيضًا يمكن إجراء انتخابات، مثلًا لاختيار ممثّل الصف.|В классе тоже можно проводить выборы, например, чтобы выбрать старосту.|In class we can also hold an election, for example to choose a class representative.
 L ברוב הקולות מחליטים, אבל מכבדים גם את מי שחשב אחרת.|نقرّر بحسب أغلبية الأصوات، لكننا نحترم أيضًا من فكّر بشكل مختلف.|Решение принимается большинством голосов, но мы уважаем и тех, кто думал иначе.|We decide by the most votes, but we also respect people who thought differently.
 Q איך קוראים למדינה שבה האנשים מחליטים?|ماذا نسمّي الدولة التي يقرّر فيها الناس؟|Как называется страна, в которой решают люди?|What is a country called in which the people decide?|e_democracy|e_monarchy,e_nolaws,e_island
-Q מה עושים בבחירות?|ماذا نفعل في الانتخابات؟|Что делают на выборах?|What do people do in an election?|vote|e_trashthrow,e_play,e_breakbench
+Q מה עושים בבחירות?|ماذا يفعل الناس في الانتخابات؟|Что делают на выборах?|What do people do in an election?|vote|e_elecwatch,e_elecwait,e_elecdecide
 Q כל כמה שנים בדרך כלל יש בחירות לכנסת?|كل كم سنة تُجرى عادةً انتخابات الكنيست؟|Через сколько лет обычно проходят выборы в Кнессет?|How often are Knesset elections usually held (in years)?|n4|n1,n10,n40
 Q מגיל כמה מצביעים לכנסת?|من أي عمر يصوّت المواطن للكنيست؟|С какого возраста голосуют в Кнессет?|From what age can a citizen vote for the Knesset?|n18|n10,n12,n8
 Q איך מצביעים בבחירות לכנסת?|كيف نصوّت في انتخابات الكنيست؟|Как голосуют на выборах в Кнессет?|How do we vote in the Knesset elections?|secret|open,e_alone2,e_byphone
-Q למה ההצבעה סודית?|لماذا التصويت سرّي؟|Почему голосование тайное?|Why is the vote secret?|e_nofear|e_boring,e_strong,e_nobody
+Q למה ההצבעה סודית?|لماذا التصويت سرّي؟|Почему голосование тайное?|Why is the vote secret?|e_nofear|e_secretfast,e_secretsame,e_secretshow
 Q איך מחליטים כשיש בחירות בכיתה?|كيف نقرّر عندما تكون هناك انتخابات في الصف؟|Как принимают решение на выборах в классе?|How do we decide in a class election?|e_majority|e_teacherwins,e_loudest,e_oldest
 E e_democracy|t|דמוקרטיה|ديمقراطية|демократия|a democracy
 E e_monarchy|t|מדינה שבה אדם אחד מחליט על הכול|دولة يقرّر فيها شخص واحد كل شيء|страна, где всё решает один человек|a country where one person decides everything
@@ -278,13 +278,13 @@ L הממשלה דואגת שהחוקים יתקיימו ושהמדינה תתנ�
 L בתי המשפט שופטים. השופטים בודקים מה קרה ומחליטים מה הוגן לפי החוק.|المحاكم تحكم. القضاة يفحصون ما حدث ويقرّرون ما هو عادل بحسب القانون.|Суды судят. Судьи выясняют, что произошло, и решают, что справедливо по закону.|The courts judge. Judges check what happened and decide what is fair by law.
 L בית המשפט העליון נמצא בירושלים. הוא מקום המשפט הגבוה ביותר.|المحكمة العليا في القدس. وهي أعلى جهة قضائية.|Верховный суд находится в Иерусалиме. Это самый высокий суд.|The Supreme Court is in Jerusalem. It is the highest court.
 L נשיא המדינה הוא לא ראש הממשלה. הוא מייצג את כל אזרחי המדינה.|رئيس الدولة ليس رئيس الحكومة. وهو يمثّل جميع مواطني الدولة.|Президент государства - не премьер-министр. Он представляет всех граждан страны.|The President of the State is not the Prime Minister. He or she represents all the citizens.
-Q מי כותב את החוקים?|من يكتب القوانين؟|Кто пишет законы?|Who writes the laws?|knesset|gov,court,city
-Q כמה חברי כנסת יש בכנסת?|كم عضوًا في الكنيست؟|Сколько депутатов в Кнессете?|How many members are there in the Knesset?|n120|n12,n10,n40
+Q מי מחליט אילו חוקים יהיו במדינה?|من يقرّر ما هي قوانين الدولة؟|Кто решает, какие законы будут в стране?|Who decides what the laws of the country will be?|knesset|gov,court,city
+Q כמה חברי כנסת יש בכנסת?|كم عضوًا في الكنيست؟|Сколько депутатов в Кнессете?|How many members are there in the Knesset?|n120|n100,n110,n130
 Q מי עומד בראש הממשלה?|من يرأس الحكومة؟|Кто возглавляет правительство?|Who is the head of the government?|pm|president,mayor,judge
 Q מי דואג שהחוקים יתקיימו ושהמדינה תתנהל?|من يهتم بتنفيذ القوانين وبإدارة الدولة؟|Кто следит за выполнением законов и управляет страной?|Who makes sure the laws are carried out and the country is run?|gov|knesset,court,city
 Q איזה גוף שופט ומחליט מה הוגן לפי החוק?|أي جهة تحكم وتقرّر ما هو عادل بحسب القانون؟|Какой орган судит и решает, что справедливо по закону?|Which body judges and decides what is fair by law?|court|knesset,gov,city
-Q איפה נמצא בית המשפט העליון?|أين تقع المحكمة العليا؟|Где находится Верховный суд?|Where is the Supreme Court?|jlm|tlv,haifa,eilat
-Q מי מייצג את כל אזרחי המדינה?|من يمثّل جميع مواطني الدولة؟|Кто представляет всех граждан страны?|Who represents all the citizens of the country?|president|mayor,judge,police
+Q איפה נמצא בית המשפט העליון?|أين تقع المحكمة العليا؟|Где находится Верховный суд?|Where is the Supreme Court?|jlm|tlv,bsheva,tiberias
+Q מי מייצג את כל אזרחי המדינה?|من يمثّل جميع مواطني الدولة؟|Кто представляет всех граждан страны?|Who represents all the citizens of the country?|president|pm,mayor,judge
 `;
 RAW+=String.raw`
 E e_respect|t|מכבדים ולומדים זה מזה|نحترم ونتعلّم من بعضنا|уважаем и учимся друг у друга|we respect and learn from each other
@@ -306,9 +306,9 @@ L כשאנחנו שונים זה מזה, אפשר ללמוד דברים חדשי
 L לא צוחקים על מי שמדבר אחרת או שונה מאיתנו. מכבדים כל אדם.|لا نسخر ممّن يتكلّم بشكل مختلف أو يختلف عنّا. نحترم كل إنسان.|Мы не смеёмся над теми, кто говорит иначе или отличается от нас. Мы уважаем каждого человека.|We do not laugh at someone who speaks differently or is different from us. We respect every person.
 Q באילו שפות מדברים בישראל?|بأي لغات يتحدّث الناس في إسرائيل؟|На каких языках говорят в Израиле?|What languages do people speak in Israel?|e_langs|e_one,e_none,e_two
 Q איך מתייחסים לאדם שמדבר אחרת מאיתנו?|كيف نتعامل مع شخص يتحدّث بشكل مختلف عنّا؟|Как относиться к человеку, который говорит иначе, чем мы?|How do we treat a person who speaks differently from us?|e_respect|e_laugh,e_avoid,e_hit
-Q איזה חג חוגגים בדרך כלל בקהילה המוסלמית?|أي عيد يحتفل به المسلمون عادةً؟|Какой праздник обычно отмечает мусульманская община?|Which holiday does the Muslim community usually celebrate?|e_eid|e_pizza,purim,e_xmas
-Q איזה חג חוגגים בדרך כלל בקהילה הנוצרית?|أي عيد يحتفل به المسيحيون عادةً؟|Какой праздник обычно отмечает христианская община?|Which holiday does the Christian community usually celebrate?|e_xmas|e_eid,purim,e_pizza
-Q איזה חג חוגגים בדרך כלל בקהילה היהודית?|أي عيد يحتفل به اليهود عادةً؟|Какой праздник обычно отмечает еврейская община?|Which holiday does the Jewish community usually celebrate?|e_rosh|e_eid,e_xmas,e_pizza
+Q איזה חג חוגגים בדרך כלל בקהילה המוסלמית?|أي عيد يحتفل به المسلمون عادةً؟|Какой праздник обычно отмечает мусульманская община?|Which holiday does the Muslim community usually celebrate?|e_eid|e_hanu,purim,e_xmas
+Q איזה חג חוגגים בדרך כלל בקהילה הנוצרית?|أي عيد يحتفل به المسيحيون عادةً؟|Какой праздник обычно отмечает христианская община?|Which holiday does the Christian community usually celebrate?|e_xmas|e_eid,purim,e_hanu
+Q איזה חג חוגגים בדרך כלל בקהילה היהודית?|أي عيد يحتفل به اليهود عادةً؟|Какой праздник обычно отмечает еврейская община?|Which holiday does the Jewish community usually celebrate?|e_rosh|e_eid,e_xmas,e_easter
 Q מה אפשר ללמוד כשאנחנו שונים זה מזה?|ماذا يمكننا أن نتعلّم عندما نكون مختلفين؟|Чему мы можем научиться, когда мы разные?|What can we learn when we are different from each other?|e_newthings|e_nothing2,e_hate,e_mean
 E e_newthings|t|דברים חדשים|أشياء جديدة|новое|new things
 E e_nothing2|t|שום דבר|لا شيء|ничего|nothing at all
@@ -324,9 +324,9 @@ L אפשר לשמור על הסביבה גם בבית: לכבות אור, לא �
 Q לאיזה פח זורקים בקבוק פלסטיק?|في أي حاوية نرمي زجاجة البلاستيك؟|В какой контейнер бросают пластиковую бутылку?|Which bin do we put a plastic bottle in?|binO|binB,binG,binK
 Q לאיזה פח זורקים נייר וקרטון?|في أي حاوية نرمي الورق والكرتون؟|В какой контейнер бросают бумагу и картон?|Which bin do we put paper and cardboard in?|binB|binO,binG,binK
 Q מה עושים כשלא צריך מים?|ماذا نفعل عندما لا نحتاج الماء؟|Что делают, когда вода не нужна?|What do we do when we do not need water?|e_closetap|e_leavetap,e_wasteall,e_hidew
-Q מה עושים בט״ו בשבט?|ماذا نفعل في عيد الأشجار؟|Что делают в Ту би-Шват?|What do we do on Tu BiShvat?|tree|water,e_trashthrow,e_breakbench
+Q מה עושים בט״ו בשבט?|ماذا نفعل في عيد الأشجار؟|Что делают в Ту би-Шват?|What do we do on Tu BiShvat?|tree|water,e_tubicut,e_tubipick
 Q איפה זורקים זבל?|أين نرمي القمامة؟|Куда бросают мусор?|Where do we throw trash?|e_inbin|e_ongr,e_inbeach,e_innature
-Q למה חשוב לחסוך במים?|لماذا من المهم توفير الماء؟|Почему важно экономить воду?|Why is it important to save water?|e_precious|e_boring,e_strong,e_nobody
+Q למה חשוב לחסוך במים?|لماذا من المهم توفير الماء؟|Почему важно экономить воду?|Why is it important to save water?|e_precious|e_waterrain,e_watersalt,e_waterpool
 E e_closetap|t|סוגרים את הברז|نغلق الصنبور|закрываем кран|we close the tap
 E e_leavetap|t|משאירים את הברז פתוח|نترك الصنبور مفتوحًا|оставляем кран открытым|we leave the tap open
 E e_wasteall|t|שופכים מים על הרצפה|نسكب الماء على الأرض|выливаем воду на пол|we pour water on the floor
@@ -358,12 +358,63 @@ L כשצריך עזרה דחופה מתקשרים למספרי חירום. מס�
 L משטרה: 100. מגן דוד אדום: 101. כבאות והצלה: 102.|الشرطة: 100. نجمة داود الحمراء: 101. الإطفاء والإنقاذ: 102.|Полиция: 100. «Маген Давид Адом»: 101. Пожарная служба: 102.|Police: 100. Magen David Adom: 101. Fire and rescue: 102.
 L חובש עוזר כשמישהו חולה או נפצע. כבאי מכבה אש. שוטר שומר עלינו.|يساعد المسعف عندما يمرض أحد أو يُصاب. ورجل الإطفاء يطفئ النار. والشرطي يحمينا.|Фельдшер помогает, когда кто-то заболел или ранен. Пожарный тушит огонь. Полицейский охраняет нас.|A paramedic helps when someone is sick or hurt. A firefighter puts out fires. A police officer protects us.
 L כשנשמעת אזעקה, נכנסים למקום מוגן ושומעים הוראות מהמבוגרים.|عندما تُسمع صفّارة الإنذار، ندخل إلى مكان محمي ونصغي لتعليمات الكبار.|Когда звучит сирена, мы идём в защищённое место и слушаем указания взрослых.|When an alarm sounds, we go to a protected room and listen to the grown-ups' instructions.
-Q מה עושים לפני שחוצים כביש?|ماذا نفعل قبل أن نعبر الشارع؟|Что делают перед тем, как переходить дорогу?|What do we do before we cross the road?|e_cross|e_crossred,e_phone,e_close
-Q מה עושים בכל נסיעה ברכב?|ماذا نفعل في كل رحلة بالسيارة؟|Что делают в каждой поездке на машине?|What do we do in every car ride?|e_belt|e_window,e_crossred,e_close
-Q לאיזה מספר מתקשרים כדי להזעיק משטרה?|بأي رقم نتّصل لاستدعاء الشرطة؟|По какому номеру звонят, чтобы вызвать полицию?|Which number do we call for the police?|n100|n101,n102,n12
-Q לאיזה מספר מתקשרים כדי להזעיק מגן דוד אדום?|بأي رقم نتّصل لاستدعاء نجمة داود الحمراء؟|По какому номеру звонят, чтобы вызвать «Маген Давид Адом»?|Which number do we call for Magen David Adom?|n101|n100,n102,n12
-Q לאיזה מספר מתקשרים כדי להזעיק כבאות והצלה?|بأي رقم نتّصل لاستدعاء الإطفاء والإنقاذ؟|По какому номеру звонят, чтобы вызвать пожарную службу?|Which number do we call for fire and rescue?|n102|n100,n101,n12
+Q מה עושים לפני שחוצים כביש?|ماذا نفعل قبل أن نعبر الشارع؟|Что делают перед тем, как переходить дорогу?|What do we do before we cross the road?|e_cross|e_crossrun,e_crossone,e_crossfollow
+Q מה עושים בכל נסיעה ברכב?|ماذا نفعل في كل رحلة بالسيارة؟|Что делают в каждой поездке на машине?|What do we do in every car ride?|e_belt|e_carstand,e_carhead,e_carnoseat
+Q לאיזה מספר מתקשרים כדי להזעיק משטרה?|بأي رقم نتّصل لاستدعاء الشرطة؟|По какому номеру звонят, чтобы вызвать полицию?|Which number do we call for the police?|n100|n101,n102,n104
+Q לאיזה מספר מתקשרים כדי להזעיק מגן דוד אדום?|بأي رقم نتّصل لاستدعاء نجمة داود الحمراء؟|По какому номеру звонят, чтобы вызвать «Маген Давид Адом»?|Which number do we call for Magen David Adom?|n101|n100,n102,n104
+Q לאיזה מספר מתקשרים כדי להזעיק כבאות והצלה?|بأي رقم نتّصل لاستدعاء الإطفاء والإنقاذ؟|По какому номеру звонят, чтобы вызвать пожарную службу?|Which number do we call for fire and rescue?|n102|n100,n101,n104
 Q מי מכבה אש?|من يطفئ النار؟|Кто тушит огонь?|Who puts out fires?|fireman|medic,police,teacher
 Q מי עוזר כשמישהו חולה או נפצע?|من يساعد عندما يمرض أحد أو يُصاب؟|Кто помогает, когда кто-то заболел или ранен?|Who helps when someone is sick or hurt?|medic|fireman,police,teacher
-Q מה עושים כשנשמעת אזעקה?|ماذا نفعل عندما تُسمع صفّارة الإنذار؟|Что делают, когда звучит сирена?|What do we do when an alarm sounds?|e_shelter|e_window,e_ignoreSiren,e_phone
+Q מה עושים כשנשמעת אזעקה?|ماذا نفعل عندما تُسمع صفّارة الإنذار؟|Что делают, когда звучит сигнал тревоги?|What do we do when an alarm sounds?|e_shelter|e_window,e_ignoreSiren,e_alarmcall
+`;
+
+RAW+=String.raw`
+/* מסיחים שנכתבו בסבב התוכן: כל אחד טענה שלמה שילד יכול להאמין בה.
+   מה שהוחלף נשאר למעלה בקובץ, כפי שהוא. */
+E e_street|t|הרחוב|الشارع|улица|the street
+E e_byforce|t|בכוח|بالقوّة|силой|by force
+E e_byshout|t|בצעקות|بالصراخ|криком|by shouting
+E e_noisenight|t|להרעיש בלילה|أن نزعج الجيران في الليل|шуметь по ночам|to make noise at night
+E e_nohello|t|לא להגיד שלום|ألّا نُلقي التحية|не здороваться|not to say hello
+E e_tryalone|t|ממשיכים לנסות לבד בלי לספר לאף אחד|نواصل المحاولة وحدنا دون أن نخبر أحدًا|продолжаем пробовать сами и никому не говорим|we keep trying alone and tell nobody
+E e_secretprob|t|שומרים את הבעיה בסוד|نُبقي المشكلة سرًّا|держим проблему в секрете|we keep the problem a secret
+E e_giveup|t|מוותרים ולא מנסים יותר|نستسلم ولا نحاول مرة أخرى|сдаёмся и больше не пытаемся|we give up and stop trying
+E e_rulesteacher|t|כדי שרק המורה יחליט מה מותר ומה אסור|لكي يقرّر المعلّم وحده ما هو مسموح وما هو ممنوع|чтобы только учитель решал, что можно и что нельзя|so that only the teacher decides what is allowed and what is not
+E e_rulesfast|t|כדי שהמשחק ייגמר מהר יותר|لكي تنتهي اللعبة أسرع|чтобы игра заканчивалась быстрее|so that the game ends faster
+E e_customs|t|מנהגים|عادات|обычаи|customs
+E e_advice|t|עצות|نصائح|советы|advice
+E e_keepquiet|t|לא מספרים לאף אחד|لا نخبر أحدًا|никому не рассказываем|we tell nobody
+E e_pushback|t|דוחפים חזק בחזרה|ندفع بقوة في المقابل|толкаем сильно в ответ|we push back hard
+E e_wheat|t|שיבולים|سنابل قمح|колосья пшеницы|ears of wheat
+E e_palm|t|עלי דקל|أوراق نخيل|пальмовые листья|palm leaves
+E e_herzl|p|תיאודור הרצל|تيودور هرتسل|Теодор Герцль|Theodor Herzl
+E e_weizmann|p|חיים ויצמן|حاييم وايزمان|Хаим Вейцман|Chaim Weizmann
+E e_sirentalk|t|ממשיכים לדבר עם חברים|نواصل الحديث مع الأصدقاء|продолжаем разговаривать с друзьями|we keep talking with friends
+E e_sirensit|t|יושבים וממשיכים לאכול|نجلس ونواصل الأكل|садимся и продолжаем есть|we sit and keep eating
+E e_payfines|t|רק קנסות|غرامات فقط|только штрафы|only fines
+E e_payfree|t|כלום, הכול בחינם|لا شيء، كل شيء مجاني|ничего, всё бесплатно|nothing, everything is free
+E e_paywater|t|רק את חשבון המים|فاتورة الماء فقط|только счёт за воду|only the water bill
+E e_cityothers|t|לחכות שמישהו אחר ינקה|أن أنتظر شخصًا آخر لينظّف|ждать, пока уберёт кто-то другой|to wait for someone else to clean
+E e_cityhome|t|לשמור רק על הבית ולא על הרחוב|أن أحافظ على البيت فقط لا على الشارع|беречь только дом, а не улицу|to look after only the house, not the street
+E e_citycomplain|t|רק להתלונן בעירייה|أن أشتكي للبلدية فقط|только жаловаться в муниципалитет|only to complain to the municipality
+E e_elecwatch|t|להסתכל בלבד|أن ينظروا فقط|только смотреть|to only watch
+E e_elecwait|t|לחכות בבית|أن ينتظروا في البيت|ждать дома|to wait at home
+E e_elecdecide|t|להחליט במקום כולם|أن يقرّروا بدل الجميع|решать за всех|to decide for everyone
+E e_secretfast|t|כדי שהספירה תיגמר מהר יותר|لكي ينتهي العدّ أسرع|чтобы подсчёт закончился быстрее|so that the counting ends sooner
+E e_secretsame|t|כדי שכולם יבחרו אותו דבר|لكي يختار الجميع الشيء نفسه|чтобы все выбрали одно и то же|so that everyone chooses the same thing
+E e_secretshow|t|כדי שאפשר יהיה להראות לחברים|لكي نتمكّن من أن نُري الأصدقاء|чтобы можно было показать друзьям|so that we can show it to our friends
+E e_hanu|t|חנוכה|حانوكا|Ханука|Hanukkah
+E e_easter|t|חג הפסחא|عيد القيامة|Пасха|Easter
+E e_waterrain|t|כי בחורף יורד הרבה גשם|لأن في الشتاء يهطل مطر كثير|потому что зимой идёт много дождя|because a lot of rain falls in winter
+E e_watersalt|t|כי המים בים מלוחים|لأن ماء البحر مالح|потому что вода в море солёная|because the water in the sea is salty
+E e_waterpool|t|כי בבריכה יש הרבה מים|لأن في المسبح ماء كثيرًا|потому что в бассейне много воды|because there is a lot of water in the pool
+E e_tubicut|t|לכרות עצים ביער|أن نقطع أشجارًا في الغابة|рубить деревья в лесу|to cut down trees in the forest
+E e_tubipick|t|לקטוף פרחי בר בטבע|أن نقطف أزهارًا برّية في الطبيعة|рвать дикие цветы в природе|to pick wild flowers in nature
+E e_crossrun|t|רצים מהר כדי להספיק לפני המכוניות|نركض بسرعة لنسبق السيارات|бежим быстро, чтобы успеть перед машинами|we run fast to get across before the cars
+E e_crossone|t|מסתכלים רק לצד אחד ועוברים|ننظر إلى جهة واحدة فقط ونعبر|смотрим только в одну сторону и переходим|we look only one way and cross
+E e_crossfollow|t|הולכים אחרי מישהו אחר בלי להסתכל לצדדים|نمشي خلف شخص آخر ونعبر من دون أن ننظر إلى الجهتين|идём за кем-то другим и не смотрим по сторонам|we follow someone else across without looking either way
+E e_carstand|t|עומדים בין המושבים|نقف بين المقاعد|стоим между сиденьями|we stand between the seats
+E e_carhead|t|מוציאים את הראש מהחלון|نُخرج رؤوسنا من نافذة السيارة|высовываем голову в открытое окно|we put our head out of the window
+E e_carnoseat|t|יושבים בלי מושב בטיחות|نجلس من دون مقعد أمان|сидим без детского кресла|we sit without a car seat
+E e_alarmcall|t|מתקשרים לחברים לשאול|نتّصل بالأصدقاء لنسأل|звоним друзьям, чтобы спросить|we call friends to ask
 `;

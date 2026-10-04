@@ -354,6 +354,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;
   min-height:48px;padding:12px 14px;border-radius:11px;outline:none;background:var(--surface2);color:inherit;border:1px solid var(--line)}
 .field:focus{border-color:var(--accent)}
+/* `:focus-visible` הגלובלי (שורה 118) נושא בדיוק את אותה סגוליות כמו `.field`,
+   ו-`.field` כתוב אחריו — ולכן ה-`outline:none` שלו ניצח וטבעת המיקוד נעלמה
+   משדה השם של הנבחן. מחזירים אותה כאן ולא מוחקים את `outline:none`, כדי
+   שהטבעת תופיע במקלדת בלבד, כמו בכל שאר האפליקציה. */
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 textarea.field{min-height:96px;resize:vertical}
 
 /* ---------- שורות המבחן ----------
@@ -1098,7 +1103,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="ru3 · 2026-10-04";
+var BUILD="ru4 · 2026-10-04";
 var SKEY="russian-state-v1";
 var GKEY_STORE="russian-gkey";
 
@@ -1350,8 +1355,8 @@ function bestVoice(code){
   if(explicit&&(!pin||pin.request!==request)){ pins[key]={v:explicit,g:vGender(explicit),request:request}; return explicit; }
   if(pin){
     var live=pool.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
-    if(live&&(live.localService!==false||navigator.onLine!==false))return live;
-    var same=pool.filter(function(v){return vGender(v)===pin.g&&(v.localService!==false||navigator.onLine!==false)});
+    if(live&&voiceUsable(live))return live;
+    var same=pool.filter(function(v){return vGender(v)===pin.g&&voiceUsable(v)});
     if(!same.length)return pin.v;
     pool=same;
   }else{
@@ -1365,6 +1370,10 @@ function bestVoice(code){
     if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
     if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
     if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    /* קול רשת — הנוירליים של Edge הם כאלה — נשמע טוב יותר כשיש
+       רשת, וזה כל מה שנקבע כאן. מה קורה כשאין רשת נקבע ב-voiceUsable,
+       שהוא מיון קודם: קנס בתוך הניקוד לא הצליח להתגבר על שם היצרן. */
+    if(v.localService===false&&voiceUsable(v))s+=6;
     if(/espeak|compact|pico/.test(n))s-=40;
     if(v.default)s+=4;
     return s;
@@ -1376,7 +1385,10 @@ function bestVoice(code){
      ובתוך כל קבוצה מכריעה האיכות. */
   function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
   var chosen=pool.slice().sort(function(a,b){
-    var d=grank(b)-grank(a); return d||score(b)-score(a);
+    /* קול שלא יעבוד יורד לתחתית לפני כל שיקול אחר — גם לפני המגדר,
+       שאם לא כן קול נשי מת מנצח קול גברי חי. */
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||score(b)-score(a);
   })[0];
   if(chosen)pins[key]={v:chosen,g:vGender(chosen),request:request};
   return chosen;
@@ -1581,6 +1593,77 @@ function ttsFail(err){
 function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
 
 
+/* =====================================================================
+   מנוע ההקראה של "תאוריה מדברת" — ארבעה מנגנונים
+   ---------------------------------------------------------------------
+   ארבעה כשלים שקטים של Web Speech. אף אחד מהם אינו מדווח כשגיאה,
+   וכולם נראים למשתמש בדיוק אותו דבר: הקול פשוט מפסיק באמצע. הקוד
+   כאן הועתק מהאפליקציה שבה הוא כבר רץ, ולא נוסח מחדש.
+   ===================================================================== */
+
+/* 1 · שומר-ער. באג ותיק ב-Chrome וב-Edge בשולחן העבודה: ההקראה
+   נחתכת אחרי כ-15 שניות, באמצע מילה. pause+resume תקופתי מחזיק את
+   המנוע ער. במובייל אין את הבאג ופעולה כזאת דווקא מקרטעת שם, ולכן
+   מפעילים רק היכן שבאמת צריך. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+/* עוצרים רק כששום דבר כבר לא מדבר — אחרת מקטע שהתחיל זה עתה מאבד
+   את השמירה שלו כשהמקטע הקודם מסיים להתנקות. */
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+
+/* 2 · הפניה חיה ל-utterance. Chrome אוסף אובייקט שאין אליו הפניה,
+   ואיתו נעלמים onend ו-onboundary: ההקראה נתקעת באמצע, ההדגשה
+   קופאת על מילה אחת, והמקטע הבא לא יוצא לעולם. */
+var _activeU=null;
+
+/* 3 · קול רשת שנכשל. הקולות הנוירליים של Edge הם קולות רשת, והם
+   שותקים בלי אינטרנט. הדגל נכבה ברגע שאחד מהם נכשל, ומאותו רגע
+   הדירוג מעדיף קול מקומי לשארית הסשן. */
+var _netVoiceOK=true;
+
+/* קול רשת שאי אפשר להשתמש בו עכשיו — אין אינטרנט, או שאחד כבר
+   נכשל בסשן הזה — אינו "פחות טוב", הוא פשוט לא יעבוד. לכן זה מיון
+   ראשון ולא עוד סעיף בתוך הניקוד: קנס בניקוד לא הספיק, מפני שקול
+   נוירלי של Microsoft צובר על שם היצרן ועל "Natural" יותר ממה שכל
+   קנס סביר מוריד — והוא נבחר שוב ושוב אחרי שכבר נכשל.
+   כשהוא הקול היחיד שיש הוא עדיין נבחר: מיון של רשימה בת אחד
+   מחזיר אותה כמו שהיא. */
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+
+/* 4 · שומר זמן. יש מכשירים שבהם onend פשוט לא נורה. בלי השומר הזה
+   התור נתקע: הכפתור נשאר על "עצירה" וההקראה לא ממשיכה לעולם. ארבע
+   שניות שבהן המנוע לא מדבר ולא ממתין נחשבות סוף.
+   מחזיר פונקציית ביטול — מי שסיים בדרך הרגילה מכבה את השומר. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+
+
 /* ------------------------------------------------------------
    פיצול לאמירות קצרות — הועתק מ"תאוריה מדברת", שם ההקראה נשמעת
    הכי טוב. מנועי מכשיר מאיצים ובולעים סופי מילים במשפט ארוך;
@@ -1740,21 +1823,49 @@ function speakDevice(text,code,rate){
       var v=bestVoice(code), lang=(v&&v.lang)||code;
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
       var pit=femLift(v);
+      var retried=false;
+      function alive(){return my===_sayGen}
+      function allDone(){ maybeStopKeepAlive(); hlClear(); ttsOK() }
       (function sayseg(k){
-        if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
-        if(k>=segs.length){ hlClear(); ttsOK(); return }
-        var seg=segs[k];
+        if(!alive())return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
+        if(k>=segs.length){ allDone(); return }
+        /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
+           יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+        var seg=segs[k], moved=false, disarm=null;
+        function next(){
+          if(moved||!alive())return;
+          moved=true; if(disarm)disarm();
+          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+          else allDone();
+        }
         var u=new SpeechSynthesisUtterance(seg.text);
         u.lang=lang;
         if(v){ try{ u.voice=v }catch(e2){} }
         u.rate=rt; u.pitch=pit; u.volume=1;
         u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
-        u.onend=function(){
-          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
-          else { hlClear(); ttsOK() }
+        u.onend=next;
+        u.onerror=function(e){
+          if(moved||!alive())return;
+          var err=(e&&e.error)||"";
+          /* ביטול יזום אינו תקלה — stopSpeak כבר ניקה אחריו */
+          if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+          /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול
+             מקומי וחוזרים על אותו מקטע, פעם אחת, כדי שההקראה לא
+             תישבר בשקט באמצע שאלה. */
+          if(!retried&&v&&v.localService===false){
+            retried=true; _netVoiceOK=false; moved=true;
+            if(disarm)disarm(); _activeU=null;
+            v=bestVoice(code); lang=(v&&v.lang)||code; pit=femLift(v);
+            setTimeout(function(){sayseg(k)},SEG_GAP);
+            return;
+          }
+          moved=true; if(disarm)disarm(); maybeStopKeepAlive(); ttsFail(err);
         };
-        u.onerror=function(e){ttsFail(e&&e.error)};
+        _activeU=u;                        /* מגן מפני איסוף זבל */
+        try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
         speechSynthesis.speak(u);
+        startKeepAlive();
+        disarm=ttsWatchdog(function(){return alive()&&!moved},next);
       })(0);
     }catch(e){}
   })();
@@ -1800,7 +1911,7 @@ function playUrl(url,text,code,rate){
   gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();stopKeepAlive();_activeU=null;try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -2820,7 +2931,7 @@ function screenSet(){
   });
   h+='<div class="row"><div class="lab">'+esc(t("theme"))+'</div><div class="lvls">'+
      [["auto","thAuto"],["light","thLight"],["dark","thDark"]].map(function(x){
-       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" data-a="theme" data-v="'+x[0]+'">'+
+       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" data-a="theme" data-v="'+x[0]+'" aria-pressed="'+(state.theme===x[0]?"true":"false")+'">'+
          esc(t(x[1]))+"</button>"}).join("")+"</div></div>";
   h+="</div>";
 
@@ -3319,12 +3430,12 @@ function viewExamNew(){
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exUnits"))+'</b>'+
      '<div class="seg" style="margin-top:7px">'+[3,4,5].map(function(tr){
-       return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
+       return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'" aria-pressed="'+(state.track===tr?"true":"false")+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exLevel"))+'</b><div class="seg" style="margin-top:7px">'+
      LVL.map(function(l,i){
-       return '<button class="'+(EB.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
+       return '<button class="'+(EB.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'" aria-pressed="'+(EB.level===i+1?"true":"false")+'">'+l+'</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exCount"))+': <span id="exNlab">'+EB.n+'</span></b>'+
@@ -3587,7 +3698,9 @@ function teDialog(){
   var fg=document.getElementById("te-forgot");
   if(fg)fg.onclick=function(){ TE.msg=xt("teForgotHow"); teDialog() };
 }
-function teClose(){ TE.ask=false; TE.mode=""; TE.msg=""; teDialog(); }
+function teClose(){ TE.ask=false; TE.mode=""; TE.msg=""; teDialog();
+  var b=_teOpener; _teOpener=null;
+  try{ if(b&&b.focus&&document.contains(b))b.focus() }catch(e){} }
 function teSubmit(){
   if(TE.busy)return;
   var setting=(TE.mode==="set"||TE.mode==="change"||!teHas());
@@ -3624,7 +3737,11 @@ function teSubmit(){
     }
   });
 }
-function teAsk(mode){ TE.ask=true; TE.mode=mode||""; TE.msg=""; teDialog() }
+/* הכפתור שפתח את החלון. בלעדיו, סגירה ב-Escape או ב"ביטול" מחזירה
+   את המיקוד לתחילת הדף, ומי שמנווט במקלדת מאבד את מקומו. */
+var _teOpener=null;
+function teAsk(mode){ try{_teOpener=document.activeElement}catch(e){_teOpener=null}
+  TE.ask=true; TE.mode=mode||""; TE.msg=""; teDialog() }
 function teLock(){ teSetOpen(false); render() }
 function teRemove(){ teWrite(null); teSetOpen(false); render() }
 /* נעילה אוטומטית אחרי שהאפליקציה הייתה מוסתרת זמן־מה.
@@ -4583,7 +4700,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=ru3-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=ru4-pwa1").catch(function(){});
   });
 }
 </script>

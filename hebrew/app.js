@@ -1,4 +1,25 @@
 'use strict';
+
+/* ============================================================
+   שתיל ES2019 — שלוש שיטות שהקובץ הזה משתמש בהן, ואינן קיימות
+   בדפדפן שלפני 2019.
+
+   **למה זה כאן.** `hebrew` היא אפליקציה ציבורית, והקהל שלה הוא
+   עולים חדשים ונהגים מבוגרים — כלומר גם טלפון ישן. עד 4.10.2026
+   ישב בשורה 14 `String(s??'')`: `??` הוא ES2020, וזו **שגיאת
+   תחביר ולא שגיאת ריצה** — מנוע שאינו מכיר אותה דוחה את הקובץ
+   כולו, אף שורה בו אינה רצה, והלומד מקבל `<main id="app">` ריק
+   בלי מילת הסבר אחת. זה תוקן במקום (`s==null?'':s`).
+
+   ומה שנשאר הוא קל יותר אך עדיין שובר: `Object.fromEntries`
+   (×2), `Array.prototype.flat` ו-`flatMap` (×3) הן ES2019, והן
+   נכשלות בזמן ריצה — כלומר האפליקציה נטענת ואז מתה בבניית
+   השאלות. שלוש השורות כאן פותרות את זה בלי לגעת בקוד שעובד,
+   ובלי תלות חיצונית.
+   ============================================================ */
+if(!Object.fromEntries)Object.fromEntries=function(it){var o={};Array.prototype.forEach.call(it,function(p){o[p[0]]=p[1]});return o};
+if(!Array.prototype.flat)Object.defineProperty(Array.prototype,'flat',{value:function(d){d=d===undefined?1:d;return this.reduce(function(a,v){return a.concat(Array.isArray(v)&&d>1?v.flat(d-1):v)},[])},writable:true,configurable:true});
+if(!Array.prototype.flatMap)Object.defineProperty(Array.prototype,'flatMap',{value:function(f,t){return this.map(f,t).flat()},writable:true,configurable:true});
 const GATE='shlav-internal-hebrew', ACCESS='hebrew-access-v1', STORE='hebrew-practice-v1';
 let unlocked=false;try{const key=new URL(location.href).searchParams.get('internal');if(key) localStorage.setItem(ACCESS,key);unlocked=true; /* PUBLISHED 27.9.2026 - gate removed */ }catch(e){unlocked=true};
 const app=document.getElementById('app'),langEl=document.getElementById('lang');
@@ -11,7 +32,7 @@ const U=k=>UI[lang][k];
 const LABEL={he:{choose:'בחרו מסלול',practice:'תרגול קצר',concept:'דף מושגים',write:'כתיבה מודרכת',listen:'הקרא',stopB:'עצירה',setS:'הגדרות',rateS:'מהירות הקראה',hint:'רמז',next:'לשאלה הבאה',again:'נכון, יפה!',wrong:'עוד רגע של חשיבה',end:'סיימת סבב',back:'חזרה למסלולים',topicA:'נושא',draftPh:'אפשר להתחיל במשפט קצר…'},ar:{choose:'اختر المسار',practice:'تدريب قصير',concept:'بطاقات مفاهيم',write:'تدريب كتابة',listen:'استمع',stopB:'إيقاف',setS:'الإعدادات',rateS:'سرعة القراءة',hint:'تلميح',next:'السؤال التالي',again:'صحيح!',wrong:'لنحاول من جديد',end:'انتهى التدريب',back:'العودة للمسارات',topicA:'الموضوع',draftPh:'يمكن البدء بجملة قصيرة…'},ru:{choose:'Выберите трек',practice:'Практика',concept:'Словарь',write:'Письмо',listen:'Прослушать',stopB:'Стоп',setS:'Настройки',rateS:'Скорость чтения',hint:'Подсказка',next:'Следующий вопрос',again:'Верно!',wrong:'Попробуйте еще',end:'Раунд окончен',back:'Назад',topicA:'Тема',draftPh:'Можно начать с короткого предложения…'},en:{choose:'Choose a track',practice:'Short practice',concept:'Concept sheet',write:'Guided writing',listen:'Read aloud',stopB:'Stop',setS:'Settings',rateS:'Reading speed',hint:'Hint',next:'Next question',again:'Correct!',wrong:'Try again',end:'Round complete',back:'Back to tracks',topicA:'Topic',draftPh:'You can start with a short sentence…'}};
 let lang='he',stage='high',track='281',view='home',level=1,topic='all',bank=null,round=[],idx=0,chosen=-1,showHint=false,tutorOn=false,score=0,drafts={},writingTask=0;
 let progress={answered:0,correct:0};try{progress=Object.assign(progress,JSON.parse(localStorage.getItem(STORE)||'{}'))}catch(e){};
-function t(x){return x&&typeof x==='object'?(x[lang]||x.he||''):x||''}function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}const esc=x=>safe(t(x));const L=k=>LABEL[lang][k];const V_F=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
+function t(x){return x&&typeof x==='object'?(x[lang]||x.he||''):x||''}function safe(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}const esc=x=>safe(t(x));const L=k=>LABEL[lang][k];const V_F=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/;
 const V_M=/(אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|google[^a-z]{0,15}(arabic|العربية)|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/;
 const vGender=v=>{const n=((v.name||'')+' '+(v.lang||'')).toLowerCase();return V_F.test(n)?'f':V_M.test(n)?'m':'?'};
 const TTS_CODE={he:'he-IL',ar:'ar-SA',ru:'ru-RU',en:'en-US'};

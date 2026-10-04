@@ -22,6 +22,12 @@ var INTERNAL_OK=(function(){
 <meta name="theme-color" content="#101a1c" media="(prefers-color-scheme:dark)" />
 <script>try{var __s=JSON.parse(localStorage.getItem("mathg7-v1")||"{}"),__m=__s.theme||"auto",__d=__m==="dark"||(__m!=="light"&&window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches);document.documentElement.setAttribute("data-theme",__d?"dark":"light")}catch(e){}</script>
 <link rel="manifest" href="./manifest.json" />
+<!-- אייקון הלשונית ואייקון ההוספה למסך הבית. בלעדיהם iOS מצלם את
+     הדף ומייצר תמונה מטושטשת במקום אייקון, ובלשונית מופיע אייקון
+     השורש במקום של האפליקציה. אותו קובץ של המניפסט — אין כאן קובץ
+     apple-touch-icon.png נפרד, כמו ב-domino. -->
+<link rel="icon" type="image/png" sizes="192x192" href="./img/icon-192.png" />
+<link rel="apple-touch-icon" href="./img/icon-192.png" />
 <link href="/fonts/fonts.css" rel="stylesheet" />
 <style>
 :root{--paper:#f3f8f4;--card:#fff;--ink:#17333c;--ink-soft:#4c666e;--teal:#0e9c8d;--teal-deep:#0b7568;--teal-soft:#d9f2ec;--amber:#ffc531;--amber-soft:#fff3ce;--amber-deep:#8a6100;--coral:#ff6f61;--coral-soft:#ffe3de;--coral-deep:#ba3826;--sky:#58b7e0;--sky-soft:#dff1fa;--sky-deep:#246c8c;--violet:#8a63d2;--violet-soft:#ece4fa;--violet-deep:#6a45b0;--green:#1f9d4d;--green-deep:#157a3a;--red:#d93a3a;--red-deep:#a82626;--accent:var(--teal);--ar:"Noto Sans Arabic",system-ui,Arial,sans-serif;--ru:"Noto Sans",system-ui,Arial,sans-serif}
@@ -124,6 +130,10 @@ canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:50}
 html[dir=ltr] .qtext,html[dir=ltr] .opt .ob{direction:ltr}
 .nl{direction:ltr}
 .srOnly{position:absolute;inset-inline-start:-9999px}
+/* טבעת מיקוד אחת לכל הדף. ברירת המחדל של הדפדפן נבלעת על כפתורים
+   צבעוניים, ומי שמנווט במקלדת לא רואה איפה הוא. הועתק כלשונו
+   מ-math-uni3. אין כאן outline:none בשום מקום, ולכן אין מה להחזיר. */
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
 </style>
 </head>
 <body>
@@ -142,7 +152,19 @@ html[dir=ltr] .qtext,html[dir=ltr] .opt .ob{direction:ltr}
 /* ===== visuals (inline SVG, no emoji fonts) ===== */
 var COL={red:"#e8453c",blue:"#2f7fd8",green:"#2eaa5b",yellow:"#f5b800",orange:"#f58a1f",purple:"#8a63d2"};
 var INK="#17333c";
-function svg(w,h,inner,lab){return '<svg viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'" role="img" aria-label="'+(lab||"")+'">'+inner+'</svg>'}
+/* תחליף טקסטואלי לאיור. עד היום כל איור יצא role="img" עם
+   aria-label ריק — כלומר קורא מסך מכריז "תמונה" בלי שם, וזה גרוע
+   מאיור שקוף. יש תווית — role="img" עם שם; אין — aria-hidden,
+   והאיור אינו מוכרז כלל.
+
+   **התווית מתארת את מה שמצויר, ולעולם לא את התשובה.** במד־זווית
+   ("כמה מעלות?") וברשת המשבצות ("כמה זה 5²?") המספר הוא התשובה,
+   ולכן התווית אומרת רק מה סוג האיור. כך גם בנקודות על הצירים:
+   מוכרזות האותיות שמצוירות, לא הקואורדינטות שאותן צריך לקרוא. */
+function aesc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+function FL(h,a,r,e){return lt({he:h,ar:a,ru:r,en:e})}
+function labJoin(a){return (a||[]).filter(function(x){return x!=null&&String(x).trim()!==""}).join(", ")}
+function svg(w,h,inner,lab){return '<svg viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'" '+(lab?('role="img" aria-label="'+aesc(lab)+'"'):'aria-hidden="true"')+'>'+inner+'</svg>'}
 function ptxt(x,y,t,o){o=o||{};return '<text x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" text-anchor="'+(o.a||"middle")+'" font-size="'+(o.s||13)+'" font-weight="'+(o.w||700)+'" fill="'+(o.c||INK)+'">'+t+'</text>'}
 /* coordinate plane: o={x0,x1,y0,y1,u,pts:[{x,y,l,c}],poly:[[x,y]],hl:[[x,y]]} */
 function cpl(o){var u=o.u||26,pad=24,x0=o.x0,x1=o.x1,y0=o.y0,y1=o.y1,W=(x1-x0)*u+2*pad,H=(y1-y0)*u+2*pad,s="",i;
@@ -159,7 +181,14 @@ function cpl(o){var u=o.u||26,pad=24,x0=o.x0,x1=o.x1,y0=o.y0,y1=o.y1,W=(x1-x0)*u
   if(o.poly){var pp=o.poly.map(function(p){return px(p[0])+","+py(p[1])}).join(" ");s+='<polygon points="'+pp+'" fill="rgba(88,183,224,.25)" stroke="'+COL.blue+'" stroke-width="3" stroke-linejoin="round"/>'}
   (o.pts||[]).forEach(function(p){var c=p.c||COL.red;s+='<circle cx="'+px(p.x)+'" cy="'+py(p.y)+'" r="6" fill="'+c+'" stroke="#fff" stroke-width="2"/>';
     if(p.l)s+=ptxt(px(p.x)+(p.dx==null?10:p.dx),py(p.y)+(p.dy==null?-9:p.dy),p.l,{s:15,w:800,c:c,a:"start"})});
-  return '<div class="nl">'+svg(W,H,s,"")+'</div>'}
+  var ptl=labJoin((o.pts||[]).map(function(p){return p.l}));
+  var lab=FL("מערכת צירים, ציר x מ־"+sgn(x0)+" עד "+sgn(x1)+" וציר y מ־"+sgn(y0)+" עד "+sgn(y1),
+             "جهاز إحداثيات، محور x من "+sgn(x0)+" إلى "+sgn(x1)+" ومحور y من "+sgn(y0)+" إلى "+sgn(y1),
+             "координатная плоскость, ось x от "+sgn(x0)+" до "+sgn(x1)+", ось y от "+sgn(y0)+" до "+sgn(y1),
+             "coordinate plane, x-axis from "+sgn(x0)+" to "+sgn(x1)+", y-axis from "+sgn(y0)+" to "+sgn(y1))
+    +(o.poly?FL(", ובתוכה מצולע מסומן",", وفيه مضلع معلّم",", с отмеченным многоугольником",", with a marked polygon"):"")
+    +(ptl?FL(". נקודות מסומנות: ",". نقاط معلّمة: ",". отмеченные точки: ",". marked points: ")+ptl:"");
+  return '<div class="nl">'+svg(W,H,s,lab)+'</div>'}
 /* number line with negatives: marks [{v,l,c}] */
 function nline(mn,mx,marks){var W=340,x0=18,x1=322,s="",v,span=mx-mn,lab=span<=14?1:(span<=24?2:5);
   var px=function(v){return x0+(v-mn)/span*(x1-x0)};
@@ -167,7 +196,12 @@ function nline(mn,mx,marks){var W=340,x0=18,x1=322,s="",v,span=mx-mn,lab=span<=1
   for(v=mn;v<=mx;v++){s+='<line x1="'+px(v)+'" x2="'+px(v)+'" y1="'+(v===0?46:50)+'" y2="'+(v===0?66:62)+'" stroke="'+INK+'" stroke-width="'+(v===0?3:2)+'"/>';
     if(v%lab===0)s+=ptxt(px(v),84,v<0?"\u2212"+(-v):v,{s:12,w:v===0?800:600})}
   (marks||[]).forEach(function(m){var c=m.c||COL.red;s+='<path d="M'+px(m.v)+' 52 l-8 -20 h16 z" fill="'+c+'"/>';if(m.l)s+=ptxt(px(m.v),22,m.l,{s:16,w:800,c:c})});
-  return '<div class="nl">'+svg(340,96,s,"")+'</div>'}
+  var ml=labJoin((marks||[]).map(function(m){return m.l}));
+  var nlab=FL("ציר מספרים מ־"+sgn(mn)+" עד "+sgn(mx),"محور أعداد من "+sgn(mn)+" إلى "+sgn(mx),
+              "числовая прямая от "+sgn(mn)+" до "+sgn(mx),"number line from "+sgn(mn)+" to "+sgn(mx))
+    +(ml?FL(", ועליו מסומן: ","، وعليه: ",", отмечено: ",", marked: ")+ml
+       :FL(", ועליו סימון","، وعليه علامة",", с отметкой",", with a marker"));
+  return '<div class="nl">'+svg(340,96,s,nlab)+'</div>'}
 function sgn(n){return n<0?"\u2212"+(-n):String(n)}
 function pr(n){return n<0?"(\u2212"+(-n)+")":String(n)}
 /* angle: vertex (cx,cy), first ray at angle rot (deg, ccw), second at rot+deg. o={lab,labc,r,rays:[extra deg],right} */
@@ -179,13 +213,19 @@ function angD(deg,o){o=o||{};var cx=o.cx||90,cy=o.cy||105,r=o.r||78,rot=o.rot||0
   s+=ray(cx,cy,r,rot)+ray(cx,cy,r*(o.r2||1),rot+deg);
   if(deg===90)s+=rmark(cx,cy,rot,18);else s+=arc(cx,cy,o.ar||26,rot,rot+deg);
   if(o.lab){var p=P2(cx,cy,(o.ar||26)+16,rot+deg/2);s+=ptxt(p[0],p[1]+5,o.lab,{s:15,c:COL.red,w:800})}
-  return svg(W,H,s,"")}
+  var alab=FL("זווית בין שתי קרניים","زاوية بين شعاعين","угол между двумя лучами","an angle between two rays")
+    +(o.lab?FL(", מסומנת ","، معلّمة ",", обозначен ",", marked ")+o.lab:"");
+  return svg(W,H,s,alab)}
 /* protractor reading: ray at deg, base ray right */
 function protr(deg){var cx=130,cy=120,R=100,s='<path d="M'+(cx-R)+' '+cy+' A'+R+' '+R+' 0 0 1 '+(cx+R)+' '+cy+' Z" fill="#eaf6fb" stroke="#246c8c" stroke-width="2"/>',a;
   for(a=0;a<=180;a+=10){var p=P2(cx,cy,R,a),q=P2(cx,cy,R-(a%30===0?14:8),a),t=P2(cx,cy,R+11,a);s+='<line x1="'+p[0].toFixed(1)+'" y1="'+p[1].toFixed(1)+'" x2="'+q[0].toFixed(1)+'" y2="'+q[1].toFixed(1)+'" stroke="#246c8c" stroke-width="'+(a%30===0?2.5:1.5)+'"/>';
     s+=ptxt(t[0],t[1]+4,a,{s:9,w:600,c:"#246c8c"})}
   s+='<line x1="'+(cx-R-6)+'" x2="'+(cx+R+6)+'" y1="'+cy+'" y2="'+cy+'" stroke="'+INK+'" stroke-width="4" stroke-linecap="round"/>'+ray(cx,cy,R+4,deg,COL.red)+'<circle cx="'+cx+'" cy="'+cy+'" r="4" fill="'+INK+'"/>';
-  return '<div class="nl">'+svg(260,138,s,"")+'</div>'}
+  return '<div class="nl">'+svg(260,138,s,
+    FL("מד־זווית חצי עגול, הקרן התחתונה על 0 וקרן שנייה שיש לקרוא את המעלות שלה",
+       "منقلة نصف دائرية، الشعاع السفلي على 0 وشعاع آخر يُقرأ قياسه",
+       "полукруглый транспортир: нижний луч на 0 и второй луч, величину которого надо прочитать",
+       "a half-circle protractor, the bottom ray on 0 and a second ray whose reading is asked"))+'</div>'}
 /* two-part angle with inner ray: total from rot, parts a and b */
 function splitAng(a,b,labs,o){o=o||{};var cx=60,cy=112,r=100,s="";
   s+=ray(cx,cy,r,0)+ray(cx,cy,r,a+b)+ray(cx,cy,r-6,a,COL.blue,true);
@@ -194,18 +234,31 @@ function splitAng(a,b,labs,o){o=o||{};var cx=60,cy=112,r=100,s="";
   if(labs[0])s+=ptxt(p[0]+4,p[1]+5,labs[0],{s:14,c:COL.red,w:800});if(labs[1])s+=ptxt(q[0],q[1]+4,labs[1],{s:14,c:COL.green,w:800});
   var A=P2(cx,cy,r+10,a+b),B=P2(cx,cy,r+12,a),C=P2(cx,cy,r+14,0);
   s+=ptxt(A[0],A[1]+5,"A",{s:15})+ptxt(B[0]+6,B[1],"D",{s:15})+ptxt(C[0]+4,C[1]+5,"C",{s:15})+ptxt(cx-8,cy+16,"B",{s:15});
-  return '<div class="nl">'+svg(200,150,s,"")+'</div>'}
+  var sl=labJoin(labs);
+  return '<div class="nl">'+svg(200,150,s,
+    FL("זווית ABC שהקרן BD מחלקת לשתי זוויות","الزاوية ABC يقسمها الشعاع BD إلى زاويتين",
+       "угол ABC, который луч BD делит на два угла","angle ABC split into two angles by ray BD")
+    +(sl?FL(", המסומנות ","، المعلّمتان ",", обозначены ",", marked ")+sl:""))+'</div>'}
 /* adjacent angles on a straight line: right part = a, left = 180-a */
 function adjVis(a,labs){var cx=130,cy=100,r=100,s='<line x1="'+(cx-r)+'" x2="'+(cx+r)+'" y1="'+cy+'" y2="'+cy+'" stroke="'+INK+'" stroke-width="4" stroke-linecap="round"/>'+ray(cx,cy,88,a);
   s+=arc(cx,cy,30,0,a,COL.red)+arc(cx,cy,44,a,180,COL.green);
   var p=P2(cx,cy,56,a/2),q=P2(cx,cy,64,(a+180)/2);
   if(labs[0])s+=ptxt(p[0]+8,p[1]+5,labs[0],{s:14,c:COL.red,w:800});if(labs[1])s+=ptxt(q[0],q[1]+4,labs[1],{s:14,c:COL.green,w:800});
-  return '<div class="nl">'+svg(260,116,s,"")+'</div>'}
+  var al=labJoin(labs);
+  return '<div class="nl">'+svg(260,116,s,
+    FL("שתי זוויות צמודות על ישר אחד","زاويتان متجاورتان على مستقيم واحد",
+       "два смежных угла на одной прямой","two adjacent angles on one straight line")
+    +(al?FL(", המסומנות ","، المعلّمتان ",", обозначены ",", marked ")+al:""))+'</div>'}
 /* two crossing lines: angles a,180-a,a,180-a; labs[0..3] */
 function vertVis(a,labs){var cx=120,cy=90,r=80,s=ray(cx,cy,r,0)+ray(cx,cy,r,180)+ray(cx,cy,r,a)+ray(cx,cy,r,a+180);
   var cs=[COL.red,COL.green,COL.red,COL.green],st=[0,a,180,180+a],en=[a,180,180+a,360];
   for(var i=0;i<4;i++){s+=arc(cx,cy,24+(i%2?6:0),st[i],en[i],cs[i],3);var m=(st[i]+en[i])/2,p=P2(cx,cy,48,m);if(labs[i])s+=ptxt(p[0],p[1]+5,labs[i],{s:14,c:cs[i],w:800})}
-  return '<div class="nl">'+svg(240,180,s,"")+'</div>'}
+  var vl=labJoin(labs);
+  return '<div class="nl">'+svg(240,180,s,
+    FL("שני ישרים נחתכים וארבע זוויות סביב נקודת החיתוך","مستقيمان متقاطعان وأربع زوايا حول نقطة التقاطع",
+       "две пересекающиеся прямые и четыре угла вокруг точки пересечения",
+       "two crossing lines and four angles around the crossing point")
+    +(vl?FL(", המסומנות ","، المعلّمة ",", обозначены ",", marked ")+vl:""))+'</div>'}
 /* triangle from angles at B and C, base horizontal. labs: [A,B,C] text at vertices; eq: sides to tick ["AB","AC","BC"]; right: vertex idx */
 function triVis(b,c,labs,o){o=o||{};var Bx=30,By=130,base=200,t1=Math.tan(b*Math.PI/180),t2=Math.tan(c*Math.PI/180),s="";
   var h,Ax;if(b===90){Ax=Bx;h=base*t2}else if(c===90){Ax=Bx+base;h=base*t1}else{h=base*t1*t2/(t1+t2);Ax=Bx+h/t1}
@@ -223,21 +276,38 @@ function triVis(b,c,labs,o){o=o||{};var Bx=30,By=130,base=200,t1=Math.tan(b*Math
   if(o.rightA)s+='<path d="M'+Ax.toFixed(1)+' '+(Ay+14).toFixed(1)+'" fill="none"/>';
   [["A",0],["B",1],["C",2]].forEach(function(x){if(labs[x[1]]!=null&&labs[x[1]]!=="")s+=ptxt(inner[x[0]][0],inner[x[0]][1]+(x[0]==="A"?0:0),labs[x[1]],{s:14,c:COL.red,w:800})});
   s+=ptxt(Ax,Ay-8,"A",{s:15})+ptxt(Bx-10,By+4,"B",{s:15})+ptxt(Cx+10,By+4,"C",{s:15});
-  return '<div class="nl">'+svg(260,160,s,"")+'</div>'}
+  var tl=labJoin(labs);
+  return '<div class="nl">'+svg(260,160,s,
+    FL("משולש ABC","مثلث ABC","треугольник ABC","triangle ABC")
+    +(tl?FL(", ובקודקודיו מסומן ","، وعند رؤوسه ",", у вершин обозначено ",", with the vertices marked ")+tl:"")
+    +((o.eq||[]).length?FL(", וצלעות שוות מסומנות בקווים","، وأضلاع متساوية معلّمة بشَرط",", равные стороны отмечены штрихами",", equal sides marked with ticks"):""))+'</div>'}
 function quadVis(labs){var s='<polygon points="30,120 210,128 190,34 70,26" fill="rgba(88,183,224,.22)" stroke="'+INK+'" stroke-width="3.5" stroke-linejoin="round"/>';
   s+=ptxt(52,112,labs[0],{s:14,c:COL.red,w:800})+ptxt(190,120,labs[1],{s:14,c:COL.red,w:800})+ptxt(176,56,labs[2],{s:14,c:COL.red,w:800})+ptxt(82,48,labs[3],{s:14,c:COL.red,w:800});
-  return '<div class="nl">'+svg(240,150,s,"")+'</div>'}
+  var ql=labJoin(labs);
+  return '<div class="nl">'+svg(240,150,s,
+    FL("מרובע","شكل رباعي","четырёхугольник","a quadrilateral")
+    +(ql?FL(", ובזוויותיו מסומן ","، وزواياه معلّمة ",", углы обозначены ",", angles marked ")+ql:""))+'</div>'}
 function rectVis(w,h,labs){var u=Math.min(20,180/w,100/h),W=w*u,H=h*u,s='<rect x="30" y="20" width="'+W+'" height="'+H+'" fill="#ffe3de" stroke="'+INK+'" stroke-width="3.5"/>';
-  s+=ptxt(30+W/2,20+H+20,labs[0],{s:15,c:COL.red,w:800})+ptxt(22,20+H/2+5,labs[1],{a:"end",s:15,c:COL.red,w:800});return '<div class="nl">'+svg(30+W+40,20+H+30,s,"")+'</div>'}
+  s+=ptxt(30+W/2,20+H+20,labs[0],{s:15,c:COL.red,w:800})+ptxt(22,20+H/2+5,labs[1],{a:"end",s:15,c:COL.red,w:800});return '<div class="nl">'+svg(30+W+40,20+H+30,s,
+    FL("מלבן, הצלעות המסומנות ","مستطيل، الضلعان المعلّمان ","прямоугольник, отмеченные стороны ","a rectangle, the marked sides ")
+    +labJoin([labs[0],labs[1]]))+'</div>'}
 function triAreaVis(b,h){var u=Math.min(18,190/b,100/h),W=b*u,H=h*u,ox=26,ap=ox+W*0.35,s='<polygon points="'+ox+','+(20+H)+' '+(ox+W)+','+(20+H)+' '+ap+',20" fill="#ffe3de" stroke="'+INK+'" stroke-width="3.5" stroke-linejoin="round"/><line x1="'+ap+'" x2="'+ap+'" y1="20" y2="'+(20+H)+'" stroke="'+COL.blue+'" stroke-width="3" stroke-dasharray="6 5"/>';
   s+='<path d="M'+ap+' '+(20+H-12)+' h12 v12" fill="none" stroke="'+COL.blue+'" stroke-width="2"/>'+ptxt(ox+W/2,20+H+20,String(b),{s:15,c:COL.red,w:800})+ptxt(ap+8,20+H/2,String(h),{a:"start",s:15,c:COL.blue,w:800});
-  return '<div class="nl">'+svg(ox+W+30,20+H+30,s,"")+'</div>'}
-function sqGrid(n){var u=Math.min(26,190/n),s="",i,j;for(i=0;i<n;i++)for(j=0;j<n;j++)s+='<rect x="'+(12+j*u)+'" y="'+(12+i*u)+'" width="'+u+'" height="'+u+'" fill="#ffe3de" stroke="#ba3826" stroke-width="1.5"/>';return '<div class="nl">'+svg(n*u+24,n*u+24,s,"")+'</div>'}
+  return '<div class="nl">'+svg(ox+W+30,20+H+30,s,
+    FL("משולש עם בסיס "+b+" וגובה "+h+" מסומן בקו מקווקו",
+       "مثلث قاعدته "+b+" وارتفاعه "+h+" معلّم بخط متقطع",
+       "треугольник с основанием "+b+" и высотой "+h+", показанной пунктиром",
+       "a triangle with base "+b+" and height "+h+" shown as a dashed line"))+'</div>'}
+function sqGrid(n){var u=Math.min(26,190/n),s="",i,j;for(i=0;i<n;i++)for(j=0;j<n;j++)s+='<rect x="'+(12+j*u)+'" y="'+(12+i*u)+'" width="'+u+'" height="'+u+'" fill="#ffe3de" stroke="#ba3826" stroke-width="1.5"/>';return '<div class="nl">'+svg(n*u+24,n*u+24,s,
+  FL("רשת משבצות ריבועית","شبكة مربعات","квадратная сетка клеток","a square grid of cells"))+'</div>'}
 function clockVis(h,m){var s='<circle cx="90" cy="90" r="80" fill="#fff" stroke="'+INK+'" stroke-width="5"/>',i;
   for(i=1;i<=12;i++){var a=i*30*Math.PI/180;s+='<text x="'+(90+62*Math.sin(a)).toFixed(1)+'" y="'+(97-62*Math.cos(a)).toFixed(1)+'" text-anchor="middle" font-size="18" font-weight="800" fill="'+INK+'">'+i+'</text>'}
   var ha=((h%12)*30+m*0.5)*Math.PI/180,ma=m*6*Math.PI/180;
   s+='<line x1="90" y1="90" x2="'+(90+40*Math.sin(ha)).toFixed(1)+'" y2="'+(90-40*Math.cos(ha)).toFixed(1)+'" stroke="'+INK+'" stroke-width="7" stroke-linecap="round"/><line x1="90" y1="90" x2="'+(90+58*Math.sin(ma)).toFixed(1)+'" y2="'+(90-58*Math.cos(ma)).toFixed(1)+'" stroke="'+COL.red+'" stroke-width="4" stroke-linecap="round"/><circle cx="90" cy="90" r="5" fill="'+INK+'"/>';
-  return svg(180,180,s,"")}
+  return svg(180,180,s,FL("שעון מחוגים עגול, מחוג שעות ומחוג דקות",
+    "ساعة عقارب دائرية، عقرب ساعات وعقرب دقائق",
+    "круглые часы со стрелками: часовая и минутная",
+    "a round analog clock with an hour hand and a minute hand"))}
 
 /* ===== helpers ===== */
 var LG=["he","ar","ru","en"];
@@ -1065,7 +1135,7 @@ var LESSONS={
   ST_("תמיד בודקים: מציבים את התשובה במשוואה. 2 · 6 + 5 = 17, נכון.","نتحقق دائمًا: نعوّض الجواب في المعادلة. 2 · 6 + 5 = 17 صحيح.","Всегда проверяй: подставь ответ в уравнение. 2 · 6 + 5 = 17, верно.","Always check: put the answer in the equation. 2 · 6 + 5 = 17, true.",function(){return ""})]
 };
 
-var BUILD="mg4 · 2026-10-03";
+var BUILD="mg5 · 2026-10-03";
 /* ===== UI strings ===== */
 var STR={
 he:{soonT:"בקרוב: צורות חופפות, תיבה וקובייה, שכיחות והסתברות.",mtNote:"תרגום לערבית, רוסית ואנגלית: תרגום מכונה, ממתין לבדיקה.",credit2:"יחידת משפט פיתגורס נבנתה לפי מבנה חוברת של יניב רז, מדריך מחוזי חט״ב, מחוז ירושלים, משרד החינוך. תרגילי החלוקה ביחס בהשראת שאלה מהפיקוח על הוראת המתמטיקה, משרד החינוך.",brand:"מתמטיקה לכיתה ז׳",title:"מתמטיקה לכיתה ז׳",tag:"צירים, מספרים שליליים, זוויות, משולשים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -1139,44 +1209,186 @@ function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").repl
 function T(){return STR[S.lang]}
 function lt(o){return typeof o==="string"?o:o[S.lang]}
 function unitById(id){return UNITS.filter(function(u){return u.id===id})[0]}
-/* ===== speech with word highlight ===== */
-var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null;
+/* ===== מנוע ההקראה של "תאוריה מדברת" — חמישה מנגנונים =====
+   הועתק כלשונו מ-domino/index.html (ושם מ-rakia ומ-math-elem), כדי
+   שהעותקים לא יסחפו זה מזה. חמישה כשלים שקטים של Web Speech, שכולם
+   נראים ללומד אותו דבר — הקול מפסיק באמצע או לא מתחיל:
+     1 שומר-ער · 2 הפניה חיה ל-utterance · 3 שומר-סף ·
+     4 נפילה מקול רשת · 5 שחרור במגע (בלעדיו iOS שותק לגמרי).
+   voiceUsable הוא מפתח המיון הראשון, והמגדר בא אחריו.
+   כאן speechFix ממלא את מקומו של heSpoken שבדומינו: זהו מילון
+   ההגייה של האפליקציה הזאת (מינוס, כפול, חזקה, שבר), והוא היה
+   כאן לפני ההעתקה. */
+var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null,_dis=null,_sayGen=0;
+/* 1 · שומר-ער. Chrome/Edge בשולחן העבודה חותכים הקראה אחרי כ-15 שניות.
+   השאלה כאן נאמרת יחד עם ארבעת המסיחים, וההסבר אחרי טעות ארוך עוד
+   יותר — שניהם נחתכים. במובייל אין את הבאג והפעולה מקרטעת שם, ולכן
+   רק בשולחן העבודה. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+/* 3 · שומר-סף. יש מכשירים שבהם onend לא נורה: הכפתור נשאר על "עצירה"
+   וההקראה לא ממשיכה לעולם. ארבע שניות של שקט מוחלט נחשבות סוף. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+/* 4 · קול רשת שנכשל. קול נוירלי שותק בלי אינטרנט, והלומד שומע כלום
+   בלי שגיאה. הדגל נכבה ומאותו רגע נבחר קול מקומי. */
+var _netVoiceOK=true;
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+/* פיצול לאמירות קצרות — הועתק כלשונו מ-domino (ושם מ-rakia, ושם
+   מ"תאוריה מדברת"). מעל SEG_MAX מנועי מכשיר מאיצים ובולעים סופי
+   מילים; כל מקטע נושא את ההיסט שלו במחרוזת המלאה, כי charIndex
+   מתאפס בכל אמירה ובלעדיו ההדגשה קופצת לתחילת המשפט בכל מקטע.
+   insideNumber שומר שלא ייחתך בתוך מספר — "3.5" ו-"2:3". */
+var SEG_MAX=90, SEG_GAP=260;
+function insideNumber(str,i){ return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]) }
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){ merged[merged.length-1].text+=out[i].text; continue }
+    if(out[i].text.trim().length<12&&i+1<out.length){ out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
 var VF=/(female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
 var VM=/(\bmale\b|david|mark|asaf|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
 function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
-function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
-  var f=vs.filter(function(v){return VF.test(v.name)&&!VM.test(v.name)});if(f.length)return {v:f[0],fem:true};
-  var nm=vs.filter(function(v){return !VM.test(v.name)});if(nm.length)return {v:nm[0],fem:false};
-  return {v:vs[0]||null,fem:false}}
+function vGender(v){var n=(v&&v.name)||"";return (VF.test(n)&&!VM.test(n))?"f":VM.test(n)?"m":"?"}
+/* voiceUsable הוא מפתח המיון הראשון, והמגדר בא אחריו ולא להפך:
+   קול נשי מת מנצח קול גברי חי כשהסדר מתהפך. */
+function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),
+  vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
+  if(!vs.length)return {v:null,fem:false};
+  function grank(v){var g=vGender(v);return g==="f"?2:g==="?"?1:0}
+  var chosen=vs.slice().sort(function(a,b){
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    return grank(b)-grank(a);
+  })[0];
+  return {v:chosen||null,fem:vGender(chosen)==="f"}}
 function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.raw!=null){HL.el.textContent=HL.el.dataset.raw}HL.el=null}
 function hlPrep(el,text){hlClear();if(!el||el.children.length)return;el.dataset.raw=el.textContent;HL.el=el;HL.raw=el.textContent;HL.got=false;
-  var out="",starts=[],re=/\S+|\s+/g,m,pos=0,idx=0;HL.starts=[];
+  var out="",re=/\S+|\s+/g,m,idx=0;HL.starts=[];
   while((m=re.exec(HL.raw))){if(/\S/.test(m[0])){HL.starts.push(m.index);out+='<span data-w="'+idx+'">'+esc(m[0])+'</span>';idx++}else out+=m[0]}
   el.innerHTML=out}
 function hlAt(ci){if(!HL.el)return;var w=-1,i;for(i=0;i<HL.starts.length;i++){if(HL.starts[i]<=ci)w=i;else break}
   var sp=HL.el.querySelectorAll("[data-w]");for(i=0;i<sp.length;i++)sp[i].className=(i===w?"hl":"")}
 function hlFallback(rate){if(!HL.el)return;var n=HL.starts.length,i=0,per=430/rate;
   (function step(){if(!HL.el||HL.got)return;var sp=HL.el.querySelectorAll("[data-w]");for(var k=0;k<sp.length;k++)sp[k].className=(k===i?"hl":"");i++;if(i<=n)HL.timer=setTimeout(step,per)})()}
-function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}if(typeof RECORDED!=="undefined")RECORDED.stop();_u=null;hlClear();setPlaying(false)}
+function stopSpeak(){_sayGen++;try{speechSynthesis.cancel()}catch(e){}if(typeof RECORDED!=="undefined")RECORDED.stop();_u=null;stopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false)}
 var _playing=false;function setPlaying(b){_playing=b;var bs=document.querySelectorAll('[data-a="stop"]');bs.forEach(function(x){x.style.opacity=b?1:.55})}
-function speakDevice_(text,el,onend){var raw=text;if(!("speechSynthesis" in window)||!text)return false;
-  var rate=S.slow?0.7:0.9,pv=pickVoice(),u=new SpeechSynthesisUtterance(speechFix(text));u.lang=LCODE[S.lang];if(pv.v)u.voice=pv.v;u.rate=rate;u.pitch=pv.fem?1.05:1.3;
-  var spoken=el&&el.dataset&&el.dataset.say===text;HL.noB=false;if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=speechFix(raw)!==raw}
-  u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(e.charIndex)};
-  u.onend=u.onerror=function(){if(_u===u){hlClear();setPlaying(false);if(onend)onend()}};
-  _u=u;setPlaying(true);try{speechSynthesis.speak(u)}catch(e){return false}
-  if(HL.el)setTimeout(function(){if(_u===u&&HL.el&&!HL.got)hlFallback(rate)},900);return true}
-/* שכבה 1 - קובץ מוקלט (המנוע של תאוריה מדברת, 3.10.2026). יש קובץ:
+/* קול המכשיר, מקטע אחרי מקטע. speechSynthesis.cancel() אינו מבטל
+   setTimeout, ולכן כל הקראה מקבלת מספר דור: stopSpeak מקדם אותו,
+   ומקטע מדור ישן פשוט אינו מדבר. */
+function speakDevice(text,el,onend){var raw=String(text);
+  if(!("speechSynthesis" in window)||!raw)return false;
+  var spoken=speechFix(raw),rate=S.slow?0.7:0.9;
+  HL.noB=false;
+  if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=(spoken!==raw)}
+  var segs=segments(spoken),my=++_sayGen,v=pickVoice(),retried=false;
+  function alive(){return my===_sayGen}
+  function allDone(){if(!alive())return;maybeStopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false);if(onend)onend()}
+  setPlaying(true);
+  (function sayseg(k){
+    if(!alive())return;
+    if(k>=segs.length){allDone();return}
+    var seg=segs[k],moved=false,disarm=null;
+    function next(){
+      if(moved||!alive())return;
+      moved=true;if(disarm)disarm();
+      if(k+1<segs.length)setTimeout(function(){sayseg(k+1)},SEG_GAP);
+      else allDone();
+    }
+    var u=new SpeechSynthesisUtterance(seg.text);
+    u.lang=LCODE[S.lang];if(v.v){try{u.voice=v.v}catch(e2){}}
+    u.rate=rate;u.pitch=v.fem?1.05:1.3;
+    u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(seg.start+e.charIndex)};
+    u.onend=next;
+    u.onerror=function(e){
+      if(moved||!alive())return;
+      var err=(e&&e.error)||"";
+      if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+      /* 4 · נפילה מקול רשת: הדגל נכבה, נבחר קול מקומי, ואותו מקטע
+         נאמר שוב פעם אחת. בלי זה — שקט מוחלט בלי שגיאה. */
+      if(!retried&&v.v&&v.v.localService===false){
+        retried=true;_netVoiceOK=false;moved=true;
+        if(disarm)disarm();_u=null;
+        v=pickVoice();
+        setTimeout(function(){sayseg(k)},SEG_GAP);
+        return;
+      }
+      moved=true;if(disarm)disarm();allDone();
+    };
+    _u=u;   /* 2 · הפניה חיה ל-utterance — בלעדיה Chrome אוסף אותו עם onend */
+    try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
+    try{speechSynthesis.speak(u)}catch(e2){_u=null;setPlaying(false);return}
+    startKeepAlive();
+    disarm=ttsWatchdog(function(){return alive()&&!moved},next);
+    _dis=disarm;
+  })(0);
+  if(HL.el)setTimeout(function(){if(alive()&&HL.el&&!HL.got)hlFallback(rate)},900);
+  return true}
+/* שכבה 1 — קובץ מוקלט (המנוע של תאוריה מדברת, 3.10.2026). יש קובץ:
    מנגנים וזהו — בלי הדגשה מילה־מילה (אין onboundary בקובץ). אין
-   קובץ, או שהקובץ נכשל: קול המכשיר כרגיל (speakDevice_). */
+   קובץ, או שהקובץ נכשל: קול המכשיר כרגיל. */
 function speak(text,el,onend){stopSpeak();if(!text)return false;
-  if(typeof RECORDED!=="undefined"&&RECORDED.play(text,S.lang,{rate:S.slow?0.7:0.9,
+  if(typeof RECORDED!=="undefined"&&RECORDED.play(String(text),S.lang,{rate:S.slow?0.7:0.9,
       onEnd:function(){setPlaying(false);if(onend)onend()},
-      onError:function(){speakDevice_(text,el,onend)}})){
+      onError:function(){speakDevice(text,el,onend)}})){
     setPlaying(true);return true;
   }
-  return speakDevice_(text,el,onend);
-}
+  return speakDevice(text,el,onend)}
 function qSay(q){return lt(q.q)+". "+q.o.map(function(o,i){return optSay(o)}).join(". ")}
 /* ===== effects ===== */
 var ctx=null;function tone(f,d,t,v){if(!S.sfx)return;try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();var o=ctx.createOscillator(),g=ctx.createGain();o.type=t||"sine";o.frequency.value=f;g.gain.value=v||.08;o.connect(g);g.connect(ctx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+d);o.stop(ctx.currentTime+d)}catch(e){}}
@@ -1258,8 +1470,18 @@ function render(){applyTheme();document.documentElement.lang=S.lang;document.doc
 function sayText(w){var q=P&&P.list&&P.list[P.i],t=T();
   if(w==="home")return [t.title+". "+t.tag,$("#h1")];if(w==="lesson")return [$("#lt").textContent,$("#lt")];
   if(w==="end")return [t.finX,$("#ex")];if(w==="q")return [qSay(q),null];return ["",null]}
-function sayQ(slow){var q=P.list[P.i],old=S.slow;if(slow)S.slow=true;var el=$("#qt");speak(lt(q.q),el,function(){});
-  /* question first (highlighted), then options */var u=_u;if(u){var prev=u.onend;u.onend=function(){if(_u!==u)return;hlClear();var rest=q.o.map(optSay).join(". ");S.slow=slow?true:old;speak(rest,null,function(){S.slow=old});if(slow)S.slow=old}}
+/* קודם השאלה (עם ההדגשה), ואחריה המסיחים. עד היום השרשור נעשה
+   בדריסת _u.onend מבחוץ — ועם חיתוך האמירה למקטעים _u הוא המקטע
+   הראשון בלבד, כך שהמסיחים היו נאמרים אחרי המקטע הראשון במקום
+   בסוף. הקריאה החוזרת יושבת עכשיו ב-onend של speak, שנורה פעם
+   אחת כשכל המקטעים נגמרו (וגם כשניגן קובץ מוקלט). */
+function sayQ(slow){var q=P.list[P.i],old=S.slow,sl=slow?true:old,
+  el=$("#qt"),rest=q.o.map(optSay).join(". ");
+  S.slow=sl;
+  speak(lt(q.q),el,function(){
+    hlClear();
+    S.slow=sl;speak(rest,null,function(){S.slow=old});S.slow=old;
+  });
   S.slow=old}
 function onAct(a,el){var t=T(),q=P&&P.list&&P.list[P.i];
   if(a==="home"){stopSpeak();view="home";render();window.scrollTo(0,0)}
@@ -1290,6 +1512,16 @@ function onAct(a,el){var t=T(),q=P&&P.list&&P.list[P.i];
   else if(a==="reset"){if(confirm(t.resetAsk)){S.done={};saveS();render()}}}
 document.addEventListener("click",function(e){var el=e.target.closest("[data-a]");if(!el||el.disabled)return;onAct(el.dataset.a,el)});
 window.addEventListener("pagehide",function(){stopSpeak()});
+/* 5 · iOS לא ישמיע כלום עד שאמירה אחת יצאה מתוך handler של מגע אמיתי.
+   קריאה ישירה, בלי המתנה לרשימת הקולות — הבטחה שוברת את שרשרת המגע
+   ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
+try{document.addEventListener("pointerdown",function(){
+  try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+},{once:true});}catch(e){}
+/* רשימת הקולות נטענת אסינכרונית ב-Chrome: בלי הבעיטה הזאת getVoices
+   של הלחיצה הראשונה חוזר ריק, ונבחר קול ברירת המחדל של המערכת. */
+try{speechSynthesis.getVoices();
+    speechSynthesis.addEventListener("voiceschanged",function(){try{voices()}catch(e){}});}catch(e){}
 </script>
 <script src="/tutor/josh-face.js"></script>
 <script src="/tutor/he-speech.js"></script>
@@ -1311,7 +1543,7 @@ window.addEventListener("pagehide",function(){stopSpeak()});
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-g7",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=mg4-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=mg5-pwa1").catch(function(){})});
 })();
 </script>
 

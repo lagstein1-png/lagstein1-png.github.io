@@ -354,6 +354,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;
   min-height:48px;padding:12px 14px;border-radius:11px;outline:none;background:var(--surface2);color:inherit;border:1px solid var(--line)}
 .field:focus{border-color:var(--accent)}
+/* `outline:none` של `.field` הוא (0,1,0) ויושב אחרי הכלל הכללי
+   `:focus-visible` שבראש הקובץ — אותה ספציפיות, ולכן המאוחר מנצח
+   והשדה נשאר בלי סימן מיקוד במקלדת. אותו כלל קיים ב-literature וב-biology. */
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 textarea.field{min-height:96px;resize:vertical}
 
 /* ---------- שורות המבחן ----------
@@ -1104,7 +1108,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="is3 · 2026-10-04";
+var BUILD="is4 · 2026-10-04";
 var SKEY="islam-state-v1";
 var GKEY_STORE="islam-gkey";
 
@@ -1356,8 +1360,8 @@ function bestVoice(code){
   if(explicit&&(!pin||pin.request!==request)){ pins[key]={v:explicit,g:vGender(explicit),request:request}; return explicit; }
   if(pin){
     var live=pool.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
-    if(live&&(live.localService!==false||navigator.onLine!==false))return live;
-    var same=pool.filter(function(v){return vGender(v)===pin.g&&(v.localService!==false||navigator.onLine!==false)});
+    if(live&&voiceUsable(live))return live;
+    var same=pool.filter(function(v){return vGender(v)===pin.g&&voiceUsable(v)});
     if(!same.length)return pin.v;
     pool=same;
   }else{
@@ -1371,6 +1375,10 @@ function bestVoice(code){
     if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
     if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
     if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    /* קול רשת — הנוירליים של Edge הם כאלה — נשמע טוב יותר כשיש
+       רשת, וזה כל מה שנקבע כאן. מה קורה כשאין רשת נקבע ב-voiceUsable,
+       שהוא מיון קודם: קנס בתוך הניקוד לא הצליח להתגבר על שם היצרן. */
+    if(v.localService===false&&voiceUsable(v))s+=6;
     if(/espeak|compact|pico/.test(n))s-=40;
     if(v.default)s+=4;
     return s;
@@ -1382,7 +1390,10 @@ function bestVoice(code){
      ובתוך כל קבוצה מכריעה האיכות. */
   function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
   var chosen=pool.slice().sort(function(a,b){
-    var d=grank(b)-grank(a); return d||score(b)-score(a);
+    /* קול שלא יעבוד יורד לתחתית לפני כל שיקול אחר — גם לפני המגדר,
+       שאם לא כן קול נשי מת מנצח קול גברי חי. */
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||score(b)-score(a);
   })[0];
   if(chosen)pins[key]={v:chosen,g:vGender(chosen),request:request};
   return chosen;
@@ -1587,6 +1598,77 @@ function ttsFail(err){
 function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
 
 
+/* =====================================================================
+   מנוע ההקראה של "תאוריה מדברת" — ארבעה מנגנונים
+   ---------------------------------------------------------------------
+   ארבעה כשלים שקטים של Web Speech. אף אחד מהם אינו מדווח כשגיאה,
+   וכולם נראים למשתמש בדיוק אותו דבר: הקול פשוט מפסיק באמצע. הקוד
+   כאן הועתק מהאפליקציה שבה הוא כבר רץ, ולא נוסח מחדש.
+   ===================================================================== */
+
+/* 1 · שומר-ער. באג ותיק ב-Chrome וב-Edge בשולחן העבודה: ההקראה
+   נחתכת אחרי כ-15 שניות, באמצע מילה. pause+resume תקופתי מחזיק את
+   המנוע ער. במובייל אין את הבאג ופעולה כזאת דווקא מקרטעת שם, ולכן
+   מפעילים רק היכן שבאמת צריך. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+/* עוצרים רק כששום דבר כבר לא מדבר — אחרת מקטע שהתחיל זה עתה מאבד
+   את השמירה שלו כשהמקטע הקודם מסיים להתנקות. */
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+
+/* 2 · הפניה חיה ל-utterance. Chrome אוסף אובייקט שאין אליו הפניה,
+   ואיתו נעלמים onend ו-onboundary: ההקראה נתקעת באמצע, ההדגשה
+   קופאת על מילה אחת, והמקטע הבא לא יוצא לעולם. */
+var _activeU=null;
+
+/* 3 · קול רשת שנכשל. הקולות הנוירליים של Edge הם קולות רשת, והם
+   שותקים בלי אינטרנט. הדגל נכבה ברגע שאחד מהם נכשל, ומאותו רגע
+   הדירוג מעדיף קול מקומי לשארית הסשן. */
+var _netVoiceOK=true;
+
+/* קול רשת שאי אפשר להשתמש בו עכשיו — אין אינטרנט, או שאחד כבר
+   נכשל בסשן הזה — אינו "פחות טוב", הוא פשוט לא יעבוד. לכן זה מיון
+   ראשון ולא עוד סעיף בתוך הניקוד: קנס בניקוד לא הספיק, מפני שקול
+   נוירלי של Microsoft צובר על שם היצרן ועל "Natural" יותר ממה שכל
+   קנס סביר מוריד — והוא נבחר שוב ושוב אחרי שכבר נכשל.
+   כשהוא הקול היחיד שיש הוא עדיין נבחר: מיון של רשימה בת אחד
+   מחזיר אותה כמו שהיא. */
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+
+/* 4 · שומר זמן. יש מכשירים שבהם onend פשוט לא נורה. בלי השומר הזה
+   התור נתקע: הכפתור נשאר על "עצירה" וההקראה לא ממשיכה לעולם. ארבע
+   שניות שבהן המנוע לא מדבר ולא ממתין נחשבות סוף.
+   מחזיר פונקציית ביטול — מי שסיים בדרך הרגילה מכבה את השומר. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+
+
 /* ------------------------------------------------------------
    פיצול לאמירות קצרות — הועתק מ"תאוריה מדברת", שם ההקראה נשמעת
    הכי טוב. מנועי מכשיר מאיצים ובולעים סופי מילים במשפט ארוך;
@@ -1746,21 +1828,49 @@ function speakDevice(text,code,rate){
       var v=bestVoice(code), lang=(v&&v.lang)||code;
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
       var pit=femLift(v);
+      var retried=false;
+      function alive(){return my===_sayGen}
+      function allDone(){ maybeStopKeepAlive(); hlClear(); ttsOK() }
       (function sayseg(k){
-        if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
-        if(k>=segs.length){ hlClear(); ttsOK(); return }
-        var seg=segs[k];
+        if(!alive())return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
+        if(k>=segs.length){ allDone(); return }
+        /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
+           יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+        var seg=segs[k], moved=false, disarm=null;
+        function next(){
+          if(moved||!alive())return;
+          moved=true; if(disarm)disarm();
+          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+          else allDone();
+        }
         var u=new SpeechSynthesisUtterance(seg.text);
         u.lang=lang;
         if(v){ try{ u.voice=v }catch(e2){} }
         u.rate=rt; u.pitch=pit; u.volume=1;
         u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
-        u.onend=function(){
-          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
-          else { hlClear(); ttsOK() }
+        u.onend=next;
+        u.onerror=function(e){
+          if(moved||!alive())return;
+          var err=(e&&e.error)||"";
+          /* ביטול יזום אינו תקלה — stopSpeak כבר ניקה אחריו */
+          if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+          /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול
+             מקומי וחוזרים על אותו מקטע, פעם אחת, כדי שההקראה לא
+             תישבר בשקט באמצע שאלה. */
+          if(!retried&&v&&v.localService===false){
+            retried=true; _netVoiceOK=false; moved=true;
+            if(disarm)disarm(); _activeU=null;
+            v=bestVoice(code); lang=(v&&v.lang)||code; pit=femLift(v);
+            setTimeout(function(){sayseg(k)},SEG_GAP);
+            return;
+          }
+          moved=true; if(disarm)disarm(); maybeStopKeepAlive(); ttsFail(err);
         };
-        u.onerror=function(e){ttsFail(e&&e.error)};
+        _activeU=u;                        /* מגן מפני איסוף זבל */
+        try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
         speechSynthesis.speak(u);
+        startKeepAlive();
+        disarm=ttsWatchdog(function(){return alive()&&!moved},next);
       })(0);
     }catch(e){}
   })();
@@ -1806,7 +1916,7 @@ function playUrl(url,text,code,rate){
   gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();stopKeepAlive();_activeU=null;try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -1974,18 +2084,18 @@ topic("isl-quran","sources",{"he": "הקוראן: התגלות, נסח ואעג'
   Q("isl-quran-1-03",{"he": "מהי הסורה הראשונה בקוראן לפי סדר הספר?", "ar": "ما هي أول سورة في ترتيب المصحف؟", "ru": "Какая сура первая в порядке мусхафа?", "en": "Which surah is first in the order of the Quran?"},[{"he": "אל-בקרה", "ar": "البقرة", "ru": "аль-Бакара", "en": "Al-Baqara"}, {"he": "אל-עלק", "ar": "العلق", "ru": "аль-Алак", "en": "Al-Alaq"}, {"he": "אל-אח'לאץ'", "ar": "الإخلاص", "ru": "аль-Ихлас", "en": "Al-Ikhlas"}, {"he": "אל-פאתחה", "ar": "الفاتحة", "ru": "аль-Фатиха", "en": "Al-Fatiha"}],3,{"he": "היא נקראת גם \"פותחת הספר\".", "ar": "تسمى أيضًا «فاتحة الكتاب».", "ru": "Её называют также «Открывающей Книгу».", "en": "It is also called \"the Opening of the Book\"."},{"he": "הסורה הראשונה בסדר הקוראן היא אל-פאתחה, ויש בה שבעה פסוקים. קוראים אותה בכל תפילה.", "ar": "أول سورة في ترتيب المصحف هي الفاتحة، وفيها سبع آيات، وتُقرأ في كل صلاة.", "ru": "Первая в порядке мусхафа - аль-Фатиха, в ней семь аятов. Её читают в каждой молитве.", "en": "The first surah in the order of the Quran is al-Fatiha, with seven verses. It is read in every prayer."},null),
   Q("isl-quran-1-04",{"he": "באיזה חודש התחילה ירידת הקוראן?", "ar": "في أي شهر بدأ نزول القرآن؟", "ru": "В каком месяце началось ниспослание Корана?", "en": "In which month did the revelation of the Quran begin?"},[{"he": "ברמדאן", "ar": "في رمضان", "ru": "В рамадане", "en": "In Ramadan"}, {"he": "בשוואל", "ar": "في شوال", "ru": "В шавваль", "en": "In Shawwal"}, {"he": "במוחרם", "ar": "في محرم", "ru": "В мухаррам", "en": "In Muharram"}, {"he": "ברג'ב", "ar": "في رجب", "ru": "В раджаб", "en": "In Rajab"}],0,{"he": "זה גם חודש הצום.", "ar": "هو أيضًا شهر الصيام.", "ru": "Это же месяц поста.", "en": "It is also the month of fasting."},{"he": "הקוראן התחיל לרדת בליל אל-קדר שברמדאן, כפי שנאמר בסורת אל-בקרה ובסורת אל-קדר.", "ar": "بدأ نزول القرآن في ليلة القدر من رمضان، كما في سورتي البقرة والقدر.", "ru": "Откровение Корана началось в ночь предопределения в рамадане, как сказано в сурах аль-Бакара и аль-Кадр.", "en": "The Quran began to be revealed on the Night of Power in Ramadan, as stated in surahs al-Baqara and al-Qadr."},null),
   Q("isl-quran-1-05",{"he": "מה פירוש המילה \"נסח\" בלימודי הדת?", "ar": "ماذا يعني «النسخ» في علوم الدين؟", "ru": "Что означает «наск» в религиозных науках?", "en": "What does \"naskh\" mean in religious studies?"},[{"he": "כתיבת הקוראן מחדש בנוסח אחר, אחרי שעברו עליו שנים רבות", "ar": "كتابة القرآن من جديد بنص آخر بعد مرور سنين كثيرة", "ru": "Переписывание Корана заново другим текстом спустя много лет", "en": "Writing the Quran again in a different wording after many years"}, {"he": "ביטול הוראה דתית קודמת על ידי הוראה מאוחרת יותר", "ar": "رفع حكم شرعي سابق بحكم شرعي لاحق", "ru": "Отмена прежнего предписания более поздним", "en": "Replacing an earlier ruling with a later ruling"}, {"he": "תרגום הקוראן לשפה אחרת, כדי שמי שאינו דובר ערבית יבין אותו", "ar": "ترجمة القرآن إلى لغة أخرى ليفهمه من لا يتكلم العربية", "ru": "Перевод Корана на другой язык, чтобы его понял тот, кто не знает арабского", "en": "Translating the Quran into another language so non-Arabic speakers understand it"}, {"he": "שינון סורה בעל פה, עד שאפשר לקרוא אותה בתפילה בלי להסתכל", "ar": "حفظ سورة عن ظهر قلب حتى تُقرأ في الصلاة من غير نظر", "ru": "Заучивание суры наизусть, чтобы читать её в молитве не глядя", "en": "Memorizing a surah by heart so it can be recited in prayer without looking"}],1,{"he": "המילה קשורה להסרה ולהחלפה.", "ar": "الكلمة مرتبطة بالرفع والإزالة.", "ru": "Слово связано со снятием и заменой.", "en": "The word is about lifting and replacing."},{"he": "נסח הוא כשהמחוקק מבטל דין מוקדם ונותן במקומו דין חדש. הוא קשור להוראות ולא לסיפורים.", "ar": "النسخ أن يرفع الشارع حكمًا سابقًا ويضع مكانه حكمًا جديدًا. وهو يتعلق بالأحكام لا بالقصص.", "ru": "Наск - когда законодатель отменяет прежнее предписание и вводит новое. Он касается предписаний, а не рассказов.", "en": "Naskh is when the lawgiver cancels an earlier ruling and sets a new one. It concerns rulings, not stories."},null),
-  Q("isl-quran-1-06",{"he": "לאיזה כיוון התפללו המוסלמים בתחילה, לפני שהשתנה כיוון התפילה?", "ar": "إلى أي جهة صلّى المسلمون في البداية قبل تغيير القبلة؟", "ru": "В какую сторону молились мусульмане сначала, до смены киблы?", "en": "Which direction did the Muslims first pray toward, before the qibla changed?"},[{"he": "אל הר סיני", "ar": "إلى جبل سيناء", "ru": "К горе Синай", "en": "Toward Mount Sinai"}, {"he": "אל הים", "ar": "إلى جهة البحر", "ru": "В сторону моря", "en": "Toward the sea"}, {"he": "לבית המקדש בירושלים", "ar": "إلى بيت المقدس", "ru": "К Байт аль-Макдису в Иерусалиме", "en": "Toward Bayt al-Maqdis in Jerusalem"}, {"he": "אל מדינה", "ar": "إلى المدينة المنورة", "ru": "К Медине", "en": "Toward Medina"}],2,{"he": "המקום הזה הוא המסגד אל-אקצא.", "ar": "هذا المكان فيه المسجد الأقصى.", "ru": "В этом месте находится мечеть аль-Акса.", "en": "This place has al-Aqsa Mosque."},{"he": "בתחילה התפללו לבית המקדש. אחר כך ירדה הוראה להתפלל אל הכעבה (אל-בקרה, 144). זו דוגמה מפורסמת לנסח.", "ar": "صلّوا أولًا إلى بيت المقدس، ثم نزل الأمر بالتوجه إلى الكعبة (البقرة 144). وهذا مثال مشهور للنسخ.", "ru": "Сначала молились в сторону Байт аль-Макдиса, потом пришло веление обращаться к Каабе (аль-Бакара, 144). Это известный пример наска.", "en": "At first they prayed toward Bayt al-Maqdis, then came the command to face the Kaaba (al-Baqara 144). This is a famous example of naskh."},null),
+  Q("isl-quran-1-06",{"he": "לאיזה כיוון התפללו המוסלמים בתחילה, לפני שהשתנה כיוון התפילה?", "ar": "إلى أي جهة صلّى المسلمون في البداية قبل تغيير القبلة؟", "ru": "В какую сторону молились мусульмане сначала, до смены киблы?", "en": "Which direction did the Muslims first pray toward, before the qibla changed?"},[{"he": "אל הר סיני שבארץ מצרים", "ar": "إلى جبل سيناء في أرض مصر", "ru": "К горе Синай в земле Египта", "en": "Toward Mount Sinai in the land of Egypt"}, {"he": "אל הים הגדול, לכיוון המערב", "ar": "إلى جهة البحر الكبير غربًا", "ru": "В сторону великого моря, на запад", "en": "Toward the great sea, to the west"}, {"he": "לבית המקדש בירושלים", "ar": "إلى بيت المقدس في القدس", "ru": "К Байт аль-Макдису в Иерусалиме", "en": "Toward Bayt al-Maqdis in Jerusalem"}, {"he": "אל אל-מדינה שבצפון חצי האי", "ar": "إلى المدينة المنورة شمالًا", "ru": "К Медине на севере полуострова", "en": "Toward Medina in the north of the peninsula"}],2,{"he": "המקום הזה הוא המסגד אל-אקצא.", "ar": "هذا المكان فيه المسجد الأقصى.", "ru": "В этом месте находится мечеть аль-Акса.", "en": "This place has al-Aqsa Mosque."},{"he": "בתחילה התפללו לבית המקדש. אחר כך ירדה הוראה להתפלל אל הכעבה (אל-בקרה, 144). זו דוגמה מפורסמת לנסח.", "ar": "صلّوا أولًا إلى بيت المقدس، ثم نزل الأمر بالتوجه إلى الكعبة (البقرة 144). وهذا مثال مشهور للنسخ.", "ru": "Сначала молились в сторону Байт аль-Макдиса, потом пришло веление обращаться к Каабе (аль-Бакара, 144). Это известный пример наска.", "en": "At first they prayed toward Bayt al-Maqdis, then came the command to face the Kaaba (al-Baqara 144). This is a famous example of naskh."},null),
 ],
 [
-  Q("isl-quran-2-01",{"he": "מי ציווה לאסוף את הקוראן לדפים אחרי קרב אל-יאמאמה?", "ar": "من الذي أمر بجمع القرآن في صحف بعد معركة اليمامة؟", "ru": "Кто распорядился собрать Коран в свитки после битвы при Ямаме?", "en": "Who ordered the Quran to be gathered into sheets after the Battle of al-Yamama?"},[{"he": "ח'ליפה עלי בן אבי טאלב", "ar": "الخليفة علي بن أبي طالب", "ru": "Халиф Али ибн Абу Талиб", "en": "Caliph Ali ibn Abi Talib"}, {"he": "ח'ליפה מועאוויה", "ar": "الخليفة معاوية", "ru": "Халиф Муавия", "en": "Caliph Muawiya"}, {"he": "ח'ליפה אבו בכר, אחרי הצעתו של עומר", "ar": "الخليفة أبو بكر بعد اقتراح عمر", "ru": "Халиф Абу Бакр по совету Умара", "en": "Caliph Abu Bakr, after a suggestion from Umar"}, {"he": "הנביא עצמו, בליל אל-אסראא", "ar": "النبي نفسه في ليلة الإسراء", "ru": "Сам Пророк в ночь аль-Исра", "en": "The Prophet himself, on the night of al-Isra"}],2,{"he": "זה קרה זמן קצר אחרי מות הנביא, כשרבים משומרי הקוראן נהרגו.", "ar": "حدث هذا بعد وفاة النبي بقليل، حين استُشهد كثير من حفظة القرآن.", "ru": "Это было вскоре после смерти Пророка, когда погибло много знатоков Корана.", "en": "This was soon after the Prophet's death, when many who had memorized the Quran were killed."},{"he": "אחרי קרב אל-יאמאמה חשש עומר שהקוראן יאבד. אבו בכר ציווה על זיד בן ת'אבית לאסוף את הדפים.", "ar": "بعد اليمامة خشي عمر ضياع القرآن، فأمر أبو بكر زيد بن ثابت بجمعه.", "ru": "После Ямамы Умар боялся потери Корана. Абу Бакр поручил Зайду ибн Сабиту собрать его.", "en": "After al-Yamama Umar feared the Quran would be lost. Abu Bakr told Zayd ibn Thabit to collect it."},null),
+  Q("isl-quran-2-01",{"he": "מי ציווה לאסוף את הקוראן לדפים אחרי קרב אל-יאמאמה?", "ar": "من الذي أمر بجمع القرآن في صحف بعد معركة اليمامة؟", "ru": "Кто распорядился собрать Коран в свитки после битвы при Ямаме?", "en": "Who ordered the Quran to be gathered into sheets after the Battle of al-Yamama?"},[{"he": "ח'ליפה עלי בן אבי טאלב, בשנות שלטונו", "ar": "الخليفة علي بن أبي طالب في سنوات خلافته", "ru": "Халиф Али ибн Абу Талиб в годы своего правления", "en": "Caliph Ali ibn Abi Talib, during his caliphate"}, {"he": "ח'ליפה מועאוויה, בימי שלטונו בדמשק", "ar": "الخليفة معاوية في أيام حكمه بدمشق", "ru": "Халиф Муавия в годы его правления в Дамаске", "en": "Caliph Muawiya, in his years of rule in Damascus"}, {"he": "ח'ליפה אבו בכר, אחרי הצעתו של עומר", "ar": "الخليفة أبو بكر بعد اقتراح عمر", "ru": "Халиф Абу Бакр по совету Умара", "en": "Caliph Abu Bakr, after a suggestion from Umar"}, {"he": "הנביא עצמו, בליל אל-אסראא והמיעראג'", "ar": "النبي نفسه في ليلة الإسراء والمعراج", "ru": "Сам Пророк в ночь аль-Исра и Мираджа", "en": "The Prophet himself, on the night of al-Isra and Mi'raj"}],2,{"he": "זה קרה זמן קצר אחרי מות הנביא, כשרבים משומרי הקוראן נהרגו.", "ar": "حدث هذا بعد وفاة النبي بقليل، حين استُشهد كثير من حفظة القرآن.", "ru": "Это было вскоре после смерти Пророка, когда погибло много знатоков Корана.", "en": "This was soon after the Prophet's death, when many who had memorized the Quran were killed."},{"he": "אחרי קרב אל-יאמאמה חשש עומר שהקוראן יאבד. אבו בכר ציווה על זיד בן ת'אבית לאסוף את הדפים.", "ar": "بعد اليمامة خشي عمر ضياع القرآن، فأمر أبو بكر زيد بن ثابت بجمعه.", "ru": "После Ямамы Умар боялся потери Корана. Абу Бакр поручил Зайду ибн Сабиту собрать его.", "en": "After al-Yamama Umar feared the Quran would be lost. Abu Bakr told Zayd ibn Thabit to collect it."},null),
   Q("isl-quran-2-02",{"he": "מה עשה הח'ליפה עות'מאן בקשר לקוראן?", "ar": "ماذا فعل الخليفة عثمان بن عفان في شأن القرآن؟", "ru": "Что сделал халиф Усман для Корана?", "en": "What did Caliph Uthman do for the Quran?"},[{"he": "כתב סורה חדשה והוסיף אותה לסוף הקוראן", "ar": "كتب سورة جديدة وأضافها إلى آخر القرآن", "ru": "Написал новую суру и добавил её в конец Корана", "en": "He wrote a new surah and added it at the end of the Quran"}, {"he": "ביטל את סורת אל-פאתחה והוציא אותה מן המצחף", "ar": "ألغى سورة الفاتحة وأخرجها من المصحف", "ru": "Отменил суру аль-Фатиха и убрал её из мусхафа", "en": "He removed surah al-Fatiha and took it out of the mushaf"}, {"he": "תרגם את הקוראן לפרסית ושלח את התרגום לערים הגדולות", "ar": "ترجم القرآن إلى الفارسية وأرسل الترجمة إلى الأمصار", "ru": "Перевёл Коран на персидский и разослал перевод по городам", "en": "He translated the Quran into Persian and sent the translation to the cities"}, {"he": "העתיק עותקים מהמצחף ושלח אותם לערים הגדולות", "ar": "نسخ مصاحف وأرسلها إلى الأمصار", "ru": "Сделал списки мусхафа и разослал их по городам", "en": "Had copies of the mushaf made and sent them to the major cities"}],3,{"he": "המטרה הייתה שכולם יקראו בנוסח אחד.", "ar": "الهدف أن يقرأ الجميع بنص واحد.", "ru": "Цель была в том, чтобы все читали один текст.", "en": "The aim was that everyone would read one text."},{"he": "עות'מאן איחד את הקריאה והעתיק עותקים אחידים. כך נשמר הנוסח אחד בכל העולם המוסלמי.", "ar": "وحّد عثمان القراءة ونسخ مصاحف موحدة، فبقي النص واحدًا في العالم الإسلامي.", "ru": "Усман унифицировал чтение и разослал одинаковые списки, так текст остался единым.", "en": "Uthman unified the text and sent identical copies, so the text stayed one across the Muslim world."},null),
-  Q("isl-quran-2-03",{"he": "במה סורות מכה (מכיות) מתמקדות בדרך כלל?", "ar": "بماذا تتميز السور المكية في الغالب؟", "ru": "Чем в основном отличаются мекканские суры?", "en": "What do the Makkan surahs mostly focus on?"},[{"he": "באמונה באל אחד, בחיי העולם הבא ובטוב הלב", "ar": "بالعقيدة والتوحيد واليوم الآخر ومكارم الأخلاق", "ru": "Верой в Единого Бога, жизнью после смерти, добрыми качествами", "en": "Faith in one God, the afterlife and good character"}, {"he": "בפרטי הדין של הירושה בלבד", "ar": "بتفاصيل الميراث فقط", "ru": "Только деталями наследства", "en": "Only the details of inheritance"}, {"he": "בסדר הקרבות", "ar": "بترتيب المعارك", "ru": "Порядком сражений", "en": "The order of battles"}, {"he": "בהסדרי המסחר בשוק של מדינה", "ar": "بتنظيم تجارة سوق المدينة", "ru": "Правилами торговли на рынке Медины", "en": "Trade rules in the Medina market"}],0,{"he": "חשבו על המסר הראשון שנאמר לאנשים בתחילת הדרך.", "ar": "فكّر في الرسالة الأولى التي قيلت للناس في البداية.", "ru": "Подумайте о первом послании людям в начале пути.", "en": "Think of the first message given to people at the start."},{"he": "בימי מכה הדגש היה על יסודות האמונה. בימי מדינה ירדו יותר הוראות על חוק וחברה.", "ar": "ركّز العهد المكي على أسس العقيدة، وفي المدني نزلت أحكام التشريع والمجتمع أكثر.", "ru": "В мекканский период упор был на основы веры, в мединский - больше предписаний о праве и обществе.", "en": "The Makkan period stressed the foundations of faith; in Medina more rulings on law and society came down."},null),
-  Q("isl-quran-2-04",{"he": "איך נאסר היין בקוראן, ומה אפשר ללמוד מכך?", "ar": "كيف حُرّمت الخمر في القرآن؟ وما الحكمة العامة في ذلك؟", "ru": "Как в Коране был запрещён хмельной напиток и чему это учит?", "en": "How was wine prohibited in the Quran? And what general wisdom does this show?"},[{"he": "ביום אחד בלי הכנה, כדי להלחיץ", "ar": "دفعة واحدة دون تمهيد", "ru": "Сразу, без подготовки", "en": "All at once with no preparation"}, {"he": "בהדרגה, כדי להקל על האנשים", "ar": "بالتدرج تيسيرًا على الناس", "ru": "Постепенно, чтобы облегчить людям", "en": "Gradually, to make it easier for people"}, {"he": "רק בימי מכה", "ar": "في مكة فقط", "ru": "Только в Мекке", "en": "Only in Makkah"}, {"he": "לא נאסר בכלל", "ar": "لم يُحرَّم أصلًا", "ru": "Не был запрещён вовсе", "en": "It was never prohibited"}],1,{"he": "חשבו על \"צעד אחר צעד\".", "ar": "فكّر في «خطوة بعد خطوة».", "ru": "Подумайте о «шаг за шагом».", "en": "Think \"step by step\"."},{"he": "האיסור בא בשלבים, עד הוראה סופית בסורת אל-מאאידה. זו חכמת הנסח: חוק בהדרגה וקלות על העם.", "ar": "جاء التحريم على مراحل حتى الحكم النهائي في سورة المائدة، وهذه من حكم النسخ: التدرج والتيسير.", "ru": "Запрет шёл этапами до окончательного веления в суре аль-Маида. Это мудрость наска: постепенность и облегчение.", "en": "The ban came in stages until the final ruling in al-Ma'ida. This is a wisdom of naskh: gradual law and ease for people."},null),
+  Q("isl-quran-2-03",{"he": "במה סורות מכה (מכיות) מתמקדות בדרך כלל?", "ar": "بماذا تتميز السور المكية في الغالب؟", "ru": "Чем в основном отличаются мекканские суры?", "en": "What do the Makkan surahs mostly focus on?"},[{"he": "באמונה באל אחד, בחיי העולם הבא ובטוב הלב", "ar": "بالعقيدة والتوحيد واليوم الآخر ومكارم الأخلاق", "ru": "Верой в Единого Бога, жизнью после смерти, добрыми качествами", "en": "Faith in one God, the afterlife and good character"}, {"he": "בפרטי הדין של הירושה ושל חלוקת הרכוש", "ar": "بتفاصيل أحكام الميراث وقسمة التركة", "ru": "Деталями наследства и раздела имущества между наследниками", "en": "The details of inheritance and dividing property"}, {"he": "בסדר הקרבות ובחלוקת השלל שאחריהם", "ar": "بترتيب الغزوات وقسمة الغنائم بعدها", "ru": "Порядком сражений и разделом военной добычи после них", "en": "The order of the battles and dividing the spoils"}, {"he": "בהסדרי המסחר במידות ובמשקלות שבשוק אל-מדינה", "ar": "بتنظيم التجارة والمكاييل والموازين في سوق المدينة", "ru": "Правилами торговли, мер и весов на рынке города Медины", "en": "Rules of trade, measures and weights in the Medina market"}],0,{"he": "חשבו על המסר הראשון שנאמר לאנשים בתחילת הדרך.", "ar": "فكّر في الرسالة الأولى التي قيلت للناس في البداية.", "ru": "Подумайте о первом послании людям в начале пути.", "en": "Think of the first message given to people at the start."},{"he": "בימי מכה הדגש היה על יסודות האמונה. בימי מדינה ירדו יותר הוראות על חוק וחברה.", "ar": "ركّز العهد المكي على أسس العقيدة، وفي المدني نزلت أحكام التشريع والمجتمع أكثر.", "ru": "В мекканский период упор был на основы веры, в мединский - больше предписаний о праве и обществе.", "en": "The Makkan period stressed the foundations of faith; in Medina more rulings on law and society came down."},null),
+  Q("isl-quran-2-04",{"he": "איך נאסר היין בקוראן, ומה אפשר ללמוד מכך?", "ar": "كيف حُرّمت الخمر في القرآن؟ وما الحكمة العامة في ذلك؟", "ru": "Как в Коране был запрещён хмельной напиток и чему это учит?", "en": "How was wine prohibited in the Quran? And what general wisdom does this show?"},[{"he": "ביום אחד בלי הכנה, כדי להלחיץ", "ar": "دفعة واحدة دون تمهيد", "ru": "Сразу, без подготовки", "en": "All at once with no preparation"}, {"he": "בהדרגה, כדי להקל על האנשים", "ar": "بالتدرج تيسيرًا على الناس", "ru": "Постепенно, чтобы облегчить людям", "en": "Gradually, to make it easier for people"}, {"he": "בפעם אחת, בהוראה שירדה בימי מכה", "ar": "دفعة واحدة بآية نزلت في مكة", "ru": "Сразу, одним аятом, ниспосланным в Мекке", "en": "All at once, in a verse revealed in Makkah"}, {"he": "הוא לא נאסר, אלא רק הומלץ להפחית בו", "ar": "لم يُحرَّم، وإنما نُدب إلى الإقلال منه", "ru": "Не был запрещён, лишь советовали пить меньше", "en": "It was never prohibited, only drinking less was advised"}],1,{"he": "חשבו על \"צעד אחר צעד\".", "ar": "فكّر في «خطوة بعد خطوة».", "ru": "Подумайте о «шаг за шагом».", "en": "Think \"step by step\"."},{"he": "האיסור בא בשלבים, עד הוראה סופית בסורת אל-מאאידה. זו חכמת הנסח: חוק בהדרגה וקלות על העם.", "ar": "جاء التحريم على مراحل حتى الحكم النهائي في سورة المائدة، وهذه من حكم النسخ: التدرج والتيسير.", "ru": "Запрет шёл этапами до окончательного веления в суре аль-Маида. Это мудрость наска: постепенность и облегчение.", "en": "The ban came in stages until the final ruling in al-Ma'ida. This is a wisdom of naskh: gradual law and ease for people."},null),
   Q("isl-quran-2-05",{"he": "מה פירוש \"אעג'אז אל-קוראן\"?", "ar": "ما معنى «إعجاز القرآن»؟", "ru": "Что значит «иджаз Корана»?", "en": "What does \"i'jaz of the Quran\" mean?"},[{"he": "שהקוראן קצר מאוד, ולכן קל לשנן אותו בעל פה", "ar": "أن القرآن قصير جدًا فيسهل حفظه عن ظهر قلب", "ru": "Что Коран очень короткий, и потому его легко заучить", "en": "That the Quran is very short, so it is easy to memorize"}, {"he": "שאפשר לכתוב כמוהו בקלות, אם יושבים על כך זמן מה", "ar": "أنه يسهل تأليف مثله إذا جلس المرء لذلك مدة", "ru": "Что подобное ему легко сочинить, если посидеть над этим время", "en": "That something like it is easy to compose if one sits over it a while"}, {"he": "שבני אדם אינם מסוגלים להביא דבר כמוהו", "ar": "عجز البشر عن الإتيان بمثله", "ru": "Люди не могут создать подобное ему", "en": "That people are unable to produce anything like it"}, {"he": "שאין בו שום פסוק, אלא רק סיפורים על הנביאים", "ar": "أنه لا آيات فيه وإنما قصص عن الأنبياء فقط", "ru": "Что в нём нет аятов, а только рассказы о пророках", "en": "That it has no verses, only stories about the prophets"}],2,{"he": "המילה באה מ\"חוסר יכולת\".", "ar": "الكلمة من «العجز».", "ru": "Слово происходит от «бессилие».", "en": "The word comes from \"inability\"."},{"he": "אעג'אז הוא חוסר היכולת של בני אדם להביא משהו דומה לקוראן, אף שהוא נאמר להם באתגר.", "ar": "الإعجاز هو عجز الناس عن الإتيان بمثل القرآن مع التحدي.", "ru": "Иджаз - неспособность людей создать подобное Корану, хотя им был брошен вызов.", "en": "I'jaz is people's inability to bring anything like the Quran, even after being challenged."},null),
   Q("isl-quran-2-06",{"he": "מהו \"האתגר\" (אל-תחדי) בקוראן?", "ar": "ما هو «التحدي» في القرآن؟", "ru": "Что такое «вызов» (ат-тахадди) в Коране?", "en": "What is the \"challenge\" (al-tahaddi) in the Quran?"},[{"he": "חידת שעשוע שילדים ערבים היו שואלים זה את זה", "ar": "لعبة ألغاز كان أطفال العرب يسألها بعضهم بعضًا", "ru": "Игра в загадки, которую арабские дети задавали друг другу", "en": "A riddle game Arab children would ask one another"}, {"he": "מירוץ סוסים שנערך בשוק, והזוכה בו קיבל פרס", "ar": "سباق خيل يُقام في السوق وينال الفائز فيه جائزة", "ru": "Скачки, которые устраивали на рынке, и победитель получал приз", "en": "A horse race held at the market, with a prize for the winner"}, {"he": "מחלוקת על חלוקת הירושה בין בני המשפחה אחרי מוות", "ar": "خلاف على قسمة الميراث بين أفراد الأسرة بعد الوفاة", "ru": "Спор о разделе наследства между членами семьи после смерти", "en": "A dispute over dividing an inheritance among the family after a death"}, {"he": "הקריאה להביא סורה כמו סורותיו אם הם בספק", "ar": "دعوتهم إلى الإتيان بسورة مثله إن كانوا في شك", "ru": "Призыв создать суру, подобную ему, если сомневаются", "en": "The call to bring a surah like it if they doubt it"}],3,{"he": "אחד הפסוקים הוא באל-בקרה 23.", "ar": "إحدى الآيات في البقرة 23.", "ru": "Один из аятов - в аль-Бакаре 23.", "en": "One verse is in al-Baqara 23."},{"he": "הקוראן קרא למי שמפקפק בו להביא סורה דומה, והם לא הצליחו. זהו האתגר.", "ar": "دعا القرآن المشككين إلى الإتيان بسورة مثله فعجزوا، وهذا هو التحدي.", "ru": "Коран призвал сомневающихся создать суру подобную ему, и они не смогли. Это и есть вызов.", "en": "The Quran called the doubters to bring a surah like it, and they could not. That is the challenge."},null),
 ],
 [
-  Q("isl-quran-3-01",{"he": "איזה מהבאים הוא צד של אעג'אז הקוראן?", "ar": "أي مما يأتي وجه من وجوه إعجاز القرآن؟", "ru": "Что из этого - сторона иджаза Корана?", "en": "Which of these is an aspect of the Quran's i'jaz?"},[{"he": "מספר הדפים בעותק אחד", "ar": "عدد أوراق نسخة واحدة", "ru": "Число страниц в одном экземпляре", "en": "The number of pages in one copy"}, {"he": "צבע הדיו", "ar": "لون الحبر", "ru": "Цвет чернил", "en": "The colour of the ink"}, {"he": "הדפוס", "ar": "المطبعة", "ru": "Типография", "en": "The printing press"}, {"he": "הסגנון והרטוריקה הערבית שאין כמותם", "ar": "البلاغة والأسلوب العربي الذي لا نظير له", "ru": "Несравненная красота и риторика арабского слога", "en": "Its unmatched Arabic eloquence and style"}],3,{"he": "הערבים היו מומחים לשפה, ובכל זאת נדהמו.", "ar": "كان العرب أهل فصاحة ومع ذلك دُهشوا.", "ru": "Арабы были мастерами слова и всё же были поражены.", "en": "The Arabs were masters of language and were still amazed."},{"he": "מהצדדים: הסגנון והרטוריקה, החוקים שבו, והידיעות על דברים נסתרים. מספר דפים וצבע דיו אינם חלק מכך.", "ar": "من الوجوه: البلاغة والتشريع والإخبار بالغيب. أما عدد الأوراق ولون الحبر فليسا منها.", "ru": "Среди сторон: слог и риторика, законы и вести о сокрытом. Число страниц и цвет чернил к ним не относятся.", "en": "Aspects include its eloquence, its legislation and news of the unseen. Page count and ink colour are not aspects."},null),
+  Q("isl-quran-3-01",{"he": "איזה מהבאים הוא צד של אעג'אז הקוראן?", "ar": "أي مما يأتي وجه من وجوه إعجاز القرآن؟", "ru": "Что из этого - сторона иджаза Корана?", "en": "Which of these is an aspect of the Quran's i'jaz?"},[{"he": "מספר הדפים שבעותק אחד, השווה בכל ההוצאות", "ar": "عدد أوراق النسخة الواحدة وتساويه في كل الطبعات", "ru": "Число страниц в одном экземпляре, равное во всех изданиях", "en": "The number of pages in one copy, the same in every edition"}, {"he": "צבע הדיו שבו נכתבו העותקים הראשונים", "ar": "لون الحبر الذي كُتبت به النسخ الأولى", "ru": "Цвет чернил, которыми написаны первые списки", "en": "The colour of the ink the first copies were written in"}, {"he": "הדפוס שבו מודפסים העותקים בימינו", "ar": "المطبعة التي تُطبع بها النسخ في أيامنا", "ru": "Типография, в которой печатают списки в наши дни", "en": "The printing press that prints copies nowadays"}, {"he": "הסגנון והרטוריקה הערבית שאין כמותם", "ar": "البلاغة والأسلوب العربي الذي لا نظير له", "ru": "Несравненная красота и риторика арабского слога", "en": "Its unmatched Arabic eloquence and style"}],3,{"he": "הערבים היו מומחים לשפה, ובכל זאת נדהמו.", "ar": "كان العرب أهل فصاحة ومع ذلك دُهشوا.", "ru": "Арабы были мастерами слова и всё же были поражены.", "en": "The Arabs were masters of language and were still amazed."},{"he": "מהצדדים: הסגנון והרטוריקה, החוקים שבו, והידיעות על דברים נסתרים. מספר דפים וצבע דיו אינם חלק מכך.", "ar": "من الوجوه: البلاغة والتشريع والإخبار بالغيب. أما عدد الأوراق ولون الحبر فليسا منها.", "ru": "Среди сторон: слог и риторика, законы и вести о сокрытом. Число страниц и цвет чернил к ним не относятся.", "en": "Aspects include its eloquence, its legislation and news of the unseen. Page count and ink colour are not aspects."},null),
   Q("isl-quran-3-02",{"he": "איזו ידיעה על העתיד בקוראן נחשבת לצד של אעג'אז?", "ar": "أي خبر عن المستقبل في القرآن يعد من وجوه الإعجاز؟", "ru": "Какая весть о будущем в Коране считается стороной иджаза?", "en": "Which news of the future in the Quran is considered an aspect of i'jaz?"},[{"he": "ניצחון הביזנטים (אר-רום) על הפרסים אחרי כמה שנים", "ar": "انتصار الروم على الفرس بعد بضع سنين", "ru": "Победа ромеев над персами через несколько лет", "en": "The Romans' victory over the Persians after a few years"}, {"he": "ניצחון הפרסים על הרומאים, ששלטו מאז בכל ארצות המזרח", "ar": "انتصار الفرس على الروم وحكمهم بلاد المشرق منذ ذلك الحين", "ru": "Победа персов над ромеями, после которой они правили всем Востоком", "en": "A Persian victory over the Romans, after which they ruled all the East"}, {"he": "הפסקת כל הקרבות בעולם מיד אחרי ירידת הסורה", "ar": "توقف كل الحروب في العالم فور نزول السورة", "ru": "Прекращение всех войн в мире сразу после ниспослания суры", "en": "The end of all wars in the world right after the surah was revealed"}, {"he": "מציאת אוצר גדול בדרום חצי האי, שחילקו אותו לעניים", "ar": "العثور على كنز كبير في جنوب الجزيرة ووُزّع على الفقراء", "ru": "Находка большого клада на юге полуострова, который раздали бедным", "en": "Finding a great treasure in the south of the peninsula, shared with the poor"}],0,{"he": "הסורה נקראת על שם האימפריה.", "ar": "السورة سُميت باسم الإمبراطورية.", "ru": "Сура названа по имени империи.", "en": "The surah is named after the empire."},{"he": "בסורת אר-רום נאמר שהרומאים ינצחו בעוד כמה שנים. זה קרה, וזו ידיעה על העתיד שמוכיחה את מקור הקוראן.", "ar": "في سورة الروم وعد بأن الروم سينتصرون بعد بضع سنين، وقد وقع ذلك، وهو إخبار بالغيب.", "ru": "В суре ар-Рум сказано, что ромеи победят через несколько лет. Так и случилось - это весть о сокрытом.", "en": "Surat ar-Rum says the Romans would win within a few years. It happened, and it is news of the unseen."},null),
   Q("isl-quran-3-03",{"he": "איזה פסוק מראה שאלוהים שומר על הקוראן?", "ar": "أي آية تدل على أن الله يحفظ القرآن؟", "ru": "Какой аят указывает, что Аллах хранит Коран?", "en": "Which verse shows that Allah protects the Quran?"},[{"he": "\"אמור: הוא אללה אחד, אללה הנצחי, לא ילד ולא נולד\" (אל-אח'לאץ' 1-3)", "ar": "﴿قُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ * لَمْ يَلِدْ وَلَمْ يُولَدْ﴾ (الإخلاص 1-3)", "ru": "«Скажи: Он - Аллах Единый, Аллах Самодостаточный, не родил и не был рождён» (аль-Ихлас, 1-3)", "en": "\"Say: He is Allah, the One; Allah, the Eternal; He begets not, nor was He begotten\" (al-Ikhlas 1-3)"}, {"he": "\"אנו הורדנו את הזכר ואנו שומרים עליו\" (אל-חיג'ר 9)", "ar": "﴿إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ﴾ (الحجر 9)", "ru": "«Воистину, Мы ниспослали Напоминание и Мы его охраняем» (аль-Хиджр, 9)", "en": "\"We sent down the Reminder and We will protect it\" (al-Hijr 9)"}, {"he": "\"קרא בשם ריבונך אשר ברא, ברא את האדם מקריש דם\" (אל-עלק 1-2)", "ar": "﴿اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ * خَلَقَ الْإِنْسَانَ مِنْ عَلَقٍ﴾ (العلق 1-2)", "ru": "«Читай во имя твоего Господа, Который сотворил, сотворил человека из сгустка» (аль-Алак, 1-2)", "en": "\"Read in the name of your Lord who created, created man from a clot\" (al-Alaq 1-2)"}, {"he": "\"הוא הראשון והאחרון, הגלוי והנסתר, והוא יודע כל דבר\" (אל-חדיד 3)", "ar": "﴿هُوَ الْأَوَّلُ وَالْآخِرُ وَالظَّاهِرُ وَالْبَاطِنُ وَهُوَ بِكُلِّ شَيْءٍ عَلِيمٌ﴾ (الحديد 3)", "ru": "«Он - Первый и Последний, Явный и Сокрытый, и Он знает обо всём» (аль-Хадид, 3)", "en": "\"He is the First and the Last, the Manifest and the Hidden, and He knows all things\" (al-Hadid 3)"}],1,{"he": "חפשו פסוק שמדבר על \"שמירה\".", "ar": "ابحث عن آية فيها «الحفظ».", "ru": "Ищите аят о «хранении».", "en": "Look for a verse about \"protecting\"."},{"he": "בסורת אל-חיג'ר 9 נאמר שאלוהים הוריד את הזכר ושהוא שומר עליו. זה ההוכחה מן הקוראן לשמירתו.", "ar": "في الحجر 9 أخبر الله أنه نزّل الذكر وتكفّل بحفظه، وهذا دليل حفظ القرآن.", "ru": "В аль-Хиджр 9 сказано, что Аллах ниспослал Напоминание и сохранит его. Это довод о сохранности Корана.", "en": "In al-Hijr 9 Allah says He sent down the Reminder and will protect it. This is the proof of the Quran's preservation."},null),
   Q("isl-quran-3-04",{"he": "כמה זמן ירד הקוראן בערך?", "ar": "كم استغرق نزول القرآن تقريبًا؟", "ru": "Сколько примерно длилось ниспосылание Корана?", "en": "About how long did the revelation of the Quran take?"},[{"he": "כשנה אחת בלבד, כולה במכה לפני ההג'רה", "ar": "نحو سنة واحدة فقط، كلها في مكة قبل الهجرة", "ru": "Около одного года, целиком в Мекке до хиджры", "en": "About one year only, all of it in Makkah before the hijra"}, {"he": "כ-7 שנים, כ-4 במכה וכ-3 במדינה", "ar": "نحو 7 سنوات: 4 في مكة و3 في المدينة", "ru": "Около 7 лет: 4 в Мекке и 3 в Медине", "en": "About 7 years: about 4 in Makkah and 3 in Medina"}, {"he": "כ-23 שנה, כ-13 במכה וכ-10 במדינה", "ar": "نحو 23 سنة: 13 في مكة و10 في المدينة", "ru": "Около 23 лет: 13 в Мекке и 10 в Медине", "en": "About 23 years: about 13 in Makkah and 10 in Medina"}, {"he": "כ-50 שנה, כ-30 במכה וכ-20 במדינה", "ar": "نحو 50 سنة: 30 في مكة و20 في المدينة", "ru": "Около 50 лет: 30 в Мекке и 20 в Медине", "en": "About 50 years: about 30 in Makkah and 20 in Medina"}],2,{"he": "עשרות בשנים, אבל לא חמישים.", "ar": "أكثر من عقدين، لكن ليس خمسين.", "ru": "Больше двух десятилетий, но не пятьдесят.", "en": "More than two decades, but not fifty."},{"he": "הקוראן ירד בהדרגה, בערך 23 שנה מהתגלות חירא עד סוף חיי הנביא.", "ar": "نزل القرآن منجَّمًا نحو ثلاث وعشرين سنة، من غار حراء إلى قرب وفاة النبي.", "ru": "Коран ниспосылался постепенно примерно 23 года - от Хиры до конца жизни Пророка.", "en": "The Quran came down gradually over about 23 years, from Hira until near the end of the Prophet's life."},null),
@@ -2090,7 +2200,7 @@ topic("isl-seera","faith",{"he": "הסירה: קרב בדר ואל-אסראא ו
   Q("isl-seera-2-05",{"he": "מה הייתה התוצאה של קרב בדר?", "ar": "ما نتيجة غزوة بدر؟", "ru": "Каков был итог битвы при Бадре?", "en": "What was the result of the Battle of Badr?"},[{"he": "תבוסת המוסלמים, שנסוגו אל אל-מדינה אחרי שאיבדו לוחמים רבים", "ar": "هزيمة المسلمين وانسحابهم إلى المدينة بعد خسارة كثير من المقاتلين", "ru": "Поражение мусульман: они отступили в Медину, потеряв много бойцов", "en": "A Muslim defeat: they withdrew to Medina after losing many fighters"}, {"he": "שביתת נשק בלי מנצח, ושני הצדדים חזרו לבתיהם כפי שבאו", "ar": "هدنة بلا منتصر، وعاد الطرفان إلى ديارهما كما جاءا", "ru": "Перемирие без победителя: обе стороны вернулись домой, как пришли", "en": "A truce with no winner: both sides went home as they had come"}, {"he": "ניצחון המוסלמים, כשבעים מאנשי קורייש נהרגו וכשבעים נשבו", "ar": "انتصر المسلمون وقُتل نحو سبعين من قريش وأُسر نحو سبعين", "ru": "Победа мусульман: около семидесяти курайшитов убито и около семидесяти пленено", "en": "A Muslim victory: about seventy Quraysh killed and about seventy captured"}, {"he": "הקרב הופסק בגלל סופת חול כבדה, ולא הוכרע באותו יום", "ar": "توقفت المعركة بسبب عاصفة رملية شديدة ولم تُحسم في ذلك اليوم", "ru": "Битва прервалась из-за сильной песчаной бури и не решилась в тот день", "en": "The battle stopped in a heavy sandstorm and was not decided that day"}],2,{"he": "הקוראן קורא ליום הזה \"יום אל-פורקאן\".", "ar": "يسميه القرآن «يوم الفرقان».", "ru": "Коран называет этот день «днём различения».", "en": "The Quran calls this day \"the Day of Criterion\"."},{"he": "המוסלמים, שהיו מעטים, ניצחו. הקוראן קורא ליום \"יום אל-פורקאן\" (אל-אנפאל 41), והוא חיזק את מעמדם במדינה.", "ar": "انتصر المسلمون وهم قلة، وسمّاه القرآن «يوم الفرقان» (الأنفال 41)، وقوّى مكانتهم في المدينة.", "ru": "Мусульмане, хотя их было мало, победили. Коран называет его «днём различения» (аль-Анфаль, 41), он укрепил их положение.", "en": "The Muslims, though few, won. The Quran calls it \"the Day of the Criterion\" (al-Anfal 41), and it strengthened their standing."},null),
 ],
 [
-  Q("isl-seera-3-01",{"he": "מהו משמעות אחת של האסראא והמיעראג'?", "ar": "ما إحدى دلالات الإسراء والمعراج؟", "ru": "Каково одно из значений аль-Исры и Мираджа?", "en": "What is one significance of al-Isra and al-Mi'raj?"},[{"he": "שמסגד אל-אקצא אינו חשוב, ואין לו מקום בדת האיסלאם", "ar": "أن المسجد الأقصى غير مهم ولا مكانة له في الإسلام", "ru": "Что мечеть аль-Акса неважна и не имеет места в исламе", "en": "That al-Aqsa mosque is unimportant and has no place in Islam"}, {"he": "שהתפילה אינה חובה, ומי שרוצה מתפלל ומי שלא רוצה פטור", "ar": "أن الصلاة ليست واجبة، فمن شاء صلى ومن شاء ترك", "ru": "Что молитва необязательна: кто хочет - молится, кто нет - свободен", "en": "That prayer is not obligatory: whoever wishes prays, whoever does not is exempt"}, {"he": "שהמסע היה חלום בלבד, ולא קרה דבר במציאות באותו לילה", "ar": "أن الرحلة كانت رؤيا منام فقط ولم يقع شيء في الواقع تلك الليلة", "ru": "Что путешествие было лишь сном и в ту ночь наяву ничего не произошло", "en": "That the journey was only a dream and nothing really happened that night"}, {"he": "הקשר בין המסגד אל-חראם לאל-אקצא ומקומה של התפילה", "ar": "الربط بين المسجد الحرام والمسجد الأقصى ومكانة الصلاة", "ru": "Связь между аль-Харам и аль-Аксой и место молитвы", "en": "The link between al-Masjid al-Haram and al-Aqsa and the place of prayer"}],3,{"he": "בסורת אל-אסראא נזכרים שני המסגדים.", "ar": "في سورة الإسراء ذُكر المسجدان.", "ru": "В суре аль-Исра названы обе мечети.", "en": "Both mosques are named in surah al-Isra."},{"he": "מן הדלאלות: קשר בין שני המסגדים, ההוכחה לגודל מעמדו של הנביא, וחשיבות התפילה שנקבעה שם.", "ar": "من الدلالات: الربط بين المسجدين وتكريم النبي وبيان عظمة الصلاة التي فُرضت هناك.", "ru": "Среди значений: связь двух мечетей, возвышение Пророка и важность молитвы, предписанной там.", "en": "Significances include linking the two mosques, honouring the Prophet and the importance of the prayer made obligatory there."},null),
+  Q("isl-seera-3-01",{"he": "מהי אחת המשמעויות של האסראא והמיעראג'?", "ar": "ما إحدى دلالات الإسراء والمعراج؟", "ru": "Каково одно из значений аль-Исры и Мираджа?", "en": "What is one significance of al-Isra and al-Mi'raj?"},[{"he": "שמסגד אל-אקצא אינו חשוב, ואין לו מקום בדת האיסלאם", "ar": "أن المسجد الأقصى غير مهم ولا مكانة له في الإسلام", "ru": "Что мечеть аль-Акса неважна и не имеет места в исламе", "en": "That al-Aqsa mosque is unimportant and has no place in Islam"}, {"he": "שהתפילה אינה חובה, ומי שרוצה מתפלל ומי שלא רוצה פטור", "ar": "أن الصلاة ليست واجبة، فمن شاء صلى ومن شاء ترك", "ru": "Что молитва необязательна: кто хочет - молится, кто нет - свободен", "en": "That prayer is not obligatory: whoever wishes prays, whoever does not is exempt"}, {"he": "שהמסע היה חלום בלבד, ולא קרה דבר במציאות באותו לילה", "ar": "أن الرحلة كانت رؤيا منام فقط ولم يقع شيء في الواقع تلك الليلة", "ru": "Что путешествие было лишь сном и в ту ночь наяву ничего не произошло", "en": "That the journey was only a dream and nothing really happened that night"}, {"he": "הקשר בין המסגד אל-חראם לאל-אקצא ומקומה של התפילה", "ar": "الربط بين المسجد الحرام والمسجد الأقصى ومكانة الصلاة", "ru": "Связь между аль-Харам и аль-Аксой и место молитвы", "en": "The link between al-Masjid al-Haram and al-Aqsa and the place of prayer"}],3,{"he": "בסורת אל-אסראא נזכרים שני המסגדים.", "ar": "في سورة الإسراء ذُكر المسجدان.", "ru": "В суре аль-Исра названы обе мечети.", "en": "Both mosques are named in surah al-Isra."},{"he": "מן הדלאלות: קשר בין שני המסגדים, ההוכחה לגודל מעמדו של הנביא, וחשיבות התפילה שנקבעה שם.", "ar": "من الدلالات: الربط بين المسجدين وتكريم النبي وبيان عظمة الصلاة التي فُرضت هناك.", "ru": "Среди значений: связь двух мечетей, возвышение Пророка и важность молитвы, предписанной там.", "en": "Significances include linking the two mosques, honouring the Prophet and the importance of the prayer made obligatory there."},null),
   Q("isl-seera-3-02",{"he": "מי ליווה את הנביא (עליו השלום) בדרכו להג'רה?", "ar": "من رافق النبي ﷺ في هجرته؟", "ru": "Кто сопровождал Пророка (мир ему) в хиджре?", "en": "Who accompanied the Prophet (peace be upon him) on the Hijra?"},[{"he": "אבו בכר, ובמערת ת'ור הם התחבאו", "ar": "أبو بكر، واختبآ في غار ثور", "ru": "Абу Бакр, они укрывались в пещере Саур", "en": "Abu Bakr, and they hid in the cave of Thawr"}, {"he": "עומר, ובמערת חירא", "ar": "عمر في غار حراء", "ru": "Умар в пещере Хира", "en": "Umar, in the cave of Hira"}, {"he": "עלי, ובמערת אל-כהף", "ar": "علي في غار الكهف", "ru": "Али в пещере аль-Кахф", "en": "Ali, in the cave of al-Kahf"}, {"he": "בלאל ביום החג'", "ar": "بلال في الحج", "ru": "Билал в хадже", "en": "Bilal at hajj"}],0,{"he": "הוא נקרא \"אל-צדיק\" ואחר כך ח'ליפה ראשון.", "ar": "لقبه «الصديق» وصار أول الخلفاء.", "ru": "Его прозвали «ас-Сиддик», он стал первым халифом.", "en": "He was called \"al-Siddiq\" and became the first caliph."},{"he": "אבו בכר ליווה את הנביא בהג'רה. הם הסתתרו במערת ת'ור שלושה ימים, ואללה הציל אותם.", "ar": "رافق أبو بكر النبي في الهجرة واختبآ في غار ثور ثلاثة أيام، ونجّاهما الله.", "ru": "Абу Бакр сопровождал Пророка, они укрывались в пещере Саур три дня, и Аллах их спас.", "en": "Abu Bakr accompanied him; they hid in the cave of Thawr for three days and Allah saved them."},null),
   Q("isl-seera-3-03",{"he": "מה עשה הנביא (עליו השלום) כדי לחזק את הקשר בין המהאג'רון והאנצאר באל-מדינה?", "ar": "ماذا فعل النبي ﷺ لتقوية الصلة بين المهاجرين والأنصار؟", "ru": "Что сделал Пророк (мир ему) для связи мухаджиров и ансаров?", "en": "What did the Prophet (peace be upon him) do to strengthen ties between the Muhajirun and Ansar?"},[{"he": "הפריד בין המהאג'רון לאנצאר, וכל קבוצה גרה לבדה", "ar": "فرّق بين المهاجرين والأنصار، وسكنت كل جماعة وحدها", "ru": "Разделил мухаджиров и ансаров: каждая группа жила отдельно", "en": "He kept the Muhajirun and the Ansar apart, each group living on its own"}, {"he": "יצר אחווה (מואח'את) בין כל מהאג'ר לאנצארי", "ar": "آخى بين كل مهاجر وأنصاري", "ru": "Установил братство (муаха) между мухаджиром и ансаром", "en": "He created brotherhood (mu'akhat) between each Muhajir and an Ansari"}, {"he": "ביטל את התפילה בציבור, וכל אחד התפלל לבדו בביתו", "ar": "ألغى صلاة الجماعة، وصلى كل واحد وحده في بيته", "ru": "Отменил общую молитву: каждый молился один у себя дома", "en": "He abolished congregational prayer, each praying alone at home"}, {"he": "אסר על מסחר בין המהאג'רון לאנצאר בשוק אל-מדינה", "ar": "منع التجارة بين المهاجرين والأنصار في سوق المدينة", "ru": "Запретил торговлю между мухаджирами и ансарами на рынке Медины", "en": "He forbade trade between the Muhajirun and the Ansar in Medina’s market"}],1,{"he": "המילה פירושה \"לעשות לאחים\".", "ar": "الكلمة من «الإخاء».", "ru": "Слово от «братства».", "en": "The word means \"making brothers\"."},{"he": "בנה הנביא את מסגדו באל-מדינה ויצר אחווה בין המהאג'רון לאנצאר, כך שחלקו ביניהם בית וממון.", "ar": "بنى النبي مسجده في المدينة وآخى بين المهاجرين والأنصار فتشاركوا الدار والمال.", "ru": "Пророк построил мечеть в Медине и установил братство между мухаджирами и ансарами; они делили дом и имущество.", "en": "The Prophet built his mosque in Medina and paired Muhajirun with Ansar, who shared home and wealth."},null),
   Q("isl-seera-3-04",{"he": "מהו הסכם אל-חודיביה?", "ar": "ما هو صلح الحديبية؟", "ru": "Что такое Худайбийский договор?", "en": "What was the Treaty of al-Hudaybiyya?"},[{"he": "קרב גדול ליד באר בדר בשנה השנייה להג'רה, שבו ניצחו המוסלמים", "ar": "معركة كبرى عند بئر بدر في السنة الثانية للهجرة انتصر فيها المسلمون", "ru": "Большое сражение у колодца Бадр во втором году хиджры, где победили мусульмане", "en": "A great battle at the well of Badr in year 2 AH, which the Muslims won"}, {"he": "בניית המסגד הראשון בקובא, בדרכו של הנביא ממכה אל אל-מדינה", "ar": "بناء أول مسجد في قباء في طريق النبي من مكة إلى المدينة", "ru": "Постройка первой мечети в Кубе на пути Пророка из Мекки в Медину", "en": "The building of the first mosque at Quba on the Prophet’s way from Makkah to Medina"}, {"he": "הסכם הפסקת אש עם קורייש לעשר שנים בשנה השישית להג'רה", "ar": "هدنة مع قريش لعشر سنين في السنة السادسة للهجرة", "ru": "Перемирие с курайшитами на десять лет в шестом году хиджры", "en": "A ten-year truce with Quraysh in year 6 AH"}, {"he": "ההוראה הראשונה לצום בחודש ראמדאן, בשנה השנייה להג'רה באל-מדינה", "ar": "أول فرض لصيام شهر رمضان في السنة الثانية للهجرة بالمدينة", "ru": "Первое предписание поста в месяц рамадан во втором году хиджры в Медине", "en": "The first obligation to fast in Ramadan, in year 2 AH in Medina"}],2,{"he": "הוא נחתם ליד מכה, אחרי שהמוסלמים לא נכנסו אליה באותה שנה.", "ar": "عُقد قرب مكة بعد أن مُنع المسلمون من دخولها ذلك العام.", "ru": "Был заключён у Мекки после того, как мусульман не пустили в тот год.", "en": "It was signed near Makkah after the Muslims were prevented from entering that year."},{"he": "בהודיביה נחתם הסכם הפסקת אש, והוא נקרא בקוראן \"ניצחון גלוי\" (אל-פתח). שנתיים אחר כך נפתחה מכה.", "ar": "عُقد صلح الحديبية سنة 6هـ وسمّاه القرآن «فتحًا مبينًا»، وبعد نحو سنتين فُتحت مكة.", "ru": "В Худайбии заключили перемирие, названное в Коране «явной победой» (аль-Фатх). Спустя около двух лет была взята Мекка.", "en": "At al-Hudaybiyya a truce was signed, which the Quran calls a \"clear victory\" (al-Fath). About two years later Makkah opened."},null),
@@ -2730,7 +2840,7 @@ function screenSet(){
   });
   h+='<div class="row"><div class="lab">'+esc(t("theme"))+'</div><div class="lvls">'+
      [["auto","thAuto"],["light","thLight"],["dark","thDark"]].map(function(x){
-       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" data-a="theme" data-v="'+x[0]+'">'+
+       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" data-a="theme" data-v="'+x[0]+'" aria-pressed="'+(state.theme===x[0]?"true":"false")+'">'+
          esc(t(x[1]))+"</button>"}).join("")+"</div></div>";
   h+="</div>";
 
@@ -3229,12 +3339,12 @@ function viewExamNew(){
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exUnits"))+'</b>'+
      '<div class="seg" style="margin-top:7px">'+[3,4,5].map(function(tr){
-       return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
+       return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'" aria-pressed="'+(state.track===tr?"true":"false")+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exLevel"))+'</b><div class="seg" style="margin-top:7px">'+
      LVL.map(function(l,i){
-       return '<button class="'+(EB.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
+       return '<button class="'+(EB.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'" aria-pressed="'+(EB.level===i+1?"true":"false")+'">'+l+'</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exCount"))+': <span id="exNlab">'+EB.n+'</span></b>'+
@@ -3497,7 +3607,9 @@ function teDialog(){
   var fg=document.getElementById("te-forgot");
   if(fg)fg.onclick=function(){ TE.msg=xt("teForgotHow"); teDialog() };
 }
-function teClose(){ TE.ask=false; TE.mode=""; TE.msg=""; teDialog(); }
+function teClose(){ TE.ask=false; TE.mode=""; TE.msg=""; teDialog();
+  var b=_teOpener; _teOpener=null;
+  try{ if(b&&b.focus&&document.contains(b))b.focus() }catch(e){} }
 function teSubmit(){
   if(TE.busy)return;
   var setting=(TE.mode==="set"||TE.mode==="change"||!teHas());
@@ -3534,7 +3646,11 @@ function teSubmit(){
     }
   });
 }
-function teAsk(mode){ TE.ask=true; TE.mode=mode||""; TE.msg=""; teDialog() }
+/* הכפתור שפתח את החלון. בלעדיו, סגירה ב-Escape או ב"ביטול" מחזירה
+   את המיקוד לתחילת הדף, ומי שמנווט במקלדת מאבד את מקומו. */
+var _teOpener=null;
+function teAsk(mode){ try{_teOpener=document.activeElement}catch(e){_teOpener=null}
+  TE.ask=true; TE.mode=mode||""; TE.msg=""; teDialog() }
 function teLock(){ teSetOpen(false); render() }
 function teRemove(){ teWrite(null); teSetOpen(false); render() }
 /* נעילה אוטומטית אחרי שהאפליקציה הייתה מוסתרת זמן־מה.
@@ -4494,7 +4610,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=is3-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=is4-pwa1").catch(function(){});
   });
 }
 </script>

@@ -52,14 +52,13 @@ function ttsWatchdog(alive,onSilent){
   },1000);
   return function(){clearInterval(dog)};
 }
-/* 5 · שחרור במגע. iOS לא ישמיע כלום עד שאמירה אחת יצאה מתוך handler של
-   מגע אמיתי. אמירה שיוצאת אחרי await - וכאן RECORDED.play אסינכרוני
-   ומחזיר שליטה ל-device() מחוץ למגע - נבלעת בשקט. קריאה ישירה, בלי
-   הבטחה: הבטחה שוברת את שרשרת המגע וספארי כבר לא יזהה יוזמת משתמש.
+/* 5 · שחרור במגע (המנגנון החמישי): ב-iOS לא תישמע שום אמירה עד שאחת יצאה
+   מתוך handler של מגע אמיתי. כאן ההקראה הראשונה היא לרוב קובץ מוקלט
+   (RECORDED), ואז speechSynthesis לא משוחרר — והמשך הרצף, שרץ מתוך
+   onend ולא מתוך מגע, נבלע בשקט. אמירת רווח בעוצמה אפס, פעם אחת.
+   קריאה ישירה, בלי הבטחה: הבטחה שוברת את שרשרת המגע.
    (שחרור אלמנט השמע לקובץ המוקלט נעשה ב-/speech/recorded.js.) */
-try{document.addEventListener("pointerdown",function(){
-  try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
-},{once:true});}catch(e){}
+try{window.addEventListener("pointerdown",function(){try{var u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}},{once:true})}catch(e){}
 /* עוזבים את הדף - הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב אחר. */
 try{document.addEventListener("visibilitychange",function(){
   if(document.hidden)stopSpeech();
@@ -73,6 +72,63 @@ function voiceFor(lang){
      הראשון: קול רשת שלא יעבוד עכשיו אינו "פחות טוב", הוא פשוט ישתוק. */
   f=byUsable(f);ok=byUsable(ok);
   return (f[0]||ok[0]||null);   /* all-male device: null, default voice + raised pitch */
+}
+/* ---------- מקטעים. הועתק מ-english/index.html כלשונו ---------- */
+var SEG_MAX=90, SEG_GAP=260;
+/* סימן פיסוק בין שתי ספרות הוא חלק מהמספר ולא מקום לחתוך בו:
+   בלי הבדיקה הזאת "3,500" נשבר והמנוע קורא "שלוש, חמש מאות". */
+function insideNumber(str,i){
+  return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]);
+}
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  /* מקטע זעיר — "12." או ")" — עם הפסקה של רבע שנייה אחריו נשמע
+     כמו גמגום. מאחדים אותו לזה שאחריו. */
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&
+       merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){
+      merged[merged.length-1].text+=out[i].text; continue;
+    }
+    if(out[i].text.trim().length<12&&i+1<out.length){
+      out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue;
+    }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
+/* מנוע ההגייה העברי — /tutor/he-speech.js. הועתק מ-english/index.html כלשונו.
+   **עברית בלבד**, בהוראת הבעלים. ערבית, רוסית ואנגלית עוברות כמות שהן.
+   הקובץ לא נטען — הטקסט חוזר כמות שהוא, ואין שגיאה. התגית וה-PRE של
+   sw.js יושבים כאן מהיום הראשון, והמנוע פשוט לא נקרא מעולם. */
+function heSpoken(t,code){
+  var l=code?String(code).slice(0,2):"he";
+  if(l!=="he"||typeof HESPEECH==="undefined")return t;
+  try{ return HESPEECH.spoken(t) }catch(e){ return t }
 }
 function mk(text){
   var toks=String(text).split(/\s+/).filter(Boolean), parts=[], html=[];
@@ -114,7 +170,8 @@ function speakSeq(segs,done){
 function speakOne(s,tok,cb){
   var root=s.el?document.querySelector(s.el):null, ws=root?root.querySelectorAll(".w"):[];
   var box=s.box?document.querySelector(s.box):null; if(box)box.classList.add("hl");
-  var words=s.t.split(/\s+/).filter(Boolean), cur=-1, got=false, finished=false, lang=s.lang||"he";
+  var lang=s.lang||"he", spoken=heSpoken(s.t,lang);
+  var words=spoken.split(/\s+/).filter(Boolean), cur=-1, got=false, finished=false;
   var disarm=null, retried=false;
   function hl(k){if(k===cur||!ws[k])return;if(ws[cur])ws[cur].classList.remove("hl");cur=k;ws[k].classList.add("hl");
     try{ws[k].scrollIntoView({block:"nearest"})}catch(e){}}
@@ -127,48 +184,72 @@ function speakOne(s,tok,cb){
   function device(){
     if(finished||tok!==SP.tok)return;
     var starts=[],p=0;
-    words.forEach(function(w){var k=s.t.indexOf(w,p);starts.push(k);p=k+w.length});
-    var u=new SpeechSynthesisUtterance(s.t), v=voiceFor(lang);
-    u.lang=LANG_TTS[lang];
-    if(v)u.voice=v;else u.pitch=1.25;
-    u.rate=rate();
-    u.onboundary=function(e){
-      if(tok!==SP.tok)return; if(e.name&&e.name!=="word")return; got=true;
-      var k=0;for(var j=0;j<starts.length;j++){if(starts[j]<=e.charIndex)k=j}hl(k);
-    };
-    u.onend=fin;
-    u.onerror=function(e){
+    words.forEach(function(w){var k=spoken.indexOf(w,p);starts.push(k);p=k+w.length});
+    /* charIndex נמדד בתוך המקטע; seg.start הוא ההיסט שלו בנאמר כולו,
+       ו-hlAt(seg.start+charIndex) הוא מה ששומר את ההדגשה במקום. */
+    function hlAt(c){var k=0;for(var j=0;j<starts.length;j++){if(starts[j]<=c)k=j}hl(k)}
+    var v=voiceFor(lang), segs=segments(spoken);
+    /* מעל SEG_MAX מנועי מכשיר מאיצים ובולעים סופי מילים, ולכן כל אמירה
+       ארוכה נחתכת על סוף משפט, ואם אין — על פסיק או רווח. */
+    (function sayseg(n){
       if(finished||tok!==SP.tok)return;
-      var err=(e&&e.error)||"";
-      /* ביטול יזום אינו תקלה - stopSpeech כבר ניקה אחריו */
-      if(err==="canceled"||err==="interrupted"){finished=true;if(disarm){disarm();disarm=null}return}
-      /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול מקומי
-         וחוזרים על אותו מקטע, פעם אחת, כדי שלא יישבר בשקט באמצע שאלה. */
-      if(!retried&&v&&v.localService===false){
-        retried=true;_netVoiceOK=false;_activeU=null;
-        if(disarm){disarm();disarm=null}
-        SP.timers.push(setTimeout(device,260));
-        return;
+      if(n>=segs.length){fin();return}
+      /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר-הסף
+         יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+      var seg=segs[n], moved=false;
+      function next(){
+        if(moved||finished||tok!==SP.tok)return;
+        moved=true; if(disarm){disarm();disarm=null}
+        if(n+1<segs.length)SP.timers.push(setTimeout(function(){sayseg(n+1)},SEG_GAP));
+        else fin();
       }
-      fin();
-    };
-    /* fallback: no boundary events (some Android voices). Estimate word timing. */
-    if(ws.length){
-      SP.timers.push(setTimeout(function(){
-        if(got||tok!==SP.tok)return;
-        var per=Math.max(260,(s.t.length*72/u.rate)/Math.max(1,words.length));
-        words.forEach(function(_,k){SP.timers.push(setTimeout(function(){if(!got&&tok===SP.tok)hl(k)},k*per))});
-      },700));
-    }
-    try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e){}
-    _activeU=u;                        /* מגן מפני איסוף זבל */
-    speechSynthesis.speak(u);
-    startKeepAlive();
-    if(disarm)disarm();
-    disarm=ttsWatchdog(function(){return !finished&&tok===SP.tok},fin);
+      var u=new SpeechSynthesisUtterance(seg.text);
+      u.lang=LANG_TTS[lang];
+      if(v)u.voice=v;else u.pitch=1.25;
+      u.rate=rate();
+      u.onboundary=function(e){
+        if(tok!==SP.tok)return; if(e.name&&e.name!=="word")return; got=true;
+        hlAt(seg.start+e.charIndex);
+      };
+      u.onend=next;
+      u.onerror=function(e){
+        if(moved||finished||tok!==SP.tok)return;
+        var err=(e&&e.error)||"";
+        /* ביטול יזום אינו תקלה - stopSpeech כבר ניקה אחריו */
+        if(err==="canceled"||err==="interrupted"){moved=true;if(disarm){disarm();disarm=null}return}
+        /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול מקומי
+           וחוזרים על אותו מקטע, פעם אחת, כדי שלא יישבר בשקט באמצע שאלה. */
+        if(!retried&&v&&v.localService===false){
+          retried=true;_netVoiceOK=false;moved=true;_activeU=null;
+          if(disarm){disarm();disarm=null}
+          v=voiceFor(lang);
+          SP.timers.push(setTimeout(function(){sayseg(n)},SEG_GAP));
+          return;
+        }
+        moved=true;if(disarm){disarm();disarm=null}
+        fin();
+      };
+      /* fallback: no boundary events (some Android voices). Estimate word timing. */
+      if(ws.length){
+        var sw=seg.text.split(/\s+/).filter(Boolean), off=[], q=0;
+        sw.forEach(function(w){var k=seg.text.indexOf(w,q);off.push(k);q=k+w.length});
+        SP.timers.push(setTimeout(function(){
+          if(got||moved||tok!==SP.tok)return;
+          var per=Math.max(260,(seg.text.length*72/u.rate)/Math.max(1,sw.length));
+          sw.forEach(function(_,m){SP.timers.push(setTimeout(function(){if(!got&&tok===SP.tok)hlAt(seg.start+off[m])},m*per))});
+        },700));
+      }
+      try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
+      _activeU=u;                        /* מגן מפני איסוף זבל */
+      speechSynthesis.speak(u);
+      startKeepAlive();
+      if(disarm)disarm();
+      disarm=ttsWatchdog(function(){return !finished&&tok===SP.tok&&!moved},next);
+    })(0);
   }
   /* layer 1: recorded file (speech/recorded.js, Kore). A file exists only for text that record.js recorded exactly,
-     in the language folder audio/<lang>/. No file, or a failed file: the device voice below. No word highlight on a file. */
+     in the language folder audio/<lang>/. No file, or a failed file: the device voice below. No word highlight on a file.
+     The recorded id hashes the text as it is written, not the pronunciation text — heSpoken belongs to the device voice only. */
   if(typeof RECORDED!=="undefined"){
     try{speechSynthesis.cancel()}catch(e0){}
     var ok=false;

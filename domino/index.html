@@ -25,9 +25,9 @@ var INTERNAL_OK=(function(){
 <link rel="apple-touch-icon" href="./img/icon-192.png" />
 <link href="/fonts/fonts.css" rel="stylesheet" />
 <style>
-:root{--paper:#f3f8f4;--card:#fff;--ink:#17333c;--ink-soft:#4c666e;--teal:#0e9c8d;--teal-deep:#0b7568;--teal-soft:#d9f2ec;--amber:#ffc531;--amber-soft:#fff3ce;--coral:#ff6f61;--coral-soft:#ffe3de;--sky:#58b7e0;--sky-deep:#246c8c;--violet:#8a63d2;--violet-deep:#6a45b0;--violet-soft:#ece4fa;--green:#1f9d4d;--green-deep:#157a3a;--red:#d93a2f;--line:#dbe7e3;--btn:#0b7568;--on-teal:#fff;--ar:"Noto Sans Arabic","Heebo",system-ui,sans-serif;--ru:"Noto Sans","Heebo",system-ui,sans-serif}
+:root{--paper:#f3f8f4;--card:#fff;--ink:#17333c;--ink-soft:#4c666e;--teal:#0e9c8d;--teal-deep:#0b7568;--teal-soft:#d9f2ec;--amber:#ffc531;--amber-soft:#fff3ce;--coral:#ff6f61;--coral-soft:#ffe3de;--sky:#58b7e0;--sky-deep:#246c8c;--violet:#8a63d2;--violet-deep:#6a45b0;--violet-soft:#ece4fa;--green:#1f9d4d;--green-deep:#157a3a;--red:#d93a2f;--line:#dbe7e3;--btn:#0b7568;--on-teal:#fff;--pick:#0b7568;--ar:"Noto Sans Arabic","Heebo",system-ui,sans-serif;--ru:"Noto Sans","Heebo",system-ui,sans-serif}
 @media (prefers-color-scheme:dark){
-  :root{--paper:#101a1c;--card:#17262a;--ink:#e8f1f2;--ink-soft:#a9c0c5;--teal:#5fd9c8;--teal-deep:#3fbfae;--teal-soft:#123833;--amber:#ffd45e;--amber-soft:#3a2e0c;--coral:#ff9186;--coral-soft:#3d1a16;--sky:#7fcbea;--violet:#b49aef;--violet-deep:#8a63d2;--violet-soft:#241a3a;--green:#1f9d4d;--green-deep:#1f9d4d;--red:#d93a2f;--line:#2b4146;--btn:#12857a;--on-teal:#04201c;--sky-deep:#2f86b3}
+  :root{--paper:#101a1c;--card:#17262a;--ink:#e8f1f2;--ink-soft:#a9c0c5;--teal:#5fd9c8;--teal-deep:#3fbfae;--teal-soft:#123833;--amber:#ffd45e;--amber-soft:#3a2e0c;--coral:#ff9186;--coral-soft:#3d1a16;--sky:#7fcbea;--violet:#b49aef;--violet-deep:#8a63d2;--violet-soft:#241a3a;--green:#1f9d4d;--green-deep:#1f9d4d;--red:#d93a2f;--line:#2b4146;--btn:#12857a;--on-teal:#04201c;--pick:#5fd9c8;--sky-deep:#2f86b3}
 }
 *{box-sizing:border-box}
 html{font-size:20px}
@@ -41,7 +41,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 .brand{font-weight:800;font-size:.9rem;line-height:1.15;flex:1;min-width:0;color:var(--teal-deep);background:none;border:0;text-align:start;padding:6px 0}
 .langs{display:flex;gap:4px}
 .langs button{min-width:46px;min-height:50px;padding:0 4px;border-radius:14px;border:2px solid var(--teal);background:var(--card);font-weight:700;font-size:.9rem}
-.langs button[aria-pressed=true]{background:var(--teal);color:var(--on-teal)}
+/* הכפתור הנבחר בשורת השפות הוא 18px/700 — טקסט רגיל ולא גדול,
+   ולכן הסף הוא 4.5:1. לבן על --teal היה 3.41:1 במצב בהיר.
+   --pick הוא teal-deep בבהיר ו--teal בכהה: 5.59:1 ו-9.97:1. */
+.langs button[aria-pressed=true]{background:var(--pick);color:var(--on-teal)}
 .gear{min-width:46px;padding:0;min-height:50px;border-radius:14px;border:2px solid var(--violet);background:var(--card);color:var(--violet-deep)}
 h1{font-size:1.6rem;margin:.2em 0 .1em;line-height:1.25}
 h2{font-size:1.25rem;margin:.2em 0 .4em}
@@ -97,9 +100,16 @@ h2{font-size:1.25rem;margin:.2em 0 .4em}
 .dc .tx.n{direction:ltr}
 .dc .fr{display:inline-flex;flex-direction:column;align-items:center;font-weight:800;line-height:1;font-size:17cqw}
 .dc .fr s{display:block;width:100%;height:.9cqw;background:#17333c;margin:1cqw 0;text-decoration:none}
-.dc .no{position:absolute;inset-inline-start:50%;bottom:1cqw;transform:translateX(-50%);min-width:6cqw;height:6cqw;border-radius:3cqw;background:var(--dcc,#0e9c8d);color:#fff;font-weight:800;font-size:3.6cqw;line-height:6cqw;text-align:center;padding:0 1cqw;z-index:2}
+/* תג מספר הקלף. לבן על צבע הסט היה 2.46:1 בשעון (כתום) ו-3.41:1
+   במספרים — והטקסט כאן הוא כ-14px, כלומר טקסט רגיל שסף 4.5:1.
+   דיו כהה על נייר הקלף עם טבעת בצבע הסט: 13.33:1 בכל חמשת
+   הנושאים, וצבע הסט נשאר על המסך ועל הדף. */
+.dc .no{position:absolute;inset-inline-start:50%;bottom:1cqw;transform:translateX(-50%);min-width:6cqw;height:6cqw;border-radius:3cqw;background:#fff;border:.45cqw solid var(--dcc,#0e9c8d);color:#17333c;font-weight:800;font-size:3.6cqw;line-height:5.1cqw;text-align:center;padding:0 1cqw;z-index:2}
 html[dir=rtl] .dc .no{transform:translateX(50%)}
 .dc .st{position:absolute;top:1.2cqw;inset-inline-start:1.8cqw;font-size:4.6cqw;font-weight:800;color:#b07a00;line-height:1;z-index:2}
+/* טבעת מיקוד מפורשת. ברירת המחדל של הדפדפן נבלעת על כפתור צבעוני,
+   ומי שמנווט במקלדת לא רואה איפה הוא. אף כלל כאן אינו מבטל outline. */
+button:focus-visible{outline:3px solid #6a45b0;outline-offset:2px}
 .dc button.half:focus-visible{outline:3px solid #6a45b0;outline-offset:-3px}
 .dc button.half .vis{padding-top:6cqw}
 .dc .spk{position:absolute;top:1cqw;inset-inline-end:1cqw;width:8cqw;height:8cqw;min-width:34px;min-height:34px;border-radius:50%;background:#1f9d4d;display:flex;align-items:center;justify-content:center}
@@ -108,6 +118,9 @@ canvas#cf{display:none}
 /* ===== הדפסה ===== */
 #pc,#pk{display:none}
 .sheet{width:210mm;height:297mm;position:relative;overflow:hidden;background:#fff;color:#17333c;break-after:page;page-break-after:always;font-family:"Heebo",system-ui,sans-serif}
+/* הגיליון האחרון אינו שובר דף אחריו — אחרת יוצא דף חמישי ריק
+   מהמדפסת בכל הדפסה (ארבעה גיליונות ב-#pc, אחד ב-#pk). */
+.sheet:last-child{break-after:auto;page-break-after:auto}
 html[lang="ar"] .sheet{font-family:var(--ar)}
 html[lang="ru"] .sheet{font-family:var(--ru)}
 .sheet .cut{position:absolute;top:9mm;inset-inline:0;text-align:center;font-size:3.4mm;color:#4c666e}
@@ -174,7 +187,8 @@ function rodsSvg(t,o){var s="",i,j;
   for(i=0;i<t;i++){var x=4+i*13;s+='<rect x="'+x+'" y="6" width="10" height="64" rx="2" fill="#7fcbea" stroke="'+INK+'" stroke-width="1.4"/>';for(j=1;j<10;j++)s+='<line x1="'+x+'" x2="'+(x+10)+'" y1="'+(6+j*6.4)+'" y2="'+(6+j*6.4)+'" stroke="'+INK+'" stroke-width=".6"/>'}
   var ox=4+t*13+6;
   for(i=0;i<o;i++){s+='<rect x="'+(ox+(i%3)*12)+'" y="'+(10+Math.floor(i/3)*14)+'" width="10" height="10" rx="2" fill="#ffc531" stroke="'+INK+'" stroke-width="1.2"/>'}
-  return svg(ox+40,76,s,t+"/"+o)}
+  /* התווית היא המספר עצמו. "4/7" נשמע כשבר ולא כ-47. */
+  return svg(ox+40,76,s,String(t*10+o))}
 function pieSvg(p,q){var s='<circle cx="50" cy="50" r="42" fill="#fff" stroke="'+INK+'" stroke-width="2.5"/>',i;
   for(i=0;i<p;i++){var a0=-Math.PI/2+i*2*Math.PI/q,a1=-Math.PI/2+(i+1)*2*Math.PI/q;
     s+='<path d="M50 50 L'+(50+42*Math.cos(a0)).toFixed(2)+' '+(50+42*Math.sin(a0)).toFixed(2)+' A42 42 0 0 1 '+(50+42*Math.cos(a1)).toFixed(2)+' '+(50+42*Math.sin(a1)).toFixed(2)+' Z" fill="'+SHADE+'"/>'}
@@ -215,7 +229,7 @@ function R(sp,lang){var t=sp.t;
 /* ===== the generators: each returns 20 items, an item = list of representation specs of ONE value ===== */
 function distinctPick(pool,n){return shuffle(pool).slice(0,n)}
 var SETS={
-nums:{c:"#0e9c8d",ic:"1 2",n:L("מספרים וכמויות","الأعداد والكميات","Числа и количество","Numbers and amounts"),d:L("נקודות, ספרות ומילים","نقاط وأرقام وكلمات","точки, цифры и слова","dots, digits and words"),lv:2,
+nums:{c:"#0e9c8d",ic:"1 2",n:L("מספרים וכמויות","الأعداد والكميات","Числа и количество","Numbers and amounts"),d:L("נקודות, ספרות, מילים ומוטות עשרות","نقاط وأرقام وكلمات وقضبان العشرات","точки, цифры, слова и палочки десятков","dots, digits, words and tens rods"),lv:2,
  items:function(lv){var out=[],i;
   if(lv===1){for(i=1;i<=20;i++)out.push([{t:"digit",n:i},{t:"word",n:i},{t:"dots",n:i}])}
   else{distinctPick(range(21,99).filter(function(v){return v%10}),20).forEach(function(v){var t10=v-v%10,o=v%10;out.push([{t:"digit",n:v},{t:"expand",t10:t10,o:o},{t:"rods",t10:t10,o:o}])})}
@@ -230,7 +244,7 @@ add:{c:"#2f7fd8",ic:"+ −",n:L("חיבור וחיסור","الجمع والطر
    else{var a2=ri(10,v-10);reps.push({t:"sum",a:a2,b:v-a2});var b2=ri(10,Math.min(40,100-v));reps.push({t:"diff",a:v+b2,b:b2})}
    out.push(reps)});
   return out}},
-mul:{c:"#e8453c",ic:"×",n:L("לוח הכפל","جدول الضرب","Таблица умножения","Times table"),d:L("כפל ותוצאה","ضرب ونتيجة","умножение и ответ","times and answer"),lv:2,
+mul:{c:"#e8453c",ic:"×",key:"digit",n:L("לוח הכפל","جدول الضرب","Таблица умножения","Times table"),d:L("כפל ותוצאה","ضرب ونتيجة","умножение и ответ","times and answer"),lv:2,
  items:function(lv){var pairs={},f=lv===1?[2,3,4,5,10]:range(2,10),i,j,list=[];
   f.forEach(function(a){for(j=(lv===1?1:2);j<=10;j++){var p=a*j;(pairs[p]=pairs[p]||[]).push([a,j])}});
   Object.keys(pairs).forEach(function(p){list.push(+p)});
@@ -242,8 +256,12 @@ frac:{c:"#8a63d2",ic:"½",n:L("שברים","الكسور","Дроби","Fraction
 clock:{c:"#f58a1f",tc:"#1a1300",ic:"12",n:L("שעון","الساعة","Часы","Clock"),d:L("שעון ושעה דיגיטלית","ساعة ووقت رقمي","часы и цифровое время","clock and digital time"),lv:2,
  items:function(lv){var mins=lv===1?[0,30]:[0,15,30,45],all=[],h;
   for(h=1;h<=12;h++)mins.forEach(function(m){all.push([h,m])});
+  /* ייצוג 24 שעות (13:00…23:45) הוא לא "קל": הוא דורש המרה בראש.
+     ברמה 1 — שעון מחוגים מול שעה דיגיטלית 12 בלבד; ברמה 2, "קצת
+     יותר קשה", הוא נשאר כפי שהיה. נמדד לפני התיקון: 60.8% מהקלפים
+     ברמה 1 נשאו ייצוג 24 שעות (2700 ערכות). */
   return distinctPick(all,20).map(function(x){var reps=[{t:"clock",h:x[0],m:x[1]},{t:"dig12",h:x[0],m:x[1]}];
-    if(x[0]<12)reps.push({t:"dig24",h:x[0],m:x[1]});return reps})}}
+    if(lv===2&&x[0]<12)reps.push({t:"dig24",h:x[0],m:x[1]});return reps})}}
 };
 var SETIDS=["nums","add","mul","frac","clock"];
 function range(a,b){var r=[],i;for(i=a;i<=b;i++)r.push(i);return r}
@@ -252,6 +270,29 @@ function specKey(sp){return JSON.stringify(sp)}
 function build(setId,lv,seed){
   RNG=mulberry(seed);
   var S0=SETS[setId],N=20,items=shuffle(S0.items(lv)),best=null,bestScore=1e9,att,i;
+  /* נושא שהוכרז בו ייצוג-תשובה (key) — לוח הכפל — נושא אותו
+     בחצי הראשון של כל קלף, וייצוג אחר שלו בחצי האחרון. בלי זה
+     כמעט מחצית החיבורים מצמידים שני ייצוגים של אותו זוג גורמים —
+     "3×4" מול מערך של 3 שורות ו-4, או מול "4+4+4" — ואת אלה סוגרים
+     בספירת שורות ועמודות, בלי לכפול. נמדד לפני התיקון: 45.2%
+     מהחיבורים ברמה 1 ו-41.3% ברמה 2 (6000 חיבורים לכל רמה,
+     300 ערכות). הייצוג המוכרז אינו יושב בשני החצאים, ולכן אף קלף
+     אינו נושא שני חצאים מאותו סוג — והחיפוש למטה מיותר. */
+  if(S0.key){
+    best={ta:[],tb:[]};
+    items.forEach(function(it){var ka=0,ix=[],k;
+      for(k=0;k<it.length;k++){if(it[k].t===S0.key)ka=k;else ix.push(k)}
+      best.ta.push(ka);best.tb.push(ix.length?pick(ix):ka)});
+    bestScore=0;for(i=0;i<N;i++){if(items[i][best.ta[i]].t===items[(i+1)%N][best.tb[(i+1)%N]].t)bestScore++}
+  }
+  else
+  /* לפריט עם שני ייצוגים בלבד — השעון ברמה 1, מאז שייצוג 24 שעות
+     עבר לרמה 2 — יש הקצאה אחת שבה אף קלף אינו נושא שני חצאים מאותו
+     סוג, והגרלה אקראית לא תמצא אותה (שתיים מתוך 2^20). מנסים אותה
+     קודם; בכל שאר הנושאים התנאי אינו מתקיים ודבר לא משתנה. */
+  if(items.every(function(it){return it.length===2})){
+    best={ta:items.map(function(){return 0}),tb:items.map(function(){return 1})};
+    bestScore=0;for(i=0;i<N;i++){if(items[i][0].t===items[(i+1)%N][1].t)bestScore++}}
   for(att=0;att<300&&bestScore>0;att++){
     var ta=[],tb=[];
     for(i=0;i<N;i++){var ix=range(0,items[i].length-1),a=pick(ix),b;do{b=pick(ix)}while(b===a);ta.push(a);tb.push(b)}
@@ -265,7 +306,7 @@ function build(setId,lv,seed){
   var deck={set:setId,lv:lv,seed:seed,cards:printed,chain:chainIds,byChain:cards};
   RNG=Math.random;return deck}
 /* ===== UI strings ===== */
-var BUILD="dm5 · 2026-10-04";
+var BUILD="dm6 · 2026-10-04";
 var STR={
 he:{brand:"דומינו לימודי",title:"דומינו לימודי להדפסה",tag:"מדפיסים 20 קלפים, גוזרים ומסדרים במעגל. כל קלף מתחבר לקלף שמתאים לו.",
  howT:"איך משחקים?",limor:"אני לימור. ככה משחקים:",how:"1. מדפיסים את הקלפים וגוזרים לפי הקו המקווקו.\n2. מערבבים את הקלפים על השולחן.\n3. מתחילים בקלף עם הכוכב. מחפשים קלף שהחצי הראשון שלו מתאים לחצי השני של הקלף הקודם.\n4. ממשיכים עד שהמעגל נסגר. הקלף האחרון מתחבר לקלף עם הכוכב.",
@@ -312,10 +353,17 @@ function $(s){return document.querySelector(s)}
 function T(){return STR[S.lang]}
 function lt(o){return o[S.lang]}
 function mkDeck(){if(!SETS[S.set])S.set="nums";if(S.lvl>SETS[S.set].lv)S.lvl=1;DECK=build(S.set,S.lvl,S.seed)}
-/* ===== speech with word highlight (same engine as the other bekol apps) ===== */
-var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null,_dis=null;
+/* ===== מנוע ההקראה של "תאוריה מדברת" — חמישה מנגנונים =====
+   הועתק כלשונו מ-rakia/index.html (segments, insideNumber, voiceUsable,
+   נפילה מקול רשת) ומ-math-elem/index.html (חיווט השכבה המוקלטת), כדי
+   שהעותקים לא יסחפו זה מזה. חמישה כשלים שקטים של Web Speech, שכולם
+   נראים ללומד אותו דבר — הקול מפסיק באמצע או לא מתחיל:
+     1 שומר-ער · 2 הפניה חיה ל-utterance · 3 שומר-סף ·
+     4 נפילה מקול רשת · 5 שחרור במגע (בלעדיו iOS שותק לגמרי).
+   voiceUsable הוא מפתח המיון הראשון, והמגדר בא אחריו. */
+var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null,_dis=null,_sayGen=0;
 /* 1 · שומר-ער. Chrome/Edge בשולחן העבודה חותכים הקראה אחרי כ-15 שניות.
-   הטקסט של לימור כאן הוא 245 תווים בעברית ו-299 ברוסית — הוא נחתך.
+   הטקסט של לימור כאן הוא 245 תווים בעברית ו-320 ברוסית — הוא נחתך.
    במובייל אין את הבאג והפעולה מקרטעת שם, ולכן רק בשולחן העבודה. */
 var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
                  &&!/Android|Mobile/i.test(navigator.userAgent);
@@ -331,6 +379,10 @@ function startKeepAlive(){
   },9000);
 }
 function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
 /* 3 · שומר-סף. יש מכשירים שבהם onend לא נורה: הכפתור נשאר על "עצירה"
    וההקראה לא ממשיכה לעולם. ארבע שניות של שקט מוחלט נחשבות סוף. */
 function ttsWatchdog(alive,onSilent){
@@ -343,13 +395,75 @@ function ttsWatchdog(alive,onSilent){
   },1000);
   return function(){clearInterval(dog)};
 }
+/* 4 · קול רשת שנכשל. קול נוירלי שותק בלי אינטרנט, והלומד שומע כלום
+   בלי שגיאה. הדגל נכבה ומאותו רגע נבחר קול מקומי. */
+var _netVoiceOK=true;
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+/* פיצול לאמירות קצרות — הועתק כלשונו מ-rakia (ושם מ"תאוריה מדברת").
+   מעל SEG_MAX מנועי מכשיר מאיצים ובולעים סופי מילים; כל מקטע נושא
+   את ההיסט שלו במחרוזת המלאה, כי charIndex מתאפס בכל אמירה ובלעדיו
+   ההדגשה קופצת לתחילת המשפט בכל מקטע. */
+var SEG_MAX=90, SEG_GAP=260;
+function insideNumber(str,i){ return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]) }
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){ merged[merged.length-1].text+=out[i].text; continue }
+    if(out[i].text.trim().length<12&&i+1<out.length){ out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
+/* המילון העברי של "תאוריה מדברת". he-speech.js נטען בדף מהיום הראשון
+   ולא נקרא אף פעם — "משלש" יצא "משלש" ולא "משולש". בשאר השפות
+   הטקסט עובר כמות שהוא. */
+function heSpoken(t,l){
+  if(l!=="he"||typeof HESPEECH==="undefined")return t;
+  try{ return HESPEECH.spoken(t) }catch(e){ return t }
+}
 var VF=/(female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
 var VM=/(\bmale\b|david|mark|asaf|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
 function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
-function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
-  var f=vs.filter(function(v){return VF.test(v.name)&&!VM.test(v.name)});if(f.length)return {v:f[0],fem:true};
-  var nm=vs.filter(function(v){return !VM.test(v.name)});if(nm.length)return {v:nm[0],fem:false};
-  return {v:vs[0]||null,fem:false}}
+function vGender(v){var n=(v&&v.name)||"";return (VF.test(n)&&!VM.test(n))?"f":VM.test(n)?"m":"?"}
+/* voiceUsable הוא מפתח המיון הראשון, והמגדר בא אחריו ולא להפך:
+   קול נשי מת מנצח קול גברי חי כשהסדר מתהפך. */
+function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),
+  vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
+  if(!vs.length)return {v:null,fem:false};
+  function grank(v){var g=vGender(v);return g==="f"?2:g==="?"?1:0}
+  var chosen=vs.slice().sort(function(a,b){
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    return grank(b)-grank(a);
+  })[0];
+  return {v:chosen||null,fem:vGender(chosen)==="f"}}
 function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.raw!=null){HL.el.textContent=HL.el.dataset.raw}HL.el=null}
 function hlPrep(el,text){hlClear();if(!el||el.children.length)return;el.dataset.raw=el.textContent;HL.el=el;HL.raw=el.textContent;HL.got=false;
   var out="",re=/\S+|\s+/g,m,idx=0;HL.starts=[];
@@ -359,25 +473,80 @@ function hlAt(ci){if(!HL.el)return;var w=-1,i;for(i=0;i<HL.starts.length;i++){if
   var sp=HL.el.querySelectorAll("[data-w]");for(i=0;i<sp.length;i++)sp[i].className=(i===w?"hl":"")}
 function hlFallback(rate){if(!HL.el)return;var n=HL.starts.length,i=0,per=430/rate;
   (function step(){if(!HL.el||HL.got)return;var sp=HL.el.querySelectorAll("[data-w]");for(var k=0;k<sp.length;k++)sp[k].className=(k===i?"hl":"");i++;if(i<=n)HL.timer=setTimeout(step,per)})()}
-function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}_u=null;stopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false)}
+function stopSpeak(){_sayGen++;try{speechSynthesis.cancel()}catch(e){}if(typeof RECORDED!=="undefined")RECORDED.stop();_u=null;stopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false)}
 function setPlaying(b){var bs=document.querySelectorAll('[data-a="stop"]');bs.forEach(function(x){x.style.opacity=b?1:.55})}
-function speak(text,el,onend){stopSpeak();var raw=text;if(!("speechSynthesis" in window)||!text)return false;
-  var rate=S.slow?0.7:0.9,pv=pickVoice(),u=new SpeechSynthesisUtterance(text);u.lang=LCODE[S.lang];if(pv.v)u.voice=pv.v;u.rate=rate;u.pitch=pv.fem?1.05:1.3;
-  HL.noB=false;if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw)}
-  u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(e.charIndex)};
-  function fin(){if(_u!==u)return;_u=null;stopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false);if(onend)onend()}
-  u.onend=u.onerror=fin;
-  _u=u;setPlaying(true);try{speechSynthesis.speak(u)}catch(e){_u=null;setPlaying(false);return false}
-  startKeepAlive();_dis=ttsWatchdog(function(){return _u===u},fin);
-  if(HL.el)setTimeout(function(){if(_u===u&&HL.el&&!HL.got)hlFallback(rate)},900);return true}
+/* קול המכשיר, מקטע אחרי מקטע. speechSynthesis.cancel() אינו מבטל
+   setTimeout, ולכן כל הקראה מקבלת מספר דור: stopSpeak מקדם אותו,
+   ומקטע מדור ישן פשוט אינו מדבר. */
+function speakDevice(text,el,onend){var raw=String(text);
+  if(!("speechSynthesis" in window)||!raw)return false;
+  var spoken=heSpoken(raw,S.lang),rate=S.slow?0.7:0.9;
+  HL.noB=false;
+  if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=(spoken!==raw)}
+  var segs=segments(spoken),my=++_sayGen,v=pickVoice(),retried=false;
+  function alive(){return my===_sayGen}
+  function allDone(){if(!alive())return;maybeStopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false);if(onend)onend()}
+  setPlaying(true);
+  (function sayseg(k){
+    if(!alive())return;
+    if(k>=segs.length){allDone();return}
+    var seg=segs[k],moved=false,disarm=null;
+    function next(){
+      if(moved||!alive())return;
+      moved=true;if(disarm)disarm();
+      if(k+1<segs.length)setTimeout(function(){sayseg(k+1)},SEG_GAP);
+      else allDone();
+    }
+    var u=new SpeechSynthesisUtterance(seg.text);
+    u.lang=LCODE[S.lang];if(v.v){try{u.voice=v.v}catch(e2){}}
+    u.rate=rate;u.pitch=v.fem?1.05:1.3;
+    u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(seg.start+e.charIndex)};
+    u.onend=next;
+    u.onerror=function(e){
+      if(moved||!alive())return;
+      var err=(e&&e.error)||"";
+      if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+      /* 4 · נפילה מקול רשת: הדגל נכבה, נבחר קול מקומי, ואותו מקטע
+         נאמר שוב פעם אחת. בלי זה — שקט מוחלט בלי שגיאה. */
+      if(!retried&&v.v&&v.v.localService===false){
+        retried=true;_netVoiceOK=false;moved=true;
+        if(disarm)disarm();_u=null;
+        v=pickVoice();
+        setTimeout(function(){sayseg(k)},SEG_GAP);
+        return;
+      }
+      moved=true;if(disarm)disarm();allDone();
+    };
+    _u=u;   /* 2 · הפניה חיה ל-utterance — בלעדיה Chrome אוסף אותו עם onend */
+    try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
+    try{speechSynthesis.speak(u)}catch(e2){_u=null;setPlaying(false);return}
+    startKeepAlive();
+    disarm=ttsWatchdog(function(){return alive()&&!moved},next);
+    _dis=disarm;
+  })(0);
+  if(HL.el)setTimeout(function(){if(alive()&&HL.el&&!HL.got)hlFallback(rate)},900);
+  return true}
+/* שכבה 1 — קובץ מוקלט (המנוע של תאוריה מדברת). יש קובץ: מנגנים וזהו,
+   בלי הדגשה מילה־מילה (אין onboundary בקובץ). אין קובץ, או שהקובץ
+   נכשל: קול המכשיר כרגיל. */
+function speak(text,el,onend){stopSpeak();if(!text)return false;
+  if(typeof RECORDED!=="undefined"&&RECORDED.play(String(text),S.lang,{rate:S.slow?0.7:0.9,
+      onEnd:function(){setPlaying(false);if(onend)onend()},
+      onError:function(){speakDevice(text,el,onend)}})){
+    setPlaying(true);return true;
+  }
+  return speakDevice(text,el,onend)}
 /* ===== card markup ===== */
 var SPKSVG='<svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8c2 2 2 6 0 8" stroke="#fff" fill="none" stroke-width="2"/></svg>';
 function cardHTML(c,inter,opt){opt=opt||{};var a=R(c.a,S.lang),b=R(c.b,S.lang),col=SETS[S.set].c,t=T();
   function half(r,side){var inner='<span class="vis">'+r.h+'</span>';
     if(inter)return '<button class="half" data-a="sayhalf" data-c="'+c.id+'" data-s="'+side+'" aria-label="'+esc(t.listenHalf+": "+r.s)+'">'+inner+'<span class="spk">'+SPKSVG+'</span></button>';
     return '<div class="half">'+inner+'</div>'}
-  var star=(DECK.chain[0]===c.id)?'<span class="st" aria-label="'+esc(t.start)+'">★</span>':'';
-  return '<div class="dc" style="--dcc:'+col+'">'+half(a,"a")+half(b,"b")+(opt.noNo?'':'<span class="no">'+c.id+'</span>')+star+'</div>'}
+  /* aria-label על span בלי role נבלע בקוראי מסך, והלומד שמע "כוכב
+     שחור" או כלום. role="img" הוא מה שמחזיק את התחליף הטקסטואלי —
+     גם לכוכב וגם למספר הקלף, שבלי ההקשר נשמע כספרה סתומה. */
+  var star=(DECK.chain[0]===c.id)?'<span class="st" role="img" aria-label="'+esc(t.start)+'">★</span>':'';
+  return '<div class="dc" style="--dcc:'+col+'">'+half(a,"a")+half(b,"b")+(opt.noNo?'':'<span class="no" role="img" aria-label="'+esc(t.cardW+" "+c.id)+'">'+c.id+'</span>')+star+'</div>'}
 function byId(id){return DECK.cards.filter(function(c){return c.id===id})[0]}
 function sheetsHTML(){var t=T(),h="",p,i;
   for(p=0;p<4;p++){h+='<div class="sheet"><div class="cut">'+esc(t.cut)+'</div><div class="cards">';
@@ -427,15 +596,21 @@ function sayText(w){var t=T();
 function doPrint(cls){stopSpeak();var r=document.documentElement;r.classList.add(cls);
   var done=function(){r.classList.remove("pc");r.classList.remove("pk");window.removeEventListener("afterprint",done)};
   window.addEventListener("afterprint",done);setTimeout(function(){try{window.print()}catch(e){done()}},60)}
+/* #live יושב בדף מהיום הראשון ואיש לא כתב אליו. החלפת נושא, רמה או
+   ערכה מרעננת את כל המסך בלי מילה, ומי שמנווט בקורא מסך לא יודע
+   שמשהו קרה. ההודעה בנויה ממחרוזות שכבר קיימות, בלי תרגום חדש. */
+function announce(msg){var l=document.getElementById("live");if(l)l.textContent=msg}
+function announceDeck(){var t=T(),cur=SETS[S.set];
+  announce(lt(cur.n)+(cur.lv>1?" · "+t.level+" "+S.lvl:"")+" · "+t.kitNo+" "+S.seed)}
 function onAct(a,el){
   if(a==="home"){stopSpeak();view="home";render();window.scrollTo(0,0)}
   else if(a==="lang"){stopSpeak();S.lang=el.dataset.l;saveS();render()}
   else if(a==="settings"){stopSpeak();view="settings";render();window.scrollTo(0,0)}
   else if(a==="keyview"){stopSpeak();view="key";render();window.scrollTo(0,0)}
-  else if(a==="set"){stopSpeak();S.set=el.dataset.s;if(S.lvl>SETS[S.set].lv)S.lvl=1;saveS();mkDeck();render()}
-  else if(a==="lvl"){stopSpeak();S.lvl=+el.dataset.l;saveS();mkDeck();render()}
-  else if(a==="kit"){stopSpeak();S.seed=+el.dataset.k;saveS();mkDeck();render()}
-  else if(a==="newkit"){stopSpeak();S.seed=Math.floor(Math.random()*9000)+1000;saveS();mkDeck();render()}
+  else if(a==="set"){stopSpeak();S.set=el.dataset.s;if(S.lvl>SETS[S.set].lv)S.lvl=1;saveS();mkDeck();render();announceDeck()}
+  else if(a==="lvl"){stopSpeak();S.lvl=+el.dataset.l;saveS();mkDeck();render();announceDeck()}
+  else if(a==="kit"){stopSpeak();S.seed=+el.dataset.k;saveS();mkDeck();render();announceDeck()}
+  else if(a==="newkit"){stopSpeak();S.seed=Math.floor(Math.random()*9000)+1000;saveS();mkDeck();render();announceDeck()}
   else if(a==="say"||a==="slowsay"){var r=sayText(el.dataset.t),o=S.slow;if(a==="slowsay")S.slow=true;speak(r[0],r[1]);S.slow=o}
   else if(a==="sayhalf"){var c=byId(+el.dataset.c),rp=R(el.dataset.s==="a"?c.a:c.b,S.lang);speak(rp.s,null)}
   else if(a==="stop")stopSpeak();
@@ -473,7 +648,7 @@ function boot(){var q=new URLSearchParams(location.search),l=q.get("lang");if(l&
   render();
   var pr=q.get("print");if(pr==="cards")document.documentElement.classList.add("pc");else if(pr==="key")document.documentElement.classList.add("pk");
   if(window.TUTOR){try{TUTOR.mount({app:"domino",lang:function(){return S.lang},q:function(){return null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm5-pwa1").catch(function(){})})}
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm6-pwa1").catch(function(){})})}
 if(!INTERNAL_OK){
   document.getElementById("gate").hidden=false;
   document.title="לא פורסם";

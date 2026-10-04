@@ -90,16 +90,27 @@ function optInfo(q,i,l){
   l=l||state.lang;var o=q.opts[i];
   if(q.kind==="auth")return{text:o,lang:"en",speak:o};
   if(q.kind==="emoji"||q.kind==="listen")return{text:o.en,lang:"en",speak:o.en};
-  if(q.kind==="meaning"){if(l==="en")return{text:o.emoji,lang:"en",speak:o.en,big:true};return{text:o.tr[l],lang:l,speak:o.tr[l]}}
+  /* בממשק אנגלי התשובה היא תמונה. כפתור שכולו אמוג׳י נשאר בלי שם נגיש,
+     ולכן alt — אותו תחליף טקסטואלי שהתמונה שבשאלה מקבלת. */
+  if(q.kind==="meaning"){if(l==="en")return{text:o.emoji,lang:"en",speak:o.en,big:true,alt:t("picAlt",{w:o.en},l)};return{text:o.tr[l],lang:l,speak:o.tr[l]}}
   if(q.kind==="aw")return{text:o.emoji+" "+o.en,lang:"en",speak:o.en};
   return{text:o.letter,lang:"en",speak:o.letter,big:true};
 }
 function optText(q,i,l){return optInfo(q,i,l).text}
 /* the thing above the options */
+/* תחליף טקסטואלי לתמונה. התמונה היא כל השאלה, ולכן היא אינה קישוט:
+   עם aria-hidden קורא מסך לא קיבל דבר, והשאלה הייתה ריקה. התחליף הוא
+   שם הדבר בשפת הממשק — בדיוק מה שהרמז אומר ללומד לעשות ("הסתכלו
+   בתמונה ואמרו לעצמכם איך קוראים לה בשפה שלכם"), ולכן אינו מגלה את
+   המילה באנגלית. בממשק אנגלי אין תרגום, ושם התחליף הוא המילה עצמה —
+   וזה גם מה שקורא מסך אומר ממילא על אמוג׳י שאינו מוסתר. */
+function picAlt(w){return t("picAlt",{w:trOf(w)||w.en})}
 function stimInfo(q){
   var w=q.w;
   if(q.kind==="auth")return q.stim?{html:q.listen?"":esc(q.stim),speak:spokenStim(q.stim),listen:q.listen}:null;
-  if(q.kind==="emoji")return{html:'<span class="bigem" aria-hidden="true">'+w.emoji+'</span>',speak:null};
+  /* lang על האלמנט שנושא את aria-label: המעטפת היא lang="en", ובלעדיו
+     קורא מסך אומר את המילה העברית בקול אנגלי. */
+  if(q.kind==="emoji")return{html:'<span class="bigem" role="img" lang="'+state.lang+'" aria-label="'+esc(picAlt(w))+'">'+w.emoji+'</span>',speak:null};
   if(q.kind==="meaning")return{html:'<span class="bigen" lang="en" dir="ltr">'+esc(w.en)+'</span>',speak:w.en};
   if(q.kind==="aw")return{html:'<span class="bigen" lang="en" dir="ltr">'+w.letter+w.letter.toLowerCase()+'</span>',speak:w.letter};
   if(q.kind==="al")return{html:'<span class="bigem" aria-hidden="true">'+w.emoji+'</span><span class="bigen" lang="en" dir="ltr">'+esc(w.en)+'</span>',speak:w.en};
@@ -116,7 +127,7 @@ function renderPractice(){
   for(var i=0;i<R.qs.length;i++)dots+='<i class="'+(i<R.i?"d":i===R.i?"c":"")+'"></i>';
   var opts=q.opts.map(function(_,i){
     var o=optInfo(q,i);
-    return '<div class="optwrap"><button class="opt'+(o.big?' bigopt':'')+'" lang="'+o.lang+'" dir="'+dirOf(o.lang)+'" data-i="'+i+'" id="opt'+i+'">'+esc(o.text)+'</button><button class="spk" data-opt="'+i+'" aria-label="'+t("play")+': '+esc(o.speak||o.text)+'">🔊</button></div>';
+    return '<div class="optwrap"><button class="opt'+(o.big?' bigopt':'')+'" lang="'+o.lang+'" dir="'+dirOf(o.lang)+'" data-i="'+i+'" id="opt'+i+'"'+(o.alt?' aria-label="'+esc(o.alt)+'"':'')+'>'+esc(o.text)+'</button><button class="spk" data-opt="'+i+'" aria-label="'+t("play")+': '+esc(o.speak||o.text)+'">🔊</button></div>';
   }).join("");
   var stim=si?'<div class="stim">'+(si.listen?'<button class="bigbtn play stimplay" id="stimPlay"><span>🔊</span> '+t("play")+'</button>':'')+(si.html?'<div class="sentEn" lang="en" dir="ltr">'+si.html+'</div>':'')+'</div>':'';
   return topbar(uTitle(unit),1)+'<main class="prac"><div class="prog" role="img" aria-label="'+t("qOf",{n:R.i+1,m:R.qs.length})+'">'+dots+'</div>'+

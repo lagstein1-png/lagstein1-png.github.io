@@ -14,7 +14,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "h121 · 2026-10-04";
+  var BUILD = "h122 · 2026-10-04";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -208,12 +208,19 @@
       return '<img class="qimg" src="' + esc(im.src) + '" alt="' + esc(im.alt) + '">';
     }).join("");
   }
+  /* \u05db\u05e4\u05ea\u05d5\u05e8 \u05d4\u05d4\u05e7\u05e8\u05d0\u05d4 \u05d4\u05d5\u05d0 \u05d3\u05d5\u05be\u05de\u05e6\u05d1\u05d9: \u05dc\u05d7\u05d9\u05e6\u05d4 \u05de\u05e7\u05e8\u05d9\u05d0\u05d4, \u05dc\u05d7\u05d9\u05e6\u05d4 \u05e9\u05e0\u05d9\u05d9\u05d4 \u05e2\u05d5\u05e6\u05e8\u05ea,
+     \u05d5-`Speech.onstate` \u05de\u05e2\u05d1\u05d9\u05e8 \u05d0\u05d5\u05ea\u05d5 \u05d1\u05d9\u05df `aria-pressed` \u05d0\u05de\u05ea \u05dc\u05e9\u05e7\u05e8.
+     \u05d4\u05de\u05d0\u05e4\u05d9\u05d9\u05df \u05e0\u05db\u05ea\u05d1 \u05db\u05d0\u05df \u05d2\u05dd \u05d1\u05de\u05e6\u05d1 \u05d4\u05d4\u05ea\u05d7\u05dc\u05ea\u05d9 \u2014 \u05d1\u05dc\u05e2\u05d3\u05d9\u05d5 \u05e7\u05d5\u05e8\u05d0 \u05de\u05e1\u05da \u05e9\u05d5\u05de\u05e2
+     "\u05dc\u05d7\u05e6\u05df" \u05e8\u05d2\u05d9\u05dc \u05e2\u05d3 \u05dc\u05d4\u05e7\u05e8\u05d0\u05d4 \u05d4\u05e8\u05d0\u05e9\u05d5\u05e0\u05d4, \u05d5\u05d0\u05d7\u05e8\u05d9 \u05db\u05dc \u05e6\u05d9\u05d5\u05e8 \u05de\u05d7\u05d3\u05e9 \u05e9\u05dc \u05d4\u05e9\u05d0\u05dc\u05d4
+     (innerHTML) \u05d4\u05d5\u05d0 \u05d7\u05d5\u05d6\u05e8 \u05dc\u05e9\u05ea\u05d5\u05e7, \u05db\u05d9 onstate \u05d9\u05d5\u05e8\u05d4 \u05e8\u05e7 \u05db\u05e9\u05de\u05d3\u05d1\u05e8\u05d9\u05dd. */
   function spkElBtn(elId, label) {
     return '<button class="spk" data-read-el="' + esc(elId) + '" type="button" ' +
+           'aria-pressed="false" ' +
            'aria-label="' + esc(label) + '" title="' + esc(label) + '">\u266b ' + esc(label) + '</button>';
   }
   function spkBtn(id, label) {
     return '<button class="spk" data-read="' + esc(id) + '" type="button" ' +
+           'aria-pressed="false" ' +
            'aria-label="' + esc(label) + '" title="' + esc(label) + '">\u266b ' + esc(label) + '</button>';
   }
 
@@ -306,6 +313,11 @@
     var want = [fa.value].concat(fa.accept || []).map(norm);
     return { ok: want.indexOf(norm(raw)) >= 0, why: "" };
   }
+  /* סעיף שאפשר לנקד אותו — כלומר יש לו תשובה סופית ממפתח ההערכה.
+     בשני השאלונים של היום אין אף אחד כזה (34 מתוך 34 בלי
+     finalAnswer), וזו עובדה שהממשק חייב לומר ולא להסתיר מאחורי
+     ציון אפס. */
+  function scorable(sub) { return !!(sub && sub.finalAnswer); }
   function answerText(fa) {
     if (!fa) return "—";
     if (fa.type !== "number") return String(fa.value);
@@ -605,7 +617,7 @@
        שם הוא מאבד את החוט. */
     var h = '<div class="card"><div class="qhead"><span class="qnum">שאלה ' +
             esc(q.number) + '</span><span class="chip">' + esc(q.topic) + "</span>" +
-            '<button class="btn wide" data-read="' + esc(id) + 'all" type="button">' +
+            '<button class="btn wide" data-read="' + esc(id) + 'all" type="button" aria-pressed="false">' +
             '<span aria-hidden="true">🔊</span> השאלה כולה</button></div>';
     h += '<div class="saybar">' + spkBtn(id, "הקריאו את השאלה") +
          '<div class="grow"><div id="t-' + id + '">' + paraHtml(q.text) + "</div></div></div>";
@@ -776,7 +788,14 @@
     if (!ex) return;
     var got = 0, max = 0, byTopic = {}, rows = [], byChapter = {};
     var subPts = {};
-    simSubs(ex).forEach(function (it) { subPts[it.id] = Number(it.sub.points) || 0; });
+    /* סעיף בלי מפתח הערכה רשמי אינו נספר — לא במונה ולא במכנה.
+       כשהוא נספר כאפס, נבחן שענה נכון על כל השאלון מקבל 0 מתוך
+       100, וזה ציון שקרי. נקודותיו יורדות לאפס כאן, ומשם כל
+       החישוב מתעלם ממנו מעצמו. */
+    var noKey = 0;
+    simSubs(ex).forEach(function (it) {
+      subPts[it.id] = scorable(it.sub) ? (Number(it.sub.points) || 0) : 0;
+    });
     if (ex.chapters && ex.chapters.length) {
       /* ציון הבחינה מתוך 100: לכל פרק משקל קבוע (pointsEach), ומה
          שהתלמיד עשה בתוך הפרק נמתח למשקל הזה. כך בחירת שאלות קשות
@@ -787,10 +806,22 @@
           if (it.q.chapter !== c.id) return;
           cm += subPts[it.id];
         });
-        byChapter[c.id] = { def: c, got: 0, max: cm, weight: c.pointsEach };
+        /* פרק שאין בו סעיף אחד עם מפתח אינו מדורג כלל, ומשקלו אינו
+           נכנס למכנה — אחרת ה-100 כולל פרק שאי אפשר לקבל בו נקודה. */
+        if (cm) byChapter[c.id] = { def: c, got: 0, max: cm, weight: c.pointsEach };
       });
     }
     simSubs(ex).forEach(function (it) {
+      /* בלי מפתח אין "נכון" ואין "לא נכון": הסעיף יורד מהניקוד
+         ומהטבלה לפי נושא, ובשורה שלו נכתב במפורש שאין עדיין מפתח.
+         בלי זה הוא נצבע אדום, והנושא כולו סומן כחלש. */
+      if (!scorable(it.sub)) {
+        noKey++;
+        rows.push({ id: it.id, letter: it.sub.letter, number: it.q.number,
+                    topic: it.q.topic, ok: false, nokey: true, pts: 0,
+                    given: SIM.ans[it.id] || "", want: answerText(it.sub.finalAnswer) });
+        return;
+      }
       var r = checkAnswer(it.sub.finalAnswer, SIM.ans[it.id] || "");
       var pts = Number(it.sub.points) || 0;
       max += pts;
@@ -809,29 +840,39 @@
                   given: SIM.ans[it.id] || "", want: answerText(it.sub.finalAnswer) });
     });
     if (ex.chapters && ex.chapters.length) {
-      var g100 = 0;
+      var g100 = 0, wsum = 0;
       Object.keys(byChapter).forEach(function (k) {
         var ch = byChapter[k];
         ch.scaled = ch.max ? Math.round((ch.got / ch.max) * ch.weight * 100) / 100 : 0;
-        g100 += ch.scaled;
+        g100 += ch.scaled; wsum += ch.weight;
       });
-      got = Math.round(g100 * 100) / 100; max = 100;
+      /* המכנה הוא סכום משקלי הפרקים שבאמת דורגו. כששאלון מלא
+         במפתח זה 100 בדיוק, כמו קודם, וכשאין מפתח כלל זה 0 —
+         ואז אין ציון להציג. */
+      got = Math.round(g100 * 100) / 100; max = Math.round(wsum * 100) / 100;
     }
-    SIM.res = { got: got, max: max, byTopic: byTopic, byChapter: byChapter, rows: rows, byTime: !!byTime };
+    SIM.res = { got: got, max: max, noKey: noKey, byTopic: byTopic,
+                byChapter: byChapter, rows: rows, byTime: !!byTime };
     var d = store.data;
     if (!d.sims) d.sims = [];
-    d.sims.push({ examId: ex.id, at: Date.now(), got: got, max: max });
-    if (d.sims.length > 50) d.sims = d.sims.slice(-50);
+    /* בחינה בלי ציון אינה נשמרת בהיסטוריה: רשומה של 0 הייתה נשארת
+       במכשיר כאילו זו התוצאה, ומושכת למטה כל גרף שייבנה ממנה. */
+    if (max) {
+      d.sims.push({ examId: ex.id, at: Date.now(), got: got, max: max });
+      if (d.sims.length > 50) d.sims = d.sims.slice(-50);
+    }
     store.save();
     renderSim();
-    say(byTime ? "הזמן נגמר. הנה הדוח." : "הבחינה הוגשה. הנה הדוח.");
+    say(max ? (byTime ? "הזמן נגמר. הנה הדוח." : "הבחינה הוגשה. הנה הדוח.")
+            : "הבחינה הוגשה. אין עדיין מפתח הערכה רשמי לשאלון הזה, ולכן אין ציון. " +
+              "בדוח אפשר לראות מה נכתב בכל סעיף.");
   }
 
   function simQuestionHtml(q) {
     var id = "q" + q.number;
     var h = '<div class="card"><div class="qhead"><span class="qnum">שאלה ' +
             esc(q.number) + '</span><span class="chip">' + esc(q.topic) + "</span>" +
-            '<button class="btn wide" data-read="' + esc(id) + 'all" type="button">' +
+            '<button class="btn wide" data-read="' + esc(id) + 'all" type="button" aria-pressed="false">' +
             '<span aria-hidden="true">🔊</span> השאלה כולה</button></div>';
     h += '<div class="saybar">' + spkBtn(id, "הקריאו את השאלה") +
          '<div class="grow"><div id="t-' + id + '">' + paraHtml(q.text) + "</div></div></div>";
@@ -888,15 +929,61 @@
     return msg ? '<p class="calm-praise">' + msg + "</p>" : "";
   }
 
+  /* הטבלה "סעיף אחר סעיף". מוצגת גם כשאין ציון כלל, ולכן היא
+     פונקציה משלה ולא חלק מגוף הדוח. */
+  function simRowsHtml(rows) {
+    var h = "<table class=\"tbl\"><thead><tr>" +
+      "<th>סעיף</th><th>מה נכתב</th><th>התשובה</th><th></th></tr></thead><tbody>";
+    /* "1" ואחריו "א" בתוך תא בכיוון ימין־לשמאל מוצגים הפוך — "א1" —
+       מפני שהספרה והאות הן שני כיוונים נגדיים. bdi בכיוון שמאל־לימין
+       מבודד את הצירוף ומציג אותו כפי שנכתב, והתא כולו נשאר במקומו. */
+    rows.forEach(function (x) {
+      /* סעיף בלי מפתח מקבל תווית ניטרלית ולא אדומה, והיא נאמרת
+         במילים לקורא מסך — "לא" על סעיף שאיש לא בדק הוא שקר. */
+      var tag = x.nokey
+        ? '<span class="tag nk">אין עדיין מפתח</span>'
+        : '<span class="tag ' + (x.ok ? "ok" : "no") + '">' + (x.ok ? "נכון" : "לא") + "</span>";
+      h += '<tr><td><bdi dir="ltr">' + esc(x.number) + esc(x.letter) + "</bdi></td><td>" +
+        (x.given ? esc(x.given) : '<span class="meta">ריק</span>') + "</td><td>" +
+        (x.nokey ? '<span class="meta">תתפרסם עם מפתח ההערכה</span>' : esc(x.want)) +
+        "</td><td>" + tag + "</td></tr>";
+    });
+    return h + "</tbody></table>";
+  }
+
   function simReportHtml(ex) {
     var r = SIM.res;
     var pct = r.max ? Math.round((r.got / r.max) * 100) : 0;
     var h = "";
     if (r.byTime) h += '<p class="note">הזמן נגמר, והבחינה הוגשה כפי שהייתה.</p>';
+    /* אין אף סעיף שאפשר לנקד — אומרים את זה במילים במקום להציג 0.
+       נבחן שרואה 0 מתוך 100 אחרי שענה נכון מפסיק להאמין לאפליקציה
+       גם ביום שבו הציון יהיה אמיתי. */
+    if (!r.max) {
+      /* בלי role="status", כמו בשורת המשוב שבתרגול: את המשפט הזה
+         כבר מכריז #live מתוך simFinish, ושני ערוצים היו מקריאים
+         אותו פעמיים. */
+      h += '<div class="score nokey">' +
+        "<div><b>אין עדיין ציון לשאלון הזה.</b></div>" +
+        "<div>מפתח ההערכה הרשמי של משרד החינוך לשאלון הזה עוד לא פורסם, " +
+        "ולכן האפליקציה אינה מחשבת ציון ואינה מסמנת סעיף כנכון או כשגוי. " +
+        "מה שכתבתם נשמר, ובטבלה למטה אפשר לראות את כל הסעיפים.</div></div>";
+      h += "<h2>סעיף אחר סעיף</h2>" + simRowsHtml(r.rows);
+      h += '<div class="hintbar" style="margin-top:1rem">' +
+        '<button class="btn pri" data-go="practice" type="button">לתרגול מודרך, עם הרמזים והפתרונות</button>' +
+        '<button class="btn" data-simstart="1" type="button">בחינה נוספת</button></div>';
+      return h;
+    }
     var glow = pct >= 75 && !(store.data && store.data.reduceMotion);
     h += '<div class="score' + (glow ? " calm-glow" : "") + '"><div class="big">' + pct + "</div>" +
       "<div>" + r.got + " מתוך " + r.max + " נקודות</div></div>";
     h += calmPraise(pct);
+    /* שאלון שחלקו עם מפתח וחלקו בלי — אומרים כמה סעיפים לא נספרו,
+       כדי שהמכנה לא ייראה שרירותי. */
+    if (r.noKey) h += '<p class="note">' +
+      plural(r.noKey, "סעיף אחד אינו נספר בציון", "שני סעיפים אינם נספרים בציון",
+             "סעיפים אינם נספרים בציון") +
+      ", מפני שאין להם עדיין תשובה ממפתח ההערכה הרשמי.</p>";
 
     var topics = Object.keys(r.byTopic);
     if (r.byChapter && Object.keys(r.byChapter).length) {
@@ -930,18 +1017,7 @@
       ? "מה לחזור עליו קודם: " + weak.map(esc).join(", ") + "."
       : "אין נושא שחוזר בו יותר מטעות אחת. אפשר להמשיך הלאה.") + "</p>";
 
-    h += "<h2>סעיף אחר סעיף</h2><table class=\"tbl\"><thead><tr>" +
-      "<th>סעיף</th><th>מה נכתב</th><th>התשובה</th><th></th></tr></thead><tbody>";
-    /* "1" ואחריו "א" בתוך תא בכיוון ימין־לשמאל מוצגים הפוך — "א1" —
-       מפני שהספרה והאות הן שני כיוונים נגדיים. bdi בכיוון שמאל־לימין
-       מבודד את הצירוף ומציג אותו כפי שנכתב, והתא כולו נשאר במקומו. */
-    r.rows.forEach(function (x) {
-      h += '<tr><td><bdi dir="ltr">' + esc(x.number) + esc(x.letter) + "</bdi></td><td>" +
-        (x.given ? esc(x.given) : '<span class="meta">ריק</span>') + "</td><td>" +
-        esc(x.want) + '</td><td><span class="tag ' + (x.ok ? "ok" : "no") + '">' +
-        (x.ok ? "נכון" : "לא") + "</span></td></tr>";
-    });
-    h += "</tbody></table>";
+    h += "<h2>סעיף אחר סעיף</h2>" + simRowsHtml(r.rows);
     h += '<div class="hintbar" style="margin-top:1rem">' +
       '<button class="btn pri" data-go="practice" type="button">לתרגול מודרך, עם הפתרונות</button>' +
       '<button class="btn" data-simstart="1" type="button">בחינה נוספת</button></div>';
@@ -1494,7 +1570,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=h121-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=h122-pwa1").catch(function () {});
     });
   }
 

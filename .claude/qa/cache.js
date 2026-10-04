@@ -111,8 +111,13 @@ function sharedPaths(app) {
   return [...out];
 }
 function changedSinceMain(app) {
+  /* הרשימה לשורש נגזרת מ-ROOT_OWNS ואינה כתובה פעמיים. עד
+     4.10.2026 היא הייתה עותק שני, ו-'fonts' חסר בו: שינוי שנוגע
+     רק ב-/fonts/ לא סימן את השורש כ״השתנה מול main״, ולכן לא נדרש
+     מפתח קאש חדש — אף ש-ROOT_OWNS אומר במפורש שהשורש הוא שמגיש
+     את התיקייה הזאת. נמצא בבוט 108. */
   const paths = app === '.'
-    ? ['index.html', 'sw.js', 'manifest.json', 'img', 'legal', 'voice', 'tutor']
+    ? ['index.html', 'sw.js', 'manifest.json'].concat(ROOT_OWNS)
     : [app].concat(sharedPaths(app));
   const out = git(['diff', '--name-only', MAIN, '--'].concat(paths));
   if (out === null) return null;

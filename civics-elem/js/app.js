@@ -18,7 +18,7 @@ function uTitle(u,l){return unitTitle(u,l||state.lang)}
 /* ---------- chrome ---------- */
 function topbar(title,backTo){
   var langs=LANGS.map(function(l){return '<button class="lg'+(l===state.lang?' on':'')+'" data-lang="'+l+'" aria-pressed="'+(l===state.lang?"true":"false")+'" aria-label="'+LANG_LABEL[l]+'">'+(l==="he"?"עב":l==="ar"?"عر":l==="ru"?"RU":"EN")+'</button>'}).join("");
-  return '<header class="top">'+(backTo?'<button class="back" id="backBtn" aria-label="'+t("back")+'">'+(dirOf(state.lang)==="rtl"?"➜":"⬅")+'</button>':'<span class="logo">🏛️</span>')+
+  return '<header class="top">'+(backTo?'<button class="back" id="backBtn" aria-label="'+t("back")+'">'+(dirOf(state.lang)==="rtl"?"➜":"⬅")+'</button>':'<span class="logo" aria-hidden="true">🏛️</span>')+
    '<h1 id="pageTitle">'+esc(title)+'</h1><nav class="langs">'+langs+'</nav><button class="gear" id="gearBtn" aria-label="'+t("settings")+'">⚙️</button></header>';
 }
 function playRow(){
@@ -52,7 +52,7 @@ function pageSegs(){
 }
 function renderHome(){
   var cards=UNITS.map(function(u){
-    return '<button class="ucard" data-u="'+u.id+'" style="--c:'+u.color+'"><span class="ui">'+u.icon+'</span><span class="ut">'+esc(uTitle(u))+'</span>'+(state.done[u.id]?'<span class="ck" title="'+t("unitCheck")+'">✓</span>':'')+'</button>';
+    return '<button class="ucard" data-u="'+u.id+'" style="--c:'+u.color+'"><span class="ui" aria-hidden="true">'+u.icon+'</span><span class="ut">'+esc(uTitle(u))+'</span>'+(state.done[u.id]?'<span class="ck" role="img" aria-label="'+t("unitCheck")+'">✓</span>':'')+'</button>';
   }).join("");
   return topbar(t("appTitle"))+'<main>'+playRow()+'<p class="lead" id="intro"><b>'+esc(t("appTitle"))+'.</b> '+esc(t("appSub"))+'</p><h2>'+t("stories")+'</h2><div class="ucards">'+cards+'</div>'+
     '<p class="small">'+t("privacy")+'</p></main>';
@@ -83,8 +83,8 @@ function renderPractice(){
     return '<div class="optwrap"><button class="'+cls+'" lang="'+l+'" dir="'+d+'" data-i="'+i+'" id="opt'+i+'"'+(off?" disabled":"")+'>'+esc(optText(k))+'</button><button class="spk" data-opt="'+i+'" aria-label="'+t("play")+'">🔊</button></div>';
   }).join("");
   var st=storyById(q.story);
-  return topbar(uTitle(unit),1)+'<main class="prac"><div class="prog" aria-label="'+t("qOf",{n:R.i+1,m:R.qs.length})+'">'+dots+'</div>'+
-   playRow()+'<div class="stage"><div class="emoji" aria-hidden="true">'+st.icon+'</div><div class="sent" lang="'+l+'" dir="'+d+'" id="qtext">'+mk(qText(q)).html+'</div></div><div class="opts">'+opts+'</div>'+
+  return topbar(uTitle(unit),1)+'<main class="prac"><div class="prog" role="img" aria-label="'+t("qOf",{n:R.i+1,m:R.qs.length})+'">'+dots+'</div>'+
+   playRow()+'<div class="stage">'+(unit.id==="mix"?'<div class="emoji" role="img" aria-label="'+esc(st.title[l])+'">'+st.icon+'</div>':'<div class="emoji" aria-hidden="true">'+st.icon+'</div>')+'<div class="sent" lang="'+l+'" dir="'+d+'" id="qtext">'+mk(qText(q)).html+'</div></div><div class="opts">'+opts+'</div>'+
    '<div class="fb'+(R.fb?" "+R.fb.c:"")+'" id="fb" role="status">'+(R.fb?esc(R.fb.m):"")+'</div>'+
    '<div class="helprow"><button class="hbtn hint" id="hintBtn">💡 '+t("hintBtn")+'</button><button class="hbtn limor" id="limorBtn"><span class="lav">ל</span> '+t("limorBtn")+'</button></div>'+
    '<button class="cta next'+(R.locked?" show":"")+'" id="nextBtn" style="--c:'+unit.color+'">'+t("next")+'</button></main>';
@@ -138,8 +138,9 @@ function hint(){
 /* ---------- Limor help ---------- */
 function openLimor(){
   stopSpeech();var q=curQ(),st=storyById(q.story);
+  var back=document.activeElement;
   var ov=document.createElement("div");ov.className="limorov";ov.id="limorOv";
-  ov.innerHTML='<div class="limorbox"><div class="lhead"><span class="lav big"><img src="/img/limor.jpg" alt="" onerror="this.remove()">ל</span><b>'+t("lmTitle")+'</b><button class="x" id="lmClose" aria-label="'+t("back")+'">✕</button></div>'+
+  ov.innerHTML='<div class="limorbox" role="dialog" aria-modal="true" aria-label="'+t("lmTitle")+'" tabindex="-1"><div class="lhead"><span class="lav big"><img src="/img/limor.jpg" alt="" onerror="this.remove()">ל</span><b>'+t("lmTitle")+'</b><button class="x" id="lmClose" aria-label="'+t("back")+'">✕</button></div>'+
    '<div class="lplay"><button class="bigbtn play" id="lmPlay"><span>▶</span> '+t("play")+'</button><button class="bigbtn stop" id="lmStop"><span>■</span> '+t("stop")+'</button></div>'+
    '<p class="ltext" id="lmText" lang="'+state.lang+'" dir="'+dirOf(state.lang)+'">'+mk(t("lmR4")).html+'</p>'+
    '<div class="lask"><b>'+t("lmAsk")+'</b>'+
@@ -154,7 +155,11 @@ function openLimor(){
     if(k==="lmR1"){closeL();speakSeq(practiceSegs());return}
     playText();
   }
-  function closeL(){stopSpeech();ov.remove()}
+  function onKey(e){if(e.key==="Escape"||e.key==="Esc"){e.preventDefault();closeL()}}
+  function closeL(){stopSpeech();document.removeEventListener("keydown",onKey);ov.remove();
+    try{if(back&&back.focus)back.focus()}catch(e){}}
+  document.addEventListener("keydown",onKey);
+  try{$("#lmClose").focus()}catch(e){}
   $("#lmClose").onclick=closeL;$("#lmPlay").onclick=playText;$("#lmStop").onclick=stopSpeech;
   [].forEach.call(ov.querySelectorAll(".lq"),function(b){b.onclick=function(){show(b.getAttribute("data-k"))}});
   /* Limor never names the answer: she sends the child back to the story and to the question */
@@ -162,7 +167,7 @@ function openLimor(){
 }
 /* ---------- done / settings ---------- */
 function renderDone(){
-  return topbar(uTitle(unit),1)+'<main class="done"><div class="trophy">🌟</div><p class="lead" id="doneText">'+mk(t("unitDone")).html+'</p>'+playRow()+
+  return topbar(uTitle(unit),1)+'<main class="done"><div class="trophy" aria-hidden="true">🌟</div><p class="lead" id="doneText">'+mk(t("unitDone")).html+'</p>'+playRow()+
    '<button class="cta" id="againBtn" style="--c:'+unit.color+'">'+t("again")+'</button><button class="cta alt" id="unitsBtn">'+t("stories")+'</button></main>';
 }
 function renderSettings(){
@@ -175,7 +180,7 @@ function renderSettings(){
 }
 /* ---------- confetti ---------- */
 function confetti(n){
-  var c=document.createElement("div");c.className="confetti";var em=["🎉","⭐","✨","🌟","🎈"];
+  var c=document.createElement("div");c.className="confetti";c.setAttribute("aria-hidden","true");var em=["🎉","⭐","✨","🌟","🎈"];
   for(var i=0;i<n;i++){var s=document.createElement("span");s.textContent=em[i%em.length];
     s.style.left=(Math.random()*100)+"%";s.style.animationDelay=(Math.random()*0.5)+"s";s.style.fontSize=(16+Math.random()*18)+"px";c.appendChild(s)}
   document.body.appendChild(c);setTimeout(function(){c.remove()},2600);

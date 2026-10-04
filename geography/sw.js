@@ -14,6 +14,10 @@ const CACHE = "geography-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
              "/legal/terms.js","/legal/protect.js",
+             /* מנוע ההגייה העברי — /tutor/he-speech.js. התגית נטענת
+                ב-index.html מהיום הראשון, והקובץ לא היה ב-PRE: אופליין
+                הוא 404, HESPEECH אינו קיים, והטקסט נאמר כמות שהוא. */
+             "/tutor/he-speech.js",
              /* השכבה המוקלטת — /speech/recorded.js (2.10.2026) */
              "/speech/recorded.js",
              /* גופנים מקומיים — /fonts/fonts.css (1.10.2026) */

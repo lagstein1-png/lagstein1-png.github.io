@@ -24,14 +24,9 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const AL = require('./applist.js');
 
-const ROOT = path.join(__dirname, '..', '..');
-const argv = process.argv.slice(2).filter(a => !a.startsWith('--')).map(a => a.replace(/\/$/, ''));
-
-function appsFromStages() {
-  const s = JSON.parse(fs.readFileSync(path.join(__dirname, 'stages.json'), 'utf8'));
-  return Object.keys(s.apps || s);
-}
+const ROOT = AL.ROOT;
 
 /* הבלוק שאחרי `if(e.key===" ")`: ספירת סוגריים מסולסלים מהראשון. */
 function blockAt(src, from) {
@@ -45,7 +40,9 @@ function blockAt(src, from) {
   return src.slice(open, open + 400);
 }
 
-const targets = argv.length ? argv : appsFromStages();
+/* `applist` מחזיר רק את מי שקיים כאן, ולכן ״תאוריה מדברת״ ו-
+   `english-bagrut` — ריפואים אחרים — אינם מדווחים כחסרים. */
+const targets = AL.pick(process.argv.slice(2), AL.local());
 let findings = 0, scanned = 0, withHandler = 0;
 
 for (const app of targets) {
