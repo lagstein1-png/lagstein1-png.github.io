@@ -189,7 +189,12 @@ const SOURCES = {
   /* תנ״ך לילדים (3.10.2026): הנתונים ב-js/data.js כשורות מופרדות ב-| (L משפט, Q שאלה, S כותרת, E ישות/תשובה), קוראים אותם במסלול נפרד (tanakhElem). */
   'tanakh-elem': ['tanakh-elem/js/data.js'],
   /* מולדת ואזרחות לילדים (3.10.2026): הנתונים ב-js/data.js כשורות מופרדות ב-| (L משפט, Q שאלה, S כותרת, E ישות/תשובה), קוראים אותם במסלול נפרד (civicsElem). */
-  'civics-elem': ['civics-elem/js/data.js']
+  'civics-elem': ['civics-elem/js/data.js'],
+  /* קריאה ושפה (4.10.2026, O-115): משפטים, קטעים, כותרות ושאלות מ-js/data.js,
+     והוראות התרגיל (i_*) מ-js/i18n.js. corpus קורא אותם במסלול נפרד (hebrewLit).
+     בכוונה לא כולל: מילה בודדת והברה (אותן הילד מפענח, והקלטה שגויה מלמדת
+     שגיאה), ומשפטי CT_* שנבנים בזמן ריצה מנושא ופועל. */
+  'hebrew-lit': ['hebrew-lit/js/data.js', 'hebrew-lit/js/i18n.js']
 };
 
 /* בדיוק מה ש-plainOf עושה באפליקציה: תגיות יורדות, ישויות נפתחות,
@@ -261,6 +266,28 @@ function tanakhElem(text) {
   return out;
 }
 
+/* hebrew-lit: בדיוק מה ש-mk().spoken עושה ב-js/speech.js — מפרקים לפי
+   רווחים, מוחקים קווים תחתונים (המקום הריק ב-CLOZE), ומשאירים רק אסימון
+   שיש בו אות או ספרה. זה הטקסט שמגיע ל-RECORDED.play. */
+function hebrewLitSpoken(t) {
+  return String(t).split(/\s+/).filter(Boolean).map(w => w.replace(/_+/g, ''))
+    .filter(w => /[\u0590-\u05FFa-zA-Z\u0400-\u04FF\u0600-\u06FF0-9]/.test(w)).join(' ');
+}
+/* hebrew-lit/js/data.js: שדות w (משפט ב-CLOZE וב-SENT_QA), q (שאלה), title,
+   text ו-nk (קטע, עם ניקוד ובלעדיו). מחרוזת בודדת־מילה נופלת במסנן של corpus.
+   hebrew-lit/js/i18n.js: S("i_…", he, …) — ההוראה שנקראת לפני כל תרגיל. */
+function hebrewLit(dataText, i18nText) {
+  const out = [];
+  for (const m of dataText.matchAll(/(?:[{,]\s*)"?(w|q|title|text|nk)"?\s*:\s*("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g)) {
+    const raw = m[2].slice(1, -1);
+    const val = m[2][0] === '"' ? unquote(raw) : raw.replace(/\\'/g, "'");
+    out.push(m[1] === 'title' ? val : hebrewLitSpoken(val));
+  }
+  for (const m of i18nText.matchAll(/\bS\(\s*"(i_[^"]*)"\s*,\s*"((?:[^"\\]|\\.)*)"/g))
+    out.push(hebrewLitSpoken(unquote(m[2])));
+  return out;
+}
+
 /* civics-elem/js/data.js: RAW הוא טקסט שורות. מוקלט כל הטקסט העברי שהאפליקציה מקריאה:
    כותרת נושא (S), משפט (L), שאלה (Q) ותשובה (E). שדה 'he' הוא הראשון אחרי הקידומת. */
 function civicsElem(text) {
@@ -288,6 +315,18 @@ function corpus(app) {
     const tf = path.join(ROOT, files[0]);
     if (!fs.existsSync(tf)) return seen;
     for (const raw of civicsElem(fs.readFileSync(tf, 'utf8'))) {
+      const text = plainOf(String(raw));
+      if (!/[א-ת]/.test(text)) continue;
+      if (text.split(' ').length < 2) continue;
+      const id = R.id(text);
+      if (!seen.has(id)) seen.set(id, text);
+    }
+    return seen;
+  }
+  if (app === 'hebrew-lit') {
+    const [df, tf] = files.map(f => path.join(ROOT, f));
+    if (!fs.existsSync(df) || !fs.existsSync(tf)) return seen;
+    for (const raw of hebrewLit(fs.readFileSync(df, 'utf8'), fs.readFileSync(tf, 'utf8'))) {
       const text = plainOf(String(raw));
       if (!/[א-ת]/.test(text)) continue;
       if (text.split(' ').length < 2) continue;
