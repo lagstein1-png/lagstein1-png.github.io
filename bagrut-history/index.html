@@ -290,6 +290,8 @@ main{padding:1.1rem 0 3rem}
 .verdict{border-radius:12px;padding:.7rem .85rem;font-weight:800}
 .verdict.ok{background:var(--ok-soft);color:var(--ok)}
 .verdict.no{background:var(--bad-soft);color:var(--bad)}
+/* סעיף שעדיין אין לו תשובה סופית — לא נכון ולא שגוי */
+.verdict.wait{background:var(--warn-soft);color:var(--warn)}
 .verdict .why{display:block;font-weight:400;font-size:.94em;margin-top:.3rem;color:var(--ink)}
 
 /* רמז שנחשף. המספר בצד אינו קישוט: הוא אומר לתלמיד כמה נשארו,
@@ -338,7 +340,7 @@ main{padding:1.1rem 0 3rem}
   text-align:center;margin-bottom:.9rem;
 }
 .score .big{font-size:2.1em;font-weight:800;line-height:1.1;color:var(--accent)}
-.calm-praise{text-align:center;font-weight:600;color:#7c5e10;margin:-.3rem 0 .9rem}
+.calm-praise{text-align:center;font-weight:600;color:var(--warn);margin:-.3rem 0 .9rem}
 @keyframes calmGlow{0%{box-shadow:0 0 0 0 rgba(180,140,40,0)}35%{box-shadow:0 0 26px 6px rgba(180,140,40,.45)}100%{box-shadow:0 0 0 0 rgba(180,140,40,0)}}
 .score.calm-glow{animation:calmGlow 2.6s ease-out 1}
 .reduce-motion .score.calm-glow{animation:none}
@@ -498,10 +500,12 @@ footer{color:var(--faint);font-size:.85em;padding:1.2rem 0 2rem;text-align:cente
           <div class="desc" data-i18n="langDesc">תרגום מכונה</div>
         </div>
         <div class="group" role="group" aria-label="שפה">
-          <button class="btn" data-lang="he" type="button">עברית</button>
-          <button class="btn" data-lang="ar" type="button">العربية</button>
-          <button class="btn" data-lang="ru" type="button">Русский</button>
-          <button class="btn" data-lang="en" type="button">English</button>
+          <!-- `lang` על כל כפתור: בלעדיו קורא מסך שרץ בעברית הגה את
+               "العربية" ואת "Русский" בקול עברי, כלומר כגיבוב תווים. -->
+          <button class="btn" data-lang="he" lang="he" type="button">עברית</button>
+          <button class="btn" data-lang="ar" lang="ar" type="button">العربية</button>
+          <button class="btn" data-lang="ru" lang="ru" type="button">Русский</button>
+          <button class="btn" data-lang="en" lang="en" type="button">English</button>
         </div>
       </div>
       <div class="row">
@@ -640,7 +644,7 @@ footer{color:var(--faint);font-size:.85em;padding:1.2rem 0 2rem;text-align:cente
 <script src="speech.js"></script>
 <div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
      align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
-     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
+     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center">
   <div style="max-width:32rem">
     <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
     <h1 style="font-size:1.4rem;margin:0 0 .6rem" data-i18n="gateH1">האפליקציה הזאת עדיין לא פורסמה</h1>

@@ -238,6 +238,11 @@ const SUITE = [
      שגיאה ואין מסך שבור, ו-47 הבדיקות עברו. */
   { id: 'shadow',   args: [],     needsServer: true },
   { id: 'say',      args: [],     needsServer: true },
+  /* אותו באג, בלי דפדפן ובלי רשימת שמות. `say.js` מכוון לארבע
+     אפליקציות בשם, ולכן עשר אפליקציות שנולדו מהעתקה נשאו את
+     דליפת הרווח והיו ירוקות אצלו (4.10.2026). כאן נקרא כל
+     index.html שב-stages.json. */
+  { id: 'spacesay', args: [],     needsServer: false },
   /* מה שבאמת מגיע למנוע ההקראה. content.js מודד שדה שנדגם; זה מריץ
      את speakMath על שאלות שנבנו וקורא את הפלט. תפס ^ גולמי ב-math-uni2
      בזמן ש-content.js החזיר עליה PASS. */

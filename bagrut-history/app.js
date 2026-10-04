@@ -14,7 +14,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "h120 · 2026-10-04";
+  var BUILD = "h121 · 2026-10-04";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -289,7 +289,12 @@
     return stripLhs(s);
   }
   function checkAnswer(fa, raw) {
-    if (!fa) return { ok: false, why: "לסעיף הזה אין עדיין תשובה סופית בקובץ התוכן." };
+    /* סעיף בלי תשובה סופית אינו תשובה שגויה. עד שיגיע מפתח ההערכה
+       הרשמי אין במה להשוות, ו"עוד לא." אדום על תשובה נכונה הוא בדיוק
+       מה שגורם ללומד להפסיק להאמין לאפליקציה גם כשהיא צודקת. */
+    if (!fa) return { ok: false, nokey: true,
+      why: "התשובה הסופית לסעיף הזה עוד לא נכתבה — היא תתווסף עם מפתח ההערכה " +
+           "הרשמי של משרד החינוך. מה שכתבתם נשמר, ואפשר לפתוח את הרמזים ואת הפתרון המלא." };
     if (!String(raw || "").trim()) return { ok: false, why: "עוד לא נכתבה תשובה." };
     if (fa.type === "number") {
       var v = parseNum(raw);
@@ -441,8 +446,14 @@
        שצריך לגרור. */
     var h = '<div class="sub"><div class="saybar">' +
       spkBtn(id, "הקריאו את סעיף " + sub.letter) +
-      '<div class="grow"><h3 id="t-' + id + '"><span class="letter">' + esc(sub.letter) +
-      ".</span> " + "</h3>" + paraHtml(sub.text) +
+      /* ה-id יושב על עוטף שמכיל גם את הכותרת וגם את הפסקאות. כשהוא
+         ישב על ה-h3 לבדו — והפסקאות מחוצה לו — `Speech.mark` לא מצא
+         בתוכו ולו span אחד עם `.sent`, ונפל להדגשת היחידה כולה:
+         מסגרת צהובה סביב האות "א." בזמן שהסעיף עצמו מוקרא בלי שום
+         סימן. ב-bagrut-806 הטקסט יושב בתוך ה-h3 (שם הוא שורה אחת);
+         כאן הוא פסקאות, ו-<p> אינו חוקי בתוך כותרת. */
+      '<div class="grow"><div id="t-' + id + '"><h3><span class="letter">' + esc(sub.letter) +
+      ".</span></h3>" + paraHtml(sub.text) + "</div>" +
       '<p class="meta">' + plural(sub.points, "נקודה אחת", "שתי נקודות", "נקודות") +
       "</p></div></div>";
     h += formula(sub.latex, "f-" + id);
@@ -490,10 +501,10 @@
          בדף מרגע הטעינה ולכן נקרא באמינות; אזור חי שנוצר יחד עם
          התוכן שבתוכו אינו מוכרז בכל קורא מסך. שני הערוצים יחד היו
          משמיעים "נכון" פעמיים. */
-      h += '<div class="verdict ' + (st.res.ok ? "ok" : "no") + '">' +
-        "<span>" + (st.res.ok ? "נכון." : "עוד לא.") + "</span>" +
+      h += '<div class="verdict ' + (st.res.nokey ? "wait" : st.res.ok ? "ok" : "no") + '">' +
+        "<span>" + (st.res.nokey ? "עוד אי אפשר לבדוק." : st.res.ok ? "נכון." : "עוד לא.") + "</span>" +
         (st.res.why ? '<span class="why">' + esc(st.res.why) + "</span>" : "") +
-        (!st.res.ok && st.tries >= 2 && !st.sol
+        (!st.res.ok && !st.res.nokey && st.tries >= 2 && !st.sol
           ? '<span class="why">אפשר לקחת רמז, ואפשר לפתוח את הפתרון המלא.</span>' : "") +
         "</div>";
     }
@@ -791,7 +802,7 @@
          ההתקדמות הוא אינו נספר: "לא הגעתי לזה" אינו "טעיתי בזה",
          ובחינה שנגמר בה הזמן הייתה מוסיפה לנושא כישלון לכל סעיף
          שהתלמיד לא הספיק להגיע אליו. */
-      if (String(SIM.ans[it.id] || "").trim()) recordResult(it.q, it.id, r.ok);
+      if (String(SIM.ans[it.id] || "").trim() && it.sub.finalAnswer) recordResult(it.q, it.id, r.ok);
       if (byChapter[it.q.chapter] && r.ok) byChapter[it.q.chapter].got += pts;
       rows.push({ id: it.id, letter: it.sub.letter, number: it.q.number,
                   topic: it.q.topic, ok: r.ok, pts: pts,
@@ -831,8 +842,8 @@
       var sid = id + "s" + si;
       h += '<div class="sub"><div class="saybar">' +
         spkBtn(sid, "הקריאו את סעיף " + sub.letter) +
-        '<div class="grow"><h3 id="t-' + sid + '"><span class="letter">' + esc(sub.letter) +
-        ".</span> " + "</h3>" + paraHtml(sub.text) +
+        '<div class="grow"><div id="t-' + sid + '"><h3><span class="letter">' + esc(sub.letter) +
+        ".</span></h3>" + paraHtml(sub.text) + "</div>" +
         '<p class="meta">' + plural(sub.points, "נקודה אחת", "שתי נקודות", "נקודות") +
         "</p></div></div>";
       h += formula(sub.latex, "f-" + sid);
@@ -882,7 +893,7 @@
     var pct = r.max ? Math.round((r.got / r.max) * 100) : 0;
     var h = "";
     if (r.byTime) h += '<p class="note">הזמן נגמר, והבחינה הוגשה כפי שהייתה.</p>';
-    var glow = pct >= 75 && !(store.data && store.data.a11y && store.data.a11y.reduceMotion);
+    var glow = pct >= 75 && !(store.data && store.data.reduceMotion);
     h += '<div class="score' + (glow ? " calm-glow" : "") + '"><div class="big">' + pct + "</div>" +
       "<div>" + r.got + " מתוך " + r.max + " נקודות</div></div>";
     h += calmPraise(pct);
@@ -1107,7 +1118,7 @@
   var TUT_ID = null;
   if (window.TUTOR) {
     TUTOR.mount({
-      app: "advanced-math",
+      app: "bagrut-history",
       pickLang: true,                 /* אין בורר באפליקציה — הפאנל מביא אחד */
       lang: function () { return "he" },
       q: function () {
@@ -1153,7 +1164,7 @@
         say("שאלה " + it.q.number + " סעיף " + it.sub.letter);
       };
       BARAK.register({
-        app: "advanced-math",
+        app: "bagrut-history",
         getScreenContext: function () {
           var it = bkCur();
           if (!it) return null;
@@ -1254,7 +1265,7 @@
       "[data-go],[data-exam],[data-topic],[data-fs],[data-theme],[data-rate],[data-say],[data-a11y]," +
       "[data-read],[data-read-el],[data-check],[data-hint],[data-sol],[data-hclear],[data-tutor]," +
       "[data-simstart],[data-simend]," +
-      "#btn-reset,#btn-stop,#btn-try," +
+      "#btn-reset,#btn-stop,#btn-try,#btn-tutor-home," +
       "#btn-pause,#btn-back,#btn-fwd") : null;
     if (!el) return;
 
@@ -1330,12 +1341,15 @@
       pc2.res = checkAnswer(sc.sub.finalAnswer, pc2.val);
       pc2.tries++;
       /* לחיצה על "בדקו" בשדה ריק אינה ניסיון שנכשל אלא לחיצה בטעות. */
-      if (String(pc2.val || "").trim()) recordResult(sc.q, chk, pc2.res.ok);
+      /* בלי מפתח תשובות אין תוצאה לרשום. בלי התנאי הזה כל סעיף
+         שנבדק נספר ככישלון, ומסך ההתקדמות צבע את כל הנושאים באדום. */
+      if (String(pc2.val || "").trim() && sc.sub.finalAnswer) recordResult(sc.q, chk, pc2.res.ok);
       renderAns(chk);
       /* אותו מידע שמופיע על המסך, ולא פחות ממנו: הנוסח שמופיע אחרי
          שני ניסיונות הוא הדרך היחידה קדימה למי שנתקע, ומי שמקשיב
          היה מפספס אותו לגמרי. */
-      say(pc2.res.ok ? "נכון" :
+      say(pc2.res.nokey ? "עוד אי אפשר לבדוק. " + (pc2.res.why || "") :
+          pc2.res.ok ? "נכון" :
           "עוד לא. " + (pc2.res.why || "") +
           (pc2.tries >= 2 && !pc2.sol ? " אפשר לקחת רמז, ואפשר לפתוח את הפתרון המלא." : ""));
       /* שגוי — חוזרים לשדה, שם צריך לתקן. נכון — חוזרים לכפתור
@@ -1480,7 +1494,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=h120-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=h121-pwa1").catch(function () {});
     });
   }
 
@@ -1490,14 +1504,17 @@
   rebuildWeak();
   applyPrefs();
   $("#build").textContent = BUILD;
+  /* התרגום מוחל לפני השער ולא אחריו. אחריו, דובר ערבית שהגיע בלי
+     מפתח ראה מסך נעול בעברית — ושלוש המחרוזות שלו (gateH1, gateP,
+     gateLink) כבר כתובות בארבע שפות ב-lang.js ופשוט לא הגיעו למסך. */
+  I18N.apply(I18N.cur());
   /* INTERNAL-GATE — לא נטענת בלי מפתח. */
   if (typeof INTERNAL_OK !== "undefined" && !INTERNAL_OK) {
     var g = document.getElementById("gate");
     if (g) g.hidden = false;
-    document.title = "לא פורסם";
+    document.title = "לא פורסם";   /* כלשון התבנית המשותפת, .claude/qa/internal-gate.html */
     return;
   }
-  I18N.apply(I18N.cur());
   document.addEventListener("langchange", function () { go(state.screen); });
   if (store.data.examId && examById(store.data.examId)) state.examId = store.data.examId;
   go("home");

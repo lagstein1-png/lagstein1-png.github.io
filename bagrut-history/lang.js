@@ -206,7 +206,13 @@ var I18N = (function () {
       note.textContent = cur() === "he" ? "" : t("mtNote");
     }
     document.querySelectorAll("[data-lang]").forEach(function (b) {
-      b.classList.toggle("on", b.getAttribute("data-lang") === cur());
+      var sel = b.getAttribute("data-lang") === cur();
+      b.classList.toggle("on", sel);
+      /* `.btn.on` אינו קיים ב-CSS של האפליקציה הזאת, ולכן ה-class
+         לבדו לא צבע דבר: הסימון בפועל הוא `.btn[aria-pressed="true"]`,
+         בדיוק כמו בשאר בוררי ההגדרות. והוא גם מה שמכריז לקורא מסך
+         איזו שפה נבחרה. */
+      b.setAttribute("aria-pressed", String(sel));
     });
   }
   function apply(l) {

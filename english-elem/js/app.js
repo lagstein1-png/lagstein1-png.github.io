@@ -161,9 +161,11 @@ function nextQ(){
   if(R.i+1>=R.qs.length){state.done[unit.id]=true;save();view="done";render();confetti(60);return}
   R.i++;R.tries=0;R.hints=0;R.locked=false;R.gone={};render();window.scrollTo(0,0);
 }
+/* משאירים תמיד שתי אפשרויות. מי שכבר טעה פעם אחת נשאר לו מסיח אחד להסרה;
+   לפני התיקון הוסרו שניים ונשארה רק התשובה הנכונה. */
 function eliminate(){
   var q=curQ(),wrong=[];q.opts.forEach(function(_,i){if(i!==q.ans&&!R.gone[i])wrong.push(i)});
-  sample(wrong,Math.min(2,wrong.length)).forEach(function(i){R.gone[i]=1;var b=$("#opt"+i);b.classList.add("soft");b.disabled=true});
+  sample(wrong,Math.max(0,wrong.length-1)).forEach(function(i){R.gone[i]=1;var b=$("#opt"+i);b.classList.add("soft");b.disabled=true});
 }
 function hintKey(q){return q.kind==="auth"?"h_auth":q.kind==="alisten"?"h_al":"h_"+q.kind}
 function hint(){
@@ -274,7 +276,18 @@ if(!window.__GATED){
   if(_g){var _p=_g.split(":");unit=unitById(_p[1]);if(unit){if(_p[0]==="lesson")go("lesson");else if(_p[0]==="practice")startRound(unit)}}
 }
 /* ---------- Limor (shared tutor), mounted only when the shared scripts exist ---------- */
-function screenQ(){if(view!=="practice"||!R)return null;var q=curQ();return {stim:q.kind==="auth"?q.stim:(q.w?q.w.en:""),prompt:promptText(q,"he")}}
+/* מה שכתוב ללומד על המסך, ולא יותר. בשאלת הקשבה הטקסט מוסתר בכוונה,
+   ובשאלת תמונה או אות המילה היא התשובה — לימור מקבלת correct:null,
+   ועד כאן קיבלה את התשובה בתוך השאלה עצמה. */
+function visibleStim(q){
+  if(q.kind==="auth")return q.listen?"":(q.stim||"");
+  if(!q.w)return "";
+  if(q.kind==="listen"||q.kind==="alisten")return "";
+  if(q.kind==="emoji")return q.w.emoji;
+  if(q.kind==="aw")return q.w.letter;
+  return q.w.en;   /* meaning, al — המילה כתובה על המסך */
+}
+function screenQ(){if(view!=="practice"||!R)return null;var q=curQ();return {stim:visibleStim(q),prompt:promptText(q,"he")}}
 if(window.TUTOR&&!window.__GATED){
   TUTOR.mount({app:"english-elem",lang:function(){return state.lang},
     q:function(){var s=screenQ();if(!s)return null;return {expr:(s.stim?s.stim+" — ":"")+s.prompt,ans:null,level:unit?uTitle(unit,"he"):""}},

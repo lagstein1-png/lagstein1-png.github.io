@@ -3031,7 +3031,10 @@ function genTrafo(L){
   var Np,Ns,Vp,Vs,Ip,Is,k;
   k=pick([2,4,5,10,20]);Vp=pick([230,400]);
   if(L===1){
-    Np=pick([200,400,500,1000]);Ns=Np/k;Vs=Vp/k;
+    /* אותה מלכודת כמו ברמה 2: 400 V עם 400 כריכות בראשוני נתן V_s
+       שווה בדיוק ל-N_s שכבר מודפס בשאלה, ועם יחס 2 הוא יצא שווה
+       ל-N_p. הלומד קורא את התשובה מן השאלה במקום לחשב יחס. */
+    Vs=Vp/k;do{Np=pick([200,400,500,1000]);Ns=Np/k}while(Vs===Ns||Vs===Np);
     return {ask:_("מה המתח בליפוף המשני של שנאי אידיאלי?"),
       expr:"V<sub>p</sub> = "+U(Vp,"V")+" ,  N<sub>p</sub> = "+Np+" ,  N<sub>s</sub> = "+Ns,
       ans:W(U(Vs,"V")),
@@ -3058,7 +3061,10 @@ function genTrafo(L){
       rule:"trafo",hint:_("מספר הכריכות ביחס ישר למתח.")};
   }
   if(L===3){
-    Ip=pick([1,2,5]);Is=Ip*k;Vs=Vp/k;
+    /* 400 V עם יחס 20 וזרם ראשוני 1 A נתן I_s = 20 A, וזה בדיוק
+       המספר של V_s = 20 V שבשאלה. היחידה שונה, אבל המספר זהה —
+       והלומד בוחר אותו בלי לחשב. */
+    Vs=Vp/k;do{Ip=pick([1,2,5]);Is=Ip*k}while(Is===Vs);
     return {ask:_("מה הזרם בליפוף המשני של שנאי אידיאלי מוריד מתח?"),
       expr:"V<sub>p</sub> = "+U(Vp,"V")+" ,  V<sub>s</sub> = "+U(Vs,"V")+" ,  I<sub>p</sub> = "+U(Ip,"A"),
       ans:W(U(Is,"A")),

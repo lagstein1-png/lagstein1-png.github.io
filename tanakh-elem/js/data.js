@@ -106,7 +106,7 @@ L נחש דיבר אל חוה ואמר: "תאכלי מהעץ הזה". היא א�
 L אלוהים ידע מה קרה. אדם וחוה יצאו מהגן.|عرف الله ما حدث. خرج آدم وحواء من الجنة.|Бог узнал, что случилось. Адам и Ева вышли из сада.|God knew what happened. Adam and Eve left the garden.
 L הסיפור מלמד: חשוב לשמור על ההוראות ולהגיד את האמת.|تعلّمنا القصة: من المهم أن نلتزم بالتعليمات وأن نقول الحقيقة.|История учит: важно соблюдать правила и говорить правду.|The story teaches: it is important to follow instructions and tell the truth.
 Q איך קוראים לגן שאלוהים עשה?|ماذا اسم الجنة التي صنعها الله؟|Как называется сад, который создал Бог?|What was the garden that God made called?|eden|jericho,sinai,egypt
-Q מי היה האדם הראשון?|من كان الإنسان الأول؟|Кто был первым человеком?|Who was the first person?|adam|noah,abraham,moses
+Q איך קראו לאיש הראשון?|ماذا كان اسم الإنسان الأول؟|Как звали первого человека?|What was the first person called?|adam|noah,abraham,moses
 Q איך קראו לאישה הראשונה?|ماذا كان اسم المرأة الأولى؟|Как звали первую женщину?|What was the first woman called?|eve|sarah,rebecca,rachel
 Q איזה בעל חיים דיבר אל חוה?|أي حيوان تكلم مع حواء؟|Какое животное говорило с Евой?|Which animal spoke to Eve?|snake|dove,lion,camel
 Q מאיזה עץ אסור היה לאכול?|من أي شجرة لم يكن مسموحًا الأكل؟|С какого дерева нельзя было есть?|Which tree were they not allowed to eat from?|knowledge|fig,olive,palm
@@ -144,7 +144,7 @@ Q מי בנה תיבה?|من بنى الفلك؟|Кто построил ков�
 Q מה הופיע בשמיים אחרי הגשם?|ماذا ظهر في السماء بعد المطر؟|Что появилось в небе после дождя?|What appeared in the sky after the rain?|t_rainbow|t_ark,t_tower,t_sunset
 Q כמה בעלי חיים מכל סוג נכנסו לתיבה?|كم حيوانًا من كل نوع دخل الفلك؟|Сколько животных каждого вида вошло в ковчег?|How many animals of each kind went into the ark?|n2|n1,n3,n4
 Q מי נכנס לתיבה עם נוח?|من دخل الفلك مع نوح؟|Кто вошёл в ковчег вместе с Ноем?|Who went into the ark with Noah?|t_family|t_pharaoh,t_goliath,t_army
-Q איזה עלה הביאה היונה?|أي ورقة أحضرتها الحمامة؟|Какой лист принесла голубка?|Which leaf did the dove bring?|olive|fig,palm,knowledge
+Q מאיזה עץ היה העלה שהיונה הביאה?|من أي شجرة كانت الورقة التي أحضرتها الحمامة؟|С какого дерева был лист, который принесла голубка?|Which tree did the dove's leaf come from?|olive|fig,palm,knowledge
 Q מה היה הסימן לשלום?|ما كانت علامة السلام؟|Что было знаком мира?|What was the sign of peace?|t_rainbow|t_ark,t_tower,t_sunset
 E t_ark|t|תיבה|فلكًا|ковчег|an ark
 E t_tower|t|מגדל|برجًا|башню|a tower
@@ -173,10 +173,10 @@ Q איפה ישב אברהם כשהאורחים הגיעו?|أين جلس إبر
 Q מה אברהם נתן לאורחים? מים, לחם ו...|ماذا أعطى إبراهيم للضيوف؟ ماءً وخبزًا و...|Что Авраам дал гостям? Воду, хлеб и...|What did Abraham give the guests? Water, bread and...|t_food|t_swords,t_books,t_toys
 Q איזה בן נולד לאברהם ולשרה?|أي ابن وُلد لإبراهيم وسارة؟|Какой сын родился у Авраама и Сары?|Which son was born to Abraham and Sarah?|isaac|jacob,esau,joseph
 Q בן כמה היה אברהם כשנולד יצחק?|كم كان عمر إبراهيم عندما وُلد إسحاق؟|Сколько лет было Аврааму, когда родился Исаак?|How old was Abraham when Isaac was born?|n100|n10,n40,n12
-Q מה עשתה שרה כשקיבלה את הבשורה?|ماذا فعلت سارة عندما سمعت الخبر؟|Что сделала Сара, когда услышала новость?|What did Sarah do when she heard the news?|t_laugh|t_cry,t_run,t_sleep
+Q מה עשתה שרה כשקיבלה את הבשורה?|ماذا فعلت سارة عندما سمعت الخبر؟|Что сделала Сара, когда услышала новость?|What did Sarah do when she heard the news?|t_laugh|t_cry,t_run,t_sleptf
 Q מה אלוהים הבטיח לאברהם?|ماذا وعد الله إبراهيم؟|Что Бог обещал Аврааму?|What did God promise Abraham?|t_son|t_boat,t_castle,t_gold
 Q איזו מצווה קיים אברהם כשקיבל אורחים?|أي وصية طبّق إبراهيم عندما استقبل الضيوف؟|Какую заповедь исполнил Авраам, приняв гостей?|Which good deed did Abraham do when he welcomed guests?|t_guests|t_wars,t_trade,t_hunt
-Q עם איזה חיות יצא אברהם לדרך?|مع أي حيوانات انطلق إبراهيم؟|С какими животными Авраам отправился в путь?|With which animals did Abraham set out?|camel|whale,frogs,lion
+Q איזו חיה הלכה עם אברהם בדרך?|أي حيوان سار مع إبراهيم في الطريق؟|Какое животное шло с Авраамом в пути?|Which animal walked with Abraham on the journey?|camel|whale,frogs,lion
 E t_tent|t|האוהל|الخيمة|шатёр|the tent
 E t_food|t|אוכל|طعامًا|еду|food
 E t_swords|t|חרבות|سيوفًا|мечи|swords
@@ -184,6 +184,7 @@ E t_books|t|ספרים|كتبًا|книги|books
 E t_laugh|t|צחקה|ضحكت|засмеялась|she laughed
 E t_cry|t|בכתה|بكت|заплакала|she cried
 E t_run|t|ברחה|هربت|убежала|she ran away
+E t_sleptf|t|נרדמה|نامت|уснула|she fell asleep
 E t_son|t|בן|ابنًا|сына|a son
 E t_boat|t|סירה|قاربًا|лодку|a boat
 E t_castle|t|טירה|قلعة|замок|a castle
@@ -243,7 +244,7 @@ L גם האחים של יוסף באו ממדינה אחרת. הם לא הכיר
 L יוסף סלח להם. הוא אמר: "אל תפחדו". כל המשפחה עברה לגור במצרים.|سامحهم يوسف. قال: «لا تخافوا». وانتقلت العائلة كلها لتسكن في مصر.|Иосиф простил их. Он сказал: «Не бойтесь». Вся семья переехала жить в Египет.|Joseph forgave them. He said, "Do not be afraid." The whole family moved to live in Egypt.
 Q כמה בנים היו ליעקב?|كم ابنًا كان ليعقوب؟|Сколько сыновей было у Иакова?|How many sons did Jacob have?|n12|n7,n10,n40
 Q מה יעקב נתן ליוסף?|ماذا أعطى يعقوب ليوسف؟|Что Иаков подарил Иосифу?|What did Jacob give Joseph?|t_coat|t_ring,t_sword,t_crown
-Q למי האחים מכרו את יוסף?|لمن باع الإخوة يوسف؟|Кому братья продали Иосифа?|Who did the brothers sell Joseph to?|t_traders|t_soldiers,t_angels,t_children
+Q מי קנה את יוסף מהאחים?|من اشترى يوسف من إخوته؟|Кто купил Иосифа у братьев?|Who bought Joseph from his brothers?|t_traders|t_soldiers,t_angels,t_children
 Q לאיזו מדינה הובא יוסף?|إلى أي بلد أُحضر يوسف؟|В какую страну привезли Иосифа?|Which country was Joseph taken to?|egypt|canaan,midian,haran
 Q איפה יוסף היה אחרי שעבד בבית?|أين كان يوسف بعد أن عمل في البيت؟|Где оказался Иосиф после работы в доме?|Where was Joseph after he worked in the house?|t_prison|t_garden,t_school,t_ship
 Q מי חלם על פרות?|من حلم ببقرات؟|Кому приснились коровы?|Who dreamed about cows?|pharaoh|jacob,saul,moses
@@ -260,7 +261,7 @@ E t_coat|t|כתונת צבעונית|قميصًا ملوّنًا|разноцв�
 E t_ring|t|טבעת|خاتمًا|кольцо|a ring
 E t_sword|t|חרב|سيفًا|меч|a sword
 E t_crown|t|כתר|تاجًا|корону|a crown
-E t_traders|t|לסוחרים|لتجار|торговцам|traders
+E t_traders|t|הסוחרים|التجار|торговцы|the traders
 E t_prison|t|בבית הסוהר|في السجن|в тюрьме|in prison
 E t_garden|t|בגן|في حديقة|в саду|in a garden
 E t_school|t|בבית ספר|في مدرسة|в школе|in a school
@@ -291,7 +292,7 @@ L יום אחד משה ראה סנה בוער, אבל הסנה לא נשרף. ה
 L אלוהים קרא לו מתוך הסנה: "משה, לך אל פרעה. שחרר את עמי". משה פחד, ואלוהים אמר: "אהרן אחיך יעזור לך".|ناداه الله من العليقة: «موسى، اذهب إلى فرعون. أطلق شعبي». خاف موسى، فقال الله: «أخوك هارون سيساعدك».|Бог позвал его из куста: «Моисей, иди к фараону. Отпусти Мой народ». Моисей испугался, и Бог сказал: «Твой брат Аарон поможет тебе».|God called to him from the bush: "Moses, go to Pharaoh. Let my people go." Moses was afraid, and God said, "Your brother Aaron will help you."
 Q איפה פרעה שלט?|أين حكم فرعون؟|Где правил фараон?|Where did Pharaoh rule?|egypt|canaan,midian,jericho
 Q באיזה נהר צפה התינוק משה?|على أي نهر طفا الطفل موسى؟|На какой реке плыл маленький Моисей?|On which river did baby Moses float?|nile|jordan,sea,redsea
-Q באיזו תיבה שמה אמא את משה?|ماذا وضعت أم موسى فيه ابنها؟|Во что мать положила Моисея?|What did Moses' mother put him in?|t_basket|t_bed,t_boat,t_castle
+Q במה שמה אמא את משה?|ماذا وضعت أم موسى فيه ابنها؟|Во что мать положила Моисея?|What did Moses' mother put him in?|t_basket|t_bed,t_boat,t_castle
 Q מי שמרה על משה מרחוק?|من راقبت موسى من بعيد؟|Кто издалека смотрел за Моисеем?|Who watched Moses from far away?|miriam|sarah,rachel,rebecca
 Q מי מצאה את התינוק?|من وجدت الطفل؟|Кто нашёл малыша?|Who found the baby?|t_pharaohdaughter|t_rachel_n,t_sarah_n,t_eve_n
 Q לאן משה ברח כשהתבגר?|إلى أين هرب موسى عندما كبر؟|Куда убежал Моисей, когда вырос?|Where did Moses run to when he grew up?|midian|egypt,canaan,jericho
@@ -302,7 +303,7 @@ Q מי קרא למשה מתוך הסנה?|من ناد موسى من العليق
 Q את מי משה היה צריך לבקש לשחרר?|مَن كان على موسى أن يطلب إطلاق سراحهم؟|Кого Моисей должен был попросить отпустить?|Whom did Moses have to ask to let go?|t_israelites|t_pharaoh,t_animals_n,t_soldiers
 Q מי עזר למשה?|من ساعد موسى؟|Кто помогал Моисею?|Who helped Moses?|aaron|esau,saul,laban
 Q מה היה השם של אחות משה?|ما اسم أخت موسى؟|Как звали сестру Моисея?|What was Moses' sister's name?|miriam|sarah,rachel,eve
-E t_basket|t|סל קטן|سلة صغيرة|маленькая корзина|a small basket
+E t_basket|t|תיבה|سلة|корзину|a basket
 E t_pharaohdaughter|t|בת פרעה|ابنة فرعون|дочь фараона|Pharaoh's daughter
 E t_rachel_n|t|רחל|راحيل|Рахиль|Rachel
 E t_sarah_n|t|שרה|سارة|Сара|Sarah
@@ -342,7 +343,6 @@ E t_pita|t|פיתה|خبز عربي|пита|pita
 E t_bagel|t|בייגל|كعكة سمسم|бублик|a bagel
 E t_seagalilee|t|הכנרת|بحيرة طبريا|Галилейское море|the Sea of Galilee
 E t_staff|t|מטה|عصاه|посох|his staff
-E t_sword|t|חרב|سيف|меч|a sword
 E t_torch|t|לפיד|مشعلًا|факел|a torch
 E t_flag|t|דגל|علمًا|флаг|a flag
 E t_dryland|t|ביבשה, בין קירות מים|على اليابسة بين جدارين من الماء|по суше между стенами воды|on dry land between walls of water
@@ -465,8 +465,8 @@ E t_guitar|t|גיטרה|غيتار|гитара|the guitar
 E t_sling|t|בקלע|بالمقلاع|пращой|a sling
 E t_bow|t|בקשת|بالقوس|луком|a bow
 E t_spear|t|ברומח|بالرمح|копьём|a spear
-E t_catapult|t|במעוט|بمنجنيق|катапультой|a catapult
-E t_stones|t|אבנים|حجارة ملساء|камни|stones
+E t_catapult|t|בקטפולטה|بمنجنيق|катапультой|a catapult
+E t_stones|t|אבנים|حجارة|камни|stones
 E t_sticks|t|מקלות|عصي|палки|sticks
 E t_books_n|t|ספרים|كتب|книги|books
 E t_shoes|t|נעליים|أحذية|туфли|shoes

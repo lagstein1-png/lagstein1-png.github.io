@@ -23,7 +23,7 @@
 | `english-bagrut` | — | — | אינה בריפו הזה |
 | `literature` | j26 · 2026-10-04 | j26-pwa1 | תואם |
 | `tanakh` | p26 · 2026-10-04 | p26-pwa1 | תואם |
-| `hebrew-arab` | y12 · 2026-10-04 | y12-pwa1 | תואם |
-| `motal` | d18 · 2026-10-04 | d18-pwa1 | תואם |
+| `hebrew-arab` | y13 · 2026-10-04 | y13-pwa1 | תואם |
+| `motal` | d19 · 2026-10-04 | d19-pwa1 | תואם |
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-10-04.

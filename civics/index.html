@@ -7876,7 +7876,10 @@ document.addEventListener("keydown",function(e){
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();speak(saySpell(P.q.say),state.lang);return}
+  /* say נבנה כ"השאלה, התשובה הנכונה וההסבר" ונועד להישמע *אחרי*
+     המענה. לפני המענה הרווח מקריא את נוסח השאלה בלבד — אותו תיקון
+     שנעשה ב-literature ובשבע אחיותיה. */
+  if(e.key===" "){e.preventDefault();speak(saySpell(P.done?P.q.say:(P.q.lead||"")),state.lang);return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב

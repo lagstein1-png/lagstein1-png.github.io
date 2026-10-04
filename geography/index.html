@@ -347,6 +347,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;
   min-height:48px;padding:12px 14px;border-radius:11px;outline:none;background:var(--surface2);color:inherit;border:1px solid var(--line)}
 .field:focus{border-color:var(--accent)}
+/* outline:none שבשורה שמעליה גובר על :focus-visible הכללי — אותה
+   דרגת סגוליות, והוא מאוחר ממנו בקובץ. בלי הכלל הזה שדה השם של
+   הנבחן ותיבת הדבקת הקוד מסמנים מיקוד בשינוי צבע מסגרת של פיקסל
+   אחד בלבד, ומי שעובד במקלדת אינו רואה איפה הוא עומד. */
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 textarea.field{min-height:96px;resize:vertical}
 
 /* ---------- שורות המבחן ----------
@@ -839,6 +844,7 @@ T.he={
   trkMid:"גאוגרפיה של המזרח התיכון", trkMidD:"גבולות, אקלים ומים, אוכלוסייה, כלכלה וגאופוליטיקה",
   trkEretz:"גאוגרפיה של ארץ ישראל", trkEretzD:"מבנה ותצורות נוף לאורך הארץ",
   trkNativ:"נתי״ב — ניתוח תופעות יסוד במרחב", trkNativD:"קריאת מפות וכלים מרחביים",
+  trackW:"מסלול",
   
   lv1:"ידע", lv2:"הבנה", lv3:"ניתוח", lvC:"אתגר", chMixed:"שאלות מכל הנושאים והרמות, בלי רמזים", chTimer:"טיימר לשאלה", chOff:"כבוי", chSec:"{0} שנ׳", chTimeUp:"הזמן נגמר — התשובה נספרת כטעות",
   lv1D:"מושג והגדרה — מה זה אומר", lv2D:"מקרה קונקרטי — איזה עיקרון פועל כאן", lv3D:"דילמה, איזון וטיעון נגדי",
@@ -899,6 +905,7 @@ T.ar={
   trkMid:"جغرافية الشرق الأوسط", trkMidD:"الحدود، المناخ والمياه، السكان، الاقتصاد والجيوبوليتيكا",
   trkEretz:"جغرافية أرض إسرائيل", trkEretzD:"البنية والتضاريس على طول البلاد",
   trkNativ:"ناتيب، تحليل ظواهر أساسية في المجال", trkNativD:"قراءة الخرائط والأدوات المكانية",
+  trackW:"المسار",
   
   lv1:"معرفة", lv2:"فهم", lv3:"تحليل", lvC:"تحدٍّ", chMixed:"أسئلة من كل المواضيع والمستويات، بلا تلميحات", chTimer:"مؤقت لكل سؤال", chOff:"مطفأ", chSec:"{0} ث", chTimeUp:"انتهى الوقت، تُحسب الإجابة خطأ",
   lv1D:"مفهوم وتعريف، ماذا يعني", lv2D:"حالة عينية، أيّ مبدأ يعمل هنا", lv3D:"معضلة وموازنة وحجّة مضادّة",
@@ -959,6 +966,7 @@ T.ru={
   trkMid:"География Ближнего Востока", trkMidD:"Границы, климат и вода, население, экономика и геополитика",
   trkEretz:"География Земли Израиля", trkEretzD:"Строение и ландшафты вдоль страны",
   trkNativ:"НАТИВ: анализ базовых явлений в пространстве", trkNativD:"Чтение карт и пространственные инструменты",
+  trackW:"Направление",
   
   lv1:"Знание", lv2:"Понимание", lv3:"Анализ", lvC:"Вызов", chMixed:"вопросы из всех тем и уровней, без подсказок", chTimer:"таймер на вопрос", chOff:"выкл", chSec:"{0} сек", chTimeUp:"время вышло: ответ засчитан как ошибка",
   lv1D:"Понятие и определение, что это значит", lv2D:"Конкретный случай: какой принцип здесь работает", lv3D:"Дилемма, равновесие и контраргумент",
@@ -1019,6 +1027,7 @@ T.en={
   trkMid:"Geography of the Middle East", trkMidD:"Borders, climate and water, population, economy and geopolitics",
   trkEretz:"Geography of the Land of Israel", trkEretzD:"Structure and landforms along the country",
   trkNativ:"NATIV: analyzing basic spatial phenomena", trkNativD:"Map reading and spatial tools",
+  trackW:"Track",
   
   lv1:"Knowledge", lv2:"Understanding", lv3:"Analysis", lvC:"Challenge", chMixed:"questions from all topics and levels, no hints", chTimer:"timer per question", chOff:"off", chSec:"{0}s", chTimeUp:"time is up - the answer counts as wrong",
   lv1D:"A concept and its definition: what it means", lv2D:"A concrete case: which principle is at work", lv3D:"A dilemma, a balance and a counter-argument",
@@ -1104,7 +1113,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="q22 · 2026-10-04";
+var BUILD="q23 · 2026-10-04";
 var SKEY="geography-state-v1";
 var GKEY_STORE="geography-gkey";
 
@@ -2055,7 +2064,7 @@ topic("teva","mid",
     {he:"עיראק וסוריה, השוכנות על נהרות גדולים",ar:"العراق وسوريا الواقعتين على أنهار كبيرة",ru:"Ираке и Сирии, лежащих на больших реках",en:"Iraq and Syria, which lie on large rivers"},
     {he:"לבנון, העשירה במשקעים",ar:"لبنان الغني بالأمطار",ru:"Ливане, богатом осадками",en:"Lebanon, which is rich in rainfall"}],
    0,
-   {he:"חפשו מדינות עשירות באנרגיה, רעננות במים וקרובות לים.",ar:"ابحثوا عن دول غنية بالطاقة، فقيرة بالمياه وقريبة من البحر.",ru:"Ищите страны, богатые энергией, бедные водой и близкие к морю.",en:"Look for energy-rich, water-poor states close to the sea."}),
+   {he:"חפשו מדינות עשירות באנרגיה, דלות במים וקרובות לים.",ar:"ابحثوا عن دول غنية بالطاقة، فقيرة بالمياه وقريبة من البحر.",ru:"Ищите страны, богатые энергией, бедные водой и близкие к морю.",en:"Look for energy-rich, water-poor states close to the sea."}),
   Q("tv-4",
     {he:"הסהר הפורה הוא אזור שבו התפתחו חקלאות ותרבויות עתיקות בעיקר משום ש:",ar:"الهلال الخصيب منطقة تطورت فيها الزراعة والحضارات القديمة أساسًا لأن:",ru:"Плодородный полумесяц: область, где развились земледелие и древние цивилизации главным образом потому, что:",en:"The Fertile Crescent is where farming and ancient civilizations developed mainly because:"},
    [{he:"נהרות הפרת והחידקל אפשרו השקיה סדירה באזור צחיח",ar:"نهرا الفرات ودجلة أتاحا ريًا منتظمًا في منطقة قاحلة",ru:"Реки Евфрат и Тигр обеспечили регулярное орошение в засушливой области",en:"The Euphrates and Tigris rivers allowed regular irrigation in an arid region"},
@@ -2078,7 +2087,7 @@ topic("ukhlusiya","mid",
  [
   Q("uk-1",
     {he:"אוכלוסיית המזרח התיכון מתרכזת בעיקר:",ar:"يتمركز سكان الشرق الأوسط أساسًا:",ru:"Население Ближнего Востока сосредоточено главным образом:",en:"The Middle East's population is concentrated mainly:"},
-   [{he:"לאורך הנהרות, במדשאות ולאורך החופים — היכן שיש מים",ar:"على طول الأنهار، في الواحات وعلى السواحل، حيث توجد المياه",ru:"Вдоль рек, в оазисах и на побережьях: там, где есть вода",en:"Along rivers, in oases and along coasts: where water is found"},
+   [{he:"לאורך הנהרות, בנאות המדבר ולאורך החופים — היכן שיש מים",ar:"على طول الأنهار، في الواحات وعلى السواحل، حيث توجد المياه",ru:"Вдоль рек, в оазисах и на побережьях: там, где есть вода",en:"Along rivers, in oases and along coasts: where water is found"},
     {he:"בלב המדבריות, הרחק ממוקדי יישוב עתיקים",ar:"في قلب الصحارى، بعيدًا عن مراكز الاستيطان القديمة",ru:"В центре пустынь, вдали от древних очагов заселения",en:"In the heart of the deserts, far from ancient settlement hubs"},
     {he:"ברכסי ההרים הגבוהים בלבד",ar:"في سلاسل الجبال العالية فقط",ru:"Только в высоких горных хребтах",en:"Only in the high mountain ranges"},
     {he:"בפיזור שווה על פני כל שטח האזור",ar:"بتوزع متساوٍ على كامل مساحة المنطقة",ru:"Равномерно по всей территории региона",en:"Evenly spread across the whole region"}],
@@ -2095,7 +2104,7 @@ topic("ukhlusiya","mid",
   Q("uk-3",
     {he:"אחד האתגרים המרכזיים של העיור המהיר בערי המזרח התיכון הוא:",ar:"من أبرز تحديات التحضّر السريع في مدن الشرق الأوسط:",ru:"Одна из главных проблем быстрой урбанизации в городах Ближнего Востока:",en:"One of the main challenges of rapid urbanization in Middle Eastern cities is:"},
    [{he:"לחץ כבד על תשתיות, דיור ושירותים, והתפשטות שכונות עניים",ar:"ضغط شديد على البنى التحتية والإسكان والخدمات، وانتشار أحياء الفقر",ru:"Сильная нагрузка на инфраструктуру, жилье и услуги, и рост трущоб",en:"Heavy strain on infrastructure, housing and services, and the spread of slums"},
-    {he:"ירידה חדה במספר התושבים הערים הגדולות",ar:"انخفاض حاد في عدد سكان المدن الكبرى",ru:"Резкое сокращение населения крупных городов",en:"A sharp decline in the population of the largest cities"},
+    {he:"ירידה חדה במספר התושבים בערים הגדולות",ar:"انخفاض حاد في عدد سكان المدن الكبرى",ru:"Резкое сокращение населения крупных городов",en:"A sharp decline in the population of the largest cities"},
     {he:"היעלמות הכפרים בתוך דור אחד בכל האזור",ar:"اختفاء القرى خلال جيل واحد في كل المنطقة",ru:"Исчезновение деревень за одно поколение во всём регионе",en:"The disappearance of villages within one generation across the region"},
     {he:"עודף מקומות עבודה ללא עובדים שיאיישו אותם",ar:"فائض في الوظائف دون عمّال لشغلها",ru:"Избыток рабочих мест без работников",en:"A surplus of jobs with no workers to fill them"}],
    0,
@@ -2175,7 +2184,7 @@ topic("geo-pol","mid",
   Q("gp-2",
     {he:"אילו מהבאים הוא גורם גאוגרפי מרכזי לעימותים במזרח התיכון?",ar:"أي مما يلي عامل جغرافي مركزي للنزاعات في الشرق الأوسط؟",ru:"Что из перечисленного: центральный географический фактор конфликтов на Ближнем Востоке?",en:"Which of the following is a central geographic factor in Middle East conflicts?"},
    [{he:"התחרות על משאבים נדירים — מים ונפט — ועל מעברים אסטרטגיים",ar:"التنافس على موارد نادرة، المياه والنفط، وعلى الممرات الاستراتيجية",ru:"Соперничество за редкие ресурсы: воду и нефть, и за стратегические проходы",en:"Competition over scarce resources: water and oil, and over strategic passages"},
-    {he:"המיזוג האווירי הנעים המושך מתיישבים רבים מדי",ar:"الطقس اللطيف الذي يجذب مستوطنين كثرًا جدًا",ru:"Приятная погода, привлекающая слишком много переселенцев",en:"The pleasant weather attracting too many settlers"},
+    {he:"מזג האוויר הנעים המושך מתיישבים רבים מדי",ar:"الطقس اللطيف الذي يجذب مستوطنين كثرًا جدًا",ru:"Приятная погода, привлекающая слишком много переселенцев",en:"The pleasant weather attracting too many settlers"},
     {he:"המרחק הגדול מהים",ar:"البعد الكبير عن البحر",ru:"Большое удаление от моря",en:"The great distance from the sea"},
     {he:"היעדר מדינות ריבוניות באזור",ar:"غياب دول ذات سيادة في المنطقة",ru:"Отсутствие суверенных государств в регионе",en:"The absence of sovereign states in the region"}],
    0,
@@ -2187,7 +2196,7 @@ topic("geo-pol","mid",
     {he:"עיראק וערב הסעודית",ar:"العراق والسعودية",ru:"Ираком и Саудовской Аравией",en:"Iraq and Saudi Arabia"},
     {he:"טורקיה ואיראן",ar:"تركيا وإيران",ru:"Турцией и Ираном",en:"Turkey and Iran"}],
    0,
-   {he:"שני שכנים, שני חתימות חגיגיות בשנים שונות.",ar:"جاران، وتوقيعان احتفاليان في سنتين مختلفتين.",ru:"Два соседа, две торжественные подписи в разные годы.",en:"Two neighbors, two ceremonial signings in different years."}),
+   {he:"שני שכנים, שתי חתימות חגיגיות בשנים שונות.",ar:"جاران، وتوقيعان احتفاليان في سنتين مختلفتين.",ru:"Два соседа, две торжественные подписи в разные годы.",en:"Two neighbors, two ceremonial signings in different years."}),
   Q("gp-4",
     {he:"מהי הליגה הערבית?",ar:"ما هي الجامعة العربية؟",ru:"Что такое Лига арабских государств?",en:"What is the Arab League?"},
    [{he:"ארגון אזורי של מדינות ערב לשיתוף פעולה פוליטי, כלכלי ותרבותי",ar:"منظمة إقليمية للدول العربية للتعاون السياسي والاقتصادي والثقافي",ru:"Региональная организация арабских государств для политического, экономического и культурного сотрудничества",en:"A regional organization of Arab states for political, economic and cultural cooperation"},
@@ -2215,7 +2224,7 @@ topic("shekhenot","mid",
     {he:"לוב, תוניסיה, סודן ותימן",ar:"ليبيا وتونس والسودان واليمن",ru:"Ливия, Тунис, Судан и Йемен",en:"Libya, Tunisia, Sudan and Yemen"},
     {he:"כווית, בחריין, קטאר ואיחוד האמירויות",ar:"الكويت والبحرين وقطر والإمارات",ru:"Кувейт, Бахрейн, Катар и ОАЭ",en:"Kuwait, Bahrain, Qatar and the UAE"}],
    0,
-   {he:"הציעו מבט על המפה — מי נוגע בישראל מכל עבר?",ar:"ألقوا نظرة على الخريطة، من يلامس إسرائيل من كل جهة؟",ru:"Взгляните на карту: кто касается Израиля со всех сторон?",en:"Look at the map: who touches Israel on every side?"},null,"meMap"),
+   {he:"הציצו במפה — מי נוגע בישראל מכל עבר?",ar:"ألقوا نظرة على الخريطة، من يلامس إسرائيل من كل جهة؟",ru:"Взгляните на карту: кто касается Израиля со всех сторон?",en:"Look at the map: who touches Israel on every side?"},null,"meMap"),
   Q("sh-2",
     {he:"מצרים היא המדינה הערבית המאוכלסת ביותר. מהו הגורם הגאוגרפי המרכזי לריכוז האוכלוסייה בה?",ar:"مصر أكبر الدول العربية سكانًا. ما العامل الجغرافي المركزي لتمركز السكان فيها؟",ru:"Египет: самое населенное арабское государство. Каков главный географический фактор концентрации его населения?",en:"Egypt is the most populous Arab state. What is the main geographic factor behind its population concentration?"},
    [{he:"נהר הנילוס ודלתא שלו, המספקים מים וקרקע חקלאית פורייה במדינה מדברית",ar:"نهر النيل ودلتاه، اللذان يوفران المياه وأرضًا زراعية خصبة في دولة صحراوية",ru:"Река Нил и его дельта, дающие воду и плодородную почву в пустынной стране",en:"The Nile river and its delta, providing water and fertile farmland in a desert state"},
@@ -2342,7 +2351,7 @@ topic("aklim","eretz",
    {he:"עקבו אחרי הכיוון שממנו מגיע הגשם.",ar:"تتبعوا الاتجاه الذي يأتي منه المطر.",ru:"Проследите направление, откуда приходит дождь.",en:"Trace the direction the rain comes from."}),
   Q("ak-3",
     {he:"מהו «צל גשם»?",ar:"ما هو «ظل المطر»؟",ru:"Что такое «дождевая тень»?",en:"What is a 'rain shadow'?"},
-   [{he:"אזור מעבר לרכס הרים שמקבל מעט משקעים, כי ההר מעלים את העננים בצד המערבי",ar:"منطقة خلف سلسلة جبال تتلقى قليلًا من الأمطار لأن الجبل يُسقط الغيوم في الجهة الغربية",ru:"Область за горным хребтом, получающая мало осадков, потому что хребет высаживает облака на наветренном склоне",en:"An area beyond a mountain ridge that gets little rain because the ridge drops the clouds on the windward side"},
+   [{he:"אזור מעבר לרכס הרים שמקבל מעט משקעים, כי ההר מוריד את העננים בצד המערבי",ar:"منطقة خلف سلسلة جبال تتلقى قليلًا من الأمطار لأن الجبل يُسقط الغيوم في الجهة الغربية",ru:"Область за горным хребтом, получающая мало осадков, потому что хребет высаживает облака на наветренном склоне",en:"An area beyond a mountain ridge that gets little rain because the ridge drops the clouds on the windward side"},
     {he:"צל בענן המסתיר את הגשם מהמכ״ם",ar:"ظل في الغيمة يخفي المطر عن الرادار",ru:"Тень в облаке, скрывающая дождь от радара",en:"A shadow inside a cloud that hides the rain from radar"},
     {he:"גשם היורד רק בשעות הלילה",ar:"مطر يهطل فقط في ساعات الليل",ru:"Дождь, идущий только ночью",en:"Rain that falls only at night"},
     {he:"אזור שבו הגשם נספג מהר מאוד בקרקע",ar:"منطقة يتسرّب فيها المطر بسرعة كبيرة إلى التربة",ru:"Область, где дождевая вода очень быстро впитывается в почву",en:"An area where rainwater soaks into the ground very fast"}],
@@ -2936,13 +2945,21 @@ function simRight(){
   for(i=0;i<SIM.q.length;i++)if(SIM.ans[i]>=0&&SIM.q[i].opts[SIM.ans[i]].ok)n++;
   return n;
 }
+/* שתי שאלות זהות במבחן אחד אינן "חזרה" אלא תקלה. הבדיקה הייתה
+   על q.id, שהוא נושא|רמה|אינדקס — ולכן אותו פריט שהוגש גם ברמה 2
+   וגם ברמה 3 נספר כשתי שאלות שונות. ההשוואה כאן היא על הפריט
+   עצמו (q.reveal), ולכן היא נכונה גם כשלרמות יש מאגרים נפרדים. */
+function simSeen(qs,q){
+  for(var k=0;k<qs.length;k++)if(qs[k].reveal===q.reveal)return true;
+  return false;
+}
 function simStart(){
   var pairs=[],qs=[],i,q;
   TOPICS.forEach(function(tp){for(var l=1;l<=3;l++)pairs.push([tp.id,l])});
   shuffle(pairs);
   for(i=0;i<pairs.length&&qs.length<SIM_N;i++){
     q=buildQuestion(pairs[i][0],pairs[i][1],undefined,true);
-    if(q)qs.push(q);
+    if(q&&!simSeen(qs,q))qs.push(q);
   }
   /* פחות צמדי נושא-רמה מ-SIM_N: סבב נוסף, בלי לחזור על אותו פריט. */
   var guard=0;
@@ -2950,9 +2967,7 @@ function simStart(){
     var pr=pairs[guard%pairs.length]; guard++;
     q=buildQuestion(pr[0],pr[1],undefined,true);
     if(!q)continue;
-    var dup=false,k;
-    for(k=0;k<qs.length;k++)if(qs[k].id===q.id){dup=true;break}
-    if(!dup)qs.push(q);
+    if(!simSeen(qs,q))qs.push(q);
   }
   SIM.q=qs;
   SIM.ans=qs.map(function(){return -1});
@@ -3392,6 +3407,35 @@ function examQuestions(spec){
    הן הרבה מעבר למה שהמחולל עצמו יודע לייצר. */
 function exNewSeed(){return (Math.random()*16777215)>>>0}
 function exSlot(topicId,level){return [topicId,level,exNewSeed()]}
+/* זרע נפרד לכל משבצת הוא מה שמאפשר להחליף שאלה אחת בלי לגעת
+   בשאר — אבל זרע אקראי לבדו נותן גם את אותה שאלה בשתי משבצות.
+   נמדד על בנק השאלות הזה: 190 מתוך 200 מבחנים בני עשר שאלות
+   הכילו שאלה כפולה, ובחלקם שלושה עותקים של אותה שאלה.
+   כאן מוגרל זרע שוב עד שהשאלה שיוצאת ממנו אינה כבר במבחן.
+   הבדיקה נעשית *בבחירת הזרע*, אצל המורה בלבד; הזרע שנבחר נוסע
+   בקישור כרגיל, ולכן התלמיד בונה בדיוק את אותו מבחן. */
+function exSlotKey(slot){var q=exBuildSlot(slot);return q?(q.topic+"|"+q.ask):""}
+function exUsedKeys(slots,skip){
+  var used={},i,k;
+  for(i=0;i<(slots||[]).length;i++){
+    if(i===skip)continue;
+    k=exSlotKey(slots[i]); if(k)used[k]=1;
+  }
+  return used;
+}
+/* ארבעים ניסיונות, ולא לולאה עד שתצליח: כשהמאגר של הנושא קטן
+   ממספר המשבצות שהוקצו לו, שאלה כפולה היא בלתי נמנעת — ואז
+   עדיף להחזיר משבצת תקינה מאשר להיתקע. */
+function exSlotUnique(topicId,level,used){
+  var i,cand,k,first=null;
+  if(!used)used={};
+  for(i=0;i<40;i++){
+    cand=exSlot(topicId,level); k=exSlotKey(cand);
+    if(!first)first=cand;
+    if(!k||!used[k]){ if(k)used[k]=1; return cand }
+  }
+  return first;
+}
 /* אותו זרע → אותה שאלה בדיוק: אצל המורה כשהוא בוחר, ואצל
    התלמיד כשהוא נבחן. */
 function exBuildSlot(slot){
@@ -3441,8 +3485,8 @@ function exSlots(){
   if(EB.q&&EB.q.length)return EB.q;
   var tops=EB.topics.filter(function(x){return topicById(x)});
   if(!tops.length)tops=topicsForTrack(state.track).slice(0,3).map(function(t){return t.id});
-  var q=[],i;
-  for(i=0;i<EB.n;i++)q.push(exSlot(tops[i%tops.length],EB.level));
+  var q=[],i,used={};
+  for(i=0;i<EB.n;i++)q.push(exSlotUnique(tops[i%tops.length],EB.level,used));
   /* מערבבים כאן ולא בשליחה: המורה רואה את הסדר הסופי ומאשר אותו. */
   EB.q=shuffle(q);
   return EB.q;
@@ -3654,9 +3698,16 @@ function viewExamNew(){
   h+='<label class="tt"><b>'+esc(xt("exName"))+'</b></label>'+
      '<input class="field" id="exTitle" value="'+esc(EB.title)+'" placeholder="'+esc(xt("exNamePh"))+'" maxlength="60">';
 
-  h+='<div style="margin-top:16px"><b>'+esc(xt("exUnits"))+'</b>'+
-     '<div class="seg" style="margin-top:7px">'+[3,4,5].map(function(tr){
-       return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
+  /* מסלול, ולא "יחידות". הבורר הגיע ממשפחת המתמטיקה עם 3/4/5
+     יח״ל, ובגיאוגרפיה אין כאלה: הוא קבע state.track="4", אף
+     נושא לא ענה על trk==="4", ורשימת הנושאים נשארה ריקה בלי
+     דרך חזרה. גם ההדגשה לא עבדה — data-t מחזיר מחרוזת והושווה
+     למספר. כאן המסלולים האמיתיים, ושלושת המסלולים פותחים את
+     עשרת הנושאים ולא רק את השישה של "מזרח תיכון". */
+  var exTrk=state.track||(TRACKS[0]||{}).id;
+  h+='<div style="margin-top:16px"><b>'+esc(t("trackW"))+'</b>'+
+     '<div class="seg" style="margin-top:7px">'+TRACKS.map(function(tr){
+       return '<button class="'+(exTrk===tr.id?"on":"")+'" data-a="track" data-t="'+esc(tr.id)+'">'+esc(t(tr.nk))+'</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exLevel"))+'</b><div class="seg" style="margin-top:7px">'+
@@ -3676,7 +3727,7 @@ function viewExamNew(){
      '<div class="grid g2">';
   tops.forEach(function(t){
     var on=EB.topics.indexOf(t.id)>=0;
-    h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" data-a="extopic" data-t="'+t.id+
+    h+='<button class="tpc '+areaCls(t.id)+(on?" on":"")+'" data-a="extopic" data-t="'+t.id+
        '" aria-pressed="'+(on?"true":"false")+'"><span class="tn">'+esc(tName(t))+'</span>'+
        '<span class="td">'+esc(tDesc(t))+'</span></button>';
   });
@@ -4363,7 +4414,7 @@ function examAction(a,el){
     /* משבצת חדשה ולא רק זרע חדש, כדי שהמערך יישאר בן שלושה
        איברים גם אם מישהו יוסיף שדה בעתיד. */
     if(ql[qi])
-      {ql[qi]=exSlot(ql[qi][0],ql[qi][1]);EB.built=null}
+      {ql[qi]=exSlotUnique(ql[qi][0],ql[qi][1],exUsedKeys(ql,qi));EB.built=null}
     render();return true;
   }
   if(a==="exqdel"){
@@ -4375,7 +4426,8 @@ function examAction(a,el){
   if(a==="exqadd"){
     var at=el.getAttribute("data-t"),al=exSlots();
     /* עשרים וחמש — גם הגבול של המחוון, וגם מבחן ארוך דיו. */
-    if(topicById(at)&&al.length<25){al.push(exSlot(at,EB.level));EB.n=al.length;EB.built=null}
+    if(topicById(at)&&al.length<25){
+      al.push(exSlotUnique(at,EB.level,exUsedKeys(al)));EB.n=al.length;EB.built=null}
     render();return true;
   }
   if(a==="exbuild"){
@@ -4612,7 +4664,16 @@ document.addEventListener("click",function(e){
   /* מסכי המבחן מנווטים ב-go/data-v; שאר האפליקציה בפעולות בשמן. */
   if(a==="go"){view=(v==="exam"||v==="marks"||v==="sit")?v:"";if(!view)state.screen="home";stopSpeak();render();window.scrollTo(0,0);return}
   if(a==="marks"){view="marks";stopSpeak();render();window.scrollTo(0,0);return}
-  if(a==="track"){state.track=el.getAttribute("data-t")||"";render();return}
+  if(a==="track"){
+    var tv=el.getAttribute("data-t")||"";
+    /* רק מסלול שקיים. ערך זר היה מרוקן את רשימת הנושאים ואת
+       משבצות השאלות, ושלושת הכפתורים לא היו מחזירים ממנו. */
+    state.track=TRACKS.some(function(x){return x.id===tv})?tv:(TRACKS[0]||{}).id;
+    /* נושאי ברירת המחדל נבחרים מחדש למסלול החדש; בלי זה נשארו
+       מסומנים נושאים של מסלול שכבר אינו על המסך. */
+    EB.topics=[]; EB.q=null; EB.built=null;
+    render();return;
+  }
   if(a==="stop"){stopSpeak();return}if(a==="say"||a==="sayline"){
     var txt=el.getAttribute("data-say")||"";
     var lg=el.getAttribute("data-lang")||state.lang;
@@ -4773,7 +4834,12 @@ document.addEventListener("keydown",function(e){
     if(P.q.opts[i]){e.preventDefault();answer(i)}
     return;
   }
-  if(e.key===" "){e.preventDefault();speak(saySpell(P.q.say),state.lang);return}
+  /* say הוא "השאלה והתשובה עליה", ונועד להישמע *אחרי* המענה.
+     רווח זמין גם לפני, ולכן הוא הקריא את התשובה הנכונה למי
+     שעוד לא ענה. לפני המענה מוקרא נוסח השאלה בלבד — אותו
+     תיקון שכבר נעשה בכפתור ההקראה של המבחן (sitread). */
+  if(e.key===" "){e.preventDefault();
+    speak(saySpell(P.done?P.q.say:(P.q.lead||"")),state.lang);return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
@@ -4917,7 +4983,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=q22-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=q23-pwa1").catch(function(){});
   });
 }
 </script>

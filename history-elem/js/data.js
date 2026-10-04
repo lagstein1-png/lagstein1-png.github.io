@@ -79,7 +79,7 @@ E v_kings|t|רק מלכים|الملوك فقط|только цари|only kings
 E hanukkah|h|חנוכה|الحانوكا|Ханука|Hanukkah
 E purim|h|פורים|بوريم|Пурим|Purim
 E sukkot|h|סוכות|عيد العُرُش|Суккот|Sukkot
-E tubishvat|h|ט״ו בשבט|رأس السنة للأشجار (ט״ו בשבט)|Ту би-Шват|Tu BiShvat
+E tubishvat|h|ט״ו בשבט|رأس السنة للأشجار (طو بشباط)|Ту би-Шват|Tu BiShvat
 E indep|h|יום העצמאות|يوم الاستقلال|День независимости|Independence Day
 E m_clean|t|ניקו את בית המקדש וחנכו אותו מחדש|نظّفوا الهيكل وافتتحوه من جديد|очистили Храм и заново освятили его|they cleaned the Temple and dedicated it again
 E m_leave|t|עזבו את העיר ולא חזרו|تركوا المدينة ولم يعودوا|ушли из города и не вернулись|they left the city and never came back
@@ -198,6 +198,9 @@ E ten_sec|t|עשר שניות|عشر ثوانٍ|десять секунд|ten se
 E an_hour|t|שעה שלמה|ساعة كاملة|целый час|a whole hour
 E all_day|t|כל היום|طوال النهار|весь день|all day
 E righteous|t|חסידי אומות העולם|الصالحون بين الأمم|Праведники народов мира|Righteous Among the Nations
+E survivors_c|t|ניצולי השואה|الناجون من الكارثة (الشواه)|пережившие Холокост|Holocaust survivors
+E partisans_c|t|הפרטיזנים|الأنصار (البارتيزان)|партизаны|the partisans
+E olim_c|t|העולים החדשים|المهاجرون الجدد (عوليم)|новые репатрианты|the new immigrants
 E villains|t|המורים|المعلّمون|учителя|teachers
 E bakers_c|t|אופים|خبّازون|пекари|bakers
 E yadvashem|b|יד ושם|ياد فاشيم|Яд ва-Шем|Yad Vashem
@@ -229,7 +232,7 @@ L ההיסטוריה היא סיפור של העבר: מה קרה, ולמה זה
 L פעם לא היו מכוניות. אנשים נסעו ברגל או בעגלה עם סוס.|في الماضي لم تكن هناك سيارات. كان الناس يسافرون سيرًا على الأقدام أو بعربة يجرّها حصان.|Раньше не было машин. Люди ходили пешком или ездили в повозке с лошадью.|Long ago there were no cars. People walked or rode in a cart pulled by a horse.
 L פעם שלחו מכתב בדואר, וחיכו ימים רבים לתשובה. היום שולחים הודעה, והיא מגיעה בשנייה.|في الماضي كانوا يرسلون رسالة بالبريد وينتظرون الجواب أيامًا كثيرة. اليوم نرسل رسالة وتصل خلال ثانية.|Раньше письмо отправляли по почте и много дней ждали ответа. Сегодня мы отправляем сообщение, и оно приходит за секунду.|Long ago people sent a letter by mail and waited many days for an answer. Today we send a message and it arrives in a second.
 L גם למשפחה שלכם יש היסטוריה. אפשר לשאול את סבא וסבתא איך היו החיים כשהם היו ילדים.|وللعائلة أيضًا تاريخ. يمكنك أن تسأل جدّك وجدّتك كيف كانت الحياة عندما كانا طفلين.|У вашей семьи тоже есть история. Можно спросить бабушку и дедушку, какой была жизнь, когда они были детьми.|Your family has a history too. You can ask your grandparents what life was like when they were children.
-Q מה קרה אתמול?|ماذا نسمّي ما حدث أمس؟|Как называется то, что случилось вчера?|What do we call what happened yesterday?|past|now,future,always
+Q איך קוראים למה שקרה אתמול?|ماذا نسمّي ما حدث أمس؟|Как называется то, что случилось вчера?|What do we call what happened yesterday?|past|now,future,always
 Q איך נקרא הזמן שעוד לא הגיע?|ماذا نسمّي الزمن الذي لم يأتِ بعد؟|Как называется время, которое ещё не наступило?|What do we call the time that has not come yet?|future|past,now,always
 Q איך נסעו אנשים לפני הרבה שנים, כשלא היו מכוניות?|كيف كان الناس يسافرون قبل سنوات كثيرة عندما لم تكن هناك سيارات؟|Как ездили люди много лет назад, когда не было машин?|How did people travel many years ago, when there were no cars?|s_horse|s_car,s_plane,s_train
 Q איך שלחו הודעה למישהו רחוק לפני הרבה שנים?|كيف كانوا يرسلون رسالة إلى شخص بعيد قبل سنوات كثيرة؟|Как отправляли весточку далёкому человеку много лет назад?|How did people send a message to someone far away many years ago?|s_letter|s_video,s_text,s_email
@@ -268,7 +271,7 @@ L לכן בחנוכה מדליקים נרות במשך שמונה ימים, וא
 Q איזה חג מספר על המכבים?|أي عيد يحكي عن المكابيين؟|Какой праздник рассказывает о Маккавеях?|Which holiday tells about the Maccabees?|hanukkah|purim,sukkot,tubishvat
 Q מי היה המנהיג של המכבים?|من كان قائد المكابيين؟|Кто был вождём Маккавеев?|Who was the leader of the Maccabees?|judah|king_david,herzl,ben_gurion
 Q מה המכבים עשו כשחזרו לירושלים?|ماذا فعل المكابيون عندما عادوا إلى القدس؟|Что сделали Маккавеи, вернувшись в Иерусалим?|What did the Maccabees do when they came back to Jerusalem?|m_clean|m_leave,m_sell,m_hide
-Q כמה ימים הדליק השמן, לפי הסיפור?|كم يومًا اشتعل الزيت حسب القصة؟|Сколько дней горело масло, по рассказу?|How many days did the oil burn, according to the story?|d8|d3,d5,d10
+Q כמה ימים דלק השמן, לפי הסיפור?|كم يومًا اشتعل الزيت حسب القصة؟|Сколько дней горело масло, по рассказу?|How many days did the oil burn, according to the story?|d8|d3,d5,d10
 Q מה מדליקים בחנוכה במשך שמונה ימים?|ماذا نُشعل في الحانوكا طوال ثمانية أيام؟|Что зажигают на Хануку восемь дней?|What do we light for eight days on Hanukkah?|candles|fireworks,bonfire,flashlights
 Q מה אוכלים בחנוכה?|ماذا نأكل في الحانوكا؟|Что едят на Хануку?|What do we eat on Hanukkah?|sufg|matza,hamantash,figs
 S anc|🏛️|#b08900|עמים בעולם העתיק|شعوب العالم القديم|народы древнего мира|Peoples of the Ancient World
@@ -304,7 +307,7 @@ Q מי היה העיתונאי שחלם על בית ליהודים בארץ יש
 Q איך קוראים לרעיון שליהודים יש בית בארץ ישראל?|ماذا نسمّي فكرة أن يكون لليهود بيت في أرض إسرائيل؟|Как называется идея, что у евреев должен быть дом в Земле Израиля?|What is the idea of a Jewish home in the Land of Israel called?|zionism|geo_c,arch_c,democ_c
 Q באיזו עיר נערך הקונגרס הציוני הראשון?|في أي مدينة عُقد المؤتمر الصهيوني الأول؟|В каком городе прошёл первый сионистский конгресс?|In which city was the first Zionist Congress held?|basel|rome_c,cairo,tlv
 Q באיזו שנה נערך הקונגרס הציוני הראשון?|في أي سنة عُقد المؤتمر الصهيوني الأول؟|В каком году прошёл первый сионистский конгресс?|In which year was the first Zionist Congress held?|y1897|y1997,y1797,y1947
-Q מה הקיבוץ הראשון, שהוקם ליד הכנרת?|ما اسم أول كيبوتس أُقيم قرب بحيرة طبريا؟|Как называется первый кибуц, основанный у озера Кинерет?|What is the first kibbutz, which was built near the Sea of Galilee?|degania|eilat,haifa,safed
+Q מה שמו של הקיבוץ הראשון, שהוקם ליד הכנרת?|ما اسم أول كيبوتس أُقيم قرب بحيرة طبريا؟|Как называется первый кибуц, основанный у озера Кинерет?|What is the name of the first kibbutz, which was built near the Sea of Galilee?|degania|eilat,haifa,safed
 Q מה עשו העולים החדשים באדמה?|ماذا فعل المهاجرون الجدد في الأرض؟|Что делали новые репатрианты на земле?|What did the new immigrants do on the land?|m_plant|m_sleep,m_sell,m_hide
 S hebrew|🗣️|#0b7285|העברית חוזרת לדבר|العبرية تعود إلى الكلام|иврит снова становится разговорным|Hebrew Comes Back to Speech
 L במשך שנים רבות כתבו וקראו בעברית, אבל כמעט לא דיברו בה בבית ובשוק. דיברו רוסית, ערבית, אידיש, לדינו ושפות אחרות.|لسنوات طويلة كانوا يكتبون ويقرؤون بالعبرية، لكنهم لم يتحدّثوا بها تقريبًا في البيت والسوق. تحدّثوا الروسية والعربية والييدية واللادينو ولغات أخرى.|Много лет на иврите писали и читали, но почти не говорили в доме и на рынке. Говорили по-русски, по-арабски, на идиш, на ладино и на других языках.|For many years people wrote and read in Hebrew, but hardly spoke it at home or in the market. They spoke Russian, Arabic, Yiddish, Ladino and other languages.
@@ -348,12 +351,13 @@ L בכל שנה יש בישראל יום זיכרון לשואה. מצפצפת �
 L בירושלים יש מוזיאון לזכר השואה, יד ושם. שם שומרים את שמות הנספים ואת הסיפורים שלהם.|في القدس متحف لذكرى الكارثة اسمه «ياد فاشيم». هناك تُحفظ أسماء الضحايا وقصصهم.|В Иерусалиме есть музей памяти Холокоста - Яд ва-Шем. Там хранят имена погибших и их истории.|In Jerusalem there is a museum in memory of the Holocaust, Yad Vashem. It keeps the names and stories of those who were killed.
 Q איך מכבדים את הזיכרון ביום השואה?|كيف نُكرم الذكرى في يوم الكارثة؟|Как чтят память в День Холокоста?|How do we honor the memory on Holocaust Remembrance Day?|siren_stand|party,race,shopping
 Q כמה זמן מצפצפת הסירנה ביום השואה?|كم تدوم صفّارة الإنذار في يوم الكارثة؟|Сколько длится сирена в День Холокоста?|How long does the siren sound on Holocaust Remembrance Day?|two_min|ten_sec,an_hour,all_day
-Q איך קוראים לאנשים שהסתירו יהודים וסיכנו את חייהם?|ماذا نسمّي الناس الذين أخفوا يهودًا وخاطروا بحياتهم؟|Как называют людей, которые прятали евреев и рисковали жизнью?|What are the people who hid Jews and risked their lives called?|righteous|villains,pirates,bakers_c
+Q איך קוראים לאנשים שהסתירו יהודים וסיכנו את חייהם?|ماذا نسمّي الناس الذين أخفوا يهودًا وخاطروا بحياتهم؟|Как называют людей, которые прятали евреев и рисковали жизнью?|What are the people who hid Jews and risked their lives called?|righteous|survivors_c,partisans_c,olim_c
 Q איך קוראים למוזיאון לזכר השואה בירושלים?|ماذا يُسمّى متحف ذكرى الكارثة في القدس؟|Как называется музей памяти Холокоста в Иерусалиме?|What is the Holocaust museum in Jerusalem called?|yadvashem|israelmuseum,zoo_c,science_m
 Q למה חשוב לזכור?|لماذا من المهم أن نتذكّر؟|Почему важно помнить?|Why is it important to remember?|remember_why|forget_why,nobody_why,dont_why
 S people|🌟|#e64980|אנשים שעשו היסטוריה|أشخاص صنعوا التاريخ|люди, которые творили историю|People Who Made History
 L היסטוריה לא עושים רק מלכים. גם אנשים רגילים עם רעיון טוב ועם סבלנות יכולים לשנות דברים.|التاريخ لا يصنعه الملوك فقط. فالناس العاديون أيضًا، بفكرة جيدة وصبر، يمكنهم أن يغيّروا الأشياء.|Историю делают не только цари. Обычные люди с хорошей идеей и терпением тоже могут многое изменить.|History is not made only by kings. Ordinary people with a good idea and patience can also change things.
 L בנימין זאב הרצל חלם על בית ליהודים, ואליעזר בן־יהודה החזיר את העברית לדיבור.|حلم بنيامين زئيف هرتسل ببيت لليهود، وأعاد إليعيزر بن يهودا العبرية إلى الكلام.|Биньямин Зеэв Герцль мечтал о доме для евреев, а Элиэзер Бен-Йехуда вернул иврит в разговорную речь.|Binyamin Ze'ev Herzl dreamed of a home for the Jews, and Eliezer Ben-Yehuda brought Hebrew back to speech.
+L חיים ויצמן היה מדען, והוא היה הנשיא הראשון של ישראל.|كان حاييم وايزمان عالِمًا، وكان أول رئيس لدولة إسرائيل.|Хаим Вейцман был учёным, и он стал первым президентом Израиля.|Chaim Weizmann was a scientist, and he was the first President of Israel.
 L גולדה מאיר הייתה ראש הממשלה של ישראל משנת 1969 עד 1974. היא האישה היחידה עד היום שהייתה ראש הממשלה.|كانت غولدا مائير رئيسة حكومة إسرائيل من سنة 1969 إلى 1974. وهي المرأة الوحيدة حتى اليوم التي تولّت رئاسة الحكومة.|Голда Меир была премьер-министром Израиля с 1969 по 1974 год. Она единственная женщина, которая занимала этот пост.|Golda Meir was Israel's Prime Minister from 1969 to 1974. She is the only woman so far who was Prime Minister.
 L אילן רמון היה האסטרונאוט הישראלי הראשון. הוא טס לחלל בשנת 2003.|كان إيلان رامون أول رائد فضاء إسرائيلي. سافر إلى الفضاء في سنة 2003.|Илан Рамон был первым израильским астронавтом. Он полетел в космос в 2003 году.|Ilan Ramon was the first Israeli astronaut. He flew into space in 2003.
 L לכל אחד מאיתנו יש סיפור. אפשר לשאול את המשפחה: מי עשה משהו חשוב, ואיך?|لكل واحد منا قصة. يمكنك أن تسأل العائلة: من فعل شيئًا مهمًّا، وكيف؟|У каждого из нас есть своя история. Можно спросить у семьи: кто сделал что-то важное и как?|Each of us has a story. You can ask your family: who did something important, and how?
@@ -370,6 +374,7 @@ L בקיסריה יש תיאטרון רומי, נמל עתיק ואמת מים. 
 L בבית שאן חפרו ומצאו עיר רומית שלמה, עם רחוב עם עמודים ותיאטרון גדול.|في بيسان حفروا ووجدوا مدينة رومانية كاملة، فيها شارع بأعمدة ومسرح كبير.|В Бейт-Шеане раскопали целый римский город с улицей с колоннами и большим театром.|In Beit She'an people dug and found a whole Roman city, with a street of columns and a big theater.
 L בשנת 1947 ילד רועה מצא במערות ליד ים המלח כדי חרס עם מגילות עתיקות. אלה מגילות ים המלח.|في سنة 1947 وجد راعٍ شاب في كهوف قرب البحر الميت جرارًا فخّارية فيها لفائف قديمة. هذه هي مخطوطات البحر الميت.|В 1947 году молодой пастух нашёл в пещерах у Мёртвого моря глиняные кувшины с древними свитками. Это Кумранские свитки.|In 1947 a young shepherd found clay jars with ancient scrolls in caves near the Dead Sea. These are the Dead Sea Scrolls.
 L חלק מהמגילות מוצגות בירושלים, בהיכל הספר במוזיאון ישראל.|يُعرض جزء من المخطوطات في القدس، في «هيخال هاسيفر» في متحف إسرائيل.|Часть свитков выставлена в Иерусалиме, в «Храме книги» в Музее Израиля.|Some of the scrolls are shown in Jerusalem, in the Shrine of the Book at the Israel Museum.
+L כשמבקרים באתר עתיק מסתכלים ושומרים על המקום: לא מטפסים על הקירות ולא לוקחים אבנים הביתה.|عندما نزور موقعًا أثريًا ننظر ونحافظ على المكان: لا نتسلّق الجدران ولا نأخذ حجارة إلى البيت.|Когда мы приходим на древнее место, мы смотрим и бережём его: не лазаем по стенам и не берём камни домой.|When we visit an ancient site we look and take care of the place: we do not climb the walls and we do not take stones home.
 Q איזה מקום הוא מצודה על הר ליד ים המלח?|أي مكان هو قلعة على جبل قرب البحر الميت؟|Какое место - крепость на горе у Мёртвого моря?|Which place is a fortress on a mountain near the Dead Sea?|masada|caesarea,beit_shean,eilat
 Q מי בנה ארמונות במצדה?|من بنى قصورًا في مسعدة؟|Кто построил дворцы в Масаде?|Who built palaces at Masada?|herod|ben_gurion,herzl,golda
 Q באיזה מקום יש תיאטרון רומי, נמל עתיק ואמת מים?|أين يوجد مسرح روماني وميناء قديم وقناة مياه؟|Где есть римский театр, древний порт и акведук?|Where is there a Roman theater, an ancient port and an aqueduct?|caesarea|masada,eilat,safed

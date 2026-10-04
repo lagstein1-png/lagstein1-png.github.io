@@ -294,7 +294,7 @@ G.coord1=function(lv){var T=[],hi=lv===1?6:(lv===2?8:10),u=hi>8?24:28;
       L("D מעל A, ולכן יש לה אותו x. D משמאל ל-C, ולכן יש לה אותו y.","D فوق A فلها نفس x، وD على يسار C فلها نفس y.","D над A, поэтому x такой же. D левее C, поэтому y такой же.","D is above A, so it has the same x. D is left of C, so it has the same y."),
       L("D היא "+ans+": ה-x של A וה-y של C.","D هي "+ans+": x من A وy من C.","D — "+ans+": x от A и y от C.","D is "+ans+": the x of A and the y of C."),2)});
   T.push(function(){var a=ri(1,5),b=ri(1,5),r=ri(1,4),up=ri(1,4),ans=fp(a+r,b+up);
-    return mk("move",L("מתחילים ב-"+fq(a,b)+", זזים "+r+" ימינה ו-"+up+" למעלה. לאן מגיעים?","نبدأ من "+fq(a,b)+" ونتحرك "+r+" يمينًا و"+up+" إلى الأعلى. أين نصل؟","Начинаем в "+fq(a,b)+", сдвигаемся на "+r+" вправо и "+up+" вверх. Куда придём?","Start at "+fq(a,b)+", move "+r+" right and "+up+" up. Where do you land?"),"",ans,[fp(a+up,b+r),fp(a+r,b),fp(a,b+up),fp(a+r,b-up)].filter(function(z){return z!==ans&&z.indexOf("-")<0}),
+    return mk("move",L("מתחילים ב-"+fq(a,b)+", זזים "+r+" ימינה ו-"+up+" למעלה. לאן מגיעים?","نبدأ من "+fq(a,b)+" ونتحرك "+r+" يمينًا و"+up+" إلى الأعلى. أين نصل؟","Начинаем в "+fq(a,b)+", сдвигаемся на "+r+" вправо и "+up+" вверх. Куда придём?","Start at "+fq(a,b)+", move "+r+" right and "+up+" up. Where do you land?"),"",ans,[fp(a+up,b+r),fp(a+r,b),fp(a,b+up),fp(a,b),fp(a+r,b-up)].filter(function(z){return z!==ans&&z.indexOf("-")<0}),
       L("ימינה מוסיפה ל-x. למעלה מוסיפה ל-y.","اليمين يزيد x والأعلى يزيد y.","Вправо — прибавляем к x. Вверх — прибавляем к y.","Right adds to x. Up adds to y."),
       L("x: "+a+" + "+r+" = "+(a+r)+". y: "+b+" + "+up+" = "+(b+up)+".","x: "+a+" + "+r+" = "+(a+r)+". y: "+b+" + "+up+" = "+(b+up)+".","x: "+a+" + "+r+" = "+(a+r)+". y: "+b+" + "+up+" = "+(b+up)+".","x: "+a+" + "+r+" = "+(a+r)+". y: "+b+" + "+up+" = "+(b+up)+"."),3)})}
   T.push(function(){var x=ri(1,hi),y=ri(1,hi);while(x===y)y=ri(1,hi);var ans=x;
@@ -661,7 +661,7 @@ G.alg=function(lv){var T=[];
     else if(w==="sub"){ex="x \u2212 "+c;q=L("המספר x פחות "+c,"العدد x ناقص "+c,"Число x минус "+c,"The number x minus "+c)}
     else{ex=k+"x + "+c;q=L("פי "+k+" מ-x, ועוד "+c,"ضعف x "+k+" مرات ثم زائد "+c,"x умножить на "+k+" и ещё "+c,"x times "+k+", then plus "+c)}
     var d=[ "x + "+c,k+"x","x \u2212 "+c,k+"x + "+c,c+"x + "+k,(k+c)+"x","x \u2212 "+k,c+" \u2212 x"].filter(function(z){return z!==ex});
-    return mk("write",LL(function(l){return ({he:"איזה ביטוי מתאים לתיאור: ",ar:"أي تعبير يناسب الوصف: ",ru:"Какое выражение подходит к описанию: ",en:"Which expression matches: "})[l]+q[l]}),"",ex,shuffle(d).slice(0,3),
+    return mk("write",LL(function(l){return ({he:"איזה ביטוי מתאים לתיאור: ",ar:"أي تعبير يناسب الوصف: ",ru:"Какое выражение подходит к описанию: ",en:"Which expression matches: "})[l]+q[l]}),"",ex,d,
      L("מתרגמים מילה אחר מילה: ״פי״ זה כפל, ״ועוד״ זה חיבור, ״פחות״ זה חיסור.","نترجم كلمة كلمة: «ضعف» ضرب و«زائد» جمع و«ناقص» طرح.","Переводим слово за словом: «в … раз» — умножение, «плюс» — сложение, «минус» — вычитание.","Translate word by word: ‘times’ is multiplying, ‘plus’ is adding, ‘minus’ is subtracting."),
      L("התשובה: "+ex+".","الجواب: "+ex+".","Ответ: "+ex+".","The answer: "+ex+"."),0)});
   T.push(function(){var a=ri(2,6),b=ri(1,9),x=ri(lv===1?1:-5,8),f=Math.random()<.5,v=f?a*x+b:a*x-b;
@@ -789,6 +789,7 @@ G.pyth=function(lv){var T=[];
      L(c+"² − "+a+"² = "+sqr(c)+" − "+sqr(a)+" = "+sqr(b)+", ו-√"+sqr(b)+" = "+b+".",c+"² − "+a+"² = "+sqr(c)+" − "+sqr(a)+" = "+sqr(b)+"، و√"+sqr(b)+" = "+b+".",c+"² − "+a+"² = "+sqr(c)+" − "+sqr(a)+" = "+sqr(b)+", а √"+sqr(b)+" = "+b+".",c+"² − "+a+"² = "+sqr(c)+" − "+sqr(a)+" = "+sqr(b)+", and √"+sqr(b)+" = "+b+"."),2)});
   T.push(function(){var t=trp(),a=t[0],b=t[1],c=t[2],kind=pick(["ok","small","big"]),x=a,y=b,z=c;
     if(kind==="small")z=c+ri(1,2);if(kind==="big")z=c-1;if(kind==="big"&&z<=Math.max(a,b))z=c+1,kind="small";
+    if(z>=a+b)z=c+1; /* אי־שוויון המשולש: 3, 4 ו-7 אינו משולש כלל */
     var s=sqr(x)+sqr(y),d=sqr(z),ans=s===d?0:(s<d?1:2),
       O=[L("כן, זה משולש ישר־זווית","نعم، المثلث قائم الزاوية","да, он прямоугольный","yes, it is a right triangle"),L("לא, כי "+s+" קטן מ-"+d,"لا، لأن "+s+" أصغر من "+d,"нет, потому что "+s+" меньше "+d,"no, because "+s+" is less than "+d),L("לא, כי "+s+" גדול מ-"+d,"لا، لأن "+s+" أكبر من "+d,"нет, потому что "+s+" больше "+d,"no, because "+s+" is greater than "+d),L("אי אפשר לדעת","لا يمكن المعرفة","нельзя узнать","cannot tell")];
     return mk("conv",L("צלעות משולש הן "+x+", "+y+" ו-"+z+" ס״מ. האם זה משולש ישר־זווית?","أضلاع مثلث "+x+" و"+y+" و"+z+" سم. هل هو قائم الزاوية؟","Стороны треугольника "+x+", "+y+" и "+z+" см. Он прямоугольный?","A triangle has sides "+x+", "+y+" and "+z+" cm. Is it a right triangle?"),"",O[ans],O.filter(function(o,i){return i!==ans}),
@@ -1064,7 +1065,7 @@ var LESSONS={
   ST_("תמיד בודקים: מציבים את התשובה במשוואה. 2 · 6 + 5 = 17, נכון.","نتحقق دائمًا: نعوّض الجواب في المعادلة. 2 · 6 + 5 = 17 صحيح.","Всегда проверяй: подставь ответ в уравнение. 2 · 6 + 5 = 17, верно.","Always check: put the answer in the equation. 2 · 6 + 5 = 17, true.",function(){return ""})]
 };
 
-var BUILD="mg3 · 2026-10-03";
+var BUILD="mg4 · 2026-10-03";
 /* ===== UI strings ===== */
 var STR={
 he:{soonT:"בקרוב: צורות חופפות, תיבה וקובייה, שכיחות והסתברות.",mtNote:"תרגום לערבית, רוסית ואנגלית: תרגום מכונה, ממתין לבדיקה.",credit2:"יחידת משפט פיתגורס נבנתה לפי מבנה חוברת של יניב רז, מדריך מחוזי חט״ב, מחוז ירושלים, משרד החינוך. תרגילי החלוקה ביחס בהשראת שאלה מהפיקוח על הוראת המתמטיקה, משרד החינוך.",brand:"מתמטיקה לכיתה ז׳",title:"מתמטיקה לכיתה ז׳",tag:"צירים, מספרים שליליים, זוויות, משולשים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -1109,7 +1110,12 @@ function optLabel(o){var l=o.l;if(typeof l==="object")return l[S.lang];return is
 function isoPts(t){return String(t).replace(/\([^()]*,[^()]*\)/g,function(m){return "\u2066"+m.replace(/, /g,",")+"\u2069"}).replace(/[\dx?][\d.x?]*(?: ?: ?[\dxn?][\d.x?]*)+(?: ?= ?[\dx?][\d.x?]*(?: ?: ?[\dx?][\d.x?]*)+)?/g,function(m){return "\u2066"+m.replace(/ /g,"")+"\u2069"})}
 function optSay(o){var l=o.l;if(typeof l==="object")return l[S.lang];return speechFix(String(l).replace(/-(?=\d)/g,"\u2212"))}
 var POWW={he:" בחזקת ",ar:" أُسّ ",ru:" в степени ",en:" to the power "},SUPN={"\u00b2":2,"\u00b3":3,"\u2074":4,"\u2075":5,"\u2076":6};
+var BLANKW={he:"המספר החסר",ar:"العدد الناقص",ru:"пропущенное число",en:"the missing number"};
+var OVERW={he:" חלקי ",ar:" على ",ru:" из ",en:" over "};
 function speechFix(t){t=String(t).replace(/[\u2066\u2069]/g,"");var lg=S.lang,mw=MINUSW[lg].trim();
+  /* ה-___ של "איזה מספר חסר?" נקרא כקו תחתון גולמי, והשבר a/b לא נפתח
+     כלל (math-elem פותח אותו מאז). שתי השורות האלה סוגרות את שתיהן. */
+  t=t.replace(/_{2,}/g,BLANKW[lg]).replace(/(\d+)\/(\d+)/g,function(m,a,b){return a+OVERW[lg]+b});
   return t.replace(/([\d)])([\u00b2\u00b3\u2074\u2075\u2076])/g,function(m,a,s){return a+POWW[lg]+SUPN[s]+" "})
    .replace(/(^|[\s(=:,;\u00b7\u00d7\u00f7+])\u2212(?=\d)/g,function(m,p){return p+mw+" "})
    .replace(/\u00d7/g,{he:" כפול ",ar:" ضرب ",ru:" умножить на ",en:" times "}[lg]).replace(/\u00b7/g,{he:" כפול ",ar:" ضرب ",ru:" умножить على ",en:" times "}[lg].replace("умножить на ","умножить на ").replace("умножить على ","умножить на "))
@@ -1126,6 +1132,9 @@ try{matchMedia("(prefers-color-scheme:dark)").addListener(function(){if((S.theme
 function saveS(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 loadS();
 function $(s){return document.querySelector(s)}
+/* אזור aria-live — ה-div קיים מאז ההעתקה, אבל אף אחד לא כתב אליו:
+   קורא מסך לא שמע אם התשובה נכונה. (כמו ב-math-uni/math-teen/english.) */
+function announce(m){var e=$("#live");if(e)e.textContent=m}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function T(){return STR[S.lang]}
 function lt(o){return typeof o==="string"?o:o[S.lang]}
@@ -1212,10 +1221,19 @@ function lessonView(){var t=T(),u=unitById(V.unit),ls=LESSONS[V.unit],st=ls[V.st
   var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="dots" style="margin-top:12px">'+ls.map(function(_,i){return '<i class="'+(i<V.step?"on":i===V.step?"cur":"")+'"></i>'}).join("")+'</div>';
   h+='<div class="card stepcard"><div class="sub">'+esc(fmt(t.stepOf,{a:V.step+1,b:n}))+'</div>'+listenRow("lesson")+'<div class="qtext" id="lt" data-say>'+esc(txt)+'</div><div class="vis">'+st.v()+'</div></div>';
   h+='<div style="margin:0 0 12px">'+tutorBtn()+'</div><div class="row">'+(V.step>0?'<button class="btn ghost" data-a="lprev">'+esc(t.prev)+'</button>':'')+(V.step<n-1?'<button class="btn next" data-a="lnext">'+esc(t.next)+'</button>':'<button class="btn next" data-a="start" data-l="1">'+esc(t.lessonEnd)+'</button>')+'</div>';return h}
-function mkQ(unit,lv){var g=G[unit],l=lv===4?pick([1,2,3,3]):lv,q=g(l),n=0,prev=P&&P.list&&P.list[P.list.length-1];
-  while(prev&&n<6&&lt(prev.q)===lt(q.q)&&prev.o.map(function(o){return o.id}).join()===q.o.map(function(o){return o.id}).join()){q=g(l);n++}return q}
-function startRound(lv){P={unit:V.unit,lv:lv,list:[],i:0,picked:null,hints:0,hintShown:false,exShown:false,streak:0,missed:[]};P.list=[];
-  for(var i=0;i<8;i++)P.list.push(mkQ(V.unit,lv));view="practice";P.cur=P.list[0];render()}
+/* מפתח השוואה בלבד. ה-SVG נלקח גולמי ולא דרך lt, כדי שהבידוד הדו־כיווני
+   לא ירוץ על "translate(0,64)" שבתוכו. (אומץ מ-math-elem, 4.10.2026:
+   כאן ההשוואה הייתה מול השאלה הקודמת בלבד, ו-17% מהסבבים חזרו על שאלה.) */
+function qkey(q){return lt(q.q)+"|"+(q.vis||"")+"|"+(q.visL?q.visL[S.lang]:"")}
+function mkQ(unit,lv){var g=G[unit],l=lv===4?pick([1,2,3,3]):lv,q=g(l),n=0,seen={};(P&&P.list||[]).forEach(function(p){seen[qkey(p)]=1});
+  while(n<40&&seen[qkey(q)]){q=g(l);n++}return q}
+/* "שאלות שהיו קשות יחזרו בפעם הבאה" (finX, בארבע השפות) — הבטחה שלא קוימה:
+   P.missed נאסף ונזרק עם P בסוף הסבב. כאן הוא שורד את הסבב, לפי נושא.
+   _rq מסמן שאלה שכבר חזרה, כדי שלא תסתובב בלי סוף. (מ-math-elem.) */
+var MISS={};
+function startRound(lv){P={unit:V.unit,lv:lv,list:[],i:0,picked:null,hints:0,hintShown:false,exShown:false,streak:0,missed:[]};
+  P.list=(MISS[V.unit]||[]).splice(0,3);P.list.forEach(function(x){x._rq=1});
+  for(var i=P.list.length;i<8;i++)P.list.push(mkQ(V.unit,lv));view="practice";P.cur=P.list[0];render()}
 function practiceView(){var t=T(),q=P.list[P.i],n=P.list.length,u=unitById(P.unit);
   var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="sub" style="margin-top:10px">'+esc(lt(u.n))+" · "+esc(fmt(t.qOf,{a:P.i+1,b:n}))+'</div><div class="prog"><i style="width:'+(P.i/n*100)+'%"></i></div>';
   h+='<div class="card">'+listenRow("q")+'<div class="qtext" id="qt" data-say>'+esc(lt(q.q))+'</div>';
@@ -1262,7 +1280,9 @@ function onAct(a,el){var t=T(),q=P&&P.list&&P.list[P.i];
   else if(a==="example"){P.exShown=true;render();speak($("#ex").textContent,$("#ex"))}
   else if(a==="pick"){stopSpeak();var k=+el.dataset.k;P.picked=k;var ok=q.o[k].id===q.a;
     if(ok){P.streak++;var msg=(P.streak>=3&&P.streak%3===0)?pick(t.streak):pick(t.right);P.msg=msg;sfxOk();confetti(P.streak>=3?120:50)}
-    else{P.streak=0;sfxSoft();if(P.missed.length<3&&q.t&&!q._rq){P.missed.push(q)}}
+    else{P.streak=0;sfxSoft();var ms=MISS[P.unit]=MISS[P.unit]||[];
+      if(P.missed.length<3&&ms.length<6&&q.t&&!q._rq){P.missed.push(q);ms.push(q)}}
+    announce((ok?P.msg:t.wrong)+" "+t.ans+optLabel(q.o.filter(function(o){return o.id===q.a})[0]));
     render();if(ok){var rb=$("#rb");speak(P.msg,rb)}else{speak(t.wrong+" "+t.ans+optSay(q.o.filter(function(o){return o.id===q.a})[0])+". "+lt(q.e),null)}}
   else if(a==="next"){stopSpeak();if(P.i<P.list.length-1){P.i++;P.picked=null;P.hintShown=false;P.exShown=false;render();window.scrollTo(0,0);setTimeout(function(){sayQ(false)},250)}
     else{S.done[P.unit]=true;saveS();view="end";render();confetti(160);window.scrollTo(0,0)}}
@@ -1291,11 +1311,10 @@ window.addEventListener("pagehide",function(){stopSpeak()});
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-g7",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=mg3-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=mg4-pwa1").catch(function(){})});
 })();
 </script>
 
-</script>
 <!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
      (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
      נמדדת בנפרד. הוסר 10.9.2026 והוחזר 15.9.2026, שניהם בהחלטת הבעלים. -->

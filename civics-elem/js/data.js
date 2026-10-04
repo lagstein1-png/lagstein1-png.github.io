@@ -107,7 +107,7 @@ L גם השכונה היא קהילה. השכנים אומרים שלום ועו
 L כמה שכונות יחד הן עיר. כמה ערים ויישובים יחד הם מדינה.|عدة أحياء معًا تكوّن مدينة. وعدة مدن وبلدات معًا تكوّن دولة.|Несколько районов вместе - это город. Несколько городов и посёлков вместе - это страна.|Several neighborhoods together make a city. Several cities and towns together make a country.
 L בקהילה טובה כל אחד עוזר, ומחליטים דברים ביחד.|في المجتمع الجيد يساعد كل واحد، ونقرّر الأمور معًا.|В хорошем сообществе каждый помогает, и важные вещи решают вместе.|In a good community everyone helps, and we decide things together.
 L כשיש בעיה, לא נשארים לבד. מבקשים עזרה ממבוגר שאפשר לסמוך עליו.|عندما تكون هناك مشكلة، لا نبقى وحدنا. نطلب المساعدة من شخص بالغ نثق به.|Если есть проблема, не остаёмся одни. Просим помощи у взрослого, которому доверяем.|When there is a problem, we are not alone. We ask a grown-up we trust for help.
-Q איך קוראים לקבוצת אנשים שעושים דברים יחד ועוזרים זה לזה?|ماذا نسمّي مجموعة من الناس تفعل الأشياء معًا وتساعد بعضها؟|Как называется группа людей, которые делают дела вместе и помогают друг другу?|What do we call a group of people who do things together and help each other?|e_comm|e_fam,e_town,e_country
+Q איך קוראים לכיתה או לשכונה, שבהן אנשים עושים דברים יחד ועוזרים זה לזה?|ماذا نسمّي الصفّ أو الحي، حيث يفعل الناس الأشياء معًا ويساعدون بعضهم؟|Как называется класс или район, где люди делают дела вместе и помогают друг другу?|What do we call a class or a neighborhood, where people do things together and help each other?|e_comm|e_fam,e_town,e_country
 Q איזה מקום גדול יותר מהעיר?|أي مكان أكبر من المدينة؟|Какое место больше города?|Which place is bigger than a city?|e_country|e_nbh,e_class,e_fam
 Q כמה שכונות יחד הן...|عدة أحياء معًا هي...|Несколько районов вместе - это...|Several neighborhoods together are...|e_town|e_class,e_fam,e_nbh
 Q כמה ערים ויישובים יחד הם...|عدة مدن وبلدات معًا هي...|Несколько городов и посёлков вместе - это...|Several cities and towns together are...|e_country|e_class,e_nbh,e_fam
@@ -129,6 +129,7 @@ E e_hide|t|מסתירים|نخفي الأمر|скрываем|we hide it
 E e_wait|t|מחכים בתור|ننتظر في الدور|ждём своей очереди|we wait in line
 E e_push|t|דוחפים|ندفع الآخرين|толкаемся|we push
 E e_cut|t|עוקפים את כולם|نتجاوز الجميع|обгоняем всех|we jump ahead of everyone
+E e_quarrel2|t|רבים על התור|نتشاجر على الدور|ссоримся из-за очереди|we quarrel over the turn
 S rules|📏|#1971c2|כללים וחוקים|القواعد والقوانين|правила и законы|Rules and Laws
 L בכל מקום יש כללים: בבית, בכיתה ובמגרש המשחקים.|في كل مكان توجد قواعد: في البيت وفي الصف وفي الملعب.|Везде есть правила: дома, в классе и на площадке.|Every place has rules: at home, in class and on the playground.
 L כללים עוזרים לכולם להרגיש בטוחים ולשחק בהוגנות.|القواعد تساعد الجميع على الشعور بالأمان واللعب بعدل.|Правила помогают всем чувствовать себя в безопасности и играть честно.|Rules help everyone feel safe and play fairly.
@@ -140,7 +141,7 @@ Q למה יש כללים?|لماذا توجد قواعد؟|Зачем нужны
 Q איך קוראים לכללים שכל המדינה צריכה לשמור עליהם?|ماذا نسمّي القواعد التي يجب على الدولة كلها الالتزام بها؟|Как называются правила, которые должна соблюдать вся страна?|What are the rules that the whole country must follow called?|laws|rules,vote,tree
 Q מי כותב את החוקים?|من يكتب القوانين؟|Кто пишет законы?|Who writes the laws?|knesset|policeb,court,city
 Q מי עוזר לשמור על החוקים?|من يساعد في الحفاظ على القوانين؟|Кто помогает соблюдать законы?|Who helps to keep the laws?|police|teacher,fireman,medic
-Q מה עושים כשמחכים בתור?|ماذا نفعل عندما ننتظر في الدور؟|Что делают, когда стоят в очереди?|What do we do when we wait in line?|e_wait|e_push,e_cut,e_hide
+Q מה עושים כשהרבה ילדים רוצים לעלות על המגלשה?|ماذا نفعل عندما يريد أولاد كثيرون الصعود إلى الزحليقة؟|Что мы делаем, когда много детей хотят залезть на горку?|What do we do when many children want to go on the slide?|e_wait|e_push,e_cut,e_quarrel2
 Q מה עושים כשמישהו מכה אותנו?|ماذا نفعل عندما يضربنا أحد؟|Что делать, когда кто-то нас бьёт?|What do we do when someone hits us?|e_tell|e_hit,e_hide,e_push
 S rights|⚖️|#2b8a3e|זכויות וחובות|الحقوق والواجبات|права и обязанности|Rights and Duties
 L לכל ילד יש זכויות. זכות היא דבר שמגיע לנו.|لكل طفل حقوق. الحق هو شيء يحق لنا الحصول عليه.|У каждого ребёнка есть права. Право - это то, что нам положено.|Every child has rights. A right is something we are entitled to.
@@ -252,18 +253,19 @@ L מי שגדול מגיל 18 ואזרח ישראלי יכול להצביע. מ�
 L ההצבעה סודית, כדי שכל אחד יבחר מה שהוא רוצה, בלי פחד.|التصويت سرّي، لكي يختار كل واحد ما يريد، من دون خوف.|Голосование тайное, чтобы каждый выбирал то, что хочет, без страха.|The vote is secret so that everyone can choose what they want, without fear.
 L גם בכיתה אפשר לעשות בחירות, למשל כדי לבחור נציג כיתה.|وفي الصف أيضًا يمكن إجراء انتخابات، مثلًا لاختيار ممثّل الصف.|В классе тоже можно проводить выборы, например, чтобы выбрать старосту.|In class we can also hold an election, for example to choose a class representative.
 L ברוב הקולות מחליטים, אבל מכבדים גם את מי שחשב אחרת.|نقرّر بحسب أغلبية الأصوات، لكننا نحترم أيضًا من فكّر بشكل مختلف.|Решение принимается большинством голосов, но мы уважаем и тех, кто думал иначе.|We decide by the most votes, but we also respect people who thought differently.
-Q איך קוראים למדינה שבה האנשים מחליטים?|ماذا نسمّي الدولة التي يقرّر فيها الناس؟|Как называется страна, в которой решают люди?|What is a country called in which the people decide?|e_democracy|e_monarchy,e_army,e_island
+Q איך קוראים למדינה שבה האנשים מחליטים?|ماذا نسمّي الدولة التي يقرّر فيها الناس؟|Как называется страна, в которой решают люди?|What is a country called in which the people decide?|e_democracy|e_monarchy,e_nolaws,e_island
 Q מה עושים בבחירות?|ماذا نفعل في الانتخابات؟|Что делают на выборах?|What do people do in an election?|vote|e_trashthrow,e_play,e_breakbench
 Q כל כמה שנים בדרך כלל יש בחירות לכנסת?|كل كم سنة تُجرى عادةً انتخابات الكنيست؟|Через сколько лет обычно проходят выборы в Кнессет?|How often are Knesset elections usually held (in years)?|n4|n1,n10,n40
 Q מגיל כמה מצביעים לכנסת?|من أي عمر يصوّت المواطن للكنيست؟|С какого возраста голосуют в Кнессет?|From what age can a citizen vote for the Knesset?|n18|n10,n12,n8
-Q איך מצביעים בבחירות לכנסת?|كيف نصوّت في انتخابات الكنيست؟|Как голосуют на выборах в Кнессет?|How do we vote in the Knesset elections?|secret|open,e_alone2,e_show
+Q איך מצביעים בבחירות לכנסת?|كيف نصوّت في انتخابات الكنيست؟|Как голосуют на выборах в Кнессет?|How do we vote in the Knesset elections?|secret|open,e_alone2,e_byphone
 Q למה ההצבעה סודית?|لماذا التصويت سرّي؟|Почему голосование тайное?|Why is the vote secret?|e_nofear|e_boring,e_strong,e_nobody
 Q איך מחליטים כשיש בחירות בכיתה?|كيف نقرّر عندما تكون هناك انتخابات في الصف؟|Как принимают решение на выборах в классе?|How do we decide in a class election?|e_majority|e_teacherwins,e_loudest,e_oldest
 E e_democracy|t|דמוקרטיה|ديمقراطية|демократия|a democracy
 E e_monarchy|t|מדינה שבה אדם אחד מחליט על הכול|دولة يقرّر فيها شخص واحد كل شيء|страна, где всё решает один человек|a country where one person decides everything
-E e_army|t|מדינה בלי חוקים|دولة بلا قوانين|страна без законов|a country with no laws
+E e_nolaws|t|מדינה בלי חוקים|دولة بلا قوانين|страна без законов|a country with no laws
 E e_island|t|אי קטן|جزيرة صغيرة|маленький остров|a small island
 E e_alone2|t|כולם רואים מה בחרת|يرى الجميع ما اخترته|все видят, что ты выбрал|everyone sees what you chose
+E e_byphone|t|בטלפון מהבית|بالهاتف من البيت|по телефону из дома|by phone from home
 E e_nofear|t|כדי שאפשר לבחור בלי פחד|لكي نختار من دون خوف|чтобы можно было выбирать без страха|so we can choose without fear
 E e_majority|t|ברוב הקולות|بحسب أغلبية الأصوات|большинством голосов|by the most votes
 E e_teacherwins|t|המורה מחליט לבד|المعلّم يقرّر وحده|учитель решает один|the teacher decides alone
