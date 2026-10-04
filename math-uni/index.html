@@ -1002,7 +1002,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u164 · 2026-10-03";
+var BUILD="u165 · 2026-10-04";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -5793,9 +5793,13 @@ function exNewSeed(){return (Math.random()*16777215)>>>0}
 function exSlot(topicId,level){return [topicId,level,exNewSeed()]}
 /* אותו זרע → אותה שאלה בדיוק: אצל המורה כשהוא בוחר, ואצל
    התלמיד כשהוא נבחן. */
+/* slot[3] הוא מספר הסעיף, ורק הסימולציה (SIMCHAIN) כותבת אותו.
+   בלעדיו שלוש משבצות השרשרת — אותו זרע — נתנו שלוש פעמים את אותה
+   שאלה בדיוק, וסעיפים א–ג של genDeriv ו-genCond לא הגיעו ללומד (O-78).
+   במבחן של מורה המשבצת באורך 3, slot[3] הוא undefined, והשאלה זהה. */
 function exBuildSlot(slot){
   if(!slot||!topicById(slot[0]))return null;
-  return withSeed(slot[2],function(){return buildQ(slot[0],slot[1])})||null;
+  return withSeed(slot[2],function(){return buildQ(slot[0],slot[1],slot[3])})||null;
 }
 /* מסך הבנייה מצייר את עצמו מחדש אחרי כל לחיצה, ובניית עשרים
    וחמש שאלות בכל ציור מיותרת. המטמון הוא לתצוגה בלבד — מי
@@ -14491,7 +14495,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u164-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u165-pwa1").catch(function(){});
   });
 }
 </script>
@@ -14544,7 +14548,7 @@ if(window.TUTOR){
       for(i=P.picked.length-1;i>=0;i--)if(o[P.picked[i]]&&!o[P.picked[i]].ok){st=txt(o[P.picked[i]].t||o[P.picked[i]].h);break}
       for(i=0;i<TRACKS.length;i++)if(TRACKS[i].v===state.track)tr=TRACKS[i].t;
       var line=(txt(typeof _==="function"?_(x.ask):x.ask)+" "+txt(x.expr)).trim(),tn=txt(x.topicName||x.topic);
-      return {id:"q"+P.i+"-"+line.slice(0,60), type:P.phase==="ask"?"mcq":"reveal",
+      return {id:"q"+P.i+"-"+line, type:P.phase==="ask"?"mcq":"reveal",
         q:line, options:o.map(function(p){return txt(p.t||p.h)}),
         correct:ok, student:st, topic:tn||null,
         level:"רמה "+x.level+" מתוך "+LVL_HE.length+(LVL_HE[x.level-1]?": "+LVL_HE[x.level-1]:""),

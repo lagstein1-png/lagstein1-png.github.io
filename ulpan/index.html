@@ -1170,7 +1170,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a127 · 2026-10-03";
+var BUILD="a128 · 2026-10-04";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -4314,9 +4314,13 @@ function exNewSeed(){return (Math.random()*16777215)>>>0}
 function exSlot(topicId,level){return [topicId,level,exNewSeed()]}
 /* אותו זרע → אותה שאלה בדיוק: אצל המורה כשהוא בוחר, ואצל
    התלמיד כשהוא נבחן. */
+/* slot[3] הוא מספר הסעיף, ורק הסימולציה (SIMCHAIN) כותבת אותו.
+   בלעדיו שלוש משבצות השרשרת — אותו זרע — נתנו שלוש פעמים את אותה
+   שאלה בדיוק, וסעיפים א–ג של genDeriv ו-genCond לא הגיעו ללומד (O-78).
+   במבחן של מורה המשבצת באורך 3, slot[3] הוא undefined, והשאלה זהה. */
 function exBuildSlot(slot){
   if(!slot||!topicById(slot[0]))return null;
-  return withSeed(slot[2],function(){return buildQ(slot[0],slot[1])})||null;
+  return withSeed(slot[2],function(){return buildQ(slot[0],slot[1],slot[3])})||null;
 }
 /* מסך הבנייה מצייר את עצמו מחדש אחרי כל לחיצה, ובניית עשרים
    וחמש שאלות בכל ציור מיותרת. המטמון הוא לתצוגה בלבד — מי
@@ -5685,7 +5689,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a127-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a128-pwa1").catch(function(){});
   });
 }
 </script>

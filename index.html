@@ -368,7 +368,10 @@ section.blk{padding-block:clamp(26px,5vw,48px); scroll-margin-block-start:78px}
   transform:translateY(-2px);
   box-shadow:0 10px 26px rgba(255,176,32,.45);
 }
-.go:focus-visible{outline:3px solid #fff; outline-offset:3px}
+/* O-96: הטבעת בצבע הטקסט של הנושא, ולא לבנה. לבן על הכרטיס הבהיר נמדד
+   1.00–1.20:1; var(--text) נמדד 14.8–17.8:1 בבהיר ו-11.6–17.1:1 בכהה
+   (WCAG 2.2 דורש 3:1 לטבעת מיקוד). */
+.go:focus-visible{outline:3px solid var(--text); outline-offset:3px}
 .go:active{transform:translateY(0)}
 @media (max-width:480px){.go{min-block-size:60px; font-size:1.3rem}}
 @media (prefers-reduced-motion:reduce){
@@ -1200,7 +1203,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=155-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=156-pwa1").catch(function(){});
   });
 }
 </script>

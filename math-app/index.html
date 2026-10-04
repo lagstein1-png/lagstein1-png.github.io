@@ -2382,7 +2382,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="b173 · 2026-10-03";
+var BUILD="b174 · 2026-10-04";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -3284,9 +3284,13 @@ function exNewSeed(){return (Math.random()*16777215)>>>0}
 function exSlot(topicId,level){return [topicId,level,exNewSeed()]}
 /* אותו זרע → אותה שאלה בדיוק: אצל המורה כשהוא בוחר, ואצל
    התלמיד כשהוא נבחן. */
+/* slot[3] הוא מספר הסעיף, ורק הסימולציה (SIMCHAIN) כותבת אותו.
+   בלעדיו שלוש משבצות השרשרת — אותו זרע — נתנו שלוש פעמים את אותה
+   שאלה בדיוק, וסעיפים א–ג של genDeriv ו-genCond לא הגיעו ללומד (O-78).
+   במבחן של מורה המשבצת באורך 3, slot[3] הוא undefined, והשאלה זהה. */
 function exBuildSlot(slot){
   if(!slot||!topicById(slot[0]))return null;
-  return withSeed(slot[2],function(){return buildQ(slot[0],slot[1])})||null;
+  return withSeed(slot[2],function(){return buildQ(slot[0],slot[1],slot[3])})||null;
 }
 /* מסך הבנייה מצייר את עצמו מחדש אחרי כל לחיצה, ובניית עשרים
    וחמש שאלות בכל ציור מיותרת. המטמון הוא לתצוגה בלבד — מי
@@ -4932,7 +4936,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b173-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b174-pwa1").catch(function(){});
   });
 }
 </script>

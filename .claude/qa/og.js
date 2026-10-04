@@ -3,6 +3,7 @@
    הכרומיום שכבר מותקן לבדיקות, ואין npm ואין שלב בנייה.
 
      node .claude/qa/og.js <תיקייה> <רקע> '<כותרת>' '<path d=…>' ['<כותרת משנה>']
+     node .claude/qa/og.js --check    תמונות השיתוף שבדיסק מול הפלטה (רץ ב-all.js)
 
    הפריסה נמדדה מ-`english/img/og.png` הקיימת: 1200×630, רקע בצבע
    המותג, כותרת RTL, שורת ״למידה שנשמעת״ מתחתיה, ואריח מעוגל עם
@@ -14,9 +15,85 @@
    **והרקע שטוח בכוונה.** PNG אינו דוחס מעברים חלקים: גרדיאנט
    רדיאלי נתן 215KB ולינארי 158KB, מול **25KB** לרקע שטוח — נמדד
    על אותה תמונה בדיוק. שאר התיקים יושבים על 35–46KB.
+
+   **--check (O-77).** הצילום אינו דטרמיניסטי — הגופן נמשך מגוגל, והרשת
+   חסומה בסביבת הפיתוח — ולכן אין ״לייצר מחדש ולהשוות בתים״. נבדק מה
+   שאפשר לקרוא מה-PNG עצמו (המפענח יושב ב-`icon.js`):
+     1. הגודל 1200×630.
+     2. הרקע — ארבע הפינות — הוא `theme_color` שבמניפסט של אותה
+        אפליקציה. זה בדיוק מה שנסחף ב-18.9: חמש תמונות בצבע זר.
+     3. אין שתי אפליקציות עם **אותו קובץ בדיוק**. הכותרת צרובה בתמונה,
+        ולכן עותק פירושו שאפליקציה אחת משותפת בשם של אחרת — נמדד
+        4.10.2026: science משותפת כ״חשבון ליסודי״.
+   מה שלא נבדק: נוסח הכותרת והסמל. אין להם מקור בדיסק שאפשר להשוות
+   אליו בלי OCR.
    ===================================================================== */
+const fs = require('fs'), path = require('path'), crypto = require('crypto');
+
+/* תמונה שלא יצאה מהמחולל הזה, בכוונה — עיצוב אחר, לא סחיפה. שורה
+   שהתמונה שלה כבר תואמת לפלטה נופלת: חריג שאינו נחוץ הוא חור. */
+const FOREIGN = {
+  'hebrew-lit':  'רקע מדורג וציור ספרים — עיצוב נפרד של היסודי',
+  'tanakh-elem': 'רקע מדורג — אותו עיצוב של hebrew-lit',
+  'rakia':       'צילום מסך של מפת הלידה, לא כרטיס של og.js',
+  'civics':      'רקע בהיר מדורג עם תגיות נושא — עיצוב נפרד',
+};
+/* עותקים ידועים: תיקייה → התיקייה שהתמונה שלה הועתקה. **זה באג פתוח,
+   לא היתר** (נמדד 4.10.2026, דווח לבצלאל): הכותרת שבתמונה היא של
+   המקור. כל שורה נמחקת כשהתמונה מחודשת, ושורה שכבר אינה עותק נופלת.
+   עותק חדש שאינו כאן — נופל. */
+const COPIED = {
+  'bagrut-history': 'bagrut-806',
+  'geography':      'civics',
+  'hebrew-arab':    'civics',
+  'literature':     'civics',
+  'motal':          'civics',
+  'tanakh':         'civics',
+  'geography-elem': 'math-app',
+  'science':        'math-app',
+};
+
+if (process.argv.includes('--check')) {
+  const { decodePNG, near, appDirs, theme, TOL, ROOT } = require('./icon.js');
+  const bad = [], byHash = new Map(); let n = 0;
+  for (const dir of appDirs()) {
+    const f = path.join(ROOT, dir, 'img', 'og.png');
+    if (!fs.existsSync(f)) continue;
+    n++;
+    const rel = path.join(dir, 'img', 'og.png');
+    const h = crypto.createHash('sha1').update(fs.readFileSync(f)).digest('hex');
+    byHash.set(h, (byHash.get(h) || []).concat(dir));
+    const img = decodePNG(f), bg = theme(dir);
+    if (img.w !== 1200 || img.h !== 630) bad.push(`${rel}: ${img.w}×${img.h}, צריך 1200×630`);
+    const off = [[3, 3], [1196, 3], [3, 626], [1196, 626]]
+      .map(([x, y]) => [x, y, img.at(x, y)]).filter(([, , c]) => !near(c, bg));
+    if (FOREIGN[dir]) {
+      if (!off.length) bad.push(`${dir}: רשום כחריג ב-FOREIGN, אבל הרקע כבר ${bg} — מחק את השורה`);
+      else console.log(`  · ${dir} — חריג מתועד: ${FOREIGN[dir]}`);
+    } else if (COPIED[dir] && FOREIGN[COPIED[dir]]) {
+      /* עותק של תמונה חריגה יורש את החריגה — הבאג שלו נספר למטה. */
+    } else for (const [x, y, c] of off) bad.push(`${rel} (${x},${y}) ${c} — הרקע אינו theme_color ${bg} (סטייה מעל ${TOL})`);
+  }
+  const copied = new Set();
+  for (const dirs of byHash.values()) {
+    if (dirs.length < 2) continue;
+    /* המקור הוא מי שאינו רשום כעותק; אם כולם רשומים — הראשון. */
+    const src = dirs.find(d => !COPIED[d]) || dirs[0];
+    for (const d of dirs) {
+      if (d === src) continue;
+      copied.add(d);
+      if (COPIED[d] === src) console.log(`  · ${d} — עותק ידוע של ${src} (באג פתוח: הכותרת של ${src})`);
+      else bad.push(`${d}/img/og.png: זהה בבית לבית ל-${src}/img/og.png — הכותרת שבתמונה היא של אפליקציה אחרת`);
+    }
+  }
+  for (const d of Object.keys(COPIED)) if (!copied.has(d)) bad.push(`COPIED: ${d} כבר אינו עותק של ${COPIED[d]} — מחק את השורה`);
+  for (const d of Object.keys(FOREIGN)) if (!fs.existsSync(path.join(ROOT, d, 'img', 'og.png'))) bad.push(`FOREIGN: ${d} — אין ${d}/img/og.png`);
+  for (const b of bad) console.log('✗ ' + b);
+  console.log(`${bad.length ? '✗' : '✓'} ${n} תמונות שיתוף מול theme_color, ${Object.keys(FOREIGN).length} חריגים, ${Object.keys(COPIED).length} עותקים ידועים, ${bad.length} פערים`);
+  process.exit(bad.length ? 1 : 0);
+}
+
 const { chromium } = require('./pw.js');
-const fs = require('fs'), path = require('path');
 
 const [dir, bg, title, d, sub] = process.argv.slice(2);
 /* כותרת המשנה: ״למידה שנשמעת״ באפליקציות, ״אפליקציות לימוד בהקראה״ בשורש

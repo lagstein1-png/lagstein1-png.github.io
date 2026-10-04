@@ -72,6 +72,8 @@
     node .claude/qa/simplify.js          # ״גרסה פשוטה״ ב-reader — רק בלחיצה, רק במצב simplify, ובלי שרת
     node .claude/qa/analytics.js         # GoatCounter: בכל הדפים או באף אחד, והתנאים זהים בארבע שפות
     node .claude/qa/mkreader.js --check  # marketing/index.html לא נערך ביד (המחולל: אותו קובץ)
+    node .claude/qa/og.js --check        # תמונות השיתוף: רקע מול theme_color, 1200×630, ואין עותק של אפליקציה אחרת (המחולל: אותו קובץ)
+    node .claude/qa/icon.js --check      # אייקוני PWA: רקע מול theme_color, וכל אייקון שהמניפסט מצהיר קיים בגודלו (המחולל: אותו קובץ)
     node .claude/qa/media.js             # סרטוני ההדגמה — חתימת כל סרטון מול DEMO_SCRIPT, וצילומי המסך בארבע שפות
     node .claude/qa/counts.js            # מספר תוכן שמצוטט בחומר שיווקי מול המדידה של היום
     node .claude/qa/barak.js             # מנוע לימור — חוזה ה-Worker מול מודל מדומה, והחיווט בלקוח; בלי רשת
@@ -81,7 +83,7 @@
     node .claude/qa/tutor-lang.js        # השאלה שלימור מקבלת כתובה בשפת המסך — בכל אפליקציה עם מחולל
     node .claude/qa/contrast.js          # האם הטקסט בכלל נראה — ניגודיות מול הסף
     node .claude/qa/shadow.js            # פונקציה גלובלית שנדרסה בשקט
-    node .claude/qa/voice.js             # מנוע ההקראה מול speechSynthesis מזויף — ארבעת המנגנונים מתאוששים
+    node .claude/qa/voice.js             # מנוע ההקראה מול speechSynthesis מזויף — ארבעת המנגנונים מתאוששים; ופס ״אין קול בשפה״ (O-79): קולות en בלבד → פס פעם אחת, he → אין, ריקה → אין. `--nolang` מריץ רק אותו
     node .claude/qa/netpin.js            # מנגנון 4 מול בחירת קול ידנית — tutor/tutor.js
     node .claude/qa/exam.js              # המבחן מהקישור — השאלה שהמורה רואה היא שהתלמיד מקבל
     node .claude/qa/recorded.js          # השכבה המוקלטת — המודול והחיווט; עם --browser גם הניגון בדפדפן

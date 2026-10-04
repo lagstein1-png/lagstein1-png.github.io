@@ -7,6 +7,7 @@
      node .claude/qa/serve.js &
      node .claude/qa/content.js                  # כל בעלי buildQ
      node .claude/qa/content.js math-uni         # אחת
+     node .claude/qa/content.js math-elem hebrew-lit  # בנק UNITS — scanUnits (O-113)
      QA_N=400 node .claude/qa/content.js english # מדגם גדול יותר
 
    **ריצה דורסת את הדוח השמור של אותה אפליקציה**, ו-`stage.js` קורא
@@ -728,6 +729,330 @@ async function scanLang(page,lg){
  },{lg:lg});
 }
 
+/* ==============================================================
+   מסלול שני: אפליקציות שהבנק שלהן הוא `UNITS` ולא `buildQ` — O-113.
+
+   math-elem ו-hebrew-lit אינן חושפות `buildQ` או `TOPICS`, ולכן
+   הסורק הראשי נפל עליהן ב-ReferenceError ואחר כך דילג עליהן
+   בהצהרה ״מחוץ להיקף״. שתי צורות, ושתיהן נקראו מהקוד ולא שוערו:
+
+   · **math-elem** (`G` + `UNITS` עם `band`, הכול ב-`index.html`):
+     `G[unit](lv)` מחזיר `{q:L, vis|visL, o:[{id,l}], a, h:L, e:L, step}`.
+     הנכונה היא האפשרות ש-`o.id===a`. רמות 1–3 (רמה 4 במסך היא
+     ערבוב שלהן ואינה מחולל משלה). `mk` **משלים** מסיחים חסרים
+     במספר אקראי 0–99 — ולכן הוא עטוף כאן ונספר כל מקרה שבו
+     המחולל עצמו לא סיפק שלושה מסיחים שונים.
+   · **hebrew-lit** (`GEN` + `UNITS` עם `grade`, ב-`js/engine.js`,
+     והבנק ב-`js/data.js`): `GEN[g]()` מחזיר `{opts:[{t,say}], ans,
+     reveal, ins, h, help, item, say}`. הנכונה היא `opts[ans]`, ו-`reveal`
+     חייב להיות הטקסט שלה. יחידות `comp` הן בנק סגור — **כל** קטע
+     וכל שאלה נבנים, בלי הגרלה. ההסבר הוא שלושה מפתחות מילון
+     (`ins`, `h`, `help`) שחייבים להתקיים בכל ארבע השפות.
+
+   אותן משפחות ממצאים ואותו `md()` כמו במסלול הראשי.
+   ============================================================== */
+async function scanUnits(page){
+ return page.evaluate(({N})=>{
+  const R={n:0,cells:0,find:{},lang:{},langs:[],kind:''};
+  const MAXEX=3;
+  function add(kind,sev,msg,where,sub){
+    const id=kind+(sub?' · '+sub:'');
+    const f=R.find[id]||(R.find[id]={kind:kind,sev:sev,n:0,ex:[],cells:{}});
+    f.n++;
+    if(where) f.cells[where]=1;
+    if(f.ex.length<MAXEX) f.ex.push({msg:String(msg).slice(0,220),where:where});
+  }
+  const div=document.createElement('div');
+  const plain=function(h){div.innerHTML=String(h==null?'':h);
+    return (div.textContent||'').replace(/\s+/g,' ').trim()};
+  const HEB=/[א-ת]/;
+  const BROKEN=/\bNaN\b|\bInfinity\b|\bundefined\b|\bnull\b|\[object Object\]/;
+  const PLACE=/\{(?:a|b|c|n|ans)\}/;
+  function textChecks(kind,t,where){
+    if(!t) return;
+    if(BROKEN.test(t)) add('broken-text','FAIL',kind+': '+t,where);
+    if(PLACE.test(t))  add('placeholder-left','FAIL',kind+': '+t,where);
+    if(/[�]/.test(t))  add('mojibake','FAIL',kind+': '+t,where);
+    if(/ {2,}/.test(t)) add('double-space','REVIEW',kind+': '+t,where);
+    const o=(t.match(/[({\[]/g)||[]).length, c=(t.match(/[)}\]]/g)||[]).length;
+    if(o!==c) add('unbalanced-brackets','REVIEW',kind+': '+t,where);
+    if((kind==='ask'||kind==='hint')&&/[\p{L}]\s+[,.;!?]/u.test(t))
+      add('space-before-punct','REVIEW',kind+': '+t,where);
+  }
+  /* זרע לפי תא — אותו mulberry32 ואותו נימוק כמו ב-scan(). */
+  const REAL_RANDOM=Math.random;
+  function seedAt(str){
+    let h=2166136261>>>0;
+    for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619) }
+    let s=h>>>0;
+    Math.random=function(){
+      s|=0; s=s+0x6D2B79F5|0;
+      let t=Math.imul(s^s>>>15,1|s);
+      t=t+Math.imul(t^t>>>7,61|t)^t;
+      return ((t^t>>>14)>>>0)/4294967296;
+    };
+  }
+  R.seeded=true;
+
+  /* ---------- מתאם: כל שאלה מתורגמת לצורה אחת ----------
+     {ask:{lg:טקסט}, expl:[{name,v:{lg:טקסט}}], opts:[{lg:טקסט}],
+      ok:[אינדקסים נכונים], id:זהות, audioOnly, extra:[[kind,sev,msg]]} */
+  const isME=(typeof G==='object'&&G&&typeof UNITS!=='undefined');
+  const isHL=(typeof GEN==='object'&&GEN&&typeof UNITS!=='undefined'&&typeof _S==='object');
+  if(!isME&&!isHL){ R.unsupported=true; return R }
+  R.kind=isME?'G':'GEN';
+  const LG_=isME?(typeof LG!=='undefined'?LG.slice():['he'])
+                :(Array.isArray(LANGS)?LANGS.slice():Object.keys(LANGS));
+  R.langs=LG_;
+  const cells=[];   // {where, gen():raw, unit}
+  let norm, padded=0, padEx=null;
+
+  if(isME){
+    /* `mk` נקרא מתוך G בחיפוש גלובלי, ולכן עטיפה כאן רואה כל קריאה.
+       נספר רק מה שהמחולל סיפק לפני ההשלמה האקראית. */
+    const REAL_MK=window.mk;
+    window.mk=function(t,q,vis,ans,dist,hint,expl,step){
+      const seen={}; seen[oid(ans)]=1; let u=0;
+      (dist||[]).forEach(function(x){const k=oid(x); if(!seen[k]){seen[k]=1;u++}});
+      const r=REAL_MK.apply(this,arguments);
+      if(u<3){ r.__padded=3-u; r.__dist=(dist||[]).map(function(x){return typeof x==='object'?x.he:String(x)}) }
+      return r;
+    };
+    R.__restore=function(){ window.mk=REAL_MK };
+    const saveLang=S.lang;
+    const labelIn=function(o,lg){ const s=S.lang; S.lang=lg; try{ return optLabel(o) } finally{ S.lang=s } };
+    const ltIn=function(x,lg){ return x==null?undefined:(typeof x==='string'?x:x[lg]) };
+    for(const u of UNITS) for(let lv=1;lv<=3;lv++){
+      const id=u.id;
+      cells.push({where:id+' L'+lv, gen:function(){ return G[id](lv) }, sample:true});
+    }
+    R.topics=UNITS.length; R.levels=3;
+    norm=function(q,where){
+      const out={ask:{},expl:[],opts:[],ok:[],extra:[]};
+      for(const lg of LG_) out.ask[lg]=ltIn(q.q,lg);
+      out.expl.push({name:'hint',v:{}},{name:'explain',v:{}});
+      for(const lg of LG_){ out.expl[0].v[lg]=ltIn(q.h,lg); out.expl[1].v[lg]=ltIn(q.e,lg) }
+      (q.o||[]).forEach(function(o,i){
+        const m={}; for(const lg of LG_) m[lg]=labelIn(o,lg);
+        out.opts.push(m); if(o.id===q.a) out.ok.push(i);
+      });
+      if(!(q.o||[]).some(function(o){return o.id===q.a}))
+        out.extra.push(['answer-not-in-options','FAIL','המזהה הנכון "'+q.a+'" אינו אף אחת מהאפשרויות']);
+      const vis=q.visL?q.visL.he:q.vis;
+      out.id=String(q.t)+' ¦ '+out.ask.he+' ¦ '+String(vis||'');
+      if(q.__padded){
+        padded++;
+        out.extra.push(['padded-distractor','REVIEW',
+          'המחולל "'+q.t+'" סיפק '+(3-q.__padded)+' מסיחים שונים, ו-mk השלים '+q.__padded+
+          ' במספר אקראי 0–99: '+out.ask.he+' ← מסיחים שסופקו: '+q.__dist.join(', ')+
+          ' · מוצג: '+out.opts.map(function(o){return o.he}).join(' | '), q.t]);
+      }
+      if(typeof LESSONS==='object'&&LESSONS[where.split(' ')[0]]===undefined)
+        out.extra.push(['no-lesson','FAIL','אין LESSONS ליחידה — כפתור ״דוגמה״ ייפול']);
+      S.lang=saveLang;
+      return out;
+    };
+  } else {
+    const trIn=function(k,lg){
+      const o=_S[k]; if(!o) return undefined;
+      return o[lg];
+    };
+    const bankOf=function(u){ return u.texts==='TEXTS1'?TEXTS1:u.texts==='TEXTS3'?TEXTS3:TEXTS };
+    for(const u of UNITS){
+      const where=u.id+' (כיתה '+u.grade+')';
+      if(u.gen==='comp'){
+        /* בנק סגור: כל קטע וכל שאלה, בדיוק פעם אחת. */
+        const list=[];
+        bankOf(u).forEach(function(tx){ (tx.qs||[]).forEach(function(_,i){ list.push([tx,i]) }) });
+        cells.push({where:where, all:list.map(function(p){return function(){
+          const q=GEN.comp(p[0],p[1]); q.__src=p[0].id+'#'+p[1]; q.__tx=p[0]; return q }}), unit:u});
+      } else {
+        const gens=[].concat(u.gen);
+        let k=0;
+        cells.push({where:where, gen:function(){ return GEN[gens[(k++)%gens.length]]() }, sample:true, unit:u});
+      }
+    }
+    R.topics=UNITS.length; R.levels=1;
+    norm=function(q,where){
+      const out={ask:{},expl:[],opts:[],ok:[],extra:[]};
+      const it=q.item||{};
+      const body=[it.sentence,it.question].filter(Boolean).join(' ');
+      for(const lg of LG_){ const ins=trIn(q.ins,lg); out.ask[lg]=(ins===undefined?undefined:(ins+(lg==='he'&&body?' '+body:''))) }
+      out.expl.push({name:'hint (h='+q.h+')',v:{}},{name:'lesson (help='+q.help+')',v:{}});
+      for(const lg of LG_){ out.expl[0].v[lg]=trIn(q.h,lg); out.expl[1].v[lg]=trIn(q.help,lg) }
+      (q.opts||[]).forEach(function(o,i){
+        const m={}; for(const lg of LG_) m[lg]=(o&&o.t!=null)?String(o.t):undefined;
+        out.opts.push(m);
+      });
+      const a=q.ans;
+      if(typeof a==='number'&&a>=0&&a<(q.opts||[]).length) out.ok.push(a);
+      else out.extra.push(['answer-index','FAIL','ans='+a+' מחוץ לטווח האפשרויות']);
+      if(out.ok.length){
+        const at=out.opts[a].he;
+        /* תשובה כפולה: אפשרות אחרת שהטקסט שלה זהה לנכונה. */
+        out.opts.forEach(function(o,i){ if(i!==a&&o.he===at) out.ok.push(i) });
+        if(String(q.reveal)!==at)
+          out.extra.push(['reveal-mismatch','FAIL','reveal="'+q.reveal+'" אבל האפשרות הנכונה היא "'+at+'"']);
+      }
+      if(!q.reveal||!String(q.reveal).trim())
+        out.extra.push(['no-reveal','FAIL','אין reveal — אחרי טעות אין מה להראות']);
+      /* זהות: הסוג, מה שעל המסך (item) ומה שנשמע (say). */
+      const says=(q.say||[]).map(function(s){return s&&s.t});
+      out.id=q.type+' ¦ '+JSON.stringify(it)+' ¦ '+says.join('/');
+      out.audioOnly=!!it.listen;
+      out.audioOnlyAns=out.ok.length?out.opts[a].he:'';
+      if(it.listen&&!says.filter(Boolean).length)
+        out.extra.push(['no-say','FAIL','שאלת האזנה בלי say — אין מה לשמוע']);
+      for(const s of (q.say||[])) if(!s||typeof s.t!=='string'||BROKEN.test(s.t))
+        out.extra.push(['broken-say','FAIL','say: '+JSON.stringify(s)]);
+      /* קטע: תרגום לכל שפה שאינה עברית — האפליקציה מציגה אותו כשהוא קיים. */
+      if(q.__tx){
+        const miss=LG_.filter(function(lg){return lg!=='he'&&!(q.__tx.tr&&q.__tx.tr[lg]&&String(q.__tx.tr[lg]).trim())});
+        if(miss.length) out.extra.push(['passage-untranslated','REVIEW',
+          'לקטע "'+q.__tx.id+'" אין תרגום ל-'+miss.join(','), miss.join(',')]);
+        out.src=q.__src;
+      }
+      return out;
+    };
+  }
+
+  const cov={q:0,hasHint:0,noHint:0,noSteps:0,hasSteps:0,wrong:0,hasWhy:0,noWhy:0,hasExpl:0,noExpl:0};
+  const lr={}; for(const lg of LG_) lr[lg]={lg:lg,built:0,threw:0,empty:0,heb:0,hebOpt:0,hebWhy:0,lim:0,longOpt:0,longQ:0,
+    skipHeb:(isHL&&lg!=='he'), teaches:isHL?'he':''};
+
+  for(const c of cells){
+    const where=c.where;
+    seedAt(where);
+    R.cells++;
+    const qseen={}, qfull={}, posN=[0,0,0,0,0,0], longest=[0,0], sizes={};
+    let cellN=0;
+    const jobs=c.all?c.all:Array.from({length:N},function(){return c.gen});
+    for(const job of jobs){
+      let q=null;
+      try{ q=job() }
+      catch(e){ add('build-throw','FAIL',String(e&&e.message||e),where); for(const lg of LG_) lr[lg].threw++; continue }
+      if(!q){ add('build-null','FAIL','המחולל החזיר null',where); continue }
+      let n;
+      try{ n=norm(q,where) }
+      catch(e){ add('option-shape','FAIL','השאלה אינה בצורה שהסורק מכיר: '+String(e&&e.message||e),where); continue }
+      R.n++; cellN++;
+      const here=where+(n.src?' · '+n.src:'');
+      for(const x of n.extra) add(x[0],x[1],x[2],here,x[3]);
+      const k=n.opts.length;
+      sizes[k]=(sizes[k]||0)+1;
+      for(const lg of LG_){ lr[lg].built++; if(!k) lr[lg].empty++ }
+      if(k<2){ add('too-few-options','FAIL',k+' אפשרויות',here); continue }
+      if(k>4) add('too-many-options','FAIL',k+' אפשרויות — המקלדת מקצה 1–4',here);
+
+      /* 1–2. תשובה אחת נכונה, ואין אפשרות כפולה — בכל שפה בנפרד:
+         שתי אפשרויות שונות בעברית יכולות להיות זהות ברוסית. */
+      if(n.ok.length===0) add('no-answer','FAIL','אף אפשרות אינה הנכונה: '+(n.ask.he||''),here);
+      else if(n.ok.length>1) add('multi-answer','FAIL',
+        n.ok.length+' אפשרויות נכונות: '+n.ok.map(function(i){return n.opts[i].he}).join(' | ')+' — '+(n.ask.he||''),here);
+      /* ב-hebrew-lit האפשרויות הן התוכן העברי עצמו ואינן מתורגמות —
+         בדיקה אחת, לא ארבע זהות. */
+      for(const lg of (isHL?['he']:LG_)){
+        const tx=n.opts.map(function(o){return o[lg]});
+        if(tx.some(function(x){return x===undefined||x===null})){
+          add('lang-missing','FAIL',lg+': אפשרות בלי טקסט — '+(n.ask.he||''),here,lg); continue }
+        if(new Set(tx.map(function(x){return String(x).trim()})).size!==tx.length)
+          add('dup-option','FAIL',lg+': שתי אפשרויות זהות על המסך: '+tx.join(' | ')+' — '+(n.ask.he||''),here,lg==='he'?'':lg);
+        for(const x of tx){
+          if(BROKEN.test(String(x))) add('broken-option','FAIL',lg+': אפשרות: '+x,here);
+          if(!String(x).trim()) add('empty-option','FAIL',lg+': אפשרות ריקה',here);
+          if(lg!=='he'&&!lr[lg].skipHeb&&HEB.test(String(x))){ lr[lg].hebOpt++ }
+        }
+      }
+      const ri=n.ok.length===1?n.ok[0]:-1;
+      const texts=n.opts.map(function(o){return String(o.he==null?'':o.he)});
+
+      /* 3. שאלה כפולה וסותרת: אותה שאלה, אותן אפשרויות, תשובה אחרת. */
+      const opsKey=texts.slice().sort().join(' ¦ ');
+      qseen[n.id+' ¦ '+opsKey+(n.audioOnly?' ¦ '+n.audioOnlyAns:'')]=1;
+      if(ri>=0&&!n.audioOnly){
+        const rc=qfull[n.id+' ¦ '+opsKey]||(qfull[n.id+' ¦ '+opsKey]={});
+        rc[texts[ri]]=1;
+        if(Object.keys(rc).length>1)
+          add('contradiction','FAIL','אותה שאלה ואותן אפשרויות, שתי תשובות: "'+String(n.ask.he).slice(0,60)+'" ← '+
+              Object.keys(rc).join(' / '),here);
+      }
+
+      /* 4. הסבר קיים, בכל שפה. */
+      cov.q++;
+      /* הספירה נכתבת לשדה משלה (`hasExpl`) ולא ל-`why`: ההסבר כאן
+         שייך לשאלה ולא למסיח, ו-md() מדפיס אותו בשורה נפרדת. */
+      for(const e of n.expl){
+        cov.hasExpl++;
+        let gone=[];
+        for(const lg of LG_){
+          const v=e.v[lg];
+          if(v===undefined||v===null||!String(v).trim()) gone.push(lg);
+          else {
+            textChecks('hint',plain(v),here);
+            if(lg!=='he'&&HEB.test(String(v))&&isME){ lr[lg].hebWhy++ }
+          }
+        }
+        if(gone.length===LG_.length){ cov.noExpl++; add('no-explanation','FAIL','אין '+e.name+' באף שפה — '+(n.ask.he||''),here,e.name.split(' ')[0]) }
+        else if(gone.length) add('lang-missing','FAIL','חסר '+e.name+' ב-'+gone.join(',')+' — '+(n.ask.he||''),here,gone.join(','));
+      }
+      /* השאלה עצמה, בכל שפה. */
+      const missAsk=LG_.filter(function(lg){const v=n.ask[lg];return v===undefined||v===null||!String(v).trim()});
+      if(missAsk.length===LG_.length) add('empty-question','FAIL','אין טקסט שאלה',here);
+      else if(missAsk.length) add('lang-missing','FAIL','חסרה השאלה ב-'+missAsk.join(',')+' — '+(n.ask.he||''),here,missAsk.join(','));
+      let dirty=false;
+      for(const lg of LG_){
+        const v=n.ask[lg]; if(v==null) continue;
+        textChecks('ask',plain(v),here);
+        if(lg!=='he'&&HEB.test(String(v))&&isME) dirty=true;
+      }
+      for(const lg of LG_) if(lg!=='he'&&isME){
+        const d=dirty||n.opts.some(function(o){return HEB.test(String(o[lg]))})||
+          n.expl.some(function(e){return HEB.test(String(e.v[lg]||''))});
+        if(d) lr[lg].heb++;
+      }
+      for(const tx of texts) textChecks('option',tx,here);
+
+      /* 8. חשוד — אותו מדד כמו בסורק הראשי. */
+      if(ri>=0){
+        posN[ri]=(posN[ri]||0)+1;
+        const lens=texts.map(function(x){return x.length});
+        const mx=Math.max.apply(null,lens), mn=Math.min.apply(null,lens);
+        const tie=function(v){return lens.filter(function(l){return l===v}).length};
+        if(texts[ri].length===mx) longest[0]+=1/tie(mx);
+        if(texts[ri].length===mn) longest[1]+=1/tie(mn);
+      }
+    }
+    if(cellN>=20){
+      const distinct=Object.keys(qseen).length;
+      if(distinct===1) add('one-question','FAIL','התא מייצר שאלה אחת בלבד ב-'+cellN+' הגרלות',where);
+      else if(c.sample&&distinct/cellN<0.05) add('low-variety','REVIEW',distinct+' שאלות שונות ב-'+cellN+' הגרלות',where);
+      const tot=posN.reduce(function(a,b){return a+b},0);
+      if(tot>=20){
+        const mx=Math.max.apply(null,posN);
+        if(mx/tot>0.5) add('position-bias','REVIEW','התשובה במקום קבוע ב-'+Math.round(mx/tot*100)+'% מהשאלות',where);
+        if(longest[0]/tot>0.7) add('longest-answer','REVIEW','מי שבוחר תמיד את האפשרות הארוכה ביותר קולע ב-'+
+          Math.round(longest[0]/tot*100)+'% מהשאלות (ניחוש עיוור: 25%)',where);
+        if(longest[1]/tot>0.7) add('shortest-answer','REVIEW','מי שבוחר תמיד את האפשרות הקצרה ביותר קולע ב-'+
+          Math.round(longest[1]/tot*100)+'% מהשאלות (ניחוש עיוור: 25%)',where);
+      }
+    }
+    let under=0; for(const s in sizes) if(+s<4) under+=sizes[s];
+    if(cellN&&under) add('few-options','REVIEW',
+      under+' מתוך '+cellN+' שאלות מציגות פחות מארבע אפשרויות',where);
+  }
+  Math.random=REAL_RANDOM;
+  if(R.__restore){ R.__restore(); delete R.__restore }
+  R.coverage=cov;
+  R.padded=padded;
+  R.langsRun=LG_.map(function(lg){return lr[lg]});
+  for(const lg of LG_) if(lr[lg].heb){
+    add('lang-untranslated','REVIEW',lg+': '+lr[lg].heb+' שאלות מתוך '+lr[lg].built+' עדיין נושאות טקסט עברי ('+
+      lr[lg].hebOpt+' באפשרות, '+lr[lg].hebWhy+' בהסבר)',lg,lg);
+  }
+  return R;
+ },{N:N});
+}
+
 /* ---------------- דוח ---------------- */
 /* פסק הדין נמנה בממצאים נבדלים. עובדה אחת שחוזרת באלף שאלות
    היא עובדה אחת. מספר המופעים נשמר לצדה ואומר כמה היא רחבה. */
@@ -751,6 +1076,9 @@ const CAT={
   'long-question':8,'long-option':8,'position-bias':8,'longest-answer':8,
   'long-question-lang':8,'long-option-lang':8,
   'shortest-answer':8,'few-options':8,
+  'answer-not-in-options':1,'answer-index':1,'reveal-mismatch':1,'empty-option':2,
+  'padded-distractor':2,'no-reveal':4,'no-explanation':4,
+  'lang-missing':6,'passage-untranslated':6,'broken-say':7,'no-lesson':9,
   'build-throw':9,'build-null':9,'no-options':9,'too-few-options':9,
   'too-many-options':9,'option-shape':9,'empty-question':9,'js-error':9
 };
@@ -784,6 +1112,8 @@ function md(app,R){
     row('רמז (`hint`)',c.hasHint||0,c.noHint||0);
     row('שלבי פתרון (`steps`)',c.hasSteps||0,c.noSteps||0);
     row('הסבר למסיח (`why`)',c.hasWhy||0,c.noWhy||0);
+    if(c.hasExpl!==undefined)
+      row('הסבר לשאלה (`h`+`e` ב-G, `h`+`help` ב-GEN; כל שדה בכל שפה)',c.hasExpl||0,c.noExpl||0);
     L.push('');
   }
   const byCat={};
@@ -847,7 +1177,9 @@ function md(app,R){
   return L.join('\n')+'\n';
 }
 
-(async()=>{
+/* נטען כמודול (הוכחת נפילה, סקראצ׳פד) — חושף את הסורקים ואינו רץ. */
+module.exports={scan,scanUnits,scanLang,verdict,md};
+if(require.main===module) (async()=>{
  fs.mkdirSync(OUT,{recursive:true});
  const b=await chromium.launch();
  const summary=[];
@@ -863,12 +1195,30 @@ function md(app,R){
      הפקודה עקף את הסינון והפיל את התהליך כולו ב-ReferenceError —
      ודווקא אליו מזמינה האזהרה של stage.js. מוצהר ומדולג. */
   const bank=(REG.apps[app]||{}).bank;
-  if(bank&&bank!=='buildQ'){
-    console.log(app,'מחוץ להיקף — bank="'+bank+'", והסורק דורש buildQ');
+  /* O-113: בנק `UNITS` (math-elem) או `js/data.js` (hebrew-lit) נסרק
+     במסלול השני, `scanUnits`. כל bank אחר — עדיין מחוץ להיקף. */
+  const unitsPath=(bank==='UNITS'||bank==='js/data.js');
+  if(bank&&bank!=='buildQ'&&!unitsPath){
+    console.log(app,'מחוץ להיקף — bank="'+bank+'", והסורק דורש buildQ או UNITS');
     await ctx.close(); continue;
   }
-  try{ await page.goto('http://127.0.0.1:8099/'+app+'/',{waitUntil:'domcontentloaded'}) }
+  try{ await page.goto('http://127.0.0.1:8099/'+app+'/',{waitUntil:unitsPath?'load':'domcontentloaded'}) }
   catch(e){ console.log(app,'SKIP — הדף לא נטען'); await ctx.close(); continue }
+  let R;
+  if(unitsPath){
+    try{
+      await page.waitForFunction(function(){
+        return typeof UNITS!=='undefined'&&UNITS.length>0&&
+               ((typeof G==='object'&&G)||(typeof GEN==='object'&&GEN));
+      },{timeout:8000});
+    }catch(e){}
+    await page.waitForTimeout(250);
+    R=await scanUnits(page);
+    if(R.unsupported){
+      console.log(app,'מחוץ להיקף — יש UNITS אבל לא G ולא GEN; הסורק אינו מכיר את המבנה');
+      await ctx.close(); continue;
+    }
+  } else {
   /* **המתנה לתנאי ולא לשעון — 17.9.2026.**
 
      כאן ישב `waitForTimeout(1200)`, ו-`O-38` נסגר בהצהרה ״אותו
@@ -894,7 +1244,7 @@ function md(app,R){
   }
   await page.waitForTimeout(250);
 
-  const R=await scan(page);
+  R=await scan(page);
   R.langsRun=[];
   for(const lg of (R.langs||['he'])){
     const r=await scanLang(page,lg);
@@ -920,6 +1270,7 @@ function md(app,R){
     };
     addLang('long-option-lang',r.longOpt,'o');
     addLang('long-question-lang',r.longQ,'q');
+  }
   }
   if(errs.length) R.find['js-error']={sev:'FAIL',n:errs.length,ex:[{msg:errs[0],where:'page'}]};
 

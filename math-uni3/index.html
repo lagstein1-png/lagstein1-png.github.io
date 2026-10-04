@@ -30,7 +30,12 @@
   --font:"Heebo","Rubik",system-ui,"Segoe UI",Arial,sans-serif;
   --bg:#f5f7fb; --btn-ink:#fff; --surface:#ffffff; --surface2:#eef1f7;
   --ink:#101828; --muted:#5b6478; --faint:#687080; --line:#e0e4ee;
-  --accent:#a21caf; --accent-ink:#ffffff; --accent-soft:#fce4fe;
+  --accent:#c026d3; --accent-ink:#ffffff; --accent-soft:#fce4fe;
+  /* O-74: --accent הוא צבע האפליקציה (#c026d3, כמו המניפסט והאייקון).
+     כטקסט הוא עובר מתחת ל-4.5:1 (4.39 על הרקע, 3.96 על --accent-soft),
+     ולכן טקסט בצבע ההדגשה לוקח את הכהה של אותו צבע — #86198f, הכהה
+     שבגרדיאנט האייקון (6.93–8.24:1). לבן על #c026d3 עצמו: 4.71:1. */
+  --accent-text:#86198f;
   /* צהוב ההדגשה — אותו צהוב של מקריא קולי, כדי שמעקב ההקראה
      ייראה אותו דבר בכל האתר. */
   --hit:#f5c451; --hit-ink:#1a1300;
@@ -59,7 +64,7 @@ html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
 :root[data-theme="dark"]{
   --bg:#0e1117; --btn-ink:var(--bg); --surface:#161b26; --surface2:#1e2532;
   --ink:#e8ecf4; --muted:#9aa4ba; --faint:#8f99ae; --line:#28313f;
-  --accent:#f0abfc; --accent-ink:#0e1117; --accent-soft:#3d1642;
+  --accent:#f0abfc; --accent-ink:#0e1117; --accent-soft:#3d1642; --accent-text:#f0abfc;
   --hit:#ffd24d; --hit-ink:#241a00;
   --cyan:#22d3ee; --cyan-soft:#132b33;
   --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
@@ -74,7 +79,7 @@ html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
   :root:not([data-theme="light"]){
     --bg:#0e1117; --btn-ink:var(--bg); --surface:#161b26; --surface2:#1e2532;
     --ink:#e8ecf4; --muted:#9aa4ba; --faint:#8f99ae; --line:#28313f;
-    --accent:#f0abfc; --accent-ink:#0e1117; --accent-soft:#3d1642;
+    --accent:#f0abfc; --accent-ink:#0e1117; --accent-soft:#3d1642; --accent-text:#f0abfc;
     --hit:#ffd24d; --hit-ink:#241a00;
     --cyan:#22d3ee; --cyan-soft:#132b33;
     --ok:#4ade80; --ok-soft:#132a1c; --bad:#fb7185; --bad-soft:#33161f;
@@ -90,7 +95,7 @@ html[lang="ru"] textarea,html[lang="ru"] select{font-family:var(--ru)}
 :root.hc{
   --bg:#ffffff; --btn-ink:#fff; --surface:#ffffff; --surface2:#ffffff;
   --ink:#000000; --muted:#1a1a1a; --faint:#333333; --line:#000000;
-  --accent:#00308f; --accent-ink:#ffffff; --accent-soft:#e8edf8;
+  --accent:#00308f; --accent-ink:#ffffff; --accent-soft:#e8edf8; --accent-text:#00308f;
   --hit:#ffe600; --hit-ink:#000000;
   --cyan:#004b57; --cyan-soft:#e6f2f4;
   --ok:#0a5c2a; --ok-soft:#e6f4ea; --bad:#8c0f2c; --bad-soft:#fbe9ed;
@@ -116,7 +121,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1
   -webkit-text-size-adjust:100%;overflow-x:hidden}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;text-align:inherit}
 input,select,textarea{font:inherit;color:var(--ink)}
-a{color:var(--accent)}
+a{color:var(--accent-text)}
 ::selection{background:var(--accent);color:var(--accent-ink)}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
 
@@ -172,7 +177,7 @@ nav{display:flex;gap:4px;margin-inline-start:auto;flex-wrap:wrap}
 .btn.w{width:100%}
 .chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;
   font-size:.82rem;font-weight:600;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
-.chip.a{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.chip.a{background:var(--accent-soft);color:var(--accent-text);border-color:transparent}
 .chip.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
 .chip.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
 .chip.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
@@ -1004,7 +1009,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g163 · 2026-10-03";
+var BUILD="g164 · 2026-10-04";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -4910,9 +4915,13 @@ function exNewSeed(){return (Math.random()*16777215)>>>0}
 function exSlot(topicId,level){return [topicId,level,exNewSeed()]}
 /* אותו זרע → אותה שאלה בדיוק: אצל המורה כשהוא בוחר, ואצל
    התלמיד כשהוא נבחן. */
+/* slot[3] הוא מספר הסעיף, ורק הסימולציה (SIMCHAIN) כותבת אותו.
+   בלעדיו שלוש משבצות השרשרת — אותו זרע — נתנו שלוש פעמים את אותה
+   שאלה בדיוק, וסעיפים א–ג של genDeriv ו-genCond לא הגיעו ללומד (O-78).
+   במבחן של מורה המשבצת באורך 3, slot[3] הוא undefined, והשאלה זהה. */
 function exBuildSlot(slot){
   if(!slot||!topicById(slot[0]))return null;
-  return withSeed(slot[2],function(){return buildQ(slot[0],slot[1])})||null;
+  return withSeed(slot[2],function(){return buildQ(slot[0],slot[1],slot[3])})||null;
 }
 /* מסך הבנייה מצייר את עצמו מחדש אחרי כל לחיצה, ובניית עשרים
    וחמש שאלות בכל ציור מיותרת. המטמון הוא לתצוגה בלבד — מי
@@ -11955,7 +11964,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g163-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g164-pwa1").catch(function(){});
   });
 }
 </script>
@@ -12008,7 +12017,7 @@ if(window.TUTOR){
       for(i=P.picked.length-1;i>=0;i--)if(o[P.picked[i]]&&!o[P.picked[i]].ok){st=txt(o[P.picked[i]].t||o[P.picked[i]].h);break}
       for(i=0;i<TRACKS.length;i++)if(TRACKS[i].v===state.track)tr=TRACKS[i].t;
       var line=(txt(typeof _==="function"?_(x.ask):x.ask)+" "+txt(x.expr)).trim(),tn=txt(x.topicName||x.topic);
-      return {id:"q"+P.i+"-"+line.slice(0,60), type:P.phase==="ask"?"mcq":"reveal",
+      return {id:"q"+P.i+"-"+line, type:P.phase==="ask"?"mcq":"reveal",
         q:line, options:o.map(function(p){return txt(p.t||p.h)}),
         correct:ok, student:st, topic:tn||null,
         level:"רמה "+x.level+" מתוך "+LVL_HE.length+(LVL_HE[x.level-1]?": "+LVL_HE[x.level-1]:""),

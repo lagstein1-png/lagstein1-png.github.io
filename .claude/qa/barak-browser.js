@@ -153,12 +153,21 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
       out.ctxSample = r.body && r.body.screen;
     }
     /* 2 — next_question מתבצעת */
+    /* ההקשר הגולמי של המתאם, ולא BARAK.context(): זה קוטע את id ל-80
+       תווים לפני השליחה לשרת, ו-barak-core מאמת את המעבר על הגולמי.
+       O-82: שאלה שהתחלפה עם id זהה היא באג במתאם (id קטוע), לא מזל
+       רע בהגרלה — barak-core מסמן אותה ככישלון ולימור אומר ללומד
+       ״לא הצלחתי״ בזמן שהמסך כבר התחלף. */
+    const raw = () => page.evaluate(() => { const a = BARAK.adapter(); try { return a && a.getScreenContext() } catch (e) { return null } });
     if (actions.indexOf('next_question') >= 0) {
-      const before = await page.evaluate(() => BARAK.context());
+      const before = await raw();
       const r = await send('תעביר אותי לשאלה הבאה', 'next');
-      const after = await page.evaluate(() => BARAK.context());
+      const after = await raw();
       if (!r.res || !r.res.action || r.res.action.ok !== true) F('next_question לא אושרה כמבוצעת: ' + JSON.stringify(r.res && r.res.action));
-      if (before && after && before.id === after.id) F('next_question — המסך לא התחלף');
+      if (before && after && before.id === after.id) {
+        if (before.q !== after.q) F('next_question — השאלה התחלפה אבל id לא (id קטוע במתאם, O-82): ' + before.id);
+        else F('next_question — המסך לא התחלף');
+      }
       if (r.last && !/הבאה/.test(r.last.text)) F('הטקסט של next לא הוצג אחרי הצלחה');
     }
     /* 3 — show_hint */
@@ -185,13 +194,13 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
     }
     /* 6 — אופליין: מקומי, ו״הבא״ מבוצע מקומית */
     {
-      const before = await page.evaluate(() => BARAK.context());
+      const before = await raw();
       const r = await send('הבא', 'abort');
       if (!r.res || r.res.source !== 'local-fallback') F('אופליין — לא נפל למקומי: ' + JSON.stringify(r.res && r.res.source));
       const note = await page.evaluate(() => (document.querySelector('.tu-note') || {}).textContent || '');
       if (note) F('אופליין — הוצגה הודעת שגיאה: ' + note);
       if (actions.indexOf('next_question') >= 0 && before) {
-        const after = await page.evaluate(() => BARAK.context());
+        const after = await raw();
         if (!r.res || !r.res.action || r.res.action.name !== 'next_question') F('אופליין — ״הבא״ לא זוהה כפעולה');
         else if (r.res.action.ok && after && before.id === after.id) F('אופליין — ״הבא״ סומן כמבוצע והמסך לא התחלף');
       }

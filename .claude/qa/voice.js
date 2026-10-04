@@ -141,7 +141,7 @@ const APPS = [
                  ומי שמחכה ל-onend מחכה לנצח
      'neterr'  — קול רשת נכשל ב-synthesis-failed */
 const FAKE = `(function(){
-  const V = [
+  const ALL = [
     { name:'espeak he',            lang:'he-IL', voiceURI:'espeak-he',  localService:true,  default:true },
     { name:'Carmit',               lang:'he-IL', voiceURI:'carmit',     localService:true,  default:false },
     { name:'Microsoft Hila Online (Natural) - Hebrew', lang:'he-IL', voiceURI:'hila-net', localService:false, default:false },
@@ -152,7 +152,12 @@ const FAKE = `(function(){
     { name:'Samantha',             lang:'en-US', voiceURI:'samantha',   localService:true,  default:false },
     { name:'Microsoft Aria Online (Natural) - English (United States)', lang:'en-US', voiceURI:'aria-net', localService:false, default:false }
   ];
-  const log = { spoke:[], pauseResume:0, voices:[], tune:[] };
+  /* מערך הקולות של המכשיר. window.__VSET נקבע בסקריפט שנטען לפני
+     זה (בדיקת nolang): 'en' — מכשיר עם קולות אנגלית בלבד, 'none' —
+     רשימה ריקה. בלעדיו — כל השבעה, כמו בארבע הבדיקות שמעל. */
+  const SET = window.__VSET || 'all';
+  const V = SET === 'en' ? ALL.filter(v => /^en/.test(v.lang)) : SET === 'none' ? [] : ALL;
+  const log = { spoke:[], pauseResume:0, voices:[], tune:[], langs:[] };
   window.__tts = log;
   let mode = 'ok';
   window.__mode = m => { mode = m; };
@@ -170,6 +175,7 @@ const FAKE = `(function(){
     speak(u){
       log.spoke.push(u.text);
       log.voices.push(u.voice ? u.voice.voiceURI : '(ברירת מחדל)');
+      log.langs.push(String(u.lang || ''));
       /* קצב וגובה — מה שבאמת נשלח למנוע, ולא מה שכתוב בהגדרות.
          volume נרשם כדי לדלג על אמירת חימום שקטה (בגרות 806). */
       log.tune.push({ rate:u.rate, pitch:u.pitch, volume:u.volume });
@@ -199,9 +205,10 @@ const FAKE = `(function(){
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
            '(KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 
-async function openApp(browser, app){
+async function openApp(browser, app, vset){
   const ctx  = await browser.newContext({ userAgent: UA });
   const page = await ctx.newPage();
+  if(vset) await page.addInitScript(s => { window.__VSET = s; }, vset);
   await page.addInitScript(FAKE);
   /* שער התנאים חוסם כל לחיצה עד שמאשרים אותו. מסמנים אותו כמאושר
      מראש — הוא אינו מה שנבדק כאן. */
@@ -294,9 +301,138 @@ async function pressLong(page, app){
   return pressSpeak(page, app);
 }
 
+/* ---------------------------------------------------------------
+     nolang — ״אין קול בשפה״ (O-79)
+
+     המכשיר מחזיק קולות, אבל אף אחד מהם בשפה שמבקשים להקריא. בחירת
+     הקול מחזירה null, הדפדפן מקריא בקול ברירת המחדל שלו — עברית
+     במבטא אנגלי, או שתיקה — ובלי מילה זה נראה כמו תקלה באפליקציה.
+     המתקן (18.9.2026) מציג פס role="alert" עם הסבר וקישור ל-/voice/,
+     פעם אחת לשפה בביקור, ורק כשיש רשימת קולות: רשימה ריקה היא מקרה
+     אחר (יש מכשירים שמחזירים ריק ומדברים היטב).
+
+     ההוכחות של אז ישבו בסקריפטים בסקראצ'פד של הסוכנים, ולכן כאן:
+       · en בלבד  → הפס מופיע, בנוסח שכתוב בקוד, וההקראה **יוצאת**
+                    בכל זאת — בלי קול אנגלי ועם u.lang עברי (null ולא
+                    הקול הראשון שיש — הכלל שמעל pickVoice)
+       · en, שוב  → אחרי ✕ הפס אינו חוזר (פעם אחת לשפה)
+       · עם he    → אין פס
+       · ריקה     → אין פס
+
+     הרשימה נגזרת ואינה קשיחה: כל דף שמגדיר ttsNoLang (משפחת ה-TTSMSG
+     בארבע שפות) או MSG_NOHE (speech.js של בגרות, עברית בלבד). הנוסח
+     הנבדק נקרא מהקובץ עצמו — noLang הראשון ב-TTSMSG הוא העברי.
+     --------------------------------------------------------------- */
+const ROOT_DIR = path.resolve(__dirname, '..', '..');
+function noLangPages(){
+  const files = require('child_process')
+    .execSync('git ls-files "*.html" "*.js"', { cwd: ROOT_DIR, encoding: 'utf8' })
+    .split('\n').filter(Boolean)
+    .filter(f => f.includes('/') && !/^(\.claude|docs|marketing|tests|learning-core|tutor)\//.test(f));
+  const out = new Map();
+  for(const f of files){
+    const src = fs.readFileSync(path.join(ROOT_DIR, f), 'utf8');
+    const dir = f.split('/')[0];
+    let msg = null, call = null;
+    if(/function ttsNoLang\s*\(/.test(src)){
+      msg = (src.match(/noLang:"([^"]+)"/) || [])[1];
+      /* speak(text,lang,…) במשפחות הרב־לשוניות; speak(text,excited)
+         במשפחת math-app — שם השפה היא שפת הממשק, עברית כברירת מחדל */
+      call = /function speak\s*\(\s*text\s*,\s*lang\b/.test(src) ? 'speak(T,"he")' : 'speak(T)';
+    } else if(/var MSG_NOHE\s*=/.test(src)){
+      msg = (src.match(/var MSG_NOHE\s*=\s*"([^"]+)"/) || [])[1];
+      call = 'Speech.speak([{text:T}])';
+    }
+    if(!call) continue;
+    let url = '/' + dir + '/';
+    try{
+      const km = fs.readFileSync(path.join(ROOT_DIR, dir, 'index.html'), 'utf8').match(/var INTERNAL_KEY="([^"]+)"/);
+      if(km) url += '?internal=' + encodeURIComponent(km[1]);
+    }catch(e){}
+    out.set(dir, { id:dir, url, file:f, msg, call });
+  }
+  return [...out.values()].sort((a, b) => a.id.localeCompare(b.id));
+}
+
+const NL_TEXT = 'זה משפט בדיקה בעברית. והנה עוד משפט קצר.';
+async function noLangSay(page, call){
+  await page.evaluate(() => { window.__mode('ok'); window.__tts.spoke = []; window.__tts.voices = []; window.__tts.langs = []; });
+  const ok = await page.evaluate(([src, T]) => {
+    try{ (new Function('T', src))(T); return true; }catch(e){ return 'חריגה: ' + e.message; }
+  }, [call, NL_TEXT]);
+  /* voicesReady ממתין עד ארבע שניות כשהרשימה ריקה — 5000 על השעון המזויף */
+  await page.clock.runFor(5000);
+  return ok;
+}
+/* האם על המסך יש role="alert" שנושא את נוסח ״אין קול בשפה״ */
+function noLangShown(page, msg){
+  const key = msg.slice(0, 28);
+  return page.evaluate(k => [...document.querySelectorAll('[role="alert"]')]
+    .some(el => (el.textContent || '').includes(k)), key);
+}
+
+async function runNoLang(browser){
+  const pages = noLangPages();
+  let bad = 0;
+  if(!pages.length){ console.log('✗ nolang      לא נמצא אף דף עם ttsNoLang או MSG_NOHE — הביטוי השתנה'); return 1; }
+  for(const p of pages){
+    const fails = [];
+    if(!p.msg){ fails.push('לא נמצא נוסח ההודעה בקובץ ' + p.file); }
+    else for(const vset of ['en', 'all', 'none']){
+      const { ctx, page } = await openApp(browser, { id:p.id, url:p.url }, vset);
+      try{
+        const r = await noLangSay(page, p.call);
+        if(r !== true){ fails.push(vset + ': ההקראה לא נקראה (' + r + ')'); continue; }
+        const shown = await noLangShown(page, p.msg);
+        const said = await page.evaluate(() => ({
+          spoke: window.__tts.spoke.filter(t => String(t).trim()),
+          voices: window.__tts.voices, langs: window.__tts.langs }));
+        if(vset === 'en'){
+          if(!shown) fails.push('en בלבד: פס ״אין קול בשפה״ לא הופיע');
+          if(!said.spoke.length) fails.push('en בלבד: ההקראה לא יצאה כלל — הנפילה המתוכננת היא קול ברירת המחדל, לא שתיקה');
+          const en = said.voices.filter(v => /^(espeak-en|samantha|aria-net)$/.test(v));
+          if(en.length) fails.push('en בלבד: משפט עברי נשלח בקול אנגלי (' + en[0] + ')');
+          const wrong = said.langs.filter(l => l && !/^(he|iw)/i.test(l));
+          if(wrong.length) fails.push('en בלבד: u.lang ' + wrong[0] + ' ולא עברית');
+          /* פעם אחת לשפה: סוגרים ב-✕ ומקריאים שוב */
+          if(shown){
+            await page.evaluate(k => {
+              const el = [...document.querySelectorAll('[role="alert"]')].find(e => (e.textContent || '').includes(k));
+              const x = el && el.querySelector('button'); if(x) x.click();
+            }, p.msg.slice(0, 28));
+            await page.clock.runFor(200);
+            if(await noLangShown(page, p.msg)) fails.push('en בלבד: ✕ לא סגר את הפס');
+            else {
+              await noLangSay(page, p.call);
+              if(await noLangShown(page, p.msg)) fails.push('en בלבד: הפס חזר בהקראה השנייה — אמור להופיע פעם אחת לשפה');
+            }
+          }
+        } else if(vset === 'all'){
+          if(shown) fails.push('עם קול he: הפס הופיע למרות שיש קול עברי');
+          if(!said.spoke.length) fails.push('עם קול he: ההקראה לא יצאה — הבדיקה ריקה');
+        } else {
+          if(shown) fails.push('רשימה ריקה: הפס הופיע — רשימה ריקה אינה ״אין קול בשפה״');
+        }
+      }catch(e){ fails.push(vset + ': חריגה: ' + e.message); }
+      finally{ await ctx.close(); }
+    }
+    if(fails.length){ bad++; console.log('✗ nolang ' + p.id.padEnd(15) + fails.join(' · ')); }
+    else console.log('✓ nolang ' + p.id.padEnd(15) + 'en בלבד → פס פעם אחת וההקראה יוצאת; he → אין; ריקה → אין');
+  }
+  console.log('  nolang: ' + pages.length + ' דפים (' + pages.map(p => p.id).join(', ') + ')');
+  return bad;
+}
+
 async function run(){
   const browser = await chromium.launch();
   let bad = 0;
+  if(process.argv.includes('--nolang')){
+    bad = await runNoLang(browser);
+    await browser.close();
+    if(bad){ console.log('\n' + bad + ' דפים נכשלו ב-nolang'); process.exit(1); }
+    console.log('\nnolang: ההודעה מופיעה רק כשצריך, בכל הדפים');
+    return;
+  }
   for(const app of APPS){
     const { ctx, page, unlocked } = await openApp(browser, app);
     const fails = [];
@@ -379,6 +515,7 @@ async function run(){
     if(fails.length){ bad++; console.log('✗ ' + app.id.padEnd(11) + fails.join(' · ')); }
     else console.log('✓ ' + app.id.padEnd(11) + 'שחרור, בחירה, שומר-ער, שומר זמן ונפילה — כולם עובדים');
   }
+  bad += await runNoLang(browser);
   await browser.close();
 
 /* ---------------------------------------------------------------
