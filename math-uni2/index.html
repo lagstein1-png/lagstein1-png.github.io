@@ -323,6 +323,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;
   padding:12px 14px;font-size:1rem;outline:none}
 .field:focus{border-color:var(--accent)}
+/* outline:none על .field יושב אחרי :focus-visible הכללי ובאותה סגוליות,
+   ולכן הוא ביטל אותו: שדה טקסט לא קיבל טבעת מיקוד במקלדת בכלל. */
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 
 /* ---------- דף נוסחאות ---------- */
 .a-base{--c:var(--c-base);--cs:var(--cs-base)}
@@ -1004,7 +1007,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v167 · 2026-10-04";
+var BUILD="v168 · 2026-10-04";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -1962,10 +1965,26 @@ var PROSE_MAP=[
   /* מינוס טיפוגרפי ו-en dash לא מופיעים בעברית, ולכן בטוח לתרגם.
      מקף רגיל נשאר מקף — "ה-3" הוא לא חיסור. */
   [/[−–]/g," מינוס "],[/=/g," שווה "],[/\+/g," ועוד "],[/\//g," חלקי "],
+  /* סימני אי־שוויון בתוך פרוזה. "=" כבר היה כאן, ואלה לא — ולכן
+     ההסבר ״בקצה סופי הכלל הפוך: p < 1 להתכנסות״ נשמע ״p 1
+     להתכנסות״: הכיוון, שהוא כל תוכן המשפט, נעלם. חמשת הסימנים
+     האלה אינם מופיעים בעברית כתובה, ולכן ההמרה חד־משמעית — וחמש
+     המחרוזות כבר יושבות ב-TR_KEYS מתוך SAY_MAP, ולכן הן מתורגמות
+     לערבית, לרוסית ולאנגלית בלי מפתח חדש. */
+  [/≠/g," לא שווה "],[/≤/g," קטן או שווה "],[/≥/g," גדול או שווה "],
+  [/</g," קטן מ "],[/>/g," גדול מ "],
   [/\bsin/gi," סינוס "],[/\bcos/gi," קוסינוס "],[/\btan/gi," טנגנס "]
 ];
 function speakProse(t){
-  var s=String(t||""),i;
+  /* טקסט שנכתב כפרוזה עלול להכיל שבר או מעריך כ-HTML — מסיח
+     ש״האינטגרל שלו הוא 9/4״, צעד ש״המכנה מתאפס ב-x = −1/9״.
+     speak() אמנם מסיר תגיות, אבל רק *אחרי* speakProse, ואז ה-"="
+     וה-"/" שבתוך התגית עצמה כבר הפכו ל״שווה״ ול״חלקי״, כלל השבר
+     לא תפס על המבנה השבור, והתגיות נמחקו בלי להשאיר מפריד:
+     הלומד שמע ״תשעים וארבע״ במקום ״תשע חלקי ארבע״. מסירים את
+     התגיות כאן, לפני המפה. plainOf אידמפוטנטית, ולכן הקריאות
+     שכבר מנקות לבד אינן משתנות. */
+  var s=plainOf(String(t||"")),i;
   for(i=0;i<PROSE_MAP.length;i++)s=s.replace(PROSE_MAP[i][0],_(PROSE_MAP[i][1]));
   return s.replace(/\s+/g," ").trim();
 }
@@ -2689,12 +2708,22 @@ function genExtrema2(L){
     D=4*a*c-b*b;
     var kind2=D<0?_("נקודת אוכף"):(D>0?(a>0?_("מינימום"):_("מקסימום")):_("המבחן אינו מכריע"));
     var rest2=[_("נקודת אוכף"),_("מינימום"),_("מקסימום")].filter(function(k){return k!==kind2});
+    /* הנימוק נבחר לפי מה שנבחר, לא לפי מקומו ברשימה. קודם הוא היה
+       לפי מקום: בשאלה שתשובתה "נקודת אוכף" (D שלילי) מי שבחר
+       "מקסימום" קיבל "אחרי שהדטרמיננטה חיובית…" — משפט שטוען על
+       השאלה הזאת בדיוק את ההפך ממה שקורה בה. שני המשפטים נשארו
+       כלשונם; רק ההתאמה ביניהם לבין המסיח תוקנה. */
+    var why2=function(k){
+      return (kind2===_("נקודת אוכף")||k===_("נקודת אוכף"))
+        ?_("הדטרמיננטה של ההסיאן מכריעה קודם. שלילית פירושה אוכף, בלי קשר לסימן של a.")
+        :_("אחרי שהדטרמיננטה חיובית, הסימן של f<sub>xx</sub> הוא שקובע — ולא ההפך ממנו.");
+    };
     return {ask:_("מהו סוג הנקודה הקריטית (0 , 0)?"),
       expr:"f(x,y) = "+coef(a,"x²")+term(b,"xy")+term(c,"y²"),
       ans:W(kind2),
       wrong:[
-        W(rest2[0],_("הדטרמיננטה של ההסיאן מכריעה קודם. שלילית פירושה אוכף, בלי קשר לסימן של a.")),
-        W(rest2[1],_("אחרי שהדטרמיננטה חיובית, הסימן של f<sub>xx</sub> הוא שקובע — ולא ההפך ממנו.")),
+        W(rest2[0],why2(rest2[0])),
+        W(rest2[1],why2(rest2[1])),
         (Math.random()<0.5
           ?W(_("המבחן אינו מכריע"),_("המבחן שותק רק כאשר D מתאפס. כאן D שונה מאפס, ולכן הוא מכריע."))
           :W(_("אין נקודה קריטית"),_("הגרדיאנט מתאפס בראשית, ולכן היא נקודה קריטית.")))
@@ -4744,6 +4773,13 @@ function buildQ(topicId,level){
     ansP=plainOf(raw.ans.h);
     opts=[{h:raw.ans.h,t:ansP,ok:true,why:""}];
   }
+  /* יותר מארבע אפשרויות שוברת את הממשק: מערך התוויות ומקשי 1–4
+     מניחים ארבע בדיוק, והחמישית הייתה מקבלת תווית undefined ולא
+     הייתה נגישה מהמקלדת. מורידים מסיח — אקראי ולא הראשון, כדי שכל
+     המסיחים שהמחולל כתב יופיעו לאורך זמן ולא רק שלושת הראשונים.
+     (השומר קיים ב-math-uni ולא הועתק לכאן. היום אף מחולל אינו
+     מגיע לחמש — 28,800 הגרלות, כולן ארבע — והוא שומר על מחר.) */
+  while(opts.length>4)opts.splice(1+Math.floor(Math.random()*(opts.length-1)),1);
   shuffle(opts);
   var sayTxt=speakProse(plainOf(raw.ask))+(raw.expr?". "+speakMath(plainOf(raw.expr)):"");
   return {
@@ -6778,7 +6814,11 @@ function onAnswer(i){
     if(state.settings.tts)speak(lineFor(P.results[P.results.length-1]));
   }else{
     P.lastWhy=o.why||_("התשובה הזו לא נכונה. שווה לפתוח את הפתרון המודרך ולראות איפה הדרך מתפצלת.");
-    announce(_f("לא נכון. {0}", P.lastWhy));
+    /* plainOf: אבחון הטעות נכתב כ-HTML (שבר אמיתי, כתב תחתי),
+       ו-textContent מכניס תגית כטקסט — קורא המסך היה מקריא
+       ״span class frac״ במקום ״שתיים חלקי שלוש״. 261 מתוך 32,400
+       מסיחים שנדגמו נושאים תגית. */
+    announce(_f("לא נכון. {0}", plainOf(P.lastWhy)));
     if(state.settings.tts)speak(speakProse(P.lastWhy));
     /* אם נגמרו האפשרויות — עוברים לחשיפה ולא משאירים תקועים */
     if(P.picked.length>=P.q.options.length-1){
@@ -13199,7 +13239,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v167-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v168-pwa1").catch(function(){});
   });
 }
 </script>

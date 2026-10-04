@@ -1,0 +1,105 @@
+# הקלטה מחדש של סרטוני ההדגמה — על רנר, לא בסביבת הפיתוח.
+#
+# **למה ורקפלו.** `marketing/media/record.js` דורש שני דברים: דפדפן
+# (קיים כאן) ו-**ffmpeg** (אינו קיים, ואי אפשר להתקין — נמדד 4.10.2026,
+# `apt-get install ffmpeg` נכשל בסביבה הזאת). בלי ffmpeg המקליט שומר
+# `.webm` בלבד ולא `.mp4`, וזה אינו הנכס שמפרסמים. הרנרים של GitHub
+# אינם חסומים ו-ffmpeg מותקן עליהם בפקודה אחת.
+#
+# **מתי זה נדרש.** `record.js --check` נופל כשחתימת ה-`DEMO_SCRIPT`
+# של אפליקציה השתנתה והסרטון לא הוקלט מחדש — ואז הסרטון מראה גרסה
+# שאינה האפליקציה. זה קרה ב-4.10.2026 ב-`literature`: בוט תיקן
+# כתובית בתסריט ההדגמה שתיארה **אזרחות** (״יסודות הדמוקרטיה… חברה
+# בישראל״) בתוך אפליקציית ספרות — שארית העתקה אמיתית — והסרטון
+# שהוקלט לפני כן נשאר עם הכתובית השגויה.
+#
+# **הערה על התסריט עצמו:** הוא יושב ב-`DEMO_SCRIPT` שבתוך ה-`index.html`
+# של האפליקציה. **לא עורכים את ה-mp4 ביד** — עורכים את התסריט ומקליטים
+# מחדש, וזה כל הרעיון של הקובץ הזה.
+
+name: demo-record
+
+on:
+  workflow_dispatch:
+    inputs:
+      apps:
+        description: 'אפליקציות מופרדות ברווח (literature math-app), או ריק — כולן'
+        required: false
+        default: ''
+      commit:
+        description: 'הקלד YES כדי לדחוף ל-main. ריק — artifact בלבד, להאזנה וצפייה לפני'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # ffmpeg אינו מותקן על ubuntu-latest — נמדד ב-voice, ריצה 1.
+      # ובלי צינור: `ffmpeg -version | head -1` מסתיר את קוד היציאה,
+      # והשומר שנועד לתפוס קובץ חסר דיווח אז הצלחה.
+      - name: מתקין ffmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: ffmpeg קיים
+        run: ffmpeg -version
+
+      - name: דפדפן
+        run: npx --yes playwright@1 install --with-deps chromium
+
+      - name: מקליט
+        env:
+          APPS: ${{ github.event.inputs.apps }}
+        run: node marketing/media/record.js ${APPS:-}
+
+      - name: החתימות מול התסריטים
+        run: node marketing/media/record.js --check
+
+      - name: מצרף להורדה
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-video
+          path: |
+            marketing/media/video/
+            marketing/media/manifest.json
+          retention-days: 7
+
+      - name: דוחף ל-main
+        if: ${{ github.event.inputs.commit == 'YES' }}
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add marketing/media/video marketing/media/manifest.json
+          if git diff --cached --quiet; then
+            echo "אין שינוי — לא נדחף דבר."
+            exit 0
+          fi
+          git commit -m "הדגמות: הוקלטו מחדש אחרי שינוי ב-DEMO_SCRIPT
+
+          record.js --check נפל על חתימה שזזה — הסרטון הראה גרסה
+          שאינה האפליקציה. ffmpeg אינו קיים בסביבת הפיתוח, ולכן
+          ההקלטה נעשית כאן.
+
+          Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
+          git push origin HEAD:main
+
+      - name: סיכום
+        if: always()
+        run: |
+          {
+            echo "### הדגמות"
+            echo ""
+            node marketing/media/record.js --check || true
+          } >> "$GITHUB_STEP_SUMMARY"

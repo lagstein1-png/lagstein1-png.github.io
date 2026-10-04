@@ -323,6 +323,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;
   padding:12px 14px;font-size:1rem;outline:none}
 .field:focus{border-color:var(--accent)}
+/* outline:none על .field יושב אחרי :focus-visible הכללי ובאותה סגוליות,
+   ולכן הוא ביטל אותו: שדה טקסט לא קיבל טבעת מיקוד במקלדת בכלל. */
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 
 /* ---------- דף נוסחאות ---------- */
 .a-base{--c:var(--c-base);--cs:var(--cs-base)}
@@ -1002,7 +1005,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="u167 · 2026-10-04";
+var BUILD="u168 · 2026-10-04";
 var KEY="axiom-state-v1";
 
 function blankState(){
@@ -2404,7 +2407,8 @@ function genProdQuo(L){
         W("f'(x) = "+e1p,
           _("גזרתם כל גורם בנפרד והכפלתם. נגזרת של מכפלה איננה מכפלת הנגזרות — צריך שני איברים.")),
         W("f'(x) = "+fac(a)+pw("x",n)+"e<sup>x</sup>",_("גזרתם רק את הגורם השני.")),
-        W("f'(x) = "+e1p+e2p(-a),_("טעות סימן: בכלל המכפלה מחברים את שני האיברים, לא מחסרים.")),
+        W("f'(x) = "+e1p+e2p(-a),a<0?_("טעות סימן באיבר השני. המקדם נשאר כמו שהוא גם בנגזרת, יחד עם הסימן שלו.")
+                                    :_("טעות סימן: בכלל המכפלה מחברים את שני האיברים, לא מחסרים.")),
         W("f'(x) = "+e1p+" · "+fac(a)+pw("x",n)+"e<sup>x</sup>",_("הכפלתם את שני האיברים במקום לחבר אותם."))
       ],
       steps:[
@@ -4345,7 +4349,9 @@ function genLogic(L){
         S(_("מציבים"),(unk?_("מציבים פעמיים: פעם אחת אמת במקום המשתנה החסר ופעם אחת שקר. אם התוצאה זהה — הערך מוגדר; אם לא — הוא תלוי בו."):""),
           (unk==="p"?"?":TF(p))+" "+op+" "+(unk==="q"?"?":TF(q))),
         S(_("התוצאה"),"",unk?(TF(vLo)+" / "+TF(vHi)+" → "+resTxt):resTxt)
-      ],rule:"logic",hint:_("גרירה שקרית רק כשההנחה אמת והמסקנה שקר.")};
+      ],rule:"logic",hint:op==="∧"?_("וגם אמת רק כששני הצדדים אמת.")
+                  :op==="∨"?_("או אמת אם לפחות צד אחד אמת.")
+                  :_("גרירה שקרית רק כשההנחה אמת והמסקנה שקר.")};
   }
   /* הצדדים והקשרים מוגרלים. קודם עמד כאן פסוק אחד קבוע — p ⇒ q ברמה 2
      ו-¬(p ∧ q) ברמה 3 — ולכן התשובה הנכונה הייתה אותה מחרוזת בכל
@@ -7185,7 +7191,7 @@ function onAction(a,el){
   if(a==="start"){startRound();view="practice";window.scrollTo(0,0);render();return}
   if(a==="starttopic"){var tid=el.getAttribute("data-t");startRound(tid);view="practice";window.scrollTo(0,0);render();return}
   if(a==="ans"){onAnswer(parseInt(el.getAttribute("data-i"),10));return}
-  if(a==="sayopt"){var oi=parseInt(el.getAttribute("data-i"),10);if(P.q&&P.q.options[oi])speak(P.q.options[oi].h);return}
+  if(a==="sayopt"){var oi=parseInt(el.getAttribute("data-i"),10);if(P.q&&P.q.options[oi])speak(speakMath(P.q.options[oi].t));return}
   if(a==="next"){advance();return}
   if(a==="stop"){
     if(P.results.length===0){goto("home");return}
@@ -9126,6 +9132,7 @@ var TR_KEYS=[
 "חילקתם את הזנב בשניים. הסימטריה אומרת שהזנב השמאלי שווה לזנב הימני כולו, 1 − Φ(z), ולא לחצי ממנו.",
 "שגיאת גדר בכיוון השני: מ-{0} ל-{1} יש {2} הכפלות ב-{0}, וגם ההכפלה הראשונה, מ-1 ל-{0}, נספרת.",
 "השמעת התשובה",
+"טעות סימן באיבר השני. המקדם נשאר כמו שהוא גם בנגזרת, יחד עם הסימן שלו.",
 "מרשים מאד. שליטה כזאת לא באה לבד.",
 "כל הכבוד. סבב כזה דורש ריכוז אמיתי.",
 "התקדמות טובה. הנושאים למטה מראים איפה לחדד."
@@ -14515,6 +14522,11 @@ trAt("en",TR_KEYS.indexOf("לקחתם את הרכיב הגדול. האורך ת�
 trAt("ar",TR_KEYS.indexOf("השמעת התשובה"),["قراءة الإجابة"]);
 trAt("ru",TR_KEYS.indexOf("השמעת התשובה"),["Озвучить ответ"]);
 trAt("en",TR_KEYS.indexOf("השמעת התשובה"),["Read the answer aloud"]);
+/* אבחון הסימן בכלל המכפלה כשהמקדם שלילי (4.10.2026). לפי indexOf ולא
+   לפי מספר: trAt שאחריו קורא TR_KEYS.length-3, ומפתח שנוסף בסוף היה מזיז אותו. */
+trAt("ar",TR_KEYS.indexOf("טעות סימן באיבר השני. המקדם נשאר כמו שהוא גם בנגזרת, יחד עם הסימן שלו."),["خطأ في إشارة الحدّ الثاني. المعامل يبقى كما هو في المشتقّة أيضًا، مع إشارته."]);
+trAt("ru",TR_KEYS.indexOf("טעות סימן באיבר השני. המקדם נשאר כמו שהוא גם בנגזרת, יחד עם הסימן שלו."),["Ошибка в знаке второго слагаемого. Коэффициент остаётся таким же и в производной, вместе со своим знаком."]);
+trAt("en",TR_KEYS.indexOf("טעות סימן באיבר השני. המקדם נשאר כמו שהוא גם בנגזרת, יחד עם הסימן שלו."),["Sign error in the second term. The coefficient stays as it is in the derivative too, along with its sign."]);
 TR_KEYS.push("מרשים מאד. שליטה כזאת לא באה לבד.","כל הכבוד. סבב כזה דורש ריכוז אמיתי.","התקדמות טובה. הנושאים למטה מראים איפה לחדד.");
 trAt("ar",TR_KEYS.length-3,["ممتاز حقًا. إتقان كهذا لا يأتي بالصدفة.","أحسنتم. جولة كهذه تتطلب تركيزًا حقيقيًا.","تقدم جيد. المواضيع أدناه تُظهر أين تُركّزون."]);
 trAt("ru",TR_KEYS.length-3,["Впечатляет. Такое мастерство не появляется само.","Молодцы. Такой раунд требует настоящей концентрации.","Хороший прогресс. Темы ниже показывают, что подтянуть."]);
@@ -14548,7 +14560,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=u167-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=u168-pwa1").catch(function(){});
   });
 }
 </script>

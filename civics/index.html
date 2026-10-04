@@ -529,7 +529,7 @@ input[type=range]{min-height:44px}
   </div>
 </div>
 <div id="live" class="sr" aria-live="polite"></div>
-<main id="main"><div id="app"></div></main>
+<main id="main" tabindex="-1"><div id="app"></div></main>
 <script>
 /* ============================================================
    מצב הדגמה — נכנס אך ורק דרך ?demo=1 בכתובת.
@@ -1091,7 +1091,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="c31 · 2026-10-04";
+var BUILD="c32 · 2026-10-04";
 var SKEY="ezrach-state-v1";
 var GKEY_STORE="ezrach-gkey";
 
@@ -7334,7 +7334,7 @@ function viewSit(){
   }
   if(SIT.phase==="ask"){
     var q=SIT.qs[SIT.i];
-    var h2='<main class="wrap" style="padding-block:18px">';
+    var h2='<div class="wrap" style="padding-block:18px">';
     h2+='<div class="spread"><div class="row">'+
         '<span class="chip area '+topicCls(q.topic)+'">'+esc(q.topicName)+'</span>'+
         '<span class="chip">'+esc(xf("stQn",SIT.i+1,SIT.qs.length))+'</span>'+
@@ -7365,7 +7365,7 @@ function viewSit(){
         esc(SIT.flags[SIT.i]?xt("stFlagged"):xt("stFlag"))+'</button>'+
         (cur>=0?'<button class="btn btn-g" data-a="sitfwd">'+esc(xt("stNext"))+' '+ic("arrow",16)+'</button>':"")+
         '</div>';
-    h2+='</div></main>';
+    h2+='</div></div>';
     return h2;
   }
   if(SIT.phase==="review"){
@@ -7762,7 +7762,7 @@ document.addEventListener("click",function(e){
     var bid=el.getAttribute("data-id"),bq=questionAt(bid);
     if(!bq)return;
     state.topic=bq.tid; state.level=bq.lv; state.screen="prac"; view="";
-    P.q=bq; P.picked=-1; P.done=false; P.ok=false; P.hint=false;
+    P.q=bq; P.picked=-1; P.done=false; P.ok=false; P.hint=false; P.timeUp=false;
     stopSpeak(); save(); render(); window.scrollTo(0,0); return;
   }
   if(a==="badclear"){state.bad={};save();render();return}
@@ -7896,6 +7896,10 @@ window.addEventListener("pagehide",stopSpeak);
    ============================================================ */
 loadKey();
 load();
+/* מצב האתגר נולד מאחורי ?internal= — בלי השער אין כפתור שמכבה אותו.
+   מצב שנשמר מפתיחה קודמת היה נשאר דלוק: שאלות מנושא אחר מזה שבכותרת,
+   בלי רמז, ועם שעון שמפיל את השאלה — ובלי מתג על המסך. */
+if(!CH_GATE)state.challenge=false;
 touchDay();
 booted=true;
 applyModes();
@@ -8016,7 +8020,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=c31-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=c32-pwa1").catch(function(){});
   });
 }
 </script>

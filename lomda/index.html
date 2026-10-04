@@ -354,6 +354,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;
   min-height:48px;padding:12px 14px;border-radius:11px;outline:none;background:var(--surface2);color:inherit;border:1px solid var(--line)}
 .field:focus{border-color:var(--accent)}
+/* `:focus-visible` הגלובלי (שורה 116) נושא בדיוק אותה סגוליות כמו `.field`,
+   ו-`.field` כתוב אחריו — ולכן ה-`outline:none` שלו ניצח וטבעת המיקוד נעלמה
+   משדה השם של הנבחן ומתיבת הדבקת הקוד. מחזירים אותה כאן ולא מוחקים
+   `outline:none`, כדי שהטבעת תופיע במקלדת בלבד, כמו בכל שאר האפליקציה. התיקון כבר נעשה ב-english. */
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 textarea.field{min-height:96px;resize:vertical}
 
 /* ---------- שורות המבחן ----------
@@ -1160,7 +1165,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l154 · 2026-10-04";
+var BUILD="l155 · 2026-10-04";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -1411,12 +1416,21 @@ function devPicker(lgs){
     function row(v){
       var on=v?cur===v.voiceURI:!cur;
       var uri=v?v.voiceURI:"";
-      return '<div class="vopt'+(on?" on":"")+'" data-a="devvoice" data-l="'+lg+'" data-u="'+esc(uri)+
-        '" role="button" tabindex="0" aria-pressed="'+(on?"true":"false")+'">'+
-        '<span style="flex:1"><span class="nm">'+esc(v?v.name:t("vAuto"))+'</span><br>'+
-        '<span class="ds">'+esc(v?v.lang:t("vDevD"))+"</span></span>"+
+      /* גוף הכרטיס הוא כפתור אמיתי, וכפתור הדוגמה אחיו ולא בנו —
+         בדיוק כמו בקולות ג׳מיני שמתחת, שתוקנו והשורה הזאת לא.
+         `div` עם `role="button"` נתפס ב-Tab, אבל הדפדפן אינו יורה
+         עליו `click` ב-Enter או ברווח, ואין כאן מטפל מקלדת שעושה זאת
+         במקומו — כלומר מי שמנווט במקלדת יכול למקד שורת קול
+         אבל לא לבחור בה. וכפתור הדוגמה שישב בתוך ה-`role="button"`
+         נקרא כחלק משם הכרטיס. 2.75rem הם 44 פיקסלים — יעד המגע. */
+      return '<div class="vopt'+(on?" on":"")+'">'+
+        '<button type="button" class="vpick" data-a="devvoice" data-l="'+lg+'" data-u="'+esc(uri)+
+        '" aria-pressed="'+(on?"true":"false")+'">'+
+        '<span class="nm">'+esc(v?v.name:t("vAuto"))+'</span><br>'+
+        '<span class="ds">'+esc(v?v.lang:t("vDevD"))+"</span></button>"+
         (v?'<button class="btn ghost" data-a="devsample" data-l="'+lg+'" data-u="'+esc(uri)+
-           '" style="padding:.35rem .7rem;min-height:2.2rem;font-size:.82rem">'+
+           '" aria-label="'+esc(t("vSample")+" \u2014 "+v.name)+
+           '" style="padding:.45rem .7rem;min-height:2.75rem;font-size:.82rem">'+
            ic("play",14)+" "+esc(t("vSample"))+"</button>":"")+"</div>";
     }
     out+='<div class="vgrid">'+row(null)+"</div>";
@@ -2567,13 +2581,14 @@ function hdr(){
   return '<div class="hbar"><div class="wrap hrow">'+
     '<h1 class="brand"><svg class="sitemark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg>'+esc(t("app"))+'<small>'+esc(t("tagline"))+'</small></h1>'+
     (s==="home"?"":'<button class="gbtn" data-a="home">'+ic("home",16)+" "+esc(t("navHome"))+"</button>")+
-    '<button class="gbtn'+(s==="prog"?" on":"")+'" data-a="prog">'+ic("chart",16)+" "+esc(t("navProg"))+"</button>"+
+    '<button class="gbtn'+(s==="prog"?" on":"")+'"'+(s==="prog"?' aria-current="page"':"")+' data-a="prog">'+ic("chart",16)+" "+esc(t("navProg"))+"</button>"+
     /* מסך המורה נעלם מהכותרת כשנבחר קוד והמכשיר נעול. */
-    (teOpen()?'<button class="gbtn'+(view==="marks"?" on":"")+'" data-a="marks">'+ic("share",16)+" "+esc(t("navExam"))+"</button>":"")+
-    '<button class="gbtn'+(s==="set"?" on":"")+'" data-a="set">'+ic("gear",16)+" "+esc(t("navSet"))+"</button>"+
+    (teOpen()?'<button class="gbtn'+(view==="marks"?" on":"")+'"'+(view==="marks"?' aria-current="page"':"")+' data-a="marks">'+ic("share",16)+" "+esc(t("navExam"))+"</button>":"")+
+    '<button class="gbtn'+(s==="set"?" on":"")+'"'+(s==="set"?' aria-current="page"':"")+' data-a="set">'+ic("gear",16)+" "+esc(t("navSet"))+"</button>"+
     '<span class="hlang" role="group">'+Object.keys(LANGS).map(function(k){
       return '<button class="'+(state.lang===k?"on":"")+'" data-a="lang" data-v="'+k+
-        '" lang="'+k+'" dir="'+LANGS[k].dir+'">'+esc(LANGS[k].name)+'</button>';
+        '" lang="'+k+'" dir="'+LANGS[k].dir+'" aria-pressed="'+(state.lang===k?"true":"false")+
+        '">'+esc(LANGS[k].name)+'</button>';
     }).join("")+'</span>'+
   "</div></div>"}
 
@@ -2697,7 +2712,8 @@ function levelBar(tp){
   var h='<div class="lvls">',i;
   for(i=1;i<=3;i++){
     var m=mastery(tp.id,i);
-    h+='<button class="lvl'+(state.level===i?" on":"")+'" data-a="lvl" data-v="'+i+'">'+
+    h+='<button class="lvl'+(state.level===i?" on":"")+'" data-a="lvl" data-v="'+i+
+      '" aria-pressed="'+(state.level===i?"true":"false")+'">'+
       esc(t("lv"+i))+' <span class="bar '+barCls(m)+'" style="width:2.6rem;flex:none">'+
       '<i style="width:'+Math.round(m*100)+'%"></i></span></button>';
   }
@@ -2940,7 +2956,8 @@ function screenSet(){
   h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
      esc(t("setLang"))+"</h3><div class=\"lvls\">";
   Object.keys(LANGS).forEach(function(k){
-    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'">'+
+    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+
+      '" aria-pressed="'+(state.lang===k?"true":"false")+'">'+
       esc(LANGS[k].name)+"</button>";
   });
   h+="</div></div>";
@@ -2953,9 +2970,11 @@ function screenSet(){
      '<p class="sub" style="margin-top:.3rem;opacity:.7">'+esc(BUILD)+'</p></div>';
   h+=vstrip();
   h+='<div class="vgrid" style="margin:.6rem 0">'+
-     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" data-a="vmode" data-v="device">'+
+     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" data-a="vmode" data-v="device"'+
+     ' aria-pressed="'+(state.voiceMode==="device"?"true":"false")+'">'+
      '<span><span class="nm">'+esc(t("vDev"))+'</span><br><span class="ds">'+esc(t("vDevD"))+"</span></span></button>"+
-     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" data-a="vmode" data-v="gem">'+
+     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" data-a="vmode" data-v="gem"'+
+     ' aria-pressed="'+(state.voiceMode==="gem"?"true":"false")+'">'+
      '<span><span class="nm">'+esc(t("vGem"))+'</span><br><span class="ds">'+esc(t("vGemD"))+"</span></span></button></div>";
 
   h+='<div class="row"><div><div class="lab">'+esc(t("rate"))+'</div>'+
@@ -3011,7 +3030,8 @@ function screenSet(){
   });
   h+='<div class="row"><div class="lab">'+esc(t("theme"))+'</div><div class="lvls">'+
      [["auto","thAuto"],["light","thLight"],["dark","thDark"]].map(function(x){
-       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" data-a="theme" data-v="'+x[0]+'">'+
+       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" data-a="theme" data-v="'+x[0]+
+         '" aria-pressed="'+(state.theme===x[0]?"true":"false")+'">'+
          esc(t(x[1]))+"</button>"}).join("")+"</div></div>";
   h+="</div>";
 
@@ -3591,12 +3611,12 @@ function viewExamNew(){
   if(TRACKS.length>1){var exTrk=trackSel();
     h+='<div style="margin-top:16px"><b>'+esc(xt("exTrack"))+'</b>'+
      '<div class="seg" style="margin-top:7px">'+TRACKS.map(function(tr){
-       return '<button class="'+(exTrk===tr.id?"on":"")+'" data-a="track" data-t="'+esc(tr.id)+'">'+esc(trName(tr))+'</button>'
+       return '<button class="'+(exTrk===tr.id?"on":"")+'" aria-pressed="'+(exTrk===tr.id?"true":"false")+'" data-a="track" data-t="'+esc(tr.id)+'">'+esc(trName(tr))+'</button>'
      }).join("")+'</div></div>';}
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exLevel"))+'</b><div class="seg" style="margin-top:7px">'+
      LVL.map(function(l,i){
-       return '<button class="'+(EB.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
+       return '<button class="'+(EB.level===i+1?"on":"")+'" aria-pressed="'+(EB.level===i+1?"true":"false")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exCount"))+': <span id="exNlab">'+EB.n+'</span></b>'+
@@ -4799,7 +4819,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l154-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l155-pwa1").catch(function(){});
   });
 }
 </script>

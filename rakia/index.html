@@ -180,6 +180,10 @@ html[lang="en"] body{letter-spacing:0}
 <a class="skip" href="#main">דילוג לתוכן</a>
 <header class="top">
   <h1>הורוסקופ <small>מפת לידה</small></h1>
+  <!-- טאבי המפה מוסתרים בכל מסך אחר, ולכן אחרי ״על הדיוק״ או ״איך זה
+       עובד״ לא הייתה שום דרך חזרה אל המפה שחושבה. הכפתור נחשף ברגע
+       שיש מפה, ו-nav מחזיר ל-form כשאין. -->
+  <button class="btn small" type="button" data-a="nav" data-v="chart" id="btn-chart" hidden>המפה שלי</button>
   <button class="btn small" type="button" data-a="nav" data-v="form">מפה חדשה</button>
   <button class="btn small" type="button" data-a="nav" data-v="people">האנשים שלי</button>
   <button class="btn small" type="button" data-a="nav" data-v="learn">איך זה עובד</button>
@@ -357,7 +361,7 @@ html[lang="en"] body{letter-spacing:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r37 · 2026-10-04";
+var BUILD="r38 · 2026-10-04";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -565,7 +569,9 @@ function onSubmit(e){
 function serialize(o){ return {who:o.who,y:o.y,m:o.m,d:o.d,hh:o.hh,mi:o.mi,timeKnown:o.timeKnown,place:o.place,houseSystem:o.houseSystem} }
 function fillForm(o){
   $("#f-name").value=o.who||""; $("#f-year").value=o.y; $("#f-month").value=o.m; $("#f-day").value=o.d;
-  $("#f-time").value=two(o.hh)+":"+two(o.mi); $("#f-notime").checked=!o.timeKnown; $("#f-houses").value=o.houseSystem||"placidus";
+  /* סימון התיבה בקוד אינו מפעיל את מאזין ה-change, ולכן שדה השעה נשאר
+     פעיל אחרי שחזור מפה ״בלי שעה״ — התיבה אומרת דבר אחד והשדה אחר. */
+  $("#f-time").value=two(o.hh)+":"+two(o.mi); $("#f-notime").checked=!o.timeKnown; $("#f-time").disabled=!o.timeKnown; $("#f-houses").value=o.houseSystem||"placidus";
   if(o.place)pickPlace(o.place);
 }
 
@@ -674,9 +680,11 @@ function elementCounts(ch){
   if(ch.houses)c[elOf(Math.floor(ch.houses.asc/30))]+=2;
   return c;
 }
-function block(title,text,cls){
+/* spoken — כותרת חלופית להקראה בלבד. המנוע קורא ״°״ כסימן גולמי (או
+   מדלג עליו), ולכן ״היום בשמיים״ שולח את האורב במילים. */
+function block(title,text,cls,spoken){
   if(!text)return "";
-  return '<div class="text-block"><h4><span class="'+(cls||"")+'">'+esc(title)+'</span><button type="button" class="speak" data-a="say" data-text="'+esc(title+". "+text)+'">הקראה</button></h4><p>'+esc(text)+'</p></div>';
+  return '<div class="text-block"><h4><span class="'+(cls||"")+'">'+esc(title)+'</span><button type="button" class="speak" data-a="say" data-text="'+esc((spoken||title)+". "+text)+'">הקראה</button></h4><p>'+esc(text)+'</p></div>';
 }
 function inW(a,b){ return LG(a+" ב"+b,a+" in "+b) }
 function chartTexts(ch){
@@ -694,8 +702,13 @@ function chartTexts(ch){
 function renderTexts(){ $("#texts").innerHTML=chartTexts(current.chart).map(function(x){return block(x.title,x.text,x.cls)}).join("") }
 
 /* ---------- הגיליון התחתון ---------- */
+/* הגיליון הוא aria-modal, ולכן הוא חייב להחזיר את המיקוד למי שפתח
+   אותו. בלי זה, מי שעבר בגלגל או בטבלה במקלדת חזר אחרי ״סגירה״
+   לתחילת הדף ואיבד את מקומו בכל לחיצה על פלנטה. */
+var _sheetOpener=null;
 function openSheet(id){
   var ch=current.chart, b=bodyOf(ch,id); if(!b)return;
+  _sheetOpener=(document.activeElement&&document.activeElement!==document.body)?document.activeElement:null;
   var nm=N.planet[id==="trueNode"?"node":id], sg=RAKIA.SIGNS[b.sign], html="";
   html+='<p class="moment">'+esc(nm)+LG(' ב',' in ')+'<b class="el-'+elOf(b.sign)+'">'+esc(N.sign[sg])+'</b>, '+fmtDeg(b.deg)+(ch.houses?', '+esc(N.house[b.house]):'')+(b.retro?' · <span class="retro">'+LG("בנסיגה","retrograde")+'</span>':'')+'</p>';
   if(id==="trueNode")html+='<p>'+esc(T(RAKIA.GLOSSARY.filter(function(g){return g.term==="ראש הדרקון"})[0].def))+'</p>';
@@ -712,7 +725,9 @@ function openSheet(id){
   requestAnimationFrame(function(){ $("#sheet").classList.add("on") });
   $('[data-a="closesheet"]').focus();
 }
-function closeSheet(){ stopSpeak(); $("#sheet").classList.remove("on"); $("#sheet-back").classList.remove("on"); setTimeout(function(){ $("#sheet").hidden=true },250) }
+function closeSheet(){ stopSpeak(); $("#sheet").classList.remove("on"); $("#sheet-back").classList.remove("on"); setTimeout(function(){ $("#sheet").hidden=true },250);
+  var o=_sheetOpener; _sheetOpener=null;
+  if(o&&document.contains(o)){ try{ o.focus({preventScroll:true}) }catch(e){ try{ o.focus() }catch(e2){} } } }
 
 /* ---------- היום בשמיים ---------- */
 function renderToday(){
@@ -736,7 +751,7 @@ function renderToday(){
   hits.slice(0,8).forEach(function(h){
     var same=h.t===h.n, title=LG(N.planet[h.t]+" בשמיים "+(same?"חוזר למקומו במפה":N.aspect[h.type]+" ל"+N.planet[h.n]+" שבמפה"),N.planet[h.t]+" in the sky "+(same?"returns to its place in the chart":"in "+N.aspect[h.type].toLowerCase()+" to "+N.planet[h.n]+" in the chart"));
     var text=same?LG("הפלנטה חוזרת למקום שבו הייתה בלידה. זה זמן שבו הנושא של הפלנטה הזאת מבקש תשומת לב מחודשת.","The planet returns to the place where it stood at birth. This is a time when the subject of this planet asks for renewed attention."):txt("aspect",RAKIA.pairKey(h.t,h.n),h.type);
-    html+=block(title+" ("+h.orb.toFixed(1)+"°)",text);
+    html+=block(title+" ("+h.orb.toFixed(1)+"°)",text,null,title+LG(" (אורב "+h.orb.toFixed(1)+" מעלות)"," (orb "+h.orb.toFixed(1)+" degrees)"));
   });
   $("#today").innerHTML=html;
 }
@@ -794,7 +809,7 @@ function shareImage(){
   img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
 }
 function toast(m){ var t=document.createElement("div"); t.setAttribute("role","status"); t.textContent=m; t.style.cssText="position:fixed;bottom:16px;inset-inline-start:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:.6rem 1rem;border-radius:999px;z-index:60;font-weight:600"; document.body.appendChild(t); setTimeout(function(){t.remove()},2200) }
-function renderChart(){ renderMoment(); renderWheel(); renderTable(); renderTexts(); if(ctab==="today")renderToday(); }
+function renderChart(){ var bc=$("#btn-chart"); if(bc)bc.hidden=false; renderMoment(); renderWheel(); renderTable(); renderTexts(); if(ctab==="today")renderToday(); }
 
 /* ---------- איך זה עובד — דיאגרמות ---------- */
 var DEMO_CHART=null;
@@ -841,7 +856,11 @@ var LEARN_SVG={
     return '<div class="learn-fig">'+s+'</div><ul class="learn-legend"><li><i style="border-color:var(--muted)"></i>צמידות 0° · אורב 8°</li><li><i style="border-color:var(--earth)"></i>שישית 60° · אורב 5°</li><li><i class="dash" style="border-color:var(--fire)"></i>ריבוע 90° · אורב 7°</li><li><i style="border-color:var(--air)"></i>משולש 120° · אורב 7°</li><li><i class="dash" style="border-color:var(--fire)"></i>ניגוד 180° · אורב 8°</li></ul><p class="hint">כשהשמש או הירח מעורבים, האורב גדל במעלה אחת.</p>';
   },
   elements:function(){
-    var rows=[["fire","אש",[0,4,8]],["earth","אדמה",[1,5,9]],["air","אוויר",[2,6,10]],["water","מים",[3,7,11]]];
+    /* הסדר בשורה הוא סדר העמודות: פותח, מחזיק, משתנה. האיכות נקבעת לפי
+       מקום המזל בגלגל — index%3: 0 פותח, 1 מחזיק, 2 משתנה. אש ומים יצאו
+       נכון במקרה (0,4,8 ו-3,7,11), אדמה ואוויר הוצגו בסדר הגלגל ולכן
+       לימדו שהשור פותח והתאומים פותחים. */
+    var rows=[["fire","אש",[0,4,8]],["earth","אדמה",[9,1,5]],["air","אוויר",[6,10,2]],["water","מים",[3,7,11]]];
     var h='<table class="elgrid"><thead><tr><th scope="col">יסוד</th><th scope="col">פותח</th><th scope="col">מחזיק</th><th scope="col">משתנה</th></tr></thead><tbody>';
     rows.forEach(function(r){ h+='<tr><th scope="row" class="el-'+r[0]+'">'+r[1]+'</th>'+r[2].map(function(i){return '<td class="'+r[0]+'">'+N.sign[RAKIA.SIGNS[i]]+'</td>'}).join("")+'</tr>' });
     return h+'</tbody></table>';
@@ -1197,7 +1216,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r37-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r38-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>

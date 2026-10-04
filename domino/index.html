@@ -77,6 +77,7 @@ h2{font-size:1.25rem;margin:.2em 0 .4em}
 .tbox{background:var(--violet-soft);border:3px solid var(--violet);border-radius:18px;padding:12px 14px;margin:12px 0;display:flex;gap:12px;align-items:flex-start}
 .tbox img{flex:none;width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:47% 27%;border:3px solid var(--violet)}
 .how{margin:0;font-size:1.05rem;white-space:pre-line}
+.how::first-line{font-weight:800}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .cwrap{display:flex;flex-direction:column;gap:4px}
 .cap{font-size:.8rem;color:var(--ink-soft);font-weight:700}
@@ -161,11 +162,10 @@ he:["","אחת","שתיים","שלוש","ארבע","חמש","שש","שבע","ש�
 ar:["","واحد","اثنان","ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية","تسعة","عشرة","أحد عشر","اثنا عشر","ثلاثة عشر","أربعة عشر","خمسة عشر","ستة عشر","سبعة عشر","ثمانية عشر","تسعة عشر","عشرون"],
 ru:["","один","два","три","четыре","пять","шесть","семь","восемь","девять","десять","одиннадцать","двенадцать","тринадцать","четырнадцать","пятнадцать","шестнадцать","семнадцать","восемнадцать","девятнадцать","двадцать"],
 en:["","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty"]};
-var OPW={plus:L("ועוד","плюс","плюс","plus"),minus:L("פחות","ناقص","минус","minus"),times:L("כפול","ضرب","умножить на","times"),over:L("מתוך","من","из","out of")};
-OPW.plus.ar="زائد";OPW.plus.ru="плюс";
+var OPW={plus:L("ועוד","زائد","плюс","plus"),minus:L("פחות","ناقص","минус","minus"),times:L("כפול","ضرب","умножить на","times"),over:L("מתוך","من","из","out of")};
 /* ===== visuals ===== */
 function dotsSvg(n){var s="",i,rows=Math.ceil(n/5),oy=(82-rows*18)/2+9,ox=(100-Math.min(n,5)*18)/2+9;
-  for(i=0;i<n;i++){var r=Math.floor(i/5),c=i%5;s+='<circle cx="'+(ox+c*18-9+0)+'" cy="'+(oy+r*18)+'" r="7" fill="'+(r%2?C2:C1)+'" stroke="'+INK+'" stroke-width="1.5"/>'}
+  for(i=0;i<n;i++){var r=Math.floor(i/5),c=i%5;s+='<circle cx="'+(ox+c*18)+'" cy="'+(oy+r*18)+'" r="7" fill="'+(r%2?C2:C1)+'" stroke="'+INK+'" stroke-width="1.5"/>'}
   return svg(100,82,s,String(n))}
 function arraySvg(r,c){var sp=Math.min(110/c,72/r),rad=sp*.38,s="",i,j,w=c*sp+6,h=r*sp+6;
   for(i=0;i<r;i++)for(j=0;j<c;j++)s+='<circle cx="'+(3+sp*(j+.5)).toFixed(1)+'" cy="'+(3+sp*(i+.5)).toFixed(1)+'" r="'+rad.toFixed(1)+'" fill="'+(i%2?C2:C1)+'" stroke="'+INK+'" stroke-width="1"/>';
@@ -265,7 +265,7 @@ function build(setId,lv,seed){
   var deck={set:setId,lv:lv,seed:seed,cards:printed,chain:chainIds,byChain:cards};
   RNG=Math.random;return deck}
 /* ===== UI strings ===== */
-var BUILD="dm4 · 2026-10-04";
+var BUILD="dm5 · 2026-10-04";
 var STR={
 he:{brand:"דומינו לימודי",title:"דומינו לימודי להדפסה",tag:"מדפיסים 20 קלפים, גוזרים ומסדרים במעגל. כל קלף מתחבר לקלף שמתאים לו.",
  howT:"איך משחקים?",limor:"אני לימור. ככה משחקים:",how:"1. מדפיסים את הקלפים וגוזרים לפי הקו המקווקו.\n2. מערבבים את הקלפים על השולחן.\n3. מתחילים בקלף עם הכוכב. מחפשים קלף שהחצי הראשון שלו מתאים לחצי השני של הקלף הקודם.\n4. ממשיכים עד שהמעגל נסגר. הקלף האחרון מתחבר לקלף עם הכוכב.",
@@ -299,7 +299,13 @@ en:{brand:"Learning dominoes",title:"Printable learning dominoes",tag:"Print 20 
 var LNAME={he:"עב",ar:"عر",ru:"Рус",en:"En"},LDIR={he:"rtl",ar:"rtl",ru:"ltr",en:"ltr"},LCODE={he:"he-IL",ar:"ar-SA",ru:"ru-RU",en:"en-US"};
 /* ===== state ===== */
 var KEY="domino-state-v1",S={lang:"he",set:"nums",lvl:1,seed:1,slow:false,big:false},view="home",DECK=null,showKey=false;
-function loadS(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)for(var k in o)S[k]=o[k]}catch(e){}}
+function loadS(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)for(var k in o)S[k]=o[k]}catch(e){}
+  /* מגירה פגומה אינה מסך ריק: render קורא ל-STR[S.lang] ו-SETS[S.set]
+     בלי בדיקה, וערך שאינו ברשימה היה זורק לפני שנכתב משהו ל-#app. */
+  if(!STR[S.lang])S.lang="he";
+  if(!SETS[S.set])S.set="nums";
+  if(!(S.seed>0))S.seed=1;
+  if(S.lvl!==1&&S.lvl!==2)S.lvl=1;}
 function saveS(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 loadS();
 function $(s){return document.querySelector(s)}
@@ -307,7 +313,36 @@ function T(){return STR[S.lang]}
 function lt(o){return o[S.lang]}
 function mkDeck(){if(!SETS[S.set])S.set="nums";if(S.lvl>SETS[S.set].lv)S.lvl=1;DECK=build(S.set,S.lvl,S.seed)}
 /* ===== speech with word highlight (same engine as the other bekol apps) ===== */
-var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null;
+var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null,_dis=null;
+/* 1 · שומר-ער. Chrome/Edge בשולחן העבודה חותכים הקראה אחרי כ-15 שניות.
+   הטקסט של לימור כאן הוא 245 תווים בעברית ו-299 ברוסית — הוא נחתך.
+   במובייל אין את הבאג והפעולה מקרטעת שם, ולכן רק בשולחן העבודה. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+/* 3 · שומר-סף. יש מכשירים שבהם onend לא נורה: הכפתור נשאר על "עצירה"
+   וההקראה לא ממשיכה לעולם. ארבע שניות של שקט מוחלט נחשבות סוף. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
 var VF=/(female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
 var VM=/(\bmale\b|david|mark|asaf|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
 function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
@@ -324,14 +359,16 @@ function hlAt(ci){if(!HL.el)return;var w=-1,i;for(i=0;i<HL.starts.length;i++){if
   var sp=HL.el.querySelectorAll("[data-w]");for(i=0;i<sp.length;i++)sp[i].className=(i===w?"hl":"")}
 function hlFallback(rate){if(!HL.el)return;var n=HL.starts.length,i=0,per=430/rate;
   (function step(){if(!HL.el||HL.got)return;var sp=HL.el.querySelectorAll("[data-w]");for(var k=0;k<sp.length;k++)sp[k].className=(k===i?"hl":"");i++;if(i<=n)HL.timer=setTimeout(step,per)})()}
-function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}_u=null;hlClear();setPlaying(false)}
+function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}_u=null;stopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false)}
 function setPlaying(b){var bs=document.querySelectorAll('[data-a="stop"]');bs.forEach(function(x){x.style.opacity=b?1:.55})}
 function speak(text,el,onend){stopSpeak();var raw=text;if(!("speechSynthesis" in window)||!text)return false;
   var rate=S.slow?0.7:0.9,pv=pickVoice(),u=new SpeechSynthesisUtterance(text);u.lang=LCODE[S.lang];if(pv.v)u.voice=pv.v;u.rate=rate;u.pitch=pv.fem?1.05:1.3;
   HL.noB=false;if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw)}
   u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(e.charIndex)};
-  u.onend=u.onerror=function(){if(_u===u){hlClear();setPlaying(false);if(onend)onend()}};
-  _u=u;setPlaying(true);try{speechSynthesis.speak(u)}catch(e){return false}
+  function fin(){if(_u!==u)return;_u=null;stopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false);if(onend)onend()}
+  u.onend=u.onerror=fin;
+  _u=u;setPlaying(true);try{speechSynthesis.speak(u)}catch(e){_u=null;setPlaying(false);return false}
+  startKeepAlive();_dis=ttsWatchdog(function(){return _u===u},fin);
   if(HL.el)setTimeout(function(){if(_u===u&&HL.el&&!HL.got)hlFallback(rate)},900);return true}
 /* ===== card markup ===== */
 var SPKSVG='<svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8c2 2 2 6 0 8" stroke="#fff" fill="none" stroke-width="2"/></svg>';
@@ -357,7 +394,7 @@ function header(){var t=T(),h='<div class="top"><button class="brand" data-a="ho
 function tutorBtn(){return (window.TUTOR&&TUTOR.on&&TUTOR.on())?'<button class="btn tut" data-a="tutor"><img src="/img/limor.jpg" alt="">'+esc(TUTOR.label())+'</button>':''}
 function listenRow(sayId){var t=T();return '<div class="row" style="margin:6px 0 8px"><button class="btn play" data-a="say" data-t="'+sayId+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg>'+esc(t.listen)+'</button><button class="btn stop" data-a="stop"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>'+esc(t.stop)+'</button><button class="btn slow" data-a="slowsay" data-t="'+sayId+'">'+esc(t.slow)+'</button></div>'}
 function homeView(){var t=T(),cur=SETS[S.set],h='<h1 id="h1">'+esc(t.title)+'</h1><p class="sub" id="hs">'+esc(t.tag)+'</p>'+listenRow("home");
-  h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><b>'+esc(t.limor)+'</b>'+'<p class="how" id="how">'+esc(t.how)+'</p></div></div>'+listenRow("how")+tutorBtn();
+  h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><p class="how" id="how">'+esc(t.limor+"\n"+t.how)+'</p></div></div>'+listenRow("how")+tutorBtn();
   h+='<h2 style="margin-top:14px">'+esc(t.pick)+'</h2><div class="sets">';
   SETIDS.forEach(function(id){var s=SETS[id];h+='<button class="setb" style="--c:'+s.c+'" data-a="set" data-s="'+id+'" aria-pressed="'+(S.set===id)+'"><span class="ico" style="color:'+(s.tc||"#fff")+'" aria-hidden="true">'+esc(s.ic)+'</span><span><span class="nm">'+esc(lt(s.n))+'</span><br><span class="ds">'+esc(lt(s.d))+'</span></span></button>'});
   h+='</div>';
@@ -383,7 +420,7 @@ function render(){document.documentElement.lang=S.lang;document.documentElement.
   document.title=T().title+" · bekol";if(window.TUTOR&&TUTOR.refresh)try{TUTOR.refresh()}catch(e){}}
 function sayText(w){var t=T();
   if(w==="home")return [t.title+". "+t.tag,$("#h1")];
-  if(w==="how")return [t.limor+" "+t.how,$("#how")];
+  if(w==="how")return [t.limor+"\n"+t.how,$("#how")];
   if(w==="key")return [t.keyHow,$("#kh")];
   if(w==="settings")return [t.setNote,$("#sn")];
   return ["",null]}
@@ -408,6 +445,16 @@ function onAct(a,el){
   else if(a==="printkey")doPrint("pk")}
 document.addEventListener("click",function(e){var el=e.target.closest("[data-a]");if(!el||el.disabled)return;onAct(el.dataset.a,el)});
 window.addEventListener("pagehide",function(){stopSpeak()});
+/* 5 · iOS לא ישמיע כלום עד שאמירה אחת יצאה מתוך handler של מגע אמיתי.
+   קריאה ישירה, בלי המתנה לרשימת הקולות — הבטחה שוברת את שרשרת המגע
+   ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
+try{document.addEventListener("pointerdown",function(){
+  try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+},{once:true});}catch(e){}
+/* רשימת הקולות נטענת אסינכרונית ב-Chrome: בלי הבעיטה הזאת getVoices
+   של הלחיצה הראשונה חוזר ריק, ונבחר קול ברירת המחדל של המערכת. */
+try{speechSynthesis.getVoices();
+    speechSynthesis.addEventListener("voiceschanged",function(){try{voices()}catch(e){}});}catch(e){}
 </script>
 <script src="/tutor/josh-face.js"></script>
 <script src="/tutor/he-speech.js"></script>
@@ -421,12 +468,12 @@ window.addEventListener("pagehide",function(){stopSpeak()});
 <script>
 /* INTERNAL-GATE — לא נטענת בלי מפתח. */
 function boot(){var q=new URLSearchParams(location.search),l=q.get("lang");if(l&&STR[l])S.lang=l;
-  var st=q.get("set");if(st&&SETS[st])S.set=st;var lv=q.get("lvl");if(lv)S.lvl=+lv;var sd=q.get("seed");if(sd)S.seed=+sd;
+  var st=q.get("set");if(st&&SETS[st])S.set=st;var lv=+q.get("lvl");if(lv===1||lv===2)S.lvl=lv;var sd=+q.get("seed");if(sd>0)S.seed=sd;
   mkDeck();var vw=q.get("view");if(vw==="key"||vw==="settings")view=vw;
   render();
   var pr=q.get("print");if(pr==="cards")document.documentElement.classList.add("pc");else if(pr==="key")document.documentElement.classList.add("pk");
   if(window.TUTOR){try{TUTOR.mount({app:"domino",lang:function(){return S.lang},q:function(){return null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm4-pwa1").catch(function(){})})}
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm5-pwa1").catch(function(){})})}
 if(!INTERNAL_OK){
   document.getElementById("gate").hidden=false;
   document.title="לא פורסם";

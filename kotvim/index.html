@@ -1117,7 +1117,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="k98 · 2026-10-04";
+var BUILD="k99 · 2026-10-04";
 var SKEY="kotvim-state-v1";
 var GKEY_STORE="kotvim-gkey";
 
@@ -1351,12 +1351,19 @@ function devPicker(lgs){
     function row(v){
       var on=v?cur===v.voiceURI:!cur;
       var uri=v?v.voiceURI:"";
-      return '<div class="vopt'+(on?" on":"")+'" data-a="devvoice" data-l="'+lg+'" data-u="'+esc(uri)+
-        '" role="button" tabindex="0" aria-pressed="'+(on?"true":"false")+'">'+
-        '<span style="flex:1"><span class="nm">'+esc(v?v.name:t("vAuto"))+'</span><br>'+
-        '<span class="ds">'+esc(v?v.lang:t("vDevD"))+"</span></span>"+
+      /* אותו תיקון שכבר נעשה בכרטיסי ג׳מיני, ולא ירד לכאן: גוף
+         הכרטיס הוא כפתור אמיתי, וכפתור הדוגמה אחיו ולא בנו.
+         בצורה הקודמת Enter על ״שמעו דוגמה״ טיפס ב-closest (מאזין
+         ה-keydown של devvoice) אל הכרטיס העוטף ובחר את הקול במקום
+         להשמיע אותו, וקורא מסך הקריא ״שמעו דוגמה״ כחלק משם הכרטיס.
+         וגם 2.2rem — 35 פיקסלים, מתחת ליעד המגע — הפך ל-2.75rem. */
+      return '<div class="vopt'+(on?" on":"")+'">'+
+        '<button type="button" class="vpick" data-a="devvoice" data-l="'+lg+'" data-u="'+esc(uri)+
+        '" aria-pressed="'+(on?"true":"false")+'">'+
+        '<span class="nm">'+esc(v?v.name:t("vAuto"))+'</span><br>'+
+        '<span class="ds">'+esc(v?v.lang:t("vDevD"))+"</span></button>"+
         (v?'<button class="btn ghost" data-a="devsample" data-l="'+lg+'" data-u="'+esc(uri)+
-           '" style="padding:.35rem .7rem;min-height:2.2rem;font-size:.82rem">'+
+           '" style="padding:.35rem .7rem;min-height:2.75rem;font-size:.82rem">'+
            ic("play",14)+" "+esc(t("vSample"))+"</button>":"")+"</div>";
     }
     out+='<div class="vgrid">'+row(null)+"</div>";
@@ -2037,13 +2044,22 @@ var TYPES=[
    d:F("פנייה קצרה, בקשה ברורה, וסיום מנומס",
        "توجّه قصير، طلب واضح، وخاتمة مهذّبة",
        "Краткое обращение, ясная просьба, вежливое окончание",
-       "A short opening, a clear request, a polite close")},
+       "A short opening, a clear request, a polite close"),
+   /* תוויות הקבוצות של הסוג הזה. ״טענות״ ו״סיכום״ נכונים לחיבור;
+      במייל רשמי הקטעים הם פרטי הבקשה, והאחרון הוא סיום מנומס ולא
+      סיכום. הניסוח נלקח מ-`d` שלמעלה, באותן ארבע שפות. */
+   lb:{cl:F("פרטי הבקשה","تفاصيل الطلب","Детали просьбы","The request"),
+       cn:F("סיום","خاتمة","Окончание","Closing")}},
   {id:"story", ic:"star",
    n:F("סיפור אישי","قصة شخصية","Личная история","Personal story"),
    d:F("מה קרה, מה הרגשתי, ומה למדתי",
        "ماذا حدث، بماذا شعرت، وماذا تعلّمت",
        "Что случилось, что я почувствовал, чему научился",
-       "What happened, how I felt, what I learned")}
+       "What happened, how I felt, what I learned"),
+   /* ובסיפור אישי אין טענות ואין סיכום — יש מה קרה ומה למדתי,
+      בדיוק כפי ש-`d` כבר אומר ללומד במסך הראשון. */
+   lb:{cl:F("מה קרה","ماذا حدث","Что случилось","What happened"),
+       cn:F("מה למדתי","ماذا تعلّمت","Чему я научился","What I learned")}}
 ];
 
 /* הנושאים. כל נושא שייך לסוג אחד, ונושא ארבעה מאגרי קטעים
@@ -2532,6 +2548,16 @@ function bankOf(typeId){ for(var i=0;i<BANKS_K.length;i++) if(BANKS_K[i].type===
 function topicById(typeId,id){ var a=bankOf(typeId),i; for(i=0;i<a.length;i++) if(a[i].id===id) return a[i]; return null }
 function gl(o){ return (o&&(o[state.lang]||o.he))||"" }
 
+/* תווית הקבוצה היא של הסוג, לא של האפליקציה. ארבע התוויות ב-T
+   נכתבו לחיבור, והוצגו כלשונן גם למי שכותב מייל רשמי או סיפור
+   אישי: ״טענות״ מעל ״ההיעדרות היא ליום אחד בלבד״, ו״סיכום״ מעל
+   ״תודה מראש״. סוג שיש לו `lb` מקבל את שלו, והשאר נשארים כשהיו. */
+var KDEF={op:"kOpen",cl:"kClaims",ex:"kEx",cn:"kConc"};
+function kLab(kind){
+  var ty=W.type?typeById(W.type):null;
+  return (ty&&ty.lb&&ty.lb[kind])?gl(ty.lb[kind]):t(KDEF[kind]);
+}
+
 /* הטקסט המורכב. שורה לכל חלק, ולא פסקה אחת ארוכה: הלומד צריך
    לראות את המבנה שהוא בנה, ולא רק את התוצאה. */
 function wText(){
@@ -2548,10 +2574,10 @@ function wText(){
    וזה ההבדל בין הדרכה לחסימה. */
 function wMissing(){
   var m=[];
-  if(W.op<0) m.push(t("kOpen"));
-  if(W.cl.length<CL_MIN) m.push(t("kClaims"));
-  if(W.ex<0) m.push(t("kEx"));
-  if(W.cn<0) m.push(t("kConc"));
+  if(W.op<0) m.push(kLab("op"));
+  if(W.cl.length<CL_MIN) m.push(kLab("cl"));
+  if(W.ex<0) m.push(kLab("ex"));
+  if(W.cn<0) m.push(kLab("cn"));
   return m;
 }
 function wReady(){ return wMissing().length===0 }
@@ -2637,10 +2663,10 @@ function screenBuild(){
   h+='<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin:10px 0 4px">'+
      '<button class="btn readBig" data-a="sayall">\u266b '+esc(t("kHearAll"))+"</button>"+
      '<button class="btn stopBig" data-a="stop">'+esc(t("stopB"))+"</button></div>";
-  h+=kGroup(t("kOpen"),"",tp.op,"op",W.op);
-  h+=kGroup(t("kClaims"),t("kClaimsD"),tp.cl,"cl",-1);
-  h+=kGroup(t("kEx"),"",tp.ex,"ex",W.ex);
-  h+=kGroup(t("kConc"),"",tp.cn,"cn",W.cn);
+  h+=kGroup(kLab("op"),"",tp.op,"op",W.op);
+  h+=kGroup(kLab("cl"),t("kClaimsD"),tp.cl,"cl",-1);
+  h+=kGroup(kLab("ex"),"",tp.ex,"ex",W.ex);
+  h+=kGroup(kLab("cn"),"",tp.cn,"cn",W.cn);
   /* #kmiss אומר מה חסר, והכפתור שמתחתיו אינו נעול: לחיצה כשחסר
      חלק חוזרת לכאן (kdone), ולא לכפתור מת. */
   h+='<div id="kmiss" class="fb '+(miss.length?"warn":"ok")+'" style="margin-top:16px" aria-live="polite">'+
@@ -3175,7 +3201,10 @@ document.addEventListener("click",function(e){
     announce(t("kStep4"));
     return;
   }
-  if(a==="kedit"){ W.step=3; stopSpeak(); render(); window.scrollTo(0,0); return }
+  /* חזרה לעריכה מנקה את התצלום. בלעדיה `W.txt` נשאר הטקסט שלפני
+     העריכה, ו-`q()` של ג׳וש (ו-getScreenContext של לימור) שולחים
+     אותו במקום מה שעל המסך — המורה עונה על טקסט שכבר השתנה. */
+  if(a==="kedit"){ W.step=3; W.txt=""; stopSpeak(); render(); window.scrollTo(0,0); return }
   if(a==="knew"){ wReset(); stopSpeak(); render(); window.scrollTo(0,0); return }
   if(a==="ksay"){ speak(W.txt,state.lang); return }
   if(a==="kcopy"){
@@ -3185,7 +3214,11 @@ document.addEventListener("click",function(e){
     });
     return;
   }
-  if(a==="lang"){state.lang=LANGS[v]?v:"he";save();render();return}
+  /* החלפת שפה בצעד הרביעי מרכיבה את הטקסט מחדש. `W.txt` הוא תצלום
+     במחרוזת, לא מזהים: בלי הבנייה מחדש המסך נשאר בשפה הקודמת אחרי
+     שהממשק התחלף, ו-`ksay` מוסר אותו למנוע ההקראה של השפה החדשה —
+     קול ערבי שמקריא עברית, בדיוק הכישלון שהאפליקציה קיימת כדי למנוע. */
+  if(a==="lang"){state.lang=LANGS[v]?v:"he";if(W.step===4)W.txt=wText();save();render();return}
   if(a==="vmode"){state.voiceMode=v==="gem"?"gem":"device";save();render();return}
   if(a==="vcheck"){voiceCheck();return}
   if(a==="devvoice"||a==="devsample"){
@@ -3283,7 +3316,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=k98-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=k99-pwa1").catch(function(){});
   });
 }
 </script>

@@ -328,6 +328,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;
   padding:12px 14px;font-size:1rem;outline:none}
 .field:focus{border-color:var(--accent)}
+/* outline:none על .field יושב אחרי :focus-visible הכללי ובאותה סגוליות,
+   ולכן הוא ביטל אותו: שדה טקסט לא קיבל טבעת מיקוד במקלדת בכלל. */
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 
 /* ---------- דף נוסחאות ---------- */
 .a-base{--c:var(--c-base);--cs:var(--cs-base)}
@@ -1009,7 +1012,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g166 · 2026-10-04";
+var BUILD="g167 · 2026-10-04";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -1017,7 +1020,7 @@ function blankState(){
     v:1,
     name:"",
     track:1,                 /* 1 מדעים והנדסה · 2 מדעי המחשב · 3 מדעי החברה */
-    level:2,                 /* 1 בסיס · 2 רגיל · 3 מאתגר */
+    level:2,                 /* 1 בסיס · 2 רמת תרגיל · 3 רמת מבחן · 4 נימוק — LVL_HE */
     topics:[],               /* הנושאים שנבחרו לתרגול */
     mastery:{},              /* לכל נושא: {seen,ok,help,m} כאשר m הוא 0..100 */
     stats:{answered:0,correct:0,helped:0,xp:0,streakDays:0,lastDay:"",rounds:0},
@@ -1875,6 +1878,9 @@ var SAY_MAP=[
   [/\bln\b/gi," לוג טבעי של "],[/\blog\b/gi," לוג "],
   [/Σ/g," סכום "],[/∈/g," שייך ל "],[/∉/g," לא שייך ל "],
   [/∪/g," איחוד "],[/∩/g," חיתוך "],[/⊆/g," מוכל ב "],[/∅/g," הקבוצה הריקה "],
+  /* סוגריים מסולסלים. בלי זה "A = { 1 , 2 }" ו-"A = ( 1 , 2 )" נשמעים
+     אותו דבר, וזו בדיוק ההבחנה שנושא החסמים בודק. מ-math-uni. */
+  [/\{/g," הקבוצה "],[/\}/g," , "],
   [/¬/g," לא "],[/∧/g," וגם "],[/∨/g," או "],[/⇒/g," גורר "],[/⇔/g," אם ורק אם "],
   [/\bdet\b/gi," דטרמיננטה של "],[/λ/g," למדה "],[/μ/g," מיו "],[/σ/g," סיגמא "],
   [/\bP\b/g," ההסתברות "],[/\bE\b/g," התוחלת "],[/\bV\b/g," השונות "],
@@ -11981,13 +11987,19 @@ trAt("en",TR_KEYS.indexOf("{0}{1} לשנה ג׳ באוניברסיטה</span>"),
 trAt("ar",TR_KEYS.indexOf("אנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית — צעד אחר צעד."),["تحليل، دوال عقدية، جبر تجريدي وتحليل عددي، خطوة بخطوة."]);
 trAt("ru",TR_KEYS.indexOf("אנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית — צעד אחר צעד."),["Анализ, комплексные функции, абстрактная алгебра и численный анализ: шаг за шагом."]);
 trAt("en",TR_KEYS.indexOf("אנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית — צעד אחר צעד."),["Analysis, complex functions, abstract algebra and numerical analysis: step by step."]);
-trAt("ar",TR_KEYS.indexOf("בשנה ג׳ מעמיקים באנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד."),["في السنة الثالثة نتعمق في التحليل والدوال العقدية والجبر التجريدي والتحليل العددي. كل سؤال يُفتح إلى خطوات، וכל خطأ يحصل على شرح، وورقة القوانين والقراءة الصوتية متاحتان دائمًا."]);
+trAt("ar",TR_KEYS.indexOf("בשנה ג׳ מעמיקים באנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד."),["في السنة الثالثة نتعمق في التحليل والدوال العقدية والجبر التجريدي والتحليل العددي. كل سؤال يُفتح إلى خطوات، وكل خطأ يحصل على شرح، وورقة القوانين والقراءة الصوتية متاحتان دائمًا."]);
 trAt("ru",TR_KEYS.indexOf("בשנה ג׳ מעמיקים באנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד."),["На третьем курсе углубляются в анализ, комплексные функции, абстрактную алгебру и численный анализ. Каждый вопрос раскладывается на шаги, каждая ошибка получает объяснение, а лист формул и озвучка доступны всегда."]);
 trAt("en",TR_KEYS.indexOf("בשנה ג׳ מעמיקים באנליזה, פונקציות מרוכבות, אלגברה מופשטת ואנליזה נומרית. כל שאלה נפתחת לשלבים, כל טעות מקבלת הסבר, ודף הנוסחאות וההקראה זמינים תמיד."),["Third year goes deeper into analysis, complex functions, abstract algebra and numerical analysis. Every question opens into steps, every mistake gets an explanation, and the formula sheet and read-aloud are always available."]);
 TR_KEYS.push("מרשים מאד. שליטה כזאת לא באה לבד.","כל הכבוד. סבב כזה דורש ריכוז אמיתי.","התקדמות טובה. הנושאים למטה מראים איפה לחדד.");
 trAt("ar",TR_KEYS.length-3,["ممتاز حقًا. إتقان كهذا لا يأتي بالصدفة.","أحسنتم. جولة كهذه تتطلب تركيزًا حقيقيًا.","تقدم جيد. المواضيع أدناه تُظهر أين تُركّزون."]);
 trAt("ru",TR_KEYS.length-3,["Впечатляет. Такое мастерство не появляется само.","Молодцы. Такой раунд требует настоящей концентрации.","Хороший прогресс. Темы ниже показывают, что подтянуть."]);
 trAt("en",TR_KEYS.length-3,["Impressive. Mastery like this does not happen by itself.","Well done. A round like this takes real focus.","Good progress. The topics below show where to sharpen."]);
+/* המילה שנוספה להקראה עם כלל הסוגריים המסולסלים. */
+TR_KEYS.push(" הקבוצה ");
+trAt("ar",TR_KEYS.length-1,[" المجموعة "]);
+trAt("ru",TR_KEYS.length-1,[" множество "]);
+trAt("en",TR_KEYS.length-1,[" the set "]);
+
 trBuild();
 exLoad();
 applyModes();
@@ -12017,7 +12029,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g166-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g167-pwa1").catch(function(){});
   });
 }
 </script>

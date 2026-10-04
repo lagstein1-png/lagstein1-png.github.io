@@ -483,6 +483,10 @@ footer{border-top:3px solid rgba(23,51,60,.08);background:color-mix(in srgb,var(
 .field{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;
   min-height:48px;padding:12px 14px;border-radius:11px;outline:none;background:var(--paper);color:var(--ink);border:1px solid var(--ink-faint)}
 .field:focus{border-color:var(--teal)}
+/* `.field` מגדיר `outline:none` בכלל הבסיס שלו, והוא מאוחר בקובץ
+   מהכלל הגלובלי `:focus-visible` ושווה לו בסגוליות — ולכן ניצח
+   אותו, וארבעת שדות המבחן נשארו בלי טבעת מיקוד למקלדת. */
+.field:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 textarea.field{min-height:96px;resize:vertical}
 
 /* ---------- שורות המבחן ----------
@@ -2397,7 +2401,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="b175 · 2026-10-04";
+var BUILD="b176 · 2026-10-04";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2523,7 +2527,7 @@ function onboarding(){
     '<p class="fd" style="font-weight:600;font-size:1.2rem;margin-top:22px">'+esc(t.step2)+'</p>'+
     '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">'+
       '<label for="pname" style="position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)">'+esc(t.step2)+'</label>'+
-      '<input id="pname" data-bind="petName" maxlength="14" value="'+esc(petName())+'" placeholder="'+esc(sel?sugg[sel]:t.namePh)+'" style="flex:1;min-width:12rem;background:var(--paper);border:3px solid rgba(23,51,60,.2);border-radius:16px;padding:13px 16px;font-size:1.1rem;font-weight:500;outline:none" onfocus="this.style.borderColor=\'var(--teal)\'" onblur="this.style.borderColor=\'rgba(23,51,60,.2)\'"/>'+
+      '<input id="pname" data-bind="petName" maxlength="14" value="'+esc(petName())+'" placeholder="'+esc(sel?sugg[sel]:t.namePh)+'" style="flex:1;min-width:12rem;background:var(--paper);border:3px solid rgba(23,51,60,.2);border-radius:16px;padding:13px 16px;font-size:1.1rem;font-weight:500" onfocus="this.style.borderColor=\'var(--teal)\'" onblur="this.style.borderColor=\'rgba(23,51,60,.2)\'"/>'+
       (sel?'<button class="btn btn-ghost" style="padding:10px 16px;font-size:.9rem" data-a="takesugg">'+esc(t.takeSugg)+' "'+esc(sugg[sel])+'"</button>':"")+
     '</div>'+
     '<button class="btn btn-teal" data-a="startpet" '+(sel?"":"disabled")+' style="width:100%;margin-top:24px;padding:17px;font-size:1.4rem">'+esc(t.start)+' '+ic("arrow",24)+'</button>'+
@@ -2535,19 +2539,37 @@ function onboarding(){
   '</div>';
 }
 /* ================= practice ================= */
+/* **הציור חייב להראות את התרגיל עצמו.**
+   הכיתוב מעל העיגולים אומר ״נסו לספור את הנקודות״, ולכן ציור
+   שמציג כמות אחרת מהתרגיל שולח את הלומד לתשובה שגויה. התקרות
+   שהיו כאן חתכו 50 לעשרים עיגולים, ו-9×9 לשש שורות של שמונה:
+   נמדד בסימולציה של 30,000 שאלות לרמה — ברמה 6, 63.8% מהציורים
+   הראו כמות שאינה התרגיל, וברמה 2 כבר 28.5%.
+   מעכשיו: או ציור נאמן, או בלי ציור. כפל וחילוק נאמנים תמיד
+   (המחולל אינו עובר 10), ובחיבור ובחיסור הציור יורד כשאינו
+   נכנס — רמז 2 המילולי מוצג ממילא בבועה, ו״עזרה מלאה — צעד־צעד״
+   פתוח בכל שאלה (SlowMode.can מחזיר true לכל טווחי המחולל). */
+function visFits(q){
+  if(!q)return false;
+  if(q.kind==="add")return q.a<=20&&q.b<=20;
+  if(q.kind==="sub")return (q.a-q.b)<=20&&q.b<=20;
+  if(q.kind==="mul")return q.a<=10&&q.b<=10;
+  return q.b<=10&&q.answer<=10;
+}
 function visualHint(q){
-  var t=T(),dots="",i,cap=20;
+  var t=T(),dots="",i;
+  if(!visFits(q))return "";
   if(q.kind==="add"){
-    dots='<div style="display:flex;gap:26px;align-items:center;justify-content:center;flex-wrap:wrap"><span class="visgrid">'+dotN(Math.min(q.a,cap),"var(--teal)")+'</span><span class="fd" style="font-size:2rem;font-weight:700;color:var(--ink)">+</span><span class="visgrid">'+dotN(Math.min(q.b,cap),"var(--sky)")+'</span></div>';
+    dots='<div style="display:flex;gap:26px;align-items:center;justify-content:center;flex-wrap:wrap"><span class="visgrid">'+dotN(q.a,"var(--teal)")+'</span><span class="fd" style="font-size:2rem;font-weight:700;color:var(--ink)">+</span><span class="visgrid">'+dotN(q.b,"var(--sky)")+'</span></div>';
   }else if(q.kind==="sub"){
-    var keep=Math.max(0,q.a-q.b),cross=Math.min(q.b,cap-keep>0?cap:q.b);
-    dots='<div class="visgrid">'+dotN(Math.min(keep,cap),"var(--teal)")+dotX(Math.min(q.b,cap))+'</div>';
+    var keep=Math.max(0,q.a-q.b);
+    dots='<div class="visgrid">'+dotN(keep,"var(--teal)")+dotX(q.b)+'</div>';
   }else if(q.kind==="mul"){
-    var r=Math.min(q.a,6),c=Math.min(q.b,8),rows="";
+    var r=q.a,c=q.b,rows="";
     for(i=0;i<r;i++)rows+='<div style="display:flex;gap:3px;justify-content:center">'+dotN(c,"var(--teal)")+'</div>';
     dots='<div style="display:grid;gap:5px">'+rows+'</div>';
   }else{
-    var groups=Math.min(q.b,6),per=Math.min(q.answer,8),g="";
+    var groups=q.b,per=q.answer,g="";
     for(i=0;i<groups;i++)g+='<span class="visgrid" style="border:2px dashed rgba(23,51,60,.25);border-radius:12px;padding:6px">'+dotN(per,"var(--sky)")+'</span>';
     dots='<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">'+g+'</div>';
   }
@@ -3604,7 +3626,7 @@ function viewExamNew(){
      '<div class="grid g2">';
   tops.forEach(function(t){
     var on=EB.topics.indexOf(t.id)>=0;
-    h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" data-a="extopic" data-t="'+t.id+
+    h+='<button class="tpc '+areaCls(t.id)+(on?" on":"")+'" data-a="extopic" data-t="'+t.id+
        '" aria-pressed="'+(on?"true":"false")+'"><span class="tn">'+esc(tName(t))+'</span>'+
        (typeof tDesc==="function"?'<span class="td">'+esc(tDesc(t))+'</span>':"")+'</button>';
   });
@@ -4102,7 +4124,10 @@ function viewSit(){
         '<span class="chip">'+esc(xf("stQn",SIT.i+1,SIT.qs.length))+'</span></div>'+
         '<span class="dots">'+SIT.answers.map(function(a,i){
           return '<span class="dot '+(i<SIT.i?(a>=0?"ok":"no"):"")+'"></span>'}).join("")+'</span></div>';
-    h2+='<div class="card pad rise '+topicCls(q.topic)+'" style="border-top:3px solid var(--c);margin-top:14px">';
+    /* `--c` הגיע עם מודול המבחן ממשפחת math-uni ואינו מוגדר כאן באף
+       כלל — ההצהרה הייתה פסולה, והכרטיס נשאר בלי פס עליון בכלל.
+       `--op` יושב על אותו אלמנט, דרך topicCls, בארבעת צבעי הפעולות. */
+    h2+='<div class="card pad rise '+topicCls(q.topic)+'" style="border-top:3px solid var(--op);margin-top:14px">';
     h2+='<p style="font-size:clamp(1rem,3.6vw,1.15rem);font-weight:600">'+q.ask+'</p>';
     if(q.expr)h2+='<p class="mline" style="margin-top:14px">'+q.expr+'</p>';
     if(q.fig)h2+=q.fig;
@@ -4951,7 +4976,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b175-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b176-pwa1").catch(function(){});
   });
 }
 </script>

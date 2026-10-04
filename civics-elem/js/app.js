@@ -17,14 +17,14 @@ function unitById(id){return UNITS.filter(function(u){return u.id===id})[0]}
 function uTitle(u,l){return unitTitle(u,l||state.lang)}
 /* ---------- chrome ---------- */
 function topbar(title,backTo){
-  var langs=LANGS.map(function(l){return '<button class="lg'+(l===state.lang?' on':'')+'" data-lang="'+l+'" aria-label="'+LANG_LABEL[l]+'">'+(l==="he"?"עב":l==="ar"?"عر":l==="ru"?"RU":"EN")+'</button>'}).join("");
+  var langs=LANGS.map(function(l){return '<button class="lg'+(l===state.lang?' on':'')+'" data-lang="'+l+'" aria-pressed="'+(l===state.lang?"true":"false")+'" aria-label="'+LANG_LABEL[l]+'">'+(l==="he"?"עב":l==="ar"?"عر":l==="ru"?"RU":"EN")+'</button>'}).join("");
   return '<header class="top">'+(backTo?'<button class="back" id="backBtn" aria-label="'+t("back")+'">'+(dirOf(state.lang)==="rtl"?"➜":"⬅")+'</button>':'<span class="logo">🏛️</span>')+
    '<h1 id="pageTitle">'+esc(title)+'</h1><nav class="langs">'+langs+'</nav><button class="gear" id="gearBtn" aria-label="'+t("settings")+'">⚙️</button></header>';
 }
 function playRow(){
   return '<div class="playrow"><button class="bigbtn play" id="playBtn"><span>▶</span> '+t("play")+'</button>'+
    '<button class="bigbtn stop" id="stopBtn"><span>■</span> '+t("stop")+'</button>'+
-   '<button class="bigbtn slow'+(state.slow?' on':'')+'" id="slowBtn"><span>🐢</span> '+t("slow")+'</button></div>';
+   '<button class="bigbtn slow'+(state.slow?' on':'')+'" id="slowBtn" aria-pressed="'+(state.slow?"true":"false")+'"><span>🐢</span> '+t("slow")+'</button></div>';
 }
 function wire(){
   [].forEach.call(document.querySelectorAll("[data-lang]"),function(b){b.onclick=function(){state.lang=b.getAttribute("data-lang");save();stopSpeech();applyLang();render()}});
@@ -32,7 +32,7 @@ function wire(){
   var bb=$("#backBtn");if(bb)bb.onclick=function(){
     if(view==="practice"||view==="done")go("lesson");else if(view==="settings")go(unit?"lesson":"home");else go("home")};
   var sb=$("#stopBtn");if(sb)sb.onclick=stopSpeech;
-  var sl=$("#slowBtn");if(sl)sl.onclick=function(){state.slow=!state.slow;save();sl.classList.toggle("on",state.slow)};
+  var sl=$("#slowBtn");if(sl)sl.onclick=function(){state.slow=!state.slow;save();sl.classList.toggle("on",state.slow);sl.setAttribute("aria-pressed",state.slow?"true":"false")};
   var pb=$("#playBtn");if(pb)pb.onclick=function(){speakSeq(pageSegs())};
 }
 /* ---------- screens ---------- */
@@ -76,14 +76,18 @@ function renderPractice(){
   var q=curQ(), dots="", l=state.lang, d=dirOf(l);
   for(var i=0;i<R.qs.length;i++)dots+='<i class="'+(i<R.i?"d":i===R.i?"c":"")+'"></i>';
   var opts=q.keys.map(function(k,i){
-    return '<div class="optwrap"><button class="opt" lang="'+l+'" dir="'+d+'" data-i="'+i+'" id="opt'+i+'">'+esc(optText(k))+'</button><button class="spk" data-opt="'+i+'" aria-label="'+t("play")+'">🔊</button></div>';
+    /* המצב חוזר מ-R ולא מה-DOM. render() רץ גם באמצע שאלה (מעבר שפה),
+       ובלעדי זה התשובה שכבר נענתה נמחקת, הכפתור הבא נעלם והמסך קופא. */
+    var cls="opt", off=R.gone[i]&&i!==q.ans;
+    if(R.locked&&i===q.ans)cls+=" right"; else if(off)cls+=" soft";
+    return '<div class="optwrap"><button class="'+cls+'" lang="'+l+'" dir="'+d+'" data-i="'+i+'" id="opt'+i+'"'+(off?" disabled":"")+'>'+esc(optText(k))+'</button><button class="spk" data-opt="'+i+'" aria-label="'+t("play")+'">🔊</button></div>';
   }).join("");
   var st=storyById(q.story);
   return topbar(uTitle(unit),1)+'<main class="prac"><div class="prog" aria-label="'+t("qOf",{n:R.i+1,m:R.qs.length})+'">'+dots+'</div>'+
    playRow()+'<div class="stage"><div class="emoji" aria-hidden="true">'+st.icon+'</div><div class="sent" lang="'+l+'" dir="'+d+'" id="qtext">'+mk(qText(q)).html+'</div></div><div class="opts">'+opts+'</div>'+
-   '<div class="fb" id="fb" role="status"></div>'+
+   '<div class="fb'+(R.fb?" "+R.fb.c:"")+'" id="fb" role="status">'+(R.fb?esc(R.fb.m):"")+'</div>'+
    '<div class="helprow"><button class="hbtn hint" id="hintBtn">💡 '+t("hintBtn")+'</button><button class="hbtn limor" id="limorBtn"><span class="lav">ל</span> '+t("limorBtn")+'</button></div>'+
-   '<button class="cta next" id="nextBtn" style="--c:'+unit.color+'">'+t("next")+'</button></main>';
+   '<button class="cta next'+(R.locked?" show":"")+'" id="nextBtn" style="--c:'+unit.color+'">'+t("next")+'</button></main>';
 }
 function startRound(u){
   unit=u;R={qs:buildRound(u),i:0,tries:0,hints:0,streak:0,locked:false,gone:{}};view="practice";render();
@@ -95,7 +99,7 @@ function wirePractice(){
   $("#hintBtn").onclick=hint;$("#limorBtn").onclick=openLimor;
   $("#nextBtn").onclick=nextQ;
 }
-function say(msg,cls){var f=$("#fb");f.className="fb "+(cls||"");f.textContent=msg;}
+function say(msg,cls){var f=$("#fb");f.className="fb "+(cls||"");f.textContent=msg;if(R)R.fb={m:msg,c:cls||""};}
 function answer(i){
   if(R.locked||R.gone[i])return;
   var q=curQ(),b=$("#opt"+i);
@@ -118,7 +122,7 @@ function answer(i){
 function nextQ(){
   stopSpeech();
   if(R.i+1>=R.qs.length){state.done[unit.id]=true;save();view="done";render();confetti(60);return}
-  R.i++;R.tries=0;R.hints=0;R.locked=false;R.gone={};render();window.scrollTo(0,0);
+  R.i++;R.tries=0;R.hints=0;R.locked=false;R.gone={};R.fb=null;render();window.scrollTo(0,0);
 }
 function eliminate(){
   var q=curQ(),wrong=[];q.keys.forEach(function(_,i){if(i!==q.ans&&!R.gone[i])wrong.push(i)});
@@ -163,9 +167,9 @@ function renderDone(){
 }
 function renderSettings(){
   return topbar(t("settings"),1)+'<main>'+playRow()+
-   '<section class="set"><h2>'+t("speed")+'</h2><div class="seg"><button class="chip'+(state.speed==="slow"?" on":"")+'" data-sp="slow">'+t("speedSlow")+'</button><button class="chip'+(state.speed!=="slow"?" on":"")+'" data-sp="normal">'+t("speedNormal")+'</button></div></section>'+
-   '<section class="set"><h2>'+t("theme")+'</h2><button class="chip'+(state.dark?" on":"")+'" id="darkBtn">'+(state.dark?"🌙 ✓":"🌙")+'</button></section>'+
-   '<section class="set"><h2>'+t("lang")+'</h2><div class="seg">'+LANGS.map(function(l){return '<button class="chip'+(l===state.lang?" on":"")+'" data-lang="'+l+'">'+LANG_LABEL[l]+'</button>'}).join("")+'</div><p class="small">'+t("mtNote")+'</p></section>'+
+   '<section class="set"><h2>'+t("speed")+'</h2><div class="seg"><button class="chip'+(state.speed==="slow"?" on":"")+'" data-sp="slow" aria-pressed="'+(state.speed==="slow"?"true":"false")+'">'+t("speedSlow")+'</button><button class="chip'+(state.speed!=="slow"?" on":"")+'" data-sp="normal" aria-pressed="'+(state.speed!=="slow"?"true":"false")+'">'+t("speedNormal")+'</button></div></section>'+
+   '<section class="set"><h2>'+t("theme")+'</h2><button class="chip'+(state.dark?" on":"")+'" id="darkBtn" aria-pressed="'+(state.dark?"true":"false")+'">'+(state.dark?"🌙 ✓":"🌙")+'</button></section>'+
+   '<section class="set"><h2>'+t("lang")+'</h2><div class="seg">'+LANGS.map(function(l){return '<button class="chip'+(l===state.lang?" on":"")+'" data-lang="'+l+'" aria-pressed="'+(l===state.lang?"true":"false")+'">'+LANG_LABEL[l]+'</button>'}).join("")+'</div><p class="small">'+t("mtNote")+'</p></section>'+
    '<p class="small">'+t("privacy")+'</p><p class="small">'+t("credit")+'</p>'+
    '<button class="chip danger" id="resetBtn">'+t("reset")+'</button></main>';
 }

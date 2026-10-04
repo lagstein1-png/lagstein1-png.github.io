@@ -336,6 +336,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;
   min-height:48px;padding:12px 14px;border-radius:11px;outline:none;background:var(--surface2);color:inherit;border:1px solid var(--line)}
 .field:focus{border-color:var(--accent)}
+/* `:focus-visible` הגלובלי (שורה 114) נושא בדיוק את אותה סגוליות כמו `.field`,
+   ו-`.field` כתוב אחריו — ולכן ה-`outline:none` שלו ניצח וטבעת המיקוד נעלמה
+   משדה השם של הנבחן. מחזירים אותה כאן ולא מוחקים את `outline:none`, כדי
+   שהטבעת תופיע במקלדת בלבד, כמו בכל שאר האפליקציה. */
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 textarea.field{min-height:96px;resize:vertical}
 
 /* ---------- שורות המבחן ----------
@@ -1184,7 +1189,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n166 · 2026-10-04";
+var BUILD="n167 · 2026-10-04";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -4375,7 +4380,7 @@ function screenSet(){
   h+="</div>";
 
   /* --- איפוס --- */
-  h+='<div class="card"><div class="row"><div><div class="lab">'+esc(t("reset"))+"</div>"+
+  h+='<div class="card"><div class="row"><div><div class="lab">'+esc(askReset?t("resetAsk"):t("reset"))+"</div>"+
      '<div class="desc">'+esc(t("resetD"))+"</div></div>"+
      (askReset?
        '<span style="display:flex;gap:.5rem"><button class="btn" data-a="noreset">'+esc(t("no"))+"</button>"+
@@ -5540,7 +5545,7 @@ function viewSit(){
   }
   /* סיום */
   var g=sitGrade(),msg;
-  msg=(SIT.name||xt("student"))+" — "+esc(sp.t||xt("exam"))+"\n"+xt("stGrade")+" "+g.pct+
+  msg=(SIT.name||xt("student"))+" — "+(sp.t||xt("exam"))+"\n"+xt("stGrade")+" "+g.pct+
       " ("+g.ok+"/"+g.n+")\n"+xt("stLinkNote")+"\n"+resultUrl(SIT.code);
   /* להורה: בלי הקוד — הוא של המורה — ועם הקישור לאפליקציה. בלי מספר
      טלפון וואטסאפ פותח את בחירת איש הקשר. */
@@ -6144,7 +6149,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n166-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n167-pwa1").catch(function(){});
   });
 }
 </script>

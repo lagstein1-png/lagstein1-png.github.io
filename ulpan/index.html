@@ -331,6 +331,13 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;
   min-height:48px;padding:12px 14px;border-radius:11px;outline:none;background:var(--surface2);color:inherit;border:1px solid var(--line)}
 .field:focus{border-color:var(--accent)}
+/* ה-`outline:none` שלמעלה אינו יושב בתוך `:focus` ולכן `aria.js`
+   אינו רואה אותו — אבל הוא גובר בפועל על `:focus-visible` הגלובלי
+   שבשורה 110: שתי הסגוליות שוות (מחלקה מול פסאודו־מחלקה), וסדר
+   המקור מכריע. כלומר מי שמנווט במקלדת הגיע לארבעת שדות הטקסט של
+   המבחן בלי טבעת מיקוד כלל, ורק גוון הגבול השתנה. מחזירים אותה
+   כאן, אחרי הכלל שמחק אותה. */
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 textarea.field{min-height:96px;resize:vertical}
 
 /* ---------- שורות המבחן ----------
@@ -1170,7 +1177,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a129 · 2026-10-04";
+var BUILD="a130 · 2026-10-04";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -1183,6 +1190,12 @@ function blankState(){
     devVoice:{},          /* קוד שפה → voiceURI שנבחר ידנית */
     rate:0.95,
     big:false, clear:false, spaced:false, hc:false, rm:false, theme:"auto",
+    /* `settings` נולד מחוץ ל-blankState (״if(!state.settings)״, פעם
+       אחת בטעינת הסקריפט), ולכן ״איפוס ההתקדמות״ — שמציב blankState
+       חדש — מחק אותו. מסך הנבחן קורא `state.settings.tts` בלי שמירה,
+       ומי שאיפס ואז נכנס לקישור מבחן באותה לשונית קיבל TypeError
+       ומסך ריק. כאן המפתח הוא חלק מהמצב, ואיפוס אינו מוחק אותו. */
+    settings:{tts:true},
     stats:{},             /* topic|level → {seen,ok,bad} */
     item:{},              /* מזהה פריט → {n,ok} — בסיס לחזרה מרווחת */
     day:{d:"",n:0}, streak:0, lastDay:"", totalOk:0, totalAsk:0
@@ -1915,26 +1928,59 @@ function sameLang(list,lang){
   }
   return n;
 }
+/* הודעות בדיקת הקול — ארבע שפות.
+   הטבלה קיימת ב-`english`, ב-`history` וב-`lomda`, והיא היא שהחסירה כאן:
+   `voiceCheck` השיב שבע מחרוזות עברית מקודדות קשיח, ולכן דובר
+   ערבית שלחץ „בדיקת קול” קיבל תשובה בעברית — באפליקציה
+   שכל קהל היעד שלה הוא מי שעוד אינו קורא עברית.
+   הבדל אחד מ-`english`, והוא מכוון: שם נבדק הקול של שפת
+   הממשק, וכאן נבדק הקול העברי — הוא שפת הלימוד,
+   והוא זה שחסרונו משתיק את האפליקציה. לכן המשפט הנאמר
+   נשאר עברי וההודעות בלבד עוברות לשפת הלומד. */
+var VCHKMSG={
+  he:{sent:"נשלח…",noSup:"✗ הדפדפן הזה לא תומך בהקראה",mkFail:"✗ יצירת האמירה נכשלה: ",
+      okN:["✓ הקול פועל — "," בשפה הזו מתוך "," קולות במכשיר"],ok:"✓ הקול פועל",unk:"לא ידוע",
+      engine:["✗ המנוע החזיר "," קולות · זו תקלה במכשיר, לא באפליקציה"],
+      spFail:"✗ speak נכשל: ",timeout:["✗ שתי שניות ואין תגובה מהמנוע · "," קולות במכשיר"],
+      say:"שלום, זו בדיקת קול"},
+  ar:{sent:"جارٍ الإرسال…",noSup:"✗ هذا المتصفّح لا يدعم القراءة الصوتية",mkFail:"✗ فشل إنشاء النطق: ",
+      okN:["✓ الصوت يعمل — "," بهذه اللغة من أصل "," صوتًا في الجهاز"],ok:"✓ الصوت يعمل",unk:"غير معروف",
+      engine:["✗ أعاد المحرّك "," صوتًا · هذا عطل في الجهاز، لا في التطبيق"],
+      spFail:"✗ فشل speak: ",timeout:["✗ ثانيتان بلا ردّ من المحرّك · "," صوتًا في الجهاز"],
+      say:"مرحبًا، هذا فحص صوت"},
+  ru:{sent:"Отправляем…",noSup:"✗ Этот браузер не поддерживает озвучивание",mkFail:"✗ Не удалось создать реплику: ",
+      okN:["✓ Голос работает — на этом языке: ",", всего на устройстве: ",""],ok:"✓ Голос работает",unk:"неизвестно",
+      engine:["✗ Синтезатор вернул "," голосов · это неполадка устройства, а не приложения"],
+      spFail:"✗ speak не сработал: ",timeout:["✗ Две секунды без ответа от синтезатора · "," голосов"],
+      say:"Здравствуйте, это проверка голоса"},
+  en:{sent:"Sending…",noSup:"✗ This browser does not support read-aloud",mkFail:"✗ Could not create the utterance: ",
+      okN:["✓ The voice works — "," in this language, out of "," voices on this device"],ok:"✓ The voice works",unk:"unknown",
+      engine:["✗ The engine returned "," voices · this is a device fault, not an app fault"],
+      spFail:"✗ speak failed: ",timeout:["✗ Two seconds and no response from the engine · "," voices on this device"],
+      say:"Hello, this is a voice check"}
+};
+function vchkT(){ var g=state.lang||"he"; return VCHKMSG[g]||VCHKMSG.he }
 function voiceCheck(){
-  VCHK="…"; render();
+  var M=vchkT();
+  VCHK=M.sent; render();
   function show(m){ VCHK=m; render() }
-  if(!("speechSynthesis" in window)){ show("✗ הדפדפן הזה לא תומך בהקראה"); return }
+  if(!("speechSynthesis" in window)){ show(M.noSup); return }
   var list=[]; try{ list=speechSynthesis.getVoices()||[] }catch(e){}
   try{ speechSynthesis.cancel() }catch(e){}
   var u;
-  try{ u=new SpeechSynthesisUtterance("שלום, זו בדיקת קול") }
-  catch(e){ show("✗ יצירת האמירה נכשלה: "+e.message); return }
-  u.lang="he-IL"; u.volume=1; u.rate=1; u.pitch=1;
+  try{ u=new SpeechSynthesisUtterance(VCHKMSG.he.say) }
+  catch(e){ show(M.mkFail+e.message); return }
+  u.lang=LEARN_TTS; u.volume=1; u.rate=1; u.pitch=1;
   var done=false;
-  u.onstart=function(){ done=true; show("✓ הקול פועל — "+sameLang(list,u.lang)+" בשפה הזו מתוך "+list.length+" קולות במכשיר") };
+  u.onstart=function(){ done=true; show(M.okN[0]+sameLang(list,u.lang)+M.okN[1]+list.length+M.okN[2]) };
   u.onerror=function(e){ done=true;
-    var er=(e&&e.error)||"לא ידוע";
-    if(er==="interrupted"||er==="canceled"){ show("✓ הקול פועל"); return }
-    show("✗ המנוע החזיר "+er+" · "+list.length+" קולות · זו תקלה במכשיר, לא באפליקציה"); };
+    var er=(e&&e.error)||M.unk;
+    if(er==="interrupted"||er==="canceled"){ show(M.ok); return }
+    show(M.engine[0]+er+" · "+list.length+M.engine[1]); };
   try{ speechSynthesis.speak(u) }
-  catch(e){ show("✗ speak נכשל: "+e.message); return }
+  catch(e){ show(M.spFail+e.message); return }
   setTimeout(function(){ if(!done)
-    show("✗ שתי שניות ואין תגובה מהמנוע · "+list.length+" קולות במכשיר") },2000);
+    show(M.timeout[0]+list.length+M.timeout[1]) },2000);
 }
 
 /* ------------------------------------------------------------
@@ -2445,7 +2491,7 @@ topic("hard","sound",
  ],
  [ /* רמה 3 — צ׳, ה׳ בסוף מילה, ושווא */
   W("צָרִיךְ","tsarich",{he:"חייבים לעשות את זה",ar:"يجب، بحاجة إلى",ru:"нужно",en:"need to, must"},["סָגוּר"]),
-  W("צֹהֳרַיִם","tsohorayim",{he:"אמצע היום, סביב 12",ar:"ظهر",ru:"полдень",en:"midday"},["עֶרֶב"]),
+  W("צָהֳרַיִם","tsohorayim",{he:"אמצע היום, סביב 12",ar:"ظهر",ru:"полдень",en:"midday"},["עֶרֶב"]),
   W("קְצָת","ktsat",{he:"טיפה, לא הכול",ar:"قليلًا",ru:"немного",en:"a bit"},["קָשֶׁה"]),
   W("מִצְטַעֵר","mitsta'er",{he:"מרגיש רע על מה שעשה",ar:"آسف",ru:"сожалею",en:"sorry"},["מְאֻחָר"]),
   W("סְלִיחָה","slicha",{he:"מילה שאומרים כשטועים או מפריעים",ar:"عفوًا",ru:"извините",en:"excuse me, sorry"},["שְׂמֹאלָה"]),
@@ -3310,11 +3356,20 @@ function formHear(tp,lv,pool,idx){
      הסדר ב-wordDistract הוא הסדר החינוכי: קודם זוגות המינימום
      של המילה עצמה, ורק אחריהן מילים אחרות מאותה רמה. */
   var ds=wordDistract(it,pool,14);
+  /* המפתח כאן הוא **הצליל ולא הכתיב**, וזו כל ההבדלה מ-formBack.
+     "גָּמָל" ו"גָּמַל" הם שתי מילים שונות בכתב ואותה מילה באוזן
+     (שתיהן [gamal]), ולכן ב-back הן זוג מצוין — הלומד רואה את
+     הניקוד ומכריע — ובשאלת האזנה הן שאלה בלי תשובה יחידה.
+     נמדד 4.10.2026: 437 מתוך 37,158 הגרלות hear הכילו את שתיהן.
+     מועמד שצלילו כצליל התשובה נדחה, ו-fillOpts ממשיך למועמד הבא
+     — לכן מספר האפשרויות נשאר ארבע ומספר קריאות ה-random אינו
+     משתנה, והמבחן הכיתתי שנבנה מזרע אינו זז. */
+  var sndKey=function(d){return String(d.ipa||d.w).toLowerCase()};
   var opts=fillOpts([O(lrn(it.w),true)],ds,4,
-    function(d){return d.w.toLowerCase()},
+    sndKey,
     function(d){return O(lrn(d.w),false,
       d.g?t("whyWord").replace("{0}",d.w).replace("{1}",gl(d.g)):whyWord(d.w))},
-    it.w.toLowerCase());
+    sndKey(it));
   return {type:"hear",prompt:t("qHear"),subject:null,hidden:it,
     opts:shuffle(opts),answer:it.w,say:it.w,reveal:it,auto:true};
 }
@@ -3520,8 +3575,15 @@ function formOrder(tp,lv,pool,idx){
   var words=it.s.split(" ");
   if(words.length<3||words.length>9)return formUse(tp,lv,pool,idx);
   var tiles=shuffle(words.slice());
-  /* ערבוב שיצא זהה למקור אינו תרגיל */
-  if(tiles.join(" ")===words.join(" ")&&words.length>2)tiles=shuffle(tiles.reverse());
+  /* ערבוב שיצא זהה למקור אינו תרגיל: המשפט מגיע ללומד פתור,
+     הוא לוחץ על האריחים משמאל לימין ומקבל "נכון" בלי לסדר דבר.
+     ניסיון אחד אינו מספיק — `shuffle` יכול להחזיר את הסדר המקורי
+     שוב, ועל משפט בן שלוש מילים זה אחד מששה בכל סיבוב. נמדד
+     4.10.2026 על `HEAD`: 12 מתוך 3,154 הגרלות order יצאו פתורות.
+     הסיבוב הראשון זהה לקוד הקודם, ולכן מבחן שנבנה מזרע ושאלתו
+     לא הייתה פתורה מקבל בדיוק את אותם אריחים כמו קודם. */
+  for(var oTry=0;oTry<24&&tiles.join(" ")===words.join(" ")&&words.length>2;oTry++)
+    tiles=shuffle(tiles.reverse());
   return {type:"order",prompt:t("qOrder"),lead:gl(it.g),tiles:tiles,target:words,
     say:it.s,reveal:it,subject:null};
 }
@@ -5643,7 +5705,10 @@ document.addEventListener("keydown",function(e){
 document.addEventListener("keydown",function(e){
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(e.target&&e.target.closest("input,textarea,select,[contenteditable]"))return;
-  if(state.screen!=="prac"||!P.q)return;
+  /* מסך הסיכום אינו מסך שאלה: הוא נבנה מ-P.rres ולא מ-P.q, אבל
+     P.q עדיין מלא — ולכן המקשים כאן היו פעילים מעליו, ו-Enter
+     החליף את השאלה מאחורי הגב בזמן שהסיכום על המסך. */
+  if(state.screen!=="prac"||!P.q||P.sum)return;
   if(!P.done&&P.q.opts&&/^[1-4]$/.test(e.key)){
     var i=parseInt(e.key,10)-1;
     if(P.q.opts[i]){e.preventDefault();answer(i)}
@@ -5656,7 +5721,16 @@ document.addEventListener("keydown",function(e){
     e.preventDefault();
     var sa=P.done?{t:P.q.say,lg:LEARN}:sayAsk(P.q);
     speak(sa.t,sa.lg); return}
-  if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
+  /* Enter הוא "הבא", ולכן הוא חייב לעשות בדיוק מה שהכפתור עושה —
+     כולל לעצור בסיכום אחרי העשירית. כאן עמד `newQuestion()` ישיר,
+     ומי שמנווט במקלדת קיבל שאלה אחת־עשרה והכותרת אמרה
+     "11 מתוך 10": מסך הסיכום, שהוא כל הטעם שבסבב, לא הופיע לו
+     אף פעם. לוחצים על הכפתור עצמו כדי ששני המסלולים לא יתפצלו שוב. */
+  if(e.key==="Enter"&&P.done){
+    e.preventDefault();
+    var nb=document.querySelector('[data-a="next"]');
+    if(nb)nb.click(); else newQuestion();
+    return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
    הקול מכריז "אין קול אנגלי" על מכשיר שיש בו אחד. */
@@ -5700,7 +5774,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a129-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a130-pwa1").catch(function(){});
   });
 }
 </script>

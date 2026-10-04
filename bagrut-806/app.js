@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x119 · 2026-10-04";
+  var BUILD = "x120 · 2026-10-04";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -354,9 +354,17 @@
      תווית "לא בחינה אמיתית", ומועד לא נוגעים בו: "מועד ג׳" היה
      מרמז על מועד בחינה שהתקיים. */
   var SERIAL = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ז׳", "ח׳", "ט׳", "י׳"];
-  function examSerial(ex, i, all) {
+  /* הסימן הסידורי נספר **בתוך הקבוצה הכפולה**, ולא במקום שהבחינה
+     תופסת ברשימה כולה. עם המדד הכללי עשרת אוספי 35572 ישבו במקומות
+     10 עד 19, ול-SERIAL יש עשרה איברים בלבד — לכן כל עשרת הכרטיסים
+     קיבלו מחרוזת ריקה, ועל המסך הופיעו עשרה כרטיסים בעלי אותה
+     כותרת בדיוק ("שאלון 35572 — הדגמה 2026 · מועד הדגמה"). שבעה
+     מהם זהים גם בשורת המניין, כלומר הלומד — וגם קורא המסך — אינם
+     יכולים לדעת איזה אוסף הם בוחרים. */
+  function examSerial(ex, all) {
     var same = all.filter(function (o) { return examTitle(o) === examTitle(ex); });
-    return same.length > 1 && SERIAL[i] ? " · אוסף " + SERIAL[i] : "";
+    var k = same.indexOf(ex);
+    return same.length > 1 && SERIAL[k] ? " · אוסף " + SERIAL[k] : "";
   }
   function countSubs(ex) {
     var n = 0;
@@ -411,7 +419,6 @@
           '<a href="' + info.link + '" target="_blank" rel="noopener">בחינות בגרות אמיתיות באתר משרד החינוך</a></p>'
         : "";
       return head + exs.map(function (ex) {
-        var i = all.indexOf(ex);
         var demo = ex.season === "הדגמה"
           ? ' <span class="chip warn">בחינת הדגמה — לא בחינה אמיתית</span>' : "";
         var lvl = ex.level
@@ -421,7 +428,7 @@
             ex.questions.filter(function (q) { return q.chapter === c.id; }).length; })
           .join(" · ");
         return '<button class="card pick" data-exam="' + esc(ex.id) + '">' +
-          "<h3>" + esc(examTitle(ex) + examSerial(ex, i, all)) + lvl + demo + "</h3>" +
+          "<h3>" + esc(examTitle(ex) + examSerial(ex, all)) + lvl + demo + "</h3>" +
           '<p class="meta">' +
           plural(ex.questions.length, "שאלה אחת", "שתי שאלות", "שאלות") + " · " +
           plural(countSubs(ex), "סעיף אחד", "שני סעיפים", "סעיפים") + " · " +
@@ -877,7 +884,11 @@
     var pct = r.max ? Math.round((r.got / r.max) * 100) : 0;
     var h = "";
     if (r.byTime) h += '<p class="note">הזמן נגמר, והבחינה הוגשה כפי שהייתה.</p>';
-    var glow = pct >= 75 && !(store.data && store.data.a11y && store.data.a11y.reduceMotion);
+    /* ההעדפה יושבת ישירות על store.data (ראו blank()), ולא תחת
+       מפתח a11y — שאינו קיים בשום מקום בקובץ. הבדיקה הקודמת קראה
+       undefined, ולכן המחלקה נוספה גם כשהלומד ביקש תנועה מופחתת;
+       מה שהציל אותו הוא השורה ב-CSS בלבד. */
+    var glow = pct >= 75 && !(store.data && store.data.reduceMotion);
     h += '<div class="score' + (glow ? " calm-glow" : "") + '"><div class="big">' + pct + "</div>" +
       "<div>" + r.got + " מתוך " + r.max + " נקודות</div></div>";
     h += calmPraise(pct);
@@ -1425,7 +1436,10 @@
     if (el.id === "btn-reset") {
       if (!window.confirm("למחוק את כל מה שנשמר במכשיר הזה?")) return;
       store.reset(); applyPrefs(); state.examId = null;
-      simStop(); SIM = { on: false, done: false, endsAt: 0, ans: {}, res: null, timer: null };
+      /* chosen נשאר כאן בכוונה: שתי האיפוסים האחרים בקובץ כוללים
+         אותו, וצורה שלישית של אותו אובייקט היא בדיוק מה שנשבר
+         בפעם הבאה שמישהו יקרא ממנו בלי לבדוק. */
+      simStop(); SIM = { on: false, done: false, endsAt: 0, ans: {}, res: null, timer: null, chosen: null };
       P = {};
       go("home");
       say("הנתונים נמחקו.");
@@ -1496,7 +1510,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x119-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x120-pwa1").catch(function () {});
     });
   }
 

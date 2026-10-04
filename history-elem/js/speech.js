@@ -1,5 +1,10 @@
 /* Read-aloud. Female voice only. Word highlight follows the voice (boundary events, with a timer fallback). */
 var SP={tok:0,playing:false,noVoice:false,timers:[]};
+/* שחרור במגע (המנגנון החמישי): ב-iOS לא תישמע שום אמירה עד שאחת יצאה
+   מתוך handler של מגע אמיתי. כאן ההקראה הראשונה היא לרוב קובץ מוקלט
+   (RECORDED), ואז speechSynthesis לא משוחרר — והמשך הרצף, שרץ מתוך
+   onend ולא מתוך מגע, נבלע בשקט. אמירת רווח בעוצמה אפס, פעם אחת. */
+try{window.addEventListener("pointerdown",function(){try{var u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}},{once:true})}catch(e){}
 /* המילון המשותף (כמו math-app), בתוספת /i — כאן בודקים את v.name כמו שהוא. voice.js, 3.10.2026 */
 var VOICE_M=/(google[^a-z]{0,15}(arabic|العربية)|אברי|אסף|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/i;
 var VOICE_F=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/i;

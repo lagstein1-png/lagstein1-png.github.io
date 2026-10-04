@@ -3,7 +3,7 @@ var state={lang:"he",speed:"normal",slow:false,dark:false,done:{}};
 try{var _s=JSON.parse(localStorage.getItem(KEY)||"null");if(_s){for(var k in _s)state[k]=_s[k]}}catch(e){}
 if(!state.done)state.done={};
 function save(){try{localStorage.setItem(KEY,JSON.stringify({lang:state.lang,speed:state.speed,slow:state.slow,dark:state.dark,done:state.done}))}catch(e){}}
-var view="home", unit=null, R=null; /* R = practice round state */
+var view="home", prevView="home", unit=null, R=null; /* R = practice round state */
 var $=function(s){return document.querySelector(s)};
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
 function dirOf(l){return(l==="he"||l==="ar")?"rtl":"ltr"}
@@ -17,22 +17,26 @@ function unitById(id){return UNITS.filter(function(u){return u.id===id})[0]}
 function uTitle(u,l){return unitTitle(u,l||state.lang)}
 /* ---------- chrome ---------- */
 function topbar(title,backTo){
-  var langs=LANGS.map(function(l){return '<button class="lg'+(l===state.lang?' on':'')+'" data-lang="'+l+'" aria-label="'+LANG_LABEL[l]+'">'+(l==="he"?"עב":l==="ar"?"عر":l==="ru"?"RU":"EN")+'</button>'}).join("");
+  var langs=LANGS.map(function(l){return '<button class="lg'+(l===state.lang?' on':'')+'" data-lang="'+l+'" aria-pressed="'+(l===state.lang)+'" aria-label="'+LANG_LABEL[l]+'">'+(l==="he"?"עב":l==="ar"?"عر":l==="ru"?"RU":"EN")+'</button>'}).join("");
   return '<header class="top">'+(backTo?'<button class="back" id="backBtn" aria-label="'+t("back")+'">'+(dirOf(state.lang)==="rtl"?"➜":"⬅")+'</button>':'<span class="logo">🔤</span>')+
    '<h1 id="pageTitle">'+esc(title)+'</h1><nav class="langs">'+langs+'</nav><button class="gear" id="gearBtn" aria-label="'+t("settings")+'">⚙️</button></header>';
 }
 function playRow(){
   return '<div class="playrow"><button class="bigbtn play" id="playBtn"><span>▶</span> '+t("play")+'</button>'+
    '<button class="bigbtn stop" id="stopBtn"><span>■</span> '+t("stop")+'</button>'+
-   '<button class="bigbtn slow'+(state.slow?' on':'')+'" id="slowBtn"><span>🐢</span> '+t("slow")+'</button></div>';
+   '<button class="bigbtn slow'+(state.slow?' on':'')+'" id="slowBtn" aria-pressed="'+(state.slow?"true":"false")+'"><span>🐢</span> '+t("slow")+'</button></div>';
 }
 function wire(){
   [].forEach.call(document.querySelectorAll("[data-lang]"),function(b){b.onclick=function(){state.lang=b.getAttribute("data-lang");save();stopSpeech();applyLang();render()}});
-  var g=$("#gearBtn");if(g)g.onclick=function(){go("settings")};
+  var g=$("#gearBtn");if(g)g.onclick=function(){if(view!=="settings")prevView=view;go("settings")};
   var bb=$("#backBtn");if(bb)bb.onclick=function(){
-    if(view==="practice"||view==="done")go("lesson");else if(view==="settings")go(unit?"lesson":"home");else go("home")};
+    if(view==="practice"||view==="done")go("lesson");
+    /* חזרה מההגדרות - למסך שממנו נפתחו. "unit?lesson:home" החזיר את מי
+       שפתח הגדרות מדף הבית ליחידה שסגר לפני רגע, כי unit נשאר מלא. */
+    else if(view==="settings")go(prevView==="lesson"&&unit?"lesson":"home");
+    else go("home")};
   var sb=$("#stopBtn");if(sb)sb.onclick=stopSpeech;
-  var sl=$("#slowBtn");if(sl)sl.onclick=function(){state.slow=!state.slow;save();sl.classList.toggle("on",state.slow)};
+  var sl=$("#slowBtn");if(sl)sl.onclick=function(){state.slow=!state.slow;save();sl.classList.toggle("on",state.slow);sl.setAttribute("aria-pressed",state.slow?"true":"false")};
   var pb=$("#playBtn");if(pb)pb.onclick=function(){speakSeq(pageSegs())};
 }
 /* ---------- cards ---------- */
@@ -112,10 +116,10 @@ function renderPractice(){
   for(var i=0;i<R.qs.length;i++)dots+='<i class="'+(i<R.i?"d":i===R.i?"c":"")+'"></i>';
   var opts=q.opts.map(function(_,i){
     var o=optInfo(q,i);
-    return '<div class="optwrap"><button class="opt'+(o.big?' bigopt':'')+'" lang="'+o.lang+'" dir="'+dirOf(o.lang)+'" data-i="'+i+'" id="opt'+i+'">'+esc(o.text)+'</button><button class="spk" data-opt="'+i+'" aria-label="'+t("play")+'">🔊</button></div>';
+    return '<div class="optwrap"><button class="opt'+(o.big?' bigopt':'')+'" lang="'+o.lang+'" dir="'+dirOf(o.lang)+'" data-i="'+i+'" id="opt'+i+'">'+esc(o.text)+'</button><button class="spk" data-opt="'+i+'" aria-label="'+t("play")+': '+esc(o.speak||o.text)+'">🔊</button></div>';
   }).join("");
   var stim=si?'<div class="stim">'+(si.listen?'<button class="bigbtn play stimplay" id="stimPlay"><span>🔊</span> '+t("play")+'</button>':'')+(si.html?'<div class="sentEn" lang="en" dir="ltr">'+si.html+'</div>':'')+'</div>':'';
-  return topbar(uTitle(unit),1)+'<main class="prac"><div class="prog" aria-label="'+t("qOf",{n:R.i+1,m:R.qs.length})+'">'+dots+'</div>'+
+  return topbar(uTitle(unit),1)+'<main class="prac"><div class="prog" role="img" aria-label="'+t("qOf",{n:R.i+1,m:R.qs.length})+'">'+dots+'</div>'+
    playRow()+'<div class="stage"><div class="sent" lang="'+l+'" dir="'+d+'" id="qtext">'+mk(promptText(q)).html+'</div>'+stim+'</div><div class="opts">'+opts+'</div>'+
    '<div class="fb" id="fb" role="status"></div>'+
    '<div class="helprow"><button class="hbtn hint" id="hintBtn">💡 '+t("hintBtn")+'</button><button class="hbtn limor" id="limorBtn"><span class="lav">ל</span> '+t("limorBtn")+'</button></div>'+
@@ -185,8 +189,9 @@ function explain(){
 }
 function openLimor(){
   stopSpeech();var q=curQ(),u=unitBy(q.unit);
+  var back=document.activeElement;
   var ov=document.createElement("div");ov.className="limorov";ov.id="limorOv";
-  ov.innerHTML='<div class="limorbox"><div class="lhead"><span class="lav big"><img src="/img/limor.jpg" alt="" onerror="this.remove()">ל</span><b>'+t("lmTitle")+'</b><button class="x" id="lmClose" aria-label="'+t("back")+'">✕</button></div>'+
+  ov.innerHTML='<div class="limorbox" role="dialog" aria-modal="true" aria-label="'+t("lmTitle")+'" tabindex="-1"><div class="lhead"><span class="lav big"><img src="/img/limor.jpg" alt="" onerror="this.remove()">ל</span><b>'+t("lmTitle")+'</b><button class="x" id="lmClose" aria-label="'+t("back")+'">✕</button></div>'+
    '<div class="lplay"><button class="bigbtn play" id="lmPlay"><span>▶</span> '+t("play")+'</button><button class="bigbtn stop" id="lmStop"><span>■</span> '+t("stop")+'</button></div>'+
    '<p class="ltext" id="lmText" lang="'+state.lang+'" dir="'+dirOf(state.lang)+'">'+mk(explain()).html+'</p>'+
    '<div class="lask"><b>'+t("lmAsk")+'</b>'+
@@ -204,7 +209,11 @@ function openLimor(){
     if(k==="lmR1"){closeL();speakSeq(practiceSegs());return}
     playText();
   }
-  function closeL(){stopSpeech();ov.remove()}
+  function onKey(e){if(e.key==="Escape"||e.key==="Esc"){e.preventDefault();closeL()}}
+  function closeL(){stopSpeech();document.removeEventListener("keydown",onKey);ov.remove();
+    try{if(back&&back.focus)back.focus()}catch(e){}}
+  document.addEventListener("keydown",onKey);
+  try{$("#lmClose").focus()}catch(e){}
   $("#lmClose").onclick=closeL;$("#lmPlay").onclick=playText;$("#lmStop").onclick=stopSpeech;
   [].forEach.call(ov.querySelectorAll(".lq"),function(b){b.onclick=function(){show(b.getAttribute("data-k"))}});
   /* Limor never names the answer: she explains how to find it, with an example from another word */
@@ -217,9 +226,9 @@ function renderDone(){
 }
 function renderSettings(){
   return topbar(t("settings"),1)+'<main>'+playRow()+
-   '<section class="set"><h2>'+t("speed")+'</h2><div class="seg"><button class="chip'+(state.speed==="slow"?" on":"")+'" data-sp="slow">'+t("speedSlow")+'</button><button class="chip'+(state.speed!=="slow"?" on":"")+'" data-sp="normal">'+t("speedNormal")+'</button></div></section>'+
-   '<section class="set"><h2>'+t("theme")+'</h2><button class="chip'+(state.dark?" on":"")+'" id="darkBtn">'+(state.dark?"🌙 ✓":"🌙")+'</button></section>'+
-   '<section class="set"><h2>'+t("lang")+'</h2><div class="seg">'+LANGS.map(function(l){return '<button class="chip'+(l===state.lang?" on":"")+'" data-lang="'+l+'">'+LANG_LABEL[l]+'</button>'}).join("")+'</div><p class="small">'+t("mtNote")+'</p></section>'+
+   '<section class="set"><h2>'+t("speed")+'</h2><div class="seg"><button class="chip'+(state.speed==="slow"?" on":"")+'" data-sp="slow" aria-pressed="'+(state.speed==="slow")+'">'+t("speedSlow")+'</button><button class="chip'+(state.speed!=="slow"?" on":"")+'" data-sp="normal" aria-pressed="'+(state.speed!=="slow")+'">'+t("speedNormal")+'</button></div></section>'+
+   '<section class="set"><h2>'+t("theme")+'</h2><button class="chip'+(state.dark?" on":"")+'" id="darkBtn" aria-pressed="'+(state.dark?"true":"false")+'">'+(state.dark?"🌙 ✓":"🌙")+'</button></section>'+
+   '<section class="set"><h2>'+t("lang")+'</h2><div class="seg">'+LANGS.map(function(l){return '<button class="chip'+(l===state.lang?" on":"")+'" data-lang="'+l+'" aria-pressed="'+(l===state.lang)+'">'+LANG_LABEL[l]+'</button>'}).join("")+'</div><p class="small">'+t("mtNote")+'</p></section>'+
    '<p class="small">'+t("privacy")+'</p><p class="small">'+t("credit")+'</p>'+
    '<button class="chip danger" id="resetBtn">'+t("reset")+'</button></main>';
 }

@@ -138,6 +138,7 @@ RAKIA.EN_DICT = {
  "דילוג לתוכן": "Skip to content",
  "הורוסקופ": "Horoscope",
  "מפת לידה": "Birth chart",
+ "המפה שלי": "My chart",
  "מפה חדשה": "New chart",
  "האנשים שלי": "My people",
  "איך זה עובד": "How it works",

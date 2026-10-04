@@ -97,7 +97,7 @@ var UNITS=[{"id":"z0","grade":7,"t":{"he":"מתחילים לחקור בבטחה"
 <script src="/tutor/barak-core.js"></script>
 <script>
 /* ===== מנוע האפליקציה: מדע וטכנולוגיה לחטיבה (science-mid) ===== */
-var BUILD="scimid1 · 2026-10-03";
+var BUILD="scimid2 · 2026-10-04";
 var SKEY="scimid-v1";
 var LANGS=[["he","עברית","he-IL"],["ar","العربية","ar-SA"],["ru","Русский","ru-RU"],["en","English","en-US"]];
 var state={lang:"he",dark:false,rate:1,grade:7,pred:{},done:{},big:false,clear:false,spaced:false,hc:false,rm:false};
@@ -119,17 +119,90 @@ function femaleVoice(code){
     return m[0]||null;
   }catch(e){return null}
 }
+/* מקטעים. מעל SEG_MAX תווים מנועי מכשיר מאיצים ובולעים סופי מילים,
+   ולכן כל אמירה ארוכה נחתכת על סוף משפט, ואם אין — על פסיק או רווח,
+   לעולם לא בתוך מספר. הועתק כלשונו מ-motal/index.html. */
+var SEG_MAX=90, SEG_GAP=260;
+function insideNumber(str,i){
+  return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]);
+}
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&
+       merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){
+      merged[merged.length-1].text+=out[i].text; continue;
+    }
+    if(out[i].text.trim().length<12&&i+1<out.length){
+      out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue;
+    }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
+/* הפניה חיה ל-utterance: בלעדיה Chrome אוסף אותו ואיתו את onend,
+   וההקראה נתקעת בלי שגיאה — ואז שרשרת readScreen נעצרת באמצע. */
+var _liveU=null;
 function deviceSpeak(text,lang,done){
+  var my=_gen;
   try{
     var code=(LANGS.filter(function(x){return x[0]===lang})[0]||LANGS[0])[2];
-    var u=new SpeechSynthesisUtterance(text);u.lang=code;u.rate=0.95*state.rate;
-    var v=femaleVoice(code);if(v)u.voice=v;
-    u.onend=function(){done&&done()};u.onerror=function(){done&&done()};
-    speechSynthesis.cancel();speechSynthesis.speak(u);
+    var v=femaleVoice(code),segs=segments(String(text));
+    try{speechSynthesis.cancel()}catch(e){}
+    (function sayseg(k){
+      if(my!==_gen)return;
+      if(k>=segs.length){done&&done();return}
+      var u=new SpeechSynthesisUtterance(segs[k].text);
+      u.lang=code;u.rate=0.95*state.rate;u.volume=1;
+      if(v){try{u.voice=v}catch(e2){}}
+      _liveU=u;
+      u.onend=function(){if(my!==_gen)return;
+        if(k+1<segs.length)setTimeout(function(){sayseg(k+1)},SEG_GAP);else done&&done()};
+      u.onerror=function(){if(my!==_gen)return;done&&done()};
+      speechSynthesis.speak(u);
+    })(0);
   }catch(e){done&&done()}
 }
 function hlClear(){var a=document.querySelectorAll(".say.hl");for(var i=0;i<a.length;i++)a[i].classList.remove("hl")}
 function stopSpeak(){_gen++;try{if(window.RECORDED)RECORDED.stop()}catch(e){}try{speechSynthesis.cancel()}catch(e){}hlClear()}
+/* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
+   אחר, ולפעמים נתקע עד סגירת הדפדפן. */
+try{document.addEventListener("visibilitychange",function(){
+  if(document.hidden)stopSpeak();
+});}catch(e){}
+/* iOS לא ישמיע כלום עד שאמירה אחת יצאה מתוך handler של מגע אמיתי.
+   אמירה שיוצאת אחרי המתנה נבלעת בשקט — בלי חריגה ובלי לוג. משחררים
+   פעם אחת עם אמירה ריקה. קריאה ישירה, בלי המתנה לרשימת הקולות:
+   הבטחה שוברת את שרשרת המגע ו-Safari כבר לא מזהה אותה כיוזמת משתמש.
+   /speech/recorded.js משחרר את אלמנט השמע שלו לבד, לא את speechSynthesis. */
+try{document.addEventListener("pointerdown",function(){
+  try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+},{once:true});}catch(e){}
 function speakOne(text,lang,el,done){
   var my=_gen;hlClear();if(el)el.classList.add("hl");
   var fin=function(){if(my!==_gen)return;if(el)el.classList.remove("hl");done&&done()};
@@ -150,7 +223,15 @@ function readBar(){
 }
 function hashN(s){var h=7;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return Math.abs(h)}
 function order(qid){var o=[0,1,2,3],h=hashN(qid+"|"+view.round);for(var i=3;i>0;i--){var j=h%(i+1);h=Math.floor(h/(i+1))+7;var x=o[i];o[i]=o[j];o[j]=x}return o}
-function renderQuestion(q,qid){Q_CUR={q:q,id:qid,ord:order(qid),picked:{},done:false,hint:false,sol:false,msg:""};return qHTML()}
+function renderQuestion(q,qid){Q_CUR={q:q,id:qid,key:qid+"|"+view.round,ord:order(qid),picked:{},done:false,hint:false,sol:false,msg:""};return qHTML()}
+/* ציור מחדש של אותו מסך (גילוי שלב, החלפת שפה, שינוי תצוגה) אינו
+   שאלה חדשה. בלי זה render() היה בונה Q_CUR נקי, והתשובה שנבחרה,
+   הרמז וההסבר נעלמו מהמסך. שאלה הבאה מקדמת view.round, ולכן המפתח
+   משתנה והשאלה כן נבנית מחדש — כולל סדר מסיחים חדש. */
+function keepQ(q,qid){
+  if(Q_CUR&&Q_CUR.key===qid+"|"+view.round&&Q_CUR.q===q)return qHTML();
+  return renderQuestion(q,qid);
+}
 function qHTML(){
   var c=Q_CUR,q=c.q,h='<div class="card" id="qcard">'+S(L(q.s),"h2","");
   for(var k=0;k<4;k++){
@@ -209,7 +290,7 @@ function screenLesson(){
   h+='<div class="card"><h2>'+esc(t("stepsT"))+"</h2>";
   for(var i=0;i<=view.step&&i<l.steps.length;i++)h+='<div class="step">'+S((i+1)+". "+L(l.steps[i]))+"</div>";
   if(view.step<l.steps.length-1)h+='<button class="btn" data-a="stepnext">'+esc(t("showStep"))+"</button>";
-  h+="</div><h2>"+esc(t("checkT"))+"</h2>"+renderQuestion(l.qs[view.qi%l.qs.length],u.id+"-L"+view.l+"-"+(view.qi%l.qs.length));
+  h+="</div><h2>"+esc(t("checkT"))+"</h2>"+keepQ(l.qs[view.qi%l.qs.length],u.id+"-L"+view.l+"-"+(view.qi%l.qs.length));
   h+='<div class="read"><button class="btn sol" data-a="lessondone">'+esc(t("doneL"))+"</button></div>";
   return h;
 }
@@ -217,7 +298,7 @@ function screenPractice(){
   var u=unit(view.u),qs=u.practice.filter(function(q){return q.lv===view.lv}),i=view.qi%qs.length;
   var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">‹ '+esc(L(u.t))+"</button><h1>"+esc(t("practiceT"))+": "+esc(t("level"+view.lv))+"</h1>"+readBar();
   h+=dots(qs.length,i,function(k){return !!state.done["q:"+u.id+"-P"+view.lv+"-"+k]});
-  return h+renderQuestion(qs[i],u.id+"-P"+view.lv+"-"+i);
+  return h+keepQ(qs[i],u.id+"-P"+view.lv+"-"+i);
 }
 function screenSettings(){
   return '<button class="btn ghost" data-a="home">‹ '+esc(t("home"))+"</button><h1>"+esc(t("settings"))+"</h1>"+readBar()+'<div class="card"><div class="read">'+[["dark","dark"],["big","bigT"],["clear","clearT"],["spaced","spacedT"],["hc","hcT"],["rm","rmT"]].map(function(m){return '<button class="btn ghost" data-a="mode" data-m="'+m[0]+'" aria-pressed="'+!!state[m[0]]+'">'+esc(t(m[1]))+"</button>"}).join("")+"</div></div>"+S(t("mtNote"),"p","note")+S(t("credit"),"p","note");
@@ -241,7 +322,7 @@ function applyModes(){
   r.classList.toggle("clear",!!state.clear);r.classList.toggle("spaced",!!state.spaced);
   r.classList.toggle("hc",!!state.hc);r.classList.toggle("rm",!!state.rm);
 }
-function go(s,o){stopSpeak();view.s=s;for(var k in (o||{}))view[k]=o[k];render();window.scrollTo(0,0)}
+function go(s,o){stopSpeak();Q_CUR=null;view.s=s;for(var k in (o||{}))view[k]=o[k];render();window.scrollTo(0,0)}
 function rerenderQ(){var c=document.getElementById("qcard");if(!c)return render();var d=document.createElement("div");d.innerHTML=qHTML();c.replaceWith(d.firstChild)}
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-a]");if(!b)return;var a=b.getAttribute("data-a");
@@ -267,8 +348,8 @@ document.addEventListener("click",function(e){
     stopSpeak();rerenderQ();
   }
   else if(a==="tutor"){stopSpeak();if(window.TUTOR)TUTOR.open()}
-  else if(a==="hint"){Q_CUR.hint=true;rerenderQ()}
-  else if(a==="sol"){Q_CUR.sol=true;Q_CUR.done=true;rerenderQ()}
+  else if(a==="hint"){if(!Q_CUR)return;Q_CUR.hint=true;rerenderQ()}
+  else if(a==="sol"){if(!Q_CUR)return;Q_CUR.sol=true;Q_CUR.done=true;rerenderQ()}
   else if(a==="qnext"){view.qi++;view.round++;render();window.scrollTo(0,0)}
 });
 function tutorCtx(){
@@ -280,7 +361,7 @@ function boot(){
   load();render();
   try{if(window.RECORDED)RECORDED.setup({base:"audio"})}catch(e){}
   try{if("speechSynthesis" in window)speechSynthesis.getVoices()}catch(e){}
-  try{if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js?v=scimid1-pwa1").catch(function(){})}catch(e){}
+  try{if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js?v=scimid2-pwa1").catch(function(){})}catch(e){}
   if(window.TUTOR){
     var txt=TUTOR.plain;
     TUTOR.mount({app:"scimid",

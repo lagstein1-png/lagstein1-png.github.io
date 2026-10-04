@@ -13,9 +13,13 @@ const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "motal-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
+             "/img/limor.jpg","/img/josh.jpg",
+             /* שכבת לימור וההקראה. שבעת הקבצים נטענים ב-index.html ולא היו
+                כאן, ולכן בלי רשת הדף נפתח ולימור אינה עולה. אותה
+                רשימה בדיוק כמו ב-history וב-english; deps.js אוכף. */
+             "/tutor/he-speech.js","/speech/recorded.js","/tutor/josh-face.js","/tutor/josh-state.js",
+             "/tutor/josh-local.js","/tutor/tutor.js","/tutor/barak-core.js",
              "/legal/terms.js","/legal/protect.js",
-             /* השכבה המוקלטת — /speech/recorded.js (2.10.2026) */
-             "/speech/recorded.js",
              /* גופנים מקומיים — /fonts/fonts.css (1.10.2026) */
              "/fonts/fonts.css","/fonts/heebo-hebrew.woff2","/fonts/heebo-math.woff2","/fonts/heebo-latin.woff2","/fonts/lexend-latin.woff2","/fonts/noto-sans-arabic-arabic.woff2","/fonts/noto-sans-cyrillic.woff2","/fonts/noto-sans-greek.woff2","/fonts/noto-sans-latin.woff2"];
 

@@ -351,6 +351,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;
   min-height:48px;padding:12px 14px;border-radius:11px;outline:none;background:var(--surface2);color:inherit;border:1px solid var(--line)}
 .field:focus{border-color:var(--accent)}
+/* `:focus-visible` הגלובלי (שורה 118) נושא בדיוק את אותה סגוליות כמו `.field`,
+   ו-`.field` כתוב אחריו — ולכן ה-`outline:none` שלו ניצח וטבעת המיקוד נעלמה
+   משדה השם של הנבחן. מחזירים אותה כאן ולא מוחקים את `outline:none`, כדי
+   שהטבעת תופיע במקלדת בלבד, כמו בכל שאר האפליקציה. */
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 textarea.field{min-height:96px;resize:vertical}
 
 /* ---------- שורות המבחן ----------
@@ -540,7 +545,10 @@ a[href*="education.gov.il"]{display:inline-flex;align-items:center;min-height:44
 if(!INTERNAL_OK){
   document.getElementById("gate").hidden=false;
   document.title="לא פורסם";
-  var A=document.getElementById("app"); if(A) A.style.display="none";
+  /* כאן עמדה שורה שניסתה להסתיר את #app. היא רצה לפני ש-#app
+     נולד בכלל (הוא כמה שורות מתחת), ולכן getElementById החזיר
+     null והשורה לא עשתה דבר מעולם. מי שמונע את הבנייה הוא
+     ה-INTERNAL_OK שעוטף את render — גם בהפעלה וגם ב-hashchange. */
 }
 </script>
 <div id="live" class="sr" aria-live="polite"></div>
@@ -1103,7 +1111,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="bg1 · 2026-10-03";
+var BUILD="bg2 · 2026-10-04";
 var SKEY="bio-state-v1";
 var GKEY_STORE="bio-gkey";
 
@@ -1344,11 +1352,25 @@ function devPicker(lgs){
   return out;
 }
 function bestVoice(code){
-  var pool=voicesFor(code); if(!pool.length)return null;
+  var pool=voicesFor(code); if(!pool.length)return (bestVoice._session||{})[String(code).toLowerCase().slice(0,2)] ? bestVoice._session[String(code).toLowerCase().slice(0,2)].v : null;
   /* בחירה ידנית גוברת על הניקוד. היא נשמרת לכל שפה בנפרד:
      קול שנבחר לעברית אינו רלוונטי כשמדברים אנגלית. */
-  var want0=(state.devVoice||{})[code];
-  if(want0){var hit=pool.filter(function(v){return v.voiceURI===want0})[0]; if(hit)return hit}
+  /* Keep one voice per language. A failed network voice may only fall
+     back to the same gender; never to the browser's unclassified default. */
+  var pins=bestVoice._session||(bestVoice._session={}), key=String(code).toLowerCase().slice(0,2), pin=pins[key];
+  var request=((state.devVoice||{})[code]);
+  var explicit=pool.filter(function(v){return v.voiceURI===((state.devVoice||{})[code])})[0];
+  if(explicit&&(!pin||pin.request!==request)){ pins[key]={v:explicit,g:vGender(explicit),request:request}; return explicit; }
+  if(pin){
+    var live=pool.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
+    if(live&&(live.localService!==false||navigator.onLine!==false))return live;
+    var same=pool.filter(function(v){return vGender(v)===pin.g&&(v.localService!==false||navigator.onLine!==false)});
+    if(!same.length)return pin.v;
+    pool=same;
+  }else{
+    var female=pool.filter(function(v){return vGender(v)==='f'});
+    if(female.length)pool=female;
+  }
   var want=String(code).toLowerCase();
   var pref=state.gemVoice&&gvOf(state.gemVoice).g==="m"?"m":"f";
   function score(v){
@@ -1366,9 +1388,11 @@ function bestVoice(code){
      קודם הקולות במגדר המבוקש, אחריהם מי שלא זוהה, ורק אז ההפוך;
      ובתוך כל קבוצה מכריעה האיכות. */
   function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
-  return pool.slice().sort(function(a,b){
+  var chosen=pool.slice().sort(function(a,b){
     var d=grank(b)-grank(a); return d||score(b)-score(a);
   })[0];
+  if(chosen)pins[key]={v:chosen,g:vGender(chosen),request:request};
+  return chosen;
 }
 /* הקול הנדרש הוא של שפת הממשק: כאן החומר עצמו נלמד בשפת האם. */
 function hasLangVoice(){return voicesFor(LANGS[state.lang].tts).length>0}
@@ -4114,6 +4138,10 @@ examFromUrl();
 /* מעבר לקישור מבחן כשהאפליקציה כבר פתוחה הוא ניווט בתוך אותו מסמך:
    הדפדפן לא טוען מחדש, ולכן ההפעלה לא רצה שוב. */
 window.addEventListener("hashchange",function(){
+  /* INTERNAL-GATE: אותו תנאי כמו בהפעלה. בלעדיו שינוי hash אחד
+     (קישור עוגן, חזרה בהיסטוריה) היה בונה את כל האפליקציה לתוך
+     #app מאחורי מסך הנעילה — בלי מפתח, ובלי שאיש לחץ עליה. */
+  if(!INTERNAL_OK)return;
   if(examFromUrl()){stopSpeak();window.scrollTo(0,0);render()}
   else if(view==="sit"||view==="badexam"||view==="oldexam"){view="";render()}
 });
@@ -4309,7 +4337,18 @@ load();
 touchDay();
 booted=true;
 applyModes();
-if(INTERNAL_OK)render();   /* INTERNAL-GATE: בלי מפתח האפליקציה אינה נבנית */
+/* חוזרים לאפליקציה באמצע תרגול: `state.screen` נשמר ב-localStorage,
+   השאלה עצמה לא. בלי השורות האלה מסך התרגול נפתח עם כותרת הנושא
+   ושלושת כפתורי הרמה בלבד — בלי שאלה, בלי הקראה ובלי הסבר. התיקון
+   כבר קיים ב-english, history, islam ו-ulpan; biology נולדה בהעתקה
+   שקדמה לו. */
+if(INTERNAL_OK){
+  if(state.screen==="prac"&&!P.q){
+    if(!state.topic||!topicOf(state.topic))state.topic=TOPICS[0].id;
+    try{newQuestion()}catch(e){state.screen="home";save()}
+  }
+  render();   /* INTERNAL-GATE: בלי מפתח האפליקציה אינה נבנית */
+}
 </script>
 <footer class="lg-foot" style="text-align:center;padding:14px 12px 20px;font-weight:500;font-size:.82rem;line-height:1.6;opacity:.78"><span dir="ltr">© 2026</span> יהושע לגשטיין · <a href="/legal/" style="color:inherit">תנאי שימוש, פרטיות וזכויות יוצרים</a> · <a href="/" style="color:inherit">כל האפליקציות</a></footer>
 <script src="/tutor/josh-face.js"></script>
@@ -4426,7 +4465,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=bg1-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=bg2-pwa1").catch(function(){});
   });
 }
 </script>

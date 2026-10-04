@@ -340,7 +340,10 @@ G.shapes=function(lv){var T=[],pool=lv>=2?FLAT:FLAT.slice(0,4);
      L("פינה היא המקום שבו שתי צלעות נפגשות. לעיגול אין פינות.","الزاوية حيث يلتقي ضلعان. الدائرة بلا زوايا.","Угол — там, где встречаются две стороны. У круга углов нет.","A corner is where two sides meet. A circle has no corners."),
      L("מספר הפינות שווה למספר הצלעות: "+n+".","عدد الزوايا يساوي عدد الأضلاع: "+n+".","Углов столько же, сколько сторон: "+n+".","Corners match sides: "+n+"."),1)});
   T.push(function(){var k=pick(SOLID.concat(pool.slice(0,4)));var isS=SOLID.indexOf(k)>=0;
-    return mk("solid",L("איזה גוף זה?","ما هذا المجسّم؟","Какое это тело?","Which solid is this?"),isS?solidShape(k):flatShape(k),SHN[k],shapeOpts(k,isS?SOLID:pool),
+    /* המחולל מציג גם צורה שטוחה (pool) וגם גוף (SOLID) — זו בדיוק ההבחנה
+       שהרמז מלמד. לכן השאלה נייטרלית, כמו ב"real" למטה; "איזה גוף זה?" על
+       מלבן שטוח לימד את ההפך מהרמז. */
+    return mk("solid",L("איזו צורה או איזה גוף זה?","أي شكل أو مجسّم هذا؟","Какая это фигура или какое тело?","Which shape or solid is this?"),isS?solidShape(k):flatShape(k),SHN[k],shapeOpts(k,isS?SOLID:pool),
      L("גוף אפשר להחזיק ביד. צורה שטוחה מציירים על דף.","المجسّم يمكن أن تمسكه بيدك. الشكل المسطّح نرسمه على الورقة.","Тело можно взять в руку. Плоскую фигуру рисуют на бумаге.","You can hold a solid. A flat shape is drawn on paper."),
      L("זה "+SHN[k].he+".","هذا "+SHN[k].ar+".","Это "+SHN[k].ru+".","This is a "+SHN[k].en+"."),2)});
   T.push(function(){var r=pick(REAL),all=REAL.map(function(x){return x.k}),pl=uniq(all);
@@ -400,10 +403,16 @@ G.time=function(lv){var T=[];
     return mk("facts",q[1],"",q[0],[7,12,24,60,30,10].filter(function(x){return x!==q[0]}),
      L("זה עניין של זיכרון: שבוע 7, שנה 12 חודשים, יממה 24 שעות, שעה 60 דקות.","هذه معلومة نحفظها: الأسبوع 7، السنة 12 شهرًا، اليوم 24 ساعة، الساعة 60 دقيقة.","Это нужно запомнить: неделя 7, год 12 месяцев, сутки 24 часа, час 60 минут.","Remember: week 7, year 12 months, day 24 hours, hour 60 minutes."),
      L("התשובה היא "+q[0]+".","الجواب "+q[0]+".","Ответ: "+q[0]+".","The answer is "+q[0]+"."),2)});
-  if(lv>=2)T.push(function(){var h=ri(1,11),a=ri(1,3);
-    return mk("later",L("עכשיו השעה "+hm(h,0)+". מה תהיה השעה בעוד "+a+" שעות?","الآن الساعة "+hm(h,0)+". كم ستكون الساعة بعد "+a+" ساعات؟","Сейчас "+hm(h,0)+". Сколько будет через "+a+" ч?","It is "+hm(h,0)+" now. What time will it be in "+a+" hours?"),clockVis(h,0),hm(h+a>12?h+a-12:h+a,0),[hm(h+a+1>12?h+a-11:h+a+1,0),hm(h-1<1?12:h-1,0),hm(h,30),hm(h+a>12?h+a-12:h+a,30)],
+  /* r הוא השעה על לוח של 12. כשעוברים את 12 ההסבר הוא משפט, ולא "11 + 2 = 1"
+     — נוסחה שקרית מול ילד בכיתה ב׳. וגם: "בעוד 1 שעות" אינו עברית. */
+  if(lv>=2)T.push(function(){var h=ri(1,11),a=ri(1,3),r=h+a>12?h+a-12:h+a,w=h+a>12,
+    hr=L(a===1?"שעה אחת":a===2?"שעתיים":a+" שעות",a===1?"ساعة واحدة":a===2?"ساعتين":a+" ساعات",a+" "+plRu(a,"час","часа","часов"),a===1?"1 hour":a+" hours");
+    return mk("later",L("עכשיו השעה "+hm(h,0)+". מה תהיה השעה בעוד "+hr.he+"?","الآن الساعة "+hm(h,0)+". كم ستكون الساعة بعد "+hr.ar+"؟","Сейчас "+hm(h,0)+". Сколько будет через "+hr.ru+"?","It is "+hm(h,0)+" now. What time will it be in "+hr.en+"?"),clockVis(h,0),hm(r,0),[hm(h+a+1>12?h+a-11:h+a+1,0),hm(h-1<1?12:h-1,0),hm(h,30),hm(r,30)],
      L("מוסיפים שעות על המספר שהמחוג הקצר מראה.","أضف الساعات إلى الرقم الذي يشير إليه العقرب القصير.","Прибавь часы к числу, на которое указывает короткая стрелка.","Add the hours to the number the short hand shows."),
-     L(h+" ועוד "+a+" זה "+(h+a>12?h+a-12:h+a)+".",h+" + "+a+" = "+(h+a>12?h+a-12:h+a)+".",h+" + "+a+" = "+(h+a>12?h+a-12:h+a)+".",h+" + "+a+" = "+(h+a>12?h+a-12:h+a)+"."),3)});
+     L(w?"אחרי 12 השעון מתחיל מחדש, ולכן "+h+" ועוד "+a+" זה "+r+".":h+" ועוד "+a+" זה "+r+".",
+       w?"بعد 12 تبدأ الساعة من جديد، لذلك "+h+" وبعدها "+a+" تصبح "+r+".":h+" + "+a+" = "+r+".",
+       w?"После 12 часы начинают сначала, поэтому "+h+" плюс "+a+" — это "+r+".":h+" + "+a+" = "+r+".",
+       w?"After 12 the clock starts again, so "+h+" plus "+a+" is "+r+".":h+" + "+a+" = "+r+"."),3)});
   if(lv>=3)T.push(function(){var h=ri(1,12),k=pick([15,45]);
     return mk("quarter",L("מה השעה בשעון?","كم الساعة على الساعة؟","Сколько времени на часах?","What time does the clock show?"),clockVis(h,k),hm(h,k),[hm(h,k===15?45:15),hm(h,0),hm(h,30),hm(h===12?1:h+1,k)],
      L("המחוג הארוך על 3 הוא רבע אחרי. על 9 הוא רבע לפני.","العقرب الطويل عند 3 يعني والربع. عند 9 يعني إلا ربعًا.","Длинная стрелка на 3 — четверть после. На 9 — без четверти.","Long hand on 3 is quarter past. On 9 it is quarter to."),
@@ -946,7 +955,7 @@ LESSONS.coord=[{t:L("כדי למצוא נקודה על הרשת: קודם הול
 LESSONS.mon2=[{t:L("בבעיה בשני צעדים עושים צעד אחד, ואז צעד שני עם התוצאה.","في المسألة بخطوتين نفعل خطوة ثم خطوة ثانية بالنتيجة.","В задаче в два шага делаем один шаг, потом второй с результатом.","In a two-step problem you do one step, then a second step with the result."),v:function(){return ""}},
  {t:L("כשקונים כמה דברים שווים, קודם כופלים: מחיר אחד כפול כמות.","عند شراء عدة أشياء متساوية نضرب أولًا: السعر × العدد.","Если покупаем несколько одинаковых вещей, сначала умножаем: цена × количество.","When you buy several equal things, multiply first: price × amount."),v:function(){return ""}},
  {t:L("עודף הוא מה ששילמנו פחות המחיר. מחסרים את המחיר מהתשלום.","الباقي هو ما دفعناه ناقص الثمن. نطرح الثمن من المبلغ المدفوع.","Сдача — это то, что заплатили, минус цена. Вычитаем цену из суммы.","Change is what you paid minus the price. Subtract the price from the payment."),v:function(){return ""}}];
-var BUILD="o7 · 2026-10-04";
+var BUILD="o8 · 2026-10-04";
 /* ===== UI strings ===== */
 var STR={
 he:{brand:"מתמטיקה מעבר לחשבון",title:"מתמטיקה ליסודי",tag:"צורות, מדידות, כסף, שברים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -998,8 +1007,12 @@ loadS();
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function T(){return STR[S.lang]}
-function lt(o){return typeof o==="string"?o:o[S.lang]}
-function optLabel(o){var l=o.l;if(typeof l==="object")return l[S.lang];l=String(l);return l.replace(/ cm$/," "+CMW[S.lang]).replace(/^-(\d)/,"−$1")}
+/* זוג קואורדינטות בעמוד RTL מתהפך: "(4, 3)" מוצג "(3 ,4)" — התשובה הנכונה
+   נראית הפוכה ללומד בעברית ובערבית. בידוד דו־כיווני (LRI…PDI) כמו ב-math-g7
+   (`isoPts` שם). רק זוג של ספרות; "(ימינה, למעלה)" שבשיעור נשאר כמו שהוא. */
+function isoPts(t){return String(t).replace(/\((\d+), ?(\d+)\)/g,"⁦($1, $2)⁩")}
+function lt(o){return isoPts(typeof o==="string"?o:o[S.lang])}
+function optLabel(o){var l=o.l;if(typeof l==="object")return isoPts(l[S.lang]);l=String(l);return isoPts(l.replace(/ cm$/," "+CMW[S.lang]).replace(/^-(\d)/,"−$1"))}
 function optSay(o){var l=o.l;if(typeof l==="object")return l[S.lang];if(FRSAY[S.lang][l])return FRSAY[S.lang][l];l=String(l);return l.replace(/ cm$/," "+CMW[S.lang]).replace(/^-/,{he:"מינוס ",ar:"ناقص ",ru:"минус ",en:"minus "}[S.lang]).replace(/^\+/,{he:"ועוד ",ar:"زائد ",ru:"плюс ",en:"plus "}[S.lang]).replace(/(\d+):(\d\d)/,function(m,h,mm){return h+" "+(mm==="00"?"":mm)})}
 function unitById(id){return UNITS.filter(function(u){return u.id===id})[0]}
 /* ===== speech with word highlight ===== */
@@ -1028,7 +1041,7 @@ function hlFallback(rate){if(!HL.el)return;var n=HL.starts.length,i=0,per=430/ra
   (function step(){if(!HL.el||HL.got)return;var sp=HL.el.querySelectorAll("[data-w]");for(var k=0;k<sp.length;k++)sp[k].className=(k===i?"hl":"");i++;if(i<=n)HL.timer=setTimeout(step,per)})()}
 function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}if(typeof RECORDED!=="undefined")RECORDED.stop();_u=null;hlClear();setPlaying(false)}
 var _playing=false;function setPlaying(b){_playing=b;var bs=document.querySelectorAll('[data-a="stop"]');bs.forEach(function(x){x.style.opacity=b?1:.55})}
-function speechFix(t){var w={he:"חלקי",ar:"على",ru:"из",en:"over"}[S.lang];return t.replace(/(\d+)\/(\d+)/g,function(m,a,b){return a+" "+w+" "+b}).replace(/×/g,{he:" כפול ",ar:" ضرب ",ru:" умножить на ",en:" times "}[S.lang]).replace(/÷/g,{he:" חלקי ",ar:" قسمة ",ru:" разделить на ",en:" divided by "}[S.lang]).replace(/−/g,{he:" פחות ",ar:" ناقص ",ru:" минус ",en:" minus "}[S.lang]).replace(/\s=\s/g,{he:" שווה ",ar:" يساوي ",ru:" равно ",en:" equals "}[S.lang]).replace(/\?\//g,"?")}
+function speechFix(t){var w={he:"חלקי",ar:"على",ru:"из",en:"over"}[S.lang];t=String(t).replace(/[⁦⁩]/g,"");return t.replace(/(\d+)\/(\d+)/g,function(m,a,b){return a+" "+w+" "+b}).replace(/×/g,{he:" כפול ",ar:" ضرب ",ru:" умножить на ",en:" times "}[S.lang]).replace(/÷/g,{he:" חלקי ",ar:" قسمة ",ru:" разделить на ",en:" divided by "}[S.lang]).replace(/−/g,{he:" פחות ",ar:" ناقص ",ru:" минус ",en:" minus "}[S.lang]).replace(/\s=\s/g,{he:" שווה ",ar:" يساوي ",ru:" равно ",en:" equals "}[S.lang]).replace(/\?\//g,"?")}
 function speakDevice_(text,el,onend){var raw=text;if(!("speechSynthesis" in window)||!text)return false;
   var rate=S.slow?0.7:0.9,pv=pickVoice(),u=new SpeechSynthesisUtterance(speechFix(text));u.lang=LCODE[S.lang];if(pv.v)u.voice=pv.v;u.rate=rate;u.pitch=pv.fem?1.05:1.3;
   var spoken=el&&el.dataset&&el.dataset.say===text;HL.noB=false;if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=speechFix(raw)!==raw}
@@ -1040,7 +1053,8 @@ function speakDevice_(text,el,onend){var raw=text;if(!("speechSynthesis" in wind
    מנגנים וזהו — בלי הדגשה מילה־מילה (אין onboundary בקובץ). אין
    קובץ, או שהקובץ נכשל: קול המכשיר כרגיל (speakDevice_). */
 function speak(text,el,onend){stopSpeak();if(!text)return false;
-  if(typeof RECORDED!=="undefined"&&RECORDED.play(text,S.lang,{rate:S.slow?0.7:0.9,
+  /* מזהה הקובץ הוא גיבוב של הטקסט — סימני הבידוד אינם נשמעים ואינם נספרים. */
+  if(typeof RECORDED!=="undefined"&&RECORDED.play(String(text).replace(/[⁦⁩]/g,""),S.lang,{rate:S.slow?0.7:0.9,
       onEnd:function(){setPlaying(false);if(onend)onend()},
       onError:function(){speakDevice_(text,el,onend)}})){
     setPlaying(true);return true;
@@ -1064,10 +1078,17 @@ function tutorBtn(dis){return (window.TUTOR&&TUTOR.on&&TUTOR.on())?'<button clas
 function listenRow(sayId){var t=T();return '<div class="row" style="margin:4px 0 8px"><button class="btn play" data-a="say" data-t="'+sayId+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M6 4l14 8-14 8z"/></svg>'+esc(t.listen)+'</button><button class="btn stop" data-a="stop"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>'+esc(t.stop)+'</button><button class="btn slow" data-a="slowsay" data-t="'+sayId+'">'+esc(t.slow)+'</button></div>'}
 function spk(a){return '<button class="sp" data-a="'+a.a+'" '+(a.k!=null?'data-k="'+a.k+'"':'')+' aria-label="'+esc(T().listen)+'"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8c2 2 2 6 0 8" stroke="#fff" fill="none" stroke-width="2"/></svg></button>'}
 function homeView(){var t=T(),h='<h1 data-say id="h1">'+esc(t.title)+'</h1><p class="sub" id="hs">'+esc(t.tag)+'</p>'+listenRow("home");
-  h+='<div class="bands"><button class="band" data-a="band" data-b="1" aria-pressed="'+(S.band===1)+'">'+esc(t.band1)+'</button><button class="band" data-a="band" data-b="2" aria-pressed="'+(S.band===2)+'">'+esc(t.band2)+'</button><button class="band" data-a="band" data-b="3" aria-pressed="'+(S.band===3)+'">'+esc(t.band3)+'</button></div>';
+  /* לשכבה ג׳ (ה׳–ו׳) אין עדיין נושאים. בלי הסימון הזה הלחיצה הורידה את
+     הלומד למסך ריק בלי מילה — ו-S.band נשמר, כך שגם הטעינה הבאה ריקה.
+     `.band.soon` ו-`t.soon` כבר קיימים בקובץ. */
+  h+='<div class="bands">';
+  [1,2,3].forEach(function(b){var has=UNITS.some(function(u){return u.band===b});
+    h+='<button class="band'+(has?'':' soon')+'" data-a="band" data-b="'+b+'" aria-pressed="'+(S.band===b)+'">'+esc(t["band"+b])+(has?'':'<small>'+esc(t.soon)+'</small>')+'</button>'});
+  h+='</div>';
+  var list=UNITS.filter(function(u){return u.band===S.band});
   h+='<h2>'+esc(t.pick)+'</h2><div class="units">';
-  UNITS.filter(function(u){return u.band===S.band}).forEach(function(u){h+='<button class="unit" style="--c:'+u.c+'" data-a="unit" data-u="'+u.id+'"><span class="ico">'+iconSvg(u.id==="pattern"?"pattern":u.id==="frac"?"frac":u.id)+'</span><span><span class="nm" style="display:block">'+esc(lt(u.n))+'</span><span class="ds">'+esc(lt(u.d))+'</span></span>'+(S.done[u.id]?'<span class="ok">✓</span>':'')+'</button>'});
-  h+='</div><p class="credit">'+esc(t.credit)+' <a href="https://pop.education.gov.il" target="_blank" rel="noopener">'+esc(t.crediL)+'</a><br>'+esc(t.privacy)+'</p>';return h}
+  list.forEach(function(u){h+='<button class="unit" style="--c:'+u.c+'" data-a="unit" data-u="'+u.id+'"><span class="ico">'+iconSvg(u.id==="pattern"?"pattern":u.id==="frac"?"frac":u.id)+'</span><span><span class="nm" style="display:block">'+esc(lt(u.n))+'</span><span class="ds">'+esc(lt(u.d))+'</span></span>'+(S.done[u.id]?'<span class="ok">✓</span>':'')+'</button>'});
+  h+='</div>'+(list.length?'':'<p class="sub">'+esc(t.soon)+'</p>')+'<p class="credit">'+esc(t.credit)+' <a href="https://pop.education.gov.il" target="_blank" rel="noopener">'+esc(t.crediL)+'</a><br>'+esc(t.privacy)+'</p>';return h}
 function unitView(){var t=T(),u=unitById(V.unit),h='<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1 style="color:'+u.c+'">'+esc(lt(u.n))+'</h1><p class="sub">'+esc(lt(u.d))+'</p>';
   h+='<div class="card"><button class="btn" style="background:'+u.c+';width:100%" data-a="lesson">'+esc(t.lesson)+'</button></div>';
   h+='<div class="card"><h2>'+esc(t.practice)+": "+esc(t.lvTitle)+'</h2><div class="lvls">';
@@ -1077,11 +1098,18 @@ function lessonView(){var t=T(),u=unitById(V.unit),ls=LESSONS[V.unit],st=ls[V.st
   var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="dots" style="margin-top:12px">'+ls.map(function(_,i){return '<i class="'+(i<V.step?"on":i===V.step?"cur":"")+'"></i>'}).join("")+'</div>';
   h+='<div class="card stepcard"><div class="sub">'+esc(fmt(t.stepOf,{a:V.step+1,b:n}))+'</div>'+listenRow("lesson")+'<div class="qtext" id="lt" data-say>'+esc(txt)+'</div><div class="vis">'+st.v()+'</div></div>';
   h+='<div style="margin:0 0 12px">'+tutorBtn()+'</div><div class="row">'+(V.step>0?'<button class="btn ghost" data-a="lprev">'+esc(t.prev)+'</button>':'')+(V.step<n-1?'<button class="btn next" data-a="lnext">'+esc(t.next)+'</button>':'<button class="btn next" data-a="start" data-l="1">'+esc(t.lessonEnd)+'</button>')+'</div>';return h}
-function qkey(q){return lt(q.q)+"|"+(q.vis||"")+"|"+(q.visL?lt(q.visL):"")}
+/* מפתח השוואה בלבד. ה-SVG נלקח גולמי ולא דרך lt, כדי שהבידוד הדו־כיווני
+   לא ירוץ על "translate(0,64)" שבתוכו. */
+function qkey(q){return lt(q.q)+"|"+(q.vis||"")+"|"+(q.visL?q.visL[S.lang]:"")}
 function mkQ(unit,lv){var g=G[unit],l=lv===4?pick([1,2,3,3]):lv,q=g(l),n=0,seen={};(P&&P.list||[]).forEach(function(p){seen[qkey(p)]=1});
   while(n<40&&seen[qkey(q)]){q=g(l);n++}return q}
-function startRound(lv){P={unit:V.unit,lv:lv,list:[],i:0,picked:null,hints:0,hintShown:false,exShown:false,streak:0,missed:[]};P.list=[];
-  for(var i=0;i<8;i++)P.list.push(mkQ(V.unit,lv));view="practice";P.cur=P.list[0];render()}
+/* "שאלות שהיו קשות יחזרו בפעם הבאה" (finX, בארבע השפות) — הבטחה שלא קוימה:
+   P.missed נאסף ונזרק עם P בסוף הסבב. כאן הוא שורד את הסבב, לפי נושא.
+   _rq מסמן שאלה שכבר חזרה, כדי שלא תסתובב בלי סוף. */
+var MISS={};
+function startRound(lv){P={unit:V.unit,lv:lv,list:[],i:0,picked:null,hints:0,hintShown:false,exShown:false,streak:0,missed:[]};
+  P.list=(MISS[V.unit]||[]).splice(0,3);P.list.forEach(function(x){x._rq=1});
+  for(var i=P.list.length;i<8;i++)P.list.push(mkQ(V.unit,lv));view="practice";P.cur=P.list[0];render()}
 function practiceView(){var t=T(),q=P.list[P.i],n=P.list.length,u=unitById(P.unit);
   var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="sub" style="margin-top:10px">'+esc(lt(u.n))+" · "+esc(fmt(t.qOf,{a:P.i+1,b:n}))+'</div><div class="prog"><i style="width:'+(P.i/n*100)+'%"></i></div>';
   h+='<div class="card">'+listenRow("q")+'<div class="qtext" id="qt" data-say>'+esc(lt(q.q))+'</div>';
@@ -1106,9 +1134,13 @@ function render(){applyTheme();document.documentElement.lang=S.lang;document.doc
 function sayText(w){var q=P&&P.list&&P.list[P.i],t=T();
   if(w==="home")return [t.title+". "+t.tag,$("#h1")];if(w==="lesson")return [$("#lt").textContent,$("#lt")];
   if(w==="end")return [t.finX,$("#ex")];if(w==="q")return [qSay(q),null];return ["",null]}
-function sayQ(slow){var q=P.list[P.i],old=S.slow;if(slow)S.slow=true;var el=$("#qt");speak(lt(q.q),el,function(){});
-  /* question first (highlighted), then options */var u=_u;if(u){var prev=u.onend;u.onend=function(){if(_u!==u)return;hlClear();var rest=q.o.map(optSay).join(". ");S.slow=slow?true:old;speak(rest,null,function(){S.slow=old});if(slow)S.slow=old}}
-  S.slow=old}
+/* קודם השאלה (מודגשת מילה־מילה), ואחריה האפשרויות. ההמשך תלוי ב-onend
+   שמקבל `speak`, ולא ב-_u: ב-_u יושבת רק הקראת המכשיר, ולכן כששכבת ההקלטה
+   ניגנה את השאלה (יש קובץ ל-36% ממחרוזות השאלה בעברית — audio/manifest.json)
+   ארבע האפשרויות לא הוקראו כלל. */
+function sayQ(slow){var q=P.list[P.i],old=S.slow,el=$("#qt");
+  function go(text,el2,cb){if(slow)S.slow=true;speak(text,el2,cb);S.slow=old}
+  go(lt(q.q),el,function(){hlClear();go(q.o.map(function(o){return optSay(o)}).join(". "),null,null)})}
 function onAct(a,el){var t=T(),q=P&&P.list&&P.list[P.i];
   if(a==="home"){stopSpeak();view="home";render();window.scrollTo(0,0)}
   else if(a==="band"){S.band=+el.dataset.b;saveS();render()}
@@ -1128,7 +1160,8 @@ function onAct(a,el){var t=T(),q=P&&P.list&&P.list[P.i];
   else if(a==="example"){P.exShown=true;render();speak($("#ex").textContent,$("#ex"))}
   else if(a==="pick"){stopSpeak();var k=+el.dataset.k;P.picked=k;var ok=q.o[k].id===q.a;
     if(ok){P.streak++;var msg=(P.streak>=3&&P.streak%3===0)?pick(t.streak):pick(t.right);P.msg=msg;sfxOk();confetti(P.streak>=3?120:50)}
-    else{P.streak=0;sfxSoft();if(P.missed.length<3&&q.t&&!q._rq){P.missed.push(q)}}
+    else{P.streak=0;sfxSoft();var ms=MISS[P.unit]=MISS[P.unit]||[];
+      if(P.missed.length<3&&ms.length<6&&q.t&&!q._rq){P.missed.push(q);ms.push(q)}}
     render();if(ok){var rb=$("#rb");speak(P.msg,rb)}else{speak(t.wrong+" "+t.ans+optSay(q.o.filter(function(o){return o.id===q.a})[0])+". "+lt(q.e),null)}}
   else if(a==="next"){stopSpeak();if(P.i<P.list.length-1){P.i++;P.picked=null;P.hintShown=false;P.exShown=false;render();window.scrollTo(0,0);setTimeout(function(){sayQ(false)},250)}
     else{S.done[P.unit]=true;saveS();view="end";render();confetti(160);window.scrollTo(0,0)}}
@@ -1156,10 +1189,8 @@ window.addEventListener("pagehide",function(){stopSpeak()});
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-elem",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o7-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o8-pwa1").catch(function(){})});
 })();
-</script>
-
 </script>
 <!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
      (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה

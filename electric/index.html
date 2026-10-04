@@ -335,6 +335,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .field{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;
   padding:12px 14px;font-size:1rem;outline:none}
 .field:focus{border-color:var(--accent)}
+/* outline:none על .field יושב אחרי :focus-visible הכללי ובאותה סגוליות,
+   ולכן הוא ביטל אותו: שדה טקסט לא קיבל טבעת מיקוד במקלדת בכלל. */
+.field:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 
 /* ---------- דף נוסחאות ---------- */
 .a-base{--c:var(--c-base);--cs:var(--cs-base)}
@@ -1031,7 +1034,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="e36 · 2026-10-04";
+var BUILD="e37 · 2026-10-04";
 var KEY="electric-state-v1";
 
 function blankState(){
@@ -9965,7 +9968,7 @@ if(!INTERNAL_OK){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=e36-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=e37-pwa1").catch(function(){});
   });
 }
 </script>

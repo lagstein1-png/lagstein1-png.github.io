@@ -989,7 +989,7 @@ weakTitle:"שמתי לב למשהו",weakMsg:"{op} קצת מאתגר עכשיו.
 hintBtn:"קשה? קחו רמז",sayOpt:"תקריאו לי את התשובה",skip:"מדלגים",breakBtn:"הפסקה קטנה",next:"ממשיכים הלאה",
 praise:"מעולה! ההתמדה שלכם השתלמה!",effort:"נכון! ראיתי כמה התאמצתם, וזה עבד!",
 enc:"כמעט! בואו נחשוב על זה ביחד עוד פעם",calmMsg:"כל הכבוד על הניסיון! בואו נראה ביחד את הפתרון",
-revealPre:"התשובה היא {a}.",
+revealPre:"התשובה היא {a}.",revealLead:"התשובה היא:",
 doneTitle:"סיבוב מושלם של התמדה!",doneSub:"{a} מתוך {b}. והחבר שלכם גאה בכם מאוד",
 doneLow:"היה קשה היום, וזה בסדר גמור",subLow:"{a} מתוך {b}. הכי חשוב שלא ויתרתם",
 doneMid:"התקדמתם יפה!",subMid:"{a} מתוך {b}. והחבר שלכם גאה בכם",
@@ -1077,7 +1077,7 @@ weakTitle:"I noticed something",weakMsg:"{op} is a bit challenging right now. Le
 hintBtn:"Hard? Take a hint",sayOpt:"Read the answer to me",skip:"Skip",breakBtn:"Short break",next:"Keep going",
 praise:"Awesome! Your persistence paid off!",effort:"Correct! I saw how hard you tried, and it worked!",
 enc:"Almost! Let's think it through together again",calmMsg:"Great try! Let's look at the solution together",
-revealPre:"The answer is {a}.",
+revealPre:"The answer is {a}.",revealLead:"The answer is:",
 doneTitle:"A perfect round of persistence!",doneSub:"{a} out of {b}. And your buddy is very proud of you",
 doneLow:"Today was hard, and that's completely okay",subLow:"{a} out of {b}. The most important thing is you didn't give up",
 doneMid:"Nice progress!",subMid:"{a} out of {b}. And your buddy is proud of you",
@@ -1161,7 +1161,7 @@ weakTitle:"Я кое-что заметил",weakMsg:"{op} сейчас немн�
 hintBtn:"Трудно? Подсказка",sayOpt:"Прочитайте ответ вслух",skip:"Пропустить",breakBtn:"Пауза",next:"Дальше",
 praise:"Отлично! Упорство окупилось!",effort:"Верно! Я видела, как вы старались, и это сработало!",
 enc:"Почти! Давай подумаем ещё раз вместе",calmMsg:"Отличная попытка! Посмотрим решение вместе",
-revealPre:"Ответ: {a}.",
+revealPre:"Ответ: {a}.",revealLead:"Ответ:",
 doneTitle:"Идеальный раунд упорства!",doneSub:"{a} из {b}. И ваш друг очень вами гордится",
 doneLow:"Сегодня было трудно, и это совершенно нормально",subLow:"{a} из {b}. Главное, что вы не сдались",
 doneMid:"Хороший прогресс!",subMid:"{a} из {b}. И ваш друг гордится вами",
@@ -1245,7 +1245,7 @@ weakTitle:"لاحظت شيئًا",weakMsg:"{op} صعب بعض الشيء الآ�
 hintBtn:"صعب؟ خذ تلميحًا",sayOpt:"اقرأوا الإجابة",skip:"تخطٍّ",breakBtn:"استراحة قصيرة",next:"نواصل",
 praise:"ممتاز! مثابرتكم أثمرت!",effort:"صحيح! رأيت كم اجتهدتم، وقد نجح الأمر!",
 enc:"تقريبًا! لنفكر معًا مرة أخرى",calmMsg:"محاولة رائعة! لنرَ الحل معًا",
-revealPre:"الجواب هو {a}.",
+revealPre:"الجواب هو {a}.",revealLead:"الجواب هو:",
 doneTitle:"جولة مثالية من المثابرة!",doneSub:"{a} من {b}. وصديقكم فخور بكم جدًا",
 doneLow:"كان اليوم صعبًا، وهذا أمر طبيعي تمامًا",subLow:"{a} من {b}. الأهم أنكم لم تستسلموا",
 doneMid:"تقدّم جميل!",subMid:"{a} من {b}. وصديقكم فخور بكم",
@@ -1398,7 +1398,17 @@ function stickerTest(id,s){
 function earnedStickers(s){return STICKER_META.filter(function(m){return stickerTest(m.id,s)}).map(function(m){return m.id})}
 
 /* ================= state & storage ================= */
-var KEY="mlh-state-v2";
+/* **מפתח לאפליקציה הזאת בלבד.** עד כאן הוא היה "mlh-state-v2" —
+   המפתח של math-app, שממנה הועתק הקובץ. שתי האפליקציות כתבו XP,
+   דמות, מדבקות והגדרות לאותה מגירה, וכל אחת דרסה את השנייה;
+   `localStorage.removeItem` שבאיפוס מחק את ההתקדמות בחשבון.
+   science תוקנה כך ב-sci-state-v2, וכאן אותו תיקון.
+   השם מסתיים ב-KEY כדי ש-storage.js יראה אותו: הביטוי שם דורש תו
+   אחד לפחות לפני "KEY", ולכן משתנה ששמו בדיוק KEY היה מחוץ לבדיקה. */
+var GEOKEY="geo-elem-state-v2";
+/* המגירה המשותפת הישנה. **לקריאה בלבד ולא נמחקת** — מי שהתקדם כאן
+   לפני התיקון מוצא את ההתקדמות שלו, ואיפוס כאן אינו נוגע ב-math-app. */
+var MLH_OLD="mlh-state-v2";
 /* מפתחות השם המוצע של כל חיה. מוגדר כאן, לפני load(), כי
    isSuggestedName נקראת מתוך load() על שמירה ישנה בלי petAuto —
    ו-var שמוגדר אחרי כן הוא עדיין undefined באותו רגע, הקריאה זורקת,
@@ -1417,7 +1427,7 @@ function defaults(){
 function load(){
   var base=defaults();
   try{
-    var raw=localStorage.getItem(KEY)||localStorage.getItem("geo-elem-state-v1");
+    var raw=localStorage.getItem(GEOKEY)||localStorage.getItem("geo-elem-state-v1")||localStorage.getItem(MLH_OLD);
     if(!raw) return base;
     var p=JSON.parse(raw),d=defaults();
     /* שמירה ישנה מחזיקה "puppy", "fox" או "owl"; בלי ההמרה הזאת
@@ -1457,7 +1467,7 @@ function load(){
   }catch(e){return base}
 }
 var state=load();
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function save(){try{localStorage.setItem(GEOKEY,JSON.stringify(state))}catch(e){}}
 function applyModes(){
   var r=document.documentElement,s=state.settings;
   /* אנגלית אינה סימן: טלפון בישראל מדווח אנגלית כברירת מחדל של
@@ -2445,11 +2455,26 @@ function speak(text,excited){
   /* הבועה מציגה את מה שנאמר. כשהיא מציגה בדיוק את הטקסט הזה,
      היא גם זו שמודגשת מילה־מילה. */
   var said=hlPrep($("#btxt"),text,lang);
+  /* שכבה 1 - קובץ מוקלט (המנוע של תאוריה מדברת). יש קובץ: מנגנים
+     וזהו, וההדגשה מילה־מילה לא רצה (אין onboundary בקובץ); אין קובץ,
+     או שהקובץ נכשל: קול המכשיר כרגיל. המודול כבר נטען בתגית וכבר
+     במטמון של sw.js — עד כאן הוא נטען ולא נקרא, ולכן השכבה הייתה
+     מתה. science, התאומה של האפליקציה הזאת, חוברה ב-s136. */
+  if(typeof RECORDED!=="undefined"){
+    try{speechSynthesis.cancel()}catch(e0){}
+    var _tok=_hlTok;
+    if(RECORDED.play(text,lang,{rate:state.settings.rate,
+        onEnd:function(){ if(_tok!==_hlTok)return; try{hlClear()}catch(e1){} try{jfSay(false)}catch(e2){} },
+        onError:function(){ if(_tok!==_hlTok)return; speakLocal(said,preset,rate,pitch,LANGS[lang].tts); }})){
+      try{jfSay(true)}catch(e3){}
+      return;
+    }
+  }
   speakLocal(said,preset,rate,pitch,LANGS[lang].tts);
 }
 /* _hlTok++ הוא מה שהופך כל מטפל שממתין לדור ישן: בלעדיו שומר
    הזמן של אמירה שבוטלה עדיין נחשב "חי" ומנקה הדגשה של אמירה חדשה. */
-function stopSpeak(){try{hlClear()}catch(e){}_hlTok++;stopKeepAlive();_activeU=null;if("speechSynthesis" in window)try{speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){try{hlClear()}catch(e){}_hlTok++;if(typeof RECORDED!=="undefined")RECORDED.stop();stopKeepAlive();_activeU=null;if("speechSynthesis" in window)try{speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -2579,7 +2604,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="w130 · 2026-10-04";
+var BUILD="w131 · 2026-10-04";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -3055,7 +3080,7 @@ function practice(){
     }else{
       h+='<div style="display:flex;align-items:center;gap:12px;background:var(--coral-soft);border:2px solid rgba(255,111,97,.3);border-radius:18px;padding:13px 18px;margin-top:22px;font-family:var(--font-display);font-weight:600;font-size:1.15rem;color:var(--coral-deep)">'+ic("x",22)+' '+(state.settings.calmMode?esc(t.calmMsg):esc(t.enc))+'</div>';
       /* הפתרון נפתח רק למי שלא הגיע אליו בעצמו */
-      h+='<div style="margin-top:12px;background:var(--paper);border:2px solid rgba(23,51,60,.1);border-radius:18px;padding:18px"><span style="font-weight:500;font-size:1.05rem">'+esc(fmt(t.revealPre,{a:q.answer}))+' <b class="fd" style="font-size:1.4rem;color:var(--teal-deep)">'+q.answer+'</b></span><p style="color:var(--ink-soft);margin-top:6px">'+esc(q.explain)+'</p></div>';
+      h+='<div style="margin-top:12px;background:var(--paper);border:2px solid rgba(23,51,60,.1);border-radius:18px;padding:18px"><span style="font-weight:500;font-size:1.05rem">'+esc(t.revealLead)+' <b class="fd" style="font-size:1.4rem;color:var(--teal-deep)">'+q.answer+'</b></span><p style="color:var(--ink-soft);margin-top:6px">'+esc(q.explain)+'</p></div>';
     }
     h+='<button class="btn btn-ink" data-a="next" style="width:100%;margin-top:18px;padding:15px;font-size:1.2rem">'+esc(t.next)+' '+ic("arrow",22)+'</button></div>';
   }
@@ -3389,7 +3414,21 @@ var LVL_C=["var(--teal)","var(--sky)","var(--amber)","var(--coral)","var(--viole
 
 function buildQ(topicId,level){
   var lang=state.settings.lang||"he";
-  var q=genQ(0,clamp(level||1,1,6),lang,topicId);
+  /* **המבחן הכיתתי אינו מביט בהתקדמות הלומד.** `genQ` מדלג על כל
+     שורה שכבר נשאלה בסשן (`P.usedRows`), ולכן המאגר שממנו הוא
+     מגריל שונה בין מכשיר למכשיר — גם כשהזרע זהה. ההבטחה שמעל
+     `examQuestions` ("אותו זרע ← אותן שאלות, גם אצל המורה וגם אצל
+     התלמיד") נשברה בשקט: `startRound` רץ בטעינה ומסמן שמונה שורות
+     אקראיות, שונות בכל מכשיר. נמדד על המאגר הזה: 1078 מתוך 2000
+     שאלות שונות בין מורה לתלמיד, ב-200 מתוך 200 מבחנים.
+     כאן המאגר ריק תמיד, ולכן הגרלת המבחן תלויה בזרע בלבד.
+     בדרך אגב זה גם מפסיק לזהם את סבב התרגול: בניית מבחן בן
+     עשרים שאלות סימנה עשרים שורות כ"נשאלו".
+     science, התאומה, תוקנה כך קודם. */
+  var keep=P.usedRows,q;
+  P.usedRows={};
+  try{ q=genQ(0,clamp(level||1,1,6),lang,topicId) }
+  finally{ P.usedRows=keep }
   if(!q)return null;
   /* האפשרויות כאן הן מספרים, לא אובייקטים.
      ואין להן `why`: מסיח כאן הוא מספר, והסכימה של math-app —
@@ -4952,7 +4991,7 @@ function onAction(a,el){
   else if(a==="noreset"){confirmReset=false;render()}
   else if(a==="doreset"){
     stopSpeak();confirmReset=false;
-    try{localStorage.removeItem(KEY);localStorage.removeItem("geo-elem-state-v1")}catch(e){}
+    try{localStorage.removeItem(GEOKEY);localStorage.removeItem("geo-elem-state-v1")}catch(e){}
     state=defaults();save();view="onboarding";P.selPet=null;startRound(1);applyModes();render();window.scrollTo(0,0);
   }
 }
@@ -5207,7 +5246,7 @@ ar:{g1Title:"درس: كيف نقرأ الخريطة؟",g1Goal:"الهدف: أن 
     g1Sum:"انتهيتم! اليوم تعلمنا: الخريطة هي رسم لمكان من الأعلى، وأربعة أجزاء تساعدنا على قراءتها: العنوان، مفتاح الخريطة، مقياس الرسم ووردة الرياح.",
     g1Again:"من البداية",g1Next:"التالي",g1Hear:"استمعوا",g1Correct:"صحيح!",g1Wrong:"ليس بعد. يمكن المحاولة مرة أخرى.",g1Check:"فحص الفهم",
     g1C1:"العنوان",g1C1r:"يخبر عن موضوع الخريطة",g1C2:"مفتاح الخريطة",g1C2r:"يشرح رموز الخريطة",g1C3:"مقياس الرسم",g1C3r:"كم تصغّر الخريطة",g1C4:"وردة الرياح",g1C4r:"تُظهر الاتجاهات"}};
-G1STR.he.g1HintQ="הכותרת מספרת על מה המפה, ושושנת הרוחות עוזרת בכיוונים. מי נשאר?";G1STR.en.g1HintQ="The title tells what the map is about, and the compass rose helps with directions. Who is left?";G1STR.ru.g1HintQ="Заголовок рассказывает, о чём карта, а роза ветров помогает с направлениями. Что остаётся?";G1STR.ar.g1HintQ="العنوان يخبر عمّا تتحدث الخريطة، ووردة الرياح تساعد في الاتجاهات. ما الذي يتبقى؟";G1STR.he.g1HintP1="המפה קטנה והמציאות ענקית. איך נדע מה המרחק האמיתי מנקודה לנקודה?";G1STR.en.g1HintP1="The map is small and reality is huge. How can we know the real distance from point to point?";G1STR.ru.g1HintP1="Карта маленькая, а мир огромный. Как узнать настоящее расстояние от точки до точки?";G1STR.ar.g1HintP1="الخريطة صغيرة والواقع ضخم. كيف نعرف المسافة الحقيقية من نقطة إلى نقطة؟";G1STR.he.g1HintP2="האות צ׳ מסמנת צפון. איזה חלק במפה עוזר לנו בכיוונים?";G1STR.en.g1HintP2="The letter צ stands for north. Which part of the map helps us with directions?";G1STR.ru.g1HintP2="Буква צ означает север. Какая часть карты помогает нам с направлениями?";G1STR.ar.g1HintP2="الحرف צ يرمز إلى الشمال. أي جزء من الخريطة يساعدنا في الاتجاهات؟";G1STR.he.g1NextLesson="לשיעור הבא";G1STR.en.g1NextLesson="Next lesson";G1STR.ru.g1NextLesson="Следующий урок";G1STR.ar.g1NextLesson="الدرس التالي";
+G1STR.he.g1HintQ="הכותרת מספרת על מה המפה, ושושנת הרוחות עוזרת בכיוונים. מי נשאר?";G1STR.en.g1HintQ="The title tells what the map is about, and the compass rose helps with directions. Who is left?";G1STR.ru.g1HintQ="Заголовок рассказывает, о чём карта, а роза ветров помогает с направлениями. Что остаётся?";G1STR.ar.g1HintQ="العنوان يخبر عمّا تتحدث الخريطة، ووردة الرياح تساعد في الاتجاهات. ما الذي يتبقى؟";G1STR.he.g1HintP1="המפה קטנה והמציאות ענקית. איך נדע מה המרחק האמיתי מנקודה לנקודה?";G1STR.en.g1HintP1="The map is small and reality is huge. How can we know the real distance from point to point?";G1STR.ru.g1HintP1="Карта маленькая, а мир огромный. Как узнать настоящее расстояние от точки до точки?";G1STR.ar.g1HintP1="الخريطة صغيرة والواقع ضخم. كيف نعرف المسافة الحقيقية من نقطة إلى نقطة؟";G1STR.he.g1HintP2="האות צ׳ מסמנת צפון. איזה חלק במפה עוזר לנו בכיוונים?";G1STR.en.g1HintP2="The letter N stands for north. Which part of the map helps us with directions?";G1STR.ru.g1HintP2="Буква С означает север. Какая часть карты помогает нам с направлениями?";G1STR.ar.g1HintP2="الحرف ش يرمز إلى الشمال. أي جزء من الخريطة يساعدنا في الاتجاهات؟";G1STR.he.g1NextLesson="לשיעור הבא";G1STR.en.g1NextLesson="Next lesson";G1STR.ru.g1NextLesson="Следующий урок";G1STR.ar.g1NextLesson="الدرس التالي";
 function g1t(k){var d=G1STR[state.settings.lang||"he"]||G1STR.he;var v=d[k];return v===undefined?(G1STR.en[k]||k):v}
 var G1SN={step:0,revealed:false,picked:-1,p1:-1,p2:-1};
 function g1Scene(revealed){
@@ -5606,7 +5645,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=w130-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=w131-pwa1").catch(function(){});
   });
 }
 </script>
