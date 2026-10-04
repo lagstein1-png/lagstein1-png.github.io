@@ -174,22 +174,31 @@ const SOURCES = {
   literature: ['literature/index.html'],
   tanakh: ['tanakh/index.html'],
   'hebrew-arab': ['hebrew-arab/index.html'],
+  biology: ['biology/index.html'],
   /* רוסית לבגרות (3.10.2026): התוכן ברוסית בלבד ("ru"), ואין בו מחרוזת "he" עם אותיות עבריות מלבד שמות הנושאים. לא מוקלט כלום; ההקראה בקול המכשיר (CL="ru"). */
   russian: ['russian/index.html'],
   islam: ['islam/index.html'],
   /* מדע (3.10.2026): המאגר SCIBANK ב-index.html הוא מערכים ("he":[...]),
      לא מחרוזות, ולכן corpus קורא אותו במסלול נפרד (sciBank). */
   science: ['science/index.html'],
+  'science-mid': ['science-mid/index.html'],
+  'science-12': ['science-12/js/data.js'],
   /* math-elem (3.10.2026): התוכן הסטטי עטוף ב-L(he,ar,ru,en) — ראה L()
      ב-math-elem/index.html. corpus קורא כל קריאת L בנפרד (mathElemBank).
      בכוונה לא כולל: STR (תוויות ממשק/שבחים) ואת מחרוזות optSay שחלקן
      נבנות בזמן ריצה ממספרים (שברים, זמן, יחידות) — בדיוק הסיבה ששאר
      משפחת math-* אינה ב-SOURCES בכלל. */
   'math-elem': ['math-elem/index.html'],
+  /* math-g7 (3.10.2026): אותו מבנה L(he,ar,ru,en) כמו math-elem. */
+  'math-g7': ['math-g7/index.html'],
   /* תנ״ך לילדים (3.10.2026): הנתונים ב-js/data.js כשורות מופרדות ב-| (L משפט, Q שאלה, S כותרת, E ישות/תשובה), קוראים אותם במסלול נפרד (tanakhElem). */
   'tanakh-elem': ['tanakh-elem/js/data.js'],
   /* מולדת ואזרחות לילדים (3.10.2026): הנתונים ב-js/data.js כשורות מופרדות ב-| (L משפט, Q שאלה, S כותרת, E ישות/תשובה), קוראים אותם במסלול נפרד (civicsElem). */
   'civics-elem': ['civics-elem/js/data.js'],
+  'culture-elem': ['culture-elem/js/data.js'],
+  'history-elem': ['history-elem/js/data.js'],
+  /* אנגלית לילדים (3.10.2026): הנתונים ב-js/data.js כשורות מופרדות ב-| (S כותרת, L פתיח, Q הנחיה, T/W/X תרגום). */
+  'english-elem': ['english-elem/js/data.js'],
   /* קריאה ושפה (4.10.2026, O-115): משפטים, קטעים, כותרות ושאלות מ-js/data.js,
      והוראות התרגיל (i_*) מ-js/i18n.js. corpus קורא אותם במסלול נפרד (hebrewLit).
      בכוונה לא כולל: מילה בודדת והברה (אותן הילד מפענח, והקלטה שגויה מלמדת
@@ -306,12 +315,44 @@ function civicsElem(text) {
   return out;
 }
 
+/* english-elem/js/data.js: RAW הוא טקסט שורות. מוקלט הטקסט העברי שהאפליקציה מקריאה:
+   כותרת (S), פתיח (L), הנחיית שאלה (Q) ותרגום כרטיס (T, W, X). */
+function englishElem(text) {
+  const k = text.indexOf('String.raw`');
+  if (k < 0) throw new Error('english-elem: RAW לא נמצא');
+  const out = [];
+  const re = /String\.raw`([^`]*)`/g; let m;
+  while ((m = re.exec(text))) for (const line of m[1].split('\n')) {
+    if (!line.trim()) continue;
+    const kind = line[0], f = line.slice(2).split('|');
+    if (kind === 'S') out.push(f[3]);
+    else if (kind === 'L') out.push(f[0]);
+    else if (kind === 'Q') out.push(f[1]);
+    else if (kind === 'T') out.push(f[3]);
+    else if (kind === 'W') out.push(f[2]);
+    else if (kind === 'X') out.push(f[1]);
+  }
+  return out;
+}
+
 function corpus(app) {
   const src = SOURCES[app];
   if (!src) return null;
   const files = typeof src === 'function' ? src() : src;
   const seen = new Map();       /* id → text, בסדר ההופעה */
-  if (app === 'civics-elem') {
+  if (app === 'english-elem') {
+    const tf = path.join(ROOT, files[0]);
+    if (!fs.existsSync(tf)) return seen;
+    for (const raw of englishElem(fs.readFileSync(tf, 'utf8'))) {
+      const text = plainOf(String(raw));
+      if (!/[א-ת]/.test(text)) continue;
+      if (text.split(' ').length < 2) continue;
+      const id = R.id(text);
+      if (!seen.has(id)) seen.set(id, text);
+    }
+    return seen;
+  }
+  if (app === 'civics-elem' || app === 'culture-elem' || app === 'history-elem') {
     const tf = path.join(ROOT, files[0]);
     if (!fs.existsSync(tf)) return seen;
     for (const raw of civicsElem(fs.readFileSync(tf, 'utf8'))) {
@@ -347,7 +388,7 @@ function corpus(app) {
     }
     return seen;
   }
-  if (app === 'math-elem') {
+  if (app === 'math-elem' || app === 'math-g7') {
     const sf = path.join(ROOT, files[0]);
     if (!fs.existsSync(sf)) return seen;
     return mathElemBank(fs.readFileSync(sf, 'utf8'));
@@ -366,6 +407,7 @@ function corpus(app) {
     return seen;
   }
   for (const f of files) {
+    if (!fs.existsSync(path.join(ROOT, f))) continue;
     const s = fs.readFileSync(path.join(ROOT, f), 'utf8');
     for (const m of s.matchAll(/\b"?he"?\s*:\s*"((?:[^"\\]|\\.)*)"/g)) {
       const text = plainOf(unquote(m[1]));

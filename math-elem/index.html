@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>מתמטיקה מעבר לחשבון ליסודי: צורות, מדידות, שברים ועוד · חינם</title>
-<meta name="description" content="שיעורים ותרגול במתמטיקה ליסודי, כיתות א׳–ב׳: מספרים, צורות, מדידות, זמן, כסף, חוקיות, שברים ונתונים. הכול מוקרא, בארבע שפות, בלי הרשמה ובלי ציונים." />
+<title>מתמטיקה מעבר לחשבון ליסודי: שברים, אחוזים, גאומטריה ועוד · חינם</title>
+<meta name="description" content="שיעורים ותרגול במתמטיקה ליסודי, כיתות א׳–ו׳: שברים, עשרוניים, אחוזים, גאומטריה, מדידות, נתונים והסתברות. הכול מוקרא, בארבע שפות, בלי הרשמה ובלי ציונים." />
 <link rel="canonical" href="https://bekol.co.il/math-elem/" />
 <meta name="theme-color" content="#0e9c8d" media="(prefers-color-scheme:light)" />
 <meta name="theme-color" content="#101a1c" media="(prefers-color-scheme:dark)" />
@@ -209,7 +209,7 @@ function iconSvg(id){var c="#fff";var m={
  frac:'<circle cx="34" cy="34" r="24" fill="#fff"/><path d="M34 34 L34 10 A24 24 0 0 1 34 58 Z" fill="#ff9f43"/>',
  data:'<rect x="10" y="36" width="12" height="22" fill="#fff"/><rect x="28" y="18" width="12" height="40" fill="#fff"/><rect x="46" y="28" width="12" height="30" fill="#fff"/>',
  words:'<text x="34" y="46" text-anchor="middle" font-size="34" font-weight="800" fill="#fff">+ ?</text>'};
- return '<svg viewBox="0 0 68 68" width="68" height="68" aria-hidden="true">'+m[id]+'</svg>'}
+ return '<svg viewBox="0 0 68 68" width="68" height="68" aria-hidden="true">'+(m[id]||"")+'</svg>'}
 /* ===== band 2 visuals ===== */
 function gridVis(w,h,showLab){var u=Math.min(30,Math.floor(300/w)),s="",i,j;
   for(i=0;i<w;i++)for(j=0;j<h;j++)s+='<rect x="'+(20+i*u)+'" y="'+(20+j*u)+'" width="'+u+'" height="'+u+'" fill="#d9f2ec" stroke="#0e9c8d" stroke-width="1.5"/>';
@@ -568,7 +568,7 @@ G.area=function(lv){var T=[];
      L("בריבוע כל ארבע הצלעות שוות. מחלקים ב-4.","في المربع الأضلاع الأربعة متساوية. اقسم على 4.","У квадрата все четыре стороны равны. Раздели на 4.","In a square all four sides are equal. Divide by 4."),L(p+" ÷ 4 = "+s+".",p+" ÷ 4 = "+s+".",p+" ÷ 4 = "+s+".",p+" ÷ 4 = "+s+"."),1)});
   return pick(T)()};
 G.angles=function(lv){var T=[],AN={right:L("ישרה","قائمة","прямой","a right angle"),acute:L("חדה","حادة","острый","an acute angle"),obtuse:L("קהה","منفرجة","тупой","an obtuse angle")};
-  T.push(function(){var k=pick(["right","acute","obtuse"]),deg=k==="right"?90:k==="acute"?pick([30,45,60,70]):pick([110,125,140,150]);
+  T.push(function(){var k=pick(["right","acute","obtuse"]),deg=k==="right"?90:k==="acute"?ri(2,8)*10+pick([0,5]):ri(11,16)*10+pick([0,5]);
     return mk("kind",L("איזו זווית זו?","أي زاوية هذه؟","Какой это угол?","What kind of angle is this?"),angleVis(deg),AN[k],["right","acute","obtuse"].filter(function(x){return x!==k}).map(function(x){return AN[x]}).concat([L("שטוחה","مستقيمة","развёрнутый","a straight angle")]),
      L("זווית ישרה היא כמו פינה של דף. חדה קטנה ממנה. קהה גדולה ממנה.","الزاوية القائمة مثل زاوية الورقة. الحادة أصغر منها والمنفرجة أكبر.","Прямой угол — как угол листа. Острый меньше, тупой больше.","A right angle is like the corner of a page. Acute is smaller, obtuse is bigger."),
      L("זו זווית "+AN[k].he+".","هذه زاوية "+AN[k].ar+".","Это "+AN[k].ru+" угол.","This is "+AN[k].en+"."),0)});
@@ -706,6 +706,156 @@ G.mon2=function(lv){var T=[],IT=[L("מחברת","دفتر","тетрадь","a n
     return mk("save2",L("דנה חסכה "+c+" שקלים. אחר כך קיבלה "+a+" ועוד "+b+" שקלים. כמה כסף יש לה עכשיו?","ادّخرت دانة "+c+" شيكل. ثم أخذت "+a+" و"+b+" شيكل. كم معها الآن؟","У Даны было "+c+" ₪. Потом она получила "+a+" и ещё "+b+" ₪. Сколько у неё теперь?","Dana saved "+c+" shekels. Then she got "+a+" and "+b+" more shekels. How much does she have now?"),"",c+n,[c+n+1,c+n-1,c+a,n,c+n+10].filter(function(z){return z>0}),
      L("מחברים את כל הסכומים.","اجمع كل المبالغ.","Сложи все суммы.","Add all the amounts."),L(c+" + "+a+" + "+b+" = "+(c+n)+".",c+" + "+a+" + "+b+" = "+(c+n)+".",c+" + "+a+" + "+b+" = "+(c+n)+".",c+" + "+a+" + "+b+" = "+(c+n)+"."),2)});
   return pick(T)()};
+/* ===== BAND 3 (grades 5-6) ===== */
+function gcd(a,b){return b?gcd(b,a%b):Math.abs(a)}
+function sm(p,q){var g=gcd(p,q);return q/g===1?String(p/g):(p/g)+"/"+(q/g)}
+function dg(n){return "\u2066"+n+"°\u2069"}
+function same(s){return L(s,s,s,s)}
+function triVis(b,h){var s=Math.min(20,Math.floor(230/b),Math.floor(150/h)),B=b*s,H=h*s,x0=30,y0=20,ap=x0+Math.round(B*0.3),t='';
+  t+='<polygon points="'+x0+','+(y0+H)+' '+(x0+B)+','+(y0+H)+' '+ap+','+y0+'" fill="#ffe3de" stroke="#17333c" stroke-width="3"/>';
+  t+='<line x1="'+ap+'" y1="'+y0+'" x2="'+ap+'" y2="'+(y0+H)+'" stroke="#e8453c" stroke-width="2.5" stroke-dasharray="6 4"/>';
+  t+='<text x="'+(x0+B/2)+'" y="'+(y0+H+20)+'" text-anchor="middle" font-size="16" font-weight="800">'+b+'</text><text x="'+(ap+8)+'" y="'+(y0+H/2+5)+'" font-size="16" font-weight="800">'+h+'</text>';
+  return '<div class="nl">'+svg(x0+B+30,y0+H+30,t,"")+'</div>'}
+function boxVis(l,w,h){var u=Math.min(18,Math.floor(150/l),Math.floor(110/h)),L_=l*u,H=h*u,d=Math.max(14,Math.round(w*u*0.5)),x0=24,y0=24+d,t='';
+  t+='<rect x="'+x0+'" y="'+y0+'" width="'+L_+'" height="'+H+'" fill="#dff1fa" stroke="#17333c" stroke-width="3"/>';
+  t+='<polygon points="'+x0+','+y0+' '+(x0+d)+','+(y0-d)+' '+(x0+L_+d)+','+(y0-d)+' '+(x0+L_)+','+y0+'" fill="#ece4fa" stroke="#17333c" stroke-width="3"/>';
+  t+='<polygon points="'+(x0+L_)+','+y0+' '+(x0+L_+d)+','+(y0-d)+' '+(x0+L_+d)+','+(y0-d+H)+' '+(x0+L_)+','+(y0+H)+'" fill="#c9e3f3" stroke="#17333c" stroke-width="3"/>';
+  t+='<text x="'+(x0+L_/2)+'" y="'+(y0+H+20)+'" text-anchor="middle" font-size="16" font-weight="800">'+l+'</text><text x="'+(x0-8)+'" y="'+(y0+H/2+5)+'" text-anchor="end" font-size="16" font-weight="800">'+h+'</text><text x="'+(x0+L_+d+6)+'" y="'+(y0-d/2+16)+'" font-size="16" font-weight="800">'+w+'</text>';
+  return '<div class="nl">'+svg(x0+L_+d+40,y0+H+30,t,"")+'</div>'}
+function negLine(v,lo,hi){lo=lo==null?-10:lo;hi=hi==null?10:hi;var u=Math.floor(300/(hi-lo)),x0=20,t='<line x1="'+x0+'" y1="40" x2="'+(x0+(hi-lo)*u)+'" y2="40" stroke="#17333c" stroke-width="3"/>',i;
+  for(i=lo;i<=hi;i++){var x=x0+(i-lo)*u;t+='<line x1="'+x+'" y1="'+(i===0?30:34)+'" x2="'+x+'" y2="'+(i===0?50:46)+'" stroke="#17333c" stroke-width="'+(i===0?3:2)+'"/>';if(i%5===0||i===lo||i===hi)t+='<text x="'+x+'" y="72" text-anchor="middle" font-size="14" font-weight="800">'+i+'</text>'}
+  if(v!=null)t+='<circle cx="'+(x0+(v-lo)*u)+'" cy="40" r="9" fill="#e8453c" stroke="#17333c" stroke-width="2"/>';
+  return '<div class="nl">'+svg(40+(hi-lo)*u,84,t,"")+'</div>'}
+function coord4(pts){var u=26,n=5,s="",i,c=10+n*u;
+  for(i=-n;i<=n;i++){s+='<line x1="'+(c+i*u)+'" y1="10" x2="'+(c+i*u)+'" y2="'+(10+2*n*u)+'" stroke="#d6e4df"/><line x1="10" y1="'+(c+i*u)+'" x2="'+(10+2*n*u)+'" y2="'+(c+i*u)+'" stroke="#d6e4df"/>';
+    if(i&&i%2===0){s+='<text x="'+(c+i*u)+'" y="'+(c+16)+'" text-anchor="middle" font-size="11" font-weight="800">'+i+'</text><text x="'+(c-6)+'" y="'+(c-i*u+4)+'" text-anchor="end" font-size="11" font-weight="800">'+i+'</text>'}}
+  s+='<line x1="10" y1="'+c+'" x2="'+(10+2*n*u)+'" y2="'+c+'" stroke="#17333c" stroke-width="3"/><line x1="'+c+'" y1="10" x2="'+c+'" y2="'+(10+2*n*u)+'" stroke="#17333c" stroke-width="3"/>';
+  pts.forEach(function(p){s+='<circle cx="'+(c+p[0]*u)+'" cy="'+(c-p[1]*u)+'" r="8" fill="'+(p[3]||"#e8453c")+'" stroke="#17333c" stroke-width="2"/><text x="'+(c+p[0]*u)+'" y="'+(c-p[1]*u+4)+'" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">'+(p[2]||"")+'</text>'});
+  return '<div class="nl">'+svg(20+2*n*u,20+2*n*u,s,"")+'</div>'}
+function bagVis(cn,cols){var s="",k=0,i,j;cn.forEach(function(n,ci){for(j=0;j<n;j++){var x=24+(k%8)*34,y=24+Math.floor(k/8)*34;s+='<circle cx="'+x+'" cy="'+y+'" r="13" fill="'+cols[ci]+'" stroke="#17333c" stroke-width="2"/>';k++}});
+  return '<div class="nl">'+svg(290,Math.ceil(k/8)*34+10,s,"")+'</div>'}
+var NEGC=L("°C","°C","°C","°C");
+G.fracop=function(lv){var T=[],P=[[2,4,"3/4"],[4,8,"3/8"],[3,9,"4/9"],[2,8,"5/8"],[5,10,"3/10"],[3,6,"1/2"],[2,6,"2/3"]];
+  T.push(function(){var q=ri(5,12),a=ri(1,q-3),b=ri(1,q-a-1),r=sm(a+b,q);
+    return mk("fsame",L("כמה זה "+a+"/"+q+" + "+b+"/"+q+"?","كم يساوي "+a+"/"+q+" + "+b+"/"+q+"؟","Сколько будет "+a+"/"+q+" + "+b+"/"+q+"?","What is "+a+"/"+q+" + "+b+"/"+q+"?"),"",r,[sm(a+b,q*2),sm(a*b,q),(a+b+1>=q?sm(a+b-1,q):sm(a+b+1,q)),sm(a+b,q+1)],
+     L("כשהמכנה זהה, מחברים רק את המונים.","عندما يتساوى المقام نجمع البسطين فقط.","Если знаменатели равны, складываем только числители.","With the same denominator, add only the tops."),L(a+" + "+b+" = "+(a+b)+", המכנה נשאר "+q+".",a+" + "+b+" = "+(a+b)+" والمقام يبقى "+q+".",a+" + "+b+" = "+(a+b)+", знаменатель остаётся "+q+".",a+" + "+b+" = "+(a+b)+", the denominator stays "+q+"."),0)});
+  if(lv>=2)T.push(function(){var p=pick(P),q1=p[0],q2=p[1],ans=p[2],sub=Math.random()<.4&&false;
+    return mk("fdiff",L("כמה זה 1/"+q1+" + 1/"+q2+"?","كم يساوي 1/"+q1+" + 1/"+q2+"؟","Сколько будет 1/"+q1+" + 1/"+q2+"?","What is 1/"+q1+" + 1/"+q2+"?"),fracBars(1,q1,1,q2),ans,[sm(2,q1+q2),"2/"+(q1+q2),sm(1,q2),sm(q2-1,q2)].filter(function(x){return x!==ans}),
+     L("קודם מביאים למכנה משותף: "+q2+".","أولًا نوحّد المقامين إلى "+q2+".","Сначала приведём к общему знаменателю: "+q2+".","First find a common denominator: "+q2+"."),L("1/"+q1+" = "+(q2/q1)+"/"+q2+", ועוד 1/"+q2+" = "+ans+".","1/"+q1+" = "+(q2/q1)+"/"+q2+" وأضف 1/"+q2+" = "+ans+".","1/"+q1+" = "+(q2/q1)+"/"+q2+", плюс 1/"+q2+" = "+ans+".","1/"+q1+" = "+(q2/q1)+"/"+q2+", plus 1/"+q2+" = "+ans+"."),1)});
+  if(lv>=2)T.push(function(){var q=pick([4,6,8,10]),a=ri(3,q-1),b=ri(1,a-1),r=sm(a-b,q);
+    return mk("fsub",L("כמה זה "+a+"/"+q+" − "+b+"/"+q+"?","كم يساوي "+a+"/"+q+" − "+b+"/"+q+"؟","Сколько будет "+a+"/"+q+" − "+b+"/"+q+"?","What is "+a+"/"+q+" − "+b+"/"+q+"?"),"",r,[sm(a-b,q-b),sm(a+b>q?a:a+b,q),sm(a-b+1,q),sm(a-b,q*2)].filter(function(x){return x!==r}),
+     L("מחסרים את המונים, והמכנה נשאר.","نطرح البسطين ويبقى المقام.","Вычитаем числители, знаменатель остаётся.","Subtract the tops; the denominator stays."),L(a+" − "+b+" = "+(a-b)+", ולכן "+r+".",a+" − "+b+" = "+(a-b)+" إذن "+r+".",a+" − "+b+" = "+(a-b)+", значит "+r+".",a+" − "+b+" = "+(a-b)+", so "+r+"."),0)});
+  if(lv>=3)T.push(function(){var F=[[1,2,1,4,"1/8"],[1,2,1,3,"1/6"],[1,3,1,2,"1/6"],[1,2,3,4,"3/8"],[2,3,1,2,"1/3"],[3,4,1,2,"3/8"],[1,4,1,4,"1/16"],[2,3,3,4,"1/2"]],f=pick(F),ans=f[4];
+    return mk("fmul",L("כמה זה "+f[0]+"/"+f[1]+" × "+f[2]+"/"+f[3]+"?","كم يساوي "+f[0]+"/"+f[1]+" × "+f[2]+"/"+f[3]+"؟","Сколько будет "+f[0]+"/"+f[1]+" × "+f[2]+"/"+f[3]+"?","What is "+f[0]+"/"+f[1]+" × "+f[2]+"/"+f[3]+"?"),"",ans,[sm(f[0]+f[2],f[1]+f[3]),sm(f[0]*f[2],f[1]+f[3]),sm(f[0]+f[2],f[1]*f[3]),"1/"+(f[1]*f[3]+1)].filter(function(x){return x!==ans}),
+     L("כופלים מונה במונה ומכנה במכנה.","نضرب البسط في البسط والمقام في المقام.","Умножаем числитель на числитель и знаменатель на знаменатель.","Multiply top by top and bottom by bottom."),L((f[0]*f[2])+"/"+(f[1]*f[3])+" = "+ans+".",(f[0]*f[2])+"/"+(f[1]*f[3])+" = "+ans+".",(f[0]*f[2])+"/"+(f[1]*f[3])+" = "+ans+".",(f[0]*f[2])+"/"+(f[1]*f[3])+" = "+ans+"."),2)});
+  return pick(T)()};
+function f2(n){return (Math.round(n*100)/100).toFixed(2)}
+G.dec3=function(lv){var T=[];
+  T.push(function(){var set=[],x;while(set.length<4){x=ri(11,98);if(x%10&&set.indexOf(x)<0)set.push(x)}var a=set[0]/100,b=set[1]/100,c=set[2]/100,e=set[3]/100;
+    var v=[a,b,c,e],big=Math.random()<.5,ans=big?Math.max.apply(null,v):Math.min.apply(null,v);
+    return mk("hcmp",big?L("איזה מספר הגדול ביותר?","ما أكبر عدد؟","Какое число самое большое?","Which number is the biggest?"):L("איזה מספר הקטן ביותר?","ما أصغر عدد؟","Какое число самое маленькое?","Which number is the smallest?"),"",f2(ans),v.map(f2),
+     L("משווים קודם עשיריות, ואחר כך מאיות.","قارن الأعشار أولًا ثم الأجزاء من مئة.","Сравни сначала десятые, потом сотые.","Compare the tenths first, then the hundredths."),L(f2(ans)+(big?" הגדול ביותר.":" הקטן ביותר."),f2(ans)+(big?" الأكبر.":" الأصغر."),f2(ans)+(big?" — самое большое.":" — самое маленькое."),f2(ans)+(big?" is the biggest.":" is the smallest.")),0)});
+  T.push(function(){var d=lv>1,a=ri(105,990)/100,b=ri(105,490)/100,plus=Math.random()<.6;if(!plus&&b>=a)b=a/2;a=Math.round(a*100)/100;b=Math.round(b*100)/100;var r=plus?a+b:a-b,sym=plus?"+":"−";
+    return mk("hadd",L("כמה זה "+f2(a)+" "+sym+" "+f2(b)+"?","كم يساوي "+f2(a)+" "+sym+" "+f2(b)+"؟","Сколько будет "+f2(a)+" "+sym+" "+f2(b)+"?","What is "+f2(a)+" "+sym+" "+f2(b)+"?"),"",f2(r),[f2(r+.1),f2(Math.abs(r-.1)),f2(r+1),f2(Math.abs(r-1))].filter(function(x){return x!==f2(r)}),
+     L("כותבים את הנקודה העשרונית אחת מתחת לשנייה.","اكتب الفاصلة العشرية تحت الفاصلة.","Пиши запятую под запятой.","Line up the decimal points."),L(f2(a)+" "+sym+" "+f2(b)+" = "+f2(r)+".",f2(a)+" "+sym+" "+f2(b)+" = "+f2(r)+".",f2(a)+" "+sym+" "+f2(b)+" = "+f2(r)+".",f2(a)+" "+sym+" "+f2(b)+" = "+f2(r)+"."),1)});
+  if(lv>=2)T.push(function(){var m=pick([10,100,1000]),a=pick([3.5,0.7,12.4,0.25,4.6,0.08,1.2]),r=Math.round(a*m*1000)/1000,s=String(r);
+    return mk("hmul",L("כמה זה "+a+" × "+m+"?","كم يساوي "+a+" × "+m+"؟","Сколько будет "+a+" × "+m+"?","What is "+a+" × "+m+"?"),"",s,[String(Math.round(a*m*10)/100),String(Math.round(a*m*10)/10),String(Math.round(a*m/10*1000)/1000),String(a+m)].filter(function(x){return x!==s}),
+     L("כשכופלים ב-10, 100 או 1000 הנקודה זזה ימינה.","عند الضرب في 10 أو 100 أو 1000 تتحرك الفاصلة إلى اليمين.","При умножении на 10, 100, 1000 запятая сдвигается вправо.","When multiplying by 10, 100 or 1000 the point moves right."),L(a+" × "+m+" = "+s+".",a+" × "+m+" = "+s+".",a+" × "+m+" = "+s+".",a+" × "+m+" = "+s+"."),2)});
+  if(lv>=3)T.push(function(){var a=pick([0.5,1.5,2.5,0.25,0.4,1.2]),n=ri(2,9),r=Math.round(a*n*1000)/1000,s=String(r);
+    return mk("hwhole",L("כמה זה "+a+" × "+n+"?","كم يساوي "+a+" × "+n+"؟","Сколько будет "+a+" × "+n+"?","What is "+a+" × "+n+"?"),"",s,[String(Math.round(a*n*10)/100),String(Math.round((a*n+1)*100)/100),String(Math.round(a*n*10)/10),String(Math.round((a*n-.5)*100)/100)].filter(function(x){return x!==s}),
+     L("כופלים כמו במספרים שלמים, ואחר כך מחזירים את הנקודה.","نضرب كالأعداد الصحيحة ثم نضع الفاصلة.","Умножай как целые числа, потом поставь запятую.","Multiply like whole numbers, then place the point."),L(a+" × "+n+" = "+s+".",a+" × "+n+" = "+s+".",a+" × "+n+" = "+s+".",a+" × "+n+" = "+s+"."),2)});
+  return pick(T)()};
+G.pct=function(lv){var T=[];
+  T.push(function(){var p=pick([10,25,50,20]),q=100/p,n=q*ri(2,9),a=n*p/100;
+    return mk("pof",L("כמה זה "+p+"% מ-"+n+"?","كم يساوي "+p+"% من "+n+"؟","Сколько составляют "+p+"% от "+n+"?","What is "+p+"% of "+n+"?"),"",a,[n-a,a*2,a+p,n/2,a+1].filter(function(x){return x>0&&x!==a}),
+     L(p+"% הוא "+p+" מתוך 100. מחלקים ב-"+q+".",p+"% هو "+p+" من 100. نقسم على "+q+".",p+"% — это "+p+" из 100. Делим на "+q+".",p+"% is "+p+" out of 100. Divide by "+q+"."),L(n+" ÷ "+q+" = "+a+".",n+" ÷ "+q+" = "+a+".",n+" ÷ "+q+" = "+a+".",n+" ÷ "+q+" = "+a+"."),0)});
+  T.push(function(){var F=[[1,2,50],[1,4,25],[3,4,75],[1,5,20],[1,10,10],[2,5,40],[3,5,60],[7,10,70]],f=pick(F),ans=f[2]+"%";
+    return mk("f2p",L("כמה אחוזים זה "+f[0]+"/"+f[1]+"?","كم بالمئة هو "+f[0]+"/"+f[1]+"؟","Сколько процентов составляет "+f[0]+"/"+f[1]+"?","What percent is "+f[0]+"/"+f[1]+"?"),"",ans,[(f[2]+10)+"%",(f[2]>20?f[2]-10:f[2]+20)+"%",f[0]+"%",(100-f[2])+"%"].filter(function(x){return x!==ans}),
+     L("מביאים למכנה 100.","نحوّل إلى مقام 100.","Приведём к знаменателю 100.","Change the bottom to 100."),L(f[0]+"/"+f[1]+" = "+f[2]+"/100 = "+f[2]+"%.",f[0]+"/"+f[1]+" = "+f[2]+"/100 = "+f[2]+"%.",f[0]+"/"+f[1]+" = "+f[2]+"/100 = "+f[2]+"%.",f[0]+"/"+f[1]+" = "+f[2]+"/100 = "+f[2]+"%."),1)});
+  if(lv>=2)T.push(function(){var p=pick([10,20,25,50]),q=100/p,pr=q*ri(2,8)*(p===50?1:1)*(p===10?10:1)/(p===10?10:1),d=pr*p/100,r=pr-d;
+    return mk("disc",L("מחיר המוצר הוא "+pr+" שקלים ויש הנחה של "+p+"%. כמה משלמים?","سعر المنتج "+pr+" شيكل وفيه خصم "+p+"%. كم ندفع؟","Товар стоит "+pr+" ₪, скидка "+p+"%. Сколько платим?","An item costs "+pr+" shekels with a "+p+"% discount. How much do you pay?"),"",r,[d,pr+d,pr-p,r+1].filter(function(x){return x>0&&x!==r}),
+     L("קודם מחשבים כמה זו ההנחה, ואז מחסרים מהמחיר.","احسب الخصم أولًا ثم اطرحه من السعر.","Сначала найди скидку, потом вычти из цены.","First find the discount, then subtract it from the price."),L("ההנחה היא "+d+", ו-"+pr+" − "+d+" = "+r+".","الخصم "+d+" و"+pr+" − "+d+" = "+r+".","Скидка "+d+", и "+pr+" − "+d+" = "+r+".","The discount is "+d+", and "+pr+" − "+d+" = "+r+"."),2)});
+  if(lv>=3)T.push(function(){var tot=pick([20,25,50,40]),k=ri(1,tot/5-1)*5/ (tot===25?5:1),part=tot===25?ri(1,24):k,pc=part*100/tot,ans=pc+"%";
+    if(pc!==Math.round(pc))return G.pct(lv);
+    return mk("pofw",L("בכיתה "+tot+" ילדים, ו-"+part+" מהם באו עם כובע. כמה אחוזים זה?","في الصف "+tot+" طفلًا و"+part+" منهم جاؤوا بقبعة. كم النسبة المئوية؟","В классе "+tot+" детей, "+part+" пришли в шапках. Сколько это процентов?","There are "+tot+" children in the class and "+part+" wear a hat. What percent is that?"),"",ans,[(pc+10)+"%",(pc>20?pc-10:pc+20)+"%",part+"%",(100-pc)+"%"].filter(function(x){return x!==ans}),
+     L("מחלקים את החלק בשלם וכופלים ב-100.","اقسم الجزء على الكل واضرب في 100.","Раздели часть на целое и умножь на 100.","Divide the part by the whole and multiply by 100."),L(part+" ÷ "+tot+" × 100 = "+pc+".",part+" ÷ "+tot+" × 100 = "+pc+".",part+" ÷ "+tot+" × 100 = "+pc+".",part+" ÷ "+tot+" × 100 = "+pc+"."),2)});
+  return pick(T)()};
+G.ratio=function(lv){var T=[];
+  T.push(function(){var a=ri(1,5),b=ri(1,5);if(a===b)b++;var k=ri(2,4),ans=a+":"+b;
+    return mk("rat",L("בקופסה "+(a*k)+" כדורים אדומים ו-"+(b*k)+" כחולים. מה היחס בין אדומים לכחולים, בצורה הפשוטה?","في الصندوق "+(a*k)+" كرة حمراء و"+(b*k)+" زرقاء. ما النسبة بين الحمراء والزرقاء بأبسط صورة؟","В коробке "+(a*k)+" красных и "+(b*k)+" синих шаров. Каково отношение красных к синим в простейшем виде?","A box has "+(a*k)+" red balls and "+(b*k)+" blue balls. What is the ratio of red to blue in simplest form?"),bagVis([a*k,b*k],["#e8453c","#2f7fd8"]),ans,[b+":"+a,(a*k)+":"+(b*k),(a+k)+":"+(b+k),a+":"+(b+1)].filter(function(x){return x!==ans}),
+     L("מחלקים את שני המספרים באותו מספר עד שאי אפשר יותר.","اقسم العددين على العدد نفسه حتى لا يمكن أكثر.","Дели оба числа на одно и то же, пока можно.","Divide both numbers by the same number until you can't."),L((a*k)+":"+(b*k)+" = "+ans+" כשמחלקים ב-"+k+".",(a*k)+":"+(b*k)+" = "+ans+" بالقسمة على "+k+".",(a*k)+":"+(b*k)+" = "+ans+" при делении на "+k+".",(a*k)+":"+(b*k)+" = "+ans+" after dividing by "+k+"."),0)});
+  T.push(function(){var a=ri(2,4),b=ri(a+1,6),k=ri(2,5),ans=b*k;
+    return mk("rscale",L("במתכון יש "+a+" כוסות קמח על כל "+b+" כוסות מים. כמה כוסות מים צריך ל-"+(a*k)+" כוסות קמח?","في الوصفة "+a+" أكواب طحين لكل "+b+" أكواب ماء. كم كوب ماء لـ"+(a*k)+" أكواب طحين؟","В рецепте "+a+" стакана муки на "+b+" стакана воды. Сколько воды нужно на "+(a*k)+" стаканов муки?","A recipe uses "+a+" cups of flour for every "+b+" cups of water. How many cups of water for "+(a*k)+" cups of flour?"),"",ans,[ans+b,a*k+b,ans-1,b+k].filter(function(x){return x>0&&x!==ans}),
+     L("בודקים כמה פעמים היחס חוזר.","اعرف كم مرة تتكرر النسبة.","Узнай, сколько раз повторяется отношение.","Find how many times the ratio repeats."),L((a*k)+" ÷ "+a+" = "+k+", ו-"+k+" × "+b+" = "+ans+".",(a*k)+" ÷ "+a+" = "+k+" و"+k+" × "+b+" = "+ans+".",(a*k)+" ÷ "+a+" = "+k+", и "+k+" × "+b+" = "+ans+".",(a*k)+" ÷ "+a+" = "+k+", and "+k+" × "+b+" = "+ans+"."),1)});
+  T.push(function(){var n=lv===1?3:4,avg=ri(4,20),arr=[],s=0,i;for(i=0;i<n-1;i++){var x=avg+ri(-3,3);arr.push(x);s+=x}arr.push(avg*n-s);if(arr[n-1]<1)return G.ratio(lv);
+    var txt=arr.join(", ");
+    return mk("avg",L("מה הממוצע של המספרים "+txt+"?","ما متوسط الأعداد "+txt+"؟","Каково среднее значение чисел "+txt+"?","What is the average of "+txt+"?"),"",avg,[avg+1,avg-1,avg+2,Math.max.apply(null,arr)].filter(function(x){return x!==avg}),
+     L("מחברים את כולם ומחלקים בכמות המספרים.","اجمع الكل واقسم على عدد الأعداد.","Сложи все и раздели на количество чисел.","Add them all and divide by how many there are."),L(arr.join(" + ")+" = "+(avg*n)+", ו-"+(avg*n)+" ÷ "+n+" = "+avg+".",arr.join(" + ")+" = "+(avg*n)+" و"+(avg*n)+" ÷ "+n+" = "+avg+".",arr.join(" + ")+" = "+(avg*n)+", и "+(avg*n)+" ÷ "+n+" = "+avg+".",arr.join(" + ")+" = "+(avg*n)+", and "+(avg*n)+" ÷ "+n+" = "+avg+"."),2)});
+  return pick(T)()};
+G.tri=function(lv){var T=[];
+  T.push(function(){var a=ri(30,80),b=ri(30,80),c=180-a-b;if(c<20)return G.tri(lv);
+    return mk("tsum",L("במשולש יש שתי זוויות: "+dg(a)+" ו-"+dg(b)+". מהי הזווית השלישית?","في مثلث زاويتان "+dg(a)+" و"+dg(b)+". ما الزاوية الثالثة؟","В треугольнике два угла: "+a+"° и "+b+"°. Чему равен третий угол?","A triangle has angles of "+a+"° and "+b+"°. What is the third angle?"),"",c+"°",[(c+10)+"°",(c-10)+"°",(a+b)+"°",(c+5)+"°"].filter(function(x){return x!==c+"°"}),
+     L("סכום הזוויות במשולש הוא 180°.","مجموع زوايا المثلث 180°.","Сумма углов треугольника равна 180°.","The angles of a triangle add up to 180°."),L("180 − "+a+" − "+b+" = "+c+".","180 − "+a+" − "+b+" = "+c+".","180 − "+a+" − "+b+" = "+c+".","180 − "+a+" − "+b+" = "+c+"."),0)});
+  T.push(function(){var a=ri(60,110),b=ri(70,120),c=ri(60,100),d=360-a-b-c;if(d<30||d>140)return G.tri(lv);
+    return mk("qsum",L("במרובע יש זוויות "+dg(a)+", "+dg(b)+" ו-"+dg(c)+". מהי הזווית הרביעית?","في رباعي زوايا "+dg(a)+" و"+dg(b)+" و"+dg(c)+". ما الزاوية الرابعة؟","В четырёхугольнике углы "+a+"°, "+b+"° и "+c+"°. Чему равен четвёртый угол?","A quadrilateral has angles "+a+"°, "+b+"° and "+c+"°. What is the fourth angle?"),"",d+"°",[(d+10)+"°",(d-10)+"°",(180-d)+"°",(d+20)+"°"].filter(function(x){return x!==d+"°"}),
+     L("סכום הזוויות במרובע הוא 360°.","مجموع زوايا الرباعي 360°.","Сумма углов четырёхугольника равна 360°.","The angles of a quadrilateral add up to 360°."),L("360 − "+a+" − "+b+" − "+c+" = "+d+".","360 − "+a+" − "+b+" − "+c+" = "+d+".","360 − "+a+" − "+b+" − "+c+" = "+d+".","360 − "+a+" − "+b+" − "+c+" = "+d+"."),1)});
+  T.push(function(){var b=ri(2,6)*2,h=ri(2,9),a=b*h/2;
+    return mk("tarea",L("מה השטח של המשולש, בסנטימטרים רבועים?","ما مساحة المثلث بالسنتيمتر المربع؟","Какова площадь треугольника в квадратных сантиметрах?","What is the area of the triangle, in square centimeters?"),triVis(b,h),a,[b*h,b+h,a+h,a-1,2*b+h].filter(function(x){return x>0&&x!==a}),
+     L("משולש הוא חצי ממלבן: בסיס כפול גובה, חלקי 2.","المثلث نصف مستطيل: القاعدة × الارتفاع ÷ 2.","Треугольник — половина прямоугольника: основание × высота ÷ 2.","A triangle is half a rectangle: base × height ÷ 2."),L(b+" × "+h+" ÷ 2 = "+a+".",b+" × "+h+" ÷ 2 = "+a+".",b+" × "+h+" ÷ 2 = "+a+".",b+" × "+h+" ÷ 2 = "+a+"."),2)});
+  if(lv>=2)T.push(function(){var a=pick([60]),k=pick(["eq","iso"]);
+    if(k==="eq")return mk("teq",L("במשולש שווה צלעות כל הזוויות שוות. כמה מעלות בכל זווית?","في المثلث متساوي الأضلاع كل الزوايا متساوية. كم درجة كل زاوية؟","В равностороннем треугольнике все углы равны. Сколько градусов в каждом?","In an equilateral triangle all angles are equal. How many degrees is each one?"),"","60°",["30°","45°","90°","120°"],
+      L("180 מחולק ל-3 זוויות שוות.","180 مقسومة على 3 زوايا متساوية.","180 делим на 3 равных угла.","180 shared between 3 equal angles."),L("180 ÷ 3 = 60.","180 ÷ 3 = 60.","180 ÷ 3 = 60.","180 ÷ 3 = 60."),0);
+    var apx=pick([40,50,70,80]),base=(180-apx)/2;
+    return mk("tiso",L("במשולש שווה שוקיים זווית הראש היא "+dg(apx)+". כמה מעלות בכל זווית בסיס?","في مثلث متساوي الساقين زاوية الرأس "+dg(apx)+". كم درجة كل زاوية قاعدة؟","В равнобедренном треугольнике угол при вершине "+apx+"°. Сколько градусов в каждом угле при основании?","In an isosceles triangle the top angle is "+apx+"°. How many degrees is each base angle?"),"",base+"°",[(180-apx)+"°",apx+"°",(base+10)+"°",(base-10)+"°"].filter(function(x){return x!==base+"°"}),
+     L("זוויות הבסיס שוות. מחסרים מ-180 ומחלקים ב-2.","زاويتا القاعدة متساويتان. اطرح من 180 واقسم على 2.","Углы при основании равны. Вычти из 180 и раздели на 2.","The base angles are equal. Subtract from 180 and halve."),L("(180 − "+apx+") ÷ 2 = "+base+".","(180 − "+apx+") ÷ 2 = "+base+".","(180 − "+apx+") ÷ 2 = "+base+".","(180 − "+apx+") ÷ 2 = "+base+"."),1)});
+  return pick(T)()};
+G.vol=function(lv){var T=[];
+  T.push(function(){var l=ri(2,8),w=ri(2,5),h=ri(2,6),v=l*w*h;
+    return mk("vbox",L("מה הנפח של התיבה, בסנטימטרים מעוקבים?","ما حجم الصندوق بالسنتيمتر المكعب؟","Каков объём коробки в кубических сантиметрах?","What is the volume of the box, in cubic centimeters?"),boxVis(l,w,h),v,[l*w+h,l+w+h,2*(l*w+l*h+w*h),v+l,v-w].filter(function(x){return x>0&&x!==v}),
+     L("נפח הוא אורך כפול רוחב כפול גובה.","الحجم = الطول × العرض × الارتفاع.","Объём = длина × ширина × высота.","Volume = length × width × height."),L(l+" × "+w+" × "+h+" = "+v+".",l+" × "+w+" × "+h+" = "+v+".",l+" × "+w+" × "+h+" = "+v+".",l+" × "+w+" × "+h+" = "+v+"."),1)});
+  T.push(function(){var s=ri(2,6),v=s*s*s;
+    return mk("vcube",L("לקובייה יש צלע של "+s+" ס״מ. מה הנפח שלה?","مكعب طول ضلعه "+s+" سم. ما حجمه؟","У куба ребро "+s+" см. Каков его объём?","A cube has edges of "+s+" cm. What is its volume?"),boxVis(s,s,s),v,[s*s,3*s,6*s*s,v+s].filter(function(x){return x!==v}),
+     L("בקובייה כל שלוש המידות שוות: צלע כפול צלע כפול צלע.","في المكعب الأبعاد الثلاثة متساوية: ضلع × ضلع × ضلع.","У куба три измерения равны: ребро × ребро × ребро.","In a cube all three sides are equal: side × side × side."),L(s+" × "+s+" × "+s+" = "+v+".",s+" × "+s+" × "+s+" = "+v+".",s+" × "+s+" × "+s+" = "+v+".",s+" × "+s+" × "+s+" = "+v+"."),0)});
+  if(lv>=2)T.push(function(){var l=ri(2,6),w=ri(2,5),h=ri(2,6),v=l*w*h,lay=l*w;
+    return mk("vmiss",L("נפח תיבה הוא "+v+" סמ״ק, האורך "+l+" והרוחב "+w+". מה הגובה?","حجم صندوق "+v+" سم³ والطول "+l+" والعرض "+w+". ما الارتفاع؟","Объём коробки "+v+" см³, длина "+l+", ширина "+w+". Какова высота?","A box has a volume of "+v+" cm³, length "+l+" and width "+w+". What is the height?"),"",h,[h+1,h-1,v/l,l+w].filter(function(x){return x>0&&x!==h&&Number.isInteger(x)}),
+     L("מחלקים את הנפח בשטח הבסיס.","اقسم الحجم على مساحة القاعدة.","Раздели объём на площадь основания.","Divide the volume by the area of the base."),L(l+" × "+w+" = "+lay+", ו-"+v+" ÷ "+lay+" = "+h+".",l+" × "+w+" = "+lay+" و"+v+" ÷ "+lay+" = "+h+".",l+" × "+w+" = "+lay+", и "+v+" ÷ "+lay+" = "+h+".",l+" × "+w+" = "+lay+", and "+v+" ÷ "+lay+" = "+h+"."),2)});
+  if(lv>=3)T.push(function(){var l=pick([10,20,50]),w=pick([10,20]),h=pick([10,5,25]),v=l*w*h,li=v/1000;if(!Number.isInteger(li)&&li*2!==Math.round(li*2))return G.vol(lv);
+    var ans=String(li);
+    return mk("vliter",L("לאקווריום אורך "+l+" ס״מ, רוחב "+w+" ס״מ וגובה "+h+" ס״מ. כמה ליטרים נכנסים בו? (ליטר = 1000 סמ״ק)","حوض أسماك طوله "+l+" سم وعرضه "+w+" سم وارتفاعه "+h+" سم. كم لترًا يتسع؟ (اللتر = 1000 سم³)","Аквариум: длина "+l+" см, ширина "+w+" см, высота "+h+" см. Сколько литров в него войдёт? (1 л = 1000 см³)","A fish tank is "+l+" cm long, "+w+" cm wide and "+h+" cm high. How many liters fit? (1 liter = 1000 cm³)"),"",ans,[String(li*10),String(li/10),String(li+1),String(v)].filter(function(x){return x!==ans}),
+     L("מחשבים נפח, ואז מחלקים ב-1000.","احسب الحجم ثم اقسم على 1000.","Найди объём, потом раздели на 1000.","Find the volume, then divide by 1000."),L(l+" × "+w+" × "+h+" = "+v+", ו-"+v+" ÷ 1000 = "+li+".",l+" × "+w+" × "+h+" = "+v+" و"+v+" ÷ 1000 = "+li+".",l+" × "+w+" × "+h+" = "+v+", и "+v+" ÷ 1000 = "+li+".",l+" × "+w+" × "+h+" = "+v+", and "+v+" ÷ 1000 = "+li+"."),2)});
+  return pick(T)()};
+G.neg=function(lv){var T=[];
+  T.push(function(){var v=ri(-9,9);if(v===0)v=-4;
+    return mk("nread",L("איזה מספר מסומן באדום?","أي عدد مُعلَّم بالأحمر؟","Какое число отмечено красным?","Which number is marked in red?"),negLine(v),String(v),[String(-v),String(v+1),String(v-1),String(v>0?v-2:v+2)].filter(function(x){return x!==String(v)}),
+     L("מימין לאפס המספרים חיוביים, משמאל לאפס הם שליליים.","يمين الصفر الأعداد موجبة ويساره سالبة.","Справа от нуля числа положительные, слева — отрицательные.","Right of zero the numbers are positive, left of zero they are negative."),L("הנקודה היא ב-"+v+".","النقطة عند "+v+".","Точка в "+v+".","The point is at "+v+"."),0)});
+  T.push(function(){var a=ri(-9,5),b;do{b=ri(-9,9)}while(b===a);var c;do{c=ri(-9,9)}while(c===a||c===b);var s=[a,b,c],mn=Math.min.apply(null,s);
+    return mk("ncmp",L("איזה מספר הקטן ביותר?","ما أصغر عدد؟","Какое число самое маленькое?","Which number is the smallest?"),"",String(mn),s.map(String).concat([String(mn+1===a||mn+1===b||mn+1===c?mn-1:mn+1)]),
+     L("ככל שהמספר יותר שמאלה על הציר, הוא קטן יותר.","كلما كان العدد أبعد إلى اليسار كان أصغر.","Чем левее на прямой, тем число меньше.","The further left on the line, the smaller the number."),L(mn+" הכי שמאלי.",mn+" هو الأبعد يسارًا.",mn+" — самое левое.",mn+" is furthest left."),1)});
+  if(lv>=2)T.push(function(){var t=ri(-8,6),d=ri(2,8),r=t-d;
+    return mk("ntemp",L("הטמפרטורה היא "+t+" מעלות והיא יורדת ב-"+d+" מעלות. מה הטמפרטורה עכשיו?","درجة الحرارة "+t+" وتنخفض "+d+" درجات. كم أصبحت؟","Температура "+t+" градусов и падает на "+d+". Сколько стало?","The temperature is "+t+" degrees and drops by "+d+". What is it now?"),negLine(t),String(r),[String(t+d),String(-r),String(r+1),String(d-t)].filter(function(x){return x!==String(r)}),
+     L("יורדים שמאלה על ציר המספרים.","ننزل يسارًا على خط الأعداد.","Двигаемся влево по числовой прямой.","Move left on the number line."),L(t+" − "+d+" = "+r+".",t+" − "+d+" = "+r+".",t+" − "+d+" = "+r+".",t+" − "+d+" = "+r+"."),2)});
+  if(lv>=2)T.push(function(){var x=ri(-4,4),y=ri(-4,4);if(!x||!y)return G.neg(lv);
+    return mk("n4",L("מהן הקואורדינטות של הנקודה האדומה?","ما إحداثيات النقطة الحمراء؟","Каковы координаты красной точки?","What are the coordinates of the red point?"),coord4([[x,y]]),"("+x+", "+y+")",["("+(-x)+", "+y+")","("+x+", "+(-y)+")","("+y+", "+x+")","("+(-x)+", "+(-y)+")"].filter(function(z){return z!=="("+x+", "+y+")"}),
+     L("קודם ימינה או שמאלה, אחר כך למעלה או למטה.","أولًا يمينًا أو يسارًا ثم للأعلى أو للأسفل.","Сначала вправо или влево, потом вверх или вниз.","First right or left, then up or down."),L("("+x+", "+y+"): "+(x<0?"שמאלה":"ימינה")+" "+Math.abs(x)+", "+(y<0?"למטה":"למעלה")+" "+Math.abs(y)+".","("+x+", "+y+"): "+(x<0?"يسارًا":"يمينًا")+" "+Math.abs(x)+" و"+(y<0?"للأسفل":"للأعلى")+" "+Math.abs(y)+".","("+x+", "+y+"): "+(x<0?"влево":"вправо")+" "+Math.abs(x)+", "+(y<0?"вниз":"вверх")+" "+Math.abs(y)+".","("+x+", "+y+"): "+(x<0?"left":"right")+" "+Math.abs(x)+", "+(y<0?"down":"up")+" "+Math.abs(y)+"."),1)});
+  if(lv>=3)T.push(function(){var x=ri(1,4),y=ri(1,4);
+    return mk("nref",L("הנקודה האדומה ב-("+x+", "+y+"). איפה היא אחרי שיקוף מעבר לציר האנכי?","النقطة الحمراء عند ("+x+", "+y+"). أين تصبح بعد الانعكاس حول المحور العمودي؟","Красная точка в ("+x+", "+y+"). Где она окажется после отражения через вертикальную ось?","The red point is at ("+x+", "+y+"). Where is it after reflecting across the vertical axis?"),coord4([[x,y]]),"("+(-x)+", "+y+")",["("+x+", "+(-y)+")","("+(-x)+", "+(-y)+")","("+y+", "+x+")","("+(-y)+", "+x+")"],
+     L("בשיקוף מעבר לציר האנכי, הגובה נשאר, והצד מתחלף.","في الانعكاس حول المحور العمودي يبقى الارتفاع ويتغير الجانب.","При отражении через вертикальную ось высота та же, а сторона меняется.","When reflecting across the vertical axis the height stays and the side flips."),L("מ-("+x+", "+y+") ל-("+(-x)+", "+y+").","من ("+x+", "+y+") إلى ("+(-x)+", "+y+").","Из ("+x+", "+y+") в ("+(-x)+", "+y+").","From ("+x+", "+y+") to ("+(-x)+", "+y+")."),2)});
+  return pick(T)()};
+G.prob=function(lv){var T=[],COLS=[["#e8453c",L("אדום","أحمر","красный","red")],["#2f7fd8",L("כחול","أزرق","синий","blue")],["#2eaa5b",L("ירוק","أخضر","зелёный","green")]];
+  T.push(function(){var a=ri(1,6),b=ri(1,6),c=ri(1,4),tot=a+b+c,cn=[a,b,c],mx=Math.max.apply(null,cn);if(cn.filter(function(x){return x===mx}).length>1)return G.prob(lv);var i=cn.indexOf(mx);
+    return mk("pmost",L("מוציאים כדור בלי להסתכל. באיזה צבע סביר ביותר לקבל?","نسحب كرة دون النظر. بأي لون يكون السحب الأكثر احتمالًا؟","Достаём шар не глядя. Какой цвет вероятнее всего?","You pick a ball without looking. Which color is most likely?"),bagVis(cn,[COLS[0][0],COLS[1][0],COLS[2][0]]),COLS[i][1],COLS.filter(function(x,j){return j!==i}).map(function(x){return x[1]}).concat([L("כולם באותה מידה","كلها بالقدر نفسه","все одинаково","all the same")]),
+     L("הצבע שיש ממנו הכי הרבה כדורים הוא הסביר ביותר.","اللون الأكثر كرات هو الأكثر احتمالًا.","Больше всего шаров — самый вероятный цвет.","The color with the most balls is the most likely."),L("יש הכי הרבה כדורים "+COLS[i][1].he+".","أكثر الكرات "+COLS[i][1].ar+".","Больше всего шаров цвета: "+COLS[i][1].ru+".","The most balls are "+COLS[i][1].en+"."),0)});
+  T.push(function(){var a=ri(1,5),b=ri(1,5);if(a===b)b=a+1;var tot=a+b,ans=sm(a,tot);
+    return mk("pfrac",L("בשקית "+a+" כדורים אדומים ו-"+b+" כחולים. מה ההסתברות להוציא כדור אדום? (כשבר)","في الكيس "+a+" كرات حمراء و"+b+" زرقاء. ما احتمال سحب كرة حمراء؟ (ككسر)","В мешке "+a+" красных и "+b+" синих шаров. Какова вероятность достать красный? (дробью)","A bag has "+a+" red and "+b+" blue balls. What is the chance of picking red? (as a fraction)"),bagVis([a,b],["#e8453c","#2f7fd8"]),ans,[sm(b,tot),sm(a,tot+1),sm(a+1,tot+1),sm(1,tot+2),sm(a,tot+2)].filter(function(x){return x!==ans}),
+     L("מספר הכדורים האדומים חלקי כל הכדורים.","عدد الكرات الحمراء على عدد كل الكرات.","Красные шары делим на все шары.","Red balls divided by all the balls."),L(a+" מתוך "+tot+" = "+ans+".",a+" من "+tot+" = "+ans+".",a+" из "+tot+" = "+ans+".",a+" out of "+tot+" = "+ans+"."),1)});
+  if(lv>=2)T.push(function(){var k=pick([["die6",L("קובייה רגילה (1 עד 6)","نرد عادي (1 إلى 6)","обычный кубик (1–6)","a normal die (1 to 6)"),L("יוצא מספר זוגי","يظهر عدد زوجي","выпадет чётное число","an even number comes up"),"1/2"],["die6",L("קובייה רגילה (1 עד 6)","نرد عادي (1 إلى 6)","обычный кубик (1–6)","a normal die (1 to 6)"),L("יוצא 6","يظهر 6","выпадет 6","a 6 comes up"),"1/6"],["die6",L("קובייה רגילה (1 עד 6)","نرد عادي (1 إلى 6)","обычный кубик (1–6)","a normal die (1 to 6)"),L("יוצא מספר קטן מ-3","يظهر عدد أصغر من 3","выпадет число меньше 3","a number less than 3 comes up"),"1/3"],["die6",L("קובייה רגילה (1 עד 6)","نرد عادي (1 إلى 6)","обычный кубик (1–6)","a normal die (1 to 6)"),L("יוצא מספר גדול מ-4","يظهر عدد أكبر من 4","выпадет число больше 4","a number greater than 4 comes up"),"1/3"]]),ans=k[3];
+    return mk("pdie",L("מטילים "+k[1].he+". מה ההסתברות ש"+k[2].he+"?","نرمي "+k[1].ar+". ما احتمال أن "+k[2].ar+"؟","Бросаем "+k[1].ru+". Какова вероятность, что "+k[2].ru+"?","We roll "+k[1].en+". What is the chance that "+k[2].en+"?"),"",ans,["1/2","1/6","1/3","2/3","5/6"].filter(function(x){return x!==ans}).slice(0,3),
+     L("סופרים כמה תוצאות מתאימות מתוך 6.","عدّ النتائج المناسبة من 6.","Посчитай подходящие исходы из 6.","Count the matching outcomes out of 6."),L("התוצאות המתאימות מתוך 6 נותנות "+ans+".","النتائج المناسبة من 6 تعطي "+ans+".","Подходящие исходы из 6 дают "+ans+".","The matching outcomes out of 6 give "+ans+"."),1)});
+  if(lv>=2)T.push(function(){var k=pick([[L("יוצא 7 בקובייה רגילה","يظهر 7 على نرد عادي","на обычном кубике выпадет 7","a normal die shows 7"),L("בלתי אפשרי","مستحيل","невозможно","impossible")],[L("יוצא מספר קטן מ-7 בקובייה רגילה","يظهر عدد أصغر من 7 على نرد عادي","на обычном кубике выпадет число меньше 7","a normal die shows a number less than 7"),L("בטוח","مؤكد","точно","certain")],[L("יוצא 3 בקובייה רגילה","يظهر 3 على نرد عادي","на обычном кубике выпадет 3","a normal die shows 3"),L("אפשרי אבל לא בטוח","ممكن لكن غير مؤكد","возможно, но не наверняка","possible but not certain")]]);
+    var all=[L("בלתי אפשרי","مستحيل","невозможно","impossible"),L("בטוח","مؤكد","точно","certain"),L("אפשרי אבל לא בטוח","ممكن لكن غير مؤكد","возможно, но не наверняка","possible but not certain")];
+    return mk("pcert",L("מה נכון על המקרה: "+k[0].he+"?","ما الصحيح عن الحالة: "+k[0].ar+"؟","Что верно для случая: "+k[0].ru+"?","What is true about this: "+k[0].en+"?"),"",k[1],all.filter(function(x){return x.he!==k[1].he}).concat([L("אי אפשר לדעת","لا يمكن أن نعرف","нельзя узнать","we cannot tell")]),
+     L("בטוח: תמיד קורה. בלתי אפשרי: אף פעם לא.","مؤكد: يحدث دائمًا. مستحيل: لا يحدث أبدًا.","Точно — бывает всегда. Невозможно — не бывает никогда.","Certain: always happens. Impossible: never happens."),L("התשובה: "+k[1].he+".","الجواب: "+k[1].ar+".","Ответ: "+k[1].ru+".","The answer: "+k[1].en+"."),2)});
+  return pick(T)()};
 /* ===== units + lessons ===== */
 var UNITS=[
  {id:"nums",c:"#e8453c",n:L("מספרים עד 100","الأعداد حتى 100","Числа до 100","Numbers to 100"),d:L("ספירה, עשרות ואחדות, השוואה וציר המספרים","العدّ والعشرات والآحاد والمقارنة وخط الأعداد","Счёт, десятки и единицы, сравнение, числовой луч","Counting, tens and ones, comparing, the number line")},
@@ -796,7 +946,7 @@ LESSONS.coord=[{t:L("כדי למצוא נקודה על הרשת: קודם הול
 LESSONS.mon2=[{t:L("בבעיה בשני צעדים עושים צעד אחד, ואז צעד שני עם התוצאה.","في المسألة بخطوتين نفعل خطوة ثم خطوة ثانية بالنتيجة.","В задаче в два шага делаем один шаг, потом второй с результатом.","In a two-step problem you do one step, then a second step with the result."),v:function(){return ""}},
  {t:L("כשקונים כמה דברים שווים, קודם כופלים: מחיר אחד כפול כמות.","عند شراء عدة أشياء متساوية نضرب أولًا: السعر × العدد.","Если покупаем несколько одинаковых вещей, сначала умножаем: цена × количество.","When you buy several equal things, multiply first: price × amount."),v:function(){return ""}},
  {t:L("עודף הוא מה ששילמנו פחות המחיר. מחסרים את המחיר מהתשלום.","الباقي هو ما دفعناه ناقص الثمن. نطرح الثمن من المبلغ المدفوع.","Сдача — это то, что заплатили, минус цена. Вычитаем цену из суммы.","Change is what you paid minus the price. Subtract the price from the payment."),v:function(){return ""}}];
-var BUILD="o6 · 2026-10-04";
+var BUILD="o7 · 2026-10-04";
 /* ===== UI strings ===== */
 var STR={
 he:{brand:"מתמטיקה מעבר לחשבון",title:"מתמטיקה ליסודי",tag:"צורות, מדידות, כסף, שברים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -857,10 +1007,16 @@ var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null;
 var VF=/(female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
 var VM=/(\bmale\b|david|mark|asaf|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
 function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
-function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
-  var f=vs.filter(function(v){return VF.test(v.name)&&!VM.test(v.name)});if(f.length)return {v:f[0],fem:true};
-  var nm=vs.filter(function(v){return !VM.test(v.name)});if(nm.length)return {v:nm[0],fem:false};
-  return {v:vs[0]||null,fem:false}}
+function pickVoice(){
+  var key=S.lang,pins=pickVoice._session||(pickVoice._session={}),pin=pins[key];
+  if(pin)return pin;
+  var code=LCODE[key],pre=code.slice(0,2),vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
+  var f=vs.filter(function(v){return VF.test(v.name)&&!VM.test(v.name)});
+  var nm=vs.filter(function(v){return !VM.test(v.name)});
+  var v=f[0]||nm[0]||vs[0]||null, result={v:v,fem:!!f.length};
+  if(v)pins[key]=result;
+  return result;
+}
 function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.raw!=null){HL.el.textContent=HL.el.dataset.raw}HL.el=null}
 function hlPrep(el,text){hlClear();if(!el||el.children.length)return;el.dataset.raw=el.textContent;HL.el=el;HL.raw=el.textContent;HL.got=false;
   var out="",starts=[],re=/\S+|\s+/g,m,pos=0,idx=0;HL.starts=[];
@@ -908,7 +1064,7 @@ function tutorBtn(dis){return (window.TUTOR&&TUTOR.on&&TUTOR.on())?'<button clas
 function listenRow(sayId){var t=T();return '<div class="row" style="margin:4px 0 8px"><button class="btn play" data-a="say" data-t="'+sayId+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M6 4l14 8-14 8z"/></svg>'+esc(t.listen)+'</button><button class="btn stop" data-a="stop"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>'+esc(t.stop)+'</button><button class="btn slow" data-a="slowsay" data-t="'+sayId+'">'+esc(t.slow)+'</button></div>'}
 function spk(a){return '<button class="sp" data-a="'+a.a+'" '+(a.k!=null?'data-k="'+a.k+'"':'')+' aria-label="'+esc(T().listen)+'"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8c2 2 2 6 0 8" stroke="#fff" fill="none" stroke-width="2"/></svg></button>'}
 function homeView(){var t=T(),h='<h1 data-say id="h1">'+esc(t.title)+'</h1><p class="sub" id="hs">'+esc(t.tag)+'</p>'+listenRow("home");
-  h+='<div class="bands"><button class="band" data-a="band" data-b="1" aria-pressed="'+(S.band===1)+'">'+esc(t.band1)+'</button><button class="band" data-a="band" data-b="2" aria-pressed="'+(S.band===2)+'">'+esc(t.band2)+'</button><button class="band soon" disabled>'+esc(t.band3)+'<small>'+esc(t.soon)+'</small></button></div>';
+  h+='<div class="bands"><button class="band" data-a="band" data-b="1" aria-pressed="'+(S.band===1)+'">'+esc(t.band1)+'</button><button class="band" data-a="band" data-b="2" aria-pressed="'+(S.band===2)+'">'+esc(t.band2)+'</button><button class="band" data-a="band" data-b="3" aria-pressed="'+(S.band===3)+'">'+esc(t.band3)+'</button></div>';
   h+='<h2>'+esc(t.pick)+'</h2><div class="units">';
   UNITS.filter(function(u){return u.band===S.band}).forEach(function(u){h+='<button class="unit" style="--c:'+u.c+'" data-a="unit" data-u="'+u.id+'"><span class="ico">'+iconSvg(u.id==="pattern"?"pattern":u.id==="frac"?"frac":u.id)+'</span><span><span class="nm" style="display:block">'+esc(lt(u.n))+'</span><span class="ds">'+esc(lt(u.d))+'</span></span>'+(S.done[u.id]?'<span class="ok">✓</span>':'')+'</button>'});
   h+='</div><p class="credit">'+esc(t.credit)+' <a href="https://pop.education.gov.il" target="_blank" rel="noopener">'+esc(t.crediL)+'</a><br>'+esc(t.privacy)+'</p>';return h}
@@ -921,8 +1077,9 @@ function lessonView(){var t=T(),u=unitById(V.unit),ls=LESSONS[V.unit],st=ls[V.st
   var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="dots" style="margin-top:12px">'+ls.map(function(_,i){return '<i class="'+(i<V.step?"on":i===V.step?"cur":"")+'"></i>'}).join("")+'</div>';
   h+='<div class="card stepcard"><div class="sub">'+esc(fmt(t.stepOf,{a:V.step+1,b:n}))+'</div>'+listenRow("lesson")+'<div class="qtext" id="lt" data-say>'+esc(txt)+'</div><div class="vis">'+st.v()+'</div></div>';
   h+='<div style="margin:0 0 12px">'+tutorBtn()+'</div><div class="row">'+(V.step>0?'<button class="btn ghost" data-a="lprev">'+esc(t.prev)+'</button>':'')+(V.step<n-1?'<button class="btn next" data-a="lnext">'+esc(t.next)+'</button>':'<button class="btn next" data-a="start" data-l="1">'+esc(t.lessonEnd)+'</button>')+'</div>';return h}
-function mkQ(unit,lv){var g=G[unit],l=lv===4?pick([1,2,3,3]):lv,q=g(l),n=0,prev=P&&P.list&&P.list[P.list.length-1];
-  while(prev&&n<6&&lt(prev.q)===lt(q.q)&&prev.o.map(function(o){return o.id}).join()===q.o.map(function(o){return o.id}).join()){q=g(l);n++}return q}
+function qkey(q){return lt(q.q)+"|"+(q.vis||"")+"|"+(q.visL?lt(q.visL):"")}
+function mkQ(unit,lv){var g=G[unit],l=lv===4?pick([1,2,3,3]):lv,q=g(l),n=0,seen={};(P&&P.list||[]).forEach(function(p){seen[qkey(p)]=1});
+  while(n<40&&seen[qkey(q)]){q=g(l);n++}return q}
 function startRound(lv){P={unit:V.unit,lv:lv,list:[],i:0,picked:null,hints:0,hintShown:false,exShown:false,streak:0,missed:[]};P.list=[];
   for(var i=0;i<8;i++)P.list.push(mkQ(V.unit,lv));view="practice";P.cur=P.list[0];render()}
 function practiceView(){var t=T(),q=P.list[P.i],n=P.list.length,u=unitById(P.unit);
@@ -999,7 +1156,7 @@ window.addEventListener("pagehide",function(){stopSpeak()});
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-elem",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o6-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o7-pwa1").catch(function(){})});
 })();
 </script>
 

@@ -357,7 +357,7 @@ html[lang="en"] body{letter-spacing:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r36 · 2026-10-04";
+var BUILD="r37 · 2026-10-04";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -1007,7 +1007,20 @@ function voicesFor(code){
   });
 }
 function bestVoice(code){
-  var pool=voicesFor(code); if(!pool.length)return null;
+  var pool=voicesFor(code); if(!pool.length)return (bestVoice._session||{})[String(code).toLowerCase().slice(0,2)] ? bestVoice._session[String(code).toLowerCase().slice(0,2)].v : null;
+  /* Keep one voice per language. A failed network voice may only fall
+     back to the same gender; never to the browser's unclassified default. */
+  var pins=bestVoice._session||(bestVoice._session={}), key=String(code).toLowerCase().slice(0,2), pin=pins[key];
+  if(pin){
+    var live=pool.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
+    if(live&&voiceUsable(live))return live;
+    var same=pool.filter(function(v){return vGender(v)===pin.g&&voiceUsable(v)});
+    if(!same.length)return pin.v;
+    pool=same;
+  }else{
+    var female=pool.filter(function(v){return vGender(v)==='f'});
+    if(female.length)pool=female;
+  }
   var want=String(code).toLowerCase(), pref="f";
   function score(v){
     var s=0,n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
@@ -1021,10 +1034,12 @@ function bestVoice(code){
   }
   /* המגדר הוא המיון שאחרי voiceUsable, לא סעיף בניקוד — החלטה של הריפו הזה */
   function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
-  return pool.slice().sort(function(a,b){
+  var chosen=pool.slice().sort(function(a,b){
     var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
     d=grank(b)-grank(a); return d||score(b)-score(a);
   })[0];
+  if(chosen)pins[key]={v:chosen,g:vGender(chosen)};
+  return chosen;
 }
 var _sayGen=0, _speakBtn=null;
 function heSpoken(t){ if(LANG==="en"||typeof HESPEECH==="undefined")return t; try{ return HESPEECH.spoken(t) }catch(e){ return t } }
@@ -1182,7 +1197,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r36-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r37-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>

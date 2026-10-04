@@ -5,11 +5,15 @@ var VOICE_M=/(google[^a-z]{0,15}(arabic|العربية)|אברי|אסף|حامد
 var VOICE_F=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/i;
 function allVoices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
 function voiceFor(lang){
+  var pins=voiceFor._session||(voiceFor._session={});
+  if(pins[lang])return pins[lang];
   var code=LANG_TTS[lang].toLowerCase(), pre=code.slice(0,2);
   var vs=allVoices().filter(function(v){var l=(v.lang||"").toLowerCase().replace("_","-");return l.indexOf(pre)===0});
   var ok=vs.filter(function(v){return !VOICE_M.test(v.name)});
   var f=ok.filter(function(v){return VOICE_F.test(v.name)});
-  return (f[0]||ok[0]||null);   /* all-male device: null, default voice + raised pitch */
+  var chosen=f[0]||ok[0]||null;
+  if(chosen)pins[lang]=chosen;
+  return chosen;
 }
 function mk(text){
   var toks=String(text).split(/\s+/).filter(Boolean), parts=[], html=[];

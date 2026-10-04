@@ -1698,11 +1698,26 @@ function pickVoice(prefer,uri,lang){
      לא שינתה כלום — הנעיצה קדמה לה והמגדר לא נבדק מעולם. נעיצה
      שאינה בשפה הנוכחית חוזרת לבחירה אוטומטית, ומי שיחזור לשפה
      שבה נעץ יקבל את הקול שלו בחזרה. */
-  if(uri){var f=pool.filter(function(v){return v.voiceURI===uri})[0];if(f)return f}
+  var pins=pickVoice._session||(pickVoice._session={}), key=code.slice(0,2), pin=pins[key];
+  if(uri&&(!pin||pin.request!==uri)){var f=pool.filter(function(v){return v.voiceURI===uri})[0];if(f&&voiceUsable(f)){pins[key]={v:f,g:guessGender(f),request:uri};return f}}
   /* אין קול בשפה הנכונה? עדיף לא לבחור כלום מאשר להקריא רוסית בקול
      עברי. null מחזיר את הבחירה לדפדפן, שלפחות מכבד את u.lang. */
-  if(!pool.length)return null;
-  return voiceOrder(pool,prefer,code)[0]||null;
+  if(!pool.length)return (pickVoice._session||{})[code.slice(0,2)] ? pickVoice._session[code.slice(0,2)].v : null;
+  /* Keep one voice per language. A failed network voice may only fall
+     back to the same gender; never to the browser's unclassified default. */
+  if(pin){
+    var live=pool.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
+    if(live&&voiceUsable(live))return live;
+    var same=pool.filter(function(v){return guessGender(v)===pin.g&&voiceUsable(v)});
+    if(!same.length)return pin.v;
+    pool=same;
+  }else{
+    var female=pool.filter(function(v){return guessGender(v)==='female'});
+    if(female.length)pool=female;
+  }
+  var chosen=voiceOrder(pool,prefer,code)[0]||null;
+  if(chosen)pins[key]={v:chosen,g:guessGender(chosen),request:uri};
+  return chosen;
 }
 /* הדירוג הוצא מ-pickVoice כדי שגם הרשימה שבמסך ההגדרות תשתמש בו:
    שני סדרים שונים לאותם קולות פירושו מסך שמראה משהו אחר ממה
@@ -2382,7 +2397,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="b174 · 2026-10-04";
+var BUILD="b175 · 2026-10-04";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4936,7 +4951,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b174-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b175-pwa1").catch(function(){});
   });
 }
 </script>

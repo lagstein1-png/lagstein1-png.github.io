@@ -279,7 +279,7 @@ try{
     speechSynthesis.addEventListener("voiceschanged", function(){
       /* רשימה חלקית בפתיחה יכולה לנעול קול גרוע — מאפסים רק בחלון
          ההסתכלות הראשון. איפוס מאוחר יותר יחזיר את הרעידה המקורית. */
-      if(Date.now() - _voiceBornAt < 15000) pickVoice._pin = {};
+      if(Date.now() - _voiceBornAt < 15000 && !pickVoice._session) pickVoice._pin = {};
       if(EL && EL.ov.classList.contains("on")) draw();
     });
 }catch(e){}
@@ -358,6 +358,7 @@ function savedVoices(){
 function savedVoice(code){ var m = savedVoices(); return m[code] || "" }
 function setVoice(code, uri){
   if(pickVoice._pin) delete pickVoice._pin[code];
+  if(pickVoice._session) delete pickVoice._session[code.slice(0,2)];
   var m = savedVoices();
   if(uri) m[code] = uri; else delete m[code];
   try{ localStorage.setItem(VOICE_KEY, JSON.stringify(m)) }catch(e){}
@@ -372,54 +373,29 @@ function voicesFor(code){
   return out;
 }
 function pickVoice(code){
-  /* בחירה מפורשת קודמת לכול — גם ל-voiceUsable. מי שבחר קול
-     ורואה שהוא לא נאמר לא יבין למה, והשקט גרוע מקול לא-אידאלי. */
-  var want = savedVoice(code);
-  if(want){
-    var all = voicesFor(code), j;
-    for(j=0;j<all.length;j++) if(all[j].voiceURI === want){
-      /* **מנגנון 4 גובר על הבחירה הידנית, ורק עליה ורק אחרי כישלון.**
-         הבחירה המפורשת עקפה את `voiceUsable` לגמרי, ולכן לומד
-         שנעץ קול רשת ואיבד אינטרנט קיבל אותו קול מת גם בניסיון
-         החוזר — כלומר מנגנון ״נפילה מקול רשת״ היה מחזיר את מה
-         שזה עתה שתק, והבלם היחיד היה `retried`. התוצאה ללומד
-         היא שקט מוחלט, בדיוק מה שארבעת המנגנונים קיימים למנוע.
-
-         **קול מקומי שנבחר ביד נשאר תמיד** — `voiceUsable` מחזיר
-         לו 1 תמיד. וכשהרשת חוזרת והדגל נדלק, הבחירה חוזרת מאליה.
-
-         **והתנאי הוא `voiceUsable` עצמו ולא חצי ממנו.** בגרסה
-         הראשונה כתבתי כאן `_netVoiceOK` בלבד, ובדיקה מול
-         `speechSynthesis` מזויף הראתה שקול רשת נעוץ עדיין נבחר
-         כשהרשת מנותקת — מפני ש-`voiceUsable` בודק **שני** דברים,
-         את הדגל ואת `navigator.onLine`. מקור אמת אחד. */
-      if(voiceUsable(all[j])) return all[j];
-      break;
-    }
-  }
-  /* נעילת סשן — 30.9.2026. הקול הראשון שדיבר בשפה נשאר הקול שלה
-     עד סוף הסשן: בלעדיו כל אמירה ממיינת מחדש, וקול רשת שנופל וחוזר
-     (הילה Online) החליף לבד נשי↔גברי באמצע שימוש, בדיוק מה שהבעלים
-     שמע ודיווח. הנעול אינו שמיש: המיון הרגיל (נשי תחילה) בוחר מחליף
-     והמחליף ננעל — לכל היותר החלפה אחת בסשן, ולמגדר זהה כשיש. */
-  /* הנעילה יושבת על הפונקציה עצמה ולא במשתנה מודול — בדיקות
-     המעבדה מחלצות את pickVoice לבדה ל-vm, ומשתנה חיצוני היה
-     מפיל אותן על ReferenceError מסיבה שאינה הבאג. */
-  var P = pickVoice._pin || (pickVoice._pin = {});
-  var pin = P[code];
-  if(pin){
-    var pall = voicesFor(code), pj;
-    for(pj=0;pj<pall.length;pj++) if(pall[pj].voiceURI === pin){
-      if(voiceUsable(pall[pj])) return pall[pj];
-      break;
-    }
-  }
   var v = voices(), p = code.slice(0,2), i, list = [], l;
   for(i=0;i<v.length;i++){
     l = (v[i].lang||"").replace("_","-").toLowerCase();
     if(l.slice(0,2) === p) list.push(v[i]);
   }
-  if(!list.length) return null;
+  if(!list.length)return (pickVoice._session||{})[code.slice(0,2)] ? pickVoice._session[code.slice(0,2)].v : null;
+  /* Keep one voice per language. A failed network voice may only fall
+     back to the same gender; never to the browser's unclassified default. */
+  var pins=pickVoice._session||(pickVoice._session={}), key=code.slice(0,2), pin=pins[key];
+  var request=savedVoice(code);
+  var explicit=list.filter(function(v){return v.voiceURI===request&&voiceUsable(v)})[0];
+  if(explicit&&(!pin||pin.request!==request)){ pins[key]={v:explicit,g:femScore(explicit),request:request}; return explicit; }
+  if(pin){
+    var live=list.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
+    if(live&&voiceUsable(live))return live;
+    var same=list.filter(function(v){return femScore(v)===pin.g&&voiceUsable(v)});
+    if(!same.length)return pin.v;
+    list=same;
+  }else{
+    var female=list.filter(function(v){return femScore(v)===2});
+    if(female.length)list=female;
+  }
+
   /* סדר הבחירה: קול זמין, ואז נשי, טבעי ולבסוף תג שפה מדויק.
      קול שהלומד בחר ידנית נשאר בעדיפות ראשונה כל עוד הוא זמין. */
   var want = code.toLowerCase();
@@ -433,7 +409,7 @@ function pickVoice(code){
         || (exactness(b)   - exactness(a));
   });
   var chosen = list[0];
-  if(chosen) P[code] = chosen.voiceURI;
+  if(chosen)pins[key]={v:chosen,g:femScore(chosen),request:request};
   return chosen;
 }
 function hasVoice(code){ return !!pickVoice(code) }

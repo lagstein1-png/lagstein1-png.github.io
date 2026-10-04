@@ -2935,7 +2935,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t173 · 2026-10-04";
+var BUILD="t174 · 2026-10-04";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -3108,19 +3108,36 @@ function voiceOrder(pool){
 }
 function deviceVoice(){
   var list=pickList(),i;
-  if(!list.length)return null;
+  if(!list.length)return (deviceVoice._session||{})[LG] ? deviceVoice._session[LG].v : null;
   /* בחירה ידנית מכובדת רק אם היא בשפת הממשק. הסריקה רצה קודם על
      כל הרשימה, וכפתור "לשמוע" ברשימת הקולות אינו משמיע אלא בוחר —
      לחיצה אחת ליד קול אנגלי נשמרה כקול שמקריא עברית, ומאז כל
      המשפטים נקראו באנגלית. מחפשים רק בתוך שפת הממשק. */
   var mineFirst=hebVoices();
-  for(i=0;i<mineFirst.length;i++)if(mineFirst[i].voiceURI===state.settings.voice)return mineFirst[i];
+  var want=state.settings.voice;
   /* בלי בחירה ידנית — קול נשי, אבל *רק מתוך שפת הממשק*.
      pickList מחזיר קודם את שפת הממשק ואחריה את כל השאר, ולכן
      סריקה על כל הרשימה מצאה קול אנגלי נשי במכשיר שאין בו קול
      עברי נשי — והעברית הוקראה באנגלית. שפה קודמת למגדר. */
   var mine=hebVoices();
-  if(mine.length)return voiceOrder(mine)[0];
+  /* Keep one voice per language. A failed network voice may only fall
+     back to the same gender; never to the browser's unclassified default. */
+  var pins=deviceVoice._session||(deviceVoice._session={}), key=LG, pin=pins[key];
+  var request=want;
+  var explicit=mineFirst.filter(function(v){return v.voiceURI===want&&voiceUsable(v)})[0];
+  if(explicit&&(!pin||pin.request!==request)){ pins[key]={v:explicit,g:guessGender(explicit),request:request}; return explicit; }
+  if(pin){
+    var live=mine.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
+    if(live&&voiceUsable(live))return live;
+    var same=mine.filter(function(v){return guessGender(v)===pin.g&&voiceUsable(v)});
+    if(!same.length)return pin.v;
+    mine=same;
+  }else{
+    var female=mine.filter(function(v){return guessGender(v)==='f'});
+    if(female.length)mine=female;
+  }
+  if(mine.length){var chosen=voiceOrder(mine)[0];pins[key]={v:chosen,g:guessGender(chosen),request:request};return chosen;}
+  if(pin)return pin.v;
   /* אין קול בשפת הממשק? מחזירים null ולא את הקול הראשון שיש.
      קול אנגלי שמושם על משפט עברי גורר איתו גם את u.lang, והמשפט
      נקרא באנגלית. null משאיר את u.lang בשפה הנכונה ומשאיר לדפדפן
@@ -9670,7 +9687,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t173-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t174-pwa1").catch(function(){});
   });
 }
 </script>

@@ -110,7 +110,20 @@
   }
   function bestVoice() {
     var pool = hebrewVoices();
-    if (!pool.length) return null;
+    if (!pool.length) return (bestVoice._session||{}).he ? bestVoice._session.he.v : null;
+  /* Keep one voice per language. A failed network voice may only fall
+     back to the same gender; never to the browser's unclassified default. */
+  var pins=bestVoice._session||(bestVoice._session={}), key="he", pin=pins[key];
+  if(pin){
+    var live=pool.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
+    if(live&&(live.localService!==false||(netVoiceOK&&navigator.onLine!==false)))return live;
+    var same=pool.filter(function(v){return vGender(v)===pin.g&&(v.localService!==false||(netVoiceOK&&navigator.onLine!==false))});
+    if(!same.length)return pin.v;
+    pool=same;
+  }else{
+    var female=pool.filter(function(v){return vGender(v)==='f'});
+    if(female.length)pool=female;
+  }
     function score(v) {
       var s = 0, n = ((v.name || "") + " " + (v.lang || "")).toLowerCase();
       if (normLang(v.lang).toLowerCase() === LANG.toLowerCase()) s += 12;
@@ -137,10 +150,12 @@
       return v.localService === false ? (netVoiceOK && navigator.onLine !== false) : true;
     }
     function grank(v) { var g = vGender(v); return g === "f" ? 2 : g === "?" ? 1 : 0; }
-    return pool.slice().sort(function (a, b) {
+    var chosen=pool.slice().sort(function (a, b) {
       var d = usable(b) - usable(a); if (d) return d;
       d = grank(b) - grank(a); return d || score(b) - score(a);
     })[0];
+    if(chosen)pins[key]={v:chosen,g:vGender(chosen)};
+    return chosen;
   }
   api.hasHebrewVoice = function () { return hebrewVoices().length > 0; };
   api.voiceName = function () { var v = bestVoice(); return v ? v.name : ""; };

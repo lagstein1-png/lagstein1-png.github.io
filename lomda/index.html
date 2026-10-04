@@ -1160,7 +1160,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l153 · 2026-10-04";
+var BUILD="l154 · 2026-10-04";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -1432,11 +1432,25 @@ function devPicker(lgs){
   return out;
 }
 function bestVoice(code){
-  var pool=voicesFor(code); if(!pool.length)return null;
+  var pool=voicesFor(code); if(!pool.length)return (bestVoice._session||{})[String(code).toLowerCase().slice(0,2)] ? bestVoice._session[String(code).toLowerCase().slice(0,2)].v : null;
   /* בחירה ידנית גוברת על הניקוד. היא נשמרת לכל שפה בנפרד:
      קול שנבחר לעברית אינו רלוונטי כשמדברים אנגלית. */
-  var want0=(state.devVoice||{})[code];
-  if(want0){var hit=pool.filter(function(v){return v.voiceURI===want0})[0]; if(hit)return hit}
+  /* Keep one voice per language. A failed network voice may only fall
+     back to the same gender; never to the browser's unclassified default. */
+  var pins=bestVoice._session||(bestVoice._session={}), key=String(code).toLowerCase().slice(0,2), pin=pins[key];
+  var request=((state.devVoice||{})[code]);
+  var explicit=pool.filter(function(v){return v.voiceURI===((state.devVoice||{})[code])})[0];
+  if(explicit&&(!pin||pin.request!==request)){ pins[key]={v:explicit,g:vGender(explicit),request:request}; return explicit; }
+  if(pin){
+    var live=pool.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
+    if(live&&voiceUsable(live))return live;
+    var same=pool.filter(function(v){return vGender(v)===pin.g&&voiceUsable(v)});
+    if(!same.length)return pin.v;
+    pool=same;
+  }else{
+    var female=pool.filter(function(v){return vGender(v)==='f'});
+    if(female.length)pool=female;
+  }
   var want=String(code).toLowerCase();
   var pref=state.gemVoice&&gvOf(state.gemVoice).g==="m"?"m":"f";
   function score(v){
@@ -1458,12 +1472,14 @@ function bestVoice(code){
      קודם הקולות במגדר המבוקש, אחריהם מי שלא זוהה, ורק אז ההפוך;
      ובתוך כל קבוצה מכריעה האיכות. */
   function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
-  return pool.slice().sort(function(a,b){
+  var chosen=pool.slice().sort(function(a,b){
     /* קול שלא יעבוד יורד לתחתית לפני כל שיקול אחר — גם לפני המגדר,
        שאם לא כן קול נשי מת מנצח קול גברי חי. */
     var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
     d=grank(b)-grank(a); return d||score(b)-score(a);
   })[0];
+  if(chosen)pins[key]={v:chosen,g:vGender(chosen),request:request};
+  return chosen;
 }
 /* הקול הנדרש הוא של שפת הממשק: כאן החומר עצמו נלמד בשפת האם. */
 function hasLangVoice(){return voicesFor(LANGS[state.lang].tts).length>0}
@@ -4783,7 +4799,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l153-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l154-pwa1").catch(function(){});
   });
 }
 </script>

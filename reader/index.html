@@ -744,12 +744,7 @@ document.addEventListener("click",function(e){
     var u=new SpeechSynthesisUtterance(label);
     u.lang=SAY_LANG[LG]||"he-IL";
     /* קול לפי שפת התווית: נשי תחילה גם ב-ar/ru/en, לא ברירת המכשיר */
-    var _cv=heVoice;
-    if(LG!=="he"){
-      var _base=(SAY_LANG[LG]||"he-IL").split("-")[0].toLowerCase();
-      var _pool=(speechSynthesis.getVoices()||[]).filter(function(x){return String(x.lang||"").replace("_","-").toLowerCase().split("-")[0]===_base});
-      _cv=_pool.filter(function(x){return voiceGender(x)==="f"})[0]||_pool.filter(function(x){return voiceGender(x)===""})[0]||_pool[0]||null;
-    }
+    var _cv=sessionVoice(SAY_LANG[LG]||"he-IL", "");
     if(_cv){u.voice=_cv;u.pitch=voicePitch(_cv)}
     u.rate=P.rate;
     try{speechSynthesis.speak(u)}catch(err){}
@@ -1017,6 +1012,28 @@ var boundaryMsg = false; /* האם ההודעה על "בלי דיווח מילי
 /* אוסף את כל הקולות העבריים שהדפדפן מציע — לא רק את הראשון.
    ההבדל משמעותי: בכרום יש בדרך כלל קול אחד בלבד, וב-Edge יש
    גם קולות נוירוניים מקוונים, כולל נשיים, בחינם. */
+/* Pin per language; only a same-gender voice can replace a failed voice. */
+function sessionVoice(code, uri){
+  var pins=sessionVoice._session||(sessionVoice._session={}), key=code.slice(0,2), pin=pins[key];
+  var pool=(speechSynthesis.getVoices()||[]).filter(function(v){return String(v.lang||"").replace("_","-").toLowerCase().slice(0,2)===key});
+  var request=uri;
+  var explicit=pool.filter(function(v){return v.voiceURI===uri&&voiceUsable(v)})[0];
+  if(explicit&&(!pin||pin.request!==request)){pins[key]={v:explicit,g:voiceGender(explicit),request:request};return explicit}
+  if(pin){
+    var live=pool.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
+    if(live&&voiceUsable(live))return live;
+    var same=pool.filter(function(v){return voiceGender(v)===pin.g&&voiceUsable(v)});
+    if(!same.length)return pin.v;
+    pool=same;
+  }else{
+    var female=pool.filter(function(v){return voiceGender(v)==="f"});
+    if(female.length)pool=female;
+  }
+  pool.sort(function(a,b){return (voiceUsable(b)-voiceUsable(a))||((voiceGender(b)==="f")-(voiceGender(a)==="f"))||voiceQuality(b)-voiceQuality(a)});
+  var chosen=pool[0]||null;
+  if(chosen)pins[key]={v:chosen,g:voiceGender(chosen),request:request};
+  return chosen;
+}
 function pickVoice(){
   if(!('speechSynthesis' in window)) return;
   var v = speechSynthesis.getVoices();
@@ -1036,7 +1053,7 @@ function pickVoice(){
                d = (voiceGender(b)==='f') - (voiceGender(a)==='f');
                return d || voiceQuality(b) - voiceQuality(a);
              });
-  heVoice = heVoices.filter(function(x){ return x.voiceURI === P.voice; })[0] || heVoices[0] || null;
+  heVoice = sessionVoice("he-IL", P.voice);
   renderVoices();
 }
 
@@ -1291,7 +1308,7 @@ function speakSentence(n){
   var u = new SpeechSynthesisUtterance(said.trim() || text);
   var tok = SEQ;                             /* האמירה הזאת שייכת לסבב הזה */
   u.lang = 'he-IL';
-  var chosen = heVoices.filter(function(v){ return v.voiceURI === VOICE; })[0] || heVoice;
+  var chosen = sessionVoice('he-IL', VOICE);
   if(chosen) u.voice = chosen;
   u.rate = P.rate;
   u.pitch = voicePitch(chosen);
@@ -1751,7 +1768,7 @@ function refreshDynamic(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=124-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=125-pwa1").catch(function(){});
   });
 }
 </script>
