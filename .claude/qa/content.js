@@ -8,6 +8,7 @@
      node .claude/qa/content.js                  # כל בעלי buildQ
      node .claude/qa/content.js math-uni         # אחת
      node .claude/qa/content.js math-elem hebrew-lit  # בנק UNITS — scanUnits (O-113)
+     node .claude/qa/content.js tanakh-elem civics-elem  # בנק STORIES — scanUnits (O-129)
      QA_N=400 node .claude/qa/content.js english # מדגם גדול יותר
 
    **ריצה דורסת את הדוח השמור של אותה אפליקציה**, ו-`stage.js` קורא
@@ -799,8 +800,11 @@ async function scanUnits(page){
       ok:[אינדקסים נכונים], id:זהות, audioOnly, extra:[[kind,sev,msg]]} */
   const isME=(typeof G==='object'&&G&&typeof UNITS!=='undefined');
   const isHL=(typeof GEN==='object'&&GEN&&typeof UNITS!=='undefined'&&typeof _S==='object');
-  if(!isME&&!isHL){ R.unsupported=true; return R }
-  R.kind=isME?'G':'GEN';
+  /* O-129: tanakh-elem ו-civics-elem — `STORIES` + `ENT` + `makeQ` (js/engine.js). */
+  const isST=(!isME&&!isHL&&typeof STORIES!=='undefined'&&Array.isArray(STORIES)&&
+              typeof ENT==='object'&&typeof makeQ==='function'&&typeof _S==='object');
+  if(!isME&&!isHL&&!isST){ R.unsupported=true; return R }
+  R.kind=isME?'G':isHL?'GEN':'STORIES';
   const LG_=isME?(typeof LG!=='undefined'?LG.slice():['he'])
                 :(Array.isArray(LANGS)?LANGS.slice():Object.keys(LANGS));
   R.langs=LG_;
@@ -850,6 +854,81 @@ async function scanUnits(page){
       if(typeof LESSONS==='object'&&LESSONS[where.split(' ')[0]]===undefined)
         out.extra.push(['no-lesson','FAIL','אין LESSONS ליחידה — כפתור ״דוגמה״ ייפול']);
       S.lang=saveLang;
+      return out;
+    };
+  } else if(isST){
+    /* O-129 — STORIES (tanakh-elem, civics-elem). נקרא מ-js/engine.js ומ-app.js:
+       `makeQ(q)` מחזיר `{story, q:{he,ar,ru,en}, a, keys, ans}`. האפשרויות הן
+       `entText(key)[lg]`, והנכונה היא `keys[ans]===a`. מסיחים מפורשים (`d`)
+       או שלושה מאותו סוג ישות בהגרלה. הרמז היחיד הוא `h_story` עם שם הסיפור,
+       ויחד איתו הסיפור עצמו (`lines`) — זה מה שהלומד קורא לפני התרגול.
+       בנק סגור: כל שאלה בכל סיפור נבנית בדיוק פעם אחת, כמו `comp`. */
+    const strIn=function(k,lg){ const o=_S[k]; return o?o[lg]:undefined };
+    const entIn=function(k,lg){
+      if(/^n\d+$/.test(k)) return k.slice(1);
+      return ENT[k]?ENT[k].tx[lg]:undefined;
+    };
+    const storyDone={};
+    for(const st of STORIES){
+      const where=st.id+' ('+(st.title&&st.title.he)+')';
+      cells.push({where:where, all:st.qs.map(function(q0,i){return function(){
+        const q=makeQ(q0); q.__src=st.id+'#'+i; q.__st=st; q.__raw=q0; return q }})});
+    }
+    R.topics=STORIES.length; R.levels=1;
+    norm=function(q,where){
+      const out={ask:{},expl:[],opts:[],ok:[],extra:[]};
+      const st=q.__st, q0=q.__raw;
+      for(const lg of LG_) out.ask[lg]=q.q?q.q[lg]:undefined;
+      out.expl.push({name:'hint (h_story)',v:{}});
+      for(const lg of LG_){
+        const h=strIn('h_story',lg), ti=st.title?st.title[lg]:undefined;
+        out.expl[0].v[lg]=(h===undefined||ti===undefined||!String(ti).trim())?undefined:h.split('{s}').join(ti);
+      }
+      /* מפתח שאינו ישות: app.js יפול ב-entText על המסך. */
+      [q.a].concat(q0.d||[]).forEach(function(k){
+        if(!/^n\d+$/.test(k)&&!ENT[k]) out.extra.push(['unknown-entity','FAIL','המפתח "'+k+'" אינו ב-ENT']);
+      });
+      if(q0.d&&q0.d.length!==3)
+        out.extra.push(['distractor-count','FAIL',q0.d.length+' מסיחים מפורשים במקום 3: '+q0.d.join(',')]);
+      (q.keys||[]).forEach(function(k,i){
+        const m={}; for(const lg of LG_) m[lg]=entIn(k,lg);
+        out.opts.push(m); if(k===q.a) out.ok.push(i);
+      });
+      if(!(q.keys||[]).some(function(k){return k===q.a}))
+        out.extra.push(['answer-not-in-options','FAIL','המפתח הנכון "'+q.a+'" אינו אף אחת מהאפשרויות']);
+      else if(q.keys[q.ans]!==q.a)
+        out.extra.push(['answer-index','FAIL','ans='+q.ans+' אינו מצביע על "'+q.a+'"']);
+      /* מסיח בהגרלה: כל ישות מאותו סוג יכולה לעלות. מספיק ששתיים מהן
+         (התשובה ומסיח, או שני מסיחים) נכתבות אותו דבר באחת השפות — והלומד
+         יראה שתי אפשרויות זהות. נבדק על כל המאגר ולא רק על מה שהוגרל,
+         אחרת הממצא תלוי בזרע. */
+      if(!q0.d){
+        const pool=[q.a].concat(poolFor(q.a).filter(function(k){return k!==q.a}));
+        for(const lg of LG_){
+          const by={};
+          for(const k of pool){ const x=entIn(k,lg); if(x==null) continue;
+            const t_=String(x).trim(); if(by[t_]){
+              out.extra.push(['dup-option','FAIL',lg+': בהגרלת המסיחים יכולים לעלות יחד "'+by[t_]+'" ו-"'+k+'", ושניהם נכתבים '+t_, lg==='he'?'':lg]);
+            } else by[t_]=k }
+        }
+      }
+      /* הסיפור: כותרת ושורות, בכל שפה — פעם אחת לסיפור. */
+      if(!storyDone[st.id]){
+        storyDone[st.id]=1;
+        const missT=LG_.filter(function(lg){return !st.title||!st.title[lg]||!String(st.title[lg]).trim()});
+        if(missT.length) out.extra.push(['lang-missing','FAIL','חסרה כותרת הסיפור ב-'+missT.join(','),missT.join(',')]);
+        if(!st.lines.length) out.extra.push(['no-lesson','FAIL','לסיפור "'+st.id+'" אין שורות — מסך ״קודם נלמד״ ריק']);
+        st.lines.forEach(function(ln,i){
+          const miss=LG_.filter(function(lg){return !ln[lg]||!String(ln[lg]).trim()});
+          if(miss.length) out.extra.push(['lang-missing','FAIL','חסרה שורה '+(i+1)+' בסיפור ב-'+miss.join(','),miss.join(',')]);
+          for(const lg of LG_) if(ln[lg]){
+            textChecks('lesson',plain(ln[lg]),where+' · שורה '+(i+1));
+            if(lg!=='he'&&HEB.test(String(ln[lg]))) out.extra.push(['lesson-hebrew','REVIEW',lg+': שורה '+(i+1)+' נושאת טקסט עברי: '+ln[lg],lg]);
+          }
+        });
+      }
+      out.id=st.id+' ¦ '+(out.ask.he||'');
+      out.src=q.__src;
       return out;
     };
   } else {
@@ -989,7 +1068,7 @@ async function scanUnits(page){
           if(v===undefined||v===null||!String(v).trim()) gone.push(lg);
           else {
             textChecks('hint',plain(v),here);
-            if(lg!=='he'&&HEB.test(String(v))&&isME){ lr[lg].hebWhy++ }
+            if(lg!=='he'&&HEB.test(String(v))&&(isME||isST)){ lr[lg].hebWhy++ }
           }
         }
         if(gone.length===LG_.length){ cov.noExpl++; add('no-explanation','FAIL','אין '+e.name+' באף שפה — '+(n.ask.he||''),here,e.name.split(' ')[0]) }
@@ -1003,9 +1082,9 @@ async function scanUnits(page){
       for(const lg of LG_){
         const v=n.ask[lg]; if(v==null) continue;
         textChecks('ask',plain(v),here);
-        if(lg!=='he'&&HEB.test(String(v))&&isME) dirty=true;
+        if(lg!=='he'&&HEB.test(String(v))&&(isME||isST)) dirty=true;
       }
-      for(const lg of LG_) if(lg!=='he'&&isME){
+      for(const lg of LG_) if(lg!=='he'&&(isME||isST)){
         const d=dirty||n.opts.some(function(o){return HEB.test(String(o[lg]))})||
           n.expl.some(function(e){return HEB.test(String(e.v[lg]||''))});
         if(d) lr[lg].heb++;
@@ -1195,8 +1274,9 @@ if(require.main===module) (async()=>{
      הפקודה עקף את הסינון והפיל את התהליך כולו ב-ReferenceError —
      ודווקא אליו מזמינה האזהרה של stage.js. מוצהר ומדולג. */
   const bank=(REG.apps[app]||{}).bank;
-  /* O-113: בנק `UNITS` (math-elem) או `js/data.js` (hebrew-lit) נסרק
-     במסלול השני, `scanUnits`. כל bank אחר — עדיין מחוץ להיקף. */
+  /* O-113: בנק `UNITS` (math-elem) או `js/data.js` (hebrew-lit, ומאז O-129
+     גם tanakh-elem ו-civics-elem — STORIES) נסרק במסלול השני, `scanUnits`.
+     כל bank אחר — עדיין מחוץ להיקף. */
   const unitsPath=(bank==='UNITS'||bank==='js/data.js');
   if(bank&&bank!=='buildQ'&&!unitsPath){
     console.log(app,'מחוץ להיקף — bank="'+bank+'", והסורק דורש buildQ או UNITS');
@@ -1209,13 +1289,14 @@ if(require.main===module) (async()=>{
     try{
       await page.waitForFunction(function(){
         return typeof UNITS!=='undefined'&&UNITS.length>0&&
-               ((typeof G==='object'&&G)||(typeof GEN==='object'&&GEN));
+               ((typeof G==='object'&&G)||(typeof GEN==='object'&&GEN)||
+                (typeof STORIES!=='undefined'&&STORIES.length>0&&typeof makeQ==='function'));
       },{timeout:8000});
     }catch(e){}
     await page.waitForTimeout(250);
     R=await scanUnits(page);
     if(R.unsupported){
-      console.log(app,'מחוץ להיקף — יש UNITS אבל לא G ולא GEN; הסורק אינו מכיר את המבנה');
+      console.log(app,'מחוץ להיקף — יש UNITS אבל לא G, לא GEN ולא STORIES; הסורק אינו מכיר את המבנה');
       await ctx.close(); continue;
     }
   } else {

@@ -168,6 +168,8 @@ dl.gloss dd{margin:0}
 .hlang button.on{border-color:var(--acc);color:var(--acc-ink);background:var(--acc)}
 @media (pointer:coarse){.hlang button{min-height:44px}}
 html[lang="en"] body{letter-spacing:0}
+/* O-94: בגלילה אל טאב, הכותרת הדביקה במחשב לא תסתיר את ראש הכרטיס */
+@media (min-width:561px){#v-chart>[id^="chart-tab-"]{scroll-margin-top:5rem}}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -355,7 +357,7 @@ html[lang="en"] body{letter-spacing:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r35 · 2026-10-04";
+var BUILD="r36 · 2026-10-04";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -487,6 +489,15 @@ function showTab(t){
   ["wheel","table","texts","today"].forEach(function(k){ $("#chart-tab-"+k).hidden=(k!==t) });
   $$('[data-a="ctab"]').forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.v===t))});
   if(t==="today")renderToday();
+}
+/* O-94 (4.10.2026): בטלפון כרטיס ״הרגע האחד״ ממלא את המסך, ותוכן הטאב
+   מתחיל מתחת לקצה (נמדד: 796px במסך של 664px באייפון 13). הלחיצה החליפה
+   רק את צבע הכפתור — ונראתה כמו כפתור שלא עושה כלום. גוללים אל התוכן
+   רק כשהוא לא נראה; במחשב, שבו הוא כבר במסך, שום דבר לא זז. */
+function revealTab(t){
+  var el=$("#chart-tab-"+t); if(!el)return;
+  var r=el.getBoundingClientRect();
+  if(r.top<0||r.top>window.innerHeight-120){ try{ el.scrollIntoView({block:"start"}) }catch(e){ el.scrollIntoView(true) } }
 }
 
 /* ---------- חיפוש מקום ---------- */
@@ -1121,7 +1132,7 @@ document.addEventListener("click",function(e){
   var el=e.target.closest("[data-a]"); if(!el)return;
   var a=el.dataset.a, v=el.dataset.v;
   if(a==="nav"){ e.preventDefault(); nav(v) }
-  else if(a==="ctab")showTab(v);
+  else if(a==="ctab"){ showTab(v); revealTab(v) }
   else if(a==="pl")openSheet(v);
   else if(a==="closesheet")closeSheet();
   else if(a==="say")speak(el.dataset.text,el);
@@ -1171,7 +1182,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r35-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r36-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>

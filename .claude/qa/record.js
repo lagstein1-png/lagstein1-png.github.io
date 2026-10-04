@@ -375,7 +375,47 @@ function corpus(app) {
       if (!seen.has(id)) seen.set(id, text);
     }
   }
+  if (app === 'lomda') for (const raw of lomdaParts(files)) {
+    const text = plainOf(String(raw));
+    if (!/[א-ת0-9]/.test(text)) continue;
+    const id = R.id(text);
+    if (!seen.has(id)) seen.set(id, text);
+  }
   return seen;
+}
+
+/* lomda (4.10.2026): השאלה, הכרטיס שאחרי המענה, הרמז והקטע נבנים
+   בזמן ריצה מחלקים — ״כותרת. תיאור״, ״שאלה. כותרת · שנה״, ״השנה: 1869״,
+   שורות קטע מחוברות ברווח — ו-speak שם מנגן אותם כרצף של קבצים
+   (recParts ב-lomda/index.html). נמדד: 0 הקלטות ב-42 שאלות במסלולים
+   האלה. כאן החלקים שחסרו: כותרת בת מילה אחת, שורות קטע (he:[…]),
+   השנה כפי ש-yr() כותבת אותה (וההזזות של formWhen), המאה של centuryStr,
+   ותוויות השאלה והרמז מהמילון העברי. ההקלטה של משפט מורכב שלם הייתה
+   עולה פי 2.8 מהמאגר כולו (357 אלף תווים) — החלקים: כ-26 אלף.
+   מה שמשתנה ב-index.html נתפס ב-`recorded.js --browser`. */
+function lomdaParts(files) {
+  const out = [];
+  const idx = path.join(ROOT, 'lomda', 'index.html');
+  const ui = fs.existsSync(idx) ? fs.readFileSync(idx, 'utf8') : '';
+  const L = k => { const m = ui.match(new RegExp('\\b' + k + ':"([^"]*)"')); return m ? m[1] : ''; };
+  for (const k of ['qWhen', 'qWhat', 'qWhy', 'qEff', 'qFirst', 'qTerm', 'qName',
+                   'hintYearL', 'hintTopicL', 'hintSrcL', 'hintOrderL']) out.push(L(k));
+  const bce = L('bce'), ce = L('ce'), cent = L('century');
+  const yr = y => y < 0 ? -y + ' ' + bce : y < 1000 ? y + ' ' + ce : String(y);
+  const OFF = [-200, -100, -50, -30, 30, 50, 100, 200];   /* formWhen: מסיחים כשהתקופה דלילה */
+  for (const f of files) {
+    const s = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    for (const m of s.matchAll(/\b"?he"?\s*:\s*"((?:[^"\\]|\\.)*)"/g)) out.push(unquote(m[1]));
+    for (const m of s.matchAll(/\bhe\s*:\s*\[((?:[^\]"]|"(?:[^"\\]|\\.)*")*)\]/g))
+      for (const x of m[1].matchAll(/"((?:[^"\\]|\\.)*)"/g)) out.push(unquote(x[1]));
+    if (!bce) continue;
+    for (const m of s.matchAll(/\bE\(\s*(-?\d+)\s*,/g)) {
+      const y = +m[1];
+      for (const d of [0, ...OFF]) if (y + d !== 0) out.push(yr(y + d));
+      out.push(cent + ' ה-' + (Math.floor((Math.abs(y) - 1) / 100) + 1) + (y < 0 ? ' ' + bce : ''));
+    }
+  }
+  return out;
 }
 
 function dirOf(app) { return path.join(ROOT, app, 'audio'); }
@@ -843,6 +883,8 @@ async function build(app, max) {
   }
   /* --list: כל האפליקציות שיש להן מאגר — ל-app=all ב-record.yml */
   if (args.includes('--list')) { console.log(Object.keys(SOURCES).join(' ')); process.exit(0); }
+  /* --ids <app>: מזהי המאגר כ-JSON — recorded.js --browser בונה מהם מניפסט ״הכול הוקלט״ */
+  if (args.includes('--ids')) { console.log(JSON.stringify([...(corpus(apps[0]) || new Map()).keys()])); process.exit(0); }
   if (args.includes('--manifest')) {
     for (const app of apps.length ? apps : Object.keys(SOURCES)) console.log(app + ': ' + writeManifest(app) + ' במניפסט');
     process.exit(0);

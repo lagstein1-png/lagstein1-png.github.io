@@ -1160,7 +1160,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l152 · 2026-10-04";
+var BUILD="l153 · 2026-10-04";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -2019,6 +2019,36 @@ function sitSay(q){
   var ex=plainOf(q.expr||"").trim();
   return {t:plainOf(q.ask||"")+(ex?" "+ex:""),l:state.lang||"he"};
 }
+/* מפרק משפט לחלקים שלכל אחד יש קובץ, או null. החיתוך רק אחרי
+   סימן פיסוק ורווח, או סביב " · " — שם הלומדה מחברת שדות. הפיסוק
+   שבנקודת החיבור (״קרה?.״, ״השנה:״, ״כותרת,״) אינו חלק מהשדה המוקלט.
+   מהארוך לקצר: שדה שיש בו כמה משפטים נמצא שלם לפני שמפרקים אותו. */
+function recParts(text,lang){
+  if(typeof RECORDED==="undefined"||lang!=="he")return null;
+  if(RECORDED.has(text,lang))return [text];
+  var cuts=[],re=/\s+·\s+|([.?!:,״])\s+(?!·)/g,m;
+  while((m=re.exec(text)))cuts.push([m.index+(m[1]?1:0),m.index+m[0].length]);
+  cuts.push([text.length,text.length]);
+  function key(s){
+    s=s.trim(); if(!s)return null;
+    if(RECORDED.has(s,lang))return s;
+    s=s.replace(/[.,:]$/,"");
+    return s&&RECORDED.has(s,lang)?s:null;
+  }
+  var memo={};
+  function from(st){
+    if(st>=text.length)return [];
+    if(st in memo)return memo[st];
+    memo[st]=null;
+    for(var i=cuts.length-1;i>=0;i--){
+      if(cuts[i][0]<=st)break;
+      var k=key(text.slice(st,cuts[i][0])); if(!k)continue;
+      var rest=from(cuts[i][1]); if(rest)return (memo[st]=[k].concat(rest));
+    }
+    return null;
+  }
+  return from(0);
+}
 function speak(text,lang,rateMul){
   /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
      לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
@@ -2034,10 +2064,20 @@ function speak(text,lang,rateMul){
      יש קובץ להקראה הזאת: מנגנים אותו וזהו. אין: ממשיכים למטה
      כאילו השכבה לא קיימת. כישלון באמצע — קול המכשיר. ההדגשה
      מילה־במילה אינה אפשרית על קובץ, כמו ב-playUrl. */
-  if(typeof RECORDED!=="undefined"&&RECORDED.play(text,lang,{rate:state.rate,
-      onError:function(){ if(my===_sayGen)speakDevice(text,code,rate) }})){
+  /* המשפט נבנה כאן מחלקים (״כותרת. תיאור״, ״שאלה. כותרת · שנה״),
+     ו-record.js מקליט כל חלק לבד — לכן מנגנים את החלקים ברצף, וכל
+     חלק הוא קובץ. חלק אחד חסר: כל המשפט בקול המכשיר, לא חצי־חצי.
+     saySpell (ספרה רומית, מירכאות, נוסחה כימית) רץ רק אחרי החיפוש
+     ורק לקול המכשיר: הוא משנה את הטקסט, ולכן גם את המזהה. */
+  var parts=recParts(text,lang);
+  if(parts&&(function play(k){
+    return RECORDED.play(parts[k],lang,{rate:state.rate,
+      onEnd:function(){ if(my===_sayGen&&k+1<parts.length)play(k+1) },
+      onError:function(){ if(my===_sayGen)speakDevice(saySpell(parts.slice(k).join(" ")),code,rate) }});
+  })(0)){
     return;
   }
+  text=saySpell(text);
   if(gemOn()){
     var vid=gvOf(state.gemVoice).id;
     var ck=lang+"|"+vid+"|"+rate.toFixed(2)+"|"+text;
@@ -2264,8 +2304,21 @@ function saySpell(x){
     return i>0?p+String(i):m;
   }).replace(/״/g,function(m,i,str){
     return /^[\u05D0-\u05EA](?![\u05D0-\u05EA])/.test(str.slice(i+1))?m:"";
-  }).replace(/\s—\s/g,", ");
+  }).replace(/\s—\s/g,", ").replace(/(^|[^A-Za-z])(pH|(?:(?:Na|Cl|Fe|Ca|Mg|[HOCNSK])\d*)+)(?![A-Za-z0-9])/g,function(m,p,f,off,str){
+    /* סמל לטיני בתוך משפט עברי — קול עברי קורא ״pH״ ו״H2O״ כמילה
+       (O-6). רק כשיש במשפט עברית, ורק נוסחה של ממש: יש בה ספרה, או
+       סמל של שתי אותיות (Fe). ״DNA״ ו-״R1״ אינם נוסחה ונשארים. אות
+       בודדת (״O לחמצן״) נשארת: קול עברי אומר אותה נכון לבד. */
+    if(!/[א-ת]/.test(str))return m;
+    if(f==="pH")return p+"פי אייץ׳";
+    if(!/\d|[a-z]/.test(f))return m;
+    return p+f.match(/[A-Z][a-z]?|\d+/g).map(function(x){
+      return /\d/.test(x)?x:x.split("").map(function(c){return SAY_LAT[c.toUpperCase()]}).join(" ");
+    }).join(" ");
+  });
 }
+/* שמות האותיות הלטיניות שבסמלי היסודות שבלומדה (chem.js: H2O, H2O2, CO2, Fe, pH). */
+var SAY_LAT={A:"איי",C:"סי",E:"אי",F:"אף",G:"ג׳י",H:"אייץ׳",K:"קיי",L:"אל",M:"אם",N:"אן",O:"או",S:"אס"};
 
 /* כל האירועים מכל התוכן — משם נלקחים מסיחים כשהנושא עצמו קטן מדי,
    וגם תרגיל הסדר הכרונולוגי בין תקופות. */
@@ -2747,7 +2800,7 @@ function screenPractice(){
       h+='<div class="why">'+esc(q.opts[P.picked].why)+"</div>";
     h+="</div>";
     h+='<div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">'+
-       spkBtn(saySpell(q.say),state.lang,false,t("hearSent"))+spkBtn(saySpell(q.say),state.lang,true,t("hearSlow"))+spkStop()+
+       spkBtn(q.say,state.lang,false,t("hearSent"))+spkBtn(q.say,state.lang,true,t("hearSlow"))+spkStop()+
        '<button class="btn pri" data-a="next" style="margin-inline-start:auto">'+
        esc(t("next"))+" "+ic("arrow",16)+"</button></div>";
   } else {
@@ -4321,7 +4374,7 @@ function examAction(a,el){
      התשובה. כאן מוקרא מה שעל המסך — הכותרת והמקור — והאפשרויות
      ממילא אינן חלק ממנו. */
   if(a==="sitread"){var q2=SIT.qs[SIT.i];
-    if(q2){var o2=sitSay(q2); if(o2.t)speak(saySpell(o2.t),o2.l)}
+    if(q2){var o2=sitSay(q2); if(o2.t)speak(o2.t,o2.l)}
     return true}
   if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
   if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
@@ -4480,7 +4533,7 @@ function answer(i){
   announce(P.ok?t("correct"):t("wrong")+". "+t("answerIs")+" "+q.answer);
   /* המשפט המלא נשמע מיד, גם כשטעו — במיוחד כשטעו. שמיעה של
      המשפט השלם היא מה שקושר את התאריך לסיפור. */
-  setTimeout(function(){speak(saySpell(q.say),state.lang)},P.ok?200:420);
+  setTimeout(function(){speak(q.say,state.lang)},P.ok?200:420);
 }
 function testKey(){
   var inp=$("#gk"); var k=inp?inp.value.trim():"";
@@ -4589,7 +4642,7 @@ document.addEventListener("click",function(e){
     /* רמז אינו טעות ואינו נספר ככזו. מי שנעזר בו עדיין עונה בעצמו. */
     if(!P.q||P.done)return;
     P.hint=true; render();
-    if(P.q.hint)speak(saySpell(P.q.hint),state.lang);
+    if(P.q.hint)speak(P.q.hint,state.lang);
     return;
   }
   if(a==="dunno"){
@@ -4597,7 +4650,7 @@ document.addEventListener("click",function(e){
        התשובה. מי שמנחש לומד פחות ממי שמודה. */
     var q=P.q; if(!q)return;
     P.done=true; P.ok=false; P.picked=-1; record(false); render();
-    setTimeout(function(){speak(saySpell(q.say),state.lang)},260);
+    setTimeout(function(){speak(q.say,state.lang)},260);
     return;
   }
   if(a==="lang"){state.lang=LANGS[v]?v:"he";save();render();return}
@@ -4688,7 +4741,7 @@ document.addEventListener("keydown",function(e){
     return;
   }
   if(e.key===" "){e.preventDefault();
-    speak(saySpell(P.done?P.q.say:sayAsk(P.q)),state.lang); return}
+    speak(P.done?P.q.say:sayAsk(P.q),state.lang); return}
   if(e.key==="Enter"&&P.done){e.preventDefault();newQuestion();return}
 });
 /* רשימת הקולות של הדפדפן מגיעה מאוחר. בלי הרינדור הזה סרגל מצב
@@ -4730,7 +4783,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l152-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l153-pwa1").catch(function(){});
   });
 }
 </script>
@@ -4812,12 +4865,12 @@ if(window.TUTOR){
       read_aloud:{desc:"מקריא את השאלה בקול",
         run:function(){
           if(!BARAK.context())return false;
-          var s=sayAsk(P.q);if(!s)return false;speak(saySpell(s),state.lang);return true;
+          var s=sayAsk(P.q);if(!s)return false;speak(s,state.lang);return true;
         }},
       repeat_question:{desc:"מקריא את השאלה שוב",
         run:function(){
           if(!BARAK.context())return false;
-          var s=sayAsk(P.q);if(!s)return false;speak(saySpell(s),state.lang);return true;
+          var s=sayAsk(P.q);if(!s)return false;speak(s,state.lang);return true;
         }},
       highlight_option:{desc:"מדגיש במסך אחת מהאפשרויות, לפי מקומה (0 עד 3)",
         params:{index:{type:"integer",min:0,max:3,required:true}},
@@ -4831,7 +4884,7 @@ if(window.TUTOR){
           if(!BARAK.context()||!P.done)return false;
           var fb=document.querySelector(".fb");if(!fb)return false;
           var s=txt(fb.innerHTML);if(!s)return false;
-          BARAK.highlight(fb);speak(saySpell(s),state.lang);return true;
+          BARAK.highlight(fb);speak(s,state.lang);return true;
         }},
       go_screen:{desc:"עובר למסך אחר של האפליקציה: בית, התקדמות, הגדרות או תרגול",
         params:{name:{type:"string",enum:["home","prog","set","prac"],required:true}},

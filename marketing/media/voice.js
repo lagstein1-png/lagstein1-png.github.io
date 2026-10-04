@@ -21,8 +21,10 @@
    ו-`deploy-tutor`. הקובץ הזה אינו רץ כאן; הוא רץ שם.
 
    **ולמה Gemini ולא ספק אחר:** המפתח כבר קיים כ-Secret
-   (`GEMINI_API_KEY`, אותו מפתח של לימור), הוא בשכבה החינמית, והוא
-   בצד שרת בלבד — ארבעת התנאים של סעיף 1 ב-`CLAUDE.md`. אין מפתח
+   (`GEMINI_API_KEY`, אותו מפתח של לימור ושל `record.yml`; מ-3.10.2026
+   הוא במדרגה בתשלום, Tier 2 — `.claude/qa/record.js`), והוא
+   בצד שרת בלבד. התנאי ״שכבה חינמית״ של סעיף 1 ב-`CLAUDE.md` הוכרע
+   אחרת בידי הבעלים (O-83, 21.9.2026: ״כבר שילמנו״). אין מפתח
    בריפו, ואין תלות חדשה: `fetch` מובנה ב-Node, ו-ffmpeg כבר נדרש
    ל-`audio.js`.
 
@@ -111,15 +113,26 @@ function pcmToMp3(ffmpeg, pcm, rate) {
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+/* **הוראת הקראה — אותו תיקון כמו ב-`.claude/qa/record.js` (READ_PROMPT).**
+   שורה קצרה כמו ״בערבית.״ או ״ובאנגלית.״ נקראת לפעמים כהוראה, והמודל
+   מנסה לענות לה: 400 ״Model tried to generate text״, או 200 בלי אודיו
+   שוב ושוב. שם נמדד (3.10.2026, ulpan) 15 כשלים מתוך 200 משפטים
+   מהסוג הזה. רק אז — לא לכל שורה — אותה שורה נשלחת שוב עם ההוראה
+   לפניה. השורות שהוקראו כך מסומנות בפלט, כדי לבדוק באוזן שההוראה
+   עצמה לא נשמעת. */
+const READ_PROMPT = 'הקרא בקול ברור את המשפט הבא, בדיוק כפי שהוא כתוב, ואל תוסיף דבר:\n';
+
 async function speak(ffmpeg, text) {
-  /* 429 הוא מכסה ולא תקלה — ממתינים ומנסים שוב, פעמיים. כל שאר
-     השגיאות נזרקות מיד: ניסיון חוזר על 400 רק שורף מכסה. */
+  /* 429 הוא מכסה ולא תקלה — ממתינים ומנסים שוב, פעמיים. 400 של
+     ״generate text״ מקבל ניסיון אחד עם הוראת ההקראה. כל שאר השגיאות
+     נזרקות מיד: ניסיון חוזר על 400 אחר רק שורף מכסה. */
+  let prompted = false;
   for (let attempt = 0; ; attempt++) {
     const r = await fetch(API + '/models/' + MODEL + ':generateContent?key=' + encodeURIComponent(KEY), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text }] }],
+        contents: [{ parts: [{ text: prompted ? READ_PROMPT + text : text }] }],
         generationConfig: {
           responseModalities: ['AUDIO'],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: VOICE } } }
@@ -131,6 +144,7 @@ async function speak(ffmpeg, text) {
       const body = await r.text();
       let msg = body;
       try { msg = JSON.parse(body).error.message } catch (e) { }
+      if (r.status === 400 && !prompted && /generate text/i.test(String(msg))) { prompted = true; continue }
       throw new Error('gemini ' + r.status + ' ' + String(msg).replace(/\s+/g, ' ').slice(0, 160));
     }
     const j = await r.json();
@@ -139,13 +153,14 @@ async function speak(ffmpeg, text) {
     /* **תשובה 200 בלי אודיו — נמדד, וזה חולף.** בריצה 2 של
        `voice` שורה 11 מתוך 12 ב-reader חזרה כך, ואחת־עשרה
        אחיותיה עברו באותה שנייה. זו אינה שגיאת קלט אלא רעש של
-       השירות, ולכן מנסים שוב — בדיוק כמו 429, ולא זורקים. */
+       השירות, ולכן מנסים שוב — בדיוק כמו 429, ולא זורקים.
+       שלוש פעמים ברצף — כבר אינו רעש: עוברים להוראת ההקראה. */
     if (!inline || !inline.data) {
-      if (attempt < 2) { await sleep(2000 * (attempt + 1)); continue }
-      throw new Error('תשובה בלי אודיו בשלושה ניסיונות');
+      if (attempt < 5) { if (attempt >= 2) prompted = true; await sleep(2000 * Math.min(attempt + 1, 3)); continue }
+      throw new Error('תשובה בלי אודיו בשישה ניסיונות');
     }
     const rate = Number((/rate=(\d+)/.exec(inline.mimeType || '') || [])[1]) || 24000;
-    return pcmToMp3(ffmpeg, Buffer.from(inline.data, 'base64'), rate);
+    return { mp3: pcmToMp3(ffmpeg, Buffer.from(inline.data, 'base64'), rate), prompted };
   }
 }
 
@@ -195,10 +210,10 @@ async function build(only) {
       if (fs.existsSync(dst)) { skipped++; continue }
       if (!row.text) continue;
       try {
-        const mp3 = await speak(ffmpeg, row.text);
-        fs.writeFileSync(dst, mp3);
+        const got = await speak(ffmpeg, row.text);
+        fs.writeFileSync(dst, got.mp3);
         made++;
-        console.log(`✓ ${name}/${row.n}  ${row.text.slice(0, 46)}`);
+        console.log(`✓ ${name}/${row.n}  ${row.text.slice(0, 46)}${got.prompted ? '  (עם הוראת הקראה — לבדוק באוזן)' : ''}`);
       } catch (e) {
         failed++;
         console.log(`✗ ${name}/${row.n}  ${e.message}`);

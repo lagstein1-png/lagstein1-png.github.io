@@ -17,6 +17,8 @@ const PRE = ["./","./index.html","./manifest.json",
              /* ג׳וש — שכבת הפנים והתמונה. שתיהן בנתיבים משותפים
                 (/tutor/, /img/) ולכן עותק אחד לכל האתר. */
              "/tutor/he-speech.js","/tutor/josh-face.js","/img/limor.jpg","/img/josh.jpg",
+             /* לימור בדף הבית — O-51 (4.10.2026): הממשק והמוח המקומי. */
+             "/tutor/josh-local.js","/tutor/tutor.js",
              /* גופנים מקומיים — /fonts/fonts.css (1.10.2026) */
              "/fonts/fonts.css","/fonts/heebo-hebrew.woff2","/fonts/heebo-math.woff2","/fonts/heebo-latin.woff2","/fonts/noto-sans-arabic-arabic.woff2","/fonts/noto-sans-cyrillic.woff2","/fonts/noto-sans-greek.woff2","/fonts/noto-sans-latin.woff2"];
 

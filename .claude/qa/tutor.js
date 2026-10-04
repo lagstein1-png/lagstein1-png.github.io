@@ -35,6 +35,10 @@ const EXTERNAL = ['theory'];
 /* 3.10.2026: תפקידים שנוספו ב-worker.js לאפליקציות חדשות. הכפתור שלהן עדיין לא מחווט
    (מחוץ לבדיקת החיווט), אבל לכל אחת כבר יש ROLE. */
 const ROLE_ONLY = ['science', 'math-elem', 'hebrew-lit', 'teacher-material'];
+/* O-51, 4.10.2026: דף הבית. אינו אפליקציית לימוד — התפקיד שלו מדריכה
+   שעוזרת לבחור אפליקציה — ולכן הוא ברשימה משלו, והחיווט שלו נבדק
+   בסעיף 7א מול index.html ו-sw.js של השורש. */
+const HOME = ['home'];
 const LANGS = ['he', 'ar', 'ru', 'en'];
 
 let bad = 0;
@@ -263,10 +267,10 @@ import(WORKER).then(async W => {
 
   /* ---------- 5. תפקיד לכל אפליקציה ---------- */
   t('לכל שתים־עשרה האפליקציות יש תפקיד',
-    Object.keys(W.ROLE).sort(), APPS.concat(EXTERNAL, ROLE_ONLY).sort());
+    Object.keys(W.ROLE).sort(), APPS.concat(EXTERNAL, ROLE_ONLY, HOME).sort());
   const dup = new Set(Object.values(W.ROLE));
-  t('אין שני תפקידים זהים', dup.size, APPS.length + EXTERNAL.length + ROLE_ONLY.length);
-  APPS.concat(EXTERNAL).forEach(a => {
+  t('אין שני תפקידים זהים', dup.size, APPS.length + EXTERNAL.length + ROLE_ONLY.length + HOME.length);
+  APPS.concat(EXTERNAL, HOME).forEach(a => {
     const c = W.contextBlock({ app: a, lang: 'he', q: null }, 0);
     if (c.indexOf(W.ROLE[a]) !== 0) { bad++; console.log(`✗ ${a}: התפקיד אינו נשלח בראש ההקשר`) }
   });
@@ -649,6 +653,31 @@ import(WORKER).then(async W => {
     if (miss.length) { bad++; console.log(`✗ ${a}: חסר ${miss.join(', ')}`) }
   });
   console.log(`✓ שתים־עשרה האפליקציות מחווטות (תגית, mount, open, PRE)`);
+
+  /* ---------- 7א. דף הבית — O-51 ----------
+     תגית, mount עם app:"home", open, ו-tutor.js ב-PRE של השורש. ובשרת:
+     רשימת האפליקציות נכנסת להקשר של home בלבד, ובלי תרגיל אין
+     ״בקש מהתלמיד לכתוב את התרגיל״ — זו הוראה של מורה, לא של מדריכה. */
+  {
+    const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+    const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
+    const miss = [];
+    if (!/<script[^>]*src="\/tutor\/tutor\.js"><\/script>/.test(html)) miss.push('תגית סקריפט');
+    if (!/TUTOR\.mount\(\{\s*app:"home"/.test(html)) miss.push('mount עם app:"home"');
+    if (!/TUTOR\.open\(/.test(html)) miss.push('open');
+    if (sw.indexOf('"/tutor/tutor.js"') < 0) miss.push('PRE ב-sw.js');
+    t('דף הבית מחווט (תגית, mount, open, PRE)', miss, []);
+    const body = { app: 'home', lang: 'he', q: { apps: ['חשבון ליסודי', 'אולפן'] },
+                   messages: [{ role: 'user', text: 'מה כדאי לי ללמוד?' }] };
+    const inp = W.readBody(body);
+    const ctx = inp && W.contextBlock(inp, 0);
+    t('home: רשימת האפליקציות נכנסת להקשר', !!ctx && ctx.indexOf('חשבון ליסודי · אולפן') >= 0, true);
+    t('home: אין בקשה לכתוב תרגיל', !!ctx && /התרגיל/.test(ctx), false);
+    const other = W.readBody(Object.assign({}, body, { app: 'math-app' }));
+    t('רשימת האפליקציות נזרקת מחוץ לדף הבית', other && other.apps, null);
+    t('home: התפקיד אינו מדבר על הרשמה או תשלום כהצעה',
+      /אל תציעי להירשם/.test(W.ROLE.home) && /אל תפתרי תרגילים/.test(W.ROLE.home), true);
+  }
 
   /* ---------- 8. שער התנאים ---------- */
   const url = (client.match(/var API\s*=\s*"([^"]*)"/) || [])[1];

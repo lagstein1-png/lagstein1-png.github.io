@@ -86,15 +86,16 @@ const NO_ENTER = {
    אפליקציה מפיל כרגיל; **וכשל ידוע שנעלם מפיל גם הוא** — כדי
    שהשורה תימחק מכאן ולא תכסה באג חדש שיגיע במקומו. */
 const KNOWN = {
-  'hebrew-lit':  { re: /^(next_question לא אושרה|next_question — המסך לא התחלף|הטקסט של next לא הוצג)/,
-                   why: 'next_question מסרבת לפני מענה (״אחרי שנענתה״, js/app.js:264) — הבדיקה מצפה לדילוג כמו במתמטיקה. הכרעת מוצר.' },
-  'tanakh-elem': { re: /^(next_question לא אושרה|next_question — המסך לא התחלף|הטקסט של next לא הוצג)/,
-                   why: 'אותו מתאם כמו hebrew-lit (js/app.js:209).' },
-  'civics-elem': { re: /^(next_question לא אושרה|next_question — המסך לא התחלף|הטקסט של next לא הוצג)/,
-                   why: 'אותו מתאם כמו hebrew-lit (js/app.js:209).' },
-  'bagrut-history': { re: /^show_hint לא אושרה/,
-                   why: 'ל-34 מתוך 34 הסעיפים ב-data/exams.js אין steps, ו-show_hint מוצעת למודל ולעולם אינה מצליחה.' }
 };
+
+/* **״הבא״ רק אחרי מענה — התנהגות מוצהרת, לא כשל ידוע. O-128, 4.10.2026.**
+   ב-hebrew-lit, ‏tanakh-elem ו-civics-elem ‏`next_question` מסרבת לשאלה
+   שלא נענתה (התיאור: ״עובר לשאלה הבאה אחרי שנענתה״; `run` מחזירה false
+   כל עוד `!R.locked`). הכרעה: זו הכוונה לגיל הצעיר — אין דילוג בלי
+   ניסיון. עד היום זה ישב ב-`KNOWN` כאילו היה באג; עכשיו זה **נאכף**:
+   לפני מענה — סירוב, המסך לא זז, ומוצג ACTION_FAILED; אחרי מענה — מעבר.
+   אפליקציה מכאן שתתחיל לדלג על שאלה שלא נענתה — נופלת. */
+const NEXT_AFTER_ANSWER = { 'hebrew-lit': 1, 'tanakh-elem': 1, 'civics-elem': 1 };
 
 /* עקיפה לזמן פיתוח: BARAK_ENTER='{"english":["[data-a=\"x\"]"]}' */
 try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch (e) {}
@@ -211,7 +212,33 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
        רע בהגרלה — barak-core מסמן אותה ככישלון ולימור אומר ללומד
        ״לא הצלחתי״ בזמן שהמסך כבר התחלף. */
     const raw = () => page.evaluate(() => { const a = BARAK.adapter(); try { return a && a.getScreenContext() } catch (e) { return null } });
-    if (actions.indexOf('next_question') >= 0) {
+    if (actions.indexOf('next_question') >= 0 && NEXT_AFTER_ANSWER[app]) {
+      /* O-128 — הצד הראשון: לפני מענה, סירוב בנימוק המוצהר. */
+      const desc = await page.evaluate(() => ((BARAK.actions() || []).filter(a => a.name === 'next_question')[0] || {}).desc || '');
+      if (!/אחרי שנענתה/.test(desc)) F('O-128: התיאור של next_question אינו אומר ״אחרי שנענתה״: ' + desc);
+      const failedTxt = await page.evaluate(() => BARAK.ACTION_FAILED.he);
+      const before = await raw();
+      const r = await send('תעביר אותי לשאלה הבאה', 'next');
+      const after = await raw();
+      if (!r.res || !r.res.action || r.res.action.ok !== false) F('O-128: next_question דילגה על שאלה שלא נענתה (צפוי סירוב): ' + JSON.stringify(r.res && r.res.action));
+      if (before && after && (before.id !== after.id || before.q !== after.q)) F('O-128: המסך התחלף לפני מענה');
+      if (!r.last || r.last.text !== failedTxt) F('O-128: הסירוב לא הוצג כ-ACTION_FAILED: ' + (r.last && r.last.text));
+      /* הצד השני: עונים (לחיצה על אפשרות עד שהשאלה ננעלת — נכונה, או
+         שתי טעויות וחשיפה), ואז ״הבא״ חייב לעבור. בלי זה סירוב גורף
+         (`run` שמחזירה תמיד false) היה עובר את הבדיקה. */
+      for (let i = 0; i < 4 && !(await page.evaluate(() => !!(window.R && R.locked))); i++) {
+        await page.evaluate(() => { const o = document.querySelector('button.opt:not([disabled])'); if (o) o.click() });
+        await page.waitForTimeout(150);
+      }
+      if (!(await page.evaluate(() => !!(window.R && R.locked)))) F('O-128: לא הצלחתי לענות על השאלה (R.locked לא נדלק)');
+      else {
+        const b2 = await raw();
+        const r2 = await send('תעביר אותי לשאלה הבאה', 'next');
+        const a2 = await raw();
+        if (!r2.res || !r2.res.action || r2.res.action.ok !== true) F('O-128: next_question לא עברה גם אחרי מענה: ' + JSON.stringify(r2.res && r2.res.action));
+        if (b2 && a2 && b2.id === a2.id && b2.q === a2.q) F('O-128: אחרי מענה — המסך לא התחלף');
+      }
+    } else if (actions.indexOf('next_question') >= 0) {
       const before = await raw();
       const r = await send('תעביר אותי לשאלה הבאה', 'next');
       const after = await raw();

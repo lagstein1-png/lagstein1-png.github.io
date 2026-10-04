@@ -173,6 +173,75 @@ function fresh(manifest, audioBehaviour) {
     t('english בדפדפן — משפט עם קובץ: Audio אחד, speechSynthesis אפס', [res.a1, res.s1, res.synth.slice(0, res.s1)], [1, 0, []]);
     t('english בדפדפן — הקובץ הנכון', res.src, 'audio/he/' + idOf + '.mp3');
     t('english בדפדפן — משפט בלי קובץ: קול המכשיר, בלי Audio נוסף', [res.a2, res.s2 >= 1], [1, true]);
+
+    /* --- lomda: מה ש-record.js מקליט הוא מה שהלומד שומע (4.10.2026) ---
+       נמדד בדפדפן: שאלה (רווח), כרטיס אחרי המענה, רמז ושורות הקטע
+       הגיעו ל-0 הקלטות מתוך 42 שאלות — הם משפטים מורכבים בזמן ריצה
+       (``כותרת. תיאור``, ``שאלה. כותרת · שנה``) ו-saySpell רץ לפני
+       הגיבוב, בעוד record.js מקליט כל שדה לבד. כאן המניפסט הוא המאגר
+       כולו (``record.js --ids lomda``), כאילו הכול הוקלט, וכל הקראה
+       בעברית בכל מסלול חייבת להגיע ל-Audio ולא לקול המכשיר. */
+    const ids = JSON.parse(require('child_process').execFileSync(process.execPath,
+      [path.join(__dirname, 'record.js'), '--ids', 'lomda'], { maxBuffer: 1 << 26 }).toString());
+    const lp = await (await browser.newContext()).newPage();
+    await lp.addInitScript((ver) => {
+      try { localStorage.setItem('legal-accepted-v' + ver, JSON.stringify({ v: ver, at: new Date().toISOString(), lang: 'he' })); } catch (e) {}
+      window.__log = [];
+      class U extends EventTarget { constructor(t) { super(); this.text = t; } }
+      Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speaking: false, pending: false, paused: false,
+        getVoices() { return [{ name: 'Google עברית', lang: 'he-IL', voiceURI: 'g', localService: true }]; },
+        addEventListener() {}, removeEventListener() {}, cancel() {}, pause() {}, resume() {},
+        speak(u) { if (u.text) window.__log.push({ p: window.__p, dev: u.text }); } } });
+      window.SpeechSynthesisUtterance = U;
+      /* onended מיידי: משפט שמנוגן כשרשרת של קטעים מוקלטים צריך את כולם */
+      window.Audio = function () {
+        const a = { playbackRate: 1, onended: null, onerror: null, _src: '' };
+        Object.defineProperty(a, 'src', { get() { return a._src; }, set(v) { a._src = String(v); } });
+        a.pause = function () {};
+        a.play = function () { if (!a._src.startsWith('data:')) { window.__log.push({ p: window.__p, audio: a._src });
+          const f = a.onended; if (f) Promise.resolve().then(f); } return Promise.resolve(); };
+        return a;
+      };
+    }, LEGAL_VER);
+    await lp.route('**/lomda/audio/manifest.json', r => r.fulfill({ status: 200, contentType: 'application/json',
+      body: JSON.stringify({ langs: { he: { ids } } }) }));
+    await lp.goto(BASE + '/lomda/', { waitUntil: 'domcontentloaded' });
+    await lp.waitForFunction(() => window.RECORDED && RECORDED._state.loaded && TOPICS.length);
+    const lr = await lp.evaluate(async () => {
+      const tick = () => Promise.resolve();   /* הרצף כולו במיקרו־משימות: setTimeout היה מוסיף 40 שניות */
+      const agg = {}, miss = [];
+      let nq = 0;
+      state.lang = 'he'; state.settings = state.settings || {}; state.settings.tts = false;
+      async function act(p, fn) {
+        window.__p = p; const n0 = window.__log.length;
+        fn(); for (let i = 0; i < 40; i++) await tick();
+        const got = window.__log.slice(n0), a = agg[p] = agg[p] || { calls: 0, recorded: 0 };
+        if (!got.length) return;
+        a.calls++;
+        const dev = got.filter(x => x.dev);
+        if (!dev.length) a.recorded++; else if (miss.length < 8) miss.push(p + ': ' + dev[0].dev);
+      }
+      for (const tp of TOPICS) for (let lv = 1; lv <= 3; lv++) {
+        state.topic = tp.id; state.level = lv; state.screen = 'prac'; view = ''; P.sum = false;
+        newQuestion(); if (!P.q) continue; nq++;
+        await act('שאלה (רווח)', () => document.body.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true })));
+        for (const b of document.querySelectorAll('.subject .spk[data-a="say"]:not([data-slow])')) await act('כותרת', () => b.click());
+        for (const b of document.querySelectorAll('.orow .spk')) await act('אפשרות', () => b.click());
+        for (const b of document.querySelectorAll('.passage .s')) await act('שורת קטע', () => b.click());
+        for (const b of [...document.querySelectorAll('.qcard .spk[data-a="say"]:not([data-slow])')]
+          .filter(b => !b.closest('.subject') && !b.closest('.orow'))) await act('קטע מלא', () => b.click());
+        const hb = document.querySelector('[data-a="hint"]'); if (hb) await act('רמז', () => hb.click());
+        P.done = true; P.ok = true; P.picked = 0; render();
+        for (const b of document.querySelectorAll('.qcard .spk[data-a="say"]:not([data-slow])')) if (!b.closest('.orow') && !b.closest('.subject'))
+          await act('אחרי המענה', () => b.click());
+        await act('רווח אחרי המענה', () => document.body.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true })));
+      }
+      return { agg, miss, nq };
+    });
+    console.log('  lomda: ' + lr.nq + ' שאלות · ' + Object.entries(lr.agg).map(([k, v]) => k + ' ' + v.recorded + '/' + v.calls).join(' · '));
+    lr.miss.forEach(m => console.log('    לקול המכשיר — ' + m));
+    t('lomda בדפדפן — כל מה שהמאגר מקליט מגיע ל-Audio בכל מסלול (שאלה, כותרת, אפשרות, קטע, רמז, אחרי המענה)',
+      Object.values(lr.agg).reduce((s, v) => s + v.calls - v.recorded, 0), 0);
     await browser.close();
   }
 

@@ -372,8 +372,8 @@ async function tap(page, sel) {
 
 const FLOWS = {
   /* תסריט 3 — מצב מורה, ב-math-teen (שבוע 3 בלוח: קבוצת מורי מתמטיקה) */
-  teacher: { app: 'math-teen', script: 3, file: 'teacher-math-teen', tail: 'מצב מורה בתשע אפליקציות · בלי חשבון לתלמיד', steps: [
-    async (page) => {                               /* בכל אפליקציה יש מצב מורה */
+  teacher: { app: 'math-teen', script: 3, file: 'teacher-math-teen', tail: 'מצב מורה ב-17 אפליקציות · בלי חשבון לתלמיד', steps: [
+    async (page) => {                               /* ב-17 מתוך 23 האפליקציות יש מצב מורה */
       /* פתיחה ראשונה = שלושה מסכי היכרות, כמו אצל הלומד */
       for (let k = 0; k < 3 && await page.locator('[data-a="obnext"]').count(); k++) await tap(page, '[data-a="obnext"]');
       await tap(page, '[data-a="go"][data-v="settings"]');
@@ -516,7 +516,7 @@ const switchLang = async (page, lg) => {
 };
 FLOWS.langs = {                                   /* תסריט 4 — ארבע השפות, ב״אקסיומה״ */
   app: 'math-uni', script: 4, file: 'langs-math-uni', tail: 'ארבע שפות · השאלות, הרמזים וההסברים', steps: [
-    async (page) => {                               /* שאלה במתמטיקה בעברית */
+    async (page) => {                               /* שאלה במתמטיקה, בעברית */
       /* ההיכרות אינה חלק מהתסריט הזה — לחיצות מהירות, כדי שהשאלה בעברית תישאר על המסך */
       for (let k = 0; k < 3 && await page.locator('[data-a="obnext"]').count(); k++) { await page.click('[data-a="obnext"]'); await page.waitForTimeout(150); }
       if (await page.locator('[data-a="lvl"][data-l="2"]').count()) await page.click('[data-a="lvl"][data-l="2"]');
