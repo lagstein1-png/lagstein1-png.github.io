@@ -131,20 +131,20 @@ var GEN={
 function pick1(a){return a[rnd(a.length)]}
 /* units: grade, gen name, number of questions per round */
 var UNITS=[
- {id:"u1",grade:1,icon:"🔤",color:"#e8590c",gen:"first",n:10},
- {id:"u2",grade:1,icon:"🖼️",color:"#2b8a3e",gen:"pic",n:10},
- {id:"u3",grade:1,icon:"🧩",color:"#1c7ed6",gen:"syl",n:10},
+ {id:"u1",grade:1,icon:"🔤",color:"#c64c0a",gen:"first",n:10},
+ {id:"u2",grade:1,icon:"🖼️",color:"#29853c",gen:"pic",n:10},
+ {id:"u3",grade:1,icon:"🧩",color:"#1a76c9",gen:"syl",n:10},
  {id:"u4",grade:1,icon:"🔗",color:"#9c36b5",gen:"build",n:10},
  {id:"u5",grade:1,icon:"🎧",color:"#c2255c",gen:"listen",n:10},
- {id:"u6",grade:1,icon:"✏️",color:"#0c8599",gen:["cloze","sentqa"],n:10},
+ {id:"u6",grade:1,icon:"✏️",color:"#0b7f92",gen:["cloze","sentqa"],n:10},
  {id:"u12",grade:1,icon:"📄",color:"#5f3dc4",gen:"comp",texts:"TEXTS1",n:9},
- {id:"u13",grade:3,icon:"🌱",color:"#1c7ed6",gen:"family",n:10},
- {id:"u14",grade:3,icon:"✍️",color:"#2b8a3e",gen:"spell",n:10},
+ {id:"u13",grade:3,icon:"🌱",color:"#1a76c9",gen:"family",n:10},
+ {id:"u14",grade:3,icon:"✍️",color:"#29853c",gen:"spell",n:10},
  {id:"u15",grade:3,icon:"📰",color:"#c2255c",gen:"comp",texts:"TEXTS3",n:10},
  {id:"u16",grade:4,icon:"🏷️",color:"#9c36b5",gen:"pos",n:10},
- {id:"u7",grade:2,icon:"👏",color:"#e8590c",gen:"count",n:10},
- {id:"u8",grade:2,icon:"🎵",color:"#2b8a3e",gen:"rhyme",n:10},
- {id:"u9",grade:2,icon:"🔍",color:"#1c7ed6",gen:"same",n:10},
+ {id:"u7",grade:2,icon:"👏",color:"#c64c0a",gen:"count",n:10},
+ {id:"u8",grade:2,icon:"🎵",color:"#29853c",gen:"rhyme",n:10},
+ {id:"u9",grade:2,icon:"🔍",color:"#1a76c9",gen:"same",n:10},
  {id:"u10",grade:2,icon:"🔚",color:"#9c36b5",gen:"final",n:10},
  {id:"u11",grade:2,icon:"📖",color:"#c2255c",gen:"comp",n:9}
 ];

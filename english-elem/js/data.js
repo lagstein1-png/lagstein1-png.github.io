@@ -7,7 +7,7 @@
    Q stim|he|ar|ru|en|correct|d1;d2;d3         written question: English stim (optional; "@" = hear it, hidden), prompt in 4 languages, English options
    Content written fresh; the Arabic, Russian and English interface text is machine-quality, for teacher review. */
 var RAW=String.raw`
-S abc|🔤|#1c7ed6|האותיות באנגלית|الحروف الإنجليزية|Английский алфавит|The English alphabet|g12|abc
+S abc|🔤|#1a76c9|האותיות באנגלית|الحروف الإنجليزية|Английский алфавит|The English alphabet|g12|abc
 L בואו נכיר את האותיות. לכל אות יש מילה אחת שמתחילה בה.|لنتعرّف على الحروف. لكل حرف كلمة تبدأ به.|Давайте познакомимся с буквами. У каждой буквы есть слово, которое с неё начинается.|Let's meet the letters. Each letter has a word that starts with it.
 T A|apple|🍎|תפוח|تفاحة|яблоко
 T B|ball|⚽|כדור|كرة|мяч
@@ -35,7 +35,7 @@ T W|watch|⌚|שעון יד|ساعة يد|наручные часы
 T X|xylophone|🎶|קסילופון|إكسيليفون|ксилофон
 T Y|yellow|🟡|צהוב|أصفر|жёлтый
 T Z|zebra|🦓|זברה|حمار وحشي|зебра
-S colors|🎨|#e8590c|צבעים|الألوان|Цвета|Colors|g12|vocab
+S colors|🎨|#c64c0a|צבעים|الألوان|Цвета|Colors|g12|vocab
 L בואו נלמד צבעים באנגלית. לחצו על כל כרטיס ושמעו.|لنتعلّم الألوان بالإنجليزية. اضغط على كل بطاقة واستمع.|Давайте выучим цвета по-английски. Нажимай на карточки и слушай.|Let's learn colors in English. Tap each card and listen.
 W red|🔴|אדום|أحمر|красный
 W blue|🔵|כחול|أزرق|синий
@@ -46,7 +46,7 @@ W purple|🟣|סגול|بنفسجي|фиолетовый
 W black|⚫|שחור|أسود|чёрный
 W white|⚪|לבן|أبيض|белый
 W brown|🟤|חום|بني|коричневый
-S numbers|🔢|#2f9e44|מספרים 1 עד 10|الأعداد من 1 إلى 10|Числа от 1 до 10|Numbers 1 to 10|g12|vocab
+S numbers|🔢|#278539|מספרים 1 עד 10|الأعداد من 1 إلى 10|Числа от 1 до 10|Numbers 1 to 10|g12|vocab
 L בואו נספור באנגלית מאחד עד עשר. הקשיבו לכל מספר.|لنعدّ بالإنجليزية من واحد إلى عشرة. استمع إلى كل عدد.|Давайте посчитаем по-английски от одного до десяти. Слушай каждое число.|Let's count in English from one to ten. Listen to each number.
 W one|1️⃣|אחד|واحد|один
 W two|2️⃣|שניים|اثنان|два
@@ -96,7 +96,7 @@ W cake|🍰|עוגה|كعكة|торт
 W orange|🍊|תפוז|برتقالة|апельсин
 W grapes|🍇|ענבים|عنب|виноград
 W tomato|🍅|עגבנייה|طماطم|помидор
-S school|🎒|#0c8599|בבית הספר|في المدرسة|В школе|At school|g34|vocab
+S school|🎒|#0b7f92|בבית הספר|في المدرسة|В школе|At school|g34|vocab
 L בואו נלמד שמות של דברים בכיתה ובבית הספר.|لنتعلّم أسماء الأشياء في الصف والمدرسة.|Давайте выучим названия предметов в классе и в школе.|Let's learn the names of things in class and at school.
 W book|📖|ספר|كتاب|книга
 W pencil|✏️|עיפרון|قلم رصاص|карандаш
@@ -108,7 +108,7 @@ W clock|⏰|שעון|ساعة|часы
 W school|🏫|בית ספר|مدرسة|школа
 W ruler|📏|סרגל|مسطرة|линейка
 W chair|🪑|כיסא|كرسي|стул
-S body|👂|#f08c00|הגוף|الجسم|Тело|My body|g34|vocab
+S body|👂|#aa6300|הגוף|الجسم|Тело|My body|g34|vocab
 L בואו נלמד את חלקי הגוף באנגלית. הקשיבו וחזרו אחריי.|لنتعلّم أجزاء الجسم بالإنجليزية. استمع وكرّر.|Давайте выучим части тела по-английски. Слушай и повторяй.|Let's learn the parts of the body in English. Listen and repeat.
 W eye|👁️|עין|عين|глаз
 W ear|👂|אוזן|أذن|ухо
@@ -120,7 +120,7 @@ W leg|🦵|רגל|ساق|нога
 W tooth|🦷|שן|سن|зуб
 W heart|❤️|לב|قلب|сердце
 W brain|🧠|מוח|دماغ|мозг
-S nature|🌈|#1098ad|מזג אוויר וטבע|الطقس والطبيعة|Погода и природа|Weather and nature|g34|vocab
+S nature|🌈|#0d8091|מזג אוויר וטבע|الطقس والطبيعة|Погода и природа|Weather and nature|g34|vocab
 L בואו נדבר על מזג האוויר ועל הטבע, באנגלית.|لنتحدّث عن الطقس والطبيعة بالإنجليزية.|Давайте поговорим о погоде и природе по-английски.|Let's talk about the weather and nature, in English.
 W sun|☀️|שמש|شمس|солнце
 W rain|🌧️|גשם|مطر|дождь
@@ -132,7 +132,7 @@ W star|⭐|כוכב|نجمة|звезда
 W tree|🌳|עץ|شجرة|дерево
 W flower|🌸|פרח|زهرة|цветок
 W rainbow|🌈|קשת|قوس قزح|радуга
-S transport|🚌|#5c940d|תחבורה ובית|المواصلات والبيت|Транспорт и дом|Transport and home|g34|vocab
+S transport|🚌|#50810b|תחבורה ובית|المواصلات والبيت|Транспорт и дом|Transport and home|g34|vocab
 L בואו נלמד באיזה כלי רכב נוסעים, ואיפה גרים.|لنتعلّم بأيّ مركبة نسافر وأين نسكن.|Давайте выучим, на чём ездят и где живут.|Let's learn how we travel and where we live.
 W car|🚗|מכונית|سيارة|машина
 W bus|🚌|אוטובוס|حافلة|автобус

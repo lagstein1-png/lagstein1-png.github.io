@@ -16,7 +16,7 @@ function applyLang(){
 function go(v,extra){stopSpeech();view=v;if(extra){for(var k in extra)window[k]=extra[k]}render();window.scrollTo(0,0)}
 function unitById(id){return UNITS.filter(function(u){return u.id===id})[0]}
 var GRADE_LETTER={1:"א",2:"ב",3:"ג",4:"ד",5:"ה",6:"ו"};
-var GRADE_COLOR={1:"#e8590c",2:"#2b8a3e",3:"#1c7ed6",4:"#9c36b5",5:"#c2255c",6:"#0c8599"};
+var GRADE_COLOR={1:"#c64c0a",2:"#29853c",3:"#1a76c9",4:"#9c36b5",5:"#c2255c",6:"#0b7f92"};
 /* ---------- chrome ---------- */
 function topbar(title,backTo){
   var langs=LANGS.map(function(l){return '<button class="lg'+(l===state.lang?' on':'')+'" data-lang="'+l+'" aria-pressed="'+(l===state.lang)+'" aria-label="'+LANG_LABEL[l]+'">'+(l==="he"?"עב":l==="ar"?"عر":l==="ru"?"RU":"EN")+'</button>'}).join("");

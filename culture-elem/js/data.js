@@ -65,7 +65,7 @@ E e_mon|t|ביום שני|يوم الاثنين|в понедельник|on Mon
 E e_tue|t|ביום שלישי|يوم الثلاثاء|во вторник|on Tuesday
 Q באיזה יום נחים הנוצרים ומתפללים?|في أي يوم يرتاح المسيحيون ويصلّون؟|В какой день христиане отдыхают и молятся?|On which day do Christians rest and pray?|e_sun|e_wed,e_mon,e_tue
 E e_sun|t|ביום ראשון|يوم الأحد|в воскресенье|on Sunday
-S rosh|🍎|#e8590c|ראש השנה ויום כיפור|رأس السنة العبرية ويوم الغفران|Рош а-Шана и Йом-Кипур|Rosh Hashanah and Yom Kippur
+S rosh|🍎|#c64c0a|ראש השנה ויום כיפור|رأس السنة العبرية ويوم الغفران|Рош а-Шана и Йом-Кипур|Rosh Hashanah and Yom Kippur
 L ראש השנה הוא ראש השנה היהודית. הוא חל בסתיו.|رأس السنة العبرية هو بداية السنة اليهودية. ويأتي في الخريف.|Рош а-Шана - это еврейский Новый год. Он бывает осенью.|Rosh Hashanah is the Jewish New Year. It comes in the autumn.
 L בבית הכנסת תוקעים בשופר. השופר עשוי מקרן של איל.|في الكنيس ينفخون في الشوفار. وهو مصنوع من قرن كبش.|В синагоге трубят в шофар. Он сделан из рога барана.|In the synagogue people blow the shofar. It is made from a ram's horn.
 L אוכלים תפוח בדבש ואומרים: שתהיה לנו שנה מתוקה.|يأكلون تفاحة بالعسل ويقولون: لتكن لنا سنة حلوة.|Едят яблоко с мёдом и говорят: пусть у нас будет сладкий год.|People eat an apple in honey and say: may we have a sweet year.
@@ -86,7 +86,7 @@ E e_empty|t|ריקים ממכוניות|خالية من السيارات|пус�
 E e_jam|t|מלאים בפקקים|مليئة بالازدحام|полные пробок|full of traffic jams
 E e_race|t|יש בהם מרוצי מכוניות|فيها سباقات سيارات|там гонки машин|there are car races
 E e_flood|t|מכוסים במים|مغطّاة بالماء|залиты водой|covered with water
-S sukkot|🌿|#2b8a3e|סוכות ושמחת תורה|سوكوت وفرحة التوراة|Суккот и Симхат-Тора|Sukkot and Simchat Torah
+S sukkot|🌿|#29853c|סוכות ושמחת תורה|سوكوت وفرحة التوراة|Суккот и Симхат-Тора|Sukkot and Simchat Torah
 L בסוכות בונים סוכה: בית קטן עם גג של ענפים.|في سوكوت يبنون سُكّا: بيتًا صغيرًا سقفه من الأغصان.|На Суккот строят сукку: маленький домик с крышей из веток.|On Sukkot people build a sukkah: a small hut with a roof of branches.
 L דרך הענפים רואים את הכוכבים. אוכלים בסוכה ואפילו ישנים בה.|من بين الأغصان نرى النجوم. يأكلون في السُّكّا وحتى ينامون فيها.|Сквозь ветки видно звёзды. В сукке едят, а иногда и спят.|Through the branches you can see the stars. People eat in the sukkah and sometimes even sleep there.
 L הסוכה מזכירה את הימים שבהם עם ישראל הלך במדבר.|السُّكّا تذكّرنا بالأيام التي مشى فيها بنو إسرائيل في الصحراء.|Сукка напоминает о днях, когда народ Израиля шёл по пустыне.|The sukkah reminds us of the days when the people of Israel walked in the desert.
@@ -107,7 +107,7 @@ E e_dance|t|רוקדים עם ספרי תורה|يرقصون مع لفائف ا�
 E e_fastt|t|צמים כל היום ולא קוראים ספר תורה|يصومون طوال اليوم ولا يقرؤون التوراة|постятся весь день и не читают Тору|they fast all day and do not read the Torah
 E e_sleepb|t|ישנים בסוכה|ينامون في السُّكّا|спят в сукке|they sleep in the sukkah
 E e_nothing|t|מחזירים את ספר התורה לארון עד השנה הבאה|يعيدون لفيفة التوراة إلى الخزانة حتى السنة القادمة|убирают свиток Торы в шкаф до следующего года|they put the Torah scroll away in the ark until next year
-S hanuka|🕎|#e67700|חנוכה: חג האורים|حانوكا: عيد الأنوار|Ханука: праздник огней|Hanukkah: The Festival of Lights
+S hanuka|🕎|#b35d00|חנוכה: חג האורים|حانوكا: عيد الأنوار|Ханука: праздник огней|Hanukkah: The Festival of Lights
 L לפני הרבה שנים המקדש בירושלים היה מלוכלך. המכבים ניצחו והחזירו אותו לעם.|قبل سنوات كثيرة كان الهيكل في القدس متّسخًا. انتصر المكابيون وأعادوه للشعب.|Много лет назад Храм в Иерусалиме был осквернён. Маккавеи победили и вернули его народу.|Many years ago the Temple in Jerusalem was dirty. The Maccabees won and gave it back to the people.
 L במקדש היה רק קצת שמן, אבל הוא דלק שמונה ימים. זה היה נס.|لم يكن في الهيكل إلا القليل من الزيت، لكنه اشتعل ثمانية أيام. كانت تلك معجزة.|В Храме было совсем мало масла, но оно горело восемь дней. Это было чудо.|There was only a little oil in the Temple, but it burned for eight days. It was a miracle.
 L בחנוכה מדליקים חנוכייה. בכל לילה מדליקים נר אחד יותר.|في حانوكا يُشعلون شمعدان حانوكا. كل ليلة يُشعلون شمعة إضافية.|На Хануку зажигают ханукию. Каждую ночь зажигают на одну свечу больше.|On Hanukkah people light a hanukkiah. Every night they light one more candle.
@@ -127,7 +127,7 @@ E e_goal|t|השופר|الشوفار|шофар|the shofar
 Q כמה קנים יש בחנוכייה, כולל השמש?|كم فرعًا في شمعدان حانوكا مع الشمّاش؟|Сколько рожков у ханукии вместе с шамашем?|How many branches does a hanukkiah have, with the shamash?|n9|n7,n8,n10
 Q איזה מאכל אוכלים בחנוכה?|أي طعام يأكلون في حانوكا؟|Какое блюдо едят на Хануку?|Which food do people eat on Hanukkah?|f_sufg|f_matz,f_hamen,f_chal
 Q באיזה משחק משחקים בחנוכה?|أي لعبة يلعبون في حانوكا؟|Во что играют на Хануку?|Which game do people play on Hanukkah?|o_dreid|o_ragn,o_lulav,o_hagg
-S tubi|🌳|#5c940d|ט״ו בשבט: ראש השנה לאילנות|طو بشفاط: رأس السنة للأشجار|Ту би-Шват: Новый год деревьев|Tu BiShvat: New Year of the Trees
+S tubi|🌳|#50810b|ט״ו בשבט: ראש השנה לאילנות|طو بشفاط: رأس السنة للأشجار|Ту би-Шват: Новый год деревьев|Tu BiShvat: New Year of the Trees
 L ט״ו בשבט הוא ראש השנה לאילנות. הוא חל בסוף החורף.|طو بشفاط هو رأس السنة للأشجار. ويأتي في نهاية الشتاء.|Ту би-Шват - Новый год деревьев. Он бывает в конце зимы.|Tu BiShvat is the New Year of the Trees. It comes at the end of winter.
 L אז הגשמים כבר מרווים את האדמה, והעצים מתחילים להתעורר.|في هذا الوقت تروي الأمطار الأرض وتبدأ الأشجار بالاستيقاظ.|К этому времени дожди уже напоили землю, и деревья начинают просыпаться.|By then the rains have watered the ground, and the trees begin to wake up.
 L ילדים בכל הארץ נוטעים שתילים. עץ קטן יכול לגדול ולתת צל ופירות.|يزرع الأولاد في كل البلاد شتلات. شجرة صغيرة تكبر وتعطي ظلًّا وثمارًا.|Дети по всей стране сажают саженцы. Маленькое деревце вырастает и даёт тень и плоды.|Children all over the country plant saplings. A small tree can grow and give shade and fruit.
@@ -204,7 +204,7 @@ E e_dog|p|הילד הגדול ביותר|أكبر طفل|самый старши
 E e_judgex|p|המורה בכיתה|المعلّم في الصف|учитель в классе|the teacher in class
 Q מה אוכלים בפסח במקום לחם?|ماذا يأكلون في بيساح بدل الخبز؟|Что едят на Песах вместо хлеба?|What do people eat on Pesach instead of bread?|f_matz|f_chal,f_sufg,f_hamen
 Q כמה קושיות שואלים בליל הסדר?|كم سؤالًا يسألون في ليلة السيدر؟|Сколько вопросов задают на седере?|How many questions are asked at the seder?|n4|n3,n5,n7
-S shavuot|🌾|#e67700|שבועות: חג הביכורים והתורה|شفوعوت: عيد الباكورة والتوراة|Шавуот: праздник первых плодов и Торы|Shavuot: The Holiday of First Fruits and the Torah
+S shavuot|🌾|#b35d00|שבועות: חג הביכורים והתורה|شفوعوت: عيد الباكورة والتوراة|Шавуот: праздник первых плодов и Торы|Shavuot: The Holiday of First Fruits and the Torah
 L שבועות חל שבעה שבועות אחרי פסח. מכאן בא השם שלו.|يأتي شفوعوت بعد بيساح بسبعة أسابيع. ومن هنا جاء اسمه.|Шавуот бывает через семь недель после Песаха. Отсюда его название.|Shavuot comes seven weeks after Pesach. That is where its name comes from.
 L בשבועות מספרים על הר סיני, שם קיבל עם ישראל את עשרת הדיברות.|في شفوعوت نحكي عن جبل سيناء حيث تلقّى بنو إسرائيل الوصايا العشر.|На Шавуот вспоминают гору Синай, где народ Израиля получил десять заповедей.|On Shavuot people remember Mount Sinai, where the people of Israel received the Ten Commandments.
 L זה גם חג הביכורים: חג הפירות הראשונים של השנה. פעם החקלאים הביאו אותם לירושלים.|وهو أيضًا عيد الباكورة: عيد أول ثمار السنة. وكان المزارعون قديمًا يحضرونها إلى القدس.|Это и праздник первых плодов года. Раньше земледельцы приносили их в Иерусалим.|It is also the holiday of the first fruits of the year. In the past farmers brought them to Jerusalem.

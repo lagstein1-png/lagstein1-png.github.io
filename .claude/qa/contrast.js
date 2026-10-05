@@ -39,14 +39,16 @@
 'use strict';
 const { chromium } = require('./pw.js');
 const BASE = process.env.QA_BASE || 'http://127.0.0.1:8099';
-const APPS = process.argv.slice(2).length ? process.argv.slice(2) :
-  ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'bagrut-806',
-   'ulpan', 'english', 'history', 'lomda', 'reader', 'kotvim', 'rakia', 'legal', '.',
-   /* 30.9.2026: תשע אפליקציות שלא נמדדו מעולם — 31 ממצאים כשנוספו
-      (civics, geography, hebrew-arab, literature, motal, tanakh, science,
-      geography-elem; electric נקייה). */
-   'civics', 'electric', 'geography', 'geography-elem', 'hebrew-arab',
-   'literature', 'motal', 'science', 'tanakh', 'russian'];
+/* **הרשימה נגזרת, לא כתובה ביד — O-135, 5.10.2026.** עד היום היא
+   הייתה 25 שמות מוקלדים, וחמש־עשרה האפליקציות שפורסמו ב-5.10 לא
+   נכנסו לאף אחת מהן. ההרצה הראשונה עליהן החזירה **50 ממצאים בעשר
+   אפליקציות** — ובהן כפתור ההקראה של כל משפחת ה-elem (3.45:1) וכרטיס
+   היחידה (2.48:1). כל אפליקציה שב-`stages.json` וקיימת כאן נמדדת
+   עכשיו, ועוד `legal/` ודף הבית, שאינם אפליקציות. */
+const AL = require('./applist.js');
+const EXTRA = ['legal', '.'];
+const APPS = process.argv.slice(2).length ? process.argv.slice(2)
+  : AL.local().concat(EXTRA);
 
 const SCAN = () => {
   /* --- WCAG 2.2 --- */

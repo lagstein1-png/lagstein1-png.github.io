@@ -25,7 +25,7 @@ var INTERNAL_OK=true;
 <style>
 :root{--paper:#f3f8f4;--card:#fff;--ink:#17333c;--ink-soft:#4c666e;--teal:#0e9c8d;--teal-deep:#0b7568;--teal-soft:#d9f2ec;--amber:#ffc531;--amber-soft:#fff3ce;--coral:#ff6f61;--coral-soft:#ffe3de;--sky:#58b7e0;--sky-deep:#246c8c;--violet:#8a63d2;--violet-deep:#6a45b0;--violet-soft:#ece4fa;--green:#1f9d4d;--green-deep:#157a3a;--red:#d93a2f;--line:#dbe7e3;--btn:#0b7568;--on-teal:#fff;--pick:#0b7568;--ar:"Noto Sans Arabic","Heebo",system-ui,sans-serif;--ru:"Noto Sans","Heebo",system-ui,sans-serif}
 @media (prefers-color-scheme:dark){
-  :root{--paper:#101a1c;--card:#17262a;--ink:#e8f1f2;--ink-soft:#a9c0c5;--teal:#5fd9c8;--teal-deep:#3fbfae;--teal-soft:#123833;--amber:#ffd45e;--amber-soft:#3a2e0c;--coral:#ff9186;--coral-soft:#3d1a16;--sky:#7fcbea;--violet:#b49aef;--violet-deep:#8a63d2;--violet-soft:#241a3a;--green:#1f9d4d;--green-deep:#1f9d4d;--red:#d93a2f;--line:#2b4146;--btn:#12857a;--on-teal:#04201c;--pick:#5fd9c8;--sky-deep:#2f86b3}
+  :root{--paper:#101a1c;--card:#17262a;--ink:#e8f1f2;--ink-soft:#a9c0c5;--teal:#5fd9c8;--teal-deep:#3fbfae;--teal-soft:#123833;--amber:#ffd45e;--amber-soft:#3a2e0c;--coral:#ff9186;--coral-soft:#3d1a16;--sky:#7fcbea;--violet:#b49aef;--violet-deep:#8a63d2;--violet-soft:#241a3a;--green:#1f9d4d;--green-deep:#1f9d4d;--red:#d93a2f;--line:#2b4146;--btn:#12857a;--on-teal:#04201c;--pick:#5fd9c8;--sky-deep:#246c8c}
 }
 *{box-sizing:border-box}
 html{font-size:20px}
@@ -53,7 +53,7 @@ h2{font-size:1.25rem;margin:.2em 0 .4em}
 .btn.play{background:var(--green);font-size:1.1rem;min-height:62px;padding:10px 18px}
 .btn.stop{background:var(--red);padding:10px 14px}
 .btn.slow{background:var(--sky-deep);color:#fff;padding:10px 14px}
-.btn.print{flex-direction:column;gap:0;background:var(--violet-deep);font-size:1.1rem;min-height:64px;flex:1;min-width:230px}
+.btn.print{flex-direction:column;gap:0;background:#6a45b0;font-size:1.1rem;min-height:64px;flex:1;min-width:230px}
 .btn.print small{display:block;font-weight:500;font-size:.75rem;opacity:.95}
 .btn.shuf{background:var(--amber);color:#1a1300}
 .btn.ghost{background:var(--card);color:var(--teal-deep);border:2px solid var(--teal);box-shadow:none}
@@ -104,7 +104,7 @@ h2{font-size:1.25rem;margin:.2em 0 .4em}
    הנושאים, וצבע הסט נשאר על המסך ועל הדף. */
 .dc .no{position:absolute;inset-inline-start:50%;bottom:1cqw;transform:translateX(-50%);min-width:6cqw;height:6cqw;border-radius:3cqw;background:#fff;border:.45cqw solid var(--dcc,#0e9c8d);color:#17333c;font-weight:800;font-size:3.6cqw;line-height:5.1cqw;text-align:center;padding:0 1cqw;z-index:2}
 html[dir=rtl] .dc .no{transform:translateX(50%)}
-.dc .st{position:absolute;top:1.2cqw;inset-inline-start:1.8cqw;font-size:4.6cqw;font-weight:800;color:#b07a00;line-height:1;z-index:2}
+.dc .st{position:absolute;top:1.2cqw;inset-inline-start:1.8cqw;font-size:4.6cqw;font-weight:800;color:#9b6b00;line-height:1;z-index:2}
 /* טבעת מיקוד מפורשת. ברירת המחדל של הדפדפן נבלעת על כפתור צבעוני,
    ומי שמנווט במקלדת לא רואה איפה הוא. אף כלל כאן אינו מבטל outline. */
 button:focus-visible{outline:3px solid #6a45b0;outline-offset:2px}
@@ -302,7 +302,7 @@ function build(setId,lv,seed){
   var deck={set:setId,lv:lv,seed:seed,cards:printed,chain:chainIds,byChain:cards};
   RNG=Math.random;return deck}
 /* ===== UI strings ===== */
-var BUILD="dm8 · 2026-10-04";
+var BUILD="dm9 · 2026-10-05";
 var STR={
 he:{brand:"דומינו לימודי",title:"דומינו לימודי להדפסה",tag:"מדפיסים 20 קלפים, גוזרים ומסדרים במעגל. כל קלף מתחבר לקלף שמתאים לו.",
  howT:"איך משחקים?",limor:"אני לימור. ככה משחקים:",how:"1. מדפיסים את הקלפים וגוזרים לפי הקו המקווקו.\n2. מערבבים את הקלפים על השולחן.\n3. מתחילים בקלף עם הכוכב. מחפשים קלף שהחצי הראשון שלו מתאים לחצי השני של הקלף הקודם.\n4. ממשיכים עד שהמעגל נסגר. הקלף האחרון מתחבר לקלף עם הכוכב.",
@@ -643,7 +643,7 @@ function boot(){var q=new URLSearchParams(location.search),l=q.get("lang");if(l&
   render();
   var pr=q.get("print");if(pr==="cards")document.documentElement.classList.add("pc");else if(pr==="key")document.documentElement.classList.add("pk");
   if(window.TUTOR){try{TUTOR.mount({app:"domino",lang:function(){return S.lang},q:function(){return null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm8-pwa1").catch(function(){})})}
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm9-pwa1").catch(function(){})})}
 if(!INTERNAL_OK){
   document.getElementById("gate").hidden=false;
   document.title="לא פורסם";
