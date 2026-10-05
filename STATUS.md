@@ -38,7 +38,7 @@
 | `culture-elem` | tm7 · 2026-10-04 | tm7-pwa1 | תואם |
 | `history-elem` | hk7 · 2026-10-04 | hk7-pwa1 | תואם |
 | `english-elem` | en6 · 2026-10-04 | en6-pwa1 | תואם |
-| `science-12` | sg7 · 2026-10-03 | sg7-pwa1 | תואם |
+| `science-12` | sg8 · 2026-10-05 | sg8-pwa1 | תואם |
 | `domino` | dm8 · 2026-10-04 | dm8-pwa1 | תואם |
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-10-05.

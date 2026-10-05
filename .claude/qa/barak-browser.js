@@ -70,7 +70,9 @@ const ENTER = {
   /* אותה משפחה כמו civics-elem — נכנסו עם ערימת הצהריים (4.10.2026). */
   'culture-elem': ['[data-u]', '#startBtn'],
   'history-elem': ['[data-u]', '#startBtn'],
-  'english-elem': ['[data-u]', '#startBtn']
+  'english-elem': ['[data-u]', '#startBtn'],
+  /* science-12 — אותה משפחה, נכנסה עם חיווט לימור (5.10.2026) */
+  'science-12':   ['[data-u]', '#startBtn']
 };
 
 /* **מדולגות בקול, לא בשקט.** יש להן מתאם, אבל הכניסה היא שיעור
@@ -100,7 +102,7 @@ const KNOWN = {
    לפני מענה — סירוב, המסך לא זז, ומוצג ACTION_FAILED; אחרי מענה — מעבר.
    אפליקציה מכאן שתתחיל לדלג על שאלה שלא נענתה — נופלת. */
 const NEXT_AFTER_ANSWER = { 'hebrew-lit': 1, 'tanakh-elem': 1, 'civics-elem': 1,
-  'culture-elem': 1, 'history-elem': 1, 'english-elem': 1 };
+  'culture-elem': 1, 'history-elem': 1, 'english-elem': 1, 'science-12': 1 };
 
 /* עקיפה לזמן פיתוח: BARAK_ENTER='{"english":["[data-a=\"x\"]"]}' */
 try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch (e) {}

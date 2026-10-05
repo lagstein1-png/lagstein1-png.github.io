@@ -223,6 +223,32 @@ function render(){
 }
 try{speechSynthesis.onvoiceschanged=function(){}}catch(e){}
 if(!window.__GATED)render();
-/* The age-appropriate local panel uses authored guidance, not a second AI service.
- Shared scripts are loaded, but science-12 has no deployed server role yet.
- Deliberately do not mount an unsupported remote app or use another subject's role. */
+/* ---------- לימור ----------
+
+   עד 5.10.2026 ישבה כאן הערה: ״השלד המשותף נטען, אבל ל-science-12
+   עדיין אין תפקיד פרוס בשרת, ולכן בכוונה איננו מחברים אפליקציה
+   שאינה נתמכת ואיננו משתמשים בתפקיד של מקצוע אחר.״ **זה היה נכון,
+   והיא התיישנה:** התפקיד `science-12` נוסף ל-ROLE ונפרס.
+
+   הפער שנשאר היה גרוע מהשניים שההערה מנעה — הכרטיס בדף הבית נושא
+   `tTeacher`, כלומר מבטיח ללומד מורה, והאפליקציה לא חיברה אותו
+   בכלל. מחובר עכשיו באותו נוסח של civics-elem, שממנה היא נולדה. */
+if(window.TUTOR&&!window.__GATED){
+  TUTOR.mount({app:"science-12",lang:function(){return state.lang},
+    q:function(){if(view!=="practice"||!R)return null;var q=curQ();
+      return {expr:qText(q),ans:null,level:unit?uTitle(unit,"he"):""}},
+    stopHost:function(){stopSpeech()}});
+  if(window.BARAK)BARAK.register({app:"science-12",
+    getScreenContext:function(){if(view!=="practice"||!R)return null;var q=curQ();
+      return {id:"mc"+R.i+"-"+(unit?unit.id:""),type:"mcq",q:qText(q,"he"),
+        options:q.keys.map(function(k){return optText(k,"he")}),
+        correct:null,student:null,topic:unit?uTitle(unit,"he"):"",
+        level:"יסודי",curriculum:"מדע וטכנולוגיה, כיתות א׳-ב׳"}},
+    actions:{
+      read_aloud:{desc:"מקריא את השאלה בקול",
+        run:function(){if(view!=="practice")return false;speakSeq(practiceSegs());return true}},
+      show_hint:{desc:"מציג את הרמז הבא",
+        run:function(){if(view!=="practice"||R.locked)return false;var n=R.hints;hint();return R.hints>n}},
+      next_question:{desc:"עובר לשאלה הבאה אחרי שנענתה",
+        run:function(){if(view!=="practice"||!R.locked)return false;nextQ();return true}}}});
+}
