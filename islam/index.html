@@ -2,20 +2,11 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="robots" content="noindex,nofollow">
 <script>
-/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html.
-   המפתח נשמר במגירה משל האפליקציה (shlav-internal-islam) ולא
-   במגירה המשותפת shlav-internal, כדי שפתיחת אזרח לא תסגור את
-   מתח ולהפך. */
-var INTERNAL_KEY="shlav-internal-islam";
-var INTERNAL_OK=(function(){
-  try{
-    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
-    if(q) localStorage.setItem("shlav-internal-islam", decodeURIComponent(q));
-    return localStorage.getItem("shlav-internal-islam")===INTERNAL_KEY;
-  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
-})();
+/* השער הפנימי הוסר ב-5.10.2026, עם הפרסום. הקבוע נשאר כדי
+   שנקודות הבוט שמסתמכות עליו ימשיכו לעבוד; התבנית המלאה
+   שמורה ב-.claude/qa/internal-gate.html. */
+var INTERNAL_OK=true;
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>מורשת ודת האיסלאם: בגרות צעד אחר צעד</title>
@@ -501,18 +492,6 @@ input[type=range]{min-height:44px}
 <link rel="license" href="/legal/">
 </head>
 <body>
-<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
-     align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
-     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
-  <div style="max-width:32rem">
-    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
-    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
-    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר.
-       אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
-    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;
-       background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a>
-  </div>
-</div>
 <style>#gate[hidden]{display:none!important}
 /* כפתורי הקראה גדולים וצבעוניים — התקן המשותף (ירוק הקראה, אדום עצירה) */
 .spk:not(.sm){border-radius:12px;background:#0b7c71;border-color:#0b7c71;color:#fff;font-weight:700;min-height:46px;width:auto;height:auto;padding:8px 18px;font-size:1.02rem;gap:.4rem}
@@ -1108,7 +1087,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="is5 · 2026-10-04";
+var BUILD="is6 · 2026-10-04";
 var SKEY="islam-state-v1";
 var GKEY_STORE="islam-gkey";
 
@@ -4485,7 +4464,6 @@ applyModes();
 /* חוזרים לאפליקציה באמצע תרגול: השאלה עצמה אינה נשמרת, רק
    המסך. בלי שורה זו המסך נפתח עם כותרת בלבד, בלי שאלה ובלי
    דרך להתחיל — מי שסגר את הדפדפן באמצע תרגול חזר למסך מת. */
-/* INTERNAL-GATE — לא נטענת בלי מפתח. */
 if(!INTERNAL_OK){
   document.getElementById("gate").hidden=false;
   document.title="לא פורסם";
@@ -4617,7 +4595,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=is5-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=is6-pwa1").catch(function(){});
   });
 }
 </script>

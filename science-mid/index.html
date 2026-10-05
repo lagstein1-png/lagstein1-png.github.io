@@ -3,18 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="robots" content="noindex,nofollow">
 <title>מדע וטכנולוגיה לחטיבה, כיתות ז-ט</title>
 <script>
-/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html */
-var INTERNAL_KEY="shlav-internal-science-mid";
-var INTERNAL_OK=(function(){
-  try{
-    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
-    if(q) localStorage.setItem("shlav-internal-science-mid", decodeURIComponent(q));
-    return localStorage.getItem("shlav-internal-science-mid")===INTERNAL_KEY;
-  }catch(e){ return false }
-})();
+/* השער הפנימי הוסר ב-5.10.2026, עם הפרסום. הקבוע נשאר כדי
+   שנקודות הבוט שמסתמכות עליו ימשיכו לעבוד; התבנית המלאה
+   שמורה ב-.claude/qa/internal-gate.html. */
+var INTERNAL_OK=true;
 </script>
 <meta name="theme-color" content="#f3f7f4" media="(prefers-color-scheme:light)" />
 <meta name="theme-color" content="#0f1a16" media="(prefers-color-scheme:dark)" />
@@ -76,12 +70,6 @@ button[data-a="lang"][lang="ru"]{font-family:"Noto Sans",system-ui,sans-serif}
 </style>
 </head>
 <body>
-<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#fff;color:#1a1a1a;font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
-  <div style="max-width:32rem"><div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
-  <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
-  <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר. אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
-  <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a></div>
-</div>
 <a class="skip" href="#main">דילוג לתוכן</a>
 <header class="top"><div class="brand" id="brand"></div><div class="lg" id="lg" role="group" aria-label="Language"></div></header>
 <main id="main" tabindex="-1"><div id="app"></div></main>
@@ -100,7 +88,7 @@ var UNITS=[{"id":"z0","grade":7,"t":{"he":"מתחילים לחקור בבטחה"
 <script src="/tutor/barak-core.js"></script>
 <script>
 /* ===== מנוע האפליקציה: מדע וטכנולוגיה לחטיבה (science-mid) ===== */
-var BUILD="scimid5 · 2026-10-04";
+var BUILD="scimid6 · 2026-10-04";
 var SKEY="scimid-v1";
 var LANGS=[["he","עברית","he-IL"],["ar","العربية","ar-SA"],["ru","Русский","ru-RU"],["en","English","en-US"]];
 var state={lang:"he",dark:false,rate:1,grade:7,pred:{},done:{},big:false,clear:false,spaced:false,hc:false,rm:false};
@@ -517,7 +505,7 @@ function boot(){
   load();render();
   try{if(window.RECORDED)RECORDED.setup({base:"audio"})}catch(e){}
   try{if("speechSynthesis" in window)speechSynthesis.getVoices()}catch(e){}
-  try{if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js?v=scimid5-pwa1").catch(function(){})}catch(e){}
+  try{if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js?v=scimid6-pwa1").catch(function(){})}catch(e){}
   if(window.TUTOR){
     var txt=TUTOR.plain;
     TUTOR.mount({app:"scimid",

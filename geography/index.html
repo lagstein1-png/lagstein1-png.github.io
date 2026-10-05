@@ -2,20 +2,11 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="robots" content="noindex,nofollow">
 <script>
-/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html.
-   המפתח נשמר במגירה משל האפליקציה (shlav-internal-geography) ולא
-   במגירה המשותפת shlav-internal, כדי שפתיחת אזרח לא תסגור את
-   מתח ולהפך. */
-var INTERNAL_KEY="shlav-internal-geography";
-var INTERNAL_OK=(function(){
-  try{
-    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
-    if(q) localStorage.setItem("shlav-internal-geography", decodeURIComponent(q));
-    return localStorage.getItem("shlav-internal-geography")===INTERNAL_KEY;
-  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
-})();
+/* השער הפנימי הוסר ב-5.10.2026, עם הפרסום. הקבוע נשאר כדי
+   שנקודות הבוט שמסתמכות עליו ימשיכו לעבוד; התבנית המלאה
+   שמורה ב-.claude/qa/internal-gate.html. */
+var INTERNAL_OK=true;
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>נוף — גיאוגרפיה לבגרות: מזרח תיכון, ארץ ישראל וניתוח מרחבי</title>
@@ -533,18 +524,6 @@ input[type=range]{min-height:44px}
 .optspk{flex:0 0 auto;min-width:46px;min-height:46px;border:2px solid #0b7c71;border-radius:12px;background:#0b7c71;color:#fff;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:8px 10px}
 .optspk:hover{background:#0b7c71}
 </style>
-<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;
-     align-items:center;justify-content:center;background:#fff;color:#1a1a1a;
-     font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
-  <div style="max-width:32rem">
-    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
-    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
-    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר.
-       אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
-    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;
-       background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a>
-  </div>
-</div>
 <div id="live" class="sr" aria-live="polite"></div>
 <a class="skip" href="#main">דילוג לתוכן</a>
 <main id="main" tabindex="-1"><div id="app"></div></main>
@@ -1113,7 +1092,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="q26 · 2026-10-04";
+var BUILD="q27 · 2026-10-04";
 var SKEY="geography-state-v1";
 var GKEY_STORE="geography-gkey";
 
@@ -6689,7 +6668,6 @@ load();
 touchDay();
 booted=true;
 applyModes();
-/* INTERNAL-GATE — לא נטענת בלי מפתח. */
 if(!INTERNAL_OK){
   document.getElementById("gate").hidden=false;
   document.title="לא פורסם";
@@ -6821,7 +6799,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=q26-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=q27-pwa1").catch(function(){});
   });
 }
 </script>

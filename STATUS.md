@@ -25,5 +25,20 @@
 | `tanakh` | p26 · 2026-10-04 | p26-pwa1 | תואם |
 | `hebrew-arab` | y13 · 2026-10-04 | y13-pwa1 | תואם |
 | `motal` | d19 · 2026-10-04 | d19-pwa1 | תואם |
+| `math-g7` | mg8 · 2026-10-03 | mg8-pwa1 | תואם |
+| `electric` | e40 · 2026-10-04 | e40-pwa1 | תואם |
+| `science-mid` | scimid6 · 2026-10-04 | scimid6-pwa1 | תואם |
+| `biology` | bg6 · 2026-10-04 | bg6-pwa1 | תואם |
+| `geography` | q27 · 2026-10-04 | q27-pwa1 | תואם |
+| `bagrut-history` | h124 · 2026-10-04 | h124-pwa1 | תואם |
+| `islam` | is6 · 2026-10-04 | is6-pwa1 | תואם |
+| `russian` | ru6 · 2026-10-04 | ru6-pwa1 | תואם |
+| `tanakh-elem` | te9 · 2026-10-04 | te9-pwa1 | תואם |
+| `civics-elem` | mc10 · 2026-10-04 | mc10-pwa1 | תואם |
+| `culture-elem` | tm7 · 2026-10-04 | tm7-pwa1 | תואם |
+| `history-elem` | hk7 · 2026-10-04 | hk7-pwa1 | תואם |
+| `english-elem` | en6 · 2026-10-04 | en6-pwa1 | תואם |
+| `science-12` | sg7 · 2026-10-03 | sg7-pwa1 | תואם |
+| `domino` | dm8 · 2026-10-04 | dm8-pwa1 | תואם |
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-10-05.

@@ -2,17 +2,11 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="robots" content="noindex,nofollow">
 <script>
-/* INTERNAL-GATE — שער פנימי. ראו .claude/qa/internal-gate.html */
-var INTERNAL_KEY="shlav-internal-math-g7";
-var INTERNAL_OK=(function(){
-  try{
-    var q=(location.search.match(/[?&]internal=([^&]*)/)||[])[1];
-    if(q) localStorage.setItem("shlav-internal-math-g7", decodeURIComponent(q));
-    return localStorage.getItem("shlav-internal-math-g7")===INTERNAL_KEY;
-  }catch(e){ return false }   /* localStorage חסום — סגור, לא פתוח */
-})();
+/* השער הפנימי הוסר ב-5.10.2026, עם הפרסום. הקבוע נשאר כדי
+   שנקודות הבוט שמסתמכות עליו ימשיכו לעבוד; התבנית המלאה
+   שמורה ב-.claude/qa/internal-gate.html. */
+var INTERNAL_OK=true;
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>מתמטיקה לכיתה ז׳: צירים, זוויות, מספרים מכוונים ועוד · חינם</title>
@@ -138,14 +132,6 @@ html[dir=ltr] .qtext,html[dir=ltr] .opt .ob{direction:ltr}
 </head>
 <body>
 <style>#gate[hidden]{display:none!important}</style>
-<div id="gate" hidden style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#fff;color:#1a1a1a;font:16px/1.6 system-ui,sans-serif;padding:24px;text-align:center" dir="rtl">
-  <div style="max-width:32rem">
-    <div style="font-size:2.4rem;margin-bottom:.5rem" aria-hidden="true">🔒</div>
-    <h1 style="font-size:1.4rem;margin:0 0 .6rem">האפליקציה הזאת עדיין לא פורסמה</h1>
-    <p style="margin:0 0 1rem">היא בבנייה ובבדיקה, והתוכן שבה עוד לא אושר. אפשר להיכנס לאפליקציות שכבר פורסמו.</p>
-    <a href="/" style="display:inline-block;padding:.7rem 1.4rem;border-radius:.6rem;background:#1a1a1a;color:#fff;text-decoration:none">לדף הבית</a>
-  </div>
-</div>
 <div class="wrap"><div id="live" class="srOnly" aria-live="polite"></div><div id="app"></div></div>
 <canvas id="cf"></canvas>
 <script>
@@ -1161,7 +1147,7 @@ var LESSONS={
   ST_("תמיד בודקים: מציבים את התשובה במשוואה. 2 · 6 + 5 = 17, נכון.","نتحقق دائمًا: نعوّض الجواب في المعادلة. 2 · 6 + 5 = 17 صحيح.","Всегда проверяй: подставь ответ в уравнение. 2 · 6 + 5 = 17, верно.","Always check: put the answer in the equation. 2 · 6 + 5 = 17, true.",function(){return ""})]
 };
 
-var BUILD="mg7 · 2026-10-03";
+var BUILD="mg8 · 2026-10-03";
 /* ===== UI strings ===== */
 var STR={
 he:{soonT:"בקרוב: צורות חופפות, תיבה וקובייה, שכיחות והסתברות.",mtNote:"תרגום לערבית, רוסית ואנגלית: תרגום מכונה, ממתין לבדיקה.",credit2:"יחידת משפט פיתגורס נבנתה לפי מבנה חוברת של יניב רז, מדריך מחוזי חט״ב, מחוז ירושלים, משרד החינוך. תרגילי החלוקה ביחס בהשראת שאלה מהפיקוח על הוראת המתמטיקה, משרד החינוך.",brand:"מתמטיקה לכיתה ז׳",title:"מתמטיקה לכיתה ז׳",tag:"צירים, מספרים שליליים, זוויות, משולשים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -1569,7 +1555,7 @@ try{speechSynthesis.getVoices();
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-g7",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=mg7-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=mg8-pwa1").catch(function(){})});
 })();
 </script>
 
