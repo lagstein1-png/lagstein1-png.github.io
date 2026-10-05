@@ -74,8 +74,14 @@ const BATCH_MAX_CHARS = 16000;
    (25 אסימונים לשנייה = כ-655 שניות). ~11 תווים לשניית דיבור
    בעברית + 2.2 שניות שקט בין פריטים. */
 const BATCH_MAX_SEC = 600;
+/* **Gacrux ולא Kore ב-gcloud — הכרעת הבעלים 5.10.2026:** ״gcloud runs
+   must use he-IL-Chirp3-HD-Gacrux to match Limor's voice״. הקול של
+   לימור באתר הוא Gacrux (ההוראה מ-3.10 ב-record.yml), ושני קולות
+   שונים על אותה אפליקציה נשמעים כשתי מורות. אם Gacrux אינו קיים
+   ב-Chirp3-HD לעברית — **עוצרים ומדווחים**, ולא מקליטים בקול אחר;
+   השומר הוא הצעד ״הקול קיים״ שב-record.yml. */
 const VOICE = process.env.TTS_VOICE || process.env.GEMINI_TTS_VOICE ||
-              (PROVIDER === 'gcloud' ? 'he-IL-Chirp3-HD-Kore' : 'Kore');   /* הבעלים, 2.10.2026: Kore בכל האתר, כמו בתאוריה מדברת */
+              (PROVIDER === 'gcloud' ? 'he-IL-Chirp3-HD-Gacrux' : 'Kore');   /* הבעלים, 2.10.2026: Kore בכל האתר, כמו בתאוריה מדברת */
 const API   = 'https://generativelanguage.googleapis.com/v1beta';
 const GCLOUD = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 /* מחיר למיליון תווים, כפי שכתוב ב-tools/tts-build.js של הריפו הנפרד
@@ -92,10 +98,12 @@ const PRICE_PER_M = { gcloud: 40, gemini: null };
    ההוצאה מצטברת בין ריצות (record-spend.json ו-record-spend/, ראו למטה).
    המחיר בדולר למיליון אסימונים [קלט טקסט, פלט אודיו] — מ-cloudprice.net
    ומחיפוש, 2.10.2026, **לא מדף התמחור של גוגל ולא מחשבונית**. מודל
-   שאינו בטבלה מחויב במחיר היקר שבה. התקרה: TTS_BUDGET_USD (ברירת מחדל 25). */
+   שאינו בטבלה מחויב במחיר היקר שבה. התקרה: TTS_BUDGET_USD
+   (ברירת מחדל 100 — הכרעת הבעלים 5.10.2026, ״$100 combined, Gemini + Cloud״;
+   האומדן לסיום הכול הוא כ-$43). */
 const PRICES = { 'gemini-2.5-pro-preview-tts': [1, 20], 'gemini-2.5-flash-preview-tts': [0.5, 10],
                  'gemini-3.1-flash-tts-preview': [1, 20] };
-const BUDGET = Number(process.env.TTS_BUDGET_USD || 25);
+const BUDGET = Number(process.env.TTS_BUDGET_USD || 100);
 /* ריצות במקביל (הבעלים, 3.10.2026: ״רוץ בכמה חזיתות״): קובץ אחד משותף
    היה מתנגש בכל דחיפה. לכן כל ריצה כותבת רק לקובץ משלה,
    record-spend/<GITHUB_RUN_ID>.json, וההוצאה הכוללת היא record-spend.json

@@ -105,6 +105,46 @@ jobs:
           echo "voice=$V" >> "$GITHUB_OUTPUT"
           echo "ספק: $P · קול: ${V:-ברירת מחדל}"
 
+      # **הקול חייב להיות Gacrux, ואם אין — עוצרים.** הכרעת הבעלים
+      # 5.10.2026: ״gcloud runs must use he-IL-Chirp3-HD-Gacrux to match
+      # Limor's voice… If Gacrux is not available on Cloud TTS, STOP and
+      # report — do not record with a different voice.״
+      #
+      # למה זה צעד ולא הנחה: קול שאינו קיים מחזיר שגיאה רק בבקשה
+      # הראשונה, אחרי שכבר שילמנו על הרנר ועל ההתקנה; וגרוע מזה —
+      # ספק שמחליף בשקט לקול ברירת מחדל היה נותן לנו מאות קליפים
+      # בקול הלא נכון, שנשמעים כמו מורה אחרת באמצע אותה אפליקציה.
+      # הרשימה נשאלת מהשרת, ולא מהזיכרון.
+      - name: הקול קיים אצל הספק
+        if: ${{ steps.prov.outputs.provider == 'gcloud' }}
+        env:
+          TKEY: ${{ secrets.TTS_KEY }}
+          WANT: ${{ steps.prov.outputs.voice }}
+        run: |
+          set -uo pipefail
+          WANT="${WANT:-he-IL-Chirp3-HD-Gacrux}"
+          R=$(curl -sS -H "x-goog-api-key: $TKEY" \
+                "https://texttospeech.googleapis.com/v1/voices?languageCode=he-IL") || {
+            echo "::error::רשימת הקולות לא נענתה. אין לאמת את $WANT — עוצרים."; exit 1; }
+          echo "$R" | node -e '
+            let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{
+              let j;try{j=JSON.parse(s)}catch(e){
+                console.log("::error::תשובה שאינה JSON מרשימת הקולות — עוצרים.");
+                console.log(s.slice(0,400));process.exit(1)}
+              if(j.error){console.log("::error::"+(j.error.message||"שגיאה ברשימת הקולות"));process.exit(1)}
+              const want=process.env.WANT;
+              const names=(j.voices||[]).map(v=>v.name);
+              const chirp=names.filter(n=>/Chirp3-HD/.test(n));
+              console.log("קולות he-IL: "+names.length+" · מהם Chirp3-HD: "+chirp.length);
+              console.log("  "+chirp.join(" "));
+              if(!names.includes(want)){
+                console.log("::error::הקול "+want+" אינו קיים ב-he-IL אצל Cloud TTS. "+
+                  "הוראת הבעלים: לעצור ולדווח, ולא להקליט בקול אחר.");
+                process.exit(1);
+              }
+              console.log("✓ "+want+" קיים.");
+            });'
+
       - name: יש מפתח
         env:
           GKEY: ${{ secrets.GEMINI_API_KEY }}
@@ -159,9 +199,12 @@ jobs:
           TTS_KEY: ${{ secrets.TTS_KEY }}
           TTS_PROVIDER: ${{ steps.prov.outputs.provider }}
           TTS_VOICE: ${{ steps.prov.outputs.voice }}
-          # התקרה: $40 (הבעלים, 3.10.2026). ריצה 30 קיבלה כאן 25 — המשתנה
-          # שהוגדר אינו מגיע ל-vars (אולי נשמר כ-Secret), ולכן נקרא גם משם.
-          TTS_BUDGET_USD: ${{ vars.TTS_BUDGET_USD || secrets.TTS_BUDGET_USD || '40' }}
+          # התקרה: **$100** (הבעלים, 5.10.2026 — ״$100 combined, Gemini +
+          # Cloud״; האומדן לסיום כל מה שחסר הוא כ-$43). קודם $40, ולפני כן
+          # $25. ריצה 30 קיבלה כאן 25 — המשתנה שהוגדר אינו מגיע ל-vars
+          # (אולי נשמר כ-Secret), ולכן נקרא גם משם, והנפילה האחרונה היא
+          # זו שקובעת בפועל.
+          TTS_BUDGET_USD: ${{ vars.TTS_BUDGET_USD || secrets.TTS_BUDGET_USD || '100' }}
           # Tier 2 (הבעלים, 3.10.2026): 6.6 משפטים לדקה במרווח 5 שניות היו 31 שעות
           TTS_PACE_MIN_MS: ${{ vars.TTS_PACE_MIN_MS || '1500' }}
         run: |
