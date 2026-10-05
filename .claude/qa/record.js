@@ -210,6 +210,9 @@ const SOURCES = {
      תופס אותו; זה מסלול נוסף שעוד לא נכתב. */
   /* מוט״ל (5.10.2026): 153 פריטים סטטיים, מבנה literature. **לא**
      הקורא הכללי — ראו ההערה מעל motalBank. */
+  /* נוף — גיאוגרפיה לבגרות (5.10.2026): 98 פריטים ו-61 מושגים
+     סטטיים. **לא** הקורא הכללי — ראו ההערה מעל geoBank. */
+  geography: ['geography/index.html'],
   motal: ['motal/index.html'],
   'geography-elem': ['geography-elem/index.html'],
   /* כותבים ביחד (5.10.2026): הקטעים עטופים ב-`F(he,ar,ru,en)` — אותו
@@ -280,6 +283,83 @@ function sciBank(text, name) {
      4. `gl(o)` לכל אפשרות                — כפתור רמקול לכל תשובה, שורה 2408
      5. `term + ". " + def`             — דף המושגים, שורה 2241
    `plainOf` חל אחר כך בתוך `speak`, בדיוק כמו כאן. */
+/* geography/index.html — למה לא הקורא הכללי, במספרים.
+
+   הרצתי את שניהם על אותו קובץ. הכללי (`he:"…"`) מחזיר 825 מחרוזות,
+   אבל רק 576 מהן נאמרות כלשונן: 249 הן בזבוז גמור — 98 הסברים
+   (`ex`) שנאמרים רק בתוך `say`, שמות ותיאורי נושא שאין להם כפתור
+   כלל, וכותרות מושגים שנאמרות רק בזוג. ובכיוון השני הוא **מחמיץ
+   172 מחרוזות ו-27,193 תווים** — בדיוק את ההסבר המלא ואת המושגים,
+   הערך הגבוה ביותר ללומד.
+
+   שש הצורות שמגיעות ל-`speak`:
+     1. `gl(it.q)`                                   — askBox, בלי saySpell
+     2. `saySpell(gl(it.q))`                         — repeat_question של לימור
+     3. `gl(o)` לכל אפשרות                            — כפתור לכל תשובה
+     4. `saySpell(gl(it.hint))`                      — הרמז
+     5. `saySpell(q + " " + ans + ". " + ex)`        — `say`, אחרי המענה
+     6. `gl(c.t) + ". " + gl(c.d)`                   — דף המושגים, כזוג */
+function geoBank(text) {
+  const vm = require('vm');
+  const a = text.indexOf('\ntopic("gvulot"');
+  const b = text.indexOf('\nvar CONCEPTS=[', a);
+  if (a < 0 || b < 0) throw new Error('geography: בלוק ה-topic לא נמצא');
+  /* בין קריאת ה-topic האחרונה ל-CONCEPTS יושבות עוד פונקציות של הדף
+     (saySpell ואחרות). חותכים עד סוף קריאת ה-topic האחרונה, בספירת
+     סוגריים, ולא עד CONCEPTS. */
+  const last = text.lastIndexOf('\ntopic("', b);
+  let pd = 0, pq = null, pe = false, end = last;
+  for (; end < b; end++) {
+    const c = text[end];
+    if (pq) { if (pe) pe = false; else if (c === '\\') pe = true; else if (c === pq) pq = null; continue }
+    if (c === '"' || c === "'") { pq = c; continue }
+    if (c === '(') pd++;
+    if (c === ')') { pd--; if (!pd) { end++; break } }
+  }
+  while (end < b && /[\s;]/.test(text[end])) end++;
+  const ctx = { TOPICS: [] };
+  vm.createContext(ctx);
+  vm.runInContext(
+    'function topic(id,trk,n,d,levels){TOPICS.push({id:id,trk:trk,n:n,d:d,L:levels})}' +
+    'function Q(id,q,opts,ok,hint,ex,fig){return {id:id,q:q,o:opts,ok:ok,hint:hint,ex:ex,fig:fig||null}}' +
+    text.slice(a, end),
+    ctx, { timeout: 20000 });
+
+  /* העתק מדויק מ-geography/index.html שורה 4226. */
+  const saySpell = x => String(x == null ? '' : x)
+    .replace(/[\u201c\u201d\u2018\u2019]/g, '')
+    .replace(/\u05f4/g, (m, i, str) => /^[\u05d0-\u05ea](?![\u05d0-\u05ea])/.test(str.slice(i + 1)) ? m : '')
+    .replace(/\s\u2014\s/g, ', ');
+  const he = o => (o && o.he) || '';
+
+  const out = [];
+  for (const tp of ctx.TOPICS)
+    for (const lv of (tp.L || []))
+      for (const it of (lv || [])) {
+        if (!it) continue;
+        out.push(he(it.q));
+        out.push(saySpell(he(it.q)));
+        for (const o of (it.o || [])) out.push(he(o));
+        if (it.hint) out.push(saySpell(he(it.hint)));
+        out.push(saySpell(he(it.q) + ' ' + he(it.o && it.o[it.ok]) + '. ' + he(it.ex)));
+      }
+
+  const i = b + '\nvar CONCEPTS='.length;
+  let d = 0, q = null, esc = false, j = i;
+  for (; j < text.length; j++) {
+    const c = text[j];
+    if (q) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === q) q = null; continue }
+    if (c === '"') { q = c; continue }
+    if (c === '[') d++;
+    if (c === ']') { d--; if (!d) { j++; break } }
+  }
+  /* ב-geography מפתחות ה-CONCEPTS אינם במרכאות (`{trk:"mid",…}`),
+     ולכן JSON.parse נופל. מריצים אותם באותו הקשר מבודד. */
+  const concepts = vm.runInContext('(' + text.slice(i, j) + ')', ctx, { timeout: 20000 });
+  for (const c of concepts) out.push(he(c.t) + '. ' + he(c.d));
+  return out;
+}
+
 function motalBank(text) {
   const vm = require('vm');
   const a = text.indexOf('\nvar TOPICS=[];');
@@ -465,6 +545,18 @@ function corpus(app) {
     for (const raw of hebrewLit(fs.readFileSync(df, 'utf8'), fs.readFileSync(tf, 'utf8'))) {
       const text = plainOf(String(raw));
       if (!/[א-ת]/.test(text)) continue;
+      if (text.split(' ').length < 2) continue;
+      const id = R.id(text);
+      if (!seen.has(id)) seen.set(id, text);
+    }
+    return seen;
+  }
+  if (app === 'geography') {
+    const tf = path.join(ROOT, files[0]);
+    if (!fs.existsSync(tf)) return seen;
+    for (const raw of geoBank(fs.readFileSync(tf, 'utf8'))) {
+      const text = plainOf(String(raw));
+      if (!/[\u05d0-\u05ea]/.test(text)) continue;
       if (text.split(' ').length < 2) continue;
       const id = R.id(text);
       if (!seen.has(id)) seen.set(id, text);
