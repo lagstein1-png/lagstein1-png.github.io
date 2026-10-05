@@ -154,15 +154,15 @@ X What is your name?|איך קוראים לך?|ما اسمك؟|Как тебя �
 X My name is Dana.|קוראים לי דנה.|اسمي دانة.|Меня зовут Дана.
 X How are you?|מה שלומך?|كيف حالك؟|Как дела?
 X I am fine, thank you.|אני בסדר, תודה.|أنا بخير، شكرًا.|У меня всё хорошо, спасибо.
-Q |אתם פוגשים חבר בבוקר. מה אומרים?|تقابل صديقًا في الصباح. ماذا تقول؟|Ты встретил друга утром. Что скажешь?|You meet a friend in the morning. What do you say?|Good morning!|Good night!;Goodbye!;Sorry.
+Q |אתם פוגשים חבר בבוקר. מה אומרים?|تقابل صديقًا في الصباح. ماذا تقول؟|Ты встретил друга утром. Что скажешь?|You meet a friend in the morning. What do you say?|Good morning!|Good night!;Goodbye!;What is your name?
 Q |אתם הולכים לישון. מה אומרים?|أنت ذاهب إلى النوم. ماذا تقول؟|Ты идёшь спать. Что скажешь?|You are going to sleep. What do you say?|Good night!|Good morning!;Hello!;Thank you.
-Q |מישהו נתן לכם מתנה. מה אומרים?|أعطاك أحدهم هدية. ماذا تقول؟|Тебе подарили подарок. Что скажешь?|Someone gave you a gift. What do you say?|Thank you.|Please.;Goodbye!;Sorry.
+Q |מישהו נתן לכם מתנה. מה אומרים?|أعطاك أحدهم هدية. ماذا تقول؟|Тебе подарили подарок. Что скажешь?|Someone gave you a gift. What do you say?|Thank you.|Please.;Goodbye!;My name is Dana.
 Q |אתם עוזבים את הכיתה. מה אומרים?|أنت تغادر الصف. ماذا تقول؟|Ты уходишь из класса. Что скажешь?|You are leaving the classroom. What do you say?|Goodbye!|Hello!;Good morning!;Thank you.
 Q |בטעות דרכתם למישהו על הרגל. מה אומרים?|دُست على قدم أحدهم بالخطأ. ماذا تقول؟|Ты случайно наступил кому-то на ногу. Что скажешь?|You stepped on someone's foot by mistake. What do you say?|Sorry.|Please.;Hello!;Good night!
 Q What is your name?|בחרו תשובה מתאימה.|اختر إجابة مناسبة.|Выбери подходящий ответ.|Choose a fitting answer.|My name is Dana.|I am fine, thank you.;Goodbye!;Thank you.
-Q How are you?|בחרו תשובה מתאימה.|اختر إجابة مناسبة.|Выбери подходящий ответ.|Choose a fitting answer.|I am fine, thank you.|My name is Dana.;Good night!;Please.
-Q @Good morning!|הקשיבו. איזה משפט נשמע?|استمع. أيّ جملة سمعت؟|Послушай. Какое предложение ты услышал?|Listen. Which sentence did you hear?|Good morning!|Good night!;Goodbye!;Thank you.
-Q @Thank you.|הקשיבו. איזה משפט נשמע?|استمع. أيّ جملة سمعت؟|Послушай. Какое предложение ты услышал?|Listen. Which sentence did you hear?|Thank you.|Please.;Sorry.;Hello!
+Q How are you?|בחרו תשובה מתאימה.|اختر إجابة مناسبة.|Выбери подходящий ответ.|Choose a fitting answer.|I am fine, thank you.|My name is Dana.;Good night!;What is your name, please?
+Q @Good morning!|הקשיבו. איזה משפט נשמע?|استمع. أيّ جملة سمعت؟|Послушай. Какое предложение ты услышал?|Listen. Which sentence did you hear?|Good morning!|Good night!;Goodbye!;Good morning, Dana!
+Q @Thank you.|הקשיבו. איזה משפט נשמע?|استمع. أيّ جملة سمعت؟|Послушай. Какое предложение ты услышал?|Listen. Which sentence did you hear?|Thank you.|Please.;Sorry.;I am fine, thank you.
 Q @My name is Dana.|הקשיבו. איזה משפט נשמע?|استمع. أيّ جملة سمعت؟|Послушай. Какое предложение ты услышал?|Listen. Which sentence did you hear?|My name is Dana.|What is your name?;How are you?;I am fine.
 S sentences|✍️|#364fc7|משפטים פשוטים|جمل بسيطة|Простые предложения|Simple sentences|g56|phrase
 L בואו נקרא ונשמע משפטים קצרים באנגלית. אחר כך נבחר את המילה הנכונה.|لنقرأ ونسمع جملًا قصيرة بالإنجليزية. ثم نختار الكلمة الصحيحة.|Давайте прочитаем и послушаем короткие предложения по-английски. Потом выберем правильное слово.|Let's read and hear short sentences in English. Then we choose the right word.

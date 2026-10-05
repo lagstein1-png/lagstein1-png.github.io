@@ -187,12 +187,18 @@ function hint(){
   else openLimor();
 }
 /* ---------- Limor help ---------- */
+/* מילים שהאות הראשונה שלהן אינה הצליל הראשון. לימור מסבירה פונטיקה
+   ("במילה {w} שומעים קודם את האות {l}"), והדוגמה שהיא בחרה נגזרה
+   מהאות הכתובה — ולכן ביחידת המספרים היא אמרה "במילה one שומעים קודם
+   את האות O" (שומעים w), וביחידת הגוף "במילה eye שומעים קודם את האות
+   E" (שומעים את שם האות I). הסבר שמלמד הפוך גרוע מאין הסבר. */
+var NOPHONICS={one:1,eye:1,eight:1};
 /* an example card that is not the answer, so the explanation never names it */
 function exampleFor(q){
   var letterKind=q.kind==="aw"||q.kind==="al"||q.kind==="alisten";
   var pool=unitBy(letterKind?"abc":(q.unit&&unitBy(q.unit).kind!=="phrase"?q.unit:"animals")).cards;
   var bad=q.w?q.w.en:(q.correct||"");
-  var pick=pool.filter(function(c){return c.en!==bad&&c.en.length<8})[0]||pool[0];
+  var pick=pool.filter(function(c){return c.en!==bad&&c.en.length<8&&!NOPHONICS[c.en]})[0]||pool[0];
   return pick;
 }
 function explain(){

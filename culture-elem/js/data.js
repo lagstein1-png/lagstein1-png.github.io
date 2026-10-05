@@ -34,15 +34,15 @@ E e_wedmo|t|ביום רביעי בבוקר|صباح يوم الأربعاء|в �
 E e_sunno|t|ביום ראשון בצהריים|ظهر يوم الأحد|в воскресенье в обед|on Sunday at noon
 E e_montu|t|בליל שני|ليلة الاثنين|в ночь на понедельник|on Monday night
 E e_rest|t|נחים ומבלים עם המשפחה|نرتاح ونقضي الوقت مع العائلة|отдыхаем и проводим время с семьёй|we rest and spend time with the family
-E e_work|t|עובדים בקדחתנות|نعمل بجدّ كبير|усиленно работаем|we work as hard as we can
-E e_alone2|t|נשארים לבד בחדר|نبقى وحدنا في الغرفة|остаёмся одни в комнате|we stay alone in a room
-E e_rush|t|ממהרים לכל מקום|نسرع إلى كل مكان|спешим повсюду|we rush everywhere
-E f_chal|f|חלה|خبز الحلّة|хала|challah
+E e_work|t|ממשיכים לעבוד ולסדר את הבית כרגיל|نواصل العمل وترتيب البيت كالمعتاد|продолжаем работать и убирать дом, как обычно|we keep working and tidying the house as usual
+E e_alone2|t|נוסעים לבית הספר כרגיל|نذهب إلى المدرسة كالمعتاد|едем в школу, как обычно|we go to school as usual
+E e_rush|t|ממהרים לקניות בעיר|نسرع للتسوّق في المدينة|спешим за покупками в городе|we rush out shopping in town
+E f_chal|f|חלה|خبز الحلّة|хала|challah (braided bread)
 E f_sufg|f|סופגנייה|سوفغانيا (كعكة محشوة)|пончик-суфгания|a sufganiyah (jelly doughnut)
-E f_hamen|f|אוזן המן|أذن هامان|ухо Амана|a hamantash
-E f_matz|f|מצה|فطير (ماتساه)|маца|matzah
-E f_cheese|f|עוגת גבינה|كعكة الجبن|чизкейк|cheesecake
-E f_apple|f|תפוח בדבש|تفاحة بالعسل|яблоко с мёдом|an apple in honey
+E f_hamen|f|אוזן המן|أذن هامان|ухо Амана|a hamantash (a filled cookie)
+E f_matz|f|מצה|فطير (ماتساه)|маца|matzah (flat, unleavened bread)
+E f_cheese|f|עוגת גבינה|كعكة الجبن|чизкейк|cheesecake (a cake of soft cheese)
+E f_apple|f|תפוח בדבש|تفاحة بالعسل|яблоко с мёдом|an apple dipped in honey
 E o_candl|o|נרות|شموع|свечи|candles
 E o_shofar|o|שופר|بوق الشوفار|шофар|a shofar
 E o_sukk|o|סוכה|سُكّا (كوخ)|сукка|a sukkah
@@ -72,13 +72,13 @@ L אוכלים תפוח בדבש ואומרים: שתהיה לנו שנה מתו
 L יום כיפור חל כעשרה ימים אחרי ראש השנה.|يأتي يوم الغفران بعد رأس السنة بنحو عشرة أيام.|Йом-Кипур наступает примерно через десять дней после Рош а-Шана.|Yom Kippur comes about ten days after Rosh Hashanah.
 L ביום כיפור צמים, מבקשים סליחה ומשתדלים להיות טובים יותר.|في يوم الغفران يصومون ويطلبون المسامحة ويحاولون أن يكونوا أفضل.|В Йом-Кипур постятся, просят прощения и стараются стать лучше.|On Yom Kippur people fast, ask for forgiveness and try to be better.
 L ביום כיפור אין מכוניות בכבישים, והילדים רוכבים על אופניים.|في يوم الغفران لا توجد سيارات في الشوارع والأولاد يركبون الدراجات.|В Йом-Кипур на дорогах нет машин, и дети катаются на велосипедах.|On Yom Kippur there are no cars on the roads, and children ride bikes.
-Q איזה חג הוא ראש השנה היהודית?|أي عيد هو رأس السنة اليهودية؟|Какой праздник - еврейский Новый год?|Which holiday is the Jewish New Year?|h_rosh|h_pur,h_han,h_pes
+Q איזה חג יהודי חוגגים בסתיו, וכעשרה ימים אחריו בא יום כיפור?|أي عيد يهودي يُحتفل به في الخريف، ويأتي بعده بنحو عشرة أيام يوم الغفران؟|Какой еврейский праздник отмечают осенью, а примерно через десять дней после него наступает Йом-Кипур?|Which Jewish holiday is celebrated in autumn, with Yom Kippur about ten days later?|h_rosh|h_pur,h_han,h_pes
 Q איזה כלי תוקעים בו בראש השנה?|في أي آلة ينفخون في رأس السنة؟|Во что трубят на Рош а-Шана?|What do people blow on Rosh Hashanah?|o_shofar|o_ragn,o_lulav,o_dreid
 Q מה אוכלים בראש השנה כדי לברך על שנה מתוקה?|ماذا يأكلون في رأس السنة لسنة حلوة؟|Что едят на Рош а-Шана ради сладкого года?|What do people eat on Rosh Hashanah for a sweet year?|f_apple|f_hamen,f_matz,f_cheese
 Q בערך כמה ימים עוברים מראש השנה עד יום כיפור?|تقريبًا كم يومًا بين رأس السنة ويوم الغفران؟|Примерно сколько дней между Рош а-Шана и Йом-Кипур?|About how many days are there from Rosh Hashanah to Yom Kippur?|n10|n3,n5,n40
 Q מה עושים ביום כיפור?|ماذا يفعلون في يوم الغفران؟|Что делают в Йом-Кипур?|What do people do on Yom Kippur?|e_fast|e_party,e_swim,e_shop
 E e_fast|t|צמים ומבקשים סליחה|يصومون ويطلبون المسامحة|постятся и просят прощения|they fast and ask for forgiveness
-E e_party|t|עושים מסיבה גדולה|يقيمون حفلة كبيرة|устраивают большую вечеринку|they have a big party
+E e_party|t|עורכים מסיבה גדולה עם אוכל ומוזיקה|يقيمون حفلة كبيرة فيها طعام وموسيقى|устраивают большую вечеринку с едой и музыкой|they hold a big party with food and music
 E e_swim|t|הולכים לשחות בים|يذهبون للسباحة في البحر|идут купаться в море|they go swimming in the sea
 E e_shop|t|יוצאים לקניות|يخرجون للتسوّق|идут за покупками|they go shopping
 Q איך נראים הכבישים ביום כיפור?|كيف تبدو الشوارع في يوم الغفران؟|Как выглядят дороги в Йом-Кипур?|What do the roads look like on Yom Kippur?|e_empty|e_jam,e_race,e_flood
@@ -104,9 +104,9 @@ Q איזה מהדברים האלה הוא אחד מארבעת המינים?|أي
 Q כמה ימים נמשך חג סוכות?|كم يومًا يستمرّ عيد سوكوت؟|Сколько дней длится Суккот?|How many days does Sukkot last?|n7|n3,n10,n40
 Q מה עושים בשמחת תורה?|ماذا يفعلون في فرحة التوراة؟|Что делают на Симхат-Тору?|What do people do on Simchat Torah?|e_dance|e_fastt,e_sleepb,e_nothing
 E e_dance|t|רוקדים עם ספרי תורה|يرقصون مع لفائف التوراة|танцуют со свитками Торы|they dance with Torah scrolls
-E e_fastt|t|צמים כל היום|يصومون طوال اليوم|постятся весь день|they fast all day
-E e_sleepb|t|ישנים בבית הספר|ينامون في المدرسة|спят в школе|they sleep at school
-E e_nothing|t|לא עושים כלום|لا يفعلون شيئًا|ничего не делают|they do nothing
+E e_fastt|t|צמים כל היום ולא קוראים ספר תורה|يصومون طوال اليوم ولا يقرؤون التوراة|постятся весь день и не читают Тору|they fast all day and do not read the Torah
+E e_sleepb|t|ישנים בסוכה|ينامون في السُّكّا|спят в сукке|they sleep in the sukkah
+E e_nothing|t|מחזירים את ספר התורה לארון עד השנה הבאה|يعيدون لفيفة التوراة إلى الخزانة حتى السنة القادمة|убирают свиток Торы в шкаф до следующего года|they put the Torah scroll away in the ark until next year
 S hanuka|🕎|#e67700|חנוכה: חג האורים|حانوكا: عيد الأنوار|Ханука: праздник огней|Hanukkah: The Festival of Lights
 L לפני הרבה שנים המקדש בירושלים היה מלוכלך. המכבים ניצחו והחזירו אותו לעם.|قبل سنوات كثيرة كان الهيكل في القدس متّسخًا. انتصر المكابيون وأعادوه للشعب.|Много лет назад Храм в Иерусалиме был осквернён. Маккавеи победили и вернули его народу.|Many years ago the Temple in Jerusalem was dirty. The Maccabees won and gave it back to the people.
 L במקדש היה רק קצת שמן, אבל הוא דלק שמונה ימים. זה היה נס.|لم يكن في الهيكل إلا القليل من الزيت، لكنه اشتعل ثمانية أيام. كانت تلك معجزة.|В Храме было совсем мало масла, но оно горело восемь дней. Это было чудо.|There was only a little oil in the Temple, but it burned for eight days. It was a miracle.
@@ -116,9 +116,9 @@ L אוכלים סופגניות ולביבות, כי הן מטוגנות בשמ�
 Q איזה חג נמשך שמונה ימים ומדליקים בו נרות כל לילה?|أي عيد يستمرّ ثمانية أيام ويُشعلون فيه الشموع كل ليلة؟|Какой праздник длится восемь дней, и в нём каждую ночь зажигают свечи?|Which holiday lasts eight days, with candles lit every night?|h_han|h_pur,h_suk,h_shav
 Q על איזה נס מספרים בחנוכה?|عن أي معجزة نحكي في حانوكا؟|О каком чуде рассказывают на Хануку?|Which miracle do we tell about on Hanukkah?|e_oil|e_rain,e_sea,e_bread
 E e_oil|t|מעט שמן דלק שמונה ימים|القليل من الزيت اشتعل ثمانية أيام|немного масла горело восемь дней|a little oil burned for eight days
-E e_rain|t|גשם ירד ארבעים יום|نزل المطر أربعين يومًا|дождь шёл сорок дней|rain fell for forty days
-E e_sea|t|הים נהיה מתוק|صار البحر حلوًا|море стало сладким|the sea became sweet
-E e_bread|t|הלחם גדל מעצמו|كبر الخبز من تلقاء نفسه|хлеб вырос сам|the bread grew by itself
+E e_rain|t|גשם ירד ארבעים יום וכיסה את כל הארץ|نزل المطر أربعين يومًا وغطّى كل البلاد|дождь шёл сорок дней и покрыл всю страну|rain fell for forty days and covered the whole land
+E e_sea|t|הנרות נדלקו בלי גפרור|اشتعلت الشموع بلا عود ثقاب|свечи зажглись без спички|the candles lit without a match
+E e_bread|t|המקדש נבנה ביום אחד|بُني الهيكل في يوم واحد|Храм построили за один день|the Temple was built in one day
 Q איך קוראים לנר שמדליקים בו את שאר הנרות?|ماذا نسمّي الشمعة التي نُشعل بها باقي الشموع؟|Как называется свеча, от которой зажигают остальные?|What is the candle that lights the others called?|e_shamash|e_hamash,e_hall,e_goal
 E e_shamash|t|השמש|الشمّاش|шамаш|the shamash
 E e_hamash|t|הסביבון|السفيفون|севивон|the dreidel
@@ -155,9 +155,9 @@ E e_aut|t|בתחילת הסתיו|في بداية الخريف|в начале �
 E e_spring|t|בסוף האביב|في نهاية الربيع|в конце весны|at the end of spring
 Q למה חשוב לשמור על העצים?|لماذا من المهمّ الحفاظ على الأشجار؟|Почему важно беречь деревья?|Why is it important to take care of trees?|e_air|e_noise,e_dirt,e_cold
 E e_air|t|הם נותנים צל, פירות ואוויר נקי|تعطينا ظلًّا وثمارًا وهواءً نظيفًا|они дают тень, плоды и чистый воздух|they give shade, fruit and clean air
-E e_noise|t|הם עושים רעש|إنها تُحدث ضجيجًا|они шумят|they make noise
-E e_dirt|t|הם מלכלכים את הרחוב|إنها تُوسّخ الشارع|они пачкают улицу|they make the street dirty
-E e_cold|t|הם מקררים את הים|إنها تبرّد البحر|они охлаждают море|they cool the sea
+E e_noise|t|הם מסתירים את השמש מהגינה בכל שעות היום|إنها تحجب الشمس عن الحديقة طوال ساعات النهار|они целый день закрывают от сада солнце|they keep the sun off the garden all day long
+E e_dirt|t|הם מפילים עלים ומלכלכים את הרחוב|إنها تُسقط الأوراق وتوسّخ الشارع|они роняют листья и пачкают улицу|they drop leaves and make the street dirty
+E e_cold|t|הם מקררים את מי הים|إنها تبرّد مياه البحر|они охлаждают морскую воду|they cool the sea water
 S purim|🎭|#862e9c|פורים: חג התחפושות|بوريم: عيد التنكّر|Пурим: праздник костюмов|Purim: The Costume Holiday
 L בפורים קוראים את סיפור אסתר ומרדכי. הסיפור כתוב במגילה.|في بوريم يقرؤون قصة إستير ومردخاي. والقصة مكتوبة في المغيلا.|На Пурим читают историю Эстер и Мордехая. Она записана в свитке-мегиле.|On Purim people read the story of Esther and Mordechai. The story is written in the megillah.
 L המן הרע רצה לפגוע ביהודים, אבל אסתר המלכה עזרה להציל אותם.|أراد هامان الشرّير أن يؤذي اليهود، لكن الملكة إستير ساعدت في إنقاذهم.|Злой Аман хотел навредить евреям, но царица Эстер помогла их спасти.|Wicked Haman wanted to hurt the Jewish people, but Queen Esther helped to save them.
@@ -167,7 +167,7 @@ L שולחים משלוחי מנות לחברים ולשכנים, ונותנים
 L אוכלים אוזני המן, עוגיות עם מילוי.|يأكلون آذان هامان، وهي كعكات محشوّة.|Едят уши Амана - печенье с начинкой.|People eat hamantashen, cookies with a filling.
 Q איזה חג הוא חג התחפושות?|أي عيد هو عيد التنكّر؟|Какой праздник - праздник костюмов?|Which holiday is the costume holiday?|h_pur|h_suk,h_shab,h_tub
 Q איפה כתוב סיפור פורים?|أين كُتبت قصة بوريم؟|Где записана история Пурима?|Where is the story of Purim written?|o_megil|o_dreid,o_shofar,o_lulav
-Q איך קוראים לדמות הטובה והאמיצה בסיפור?|ماذا اسم الشخصية الطيبة والشجاعة في القصة؟|Как зовут добрую и смелую героиню истории?|Who is the kind and brave character in the story?|e_esther|e_haman,e_moses,e_noah
+Q איך קוראים לדמות הטובה והאמיצה בסיפור?|ما اسم الشخصية الطيبة والشجاعة في القصة؟|Как зовут добрую и смелую героиню истории?|Who is the kind and brave character in the story?|e_esther|e_haman,e_moses,e_noah
 E e_esther|p|המלכה אסתר|الملكة إستير|царица Эстер|Queen Esther
 E e_haman|p|המן|هامان|Аман|Haman
 E e_moses|p|משה|موسى|Моисей|Moses
@@ -175,9 +175,9 @@ E e_noah|p|נח|نوح|Ной|Noah
 Q במה מרעישים כששומעים את השם המן?|بماذا نُحدث الضجيج عندما نسمع اسم هامان؟|Чем шумят, услышав имя Аман?|What do people make noise with when they hear the name Haman?|o_ragn|o_shofar,o_chanu,o_sukk
 Q מה שולחים לחברים בפורים?|ماذا يرسلون للأصدقاء في بوريم؟|Что отправляют друзьям на Пурим?|What do people send to friends on Purim?|e_mish|e_homew,e_sand,e_ring
 E e_mish|t|משלוח מנות|هدية طعام (مشلوح مانوت)|угощение (мишлоах манот)|a food gift (mishloach manot)
-E e_homew|t|שיעורי בית|واجبات بيتية|домашние задания|homework
-E e_sand|t|חול מהים|رملًا من البحر|песок с моря|sand from the sea
-E e_ring|t|טבעות ברזל|خواتم حديدية|железные кольца|iron rings
+E e_homew|t|כרטיסי ברכה|بطاقات تهنئة|открытки|greeting cards
+E e_sand|t|סופגניות|سوفغانيا|суфгании|doughnuts
+E e_ring|t|זרי פרחים ועלים ירוקים לקישוט הבית|أكاليل من الأزهار والأوراق الخضراء لتزيين البيت|венки из цветов и зелёных листьев для украшения дома|wreaths of flowers and green leaves to decorate the home
 Q איזה מאכל אוכלים בפורים?|أي طعام يأكلون في بوريم؟|Какое блюдо едят на Пурим?|Which food do people eat on Purim?|f_hamen|f_matz,f_apple,f_chal
 S pesach|🍷|#a61e4d|פסח: חג החירות|بيساح: عيد الحرية|Песах: праздник свободы|Pesach: The Holiday of Freedom
 L לפני הרבה שנים בני ישראל היו עבדים במצרים. משה הוביל אותם לחופש.|قبل سنوات كثيرة كان بنو إسرائيل عبيدًا في مصر. قادهم موسى إلى الحرية.|Много лет назад сыны Израиля были рабами в Египте. Моисей вывел их на свободу.|Many years ago the people of Israel were slaves in Egypt. Moses led them to freedom.
@@ -195,12 +195,12 @@ Q איך קוראים לארוחה המיוחדת בערב הראשון של פ�
 E e_seder|t|ליל סדר|ليلة السيدر|седер|the seder
 E e_kidd|t|קידוש|كيدّوش|кидуш|Kiddush
 E e_brit|t|בר מצווה|بار ميتسفا|бар-мицва|a bar mitzvah
-E e_shav|t|שבועון|مجلة أسبوعية|еженедельник|a weekly magazine
+E e_shav|t|ארוחת ליל שבת|وجبة ليلة السبت|субботний ужин|the Friday night meal
 Q איזה ספר קוראים בליל הסדר?|أي كتاب يقرؤون في ليلة السيدر؟|Какую книгу читают на седере?|Which book do people read at the seder?|o_hagg|o_megil,o_chanu,o_ragn
 Q מי שואל את ארבע הקושיות?|من يسأل الأسئلة الأربعة؟|Кто задаёт четыре вопроса?|Who asks the four questions?|e_youngest|e_oldest,e_dog,e_judgex
 E e_youngest|p|הילד הקטן ביותר|أصغر طفل|самый младший ребёнок|the youngest child
 E e_oldest|p|הסבא|الجدّ|дедушка|the grandfather
-E e_dog|p|השכן מהקומה למעלה|الجار من الطابق الأعلى|сосед сверху|the neighbor from upstairs
+E e_dog|p|הילד הגדול ביותר|أكبر طفل|самый старший ребёнок|the oldest child
 E e_judgex|p|המורה בכיתה|المعلّم في الصف|учитель в классе|the teacher in class
 Q מה אוכלים בפסח במקום לחם?|ماذا يأكلون في بيساح بدل الخبز؟|Что едят на Песах вместо хлеба?|What do people eat on Pesach instead of bread?|f_matz|f_chal,f_sufg,f_hamen
 Q כמה קושיות שואלים בליל הסדר?|كم سؤالًا يسألون في ليلة السيدر؟|Сколько вопросов задают на седере?|How many questions are asked at the seder?|n4|n3,n5,n7
@@ -213,16 +213,16 @@ L מקשטים את הבית ואת הגן בפרחים ובעלים ירוקי�
 Q אחרי כמה שבועות מפסח חל שבועות?|بعد كم أسبوعًا من بيساح يأتي شفوعوت؟|Через сколько недель после Песаха бывает Шавуот?|How many weeks after Pesach does Shavuot come?|n7|n3,n4,n10
 Q מה קיבל עם ישראל בהר סיני?|ماذا تلقّى بنو إسرائيل في جبل سيناء؟|Что получил народ Израиля на горе Синай?|What did the people of Israel receive at Mount Sinai?|e_ten|e_crown,e_boat,e_map
 E e_ten|t|את עשרת הדיברות|الوصايا العشر|десять заповедей|the Ten Commandments
-E e_crown|t|כתר זהב|تاجًا من ذهب|золотую корону|a golden crown
-E e_boat|t|ספינה גדולה|سفينة كبيرة|большой корабль|a big ship
-E e_map|t|מפה של העולם|خريطة للعالم|карту мира|a map of the world
+E e_crown|t|את ארבעת המינים: לולב, אתרוג, הדס וערבה|الأنواع الأربعة: لولاف وإترج وآس وصفصاف|четыре растения: лулав, этрог, мирт и ива|the four plants: lulav, etrog, myrtle and willow
+E e_boat|t|את עשר המכות|الضربات العشر|десять казней|the ten plagues
+E e_map|t|את מגילת אסתר|مجلّة إستير|свиток Эстер|the scroll of Esther
 Q איזה חג הוא חג הביכורים, חג הפירות הראשונים?|أي عيد هو عيد الباكورة، عيد أول الثمار؟|Какой праздник - праздник первых плодов?|Which holiday is the holiday of first fruits?|h_shav|h_han,h_pur,h_rosh
 Q איזה מאכל אוכלים בשבועות?|أي طعام يأكلون في شفوعوت؟|Какое блюдо едят на Шавуот?|Which food do people eat on Shavuot?|f_cheese|f_matz,f_hamen,f_sufg
 Q במה מקשטים את הבית בשבועות?|بماذا يزيّنون البيت في شفوعوت؟|Чем украшают дом на Шавуот?|What do people decorate the home with on Shavuot?|e_flow|e_snow,e_balloon,e_lamp
 E e_flow|t|בפרחים ובעלים ירוקים|بالأزهار والأوراق الخضراء|цветами и зелёными листьями|flowers and green leaves
-E e_snow|t|בשלג|بالثلج|снегом|snow
-E e_balloon|t|בפנסים מהקרח|بفوانيس من الجليد|ледяными фонарями|ice lanterns
-E e_lamp|t|בשרשראות של שוקולד|بسلاسل من الشوكولاتة|цепочками из шоколада|chocolate chains
+E e_snow|t|בנרות ובשרשרת של שמונה אורות|بالشموع وسلسلة من ثمانية أضواء|свечами и гирляндой из восьми огней|candles and a chain of eight lights
+E e_balloon|t|בסוכה של ענפים בחצר|بسُكّا من الأغصان في الساحة|суккой из веток во дворе|a sukkah of branches in the yard
+E e_lamp|t|בבלונים ובתחפושות|ببالونات وأزياء تنكّرية|шарами и костюмами|balloons and costumes
 S comm|🍲|#0b7285|הרבה קהילות, הרבה מנהגים|جماعات كثيرة وعادات كثيرة|много общин, много обычаев|Many Communities, Many Customs
 L יהודים הגיעו לישראל ממקומות רבים: פולין, תימן, מרוקו, עיראק, רוסיה, אתיופיה ועוד.|جاء اليهود إلى إسرائيل من أماكن كثيرة: بولندا واليمن والمغرب والعراق وروسيا وإثيوبيا وغيرها.|Евреи приехали в Израиль из многих мест: Польши, Йемена, Марокко, Ирака, России, Эфиопии и других.|Jewish people came to Israel from many places: Poland, Yemen, Morocco, Iraq, Russia, Ethiopia and more.
 L כל קהילה הביאה איתה שירים, בגדים ומאכלים. כך התרבות שלנו נעשית עשירה יותר.|أحضرت كل جماعة معها أغاني وملابس وأطعمة. وهكذا تصبح ثقافتنا أغنى.|Каждая община привезла свои песни, одежду и блюда. Так наша культура становится богаче.|Each community brought songs, clothes and foods. That makes our culture richer.
@@ -238,15 +238,15 @@ Q איזה חג חוגגים יוצאי אתיופיה?|أي عيد يحتفل �
 Q איזה חג חוגגים יוצאי מרוקו אחרי פסח?|أي عيد يحتفل به اليهود من المغرب بعد بيساح؟|Какой праздник отмечают евреи из Марокко после Песаха?|Which holiday do Jews from Morocco celebrate after Pesach?|h_mim|h_sigd,h_tub,h_suk
 Q מה עושים במימונה?|ماذا يفعلون في الميمونة؟|Что делают на Мимуне?|What do people do at the Mimouna?|e_open|e_lock,e_hide2,e_class
 E e_open|t|פותחים את הבית לאורחים ואוכלים מתוקים|يفتحون البيت للضيوف ويأكلون الحلويات|открывают дом для гостей и едят сладости|they open the home to guests and eat sweets
-E e_lock|t|נועלים את הדלת ונשארים לבד|يُقفلون الباب ويبقون وحدهم|запирают дверь и остаются одни|they lock the door and stay alone
-E e_hide2|t|מסתירים את האוכל|يخبّئون الطعام|прячут еду|they hide the food
-E e_class|t|הולכים לבית הספר|يذهبون إلى المدرسة|идут в школу|they go to school
+E e_lock|t|נועלים את הדלת ונשארים לבד עד סוף החג|يُقفلون الباب ويبقون وحدهم حتى نهاية العيد|запирают дверь и остаются одни до конца праздника|they lock the door and stay alone until the holiday ends
+E e_hide2|t|מסתירים את האוכל ואוכלים רק מצות|يخبّئون الطعام ولا يأكلون إلا الفطير|прячут еду и едят только мацу|they hide the food and eat only matzah
+E e_class|t|הולכים לבית הספר ולומדים כרגיל|يذهبون إلى المدرسة ويتعلّمون كالمعتاد|идут в школу и учатся как обычно|they go to school and study as usual
 Q איזה מאכל אוכלים יוצאי תימן בשבת בבוקר?|أي طعام يأكله اليهود من اليمن صباح السبت؟|Что едят евреи из Йемена в субботу утром?|What do Jews from Yemen eat on Shabbat morning?|f_jach|f_cous,f_gefi,f_kubb
 Q למה טוב שיש בישראל הרבה קהילות?|لماذا من الجيّد وجود جماعات كثيرة في إسرائيل؟|Почему хорошо, что в Израиле много общин?|Why is it good that Israel has many communities?|e_rich|e_boringc,e_same,e_less
 E e_rich|t|כי כל קהילה מוסיפה שירים, מאכלים ומנהגים|لأن كل جماعة تضيف أغاني وأطعمة وعادات|потому что каждая община добавляет песни, блюда и обычаи|because each community adds songs, foods and customs
-E e_boringc|t|כי כולם צריכים לעשות אותו דבר|لأن الجميع يجب أن يفعلوا الشيء نفسه|потому что все должны делать одно и то же|because everyone has to do the same thing
-E e_same|t|כי אין הבדל בין אנשים|لأنه لا فرق بين الناس|потому что люди ничем не отличаются|because there is no difference between people
-E e_less|t|כי כך יש פחות חגים|لأن هذا يقلّل الأعياد|потому что так меньше праздников|because this means fewer holidays
+E e_boringc|t|כי כך כל המשפחות לובשות ואוכלות בדיוק אותו דבר|لأن كل العائلات تلبس وتأكل الشيء نفسه تمامًا في كل مكان|потому что так все семьи одеваются и едят совершенно одинаково|because this way every family dresses and eats exactly the same
+E e_same|t|כי אין הבדל בין האנשים בכל הארץ|لأنه لا فرق بين الناس في كل البلاد|потому что между людьми по всей стране нет разницы|because there is no difference between people anywhere
+E e_less|t|כי כך יש פחות חגים ופחות ימי לימוד|لأن هذا يقلّل الأعياد وأيام الدراسة|потому что так меньше праздников и учебных дней|because this means fewer holidays and school days
 S faiths|🌙|#5f3dc4|חגים של כולם בישראל|أعياد الجميع في إسرائيل|праздники всех в Израиле|Holidays of Everyone in Israel
 L בישראל חיים יהודים, מוסלמים, נוצרים, דרוזים ועוד. לכל קבוצה יש חגים משלה.|في إسرائيل يعيش يهود ومسلمون ومسيحيون ودروز وغيرهم. ولكل مجموعة أعيادها.|В Израиле живут евреи, мусульмане, христиане, друзы и другие. У каждой группы свои праздники.|In Israel live Jews, Muslims, Christians, Druze and others. Every group has its own holidays.
 L רמדאן הוא חודש שבו המוסלמים צמים מעלות השחר, לפני הזריחה, ועד השקיעה. בסופו חוגגים את עיד אל־פיטר.|رمضان شهر يصوم فيه المسلمون من الفجر حتى الغروب. وفي نهايته يحتفلون بعيد الفطر.|Рамадан - месяц, когда мусульмане постятся от рассвета до заката. В конце отмечают Ид аль-Фитр.|Ramadan is a month when Muslims fast from dawn, before sunrise, until sunset. At its end they celebrate Eid al-Fitr.
@@ -256,20 +256,20 @@ L הנוצרים חוגגים את חג המולד בסוף דצמבר, ואת �
 L כשחוגגים חבר, מברכים אותו: חג שמח, עיד מובארכ או מרי כריסטמס. זה מראה כבוד.|عندما يحتفل صديق نقول له: عيد مبارك أو ميلاد مجيد أو حَغ سَميَح. هذا يُظهر الاحترام.|Когда друг празднует, мы поздравляем его: «Хаг самеах», «Ид мубарак» или «С Рождеством». Так мы показываем уважение.|When a friend celebrates, we greet them: Chag Sameach, Eid Mubarak or Merry Christmas. This shows respect.
 Q מה עושים המוסלמים בחודש רמדאן?|ماذا يفعل المسلمون في شهر رمضان؟|Что делают мусульмане в месяц Рамадан?|What do Muslims do during the month of Ramadan?|e_ramad|e_hanuk,e_plant2,e_sailx
 E e_ramad|t|צמים מעלות השחר עד השקיעה|يصومون من الفجر حتى الغروب|постятся от рассвета до заката|they fast from dawn to sunset
-E e_hanuk|t|מדליקים תשעה נרות|يُشعلون تسع شموع|зажигают девять свечей|they light nine candles
+E e_hanuk|t|מדליקים תשעה נרות בכל לילה בחלון|يُشعلون تسع شموع كل ليلة في النافذة|каждую ночь зажигают девять свечей в окне|they light nine candles in the window every night
 E e_plant2|t|נוטעים עצים בגן|يزرعون الأشجار في الحديقة|сажают деревья в саду|they plant trees in the garden
 E e_sailx|t|בונים סוכה|يبنون سُكّا|строят сукку|they build a sukkah
 Q איזה חג חוגגים בסוף חודש רמדאן?|أي عيد يحتفلون به في نهاية رمضان؟|Какой праздник отмечают в конце Рамадана?|Which holiday is celebrated at the end of Ramadan?|h_eidf|h_xmas,h_pur,h_han
-Q איזה חג הוא חג הקורבן?|أي عيد هو عيد الأضحية؟|Какой праздник - праздник жертвоприношения?|Which holiday is the feast of sacrifice?|h_eida|h_east,h_tub,h_eidf
+Q באיזה חג מחלקים בשר למשפחה ולאנשים שצריכים עזרה?|في أي عيد يوزّعون اللحم على العائلة وعلى المحتاجين؟|В какой праздник раздают мясо семье и тем, кто нуждается в помощи?|In which holiday do people share meat with family and with people who need help?|h_eida|h_east,h_tub,h_eidf
 Q איזה חג חוגגים הנוצרים בסוף דצמבר?|أي عيد يحتفل به المسيحيون في نهاية كانون الأول؟|Какой праздник христиане отмечают в конце декабря?|Which holiday do Christians celebrate at the end of December?|h_xmas|h_eida,h_pes,h_sigd
 Q איזה מקום מבקרים הדרוזים בחג שלהם?|أي مكان يزوره الدروز في عيدهم؟|Какое место друзы посещают в свой праздник?|Which place do the Druze visit on their holiday?|e_tomb|e_zoo,e_beach,e_mall
 E e_tomb|t|את קבר נבי שועייב בגליל|مقام النبي شعيب في الجليل|гробницу Наби-Шуайб в Галилее|the tomb of Nabi Shu'ayb in the Galilee
-E e_zoo|t|את גן החיות|حديقة الحيوان|зоопарк|the zoo
-E e_beach|t|את החוף בתל אביב|شاطئ تل أبيب|пляж в Тель-Авиве|the beach in Tel Aviv
-E e_mall|t|את הקניון|المركز التجاري|торговый центр|the mall
+E e_zoo|t|את מסגד אל־אקצא בירושלים|المسجد الأقصى في القدس|мечеть Аль-Акса в Иерусалиме|the Al-Aqsa Mosque in Jerusalem
+E e_beach|t|את גני הבהאים בחיפה|حدائق البهائيين في حيفا|сады бахаи в Хайфе|the Baha'i Gardens in Haifa
+E e_mall|t|את כנסיית הקבר בעיר העתיקה בירושלים|كنيسة القيامة في البلدة القديمة في القدس|храм Гроба Господня в Старом городе Иерусалима|the Church of the Holy Sepulchre in the Old City of Jerusalem
 Q מה עושים כשחבר חוגג חג שאנחנו לא חוגגים?|ماذا نفعل عندما يحتفل صديق بعيد لا نحتفل به؟|Что делать, когда друг празднует праздник, который мы не отмечаем?|What do we do when a friend celebrates a holiday that we do not celebrate?|e_greet|e_laugh,e_ignore2,e_forbid
 E e_greet|t|מברכים אותו בכבוד ושמחים איתו|نهنّئه باحترام ونفرح معه|поздравляем его с уважением и радуемся вместе|we greet him with respect and are happy with him
-E e_laugh|t|צוחקים על המנהגים שלו|نضحك على عاداته|смеёмся над его обычаями|we laugh at his customs
+E e_laugh|t|צוחקים על המנהגים שלו ומספרים לכל הכיתה|نضحك على عاداته ونحكي ذلك لكل الصف|смеёмся над его обычаями и рассказываем всему классу|we laugh at his customs and tell it to the whole class
 E e_ignore2|t|לא מדברים איתו כל היום|لا نكلّمه طوال اليوم|не разговариваем с ним весь день|we do not talk to him all day
 E e_forbid|t|אומרים לו לא לחגוג|نقول له ألّا يحتفل|говорим ему не праздновать|we tell him not to celebrate
 S holy|🕌|#c92a2a|מקומות מיוחדים בירושלים ובחיפה|أماكن مميّزة في القدس وحيفا|особые места в Иерусалиме и Хайфе|Special Places in Jerusalem and Haifa
@@ -288,7 +288,7 @@ E pl_pyram|l|הפירמידות|الأهرامات|пирамиды|the pyramids
 E pl_eilat|l|חוף אילת|شاطئ إيلات|пляж Эйлата|the Eilat beach
 Q איפה יהודים מתפללים ומכניסים פתקים בין האבנים?|أين يصلّي اليهود ويضعون رسائل بين الحجارة؟|Где евреи молятся и кладут записки между камней?|Where do Jewish people pray and put notes between the stones?|pl_kotel|pl_aqsa,pl_sepul,pl_bahai
 Q איזה מקום בירושלים קדוש למוסלמים?|أي مكان في القدس مقدّس للمسلمين؟|Какое место в Иерусалиме священно для мусульман?|Which place in Jerusalem is holy to Muslims?|pl_aqsa|pl_kotel,pl_sepul,pl_bahai
-Q איזה מקום בירושלים קדוש לנוצרים?|أي مكان في القدس مقدّس للمسيحيين؟|Какое место в Иерусалиме священно для христиан?|Which place in Jerusalem is holy to Christians?|pl_sepul|pl_kotel,pl_aqsa,pl_bahai
+Q איזה מקום בירושלים קדוש לנוצרים?|أي مكان في القدس مقدّس للمسيحيين؟|Какое место в Иерусалиме священно для христиан?|Which place in Jerusalem is sacred to Christians?|pl_sepul|pl_kotel,pl_aqsa,pl_bahai
 Q איפה נמצאים גני הבהאים?|أين توجد حدائق البهائيين؟|Где находятся сады бахаи?|Where are the Bahá'í Gardens?|e_haifa2|e_eilat2,e_safed2,e_arad2
 E e_haifa2|l|בחיפה|في حيفا|в Хайфе|in Haifa
 E e_eilat2|l|באילת|في إيلات|в Эйлате|in Eilat
@@ -296,8 +296,8 @@ E e_safed2|l|בבאר שבע|في بئر السبع|в Беэр-Шеве|in Beer
 E e_arad2|l|ברמת גן|في رمات غان|в Рамат-Гане|in Ramat Gan
 Q איך מתנהגים כשמבקרים במקום קדוש?|كيف نتصرّف عند زيارة مكان مقدّس؟|Как себя ведут в священном месте?|How do we behave when we visit a holy place?|e_respect|e_loud,e_selfie,e_run3
 E e_respect|t|בשקט ובכבוד, בבגדים צנועים|بهدوء واحترام وبملابس محتشمة|тихо и с уважением, в скромной одежде|quietly and with respect, in modest clothes
-E e_loud|t|בצעקות ובמשחקים|بالصراخ واللعب|с криками и играми|with shouting and games
-E e_selfie|t|מפריעים למתפללים לצלם|نزعج المصلّين للتصوير|мешаем молящимся фотографироваться|we bother people who pray to take photos
+E e_loud|t|בצעקות ובמשחקים רועשים בין המתפללים|بالصراخ والألعاب الصاخبة بين المصلّين|с криками и шумными играми среди молящихся|with shouting and noisy games among the worshippers
+E e_selfie|t|מצלמים בפלאש ומפריעים למתפללים|نصوّر بالفلاش ونزعج المصلّين|снимаем со вспышкой и мешаем молящимся|we take flash photos and disturb the worshippers
 E e_run3|t|רצים ונוגעים בכל דבר|نركض ونلمس كل شيء|бегаем и трогаем всё подряд|we run and touch everything
 S calend|📅|#862e9c|הלוח העברי והשפה העברית|التقويم العبري واللغة العبرية|еврейский календарь и иврит|The Hebrew Calendar and the Hebrew Language
 L חגי ישראל נקבעים לפי הלוח העברי. הוא מתבסס על הירח ועל השמש.|تُحدَّد أعياد إسرائيل حسب التقويم العبري. وهو مبني على القمر والشمس.|Праздники Израиля определяются по еврейскому календарю. Он основан на Луне и Солнце.|Israel's holidays are set by the Hebrew calendar. It is based on the moon and the sun.
@@ -306,17 +306,17 @@ L שמות החודשים הם: תשרי, חשוון, כסלו, טבת, שבט, 
 L בשבוע יש שבעה ימים: יום ראשון, יום שני, שלישי, רביעי, חמישי, שישי ושבת.|في الأسبوع سبعة أيام: يوم أول، ثانٍ، ثالث، رابع، خامس، جمعة وسبت.|В неделе семь дней: первый день, второй, третий, четвёртый, пятый, пятница и суббота.|A week has seven days: first day, second day, third, fourth, fifth, Friday and Shabbat.
 L המוסלמים סופרים לפי לוח הירח שלהם, והנוצרים לפי הלוח הכללי. לכן החגים שלהם בתאריכים אחרים.|يحسب المسلمون حسب تقويمهم القمري، ويحسب المسيحيون حسب التقويم العام. لذلك تقع أعيادهم في تواريخ أخرى.|Мусульмане считают по своему лунному календарю, а христиане - по общему. Поэтому их праздники приходятся на другие даты.|Muslims count by their own moon calendar, and Christians by the general calendar. That is why their holidays fall on other dates.
 L העברית היא שפה עתיקה. היא חזרה לדיבור ביום־יום, ואליעזר בן־יהודה עזר לכך. בישראל מדברים גם ערבית, רוסית, אמהרית, אנגלית ועוד.|العبرية لغة قديمة. عادت للكلام اليومي وساعد في ذلك إليعيزر بن يهودا. وفي إسرائيل يتكلّمون أيضًا العربية والروسية والأمهرية والإنجليزية وغيرها.|Иврит - древний язык. Он вернулся в повседневную речь, и в этом помог Элиэзер Бен-Йегуда. В Израиле говорят также на арабском, русском, амхарском, английском и других языках.|Hebrew is an ancient language. It came back into everyday speech, and Eliezer Ben-Yehuda helped with that. In Israel people also speak Arabic, Russian, Amharic, English and more.
-Q לפי מה נקבעים חגי ישראל?|حسب ماذا تُحدَّد أعياد إسرائيل؟|По какому календарю определяются праздники Израиля?|By what are Israel's holidays set?|e_hcal|e_shoes,e_menu,e_map2
+Q לפי מה נקבעים חגי ישראל?|حسب ماذا تُحدَّد أعياد إسرائيل؟|Как определяются праздники Израиля?|By what are Israel's holidays set?|e_hcal|e_shoes,e_menu,e_map2
 E e_hcal|t|לפי הלוח העברי|حسب التقويم العبري|по еврейскому календарю|by the Hebrew calendar
-E e_shoes|t|לפי מספר הנעליים|حسب عدد الأحذية|по числу ботинок|by the number of shoes
-E e_menu|t|לפי התפריט בבית הספר|حسب قائمة الطعام في المدرسة|по меню в школе|by the school menu
-E e_map2|t|לפי צבע השמיים|حسب لون السماء|по цвету неба|by the color of the sky
+E e_shoes|t|לפי הלוח הכללי|حسب التقويم العام|по общему календарю|by the general calendar
+E e_menu|t|לפי לוח הירח של המוסלמים|حسب التقويم القمري عند المسلمين|по лунному календарю мусульман|by the Muslim moon calendar
+E e_map2|t|לפי עונות השנה בלבד|حسب فصول السنة فقط|только по временам года|by the seasons only
 Q כמה ימים יש בשבוע?|كم يومًا في الأسبوع؟|Сколько дней в неделе?|How many days are in a week?|n7|n5,n10,n12
 Q כמה ימים יש בחודש עברי?|كم يومًا في الشهر العبري؟|Сколько дней в еврейском месяце?|How many days are in a Hebrew month?|e_29|e_8d,e_100d,e_14d
 E e_29|t|עשרים ותשעה או שלושים|تسعة وعشرون أو ثلاثون|двадцать девять или тридцать|twenty-nine or thirty
 E e_8d|t|שבעה או שמונה|سبعة أو ثمانية|семь или восемь|seven or eight
-E e_100d|t|מאה או מאתיים|مئة أو مئتان|сто или двести|one hundred or two hundred
-E e_14d|t|ארבעה עשר או חמישה עשר|أربعة عشر أو خمسة عشر|четырнадцать или пятнадцать|fourteen or fifteen
+E e_100d|t|שלושים או שלושים ואחד|ثلاثون أو واحد وثلاثون|тридцать или тридцать один|thirty or thirty-one
+E e_14d|t|ארבעה עשר או עשרים ושמונה|أربعة عشر أو ثمانية وعشرون|четырнадцать или двадцать восемь|fourteen or twenty-eight
 Q באיזה חודש עברי חל ראש השנה?|أي شهر عبري يبدأ فيه رأس السنة العبرية؟|В каком еврейском месяце бывает Рош а-Шана?|In which Hebrew month does Rosh Hashanah fall?|e_tishrei|e_nisan,e_adar,e_sivan
 E e_tishrei|t|תשרי|تشري|тишрей|Tishrei
 E e_nisan|t|ניסן|نيسان|нисан|Nisan
@@ -326,7 +326,7 @@ Q מי עזר להחזיר את העברית לדיבור ביום־יום?|من
 E e_benyeh|p|אליעזר בן־יהודה|إليعيزر بن يهودا|Элиэзер Бен-Йегуда|Eliezer Ben-Yehuda
 Q אילו שפות מדברים בישראל?|أي لغات يتكلّمون في إسرائيل؟|На каких языках говорят в Израиле?|Which languages do people speak in Israel?|e_langs|e_onlyh,e_latin,e_none
 E e_langs|t|עברית, ערבית, רוסית, אמהרית, אנגלית ועוד|العبرية والعربية والروسية والأمهرية والإنجليزية وغيرها|иврит, арабский, русский, амхарский, английский и другие|Hebrew, Arabic, Russian, Amharic, English and more
-E e_onlyh|t|רק יפנית|اليابانية فقط|только японский|only Japanese
-E e_latin|t|רק לטינית|اللاتينية فقط|только латынь|only Latin
-E e_none|t|אף שפה|لا لغة|никакого языка|no language
+E e_onlyh|t|ערבית, רוסית ואמהרית בלבד, בלי עברית כלל|العربية والروسية والأمهرية فقط، بدون العبرية إطلاقًا|только арабский, русский и амхарский, без иврита|only Arabic, Russian and Amharic, with no Hebrew at all
+E e_latin|t|עברית, לטינית ויוונית עתיקה בלבד|العبرية واللاتينية واليونانية القديمة فقط|только иврит, латынь и древнегреческий|only Hebrew, Latin and ancient Greek
+E e_none|t|עברית, יפנית, סינית, קוריאנית, הינדית ותאילנדית|العبرية واليابانية والصينية والكورية والهندية والتايلاندية|иврит, японский, китайский, корейский, хинди и тайский язык|Hebrew, Japanese, Chinese, Korean, Hindi and Thai too
 `;

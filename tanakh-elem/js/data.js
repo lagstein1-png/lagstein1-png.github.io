@@ -50,7 +50,7 @@ E sinai|l|הר סיני|جبل سيناء|гора Синай|Mount Sinai
 E jericho|l|יריחו|أريحا|Иерихон|Jericho
 E jerusalem|l|ירושלים|أورشليم|Иерусалим|Jerusalem
 E jordan|l|נהר הירדן|نهر الأردن|река Иордан|the Jordan River
-E nile|l|נהר היאור|نهر النيل|река Нил|the Nile
+E nile|l|נהר היאור|نهر النيل|река Нил|the Nile River
 E redsea|l|ים סוף|بحر القلزم|Красное море|the Red Sea
 E midian|l|מדין|مديان|Мадиам|Midian
 E elah|l|עמק האלה|وادي البطم|долина Эла|the Valley of Elah
@@ -81,7 +81,7 @@ E sheep|a|כבשים|خراف|овцы|sheep
 E knowledge|tr|עץ הדעת|شجرة المعرفة|дерево познания|the Tree of Knowledge
 E fig|tr|עץ תאנה גדול|شجرة تين كبيرة|большая смоковница|a big fig tree
 E olive|tr|עץ זית|شجرة زيتون|оливковое дерево|an olive tree
-E palm|tr|עץ תמר גבוה|شجرة نخيل عالية|высокая финиковая пальма|a tall date palm
+E palm|tr|עץ תמר גבוה|شجرة نخيل عالية|высокая финиковая пальма|a tall date palm tree
 S s1|🌍|#e8590c|בריאת העולם|خلق العالم|Сотворение мира|The Creation of the World
 L בהתחלה לא היה כלום. אלוהים ברא את העולם.|في البداية لم يكن شيء. خلق الله العالم.|Сначала ничего не было. Бог создал мир.|At first there was nothing. God made the world.
 L ביום הראשון אלוהים אמר: "יהי אור". והאור בא.|في اليوم الأول قال الله: «ليكن نور». فجاء النور.|В первый день Бог сказал: «Да будет свет». И пришёл свет.|On the first day God said, "Let there be light." And light came.
@@ -111,18 +111,19 @@ L נחש דיבר אל חוה ואמר: "תאכלי מהעץ הזה". היא א�
 L אלוהים ידע מה קרה. אדם וחוה יצאו מהגן.|عرف الله ما حدث. خرج آدم وحواء من الجنة.|Бог узнал, что случилось. Адам и Ева вышли из сада.|God knew what happened. Adam and Eve left the garden.
 L הסיפור מלמד: חשוב לשמור על ההוראות ולהגיד את האמת.|تعلّمنا القصة: من المهم أن نلتزم بالتعليمات وأن نقول الحقيقة.|История учит: важно соблюдать правила и говорить правду.|The story teaches: it is important to follow instructions and tell the truth.
 Q איך קוראים לגן שאלוהים עשה?|ماذا اسم الجنة التي صنعها الله؟|Как называется сад, который создал Бог?|What was the garden that God made called?|eden|t_gardenpalms,t_gardenwater,t_gardenflowers
-Q איך קראו לאיש הראשון?|ماذا كان اسم الإنسان الأول؟|Как звали первого человека?|What was the first person called?|adam|noah,abraham,moses
+Q איך קראו לאיש הראשון?|ماذا كان اسم الإنسان الأول؟|Как звали первого человека?|What was the first person called?|adam|t_noah_n2,t_abraham_n2,t_moses_n2
 Q איך קראו לאישה הראשונה?|ماذا كان اسم المرأة الأولى؟|Как звали первую женщину?|What was the first woman called?|eve|sarah,rebecca,rachel
 Q איזה בעל חיים דיבר אל חוה?|أي حيوان تكلم مع حواء؟|Какое животное говорило с Евой?|Which animal spoke to Eve?|snake|dove,lion,camel
 Q מאיזה עץ אסור היה לאכול?|من أي شجرة لم يكن مسموحًا الأكل؟|С какого дерева нельзя было есть?|Which tree were they not allowed to eat from?|knowledge|fig,olive,palm
-Q מכמה עצים אסור היה לאכול?|من كم شجرة لم يكن مسموحًا الأكل؟|С скольких деревьев нельзя было есть?|From how many trees were they not allowed to eat?|n1|n2,n3,n4
+Q מכמה עצים אסור היה לאכול?|من كم شجرة لم يكن مسموحًا الأكل؟|Со скольких деревьев нельзя было есть?|From how many trees were they not allowed to eat?|n1|n2,n3,n4
 Q מי ידע מה קרה בגן?|من عرف ما حدث في الجنة؟|Кто узнал, что случилось в саду?|Who knew what happened in the garden?|god|noah,david,pharaoh
-Q מי אכל מהעץ אחרי חוה?|من أكل من الشجرة بعد حواء؟|Кто съел плод после Евы?|Who ate from the tree after Eve?|adam|noah,abraham,moses
-Q מה מלמד הסיפור? חשוב לשמור על...|ماذا تعلّمنا القصة؟ من المهم أن نلتزم...|Чему учит история? Важно соблюдать...|What does the story teach? It is important to keep...|t_rules|t_games,t_sleep,t_toys
+Q מי אכל מהעץ אחרי חוה?|من أكل من الشجرة بعد حواء؟|Кто съел плод после Евы?|Who ate from the tree after Eve?|adam|t_noah_n2,t_moses_n2,t_jacob_n2
+Q מה מלמד הסיפור? חשוב לשמור על...|ماذا تعلّمنا القصة؟ من المهم أن نلتزم...|Чему учит история? Важно соблюдать...|What does the story teach? It is important to keep...|t_rules|t_games,t_sleep,t_quietclass
 E t_rules|t|ההוראות|التعليمات|правила|the instructions
 E t_games|t|המשחקים בחצר|الألعاب في الساحة|игры во дворе|the games in the yard
 E t_sleep|t|השינה בצהריים|النوم في الظهيرة|дневной сон|sleeping in the afternoon
 E t_toys|t|הצעצועים|الدمى|игрушки|the toys
+E t_quietclass|t|השקט בכיתה|الهدوء في الصف|тишину в классе|quiet in the classroom
 Q מה אמר הנחש לחוה לעשות?|ماذا قال الثعبان لحواء أن تفعل؟|Что змей сказал Еве сделать?|What did the snake tell Eve to do?|t_eattree|t_pickflower,t_leavegarden,t_sleepgarden
 Q מי יצא מהגן?|من خرج من الجنة؟|Кто вышел из сада?|Who left the garden?|t_adameve|t_abrahamsarah,t_noahwife,t_isaacrebecca
 E t_eattree|t|לאכול מהעץ|أن تأكل من الشجرة|съесть плод с дерева|to eat from the tree
@@ -153,7 +154,7 @@ Q מה הופיע בשמיים אחרי הגשם?|ماذا ظهر في السم�
 Q כמה בעלי חיים מכל סוג נכנסו לתיבה?|كم حيوانًا من كل نوع دخل الفلك؟|Сколько животных каждого вида вошло в ковчег?|How many animals of each kind went into the ark?|n2|n1,n3,n4
 Q מי נכנס לתיבה עם נוח?|من دخل الفلك مع نوح؟|Кто вошёл в ковчег вместе с Ноем?|Who went into the ark with Noah?|t_family|t_pharaoh,t_goliath,t_army
 Q מאיזה עץ היה העלה שהיונה הביאה?|من أي شجرة كانت الورقة التي أحضرتها الحمامة؟|С какого дерева был лист, который принесла голубка?|Which tree did the dove's leaf come from?|olive|fig,palm,knowledge
-Q מה היה הסימן לשלום?|ما كانت علامة السلام؟|Что было знаком мира?|What was the sign of peace?|t_rainbow|t_ark,t_tower,t_sunset
+Q מה היה הסימן לשלום?|ما كانت علامة السلام؟|Что было знаком мира?|What was the sign of peace?|t_rainbow|dove,olive,t_sunset
 E t_ark|t|תיבה|فلكًا|ковчег|an ark
 E t_tower|t|מגדל|برجًا|башню|a tower
 E t_house|t|בית|بيتًا|дом|a house
@@ -165,7 +166,7 @@ E t_pharaoh|t|פרעה|فرعون|фараон|Pharaoh
 E t_goliath|t|גלית והחיילים שלו|جليات وجنوده|Голиаф и его солдаты|Goliath and his soldiers
 E t_army|t|צבא גדול של מלך|جيش كبير لملك|большое войско царя|a king's big army
 Q מה כיסה את כל העולם בימי נוח?|ماذا غطّى العالم كله في أيام نوح؟|Что покрыло весь мир во времена Ноя?|What covered the whole world in Noah's days?|t_water|t_snow,t_sand,t_fire
-Q כמה לילות ירד גשם גדול?|كم ليلة نزل المطر الغزير؟|Сколько ночей шёл сильный дождь?|For how many nights did the great rain fall?|n40|n7,n10,n12
+Q כמה לילות ירד גשם גדול?|كم ليلة نزل المطر الغزير؟|Сколько ночей шёл сильный дождь?|For how many nights did the great rain fall?|n40|n4,n7,n14
 S s4|⭐|#9c36b5|אברהם ושרה|إبراهيم وسارة|Авраам и Сара|Abraham and Sarah
 L אברהם ושרה גרו בחרן. אלוהים אמר לאברהם: "לך לארץ חדשה, ואני אברך אותך".|عاش إبراهيم وسارة في حاران. قال الله لإبراهيم: «اذهب إلى أرض جديدة، وأنا أباركك».|Авраам и Сара жили в Харане. Бог сказал Аврааму: «Иди в новую землю, и Я благословлю тебя».|Abraham and Sarah lived in Haran. God said to Abraham, "Go to a new land, and I will bless you."
 L אברהם יצא לדרך עם שרה, עם הצאן ועם הגמלים. הם הגיעו לארץ כנען.|انطلق إبراهيم مع سارة ومعهما الغنم والجمال. وصلوا إلى أرض كنعان.|Авраам отправился в путь с Сарой, со стадами и верблюдами. Они пришли в землю Ханаан.|Abraham set out with Sarah, his sheep and his camels. They reached the land of Canaan.
@@ -178,9 +179,9 @@ Q לאיזו ארץ הגיעו אברהם ושרה?|إلى أي أرض وصل إ
 Q מי הייתה אשתו של אברהם?|من كانت زوجة إبراهيم؟|Кто была женой Авраама?|Who was Abraham's wife?|sarah|rebecca,rachel,miriam
 Q כמה אורחים הגיעו לאוהל של אברהם?|كم ضيفًا جاء إلى خيمة إبراهيم؟|Сколько гостей пришло к шатру Авраама?|How many guests came to Abraham's tent?|n3|n1,n2,n4
 Q איפה ישב אברהם כשהאורחים הגיעו?|أين جلس إبراهيم عندما جاء الضيوف؟|Где сидел Авраам, когда пришли гости?|Where was Abraham sitting when the guests came?|t_tent|t_ark,t_tower,t_wall
-Q מה אברהם נתן לאורחים? מים, לחם ו...|ماذا أعطى إبراهيم للضيوف؟ ماءً وخبزًا و...|Что Авраам дал гостям? Воду, хлеб и...|What did Abraham give the guests? Water, bread and...|t_food|t_swords,t_books,t_toys
+Q מה אברהם נתן לאורחים? מים, לחם ו...|ماذا أعطى إبراهيم للضيوف؟ ماءً وخبزًا و...|Что Авраам дал гостям? Воду, хлеб и...|What did Abraham give the guests? Water, bread and...|t_food|t_swords,t_books,t_newclothes
 Q איזה בן נולד לאברהם ולשרה?|أي ابن وُلد لإبراهيم وسارة؟|Какой сын родился у Авраама и Сары?|Which son was born to Abraham and Sarah?|isaac|jacob,esau,joseph
-Q בן כמה היה אברהם כשנולד יצחק?|كم كان عمر إبراهيم عندما وُلد إسحاق؟|Сколько лет было Аврааму, когда родился Исаак?|How old was Abraham when Isaac was born?|n100|n10,n40,n12
+Q בן כמה היה אברהם כשנולד יצחק?|كم كان عمر إبراهيم عندما وُلد إسحاق؟|Сколько лет было Аврааму, когда родился Исаак?|How old was Abraham when Isaac was born?|n100|n120,n90,n40
 Q מה עשתה שרה כשקיבלה את הבשורה?|ماذا فعلت سارة عندما سمعت الخبر؟|Что сделала Сара, когда услышала новость?|What did Sarah do when she heard the news?|t_laugh|t_cry,t_run,t_sleptf
 Q מה אלוהים הבטיח לאברהם?|ماذا وعد الله إبراهيم؟|Что Бог обещал Аврааму?|What did God promise Abraham?|t_son|t_boat,t_castle,t_gold
 Q איזו מצווה קיים אברהם כששלושת האנשים באו לאוהל?|أي وصية طبّق إبراهيم عندما جاء الرجال الثلاثة إلى الخيمة؟|Какую заповедь исполнил Авраам, когда трое пришли к шатру?|Which good deed did Abraham do when the three men came to his tent?|t_guests|t_wars,t_trade,t_hunt
@@ -189,6 +190,7 @@ E t_tent|t|האוהל|الخيمة|шатёр|the tent
 E t_food|t|אוכל|طعامًا|еду|food
 E t_swords|t|חרבות|سيوفًا|мечи|swords
 E t_books|t|ספרים|كتبًا|книги|books
+E t_newclothes|t|בגדים חדשים|ثيابًا جديدة|новую одежду|new clothes
 E t_laugh|t|צחקה|ضحكت|засмеялась|she laughed
 E t_cry|t|בכתה|بكت|заплакала|she cried
 E t_run|t|ברחה|هربت|убежала|she ran away
@@ -227,6 +229,7 @@ E t_abrahamsarah|t|אברהם ושרה|إبراهيم وسارة|Авраам и
 E t_noahwife|t|נוח ובנו|نوح وابنه|Ной и его сын|Noah and his son
 E t_lentils|t|מרק עדשים|شوربة عدس|чечевичная похлёбка|lentil soup
 E t_fish|t|דג|سمكة|рыбу|fish
+E t_fishes|t|דגים|أسماك|рыбы|fish
 E t_eggs|t|ביצים קשות|بيضًا مسلوقًا|варёные яйца|boiled eggs
 E t_cake|t|עוגה עם דבש ואגוזים|كعكة بالعسل والجوز|пирог с мёдом и орехами|honey and nut cake
 E t_stone|t|אבן|حجر|камне|a stone
@@ -288,10 +291,10 @@ E t_nobody|t|אף אחד לא הכיר|لم يعرف أحد أحدًا|Никт�
 E t_pharaoh_knew|t|פרעה הכיר את כולם|عرف فرعون الجميع|Фараон узнал всех|Pharaoh recognized everyone
 E t_forgave|t|סלח להם|سامحهم|простил их|He forgave them
 E t_punished|t|העניש אותם|عاقبهم|наказал их|He punished them
-E t_ignored|t|התעלם מהם|تجاهلهم|не обратил внимания|He ignored them
+E t_ignored|t|התעלם מהם|تجاهلهم|не обратил на них внимания|He ignored them
 E t_sold|t|מכר אותם|باعهم|продал их|He sold them
 E t_brothers|t|האחים שלו|إخوته|его братья|his brothers
-Q על מה חלם פרעה?|عن ماذا حلم فرعون؟|О чём мечтал фараон во сне?|What did Pharaoh dream about?|t_cows|t_dogs,t_birds_n,t_fish
+Q על מה חלם פרעה?|عن ماذا حلم فرعون؟|Что приснилось фараону?|What did Pharaoh dream about?|t_cows|t_dogs,t_birds_n,t_fishes
 S s7|🔥|#e8590c|משה והסנה|موسى والعليقة|Моисей и куст|Moses and the Burning Bush
 L במצרים נולדו הרבה ילדים בני ישראל. פרעה פחד, והוא קבע חוקים קשים.|وُلد في مصر أولاد كثيرون من بني إسرائيل. خاف فرعون ووضع قوانين قاسية.|В Египте родилось много детей Израиля. Фараон испугался и издал суровые законы.|Many Israelite children were born in Egypt. Pharaoh was afraid, and he made harsh laws.
 L אמא של משה שמה אותו בתיבה קטנה על נהר היאור. אחותו מרים שמרה עליו מרחוק.|وضعت أم موسى ابنها في سلة صغيرة على نهر النيل. وراقبته أخته مريم من بعيد.|Мать Моисея положила его в маленькую корзину на реке Нил. Его сестра Мариам смотрела издалека.|Moses' mother put him in a small basket on the Nile. His sister Miriam watched from far away.
@@ -308,7 +311,7 @@ Q לאן משה ברח כשהתבגר?|إلى أين هرب موسى عندما 
 Q איזו עבודה עשה משה במדין?|أي عمل عمل موسى في مديان؟|Какую работу делал Моисей в Мадиаме?|What job did Moses do in Midian?|t_shepherd|t_baker,t_soldier,t_king
 Q אצל מי עבד משה?|عند من عمل موسى؟|У кого работал Моисей?|Who did Moses work for?|jethro|laban,pharaoh,jacob
 Q מה בער ולא נשרף?|ما الذي اشتعل ولم يحترق؟|Что горело и не сгорало?|What burned but was not burned up?|t_bush|t_tree_n,t_house,t_ark
-Q מי קרא למשה מתוך הסנה?|من ناد موسى من العليقة؟|Кто позвал Моисея из куста?|Who called Moses from the bush?|god|aaron,david,joshua
+Q מי קרא למשה מתוך הסנה?|من نادى موسى من العليقة؟|Кто позвал Моисея из куста?|Who called Moses from the bush?|god|aaron,david,joshua
 Q את מי ביקש משה מפרעה לשחרר?|من طلب موسى من فرعون أن يطلق سراحهم؟|Кого Моисей просил фараона отпустить?|Whom did Moses ask Pharaoh to set free?|t_israelites|t_pharaoh,t_animals_n,t_soldiers
 Q מי עזר למשה?|من ساعد موسى؟|Кто помогал Моисею?|Who helped Moses?|aaron|esau,saul,laban
 Q מה היה השם של אחות משה?|ما اسم أخت موسى؟|Как звали сестру Моисея?|What was Moses' sister's name?|miriam|sarah,rachel,eve
@@ -317,6 +320,10 @@ E t_pharaohdaughter|t|בת פרעה|ابنة فرعون|дочь фараона|
 E t_rachel_n|t|רחל אשת יעקב|راحيل زوجة يعقوب|Рахиль, жена Иакова|Rachel, Jacob's wife
 E t_sarah_n|t|שרה אשת אברהם|سارة زوجة إبراهيم|Сара, жена Авраама|Sarah, Abraham's wife
 E t_eve_n|t|חוה מגן עדן|حواء من جنة عدن|Ева из Эдемского сада|Eve from the Garden of Eden
+E t_noah_n2|t|נוח מהתיבה|نوح من الفلك|Ной из ковчега|Noah from the ark
+E t_abraham_n2|t|אברהם מהאוהל|إبراهيم من الخيمة|Авраам из шатра|Abraham from the tent
+E t_moses_n2|t|משה מהר סיני|موسى من جبل سيناء|Моисей с горы Синай|Moses from Mount Sinai
+E t_jacob_n2|t|יעקב מהסולם|يعقوب من السُّلّم|Иаков с лестницы|Jacob from the ladder
 E t_shepherd|t|רועה צאן|راعي غنم|пастух|a shepherd
 E t_baker|t|אופה בשוק|خبّاز في السوق|пекарь на рынке|a baker in the market
 E t_soldier|t|חייל בצבא|جندي في الجيش|солдат в войске|a soldier in the army
@@ -344,9 +351,9 @@ Q איך בני ישראל עברו בים?|كيف عبر بنو إسرائيل 
 Q מי ניגנה בתוף ורקדה?|من قرعت الدف ورقصت؟|Кто играла на бубне и танцевала?|Who played the drum and danced?|miriam|sarah,rebecca,rahab
 Q באיזה חג אנחנו זוכרים את יציאת מצרים?|في أي عيد نتذكّر الخروج من مصر؟|В какой праздник мы вспоминаем исход из Египта?|On which holiday do we remember leaving Egypt?|pesach|purim,sukkot,shabbat
 Q מי הלך עם משה? אהרן ו...|من ذهب مع موسى؟ هارون و...|Кто шёл с Моисеем? Аарон и...|Who went with Moses? Aaron and...|miriam|sarah,rachel,eve
-Q מה קרה לצבא פרעה?|ماذا حدث لجيش فرعون؟|Что случилось с армией фараона?|What happened to Pharaoh's army?|t_didntreach|t_won,t_crossed,t_flew
+Q מה קרה לצבא פרעה?|ماذا حدث لجيش فرعون؟|Что случилось с армией фараона?|What happened to Pharaoh's army?|t_didntreach|t_won,t_crossed,t_wentback
 Q למה בני ישראל לא הספיקו לחכות לבצק?|لماذا لم يستطع بنو إسرائيل انتظار العجين؟|Почему Израиль не мог ждать, пока тесто поднимется?|Why couldn't the Israelites wait for the dough to rise?|t_hurry|t_sleepy,t_hungry,t_cold
-E t_matzah|t|מצה|مصّة|маца|matzah
+E t_matzah|t|מצה|فطير (متسة)|маца|matzah
 E t_cake_n|t|עוגת שוקולד|كعكة شوكولاتة|шоколадный торт|chocolate cake
 E t_pita|t|פיתה|خبز عربي|пита|pita
 E t_bagel|t|בייגל|كعكة سمسم|бублик|a bagel
@@ -362,11 +369,12 @@ E t_didntreach|t|לא הגיע אליהם|لم يصل إليهم|не дошла
 E t_won|t|ניצח את כולם|انتصر على الجميع|победила всех|It won the battle
 E t_crossed|t|עבר בים בשקט|عبر البحر بهدوء|спокойно прошла море|It crossed the sea quietly
 E t_flew|t|עף באוויר|طار في الهواء|улетела по воздуху|It flew away
+E t_wentback|t|חזר למצרים בלי להילחם|عاد إلى مصر دون قتال|вернулась в Египет без боя|It went back to Egypt without fighting
 E t_hurry|t|מיהרו לצאת|كانوا مستعجلين للخروج|спешили уйти|They were in a hurry to leave
 E t_sleepy|t|היו עייפים מהדרך|كانوا متعبين من الطريق|устали от дороги|They were tired from the road
 E t_hungry|t|לא היה להם קמח בבתים|لم يكن لديهم طحين في البيوت|у них не было муки в домах|They had no flour in their houses
 E t_cold|t|היה קר מדי בחוץ|كان الجو باردًا جدًا في الخارج|на улице было слишком холодно|It was far too cold outside
-Q מי אמר לבני ישראל "לכו"?|من قال لبني إسرائيل «اذهبوا»؟|Кто сказал Израилю «Идите»?|Who said to the Israelites, "Go"?|pharaoh|laban,saul,esau
+Q מי אמר לבני ישראל "לכו"?|من قال لبني إسرائيل «اذهبوا»؟|Кто сказал Израилю «Идите»?|Who said to the Israelites, "Go"?|pharaoh|aaron,joshua,jethro
 S s9|📜|#9c36b5|עשרת הדיברות|الوصايا العشر|Десять заповедей|The Ten Commandments
 L אחרי שלושה חודשים בני ישראל הגיעו למדבר ולהר סיני. העם חנה למרגלות ההר.|بعد ثلاثة أشهر وصل بنو إسرائيل إلى الصحراء وإلى جبل سيناء. أقام الشعب عند سفح الجبل.|Через три месяца Израиль пришёл в пустыню к горе Синай. Народ встал лагерем у подножия горы.|After three months the Israelites reached the desert and Mount Sinai. The people camped at the foot of the mountain.
 L משה עלה אל ההר, ואלוהים נתן לו עשרת הדיברות על שני לוחות אבן.|صعد موسى إلى الجبل، وأعطاه الله الوصايا العشر على لوحين من الحجر.|Моисей поднялся на гору, и Бог дал ему десять заповедей на двух каменных скрижалях.|Moses went up the mountain, and God gave him the Ten Commandments on two stone tablets.
@@ -380,7 +388,7 @@ Q על מה נכתבו עשרת הדיברות?|على ماذا كُتبت ال�
 Q כמה לוחות נתן אלוהים למשה?|كم لوحًا أعطى الله لموسى؟|Сколько скрижалей Бог дал Моисею?|How many tablets did God give Moses?|n2|n1,n3,n4
 Q כמה דיברות יש?|كم وصية هناك؟|Сколько заповедей?|How many commandments are there?|n10|n3,n7,n12
 Q כמה ימים משה היה על ההר?|كم يومًا بقي موسى على الجبل؟|Сколько дней Моисей был на горе?|How many days was Moses on the mountain?|n40|n7,n10,n12
-Q כמה שנים הלכו בני ישראל במדבר?|كم سنة مشى بنو إسرائيل في الصحراء؟|Сколько лет Израиль шёл по пустыне?|How many years did the Israelites walk in the desert?|n40|n7,n10,n12
+Q כמה שנים הלכו בני ישראל במדבר?|كم سنة مشى بنو إسرائيل في الصحراء؟|Сколько лет Израиль шёл по пустыне?|How many years did the Israelites walk in the desert?|n40|n10,n70,n100
 Q איך קראו לאוכל שאלוהים נתן במדבר?|ماذا سُمّي الطعام الذي أعطاه الله في الصحراء؟|Как называлась еда, которую Бог дал в пустыне?|What was the food God gave in the desert called?|t_manna|t_pizza,t_soup,t_cake_n
 Q מה אומרת מצווה אחת מהעשרת הדיברות?|ماذا تقول إحدى الوصايا العشر؟|Что говорит одна из десяти заповедей?|What does one of the Ten Commandments say?|t_honorparents|t_cmd_early,t_cmd_water,t_cmd_gift
 Q איזה יום מיוחד הדיברות מזכירים?|أي يوم مميز تذكّره الوصايا؟|Какой особый день упоминают заповеди?|Which special day do the commandments mention?|shabbat|purim,pesach,sukkot
@@ -416,7 +424,7 @@ Q מי הוביל את בני ישראל אחרי משה?|من قاد بني إ�
 Q איזה נהר עברו בני ישראל?|أي نهر عبر بنو إسرائيل؟|Какую реку перешёл Израиль?|Which river did the Israelites cross?|jordan|nile,redsea,sea
 Q לאיזו ארץ נכנסו בני ישראל?|إلى أي أرض دخل بنو إسرائيل؟|В какую землю вошёл Израиль?|Which land did the Israelites enter?|canaan|egypt,midian,haran
 Q איזו עיר הייתה לה חומה גבוהה?|أي مدينة كان لها سور عالٍ؟|У какого города была высокая стена?|Which city had a high wall?|jericho|bethlehem,jerusalem,haran
-Q מי עזרה לשני האנשים והחביאה אותם?|من ساعدت الرجلين وأخفتهما؟|Кто помог двум людям и спрятала их?|Who helped the two men and hid them?|rahab|rachel,sarah,miriam
+Q מי עזרה לשני האנשים והחביאה אותם?|من ساعدت الرجلين وأخفتهما؟|Кто помогла двум мужчинам и спрятала их?|Who helped the two men and hid them?|rahab|rachel,sarah,miriam
 Q כמה אנשים יהושע שלח לבדוק את העיר?|كم رجلًا أرسل يشوع ليستطلع المدينة؟|Сколько людей Иисус Навин послал осмотреть город?|How many men did Joshua send to look at the city?|n2|n1,n3,n4
 Q כמה ימים הלכו סביב העיר פעם אחת בכל יום?|كم يومًا داروا حول المدينة مرة واحدة كل يوم؟|Сколько дней они обходили город по разу в день?|For how many days did they walk around the city once a day?|n6|n3,n7,n10
 Q כמה פעמים הלכו סביב העיר ביום השביעי?|كم مرة داروا حول المدينة في اليوم السابع؟|Сколько раз они обошли город на седьмой день?|How many times did they walk around the city on the seventh day?|n7|n3,n6,n10
@@ -503,8 +511,8 @@ Q מי צעקה "תנו לה אותו"?|من صرخت «أعطوها إياه»�
 Q איך שלמה ידע מי האמא האמיתית?|كيف عرف سليمان من هي الأم الحقيقية؟|Как Соломон узнал, кто настоящая мать?|How did Solomon know who the real mother was?|t_loved|t_guessed,t_lot,t_asked_king
 Q מה שלמה בנה בירושלים?|ماذا بنى سليمان في أورشليم؟|Что Соломон построил в Иерусалиме?|What did Solomon build in Jerusalem?|t_temple|t_pyramid,t_ark2,t_tower2
 Q באיזו עיר שלמה בנה את בית המקדש?|في أي مدينة بنى سليمان الهيكل؟|В каком городе Соломон построил Храм?|In which city did Solomon build the Temple?|jerusalem|jericho,bethel,haran
-Q איזה ספר כתב שלמה?|أي كتاب كتب سليمان؟|Какую книгу писал Соломон?|Which book did Solomon write?|t_proverbs|t_atlas,t_cookbook,t_diary
-Q מי בא לשמוע את החכמה של שלמה?|من جاء ليسمع حكمة سليمان؟|Кто приходил слушать мудрость Соломона?|Who came to hear Solomon's wisdom?|t_people|t_nobody2,t_animals_n2,t_horse
+Q איזה ספר כתב שלמה?|أي كتاب كتب سليمان؟|Какую книгу написал Соломон?|Which book did Solomon write?|t_proverbs|t_atlas,t_cookbook,t_diary
+Q מי בא לשמוע את החכמה של שלמה?|من جاء ليسمع حكمة سليمان؟|Кто приходил слушать мудрость Соломона?|Who came to hear Solomon's wisdom?|t_people|t_sol_jerusalem,t_sol_family,t_sol_palace
 E t_wiseheart|t|לב חכם|قلبًا حكيمًا|мудрое сердце|a wise heart
 E t_gold2|t|הרבה זהב|ذهبًا كثيرًا|много золота|a lot of gold
 E t_horse|t|סוס מהיר|حصانًا سريعًا|быстрого коня|a fast horse
@@ -545,4 +553,7 @@ E t_diary|t|יומן|مذكرات|дневник|a diary
 E t_people|t|אנשים מכל העולם|ناس من كل العالم|люди со всего мира|people from all over the world
 E t_nobody2|t|אף אחד לא בא אליו|لم يأتِ إليه أحد|к нему никто не приходил|nobody came to him
 E t_animals_n2|t|רק החיות של השדה|حيوانات الحقل فقط|только животные с поля|only the animals of the field
+E t_sol_jerusalem|t|אנשים מירושלים בלבד|أناس من أورشليم فقط|люди только из Иерусалима|people from Jerusalem only
+E t_sol_family|t|רק המשפחה של המלך|عائلة الملك فقط|только семья царя|only the king's family
+E t_sol_palace|t|רק האנשים שגרו בארמון|فقط من سكنوا في القصر|только те, кто жил во дворце|only the people who lived in the palace
 `;

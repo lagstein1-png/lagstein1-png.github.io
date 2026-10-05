@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "x120 · 2026-10-04";
+  var BUILD = "x121 · 2026-10-04";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -1111,7 +1111,7 @@
   var TUT_ID = null;
   if (window.TUTOR) {
     TUTOR.mount({
-      app: "advanced-math",
+      app: "bagrut-806",
       pickLang: true,                 /* אין בורר באפליקציה — הפאנל מביא אחד */
       lang: function () { return "he" },
       q: function () {
@@ -1157,7 +1157,7 @@
         say("שאלה " + it.q.number + " סעיף " + it.sub.letter);
       };
       BARAK.register({
-        app: "advanced-math",
+        app: "bagrut-806",
         getScreenContext: function () {
           var it = bkCur();
           if (!it) return null;
@@ -1510,7 +1510,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=x120-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=x121-pwa1").catch(function () {});
     });
   }
 

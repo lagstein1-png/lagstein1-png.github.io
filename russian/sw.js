@@ -13,9 +13,15 @@ const V = new URL(self.location).searchParams.get("v") || "dev";
 const CACHE = "russian-" + V;
 const PRE = ["./","./index.html","./manifest.json",
              "./img/icon-192.png","./img/icon-512.png",
+             /* לימור והקראה — אותם נתיבים משותפים שב-PRE של english
+                ועשר האחרות. index.html טוען את שבעת הקבצים האלה,
+                ו-tutor.js טוען את /img/limor.jpg בזמן ריצה; בלעדיהם
+                כאן, מי שהתקין ויצא מהרשת נשאר בלי לימור ובלי ההקראה
+                העברית עד החיבור הבא. נוסף 5.10.2026. */
+             "/img/limor.jpg","/img/josh.jpg",
+             "/tutor/he-speech.js","/speech/recorded.js","/tutor/josh-face.js","/tutor/josh-state.js",
+             "/tutor/josh-local.js","/tutor/tutor.js","/tutor/barak-core.js",
              "/legal/terms.js","/legal/protect.js",
-             /* השכבה המוקלטת — /speech/recorded.js (2.10.2026) */
-             "/speech/recorded.js",
              /* גופנים מקומיים — /fonts/fonts.css (1.10.2026) */
              "/fonts/fonts.css","/fonts/heebo-hebrew.woff2","/fonts/heebo-math.woff2","/fonts/heebo-latin.woff2","/fonts/lexend-latin.woff2","/fonts/noto-sans-arabic-arabic.woff2","/fonts/noto-sans-cyrillic.woff2","/fonts/noto-sans-greek.woff2","/fonts/noto-sans-latin.woff2"];
 

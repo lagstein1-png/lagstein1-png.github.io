@@ -177,7 +177,7 @@ Q באילו צבעים הדגל של ישראל?|ما ألوان علم إسر�
 Q איזה סמל נמצא באמצע הדגל?|أي رمز يوجد في وسط العلم؟|Какой символ находится в середине флага?|Which symbol is in the middle of the flag?|star|menorah,olive,emblem
 Q איזה דבר מצויר בסמל המדינה?|ما الذي يظهر في شعار الدولة؟|Что изображено на гербе государства?|What is drawn in the state emblem?|menorah|star,flag,anthem
 Q מה מצויר משני צדי המנורה בסמל?|ما الذي يظهر على جانبي الشمعدان في الشعار؟|Что нарисовано по бокам от меноры на гербе?|What is drawn on both sides of the menorah in the emblem?|olive|star,e_wheat,e_palm
-Q איך קוראים להמנון של ישראל?|ما اسم النشيد الوطني لإسرائيل؟|Как называется гимн Израиля?|What is Israel's anthem called?|hatikva|flag,emblem,star
+Q איך קוראים להמנון של ישראל?|ما اسم النشيد الوطني لإسرائيل؟|Как называется гимн Израиля?|What is Israel's anthem called?|hatikva|e_jerugold,e_youandi,e_hallel
 Q מה עושים כששרים את ההמנון?|ماذا نفعل عندما نغنّي النشيد الوطني؟|Что делают, когда поют гимн?|What do we do when the anthem is sung?|e_stand|e_sitdown,e_run2,e_play
 Q מהי בירת ישראל?|ما هي عاصمة إسرائيل؟|Какая столица Израиля?|What is the capital of Israel?|jlm|tlv,haifa,eilat
 Q איזה יום חוגגים שהמדינה קמה?|في أي يوم نحتفل بقيام الدولة؟|В какой день мы празднуем создание государства?|On which day do we celebrate the founding of the state?|indep|memor,purim,pesach
@@ -236,7 +236,7 @@ E e_gardens|t|דואגת לגינות ולרחובות|تهتم بالحدائق
 E e_laws2|t|כותבת חוקים לכל המדינה|تكتب قوانين للدولة كلها|пишет законы для всей страны|writes laws for the whole country
 E e_judge2|t|מחליטה במשפטים|تحكم في المحاكمات|решает в судах|decides in trials
 E e_army|t|מגינה על הגבולות|تحمي الحدود|охраняет границы|guards the borders
-E e_taxes|t|מיסים|ضرائب|налоги|taxes
+E e_taxes|t|מיסים, כמו ארנונה|ضرائب، مثل الأرنونا|налоги, например арнону|taxes, such as arnona
 E e_games|t|משחקים|ألعابًا|игрушки|toys
 E e_flags|t|דגלים|أعلامًا|флажки|flags
 E e_candy|t|סוכריות|حلوى|конфеты|candy
@@ -253,7 +253,7 @@ L מי שגדול מגיל 18 ואזרח ישראלי יכול להצביע. מ�
 L ההצבעה סודית, כדי שכל אחד יבחר מה שהוא רוצה, בלי פחד.|التصويت سرّي، لكي يختار كل واحد ما يريد، من دون خوف.|Голосование тайное, чтобы каждый выбирал то, что хочет, без страха.|The vote is secret so that everyone can choose what they want, without fear.
 L גם בכיתה אפשר לעשות בחירות, למשל כדי לבחור נציג כיתה.|وفي الصف أيضًا يمكن إجراء انتخابات، مثلًا لاختيار ممثّل الصف.|В классе тоже можно проводить выборы, например, чтобы выбрать старосту.|In class we can also hold an election, for example to choose a class representative.
 L ברוב הקולות מחליטים, אבל מכבדים גם את מי שחשב אחרת.|نقرّر بحسب أغلبية الأصوات، لكننا نحترم أيضًا من فكّر بشكل مختلف.|Решение принимается большинством голосов, но мы уважаем и тех, кто думал иначе.|We decide by the most votes, but we also respect people who thought differently.
-Q איך קוראים למדינה שבה האנשים מחליטים?|ماذا نسمّي الدولة التي يقرّر فيها الناس؟|Как называется страна, в которой решают люди?|What is a country called in which the people decide?|e_democracy|e_monarchy,e_nolaws,e_island
+Q מה המשמעות של דמוקרטיה?|ما معنى الديمقراطية؟|Что означает демократия?|What does democracy mean?|e_peopledecide|e_onedecides,e_nolaws2,e_nochange
 Q מה עושים בבחירות?|ماذا يفعل الناس في الانتخابات؟|Что делают на выборах?|What do people do in an election?|vote|e_elecwatch,e_elecwait,e_elecdecide
 Q כל כמה שנים בדרך כלל יש בחירות לכנסת?|كل كم سنة تُجرى عادةً انتخابات الكنيست؟|Через сколько лет обычно проходят выборы в Кнессет?|How often are Knesset elections usually held (in years)?|n4|n1,n10,n40
 Q מגיל כמה מצביעים לכנסת?|من أي عمر يصوّت المواطن للكنيست؟|С какого возраста голосуют в Кнессет?|From what age can a citizen vote for the Knesset?|n18|n10,n12,n8
@@ -309,9 +309,9 @@ Q איך מתייחסים לאדם שמדבר אחרת מאיתנו?|كيف نت
 Q איזה חג חוגגים בדרך כלל בקהילה המוסלמית?|أي عيد يحتفل به المسلمون عادةً؟|Какой праздник обычно отмечает мусульманская община?|Which holiday does the Muslim community usually celebrate?|e_eid|e_hanu,purim,e_xmas
 Q איזה חג חוגגים בדרך כלל בקהילה הנוצרית?|أي عيد يحتفل به المسيحيون عادةً؟|Какой праздник обычно отмечает христианская община?|Which holiday does the Christian community usually celebrate?|e_xmas|e_eid,purim,e_hanu
 Q איזה חג חוגגים בדרך כלל בקהילה היהודית?|أي عيد يحتفل به اليهود عادةً؟|Какой праздник обычно отмечает еврейская община?|Which holiday does the Jewish community usually celebrate?|e_rosh|e_eid,e_xmas,e_easter
-Q מה אפשר ללמוד כשאנחנו שונים זה מזה?|ماذا يمكننا أن نتعلّم عندما نكون مختلفين؟|Чему мы можем научиться, когда мы разные?|What can we learn when we are different from each other?|e_newthings|e_nothing2,e_hate,e_mean
-E e_newthings|t|דברים חדשים|أشياء جديدة|новое|new things
-E e_nothing2|t|שום דבר|لا شيء|ничего|nothing at all
+Q מה אפשר ללמוד כשאנחנו שונים זה מזה?|ماذا يمكننا أن نتعلّم عندما نكون مختلفين؟|Чему мы можем научиться, когда мы разные?|What can we learn when we are different from each other?|e_newthings|e_nothing2,e_samefood,e_samehol
+E e_newthings|t|דברים חדשים, כמו אוכל, חגים ושפות|أشياء جديدة، مثل الطعام والأعياد واللغات|новому: еде, праздникам и языкам|new things, like food, holidays and languages
+E e_nothing2|t|שום דבר, כי כולנו יודעים את אותם דברים|لا شيء، لأنّنا جميعًا نعرف الأشياء نفسها|ничему, ведь мы все знаем одно и то же|nothing at all, because we all know the same things
 E e_hate|t|לריב יותר|أن نتشاجر أكثر|ссориться больше|to quarrel more
 E e_mean|t|להציק|أن نزعج الآخرين|обижать|to bother others
 S env|🌳|#2f9e44|שומרים על הסביבה|نحافظ على البيئة|бережём окружающую среду|Taking Care of Nature
@@ -331,10 +331,10 @@ E e_closetap|t|סוגרים את הברז|نغلق الصنبور|закрыва
 E e_leavetap|t|משאירים את הברז פתוח|نترك الصنبور مفتوحًا|оставляем кран открытым|we leave the tap open
 E e_wasteall|t|שופכים מים על הרצפה|نسكب الماء على الأرض|выливаем воду на пол|we pour water on the floor
 E e_hidew|t|מסתירים את המים|نخفي الماء|прячем воду|we hide the water
-E e_inbin|t|בפח|في الحاوية|в контейнер|in a bin
-E e_ongr|t|על הרצפה|على الأرض|на землю|on the ground
-E e_inbeach|t|בחול בחוף|في رمل الشاطئ|в песок на пляже|in the sand at the beach
-E e_innature|t|בטבע, ביער|في الطبيعة، في الغابة|в природе, в лесу|in nature, in the forest
+E e_inbin|t|בפח, גם אם צריך ללכת קצת עד אליו|في الحاوية، حتى لو كان علينا أن نمشي قليلًا إليها|в контейнер, даже если до него надо пройти|in a bin, even if we have to walk a bit to reach it
+E e_ongr|t|על הרצפה, כי מישהו ינקה את זה אחר כך|على الأرض، لأنّ أحدًا سينظّفها لاحقًا|на землю, ведь кто-нибудь потом уберёт|on the ground, because someone will clean it up later
+E e_inbeach|t|בחול בחוף, כי הגלים ייקחו את זה לים|في رمل الشاطئ، لأنّ الأمواج ستأخذها إلى البحر|в песок на пляже, ведь волны унесут его в море|in the sand at the beach, because the waves will take it to the sea
+E e_innature|t|בטבע, ביער, כי שם זה לא מפריע לאף אחד|في الطبيعة، في الغابة، لأنّها هناك لا تزعج أحدًا|в природу, в лес, ведь там он никому не мешает|in nature, in the forest, because it bothers nobody there
 E e_precious|t|כי מים הם דבר יקר|لأن الماء ثمين|потому что вода очень ценна|because water is precious
 `;
 
@@ -391,7 +391,7 @@ E e_herzl|p|תיאודור הרצל|تيودور هرتسل|Теодор Гер�
 E e_weizmann|p|חיים ויצמן|حاييم وايزمان|Хаим Вейцман|Chaim Weizmann
 E e_sirentalk|t|ממשיכים לדבר עם חברים|نواصل الحديث مع الأصدقاء|продолжаем разговаривать с друзьями|we keep talking with friends
 E e_sirensit|t|יושבים וממשיכים לאכול|نجلس ونواصل الأكل|садимся и продолжаем есть|we sit and keep eating
-E e_payfines|t|רק קנסות|غرامات فقط|только штрафы|only fines
+E e_payfines|t|רק קנסות על חניה|غرامات وقوف السيارات فقط|только штрафы за парковку|only parking fines
 E e_payfree|t|כלום, הכול בחינם|لا شيء، كل شيء مجاني|ничего, всё бесплатно|nothing, everything is free
 E e_paywater|t|רק את חשבון המים|فاتورة الماء فقط|только счёт за воду|only the water bill
 E e_cityothers|t|לחכות שמישהו אחר ינקה|أن أنتظر شخصًا آخر لينظّف|ждать, пока уберёт кто-то другой|to wait for someone else to clean
@@ -404,7 +404,7 @@ E e_secretfast|t|כדי שהספירה תיגמר מהר יותר|لكي ينت�
 E e_secretsame|t|כדי שכולם יבחרו אותו דבר|لكي يختار الجميع الشيء نفسه|чтобы все выбрали одно и то же|so that everyone chooses the same thing
 E e_secretshow|t|כדי שאפשר יהיה להראות לחברים|لكي نتمكّن من أن نُري الأصدقاء|чтобы можно было показать друзьям|so that we can show it to our friends
 E e_hanu|t|חנוכה|حانوكا|Ханука|Hanukkah
-E e_easter|t|חג הפסחא|عيد القيامة|Пасха|Easter
+E e_easter|t|חג הפסחא הנוצרי|عيد القيامة المسيحي|христианская Пасха|Easter, the Christian holiday
 E e_waterrain|t|כי בחורף יורד הרבה גשם|لأن في الشتاء يهطل مطر كثير|потому что зимой идёт много дождя|because a lot of rain falls in winter
 E e_watersalt|t|כי המים בים מלוחים|لأن ماء البحر مالح|потому что вода в море солёная|because the water in the sea is salty
 E e_waterpool|t|כי בבריכה יש הרבה מים|لأن في المسبح ماء كثيرًا|потому что в бассейне много воды|because there is a lot of water in the pool
@@ -417,4 +417,13 @@ E e_carstand|t|עומדים בין המושבים|نقف بين المقاعد|�
 E e_carhead|t|מוציאים את הראש מהחלון|نُخرج رؤوسنا من نافذة السيارة|высовываем голову в открытое окно|we put our head out of the window
 E e_carnoseat|t|יושבים בלי מושב בטיחות|نجلس من دون مقعد أمان|сидим без детского кресла|we sit without a car seat
 E e_alarmcall|t|מתקשרים לחברים לשאול|نتّصل بالأصدقاء لنسأل|звоним друзьям, чтобы спросить|we call friends to ask
+E e_samefood|t|שכל המשפחות אוכלות בדיוק אותו אוכל|أنّ كل العائلات تأكل الطعام نفسه تمامًا|тому, что все семьи едят одно и то же|that all families eat exactly the same food
+E e_samehol|t|שכל הקהילות חוגגות בדיוק אותם חגים|أنّ كل الطوائف تحتفل بالأعياد نفسها|тому, что все общины празднуют одни и те же праздники|that all communities celebrate the same holidays
+E e_peopledecide|t|שהאנשים במדינה מחליטים|أنّ الناس في الدولة هم من يقرّرون|что в стране решают люди|that the people in the country decide
+E e_onedecides|t|שאדם אחד מחליט על הכול|أنّ شخصًا واحدًا يقرّر كل شيء|что всё решает один человек|that one person decides everything
+E e_nolaws2|t|שאין במדינה חוקים בכלל|أنّه لا توجد في الدولة قوانين أبدًا|что в стране совсем нет законов|that the country has no laws at all
+E e_nochange|t|שהחוקים לא משתנים לעולם|أنّ القوانين لا تتغيّر أبدًا|что законы никогда не меняются|that the laws never change
+E e_jerugold|t|ירושלים של זהב|القدس الذهبية|«Золотой Иерусалим»|Jerusalem of Gold
+E e_youandi|t|אני ואתה|أنا وأنت|«Ты и я»|You and I
+E e_hallel|t|הללויה|هللويا|«Аллилуйя»|Hallelujah
 `;

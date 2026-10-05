@@ -879,10 +879,24 @@ async function scanUnits(page){
       const out={ask:{},expl:[],opts:[],ok:[],extra:[]};
       const st=q.__st, q0=q.__raw;
       for(const lg of LG_) out.ask[lg]=q.q?q.q[lg]:undefined;
-      out.expl.push({name:'hint (h_story)',v:{}});
+      /* שתי דרכים לרמז במשפחת STORIES, ושתיהן תקינות.
+         ב-tanakh-elem וב-civics-elem הרמז הוא תבנית אחת ב-`_S`,
+         `h_story`, שמקבלת את שם הסיפור ב-`{s}`. ב-science-12 אין
+         `h_story` כלל: לכל סיפור `hint` משלו בארבע שפות, ישירות
+         על הסיפור. עד 5.10.2026 הסורק ידע רק את הראשונה, ולכן
+         הסריקה הראשונה אי־פעם של science-12 החזירה 36 FAIL של
+         ״אין hint״ — על אפליקציה שיש בה רמז לכל יחידה. זו הייתה
+         הבדיקה שבורה, לא האפליקציה. */
+      const tmpl = _S && _S.h_story;
+      out.expl.push({name: tmpl ? 'hint (h_story)' : 'hint (לכל סיפור)', v:{}});
       for(const lg of LG_){
-        const h=strIn('h_story',lg), ti=st.title?st.title[lg]:undefined;
-        out.expl[0].v[lg]=(h===undefined||ti===undefined||!String(ti).trim())?undefined:h.split('{s}').join(ti);
+        if(tmpl){
+          const h=strIn('h_story',lg), ti=st.title?st.title[lg]:undefined;
+          out.expl[0].v[lg]=(h===undefined||ti===undefined||!String(ti).trim())?undefined:h.split('{s}').join(ti);
+        } else {
+          const h=st.hint?st.hint[lg]:undefined;
+          out.expl[0].v[lg]=(h===undefined||!String(h).trim())?undefined:h;
+        }
       }
       /* מפתח שאינו ישות: app.js יפול ב-entText על המסך. */
       [q.a].concat(q0.d||[]).forEach(function(k){

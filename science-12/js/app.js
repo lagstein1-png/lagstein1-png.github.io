@@ -213,8 +213,13 @@ function render(){
     $("#darkBtn").onclick=function(){state.dark=!state.dark;save();render()};
     $("#resetBtn").onclick=function(){if(confirm(t("resetSure"))){state.done={};save();go("home")}};
   }
-  if(!("speechSynthesis" in window)||(allVoices().length&&!voiceFor(state.lang)&&view==="home")){
-    var n=document.createElement("p");n.className="small warn";n.textContent=t("noVoice");var m=$("main");if(m)m.appendChild(n);}
+  /* שתי תקלות שונות, שתי הודעות. בלי מנוע הקראה אי אפשר להקריא בכלל,
+     וזה המקרה היחיד שבו נכון לבקש מהלומד לקרוא לבד. כשיש מנוע ואין בו
+     קול נשי — ההקראה כן יוצאת, בקול ברירת המחדל (speech.js, u.pitch=1.25). */
+  var warnKey=!("speechSynthesis" in window)?"noSpeech"
+             :(allVoices().length&&!voiceFor(state.lang)&&view==="home")?"noVoice":null;
+  if(warnKey){
+    var n=document.createElement("p");n.className="small warn";n.textContent=t(warnKey);var m=$("main");if(m)m.appendChild(n);}
 }
 try{speechSynthesis.onvoiceschanged=function(){}}catch(e){}
 if(!window.__GATED)render();

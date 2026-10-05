@@ -265,11 +265,32 @@ import(WORKER).then(async W => {
       !!(bOld && bNew) && +bNew[1] > +bOld[1], true);
   }
 
-  /* ---------- 5. תפקיד לכל אפליקציה ---------- */
-  t('לכל שתים־עשרה האפליקציות יש תפקיד',
-    Object.keys(W.ROLE).sort(), APPS.concat(EXTERNAL, ROLE_ONLY, HOME).sort());
+  /* ---------- 5. תפקיד לכל אפליקציה ----------
+
+     **הרשימה נגזרת ואינה מוקלדת, מ-5.10.2026.** עד אז היא הייתה
+     `APPS + EXTERNAL + ROLE_ONLY + HOME` — שמות שהוקלדו ביד — ולכן
+     עשרים אפליקציות שקוראות ל-`TUTOR.mount` בלי `ROLE` עברו כאן
+     בירוק. `readBody` מחזיר להן 400, אבל `tutor.js` מציג את הכפתור
+     לפי `BRAIN` בלבד: הלומד רואה כפתור תקין, לוחץ, ונופל בשקט למוח
+     המקומי. שמונה מהן כבר היו ציבוריות. נמצא בבוטי השער.
+
+     מעכשיו: מי שמחווט ל-Limor חייב `ROLE`, ו-`EXTERNAL`/`ROLE_ONLY`/
+     `HOME` נשארים בשם מפני שאינם נגזרים מהריפו (ריפו אחר, דף הבית,
+     וחומר למורה). */
+  const AL = require('./applist.js');
+  const mounted = [];
+  for (const a of AL.local()) {
+    const src = AL.sourceOf(a);
+    const k = src.indexOf('TUTOR.mount(');
+    if (k < 0) continue;
+    const m = /app:\s*"([^"]+)"/.exec(src.slice(k, k + 400));
+    if (m) mounted.push(m[1]);
+  }
+  const want = [...new Set(mounted.concat(EXTERNAL, ROLE_ONLY, HOME))].sort();
+  const got = Object.keys(W.ROLE).sort();
+  t(`לכל אפליקציה שמחווטת ללימור יש תפקיד (${mounted.length} מחווטות)`, got, want);
   const dup = new Set(Object.values(W.ROLE));
-  t('אין שני תפקידים זהים', dup.size, APPS.length + EXTERNAL.length + ROLE_ONLY.length + HOME.length);
+  t('אין שני תפקידים זהים', dup.size, got.length);
   APPS.concat(EXTERNAL, HOME).forEach(a => {
     const c = W.contextBlock({ app: a, lang: 'he', q: null }, 0);
     if (c.indexOf(W.ROLE[a]) !== 0) { bad++; console.log(`✗ ${a}: התפקיד אינו נשלח בראש ההקשר`) }

@@ -22,6 +22,11 @@ var INTERNAL_OK=(function(){
 <meta name="theme-color" content="#f3f8f4" media="(prefers-color-scheme:light)">
 <meta name="theme-color" content="#101a1c" media="(prefers-color-scheme:dark)">
 <link rel="manifest" href="./manifest.json" />
+<!-- אייקון הלשונית ואייקון ההוספה למסך הבית. בלי rel="icon" הלשונית
+     מציגה את האייקון של השורש במקום של האפליקציה, ו-iOS מצלם את הדף
+     ומייצר תמונה מטושטשת. אותו קובץ של המניפסט — אין כאן
+     apple-touch-icon.png נפרד, כמו ב-math-g7 וב-math-elem. -->
+<link rel="icon" type="image/png" sizes="192x192" href="./img/icon-192.png" />
 <link rel="apple-touch-icon" href="./img/icon-192.png" />
 <link href="/fonts/fonts.css" rel="stylesheet" />
 <style>
@@ -246,14 +251,20 @@ add:{c:"#2f7fd8",ic:"+ −",n:L("חיבור וחיסור","الجمع والطر
   return out}},
 mul:{c:"#e8453c",ic:"×",key:"digit",n:L("לוח הכפל","جدول الضرب","Таблица умножения","Times table"),d:L("כפל ותוצאה","ضرب ونتيجة","умножение и ответ","times and answer"),lv:2,
  items:function(lv){var pairs={},f=lv===1?[2,3,4,5,10]:range(2,10),i,j,list=[];
-  f.forEach(function(a){for(j=(lv===1?1:2);j<=10;j++){var p=a*j;(pairs[p]=pairs[p]||[]).push([a,j])}});
+  /* הכופל מתחיל ב-2 בשתי הרמות. עם כופל 1 נולדים חצאי קלף
+     שנסגרים בלי לכפול: "3×1" מול "3" הוא קריאה, ומערך של
+     עמודה אחת הוא ספירת שורה. נמדד לפני התיקון, 500 ערכות
+     ברמה 1 (20,000 חצאים): 1254 חצאים כאלה, 6.3%; ברמה 2,
+     שכבר התחילה ב-2 — אפס. מאגר המכפלות ברמה 1 יורד מ-31
+     ל-28 ערכים, ודרושים 20. */
+  f.forEach(function(a){for(j=2;j<=10;j++){var p=a*j;(pairs[p]=pairs[p]||[]).push([a,j])}});
   Object.keys(pairs).forEach(function(p){list.push(+p)});
   return distinctPick(list,20).map(function(p){var pr=pick(pairs[p]),a=pr[0],b=pr[1],reps=[{t:"digit",n:p},{t:"mul",a:a,b:b},{t:"array",r:a,c:b}];
     if(a<=5&&b>=2)reps.push({t:"rep",a:b,k:a});
     return reps})}},
 frac:{c:"#8a63d2",ic:"½",n:L("שברים","الكسور","Дроби","Fractions"),d:L("ציור, עיגול ושבר","رسم ودائرة وكسر","рисунок, круг и дробь","picture, circle and fraction"),lv:1,
  items:function(){return [[1,2],[1,3],[2,3],[1,4],[3,4],[1,5],[2,5],[3,5],[4,5],[1,6],[5,6],[1,8],[3,8],[5,8],[7,8],[1,10],[3,10],[7,10],[9,10],[1,12]].map(function(f){return [{t:"pie",p:f[0],q:f[1]},{t:"bar",p:f[0],q:f[1]},{t:"frac",p:f[0],q:f[1]}]})}},
-clock:{c:"#f58a1f",tc:"#1a1300",ic:"12",n:L("שעון","الساعة","Часы","Clock"),d:L("שעון ושעה דיגיטלית","ساعة ووقت رقمي","часы и цифровое время","clock and digital time"),lv:2,
+clock:{c:"#f58a1f",tc:"#1a1300",ic:"12",n:L("שעון","الساعة","Часы","Clock"),d:L("שעון ושעה דיגיטלית, וברמה 2 גם שעון 24 שעות","ساعة ووقت رقمي، وفي المستوى 2 أيضًا نظام 24 ساعة","часы и цифровое время, а на уровне 2 ещё и 24-часовое время","clock and digital time, and 24-hour time at level 2"),lv:2,
  items:function(lv){var mins=lv===1?[0,30]:[0,15,30,45],all=[],h;
   for(h=1;h<=12;h++)mins.forEach(function(m){all.push([h,m])});
   /* ייצוג 24 שעות (13:00…23:45) הוא לא "קל": הוא דורש המרה בראש.
@@ -306,7 +317,7 @@ function build(setId,lv,seed){
   var deck={set:setId,lv:lv,seed:seed,cards:printed,chain:chainIds,byChain:cards};
   RNG=Math.random;return deck}
 /* ===== UI strings ===== */
-var BUILD="dm6 · 2026-10-04";
+var BUILD="dm7 · 2026-10-04";
 var STR={
 he:{brand:"דומינו לימודי",title:"דומינו לימודי להדפסה",tag:"מדפיסים 20 קלפים, גוזרים ומסדרים במעגל. כל קלף מתחבר לקלף שמתאים לו.",
  howT:"איך משחקים?",limor:"אני לימור. ככה משחקים:",how:"1. מדפיסים את הקלפים וגוזרים לפי הקו המקווקו.\n2. מערבבים את הקלפים על השולחן.\n3. מתחילים בקלף עם הכוכב. מחפשים קלף שהחצי הראשון שלו מתאים לחצי השני של הקלף הקודם.\n4. ממשיכים עד שהמעגל נסגר. הקלף האחרון מתחבר לקלף עם הכוכב.",
@@ -648,7 +659,7 @@ function boot(){var q=new URLSearchParams(location.search),l=q.get("lang");if(l&
   render();
   var pr=q.get("print");if(pr==="cards")document.documentElement.classList.add("pc");else if(pr==="key")document.documentElement.classList.add("pk");
   if(window.TUTOR){try{TUTOR.mount({app:"domino",lang:function(){return S.lang},q:function(){return null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm6-pwa1").catch(function(){})})}
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm7-pwa1").catch(function(){})})}
 if(!INTERNAL_OK){
   document.getElementById("gate").hidden=false;
   document.title="לא פורסם";

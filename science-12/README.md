@@ -26,14 +26,19 @@ Vector topic icons work even without an emoji font. Reduced motion is respected.
 
 ## Audio and tutor limitations
 
-Shared RECORDED hooks are wired in all four languages and registered in the
-recording source list. audio/manifest.json is intentionally empty. No audio was
-generated or purchased for this build. Available recordings will take precedence;
-otherwise a known female device voice of the matching language is required.
-No suitable female voice: a translated notice appears, rather than silently
-using a male or wrong-language voice. Device audio has gesture unlock, short
-segments, keep-alive, retained utterance and a watchdog. Timer word tracking is
-approximate when the device omits boundary events. Actual audio quality needs
+The shared RECORDED hook is wired for Hebrew only: in js/speech.js the recorded
+layer runs under `lang==="he"`, and Arabic, Russian and English go straight to the
+device voice. science-12 is registered in the recording source list.
+audio/manifest.json is intentionally empty. No audio was generated or purchased
+for this build. An available Hebrew recording takes precedence over the device
+voice. Voice choice drops device voices with known male names and prefers a known
+female name in the matching language. When neither is available the text is still
+read aloud, using the device default voice at a raised pitch, and a translated
+notice says exactly that (noVoice). Only a device with no speech engine at all
+gets the notice that asks the learner to read or try another device (noSpeech).
+Device audio has gesture unlock, short segments, keep-alive, a retained
+utterance and a watchdog. Timer word tracking is approximate when the device
+omits boundary events. Actual audio quality needs
 listening on Hebrew/Arabic/Russian/English devices.
 
 Limor here is the template's authored local support panel, not live AI chat.

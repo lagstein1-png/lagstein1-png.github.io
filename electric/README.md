@@ -33,6 +33,7 @@
 
 - **התוכן לא נבדק בידי מורה לחשמל.** הערכים והנוסחאות נבדקו בקוד
   ובקריאה, ולא מול תכנית הלימודים של משרד החינוך.
-- לימור מקבלת תפקיד `electric` ב-`tutor-api/worker.js`, אבל השרת צריך
-  פריסה (`deploy-tutor.yml`, ידני) לפני שהתפקיד חי.
+- לימור חיה: התפקיד `electric` קיים ב-`tutor-api/worker.js` (שורה 109),
+  והשרת נפרס — `deploy-tutor` ריצה 21, success, על `9c585f8` (FINDINGS O-103,
+  נסגר 4.10.2026). אין כאן עוד מה לעשות.
 - `content.js`: 0 FAIL, REVIEW — `.claude/qa/reports/electric.md`.

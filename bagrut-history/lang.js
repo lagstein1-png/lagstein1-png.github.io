@@ -173,9 +173,12 @@ var I18N = (function () {
   /* פורמטים עם מספרים. העברית נשארת על plural() בקוד; לשאר השפות
      תבנית פשוטה (תרגום מכונה, בבדיקה). */
   var FMT = {
-    ar: { choice: "{c} من أصل {n}", meta: "{q} أسئلة · {s} فقرات · {m} دقيقة" },
-    ru: { choice: "{c} из {n}", meta: "{q} вопр. · {s} пунктов · {m} мин" },
-    en: { choice: "{c} of {n}", meta: "{q} questions · {s} sections · {m} min" }
+    ar: { choice: "{c} من أصل {n}", chapters: "{c} فصول من أصل {n}",
+          meta: "{q} أسئلة · {s} فقرات · {m} دقيقة" },
+    ru: { choice: "{c} из {n}", chapters: "{c} раздела из {n}",
+          meta: "{q} вопр. · {s} пунктов · {m} мин" },
+    en: { choice: "{c} of {n}", chapters: "{c} chapters of {n}",
+          meta: "{q} questions · {s} sections · {m} min" }
   };
   function cur() {
     try { return localStorage.getItem("bekol-lang") || "he"; } catch (e) { return "he"; }

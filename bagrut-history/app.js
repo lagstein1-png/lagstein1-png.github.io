@@ -14,7 +14,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "h122 · 2026-10-04";
+  var BUILD = "h123 · 2026-10-04";
 
   /* --- עוזרים קצרים --------------------------------------------- */
   function $(s) { return document.querySelector(s); }
@@ -434,11 +434,22 @@
           ? ' <span class="chip warn">' + I18N.t("demoChip") + '</span>' : "";
         var lvl = ex.level
           ? ' <span class="chip">' + esc(ex.level) + "</span>" : "";
+        /* שאלון עם קבוצת פרקים: ארבעה "1 מתוך 3" ברצף אמרו לנבחן
+           שהוא עונה על ארבע שאלות, והוא עונה על שלוש. הקבוצה
+           נאמרת פעם אחת, כקבוצה. */
+        var grp0 = chapterGroup(ex), seenGrp = false;
         var choice = (ex.chapters || [])
           .map(function (c) {
+            if (grp0 && grp0.from.indexOf(c.id) >= 0) {
+              if (seenGrp) return "";
+              seenGrp = true;
+              return I18N.fmt("chapters", { c: grp0.choose, n: grp0.from.length }) ||
+                     (grp0.choose + " פרקים מתוך " + grp0.from.length);
+            }
             var n = ex.questions.filter(function (q) { return q.chapter === c.id; }).length;
             return I18N.fmt("choice", { c: c.choose, n: n }) || (c.choose + " מתוך " + n);
           })
+          .filter(function (x) { return x; })
           .join(" · ");
         return '<button class="card pick" data-exam="' + esc(ex.id) + '">' +
           "<h3>" + esc(examTitle(ex) + examSerial(ex, i, all)) + lvl + demo + "</h3>" +
@@ -619,8 +630,13 @@
             esc(q.number) + '</span><span class="chip">' + esc(q.topic) + "</span>" +
             '<button class="btn wide" data-read="' + esc(id) + 'all" type="button" aria-pressed="false">' +
             '<span aria-hidden="true">🔊</span> השאלה כולה</button></div>';
-    h += '<div class="saybar">' + spkBtn(id, "הקריאו את השאלה") +
-         '<div class="grow"><div id="t-' + id + '">' + paraHtml(q.text) + "</div></div></div>";
+    /* עשר מתוך שבע־עשרה השאלות הן כותרת בלבד: המקור והשאלה יושבים
+       בסעיפים. בלי התנאי הזה נבנה כאן כפתור רמקול ליד טקסט ריק,
+       ו-Speech.speak מסנן יחידה בלי טקסט ויוצא בשקט — לחיצה שלא
+       עושה דבר, בדיוק אצל מי שתלוי בהקראה. */
+    if (String(q.text || "").trim())
+      h += '<div class="saybar">' + spkBtn(id, "הקריאו את השאלה") +
+           '<div class="grow"><div id="t-' + id + '">' + paraHtml(q.text) + "</div></div></div>";
     h += qImg(q);
     h += formula(q.latex, "f-" + id);
     h += saySrc(q);
@@ -731,6 +747,60 @@
     });
     return out;
   }
+  /* --- בוחרים שאלות, ולפעמים בוחרים גם פרקים -------------------
+     בשאלון 22261 הפרק הראשון חובה, ומן השני, השלישי והרביעי
+     בוחרים **שניים** — כך כתוב ב-note של שלושת הפרקים עצמם, וכך
+     כתוב בשאלון הרשמי. עד כאן הסימולציה דרשה שאלה אחת מכל אחד
+     מארבעת הפרקים: ארבע שאלות במקום שלוש, וסכום משקלים
+     34+33+33+33 = 133 במקום 100. הנבחן ראה על המסך את הכלל
+     הנכון ("בוחרים שניים משלושת הפרקים") ומיד אחריו התראה
+     שחסמה אותו עד שיבחר בכולם.
+
+     `chapterGroup` הוא קבוצה שבוחרים מתוכה **פרקים**: `from` הם
+     הפרקים שבקבוצה, `choose` כמה מהם נענים. פרק שלא נבחר יוצא
+     מהמניין מעצמו — `byChapter` ב-simFinish נבנה רק מפרקים שיש
+     בהם סעיף, ולכן המכנה חוזר להיות 100. */
+  function chapterGroup(ex) {
+    var g = ex && ex.chapterGroup;
+    return (g && g.from && g.from.length) ? g : null;
+  }
+  /* פונקציה טהורה בכוונה — בלי DOM ובלי alert — כדי שאפשר יהיה
+     להריץ אותה ב-node על שני השאלונים ולראות אותה נופלת. */
+  function chooseError(ex, chosen) {
+    var chaps = (ex && ex.chapters) || [];
+    if (!chaps.length) return null;
+    var g = chapterGroup(ex), inGroup = {};
+    if (g) g.from.forEach(function (id) { inGroup[id] = true; });
+    var answered = 0;
+    for (var ci = 0; ci < chaps.length; ci++) {
+      var c = chaps[ci];
+      var n = (ex.questions || []).filter(function (q) {
+        return q.chapter === c.id && chosen[q.number];
+      }).length;
+      var want = c.choose + (c.choose === 1 ? " שאלה" : " שאלות");
+      if (inGroup[c.id]) {
+        if (n === 0) continue;           /* פרק שלא נענה — תקין */
+        if (n !== c.choose)
+          return "בפרק «" + c.title + "» צריך לבחור בדיוק " + want +
+                 ", או לא לבחור בו כלל. כרגע נבחרו " + n + ".";
+        answered++;
+      } else if (n !== c.choose) {
+        return "בפרק «" + c.title + "» צריך לבחור בדיוק " + want +
+               ". כרגע נבחרו " + n + ".";
+      }
+    }
+    if (g && answered !== g.choose)
+      return "מתוך " + g.label + " עונים על " + g.choose +
+             " פרקים. כרגע נבחרו " + answered + ".";
+    return null;
+  }
+  /* האם הפרק מסומן מראש. בקבוצה — רק הראשונים שבה, כמניין
+     `choose` שלה; מחוצה לה — תמיד. */
+  function preChecked(ex, c) {
+    var g = chapterGroup(ex);
+    if (!g || g.from.indexOf(c.id) < 0) return true;
+    return g.from.indexOf(c.id) < g.choose;
+  }
   function simStart(ex) {
     /* בחירה לפי פרקים: כל checkbox מסומן הוא שאלה שהתלמיד לוקח לבחינה.
        בלי פרקים (מבנה ישן) כל השאלות נכנסות. */
@@ -740,17 +810,8 @@
       $$("input[data-choose]").forEach(function (cb) {
         if (cb.checked) chosen[cb.getAttribute("data-choose")] = true;
       });
-      for (var ci = 0; ci < ex.chapters.length; ci++) {
-        var c = ex.chapters[ci];
-        var n = ex.questions.filter(function (q) {
-          return q.chapter === c.id && chosen[q.number];
-        }).length;
-        if (n !== c.choose) {
-          window.alert("בפרק «" + c.title + "» צריך לבחור בדיוק " + c.choose +
-            (c.choose === 1 ? " שאלה" : " שאלות") + ". כרגע נבחרו " + n + ".");
-          return;
-        }
-      }
+      var err = chooseError(ex, chosen);
+      if (err) { window.alert(err); return; }
       SIM.chosen = chosen;
     }
     SIM.on = true; SIM.done = false; SIM.res = null; SIM.ans = {};
@@ -874,8 +935,13 @@
             esc(q.number) + '</span><span class="chip">' + esc(q.topic) + "</span>" +
             '<button class="btn wide" data-read="' + esc(id) + 'all" type="button" aria-pressed="false">' +
             '<span aria-hidden="true">🔊</span> השאלה כולה</button></div>';
-    h += '<div class="saybar">' + spkBtn(id, "הקריאו את השאלה") +
-         '<div class="grow"><div id="t-' + id + '">' + paraHtml(q.text) + "</div></div></div>";
+    /* עשר מתוך שבע־עשרה השאלות הן כותרת בלבד: המקור והשאלה יושבים
+       בסעיפים. בלי התנאי הזה נבנה כאן כפתור רמקול ליד טקסט ריק,
+       ו-Speech.speak מסנן יחידה בלי טקסט ויוצא בשקט — לחיצה שלא
+       עושה דבר, בדיוק אצל מי שתלוי בהקראה. */
+    if (String(q.text || "").trim())
+      h += '<div class="saybar">' + spkBtn(id, "הקריאו את השאלה") +
+           '<div class="grow"><div id="t-' + id + '">' + paraHtml(q.text) + "</div></div></div>";
     h += qImg(q);
     h += formula(q.latex, "f-" + id);
     if (q.speech) h += '<p class="sr">בהקראה: ' + esc(q.speech) + "</p>";
@@ -1036,16 +1102,20 @@
     if (!SIM.on) {
       var chooseHtml = "";
       if (ex.chapters && ex.chapters.length) {
+        var grp = chapterGroup(ex);
         chooseHtml = "<h2>בחרו שאלות לכל פרק</h2><p class=\"meta\">כמו בבחינה האמיתית: " +
           "בכל פרק בוחרים חלק מהשאלות. אפשר להשאיר את ברירת המחדל.</p>" +
+          (grp ? '<p class="note">מתוך ' + esc(grp.label) + " עונים על " + grp.choose +
+                 " פרקים בלבד. הפרק שלא נענה נשאר ריק, ואינו נספר בציון.</p>" : "") +
           ex.chapters.map(function (c, ci) {
             var qs = ex.questions.filter(function (q) { return q.chapter === c.id; });
+            var pre = preChecked(ex, c);
             return '<div class="card"><h3>' + esc(c.title) + '</h3>' +
               (c.note ? '<p class="meta">' + esc(c.note) + "</p>" : "") +
               qs.map(function (q, qi) {
                 return '<label style="display:flex;gap:.5rem;align-items:flex-start;margin:.35rem 0">' +
                   '<input type="checkbox" data-choose="' + q.number + '"' +
-                  (qi < c.choose ? " checked" : "") + ' style="margin-top:.3rem">' +
+                  (pre && qi < c.choose ? " checked" : "") + ' style="margin-top:.3rem">' +
                   "<span>" + esc(q.topic) + (q.short ? " — " + esc(q.short) : "") + "</span></label>";
               }).join("") + "</div>";
           }).join("");
@@ -1570,7 +1640,7 @@
      עדכן גם את השורה הזאת, אחרת המשתמש לא יראה את התיקון. */
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js?v=h122-pwa1").catch(function () {});
+      navigator.serviceWorker.register("sw.js?v=h123-pwa1").catch(function () {});
     });
   }
 

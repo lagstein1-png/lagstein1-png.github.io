@@ -20,6 +20,12 @@ const PRE = ["./","./index.html","./manifest.json",
              "/tutor/he-speech.js",
              /* השכבה המוקלטת — /speech/recorded.js (2.10.2026) */
              "/speech/recorded.js",
+             /* חמש תגיות לימור שב-index.html. בלעדיהן אופליין הן 404,
+                TUTOR ו-BARAK אינם קיימים, וכפתור ״עזרה מהמורה״ אינו
+                נבנה כלל. שלושים מתוך שלושים ותשע אפליקציות כבר מונות
+                אותן ב-PRE; כאן הן חסרו (5.10.2026). */
+             "/tutor/josh-face.js","/tutor/josh-state.js",
+             "/tutor/josh-local.js","/tutor/tutor.js","/tutor/barak-core.js",
              /* גופנים מקומיים — /fonts/fonts.css (1.10.2026) */
              "/fonts/fonts.css","/fonts/heebo-hebrew.woff2","/fonts/heebo-math.woff2","/fonts/heebo-latin.woff2","/fonts/lexend-latin.woff2","/fonts/noto-sans-arabic-arabic.woff2","/fonts/noto-sans-cyrillic.woff2","/fonts/noto-sans-greek.woff2","/fonts/noto-sans-latin.woff2"];
 
