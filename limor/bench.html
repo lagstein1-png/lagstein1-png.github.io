@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>לימור במכשיר — מבחן קבוע</title>
+<meta name="robots" content="noindex">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+/* ============================================================
+   מבחן הפיילוט של ״לימור במכשיר״ — 5.10.2026. דף פנימי לבעלים,
+   לא ללומד: מריץ את עשרים השאלות של `bench.js` על המודל במכשיר,
+   מודד זמן לכל תשובה ומפעיל את אותם שומרים כמו השרת. שגיאות
+   עובדה ועברית מסמן אדם, בתיבות שליד כל תשובה.
+   ============================================================ */
+:root{ --bg:#f6f7fb; --bg-elev:#fff; --text:#14181f; --text-soft:#4a5464; --line:#dfe4ee; --accent:#0a7c7c; --ok:#2f7a45; --no:#b3261e }
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){ --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6; --line:#2a3448; --accent:#5cc7c7; --ok:#6fd08f; --no:#ff8a80 } }
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font-family:Heebo,"Segoe UI",system-ui,Arial,sans-serif;font-size:18px;line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:18px 16px 48px}
+h1{font-size:1.4rem;margin:0 0 8px}
+.card{background:var(--bg-elev);border:1px solid var(--line);border-radius:16px;padding:16px;margin-block-end:14px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-block-start:10px}
+.btn{border:1px solid var(--line);background:var(--bg-elev);color:var(--text);border-radius:12px;padding:10px 16px;font:inherit;cursor:pointer;min-height:48px}
+.btn.pri{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn[disabled]{opacity:.5;cursor:default}
+.soft{color:var(--text-soft);font-size:.92rem}
+.item{border-top:1px solid var(--line);padding-block:12px}
+.item:first-child{border-top:0}
+.q{white-space:pre-line;font-size:.95rem;color:var(--text-soft)}
+.a{white-space:pre-line;margin-block:6px}
+.ok{color:var(--ok);font-weight:700} .no{color:var(--no);font-weight:700}
+label{margin-inline-end:16px;font-size:.95rem}
+input[type=checkbox]{width:22px;height:22px;vertical-align:middle}
+textarea{width:100%;min-height:140px;font:inherit;font-size:.8rem;direction:ltr}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>לימור במכשיר — מבחן קבוע של 20 שאלות</h1>
+<p class="soft">דף בדיקה לבעלים. אותן שאלות רצות מול Gemini בוורקפלו <span dir="ltr">limor-bench</span>, וכך משווים על אותו קלט.</p>
+
+<section class="card" id="env" aria-live="polite"></section>
+<!-- אותו כפתור הורדה כמו בדף לימור: גודל קודם, הורדה רק בלחיצה. -->
+<section class="card" id="limor-device" hidden></section>
+
+<section class="card">
+  <div class="btns">
+    <button class="btn pri" id="run" type="button" disabled>הריצו את 20 השאלות</button>
+    <button class="btn" id="copy" type="button" disabled>העתיקו את התוצאות</button>
+  </div>
+  <p class="soft" id="sum" aria-live="polite"></p>
+</section>
+
+<section class="card" id="list"></section>
+<textarea id="out" aria-label="התוצאות כ-JSON" readonly hidden></textarea>
+</div>
+
+<script src="bench.js"></script>
+<script src="/tutor/limor-device.js"></script>
+<script>
+(function(){
+"use strict";
+var $ = function(id){ return document.getElementById(id) };
+var RES = [], INFO = {}, RUNNING = false;
+var WHY = { reveals:"נפסלה: חשפה את התשובה", equation:"נפסלה: משוואה שגויה", lang:"נפסלה: תרגום מילולי בעברית", empty:"נפסלה: תשובה ריקה" };
+function esc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") }
+
+/* המכשיר: מה הדפדפן אומר על עצמו. נרשם עם התוצאות, כדי שזמן תגובה
+   יישאר מחובר למכשיר שמדד אותו. */
+function env(){
+  INFO.ua = navigator.userAgent;
+  INFO.memory = navigator.deviceMemory || null;
+  LIMOR_DEVICE.capable().then(function(c){
+    INFO.capable = c.ok; INFO.why = c.why;
+    if (!navigator.gpu) return null;
+    return navigator.gpu.requestAdapter().then(function(a){ return a && (a.info || null) }, function(){ return null });
+  }).then(function(info){
+    if (info) INFO.gpu = [info.vendor, info.architecture, info.description].filter(Boolean).join(" · ");
+    $("env").innerHTML = "<p>" + (INFO.capable ? '<span class="ok">המכשיר מסוגל.</span>' : '<span class="no">המכשיר אינו מסוגל (' + esc(INFO.why) + ').</span> לימור תישאר כאן על השרת והמוח המקומי.') + "</p>" +
+      '<p class="soft">זיכרון: ' + esc(INFO.memory ? INFO.memory + " ג׳יגה (לפי הדפדפן)" : "הדפדפן אינו מדווח") + (INFO.gpu ? " · מעבד גרפי: <span dir=\"ltr\">" + esc(INFO.gpu) + "</span>" : "") + "</p>";
+  });
+}
+
+function median(a){ var s = a.slice().sort(function(x, y){ return x - y }), m = s.length >> 1; return s.length ? (s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2)) : 0 }
+function summary(){
+  var done = RES.filter(Boolean), ms = done.map(function(r){ return r.ms });
+  var pass = done.filter(function(r){ return r.ok }).length;
+  var fact = done.filter(function(r){ return r.fact }).length, heb = done.filter(function(r){ return r.hebrew }).length;
+  $("sum").textContent = done.length + " מתוך " + LIMOR_BENCH.length + " נענו · עברו את השומרים: " + pass +
+    " · זמן חציוני: " + median(ms) + " מ״ש · הראשונה (כוללת חימום): " + (done[0] ? done[0].ms : 0) + " מ״ש" +
+    " · סומנו בידי אדם: עובדה " + fact + ", עברית " + heb;
+  $("out").value = JSON.stringify({ when: new Date().toISOString(), model: LIMOR_DEVICE.MODEL, dtype: LIMOR_DEVICE.DTYPE, device: INFO, results: done }, null, 1);
+}
+
+function row(i){
+  var it = LIMOR_BENCH[i], r = RES[i];
+  var h = '<div class="item"><b>' + (i + 1) + ". " + esc(it.id) + "</b>" +
+    '<div class="q">' + esc(it.screen.q) + (it.screen.student ? "\nהלומד ענה: " + esc(it.screen.student) : "") + "\nהלומד כותב: " + esc(it.userText) + "</div>";
+  if (r) {
+    h += '<div class="a">' + esc(r.text || "(ריק)") + "</div>" +
+      '<div class="soft">' + r.ms + " מ״ש · " + (r.ok ? '<span class="ok">עברה את השומרים</span>' : '<span class="no">' + esc(WHY[r.reason] || r.reason) + "</span>") + "</div>" +
+      '<div><label><input type="checkbox" data-i="' + i + '" data-k="fact"' + (r.fact ? " checked" : "") + "> שגיאת עובדה</label>" +
+      '<label><input type="checkbox" data-i="' + i + '" data-k="hebrew"' + (r.hebrew ? " checked" : "") + "> שגיאת עברית</label></div>";
+  }
+  return h + "</div>";
+}
+function list(){ $("list").innerHTML = LIMOR_BENCH.map(function(_, i){ return row(i) }).join("") }
+
+function run(){
+  RUNNING = true; $("run").disabled = true; RES = [];
+  var i = 0;
+  (function next(){
+    if (i >= LIMOR_BENCH.length) { RUNNING = false; $("run").disabled = false; $("copy").disabled = false; summary(); return }
+    var it = LIMOR_BENCH[i];
+    LIMOR_DEVICE.answer({ app: it.app, lang: "he", sign: it.sign, mode: "chat", screen: it.screen, userText: it.userText, history: [] })
+      .then(function(r){ RES[i] = { id: it.id, ok: r.ok, reason: r.reason, text: r.text, ms: r.ms, fact: false, hebrew: false } },
+            function(e){ RES[i] = { id: it.id, ok: false, reason: "error: " + (e && e.message || e), text: "", ms: 0, fact: false, hebrew: false } })
+      .then(function(){ list(); summary(); i++; setTimeout(next, 0) });
+  })();
+}
+
+$("run").addEventListener("click", run);
+$("copy").addEventListener("click", function(){
+  summary(); $("out").hidden = false; $("out").select();
+  try { navigator.clipboard.writeText($("out").value) } catch (e) {}
+});
+$("list").addEventListener("change", function(e){
+  var c = e.target; if (!c.dataset || !c.dataset.k) return;
+  var r = RES[+c.dataset.i]; if (r) { r[c.dataset.k] = c.checked; summary() }
+});
+/* הכפתור נפתח כשהמודל מוכן — בדיקה קצרה, לא אירוע: limor-device.js
+   אינו משדר, ודף בדיקה אינו סיבה להוסיף לו ממשק. */
+setInterval(function(){ $("run").disabled = RUNNING || !LIMOR_DEVICE.ready() }, 500);
+env(); list();
+})();
+</script>
+</body>
+</html>

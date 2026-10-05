@@ -239,7 +239,13 @@ const SOURCES = {
      מבנה כמו `L()` ב-math-elem, בשם אחר. נמדד: `F("…",` תופס 130
      מתוך 130 הקריאות, ואין בקובץ אף קריאה משורשרת. */
   kotvim: ['kotvim/index.html'],
-  'hebrew-lit': ['hebrew-lit/js/data.js', 'hebrew-lit/js/i18n.js']
+  'hebrew-lit': ['hebrew-lit/js/data.js', 'hebrew-lit/js/i18n.js'],
+  /* לימור (5.10.2026, הבעלים: ״רוץ״): המשפטים הקבועים של המוח המקומי —
+     הבלוק `he` של `R` ב-josh-local.js — ועוד הברכה ושתי הפניות היזומות
+     מ-tutor.js, פעם אחת לכל האפליקציות, אל `tutor/audio/`. תשובות השרת
+     נכתבות חיות ואין להן הקלטה; ראו recParts ב-tutor/tutor.js. מסלול
+     נפרד (tutorBank). */
+  tutor: ['tutor/josh-local.js', 'tutor/tutor.js']
 };
 
 /* בדיוק מה ש-plainOf עושה באפליקציה: תגיות יורדות, ישויות נפתחות,
@@ -530,11 +536,46 @@ function englishElem(text) {
   return out;
 }
 
+/* לימור: הבלוק העברי של `var R = {` ב-josh-local.js, מ-`he: {` ועד
+   `ar: {`, ומ-tutor.js הברכה (`greet`, `greetFloat`) והפניות היזומות
+   (`nudge`) מהמילון העברי — רק מה שנכנס לבועה ונאמר. כל מחרוזת
+   מפורקת בשורה חדשה, כמו recParts שם: reply מחבר פסקאות ב-\n\n,
+   והברכה מצרפת את greetFloat ב-\n. [[act:…|מילה]] נאמר ״מילה״ (actStrip). */
+function tutorBank(local, ui) {
+  const out = [];
+  const a = local.indexOf('var R = {'), he = local.indexOf('he: {', a), ar = local.indexOf('\nar: {', he);
+  if (a >= 0 && he >= 0 && ar >= 0)
+    for (const m of local.slice(he, ar).replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/"((?:[^"\\]|\\.)*)"/g))
+      out.push(unquote(m[1]));
+  const h = ui.indexOf('he:{ btn:'), end = ui.indexOf('\nar:{', h);
+  if (h >= 0 && end > h) {
+    const blk = ui.slice(h, end);
+    for (const k of ['greet', 'greetFloat', 'stuck', 'frustrated']) {
+      const m = blk.match(new RegExp('\\b' + k + ':"((?:[^"\\\\]|\\\\.)*)"'));
+      if (m) out.push(unquote(m[1]));
+    }
+  }
+  return out.map(x => x.replace(/\[\[act:[a-z_]+(?::[^|\]]+)?\|([^\]]+)\]\]/g, '$1'))
+            .flatMap(x => x.split(/\n+/)).map(x => x.trim()).filter(Boolean);
+}
+
 function corpus(app) {
   const src = SOURCES[app];
   if (!src) return null;
   const files = typeof src === 'function' ? src() : src;
   const seen = new Map();       /* id → text, בסדר ההופעה */
+  if (app === 'tutor') {
+    const [lf, uf] = files.map(f => path.join(ROOT, f));
+    if (!fs.existsSync(lf) || !fs.existsSync(uf)) return seen;
+    for (const raw of tutorBank(fs.readFileSync(lf, 'utf8'), fs.readFileSync(uf, 'utf8'))) {
+      const text = plainOf(String(raw));
+      if (!/[א-ת]/.test(text)) continue;
+      if (text.split(' ').length < 2) continue;
+      const id = R.id(text);
+      if (!seen.has(id)) seen.set(id, text);
+    }
+    return seen;
+  }
   if (app === 'english-elem') {
     const tf = path.join(ROOT, files[0]);
     if (!fs.existsSync(tf)) return seen;

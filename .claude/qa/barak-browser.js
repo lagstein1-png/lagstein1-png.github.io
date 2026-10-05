@@ -233,8 +233,12 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
       /* הצד השני: עונים (לחיצה על אפשרות עד שהשאלה ננעלת — נכונה, או
          שתי טעויות וחשיפה), ואז ״הבא״ חייב לעבור. בלי זה סירוב גורף
          (`run` שמחזירה תמיד false) היה עובר את הבדיקה. */
+      /* כל לחיצה על האפשרות הבאה בתור, ולא על ״הראשונה שפעילה״: ב-science-12
+         שלוש טעויות מפעילות מחדש את כולן (app.js:140), ואז הלחיצה הרביעית
+         חזרה לראשונה — והבדיקה נפלה בכל פעם שהתשובה הייתה הרביעית
+         (5.10.2026: 1 מתוך 5 ו-1 מתוך 6 ריצות). */
       for (let i = 0; i < 4 && !(await page.evaluate(() => !!(window.R && R.locked))); i++) {
-        await page.evaluate(() => { const o = document.querySelector('button.opt:not([disabled])'); if (o) o.click() });
+        await page.evaluate(i => { const o = document.querySelectorAll('button.opt')[i] || document.querySelector('button.opt:not([disabled])'); if (o && !o.disabled) o.click() }, i);
         await page.waitForTimeout(150);
       }
       if (!(await page.evaluate(() => !!(window.R && R.locked)))) F('O-128: לא הצלחתי לענות על השאלה (R.locked לא נדלק)');

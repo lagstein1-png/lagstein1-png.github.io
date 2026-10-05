@@ -526,10 +526,43 @@ function startReveal(i){
   }, 28);
 }
 
+/* ---------- המשפטים הקבועים — מוקלטים, 5.10.2026 ----------
+   תשובת השרת נכתבת חיה ואין לה הקלטה. אבל המוח המקומי
+   (`josh-local.js`) עונה מרשימה קבועה, וגם הברכה והפניות היזומות
+   (`greet`, `nudge`) קבועות. את המשפטים העבריים האלה מקליט
+   `record.js` (המקור `tutor`) אל `/tutor/audio/`, שורה־שורה — פעם אחת
+   לכל האפליקציות, באותו קול של ההקלטות שבהן. הבעלים, 5.10.2026.
+
+   **הכול או כלום.** בועה נאמרת מהקבצים רק כשלכל שורה בה יש קובץ;
+   שורה אחת בלי קובץ (השאלה שעל המסך, תשובה מהשרת) — כל הבועה
+   בקול המכשיר, כדי שלא יתחלפו שני קולות באמצע תשובה אחת.
+   מוגן: בדף הבית ובריפו הנפרד אין `RECORDED.load`, ואז אין שינוי. */
+var REC_DIR = "/tutor/audio";
+function recOK(){ return typeof RECORDED !== "undefined" && !!RECORDED.load }
+function recLoad(){ if(recOK()) try{ RECORDED.load(REC_DIR) }catch(e){} }
+/* בטעינת הדף ולא בפתיחת הפאנל: הברכה נאמרת ברגע הפתיחה, והמניפסט
+   חייב להיות כבר כאן. `say` אינו מחכה לו — אמירה אחרי `await` נבלעת
+   ב-iOS (המנגנון החמישי), ולכן מה שלא נטען עדיין הולך לקול המכשיר.
+   `recorded.js` נטען בסוף הדף, אחרי הקובץ הזה — ולכן `load`. */
+try{
+  if(document.readyState === "complete") setTimeout(recLoad, 0);
+  else g.addEventListener("load", recLoad);
+}catch(e){}
+function recParts(body){
+  if(!recOK()) return null;
+  var parts = String(body).split(/\n+/).map(function(p){ return p.trim() })
+                          .filter(function(p){ return p });
+  if(!parts.length) return null;
+  for(var k = 0; k < parts.length; k++)
+    if(!RECORDED.has(parts[k], "he", REC_DIR)) return null;
+  return parts;
+}
+
 function stopSay(){
   PLAYING = -1; PREVIEWING = false; VOICE_STARTED = false;
   stopKeepAlive(); _activeU = null;
   try{ speechSynthesis.cancel() }catch(e){}
+  if(recOK()) try{ RECORDED.stop() }catch(e){}
   draw();
 }
 function say(i){
@@ -537,17 +570,39 @@ function say(i){
   /* עוצרים גם את ההקראה של האפליקציה עצמה, אם יש לה כזאת */
   if(CFG && CFG.stopHost) try{ CFG.stopHost() }catch(e){}
   try{ speechSynthesis.cancel() }catch(e){}
-  var segs = segments(stripMd(actStrip(splitSugg(m.text).body))), r = rate(), n = 0;
-  if(!segs.length) return;
-  PLAYING = i; VOICE_STARTED = false; draw();
-  (function next(){
-    if(PLAYING !== i || n >= segs.length){
-      if(PLAYING === i){ PLAYING = -1; VOICE_STARTED = false; draw() }
-      _activeU = null; maybeStopKeepAlive(); return;
-    }
-    var s = segs[n++], code = VOICE[s.l] || VOICE.he;
-    speakSeg(heSpoken(spoken(s.t, s.l), s.l), code, r, function(){ return PLAYING === i }, next);
-  })();
+  if(recOK()) try{ RECORDED.stop() }catch(e){}
+  var body = stripMd(actStrip(splitSugg(m.text).body));
+  var recs = recParts(body), k = 0;
+  if(recs){
+    /* ההקלטה בקצב טבעי: מה שהלומד בחר ביחס לברירת המחדל, ולא
+       הבסיס שניתן לקול המכשיר. */
+    var rr = rate() / JOSH_RATE;
+    PLAYING = i; VOICE_STARTED = true; draw();
+    (function nextRec(){
+      if(PLAYING !== i) return;
+      if(k >= recs.length){ PLAYING = -1; VOICE_STARTED = false; draw(); return }
+      var ok = RECORDED.play(recs[k++], "he", { base: REC_DIR, rate: rr,
+        onEnd: nextRec,
+        onError: function(){ if(PLAYING === i) device() } });
+      if(!ok) device();
+    })();
+    return;
+  }
+  device();
+  function device(){
+    if(recOK()) try{ RECORDED.stop() }catch(e){}
+    var segs = segments(stripMd(actStrip(splitSugg(m.text).body))), r = rate(), n = 0;
+    if(!segs.length){ if(PLAYING === i){ PLAYING = -1; VOICE_STARTED = false; draw() } return }
+    PLAYING = i; VOICE_STARTED = false; draw();
+    (function next(){
+      if(PLAYING !== i || n >= segs.length){
+        if(PLAYING === i){ PLAYING = -1; VOICE_STARTED = false; draw() }
+        _activeU = null; maybeStopKeepAlive(); return;
+      }
+      var s = segs[n++], code = VOICE[s.l] || VOICE.he;
+      speakSeg(heSpoken(spoken(s.t, s.l), s.l), code, r, function(){ return PLAYING === i }, next);
+    })();
+  }
 }
 
 /* מקטע אחד, ושלושת המנגנונים שסביבו. `done` נקרא בדיוק פעם אחת —
@@ -1434,6 +1489,7 @@ function open(auto){
      אליו, ושיחה שהתחילה בעברית הייתה ממשיכה בעברית גם אחרי
      שהילד החליף את שפת האפליקציה. נמדד: הפאנל התחלף, הבוט לא. */
   if(QID !== id || LANGAT !== lg){ MSGS = []; NOTE = ""; QID = id; LANGAT = lg }
+  recLoad();   /* המניפסט של המשפטים המוקלטים — בפתיחה הראשונה בלבד */
   build().ov.classList.add("on");
   floatHide();
   kbSync();

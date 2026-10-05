@@ -27,6 +27,12 @@ Gemma בתוך הדפדפן (WebLLM או MediaPipe). זה מוח שני במתכ
 קוד כלשהו מחוץ לתיקייה. לחבר אותו ללימור — כשכבה בין השרת לבין
 `josh-local.js` — הוא שינוי של הכלל הזה, לא תוספת אליו.
 
+**והשינוי הזה נעשה, בפיילוט אחד (הבעלים, 5.10.2026).** `tutor/limor-device.js`
+מריץ Gemma 4 E2B דרך transformers.js **כשכבה ראשונה** של לימור, לפני השרת,
+ורק בדפים שבתוך `limor/`. זה אינו מוח שני: `CORE`, `contextBlock`, השומרים
+ו-`DEVICE_RULE` מיובאים מ-`worker.js` עצמו. `brain.js` סעיף 5 אוכף את
+התחום. הפרטים והמגבלות — `JOSH.md`, ״לימור במכשיר״; התוצאות — O-138.
+
 **והפנים שלו יושבות בקובץ נפרד, שאינו מוח.** `tutor/josh-face.js`
 היא שכבת תצוגה טהורה: עשרה אירועים (`idle`, `listening`, `thinking`,
 `speaking`, `correct`, `wrong`, `encourage`, `frustrated`, `stuck`,

@@ -1,0 +1,52 @@
+# המבחן הקבוע של לימור — הצד של Gemini. פיילוט ״לימור במכשיר״, 5.10.2026.
+#
+# עשרים השאלות של limor/bench.js, דרך ה-handler האמיתי של worker.js,
+# כדי להשוות לתוצאות של limor/bench.html במכשיר על אותו קלט.
+# הסביבה של הסוכן חסומה מול googleapis, ולכן זה רץ כאן.
+#
+# **מה זה אינו: פריסה.** ה-Worker החי אינו נוגע. הפעלה ידנית בלבד,
+# permissions: contents: read, והמפתח מ-Secrets דרך env:. עשרים שאלות
+# הן עד ארבעים קריאות (ניסיון שני כשהשומר פוסל), בשכבה החינמית.
+
+name: limor-bench
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: עשרים שאלות מול Gemini
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY || secrets.GOOGLE_API_KEY || secrets.GOOGLE_AI_KEY }}
+          BENCH_OUT: /tmp/limor-bench.txt
+        run: |
+          if [ -z "${GEMINI_API_KEY:-}" ]; then
+            echo "::error::לא נמצא מפתח Gemini ב-Secrets (GEMINI_API_KEY, GEMINI_KEY, GOOGLE_API_KEY, GOOGLE_AI_KEY)."
+            exit 1
+          fi
+          node tutor-api/local/limor-bench.mjs
+          {
+            echo "## לימור — המבחן הקבוע, Gemini"
+            echo ""
+            echo '```'
+            cat /tmp/limor-bench.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: limor-bench
+          path: |
+            /tmp/limor-bench.txt
+            /tmp/limor-bench.json
