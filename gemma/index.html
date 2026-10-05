@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מודל במכשיר — Gemma</title>
+<meta name="description" content="דף ניסוי: מודל שפה שרץ בתוך הדפדפן, בלי שרת. השאלות והתשובות נשארות במכשיר.">
+<meta name="robots" content="noindex">
+<link rel="license" href="/legal/">
+<meta name="theme-color" content="#f6f7fb" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0b0f17" media="(prefers-color-scheme:dark)">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+/* ============================================================
+   דף ניסוי של מודל שפה שרץ במכשיר — 5.10.2026, בהכרעת הבעלים.
+   אינו אפליקציית לימוד ואינו נמנה ב-badge; רשום ב-stages.json
+   תחת notApps. אין לו sw.js, והשומר ב-sw.js של השורש מוציא אותו
+   מהמטמון — הדף והספריות תמיד מהרשת.
+   החריג מכלל ״אין תלות חיצונית״ ומכלל ״מוח אחד״ חל על התיקייה
+   הזאת בלבד: deps.js ו-brain.js אוכפים את שני הגבולות.
+   ============================================================ */
+:root{
+  --bg:#f6f7fb; --bg-elev:#ffffff; --text:#14181f; --text-soft:#4a5464;
+  --line:#dfe4ee; --accent:#0a8f8f; --accent-soft:#e3f4f4; --no:#b3261e;
+}
+:root[data-theme="dark"]{
+  --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6;
+  --line:#2a3448; --accent:#5cc7c7; --accent-soft:#12303d; --no:#ff8a80;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b0f17; --bg-elev:#131926; --text:#eef2f9; --text-soft:#aab4c6;
+    --line:#2a3448; --accent:#5cc7c7; --accent-soft:#12303d; --no:#ff8a80;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:17px/1.6 "Heebo",system-ui,Arial,sans-serif}
+.skip{position:absolute;inset-inline-start:-9999px}
+.skip:focus{inset-inline-start:12px;top:12px;background:var(--bg-elev);padding:8px 12px;border-radius:8px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:18px 16px 48px}
+h1{font-size:1.5rem;margin:0}
+h2{font-size:1.1rem;margin:0 0 10px}
+.lead{color:var(--text-soft);margin:6px 0 18px}
+.card{background:var(--bg-elev);border:1px solid var(--line);border-radius:18px;padding:18px;margin-block-end:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-block-end:12px}
+.chip{border:1px solid var(--line);background:var(--bg-elev);color:var(--text);border-radius:999px;padding:10px 16px;font:inherit;cursor:pointer;min-height:48px}
+.chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+:root[data-theme="dark"] .chip[aria-pressed="true"]{color:#0b0f17}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#0b0f17}}
+.btn{border:1px solid var(--line);background:var(--bg-elev);color:var(--text);border-radius:12px;padding:12px 16px;font:inherit;cursor:pointer;min-height:48px}
+.btn.pri{background:#0a6f6f;color:#fff;border-color:#0a6f6f}
+.btn[disabled]{opacity:.55;cursor:default}
+label{font-weight:600}
+select,input[type="file"],textarea{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;min-height:48px}
+textarea{width:100%;min-height:96px;resize:vertical}
+progress{width:100%;height:18px}
+.status{font-weight:600}
+.status.bad{color:var(--no)}
+.out{white-space:pre-wrap;min-height:3em;border-inline-start:3px solid var(--accent);padding-inline-start:12px}
+.note{color:var(--text-soft);font-size:.92rem}
+[hidden]{display:none!important}
+a{color:inherit}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+footer{text-align:center;color:var(--text-soft);font-size:.85rem;margin-block-start:28px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">דילוג לתוכן</a>
+<div class="wrap">
+<header><h1>מודל שפה שרץ במכשיר</h1></header>
+<p class="lead">זה דף ניסוי. המודל (Gemma) יורד פעם אחת ורץ בתוך הדפדפן. השאלה שלכם והתשובה לא נשלחות לשום שרת.</p>
+
+<main id="main" tabindex="-1">
+  <section class="card" aria-labelledby="h-check">
+    <h2 id="h-check">האם המכשיר מתאים</h2>
+    <p class="status" id="gpu" role="status">בודקים אם הדפדפן תומך ב-WebGPU…</p>
+    <p class="note" id="gpuFallback" hidden>אפשר בינתיים לשאול את <a href="/limor/">לימור</a>. היא עונה מהשרת, ולא צריכה כרטיס מסך.</p>
+  </section>
+
+  <section class="card" aria-labelledby="h-load" id="loadCard" hidden>
+    <h2 id="h-load">טעינת המודל</h2>
+    <div class="row" role="group" aria-label="איך לטעון">
+      <button class="chip" type="button" id="engWeb">הורדה מהרשת (WebLLM)</button>
+      <button class="chip" type="button" id="engMp">קובץ מהמכשיר (MediaPipe)</button>
+    </div>
+    <div class="row" id="webOpts">
+      <label for="variant">גודל המודל</label>
+      <select id="variant">
+        <option value="E2B">E2B — קטן ומהיר יותר</option>
+        <option value="E4B">E4B — גדול ומדויק יותר</option>
+      </select>
+    </div>
+    <div class="row" id="mpOpts" hidden>
+      <label for="file">קובץ המודל (.task, .bin או ‎.litertlm)</label>
+      <input type="file" id="file" accept=".task,.bin,.litertlm">
+      <label><input type="checkbox" id="keep"> לשמור את הקובץ בדפדפן לפעם הבאה</label>
+    </div>
+    <div class="row"><button class="btn pri" type="button" id="load">טעינה</button></div>
+    <progress id="bar" max="100" value="0" aria-labelledby="barText" hidden></progress>
+    <p class="note" id="barText" aria-live="polite"></p>
+  </section>
+
+  <section class="card" aria-labelledby="h-ask" id="askCard" hidden>
+    <h2 id="h-ask">שאלה</h2>
+    <label for="q">מה תרצו לשאול?</label>
+    <textarea id="q"></textarea>
+    <div class="row" style="margin-block-start:10px">
+      <button class="btn pri" type="button" id="send">שליחה</button>
+      <button class="btn" type="button" id="mic">דיבור במקום הקלדה</button>
+      <button class="btn" type="button" id="stop" disabled>עצירה</button>
+      <button class="btn" type="button" id="reset">שיחה חדשה</button>
+    </div>
+    <p class="note" id="micNote"></p>
+    <div class="out" id="out" aria-live="off"></div>
+    <p class="note" id="done" role="status"></p>
+  </section>
+
+  <section class="card" aria-labelledby="h-priv">
+    <h2 id="h-priv">מה יוצא מהמכשיר</h2>
+    <p class="note">השאלה והתשובה נשארות במכשיר. מה שכן יוצא: הדפדפן מוריד את הספריות מ-cdn.jsdelivr.net, ובטעינה דרך הרשת גם את קובצי המודל מ-Hugging Face. אלה הורדות של קבצים, ולא נשלח בהן שום דבר שכתבתם.</p>
+    <p class="note">בטעינה דרך הרשת, כפתור הדיבור משתמש בזיהוי הדיבור של הדפדפן. ברוב הדפדפנים ההקלטה נשלחת לשרת של יצרן הדפדפן (גוגל או אפל). בטעינה מקובץ, ההקלטה נשארת במכשיר.</p>
+  </section>
+</main>
+<footer><span dir="ltr">© 2026</span> · <a href="/legal/">תנאי שימוש ופרטיות</a> · <a href="/">כל האפליקציות</a></footer>
+</div>
+
+<!-- הבדיקה רצה בסקריפט רגיל ולא במודול: אם הספריות לא ירדו, המודול לא
+     ירוץ בכלל, והלומד עדיין צריך לקבל תשובה למה. -->
+<script>
+(function(){
+  "use strict";
+  var gpu = document.getElementById("gpu");
+  function fail(msg){
+    gpu.textContent = msg;
+    gpu.className = "status bad";
+    document.getElementById("gpuFallback").hidden = false;
+    document.getElementById("loadCard").hidden = true;
+    document.getElementById("askCard").hidden = true;
+  }
+  window.gemmaFail = fail;
+  if (!("gpu" in navigator)) { fail("הדפדפן הזה לא תומך ב-WebGPU, ולכן המודל לא יכול לרוץ בו. אפשר לנסות בכרום או באדג׳ מעודכנים."); return; }
+  navigator.gpu.requestAdapter().then(function(a){
+    if (!a) { fail("לא נמצא כרטיס מסך שהדפדפן יכול להשתמש בו."); return; }
+    gpu.textContent = "הדפדפן תומך ב-WebGPU. אפשר לטעון את המודל.";
+    document.getElementById("loadCard").hidden = false;
+  }, function(){ fail("הבדיקה של כרטיס המסך נכשלה."); });
+})();
+</script>
+<script type="module" src="./app.js" onerror="gemmaFail('הספריות של המודל לא ירדו. בדקו את החיבור לאינטרנט ונסו שוב.')"></script>
+</body>
+</html>

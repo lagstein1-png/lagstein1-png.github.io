@@ -206,7 +206,7 @@ const SUITE = [
   { id: 'galileo',       args: [] },
   { id: 'rakia-content', args: [] },
   { id: 'rakia-safety',  args: [] },
-  { id: 'deps',          args: [] },
+  { id: 'deps',          args: ['rakia', 'gemma'] },
   { id: 'rakia/mk-ephem',  args: ['--check'] },
   { id: 'rakia/mk-places', args: ['--check'] },
   { id: 'smoke',    args: PAGES.concat(['rakia']),  needsServer: true },
