@@ -33,6 +33,8 @@
           onEnd: fn, onError: fn })) return;     // יש קובץ — מנגן
      speakDevice(...);                            // אין — קול המכשיר
      RECORDED.stop();                             // בעצירה
+   ומאגר משותף (לימור): RECORDED.load("/tutor/audio") פעם אחת, ואז
+     RECORDED.play(text, "he", { base: "/tutor/audio", … }).
    ================================================================== */
 (function (g) {
   "use strict";
@@ -55,6 +57,7 @@
   var R = {
     base: "audio",
     have: {},          /* lang → Set של מזהים שיש להם קובץ */
+    extra: {},         /* תיקייה משותפת → { have, ready } — ראו load */
     loaded: false,
     el: null,          /* אלמנט שמע אחד, קבוע */
     playing: null,     /* המזהה שמנגן עכשיו, כדי ש-onEnd של ניגון ישן לא ייכנס */
@@ -84,6 +87,16 @@
   /* טוען את רשימת המזהים. מניפסט ריק יושב בכל אפליקציה מראש — 404
      נרשם בקונסולה כשגיאה, ובדיקות הדפדפן סופרות אותה. אין קובץ בכל
      זאת — השכבה כבויה, בשקט. */
+  function sets(m) {
+    var out = {}, langs = (m && m.langs) || {};
+    Object.keys(langs).forEach(function (lg) {
+      var set = {};
+      (langs[lg].ids || []).forEach(function (x) { set[x] = 1; });
+      out[lg] = set;
+    });
+    return out;
+  }
+
   function setup(opts) {
     opts = opts || {};
     if (opts.base) R.base = String(opts.base).replace(/\/+$/, "");
@@ -94,22 +107,36 @@
         if (!r.ok) throw new Error("no manifest");
         return r.json();
       }).then(function (m) {
-        var langs = (m && m.langs) || {};
-        Object.keys(langs).forEach(function (lg) {
-          var set = {};
-          (langs[lg].ids || []).forEach(function (x) { set[x] = 1; });
-          R.have[lg] = set;
-        });
+        R.have = sets(m);
         R.loaded = true;
         return true;
       }).catch(function () { R.loaded = true; return false; });
     } catch (e) { R.loaded = true; return Promise.resolve(false); }
   }
 
+  /* **מאגר נוסף, בתיקייה משותפת — לימור, 5.10.2026.** המשפטים הקבועים
+     של המוח המקומי שלה (`/tutor/josh-local.js`) זהים בכל האפליקציות,
+     ולכן הם מוקלטים פעם אחת ב-`/tutor/audio/` ולא בכל `audio/`. אותו
+     אלמנט שמע — זה ששוחרר במגע — ומניפסט משלו, שנטען פעם אחת. */
+  function load(dir) {
+    dir = String(dir).replace(/\/+$/, "");
+    if (R.extra[dir]) return R.extra[dir].ready;
+    var e = R.extra[dir] = { have: {} };
+    try {
+      e.ready = fetch(dir + "/manifest.json", { cache: "no-cache" }).then(function (r) {
+        if (!r.ok) throw new Error("no manifest");
+        return r.json();
+      }).then(function (m) { e.have = sets(m); return true; })
+        .catch(function () { return false; });
+    } catch (x) { e.ready = Promise.resolve(false); }
+    return e.ready;
+  }
+
   function base(lang) { return String(lang || "he").replace("_", "-").split("-")[0].toLowerCase(); }
 
-  function has(text, lang) {
-    var set = R.have[base(lang)];
+  function has(text, lang, dir) {
+    var all = dir ? (R.extra[String(dir).replace(/\/+$/, "")] || {}).have || {} : R.have;
+    var set = all[base(lang)];
     return !!(set && set[id(text)]);
   }
 
@@ -118,7 +145,7 @@
      פגום, רשת) מגיע ב-onError, והקורא נופל לקול המכשיר משם. */
   function play(text, lang, opts) {
     opts = opts || {};
-    if (!has(text, lang)) return false;
+    if (!has(text, lang, opts.base)) return false;
     var a = el(); if (!a) return false;
     var fid = id(text);
     /* stop קודם, ורק אז הדור: stop מקדם את הדור בעצמו, ודור שנלקח
@@ -130,7 +157,7 @@
     a.onended = function () { if (my !== R.gen) return; R.playing = null; if (opts.onEnd) opts.onEnd(); };
     a.onerror = function () { if (my !== R.gen) return; R.playing = null; if (opts.onError) opts.onError(); };
     try {
-      a.src = R.base + "/" + base(lang) + "/" + fid + ".mp3";
+      a.src = (opts.base ? String(opts.base).replace(/\/+$/, "") : R.base) + "/" + base(lang) + "/" + fid + ".mp3";
       /* ההקלטה בקצב טבעי; הכפלה בבחירת הלומד בלבד, בלי הבסיס
          שהאפליקציה נותנת לקול המכשיר. */
       a.playbackRate = Math.max(0.5, Math.min(2, Number(opts.rate) || 1));
@@ -151,7 +178,7 @@
     try { a.onended = null; a.onerror = null; a.pause(); } catch (e) {}
   }
 
-  g.RECORDED = { id: id, setup: setup, has: has, play: play, stop: stop,
+  g.RECORDED = { id: id, setup: setup, load: load, has: has, play: play, stop: stop,
                  isPlaying: function () { return !!R.playing; }, _state: R };
 
   /* המודול מתחיל בעצמו: הקבצים יושבים תמיד ב-`audio/` של האפליקציה,
