@@ -49,6 +49,16 @@
       המותר הוא `tutor/tutor.js`, ו-`.claude/qa/tutor.js` הוא
       שבודק שהוא אכן מחווט בשתים־עשרה האפליקציות.
 
+   4. **החריגה של ״לימור במכשיר״ — קובץ אחד, דף אחד.** הכרעת הבעלים,
+      5.10.2026: מודל Gemma 4 שרץ בדפדפן של הלומד (`JOSH.md`). זו
+      חריגה משני כללים — ספרייה חיצונית ובקשה יוצאת — ולכן היא
+      מותרת **רק** ב-`tutor/limor-device.js`, והקובץ הזה נטען **רק**
+      מדפים בתוך `limor/`. כל קובץ אחר בקבוצת ההגיעוּת שנושא
+      `import(` של כתובת, `huggingface.co`, `cdn.jsdelivr.net` או
+      `@huggingface/transformers` נופל; וכל דף או `sw.js` מחוץ
+      ל-`limor/` שטוען את הקובץ נופל. הרחבה לאפליקציה נוספת היא
+      החלטה, ולכן היא מתחילה בשינוי כאן.
+
    הוכחת נפילה, 12.9.2026: החזרת שתי התגיות לדף הבית בלבד הפילה את
    שלוש הבדיקות יחד — `index.html` נכנס לקבוצת ההגיעוּת ואיתו
    `josh-engine.js`, שנושא גם את ויקיפדיה וגם את `global.Josh`.
@@ -117,6 +127,22 @@ for (const [p, from] of [...reach].sort()) {
     hit(p, from, 'ספק חיפוש חיצוני בקוד שנטען. אין חיפוש מהדפדפן — ראו O-48');
   if (GLOBAL.test(s))
     hit(p, from, 'מגדיר ג׳וש גלובלי. הממשק היחיד הוא tutor/tutor.js');
+}
+
+/* 4 — החריגה של ״לימור במכשיר״: קובץ אחד, ומי שטוען אותו */
+const DEVICE = 'tutor/limor-device.js';
+const EXTERNAL = /\bimport\s*\(\s*["'`]https?:|huggingface\.co|cdn\.jsdelivr\.net|@huggingface\/transformers/;
+for (const [p, from] of [...reach].sort()) {
+  if (p === DEVICE || !/\.(js|html)$/i.test(p)) continue;
+  const s = read(p); if (s == null) continue;
+  if (EXTERNAL.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/<!--[\s\S]*?-->/g, '')))
+    hit(p, from, 'ספרייה או מודל חיצוניים. החריגה מותרת רק ב-' + DEVICE + ' — ראו JOSH.md');
+}
+for (const f of tracked) {
+  if (f.startsWith('limor/') || !(f.endsWith('.html') || path.basename(f) === 'sw.js')) continue;
+  const s = read(f); if (s == null) continue;
+  if (/limor-device\.js/.test(s.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '')))
+    hit(DEVICE, f, 'לימור במכשיר היא פיילוט בדף /limor/ בלבד. הרחבה — הכרעת בעלים, ואז שינוי כאן');
 }
 
 for (const h of hits) console.log(h);
