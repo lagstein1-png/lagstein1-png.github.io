@@ -72,6 +72,24 @@ jobs:
           APPS: ${{ github.event.inputs.apps }}
         run: node marketing/media/record.js ${APPS:-}
 
+      # **הצילומים, לפני ה-`--check` ולא אחריו.** ריצה 1 (5.10.2026)
+      # הקליטה את כל הסרטונים בהצלחה ואז נפלה ב-`--check` על 60
+      # צילומי מסך חסרים — נכס שהוורקפלו מעולם לא ייצר — ולכן צעד
+      # הדחיפה דולג **וכל ההקלטה נזרקה**. צילום אינו דורש ffmpeg,
+      # והוא זול; מייצרים אותו כאן, ואז `--check` הוא פסק דין על
+      # מה שהריצה הזאת באמת הפיקה.
+      # ומצלמים **רק מה שחסר**: 144 הצילומים שוקלים 29MB, וצילום
+      # מחדש בכל ריצה היה מוסיף אותם להיסטוריה שוב ושוב.
+      - name: צילומי מסך — רק אם חסרים
+        run: |
+          set -euo pipefail
+          out=$(node marketing/media/record.js --check || true)
+          if printf '%s' "$out" | grep -q "צילום חסר"; then
+            node marketing/media/record.js --shots
+          else
+            echo "כל הצילומים קיימים — אין צילום מחדש."
+          fi
+
       - name: החתימות מול התסריטים
         run: node marketing/media/record.js --check
 
@@ -81,6 +99,7 @@ jobs:
           name: demo-video
           path: |
             marketing/media/video/
+            marketing/media/shots/
             marketing/media/manifest.json
           retention-days: 7
 
@@ -90,7 +109,7 @@ jobs:
           set -euo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add marketing/media/video marketing/media/manifest.json
+          git add marketing/media/video marketing/media/shots marketing/media/manifest.json
           if git diff --cached --quiet; then
             echo "אין שינוי — לא נדחף דבר."
             exit 0
