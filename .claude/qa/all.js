@@ -112,6 +112,7 @@ const SUITE = [
   { id: 'content806', args: [] },
   { id: 'a11y',     args: [] },
   { id: 'aria',     args: [] },
+  { id: 'pressed',  args: [] },
   { id: 'fonts',    args: [] },
   { id: 'engine',   args: [] },
   { id: 'exam806',  args: [] },

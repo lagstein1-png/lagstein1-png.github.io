@@ -1165,7 +1165,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l155 · 2026-10-04";
+var BUILD="l156 · 2026-10-05";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -2586,7 +2586,7 @@ function hdr(){
     (teOpen()?'<button class="gbtn'+(view==="marks"?" on":"")+'"'+(view==="marks"?' aria-current="page"':"")+' data-a="marks">'+ic("share",16)+" "+esc(t("navExam"))+"</button>":"")+
     '<button class="gbtn'+(s==="set"?" on":"")+'"'+(s==="set"?' aria-current="page"':"")+' data-a="set">'+ic("gear",16)+" "+esc(t("navSet"))+"</button>"+
     '<span class="hlang" role="group">'+Object.keys(LANGS).map(function(k){
-      return '<button class="'+(state.lang===k?"on":"")+'" data-a="lang" data-v="'+k+
+      return '<button class="'+(state.lang===k?"on":"")+'" aria-pressed="'+(state.lang===k?"true":"false")+'" data-a="lang" data-v="'+k+
         '" lang="'+k+'" dir="'+LANGS[k].dir+'" aria-pressed="'+(state.lang===k?"true":"false")+
         '">'+esc(LANGS[k].name)+'</button>';
     }).join("")+'</span>'+
@@ -2648,7 +2648,7 @@ function hfIdx(){
     var n=TOPICS.filter(function(x){return x.trk===tr.id}).length;
     if(!n)return;
     var on=HF.trk===tr.id;
-    h+='<button class="'+(on?"on":"")+'" data-a="idx" data-t="'+esc(tr.id)+
+    h+='<button class="'+(on?"on":"")+'" aria-pressed="'+(on?"true":"false")+'" data-a="idx" data-t="'+esc(tr.id)+
        '" aria-pressed="'+(on?"true":"false")+'">'+ic(tr.icon,13)+esc(trName(tr))+
        '<span class="n">'+n+"</span></button>";
   });
@@ -2712,7 +2712,7 @@ function levelBar(tp){
   var h='<div class="lvls">',i;
   for(i=1;i<=3;i++){
     var m=mastery(tp.id,i);
-    h+='<button class="lvl'+(state.level===i?" on":"")+'" data-a="lvl" data-v="'+i+
+    h+='<button class="lvl'+(state.level===i?" on":"")+'" aria-pressed="'+(state.level===i?"true":"false")+'" data-a="lvl" data-v="'+i+
       '" aria-pressed="'+(state.level===i?"true":"false")+'">'+
       esc(t("lv"+i))+' <span class="bar '+barCls(m)+'" style="width:2.6rem;flex:none">'+
       '<i style="width:'+Math.round(m*100)+'%"></i></span></button>';
@@ -2956,7 +2956,7 @@ function screenSet(){
   h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
      esc(t("setLang"))+"</h3><div class=\"lvls\">";
   Object.keys(LANGS).forEach(function(k){
-    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+
+    h+='<button class="lvl'+(state.lang===k?" on":"")+'" aria-pressed="'+(state.lang===k?"true":"false")+'" data-a="lang" data-v="'+k+
       '" aria-pressed="'+(state.lang===k?"true":"false")+'">'+
       esc(LANGS[k].name)+"</button>";
   });
@@ -2970,10 +2970,10 @@ function screenSet(){
      '<p class="sub" style="margin-top:.3rem;opacity:.7">'+esc(BUILD)+'</p></div>';
   h+=vstrip();
   h+='<div class="vgrid" style="margin:.6rem 0">'+
-     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" data-a="vmode" data-v="device"'+
+     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" aria-pressed="'+(state.voiceMode==="device"?"true":"false")+'" data-a="vmode" data-v="device"'+
      ' aria-pressed="'+(state.voiceMode==="device"?"true":"false")+'">'+
      '<span><span class="nm">'+esc(t("vDev"))+'</span><br><span class="ds">'+esc(t("vDevD"))+"</span></span></button>"+
-     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" data-a="vmode" data-v="gem"'+
+     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" aria-pressed="'+(state.voiceMode==="gem"?"true":"false")+'" data-a="vmode" data-v="gem"'+
      ' aria-pressed="'+(state.voiceMode==="gem"?"true":"false")+'">'+
      '<span><span class="nm">'+esc(t("vGem"))+'</span><br><span class="ds">'+esc(t("vGemD"))+"</span></span></button></div>";
 
@@ -3030,7 +3030,7 @@ function screenSet(){
   });
   h+='<div class="row"><div class="lab">'+esc(t("theme"))+'</div><div class="lvls">'+
      [["auto","thAuto"],["light","thLight"],["dark","thDark"]].map(function(x){
-       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" data-a="theme" data-v="'+x[0]+
+       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" aria-pressed="'+(state.theme===x[0]?"true":"false")+'" data-a="theme" data-v="'+x[0]+
          '" aria-pressed="'+(state.theme===x[0]?"true":"false")+'">'+
          esc(t(x[1]))+"</button>"}).join("")+"</div></div>";
   h+="</div>";
@@ -3631,7 +3631,7 @@ function viewExamNew(){
      '<div class="grid g2">';
   tops.forEach(function(t){
     var on=EB.topics.indexOf(t.id)>=0;
-    h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" data-a="extopic" data-t="'+t.id+
+    h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" aria-pressed="'+(on?"true":"false")+'" data-a="extopic" data-t="'+t.id+
        '" aria-pressed="'+(on?"true":"false")+'"><span class="tn">'+esc(tName(t))+'</span>'+
        '<span class="td">'+esc(tDesc(t))+'</span></button>';
   });
@@ -4819,7 +4819,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l155-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l156-pwa1").catch(function(){});
   });
 }
 </script>

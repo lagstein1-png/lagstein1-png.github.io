@@ -2604,7 +2604,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="w131 · 2026-10-04";
+var BUILD="w132 · 2026-10-05";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2724,7 +2724,7 @@ function header(){
   var nav=[["units",t.navUnits||"יחידות","book"],["settings",t.navSettings,"gear"]];
   return '<header><div class="wrap hbar">'+
     '<button class="logo" data-a="go" data-v="units" aria-label="'+esc(t.appName)+'"><span class="mark">'+ic("pi",26)+'</span><span class="fd"><b>'+esc(t.obTitle1)+'</b><small>'+esc(t.appShort)+'</small></span></button>'+
-    '<nav>'+nav.map(function(n){return '<button class="'+lc("nb"+(view===n[0]?" on":""))+'" data-a="go" data-v="'+n[0]+'">'+ic(n[2],18)+'<span>'+esc(n[1])+'</span></button>'}).join("")+'</nav>'+
+    '<nav>'+nav.map(function(n){return '<button class="'+lc("nb"+(view===n[0]?" on":""))+'" aria-pressed="'+(view===n[0]?"true":"false")+'" data-a="go" data-v="'+n[0]+'">'+ic(n[2],18)+'<span>'+esc(n[1])+'</span></button>'}).join("")+'</nav>'+
     '<button class="chip" data-a="copylink">'+ic("link",16)+'<span>'+esc(t.copyLink)+'</span></button>'+
     '<span class="xpchip">'+petSvg(state.pet,"happy",32)+'<span><span class="fd" style="font-weight:700;font-size:.9rem;display:block">'+esc(t.level)+' '+lvl+'</span><span style="font-size:.72rem;color:var(--ink-faint);display:flex;align-items:center;gap:4px">'+ic("star",12)+' '+state.stats.xp+' XP</span></span></span>'+
   '</div></header>';
@@ -2749,7 +2749,7 @@ function onboarding(){
   '<div style="max-width:1100px;margin:0 auto;display:grid;gap:44px;width:100%">'+
   /* בורר שפה — כדי שאפשר יהיה להחליף שפה כבר במסך הפתיחה */
   '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'+Object.keys(LANGS).map(function(l){
-    return '<button class="oblang'+(state.settings.lang===l?" on":"")+'" data-a="lang" data-l="'+l+'" aria-label="'+esc(LANGS[l].label)+'"><span aria-hidden="true" style="font-size:1.25rem">'+LANGS[l].flag+'</span>'+esc(LANGS[l].label)+'</button>';
+    return '<button class="oblang'+(state.settings.lang===l?" on":"")+'" aria-pressed="'+(state.settings.lang===l?"true":"false")+'" data-a="lang" data-l="'+l+'" aria-label="'+esc(LANGS[l].label)+'"><span aria-hidden="true" style="font-size:1.25rem">'+LANGS[l].flag+'</span>'+esc(LANGS[l].label)+'</button>';
   }).join("")+'</div>'+'<div class="cols ob-hero" style="align-items:center">'+
   '<div>'+
     '<span class="fd" style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--paper);font-weight:500;font-size:.85rem;padding:7px 16px;border-radius:99px;transform:rotate(-1deg)">'+ic("sparkle",15)+' '+esc(t.obBadge)+'</span>'+
@@ -3039,8 +3039,8 @@ function practice(){
   if(P.phase==="done")return doneScreen();
   var h="";
   /* level bar */
-  h+='<div class="wrap" style="padding-top:22px"><div class="lvlbar"><button class="'+lc("lvl"+(state.level===null?" on":""))+'" data-a="lvl" data-l="0">'+ic("sparkle",15)+' '+esc(t.levelAuto)+'</button>';
-  for(var L=1;L<=6;L++)h+='<button class="'+lc("lvl l"+L+(state.level===L?" on":""))+'" data-a="lvl" data-l="'+L+'" title="'+esc(names[L-1])+'"><span class="n">'+L+'</span>'+esc(names[L-1])+'</button>';
+  h+='<div class="wrap" style="padding-top:22px"><div class="lvlbar"><button class="'+lc("lvl"+(state.level===null?" on":""))+'" aria-pressed="'+(state.level===null?"true":"false")+'" aria-pressed="'+(state.level===null?"true":"false")+'" data-a="lvl" data-l="0">'+ic("sparkle",15)+' '+esc(t.levelAuto)+'</button>';
+  for(var L=1;L<=6;L++)h+='<button class="'+lc("lvl l"+L+(state.level===L?" on":""))+'" aria-pressed="'+(state.level===L?"true":"false")+'" data-a="lvl" data-l="'+L+'" title="'+esc(names[L-1])+'"><span class="n">'+L+'</span>'+esc(names[L-1])+'</button>';
   h+='</div>';
   /* status strip */
   h+='<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px"><span class="fd" style="font-weight:700;font-size:1.1rem">'+fmt(t.qOf,{a:P.qi+1,b:P.ses.length})+'</span>'+(P.focus?'<span class="'+lc("chip op-"+P.focus)+'" style="background:var(--op-s);border-color:var(--op);color:var(--op-d)">'+ic("sparkle",14)+' '+esc(t.focusBadge)+' · '+esc(tName({id:P.focus}))+'</span>':"")+'<span class="dots">';
@@ -3289,7 +3289,7 @@ function settingsView(){
     h+='<p class="fd" style="font-weight:600;font-size:1.1rem;margin-top:20px">'+esc(t.sndType)+'</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:10px">';
     PRESETS.forEach(function(p){
       var on=s.preset===p.id;
-      h+='<button class="pick'+(on?" on":"")+'" data-a="preset" data-p="'+p.id+'"><span style="flex:1;text-align:start"><b class="fd" style="font-size:1.15rem;display:flex;justify-content:space-between">'+esc(p[pl]||p.he)+(on?ic("check",18):"")+'</b><span style="color:var(--ink-soft);font-size:.85rem">'+esc(p["d"+pl]||p.dhe)+'</span><br><span style="color:var(--ink-faint);font-size:.72rem;direction:ltr;display:inline-block">'+p.rate.toFixed(2)+'x · '+p.pitch.toFixed(2)+'</span></span></button>';
+      h+='<button class="pick'+(on?" on":"")+'" aria-pressed="'+(on?"true":"false")+'" data-a="preset" data-p="'+p.id+'"><span style="flex:1;text-align:start"><b class="fd" style="font-size:1.15rem;display:flex;justify-content:space-between">'+esc(p[pl]||p.he)+(on?ic("check",18):"")+'</b><span style="color:var(--ink-soft);font-size:.85rem">'+esc(p["d"+pl]||p.dhe)+'</span><br><span style="color:var(--ink-faint);font-size:.72rem;direction:ltr;display:inline-block">'+p.rate.toFixed(2)+'x · '+p.pitch.toFixed(2)+'</span></span></button>';
     });
     h+='</div>';
     /* device voices */
@@ -3336,7 +3336,7 @@ function settingsView(){
     /* השם בלבד ב-`aria-label`: בלעדיו `sayClick` קרא את תוכן הכפתור,
        כלומר את הדגל ואת "ar-SA · RTL" — קוד מנוע וכיוון כתיבה,
        שנועדו לעין ולא לאוזן. */
-    return '<button class="pick'+(on?" on":"")+'" data-a="lang" data-l="'+l+'" aria-label="'+esc(m.label)+'"><span aria-hidden="true" style="font-size:1.9rem">'+m.flag+'</span><span style="flex:1;text-align:start"><b class="fd" style="font-size:1.15rem;display:block">'+esc(m.label)+'</b><span style="color:var(--ink-faint);font-size:.72rem">'+m.tts+' · '+m.dir.toUpperCase()+'</span></span>'+(on?ic("check",18):"")+'</button>';
+    return '<button class="pick'+(on?" on":"")+'" aria-pressed="'+(on?"true":"false")+'" data-a="lang" data-l="'+l+'" aria-label="'+esc(m.label)+'"><span aria-hidden="true" style="font-size:1.9rem">'+m.flag+'</span><span style="flex:1;text-align:start"><b class="fd" style="font-size:1.15rem;display:block">'+esc(m.label)+'</b><span style="color:var(--ink-faint);font-size:.72rem">'+m.tts+' · '+m.dir.toUpperCase()+'</span></span>'+(on?ic("check",18):"")+'</button>';
   }).join("")+'</div></div>';
   /* theme */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--amber-soft);color:var(--amber-deep)">'+ic("star",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.themeTitle)+'</h2></div>'+
@@ -3344,7 +3344,7 @@ function settingsView(){
   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px">'+
   [["ocean",t.themeOcean],["grape",t.themeGrape],["berry",t.themeBerry]].map(function(th){
     var on=s.theme===th[0];
-    return '<button class="pick'+(on?" on":"")+'" data-a="theme" data-th="'+th[0]+'"><span class="thsw">'+THEMES[th[0]].map(function(c){return '<i style="background:'+c+'"></i>'}).join("")+'</span><b class="fd" style="flex:1;text-align:start">'+esc(th[1])+'</b>'+(on?ic("check",18):"")+'</button>';
+    return '<button class="pick'+(on?" on":"")+'" aria-pressed="'+(on?"true":"false")+'" data-a="theme" data-th="'+th[0]+'"><span class="thsw">'+THEMES[th[0]].map(function(c){return '<i style="background:'+c+'"></i>'}).join("")+'</span><b class="fd" style="flex:1;text-align:start">'+esc(th[1])+'</b>'+(on?ic("check",18):"")+'</button>';
   }).join("")+'</div></div>';
   /* display */
   h+='<div class="card" style="padding:24px;margin-top:22px"><div style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:var(--sky-soft);color:var(--sky-deep)">'+ic("eye",22)+'</span><h2 class="fd" style="font-size:1.45rem">'+esc(t.dispTitle)+'</h2></div>'+
@@ -3353,7 +3353,7 @@ function settingsView(){
   '<div style="display:flex;gap:9px;margin-top:9px;flex-wrap:wrap">'+
   [[1,t.size1,"1rem"],[2,t.size2,"1.2rem"],[3,t.size3,"1.45rem"]].map(function(z){
     var on=(s.textSize||1)===z[0];
-    return '<button class="pick'+(on?" on":"")+'" data-a="tsize" data-z="'+z[0]+'" style="flex:1;min-width:104px;justify-content:center"><b class="fd" style="font-size:'+z[2]+'">'+esc(z[1])+'</b>'+(on?ic("check",18):"")+'</button>';
+    return '<button class="pick'+(on?" on":"")+'" aria-pressed="'+(on?"true":"false")+'" data-a="tsize" data-z="'+z[0]+'" style="flex:1;min-width:104px;justify-content:center"><b class="fd" style="font-size:'+z[2]+'">'+esc(z[1])+'</b>'+(on?ic("check",18):"")+'</button>';
   }).join("")+'</div>'+
   '<div style="margin-top:14px">'+tog("clearFont",t.clearFont,t.clearFontD)+tog("contrast",t.contrast,t.contrastD)+tog("spaced",t.spaced,t.spacedD)+tog("reduceMotion",t.reduceMotion,t.reduceMotionD)+'</div>'+
   /* רשימת מקשי הקיצור */
@@ -3849,12 +3849,12 @@ function viewExamNew(){
      רק בלבלה. מציגים אותה רק כשיש באמת יותר ממסלול אחד. */
   if(TRACKS.length>1)h+='<div style="margin-top:16px"><b>'+esc(xt("exUnits"))+'</b>'+
      '<div class="seg" style="margin-top:7px">'+[3,4,5].map(function(tr){
-       return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
+       return '<button class="'+(state.track===tr?"on":"")+'" aria-pressed="'+(state.track===tr?"true":"false")+'" data-a="track" data-t="'+tr+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exLevel"))+'</b><div class="seg" style="margin-top:7px">'+
      LVL.map(function(l,i){
-       return '<button class="'+(EB.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
+       return '<button class="'+(EB.level===i+1?"on":"")+'" aria-pressed="'+(EB.level===i+1?"true":"false")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exCount"))+': <span id="exNlab">'+EB.n+'</span></b>'+
@@ -3865,7 +3865,7 @@ function viewExamNew(){
      '<div class="grid g2">';
   tops.forEach(function(t){
     var on=EB.topics.indexOf(t.id)>=0;
-    h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" data-a="extopic" data-t="'+t.id+
+    h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" aria-pressed="'+(on?"true":"false")+'" data-a="extopic" data-t="'+t.id+
        '" aria-pressed="'+(on?"true":"false")+'"><span class="tn">'+esc(tName(t))+'</span>'+
        (typeof tDesc==="function"?'<span class="td">'+esc(tDesc(t))+'</span>':"")+'</button>';
   });
@@ -5645,7 +5645,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=w131-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=w132-pwa1").catch(function(){});
   });
 }
 </script>
