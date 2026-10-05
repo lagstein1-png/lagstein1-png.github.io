@@ -105,6 +105,25 @@ jobs:
           echo "voice=$V" >> "$GITHUB_OUTPUT"
           echo "ספק: $P · קול: ${V:-ברירת מחדל}"
 
+      # **סדר:** בדיקת המפתח לפני בדיקת הקול. בריצה 80 השער רץ ראשון
+      # בלי TTS_KEY, וגוגל החזיר ״Method doesn't allow unregistered
+      # callers״ — נכון, אבל לא אומר ללומד-של-הלוג מה חסר.
+      - name: יש מפתח
+        env:
+          GKEY: ${{ secrets.GEMINI_API_KEY }}
+          TKEY: ${{ secrets.TTS_KEY }}
+          P: ${{ steps.prov.outputs.provider }}
+        run: |
+          if [ "$P" = "gcloud" ] && [ -z "${TKEY:-}" ]; then
+            echo "::error::הספק gcloud דורש TTS_KEY ב-Secrets (מפתח Cloud Text-to-Speech)."
+            exit 1
+          fi
+          if [ "$P" != "gcloud" ] && [ -z "${GKEY:-}" ]; then
+            echo "::error::חסר GEMINI_API_KEY ב-Secrets. בלעדיו אין מה להקליט."
+            exit 1
+          fi
+
+      # ריצה מתוזמנת — אין קלט: בוחרים את האפליקציה שהכי הרבה חסר בה.
       # **הקול חייב להיות Gacrux, ואם אין — עוצרים.** הכרעת הבעלים
       # 5.10.2026: ״gcloud runs must use he-IL-Chirp3-HD-Gacrux to match
       # Limor's voice… If Gacrux is not available on Cloud TTS, STOP and
@@ -145,22 +164,6 @@ jobs:
               console.log("✓ "+want+" קיים.");
             });'
 
-      - name: יש מפתח
-        env:
-          GKEY: ${{ secrets.GEMINI_API_KEY }}
-          TKEY: ${{ secrets.TTS_KEY }}
-          P: ${{ steps.prov.outputs.provider }}
-        run: |
-          if [ "$P" = "gcloud" ] && [ -z "${TKEY:-}" ]; then
-            echo "::error::הספק gcloud דורש TTS_KEY ב-Secrets (מפתח Cloud Text-to-Speech)."
-            exit 1
-          fi
-          if [ "$P" != "gcloud" ] && [ -z "${GKEY:-}" ]; then
-            echo "::error::חסר GEMINI_API_KEY ב-Secrets. בלעדיו אין מה להקליט."
-            exit 1
-          fi
-
-      # ריצה מתוזמנת — אין קלט: בוחרים את האפליקציה שהכי הרבה חסר בה.
       - name: איזו אפליקציה
         id: pick
         run: |
