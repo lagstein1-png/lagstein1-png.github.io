@@ -100,6 +100,16 @@ function fresh(manifest, audioBehaviour) {
   await new Promise(r => setTimeout(r, 20));
   t('stop משתיק — onEnd של ניגון שנעצר אינו נורה', late, false);
 
+  /* מאגר משותף — לימור (5.10.2026): מניפסט שני בתיקייה משלו, והניגון
+     מאותה תיקייה. */
+  const e2 = fresh(man);
+  await e2.R.load('/tutor/audio/');
+  t('load — יש קובץ במאגר המשותף, ואין למשפט אחר',
+    [e2.R.has(TXT, 'he', '/tutor/audio'), e2.R.has('משפט אחר לגמרי בעברית', 'he', '/tutor/audio')], [true, false]);
+  e2.R.play(TXT, 'he', { base: '/tutor/audio' });
+  t('play עם base מנגן מהתיקייה המשותפת', e2.calls.play[e2.calls.play.length - 1],
+    '/tutor/audio/he/' + R.id(TXT) + '.mp3');
+
   /* --- 2 · החיווט ------------------------------------------------ */
   /* המנוע נטען בכולן — ״כמנוע שממנו לוקחים בעתיד״ — ו-sw.js של תשע
      האפליקציות חייב להישאר זהה (engine.js). מנגן רק במי שיש לה
