@@ -1117,7 +1117,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="k99 · 2026-10-04";
+var BUILD="k100 · 2026-10-05";
 var SKEY="kotvim-state-v1";
 var GKEY_STORE="kotvim-gkey";
 
@@ -2591,12 +2591,12 @@ function hdr(){
   return '<div class="hbar"><div class="wrap hrow">'+
     '<h1 class="brand"><svg class="sitemark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg>'+esc(t("app"))+'<small>'+esc(t("tagline"))+'</small></h1>'+
     (s==="home"?"":'<button class="gbtn" data-a="home">'+ic("home",16)+" "+esc(t("navHome"))+"</button>")+
-    '<button class="gbtn'+(s==="prog"?" on":"")+'" data-a="prog">'+ic("chart",16)+" "+esc(t("navProg"))+"</button>"+
+    '<button class="gbtn'+(s==="prog"?" on":"")+'" aria-pressed="'+(s==="prog"?"true":"false")+'" data-a="prog">'+ic("chart",16)+" "+esc(t("navProg"))+"</button>"+
     /* מסך המורה נעלם מהכותרת כשנבחר קוד והמכשיר נעול. */
     ""+
-    '<button class="gbtn'+(s==="set"?" on":"")+'" data-a="set">'+ic("gear",16)+" "+esc(t("navSet"))+"</button>"+
+    '<button class="gbtn'+(s==="set"?" on":"")+'" aria-pressed="'+(s==="set"?"true":"false")+'" data-a="set">'+ic("gear",16)+" "+esc(t("navSet"))+"</button>"+
     '<span class="hlang" role="group">'+Object.keys(LANGS).map(function(k){
-      return '<button class="'+(state.lang===k?"on":"")+'" data-a="lang" data-v="'+k+
+      return '<button class="'+(state.lang===k?"on":"")+'" aria-pressed="'+(state.lang===k?"true":"false")+'" data-a="lang" data-v="'+k+
         '" lang="'+k+'" dir="'+LANGS[k].dir+'">'+esc(LANGS[k].name)+'</button>';
     }).join("")+'</span>'+
   "</div></div>"}
@@ -2615,7 +2615,7 @@ function vstrip(){
 
 /* --- ארבעת המסכים --- */
 function kCard(inner,act,on,extra){
-  return '<button class="card'+(on?" on":"")+'" '+(act||"")+' style="width:100%;text-align:start;'+(extra||"")+'">'+inner+'</button>';
+  return '<button class="card'+(on?" on":"")+'" aria-pressed="'+(on?"true":"false")+'" '+(act||"")+' style="width:100%;text-align:start;'+(extra||"")+'">'+inner+'</button>';
 }
 function screenType(){
   var h='<div class="wrap"><h2 class="h2">'+esc(t("kStep1"))+"</h2>"+
@@ -2721,7 +2721,7 @@ function screenSet(){
   h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
      esc(t("setLang"))+"</h3><div class=\"lvls\">";
   Object.keys(LANGS).forEach(function(k){
-    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'">'+
+    h+='<button class="lvl'+(state.lang===k?" on":"")+'" aria-pressed="'+(state.lang===k?"true":"false")+'" aria-pressed="'+(state.lang===k?"true":"false")+'" data-a="lang" data-v="'+k+'">'+
       esc(LANGS[k].name)+"</button>";
   });
   h+="</div></div>";
@@ -2734,9 +2734,9 @@ function screenSet(){
      '<p class="sub" style="margin-top:.3rem;opacity:.7">'+esc(BUILD)+'</p></div>';
   h+=vstrip();
   h+='<div class="vgrid" style="margin:.6rem 0">'+
-     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" data-a="vmode" data-v="device">'+
+     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" aria-pressed="'+(state.voiceMode==="device"?"true":"false")+'" aria-pressed="'+(state.voiceMode==="device"?"true":"false")+'" data-a="vmode" data-v="device">'+
      '<span><span class="nm">'+esc(t("vDev"))+'</span><br><span class="ds">'+esc(t("vDevD"))+"</span></span></button>"+
-     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" data-a="vmode" data-v="gem">'+
+     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" aria-pressed="'+(state.voiceMode==="gem"?"true":"false")+'" aria-pressed="'+(state.voiceMode==="gem"?"true":"false")+'" data-a="vmode" data-v="gem">'+
      '<span><span class="nm">'+esc(t("vGem"))+'</span><br><span class="ds">'+esc(t("vGemD"))+"</span></span></button></div>";
 
   h+='<div class="row"><div><div class="lab">'+esc(t("rate"))+'</div>'+
@@ -2792,7 +2792,7 @@ function screenSet(){
   });
   h+='<div class="row"><div class="lab">'+esc(t("theme"))+'</div><div class="lvls">'+
      [["auto","thAuto"],["light","thLight"],["dark","thDark"]].map(function(x){
-       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" data-a="theme" data-v="'+x[0]+'">'+
+       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" aria-pressed="'+(state.theme===x[0]?"true":"false")+'" aria-pressed="'+(state.theme===x[0]?"true":"false")+'" data-a="theme" data-v="'+x[0]+'">'+
          esc(t(x[1]))+"</button>"}).join("")+"</div></div>";
   h+="</div>";
 
@@ -3316,7 +3316,7 @@ boot();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=k99-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=k100-pwa1").catch(function(){});
   });
 }
 </script>

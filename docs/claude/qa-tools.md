@@ -14,6 +14,7 @@
     node .claude/qa/naming.js                # כלל השם של ״תאוריה מדברת״
     node .claude/qa/a11y.js                  # ששת מצבי הנגישות — מ-applyModes ועד כלל ב-CSS
     node .claude/qa/aria.js                  # מצב דו־מצבי קבוע, outline בתוך :focus, tabindex חיובי, מאפיין פיזי
+    node .claude/qa/pressed.js               # כפתור דו־מצבי בלי aria-pressed — קורא מסך אינו יודע מה נבחר
     node .claude/qa/cache.js                 # חמש בדיקות על שלושה־עשר ה-sw.js
     node .claude/qa/storage.js               # מפתח localStorage אחד לאפליקציה אחת
     node .claude/qa/say.js                   # ההקראה לא מסגירה את התשובה לפני שעונים

@@ -2935,7 +2935,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t175 · 2026-10-04";
+var BUILD="t176 · 2026-10-05";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -7313,7 +7313,7 @@ function header(){
   /* בורר שפה גלוי בשורה העליונה (26.9.2026) — לא רק בהגדרות. */
   var lang='<span class="hlang" role="group" aria-label="'+esc(_("שפה"))+'">'+
     Object.keys(LANGS).map(function(k){
-      return '<button class="'+(LG===k?"on":"")+'" data-a="lang" data-n="'+k+
+      return '<button class="'+(LG===k?"on":"")+'" aria-pressed="'+(LG===k?"true":"false")+'" data-a="lang" data-n="'+k+
         '" lang="'+k+'" dir="'+LANGS[k].dir+'">'+esc(LANGS[k].name)+'</button>';
     }).join("")+'</span>';
   var brand='<button class="brand" data-a="go" data-v="home" aria-label="לדף הבית"><svg class="sitemark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4.6 6.4C8.3 2.5 15.7 2.5 19.4 6.4" stroke-width="1.7" opacity=".62"/><path d="M5.5 20v-3.6M12 20v-7.4M18.5 20v-11.2" stroke-width="3"/></svg>'+
@@ -7331,7 +7331,7 @@ function header(){
 var LVL_C=["var(--c-base)","var(--c-alg)","var(--c-geo)","var(--c-data)"];
 function levelPicker(){
   return '<div class="seg" role="group" aria-label="רמת קושי">'+LVL.map(function(l,i){
-    return '<button class="'+(state.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="lvl" data-l="'+(i+1)+'">'+l+'</button>';
+    return '<button class="'+(state.level===i+1?"on":"")+'" aria-pressed="'+(state.level===i+1?"true":"false")+'" style="--c:'+LVL_C[i]+'" data-a="lvl" data-l="'+(i+1)+'">'+l+'</button>';
   }).join("")+'</div>';
 }
 
@@ -7370,7 +7370,7 @@ function viewOnboard(){
       :step===2?
        '<p class="sub sm">קובע אילו נושאים יוצעו לכם. אפשר לשנות בכל רגע.</p>'+
        '<div class="seg" style="margin-top:12px">'+TRACKS.map(function(tr){
-         return '<button class="'+(state.track===tr.v?"on":"")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>';
+         return '<button class="'+(state.track===tr.v?"on":"")+'" aria-pressed="'+(state.track===tr.v?"true":"false")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>';
        }).join("")+'</div>'+
        '<p class="sub sm" style="margin-top:12px">רמת הקושי בתרגול:</p><div style="margin-top:8px">'+levelPicker()+'</div>'
       :
@@ -7612,7 +7612,7 @@ function viewTopics(){
   h+='<div class="card pad" style="margin-top:16px"><div class="spread"><div><b>המסלול שלי</b>'+
      '<p class="sub sm">קובע אילו נושאים מוצגים כאן</p></div>'+
      '<div class="seg">'+TRACKS.map(function(tr){
-       return '<button class="'+(state.track===tr.v?"on":"")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>';
+       return '<button class="'+(state.track===tr.v?"on":"")+'" aria-pressed="'+(state.track===tr.v?"true":"false")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>';
      }).join("")+'</div></div>'+
      '<hr class="sep"><div class="spread"><div><b>רמת קושי</b><p class="sub sm">אפשר לשנות גם באמצע סבב</p></div>'+levelPicker()+'</div>'+
      '</div>';
@@ -7716,7 +7716,7 @@ function viewSettings(){
   h+='<div class="card pad" style="margin-top:16px"><div class="h2">'+esc(_("שפה"))+'</div>'+
      '<div class="seg" style="margin-top:10px">'+
      Object.keys(LANGS).map(function(k){
-       return '<button class="'+(LG===k?"on":"")+'" data-a="lang" data-n="'+k+
+       return '<button class="'+(LG===k?"on":"")+'" aria-pressed="'+(LG===k?"true":"false")+'" data-a="lang" data-n="'+k+
          '" lang="'+k+'" dir="'+LANGS[k].dir+'">'+esc(LANGS[k].name)+'</button>';
      }).join("")+'</div></div>';
 
@@ -7738,11 +7738,11 @@ function viewSettings(){
   h+='<div class="card pad" style="margin-top:16px"><div class="h2">קריאה ונגישות</div>'+
      '<p class="sub sm">גודל האותיות</p><div class="seg" style="margin-top:8px">'+
      [[1,"רגיל"],[2,"גדול"],[3,"ענק"]].map(function(o){
-       return '<button class="'+(s.ts===o[0]?"on":"")+'" data-a="ts" data-n="'+o[0]+'">'+o[1]+'</button>';
+       return '<button class="'+(s.ts===o[0]?"on":"")+'" aria-pressed="'+(s.ts===o[0]?"true":"false")+'" data-a="ts" data-n="'+o[0]+'">'+o[1]+'</button>';
      }).join("")+'</div>'+
      '<p class="sub sm" style="margin-top:14px">ערכת צבע</p><div class="seg" style="margin-top:8px">'+
      [["auto","לפי המכשיר"],["light","בהיר"],["dark","כהה"]].map(function(o){
-       return '<button class="'+(s.theme===o[0]?"on":"")+'" data-a="theme" data-n="'+o[0]+'">'+o[1]+'</button>';
+       return '<button class="'+(s.theme===o[0]?"on":"")+'" aria-pressed="'+(s.theme===o[0]?"true":"false")+'" data-a="theme" data-n="'+o[0]+'">'+o[1]+'</button>';
      }).join("")+'</div>'+
      '<div style="margin-top:14px">'+
      togBtn("clearfont","פונט ברור לקריאה","אותיות פשוטות ורחבות, בלי קישוטים")+
@@ -7759,7 +7759,7 @@ function viewSettings(){
      '</div>'+
      '<p class="sub sm" style="margin-top:14px">אורך סבב</p><div class="seg" style="margin-top:8px">'+
      [5,8,12].map(function(n){
-       return '<button class="'+(s.roundLen===n?"on":"")+'" data-a="rlen" data-n="'+n+'">'+n+' שאלות</button>';
+       return '<button class="'+(s.roundLen===n?"on":"")+'" aria-pressed="'+(s.roundLen===n?"true":"false")+'" data-a="rlen" data-n="'+n+'">'+n+' שאלות</button>';
      }).join("")+'</div></div>';
 
   h+='<div class="card pad" style="margin-top:14px"><div class="h2">הקראה</div>'+
@@ -7811,7 +7811,7 @@ function viewSettings(){
      '<p class="sub sm" style="margin-top:10px">שם או כינוי</p>'+
      '<input class="field" style="margin-top:6px" maxlength="18" value="'+esc(state.name)+'" data-bind="name" placeholder="לא חובה" />'+
      '<p class="sub sm" style="margin-top:14px">מסלול</p><div class="seg" style="margin-top:8px">'+
-     TRACKS.map(function(tr){return '<button class="'+(state.track===tr.v?"on":"")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>'}).join("")+
+     TRACKS.map(function(tr){return '<button class="'+(state.track===tr.v?"on":"")+'" aria-pressed="'+(state.track===tr.v?"true":"false")+'" data-a="track" data-t="'+tr.v+'">'+tr.t+'</button>'}).join("")+
      '</div></div>';
 
   h+='<div class="card pad" style="margin-top:14px;border-color:var(--bad)"><div class="h2">איפוס</div>'+
@@ -8632,12 +8632,12 @@ function viewExamNew(){
 
   h+='<div style="margin-top:16px"><b>יחידות</b>'+
      '<div class="seg" style="margin-top:7px">'+[3,4,5].map(function(tr){
-       return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'">'+tr+' יח״ל</button>'
+       return '<button class="'+(state.track===tr?"on":"")+'" aria-pressed="'+(state.track===tr?"true":"false")+'" data-a="track" data-t="'+tr+'">'+tr+' יח״ל</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>רמה</b><div class="seg" style="margin-top:7px">'+
      LVL.map(function(l,i){
-       return '<button class="'+(EB.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
+       return '<button class="'+(EB.level===i+1?"on":"")+'" aria-pressed="'+(EB.level===i+1?"true":"false")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>מספר שאלות: <span id="exNlab">'+EB.n+'</span></b>'+
@@ -8651,7 +8651,7 @@ function viewExamNew(){
      '<div class="grid g2">';
   tops.forEach(function(t){
     var on=EB.topics.indexOf(t.id)>=0;
-    h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" data-a="extopic" data-t="'+t.id+
+    h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" aria-pressed="'+(on?"true":"false")+'" data-a="extopic" data-t="'+t.id+
        '" aria-pressed="'+(on?"true":"false")+'"><span class="tn">'+esc(t.name)+'</span>'+
        '<span class="td">'+esc(t.desc)+'</span></button>';
   });
@@ -9706,7 +9706,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t175-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t176-pwa1").catch(function(){});
   });
 }
 </script>
