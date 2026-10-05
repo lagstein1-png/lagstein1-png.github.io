@@ -29,9 +29,9 @@
 | `electric` | e44 · 2026-10-05 | e44-pwa1 | תואם |
 | `science-mid` | scimid7 · 2026-10-05 | scimid7-pwa1 | תואם |
 | `biology` | bg8 · 2026-10-05 | bg8-pwa1 | תואם |
-| `geography` | q30 · 2026-10-05 | q30-pwa1 | תואם |
+| `geography` | q31 · 2026-10-05 | q31-pwa1 | תואם |
 | `bagrut-history` | h127 · 2026-10-05 | h127-pwa1 | תואם |
-| `islam` | is8 · 2026-10-05 | is8-pwa1 | תואם |
+| `islam` | is9 · 2026-10-05 | is9-pwa1 | תואם |
 | `russian` | ru9 · 2026-10-05 | ru9-pwa1 | תואם |
 | `tanakh-elem` | te13 · 2026-10-05 | te13-pwa1 | תואם |
 | `civics-elem` | mc14 · 2026-10-05 | mc14-pwa1 | תואם |

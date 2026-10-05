@@ -233,8 +233,19 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
       /* הצד השני: עונים (לחיצה על אפשרות עד שהשאלה ננעלת — נכונה, או
          שתי טעויות וחשיפה), ואז ״הבא״ חייב לעבור. בלי זה סירוב גורף
          (`run` שמחזירה תמיד false) היה עובר את הבדיקה. */
-      for (let i = 0; i < 4 && !(await page.evaluate(() => !!(window.R && R.locked))); i++) {
-        await page.evaluate(() => { const o = document.querySelector('button.opt:not([disabled])'); if (o) o.click() });
+      /* **לוחצים על אפשרות אחרת בכל סיבוב, ולא על ״הראשונה שאינה
+         מושבתת״ — 5.10.2026.** `science-12` אינה חושפת את התשובה: אחרי
+         שלוש טעויות היא מאפסת את `R.gone` ומחזירה את כל האפשרויות,
+         ולכן `querySelector` חזר ללחוץ על אותה אפשרות ראשונה והלולאה
+         לא נגעה בתשובה הנכונה כשהיא הייתה הרביעית בערבוב. נמדד: 2
+         נפילות מתוך 6 הרצות על אותו קומיט. כאן נלחץ `data-i` לפי
+         אינדקס, אחד־אחד, ולכן כל אפשרות נלחצת בדיוק פעם אחת. */
+      const nOpts = await page.evaluate(() => document.querySelectorAll('button.opt').length);
+      for (let i = 0; i < nOpts && !(await page.evaluate(() => !!(window.R && R.locked))); i++) {
+        await page.evaluate(k => {
+          const o = document.querySelector('button.opt[data-i="' + k + '"]') || document.querySelectorAll('button.opt')[k];
+          if (o && !o.disabled) o.click();
+        }, i);
         await page.waitForTimeout(150);
       }
       if (!(await page.evaluate(() => !!(window.R && R.locked)))) F('O-128: לא הצלחתי לענות על השאלה (R.locked לא נדלק)');
