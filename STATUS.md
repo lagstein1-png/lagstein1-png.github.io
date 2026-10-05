@@ -19,7 +19,7 @@
 | `theory` | — | — | אינה בריפו הזה |
 | `civics` | c32 · 2026-10-04 | c32-pwa1 | תואם |
 | `hebrew` | i28 · 2026-10-04 | i28-pwa1 | תואם |
-| `hebrew-lit` | hl10 · 2026-10-04 | hl10-pwa1 | תואם |
+| `hebrew-lit` | hl11 · 2026-10-04 | hl11-pwa1 | תואם |
 | `english-bagrut` | — | — | אינה בריפו הזה |
 | `literature` | j26 · 2026-10-04 | j26-pwa1 | תואם |
 | `tanakh` | p26 · 2026-10-04 | p26-pwa1 | תואם |

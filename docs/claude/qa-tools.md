@@ -18,6 +18,7 @@
     node .claude/qa/storage.js               # מפתח localStorage אחד לאפליקציה אחת
     node .claude/qa/say.js                   # ההקראה לא מסגירה את התשובה לפני שעונים
     node .claude/qa/spacesay.js              # אותה דליפה, סטטית, בכל האפליקציות שב-stages.json
+    node .claude/qa/barcontrast.js           # ניגודיות ארבעת הפקדים בפס הכותרת — בחישוב, בלי דפדפן
     node .claude/qa/saysym.js                # מה באמת נאמר — אין ^ או _ גולמי בהקראה
     node .claude/qa/guess.js                 # אי אפשר לקלוע לפי אורך התשובה או מיקומה; תא שחצה נמדד שוב לפני שמפיל
     node .claude/qa/visible.js               # מסיח בשאלת חסר שכבר גלוי במשפט — נפסל בלי ידע
