@@ -203,6 +203,19 @@ const SOURCES = {
      והוראות התרגיל (i_*) מ-js/i18n.js. corpus קורא אותם במסלול נפרד (hebrewLit).
      בכוונה לא כולל: מילה בודדת והברה (אותן הילד מפענח, והקלטה שגויה מלמדת
      שגיאה), ומשפטי CT_* שנבנים בזמן ריצה מנושא ופועל. */
+  /* גאוגרפיה ליסודי (5.10.2026): `GEOBANK` בנוי בדיוק כמו `SCIBANK`
+     של `science` — שורה היא ["נושא", רמה, {he:[…],ar:[…],…}] — ולכן
+     אותו קורא, עם שם המערך כפרמטר. **שיעורי geo1–geo3 אינם כאן**:
+     שם `he` הוא אובייקט מפתחות (`he:{g1Title:"…"}`) ואף קורא אינו
+     תופס אותו; זה מסלול נוסף שעוד לא נכתב. */
+  /* מוט״ל (5.10.2026): 153 פריטים סטטיים, מבנה literature. **לא**
+     הקורא הכללי — ראו ההערה מעל motalBank. */
+  motal: ['motal/index.html'],
+  'geography-elem': ['geography-elem/index.html'],
+  /* כותבים ביחד (5.10.2026): הקטעים עטופים ב-`F(he,ar,ru,en)` — אותו
+     מבנה כמו `L()` ב-math-elem, בשם אחר. נמדד: `F("…",` תופס 130
+     מתוך 130 הקריאות, ואין בקובץ אף קריאה משורשרת. */
+  kotvim: ['kotvim/index.html'],
   'hebrew-lit': ['hebrew-lit/js/data.js', 'hebrew-lit/js/i18n.js']
 };
 
@@ -223,10 +236,15 @@ function unquote(raw) {
 /* science/index.html: const SCIBANK=[["bio",1,{"he":[...],"en":[...]}],...].
    המחרוזות העבריות הן המערכים שבתוך "he". קוראים את המערך בספירת
    סוגריים (מחרוזות מוגנות) ו-JSON.parse, בלי eval. */
-function sciBank(text) {
-  const k = text.indexOf('const SCIBANK=');
-  if (k < 0) throw new Error('science: SCIBANK לא נמצא');
-  const i = k + 'const SCIBANK='.length;
+function sciBank(text, name) {
+  /* 5.10.2026: אותו מבנה בדיוק קיים גם ב-geography-elem בשם `GEOBANK`
+     — שורה היא ["נושא", רמה, {he:[…],ar:[…],ru:[…],en:[…]}]. במקום
+     קורא שני, שם המערך הוא פרמטר. */
+  name = name || 'SCIBANK';
+  const decl = 'const ' + name + '=';
+  const k = text.indexOf(decl);
+  if (k < 0) throw new Error(name + ' לא נמצא');
+  const i = k + decl.length;
   let d = 0, q = null, esc = false, j = i;
   for (; j < text.length; j++) {
     const c = text[j];
@@ -245,9 +263,86 @@ function sciBank(text) {
    רק את התחילית הקטועה ("איזה מספר בא אחרי "), מקליטה אותה, ואף
    RECORDED.play בזמן ריצה לא יתאים לה לעולם (ה-id תלוי במספר) —
    הוצאה בלי תועלת. נמצא ותוקן 3.10.2026, לפני ההקלטה הראשונה. */
-function mathElemBank(text) {
+/* motal/index.html — ולמה לא הקורא הכללי.
+
+   המבנה כאן זהה ל-literature: שלוש קריאות `topic(id,trk,n,d,levels)`,
+   וכל רמה מערך של `Q(id,q,opts,ok,hint,ex,fig,wrong)`. הקורא הכללי
+   (`he:"…"`) אמנם רץ עליו, אבל הוא מקליט את הדבר הלא נכון: את
+   **ההסבר לבדו** (`ex`), שלעולם אינו נאמר לבד, ומחמיץ את ההקראה
+   המרכזית של האפליקציה — `say`, שהוא ״השאלה, התשובה הנכונה וההסבר״
+   מחוברים (`buildFromItem`, שורה 2191). מזהה ההקלטה הוא גיבוב של
+   המחרוזת השלמה, ולכן קליפ של ההסבר לבדו לא יתאים לעולם.
+
+   שלוש הצורות שבאמת מגיעות ל-`speak`, ועוד אחת בדף המושגים:
+     1. `gl(it.q)`                      — `askBox`, **בלי** saySpell
+     2. `saySpell(gl(it.hint))`         — שורות 4272, 4475
+     3. `saySpell(q.say)`               — שורות 2426, 2590
+     4. `gl(o)` לכל אפשרות                — כפתור רמקול לכל תשובה, שורה 2408
+     5. `term + ". " + def`             — דף המושגים, שורה 2241
+   `plainOf` חל אחר כך בתוך `speak`, בדיוק כמו כאן. */
+function motalBank(text) {
+  const vm = require('vm');
+  const a = text.indexOf('\nvar TOPICS=[];');
+  const b = text.indexOf('\nfunction itemId(', a);
+  if (a < 0 || b < 0) throw new Error('motal: בלוק ה-topic לא נמצא');
+  const ctx = { TOPICS: [] };
+  vm.createContext(ctx);
+  vm.runInContext(
+    'var TOPICS=[];' +
+    'function topic(id,trk,n,d,levels){TOPICS.push({id:id,trk:trk,n:n,d:d,L:levels})}' +
+    'function Q(id,q,opts,ok,hint,ex,fig,wrong){' +
+    '  return {id:id,q:q,o:opts,ok:ok,hint:hint,ex:ex,fig:fig||null,wrong:wrong||null} }' +
+    text.slice(a, b).replace(/^[\s\S]*?var TOPICS=\[\];/, ''),
+    ctx, { timeout: 20000 });
+
+  /* העתק מדויק מ-motal/index.html שורה 2165. מזהה שגוי כאן הוא
+     קליפ שלא ינוגן לעולם. */
+  const saySpell = x => String(x == null ? '' : x)
+    .replace(/[\u201c\u201d\u2018\u2019]/g, '')
+    .replace(/\u05f4/g, (m, i, str) => /^[\u05d0-\u05ea](?![\u05d0-\u05ea])/.test(str.slice(i + 1)) ? m : '')
+    .replace(/\s\u2014\s/g, ', ');
+  const he = o => (o && o.he) || '';
+
+  const out = [];
+  for (const tp of ctx.TOPICS)
+    for (const lv of (tp.L || []))
+      for (const it of (lv || [])) {
+        if (!it) continue;
+        out.push(he(it.q));
+        if (it.hint) out.push(saySpell(he(it.hint)));
+        const ans = he(it.o && it.o[it.ok]);
+        out.push(saySpell(he(it.q) + ' ' + ans + '. ' + he(it.ex)));
+        /* לכל אפשרות כפתור רמקול משלה בתרגול החופשי (שורה 2408):
+           `data-say="plainOf(o.h)"`, ו-`o.h` הוא `esc(gl(o))`.
+           ה-`plainOf` שכאן מפענח ישויות, ולכן הטקסט הגולמי מספיק. */
+        for (const o of (it.o || [])) out.push(he(o));
+      }
+
+  /* דף המושגים: `term + ". " + def`, מחרוזת אחת מחוברת. */
+  const ck = text.indexOf('\nvar CONCEPTS=[');
+  if (ck >= 0) {
+    const i = ck + '\nvar CONCEPTS='.length;
+    let d = 0, q = null, esc = false, j = i;
+    for (; j < text.length; j++) {
+      const c = text[j];
+      if (q) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === q) q = null; continue }
+      if (c === '"') { q = c; continue }
+      if (c === '[') d++;
+      if (c === ']') { d--; if (!d) { j++; break } }
+    }
+    for (const c of JSON.parse(text.slice(i, j))) out.push(he(c.t) + '. ' + he(c.d));
+  }
+  return out;
+}
+
+function mathElemBank(text, fn) {
+  /* 5.10.2026: `kotvim` עוטף את הקטעים ב-`F(he,ar,ru,en)` — אותו מבנה
+     בדיוק, בשם אחר. שם הפונקציה הוא פרמטר, והפסיק אחרי המרכאות
+     הסוגרות נשאר חובה מאותה סיבה (ראו ההערה למעלה). */
+  fn = fn || 'L';
   const seen = new Map();
-  for (const m of text.matchAll(/\bL\(\s*"((?:[^"\\]|\\.)*)"\s*,/g)) {
+  const re = new RegExp('\\b' + fn + '\\(\\s*"((?:[^"\\\\]|\\\\.)*)"\\s*,', 'g');
+  for (const m of text.matchAll(re)) {
     const t = plainOf(unquote(m[1]));
     if (!/[א-ת]/.test(t)) continue;
     if (t.split(' ').length < 2) continue;
@@ -376,6 +471,18 @@ function corpus(app) {
     }
     return seen;
   }
+  if (app === 'motal') {
+    const tf = path.join(ROOT, files[0]);
+    if (!fs.existsSync(tf)) return seen;
+    for (const raw of motalBank(fs.readFileSync(tf, 'utf8'))) {
+      const text = plainOf(String(raw));
+      if (!/[\u05d0-\u05ea]/.test(text)) continue;
+      if (text.split(' ').length < 2) continue;
+      const id = R.id(text);
+      if (!seen.has(id)) seen.set(id, text);
+    }
+    return seen;
+  }
   if (app === 'tanakh-elem') {
     const tf = path.join(ROOT, files[0]);
     if (!fs.existsSync(tf)) return seen;
@@ -388,15 +495,16 @@ function corpus(app) {
     }
     return seen;
   }
-  if (app === 'math-elem' || app === 'math-g7') {
+  if (app === 'math-elem' || app === 'math-g7' || app === 'kotvim') {
     const sf = path.join(ROOT, files[0]);
     if (!fs.existsSync(sf)) return seen;
-    return mathElemBank(fs.readFileSync(sf, 'utf8'));
+    return mathElemBank(fs.readFileSync(sf, 'utf8'), app === 'kotvim' ? 'F' : 'L');
   }
-  if (app === 'science') {
+  if (app === 'science' || app === 'geography-elem') {
     const sf = path.join(ROOT, files[0]);
     if (!fs.existsSync(sf)) return seen;
-    const bank = sciBank(fs.readFileSync(sf, 'utf8'));
+    const bank = sciBank(fs.readFileSync(sf, 'utf8'),
+                         app === 'geography-elem' ? 'GEOBANK' : 'SCIBANK');
     for (const row of bank) for (const raw of (row[2] && row[2].he) || []) {
       const text = plainOf(String(raw)).replace(/[\u{1F300}-\u{1FAFF}\u{FE0F}\u{200D}]/gu, '').replace(/\s{2,}/g, ' ').trim();
       if (!/[א-ת]/.test(text)) continue;
