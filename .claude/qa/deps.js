@@ -11,13 +11,24 @@
    2. כל סקריפט מקומי קיים בדיסק, וכל אחד מהם נמצא גם ב-PRE של sw.js
       (אחרת האפליקציה מבטיחה אופליין ונופלת בלי רשת).
    3. אין import(, require(, או fetch( לכתובת חיצונית באף קובץ.
-   הוכחת נפילה: FINDINGS.md, שלב D של רקיע.
+   4. אין import סטטי מכתובת חיצונית (`import … from "https://…"`).
+      עד 5.10.2026 הבדיקה לא ראתה אותו בכלל — רק את import( — ולא
+      הלכה אחרי import מקומי לקובץ הבא. עכשיו היא הולכת אחרי
+      `from "./x.js"` ואחרי `new URL("./x.js", import.meta.url)`.
+   החריג היחיד: `gemma/` — מודל שפה במכשיר, בהכרעת הבעלים 5.10.2026.
+   הוא רשאי לייבא את שתי הספריות של המודל מ-jsdelivr, ורק אותן (EXEMPT).
+   הוכחת נפילה: FINDINGS.md, שלב D של רקיע; סעיף 4 — FINDINGS.md, 5.10.2026.
    ===================================================================== */
 'use strict';
 const fs = require('fs'), path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const PAGES = process.argv.slice(2).length ? process.argv.slice(2) : ['rakia'];
 const ALLOWED = /^(https?:)?\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|gc\.zgo\.at)(\/|$)/;
+const EXEMPT = { gemma: /^https:\/\/cdn\.jsdelivr\.net\/npm\/(@mlc-ai\/web-llm|@mediapipe\/tasks-genai)(\/|$)/ };
+const EXTERNAL = u => /^(https?:)?\/\//.test(u);
+/* import סטטי ו-export…from, וגם import "x" בלי from. */
+const STATIC_IMPORT = /(?:^|[;\n}])\s*(?:import|export)\s+(?:[^'"`;]*?\sfrom\s*)?["']([^"']+)["']/g;
+const WORKER_URL = /new\s+URL\s*\(\s*["']([^"']+)["']\s*,\s*import\.meta\.url/g;
 let bad = 0;
 for (const app of PAGES) {
   const file = path.join(ROOT, app, 'index.html');
@@ -39,8 +50,20 @@ for (const app of PAGES) {
     const key = u.startsWith('/') ? u : './' + u.replace(/^\.\//, '');
     if (sw && !pre.includes('"' + key + '"')) { bad++; console.log(`✗ ${app}: ${u} נטען אבל אינו ב-PRE של sw.js — לא יעבוד אופליין`); }
   }
-  for (const f of files) {
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
     const src = fs.readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    for (const m of [...src.matchAll(STATIC_IMPORT), ...src.matchAll(WORKER_URL)]) {
+      const u = m[1];
+      if (EXTERNAL(u)) {
+        if (!ALLOWED.test(u) && !(EXEMPT[app] && EXEMPT[app].test(u))) { bad++; console.log(`✗ ${path.relative(ROOT, f)}: import סטטי מכתובת חיצונית — ${u}`); }
+        continue;
+      }
+      if (!/^\.{0,2}\//.test(u)) continue;
+      const dep = u.startsWith('/') ? path.join(ROOT, u) : path.resolve(path.dirname(f), u);
+      if (!fs.existsSync(dep)) { bad++; console.log(`✗ ${path.relative(ROOT, f)}: import מקומי חסר — ${u}`); continue; }
+      if (!files.includes(dep)) files.push(dep);
+    }
     const rel = path.relative(ROOT, f);
     if (/\bimport\s*\(/.test(src)) { bad++; console.log(`✗ ${rel}: import(`); }
     if (/\brequire\s*\(/.test(src)) { bad++; console.log(`✗ ${rel}: require(`); }

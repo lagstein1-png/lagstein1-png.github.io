@@ -49,6 +49,13 @@
       המותר הוא `tutor/tutor.js`, ו-`.claude/qa/tutor.js` הוא
       שבודק שהוא אכן מחווט בשתים־עשרה האפליקציות.
 
+   4. **מודל שפה בדפדפן — רק ב-`gemma/`.** בהכרעת הבעלים 5.10.2026
+      נוסף דף ניסוי שמריץ Gemma במכשיר (WebLLM / MediaPipe). זה מוח
+      שני במתכוון, והחריג תחום לתיקייה אחת: אף קובץ קוד שנעקב מחוץ
+      ל-`gemma/` (ומחוץ לכלים ב-`.claude/`) אינו רשאי לשאת את שמות
+      שתי הספריות. כך לימור אינה יכולה לאמץ אותו בשקט — חיבור אליה
+      הוא החלטה, לא חיווט. הוכחת נפילה: FINDINGS.md, 5.10.2026.
+
    הוכחת נפילה, 12.9.2026: החזרת שתי התגיות לדף הבית בלבד הפילה את
    שלוש הבדיקות יחד — `index.html` נכנס לקבוצת ההגיעוּת ואיתו
    `josh-engine.js`, שנושא גם את ויקיפדיה וגם את `global.Josh`.
@@ -117,6 +124,15 @@ for (const [p, from] of [...reach].sort()) {
     hit(p, from, 'ספק חיפוש חיצוני בקוד שנטען. אין חיפוש מהדפדפן — ראו O-48');
   if (GLOBAL.test(s))
     hit(p, from, 'מגדיר ג׳וש גלובלי. הממשק היחיד הוא tutor/tutor.js');
+}
+
+/* 4 — מודל שפה בדפדפן מחוץ לתיקייה שלו */
+const ON_DEVICE = /@mlc-ai\/web-llm|@mediapipe\/tasks-genai/;
+for (const f of tracked) {
+  if (!/\.(js|mjs|html)$/i.test(f) || f.startsWith('.claude/') || f.startsWith('gemma/')) continue;
+  const s = read(f); if (s == null) continue;
+  if (ON_DEVICE.test(s))
+    hit(f, 'git ls-files', 'מודל שפה בדפדפן מחוץ ל-gemma/. החריג חל על התיקייה הזאת בלבד — ראו CLAUDE.md');
 }
 
 for (const h of hits) console.log(h);
