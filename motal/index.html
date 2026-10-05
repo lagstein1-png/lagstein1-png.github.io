@@ -1074,7 +1074,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="d19 · 2026-10-04";
+var BUILD="d20 · 2026-10-05";
 var SKEY="motal-state-v1";
 var GKEY_STORE="motal-gkey";
 
@@ -2257,18 +2257,18 @@ function hdr(){
   return '<div class="hbar"><div class="wrap hrow">'+
     '<h1 class="brand">'+esc(t("app"))+'<small>'+esc(t("tagline"))+'</small></h1>'+
     (s==="home"?"":'<button class="gbtn" data-a="home">'+ic("home",16)+" "+esc(t("navHome"))+"</button>")+
-    '<button class="gbtn'+(s==="sim"?" on":"")+'" data-a="sim">'+ic("play",16)+" "+esc(t("navSim"))+"</button>"+
+    '<button class="gbtn'+(s==="sim"?" on":"")+'" aria-pressed="'+(s==="sim"?"true":"false")+'" data-a="sim">'+ic("play",16)+" "+esc(t("navSim"))+"</button>"+
     /* בנק הטעויות מופיע רק כשיש בו משהו. כפתור שמוביל תמיד
        למסך ריק מלמד להתעלם ממנו. */
-    (badList().length?'<button class="gbtn'+(s==="bad"?" on":"")+'" data-a="bad">'+ic("redo",16)+" "+
+    (badList().length?'<button class="gbtn'+(s==="bad"?" on":"")+'" aria-pressed="'+(s==="bad"?"true":"false")+'" data-a="bad">'+ic("redo",16)+" "+
       esc(t("navBad"))+" ("+badList().length+")</button>":"")+
-    '<button class="gbtn'+(s==="form"?" on":"")+'" data-a="form">'+ic("book",16)+" "+esc(t("navForm"))+"</button>"+
-    '<button class="gbtn'+(s==="prog"?" on":"")+'" data-a="prog">'+ic("chart",16)+" "+esc(t("navProg"))+"</button>"+
+    '<button class="gbtn'+(s==="form"?" on":"")+'" aria-pressed="'+(s==="form"?"true":"false")+'" data-a="form">'+ic("book",16)+" "+esc(t("navForm"))+"</button>"+
+    '<button class="gbtn'+(s==="prog"?" on":"")+'" aria-pressed="'+(s==="prog"?"true":"false")+'" data-a="prog">'+ic("chart",16)+" "+esc(t("navProg"))+"</button>"+
     /* מסך המורה נעלם מהכותרת כשנבחר קוד והמכשיר נעול. */
-    (teOpen()?'<button class="gbtn'+(view==="marks"?" on":"")+'" data-a="marks">'+ic("share",16)+" "+esc(t("navExam"))+"</button>":"")+
-    '<button class="gbtn'+(s==="set"?" on":"")+'" data-a="set">'+ic("gear",16)+" "+esc(t("navSet"))+"</button>"+
+    (teOpen()?'<button class="gbtn'+(view==="marks"?" on":"")+'" aria-pressed="'+(view==="marks"?"true":"false")+'" data-a="marks">'+ic("share",16)+" "+esc(t("navExam"))+"</button>":"")+
+    '<button class="gbtn'+(s==="set"?" on":"")+'" aria-pressed="'+(s==="set"?"true":"false")+'" data-a="set">'+ic("gear",16)+" "+esc(t("navSet"))+"</button>"+
     '<span class="hlang" role="group">'+Object.keys(LANGS).map(function(k){
-      return '<button class="'+(state.lang===k?"on":"")+'" data-a="lang" data-v="'+k+
+      return '<button class="'+(state.lang===k?"on":"")+'" aria-pressed="'+(state.lang===k?"true":"false")+'" data-a="lang" data-v="'+k+
         '" lang="'+k+'" dir="'+LANGS[k].dir+'">'+esc(LANGS[k].name)+'</button>';
     }).join("")+'</span>'+
   "</div></div>"}
@@ -2320,12 +2320,12 @@ function levelBar(tp){
   var h='<div class="lvls">',i;
   for(i=1;i<=3;i++){
     var m=mastery(tp.id,i);
-    h+='<button class="lvl'+(state.level===i&&!state.challenge?" on":"")+'" data-a="lvl" data-v="'+i+'">'+
+    h+='<button class="lvl'+(state.level===i&&!state.challenge?" on":"")+'" aria-pressed="'+(state.level===i&&!state.challenge?"true":"false")+'" data-a="lvl" data-v="'+i+'">'+
       esc(t("lv"+i))+' <span class="bar '+barCls(m)+'" style="width:2.6rem;flex:none">'+
       '<i style="width:'+Math.round(m*100)+'%"></i></span></button>';
   }
   if(CH_GATE){
-    h+='<button class="lvl'+(state.challenge?" on":"")+'" data-a="chal"'+(state.challenge?' style="background:#6d28d9;color:#fff;border-color:#6d28d9;font-weight:700"':"")+'>'+esc(t("lvC"))+'</button>';
+    h+='<button class="lvl'+(state.challenge?" on":"")+'" aria-pressed="'+(state.challenge?"true":"false")+'" data-a="chal"'+(state.challenge?' style="background:#6d28d9;color:#fff;border-color:#6d28d9;font-weight:700"':"")+'>'+esc(t("lvC"))+'</button>';
   }
   h+="</div>";
   if(CH_GATE&&state.challenge){
@@ -2333,7 +2333,7 @@ function levelBar(tp){
        '<span style="font-size:.88rem;color:var(--muted)">'+esc(t("chMixed"))+'</span>'+
        '<span style="font-size:.88rem;color:var(--muted)">· '+esc(t("chTimer"))+':</span>'+
        [0,30,60].map(function(s){
-         return '<button class="lvl'+(state.chSecs===s?" on":"")+'" data-a="chsec" data-v="'+s+'" style="min-height:46px">'+(s===0?esc(t("chOff")):esc(t("chSec").replace("{0}",s)))+'</button>';
+         return '<button class="lvl'+(state.chSecs===s?" on":"")+'" aria-pressed="'+(state.chSecs===s?"true":"false")+'" data-a="chsec" data-v="'+s+'" style="min-height:46px">'+(s===0?esc(t("chOff")):esc(t("chSec").replace("{0}",s)))+'</button>';
        }).join("")+'</div>';
   }
   return h;
@@ -2668,7 +2668,7 @@ function screenSet(){
   h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
      esc(t("setLang"))+"</h3><div class=\"lvls\">";
   Object.keys(LANGS).forEach(function(k){
-    h+='<button class="lvl'+(state.lang===k?" on":"")+'" data-a="lang" data-v="'+k+'" lang="'+k+'" dir="'+LANGS[k].dir+'">'+
+    h+='<button class="lvl'+(state.lang===k?" on":"")+'" aria-pressed="'+(state.lang===k?"true":"false")+'" aria-pressed="'+(state.lang===k?"true":"false")+'" data-a="lang" data-v="'+k+'" lang="'+k+'" dir="'+LANGS[k].dir+'">'+
       esc(LANGS[k].name)+"</button>";
   });
   h+='<p style="color:var(--muted);font-size:.85rem;margin:.4rem 0 0">'+esc(t("setLangD"))+"</p>";
@@ -2682,9 +2682,9 @@ function screenSet(){
      '<p class="sub" style="margin-top:.3rem;opacity:.7">'+esc(BUILD)+'</p></div>';
   h+=vstrip();
   h+='<div class="vgrid" style="margin:.6rem 0">'+
-     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" data-a="vmode" data-v="device">'+
+     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" aria-pressed="'+(state.voiceMode==="device"?"true":"false")+'" aria-pressed="'+(state.voiceMode==="device"?"true":"false")+'" data-a="vmode" data-v="device">'+
      '<span><span class="nm">'+esc(t("vDev"))+'</span><br><span class="ds">'+esc(t("vDevD"))+"</span></span></button>"+
-     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" data-a="vmode" data-v="gem">'+
+     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" aria-pressed="'+(state.voiceMode==="gem"?"true":"false")+'" aria-pressed="'+(state.voiceMode==="gem"?"true":"false")+'" data-a="vmode" data-v="gem">'+
      '<span><span class="nm">'+esc(t("vGem"))+'</span><br><span class="ds">'+esc(t("vGemD"))+"</span></span></button></div>";
 
   h+='<div class="row"><div><div class="lab">'+esc(t("rate"))+'</div>'+
@@ -2734,7 +2734,7 @@ function screenSet(){
   });
   h+='<div class="row"><div class="lab">'+esc(t("theme"))+'</div><div class="lvls">'+
      [["auto","thAuto"],["light","thLight"],["dark","thDark"]].map(function(x){
-       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" data-a="theme" data-v="'+x[0]+'">'+
+       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" aria-pressed="'+(state.theme===x[0]?"true":"false")+'" aria-pressed="'+(state.theme===x[0]?"true":"false")+'" data-a="theme" data-v="'+x[0]+'">'+
          esc(t(x[1]))+"</button>"}).join("")+"</div></div>";
   h+="</div>";
 
@@ -3252,12 +3252,12 @@ function viewExamNew(){
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exUnits"))+'</b>'+
      '<div class="seg" style="margin-top:7px">'+[3,4,5].map(function(tr){
-       return '<button class="'+(state.track===tr?"on":"")+'" data-a="track" data-t="'+tr+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
+       return '<button class="'+(state.track===tr?"on":"")+'" aria-pressed="'+(state.track===tr?"true":"false")+'" data-a="track" data-t="'+tr+'">'+tr+' '+esc(xt("exUnitSuf"))+'</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exLevel"))+'</b><div class="seg" style="margin-top:7px">'+
      LVL.map(function(l,i){
-       return '<button class="'+(EB.level===i+1?"on":"")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
+       return '<button class="'+(EB.level===i+1?"on":"")+'" aria-pressed="'+(EB.level===i+1?"true":"false")+'" style="--c:'+LVL_C[i]+'" data-a="exlvl" data-l="'+(i+1)+'">'+l+'</button>'
      }).join("")+'</div></div>';
 
   h+='<div style="margin-top:16px"><b>'+esc(xt("exCount"))+': <span id="exNlab">'+EB.n+'</span></b>'+
@@ -3272,7 +3272,7 @@ function viewExamNew(){
      '<div class="grid g2">';
   tops.forEach(function(t){
     var on=EB.topics.indexOf(t.id)>=0;
-    h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" data-a="extopic" data-t="'+t.id+
+    h+='<button class="tpc '+areaCls(t.area)+(on?" on":"")+'" aria-pressed="'+(on?"true":"false")+'" data-a="extopic" data-t="'+t.id+
        '" aria-pressed="'+(on?"true":"false")+'"><span class="tn">'+esc(tName(t))+'</span>'+
        '<span class="td">'+esc(tDesc(t))+'</span></button>';
   });
@@ -4526,7 +4526,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=d19-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=d20-pwa1").catch(function(){});
   });
 }
 </script>
