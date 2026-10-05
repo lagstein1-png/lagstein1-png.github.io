@@ -99,7 +99,15 @@ jobs:
       - name: ספק וקול
         id: prov
         run: |
+          # **gcloud חסום — הכרעת הבעלים 5.10.2026.** הוא הוקם, נבדק
+          # בריצה 106 (שמונה קליפים ב-geography, he-IL-Chirp3-HD-Gacrux),
+          # והבעלים האזין ופסל: הקול אינו מובן. הקליפים נמחקו, וכל
+          # ההקלטות ממשיכות בג׳מיני. נעצר כאן ולא אחרי שהרנר כבר עלה.
           P="${{ github.event.inputs.provider || vars.TTS_PROVIDER || 'gemini' }}"
+          if [ "$P" = "gcloud" ]; then
+            echo "::error::Cloud TTS נפסל על ידי הבעלים ב-5.10.2026 — הקול אינו מובן. הריצו עם provider ריק או gemini."
+            exit 1
+          fi
           V="${{ github.event.inputs.voice || vars.TTS_VOICE }}"
           echo "provider=$P" >> "$GITHUB_OUTPUT"
           echo "voice=$V" >> "$GITHUB_OUTPUT"

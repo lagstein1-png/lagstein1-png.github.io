@@ -149,7 +149,11 @@ const S = ['שלום לכולם היום', 'אנחנו לומדים יחד', 'ז
 {
   const T = tree('gcloud', { english: S.slice(0, 2) });
   manifest(T, 'english', 'he-IL-Chirp3-HD-Kore', []);
-  const r = run(T, ['english', '--max', '2'], { TTS_PROVIDER: 'gcloud', TTS_VOICE: 'he-IL-Chirp3-HD-Kore' });
+  /* הספק חסום מ-5.10.2026 (הבעלים פסל את הקול), אבל המסלול עצמו
+     נשאר בקוד — ולכן גם הבדיקה שלו. פתח המילוט הוא בדיוק בשביל
+     זה: בדיקה מותר לה לעבור בו, הקלטה אמיתית לא. */
+  const r = run(T, ['english', '--max', '2'], { TTS_PROVIDER: 'gcloud', TTS_VOICE: 'he-IL-Chirp3-HD-Kore',
+                                                TTS_ALLOW_GCLOUD: 'I-KNOW-THE-OWNER-REJECTED-IT' });
   const rates = S.slice(0, 2).map(s => kbpsOf(path.join(T, 'english', 'audio', 'he', R.id(s) + '.mp3')));
   check('2. gcloud: שני הקליפים נכתבו ב-64k', rates.every(k => k === 64), 'קצבים ' + rates.join(',') + ' · ' + r.out.split('\n').filter(l => /✗/.test(l)).slice(0, 2).join(' | '));
 }

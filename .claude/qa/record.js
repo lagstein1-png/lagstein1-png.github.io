@@ -51,7 +51,21 @@ const QUALITY = require('./record-quality.js');
    מונו, בלי ID3 ובלי Info — לא הצינור שלנו (ffmpeg מוסיף את שניהם)
    ולא ההקלטות שבריפו הנפרד; מתאים ל-MP3 שמחזיר Cloud TTS. לכן
    הספק הזה נכנס, ובוחרים אותו ב-TTS_PROVIDER=gcloud עם TTS_KEY. */
+/* **Cloud TTS אסור — הכרעת הבעלים 5.10.2026.** הוא הוקם, נבדק
+   בריצת אימות קטנה (37310788622, שמונה קליפים ב-geography בקול
+   he-IL-Chirp3-HD-Gacrux), והבעלים האזין ופסל: **הקול אינו מובן.**
+   שמונת הקליפים נמחקו והמניפסט הוחזר. כל ההקלטות ממשיכות בג׳מיני.
+
+   המסלול עצמו (`synthGcloud`, `GCLOUD`, תמחור `cloud-tts`) נשאר
+   בקובץ ואינו נמחק — הוא עבד, והמחיקה הייתה מוחקת גם את הידיעה
+   שניסינו ולמה נפסל. אבל הוא **חסום**: בקשה מפורשת ל-gcloud
+   נעצרת כאן ולא בבקשה הראשונה, אחרי שכבר שילמנו על הרנר. */
 const PROVIDER = (process.env.TTS_PROVIDER || 'gemini').toLowerCase();
+if (PROVIDER === 'gcloud' && process.env.TTS_ALLOW_GCLOUD !== 'I-KNOW-THE-OWNER-REJECTED-IT') {
+  console.error('Cloud TTS נפסל על ידי הבעלים ב-5.10.2026 — הקול אינו מובן. ' +
+                'כל ההקלטות בג׳מיני. (TTS_PROVIDER=gemini)');
+  process.exit(1);
+}
 const KEY   = PROVIDER === 'gcloud'
   ? (process.env.TTS_KEY || '')
   : (process.env.GEMINI_API_KEY || process.env.GEMINI_KEY || '');
@@ -74,12 +88,10 @@ const BATCH_MAX_CHARS = 16000;
    (25 אסימונים לשנייה = כ-655 שניות). ~11 תווים לשניית דיבור
    בעברית + 2.2 שניות שקט בין פריטים. */
 const BATCH_MAX_SEC = 600;
-/* **Gacrux ולא Kore ב-gcloud — הכרעת הבעלים 5.10.2026:** ״gcloud runs
-   must use he-IL-Chirp3-HD-Gacrux to match Limor's voice״. הקול של
-   לימור באתר הוא Gacrux (ההוראה מ-3.10 ב-record.yml), ושני קולות
-   שונים על אותה אפליקציה נשמעים כשתי מורות. אם Gacrux אינו קיים
-   ב-Chirp3-HD לעברית — **עוצרים ומדווחים**, ולא מקליטים בקול אחר;
-   השומר הוא הצעד ״הקול קיים״ שב-record.yml. */
+/* הערך ל-gcloud נשאר רשום, אבל הספק חסום (ראו למעלה). Gacrux
+   **כן** קיים ב-Chirp3-HD לעברית — השער שב-record.yml אימת זאת
+   מול רשימת הקולות של השרת ב-5.10.2026 — אלא שהצליל עצמו נפסל
+   בהאזנה. קיים אינו אומר מובן. */
 const VOICE = process.env.TTS_VOICE || process.env.GEMINI_TTS_VOICE ||
               (PROVIDER === 'gcloud' ? 'he-IL-Chirp3-HD-Gacrux' : 'Kore');   /* הבעלים, 2.10.2026: Kore בכל האתר, כמו בתאוריה מדברת */
 const API   = 'https://generativelanguage.googleapis.com/v1beta';
