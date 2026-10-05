@@ -24,12 +24,22 @@ var INTERNAL_OK=true;
 <link href="/fonts/fonts.css" rel="stylesheet" />
 <style>
 :root{--paper:#f3f8f4;--card:#fff;--ink:#17333c;--ink-soft:#4c666e;--teal:#0e9c8d;--teal-deep:#0b7568;--teal-soft:#d9f2ec;--amber:#ffc531;--amber-soft:#fff3ce;--coral:#ff6f61;--coral-soft:#ffe3de;--sky:#58b7e0;--sky-deep:#246c8c;--violet:#8a63d2;--violet-deep:#6a45b0;--violet-soft:#ece4fa;--green:#1f9d4d;--green-deep:#157a3a;--red:#d93a2f;--line:#dbe7e3;--btn:#0b7568;--on-teal:#fff;--pick:#0b7568;--ar:"Noto Sans Arabic","Heebo",system-ui,sans-serif;--ru:"Noto Sans","Heebo",system-ui,sans-serif}
+/* ערכת הצבע נבחרת, ולא רק נגררת מהמכשיר — 5.10.2026. עד אז היה
+   כאן `@media` בלבד, ולכן לא הייתה ללומד שום דרך לבחור. */
+html[data-theme=dark]{color-scheme:dark;--paper:#101a1c;--card:#17262a;--ink:#e8f1f2;--ink-soft:#a9c0c5;--teal:#5fd9c8;--teal-deep:#3fbfae;--teal-soft:#123833;--amber:#ffd45e;--amber-soft:#3a2e0c;--coral:#ff9186;--coral-soft:#3d1a16;--sky:#7fcbea;--violet:#b49aef;--violet-deep:#8a63d2;--violet-soft:#241a3a;--green:#1f9d4d;--green-deep:#1f9d4d;--red:#d93a2f;--line:#2b4146;--btn:#12857a;--on-teal:#04201c;--pick:#5fd9c8;--sky-deep:#246c8c}
 @media (prefers-color-scheme:dark){
-  :root{--paper:#101a1c;--card:#17262a;--ink:#e8f1f2;--ink-soft:#a9c0c5;--teal:#5fd9c8;--teal-deep:#3fbfae;--teal-soft:#123833;--amber:#ffd45e;--amber-soft:#3a2e0c;--coral:#ff9186;--coral-soft:#3d1a16;--sky:#7fcbea;--violet:#b49aef;--violet-deep:#8a63d2;--violet-soft:#241a3a;--green:#1f9d4d;--green-deep:#1f9d4d;--red:#d93a2f;--line:#2b4146;--btn:#12857a;--on-teal:#04201c;--pick:#5fd9c8;--sky-deep:#246c8c}
+  html:not([data-theme=light]){color-scheme:dark;--paper:#101a1c;--card:#17262a;--ink:#e8f1f2;--ink-soft:#a9c0c5;--teal:#5fd9c8;--teal-deep:#3fbfae;--teal-soft:#123833;--amber:#ffd45e;--amber-soft:#3a2e0c;--coral:#ff9186;--coral-soft:#3d1a16;--sky:#7fcbea;--violet:#b49aef;--violet-deep:#8a63d2;--violet-soft:#241a3a;--green:#1f9d4d;--green-deep:#1f9d4d;--red:#d93a2f;--line:#2b4146;--btn:#12857a;--on-teal:#04201c;--pick:#5fd9c8;--sky-deep:#246c8c}
 }
 *{box-sizing:border-box}
 html{font-size:20px}
 html.big{font-size:24px}
+/* ארבעת מצבי הנגישות שחסרו — 5.10.2026. */
+html.clear-font body,html.clear-font button,html.clear-font input,html.clear-font select,html.clear-font textarea{font-family:Tahoma,Verdana,Arial,sans-serif}
+html.spaced body{letter-spacing:.015em;word-spacing:.12em;line-height:1.8}
+html.reduce-motion *,html.reduce-motion *::before,html.reduce-motion *::after{animation:none!important;transition:none!important}
+html.hi-contrast{--paper:#fff;--card:#fff;--ink:#000;--ink-soft:#1a1a1a;--line:#000}
+html.hi-contrast body{background:#fff;color:#000}
+html.hi-contrast .card,html.hi-contrast .btn,html.hi-contrast .tog,html.hi-contrast .lvl,html.hi-contrast .pick{border:2px solid #000}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:"Heebo",system-ui,"Segoe UI",Arial,sans-serif;line-height:1.5;-webkit-text-size-adjust:100%}
 html[lang="ar"] body,html[lang="ar"] button{font-family:var(--ar)}
 html[lang="ru"] body,html[lang="ru"] button{font-family:var(--ru)}
@@ -302,7 +312,7 @@ function build(setId,lv,seed){
   var deck={set:setId,lv:lv,seed:seed,cards:printed,chain:chainIds,byChain:cards};
   RNG=Math.random;return deck}
 /* ===== UI strings ===== */
-var BUILD="dm9 · 2026-10-05";
+var BUILD="dm10 · 2026-10-05";
 var STR={
 he:{brand:"דומינו לימודי",title:"דומינו לימודי להדפסה",tag:"מדפיסים 20 קלפים, גוזרים ומסדרים במעגל. כל קלף מתחבר לקלף שמתאים לו.",
  howT:"איך משחקים?",limor:"אני לימור. ככה משחקים:",how:"1. מדפיסים את הקלפים וגוזרים לפי הקו המקווקו.\n2. מערבבים את הקלפים על השולחן.\n3. מתחילים בקלף עם הכוכב. מחפשים קלף שהחצי הראשון שלו מתאים לחצי השני של הקלף הקודם.\n4. ממשיכים עד שהמעגל נסגר. הקלף האחרון מתחבר לקלף עם הכוכב.",
@@ -310,28 +320,28 @@ he:{brand:"דומינו לימודי",title:"דומינו לימודי להדפ�
  cardsT:"הקלפים",tapHalf:"לוחצים על חצי קלף כדי לשמוע אותו.",printCards:"הדפסת הקלפים",printCardsD:"4 דפים, 5 קלפים בכל דף",printKey:"הדפסת מפתח למורה",printKeyD:"דף אחד עם הסדר הנכון",
  showKey:"מפתח למורה: הסדר הנכון",keyT:"מפתח למורה",keyHow:"הסדר הנכון של הקלפים. הקלף האחרון מתחבר לקלף הראשון.",keyOrder:"הסדר (מספרי הקלפים)",start:"התחלה",cardW:"קלף",
  cut:"גוזרים לפי הקו המקווקו",foot:"בקול · bekol.co.il · דומינו לימודי",back:"חזרה",listen:"הקראה",stop:"עצירה",slow:"לאט",listenHalf:"שמעו את חצי הקלף",
- settings:"הגדרות",setSlow:"הקראה לאט",setBig:"אותיות גדולות",on:"פועל",off:"כבוי",setNote:"המסך עובר למצב כהה לפי הגדרות המכשיר. ההדפסה תמיד על רקע לבן."},
+ settings:"הגדרות",setSlow:"הקראה לאט",setBig:"אותיות גדולות",setClear:"פונט קריא",setContrast:"ניגודיות גבוהה",setSpaced:"ריווח אותיות",setMotion:"פחות תנועה",setTheme:"ערכת נושא",thAuto:"אוטומטי",thLight:"בהיר",thDark:"כהה",on:"פועל",off:"כבוי",setNote:"המסך עובר למצב כהה לפי הגדרות המכשיר. ההדפסה תמיד על רקע לבן."},
 ar:{brand:"دومينو تعليمي",title:"دومينو تعليمي للطباعة",tag:"نطبع 20 بطاقة ونقصّها ونرتّبها في دائرة. كل بطاقة تتّصل بالبطاقة المناسبة لها.",
  howT:"كيف نلعب؟",limor:"أنا ليمور. هكذا نلعب:",how:"1. نطبع البطاقات ونقصّها على الخط المتقطّع.\n2. نخلط البطاقات على الطاولة.\n3. نبدأ بالبطاقة التي عليها نجمة. نبحث عن بطاقة يناسب نصفها الأول النصف الأخير من البطاقة السابقة.\n4. نكمل حتى تُغلق الدائرة. البطاقة الأخيرة تتّصل بالبطاقة التي عليها النجمة.",
  pick:"اختاروا موضوعًا",level:"المستوى",l1:"سهل",l2:"أصعب قليلًا",kit:"مجموعة",kitNew:"مجموعة جديدة",kitNo:"رقم المجموعة",
  cardsT:"البطاقات",tapHalf:"اضغطوا على نصف بطاقة لتسمعوه.",printCards:"طباعة البطاقات",printCardsD:"4 صفحات، 5 بطاقات في كل صفحة",printKey:"طباعة مفتاح المعلّم",printKeyD:"صفحة واحدة بالترتيب الصحيح",
  showKey:"مفتاح المعلّم: الترتيب الصحيح",keyT:"مفتاح المعلّم",keyHow:"الترتيب الصحيح للبطاقات. البطاقة الأخيرة تتّصل بالأولى.",keyOrder:"الترتيب (أرقام البطاقات)",start:"البداية",cardW:"بطاقة",
  cut:"نقصّ على الخط المتقطّع",foot:"بقول · bekol.co.il · دومينو تعليمي",back:"رجوع",listen:"استماع",stop:"إيقاف",slow:"ببطء",listenHalf:"استمعوا إلى نصف البطاقة",
- settings:"الإعدادات",setSlow:"قراءة بطيئة",setBig:"حروف كبيرة",on:"يعمل",off:"متوقف",setNote:"تتحوّل الشاشة إلى الوضع الداكن حسب إعدادات الجهاز. الطباعة دائمًا على خلفية بيضاء."},
+ settings:"الإعدادات",setSlow:"قراءة بطيئة",setBig:"حروف كبيرة",setClear:"خط واضح",setContrast:"تباين عالٍ",setSpaced:"تباعد الحروف",setMotion:"حركة أقل",setTheme:"المظهر",thAuto:"تلقائي",thLight:"فاتح",thDark:"داكن",on:"يعمل",off:"متوقف",setNote:"تتحوّل الشاشة إلى الوضع الداكن حسب إعدادات الجهاز. الطباعة دائمًا على خلفية بيضاء."},
 ru:{brand:"Учебное домино",title:"Учебное домино для печати",tag:"Печатаем 20 карточек, вырезаем и выкладываем по кругу. Каждая карточка подходит к своей паре.",
  howT:"Как играть?",limor:"Я Лимор. Играем так:",how:"1. Печатаем карточки и вырезаем по пунктирной линии.\n2. Перемешиваем карточки на столе.\n3. Начинаем с карточки со звёздочкой. Ищем карточку, у которой первая половина подходит ко второй половине предыдущей.\n4. Продолжаем, пока круг не замкнётся. Последняя карточка подходит к карточке со звёздочкой.",
  pick:"Выберите тему",level:"Уровень",l1:"Легко",l2:"Чуть сложнее",kit:"Набор",kitNew:"Новый набор",kitNo:"Номер набора",
  cardsT:"Карточки",tapHalf:"Нажмите на половинку карточки, чтобы услышать её.",printCards:"Печать карточек",printCardsD:"4 листа, по 5 карточек на листе",printKey:"Печать ключа для учителя",printKeyD:"Один лист с правильным порядком",
  showKey:"Ключ для учителя: правильный порядок",keyT:"Ключ для учителя",keyHow:"Правильный порядок карточек. Последняя карточка подходит к первой.",keyOrder:"Порядок (номера карточек)",start:"Старт",cardW:"Карточка",
  cut:"Вырезаем по пунктирной линии",foot:"Беколь · bekol.co.il · Учебное домино",back:"Назад",listen:"Слушать",stop:"Стоп",slow:"Медленно",listenHalf:"Послушать половинку карточки",
- settings:"Настройки",setSlow:"Медленное чтение",setBig:"Крупный шрифт",on:"Вкл.",off:"Выкл.",setNote:"Экран становится тёмным по настройкам устройства. Печать всегда на белом фоне."},
+ settings:"Настройки",setSlow:"Медленное чтение",setBig:"Крупный шрифт",setClear:"Простой шрифт",setContrast:"Высокий контраст",setSpaced:"Межбуквенный интервал",setMotion:"Меньше движения",setTheme:"Тема",thAuto:"Авто",thLight:"Светлая",thDark:"Тёмная",on:"Вкл.",off:"Выкл.",setNote:"Экран становится тёмным по настройкам устройства. Печать всегда на белом фоне."},
 en:{brand:"Learning dominoes",title:"Printable learning dominoes",tag:"Print 20 cards, cut them out and lay them in a circle. Each card connects to the card that matches it.",
  howT:"How to play",limor:"I'm Limor. Here is how we play:",how:"1. Print the cards and cut along the dashed line.\n2. Mix the cards up on the table.\n3. Start with the card that has the star. Find a card whose first half matches the last half of the card before it.\n4. Keep going until the circle closes. The last card connects to the star card.",
  pick:"Pick a topic",level:"Level",l1:"Easy",l2:"A bit harder",kit:"Set",kitNew:"New set",kitNo:"Set number",
  cardsT:"The cards",tapHalf:"Tap half a card to hear it.",printCards:"Print the cards",printCardsD:"4 A4 pages, 5 cards per page",printKey:"Print the teacher key",printKeyD:"One page with the right order",
  showKey:"Teacher key: the right order",keyT:"Teacher key",keyHow:"The right order of the cards. The last card connects to the first.",keyOrder:"Order (card numbers)",start:"Start",cardW:"Card",
  cut:"Cut along the dashed line",foot:"bekol · bekol.co.il · Learning dominoes",back:"Back",listen:"Listen",stop:"Stop",slow:"Slow",listenHalf:"Hear this half card",
- settings:"Settings",setSlow:"Slow reading",setBig:"Large text",on:"On",off:"Off",setNote:"The screen goes dark when your device is set to dark mode. Printing is always on white."}
+ settings:"Settings",setSlow:"Slow reading",setBig:"Large text",setClear:"Clear font",setContrast:"High contrast",setSpaced:"Letter spacing",setMotion:"Less motion",setTheme:"Theme",thAuto:"Auto",thLight:"Light",thDark:"Dark",on:"On",off:"Off",setNote:"The screen goes dark when your device is set to dark mode. Printing is always on white."}
 };
 var LNAME={he:"עב",ar:"عر",ru:"Рус",en:"En"},LDIR={he:"rtl",ar:"rtl",ru:"ltr",en:"ltr"},LCODE={he:"he-IL",ar:"ar-SA",ru:"ru-RU",en:"en-US"};
 /* ===== state ===== */
@@ -577,8 +587,20 @@ function keyView(){var t=T(),h='<button class="btn ghost" data-a="home">'+esc(t.
   DECK.byChain.forEach(function(c,i){h+='<div class="cwrap"><span class="cap">'+(i+1)+' · '+esc(t.cardW)+' '+c.id+(i===0?' · ★ '+esc(t.start):'')+'</span>'+cardHTML(c,true,{noNo:true})+'</div>'});
   return h+'</div>'}
 function settingsView(){var t=T();function tg(k,l){return '<div class="set"><span>'+esc(l)+'</span><button class="tog" data-a="tog" data-k="'+k+'" aria-pressed="'+!!S[k]+'">'+esc(S[k]?t.on:t.off)+'</button></div>'}
-  return '<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1 id="st">'+esc(t.settings)+'</h1>'+listenRow("settings")+'<div class="card">'+tg("slow",t.setSlow)+tg("big",t.setBig)+'<p class="sub" id="sn" style="margin-top:12px">'+esc(t.setNote)+'</p></div>'}
-function render(){document.documentElement.lang=S.lang;document.documentElement.dir=LDIR[S.lang];document.documentElement.classList.toggle("big",!!S.big);
+  return '<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1 id="st">'+esc(t.settings)+'</h1>'+listenRow("settings")+'<div class="card">'+tg("slow",t.setSlow)+tg("big",t.setBig)+tg("clearFont",t.setClear)+tg("contrast",t.setContrast)+tg("spaced",t.setSpaced)+tg("reduceMotion",t.setMotion)+'<div class="set"><span>'+esc(t.setTheme)+'</span><span class="row">'+[["auto",t.thAuto],["light",t.thLight],["dark",t.thDark]].map(function(x){return '<button class="tog" data-a="theme" data-th="'+x[0]+'" aria-pressed="'+((S.theme||"auto")===x[0])+'">'+esc(x[1])+'</button>'}).join("")+'</span></div>'+'<p class="sub" id="sn" style="margin-top:12px">'+esc(t.setNote)+'</p></div>'}
+/* ששת מצבי הנגישות. עד 5.10.2026 היה כאן `big` בלבד, וערכת הצבע
+   נגררה מהמכשיר בלי בחירה. */
+function applyModes(){
+  var r=document.documentElement,m=S.theme||"auto",
+      d=m==="dark"||(m!=="light"&&window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches);
+  r.setAttribute("data-theme",d?"dark":"light");
+  r.classList.toggle("big",!!S.big);
+  r.classList.toggle("clear-font",!!S.clearFont);
+  r.classList.toggle("hi-contrast",!!S.contrast);
+  r.classList.toggle("spaced",!!S.spaced);
+  r.classList.toggle("reduce-motion",!!S.reduceMotion);
+}
+function render(){applyModes();document.documentElement.lang=S.lang;document.documentElement.dir=LDIR[S.lang];
   if(!DECK)mkDeck();
   var h=header();h+=({home:homeView,key:keyView,settings:settingsView})[view]();$("#app").innerHTML=h;
   $("#pc").innerHTML=sheetsHTML();$("#pk").innerHTML=keyHTML();
@@ -612,6 +634,7 @@ function onAct(a,el){
   else if(a==="stop")stopSpeak();
   else if(a==="tutor"){stopSpeak();if(window.TUTOR)TUTOR.open()}
   else if(a==="tog"){var kk=el.dataset.k;S[kk]=!S[kk];saveS();render()}
+  else if(a==="theme"){S.theme=el.dataset.th;saveS();render()}
   else if(a==="printcards")doPrint("pc");
   else if(a==="printkey")doPrint("pk")}
 document.addEventListener("click",function(e){var el=e.target.closest("[data-a]");if(!el||el.disabled)return;onAct(el.dataset.a,el)});
@@ -643,7 +666,7 @@ function boot(){var q=new URLSearchParams(location.search),l=q.get("lang");if(l&
   render();
   var pr=q.get("print");if(pr==="cards")document.documentElement.classList.add("pc");else if(pr==="key")document.documentElement.classList.add("pk");
   if(window.TUTOR){try{TUTOR.mount({app:"domino",lang:function(){return S.lang},q:function(){return null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm9-pwa1").catch(function(){})})}
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm10-pwa1").catch(function(){})})}
 if(!INTERNAL_OK){
   document.getElementById("gate").hidden=false;
   document.title="לא פורסם";

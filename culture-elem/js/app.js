@@ -1,15 +1,29 @@
 var KEY="culture-elem:v1";
-var state={lang:"he",speed:"normal",slow:false,dark:false,done:{}};
+var state={lang:"he",speed:"normal",slow:false,dark:false,textSize:1,clearFont:false,contrast:false,spaced:false,reduceMotion:false,done:{}};
 try{var _s=JSON.parse(localStorage.getItem(KEY)||"null");if(_s){for(var k in _s)state[k]=_s[k]}}catch(e){}
 if(!state.done)state.done={};
-function save(){try{localStorage.setItem(KEY,JSON.stringify({lang:state.lang,speed:state.speed,slow:state.slow,dark:state.dark,done:state.done}))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({lang:state.lang,speed:state.speed,slow:state.slow,dark:state.dark,textSize:state.textSize,clearFont:state.clearFont,contrast:state.contrast,spaced:state.spaced,reduceMotion:state.reduceMotion,done:state.done}))}catch(e){}}
 var view="home", unit=null, R=null; /* R = practice round state */
 var $=function(s){return document.querySelector(s)};
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
 function dirOf(l){return(l==="he"||l==="ar")?"rtl":"ltr"}
+/* ששת מצבי הנגישות. עד 5.10.2026 הייתה כאן ערכת הצבע בלבד — חמישה
+   מצבים שהאתר כולו מחזיק פשוט לא היו באפליקציה הזאת, ו-`a11y.js`
+   לא מדדה אותה כלל. `applyModes` נקראת מ-`applyLang`, כלומר בכל
+   רינדור, ולכן המצב חוזר גם אחרי רענון ואחרי מעבר שפה. */
+function applyModes(){
+  var r=document.documentElement;
+  r.setAttribute("data-theme",state.dark?"dark":"light");
+  r.classList.toggle("ts2",state.textSize===2);
+  r.classList.toggle("ts3",state.textSize===3);
+  r.classList.toggle("clear-font",!!state.clearFont);
+  r.classList.toggle("hi-contrast",!!state.contrast);
+  r.classList.toggle("spaced",!!state.spaced);
+  r.classList.toggle("reduce-motion",!!state.reduceMotion);
+}
 function applyLang(){
   document.documentElement.lang=state.lang;document.documentElement.dir=dirOf(state.lang);
-  document.documentElement.setAttribute("data-theme",state.dark?"dark":"light");
+  applyModes();
   document.title=t("appTitle")+" · bekol";
 }
 function go(v,extra){stopSpeech();view=v;if(extra){for(var k in extra)window[k]=extra[k]}render();window.scrollTo(0,0)}
@@ -174,6 +188,11 @@ function renderSettings(){
   return topbar(t("settings"),1)+'<main>'+playRow()+
    '<section class="set"><h2>'+t("speed")+'</h2><div class="seg"><button class="chip'+(state.speed==="slow"?" on":"")+'" data-sp="slow" aria-pressed="'+(state.speed==="slow"?"true":"false")+'">'+t("speedSlow")+'</button><button class="chip'+(state.speed!=="slow"?" on":"")+'" data-sp="normal" aria-pressed="'+(state.speed!=="slow"?"true":"false")+'">'+t("speedNormal")+'</button></div></section>'+
    '<section class="set"><h2>'+t("theme")+'</h2><button class="chip'+(state.dark?" on":"")+'" id="darkBtn" aria-pressed="'+(state.dark?"true":"false")+'">'+(state.dark?"🌙 ✓":"🌙")+'</button></section>'+
+   '<section class="set"><h2>'+t("a11y")+'</h2>'+
+   '<p class="small">'+t("textSize")+'</p><div class="seg">'+[[1,"tsNormal"],[2,"tsBig"],[3,"tsHuge"]].map(function(x){
+     return '<button class="chip'+((state.textSize||1)===x[0]?" on":"")+'" data-ts="'+x[0]+'" aria-pressed="'+(((state.textSize||1)===x[0])?"true":"false")+'">'+t(x[1])+'</button>'}).join("")+'</div>'+
+   '<div class="seg" style="margin-top:8px;flex-wrap:wrap">'+[["clearFont","clearFont"],["contrast","contrastMode"],["spaced","spacedMode"],["reduceMotion","motionMode"]].map(function(x){
+     return '<button class="chip'+(state[x[0]]?" on":"")+'" data-mode="'+x[0]+'" aria-pressed="'+(state[x[0]]?"true":"false")+'">'+t(x[1])+(state[x[0]]?" ✓":"")+'</button>'}).join("")+'</div></section>'+
    '<section class="set"><h2>'+t("lang")+'</h2><div class="seg">'+LANGS.map(function(l){return '<button class="chip'+(l===state.lang?" on":"")+'" data-lang="'+l+'" aria-pressed="'+(l===state.lang?"true":"false")+'">'+LANG_LABEL[l]+'</button>'}).join("")+'</div><p class="small">'+t("mtNote")+'</p></section>'+
    '<p class="small">'+t("privacy")+'</p><p class="small">'+t("credit")+'</p>'+
    '<button class="chip danger" id="resetBtn">'+t("reset")+'</button></main>';
@@ -198,6 +217,8 @@ function render(){
   if(view==="settings"){
     [].forEach.call(document.querySelectorAll("[data-sp]"),function(b){b.onclick=function(){state.speed=b.getAttribute("data-sp");save();render()}});
     $("#darkBtn").onclick=function(){state.dark=!state.dark;save();render()};
+    [].forEach.call(document.querySelectorAll("[data-ts]"),function(b){b.onclick=function(){state.textSize=+b.getAttribute("data-ts");save();render()}});
+    [].forEach.call(document.querySelectorAll("[data-mode]"),function(b){b.onclick=function(){var k=b.getAttribute("data-mode");state[k]=!state[k];save();render()}});
     $("#resetBtn").onclick=function(){if(confirm(t("resetSure"))){state.done={};save();go("home")}};
   }
   if(!("speechSynthesis" in window)||(allVoices().length&&!voiceFor(state.lang)&&view==="home")){

@@ -87,9 +87,49 @@ const speak=(s,lg)=>{
 /* זיהוי שפה מהכתב בפועל — שדה תרגום יכול להכיל עברית (fallback ב-data). */
 const textLang=s=>{s=String(s||'');const c={he:(s.match(/[\u0590-\u05FF]/g)||[]).length,ar:(s.match(/[\u0600-\u06FF]/g)||[]).length,ru:(s.match(/[\u0400-\u04FF]/g)||[]).length,en:(s.match(/[A-Za-z]/g)||[]).length};return Object.keys(c).reduce((a,b)=>c[b]>c[a]?b:a,'he')};
 const setPanel=()=>{const p=document.getElementById('setpanel');const b=document.getElementById('setbtn');if(b){b.setAttribute('aria-label',L('setS'));if(p)b.setAttribute('aria-expanded',String(!p.hidden))}if(!p)return;p.querySelector('.set-t').textContent=L('setS');p.querySelector('.set-r').textContent=L('rateS')};
-function setLang(v){lang=LABEL[v]?v:'he';langEl.value=lang;document.documentElement.lang=lang;document.documentElement.dir=['ar','he'].includes(lang)?'rtl':'ltr';document.querySelector('header .mini').textContent=U('subtitle');document.querySelector('#lang-label').textContent=({he:'שפת העזר',ar:'لغة المساعدة',ru:'Язык подсказок',en:'Help language'})[lang];document.querySelector('#footer').textContent=U('exam');setPanel();render()}langEl.onchange=e=>setLang(e.target.value);
+function setLang(v){lang=LABEL[v]?v:'he';langEl.value=lang;document.documentElement.lang=lang;document.documentElement.dir=['ar','he'].includes(lang)?'rtl':'ltr';document.querySelector('header .mini').textContent=U('subtitle');document.querySelector('#lang-label').textContent=({he:'שפת העזר',ar:'لغة المساعدة',ru:'Язык подсказок',en:'Help language'})[lang];document.querySelector('#footer').textContent=U('exam');setPanel();wireModes();render()}langEl.onchange=e=>setLang(e.target.value);
+/* ---------- ששת מצבי הנגישות ----------
+   נוספו 5.10.2026, אחרי ש-`a11y.js` נגזרה מ-`stages.json` ומדדה
+   כאן אפס מתוך שישה. הכפתורים נכנסים לפאנל ההגדרות הקיים, כדי
+   שלא ייפתח מסך חדש שצריך למצוא. */
+const MODE_KEY='hebrew-modes';
+let modes={textSize:1,clearFont:false,contrast:false,spaced:false,reduceMotion:false,theme:'auto'};
+try{Object.assign(modes,JSON.parse(localStorage.getItem(MODE_KEY)||'{}'))}catch(e){}
+function saveModes(){try{localStorage.setItem(MODE_KEY,JSON.stringify(modes))}catch(e){}}
+const MODE_L={
+ he:{a11y:'נגישות',ts:'גודל טקסט',tsN:'רגיל',tsB:'גדול',tsH:'ענק',cf:'פונט קריא',hc:'ניגודיות גבוהה',sp:'ריווח אותיות',rm:'פחות תנועה',th:'ערכת נושא',thA:'אוטומטי',thL:'בהיר',thD:'כהה'},
+ ar:{a11y:'إمكانية الوصول',ts:'حجم النص',tsN:'عادي',tsB:'كبير',tsH:'ضخم',cf:'خط واضح',hc:'تباين عالٍ',sp:'تباعد الحروف',rm:'حركة أقل',th:'المظهر',thA:'تلقائي',thL:'فاتح',thD:'داكن'},
+ ru:{a11y:'Доступность',ts:'Размер текста',tsN:'Обычный',tsB:'Крупный',tsH:'Очень крупный',cf:'Простой шрифт',hc:'Высокий контраст',sp:'Межбуквенный интервал',rm:'Меньше движения',th:'Тема',thA:'Авто',thL:'Светлая',thD:'Тёмная'},
+ en:{a11y:'Accessibility',ts:'Text size',tsN:'Normal',tsB:'Large',tsH:'Huge',cf:'Clear font',hc:'High contrast',sp:'Letter spacing',rm:'Less motion',th:'Theme',thA:'Auto',thL:'Light',thD:'Dark'}};
+function applyModes(){
+  const r=document.documentElement;
+  const m=modes.theme||'auto';
+  const d=m==='dark'||(m!=='light'&&window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches);
+  r.setAttribute('data-theme',d?'dark':'light');
+  r.classList.toggle('ts2',modes.textSize===2);
+  r.classList.toggle('ts3',modes.textSize===3);
+  r.classList.toggle('clear-font',!!modes.clearFont);
+  r.classList.toggle('hi-contrast',!!modes.contrast);
+  r.classList.toggle('spaced',!!modes.spaced);
+  r.classList.toggle('reduce-motion',!!modes.reduceMotion);
+}
+function modesHTML(){
+  const M=MODE_L[lang]||MODE_L.he;
+  const ts=[[1,M.tsN],[2,M.tsB],[3,M.tsH]].map(x=>`<button type="button" class="mbtn" data-ts="${x[0]}" aria-pressed="${(modes.textSize||1)===x[0]}">${safe(x[1])}</button>`).join('');
+  const tg=[['clearFont',M.cf],['contrast',M.hc],['spaced',M.sp],['reduceMotion',M.rm]].map(x=>`<button type="button" class="mbtn" data-mode="${x[0]}" aria-pressed="${!!modes[x[0]]}">${safe(x[1])}</button>`).join('');
+  const th=[['auto',M.thA],['light',M.thL],['dark',M.thD]].map(x=>`<button type="button" class="mbtn" data-th="${x[0]}" aria-pressed="${(modes.theme||'auto')===x[0]}">${safe(x[1])}</button>`).join('');
+  return `<strong class="set-a">${safe(M.a11y)}</strong><span class="set-ts">${safe(M.ts)}</span>${ts}${tg}<span class="set-th">${safe(M.th)}</span>${th}`;
+}
+function wireModes(){
+  const box=document.getElementById('modebox'); if(!box)return;
+  box.innerHTML=modesHTML();
+  box.querySelectorAll('[data-ts]').forEach(b=>b.onclick=()=>{modes.textSize=+b.dataset.ts;saveModes();applyModes();wireModes()});
+  box.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{const k=b.dataset.mode;modes[k]=!modes[k];saveModes();applyModes();wireModes()});
+  box.querySelectorAll('[data-th]').forEach(b=>b.onclick=()=>{modes.theme=b.dataset.th;saveModes();applyModes();wireModes()});
+}
+applyModes();
 const setBtn=document.getElementById('setbtn'),setP=document.getElementById('setpanel'),rateEl=document.getElementById('rate');
-if(setBtn&&setP){setPanel();setBtn.onclick=()=>{setP.hidden=!setP.hidden;setPanel()};rateEl.value=rate;rateEl.oninput=e=>{rate=parseFloat(e.target.value)||0.83;try{localStorage.setItem('hebrew-rate',rate)}catch(_){}}}
+if(setBtn&&setP){setPanel();wireModes();setBtn.onclick=()=>{setP.hidden=!setP.hidden;setPanel()};rateEl.value=rate;rateEl.oninput=e=>{rate=parseFloat(e.target.value)||0.83;try{localStorage.setItem('hebrew-rate',rate)}catch(_){}}}
 function base(content){app.innerHTML=content+`<div class="sources">${U('sources')}: <a target="_blank" rel="noopener" href="https://pop.education.gov.il/tchumey_daat/ivrit_havana_habaa_lashon/chativat-beynayim/noseem_nilmadim/havana_habaa/">חטיבת ביניים</a> · <a target="_blank" rel="noopener" href="https://pop.education.gov.il/tchumey_daat/ivrit_havana_habaa_lashon/chativa-elyona/bhinot-bagrut-umesimot/">שאלונים 281/282</a> · <a target="_blank" rel="noopener" href="https://pop.education.gov.il/tchumey_daat/ivrit_havana_habaa_lashon/chativa-elyona/havana-habaa-olim/matriculation-questionnaires-274/">שאלון 274</a>. ${U('exam')}</div>`}
 function home(){base(`<section class="hero"><div><div class="eyebrow">${U('eyebrow')}</div><h1>${U('headline')}</h1><p>${U('intro')}</p><p style="margin-top:10px"><button class="secondary" data-action="speak-home">🔊 ${L('listen')}</button></p></div><div class="hero-art" aria-hidden="true">א</div></section><h2>${U('stage')}</h2><div class="tracks">${[['middle','middle','middleDesc'],['high','high','highDesc'],['olim','olim','olimDesc']].map(([id,name,desc])=>`<div class="orow"><button class="card track ${stage===id?'active':''}" data-stage="${id}" aria-pressed="${stage===id}" style="flex:1"><span class="num">${id==='middle'?'7–9':id==='high'?'10–12':'ע'}</span><strong>${U(name)}</strong><small>${U(desc)}</small></button><button class="ospk" data-say="${U(name)}. ${U(desc)}" aria-label="${L('listen')}">🔊</button></div>`).join('')}</div>${stage==='high'?`<div class="bar" style="margin-top:15px"><button class="pill ${track==='281'?'active':''}" aria-pressed="${track==='281'}" data-track="281">${U('pill281')}</button><button class="pill ${track==='282'?'active':''}" aria-pressed="${track==='282'}" data-track="282">${U('pill282')}</button></div><div class="note">${U('essayNote')}</div>`:''}<h2>${U('how')}</h2><div class="tiles"><div class="orow"><button class="card tile" data-view="practice" style="flex:1"><span class="glyph">◉</span><strong>${L('practice')}</strong><small>${U('practiceDesc')}</small></button><button class="ospk" data-say="${L('practice')}. ${U('practiceDesc')}" aria-label="${L('listen')}">🔊</button></div><div class="orow"><button class="card tile" data-view="concept" style="flex:1"><span class="glyph">▤</span><strong>${L('concept')}</strong><small>${U('conceptDesc')}</small></button><button class="ospk" data-say="${L('concept')}. ${U('conceptDesc')}" aria-label="${L('listen')}">🔊</button></div><div class="orow"><button class="card tile" data-view="write" style="flex:1"><span class="glyph">✎</span><strong>${L('write')}</strong><small>${U('writeDesc')}</small></button><button class="ospk" data-say="${L('write')}. ${U('writeDesc')}" aria-label="${L('listen')}">🔊</button></div></div><h2>${U('tools')}</h2><div class="tiles">${[['ulpan','ulpan','ulpanDesc'],['kotvim','kotvim','kotvimDesc'],['reader','reader','readerDesc']].map(([path,name,desc])=>`<div class="orow"><a class="card tile" href="/${path}/" style="text-decoration:none;flex:1"><span class="glyph">↗</span><strong>${U(name)}</strong><small>${U(desc)}</small></a><button class="ospk" data-say="${U(name)}. ${U(desc)}" aria-label="${L('listen')}">🔊</button></div>`).join('')}</div><div class="note">${U('exam')}</div><p class="status">${U('mtNote')}</p><p class="status">${progress.answered} ${U('saved')}</p>`)}
 
