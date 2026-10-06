@@ -125,8 +125,17 @@ async function measure(page, perCell, only, lang) {
     };
 
     const cells = [];
+    /* 6.10.2026 — **ארבע רמות היו מספר קשיח, ושלוש אפליקציות
+       מגדירות שלוש.** ‏`poolOf(tp,lv)` נופל בשקט ל-`tp.L[0]`
+       כשאין רמה כזאת, ולכן רמה 4 נמדדה כהעתק של רמה 1 ודווחה
+       בשם שני: 21 תאי פנטום ב-geography, ב-tanakh וב-biology,
+       וכל ממצא ברמה 1 הופיע פעמיים. כך 9 תאים אמיתיים נקראו
+       כ-12. הטווח נגזר מהמאגר, כמו ב-`density.js` וב-`content.js`:
+       אורך `t.L` של הנושא, ואחריו `LVL`, ורק בלעדיהם 4. */
+    const nl = (typeof LVL !== 'undefined' && LVL.length) || 0;
     for (const t of TOPICS) {
-      for (let lv = 1; lv <= 4; lv++) {
+      const lvls = (t.L && t.L.length) || nl || 4;
+      for (let lv = 1; lv <= lvls; lv++) {
         if (only && only.indexOf(t.id + '|' + lv) < 0) continue;
         seedAt((lang || 'he') + '|' + t.id + '|' + lv);
         let built = 0, longU = 0, shortU = 0, pos = [0, 0, 0, 0, 0, 0], verbal = false;
