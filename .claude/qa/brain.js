@@ -49,19 +49,16 @@
       המותר הוא `tutor/tutor.js`, ו-`.claude/qa/tutor.js` הוא
       שבודק שהוא אכן מחווט בשתים־עשרה האפליקציות.
 
-   4. **מודל שפה בדפדפן — רק ב-`gemma/`.** בהכרעת הבעלים 5.10.2026
-      נוסף דף ניסוי שמריץ Gemma במכשיר (WebLLM / MediaPipe). זה מוח
-      שני במתכוון, והחריג תחום לתיקייה אחת: אף קובץ קוד שנעקב מחוץ
-      ל-`gemma/` (ומחוץ לכלים ב-`.claude/`) אינו רשאי לשאת את שמות
-      שתי הספריות. כך לימור אינה יכולה לאמץ אותו בשקט — חיבור אליה
-      הוא החלטה, לא חיווט. הוכחת נפילה: FINDINGS.md, 5.10.2026.
+   4. **מודל שפה בדפדפן — שמות WebLLM ו-MediaPipe אסורים בכל מקום.**
+      דף הניסוי `/gemma/` הוסר ב-6.10.2026; הדרך היחידה למודל במכשיר
+      היא סעיף 5 (transformers.js, בקובץ אחד). כל קובץ קוד שנעקב
+      (מלבד הכלים ב-`.claude/`) שנושא את שמות שתי הספריות נופל.
 
    5. **החריגה של ״לימור במכשיר״ — קובץ אחד, דף אחד.** הכרעת הבעלים,
       5.10.2026: מודל Gemma 4 שרץ בדפדפן של הלומד (`JOSH.md`). זו
       חריגה משני כללים — ספרייה חיצונית ובקשה יוצאת — ולכן היא
       מותרת **רק** ב-`tutor/limor-device.js`, והקובץ הזה נטען **רק**
-      מדפים בתוך `limor/`. כל קובץ אחר בקבוצת ההגיעוּת (מלבד `gemma/`,
-      שהחריג של סעיף 4 חל עליה) שנושא
+      מדפים בתוך `limor/`. כל קובץ אחר בקבוצת ההגיעוּת שנושא
       `import(` של כתובת, `huggingface.co`, `cdn.jsdelivr.net` או
       `@huggingface/transformers` נופל; וכל דף או `sw.js` מחוץ
       ל-`limor/` שטוען את הקובץ נופל. הרחבה לאפליקציה נוספת היא
@@ -137,20 +134,20 @@ for (const [p, from] of [...reach].sort()) {
     hit(p, from, 'מגדיר ג׳וש גלובלי. הממשק היחיד הוא tutor/tutor.js');
 }
 
-/* 4 — מודל שפה בדפדפן מחוץ לתיקייה שלו */
+/* 4 — WebLLM / MediaPipe — אסורים בכל קובץ קוד */
 const ON_DEVICE = /@mlc-ai\/web-llm|@mediapipe\/tasks-genai/;
 for (const f of tracked) {
-  if (!/\.(js|mjs|html)$/i.test(f) || f.startsWith('.claude/') || f.startsWith('gemma/')) continue;
+  if (!/\.(js|mjs|html)$/i.test(f) || f.startsWith('.claude/')) continue;
   const s = read(f); if (s == null) continue;
   if (ON_DEVICE.test(s))
-    hit(f, 'git ls-files', 'מודל שפה בדפדפן מחוץ ל-gemma/. החריג חל על התיקייה הזאת בלבד — ראו CLAUDE.md');
+    hit(f, 'git ls-files', 'WebLLM או MediaPipe בקוד. דף /gemma/ הוסר; החריג היחיד הוא tutor/limor-device.js — ראו CLAUDE.md');
 }
 
 /* 5 — החריגה של ״לימור במכשיר״: קובץ אחד, ומי שטוען אותו */
 const DEVICE = 'tutor/limor-device.js';
 const EXTERNAL = /\bimport\s*\(\s*["'`]https?:|huggingface\.co|cdn\.jsdelivr\.net|@huggingface\/transformers/;
 for (const [p, from] of [...reach].sort()) {
-  if (p === DEVICE || p.startsWith('gemma/') || !/\.(js|html)$/i.test(p)) continue;
+  if (p === DEVICE || !/\.(js|html)$/i.test(p)) continue;
   const s = read(p); if (s == null) continue;
   if (EXTERNAL.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/<!--[\s\S]*?-->/g, '')))
     hit(p, from, 'ספרייה או מודל חיצוניים. החריגה מותרת רק ב-' + DEVICE + ' — ראו JOSH.md');
