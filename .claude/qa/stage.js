@@ -83,6 +83,36 @@ for(const [id,a] of Object.entries(REG.apps)){
       F(id,"שלב "+stage+" והשער הפנימי עדיין בקובץ — נועל את מי שאושר לו להיכנס");
   }
 
+  /* 4ב. **מי שפורסמה ואין עליה דוח תוכן — נאמר בשם, 6.10.2026.**
+        ‏`civics` נשאה `bank:"none"` בזמן שב-`index.html` שלה יש
+        `function buildQ(` מאז ומתמיד, ולכן 168 שאלות באפליקציה
+        ציבורית מעולם לא נסרקו: הרישום הצהיר דבר שהקובץ מכחיש. שינוי
+        המילה אחת החזיר 3,600 שאלות, 0 FAIL ושש משפחות REVIEW — ובהן
+        ״100% מהמסיחים בלי הסבר למה הם שגויים״.
+        הבדיקה כאן אינה מסתמכת על `bank` אלא על **התוצאה**: אפליקציה
+        שעלתה ל-approved או ל-public, יש בקובץ שלה מאגר שאפשר לסרוק,
+        ואין עליה דוח — מדווחת בשם. אזהרה ולא FAIL, מפני ש-`cleared`
+        הוא הכרעת בעלים; אבל היא נאמרת בכל ריצה ואינה נעלמת.
+        ‏`TOOLS` הן כלים ולא אפליקציות חידון, וכל אחת מודפסת עם הסיבה. */
+  {
+    const TOOLS = {
+      'reader': 'מקריא טקסט שהלומד מדביק — אין מאגר שאלות',
+      'kotvim': 'מחולל כתיבה — אין מאגר שאלות',
+      'domino': 'מחולל קלפים להדפסה — אין מאגר שאלות',
+      'hebrew': 'מאגר קטן בתוך app.js, לא בשלד topic()/Q()',
+      'rakia': 'מפת לידה — הטקסטים נבדקים ב-rakia-content.js',
+    };
+    const f = path.join(ROOT, id, "index.html");
+    const src = fs.existsSync(f) ? fs.readFileSync(f, "utf8") : "";
+    const scannable = /function\s+buildQ\s*\(/.test(src) ||
+      ["buildQ", "UNITS", "js/data.js", "GEOBANK"].includes(a.bank);
+    if (LADDER.indexOf(stage) >= LADDER.indexOf("approved") && !scanOf(id) && scannable)
+      W(id, "פורסמה, יש בה מאגר שאפשר לסרוק, ואין עליה דוח תוכן — " +
+            "bank=\"" + (a.bank || "—") + "\"");
+    else if (LADDER.indexOf(stage) >= LADDER.indexOf("approved") && !scanOf(id) && TOOLS[id])
+      W(id, "אין דוח תוכן, וזה תקין: " + TOOLS[id]);
+  }
+
   /* 5. אישור דורש סריקת תוכן. */
   if(LADDER.indexOf(stage)>=LADDER.indexOf("approved")){
     if(!PUBLIC_OK.includes(a.contentQA))
