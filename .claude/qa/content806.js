@@ -47,6 +47,34 @@ global.window = {};
 require(process.env.QA806_DATA || path.join(ROOT, APP, 'data', 'exams.js'));
 const EXAMS = global.window.EXAMS || [];
 
+/* 6.10.2026 — O-151. **מה שנמדד הוא מה שנאמר.** ‏`speech.js` מחזיקה
+   מילון הגייה (`PROSE`) שכבר ממיר `sin`, ‏`cos` ו-`tan` לשמן העברי,
+   והבודק קרא את השדה הגולמי — ולכן דיווח עליהן ככשל הקראה. המילון
+   **אינו מועתק** לכאן: הוא נחלץ מ-`speech.js` ומורץ, בדיוק כמו
+   ש-`exam806` מחלץ את `checkAnswer` מ-`app.js`. נכשלה החילוץ —
+   נופלים לטקסט הגולמי, וזה נאמר בפלט. */
+const SAYABLE = (() => {
+  try {
+    const src = fs.readFileSync(path.join(ROOT, APP, 'speech.js'), 'utf8');
+    const at = src.indexOf('var PROSE = [');
+    const open = src.indexOf('[', at);
+    let depth = 0, end = -1, inStr = null, inRe = false;
+    for (let i = open; i < src.length; i++) {
+      const c = src[i];
+      if (inStr) { if (c === '\\') i++; else if (c === inStr) inStr = null; continue }
+      if (inRe) { if (c === '\\') i++; else if (c === '/') inRe = false; continue }
+      if (c === '"' || c === "'") { inStr = c; continue }
+      if (c === '/' && src[i + 1] === '*') { i = src.indexOf('*/', i) + 1; continue }
+      if (c === '/' && /[\[,(\s]/.test(src[i - 1] || '')) { inRe = true; continue }
+      if (c === '[') depth++;
+      else if (c === ']') { depth--; if (!depth) { end = i + 1; break } }
+    }
+    if (end < 0) return null;
+    const PROSE = eval(src.slice(open, end));
+    return s => { let t = String(s); for (const r of PROSE) t = t.replace(r[0], r[1]); return t.replace(/\s+/g, ' ').trim() };
+  } catch (e) { return null }
+})();
+
 const find = {};
 function add(kind, sev, msg, where) {
   const f = find[kind] || (find[kind] = { kind, sev, n: 0, ex: [], cells: {} });
@@ -142,9 +170,19 @@ function check(str, where) {
   /* אות לטינית בודדת היא שם משתנה מקובל — x, k, A, B — ומוקראת
      בסדר. רצף של שתיים ומעלה הוא מילה לטינית, וקול עברי יאיית
      אותה אות־אות: "backslash" נשמע "בי איי סי...". */
-  const latin = s.match(/[A-Za-z]{2,}/g);
+  const spoken = SAYABLE ? SAYABLE(s) : s;
+  const latin = spoken.match(/[A-Za-z]{2,}/g);
   if (latin) {
-    const real = latin.filter(w => !/^(ABC|BC|AB|AC|CE|BCE)$/.test(w));
+    /* 6.10.2026 — O-151. **רצף של אותיות גדולות הוא תווית גאומטרית**,
+       ולא מילה לטינית: `AB` הוא קטע, `ABC` משולש, `AOB` זווית. קול
+       עברי מאיית אותן אות־אות — וזו בדיוק הקריאה הנכונה (״קטע איי
+       בי״). הרשימה הישנה מנתה שישה צירופים ביד, ולכן `AD`, ‏`BD`,
+       ‏`CD`, ‏`ABD`, ‏`AM`, ‏`ABCD`, ‏`BM`, ‏`DE`, ‏`BCD`, ‏`AOB`,
+       ‏`PM`, ‏`AG`, ‏`ACB` ו-`DB` כולם דווחו — 109 תאים.
+       מה שנשאר ממצא הוא רצף **לא־גדול**: `ln`, ‏`sin`, ‏`cos`,
+       ‏`log` (שם פונקציה שצריך מילון הגייה) ו-`bi`/`kt`/`ax`
+       (מכפלה שנכתבה בלי סימן). */
+    const real = latin.filter(w => !/^[A-Z]{2,5}$/.test(w));
     if (real.length)
       add('tts', 'REVIEW', 'רצף לטיני בתוך טקסט עברי: ' + real.slice(0, 3).join(', '), where);
   }
