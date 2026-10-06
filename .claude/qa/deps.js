@@ -15,8 +15,8 @@
       עד 5.10.2026 הבדיקה לא ראתה אותו בכלל — רק את import( — ולא
       הלכה אחרי import מקומי לקובץ הבא. עכשיו היא הולכת אחרי
       `from "./x.js"` ואחרי `new URL("./x.js", import.meta.url)`.
-   החריג היחיד: `gemma/` — מודל שפה במכשיר, בהכרעת הבעלים 5.10.2026.
-   הוא רשאי לייבא את שתי הספריות של המודל מ-jsdelivr, ורק אותן (EXEMPT).
+   אין כאן חריג. דף /gemma/ הוסר ב-6.10.2026, והחריג היחיד שנשאר בריפו —
+   `tutor/limor-device.js` — נבדק ב-`brain.js` סעיף 5, לא כאן.
    הוכחת נפילה: FINDINGS.md, שלב D של רקיע; סעיף 4 — FINDINGS.md, 5.10.2026.
    ===================================================================== */
 'use strict';
@@ -24,7 +24,7 @@ const fs = require('fs'), path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const PAGES = process.argv.slice(2).length ? process.argv.slice(2) : ['rakia'];
 const ALLOWED = /^(https?:)?\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|gc\.zgo\.at)(\/|$)/;
-const EXEMPT = { gemma: /^https:\/\/cdn\.jsdelivr\.net\/npm\/(@mlc-ai\/web-llm|@mediapipe\/tasks-genai)(\/|$)/ };
+const EXEMPT = {};
 const EXTERNAL = u => /^(https?:)?\/\//.test(u);
 /* import סטטי ו-export…from, וגם import "x" בלי from. */
 const STATIC_IMPORT = /(?:^|[;\n}])\s*(?:import|export)\s+(?:[^'"`;]*?\sfrom\s*)?["']([^"']+)["']/g;

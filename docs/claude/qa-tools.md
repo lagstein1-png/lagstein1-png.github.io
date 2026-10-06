@@ -51,7 +51,6 @@
     node .claude/qa/rakia-content.js         # רקיע — 469 הטקסטים: מניין, מבנה {he}, אורך, ייחוד, והמילון
     node .claude/qa/rakia-safety.js          # רקיע — מה שאסור לטקסט לומר: רפואה, כסף, משפט, מוות, נבואה, ודאות, מגדר
     node .claude/qa/deps.js                  # רקיע — אפס תלות בזמן ריצה, וכל סקריפט מקומי גם ב-PRE
-    node .claude/qa/deps.js rakia gemma      # כמו ב-all.js: gemma/ רשאית לייבא שתי ספריות מ-jsdelivr, ורק אותן
     node .claude/qa/rakia/mk-ephem.js --check    # טבלאות האפמריס לא נערכו ביד (המחולל: אותו קובץ עם נתיב astronomia)
     node .claude/qa/rakia/mk-places.js --check   # places.js לא נערך ביד (המחולל: אותו קובץ עם all-the-cities ו-tz-lookup)
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
