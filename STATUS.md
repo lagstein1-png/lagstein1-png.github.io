@@ -26,7 +26,7 @@
 | `hebrew-arab` | y19 · 2026-10-06 | y19-pwa1 | תואם |
 | `motal` | d26 · 2026-10-06 | d26-pwa1 | תואם |
 | `math-g7` | mg15 · 2026-10-06 | mg15-pwa1 | תואם |
-| `electric` | e47 · 2026-10-06 | e47-pwa1 | תואם |
+| `electric` | e48 · 2026-10-06 | e48-pwa1 | תואם |
 | `science-mid` | scimid10 · 2026-10-06 | scimid10-pwa1 | תואם |
 | `biology` | bg15 · 2026-10-06 | bg15-pwa1 | תואם |
 | `geography` | q37 · 2026-10-06 | q37-pwa1 | תואם |
