@@ -590,6 +590,20 @@ async function scan(page,sayIsReveal,sayPrep){
            askT.indexOf(a)<0&&exprT.indexOf(a)<0&&others===0)
           add('answer-in-say','REVIEW',
               'מה שנאמר לפני התשובה ('+via+') מכיל אותה, ואף מסיח לא: "'+a+'"',where,via);
+        /* 6.10.2026 — **והרמז נקרא גם הוא לפני המענה.** עד היום
+           נמדד כאן `say` בלבד, ו-`hint` לא נבדק כלל ב-31
+           האפליקציות — בזמן ש-`exam806` בודק אותו ב-806 מהיום
+           הראשון, ו-`hebank` ב-hebrew. רמז שאומר את התשובה במילים
+           שלה פותר במקום הלומד.
+           אותה א־סימטריה בדיוק: רמז שמונה את כל האפשרויות הוא
+           ניסוח לגיטימי, ורק רמז שאומר את הנכונה **ואף מסיח לא**
+           הוא דליפה. והסף 4 ולא 2: ברמז עברי קצר שתי אותיות
+           נפגשות במקרה. */
+        const hOthers=texts.filter((x,i)=>i!==ri&&x&&x.length>=4&&hintT.indexOf(x)>=0).length;
+        if(a&&a.length>=4&&hintT.indexOf(a)>=0&&
+           askT.indexOf(a)<0&&exprT.indexOf(a)<0&&hOthers===0)
+          add('answer-in-hint','REVIEW',
+              'הרמז, שנקרא לפני המענה, מכיל את התשובה ואף מסיח לא: "'+a+'"',where,'hint');
       }
 
       /* 8. חשוד — נאסף לתא ומוכרע בסופו */
@@ -1363,7 +1377,7 @@ const CAT={
   'placeholder-left':5,'double-space':5,'space-before-punct':5,'unbalanced-brackets':5,
   'doubled-word':5,'double-escaped':5,'mojibake':5,'broken-text':5,
   'translation-missing':6,'lang-broken':6,'lang-untranslated':6,
-  'no-say':7,'html-in-say':7,'glued-say':7,'latex-in-say':7,'symbol-in-say':7,'long-say':7,'answer-in-say':7,
+  'no-say':7,'html-in-say':7,'glued-say':7,'answer-in-hint':7,'latex-in-say':7,'symbol-in-say':7,'long-say':7,'answer-in-say':7,
   'long-question':8,'long-option':8,'position-bias':8,'longest-answer':8,
   'long-question-lang':8,'long-option-lang':8,
   'shortest-answer':8,'few-options':8,
