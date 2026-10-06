@@ -52,8 +52,13 @@ const REG=JSON.parse(fs.readFileSync(path.join(DIR,'stages.json'),'utf8'));
 const OUT=path.join(DIR,'reports');
 const N=parseInt(process.env.QA_N||'150',10);
 
+/* 6.10.2026 — O-141: ברירת המחדל סיננה `bank==='buildQ'` בלבד, ולכן
+   כל משפחת `UNITS` / `js/data.js` (אחת־עשרה אפליקציות) נסרקה רק
+   כששם נכתב ביד בשורת הפקודה. אפליקציה שנוספה ולא נקראה בשם —
+   לא נסרקה מעולם, ואף כלי לא אמר זאת. */
+const SCANNABLE=['buildQ','UNITS','js/data.js'];
 const APPS=process.argv.slice(2).length?process.argv.slice(2)
-  :Object.keys(REG.apps).filter(k=>REG.apps[k].bank==='buildQ');
+  :Object.keys(REG.apps).filter(k=>SCANNABLE.includes(REG.apps[k].bank));
 
 /* --------------------------------------------------------------
    כל הבדיקות רצות בתוך הדפדפן. שמונים אלף שאלות אינן עוברות
@@ -803,11 +808,34 @@ async function scanUnits(page){
   /* O-129: tanakh-elem ו-civics-elem — `STORIES` + `ENT` + `makeQ` (js/engine.js). */
   const isST=(!isME&&!isHL&&typeof STORIES!=='undefined'&&Array.isArray(STORIES)&&
               typeof ENT==='object'&&typeof makeQ==='function'&&typeof _S==='object');
-  if(!isME&&!isHL&&!isST){ R.unsupported=true; return R }
-  R.kind=isME?'G':isHL?'GEN':'STORIES';
+  /* 6.10.2026 — O-141. שתי צורות נוספות, ושתיהן אפליקציות ציבוריות
+     שמעולם לא נסרקו:
+
+     · **science-mid** (`isSM`) — `UNITS` עם `lessons` ו-`practice`,
+       הכול ב-`index.html`. שאלה היא `{lv, s, o, h, y}`, ‏`o[0]`
+       היא תמיד הנכונה (`qHTML` מסמן `i===0` כ-right) וההגרלה היא
+       של סדר התצוגה בלבד. בנק סגור: 170 שאלות, 17 יחידות, 3 רמות.
+     · **english-elem** (`isEE`) — `UN` נבנה מ-`RAW` ב-`js/data.js`,
+       והשאלות נבנות ב-`wordQ`/`authQ` מ-`js/engine.js`. הסורק קורא
+       ל-`promptText`, ל-`optInfo` ול-`hintKey` של האפליקציה עצמה
+       ולא מעתיק אותן — העתק נפרד מהמקור ביום שהמקור משתנה. */
+  const isSM=(!isME&&!isHL&&!isST&&typeof UNITS!=='undefined'&&Array.isArray(UNITS)&&
+              UNITS.length>0&&UNITS[0]&&Array.isArray(UNITS[0].practice)&&
+              Array.isArray(UNITS[0].lessons));
+  const isEE=(!isME&&!isHL&&!isST&&!isSM&&typeof UN!=='undefined'&&Array.isArray(UN)&&
+              UN.length>0&&typeof wordQ==='function'&&typeof authQ==='function'&&
+              typeof promptText==='function'&&typeof optInfo==='function');
+  if(!isME&&!isHL&&!isST&&!isSM&&!isEE){ R.unsupported=true; return R }
+  R.kind=isME?'G':isHL?'GEN':isSM?'UNITS-SM':isEE?'UN':'STORIES';
+  /* ב-science-mid ‏`LANGS` הוא מערך של שלשות (`["he","עברית","he-IL"]`)
+     ולא מערך קודים, ולכן `slice()` לבדו היה מחזיר מערכים במקום שפות. */
+  const codeOf=function(x){ return Array.isArray(x)?x[0]:x };
   const LG_=isME?(typeof LG!=='undefined'?LG.slice():['he'])
-                :(Array.isArray(LANGS)?LANGS.slice():Object.keys(LANGS));
+                :(Array.isArray(LANGS)?LANGS.map(codeOf):Object.keys(LANGS));
   R.langs=LG_;
+  /* האפשרויות ב-hebrew-lit וב-english-elem הן התוכן עצמו (עברית /
+     אנגלית) ואינן מתורגמות — בדיקה אחת, לא ארבע זהות. */
+  const oneLangOpts=(isHL||isEE);
   const cells=[];   // {where, gen():raw, unit}
   let norm, padded=0, padEx=null;
 
@@ -854,6 +882,119 @@ async function scanUnits(page){
       if(typeof LESSONS==='object'&&LESSONS[where.split(' ')[0]]===undefined)
         out.extra.push(['no-lesson','FAIL','אין LESSONS ליחידה — כפתור ״דוגמה״ ייפול']);
       S.lang=saveLang;
+      return out;
+    };
+  } else if(isSM){
+    /* --- science-mid: בנק סגור, תא ליחידה ולרמה ---------------------
+       כל שאלה נבנית בדיוק פעם אחת. `pred` (מסך הניבוי שפותח יחידה)
+       אינה שאלה מדורגת — אין לה תשובה נכונה ואין לה `h`/`y` — ולכן
+       היא אינה נספרת כאן; הטקסט שלה כן נבדק עם שאר פרוזת היחידה. */
+    const unitDone={};
+    for(const u of UNITS){
+      const byLv={};
+      const push=function(q,src){ (byLv[q.lv]||(byLv[q.lv]=[])).push([q,src]) };
+      (u.lessons||[]).forEach(function(ls,li){
+        (ls.qs||[]).forEach(function(q,qi){ push(q,'שיעור '+(li+1)+'#'+(qi+1)) });
+      });
+      (u.practice||[]).forEach(function(q,qi){ push(q,'תרגול#'+(qi+1)) });
+      Object.keys(byLv).sort().forEach(function(lv){
+        cells.push({where:u.id+' ('+(u.t&&u.t.he)+') L'+lv, unit:u,
+          all:byLv[lv].map(function(pair){return function(){
+            const q=Object.create(pair[0]); q.__src=pair[1]; q.__u=u; return q }})});
+      });
+    }
+    R.topics=UNITS.length; R.levels=3;
+    norm=function(q,where){
+      const out={ask:{},expl:[],opts:[],ok:[],extra:[]};
+      const u=q.__u;
+      for(const lg of LG_) out.ask[lg]=q.s?q.s[lg]:undefined;
+      out.expl.push({name:'hint (h)',v:{}},{name:'explanation (y)',v:{}});
+      for(const lg of LG_){ out.expl[0].v[lg]=q.h?q.h[lg]:undefined;
+                            out.expl[1].v[lg]=q.y?q.y[lg]:undefined }
+      (q.o||[]).forEach(function(o,i){
+        const m={}; for(const lg of LG_) m[lg]=o?o[lg]:undefined;
+        out.opts.push(m); if(i===0) out.ok.push(0);
+      });
+      if((q.o||[]).length!==4)
+        out.extra.push(['option-count','FAIL',(q.o||[]).length+' אפשרויות — qHTML מצייר ארבע קבועות, והחסרות יוצאות undefined']);
+      /* פרוזת היחידה: ניבוי, תופעה, מושג וצעדים — פעם אחת ליחידה. */
+      if(!unitDone[u.id]){
+        unitDone[u.id]=1;
+        const one=function(obj,label){
+          if(!obj) return;
+          const miss=LG_.filter(function(lg){return !obj[lg]||!String(obj[lg]).trim()});
+          if(miss.length) out.extra.push(['lang-missing','FAIL','חסר '+label+' ב-'+miss.join(','),miss.join(',')]);
+          for(const lg of LG_) if(obj[lg]){
+            textChecks('lesson',plain(obj[lg]),where+' · '+label);
+            if(lg!=='he'&&HEB.test(String(obj[lg])))
+              out.extra.push(['lesson-hebrew','REVIEW',lg+': '+label+' נושא טקסט עברי: '+obj[lg],lg]);
+          }
+        };
+        one(u.t,'כותרת היחידה');
+        if(u.pred){ one(u.pred.s,'משפט הניבוי');
+          (u.pred.o||[]).forEach(function(o,i){ one(o,'ניבוי, אפשרות '+(i+1)) }) }
+        (u.lessons||[]).forEach(function(ls,li){
+          const pre='שיעור '+(li+1)+': ';
+          one(ls.t,pre+'כותרת'); one(ls.phen,pre+'תופעה'); one(ls.concept,pre+'מושג');
+          (ls.steps||[]).forEach(function(st,si){ one(st,pre+'צעד '+(si+1)) });
+        });
+      }
+      out.id=(q.s&&q.s.he)||'';
+      out.src=q.__src;
+      return out;
+    };
+  } else if(isEE){
+    /* --- english-elem: בנק סגור, תא ליחידה --------------------------
+       לכל כרטיס בכל יחידת אוצר מילים נבנית שאלה בכל סוג שהיחידה
+       מציעה (`kindsFor`), ולכל שורת `Q` נבנית שאלת `auth` אחת.
+       `mix` היא הרכבה מחדש של אותן שאלות ולכן אינה תא.
+
+       המסיחים מוגרלים (`pickDistractors`), ולכן נוסח השאלה ייחודי
+       אבל האפשרויות משתנות בין הרצות — הזרע של הסורק מקבע אותן. */
+    for(const u of UN){
+      const where=u.id+' ('+(u.title&&u.title.he)+')';
+      const jobs=[];
+      if(u.kind==='phrase'||!u.cards.length){
+        (u.qs||[]).forEach(function(q0,i){ jobs.push(function(){
+          const q=authQ(q0); q.__src='Q#'+(i+1); q.__u=u; return q }) });
+      } else {
+        const ks=kindsFor(u);
+        (u.cards||[]).forEach(function(w,i){ ks.forEach(function(k){ jobs.push(function(){
+          const q=wordQ(u,w,k); q.__src=(w.en||w.letter)+'/'+k; q.__u=u; return q }) }) });
+        (u.qs||[]).forEach(function(q0,i){ jobs.push(function(){
+          const q=authQ(q0); q.__src='Q#'+(i+1); q.__u=u; return q }) });
+      }
+      if(jobs.length) cells.push({where:where, all:jobs, unit:u});
+    }
+    R.topics=UN.length; R.levels=1;
+    norm=function(q,where){
+      const out={ask:{},expl:[],opts:[],ok:[],extra:[]};
+      const u=q.__u;
+      for(const lg of LG_) out.ask[lg]=promptText(q,lg);
+      /* הרמז והשיעור יושבים במילון ממש כמו בשאר המשפחה, ומפתח
+         הרמז נגזר מהסוג — `hintKey` של האפליקציה, ולא העתק שלו. */
+      const hk=(typeof hintKey==='function')?hintKey(q):null;
+      const lk=(q.kind==='auth')?'lmX_auth':(q.kind==='alisten'?'lmX_al':'lmX_'+q.kind);
+      out.expl.push({name:'hint ('+hk+')',v:{}},{name:'lesson ('+lk+')',v:{}});
+      for(const lg of LG_){
+        out.expl[0].v[lg]=hk?t(hk,null,lg):undefined;
+        out.expl[1].v[lg]=t(lk,null,lg);
+      }
+      (q.opts||[]).forEach(function(o,i){
+        const m={}; for(const lg of LG_){ const inf=optInfo(q,i,lg); m[lg]=inf?inf.text:undefined }
+        out.opts.push(m); if(i===q.ans) out.ok.push(i);
+      });
+      if(!(q.opts||[]).length||q.ans<0)
+        out.extra.push(['answer-index','FAIL','ans='+q.ans+' — התשובה הנכונה אינה ברשימת האפשרויות']);
+      /* הכרטיס עצמו: לכל כרטיס אוצר מילים חייב להיות תרגום בשלוש
+         שפות הממשק שאינן אנגלית — בלעדיו שאלת ה״משמעות״ ריקה. */
+      if(q.w&&q.w.tr){
+        const miss=LG_.filter(function(lg){return lg!=='en'&&(!q.w.tr[lg]||!String(q.w.tr[lg]).trim())});
+        if(miss.length) out.extra.push(['lang-missing','FAIL',
+          'לכרטיס "'+(q.w.en||q.w.letter)+'" אין תרגום ל-'+miss.join(','),miss.join(',')]);
+      }
+      out.id=u.id+' ¦ '+(q.kind)+' ¦ '+(q.w?(q.w.en||q.w.letter):(q.correct||q.stim||''));
+      out.src=q.__src;
       return out;
     };
   } else if(isST){
@@ -1011,7 +1152,7 @@ async function scanUnits(page){
 
   const cov={q:0,hasHint:0,noHint:0,noSteps:0,hasSteps:0,wrong:0,hasWhy:0,noWhy:0,hasExpl:0,noExpl:0};
   const lr={}; for(const lg of LG_) lr[lg]={lg:lg,built:0,threw:0,empty:0,heb:0,hebOpt:0,hebWhy:0,lim:0,longOpt:0,longQ:0,
-    skipHeb:(isHL&&lg!=='he'), teaches:isHL?'he':''};
+    skipHeb:(oneLangOpts&&lg!=='he'), teaches:isHL?'he':''};
 
   for(const c of cells){
     const where=c.where;
@@ -1044,7 +1185,7 @@ async function scanUnits(page){
         n.ok.length+' אפשרויות נכונות: '+n.ok.map(function(i){return n.opts[i].he}).join(' | ')+' — '+(n.ask.he||''),here);
       /* ב-hebrew-lit האפשרויות הן התוכן העברי עצמו ואינן מתורגמות —
          בדיקה אחת, לא ארבע זהות. */
-      for(const lg of (isHL?['he']:LG_)){
+      for(const lg of (oneLangOpts?['he']:LG_)){
         const tx=n.opts.map(function(o){return o[lg]});
         if(tx.some(function(x){return x===undefined||x===null})){
           add('lang-missing','FAIL',lg+': אפשרות בלי טקסט — '+(n.ask.he||''),here,lg); continue }
@@ -1082,7 +1223,7 @@ async function scanUnits(page){
           if(v===undefined||v===null||!String(v).trim()) gone.push(lg);
           else {
             textChecks('hint',plain(v),here);
-            if(lg!=='he'&&HEB.test(String(v))&&(isME||isST)){ lr[lg].hebWhy++ }
+            if(lg!=='he'&&HEB.test(String(v))&&(isME||isST||isSM)){ lr[lg].hebWhy++ }
           }
         }
         if(gone.length===LG_.length){ cov.noExpl++; add('no-explanation','FAIL','אין '+e.name+' באף שפה — '+(n.ask.he||''),here,e.name.split(' ')[0]) }
@@ -1096,7 +1237,7 @@ async function scanUnits(page){
       for(const lg of LG_){
         const v=n.ask[lg]; if(v==null) continue;
         textChecks('ask',plain(v),here);
-        if(lg!=='he'&&HEB.test(String(v))&&(isME||isST)) dirty=true;
+        if(lg!=='he'&&HEB.test(String(v))&&(isME||isST||isSM)) dirty=true;
       }
       for(const lg of LG_) if(lg!=='he'&&(isME||isST)){
         const d=dirty||n.opts.some(function(o){return HEB.test(String(o[lg]))})||
@@ -1302,15 +1443,20 @@ if(require.main===module) (async()=>{
   if(unitsPath){
     try{
       await page.waitForFunction(function(){
-        return typeof UNITS!=='undefined'&&UNITS.length>0&&
-               ((typeof G==='object'&&G)||(typeof GEN==='object'&&GEN)||
-                (typeof STORIES!=='undefined'&&STORIES.length>0&&typeof makeQ==='function'));
+        /* 6.10.2026: שתי צורות נוספות — science-mid (`UNITS` עם
+           `practice`) ו-english-elem (`UN` + `wordQ`). בלעדיהן
+           ההמתנה נגמרה בתקרה, והסורק קרא דף חצי מחווט. */
+        return (typeof UNITS!=='undefined'&&UNITS.length>0&&
+                 ((typeof G==='object'&&G)||(typeof GEN==='object'&&GEN)||
+                  (UNITS[0]&&UNITS[0].practice)||
+                  (typeof STORIES!=='undefined'&&STORIES.length>0&&typeof makeQ==='function')))||
+               (typeof UN!=='undefined'&&UN.length>0&&typeof wordQ==='function');
       },{timeout:8000});
     }catch(e){}
     await page.waitForTimeout(250);
     R=await scanUnits(page);
     if(R.unsupported){
-      console.log(app,'מחוץ להיקף — יש UNITS אבל לא G, לא GEN ולא STORIES; הסורק אינו מכיר את המבנה');
+      console.log(app,'מחוץ להיקף — הסורק אינו מכיר את המבנה (לא G, לא GEN, לא STORIES, לא UNITS של science-mid ולא UN של english-elem)');
       await ctx.close(); continue;
     }
   } else {
