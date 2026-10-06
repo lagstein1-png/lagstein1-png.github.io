@@ -41,7 +41,9 @@ const BASE = {
   'motal': 17,
   'literature': 9, 'tanakh': 9, 'hebrew-arab': 9,
   /* החוב הפתוח — O-136(ו). כל מספר כאן נמדד ב-6.10.2026. */
-  'islam': 5, 'russian': 4, 'geography': 3, 'biology': 2, 'civics': 7,
+  /* `biology` עלתה מ-2 ל-9 ב-6.10.2026 — 105 שאלות חדשות — ולכן
+     היא עברה לקו התקן ואינה חוב. */
+  'islam': 5, 'russian': 4, 'geography': 3, 'civics': 7,
 };
 
 /* המאגר נקרא בהרצה ולא ב-grep: `topic(...)` בונה את TOPICS, ו-`Q`

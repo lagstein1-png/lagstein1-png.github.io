@@ -28,7 +28,7 @@
 | `math-g7` | mg13 · 2026-10-05 | mg13-pwa1 | תואם |
 | `electric` | e45 · 2026-10-05 | e45-pwa1 | תואם |
 | `science-mid` | scimid8 · 2026-10-05 | scimid8-pwa1 | תואם |
-| `biology` | bg9 · 2026-10-05 | bg9-pwa1 | תואם |
+| `biology` | bg10 · 2026-10-06 | bg10-pwa1 | תואם |
 | `geography` | q32 · 2026-10-05 | q32-pwa1 | תואם |
 | `bagrut-history` | h128 · 2026-10-05 | h128-pwa1 | תואם |
 | `islam` | is10 · 2026-10-05 | is10-pwa1 | תואם |
