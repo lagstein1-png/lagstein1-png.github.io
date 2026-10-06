@@ -30,7 +30,7 @@
 | `science-mid` | scimid10 · 2026-10-06 | scimid10-pwa1 | תואם |
 | `biology` | bg12 · 2026-10-06 | bg12-pwa1 | תואם |
 | `geography` | q35 · 2026-10-06 | q35-pwa1 | תואם |
-| `bagrut-history` | h130 · 2026-10-06 | h130-pwa1 | תואם |
+| `bagrut-history` | h131 · 2026-10-06 | h131-pwa1 | תואם |
 | `islam` | is13 · 2026-10-06 | is13-pwa1 | תואם |
 | `russian` | ru13 · 2026-10-06 | ru13-pwa1 | תואם |
 | `tanakh-elem` | te16 · 2026-10-06 | te16-pwa1 | תואם |
