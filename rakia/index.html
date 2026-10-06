@@ -361,7 +361,7 @@ html[lang="en"] body{letter-spacing:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r43 · 2026-10-06";
+var BUILD="r44 · 2026-10-06";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -1127,7 +1127,11 @@ function speakDevice(text,code,rate){
 }
 function plainOf(h){ var d=document.createElement("div"); d.innerHTML=String(h||""); return (d.textContent||"").replace(/\s+/g," ").trim() }
 function speak(text,btn){
-  text=plainOf(String(text||"")).trim(); if(!text)return;
+  /* 6.10.2026 — O-145: `<br>` נעלם ב-plainOf בלי להשאיר רווח, ולכן
+     "…ניקיון גדול<br>עד איזו שעה" נאמר כמילה אחת מודבקת. תגית `br`
+     היא סוף משפט, ולכן היא הופכת לנקודה לפני ההשטחה. נמדד
+     ב-hebrew-arab: 450 מופעים בקטעי הקריאה. */
+  text=plainOf(String(text||"").replace(/<br\s*\/?>/gi,". ")).trim(); if(!text)return;
   stopSpeak(); setSpeakBtn(btn||null,!!btn);
   speakDevice(text,LG("he-IL","en-US"),clamp(state.rate,0.55,1.4));
 }
@@ -1216,7 +1220,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r43-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r44-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>

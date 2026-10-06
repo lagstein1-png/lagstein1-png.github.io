@@ -64,10 +64,19 @@ const APPS=process.argv.slice(2).length?process.argv.slice(2)
    כל הבדיקות רצות בתוך הדפדפן. שמונים אלף שאלות אינן עוברות
    את הגשר אל node — רק הספירות והדוגמאות עוברות.
    -------------------------------------------------------------- */
-async function scan(page){
- return page.evaluate(({N})=>{
+async function scan(page,sayIsReveal,sayPrep){
+ return page.evaluate(({N,sayIsReveal,sayPrep})=>{
   const R={n:0,cells:0,find:{},lang:{},langs:[]};
   const MAXEX=3;
+  /* ניקוי ההקראה של האפליקציה עצמה, כפי ש-`speak()` מריץ אותו. */
+  let prep=function(x){ return x }, prepOk=false;
+  if(sayPrep){
+    try{
+      const f=new Function('text','return ('+sayPrep+')');
+      if(typeof f('a<br>b')==='string'){ prep=function(x){ try{ return f(x) }catch(e){ return x } }; prepOk=true }
+    }catch(e){}
+  }
+  R.sayPrep=prepOk?sayPrep:null;
   /* ממצא = שם, חומרה, הודעה, ומקום.
 
      שתי החלטות שנלמדו מהריצה הראשונה, ושתיהן על רעש:
@@ -435,14 +444,41 @@ async function scan(page){
         }
         catch(e){ return raw }
       };
-      const say=spk(String(q.say||''));
+      /* `prep` הוא הביטוי של `speak()` עצמו, מורץ כאן על הטקסט
+         הגולמי. נכשל או חסר — נופלים לשדה הגולמי, ונאמר בדוח. */
+      const rawSay=String(q.say||'');
+      const say=spk(prep(rawSay));
+      /* 6.10.2026 — O-145. **תגית שנעלמת בלי להשאיר רווח מדביקה
+         שתי מילים.** ‏`plainOf` משטיח `<br>` לכלום, ולכן
+         "…ניקיון גדול<br>עד איזו שעה" נאמר "גדולעד". זה אינו
+         נראה על המסך (שם התגית עושה את עבודתה) ואף בדיקה לא
+         ראתה אותו: `html-in-say` מדד את השדה הגולמי ונעלם ברגע
+         שהסורק התחיל למדוד את מה שבאמת נאמר. */
+      if(prepOk&&/<\s*(br|\/p|\/div|\/li|\/h[1-6])\b[^>]*>/i.test(rawSay)){
+        const parts=rawSay.split(/<\s*(?:br|\/p|\/div|\/li|\/h[1-6])\b[^>]*>/i).map(prep);
+        for(let i=0;i+1<parts.length;i++){
+          const a2=(parts[i]||'').trim().split(/\s+/).pop()||'';
+          const b2=((parts[i+1]||'').trim().split(/\s+/)[0])||'';
+          if(a2&&b2&&say.indexOf(a2+b2)>=0)
+            add('glued-say','REVIEW','תגית נעלמה בלי רווח ושתי מילים נאמרות כאחת: "'+a2+b2+'"',where);
+        }
+      }
       if(askT&&!say.trim()) add('no-say','REVIEW','אין say — אין מה להקריא',where);
       if(/<[a-zA-Z\/]/.test(say)) add('html-in-say','REVIEW','תגיות HTML ב-say: '+say.slice(0,80),where);
       if(LATEX.test(say)) add('latex-in-say','FAIL','LaTeX ב-say: '+say.slice(0,80),where);
       const sym=say.match(UNSPOKEN);
       if(sym) add('symbol-in-say','REVIEW',
         'סימן ש-SAY_MAP לא המיר: '+say.slice(0,80),where,sym[0]);
-      if(say.length>400) add('long-say','REVIEW',say.length+' תווים בהקראה אחת',where);
+      /* 6.10.2026 — O-142(א). ״הקראה ארוכה״ היא ממצא רק באפליקציה
+         שמשמיעה את המחרוזת כמקשה אחת. שלושים וארבע מתוך ארבעים
+         נושאות `segments()` עם `SEG_MAX=90`, שחותך את מה שנאמר
+         למקטעים לפני שהוא מגיע למנוע הדיבור — ושם 436 תווים אינם
+         נשימה אחת אלא חמישה מקטעים. בלי התנאי הזה היו 932 מופעים
+         (civics 482, hebrew-arab 450) על תוכן שהמנוע כבר מטפל בו.
+         מי שאין לו מפצל — הסף נשאר, והוא נאמר. */
+      const splits=(typeof segments==='function'&&typeof SEG_MAX==='number'&&SEG_MAX>0);
+      if(say.length>400&&!splits)
+        add('long-say','REVIEW',say.length+' תווים בהקראה אחת, והאפליקציה אינה מפצלת (אין segments/SEG_MAX)',where);
       /* דליפת תשובה בהקראה נמדדת על **מה שבאמת נאמר לפני
          שעונים**, ולא על השדה הגולמי `say`.
 
@@ -458,6 +494,21 @@ async function scan(page){
           try{ const o=sitSay(q); spoken=plain(o&&o.t); via='sitSay' }catch(e){}
         } else if(typeof questionSay==='function'){
           try{ spoken=plain(questionSay(q)); via='questionSay' }catch(e){}
+        } else if(q.lead!==undefined&&q.lead!==null){
+          spoken=spk(String(q.lead||'')); via='lead';
+        } else if(sayIsReveal){
+          /* 6.10.2026 — O-153, ותשע אפליקציות. במשפחה הזאת `say`
+             **אינו** מה שנשמע לפני המענה. הקוד באפליקציה הוא
+             `speak(saySpell(P.done ? P.q.say : (P.q.lead||"")))`:
+             ‏`lead` נאמר קודם ו-`say` רק אחרי, והוא נבנה בכוונה
+             כ-`שאלה + תשובה + הסבר`. ‏`buildQ` הציבורי מעביר את
+             ה-`lead` בשדה `ask`, ולכן בתוך הסורק אין `lead` כלל
+             ונפלנו ל-`say` — 24,820 ״דליפות״ בתשע אפליקציות,
+             שכולן תיאור של התכנון ולא ממצא. מה שנשמע לפני המענה
+             הוא `ask`, והבדיקה כבר מוציאה אותו (`askT.indexOf(a)<0`),
+             ולכן כאן אין מה למדוד. הדגל נקבע ב-node מתוך קוד
+             האפליקציה עצמה, ולא מניחוש בתוך הדף. */
+          spoken=''; via='ask';
         }
         /* שתי הסתייגויות, בלעדיהן המדד מדווח על מה שחייב לקרות:
 
@@ -608,7 +659,7 @@ async function scan(page){
     ') בלי הסבר למה הם שגויים','—');
 
   return R;
- },{N:N});
+ },{N:N,sayIsReveal:!!sayIsReveal,sayPrep:sayPrep||null});
 }
 
 /* שפה: מחליפים, מגרילים מעט, ובודקים שהאפליקציה בכלל בונה שאלה.
@@ -1306,7 +1357,7 @@ const CAT={
   'placeholder-left':5,'double-space':5,'space-before-punct':5,'unbalanced-brackets':5,
   'doubled-word':5,'double-escaped':5,'mojibake':5,'broken-text':5,
   'translation-missing':6,'lang-broken':6,'lang-untranslated':6,
-  'no-say':7,'html-in-say':7,'latex-in-say':7,'symbol-in-say':7,'long-say':7,'answer-in-say':7,
+  'no-say':7,'html-in-say':7,'glued-say':7,'latex-in-say':7,'symbol-in-say':7,'long-say':7,'answer-in-say':7,
   'long-question':8,'long-option':8,'position-bias':8,'longest-answer':8,
   'long-question-lang':8,'long-option-lang':8,
   'shortest-answer':8,'few-options':8,
@@ -1437,6 +1488,30 @@ if(require.main===module) (async()=>{
     console.log(app,'מחוץ להיקף — bank="'+bank+'", והסורק דורש buildQ או UNITS');
     await ctx.close(); continue;
   }
+  /* 6.10.2026 — O-153. הדגל נקרא מקוד האפליקציה, לא מניחוש בדף:
+     `speak(... P.done ? P.q.say : (P.q.lead || "") ...)` אומר
+     במפורש ש-`say` נשמע רק אחרי המענה. תשע אפליקציות. */
+  /* 6.10.2026 — O-145. **מה שנמדד הוא מה שנאמר, ולא השדה הגולמי.**
+     ‏`speak()` מנקה את הטקסט לפני שהוא מגיע למנוע — משטיח תגיות
+     (`plainOf`), ובשתי אפליקציות גם ממיר רצף קו תחתון. הסורק קרא
+     את `q.say` כפי שהוא, ולכן דיווח 450 `html-in-say` ו-268
+     `symbol-in-say · _` ב-hebrew-arab — על טקסט שהלומד שומע נקי.
+     זו אותה התראת שווא שהקובץ הזה מתעד כבר שלוש פעמים.
+     הביטוי **אינו מועתק**: הוא נחלץ מקוד האפליקציה ומורץ בדף,
+     בדיוק כמו ש-exam806 מחלץ את checkAnswer מ-app.js. */
+  const SAY_PREP=(function(){
+    try{
+      const src=fs.readFileSync(path.join(ROOT,app,'index.html'),'utf8');
+      const m=src.match(/text=(plainOf\(String\(text\|\|""\)[\s\S]{0,400}?);\s*if\(!text\)return;/);
+      return m?m[1]:null;
+    }catch(e){ return null }
+  })();
+  const SAY_IS_REVEAL=(function(){
+    try{
+      const f=path.join(ROOT,app,'index.html');
+      return /P\.done\s*\?\s*P\.q\.say\s*:/.test(fs.readFileSync(f,'utf8'));
+    }catch(e){ return false }
+  })();
   try{ await page.goto('http://127.0.0.1:8099/'+app+'/',{waitUntil:unitsPath?'load':'domcontentloaded'}) }
   catch(e){ console.log(app,'SKIP — הדף לא נטען'); await ctx.close(); continue }
   let R;
@@ -1485,7 +1560,7 @@ if(require.main===module) (async()=>{
   }
   await page.waitForTimeout(250);
 
-  R=await scan(page);
+  R=await scan(page,SAY_IS_REVEAL,SAY_PREP);
   R.langsRun=[];
   for(const lg of (R.langs||['he'])){
     const r=await scanLang(page,lg);

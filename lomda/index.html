@@ -1165,7 +1165,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l161 · 2026-10-06";
+var BUILD="l162 · 2026-10-06";
 var SKEY="lomda-state-v1";
 var GKEY_STORE="lomda-gkey";
 
@@ -2084,7 +2084,11 @@ function speak(text,lang,rateMul){
      לבד, וניקוי חוזר אינו משנה דבר — אבל בלעדיו כל מחרוזת שנשארה
      עם <sub> או <span class="frac"> הוקראה בקול כתגית: הסטודנט
      שמע "span class frac" באמצע השאלה. */
-  text=plainOf(String(text||"")).trim(); if(!text)return;
+  /* 6.10.2026 — O-145: `<br>` נעלם ב-plainOf בלי להשאיר רווח, ולכן
+     "…ניקיון גדול<br>עד איזו שעה" נאמר כמילה אחת מודבקת. תגית `br`
+     היא סוף משפט, ולכן היא הופכת לנקודה לפני ההשטחה. נמדד
+     ב-hebrew-arab: 450 מופעים בקטעי הקריאה. */
+  text=plainOf(String(text||"").replace(/<br\s*\/?>/gi,". ")).trim(); if(!text)return;
   lang=lang||"en";
   var code=lang==="en"?EN_TTS:LANGS[lang].tts;
   var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
@@ -4819,7 +4823,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l161-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l162-pwa1").catch(function(){});
   });
 }
 </script>
