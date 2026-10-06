@@ -10,9 +10,13 @@
      node .claude/qa/hebank.js --check      (אותו דבר; לעקביות עם שאר הכלים)
      QA_BANK=<נתיב> node .claude/qa/hebank.js   מאגר חלופי — להוכחת נפילה
 
-   המאגר שטוח ועברית בלבד: לכל פריט `{tracks, topic, level, passage,
-   prompt, options, correct, hint, explain}`. לכן אין כאן בדיקת
-   ארבע שפות, ואין `buildQ` להריץ — נסרק הכול, ולא במדגם.
+   המאגר שטוח, ואין בו `buildQ` להריץ — נסרק הכול, ולא במדגם.
+   שני חלקים ושתי סכימות:
+
+     practice       `{tracks, topic, level, passage, prompt, options,
+                    correct, hint, explain}` — **עברית בלבד.**
+     topics[].levels  פריטי `concept` ו-`scenario`, ו-`conceptExtras`
+                    לצדם — **ארבע שפות**, ולכן נבדקת שלמותן.
 
    הדוח נכתב ל-`reports/hebrew.json` ו-`.md` באותה צורה שהשאר
    כותבים, כדי ש-`stage.js` ו-`fresh.js` יקראו אותו כמו כל אחד.
@@ -117,6 +121,48 @@ for (let i = 0; i < items.length; i++) {
   if (h && ans && ans.length >= 3 && h.indexOf(ans) >= 0)
     add('answer-in-hint', 'FAIL', 'הרמז מכיל את התשובה במילים שלה: "' + ans + '"', where);
 }
+
+/* --- החלק הרב־לשוני: מושגים, תרחישים ותוספות ---------------------
+   6.10.2026. ‏`practice` עברית בלבד, אבל `topics[].levels` ו-
+   ‏`conceptExtras` כתובים בארבע שפות — וזה החלק שהלומד קורא
+   **לפני** התרגול. חסר תרגום שם הוא מסך ריק, לא אי־נוחות. */
+const LGS = ['he', 'ar', 'ru', 'en'];
+function four(obj, label, where) {
+  if (!obj) return;
+  const miss = LGS.filter(lg => {
+    const v = obj[lg];
+    if (Array.isArray(v)) return !v.length || v.some(x => !norm(x));
+    return !norm(v);
+  });
+  if (miss.length === LGS.length) add('lang-missing', 'FAIL', 'אין ' + label + ' באף שפה', where);
+  else if (miss.length) add('lang-missing', 'FAIL', 'חסר ' + label + ' ב-' + miss.join(','), where);
+  /* **ואין כאן `lang-untranslated`, בכוונה.** האפליקציה הזאת מלמדת
+     עברית, ולכן ״נמט تصريف الفعل العبري، مثل קל أو הפעיל״ הוא
+     הגדרה ערבית תקינה לגמרי: המילה העברית היא החומר, והערבית
+     היא ההסבר. נמדד — שש הגדרות כאלה (קל, הפעיל, כתיבה, לכן).
+     זה בדיוק מה ש-`LEARN="he"` פוטר ממנו ב-`ulpan`. */
+}
+for (const t of (B.topics || [])) {
+  four(t.name, 'שם הנושא', t.id);
+  four(t.description, 'תיאור הנושא', t.id);
+  (t.levels || []).forEach((lv, li) => (lv || []).forEach((x, xi) => {
+    const w = t.id + ' L' + (li + 1) + ' #' + (xi + 1);
+    if (x.type === 'concept') { four(x.name, 'שם המושג', w); four(x.def, 'הגדרת המושג', w) }
+    else if (x.type === 'scenario') {
+      four(x.lines, 'שורות התרחיש', w);
+      (x.questions || []).forEach((qq, qi) => {
+        const pre = 'תרחיש, שאלה ' + (qi + 1) + ': ';
+        four(qq.prompt, pre + 'נוסח', w);
+        four(qq.answer, pre + 'תשובה', w);
+        (qq.wrong || []).forEach((ww, wi) => four(ww, pre + 'מסיח ' + (wi + 1), w));
+      });
+    }
+  }));
+}
+(B.conceptExtras || []).forEach((x, i) => {
+  const w = 'conceptExtras #' + (i + 1) + ' (' + norm(x.topic) + ')';
+  four(x.name, 'שם המושג', w); four(x.def, 'ההגדרה', w);
+});
 
 /* --- ניחוש לפי אורך, לכל תא --- */
 const byCell = {};
