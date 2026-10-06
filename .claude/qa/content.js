@@ -57,6 +57,17 @@ const N=parseInt(process.env.QA_N||'150',10);
    כששם נכתב ביד בשורת הפקודה. אפליקציה שנוספה ולא נקראה בשם —
    לא נסרקה מעולם, ואף כלי לא אמר זאת. */
 const SCANNABLE=['buildQ','UNITS','js/data.js'];
+/* 6.10.2026 — **במשפחת המתמטיקה הרמז הוא הכלל, והכלל נוקב בתוצאה.**
+   ״דטרמיננטה שונה מאפס — פתרון יחיד. אפס — בודקים אם המשוואות
+   זהות או סותרות״ הוא הניסוח התקני של המשפט, והוא מזכיר את
+   התשובה הנכונה בשמה ואת שתי האחרות רק ברמז (״זהות או סותרות״).
+   הבדיקה החדשה `answer-in-hint` סימנה אותו 127 פעם ב-math-uni
+   ו-99 ב-math-uni2, וב-28 האפליקציות האחרות — **אפס**. זו אותה
+   החרגה בדיוק, ומאותה סיבה, שיש ב-`clearwhy.js`: שם ההסבר הוא
+   נוסחה, כאן הרמז הוא כלל. ההחרגה נכתבת ביד **והרשימה היא של
+   מי שיוצא**, כדי שאפליקציה חדשה תיכנס כברירת מחדל. */
+const HINT_IS_RULE=new Set(['math-app','math-teen','math-uni','math-uni2','math-uni3',
+                            'math-g7','math-elem','electric','bagrut-806']);
 const APPS=process.argv.slice(2).length?process.argv.slice(2)
   :Object.keys(REG.apps).filter(k=>SCANNABLE.includes(REG.apps[k].bank));
 
@@ -64,8 +75,8 @@ const APPS=process.argv.slice(2).length?process.argv.slice(2)
    כל הבדיקות רצות בתוך הדפדפן. שמונים אלף שאלות אינן עוברות
    את הגשר אל node — רק הספירות והדוגמאות עוברות.
    -------------------------------------------------------------- */
-async function scan(page,sayIsReveal,sayPrep){
- return page.evaluate(({N,sayIsReveal,sayPrep})=>{
+async function scan(page,sayIsReveal,sayPrep,hintIsRule){
+ return page.evaluate(({N,sayIsReveal,sayPrep,hintIsRule})=>{
   const R={n:0,cells:0,find:{},lang:{},langs:[]};
   const MAXEX=3;
   /* ניקוי ההקראה של האפליקציה עצמה, כפי ש-`speak()` מריץ אותו. */
@@ -600,7 +611,7 @@ async function scan(page,sayIsReveal,sayPrep){
            הוא דליפה. והסף 4 ולא 2: ברמז עברי קצר שתי אותיות
            נפגשות במקרה. */
         const hOthers=texts.filter((x,i)=>i!==ri&&x&&x.length>=4&&hintT.indexOf(x)>=0).length;
-        if(a&&a.length>=4&&hintT.indexOf(a)>=0&&
+        if(!hintIsRule&&a&&a.length>=4&&hintT.indexOf(a)>=0&&
            askT.indexOf(a)<0&&exprT.indexOf(a)<0&&hOthers===0)
           add('answer-in-hint','REVIEW',
               'הרמז, שנקרא לפני המענה, מכיל את התשובה ואף מסיח לא: "'+a+'"',where,'hint');
@@ -679,7 +690,7 @@ async function scan(page,sayIsReveal,sayPrep){
     ') בלי הסבר למה הם שגויים','—');
 
   return R;
- },{N:N,sayIsReveal:!!sayIsReveal,sayPrep:sayPrep||null});
+ },{N:N,sayIsReveal:!!sayIsReveal,sayPrep:sayPrep||null,hintIsRule:!!hintIsRule});
 }
 
 /* שפה: מחליפים, מגרילים מעט, ובודקים שהאפליקציה בכלל בונה שאלה.
@@ -1580,7 +1591,7 @@ if(require.main===module) (async()=>{
   }
   await page.waitForTimeout(250);
 
-  R=await scan(page,SAY_IS_REVEAL,SAY_PREP);
+  R=await scan(page,SAY_IS_REVEAL,SAY_PREP,HINT_IS_RULE.has(app));
   R.langsRun=[];
   for(const lg of (R.langs||['he'])){
     const r=await scanLang(page,lg);
