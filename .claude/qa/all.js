@@ -113,6 +113,7 @@ const SUITE = [
   { id: 'a11y',     args: [] },
   { id: 'aria',     args: [] },
   { id: 'pressed',  args: [] },
+  { id: 'density',  args: [] },
   { id: 'fonts',    args: [] },
   { id: 'engine',   args: [] },
   { id: 'exam806',  args: [] },
