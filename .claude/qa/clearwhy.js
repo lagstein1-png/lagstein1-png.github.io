@@ -52,8 +52,25 @@ const PER_CELL = Number(process.env.QA_N || 4);
 const MAXLEN = Number(process.env.QA_WHYLEN || 120);
 
 /* משפחת החידון בלבד. במשפחת המתמטיקה ההסבר **הוא** נוסחה, וזה
-   נכון שם: ״הכפלתם ב-3 במקום ב-2״ יושב ליד תרגיל. */
-const APPS = ['english', 'history', 'ulpan', 'lomda', 'kotvim'];
+   נכון שם: ״הכפלתם ב-3 במקום ב-2״ יושב ליד תרגיל.
+
+   6.10.2026 — **הרשימה הפוכה עכשיו, וזה העיקר.** היא הייתה חמישה
+   שמות כתובים ביד, ולכן `civics` — שיש בה 1,536 הסברי מסיחים
+   בארבע שפות — דולגה בכל ריצה, גם ב-`all.js`. הכלי קורא אותה
+   מצוין כשנותנים לו את השם. אותה משפחת ממצאים של O-141 ושל
+   O-135: **רשימה שנכתבת ביד מדלגת בשקט על מה שנוסף אחריה.**
+
+   לכן המשפחה נגזרת מ-`stages.json`, וההחרגה היא שנכתבת ביד —
+   משפחת המתמטיקה והמחוללים, שבהם ההסבר הוא נוסחה. אפליקציה
+   חדשה **נכנסת** כברירת מחדל, ומי שמחריג אותה אומר למה. */
+const MATHY = new Set(['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
+                       'math-g7', 'math-elem', 'electric', 'science', 'science-mid',
+                       'geography-elem', 'bagrut-806', 'bagrut-history']);
+const REG = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, 'stages.json'), 'utf8'));
+const APPS = Object.keys(REG.apps)
+  .filter(k => ['buildQ', 'UNITS', 'js/data.js'].includes(REG.apps[k].bank))
+  .filter(k => !MATHY.has(k))
+  .concat(['kotvim']);
 
 /* סימנים שאין להם מקום בהסבר של שאלה מילולית.
 
@@ -87,7 +104,7 @@ const NATIVE = /[֐-׿؀-ۿЀ-ӿ]/;
               typeof TOPICS !== 'undefined' && TOPICS && TOPICS.length > 0,
         { timeout: 8000 }).catch(() => {});
     } catch (e) {
-      console.log(`✗ ${app.padEnd(9)} הדף לא נטען — ${e.message}`);
+      console.log(`✗ ${app.padEnd(13)} הדף לא נטען — ${e.message}`);
       bad++; await ctx.close(); continue;
     }
 
@@ -140,7 +157,7 @@ const NATIVE = /[֐-׿؀-ۿЀ-ӿ]/;
     }, { per: PER_CELL, maxlen: MAXLEN, symSrc: SYMBOL.source, natSrc: NATIVE.source });
 
     await ctx.close();
-    if (res.skip) { console.log(`· ${app.padEnd(9)}אין buildQ/TOPICS — דולג`); continue }
+    if (res.skip) { console.log(`· ${app.padEnd(13)}אין buildQ/TOPICS — דולג`); continue }
 
     let appBad = 0, tot = 0;
     const lines = [];
@@ -153,10 +170,10 @@ const NATIVE = /[֐-׿؀-ۿЀ-ӿ]/;
       lines.push(`     ${lg}: ${r.sym} עם סימן · ${r.foreign} בלי שפת הלומד · ${r.long} ארוך מ-${MAXLEN}`);
       for (const e of r.ex) lines.push('        ' + e);
     }
-    if (!tot) { console.log(`✗ ${app.padEnd(9)}לא נמדד אף הסבר — הבדיקה שבורה, לא האפליקציה`); bad++; continue }
+    if (!tot) { console.log(`✗ ${app.padEnd(13)}לא נמדד אף הסבר — הבדיקה שבורה, לא האפליקציה`); bad++; continue }
     checked++;
-    if (appBad) { bad += appBad; console.log(`✗ ${app.padEnd(9)}${appBad} הסברים שאינם משפט קריא`); lines.forEach(l => console.log(l)) }
-    else console.log(`✓ ${app.padEnd(9)}${tot} הסברים בארבע שפות — משפט, בשפת הלומד, בלי סימנים`);
+    if (appBad) { bad += appBad; console.log(`✗ ${app.padEnd(13)}${appBad} הסברים שאינם משפט קריא`); lines.forEach(l => console.log(l)) }
+    else console.log(`✓ ${app.padEnd(13)}${tot} הסברים בארבע שפות — משפט, בשפת הלומד, בלי סימנים`);
   }
 
   await browser.close();
