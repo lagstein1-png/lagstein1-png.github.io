@@ -31,7 +31,7 @@
 | `biology` | bg12 · 2026-10-06 | bg12-pwa1 | תואם |
 | `geography` | q35 · 2026-10-06 | q35-pwa1 | תואם |
 | `bagrut-history` | h130 · 2026-10-06 | h130-pwa1 | תואם |
-| `islam` | is12 · 2026-10-06 | is12-pwa1 | תואם |
+| `islam` | is13 · 2026-10-06 | is13-pwa1 | תואם |
 | `russian` | ru13 · 2026-10-06 | ru13-pwa1 | תואם |
 | `tanakh-elem` | te16 · 2026-10-06 | te16-pwa1 | תואם |
 | `civics-elem` | mc17 · 2026-10-06 | mc17-pwa1 | תואם |
