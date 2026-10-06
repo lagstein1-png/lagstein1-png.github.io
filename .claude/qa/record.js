@@ -164,10 +164,27 @@ function spendAdd(model, texts, usage) {
   SPEND.byModel[model] = Math.round(((SPEND.byModel[model] || 0) + c) * 1e4) / 1e4;
   SPEND.budgetUsd = BUDGET;
   fs.mkdirSync(SPEND_DIR, { recursive: true });
+  writeRun();
+}
+
+/* **למה הסיבה נכתבת לקובץ ולא רק ללוג — 6.10.2026.** שלוש ריצות של
+   `geography` נגמרו עם 0–2 קבצים ודיווחו ״success״, והסיבה ישבה בלוג
+   של ה-job בלבד — שאינו נגיש מסביבת הפיתוח (`gh api …/logs` מפנה
+   ל-blob חיצוני). ולכן אי אפשר היה לדעת אם זו מכסה, תקרת הוצאה,
+   ה-timeout או שער האיכות, וההנחה הראשונה (״מכסה יומית״) הייתה
+   שגויה. ‏`stopped`, `made` ו-`failed` נכתבים עכשיו ל-
+   `record-spend/<run>.json`, שנדחף בכל מקטע — ולכן הריצה הבאה עונה
+   על השאלה בעצמה. */
+function writeRun() {
+  SPEND.stopped = STOPPED || null;
+  SPEND.made = RUN_MADE;
+  SPEND.failed = RUN_FAILED;
+  fs.mkdirSync(SPEND_DIR, { recursive: true });
   fs.writeFileSync(RUN_FILE, JSON.stringify(SPEND, null, 1) + '\n');
 }
 /* מכסה או תקרה: אין טעם לעבור לאפליקציה הבאה ב---all */
 let STOPPED = '';
+let RUN_MADE = 0, RUN_FAILED = 0;
 /* עצירה בזמן (3.10.2026): ריצה שנחתכה ב-timeout של Actions מאבדת את
    כל הקבצים וגם את רישום ההוצאה, וגוגל גובה בכל זאת (ריצה 27).
    record.yml עוטף כל אפליקציה ב-`timeout -s INT` לפני גבול ה-job;
@@ -1142,6 +1159,7 @@ async function build(app, max) {
     const n = writeManifest(app, liveVoice);
     console.log('\nנוצרו ' + made + ', נכשלו/הושחרו ' + failed + ' · בקשות ' + requests + ' · במניפסט ' + n + ' · ' +
                 Math.round((Date.now() - t0) / 60000) + ' דק׳');
+    RUN_MADE += made; RUN_FAILED += failed; writeRun();
     return quota && !made ? 1 : 0;
   }
   /* --- מצב רגיל: בקשה לכל מחרוזת --- */
@@ -1169,6 +1187,7 @@ async function build(app, max) {
   const n = writeManifest(app, liveVoice);
   console.log('\nנוצרו ' + made + ', נכשלו ' + failed + ' · במניפסט ' + n + ' · ' +
               Math.round((Date.now() - t0) / 60000) + ' דק׳');
+  RUN_MADE += made; RUN_FAILED += failed; writeRun();
   return quota && !made ? 1 : 0;
 }
 
