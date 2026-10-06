@@ -112,6 +112,8 @@ const SUITE = [
   { id: 'content806', args: [] },
   /* 6.10.2026 — O-132: אותו סורק, האפליקציה השנייה במשפחה. */
   { id: 'content806', args: ['bagrut-history'], label: 'content806:hist' },
+  /* 6.10.2026 — O-143: המאגר של hebrew ב-bank.json, ולא בשלד topic(). */
+  { id: 'hebank',   args: [] },
   { id: 'a11y',     args: [] },
   { id: 'aria',     args: [] },
   { id: 'pressed',  args: [] },

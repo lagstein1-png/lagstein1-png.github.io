@@ -57,6 +57,13 @@ function sourcesOf(app, root) {
     out.push(path.join(R, app, 'data', 'exams.js'));
     return out.filter(f => fs.existsSync(f));
   }
+  /* 6.10.2026 — O-143: `hebrew` מחזיקה את המאגר ב-`bank.json`
+     שנטען ב-fetch, ו-`hebank.js` סורק אותו. */
+  if (app === 'hebrew') {
+    out.push(path.join(R, app, 'index.html'), path.join(R, app, 'app.js'),
+             path.join(R, app, 'bank.json'));
+    return out.filter(f => fs.existsSync(f));
+  }
   out.push(path.join(R, app, 'index.html'));
   const dataDir = path.join(R, app, 'data');
   if (fs.existsSync(dataDir))

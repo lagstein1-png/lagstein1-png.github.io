@@ -99,7 +99,6 @@ for(const [id,a] of Object.entries(REG.apps)){
       'reader': 'מקריא טקסט שהלומד מדביק — אין מאגר שאלות',
       'kotvim': 'מחולל כתיבה — אין מאגר שאלות',
       'domino': 'מחולל קלפים להדפסה — אין מאגר שאלות',
-      'hebrew': 'מאגר קטן בתוך app.js, לא בשלד topic()/Q()',
       'rakia': 'מפת לידה — הטקסטים נבדקים ב-rakia-content.js',
     };
     const f = path.join(ROOT, id, "index.html");
@@ -108,7 +107,7 @@ for(const [id,a] of Object.entries(REG.apps)){
       /* 6.10.2026: `data/exams.js` — משפחת הבגרות, שאותה סורק
          `content806.js` ולא `content.js`. בלעדיה חוסר דוח על
          `bagrut-history` לא היה נאמר (O-132). */
-      ["buildQ", "UNITS", "js/data.js", "GEOBANK", "data/exams.js"].includes(a.bank);
+      ["buildQ", "UNITS", "js/data.js", "GEOBANK", "data/exams.js", "bank.json"].includes(a.bank);
     if (LADDER.indexOf(stage) >= LADDER.indexOf("approved") && !scanOf(id) && scannable)
       W(id, "פורסמה, יש בה מאגר שאפשר לסרוק, ואין עליה דוח תוכן — " +
             "bank=\"" + (a.bank || "—") + "\"");
@@ -123,7 +122,7 @@ for(const [id,a] of Object.entries(REG.apps)){
     if(a.contentQA==="legacy-published"&&!scanOf(id))
       /* O-121: content.js סורק buildQ במסלול הראשי, ו-UNITS / js/data.js
          במסלול scanUnits (O-113) — אותה רשימה כמו `unitsPath` שם. */
-      W(id, ["buildQ","UNITS","js/data.js"].includes(a.bank)
+      W(id, ["buildQ","UNITS","js/data.js","data/exams.js","bank.json"].includes(a.bank)
         ? "פורסמה לפני שהשער נבנה, ו-content.js עוד לא רץ עליה."
         : "פורסמה לפני שהשער נבנה, ו-content.js אינו יכול לסרוק אותה — "+
           "bank=\""+(a.bank||"—")+"\" ולא buildQ / UNITS / js/data.js. סקירה ידנית.");

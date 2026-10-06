@@ -70,6 +70,7 @@
     node .claude/qa/agents.js            # סוכן אינו קורא לסוכן — אין כלי סוכנים בשורת tools ואין הבטחה כזאת
     node .claude/qa/century.js           # המאה בארבע השפות — על הפונקציה האמיתית שבאפליקציה
     node .claude/qa/content806.js        # סריקת התוכן של bagrut-806 (הבנק הסטטי) — כותב את הדוח. שם אפליקציה כארגומנט: bagrut-history
+    node .claude/qa/hebank.js            # סריקת התוכן של hebrew — bank.json, עברית בלבד; QA_BANK מצביע על מאגר חלופי
     node .claude/qa/engine.js            # המנוע המשותף — האם העותקים בכל האפליקציות עדיין זהים
     node .claude/qa/tutor.js             # ״עזרה מהמורה״ — השומרים בשרת, החיווט בלקוח, ושער התנאים
     node .claude/qa/offer.js             # הצעה שלימור מציעה (״נעבור ל…״) מתקיימת בפועל
