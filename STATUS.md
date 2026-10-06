@@ -29,7 +29,7 @@
 | `electric` | e47 · 2026-10-06 | e47-pwa1 | תואם |
 | `science-mid` | scimid10 · 2026-10-06 | scimid10-pwa1 | תואם |
 | `biology` | bg12 · 2026-10-06 | bg12-pwa1 | תואם |
-| `geography` | q34 · 2026-10-06 | q34-pwa1 | תואם |
+| `geography` | q35 · 2026-10-06 | q35-pwa1 | תואם |
 | `bagrut-history` | h130 · 2026-10-06 | h130-pwa1 | תואם |
 | `islam` | is12 · 2026-10-06 | is12-pwa1 | תואם |
 | `russian` | ru12 · 2026-10-06 | ru12-pwa1 | תואם |
