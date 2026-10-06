@@ -105,7 +105,10 @@ for(const [id,a] of Object.entries(REG.apps)){
     const f = path.join(ROOT, id, "index.html");
     const src = fs.existsSync(f) ? fs.readFileSync(f, "utf8") : "";
     const scannable = /function\s+buildQ\s*\(/.test(src) ||
-      ["buildQ", "UNITS", "js/data.js", "GEOBANK"].includes(a.bank);
+      /* 6.10.2026: `data/exams.js` — משפחת הבגרות, שאותה סורק
+         `content806.js` ולא `content.js`. בלעדיה חוסר דוח על
+         `bagrut-history` לא היה נאמר (O-132). */
+      ["buildQ", "UNITS", "js/data.js", "GEOBANK", "data/exams.js"].includes(a.bank);
     if (LADDER.indexOf(stage) >= LADDER.indexOf("approved") && !scanOf(id) && scannable)
       W(id, "פורסמה, יש בה מאגר שאפשר לסרוק, ואין עליה דוח תוכן — " +
             "bank=\"" + (a.bank || "—") + "\"");

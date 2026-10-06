@@ -10,7 +10,7 @@
     node .claude/qa/parse.js                 # תקינות פרסינג
     node .claude/qa/entropy.js               # תשובה קבועה / כפילויות
     node .claude/qa/options.js               # כמה אפשרויות התלמיד באמת רואה
-    node .claude/qa/exam806.js               # התוכן הכתוב־ביד של 806
+    node .claude/qa/exam806.js               # התוכן הכתוב־ביד של 806 (ו-`--app=bagrut-history` לאחות שלה)
     node .claude/qa/naming.js                # כלל השם של ״תאוריה מדברת״
     node .claude/qa/a11y.js                  # ששת מצבי הנגישות — מ-applyModes ועד כלל ב-CSS
     node .claude/qa/aria.js                  # מצב דו־מצבי קבוע, outline בתוך :focus, tabindex חיובי, מאפיין פיזי
@@ -69,7 +69,7 @@
     node .claude/qa/i18n.js              # האוניברסיטה — כל _("…") מפתח ב-TR_KEYS, וכל מפתח מתורגם
     node .claude/qa/agents.js            # סוכן אינו קורא לסוכן — אין כלי סוכנים בשורת tools ואין הבטחה כזאת
     node .claude/qa/century.js           # המאה בארבע השפות — על הפונקציה האמיתית שבאפליקציה
-    node .claude/qa/content806.js        # סריקת התוכן של bagrut-806 (הבנק הסטטי) — כותב את הדוח
+    node .claude/qa/content806.js        # סריקת התוכן של bagrut-806 (הבנק הסטטי) — כותב את הדוח. שם אפליקציה כארגומנט: bagrut-history
     node .claude/qa/engine.js            # המנוע המשותף — האם העותקים בכל האפליקציות עדיין זהים
     node .claude/qa/tutor.js             # ״עזרה מהמורה״ — השומרים בשרת, החיווט בלקוח, ושער התנאים
     node .claude/qa/offer.js             # הצעה שלימור מציעה (״נעבור ל…״) מתקיימת בפועל

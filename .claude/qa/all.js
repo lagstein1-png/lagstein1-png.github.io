@@ -110,6 +110,8 @@ const SUITE = [
      כפי שהם בעץ — לפני שסורק כלשהו נגע בהם. */
   { id: 'fresh',    args: [] },
   { id: 'content806', args: [] },
+  /* 6.10.2026 — O-132: אותו סורק, האפליקציה השנייה במשפחה. */
+  { id: 'content806', args: ['bagrut-history'], label: 'content806:hist' },
   { id: 'a11y',     args: [] },
   { id: 'aria',     args: [] },
   { id: 'pressed',  args: [] },
@@ -117,6 +119,7 @@ const SUITE = [
   { id: 'fonts',    args: [] },
   { id: 'engine',   args: [] },
   { id: 'exam806',  args: [] },
+  { id: 'exam806',  args: ['--app=bagrut-history'], label: 'exam806:hist' },
   { id: 'tutor',    args: [] },
   { id: 'hebrew',   args: [] },
   { id: 'langretry', args: [], ext: '.mjs' },
@@ -294,7 +297,10 @@ const results = [];
 let failed = 0;
 
 for (const t of plan) {
-  process.stdout.write(`── ${t.id} `.padEnd(72, '─') + '\n');
+  /* `label` — שני ערכים יכולים לחלוק `id` כששם האפליקציה הוא
+     ארגומנט (content806 / exam806 במשפחת הבגרות). בלעדיו שתי
+     שורות זהות בסיכום, ואי אפשר לדעת איזו מהן נפלה. */
+  process.stdout.write(`── ${t.label || t.id} `.padEnd(72, '─') + '\n');
   /* **`ext` — סיומת, ולא `.js` קשיח.** בדיקה שמייבאת את
      `worker.js` חייבת להיות ESM (`import` ו-`await` ברמה
      העליונה), והמוסכמה כאן היא `.mjs` — כמו `evals.mjs`.
@@ -303,7 +309,7 @@ for (const t of plan) {
   const r = spawnSync(process.execPath, [path.join(QA, t.id + (t.ext || '.js'))].concat(t.args),
                       { cwd: process.cwd(), stdio: 'inherit' });
   const code = r.status === null ? 1 : r.status;
-  results.push([t.id, code]);
+  results.push([t.label || t.id, code]);
   if (code) failed++;
   process.stdout.write('\n');
 }
@@ -312,7 +318,7 @@ stop();
 
 console.log('═'.repeat(72));
 for (const [id, code] of results) {
-  console.log(`  ${code ? '✗' : '✓'} ${id.padEnd(10)} ${code ? 'exit ' + code : ''}`);
+  console.log(`  ${code ? '✗' : '✓'} ${id.padEnd(16)} ${code ? 'exit ' + code : ''}`);
 }
 if (STATIC) console.log('  · כל הבדיקות שדורשות דפדפן — דולגו (--static)');
 else if (FAST) console.log(`  · ${SUITE.filter(t => t.slow).map(t => t.id).join(', ')} — דולגו (--fast)`);

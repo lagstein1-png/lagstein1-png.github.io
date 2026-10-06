@@ -25,7 +25,7 @@ window.EXAMS = [
   "questionnaire": "22261",
   "level": "70% מהציון",
   "season": "חורף תשפ\"ה",
-  "year": "2025",
+  "year": 2025,
   "durationMinutes": 180,
   "weight": "70%",
   "source": {
@@ -837,7 +837,7 @@ window.EXAMS = [
   "questionnaire": "22262",
   "level": "30% מהציון",
   "season": "חורף תשפ\"ה",
-  "year": "2025",
+  "year": 2025,
   "durationMinutes": 90,
   "weight": "30%",
   "source": {

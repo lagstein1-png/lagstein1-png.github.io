@@ -1,4 +1,4 @@
-/* בודק התוכן של bagrut-806.
+/* בודק התוכן של bagrut-806, ומאז 6.10.2026 גם של bagrut-history (`--app=`).
 
    כל שאר האפליקציות נבדקות ב-entropy ו-options, שמגרילות שאלות
    ממחולל. ל-806 אין מחולל: התוכן נכתב ביד, שאלה־שאלה, ולכן אף
@@ -13,12 +13,17 @@
 const fs = require('fs'), path = require('path'), vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const APP = path.join(ROOT, 'bagrut-806', 'app.js');
+/* 6.10.2026 — O-132: `bagrut-history` היא אותה סכימה ואותן ארבע
+   הפונקציות ב-`app.js`, ורק שם התיקייה שונה. `--app=<שם>` בוחר
+   אותה; בלעדיו שום דבר לא השתנה. */
+const NAME = (process.argv.find(a => a.startsWith('--app=')) || '').slice(6) || 'bagrut-806';
+const APP = path.join(ROOT, NAME, 'app.js');
 /* נתיב תוכן חלופי כארגומנט — כך אפשר להריץ את הבודק על מקרה מבחן
    ולראות אותו נופל. בדיקה שלא נראתה נכשלת אינה בדיקה. */
-const DATA = process.argv[2]
-  ? path.resolve(process.argv[2])
-  : path.join(ROOT, 'bagrut-806', 'data', 'exams.js');
+const PATHARG = process.argv.slice(2).find(a => !a.startsWith('--'));
+const DATA = PATHARG
+  ? path.resolve(PATHARG)
+  : path.join(ROOT, NAME, 'data', 'exams.js');
 
 /* --- התוכן ------------------------------------------------------ */
 const win = {};
@@ -102,6 +107,45 @@ const TOPICS = [
   'התפלגות נורמלית', 'מודל ריבועי', 'גאומטריה במרחב'
 ];
 
+/* --- פרופיל לכל אפליקציה במשפחה -------------------------------------
+   6.10.2026, O-132. שלוש מן הבדיקות כאן הן של **806** ולא של המשפחה:
+   אוצר נושאי המתמטיקה, סכום 100 נקודות, ותשובה סופית לכל סעיף.
+   ‏`bagrut-history` נבנתה מהעתקה שלה ושלושתן אינן חלות עליה —
+   נושאי היסטוריה, שאלון של 200 נקודות שמשוקלל ל-70%/30%, ומפתח
+   הערכה רשמי שמשרד החינוך לא פרסם (כתוב בראש `data/exams.js`).
+   להריץ אותה מול הפרופיל של 806 נותן 67 ממצאים שכולם ״כך תוכנן״,
+   וזו בדיוק הבדיקה שמאמנת להתעלם ממנה. */
+const HIST_TOPICS = [
+  'מדיניות ואידאולוגיה נאצית — מרעיון למעשה',
+  'היהודים בצפון אפריקה ובאירופה תחת הכיבוש הנאצי',
+  'הגטאות, מלחמת העולם השנייה בשנתיים האחרונות',
+  'המטרות של התנועות הלאומיות ופעולות למימושן',
+  'מאפייני התנועות הלאומיות',
+  'התנועות הלאומיות — גורמים מעכבים וגורמים מסייעים',
+  'המאבק במדיניות של בריטניה בארץ־ישראל (1945–1947)',
+  'מלחמת העצמאות',
+  'כ״ט בנובמבר 1947, תוצאות והשלכות של מלחמת העצמאות',
+  'תהליך הדה־קולוניזציה וגורל היהודים בארצות האסלאם',
+  'עלייה וקליטה בשנות החמישים והשישים',
+  'מלחמת ששת הימים (1967)',
+  'מלחמת יום הכיפורים (1973)',
+  'מקור — הממלכה החשמונאית: תמיכה וביקורת',
+  '"השלטון הישיר", המרד הגדול',
+  'מקור — תוצאות המרד והתגובות על החורבן',
+  'הורדוס ובר כוכבא — דמויות שנויות במחלוקת'
+];
+const PROFILE = {
+  'bagrut-806':     { topics: TOPICS, total: 100, needText: true, key: 'fail', needMoed: true },
+  /* `key:'note'` — אין מפתח הערכה רשמי, ולכן ״אין finalAnswer״ אינו
+     ממצא אלא מצב התוכן המתועד. כשהמפתח יגיע — לשנות ל-`fail`. */
+  /* `needMoed:false` — ב-806 `moed` הוא תמיד "הדגמה", כלומר עונה
+     ולא מועד; בשאלוני ההיסטוריה האמיתיים העונה ("חורף תשפ״ה") היא
+     המועד, ואין שדה שני לרשום בו. שדה ריק עדיף על שדה שמולא כדי
+     שבדיקה תעבור. */
+  'bagrut-history': { topics: HIST_TOPICS, total: null, needText: false, key: 'note', needMoed: false }
+};
+const PROF = PROFILE[NAME] || PROFILE['bagrut-806'];
+
 /* --- 1. שלמות הסכימה, 2. latex בלי speech, 3. תשובה שנבדקת מול עצמה --- */
 const ids = new Set();
 for (const ex of EXAMS) {
@@ -114,7 +158,7 @@ for (const ex of EXAMS) {
 
   if (typeof ex.year !== 'number') fail('year אינו מספר');
   if (!has(ex.season)) fail('אין season');
-  if (!has(ex.moed)) fail('אין moed');
+  if (PROF.needMoed !== false && !has(ex.moed)) fail('אין moed');
   if (!(Number(ex.durationMinutes) > 0)) fail('durationMinutes אינו מספר חיובי');
 
   const demo = str(ex.season) === 'הדגמה';
@@ -133,11 +177,12 @@ for (const ex of EXAMS) {
     else numbers.add(q.number);
 
     if (!has(q.topic)) fail('אין topic — דוח הנושאים החלשים נבנה ממנו');
-    else if (TOPICS.indexOf(str(q.topic)) < 0)
+    else if (PROF.topics.indexOf(str(q.topic)) < 0)
       fail('topic "' + str(q.topic) + '" אינו באוצר המילים. שם נרדף לנושא ' +
         'קיים מפצל את דוח הנושאים החלשים לשתי שורות. ' +
-        'אם זה באמת נושא חדש — להוסיף אותו ל-TOPICS ב-exam806.js');
-    if (!has(q.text)) fail('אין text');
+        'אם זה באמת נושא חדש — להוסיף אותו לפרופיל של ' + NAME + ' ב-exam806.js');
+    /* ב-bagrut-history גוף השאלה יושב בסעיפים, והכותרת ב-short. */
+    if (PROF.needText && !has(q.text)) fail('אין text');
     else if (looksLatex(q.text)) fail('ב-text יש סימני LaTeX. הנוסחאות שייכות ל-latex');
 
     /* הכלל שהקובץ עצמו קורא לו "אסור לשבור" */
@@ -175,7 +220,10 @@ for (const ex of EXAMS) {
 
       /* --- התשובה הסופית --- */
       const fa = s.finalAnswer;
-      if (!fa) { fail('אין finalAnswer — הסעיף לא ניתן לבדיקה'); }
+      if (!fa) {
+        (PROF.key === 'note' ? note : fail)('אין finalAnswer — הסעיף לא ניתן לבדיקה' +
+          (PROF.key === 'note' ? ' (מפתח ההערכה הרשמי לא פורסם)' : ''));
+      }
       else if (['number', 'expression', 'text'].indexOf(fa.type) < 0) {
         fail('finalAnswer.type הוא "' + fa.type + '" ואינו number / expression / text');
       } else if (fa.type === 'number') {
@@ -305,7 +353,8 @@ for (const ex of EXAMS) {
     console.log('✓ ' + where[0] + ': בחינה אמיתית, ' + qs.length + ' שאלות, ' + pts + ' נקודות');
     /* בחינה שמתיימרת להיות אמיתית חייבת להיות שלמה. בחינת הדגמה
        חלקית במהותה, ולכן הכלל חל רק על מי שאינה מסומנת ככזאת. */
-    if (pts !== 100) fail('בחינה שאינה מסומנת "הדגמה" וסכום הנקודות בה ' + pts + ' ולא 100');
+    if (PROF.total != null && pts !== PROF.total)
+      fail('בחינה שאינה מסומנת "הדגמה" וסכום הנקודות בה ' + pts + ' ולא ' + PROF.total);
   }
 }
 

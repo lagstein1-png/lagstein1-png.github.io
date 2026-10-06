@@ -45,11 +45,15 @@ const ROOT = path.resolve(__dirname, '..', '..');
 /* מקורות התוכן לכל אפליקציה — ורק מה שהדוח שלה קורא.
    ברירת המחדל היא `index.html` לבדו: שם יושבים גם הבנק וגם
    `buildQ`. `lomda` מחזיקה את התוכן ב-`data/`, ו-`bagrut-806`
-   נסרקת על ידי `content806.js` שקורא את `data/exams.js` בלבד. */
+   ו-`bagrut-history` נסרקות על ידי `content806.js` שקורא את
+   `data/exams.js` בלבד. */
 function sourcesOf(app, root) {
   const R = root || ROOT;
   const out = [];
-  if (app === 'bagrut-806') {
+  /* 6.10.2026: `bagrut-history` נבנתה באותה סכימה בדיוק (`window.EXAMS`
+     ב-`data/exams.js`), ולכן `content806.js` סורק את שתיהן ולשתיהן
+     אותו מקור חתימה. */
+  if (app === 'bagrut-806' || app === 'bagrut-history') {
     out.push(path.join(R, app, 'data', 'exams.js'));
     return out.filter(f => fs.existsSync(f));
   }

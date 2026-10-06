@@ -26,7 +26,7 @@ const { sigOf, sourcesOf } = require('./sig.js');
 const DIR = __dirname;
 const ROOT = process.argv[2] ? path.resolve(process.argv[2]) : path.resolve(DIR, '..', '..');
 const OUT = path.join(ROOT, '.claude', 'qa', 'reports');
-const TOOL = { 'bagrut-806': 'content806.js' };
+const TOOL = { 'bagrut-806': 'content806.js', 'bagrut-history': 'content806.js' };
 
 if (!fs.existsSync(OUT)) { console.log('אין תיקיית reports — אין מה לבדוק.'); process.exit(0) }
 

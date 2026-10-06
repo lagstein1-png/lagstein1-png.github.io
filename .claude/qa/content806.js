@@ -6,7 +6,8 @@
    ולכן היא נפלה בין הכיסאות — **אף סריקת תוכן אוטומטית לא רצה
    עליה מעולם** (O-13 ב-FINDINGS).
 
-     node .claude/qa/content806.js
+     node .claude/qa/content806.js                  # bagrut-806
+     node .claude/qa/content806.js bagrut-history   # ואותה סכימה בדיוק
 
    מה זה **אינו**: `exam806.js` כבר בודק את הסכימה, את `speech`
    מול `latex`, את `tolerance`, את `reject` ואת הרמז שמכיל את
@@ -29,7 +30,16 @@
 const fs = require('fs'), path = require('path');
 const DIR = __dirname, ROOT = path.resolve(DIR, '..', '..');
 const OUT = path.join(DIR, 'reports');
-const APP = 'bagrut-806';
+/* 6.10.2026 — O-132: `bagrut-history` נבנתה מהעתקה של `bagrut-806`
+   ועם אותה סכימה (`window.EXAMS` ב-`data/exams.js`), אבל הסורק נולד
+   עם שם אפליקציה אחד קבוע ולכן 123 צעדי הפתרון שלה מעולם לא נסרקו.
+   שם האפליקציה הוא ארגומנט, וברירת המחדל לא השתנתה. */
+const FAMILY = ['bagrut-806', 'bagrut-history'];
+const APP = process.argv[2] || FAMILY[0];
+if (!FAMILY.includes(APP)) {
+  console.error('content806.js: ' + APP + ' אינה במשפחת הבנק הסטטי (' + FAMILY.join(', ') + ')');
+  process.exit(2);
+}
 
 global.window = {};
 /* QA806_DATA מאפשר להצביע על קובץ תוכן אחר. הוא קיים כדי להוכיח
@@ -66,7 +76,11 @@ for (const ex of EXAMS) {
        ב-latex. השוואה על הנוסח בלבד סימנה שמונה שאלות שונות
        לגמרי ככפולות — בדיקה שנדלקת על תוכן תקין מאמנת להתעלם
        ממנה, וזה גרוע מבדיקה שאינה קיימת. */
-    const kq = norm(q.text) + ' ¶ ' + norm(q.latex);
+    /* 6.10.2026 — ומפתח ריק אינו מפתח. ב-`bagrut-history` כל `text`
+       ריק (הכותרת יושבת ב-`short`, וגוף השאלה בסעיפים), וב-806 אין
+       `latex` בלי נוסח, ולכן `'' + ' ¶ ' + ''` יצא מחרוזת אמת ותשע
+       שאלות שונות לגמרי דווחו ככפולות של השלישית. */
+    const kq = [norm(q.text), norm(q.latex)].filter(Boolean).join(' ¶ ');
     if (kq) {
       if (seenQ.has(kq))
         add('duplicate', 'REVIEW', 'נוסח השאלה זהה ל-' + seenQ.get(kq), where);
@@ -83,7 +97,7 @@ for (const ex of EXAMS) {
          אז שני מסכים מציגים אותה שאלה ומקבלים תשובות שונות. --- */
       /* גם כאן: אותו נוסח סעיף מתחת לשתי פונקציות שונות הוא
          שתי שאלות שונות, ולכן הנוסחה של השאלה־האם נכנסת למפתח. */
-      const ks = norm(q.latex) + ' ¶ ' + norm(s.text) + ' ¶ ' + norm(s.latex);
+      const ks = [norm(q.latex), norm(s.text), norm(s.latex)].filter(Boolean).join(' ¶ ');
       if (ks) {
         const prev = seenSub.get(ks);
         if (prev) {
