@@ -26,7 +26,16 @@
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.resolve(__dirname, '..', '..');
-const APPS = ['math-uni', 'math-uni2', 'math-uni3'];
+/* 6.10.2026 — **והרשימה החמישית.** ‏`electric` משתמשת באותו מנגנון
+   בדיוק (`_()` + `TR_KEYS` + `trAt`) ומעולם לא נבדקה כאן, מפני
+   שהרשימה מנתה שלושה שמות. נמצא כשהרחבת רמה 4 הוסיפה מחרוזות
+   חדשות: `content.js` דיווח `lang-untranslated` ×122 — מחרוזות
+   שהלומד הערבי, הרוסי והאנגלי רואה בעברית. הרשימה נגזרת עכשיו
+   מהקוד עצמו: כל אפליקציה שיש בה `var TR_KEYS = [` נכנסת. */
+const APPS = require('./applist.js').local().filter(a => {
+  try { return /var TR_KEYS\s*=\s*\[/.test(fs.readFileSync(path.join(ROOT, a, 'index.html'), 'utf8')); }
+  catch (e) { return false; }
+});
 const LANGS = ['ar', 'ru', 'en'];
 
 let bad = 0;
@@ -34,10 +43,56 @@ for (const app of APPS) {
   const src = fs.readFileSync(path.join(ROOT, app, 'index.html'), 'utf8');
   const km = src.match(/var TR_KEYS\s*=\s*(\[[\s\S]*?\]);\s*\n/);
   if (!km) { console.log(`✗ ${app}: אין TR_KEYS`); bad++; continue; }
+  /* 6.10.2026 — **המערך נבנה בסדר הריצה, ולא מהליטרל בלבד.**
+     ‏`TR_KEYS.push("…")` אחרי `load()` הוא קוד, והבודק קרא רק את
+     הליטרל: 283 מחרוזות ב-`electric` דווחו ״אין מפתח כזה״ בזמן
+     שהיה להן מפתח ותרגום מלא. וגרוע מזה — `trAt("ar",
+     TR_KEYS.length-3, […])` נמדד מול אורך הליטרל ולא מול האורך
+     בדפדפן, ולכן הצמיד תרגומי זנב למפתחות אחרים לגמרי **ועבר
+     בירוק**, כי אותם מפתחות היו מתורגמים ממילא. בודק שבונה
+     מילון שגוי ומדווח ירוק גרוע מבודק שאינו קיים.
+     כאן הליטרל וה-push מורצים בסדר שבו הם מופיעים בקובץ — בדיוק
+     כמו הדפדפן. נמצא ב-math-uni, ב-math-uni2 וב-math-uni3. */
   const KEYS = vm.runInNewContext(km[1]);
+  /* `push` ו-`trAt` מורצים **בסדר שבו הם מופיעים בקובץ**, ולא זה
+     אחרי זה. ב-math-uni3 יש שני בלוקי push, והאחרון שבהם מופיע
+     **אחרי** קריאות ה-trAt שביניהם: להריץ את שניהם קודם מזיז את
+     `TR_KEYS.length-3` באחד, וממציא ״מפתח בלי תרגום״ שאינו קיים. */
+  const EVENTS = [];
+  for (const m of src.matchAll(/^[ \t]*TR_KEYS\.push\(([\s\S]*?)\);[ \t]*$/gm))
+    EVENTS.push({ at: m.index, push: m[1] });
+  for (const m of src.matchAll(/^[ \t]*tr(?:At|Part)\("(?:ar|ru|en)"/gm))
+    EVENTS.push({ at: m.index, call: true });
+  EVENTS.sort((a, b) => a.at - b.at);
+
+  const D = { ar: {}, ru: {}, en: {} };
+  const ctx = vm.createContext({
+    TR_KEYS: KEYS,
+    trAt(l, start, arr) { if (start >= 0) arr.forEach((v, i) => { if (v) D[l][KEYS[start + i]] = v; }); },
+    trPart(l, arr) { ctx.trAt(l, 0, arr); },
+  });
+  let calls = 0, broken = 0;
+  for (const ev of EVENTS) {
+    if (ev.push) {
+      try { KEYS.push(...vm.runInNewContext('[' + ev.push + ']')); }
+      catch (e) { console.log(`✗ ${app}: TR_KEYS.push שלא נקרא — ${e.message}`); bad++; }
+      continue;
+    }
+    /* הקריאות ל-trAt מורצות כקוד ולא מפוענחות בביטוי רגולרי. הגרסה
+       הקודמת קראה את הארגומנט השני ב-([^,]+), ומפתח שנמסר כ-
+       TR_KEYS.indexOf("…, …") — עם פסיק בתוך המחרוזת — נשבר באמצעו
+       ולא נספר. כך נרשמו 155 מפתחות ״בלי תרגום״ (O-69) שכולם מתורגמים. */
+    let end = ev.at, ok = false;
+    while ((end = src.indexOf(']);', end)) !== -1) {
+      end += 3;
+      try { vm.runInContext(src.slice(ev.at, end), ctx); ok = true; break; }
+      catch (e) { if (!(e instanceof SyntaxError)) throw e; }
+    }
+    if (ok) calls++; else broken++;
+  }
   const set = new Set(KEYS);
 
-  /* 1 — כל מחרוזת שנקראת ב-_() קיימת כמפתח */
+  /* 1 — כל מחרוזת שנקראת ב-_() קיימת כמפתח  (אחרי בניית המערך) */
   const lits = new Map();
   for (const m of src.matchAll(/\b_f?\(\s*"((?:[^"\\]|\\.)*)"/g)) {
     const s = JSON.parse('"' + m[1] + '"');
@@ -50,27 +105,21 @@ for (const app of APPS) {
   if (miss) bad++;
   else console.log(`✓ ${app}: ${lits.size} מחרוזות ב-_(), כולן ב-TR_KEYS (${KEYS.length} מפתחות)`);
 
-  /* 2 — כל מפתח מתורגם בשלוש השפות  ← מפיל
-     הקריאות ל-trAt מורצות כקוד ולא מפוענחות בביטוי רגולרי. הגרסה
-     הקודמת קראה את הארגומנט השני ב-([^,]+), ומפתח שנמסר כ-
-     TR_KEYS.indexOf("…, …") — עם פסיק בתוך המחרוזת — נשבר באמצעו
-     ולא נספר. כך נרשמו 155 מפתחות ״בלי תרגום״ (O-69) שכולם מתורגמים. */
-  const D = { ar: {}, ru: {}, en: {} };
-  const ctx = vm.createContext({
-    TR_KEYS: KEYS,
-    trAt(l, start, arr) { if (start >= 0) arr.forEach((v, i) => { if (v) D[l][KEYS[start + i]] = v; }); },
-    trPart(l, arr) { ctx.trAt(l, 0, arr); },
-  });
-  let calls = 0, broken = 0;
-  for (const m of src.matchAll(/^[ \t]*tr(?:At|Part)\("(?:ar|ru|en)"/gm)) {
-    let end = m.index, ok = false;
-    while ((end = src.indexOf(']);', end)) !== -1) {
-      end += 3;
-      try { vm.runInContext(src.slice(m.index, end), ctx); ok = true; break; }
-      catch (e) { if (!(e instanceof SyntaxError)) throw e; }
-    }
-    if (ok) calls++; else broken++;
+  /* 2 — כל מפתח מתורגם בשלוש השפות  ← מפיל.
+     המילון נבנה למעלה, יחד עם המערך, בסדר הריצה. */
+  /* ועוגן שאינו קבוע נאמר בקול, ואינו מפיל: המודל כאן כבר נאמן
+     לדפדפן, ולכן זו שבירוּת ולא שגיאה. מפתח שיתווסף לסוף הליטרל
+     **יזיז** כל `TR_KEYS.length-N` שאחריו, בלי שאיש ירגיש.
+     `TR_KEYS.indexOf("…")` אינו זז לעולם. */
+  let drifty = 0;
+  for (const m of src.matchAll(/tr(?:At|Part)\(\s*"(?:ar|ru|en)"\s*,\s*([^,[]+),/g)) {
+    const a = m[1].trim();
+    if (/^\d+$/.test(a) || /^TR_KEYS\.indexOf\(\s*"/.test(a)) continue;
+    drifty++;
   }
+  if (drifty) console.log(`· ${app}: ${drifty} עוגני trAt שאינם קבועים (\`TR_KEYS.length-N\`) — ` +
+    `מפתח שיתווסף לסוף יזיז אותם בשקט. \`TR_KEYS.indexOf("…")\` אינו זז.`);
+
   const debt = LANGS.map(l => [l, KEYS.filter(k => !D[l][k])]);
   const total = debt.reduce((n, [, ks]) => n + ks.length, 0);
   if (total || broken || !calls) {
