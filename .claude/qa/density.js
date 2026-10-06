@@ -49,6 +49,10 @@ const BASE = {
   /* `civics` עלתה מ-7 ל-9 ב-6.10.2026 — 48 שאלות חדשות. **וכאן נגמר
      החוב**: כל תשעת המאגרים שהכלי קורא עומדים על הבסיס שלהם, וחמישה
      מהם על 9 או מעליו. */
+  /* **חוב חדש, נמדד 6.10.2026** — שלושת המאגרים האלה לא נקראו עד
+     שנוספו הבדלים `PARA`/`E`/`C`/`Sc`. המספר הוא התא הדק שנמדד
+     היום, ולא יעד: הוא מקבע את הקיים ומונע ירידה. */
+  'english': 4, 'history': 3, 'ulpan': 3,
 };
 
 /* המאגר נקרא בהרצה ולא ב-grep: `topic(...)` בונה את TOPICS, ו-`Q`
@@ -68,6 +72,11 @@ function banks(app) {
     'function Q(){return{o:arguments[2]}}' +
     'function W(){return{}}function S(){return{}}function L(){return{}}' +
     'function figBox(){return""}function figLine(){return""}function fig(){return""}' +
+    /* `PARA` (english, ulpan) ו-`E` (history) הם פריטי מאגר שאינם `Q`:
+       קטע קריאה ופריט ציר זמן. הם נספרים כפריטים, כי זה מה שהלומד
+       מקבל בהגרלה. נוספו 6.10.2026, אחרי ששלוש אפליקציות דווחו
+       ״הכלי אינו קורא את המאגר הזה״. */
+    'function PARA(){return{k:"p"}}function E(){return{k:"e"}}function C(){return{k:"c"}}function Sc(){return{k:"p"}}' +
     src.slice(start, end);
   const ctx = {};
   try {
