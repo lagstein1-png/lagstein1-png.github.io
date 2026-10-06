@@ -40,8 +40,20 @@ const BASE = process.env.QA_BASE || 'http://127.0.0.1:8099';
    והתשובה נושאת את ההסבר. `measure` גנרית מלכתחילה (buildQ +
    q.options), ויש בה מסלול `skip` לאפליקציה שאין בה את השניים —
    ולכן ההרחבה אינה קוד חדש אלא רשימה שלא עודכנה. */
-const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-              'english', 'history', 'ulpan', 'lomda'];
+/* 6.10.2026 — **ותשע מתוך עשרים ואחת.** ההערה למעלה מתעדת את
+   ההרחבה הראשונה (חמש ⇒ תשע), ומאז נולדו שתים־עשרה אפליקציות
+   חידון נוספות — `civics`, ‏`geography`, ‏`science`, ‏`tanakh`,
+   ‏`literature`, ‏`motal`, ‏`hebrew-arab`, ‏`islam`, ‏`russian`,
+   ‏`biology`, ‏`electric`, ‏`math-g7` — ואף אחת מהן לא נמדדה כאן.
+   דווקא `science`, שהיום נמצא בה שהתשובה הנכונה היא הארוכה
+   ב-48 מתוך 52 שורות (92%), הייתה מחוץ לרשימה.
+   לכן הרשימה נגזרת מ-`stages.json` כמו ב-`content.js`: מי
+   שיש לו `buildQ`/`UNITS`/`js/data.js` נכנס, ו-`measure`
+   מדלגת בעצמה על מי שאין בו `buildQ` ו-`q.options`. זו הרשימה
+   הכתובה־ביד הרביעית שנמצאה בסשן הזה. */
+const REG = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, 'stages.json'), 'utf8'));
+const APPS = Object.keys(REG.apps)
+  .filter(k => ['buildQ', 'UNITS', 'js/data.js'].includes(REG.apps[k].bank));
 const PER_CELL = Number(process.env.QA_N || 40);
 const CONFIRM_N = Number(process.env.QA_CONFIRM || PER_CELL * 10);
 
