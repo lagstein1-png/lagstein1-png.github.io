@@ -1087,6 +1087,39 @@ async function build(app, max) {
     /* אצווה שהפיצול שלה לא תקף מתחלקת פעם אחת לשניים ומנסה שוב —
        ככה אצווה ארוכה מדי לא נתקעת על אותה צורה כל יום. מקטע שכבר
        נכתב בריצה הזאת לא נכתב שוב (אותה תוכנית, אותו קובץ). */
+    /* 6.10.2026 — O-154. **אצווה שנכשלה שילמה ולא התקינה דבר.**
+       שרשרת החצייה 40→20→10→5→2→1 עולה 63 בקשות לפני שהיא מגיעה
+       למחרוזת בודדת, ובסופה האצווה ״הושחרה״ — כלומר ארבעים
+       מחרוזות שולמו ואף אחת לא נכתבה. נמדד ב-`record-spend/
+       37430784014.json`: 191 בקשות, $3.53, ו-40 קליפים — 4.8
+       בקשות לקליפ.
+       שתי החלטות, ושתיהן מצמצמות הוצאה לקליפ:
+       · החצייה נעצרת אחרי שתי רמות (40→20→10), ולא שש.
+       · מה שלא התפצל **מוקלט מחרוזת־מחרוזת** במקום להישחר. אף
+         בקשה לא משולמת יותר בלי ניסיון התקנה.
+       עלות במקרה הגרוע: 1+2+4+40 = 47 בקשות ל-40 קליפים, במקום
+       103 בקשות ל-אפס. */
+    const MAX_HALVE = 2;
+    const one = async (pair, model) => {
+      try {
+        requests++;
+        lastPrompted = false;
+        const mp3 = PROVIDER === 'gcloud' ? await synthGcloud(ffmpeg, H.spoken(pair[1])) : await synth(ffmpeg, H.spoken(pair[1]));
+        if (mp3.length >= MIN_BYTES) {
+          const f = path.join(outDir, pair[0] + '.mp3');
+          if (!installed.has(pair[0]) && !current(pair[0])) { QUALITY.install(f, mp3, KBPS, ffmpeg); installed.add(pair[0]); delete attempts[pair[0]]; made++; }
+          if (lastPrompted) notePrompted(app, pair[0]);
+          console.log('  ' + made + '/' + todo.length + ' · מחרוזת בודדת אחרי כישלון פיצול (' + model + ')');
+          return true;
+        }
+      } catch (e2) {
+        if (e2 instanceof QuotaError || e2 instanceof BudgetError || /429|RESOURCE_EXHAUSTED|quota/i.test(e2.message)) throw e2;
+        QUALITY.fail(attempts, pair[0], e2.message);
+        return false;
+      }
+      if (!attempts[pair[0]]) QUALITY.fail(attempts, pair[0], 'split');
+      return false;
+    };
     const doBatch = async (batch, model, depth) => {
       if (STOPPED === 'time') return;
       requests++;
@@ -1105,39 +1138,26 @@ async function build(app, max) {
         console.log('  ' + made + '/' + todo.length + ' · בקשה ' + requests + ' (' + model + ') · ' + Math.round((Date.now() - t0) / 1000) + 'ש');
         return;
       }
-      if (batch.length > 1 && depth < 6) {
-        /* שרשרת חלוקה (29.9): 40 → 20 → 10 → 5 → 2 → 1. כישלון פיצול
-           כבר שילם בקשה — אין שחרור לפני שמגיעים למחרוזת בודדת. */
+      if (batch.length > 1 && depth < MAX_HALVE) {
+        /* שרשרת חלוקה: 40 → 20 → 10, ואז מחרוזת־מחרוזת. שש רמות
+           עלו 63 בקשות של תקורה לפני הניסיון הראשון שמתקין משהו. */
         const half = Math.ceil(batch.length / 2);
         console.log('  הפיצול לא החזיר ' + batch.length + ' מקטעים — מתחלק לשתי אצוות ומנסה שוב (עומק ' + (depth + 1) + ')');
         await doBatch(batch.slice(0, half), model, depth + 1);
         await doBatch(batch.slice(half), model, depth + 1);
         return;
       }
-      if (batch.length === 1) {
-        /* נתיב אחרון: הקלטה ישירה של מחרוזת בודדת, בלי אצווה ובלי
-           פיצול בכלל. שגיאת מכסה עולה ללולאה הראשית כרגיל. */
-        try {
-          requests++;
-          lastPrompted = false;
-          const mp3 = PROVIDER === 'gcloud' ? await synthGcloud(ffmpeg, H.spoken(batch[0][1])) : await synth(ffmpeg, H.spoken(batch[0][1]));
-          if (mp3.length >= MIN_BYTES) {
-            const f = path.join(outDir, batch[0][0] + '.mp3');
-            if (!installed.has(batch[0][0]) && !current(batch[0][0])) { QUALITY.install(f, mp3, KBPS, ffmpeg); installed.add(batch[0][0]); delete attempts[batch[0][0]]; made++; }
-            if (lastPrompted) notePrompted(app, batch[0][0]);
-            console.log('  ' + made + '/' + todo.length + ' · מחרוזת בודדת אחרי כישלון פיצול (' + model + ')');
-            return;
-          }
-        } catch (e2) {
-          if (e2 instanceof QuotaError || e2 instanceof BudgetError || /429|RESOURCE_EXHAUSTED|quota/i.test(e2.message)) throw e2;
-          QUALITY.fail(attempts, batch[0][0], e2.message);
-        }
+      /* נתיב אחרון: הקלטה ישירה, מחרוזת־מחרוזת, בלי אצווה ובלי
+         פיצול. שגיאת מכסה עולה ללולאה הראשית כרגיל. */
+      let ok = 0;
+      for (const pair of batch) {
+        if (STOPPED === 'time') break;
+        if (installed.has(pair[0]) || current(pair[0])) continue;
+        if (await one(pair, model)) ok++; else failed++;
       }
-      /* מחרוזת בודדת שגם ההקלטה הישירה שלה נכשלה — נספרת לה. אצווה
-         שלמה שנכשלה אינה נספרת לכל אחת מ-40 המחרוזות: זו לא אשמתן. */
-      if (batch.length === 1 && !attempts[batch[0][0]]) QUALITY.fail(attempts, batch[0][0], 'split');
-      failed += batch.length;
-      console.log('  ✗ אצווה של ' + batch.length + ' הושחרת: הפיצול לא החזיר ' + batch.length + ' מקטעים (יוקלטו בריצה אחרת)');
+      if (ok < batch.length)
+        console.log('  · אצווה של ' + batch.length + ': הפיצול לא החזיר ' + batch.length +
+                    ' מקטעים — הוקלטו ' + ok + ' מחרוזת־מחרוזת');
     };
     const tired = new Set();
     for (const batch of batches) {
