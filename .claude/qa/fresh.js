@@ -38,8 +38,21 @@ for (const f of fs.readdirSync(OUT).filter(x => x.endsWith('.json') && x !== 'su
   try { R = JSON.parse(fs.readFileSync(path.join(OUT, f), 'utf8')) }
   catch (e) { rows.push(['✗', app, 'הדוח אינו נקרא — ' + e.message]); bad++; continue }
 
+  /* **דוח שנשאר בלי התוכן שלו הוא ממצא, לא דילוג — 7.10.2026.**
+     עד כאן השורה הייתה `'·' … 'מדולג'` בלי `bad++`, ולכן העלמות
+     התוכן — מחיקה, שינוי שם, נתיב שזז — עברה בשקט דווקא בשער
+     שחוסם `git push`. נמדד על עותק בסקראצ׳פד: שינוי התוכן של
+     `biology` החזיר `✗ … 1 דוחות מתארים עץ אחר`, מחיקת
+     `biology/index.html` החזירה `· מדולג` ו-exit 0, ומחיקת **כל
+     ארבעים תיקיות האפליקציות** החזירה ״34 דוחות, כולם על התוכן
+     שבעץ״ ו-exit 0. הכיוון המסוכן הוא בדיוק זה: `stage.js` ממשיך
+     לקרוא `verdict` מאותו דוח, ולכן `PASS` של תוכן שאינו קיים
+     עובר בשער. */
   const now = sigOf(app, ROOT);
-  if (!now) { rows.push(['·', app, 'אין קובצי תוכן בעץ — מדולג']); continue }
+  if (!now) {
+    rows.push(['✗', app, 'הדוח קיים ואין לו קובצי תוכן בעץ — האפליקציה הוסרה (ומחקו את הדוח), או שהנתיב זז (`sig.js` → `sourcesOf`)']);
+    bad++; continue;
+  }
 
   const tool = TOOL[app] || 'content.js';
   if (!R.sig) {

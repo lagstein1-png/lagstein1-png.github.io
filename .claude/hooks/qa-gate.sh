@@ -44,9 +44,29 @@ cd "$ROOT" || exit 0
 # century, banks, status ו-wix. c90d805 הוא ההוכחה — הוא שינה את
 # FINDINGS.md בלבד, נפל ב-naming ב-CI, והשער כאן היה יוצא 0 עליו
 # (נמדד 9.9.2026, לפני ואחרי). שתי שניות אינן שוות את החור הזה.
-changed=$(git status --porcelain 2>/dev/null | awk '{print $NF}' \
-          | grep -Ev '^\.claude/qa/reports/' || true)
-[[ -z "$changed" ]] && exit 0
+#
+# **ועץ נקי אינו ראיה שלא נגענו — 7.10.2026.** עד כאן נבדק
+# `git status --porcelain` בלבד, ולכן **ברגע שנוצר commit השער
+# השתתק**: במסלול הרגיל — תיקון, commit, מיזוג, push, סיום —
+# `all.js --static` לא רץ כאן אף פעם. נמדד על העץ הזה:
+# `git status --porcelain | wc -l` החזיר 0, ואז `bash qa-gate.sh`
+# החזיר קוד 0 ו**אפס בתים פלט**. לכן נספרים גם קומיטים שטרם
+# נדחפו. השוואת שלוש נקודות ולא שתיים: אם המרוחק מקדים, `..`
+# היה מציג את מה ש*הוא* הוסיף כאילו נגענו בו.
+#
+# ו-`sed` ולא `awk '{print $NF}'`: נתיב עם רווח, או שינוי שם
+# (`R  old -> new`), מחזיר חתיכה ולא נתיב — ואז הסינון מתפספס.
+SKIP='^\.claude/qa/reports/'
+changed=$(git status --porcelain 2>/dev/null | sed 's/^...//; s/^.* -> //' \
+          | grep -Ev "$SKIP" || true)
+
+up=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || true)
+[[ -n "$up" ]] || { git rev-parse --verify -q origin/main >/dev/null 2>&1 && up=origin/main; }
+ahead=""
+[[ -n "$up" ]] && ahead=$(git diff --name-only "$up"...HEAD 2>/dev/null \
+          | grep -Ev "$SKIP" || true)
+
+[[ -z "$changed" && -z "$ahead" ]] && exit 0
 
 out=$(node .claude/qa/all.js --static 2>&1)
 code=$?
