@@ -1177,7 +1177,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="a137 · 2026-10-06";
+var BUILD="a138 · 2026-10-07";
 var SKEY="ulpan-state-v1";
 var GKEY_STORE="ulpan-gkey";
 
@@ -3280,7 +3280,7 @@ function wordDistract(it,pool,n,needGloss){
   });
   var rest=shuffle(pool.filter(function(x){return x.k==="w"}));
   for(i=0;i<rest.length&&out.length<n;i++)add(rest[i]);
-  rest=shuffle(allWords());
+  rest=shuffle(allWords().slice());
   for(i=0;i<rest.length&&out.length<n;i++)add(rest[i]);
   return out.slice(0,n);
 }
@@ -3547,7 +3547,7 @@ function formGap(tp,lv,pool,idx){
     var src=x.k==="s"?x.s:(x.k==="w"?x.w:"");
     hebWords(src).forEach(function(b){if(okDist(b))others.push(b)});
   });
-  shuffle(allWords()).forEach(function(x){
+  shuffle(allWords().slice()).forEach(function(x){
     hebWords(x.w).forEach(function(b){if(okDist(b))backup.push(b)});
   });
   /* מסיח שאורכו רחוק מהתשובה מאפשר לענות בלי לקרוא — "הארוכה
@@ -5778,7 +5778,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=a137-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=a138-pwa1").catch(function(){});
   });
 }
 </script>

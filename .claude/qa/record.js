@@ -284,6 +284,43 @@ function unquote(raw) {
   try { return JSON.parse('"' + raw + '"'); } catch (e) { return raw.replace(/\\"/g, '"'); }
 }
 
+/* המזהה נחשב על הטקסט שהאפליקציה באמת מוסרת ל-RECORDED.play, ולא על
+   השדה הגולמי. ברוב האפליקציות אתרי הקריאה כותבים `speak(saySpell(...))`,
+   ולכן saySpell כבר רץ כשהמזהה נחשב — ואילו ב-lomda הוא רץ *אחרי*
+   RECORDED.play, בכוונה ומתועד שם. ההבחנה נמדדת מהקוד: אפליקציה שיש בה
+   `speak(saySpell(` באתרי הקריאה מקבלת את הפונקציה שלה, והשאר לא.
+
+   אין כאן העתק של saySpell אלא **חילוץ של הפונקציה של האפליקציה עצמה**:
+   ל-history יש גרסה משלה (ספרות רומיות), ועותק שנשאר מאחור הוא בדיוק
+   מזהה שגוי — קליפ שלא ינוגן לעולם. */
+const SPELL_MISS = [];
+const SPELL_CACHE = new Map();
+function appSaySpell(app) {
+  if (SPELL_CACHE.has(app)) return SPELL_CACHE.get(app);
+  const idx = path.join(ROOT, app, 'index.html');
+  let fn = x => String(x == null ? '' : x);
+  if (fs.existsSync(idx)) {
+    const html = fs.readFileSync(idx, 'utf8');
+    const wraps = (html.match(/speak\(saySpell\(/g) || []).length;
+    const k = html.indexOf('\nfunction saySpell(');
+    const end = k < 0 ? -1 : html.indexOf('\n}\n', k);
+    if (wraps > 0 && k >= 0 && end > k) {
+      try { fn = new Function(html.slice(k + 1, end + 3) + '\nreturn saySpell;')(); }
+      catch (e) { SPELL_MISS.push(app + ' — saySpell לא נבנה: ' + e.message); }
+    } else if (wraps > 0) {
+      SPELL_MISS.push(app + ' — ' + wraps + ' אתרי speak(saySpell( ואין הגדרה לחלץ');
+    }
+  }
+  SPELL_CACHE.set(app, fn);
+  return fn;
+}
+/* בדיוק מה ש-speak עושה לפני RECORDED.play: saySpell של האפליקציה,
+   ואז <br> לנקודה־רווח (O-145), ואז plainOf. */
+function sayText(app, raw) {
+  return plainOf(appSaySpell(app)(String(raw == null ? '' : raw))
+    .replace(/<br\s*\/?>/gi, '. '));
+}
+
 /* science/index.html: const SCIBANK=[["bio",1,{"he":[...],"en":[...]}],...].
    המחרוזות העבריות הן המערכים שבתוך "he". קוראים את המערך בספירת
    סוגריים (מחרוזות מוגנות) ו-JSON.parse, בלי eval. */
@@ -373,11 +410,8 @@ function geoBank(text) {
     text.slice(a, end),
     ctx, { timeout: 20000 });
 
-  /* העתק מדויק מ-geography/index.html שורה 4226. */
-  const saySpell = x => String(x == null ? '' : x)
-    .replace(/[\u201c\u201d\u2018\u2019]/g, '')
-    .replace(/\u05f4/g, (m, i, str) => /^[\u05d0-\u05ea](?![\u05d0-\u05ea])/.test(str.slice(i + 1)) ? m : '')
-    .replace(/\s\u2014\s/g, ', ');
+  /* הפונקציה של geography עצמה, מחולצת — לא העתק. */
+  const saySpell = appSaySpell('geography');
   const he = o => (o && o.he) || '';
 
   const out = [];
@@ -423,12 +457,9 @@ function motalBank(text) {
     text.slice(a, b).replace(/^[\s\S]*?var TOPICS=\[\];/, ''),
     ctx, { timeout: 20000 });
 
-  /* העתק מדויק מ-motal/index.html שורה 2165. מזהה שגוי כאן הוא
-     קליפ שלא ינוגן לעולם. */
-  const saySpell = x => String(x == null ? '' : x)
-    .replace(/[\u201c\u201d\u2018\u2019]/g, '')
-    .replace(/\u05f4/g, (m, i, str) => /^[\u05d0-\u05ea](?![\u05d0-\u05ea])/.test(str.slice(i + 1)) ? m : '')
-    .replace(/\s\u2014\s/g, ', ');
+  /* הפונקציה של motal עצמה, מחולצת — לא העתק. מזהה שגוי כאן הוא
+     קליפ שלא ינוגן לעולם, וזה בדיוק מה שהעתק שנשאר מאחור מייצר. */
+  const saySpell = appSaySpell('motal');
   const he = o => (o && o.he) || '';
 
   const out = [];
@@ -693,7 +724,7 @@ function corpus(app) {
     if (!fs.existsSync(path.join(ROOT, f))) continue;
     const s = fs.readFileSync(path.join(ROOT, f), 'utf8');
     for (const m of s.matchAll(/\b"?he"?\s*:\s*"((?:[^"\\]|\\.)*)"/g)) {
-      const text = plainOf(unquote(m[1]));
+      const text = sayText(app, unquote(m[1]));
       if (!/[א-ת]/.test(text)) continue;
       if (text.split(' ').length < 2) continue;
       const id = R.id(text);
