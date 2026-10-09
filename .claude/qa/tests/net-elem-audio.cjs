@@ -1,0 +1,7 @@
+const {chromium}=require('../pw.js');const assert=require('assert');
+(async()=>{let b=await chromium.launch(),c=await b.newContext(),p=await c.newPage();await p.goto('http://127.0.0.1:8099/net-elem/?internal=shlav-internal-net-elem-k');if(await p.locator('.lg-wrap').count())await p.locator('.lg-wrap button').nth(4).click();await p.locator('[data-u="privacy"]').click();await p.locator('#startBtn').click();
+for(let lang of ['he','ar','ru','en']){await p.locator(`[data-lang="${lang}"]`).click();let result=await p.evaluate(async()=>{
+let requests=[],ended;RECORDED.play=(text,lang,opts)=>{requests.push({text,lang,rate:opts.rate});ended=opts.onEnd;return true};RECORDED._state.el={duration:4,currentTime:2};RECORDED.stop=()=>{};
+let s=practiceSegs();speakSeq([s[0]]);await new Promise(r=>setTimeout(r,110));let qhl=document.querySelectorAll('#qtext .hl').length;stopSpeech();let clean=document.querySelectorAll('.hl').length;
+speakSeq([s[1]]);await new Promise(r=>setTimeout(r,110));let ahl=document.querySelectorAll('.opt .w.hl').length;ended();return{requests,qhl,ahl,clean,playing:SP.playing};});assert(result.requests.every(x=>x.lang===lang));assert.equal(result.qhl,1);assert.equal(result.ahl,1);assert.equal(result.clean,0);assert.equal(result.playing,false);}
+console.log('Recorded-layer callbacks, correct language, word highlighting on question AND answer, stop and end: 4 languages PASS (mock audio, not audible recordings).');await b.close()})().catch(e=>{console.error(e);process.exit(1)});

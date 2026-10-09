@@ -40,5 +40,6 @@
 | `english-elem` | en14 · 2026-10-09 | en14-pwa1 | תואם |
 | `science-12` | sg16 · 2026-10-09 | sg16-pwa1 | תואם |
 | `domino` | dm16 · 2026-10-09 | dm16-pwa1 | תואם |
+| `net-elem` | ns1 · 2026-10-07 | ns1-pwa1 | תואם |
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-10-09.

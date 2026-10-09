@@ -237,6 +237,7 @@ const SOURCES = {
   'tanakh-elem': ['tanakh-elem/js/data.js'],
   /* מולדת ואזרחות לילדים (3.10.2026): הנתונים ב-js/data.js כשורות מופרדות ב-| (L משפט, Q שאלה, S כותרת, E ישות/תשובה), קוראים אותם במסלול נפרד (civicsElem). */
   'civics-elem': ['civics-elem/js/data.js'],
+  'net-elem': ['net-elem/js/data.js'],
   'culture-elem': ['culture-elem/js/data.js'],
   'history-elem': ['history-elem/js/data.js'],
   /* אנגלית לילדים (3.10.2026): הנתונים ב-js/data.js כשורות מופרדות ב-| (S כותרת, L פתיח, Q הנחיה, T/W/X תרגום). */
@@ -641,13 +642,20 @@ function corpus(app) {
     }
     return seen;
   }
-  if (app === 'civics-elem' || app === 'culture-elem' || app === 'history-elem') {
+  if (app === 'net-elem' || app === 'civics-elem' || app === 'culture-elem' || app === 'history-elem') {
     const tf = path.join(ROOT, files[0]);
     if (!fs.existsSync(tf)) return seen;
-    for (const raw of civicsElem(fs.readFileSync(tf, 'utf8'))) {
+    const extra = [];
+    if(app === 'net-elem') {
+      const it = fs.readFileSync(path.join(ROOT, 'net-elem/js/i18n.js'), 'utf8');
+      for(const m of it.matchAll(/^S\("[^"]+",("(?:[^"\\]|\\.)*")/gm)) extra.push(JSON.parse(m[1]));
+      const ctx = {}; require('vm').runInNewContext(fs.readFileSync(tf,'utf8'),ctx);
+      for(const obj of [ctx.NET_HINTS,ctx.NET_EXAMPLES]) for(const v of Object.values(obj)) extra.push(v.he);
+    }
+    for (const raw of civicsElem(fs.readFileSync(tf, 'utf8')).concat(extra)) {
       const text = plainOf(String(raw));
       if (!/[א-ת]/.test(text)) continue;
-      if (text.split(' ').length < 2) continue;
+      if (app !== 'net-elem' && text.split(' ').length < 2) continue;
       const id = R.id(text);
       if (!seen.has(id)) seen.set(id, text);
     }
