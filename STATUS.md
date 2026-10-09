@@ -24,7 +24,7 @@
 | `literature` | j33 · 2026-10-09 | j33-pwa1 | תואם |
 | `tanakh` | p34 · 2026-10-09 | p34-pwa1 | תואם |
 | `hebrew-arab` | y20 · 2026-10-09 | y20-pwa1 | תואם |
-| `motal` | d27 · 2026-10-09 | d27-pwa1 | תואם |
+| `motal` | d28 · 2026-10-09 | d28-pwa1 | תואם |
 | `math-g7` | mg16 · 2026-10-09 | mg16-pwa1 | תואם |
 | `electric` | e49 · 2026-10-09 | e49-pwa1 | תואם |
 | `science-mid` | scimid10 · 2026-10-06 | scimid10-pwa1 | תואם |
