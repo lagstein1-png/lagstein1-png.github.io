@@ -225,9 +225,9 @@ button[data-a="lang"][lang="ru"]{font-family:var(--ru)}
   display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;
   font-weight:800;color:var(--muted);flex:none}
 .opt.ok{border-color:var(--ok);background:var(--ok-soft)}
-.opt.ok .k{background:var(--ok);color:#fff}
+.opt.ok .k{background:var(--ok);color:var(--bg)}
 .opt.bad{border-color:var(--bad);background:var(--bad-soft)}
-.opt.bad .k{background:var(--bad);color:#fff}
+.opt.bad .k{background:var(--bad);color:var(--bg)}
 .opt[disabled]{cursor:default}
 .opt.dim{opacity:.55}
 /* בחירה במבחן היא בחירה, לא תשובה נכונה. במסכי התרגול הצבע
@@ -431,7 +431,7 @@ textarea.field{min-height:96px;resize:vertical}
 .xq{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface2)}
 .xq-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .xq-n{flex:0 0 auto;min-width:27px;height:27px;border-radius:8px;display:inline-flex;
-  align-items:center;justify-content:center;font-weight:800;font-size:.85rem;background:var(--line)}
+  align-items:center;justify-content:center;font-weight:800;font-size:.85rem;background:var(--ink);color:var(--bg)}
 .xq-tp{font-weight:700;font-size:.88rem;color:var(--muted);overflow-wrap:anywhere}
 .xq-acts{margin-inline-start:auto;display:flex;gap:6px;flex-wrap:wrap}
 /* 44 פיקסלים גם כאן. כפתור קטן בתוך רשימה ארוכה הוא בדיוק
@@ -1091,7 +1091,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="c42 · 2026-10-06";
+var BUILD="c43 · 2026-10-09";
 var SKEY="ezrach-state-v1";
 var GKEY_STORE="ezrach-gkey";
 
@@ -12612,6 +12612,11 @@ document.addEventListener("keydown",function(e){
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   if(e.target&&e.target.closest("input,textarea,select,[contenteditable]"))return;
   if(state.screen!=="prac"||!P.q)return;
+  /* רווח או Enter על כפתור ממוקד הם הפעלה שלו — הדפדפן כבר יורה
+     click — ולא הקראה חוזרת ולא מעבר לשאלה הבאה. בלי זה, רמקול של
+     תא תשובה שהגיעו אליו בטאב הקריא ברווח את השאלה במקום את התא,
+     ואחרי שעונים Enter עליו דילג לשאלה הבאה במקום להקריא. */
+  if((e.key===" "||e.key==="Enter")&&e.target&&e.target.closest("button,[role='button'],a[href]"))return;
   if(!P.done&&P.q.opts&&/^[1-4]$/.test(e.key)){
     var i=parseInt(e.key,10)-1;
     if(P.q.opts[i]){e.preventDefault();answer(i)}
@@ -12764,7 +12769,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=c42-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=c43-pwa1").catch(function(){});
   });
 }
 </script>

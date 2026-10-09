@@ -426,7 +426,7 @@ footer{border-top:1px solid var(--line);margin-top:auto;background:var(--surface
 .xq{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface2)}
 .xq-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .xq-n{flex:0 0 auto;min-width:27px;height:27px;border-radius:8px;display:inline-flex;
-  align-items:center;justify-content:center;font-weight:800;font-size:.85rem;background:var(--line)}
+  align-items:center;justify-content:center;font-weight:800;font-size:.85rem;background:var(--ink);color:var(--bg)}
 .xq-tp{font-weight:700;font-size:.88rem;color:var(--muted);overflow-wrap:anywhere}
 .xq-acts{margin-inline-start:auto;display:flex;gap:6px;flex-wrap:wrap}
 /* 44 פיקסלים גם כאן. כפתור קטן בתוך רשימה ארוכה הוא בדיוק
@@ -516,7 +516,7 @@ input[type=range]{min-height:44px}
    ״הכפתורים רמז הקראה וכו קטנים יש להסיף צבע״). ירוק הקראה, אדום עצירה,
    כתום רמז, סגול לימור, כחול פתרון מודרך, אפור־כחלחל נוסחה — אותם
    צבעים בדיוק בכל האפליקציות, והסריקה הרוחבית בודקת את זה. */
-.btn[data-a="read"],.btn[data-a="readsteps"]{background:#0e9c8d!important;border-color:#0b7c71!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
+.btn[data-a="read"],.btn[data-a="readsteps"]{background:#0b7c71!important;border-color:#0b7c71!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
 .btn[data-a="read"]:hover,.btn[data-a="readsteps"]:hover{background:#0b7c71!important;color:#fff!important}
 .btn[data-a="hush"],.btn[data-a="stop"]{background:#bf4426!important;border-color:#a03a20!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
 .btn[data-a="hush"]:hover,.btn[data-a="stop"]:hover{background:#a03a20!important;color:#fff!important}
@@ -531,7 +531,7 @@ input[type=range]{min-height:44px}
 /* רמקול לכל תשובה — מי שקורא בקושי בוחר באוזן (אותו תקן של history) */
 .opts .orow{display:flex;gap:6px;align-items:stretch}
 .opts .orow .opt{flex:1 1 auto}
-.optspk{flex:0 0 auto;min-width:46px;min-height:46px;border:2px solid #0b7c71;border-radius:12px;background:#0e9c8d;color:#fff;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:8px 10px}
+.optspk{flex:0 0 auto;min-width:46px;min-height:46px;border:2px solid #0b7c71;border-radius:12px;background:#0b7c71;color:#fff;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:8px 10px}
 .optspk:hover{background:#0b7c71}
 </style>
 <div class="deco" aria-hidden="true"></div>
@@ -1016,7 +1016,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="e48 · 2026-10-06";
+var BUILD="e49 · 2026-10-09";
 var KEY="electric-state-v1";
 
 function blankState(){
@@ -5923,6 +5923,11 @@ document.addEventListener("keydown",function(e){
   if(!state.settings.keys)return;
   if(e.target.closest("input,textarea,select"))return;
   if(!state.onboarded||view!=="practice"||!P.q)return;
+  /* רווח או Enter על כפתור ממוקד הם הפעלה שלו — הדפדפן כבר יורה
+     click — ולא הקראה חוזרת ולא מעבר לשאלה הבאה. בלי זה, רמקול של
+     תא תשובה שהגיעו אליו בטאב הקריא ברווח את השאלה במקום את התא,
+     ואחרי שעונים Enter עליו דילג לשאלה הבאה במקום להקריא. */
+  if((e.key===" "||e.key==="Enter")&&e.target&&e.target.closest("button,[role='button'],a[href]"))return;
   if(P.phase==="ask"&&/^[1-4]$/.test(e.key)){
     var i=parseInt(e.key,10)-1;
     if(P.q.options[i]){e.preventDefault();onAnswer(i)}
@@ -11762,7 +11767,7 @@ if(!INTERNAL_OK){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=e48-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=e49-pwa1").catch(function(){});
   });
 }
 </script>

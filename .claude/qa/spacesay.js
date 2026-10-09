@@ -1,8 +1,11 @@
 /* =====================================================================
-   מקש הרווח מקריא את `P.q.say` לפני שענו — סריקה סטטית בכל האפליקציות.
+   מקש הרווח במסך התרגול — שתי שאלות, שתיהן סריקה סטטית בכל האפליקציות.
 
      node .claude/qa/spacesay.js            # כל האפליקציות שב-stages.json
      node .claude/qa/spacesay.js civics     # רק זו
+
+   **שאלה 1: הרווח מקריא את `P.q.say` לפני שענו.**
+   **שאלה 2: הרווח על כפתור ממוקד יורה פעמיים** (נוסף 9.10.2026).
 
    **למה סטטי, כשיש כבר `say.js`.** `say.js` מריץ דפדפן אמיתי וזו
    הבדיקה החזקה — אבל היא מכוונת לארבע אפליקציות בשם (`english`,
@@ -70,5 +73,49 @@ for (const app of targets) {
   }
 }
 
-console.log(`\n${scanned} אפליקציות נסרקו, ${withHandler} עם מטפל רווח שמקריא say, ${findings} ממצאים`);
-process.exit(findings ? 1 : 0);
+/* ---------------------------------------------------------------------
+   שאלה 2 — הרווח על כפתור ממוקד יורה פעמיים.
+
+   רווח או Enter על כפתור ממוקד הם **הפעלה שלו**: הדפדפן יורה `click`
+   מעצמו. מטפל גלובלי שלא בודק על מה המיקוד יושב יורה בנוסף את הקיצור
+   שלו — ולכן רמקול של תא תשובה שהגיעו אליו בטאב הקריא ברווח את השאלה
+   במקום את התא, ואחרי שעונים Enter עליו דילג לשאלה הבאה במקום להקריא.
+   זה פוגע בדיוק במי שעובד במקלדת בלבד.
+
+   **נמדד 9.10.2026: השומר היה בשבע אפליקציות, וחסר בשלוש־עשרה.**
+   `history`, `kotvim`, `lomda`, `motal`, `reader`, `tanakh` ו-`ulpan`
+   נשאו אותו; `biology`, `civics`, `electric`, `english`, `geography`,
+   `hebrew-arab`, `islam`, `literature`, `math-teen`, `math-uni`,
+   `math-uni2`, `math-uni3` ו-`russian` לא. באג של העתקה, כמו שאלה 1.
+
+   **מה נבדק, ולמה כך.** המטפל שנבדק הוא זה שיש בו גם ענף `1-4`
+   (תשובה) וגם ענף `" "` — כלומר מטפל התרגול, ולא כל `keydown` באתר.
+   מטפל צר שכבר שואל על מה המיקוד יושב (`[data-a='gvoice']` ב-`biology`,
+   `[data-a="pl"]` ב-`rakia`) אינו נכנס לסריקה מאליו, ואינו ממצא.
+   --------------------------------------------------------------------- */
+const GUARD = /closest\(\s*["'`]button,\[role=['"]button['"]\],a\[href\]["'`]\s*\)/;
+const ANSWER = /\/\^\[1-4\]\$\//;
+let unguarded = 0, practice = 0;
+
+for (const app of targets) {
+  const f = path.join(ROOT, app, 'index.html');
+  if (!fs.existsSync(f)) continue;
+  const src = fs.readFileSync(f, 'utf8');
+  let i = 0;
+  while ((i = src.indexOf('addEventListener', i)) >= 0) {
+    const head = src.slice(i, i + 40);
+    if (!/addEventListener\s*\(\s*["'`]keydown/.test(head)) { i += 16; continue }
+    const body = blockAt(src, i);
+    i += 16;
+    if (!ANSWER.test(body) || body.indexOf('e.key===" "') < 0) continue;
+    practice++;
+    const line = src.slice(0, src.indexOf(body)).split('\n').length;
+    if (GUARD.test(body)) { console.log(`✓ ${app.padEnd(15)} שורה ${line}: מטפל התרגול שואל על מה המיקוד יושב`); continue }
+    unguarded++;
+    console.log(`✗ ${app.padEnd(15)} שורה ${line}: רווח/Enter על כפתור ממוקד יורה גם את הקיצור — חסר השומר`);
+    console.log(`   העתק מ-lomda: if((e.key===" "||e.key==="Enter")&&e.target&&e.target.closest("button,[role='button'],a[href]"))return;`);
+  }
+}
+
+console.log(`\n${scanned} אפליקציות נסרקו · ${withHandler} עם מטפל רווח שמקריא say, ${findings} ממצאים · ${practice} מטפלי תרגול, ${unguarded} בלי שומר המיקוד`);
+process.exit(findings + unguarded ? 1 : 0);

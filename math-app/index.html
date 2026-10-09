@@ -648,14 +648,14 @@ input[type=range]{min-height:44px}
 <body>
 <style>
 /* כפתורי הקראה גדולים וצבעוניים — התקן המשותף (ירוק הקראה, אדום עצירה) */
-.spk:not(.sm){border-radius:12px;background:#0e9c8d;border-color:#0b7c71;color:#fff;font-weight:700;min-height:46px;width:auto;height:auto;padding:8px 18px;font-size:1.02rem;gap:.4rem}
+.spk:not(.sm){border-radius:12px;background:#0b7c71;border-color:#0b7c71;color:#fff;font-weight:700;min-height:46px;width:auto;height:auto;padding:8px 18px;font-size:1.02rem;gap:.4rem}
 .spk:not(.sm):hover{background:#0b7c71;color:#fff}
 .spkStop{background:#bf4426!important;border-color:#a03a20!important;color:#fff!important}
 .spkStop:hover{background:#a03a20!important;color:#fff!important}
 /* כפתורי העזר הצבעוניים — התקן המשותף המלא (26.9.2026). ירוק הקראה, אדום עצירה,
    כתום רמז, סגול לימור, כחול פתרון מודרך, אפור־כחלחל נוסחה — אותם
    צבעים בדיוק בכל האפליקציות (מקור האמת: math-teen, docs/STYLE-STANDARD.md). */
-.btn[data-a="read"],.btn[data-a="readsteps"]{background:#0e9c8d!important;border-color:#0b7c71!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
+.btn[data-a="read"],.btn[data-a="readsteps"]{background:#0b7c71!important;border-color:#0b7c71!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
 .btn[data-a="read"]:hover,.btn[data-a="readsteps"]:hover{background:#0b7c71!important;color:#fff!important}
 .btn[data-a="hush"],.btn[data-a="stop"]{background:#bf4426!important;border-color:#a03a20!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
 .btn[data-a="hush"]:hover,.btn[data-a="stop"]:hover{background:#a03a20!important;color:#fff!important}
@@ -670,7 +670,7 @@ input[type=range]{min-height:44px}
 /* רמקול לכל תשובה — מי שקורא בקושי בוחר באוזן (אותו תקן של history) */
 .opts .orow{display:flex;gap:6px;align-items:stretch}
 .opts .orow .opt{flex:1 1 auto}
-.optspk{flex:0 0 auto;min-width:46px;min-height:46px;border:2px solid #0b7c71;border-radius:12px;background:#0e9c8d;color:#fff;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:8px 10px}
+.optspk{flex:0 0 auto;min-width:46px;min-height:46px;border:2px solid #0b7c71;border-radius:12px;background:#0b7c71;color:#fff;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:8px 10px}
 .optspk:hover{background:#0b7c71}
 /* התאמה לתקן בעיצוב הילדים: הרמז בכתום התקני, רמקול ליד כל תשובה */
 .hintpill{background:#b45309;color:#fff}
@@ -2401,7 +2401,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="b182 · 2026-10-06";
+var BUILD="b183 · 2026-10-09";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4799,6 +4799,11 @@ document.addEventListener("keydown",function(e){
   if(SlowMode.isOpen())return;                       /* חלון הלמידה האיטית מנהל את המקשים בעצמו */
   if(e.target.closest("input,textarea,select"))return; /* לא מפריעים בזמן הקלדה */
   if(view!=="practice")return;
+  /* רווח או Enter על כפתור ממוקד הם הפעלה שלו — הדפדפן כבר יורה
+     click — ולא הקראה חוזרת ולא מעבר לשאלה הבאה. בלי זה, רמקול של
+     תא תשובה שהגיעו אליו בטאב הקריא ברווח את השאלה במקום את התא,
+     ואחרי שעונים Enter עליו דילג לשאלה הבאה במקום להקריא. */
+  if((e.key===" "||e.key==="Enter")&&e.target&&e.target.closest("button,[role='button'],a[href]"))return;
   /* 1-4 = בחירת תשובה */
   if(P.phase==="ask"&&/^[1-4]$/.test(e.key)){
     var q=P.ses[P.qi];
@@ -4918,7 +4923,7 @@ function lessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.75">'+esc(lt("lsSum"))+'</p>';
     h+='<div style="margin:12px 0">'+lsBar(4,2)+'</div>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("lsagain",lt("lsAgain"),'background:#0e9c8d;color:#fff;font-weight:700')+lsHearBtn(lt("lsSum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("lsagain",lt("lsAgain"),'background:#0b7c71;color:#fff;font-weight:700')+lsHearBtn(lt("lsSum"))+'</div>';
   }
   if(st.step>0&&st.step<5)h+='<div style="margin-top:14px">'+lsBtn("lsback",lt("lsBack"),'color:#475569')+'</div>';
   return h+'</div>';
@@ -4976,7 +4981,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b182-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b183-pwa1").catch(function(){});
   });
 }
 </script>

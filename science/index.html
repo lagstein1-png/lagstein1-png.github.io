@@ -649,14 +649,14 @@ a.chip{min-height:44px}
 <body>
 <style>
 /* כפתורי הקראה גדולים וצבעוניים — התקן המשותף (ירוק הקראה, אדום עצירה) */
-.spk:not(.sm){border-radius:12px;background:#0e9c8d;border-color:#0b7c71;color:#fff;font-weight:700;min-height:46px;width:auto;height:auto;padding:8px 18px;font-size:1.02rem;gap:.4rem}
+.spk:not(.sm){border-radius:12px;background:#0b7c71;border-color:#0b7c71;color:#fff;font-weight:700;min-height:46px;width:auto;height:auto;padding:8px 18px;font-size:1.02rem;gap:.4rem}
 .spk:not(.sm):hover{background:#0b7c71;color:#fff}
 .spkStop{background:#bf4426!important;border-color:#a03a20!important;color:#fff!important}
 .spkStop:hover{background:#a03a20!important;color:#fff!important}
 /* כפתורי העזר הצבעוניים — התקן המשותף המלא (26.9.2026). ירוק הקראה, אדום עצירה,
    כתום רמז, סגול לימור, כחול פתרון מודרך, אפור־כחלחל נוסחה — אותם
    צבעים בדיוק בכל האפליקציות (מקור האמת: math-teen, docs/STYLE-STANDARD.md). */
-.btn[data-a="read"],.btn[data-a="readsteps"]{background:#0e9c8d!important;border-color:#0b7c71!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
+.btn[data-a="read"],.btn[data-a="readsteps"]{background:#0b7c71!important;border-color:#0b7c71!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
 .btn[data-a="read"]:hover,.btn[data-a="readsteps"]:hover{background:#0b7c71!important;color:#fff!important}
 .btn[data-a="hush"],.btn[data-a="stop"]{background:#bf4426!important;border-color:#a03a20!important;color:#fff!important;font-weight:700;min-height:46px;padding:10px 16px!important;font-size:1rem!important}
 .btn[data-a="hush"]:hover,.btn[data-a="stop"]:hover{background:#a03a20!important;color:#fff!important}
@@ -671,7 +671,7 @@ a.chip{min-height:44px}
 /* רמקול לכל תשובה — מי שקורא בקושי בוחר באוזן (אותו תקן של history) */
 .opts .orow{display:flex;gap:6px;align-items:stretch}
 .opts .orow .opt{flex:1 1 auto}
-.optspk{flex:0 0 auto;min-width:46px;min-height:46px;border:2px solid #0b7c71;border-radius:12px;background:#0e9c8d;color:#fff;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:8px 10px}
+.optspk{flex:0 0 auto;min-width:46px;min-height:46px;border:2px solid #0b7c71;border-radius:12px;background:#0b7c71;color:#fff;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:8px 10px}
 .optspk:hover{background:#0b7c71}
 /* התאמה לתקן בעיצוב הילדים: הרמז בכתום התקני, רמקול ליד כל תשובה */
 .hintpill{background:#b45309;color:#fff}
@@ -2572,7 +2572,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s155 · 2026-10-06";
+var BUILD="s156 · 2026-10-09";
 var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -5055,6 +5055,11 @@ document.addEventListener("keydown",function(e){
   if(SlowMode.isOpen())return;                       /* חלון הלמידה האיטית מנהל את המקשים בעצמו */
   if(e.target.closest("input,textarea,select"))return; /* לא מפריעים בזמן הקלדה */
   if(view!=="practice")return;
+  /* רווח או Enter על כפתור ממוקד הם הפעלה שלו — הדפדפן כבר יורה
+     click — ולא הקראה חוזרת ולא מעבר לשאלה הבאה. בלי זה, רמקול של
+     תא תשובה שהגיעו אליו בטאב הקריא ברווח את השאלה במקום את התא,
+     ואחרי שעונים Enter עליו דילג לשאלה הבאה במקום להקריא. */
+  if((e.key===" "||e.key==="Enter")&&e.target&&e.target.closest("button,[role='button'],a[href]"))return;
   /* 1-4 = בחירת תשובה */
   if(P.phase==="ask"&&/^[1-4]$/.test(e.key)){
     var q=P.ses[P.qi];
@@ -5154,7 +5159,7 @@ function lessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.75">'+esc(lt("lsSum"))+'</p>';
     h+='<div style="margin:12px 0">'+lsBar(4,2)+'</div>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("lsagain",lt("lsAgain"),'background:#0e9c8d;color:#fff;font-weight:700')+lsHearBtn(lt("lsSum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("lsagain",lt("lsAgain"),'background:#0b7c71;color:#fff;font-weight:700')+lsHearBtn(lt("lsSum"))+'</div>';
   }
   if(st.step>0&&st.step<5)h+='<div style="margin-top:14px">'+lsBtn("lsback",lt("lsBack"),'color:#475569')+'</div>';
   return h+'</div>';
@@ -5243,7 +5248,7 @@ function sciLessonView(){
     if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(slt("slCorrect"))+'</p><div style="margin-top:10px">'+lsBtn("slnext",slt("slNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(slt("slSum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("slagain",slt("slAgain"),'background:#0e9c8d;color:#fff;font-weight:700')+slHearBtn(slt("slSum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("slagain",slt("slAgain"),'background:#0b7c71;color:#fff;font-weight:700')+slHearBtn(slt("slSum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci2" style="color:#1d4ed8;font-weight:600">'+esc(slt("slNextLesson"))+'</a></p>';
   }
   return h+'</div>';
@@ -5326,7 +5331,7 @@ function sci2LessonView(){
     if(st.p1===1&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s2t("s2Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s2next",s2t("s2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s2t("s2Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s2again",s2t("s2Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s2HearBtn(s2t("s2Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s2again",s2t("s2Again"),'background:#0b7c71;color:#fff;font-weight:700')+s2HearBtn(s2t("s2Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci1" style="color:#1d4ed8;font-weight:600">'+esc(s2t("s2NextLesson"))+'</a> · <a href="?lesson=sci3" style="color:#1d4ed8;font-weight:600">'+esc(s2t("s2Fwd"))+'</a></p>';
   }
   return h+'</div>';
@@ -5409,7 +5414,7 @@ function sci3LessonView(){
     if(st.p1===1&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s3t("s3Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s3next",s3t("s3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s3t("s3Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s3again",s3t("s3Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s3HearBtn(s3t("s3Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s3again",s3t("s3Again"),'background:#0b7c71;color:#fff;font-weight:700')+s3HearBtn(s3t("s3Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci2" style="color:#1d4ed8;font-weight:600">'+esc(s3t("s3PrevLesson"))+'</a> · <a href="?lesson=sci4" style="color:#1d4ed8;font-weight:600">'+esc(s3t("s3Fwd"))+'</a></p>';
   }
   return h+'</div>';
@@ -5492,7 +5497,7 @@ function sci4LessonView(){
     if(st.p1===1&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s4t("s4Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s4next",s4t("s4Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s4t("s4Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s4again",s4t("s4Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s4HearBtn(s4t("s4Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s4again",s4t("s4Again"),'background:#0b7c71;color:#fff;font-weight:700')+s4HearBtn(s4t("s4Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci3" style="color:#1d4ed8;font-weight:600">'+esc(s4t("s4PrevLesson"))+'</a> · <a href="?lesson=sci5" style="color:#1d4ed8;font-weight:600">'+esc(s4t("s4Fwd"))+'</a></p>';
   }
   return h+'</div>';
@@ -5574,7 +5579,7 @@ function sci5LessonView(){
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s5t("s5Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s5next",s5t("s5Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s5t("s5Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s5again",s5t("s5Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s5HearBtn(s5t("s5Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s5again",s5t("s5Again"),'background:#0b7c71;color:#fff;font-weight:700')+s5HearBtn(s5t("s5Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci4" style="color:#1d4ed8;font-weight:600">'+esc(s5t("s5PrevLesson"))+'</a> · <a href="?lesson=sci6" style="color:#1d4ed8;font-weight:600">'+esc(s5t("s5Fwd"))+'</a></p>';
   }
   return h+'</div>';
@@ -5659,7 +5664,7 @@ function sci6LessonView(){
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s6t("s6Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s6next",s6t("s6Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s6t("s6Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s6again",s6t("s6Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s6HearBtn(s6t("s6Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s6again",s6t("s6Again"),'background:#0b7c71;color:#fff;font-weight:700')+s6HearBtn(s6t("s6Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci5" style="color:#1d4ed8;font-weight:600">'+esc(s6t("s6PrevLesson"))+'</a> · <a href="?lesson=sci7" style="color:#1d4ed8;font-weight:600">'+esc(s6t("s6Fwd"))+'</a></p>';
   }
   return h+'</div>';
@@ -5739,7 +5744,7 @@ function sci7LessonView(){
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s7t("s7Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s7next",s7t("s7Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s7t("s7Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s7again",s7t("s7Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s7HearBtn(s7t("s7Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s7again",s7t("s7Again"),'background:#0b7c71;color:#fff;font-weight:700')+s7HearBtn(s7t("s7Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci6" style="color:#1d4ed8;font-weight:600">'+esc(s7t("s7PrevLesson"))+'</a> · <a href="?lesson=sci8" style="color:#1d4ed8;font-weight:600">'+esc(s7t("s7Fwd"))+'</a></p>';
   }
   return h+'</div>';
@@ -5819,7 +5824,7 @@ function sci8LessonView(){
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s8t("s8Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s8next",s8t("s8Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s8t("s8Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s8again",s8t("s8Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s8HearBtn(s8t("s8Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s8again",s8t("s8Again"),'background:#0b7c71;color:#fff;font-weight:700')+s8HearBtn(s8t("s8Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci7" style="color:#1d4ed8;font-weight:600">'+esc(s8t("s8PrevLesson"))+'</a> · <a href="?lesson=sci9" style="color:#1d4ed8;font-weight:600">'+esc(s8t("s8Fwd"))+'</a></p>';
   }
   return h+'</div>';
@@ -5900,7 +5905,7 @@ function sci9LessonView(){
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s9t("s9Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s9next",s9t("s9Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s9t("s9Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s9again",s9t("s9Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s9HearBtn(s9t("s9Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s9again",s9t("s9Again"),'background:#0b7c71;color:#fff;font-weight:700')+s9HearBtn(s9t("s9Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci8" style="color:#1d4ed8;font-weight:600">'+esc(s9t("s9PrevLesson"))+'</a> · <a href="?lesson=sci10" style="color:#1d4ed8;font-weight:600">'+esc(s9t("s9Fwd"))+'</a></p>';
   }
   return h+'</div>';
@@ -5980,7 +5985,7 @@ function sci10LessonView(){
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s10t("s10Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s10next",s10t("s10Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s10t("s10Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s10again",s10t("s10Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s10HearBtn(s10t("s10Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s10again",s10t("s10Again"),'background:#0b7c71;color:#fff;font-weight:700')+s10HearBtn(s10t("s10Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci9" style="color:#1d4ed8;font-weight:600">'+esc(s10t("s10PrevLesson"))+'</a> · <a href="?lesson=sci11" style="color:#1d4ed8;font-weight:600">'+esc(s10t("s10Fwd"))+'</a></p>';
   }
   return h+'</div>';
@@ -6060,7 +6065,7 @@ function sci11LessonView(){
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s11t("s11Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s11next",s11t("s11Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s11t("s11Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s11again",s11t("s11Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s11HearBtn(s11t("s11Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s11again",s11t("s11Again"),'background:#0b7c71;color:#fff;font-weight:700')+s11HearBtn(s11t("s11Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci10" style="color:#1d4ed8;font-weight:600">'+esc(s11t("s11PrevLesson"))+'</a> · <a href="?lesson=sci12" style="color:#1d4ed8;font-weight:600">'+esc(s11t("s11Fwd"))+'</a></p>';
   }
   return h+'</div>';
@@ -6143,7 +6148,7 @@ function sci12LessonView(){
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s12t("s12Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s12next",s12t("s12Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s12t("s12Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s12again",s12t("s12Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s12HearBtn(s12t("s12Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s12again",s12t("s12Again"),'background:#0b7c71;color:#fff;font-weight:700')+s12HearBtn(s12t("s12Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci11" style="color:#1d4ed8;font-weight:600">'+esc(s12t("s12PrevLesson"))+'</a> · <a href="?lesson=sci13" style="color:#1d4ed8;font-weight:600">'+esc(s12t("s12Fwd"))+'</a></p>';
   }
   return h+'</div>';
@@ -6223,7 +6228,7 @@ function sci13LessonView(){
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(s13t("s13Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s13next",s13t("s13Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s13t("s13Sum"))+'</p>';
-    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s13again",s13t("s13Again"),'background:#0e9c8d;color:#fff;font-weight:700')+s13HearBtn(s13t("s13Sum"))+'</div>';
+    h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("s13again",s13t("s13Again"),'background:#0b7c71;color:#fff;font-weight:700')+s13HearBtn(s13t("s13Sum"))+'</div>';
     h+='<p style="margin-top:16px"><a href="?lesson=sci12" style="color:#1d4ed8;font-weight:600">'+esc(s13t("s13PrevLesson"))+'</a></p>';
   }
   return h+'</div>';
@@ -6280,7 +6285,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s155-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s156-pwa1").catch(function(){});
   });
 }
 </script>
