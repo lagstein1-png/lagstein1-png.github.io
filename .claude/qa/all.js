@@ -212,6 +212,11 @@ const SUITE = [
      ב-recorded.js ונשכח ב-41 קובצי sw.js נותן קול שעובד ברשת ומת
      אופליין. הוכח אדום בשלוש צורות — FINDINGS.md, 10.10.2026. */
   { id: 'audio-size', args: ['--check'] },
+  /* מזהה הקליפ הוא גיבוב של הטקסט ולא של האפליקציה, ולכן נושא שעבר
+     בית משאיר את הקליפ בתיקייה הישנה — והחדשה מקליטה ומשלמת עליו
+     שוב. נמדד 10.10.2026: 67 קליפים. אדום על אותם 67, ירוק אחרי
+     --run — FINDINGS.md. */
+  { id: 'audio-adopt', args: ['--check'] },
   /* רקיע — מפת לידה, 18.9.2026. גלילאו מודד את המנוע מול Swiss
      Ephemeris; content ו-safety את 469 הטקסטים; deps את אפס התלות;
      שני המחוללים את הטבלאות שאסור לערוך ביד. */
@@ -303,6 +308,7 @@ process.on('SIGINT', () => { stop(); process.exit(130); });
 
 const results = [];
 let failed = 0;
+let skipped = 0;   /* יציאה 3 — עבר, וחלק לא נבדק. O-210. */
 
 for (const t of plan) {
   /* `label` — שני ערכים יכולים לחלוק `id` כששם האפליקציה הוא
@@ -318,7 +324,17 @@ for (const t of plan) {
                       { cwd: process.cwd(), stdio: 'inherit' });
   const code = r.status === null ? 1 : r.status;
   results.push([t.label || t.id, code]);
-  if (code) failed++;
+  /* ===== יציאה 3 — ״עבר, אבל חלק לא נבדק״. O-210, 10.10.2026 =====
+     `sitemap --check` מדלג על `lastmod` בשיבוט shallow ו-`cache.js`
+     מדלג על בדיקה 6 בלי `origin/main`. שניהם הדפיסו שורת `·`
+     והחזירו 0, ולכן הסיכום כאן אמר ״כולן עברו״ — ו-9.10.2026 זה
+     נתן 89/89 מקומית מול כישלון ב-CI על אותו קומיט בדיוק, כי שם
+     ההיסטוריה מלאה והבדיקה כן רצה. **ירוק שאינו מבדיל בין ✓ לבין
+     ✓־שדילג אינו ראיה.** עכשיו 3 הוא ✓? ונספר בנפרד: הסוויטה אינה
+     נכשלת (הסביבה היא שאינה יכולה לבדוק), אבל היא **אומרת** מה לא
+     נבדק, ומי שקורא את הסיכום יודע מה הוא אינו יודע. */
+  if (code === 3) skipped++;
+  else if (code) failed++;
   process.stdout.write('\n');
 }
 
@@ -326,13 +342,20 @@ stop();
 
 console.log('═'.repeat(72));
 for (const [id, code] of results) {
-  console.log(`  ${code ? '✗' : '✓'} ${id.padEnd(16)} ${code ? 'exit ' + code : ''}`);
+  const mark = code === 3 ? '✓?' : code ? '✗' : '✓';
+  const note = code === 3 ? 'עבר, וחלק לא נבדק' : code ? 'exit ' + code : '';
+  console.log(`  ${mark.padEnd(2)} ${id.padEnd(16)} ${note}`);
 }
 if (STATIC) console.log('  · כל הבדיקות שדורשות דפדפן — דולגו (--static)');
 else if (FAST) console.log(`  · ${SUITE.filter(t => t.slow).map(t => t.id).join(', ')} — דולגו (--fast)`);
 console.log('═'.repeat(72));
+const skippers = results.filter(([, c]) => c === 3).map(([id]) => id);
+if (skippers.length)
+  console.log(`· ${skippers.join(', ')} — עברו, וחלק מהן לא נבדק. ירוק כאן אינו ראיה לאותו חלק (O-210).`);
 console.log(failed
   ? `${failed} מתוך ${results.length} נכשלו`
-  : `${results.length} בדיקות, כולן עברו`);
+  : skipped
+    ? `${results.length} בדיקות, כולן עברו — ${skipped} מהן בלי לבדוק הכול`
+    : `${results.length} בדיקות, כולן עברו`);
 
 process.exit(failed ? 1 : 0);

@@ -96,6 +96,7 @@
     node .claude/qa/record-safety.js     # ההקלטה אינה מוחקת, אינה ננעלת ואינה נופלת על gcloud — ffmpeg/ffprobe/fetch מדומים
     node .claude/qa/audio-size.js            # תקרת שני מאגרי הקול, ומתג המקור מול 41 קובצי sw.js
     node .claude/qa/audio-move.js            # בונה את עצי ריפואי הקול מהעץ הזה — מעתיק, לא מוחק
+    node .claude/qa/audio-adopt.js           # קליפ שכבר שולם עליו לא מוקלט שוב — מאמץ בין אפליקציות
     node .claude/qa/findings.js --check  # FINDINGS.md מחזיק שבוע, הישן בארכיון — --archive מעביר (O-85)
     node .claude/qa/suite.js --check     # הרשימה הזאת מול SUITE שב-all.js — מזהה חסר או שורה מתה נופלים
     node .claude/qa/all.js                   # הכול, ופסק דין אחד

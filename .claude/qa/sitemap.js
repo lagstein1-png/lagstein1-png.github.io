@@ -177,7 +177,7 @@ const bad = gate(cur);
 let want = build();
 let have = cur;
 if (SHALLOW) {
-  console.log('· ריפו shallow — lastmod לא נבדק (התאריכים מ-git אינם אמינים)');
+  console.log('· דולג: ריפו shallow — lastmod לא נבדק (התאריכים מ-git אינם אמינים)');
   const strip = s => s.replace(/<lastmod>[^<]*<\/lastmod>/g, '<lastmod/>');
   want = strip(want); have = strip(have);
 }
@@ -198,4 +198,10 @@ if (want !== have) {
 }
 for (const s of skipped) console.log(`· בחוץ: ${s}`);
 if (bad.length) { for (const b of bad) console.log('✗ ' + b); process.exit(1); }
-console.log(`✓ sitemap.xml: ${ids.length} כתובות, תואם ל-stages.json, ל-noindex ול-git`);
+console.log(`✓ sitemap.xml: ${ids.length} כתובות, תואם ל-stages.json, ל-noindex${SHALLOW ? '' : ' ול-git'}`);
+/* **יציאה 3 = ״עבר, וחלק לא נבדק״ — O-210, 10.10.2026.** בשיבוט
+   shallow ה-`lastmod` לא נבדק, וקודם הוחזר 0 — ולכן `all.js` אמר
+   ״כולן עברו״ על בדיקה שדילגה בדיוק על מה שנשבר ב-CI (ריצה 1388).
+   `all.js` מתרגם 3 ל-`✓?` ואינו נכשל: הסביבה היא שאינה יכולה
+   לבדוק, אבל הסיכום אומר זאת במקום להסתיר. */
+if (SHALLOW) process.exit(3);

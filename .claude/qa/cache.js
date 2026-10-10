@@ -67,7 +67,7 @@ function git(args) {
   catch (e) { return null; }
 }
 const MAIN = git(['rev-parse', '--verify', '--quiet', 'origin/main']) ? 'origin/main' : null;
-if (!MAIN) console.log('· אין origin/main בשיבוט הזה — בדיקה 6 (מפתח מול main) מדולגת. git fetch origin main');
+if (!MAIN) console.log('· דולג: אין origin/main בשיבוט הזה — בדיקה 6 (מפתח מול main) לא נבדקה. git fetch origin main');
 
 function keyOnMain(app) {
   for (const h of HOSTS) {
@@ -264,4 +264,9 @@ for (const [a, pa] of all)
     }
 
 console.log(`\n${checked} sw.js נבדקו, ${bad} ממצאים`);
-process.exit(bad ? 1 : 0);
+/* **יציאה 3 = ״עבר, וחלק לא נבדק״ — O-210, 10.10.2026.** בלי
+   `origin/main` בשיבוט, בדיקה 6 (מפתח קיים מול תוכן שונה) אינה
+   רצה — וזו הבדיקה היחידה כאן שמונעת מיזוג של תיקון שאיש לא יקבל.
+   עד היום הוחזר 0, ולכן `all.js` אמר ״עברה״. `all.js` מתרגם 3
+   ל-`✓?`: הסוויטה אינה נכשלת, אבל הסיכום אומר מה לא נבדק. */
+process.exit(bad ? 1 : (!MAIN ? 3 : 0));
