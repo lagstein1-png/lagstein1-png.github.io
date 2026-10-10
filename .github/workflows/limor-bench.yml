@@ -50,3 +50,44 @@ jobs:
           path: |
             /tmp/limor-bench.txt
             /tmp/limor-bench.json
+
+  # הצד של Gemma — הקובץ tutor/limor-device.js עצמו, על המעבד של הרנר.
+  # הסביבה של הסוכן חסומה מול huggingface.co; הרנר לא. transformers.js
+  # מותקנת כאן לריצה בלבד (--no-save, מחוץ לריפו), כמו node עצמו —
+  # האתר אינו טוען דבר מזה. זמן התגובה כאן הוא של מעבד, לא של טלפון.
+  device:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: transformers.js 4.3.0 — אותה גרסה שהדף נועץ
+        run: |
+          mkdir -p /tmp/tjs && cd /tmp/tjs
+          npm install --no-save --no-audit --no-fund @huggingface/transformers@4.3.0
+
+      - name: עשרים שאלות מול Gemma 4 E2B, על המעבד
+        env:
+          TJS: /tmp/tjs/node_modules/@huggingface/transformers/dist/transformers.node.mjs
+          BENCH_OUT: /tmp/limor-device-bench.txt
+        run: |
+          node tutor-api/local/limor-device-bench.mjs
+          {
+            echo "## לימור — המבחן הקבוע, Gemma במעבד"
+            echo ""
+            echo '```'
+            cat /tmp/limor-device-bench.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: limor-device-bench
+          path: |
+            /tmp/limor-device-bench.txt
+            /tmp/limor-device-bench.json
