@@ -25,7 +25,7 @@
 | `tanakh` | p37 · 2026-10-10 | p37-pwa1 | תואם |
 | `hebrew-arab` | y21 · 2026-10-10 | y21-pwa1 | תואם |
 | `motal` | d29 · 2026-10-10 | d29-pwa1 | תואם |
-| `math-g7` | mg17 · 2026-10-10 | mg17-pwa1 | תואם |
+| `math-g7` | mg18 · 2026-10-10 | mg18-pwa1 | תואם |
 | `electric` | e50 · 2026-10-10 | e50-pwa1 | תואם |
 | `science-mid` | scimid12 · 2026-10-10 | scimid12-pwa1 | תואם |
 | `biology` | bg19 · 2026-10-10 | bg19-pwa1 | תואם |

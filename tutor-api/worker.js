@@ -604,8 +604,9 @@ const FALLBACK = {
    שמפרק 17 ל-10 ו-7 כותב מספרים שאינם בתרגיל, וזו בדיוק
    ההוראה ״ייצוגים פשוטים״. פסילה שלהם הייתה פוסלת הוראה טובה.
 */
-function revealsAnswer(text, ans) {
+function revealsAnswer(text, ans, screen) {
   if (ans === null || ans === undefined || ans === "") return false;
+  if (screen && quotesAnswer(text, ans, screen)) return true;
   const s = String(ans).trim();
   if (!s) return false;
   if (/^-?\d+(\.\d+)?$/.test(s))
@@ -625,6 +626,45 @@ function revealsAnswer(text, ans) {
      בגלל ו׳ אחת בהתחלה. אות שימוש מוסרת רק אם נשארת מילה של שלוש
      אותיות לפחות, כדי לא לרסק מילים קצרות. */
   return s.length >= 3 && strip(text).indexOf(strip(s)) >= 0;
+}
+
+/* ---------- ציטוט חלקי — O-138, 10.10.2026 ----------
+   `revealsAnswer` תופס רק את התשובה כולה, ולכן ״מהי ׳הכרה משפטית
+   בינלאומית׳?״ עבר, כשהתשובה הנכונה נפתחת במילים האלה בדיוק. שלוש
+   מילים רצופות מהתשובה הנכונה מסגירות איזו אפשרות נכונה — **אלא אם
+   אותו רצף כתוב גם בשאלה או באחד המסיחים**: אז הוא ציטוט ממה שעל
+   המסך, וזה בדיוק מה שרמז טוב עושה (״שים לב למילים ׳אלא על פי משפט
+   חוקי׳״). פחות משלוש מילים אינו נבדק: ״הכרה משפטית״ לבדה היא מושג,
+   לא תשובה. חל רק כשהלקוח שלח את המסך — בלעדיו אין ממה להחריג. */
+function words(t) {
+  return String(t).replace(/[\u0591-\u05C7]/g, "").replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .toLowerCase().split(/\s+/).filter(Boolean);
+}
+/* אותה מילה, או אותה מילה עם עד שתי אותיות שימוש לפניה (״ההכרה״,
+   ״ובבית״). לא `strip`: הוא מוריד אות ראשונה גם כשהיא חלק מהמילה
+   (״משפטית״ → ״שפטית״), ולכן ״המשפטית״ ו״משפטית״ לא נפגשים בו. */
+function sameWord(a, b) {
+  if (a === b) return true;
+  const [l, s] = a.length > b.length ? [a, b] : [b, a];
+  return s.length >= 3 && l.endsWith(s) && /^[והבלכמש]{1,2}$/.test(l.slice(0, l.length - s.length));
+}
+function hasRun(hay, run) {
+  for (let i = 0; i + run.length <= hay.length; i++)
+    if (run.every((w, k) => sameWord(hay[i + k], w))) return true;
+  return false;
+}
+function quotesAnswer(text, ans, screen) {
+  const s = String(ans).trim();
+  if (/^-?\d+(\.\d+)?$/.test(s)) return false;
+  const aw = words(s), said = words(text);
+  const shown = [screen.expr].concat(screen.options || [])
+    .filter(o => o && String(o).trim() !== s).map(words);
+  for (let i = 0; i + 3 <= aw.length; i++) {
+    const run = aw.slice(i, i + 3);
+    if (shown.some(w => hasRun(w, run))) continue;
+    if (hasRun(said, run)) return true;
+  }
+  return false;
 }
 
 function strip(txt) {
@@ -1496,7 +1536,7 @@ async function handleAsk(request, env, ctx, org, fetchFn) {
 
   /* הבדיקה, ואחריה ניסיון שני אחד ולא יותר. רמז — תמיד בלי התשובה. */
   const guard = turn < 2 || inp.mode === "hint";
-  const bad = t => (guard && revealsAnswer(t, ans)) || badEquation(t) || badLang(t, inp.lang);
+  const bad = t => (guard && revealsAnswer(t, ans, inp.q)) || badEquation(t) || badLang(t, inp.lang);
   if (bad(out.text)) {
     /* שלוש סיבות ושלושה נוסחים. הנוסח חייב לומר **מה** נשבר:
        ״כתוב מחדש״ לבדו מחזיר את אותה שגיאה, מפני שהמודל אינו
