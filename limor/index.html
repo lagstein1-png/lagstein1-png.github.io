@@ -111,7 +111,14 @@ footer{text-align:center;color:var(--text-soft);font-size:.85rem;margin-block-st
 <script src="/tutor/tutor.js"></script>
 <script src="/tutor/barak-core.js"></script>
 <!-- החריגה היחידה לכלל ״בלי ספריות חיצוניות״ — רק בדף הזה. JOSH.md. -->
-<script src="/tutor/limor-device.js"></script>
+<script>
+/* O-138, 10.10.2026: המבחן הקבוע הראה ש-Gemma 4 E2B עוזר באמת ב-3 מתוך 20
+   שאלות, ומחליף בסדר המוח את Gemini, שעזר ב-20. לכן לימור במכשיר נטענת
+   רק בכתובת ?device=1, לבדיקה, ולא מוצעת ללומד. ההחזרה: למחוק את התנאי. */
+if (/[?&]device=1(?:&|$)/.test(location.search)) {
+  var ld = document.createElement("script"); ld.src = "/tutor/limor-device.js"; document.head.appendChild(ld);
+}
+</script>
 <script>
 (function(){
 "use strict";
