@@ -64,6 +64,59 @@
     gen: 0
   };
 
+  /* ===== מקור קובצי הקול — 10.10.2026, הכרעת הבעלים =====
+     22,406 קובצי ה-MP3 שקלו 984MB (נמדד ב-du), והאתר המפורסם חצה את
+     מגבלת ה-1GB של GitHub Pages — O-191. הקבצים עוברים לריפואים
+     נפרדים, וכל אחד מהם הוא אתר Pages משלו עם מגבלה משלו.
+
+     **שניים ולא אחד, וזה נמדד ולא שוער.** `record.js --plan` אומר
+     שחסרות 5,029 הקלטות, ובדיסק קובץ שוקל 44.9KB בממוצע — כלומר
+     המאגר השלם הוא 1,143MB, מעל 1,024. שני דליים מאוזנים: 572MB
+     ו-571MB כשיושלמו, עם כ-450MB מרווח לכל אחד.
+     `audio-size.js` מפיל כשדלי חוצה את התקרה שלו.
+
+     **המניפסט נשאר כאן, ורק ה-MP3 עוברים.** הוא קטן (768KB
+     לארבעים האפליקציות), הוא נטען ב-`cache: "no-cache"`, והשארתו
+     במקור של הדף חוסכת CORS בשאלה ״יש קובץ?״ — זו השאלה שנשאלת
+     לפני כל הקראה, ותשובה שגויה לה משתיקה את הלומד.
+
+     **ערך ריק = הקבצים מקומיים, בדיוק כמו עד 10.10.2026.** שתי
+     המחרוזות האלה הן המתג היחיד של כל המעבר. */
+  var HOST_1 = "";   /* lagstein1-png/bekol-audio  */
+  var HOST_2 = "";   /* lagstein1-png/bekol-audio2 */
+  var ON_2 = { civics: 1, geography: 1, tanakh: 1, biology: 1, "science-mid": 1,
+               "geography-elem": 1, english: 1, "math-elem": 1, "tanakh-elem": 1,
+               "culture-elem": 1, hebrew: 1, "hebrew-lit": 1, tutor: 1,
+               "english-elem": 1 };
+
+  /* "audio" יחסי לדף, ולכן באפליקציה הוא `/lomda/audio`. נתיב
+     שמתחיל בלוכסן (`/tutor/audio` — המאגר המשותף של לימור) נשאר
+     כפי שהוא. */
+  function abs(dir) {
+    dir = String(dir).replace(/\/+$/, "");
+    if (dir.charAt(0) === "/") return dir;
+    /* **בלי `location` הנתיב נשאר יחסי, כמו עד 10.10.2026.** אין דרך
+       לדעת באיזו אפליקציה אנחנו, ולכן גם אין דרך לבנות כתובת מרוחקת
+       — והיחסי הוא התשובה הנכונה ולא ברירת מחדל עצלה. בלי השורה הזאת
+       `abs` זרקה, ה-`try` סביב `a.src` תפס, וכל קליפ היה נופל לקול
+       המכשיר בשקט. ‏`recorded.js` תפס את זה ביום שהמעבר נכתב. */
+    var p = (typeof location !== "undefined" && location && location.pathname) || "";
+    if (!p) return dir;
+    return p.slice(0, p.lastIndexOf("/") + 1) + dir;
+  }
+  function hostOf(dir) {
+    var seg = abs(dir).split("/").filter(function (x) { return x; })[0] || "";
+    return ON_2[seg] ? HOST_2 : HOST_1;
+  }
+  /* הכתובת המלאה של קליפ. זה המקום **היחיד** באתר שבונה אותה. */
+  function clip(dir, lg, fid) {
+    var path = abs(dir) + "/" + lg + "/" + fid + ".mp3";
+    /* נתיב יחסי אינו ניתן לתלייה על מקור — `host + "audio/…"` היה
+       יוצא בלי לוכסן. אין לוכסן פותח, אין מקור. */
+    var h = path.charAt(0) === "/" ? hostOf(dir) : "";
+    return h ? h.replace(/\/+$/, "") + path : path;
+  }
+
   var SILENT_WAV = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
 
   /* ב-iOS ההיתר להשמיע ניתן לאלמנט שקיבל play() בתוך מגע אמיתי,
@@ -157,7 +210,7 @@
     a.onended = function () { if (my !== R.gen) return; R.playing = null; if (opts.onEnd) opts.onEnd(); };
     a.onerror = function () { if (my !== R.gen) return; R.playing = null; if (opts.onError) opts.onError(); };
     try {
-      a.src = (opts.base ? String(opts.base).replace(/\/+$/, "") : R.base) + "/" + base(lang) + "/" + fid + ".mp3";
+      a.src = clip(opts.base || R.base, base(lang), fid);
       /* ההקלטה בקצב טבעי; הכפלה בבחירת הלומד בלבד, בלי הבסיס
          שהאפליקציה נותנת לקול המכשיר. */
       a.playbackRate = Math.max(0.5, Math.min(2, Number(opts.rate) || 1));
@@ -179,7 +232,7 @@
   }
 
   g.RECORDED = { id: id, setup: setup, load: load, has: has, play: play, stop: stop,
-                 isPlaying: function () { return !!R.playing; }, _state: R };
+                 clip: clip, isPlaying: function () { return !!R.playing; }, _state: R };
 
   /* המודול מתחיל בעצמו: הקבצים יושבים תמיד ב-`audio/` של האפליקציה,
      ולכן אין מה לחווט. הקובץ הזה נטען בסוף הדף — אחרי הסקריפט של

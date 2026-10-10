@@ -27,11 +27,19 @@ self.addEventListener("activate", e => {
     keys.filter(k => k.startsWith("englishelem-") && k !== CACHE).map(k => caches.delete(k))
   )).then(() => self.clients.claim()));
 });
+/* ===== מקור קובצי הקול — 10.10.2026, הכרעת הבעלים =====
+   22,406 קובצי ה-MP3 שקלו 984MB והאתר המפורסם חצה את מגבלת ה-1GB של
+   GitHub Pages (O-191), ולכן הם עוברים לריפו Pages נפרד — כלומר הם
+   מגיעים ממקור אחר. **בלי השורה הזאת הם נופלים מה-worker החוצה**, ומי
+   שהתקין את האפליקציה מאבד את הקול המוקלט ברגע שאין רשת. המניפסט נשאר
+   במקור הזה. ריק = הקבצים מקומיים, בדיוק כמו עד 10.10.2026. */
+const AUDIO = "";
 self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return;
+  if (url.origin !== self.location.origin && !(AUDIO && url.origin === AUDIO)) return;
+  /* הקראה בענן לא נכנסת למטמון, וכך גם כל מקור זר — חוץ ממקור הקול. */
   /* ניווט: רשת קודם, ומטמון כשאין רשת. רק תשובה 200 נשמרת. */
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).then(r => {
@@ -56,8 +64,13 @@ self.addEventListener("fetch", e => {
     return;
   }
   /* משאב: המטמון של האפליקציה הזאת בלבד (לא caches.match גלובלי) */
+  /* ‏`status === 200` שומר על מה ששמר עד היום: שדף 404 לא ייכנס למטמון.
+     אבל בקשה למקור אחר — ו-`<audio src>` היא no-cors — חוזרת **אטומה**,
+     ‏`status` הוא 0 ואין דרך לקרוא אותו. בלי התנאי השני אף קליפ מריפו
+     הקול לא היה נשמר, והאופליין היה מת בשקט. אטום קורה רק במקור אחר,
+     ולכן השומר הקיים אינו מתרופף כאן בכלום. */
   e.respondWith(caches.open(CACHE).then(c => c.match(req).then(hit => hit || fetch(req).then(r => {
-    if (r && r.status === 200) {
+    if (r && (r.status === 200 || r.type === "opaque")) {
       const copy = r.clone();
       c.put(req, copy).catch(() => {});
     }

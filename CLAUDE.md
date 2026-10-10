@@ -27,6 +27,7 @@ Instinct מסייע גם בתחזוקת אתר בקול. בזמן ש-Claude Code
 | נושא | מסמך |
 |---|---|
 | מלכודות הקאש — `legal/`, נתיבים משותפים וה-`sw.js` של השורש | `docs/claude/cache-traps.md` |
+| מאגרי הקול — שני ריפואי Pages נפרדים, והמתג שחייב להתהפך בארבעה מקומות | `docs/claude/audio-repos.md` |
 | המבחן הכיתתי אינו מביט בהתקדמות הלומד | `docs/claude/class-exam.md` |
 | אפליקציה חדשה או נושא ב-`lomda` | `docs/claude/new-app-or-topic.md` |
 | לימור — מוח אחד, ואין שני | `docs/claude/barak.md` |
@@ -80,7 +81,10 @@ Instinct מסייע גם בתחזוקת אתר בקול. בזמן ש-Claude Code
 3. תלות חיצונית חדשה. `deps.js` אוכף. חריג הבעלים: GoatCounter בכל הדפים
    (26 ב-2.10.2026, `analytics.js` סופר) או באף אחד, והתנאים אומרים אותו דבר
    בארבע שפות — `analytics.js`. חריג שני (5.10.2026): `tutor/limor-device.js` — לימור במכשיר, transformers.js ו-Hugging Face,
-   רק בדפים שב-`limor/` (`brain.js` סעיף 5).
+   רק בדפים שב-`limor/` (`brain.js` סעיף 5). חריג שלישי (10.10.2026): **מאגרי הקול בריפו
+   נפרד** — `lagstein1-png.github.io`, שהוא אותו GitHub Pages שמגיש את `bekol.co.il`,
+   ולכן אין צד שלישי חדש ואין מה להצהיר ב-`legal/`. `audio-size.js` אוכף את התקרה
+   ואת המתג. `audio-repos.md`.
 4. מחיקת תוכן קיים (שאלות, רמזים, תרגומים). `git diff --numstat` לפני commit.
 
 ## גרסאות ומטמון — הכללים שיש להם כלי
@@ -89,6 +93,8 @@ Instinct מסייע גם בתחזוקת אתר בקול. בזמן ש-Claude Code
   ו-`reader` נושאים `?v=` בלבד. **מספר הגרסה מוקצה במיזוג מול `main`, לא
   בבנייה.** `cache.js` אוכף גם מול `origin/main`.
 - נגעת ב-`legal/`, `/tutor/`, `/img/josh.jpg`, `/fonts/` — כל המפתחות עולים יחד. `cache-traps.md`.
+- קובצי הקול עוברים לריפו נפרד: `HOST_1`/`HOST_2` ב-`recorded.js` ו-`AUDIO` ב-**41**
+  קובצי `sw.js` מתהפכים **יחד**, אחרת הקול עובד ברשת ומת אופליין. `audio-size.js`, `audio-repos.md`.
 - `localStorage`: מפתח שהועתק הוא מגירה משותפת — כל אפליקציה שם משלה. `storage.js`.
 - הקראה: ארבעה מנגנונים ועוד חמישי (שחרור במגע, בלעדיו iOS שותק), `voiceUsable` מפתח
   מיון ראשון, **מגדר קודם לאיכות**. `voice.js`, `netpin.js`, `hespeech.js`. **והשכבה המוקלטת**

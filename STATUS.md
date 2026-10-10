@@ -1,45 +1,44 @@
 | אפליקציה | BUILD | מפתח קאש | תואם |
 |---|---|---|---|
-| `math-app` | b183 · 2026-10-09 | b183-pwa1 | תואם |
-| `math-teen` | t182 · 2026-10-09 | t182-pwa1 | תואם |
-| `math-uni` | u175 · 2026-10-09 | u175-pwa1 | תואם |
-| `math-uni2` | v175 · 2026-10-09 | v175-pwa1 | תואם |
-| `math-uni3` | g174 · 2026-10-09 | g174-pwa1 | תואם |
-| `bagrut-806` | x128 · 2026-10-09 | x128-pwa1 | תואם |
-| `ulpan` | a139 · 2026-10-09 | a139-pwa1 | תואם |
-| `english` | n176 · 2026-10-09 | n176-pwa1 | תואם |
-| `history` | m173 · 2026-10-09 | m173-pwa1 | תואם |
-| `lomda` | l164 · 2026-10-10 | l164-pwa1 | תואם |
-| `kotvim` | k107 · 2026-10-09 | k107-pwa1 | תואם |
-| `math-elem` | o16 · 2026-10-09 | o16-pwa1 | תואם |
-| `science` | s156 · 2026-10-09 | s156-pwa1 | תואם |
-| `geography-elem` | w139 · 2026-10-09 | w139-pwa1 | תואם |
-| `reader` | — | 133-pwa1 | מפתח בלבד |
-| `rakia` | r45 · 2026-10-09 | r45-pwa1 | תואם |
+| `math-app` | b184 · 2026-10-10 | b184-pwa1 | תואם |
+| `math-teen` | t183 · 2026-10-10 | t183-pwa1 | תואם |
+| `math-uni` | u176 · 2026-10-10 | u176-pwa1 | תואם |
+| `math-uni2` | v176 · 2026-10-10 | v176-pwa1 | תואם |
+| `math-uni3` | g175 · 2026-10-10 | g175-pwa1 | תואם |
+| `bagrut-806` | x129 · 2026-10-10 | x129-pwa1 | תואם |
+| `ulpan` | a140 · 2026-10-10 | a140-pwa1 | תואם |
+| `english` | n177 · 2026-10-10 | n177-pwa1 | תואם |
+| `history` | m174 · 2026-10-10 | m174-pwa1 | תואם |
+| `lomda` | l165 · 2026-10-10 | l165-pwa1 | תואם |
+| `kotvim` | k108 · 2026-10-10 | k108-pwa1 | תואם |
+| `math-elem` | o17 · 2026-10-10 | o17-pwa1 | תואם |
+| `science` | s157 · 2026-10-10 | s157-pwa1 | תואם |
+| `geography-elem` | w140 · 2026-10-10 | w140-pwa1 | תואם |
+| `reader` | — | 134-pwa1 | מפתח בלבד |
+| `rakia` | r46 · 2026-10-10 | r46-pwa1 | תואם |
 | `theory` | — | — | אינה בריפו הזה |
-| `civics` | c43 · 2026-10-09 | c43-pwa1 | תואם |
-| `hebrew` | i35 · 2026-10-06 | i35-pwa1 | תואם |
-| `hebrew-lit` | hl19 · 2026-10-09 | hl19-pwa1 | תואם |
+| `civics` | c44 · 2026-10-10 | c44-pwa1 | תואם |
+| `hebrew` | i36 · 2026-10-10 | i36-pwa1 | תואם |
+| `hebrew-lit` | hl20 · 2026-10-10 | hl20-pwa1 | תואם |
 | `english-bagrut` | — | — | אינה בריפו הזה |
-| `literature` | j34 · 2026-10-10 | j34-pwa1 | תואם |
-| `tanakh` | p35 · 2026-10-10 | p35-pwa1 | תואם |
-| `hebrew-arab` | y20 · 2026-10-09 | y20-pwa1 | תואם |
-| `motal` | d28 · 2026-10-09 | d28-pwa1 | תואם |
-| `math-g7` | mg16 · 2026-10-09 | mg16-pwa1 | תואם |
-| `electric` | e49 · 2026-10-09 | e49-pwa1 | תואם |
-| `science-mid` | scimid10 · 2026-10-06 | scimid10-pwa1 | תואם |
-| `biology` | bg17 · 2026-10-10 | bg17-pwa1 | תואם |
-| `geography` | q38 · 2026-10-09 | q38-pwa1 | תואם |
-| `bagrut-history` | h132 · 2026-10-09 | h132-pwa1 | תואם |
-| `islam` | is15 · 2026-10-09 | is15-pwa1 | תואם |
-| `russian` | ru15 · 2026-10-09 | ru15-pwa1 | תואם |
-| `tanakh-elem` | te17 · 2026-10-09 | te17-pwa1 | תואם |
-| `civics-elem` | mc18 · 2026-10-09 | mc18-pwa1 | תואם |
-| `culture-elem` | tm15 · 2026-10-09 | tm15-pwa1 | תואם |
-| `history-elem` | hk15 · 2026-10-09 | hk15-pwa1 | תואם |
-| `english-elem` | en14 · 2026-10-09 | en14-pwa1 | תואם |
-| `science-12` | sg16 · 2026-10-09 | sg16-pwa1 | תואם |
-| `domino` | dm16 · 2026-10-09 | dm16-pwa1 | תואם |
-| `net-elem` | ns1 · 2026-10-07 | ns1-pwa1 | תואם |
+| `literature` | j35 · 2026-10-10 | j35-pwa1 | תואם |
+| `tanakh` | p36 · 2026-10-10 | p36-pwa1 | תואם |
+| `hebrew-arab` | y21 · 2026-10-10 | y21-pwa1 | תואם |
+| `motal` | d29 · 2026-10-10 | d29-pwa1 | תואם |
+| `math-g7` | mg17 · 2026-10-10 | mg17-pwa1 | תואם |
+| `electric` | e50 · 2026-10-10 | e50-pwa1 | תואם |
+| `science-mid` | scimid11 · 2026-10-10 | scimid11-pwa1 | תואם |
+| `biology` | bg18 · 2026-10-10 | bg18-pwa1 | תואם |
+| `geography` | q39 · 2026-10-10 | q39-pwa1 | תואם |
+| `bagrut-history` | h133 · 2026-10-10 | h133-pwa1 | תואם |
+| `islam` | is16 · 2026-10-10 | is16-pwa1 | תואם |
+| `russian` | ru16 · 2026-10-10 | ru16-pwa1 | תואם |
+| `tanakh-elem` | te18 · 2026-10-10 | te18-pwa1 | תואם |
+| `civics-elem` | mc19 · 2026-10-10 | mc19-pwa1 | תואם |
+| `culture-elem` | tm16 · 2026-10-10 | tm16-pwa1 | תואם |
+| `history-elem` | hk16 · 2026-10-10 | hk16-pwa1 | תואם |
+| `english-elem` | en15 · 2026-10-10 | en15-pwa1 | תואם |
+| `science-12` | sg17 · 2026-10-10 | sg17-pwa1 | תואם |
+| `domino` | dm17 · 2026-10-10 | dm17-pwa1 | תואם |
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-10-09.
+נוצר ב-`node .claude/qa/status.js --md`, 2026-10-10.

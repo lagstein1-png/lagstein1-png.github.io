@@ -28,7 +28,8 @@ function t(name, got, want) {
 }
 
 /* --- 1 · המודול -------------------------------------------------- */
-function fresh(manifest, audioBehaviour) {
+function fresh(manifest, audioBehaviour, opts) {
+  opts = opts || {};
   const calls = { play: [], src: [] };
   const out = { fetched: 0 };
   class Audio {
@@ -45,13 +46,22 @@ function fresh(manifest, audioBehaviour) {
       return Promise.resolve();
     }
   }
-  const ctx = { Audio, console, setTimeout, Math, String, Number, Object, Promise, Error,
+  const ctx = { Audio, console, setTimeout, Math, String, Number, Object, Promise, Error, URL,
     document: { addEventListener() {} },
+    /* ‏`location` קיים בדפדפן ואינו קיים כאן — ולכן הוא נמסר במפורש.
+       הקשר בלי `location` הוא מצב חוקי, והמודול חייב להישאר יחסי בו. */
+    location: opts.pathname ? { pathname: opts.pathname } : undefined,
     fetch: () => (out.fetched++, manifest) ? Promise.resolve({ ok: true, json: () => Promise.resolve(manifest) })
                           : Promise.resolve({ ok: false }) };
   ctx.window = ctx; ctx.globalThis = ctx;
   vm.createContext(ctx);
-  vm.runInContext(fs.readFileSync(path.join(ROOT, 'speech', 'recorded.js'), 'utf8'), ctx);
+  let src = fs.readFileSync(path.join(ROOT, 'speech', 'recorded.js'), 'utf8');
+  /* הפיכת המתג בלי לגעת בקובץ: כך הבדיקה מודדת את המעבר עצמו ולא
+     רק את המצב שלפניו. בלי זה הכלי היה ירוק על שורה שלא קרא —
+     בדיוק O-210. */
+  if (opts.host1 !== undefined) src = src.replace('var HOST_1 = "";', 'var HOST_1 = ' + JSON.stringify(opts.host1) + ';');
+  if (opts.host2 !== undefined) src = src.replace('var HOST_2 = "";', 'var HOST_2 = ' + JSON.stringify(opts.host2) + ';');
+  vm.runInContext(src, ctx);
   out.R = ctx.RECORDED; out.calls = calls;
   return out;
 }
@@ -80,6 +90,42 @@ function fresh(manifest, audioBehaviour) {
   await new Promise(r => setTimeout(r, 20));
   t('play על משפט שבמניפסט מנגן את הקובץ הנכון ומדווח סיום',
     [ok, a.calls.play[0], ended], [true, 'audio/he/' + R.id(TXT) + '.mp3', true]);
+
+  /* ===== מקור הקול — המעבר לריפואים נפרדים, 10.10.2026 =====
+     ‏`clip` הוא המקום **היחיד** באתר שבונה כתובת של קליפ, ולכן זה
+     המקום היחיד שצריך למדוד. שלוש שאלות: מקומי נשאר כפי שהיה, דלי 1
+     ודלי 2 הולכים לריפו הנכון, והמאגר המשותף של לימור (`/tutor/audio`)
+     הולך לפי מי שמחזיק את `tutor` ולא לפי האפליקציה שבה הלומד נמצא. */
+  const H1 = 'https://lagstein1-png.github.io/bekol-audio';
+  const H2 = 'https://lagstein1-png.github.io/bekol-audio2';
+  const ID = R.id(TXT);
+
+  const loc = fresh(man, null, { pathname: '/english/index.html' });
+  t('מקור מקומי — הנתיב מוחלט לתיקיית האפליקציה, ואין מקור',
+    loc.R.clip('audio', 'he', ID), '/english/audio/he/' + ID + '.mp3');
+
+  const rem = fresh(man, null, { pathname: '/history/', host1: H1, host2: H2 });
+  t('דלי 1 — history הולכת ל-bekol-audio',
+    rem.R.clip('audio', 'he', ID), H1 + '/history/audio/he/' + ID + '.mp3');
+
+  const rem2 = fresh(man, null, { pathname: '/civics/', host1: H1, host2: H2 });
+  t('דלי 2 — civics הולכת ל-bekol-audio2',
+    rem2.R.clip('audio', 'he', ID), H2 + '/civics/audio/he/' + ID + '.mp3');
+
+  t('המאגר המשותף של לימור נקבע לפי tutor, לא לפי הדף שהלומד נמצא בו',
+    rem.R.clip('/tutor/audio', 'he', ID), H2 + '/tutor/audio/he/' + ID + '.mp3');
+
+  const nol = fresh(man, null, { host1: H1, host2: H2 });
+  t('הקשר בלי location — יחסי, בלי מקור, ובלי לזרוק',
+    nol.R.clip('audio', 'he', ID), 'audio/he/' + ID + '.mp3');
+
+  const played = fresh(man, null, { pathname: '/history/', host1: H1, host2: H2 });
+  await played.R.setup({ base: 'audio' });
+  let pend = false;
+  const pok = played.R.play(TXT, 'he', { onEnd: () => { pend = true; } });
+  await new Promise(r => setTimeout(r, 20));
+  t('ובניגון אמיתי — play מנגן את הכתובת המרוחקת ומדווח סיום',
+    [pok, played.calls.play[0], pend], [true, H1 + '/history/audio/he/' + ID + '.mp3', true]);
 
   const b = fresh(man, 'fail');
   await b.R.setup({ base: 'audio' });
@@ -181,7 +227,12 @@ function fresh(manifest, audioBehaviour) {
                synth: window.__log.synth.slice() };
     }, TXT2);
     t('english בדפדפן — משפט עם קובץ: Audio אחד, speechSynthesis אפס', [res.a1, res.s1, res.synth.slice(0, res.s1)], [1, 0, []]);
-    t('english בדפדפן — הקובץ הנכון', res.src, 'audio/he/' + idOf + '.mp3');
+    /* **מוחלט ולא יחסי, מ-10.10.2026.** `clip` מחשב את תיקיית
+       האפליקציה מ-`location.pathname` כדי שיוכל לתלות אותה על מקור
+       אחר (ריפו הקול). בדפדפן שמריץ את `/english/` זה `/english/audio/…`,
+       והדפדפן פותר את שתי הצורות לאותה כתובת — אבל רק המוחלטת
+       ניתנת להעברה. זו הבדיקה שהוכיחה שזה אכן מה שיוצא. */
+    t('english בדפדפן — הקובץ הנכון', res.src, '/english/audio/he/' + idOf + '.mp3');
     t('english בדפדפן — משפט בלי קובץ: קול המכשיר, בלי Audio נוסף', [res.a2, res.s2 >= 1], [1, true]);
 
     /* --- lomda: מה ש-record.js מקליט הוא מה שהלומד שומע (4.10.2026) ---
