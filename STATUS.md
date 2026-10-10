@@ -21,14 +21,14 @@
 | `hebrew` | i35 · 2026-10-06 | i35-pwa1 | תואם |
 | `hebrew-lit` | hl19 · 2026-10-09 | hl19-pwa1 | תואם |
 | `english-bagrut` | — | — | אינה בריפו הזה |
-| `literature` | j33 · 2026-10-09 | j33-pwa1 | תואם |
-| `tanakh` | p34 · 2026-10-09 | p34-pwa1 | תואם |
+| `literature` | j34 · 2026-10-10 | j34-pwa1 | תואם |
+| `tanakh` | p35 · 2026-10-10 | p35-pwa1 | תואם |
 | `hebrew-arab` | y20 · 2026-10-09 | y20-pwa1 | תואם |
 | `motal` | d28 · 2026-10-09 | d28-pwa1 | תואם |
 | `math-g7` | mg16 · 2026-10-09 | mg16-pwa1 | תואם |
 | `electric` | e49 · 2026-10-09 | e49-pwa1 | תואם |
 | `science-mid` | scimid10 · 2026-10-06 | scimid10-pwa1 | תואם |
-| `biology` | bg16 · 2026-10-09 | bg16-pwa1 | תואם |
+| `biology` | bg17 · 2026-10-10 | bg17-pwa1 | תואם |
 | `geography` | q38 · 2026-10-09 | q38-pwa1 | תואם |
 | `bagrut-history` | h132 · 2026-10-09 | h132-pwa1 | תואם |
 | `islam` | is15 · 2026-10-09 | is15-pwa1 | תואם |
