@@ -1170,7 +1170,7 @@
    * ברירת המחדל שלו. אין דרך להתקין קול מתוך דף אינטרנט.
    */
   var FEMALE_HE = /(carmit|hila|הילה|כרמית)/i;
-  var MALE_HE   = /(asaf|avri|אסף|אברי)/i;
+  var MALE_HE   = /(asaf|hillel|avri|אסף|הילל|אברי)/i;
   var NATURAL   = /(natural|online|neural|premium|enhanced|wavenet|siri)/i;
 
   P._pickVoice = function () {
