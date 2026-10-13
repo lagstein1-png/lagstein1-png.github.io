@@ -64,6 +64,8 @@ var FLOAT = /[?&]limor2=1(?:&|$)/.test(location.search);
 var MOTION = ((location.search || "").match(/[?&]motion=([0-3])(?:&|$)/) || [])[1] || "1";
 var FLDEMO = /[?&]fldemo=1(?:&|$)/.test(location.search);
 
+/* 13.10.2026: לימור לא מדברת בקול מכשיר לעולם. אין הקלטה — שקט. */
+var TUTOR_DEVICE_VOICE = false;
 var VOICE_KEY = "tutor-voice-v2"; /* דמות לימור: לא יורשים בחירת קול גברי של ברק; חדש לכל שפה */
 var RATE_KEY = "tutor-rate-v1";   /* מהירות ההקראה. משותף בכוונה — מודול אחד, התנהגות אחת */
 var DAY_KEY  = "tutor-day-v1";    /* מונה יומי. ילד אחד, תקציב אחד, בלי קשר לאפליקציה */
@@ -591,6 +593,7 @@ function say(i){
   device();
   function device(){
     if(recOK()) try{ RECORDED.stop() }catch(e){}
+    if(!TUTOR_DEVICE_VOICE){ if(PLAYING === i || PLAYING === -1){ PLAYING = -1; VOICE_STARTED = false; draw() } return }
     var segs = segments(stripMd(actStrip(splitSugg(m.text).body))), r = rate(), n = 0;
     if(!segs.length){ if(PLAYING === i){ PLAYING = -1; VOICE_STARTED = false; draw() } return }
     PLAYING = i; VOICE_STARTED = false; draw();
