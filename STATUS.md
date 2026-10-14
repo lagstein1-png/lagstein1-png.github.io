@@ -40,5 +40,6 @@
 | `english-elem` | en17 · 2026-10-10 | en17-pwa1 | תואם |
 | `science-12` | sg19 · 2026-10-10 | sg19-pwa1 | תואם |
 | `domino` | dm19 · 2026-10-10 | dm19-pwa1 | תואם |
+| `net-elem` | ns6 · 2026-10-10 | ns6-pwa1 | תואם |
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-10-13.
+נוצר ב-`node .claude/qa/status.js --md`, 2026-10-14.
