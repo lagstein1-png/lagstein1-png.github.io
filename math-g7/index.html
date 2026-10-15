@@ -999,6 +999,21 @@ G.ratio=function(lv){var T=[],mx=lv===1?5:(lv===2?8:12);
     return mk("cmp",L("במתכון א׳ יש "+(a===1?"כוס קמח אחת":a+" כוסות קמח")+" על כל "+b+" כוסות מים. במתכון ב׳ יש "+c+" על "+d+". באיזה מתכון הבצק סמיך יותר (יחס גדול יותר של קמח למים)?","في الوصفة أ "+(a===1?"كوب طحين واحد":(a===2?"كوبا طحين":a+" أكواب طحين"))+" لكل "+(b===2?"كوبي ماء":b+" أكواب ماء")+"، وفي الوصفة ب "+c+" لكل "+d+". في أي وصفة العجين أثخن (نسبة الطحين إلى الماء أكبر)؟","В рецепте A на "+b+" "+plRu(b,"стакан","стакана","стаканов")+" воды приходится "+a+" "+plRu(a,"стакан","стакана","стаканов")+" муки, в рецепте Б — "+c+" на "+d+". В каком тесто гуще (отношение муки к воде больше)?","Recipe A has "+(a===1?"1 cup of flour":a+" cups of flour")+" for every "+b+" cups of water. Recipe B has "+c+" for every "+d+". Which dough is thicker (larger flour to water ratio)?"),"",ans,[A,B,EQ].filter(function(z){return oid(z)!==oid(ans)}).concat([L("תלוי בכמות שמכינים כל פעם","يعتمد على الكمية المحضّرة","зависит от количества теста","it depends on how much you make")]),
      L("משווים שברים: "+a+"/"+b+" ו-"+c+"/"+d+". אפשר להביא למכנה משותף.","نقارن الكسرين "+a+"/"+b+" و"+c+"/"+d+" بمقام مشترك.","Сравни дроби "+a+"/"+b+" и "+c+"/"+d+" с общим знаменателем.","Compare the fractions "+a+"/"+b+" and "+c+"/"+d+" with a common denominator."),
      L(a+"/"+b+" = "+sa+"/"+(b*d)+" ו-"+c+"/"+d+" = "+sb+"/"+(b*d)+".",a+"/"+b+" = "+sa+"/"+(b*d)+" و"+c+"/"+d+" = "+sb+"/"+(b*d)+".",a+"/"+b+" = "+sa+"/"+(b*d)+" и "+c+"/"+d+" = "+sb+"/"+(b*d)+".",a+"/"+b+" = "+sa+"/"+(b*d)+" and "+c+"/"+d+" = "+sb+"/"+(b*d)+"."),3)});
+  T.push(function(){var a,b,c,d,g3=0;
+    if(lv===1){b=ri(2,mx);d=b;a=ri(1,mx);c=ri(1,mx);while((a===b||c===d)&&g3<40){g3++;a=ri(1,mx);c=ri(1,mx)}}
+    else if(Math.random()<.28){var a0=ri(1,mx),b0=ri(1,mx);while(a0===b0||gcd(a0,b0)>1)a0=ri(1,mx),b0=ri(1,mx);var k=ri(2,lv===2?4:6);a=a0;b=b0;c=a0*k;d=b0*k;if(Math.random()<.5){var t1=a;a=c;c=t1;t1=b;b=d;d=t1}}
+    else{a=ri(1,mx);b=ri(1,mx);c=ri(1,mx);d=ri(1,mx);while((a*d===b*c||a===b||c===d)&&g3<80){g3++;a=ri(1,mx);b=ri(1,mx);c=ri(1,mx);d=ri(1,mx)}}
+    var l1=a*d,r1=c*b,sg=l1>r1?">":(l1<r1?"<":"=");
+    var sym={"<":L("היחס הראשון קטן מהשני (<)","النسبة الأولى أصغر من الثانية (<)","первое отношение меньше второго (<)","the first ratio is less than the second (<)"),">":L("היחס הראשון גדול מהשני (>)","النسبة الأولى أكبر من الثانية (>)","первое отношение больше второго (>)","the first ratio is greater than the second (>)"),"=":L("היחסים שווים (=)","النسبتان متساويتان (=)","отношения равны (=)","the ratios are equal (=)")};
+    var tx=rt(a,b)+" ___ "+rt(c,d);
+    return mk("cmpr",L("איזה סימן מתאים בין שני היחסים? "+tx,"أي إشارة تناسب بين النسبتين؟ "+tx,"Какой знак подходит между отношениями? "+tx,"Which sign fits between the two ratios? "+tx),"",sym[sg],["<",">","="].filter(function(z){return z!==sg}).map(function(z){return sym[z]}).concat([L("אי אפשר לדעת בלי יחידות","لا يمكن معرفة ذلك بدون وحدات","нельзя узнать без единиц","you cannot tell without units")]),
+     L("כותבים כל יחס כשבר ומשווים: "+a+"/"+b+" ו-"+c+"/"+d+". אפשר להביא למכנה משותף.","نكتب كل نسبة ككسر ونقارن: "+a+"/"+b+" و"+c+"/"+d+". نستعمل مقامًا مشتركًا.","Запиши каждое отношение дробью и сравни: "+a+"/"+b+" и "+c+"/"+d+". Приведи к общему знаменателю.","Write each ratio as a fraction and compare: "+a+"/"+b+" and "+c+"/"+d+". Use a common denominator."),
+     L("בכפל אלכסוני: "+a+" · "+d+" = "+l1+" ו-"+c+" · "+b+" = "+r1+". "+l1+" "+(sg==="="?"שווה ל-":(sg===">"?"גדול מ-":"קטן מ-"))+r1+", לכן "+rt(a,b)+" "+sg+" "+rt(c,d)+".","بالضرب المتقاطع: "+a+" · "+d+" = "+l1+" و"+c+" · "+b+" = "+r1+". إذن "+rt(a,b)+" "+sg+" "+rt(c,d)+".","Перекрёстно: "+a+" · "+d+" = "+l1+" и "+c+" · "+b+" = "+r1+". Значит "+rt(a,b)+" "+sg+" "+rt(c,d)+".","Cross-multiply: "+a+" · "+d+" = "+l1+" and "+c+" · "+b+" = "+r1+". So "+rt(a,b)+" "+sg+" "+rt(c,d)+"."),3)});
+  if(lv>=2)T.push(function(){var a=ri(1,mx),b=ri(1,mx);while(a===b||gcd(a,b)>1)b=ri(1,mx),a=ri(1,mx);var k=ri(2,6),ok=rt(a,b)+" = "+rt(a*k,b*k),
+      bad=[rt(a,b)+" = "+rt(a+k,b+k),rt(a,b)+" = "+rt(b*k,a*k),rt(a,b)+" = "+rt(a*k,b*k+1),rt(a,b)+" = "+rt(a*k+1,b*k)];
+    return mk("eqr2",L("באיזו שורה היחסים שווים?","في أي سطر النسبتان متساويتان؟","В какой строке отношения равны?","In which line are the two ratios equal?"),"",ok,bad,
+     L("בודקים אם כפלו את שני המספרים באותו מספר. אם רק הוסיפו מספר, היחס השתנה.","نفحص هل ضُرب العددان في العدد نفسه. إذا أُضيف عدد فقط تغيّرت النسبة.","Проверь, умножили ли оба числа на одно и то же. Если только прибавили, отношение изменилось.","Check whether both numbers were multiplied by the same number. If a number was only added, the ratio changed."),
+     L("כופלים את שניהם ב-"+k+": "+rt(a,b)+" = "+rt(a*k,b*k)+".","نضرب الاثنين في "+k+": "+rt(a,b)+" = "+rt(a*k,b*k)+".","Умножаем оба на "+k+": "+rt(a,b)+" = "+rt(a*k,b*k)+".","Multiply both by "+k+": "+rt(a,b)+" = "+rt(a*k,b*k)+"."),2)});
   return pick(T)()};
 
 /* ---------- unit: proportion, dividing in a ratio, scale ---------- */
@@ -1497,7 +1512,7 @@ var LESSONS={
   ST_("תמיד בודקים: מציבים את התשובה במשוואה. 2 · 6 + 5 = 17, נכון.","نتحقق دائمًا: نعوّض الجواب في المعادلة. 2 · 6 + 5 = 17 صحيح.","Всегда проверяй: подставь ответ в уравнение. 2 · 6 + 5 = 17, верно.","Always check: put the answer in the equation. 2 · 6 + 5 = 17, true.",function(){return ""})]
 };
 
-var BUILD="mg21 · 2026-10-10";
+var BUILD="mg22 · 2026-10-15";
 /* ===== UI strings ===== */
 var STR={
 he:{trackT:"איזה מסלול?",tr7:"כיתה ז׳",tr9:"כיתה ט׳ מצומצם",title9:"גיאומטריה לכיתה ט׳, רמה מצומצמת",tag9:"שיעור קצר ותרגול בשלוש רמות בכל נושא. הכול עם הקראה.",credit9:"תרגול כיתה ט׳ מצומצם בנוי לפי רשימת הנושאים בחוברת העבודה בגיאומטריה של מחוז תל אביב חט״ב (תשפ״ה). כל השאלות נכתבו מחדש.",soonT:"בקרוב: צורות חופפות, תיבה וקובייה, שכיחות והסתברות.",mtNote:"תרגום לערבית, רוסית ואנגלית: תרגום מכונה, ממתין לבדיקה.",credit2:"יחידת משפט פיתגורס נבנתה לפי מבנה חוברת של יניב רז, מדריך מחוזי חט״ב, מחוז ירושלים, משרד החינוך. תרגילי החלוקה ביחס בהשראת שאלה מהפיקוח על הוראת המתמטיקה, משרד החינוך.",brand:"מתמטיקה לכיתה ז׳",title:"מתמטיקה לכיתה ז׳",tag:"צירים, מספרים שליליים, זוויות, משולשים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -1972,7 +1987,7 @@ try{speechSynthesis.getVoices();
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-g7",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=mg21-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=mg22-pwa1").catch(function(){})});
 })();
 </script>
 
