@@ -395,12 +395,13 @@ async function scan(page,sayIsReveal,sayPrep,hintIsRule){
          לכן המפתח הוא הנוסח, הביטוי והאפשרויות יחד — ובשאלת
          האזנה גם התשובה. */
       const opsKey=texts.slice().sort().join(' ¦ ');
-      const idKey=askT+' ¦ '+exprT+' ¦ '+opsKey+
+      const figK=q.fig?' ¦ '+q.fig:'';
+      const idKey=askT+' ¦ '+exprT+figK+' ¦ '+opsKey+
                   (q.audioOnly&&ri>=0?' ¦ '+texts[ri]:'');
       qseen[idKey]=(qseen[idKey]||0)+1;
       if(ri>=0&&!q.audioOnly){
-        const rc=qfull[askT+' ¦ '+exprT+' ¦ '+opsKey]||
-                 (qfull[askT+' ¦ '+exprT+' ¦ '+opsKey]={});
+        const rc=qfull[askT+' ¦ '+exprT+figK+' ¦ '+opsKey]||
+                 (qfull[askT+' ¦ '+exprT+figK+' ¦ '+opsKey]={});
         rc[texts[ri]]=1;
         if(Object.keys(rc).length>1)
           add('contradiction','FAIL',
