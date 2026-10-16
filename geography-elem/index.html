@@ -33,6 +33,9 @@
   --font-body:"Heebo",system-ui,"Segoe UI",Arial,sans-serif;
   --paper:#f3f8f4; --card:#ffffff; --ink:#17333c; --ink-soft:#4c666e; --ink-faint:#5a7178;
   --teal:#0e9c8d; --teal-deep:#0b7568; --teal-soft:#d9f2ec; --teal-ink:#fff;
+  /* O-209: טקסט בטורקיז. ‎--teal‎ נותן 3.41:1 מול לבן — מתחת ל-4.5.
+     הגוון הזה נותן 5.08:1. רקעים, מסגרות ו-‎--accent‎ נשארים ‎--teal‎. */
+  --teal-text:#0b7c71;
   --amber:#ffc531; --amber-deep:#8a6100; --amber-soft:#fff3ce;
   --coral:#ff6f61; --coral-deep:#ba3826; --coral-soft:#ffe3de;
   --sky:#58b7e0; --sky-deep:#246c8c; --sky-soft:#dff1fa;
@@ -121,6 +124,10 @@ html.ts3{font-size:128%}
   :root{
     --paper:#101a1c; --card:#17262a; --ink:#e8f1f2; --ink-soft:#a9c0c5; --ink-faint:#8aa3a9;
     --teal:#5fd9c8; --teal-deep:#3fbfae; --teal-soft:#123833; --teal-ink:#000;
+    /* O-209: הגוון הכהה של הבהיר היה נותן כאן 3.07:1 מול הכרטיס.
+       הטורקיז המקורי כבר עובר: 4.57 מול הכרטיס, 5.19 מול הרקע,
+       4.96 ו-4.69 מול הכרטיסים של ענבים ופטל — ולכן הוא נשאר. */
+    --teal-text:#0e9c8d;
     --amber:#ffd45e; --amber-deep:#ffc531; --amber-soft:#3a2e0c;
     --coral:#ff9186; --coral-deep:#ff6f61; --coral-soft:#3d1a16;
     --sky:#7fcbea; --sky-deep:#58b7e0; --sky-soft:#12303d;
@@ -140,6 +147,7 @@ html.clear-font{--font-display:Tahoma,Verdana,Arial,sans-serif;--font-body:Tahom
 html.hi-contrast{
   --paper:#ffffff;--card:#ffffff;--ink:#000000;--ink-soft:#161616;--ink-faint:#333333;
   --teal:#00584e;--teal-deep:#00352e;--teal-soft:#e8f2f0;--teal-ink:#fff;
+  --teal-text:#00584e; /* O-209: 8.38:1 מול לבן, וגובר גם על המצב הכהה */
   --amber:#7a5500;--amber-deep:#523900;--amber-soft:#fbf3e2;
   --coral:#9c1f16;--coral-deep:#73160f;--coral-soft:#fbe8e6;
   --sky:#00517a;--sky-deep:#003651;--sky-soft:#e7f0f6;
@@ -2607,7 +2615,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="w147 · 2026-10-16";
+var BUILD="w148 · 2026-10-16";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -5202,7 +5210,7 @@ function lsOpts(list,answered,correctIdx,act){
   return '<div style="display:grid;gap:10px;margin-top:12px">'+list.map(function(o,i){
     var bg='#fff',bd='#334155',fg='#0f172a';
     if(answered>=0){
-      if(i===correctIdx){bg='#0e9c8d';bd='#0e9c8d';fg='#fff'}
+      if(i===correctIdx){bg='#0b7c71';bd='#0b7c71';fg='#fff'}
       else if(i===answered){bg='#bf4426';bd='#bf4426';fg='#fff'}
     }
     return '<div style="display:flex;gap:8px;align-items:stretch"><button class="btn" data-a="'+act+'" data-i="'+i+'" style="flex:1;min-height:46px;font-weight:700;font-size:1.05rem;background:'+bg+';border:2px solid '+bd+';color:'+fg+'">'+esc(o)+'</button>'+(state.settings.tts?'<button type="button" class="optspk" data-a="sayopt" data-o="'+esc(o)+'" aria-label="hear option">'+ic("speaker",15)+'</button>':"")+'</div>';
@@ -5231,7 +5239,7 @@ function lessonView(){
     h+=lsOpts(["1/4","2/4","4/4"],st.picked,1,"lspick");
     if(st.picked>=0){
       var why=st.picked===1?"":lt({0:"lsWhy0",2:"lsWhy4"}[st.picked]);
-      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?lt("lsCorrect"):lt("lsWrong"))+' '+esc(why)+'</p>';
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'#bf4426')+'">'+esc(st.picked===1?lt("lsCorrect"):lt("lsWrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
   }else if(st.step===3){
@@ -5248,7 +5256,7 @@ function lessonView(){
     }
     if(st.p1>=0&&st.p1!==1)h+='<p style="margin-top:12px;font-weight:700;color:#bf4426">'+esc(lt("lsWrong"))+'</p>';
     if(st.p2>=0&&st.p2!==2)h+='<p style="margin-top:12px;font-weight:700;color:#bf4426">'+esc(lt("lsWrong"))+'</p>';
-    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(lt("lsCorrect"))+'</p><div style="margin-top:10px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(lt("lsCorrect"))+'</p><div style="margin-top:10px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.75">'+esc(lt("lsSum"))+'</p>';
     h+='<div style="margin:12px 0">'+lsBar(4,2)+'</div>';
@@ -5328,7 +5336,7 @@ function g1Scene(revealed){
   return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
     return '<div class="card" style="text-align:center;padding:18px 22px;min-width:120px">'+
       '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(g1t(it[1]))+'</div>'+
-      (revealed?'<div style="margin-top:8px;font-weight:700;color:#0e9c8d;font-size:.95rem">'+esc(g1t(it[2]))+'</div>':'')+
+      (revealed?'<div style="margin-top:8px;font-weight:700;color:var(--teal-text);font-size:.95rem">'+esc(g1t(it[2]))+'</div>':'')+
       '</div>';
   }).join("")+'</div>';
 }
@@ -5358,7 +5366,7 @@ function geo1LessonView(){
     h+=lsOpts([g1t("g1A0"),g1t("g1A1"),g1t("g1A2")],st.picked,1,"g1pick");
     if(st.picked>=0){
       var why=st.picked===1?"":g1t({0:"g1Why0",2:"g1Why2"}[st.picked]);
-      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?g1t("g1Correct"):g1t("g1Wrong"))+' '+esc(why)+'</p>';
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'#bf4426')+'">'+esc(st.picked===1?g1t("g1Correct"):g1t("g1Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("g1next",g1t("g1Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
   }else if(st.step===3){
@@ -5374,7 +5382,7 @@ function geo1LessonView(){
       h+=gHintBtn(g1t("g1HintP2"));
       h+=lsOpts([g1t("g1P2a0"),g1t("g1P2a1"),g1t("g1P2a2")],st.p2,2,"g1p2");
     }
-    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(g1t("g1Correct"))+'</p><div style="margin-top:10px">'+lsBtn("g1next",g1t("g1Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(g1t("g1Correct"))+'</p><div style="margin-top:10px">'+lsBtn("g1next",g1t("g1Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g1t("g1Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g1again",g1t("g1Again"),'background:#0b7c71;color:#fff;font-weight:700')+g1HearBtn(g1t("g1Sum"))+'</div>';
@@ -5453,7 +5461,7 @@ function g2Scene(revealed){
   return '<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
     return '<div class="card" style="text-align:center;padding:18px 22px;min-width:120px">'+
       '<div style="font-size:3rem">'+it[0]+'</div><div style="font-weight:700;margin-top:6px">'+esc(g2t(it[1]))+'</div>'+
-      (revealed?'<div style="margin-top:8px;font-weight:700;color:#0e9c8d;font-size:.95rem">'+esc(g2t(it[2]))+'</div>':'')+
+      (revealed?'<div style="margin-top:8px;font-weight:700;color:var(--teal-text);font-size:.95rem">'+esc(g2t(it[2]))+'</div>':'')+
       '</div>';
   }).join("")+'</div>';
 }
@@ -5483,7 +5491,7 @@ function geo2LessonView(){
     h+=lsOpts([g2t("g2A0"),g2t("g2A1"),g2t("g2A2")],st.picked,1,"g2pick");
     if(st.picked>=0){
       var why=st.picked===1?"":g2t({0:"g2Why0",2:"g2Why2"}[st.picked]);
-      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?g2t("g2Correct"):g2t("g2Wrong"))+' '+esc(why)+'</p>';
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'#bf4426')+'">'+esc(st.picked===1?g2t("g2Correct"):g2t("g2Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("g2next",g2t("g2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
   }else if(st.step===3){
@@ -5499,7 +5507,7 @@ function geo2LessonView(){
       h+=gHintBtn(g2t("g2HintP2"));
       h+=lsOpts([g2t("g2P2a0"),g2t("g2P2a1"),g2t("g2P2a2")],st.p2,2,"g2p2");
     }
-    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(g2t("g2Correct"))+'</p><div style="margin-top:10px">'+lsBtn("g2next",g2t("g2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(g2t("g2Correct"))+'</p><div style="margin-top:10px">'+lsBtn("g2next",g2t("g2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g2t("g2Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g2again",g2t("g2Again"),'background:#0b7c71;color:#fff;font-weight:700')+g2HearBtn(g2t("g2Sum"))+'</div>';
@@ -5602,7 +5610,7 @@ function g3Scene(revealed){
   var h='<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
     return '<div class="card" style="text-align:center;padding:18px 22px;min-width:104px">'+
       '<div style="font-size:2.4rem;font-weight:800;color:#1d4ed8">'+it[0]+'</div>'+
-      (revealed?'<div style="margin-top:8px;font-weight:700;color:#0e9c8d;font-size:1rem">'+esc(g3t(it[1]))+'</div>':'<div style="margin-top:8px;font-weight:700;color:#94a3b8">?</div>')+
+      (revealed?'<div style="margin-top:8px;font-weight:700;color:var(--teal-text);font-size:1rem">'+esc(g3t(it[1]))+'</div>':'<div style="margin-top:8px;font-weight:700;color:#94a3b8">?</div>')+
       '</div>';
   }).join("")+'</div>';
   if(revealed){
@@ -5643,7 +5651,7 @@ function geo3LessonView(){
     h+=lsOpts([g3t("g3A0"),g3t("g3A1"),g3t("g3A2")],st.picked,1,"g3pick");
     if(st.picked>=0){
       var why=st.picked===1?"":g3t({0:"g3Why0",2:"g3Why2"}[st.picked]);
-      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'#0e9c8d':'#bf4426')+'">'+esc(st.picked===1?g3t("g3Correct"):g3t("g3Wrong"))+' '+esc(why)+'</p>';
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'#bf4426')+'">'+esc(st.picked===1?g3t("g3Correct"):g3t("g3Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("g3next",g3t("g3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
   }else if(st.step===3){
@@ -5659,7 +5667,7 @@ function geo3LessonView(){
       h+=gHintBtn(g3t("g3HintP2"));
       h+=lsOpts([g3t("g3P2a0"),g3t("g3P2a1"),g3t("g3P2a2")],st.p2,2,"g3p2");
     }
-    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:#0e9c8d">'+esc(g3t("g3Correct"))+'</p><div style="margin-top:10px">'+lsBtn("g3next",g3t("g3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
+    if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(g3t("g3Correct"))+'</p><div style="margin-top:10px">'+lsBtn("g3next",g3t("g3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g3t("g3Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g3again",g3t("g3Again"),'background:#0b7c71;color:#fff;font-weight:700')+g3HearBtn(g3t("g3Sum"))+'</div>';
@@ -5719,7 +5727,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=w147-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=w148-pwa1").catch(function(){});
   });
 }
 </script>
