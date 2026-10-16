@@ -154,7 +154,7 @@ const SCAN = () => {
   document.querySelectorAll('a.skip, .skip').forEach(e => { try { e.focus() } catch (x) {} });
 
   const out = [], seenSel = {};
-  let scanned = 0, unrendered = 0;
+  let scanned = 0, unrendered = 0, svg = 0;
   const sel = el => {
     let s = el.tagName.toLowerCase();
     if (el.id) s += '#' + el.id;
@@ -186,6 +186,11 @@ const SCAN = () => {
        אז קורא המסך מכריז עליו. פטור שנשען על `opacity` נמוך היה
        מכשיר גם טקסט אמיתי שדהה בטעות. */
     if (el.closest('[aria-hidden="true"]')) { unrendered++; continue }
+    /* **טקסט בתוך SVG אינו נמדד, ונספר בנפרד (O-230).** הצבע שלו הוא
+       `fill` ולא `color`, והרקע שלו הוא צורה שכנה בתוך ה-SVG ולא הורה
+       בשרשרת — ולכן המדידה כאן הייתה מספר בדוי לשני הכיוונים: בשיעור של
+       math-elem היא דיווחה 1.07:1 על ספרה שחורה על רקע בהיר. */
+    if (el.closest('svg')) { svg++; continue }
     const fg = parse(cs.color);
     if (!fg) continue;
     scanned++;
@@ -207,7 +212,7 @@ const SCAN = () => {
                  size: Math.round(size), txt: txt.slice(0, 28) });
     }
   }
-  return { out, scanned, unrendered };
+  return { out, scanned, unrendered, svg };
 };
 
 /* מדליק ניגודיות גבוהה ומחזיר false כשאין לדף כלל CSS כזה */
@@ -227,9 +232,95 @@ const HC_ON = () => {
   return true;
 };
 
+/* =====================================================================
+   **מעבר רביעי: השיעורים המודרכים (O-230, 16.10.2026).** שלושת המעברים
+   שלמעלה סורקים את הדף כפי שהוא נטען, והשיעור המודרך נבנה רק אחרי
+   כניסה אליו — ולכן טקסט אפור קבוע (`#475569`) על כרטיס כהה (`#17262a`)
+   ישב שם ב-2.06:1 בלי שאיש ראה. אותו עיוורון הסתיר את O-209.
+
+   **הרשימה נגזרת מהקוד, לא נכתבת ביד:** כל אפליקציה שיש בה
+   `function lessonView` או `function xxxLessonView`. כתובת הכניסה
+   נגזרת מהדגל שמדליק את השיעור — `var X_ON=/(^|[?&])lesson=sci2(&|$)/`
+   שמופיע ב-`view==="lesson"&&X_ON`. שיעור בלי דגל כזה (math-elem,
+   math-g7) נפתח בלחיצה: היחידה הראשונה ← ״שיעור״ (רק היחידה הראשונה). פונקציית שיעור שאין אליה
+   שום כניסה **מודפסת**, ואינה נחשבת ״עברה״.
+
+   **בתוך השיעור:** בכל שלב סורקים, לוחצים על כל תשובה (כדי שההסבר
+   לטעות ולנכון יופיע) וסורקים שוב, לוחצים על פעולות השלב (״בואו
+   נבדוק״, ״חלקו״…) וסורקים, ואז ״הבא״ — עד שאין ״הבא״.
+   ===================================================================== */
+const fsL = require('fs'), pathL = require('path');
+const ROOTL = pathL.join(__dirname, '..', '..');
+function lessonTargets(apps) {
+  const out = [], dead = [];
+  for (const app of apps) {
+    if (app === '.' || app === 'legal') continue;
+    const dir = pathL.join(ROOTL, app);
+    let files = ['index.html'];
+    for (const sub of ['', 'js']) {
+      try { for (const f of fsL.readdirSync(pathL.join(dir, sub))) if (/\.js$/.test(f)) files.push(pathL.join(sub, f)) } catch (e) {}
+    }
+    const src = files.map(f => { try { return fsL.readFileSync(pathL.join(dir, f), 'utf8') } catch (e) { return '' } }).join('\n');
+    const fns = [...src.matchAll(/function\s+(\w*[lL]essonView)\s*\(/g)].map(m => m[1]);
+    if (!fns.length) continue;
+    const reached = new Set();
+    /* דגל URL: var X_ON=/(^|[?&])lesson=sci2(&|$)/ , ו-view==="lesson"&&X_ON)html+=fn() */
+    const flags = {};
+    for (const m of src.matchAll(/var\s+(\w+_ON)\s*=\s*\/\(\^\|\[\?&\]\)([\w=-]+)\(&\|\$\)\//g)) flags[m[1]] = m[2];
+    for (const m of src.matchAll(/view\s*===?\s*["']lesson["']\s*&&\s*(\w+_ON)\s*\)\s*html\s*\+=\s*(\w+)\(/g)) {
+      if (flags[m[1]] && fns.includes(m[2])) { out.push({ app, fn: m[2], q: '?' + flags[m[1]], click: false }); reached.add(m[2]) }
+    }
+    /* בלי דגל: view==="lesson" ... lessonView() ונכנסים בלחיצה */
+    for (const fn of fns) {
+      if (reached.has(fn)) continue;
+      /* `view==="lesson")h+=fn()` או מפת מסכים `{lesson:fn,...}` */
+      const callRe = new RegExp('["\']lesson["\'][^\\n]{0,80}\\b' + fn + '\\(\\)|\\blesson\\s*:\\s*' + fn + '\\b');
+      if (callRe.test(src) && /data-a="lesson"/.test(src)) { out.push({ app, fn, q: '', click: true }); reached.add(fn) }
+      else dead.push(app + ' ' + fn);
+    }
+  }
+  return { out, dead };
+}
+
+/* נכנס לשיעור. מחזיר false אם לא נמצאה דרך פנימה */
+const LESSON_OPEN = (click) => {
+  const ok = document.querySelector('#lg-ok'); if (ok) ok.click();
+  if (click) {
+    if (!document.querySelector('[data-a="lesson"]')) {
+      const u = document.querySelector('[data-a="unit"]'); if (u) u.click();
+    }
+    const l = document.querySelector('[data-a="lesson"]'); if (!l) return false;
+    l.click(); return true;
+  }
+  /* דגל ה-URL מדליק את השיעור; בחלק מהאפליקציות (math-app) צריך גם
+     לעבור למסך — אותו מסך שכפתור הניווט ״שיעור״ פותח */
+  if (typeof view !== 'undefined' && view !== 'lesson' && typeof render === 'function') { view = 'lesson'; render() }
+  return typeof view === 'undefined' || view === 'lesson';
+};
+/* מצב הכפתורים בשלב הנוכחי: תשובות (data-i), פעולות, ו״הבא״ */
+/* `pre` היא תחילית הפעולות של השיעור (`s2`, `g1`, `ls`, `l`) — נלמדת
+   מ״הבא״ הראשון ונשמרת, כי בשלב שמחכה לתשובה אין ״הבא״ */
+const LESSON_BTNS = (known) => {
+  const all = [...document.querySelectorAll('main [data-a], #app [data-a]')];
+  const nx = all.find(b => /next$/.test(b.dataset.a) && !/nextlesson/i.test(b.dataset.a));
+  const pre = known != null ? known : nx ? nx.dataset.a.replace(/next$/, '') : null;
+  const mine = a => pre !== null ? a.startsWith(pre) : true;
+  const ans = all.filter(b => b.hasAttribute('data-i') && mine(b.dataset.a) && !/hear/.test(b.dataset.a)).map(b => b.dataset.a + '#' + b.dataset.i);
+  const act = all.filter(b => !b.hasAttribute('data-i') && pre && b.dataset.a.startsWith(pre) &&
+    !/(next|back|prev|again|hear)$/.test(b.dataset.a) && !/^(lang|lesson|lv)/.test(b.dataset.a)).map(b => b.dataset.a);
+  const sig = (document.querySelector('main') || document.body).innerText.slice(0, 200);
+  return { ans, act, next: nx ? nx.dataset.a : null, sig, pre };
+};
+const LESSON_CLICK = (key) => {
+  const [a, i] = key.split('#');
+  const sel = i === undefined ? `[data-a="${a}"]:not([data-i])` : `[data-a="${a}"][data-i="${i}"]`;
+  const b = document.querySelector(sel); if (!b) return false;
+  b.click(); return true;
+};
+
 (async () => {
   const browser = await chromium.launch();
-  let bad = 0, scanned = 0, unrendered = 0, noHc = 0;
+  let bad = 0, scanned = 0, unrendered = 0, noHc = 0, noHcL = 0, svgSkip = 0;
   for (const app of APPS) {
     for (const scheme of ['light', 'dark', 'hc']) {
       const ctx = await browser.newContext({ colorScheme: scheme === 'hc' ? 'light' : scheme });
@@ -244,7 +335,7 @@ const HC_ON = () => {
         if (!has) { noHc++; await ctx.close(); continue }
       }
       const r = await page.evaluate(SCAN);
-      scanned += r.scanned; unrendered += r.unrendered;
+      scanned += r.scanned; unrendered += r.unrendered; svgSkip += r.svg;
       for (const f of r.out) {
         bad++;
         console.log(`✗ ${app} [${scheme}] ${f.sel} — ${f.ratio}:1, נדרש ${f.need}:1`);
@@ -253,8 +344,63 @@ const HC_ON = () => {
       await ctx.close();
     }
   }
+  /* --- מעבר רביעי: השיעורים המודרכים --- */
+  const LT = lessonTargets(APPS);
+  let lessonScans = 0, lessonBad = 0, lessonFail = 0;
+  for (const d of LT.dead) console.log(`· ${d} — פונקציית שיעור שאין אליה כניסה; לא נמדדה`);
+  for (const L of LT.out) {
+    for (const scheme of ['light', 'dark', 'hc']) {
+      const ctx = await browser.newContext({ colorScheme: scheme === 'hc' ? 'light' : scheme });
+      const page = await ctx.newPage();
+      await page.route('**', r => r.request().url().startsWith(BASE) ? r.continue() : r.abort());
+      const tag = `${L.app} [${scheme}] שיעור ${L.fn}${L.q ? ' ' + L.q : ''}`;
+      try {
+        await page.goto(`${BASE}/${L.app}/${L.q}`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+      } catch (e) { console.log(`✗ ${tag} — לא נטען`); bad++; lessonFail++; await ctx.close(); continue }
+      await page.waitForTimeout(600);
+      const opened = await page.evaluate(LESSON_OPEN, L.click);
+      await page.waitForTimeout(150);
+      if (!opened) { console.log(`✗ ${tag} — לא נפתח`); bad++; lessonFail++; await ctx.close(); continue }
+      const seen = new Set();
+      const scan = async () => {
+        if (scheme === 'hc') { const has = await page.evaluate(HC_ON); if (!has) return false }
+        /* SCAN מסיר [hidden] אבל אינו מוחק תוכן, ו-render הבא מצייר מחדש */
+        const r = await page.evaluate(SCAN);
+        lessonScans++;
+        scanned += r.scanned; unrendered += r.unrendered; svgSkip += r.svg;
+        for (const f of r.out) {
+          const k = f.sel + '|' + f.fg + '|' + f.bg;
+          if (seen.has(k)) continue; seen.add(k);
+          bad++; lessonBad++;
+          console.log(`✗ ${tag} ${f.sel} — ${f.ratio}:1, נדרש ${f.need}:1`);
+          console.log(`    ${f.fg} על ${f.bg} · ${f.size}px · ‹${f.txt}›`);
+        }
+        return true;
+      };
+      const click = async k => { const ok = await page.evaluate(LESSON_CLICK, k); if (ok) await page.waitForTimeout(80); return ok };
+      if (scheme === 'hc' && !(await page.evaluate(HC_ON))) { noHcL++; await ctx.close(); continue }
+      let steps = 0, lastSig = null, pre = null;
+      while (steps++ < 25) {
+        await scan();
+        let st = await page.evaluate(LESSON_BTNS, pre);
+        if (pre === null) pre = st.pre;
+        for (const k of st.ans) { if (await click(k)) await scan() }
+        for (const k of st.act) { if (await click(k)) await scan() }
+        st = await page.evaluate(LESSON_BTNS, pre);
+        /* ״הבא״ מופיע רק אחרי תשובה נכונה — אם הלחיצה האחרונה הייתה שגויה,
+           לוחצים שוב על כל תשובה עד שהוא מופיע */
+        if (!st.next) for (const k of st.ans) { await click(k); st = await page.evaluate(LESSON_BTNS, pre); if (st.next) break }
+        if (!st.next || st.sig === lastSig) break;
+        lastSig = st.sig;
+        await click(st.next);
+      }
+      await ctx.close();
+    }
+  }
+  console.log(`\n${lessonBad || lessonFail ? '✗' : '✓'} שיעורים מודרכים: ${LT.out.length} שיעורים ב-${new Set(LT.out.map(l => l.app)).size} אפליקציות × 3 מצבים · ${lessonScans} סריקות · ${lessonBad} מתחת לסף · ${lessonFail} לא נפתחו · ${LT.dead.length} בלי כניסה · ${noHcL} בלי ניגודיות גבוהה`);
+
   console.log(`\n${bad ? '✗' : '✓'} ${APPS.length} דפים × 3 מצבים (בהיר, כהה, ניגודיות גבוהה — ${APPS.length - noHc} דפים שיש בהם)` +
-              ` · ${scanned} אלמנטים עם טקסט נמדדו · ${unrendered} לא רונדרו ולכן לא נמדדו · ${bad} מתחת לסף`);
+              ` · ${scanned} אלמנטים עם טקסט נמדדו · ${unrendered} לא רונדרו ולכן לא נמדדו · ${svgSkip} טקסטים ב-SVG לא נמדדו · ${bad} מתחת לסף`);
   await browser.close();
   process.exit(bad ? 1 : 0);
 })();

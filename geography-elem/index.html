@@ -2615,7 +2615,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="w148 · 2026-10-16";
+var BUILD="w149 · 2026-10-16";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -2696,7 +2696,7 @@ var MOE_PDF="https://meyda.education.gov.il/files/Pop/0files/geography_adam_sviv
 function gHearBtn(text){return '<button type="button" class="btn btn-g" data-a="ghear" data-say="'+esc(text)+'" aria-label="hear" style="min-height:44px;padding:6px 12px;font-size:.95rem">'+'🔊'+'</button>'}
 function gStepBtn(text){return '<button type="button" class="btn btn-g" data-a="ghear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">'+'🔊'+' '+esc(lt("lsHear"))+'</button>'}
 function gHintLbl(){return {he:"רמז מלימור",en:"Hint from Limor",ru:"Подсказка от Лимор",ar:"تلميح من ليمور"}[state.settings.lang||"he"]||"Hint"}
-function gHintBtn(txt){return '<div style="margin:10px 0"><button type="button" class="btn" data-a="ghint" data-say="'+esc(txt)+'" style="background:#b45309;border-color:#b45309;color:#fff;min-height:46px;padding:10px 16px;font-weight:700">'+'💡'+' '+esc(gHintLbl())+'</button><div class="hintxt" hidden style="background:#fdf3e3;border:2px solid #b45309;border-radius:12px;padding:10px 14px;margin-top:8px;line-height:1.6">'+esc(txt)+'</div></div>'}
+function gHintBtn(txt){return '<div style="margin:10px 0"><button type="button" class="btn" data-a="ghint" data-say="'+esc(txt)+'" style="background:#b45309;border-color:#b45309;color:#fff;min-height:46px;padding:10px 16px;font-weight:700">'+'💡'+' '+esc(gHintLbl())+'</button><div class="hintxt" hidden style="background:#fdf3e3;color:#6b5109;border:2px solid #b45309;border-radius:12px;padding:10px 14px;margin-top:8px;line-height:1.6">'+esc(txt)+'</div></div>'}
 function g1StepText(st){if(st.step===0)return g1t("g1Goal");if(st.step===1)return g1t(st.revealed?"g1V2":"g1V1")+(st.revealed?"":" "+g1t("g1V1b"));if(st.step===2)return g1t("g1Check")+". "+g1t("g1Q");if(st.step===3)return g1t("g1Rule")+" "+g1t("g1RuleEx");if(st.step===4)return g1t("g1P1")+(st.p1===1?" "+g1t("g1P2"):"");return g1t("g1Sum")}
 function g2StepText(st){if(st.step===0)return g2t("g2Goal");if(st.step===1)return g2t(st.revealed?"g2V2":"g2V1")+(st.revealed?"":" "+g2t("g2V1b"));if(st.step===2)return g2t("g2Check")+". "+g2t("g2Q");if(st.step===3)return g2t("g2Rule")+" "+g2t("g2RuleEx");if(st.step===4)return g2t("g2P1")+(st.p1===1?" "+g2t("g2P2"):"");return g2t("g2Sum")}
 function unitsView(){
@@ -5218,7 +5218,7 @@ function lsOpts(list,answered,correctIdx,act){
 }
 function lessonView(){
   var st=LSN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
-  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(lt("lsStep"),Math.min(st.step+1,5)))+'</div>';
+  h+='<div style="font-size:.9rem;color:var(--ink-soft)">'+esc(fmt0(lt("lsStep"),Math.min(st.step+1,5)))+'</div>';
   h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(lt("lsTitle"))+'</h1>';
   if(st.step===0){
     h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(lt("lsGoal"))+'</p>';
@@ -5227,7 +5227,7 @@ function lessonView(){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(lt(st.split?"lsV2":"lsV1"))+'</p>';
     h+='<div style="margin:14px 0">'+lsBar(st.split?4:2,st.split?2:1)+'</div>';
     if(!st.split){
-      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(lt("lsV1b"))+'</p>';
+      h+='<p style="font-size:1.02rem;color:var(--ink-soft);line-height:1.6">'+esc(lt("lsV1b"))+'</p>';
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("lssplit",lt("lsSplit"),'background:#b45309;color:#fff;font-weight:700')+lsHearBtn(lt("lsV1")+" "+lt("lsV1b"))+'</div>';
     }else{
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+lsHearBtn(lt("lsV2"))+'</div>';
@@ -5239,13 +5239,13 @@ function lessonView(){
     h+=lsOpts(["1/4","2/4","4/4"],st.picked,1,"lspick");
     if(st.picked>=0){
       var why=st.picked===1?"":lt({0:"lsWhy0",2:"lsWhy4"}[st.picked]);
-      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'#bf4426')+'">'+esc(st.picked===1?lt("lsCorrect"):lt("lsWrong"))+' '+esc(why)+'</p>';
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?lt("lsCorrect"):lt("lsWrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
   }else if(st.step===3){
-    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(lt("lsRule"))+'</p>';
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:var(--ink)">'+esc(lt("lsRule"))+'</p>';
     h+='<p style="font-size:1.3rem;font-weight:800;text-align:center;margin:14px 0;direction:ltr">1/2 = 2/4</p>';
-    h+='<p style="font-size:1.02rem;color:#475569">'+esc(lt("lsRuleEx"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:var(--ink-soft)">'+esc(lt("lsRuleEx"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+lsHearBtn(lt("lsRule")+" "+lt("lsRuleEx"))+'</div>';
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(lt("lsP1"))+'</p>';
@@ -5254,15 +5254,15 @@ function lessonView(){
       h+='<p style="margin-top:14px;font-size:1.08rem;line-height:1.7">'+esc(lt("lsP2"))+'</p>';
       h+=lsOpts(["10","12","15"],st.p2,2,"lsans2");
     }
-    if(st.p1>=0&&st.p1!==1)h+='<p style="margin-top:12px;font-weight:700;color:#bf4426">'+esc(lt("lsWrong"))+'</p>';
-    if(st.p2>=0&&st.p2!==2)h+='<p style="margin-top:12px;font-weight:700;color:#bf4426">'+esc(lt("lsWrong"))+'</p>';
+    if(st.p1>=0&&st.p1!==1)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(lt("lsWrong"))+'</p>';
+    if(st.p2>=0&&st.p2!==2)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(lt("lsWrong"))+'</p>';
     if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(lt("lsCorrect"))+'</p><div style="margin-top:10px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.75">'+esc(lt("lsSum"))+'</p>';
     h+='<div style="margin:12px 0">'+lsBar(4,2)+'</div>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("lsagain",lt("lsAgain"),'background:#0b7c71;color:#fff;font-weight:700')+lsHearBtn(lt("lsSum"))+'</div>';
   }
-  if(st.step>0&&st.step<5)h+='<div style="margin-top:14px">'+lsBtn("lsback",lt("lsBack"),'color:#475569')+'</div>';
+  if(st.step>0&&st.step<5)h+='<div style="margin-top:14px">'+lsBtn("lsback",lt("lsBack"),'color:var(--ink-soft)')+'</div>';
   return h+'</div>';
 }
 function lessonAction(a,el){
@@ -5343,7 +5343,7 @@ function g1Scene(revealed){
 function g1HearBtn(text){return '<button class="btn btn-g" data-a="g1hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(g1t("g1Hear"))+'</button>'}
 function geo1LessonView(){
   var st=G1SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
-  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(g1t("g1Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<div style="font-size:.9rem;color:var(--ink-soft)">'+esc(fmt0(g1t("g1Step"),Math.min(st.step+1,5)))+'</div>';
   h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(g1t("g1Title"))+'</h1>';
   h+='<div style="margin:-6px 0 12px">'+gStepBtn(g1StepText(st))+'</div>';
   if(st.step===0){
@@ -5353,7 +5353,7 @@ function geo1LessonView(){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g1t(st.revealed?"g1V2":"g1V1"))+'</p>';
     h+=g1Scene(st.revealed);
     if(!st.revealed){
-      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(g1t("g1V1b"))+'</p>';
+      h+='<p style="font-size:1.02rem;color:var(--ink-soft);line-height:1.6">'+esc(g1t("g1V1b"))+'</p>';
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g1reveal",g1t("g1Reveal"),'background:#b45309;color:#fff;font-weight:700')+g1HearBtn(g1t("g1V1")+" "+g1t("g1V1b"))+'</div>';
     }else{
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g1next",g1t("g1Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g1HearBtn(g1t("g1V2"))+'</div>';
@@ -5366,12 +5366,12 @@ function geo1LessonView(){
     h+=lsOpts([g1t("g1A0"),g1t("g1A1"),g1t("g1A2")],st.picked,1,"g1pick");
     if(st.picked>=0){
       var why=st.picked===1?"":g1t({0:"g1Why0",2:"g1Why2"}[st.picked]);
-      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'#bf4426')+'">'+esc(st.picked===1?g1t("g1Correct"):g1t("g1Wrong"))+' '+esc(why)+'</p>';
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?g1t("g1Correct"):g1t("g1Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("g1next",g1t("g1Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
   }else if(st.step===3){
-    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(g1t("g1Rule"))+'</p>';
-    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(g1t("g1RuleEx"))+'</p>';
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:var(--ink)">'+esc(g1t("g1Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:var(--ink-soft);margin-top:10px">'+esc(g1t("g1RuleEx"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("g1next",g1t("g1Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g1HearBtn(g1t("g1Rule")+" "+g1t("g1RuleEx"))+'</div>';
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g1t("g1P1"))+'</p>';
@@ -5386,7 +5386,7 @@ function geo1LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g1t("g1Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g1again",g1t("g1Again"),'background:#0b7c71;color:#fff;font-weight:700')+g1HearBtn(g1t("g1Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?lesson=geo2" style="color:#1d4ed8;font-weight:600">'+esc(g1t("g1NextLesson"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=geo2" style="color:var(--sky-deep);font-weight:600">'+esc(g1t("g1NextLesson"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5468,7 +5468,7 @@ function g2Scene(revealed){
 function g2HearBtn(text){return '<button class="btn btn-g" data-a="g2hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(g2t("g2Hear"))+'</button>'}
 function geo2LessonView(){
   var st=G2SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
-  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(g2t("g2Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<div style="font-size:.9rem;color:var(--ink-soft)">'+esc(fmt0(g2t("g2Step"),Math.min(st.step+1,5)))+'</div>';
   h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(g2t("g2Title"))+'</h1>';
   h+='<div style="margin:-6px 0 12px">'+gStepBtn(g2StepText(st))+'</div>';
   if(st.step===0){
@@ -5478,7 +5478,7 @@ function geo2LessonView(){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g2t(st.revealed?"g2V2":"g2V1"))+'</p>';
     h+=g2Scene(st.revealed);
     if(!st.revealed){
-      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(g2t("g2V1b"))+'</p>';
+      h+='<p style="font-size:1.02rem;color:var(--ink-soft);line-height:1.6">'+esc(g2t("g2V1b"))+'</p>';
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g2reveal",g2t("g2Reveal"),'background:#b45309;color:#fff;font-weight:700')+g2HearBtn(g2t("g2V1")+" "+g2t("g2V1b"))+'</div>';
     }else{
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g2next",g2t("g2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g2HearBtn(g2t("g2V2"))+'</div>';
@@ -5491,12 +5491,12 @@ function geo2LessonView(){
     h+=lsOpts([g2t("g2A0"),g2t("g2A1"),g2t("g2A2")],st.picked,1,"g2pick");
     if(st.picked>=0){
       var why=st.picked===1?"":g2t({0:"g2Why0",2:"g2Why2"}[st.picked]);
-      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'#bf4426')+'">'+esc(st.picked===1?g2t("g2Correct"):g2t("g2Wrong"))+' '+esc(why)+'</p>';
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?g2t("g2Correct"):g2t("g2Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("g2next",g2t("g2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
   }else if(st.step===3){
-    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(g2t("g2Rule"))+'</p>';
-    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(g2t("g2RuleEx"))+'</p>';
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:var(--ink)">'+esc(g2t("g2Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:var(--ink-soft);margin-top:10px">'+esc(g2t("g2RuleEx"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("g2next",g2t("g2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g2HearBtn(g2t("g2Rule")+" "+g2t("g2RuleEx"))+'</div>';
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g2t("g2P1"))+'</p>';
@@ -5511,8 +5511,8 @@ function geo2LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g2t("g2Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g2again",g2t("g2Again"),'background:#0b7c71;color:#fff;font-weight:700')+g2HearBtn(g2t("g2Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="?lesson=geo3" style="color:#1d4ed8;font-weight:600">'+esc(g2t("g2NextLesson"))+'</a></p>';
-    h+='<p style="margin-top:8px"><a href="./" style="color:#1d4ed8;font-weight:600">'+esc(g2t("g2BackUnits"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="?lesson=geo3" style="color:var(--sky-deep);font-weight:600">'+esc(g2t("g2NextLesson"))+'</a></p>';
+    h+='<p style="margin-top:8px"><a href="./" style="color:var(--sky-deep);font-weight:600">'+esc(g2t("g2BackUnits"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5609,8 +5609,8 @@ function g3Scene(revealed){
   var items=[["N","g3D_N"],["E","g3D_E"],["S","g3D_S"],["W","g3D_W"]];
   var h='<div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0">'+items.map(function(it){
     return '<div class="card" style="text-align:center;padding:18px 22px;min-width:104px">'+
-      '<div style="font-size:2.4rem;font-weight:800;color:#1d4ed8">'+it[0]+'</div>'+
-      (revealed?'<div style="margin-top:8px;font-weight:700;color:var(--teal-text);font-size:1rem">'+esc(g3t(it[1]))+'</div>':'<div style="margin-top:8px;font-weight:700;color:#94a3b8">?</div>')+
+      '<div style="font-size:2.4rem;font-weight:800;color:var(--sky-deep)">'+it[0]+'</div>'+
+      (revealed?'<div style="margin-top:8px;font-weight:700;color:var(--teal-text);font-size:1rem">'+esc(g3t(it[1]))+'</div>':'<div style="margin-top:8px;font-weight:700;color:var(--ink-faint)">?</div>')+
       '</div>';
   }).join("")+'</div>';
   if(revealed){
@@ -5621,14 +5621,14 @@ function g3Scene(revealed){
       '<circle cx="110" cy="75" r="5" fill="#b45309"/>'+
       '<path d="M118 12 L118 34 M112 26 L118 34 L124 26" stroke="#b45309" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'+
       '<text x="126" y="30" font-size="14" font-weight="800" fill="#b45309">N</text>'+
-      '</svg><div style="font-size:.9rem;color:#475569;margin-top:4px">'+esc(g3t("g3Grid"))+'</div></div>';
+      '</svg><div style="font-size:.9rem;color:var(--ink-soft);margin-top:4px">'+esc(g3t("g3Grid"))+'</div></div>';
   }
   return h;
 }
 function g3HearBtn(text){return '<button class="btn btn-g" data-a="g3hear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(g3t("g3Hear"))+'</button>'}
 function geo3LessonView(){
   var st=G3SN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
-  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(g3t("g3Step"),Math.min(st.step+1,5)))+'</div>';
+  h+='<div style="font-size:.9rem;color:var(--ink-soft)">'+esc(fmt0(g3t("g3Step"),Math.min(st.step+1,5)))+'</div>';
   h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(g3t("g3Title"))+'</h1>';
   h+='<div style="margin:-6px 0 12px">'+gStepBtn(g3StepText(st))+'</div>';
   if(st.step===0){
@@ -5638,7 +5638,7 @@ function geo3LessonView(){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g3t(st.revealed?"g3V2":"g3V1"))+'</p>';
     h+=g3Scene(st.revealed);
     if(!st.revealed){
-      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(g3t("g3V1b"))+'</p>';
+      h+='<p style="font-size:1.02rem;color:var(--ink-soft);line-height:1.6">'+esc(g3t("g3V1b"))+'</p>';
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g3reveal",g3t("g3Reveal"),'background:#b45309;color:#fff;font-weight:700')+g3HearBtn(g3t("g3V1")+" "+g3t("g3V1b"))+'</div>';
     }else{
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("g3next",g3t("g3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g3HearBtn(g3t("g3V2"))+'</div>';
@@ -5651,12 +5651,12 @@ function geo3LessonView(){
     h+=lsOpts([g3t("g3A0"),g3t("g3A1"),g3t("g3A2")],st.picked,1,"g3pick");
     if(st.picked>=0){
       var why=st.picked===1?"":g3t({0:"g3Why0",2:"g3Why2"}[st.picked]);
-      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'#bf4426')+'">'+esc(st.picked===1?g3t("g3Correct"):g3t("g3Wrong"))+' '+esc(why)+'</p>';
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?g3t("g3Correct"):g3t("g3Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("g3next",g3t("g3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
   }else if(st.step===3){
-    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(g3t("g3Rule"))+'</p>';
-    h+='<p style="font-size:1.02rem;color:#475569;margin-top:10px">'+esc(g3t("g3RuleEx"))+'</p>';
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:var(--ink)">'+esc(g3t("g3Rule"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:var(--ink-soft);margin-top:10px">'+esc(g3t("g3RuleEx"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("g3next",g3t("g3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+g3HearBtn(g3t("g3Rule")+" "+g3t("g3RuleEx"))+'</div>';
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(g3t("g3P1"))+'</p>';
@@ -5671,7 +5671,7 @@ function geo3LessonView(){
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(g3t("g3Sum"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("g3again",g3t("g3Again"),'background:#0b7c71;color:#fff;font-weight:700')+g3HearBtn(g3t("g3Sum"))+'</div>';
-    h+='<p style="margin-top:16px"><a href="./" style="color:#1d4ed8;font-weight:600">'+esc(g3t("g3BackUnits"))+'</a></p>';
+    h+='<p style="margin-top:16px"><a href="./" style="color:var(--sky-deep);font-weight:600">'+esc(g3t("g3BackUnits"))+'</a></p>';
   }
   return h+'</div>';
 }
@@ -5727,7 +5727,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=w148-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=w149-pwa1").catch(function(){});
   });
 }
 </script>

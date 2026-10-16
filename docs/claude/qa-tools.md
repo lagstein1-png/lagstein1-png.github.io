@@ -89,7 +89,7 @@
     node .claude/qa/barak-browser.js     # לימור בדפדפן אמיתי מול שרת מדומה, בכל אפליקציה
     node .claude/qa/tutor-timeout.js     # ספק שתולה — הפאנל של לימור אינו נתקע (O-72)
     node .claude/qa/tutor-lang.js        # השאלה שלימור מקבלת כתובה בשפת המסך — בכל אפליקציה עם מחולל
-    node .claude/qa/contrast.js          # האם הטקסט בכלל נראה — ניגודיות מול הסף
+    node .claude/qa/contrast.js          # האם הטקסט בכלל נראה — ניגודיות מול הסף; וגם בתוך כל שיעור מודרך, אחרי בחירת תשובה (נגזר מ-function *LessonView, O-230)
     node .claude/qa/shadow.js            # פונקציה גלובלית שנדרסה בשקט
     node .claude/qa/voice.js             # מנוע ההקראה מול speechSynthesis מזויף — ארבעת המנגנונים מתאוששים, בכל אפליקציה מקריאה (נגזר מ-stages.json; EXCEPT לפי בדיקה, O-225); ופס ״אין קול בשפה״ (O-79): קולות en בלבד → פס פעם אחת, he → אין, ריקה → אין. `--nolang` מריץ רק אותו
     node .claude/qa/netpin.js            # מנגנון 4 מול בחירת קול ידנית — tutor/tutor.js

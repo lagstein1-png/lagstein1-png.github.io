@@ -2409,7 +2409,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="b192 · 2026-10-16";
+var BUILD="b193 · 2026-10-16";
 var view=state.pet?"practice":"onboarding";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4953,7 +4953,7 @@ function lsOpts(list,answered,correctIdx,act){
 }
 function lessonView(){
   var st=LSN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
-  h+='<div style="font-size:.9rem;color:#475569">'+esc(fmt0(lt("lsStep"),Math.min(st.step+1,5)))+'</div>';
+  h+='<div style="font-size:.9rem;color:var(--ink-soft)">'+esc(fmt0(lt("lsStep"),Math.min(st.step+1,5)))+'</div>';
   h+='<h1 class="fd" style="font-size:1.5rem;margin:6px 0 14px">'+esc(lt("lsTitle"))+'</h1>';
   if(st.step===0){
     h+='<p style="font-size:1.1rem;line-height:1.7">'+esc(lt("lsGoal"))+'</p>';
@@ -4962,7 +4962,7 @@ function lessonView(){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(lt(st.split?"lsV2":"lsV1"))+'</p>';
     h+='<div style="margin:14px 0">'+lsBar(st.split?4:2,st.split?2:1)+'</div>';
     if(!st.split){
-      h+='<p style="font-size:1.02rem;color:#475569;line-height:1.6">'+esc(lt("lsV1b"))+'</p>';
+      h+='<p style="font-size:1.02rem;color:var(--ink-soft);line-height:1.6">'+esc(lt("lsV1b"))+'</p>';
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("lssplit",lt("lsSplit"),'background:#b45309;color:#fff;font-weight:700')+lsHearBtn(lt("lsV1")+" "+lt("lsV1b"))+'</div>';
     }else{
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+lsHearBtn(lt("lsV2"))+'</div>';
@@ -4974,13 +4974,13 @@ function lessonView(){
     h+=lsOpts(["1/4","2/4","4/4"],st.picked,1,"lspick");
     if(st.picked>=0){
       var why=st.picked===1?"":lt({0:"lsWhy0",2:"lsWhy4"}[st.picked]);
-      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'#bf4426')+'">'+esc(st.picked===1?lt("lsCorrect"):lt("lsWrong"))+' '+esc(why)+'</p>';
+      h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?lt("lsCorrect"):lt("lsWrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
   }else if(st.step===3){
-    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:#334155">'+esc(lt("lsRule"))+'</p>';
+    h+='<p style="font-size:1.1rem;line-height:1.7;font-weight:700;color:var(--ink)">'+esc(lt("lsRule"))+'</p>';
     h+='<p style="font-size:1.3rem;font-weight:800;text-align:center;margin:14px 0;direction:ltr">1/2 = 2/4</p>';
-    h+='<p style="font-size:1.02rem;color:#475569">'+esc(lt("lsRuleEx"))+'</p>';
+    h+='<p style="font-size:1.02rem;color:var(--ink-soft)">'+esc(lt("lsRuleEx"))+'</p>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+lsHearBtn(lt("lsRule")+" "+lt("lsRuleEx"))+'</div>';
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(lt("lsP1"))+'</p>';
@@ -4989,15 +4989,15 @@ function lessonView(){
       h+='<p style="margin-top:14px;font-size:1.08rem;line-height:1.7">'+esc(lt("lsP2"))+'</p>';
       h+=lsOpts(["10","12","15"],st.p2,2,"lsans2");
     }
-    if(st.p1>=0&&st.p1!==1)h+='<p style="margin-top:12px;font-weight:700;color:#bf4426">'+esc(lt("lsWrong"))+'</p>';
-    if(st.p2>=0&&st.p2!==2)h+='<p style="margin-top:12px;font-weight:700;color:#bf4426">'+esc(lt("lsWrong"))+'</p>';
+    if(st.p1>=0&&st.p1!==1)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(lt("lsWrong"))+'</p>';
+    if(st.p2>=0&&st.p2!==2)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(lt("lsWrong"))+'</p>';
     if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(lt("lsCorrect"))+'</p><div style="margin-top:10px">'+lsBtn("lsnext",lt("lsNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.75">'+esc(lt("lsSum"))+'</p>';
     h+='<div style="margin:12px 0">'+lsBar(4,2)+'</div>';
     h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'+lsBtn("lsagain",lt("lsAgain"),'background:#0b7c71;color:#fff;font-weight:700')+lsHearBtn(lt("lsSum"))+'</div>';
   }
-  if(st.step>0&&st.step<5)h+='<div style="margin-top:14px">'+lsBtn("lsback",lt("lsBack"),'color:#475569')+'</div>';
+  if(st.step>0&&st.step<5)h+='<div style="margin-top:14px">'+lsBtn("lsback",lt("lsBack"),'color:var(--ink-soft)')+'</div>';
   return h+'</div>';
 }
 function lessonAction(a,el){
@@ -5053,7 +5053,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=b192-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=b193-pwa1").catch(function(){});
   });
 }
 </script>
