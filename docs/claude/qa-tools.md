@@ -68,6 +68,7 @@
     node .claude/qa/status.js --check    # STATUS.md מול המדידה — הטבלה לא נכתבת ביד
     node .claude/qa/sitemap.js --check   # sitemap.xml מול stages.json, noindex ו-git (המחולל: אותו קובץ בלי --check)
     node .claude/qa/pure.js              # המבחן הכיתתי: כל קריאה ל-buildQuestion מתוך buildQ מעבירה pure=true — בכל אפליקציה עם chooseIndex (O-184)
+    node .claude/qa/coverage.js          # האחוז על הכרטיס, בסרגל הרמה ובמסך ההתקדמות הוא כיסוי (נענו נכון מתוך המאגר של התא), ״נשלט״ = כיסוי ≥75% ודיוק אחרון ≥60% — סימולציה ב-13 אפליקציות; --rev=HEAD להוכחת נפילה (O-189)
     node .claude/qa/i18n.js              # המחרוזת העברית היא המפתח — TR_KEYS (_("…") ו-_('…'), כל מפתח מתורגם, ותרגום שזז ממפתח אחר מול HEAD) ומילונים לפי מפתח עברי (reader/TR, rakia/EN_DICT)
     node .claude/qa/agents.js            # סוכן אינו קורא לסוכן — אין כלי סוכנים בשורת tools ואין הבטחה כזאת
     node .claude/qa/century.js           # המאה בארבע השפות — על הפונקציה האמיתית שבאפליקציה
@@ -93,6 +94,7 @@
     node .claude/qa/voice.js             # מנוע ההקראה מול speechSynthesis מזויף — ארבעת המנגנונים מתאוששים, בכל אפליקציה מקריאה (נגזר מ-stages.json; EXCEPT לפי בדיקה, O-225); ופס ״אין קול בשפה״ (O-79): קולות en בלבד → פס פעם אחת, he → אין, ריקה → אין. `--nolang` מריץ רק אותו
     node .claude/qa/netpin.js            # מנגנון 4 מול בחירת קול ידנית — tutor/tutor.js
     node .claude/qa/exam.js              # המבחן מהקישור — השאלה שהמורה רואה היא שהתלמיד מקבל
+    node .claude/qa/examdrift.js         # המבחן הכיתתי כשהמורה והתלמיד בשני דפדפנים: חתימת התוכן (h בקוד התשובות) — שפה אחרת אינה אזהרה, מאגר/מחולל שונה בצד התלמיד כן; כל אפליקציה עם examId (O-176)
     node .claude/qa/recorded.js          # השכבה המוקלטת — המודול והחיווט בכל אפליקציה ב-stages.json, גם js/speech.js (O-165); עם --browser גם הניגון בדפדפן
     node .claude/qa/record.js --check    # ההקלטות מול המניפסט — המחולל: אותו קובץ (record.yml מריץ אותו כל בוקר)
     node .claude/qa/record-safety.js     # ההקלטה אינה מוחקת, אינה ננעלת ואינה נופלת על gcloud — ffmpeg/ffprobe/fetch מדומים

@@ -2938,7 +2938,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t190 · 2026-10-16";
+var BUILD="t191 · 2026-10-16";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -8822,9 +8822,47 @@ function exLoad(){
 function exSave(){try{localStorage.setItem(EKEY,JSON.stringify(EX));return true}catch(e){return false}}
 function exFind(id){for(var i=0;i<EX.list.length;i++)if(EX.list[i].id===id)return EX.list[i];return null}
 
+/* --- חתימת התוכן (O-176) -------------------------------------
+   examId מגבב זרעים ולא שאלות. מורה ותלמיד שמחזיקים גרסאות שונות
+   של המאגר או של המחולל — אחד מהם קיבל עדכון והשני עוד לא — בונים
+   מאותו זרע שאלות אחרות, והמזהה עדיין תואם. הציון יוצא לפעמים נכון
+   במקרה, אבל הדוח לכל שאלה ו״מה כדאי ללמד שוב״ מתארים שאלות שהתלמיד
+   לא ראה. נמדד על science: 1,867 מתוך 2,000 שאלות שונות, ושום חיווי.
+
+   התלמיד מצרף לקוד התשובות גיבוב קצר של השאלות שבנה בפועל (שדה h),
+   והמורה משווה אותו לגיבוב של השאלות שמהן הוא מחשב את הציון. אין
+   התאמה — משפט ברור במסך הציונים (mkDrift).
+
+   השאלות נבנות כאן בעברית, בכל שפת ממשק: נוסח השאלה והתשובות תלוי
+   בשפה, ותלמיד שנבחן בערבית לא קיבל מבחן אחר. השפה מוחזרת מיד.
+   קוד ישן בלי h — אין אזהרה. h אינו נכנס ל-c בכוונה: מורה שעוד לא
+   עדכן את האפליקציה קולט קוד חדש כתקין, ופשוט מתעלם מ-h.
+   הבדיקה: .claude/qa/examdrift.js, צד התלמיד בהקשר דפדפן נפרד. */
+function exPinHe(fn){
+  var g=(typeof window!=="undefined")?window:{};
+  var st=(typeof state!=="undefined"&&state)?state:{};
+  var se=st.settings||{};
+  var has=[("lang" in st),("lang" in se),(typeof g.LG==="string")];
+  var old=[st.lang,se.lang,g.LG];
+  if(has[0])st.lang="he"; if(has[1])se.lang="he"; if(has[2])g.LG="he";
+  try{return fn()}
+  finally{if(has[0])st.lang=old[0]; if(has[1])se.lang=old[1]; if(has[2])g.LG=old[2]}
+}
+function examSig(spec){
+  try{
+    return exPinHe(function(){
+      return hash32(examQuestions(spec).map(function(q){
+        return [q.topic,q.ask,q.expr||"",(q.options||[]).map(function(o){
+          return (o.ok?"+":"-")+o.t}).join("~")].join("|");
+      }).join("§")).toString(36);
+    });
+  }catch(e){return ""}
+}
+
 /* --- קוד ההגשה של התלמיד --- */
-function encodeResult(id,name,answers){
+function encodeResult(id,name,answers,sig){
   var body={i:id,n:String(name||"").slice(0,40),a:answers,d:todayIso()};
+  if(sig)body.h=sig;
   body.c=hash32(JSON.stringify([body.i,body.n,body.a])).toString(36);
   return b64e(JSON.stringify(body));
 }
@@ -8848,7 +8886,10 @@ function gradeResult(spec,res){
               picked:(a>=0&&q.options[a])?q.options[a].t:"—",
               answer:(q.options.filter(function(o){return o.ok})[0]||{}).t||""});
   }
-  return {ok:ok,n:qs.length,pct:Math.round(100*ok/qs.length),per:per};
+  /* h קיים ושונה ⇒ התלמיד נבחן במבחן אחר (O-176). בלי h — אין אזהרה. */
+  var hs=res.h?examSig(spec):"";
+  return {ok:ok,n:qs.length,pct:Math.round(100*ok/qs.length),per:per,
+          drift:!!(res.h&&hs&&hs!==res.h)};
 }
 
 /* ------------------------------------------------------------
@@ -9037,7 +9078,8 @@ function viewMarks(){
         var wrong=s.per.filter(function(p){return !p.ok});
         h+='<div class="tog" style="align-items:flex-start"><span class="tt"><b>'+esc(s.name||_("ללא שם"))+'</b>'+
           '<span>'+s.ok+' '+_("מתוך")+' '+s.n+(wrong.length?' · '+_("נפל ב:")+' '+esc(uniq(wrong.map(function(p){return p.topicName})).join(", ")):' · '+_("הכול נכון"))+
-          (s.valid?"":' · <b style="color:var(--bad)">הקוד לא תואם לעצמו</b>')+'</span></span>'+
+          (s.valid?"":' · <b style="color:var(--bad)">הקוד לא תואם לעצמו</b>')+
+          (s.drift?' · <b style="color:var(--bad)">המבחן שהתלמיד קיבל שונה מזה שיצרתם — ייתכן שהאפליקציה התעדכנה ביניכם</b>':"")+'</span></span>'+
           '<span class="chip '+(s.pct>=70?"ok":s.pct>=55?"warn":"bad")+'">'+s.pct+'%</span></div>';
       });
       h+='</div>';
@@ -9394,7 +9436,7 @@ function sitRestore(){
     SIT.flags=o.f&&o.f.length===o.a.length?o.f:SIT.qs.map(function(){return false});
     SIT.t0=o.t||0; SIT.i=Math.min(Math.max(0,o.i|0),SIT.qs.length-1);
     SIT.phase=o.p==="done"?"done":"ask";
-    if(SIT.phase==="done")SIT.code=encodeResult(SIT.id,SIT.name,SIT.answers);
+    if(SIT.phase==="done")SIT.code=encodeResult(SIT.id,SIT.name,SIT.answers,examSig(SIT.spec));
     return true;
   }catch(e){return false}
 }
@@ -9583,7 +9625,7 @@ function codeOf(raw){
 function sitFinish(){
   SIT.phase="done";
   sitTimerOff();
-  SIT.code=encodeResult(SIT.id,SIT.name,SIT.answers);
+  SIT.code=encodeResult(SIT.id,SIT.name,SIT.answers,examSig(SIT.spec));
   sitSave();
   stopSpeak(); window.scrollTo(0,0); render();
 }
@@ -9911,7 +9953,7 @@ function mkImport(ex,res){
     if(res.a.length!==ex.spec.q.length){
       MK.msg={id:ex.id,ok:false,m:"מספר התשובות בקוד אינו תואם למבחן."};return false}
     var g=gradeResult(ex.spec,res);
-    var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok};
+    var sub={name:res.n||"",date:res.d||todayIso(),ok:g.ok,n:g.n,pct:g.pct,per:g.per,valid:!!res.ok,drift:!!g.drift};
     /* הגשה חוזרת של אותו תלמיד מחליפה את הקודמת ולא מצטברת לידה */
     /* הגשה חדשה מחליפה קודמת רק כששני השמות זהים אחרי נירמול, והשם
        אינו ריק. בלי זה כל ההגשות בלי שם נראו כאותו תלמיד ודרסו זו את
@@ -9926,7 +9968,8 @@ function mkImport(ex,res){
     if(ex.subs.length>200)ex.subs.splice(0,ex.subs.length-200);
     if(!exSave()){MK.msg={id:ex.id,ok:false,m:"האחסון בדפדפן מלא, וההגשה לא נשמרה. מחקו מבחן ישן ונסו שוב."};return false}
     MK.msg={id:ex.id,ok:true,m:(sub.name||"תלמיד")+" נקלט · "+g.pct+" ("+g.ok+"/"+g.n+")"+
-      (sub.valid?"":" · שימו לב: הקוד לא תואם לעצמו")};
+      (sub.valid?"":" · שימו לב: הקוד לא תואם לעצמו")+
+      (sub.drift?" · המבחן שהתלמיד קיבל שונה מזה שיצרתם — ייתכן שהאפליקציה התעדכנה ביניכם":"")};
     return true;
 }
 /* קליטת תוצאה מהכתובת — הצד של המורה. הכתובת מנוקה מיד, כדי שרענון
@@ -9994,7 +10037,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t190-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t191-pwa1").catch(function(){});
   });
 }
 </script>

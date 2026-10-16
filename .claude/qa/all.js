@@ -108,6 +108,9 @@ const SUITE = [
      i18n — מסיח ב-math-uni3 שהוחלף בלי מפתח ושלוש שפות ראו בעברית;
      agents — נקי, והוכח אדום במוטציה. */
   { id: 'pure',     args: [] },
+  /* האחוז שהלומד רואה הוא כיסוי ולא דיוק — 13 אפליקציות, סימולציה על
+     הקוד האמיתי ב-vm. O-189, 16.10.2026: תא של 17 הציג 100% אחרי 5.88. */
+  { id: 'coverage', args: [] },
   { id: 'i18n',     args: [] },
   { id: 'agents',   args: [] },
   /* שמות הכפתורים שב-GUIDE.md מול הממשק. המדריך צבר שלוש דריפטות
@@ -319,6 +322,10 @@ const SUITE = [
   { id: 'voice',    args: [],     needsServer: true, slow: true },
   { id: 'netpin',   args: [] },
   { id: 'exam',     args: [],     needsServer: true },
+  /* המורה והתלמיד בשני הקשרי דפדפן נפרדים, התלמיד בשפה אחרת: אותו קוד —
+     בלי אזהרה; פריט מנוטרל במאגר של התלמיד בלבד — המורה רואה ״המבחן
+     שהתלמיד קיבל שונה״. O-176, 16.10.2026: על HEAD 21/21 עברו בשקט. */
+  { id: 'examdrift', args: [],    needsServer: true },
   { id: 'entropy',  args: APPS,   needsServer: true, slow: true },
   { id: 'options',  args: APPS,   needsServer: true, slow: true },
 ];
