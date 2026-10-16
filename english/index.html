@@ -1189,7 +1189,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="n184 · 2026-10-16";
+var BUILD="n185 · 2026-10-16";
 var SKEY="niv-state-v1";
 var GKEY_STORE="niv-gkey";
 
@@ -3938,14 +3938,19 @@ function bgTutorText(bp,bq){
   }
   return q+" — "+out}
 function bgPass(){var pp=BGP.filter(function(p){return p.m===BG.module});return pp[BG.passage%pp.length]}
+/* סדר האפשרויות בשאלת בגרות (O-228). 0 = הנכונה, 1–3 = q.w[n-1].
+   ערבוב מזורע מהקטע ומהשאלה עצמם: קבוע לאותה שאלה (המסך מצויר מחדש
+   בכל לחיצה, והכפתורים לא יקפצו אחרי הבחירה), אבל אינו נגזר ממספר
+   השאלה — כך שאי אפשר לנחש את המקום לפי הסדר. */
+function bgOrder(p,q){return withSeed(hash32('bg|'+p.title+'|'+q.q),function(){return shuffle([0,1,2,3])})}
 function bgDraftKey(){return BG.prompt?BG.unit+':'+BG.prompt:BG.unit}
 function bgCount(){var s=(BG.drafts[bgDraftKey()]||'').trim();return s?s.split(/\s+/).length:0}
 function bgPage(){var h='<div class="wrap bgwrap">'+(window.TUTOR&&TUTOR.on()?'<div style="margin:12px 0"><button class="btn ghost" data-a="tutor">'+esc(TUTOR.label())+'</button></div>':'')+'<section class="card bgcard"><h2>'+esc(bgT('title'))+'</h2><p>'+esc(bgT('intro'))+'</p><p>'+esc((BGL[state.lang]||BGL.en)[6])+'</p></section><h3>'+esc(bgT('path'))+'</h3><div class="bgrow">';
 [3,4,5].forEach(function(u){h+='<button class="btn '+(BG.unit===u?'pri':'')+'" data-bg="unit" data-v="'+u+'" aria-pressed="'+(BG.unit===u)+'">'+esc(bgT('u'+u))+'</button>'});h+='</div><div class="bgrow">';
 bgMods().forEach(function(m){h+='<button class="btn '+(BG.module===m?'pri':'')+'" data-bg="module" data-v="'+m+'" aria-pressed="'+(BG.module===m)+'">Module '+m.toUpperCase()+'</button>'});h+='</div><p>'+esc(bgT('correct'))+': '+BG.correct+' '+esc(bgT('of'))+' '+BG.total+'</p>';
-var p=bgPass();if(p){var all=BGP.filter(function(item){return item.m===BG.module});h+='<section class="card bgcard"><h3>'+esc((BGL[state.lang]||BGL.en)[0])+'</h3><div class="bgrow">';all.forEach(function(item,i){h+='<button class="btn '+(i===BG.passage?'pri':'')+'" data-bg="passage" data-v="'+i+'" aria-pressed="'+(i===BG.passage)+'">'+(i+1)+'. '+esc(item.title)+'</button>'});h+='</div></section>';var q=p.questions[BG.q%p.questions.length],order=[2,0,3,1],shift=BG.q%4;
+var p=bgPass();if(p){var all=BGP.filter(function(item){return item.m===BG.module});h+='<section class="card bgcard"><h3>'+esc((BGL[state.lang]||BGL.en)[0])+'</h3><div class="bgrow">';all.forEach(function(item,i){h+='<button class="btn '+(i===BG.passage?'pri':'')+'" data-bg="passage" data-v="'+i+'" aria-pressed="'+(i===BG.passage)+'">'+(i+1)+'. '+esc(item.title)+'</button>'});h+='</div></section>';var q=p.questions[BG.q%p.questions.length],order=bgOrder(p,q);
 h+='<section class="card bgcard"><h3>'+esc(bgT('read'))+' · <span lang="en">'+esc(p.title)+'</span></h3><div class="bgrow"><button class="btn" data-bg="listen">'+esc(bgT('listen'))+'</button><button class="btn" data-bg="slow">'+esc(bgT('slow'))+'</button></div><p class="bgtext" lang="en" dir="ltr">'+esc(p.text)+'</p><h3>'+esc(bgT('q'))+' '+(BG.q+1)+' / '+p.questions.length+'</h3><p lang="en" dir="ltr">'+esc(q.q)+'</p><div class="bgoptions">';
-for(var i=0;i<4;i++){var n=order[(i+shift)%4];var otxt=n?q.w[n-1]:q.a;h+='<div class="bgrow" style="align-items:stretch"><button class="btn" lang="en" dir="ltr" data-bg="answer" data-v="'+n+'" '+(BG.done?'disabled':'')+' style="flex:1">'+esc(otxt)+'</button><button class="btn" data-bg="say" data-v="'+encodeURIComponent(otxt)+'" aria-label="'+esc(bgT('listen'))+'" style="flex:0 0 auto">&#128266;</button></div>'}h+='</div>';var bgh=BGH[q._hid]||{};var bghtxt=bgh[state.lang]||bgh.en||'';h+='<div style="margin-top:10px"><button class="btn" data-bg="hint" style="background:#b45309;border-color:#b45309;color:#fff;font-weight:700">&#128161; '+esc(bgT('hint'))+'</button><div class="bghint" hidden style="background:#fdf3e3;border:2px solid #b45309;border-radius:12px;padding:10px 14px;margin-top:8px;line-height:1.6">'+esc(bghtxt)+'</div></div>';
+for(var i=0;i<4;i++){var n=order[i];var otxt=n?q.w[n-1]:q.a;h+='<div class="bgrow" style="align-items:stretch"><button class="btn" lang="en" dir="ltr" data-bg="answer" data-v="'+n+'" '+(BG.done?'disabled':'')+' style="flex:1">'+esc(otxt)+'</button><button class="btn" data-bg="say" data-v="'+encodeURIComponent(otxt)+'" aria-label="'+esc(bgT('listen'))+'" style="flex:0 0 auto">&#128266;</button></div>'}h+='</div>';var bgh=BGH[q._hid]||{};var bghtxt=bgh[state.lang]||bgh.en||'';h+='<div style="margin-top:10px"><button class="btn" data-bg="hint" style="background:#b45309;border-color:#b45309;color:#fff;font-weight:700">&#128161; '+esc(bgT('hint'))+'</button><div class="bghint" hidden style="background:#fdf3e3;border:2px solid #b45309;border-radius:12px;padding:10px 14px;margin-top:8px;line-height:1.6">'+esc(bghtxt)+'</div></div>';
 if(BG.done)h+='<div class="bgfeedback" role="status"><strong>'+esc(bgT(BG.choice===0?'yes':'no'))+'</strong><p>'+esc(bgT('why'))+': <span lang="en" dir="ltr">'+esc(q.why)+'</span></p><button class="btn pri" data-bg="next">'+esc(bgT('next'))+'</button></div>';h+='</section>';
 }else h+='<section class="card bgcard"><p>'+esc(bgT('lit'))+'</p><p>'+esc((BGL[state.lang]||BGL.en)[3])+'</p><p>'+esc(((BGL[state.lang]||BGL.en)[4]||{})[BG.module]||'')+'</p></section>';
 h+='<section class="card bgcard"><h3>'+esc(bgT('sheet'))+'</h3><div class="bgvocab">';BGW.concat(BGWX[BG.module]||[]).forEach(function(w){var ix={he:1,ar:2,ru:3,en:0}[state.lang]||0;h+='<button class="bgword" data-bg="word" data-v="'+esc(w[0])+'"><b lang="en">'+esc(w[0])+'</b><span>'+esc(w[ix])+'</span></button>'});h+='</div></section>';if(BG.module==='e')h+='<p class="bgfeedback">'+esc((BGL[state.lang]||BGL.en)[5])+'</p>';
@@ -6239,7 +6244,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=n184-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=n185-pwa1").catch(function(){});
   });
 }
 </script>

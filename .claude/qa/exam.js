@@ -107,6 +107,46 @@ const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 �
     await page.waitForTimeout(200);
     const builtN=await page.evaluate(()=>EB.built?EB.built.q.length:0);
 
+    /* הקראה במבחן מהקישור — מערכת משוואות (O-177). המחולל כותב את
+       שתי המשוואות עם <br> ביניהן, ו-plainOf הופכת אותו לרווח. כפתור
+       ההקראה של התלמיד הקריא את q.say, ושם נשמע ״...שווה 2 מינוס 8
+       איקס...״ — שתי משוואות כמשפט אחד. הדרישה: בין סוף הראשונה לתחילת
+       השנייה, בטקסט ש-speak קיבל, יש סימן פיסוק שעוצר את הקול.
+       רק באפליקציה שיש בה speakMath ונושא שמפיק ביטוי עם <br>; בשאר
+       אין מה לבדוק, וזה מודפס ולא נבלע. */
+    let sys="—";
+    const sysCode=await page.evaluate(()=>{
+      if(typeof speakMath!=="function"||typeof TOPICS==="undefined")return null;
+      for(const t of TOPICS)for(let k=0;k<40;k++){
+        const s=exSlot(t.id,EB.level||2), q=exBuildSlot(s);
+        if(q&&String(q.expr||"").indexOf("<br>")>=0)
+          return encodeExam({v:GENV,t:"הקראה",s:1,l:EB.level||2,q:[s],r:true,f:true,w:true,m:0});
+      }
+      return null;
+    });
+    if(sysCode){
+      const sctx=await b.newContext({locale:"he-IL"});
+      const sp=await sctx.newPage();
+      sp.on("pageerror",e=>errs.push("student: "+String(e)));
+      await sp.route("**/*",r=>r.request().url().startsWith(BASE)?r.continue():r.abort());
+      await sp.goto(BASE+"/"+app+"/#x="+sysCode,{waitUntil:"domcontentloaded"});
+      await sp.waitForTimeout(700);
+      try{await sp.click("#lg-ok",{timeout:3000})}catch(e){}
+      await sp.click('[data-a="sitstart"]',{timeout:5000}).catch(()=>{});
+      await sp.waitForSelector('[data-a="sitread"]',{timeout:8000}).catch(()=>{});
+      await sp.evaluate(()=>{window.__said="";window.speak=function(t){window.__said=String(t||"")}});
+      await sp.click('[data-a="sitread"]',{timeout:3000}).catch(()=>{});
+      const v=await sp.evaluate(()=>{
+        const q=SIT.qs[SIT.i], parts=String(q.expr).split("<br>");
+        const a1=speakMath(plainOf(parts[0])).trim(), a2=speakMath(plainOf(parts[1])).trim();
+        const s=window.__said, i1=s.indexOf(a1), i2=s.indexOf(a2,i1<0?0:i1+a1.length);
+        return {said:s, ok:i1>=0&&i2>=0&&/[.?!:;]/.test(s.slice(i1+a1.length,i2))};
+      });
+      sys=v.ok?"מופרדת":"דבוקה";
+      if(!v.ok)errs.push("הקראת מערכת משוואות במבחן מהקישור דבוקה: «"+v.said.slice(0,160)+"»");
+      await sctx.close();
+    }
+
     const ok = r.seeded && r.decoded && r.sameAsStudent && r.legacyStable
             && r.rollSeedChanged && r.rollOthersSame
             && rows===10 && rowsAfterDel===9 && rowsAfterAdd===10
@@ -116,7 +156,7 @@ const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 �
       " slots="+r.n+" seeded="+r.seeded+" roll→"+JSON.stringify(r.changedByRoll)+
       " student="+r.studentN+"/"+r.sameAsStudent+" legacy="+r.legacyStable+
       " nulls="+r.nulls+" code="+r.urlLen+"/"+r.maxCode+
-      " ui="+rows+"→"+rowsAfterDel+"→"+rowsAfterAdd+" built="+builtN+" ans="+answers+
+      " ui="+rows+"→"+rowsAfterDel+"→"+rowsAfterAdd+" built="+builtN+" ans="+answers+" מערכת="+sys+
       (errs.length?"\n    JS: "+errs.slice(0,3).join(" | "):""));
     await page.close();
   }

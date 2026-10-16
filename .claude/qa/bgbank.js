@@ -31,6 +31,10 @@
    8. ההסבר (why) הוא משפט: עד 120 תווים, בלי סימני נוסחה — כמו
       clearwhy.js. נבדק על התוכן, לא בדפדפן.
    9. המניין: מדווח, ואינו מפיל — תוכן שגדל אינו באג.
+  10. מקום התשובה הנכונה אינו נגזר ממספר השאלה (O-228). הסדר נלקח
+      מ-bgOrder שבקובץ עצמו, ונבדק על כל 72 השאלות: לכל שארית של
+      מספר השאלה ב-4 — יותר ממקום אחד. בלי bgOrder ועם התבנית הישנה
+      (order=[…],shift=BG.q%4) הבדיקה מחשבת את הסדר הישן ונופלת עליו.
    ===================================================================== */
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -113,6 +117,36 @@ for (const m of MODS) {
 for (const q of LENGTH_BASELINE) if (!lenKnown.has(q))
   console.log(`· ״${q}״ — ברשימת קו הבסיס של סעיף 5 ואינה נופלת עוד (תוקנה או נמחקה); מחק אותה מ-LENGTH_BASELINE`);
 if (lenKnown.size) console.log(`· סעיף 5: ${lenKnown.size} שאלות מקו הבסיס — הנכונה ארוכה בבירור. ממצא תוכן פתוח (maayan), לא נכשל כאן`);
+
+/* סעיף 10 — מקום הנכונה לפי מספר השאלה (O-228). BG.q הוא מספר השאלה
+   בתוך הקטע, והוא מה שהממשק מציג. */
+let orderOf = null;
+const fo = src.match(/function bgOrder\(p,q\)\{[^\n]*\}/);
+if (fo) {
+  const lib = ['withSeed', 'hash32', 'shuffle'].map(n => {
+    const i = src.indexOf('function ' + n + '(');
+    if (i < 0) return '';
+    let d = 0, k = src.indexOf('{', i);
+    for (; k < src.length; k++) { if (src[k] === '{') d++; else if (src[k] === '}' && --d === 0) break; }
+    return src.slice(i, k + 1);
+  }).join('\n');
+  try { orderOf = vm.runInNewContext(lib + '\n' + fo[0] + ';bgOrder'); } catch (e) { bad.push('bgOrder אינה נטענת: ' + e.message); }
+  if ((src.match(/bgOrder\(/g) || []).length < 2) bad.push('bgOrder מוגדרת ואינה נקראת — המסך מסדר את האפשרויות בדרך אחרת');
+} else {
+  const old = src.match(/order=\[(\d),(\d),(\d),(\d)\],shift=BG\.q%4/);
+  if (old) { const ord = old.slice(1, 5).map(Number); orderOf = (p, q, j) => [0, 1, 2, 3].map(i => ord[(i + j % 4) % 4]); }
+  else bad.push('לא נמצא איך המסך מסדר את אפשרויות הבגרות (לא bgOrder ולא התבנית הישנה) — הבדיקה חייבת לזוז איתו');
+}
+if (orderOf) {
+  const byRes = [new Set(), new Set(), new Set(), new Set()], dist = [0, 0, 0, 0];
+  BGP.forEach(p => (p.questions || []).forEach((q, j) => {
+    const o = orderOf(p, q, j);
+    if (!Array.isArray(o) || o.slice().sort().join() !== '0,1,2,3') { bad.push(`${p.title} שאלה ${j + 1}: סדר האפשרויות אינו תמורה של 0–3 (${o})`); return; }
+    const pos = o.indexOf(0); dist[pos]++; byRes[j % 4].add(pos);
+  }));
+  console.log(`· סעיף 10: מקום הנכונה (1–4): ${dist.join(' / ')}`);
+  byRes.forEach((st, r) => { if (st.size === 1) bad.push(`מספר שאלה ≡${r} (mod 4): הנכונה תמיד במקום ${[...st][0] + 1} — אפשר לנחש לפי מספר השאלה`); });
+}
 
 for (const x of bad) console.log('✗ ' + x);
 console.log(`${bad.length ? '✗' : '✓'} BGP: ${BGP.length} קטעים, ${nQ} שאלות, מודולים ${MODS.map(m => m + ':' + (perMod[m] || (LIT[m] ? 'ספרות' : 0))).join(' ')} — ${bad.length} ממצאים`);

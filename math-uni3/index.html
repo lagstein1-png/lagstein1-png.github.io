@@ -1012,7 +1012,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g182 · 2026-10-16";
+var BUILD="g183 · 2026-10-16";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -6098,7 +6098,7 @@ function examAction(a,el){
   if(a==="sitfwd"){sitNext();return true}
   if(a==="sitgo"){sitGo(parseInt(el.getAttribute("data-i"),10));return true}
   if(a==="sitfinish"){sitFinish();return true}
-  if(a==="sitread"){var q2=SIT.qs[SIT.i];if(q2)speak(q2.say);return true}
+  if(a==="sitread"){var q2=SIT.qs[SIT.i];if(q2)speak(questionSay(q2));return true}
   if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
   if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
   if(a==="sitback"){view="sit";render();window.scrollTo(0,0);return true}
@@ -6301,18 +6301,26 @@ function goto(v){
   window.scrollTo(0,0);
   render();
 }
-function readQuestion(){
-  if(!P.q)return;
-  var body=P.q.expr;
+/* טקסט ההקראה של שאלה — מקור אחד לתרגול ולמבחן מהקישור (O-177).
+   המבחן הקריא עד כאן את q.say, ושם plainOf הופכת את ה-<br> שבין שתי
+   המשוואות של מערכת לרווח בלבד: ״...שווה שתיים מינוס שמונה איקס...״
+   נשמע כמשוואה אחת ארוכה. כאן כל משוואה מקבלת שם ונקודה, כמו בתרגול.
+   אותה פונקציה בדיוק יושבת ב-math-teen. */
+function questionSay(q){
+  if(!q)return "";
+  var body=q.expr;
   if(body&&body.indexOf("<br>")>=0){
     var eqs=body.split("<br>");
     body=eqs.map(function(e,i){return (i===0?_("משוואה ראשונה: "):_("משוואה שנייה: "))+speakMath(plainOf(e))}).join(". ");
   }else body=body?speakMath(plainOf(body)):"";
-  var head=speakProse(plainOf(P.q.ask)).replace(/\s+$/,"");
+  var head=speakProse(plainOf(q.ask)).replace(/\s+$/,"");
   var sep=/[.?!]$/.test(head)?" ":". ";
-  var txt=head+(body?sep+body:"")+
-    _f(". האפשרויות: {0}", P.q.options.map(function(o,i){return _f("אפשרות {0}. {1}", (i+1), speakMath(o.t))}).join(", "));
-  speak(txt);
+  return head+(body?sep+body:"")+
+    _f(". האפשרויות: {0}", (q.options||[]).map(function(o,i){return _f("אפשרות {0}. {1}", (i+1), speakMath(o.t))}).join(", "));
+}
+function readQuestion(){
+  if(!P.q)return;
+  speak(questionSay(P.q));
 }
 function readSteps(){
   if(!P.q)return;
@@ -12086,7 +12094,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g182-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g183-pwa1").catch(function(){});
   });
 }
 </script>
