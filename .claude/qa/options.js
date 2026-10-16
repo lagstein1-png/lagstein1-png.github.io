@@ -1,12 +1,13 @@
 const {chromium}=require('./pw.js');
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 (async()=>{
 let failed=0;   /* בלי זה הכלי מדפיס JS ERRORS ויוצא 0 */
  const b=await chromium.launch();
  for(const app of process.argv.slice(2)){
   const ctx=await b.newContext({locale:'he-IL'});const page=await ctx.newPage();
   const errs=[];page.on('pageerror',e=>errs.push(e.message));
-  await page.route('**/*',r=>r.request().url().startsWith('http://127.0.0.1:8099')?r.continue():r.abort());
-  await page.goto('http://127.0.0.1:8099/'+app+'/',{waitUntil:'domcontentloaded'});await page.waitForTimeout(900);
+  await page.route('**/*',r=>r.request().url().startsWith(BASE)?r.continue():r.abort());
+  await page.goto(BASE+'/'+app+'/',{waitUntil:'domcontentloaded'});await page.waitForTimeout(900);
   let r;try{r=await page.evaluate(()=>{
     const LV=[];for(let i=1;i<=((typeof LVL!=='undefined'&&LVL.length)||3);i++)LV.push(i);
     /* כמו ב-entropy.js: בלי המשמר הזה אפליקציה בלי מחולל זורקת

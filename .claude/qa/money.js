@@ -32,6 +32,16 @@
      3. אין מחרוזת מסחר ב-`DATA.STR` באף שפה
      4. אין סכום כסף בדף שהלומד רואה — ספרה צמודה ל-₪, ‎$‎ או ‎€‎
      5. אין תגית `description` שמבטיחה תשלום, ואין קישור קנייה
+     6. אין הבטחת תשלום בפרוזה של דף הבית (DATA.STR, DATA.APPS)
+     7. אין שדה הרשמה: `type="email"` באף מקום, ו-`type="password"` רק
+        בקוד המורה (te-pin, te-pin2) ובשדה מפתח הקול (gk)          — O-171
+     8. אין מילות הרשמה / חשבון משתמש / מנוי בארבע שפות בגוף הדפים  — O-171
+     9. אין סכום כסף צמוד להבטחת תשלום או ל״לחודש/לשנה״ בגוף הדפים  — O-196
+   בדיקות 8–9 רצות על כל .html/.js שהלומד טוען, ולכן הן פוגשות תוכן
+   לימודי אמיתי (״להירשם במשרד הפנים״, ״דמי מנוי 50 שקלים״ בבגרות 3).
+   אותו תוכן רשום ב-CONTENT למטה כמניין לכל קובץ, ומודפס בכל ריצה;
+   מניין שעלה הוא ממצא, ומניין שירד נופל עד שהבסיס מעודכן — כך שאין
+   ירוק שקט לשום כיוון.
    ===================================================================== */
 'use strict';
 const fs = require('fs');
@@ -159,11 +169,131 @@ for (const a of DATA.APPS)
   for (const field of ['n', 'd'])
     for (const [lg, v] of Object.entries(a[field] || {})) scan(`${a.id}.${field}.${lg}`, v);
 
+/* --- 7–9. גוף הדפים: טופס הרשמה, מילות הרשמה, וסכום שמבטיח תשלום ---
+   O-171 (7.10.2026): ״חשבון משתמש״ ו״הרשמה״ לא נאכפו כלל — טופס
+   <input type="email"><input type="password"> עם ״צור חשבון משתמש״
+   הוזרק לעץ נקי וחזר ✓. O-196: ״המנוי עולה 49 ₪ לחודש״ בגוף דף
+   אפליקציה חזר ✓, כי AMOUNT ו-PROMISE רצו על דף הבית בלבד.
+
+   מה נסרק: כל .html/.js בשורש ובכל תיקייה שהלומד מגיע אליה. מה לא:
+   כל תיקיית `data/`, כמו `lomda/data/` (בנקי תוכן — אוריינות פיננסית, מוחרג
+   מבנית ומתועד ב-O-171), `marketing/`, `promo/`, `docs/`,
+   `learning-core/`, `tutor-api/` (אינם דף שהלומד רואה), `vendor/`,
+   ו-`sw.js`. */
+const SKIP = new Set(['node_modules', 'vendor', 'audio', 'img', 'fonts', 'reports', 'docs',
+                      'marketing', 'promo', 'learning-core', 'tutor-api', 'data']);
+const BODY = [];
+(function walk(dir) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (e.name.startsWith('.') || SKIP.has(e.name)) continue;
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) walk(p);
+    else if (/\.(html|js)$/.test(e.name) && e.name !== 'sw.js') BODY.push(p);
+  }
+})(ROOT);
+if (BODY.length < 60) F(`נסרקו ${BODY.length} קבצים בלבד בגוף הדפים — הסריקה נשברה`);
+
+/* 7. טופס הרשמה. כל תגית <input — גם כשהיא בונה מחרוזת ב-JS. */
+const PW_OK = /\bid=["'](te-pin2?|gk)["']/;
+for (const p of BODY) {
+  const src = fs.readFileSync(p, 'utf8');
+  const rel = path.relative(ROOT, p);
+  for (const m of src.matchAll(/<input\b[^>]*/gi)) {
+    const tag = m[0].slice(0, 300);
+    const line = src.slice(0, m.index).split('\n').length;
+    if (/type\s*=\s*["']?email/i.test(tag)) F(`${rel}:${line} — שדה דוא״ל (type=email): אין חשבון משתמש ואין הרשמה`);
+    else if (/type\s*=\s*["']?[^>]{0,30}password/i.test(tag) && !PW_OK.test(tag))
+      F(`${rel}:${line} — שדה סיסמה שאינו קוד המורה או מפתח הקול: ${tag.slice(0, 70)}`);
+    if (/autocomplete\s*=\s*["']?(username|email|new-password|current-password)/i.test(tag))
+      F(`${rel}:${line} — autocomplete של חשבון משתמש`);
+  }
+  for (const m of src.matchAll(/(?:\.type\s*=|setAttribute\(\s*["']type["']\s*,)\s*["'](email|password)["']/g))
+    F(`${rel}:${src.slice(0, m.index).split('\n').length} — שדה ${m[1]} שנוצר ב-JS`);
+}
+
+/* 8. מילות הרשמה, חשבון ומנוי — בארבע שפות. שלילה לפני המילה מכשירה
+   (״בלי הרשמה״, ״без регистрации״, ״no sign-up״, ״بدون تسجيل الدخول״). */
+const SIGNUP = new RegExp([
+  'הרשמה', 'ההרשמה', 'להירשם', 'הירשמו', 'הירשם', 'הרשמו', 'צרו? חשבון', 'חשבון משתמש', 'פתיחת חשבון',
+  'פתחו? חשבון', 'התחברו? לחשבון', 'כניסה לחשבון', 'שם משתמש', 'למנוי', 'הצטרפו למנוי',
+  'sign[ -]?up', 'create (?:an |your )?account', 'user account', 'register (?:now|here|for|to)', 'registration',
+  'log ?in to your account', 'username', 'subscribe',
+  'إنشاء حساب', 'أنشئ حساب', 'حساب (?:ال)?مستخدم', 'تسجيل الدخول', 'سجّ?ل الدخول', 'اسم المستخدم', 'اشترك',
+  '(?<![а-яё])регистрац', 'зарегистр', 'создать аккаунт', 'создайте аккаунт', 'уч[её]тн(?:ая|ую|ой) запис',
+  'личный кабинет', 'войти в аккаунт', 'имя пользователя', '(?<![а-яё])подпиш'
+].join('|'), 'gi');
+const NEG2 = /(אין|ללא|בלי|לא|ולא|אין צורך ב|לא צריך|אין צורך)\s*$|(بلا|بدون|دون|لا|ولا|ليس)\s*$|(без|ни|не|нет)\s*$|(no|not|never|without|nor)\s+$/i;
+
+/* 9. סכום כסף שצמוד להבטחת תשלום, או ל״לחודש/לשנה״. */
+const AMT2 = /\d[\d,.]*\s*(?:₪|\$|€|ש["״]ח|שקל|NIS|ILS|shekel|шекел|شيكل|دولار|руб|dollars?)|[₪$€]\s*\d/gi;
+const PROMISE1 = new RegExp(PROMISE.source, 'i');
+const PER = /^\s*(?:ל?חודש|לשנה|בחודש|בשנה|per (?:month|year)|a month|a year|\/\s*(?:mo|month|yr|year)|في الشهر|شهري|سنوي|в месяц|в год|ежемесяч)/i;
+
+/* תוכן לימודי אמיתי שנמדד 16.10.2026 — מניין לכל קובץ. כל אחד נקרא
+   בעין: שאלות ומשפטי קריאה, לא ממשק. */
+const CONTENT = {
+  signup: {
+    'civics/index.html': [2, 'רישום נישואין בישראל — שאלת אזרחות (ru)'],
+    'english/index.html': [5, 'קטע קריאה ״A youth center tested online sign-up״'],
+    'geography/index.html': [4, 'חובת רישום של מהגר — שאלת הגירה בארבע שפות'],
+    'hebrew/app.js': [1, 'מסיח ״להירשם לשיעור״'],
+    'hebrew-arab/index.html': [4, 'מודעה במרכז הקהילתי — ״צריך להירשם מראש״'],
+    'kotvim/index.html': [1, 'משפט ״I will sign up again״'],
+    'teachers/index.html': [2, 'דף המורים: כניסה לאתר משרד החינוך (ar), ו״регистрация … не нужны״ (השלילה אחרי המילה)'],
+  },
+  amount: {
+    'math-elem/index.html': [2, 'שאלת מטבעות — ״משלמים בשקלים״ (ru/ar)'],
+    'math-teen/bagrut3.js': [5, 'בגרות 3 — דמי מנוי במכון כושר, שאלה והסבר'],
+    'motal/index.html': [6, 'החזר השקעה של מקרר ושל מערכת סולארית'],
+  },
+};
+const seen = { signup: {}, amount: {} };
+const hit = (kind, rel, line, ctx) => {
+  seen[kind][rel] = (seen[kind][rel] || 0) + 1;
+  (seen[kind]['@' + rel] = seen[kind]['@' + rel] || []).push(`${rel}:${line} ${JSON.stringify(ctx)}`);
+};
+for (const p of BODY) {
+  const src = fs.readFileSync(p, 'utf8');
+  const rel = path.relative(ROOT, p);
+  const lineOf = i => src.slice(0, i).split('\n').length;
+  let m;
+  SIGNUP.lastIndex = 0;
+  while ((m = SIGNUP.exec(src))) {
+    if (NEG2.test(src.slice(Math.max(0, m.index - 16), m.index))) continue;
+    hit('signup', rel, lineOf(m.index), src.slice(Math.max(0, m.index - 25), m.index + 30));
+  }
+  AMT2.lastIndex = 0;
+  while ((m = AMT2.exec(src))) {
+    const end = m.index + m[0].length;
+    const win = src.slice(Math.max(0, m.index - 40), end + 40);
+    const pm = win.match(PROMISE1);
+    const promised = pm && !NEG.test(win.slice(Math.max(0, pm.index - 14), pm.index));
+    if (PER.test(src.slice(end, end + 20)) || promised) hit('amount', rel, lineOf(m.index), win);
+  }
+}
+const LABEL = { signup: 'מילת הרשמה / חשבון / מנוי', amount: 'סכום כסף ליד הבטחת תשלום או ״לחודש״' };
+const known = [];
+for (const kind of ['signup', 'amount']) {
+  const files = new Set(Object.keys(seen[kind]).filter(k => k[0] !== '@').concat(Object.keys(CONTENT[kind])));
+  for (const rel of files) {
+    const got = seen[kind][rel] || 0;
+    const [want, why] = CONTENT[kind][rel] || [0, ''];
+    if (got === want) { if (got) known.push(`${rel} — ${LABEL[kind]} ×${got}: ${why}`); continue; }
+    if (got > want) {
+      F(`${rel} — ${LABEL[kind]}: ${got} מופעים, והתוכן הלימודי הרשום הוא ${want}`);
+      for (const l of seen[kind]['@' + rel] || []) fail.push('     ' + l.slice(0, 140));
+    } else {
+      F(`${rel} — ${LABEL[kind]}: ${got} מופעים, והבסיס הרשום ב-CONTENT הוא ${want}. התוכן השתנה — עדכן את המניין ב-money.js`);
+    }
+  }
+}
+
 /* --- דוח --- */
-console.log(`== אין מסחר · ${DATA.APPS.length} אפליקציות · ${PAGES.length} דפים נסרקו`);
+console.log(`== אין מסחר · ${DATA.APPS.length} אפליקציות · ${PAGES.length} דפים (meta) · ${BODY.length} קבצים (גוף הדף)`);
+for (const k of known) console.log('   · תוכן לימודי, ידוע: ' + k);
 if (fail.length) {
   console.log(`\n   FAIL (${fail.length}):`);
   for (const l of fail) console.log('   ✗ ' + l);
   process.exit(1);
 }
-console.log('   ✓ אין מחיר, אין דף קנייה, ואין הבטחת תשלום באף דף');
+console.log('   ✓ אין מחיר, אין דף קנייה, אין הבטחת תשלום, ואין הרשמה, חשבון משתמש או מנוי באף דף');

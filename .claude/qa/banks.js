@@ -55,8 +55,23 @@ for (const app of APPS) {
   const sw = fs.readFileSync(path.join(dir, 'sw.js'), 'utf8');
 
   /* --- 1+3. תגית לכל קובץ, וכולן לפני המנוע --- */
-  /* המנוע הוא הסקריפט הראשון שאין לו src. */
-  const engineAt = html.search(/<script>\s*\n/);
+  /* המנוע הוא הסקריפט הפנימי (בלי src) שקורא את window.BANKS — עוגן
+     ממשי, ולא ״הסקריפט הפנימי הראשון״. O-170, 16.10.2026: הזיהוי הישן,
+     html.search(/<script>\s*\n/), תפס את הבלוק הראשון — שאינו בהכרח
+     המנוע — ופירמוט מחדש (קוד באותה שורה כמו <script>) החזיר -1, ואז
+     `engineAt >= 0 &&` כיבה את בדיקת הסדר והכלי החזיר ✓. עכשיו: לא
+     נמצא מנוע — נופלים. */
+  let engineAt = -1;
+  {
+    const blk = /<script(\s[^>]*)?>([\s\S]*?)<\/script>/g;
+    let bm;
+    while ((bm = blk.exec(html))) {
+      if (/\ssrc\s*=/.test(bm[1] || '')) continue;
+      if (/\bwindow\.BANKS\b/.test(bm[2].replace(/\/\*[\s\S]*?\*\//g, ''))) { engineAt = bm.index; break; }
+    }
+  }
+  if (engineAt < 0)
+    bad(`${app}: לא נמצא סקריפט פנימי שקורא את window.BANKS — אי אפשר לבדוק שהמאגרים נטענים לפני המנוע`);
   for (const f of files) {
     const at = html.indexOf(`<script src="data/${f}"`);
     if (at < 0) { bad(`${app}: אין תגית <script src="data/${f}"> ב-index.html`); continue; }

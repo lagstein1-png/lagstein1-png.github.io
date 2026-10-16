@@ -47,7 +47,7 @@
 
 const { chromium } = require('./pw.js');
 
-const BASE = process.env.QA_BASE || 'http://127.0.0.1:8099';
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 const PER_CELL = Number(process.env.QA_N || 4);
 const MAXLEN = Number(process.env.QA_WHYLEN || 120);
 

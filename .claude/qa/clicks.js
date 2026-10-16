@@ -12,7 +12,7 @@
    ===================================================================== */
 'use strict';
 const { chromium } = require('./pw.js');
-const BASE = 'http://127.0.0.1:8099';
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
               'english', 'history', 'ulpan', 'lomda', 'kotvim', 'reader', 'bagrut-806'];
 /* שלוש בלי שליח [data-a] אחיד (O-28): איפה נתפסת האמירה, ועל מה לוחצים.

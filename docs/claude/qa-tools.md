@@ -5,7 +5,7 @@
 
 ## כלי בדיקה
 
-    node .claude/qa/serve.js                 # שרת מקומי על 127.0.0.1:8099
+    node .claude/qa/serve.js                 # שרת מקומי על 127.0.0.1:8099; QA_PORT=8123 — ריצה שנייה במקביל (כל הכלים קוראים port.js)
     node .claude/qa/smoke.js math-app        # דפדפן אמיתי, בודק שגיאות JS
     node .claude/qa/parse.js                 # תקינות פרסינג
     node .claude/qa/entropy.js               # תשובה קבועה / כפילויות
@@ -17,7 +17,7 @@
     node .claude/qa/pressed.js               # כפתור דו־מצבי בלי aria-pressed — קורא מסך אינו יודע מה נבחר
     node .claude/qa/density.js               # כמה שאלות בכל תא נושא×רמה — ראצ׳ט מול בסיס, התקן 9
     node .claude/qa/cache.js                 # חמש בדיקות על שלושה־עשר ה-sw.js
-    node .claude/qa/storage.js               # מפתח localStorage אחד לאפליקציה אחת
+    node .claude/qa/storage.js               # מפתח localStorage אחד לאפליקציה אחת — כל .html/.js בתיקייה, var/let/const, KEY לבדו (O-194)
     node .claude/qa/say.js                   # ההקראה לא מסגירה את התשובה לפני שעונים
     node .claude/qa/spacesay.js              # אותה דליפה, סטטית, בכל האפליקציות; וגם רווח/Enter על כפתור ממוקד שיורה פעמיים
     node .claude/qa/barcontrast.js           # ניגודיות ארבעת הפקדים בפס הכותרת — בחישוב, בלי דפדפן
@@ -29,11 +29,13 @@
     node .claude/qa/fonts.js                 # ערבית ורוסית בגופן שיש בו את הכתב
     node .claude/qa/langbtn.js               # כפתור השפה עצמו — "العربية" גם כשהממשק עברי
     node .claude/qa/teen-i18n.js             # ״שלב״ בארבע שפות בפועל — המסך, ההקראה, והרווח לפני מספר; בדפדפן
-    node .claude/qa/banks.js                 # החיווט של lomda/data/, וארבע השפות בתוכן
+    node .claude/qa/banks.js                 # החיווט של lomda/data/, וארבע השפות בתוכן; מנוע שלא זוהה (window.BANKS) — נופל (O-170)
     node .claude/qa/kotvim.js                # התוכן של ״כותבים ביחד״ — ארבע שפות, ואין קטע גנרי
     node .claude/qa/geobank.js               # המחסן של geography-elem — מבנה, שפות, רמז שמסגיר, אורך שמסגיר, ≥13 בתא
+    node .claude/qa/bgbank.js                # מסלול הבגרות של english (BGP) — מבנה, אנגלית בלבד, אורך שמסגיר (קו בסיס), מודול ריק
     node .claude/qa/leaks.js                 # תיאור של פריט בלומדה אינו מצטט את כותרתו (ההקראה לא מסגירה)
     node .claude/qa/markers.js               # סמני התנגשות מיזוג שנשארו בקובץ שנעקב
+    node .claude/qa/port.js --check          # אין כלי שמקודד 127.0.0.1:8099 — הפורט מ-QA_PORT (ברירת מחדל 8099), דרך port.js
     node .claude/qa/guide.js                 # שם כפתור שהמדריך מבטיח, וכבר אינו בממשק
     node .claude/qa/hebrew.js                # העברית של לימור — תרגום מילולי בשלושת קובצי הלקוח
     node .claude/qa/langretry.mjs            # הניסיון החוזר — handleAsk עם fetch מוזרק, שלושה מצבים
@@ -43,7 +45,7 @@
     node .claude/qa/joshstate.js             # גלאי מצב הלומד — 17 תרחישים ב-vm נפרד, וארבע נגיעות החיווט בתשע אפליקציות
     node .claude/qa/search.js                # חוזה ספק החיפוש — אין ספק, ואין ניסוח שמתיימר לבדוק
     node .claude/qa/claims.js                # חמש הטענות האסורות בשיווק — שלוש בגרפ, ושתיים שהפקודה מריצה
-    node .claude/qa/money.js                 # אין מסחר: לא מחיר, לא דף קנייה, ולא הבטחת תשלום באף דף
+    node .claude/qa/money.js                 # אין מסחר: לא מחיר, לא דף קנייה, לא הבטחת תשלום, ולא הרשמה/חשבון/מנוי — גם בגוף כל דף (O-171, O-196)
     node .claude/qa/letters.js               # אורך המכתב שהכותרת מבטיחה, מול המכתב עצמו
     node .claude/qa/skill.js                 # דף בניית האפליקציה — אות BUILD, שער השלבים, וטענת מספר־שורה
     node .claude/qa/srt.js                   # הכתוביות מול טבלאות התסריטים (המחולל: marketing/make-srt.js)
@@ -51,7 +53,7 @@
     node .claude/qa/galileo.js               # רקיע — המנוע האסטרונומי מול Swiss Ephemeris, סטייה מרבית לכל גוף
     node .claude/qa/rakia-content.js         # רקיע — 469 הטקסטים: מניין, מבנה {he}, אורך, ייחוד, והמילון
     node .claude/qa/rakia-safety.js          # רקיע — מה שאסור לטקסט לומר: רפואה, כסף, משפט, מוות, נבואה, ודאות, מגדר
-    node .claude/qa/deps.js                  # רקיע — אפס תלות בזמן ריצה, וכל סקריפט מקומי גם ב-PRE
+    node .claude/qa/deps.js                  # כל הדפים (בלי ארגומנט) — אפס תלות בזמן ריצה, וכל סקריפט מקומי גם ב-PRE; KNOWN מודפס (O-166)
     node .claude/qa/rakia/mk-ephem.js --check    # טבלאות האפמריס לא נערכו ביד (המחולל: אותו קובץ עם נתיב astronomia)
     node .claude/qa/rakia/mk-places.js --check   # places.js לא נערך ביד (המחולל: אותו קובץ עם all-the-cities ו-tz-lookup)
     node .claude/qa/wix.js                   # כרטיסי האפליקציות ל-wix-content.md
@@ -65,8 +67,8 @@
     node .claude/qa/apps.js              # שבעת המקומות שאפליקציה חדשה נוגעת בהם — האם כולם עודכנו
     node .claude/qa/status.js --check    # STATUS.md מול המדידה — הטבלה לא נכתבת ביד
     node .claude/qa/sitemap.js --check   # sitemap.xml מול stages.json, noindex ו-git (המחולל: אותו קובץ בלי --check)
-    node .claude/qa/pure.js              # המבחן הכיתתי: כל קריאה ל-buildQuestion מתוך buildQ מעבירה pure=true
-    node .claude/qa/i18n.js              # האוניברסיטה — כל _("…") מפתח ב-TR_KEYS, וכל מפתח מתורגם
+    node .claude/qa/pure.js              # המבחן הכיתתי: כל קריאה ל-buildQuestion מתוך buildQ מעבירה pure=true — בכל אפליקציה עם chooseIndex (O-184)
+    node .claude/qa/i18n.js              # המחרוזת העברית היא המפתח — TR_KEYS (_("…") ו-_('…'), כל מפתח מתורגם, ותרגום שזז ממפתח אחר מול HEAD) ומילונים לפי מפתח עברי (reader/TR, rakia/EN_DICT)
     node .claude/qa/agents.js            # סוכן אינו קורא לסוכן — אין כלי סוכנים בשורת tools ואין הבטחה כזאת
     node .claude/qa/century.js           # המאה בארבע השפות — על הפונקציה האמיתית שבאפליקציה
     node .claude/qa/content806.js        # סריקת התוכן של bagrut-806 (הבנק הסטטי) — כותב את הדוח. שם אפליקציה כארגומנט: bagrut-history
@@ -91,7 +93,7 @@
     node .claude/qa/voice.js             # מנוע ההקראה מול speechSynthesis מזויף — ארבעת המנגנונים מתאוששים; ופס ״אין קול בשפה״ (O-79): קולות en בלבד → פס פעם אחת, he → אין, ריקה → אין. `--nolang` מריץ רק אותו
     node .claude/qa/netpin.js            # מנגנון 4 מול בחירת קול ידנית — tutor/tutor.js
     node .claude/qa/exam.js              # המבחן מהקישור — השאלה שהמורה רואה היא שהתלמיד מקבל
-    node .claude/qa/recorded.js          # השכבה המוקלטת — המודול והחיווט; עם --browser גם הניגון בדפדפן
+    node .claude/qa/recorded.js          # השכבה המוקלטת — המודול והחיווט בכל אפליקציה ב-stages.json, גם js/speech.js (O-165); עם --browser גם הניגון בדפדפן
     node .claude/qa/record.js --check    # ההקלטות מול המניפסט — המחולל: אותו קובץ (record.yml מריץ אותו כל בוקר)
     node .claude/qa/record-safety.js     # ההקלטה אינה מוחקת, אינה ננעלת ואינה נופלת על gcloud — ffmpeg/ffprobe/fetch מדומים
     node .claude/qa/audio-size.js            # תקרת שני מאגרי הקול, ומתג המקור מול 41 קובצי sw.js
@@ -99,7 +101,7 @@
     node .claude/qa/audio-adopt.js           # קליפ שכבר שולם עליו לא מוקלט שוב — מאמץ בין אפליקציות
     node .claude/qa/findings.js --check  # FINDINGS.md מחזיק שבוע, הישן בארכיון — --archive מעביר (O-85)
     node .claude/qa/suite.js --check     # הרשימה הזאת מול SUITE שב-all.js — מזהה חסר או שורה מתה נופלים
-    node .claude/qa/all.js                   # הכול, ופסק דין אחד
+    node .claude/qa/all.js                   # הכול, ופסק דין אחד; רשימות האפליקציות נגזרות מ-stages.json (applist.js)
     node .claude/qa/all.js --static          # רק מה שאינו דורש דפדפן
     node .claude/qa/extract.js /tmp/js …     # מחלץ סקריפטים ל-eslint
 

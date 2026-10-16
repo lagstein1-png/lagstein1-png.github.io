@@ -332,22 +332,48 @@ var ASTRO = (function () {
   }
 
   /* ---------- זמן מקומי → UT דרך Intl ---------- */
+  /* הקיזוז בדקות, עד השנייה: לפני תקן אזורי הזמן נהג זמן מקומי ממוצע עם
+     שניות (ירושלים עד 1917 +2:20:40, מונרוביה עד 1971 −0:44:30). עיגול לדקה
+     הזיז את הרגע עד 30 שניות. לכן התוצאה יכולה להיות שבר — 140.6667. */
   function tzOffsetMinutes(tz, utcMs) {
+    utcMs = Math.floor(utcMs / 1000) * 1000;   /* Intl מציג שניות שלמות; אלפיות היו נספרות כהפרש */
     var f = new Intl.DateTimeFormat("en-US", { timeZone: tz, hour12: false, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" });
     var p = {}, parts = f.formatToParts(new Date(utcMs));
     for (var i = 0; i < parts.length; i++) p[parts[i].type] = parts[i].value;
     var h = +p.hour; if (h === 24) h = 0;   /* Chrome ישן מחזיר "24" בחצות */
     var asUtc = Date.UTC(+p.year, +p.month - 1, +p.day, h, +p.minute, +p.second);
-    return Math.round((asUtc - utcMs) / 60000);
+    return Math.round((asUtc - utcMs) / 1000) / 60;
   }
-  /* מחזיר {utcMs, offsetMinutes}. שני סיבובים: הקיזוז תלוי ברגע, והרגע תלוי בקיזוז */
+  /* מחזיר {utcMs, offsetMinutes, status, local, shiftMinutes}.
+     O-175: שעה מקומית אינה תמיד רגע אחד. ביום מעבר שעון הקיץ יש שעה
+     שלא הייתה (״חור״) ושעה שהייתה פעמיים (״כפולה״). לא מנחשים בשקט:
+       status "ok"        — רגע אחד בדיוק.
+       status "gap"       — השעה לא התקיימה. מחשבים בקיזוז שלפני הקפיצה,
+                            כלומר השעון ״ממשיך קדימה״ (02:30 → 03:30);
+                            local = השעה בשעון באותו רגע, shiftMinutes = גודל הקפיצה.
+       status "ambiguous" — השעה הייתה פעמיים. מחשבים למופע הראשון;
+                            shiftMinutes = המרחק עד המופע השני.
+     offsetMinutes הוא תמיד הקיזוז שבתוקף ב-utcMs, כך ש-utcMs + offsetMinutes
+     הוא השעה בשעון. הממשק מציג הערה ב-gap וב-ambiguous. נבדק ב-galileo.js. */
   function localToUtc(y, m, d, hh, mi, tz) {
     var guess = Date.UTC(y, m - 1, d, hh, mi);
     if (y < 100) { var dt = new Date(guess); dt.setUTCFullYear(y); guess = dt.getTime(); }
-    var off = tzOffsetMinutes(tz, guess), utc = guess - off * 60000;
-    var off2 = tzOffsetMinutes(tz, utc);
-    if (off2 !== off) { utc = guess - off2 * 60000; off = off2; }
-    return { utcMs: utc, offsetMinutes: off };
+    var DAY = 86400000, before = tzOffsetMinutes(tz, guess - DAY), after = tzOffsetMinutes(tz, guess + DAY);
+    var cands = [before, tzOffsetMinutes(tz, guess), after], seen = {}, ok = [], i;
+    for (i = 0; i < cands.length; i++) {
+      if (seen[cands[i]]) continue; seen[cands[i]] = 1;
+      var u = guess - Math.round(cands[i] * 60000);
+      if (tzOffsetMinutes(tz, u) === cands[i]) ok.push({ utc: u, off: cands[i] });
+    }
+    ok.sort(function (a, b) { return a.utc - b.utc; });
+    var utc, off, status, shift = 0;
+    if (ok.length === 1) { utc = ok[0].utc; off = ok[0].off; status = "ok"; }
+    else if (ok.length > 1) { utc = ok[0].utc; off = ok[0].off; status = "ambiguous"; shift = Math.round((ok[ok.length - 1].utc - utc) / 60000); }
+    else { utc = guess - Math.round(before * 60000); off = tzOffsetMinutes(tz, utc); status = "gap"; shift = Math.round(off - before); }
+    var loc = new Date(utc + Math.round(off * 60000));
+    function two(n) { return (n < 10 ? "0" : "") + n; }
+    return { utcMs: utc, offsetMinutes: off, status: status, shiftMinutes: shift,
+             local: two(loc.getUTCHours()) + ":" + two(loc.getUTCMinutes()) };
   }
   /* O-2: האם ה-Intl של המכשיר הזה יודע אזורי זמן והיסטוריית שעון קיץ.
      שלוש עובדות ידועות; כישלון באחת — המכשיר לא אמין, והממשק מציע קיזוז ידני. */

@@ -14,6 +14,11 @@ name: live-check
 
 on:
   workflow_dispatch:
+  # O-192: דחיפות של github-actions[bot] (record.yml) אינן מפעילות את
+  # הסוויטה, ולכן גם אינן מפעילות שום בדיקה של מה שמוגש. ריצה יומית
+  # תופסת פריסה שמפגרת גם כשאיש לא לחץ.
+  schedule:
+    - cron: '17 4 * * *'
 
 permissions:
   contents: read
@@ -39,7 +44,10 @@ jobs:
           # כך הבדיקה נכונה גם כש-CNAME מוסר זמנית עד שה-DNS מוכן.
           DOMAIN=bekol.co.il
           if [ -s CNAME ]; then BASE="https://$(tr -d '[:space:]' < CNAME)"; else BASE=https://lagstein1-png.github.io; fi
-          APPS="math-app math-teen math-uni math-uni2 math-uni3 english ulpan history lomda kotvim reader bagrut-806"
+          # O-192: הרשימה נגזרת מ-stages.json (public, עם תיקייה בעץ) ולא
+          # כתובה ביד — רשימה ביד הייתה 12 כשהאתר הגיע ל-40.
+          APPS=$(node -e 'const s=require("./.claude/qa/stages.json");const fs=require("fs");console.log(Object.entries(s.apps).filter(([k,v])=>v&&v.stage==="public"&&fs.existsSync(k+"/index.html")).map(([k])=>k).join(" "))')
+          echo "אפליקציות ציבוריות (stages.json): $APPS"
           FAIL=0
           # HTTP 000 על הכול יכול להיות DNS שלא הופנה, או תעודה שעוד לא
           # הונפקה. השורות האלה מבדילות: אין כתובת = DNS; יש כתובת = תעודה.
@@ -65,16 +73,23 @@ jobs:
             CODE=$(curl -s -o /tmp/p.html -w '%{http_code}' --max-time 30 \
                    -H 'Cache-Control: no-cache' "$BASE/$app/?cb=$GITHUB_RUN_ID")
 
-            if grep -q 'כל האפליקציות' /tmp/p.html; then LINK="✓"; else LINK="✗"; FAIL=1; fi
+            # קישור לבית נבדק רק כשהוא כתוב בדף שבעץ. חלק מהאפליקציות
+            # בונות אותו בזמן ריצה, ושם אין מה להשוות ב-HTML הגולמי.
+            if grep -q 'כל האפליקציות' "$app/index.html"; then
+              if grep -q 'כל האפליקציות' /tmp/p.html; then LINK="✓"; else LINK="✗"; FAIL=1; fi
+            else LINK="–"; fi
 
             # המפתח שמוגש בפועל מול המפתח שבעץ
+            # המפתח יושב ב-index.html, או ב-app.js / js/app.js באפליקציות הרב־קובציות
             SRC=$app/index.html
-            [ "$app" = "bagrut-806" ] && SRC=$app/app.js
+            for c in $app/index.html $app/app.js $app/js/app.js; do
+              if [ -f "$c" ] && grep -q 'sw\.js?v=' "$c"; then SRC=$c; break; fi
+            done
             WANT=$(grep -o 'sw\.js?v=[a-z0-9-]*' "$SRC" 2>/dev/null | head -1 | sed 's/.*v=//' || true)
             GOT=$(grep -o 'sw\.js?v=[a-z0-9-]*' /tmp/p.html 2>/dev/null | head -1 | sed 's/.*v=//' || true)
-            # ב-bagrut-806 המפתח יושב ב-app.js ולא בדף
-            if [ -z "$GOT" ] && [ "$app" = "bagrut-806" ]; then
-              curl -s --max-time 30 "$BASE/$app/app.js?cb=$GITHUB_RUN_ID" -o /tmp/a.js
+            # כשהמפתח אינו בדף — מורידים את הקובץ שבו הוא יושב בעץ
+            if [ -z "$GOT" ] && [ "$SRC" != "$app/index.html" ]; then
+              curl -s --max-time 30 "$BASE/$SRC?cb=$GITHUB_RUN_ID" -o /tmp/a.js
               GOT=$(grep -o 'sw\.js?v=[a-z0-9-]*' /tmp/a.js 2>/dev/null | head -1 | sed 's/.*v=//' || true)
             fi
 

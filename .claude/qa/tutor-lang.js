@@ -32,7 +32,7 @@
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('./pw.js');
-const BASE = 'http://127.0.0.1:8099';
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 const ROOT = path.resolve(__dirname, '..', '..');
 const REG = JSON.parse(fs.readFileSync(path.join(__dirname, 'stages.json'), 'utf8'));
 

@@ -36,7 +36,7 @@
 const { chromium } = require('./pw.js');
 const fs = require('fs'), path = require('path');
 
-const BASE = 'http://127.0.0.1:8099';
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 
 /* גרסת התנאים נגזרת מ-`legal/terms.js` ואינה קבועה כאן. היא עולה
    מ-1.0 ל-1.1 ברגע שכתובת השרת של הבוט מולאה (`enable-tutor.js`),

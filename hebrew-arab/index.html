@@ -1333,8 +1333,8 @@ function bestVoice(code){
   if(explicit&&(!pin||pin.request!==request)){ pins[key]={v:explicit,g:vGender(explicit),request:request}; return explicit; }
   if(pin){
     var live=pool.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
-    if(live&&(live.localService!==false||navigator.onLine!==false))return live;
-    var same=pool.filter(function(v){return vGender(v)===pin.g&&(v.localService!==false||navigator.onLine!==false)});
+    if(live&&voiceUsable(live))return live;
+    var same=pool.filter(function(v){return vGender(v)===pin.g&&voiceUsable(v)});
     if(!same.length)return pin.v;
     pool=same;
   }else{
@@ -1348,6 +1348,10 @@ function bestVoice(code){
     if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
     if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
     if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    /* קול רשת — הנוירליים של Edge הם כאלה — נשמע טוב יותר כשיש
+       רשת, וזה כל מה שנקבע כאן. מה קורה כשאין רשת נקבע ב-voiceUsable,
+       שהוא מיון קודם: קנס בתוך הניקוד לא הצליח להתגבר על שם היצרן. */
+    if(v.localService===false&&voiceUsable(v))s+=6;
     if(/espeak|compact|pico/.test(n))s-=40;
     if(v.default)s+=4;
     return s;
@@ -1359,13 +1363,21 @@ function bestVoice(code){
      ובתוך כל קבוצה מכריעה האיכות. */
   function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
   var chosen=pool.slice().sort(function(a,b){
-    var d=grank(b)-grank(a); return d||score(b)-score(a);
+    /* קול שלא יעבוד יורד לתחתית לפני כל שיקול אחר — גם לפני המגדר,
+       שאם לא כן קול נשי מת מנצח קול גברי חי. */
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||score(b)-score(a);
   })[0];
   if(chosen)pins[key]={v:chosen,g:vGender(chosen),request:request};
   return chosen;
 }
-/* הקול הנדרש הוא של שפת הממשק: כאן החומר עצמו נלמד בשפת האם. */
-function hasLangVoice(){return voicesFor(LANGS[state.lang].tts).length>0}
+/* כאן החומר הנלמד הוא עברית בכל שפת ממשק (O-164): קטע הקריאה,
+   המילים והאפשרויות נאמרים בקול עברי, וההוראות בקול שפת הממשק.
+   לכן צריך את שניהם — חסר אחד מהם, והפס אומר זאת. מסך הקול מציג
+   את שתי הרשימות, ושם רואים איזו מהן ריקה. */
+function hasLangVoice(){
+  return voicesFor(LANGS.he.tts).length>0&&voicesFor(LANGS[state.lang].tts).length>0;
+}
 
 /* --- מצב הקול, כפי שהוא מוצג למשתמש --- */
 function voiceStatus(){
@@ -1519,12 +1531,54 @@ function hlAt(c){
    הגיע מהמערכת. שגיאה שנבלעת עולה יום של חיפוש.
    ------------------------------------------------------------ */
 var TTSMSG={
-  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה"},
-  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق"},
-  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть"},
-  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close"}
+  he:{dir:"rtl",msg:"מנוע הדיבור של המכשיר לא הצליח להקריא",tail:". זו תקלה במכשיר, לא באפליקציה. ",link:"בדיקה והוראות תיקון",close:"סגירה",noLang:"במכשיר אין קול בשפה הזאת, ולכן ההקראה תישמע בקול של שפה אחרת או תשתוק. זו הגדרה במכשיר, לא באפליקציה."},
+  ar:{dir:"rtl",msg:"لم ينجح محرّك النطق في الجهاز في القراءة",tail:". هذا عطل في الجهاز، لا في التطبيق. ",link:"فحص وتعليمات إصلاح",close:"إغلاق",noLang:"لا يوجد في الجهاز صوت بهذه اللغة، لذلك ستُسمَع القراءة بصوت لغة أخرى أو تصمت. هذا إعداد في الجهاز، لا في التطبيق."},
+  ru:{dir:"ltr",msg:"Синтезатор речи устройства не смог прочитать текст",tail:". Это неполадка устройства, а не приложения. ",link:"Проверка и как исправить",close:"Закрыть",noLang:"На устройстве нет голоса для этого языка, поэтому чтение прозвучит голосом другого языка или будет молчать. Это настройка устройства, а не приложения."},
+  en:{dir:"ltr",msg:"The device speech engine could not read the text",tail:". This is a device fault, not an app fault. ",link:"Check it and how to fix it",close:"Close",noLang:"This device has no voice for this language, so reading will use another language's voice or stay silent. This is a device setting, not the app."}
 };
 var _ttsBar=null;
+/* יש קולות במכשיר, אבל אף אחד בשפת ההקראה — והחומר כאן עברי, גם
+   כשהממשק ערבי (O-164). bestVoice מחזיר null וההקראה יוצאת עם u.lang
+   בלבד: הדפדפן בוחר קול של שפה אחרת או שותק, בלי מילה, ו-onerror
+   אינו נורה. הפס מוסבר פעם אחת לכל שפה בביקור, ואינו מוסר בסוף
+   האמירה: אמירה שיצאה בקול הלא נכון אינה "מצב שהשתנה". הועתק מ-ulpan. */
+var _noLangSeen={};
+function ttsNoLang(code){
+  var k=String(code||"").split("-")[0].toLowerCase()||"?";
+  if(_noLangSeen[k])return; _noLangSeen[k]=true;
+  if(_ttsBar)return;
+  var TT=ttsMsgs();
+  /* כאן יש שתי שפות הקראה, ולכן אומרים איזו חסרה — בשם שלה */
+  var nm=LANGS[k]?' (<span lang="'+k+'" dir="'+LANGS[k].dir+'">'+LANGS[k].name+'</span>)':"";
+  ttsBar("nolang",TT.noLang+nm+' <a href="/voice/" style="color:#fff">'+TT.link+'</a>');
+}
+function ttsMsgs(){
+  var _g="he"; try{_g=state.lang||"he"}catch(e){} if(!TTSMSG[_g])_g="he";
+  return TTSMSG[_g];
+}
+function ttsBar(kind,html){
+  var TT=ttsMsgs();
+  var m=document.createElement("div");
+  m.setAttribute("role","alert");
+  m.id="tts-fail";
+  m.setAttribute("data-kind",kind);
+  m.dir=TT.dir;
+  m.style.cssText="position:fixed;inset-inline:10px;bottom:10px;z-index:99999;"+
+    "background:#7f1d1d;color:#fff;padding:13px 15px;border-radius:12px;"+
+    "font:600 15px/1.55 system-ui,Arial,sans-serif;box-shadow:0 10px 34px rgba(0,0,0,.45);"+
+    "display:flex;gap:10px;align-items:flex-start";
+  var t=document.createElement("div");
+  t.style.cssText="flex:1;min-width:0";
+  t.innerHTML=html;
+  var x=document.createElement("button");
+  x.type="button"; x.textContent="✕"; x.setAttribute("aria-label",TT.close);
+  x.style.cssText="min-width:44px;min-height:44px;border:0;border-radius:9px;"+
+    "background:rgba(255,255,255,.16);color:#fff;font-size:16px;cursor:pointer";
+  x.onclick=ttsBarHide;
+  m.appendChild(t); m.appendChild(x);
+  document.body.appendChild(m); _ttsBar=m;
+}
+function ttsBarHide(){ if(_ttsBar&&_ttsBar.parentNode)_ttsBar.parentNode.removeChild(_ttsBar); _ttsBar=null }
 function ttsFail(err){
   /* "interrupted" ו-"canceled" אינן תקלות: זה מה שהמנוע מדווח על
      אמירה שבוטלה כדי לפנות מקום לאמירה הבאה — כלומר מהלך תקין
@@ -1535,33 +1589,86 @@ function ttsFail(err){
      שלה, וניקוי כאן מחק אותה מיד. */
   if(err==="interrupted"||err==="canceled")return;
   try{ hlClear() }catch(e){}
+  /* תקלה אמיתית גוברת על פס "אין קול בשפה" — הוא מוסר והתקלה מוצגת */
+  if(_ttsBar&&_ttsBar.getAttribute("data-kind")==="nolang")ttsBarHide();
   if(_ttsBar)return;
-  var _g="he"; try{_g=state.lang||"he"}catch(e){} if(!TTSMSG[_g])_g="he";
-  var TT=TTSMSG[_g];
-  var m=document.createElement("div");
-  m.setAttribute("role","alert");
-  m.id="tts-fail";
-  m.dir=TT.dir;
-  m.style.cssText="position:fixed;inset-inline:10px;bottom:10px;z-index:99999;"+
-    "background:#7f1d1d;color:#fff;padding:13px 15px;border-radius:12px;"+
-    "font:600 15px/1.55 system-ui,Arial,sans-serif;box-shadow:0 10px 34px rgba(0,0,0,.45);"+
-    "display:flex;gap:10px;align-items:flex-start";
-  var t=document.createElement("div");
-  t.style.cssText="flex:1;min-width:0";
-  t.innerHTML=TT.msg+
+  var TT=ttsMsgs();
+  ttsBar("fail",TT.msg+
     (err?" <span dir=ltr>("+String(err)+")</span>":"")+
     TT.tail+
-    '<a href="/voice/" style="color:#fff">'+TT.link+'</a>';
-  var x=document.createElement("button");
-  x.type="button"; x.textContent="✕"; x.setAttribute("aria-label",TT.close);
-  x.style.cssText="min-width:44px;min-height:44px;border:0;border-radius:9px;"+
-    "background:rgba(255,255,255,.16);color:#fff;font-size:16px;cursor:pointer";
-  x.onclick=function(){ if(_ttsBar&&_ttsBar.parentNode)_ttsBar.parentNode.removeChild(_ttsBar); _ttsBar=null };
-  m.appendChild(t); m.appendChild(x);
-  document.body.appendChild(m); _ttsBar=m;
+    '<a href="/voice/" style="color:#fff">'+TT.link+'</a>');
 }
-/* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
-function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
+/* הקראה שהצליחה מסירה את הודעת התקלה — המצב השתנה. פס "אין קול
+   בשפה" נשאר: ההקראה "הצליחה" בקול של שפה אחרת, וזה בדיוק המצב. */
+function ttsOK(){ if(_ttsBar&&_ttsBar.getAttribute("data-kind")!=="nolang")ttsBarHide() }
+
+
+/* =====================================================================
+   מנוע ההקראה של "תאוריה מדברת" — ארבעה מנגנונים
+   ---------------------------------------------------------------------
+   ארבעה כשלים שקטים של Web Speech. אף אחד מהם אינו מדווח כשגיאה,
+   וכולם נראים למשתמש בדיוק אותו דבר: הקול פשוט מפסיק באמצע. הקוד
+   כאן הועתק מ-islam (שהועתקה מכאן ותוקנה שם), ולא נוסח מחדש — O-163.
+   ===================================================================== */
+
+/* 1 · שומר-ער. באג ותיק ב-Chrome וב-Edge בשולחן העבודה: ההקראה
+   נחתכת אחרי כ-15 שניות, באמצע מילה. pause+resume תקופתי מחזיק את
+   המנוע ער. במובייל אין את הבאג ופעולה כזאת דווקא מקרטעת שם, ולכן
+   מפעילים רק היכן שבאמת צריך. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+/* עוצרים רק כששום דבר כבר לא מדבר — אחרת מקטע שהתחיל זה עתה מאבד
+   את השמירה שלו כשהמקטע הקודם מסיים להתנקות. */
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+
+/* 2 · הפניה חיה ל-utterance. Chrome אוסף אובייקט שאין אליו הפניה,
+   ואיתו נעלמים onend ו-onboundary: ההקראה נתקעת באמצע, ההדגשה
+   קופאת על מילה אחת, והמקטע הבא לא יוצא לעולם. */
+var _activeU=null;
+
+/* 3 · קול רשת שנכשל. הקולות הנוירליים של Edge הם קולות רשת, והם
+   שותקים בלי אינטרנט. הדגל נכבה ברגע שאחד מהם נכשל, ומאותו רגע
+   הדירוג מעדיף קול מקומי לשארית הסשן. */
+var _netVoiceOK=true;
+
+/* קול רשת שאי אפשר להשתמש בו עכשיו — אין אינטרנט, או שאחד כבר
+   נכשל בסשן הזה — אינו "פחות טוב", הוא פשוט לא יעבוד. לכן זה מיון
+   ראשון ולא עוד סעיף בתוך הניקוד. כשהוא הקול היחיד שיש הוא עדיין
+   נבחר: מיון של רשימה בת אחד מחזיר אותה כמו שהיא. */
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+
+/* 4 · שומר זמן. יש מכשירים שבהם onend פשוט לא נורה. בלי השומר הזה
+   התור נתקע: הכפתור נשאר על "עצירה" וההקראה לא ממשיכה לעולם. ארבע
+   שניות שבהן המנוע לא מדבר ולא ממתין נחשבות סוף.
+   מחזיר פונקציית ביטול — מי שסיים בדרך הרגילה מכבה את השומר. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
 
 
 /* ------------------------------------------------------------
@@ -1617,6 +1724,57 @@ function segments(spoken){
   }
   out=merged;
   return out.length?out:[{text:spoken,start:0}];
+}
+/* ------------------------------------------------------------
+   באיזה קול נאמר כל משפט — O-164.
+   החומר כאן עברי בכל שפת ממשק: קטע הקריאה, המילים, האפשרויות.
+   עד כה כל הקראה יצאה בקול שפת הממשק, ודובר ערבית שמע קטע עברי
+   של 400 תווים בקול ערבי — שמבליע או מאיית אותיות שאינו מכיר.
+   הכלל: משפט שיש בו אותיות עבריות ואין בו אותיות של כתב אחר נאמר
+   בקול עברי (he-IL), בלי קשר לשפת הממשק. משפט בשפת הממשק — בקול
+   שלה. משפט שמערב את שני הכתבים בתוך עצמו (״ما معنى «שלום»؟״)
+   נשאר בקול שפת הממשק כמו קודם: פיצול באמצע משפט הוא הכרעת בעלים
+   שעוד לא ניתנה (O-164, ה-דרוש של 7.10).
+   ------------------------------------------------------------ */
+var RX_HE=/[א-תיִ-ﭏ]/,
+    RX_OTHER=/[A-Za-zÀ-ɏЀ-ӿ؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/;
+function scriptOf(s){
+  var he=RX_HE.test(s),ot=RX_OTHER.test(s);
+  return he&&!ot?"he":ot&&!he?"ot":he?"mix":"none";
+}
+/* מחלק את הטקסט לגושים לפי כתב, על גבול משפט בלבד, ומחזיר מקטעים
+   שכל אחד נושא את קוד הקול שלו. ההיסט נשמר יחסית לטקסט המלא, כדי
+   ש-hlAt ימשיך להדגיש במקום. ״؟״ הוא סוף משפט בערבית. */
+function langSegs(text,code){
+  if(String(code).toLowerCase().indexOf("he")===0)return segments(text);
+  var sent=[],from=0,i,j;
+  for(i=0;i<text.length;i++){
+    if(".!?:;؟".indexOf(text[i])<0)continue;
+    if(insideNumber(text,i))continue;
+    j=i+1; while(j<text.length&&/\s/.test(text[j]))j++;
+    sent.push({text:text.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<text.length)sent.push({text:text.slice(from),start:from});
+  var blocks=[];
+  sent.forEach(function(s){
+    var c=scriptOf(s.text), last=blocks[blocks.length-1];
+    /* משפט בלי אותיות (מספר, סוגר) מצטרף לגוש שלפניו */
+    if(last&&(c==="none"||(c==="he")===(last.he))){ last.text+=s.text; return }
+    blocks.push({text:s.text,start:s.start,he:c==="he"});
+  });
+  /* גוש ראשון בלי אותיות מצטרף לשני, אם יש */
+  if(blocks.length>1&&scriptOf(blocks[0].text)==="none"){
+    blocks[1]={text:blocks[0].text+blocks[1].text,start:blocks[0].start,he:blocks[1].he};
+    blocks.shift();
+  }
+  var out=[];
+  blocks.forEach(function(b){
+    segments(b.text).forEach(function(s){
+      out.push({text:s.text,start:b.start+s.start,code:b.he?LANGS.he.tts:code});
+    });
+  });
+  return out.length?out:[{text:text,start:0,code:code}];
 }
 /* קצב לפי שפה — אותם ערכים שנבחרו בתאוריה מדברת אחרי האזנה */
 var VOICE_TUNE={he:0.82,ar:0.85,en:0.90,ru:0.88};
@@ -1720,24 +1878,60 @@ function speakDevice(text,code,rate){
      voicesReady נשאר בשימוש למסך בחירת הקול, שם ההמתנה במקומה. */
   (function(){
     try{
-      var v=bestVoice(code), lang=(v&&v.lang)||code;
-      var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
-      var pit=femLift(v);
+      /* כל מקטע נושא קוד קול משלו (langSegs, O-164): עברית בקול עברי,
+         ההוראות בקול שפת הממשק. הקול, הקצב והגובה נבחרים פעם אחת לכל
+         קוד, ונבחרים מחדש רק אחרי שקול רשת נכשל. */
+      var segs=langSegs(String(text),code), VC={};
+      function voiceOf(c){
+        if(VC[c])return VC[c];
+        var v=bestVoice(c), lang=(v&&v.lang)||c;
+        if(!v){var all=[];try{all=speechSynthesis.getVoices()||[]}catch(e){} if(all.length)ttsNoLang(c);}
+        return (VC[c]={v:v,lang:lang,rt:tuneRate(lang,clamp(rate,0.55,1.4)),pit:femLift(v)});
+      }
+      var retried=false;
+      function alive(){return my===_sayGen}
+      function allDone(){ maybeStopKeepAlive(); hlClear(); ttsOK() }
       (function sayseg(k){
-        if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
-        if(k>=segs.length){ hlClear(); ttsOK(); return }
-        var seg=segs[k];
-        var u=new SpeechSynthesisUtterance(seg.text);
-        u.lang=lang;
-        if(v){ try{ u.voice=v }catch(e2){} }
-        u.rate=rt; u.pitch=pit; u.volume=1;
-        u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
-        u.onend=function(){
+        if(!alive())return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
+        if(k>=segs.length){ allDone(); return }
+        /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
+           יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+        var seg=segs[k], moved=false, disarm=null;
+        var sc=seg.code||code, V=voiceOf(sc), v=V.v;
+        function next(){
+          if(moved||!alive())return;
+          moved=true; if(disarm)disarm();
           if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
-          else { hlClear(); ttsOK() }
+          else allDone();
+        }
+        var u=new SpeechSynthesisUtterance(seg.text);
+        u.lang=V.lang;
+        if(v){ try{ u.voice=v }catch(e2){} }
+        u.rate=V.rt; u.pitch=V.pit; u.volume=1;
+        u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
+        u.onend=next;
+        u.onerror=function(e){
+          if(moved||!alive())return;
+          var err=(e&&e.error)||"";
+          /* ביטול יזום אינו תקלה — stopSpeak כבר ניקה אחריו */
+          if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+          /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול
+             מקומי וחוזרים על אותו מקטע, פעם אחת, כדי שההקראה לא
+             תישבר בשקט באמצע שאלה. */
+          if(!retried&&v&&v.localService===false){
+            retried=true; _netVoiceOK=false; moved=true;
+            if(disarm)disarm(); _activeU=null;
+            VC={};   /* כל קוד בוחר מחדש — voiceUsable מוריד עכשיו את קולות הרשת */
+            setTimeout(function(){sayseg(k)},SEG_GAP);
+            return;
+          }
+          moved=true; if(disarm)disarm(); maybeStopKeepAlive(); ttsFail(err);
         };
-        u.onerror=function(e){ttsFail(e&&e.error)};
+        _activeU=u;                        /* מגן מפני איסוף זבל */
+        try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
         speechSynthesis.speak(u);
+        startKeepAlive();
+        disarm=ttsWatchdog(function(){return alive()&&!moved},next);
       })(0);
     }catch(e){}
   })();
@@ -1755,6 +1949,11 @@ function speak(text,lang,rateMul){
      ב-hebrew-arab: 450 מופעים בקטעי הקריאה. */
   text=plainOf(String(text||"").replace(/<br\s*\/?>/gi,". ")).trim().replace(/_{2,}/g,"\u2026"); if(!text)return;
   lang=lang||"en";
+  /* O-164: \u05d8\u05e7\u05e1\u05d8 \u05e2\u05d1\u05e8\u05d9 \u05db\u05d5\u05dc\u05d5 \u05e0\u05d0\u05de\u05e8 \u05d1\u05e2\u05d1\u05e8\u05d9\u05ea, \u05d2\u05dd \u05db\u05e9\u05d4\u05db\u05e4\u05ea\u05d5\u05e8 \u05e0\u05e9\u05d0 \u05d0\u05ea \u05e9\u05e4\u05ea
+     \u05d4\u05de\u05de\u05e9\u05e7. \u05db\u05da \u05d2\u05dd \u05d4\u05e7\u05d5\u05d1\u05e5 \u05d4\u05de\u05d5\u05e7\u05dc\u05d8 (\u05e9\u05e0\u05e8\u05e9\u05dd \u05ea\u05d7\u05ea he) \u05e0\u05de\u05e6\u05d0, \u05d5\u05d2\u05dd \u05d2\u05f3\u05de\u05d9\u05e0\u05d9 \u05de\u05e7\u05d1\u05dc
+     \u05d0\u05ea \u05d4\u05e9\u05e4\u05d4 \u05d4\u05e0\u05db\u05d5\u05e0\u05d4. \u05d8\u05e7\u05e1\u05d8 \u05de\u05e2\u05d5\u05e8\u05d1 \u05de\u05de\u05e9\u05d9\u05da \u05dc-speakDevice, \u05e9\u05de\u05e4\u05e6\u05dc \u05d0\u05d5\u05ea\u05d5
+     \u05de\u05e9\u05e4\u05d8\u05be\u05de\u05e9\u05e4\u05d8 (langSegs). */
+  if(lang!=="he"&&scriptOf(text)==="he")lang="he";
   var code=lang==="en"?EN_TTS:LANGS[lang].tts;
   var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
   stopSpeak();
@@ -1787,7 +1986,7 @@ function playUrl(url,text,code,rate){
   gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();stopKeepAlive();_activeU=null;try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -2774,7 +2973,8 @@ function screenSet(){
      '<input type="range" min="0.6" max="1.3" step="0.05" value="'+state.rate+
      '" data-a="rate" style="max-width:14rem"></div>';
 
-  if(state.voiceMode!=="gem")h+=devPicker([ state.lang ]);
+  /* קול עברי לחומר, וקול שפת הממשק להוראות (O-164) */
+  if(state.voiceMode!=="gem")h+=devPicker(state.lang==="he"?["he"]:["he",state.lang]);
 
   if(state.voiceMode==="gem"){
     ["f","m"].forEach(function(g){
@@ -4128,7 +4328,10 @@ function examAction(a,el){
      התשובה. כאן מוקרא מה שעל המסך — הכותרת והמקור — והאפשרויות
      ממילא אינן חלק ממנו. */
   if(a==="sitread"){var q2=SIT.qs[SIT.i];
-    if(q2)speak(saySpell(plainOf(q2.ask||"")+" "+plainOf(q2.expr||"")),state.lang);
+    /* ask עובר כמו שהוא, עם ה-<br>: speak הופך אותו לסוף משפט. plainOf
+       כאן הדביק את ההוראה לקטע העברי, ואז לא היה גבול משפט שעליו
+       מחליפים לקול עברי (O-164), והמילים נדבקו (O-145). */
+    if(q2)speak(saySpell((q2.ask||"")+" "+plainOf(q2.expr||"")),state.lang);
     return true}
   if(a==="sitform"){view="formulas";render();window.scrollTo(0,0);return true}
   if(a==="sitcopy"){copyText(SIT.code,function(){SIT.copied=true;render()});return true}
@@ -4364,8 +4567,9 @@ document.addEventListener("click",function(e){
       if(uri)state.devVoice[code]=uri; else delete state.devVoice[code];
       save(); render();
     }
-    /* משמיעים תמיד — בחירה בלי לשמוע אינה בחירה. */
-    speak(t("heroT"),lg);
+    /* משמיעים תמיד — בחירה בלי לשמוע אינה בחירה. הדוגמה בשפת הקול
+       שנבחר: קול עברי שמקריא כותרת ערבית אינו דוגמה לשום דבר. */
+    speak(lg===state.lang?t("heroT"):((T[lg]&&T[lg].heroT)||t("heroT")),lg);
     return;
   }
   if(a==="gvoice"){state.gemVoice=gvOf(v).id;save();render();return}

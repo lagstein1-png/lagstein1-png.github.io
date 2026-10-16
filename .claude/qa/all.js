@@ -32,14 +32,36 @@ const FAST = process.argv.includes('--fast');
    הוא חייב להיות מהיר מספיק שלא יכבו אותו, ושש־עשרה הבדיקות
    שנשארות קוראות קוד בלבד. */
 const STATIC = process.argv.includes('--static');
-const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'lomda',
-              'english', 'history', 'ulpan'];
-const PAGES = APPS.concat(['bagrut-806', 'reader', '.']);
+/* ===== הרשימות נגזרות מ-stages.json, לא נכתבות ביד — O-198, 16.10.2026 =====
+   עד היום ישבה כאן רשימה קשיחה של תשע, ו-PAGES = התשע + 806 + reader + '.'.
+   נמדד: 26 מתוך 38 האפליקציות המקומיות — כולל כל שש־עשרה שפורסמו ב-5.10 —
+   לא עברו parse ולא smoke, ו-12 מתוך 21 אפליקציות buildQ לא עברו
+   entropy ו-options. בדיוק ״בדיקה שלא רצה על אפליקציה עברה בה באפס״.
+     PAGES     — כל אפליקציה מקומית ב-stages.json, ודף הבית ('.').
+     APPS      — מי שמגדיר buildQ (entropy/options בודקים את המחולל;
+                 לאפליקציה בלי מחולל הם מחזירים na ואינם בודקים דבר).
+     PARSE_JS  — קובצי ה-JS של האפליקציות הרב־קובציות. parse על index.html
+                 שלהן מחזיר ״0 inline scripts״ ולא בדק דבר (806, lomda/data,
+                 שבע ה-elem). vendor/ אינו שלנו ואינו נבדק. */
+const fs = require('fs');
+const AL = require('./applist.js');
+const LOCAL = AL.local();
+const APPS = AL.matching(/function\s+buildQ\b|buildQ\s*=\s*function/, LOCAL);
+const PAGES = LOCAL.concat(['.']);
+const PARSE_JS = [];
+for (const a of LOCAL) (function walk(d) {
+  for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+    if (['img', 'audio', 'vendor', 'node_modules'].includes(e.name)) continue;
+    const p = path.join(d, e.name);
+    if (e.isDirectory()) walk(p);
+    else if (/\.js$/.test(e.name)) PARSE_JS.push(path.relative(AL.ROOT, p));
+  }
+})(path.join(AL.ROOT, a));
 
 /* הבדיקות, לפי הסדר שבו כדאי לראות אותן: המהירות קודם, כדי
    שכישלון זול יעצור לפני שמחכים לדפדפן. */
 const SUITE = [
-  { id: 'parse',    args: PAGES.filter(p => p !== '.').map(a => a + '/index.html').concat(['index.html', 'rakia/index.html']) },
+  { id: 'parse',    args: PAGES.filter(p => p !== '.').map(a => a + '/index.html').concat(['index.html']).concat(PARSE_JS) },
   { id: 'cache',    args: [] },
   { id: 'storage',  args: [] },
   { id: 'naming',   args: [] },
@@ -66,8 +88,15 @@ const SUITE = [
   /* GEOBANK של geography-elem — content.js אינו סורק אותו. 1.10.2026,
      כשהמחסן גדל מ-52 ל-156. */
   { id: 'geobank',  args: [] },
+  /* BGP — מסלול הבגרות בתוך english/index.html: 16 קטעים, 72 שאלות
+     ציבוריות. stages.json אומר bank:"none", ולכן content.js מדלג,
+     ו-buildQ של english אינו נוגע בהן. O-195, 16.10.2026. */
+  { id: 'bgbank',   args: [] },
   { id: 'leaks',    args: [] },
   { id: 'markers',  args: [] },
+  /* אין כלי שמקודד 127.0.0.1:8099 — הפורט בא מ-port.js (QA_PORT).
+     בלי זה שתי ריצות אינן יכולות לרוץ במקביל. O-197, 16.10.2026. */
+  { id: 'port',     args: ['--check'] },
   /* רשימת הכלים ב-qa-tools.md מול SUITE הזה — מחולל עם --check,
      כפי שהכלל דורש. נמדד 19.9.2026: 24 מזהים חסרו במסמך. */
   { id: 'suite',    args: ['--check'] },
@@ -205,7 +234,10 @@ const SUITE = [
   /* record.js רץ לבד ב-Actions ודוחף ל-main: קול המניפסט, gcloud ביעד,
      אצווה עם מקטע פגום, קליפ תקול שאינו נועל את --next, 429 שאינו
      נספר. הוכח אדום 30.9.2026 על ה-diff שהוסיף את record-quality.js: 7/9. */
-  { id: 'record-safety', args: [] },
+  /* slow — O-197: 12,197 ms ב-7.10, 9,050 ב-16.10; כשליש מזמן השער. אינו
+     needsServer, ולכן `--fast` (וגם `--static --fast`) הוא שמדלג עליו;
+     `--static` לבדו — מה ש-qa-gate.sh מריץ — עדיין מריץ אותו, וכך גם CI. */
+  { id: 'record-safety', args: [], slow: true },
   /* מאגרי הקול — הכרעת הבעלים 10.10.2026: 984MB של MP3 יוצאים לריפואי
      Pages נפרדים (O-191). שתי שאלות, ושתיהן תקלות שאין להן אזהרה:
      דלי שחוצה את תקרת ה-1GB **מפסיק לפרסם את כל האתר**, ומתג שהופך
@@ -223,10 +255,10 @@ const SUITE = [
   { id: 'galileo',       args: [] },
   { id: 'rakia-content', args: [] },
   { id: 'rakia-safety',  args: [] },
-  { id: 'deps',          args: ['rakia'] },
+  { id: 'deps',          args: [] },   /* O-166: כל 46 הדפים, לא רקיע בלבד */
   { id: 'rakia/mk-ephem',  args: ['--check'] },
   { id: 'rakia/mk-places', args: ['--check'] },
-  { id: 'smoke',    args: PAGES.concat(['rakia']),  needsServer: true },
+  { id: 'smoke',    args: PAGES,  needsServer: true },
   /* מנוע לימור בדפדפן אמיתי מול Worker מדומה: ההקשר שנשלח, פעולה
      שמתבצעת באמת, פעולה שנכשלת ולא מוכרזת, אופליין ו-429. */
   { id: 'barak-browser', args: [], needsServer: true },

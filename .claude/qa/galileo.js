@@ -89,6 +89,41 @@ for (const [tag, y, m, d, h, mi, tz] of T) {
   const u = A.localToUtc(y, m, d, h, mi, tz), jd = A.jdFromMs(u.utcMs);
   if (Math.abs(jd - c.jd) * 86400 > 1) { bad++; console.log(`✗ ${tag}: localToUtc נתן JD ${jd} מול ${c.jd} (קיזוז ${u.offsetMinutes})`); }
 }
+/* 6ב — חור שעון הקיץ ושעה כפולה (O-175). שעה שלא הייתה או שהייתה פעמיים
+   אינה נבלעת: localToUtc מחזיר status, והקיזוז המוחזר הוא זה שבתוקף ברגע
+   שחושב (utcMs + offsetMinutes = השעה המקומית בפועל, local). המדיניות:
+   בחור — הקיזוז שלפני הקפיצה, כלומר השעון ״ממשיך קדימה״ (02:30 → 03:30);
+   בכפולה — המופע הראשון. הממשק מציג הערה בשני המקרים. */
+const DST = [
+  // tag, y, m, d, h, mi, tz, status, UT צפוי (ISO), שעה מקומית בפועל
+  ['jlm-gap', 2024, 3, 29, 2, 30, 'Asia/Jerusalem', 'gap', '2024-03-29T00:30', '03:30'],
+  ['ny-gap', 2010, 3, 14, 2, 30, 'America/New_York', 'gap', '2010-03-14T07:30', '03:30'],
+  ['sp-gap', 2017, 10, 15, 0, 30, 'America/Sao_Paulo', 'gap', '2017-10-15T03:30', '01:30'],
+  ['jlm-fold', 2024, 10, 27, 1, 30, 'Asia/Jerusalem', 'ambiguous', '2024-10-26T22:30', '01:30'],
+  ['ny-fold', 2010, 11, 7, 1, 30, 'America/New_York', 'ambiguous', '2010-11-07T05:30', '01:30'],
+  ['jlm-ok', 2024, 7, 1, 12, 0, 'Asia/Jerusalem', 'ok', '2024-07-01T09:00', '12:00'],
+];
+for (const [tag, y, m, d, h, mi, tz, status, iso, local] of DST) {
+  const u = A.localToUtc(y, m, d, h, mi, tz), got = new Date(u.utcMs).toISOString().slice(0, 16);
+  const realOff = A.tzOffsetMinutes(tz, u.utcMs), shown = new Date(u.utcMs + realOff * 60000).toISOString().slice(11, 16);
+  if (u.status !== status) { bad++; console.log(`✗ ${tag}: status ${u.status} במקום ${status}`); }
+  if (got !== iso) { bad++; console.log(`✗ ${tag}: UT ${got} במקום ${iso}`); }
+  if (u.offsetMinutes !== realOff) { bad++; console.log(`✗ ${tag}: קיזוז מוחזר ${u.offsetMinutes}, ובתוקף ברגע שחושב ${realOff}`); }
+  if (status !== 'ok' && u.local !== local) { bad++; console.log(`✗ ${tag}: שעה מקומית בפועל ${u.local} במקום ${local} (בשעון: ${shown})`); }
+}
+/* 6ג — קיזוז עם שניות (זמן מקומי ממוצע / LMT). ירושלים עד 1917 היא +2:20:40,
+   מונרוביה עד 1971 היא −0:44:30. עיגול לדקה שלמה מזיז את הרגע עד 30 שניות,
+   כלומר עד 450″ ברום השמיים. הקיזוז נשמר עד השנייה. */
+const LMT = [
+  // tag, y, m, d, h, mi, tz, קיזוז צפוי בדקות, UT צפוי (ISO עד השנייה)
+  ['jlm-1910', 1910, 1, 1, 12, 0, 'Asia/Jerusalem', 140 + 40 / 60, '1910-01-01T09:39:20'],
+  ['monrovia-1960', 1960, 1, 1, 12, 0, 'Africa/Monrovia', -(44 + 30 / 60), '1960-01-01T12:44:30'],
+];
+for (const [tag, y, m, d, h, mi, tz, off, iso] of LMT) {
+  const u = A.localToUtc(y, m, d, h, mi, tz), got = new Date(u.utcMs).toISOString().slice(0, 19);
+  if (Math.abs(u.offsetMinutes - off) > 1e-9) { bad++; console.log(`✗ ${tag}: קיזוז ${u.offsetMinutes} דקות במקום ${off.toFixed(4)}`); }
+  if (got !== iso) { bad++; console.log(`✗ ${tag}: UT ${got} במקום ${iso}`); }
+}
 const st = A.selfTest();
 if (!st.ok) { bad++; console.log(`✗ selfTest של Intl נכשל ב-node: ${st.why}`); }
 

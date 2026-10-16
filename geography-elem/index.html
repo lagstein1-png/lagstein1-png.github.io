@@ -1775,7 +1775,10 @@ function genQ(id,d,lang,force){
      התשובה הנכונה לא נוחתת תמיד באותו מקום. */
   for(var si=opts.length-1;si>0;si--){var sj=Math.floor(Math.random()*(si+1)),st=opts[si];opts[si]=opts[sj];opts[sj]=st}
   return {id:id,text:L[0],expr:null,answer:L[1],a:0,b:0,kind:row[0],d:row[1],options:opts,
-    hints:[L[5],L[6],L[7]],
+    /* L[7] הוא ההסבר, ולכן אינו רמז: כרמז שלישי הוא נפתח לפני המענה
+       ובכ־48 מ־156 השורות הכיל את התשובה מילה במילה (O-187). ההסבר
+       מוצג אחרי המענה — בשגוי ובנכון. */
+    hints:[L[5],L[6]],
     explain:L[7]};
 }
 function genSession(n,d,lang){var arr=[];for(var i=0;i<n;i++)arr.push(genQ(i,d,lang));return arr}
@@ -2721,7 +2724,9 @@ function unitsView(){
 /* ================= header ================= */
 function header(){
   var t=T(),lvl=lvlOf(state.stats);
-  var nav=[["units",t.navUnits||"יחידות","book"],["settings",t.navSettings,"gear"]];
+  /* ״תרגול״ חסר כאן, ו-156 שאלות הבנק היו נגישות רק דרך הגדרות ←
+     ״החלפת דמות״ ← אונבורדינג (O-187). */
+  var nav=[["units",t.navUnits||"יחידות","book"],["practice",t.navPractice,"pencil"],["settings",t.navSettings,"gear"]];
   return '<header><div class="wrap hbar">'+
     '<button class="logo" data-a="go" data-v="units" aria-label="'+esc(t.appName)+'"><span class="mark">'+ic("pi",26)+'</span><span class="fd"><b>'+esc(t.obTitle1)+'</b><small>'+esc(t.appShort)+'</small></span></button>'+
     '<nav>'+nav.map(function(n){return '<button class="'+lc("nb"+(view===n[0]?" on":""))+'" aria-pressed="'+(view===n[0]?"true":"false")+'" data-a="go" data-v="'+n[0]+'">'+ic(n[2],18)+'<span>'+esc(n[1])+'</span></button>'}).join("")+'</nav>'+
@@ -3077,6 +3082,8 @@ function practice(){
     h+='<div class="rise">';
     if(okNow){
       h+='<div style="display:flex;align-items:center;gap:12px;background:var(--teal-soft);border:2px solid rgba(14,156,141,.35);border-radius:18px;padding:13px 18px;margin-top:22px;font-family:var(--font-display);font-weight:600;font-size:1.15rem;color:var(--teal-deep)">'+ic("check",22)+' '+esc(BT.text||t.praise)+'</div>';
+      /* ההסבר (לשעבר הרמז השלישי, O-187) — גם למי שענה נכון. */
+      if(q.explain)h+='<p style="margin-top:12px;background:var(--paper);border:2px solid rgba(23,51,60,.1);border-radius:18px;padding:14px 18px;color:var(--ink-soft)">'+esc(q.explain)+'</p>';
     }else{
       h+='<div style="display:flex;align-items:center;gap:12px;background:var(--coral-soft);border:2px solid rgba(255,111,97,.3);border-radius:18px;padding:13px 18px;margin-top:22px;font-family:var(--font-display);font-weight:600;font-size:1.15rem;color:var(--coral-deep)">'+ic("x",22)+' '+(state.settings.calmMode?esc(t.calmMsg):esc(t.enc))+'</div>';
       /* הפתרון נפתח רק למי שלא הגיע אליו בעצמו */
@@ -3108,7 +3115,7 @@ function practice(){
   h+='</div>';
   /* hint + skip */
   if(q.expr&&SlowMode.can(q))h+='<button class="sm-btn" data-a="slow" '+(P.phase!=="ask"?"disabled":"")+'>'+ic("sparkle",20)+' '+esc(t.slowBtn)+'</button>';
-  h+='<button class="hintpill" data-a="hint" style="width:100%" '+(P.phase!=="ask"?"disabled":"")+'><span class="bulb">'+ic("bulb",24)+'</span>'+esc(t.hintBtn)+'<span class="cnt">'+Math.max(0,3-P.hints)+'</span></button>';
+  h+='<button class="hintpill" data-a="hint" style="width:100%" '+(P.phase!=="ask"?"disabled":"")+'><span class="bulb">'+ic("bulb",24)+'</span>'+esc(t.hintBtn)+'<span class="cnt">'+Math.max(0,(q.hints?q.hints.length:0)-P.hints)+'</span></button>';
   /* המורה הוא שכבה שלישית: אחרי הרמזים, לא במקומם. בלי כתובת שרת אין כפתור. */
   if(window.TUTOR&&TUTOR.on())h+='<button class="btn btn-ghost" data-a="tutor" style="width:100%;padding:13px;font-size:1.05rem" '+(P.phase!=="ask"?"disabled":"")+'>'+ic("bulb",20)+' '+esc(TUTOR.label())+'</button>';
   h+='<button class="btn btn-ghost" data-a="skip" style="width:100%;padding:13px;font-size:1.05rem" '+(P.phase!=="ask"?"disabled":"")+'>'+ic("skip",20)+' '+esc(t.skip)+'</button>';
@@ -4785,7 +4792,9 @@ function recordAnswer(correct,kind){
 function finishRound(){
   state.sessionHistory.push({date:todayIso(),correct:P.ok,total:P.ses.length,level:activeLevel()});
   if(state.sessionHistory.length>30)state.sessionHistory=state.sessionHistory.slice(-30);
-  state.stats.sessions++;state.stats.xp+=15;
+  /* בונוס הסבב רק לסבב שלפחות חציו נענה נכון. בלי התנאי, 320 לחיצות
+     ״דלג״ העלו לרמה 6 בלי אף תשובה נכונה (O-190). */
+  state.stats.sessions++;if(P.ok*2>=P.ses.length&&P.ok>0)state.stats.xp+=15;
   var d=todayIso();
   if(state.stats.days.indexOf(d)<0){state.stats.days.push(d);if(state.stats.days.length>60)state.stats.days=state.stats.days.slice(-60)}
   awardStickers();save();
@@ -4908,7 +4917,7 @@ function onAction(a,el){
   else if(a==="hint"){
     var q=P.ses[P.qi];
     if(P.phase!=="ask")return;
-    if(P.hints>=3){setBubble(t.noHints,"happy");return}
+    if(!q.hints||P.hints>=q.hints.length){setBubble(t.noHints,"happy");return}
     var hint=q.hints[P.hints];P.hints++;
     if(jsOn())JOSHSTATE.hint();
     if(state.settings.soundFx)sfxHint();
@@ -5701,7 +5710,7 @@ if(window.TUTOR){
         }},
       show_hint:{desc:"מציג את הרמז הבא לשאלה שעל המסך",
         run:function(){
-          if(view!=="practice"||P.phase!=="ask"||P.hints>=3)return false;
+          if(view!=="practice"||P.phase!=="ask"||!P.ses[P.qi]||P.hints>=(P.ses[P.qi].hints||[]).length)return false;
           var n=P.hints;onAction("hint",null);return P.hints>n;
         }},
       read_aloud:{desc:"מקריא את השאלה בקול",

@@ -55,7 +55,7 @@
 
 const { chromium } = require('./pw.js');
 
-const BASE = process.env.QA_BASE || 'http://127.0.0.1:8099';
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 const PER_CELL = Number(process.env.QA_N || 6);
 
 /* הרשימה נגזרת מ-`stages.json` ואינה כתובה ביד — רשימה קשיחה

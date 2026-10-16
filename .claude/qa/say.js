@@ -30,7 +30,7 @@ const argv = process.argv.slice(2);
 const N = argv.includes('--n') ? Number(argv[argv.indexOf('--n') + 1]) || 60 : 60;
 const apps = argv.filter(a => !a.startsWith('--') && !/^\d+$/.test(a)).map(a => a.replace(/\/$/, ''));
 const TARGET = apps.length ? apps : ['english', 'ulpan', 'history', 'lomda'];
-const BASE = 'http://127.0.0.1:8099';
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 
 async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.waitForTimeout(200); return true } catch (e) { return false } }
 

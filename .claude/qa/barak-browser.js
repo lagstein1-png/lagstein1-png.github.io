@@ -20,7 +20,7 @@
 'use strict';
 const { chromium } = require('./pw.js');
 const fs = require('fs'), path = require('path');
-const BASE = 'http://127.0.0.1:8099';
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 /* O-125, 4.10.2026: הרשימה נגזרת מ-stages.json ולא נכתבת ביד — הרשימה
    הידנית דילגה על electric, שנולדה אחריה. הקריטריון הוא מה שהבדיקה
    בודקת: מתאם לימור רשום (`BARAK.register(`) באחד מקובצי האפליקציה —

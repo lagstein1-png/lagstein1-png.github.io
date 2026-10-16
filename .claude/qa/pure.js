@@ -15,7 +15,7 @@
    ואצל התלמיד״, והקוד מתחתיה שוקל לפי state.item. בדיוק המקרה
    שהכלל נועד למנוע, ובדיוק בשליש שאלות המשפטים שההערה מזכירה.
 
-   הבדיקה: בארבע אפליקציות החידון —
+   הבדיקה: בכל אפליקציה שמצהירה function chooseIndex( (נגזר, O-184) —
      1. יש function buildQuestion(tid,lv,avoid,pure) ויש pureIndex
      2. יש function buildQ
      3. כל buildQuestion( בתוך גוף buildQ — הארגומנט הרביעי הוא true
@@ -27,7 +27,26 @@
 'use strict';
 const fs = require('fs'), path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
-const APPS = ['english', 'history', 'ulpan', 'lomda'];
+/* O-184, 16.10.2026: הרשימה נגזרת — כל אפליקציה ב-stages.json שה-index.html
+   שלה מצהיר `function chooseIndex(`, כלומר שוקלת לפי state.item ולכן חייבת
+   pureIndex במבחן. עד היום היו כאן ארבעה שמות כתובים ביד, ותשע אפליקציות עם
+   אותו chooseIndex בדיוק (civics, tanakh, islam…) היו מחוץ לבדיקה — שבירת
+   ה-pure ב-civics החזירה ✓ exit 0. שם בשורת הפקודה גובר (בדיקה של אחת). */
+const AL = require('./applist.js');
+const DERIVED = AL.local().filter(a => {
+  try { return /function chooseIndex\(/.test(fs.readFileSync(path.join(ROOT, a, 'index.html'), 'utf8')); }
+  catch (e) { return false; }
+});
+const APPS = AL.pick(process.argv.slice(2), DERIVED);
+/* רצפה: גזירה שהחזירה מעט מדי היא גזירה שנשברה (שינוי שם, תיקייה שזזה),
+   לא ריפו נקי. 14 נמדדו ב-16.10.2026; ארבע הוותיקות חייבות להיות בפנים. */
+if (APPS === DERIVED) {
+  const must = ['english', 'history', 'ulpan', 'lomda'].filter(a => !DERIVED.includes(a));
+  if (DERIVED.length < 10 || must.length) {
+    console.log(`✗ הגזירה החזירה ${DERIVED.length} אפליקציות${must.length ? ', וחסרות ' + must.join(' ') : ''} — הזיהוי לפי chooseIndex נשבר`);
+    process.exit(1);
+  }
+}
 
 /* גוף פונקציה לפי איזון סוגריים מסולסלים, מהשורה שמצהירה עליה */
 function bodyOf(src, decl) {

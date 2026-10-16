@@ -23,14 +23,15 @@
    ===================================================================== */
 'use strict';
 const { chromium } = require('./pw.js');
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 const N = +(process.env.QA_N || 6);
 (async () => {
   const b = await chromium.launch();
   const ctx = await b.newContext({ locale: 'he-IL' });
   const page = await ctx.newPage();
   const errs = []; page.on('pageerror', e => errs.push(e.message));
-  await page.route('**/*', r => r.request().url().startsWith('http://127.0.0.1:8099') ? r.continue() : r.abort());
-  await page.goto('http://127.0.0.1:8099/math-teen/', { waitUntil: 'domcontentloaded' });
+  await page.route('**/*', r => r.request().url().startsWith(BASE) ? r.continue() : r.abort());
+  await page.goto(BASE+'/math-teen/', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(900);
   const r = await page.evaluate((N) => {
     const HE = /[֐-׿]/;

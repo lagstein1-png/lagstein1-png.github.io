@@ -46,6 +46,7 @@
    את החומר — ולכן ממצא REVIEW הוא שאלה, לא האשמה.
    ============================================================ */
 const {chromium}=require('./pw.js');
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 const fs=require('fs'), path=require('path');
 const DIR=__dirname, ROOT=path.resolve(DIR,'..','..');
 const REG=JSON.parse(fs.readFileSync(path.join(DIR,'stages.json'),'utf8'));
@@ -1506,7 +1507,7 @@ if(require.main===module) (async()=>{
   const errs=[];
   page.on('pageerror',function(e){errs.push(e.message)});
   await page.route('**/*',function(r){
-    return r.request().url().startsWith('http://127.0.0.1:8099')?r.continue():r.abort()});
+    return r.request().url().startsWith(BASE)?r.continue():r.abort()});
   /* אפליקציה שאינה במשפחת buildQ אינה חושפת TOPICS, והסורק כולו
      בנוי עליו. ברירת המחדל מסננת אותה החוצה, אבל שם מפורש בשורת
      הפקודה עקף את הסינון והפיל את התהליך כולו ב-ReferenceError —
@@ -1544,7 +1545,7 @@ if(require.main===module) (async()=>{
       return /P\.done\s*\?\s*P\.q\.say\s*:/.test(fs.readFileSync(f,'utf8'));
     }catch(e){ return false }
   })();
-  try{ await page.goto('http://127.0.0.1:8099/'+app+'/',{waitUntil:unitsPath?'load':'domcontentloaded'}) }
+  try{ await page.goto(BASE+'/'+app+'/',{waitUntil:unitsPath?'load':'domcontentloaded'}) }
   catch(e){ console.log(app,'SKIP — הדף לא נטען'); await ctx.close(); continue }
   let R;
   if(unitsPath){

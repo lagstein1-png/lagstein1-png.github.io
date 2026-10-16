@@ -10,9 +10,9 @@
       הקבצים שנוצרו שם ובכלים לא יימצאו); טקסט שבמניפסט מנוגן,
       טקסט שאינו — `play` מחזיר false בלי לגעת ב-Audio; כישלון
       ניגון מגיע ב-onError; `stop` משתיק.
-   2. **החיווט** בארבע אפליקציות המאגר: תגית, PRE ב-sw.js,
-      `play` בתוך `speak` לפני קול המכשיר,
-      ו-`stop` בתוך `stopSpeak`.
+   2. **החיווט** בכל אפליקציה ב-stages.json (O-165): תגית, PRE ב-sw.js,
+      `play` בתוך פונקציית ההקראה ולפני הנפילה לקול המכשיר, ו-`stop`
+      בפונקציית העצירה — בכל קובץ של האפליקציה, גם `js/speech.js`.
    3. **`--browser`** (דורש שרת): english אמיתי, מניפסט מזויף שמכיל
       את המזהה של משפט אחד — `speak` של המשפט הזה מנגן קובץ ולא
       פונה ל-speechSynthesis; משפט אחר — ההפך.
@@ -157,39 +157,105 @@ function fresh(manifest, audioBehaviour, opts) {
     '/tutor/audio/he/' + R.id(TXT) + '.mp3');
 
   /* --- 2 · החיווט ------------------------------------------------ */
-  /* המנוע נטען בכולן — ״כמנוע שממנו לוקחים בעתיד״ — ו-sw.js של תשע
-     האפליקציות חייב להישאר זהה (engine.js). מנגן רק במי שיש לה
-     מאגר קבוע. */
-  const ALL = ['math-app','math-teen','math-uni','math-uni2','math-uni3','english',
-               'history','ulpan','lomda','kotvim','reader','rakia','bagrut-806',
-               /* 2.10.2026: חמש שחוטמו 30.9 בלי PRE (אופליין — בלי המודול), ושתיים בלי כלום */
-               'civics','hebrew','literature','tanakh','hebrew-arab','biology','islam','russian','geography','motal'];
+  /* O-165, 16.10.2026: עד היום שתי רשימות כתובות ביד (23 ו-13), רגקס
+     של תגית שלא התיר תכונות (`onerror="void 0"`), ובדיקת `speak` שקראה
+     רק `index.html` — ולכן שבע הרב־קובציות, שהניגון שלהן ב-`js/speech.js`,
+     היו מחוץ להישג מבנית, עם 1,615 הקלטות. עכשיו:
+       · הרשימה נגזרת מ-stages.json (applist.js), עם רצפה.
+       · התגית — כל `<script … src="/speech/recorded.js" …>`.
+       · הניגון והעצירה — בכל .html/.js של האפליקציה, לא רק index.html.
+       · אפליקציה בלי RECORDED.play אינה ירוקה בשקט: אם המניפסט שלה
+         ריק — דילוג מודפס עם הנימוק; אם יש בו הקלטות — נפילה, כי
+         הקלטות ששולם עליהן אינן מגיעות ללומד. */
+  const AL = require('./applist.js');
+  const ALL = AL.pick(process.argv.slice(2), AL.local());
+  if (ALL.length < 30 && !process.argv.slice(2).filter(a => !a.startsWith('-')).length)
+    t('הגזירה מ-stages.json החזירה רשימה סבירה (30 ומעלה)', ALL.length >= 30, true);
+  const TAG = /<script\b[^>]*\bsrc\s*=\s*["']\/speech\/recorded\.js["'][^>]*>/;
+  /* הערות מוחלפות ברווחים, כדי שקריאה שהפכה להערה לא תיספר כחיה,
+     והמיקומים נשארים. */
+  const strip = src => src.replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+                          .replace(/(^|[^:"'\\])\/\/[^\n]*/g, (m, p) => p + ' '.repeat(m.length - p.length));
+  function appFiles(app) {
+    const out = [];
+    (function walk(d) {
+      for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+        if (e.name.startsWith('.') || ['audio', 'img', 'vendor', 'fonts', 'data'].includes(e.name)) continue;
+        const p = path.join(d, e.name);
+        if (e.isDirectory()) walk(p);
+        else if (/\.(html|js)$/.test(e.name) && e.name !== 'sw.js') out.push(p);
+      }
+    })(path.join(ROOT, app));
+    return out;
+  }
+  /* הפונקציה הפנימית ביותר שגופה מכיל את המיקום — function רגילה או חץ עם גוף */
+  function enclosing(src, at) {
+    let best = null;
+    const re = /\bfunction\b[^{]*\{|=>\s*\{/g;
+    let m;
+    while ((m = re.exec(src)) && m.index < at) {
+      const open = m.index + m[0].length - 1;
+      let depth = 0, i = open;
+      for (; i < src.length; i++) { const c = src[i]; if (c === '{') depth++; else if (c === '}' && --depth === 0) break; }
+      if (i > at) best = { start: m.index, open, end: i, name: (m[0].match(/function\s+([\w$]+)/) || [, '(אנונימית)'])[1] };
+    }
+    return best;
+  }
+  const DEVICE = /speechSynthesis\.speak\s*\(|\b[\w$]*[Dd]evice[\w$]*\b|\bspeakParts\b|\bspeakLocal\b/;
+  /* חריג אמיתי, ידוע ומודפס — לא ירוק שקט. רשומה שכבר אינה נדרשת נופלת. */
+  const NO_FALLBACK = {
+    'net-elem': 'הקלטה בלבד בכוונה (net-elem/js/speech.js:31 ״Missing recordings never switch to another voice״, קומיט aa912314): ' +
+                'טקסט בלי הקלטה מציג ״אין קול״ ואינו נופל לקול המכשיר. נחשף עם O-165, 16.10.2026; במניפסט 3 הקלטות בלבד',
+  };
+  const SKIPPED = [];
   for (const app of ALL) {
     const html = fs.readFileSync(path.join(ROOT, app, 'index.html'), 'utf8');
-    const sw = fs.readFileSync(path.join(ROOT, app, 'sw.js'), 'utf8');
-    t(app + ' — תגית ו-PRE', [/<script src="\/speech\/recorded\.js">/.test(html), sw.indexOf('/speech/recorded.js') >= 0], [true, true]);
+    const swf = path.join(ROOT, app, 'sw.js');
+    const sw = fs.existsSync(swf) ? fs.readFileSync(swf, 'utf8') : '';
+    t(app + ' — תגית ו-PRE', [TAG.test(html), sw.indexOf('/speech/recorded.js') >= 0], [true, true]);
+
+    let plays = 0, playOk = [], stopOk = 0;
+    for (const f of appFiles(app)) {
+      const src = strip(fs.readFileSync(f, 'utf8'));
+      const rel = path.relative(ROOT, f);
+      for (const m of src.matchAll(/\bRECORDED\.play\s*\(/g)) {
+        plays++;
+        const fn = enclosing(src, m.index);
+        const after = fn ? src.slice(m.index, fn.end) : '';
+        playOk.push([rel + ':' + src.slice(0, m.index).split('\n').length + ' ' + (fn ? fn.name : '?'), !!fn && DEVICE.test(after)]);
+      }
+      for (const m of src.matchAll(/\bRECORDED\.stop\s*\(\s*\)/g)) {
+        const fn = enclosing(src, m.index);
+        if (fn && (/speechSynthesis\.cancel\s*\(/.test(src.slice(fn.open, fn.end)) || /stop/i.test(fn.name))) stopOk++;
+      }
+    }
+    if (!plays) {
+      let n = -1;
+      try {
+        const man = JSON.parse(fs.readFileSync(path.join(ROOT, app, 'audio', 'manifest.json'), 'utf8'));
+        n = Object.values(man.langs || {}).reduce((s, v) => s + ((v && v.ids) || []).length, 0);
+      } catch (e) {}
+      if (n === 0) { SKIPPED.push(app); continue; }
+      t(app + ' — יש ' + (n < 0 ? 'מניפסט שאינו נקרא' : n + ' הקלטות במניפסט') + ', ואין RECORDED.play באף קובץ — ההקלטות אינן מגיעות ללומד', false, true);
+      continue;
+    }
+    const noFb = playOk.filter(x => !x[1]).map(x => x[0]);
+    if (NO_FALLBACK[app]) {
+      if (noFb.length) console.log('· ' + app + ' — ידוע: ' + NO_FALLBACK[app]);
+      else t(app + ' — רשומת NO_FALLBACK שכבר אינה נדרשת: הסר אותה', true, false);
+    } else
+      t(app + ' — RECORDED.play בתוך פונקציית ההקראה, ואחריו נפילה לקול המכשיר', noFb, []);
+    t(app + ' — RECORDED.stop() בפונקציית העצירה', stopOk > 0, true);
   }
-  /* כל מי שב-SOURCES של record.js (יש לה מאגר קבוע), ושתיים שהבעלים
-     ביקש 2.10.2026 — אין להן מאגר קבוע עדיין, אבל speak מוכן לו */
-  /* hebrew בנויה אחרת (app.js, speakParts) ומחווטת שם — מחוץ לבדיקת התבנית */
-  const APPS = ['english', 'history', 'ulpan', 'lomda', 'civics', 'literature', 'tanakh', 'hebrew-arab', 'biology', 'islam', 'russian',
-                'geography', 'motal'];
-  for (const app of APPS) {
-    const html = fs.readFileSync(path.join(ROOT, app, 'index.html'), 'utf8');
-    const sw = fs.readFileSync(path.join(ROOT, app, 'sw.js'), 'utf8');
-    const speakBody = (html.match(/function speak\(text,lang,rateMul\)\{[\s\S]*?\n\}/) || [''])[0];
-    const stopBody = (html.match(/function stopSpeak\(\)\{[^\n]*/) || [''])[0];
-    t(app + ' — play לפני קול המכשיר, stop', [
-      speakBody.indexOf('RECORDED.play(') >= 0 && speakBody.indexOf('RECORDED.play(') < speakBody.indexOf('speakDevice('),
-      stopBody.indexOf('RECORDED.stop()') >= 0
-    ], [true, true]);
-  }
+  if (SKIPPED.length)
+    console.log('· דילוג מנומק (' + SKIPPED.length + '): ' + SKIPPED.join(' ') +
+                ' — המודול נטען, המניפסט ריק (0 הקלטות) ואין RECORDED.play. כשתיווסף הקלטה ראשונה — הבדיקה תיפול עד שיחווט ניגון.');
   t('הקובץ המשותף קיים', fs.existsSync(path.join(ROOT, 'speech', 'recorded.js')), true);
 
   /* --- 3 · בדפדפן ------------------------------------------------ */
   if (process.argv.includes('--browser')) {
     const { chromium } = require('./pw.js');
-    const BASE = 'http://127.0.0.1:8099';
+    const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
     const LEGAL_VER = (fs.readFileSync(path.join(ROOT, 'legal', 'terms.js'), 'utf8').match(/version:\s*"([^"]+)"/) || [])[1];
     const browser = await chromium.launch();
     const page = await (await browser.newContext()).newPage();

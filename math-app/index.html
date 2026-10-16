@@ -2934,7 +2934,7 @@ function doneScreen(){
   '<div style="display:flex;justify-content:center;gap:8px;margin-top:14px;color:var(--amber)">'+ic("star",stars>=1?34:26)+(stars>=2?ic("star",34):ic("star",22))+(stars>=3?ic("star",34):ic("star",22))+'</div>'+
   '<div class="cols cols3" style="margin-top:26px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">'+
   '<div class="tile"><span class="ic" style="background:var(--teal-soft);color:var(--teal-deep)">'+ic("check",20)+'</span><b>'+P.ok+'/'+P.ses.length+'</b><span>'+esc(t.doneOk)+'</span></div>'+
-  '<div class="tile"><span class="ic" style="background:var(--amber-soft);color:var(--amber-deep)">'+ic("star",20)+'</span><b>+'+(P.ok*10+15)+'</b><span>'+esc(t.doneXp)+'</span></div>'+
+  '<div class="tile"><span class="ic" style="background:var(--amber-soft);color:var(--amber-deep)">'+ic("star",20)+'</span><b>+'+(P.ok*10+roundBonus())+'</b><span>'+esc(t.doneXp)+'</span></div>'+
   '<div class="tile"><span class="ic" style="background:var(--coral-soft);color:var(--coral-deep)">'+ic("flame",20)+'</span><b>'+state.stats.streak+'</b><span>'+esc(t.streak)+'</span></div>'+
   '</div>'+
   extra+
@@ -4526,10 +4526,14 @@ function recordAnswer(correct,kind){
   else s.streak=0;
   awardStickers();save();
 }
+/* O-190: בונוס הסבב (15 נקודות) ניתן רק כשלפחות חצי מהתשובות בסבב נכונות.
+   קודם הוא ניתן בלי תנאי, ומכיוון שהרמה נגזרת מהנקודות (diffForXp),
+   320 לחיצות "דלג" הביאו לרמה 6 בלי אף תשובה נכונה. */
+function roundBonus(){return (P.ses.length&&P.ok*2>=P.ses.length)?15:0}
 function finishRound(){
   state.sessionHistory.push({date:todayIso(),correct:P.ok,total:P.ses.length,level:activeLevel()});
   if(state.sessionHistory.length>30)state.sessionHistory=state.sessionHistory.slice(-30);
-  state.stats.sessions++;state.stats.xp+=15;
+  state.stats.sessions++;state.stats.xp+=roundBonus();
   var d=todayIso();
   if(state.stats.days.indexOf(d)<0){state.stats.days.push(d);if(state.stats.days.length>60)state.stats.days=state.stats.days.slice(-60)}
   awardStickers();save();

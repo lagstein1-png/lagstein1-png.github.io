@@ -1,4 +1,5 @@
 const { chromium } = require('playwright');
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 
 const VOICES = {
   hila: { name:'Microsoft Hila - Hebrew (Israel)', lang:'he-IL', voiceURI:'uri-hila', localService:false, default:false },
@@ -26,7 +27,7 @@ navigator.onLine = true;
   const ok = (name,cond)=>{ console.log((cond?'PASS':'FAIL')+' '+name); if(!cond) fails.push(name); };
 
   await page.addInitScript(INIT);
-  await page.goto('http://127.0.0.1:8099/ulpan/');
+  await page.goto(BASE+'/ulpan/');
   await page.waitForTimeout(800);
 
   const r1 = await page.evaluate(()=>{
@@ -73,7 +74,7 @@ navigator.onLine = true;
   ok('ulpan re-pick after manual cleared', r1.afterManualCleared==='uri-hila');
 
   // --- tutor.js engine ---
-  await page.goto('http://127.0.0.1:8099/');
+  await page.goto(BASE+'/');
   await page.waitForTimeout(300);
   await page.evaluate(async ()=>{
     let src = await (await fetch('/tutor/tutor.js')).text();

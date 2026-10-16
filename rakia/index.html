@@ -531,15 +531,20 @@ function pickPlace(p){ placeSel=p; $("#f-place").value=placeLabel(p); sugList=[]
 
 /* ---------- חישוב ---------- */
 var current=null;   /* {who, y,m,d,hh,mi,timeKnown,place,tz,offset,houseSystem,chart} */
-function readForm(){
-  var y=+$("#f-year").value, m=+$("#f-month").value, d=+$("#f-day").value;
-  var notime=$("#f-notime").checked, t=$("#f-time").value||"12:00";
-  var hh=+t.split(":")[0], mi=+t.split(":")[1];
+/* אותו חסם לטופס ולפתיחת אדם שמור או מיובא — קובץ ייבוא אינו עוקף אותו (O-175) */
+function dateErr(y,m,d){
   var err=[];
   if(!(y>=1900&&y<=2100))err.push(LG("שנה בין 1900 ל-2100","a year between 1900 and 2100"));
   if(!(m>=1&&m<=12))err.push(LG("חודש","a month"));
   var dim=new Date(Date.UTC(y,m,0)).getUTCDate();
   if(!(d>=1&&d<=dim))err.push(LG("יום בין 1 ל-"+dim,"a day between 1 and "+dim));
+  return err;
+}
+function readForm(){
+  var y=+$("#f-year").value, m=+$("#f-month").value, d=+$("#f-day").value;
+  var notime=$("#f-notime").checked, t=$("#f-time").value||"12:00";
+  var hh=+t.split(":")[0], mi=+t.split(":")[1];
+  var err=dateErr(y,m,d);
   if(!placeSel){ var s=searchPlaces($("#f-place").value); if(s.length===1)placeSel=s[0]; }
   if(!placeSel)err.push(LG("מקום מהרשימה","a place from the list"));
   if(notime){hh=12;mi=0}
@@ -548,13 +553,15 @@ function readForm(){
 }
 var INTL_OK=true;
 function computeFrom(o){
-  var utcMs, off;
+  var utcMs, off, tzs=null;
   var manual=$("#f-tz").value;
   if(!INTL_OK&&manual!==""){ off=Math.round(+manual*60); utcMs=Date.UTC(o.y,o.m-1,o.d,o.hh,o.mi)-off*60000; }
-  else { var r=ASTRO.localToUtc(o.y,o.m,o.d,o.hh,o.mi,o.place[5]); utcMs=r.utcMs; off=r.offsetMinutes; }
+  else { var r=ASTRO.localToUtc(o.y,o.m,o.d,o.hh,o.mi,o.place[5]); utcMs=r.utcMs; off=r.offsetMinutes; tzs=r; }
   var jd=ASTRO.jdFromMs(utcMs);
   var ch=ASTRO.chart({jdUt:jd,lat:o.place[3],lon:o.place[4],houseSystem:o.houseSystem,timeKnown:o.timeKnown});
   o.utcMs=utcMs; o.offset=off; o.chart=ch; o.tz=o.place[5];
+  /* O-175: שעה שלא הייתה או שהייתה פעמיים — הערה ב-renderMoment */
+  o.tzStatus=tzs&&o.timeKnown?tzs.status:"ok"; o.tzLocal=tzs?tzs.local:""; o.tzShift=tzs?tzs.shiftMinutes:0;
   return o;
 }
 function onSubmit(e){
@@ -592,6 +599,11 @@ function renderMoment(){
   notes.push('<p class="hint">'+LG("זמן אוניברסלי: ","Universal Time: ")+esc(new Date(o.utcMs).toISOString().replace("T"," ").slice(0,16))+' · '+(ch.houses?LG("שיטת בתים: ","House system: ")+LG(({placidus:"פלסידוס",whole:"מזל שלם",equal:"בתים שווים"})[ch.houses.system],({placidus:"Placidus",whole:"Whole Sign",equal:"Equal Houses"})[ch.houses.system]):LG("ללא בתים","No houses"))+'</p>');
   if(!o.timeKnown)notes.push('<p class="notice">'+LG("בלי שעת לידה: אין עולה ואין בתים, והמפה חושבה לצהריים.","Without a birth time there is no Ascendant and no houses, and the chart was calculated for noon.")+'</p>');
   if(ch.houses&&ch.houses.fallback)notes.push('<p class="notice">'+LG("ברוחב גיאוגרפי כזה שיטת פלסידוס אינה מוגדרת, ולכן הבתים חושבו לפי מזל שלם.","At this latitude the Placidus system is not defined, so the houses were calculated by Whole Sign.")+'</p>');
+  if(o.tzStatus==="gap"||o.tzStatus==="ambiguous"){
+    var asked=two(o.hh)+":"+two(o.mi), sh=o.tzShift===60?LG("שעה","an hour"):LG(o.tzShift+" דקות",o.tzShift+" minutes");
+    if(o.tzStatus==="gap")notes.push('<p class="notice">'+LG("השעה "+asked+" לא הייתה קיימת ביום הזה במקום הזה: בגלל שעון הקיץ השעון קפץ "+sh+" קדימה. המפה חושבה לשעה "+o.tzLocal+" לפי השעון החדש, וזה אותו רגע. כדאי לבדוק את השעה בתעודת הלידה.","The time "+asked+" did not exist on this day in this place: the clock jumped forward "+sh+" for daylight saving time. The chart was calculated for "+o.tzLocal+" on the new clock, which is the same moment. It is worth checking the time on the birth certificate.")+'</p>');
+    else notes.push('<p class="notice">'+LG("השעה "+asked+" הייתה פעמיים ביום הזה במקום הזה: בסוף שעון הקיץ השעון חזר "+sh+" אחורה. המפה חושבה לפעם הראשונה. אם הלידה הייתה בפעם השנייה, הרגע מאוחר יותר ב"+sh+", והעולה והבתים משתנים.","The time "+asked+" happened twice on this day in this place: at the end of daylight saving time the clock went back "+sh+". The chart was calculated for the first time. If the birth was the second time, the moment is "+sh+" later, and the Ascendant and houses change.")+'</p>');
+  }
   var pl=bodyOf(ch,"pluto"); if(pl&&pl.lowPrecision)notes.push('<p class="notice">'+LG("פלוטו מחוץ לטווח הנוסחה (1885–2099) — דיוק נמוך, עד כשליש מעלה.","Pluto is outside the range of the formula (1885-2099): low accuracy, up to about a third of a degree.")+'</p>');
   $("#chart-notes").innerHTML=notes.join("");
   $("#moment-title").textContent=LG("הרגע האחד","The one moment")+(o.who?LG(" של "," of ")+o.who:"");
@@ -768,7 +780,10 @@ function renderPeople(){
   var list=people(), ul=$("#people-list");
   ul.innerHTML=list.length?list.map(function(p){ return '<li><span class="name">'+esc(p.who||"ללא שם")+'</span><span class="hint">'+p.d+'.'+p.m+'.'+p.y+(p.timeKnown?' '+two(p.hh)+':'+two(p.mi):'')+' · '+esc(LANG==="en"?(p.place[1]||p.place[0]):(p.place[0]||p.place[1]))+'</span><button type="button" class="btn small" data-a="open" data-v="'+p.id+'">פתיחה</button><button type="button" class="btn small" data-a="del" data-v="'+p.id+'">מחיקה</button></li>' }).join(""):'<li class="hint">עדיין אין אף אחד. חשבו מפה ולחצו ״שמירה לאנשים שלי״.</li>';
 }
-function openPerson(id){ var p=people().filter(function(x){return String(x.id)===String(id)})[0]; if(!p)return; fillForm(p); current=computeFrom(serialize(p)); renderChart(); nav("chart") }
+function openPerson(id){ var p=people().filter(function(x){return String(x.id)===String(id)})[0]; if(!p)return; fillForm(p);
+  var err=dateErr(+p.y,+p.m,+p.d), errEl=$("#form-err");
+  if(err.length){ errEl.textContent=LG("חסר או לא תקין: ","Missing or invalid: ")+err.join(", "); errEl.hidden=false; nav("form"); return }
+  errEl.hidden=true; current=computeFrom(serialize(p)); renderChart(); nav("chart") }
 function delPerson(id){ if(!confirm(LG("למחוק מהרשימה?","Delete from the list?")))return; setPeople(people().filter(function(x){return String(x.id)!==String(id)})); renderPeople() }
 function exportPeople(){
   var data={app:"rakia",version:1,exported:new Date().toISOString(),people:people()};

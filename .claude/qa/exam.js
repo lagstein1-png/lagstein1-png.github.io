@@ -4,7 +4,7 @@
 const {chromium}=require('./pw.js');
 const APPS=process.argv.slice(2).length?process.argv.slice(2)
   :["math-app","math-teen","math-uni","math-uni2","math-uni3","ulpan","english","history","lomda"];
-const BASE="http://127.0.0.1:8099";
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 
 (async()=>{
   const b=await chromium.launch();

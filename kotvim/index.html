@@ -1966,6 +1966,15 @@ function speak(text,lang,rateMul){
   var rate=clamp(state.rate*(rateMul||1),0.55,1.4);
   stopSpeak();
   var my=_sayGen;   /* גם תשובת רשת שמגיעה אחרי עצירה לא תושמע */
+  /* שכבה 1 — קובץ מוקלט (O-193, 16.10.2026; מועתק מ-english).
+     125 קטעים קבועים הוקלטו ולא נוגנו מעולם, כי החיבור הזה חסר.
+     יש קובץ לטקסט — מנגנים אותו וזהו. אין (טקסט שהורכב מכמה
+     קטעים, שפה אחרת) — ממשיכים למטה כאילו השכבה לא קיימת.
+     כישלון באמצע — קול המכשיר. */
+  if(typeof RECORDED!=="undefined"&&RECORDED.play(text,lang,{rate:state.rate,
+      onError:function(){ if(my===_sayGen)speakDevice(text,code,rate) }})){
+    return;
+  }
   if(gemOn()){
     var vid=gvOf(state.gemVoice).id;
     var ck=lang+"|"+vid+"|"+rate.toFixed(2)+"|"+text;
@@ -1988,7 +1997,7 @@ function playUrl(url,text,code,rate){
   gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){_sayGen++;gStop();hlClear();stopKeepAlive();_activeU=null;try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();stopKeepAlive();_activeU=null;try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){

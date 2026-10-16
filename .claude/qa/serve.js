@@ -6,7 +6,7 @@
    הרגיל — ולכן הוא מריץ את הקובץ הזה מהריפו, עם cwd אחר. */
 const http=require('http'),fs=require('fs'),path=require('path'),url=require('url');
 const root=process.cwd();
-const PORT=Number(process.env.QA_PORT)||8099;
+const { PORT } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 const mime={'.html':'text/html;charset=utf-8','.js':'text/javascript;charset=utf-8',
   '.json':'application/json;charset=utf-8','.png':'image/png','.svg':'image/svg+xml',
   '.css':'text/css','.mp3':'audio/mpeg','.webp':'image/webp','.ico':'image/x-icon',

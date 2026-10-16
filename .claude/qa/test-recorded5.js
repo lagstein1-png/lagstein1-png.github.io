@@ -1,4 +1,5 @@
 const { chromium } = require('playwright');
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 (async()=>{
   const b = await chromium.launch();
   const p = await b.newPage();
@@ -8,7 +9,7 @@ const { chromium } = require('playwright');
   const ok = (n,c)=>{ console.log((c?'PASS':'FAIL')+' '+n); if(!c) fails.push(n); };
 
   for (const app of ['civics','literature','tanakh','hebrew-arab','hebrew']) {
-    await p.goto('http://127.0.0.1:8099/'+app+'/');
+    await p.goto(BASE+'/'+app+'/');
     await p.waitForTimeout(700);
     const r = await p.evaluate(async ()=>{
       const out = {recorded: typeof RECORDED !== 'undefined'};

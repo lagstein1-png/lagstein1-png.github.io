@@ -40,7 +40,7 @@
 const fs = require('fs'), path = require('path');
 const { chromium } = require('./pw.js');
 const ROOT = path.resolve(__dirname, '..', '..');
-const BASE = 'http://127.0.0.1:' + (process.env.QA_PORT || 8099);
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 const H = 740;                       /* גובה מסך טלפון */
 const KB = 380;                      /* מה שנשאר ממנו כשהמקלדת פתוחה */
 

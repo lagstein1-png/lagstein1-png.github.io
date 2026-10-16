@@ -1,10 +1,11 @@
 const { chromium } = require('playwright');
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 (async()=>{
   const b = await chromium.launch();
   const p = await b.newPage();
   const errs = [];
   p.on('pageerror', e => errs.push(String(e)));
-  await p.goto('http://127.0.0.1:8099/ulpan/');
+  await p.goto(BASE+'/ulpan/');
   await p.waitForTimeout(900);
   const lg = await p.$('#lg-ok');
   if(lg){ await lg.click(); await p.waitForTimeout(300); }

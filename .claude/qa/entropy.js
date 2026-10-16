@@ -1,12 +1,13 @@
 const {chromium}=require('./pw.js');
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 (async()=>{
 let failed=0;   /* בלי זה הכלי מדפיס ממצאים ויוצא 0 */
  const b=await chromium.launch();
  for(const app of process.argv.slice(2)){
   const ctx=await b.newContext({locale:'he-IL'});const page=await ctx.newPage();
   const errs=[];page.on('pageerror',e=>errs.push(e.message));
-  await page.route('**/*',r=>r.request().url().startsWith('http://127.0.0.1:8099')?r.continue():r.abort());
-  try{await page.goto('http://127.0.0.1:8099/'+app+'/',{waitUntil:'domcontentloaded'})}catch(e){console.log(app,'SKIP');await ctx.close();continue}
+  await page.route('**/*',r=>r.request().url().startsWith(BASE)?r.continue():r.abort());
+  try{await page.goto(BASE+'/'+app+'/',{waitUntil:'domcontentloaded'})}catch(e){console.log(app,'SKIP');await ctx.close();continue}
   await page.waitForTimeout(1000);
   /* שגיאה באפליקציה אחת אינה גוזלת כיסוי מהשאר — אבל היא כן
      מפילה את הריצה בסוף, כי בדיקה שיוצאת 0 אחרי שנשברה היא בדיוק

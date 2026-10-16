@@ -6,7 +6,8 @@
 **הרצה: פקודה אחת.**
 
     node .claude/qa/all.js              # הכול, ופסק דין אחד
-    node .claude/qa/all.js --fast       # בלי הבדיקות המסומנות slow (ארבע, 21.9.2026)
+    node .claude/qa/all.js --fast       # בלי הבדיקות המסומנות slow (חמש מ-16.10.2026: + record-safety, היחידה שאינה needsServer)
+    QA_PORT=8123 node .claude/qa/all.js # ריצה שנייה במקביל — השרת וכל הכלים קוראים את הפורט מ-port.js (O-197)
     node .claude/qa/all.js --static     # רק מה שאינו דורש דפדפן
 
 `all.js` מרים את השרת בעצמו וסוגר אותו בסוף. להרצה של כלי בודד:

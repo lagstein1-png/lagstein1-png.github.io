@@ -1,4 +1,5 @@
 const {chromium}=require('./pw.js');
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 async function click(p,s){try{await p.click(s,{timeout:2000});await p.waitForTimeout(300);return true}catch(e){return false}}
 (async()=>{const b=await chromium.launch();
 let failed=0;   /* בלי זה הכלי מדפיס ERRORS ויוצא 0 */
@@ -16,10 +17,10 @@ for(const app of process.argv.slice(2)){
     errs.push('CONSOLE: '+t);
   });
   await page.route('**/*',r=>{
-    if(r.request().url().startsWith('http://127.0.0.1:8099'))return r.continue();
+    if(r.request().url().startsWith(BASE))return r.continue();
     blocked++;return r.abort();
   });
-  await page.goto('http://127.0.0.1:8099/'+app,{waitUntil:'domcontentloaded',timeout:20000});
+  await page.goto(BASE+'/'+app,{waitUntil:'domcontentloaded',timeout:20000});
   await page.waitForTimeout(700);
   await click(page,'#lg-ok');
   for(let i=0;i<10;i++){

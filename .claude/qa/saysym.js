@@ -18,7 +18,7 @@
 'use strict';
 const { chromium } = require('./pw.js');
 
-const BASE = 'http://127.0.0.1:8099';
+const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 const APPS = ['math-teen', 'math-uni', 'math-uni2', 'math-uni3'];
 /* דגימות לכל תא (נושא × רמה). ללא תקרה על סך השאלות: תקרה כזאת
    חתכה את הריצה לפני הנושאים האחרונים ברשימה, ושני באגים
