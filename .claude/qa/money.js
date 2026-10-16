@@ -234,9 +234,9 @@ const PER = /^\s*(?:ל?חודש|לשנה|בחודש|בשנה|per (?:month|year)|
 const CONTENT = {
   signup: {
     'civics/index.html': [2, 'רישום נישואין בישראל — שאלת אזרחות (ru)'],
-    'english/index.html': [5, 'קטע קריאה ״A youth center tested online sign-up״'],
+    'english/index.html': [6, 'קטע קריאה ״A youth center tested online sign-up״ (6 מ-16.10.2026: מסיח ״The paper sign-up forms disappeared״, O-222)'],
     'geography/index.html': [4, 'חובת רישום של מהגר — שאלת הגירה בארבע שפות'],
-    'hebrew/app.js': [1, 'מסיח ״להירשם לשיעור״'],
+    'hebrew/app.js': [2, 'מסיח ״להירשם לשיעור״ ותרגומו ״Sign up for a lesson״ (O-223, 16.10.2026)'],
     'hebrew-arab/index.html': [4, 'מודעה במרכז הקהילתי — ״צריך להירשם מראש״'],
     'kotvim/index.html': [1, 'משפט ״I will sign up again״'],
     'teachers/index.html': [2, 'דף המורים: כניסה לאתר משרד החינוך (ar), ו״регистрация … не нужны״ (השלילה אחרי המילה)'],

@@ -2580,7 +2580,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s166 · 2026-10-16";
+var BUILD="s167 · 2026-10-16";
 var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -4956,7 +4956,7 @@ function onAction(a,el){
     render();window.scrollTo(0,0)}
   else if(a==="copylink")copyLink();
   else if(a==="usay"){speak(el.getAttribute("data-say"))}
-  else if(a==="ustep"){var uc=el.closest(".card");if(uc){var ucl=uc.cloneNode(true);[].slice.call(ucl.querySelectorAll("button,script,style")).forEach(function(x){x.remove()});[].slice.call(ucl.querySelectorAll('p,h1,h2,h3,li,div')).forEach(function(x){x.appendChild(document.createTextNode(' '))});speak(ucl.textContent.replace(/\s+/g," ").trim())}}
+  else if(a==="ustep"){var uc=el.closest(".card");if(uc){var ucl=uc.cloneNode(true);[].slice.call(ucl.querySelectorAll("button,script,style,[hidden]")).forEach(function(x){x.remove()});[].slice.call(ucl.querySelectorAll('p,h1,h2,h3,li,div')).reverse().forEach(function(x){x.appendChild(document.createTextNode(/[\p{L}\p{N}]$/u.test(x.textContent.trim())?'. ':' '))});speak(ucl.textContent.replace(/\s+/g," ").trim())}}
   else if(a==="uhint"){var hp=el.parentNode.querySelector(".hintxt");if(hp){hp.hidden=!hp.hidden;if(!hp.hidden)speak(el.getAttribute("data-say"))}}
   else if(a==="selpet"){P.selPet=el.getAttribute("data-p");render()}
   else if(a==="takesugg"){var sg={fox:t.petFoxName,josh:t.petJoshName,owl:t.petOwlName}[P.selPet]||"";state.petName=sg;state.petAuto=true;save();render()}
@@ -6367,7 +6367,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s166-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s167-pwa1").catch(function(){});
   });
 }
 </script>

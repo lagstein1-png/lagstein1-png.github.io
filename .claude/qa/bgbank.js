@@ -56,33 +56,10 @@ if (!MODS.length) { console.log('✗ bgMods לא נמצאה — אי אפשר ל
    קצרה יותר) הוא עבודה של maayan — לא של הבודק. עד אז הן כאן בשמן:
    שאלה **חדשה** עם אותו פגם מפילה; שאלה מהרשימה שתוקנה — מדווחת,
    כדי שתימחק מכאן והרשימה רק תתקצר. */
-const LENGTH_BASELINE = new Set([
-  "What was wrong with the first schedule?",
-  "What helped learners stay engaged?",
-  "Where was the repair table?",
-  "Who should repair large machines?",
-  "Why was the bus late?",
-  "Why was the schedule not changed?",
-  "What did each class write?",
-  "Where did some vegetables go?",
-  "What belongs on a card?",
-  "Why start the wall?",
-  "Why use large type?",
-  "What was NOT counted?",
-  "How did the coach compare progress?",
-  "Who benefits from the chart?",
-  "What was missing at first?",
-  "What was added?",
-  "What did feedback show?",
-  "What must borrowers sign?",
-  "Why make picture guides?",
-  "What could residents mark?",
-  "What was the first plan?",
-  "What could contributors choose?",
-  "Why is the wait reduction inconclusive?",
-  "What problem did users report?",
-  "What did late summer show?",
-]);
+/* 16.10.2026 (O-222, maayan): 25 השאלות תוקנו — המסיחים נוסחו מחדש
+   באורך דומה לתשובה, והתשובות לא נגעו. הרשימה ריקה: כל שאלה שהנכונה
+   בה ארוכה בבירור מפילה. */
+const LENGTH_BASELINE = new Set([]);
 
 const bad = [], seenQ = new Map(), seenT = new Map(), perMod = {};
 const str = x => typeof x === 'string' && x.trim().length > 0;
