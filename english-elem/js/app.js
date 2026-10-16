@@ -242,7 +242,11 @@ function openLimor(){
     if(k==="lmR1"){closeL();speakSeq(practiceSegs());return}
     playText();
   }
-  function onKey(e){if(e.key==="Escape"||e.key==="Esc"){e.preventDefault();closeL()}}
+  /* מלכודת המיקוד (O-173), כמו ב-science-12: Tab ו-Shift+Tab נשארים בתוך החלון.
+     המאזין יושב על המסמך, ולכן גם מיקוד שברח החוצה (לחיצה על הרקע) חוזר פנימה. */
+  function onKey(e){if(e.key==="Escape"||e.key==="Esc"){e.preventDefault();closeL();return}
+    if(e.key==="Tab"){var bs=ov.querySelectorAll("button"),first=bs[0],last=bs[bs.length-1],a=document.activeElement,inside=[].indexOf.call(bs,a)>=0;
+      if(e.shiftKey&&(a===first||!inside)){e.preventDefault();last.focus()}else if(!e.shiftKey&&(a===last||!inside)){e.preventDefault();first.focus()}}}
   function closeL(){stopSpeech();document.removeEventListener("keydown",onKey);ov.remove();
     try{if(back&&back.focus)back.focus()}catch(e){}}
   document.addEventListener("keydown",onKey);

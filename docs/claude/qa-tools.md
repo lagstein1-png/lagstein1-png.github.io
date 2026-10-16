@@ -15,17 +15,17 @@
     node .claude/qa/a11y.js                  # ששת מצבי הנגישות — מ-applyModes ועד כלל ב-CSS
     node .claude/qa/aria.js                  # מצב דו־מצבי קבוע, outline בתוך :focus, tabindex חיובי, מאפיין פיזי
     node .claude/qa/pressed.js               # כפתור דו־מצבי בלי aria-pressed — קורא מסך אינו יודע מה נבחר
-    node .claude/qa/density.js               # כמה שאלות בכל תא נושא×רמה — ראצ׳ט מול בסיס, התקן 9
+    node .claude/qa/density.js               # כמה שאלות בכל תא נושא×רמה — ראצ׳ט מול בסיס, התקן 9; מאגר רשום שלא נקרא — נופל (O-196)
     node .claude/qa/cache.js                 # חמש בדיקות על שלושה־עשר ה-sw.js
     node .claude/qa/storage.js               # מפתח localStorage אחד לאפליקציה אחת — כל .html/.js בתיקייה, var/let/const, KEY לבדו (O-194)
     node .claude/qa/say.js                   # ההקראה לא מסגירה את התשובה לפני שעונים
     node .claude/qa/spacesay.js              # אותה דליפה, סטטית, בכל האפליקציות; וגם רווח/Enter על כפתור ממוקד שיורה פעמיים
-    node .claude/qa/barcontrast.js           # ניגודיות ארבעת הפקדים בפס הכותרת — בחישוב, בלי דפדפן
+    node .claude/qa/barcontrast.js           # ניגודיות ארבעת הפקדים בפס הכותרת — בחישוב, בלי דפדפן; app.css וגם <style> שב-index.html (O-196)
     node .claude/qa/saysym.js                # מה באמת נאמר — אין ^ או _ גולמי בהקראה
     node .claude/qa/guess.js                 # אי אפשר לקלוע לפי אורך התשובה או מיקומה; תא שחצה נמדד שוב לפני שמפיל
     node .claude/qa/visible.js               # מסיח בשאלת חסר שכבר גלוי במשפט — נפסל בלי ידע
     node .claude/qa/clearwhy.js              # הסבר הטעות כמשפט — בלי סימנים, בשפת הלומד, עד 120 תווים
-    node .claude/qa/clicks.js                # כל לחיצה מושמעת, והמתג שמשתיק אותה — בשתים־עשרה האפליקציות
+    node .claude/qa/clicks.js                # כל לחיצה מושמעת, והמתג שמשתיק אותה — הרשימה נגזרת (O-162), לא כתובה
     node .claude/qa/fonts.js                 # ערבית ורוסית בגופן שיש בו את הכתב
     node .claude/qa/langbtn.js               # כפתור השפה עצמו — "العربية" גם כשהממשק עברי
     node .claude/qa/teen-i18n.js             # ״שלב״ בארבע שפות בפועל — המסך, ההקראה, והרווח לפני מספר; בדפדפן
@@ -41,9 +41,9 @@
     node .claude/qa/langretry.mjs            # הניסיון החוזר — handleAsk עם fetch מוזרק, שלושה מצבים
     node .claude/qa/josh.js                  # הכתיב של ג׳וש (גרש עברי U+05F3), ושהשם שהלומד רואה הוא לימור
     node .claude/qa/brain.js                 # מוח אחד — אין מוח ג׳וש שני שדף טוען, ואין חיפוש מהדפדפן
-    node .claude/qa/joshface.js              # שכבת הפנים נשארת תצוגה — אין מוח, רשת, הקראה או קול
+    node .claude/qa/joshface.js              # שכבת הפנים נשארת תצוגה — אין מוח, רשת, הקראה או קול; גם כינוי (`var SS = window.speechSynthesis`, O-196)
     node .claude/qa/joshstate.js             # גלאי מצב הלומד — 17 תרחישים ב-vm נפרד, וארבע נגיעות החיווט בתשע אפליקציות
-    node .claude/qa/search.js                # חוזה ספק החיפוש — אין ספק, ואין ניסוח שמתיימר לבדוק
+    node .claude/qa/search.js                # חוזה ספק החיפוש — אין ספק, ואין ניסוח שמתיימר לבדוק; כל מארח בקוד השרת ברשימת המוכרים (O-196)
     node .claude/qa/claims.js                # חמש הטענות האסורות בשיווק — שלוש בגרפ, ושתיים שהפקודה מריצה
     node .claude/qa/money.js                 # אין מסחר: לא מחיר, לא דף קנייה, לא הבטחת תשלום, ולא הרשמה/חשבון/מנוי — גם בגוף כל דף (O-171, O-196)
     node .claude/qa/letters.js               # אורך המכתב שהכותרת מבטיחה, מול המכתב עצמו
@@ -64,7 +64,7 @@
     Actions → live-check → Run workflow      # מה באמת מוגש מהאתר החי (הסוכן חסום)
     Actions → tutor-status → Run workflow    # /health של לימור, כולל המכסה הגלובלית ב-KV (הסוכן חסום)
     node .claude/qa/keyboard.js              # הפאנל של לימור כשהמקלדת פתוחה — visualViewport מזויף, 360/412, עברית וערבית, חזקות, אופליין
-    node .claude/qa/apps.js              # שבעת המקומות שאפליקציה חדשה נוגעת בהם — האם כולם עודכנו
+    node .claude/qa/apps.js              # נקודות המגע בדף הבית (badge, ICONS, STAGE_IDS, SUBJECT_IDS…) — הרשימה: new-app-or-topic.md
     node .claude/qa/status.js --check    # STATUS.md מול המדידה — הטבלה לא נכתבת ביד
     node .claude/qa/sitemap.js --check   # sitemap.xml מול stages.json, noindex ו-git (המחולל: אותו קובץ בלי --check)
     node .claude/qa/pure.js              # המבחן הכיתתי: כל קריאה ל-buildQuestion מתוך buildQ מעבירה pure=true — בכל אפליקציה עם chooseIndex (O-184)
@@ -82,15 +82,15 @@
     node .claude/qa/og.js --check        # תמונות השיתוף: רקע מול theme_color, 1200×630, ואין עותק של אפליקציה אחרת (המחולל: אותו קובץ)
     node .claude/qa/icon.js --check      # אייקוני PWA: רקע מול theme_color, וכל אייקון שהמניפסט מצהיר קיים בגודלו (המחולל: אותו קובץ)
     node .claude/qa/media.js             # סרטוני ההדגמה — חתימת כל סרטון מול DEMO_SCRIPT, וצילומי המסך בארבע שפות
-    node .claude/qa/counts.js            # מספר תוכן שמצוטט בחומר שיווקי מול המדידה של היום
+    node .claude/qa/counts.js            # מספר תוכן שמצוטט בחומר שיווקי מול המדידה של היום — ומניין האפליקציות מול apps.js (O-200)
     node .claude/qa/barak.js             # מנוע לימור — חוזה ה-Worker מול מודל מדומה, והחיווט בלקוח; בלי רשת
-    node .claude/qa/hespeech.js          # מנוע ההגייה העברי — /tutor/he-speech.js
+    node .claude/qa/hespeech.js          # מנוע ההגייה העברי — /tutor/he-speech.js; תגית, PRE וקריאה ל-spoken בכל אפליקציה מקריאה — נגזר, NOT_WIRED מנומק (O-225)
     node .claude/qa/barak-browser.js     # לימור בדפדפן אמיתי מול שרת מדומה, בכל אפליקציה
     node .claude/qa/tutor-timeout.js     # ספק שתולה — הפאנל של לימור אינו נתקע (O-72)
     node .claude/qa/tutor-lang.js        # השאלה שלימור מקבלת כתובה בשפת המסך — בכל אפליקציה עם מחולל
     node .claude/qa/contrast.js          # האם הטקסט בכלל נראה — ניגודיות מול הסף
     node .claude/qa/shadow.js            # פונקציה גלובלית שנדרסה בשקט
-    node .claude/qa/voice.js             # מנוע ההקראה מול speechSynthesis מזויף — ארבעת המנגנונים מתאוששים; ופס ״אין קול בשפה״ (O-79): קולות en בלבד → פס פעם אחת, he → אין, ריקה → אין. `--nolang` מריץ רק אותו
+    node .claude/qa/voice.js             # מנוע ההקראה מול speechSynthesis מזויף — ארבעת המנגנונים מתאוששים, בכל אפליקציה מקריאה (נגזר מ-stages.json; EXCEPT לפי בדיקה, O-225); ופס ״אין קול בשפה״ (O-79): קולות en בלבד → פס פעם אחת, he → אין, ריקה → אין. `--nolang` מריץ רק אותו
     node .claude/qa/netpin.js            # מנגנון 4 מול בחירת קול ידנית — tutor/tutor.js
     node .claude/qa/exam.js              # המבחן מהקישור — השאלה שהמורה רואה היא שהתלמיד מקבל
     node .claude/qa/recorded.js          # השכבה המוקלטת — המודול והחיווט בכל אפליקציה ב-stages.json, גם js/speech.js (O-165); עם --browser גם הניגון בדפדפן
@@ -99,7 +99,7 @@
     node .claude/qa/audio-size.js            # תקרת שני מאגרי הקול, ומתג המקור מול 41 קובצי sw.js
     node .claude/qa/audio-move.js            # בונה את עצי ריפואי הקול מהעץ הזה — מעתיק, לא מוחק
     node .claude/qa/audio-adopt.js           # קליפ שכבר שולם עליו לא מוקלט שוב — מאמץ בין אפליקציות
-    node .claude/qa/findings.js --check  # FINDINGS.md מחזיק שבוע, הישן בארכיון — --archive מעביר (O-85)
+    node .claude/qa/findings.js --check  # FINDINGS.md מחזיק שבוע, הישן בארכיון — --archive מעביר (O-85); ושני ## בכל הקובץ (O-196)
     node .claude/qa/suite.js --check     # הרשימה הזאת מול SUITE שב-all.js — מזהה חסר או שורה מתה נופלים
     node .claude/qa/all.js                   # הכול, ופסק דין אחד; רשימות האפליקציות נגזרות מ-stages.json (applist.js)
     node .claude/qa/all.js --static          # רק מה שאינו דורש דפדפן
@@ -154,7 +154,7 @@ commit`** ובשער שמסונן עליו — מביא שינוי תוכן של
 
 **אבל יש דרך אחת לבדוק את האתר החי, והיא לא ידנית:**
 `.github/workflows/live-check.yml`, שנוסף 11.9.2026. הרנרים של
-GitHub אינם חסומים, והוא מושך את שתים־עשרה האפליקציות מהרשת
+GitHub אינם חסומים, והוא מושך את כל האפליקציות ש-`stages.json` מסמן `public` (הרשימה נגזרת בזמן הריצה) מהרשת
 ובודק שלושה דברים — סטטוס, מחרוזת שאמורה להיות בדף, ו**מפתח
 הקאש המוגש מול זה שב-`main`**. העמודה האחרונה היא העיקר: בלעדיה
 ״המחרוזת נמצאה״ יכול להיות עותק ישן שנשאר ב-CDN. הפעלה ידנית

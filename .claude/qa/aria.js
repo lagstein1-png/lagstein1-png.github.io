@@ -19,12 +19,24 @@ const path = require('path');
 const ROOT = process.cwd();
 const args = process.argv.slice(2);
 const single = args.indexOf('--file');
-const FILES = single >= 0
-  ? [args[single + 1]]
-  : (args.length ? args.map(a => path.join(a, 'index.html'))
-                 : fs.readdirSync(ROOT)
+/* מ-16.10.2026 (O-173) גם דף הבית (`.`) וגם `js/*.js` של כל אפליקציה.
+   עד אז נקרא `index.html` בלבד, ולכן כל הקוד של המשפחה הרב־קובצית
+   (`js/{i18n,data,engine,speech,app}.js`) — ובו חלון לימור — היה מחוץ
+   לטווח. הקבצים של אפליקציה נקראים יחד, כטקסט אחד: `aria-pressed`
+   שנכתב ב-`app.js` ומתעדכן ב-`engine.js` הוא תקין. */
+const DIRS = single >= 0 ? []
+  : (args.length ? args
+                 : ['.'].concat(fs.readdirSync(ROOT)
                      .filter(d => fs.existsSync(path.join(ROOT, d, 'index.html')))
-                     .sort().map(d => path.join(d, 'index.html')));
+                     .sort()));
+const jsOf = d => {
+  const j = path.join(ROOT, d, 'js');
+  return fs.existsSync(j) ? fs.readdirSync(j).filter(f => f.endsWith('.js')).sort()
+                              .map(f => path.join(d, 'js', f)) : [];
+};
+const FILES = single >= 0
+  ? [{ rel: args[single + 1], js: [] }]
+  : DIRS.map(d => ({ rel: path.join(d, 'index.html'), js: jsOf(d) }));
 
 const HEBW = /[\u0590-\u05FF]/;   /* מילה שיש בה אות עברית */
 let bad = 0, checked = 0;
@@ -61,10 +73,11 @@ function inlineStyles(src) {
   return out;
 }
 
-for (const rel of FILES) {
+for (const { rel, js } of FILES) {
   const p = path.isAbsolute(rel) ? rel : path.join(ROOT, rel);
   if (!fs.existsSync(p)) { console.log('  · ' + rel + ' אינו קיים — דולג'); continue }
-  const src = fs.readFileSync(p, 'utf8');
+  const html = fs.readFileSync(p, 'utf8');
+  const src = [html].concat(js.map(f => fs.readFileSync(path.join(ROOT, f), 'utf8'))).join('\n');
   checked++;
 
   /* ---------- 1 · מצב דו־מצבי עם ערך קבוע ----------
@@ -107,6 +120,14 @@ for (const rel of FILES) {
       /:focus-visible/.test(o.sel) &&
       /outline\s*:\s*(?!none|0\b)/.test(o.body));
     if (paired) continue;
+    /* **פטור שני, גם הוא דגם נכון:** הטבעת עוברת למיכל. `.search input:focus
+       {outline:none}` עם `.search:focus-within{box-shadow:…}` — כל השדה
+       מסומן, ולא רק הסמן שבתוכו. נוסף 16.10.2026, כשדף הבית נכנס לטווח. */
+    const host = base.split(/\s+/).slice(0, -1).join(' ');
+    const ringed = host && blocks.some(o =>
+      o.sel.split(',').some(x => x.trim() === host + ':focus-within') &&
+      /(box-shadow|outline|border-color)\s*:\s*(?!none)/.test(o.body));
+    if (ringed) continue;
     hit(rel, 'outline מבוטל בתוך כלל :focus, ואין :focus-visible שמחזיר',
         b.sel.slice(0, 70) + '  —  מי שמנווט במקלדת לא יראה איפה הוא.');
   }
@@ -200,8 +221,8 @@ for (const rel of FILES) {
      שיש בהן `lgChrome` נושאות **76 תווים בדיוק** של עברית
      סטטית, והם קישור הדילוג והפוטר. כל מילה מעבר לזה היא מילה
      שתישאר עברית. */
-  if (/function lgChrome\(/.test(src)) {
-    const body = src.slice(Math.max(0, src.indexOf('<body')))
+  if (/function lgChrome\(/.test(html)) {
+    const body = html.slice(Math.max(0, html.indexOf('<body')))
       .replace(/<script[\s\S]*?<\/script>/gi, ' ')
       /* השער הפנימי (internal-gate.html) הוא מסך לפני פרסום, ומוסר
          בשלב approved — הוא אינו חלק מהממשק שלומד רואה בשפה שבחר. */
@@ -211,9 +232,9 @@ for (const rel of FILES) {
       .replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
     /* מה ש-lgChrome דורס — הטקסט שם הוא ברירת מחדל בלבד */
     const owned = [];
-    const sk = src.match(/<a\b[^>]*class="skip"[^>]*>([^<]*)</);
+    const sk = html.match(/<a\b[^>]*class="skip"[^>]*>([^<]*)</);
     if (sk) owned.push(sk[1]);
-    const ft = src.match(/class="lg-foot"[^>]*>([\s\S]*?)<\/footer>/);
+    const ft = html.match(/class="lg-foot"[^>]*>([\s\S]*?)<\/footer>/);
     if (ft) owned.push(ft[1].replace(/<[^>]*>/g, ' '));
     const ok = new Set(owned.join(' ').split(/\s+/).filter(w => HEBW.test(w)));
     const stray = body.split(' ').filter(w => HEBW.test(w) && !ok.has(w));
@@ -221,8 +242,49 @@ for (const rel of FILES) {
       hit(rel, stray.length + ' מילים עבריות סטטיות שאינן במעטפת של lgChrome',
           '״' + stray.slice(0, 8).join(' ') + '״ — יישארו עבריות בערבית, ברוסית ובאנגלית.');
   }
+  /* ---------- 7 · חלון aria-modal בלי מלכודת מיקוד ----------
+     `aria-modal="true"` מבטיח לקורא המסך שהרקע אינרטי. בלי מלכודת,
+     Tab יוצא מהחלון אל כפתורים שהמשתמש אינו רואה — וקורא המסך
+     ממשיך לומר לו שהם לא שם. O-173, 16.10.2026: היו תשעה כאלה —
+     חלון לימור בחמש אפליקציות היסודי, ״לאט לאט״ בשלוש, והגיליון של רקיע.
+
+     **מלכודת** = מאזין שבודק `key === "Tab"` ומעביר מיקוד
+     (`.focus(`) בתוך 600 התווים שאחריו. כל הצהרה נצרכת מול המלכודת
+     הפנויה הקרובה שאחריה בקוד; הצהרה שלא נמצאה לה
+     מלכודת היא ממצא. כך גם מלכודת אחת שנמחקה מתוך שתיים נתפסת.
+     `aria-modal="false"` (הפאנל של ג׳וש) אינו מודאלי ואינו נבדק. */
+  {
+    const decl = [];
+    const dre = /aria-modal="true"|setAttribute\(\s*["']aria-modal["']\s*,\s*["']true["']\s*\)/g;
+    let dm;
+    while ((dm = dre.exec(src))) if (src[dm.index - 1] !== '[') decl.push(dm.index);
+    const traps = [];
+    const tre = /key\s*[!=]==?\s*["']Tab["']/g;
+    let tm;
+    /* מלכודת שמאצילה לפונקציה (`if(e.key==="Tab")trap(e)`) נבדקת בגוף
+       הפונקציה ההיא — שם יושב ה-`.focus(`. */
+    const moves = (from) => {
+      const w = src.slice(from, from + 600);
+      if (/\.focus\(/.test(w)) return true;
+      const call = w.slice(0, 200).match(/\b([A-Za-z_$][\w$]*)\(\s*e\s*\)/);
+      if (!call) return false;
+      const fn = src.indexOf('function ' + call[1] + '(');
+      return fn >= 0 && /\.focus\(/.test(src.slice(fn, fn + 600));
+    };
+    while ((tm = tre.exec(src))) if (moves(tm.index)) traps.push(tm.index);
+    const used = new Set();
+    /* מהסוף להתחלה: כל הצהרה לוקחת את המלכודת הקרובה אחריה, ולכן
+       הממצא מצביע על החלון שבאמת חסר — ולא על השכן שאחריו. */
+    for (const d of decl.slice().reverse()) {
+      const t = traps.find(x => x > d && !used.has(x));
+      if (t !== undefined) { used.add(t); continue }
+      const line = src.slice(0, d).split('\n').length;
+      hit(rel + (js.length ? ' (+js/)' : ''), 'aria-modal בלי מלכודת מיקוד (שורה ' + line + ' בטקסט המאוחד)',
+          'Tab יוצא מהחלון אל רקע שקורא המסך מכריז עליו כאינרטי. העתק את המלכודת מ-science-12/js/app.js.');
+    }
+  }
 }
 
 console.log('');
 if (bad) { console.log(bad + ' ממצאי נגישות'); process.exit(1) }
-console.log('✓ ' + checked + ' דפים נבדקו — מצב דו־מצבי, מיקוד, tabindex, מאפיין פיזי וקישור דילוג');
+console.log('✓ ' + checked + ' דפים נבדקו (כולל דף הבית ו-js/*.js) — מצב דו־מצבי, מיקוד, tabindex, מאפיין פיזי, קישור דילוג ומלכודת מיקוד');

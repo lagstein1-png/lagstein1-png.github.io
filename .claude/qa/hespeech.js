@@ -5,7 +5,8 @@
 
    ארבע בדיקות, ושתיים מהן הן העיקר:
 
-   1. החיווט — תגית ו-PRE בשתים־עשרה האפליקציות ובשורש.
+   1. החיווט — תגית, PRE וקריאה ל-spoken בכל אפליקציה מקריאה
+      (נגזר מ-stages.json, O-225), ו-PRE בשורש.
    2. הכללים עובדים על מה שהבעלים שמע.
    3. **ההומוגרפים נשארים בחוץ.** אחת־עשרה כניסות בקובץ המקור
       בטוחות בנהיגה ושגויות בלומדה — ״עגול״ במספר עגול, ״החד״
@@ -26,18 +27,45 @@ function t(name, got, want) {
 require(path.join(ROOT, 'tutor', 'he-speech.js'));
 const H = globalThis.HESPEECH;
 
-/* 1 — החיווט */
-const APPS = ['math-app','math-teen','math-uni','math-uni2','math-uni3','english',
-              'history','ulpan','lomda','kotvim','reader','bagrut-806'];
-const missTag = [], missPre = [];
+/* 1 — החיווט
+
+   **הרשימה נגזרת — O-225, 16.10.2026.** עד היום כאן ישבו שתים־עשרה
+   אפליקציות בשם, ו-hebrew-arab — שמקריאה עברית בקול he-IL מאז O-163 —
+   לא הייתה ביניהן. עכשיו: כל אפליקציה ב-stages.json שהקוד שלה נוגע
+   ב-`speechSynthesis`. ושלוש שאלות לכל אחת, ולא שתיים: התגית וה-PRE
+   אומרים רק שהקובץ **נטען**; השלישית שואלת אם מישהו **קורא** ל-
+   `HESPEECH.spoken` — אותה פרצה שבדיקה 6 סוגרת בלימור. */
+const AL = require('./applist.js');
+const APPS = AL.pick(process.argv.slice(2), AL.local().filter(a => /speechSynthesis/.test(AL.sourceOf(a))));
+/* **חריגים — טוענות ואינן קוראות, נמדד 16.10.2026.** שמונה־עשרה
+   אפליקציות טוענות את `/tutor/he-speech.js` (תגית ו-PRE עוברים בכולן)
+   ואף שורה בקוד שלהן אינה קוראת ל-`HESPEECH.spoken`: ״משלש״ ו״מאד״
+   נאמרים בהן כמו שהם כתובים. הכלי אינו מתקן אפליקציות; הרשימה רק
+   מתקצרת — אפליקציה שהתחילה לקרוא ונשארה כאן מפילה את הבדיקה. */
+const NOT_WIRED = new Set([
+  'hebrew-arab',                     /* O-225 — המקור של הממצא */
+  'math-g7', 'math-elem', 'hebrew-lit', 'civics', 'hebrew', 'literature', 'tanakh',
+  'science-mid', 'motal', 'tanakh-elem', 'civics-elem', 'islam', 'russian',
+  'culture-elem', 'history-elem', 'science-12', 'biology',
+]);
+const missTag = [], missPre = [], missUse = [], staleEx = [], excused = [];
 for (const a of APPS) {
-  const html = fs.readFileSync(path.join(ROOT, a, 'index.html'), 'utf8');
-  const sw   = fs.readFileSync(path.join(ROOT, a, 'sw.js'), 'utf8');
-  if (!/<script src="\/tutor\/he-speech\.js">/.test(html)) missTag.push(a);
+  const src = AL.sourceOf(a);
+  const swf = path.join(ROOT, a, 'sw.js');
+  const sw  = fs.existsSync(swf) ? fs.readFileSync(swf, 'utf8') : '';
+  /* `onerror` מותר אחרי ה-src — משפחת ה-elem כותבת כך. */
+  if (!/<script\s+src="\/tutor\/he-speech\.js"/.test(src)) missTag.push(a);
   if (sw.indexOf('/tutor/he-speech.js') < 0) missPre.push(a);
+  const uses = /HESPEECH[\s\S]{0,120}?\.spoken\s*\(/.test(src);
+  if (NOT_WIRED.has(a)) { if (uses) staleEx.push(a); else excused.push(a); }
+  else if (!uses) missUse.push(a);
 }
-t('תגית בשתים־עשרה האפליקציות', missTag, []);
-t('PRE בשתים־עשרה האפליקציות', missPre, []);
+console.log('  ' + APPS.length + ' אפליקציות מקריאות (נגזרו מ-stages.json); ' + excused.length +
+            ' טוענות ואינן קוראות — חריג מוצהר: ' + excused.join(', '));
+t('תגית בכל האפליקציות המקריאות', missTag, []);
+t('PRE בכל האפליקציות המקריאות', missPre, []);
+t('ההקראה עוברת ב-HESPEECH.spoken', missUse, []);
+t('חריג שכבר קורא — להסיר מ-NOT_WIRED', staleEx, []);
 t('PRE בשורש', fs.readFileSync(path.join(ROOT,'sw.js'),'utf8').indexOf('/tutor/he-speech.js') >= 0, true);
 
 /* 2 — מה שהבעלים שמע */

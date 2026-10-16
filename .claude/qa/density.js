@@ -61,6 +61,12 @@ const BASE = {
   /* `science` עלתה מ-4.33 ל-9.25 שאלות לתא ב-6.10.2026 — 59 שורות
      חדשות, והמחסן מ-52 ל-111. כל 12 התאים על 9 לפחות. */
   'science': 9,
+  /* O-196, 16.10.2026 — שש האפליקציות שנמדדו על התקן בלי שורה כאן.
+     בלי השורה, מאגר ששינה צורה (`poolOf` שהוסר, `topic(` ששונה) נעלם
+     מהריצה כאילו לא היה — 13 מאגרים במקום 14, ו-exit 0. עכשיו כל
+     מאגר שנמדד פעם רשום כאן, ומאגר רשום שלא נקרא — נופל. */
+  'civics': 9, 'geography': 9, 'geography-elem': 9,
+  'islam': 9, 'russian': 9, 'biology': 9,
 };
 
 /* המאגר נקרא בהרצה ולא ב-grep: `topic(...)` בונה את TOPICS, ו-`Q`
@@ -133,15 +139,23 @@ function banks(app) {
 const only = process.argv.slice(2).filter(a => !a.startsWith('--'));
 const list = only.length ? only : AL.local();
 
-let bad = 0, scanned = 0, debt = 0, unread = 0;
+let bad = 0, low = 0, scanned = 0, debt = 0, unread = 0;
 for (const app of list) {
   const T = banks(app) || flatBank(app);
-  if (!T) continue;
+  /* O-196: מאגר רשום ב-BASE שהכלי כבר אינו מוצא — הצורה השתנתה,
+     ולא שהמאגר נעלם. זה ״לא נמדד״, ו״לא נמדד״ אינו ירוק. */
+  if (!T) {
+    if (BASE[app] !== undefined) { console.log(`✗ ${app}: רשום עם בסיס ${BASE[app]}, והכלי כבר אינו מוצא בו מאגר — הצורה השתנתה`); unread++; bad++ }
+    continue;
+  }
   /* **מאגר שלא נקרא הוא מגבלה של הכלי, לא ממצא באפליקציה** — וזה
      נאמר בקול ולא מושתק. לכל מאגר כאן יש עוזרים משלו (`PARA`
      ב-english ו-ulpan, `E` ב-history), והרצה בבדלים אינה יכולה
-     לכסות את כולם. מי שמוסיף בדל — מוחק את השורה הזאת לאפליקציה. */
-  if (T.err) { console.log(`· ${app}: הכלי אינו קורא את המאגר הזה (${T.err}) — לא נמדד`); unread++; continue }
+     לכסות את כולם — אבל התיקון הוא בדל חדש כאן, ולא ריצה ירוקה. */
+  /* O-196: עד 16.10.2026 זה היה `·` ו-exit 0 — מאגר שהפסיק להיקרא
+     נספר ״לא נקרא״ והריצה ירוקה. מאגר שלא נמדד הוא ראצ׳ט שנפתח,
+     ולכן הוא נופל: מוסיפים בדל לעוזר החדש, ולא מתעלמים. */
+  if (T.err) { console.log(`✗ ${app}: הכלי אינו קורא את המאגר הזה (${T.err}) — לא נמדד`); unread++; bad++; continue }
   scanned++;
   let cells = 0, items = 0, min = Infinity, minAt = '';
   if (T.cells) {
@@ -159,10 +173,10 @@ for (const app of list) {
   const base = BASE[app] === undefined ? FLOOR : BASE[app];
   const line = `${app.padEnd(14)} ${String(items).padStart(4)} שאלות · ${String(cells).padStart(3)} תאים · ` +
                `${avg.toFixed(2)} לתא · הדק: ${minAt} (${min}) · בסיס ${base}`;
-  if (min < base) { console.log('✗ ' + line + ' — ירד מתחת לבסיס'); bad++; continue }
+  if (min < base) { console.log('✗ ' + line + ' — ירד מתחת לבסיס'); bad++; low++; continue }
   if (base < FLOOR) { console.log('· ' + line + ` — חוב פתוח, התקן ${FLOOR}`); debt++; continue }
   console.log('✓ ' + line);
 }
 
-console.log(`\n${scanned} מאגרים נמדדו · ${debt} עם חוב מוצהר · ${unread} שהכלי אינו קורא · ${bad} מתחת לבסיס`);
+console.log(`\n${scanned} מאגרים נמדדו · ${debt} עם חוב מוצהר · ${unread} שהכלי אינו קורא (נופל) · ${low} מתחת לבסיס`);
 process.exit(bad ? 1 : 0);

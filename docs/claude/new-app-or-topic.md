@@ -111,3 +111,45 @@
 ב-`engine.js`, בדיוק כמו `bagrut-806` שמצרף KaTeX. שלושת בלוקי
 ה-`index.html` שם — האונבורדינג, המבחן הכיתתי ושער התנאים —
 נבדקים בה כן, והם זהים.
+
+## נקודות המגע של אפליקציה חדשה — חמש־עשרה, ומי אוכף כל אחת
+
+**למה הרשימה כאן (16.10.2026, O-181).** `CLAUDE.md` הפנה לכאן בשביל
+״שמונה נקודות מגע״, והמסמך לא הכיל אף אחת. `PIPELINE.md` §5 ו-`apps.js`
+אמרו ״שבעה״, `create-learning-app/SKILL.md` אמר ״שמונה״, ושתי נקודות
+ש-`apps.js` אוכף מאז 4.10 (`STAGE_IDS`, `SUBJECT_IDS`) לא הופיעו באף רשימה.
+הרשימה למטה נגזרה מהבדיקות עצמן — לכל שורה הכלי שנופל כשהיא חסרה.
+הפירוט המעשי (מה להעתיק, איך) נשאר ב-`.claude/skills/create-learning-app/SKILL.md`.
+
+**בשלב `build`** — דף הבית לא נוגעים בו:
+
+| # | מה | איפה | מי נופל כשחסר |
+|---|---|---|---|
+| 1 | `index.html` מהמשפחה שהועתקה | `<app>/` | `apps.js` §4 |
+| 2 | `manifest.json` | `<app>/` | `apps.js` §4 |
+| 3 | `sw.js` עם שם מטמון ייחודי | `<app>/sw.js` | `apps.js` §5, `cache.js` |
+| 4 | אייקונים | `<app>/img/` — `icon.js` | `apps.js` §4 |
+| 5 | `BUILD`, `SKEY`, `GKEY_STORE` ייחודיים | בלוק הקונפיגורציה | `apps.js` §6, `storage.js`, `skill.js` |
+| 6 | רשומה עם `stage: "build"` | `.claude/qa/stages.json` | `stage.js` |
+| 7 | השער הפנימי | מ-`.claude/qa/internal-gate.html` | `stage.js` |
+| 8 | שכבת הקול המוקלט — קריאה ל-`RECORDED.play`/`stop` בפונקציית ההקראה | `<app>/index.html` (או `js/speech.js`) | `recorded.js`, `record.js --check` |
+
+**ביציאה ל-`public`** — כולן יחד, ב-`index.html` שבשורש:
+
+| # | מה | מי נופל כשחסר |
+|---|---|---|
+| 9 | רשומה ב-`DATA.APPS` — שם ותיאור בארבע שפות | `apps.js` §3, `stage.js` |
+| 10 | סמל ב-`ICONS` | `apps.js` §2 |
+| 11 | המזהה ב-`STAGE_IDS` — בלעדיו הכרטיס לא נבנה כלל | `apps.js` §2ב |
+| 12 | המזהה ב-`SUBJECT_IDS` — בלעדיו תווית הנושא ריקה | `apps.js` §2ב |
+| 13 | ארבע מחרוזות `badge` — המניין **כמילה** | `apps.js` §1, `stage.js` |
+| 14 | ארבע מחרוזות `lead` שמונות את התחומים | אין כלי — קוראים |
+| 15 | מפתח הקאש של דף הבית (`sw.js?v=`) | `cache.js` |
+
+ואחרי 15: `node .claude/qa/sitemap.js` (המפה נגזרת), ו-`node .claude/qa/counts.js`
+— המניין בחומר השיווקי (`marketing/facts.md`) נבדק מול `apps.js`.
+
+**ואפליקציה שאינה `index.html` יחיד** — 14 מתוך האפליקציות ב-`stages.json`
+מחזיקות JS מחוץ ל-`index.html` (נמדד 16.10.2026, `ls <app>/*.js <app>/js/*.js <app>/data/*.js`
+בלי `sw.js`), ושמונה מהן הן משפחה אחת עם `js/{app,data,engine,i18n,speech}.js`.
+כלי שסורק רק `index.html` עיוור אליהן (O-165, O-173).

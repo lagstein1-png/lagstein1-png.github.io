@@ -53,6 +53,20 @@ const src = fs.readFileSync(full, 'utf8');
 
 /* קריאה בפועל: שם שאחריו סוגר, ואפשר רווח ביניהם. */
 const call = n => new RegExp('(?:^|[^\\w.$])' + n + '\\s*\\(');
+/* **הפניה בפועל — O-196, 16.10.2026.** `\bspeechSynthesis\s*[.(\[]`
+   דרש תו צמוד אחרי השם, ולכן `var SS = window.speechSynthesis;
+   SS.speak(u)` עבר בירוק: השם עצמו מופיע בלי נקודה אחריו, והקריאה
+   יוצאת דרך הכינוי. כאן נתפסת כל צורה שבה הקוד **מחזיק** את האובייקט —
+   גישה דרך window/self/globalThis, גישה לאיבר, השמה או העברה כארגומנט,
+   סוגריים מרובעים עם מחרוזת, ופירוק (`{speechSynthesis} =`). אזכור
+   בתוך משפט בהערה (`` `speechSynthesis` `` בגרשיים הפוכים) אינו אף
+   אחת מהן, ולכן הקובץ עדיין רשאי להסביר את עצמו. */
+const ref = n => new RegExp(
+  '\\b(?:window|self|globalThis)\\s*\\.\\s*' + n + '\\b' +
+  '|\\b' + n + '\\s*[.(\\[]' +
+  '|[=(,:?]\\s*' + n + '\\b' +
+  '|\\[\\s*["\'`]' + n + '["\'`]\\s*\\]' +
+  '|\\{[^{}]*\\b' + n + '\\b[^{}]*\\}\\s*=(?!=)');
 
 const CHECKS = [
   { t: 'אין קריאת רשת',
@@ -63,8 +77,9 @@ const CHECKS = [
     bad: [['כתובת http', /https?:\/\/(?!\/)[a-z0-9]/i]] },
 
   { t: 'אין מנוע הקראה — הקול הוא של tutor.js',
-    bad: [['speechSynthesis', /\bspeechSynthesis\s*[.(\[]/],
+    bad: [['speechSynthesis', ref('speechSynthesis')],
           ['SpeechSynthesisUtterance', /new\s+SpeechSynthesisUtterance/],
+          ['SpeechSynthesisUtterance (הפניה)', ref('SpeechSynthesisUtterance')],
           ['SpeechRecognition', /\b(?:webkit)?SpeechRecognition\b/]] },
 
   { t: 'אין בחירת קול',

@@ -1,6 +1,6 @@
 ---
 name: create-learning-app
-description: Build a new learning app in this portfolio by cloning the existing engine — picking the right family to copy from, wiring the eight places a new app must touch (including the recorded-voice layer), and bumping the eleven cache keys that legal/ forces. Use when adding a new learning app, a new subject, or a new question bank as its own app, and when asked to reuse or extract the engine (TTS, hints, progress, exam mode, accessibility, four-language support) without breaking the apps that already ship.
+description: Build a new learning app in this portfolio by cloning the existing engine — picking the right family to copy from, wiring the fifteen places a new app must touch (eight at build, including the recorded-voice layer; seven at public, including STAGE_IDS and SUBJECT_IDS), and bumping every cache key that legal/ forces. Use when adding a new learning app, a new subject, or a new question bank as its own app, and when asked to reuse or extract the engine (TTS, hints, progress, exam mode, accessibility, four-language support) without breaking the apps that already ship.
 ---
 
 # בניית אפליקציית לימוד חדשה
@@ -87,9 +87,11 @@ git checkout 83ddf43        # נקודת החזרה, על origin/main
 
 ---
 
-## שלב 2 — שמונה מקומות, לא שבעה
+## שלב 2 — חמש־עשרה נקודות מגע: שמונה ב-`build`, שבע ב-`public`
 
-אפליקציה חדשה נוגעת בשמונה מקומות (השמיני, §2.8, נוסף 3.10.2026
+**הרשימה המלאה, ומי אוכף כל נקודה — `docs/claude/new-app-or-topic.md`** (16.10.2026, O-181:
+הסעיף הזה אמר ״שמונה״ ולא מנה את `STAGE_IDS` ו-`SUBJECT_IDS`, ש-`apps.js` אוכף מאז 4.10).
+כאן — איך עושים כל אחת. בשלב `build` שמונה מקומות (השמיני, §2.8, נוסף 3.10.2026
 אחרי ששתי אפליקציות פורסמו בלי השכבה המוקלטת). **החמצת אחד =
 אפליקציה שלא מופיעה, לא נטענת, לא מתעדכנת, או שותקת בלי ההקלטות.**
 
@@ -153,7 +155,7 @@ for d in */; do a=${d%/}; grep -ho 'var BUILD *= *"[a-z]' $a/*.html $a/*.js 2>/d
 
 ### 2.3 עד 2.7 — דף הבית
 
-## ⚠ השער: חמש הנגיעות האלה **אינן** בשלב `build`
+## ⚠ השער: שבע הנגיעות האלה **אינן** בשלב `build`
 
 **זה הסעיף שהיה חסר כאן, וזו הייתה סתירה ישירה מול `CLAUDE.md`:**
 
@@ -171,7 +173,7 @@ for d in */; do a=${d%/}; grep -ho 'var BUILD *= *"[a-z]' $a/*.html $a/*.js 2>/d
 `stage: "build"`** — ועוד השער הפנימי מ-`.claude/qa/internal-gate.html`.
 דף הבית לא נגעים בו בכלל.
 
-**חמש הנגיעות שלמטה נעשות רק ביציאה ל-`public`**, וכולן יחד —
+**שבע הנגיעות שלמטה (5א היא שתיים) נעשות רק ביציאה ל-`public`**, וכולן יחד —
 `badge` בלי `DATA.APPS` הוא מניין שקרי, ו-`DATA.APPS` בלי מפתח
 הקאש של דף הבית פירושו שאיש לא יראה את הכרטיס. התהליך המלא
 ב-`PIPELINE.md`.
@@ -184,7 +186,8 @@ for d in */; do a=${d%/}; grep -ho 'var BUILD *= *"[a-z]' $a/*.html $a/*.js 2>/d
 |---|---|---|
 | 3 | רשומה ב-`DATA.APPS` | `id`, `cat`, `c`, `n`×4 שפות, `d`×4 שפות, `t`, `k` |
 | 4 | סמל ב-`ICONS` | SVG 24×24, קו ולא מילוי, `aria-hidden` |
-| 5 | ארבע מחרוזות `badge` | ״שתים־עשרה״ → ״שלוש־עשרה״, וכן בערבית, רוסית ואנגלית |
+| 5 | ארבע מחרוזות `badge` | למשל ״ארבעים ואחת״ → ״ארבעים ושתיים״, וכן בערבית, רוסית ואנגלית |
+| 5א | `STAGE_IDS` ו-`SUBJECT_IDS` | המזהה בשתיהן — בלעדי הראשונה הכרטיס לא נבנה; `apps.js` §2ב |
 | 6 | ארבע מחרוזות `lead` | מונות את התחומים בשם |
 | 7 | מפתח הקאש של דף הבית | `sw.js?v=14-pwa1` → `15-pwa1` |
 
@@ -256,8 +259,8 @@ function speak(text, lang /* …שאר הפרמטרים… */){
 שגיאה.** משנים את שניהם יחד.
 
 ובכל מקרה: `TR_KEYS` הוא **מערך שורה־למפתח** (הפורמט של `math-uni`).
-**אל תכתוב מילון בשורה אחת.** ב-`math-teen` המילון הוא שורה אחת של
-219,430 תווים; כל שינוי בה מתנגש במלואו, ו-`git` יציע לבחור צד —
+**אל תכתוב מילון בשורה אחת.** ב-`math-teen` המילון הוא שלוש שורות
+(`TR_RU`, `TR_AR`, `TR_EN` — 199,862 עד 260,385 בתים כל אחת, `awk '{print length}'`, 16.10.2026); כל שינוי בשורה כזו מתנגש במלואו, ו-`git` יציע לבחור צד —
 בחירה מוחקת מאות תרגומים.
 
 **מיזוג מילון הוא איחוד, לא בחירת צד.** משווים מפתח־מפתח מול הבסיס
@@ -286,7 +289,7 @@ node .claude/qa/all.js --fast        # בלי entropy ו-options
 node .claude/qa/serve.js &            # חובה ל-smoke ול-exam
 node .claude/qa/parse.js <app>/index.html
 node .claude/qa/smoke.js <app>        # דפדפן אמיתי
-node .claude/qa/apps.js              # שבעת המקומות — ובראשם המניין
+node .claude/qa/apps.js              # נקודות המגע בדף הבית — ובראשן המניין
 node .claude/qa/banks.js             # חיווט התוכן של lomda, וארבע השפות בו
 node .claude/qa/engine.js            # שמונת עותקי המנוע עדיין זהים
 node .claude/qa/a11y.js              # ששת מצבי הנגישות מחווטים

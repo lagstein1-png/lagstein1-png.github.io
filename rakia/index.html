@@ -741,6 +741,17 @@ function closeSheet(){ stopSpeak(); $("#sheet").classList.remove("on"); $("#shee
   var o=_sheetOpener; _sheetOpener=null;
   if(o&&document.contains(o)){ try{ o.focus({preventScroll:true}) }catch(e){ try{ o.focus() }catch(e2){} } } }
 
+/* מלכודת המיקוד (O-173), כמו ב-science-12: הגיליון הוא aria-modal, ולכן
+   Tab ו-Shift+Tab נשארים בתוכו. מיקוד שברח החוצה (לחיצה על הרקע) חוזר פנימה. */
+function sheetTrap(e){
+  var sh=$("#sheet"), f=[].filter.call(sh.querySelectorAll('button,a[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'),
+    function(x){ return !x.disabled && !x.hidden && x.offsetParent!==null });
+  if(!f.length)return;
+  var a=f[0], z=f[f.length-1], cur=document.activeElement, inside=sh.contains(cur);
+  if(e.shiftKey&&(cur===a||!inside)){ e.preventDefault(); z.focus() }
+  else if(!e.shiftKey&&(cur===z||!inside)){ e.preventDefault(); a.focus() }
+}
+
 /* ---------- היום בשמיים ---------- */
 function renderToday(){
   if(!current)return;
@@ -1210,6 +1221,7 @@ document.addEventListener("keydown",function(e){
   var el=e.target;
   if(el&&el.matches&&el.matches('[data-a="pl"]')&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); openSheet(el.dataset.v) }
   if(e.key==="Escape"&&!$("#sheet").hidden)closeSheet();
+  if(e.key==="Tab"&&!$("#sheet").hidden)sheetTrap(e);
   if(el&&el.id==="f-place"){
     if(e.key==="ArrowDown"){ e.preventDefault(); if(sugList.length){ sugIdx=(sugIdx+1)%sugList.length; renderSuggest() } }
     else if(e.key==="ArrowUp"){ e.preventDefault(); if(sugList.length){ sugIdx=(sugIdx-1+sugList.length)%sugList.length; renderSuggest() } }

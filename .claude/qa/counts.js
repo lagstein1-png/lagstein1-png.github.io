@@ -243,4 +243,83 @@ if (!OUT || !LANGS || !TEACH || !BUILDER) {
   }
 }
 console.log(`${bad2 ? '✗' : '✓'} ${seen2} צירופי ״X מתוך Y״ על מצב מורה ושפות (גם במילים), ${bad2} מתים`);
-process.exit(bad || bad2 ? 1 : 0);
+
+/* =====================================================================
+   הגשר: `facts.md` מול `apps.js` — והמניין הכולל בחומר השיווקי
+   (16.10.2026, O-200)
+
+   **למה.** הבדיקה שלמעלה קוראת את המספר החיצוני מ-`facts.md` ומשווה
+   אליו — ו-`facts.md` עצמו לא נבדק מול שום דבר. כך היא חתמה ״30 צירופים,
+   0 מתים״ בזמן ש-`facts.md` אמר 23, `apps.js` החזיר 40, וה-`badge`
+   אמר ״ארבעים״: שלושים משפטים שגויים עברו ירוק, ו-107 מילות מניין
+   מתות ישבו בשמונה קבצים.
+
+   **מה נבדק:**
+   1. `apps.js` רץ עכשיו, ו-`DATA.APPS = N` שלו מושווה לשתי שורות
+      בטבלת `facts.md`: ״כרטיסים ב-`DATA.APPS`״ ו״המספר שנאמר כלפי חוץ״.
+   2. בכל `marketing/*.md` חוץ מ-`facts.md`: מספר — בספרות או במילים —
+      שבא מיד לפני ״אפליקציות״ / ״האפליקציות״ (עם אותיות שימוש), והוא
+      12 ומעלה, הוא טענה על המניין הכולל וחייב להיות N. ״X מתוך Y״
+      נבדק למעלה ומדולג כאן. 12 ומעלה — מפני שכל מניין כולל שהיה כאן
+      אי פעם היה 12 ומעלה, ותת־קבוצה (״שלוש אפליקציות מתמטיקה״) קטנה מזה.
+      זה גבול מוצהר, לא ניחוש: תת־קבוצה של 12 ומעלה תיפול, ומי שכותב
+      אותה מצטט מתוך ״X מתוך Y״.
+   **מה אינו נבדק:** מניין בערבית, ברוסית ובאנגלית בגוף הטקסט
+   (״ثلاثة عشر تطبيقًا״) — אין כאן מפרש מספרים לשפות האלה. נבדק בקריאה.
+   ===================================================================== */
+let bad3 = 0, seen3 = 0, N = null;
+{
+  let ao = '';
+  try { ao = execFileSync(process.execPath, [path.join(__dirname, 'apps.js')], { encoding: 'utf8', cwd: ROOT }) }
+  catch (e) { ao = (e.stdout || '') + (e.stderr || '') }
+  const am = ao.match(/DATA\.APPS\s*=\s*(\d+)/);
+  if (!am) { bad3++; console.log('✗ apps.js לא החזיר ״DATA.APPS = N״ שאפשר להשוות אליו') }
+  else N = +am[1];
+}
+if (N != null) {
+  const CARDS = row(/^\|\s*אפליקציות — כרטיסים ב-`DATA\.APPS`/);
+  console.log(`· apps.js עכשיו: DATA.APPS = ${N} · facts.md: ${CARDS} כרטיסים, ${OUT} כלפי חוץ`);
+  for (const [name, v] of [['כרטיסים ב-DATA.APPS', CARDS], ['המספר שנאמר כלפי חוץ', OUT]]) {
+    seen3++;
+    if (v !== N) { bad3++; console.log(`✗ marketing/facts.md — ״${name}״ הוא ${v}, ו-apps.js מחזיר היום ${N}`) }
+  }
+  const APP_W = /^[ובהלמשכ]{0,3}אפליקציות[,.;:)״"]*$/;
+  for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.md') && f !== 'facts.md').sort()) {
+    const lines = fs.readFileSync(path.join(dir, f), 'utf8').split('\n');
+    let skipping = false;
+    lines.forEach((l, i) => {
+      if (/^#{1,6}\s/.test(l)) skipping = SKIP_HEAD.test(l);
+      if (skipping) return;
+      /* הצירוף נשבר לפעמים בסוף שורה: ״עשרים ושלוש⏎אפליקציות״ */
+      const prev = (i ? lines[i - 1] : '').split(/\s+/).filter(Boolean).slice(-3);
+      const tok = l.split(/\s+/).filter(Boolean);
+      const all = prev.concat(tok), off = prev.length;
+      for (let k = off; k < all.length; k++) {
+        if (!APP_W.test(all[k])) continue;
+        /* בתוך ״…״ — ציטוט, לא טענה */
+        const before = all.slice(0, k).join(' ').slice(-200);
+        if (((before.match(/״/g) || []).length) % 2 === 1) continue;
+        let n = null;
+        for (const w of [2, 1]) {
+          if (k - w < 0) continue;
+          const ph = all.slice(k - w, k);
+          if (w === 2 && /מתוך$/.test(ph[0])) continue;
+          const v = hebNum(ph.join(' '));
+          if (v != null) { n = v; break }
+        }
+        if (n == null || n < 12) continue;
+        if (k >= 3 && /^מתוך$/.test(all[k - 3]) ) continue;
+        if (k >= 2 && /^מתוך$/.test(all[k - 2]) ) continue;
+        seen3++;
+        if (n !== N) {
+          bad3++;
+          console.log(`✗ marketing/${f}:${i + 1} — ${n} אפליקציות, ו-apps.js מחזיר היום ${N}`);
+          console.log(`    ${l.trim().slice(0, 88)}`);
+        }
+      }
+    });
+  }
+}
+console.log(`${bad3 ? '✗' : '✓'} ${seen3} מניינים כוללים (facts.md ו-marketing/*.md) מול apps.js, ${bad3} מתים`);
+process.exit(bad || bad2 || bad3 ? 1 : 0);
+

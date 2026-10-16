@@ -1,6 +1,6 @@
 # למידה שנשמעת — `bekol.co.il`
 
-עשרים ושלוש אפליקציות לימוד שרצות בדפדפן, מדברות בקול, ועובדות
+ארבעים ואחת אפליקציות לימוד שרצות בדפדפן, מדברות בקול, ועובדות
 אופליין אחרי הטעינה הראשונה; הניקוד האוטומטי, הקול המשודרג
 ו״עזרה מהמורה״ דורשים רשת.
 
@@ -11,7 +11,7 @@
 
 ---
 
-## עשרים ושלוש האפליקציות
+## ארבעים ואחת האפליקציות
 
 הסדר והשמות — כמו ב-`DATA.APPS` שבדף הבית (`node .claude/qa/apps.js`).
 
@@ -22,24 +22,42 @@
 | 3 | אקסיומה — תואר, שנה א׳ | `math-uni/` | [↗](math-uni/README.md) |
 | 4 | אקסיומה ב׳ — שנה שנייה | `math-uni2/` | [↗](math-uni2/README.md) |
 | 5 | אקסיומה ג׳ — שנה שלישית | `math-uni3/` | [↗](math-uni3/README.md) |
-| 6 | 806 — בגרות במתמטיקה | `bagrut-806/` | [↗](bagrut-806/README.md) |
-| 7 | אולפן — עברית לעולים חדשים | `ulpan/` | [↗](ulpan/README.md) |
-| 8 | ניב — אנגלית | `english/` | [↗](english/README.md) |
+| 6 | בגרות במתמטיקה | `bagrut-806/` | [↗](bagrut-806/README.md) |
+| 7 | אולפן — עברית מעשית לעולים חדשים | `ulpan/` | [↗](ulpan/README.md) |
+| 8 | ניב — אנגלית מדוברת וספרותית | `english/` | [↗](english/README.md) |
 | 9 | מפנה — היסטוריה לחטיבה | `history/` | [↗](history/README.md) |
 | 10 | לומדה — לימוד לפי נושא | `lomda/` | [↗](lomda/README.md) |
 | 11 | כותבים ביחד — גרסת ניסיון | `kotvim/` | [↗](kotvim/README.md) |
-| 12 | מדע ליסודי | `science/` | [↗](science/README.md) |
-| 13 | גאוגרפיה ליסודי | `geography-elem/` | [↗](geography-elem/README.md) |
-| 14 | מקריא קולי | `reader/` | [↗](reader/README.md) |
-| 15 | הורוסקופ — מפת לידה | `rakia/` | — |
-| 16 | תאוריה מדברת | **ריפו נפרד** | — |
-| 17 | אזרחות | `civics/` | [↗](civics/README.md) |
-| 18 | עברית לבגרות | `hebrew/` | [↗](hebrew/README.md) |
-| 19 | אנגלית לבגרות | **ריפו נפרד** | — |
-| 20 | ספרות לבגרות | `literature/` | [↗](literature/README.md) |
-| 21 | תנ״ך לבגרות | `tanakh/` | [↗](tanakh/README.md) |
-| 22 | עברית לדוברי ערבית | `hebrew-arab/` | [↗](hebrew-arab/README.md) |
-| 23 | מוט״ל — מדע וטכנולוגיה לכל | `motal/` | [↗](motal/README.md) |
+| 12 | מתמטיקה מעבר לחשבון - יסודי | `math-elem/` | — |
+| 13 | מדע ליסודי | `science/` | [↗](science/README.md) |
+| 14 | גאוגרפיה ליסודי | `geography-elem/` | [↗](geography-elem/README.md) |
+| 15 | מקריא קולי | `reader/` | [↗](reader/README.md) |
+| 16 | הורוסקופ — מפת לידה | `rakia/` | — |
+| 17 | תאוריה מדברת | **ריפו נפרד** | — |
+| 18 | אזרחות | `civics/` | [↗](civics/README.md) |
+| 19 | עברית לבגרות | `hebrew/` | [↗](hebrew/README.md) |
+| 20 | קריאה ושפה | `hebrew-lit/` | [↗](hebrew-lit/README.md) |
+| 21 | אנגלית לבגרות | **ריפו נפרד** | — |
+| 22 | ספרות לבגרות | `literature/` | [↗](literature/README.md) |
+| 23 | תנ״ך לבגרות | `tanakh/` | [↗](tanakh/README.md) |
+| 24 | עברית לדוברי ערבית | `hebrew-arab/` | [↗](hebrew-arab/README.md) |
+| 25 | מוט״ל - מדע וטכנולוגיה לכל | `motal/` | [↗](motal/README.md) |
+| 26 | מתמטיקה לכיתה ז׳ | `math-g7/` | [↗](math-g7/README.md) |
+| 27 | מתח — חשמל לתיכון | `electric/` | [↗](electric/README.md) |
+| 28 | מדע וטכנולוגיה לחטיבה | `science-mid/` | [↗](science-mid/README.md) |
+| 29 | ביולוגיה לבגרות | `biology/` | [↗](biology/README.md) |
+| 30 | נוף — גיאוגרפיה לבגרות | `geography/` | [↗](geography/README.md) |
+| 31 | היסטוריה לבגרות | `bagrut-history/` | [↗](bagrut-history/README.md) |
+| 32 | מורשת ודת האיסלאם | `islam/` | [↗](islam/README.md) |
+| 33 | רוסית לבגרות | `russian/` | [↗](russian/README.md) |
+| 34 | תנ״ך לילדים | `tanakh-elem/` | [↗](tanakh-elem/README.md) |
+| 35 | מולדת ואזרחות לילדים | `civics-elem/` | [↗](civics-elem/README.md) |
+| 36 | תרבות ומסורת לילדים | `culture-elem/` | [↗](culture-elem/README.md) |
+| 37 | היסטוריה לילדים | `history-elem/` | [↗](history-elem/README.md) |
+| 38 | אנגלית לילדים | `english-elem/` | [↗](english-elem/README.md) |
+| 39 | מדעים לכיתות א׳–ב׳ | `science-12/` | [↗](science-12/README.md) |
+| 40 | דומינו לימודי להדפסה | `domino/` | [↗](domino/README.md) |
+| 41 | אינטרנט בטוח | `net-elem/` | [↗](net-elem/README.md) |
 
 **וכולן חינם, בלי הסתייגות.** מ-15.9.2026 זהו **פרויקט חברתי
 המוגש לציבור ללא תשלום**: אין מחיר, אין מנוי, אין גרסת פרימיום
@@ -48,7 +66,7 @@
 את חזרתם. מי שכותב חומר שיווקי אומר ״חינם״ ועוצר.
 
 **ושתי הערות שמונעות בלבול במניין:** ״תאוריה מדברת״ ו״אנגלית לבגרות״
-נספרות בעשרים ושלוש אבל **אינן בריפו הזה** — הן מצביעות לריפו נפרד
+נספרות בארבעים ואחת אבל **אינן בריפו הזה** — הן מצביעות לריפו נפרד
 תחת אותו חשבון. ו-`kotvim/` (״כותבים ביחד״) פורסמה ונספרת
 מ-13.9.2026 — `stage: public` ב-`stages.json`; הכרטיס אומר
 ״גרסת ניסיון״. מקור האמת למניין הוא `.claude/qa/stages.json`,
@@ -151,8 +169,8 @@
 **מה לא נשלח:** שם, התקדמות, הגדרות, ושום פרט מזהה. השיחה אינה
 נשמרת ונמחקת במעבר לתרגיל הבא.
 
-הוא מחווט ופעיל בכל שלוש־עשרה האפליקציות — `API` ב-`tutor/tutor.js:40`
-מצביע ל-`tutor.lagstein1.workers.dev`.
+**הוא כבוי מ-16.10.2026** (O-123): `var API = ""` ב-`tutor/tutor.js:49`, וכל לומד
+מקבל את המוח המקומי. `docs/claude/barak.md`.
 
 ---
 

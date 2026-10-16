@@ -40,8 +40,6 @@ if (!ARGS.length && ALL.length < 30) {
 /* ממצאים אמיתיים וידועים. לא מתקנים כאן אפליקציות — רושמים, מנמקים,
    ומפנים לממצא. כל רשומה היא תבנית על שורת הממצא כפי שהיא מודפסת. */
 const KNOWN = [
-  { re: /^(biology|civics|hebrew|hebrew-arab|islam|literature|science-mid|tanakh): \/tutor\/[\w.-]+\.js נטען אבל אינו ב-PRE/,
-    why: 'O-185 — נכסי /tutor/ אינם ב-PRE בשמונה אפליקציות; לימור לא תעבוד אופליין למי שלא פתח אותה ברשת' },
   { re: /^math-teen: bagrut3\.js נטען אבל אינו ב-PRE/,
     why: 'נחשף עם O-166, 16.10.2026 — math-teen/index.html:522 טוען bagrut3.js ב-document.write תחת ?bagrut3=1, והקובץ אינו ב-PRE; אופליין מסך בגרות 3 יח״ל נשען על מטמון הריצה בלבד. לא תוקן ב-sw.js: תשעת קובצי sw.js זהים (engine.js), ו-bagrut3.js קיים רק ב-math-teen' },
   { re: /^[\w-]+\/index\.html: fetch לכתובת חיצונית — https:\/\/generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-2\.5-flash-preview-tts:generateContent\?key=$/,

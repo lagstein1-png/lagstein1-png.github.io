@@ -48,8 +48,10 @@ const LEGAL_VER = (fs.readFileSync(
   .match(/version:\s*"([^"]+)"/) || [])[1];
 if (!LEGAL_VER) { console.log('✗ לא נמצא version ב-legal/terms.js'); process.exit(1) }
 
-/* האפליקציות ואיך מפעילים בהן הקראה. הבורר הוא כפתור הרמקול. */
-const APPS = [
+/* **איך** מפעילים הקראה באפליקציה — ולא **מי** נבדקת. הבורר הוא כפתור
+   הרמקול; אפליקציה שאין לה שורה כאן נפתחת בדרך הכללית (כפתור התחלה,
+   ואז כפתור הרמקול או speak() ישירות). מי נבדקת — `APPS` למטה, נגזר. */
+const CONFIG = [
   { id:'english',   say:'הקראה' },
   { id:'history',   say:'הקראה' },
   { id:'lomda',     say:'הקראה' },
@@ -132,6 +134,74 @@ const APPS = [
   { id:'bagrut-806', open:async () => {},
     call:'Speech.speak([{text:"משפט בדיקה ראשון. וגם משפט שני שסוגר את הקטע."}])' }
 ];
+
+/* **מי נבדקת — נגזר, לא כתוב ביד (O-225, 16.10.2026).** עד היום
+   הרשימה כאן הייתה שלוש־עשרה שורות קבועות, ו-hebrew-arab — שקיבלה
+   ב-O-163 את ארבעת המנגנונים — לא הייתה בהן: מנוע שהועתק ואיש אינו
+   בודק. עכשיו: כל אפליקציה ב-stages.json שהקוד שלה נוגע
+   ב-`speechSynthesis` — כלומר מקריאה — חייבת לעבור את חמש הבדיקות.
+   שם בשורת הפקודה גובר (`node voice.js hebrew-arab`). אפליקציה
+   בשלב build נפתחת עם `INTERNAL_KEY` שבקוד שלה, כמו ב-nolang. */
+const AL = require('./applist.js');
+const CFG = new Map(CONFIG.map(c => [c.id, c]));
+function internalUrl(id){
+  try{
+    const km = fs.readFileSync(path.join(AL.ROOT, id, 'index.html'), 'utf8').match(/var INTERNAL_KEY="([^"]+)"/);
+    return km ? '/' + id + '/?internal=' + encodeURIComponent(km[1]) : null;
+  }catch(e){ return null; }
+}
+/* ואיך קוראים להקראה, כשאין שורה ב-CONFIG — גם זה מהקוד: שלושה
+   ממשקים שאינם `speak(text)` ואינם כפתור שהחיפוש הכללי מוצא.
+   קריאה ישירה, כמו ב-bagrut-806, ובשני משפטים — כך שומר הזמן נמדד. */
+const TWO = 'משפט בדיקה ראשון. וגם משפט שני שסוגר את הקטע.';
+function callOf(src){
+  if(/window\.Speech\s*=/.test(src)) return 'Speech.speak([{text:' + JSON.stringify(TWO) + '}])';
+  if(/function speakSeq\s*\(\s*segs\b/.test(src)) return 'speakSeq([{t:' + JSON.stringify(TWO) + ',lang:"he"}],function(){})';
+  if(/function speakOne\s*\(\s*text\s*,\s*lang\b/.test(src)) return 'speakOne(' + JSON.stringify(TWO) + ',"he",null,function(){})';
+  return null;
+}
+const APPS = AL.pick(process.argv.slice(2), AL.local().filter(a => /speechSynthesis/.test(AL.sourceOf(a))))
+  .map(id => {
+    if(CFG.has(id)) return CFG.get(id);
+    const app = { id }, url = internalUrl(id), call = callOf(AL.sourceOf(id));
+    if(url) app.url = url;
+    if(call) app.call = call;
+    return app;
+  });
+
+/* **חריגים — כשלים אמיתיים שהרשימה הנגזרת חשפה, 16.10.2026 (O-225).**
+   עד היום 25 מתוך 38 האפליקציות המקריאות לא נבדקו כאן כלל. בריצה
+   הראשונה על כולן נכשלו 22. הבדיקה הזאת אינה מתקנת אפליקציות, ולכן
+   כל כשל רשום כאן **לפי בדיקה**, לא לפי אפליקציה: hebrew-arab חרוגה
+   ב״קצב וגובה״ בלבד, ושאר ארבע הבדיקות שלה נאכפות. כשל בבדיקה שאינה
+   ברשימה — נופל. וחריג שכבר אינו נכשל — **נופל גם הוא** (״להסיר
+   מ-EXCEPT״): הרשימה הזאת רק מתקצרת.
+
+   שלוש קבוצות, והנימוק של כל אחת:
+   • ״קצב וגובה״ — האפליקציה שולחת 0.78–0.92 בגובה 1 (או 1.05), ולא
+     0.95 / 1.12 של ״נשי רגוע״. זה בדיוק מה שתוקן בשלוש־עשרה ב-13.9.2026
+     ולא הגיע לעותקים שנולדו אחר כך.
+   • ״בחירה״ ו״נפילה״ יחד — נבחר Carmit (מקומי) ולא Hila (רשת); לכן גם
+     בדיקת הנפילה ריקה. במשפחת ה-elem, domino, math-g7 ו-science-mid
+     זו מדיניות ״קול נשי בלבד, מקומי קודם״ — אם היא מכוונת או סחיפה,
+     זו הכרעה של מנוע ההקראה ולא של הכלי (renana).
+   • ״שומר-ער״ / ״שומר זמן״ / ״שחרור״ — המנגנון לא נורה. ב-literature,
+     tanakh, motal, civics, hebrew, hebrew-lit ו-math-elem. **לא אומת
+     ביד** שאין כאן מגבלה של הרתמה (כפתור אחר שנלחץ) — ולכן כל שורה
+     כאן היא ממצא פתוח לבדיקה, לא פסק דין. */
+const PITCH = 'קצב וגובה', PICK = ['בחירה', 'נפילה'], GUARDS = ['שומר-ער', 'שומר זמן', 'נפילה'];
+const EXCEPT = {
+  'hebrew-arab': [PITCH],          /* O-225 — 0.78 / 1; ארבעת המנגנונים של O-163 עוברים */
+  'geography':   [PITCH], 'islam': [PITCH], 'russian': [PITCH], 'biology': [PITCH],
+  'domino':      [PITCH, ...PICK], 'math-g7': [PITCH, ...PICK], 'science-mid': [PITCH, ...PICK],
+  'tanakh-elem': [PITCH, ...PICK], 'civics-elem': [PITCH, ...PICK], 'culture-elem': [PITCH, ...PICK],
+  'history-elem':[PITCH, ...PICK], 'science-12':  [PITCH, ...PICK], 'english-elem': [PITCH, ...PICK],
+  'literature':  [PITCH, ...GUARDS], 'tanakh': [PITCH, ...GUARDS], 'motal': [PITCH, ...GUARDS],
+  'civics':      [PITCH, ...GUARDS],
+  'hebrew-lit':  [PITCH, 'בחירה', ...GUARDS],
+  'math-elem':   ['שחרור', 'בחירה', PITCH, ...GUARDS],
+  'hebrew':      ['שחרור', 'בחירה', PITCH, ...GUARDS],
+};
 
 /* מנוע דיבור מזויף. mode קובע איך הוא נכשל:
      'ok'      — מתנהג יפה
@@ -435,7 +505,7 @@ async function run(){
   }
   for(const app of APPS){
     const { ctx, page, unlocked } = await openApp(browser, app);
-    const fails = [];
+    let fails = [];
     try{
       /* --- 0 · שחרור במגע (נמדד ב-openApp, לפני הלחיצות) --- */
       if(!unlocked) fails.push('שחרור: המגע הראשון לא הוציא אמירה ריקה — ב-iOS ההקראה תישאר שקטה');
@@ -512,8 +582,17 @@ async function run(){
       fails.push('חריגה: ' + e.message);
     }
     await ctx.close();
+    /* חריגים לפי בדיקה — ראו EXCEPT. */
+    const ex = EXCEPT[app.id] || [];
+    const labelOf = f => f.split(':')[0];
+    const excused = fails.filter(f => ex.includes(labelOf(f)));
+    fails = fails.filter(f => !ex.includes(labelOf(f)));
+    const stale = [...new Set(ex)].filter(c => !excused.some(f => labelOf(f) === c));
+    if(stale.length && !fails.some(f => labelOf(f) === 'חריגה'))
+      fails.push('חריג שכבר אינו נכשל — להסיר מ-EXCEPT: ' + stale.join(', '));
+    if(excused.length) console.log('· ' + app.id.padEnd(11) + 'חריג מוצהר (EXCEPT): ' + excused.map(labelOf).join(', '));
     if(fails.length){ bad++; console.log('✗ ' + app.id.padEnd(11) + fails.join(' · ')); }
-    else console.log('✓ ' + app.id.padEnd(11) + 'שחרור, בחירה, שומר-ער, שומר זמן ונפילה — כולם עובדים');
+    else console.log('✓ ' + app.id.padEnd(11) + (ex.length ? 'כל מה שאינו חריג עובד' : 'שחרור, בחירה, שומר-ער, שומר זמן ונפילה — כולם עובדים'));
   }
   bad += await runNoLang(browser);
   await browser.close();
@@ -656,6 +735,8 @@ async function run(){
   }
 
   if(bad){ console.log('\n' + bad + ' אפליקציות נכשלו'); process.exit(1); }
-  console.log('\n' + APPS.length + ' אפליקציות, מנוע ההקראה מתאושש בכולן');
+  const nx = APPS.filter(a => EXCEPT[a.id]).length;
+  console.log('\n' + APPS.length + ' אפליקציות (נגזרו מ-stages.json) — ' + (APPS.length - nx) +
+              ' עוברות את חמש הבדיקות' + (nx ? ', ' + nx + ' עם חריג מוצהר לפי בדיקה (EXCEPT)' : ''));
 }
 run().catch(e => { console.error(e); process.exit(1); });

@@ -35,6 +35,17 @@
    יהיו על הדף יחד. זה משנה פריסה ואינו משנה צבע — הצבעים באים
    מכללי CSS. אלמנט שגם אחרי זה אינו מרונדר **נספר ומדווח**, ולא
    נחשב ״עבר״. מספר הכיסוי מודפס בכל ריצה.
+
+   **ומעבר שלישי: ניגודיות גבוהה (O-173, 16.10.2026).** עד היום נמדדו
+   `light`/`dark` בלבד, והפקד שנבנה בדיוק לקהל הזה לא הודלק מעולם.
+   המעבר מדליק את המחלקה אחרי הטעינה ולא ב-`addInitScript`: כל אפליקציה
+   מריצה בעלייה `classList.toggle("hc", !!s.hc)`, שהיה מוחק מחלקה
+   שהוצבה לפניה. שני השמות שבשימוש — `hc` ו-`hi-contrast` — מודלקים
+   על `html` ועל `body` יחד. **ומעברי CSS מכובים לפני המדידה:** בלעדי
+   זה נמדד `.btn-p` בחמש אפליקציות כ״לבן על לבן 1:1״ — זה רקע שעוד
+   לא הספיק לעבור מהגרדיאנט אל `--accent`, ולא באג. דף שאין בו כלל
+   CSS של ניגודיות גבוהה (`reader`, `bagrut-806`, דף הבית…) מדולג
+   במעבר הזה ונספר.
    ===================================================================== */
 'use strict';
 const { chromium } = require('./pw.js');
@@ -199,18 +210,39 @@ const SCAN = () => {
   return { out, scanned, unrendered };
 };
 
+/* מדליק ניגודיות גבוהה ומחזיר false כשאין לדף כלל CSS כזה */
+const HC_ON = () => {
+  const re = /\.(hc|hi-contrast)\b/;
+  let has = false;
+  const walk = l => { for (const r of l) {
+    if (r.selectorText && re.test(r.selectorText)) { has = true; return }
+    if (r.cssRules) walk(r.cssRules);
+  } };
+  for (const ss of document.styleSheets) { try { walk(ss.cssRules) } catch (e) {} if (has) break }
+  if (!has) return false;
+  const st = document.createElement('style');
+  st.textContent = '*,*::before,*::after{transition:none!important;animation:none!important}';
+  document.head.appendChild(st);
+  for (const n of [document.documentElement, document.body]) n.classList.add('hc', 'hi-contrast');
+  return true;
+};
+
 (async () => {
   const browser = await chromium.launch();
-  let bad = 0, scanned = 0, unrendered = 0;
+  let bad = 0, scanned = 0, unrendered = 0, noHc = 0;
   for (const app of APPS) {
-    for (const scheme of ['light', 'dark']) {
-      const ctx = await browser.newContext({ colorScheme: scheme });
+    for (const scheme of ['light', 'dark', 'hc']) {
+      const ctx = await browser.newContext({ colorScheme: scheme === 'hc' ? 'light' : scheme });
       const page = await ctx.newPage();
       await page.route('**', r => r.request().url().startsWith(BASE) ? r.continue() : r.abort());
       try {
         await page.goto(`${BASE}/${app === '.' ? '' : app + '/'}`, { waitUntil: 'domcontentloaded', timeout: 20000 });
       } catch (e) { console.log(`✗ ${app} [${scheme}] — לא נטען: ${e.message.split('\n')[0]}`); bad++; await ctx.close(); continue }
       await page.waitForTimeout(700);
+      if (scheme === 'hc') {
+        const has = await page.evaluate(HC_ON);
+        if (!has) { noHc++; await ctx.close(); continue }
+      }
       const r = await page.evaluate(SCAN);
       scanned += r.scanned; unrendered += r.unrendered;
       for (const f of r.out) {
@@ -221,8 +253,8 @@ const SCAN = () => {
       await ctx.close();
     }
   }
-  console.log(`\n${bad ? '✗' : '✓'} ${APPS.length} דפים × 2 מצבי צבע · ${scanned} אלמנטים עם טקסט נמדדו` +
-              ` · ${unrendered} לא רונדרו ולכן לא נמדדו · ${bad} מתחת לסף`);
+  console.log(`\n${bad ? '✗' : '✓'} ${APPS.length} דפים × 3 מצבים (בהיר, כהה, ניגודיות גבוהה — ${APPS.length - noHc} דפים שיש בהם)` +
+              ` · ${scanned} אלמנטים עם טקסט נמדדו · ${unrendered} לא רונדרו ולכן לא נמדדו · ${bad} מתחת לסף`);
   await browser.close();
   process.exit(bad ? 1 : 0);
 })();

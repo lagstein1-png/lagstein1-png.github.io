@@ -65,9 +65,60 @@ const clearRd=()=>document.querySelectorAll('.w.rd').forEach(w=>w.classList.remo
    charIndex מול ה-spans שעל המסך, ושם הקווים נשארים. ההקלטה המוקדמת
    מקבלת את הטקסט כלשונו — המזהה שלה מחושב מהטקסט המוצג. */
 const sayable=s=>String(s==null?'':s).replace(/_+/g,m=>','+' '.repeat(m.length-1));
+/* מקטעים — SEG_MAX (O-201). מועתק כלשונו מ-english/index.html, כמו בשאר
+   האפליקציות: מעל 90 תווים מנועי מכשיר מאיצים ובולעים סופי מילים, ולכן
+   כל חלק ארוך נחתך על סוף משפט, ואם אין — על פסיק או רווח, לעולם לא בתוך
+   מספר. seg.start נשמר כהיסט, וההדגשה מילה־במילה נמדדת ממנו. */
+var SEG_MAX=90, SEG_GAP=260;
+/* סימן פיסוק בין שתי ספרות הוא חלק מהמספר ולא מקום לחתוך בו:
+   בלי הבדיקה הזאת "3,500" נשבר והמנוע קורא "שלוש, חמש מאות". */
+function insideNumber(str,i){
+  return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]);
+}
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  /* מקטע זעיר — "12." או ")" — עם הפסקה של רבע שנייה אחריו נשמע
+     כמו גמגום. מאחדים אותו לזה שאחריו. */
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&
+       merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){
+      merged[merged.length-1].text+=out[i].text; continue;
+    }
+    if(out[i].text.trim().length<12&&i+1<out.length){
+      out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue;
+    }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
 /* הקראה שמכבדת את שפת הטקסט: כל חלק מוקרא בקול של שפתו, נשי תחילה.
    חלק בשפה שאין לה קול במכשיר לא נקרא בקול עברי — מוצגת הודעה. */
-const speakParts=parts=>{if(!window.speechSynthesis)return;speechSynthesis.cancel();clearRd();const my=++_sg;parts=parts.filter(p=>p.text&&String(p.text).trim());const step=i=>{if(my!==_sg||i>=parts.length)return;const p=parts[i],code=TTS_CODE[p.lg]||TTS_CODE.he,r=pickVoice(p.lg);if(r.none&&!r.empty){if(p.lg!=='he'){vNotice(p.lg);step(i+1);return}}const u=new SpeechSynthesisUtterance(sayable(p.text));u.lang=code;u.rate=rate;if(p.tr)u.onboundary=e=>{if(e.name&&e.name!=='word')return;const ci=e.charIndex;p.tr.forEach(w=>w.el.classList.remove('rd'));const w=p.tr.find(w=>ci>=w.s&&ci<w.e);if(w)w.el.classList.add('rd')};if(r.v){u.voice=r.v;u.pitch=vGender(r.v)==='m'?FEM_PITCH:1}u.onend=()=>step(i+1);u.onerror=()=>step(i+1);speechSynthesis.speak(u)};step(0)};
+const speakParts=parts=>{if(!window.speechSynthesis)return;speechSynthesis.cancel();clearRd();const my=++_sg;parts=parts.filter(p=>p.text&&String(p.text).trim());parts=[].concat.apply([],parts.map(p=>segments(sayable(p.text)).map((g,k)=>Object.assign({},p,{text:g.text,off:g.start,cont:k>0}))));const step=i=>{if(my!==_sg||i>=parts.length)return;const p=parts[i],code=TTS_CODE[p.lg]||TTS_CODE.he,r=pickVoice(p.lg);if(r.none&&!r.empty){if(p.lg!=='he'){vNotice(p.lg);step(i+1);return}}const u=new SpeechSynthesisUtterance(sayable(p.text));u.lang=code;u.rate=rate;if(p.tr)u.onboundary=e=>{if(e.name&&e.name!=='word')return;const ci=e.charIndex+(p.off||0);p.tr.forEach(w=>w.el.classList.remove('rd'));const w=p.tr.find(w=>ci>=w.s&&ci<w.e);if(w)w.el.classList.add('rd')};if(r.v){u.voice=r.v;u.pitch=vGender(r.v)==='m'?FEM_PITCH:1}const go=()=>{if(parts[i+1]&&parts[i+1].cont)setTimeout(()=>step(i+1),SEG_GAP);else step(i+1)};u.onend=go;u.onerror=go;speechSynthesis.speak(u)};step(0)};
 /* שכבה 1 - קובץ מוקלט כשיש (מבדק חוסרים 30.9 סעיף 4). הניגון
    מנקה דיבור מכשיר תלוי; כישלון בקובץ נופל חזרה ל-speakParts.
    הנתיב עם הדגשה מילה-במילה (speakParts עם tr) נשאר בקול המכשיר -

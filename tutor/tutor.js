@@ -251,7 +251,11 @@ function setRate(v){ try{ localStorage.setItem(RATE_KEY, String(v)) }catch(e){} 
 /* הקראה אוטומטית של תשובות לימור — ברירת מחדל: פועלת. ילד עם דיסלקציה
    לא אמור לחפש כפתור כדי לשמוע אותה; מי שמעדיף שקט מכבה בתיבה. */
 var AUTO_KEY = "tutor-auto-v1";
-function autoOn(){ try{ return localStorage.getItem(AUTO_KEY) !== "0" }catch(e){ return true } }
+/* בזמן באג O-201 ההעדפה נשמרה תחת `tutor-auto-v1:` (עם נקודתיים) —
+   קוראים אותה כגיבוי, כדי שמי שכיבה בתקופה ההיא לא יאבד את הבחירה. */
+function autoOn(){ try{ var v = localStorage.getItem(AUTO_KEY);
+  if(v === null) v = localStorage.getItem(AUTO_KEY + ":");
+  return v !== "0" }catch(e){ return true } }
 function setAuto(v){ try{ localStorage.setItem(AUTO_KEY, v ? "1" : "0") }catch(e){} }
 
 /* סגירת הודעת ״לא זוהה קול נשי״ — נשמרת לשפה, במכשיר הזה. */
@@ -1540,14 +1544,14 @@ function focus(){ try{ EL.inp.focus() }catch(e){} }
 
    ההשהיה נותנת לאפליקציה לצייר את המסך קודם. פאנל שקופץ על מסך
    ריק נראה כמו תקלה, לא כמו מורה. */
-var AUTO_KEY = "tutor-auto-v1:";
+var SEEN_KEY = "tutor-auto-v1:";  /* שם נפרד מ-`AUTO_KEY` (שורה 253): `var` אינו יוצר scope, ושם זהה דרס את מפתח ההעדפה ״לימור נפתחת לבד״ — O-201 */
 var AUTO_MS  = 900;
 function autoSeen(){
-  try{ return sessionStorage.getItem(AUTO_KEY + (CFG && CFG.app)) === "1" }
+  try{ return sessionStorage.getItem(SEEN_KEY + (CFG && CFG.app)) === "1" }
   catch(e){ return true }
 }
 function autoMark(){
-  try{ sessionStorage.setItem(AUTO_KEY + (CFG && CFG.app), "1") }catch(e){}
+  try{ sessionStorage.setItem(SEEN_KEY + (CFG && CFG.app), "1") }catch(e){}
 }
 /* שער התנאים קודם. נמדד בדפדפן 13.9.2026: בביקור ראשון `.lg-wrap`
    הוא `aria-modal` והוא מכסה את הפאנל — ג׳וש היה נפתח מאחוריו,

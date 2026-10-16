@@ -20,7 +20,7 @@
      2. `checked` **נגזר** מ-`PROVIDER` ואינו כתוב קשיח
      3. התשובה בפועל נושאת `checked`, והיום הוא `false`
      4. אין ניסוח של ״בודק״ / ״מחפש״ בממשק, בארבע השפות
-     5. אין ספק חיפוש בקוד השרת
+     5. אין ספק חיפוש בקוד השרת — וכל מארח בו ברשימת המוכרים (O-196)
      6. המסמך והקוד מסכימים על המספרים
 
    **מה שאינו נבדק כאן, וזה מכוון:** חמשת קודי השגיאה שב-§4
@@ -131,8 +131,24 @@ import(WORKER).then(async W => {
                ['googleapis', /(?<!generativelanguage\.)googleapis\.com/],
                ['bing', /api\.bing\./]];
   const srvHit = SRV.filter(([, re]) => re.test(wsrc)).map(([n]) => n);
+  /* **כלל פתוח, ולא רשימה סגורה — O-196, 16.10.2026.** ארבעת השמות
+     למעלה תפסו את `api.bing.com` והחמיצו את `api.tavily.com`, וכך כל
+     ספק חמישי. כאן ההפך: כל מארח שמופיע בקוד השרת חייב להיות ברשימת
+     המוכרים — שני מנועי השפה, המקורות של ה-CORS והשרת המקומי. מארח
+     חדש נופל, ומי שמוסיף אותו מוסיף שורה כאן עם נימוק (ועם החלטת
+     הבעלים, אם זה ספק). */
+  const KNOWN_HOSTS = new Set([
+    'generativelanguage.googleapis.com',   // Gemini — מנוע השפה, 15.9.2026
+    'api.anthropic.com',                   // דרך החזרה, PROVIDER=anthropic
+    'bekol.co.il', 'www.bekol.co.il',      // ORIGINS — מי מורשה לשלוח
+    'lagstein1-png.github.io', 'lagstein-hub.onrender.com',
+    'localhost', '127.0.0.1'               // LOCAL_ORIGINS — שרת הבדיקות
+  ]);
+  const hosts = [...new Set([...wsrc.matchAll(/\b(?:https?:)?\/\/([a-z0-9-]+(?:\.[a-z0-9-]+)+|localhost)\b/gi)]
+    .map(m => m[1].toLowerCase()))];
+  for (const h of hosts) if (!KNOWN_HOSTS.has(h)) srvHit.push('מארח לא מוכר ' + h);
   if (srvHit.length) fail('ספק חיפוש בקוד השרת: ' + srvHit.join(', '));
-  else ok('אין ספק חיפוש בקוד השרת');
+  else ok('אין ספק חיפוש בקוד השרת (' + hosts.length + ' מארחים, כולם מוכרים)');
 
   /* ---------- 6 ----------
      מסמך שאינו נבדק מול הקוד נפרד ממנו תוך ימים — זה כבר קרה

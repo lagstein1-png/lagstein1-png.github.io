@@ -5,9 +5,11 @@
 Instinct מסייע גם בתחזוקת אתר בקול. בזמן ש-Claude Code מבצע סבב שינויים, Instinct עוצר כתיבה לריפו עד שהסבב מסתיים.
 לפני סבב חדש, בודקים את הקומיטים האחרונים ואת מצב העבודה של הצד השני. עובדים על main המעודכן, משלבים את השינויים החדשים לפני push, ולא מבצעים force-push. קומיטים אחרונים אינם לבדם הוכחה שהצד השני סיים: אם לא ברור, שואלים את הבעלים.
 
-אוסף אפליקציות לימוד, כל אחת `index.html` יחיד: HTML + CSS + JS באותו קובץ.
-שני יוצאים מן הכלל: `bagrut-806` (רב־קובצית, `BUILD` ב-`app.js`) ו-`lomda`
-(התוכן ב-`lomda/data/*.js`).
+אוסף אפליקציות לימוד, רובן `index.html` יחיד: HTML + CSS + JS באותו קובץ.
+**אבל 14 מחזיקות JS מחוץ ל-`index.html`** (`ls <app>/*.js <app>/js/*.js <app>/data/*.js`, 16.10.2026):
+שמונה הן משפחה אחת עם `js/{app,data,engine,i18n,speech}.js`, ועוד `bagrut-806`
+(`BUILD` ב-`app.js`), `lomda` ו-`bagrut-history` (`data/`), `rakia`, `hebrew` ו-`math-teen`.
+כלי שסורק רק `index.html` עיוור אליהן — O-165, O-173. הרשימה: `new-app-or-topic.md`.
 
 - Vanilla JS בלבד. אין React, Vue, Firebase, npm, build step, TypeScript. `deps.js` אוכף.
 - PWA עם manifest ו-service worker. עברית RTL, לעיתים גם ערבית / אנגלית / רוסית.
@@ -76,7 +78,7 @@ Instinct מסייע גם בתחזוקת אתר בקול. בזמן ש-Claude Code
 1. **כסף מהלומד — אין, וכל קשר לכסף נמחק** (הכרעת הבעלים 14.9.2026). אין
    חשבון משתמש, הרשמה או מנוי. שירות חיצוני מותר רק בשכבה חינמית, מפתח
    ב-Secret בשרת, נפילה שקטה למוח המקומי, ותיעוד ב-`legal/terms.js` (אין `privacy.html` — O-169). `money.js` אוכף.
-   נשארים בכוונה: תוכן לימודי על כסף (`lomda/data/money.js`) והמילה ״חינם״.
+   נשארים בכוונה: תוכן לימודי על כסף (`lomda/data/money.js`) והמילה ״חינם״ (ב-`DATA.STR` של דף הבית).
 2. מפתח API בתוך הריפו. `barak.js` סורק `AIza`/`sk-ant-`.
 3. תלות חיצונית חדשה. `deps.js` אוכף. חריג הבעלים: GoatCounter בכל הדפים
    (26 ב-2.10.2026, `analytics.js` סופר) או באף אחד, והתנאים אומרים אותו דבר
@@ -103,7 +105,7 @@ Instinct מסייע גם בתחזוקת אתר בקול. בזמן ש-Claude Code
 - המבחן הכיתתי: `buildQ` מעביר תמיד `pure=true`. `pure.js`.
 - תרגום: **המחרוזת העברית היא המפתח** — משנים עברית ומפתח יחד. `i18n.js`, `teen-i18n.js`.
 - שער השלבים: `build → internal → content-qa → approved → public`; `stages.json` הוא האמת. `stage.js`.
-- מניין האפליקציות: `DATA.APPS` הוא האמת, `badge` בארבע שפות כמילה. `apps.js`. שמונה נקודות מגע לאפליקציה חדשה (השמינית — שכבת הקול המוקלט) — `new-app-or-topic.md`.
+- מניין האפליקציות: `DATA.APPS` הוא האמת, `badge` בארבע שפות כמילה. `apps.js`. חמש־עשרה נקודות מגע לאפליקציה חדשה — שמונה בשלב `build` (ובהן שכבת הקול המוקלט) ושבע ביציאה ל-`public` (ובהן `STAGE_IDS` ו-`SUBJECT_IDS`); הרשימה ומי אוכף כל אחת — `new-app-or-topic.md`.
 - `lomda`: נושא חדש = שלוש נגיעות. `banks.js`. אפליקציה חדשה מוצדקת רק במחולל או באינטראקציה שאין במנוע.
 - לימור: מוח אחד, `tutor-api/worker.js` — **כבוי מ-16.10.2026, וכל לומד מקבל את המוח המקומי** (O-123, `barak.md`). `brain.js`, `joshface.js`, `joshstate.js`, `tutor.js`.
   החריג היחיד: `tutor/limor-device.js` (5.10.2026) — מודל שפה בדפדפן, ב-`/limor/` בלבד, הפרומפט והשומרים מ-`worker.js` (`brain.js` סעיף 5, `JOSH.md`). דף הניסוי `/gemma/` הוסר ב-6.10.2026; `brain.js` סעיף 4 מפיל כל שימוש ב-WebLLM או ב-MediaPipe. הרחבה לאפליקציה נוספת היא החלטה של הבעלים, לא חיווט.
@@ -131,7 +133,7 @@ Instinct מסייע גם בתחזוקת אתר בקול. בזמן ש-Claude Code
 
 ## כלי בדיקה
 
-`node .claude/qa/all.js` (`--static` בלי דפדפן, `--fast` בלי ארבע המסומנות `slow`;
+`node .claude/qa/all.js` (`--static` בלי דפדפן, `--fast` בלי חמש המסומנות `slow`;
 רשימת הכלים ב-`qa-tools.md` נאכפת מול `SUITE` ב-`suite.js --check`),
 שרת: `serve.js`. ארבעה הוקים: `qa-gate.sh` (חוסם סיום), `main-drift.sh` +
 `main-drift-commit.sh` (מדווחים), `fresh-gate.sh` (חוסם push). עקיפה: `QA_GATE=0`.

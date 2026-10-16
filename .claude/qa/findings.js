@@ -41,6 +41,19 @@ let demoted = 0;
 for (let i = iClosed + 1; i < lines.length; i++)
   if (/^## /.test(lines[i])) { lines[i] = '#' + lines[i]; demoted++; }
 
+/* O-196, 16.10.2026: ההבטחה היא ״שני `##` בלבד״ בכל הקובץ, אבל רק
+   מה שמתחת ל״נסגר״ נספר — `##` שלישי מעל ״פתוח״ או בין ״פתוח״
+   ל״נסגר״ עבר בירוק. כאן נספר הקובץ כולו (מחוץ לבלוקי ```), וכל
+   `##` שאינו אחד משני הסעיפים — ולא מתחת ל״נסגר״, שם הוא יורד
+   ל-`###` — הוא ממצא. אותו אין להוריד אוטומטית: מעל ״נסגר״ אי אפשר
+   לדעת אם הוא רשומה סגורה או ממצא פתוח, ולכן מתקנים ביד. */
+const stray = [];
+for (let i = 0, fence = false; i < iClosed; i++) {
+  if (/^```/.test(lines[i])) { fence = !fence; continue }
+  if (!fence && /^## /.test(lines[i]) && i !== iOpen) stray.push(i + 1);
+}
+if (iOpen > iClosed) stray.push(iOpen + 1);
+
 function dateOf(l) {
   const m = l.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
   return m ? new Date(Date.UTC(+m[3], +m[2] - 1, +m[1])) : null;
@@ -60,6 +73,9 @@ const oldLines = old.reduce((n, e) => n + (e.end - e.start), 0);
 const stamp = d => `${d.getUTCDate()}.${d.getUTCMonth() + 1}.${d.getUTCFullYear()}`;
 console.log(`${entries.length} רשומות ב״נסגר״, ${old.length} ישנות מ-${DAYS} ימים (לפני ${stamp(cut)}) — ${oldLines} מתוך ${lines.length} שורות` +
             (demoted ? ` · ${demoted} סעיפי ## שהיו מחוץ ל״נסגר״` : ''));
+
+if (stray.length)
+  console.log(`✗ FINDINGS.md: ${stray.length} סעיפי ## מעל ״נסגר״ שאינם ״פתוח״ (שורות ${stray.join(', ')}) — בקובץ יש בדיוק שני ##; מתקנים ביד`);
 
 if (ARCHIVE) {
   if (!old.length && !demoted) { console.log('✓ אין מה להעביר'); process.exit(0) }
@@ -89,8 +105,9 @@ if (ARCHIVE) {
   process.exit(0);
 }
 
-const bad = old.length || demoted;
-console.log(bad
+const bad = old.length || demoted || stray.length;
+console.log(old.length || demoted
   ? `✗ FINDINGS.md נושא ${old.length} רשומות ישנות מ-${DAYS} ימים${demoted ? ` ו-${demoted} סעיפי ## מחוץ ל״נסגר״` : ''} — node .claude/qa/findings.js --archive`
+  : stray.length ? `✗ FINDINGS.md: יותר משני ##`
   : `✓ FINDINGS.md מחזיק רק את ${DAYS} הימים האחרונים, ושני ## בלבד`);
 process.exit(CHECK && bad ? 1 : 0);

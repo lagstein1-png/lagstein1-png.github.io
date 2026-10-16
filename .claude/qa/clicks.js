@@ -13,8 +13,7 @@
 'use strict';
 const { chromium } = require('./pw.js');
 const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
-const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-              'english', 'history', 'ulpan', 'lomda', 'kotvim', 'reader', 'bagrut-806'];
+const AL = require('./applist.js');
 /* שלוש בלי שליח [data-a] אחיד (O-28): איפה נתפסת האמירה, ועל מה לוחצים.
    reader מדבר ישר אל speechSynthesis; bagrut-806 דרך Speech.say. */
 const SPECIAL = {
@@ -22,6 +21,19 @@ const SPECIAL = {
   'bagrut-806': { stub: 'Speech', pick: '[data-go="settings"]', off: '[data-say="0"]' },
   kotvim:       { off: '[data-a="tog"][data-v="sayBtn"]', open: '[data-a="set"]' },
 };
+/* O-162 (16.10.2026): הרשימה נגזרת, לא כתובה ביד. הרשימה הקשיחה מנתה
+   שתים־עשרה, ותשע אפליקציות שהועתקו מ-history (civics, geography,
+   literature, tanakh, motal, hebrew-arab, islam, russian, biology) נולדו
+   בלי sayClick ואיש לא ראה. נכנסת כל אפליקציה שיש בה מבנה ההקראה של
+   המשפחה — speak, המתג state.settings.tts ושליח [data-a] — ולא
+   ״מי שכבר יש לו sayClick״, אחרת אפליקציה בלעדיו לא הייתה נבדקת
+   לעולם. ועוד שלוש ה-SPECIAL, שמדברות במבנה אחר.
+   הוכחת נפילה: HEAD (לפני התיקון) — תשע אדומות; העץ — ירוקות. */
+const FAMILY = AL.local().filter(a => {
+  const s = AL.sourceOf(a);
+  return /function speak\(/.test(s) && /state\.settings\.tts/.test(s) && /closest\("\[data-a\]"\)/.test(s);
+});
+const APPS = FAMILY.concat(Object.keys(SPECIAL).filter(a => AL.local().includes(a) && !FAMILY.includes(a)));
 /* O-29: המתג. בתשע — state.settings.tts; בשלוש — כפתור במסך ההגדרות
    (off), ולפעמים צריך קודם להגיע למסך (open). כשהמתג כבוי, לחיצה
    חייבת לשתוק. */
