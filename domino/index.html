@@ -465,11 +465,31 @@ function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),
   vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
   if(!vs.length)return {v:null,fem:false};
   function grank(v){var g=vGender(v);return g==="f"?2:g==="?"?1:0}
+  /* ובתוך המגדר — האיכות. הניקוד הועתק מ-bestVoice של rakia (ושם
+     מ-english): בלעדיו נבחר הקול הנשי הראשון ברשימה ולא הטבעי —
+     Carmit המקומי ולא Hila (O-227). */
+  var want=code.toLowerCase();
+  function score(v){
+    var s=0,n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
+    if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
+    if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
+    if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    if(v.localService===false&&voiceUsable(v))s+=6;
+    if(/espeak|compact|pico/.test(n))s-=40;
+    if(v.default)s+=4;
+    return s;
+  }
   var chosen=vs.slice().sort(function(a,b){
     var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
-    return grank(b)-grank(a);
+    d=grank(b)-grank(a); return d||score(b)-score(a);
   })[0];
   return {v:chosen||null,fem:vGender(chosen)==="f"}}
+/* גובה — 1.12, הפריסט ״נשי רגוע״ של האתר, וקול גברי מורם ×1.35 עד התקרה
+   1.35 — voicePitch של rakia ו-english (O-227). עד כאן 1.05 לנשי ו-1.3 לכל
+   השאר, וההקראה כאן נשמעה אחרת מבשאר האתר. */
+var FEM_PITCH=1.35, PITCH_BASE=1.12;
+function femLift(v){ if(!v)return 1; return vGender(v)==="m"?FEM_PITCH:1 }
+function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.raw!=null){HL.el.textContent=HL.el.dataset.raw}HL.el=null}
 function hlPrep(el,text){hlClear();if(!el||el.children.length)return;el.dataset.raw=el.textContent;HL.el=el;HL.raw=el.textContent;HL.got=false;
   var out="",re=/\S+|\s+/g,m,idx=0;HL.starts=[];
@@ -486,7 +506,7 @@ function setPlaying(b){var bs=document.querySelectorAll('[data-a="stop"]');bs.fo
    ומקטע מדור ישן פשוט אינו מדבר. */
 function speakDevice(text,el,onend){var raw=String(text);
   if(!("speechSynthesis" in window)||!raw)return false;
-  var spoken=heSpoken(raw,S.lang),rate=S.slow?0.7:0.9;
+  var spoken=heSpoken(raw,S.lang),rate=S.slow?0.7:0.95;   /* 0.95 — קצב האתר (O-227); 0.7 — ״לאט״ שהלומד בחר */
   HL.noB=false;
   if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=(spoken!==raw)}
   var segs=segments(spoken),my=++_sayGen,v=pickVoice(),retried=false;
@@ -505,7 +525,7 @@ function speakDevice(text,el,onend){var raw=String(text);
     }
     var u=new SpeechSynthesisUtterance(seg.text);
     u.lang=LCODE[S.lang];if(v.v){try{u.voice=v.v}catch(e2){}}
-    u.rate=rate;u.pitch=v.fem?1.05:1.3;
+    u.rate=rate;u.pitch=voicePitch(v.v);
     u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(seg.start+e.charIndex)};
     u.onend=next;
     u.onerror=function(e){
@@ -536,7 +556,7 @@ function speakDevice(text,el,onend){var raw=String(text);
    בלי הדגשה מילה־מילה (אין onboundary בקובץ). אין קובץ, או שהקובץ
    נכשל: קול המכשיר כרגיל. */
 function speak(text,el,onend){stopSpeak();if(!text)return false;
-  if(typeof RECORDED!=="undefined"&&RECORDED.play(String(text),S.lang,{rate:S.slow?0.7:0.9,
+  if(typeof RECORDED!=="undefined"&&RECORDED.play(String(text),S.lang,{rate:S.slow?0.7:0.95,
       onEnd:function(){setPlaying(false);if(onend)onend()},
       onError:function(){speakDevice(text,el,onend)}})){
     setPlaying(true);return true;

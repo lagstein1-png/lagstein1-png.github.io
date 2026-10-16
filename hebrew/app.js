@@ -43,17 +43,90 @@ const SCEN_HINT={he:'חזרו למשפט בקטע שעוסק בשאלה.',ar:'ع
 /* ב-explain שבמאגר יושבות הפרכות לכל מסיח בנפרד (wrong[0] ← explain[0]),
    ולא משפט כללי. מי שענה נכון צריך משפט משלו, ולכן הוא נבנה כאן. */
 const RIGHT_IS={he:'התשובה הנכונה היא ״{A}״.',ar:'الإجابة الصحيحة هي «{A}».',ru:'Правильный ответ — «{A}».',en:'The correct answer is “{A}”.'};
-const FEM_PITCH=1.35;
+const FEM_PITCH=1.35,PITCH_BASE=1.12;
+/* גובה — 1.12, הפריסט ״נשי רגוע״ של האתר, וקול גברי מורם ×1.35 עד התקרה
+   1.35 — voicePitch של english ו-rakia (O-227). עד כאן 1 לקול נשי. */
+const femLift=v=>v&&vGender(v)==='m'?FEM_PITCH:1;
+const voicePitch=v=>Math.min(1.35,PITCH_BASE*femLift(v));
+/* =====================================================================
+   מנוע ההקראה של "תאוריה מדברת" — ארבעה מנגנונים ועוד חמישי.
+   הועתקו כלשונם מ-english/index.html (O-227, 16.10.2026). עד היום לא
+   היה כאן אף אחד מהם, ו-voice.js הראה שחמשתם אינם נורים: iOS שותק,
+   ההקראה נחתכת אחרי 15 שניות בכרום שולחני, onend אבוד נועל את התור,
+   וקול רשת בלי אינטרנט שותק.
+   ===================================================================== */
+/* 1 · שומר-ער. Chrome ו-Edge בשולחן העבודה חותכים הקראה אחרי כ-15 שניות.
+   במובייל אין את הבאג ופעולה כזאת דווקא מקרטעת שם. */
+const NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)&&!/Android|Mobile/i.test(navigator.userAgent);
+let _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+/* 2 · הפניה חיה ל-utterance. Chrome אוסף אובייקט שאין אליו הפניה,
+   ואיתו נעלמים onend ו-onboundary: החלק הבא לא יוצא לעולם. */
+let _activeU=null;
+/* 3 · קול רשת שנכשל. מרגע שאחד נכשל, voiceUsable — מפתח המיון הראשון —
+   מוריד את קולות הרשת לתחתית לשארית הסשן. */
+let _netVoiceOK=true;
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+/* 4 · שומר זמן. יש מכשירים שבהם onend לא נורה. ארבע שניות שבהן המנוע
+   לא מדבר ולא ממתין נחשבות סוף. מחזיר פונקציית ביטול. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+/* 5 · שחרור במגע. iOS משמיע רק אמירה שיצאה מתוך handler של מגע אמיתי.
+   קריאה ישירה, בלי הבטחה — הבטחה שוברת את שרשרת המגע. */
+try{document.addEventListener("pointerdown",function(){
+  try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+},{once:true});}catch(e){}
 /* בחירת קול: נשי תחילה (סטנדרט civics), אחר כך לא-מזוהה, ורק אז מה שיש.
    קול שזוהה כגברי מקבל הרמת גובה, כי בדפדפן אין דרך אחרת. */
 const voiceSession={};
-const pickVoice=lg=>{const base=(TTS_CODE[lg]||TTS_CODE.he).split('-')[0],pin=voiceSession[base];const all=speechSynthesis.getVoices()||[];if(!all.length)return pin?{v:pin.v}:{empty:true};let pool=all.filter(v=>(v.lang||'').replace('_','-').toLowerCase().split('-')[0]===base);if(!pool.length)return pin?{v:pin.v}:{none:true};const usable=v=>v.localService!==false||navigator.onLine!==false;if(pin){const live=pool.find(v=>v.voiceURI===pin.v.voiceURI);if(live&&usable(live))return{v:live};const same=pool.filter(v=>vGender(v)===pin.g&&usable(v));if(!same.length)return{v:pin.v};pool=same}else{const female=pool.filter(v=>vGender(v)==='f');if(female.length)pool=female}const v=pool.find(v=>usable(v)&&vGender(v)==='f')||pool.find(v=>usable(v)&&vGender(v)==='?')||pool.find(usable)||pool[0];voiceSession[base]={v,g:vGender(v)};return{v}};
+const pickVoice=lg=>{const base=(TTS_CODE[lg]||TTS_CODE.he).split('-')[0],pin=voiceSession[base];const all=speechSynthesis.getVoices()||[];if(!all.length)return pin?{v:pin.v}:{empty:true};let pool=all.filter(v=>(v.lang||'').replace('_','-').toLowerCase().split('-')[0]===base);if(!pool.length)return pin?{v:pin.v}:{none:true};if(pin){const live=pool.find(v=>v.voiceURI===pin.v.voiceURI);if(live&&voiceUsable(live))return{v:live};const same=pool.filter(v=>vGender(v)===pin.g&&voiceUsable(v));if(!same.length)return{v:pin.v};pool=same}else{const female=pool.filter(v=>vGender(v)==='f');if(female.length)pool=female}
+  /* שלושה מפתחות, בסדר של bestVoice במנוע האתר (O-227): voiceUsable, אחריו
+     המגדר, ואחריו האיכות. בלי הניקוד נבחר הקול הנשי הראשון ברשימה —
+     Carmit המקומי ולא Hila. */
+  const want=(TTS_CODE[lg]||TTS_CODE.he).toLowerCase();
+  const score=v=>{let s=0;const n=((v.name||'')+' '+(v.lang||'')).toLowerCase();
+    if(String(v.lang||'').replace('_','-').toLowerCase()===want)s+=12;
+    if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
+    if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    if(v.localService===false&&voiceUsable(v))s+=6;
+    if(/espeak|compact|pico/.test(n))s-=40;
+    if(v.default)s+=4;
+    return s};
+  const grank=v=>{const g=vGender(v);return g==='f'?2:g==='?'?1:0};
+  const v=pool.slice().sort((a,b)=>(voiceUsable(b)-voiceUsable(a))||(grank(b)-grank(a))||(score(b)-score(a)))[0];
+  voiceSession[base]={v,g:vGender(v)};return{v}};
 
 const VNOTICE={he:'אין במכשיר קול בשפה {L}, לכן החלק הזה לא מוקרא',ar:'لا يوجد على الجهاز صوت باللغة {L}، لذا لا تُقرأ هذه الفقرة',ru:'На устройстве нет голоса для языка {L}, поэтому этот фрагмент не озвучивается',en:'This device has no {L} voice, so this part is not read aloud'};
 const VLNAME={he:{ar:'ערבית',ru:'רוסית',en:'אנגלית'},ar:{ar:'العربية',ru:'الروسية',en:'الإنجليزية'},ru:{ar:'арабского',ru:'русского',en:'английского'},en:{ar:'Arabic',ru:'Russian',en:'English'}};
 const vNotice=miss=>{const msg=(VNOTICE[lang]||VNOTICE.he).replace('{L}',(VLNAME[lang]||VLNAME.he)[miss]||miss);let d=document.getElementById('vnotice');if(!d){d=document.createElement('div');d.id='vnotice';d.style.cssText='position:fixed;bottom:1rem;inset-inline-start:50%;transform:translateX(50%);background:#5b4a00;color:#fff;padding:.6rem 1rem;border-radius:10px;font-size:.9rem;z-index:60;box-shadow:0 4px 14px #0004';document.body.appendChild(d)}d.textContent=msg;d.style.display='block';clearTimeout(d._t);d._t=setTimeout(()=>{d.style.display='none'},4500)};
 let _sg=0;
-let rate=0.83;try{const r=parseFloat(localStorage.getItem('hebrew-rate'));if(r>=0.6&&r<=1.2)rate=r}catch(e){}
+/* 0.95 — קצב האתר (O-227; עד כאן 0.83 בלי נימוק). מי ששמר קצב משלו — נשאר. */
+let rate=0.95;try{const r=parseFloat(localStorage.getItem('hebrew-rate'));if(r>=0.6&&r<=1.2)rate=r}catch(e){}
 /* מעקב הקראה: עטיפת מילים בספאנים + הדגשה צהובה של המילה הנאמרת. */
 const wordSpans=el=>{if(!el)return null;if(!el.dataset.wrapped){const txt=el.textContent;el.textContent='';txt.split(/(\s+)/).forEach(part=>{if(!part)return;if(/^\s+$/.test(part)){el.appendChild(document.createTextNode(part))}else{const sp=document.createElement('span');sp.className='w';sp.textContent=part;el.appendChild(sp)}});el.dataset.wrapped='1'}let pos=0;const out=[];el.childNodes.forEach(n=>{const len=n.textContent.length;if(n.nodeType===1)out.push({s:pos,e:pos+len,el:n});pos+=len});return out};
 const clearRd=()=>document.querySelectorAll('.w.rd').forEach(w=>w.classList.remove('rd'));
@@ -118,7 +191,37 @@ function segments(spoken){
 }
 /* הקראה שמכבדת את שפת הטקסט: כל חלק מוקרא בקול של שפתו, נשי תחילה.
    חלק בשפה שאין לה קול במכשיר לא נקרא בקול עברי — מוצגת הודעה. */
-const speakParts=parts=>{if(!window.speechSynthesis)return;speechSynthesis.cancel();clearRd();const my=++_sg;parts=parts.filter(p=>p.text&&String(p.text).trim());parts=[].concat.apply([],parts.map(p=>segments(sayable(p.text)).map((g,k)=>Object.assign({},p,{text:g.text,off:g.start,cont:k>0}))));const step=i=>{if(my!==_sg||i>=parts.length)return;const p=parts[i],code=TTS_CODE[p.lg]||TTS_CODE.he,r=pickVoice(p.lg);if(r.none&&!r.empty){if(p.lg!=='he'){vNotice(p.lg);step(i+1);return}}const u=new SpeechSynthesisUtterance(sayable(p.text));u.lang=code;u.rate=rate;if(p.tr)u.onboundary=e=>{if(e.name&&e.name!=='word')return;const ci=e.charIndex+(p.off||0);p.tr.forEach(w=>w.el.classList.remove('rd'));const w=p.tr.find(w=>ci>=w.s&&ci<w.e);if(w)w.el.classList.add('rd')};if(r.v){u.voice=r.v;u.pitch=vGender(r.v)==='m'?FEM_PITCH:1}const go=()=>{if(parts[i+1]&&parts[i+1].cont)setTimeout(()=>step(i+1),SEG_GAP);else step(i+1)};u.onend=go;u.onerror=go;speechSynthesis.speak(u)};step(0)};
+/* מנוע ההגייה העברי — /tutor/he-speech.js (O-178, 16.10.2026).
+   **עברית בלבד**: חלק בשפה אחרת עובר כמות שהוא, וכך גם כשהקובץ לא
+   נטען. ההדגשה (tr) נמדדת על המוצג, ו-charIndex על הנאמר — ״משלש״
+   →״משולש״ משנה אורך. המנוע שומר את מספר האסימונים, ולכן map מתרגם
+   היסט בנאמר לתחילת המילה ה-k המוצגת. נבדלו המספרים — בלי הדגשה
+   מילה־מילה (drop), ולא הדגשה שגויה. */
+const heStarts=s=>{const a=[],re=/\S+/g;let m;while((m=re.exec(s)))a.push(m.index);return a};
+const heSay=p=>{const d=sayable(p.text);if(p.lg!=='he'||typeof HESPEECH==='undefined')return {s:d};let s;try{s=HESPEECH.spoken(d)}catch(e){return {s:d}}if(s===d)return {s:d};const ds=heStarts(d),ss=heStarts(s);if(ds.length!==ss.length)return {s:s,drop:true};return {s:s,map:c=>{let k=-1;for(let j=0;j<ss.length;j++){if(ss[j]<=c)k=j;else break}return k<0?c:ds[k]}}};
+const speakParts=parts=>{if(!window.speechSynthesis)return;speechSynthesis.cancel();clearRd();stopKeepAlive();_activeU=null;const my=++_sg;parts=parts.filter(p=>p.text&&String(p.text).trim());parts=[].concat.apply([],parts.map(p=>{const h=heSay(p);return segments(h.s).map((g,k)=>Object.assign({},p,{text:g.text,off:g.start,cont:k>0,map:h.map,tr:h.drop?null:p.tr}))}));const alive=()=>my===_sg;let retried=false;
+  const step=i=>{if(!alive())return;if(i>=parts.length){maybeStopKeepAlive();return}const p=parts[i],code=TTS_CODE[p.lg]||TTS_CODE.he,r=pickVoice(p.lg);if(r.none&&!r.empty){if(p.lg!=='he'){vNotice(p.lg);step(i+1);return}}
+    /* moved מבטיח שחלק מתקדם פעם אחת בלבד: onend ושומר הזמן יכולים שניהם
+       לרצות לקדם אותו, וקידום כפול מדלג על חלק. */
+    let moved=false,disarm=null;
+    const go=()=>{if(moved||!alive())return;moved=true;if(disarm)disarm();if(parts[i+1]&&parts[i+1].cont)setTimeout(()=>step(i+1),SEG_GAP);else step(i+1)};
+    const u=new SpeechSynthesisUtterance(sayable(p.text));u.lang=code;u.rate=rate;if(p.tr)u.onboundary=e=>{if(e.name&&e.name!=='word')return;let ci=e.charIndex+(p.off||0);if(p.map)ci=p.map(ci);p.tr.forEach(w=>w.el.classList.remove('rd'));const w=p.tr.find(w=>ci>=w.s&&ci<w.e);if(w)w.el.classList.add('rd')};if(r.v)u.voice=r.v;u.pitch=voicePitch(r.v);
+    u.onend=go;
+    u.onerror=e=>{if(moved||!alive())return;const err=(e&&e.error)||'';
+      /* ביטול יזום אינו תקלה — stopSpeech כבר ניקה אחריו */
+      if(err==='canceled'||err==='interrupted'){moved=true;if(disarm)disarm();return}
+      /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט: עוברים לקול מקומי
+         וחוזרים על אותו חלק, פעם אחת. כל כישלון אחר — ממשיכים הלאה, כמו קודם. */
+      if(!retried&&r.v&&r.v.localService===false){retried=true;_netVoiceOK=false;moved=true;if(disarm)disarm();_activeU=null;setTimeout(()=>step(i),SEG_GAP);return}
+      go()};
+    _activeU=u;   /* מגן מפני איסוף זבל */
+    try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e){}
+    speechSynthesis.speak(u);startKeepAlive();
+    disarm=ttsWatchdog(()=>alive()&&!moved,go)};
+  step(0)};
+/* עצירה: הדור מתקדם, ולכן גם שומר הזמן וגם onerror של הביטול אינם
+   מקדמים את התור — בלעדיו ״עצירה״ הייתה ממשיכה לחלק הבא. */
+const stopSpeech=()=>{++_sg;stopKeepAlive();_activeU=null;try{speechSynthesis.cancel()}catch(e){}clearRd()};
 /* שכבה 1 - קובץ מוקלט כשיש (מבדק חוסרים 30.9 סעיף 4). הניגון
    מנקה דיבור מכשיר תלוי; כישלון בקובץ נופל חזרה ל-speakParts.
    הנתיב עם הדגשה מילה-במילה (speakParts עם tr) נשאר בקול המכשיר -
@@ -180,7 +283,7 @@ function wireModes(){
 }
 applyModes();
 const setBtn=document.getElementById('setbtn'),setP=document.getElementById('setpanel'),rateEl=document.getElementById('rate');
-if(setBtn&&setP){setPanel();wireModes();setBtn.onclick=()=>{setP.hidden=!setP.hidden;setPanel()};rateEl.value=rate;rateEl.oninput=e=>{rate=parseFloat(e.target.value)||0.83;try{localStorage.setItem('hebrew-rate',rate)}catch(_){}}}
+if(setBtn&&setP){setPanel();wireModes();setBtn.onclick=()=>{setP.hidden=!setP.hidden;setPanel()};rateEl.value=rate;rateEl.oninput=e=>{rate=parseFloat(e.target.value)||0.95;try{localStorage.setItem('hebrew-rate',rate)}catch(_){}}}
 function base(content){app.innerHTML=content+`<div class="sources">${U('sources')}: <a target="_blank" rel="noopener" href="https://pop.education.gov.il/tchumey_daat/ivrit_havana_habaa_lashon/chativat-beynayim/noseem_nilmadim/havana_habaa/">${U('middle')}</a> · <a target="_blank" rel="noopener" href="https://pop.education.gov.il/tchumey_daat/ivrit_havana_habaa_lashon/chativa-elyona/bhinot-bagrut-umesimot/">${U('src282')}</a> · <a target="_blank" rel="noopener" href="https://pop.education.gov.il/tchumey_daat/ivrit_havana_habaa_lashon/chativa-elyona/havana-habaa-olim/matriculation-questionnaires-274/">${U('src274')}</a>. ${U('exam')}</div>`}
 function home(){base(`<section class="hero"><div><div class="eyebrow">${U('eyebrow')}</div><h1>${U('headline')}</h1><p>${U('intro')}</p><p style="margin-top:10px"><button class="secondary" data-action="speak-home">🔊 ${L('listen')}</button></p></div><div class="hero-art" aria-hidden="true">א</div></section><h2>${U('stage')}</h2><div class="tracks">${[['middle','middle','middleDesc'],['high','high','highDesc'],['olim','olim','olimDesc']].map(([id,name,desc])=>`<div class="orow"><button class="card track ${stage===id?'active':''}" data-stage="${id}" aria-pressed="${stage===id}" style="flex:1"><span class="num">${id==='middle'?'7–9':id==='high'?'10–12':'ע'}</span><strong>${U(name)}</strong><small>${U(desc)}</small></button><button class="ospk" data-say="${U(name)}. ${U(desc)}" aria-label="${L('listen')}">🔊</button></div>`).join('')}</div>${stage==='high'?`<div class="bar" style="margin-top:15px"><button class="pill ${track==='281'?'active':''}" aria-pressed="${track==='281'}" data-track="281">${U('pill281')}</button><button class="pill ${track==='282'?'active':''}" aria-pressed="${track==='282'}" data-track="282">${U('pill282')}</button></div><div class="note">${U('essayNote')}</div>`:''}<h2>${U('how')}</h2><div class="tiles"><div class="orow"><button class="card tile" data-view="practice" style="flex:1"><span class="glyph">◉</span><strong>${L('practice')}</strong><small>${U('practiceDesc')}</small></button><button class="ospk" data-say="${L('practice')}. ${U('practiceDesc')}" aria-label="${L('listen')}">🔊</button></div><div class="orow"><button class="card tile" data-view="concept" style="flex:1"><span class="glyph">▤</span><strong>${L('concept')}</strong><small>${U('conceptDesc')}</small></button><button class="ospk" data-say="${L('concept')}. ${U('conceptDesc')}" aria-label="${L('listen')}">🔊</button></div><div class="orow"><button class="card tile" data-view="write" style="flex:1"><span class="glyph">✎</span><strong>${L('write')}</strong><small>${U('writeDesc')}</small></button><button class="ospk" data-say="${L('write')}. ${U('writeDesc')}" aria-label="${L('listen')}">🔊</button></div></div><h2>${U('tools')}</h2><div class="tiles">${[['ulpan','ulpan','ulpanDesc'],['kotvim','kotvim','kotvimDesc'],['reader','reader','readerDesc']].map(([path,name,desc])=>`<div class="orow"><a class="card tile" href="/${path}/" style="text-decoration:none;flex:1"><span class="glyph">↗</span><strong>${U(name)}</strong><small>${U(desc)}</small></a><button class="ospk" data-say="${U(name)}. ${U(desc)}" aria-label="${L('listen')}">🔊</button></div>`).join('')}</div><div class="note">${U('exam')}</div><p class="status">${U('mtNote')}</p><p class="status">${progress.answered} ${U('saved')}</p>`)}
 
@@ -218,7 +321,7 @@ const wkey=()=>(stage==='middle'?'middle':track)+'/'+writingTask;
 function updateWords(){let d=document.getElementById('draft');if(d)document.getElementById('wordcount').textContent=`${d.value.trim()?d.value.trim().split(/\s+/).length:0} ${U('words')}`}
 function render(){if(!unlocked){app.innerHTML='<div class="error"><h1>דף פנימי</h1><p>הגרסה הזאת עדיין אינה פתוחה לציבור.</p></div>';return}if(!bank){app.innerHTML='<div class="card">טוענים...</div>';return}if(view==='practice')practice();else if(view==='concept')concept();else if(view==='write')writeView();else home()}
 app.addEventListener('input',e=>{if(e.target.id==='draft'){drafts[wkey()]=e.target.value;updateWords()}});app.addEventListener('change',e=>{if(e.target.id==='topic'){topic=e.target.value;buildRound();render()}});
-app.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.stage){stage=b.dataset.stage;track=stage==='olim'?'274':'281';level=1;topic='all';round=[];render();return}if(b.dataset.track){track=b.dataset.track;topic='all';round=[];render();return}if(b.dataset.view){view=b.dataset.view;round=[];if(view==='practice')buildRound();if(view==='write')writingTask=0;render();return}if(b.dataset.writing){writingTask=Number(b.dataset.writing);render();return}if(b.dataset.level){level=Number(b.dataset.level);buildRound();render();return}if(b.dataset.say){speak(b.dataset.say,textLang(b.dataset.say));return}let a=b.dataset.action,q=round[idx];if(a==='restart'){buildRound();render()}else if(a==='speak-home'){speak(U('headline')+'. '+U('intro'),lang)}else if(a==='speak'){const pt=t(q.prompt);speakParts([{text:q.passage,lg:'he',tr:wordSpans(document.querySelector('.practice .passage'))},{text:pt,lg:textLang(pt),tr:wordSpans(document.querySelector('.practice .question-title'))}])}else if(a==='speak-passage')speak(q.passage,'he');else if(a==='speak-prompt')speak(bank.writing[stage==='middle'?'middle':track][writingTask].prompt,'he');else if(a==='hint'){showHint=true;tutorOn=false;render();const hh=t(q.hint);if(hh)speak(hh,textLang(hh))}else if(a==='next'){idx++;chosen=-1;showHint=false;tutorOn=false;render()}else if(a==='tutor'&&q){showHint=true;tutorOn=true;render();const hh=t(whyOf(q)||q.hint);if(hh)speak(hh,textLang(hh))}else if(a==='limor'){try{speechSynthesis.cancel()}catch(e){}clearRd();if(typeof RECORDED!=='undefined')RECORDED.stop();if(window.TUTOR)TUTOR.open()}else if(a==='stop'){try{speechSynthesis.cancel()}catch(e){}clearRd();if(typeof RECORDED!=='undefined')RECORDED.stop()}});
+app.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.stage){stage=b.dataset.stage;track=stage==='olim'?'274':'281';level=1;topic='all';round=[];render();return}if(b.dataset.track){track=b.dataset.track;topic='all';round=[];render();return}if(b.dataset.view){view=b.dataset.view;round=[];if(view==='practice')buildRound();if(view==='write')writingTask=0;render();return}if(b.dataset.writing){writingTask=Number(b.dataset.writing);render();return}if(b.dataset.level){level=Number(b.dataset.level);buildRound();render();return}if(b.dataset.say){speak(b.dataset.say,textLang(b.dataset.say));return}let a=b.dataset.action,q=round[idx];if(a==='restart'){buildRound();render()}else if(a==='speak-home'){speak(U('headline')+'. '+U('intro'),lang)}else if(a==='speak'){const pt=t(q.prompt);speakParts([{text:q.passage,lg:'he',tr:wordSpans(document.querySelector('.practice .passage'))},{text:pt,lg:textLang(pt),tr:wordSpans(document.querySelector('.practice .question-title'))}])}else if(a==='speak-passage')speak(q.passage,'he');else if(a==='speak-prompt')speak(bank.writing[stage==='middle'?'middle':track][writingTask].prompt,'he');else if(a==='hint'){showHint=true;tutorOn=false;render();const hh=t(q.hint);if(hh)speak(hh,textLang(hh))}else if(a==='next'){idx++;chosen=-1;showHint=false;tutorOn=false;render()}else if(a==='tutor'&&q){showHint=true;tutorOn=true;render();const hh=t(whyOf(q)||q.hint);if(hh)speak(hh,textLang(hh))}else if(a==='limor'){stopSpeech();if(typeof RECORDED!=='undefined')RECORDED.stop();if(window.TUTOR)TUTOR.open()}else if(a==='stop'){stopSpeech();if(typeof RECORDED!=='undefined')RECORDED.stop()}});
 app.addEventListener('click',e=>{let b=e.target.closest('[data-answer]');if(!b||chosen>=0)return;chosen=Number(b.dataset.answer);let q=round[idx];if(q.choices[chosen]===q.options[q.correct])score++;progress.answered++;progress.correct+=Number(q.choices[chosen]===q.options[q.correct]);try{localStorage.setItem(STORE,JSON.stringify(progress))}catch(e){}render()});
 fetch('bank.json').then(r=>{if(!r.ok)throw Error('bank');return r.json()}).then(data=>{bank=data;render()}).catch(()=>{app.innerHTML='<div class="error">'+U('empty')+'</div>'});render();
 /* הרישום יושב ב-index.html עם ?v= שבכתובת, והוא היחיד. רישום שני

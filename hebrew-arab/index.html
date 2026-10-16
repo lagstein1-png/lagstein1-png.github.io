@@ -1492,20 +1492,32 @@ function hlWhole(el){
   HL.el=el; HL.raw=el.innerHTML; HL.added=true;
   el.classList.add("now");
 }
-function hlPrep(el,text){
+function hlPrep(el,text,spokenText){
   hlClear();
   if(!el||!text)return;
   HL.el=el; HL.raw=el.innerHTML;
-  var parts=String(text).split(/(\s+)/),html="",pos=0,idx=0;
+  var parts=String(text).split(/(\s+)/),html="",idx=0;
+  /* **המפה נמדדת על המחרוזת הנאמרת, ולא על המוצגת** (O-178, כמו
+     ב-english). `e.charIndex` מצביע לתוך מה שנאמר, ומנוע ההגייה
+     העברי משנה אורכי מילים (״משלש״→״משולש״). מספר האסימונים נשמר,
+     ולכן האסימון ה-i שנאמר הוא ה-span ה-i שמוצג. נבדלו המספרים —
+     נופלים להדגשת הכול, ולא להדגשה שגויה. */
+  var sp=String(spokenText==null?text:spokenText).split(/(\s+)/),spos=0,sidx=0;
   HL.map=[];
-  for(var i=0;i<parts.length;i++){
-    var pt=parts[i];
-    if(!pt.length)continue;
-    if(/^\s+$/.test(pt)){html+=pt;pos+=pt.length;continue}
-    HL.map.push({from:pos,to:pos+pt.length,i:idx});
-    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
-    pos+=pt.length; idx++;
+  for(var i=0;i<sp.length;i++){
+    if(!sp[i].length)continue;
+    if(/^\s+$/.test(sp[i])){spos+=sp[i].length;continue}
+    HL.map.push({from:spos,to:spos+sp[i].length,i:sidx});
+    spos+=sp[i].length; sidx++;
   }
+  for(var j=0;j<parts.length;j++){
+    var pt=parts[j];
+    if(!pt.length)continue;
+    if(/^\s+$/.test(pt)){html+=pt;continue}
+    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
+    idx++;
+  }
+  if(idx!==sidx){hlClear();return}
   if(!HL.map.length){hlClear();return}
   el.innerHTML=html;
   HL.spans=el.querySelectorAll(".wd");
@@ -1777,7 +1789,13 @@ function langSegs(text,code){
   return out.length?out:[{text:text,start:0,code:code}];
 }
 /* קצב לפי שפה — אותם ערכים שנבחרו בתאוריה מדברת אחרי האזנה */
-var VOICE_TUNE={he:0.82,ar:0.85,en:0.90,ru:0.88};
+/* 1.0 בכל השפות מאז 13.9.2026. הבעלים שמע את Hila ב-math-app — שאינה
+   מכוונת קצב לפי שפה ושולחת 0.95 כמו שהוא — ואמר ״נעים ומדויק, להכניס
+   לכל האפליקציות״. 0.82 בעברית נבחר כאן אחרי האזנה למנועי מכשיר ישנים,
+   והקול הטבעי אינו צריך אותו: 0.82×0.95 נתן 0.78, ואותו קול נשמע כאן
+   אחרת מאשר שם. המבנה נשאר כדי שכיוון לפי שפה יישאר אפשרי.
+   (O-227, 16.10.2026: התיקון של english לא הגיע לעותק הזה — הועתק משם.) */
+var VOICE_TUNE={he:1.0,ar:1.0,en:1.0,ru:1.0};
 function tuneRate(lang,rate){
   var t=VOICE_TUNE[String(lang||"he").split("-")[0].toLowerCase()]||0.88;
   var r=t*(rate||1);
@@ -1797,6 +1815,13 @@ function femLift(v){
   if(!v)return 1;
   try{ return vGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
 }
+
+/* גובה הבסיס של כל אמירה — 1.12, הפריסט ״נשי רגוע״ של math-app, שהבעלים
+   בחר אחרי האזנה (13.9.2026). femLift נשאר מכפיל: קול גברי מורם עוד,
+   עד התקרה 1.35 של ״תאוריה מדברת״. הועתק מ-english (O-227) — עד כאן
+   נשלח 1, וההקראה כאן נשמעה אחרת מבשאר האתר. */
+var PITCH_BASE=1.12;
+function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 
 
 /* ------------------------------------------------------------
@@ -1865,8 +1890,17 @@ function voiceCheck(){
    מקדם אותו, ומקטע מדור ישן פשוט אינו מדבר.
    ------------------------------------------------------------ */
 var _sayGen=0;
+/* מנוע ההגייה העברי — /tutor/he-speech.js (O-178, 16.10.2026, כמו
+   ב-english). **עברית בלבד**: ערבית, רוסית ואנגלית עוברות כמות שהן.
+   הקובץ לא נטען — הטקסט חוזר כמות שהוא, ואין שגיאה. */
+function heSpoken(t,code){
+  var l=String(code||"he").slice(0,2);
+  if(l!=="he"||typeof HESPEECH==="undefined")return t;
+  try{ return HESPEECH.spoken(t) }catch(e){ return t }
+}
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
+  text=heSpoken(text,code);
   try{speechSynthesis.cancel()}catch(e){}
   var my=++_sayGen;
   /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
@@ -1886,7 +1920,7 @@ function speakDevice(text,code,rate){
         if(VC[c])return VC[c];
         var v=bestVoice(c), lang=(v&&v.lang)||c;
         if(!v){var all=[];try{all=speechSynthesis.getVoices()||[]}catch(e){} if(all.length)ttsNoLang(c);}
-        return (VC[c]={v:v,lang:lang,rt:tuneRate(lang,clamp(rate,0.55,1.4)),pit:femLift(v)});
+        return (VC[c]={v:v,lang:lang,rt:tuneRate(lang,clamp(rate,0.55,1.4)),pit:voicePitch(v)});
       }
       var retried=false;
       function alive(){return my===_sayGen}
@@ -4519,7 +4553,7 @@ document.addEventListener("click",function(e){
        האמירה עצמה נוצרת אסינכרונית, אחרי שרשימת הקולות עולה, ולכן
        ההכנה כאן תמיד מקדימה אותה. */
     var tgt=a==="sayline"?el:hlFind(el,txt);
-    if(tgt)hlPrep(tgt,txt);
+    if(tgt)hlPrep(tgt,txt,heSpoken(txt,lg));
     else hlWhole(el.closest&&el.closest(".fb,.qcard,.card"));
     return;
   }

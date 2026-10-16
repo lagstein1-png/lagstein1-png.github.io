@@ -177,31 +177,23 @@ const APPS = AL.pick(process.argv.slice(2), AL.local().filter(a => /speechSynthe
    ברשימה — נופל. וחריג שכבר אינו נכשל — **נופל גם הוא** (״להסיר
    מ-EXCEPT״): הרשימה הזאת רק מתקצרת.
 
-   שלוש קבוצות, והנימוק של כל אחת:
-   • ״קצב וגובה״ — האפליקציה שולחת 0.78–0.92 בגובה 1 (או 1.05), ולא
-     0.95 / 1.12 של ״נשי רגוע״. זה בדיוק מה שתוקן בשלוש־עשרה ב-13.9.2026
-     ולא הגיע לעותקים שנולדו אחר כך.
-   • ״בחירה״ ו״נפילה״ יחד — נבחר Carmit (מקומי) ולא Hila (רשת); לכן גם
-     בדיקת הנפילה ריקה. במשפחת ה-elem, domino, math-g7 ו-science-mid
-     זו מדיניות ״קול נשי בלבד, מקומי קודם״ — אם היא מכוונת או סחיפה,
-     זו הכרעה של מנוע ההקראה ולא של הכלי (renana).
-   • ״שומר-ער״ / ״שומר זמן״ / ״שחרור״ — המנגנון לא נורה. ב-literature,
-     tanakh, motal, civics, hebrew, hebrew-lit ו-math-elem. **לא אומת
-     ביד** שאין כאן מגבלה של הרתמה (כפתור אחר שנלחץ) — ולכן כל שורה
-     כאן היא ממצא פתוח לבדיקה, לא פסק דין. */
-const PITCH = 'קצב וגובה', PICK = ['בחירה', 'נפילה'], GUARDS = ['שומר-ער', 'שומר זמן', 'נפילה'];
-const EXCEPT = {
-  'hebrew-arab': [PITCH],          /* O-225 — 0.78 / 1; ארבעת המנגנונים של O-163 עוברים */
-  'geography':   [PITCH], 'islam': [PITCH], 'russian': [PITCH], 'biology': [PITCH],
-  'domino':      [PITCH, ...PICK], 'math-g7': [PITCH, ...PICK], 'science-mid': [PITCH, ...PICK],
-  'tanakh-elem': [PITCH, ...PICK], 'civics-elem': [PITCH, ...PICK], 'culture-elem': [PITCH, ...PICK],
-  'history-elem':[PITCH, ...PICK], 'science-12':  [PITCH, ...PICK], 'english-elem': [PITCH, ...PICK],
-  'literature':  [PITCH, ...GUARDS], 'tanakh': [PITCH, ...GUARDS], 'motal': [PITCH, ...GUARDS],
-  'civics':      [PITCH, ...GUARDS],
-  'hebrew-lit':  [PITCH, 'בחירה', ...GUARDS],
-  'math-elem':   ['שחרור', 'בחירה', PITCH, ...GUARDS],
-  'hebrew':      ['שחרור', 'בחירה', PITCH, ...GUARDS],
-};
+   **ובאותו יום כולם תוקנו, והרשימה ריקה (O-227).** שלוש קבוצות היו
+   כאן, ולאף אחת לא נמצא נימוק בקוד, בהערה או ב-README — כולן היו
+   עותק ישן ולא מדיניות:
+   • ״קצב וגובה״ (0.78–0.92 בגובה 1 / 1.05) — VOICE_TUNE הישן (0.82
+     בעברית) ובלי PITCH_BASE: התיקון של 13.9.2026 ב-english לא הגיע
+     לעותקים. יושרו ל-0.95 / 1.12 ול-voicePitch (תקרה 1.35). ״לאט״
+     שהלומד בוחר נשאר.
+   • ״בחירה״ + ״נפילה״ ריקה (Carmit ולא Hila) — מיון בלי מפתח איכות,
+     ולכן הקול הנשי הראשון ברשימה. נוסף הניקוד של bestVoice כמפתח
+     שלישי, אחרי voiceUsable ואחרי המגדר. ״קול נשי בלבד״ של משפחת
+     ה-elem (README) נשאר — הוא מסנן קולות גבריים, לא קובע את הסדר.
+   • ״שומר-ער״ / ״שומר זמן״ / ״נפילה״ / ״שחרור״ — לא מגבלה של הכלי:
+     המנגנונים פשוט לא היו בקוד (אפס הגדרות של startKeepAlive /
+     ttsWatchdog / _netVoiceOK). הועתקו מאפליקציה ירוקה מאותה משפחה —
+     geography, civics-elem, math-g7, english.
+   חריג חדש נכנס כאן רק עם נימוק בקוד של האפליקציה עצמה. */
+const EXCEPT = {};
 
 /* מנוע דיבור מזויף. mode קובע איך הוא נכשל:
      'ok'      — מתנהג יפה

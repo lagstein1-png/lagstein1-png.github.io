@@ -171,22 +171,43 @@ function ttsWatchdog(alive,onSilent){
   },1000);
   return function(){clearInterval(dog)};
 }
+var V_FEM=/female|woman|carmit|hila|zira|samantha|karen|tessa|moira|susan|helena|irina|milena|laila|zariyah|hoda|salma|google/i,V_MALE=/\bmale\b|david|mark|asaf|hillel|guy|filip|maged|naayf/i;
+function vGender(v){var n=(v&&v.name)||"";return (V_FEM.test(n)&&!V_MALE.test(n))?"f":V_MALE.test(n)?"m":"?"}
 function femaleVoice(code){
   try{
     var vs=speechSynthesis.getVoices()||[],base=code.split("-")[0],m=vs.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf(base)===0});
-    var fem=/female|woman|carmit|hila|zira|samantha|karen|tessa|moira|susan|helena|irina|milena|laila|zariyah|hoda|salma|google/i,male=/\bmale\b|david|mark|asaf|hillel|guy|filip|maged|naayf/i;
-    function isFem(v){return (fem.test(v.name)&&!male.test(v.name))?1:0}
+    var want=String(code).toLowerCase();
+    function grank(v){var g=vGender(v);return g==="f"?2:g==="?"?1:0}
+    /* האיכות — הניקוד של bestVoice במנוע האתר (english, rakia; O-227).
+       בלעדיו המיון היציב השאיר את הקול הנשי הראשון ברשימה — Carmit
+       המקומי ולא Hila — ובדיקת הנפילה של voice.js הייתה ריקה. */
+    function score(v){
+      var s=0,n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
+      if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
+      if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
+      if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+      if(v.localService===false&&voiceUsable(v))s+=6;
+      if(/espeak|compact|pico/.test(n))s-=40;
+      if(v.default)s+=4;
+      return s;
+    }
     /* voiceUsable הוא מפתח המיון הראשון, והמגדר בא אחריו — ולא להפך.
        קול נשי שאינו יכול לדבר עכשיו (קול רשת בלי אינטרנט, או כזה
        שכבר נכשל בסשן) אינו "פחות טוב" מקול גברי חי, הוא פשוט לא
-       יישמע. המיון יציב, ולכן בתוך אותה דרגה נשמר הסדר המקורי. */
+       יישמע. ובתוך המגדר — האיכות. */
     m=m.slice().sort(function(a,b){
       var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
-      return isFem(b)-isFem(a);
+      d=grank(b)-grank(a); return d||score(b)-score(a);
     });
     return m[0]||null;
   }catch(e){return null}
 }
+/* גובה — 1.12, הפריסט ״נשי רגוע״ של האתר, וקול גברי מורם ×1.35 עד התקרה
+   1.35 — voicePitch של english ו-rakia (O-227). עד כאן הגובה לא נקבע כלל
+   (1), וקול גברי לא הורם. */
+var FEM_PITCH=1.35, PITCH_BASE=1.12;
+function femLift(v){ if(!v)return 1; return vGender(v)==="m"?FEM_PITCH:1 }
+function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 /* מקטעים. מעל SEG_MAX תווים מנועי מכשיר מאיצים ובולעים סופי מילים,
    ולכן כל אמירה ארוכה נחתכת על סוף משפט, ואם אין — על פסיק או רווח,
    לעולם לא בתוך מספר. הועתק כלשונו מ-motal/index.html. */
@@ -283,13 +304,20 @@ function ttsFail(err){
 }
 /* הקראה שהצליחה מסירה את ההודעה — המצב השתנה */
 function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild(_ttsBar);_ttsBar=null} }
+/* מנוע ההגייה העברי — /tutor/he-speech.js (O-178, 16.10.2026).
+   **עברית בלבד**. הקובץ לא נטען — הטקסט חוזר כמות שהוא. ההדגשה
+   כאן היא של הרכיב כולו, ואין charIndex שיזוז. */
+function heSpoken(t,lang){
+  if(lang!=="he"||typeof HESPEECH==="undefined")return t;
+  try{return HESPEECH.spoken(t)}catch(e){return t}
+}
 function deviceSpeak(text,lang,done){
   var my=_gen;
   function alive(){return my===_gen}
   function allDone(){ if(!alive())return; maybeStopKeepAlive(); ttsOK(); done&&done() }
   try{
     var code=(LANGS.filter(function(x){return x[0]===lang})[0]||LANGS[0])[2];
-    var v=femaleVoice(code),segs=segments(String(text)),retried=false;
+    var v=femaleVoice(code),segs=segments(heSpoken(String(text),lang)),retried=false;
     try{speechSynthesis.cancel()}catch(e){}
     (function sayseg(k){
       if(!alive())return;
@@ -304,7 +332,7 @@ function deviceSpeak(text,lang,done){
         else allDone();
       }
       var u=new SpeechSynthesisUtterance(segs[k].text);
-      u.lang=code;u.rate=0.95*state.rate;u.volume=1;
+      u.lang=code;u.rate=0.95*state.rate;u.pitch=voicePitch(v);u.volume=1;
       if(v){try{u.voice=v}catch(e2){}}
       u.onerror=function(e){
         if(moved||!alive())return;

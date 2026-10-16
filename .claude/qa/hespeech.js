@@ -37,17 +37,11 @@ const H = globalThis.HESPEECH;
    `HESPEECH.spoken` — אותה פרצה שבדיקה 6 סוגרת בלימור. */
 const AL = require('./applist.js');
 const APPS = AL.pick(process.argv.slice(2), AL.local().filter(a => /speechSynthesis/.test(AL.sourceOf(a))));
-/* **חריגים — טוענות ואינן קוראות, נמדד 16.10.2026.** שמונה־עשרה
-   אפליקציות טוענות את `/tutor/he-speech.js` (תגית ו-PRE עוברים בכולן)
-   ואף שורה בקוד שלהן אינה קוראת ל-`HESPEECH.spoken`: ״משלש״ ו״מאד״
-   נאמרים בהן כמו שהם כתובים. הכלי אינו מתקן אפליקציות; הרשימה רק
-   מתקצרת — אפליקציה שהתחילה לקרוא ונשארה כאן מפילה את הבדיקה. */
-const NOT_WIRED = new Set([
-  'hebrew-arab',                     /* O-225 — המקור של הממצא */
-  'math-g7', 'math-elem', 'hebrew-lit', 'civics', 'hebrew', 'literature', 'tanakh',
-  'science-mid', 'motal', 'tanakh-elem', 'civics-elem', 'islam', 'russian',
-  'culture-elem', 'history-elem', 'science-12', 'biology',
-]);
+/* **חריגים — טוענות ואינן קוראות.** ב-16.10.2026 היו כאן שמונה־עשרה
+   אפליקציות; באותו יום כולן חוברו (O-178), והרשימה ריקה. אם תיווסף
+   כאן אפליקציה — רק עם נימוק, ואפליקציה שהתחילה לקרוא ונשארה כאן
+   מפילה את הבדיקה. */
+const NOT_WIRED = new Set([]);
 const missTag = [], missPre = [], missUse = [], staleEx = [], excused = [];
 for (const a of APPS) {
   const src = AL.sourceOf(a);
@@ -80,7 +74,7 @@ t('מאד → מאוד',     H.spoken('זה מאד קל'), 'זה מאוד קל')
 t('מלה → מילה',     H.spoken('המלה הזאת'), 'המילה הזאת');
 
 /* 3 — ההומוגרפים נשארים בחוץ */
-const HOMO = ['עגול','החד','הרוח','כוון','לכוון','לעבר','רטב','ברטב','עבר'];
+const HOMO = ['עגול','החד','הרוח','כוון','לכוון','לעבר','רטב','ברטב','עבר','עלה'];   /* עלה — שם עצם ב-biology, O-178 */
 t('הומוגרפים אינם במילון', HOMO.filter(w => H._ktiv[w]), []);
 t('מספר עגול נשאר',   H.spoken('מספר עגול'), 'מספר עגול');
 t('חד-זווית נשאר',    H.spoken('משולש חד-זווית'), 'משולש חד-זווית');

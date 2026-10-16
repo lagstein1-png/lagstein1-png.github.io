@@ -1326,8 +1326,8 @@ function bestVoice(code){
   if(explicit&&(!pin||pin.request!==request)){ pins[key]={v:explicit,g:vGender(explicit),request:request}; return explicit; }
   if(pin){
     var live=pool.filter(function(v){return v.voiceURI===pin.v.voiceURI})[0];
-    if(live&&(live.localService!==false||navigator.onLine!==false))return live;
-    var same=pool.filter(function(v){return vGender(v)===pin.g&&(v.localService!==false||navigator.onLine!==false)});
+    if(live&&voiceUsable(live))return live;
+    var same=pool.filter(function(v){return vGender(v)===pin.g&&voiceUsable(v)});
     if(!same.length)return pin.v;
     pool=same;
   }else{
@@ -1341,6 +1341,10 @@ function bestVoice(code){
     if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
     if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
     if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    /* קול רשת — הנוירליים של Edge הם כאלה — נשמע טוב יותר כשיש
+       רשת, וזה כל מה שנקבע כאן. מה קורה כשאין רשת נקבע ב-voiceUsable,
+       שהוא מיון קודם: קנס בתוך הניקוד לא הצליח להתגבר על שם היצרן. */
+    if(v.localService===false&&voiceUsable(v))s+=6;
     if(/espeak|compact|pico/.test(n))s-=40;
     if(v.default)s+=4;
     return s;
@@ -1352,7 +1356,10 @@ function bestVoice(code){
      ובתוך כל קבוצה מכריעה האיכות. */
   function grank(v){var g=vGender(v);return g===pref?2:g==="?"?1:0}
   var chosen=pool.slice().sort(function(a,b){
-    var d=grank(b)-grank(a); return d||score(b)-score(a);
+    /* קול שלא יעבוד יורד לתחתית לפני כל שיקול אחר — גם לפני המגדר,
+       שאם לא כן קול נשי מת מנצח קול גברי חי. */
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||score(b)-score(a);
   })[0];
   if(chosen)pins[key]={v:chosen,g:vGender(chosen),request:request};
   return chosen;
@@ -1473,20 +1480,32 @@ function hlWhole(el){
   HL.el=el; HL.raw=el.innerHTML; HL.added=true;
   el.classList.add("now");
 }
-function hlPrep(el,text){
+function hlPrep(el,text,spokenText){
   hlClear();
   if(!el||!text)return;
   HL.el=el; HL.raw=el.innerHTML;
-  var parts=String(text).split(/(\s+)/),html="",pos=0,idx=0;
+  var parts=String(text).split(/(\s+)/),html="",idx=0;
+  /* **המפה נמדדת על המחרוזת הנאמרת, ולא על המוצגת** (O-178, כמו
+     ב-english). `e.charIndex` מצביע לתוך מה שנאמר, ומנוע ההגייה
+     העברי משנה אורכי מילים (״משלש״→״משולש״). מספר האסימונים נשמר,
+     ולכן האסימון ה-i שנאמר הוא ה-span ה-i שמוצג. נבדלו המספרים —
+     נופלים להדגשת הכול, ולא להדגשה שגויה. */
+  var sp=String(spokenText==null?text:spokenText).split(/(\s+)/),spos=0,sidx=0;
   HL.map=[];
-  for(var i=0;i<parts.length;i++){
-    var pt=parts[i];
-    if(!pt.length)continue;
-    if(/^\s+$/.test(pt)){html+=pt;pos+=pt.length;continue}
-    HL.map.push({from:pos,to:pos+pt.length,i:idx});
-    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
-    pos+=pt.length; idx++;
+  for(var i=0;i<sp.length;i++){
+    if(!sp[i].length)continue;
+    if(/^\s+$/.test(sp[i])){spos+=sp[i].length;continue}
+    HL.map.push({from:spos,to:spos+sp[i].length,i:sidx});
+    spos+=sp[i].length; sidx++;
   }
+  for(var j=0;j<parts.length;j++){
+    var pt=parts[j];
+    if(!pt.length)continue;
+    if(/^\s+$/.test(pt)){html+=pt;continue}
+    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
+    idx++;
+  }
+  if(idx!==sidx){hlClear();return}
   if(!HL.map.length){hlClear();return}
   el.innerHTML=html;
   HL.spans=el.querySelectorAll(".wd");
@@ -1564,6 +1583,79 @@ function ttsOK(){ if(_ttsBar&&_ttsBar.parentNode){_ttsBar.parentNode.removeChild
    כל מקטע נושא את ההיסט שלו במחרוזת המלאה, כי charIndex מתאפס
    בכל אמירה ובלעדיו ההדגשה קופצת לתחילת המשפט בכל מקטע.
    ------------------------------------------------------------ */
+/* O-227, 16.10.2026: ארבעת המנגנונים לא הגיעו לעותק הזה, ו-voice.js
+   הראה ששלושה מהם אינם נורים. הבלוק הועתק כלשונו מ-geography. */
+/* =====================================================================
+   מנוע ההקראה של "תאוריה מדברת" — ארבעה מנגנונים
+   ---------------------------------------------------------------------
+   ארבעה כשלים שקטים של Web Speech. אף אחד מהם אינו מדווח כשגיאה,
+   וכולם נראים למשתמש בדיוק אותו דבר: הקול פשוט מפסיק באמצע. הקוד
+   כאן הועתק מהאפליקציה שבה הוא כבר רץ, ולא נוסח מחדש.
+   ===================================================================== */
+
+/* 1 · שומר-ער. באג ותיק ב-Chrome וב-Edge בשולחן העבודה: ההקראה
+   נחתכת אחרי כ-15 שניות, באמצע מילה. pause+resume תקופתי מחזיק את
+   המנוע ער. במובייל אין את הבאג ופעולה כזאת דווקא מקרטעת שם, ולכן
+   מפעילים רק היכן שבאמת צריך. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+/* עוצרים רק כששום דבר כבר לא מדבר — אחרת מקטע שהתחיל זה עתה מאבד
+   את השמירה שלו כשהמקטע הקודם מסיים להתנקות. */
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+
+/* 2 · הפניה חיה ל-utterance. Chrome אוסף אובייקט שאין אליו הפניה,
+   ואיתו נעלמים onend ו-onboundary: ההקראה נתקעת באמצע, ההדגשה
+   קופאת על מילה אחת, והמקטע הבא לא יוצא לעולם. */
+var _activeU=null;
+
+/* 3 · קול רשת שנכשל. הקולות הנוירליים של Edge הם קולות רשת, והם
+   שותקים בלי אינטרנט. הדגל נכבה ברגע שאחד מהם נכשל, ומאותו רגע
+   הדירוג מעדיף קול מקומי לשארית הסשן. */
+var _netVoiceOK=true;
+
+/* קול רשת שאי אפשר להשתמש בו עכשיו — אין אינטרנט, או שאחד כבר
+   נכשל בסשן הזה — אינו "פחות טוב", הוא פשוט לא יעבוד. לכן זה מיון
+   ראשון ולא עוד סעיף בתוך הניקוד: קנס בניקוד לא הספיק, מפני שקול
+   נוירלי של Microsoft צובר על שם היצרן ועל "Natural" יותר ממה שכל
+   קנס סביר מוריד — והוא נבחר שוב ושוב אחרי שכבר נכשל.
+   כשהוא הקול היחיד שיש הוא עדיין נבחר: מיון של רשימה בת אחד
+   מחזיר אותה כמו שהיא. */
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+
+/* 4 · שומר זמן. יש מכשירים שבהם onend פשוט לא נורה. בלי השומר הזה
+   התור נתקע: הכפתור נשאר על "עצירה" וההקראה לא ממשיכה לעולם. ארבע
+   שניות שבהן המנוע לא מדבר ולא ממתין נחשבות סוף.
+   מחזיר פונקציית ביטול — מי שסיים בדרך הרגילה מכבה את השומר. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+
+
 var SEG_MAX=90, SEG_GAP=260;
 /* סימן פיסוק בין שתי ספרות הוא חלק מהמספר ולא מקום לחתוך בו:
    בלי הבדיקה הזאת "3,500" נשבר והמנוע קורא "שלוש, חמש מאות". */
@@ -1612,7 +1704,13 @@ function segments(spoken){
   return out.length?out:[{text:spoken,start:0}];
 }
 /* קצב לפי שפה — אותם ערכים שנבחרו בתאוריה מדברת אחרי האזנה */
-var VOICE_TUNE={he:0.82,ar:0.85,en:0.90,ru:0.88};
+/* 1.0 בכל השפות מאז 13.9.2026. הבעלים שמע את Hila ב-math-app — שאינה
+   מכוונת קצב לפי שפה ושולחת 0.95 כמו שהוא — ואמר ״נעים ומדויק, להכניס
+   לכל האפליקציות״. 0.82 בעברית נבחר כאן אחרי האזנה למנועי מכשיר ישנים,
+   והקול הטבעי אינו צריך אותו: 0.82×0.95 נתן 0.78, ואותו קול נשמע כאן
+   אחרת מאשר שם. המבנה נשאר כדי שכיוון לפי שפה יישאר אפשרי.
+   (O-227, 16.10.2026: התיקון של english לא הגיע לעותק הזה — הועתק משם.) */
+var VOICE_TUNE={he:1.0,ar:1.0,en:1.0,ru:1.0};
 function tuneRate(lang,rate){
   var t=VOICE_TUNE[String(lang||"he").split("-")[0].toLowerCase()]||0.88;
   var r=t*(rate||1);
@@ -1632,6 +1730,13 @@ function femLift(v){
   if(!v)return 1;
   try{ return vGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
 }
+
+/* גובה הבסיס של כל אמירה — 1.12, הפריסט ״נשי רגוע״ של math-app, שהבעלים
+   בחר אחרי האזנה (13.9.2026). femLift נשאר מכפיל: קול גברי מורם עוד,
+   עד התקרה 1.35 של ״תאוריה מדברת״. הועתק מ-english (O-227) — עד כאן
+   נשלח 1, וההקראה כאן נשמעה אחרת מבשאר האתר. */
+var PITCH_BASE=1.12;
+function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 
 
 /* ------------------------------------------------------------
@@ -1700,8 +1805,17 @@ function voiceCheck(){
    מקדם אותו, ומקטע מדור ישן פשוט אינו מדבר.
    ------------------------------------------------------------ */
 var _sayGen=0;
+/* מנוע ההגייה העברי — /tutor/he-speech.js (O-178, 16.10.2026, כמו
+   ב-english). **עברית בלבד**: ערבית, רוסית ואנגלית עוברות כמות שהן.
+   הקובץ לא נטען — הטקסט חוזר כמות שהוא, ואין שגיאה. */
+function heSpoken(t,code){
+  var l=String(code||"he").slice(0,2);
+  if(l!=="he"||typeof HESPEECH==="undefined")return t;
+  try{ return HESPEECH.spoken(t) }catch(e){ return t }
+}
 function speakDevice(text,code,rate){
   if(!("speechSynthesis" in window))return false;
+  text=heSpoken(text,code);
   try{speechSynthesis.cancel()}catch(e){}
   var my=++_sayGen;
   /* האמירה יוצאת מיד, בתוך הלחיצה. קודם היא נעטפה ב-voicesReady,
@@ -1715,22 +1829,50 @@ function speakDevice(text,code,rate){
     try{
       var v=bestVoice(code), lang=(v&&v.lang)||code;
       var segs=segments(String(text)), rt=tuneRate(lang,clamp(rate,0.55,1.4));
-      var pit=femLift(v);
+      var pit=voicePitch(v);
+      var retried=false;
+      function alive(){return my===_sayGen}
+      function allDone(){ maybeStopKeepAlive(); hlClear(); ttsOK() }
       (function sayseg(k){
-        if(my!==_sayGen)return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
-        if(k>=segs.length){ hlClear(); ttsOK(); return }
-        var seg=segs[k];
+        if(!alive())return;   /* ההקראה הזאת בוטלה — המקטע הבא לא יוצא */
+        if(k>=segs.length){ allDone(); return }
+        /* moved מבטיח שמקטע מתקדם פעם אחת בלבד: onend ושומר הזמן
+           יכולים שניהם לרצות לקדם אותו, וקידום כפול מדלג על מקטע. */
+        var seg=segs[k], moved=false, disarm=null;
+        function next(){
+          if(moved||!alive())return;
+          moved=true; if(disarm)disarm();
+          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+          else allDone();
+        }
         var u=new SpeechSynthesisUtterance(seg.text);
         u.lang=lang;
         if(v){ try{ u.voice=v }catch(e2){} }
         u.rate=rt; u.pitch=pit; u.volume=1;
         u.onboundary=function(e){if(!e.name||e.name==="word")hlAt(seg.start+e.charIndex)};
-        u.onend=function(){
-          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
-          else { hlClear(); ttsOK() }
+        u.onend=next;
+        u.onerror=function(e){
+          if(moved||!alive())return;
+          var err=(e&&e.error)||"";
+          /* ביטול יזום אינו תקלה — stopSpeak כבר ניקה אחריו */
+          if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+          /* קול רשת שנכשל פירושו כמעט תמיד שאין אינטרנט. עוברים לקול
+             מקומי וחוזרים על אותו מקטע, פעם אחת, כדי שההקראה לא
+             תישבר בשקט באמצע שאלה. */
+          if(!retried&&v&&v.localService===false){
+            retried=true; _netVoiceOK=false; moved=true;
+            if(disarm)disarm(); _activeU=null;
+            v=bestVoice(code); lang=(v&&v.lang)||code; pit=voicePitch(v);
+            setTimeout(function(){sayseg(k)},SEG_GAP);
+            return;
+          }
+          moved=true; if(disarm)disarm(); maybeStopKeepAlive(); ttsFail(err);
         };
-        u.onerror=function(e){ttsFail(e&&e.error)};
+        _activeU=u;                        /* מגן מפני איסוף זבל */
+        try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
         speechSynthesis.speak(u);
+        startKeepAlive();
+        disarm=ttsWatchdog(function(){return alive()&&!moved},next);
       })(0);
     }catch(e){}
   })();
@@ -1780,7 +1922,7 @@ function playUrl(url,text,code,rate){
   gAudio=GEL; gAudio.src=url;
   gAudio.play().catch(function(){speakDevice(text,code,rate)});
 }
-function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
+function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();stopKeepAlive();_activeU=null;try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
    אחר, ולפעמים נתקע עד סגירת הדפדפן. */
 try{document.addEventListener("visibilitychange",function(){
@@ -4247,7 +4389,7 @@ document.addEventListener("click",function(e){
        האמירה עצמה נוצרת אסינכרונית, אחרי שרשימת הקולות עולה, ולכן
        ההכנה כאן תמיד מקדימה אותה. */
     var tgt=a==="sayline"?el:hlFind(el,txt);
-    if(tgt)hlPrep(tgt,txt);
+    if(tgt)hlPrep(tgt,txt,heSpoken(txt,lg));
     else hlWhole(el.closest&&el.closest(".fb,.qcard,.card"));
     return;
   }

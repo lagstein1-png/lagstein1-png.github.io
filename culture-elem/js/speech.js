@@ -42,7 +42,6 @@ function voiceUsable(v){
   if(!v||v.localService!==false)return 1;
   return (_netVoiceOK&&navigator.onLine!==false)?1:0;
 }
-function byUsable(a){return a.slice().sort(function(x,y){return voiceUsable(y)-voiceUsable(x)})}
 /* 4 · שומר זמן. יש מכשירים שבהם onend פשוט לא נורה. ארבע שניות שבהן
    המנוע לא מדבר ולא ממתין נחשבות סוף. מחזיר פונקציית ביטול. */
 function ttsWatchdog(alive,onSilent){
@@ -69,12 +68,36 @@ function voiceFor(lang){
   var code=LANG_TTS[lang].toLowerCase(), pre=code.slice(0,2);
   var vs=allVoices().filter(function(v){var l=(v.lang||"").toLowerCase().replace("_","-");return l.indexOf(pre)===0});
   var ok=vs.filter(function(v){return !VOICE_M.test(v.name)});
-  var f=ok.filter(function(v){return VOICE_F.test(v.name)});
-  /* מגדר קודם (הסינון למעלה), ובתוך כל קבוצה voiceUsable הוא מפתח המיון
-     הראשון: קול רשת שלא יעבוד עכשיו אינו "פחות טוב", הוא פשוט ישתוק. */
-  f=byUsable(f);ok=byUsable(ok);
-  return (f[0]||ok[0]||null);   /* all-male device: null, default voice + raised pitch */
+  /* קול גברי אינו נבחר כאן כלל (״קול נשי בלבד״, README). בין השאר — שלושה
+     מפתחות, בסדר של bestVoice במנוע האתר (english, rakia; O-227):
+     voiceUsable ראשון — קול רשת שלא יעבוד עכשיו אינו "פחות טוב", הוא פשוט
+     ישתוק, ולכן גם קול נשי מת יורד מתחת לקול חי שלא זוהה; אחריו המגדר;
+     ואחריו האיכות. בלי הניקוד נבחר הקול הנשי הראשון ברשימה — Carmit
+     המקומי ולא Hila — ובדיקת הנפילה של voice.js הייתה ריקה. */
+  function grank(v){return VOICE_F.test(v.name)?1:0}
+  function score(v){
+    var s=0,n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
+    if(String(v.lang||"").replace("_","-").toLowerCase()===code)s+=12;
+    if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
+    if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    if(v.localService===false&&voiceUsable(v))s+=6;
+    if(/espeak|compact|pico/.test(n))s-=40;
+    if(v.default)s+=4;
+    return s;
+  }
+  ok=ok.slice().sort(function(a,b){
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||score(b)-score(a);
+  });
+  return ok[0]||null;   /* all-male device: null, default voice + raised pitch */
 }
+/* גובה — 1.12, הפריסט ״נשי רגוע״ של האתר (voicePitch ב-english וב-rakia,
+   O-227). v ריק פירושו שבשפה הזאת יש רק קולות גבריים, או אין קולות:
+   המכשיר מדבר בקול ברירת המחדל שלו, והוא מורם כמו קול גברי באתר — עד
+   התקרה 1.35. עד כאן 1 לקול נשי ו-1.25 בלעדיו. */
+var FEM_PITCH=1.35, PITCH_BASE=1.12;
+function femLift(v){return v?1:FEM_PITCH}
+function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 /* ---------- מקטעים. הועתק מ-english/index.html כלשונו ---------- */
 var SEG_MAX=90, SEG_GAP=260;
 /* סימן פיסוק בין שתי ספרות הוא חלק מהמספר ולא מקום לחתוך בו:
@@ -143,7 +166,9 @@ function stopSpeech(){
   try{if(typeof RECORDED!=="undefined")RECORDED.stop()}catch(e){}
   var p=document.getElementById("playBtn");if(p)p.classList.remove("on");
 }
-function rate(){return state.slow?0.62:(state.speed==="slow"?0.75:0.92)}
+/* 0.95 — קצב האתר (O-227; עד כאן 0.92 בלי נימוק). ״לאט״ ו״איטי מאוד״
+   הם בחירה של הלומד ונשארים. */
+function rate(){return state.slow?0.62:(state.speed==="slow"?0.75:0.95)}
 /* segs: [{t, lang, raw (text the recorder knows), el:'#id' (words inside get highlighted), box:'#id' (whole element highlighted)}] */
 function speakSeq(segs,done){
   stopSpeech();
@@ -157,6 +182,13 @@ function speakSeq(segs,done){
     if(!s.t){next();return}
     speakOne(s,tok,next);
   })();
+}
+/* מנוע ההגייה העברי — /tutor/he-speech.js (O-178, 16.10.2026).
+   **עברית בלבד**: ערבית, רוסית ואנגלית עוברות כמות שהן. הקובץ לא
+   נטען — הטקסט חוזר כמות שהוא, ואין שגיאה. */
+function heSpoken(t,lang){
+  if(lang!=="he"||typeof HESPEECH==="undefined")return t;
+  try{return HESPEECH.spoken(t)}catch(e){return t}
 }
 function speakOne(s,tok,cb){
   var root=s.el?document.querySelector(s.el):null, ws=root?root.querySelectorAll(".w"):[];
@@ -173,12 +205,17 @@ function speakOne(s,tok,cb){
     if(tok===SP.tok)cb()}
   function device(){
     if(finished||tok!==SP.tok)return;
+    /* הנאמר עובר במנוע ההגייה, ומפת ההיסטים נמדדת **עליו**: charIndex
+       מצביע לתוך מה שנאמר, ו״משלש״→״משולש״ משנה אורך. מספר האסימונים
+       נשמר, ולכן המילה ה-k שנאמרת היא ה-k שמוצגת. נבדלו — אין הדגשה
+       מילה־מילה, ולא הדגשה שגויה. */
+    var said=heSpoken(s.t,lang), sw0=said.split(/\s+/).filter(Boolean), sameN=sw0.length===words.length;
     var starts=[],p=0;
-    words.forEach(function(w){var k=s.t.indexOf(w,p);starts.push(k);p=k+w.length});
+    sw0.forEach(function(w){var k=said.indexOf(w,p);starts.push(k);p=k+w.length});
     /* charIndex נמדד בתוך המקטע; seg.start הוא ההיסט שלו בנאמר כולו,
        ו-hlAt(seg.start+charIndex) הוא מה ששומר את ההדגשה במקום. */
-    function hlAt(c){var k=0;for(var j=0;j<starts.length;j++){if(starts[j]<=c)k=j}hl(k)}
-    var v=voiceFor(lang), segs=segments(s.t);
+    function hlAt(c){if(!sameN)return;var k=0;for(var j=0;j<starts.length;j++){if(starts[j]<=c)k=j}hl(k)}
+    var v=voiceFor(lang), segs=segments(said);
     /* מעל SEG_MAX מנועי מכשיר מאיצים ובולעים סופי מילים, ולכן כל אמירה
        ארוכה נחתכת על סוף משפט, ואם אין — על פסיק או רווח. */
     (function sayseg(n){
@@ -195,7 +232,8 @@ function speakOne(s,tok,cb){
       }
       var u=new SpeechSynthesisUtterance(seg.text);
       u.lang=LANG_TTS[lang];
-      if(v)u.voice=v;else u.pitch=1.25;
+      if(v)u.voice=v;
+      u.pitch=voicePitch(v);
       u.rate=rate();
       u.onboundary=function(e){
         if(tok!==SP.tok)return; if(e.name&&e.name!=="word")return; got=true;

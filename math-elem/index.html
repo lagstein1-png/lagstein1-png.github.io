@@ -1038,20 +1038,132 @@ function optLabel(o){var l=o.l;if(typeof l==="object")return isoPts(l[S.lang]);l
 function optSay(o){var l=o.l;if(typeof l==="object")return l[S.lang];if(FRSAY[S.lang][l])return FRSAY[S.lang][l];l=String(l);return l.replace(/ cm$/," "+CMW[S.lang]).replace(/^-/,{he:"מינוס ",ar:"ناقص ",ru:"минус ",en:"minus "}[S.lang]).replace(/^\+/,{he:"ועוד ",ar:"زائد ",ru:"плюс ",en:"plus "}[S.lang]).replace(/(\d+):(\d\d)/,function(m,h,mm){return h+" "+(mm==="00"?"":mm)})}
 function unitById(id){return UNITS.filter(function(u){return u.id===id})[0]}
 /* ===== speech with word highlight ===== */
-var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null;
+/* ===== מנוע ההקראה של "תאוריה מדברת" — חמישה מנגנונים =====
+   הועתק כלשונו מ-math-g7/index.html (ושם מ-domino, rakia ו-math-elem
+   עצמה), O-227, 16.10.2026. עד היום ההקראה כאן הייתה אמירה אחת בלי
+   אף אחד מהם, ו-voice.js הראה שחמשתם אינם נורים:
+     1 שומר-ער · 2 הפניה חיה ל-utterance · 3 שומר-סף ·
+     4 נפילה מקול רשת · 5 שחרור במגע (בסוף הסקריפט).
+   voiceUsable הוא מפתח המיון הראשון, אחריו המגדר ואחריו האיכות.
+   speechFix, heMap וההדגשה נשארו של האפליקציה הזאת. */
+var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null,_dis=null,_sayGen=0;
+/* 1 · שומר-ער. Chrome/Edge בשולחן העבודה חותכים הקראה אחרי כ-15 שניות.
+   השאלה כאן נאמרת יחד עם ארבעת המסיחים, וההסבר אחרי טעות ארוך עוד
+   יותר — שניהם נחתכים. במובייל אין את הבאג והפעולה מקרטעת שם, ולכן
+   רק בשולחן העבודה. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+/* 3 · שומר-סף. יש מכשירים שבהם onend לא נורה: הכפתור נשאר על "עצירה"
+   וההקראה לא ממשיכה לעולם. ארבע שניות של שקט מוחלט נחשבות סוף. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+/* 4 · קול רשת שנכשל. קול נוירלי שותק בלי אינטרנט, והלומד שומע כלום
+   בלי שגיאה. הדגל נכבה ומאותו רגע נבחר קול מקומי. */
+var _netVoiceOK=true;
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+/* פיצול לאמירות קצרות — הועתק כלשונו מ-domino (ושם מ-rakia, ושם
+   מ"תאוריה מדברת"). מעל SEG_MAX מנועי מכשיר מאיצים ובולעים סופי
+   מילים; כל מקטע נושא את ההיסט שלו במחרוזת המלאה, כי charIndex
+   מתאפס בכל אמירה ובלעדיו ההדגשה קופצת לתחילת המשפט בכל מקטע.
+   insideNumber שומר שלא ייחתך בתוך מספר — "3.5" ו-"2:3". */
+var SEG_MAX=90, SEG_GAP=260;
+function insideNumber(str,i){ return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]) }
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){ merged[merged.length-1].text+=out[i].text; continue }
+    if(out[i].text.trim().length<12&&i+1<out.length){ out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
 var VF=/(female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
 var VM=/(\bmale\b|david|mark|asaf|hillel|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
 function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
-function pickVoice(){
-  var key=S.lang,pins=pickVoice._session||(pickVoice._session={}),pin=pins[key];
-  if(pin)return pin;
-  var code=LCODE[key],pre=code.slice(0,2),vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
-  var f=vs.filter(function(v){return VF.test(v.name)&&!VM.test(v.name)});
-  var nm=vs.filter(function(v){return !VM.test(v.name)});
-  var v=f[0]||nm[0]||vs[0]||null, result={v:v,fem:!!f.length};
-  if(v)pins[key]=result;
-  return result;
-}
+function vGender(v){var n=(v&&v.name)||"";return (VF.test(n)&&!VM.test(n))?"f":VM.test(n)?"m":"?"}
+/* voiceUsable הוא מפתח המיון הראשון, והמגדר בא אחריו ולא להפך:
+   קול נשי מת מנצח קול גברי חי כשהסדר מתהפך. */
+function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),
+  vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
+  if(!vs.length)return {v:null,fem:false};
+  function grank(v){var g=vGender(v);return g==="f"?2:g==="?"?1:0}
+  /* ובתוך המגדר — האיכות. הניקוד הועתק מ-bestVoice של rakia (ושם
+     מ-english): בלעדיו נבחר הקול הנשי הראשון ברשימה ולא הטבעי —
+     Carmit המקומי ולא Hila (O-227). */
+  var want=code.toLowerCase();
+  function score(v){
+    var s=0,n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
+    if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
+    if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
+    if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    if(v.localService===false&&voiceUsable(v))s+=6;
+    if(/espeak|compact|pico/.test(n))s-=40;
+    if(v.default)s+=4;
+    return s;
+  }
+  var chosen=vs.slice().sort(function(a,b){
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||score(b)-score(a);
+  })[0];
+  return {v:chosen||null,fem:vGender(chosen)==="f"}}
+/* גובה — 1.12, הפריסט ״נשי רגוע״ של האתר, וקול גברי מורם ×1.35 עד התקרה
+   1.35 — voicePitch של rakia ו-english (O-227). עד כאן 1.05 לנשי ו-1.3 לכל
+   השאר, וההקראה כאן נשמעה אחרת מבשאר האתר. */
+var FEM_PITCH=1.35, PITCH_BASE=1.12;
+function femLift(v){ if(!v)return 1; return vGender(v)==="m"?FEM_PITCH:1 }
+function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.raw!=null){HL.el.textContent=HL.el.dataset.raw}HL.el=null}
 function hlPrep(el,text){hlClear();if(!el||el.children.length)return;el.dataset.raw=el.textContent;HL.el=el;HL.raw=el.textContent;HL.got=false;
   var out="",starts=[],re=/\S+|\s+/g,m,pos=0,idx=0;HL.starts=[];
@@ -1061,22 +1173,75 @@ function hlAt(ci){if(!HL.el)return;var w=-1,i;for(i=0;i<HL.starts.length;i++){if
   var sp=HL.el.querySelectorAll("[data-w]");for(i=0;i<sp.length;i++)sp[i].className=(i===w?"hl":"")}
 function hlFallback(rate){if(!HL.el)return;var n=HL.starts.length,i=0,per=430/rate;
   (function step(){if(!HL.el||HL.got)return;var sp=HL.el.querySelectorAll("[data-w]");for(var k=0;k<sp.length;k++)sp[k].className=(k===i?"hl":"");i++;if(i<=n)HL.timer=setTimeout(step,per)})()}
-function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}if(typeof RECORDED!=="undefined")RECORDED.stop();_u=null;hlClear();setPlaying(false)}
+function stopSpeak(){_sayGen++;try{speechSynthesis.cancel()}catch(e){}if(typeof RECORDED!=="undefined")RECORDED.stop();_u=null;stopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false)}
 var _playing=false;function setPlaying(b){_playing=b;var bs=document.querySelectorAll('[data-a="stop"]');bs.forEach(function(x){x.style.opacity=b?1:.55})}
 function speechFix(t){var w={he:"חלקי",ar:"على",ru:"из",en:"over"}[S.lang];t=String(t).replace(/[⁦⁩]/g,"");return t.replace(/(\d+)\/(\d+)/g,function(m,a,b){return a+" "+w+" "+b}).replace(/×/g,{he:" כפול ",ar:" ضرب ",ru:" умножить на ",en:" times "}[S.lang]).replace(/÷/g,{he:" חלקי ",ar:" قسمة ",ru:" разделить на ",en:" divided by "}[S.lang]).replace(/−/g,{he:" פחות ",ar:" ناقص ",ru:" минус ",en:" minus "}[S.lang]).replace(/\s=\s/g,{he:" שווה ",ar:" يساوي ",ru:" равно ",en:" equals "}[S.lang]).replace(/\?\//g,"?")}
-function speakDevice_(text,el,onend){var raw=text;if(!("speechSynthesis" in window)||!text)return false;
-  var rate=S.slow?0.7:0.9,pv=pickVoice(),u=new SpeechSynthesisUtterance(speechFix(text));u.lang=LCODE[S.lang];if(pv.v)u.voice=pv.v;u.rate=rate;u.pitch=pv.fem?1.05:1.3;
-  var spoken=el&&el.dataset&&el.dataset.say===text;HL.noB=false;if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=speechFix(raw)!==raw}
-  u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(e.charIndex)};
-  u.onend=u.onerror=function(){if(_u===u){hlClear();setPlaying(false);if(onend)onend()}};
-  _u=u;setPlaying(true);try{speechSynthesis.speak(u)}catch(e){return false}
-  if(HL.el)setTimeout(function(){if(_u===u&&HL.el&&!HL.got)hlFallback(rate)},900);return true}
+/* מנוע ההגייה העברי — /tutor/he-speech.js (O-178, 16.10.2026).
+   **עברית בלבד**, ואחרי speechFix — כמו toSpoken ב-math-app. הקובץ
+   לא נטען — הטקסט חוזר כמות שהוא. המנוע שומר את מספר האסימונים,
+   ולכן heMap מתרגם charIndex של הנאמר למילה ה-i המוצגת: ״משלש״
+   שנאמר ״משולש״ אינו מזיז את ההדגשה של המילים שאחריו. */
+function heSpoken(t){if(S.lang!=="he"||typeof HESPEECH==="undefined")return t;try{return HESPEECH.spoken(t)}catch(e){return t}}
+function heStarts(s){var a=[],re=/\S+/g,m;while((m=re.exec(s)))a.push(m.index);return a}
+function heMap(c){var sp=HL.sp,w=-1,i;if(!sp)return c;for(i=0;i<sp.length;i++){if(sp[i]<=c)w=i;else break}return w<0?c:HL.starts[w]}
+/* קול המכשיר, מקטע אחרי מקטע — speakDevice של math-g7 (O-227).
+   speechSynthesis.cancel() אינו מבטל setTimeout, ולכן כל הקראה מקבלת
+   מספר דור: stopSpeak מקדם אותו, ומקטע מדור ישן פשוט אינו מדבר. */
+function speakDevice_(text,el,onend){var raw=String(text);
+  if(!("speechSynthesis" in window)||!raw)return false;
+  var fixed=speechFix(raw),spoken=heSpoken(fixed),rate=S.slow?0.7:0.95;   /* 0.95 — קצב האתר (O-227); 0.7 — ״לאט״ שהלומד בחר */
+  HL.noB=false;HL.sp=null;
+  if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=(fixed!==raw);
+    if(!HL.noB&&spoken!==raw){HL.sp=heStarts(spoken);if(HL.sp.length!==HL.starts.length)HL.noB=true}}
+  var segs=segments(spoken),my=++_sayGen,v=pickVoice(),retried=false;
+  function alive(){return my===_sayGen}
+  function allDone(){if(!alive())return;maybeStopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false);if(onend)onend()}
+  setPlaying(true);
+  (function sayseg(k){
+    if(!alive())return;
+    if(k>=segs.length){allDone();return}
+    var seg=segs[k],moved=false,disarm=null;
+    function next(){
+      if(moved||!alive())return;
+      moved=true;if(disarm)disarm();
+      if(k+1<segs.length)setTimeout(function(){sayseg(k+1)},SEG_GAP);
+      else allDone();
+    }
+    var u=new SpeechSynthesisUtterance(seg.text);
+    u.lang=LCODE[S.lang];if(v.v){try{u.voice=v.v}catch(e2){}}
+    u.rate=rate;u.pitch=voicePitch(v.v);
+    u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(heMap(seg.start+e.charIndex))};
+    u.onend=next;
+    u.onerror=function(e){
+      if(moved||!alive())return;
+      var err=(e&&e.error)||"";
+      if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+      /* 4 · נפילה מקול רשת: הדגל נכבה, נבחר קול מקומי, ואותו מקטע
+         נאמר שוב פעם אחת. בלי זה — שקט מוחלט בלי שגיאה. */
+      if(!retried&&v.v&&v.v.localService===false){
+        retried=true;_netVoiceOK=false;moved=true;
+        if(disarm)disarm();_u=null;
+        v=pickVoice();
+        setTimeout(function(){sayseg(k)},SEG_GAP);
+        return;
+      }
+      moved=true;if(disarm)disarm();allDone();
+    };
+    _u=u;   /* 2 · הפניה חיה ל-utterance — בלעדיה Chrome אוסף אותו עם onend */
+    try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
+    try{speechSynthesis.speak(u)}catch(e2){_u=null;setPlaying(false);return}
+    startKeepAlive();
+    disarm=ttsWatchdog(function(){return alive()&&!moved},next);
+    _dis=disarm;
+  })(0);
+  if(HL.el)setTimeout(function(){if(alive()&&HL.el&&!HL.got)hlFallback(rate)},900);
+  return true}
 /* שכבה 1 - קובץ מוקלט (המנוע של תאוריה מדברת, 3.10.2026). יש קובץ:
    מנגנים וזהו — בלי הדגשה מילה־מילה (אין onboundary בקובץ). אין
    קובץ, או שהקובץ נכשל: קול המכשיר כרגיל (speakDevice_). */
 function speak(text,el,onend){stopSpeak();if(!text)return false;
   /* מזהה הקובץ הוא גיבוב של הטקסט — סימני הבידוד אינם נשמעים ואינם נספרים. */
-  if(typeof RECORDED!=="undefined"&&RECORDED.play(String(text).replace(/[⁦⁩]/g,""),S.lang,{rate:S.slow?0.7:0.9,
+  if(typeof RECORDED!=="undefined"&&RECORDED.play(String(text).replace(/[⁦⁩]/g,""),S.lang,{rate:S.slow?0.7:0.95,
       onEnd:function(){setPlaying(false);if(onend)onend()},
       onError:function(){speakDevice_(text,el,onend)}})){
     setPlaying(true);return true;
@@ -1191,6 +1356,16 @@ function onAct(a,el){var t=T(),q=P&&P.list&&P.list[P.i];
   else if(a==="reset"){if(confirm(t.resetAsk)){S.done={};saveS();render()}}}
 document.addEventListener("click",function(e){var el=e.target.closest("[data-a]");if(!el||el.disabled)return;onAct(el.dataset.a,el)});
 window.addEventListener("pagehide",function(){stopSpeak()});
+/* 5 · iOS לא ישמיע כלום עד שאמירה אחת יצאה מתוך handler של מגע אמיתי.
+   קריאה ישירה, בלי המתנה לרשימת הקולות — הבטחה שוברת את שרשרת המגע
+   ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. (הועתק מ-math-g7, O-227) */
+try{document.addEventListener("pointerdown",function(){
+  try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+},{once:true});}catch(e){}
+/* רשימת הקולות נטענת אסינכרונית ב-Chrome: בלי הבעיטה הזאת getVoices
+   של הלחיצה הראשונה חוזר ריק, ונבחר קול ברירת המחדל של המערכת. */
+try{speechSynthesis.getVoices();
+    speechSynthesis.addEventListener("voiceschanged",function(){try{voices()}catch(e){}});}catch(e){}
 </script>
 <script src="/tutor/josh-face.js"></script>
 <script src="/tutor/he-speech.js"></script>
