@@ -1,5 +1,8 @@
 const fs=require('fs'),vm=require('vm');
 const files=process.argv.slice(2);
+/* O-231, 16.10.2026: בלי ארגומנטים הכלי לא בדק דבר ויצא 0 בשקט — הרצה
+   ידנית ״ירוקה״ שלא פרסה שורה. הרשימה הנגזרת חיה ב-all.js (`parse`). */
+if(!files.length){console.log('✗ parse.js: לא ניתנו קבצים, ולכן לא נבדק דבר. הרשימה המלאה: node .claude/qa/all.js --static');process.exit(2);}
 let total=0;   /* בלי זה הכלי מדפיס PARSE FAIL ויוצא 0 */
 for(const f of files){
   const src=fs.readFileSync(f,'utf8');

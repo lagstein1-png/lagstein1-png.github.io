@@ -1,6 +1,8 @@
 const {chromium}=require('./pw.js');
 const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 async function click(p,s){try{await p.click(s,{timeout:2000});await p.waitForTimeout(300);return true}catch(e){return false}}
+/* O-231, 16.10.2026: בלי ארגומנטים הכלי לא פתח אף דף ויצא 0 בשקט. */
+if(!process.argv.slice(2).length){console.log('✗ smoke.js: לא ניתנו דפים, ולכן לא נבדק דבר. הרשימה המלאה: node .claude/qa/all.js');process.exit(2);}
 (async()=>{const b=await chromium.launch();
 let failed=0;   /* בלי זה הכלי מדפיס ERRORS ויוצא 0 */
 for(const app of process.argv.slice(2)){
