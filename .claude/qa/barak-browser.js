@@ -42,6 +42,12 @@ const APPS = Object.keys(REG.apps).filter(a =>
 const argv = process.argv.slice(2);
 const TARGET = argv.length ? argv.map(a => a.replace(/\/$/, '')) : APPS;
 const API_RE = /workers\.dev/;
+/* O-123 (16.10.2026): `API` ב-tutor.js ריקה, וכל לומד מקבל את המוח המקומי.
+   הבדיקה כאן היא של מסלול השרת — המתאם, הפעולות והשומרים — ולכן היא
+   מגישה לדף עותק של tutor.js שהכתובת בו מלאה (`page.route`). מה שהלומד
+   מקבל באמת נבדק בנפרד בסוף: דף בלי ההחלפה, ואפס בקשות ל-Worker. */
+const SERVERLESS = /^var API = "";$/m.test(fs.readFileSync(path.join(__dirname, '..', '..', 'tutor', 'tutor.js'), 'utf8'));
+const API_FILL = 'var API = "https://tutor.lagstein1.workers.dev/";';
 async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.waitForTimeout(200); return true } catch (e) { return false } }
 
 /* מה שהאפליקציה צריכה כדי להגיע למסך שאלה. `enter` הוא מבחר של
@@ -122,6 +128,11 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
     let mode = 'text';
     await page.route('**/*', async r => {
       const u = r.request().url();
+      if (SERVERLESS && /\/tutor\/tutor\.js(\?|$)/.test(u)) {
+        const resp = await r.fetch();
+        const txt = (await resp.text()).replace(/^var API = "";$/m, API_FILL);
+        return r.fulfill({ response: resp, body: txt });
+      }
       if (API_RE.test(u)) {
         let body = {};
         try { body = JSON.parse(r.request().postData() || '{}') } catch (e) {}
@@ -339,6 +350,40 @@ try { Object.assign(ENTER, JSON.parse(process.env.BARAK_ENTER || '{}')) } catch 
     if (known.length) console.log('~ ' + app.padEnd(11) + 'ידוע: ' + K.why + ' [' + known.length + ']');
     if (out.fails.length) { failed++; console.log('✗ ' + app.padEnd(11) + out.fails.join(' · ')) }
     else if (!known.length) console.log('✓ ' + app.padEnd(11) + actions.join(',') + (out.ctxSample ? '  · q=' + String(out.ctxSample.q).slice(0, 40) : ''));
+    await ctx.close();
+  }
+  /* O-123: מה שהלומד מקבל — הדף כמו שהוא, בלי החלפת הכתובת. שאלה אחת
+     בחלון של לימור, תשובה מהמוח המקומי, ואפס בקשות ל-Worker. */
+  if (SERVERLESS && !argv.length) {
+    const app = 'math-app';
+    const ctx = await b.newContext({ locale: 'he-IL', viewport: { width: 390, height: 844 } });
+    const page = await ctx.newPage();
+    const hits = [];
+    await page.route('**/*', r => {
+      const u = r.request().url();
+      if (API_RE.test(u)) { hits.push(u); return r.fulfill({ status: 200, contentType: 'application/json', body: '{"say":"שרת"}' }) }
+      return u.startsWith(BASE) ? r.continue() : r.abort();
+    });
+    await page.goto(BASE + '/' + app + '/', { waitUntil: 'domcontentloaded', timeout: 20000 });
+    await page.waitForTimeout(700);
+    await click(page, '#lg-ok');
+    await page.evaluate(() => { try { TUTOR.open() } catch (e) {} });
+    await page.waitForTimeout(200);
+    let reply = '';
+    if (await page.$('#tu-in')) {
+      await page.fill('#tu-in', 'מה זה חיבור?');
+      await page.press('#tu-in', 'Enter');
+      for (let i = 0; i < 60 && !reply; i++) {
+        await page.waitForTimeout(100);
+        reply = await page.evaluate(() => { const m = TUTOR._state().msgs.filter(x => x.role === 'assistant'); return m.length ? m[m.length - 1].text : '' });
+        if (/^(רגע|לחכות)/.test(reply)) reply = '';
+      }
+    }
+    const api = await page.evaluate(() => TUTOR._state().api);
+    if (hits.length || api || !reply) {
+      failed++;
+      console.log('✗ O-123      ' + app + ' בלי החלפה: api="' + api + '", בקשות ל-Worker: ' + hits.length + ', תשובה: ' + (reply ? 'יש' : 'אין'));
+    } else console.log('✓ O-123      ' + app + ' — תשובה מהמוח המקומי, 0 בקשות ל-Worker');
     await ctx.close();
   }
   await b.close();

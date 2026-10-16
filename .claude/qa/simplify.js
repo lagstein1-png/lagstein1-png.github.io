@@ -106,7 +106,15 @@ function t(name, got, want) {
   const html = R('reader/index.html');
   t('reader: יש כפתור', /id="btnSimple"/.test(html), true);
   t('reader: הכפתור קורא ל-TUTOR.simplify', /TUTOR\.simplify\(/.test(html), true);
-  t('reader: ההסבר מתחת לתיבה אומר שהטקסט נשלח', /בלחיצה על ״גרסה פשוטה״ הטקסט נשלח/.test(html), true);
+  /* O-123 (16.10.2026): כש-API ב-tutor.js ריקה, ״גרסה פשוטה״ נבנית במכשיר
+     (`JOSHLOCAL.simplify`), וההסבר וגם התנאים חייבים לומר את זה — ולא
+     ״נשלח לשרת״. כשהכתובת תחזור, חוזרות הבדיקות הישנות. */
+  const SERVER = /^var API = "https?:/m.test(R('tutor/tutor.js'));
+  if (SERVER) t('reader: ההסבר מתחת לתיבה אומר שהטקסט נשלח', /בלחיצה על ״גרסה פשוטה״ הטקסט נשלח/.test(html), true);
+  else {
+    t('reader: ההסבר אומר שהגרסה הפשוטה נבנית במכשיר', /״גרסה פשוטה״ נבנית במכשיר עצמו/.test(html), true);
+    t('reader: ההסבר אינו טוען שהטקסט נשלח לשרת העזרה', /נשלח גם לשרת העזרה/.test(html), false);
+  }
   const tm = html.match(/^var TR = (.*);$/m);
   const TR = tm ? JSON.parse(tm[1]) : {};
   for (const lg of ['ar', 'ru', 'en'])
@@ -115,9 +123,15 @@ function t(name, got, want) {
   /* ---------- 6. התנאים ---------- */
   const terms = R('legal/terms.js');
   t('התנאים 1.8 ומעלה', parseFloat((terms.match(/version:\s*"([\d.]+)"/) || [0, '0'])[1]) >= 1.8, true);
-  for (const [lg, word] of [['he', 'גרסה פשוטה'], ['ar', 'نسخة مبسّطة'], ['ru', 'Простая версия'], ['en', 'Simple version']])
-    t('התנאים ב-' + lg + ' מונים את הטקסט המודבק', terms.indexOf(word) > 0, true);
-  t('התנאים נוקבים בתקרה בארבע השפות', (terms.match(/3[, ]000/g) || []).length >= 4, true);
+  if (SERVER) {
+    for (const [lg, word] of [['he', 'גרסה פשוטה'], ['ar', 'نسخة مبسّطة'], ['ru', 'Простая версия'], ['en', 'Simple version']])
+      t('התנאים ב-' + lg + ' מונים את הטקסט המודבק', terms.indexOf(word) > 0, true);
+    t('התנאים נוקבים בתקרה בארבע השפות', (terms.match(/3[, ]000/g) || []).length >= 4, true);
+  } else {
+    for (const [lg, word] of [['he', 'אינם נשלחים לשום שרת'], ['ar', 'لا يُرسَل إلى أيّ خادم'], ['ru', 'не отправляются ни на какой сервер'], ['en', 'are not sent to any server']])
+      t('התנאים ב-' + lg + ' אומרים שהמורה עונה מהמכשיר', terms.indexOf(word) > 0, true);
+    t('התנאים אינם מזכירים את Gemini', /Gemini/.test(terms), false);
+  }
 
   console.log(bad ? `\n✗ גרסה פשוטה — ${bad} מתוך ${n} נכשלו` : `\n✓ גרסה פשוטה — ${n} בדיקות עברו`);
   process.exit(bad ? 1 : 0);

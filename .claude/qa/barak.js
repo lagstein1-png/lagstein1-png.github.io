@@ -57,7 +57,9 @@ function fakeGemini(opts) {
   return F;
 }
 const KV = () => { const m = {}; return { RATE: { get: async k => (k in m ? m[k] : null), put: async (k, v) => { m[k] = v } }, _m: m } };
-const ENV = extra => Object.assign({ GEMINI_API_KEY: 'test-key' }, KV(), extra || {});
+/* SERVING: 'on' — השרת כבוי כברירת מחדל מ-16.10 (O-123), והבדיקות כאן
+   בודקות את מה שקורה כשהוא דולק. הכבוי עצמו נבדק בסעיף 10. */
+const ENV = extra => Object.assign({ GEMINI_API_KEY: 'test-key', SERVING: 'on' }, KV(), extra || {});
 const req = (body, p) => new Request('https://tutor.example' + (p || '/ask'), {
   method: 'POST', headers: { 'Content-Type': 'application/json', 'CF-Connecting-IP': '9.9.9.' + Math.floor(Math.random() * 250) },
   body: JSON.stringify(body) });
@@ -206,7 +208,16 @@ const BODY = extra => Object.assign({ app: 'math-app', lang: 'he', screen: SCREE
     t('GET /health עונה בלי לפנות לספק', [h.status, hd.ok, hd.key, hd.counter], [200, true, 'present', 'kv']);
     t('POST לנתיב לא מוכר — 404', (await W.default.fetch(new Request('https://x/admin', { method: 'POST' }), env, ctx)).status, 404);
     t('GET לשורש — 405', (await W.default.fetch(new Request('https://x/'), env, ctx)).status, 405);
-    t('בלי מפתח — 500', (await W.default.fetch(new Request('https://x/ask', { method: 'POST' }), { RATE: {} }, ctx)).status, 500);
+    t('בלי מפתח — 500', (await W.default.fetch(new Request('https://x/ask', { method: 'POST' }), { RATE: {}, SERVING: 'on' }, ctx)).status, 500);
+    /* O-123: בלי SERVING השרת כבוי — 503 עם fallback:local, לפני מפתח, מונה ומודל. */
+    {
+      const off = Object.assign({}, env); delete off.SERVING;
+      const r = await W.default.fetch(new Request('https://x/ask', { method: 'POST', body: '{}' }), off, ctx);
+      const d = await r.json();
+      t('O-123: בלי SERVING — 503 ו-fallback:local', [r.status, d.error, d.fallback], [503, 'off', 'local']);
+      const hh = await (await W.default.fetch(new Request('https://x/health'), off, ctx)).json();
+      t('O-123: /health אומר serving:false', hh.serving, false);
+    }
   }
   /* 11. הזרקה דרך הטקסט של הלומד — השומר מכני ואינו סומך על המודל */
   {
@@ -402,7 +413,7 @@ const BODY = extra => Object.assign({ app: 'math-app', lang: 'he', screen: SCREE
     const origFetch = global.fetch;
     global.fetch = async () => { netCalls++; throw new Error('אסור להגיע לרשת') };
     try {
-      const env = { GEMINI_API_KEY: 'test-key' };   /* אין RATE, אין ALLOW_NO_RATE_LIMIT */
+      const env = { GEMINI_API_KEY: 'test-key', SERVING: 'on' };   /* אין RATE, אין ALLOW_NO_RATE_LIMIT */
       const r = await W.default.fetch(reqIP(BODY(), '4.4.4.4'), env, ctx);
       const d = await r.json();
       t('ייצור בלי RATE — 503 ולא 200, ואין קריאת רשת בכלל',

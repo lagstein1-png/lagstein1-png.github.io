@@ -105,7 +105,7 @@ Instinct מסייע גם בתחזוקת אתר בקול. בזמן ש-Claude Code
 - שער השלבים: `build → internal → content-qa → approved → public`; `stages.json` הוא האמת. `stage.js`.
 - מניין האפליקציות: `DATA.APPS` הוא האמת, `badge` בארבע שפות כמילה. `apps.js`. שמונה נקודות מגע לאפליקציה חדשה (השמינית — שכבת הקול המוקלט) — `new-app-or-topic.md`.
 - `lomda`: נושא חדש = שלוש נגיעות. `banks.js`. אפליקציה חדשה מוצדקת רק במחולל או באינטראקציה שאין במנוע.
-- לימור: מוח אחד, `tutor-api/worker.js`. `brain.js`, `joshface.js`, `joshstate.js`, `tutor.js`.
+- לימור: מוח אחד, `tutor-api/worker.js` — **כבוי מ-16.10.2026, וכל לומד מקבל את המוח המקומי** (O-123, `barak.md`). `brain.js`, `joshface.js`, `joshstate.js`, `tutor.js`.
   החריג היחיד: `tutor/limor-device.js` (5.10.2026) — מודל שפה בדפדפן, ב-`/limor/` בלבד, הפרומפט והשומרים מ-`worker.js` (`brain.js` סעיף 5, `JOSH.md`). דף הניסוי `/gemma/` הוסר ב-6.10.2026; `brain.js` סעיף 4 מפיל כל שימוש ב-WebLLM או ב-MediaPipe. הרחבה לאפליקציה נוספת היא החלטה של הבעלים, לא חיווט.
 - ״תאוריה מדברת״: ריפו נפרד, השם האנגלי הישן אסור. `naming.js`. המופע החוקי היחיד: השדה `u` (נתיב).
 - רקיע: הדיוק נמדד מול Swiss Ephemeris — `galileo.js`; הטקסטים — `rakia-content.js`, `rakia-safety.js`.

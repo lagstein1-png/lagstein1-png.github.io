@@ -457,6 +457,14 @@ function isGemini(model) { return /^gemini/.test(String(model)) }
    `null` ולא מחרוזת ריקה: ״אין ספק מותקן״ אינו ספק ששמו ריק. */
 const PROVIDER = null;
 
+/* **השרת כבוי מ-16.10.2026 (O-123, הכרעת הבעלים: ״מוח מקומי, בלי Gemini״).**
+   כל POST מקבל 503 עם `fallback: "local"`, לפני שנוגעים במפתח, במונה או
+   במודל. לקוח ישן שעוד מחזיק את הכתובת נופל בשקט למוח המקומי — זה בדיוק
+   מה ש-tutor.js עושה עם כל 503. `/health` נשאר, ואומר `serving: false`.
+   ההדלקה היא `SERVING = "on"` ב-`[vars]` של wrangler.toml, ולא שינוי קוד —
+   וכברירת מחדל, בלי המשתנה, השרת כבוי. `barak.js` מדליק אותו בבדיקות. */
+const SERVING = env => !!env && env.SERVING === "on";
+
 /* ---------- גבולות הקלט. כל אחד מהם הוא גם תקרת עלות ---------- */
 const LIM = {
   msgs: 14,          /* אורך השיחה שנשלח בחזרה */
@@ -1586,7 +1594,7 @@ export default {
        חלק מהתקרה שהוא מדווח עליה. שדה מצטבר ליום שלם, לא לפי IP:
        אין כאן שום דבר שמזהה לומד. */
     if (request.method === "GET" && url.pathname === "/health")
-      return json({ ok: true, key: env[engineOf(env).key] ? "present" : "missing",
+      return json({ ok: true, serving: SERVING(env), key: env[engineOf(env).key] ? "present" : "missing",
                     counter: env.RATE ? "kv" : (noCounter(env) ? "missing" : "declared-off"),
                     apps: Object.keys(ROLE), actions: ACTION_NAMES, limits: LIM,
                     usage: await currentUsage(env) }, 200, env, org);
@@ -1601,6 +1609,7 @@ export default {
     if (reqOrigin && org !== reqOrigin) return json({ error: "origin" }, 403, env, org);
     if (url.pathname !== "/" && url.pathname !== "/ask" && !/\/(?:ask|api\/josh\/chat)\/?$/.test(url.pathname))
       return json({ error: "path" }, 404, env, org);
+    if (!SERVING(env)) return json({ error: "off", fallback: "local" }, 503, env, org);
     if (!env[engineOf(env).key]) return json({ error: "server" }, 500, env, org);
     /* אין מונה יומי ואין הצהרה — לא מתחילים. עדיף בוט שאינו עונה
        על חשבון שאינו חסום. */
@@ -1618,7 +1627,7 @@ export { revealsAnswer, badEquation, badLang, HE_CALQUE, readBody, contextBlock,
          DEVICE_RULE,
          LANGRULE,
          overLimit, currentUsage, _rate, _models,
-         SIGNS, ADAPT, PROVIDER,
+         SIGNS, ADAPT, PROVIDER, SERVING,
          buildBody, buildHeaders, capOf, noCounter, MODEL, MAX_TOKENS,
          CLAUDE_MODEL, ENGINES, engineOf, geminiBody, parseReply,
          ACTION_NAMES, readActions, toolsOf, validateAction, faceFor, FACES,
