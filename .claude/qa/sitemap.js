@@ -73,8 +73,20 @@ function pathsOf(id) { return id === '' ? ['index.html'] : [id, ':(exclude)' + i
 function lastmod(id) {
   const ps = pathsOf(id);
   if (git(['status', '--porcelain', '--', ...ps])) return TODAY;
-  return git(['log', '-1', '--format=%cs', '--', ...ps]) || TODAY;
+  const [hash, date] = git(['log', '-1', '--format=%H %cs', '--', ...ps]).split(' ');
+  /* 16.10.2026: בשיבוט shallow, קומיט הגבול ״אחראי״ לכל קובץ שלא נגע בו
+     אף קומיט אחריו — והתאריך שלו שקר (teachers: 10-03 במקום 10-01). קומיט
+     wip של סבב B כתב אותו ל-main, ו-qa 1428 ו-1430 נפלו. על קומיט גבול
+     התאריך שכבר בקובץ נשאר. */
+  if (hash && SHALLOW_TIPS.includes(hash)) {
+    const blk = CUR_XML.split('<url>').find(b => b.includes(`<loc>${locOf(id)}</loc>`)) || '';
+    const lm = (blk.match(/<lastmod>([^<]+)<\/lastmod>/) || [])[1];
+    if (lm) return lm;
+  }
+  return date || TODAY;
 }
+const SHALLOW_TIPS = SHALLOW ? (() => { try { return fs.readFileSync(path.join(git(['rev-parse', '--git-dir']).replace(/^(?!\/)/, ROOT + '/'), 'shallow'), 'utf8').split('\n').filter(Boolean); } catch (e) { return []; } })() : [];
+const CUR_XML = fs.existsSync(FILE) ? fs.readFileSync(FILE, 'utf8') : '';
 function page(id) {
   const f = path.join(ROOT, id, 'index.html');
   return fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null;
