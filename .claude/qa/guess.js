@@ -213,7 +213,7 @@ const WHY_ELEM = 'נכתבו לפני שהמעבר נמדד (O-174); רובן מ
                  'וחלקן רק בתרגום — כתיבת מסיחים באורך דומה בארבע השפות';
 const FAM_BASE = {
   'hebrew-lit':   { long: 0, cells: 0,  why: 'הבנת הנקרא (u11/u12/u15) ומשפט חסר אחד ב-u6 — מסיחים כתובים־ביד קצרים מהתשובה' },
-  'tanakh-elem':  { long: 0,  cells: 1,  why: WHY_ELEM + '; והתא s2 [en] — הקצרה היא הנכונה ב-73%' },
+  'tanakh-elem':  { long: 0,  cells: 0,  why: WHY_ELEM + '; התא s2 [en] — הקצרה הייתה הנכונה ב-73% (8 מ-11), ו-17.10.2026 ירד ל-3 מ-11 (ספירה ידנית; guess.js — מתחת לקו הראייה): 3 מסיחים ותשובה אחת שונו באנגלית ו-t_adam_n2 נוסף' },
   'civics-elem':  { long: 0, cells: 0,  why: WHY_ELEM },
   'culture-elem': { long: 0, cells: 0,  why: WHY_ELEM },
   'history-elem': { long: 0, cells: 0,  why: WHY_ELEM },

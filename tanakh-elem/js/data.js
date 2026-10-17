@@ -39,7 +39,7 @@ E eden|l|גן עדן|جنة عدن|Эдемский сад|the Garden of Eden
 E ararat|l|הרי אררט|جبال أرارات|горы Арарат|the mountains of Ararat
 E t_mtcarmel|l|הרי הכרמל|جبال الكرمل|горы Кармель|the mountains of Carmel
 E t_mttabor|l|הרי תבור|جبال طابور|горы Фавор|the mountains of Tabor
-E t_gardenpalms|l|גן התמרים|جنة النخيل|Сад пальм|the Garden of Palms
+E t_gardenpalms|l|גן התמרים|جنة النخيل|Сад пальм|the Palm Garden
 E t_gardenwater|l|גן המים|جنة المياه|Сад воды|the Garden of Water
 E t_gardenflowers|l|גן הפרחים|جنة الأزهار|Сад цветов|the Garden of Flowers
 E egypt|l|מצרים|مصر|Египет|Egypt
@@ -125,7 +125,7 @@ L אלוהים ידע מה קרה. אדם וחוה יצאו מהגן.|عرف ا�
 L הסיפור מלמד: חשוב לשמור על ההוראות ולהגיד את האמת.|تعلّمنا القصة: من المهم أن نلتزم بالتعليمات وأن نقول الحقيقة.|История учит: важно соблюдать правила и говорить правду.|The story teaches: it is important to follow instructions and tell the truth.
 Q איך קוראים לגן שאלוהים עשה?|ماذا اسم الجنة التي صنعها الله؟|Как называется сад, который создал Бог?|What was the garden that God made called?|eden|t_gardenpalms,t_gardenwater,t_gardenflowers
 Y לפי הסיפור בתורה, אלוהים עשה גן יפה ונתן לו את השם גן עדן.|بحسب القصة في التوراة، صنع الله جنة جميلة وسمّاها جنة عدن.|По рассказу Торы, Бог создал красивый сад и сам назвал его Эдемом.|In the Torah story, God made a beautiful garden and gave it the name Eden.
-Q איך קראו לאיש הראשון?|ماذا كان اسم الإنسان الأول؟|Как звали первого человека?|What was the first person called?|adam|t_noah_n2,t_abraham_n2,t_moses_n2
+Q איך קראו לאיש הראשון?|ماذا كان اسم الإنسان الأول؟|Как звали первого человека?|What was the first person called?|t_adam_n2|t_noah_n2,t_abraham_n2,t_moses_n2
 Y לפי הסיפור בתורה, אדם היה האדם הראשון בעולם, והוא גר ראשון בגן עדן.|بحسب القصة في التوراة، كان آدم أول إنسان في العالم، وكان أول من سكن جنة عدن.|По рассказу Торы, Адам был самым первым человеком и первым поселился в Эдемском саду.|In the Torah story, Adam was the very first person, and he was the first to live in the Garden of Eden.
 Q איך קראו לאישה הראשונה?|ماذا كان اسم المرأة الأولى؟|Как звали первую женщину?|What was the first woman called?|eve|sarah,rebecca,rachel
 Y לפי הסיפור בתורה, חוה נבראה אחרי אדם, והיא הייתה האישה הראשונה.|بحسب القصة في التوراة، خُلقت حواء بعد آدم، وكانت أول امرأة.|По рассказу Торы, Ева появилась после Адама и стала первой женщиной.|In the Torah story, Eve was made after Adam, and she was the first woman.
@@ -137,7 +137,7 @@ Q מכמה עצים אסור היה לאכול?|من كم شجرة لم يكن �
 Y לפי הסיפור בתורה, היה רק עץ אחד שאסור לאכול ממנו, עץ הדעת.|بحسب القصة في التوراة، كانت هناك شجرة واحدة فقط ممنوع الأكل منها، شجرة المعرفة.|По рассказу Торы, запрещено было есть только с одного дерева, с дерева познания.|In the Torah story, there was only one tree they could not eat from, the Tree of Knowledge.
 Q מי ידע מה קרה בגן?|من عرف ما حدث في الجنة؟|Кто узнал, что случилось в саду?|Who knew what happened in the garden?|god|noah,benjamin,pharaoh
 Y לפי הסיפור בתורה, אלוהים ידע מה קרה, ולכן אדם וחוה יצאו מהגן.|بحسب القصة في التوراة، عرف الله ما حدث، لذلك خرج آدم وحواء من الجنة.|По рассказу Торы, Бог узнал, что случилось, поэтому Адам и Ева покинули сад.|In the Torah story, God knew what had happened, so Adam and Eve left the garden.
-Q מי אכל מהעץ אחרי חוה?|من أكل من الشجرة بعد حواء؟|Кто съел плод после Евы?|Who ate from the tree after Eve?|adam|t_noah_n2,t_moses_n2,t_jacob_n2
+Q מי אכל מהעץ אחרי חוה?|من أكل من الشجرة بعد حواء؟|Кто съел плод после Евы?|Who ate from the tree after Eve?|t_adam_n2|t_noah_n2,t_moses_n2,t_jacob_n2
 Y לפי הסיפור בתורה, חוה אכלה ראשונה מהעץ, ואחריה אכל גם אדם.|بحسب القصة في التوراة، أكلت حواء من الشجرة أولًا، وبعدها أكل آدم أيضًا.|По рассказу Торы, Ева съела плод первой, а после неё съел и Адам.|In the Torah story, Eve ate from the tree first, and after her Adam ate too.
 Q מה מלמד הסיפור? חשוב לשמור על...|ماذا تعلّمنا القصة؟ من المهم أن نلتزم...|Чему учит история? Важно соблюдать...|What does the story teach? It is important to keep...|t_rules|t_games,t_sleep,t_quietclass
 Y אדם וחוה לא שמרו על ההוראה של עץ הדעת, ולכן הסיפור מלמד לשמור על הוראות.|لم يلتزم آدم وحواء بالتعليمات عن شجرة المعرفة، لذلك تعلّمنا القصة أن نلتزم بالتعليمات.|Адам и Ева не соблюли правило о дереве познания, поэтому история учит соблюдать правила.|Adam and Eve did not follow the rule about the Tree of Knowledge, so the story teaches us to follow instructions.
@@ -145,14 +145,14 @@ E t_rules|t|ההוראות|التعليمات|правила|the instructions
 E t_games|t|המשחקים בחצר|الألعاب في الساحة|игры во дворе|the games in the yard
 E t_sleep|t|השינה בצהריים|النوم في الظهيرة|дневной сон|sleeping in the afternoon
 E t_toys|t|הצעצועים|الدمى|игрушки|the toys
-E t_quietclass|t|השקט בכיתה|الهدوء في الصف|тишину в классе|quiet in the classroom
+E t_quietclass|t|השקט בכיתה|الهدوء في الصف|тишину в классе|quiet in class
 Q מה אמר הנחש לחוה לעשות?|ماذا قال الثعبان لحواء أن تفعل؟|Что змей сказал Еве сделать?|What did the snake tell Eve to do?|t_eattree|t_pickflower,t_leavegarden,t_sleepgarden
 Y לפי הסיפור בתורה, הנחש אמר לחוה לאכול מהעץ היחיד שהיה אסור לאכול ממנו.|بحسب القصة في التوراة، قال الثعبان لحواء أن تأكل من الشجرة الوحيدة الممنوعة.|По рассказу Торы, змей сказал Еве съесть плод с единственного запретного дерева.|In the Torah story, the snake told Eve to eat from the one tree that was not allowed.
 Q מי יצא מהגן?|من خرج من الجنة؟|Кто вышел из сада?|Who left the garden?|t_adameve|t_abrahamsarah,t_noahwife,t_isaacrebecca
 Y לפי הסיפור בתורה, גם חוה וגם אדם אכלו מעץ הדעת, ולכן שניהם יצאו מהגן.|بحسب القصة في التوراة، أكل آدم وحواء كلاهما من شجرة المعرفة، لذلك خرج الاثنان من الجنة.|По рассказу Торы, и Ева, и Адам съели плод с дерева познания, поэтому оба покинули сад.|In the Torah story, Eve and Adam both ate from the Tree of Knowledge, so both of them left the garden.
-E t_eattree|t|לאכול מהעץ|أن تأكل من الشجرة|съесть плод с дерева|to eat from the tree
+E t_eattree|t|לאכול מהעץ|أن تأكل من الشجرة|съесть плод с дерева|to eat fruit from the tree
 E t_sleepgarden|t|לישון בגן עד הבוקר|أن تنام في الجنة حتى الصباح|спать в саду до самого утра|to sleep in the garden until morning
-E t_pickflower|t|לקטוף פרחים בגן|أن تقطف أزهارًا في الجنة|сорвать цветы в саду|to pick flowers in the garden
+E t_pickflower|t|לקטוף פרחים בגן|أن تقطف أزهارًا في الجنة|сорвать цветы в саду|to pick garden flowers
 E t_leavegarden|t|לצאת מהגן אל הנהר|أن تخرج من الجنة إلى النهر|выйти из сада к реке|to go out of the garden to the river
 E t_water|t|מים|مياه|вода|water
 E t_snow|t|שלג|ثلج|снег|snow
@@ -410,6 +410,7 @@ E t_pharaohdaughter|t|בת פרעה|ابنة فرعون|дочь фараона|
 E t_rachel_n|t|רחל אשת יעקב|راحيل زوجة يعقوب|Рахиль, жена Иакова|Rachel, Jacob's wife
 E t_sarah_n|t|שרה אשת אברהם|سارة زوجة إبراهيم|Сара, жена Авраама|Sarah, Abraham's wife
 E t_eve_n|t|חוה מגן עדן|حواء من جنة عدن|Ева из Эдемского сада|Eve from the Garden of Eden
+E t_adam_n2|t|אדם הראשון|آدم|Адам|Adam from the garden
 E t_noah_n2|t|נוח מהתיבה|نوح من الفلك|Ной из ковчега|Noah from the ark
 E t_abraham_n2|t|אברהם מהאוהל|إبراهيم من الخيمة|Авраам из шатра|Abraham from the tent
 E t_moses_n2|t|משה מהר סיני|موسى من جبل سيناء|Моисей с горы Синай|Moses from Mount Sinai

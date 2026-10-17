@@ -33,7 +33,7 @@
 | `bagrut-history` | h138 · 2026-10-16 | h138-pwa1 | תואם |
 | `islam` | is22 · 2026-10-16 | is22-pwa1 | תואם |
 | `russian` | ru23 · 2026-10-16 | ru23-pwa1 | תואם |
-| `tanakh-elem` | te28 · 2026-10-16 | te28-pwa1 | תואם |
+| `tanakh-elem` | te29 · 2026-10-16 | te29-pwa1 | תואם |
 | `civics-elem` | mc28 · 2026-10-16 | mc28-pwa1 | תואם |
 | `culture-elem` | tm25 · 2026-10-16 | tm25-pwa1 | תואם |
 | `history-elem` | hk25 · 2026-10-16 | hk25-pwa1 | תואם |
