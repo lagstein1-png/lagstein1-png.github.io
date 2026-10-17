@@ -2,7 +2,7 @@
 Internal rebuild: ns1, 7 topics, 35 original scenario questions, 4 options per question.
 Open locally with ?internal=shlav-internal-net-elem-k. Not a security boundary.
 No homepage or sitemap entry. No scores, ranking, payments, or new network services.
-Recorded voice layer only; audio/manifest.json is empty. Missing audio produces a visible notice and silence, never a different voice. Estimated word highlighting follows audio position, not actual word timestamps.
+Recorded voice first; text without a recording falls back to the device voice (female voice only, the four mechanisms + release on touch, copied from civics-elem; O-220, 17.10.2026). The visible notice appears only when there is neither a file nor a device voice. On a file, estimated word highlighting follows audio position, not actual word timestamps.
 The current record.js pipeline extracts Hebrew only, including fixed UI, lessons, questions, options and local tutor text. Other language audio awaits a recording pipeline supporting those languages.
 Local Limor works without API calls. The shared teacher additionally requires the worker ROLE and a tutor worker redeploy after merge. No tutor API call was made during testing.
 Translations are machine-quality and await a speaker review. This foundation is not a certified or complete curriculum.

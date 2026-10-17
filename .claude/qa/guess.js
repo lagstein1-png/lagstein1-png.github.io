@@ -191,7 +191,9 @@ async function run() {
   const browser = await chromium.launch();
   let bad = 0, checked = 0, warned = 0;
 
-  for (const app of APPS) {
+  /* `--lessons` — רק מעבר השיעור (O-188), בלי תאי buildQ */
+  const ONLY_LESSONS = process.argv.includes('--lessons');
+  for (const app of (ONLY_LESSONS ? [] : APPS)) {
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
     await page.route('**', r =>
@@ -313,15 +315,171 @@ async function run() {
     }
   }
 
+  bad += await lessons(browser);
+
   await browser.close();
   console.log();
   if (bad) {
     console.log(`${bad} תאים שאפשר לנחש בהם בלי לדעת את החומר`);
     process.exit(1);
   }
+  if (ONLY_LESSONS) { console.log('✓ מסכי השיעור — אין מיקום צפוי, אין שאלה פגומה, ואין ארוכה בבירור מחוץ לבסיס'); return; }
   console.log(`✓ ${checked} תאים נמדדו בעברית, והמילוליים שבהם גם בשאר השפות — ` +
               `אין תא שאורך התשובה או מיקומה מסגירים אותה` +
               (warned ? ` (${warned} מעל קו הראייה — ראו למעלה)` : ''));
+}
+
+/* =====================================================================
+   מסכי השיעור המודרך — `lsOpts(list, answered, correctIdx, act)` (O-188)
+
+   כל מה שלמעלה מודד את `buildQ`. שאלות השיעור אינן עוברות שם:
+   הן כתובות ישירות בקריאות `lsOpts` בתוך `*LessonView`, ולכן אף
+   כלי לא ראה אותן. ב-science, 42 קריאות: הנכונה עמדה במקום 0 או 1
+   ב-40 מהן, ובמקום 2 רק בשתיים.
+
+   **המקור נקרא מהשרת, לא מהדיסק.** כך `QA_BASE`/`QA_PORT` מול עץ
+   ישן (worktree) מודד את העץ ההוא — וכך נעשתה הוכחת הנפילה.
+   הקריאות מחולצות בביטוי רגולרי, ומספרן נבדק מול `lsOpts(` פחות
+   ההגדרה: קריאה שהביטוי לא תפס היא ✗, לא שקט.
+
+   **המיקום נמדד על מה שמצויר.** כל רשימה מוערכת בדף עצמו
+   (`slt(...)` וחברותיה הן פונקציות גלובליות), עוברת ב-`lsOpts`
+   האמיתי, ומהכפתורים נקרא סדר `data-i`. אין כאן העתק של הערבוב.
+
+   שלושה כללים מפילים:
+   (א) מיקום צפוי — מקום שמחזיק יותר מ-60% מהנכונות, או מקום
+       שמקבל פחות מחצי ממה שערבוב הוגן היה נותן לו (ובלבד שהיה
+       אמור לקבל 5 לפחות). לפני O-188: ‎21/19/2‎ — המקום השלישי
+       קיבל 2 במקום 14.
+   (ב) פחות משלוש אפשרויות, או שתי אפשרויות זהות (בכל שפה).
+   (ג) הנכונה ארוכה בבירור — היחידה באורך המרבי, ולפחות פי 1.5
+       מהשנייה באורכה, בשפה כלשהי.
+   ושלוש שורות · שאינן מפילות: התפלגות מספר האפשרויות (שלוש היום —
+   שלב התוכן של O-188 מוסיף רביעית), שיעור ״הארוכה היא הנכונה״
+   בכל שפה, ושאלות (ג) שבבסיס.
+   ===================================================================== */
+
+/* (ג) — בסיס. 26 מסכים שבהם הנכונה ארוכה בבירור, נמדד 17.10.2026.
+   תיקונם הוא כתיבת מסיחים בארבע שפות — שלב התוכן של O-188 — ולא
+   קוד. מסך שנוסף לכאן חייב נימוק; מסך שתוקן מדווח, כדי שיימחק.
+   מסך חדש שאינו כאן ונופל ב-(ג) — ✗. */
+const LESSON_LONG_BASE = {
+  science: ['slpick', 'slp1', 'slp2', 's2pick', 's2p1', 's2p2', 's3pick', 's4p1',
+            's5pick', 's5p1', 's5p2', 's6p1', 's7p1', 's8pick', 's8p1', 's8p2',
+            's9pick', 's9p1', 's10p2', 's11pick', 's11p1', 's11p2', 's12pick',
+            's12p1', 's12p2', 's13p2'],
+};
+/* אפליקציה שיש בה `lsOpts` בלי ערבוב, ואינה בתחום התיקון שבו נוספה
+   הבדיקה. מודפסת ב-·, ולא מפילה. כשהיא נקייה — מדווח, כדי שתימחק. */
+const LESSON_OPEN = {
+  'math-app':      'O-188 — 3 מסכים, אין ערבוב ב-lsOpts; ההעתקה מ-science טרם נעשתה',
+  'geography-elem': 'O-188 — 12 מסכים, אין ערבוב ב-lsOpts; ההעתקה מ-science טרם נעשתה',
+};
+const LONG_RATIO = 1.5;
+
+async function lessons(browser) {
+  let bad = 0;
+  const apps = Object.keys(REG.apps);
+  for (const app of apps) {
+    let src;
+    try { const r = await fetch(`${BASE}/${app}/index.html`); if (!r.ok) continue; src = await r.text(); }
+    catch (e) { continue; }
+    if (!/function\s+lsOpts\s*\(/.test(src)) continue;
+
+    const re = /lsOpts\((\[[^\]]*\]),\s*([^,()]+),\s*(\d+),\s*"([^"]+)"\)/g;
+    const calls = []; let m;
+    while ((m = re.exec(src)))
+      calls.push({ expr: m[1], ci: +m[3], act: m[4], line: src.slice(0, m.index).split('\n').length });
+    const total = (src.match(/lsOpts\(/g) || []).length - 1;
+    const soft = !!LESSON_OPEN[app];
+    const errs = [];
+    if (calls.length !== total)
+      errs.push(`חולצו ${calls.length} קריאות מתוך ${total} — הביטוי לא תפס קריאה, הבדיקה עיוורת לה`);
+
+    const ctx = await browser.newContext();
+    const page = await ctx.newPage();
+    await page.route('**', r => r.request().url().startsWith(BASE) ? r.continue() : r.abort());
+    await page.goto(`${BASE}/${app}/`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(800);
+    const res = await page.evaluate((calls) => {
+      const out = [];
+      const box = document.createElement('div');
+      const langs = (typeof LANGS !== 'undefined') ? Object.keys(LANGS) : ['he'];
+      const st = (typeof state === 'object' && state && state.settings) ? state.settings : null;
+      const keep = st ? st.lang : null;
+      for (const lg of langs) {
+        if (st) st.lang = lg;
+        for (const c of calls) {
+          let list;
+          try { list = (0, eval)(c.expr); } catch (e) { out.push({ lg, act: c.act, err: String(e.message || e) }); continue; }
+          box.innerHTML = lsOpts(list, -1, c.ci, c.act);
+          const order = [...box.querySelectorAll('button[data-i]')].map(b => +b.getAttribute('data-i'));
+          out.push({ lg, act: c.act, ci: c.ci, order, list: list.map(String) });
+        }
+      }
+      if (st) st.lang = keep;
+      return out;
+    }, calls);
+    await ctx.close();
+
+    /* (א) — המיקום, פעם אחת (הסדר אינו תלוי בשפה) */
+    const he = res.filter(r => r.lg === res[0].lg && !r.err);
+    const obs = [], exp = [], nDist = {};
+    for (const r of he) {
+      const n = r.list.length;
+      nDist[n] = (nDist[n] || 0) + 1;
+      const p = r.order.indexOf(r.ci);
+      if (p < 0) { errs.push(`${r.act} — הנכונה (${r.ci}) אינה בין הכפתורים`); continue; }
+      if (r.order.length !== n || new Set(r.order).size !== n)
+        errs.push(`${r.act} — מצוירים ${r.order.length} כפתורים ל-${n} אפשרויות`);
+      obs[p] = (obs[p] || 0) + 1;
+      for (let k = 0; k < n; k++) exp[k] = (exp[k] || 0) + 1 / n;
+    }
+    const N = he.length;
+    for (let k = 0; k < exp.length; k++) {
+      const o = obs[k] || 0, e = exp[k];
+      if (o / N > 0.60) errs.push(`מיקום ${k} מחזיק ${o} מתוך ${N} נכונות (${pct(o / N)}%) — אפשר לנחש לפי מקום`);
+      else if (e >= 5 && o < e / 2) errs.push(`מיקום ${k} מקבל ${o} נכונות, וערבוב הוגן היה נותן ~${Math.round(e)} — אפשר לפסול אותו בלי לדעת`);
+    }
+
+    /* (ב) ו-(ג) — בכל שפה */
+    const base = new Set(LESSON_LONG_BASE[app] || []);
+    const longKnown = new Set(), longAgg = {};
+    for (const r of res) {
+      if (r.err) { errs.push(`${r.act} [${r.lg}] — הרשימה לא הוערכה: ${r.err}`); continue; }
+      const norm = r.list.map(s => s.replace(/\s+/g, ' ').trim());
+      if (norm.length < 3) errs.push(`${r.act} [${r.lg}] — ${norm.length} אפשרויות בלבד`);
+      if (new Set(norm).size !== norm.length) errs.push(`${r.act} [${r.lg}] — שתי אפשרויות זהות: ${JSON.stringify(norm)}`);
+      const L = norm.map(s => s.length), mx = Math.max(...L);
+      const second = Math.max(...L.filter((x, i) => i !== L.indexOf(mx)));
+      const uniq = L.filter(x => x === mx).length === 1;
+      const a = longAgg[r.lg] || (longAgg[r.lg] = [0, 0]); a[1]++;
+      if (uniq && L[r.ci] === mx) {
+        a[0]++;
+        if (mx >= LONG_RATIO * Math.max(second, 1)) {
+          if (base.has(r.act)) longKnown.add(r.act);
+          else errs.push(`${r.act} [${r.lg}] — הנכונה ארוכה בבירור: ${L.join('/')} תווים, נכונה ${r.ci}`);
+        }
+      }
+    }
+
+    const posTxt = exp.map((_, k) => obs[k] || 0).join('/');
+    const mark = errs.length ? (soft ? '·' : '✗') : '✓';
+    console.log(`${mark} ${app.padEnd(10)} שיעור: ${N} שאלות · מיקום הנכונה ${posTxt}` +
+                (errs.length ? ` · ${errs.length} ממצאים` : ''));
+    for (const e of errs) console.log(`    ${soft ? '·' : '✗'} ${e}`);
+    if (soft) console.log(`    · לא מפיל: ${LESSON_OPEN[app]}`);
+    if (soft && !errs.length) console.log(`    · נקייה — למחוק את '${app}' מ-LESSON_OPEN`);
+    console.log(`    · מספר אפשרויות לשאלה: ${JSON.stringify(nDist)}`);
+    console.log(`    · הארוכה היא הנכונה: ` +
+                Object.entries(longAgg).map(([lg, [k, n]]) => `${lg} ${k}/${n} (${pct(k / n)}%)`).join(', '));
+    if (longKnown.size)
+      console.log(`    · ${longKnown.size} מסכים בבסיס (ג) — הנכונה ארוכה בבירור; שלב התוכן של O-188`);
+    const fixed = [...base].filter(a => !longKnown.has(a));
+    if (fixed.length) console.log(`    · תוקנו, למחוק מ-LESSON_LONG_BASE: ${fixed.join(', ')}`);
+    if (!soft) bad += errs.length;
+  }
+  return bad;
 }
 
 run().catch(e => { console.log('✗ ' + e.message); process.exit(1); });

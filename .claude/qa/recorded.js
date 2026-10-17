@@ -203,10 +203,9 @@ function fresh(manifest, audioBehaviour, opts) {
   }
   const DEVICE = /speechSynthesis\.speak\s*\(|\b[\w$]*[Dd]evice[\w$]*\b|\bspeakParts\b|\bspeakLocal\b/;
   /* חריג אמיתי, ידוע ומודפס — לא ירוק שקט. רשומה שכבר אינה נדרשת נופלת. */
-  const NO_FALLBACK = {
-    'net-elem': 'הקלטה בלבד בכוונה (net-elem/js/speech.js:31 ״Missing recordings never switch to another voice״, קומיט aa912314): ' +
-                'טקסט בלי הקלטה מציג ״אין קול״ ואינו נופל לקול המכשיר. נחשף עם O-165, 16.10.2026; במניפסט 3 הקלטות בלבד',
-  };
+  /* net-elem ישבה כאן מ-16.10.2026 (הקלטה בלבד, ״אין קול״ לכל טקסט בלי קובץ) ויצאה ב-O-220,
+     17.10.2026, כשחוברה לקול המכשיר כמו שאר משפחת ה-elem. */
+  const NO_FALLBACK = {};
   const SKIPPED = [];
   for (const app of ALL) {
     const html = fs.readFileSync(path.join(ROOT, app, 'index.html'), 'utf8');
