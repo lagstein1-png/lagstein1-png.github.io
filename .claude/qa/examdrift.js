@@ -130,19 +130,28 @@ async function student(b, app, code, lang, drift, errs) {
   let bad = 0;
   for (let ai = 0; ai < APPS.length; ai++) {
     const app = APPS[ai], lang = LANGS[ai % LANGS.length], errs = [];
+    /* 17.10.2026 (qa 1455): הזרע היה Math.random, ובזרע מסוים הסרת הפריט
+       הראשון מהמאגר לא נגעה באף שאלה שבמבחן — ״המוטציה לא שינתה דבר״,
+       אדום בלי באג. עכשיו הזרע נגזר משם האפליקציה, וכשהמוטציה אינה נוגעת
+       במבחן עוברים לזרע הבא (עד שלושה). סחיפה שלא שינתה שאלה אינה מה
+       שהבדיקה בודקת; סחיפה ששינתה ולא הוזהרה — נופלת כמו קודם. */
+    const SEED0 = [...app].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0, 7);
+    let line = '', ok = true, tries = 0;
+    for (; tries < 3; tries++) {
     const tctx = await b.newContext();
-    let line = '', ok = true;
+    errs.length = 0;
+    let retry = false;
     try {
       const teacher = await open(tctx, `${BASE}/${app}/?internal=shlav-internal-${app}`, errs);
-      const t = await teacher.evaluate(HETEXTS => {
+      const t = await teacher.evaluate(([HETEXTS, SEED]) => {
         const heTexts = eval(HETEXTS);
         EB.q = null; EB.n = 10;
         const q = exSlots().slice();
-        const spec = { v: GENV, t: 'בדיקת סחיפה', s: (Math.random() * 4294967295) >>> 0, l: EB.level, q, r: true, f: true, w: true };
+        const spec = { v: GENV, t: 'בדיקת סחיפה', s: SEED, l: EB.level, q, r: true, f: true, w: true };
         const id = examId(spec);
         if (!exFind(id)) { EX.list.unshift({ id, spec, date: todayIso(), subs: [] }); exSave(); }
         return { code: encodeExam(spec), id, he: heTexts(spec) };
-      }, HETEXTS);
+      }, [HETEXTS, (SEED0 + tries * 2654435761) >>> 0]);
 
       /* קליטה דרך המסך, כמו מורה אמיתי: מסך הציונים, המבחן פתוח, הדבקת
          הקוד בתיבה ולחיצה על ״קליטה״. בחצי מהאפליקציות הקליטה כתובה
@@ -176,6 +185,7 @@ async function student(b, app, code, lang, drift, errs) {
       const diff2 = s2.he.filter((x, k) => x !== t.he[k]).length;
       const c2 = diff2 > 0 && g2.warnMsg && g2.warnRow;
 
+      if (diff2 === 0 && tries < 2) { retry = true; continue; }
       ok = c1 && c2 && errs.length === 0;
       line = `נקי[${lang}] ${same1 ? 'זהה' : 'שונה!'} ציון ${g1.ok}/${s1.self} אזהרה=${g1.warnMsg || g1.warnRow}` +
         ` · סחיפה[${s2.how}] ${diff2}/${t.he.length} שונות, ` +
@@ -184,6 +194,9 @@ async function student(b, app, code, lang, drift, errs) {
     } catch (e) {
       ok = false; line = 'נפל: ' + String(e).split('\n')[0];
     } finally { await tctx.close(); }
+    if (!retry) break;
+    }
+    if (tries) line += ` (זרע ${tries + 1} מתוך 3)`;
     if (!ok) bad++;
     console.log(`${ok ? '✓' : '✗'} ${app.padEnd(15)} ${line}` + (errs.length ? '\n    JS: ' + errs.slice(0, 3).join(' | ') : ''));
   }
