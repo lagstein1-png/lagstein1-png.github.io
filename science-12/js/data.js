@@ -82,6 +82,12 @@ var SCIENCE_DATA=[
             "en": "Tongue"
           }
         ],
+        "why": {
+          "he": "בעיניים רואים צבע וצורה, ולכן הן מגלות לנו את הצבע של הפרח.",
+          "ar": "بالعينين نرى اللون والشكل، لذلك نعرف بهما لون الزهرة.",
+          "ru": "Глазами мы видим цвет и форму, поэтому они показывают нам цвет цветка.",
+          "en": "Our eyes see color and shape, so they show us what color the flower is."
+        },
         "correct": 0
       },
       {
@@ -117,6 +123,12 @@ var SCIENCE_DATA=[
             "en": "Skin"
           }
         ],
+        "why": {
+          "he": "באוזניים שומעים קולות, ושיר בנוי מקולות.",
+          "ar": "بالأذنين نسمع الأصوات، والأغنية مكوّنة من أصوات.",
+          "ru": "Ушами мы слышим звуки, а песня состоит из звуков.",
+          "en": "Our ears hear sounds, and a song is made of sounds."
+        },
         "correct": 0
       },
       {
@@ -152,6 +164,12 @@ var SCIENCE_DATA=[
             "en": "Tongue"
           }
         ],
+        "why": {
+          "he": "באף מריחים, וללחם טרי יש ריח.",
+          "ar": "بالأنف نشم، وللخبز الطازج رائحة.",
+          "ru": "Носом мы чувствуем запах, а у свежего хлеба есть запах.",
+          "en": "Our nose smells, and fresh bread has a smell."
+        },
         "correct": 0
       },
       {
@@ -187,6 +205,12 @@ var SCIENCE_DATA=[
             "en": "Fingers"
           }
         ],
+        "why": {
+          "he": "בלשון טועמים אוכל, והתפוח הוא אוכל.",
+          "ar": "باللسان نتذوق الطعام، والتفاحة طعام.",
+          "ru": "Языком мы пробуем еду, а яблоко тоже еда.",
+          "en": "Our tongue tastes food, and an apple is food."
+        },
         "correct": 0
       },
       {
@@ -222,6 +246,12 @@ var SCIENCE_DATA=[
             "en": "Tongue"
           }
         ],
+        "why": {
+          "he": "העור מרגיש מגע, ולכן הוא מרגיש שהבד רך.",
+          "ar": "الجلد يشعر باللمس، لذلك يشعر بأن القماش ناعم.",
+          "ru": "Кожа чувствует прикосновение, поэтому она чувствует, что ткань мягкая.",
+          "en": "Our skin feels touch, so it can feel that the cloth is soft."
+        },
         "correct": 0
       },
       {
@@ -257,6 +287,12 @@ var SCIENCE_DATA=[
             "en": "Hold it against our face"
           }
         ],
+        "why": {
+          "he": "לא נוגעים בדבר חם, ומבוגר יודע להחזיק את הכוס בלי להיכוות.",
+          "ar": "لا نلمس شيئًا ساخنًا، والشخص البالغ يعرف كيف يمسك الكوب دون أن يحترق.",
+          "ru": "Горячее не трогаем, а взрослый знает, как взять чашку и не обжечься.",
+          "en": "We do not touch hot things, and a grown-up knows how to hold the cup safely."
+        },
         "correct": 0
       },
       {
@@ -292,6 +328,12 @@ var SCIENCE_DATA=[
             "en": "Nose"
           }
         ],
+        "why": {
+          "he": "העור מרגיש מגע, והוא גם מרגיש אם משהו חם או קר.",
+          "ar": "الجلد يشعر باللمس، ويشعر أيضًا إن كان الشيء ساخنًا أو باردًا.",
+          "ru": "Кожа чувствует прикосновение, а ещё она чувствует тепло и холод.",
+          "en": "Our skin feels touch, and it also feels if something is hot or cold."
+        },
         "correct": 0
       },
       {
@@ -327,6 +369,12 @@ var SCIENCE_DATA=[
             "en": "Smell"
           }
         ],
+        "why": {
+          "he": "צלצול הוא קול, ואת הקולות שומעים באוזניים.",
+          "ar": "الرنين صوت، والأصوات نسمعها بالأذنين.",
+          "ru": "Звон является звуком, а звуки мы слышим ушами.",
+          "en": "A ring is a sound, and we hear sounds with our ears."
+        },
         "correct": 0
       },
       {
@@ -362,6 +410,12 @@ var SCIENCE_DATA=[
             "en": "The sound of a bird"
           }
         ],
+        "why": {
+          "he": "באף מריחים, ולכן האף מגלה ריח ולא צבע או קול.",
+          "ar": "بالأنف نشم، لذلك يكشف الأنف الرائحة وليس اللون أو الصوت.",
+          "ru": "Носом мы чувствуем запах, а цвет или звук нос не узнаёт.",
+          "en": "Our nose smells, so it finds smells and not colors or sounds."
+        },
         "correct": 0
       },
       {
@@ -397,6 +451,12 @@ var SCIENCE_DATA=[
             "en": "Ten"
           }
         ],
+        "why": {
+          "he": "יש לנו ראייה, שמיעה, ריח, טעם ומגע, וביחד הם חמישה חושים.",
+          "ar": "لدينا البصر والسمع والشم والتذوق واللمس، ومعًا هي خمس حواس.",
+          "ru": "У нас есть зрение, слух, обоняние, вкус и осязание, и вместе это пять чувств.",
+          "en": "We have sight, hearing, smell, taste and touch, which makes five senses."
+        },
         "correct": 0
       }
     ]
@@ -483,6 +543,12 @@ var SCIENCE_DATA=[
             "en": "Paper"
           }
         ],
+        "why": {
+          "he": "בעלי חיים צריכים מים, מזון ואוויר, ואת המים הם שותים.",
+          "ar": "تحتاج الحيوانات إلى ماء وغذاء وهواء، والماء هو ما تشربه.",
+          "ru": "Животным нужны вода, еда и воздух, и пьют они воду.",
+          "en": "Animals need water, food and air, and water is what they drink."
+        },
         "correct": 0
       },
       {
@@ -518,6 +584,12 @@ var SCIENCE_DATA=[
             "en": "Inside a book"
           }
         ],
+        "why": {
+          "he": "דג נושם ושוחה במים, ובלי מים הוא לא יכול לחיות.",
+          "ar": "السمكة تتنفس وتسبح في الماء، ولا تستطيع العيش بدونه.",
+          "ru": "Рыба дышит и плавает в воде и без воды жить не может.",
+          "en": "A fish breathes and swims in water, and it cannot live without it."
+        },
         "correct": 0
       },
       {
@@ -553,6 +625,12 @@ var SCIENCE_DATA=[
             "en": "A dog"
           }
         ],
+        "why": {
+          "he": "ציפור יכולה לעוף, ובשביל זה יש לה כנפיים.",
+          "ar": "يستطيع الطائر الطيران، ولهذا له جناحان.",
+          "ru": "Птица умеет летать, и для этого у неё есть крылья.",
+          "en": "A bird can fly, and it has wings to do it."
+        },
         "correct": 0
       },
       {
@@ -588,6 +666,12 @@ var SCIENCE_DATA=[
             "en": "A wolf"
           }
         ],
+        "why": {
+          "he": "חתולה יכולה לגור עם אנשים בבית, ואריה, שועל וזאב הם חיות בר.",
+          "ar": "القطة يمكن أن تعيش مع الناس في البيت، أما الأسد والثعلب والذئب فحيوانات برية.",
+          "ru": "Кошка может жить с людьми дома, а лев, лиса и волк являются дикими животными.",
+          "en": "A cat can live with people at home, while lions, foxes and wolves are wild."
+        },
         "correct": 0
       },
       {
@@ -623,6 +707,12 @@ var SCIENCE_DATA=[
             "en": "Pick it up"
           }
         ],
+        "why": {
+          "he": "חיית בר לא מכירה אותנו ויכולה להיבהל, ולכן לא נוגעים בה.",
+          "ar": "الحيوان البري لا يعرفنا وقد يخاف، لذلك لا نلمسه.",
+          "ru": "Дикое животное нас не знает и может испугаться, поэтому его не трогаем.",
+          "en": "A wild animal does not know us and may get scared, so we do not touch it."
+        },
         "correct": 0
       },
       {
@@ -658,6 +748,12 @@ var SCIENCE_DATA=[
             "en": "A pencil"
           }
         ],
+        "why": {
+          "he": "בעלי חיים נושמים אוויר, כמו שאנחנו נושמים.",
+          "ar": "الحيوانات تتنفس الهواء، كما نتنفس نحن.",
+          "ru": "Животные дышат воздухом, как и мы.",
+          "en": "Animals breathe air, just like we do."
+        },
         "correct": 0
       },
       {
@@ -693,6 +789,12 @@ var SCIENCE_DATA=[
             "en": "Hamster"
           }
         ],
+        "why": {
+          "he": "אריה חי בטבע ולא בבית של אנשים, ולכן הוא חיית בר.",
+          "ar": "الأسد يعيش في الطبيعة وليس في بيوت الناس، لذلك هو حيوان بري.",
+          "ru": "Лев живёт в природе, а не у людей дома, поэтому он дикое животное.",
+          "en": "A lion lives in nature and not in people's homes, so it is a wild animal."
+        },
         "correct": 0
       },
       {
@@ -728,6 +830,12 @@ var SCIENCE_DATA=[
             "en": "Books"
           }
         ],
+        "why": {
+          "he": "בעלי חיים צריכים מזון, והמזון נותן להם כוח לגדול.",
+          "ar": "تحتاج الحيوانات إلى الغذاء، والغذاء يعطيها القوة لتكبر.",
+          "ru": "Животным нужна еда, и еда даёт им силы расти.",
+          "en": "Animals need food, and food gives them the strength to grow."
+        },
         "correct": 0
       },
       {
@@ -763,6 +871,12 @@ var SCIENCE_DATA=[
             "en": "It runs"
           }
         ],
+        "why": {
+          "he": "לדג יש סנפירים וזנב, והוא מזיז אותם כדי לשחות.",
+          "ar": "للسمكة زعانف وذيل، وهي تحركها لتسبح.",
+          "ru": "У рыбы есть плавники и хвост, и она двигает ими, чтобы плыть.",
+          "en": "A fish has fins and a tail, and it moves them to swim."
+        },
         "correct": 0
       },
       {
@@ -798,6 +912,12 @@ var SCIENCE_DATA=[
             "en": "We give it some of our food"
           }
         ],
+        "why": {
+          "he": "כלב שלא מכירים יכול להיבהל, ומבוגר יודע אם בטוח להתקרב.",
+          "ar": "الكلب الذي لا نعرفه قد يخاف، والشخص البالغ يعرف إن كان الاقتراب آمنًا.",
+          "ru": "Незнакомая собака может испугаться, а взрослый знает, безопасно ли подходить.",
+          "en": "A dog we do not know may get scared, and an adult knows if it is safe to go near."
+        },
         "correct": 0
       }
     ]
@@ -884,6 +1004,12 @@ var SCIENCE_DATA=[
             "en": "A toy"
           }
         ],
+        "why": {
+          "he": "בתוך הזרע יש צמח קטן, ובאדמה עם מים הוא מתחיל לצמוח.",
+          "ar": "داخل البذرة نبات صغير، وفي التربة مع الماء يبدأ بالنمو.",
+          "ru": "Внутри семени есть маленькое растение, и в земле с водой оно начинает расти.",
+          "en": "A seed holds a tiny plant, and it starts to grow in wet soil."
+        },
         "correct": 0
       },
       {
@@ -919,6 +1045,12 @@ var SCIENCE_DATA=[
             "en": "Leaf"
           }
         ],
+        "why": {
+          "he": "השורש נמצא באדמה, ולכן הוא יכול לקלוט ממנה מים.",
+          "ar": "الجذر موجود في التربة، لذلك يستطيع أن يمتص منها الماء.",
+          "ru": "Корень находится в земле, поэтому может впитывать из неё воду.",
+          "en": "The root is in the soil, so it can take in water from it."
+        },
         "correct": 0
       },
       {
@@ -954,6 +1086,12 @@ var SCIENCE_DATA=[
             "en": "Shoes"
           }
         ],
+        "why": {
+          "he": "העלים זקוקים לאור כדי שהצמח יוכל לגדול.",
+          "ar": "تحتاج الأوراق إلى الضوء لكي ينمو النبات.",
+          "ru": "Листьям нужен свет, чтобы растение могло расти.",
+          "en": "Leaves need light so the plant can grow."
+        },
         "correct": 0
       },
       {
@@ -989,6 +1127,12 @@ var SCIENCE_DATA=[
             "en": "Feathers"
           }
         ],
+        "why": {
+          "he": "לכל צמח יש שורש, גבעול ועלים, ואין לו אוזניים, גלגלים או נוצות.",
+          "ar": "لكل نبات جذر وساق وأوراق، وليس له آذان أو عجلات أو ريش.",
+          "ru": "У каждого растения есть корень, стебель и листья, а ушей, колёс и перьев нет.",
+          "en": "Every plant has a root, a stem and leaves, but no ears, wheels or feathers."
+        },
         "correct": 0
       },
       {
@@ -1024,6 +1168,12 @@ var SCIENCE_DATA=[
             "en": "With dry sand"
           }
         ],
+        "why": {
+          "he": "זרם חזק יכול לשבור צמח קטן או לשטוף אותו, ולכן משקים לאט.",
+          "ar": "الماء القوي قد يكسر النبات الصغير أو يجرفه، لذلك نسقيه ببطء.",
+          "ru": "Сильная струя может сломать или смыть маленькое растение, поэтому поливаем медленно.",
+          "en": "A strong splash can break or wash away a small plant, so we water it slowly."
+        },
         "correct": 0
       },
       {
@@ -1059,6 +1209,12 @@ var SCIENCE_DATA=[
             "en": "Pull off the leaves"
           }
         ],
+        "why": {
+          "he": "כשמשווים את הגובה מיום ליום, רואים בעיניים כמה הצמח גדל.",
+          "ar": "عندما نقارن الارتفاع من يوم إلى يوم، نرى بأعيننا كم نما النبات.",
+          "ru": "Если сравнивать высоту день за днём, видно, насколько растение выросло.",
+          "en": "Comparing the height day by day shows how much the plant has grown."
+        },
         "correct": 0
       },
       {
@@ -1094,6 +1250,12 @@ var SCIENCE_DATA=[
             "en": "In the air"
           }
         ],
+        "why": {
+          "he": "השורש קולט מים מהאדמה, ולכן הוא נמצא בתוכה.",
+          "ar": "يمتص الجذر الماء من التربة، لذلك يكون في داخلها.",
+          "ru": "Корень впитывает воду из земли, поэтому он находится в ней.",
+          "en": "The root takes in water from the soil, so it grows inside the soil."
+        },
         "correct": 0
       },
       {
@@ -1129,6 +1291,12 @@ var SCIENCE_DATA=[
             "en": "Only dry sand"
           }
         ],
+        "why": {
+          "he": "השורש קולט מים והעלים זקוקים לאור, וכך הצמח גדל.",
+          "ar": "يمتص الجذر الماء وتحتاج الأوراق إلى الضوء، وهكذا ينمو النبات.",
+          "ru": "Корень впитывает воду, а листьям нужен свет, и так растение растёт.",
+          "en": "The root takes in water and the leaves need light, and that is how the plant grows."
+        },
         "correct": 0
       },
       {
@@ -1164,6 +1332,12 @@ var SCIENCE_DATA=[
             "en": "Fruit"
           }
         ],
+        "why": {
+          "he": "הגבעול חזק ועומד ישר, והוא מחבר בין השורש לעלים.",
+          "ar": "الساق قوية ومستقيمة، وهي تصل بين الجذر والأوراق.",
+          "ru": "Стебель крепкий и прямой, и он соединяет корень с листьями.",
+          "en": "The stem is strong and straight, and it joins the root to the leaves."
+        },
         "correct": 0
       },
       {
@@ -1199,6 +1373,12 @@ var SCIENCE_DATA=[
             "en": "A grain of sand"
           }
         ],
+        "why": {
+          "he": "צמח יכול לצמוח מזרע, ומים ואדמה עוזרים לו להתחיל לגדול.",
+          "ar": "يمكن أن ينمو النبات من بذرة، والماء والتربة يساعدانه على بداية النمو.",
+          "ru": "Растение может вырасти из семени, а вода и земля помогают ему начать расти.",
+          "en": "A plant can grow from a seed, and water and soil help it start growing."
+        },
         "correct": 0
       }
     ]
@@ -1285,6 +1465,12 @@ var SCIENCE_DATA=[
             "en": "Autumn"
           }
         ],
+        "why": {
+          "he": "בישראל הקיץ חם ויבש, ואת רוב הגשם מקבלים בחורף.",
+          "ar": "في إسرائيل الصيف حار وجاف، ومعظم المطر ينزل في الشتاء.",
+          "ru": "В Израиле лето жаркое и сухое, а дожди идут в основном зимой.",
+          "en": "In Israel summer is hot and dry, and most rain falls in winter."
+        },
         "correct": 0
       },
       {
@@ -1320,6 +1506,12 @@ var SCIENCE_DATA=[
             "en": "Autumn"
           }
         ],
+        "why": {
+          "he": "בישראל החורף לרוב קריר וגשום, ובקיץ כמעט אין גשם.",
+          "ar": "في إسرائيل الشتاء غالبًا بارد وممطر، وفي الصيف لا يكاد ينزل مطر.",
+          "ru": "В Израиле зима обычно прохладная и дождливая, а летом дождя почти нет.",
+          "en": "In Israel winter is usually cool and rainy, and there is almost no rain in summer."
+        },
         "correct": 0
       },
       {
@@ -1355,6 +1547,12 @@ var SCIENCE_DATA=[
             "en": "Autumn"
           }
         ],
+        "why": {
+          "he": "באביב מתחמם אחרי גשמי החורף, ולכן פורחים הרבה פרחים.",
+          "ar": "في الربيع يصبح الجو أدفأ بعد أمطار الشتاء، لذلك تتفتح أزهار كثيرة.",
+          "ru": "Весной теплеет после зимних дождей, поэтому распускается много цветов.",
+          "en": "Spring gets warmer after the winter rain, so many flowers bloom."
+        },
         "correct": 0
       },
       {
@@ -1390,6 +1588,12 @@ var SCIENCE_DATA=[
             "en": "Spring"
           }
         ],
+        "why": {
+          "he": "בסתיו מתקרר, ויש עצים שמשירים את העלים לפני החורף.",
+          "ar": "في الخريف يبرد الجو، وبعض الأشجار تُسقط أوراقها قبل الشتاء.",
+          "ru": "Осенью холодает, и некоторые деревья сбрасывают листья перед зимой.",
+          "en": "In autumn it gets cooler, and some trees drop their leaves before winter."
+        },
         "correct": 0
       },
       {
@@ -1425,6 +1629,12 @@ var SCIENCE_DATA=[
             "en": "Seven"
           }
         ],
+        "why": {
+          "he": "השנה מתחלקת לחורף, אביב, קיץ וסתיו, ואלה ארבע עונות.",
+          "ar": "تنقسم السنة إلى شتاء وربيع وصيف وخريف، وهذه أربعة فصول.",
+          "ru": "Год делится на зиму, весну, лето и осень, и это четыре времени года.",
+          "en": "A year has winter, spring, summer and autumn, and that makes four seasons."
+        },
         "correct": 0
       },
       {
@@ -1460,6 +1670,12 @@ var SCIENCE_DATA=[
             "en": "What is in the drawer"
           }
         ],
+        "why": {
+          "he": "מזג האוויר עוזר לנו לדעת מה ללבוש ומה לקחת איתנו.",
+          "ar": "الطقس يساعدنا أن نعرف ماذا نلبس وماذا نأخذ معنا.",
+          "ru": "Погода подсказывает, что надеть и что взять с собой.",
+          "en": "The weather tells us what to wear and what to take with us."
+        },
         "correct": 0
       },
       {
@@ -1495,6 +1711,12 @@ var SCIENCE_DATA=[
             "en": "Sandals"
           }
         ],
+        "why": {
+          "he": "מעיל שומר על הגוף חם ויבש כשקר ויורד גשם.",
+          "ar": "المعطف يُبقي الجسم دافئًا وجافًا عندما يكون الجو باردًا وماطرًا.",
+          "ru": "Куртка сохраняет тело тёплым и сухим, когда холодно и идёт дождь.",
+          "en": "A coat keeps your body warm and dry when it is cold and rainy."
+        },
         "correct": 0
       },
       {
@@ -1530,6 +1752,12 @@ var SCIENCE_DATA=[
             "en": "Another winter"
           }
         ],
+        "why": {
+          "he": "העונות באות תמיד באותו סדר, חורף ואז אביב, קיץ וסתיו.",
+          "ar": "تأتي الفصول دائمًا بالترتيب نفسه، شتاء ثم ربيع ثم صيف ثم خريف.",
+          "ru": "Времена года всегда идут по порядку, зима, потом весна, лето и осень.",
+          "en": "The seasons always come in the same order, winter, then spring, summer and autumn."
+        },
         "correct": 0
       },
       {
@@ -1565,6 +1793,12 @@ var SCIENCE_DATA=[
             "en": "We do not drink at all"
           }
         ],
+        "why": {
+          "he": "בחום הגוף מאבד מים, ולכן צריך לשתות הרבה.",
+          "ar": "في الحر يفقد الجسم الماء، لذلك نحتاج أن نشرب كثيرًا.",
+          "ru": "В жару тело теряет воду, поэтому нужно много пить.",
+          "en": "In the heat the body loses water, so we need to drink a lot."
+        },
         "correct": 0
       },
       {
@@ -1600,6 +1834,12 @@ var SCIENCE_DATA=[
             "en": "A clear blue sky"
           }
         ],
+        "why": {
+          "he": "הגשם יורד מעננים, ועננים אפורים מלאים בטיפות מים.",
+          "ar": "المطر ينزل من الغيوم، والغيوم الرمادية مليئة بقطرات الماء.",
+          "ru": "Дождь идёт из туч, а серые тучи полны капель воды.",
+          "en": "Rain falls from clouds, and gray clouds are full of water drops."
+        },
         "correct": 0
       }
     ]
@@ -1686,6 +1926,12 @@ var SCIENCE_DATA=[
             "en": "Glue"
           }
         ],
+        "why": {
+          "he": "אנשים צריכים מים כדי לחיות, ולכן שותים אותם כל יום.",
+          "ar": "يحتاج الناس إلى الماء ليعيشوا، لذلك نشربه كل يوم.",
+          "ru": "Людям вода нужна для жизни, поэтому мы пьём её каждый день.",
+          "en": "People need water to live, so we drink it every day."
+        },
         "correct": 0
       },
       {
@@ -1721,6 +1967,12 @@ var SCIENCE_DATA=[
             "en": "Cold air"
           }
         ],
+        "why": {
+          "he": "כשמים קרים מאוד הם קופאים ונהיים קשים, וכך נוצר קרח.",
+          "ar": "عندما يبرد الماء كثيرًا يتجمد ويصبح صلبًا، وهكذا يتكوّن الجليد.",
+          "ru": "Когда вода сильно остывает, она замерзает и твердеет, так получается лёд.",
+          "en": "When water gets very cold it freezes and turns hard, and that is ice."
+        },
         "correct": 0
       },
       {
@@ -1756,6 +2008,12 @@ var SCIENCE_DATA=[
             "en": "A pencil"
           }
         ],
+        "why": {
+          "he": "צמחים, אנשים וחיות צריכים מים, וכיסא, ספר ועיפרון לא חיים.",
+          "ar": "النباتات والناس والحيوانات تحتاج إلى الماء، أما الكرسي والكتاب والقلم فلا تعيش.",
+          "ru": "Растениям, людям и животным нужна вода, а стул, книга и карандаш не живые.",
+          "en": "Plants, people and animals need water, but a chair, a book and a pencil are not alive."
+        },
         "correct": 0
       },
       {
@@ -1791,6 +2049,12 @@ var SCIENCE_DATA=[
             "en": "Water with paint from painting"
           }
         ],
+        "why": {
+          "he": "מים מלוכלכים יכולים לגרום למחלה, ולכן שותים רק מים שמיועדים לשתייה.",
+          "ar": "الماء المتسخ قد يسبب المرض، لذلك نشرب فقط الماء المخصص للشرب.",
+          "ru": "Грязная вода может вызвать болезнь, поэтому пьём только питьевую воду.",
+          "en": "Dirty water can make you sick, so we drink only water that is safe to drink."
+        },
         "correct": 0
       },
       {
@@ -1826,6 +2090,12 @@ var SCIENCE_DATA=[
             "en": "Pour water on the floor"
           }
         ],
+        "why": {
+          "he": "מים שזורמים בלי צורך הולכים לבזבוז, וחשוב לשמור עליהם.",
+          "ar": "الماء الذي يجري بلا حاجة يضيع، ومن المهم أن نحافظ عليه.",
+          "ru": "Вода, которая течёт зря, пропадает, а её важно беречь.",
+          "en": "Water that runs when no one needs it is wasted, and it is important to save it."
+        },
         "correct": 0
       },
       {
@@ -1861,6 +2131,12 @@ var SCIENCE_DATA=[
             "en": "A key"
           }
         ],
+        "why": {
+          "he": "מים זורמים ומקבלים את הצורה של הכלי, ואבן או כדור לא זורמים.",
+          "ar": "الماء يجري ويأخذ شكل الوعاء، أما الحجر والكرة فلا يجريان.",
+          "ru": "Вода течёт и принимает форму посуды, а камень и мяч не текут.",
+          "en": "Water flows and takes the shape of its container, but a stone or a ball does not flow."
+        },
         "correct": 0
       },
       {
@@ -1896,6 +2172,12 @@ var SCIENCE_DATA=[
             "en": "It always stays hard"
           }
         ],
+        "why": {
+          "he": "קרח הוא מים שקפאו, והשמש מחממת אותו עד שהוא כבר לא קפוא.",
+          "ar": "الجليد ماء تجمد، والشمس تُدفئه حتى لا يبقى متجمدًا.",
+          "ru": "Лёд является замёрзшей водой, а солнце греет его, пока он не перестанет быть замёрзшим.",
+          "en": "Ice is frozen water, and the sun warms it until it is no longer frozen."
+        },
         "correct": 0
       },
       {
@@ -1931,6 +2213,12 @@ var SCIENCE_DATA=[
             "en": "Inside the school bag"
           }
         ],
+        "why": {
+          "he": "במקפיא קר מאוד, ומים קופאים רק בקור גדול.",
+          "ar": "في المجمِّد برد شديد، والماء يتجمد فقط في البرد الشديد.",
+          "ru": "В морозилке очень холодно, а вода замерзает только на сильном холоде.",
+          "en": "The freezer is very cold, and water freezes only when it is very cold."
+        },
         "correct": 0
       },
       {
@@ -1966,6 +2254,12 @@ var SCIENCE_DATA=[
             "en": "We rinse our mouth ten times"
           }
         ],
+        "why": {
+          "he": "בזמן הצחצוח לא צריך מים, ולכן אין סיבה שהם יזרמו.",
+          "ar": "في أثناء التنظيف لا نحتاج الماء، فلا داعي أن يبقى جاريًا.",
+          "ru": "Пока чистим зубы, вода не нужна, и ей незачем течь.",
+          "en": "While brushing you do not need water, so there is no reason to let it run."
+        },
         "correct": 0
       },
       {
@@ -2001,6 +2295,12 @@ var SCIENCE_DATA=[
             "en": "In a dry branch"
           }
         ],
+        "why": {
+          "he": "ים ונהר מלאים במים, ואבן, חול במדבר וענף יבש הם יבשים.",
+          "ar": "البحر والنهر مليئان بالماء، أما الحجر ورمل الصحراء والغصن اليابس فجافة.",
+          "ru": "Море и река полны воды, а камень, песок пустыни и сухая ветка сухие.",
+          "en": "Seas and rivers are full of water, while stones, desert sand and dry branches are dry."
+        },
         "correct": 0
       }
     ]
@@ -2087,6 +2387,12 @@ var SCIENCE_DATA=[
             "en": "A notebook"
           }
         ],
+        "why": {
+          "he": "השמש היא כוכב גדול שנותן אור, ולכן ביום יש אור.",
+          "ar": "الشمس نجم كبير يعطي الضوء، لذلك يكون النهار مضيئًا.",
+          "ru": "Солнце является большой звездой, которая даёт свет, поэтому днём светло.",
+          "en": "The Sun is a big star that gives light, so it is bright in the daytime."
+        },
         "correct": 0
       },
       {
@@ -2122,6 +2428,12 @@ var SCIENCE_DATA=[
             "en": "The chair"
           }
         ],
+        "why": {
+          "he": "כדור הארץ מסתובב, ולכן כל מקום פונה פעם אל השמש ופעם לא.",
+          "ar": "الأرض تدور، لذلك يتجه كل مكان مرة نحو الشمس ومرة لا.",
+          "ru": "Земля вращается, поэтому каждое место то повёрнуто к Солнцу, то нет.",
+          "en": "The Earth turns, so each place faces the Sun at some times and not at others."
+        },
         "correct": 0
       },
       {
@@ -2157,6 +2469,12 @@ var SCIENCE_DATA=[
             "en": "It is always cold there"
           }
         ],
+        "why": {
+          "he": "השמש מאירה את הצד של כדור הארץ שפונה אליה, ושם יש אור.",
+          "ar": "الشمس تضيء جانب الأرض المتجه نحوها، وهناك يكون الضوء.",
+          "ru": "Солнце освещает ту сторону Земли, которая к нему повёрнута, и там светло.",
+          "en": "The Sun lights the side of the Earth that faces it, so it is bright there."
+        },
         "correct": 0
       },
       {
@@ -2192,6 +2510,12 @@ var SCIENCE_DATA=[
             "en": "When looking at the floor"
           }
         ],
+        "why": {
+          "he": "ביום אור השמש חזק יותר מהכוכבים, ובלילה החושך עוזר לראות אותם.",
+          "ar": "في النهار ضوء الشمس أقوى من النجوم، وفي الليل تساعدنا العتمة على رؤيتها.",
+          "ru": "Днём солнечный свет ярче звёзд, а ночью в темноте их хорошо видно.",
+          "en": "In the day sunlight is brighter than the stars, and at night the dark helps us see them."
+        },
         "correct": 0
       },
       {
@@ -2227,6 +2551,12 @@ var SCIENCE_DATA=[
             "en": "Yes, with ordinary sunglasses"
           }
         ],
+        "why": {
+          "he": "אור השמש חזק מאוד ויכול לפגוע בעיניים, גם עם משקפי שמש.",
+          "ar": "ضوء الشمس قوي جدًا وقد يؤذي العينين، حتى مع نظارات شمسية.",
+          "ru": "Солнечный свет очень яркий и может навредить глазам, даже в солнечных очках.",
+          "en": "Sunlight is very strong and can hurt your eyes, even with sunglasses."
+        },
         "correct": 0
       },
       {
@@ -2262,6 +2592,12 @@ var SCIENCE_DATA=[
             "en": "Always winter"
           }
         ],
+        "why": {
+          "he": "כדור הארץ ממשיך להסתובב, ולכן המקום שלנו חוזר לפנות אל השמש.",
+          "ar": "الأرض تستمر في الدوران، لذلك يعود مكاننا ليتجه نحو الشمس.",
+          "ru": "Земля продолжает вращаться, поэтому наше место снова поворачивается к Солнцу.",
+          "en": "The Earth keeps turning, so our place faces the Sun again."
+        },
         "correct": 0
       },
       {
@@ -2297,6 +2633,12 @@ var SCIENCE_DATA=[
             "en": "A bright blue sky"
           }
         ],
+        "why": {
+          "he": "בלילה השמש לא מאירה אצלנו, ולכן אפשר לראות את הירח והכוכבים.",
+          "ar": "في الليل لا تضيء الشمس عندنا، لذلك يمكن رؤية القمر والنجوم.",
+          "ru": "Ночью Солнце у нас не светит, поэтому видны Луна и звёзды.",
+          "en": "At night the Sun is not lighting our place, so we can see the moon and stars."
+        },
         "correct": 0
       },
       {
@@ -2332,6 +2674,12 @@ var SCIENCE_DATA=[
             "en": "After breakfast"
           }
         ],
+        "why": {
+          "he": "בלילה חשוך ושקט, והגוף נח כדי שיהיה לו כוח ליום חדש.",
+          "ar": "في الليل يكون الظلام والهدوء، فيرتاح الجسم ليكون عنده قوة ليوم جديد.",
+          "ru": "Ночью темно и тихо, и тело отдыхает, чтобы набраться сил на новый день.",
+          "en": "At night it is dark and quiet, and the body rests to get strength for a new day."
+        },
         "correct": 0
       },
       {
@@ -2367,6 +2715,12 @@ var SCIENCE_DATA=[
             "en": "The moon hides the sun"
           }
         ],
+        "why": {
+          "he": "כדור הארץ מסתובב, ובלילה האור של השמש מגיע לצד השני שלו.",
+          "ar": "الأرض تدور، وفي الليل يصل ضوء الشمس إلى جانبها الآخر.",
+          "ru": "Земля вращается, и ночью солнечный свет попадает на другую её сторону.",
+          "en": "The Earth turns, and at night the sunlight reaches its other side."
+        },
         "correct": 0
       },
       {
@@ -2402,6 +2756,12 @@ var SCIENCE_DATA=[
             "en": "It sleeps like we do"
           }
         ],
+        "why": {
+          "he": "השמש לא נעלמת, וכשכדור הארץ מסתובב היא מאירה את הצד השני שלו.",
+          "ar": "الشمس لا تختفي، وعندما تدور الأرض تضيء الشمس جانبها الآخر.",
+          "ru": "Солнце не исчезает, и пока Земля вращается, оно освещает другую её сторону.",
+          "en": "The Sun does not disappear, and as the Earth turns it lights the other side."
+        },
         "correct": 0
       }
     ]

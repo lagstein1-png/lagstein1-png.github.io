@@ -140,15 +140,18 @@ function renderPractice(){
   var q=curQ(), dots="", l=state.lang, d=dirOf(l), si=stimInfo(q);
   for(var i=0;i<R.qs.length;i++)dots+='<i class="'+(i<R.i?"d":i===R.i?"c":"")+'"></i>';
   var opts=q.opts.map(function(_,i){
-    var o=optInfo(q,i);
-    return '<div class="optwrap"><button class="opt'+(o.big?' bigopt':'')+'" lang="'+o.lang+'" dir="'+dirOf(o.lang)+'" data-i="'+i+'" id="opt'+i+'"'+(o.alt?' aria-label="'+esc(o.alt)+'"':'')+'>'+esc(o.text)+'</button><button class="spk" data-opt="'+i+'" aria-label="'+t("play")+': '+esc(o.speak||o.text)+'">🔊</button></div>';
+    /* המצב חוזר מ-R ולא מה-DOM. render() רץ גם באמצע שאלה (מעבר שפה),
+       ובלעדי זה התשובה שכבר נענתה נמחקת, כפתור הבא נעלם והמסך קופא. */
+    var o=optInfo(q,i), cls="opt"+(o.big?" bigopt":""), off=R.gone[i]&&i!==q.ans;
+    if(R.locked&&i===q.ans)cls+=" right"; else if(off)cls+=" soft";
+    return '<div class="optwrap"><button class="'+cls+'" lang="'+o.lang+'" dir="'+dirOf(o.lang)+'" data-i="'+i+'" id="opt'+i+'"'+(off?" disabled":"")+(o.alt?' aria-label="'+esc(o.alt)+'"':'')+'>'+esc(o.text)+'</button><button class="spk" data-opt="'+i+'" aria-label="'+t("play")+': '+esc(o.speak||o.text)+'">🔊</button></div>';
   }).join("");
   var stim=si?'<div class="stim">'+(si.listen?'<button class="bigbtn play stimplay" id="stimPlay"><span>🔊</span> '+t("play")+'</button>':'')+(si.html?'<div class="sentEn" lang="en" dir="ltr">'+si.html+'</div>':'')+'</div>':'';
   return topbar(uTitle(unit),1)+'<main class="prac"><div class="prog" role="img" aria-label="'+t("qOf",{n:R.i+1,m:R.qs.length})+'">'+dots+'</div>'+
    playRow()+'<div class="stage"><div class="sent" lang="'+l+'" dir="'+d+'" id="qtext">'+mk(promptText(q)).html+'</div>'+stim+'</div><div class="opts">'+opts+'</div>'+
-   '<div class="fb" id="fb" role="status"></div>'+
+   '<div class="fb'+(R.fb?" "+R.fb.c:"")+'" id="fb" role="status">'+(R.fb?esc(R.fb.m()):"")+'</div>'+
    '<div class="helprow"><button class="hbtn hint" id="hintBtn">💡 '+t("hintBtn")+'</button><button class="hbtn limor" id="limorBtn"><span class="lav">ל</span> '+t("limorBtn")+'</button></div>'+
-   '<button class="cta next" id="nextBtn" style="--c:'+unit.color+'">'+t("next")+'</button></main>';
+   '<button class="cta next'+(R.locked?" show":"")+'" id="nextBtn" style="--c:'+unit.color+'">'+t("next")+'</button></main>';
 }
 function startRound(u){
   unit=u;R={qs:buildRound(u),i:0,tries:0,hints:0,streak:0,locked:false,gone:{}};view="practice";render();
@@ -161,14 +164,16 @@ function wirePractice(){
   $("#hintBtn").onclick=hint;$("#limorBtn").onclick=openLimor;
   $("#nextBtn").onclick=nextQ;
 }
-function say(msg,cls){var f=$("#fb");f.className="fb "+(cls||"");f.textContent=msg;}
+/* say מקבלת פונקציה שבונה את הטקסט, ולא את הטקסט עצמו. R.fb שומר אותה, והציור מפעיל אותה
+   שוב — כך שאחרי מעבר שפה המשוב נבנה מחדש בשפה החדשה. */
+function say(m,cls){var f=$("#fb");f.className="fb "+(cls||"");f.textContent=m();if(R)R.fb={m:m,c:cls||""};}
 function answer(i){
   if(R.locked||R.gone[i])return;
   var q=curQ(),b=$("#opt"+i);
   if(i===q.ans){
     R.locked=true;R.streak++;b.classList.add("right");
-    var msg=(R.streak===3)?t("streak"):t("good"+(1+rnd(4)));
-    say("✔ "+msg,"ok");confetti(R.streak>=3?44:22);
+    var key=(R.streak===3)?"streak":"good"+(1+rnd(4)),msg=t(key);
+    say(function(){return "✔ "+t(key)},"ok");confetti(R.streak>=3?44:22);
     $("#nextBtn").classList.add("show");
     speakSeq([{t:msg,lang:state.lang}]);
   }else{
@@ -176,15 +181,15 @@ function answer(i){
     if(R.tries>=2){
       R.locked=true;$("#opt"+q.ans).classList.add("right");
       var o=optInfo(q,q.ans),shown=q.kind==="meaning"&&state.lang==="en"?q.opts[q.ans].en:o.text;
-      say(t("reveal")+" "+shown,"rev");$("#nextBtn").classList.add("show");
+      say(function(){var o2=optInfo(q,q.ans);return t("reveal")+" "+(q.kind==="meaning"&&state.lang==="en"?q.opts[q.ans].en:o2.text)},"rev");$("#nextBtn").classList.add("show");
       speakSeq([{t:t("reveal"),lang:state.lang},{t:o.speak,lang:o.lang}]);
-    }else{say(t("try1"),"try");speakSeq([{t:t("try1"),lang:state.lang}])}
+    }else{say(function(){return t("try1")},"try");speakSeq([{t:t("try1"),lang:state.lang}])}
   }
 }
 function nextQ(){
   stopSpeech();
   if(R.i+1>=R.qs.length){state.done[unit.id]=true;save();view="done";render();confetti(60);return}
-  R.i++;R.tries=0;R.hints=0;R.locked=false;R.gone={};render();window.scrollTo(0,0);
+  R.i++;R.tries=0;R.hints=0;R.locked=false;R.gone={};R.fb=null;render();window.scrollTo(0,0);
 }
 /* משאירים תמיד שתי אפשרויות. מי שכבר טעה פעם אחת נשאר לו מסיח אחד להסרה;
    לפני התיקון הוסרו שניים ונשארה רק התשובה הנכונה. */
@@ -196,8 +201,8 @@ function hintKey(q){return q.kind==="auth"?"h_auth":q.kind==="alisten"?"h_al":"h
 function hint(){
   if(R.locked)return;
   var q=curQ(),h=t(hintKey(q));R.hints++;
-  if(R.hints===1){say("💡 "+h,"hint");speakSeq([{t:h,lang:state.lang}])}
-  else if(R.hints===2){eliminate();say("💡 "+t("h2note")+" "+h,"hint");speakSeq([{t:t("h2note"),lang:state.lang}])}
+  if(R.hints===1){say(function(){return "💡 "+t(hintKey(q))},"hint");speakSeq([{t:h,lang:state.lang}])}
+  else if(R.hints===2){eliminate();say(function(){return "💡 "+t("h2note")+" "+t(hintKey(q))},"hint");speakSeq([{t:t("h2note"),lang:state.lang}])}
   else openLimor();
 }
 /* ---------- Limor help ---------- */

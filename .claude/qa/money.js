@@ -233,6 +233,7 @@ const PER = /^\s*(?:ל?חודש|לשנה|בחודש|בשנה|per (?:month|year)|
    בעין: שאלות ומשפטי קריאה, לא ממשק. */
 const CONTENT = {
   signup: {
+    'net-elem/js/data.js': [1, 'הסבר בטיחות ברשת (ru): ״кто-то пытается войти в аккаунт״ — חשבון של הלומד במשחק, לא באתר (O-174, 17.10.2026)'],
     'civics/index.html': [2, 'רישום נישואין בישראל — שאלת אזרחות (ru)'],
     'english/index.html': [6, 'קטע קריאה ״A youth center tested online sign-up״ (6 מ-16.10.2026: מסיח ״The paper sign-up forms disappeared״, O-222)'],
     'geography/index.html': [4, 'חובת רישום של מהגר — שאלת הגירה בארבע שפות'],

@@ -152,7 +152,7 @@ function renderPractice(){
   var m=mk(t(q.ins));
   return topbar(t(unit.id),1)+'<main class="prac"><div class="prog" aria-label="'+t("qOf",{n:R.i+1,m:R.qs.length})+'">'+dots+'</div>'+
    playRow()+'<p class="ins" id="ins">'+m.html+'</p><div class="stage">'+itemHtml(q)+'</div><div class="opts">'+opts+'</div>'+
-   '<div class="fb'+(R.fb?" "+R.fb.c:"")+'" id="fb" role="status">'+(R.fb?esc(R.fb.m):"")+'</div>'+
+   '<div class="fb'+(R.fb?" "+R.fb.c:"")+'" id="fb" role="status">'+(R.fb?esc(R.fb.m()):"")+'</div>'+
    '<div class="helprow"><button class="hbtn hint" id="hintBtn">💡 '+t("hintBtn")+'</button><button class="hbtn limor" id="limorBtn"><span class="lav">ל</span> '+t("limorBtn")+'</button></div>'+
    '<button class="cta next'+(R.locked?" show":"")+'" id="nextBtn" style="--c:'+unit.color+'">'+t("next")+'</button></main>';
 }
@@ -167,23 +167,25 @@ function wirePractice(){
   $("#hintBtn").onclick=hint;$("#limorBtn").onclick=openLimor;
   $("#nextBtn").onclick=nextQ;
 }
-function say(msg,cls){var f=$("#fb");f.className="fb "+(cls||"");f.textContent=msg;if(R)R.fb={m:msg,c:cls||""};}
+/* say מקבלת פונקציה שבונה את הטקסט, ולא את הטקסט עצמו. R.fb שומר אותה, והציור מפעיל אותה
+   שוב — כך שאחרי מעבר שפה המשוב נבנה מחדש בשפה החדשה. */
+function say(m,cls){var f=$("#fb");f.className="fb "+(cls||"");f.textContent=m();if(R)R.fb={m:m,c:cls||""};}
 function answer(i){
   if(R.locked||R.gone[i])return;
   var q=curQ(),b=$("#opt"+i);
   if(i===q.ans){
     R.locked=true;R.streak++;b.classList.add("right");
-    var msg=(R.streak===3)?t("streak"):t("good"+(1+rnd(4)));
-    say("✔ "+msg,"ok");confetti(R.streak>=3?44:22);
+    var key=(R.streak===3)?"streak":"good"+(1+rnd(4)),msg=t(key);
+    say(function(){return "✔ "+t(key)},"ok");confetti(R.streak>=3?44:22);
     $("#nextBtn").classList.add("show");sfx(true);
     speakSeq([{t:msg,lang:state.lang}]);
   }else{
     R.streak=0;R.tries++;R.gone[i]=1;b.classList.add("soft");b.disabled=true;
     if(R.tries>=2){
       R.locked=true;$("#opt"+q.ans).classList.add("right");
-      say(t("reveal")+" "+q.reveal,"rev");$("#nextBtn").classList.add("show");
+      say(function(){return t("reveal")+" "+q.reveal},"rev");$("#nextBtn").classList.add("show");
       speakSeq([{t:t("reveal"),lang:state.lang},{t:q.reveal,lang:"he"}]);
-    }else{say(t("try1"),"try");speakSeq([{t:t("try1"),lang:state.lang}])}
+    }else{say(function(){return t("try1")},"try");speakSeq([{t:t("try1"),lang:state.lang}])}
   }
 }
 function nextQ(){
@@ -198,8 +200,8 @@ function eliminate(){
 function hint(){
   if(R.locked)return;
   var q=curQ();R.hints++;
-  if(R.hints===1){say("💡 "+t(q.h),"hint");speakSeq([{t:t(q.h),lang:state.lang}])}
-  else if(R.hints===2){eliminate();say("💡 "+t("h2note")+" "+t(q.h),"hint");speakSeq([{t:t("h2note"),lang:state.lang}])}
+  if(R.hints===1){say(function(){return "💡 "+t(q.h)},"hint");speakSeq([{t:t(q.h),lang:state.lang}])}
+  else if(R.hints===2){eliminate();say(function(){return "💡 "+t("h2note")+" "+t(q.h)},"hint");speakSeq([{t:t("h2note"),lang:state.lang}])}
   else openLimor();
 }
 /* ---------- Limor help ---------- */

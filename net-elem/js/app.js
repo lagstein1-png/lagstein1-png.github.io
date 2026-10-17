@@ -100,7 +100,7 @@ function renderPractice(){
   var st=storyById(q.story);
   return topbar(uTitle(unit),1)+'<main class="prac"><div class="prog" role="img" aria-label="'+t("qOf",{n:R.i+1,m:R.qs.length})+'">'+dots+'</div>'+
    playRow()+'<div class="stage">'+(unit.id==="mix"?'<div class="emoji" role="img" aria-label="'+esc(st.title[l])+'">'+topicIcon()+'</div>':'<div class="emoji" aria-hidden="true">'+topicIcon()+'</div>')+'<div class="sent" lang="'+l+'" dir="'+d+'" id="qtext">'+mk(qText(q)).html+'</div></div><div class="opts">'+opts+'</div>'+
-   '<div class="fb'+(R.fb?" "+R.fb.c:"")+'" id="fb" role="status">'+(R.fb?esc(R.fb.m):"")+'</div>'+whyHtml(q)+
+   '<div class="fb'+(R.fb?" "+R.fb.c:"")+'" id="fb" role="status">'+(R.fb?esc(R.fb.m()):"")+'</div>'+whyHtml(q)+
    '<div class="helprow"><button class="hbtn hint" id="hintBtn">? '+t("hintBtn")+'</button><button class="hbtn limor" id="limorBtn"><span class="lav"><img src="/img/limor.jpg" alt=""></span> '+t("limorBtn")+'</button></div>'+
    '<button class="cta next'+(R.locked?" show":"")+'" id="nextBtn" style="--c:'+unit.color+'">'+t("next")+'</button></main>';
 }
@@ -114,7 +114,9 @@ function wirePractice(){
   $("#hintBtn").onclick=hint;$("#limorBtn").onclick=openLimor;
   $("#nextBtn").onclick=nextQ;
 }
-function say(msg,cls){var f=$("#fb");f.className="fb "+(cls||"");f.textContent=msg;if(R)R.fb={m:msg,c:cls||""};}
+/* O-174: say takes a function that builds the text, not the text itself. R.fb keeps that function, and the
+   render calls it again — so after a language switch the feedback is rebuilt in the new language, like whyHtml. */
+function say(m,cls){var f=$("#fb");f.className="fb "+(cls||"");f.textContent=m();if(R)R.fb={m:m,c:cls||""};}
 /* O-174: the optional explanation (Y line in js/data.js). It appears only once the question is closed,
    so it never gives the answer away while the learner still has a try. No `why` = the screen and the speech stay as before. */
 function whyOf(q,l){return q.why&&q.why[l||state.lang]||""}
@@ -126,13 +128,13 @@ function answer(i){
   var q=curQ(),b=$("#opt"+i);
   if(i===q.ans){
     R.locked=true;R.streak++;b.classList.add("right");
-    var msg=(R.streak===3)?t("streak"):t("good"+(1+rnd(4)));
-    say("✔ "+msg,"ok");confetti(22);
+    var key=(R.streak===3)?"streak":"good"+(1+rnd(4)),msg=t(key);
+    say(function(){return "✔ "+t(key)},"ok");confetti(22);
     $("#nextBtn").classList.add("show");
     speakSeq(withWhy(q,[{t:msg,lang:state.lang}]));
   }else{
     R.streak=0;R.tries++;R.gone[i]=1;b.classList.add("soft");b.disabled=true;
-    say(t("try1"),"try");speakSeq([{t:t("try1"),lang:state.lang}]);
+    say(function(){return t("try1")},"try");speakSeq([{t:t("try1"),lang:state.lang}]);
   }
 }
 function nextQ(){
@@ -143,9 +145,9 @@ function nextQ(){
 }
 function hint(){
   if(R.locked)return;
-  var q=curQ(),h=NET_HINTS[q.story][state.lang];R.hints++;
-  if(R.hints===1){say("? "+h,"hint");speakSeq([{t:h,lang:state.lang}])}
-  else if(R.hints===2){say("? "+t("h2note")+" "+h,"hint");speakSeq([{t:t("h2note"),lang:state.lang},{t:h,lang:state.lang}])}
+  var q=curQ(),hf=function(){return NET_HINTS[q.story][state.lang]},h=hf();R.hints++;
+  if(R.hints===1){say(function(){return "? "+hf()},"hint");speakSeq([{t:h,lang:state.lang}])}
+  else if(R.hints===2){say(function(){return "? "+t("h2note")+" "+hf()},"hint");speakSeq([{t:t("h2note"),lang:state.lang},{t:h,lang:state.lang}])}
   else openLimor();
 }
 /* ---------- Limor help ---------- */
