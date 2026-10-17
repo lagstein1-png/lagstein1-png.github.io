@@ -74,7 +74,7 @@
     node .claude/qa/century.js           # המאה בארבע השפות — על הפונקציה האמיתית שבאפליקציה
     node .claude/qa/content806.js        # סריקת התוכן של bagrut-806 (הבנק הסטטי) — כותב את הדוח. שם אפליקציה כארגומנט: bagrut-history
     node .claude/qa/hebank.js            # סריקת התוכן של hebrew — bank.json, עברית בלבד; QA_BANK מצביע על מאגר חלופי
-    node .claude/qa/engine.js            # המנוע המשותף — האם העותקים בכל האפליקציות עדיין זהים
+    node .claude/qa/engine.js            # המנוע המשותף — האם העותקים בכל האפליקציות עדיין זהים; גם משפחת `js/` (כל `*/js/engine.js` עם `makeQ`): בניית השאלה, `say` ושדה ההסבר
     node .claude/qa/tutor.js             # ״עזרה מהמורה״ — השומרים בשרת, החיווט בלקוח, ושער התנאים
     node .claude/qa/offer.js             # הצעה שלימור מציעה (״נעבור ל…״) מתקיימת בפועל
     node .claude/qa/simplify.js          # ״גרסה פשוטה״ ב-reader — רק בלחיצה, רק במצב simplify, ובלי שרת

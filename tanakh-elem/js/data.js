@@ -116,7 +116,7 @@ Q איך קראו לאישה הראשונה?|ماذا كان اسم المرأة
 Q איזה בעל חיים דיבר אל חוה?|أي حيوان تكلم مع حواء؟|Какое животное говорило с Евой?|Which animal spoke to Eve?|snake|dove,lion,camel
 Q מאיזה עץ אסור היה לאכול?|من أي شجرة لم يكن مسموحًا الأكل؟|С какого дерева нельзя было есть?|Which tree were they not allowed to eat from?|knowledge|fig,olive,palm
 Q מכמה עצים אסור היה לאכול?|من كم شجرة لم يكن مسموحًا الأكل؟|Со скольких деревьев нельзя было есть?|From how many trees were they not allowed to eat?|n1|n2,n3,n4
-Q מי ידע מה קרה בגן?|من عرف ما حدث في الجنة؟|Кто узнал, что случилось в саду?|Who knew what happened in the garden?|god|noah,david,pharaoh
+Q מי ידע מה קרה בגן?|من عرف ما حدث في الجنة؟|Кто узнал, что случилось в саду?|Who knew what happened in the garden?|god|noah,benjamin,pharaoh
 Q מי אכל מהעץ אחרי חוה?|من أكل من الشجرة بعد حواء؟|Кто съел плод после Евы?|Who ate from the tree after Eve?|adam|t_noah_n2,t_moses_n2,t_jacob_n2
 Q מה מלמד הסיפור? חשוב לשמור על...|ماذا تعلّمنا القصة؟ من المهم أن نلتزم...|Чему учит история? Важно соблюдать...|What does the story teach? It is important to keep...|t_rules|t_games,t_sleep,t_quietclass
 E t_rules|t|ההוראות|التعليمات|правила|the instructions
@@ -394,7 +394,7 @@ Q מה אומרת מצווה אחת מהעשרת הדיברות?|ماذا تقو
 Q איזה יום מיוחד הדיברות מזכירים?|أي يوم مميز تذكّره الوصايا؟|Какой особый день упоминают заповеди?|Which special day do the commandments mention?|shabbat|purim,pesach,sukkot
 Q באיזה חג אנחנו זוכרים את מתן תורה?|في أي عيد نتذكّر إعطاء التوراة؟|В какой праздник мы вспоминаем дарование Торы?|On which holiday do we remember the giving of the Torah?|shavuot|purim,pesach,sukkot
 Q איפה העם חיכה כשמשה היה על ההר?|أين انتظر الشعب بينما كان موسى على الجبل؟|Где ждал народ, пока Моисей был на горе?|Where did the people wait while Moses was on the mountain?|t_foot|t_top,t_egypt_n,t_sea_n
-Q מי נתן את הדיברות למשה?|من أعطى الوصايا لموسى؟|Кто дал Моисею заповеди?|Who gave the commandments to Moses?|god|pharaoh,jethro,aaron
+Q מי נתן את הדיברות למשה?|من أعطى الوصايا لموسى؟|Кто дал Моисею заповеди?|Who gave the commandments to Moses?|god|abraham,jethro,aaron
 E t_tablets|t|על שני לוחות אבן|على لوحين من الحجر|на двух каменных скрижалях|on two stone tablets
 E t_paper|t|על נייר גדול וחלק|على ورقة كبيرة وملساء|на большом гладком листе бумаги|on a big smooth sheet of paper
 E t_wall_n|t|על קיר האוהל של משה|على جدار خيمة موسى|на стене шатра Моисея|on the wall of Moses' tent
@@ -420,7 +420,7 @@ L לעיר יריחו הייתה חומה גבוהה. אלוהים אמר ליה
 L שישה ימים הלכו סביב העיר פעם אחת בכל יום, עם שופרות. ביום השביעי הלכו שבע פעמים.|لمدة ستة أيام داروا حول المدينة مرة واحدة كل يوم، ومعهم أبواق. وفي اليوم السابع داروا سبع مرات.|Шесть дней они обходили город по разу в день, с шофарами. На седьмой день они обошли его семь раз.|For six days they walked around the city once each day, with shofars. On the seventh day they walked around it seven times.
 L אז כולם צעקו ותקעו בשופרות, והחומה נפלה.|ثم صرخ الجميع ونفخوا في الأبواق، فسقط السور.|Тогда все закричали и затрубили в шофары, и стена упала.|Then everyone shouted and blew the shofars, and the wall fell.
 L רחב ומשפחתה נשארו בשלום, כי היא עזרה לשני האנשים.|بقيت راحاب وعائلتها بسلام، لأنها ساعدت الرجلين.|Раав и её семья остались целы, потому что она помогла двум людям.|Rahab and her family stayed safe, because she helped the two men.
-Q מי הוביל את בני ישראל אחרי משה?|من قاد بني إسرائيل بعد موسى؟|Кто вёл Израиль после Моисея?|Who led the Israelites after Moses?|joshua|aaron,david,samuel
+Q מי הוביל את בני ישראל אחרי משה?|من قاد بني إسرائيل بعد موسى؟|Кто вёл Израиль после Моисея?|Who led the Israelites after Moses?|joshua|aaron,benjamin,samuel
 Q איזה נהר עברו בני ישראל?|أي نهر عبر بنو إسرائيل؟|Какую реку перешёл Израиль?|Which river did the Israelites cross?|jordan|nile,redsea,sea
 Q לאיזו ארץ נכנסו בני ישראל?|إلى أي أرض دخل بنو إسرائيل؟|В какую землю вошёл Израиль?|Which land did the Israelites enter?|canaan|egypt,midian,haran
 Q איזו עיר הייתה לה חומה גבוהה?|أي مدينة كان لها سور عالٍ؟|У какого города была высокая стена?|Which city had a high wall?|jericho|bethlehem,jerusalem,haran
@@ -430,7 +430,7 @@ Q כמה ימים הלכו סביב העיר פעם אחת בכל יום?|كم �
 Q כמה פעמים הלכו סביב העיר ביום השביעי?|كم مرة داروا حول المدينة في اليوم السابع؟|Сколько раз они обошли город на седьмой день?|How many times did they walk around the city on the seventh day?|n7|n3,n6,n10
 Q במה תקעו סביב העיר?|بماذا نفخوا حول المدينة؟|Во что они трубили вокруг города?|What did they blow around the city?|t_shofar|t_flute,t_bell,t_horn_car
 Q מה קרה לחומה בסוף?|ماذا حدث للسور في النهاية؟|Что случилось со стеной в конце?|What happened to the wall in the end?|t_fell|t_grew,t_flew_n,t_moved
-Q מי אמר ליהושע מה לעשות?|من قال ليشوع ماذا يفعل؟|Кто сказал Иисусу Навину, что делать?|Who told Joshua what to do?|god|pharaoh,saul,esau
+Q מי אמר ליהושע מה לעשות?|من قال ليشوع ماذا يفعل؟|Кто сказал Иисусу Навину, что делать?|Who told Joshua what to do?|god|pharaoh,saul,samuel
 Q למה רחב נשארה בשלום?|لماذا بقيت راحاب بسلام؟|Почему Раав осталась цела?|Why did Rahab stay safe?|t_helped|t_ran,t_hid_n,t_fought
 E t_shofar|t|בשופרות|بالأبواق|в шофары|shofars
 E t_flute|t|בחלילים|بالمزامير|во флейты|flutes
@@ -459,7 +459,7 @@ Q איזו עבודה עשה דוד?|أي عمل عمل داود؟|Какую р
 Q ממה דוד הציל את הכבשים? מאריה ומ...|ممن أنقذ داود الخراف؟ من أسد ومن...|От кого Давид спас овец? От льва и от...|What did David save the sheep from? A lion and a...|t_bear|t_dog,t_rabbit,t_snake_n
 Q באיזה כלי נגינה דוד ניגן?|على أي آلة عزف داود؟|На каком инструменте играл Давид?|Which instrument did David play?|t_harp|t_drum,t_piano,t_guitar
 Q מי היה המלך שאהב לשמוע את דוד מנגן?|من كان الملك الذي أحب أن يسمع داود يعزف؟|Какой царь любил слушать игру Давида?|Which king loved to hear David play?|saul|solomon,pharaoh,joshua
-Q מי היה החבר הטוב של דוד?|من كان صديق داود الجيد؟|Кто был хорошим другом Давида?|Who was David's good friend?|jonathan|goliath,esau,jesse
+Q מי היה החבר הטוב של דוד?|من كان صديق داود الجيد؟|Кто был хорошим другом Давида?|Who was David's good friend?|jonathan|goliath,abraham,jesse
 Q איך קראו ללוחם הענק?|ماذا كان اسم المحارب العملاق؟|Как звали великана-воина?|What was the giant warrior called?|goliath|saul,jesse,laban
 Q באיזה עמק עמד צבא גדול?|في أي وادٍ وقف جيش كبير؟|В какой долине стояла большая армия?|In which valley did a big army stand?|elah|jordan,sinai,jericho
 Q באיזה נשק דוד זרק את האבן?|بأي سلاح رمى داود الحجر؟|Чем Давид бросил камень?|What did David throw the stone with?|t_sling|t_bow,t_spear,t_catapult

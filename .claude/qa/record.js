@@ -513,7 +513,7 @@ function mathElemBank(text, fn) {
 }
 
 /* tanakh-elem/js/data.js: RAW הוא טקסט שורות. מוקלט כל הטקסט העברי שהאפליקציה מקריאה:
-   כותרת סיפור (S), משפט (L), שאלה (Q) ותשובה (E). שדה 'he' הוא הראשון אחרי הקידומת. */
+   כותרת סיפור (S), משפט (L), שאלה (Q), הסבר (Y, O-174) ותשובה (E). שדה 'he' הוא הראשון אחרי הקידומת. */
 function tanakhElem(text) {
   const k = text.indexOf('String.raw`');
   if (k < 0) throw new Error('tanakh-elem: RAW לא נמצא');
@@ -525,6 +525,7 @@ function tanakhElem(text) {
     if (kind === 'S') out.push(f[3]);
     else if (kind === 'L') out.push(f[0]);
     else if (kind === 'Q') out.push(f[0]);
+    else if (kind === 'Y') out.push(f[0]);
     else if (kind === 'E') out.push(f[2]);
   }
   return out;
@@ -553,7 +554,9 @@ function hebrewLit(dataText, i18nText) {
 }
 
 /* civics-elem/js/data.js: RAW הוא טקסט שורות. מוקלט כל הטקסט העברי שהאפליקציה מקריאה:
-   כותרת נושא (S), משפט (L), שאלה (Q) ותשובה (E). שדה 'he' הוא הראשון אחרי הקידומת. */
+   כותרת נושא (S), משפט (L), שאלה (Q), הסבר (Y, O-174) ותשובה (E). שדה 'he' הוא הראשון אחרי הקידומת.
+   אותו מסלול משמש את net-elem, culture-elem ו-history-elem. ב-science-12 ההסבר הוא
+   `"why":{"he":…}`, והוא נאסף בלולאת `"he":` הכללית שב-corpus — בלי מסלול משלו. */
 function civicsElem(text) {
   const k = text.indexOf('String.raw`');
   if (k < 0) throw new Error('civics-elem: RAW לא נמצא');
@@ -565,6 +568,7 @@ function civicsElem(text) {
     if (kind === 'S') out.push(f[3]);
     else if (kind === 'L') out.push(f[0]);
     else if (kind === 'Q') out.push(f[0]);
+    else if (kind === 'Y') out.push(f[0]);
     else if (kind === 'E') out.push(f[2]);
   }
   return out;

@@ -212,12 +212,12 @@ const FIXED_MIN = 3;
 const WHY_ELEM = 'נכתבו לפני שהמעבר נמדד (O-174); רובן מילה או צירוף מול מסיחים קצרים, ' +
                  'וחלקן רק בתרגום — כתיבת מסיחים באורך דומה בארבע השפות';
 const FAM_BASE = {
-  'hebrew-lit':   { long: 14, cells: 0,  why: 'הבנת הנקרא (u11/u12/u15) ומשפט חסר אחד ב-u6 — מסיחים כתובים־ביד קצרים מהתשובה' },
-  'tanakh-elem':  { long: 5,  cells: 1,  why: WHY_ELEM + '; והתא s2 [en] — הקצרה היא הנכונה ב-73%' },
-  'civics-elem':  { long: 18, cells: 0,  why: WHY_ELEM },
-  'culture-elem': { long: 27, cells: 0,  why: WHY_ELEM },
-  'history-elem': { long: 14, cells: 0,  why: WHY_ELEM },
-  'science-12':   { long: 9,  cells: 0,  why: WHY_ELEM },
+  'hebrew-lit':   { long: 0, cells: 0,  why: 'הבנת הנקרא (u11/u12/u15) ומשפט חסר אחד ב-u6 — מסיחים כתובים־ביד קצרים מהתשובה' },
+  'tanakh-elem':  { long: 0,  cells: 1,  why: WHY_ELEM + '; והתא s2 [en] — הקצרה היא הנכונה ב-73%' },
+  'civics-elem':  { long: 0, cells: 0,  why: WHY_ELEM },
+  'culture-elem': { long: 0, cells: 0,  why: WHY_ELEM },
+  'history-elem': { long: 0, cells: 0,  why: WHY_ELEM },
+  'science-12':   { long: 0,  cells: 0,  why: WHY_ELEM },
   'net-elem':     { long: 0,  cells: 0,  why: 'נקייה מ-17.10.2026 — עד אז הנכונה הייתה הארוכה ב-35 מתוך 35 (100% בעברית); 13 מסיחים נכתבו מחדש בארבע שפות' },
 };
 

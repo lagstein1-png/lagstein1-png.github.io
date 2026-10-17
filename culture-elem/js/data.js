@@ -43,6 +43,7 @@ E f_hamen|f|אוזן המן|أذن هامان|ухо Амана|a hamantash (a f
 E f_matz|f|מצה|فطير (ماتساه)|маца|matzah (flat, unleavened bread)
 E f_cheese|f|עוגת גבינה|كعكة الجبن|чизкейк|cheesecake (a cake of soft cheese)
 E f_apple|f|תפוח בדבש|تفاحة بالعسل|яблоко с мёдом|an apple dipped in honey
+E f_bbq|f|בשר על האש|لحم مشويّ على النار|шашлык на мангале|meat grilled on a barbecue
 E o_candl|o|נרות|شموع|свечи|candles
 E o_shofar|o|שופר|بوق الشوفار|шофар|a shofar
 E o_sukk|o|סוכה|سُكّا (كوخ)|сукка|a sukkah
@@ -92,9 +93,9 @@ L אוכלים תפוח בדבש ואומרים: שתהיה לנו שנה מתו
 L יום כיפור חל כעשרה ימים אחרי ראש השנה.|يأتي يوم الغفران بعد رأس السنة بنحو عشرة أيام.|Йом-Кипур наступает примерно через десять дней после Рош а-Шана.|Yom Kippur comes about ten days after Rosh Hashanah.
 L ביום כיפור צמים, מבקשים סליחה ומשתדלים להיות טובים יותר.|في يوم الغفران يصومون ويطلبون المسامحة ويحاولون أن يكونوا أفضل.|В Йом-Кипур постятся, просят прощения и стараются стать лучше.|On Yom Kippur people fast, ask for forgiveness and try to be better.
 L ביום כיפור אין מכוניות בכבישים, והילדים רוכבים על אופניים.|في يوم الغفران لا توجد سيارات في الشوارع والأولاد يركبون الدراجات.|В Йом-Кипур на дорогах нет машин, и дети катаются на велосипедах.|On Yom Kippur there are no cars on the roads, and children ride bikes.
-Q איזה חג יהודי חוגגים בסתיו, וכעשרה ימים אחריו בא יום כיפור?|أي عيد يهودي يُحتفل به في الخريف، ويأتي بعده بنحو عشرة أيام يوم الغفران؟|Какой еврейский праздник отмечают осенью, а примерно через десять дней после него наступает Йом-Кипур?|Which Jewish holiday is celebrated in autumn, with Yom Kippur about ten days later?|h_rosh|h_pur,h_han,h_pes
+Q איזה חג יהודי חוגגים בסתיו, וכעשרה ימים אחריו בא יום כיפור?|أي عيد يهودي يُحتفل به في الخريف، ويأتي بعده بنحو عشرة أيام يوم الغفران؟|Какой еврейский праздник отмечают осенью, а примерно через десять дней после него наступает Йом-Кипур?|Which Jewish holiday is celebrated in autumn, with Yom Kippur about ten days later?|h_rosh|h_pur,h_han,h_tub
 Q איזה כלי תוקעים בו בראש השנה?|في أي آلة ينفخون في رأس السنة؟|Во что трубят на Рош а-Шана?|What do people blow on Rosh Hashanah?|o_shofar|o_ragn,o_lulav,o_dreid
-Q מה אוכלים בראש השנה כדי לברך על שנה מתוקה?|ماذا يأكلون في رأس السنة لسنة حلوة؟|Что едят на Рош а-Шана ради сладкого года?|What do people eat on Rosh Hashanah for a sweet year?|f_apple|f_hamen,f_matz,f_cheese
+Q מה אוכלים בראש השנה כדי לברך על שנה מתוקה?|ماذا يأكلون في رأس السنة لسنة حلوة؟|Что едят на Рош а-Шана ради сладкого года?|What do people eat on Rosh Hashanah for a sweet year?|f_apple|f_hamen,f_sufg,f_cheese
 Q בערך כמה ימים עוברים מראש השנה עד יום כיפור?|تقريبًا كم يومًا بين رأس السنة ويوم الغفران؟|Примерно сколько дней между Рош а-Шана и Йом-Кипур?|About how many days are there from Rosh Hashanah to Yom Kippur?|n10|n3,n5,n40
 Q מה עושים ביום כיפור?|ماذا يفعلون في يوم الغفران؟|Что делают в Йом-Кипур?|What do people do on Yom Kippur?|e_fast|e_party,e_swim,e_shop
 E e_fast|t|צמים ומבקשים סליחה|يصومون ويطلبون المسامحة|постятся и просят прощения|they fast and ask for forgiveness
@@ -122,9 +123,9 @@ E xc_camel|t|על גמלים|على الجمال|на верблюдах|on came
 E xc_donkey|t|על חמורים|على الحمير|на ослах|on donkeys
 Q על מה רוכבים ילדים בכבישים ביום כיפור?|على ماذا يركب الأولاد في الشوارع يوم الغفران؟|На чём катаются дети по дорогам в Йом-Кипур?|What do children ride on the roads on Yom Kippur?|xc_bike|xc_horse,xc_camel,xc_donkey
 E xc_better|t|טובים יותר|أفضل وألطف|добрее и лучше|kinder and better
-E xc_faster|t|מהירים יותר|أسرع|быстрее|faster
-E xc_stronger|t|חזקים יותר|أقوى|сильнее|stronger
-E xc_richer|t|עשירים יותר|أغنى|богаче|richer
+E xc_faster|t|מהירים יותר|أسرع من قبل|быстрее, чем раньше|faster than before
+E xc_stronger|t|חזקים יותר|أقوى من قبل|сильнее, чем раньше|stronger than before
+E xc_richer|t|עשירים יותר|أغنى من قبل|богаче, чем раньше|richer than before
 Q ביום כיפור משתדלים להיות...|في يوم الغفران نحاول أن نكون...|В Йом-Кипур стараются стать...|On Yom Kippur, people try to be...|xc_better|xc_faster,xc_stronger,xc_richer
 S sukkot|🌿|#29853c|סוכות ושמחת תורה|سوكوت وفرحة التوراة|Суккот и Симхат-Тора|Sukkot and Simchat Torah
 L בסוכות בונים סוכה: בית קטן עם גג של ענפים.|في سوكوت يبنون سُكّا: بيتًا صغيرًا سقفه من الأغصان.|На Суккот строят сукку: маленький домик с крышей из веток.|On Sukkot people build a sukkah: a small hut with a roof of branches.
@@ -149,7 +150,7 @@ E e_sleepb|t|ישנים בסוכה|ينامون في السُّكّا|спят �
 E e_nothing|t|מחזירים את ספר התורה לארון עד השנה הבאה|يعيدون لفيفة التوراة إلى الخزانة حتى السنة القادمة|убирают свиток Торы в шкаф до следующего года|they put the Torah scroll away in the ark until next year
 E xc_desert|t|את ההליכה של עם ישראל במדבר|مسيرة شعب إسرائيل في الصحراء|странствие народа Израиля по пустыне|the people of Israel walking in the desert
 E xc_oilmir|t|את הנס של השמן במקדש|معجزة الزيت في الهيكل|чудо с маслом в Храме|the miracle of the oil in the Temple
-E xc_megread|t|את הסיפור של אסתר ומרדכי|قصة إستير ومردخاي|историю Эстер и Мордехая|the story of Esther and Mordecai
+E xc_megread|t|את הסיפור של אסתר ומרדכי|قصة إستير ومردخاي|историю про Эстер и Мордехая|the story of Esther and Mordecai
 E xc_treepl|t|את הנטיעה של עצים בחורף|غرس الأشجار في الشتاء|посадку деревьев зимой|planting trees in winter
 Q מה הסוכה מזכירה לנו?|بماذا تذكّرنا السُّكّا؟|О чём напоминает нам сукка?|What does the sukkah remind us of?|xc_desert|xc_oilmir,xc_megread,xc_treepl
 E xc_stars|t|את הכוכבים|النجوم|звёзды|the stars
@@ -162,7 +163,7 @@ E xc_haggr|t|קוראים בה את ההגדה|يقرأون فيها الهغا�
 E xc_costu|t|מתחפשים בה ומרעישים ברעשן|يتنكّرون فيها ويُحدثون ضجيجًا بالمِقرعة|наряжаются в ней и шумят трещоткой|they dress up in it and shake noisemakers
 E xc_fastin|t|צמים בה ומבקשים סליחה|يصومون فيها ويطلبون السماح|постятся в ней и просят прощения|they fast in it and ask for forgiveness
 Q מה עושים בסוכה?|ماذا يفعلون في السُّكّا؟|Что делают в сукке?|What do people do in the sukkah?|xc_eatsl|xc_haggr,xc_costu,xc_fastin
-Q איזה חג חוגגים מיד אחרי סוכות?|أي عيد يحتفلون به مباشرة بعد سوكوت؟|Какой праздник отмечают сразу после Суккота?|Which holiday comes right after Sukkot?|h_simh|h_han,h_pur,h_shav
+Q איזה חג חוגגים מיד אחרי סוכות?|أي عيد يحتفلون به مباشرة بعد سوكوت؟|Какой праздник отмечают сразу после Суккота?|Which holiday comes right after Sukkot?|h_simh|h_han,h_rosh,h_shav
 S hanuka|🕎|#b35d00|חנוכה: חג האורים|حانوكا: عيد الأنوار|Ханука: праздник огней|Hanukkah: The Festival of Lights
 L לפני הרבה שנים המקדש בירושלים היה מלוכלך. המכבים ניצחו והחזירו אותו לעם.|قبل سنوات كثيرة كان الهيكل في القدس متّسخًا. انتصر المكابيون وأعادوه للشعب.|Много лет назад Храм в Иерусалиме был осквернён. Маккавеи победили и вернули его народу.|Many years ago the Temple in Jerusalem was dirty. The Maccabees won and gave it back to the people.
 L במקדש היה רק קצת שמן, אבל הוא דלק שמונה ימים. זה היה נס.|لم يكن في الهيكل إلا القليل من الزيت، لكنه اشتعل ثمانية أيام. كانت تلك معجزة.|В Храме было совсем мало масла, но оно горело восемь дней. Это было чудо.|There was only a little oil in the Temple, but it burned for eight days. It was a miracle.
@@ -181,8 +182,8 @@ E e_hamash|t|הסביבון|السفيفون|севивон|the dreidel
 E e_hall|t|המגילה|الميغيلا|мегила|the megillah
 E e_goal|t|השופר|الشوفار|шофар|the shofar
 Q כמה קנים יש בחנוכייה, כולל השמש?|كم فرعًا في شمعدان حانوكا مع الشمّاش؟|Сколько рожков у ханукии вместе с шамашем?|How many branches does a hanukkiah have, with the shamash?|n9|n7,n8,n10
-Q איזה מאכל אוכלים בחנוכה?|أي طعام يأكلون في حانوكا؟|Какое блюдо едят на Хануку?|Which food do people eat on Hanukkah?|f_sufg|f_matz,f_hamen,f_chal
-Q באיזה משחק משחקים בחנוכה?|أي لعبة يلعبون في حانوكا؟|Во что играют на Хануку?|Which game do people play on Hanukkah?|o_dreid|o_ragn,o_lulav,o_hagg
+Q איזה מאכל אוכלים בחנוכה?|أي طعام يأكلون في حانوكا؟|Какое блюдо едят на Хануку?|Which food do people eat on Hanukkah?|f_sufg|f_matz,f_hamen,f_bbq
+Q באיזה משחק משחקים בחנוכה?|أي لعبة يلعبون في حانوكا؟|Во что играют на Хануку?|Which game do people play on Hanukkah?|o_dreid|o_ragn,o_lulav,o_megil
 E xc_macc|p|המכבים|المكابيون|Маккавеи|the Maccabees
 Q מי ניצחו והחזירו את המקדש לעם?|من انتصر وأعاد الهيكل إلى الشعب؟|Кто победил и вернул Храм народу?|Who won and gave the Temple back to the people?|xc_macc|e_moses,e_noah,e_esther
 E xc_jlm|l|בירושלים|في القدس|в Иерусалиме|in Jerusalem
@@ -257,9 +258,10 @@ L שולחים משלוחי מנות לחברים ולשכנים, ונותנים
 L אוכלים אוזני המן, עוגיות עם מילוי.|يأكلون آذان هامان، وهي كعكات محشوّة.|Едят уши Амана - печенье с начинкой.|People eat hamantashen, cookies with a filling.
 Q איזה חג הוא חג התחפושות?|أي عيد هو عيد التنكّر؟|Какой праздник - праздник костюмов?|Which holiday is the costume holiday?|h_pur|h_suk,h_shab,h_tub
 Q איפה כתוב סיפור פורים?|أين كُتبت قصة بوريم؟|Где записана история Пурима?|Where is the story of Purim written?|o_megil|o_dreid,o_shofar,o_lulav
-Q איך קוראים לדמות הטובה והאמיצה בסיפור?|ما اسم الشخصية الطيبة والشجاعة في القصة؟|Как зовут добрую и смелую героиню истории?|Who is the kind and brave character in the story?|e_esther|e_haman,e_moses,e_noah
+Q איך קוראים לדמות הטובה והאמיצה בסיפור?|ما اسم الشخصية الطيبة والشجاعة في القصة؟|Как зовут добрую и смелую героиню истории?|Who is the kind and brave character in the story?|e_esther|e_haman,e_moses,e_king
 E e_esther|p|המלכה אסתר|الملكة إستير|царица Эстер|Queen Esther
 E e_haman|p|המן|هامان|Аман|Haman
+E e_king|p|המלך אחשוורוש|الملك أحشويروش|царь Ахашверош|King Ahasuerus
 E e_moses|p|משה|موسى|Моисей|Moses
 E e_noah|p|נח|نوح|Ной|Noah
 Q במה מרעישים כששומעים את השם המן?|بماذا نُحدث الضجيج عندما نسمع اسم هامان؟|Чем шумят, услышав имя Аман?|What do people make noise with when they hear the name Haman?|o_ragn|o_shofar,o_chanu,o_sukk
@@ -394,7 +396,7 @@ Q מה כל קהילה הביאה איתה לישראל?|ماذا أحضرت ك�
 E xc_many|t|ממקומות רבים בעולם|من أماكن كثيرة في العالم|из многих мест мира|from many places in the world
 E xc_onlypl|t|רק מפולין|من بولندا فقط|только из Польши|only from Poland
 E xc_onlyye|t|רק מתימן|من اليمن فقط|только из Йемена|only from Yemen
-E xc_onlyam|t|רק מאמריקה|من أمريكا فقط|только из Америки|only from America
+E xc_onlyam|t|רק מאמריקה, ולא ממקום אחר|من أمريكا فقط، ولا من مكان آخر|только из Америки, и больше ниоткуда|only from America, and nowhere else
 Q מאיפה הגיעו יהודים לישראל?|من أين جاء اليهود إلى إسرائيل؟|Откуда евреи приехали в Израиль?|Where did Jews come to Israel from?|xc_many|xc_onlypl,xc_onlyye,xc_onlyam
 Q לאיזו עיר מתפללים לחזור בחג הסיגד?|إلى أي مدينة يصلّون للعودة في عيد السيغد؟|В какой город молятся вернуться в праздник Сигд?|On the Sigd, people pray to return to which city?|xc_tojlm|xc_tohaifa,xc_toeilat,xc_tobs
 E xc_share|t|לספר עליהם לחברים|أن نحكي عنها للأصدقاء|рассказать о них друзьям|tell our friends about them
@@ -438,7 +440,7 @@ E xc_shanat|t|שנה טובה|شانا توفا (سنة طيبة)|Шана то�
 E xc_shabsh|t|שבת שלום|شابات شالوم (سبت سلام)|Шабат шалом|Shabbat Shalom
 Q איך מברכים חבר מוסלמי בחג שלו?|كيف نهنّئ صديقًا مسلمًا في عيده؟|Как поздравить друга-мусульманина с его праздником?|How do we greet a Muslim friend on his holiday?|xc_eidm|xc_merry,xc_shanat,xc_shabsh
 E xc_allp|t|יהודים, מוסלמים, נוצרים, דרוזים ועוד|يهود ومسلمون ومسيحيون ودروز وغيرهم|евреи, мусульмане, христиане, друзы и другие|Jews, Muslims, Christians, Druze and others
-E xc_jonly|t|יהודים בלבד, בלי אף קבוצה אחרת|يهود فقط، بلا أي مجموعة أخرى|только евреи, и больше никто|only Jews, and no other group
+E xc_jonly|t|יהודים בלבד, בלי אף קבוצה אחרת|يهود فقط، بلا أي مجموعة أخرى|только евреи, и ни одной другой группы|only Jews, and no other group
 E xc_monly|t|מוסלמים ונוצרים בלבד|مسلمون ومسيحيون فقط|только мусульмане и христиане|only Muslims and Christians
 E xc_donly|t|דרוזים ויהודים בלבד|دروز ويهود فقط|только друзы и евреи|only Druze and Jews
 Q מי חיים בישראל?|من يعيش في إسرائيل؟|Кто живёт в Израиле?|Who lives in Israel?|xc_allp|xc_jonly,xc_monly,xc_donly
@@ -452,7 +454,7 @@ L כשמבקרים במקום קדוש, מתלבשים בצניעות, מדבר�
 E pl_kotel|l|הכותל המערבי|الحائط الغربي (الكوتل)|Западная стена|the Western Wall
 E pl_aqsa|l|מסגד אל־אקצא|المسجد الأقصى|мечеть Аль-Акса|the Al-Aqsa Mosque
 E pl_sepul|l|כנסיית הקבר|كنيسة القيامة|Храм Гроба Господня|the Church of the Holy Sepulchre
-E pl_bahai|l|גני הבהאים|حدائق البهائيين|сады бахаи|the Bahá'í Gardens
+E pl_bahai|l|גני הבהאים|حدائق البهائيين|сады бахаи|the gardens of the Bahá'í faith
 E pl_eiffel|l|מגדל אייפל|برج إيفل|Эйфелева башня|the Eiffel Tower
 E pl_pyram|l|הפירמידות|الأهرامات|пирамиды|the pyramids
 E pl_eilat|l|חוף אילת|شاطئ إيلات|пляж Эйлата|the Eilat beach
@@ -514,8 +516,9 @@ E e_tishrei|t|תשרי|تشري|тишрей|Tishrei
 E e_nisan|t|ניסן|نيسان|нисан|Nisan
 E e_adar|t|אדר|أدار|адар|Adar
 E e_sivan|t|סיוון|سيفان|сиван|Sivan
-Q מי עזר להחזיר את העברית לדיבור ביום־יום?|من ساعد في إعادة العبرية إلى الكلام اليومي؟|Кто помог вернуть иврит в повседневную речь?|Who helped to bring Hebrew back into everyday speech?|e_benyeh|e_haman,e_esther,e_noah
+Q מי עזר להחזיר את העברית לדיבור ביום־יום?|من ساعد في إعادة العبرية إلى الكلام اليومي؟|Кто помог вернуть иврит в повседневную речь?|Who helped to bring Hebrew back into everyday speech?|e_benyeh|e_haman,e_esther,e_herzl
 E e_benyeh|p|אליעזר בן־יהודה|إليعيزر بن يهودا|Элиэзер Бен-Йегуда|Eliezer Ben-Yehuda
+E e_herzl|p|תיאודור הרצל|تيودور هرتسل|Теодор Герцль|Theodor Herzl
 Q אילו שפות מדברים בישראל?|أي لغات يتكلّمون في إسرائيل؟|На каких языках говорят в Израиле?|Which languages do people speak in Israel?|e_langs|e_onlyh,e_latin,e_none
 E e_langs|t|עברית, ערבית, רוסית, אמהרית, אנגלית ועוד|العبرية والعربية والروسية والأمهرية والإنجليزية وغيرها|иврит, арабский, русский, амхарский, английский и другие|Hebrew, Arabic, Russian, Amharic, English and more
 E e_onlyh|t|ערבית, רוסית ואמהרית בלבד, בלי עברית כלל|العربية والروسية والأمهرية فقط، بدون العبرية إطلاقًا|только арабский, русский и амхарский, без иврита|only Arabic, Russian and Amharic, with no Hebrew at all

@@ -106,7 +106,24 @@ const normGate = s => normTeacher(s)
   .replace(/\b(?:xf|teF)\(/g, 'F_(')
   .replace(/var dirv=.*$/m, 'var dirv=DIR;');
 
-/* הבלוקים. from/to הם עוגנים; הבלוק הוא מ-from ועד השורה שלפני to. */
+/* משפחת `js/` — 17.10.2026, O-174. שש אפליקציות שהמנוע שלהן נכתב פעם אחת
+   והועתק לקבצים נפרדים (`js/engine.js`, `js/app.js`), ולכן APPS9 עיוור אליהן.
+   הרשימה **נגזרת מהדיסק**: כל `<app>/js/engine.js` שמגדיר `function makeQ` —
+   מנוע הסיפורים. english-elem ו-hebrew-lit נושאות `js/engine.js` אחר לגמרי
+   (אין בהן makeQ), ולכן הן נופלות מהמסנן ולא מרשימה כתובה ביד.
+   אפליקציה חדשה שתיוולד מהעתקה תיכנס לבדיקה מעצמה. */
+const FAMILY = fs.readdirSync(ROOT, { withFileTypes: true })
+  .filter(d => d.isDirectory() && !d.name.startsWith('.'))
+  .map(d => d.name)
+  .filter(a => {
+    const f = path.join(ROOT, a, 'js', 'engine.js');
+    return fs.existsSync(f) && /^function makeQ\b/m.test(fs.readFileSync(f, 'utf8'));
+  })
+  .sort();
+
+/* הבלוקים. from/to הם עוגנים; הבלוק הוא מ-from ועד השורה שלפני to.
+   `fns` הוא רשימת פונקציות ברמה העליונה: כל אחת מ-`function שם` ועד
+   השורה הראשונה שמתחילה בעמודה 0 ואינה המשך שלה (רווח, `}`, `]`, `)`). */
 const BLOCKS = [
   {
     id: 'service worker',
@@ -141,6 +158,23 @@ const BLOCKS = [
     norm: normGate,
     why: 'זהה חוץ ממפתח המורה, שמות עוזרי התרגום וביטוי הכיוון',
   },
+  /* שני הבלוקים של המשפחה נמדדו זהים בשש ב-17.10.2026 (md5 לכל פונקציה).
+     מה שנשאר בחוץ שונה היום בכוונה: entText/poolFor (NUMS ב-culture
+     וב-tanakh, הפרסר של science-12), והמסכים עצמם (render*, answer, hint). */
+  {
+    id: 'משפחת js/ מנוע',
+    apps: FAMILY,
+    file: 'js/engine.js',
+    fns: ['rnd', 'shuffle', 'sample', 'storyById', 'makeQ', 'buildRound', 'unitTitle'],
+    why: 'בניית השאלה והסבב — makeQ מעביר גם את why',
+  },
+  {
+    id: 'משפחת js/ הסבר',
+    apps: FAMILY,
+    file: 'js/app.js',
+    fns: ['curQ', 'say', 'whyOf', 'whyHtml', 'withWhy'],
+    why: 'שדה ההסבר (O-174) ו-say ששומר את המשוב ב-R.fb — בלעדיו מעבר שפה מוחק את המשוב',
+  },
 ];
 
 const md5 = s => crypto.createHash('md5').update(s).digest('hex').slice(0, 12);
@@ -150,6 +184,17 @@ function slice(app, b) {
   if (!fs.existsSync(f)) return null;
   const src = fs.readFileSync(f, 'utf8');
   if (b.whole) return src;
+  if (b.fns) {
+    const lines = src.split('\n'), parts = [];
+    for (const fn of b.fns) {
+      const si = lines.findIndex(l => new RegExp('^function ' + fn + '\\b').test(l));
+      if (si < 0) return null;
+      let ei = si + 1;
+      while (ei < lines.length && lines[ei].trim() && /^[ \t}\])]/.test(lines[ei])) ei++;
+      parts.push(lines.slice(si, ei).join('\n'));
+    }
+    return parts.join('\n');
+  }
 
   const lines = src.split('\n');
   const si = lines.findIndex(l => new RegExp(b.from).test(l));
@@ -174,6 +219,14 @@ for (const b of BLOCKS) {
   }
 
   const label = b.id.padEnd(16);
+
+  /* רשימה נגזרת שהתרוקנה (שם קובץ שהשתנה, makeQ ששמו שונה) הייתה
+     עוברת כאן ב-0 בשקט — בלוק שלא נבדק באף אפליקציה. */
+  if (b.apps.length < 2) {
+    console.log(`✗ ${label} רק ${b.apps.length} אפליקציות נמצאו — אין מה להשוות (${b.file})`);
+    findings++;
+    continue;
+  }
 
   if (missing.length) {
     console.log(`✗ ${label} לא נמצא ב: ${missing.join(', ')}`);

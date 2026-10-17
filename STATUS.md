@@ -19,7 +19,7 @@
 | `theory` | — | — | אינה בריפו הזה |
 | `civics` | c50 · 2026-10-16 | c50-pwa1 | תואם |
 | `hebrew` | i44 · 2026-10-16 | i44-pwa1 | תואם |
-| `hebrew-lit` | hl25 · 2026-10-16 | hl25-pwa1 | תואם |
+| `hebrew-lit` | hl26 · 2026-10-16 | hl26-pwa1 | תואם |
 | `english-bagrut` | — | — | אינה בריפו הזה |
 | `literature` | j42 · 2026-10-16 | j42-pwa1 | תואם |
 | `tanakh` | p43 · 2026-10-16 | p43-pwa1 | תואם |
@@ -33,13 +33,13 @@
 | `bagrut-history` | h138 · 2026-10-16 | h138-pwa1 | תואם |
 | `islam` | is22 · 2026-10-16 | is22-pwa1 | תואם |
 | `russian` | ru23 · 2026-10-16 | ru23-pwa1 | תואם |
-| `tanakh-elem` | te25 · 2026-10-16 | te25-pwa1 | תואם |
-| `civics-elem` | mc25 · 2026-10-16 | mc25-pwa1 | תואם |
-| `culture-elem` | tm22 · 2026-10-16 | tm22-pwa1 | תואם |
-| `history-elem` | hk22 · 2026-10-16 | hk22-pwa1 | תואם |
+| `tanakh-elem` | te26 · 2026-10-16 | te26-pwa1 | תואם |
+| `civics-elem` | mc26 · 2026-10-16 | mc26-pwa1 | תואם |
+| `culture-elem` | tm23 · 2026-10-16 | tm23-pwa1 | תואם |
+| `history-elem` | hk23 · 2026-10-16 | hk23-pwa1 | תואם |
 | `english-elem` | en20 · 2026-10-16 | en20-pwa1 | תואם |
-| `science-12` | sg23 · 2026-10-16 | sg23-pwa1 | תואם |
+| `science-12` | sg24 · 2026-10-16 | sg24-pwa1 | תואם |
 | `domino` | dm23 · 2026-10-16 | dm23-pwa1 | תואם |
-| `net-elem` | ns11 · 2026-10-16 | ns11-pwa1 | תואם |
+| `net-elem` | ns12 · 2026-10-16 | ns12-pwa1 | תואם |
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-10-15.

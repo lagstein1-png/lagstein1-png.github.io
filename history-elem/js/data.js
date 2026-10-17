@@ -51,7 +51,7 @@ E w_sing|t|שירים|أغانٍ|песни|songs
 E w_color|t|צבעים|ألوان|краски|colors
 E w_kite|t|עפיפונים|طائرات ورقية|воздушные змеи|kites
 E always|t|תמיד|دائمًا|всегда|always
-E w_great|t|החומה הסינית|سور الصين العظيم|Великая Китайская стена|the Great Wall of China
+E w_great|t|החומה הסינית|السور العظيم في الصين|Великая Китайская стена|the Great Wall of China
 E w_jericho|t|חומות יריחו|أسوار أريحا|стены Иерихона|the walls of Jericho
 E w_berlin|t|חומת ברלין|جدار برلين|Берлинская стена|the Berlin Wall
 E kotel|t|הכותל המערבי|حائط البراق (الحائط الغربي)|Западная стена|the Western Wall
@@ -98,7 +98,7 @@ E flashlights|t|פנסים|مصابيح يدوية|фонарики|flashlights
 E sufg|t|סופגניות ולביבות|سوفغانيوت وفطائر مقلية|пончики и оладьи|doughnuts and latkes
 E matza|t|מצה|فطير|маца|matzah
 E hamantash|t|אוזני המן|آذان هامان|уши Амана|hamantaschen
-E figs|t|תאנים וחרובים|تين وخروب|инжир и рожковое дерево|figs and carob
+E figs|t|תאנים וחרובים|ثمار التين والخرّوب|инжир и рожковое дерево|figs and carob
 E pharaoh|t|פרעה|فرعون|фараон|a pharaoh
 E emperor|t|קיסר|إمبراطور|император|an emperor
 E sultan|t|סולטן|سلطان|султан|a sultan
@@ -193,7 +193,7 @@ E snow_b|t|בתים מוכנים שחיכו להם|بيوتًا جاهزة كا�
 E sand_b|t|הרבה זהב ואבנים יקרות|كثيرًا من الذهب والأحجار الكريمة|много золота и драгоценных камней|a lot of gold and precious stones
 E ussr|g|ברית המועצות לשעבר|الاتحاد السوفييتي السابق|бывший Советский Союз|the former Soviet Union
 E peru|g|פרו|بيرو|Перу|Peru
-E usa_c|g|ארצות הברית|الولايات المتحدة|США|the United States
+E usa_c|g|ארצות הברית של אמריקה|الولايات المتحدة الأمريكية|Соединённые Штаты Америки|the United States of America
 E france_c|g|צרפת|فرنسا|Франция|France
 E argentina_c|g|ארגנטינה|الأرجنتين|Аргентина|Argentina
 E ethiopia|g|אתיופיה|إثيوبيا|Эфиопия|Ethiopia
@@ -236,7 +236,7 @@ E dinosaur_b|t|שלד דינוזאור|هيكل ديناصور|скелет ди
 E old_car|t|מכונית ישנה|سيارة قديمة|старую машину|an old car
 E shrine|b|היכל הספר במוזיאון ישראל|هيخال هاسيفر في متحف إسرائيل|«Храм книги» в Музее Израиля|the Shrine of the Book at the Israel Museum
 E careful|t|מסתכלים ושומרים על המקום|ننظر ونحافظ على المكان|смотрим и бережём место|we look and take care of the place
-E climb_walls|t|מטפסים על הקירות העתיקים|نتسلّق الجدران القديمة|лазаем по древним стенам|we climb the old walls
+E climb_walls|t|מטפסים על הקירות העתיקים|نتسلّق الجدران القديمة|лазаем по древним стенам|we climb on the ancient walls
 E take_stones|t|לוקחים אבנים הביתה|نأخذ حجارة إلى البيت|берём камни домой|we take stones home
 E scribble|t|מציירים על הקירות|نرسم على الجدران|рисуем на стенах|we draw on the walls
 S now|⏳|#c64c0a|עבר, הווה ועתיד|الماضي والحاضر والمستقبل|прошлое, настоящее и будущее|Past, Present and Future
@@ -288,7 +288,7 @@ E xh_hidem|t|כדי להסתיר אותם מכולם|لكي يخفوها عن ا
 E xh_throw|t|כדי לזרוק אותם בסוף|لكي يرموها في النهاية|чтобы потом их выбросить|so they can throw them away later
 Q למה מציגים חפצים עתיקים במוזיאון?|لماذا تُعرض الأشياء القديمة في المتحف؟|Зачем древние вещи выставляют в музее?|Why are ancient objects shown in a museum?|xh_see|xh_sell,xh_hidem,xh_throw
 E xh_hist|t|שואל שאלות ובודק מה נכון|يسأل أسئلة ويفحص ما هو صحيح|задаёт вопросы и проверяет, что правда|asks questions and checks what is true
-E xh_guess|t|מנחש מה יקרה מחר|يخمّن ماذا سيحدث غدًا|угадывает, что будет завтра|guesses what will happen tomorrow
+E xh_guess|t|מנחש מה יקרה מחר, בלי לבדוק|يخمّن ماذا سيحدث غدًا دون أن يفحص|угадывает, что будет завтра, и не проверяет|guesses what will happen tomorrow without checking
 E xh_builder|t|בונה בתים חדשים|يبني بيوتًا جديدة|строит новые дома|builds new houses
 E xh_grow|t|מגדל ירקות בשדה|يزرع الخضار في الحقل|выращивает овощи в поле|grows vegetables in a field
 Q מה עושה היסטוריון?|ماذا يفعل المؤرّخ؟|Что делает историк?|What does a historian do?|xh_hist|xh_guess,xh_builder,xh_grow
@@ -378,7 +378,7 @@ Q איך הנילוס עזר למצרים?|كيف ساعد النيل المصر
 E xh_wsb|t|כתב, ספורט ובנייה|الكتابة والرياضة والبناء|письменность, спорт и строительство|writing, sport and building
 E xh_tech|t|טלפונים ומחשבים|الهواتف والحواسيب|телефоны и компьютеры|phones and computers
 E xh_planes|t|מטוסים ורכבות|الطائرات والقطارات|самолёты и поезда|planes and trains
-E xh_tvradio|t|טלוויזיה ורדיו|التلفاز والراديو|телевидение и радио|television and radio
+E xh_tvradio|t|טלוויזיה ורדיו|التلفاز والراديو|телевизоры и радиоприёмники|television and radio
 Q מה למדנו מהעמים של העולם העתיק?|ماذا تعلّمنا من شعوب العالم القديم؟|Чему мы научились у народов древнего мира?|What did we learn from the peoples of the ancient world?|xh_wsb|xh_tech,xh_planes,xh_tvradio
 E xh_aqd|t|תעלות גבוהות שמובילות מים|قنوات عالية تنقل الماء|высокие каналы, по которым течёт вода|high channels that carry water
 E xh_pools|t|בריכות שחייה גדולות|برك سباحة كبيرة|большие бассейны|big swimming pools
@@ -444,7 +444,7 @@ E xh_noj|t|שאין שם יהודים בכלל|أنه لا يوجد يهود ه�
 E xh_wantst|t|שכל היהודים רוצים להישאר שם|أن كل اليهود يريدون البقاء هناك|что все евреи хотят остаться там|that all Jews wanted to stay there
 Q מה ראה הרצל באירופה?|ماذا رأى هرتسل في أوروبا؟|Что Герцль увидел в Европе?|What did Herzl see in Europe?|xh_suffer|xh_richj,xh_noj,xh_wantst
 E xh_swiss|g|שווייץ|سويسرا|Швейцария|Switzerland
-Q באיזו מדינה נמצאת העיר בזל?|في أي دولة تقع مدينة بازل؟|В какой стране находится город Базель?|In which country is the city of Basel?|xh_swiss|france_c,greece,egypt_c
+Q באיזו מדינה נמצאת העיר בזל?|في أي دولة تقع مدينة بازل؟|В какой стране находится город Базель?|In which country is the city of Basel?|xh_swiss|france_c,greece,argentina_c
 S hebrew|🗣️|#0b7285|העברית חוזרת לדבר|العبرية تعود إلى الكلام|иврит снова становится разговорным|Hebrew Comes Back to Speech
 L במשך שנים רבות כתבו וקראו בעברית, אבל כמעט לא דיברו בה בבית ובשוק. דיברו רוסית, ערבית, אידיש, לדינו ושפות אחרות.|لسنوات طويلة كانوا يكتبون ويقرؤون بالعبرية، لكنهم لم يتحدّثوا بها تقريبًا في البيت والسوق. تحدّثوا الروسية والعربية والييدية واللادينو ولغات أخرى.|Много лет на иврите писали и читали, но почти не говорили в доме и на рынке. Говорили по-русски, по-арабски, на идиш, на ладино и на других языках.|For many years people wrote and read in Hebrew, but hardly spoke it at home or in the market. They spoke Russian, Arabic, Yiddish, Ladino and other languages.
 L אליעזר בן־יהודה חשב שעם צריך לדבר בשפה אחת משלו. הוא החליט לדבר עברית כל יום, גם בבית.|رأى إليعيزر بن يهودا أن الشعب يجب أن يتكلّم بلغة واحدة خاصة به. وقرّر أن يتكلّم العبرية كل يوم، حتى في البيت.|Элиэзер Бен-Йехуда считал, что народу нужен один общий язык. Он решил говорить на иврите каждый день, даже дома.|Eliezer Ben-Yehuda thought a people needed one language of its own. He decided to speak Hebrew every day, even at home.
@@ -465,7 +465,8 @@ E xh_glida|t|גלידה|غليدا (بوظة)|глида (мороженое)|gl
 E xh_ima|t|אמא|إيما (أمّ)|има (мама)|ima (mom)
 E xh_lechem|t|לחם|ليحِم (خبز)|лехем (хлеб)|lechem (bread)
 E xh_mayim|t|מים|مايِم (ماء)|маим (вода)|mayim (water)
-Q איזו מילה חסרה בעברית בזמן של בן־יהודה?|أيّ كلمة كانت ناقصة في العبرية في زمن بن يهودا؟|Какого слова не было в иврите во времена Бен-Йегуды?|Which word was missing from Hebrew in Ben-Yehuda's time?|xh_glida|xh_ima,xh_lechem,xh_mayim
+E xh_shulchan|t|שולחן|شولحان (طاولة)|шулхан (стол)|shulchan (table)
+Q איזו מילה חסרה בעברית בזמן של בן־יהודה?|أيّ كلمة كانت ناقصة في العبرية في زمن بن يهودا؟|Какого слова не было в иврите во времена Бен-Йегуды?|Which word was missing from Hebrew in Ben-Yehuda's time?|xh_glida|xh_ima,xh_lechem,xh_shulchan
 E xh_schools|t|בבתי הספר|في المدارس|в школах|in schools
 E xh_cinemas|t|בבתי הקולנוע|في دور السينما|в кинотеатрах|in cinemas
 E xh_port|t|בנמל|في الميناء|в порту|at the port
@@ -577,7 +578,7 @@ E xh_sang|t|שרו שירים ברדיו|غنّوا أغاني في الرادي
 Q מה עשו חסידי אומות העולם?|ماذا فعل الصالحون بين الأمم؟|Что сделали Праведники народов мира?|What did the Righteous Among the Nations do?|xh_hid|xh_wrote,xh_builtil,xh_sang
 E xh_80y|t|לפני יותר משמונים שנה|قبل أكثر من ثمانين سنة|больше восьмидесяти лет назад|more than eighty years ago
 E xh_10ya|t|לפני עשר שנים|قبل عشر سنوات|десять лет назад|ten years ago
-E xh_1000y|t|לפני אלף שנה|قبل ألف سنة|тысячу лет назад|a thousand years ago
+E xh_1000y|t|לפני יותר מאלף שנה|قبل أكثر من ألف سنة|больше тысячи лет назад|more than a thousand years ago
 E xh_lastyr|t|בשנה שעברה|في السنة الماضية|в прошлом году|last year
 Q מתי הייתה השואה?|متى وقعت المحرقة (الشواه)؟|Когда была Катастрофа?|When did the Holocaust happen?|xh_80y|xh_10ya,xh_1000y,xh_lastyr
 E xh_trusted|t|עם מבוגר שאנחנו סומכים עליו|مع شخص بالغ نثق به|со взрослым, которому мы доверяем|with an adult we trust
@@ -606,7 +607,7 @@ E xh_y2003|y|2003|2003|2003|2003
 Q באיזו שנה טס אילן רמון לחלל?|في أيّ سنة طار إيلان رامون إلى الفضاء؟|В каком году Илан Рамон полетел в космос?|In which year did Ilan Ramon fly to space?|xh_y2003|y1997,y1968,y1948
 E xh_anyone|t|גם אנשים רגילים עם רעיון טוב|أيضًا أناس عاديون لديهم فكرة جيدة|и обычные люди с хорошей идеей|ordinary people with a good idea too
 E xh_kingsonly|t|רק מלכים ומלכות|الملوك والملكات فقط|только цари и царицы|only kings and queens
-E xh_richonly|t|רק אנשים עשירים מאוד|الأغنياء جدًّا فقط|только очень богатые люди|only very rich people
+E xh_richonly|t|רק אנשים עשירים מאוד|الأشخاص الأغنياء جدًّا فقط|только очень богатые люди|only people who are very rich
 E xh_oldonly|t|רק אנשים זקנים מאוד|كبار السنّ جدًّا فقط|только очень старые люди|only very old people
 Q מי יכול לשנות דברים ולעשות היסטוריה?|من يستطيع أن يغيّر الأشياء ويصنع التاريخ؟|Кто может что-то изменить и войти в историю?|Who can change things and make history?|xh_anyone|xh_kingsonly,xh_richonly,xh_oldonly
 E xh_6974|y|1969 עד 1974|1969 حتى 1974|с 1969 по 1974|1969 to 1974
