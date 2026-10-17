@@ -5,7 +5,8 @@ function sample(a,n){return shuffle(a).slice(0,n)}
 var ENT={}, STORIES=[];
 SCIENCE_DATA.forEach(function(u){
  var s={id:u.id,icon:u.icon,color:u.color,title:u.title,lines:u.lines,hint:u.hint,help:u.help,qs:[]};
- u.qs.forEach(function(q,n){var keys=q.opts.map(function(tx,i){var id=u.id+"_"+n+"_"+i;ENT[id]={type:u.id+"_"+n,tx:tx};return id});s.qs.push({story:u.id,q:q.q,a:keys[q.correct],d:keys.filter(function(k,i){return i!==q.correct})})});STORIES.push(s);
+ /* q.why — optional {he,ar,ru,en}: one sentence that explains the right answer, shown once the question is closed. */
+ u.qs.forEach(function(q,n){var keys=q.opts.map(function(tx,i){var id=u.id+"_"+n+"_"+i;ENT[id]={type:u.id+"_"+n,tx:tx};return id});s.qs.push({story:u.id,q:q.q,a:keys[q.correct],d:keys.filter(function(k,i){return i!==q.correct}),why:q.why||null})});STORIES.push(s);
 });
 function entText(key){
     return ENT[key].tx;
@@ -20,7 +21,7 @@ function makeQ(q){
   var pool=poolFor(q.a).filter(function(k){return k!==q.a});
   var d=q.d?q.d.slice():sample(pool,3);
   var keys=shuffle([q.a].concat(d));
-  return {story:q.story,q:q.q,a:q.a,keys:keys,ans:keys.indexOf(q.a)};
+  return {story:q.story,q:q.q,a:q.a,keys:keys,ans:keys.indexOf(q.a),why:q.why||null};
 }
 function buildRound(unit){
   var src=unit.id==="mix"?ALL_Q:storyById(unit.id).qs;

@@ -1,9 +1,9 @@
 /* Original internal practice bank: 7 topics, 35 scenarios, 4 languages. */
 var RAW=String.raw`
 E|privacy0|privacy|לא לשתף ולשאול מבוגר שסומכים עליו|لا أشارك وأسأل شخصًا بالغًا أثق به|Не отправлять и спросить взрослого, которому доверяю|Do not share and ask a trusted adult
-E|privacy1|privacy|לשלוח את כתובת הבית|إرسال عنوان البيت|Отправить домашний адрес|Send my home address
+E|privacy1|privacy|לשלוח את הפרטים, ולספר למבוגר רק אחר כך|إرسال المعلومات، ثم إخبار شخص بالغ لاحقًا|Отправить свои данные, а взрослому рассказать уже потом|Send the details and tell an adult about it later
 E|privacy2|privacy|לפרסם את מספר הטלפון בקבוצה|نشر رقم الهاتف في المجموعة|Опубликовать номер телефона в группе|Post my phone number in the group
-E|privacy3|privacy|לשלוח את קוד הכניסה|إرسال رمز الدخول|Отправить код входа|Send my login code
+E|privacy3|privacy|לתת את הפרטים כי הוא נשמע נחמד|إعطاء المعلومات لأنه يبدو لطيفًا|Дать данные, потому что он кажется милым|Give the details because they seem nice
 S|privacy|🔐|#6d28d9|פרטים ששומרים לעצמנו|معلومات نحافظ على خصوصيتها|Личные данные|Keeping personal details private
 L|כתובת הבית, מספר הטלפון וקוד הכניסה הם פרטים פרטיים. לא שולחים אותם למישהו שפגשנו ברשת.|عنوان البيت ورقم الهاتف ورمز الدخول معلومات خاصة. لا نرسلها لشخص التقيناه على الإنترنت.|Адрес дома, номер телефона и код входа являются личными данными. Не отправляем их человеку, с которым познакомились в интернете.|Your home address, phone number and login code are private. Do not send them to someone you met online.
 L|כשלא בטוחים מה מותר לשתף, עוצרים ושואלים מבוגר שסומכים עליו.|عندما لا نعرف ما يمكن مشاركته، نتوقف ونسأل شخصًا بالغًا نثق به.|Если не уверены, чем можно делиться, останавливаемся и спрашиваем взрослого, которому доверяем.|If you are unsure what to share, pause and ask a trusted adult.
@@ -13,8 +13,8 @@ Q|חבר במשחק מבקש קוד שקיבלת כדי להיכנס לחשבו�
 Q|יש טופס לא מוכר שמבקש פרטים על המשפחה. מה כדאי לעשות?|استمارة لا تعرفها تطلب معلومات عن العائلة. ماذا تفعل؟|Незнакомая форма просит данные о семье. Что лучше сделать?|An unfamiliar form asks for family details. What should you do?|privacy0|privacy1,privacy2,privacy3
 Q|אתם לא בטוחים אם מותר למסור פרט אישי. מה כדאי לעשות קודם?|لستم متأكدين إن كان يمكن إعطاء معلومة شخصية. ماذا تفعلون أولًا؟|Ты не уверен, можно ли сообщить личную информацию. Что сделать сначала?|You are unsure whether to share a personal detail. What should you do first?|privacy0|privacy1,privacy2,privacy3
 E|password0|password|לבקש עזרה ממבוגר ולשמור על הסיסמה|طلب مساعدة شخص بالغ وحماية كلمة المرور|Попросить взрослого помочь и беречь пароль|Ask an adult for help and protect the password
-E|password1|password|לשלוח את הסיסמה בצ׳אט|إرسال كلمة المرور في الدردشة|Отправить пароль в чат|Send the password in chat
-E|password2|password|לבחור את השם שלי כסיסמה|اختيار اسمي كلمة مرور|Выбрать своё имя как пароль|Use my name as the password
+E|password1|password|לשלוח את הסיסמה לחבר כדי שיעזור לי|إرسال كلمة المرور لصديق كي يساعدني|Отправить пароль другу, чтобы он помог|Send the password to a friend so they can help
+E|password2|password|להשתמש באותה סיסמה קצרה בכל החשבונות|استخدام كلمة المرور القصيرة نفسها لكل الحسابات|Использовать один короткий пароль для всех аккаунтов|Use the same short password for every account
 E|password3|password|לפרסם את קוד האימות|نشر رمز التحقق|Опубликовать код проверки|Post the verification code
 S|password|🗝️|#0f766e|סיסמה שומרת על החשבון|كلمة المرور تحمي الحساب|Пароль защищает аккаунт|Passwords protect accounts
 L|סיסמה היא כמו מפתח לחשבון. בוחרים עם מבוגר סיסמה ארוכה, ולא משתמשים באותה סיסמה לכל החשבונות.|كلمة المرور مثل مفتاح للحساب. نختار مع شخص بالغ كلمة مرور طويلة، ولا نستخدمها لكل الحسابات.|Пароль похож на ключ от аккаунта. Вместе со взрослым выбираем длинный пароль и не используем его для всех аккаунтов.|A password is like an account key. Choose a long password with an adult and use a different one for each account.
@@ -25,9 +25,9 @@ Q|קיבלת קוד אימות שלא ביקשת. מה כדאי לעשות?|تل
 Q|נראה שמישהו אחר נכנס לחשבון שלך. מה כדאי לעשות?|يبدو أن شخصًا آخر دخل حسابك. ماذا تفعل؟|Кажется, кто-то другой вошёл в твой аккаунт. Что лучше сделать?|Someone else may have entered your account. What should you do?|password0|password1,password2,password3
 Q|רוצים לבחור סיסמה לחשבון נוסף. מה כדאי לעשות?|نريد اختيار كلمة مرور لحساب آخر. ماذا نفعل؟|Нужно выбрать пароль для ещё одного аккаунта. Что лучше сделать?|You need a password for another account. What should you do?|password0|password1,password2,password3
 E|links0|links|לעצור ולבדוק עם מבוגר לפני לחיצה|التوقف والتحقق مع شخص بالغ قبل الضغط|Остановиться и проверить со взрослым перед нажатием|Pause and check with an adult before clicking
-E|links1|links|ללחוץ מיד כדי לא לפספס|الضغط فورًا كي لا أفوّت الفرصة|Сразу нажать, чтобы не упустить шанс|Click immediately so I do not miss out
+E|links1|links|ללחוץ מיד, כי כתוב שהמבצע נגמר היום|الضغط فورًا لأنه مكتوب أن العرض ينتهي اليوم|Сразу нажать, ведь написано, что акция кончается сегодня|Click right away because it says the offer ends today
 E|links2|links|להוריד את הקובץ בלי לבדוק|تنزيل الملف دون التحقق|Скачать файл без проверки|Download the file without checking
-E|links3|links|להעביר את הקישור לכל החברים|إرسال الرابط لكل الأصدقاء|Переслать ссылку всем друзьям|Forward the link to every friend
+E|links3|links|להעביר את הקישור לכל החברים, כדי שגם הם יזכו|إرسال الرابط لكل الأصدقاء كي يربحوا هم أيضًا|Переслать ссылку всем друзьям, чтобы они тоже выиграли|Forward the link to every friend so they can win too
 S|links|🔎|#b45309|הודעות וקישורים חשודים|رسائل وروابط مشبوهة|Подозрительные сообщения и ссылки|Suspicious messages and links
 L|הודעה שמבטיחה פרס או דורשת ללחוץ מיד יכולה להיות ניסיון להטעות. לא לוחצים רק כי כתוב שזה דחוף.|رسالة تعد بجائزة أو تطلب الضغط فورًا قد تحاول خداعنا. لا نضغط فقط لأنها تقول إن الأمر عاجل.|Сообщение с обещанием приза или требованием нажать немедленно может быть обманом. Не нажимаем только потому, что написано «срочно».|A message promising a prize or demanding an immediate click may be a trick. Do not click just because it says it is urgent.
 L|גם הודעה מחשבון של חבר יכולה להיות חשודה. עוצרים ובודקים עם מבוגר לפני פתיחת קישור או הורדת קובץ.|حتى رسالة من حساب صديق قد تكون مشبوهة. نتوقف ونتحقق مع شخص بالغ قبل فتح رابط أو تنزيل ملف.|Даже сообщение с аккаунта друга может быть подозрительным. Останавливаемся и проверяем со взрослым перед открытием ссылки или скачиванием файла.|Even a message from a friend’s account can be suspicious. Pause and check with an adult before opening a link or downloading a file.
@@ -37,7 +37,7 @@ Q|חשבון של חבר שלח הודעה מוזרה עם קובץ. מה כדא
 Q|הודעה מבטיחה מטבעות משחק בחינם דרך קישור. מה כדאי לעשות?|رسالة تعد بعملات لعبة مجانية عبر رابط. ماذا تفعل؟|Сообщение обещает бесплатные игровые монеты по ссылке. Что лучше сделать?|A message promises free game coins through a link. What should you do?|links0|links1,links2,links3
 Q|אתר אומר שצריך להוריד משהו כדי לקבל מתנה. מה כדאי לעשות?|موقع يقول إن عليك تنزيل شيء للحصول على هدية. ماذا تفعل؟|Сайт требует что-то скачать ради подарка. Что лучше сделать?|A site says to download something to get a gift. What should you do?|links0|links1,links2,links3
 E|people0|people|להפסיק את השיחה ולספר למבוגר שסומכים עליו|إيقاف الحديث وإخبار شخص بالغ أثق به|Прекратить разговор и рассказать взрослому, которому доверяю|Stop the conversation and tell a trusted adult
-E|people1|people|ללכת לפגישה בלי לספר|الذهاب للقاء دون إخبار أحد|Пойти на встречу, никому не сказав|Go to the meeting without telling anyone
+E|people1|people|ללכת לפגישה לבד, כי בצ׳אט הוא נשמע כמו ילד נחמד|الذهاب إلى اللقاء وحدي لأنه يبدو طفلًا لطيفًا في الدردشة|Пойти на встречу одному, ведь в чате он кажется милым ребёнком|Meet them alone because in chat they seem like a nice kid
 E|people2|people|לשמור את השיחה בסוד ממבוגרים|إخفاء الحديث عن الكبار|Скрыть разговор от взрослых|Keep the conversation secret from adults
 E|people3|people|לשלוח תמונה אישית כדי לרצות אותו|إرسال صورة شخصية لإرضائه|Отправить личное фото, чтобы угодить|Send a personal photo to please them
 S|people|🧑‍🤝‍🧑|#0369a1|מי נמצא בצד השני?|من على الطرف الآخر؟|Кто на другой стороне?|Who is on the other side?
@@ -49,9 +49,9 @@ Q|שחקן מבקש תמונה אישית שלך ומפעיל לחץ. מה כד�
 Q|מישהו אומר שהוא ילד כמוך, אבל מבקש דברים שמדאיגים אותך. מה כדאי לעשות?|شخص يقول إنه طفل مثلك لكنه يطلب أشياء تقلقك. ماذا تفعل؟|Кто-то говорит, что он ребёнок, но просит то, что тебя тревожит. Что лучше сделать?|Someone says they are a child but asks for things that worry you. What should you do?|people0|people1,people2,people3
 Q|שיחה ברשת גורמת לך להרגיש לא בנוח. מה כדאי לעשות?|حديث على الإنترنت يجعلك تشعر بعدم الراحة. ماذا تفعل؟|Разговор в интернете вызывает неприятные чувства. Что лучше сделать?|An online conversation makes you uncomfortable. What should you do?|people0|people1,people2,people3
 E|kindness0|kindness|לא להצטרף לפגיעה ולפנות למבוגר|عدم المشاركة في الأذى واللجوء إلى شخص بالغ|Не участвовать в травле и обратиться к взрослому|Do not join the hurtful behavior and ask an adult for help
-E|kindness1|kindness|לשלוח עוד עלבונות|إرسال المزيد من الإهانات|Послать ещё оскорбления|Send more insults
+E|kindness1|kindness|לשלוח עוד עלבונות, כי כולם בקבוצה עושים את זה|إرسال المزيد من الإهانات لأن كل من في المجموعة يفعل ذلك|Послать ещё оскорбления, ведь вся группа так делает|Send more insults because everyone in the group is doing it
 E|kindness2|kindness|להפיץ את ההודעה הפוגעת|نشر الرسالة المؤذية|Распространить обидное сообщение|Spread the hurtful message
-E|kindness3|kindness|לצחוק כדי להיות חלק מהקבוצה|الضحك لأكون جزءًا من المجموعة|Смеяться, чтобы быть как все|Laugh to fit in with the group
+E|kindness3|kindness|לצחוק יחד עם כולם, כדי שלא יצחקו גם עליי|الضحك مع الجميع كي لا يسخروا مني أنا أيضًا|Смеяться вместе со всеми, чтобы не смеялись надо мной|Laugh along with everyone so they do not mock me too
 S|kindness|💬|#be185d|מילים ששומרות על אחרים|كلمات تحمي الآخرين|Бережное общение|Kind words online
 L|גם מאחורי המסך יש אנשים עם רגשות. לא מעליבים ולא משתפים הודעה שפוגעת במישהו.|حتى خلف الشاشة يوجد أشخاص لديهم مشاعر. لا نهين ولا نشارك رسالة تؤذي أحدًا.|За экраном тоже люди с чувствами. Не оскорбляем и не пересылаем обидные сообщения.|People behind screens have feelings too. Do not insult people or share hurtful messages.
 L|אם חבר נפגע, אפשר לומר לו שהוא לא לבד ולפנות יחד למבוגר. לא מצטרפים ללעג.|إذا تأذى صديق، يمكننا أن نقول إنه ليس وحده ونلجأ معًا إلى شخص بالغ. لا نشارك في السخرية.|Если друга обидели, можно сказать, что он не один, и вместе обратиться к взрослому. Не присоединяемся к насмешкам.|If a friend is hurt, tell them they are not alone and ask an adult for help together. Do not join in mocking.
@@ -61,7 +61,7 @@ Q|חבר אומר שפגעו בו בצ׳אט. איך אפשר לעזור?|صدي
 Q|מישהו מבקש ממך להצטרף ללעג על ילד אחר. מה כדאי לעשות?|شخص يطلب منك المشاركة في السخرية من طفل آخر. ماذا تفعل؟|Тебя зовут посмеяться над другим ребёнком. Что лучше сделать?|Someone asks you to join in mocking another child. What should you do?|kindness0|kindness1,kindness2,kindness3
 Q|אתם רואים הודעות שפוגעות שוב ושוב באותו ילד. מה כדאי לעשות?|ترون رسائل تؤذي الطفل نفسه مرارًا. ماذا تفعلون؟|Ты видишь повторяющиеся обидные сообщения одному ребёнку. Что лучше сделать?|You see repeated hurtful messages aimed at one child. What should you do?|kindness0|kindness1,kindness2,kindness3
 E|photos0|photos|לעצור ולבדוק רשות ופרטיות לפני השיתוף|التوقف والتحقق من الإذن والخصوصية قبل المشاركة|Остановиться и проверить разрешение и личные данные до отправки|Pause and check permission and privacy before sharing
-E|photos1|photos|לפרסם גם אם החבר ביקש שלא|النشر حتى لو طلب الصديق عدم ذلك|Опубликовать, даже если друг против|Post it even if my friend says no
+E|photos1|photos|לפרסם גם אם החבר ביקש שלא, כי התמונה יפה|النشر حتى لو طلب الصديق عدم ذلك، لأن الصورة جميلة|Опубликовать, даже если друг против, ведь фото получилось красивым|Post it even if my friend says no, because it is a nice photo
 E|photos2|photos|לשלוח מהר בלי לבדוק|الإرسال بسرعة دون التحقق|Быстро отправить без проверки|Send it quickly without checking
 E|photos3|photos|לחשוב שאי אפשר להעתיק תמונה שנשלחה|الاعتقاد أنه لا يمكن نسخ صورة أُرسلت|Думать, что отправленное фото нельзя скопировать|Assume a sent photo cannot be copied
 S|photos|📷|#15803d|לפני שמשתפים תמונה|قبل مشاركة صورة|Перед отправкой фото|Before sharing a photo
@@ -73,8 +73,8 @@ Q|בתמונה רואים את כתובת הבית. מה כדאי לעשות ל�
 Q|אתם לא בטוחים אם תמונה מתאימה לשיתוף. מה כדאי לעשות?|لستم متأكدين إن كانت الصورة مناسبة للمشاركة. ماذا تفعلون؟|Ты не уверен, стоит ли отправлять фото. Что лучше сделать?|You are unsure whether a photo should be shared. What should you do?|photos0|photos1,photos2,photos3
 Q|רוצים לשלוח תמונה לקבוצה גדולה. מה כדאי לבדוק קודם?|نريد إرسال صورة لمجموعة كبيرة. ماذا نتحقق منه أولًا؟|Хочешь отправить фото в большую группу. Что проверить сначала?|You want to send a photo to a large group. What should you check first?|photos0|photos1,photos2,photos3
 E|help0|help|לעצור ולבקש עזרה ממבוגר שסומכים עליו|التوقف وطلب مساعدة شخص بالغ نثق به|Остановиться и попросить взрослого, которому доверяю, помочь|Pause and ask a trusted adult for help
-E|help1|help|להסתיר הכול כי אני מתבייש|إخفاء كل شيء لأنني أشعر بالخجل|Всё скрыть, потому что стыдно|Hide everything because I feel embarrassed
-E|help2|help|להמשיך לענות למי שמאיים|متابعة الرد على من يهدد|Продолжать отвечать тому, кто угрожает|Keep answering the person making threats
+E|help1|help|להסתיר הכול, כי אני מתבייש ומפחד שיכעסו עליי|إخفاء كل شيء لأنني أخجل وأخاف أن يغضبوا مني|Всё скрыть, потому что стыдно и страшно, что меня будут ругать|Hide everything because I feel embarrassed and fear getting in trouble
+E|help2|help|להמשיך לענות למי שמאיים, כדי שיפסיק לכעוס|متابعة الرد على من يهدد كي يتوقف عن الغضب|Продолжать отвечать тому, кто угрожает, чтобы он перестал злиться|Keep answering the person making threats so they calm down
 E|help3|help|להפיץ תמונות פוגעניות לחברים|إرسال صور مؤذية للأصدقاء|Распространить вредящие изображения друзьям|Send harmful images to friends
 S|help|🛟|#4338ca|לא נשארים לבד|لا نبقى وحدنا|Не оставаться одному|You do not have to handle it alone
 L|אם הודעה מפחידה או פוגעת, עוצרים ומספרים למבוגר שסומכים עליו. גם אם כבר לחצנו או שלחנו משהו, אפשר לבקש עזרה. זו לא אשמת הילד שפגעו בו.|إذا كانت الرسالة مخيفة أو مؤذية، نتوقف ونخبر شخصًا بالغًا نثق به. حتى إن ضغطنا أو أرسلنا شيئًا، يمكننا طلب المساعدة. الطفل ليس مذنبًا عندما يؤذيه أحد.|Если сообщение пугает или обижает, останавливаемся и рассказываем взрослому, которому доверяем. Даже если уже нажали или отправили что-то, можно просить помощи. Ребёнок не виноват в том, что его обидели.|If a message scares or hurts you, pause and tell a trusted adult. Even if you already clicked or sent something, you can ask for help. It is not a child’s fault if someone hurts them.

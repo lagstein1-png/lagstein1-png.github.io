@@ -112,8 +112,39 @@ const NATIVE = /[֐-׿؀-ۿЀ-ӿ]/;
       const mk = (typeof buildQuestion === 'function')
         ? (t, lv) => buildQuestion(t, lv, undefined, true)
         : (typeof buildQ === 'function') ? (t, lv) => buildQ(t, lv) : null;
-      if (!mk) return { skip: true };
       const SYM = new RegExp(symSrc), NAT = new RegExp(natSrc);
+      /* O-174 — משפחת `js/{app,data,engine}.js` (civics-elem ועוד). אין בה
+         buildQ ולא מסיחים עם הסבר; יש שדה `why` אחד לשאלה, בארבע שפות
+         (שורת `Y` אחרי `Q` ב-data.js, או `why` באובייקט ב-science-12).
+         כאן הדרישה מחמירה בשני דברים: הכתב חייב להיות של **השפה הזאת**
+         (עברית בעברית, ערבית בערבית, קירילית ברוסית), וההסבר הוא **משפט
+         אחד** — אין סוף משפט ואחריו עוד טקסט. שאלה בלי `why` אינה ממצא. */
+      if (!mk && typeof ALL_Q !== 'undefined' && Array.isArray(ALL_Q)) {
+        const SCRIPT = { he: /[א-ת]/, ar: /[ء-ي]/, ru: /[А-яЁё]/, en: /[A-Za-z]/ };
+        const fam = { family: true, total: ALL_Q.length, with: 0 };
+        for (const lg of ['he', 'ar', 'ru', 'en']) fam[lg] = { n: 0, sym: 0, foreign: 0, long: 0, multi: 0, ex: [] };
+        for (const q of ALL_Q) {
+          if (!q.why) continue;
+          fam.with++;
+          for (const lg of ['he', 'ar', 'ru', 'en']) {
+            const r = fam[lg], w = String(q.why[lg] || '').trim();
+            r.n++;
+            const hitSym = SYM.test(w);
+            const hitFor = !SCRIPT[lg].test(w);
+            const hitLong = w.length > maxlen;
+            const hitMulti = /[.!?؟;]\s+\S/.test(w);
+            if (hitSym) r.sym++;
+            if (hitFor) r.foreign++;
+            if (hitLong) r.long++;
+            if (hitMulti) r.multi++;
+            if ((hitSym || hitFor || hitLong || hitMulti) && r.ex.length < 3)
+              r.ex.push((hitSym ? 'סימן' : hitFor ? 'חסר או לא בשפת הלומד' : hitLong ? 'ארוך' : 'יותר ממשפט אחד') +
+                        ': ' + (w || '(ריק)').slice(0, 74));
+          }
+        }
+        return fam;
+      }
+      if (!mk) return { skip: true };
 
       const out = {};
       for (const lg of ['he', 'ar', 'ru', 'en']) {
@@ -158,6 +189,22 @@ const NATIVE = /[֐-׿؀-ۿЀ-ӿ]/;
 
     await ctx.close();
     if (res.skip) { console.log(`· ${app.padEnd(13)}אין buildQ/TOPICS — דולג`); continue }
+    if (res.family) {
+      if (!res.total) { console.log(`✗ ${app.padEnd(13)}ALL_Q ריק — הבדיקה שבורה, לא האפליקציה`); bad++; continue }
+      if (!res.with) { console.log(`· ${app.padEnd(13)}0 מתוך ${res.total} שאלות עם הסבר (why) — אין עדיין תוכן`); continue }
+      checked++;
+      let famBad = 0; const fl = [];
+      for (const lg of ['he', 'ar', 'ru', 'en']) {
+        const r = res[lg], n = r.sym + r.foreign + r.long + r.multi;
+        if (!n) continue;
+        famBad += n;
+        fl.push(`     ${lg}: ${r.sym} עם סימן · ${r.foreign} חסר או לא בשפת הלומד · ${r.long} ארוך מ-${MAXLEN} · ${r.multi} יותר ממשפט אחד`);
+        for (const e of r.ex) fl.push('        ' + e);
+      }
+      if (famBad) { bad += famBad; console.log(`✗ ${app.padEnd(13)}${famBad} הסברים שאינם משפט קריא (${res.with} מתוך ${res.total} שאלות עם why)`); fl.forEach(l => console.log(l)) }
+      else console.log(`✓ ${app.padEnd(13)}${res.with} מתוך ${res.total} שאלות עם הסבר, בארבע שפות — משפט אחד, בשפת הלומד, בלי סימנים`);
+      continue;
+    }
 
     let appBad = 0, tot = 0;
     const lines = [];

@@ -11,6 +11,9 @@ var ENT={}, STORIES=[], cur=null;
     else if(k==="S"){cur={id:f[0],icon:f[1],color:f[2],title:{he:f[3],ar:f[4],ru:f[5],en:f[6]},lines:[],qs:[]};STORIES.push(cur)}
     else if(k==="L"&&cur)cur.lines.push({he:f[0],ar:f[1],ru:f[2],en:f[3]});
     else if(k==="Q"&&cur)cur.qs.push({story:cur.id,q:{he:f[0],ar:f[1],ru:f[2],en:f[3]},a:f[4],d:f[5]?f[5].split(","):null});
+    /* Y he|ar|ru|en — optional, right after its Q line: one sentence that explains the right answer.
+       Shown and read aloud once the question is closed (right answer, or the answer revealed). No Y line = no explanation. */
+    else if(k==="Y"&&cur&&cur.qs.length)cur.qs[cur.qs.length-1].why={he:f[0],ar:f[1],ru:f[2],en:f[3]};
   });
 })();
 var NUMS=["3","4","5","7","10","12","18","40","100","101","102","120"];
@@ -30,7 +33,7 @@ function makeQ(q){
   var pool=poolFor(q.a).filter(function(k){return k!==q.a});
   var d=q.d?q.d.slice():sample(pool,3);
   var keys=shuffle([q.a].concat(d));
-  return {story:q.story,q:q.q,a:q.a,keys:keys,ans:keys.indexOf(q.a)};
+  return {story:q.story,q:q.q,a:q.a,keys:keys,ans:keys.indexOf(q.a),why:q.why||null};
 }
 function buildRound(unit){
   var src=unit.id==="mix"?ALL_Q:storyById(unit.id).qs;

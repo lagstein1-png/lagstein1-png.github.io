@@ -176,6 +176,200 @@ async function measure(page, perCell, only, lang) {
   }, [perCell, only || null, lang || null]);
 }
 
+/* =====================================================================
+   משפחת `js/{app,data,engine,i18n,speech}.js` (O-174, 17.10.2026)
+
+   `measure` למעלה דורשת `buildQ`+`TOPICS`, ולכן שמונה האפליקציות
+   שבנויות על `js/engine.js` הודפסו ״אין buildQ/TOPICS — דולג״ ו-exit 0
+   לא אמר עליהן דבר. באותו יום נוספו בהן 171 שאלות כתובות־ביד.
+
+   **הן בנויות אחרת, אבל כולן חושפות `UNITS` ו-`buildRound(unit)`** —
+   הפונקציה שהדף עצמו קורא לה בתחילת סבב. לכן מודדים דרכה, ולא
+   דרך העתק של המנוע: שלוש צורות מנוע (STORIES ב-6, כרטיסי מילים
+   ב-english-elem, מחוללים ב-hebrew-lit) נבדקות באותו מסלול.
+   הטקסט של אפשרות נלקח מאותה פונקציה שמציירת אותה:
+   `entText(k)[lang]` (= `optText` של STORIES), `optInfo(q,i,lang).text`
+   (english-elem), ו-`o.t` (hebrew-lit — האפשרויות בעברית בכל שפה).
+
+   תא = יחידה × שפה. בכל תא `PER_CELL` סבבים מוזרעים, ועליהם אותם
+   שלושה מדדים ואותם ספים כמו בתאי buildQ. ושאלה כתובה (אותה קבוצת
+   אפשרויות בכל הגרלותיה, לפחות FIXED_MIN פעמים) נבדקת גם לבדה:
+   כפולה, פחות משלוש אפשרויות, ונכונה ארוכה בבירור — אותו (ג) של
+   השיעור. ״ארוכה בבירור״ שבבסיס מודפסת ב-·, וחדשה — ✗.
+   ===================================================================== */
+const FIXED_MIN = 3;
+/* הבסיס — מה שנמצא ביום שהמעבר נולד (17.10.2026, `QA_PORT=8223 node
+   .claude/qa/guess.js`), כמניין לכל אפליקציה ולא כרשימת שאלות:
+   `long` = זוגות שאלה×שפה שבהם הנכונה ארוכה בבירור, `cells` = תאי
+   יחידה×שפה שחצו את LIMIT. **מניין שעלה — ✗**: שאלה חדשה שנכתבה ארוכה,
+   או תרגום שהאריך את הנכונה. מניין שירד — · ״לעדכן את הבסיס״, כדי
+   שהבסיס ירד יחד עם התיקון ולא יחזיק מקום לטעות הבאה. מניין ולא רשימה
+   — כי 112 מזהים בעברית כאן היו קובץ בתוך קובץ; המחיר: תיקון של אחת
+   ושבירה של אחרת באותו קומיט עוברים. התיקון עצמו הוא כתיבת מסיחים בארבע
+   שפות (maayan), לא קוד. ״ארוכה בבירור״ = אותו (ג) של השיעור: יחידה
+   באורך המרבי ולפחות פי LONG_RATIO מהשנייה — ולכן גם ״אלוהים״ מול
+   ״משה״ (6 מול 4 תווים) נספרת. */
+const WHY_ELEM = 'נכתבו לפני שהמעבר נמדד (O-174); רובן מילה או צירוף מול מסיחים קצרים, ' +
+                 'וחלקן רק בתרגום — כתיבת מסיחים באורך דומה בארבע השפות';
+const FAM_BASE = {
+  'hebrew-lit':   { long: 14, cells: 0,  why: 'הבנת הנקרא (u11/u12/u15) ומשפט חסר אחד ב-u6 — מסיחים כתובים־ביד קצרים מהתשובה' },
+  'tanakh-elem':  { long: 5,  cells: 1,  why: WHY_ELEM + '; והתא s2 [en] — הקצרה היא הנכונה ב-73%' },
+  'civics-elem':  { long: 18, cells: 0,  why: WHY_ELEM },
+  'culture-elem': { long: 27, cells: 0,  why: WHY_ELEM },
+  'history-elem': { long: 14, cells: 0,  why: WHY_ELEM },
+  'science-12':   { long: 9,  cells: 0,  why: WHY_ELEM },
+  'net-elem':     { long: 0,  cells: 0,  why: 'נקייה מ-17.10.2026 — עד אז הנכונה הייתה הארוכה ב-35 מתוך 35 (100% בעברית); 13 מסיחים נכתבו מחדש בארבע שפות' },
+};
+
+async function measureFamily(page, n) {
+  return page.evaluate(([n, ratio, fixedMin]) => {
+    if (typeof buildRound !== 'function' || typeof UNITS === 'undefined') return { skip: true };
+    const LG = ['he', 'ar', 'ru', 'en'];
+    const norm = s => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+    const optsOf = (q, l) => {
+      if (q.keys && typeof entText === 'function') return q.keys.map(k => entText(k)[l]);
+      if (q.opts && typeof optInfo === 'function') return q.opts.map((_, i) => optInfo(q, i, l).text);
+      if (q.opts) return q.opts.map(o => (o && typeof o === 'object') ? o.t : o);
+      return null;
+    };
+    const ansOf = q => (typeof q.ans === 'number') ? q.ans : -1;
+    const idOf = q => {
+      const c = (optsOf(q, 'he') || [])[ansOf(q)];
+      if (q.q && q.q.he) return q.q.he + ' → ' + c;
+      if (q.prompt && typeof q.prompt === 'object') return (q.stim ? q.stim + ' | ' : '') + q.prompt.he + ' → ' + c;
+      if (q.item) return (q.type || '') + ' | ' + norm(q.item.question || q.item.sentence || q.item.big || q.item.text || q.item.emoji || '') + ' → ' + c;
+      if (q.w) return (q.kind || '') + ' | ' + q.w.en + ' → ' + c;
+      return '? → ' + c;
+    };
+    const REAL_RANDOM = Math.random;
+    const seedAt = str => {
+      let h = 2166136261 >>> 0;
+      for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+      let z = h >>> 0;
+      Math.random = () => {
+        z |= 0; z = z + 0x6D2B79F5 | 0;
+        let x = Math.imul(z ^ z >>> 15, 1 | z);
+        x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x;
+        return ((x ^ x >>> 14) >>> 0) / 4294967296;
+      };
+    };
+    const cells = [], errs = [], qs = {};
+    const sameAsHe = { ar: true, ru: true, en: true };
+    let nUnits = 0;
+    for (const u of UNITS) {
+      if (u.id === 'mix') continue;   /* סבב מעורב נבנה מהיחידות עצמן */
+      nUnits++;
+      seedAt(u.id);
+      const per = {};
+      for (const l of LG) per[l] = { tid: u.id, lv: 1, n: 0, longU: 0, shortU: 0, pos: [0, 0, 0, 0, 0, 0], verbal: true };
+      for (let k = 0; k < n; k++) {
+        let round;
+        try { round = buildRound(u); } catch (e) { errs.push(`${u.id} — buildRound נפל: ${e.message}`); break; }
+        for (const q of round || []) {
+          const ci = ansOf(q);
+          const id = u.id + ' · ' + idOf(q);
+          const rec = qs[id] || (qs[id] = { unit: u.id, id, seen: 0, sig: null, fixed: true, by: {} });
+          rec.seen++;
+          for (const l of LG) {
+            const o = optsOf(q, l);
+            if (!o) { errs.push(`${u.id} — אין אפשרויות שאפשר לקרוא`); continue; }
+            const txt = o.map(norm);
+            if (l !== 'he' && txt.join('\u0001') !== optsOf(q, 'he').map(norm).join('\u0001')) sameAsHe[l] = false;
+            if (l === 'he') {
+              const sig = txt.slice().sort().join('\u0001') + '\u0002' + txt[ci];
+              if (rec.sig === null) rec.sig = sig; else if (rec.sig !== sig) rec.fixed = false;
+            }
+            if (!rec.by[l]) rec.by[l] = { txt, ci };
+            if (txt.length < 3) rec.by[l].few = txt.length;
+            if (new Set(txt).size !== txt.length) rec.by[l].dup = txt;
+            if (ci < 0 || ci >= txt.length) { rec.by[l].noans = true; continue; }
+            const c = per[l]; c.n++;
+            const L = txt.map(s => s.length), mx = Math.max(...L), mn = Math.min(...L);
+            if (L.filter(x => x === mx).length === 1 && L[ci] === mx) c.longU++;
+            if (L.filter(x => x === mn).length === 1 && L[ci] === mn) c.shortU++;
+            if (ci < c.pos.length) c.pos[ci]++;
+          }
+        }
+      }
+      for (const l of LG) if (per[l].n) cells.push(Object.assign(per[l], { lang: l }));
+    }
+    Math.random = REAL_RANDOM;
+    /* שאלות קבועות: (ג), כפולה, מעט אפשרויות */
+    const fixed = [];
+    for (const rec of Object.values(qs)) {
+      const isFixed = rec.fixed && rec.seen >= fixedMin;
+      for (const l of LG) {
+        const b = rec.by[l]; if (!b) continue;
+        let long = false, Ls = b.txt.map(s => s.length);
+        if (isFixed && !b.noans) {
+          const mx = Math.max(...Ls), second = Math.max(...Ls.filter((_, i) => i !== b.ci));
+          long = Ls.filter(x => x === mx).length === 1 && Ls[b.ci] === mx && mx >= ratio * Math.max(second, 1);
+        }
+        fixed.push({ id: rec.id, unit: rec.unit, lang: l, isFixed, long, lens: Ls.join('/'), ci: b.ci,
+                     longest: isFixed && !b.noans && Ls.filter(x => x === Math.max(...Ls)).length === 1 && Ls[b.ci] === Math.max(...Ls),
+                     dup: b.dup || null, few: b.few || 0, noans: !!b.noans });
+      }
+    }
+    const langs = LG.filter(l => l === 'he' || !sameAsHe[l]);
+    return { cells: cells.filter(c => langs.includes(c.lang)), items: fixed.filter(f => langs.includes(f.lang)),
+             errs, langs, nUnits };
+  }, [n, LONG_RATIO, FIXED_MIN]);
+}
+
+async function judgeFamily(app, page) {
+  const res = await measureFamily(page, PER_CELL);
+  if (res.skip) return null;
+  const errs = res.errs.slice(), warns = [], cellHits = [], longHits = [];
+  if (!res.cells.length) errs.push('לא נמדד אף תא — הבדיקה שבורה, לא האפליקציה');
+  let cellsN = 0;
+  for (const c of res.cells) {
+    if (c.n < MIN_N) continue;
+    if (c.lang === 'he') cellsN++;
+    const r = rates(c);
+    for (const kind in r) {
+      const tag = `${c.tid} [${c.lang}] — ${kind}`;
+      if (r[kind] > LIMIT) cellHits.push(`${tag} היא התשובה ב-${pct(r[kind])}% מ-${c.n} שאלות (ניחוש עיוור: 25%)`);
+      else if (r[kind] > WARN) warns.push(`${tag} ב-${pct(r[kind])}% (מתחת לסף ${pct(LIMIT)}%, מעל קו הראייה ${pct(WARN)}%)`);
+    }
+  }
+  const agg = {};
+  let nFixed = 0;
+  for (const it of res.items) {
+    if (it.isFixed && it.lang === 'he') nFixed++;
+    if (it.noans) errs.push(`${it.id} [${it.lang}] — הנכונה אינה בין האפשרויות`);
+    if (it.few) errs.push(`${it.id} [${it.lang}] — ${it.few} אפשרויות בלבד`);
+    if (it.dup) errs.push(`${it.id} [${it.lang}] — שתי אפשרויות זהות: ${JSON.stringify(it.dup)}`);
+    if (!it.isFixed) continue;
+    const a = agg[it.lang] || (agg[it.lang] = [0, 0]); a[1]++;
+    if (it.longest) a[0]++;
+    if (it.long) longHits.push(`${it.id} [${it.lang}] — הנכונה ארוכה בבירור: ${it.lens} תווים, נכונה ${it.ci}`);
+  }
+  /* הבסיס: מניין שעלה — כל הרשימה מודפסת ב-✗, כי אין דרך לדעת מי החדשה */
+  const base = FAM_BASE[app] || { long: 0, cells: 0 };
+  const notes = [];
+  for (const [kind, hits, label] of [['cells', cellHits, 'תאים מעל הסף'], ['long', longHits, 'נכונות ארוכות בבירור']]) {
+    if (hits.length > base[kind]) {
+      errs.push(`${hits.length} ${label}, ובבסיס ${base[kind]} — נוסף ממצא:`);
+      for (const h of hits) errs.push('  ' + h);
+    } else if (hits.length) {
+      notes.push(`${hits.length} ${label} — בבסיס FAM_BASE: ${base.why}`);
+      if (hits.length < base[kind]) notes.push(`${label}: ${hits.length} מתוך ${base[kind]} שבבסיס — תוקנו, להוריד את FAM_BASE['${app}'].${kind}`);
+    } else if (base[kind]) notes.push(`${label}: אפס, ובבסיס ${base[kind]} — להוריד את FAM_BASE['${app}'].${kind} ל-0`);
+  }
+  console.log(`${errs.length ? '✗' : '✓'} ${app.padEnd(10)} engine.js: ${res.nUnits} יחידות · ${cellsN} תאים ` +
+              `×${res.langs.length} שפות · ${nFixed} שאלות כתובות` +
+              (errs.length ? ` · ${errs.length} ממצאים` : notes.length ? ' · אין ממצא מחוץ לבסיס' : ' · אין שאלה או תא שאפשר לנחש בהם'));
+  for (const e of errs) console.log(`    ✗ ${e}`);
+  for (const n of notes) console.log(`    · ${n}`);
+  for (const w of warns) console.log(`    · ${w}`);
+  if (res.langs.length < 4)
+    console.log(`    · ${['ar', 'ru', 'en'].filter(l => !res.langs.includes(l)).join('/')}: האפשרויות זהות לעברית — לא נמדד שוב`);
+  console.log(`    · הארוכה היא הנכונה (שאלות כתובות): ` +
+              Object.entries(agg).map(([lg, [k, m]]) => `${lg} ${k}/${m} (${pct(k / m)}%)`).join(', '));
+  const based = errs.length ? 0 : Math.min(cellHits.length, base.cells || 0) + Math.min(longHits.length, base.long || 0);
+  return { bad: errs.length, warned: warns.length, checked: cellsN, based };
+}
+
 /* שלושת המדדים של תא, לפי שם — אותו שם שמודפס */
 function rates(c) {
   const tot = c.pos.reduce((a, b) => a + b, 0);
@@ -193,6 +387,8 @@ async function run() {
 
   /* `--lessons` — רק מעבר השיעור (O-188), בלי תאי buildQ */
   const ONLY_LESSONS = process.argv.includes('--lessons');
+  const famDone = new Set();
+  let famBased = 0;   /* ממצאי משפחת engine.js שבבסיס — לא ״אין תא״ */
   for (const app of (ONLY_LESSONS ? [] : APPS)) {
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
@@ -203,7 +399,14 @@ async function run() {
 
     const res = await measure(page, PER_CELL);
 
-    if (res.skip) { await ctx.close(); console.log(`· ${app.padEnd(10)} אין buildQ/TOPICS — דולג`); continue; }
+    if (res.skip) {
+      /* O-174 — משפחת js/engine.js נמדדת דרך buildRound(UNITS) */
+      const fam = await judgeFamily(app, page);
+      await ctx.close();
+      if (fam) { famDone.add(app); bad += fam.bad; warned += fam.warned; checked += fam.checked; famBased += fam.based; continue; }
+      console.log(`· ${app.padEnd(10)} אין buildQ/TOPICS ואין buildRound/UNITS — דולג`);
+      continue;
+    }
 
     /* תא שלא נבנה בו כלום אינו "נקי" — הוא לא נמדד. */
     if (!res.cells.length) {
@@ -315,6 +518,20 @@ async function run() {
     }
   }
 
+  /* O-174 — כל אפליקציה שיש לה js/engine.js חייבת להימדד. הרשימה נגזרת
+     מ-stages.json ומהשרת (כמו `lessons`), לא נכתבת ביד; אפליקציה שהמנוע
+     שלה לא נמדד (bank אחר, או buildRound שנעלם) היא ✗, לא שקט. */
+  if (!ONLY_LESSONS) {
+    const fam = [];
+    for (const app of Object.keys(REG.apps)) {
+      try { const r = await fetch(`${BASE}/${app}/js/engine.js`); if (r.ok) fam.push(app); } catch (e) {}
+    }
+    const miss = fam.filter(a => !famDone.has(a));
+    for (const a of miss) console.log(`✗ ${a.padEnd(10)} יש js/engine.js, ולא נמדד — הבדיקה עיוורת לו`);
+    bad += miss.length;
+    console.log(`${miss.length ? '✗' : '✓'} משפחת js/engine.js: ${famDone.size} מתוך ${fam.length} נמדדו`);
+  }
+
   bad += await lessons(browser);
 
   await browser.close();
@@ -326,7 +543,8 @@ async function run() {
   if (ONLY_LESSONS) { console.log('✓ מסכי השיעור — אין מיקום צפוי, אין שאלה פגומה, ואין ארוכה בבירור מחוץ לבסיס'); return; }
   console.log(`✓ ${checked} תאים נמדדו בעברית, והמילוליים שבהם גם בשאר השפות — ` +
               `אין תא שאורך התשובה או מיקומה מסגירים אותה` +
-              (warned ? ` (${warned} מעל קו הראייה — ראו למעלה)` : ''));
+              (warned ? ` (${warned} מעל קו הראייה — ראו למעלה)` : '') +
+              (famBased ? `; ו-${famBased} ממצאים ישנים במשפחת js/engine.js שבבסיס FAM_BASE — לא נקיים, ראו ·` : ''));
 }
 
 /* =====================================================================

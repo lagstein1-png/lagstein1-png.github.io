@@ -110,6 +110,12 @@ function wirePractice(){
   $("#nextBtn").onclick=nextQ;
 }
 function say(msg,cls){var f=$("#fb");f.className="fb "+(cls||"");f.textContent=msg;}
+/* O-174: the optional explanation (Y line in js/data.js). It appears only once the question is closed,
+   so it never gives the answer away while the learner still has a try. No `why` = the screen and the speech stay as before. */
+function whyOf(q,l){return q.why&&q.why[l||state.lang]||""}
+function whyHtml(q){var w=R.locked?whyOf(q):"";return w?'<p class="lead fbwhy" id="fbwhy" role="status" lang="'+state.lang+'" dir="'+dirOf(state.lang)+'">'+mk(w).html+'</p>':""}
+function withWhy(q,segs){var w=whyOf(q);if(!w)return segs;var f=$("#fb");if(f&&!$("#fbwhy"))f.insertAdjacentHTML("afterend",whyHtml(q));
+  return segs.concat([{t:mk(w).spoken,raw:q.why.he,lang:state.lang,el:"#fbwhy"}])}
 function answer(i){
   if(R.locked||R.gone[i])return;
   var q=curQ(),b=$("#opt"+i);
@@ -118,14 +124,14 @@ function answer(i){
     var msg=(R.streak===3)?t("streak"):t("good"+(1+rnd(4)));
     say("✔ "+msg,"ok");confetti(R.streak>=3?44:22);
     $("#nextBtn").classList.add("show");
-    speakSeq([{t:msg,lang:state.lang}]);
+    speakSeq(withWhy(q,[{t:msg,lang:state.lang}]));
   }else{
     R.streak=0;R.tries++;R.gone[i]=1;b.classList.add("soft");b.disabled=true;
     if(R.tries>=2){
       R.locked=true;$("#opt"+q.ans).classList.add("right");
       var ans=optText(q.a);
       say(t("reveal")+" "+ans,"rev");$("#nextBtn").classList.add("show");
-      speakSeq([{t:t("reveal"),lang:state.lang},{t:ans,lang:state.lang}]);
+      speakSeq(withWhy(q,[{t:t("reveal"),lang:state.lang},{t:ans,lang:state.lang}]));
     }else{say(t("try1"),"try");speakSeq([{t:t("try1"),lang:state.lang}])}
   }
 }
