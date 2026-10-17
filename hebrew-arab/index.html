@@ -1081,7 +1081,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="y27 · 2026-10-16";
+var BUILD="y28 · 2026-10-16";
 var SKEY="hebrew-arab-state-v1";
 var GKEY_STORE="hebrew-arab-gkey";
 
@@ -2697,16 +2697,6 @@ function spkStop(){
   return '<button class="spk spkStop" data-a="stop" aria-label="'+esc(t("stopB"))+'">'+esc(t("stopB"))+"</button>";
 }
 
-/* כרטיס הנושא: מה שמוצג מעל האפשרויות. בהיסטוריה זו כותרת
-   האירוע או המושג, ולצידה כפתורי השמעה בשפת הממשק. */
-function leadBox(txt,sub){
-  if(!txt)return "";
-  return '<div class="subject"><span class="word" style="font-size:1.15rem">'+esc(txt)+"</span>"+
-    (sub?'<span class="ipa">'+esc(sub)+"</span>":"")+
-    '<span style="margin-inline-start:auto;display:flex;gap:.4rem">'+
-    spkBtn(txt,state.lang,false,t("hearWord"))+spkBtn(txt,state.lang,true,t("hearSlow"))+spkStop()+"</span></div>";
-}
-
 /* נוסח השאלה, ולצידו כפתורי השמעה. כאן השאלה היא משפט שלם
    ולא מילה בודדת, ולכן היא יושבת בשורה משלה ולא בתוך שורת נושא. */
 function askBox(txt){
@@ -3018,7 +3008,7 @@ function screenSet(){
   h+='<div class="card" style="margin-bottom:1rem"><h3 style="font-size:1.1rem;margin-bottom:.5rem">'+
      esc(t("setLang"))+"</h3><div class=\"lvls\">";
   Object.keys(LANGS).forEach(function(k){
-    h+='<button class="lvl'+(state.lang===k?" on":"")+'" aria-pressed="'+(state.lang===k?"true":"false")+'" aria-pressed="'+(state.lang===k?"true":"false")+'" data-a="lang" data-v="'+k+'" lang="'+k+'" dir="'+LANGS[k].dir+'">'+
+    h+='<button class="lvl'+(state.lang===k?" on":"")+'" aria-pressed="'+(state.lang===k?"true":"false")+'" data-a="lang" data-v="'+k+'" lang="'+k+'" dir="'+LANGS[k].dir+'">'+
       esc(LANGS[k].name)+"</button>";
   });
   h+="</div></div>";
@@ -3033,9 +3023,9 @@ function screenSet(){
      '<p class="sub" style="margin-top:.3rem;opacity:.7">'+esc(BUILD)+'</p></div>';
   h+=vstrip();
   h+='<div class="vgrid" style="margin:.6rem 0">'+
-     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" aria-pressed="'+(state.voiceMode==="device"?"true":"false")+'" aria-pressed="'+(state.voiceMode==="device"?"true":"false")+'" data-a="vmode" data-v="device">'+
+     '<button class="vopt'+(state.voiceMode==="device"?" on":"")+'" aria-pressed="'+(state.voiceMode==="device"?"true":"false")+'" data-a="vmode" data-v="device">'+
      '<span><span class="nm">'+esc(t("vDev"))+'</span><br><span class="ds">'+esc(t("vDevD"))+"</span></span></button>"+
-     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" aria-pressed="'+(state.voiceMode==="gem"?"true":"false")+'" aria-pressed="'+(state.voiceMode==="gem"?"true":"false")+'" data-a="vmode" data-v="gem">'+
+     '<button class="vopt'+(state.voiceMode==="gem"?" on":"")+'" aria-pressed="'+(state.voiceMode==="gem"?"true":"false")+'" data-a="vmode" data-v="gem">'+
      '<span><span class="nm">'+esc(t("vGem"))+'</span><br><span class="ds">'+esc(t("vGemD"))+"</span></span></button></div>";
 
   h+='<div class="row"><div><div class="lab">'+esc(t("rate"))+'</div>'+
@@ -3086,7 +3076,7 @@ function screenSet(){
   });
   h+='<div class="row"><div class="lab">'+esc(t("theme"))+'</div><div class="lvls">'+
      [["auto","thAuto"],["light","thLight"],["dark","thDark"]].map(function(x){
-       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" aria-pressed="'+(state.theme===x[0]?"true":"false")+'" aria-pressed="'+(state.theme===x[0]?"true":"false")+'" data-a="theme" data-v="'+x[0]+'">'+
+       return '<button class="lvl'+(state.theme===x[0]?" on":"")+'" aria-pressed="'+(state.theme===x[0]?"true":"false")+'" data-a="theme" data-v="'+x[0]+'">'+
          esc(t(x[1]))+"</button>"}).join("")+"</div></div>";
   h+="</div>";
 
@@ -4868,7 +4858,7 @@ if(window.TUTOR){
         q:txt(x.lead), options:o.map(function(p){return txt(p.h)}),
         correct:ok, student:st, topic:tp?txt(tName(tp)):null,
         level:x.lv!=null?t("lv"+x.lv):null,
-        curriculum:"ספרות לבגרות"+(tr?" — "+txt(t(tr.nk)):"")+(tp?" — "+txt(tName(tp)):"")};
+        curriculum:"עברית לדוברי ערבית לבגרות"+(tr?" — "+txt(t(tr.nk)):"")+(tp?" — "+txt(tName(tp)):"")};
     },
     actions:{
       next_question:{desc:"עובר לשאלה הבאה; באמצע שאלה — מחליף אותה בשאלה אחרת באותו נושא ורמה",
@@ -4934,7 +4924,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=y27-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=y28-pwa1").catch(function(){});
   });
 }
 </script>

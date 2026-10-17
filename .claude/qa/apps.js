@@ -197,17 +197,23 @@ for (const a of apps) {
 }
 
 /* --- 6. מפתחות האחסון ייחודיים --- */
+/* O-180 (17.10.2026): עד היום אפליקציה בלי SKEY דולגה בשקט, ו-`app.js`
+   לא נקרא כלל — כך ש-bagrut-806 ו-bagrut-history, שה-SKEY שלהן שם,
+   לא נבדקו מעולם. עכשיו נקראים שניהם, ומי שדולגה מודפסת בשורת ·.
+   ההתנגשות של כל מפתח, בכל שם משתנה, נבדקת ב-`storage.js`. */
 const keys = new Map();
+const noSkey = [];
 for (const a of apps) {
   if (EXTERNAL.has(a.id)) continue;
-  const f = path.join(ROOT, a.id, 'index.html');
-  if (!fs.existsSync(f)) continue;
-  const t = fs.readFileSync(f, 'utf8');
+  const t = ['index.html', 'app.js'].map(f => path.join(ROOT, a.id, f))
+    .filter(f => fs.existsSync(f)).map(f => fs.readFileSync(f, 'utf8')).join('\n');
+  if (!t) continue;
   const k = t.match(/var SKEY\s*=\s*"([^"]+)"/);
-  if (!k) continue;                       /* לא כל משפחה משתמשת ב-SKEY */
+  if (!k) { noSkey.push(a.id); continue; } /* לא כל משפחה משתמשת ב-SKEY */
   if (keys.has(k[1])) bad(`${a.id}: SKEY "${k[1]}" כבר בשימוש ב-${keys.get(k[1])} — שתיהן ידרסו זו את זו`);
   else keys.set(k[1], a.id);
 }
+console.log(`· SKEY: ${keys.size} נבדקו לייחודיות; ${noSkey.length} בלי SKEY ולא נבדקו כאן (storage.js בודק אותן): ${noSkey.join(', ')}`);
 
 /* --- 6.5. מניין התחומים של הלומדה, בארבע שפות --- */
 /* אותה מלכודת של ה-`badge` בדיוק, במקום שני: כרטיס הלומדה ופסקת

@@ -56,6 +56,7 @@ html.hc{ --bg:#000; --card:#000; --ink:#fff; --muted:#fff; --line:#fff; --acc:#f
 html.clear-font{ --font:"Arial","Verdana",system-ui,sans-serif }
 html.spaced body{ letter-spacing:.06em; word-spacing:.16em; line-height:1.9 }
 html.rm *{ animation:none!important; transition:none!important; scroll-behavior:auto!important }
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 *{box-sizing:border-box}
 html{font-size:var(--fs,17px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.65 var(--font);-webkit-text-size-adjust:100%}
@@ -361,7 +362,7 @@ html[lang="en"] body{letter-spacing:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r52 · 2026-10-16";
+var BUILD="r53 · 2026-10-16";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -1247,7 +1248,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r52-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r53-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>

@@ -48,11 +48,29 @@ function filesOf(app) {
   return out;
 }
 
+/* **תכונה כפולה באותה תגית (O-180, 17.10.2026).** 57 תגיות ב-16
+   אפליקציות נשאו `aria-pressed` פעמיים — שכפול של תיקון O-136א שרץ
+   פעמיים על אותה שורה. הדפדפן לוקח את הראשונה ומשליך את השנייה, כך
+   שהיום אין נזק נראה; אבל מי שיתקן את הערך בשנייה בלבד יתקן אוויר.
+   תגית = `<שם …>` בשורה אחת. תגית שנבנית על פני כמה שורות, עם
+   חלופה בטרנרי (`reader`), אינה נתפסת כאן ואינה כפולה. */
+const TAG = /<[a-zA-Z][\w-]*\b[^<>\n]*>/g;
+let dup = 0;
+
 let bad = 0, seen = 0, apps = 0;
 for (const app of list) {
   let n = 0, miss = [];
   for (const p of filesOf(app)) {
     const src = fs.readFileSync(p, 'utf8');
+    TAG.lastIndex = 0; let t;
+    while ((t = TAG.exec(src))) {
+      const k = (t[0].match(/aria-pressed\s*=/g) || []).length;
+      if (k > 1) {
+        dup++;
+        const line = src.slice(0, t.index).split('\n').length;
+        console.log(`✗ ${path.relative(ROOT, p)}:${line} — aria-pressed ${k} פעמים באותה תגית`);
+      }
+    }
     const hits = new Set();
     for (const re of RE) { re.lastIndex = 0; let m; while ((m = re.exec(src))) hits.add(m[0]); }
     for (const tag of hits) {
@@ -75,5 +93,5 @@ for (const app of list) {
   }
 }
 
-console.log(`\n${apps} אפליקציות עם כפתורים דו־מצביים · ${seen} תבניות כפתור · ${bad} בלי aria-pressed`);
-process.exit(bad ? 1 : 0);
+console.log(`\n${apps} אפליקציות עם כפתורים דו־מצביים · ${seen} תבניות כפתור · ${bad} בלי aria-pressed · ${dup} תגיות עם aria-pressed כפול`);
+process.exit(bad || dup ? 1 : 0);

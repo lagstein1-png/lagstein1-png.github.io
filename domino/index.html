@@ -312,7 +312,7 @@ function build(setId,lv,seed){
   var deck={set:setId,lv:lv,seed:seed,cards:printed,chain:chainIds,byChain:cards};
   RNG=Math.random;return deck}
 /* ===== UI strings ===== */
-var BUILD="dm22 · 2026-10-16";
+var BUILD="dm23 · 2026-10-16";
 var STR={
 he:{brand:"דומינו לימודי",title:"דומינו לימודי להדפסה",tag:"מדפיסים 20 קלפים, גוזרים ומסדרים במעגל. כל קלף מתחבר לקלף שמתאים לו.",
  howT:"איך משחקים?",limor:"אני לימור. ככה משחקים:",how:"1. מדפיסים את הקלפים וגוזרים לפי הקו המקווקו.\n2. מערבבים את הקלפים על השולחן.\n3. מתחילים בקלף עם הכוכב. מחפשים קלף שהחצי הראשון שלו מתאים לחצי השני של הקלף הקודם.\n4. ממשיכים עד שהמעגל נסגר. הקלף האחרון מתחבר לקלף עם הכוכב.",
@@ -345,15 +345,15 @@ en:{brand:"Learning dominoes",title:"Printable learning dominoes",tag:"Print 20 
 };
 var LNAME={he:"עב",ar:"عر",ru:"Рус",en:"En"},LDIR={he:"rtl",ar:"rtl",ru:"ltr",en:"ltr"},LCODE={he:"he-IL",ar:"ar-SA",ru:"ru-RU",en:"en-US"};
 /* ===== state ===== */
-var KEY="domino-state-v1",S={lang:"he",set:"nums",lvl:1,seed:1,slow:false,big:false},view="home",DECK=null,showKey=false;
-function loadS(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)for(var k in o)S[k]=o[k]}catch(e){}
+var SKEY="domino-state-v1",S={lang:"he",set:"nums",lvl:1,seed:1,slow:false,big:false},view="home",DECK=null,showKey=false;
+function loadS(){try{var o=JSON.parse(localStorage.getItem(SKEY)||"null");if(o)for(var k in o)S[k]=o[k]}catch(e){}
   /* מגירה פגומה אינה מסך ריק: render קורא ל-STR[S.lang] ו-SETS[S.set]
      בלי בדיקה, וערך שאינו ברשימה היה זורק לפני שנכתב משהו ל-#app. */
   if(!STR[S.lang])S.lang="he";
   if(!SETS[S.set])S.set="nums";
   if(!(S.seed>0))S.seed=1;
   if(S.lvl!==1&&S.lvl!==2)S.lvl=1;}
-function saveS(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function saveS(){try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}}
 loadS();
 function $(s){return document.querySelector(s)}
 function T(){return STR[S.lang]}
@@ -686,7 +686,7 @@ function boot(){var q=new URLSearchParams(location.search),l=q.get("lang");if(l&
   render();
   var pr=q.get("print");if(pr==="cards")document.documentElement.classList.add("pc");else if(pr==="key")document.documentElement.classList.add("pk");
   if(window.TUTOR){try{TUTOR.mount({app:"domino",lang:function(){return S.lang},q:function(){return null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm22-pwa1").catch(function(){})})}
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm23-pwa1").catch(function(){})})}
 if(!INTERNAL_OK){
   document.getElementById("gate").hidden=false;
   document.title="לא פורסם";
