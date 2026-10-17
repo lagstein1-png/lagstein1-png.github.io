@@ -130,7 +130,10 @@ function t(name, got, want) {
   } else {
     for (const [lg, word] of [['he', 'אינם נשלחים לשום שרת'], ['ar', 'لا يُرسَل إلى أيّ خادم'], ['ru', 'не отправляются ни на какой сервер'], ['en', 'are not sent to any server']])
       t('התנאים ב-' + lg + ' אומרים שהמורה עונה מהמכשיר', terms.indexOf(word) > 0, true);
-    t('התנאים אינם מזכירים את Gemini', /Gemini/.test(terms), false);
+    /* O-219 (17.10.2026, הכרעת הבעלים): סעיף ההקראה נוקב Google Gemini;
+       האיסור על שם הספק נשאר על שאר התנאים. */
+    const NV = /\["(?:הקראה בקול טבעי|القراءة بصوت طبيعي|Чтение естественным голосом|Natural-voice reading)","(?:[^"\\]|\\.)*"\]/g;
+    t('התנאים מזכירים את Gemini רק בסעיף ההקראה', /Gemini/.test(terms.replace(NV, "")), false);
   }
 
   console.log(bad ? `\n✗ גרסה פשוטה — ${bad} מתוך ${n} נכשלו` : `\n✓ גרסה פשוטה — ${n} בדיקות עברו`);
