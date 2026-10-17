@@ -2580,7 +2580,7 @@ function ic(n,cl){
 /* ================= app state ================= */
 /* מספר גרסה — מופיע בתחתית המסך. מעלים אותו בכל שינוי,
    כדי לדעת מיד אם הדפדפן מציג קובץ ישן מהזיכרון. */
-var BUILD="s168 · 2026-10-16";
+var BUILD="s169 · 2026-10-16";
 var view=/[?&]lesson=sci([1-9]|1[0-3])(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -5197,6 +5197,12 @@ function lsOpts(list,answered,correctIdx,act){
     return '<div style="display:flex;gap:8px;align-items:stretch"><button class="btn" data-a="'+act+'" data-i="'+i+'" style="flex:1;min-height:46px;font-weight:700;font-size:1.05rem;background:'+bg+';border:2px solid '+bd+';color:'+fg+'">'+esc(o)+'</button><button class="btn btn-g" data-a="usay" data-say="'+esc(o)+'" aria-label="'+esc(T().uHear)+'" style="min-height:46px;min-width:52px;padding:10px 12px;flex:none">🔊</button></div>';
   }).join("")+'</div>';
 }
+/* O-188: אפשרות רביעית במסכי השיעור. המפתח (למשל slA3, slP1a3, slWhy3)
+   נכנס רק כשהוא קיים בכל ארבע השפות של המילון. עד שהתוכן נכתב, המסך
+   נשאר עם שלוש אפשרויות, ושום דבר לא נשבר. */
+function lsHas(D,k){if(!k)return false;for(var l in D){if(!D[l]||D[l][k]===undefined)return false}return true}
+function lsMore(D,k,tf){return lsHas(D,k)?[tf(k)]:[]}
+function lsWhy(D,k,tf){return lsHas(D,k)?tf(k):""}
 function lessonView(){
   var st=LSN,h='<div class="card" style="max-width:640px;margin:18px auto;padding:22px">';
   h+='<div style="font-size:.9rem;color:var(--ink-soft)">'+esc(fmt0(lt("lsStep"),Math.min(st.step+1,5)))+'</div>';
@@ -5308,9 +5314,9 @@ function sciLessonView(){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(slt("slQ"))+'</p>';
     h+=uHintBtn(slt("slHintQ"));
     h+=slScene(true);
-    h+=lsOpts([slt("slA0"),slt("slA1"),slt("slA2")],st.picked,1,"slpick");
+    h+=lsOpts([slt("slA0"),slt("slA1"),slt("slA2"),...lsMore(SLSTR,"slA3",slt)],st.picked,1,"slpick");
     if(st.picked>=0){
-      var why=st.picked===1?"":slt({0:"slWhy0",2:"slWhy2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(SLSTR,{0:"slWhy0",2:"slWhy2",3:"slWhy3"}[st.picked],slt);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?slt("slCorrect"):slt("slWrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("slnext",slt("slNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -5321,12 +5327,14 @@ function sciLessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(slt("slP1"))+'</p>';
     h+=uHintBtn(slt("slHintP1"));
-    h+=lsOpts([slt("slP1a0"),slt("slP1a1"),slt("slP1a2")],st.p1,1,"slp1");
+    h+=lsOpts([slt("slP1a0"),slt("slP1a1"),slt("slP1a2"),...lsMore(SLSTR,"slP1a3",slt)],st.p1,1,"slp1");
     if(st.p1===1){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(slt("slP2"))+'</p>';
       h+=uHintBtn(slt("slHintP2"));
-      h+=lsOpts([slt("slP2a0"),slt("slP2a1"),slt("slP2a2")],st.p2,2,"slp2");
+      h+=lsOpts([slt("slP2a0"),slt("slP2a1"),slt("slP2a2"),...lsMore(SLSTR,"slP2a3",slt)],st.p2,2,"slp2");
     }
+    if(st.p1>=0&&st.p1!==1)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(slt("slWrong"))+'</p>';
+    if(st.p1===1&&st.p2>=0&&st.p2!==2)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(slt("slWrong"))+'</p>';
     if(st.p1===1&&st.p2===2)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(slt("slCorrect"))+'</p><div style="margin-top:10px">'+lsBtn("slnext",slt("slNext"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(slt("slSum"))+'</p>';
@@ -5391,9 +5399,9 @@ function sci2LessonView(){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s2t("s2Q"))+'</p>';
     h+=uHintBtn(s2t("s2HintQ"));
     h+=s2Scene(true);
-    h+=lsOpts([s2t("s2A0"),s2t("s2A1"),s2t("s2A2")],st.picked,1,"s2pick");
+    h+=lsOpts([s2t("s2A0"),s2t("s2A1"),s2t("s2A2"),...lsMore(S2STR,"s2A3",s2t)],st.picked,1,"s2pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s2t({0:"s2Why0",2:"s2Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S2STR,{0:"s2Why0",2:"s2Why2",3:"s2Why3"}[st.picked],s2t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s2t("s2Correct"):s2t("s2Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s2next",s2t("s2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -5404,12 +5412,14 @@ function sci2LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s2t("s2P1"))+'</p>';
     h+=uHintBtn(s2t("s2HintP1"));
-    h+=lsOpts([s2t("s2P1a0"),s2t("s2P1a1"),s2t("s2P1a2")],st.p1,1,"s2p1");
+    h+=lsOpts([s2t("s2P1a0"),s2t("s2P1a1"),s2t("s2P1a2"),...lsMore(S2STR,"s2P1a3",s2t)],st.p1,1,"s2p1");
     if(st.p1===1){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s2t("s2P2"))+'</p>';
       h+=uHintBtn(s2t("s2HintP2"));
-      h+=lsOpts([s2t("s2P2a0"),s2t("s2P2a1"),s2t("s2P2a2")],st.p2,0,"s2p2");
+      h+=lsOpts([s2t("s2P2a0"),s2t("s2P2a1"),s2t("s2P2a2"),...lsMore(S2STR,"s2P2a3",s2t)],st.p2,0,"s2p2");
     }
+    if(st.p1>=0&&st.p1!==1)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s2t("s2Wrong"))+'</p>';
+    if(st.p1===1&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s2t("s2Wrong"))+'</p>';
     if(st.p1===1&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s2t("s2Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s2next",s2t("s2Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s2t("s2Sum"))+'</p>';
@@ -5474,9 +5484,9 @@ function sci3LessonView(){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s3t("s3Q"))+'</p>';
     h+=uHintBtn(s3t("s3HintQ"));
     h+=s3Scene(true);
-    h+=lsOpts([s3t("s3A0"),s3t("s3A1"),s3t("s3A2")],st.picked,1,"s3pick");
+    h+=lsOpts([s3t("s3A0"),s3t("s3A1"),s3t("s3A2"),...lsMore(S3STR,"s3A3",s3t)],st.picked,1,"s3pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s3t({0:"s3Why0",2:"s3Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S3STR,{0:"s3Why0",2:"s3Why2",3:"s3Why3"}[st.picked],s3t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s3t("s3Correct"):s3t("s3Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s3next",s3t("s3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -5487,12 +5497,14 @@ function sci3LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s3t("s3P1"))+'</p>';
     h+=uHintBtn(s3t("s3HintP1"));
-    h+=lsOpts([s3t("s3P1a0"),s3t("s3P1a1"),s3t("s3P1a2")],st.p1,1,"s3p1");
+    h+=lsOpts([s3t("s3P1a0"),s3t("s3P1a1"),s3t("s3P1a2"),...lsMore(S3STR,"s3P1a3",s3t)],st.p1,1,"s3p1");
     if(st.p1===1){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s3t("s3P2"))+'</p>';
       h+=uHintBtn(s3t("s3HintP2"));
-      h+=lsOpts([s3t("s3P2a0"),s3t("s3P2a1"),s3t("s3P2a2")],st.p2,0,"s3p2");
+      h+=lsOpts([s3t("s3P2a0"),s3t("s3P2a1"),s3t("s3P2a2"),...lsMore(S3STR,"s3P2a3",s3t)],st.p2,0,"s3p2");
     }
+    if(st.p1>=0&&st.p1!==1)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s3t("s3Wrong"))+'</p>';
+    if(st.p1===1&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s3t("s3Wrong"))+'</p>';
     if(st.p1===1&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s3t("s3Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s3next",s3t("s3Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s3t("s3Sum"))+'</p>';
@@ -5557,9 +5569,9 @@ function sci4LessonView(){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s4t("s4Q"))+'</p>';
     h+=uHintBtn(s4t("s4HintQ"));
     h+=s4Scene(true);
-    h+=lsOpts([s4t("s4A0"),s4t("s4A1"),s4t("s4A2")],st.picked,1,"s4pick");
+    h+=lsOpts([s4t("s4A0"),s4t("s4A1"),s4t("s4A2"),...lsMore(S4STR,"s4A3",s4t)],st.picked,1,"s4pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s4t({0:"s4Why0",2:"s4Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S4STR,{0:"s4Why0",2:"s4Why2",3:"s4Why3"}[st.picked],s4t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s4t("s4Correct"):s4t("s4Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s4next",s4t("s4Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -5570,12 +5582,14 @@ function sci4LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s4t("s4P1"))+'</p>';
     h+=uHintBtn(s4t("s4HintP1"));
-    h+=lsOpts([s4t("s4P1a0"),s4t("s4P1a1"),s4t("s4P1a2")],st.p1,1,"s4p1");
+    h+=lsOpts([s4t("s4P1a0"),s4t("s4P1a1"),s4t("s4P1a2"),...lsMore(S4STR,"s4P1a3",s4t)],st.p1,1,"s4p1");
     if(st.p1===1){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s4t("s4P2"))+'</p>';
       h+=uHintBtn(s4t("s4HintP2"));
-      h+=lsOpts([s4t("s4P2a0"),s4t("s4P2a1"),s4t("s4P2a2")],st.p2,0,"s4p2");
+      h+=lsOpts([s4t("s4P2a0"),s4t("s4P2a1"),s4t("s4P2a2"),...lsMore(S4STR,"s4P2a3",s4t)],st.p2,0,"s4p2");
     }
+    if(st.p1>=0&&st.p1!==1)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s4t("s4Wrong"))+'</p>';
+    if(st.p1===1&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s4t("s4Wrong"))+'</p>';
     if(st.p1===1&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s4t("s4Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s4next",s4t("s4Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s4t("s4Sum"))+'</p>';
@@ -5639,9 +5653,9 @@ function sci5LessonView(){
     h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s5t("s5Check"))+'</h2>';
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s5t("s5Q"))+'</p>';
     h+=uHintBtn(s5t("s5HintQ"));
-    h+=lsOpts([s5t("s5A0"),s5t("s5A1"),s5t("s5A2")],st.picked,1,"s5pick");
+    h+=lsOpts([s5t("s5A0"),s5t("s5A1"),s5t("s5A2"),...lsMore(S5STR,"s5A3",s5t)],st.picked,1,"s5pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s5t({0:"s5Why0",2:"s5Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S5STR,{0:"s5Why0",2:"s5Why2",3:"s5Why3"}[st.picked],s5t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s5t("s5Correct"):s5t("s5Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s5next",s5t("s5Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -5652,12 +5666,14 @@ function sci5LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s5t("s5P1"))+'</p>';
     h+=uHintBtn(s5t("s5HintP1"));
-    h+=lsOpts([s5t("s5P1a0"),s5t("s5P1a1"),s5t("s5P1a2")],st.p1,0,"s5p1");
+    h+=lsOpts([s5t("s5P1a0"),s5t("s5P1a1"),s5t("s5P1a2"),...lsMore(S5STR,"s5P1a3",s5t)],st.p1,0,"s5p1");
     if(st.p1===0){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s5t("s5P2"))+'</p>';
       h+=uHintBtn(s5t("s5HintP2"));
-      h+=lsOpts([s5t("s5P2a0"),s5t("s5P2a1"),s5t("s5P2a2")],st.p2,0,"s5p2");
+      h+=lsOpts([s5t("s5P2a0"),s5t("s5P2a1"),s5t("s5P2a2"),...lsMore(S5STR,"s5P2a3",s5t)],st.p2,0,"s5p2");
     }
+    if(st.p1>=0&&st.p1!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s5t("s5Wrong"))+'</p>';
+    if(st.p1===0&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s5t("s5Wrong"))+'</p>';
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s5t("s5Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s5next",s5t("s5Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s5t("s5Sum"))+'</p>';
@@ -5724,9 +5740,9 @@ function sci6LessonView(){
     h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s6t("s6Check"))+'</h2>';
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s6t("s6Q"))+'</p>';
     h+=uHintBtn(s6t("s6HintQ"));
-    h+=lsOpts([s6t("s6A0"),s6t("s6A1"),s6t("s6A2")],st.picked,1,"s6pick");
+    h+=lsOpts([s6t("s6A0"),s6t("s6A1"),s6t("s6A2"),...lsMore(S6STR,"s6A3",s6t)],st.picked,1,"s6pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s6t({0:"s6Why0",2:"s6Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S6STR,{0:"s6Why0",2:"s6Why2",3:"s6Why3"}[st.picked],s6t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s6t("s6Correct"):s6t("s6Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s6next",s6t("s6Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -5737,12 +5753,14 @@ function sci6LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s6t("s6P1"))+'</p>';
     h+=uHintBtn(s6t("s6HintP1"));
-    h+=lsOpts([s6t("s6P1a0"),s6t("s6P1a1"),s6t("s6P1a2")],st.p1,0,"s6p1");
+    h+=lsOpts([s6t("s6P1a0"),s6t("s6P1a1"),s6t("s6P1a2"),...lsMore(S6STR,"s6P1a3",s6t)],st.p1,0,"s6p1");
     if(st.p1===0){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s6t("s6P2"))+'</p>';
       h+=uHintBtn(s6t("s6HintP2"));
-      h+=lsOpts([s6t("s6P2a0"),s6t("s6P2a1"),s6t("s6P2a2")],st.p2,0,"s6p2");
+      h+=lsOpts([s6t("s6P2a0"),s6t("s6P2a1"),s6t("s6P2a2"),...lsMore(S6STR,"s6P2a3",s6t)],st.p2,0,"s6p2");
     }
+    if(st.p1>=0&&st.p1!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s6t("s6Wrong"))+'</p>';
+    if(st.p1===0&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s6t("s6Wrong"))+'</p>';
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s6t("s6Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s6next",s6t("s6Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s6t("s6Sum"))+'</p>';
@@ -5804,9 +5822,9 @@ function sci7LessonView(){
     h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s7t("s7Check"))+'</h2>';
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s7t("s7Q"))+'</p>';
     h+=uHintBtn(s7t("s7HintQ"));
-    h+=lsOpts([s7t("s7A0"),s7t("s7A1"),s7t("s7A2")],st.picked,1,"s7pick");
+    h+=lsOpts([s7t("s7A0"),s7t("s7A1"),s7t("s7A2"),...lsMore(S7STR,"s7A3",s7t)],st.picked,1,"s7pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s7t({0:"s7Why0",2:"s7Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S7STR,{0:"s7Why0",2:"s7Why2",3:"s7Why3"}[st.picked],s7t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s7t("s7Correct"):s7t("s7Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s7next",s7t("s7Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -5817,12 +5835,14 @@ function sci7LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s7t("s7P1"))+'</p>';
     h+=uHintBtn(s7t("s7HintP1"));
-    h+=lsOpts([s7t("s7P1a0"),s7t("s7P1a1"),s7t("s7P1a2")],st.p1,0,"s7p1");
+    h+=lsOpts([s7t("s7P1a0"),s7t("s7P1a1"),s7t("s7P1a2"),...lsMore(S7STR,"s7P1a3",s7t)],st.p1,0,"s7p1");
     if(st.p1===0){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s7t("s7P2"))+'</p>';
       h+=uHintBtn(s7t("s7HintP2"));
-      h+=lsOpts([s7t("s7P2a0"),s7t("s7P2a1"),s7t("s7P2a2")],st.p2,0,"s7p2");
+      h+=lsOpts([s7t("s7P2a0"),s7t("s7P2a1"),s7t("s7P2a2"),...lsMore(S7STR,"s7P2a3",s7t)],st.p2,0,"s7p2");
     }
+    if(st.p1>=0&&st.p1!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s7t("s7Wrong"))+'</p>';
+    if(st.p1===0&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s7t("s7Wrong"))+'</p>';
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s7t("s7Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s7next",s7t("s7Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s7t("s7Sum"))+'</p>';
@@ -5884,9 +5904,9 @@ function sci8LessonView(){
     h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s8t("s8Check"))+'</h2>';
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s8t("s8Q"))+'</p>';
     h+=uHintBtn(s8t("s8HintQ"));
-    h+=lsOpts([s8t("s8A0"),s8t("s8A1"),s8t("s8A2")],st.picked,1,"s8pick");
+    h+=lsOpts([s8t("s8A0"),s8t("s8A1"),s8t("s8A2"),...lsMore(S8STR,"s8A3",s8t)],st.picked,1,"s8pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s8t({0:"s8Why0",2:"s8Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S8STR,{0:"s8Why0",2:"s8Why2",3:"s8Why3"}[st.picked],s8t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s8t("s8Correct"):s8t("s8Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s8next",s8t("s8Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -5897,12 +5917,14 @@ function sci8LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s8t("s8P1"))+'</p>';
     h+=uHintBtn(s8t("s8HintP1"));
-    h+=lsOpts([s8t("s8P1a0"),s8t("s8P1a1"),s8t("s8P1a2")],st.p1,0,"s8p1");
+    h+=lsOpts([s8t("s8P1a0"),s8t("s8P1a1"),s8t("s8P1a2"),...lsMore(S8STR,"s8P1a3",s8t)],st.p1,0,"s8p1");
     if(st.p1===0){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s8t("s8P2"))+'</p>';
       h+=uHintBtn(s8t("s8HintP2"));
-      h+=lsOpts([s8t("s8P2a0"),s8t("s8P2a1"),s8t("s8P2a2")],st.p2,0,"s8p2");
+      h+=lsOpts([s8t("s8P2a0"),s8t("s8P2a1"),s8t("s8P2a2"),...lsMore(S8STR,"s8P2a3",s8t)],st.p2,0,"s8p2");
     }
+    if(st.p1>=0&&st.p1!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s8t("s8Wrong"))+'</p>';
+    if(st.p1===0&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s8t("s8Wrong"))+'</p>';
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s8t("s8Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s8next",s8t("s8Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s8t("s8Sum"))+'</p>';
@@ -5965,9 +5987,9 @@ function sci9LessonView(){
     h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s9t("s9Check"))+'</h2>';
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s9t("s9Q"))+'</p>';
     h+=uHintBtn(s9t("s9HintQ"));
-    h+=lsOpts([s9t("s9A0"),s9t("s9A1"),s9t("s9A2")],st.picked,1,"s9pick");
+    h+=lsOpts([s9t("s9A0"),s9t("s9A1"),s9t("s9A2"),...lsMore(S9STR,"s9A3",s9t)],st.picked,1,"s9pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s9t({0:"s9Why0",2:"s9Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S9STR,{0:"s9Why0",2:"s9Why2",3:"s9Why3"}[st.picked],s9t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s9t("s9Correct"):s9t("s9Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s9next",s9t("s9Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -5978,12 +6000,14 @@ function sci9LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s9t("s9P1"))+'</p>';
     h+=uHintBtn(s9t("s9HintP1"));
-    h+=lsOpts([s9t("s9P1a0"),s9t("s9P1a1"),s9t("s9P1a2")],st.p1,0,"s9p1");
+    h+=lsOpts([s9t("s9P1a0"),s9t("s9P1a1"),s9t("s9P1a2"),...lsMore(S9STR,"s9P1a3",s9t)],st.p1,0,"s9p1");
     if(st.p1===0){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s9t("s9P2"))+'</p>';
       h+=uHintBtn(s9t("s9HintP2"));
-      h+=lsOpts([s9t("s9P2a0"),s9t("s9P2a1"),s9t("s9P2a2")],st.p2,0,"s9p2");
+      h+=lsOpts([s9t("s9P2a0"),s9t("s9P2a1"),s9t("s9P2a2"),...lsMore(S9STR,"s9P2a3",s9t)],st.p2,0,"s9p2");
     }
+    if(st.p1>=0&&st.p1!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s9t("s9Wrong"))+'</p>';
+    if(st.p1===0&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s9t("s9Wrong"))+'</p>';
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s9t("s9Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s9next",s9t("s9Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s9t("s9Sum"))+'</p>';
@@ -6045,9 +6069,9 @@ function sci10LessonView(){
     h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s10t("s10Check"))+'</h2>';
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s10t("s10Q"))+'</p>';
     h+=uHintBtn(s10t("s10HintQ"));
-    h+=lsOpts([s10t("s10A0"),s10t("s10A1"),s10t("s10A2")],st.picked,1,"s10pick");
+    h+=lsOpts([s10t("s10A0"),s10t("s10A1"),s10t("s10A2"),...lsMore(S10STR,"s10A3",s10t)],st.picked,1,"s10pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s10t({0:"s10Why0",2:"s10Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S10STR,{0:"s10Why0",2:"s10Why2",3:"s10Why3"}[st.picked],s10t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s10t("s10Correct"):s10t("s10Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s10next",s10t("s10Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -6058,12 +6082,14 @@ function sci10LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s10t("s10P1"))+'</p>';
     h+=uHintBtn(s10t("s10HintP1"));
-    h+=lsOpts([s10t("s10P1a0"),s10t("s10P1a1"),s10t("s10P1a2")],st.p1,0,"s10p1");
+    h+=lsOpts([s10t("s10P1a0"),s10t("s10P1a1"),s10t("s10P1a2"),...lsMore(S10STR,"s10P1a3",s10t)],st.p1,0,"s10p1");
     if(st.p1===0){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s10t("s10P2"))+'</p>';
       h+=uHintBtn(s10t("s10HintP2"));
-      h+=lsOpts([s10t("s10P2a0"),s10t("s10P2a1"),s10t("s10P2a2")],st.p2,0,"s10p2");
+      h+=lsOpts([s10t("s10P2a0"),s10t("s10P2a1"),s10t("s10P2a2"),...lsMore(S10STR,"s10P2a3",s10t)],st.p2,0,"s10p2");
     }
+    if(st.p1>=0&&st.p1!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s10t("s10Wrong"))+'</p>';
+    if(st.p1===0&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s10t("s10Wrong"))+'</p>';
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s10t("s10Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s10next",s10t("s10Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s10t("s10Sum"))+'</p>';
@@ -6125,9 +6151,9 @@ function sci11LessonView(){
     h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s11t("s11Check"))+'</h2>';
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s11t("s11Q"))+'</p>';
     h+=uHintBtn(s11t("s11HintQ"));
-    h+=lsOpts([s11t("s11A0"),s11t("s11A1"),s11t("s11A2")],st.picked,1,"s11pick");
+    h+=lsOpts([s11t("s11A0"),s11t("s11A1"),s11t("s11A2"),...lsMore(S11STR,"s11A3",s11t)],st.picked,1,"s11pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s11t({0:"s11Why0",2:"s11Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S11STR,{0:"s11Why0",2:"s11Why2",3:"s11Why3"}[st.picked],s11t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s11t("s11Correct"):s11t("s11Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s11next",s11t("s11Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -6138,12 +6164,14 @@ function sci11LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s11t("s11P1"))+'</p>';
     h+=uHintBtn(s11t("s11HintP1"));
-    h+=lsOpts([s11t("s11P1a0"),s11t("s11P1a1"),s11t("s11P1a2")],st.p1,0,"s11p1");
+    h+=lsOpts([s11t("s11P1a0"),s11t("s11P1a1"),s11t("s11P1a2"),...lsMore(S11STR,"s11P1a3",s11t)],st.p1,0,"s11p1");
     if(st.p1===0){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s11t("s11P2"))+'</p>';
       h+=uHintBtn(s11t("s11HintP2"));
-      h+=lsOpts([s11t("s11P2a0"),s11t("s11P2a1"),s11t("s11P2a2")],st.p2,0,"s11p2");
+      h+=lsOpts([s11t("s11P2a0"),s11t("s11P2a1"),s11t("s11P2a2"),...lsMore(S11STR,"s11P2a3",s11t)],st.p2,0,"s11p2");
     }
+    if(st.p1>=0&&st.p1!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s11t("s11Wrong"))+'</p>';
+    if(st.p1===0&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s11t("s11Wrong"))+'</p>';
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s11t("s11Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s11next",s11t("s11Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s11t("s11Sum"))+'</p>';
@@ -6208,9 +6236,9 @@ function sci12LessonView(){
     h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s12t("s12Check"))+'</h2>';
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s12t("s12Q"))+'</p>';
     h+=uHintBtn(s12t("s12HintQ"));
-    h+=lsOpts([s12t("s12A0"),s12t("s12A1"),s12t("s12A2")],st.picked,1,"s12pick");
+    h+=lsOpts([s12t("s12A0"),s12t("s12A1"),s12t("s12A2"),...lsMore(S12STR,"s12A3",s12t)],st.picked,1,"s12pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s12t({0:"s12Why0",2:"s12Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S12STR,{0:"s12Why0",2:"s12Why2",3:"s12Why3"}[st.picked],s12t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s12t("s12Correct"):s12t("s12Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s12next",s12t("s12Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -6221,12 +6249,14 @@ function sci12LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s12t("s12P1"))+'</p>';
     h+=uHintBtn(s12t("s12HintP1"));
-    h+=lsOpts([s12t("s12P1a0"),s12t("s12P1a1"),s12t("s12P1a2")],st.p1,0,"s12p1");
+    h+=lsOpts([s12t("s12P1a0"),s12t("s12P1a1"),s12t("s12P1a2"),...lsMore(S12STR,"s12P1a3",s12t)],st.p1,0,"s12p1");
     if(st.p1===0){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s12t("s12P2"))+'</p>';
       h+=uHintBtn(s12t("s12HintP2"));
-      h+=lsOpts([s12t("s12P2a0"),s12t("s12P2a1"),s12t("s12P2a2")],st.p2,0,"s12p2");
+      h+=lsOpts([s12t("s12P2a0"),s12t("s12P2a1"),s12t("s12P2a2"),...lsMore(S12STR,"s12P2a3",s12t)],st.p2,0,"s12p2");
     }
+    if(st.p1>=0&&st.p1!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s12t("s12Wrong"))+'</p>';
+    if(st.p1===0&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s12t("s12Wrong"))+'</p>';
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s12t("s12Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s12next",s12t("s12Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s12t("s12Sum"))+'</p>';
@@ -6288,9 +6318,9 @@ function sci13LessonView(){
     h+='<h2 style="font-size:1.15rem;margin:0 0 6px">'+esc(s13t("s13Check"))+'</h2>';
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s13t("s13Q"))+'</p>';
     h+=uHintBtn(s13t("s13HintQ"));
-    h+=lsOpts([s13t("s13A0"),s13t("s13A1"),s13t("s13A2")],st.picked,1,"s13pick");
+    h+=lsOpts([s13t("s13A0"),s13t("s13A1"),s13t("s13A2"),...lsMore(S13STR,"s13A3",s13t)],st.picked,1,"s13pick");
     if(st.picked>=0){
-      var why=st.picked===1?"":s13t({0:"s13Why0",2:"s13Why2"}[st.picked]);
+      var why=st.picked===1?"":lsWhy(S13STR,{0:"s13Why0",2:"s13Why2",3:"s13Why3"}[st.picked],s13t);
       h+='<p style="margin-top:12px;font-weight:700;color:'+(st.picked===1?'var(--teal-text)':'var(--coral-deep)')+'">'+esc(st.picked===1?s13t("s13Correct"):s13t("s13Wrong"))+' '+esc(why)+'</p>';
       if(st.picked===1)h+='<div style="margin-top:10px">'+lsBtn("s13next",s13t("s13Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
     }
@@ -6301,12 +6331,14 @@ function sci13LessonView(){
   }else if(st.step===4){
     h+='<p style="font-size:1.08rem;line-height:1.7">'+esc(s13t("s13P1"))+'</p>';
     h+=uHintBtn(s13t("s13HintP1"));
-    h+=lsOpts([s13t("s13P1a0"),s13t("s13P1a1"),s13t("s13P1a2")],st.p1,0,"s13p1");
+    h+=lsOpts([s13t("s13P1a0"),s13t("s13P1a1"),s13t("s13P1a2"),...lsMore(S13STR,"s13P1a3",s13t)],st.p1,0,"s13p1");
     if(st.p1===0){
       h+='<p style="font-size:1.08rem;line-height:1.7;margin-top:18px">'+esc(s13t("s13P2"))+'</p>';
       h+=uHintBtn(s13t("s13HintP2"));
-      h+=lsOpts([s13t("s13P2a0"),s13t("s13P2a1"),s13t("s13P2a2")],st.p2,0,"s13p2");
+      h+=lsOpts([s13t("s13P2a0"),s13t("s13P2a1"),s13t("s13P2a2"),...lsMore(S13STR,"s13P2a3",s13t)],st.p2,0,"s13p2");
     }
+    if(st.p1>=0&&st.p1!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s13t("s13Wrong"))+'</p>';
+    if(st.p1===0&&st.p2>=0&&st.p2!==0)h+='<p style="margin-top:12px;font-weight:700;color:var(--coral-deep)">'+esc(s13t("s13Wrong"))+'</p>';
     if(st.p1===0&&st.p2===0)h+='<p style="margin-top:12px;font-weight:700;color:var(--teal-text)">'+esc(s13t("s13Correct"))+'</p><div style="margin-top:10px">'+lsBtn("s13next",s13t("s13Next"),'background:#1d4ed8;color:#fff;font-weight:700')+'</div>';
   }else{
     h+='<p style="font-size:1.12rem;line-height:1.8;font-weight:600">'+esc(s13t("s13Sum"))+'</p>';
@@ -6367,7 +6399,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=s168-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=s169-pwa1").catch(function(){});
   });
 }
 </script>
