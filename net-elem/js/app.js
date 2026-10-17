@@ -134,7 +134,12 @@ function answer(i){
     speakSeq(withWhy(q,[{t:msg,lang:state.lang}]));
   }else{
     R.streak=0;R.tries++;R.gone[i]=1;b.classList.add("soft");b.disabled=true;
-    say(function(){return t("try1")},"try");speakSeq([{t:t("try1"),lang:state.lang}]);
+    if(R.tries>=2){
+      R.locked=true;$("#opt"+q.ans).classList.add("right");
+      var ans=optText(q.a);
+      say(function(){return t("reveal")+" "+optText(q.a)},"rev");$("#nextBtn").classList.add("show");
+      speakSeq(withWhy(q,[{t:t("reveal"),lang:state.lang},{t:ans,lang:state.lang}]));
+    }else{say(function(){return t("try1")},"try");speakSeq([{t:t("try1"),lang:state.lang}])}
   }
 }
 function nextQ(){

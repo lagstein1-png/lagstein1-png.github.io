@@ -33,13 +33,13 @@
 | `bagrut-history` | h138 · 2026-10-16 | h138-pwa1 | תואם |
 | `islam` | is22 · 2026-10-16 | is22-pwa1 | תואם |
 | `russian` | ru23 · 2026-10-16 | ru23-pwa1 | תואם |
-| `tanakh-elem` | te27 · 2026-10-16 | te27-pwa1 | תואם |
-| `civics-elem` | mc27 · 2026-10-16 | mc27-pwa1 | תואם |
-| `culture-elem` | tm24 · 2026-10-16 | tm24-pwa1 | תואם |
-| `history-elem` | hk24 · 2026-10-16 | hk24-pwa1 | תואם |
+| `tanakh-elem` | te28 · 2026-10-16 | te28-pwa1 | תואם |
+| `civics-elem` | mc28 · 2026-10-16 | mc28-pwa1 | תואם |
+| `culture-elem` | tm25 · 2026-10-16 | tm25-pwa1 | תואם |
+| `history-elem` | hk25 · 2026-10-16 | hk25-pwa1 | תואם |
 | `english-elem` | en21 · 2026-10-16 | en21-pwa1 | תואם |
 | `science-12` | sg25 · 2026-10-16 | sg25-pwa1 | תואם |
 | `domino` | dm23 · 2026-10-16 | dm23-pwa1 | תואם |
-| `net-elem` | ns13 · 2026-10-16 | ns13-pwa1 | תואם |
+| `net-elem` | ns14 · 2026-10-16 | ns14-pwa1 | תואם |
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-10-15.
