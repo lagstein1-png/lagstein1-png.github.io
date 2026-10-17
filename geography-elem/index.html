@@ -2615,7 +2615,7 @@ STR.he.praise2="יופי! בדיוק ככה!";STR.he.praise3="נהדר! תפסת
 STR.en.praise2="Yay! Exactly right!";STR.en.praise3="Great! You've got the hang of it!";STR.en.praise4="Wow, strong! Another one like that!";STR.en.praise5="Well done! You earned it!";STR.en.streakMsg="{n} in a row! You're on a roll!";
 STR.ru.praise2="Ура! Именно так!";STR.ru.praise3="Отлично! Вы поймали суть!";STR.ru.praise4="Ух ты, здорово! Ещё одну такую же!";STR.ru.praise5="Молодцы! Вы это заслужили!";STR.ru.streakMsg="{n} подряд! Вы на волне!";
 STR.ar.praise2="رائع! هكذا بالضبط!";STR.ar.praise3="ممتاز! أمسكتم الفكرة!";STR.ar.praise4="واو، قوي! واحدة أخرى مثلها!";STR.ar.praise5="أحسنتم! تستحقونها!";STR.ar.streakMsg="{n} على التوالي! أنتم في قمة الحماس!";
-var BUILD="w149 · 2026-10-16";
+var BUILD="w150 · 2026-10-16";
 var view=/[?&]lesson=geo([1-9][0-9]*)(&|$)/.test(location.search||"")?"lesson":"units";
 var P={ses:[],qi:0,phase:"ask",wrong:[],flash:null,hints:0,results:[],ok:0,brk:false,visual:false};
 var BT={text:"",shown:0,timer:null};
@@ -5206,8 +5206,19 @@ function lsBar(parts,shaded){
 }
 function lsBtn(a,label,style){return '<button class="btn" data-a="'+a+'" style="min-height:46px;font-size:1.05rem;padding:12px 22px;'+(style||'')+'">'+esc(label)+'</button>'}
 function lsHearBtn(text){return '<button class="btn btn-g" data-a="lshear" data-say="'+esc(text)+'" style="min-height:46px;padding:10px 16px">🔊 '+esc(lt("lsHear"))+'</button>'}
+/* O-188: האפשרויות מוצגות בסדר מעורבב, והסדר יציב לכל מסך — הזרע הוא
+   שם הפעולה (act), ולכן אותו מסך נראה אותו דבר בכל ציור מחדש.
+   data-i נשאר האינדקס המקורי, כך שבדיקת הנכונה וההסברים לא השתנו.
+   קודם הנכונה עמדה ב-40 מתוך 42 מסכים במקום הראשון או השני. */
+function lsOrder(n,act){
+  var h=2166136261,k,j,t,ord=[];
+  for(k=0;k<String(act).length;k++){h^=String(act).charCodeAt(k);h=Math.imul(h,16777619)>>>0}
+  for(k=0;k<n;k++)ord.push(k);
+  for(k=n-1;k>0;k--){h=(Math.imul(h,1103515245)+12345)>>>0;j=(h>>>8)%(k+1);t=ord[k];ord[k]=ord[j];ord[j]=t}
+  return ord;
+}
 function lsOpts(list,answered,correctIdx,act){
-  return '<div style="display:grid;gap:10px;margin-top:12px">'+list.map(function(o,i){
+  return '<div style="display:grid;gap:10px;margin-top:12px">'+lsOrder(list.length,act).map(function(i){var o=list[i];
     var bg='#fff',bd='#334155',fg='#0f172a';
     if(answered>=0){
       if(i===correctIdx){bg='#0b7c71';bd='#0b7c71';fg='#fff'}
@@ -5727,7 +5738,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=w149-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=w150-pwa1").catch(function(){});
   });
 }
 </script>

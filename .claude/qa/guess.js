@@ -364,18 +364,20 @@ async function run() {
    קוד. מסך שנוסף לכאן חייב נימוק; מסך שתוקן מדווח, כדי שיימחק.
    מסך חדש שאינו כאן ונופל ב-(ג) — ✗. */
 const LESSON_LONG_BASE = {
-  science: ['slpick', 'slp1', 'slp2', 's2pick', 's2p1', 's2p2', 's3pick', 's4p1',
-            's5pick', 's5p1', 's5p2', 's6p1', 's7p1', 's8pick', 's8p1', 's8p2',
-            's9pick', 's9p1', 's10p2', 's11pick', 's11p1', 's11p2', 's12pick',
-            's12p1', 's12p2', 's13p2'],
+  /* science — 26 המסכים תוקנו 17.10.2026 (מסיחים באורך דומה בארבע
+     השפות, maayan). הרשומה נמחקה; מסך שחוזר ונופל ב-(ג) — ✗. */
+  /* geography-elem — 3 מסכים (8 תאים בארבע השפות), נמדד 17.10.2026 אחרי
+     העתקת lsOrder. תיקונם הוא מסיחים בארבע שפות, לא קוד. */
+  'geography-elem': ['g1p1', 'g1p2', 'g2p1'],
 };
 /* אפליקציה שיש בה `lsOpts` בלי ערבוב, ואינה בתחום התיקון שבו נוספה
    הבדיקה. מודפסת ב-·, ולא מפילה. כשהיא נקייה — מדווח, כדי שתימחק. */
 const LESSON_OPEN = {
-  'math-app':      'O-188 — 3 מסכים, אין ערבוב ב-lsOpts; ההעתקה מ-science טרם נעשתה',
-  'geography-elem': 'O-188 — 12 מסכים, אין ערבוב ב-lsOpts; ההעתקה מ-science טרם נעשתה',
+  /* math-app יצאה 17.10.2026: lsOrder הועתק מ-science, ו-(א) אינו נמדד
+     מתחת ל-POS_MIN_N (שלושה מסכים בשיעור שלה). */
 };
 const LONG_RATIO = 1.5;
+const POS_MIN_N = 6;
 
 async function lessons(browser) {
   let bad = 0;
@@ -436,7 +438,11 @@ async function lessons(browser) {
       for (let k = 0; k < n; k++) exp[k] = (exp[k] || 0) + 1 / n;
     }
     const N = he.length;
-    for (let k = 0; k < exp.length; k++) {
+    /* (א) רק מ-POS_MIN_N שאלות. ב-3 שאלות אין ״מיקום צפוי״: כל חלוקה
+       פרט ל-1/1/1 (2 מתוך 9 סדרים) עוברת 60%, והניחוש עצמו הוא אחד
+       לשלושה בכל מקרה. הכרעה, 17.10.2026 (math-app, שלושה מסכים). */
+    const posSkip = N < POS_MIN_N;
+    for (let k = 0; k < exp.length && !posSkip; k++) {
       const o = obs[k] || 0, e = exp[k];
       if (o / N > 0.60) errs.push(`מיקום ${k} מחזיק ${o} מתוך ${N} נכונות (${pct(o / N)}%) — אפשר לנחש לפי מקום`);
       else if (e >= 5 && o < e / 2) errs.push(`מיקום ${k} מקבל ${o} נכונות, וערבוב הוגן היה נותן ~${Math.round(e)} — אפשר לפסול אותו בלי לדעת`);
@@ -468,6 +474,7 @@ async function lessons(browser) {
     console.log(`${mark} ${app.padEnd(10)} שיעור: ${N} שאלות · מיקום הנכונה ${posTxt}` +
                 (errs.length ? ` · ${errs.length} ממצאים` : ''));
     for (const e of errs) console.log(`    ${soft ? '·' : '✗'} ${e}`);
+    if (posSkip) console.log(`    · (א) לא נמדד: ${N} שאלות, פחות מ-${POS_MIN_N} — מעט מדי כדי לקבוע מיקום צפוי`);
     if (soft) console.log(`    · לא מפיל: ${LESSON_OPEN[app]}`);
     if (soft && !errs.length) console.log(`    · נקייה — למחוק את '${app}' מ-LESSON_OPEN`);
     console.log(`    · מספר אפשרויות לשאלה: ${JSON.stringify(nDist)}`);
