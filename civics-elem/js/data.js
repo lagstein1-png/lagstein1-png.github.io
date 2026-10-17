@@ -117,6 +117,21 @@ Q מה עושים כשיש בעיה שקשה לפתור לבד?|ماذا نفع�
 E e_comm|t|קהילה|مجتمع|сообщество|a community
 E e_askadult|t|מבקשים עזרה ממבוגר מהימן|نطلب المساعدة من شخص بالغ موثوق|просим помощи у надёжного взрослого|we ask a trusted grown-up for help
 E e_small|t|קטנה|صغير|маленькое|small
+E xv_care|t|דואגים זה לזה|يهتمّون ببعضهم|заботятся друг о друге|they take care of each other
+E xv_fight|t|רבים כל הזמן|يتشاجرون طوال الوقت|всё время ссорятся|they argue all the time
+E xv_silent|t|לא מדברים זה עם זה|لا يتكلّمون مع بعضهم|не разговаривают друг с другом|they do not talk to each other
+E xv_selfonly|t|כל אחד דואג רק לעצמו|كل واحد يهتمّ بنفسه فقط|каждый думает только о себе|each one cares only for himself
+Q מה עושים אנשים במשפחה?|ماذا يفعل الناس في العائلة؟|Что делают люди в семье?|What do people in a family do?|xv_care|xv_fight,xv_silent,xv_selfonly
+E xv_kidsteach|t|הילדים והמורה|الأولاد والمعلّم|дети и учитель|the children and the teacher
+E xv_onlyteach|t|רק המורים|المعلّمون فقط|только учителя|only the teachers
+E xv_onlypar|t|רק ההורים|الأهل فقط|только родители|only the parents
+E xv_onlyneigh|t|רק השכנים|الجيران فقط|только соседи|only the neighbors
+Q מי לומד יחד בכיתה?|من يتعلّم معًا في الصف؟|Кто учится вместе в классе?|Who learns together in the class?|xv_kidsteach|xv_onlyteach,xv_onlypar,xv_onlyneigh
+E xv_eachhelps|t|כל אחד עוזר, ומחליטים יחד|كل واحد يساعد، ونقرّر معًا|каждый помогает, и решают вместе|everyone helps, and we decide together
+E xv_eachwants|t|כל אחד עושה מה שהוא רוצה|كل واحد يفعل ما يريد|каждый делает, что хочет|everyone does whatever they want
+E xv_onedec|t|רק אדם אחד מחליט על הכול|شخص واحد فقط يقرّر كل شيء|только один человек решает всё|only one person decides everything
+E xv_notalk|t|אף אחד לא מדבר עם אף אחד|لا أحد يتكلّم مع أحد|никто ни с кем не разговаривает|nobody talks to anybody
+Q מה קורה בקהילה טובה?|ماذا يحدث في جماعة جيدة؟|Что происходит в хорошей общине?|What happens in a good community?|xv_eachhelps|xv_eachwants,xv_onedec,xv_notalk
 `;
 RAW+=String.raw`
 E e_safe2|t|כדי שיהיה בטוח והוגן לכולם|لكي يكون الجميع بأمان ومعاملين بعدل|чтобы всем было безопасно и справедливо|so that it is safe and fair for everyone
@@ -143,6 +158,26 @@ Q מי כותב את החוקים?|من يكتب القوانين؟|Кто пи�
 Q מי עוזר לשמור על החוקים?|من يساعد في الحفاظ على القوانين؟|Кто помогает соблюдать законы?|Who helps to keep the laws?|police|teacher,fireman,medic
 Q מה עושים כשהרבה ילדים רוצים לעלות על המגלשה?|ماذا نفعل عندما يريد أولاد كثيرون الصعود إلى الزحليقة؟|Что мы делаем, когда много детей хотят залезть на горку?|What do we do when many children want to go on the slide?|e_wait|e_push,e_cut,e_quarrel2
 Q מה עושים כשמישהו מכה אותנו?|ماذا نفعل عندما يضربنا أحد؟|Что делать, когда кто-то нас бьёт?|What do we do when someone hits us?|e_tell|e_hit,e_keepquiet,e_pushback
+E xv_everywhere|t|בכל מקום: בבית, בכיתה ובמגרש|في كل مكان: في البيت والصف والملعب|везде: дома, в классе и на площадке|everywhere: at home, in class and on the playground
+E xv_onlyschool|t|רק בבית הספר, ולא בבית|في المدرسة فقط، وليس في البيت|только в школе, а не дома|only at school, not at home
+E xv_onlyroad|t|רק בכביש, ולא בשום מקום אחר|في الشارع فقط، ولا في أي مكان آخر|только на дороге, и больше нигде|only on the road, and nowhere else
+E xv_onlyarmy|t|רק בצבא, ולא אצל ילדים|في الجيش فقط، وليس عند الأولاد|только в армии, а не у детей|only in the army, not for children
+Q איפה יש כללים?|أين توجد قواعد؟|Где есть правила?|Where are there rules?|xv_everywhere|xv_onlyschool,xv_onlyroad,xv_onlyarmy
+E xv_listen|t|מקשיבים כשמישהו אחר מדבר|نصغي عندما يتكلّم شخص آخر|слушаем, когда говорит другой|we listen when someone else is talking
+E xv_shout|t|צועקים כדי שישמעו אותנו|نصرخ لكي يسمعونا|кричим, чтобы нас услышали|we shout so that people hear us
+E xv_take|t|לוקחים דברים בלי לשאול|نأخذ أشياء بدون أن نسأل|берём вещи без спроса|we take things without asking
+E xv_runclass|t|רצים בין השולחנות|نركض بين الطاولات|бегаем между партами|we run between the desks
+Q איזה מהם הוא כלל טוב לכיתה?|أيّ منها قاعدة جيدة للصف؟|Какое из этого — хорошее правило для класса?|Which of these is a good class rule?|xv_listen|xv_shout,xv_take,xv_runclass
+E xv_redlight|t|עוצרים כשהרמזור אדום|نتوقّف عندما تكون الإشارة حمراء|останавливаемся на красный свет|we stop at a red light
+E xv_breakfast|t|אוכלים ארוחת בוקר בשבע|نتناول الفطور في السابعة|завтракаем в семь часов|we eat breakfast at seven
+E xv_bed9|t|הולכים לישון בתשע|ننام في التاسعة|ложимся спать в девять|we go to bed at nine
+E xv_football|t|משחקים כדורגל בהפסקה|نلعب كرة القدم في الاستراحة|играем в футбол на перемене|we play football at recess
+Q איזה מהם הוא חוק שכל המדינה שומרת עליו?|أيّ منها قانون تلتزم به الدولة كلّها؟|Что из этого — закон, который соблюдает вся страна?|Which of these is a law that the whole country keeps?|xv_redlight|xv_breakfast,xv_bed9,xv_football
+E xv_everyturn|t|כל אחד מקבל את התור שלו|كل واحد يحصل على دوره|каждый получает свою очередь|everyone gets their turn
+E xv_strongfirst|t|החזק ביותר מגיע ראשון|الأقوى يصل أوّلًا|самый сильный приходит первым|the strongest gets there first
+E xv_nobodygets|t|אף אחד לא מגיע למגלשה|لا أحد يصل إلى الزحليقة|никто не попадает на горку|nobody gets to the slide
+E xv_tallfirst|t|הגבוה ביותר עולה ראשון|الأطول يصعد أوّلًا|самый высокий идёт первым|the tallest goes first
+Q מחכים בתור ולא דוחפים. מה קורה?|ننتظر في الدور ولا ندفع. ماذا يحدث؟|Ждём в очереди и не толкаемся. Что происходит?|We wait in line and do not push. What happens?|xv_everyturn|xv_strongfirst,xv_nobodygets,xv_tallfirst
 S rights|⚖️|#29853c|זכויות וחובות|الحقوق والواجبات|права и обязанности|Rights and Duties
 L לכל ילד יש זכויות. זכות היא דבר שמגיע לנו.|لكل طفل حقوق. الحق هو شيء يحق لنا الحصول عليه.|У каждого ребёнка есть права. Право - это то, что нам положено.|Every child has rights. A right is something we are entitled to.
 L יש לנו זכות ללמוד, לשחק, לקבל טיפול רפואי ולהיות מוגנים.|لدينا الحق في أن نتعلّم ونلعب ونتلقّى علاجًا طبيًا ونكون محميّين.|У нас есть право учиться, играть, получать медицинскую помощь и быть в безопасности.|We have the right to learn, to play, to get medical care and to be protected.
@@ -158,6 +193,14 @@ Q מה נכון לגבי הזכויות והחובות?|ما الصحيح بشأ
 Q איזו זכות מאפשרת לנו להגיד מה אנחנו חושבים?|أي حق يتيح لنا أن نقول ما نفكّر فيه؟|Какое право позволяет нам говорить, что мы думаем?|Which right lets us say what we think?|rsay|rplay,rheal,rlearn
 E e_right|t|זכות|حق|право|a right
 E e_duty|t|חובה|واجب|обязанность|a duty
+Q ילד חולה הולך לרופא. איזו זכות יש לו?|ولد مريض يذهب إلى الطبيب. أيّ حقّ له؟|Больной ребёнок идёт к врачу. Какое у него право?|A sick child goes to the doctor. Which right does he have?|rheal|rsay,rplay,urules
+Q שומרים על הניקיון בכיתה. איך קוראים לזה?|نحافظ على النظافة في الصف. ماذا نسمّي ذلك؟|Мы следим за чистотой в классе. Как это называется?|We keep the classroom clean. What is this called?|e_duty|e_right,laws,rules
+Q ילדים משחקים בהפסקה. איך קוראים לזה?|الأولاد يلعبون في الاستراحة. ماذا نسمّي ذلك؟|Дети играют на перемене. Как это называется?|Children play at recess. What is this called?|e_right|e_duty,laws,rules
+E xv_sayhear|t|אפשר להגיד מה אני חושב, ומקשיבים לי|يمكنني أن أقول ما أفكّر فيه، ويصغون إليّ|я могу сказать, что думаю, и меня слушают|I can say what I think, and people listen to me
+E xv_shoutall|t|אפשר לצעוק על כולם מתי שאני רוצה|يمكنني أن أصرخ على الجميع متى أردت|я могу кричать на всех, когда хочу|I can shout at everyone whenever I want
+E xv_onlyme|t|רק אני מדבר, ואחרים שותקים|أنا فقط أتكلّم، والآخرون يسكتون|говорю только я, а другие молчат|only I talk, and others stay quiet
+E xv_nodiff|t|אסור לאחרים לחשוב אחרת ממני|ممنوع على الآخرين أن يفكّروا بشكل مختلف عنّي|другим нельзя думать иначе, чем я|others may not think differently from me
+Q יש לי זכות להגיד את דעתי. מה זה אומר?|لي حقّ أن أعبّر عن رأيي. ماذا يعني ذلك؟|У меня есть право высказывать своё мнение. Что это значит?|I have the right to say what I think. What does this mean?|xv_sayhear|xv_shoutall,xv_onlyme,xv_nodiff
 `;
 
 RAW+=String.raw`
@@ -185,6 +228,16 @@ E e_stand|t|עומדים|نقف|стоим|we stand
 E e_sitdown|t|יושבים ואוכלים|نجلس ونأكل|сидим и едим|we sit and eat
 E e_run2|t|רצים|نركض|бежим|we run
 E e_play|t|משחקים|نلعب|играем|we play
+E xv_israelw|t|ישראל|إسرائيل|Израиль|Israel
+E xv_shalomw|t|שלום|سلام|мир|peace
+E xv_jlmw|t|ירושלים|القدس|Иерусалим|Jerusalem
+E xv_hatikvaw|t|התקווה|الأمل (هتكفا)|надежда|Hatikvah
+Q איזו מילה כתובה למטה בסמל המדינה?|أيّ كلمة مكتوبة في أسفل شعار الدولة؟|Какое слово написано внизу на гербе государства?|Which word is written at the bottom of the state emblem?|xv_israelw|xv_shalomw,xv_jlmw,xv_hatikvaw
+E xv_belong|t|שאנחנו שייכים יחד|أنّنا ننتمي معًا|что мы вместе|that we belong together
+E xv_richest|t|מי העשיר ביותר במדינה|من الأغنى في الدولة|кто самый богатый в стране|who is the richest in the country
+E xv_weather|t|מה מזג האוויר מחר|كيف سيكون الطقس غدًا|какая завтра погода|what the weather is tomorrow
+E xv_whowins|t|מי ינצח במשחק|من سيفوز في المباراة|кто выиграет в игре|who will win the game
+Q מה הסמלים של המדינה מראים לנו?|ماذا ترينا رموز الدولة؟|Что нам показывают символы государства?|What do the symbols of the country show us?|xv_belong|xv_richest,xv_weather,xv_whowins
 S indep|🕯️|#c92a2a|יום העצמאות ויום הזיכרון|يوم الاستقلال ويوم الذكرى|День независимости и День памяти|Independence Day and Memorial Day
 L בשנת 1948 הוקמה מדינת ישראל.|في عام 1948 قامت دولة إسرائيل.|В 1948 году было создано государство Израиль.|In 1948 the State of Israel was founded.
 L דוד בן־גוריון קרא את מגילת העצמאות בתל אביב. הוא היה ראש הממשלה הראשון.|قرأ دافيد بن غوريون وثيقة الاستقلال في تل أبيب. وكان أول رئيس للحكومة.|Давид Бен-Гурион прочитал Декларацию независимости в Тель-Авиве. Он был первым премьер-министром.|David Ben-Gurion read the Declaration of Independence in Tel Aviv. He was the first Prime Minister.
@@ -198,6 +251,21 @@ Q איזה יום הוא היום שמח, עם דגלים וזיקוקים?|أي
 Q איזה יום זוכרים בו חיילים ואנשים שנהרגו?|في أي يوم نتذكّر الجنود والأشخاص الذين قُتلوا؟|В какой день вспоминают солдат и людей, которые погибли?|On which day do we remember soldiers and people who were killed?|memor|indep,purim,pesach
 Q מה עושים כשנשמעת צפירה ביום הזיכרון?|ماذا نفعل عندما تُسمع الصفّارة في يوم الذكرى؟|Что делают, когда в День памяти звучит сирена?|What do we do when the siren sounds on Memorial Day?|siren|run,e_sirentalk,e_sirensit
 Q מי היה ראש הממשלה הראשון של ישראל?|من كان أول رئيس حكومة في إسرائيل؟|Кто был первым премьер-министром Израиля?|Who was the first Prime Minister of Israel?|bengurion|mayor,president,e_weizmann
+E xv_daybefore|t|יום אחד לפני יום העצמאות|يومًا واحدًا قبل يوم الاستقلال|за один день до Дня независимости|one day before Independence Day
+E xv_dayafter|t|יום אחד אחרי יום העצמאות|يومًا واحدًا بعد يوم الاستقلال|через один день после Дня независимости|one day after Independence Day
+E xv_inhanuk|t|באמצע חנוכה|في منتصف حانوكا|в середине Хануки|in the middle of Hanukkah
+E xv_inrosh|t|בראש השנה|في رأس السنة العبرية|на Рош а-Шана|on Rosh Hashanah
+Q מתי חל יום הזיכרון?|متى يحلّ يوم الذكرى؟|Когда бывает День памяти?|When is Memorial Day?|xv_daybefore|xv_dayafter,xv_inhanuk,xv_inrosh
+E xv_fireworks|t|זיקוקים|ألعاب نارية|салют|fireworks
+E xv_rainbow|t|קשת בענן|قوس قزح|радугу|a rainbow
+E xv_snowfall|t|שלג יורד|ثلجًا يتساقط|падающий снег|falling snow
+E xv_northlight|t|זוהר צפוני|الشفق القطبي|северное сияние|the northern lights
+Q מה רואים בשמיים בערב יום העצמאות?|ماذا نرى في السماء مساء يوم الاستقلال؟|Что видно в небе вечером в День независимости?|What can you see in the sky on the evening of Independence Day?|xv_fireworks|xv_rainbow,xv_snowfall,xv_northlight
+E xv_bbq|t|עושים מנגל עם המשפחה|نشوي اللحم مع العائلة|устраиваем пикник с мангалом всей семьёй|we have a barbecue with the family
+E xv_fastday|t|צמים כל היום|نصوم طوال اليوم|постимся весь день|we fast all day
+E xv_buildsuk|t|בונים סוכה בחצר|نبني سُكّا في الساحة|строим сукку во дворе|we build a sukkah in the yard
+E xv_lighthan|t|מדליקים חנוכייה|نُشعل شمعدان حانوكا|зажигаем ханукию|we light a hanukkiah
+Q מה עושים הרבה משפחות ביום העצמאות?|ماذا تفعل عائلات كثيرة في يوم الاستقلال؟|Что делают многие семьи в День независимости?|What do many families do on Independence Day?|xv_bbq|xv_fastday,xv_buildsuk,xv_lighthan
 `;
 RAW+=String.raw`
 S map|🗺️|#0b7285|ישראל על המפה|إسرائيل على الخريطة|Израиль на карте|Israel on the Map
@@ -215,6 +283,12 @@ Q על איזה ים נמצאת העיר אילת?|على أي بحر تقع م�
 Q מהו המקום הנמוך ביותר בעולם?|ما هو أخفض مكان في العالم؟|Какое место самое низкое в мире?|What is the lowest place in the world?|dead|kinneret,med,negev
 Q איפה אפשר לצוף בלי לשחות?|أين يمكن الطفو من دون سباحة؟|Где можно лежать на воде, не плавая?|Where can you float without swimming?|dead|kinneret,med,redsea
 Q איפה נמצאת העיר אילת בישראל?|أين تقع مدينة إيلات في إسرائيل؟|Где в Израиле находится город Эйлат?|Where in Israel is the city of Eilat?|south|north,east,west
+Q באיזה אזור בישראל נמצאת הכנרת?|في أيّ منطقة في إسرائيل تقع بحيرة طبريا؟|В какой части Израиля находится Кинерет?|In which part of Israel is the Sea of Galilee?|north|south,east,west
+E xv_fish|t|דגים צבעוניים|أسماكًا ملوّنة|разноцветных рыб|colorful fish
+E xv_polar|t|דובי קוטב|دببة قطبية|белых медведей|polar bears
+E xv_icebergs|t|הרים של קרח|جبالًا جليدية|ледяные горы|icebergs
+E xv_penguins|t|פינגווינים|بطاريق|пингвинов|penguins
+Q מה אפשר לראות כששוחים בים האדום ליד אילת?|ماذا يمكن أن نرى عندما نسبح في البحر الأحمر قرب إيلات؟|Что можно увидеть, когда плаваешь в Красном море у Эйлата?|What can you see when you swim in the Red Sea near Eilat?|xv_fish|xv_polar,xv_icebergs,xv_penguins
 S town|🏙️|#7048e8|העיר שלי והעירייה|مدينتي والبلدية|мой город и муниципалитет|My City and the Municipality
 L כל עיר או יישוב מנוהלים על ידי העירייה או המועצה.|كل مدينة أو بلدة تُدار من قِبل البلدية أو المجلس.|Каждым городом или посёлком управляет муниципалитет или совет.|Every city or town is run by a municipality or a council.
 L בראש העירייה עומד ראש העיר. התושבים בוחרים אותו בבחירות.|يرأس البلدية رئيس البلدية. والسكان ينتخبونه في الانتخابات.|Во главе муниципалитета стоит мэр. Жители выбирают его на выборах.|The mayor is the head of the municipality. The residents choose him or her in an election.
@@ -243,6 +317,20 @@ E e_candy|t|סוכריות|حلوى|конфеты|candy
 E e_trashthrow|t|לזרוק זבל בגינה|أن نرمي القمامة في الحديقة|бросать мусор в парке|to throw trash in the park
 E e_breakbench|t|לשבור ספסלים|أن نكسر المقاعد|ломать скамейки|to break benches
 E e_hidehere|t|להתעלם מהלכלוך|أن نتجاهل الأوساخ|не замечать грязь|to ignore the mess
+E xv_lamps|t|פנסים ברחובות|مصابيح الشوارع|фонари на улицах|street lights
+E xv_candlesh|t|נרות בכל הבתים|شموعًا في كل البيوت|свечи во всех домах|candles in every home
+E xv_bonfires|t|מדורות בגינות|نيرانًا في الحدائق|костры в парках|bonfires in the parks
+E xv_nightfw|t|זיקוקים בכל ערב|ألعابًا نارية كل مساء|салют каждый вечер|fireworks every evening
+Q מה העירייה מדליקה בערב?|ماذا تُضيء البلدية في المساء؟|Что зажигает муниципалитет вечером?|What does the city council light up in the evening?|xv_lamps|xv_candlesh,xv_bonfires,xv_nightfw
+E xv_schtrash|t|דואגת לבתי הספר ולאשפה|تهتمّ بالمدارس وبالنفايات|заботится о школах и мусоре|takes care of schools and garbage
+Q לאיזה דבר עוד דואגת העירייה?|بماذا تهتمّ البلدية أيضًا؟|О чём ещё заботится муниципалитет?|What else does the city council take care of?|xv_schtrash|e_laws2,e_judge2,e_army
+E xv_elections|t|בבחירות|بالانتخابات|на выборах|in elections
+E xv_lottery|t|בהגרלה|بالقرعة|жеребьёвкой|by lottery
+E xv_byage|t|לפי הגיל|حسب العمر|по возрасту|by age
+E xv_byking|t|המלך ממנה אותו|الملك يعيّنه|его назначает царь|the king appoints him
+Q איך בוחרים את ראש העיר?|كيف يُختار رئيس البلدية؟|Как выбирают мэра?|How is the mayor chosen?|xv_elections|xv_lottery,xv_byage,xv_byking
+E xv_council|b|המועצה|المجلس المحلي|местный совет|the local council
+Q מי מנהל יישוב קטן, כמו כפר?|من يدير بلدة صغيرة مثل القرية؟|Кто управляет маленьким населённым пунктом, например деревней?|Who runs a small community, like a village?|xv_council|knesset,court,policeb
 `;
 RAW+=String.raw`
 S democ|🗳️|#d9480f|דמוקרטיה ובחירות|الديمقراطية والانتخابات|демократия и выборы|Democracy and Elections
@@ -271,6 +359,21 @@ E e_majority|t|ברוב הקולות|بحسب أغلبية الأصوات|бол
 E e_teacherwins|t|המורה מחליט לבד|المعلّم يقرّر وحده|учитель решает один|the teacher decides alone
 E e_loudest|t|מי שצועק הכי חזק|من يصرخ أعلى|тот, кто кричит громче всех|whoever shouts the loudest
 E e_oldest|t|הילד הכי גדול|الولد الأكبر|самый старший ребёнок|the oldest child
+E xv_cannot|t|כי אי אפשר שכולם יחליטו על כל דבר|لأنه لا يمكن أن يقرّر الجميع في كل شيء|потому что все не могут решать всё сами|because everyone cannot decide everything
+E xv_dontwant|t|כי האזרחים לא רוצים להחליט אף פעם|لأن المواطنين لا يريدون أن يقرّروا أبدًا|потому что граждане никогда не хотят решать|because citizens never want to decide
+E xv_kingsaid|t|כי כך המלך החליט לפני הרבה שנים|لأن الملك قرّر ذلك قبل سنوات كثيرة|потому что так решил царь много лет назад|because a king decided so many years ago
+E xv_nofair|t|כי ככה הבחירות נגמרות מהר יותר|لأن الانتخابات تنتهي هكذا بسرعة أكبر|потому что так выборы заканчиваются быстрее|because then elections end faster
+Q למה בוחרים אנשים שיחליטו בשבילנו?|لماذا ننتخب أشخاصًا يقرّرون بدلًا منّا؟|Почему мы выбираем людей, которые решают за нас?|Why do we choose people to decide for us?|xv_cannot|xv_dontwant,xv_kingsaid,xv_nofair
+E xv_kalpi|l|בקלפי|في صندوق الاقتراع|на избирательном участке|at the ballot box
+E xv_incourt|l|בבית המשפט|في المحكمة|в суде|at the court
+E xv_inhosp|l|בבית החולים|في المستشفى|в больнице|at the hospital
+E xv_inpolice|l|בתחנת המשטרה|في مركز الشرطة|в полицейском участке|at the police station
+Q איפה מצביעים בבחירות?|أين نصوّت في الانتخابات؟|Где голосуют на выборах?|Where do people vote in elections?|xv_kalpi|xv_incourt,xv_inhosp,xv_inpolice
+E xv_accept|t|מכבדים את ההחלטה|نحترم القرار|уважаем решение|we respect the decision
+E xv_argueall|t|רבים עם כל מי שבחר אחרת|نتشاجر مع كل من اختار غير ذلك|ссоримся со всеми, кто выбрал иначе|we argue with everyone who chose differently
+E xv_leave|t|עוזבים את הכיתה בכעס|نترك الصف بغضب|сердито уходим из класса|we leave the class angrily
+E xv_revote|t|מצביעים שוב עד שננצח|نصوّت من جديد حتى نفوز|голосуем снова, пока не победим|we vote again until we win
+Q הרוב החליט אחרת ממה שרצינו. מה עושים?|الأغلبية قرّرت غير ما أردنا. ماذا نفعل؟|Большинство решило не так, как мы хотели. Что делать?|The majority decided differently from what we wanted. What do we do?|xv_accept|xv_argueall,xv_leave,xv_revote
 S gov|🏛️|#5f3dc4|רשויות המדינה|سلطات الدولة|органы государства|The Branches of the State
 L במדינה יש שלושה חלקים חשובים, ולכל אחד תפקיד אחר.|في الدولة ثلاثة أجزاء مهمة، ولكل واحد منها دور مختلف.|В государстве три важные части, и у каждой своя задача.|The state has three important parts, and each has a different job.
 L הכנסת כותבת חוקים. בכנסת יושבים 120 חברי כנסת שהעם בחר.|الكنيست يكتب القوانين. في الكنيست 120 عضوًا انتخبهم الشعب.|Кнессет пишет законы. В Кнессете 120 депутатов, которых выбрал народ.|The Knesset writes laws. In the Knesset there are 120 members that the people chose.
@@ -285,6 +388,17 @@ Q מי דואג שהחוקים יתקיימו ושהמדינה תתנהל?|من 
 Q איזה גוף שופט ומחליט מה הוגן לפי החוק?|أي جهة تحكم وتقرّر ما هو عادل بحسب القانون؟|Какой орган судит и решает, что справедливо по закону?|Which body judges and decides what is fair by law?|court|knesset,gov,city
 Q איפה נמצא בית המשפט העליון?|أين تقع المحكمة العليا؟|Где находится Верховный суд?|Where is the Supreme Court?|jlm|tlv,bsheva,tiberias
 Q מי מייצג את כל אזרחי המדינה?|من يمثّل جميع مواطني الدولة؟|Кто представляет всех граждан страны?|Who represents all the citizens of the country?|president|pm,mayor,judge
+Q כמה חלקים חשובים יש במדינה, ולכל אחד תפקיד אחר?|كم قسمًا مهمًّا في الدولة، ولكل منها دور مختلف؟|Сколько важных частей в государстве, у каждой из которых своя роль?|How many important parts does the country have, each with a different job?|n3|n4,n5,n7
+E xv_judges|t|בודקים מה קרה ומחליטים מה הוגן|يفحصون ما حدث ويقرّرون ما هو عادل|выясняют, что случилось, и решают, что справедливо|they check what happened and decide what is fair
+E xv_writelaw|t|כותבים חוקים חדשים למדינה|يكتبون قوانين جديدة للدولة|пишут новые законы для страны|they write new laws for the country
+E xv_cleanst|t|מנקים את הרחובות בעיר|ينظّفون شوارع المدينة|убирают улицы в городе|they clean the streets in the city
+E xv_putfire|t|מכבים שריפות בבתים|يطفئون الحرائق في البيوت|тушат пожары в домах|they put out fires in houses
+Q מה עושים השופטים?|ماذا يفعل القضاة؟|Что делают судьи?|What do judges do?|xv_judges|xv_writelaw,xv_cleanst,xv_putfire
+E xv_thepeople|t|העם, בבחירות|الشعب، في الانتخابات|народ, на выборах|the people, in elections
+E xv_bypm|t|ראש הממשלה, לבד|رئيس الحكومة وحده|премьер-министр, сам|the prime minister, alone
+E xv_byjudges|t|השופטים, בבית המשפט|القضاة، في المحكمة|судьи, в суде|the judges, in court
+E xv_bypres|t|נשיא המדינה, במכתב|رئيس الدولة، برسالة|президент, письмом|the president, by letter
+Q מי בוחר את חברי הכנסת?|من ينتخب أعضاء الكنيست؟|Кто выбирает членов Кнессета?|Who chooses the members of the Knesset?|xv_thepeople|xv_bypm,xv_byjudges,xv_bypres
 `;
 RAW+=String.raw`
 E e_respect|t|מכבדים ולומדים זה מזה|نحترم ونتعلّم من بعضنا|уважаем и учимся друг у друга|we respect and learn from each other
@@ -314,6 +428,26 @@ E e_newthings|t|דברים חדשים, כמו אוכל, חגים ושפות|أش
 E e_nothing2|t|שום דבר, כי כולנו יודעים את אותם דברים|لا شيء، لأنّنا جميعًا نعرف الأشياء نفسها|ничему, ведь мы все знаем одно и то же|nothing at all, because we all know the same things
 E e_hate|t|לריב יותר|أن نتشاجر أكثر|ссориться больше|to quarrel more
 E e_mean|t|להציק|أن نزعج الآخرين|обижать|to bother others
+E xv_groups|t|יהודים, ערבים, דרוזים, בדואים, צ׳רקסים ועוד|يهود وعرب ودروز وبدو وشركس وغيرهم|евреи, арабы, друзы, бедуины, черкесы и другие|Jews, Arabs, Druze, Bedouins, Circassians and others
+E xv_jewsonly|t|רק יהודים, ואף קבוצה אחרת|يهود فقط، ولا أي مجموعة أخرى|только евреи, и больше никто|only Jews, and no other group
+E xv_arabsonly|t|רק ערבים ודרוזים, ואף קבוצה אחרת|عرب ودروز فقط، ولا أي مجموعة أخرى|только арабы и друзы, и больше никто|only Arabs and Druze, and no other group
+E xv_touronly|t|רק תיירים שבאו לחופשה קצרה|سيّاح فقط جاؤوا لعطلة قصيرة|только туристы, приехавшие ненадолго|only tourists on a short holiday
+Q מי גר בישראל?|من يسكن في إسرائيل؟|Кто живёт в Израиле?|Who lives in Israel?|xv_groups|xv_jewsonly,xv_arabsonly,xv_touronly
+E xv_manyc|t|מהרבה מדינות, כמו אתיופיה, רוסיה ומרוקו|من دول كثيرة، مثل إثيوبيا وروسيا والمغرب|из многих стран, например из Эфиопии, России и Марокко|from many countries, like Ethiopia, Russia and Morocco
+E xv_onlyeth|t|רק מאתיופיה, ולא ממקום אחר|من إثيوبيا فقط، ولا من مكان آخر|только из Эфиопии, и ниоткуда больше|only from Ethiopia, and from nowhere else
+E xv_onlyrus|t|רק מרוסיה, ולא ממקום אחר|من روسيا فقط، ولا من مكان آخر|только из России, и ниоткуда больше|only from Russia, and from nowhere else
+E xv_nobodyc|t|אף אחד לא הגיע ממדינה אחרת|لم يأتِ أحد من دولة أخرى|никто не приехал из другой страны|nobody came from another country
+Q מאיפה הגיעו אנשים שגרים היום בישראל?|من أين جاء الناس الذين يسكنون اليوم في إسرائيل؟|Откуда приехали люди, которые живут сегодня в Израиле?|Where did people who live in Israel today come from?|xv_manyc|xv_onlyeth,xv_onlyrus,xv_nobodyc
+E xv_welcome|t|מקבלים אותו ולומדים ממנו מילים|نستقبله ونتعلّم منه كلمات|принимаем его и учим у него слова|we welcome him and learn words from him
+E xv_mockacc|t|צוחקים על המבטא שלו|نضحك على لهجته|смеёмся над его акцентом|we laugh at his accent
+E xv_noplay|t|לא משחקים איתו בהפסקה|لا نلعب معه في الاستراحة|не играем с ним на перемене|we do not play with him at recess
+E xv_moveclass|t|מבקשים שיעבור לכיתה אחרת|نطلب أن ينتقل إلى صف آخر|просим перевести его в другой класс|we ask for him to move to another class
+Q ילד חדש בכיתה מדבר אמהרית. מה עושים?|ولد جديد في الصف يتكلّم الأمهرية. ماذا نفعل؟|Новый мальчик в классе говорит по-амхарски. Что делать?|A new boy in class speaks Amharic. What do we do?|xv_welcome|xv_mockacc,xv_noplay,xv_moveclass
+E xv_amharic|t|אמהרית|الأمهرية|амхарский|Amharic
+E xv_japanese|t|יפנית|اليابانية|японский|Japanese
+E xv_swedish|t|שוודית|السويدية|шведский|Swedish
+E xv_portug|t|פורטוגזית|البرتغالية|португальский|Portuguese
+Q איזו שפה מדברים בישראל הרבה עולים מאתיופיה?|أيّ لغة يتكلّمها في إسرائيل كثير من القادمين من إثيوبيا؟|На каком языке говорят в Израиле многие репатрианты из Эфиопии?|Which language do many immigrants from Ethiopia speak in Israel?|xv_amharic|xv_japanese,xv_swedish,xv_portug
 S env|🌳|#278539|שומרים על הסביבה|نحافظ على البيئة|бережём окружающую среду|Taking Care of Nature
 L הארץ שלנו יפה, ואנחנו צריכים לשמור עליה: על הים, על הגינות ועל היערות.|بلدنا جميل، وعلينا أن نحافظ عليه: على البحر والحدائق والغابات.|Наша страна красива, и мы должны её беречь: море, парки и леса.|Our country is beautiful, and we need to take care of it: the sea, the parks and the forests.
 L לא זורקים זבל על הרצפה, בחוף או בטבע. זורקים לפח.|لا نرمي القمامة على الأرض أو على الشاطئ أو في الطبيعة. نرميها في الحاوية.|Мы не бросаем мусор на землю, на пляже или в природе. Мы бросаем его в контейнер.|We do not throw trash on the ground, on the beach or in nature. We put it in a bin.
@@ -336,6 +470,26 @@ E e_ongr|t|על הרצפה, כי מישהו ינקה את זה אחר כך|عل�
 E e_inbeach|t|בחול בחוף, כי הגלים ייקחו את זה לים|في رمل الشاطئ، لأنّ الأمواج ستأخذها إلى البحر|в песок на пляже, ведь волны унесут его в море|in the sand at the beach, because the waves will take it to the sea
 E e_innature|t|בטבע, ביער, כי שם זה לא מפריע לאף אחד|في الطبيعة، في الغابة، لأنّها هناك لا تزعج أحدًا|в природу, в лес, ведь там он никому не мешает|in nature, in the forest, because it bothers nobody there
 E e_precious|t|כי מים הם דבר יקר|لأن الماء ثمين|потому что вода очень ценна|because water is precious
+E xv_shade|t|צל ואוויר נקי|ظلًّا وهواءً نقيًّا|тень и чистый воздух|shade and clean air
+E xv_saltw|t|מים מלוחים|ماءً مالحًا|солёную воду|salty water
+E xv_noise|t|רעש חזק|ضجيجًا قويًّا|сильный шум|loud noise
+E xv_electric|t|חשמל לבית|كهرباء للبيت|электричество для дома|electricity for the house
+Q מה העצים נותנים לנו?|ماذا تعطينا الأشجار؟|Что нам дают деревья?|What do trees give us?|xv_shade|xv_saltw,xv_noise,xv_electric
+E xv_lightoff|t|מכבים את האור כשיוצאים מהחדר|نطفئ الضوء عندما نخرج من الغرفة|выключаем свет, когда выходим из комнаты|we turn off the light when we leave the room
+E xv_tvon|t|משאירים את הטלוויזיה דולקת כל היום|نترك التلفاز يعمل طوال اليوم|оставляем телевизор включённым весь день|we leave the TV on all day
+E xv_wastefood|t|זורקים את כל האוכל שנשאר|نرمي كل الطعام الذي بقي|выбрасываем всю оставшуюся еду|we throw away all the leftover food
+E xv_fridge|t|פותחים את המקרר שוב ושוב|نفتح الثلاجة مرة بعد مرة|открываем холодильник снова и снова|we open the fridge again and again
+Q איך שומרים על הסביבה גם בבית?|كيف نحافظ على البيئة في البيت أيضًا؟|Как беречь природу и дома?|How do we take care of the environment at home too?|xv_lightoff|xv_tvon,xv_wastefood,xv_fridge
+E xv_reuse|t|משתמשים בה שוב, למשל לצעצועים|نستعمله من جديد، مثلًا للألعاب|используем её снова, например для игрушек|we use it again, for example for toys
+E xv_street|t|זורקים אותה ברחוב|نرميه في الشارع|выбрасываем её на улице|we throw it in the street
+E xv_burn|t|שורפים אותה במדורה|نحرقه في النار|сжигаем её в костре|we burn it in a bonfire
+E xv_bury|t|קוברים אותה בחול בחוף|ندفنه في رمل الشاطئ|закапываем её в песок на пляже|we bury it in the sand on the beach
+Q נשארה קופסה ריקה וחזקה. מה כדאי לעשות?|بقي صندوق فارغ ومتين. ماذا يُستحسن أن نفعل؟|Осталась пустая крепкая коробка. Что лучше сделать?|There is a strong empty box left. What is best to do?|xv_reuse|xv_street,xv_burn,xv_bury
+E xv_allnature|t|על הים, על הגינות ועל היערות|على البحر والحدائق والغابات|о море, о садах и о лесах|the sea, the gardens and the forests
+E xv_onlyhome|t|רק על הבית שלנו|على بيتنا فقط|только о нашем доме|only our own home
+E xv_onlymall|t|רק על הקניונים והחנויות|على المجمّعات التجارية والمحلّات فقط|только о торговых центрах и магазинах|only the malls and shops
+E xv_onlycars|t|רק על המכוניות שלנו|على سياراتنا فقط|только о наших машинах|only our cars
+Q על מה צריך לשמור בארץ שלנו?|على ماذا يجب أن نحافظ في بلادنا؟|О чём нужно заботиться в нашей стране?|What should we take care of in our country?|xv_allnature|xv_onlyhome,xv_onlymall,xv_onlycars
 `;
 
 RAW+=String.raw`
@@ -366,6 +520,16 @@ Q לאיזה מספר מתקשרים כדי להזעיק כבאות והצלה?|
 Q מי מכבה אש?|من يطفئ النار؟|Кто тушит огонь?|Who puts out fires?|fireman|medic,police,teacher
 Q מי עוזר כשמישהו חולה או נפצע?|من يساعد عندما يمرض أحد أو يُصاب؟|Кто помогает, когда кто-то заболел или ранен?|Who helps when someone is sick or hurt?|medic|fireman,police,teacher
 Q מה עושים כשנשמעת אזעקה?|ماذا نفعل عندما تُسمع صفّارة الإنذار؟|Что делают, когда звучит сигнал тревоги?|What do we do when an alarm sounds?|e_shelter|e_window,e_ignoreSiren,e_alarmcall
+E xv_waitred|t|עומדים ומחכים לאור ירוק|نقف وننتظر الضوء الأخضر|стоим и ждём зелёного света|we stand and wait for the green light
+E xv_runfast|t|רצים מהר לצד השני|نركض بسرعة إلى الجهة الأخرى|быстро бежим на другую сторону|we run fast to the other side
+E xv_crosscare|t|עוברים לאט ובזהירות|نعبر ببطء وبحذر|переходим медленно и осторожно|we cross slowly and carefully
+E xv_nocars|t|עוברים אם לא רואים מכוניות|نعبر إذا لم نرَ سيارات|переходим, если не видно машин|we cross if we do not see any cars
+Q הרמזור להולכי רגל אדום. מה עושים?|إشارة المشاة حمراء. ماذا نفعل؟|На светофоре для пешеходов красный свет. Что делать?|The pedestrian light is red. What do we do?|xv_waitred|xv_runfast,xv_crosscare,xv_nocars
+E xv_beltalways|t|כן, חוגרים בכל נסיעה|نعم، نربط الحزام في كل رحلة|да, пристёгиваемся в любой поездке|yes, we buckle up on every ride
+E xv_beltlong|t|לא, רק בנסיעה ארוכה|لا، فقط في رحلة طويلة|нет, только в долгой поездке|no, only on a long ride
+E xv_beltfront|t|רק מי שיושב מקדימה|فقط من يجلس في المقعد الأمامي|только тот, кто сидит впереди|only whoever sits in front
+E xv_beltrain|t|רק כשיורד גשם|فقط عندما تمطر|только когда идёт дождь|only when it rains
+Q נוסעים ברכב רק לחנות ליד הבית. חוגרים חגורה?|نسافر بالسيارة فقط إلى المتجر قرب البيت. هل نربط الحزام؟|Едем на машине только до магазина рядом с домом. Пристёгиваемся?|We drive only to the shop near home. Do we buckle up?|xv_beltalways|xv_beltlong,xv_beltfront,xv_beltrain
 `;
 
 RAW+=String.raw`

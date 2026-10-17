@@ -34,11 +34,11 @@
 | `islam` | is22 · 2026-10-16 | is22-pwa1 | תואם |
 | `russian` | ru23 · 2026-10-16 | ru23-pwa1 | תואם |
 | `tanakh-elem` | te24 · 2026-10-16 | te24-pwa1 | תואם |
-| `civics-elem` | mc24 · 2026-10-16 | mc24-pwa1 | תואם |
-| `culture-elem` | tm21 · 2026-10-16 | tm21-pwa1 | תואם |
-| `history-elem` | hk21 · 2026-10-16 | hk21-pwa1 | תואם |
+| `civics-elem` | mc25 · 2026-10-16 | mc25-pwa1 | תואם |
+| `culture-elem` | tm22 · 2026-10-16 | tm22-pwa1 | תואם |
+| `history-elem` | hk22 · 2026-10-16 | hk22-pwa1 | תואם |
 | `english-elem` | en20 · 2026-10-16 | en20-pwa1 | תואם |
-| `science-12` | sg22 · 2026-10-16 | sg22-pwa1 | תואם |
+| `science-12` | sg23 · 2026-10-16 | sg23-pwa1 | תואם |
 | `domino` | dm23 · 2026-10-16 | dm23-pwa1 | תואם |
 | `net-elem` | ns10 · 2026-10-16 | ns10-pwa1 | תואם |
 

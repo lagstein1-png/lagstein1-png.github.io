@@ -140,12 +140,21 @@ const only = process.argv.slice(2).filter(a => !a.startsWith('--'));
 const list = only.length ? only : AL.local();
 
 let bad = 0, low = 0, scanned = 0, debt = 0, unread = 0;
+/* O-174, 17.10.2026: אפליקציה בלי `topic()` ובלי `*BANK` ב-index.html
+   דולגה כאן בשקט — ובהן תשע הרב־קובציות (`js/data.js`, `data/`),
+   שבהן סבב אחד ממצה נושא שלם. הכלי עדיין אינו מודד אותן, אבל אומר
+   בקול כמה ואילו. שורת `·` ולא נפילה: זו מגבלת הכלי, לא ממצא. */
+const skipped = [], multi = [];
 for (const app of list) {
   const T = banks(app) || flatBank(app);
   /* O-196: מאגר רשום ב-BASE שהכלי כבר אינו מוצא — הצורה השתנתה,
      ולא שהמאגר נעלם. זה ״לא נמדד״, ו״לא נמדד״ אינו ירוק. */
   if (!T) {
     if (BASE[app] !== undefined) { console.log(`✗ ${app}: רשום עם בסיס ${BASE[app]}, והכלי כבר אינו מוצא בו מאגר — הצורה השתנתה`); unread++; bad++ }
+    else {
+      skipped.push(app);
+      if (fs.existsSync(path.join(ROOT, app, 'js', 'data.js')) || fs.existsSync(path.join(ROOT, app, 'data'))) multi.push(app);
+    }
     continue;
   }
   /* **מאגר שלא נקרא הוא מגבלה של הכלי, לא ממצא באפליקציה** — וזה
@@ -178,5 +187,9 @@ for (const app of list) {
   console.log('✓ ' + line);
 }
 
+if (skipped.length) {
+  console.log(`\n· ${skipped.length} אפליקציות לא נמדדו — אין בהן topic() או *BANK ב-index.html (מגבלת הכלי, לא נפילה)`);
+  if (multi.length) console.log(`· מהן ${multi.length} רב־קובציות שהמאגר שלהן בקובץ נפרד: ${multi.join(', ')}`);
+}
 console.log(`\n${scanned} מאגרים נמדדו · ${debt} עם חוב מוצהר · ${unread} שהכלי אינו קורא (נופל) · ${low} מתחת לבסיס`);
 process.exit(bad ? 1 : 0);

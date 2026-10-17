@@ -251,6 +251,20 @@ Q איך נסעו אנשים לפני הרבה שנים, כשלא היו מכו�
 Q איך שלחו הודעה למישהו רחוק לפני הרבה שנים?|كيف كانوا يرسلون رسالة إلى شخص بعيد قبل سنوات كثيرة؟|Как отправляли весточку далёкому человеку много лет назад?|How did people send a message to someone far away many years ago?|s_letter|s_video,s_text,s_email
 Q על מה ההיסטוריה מספרת?|عمّ يحدّثنا التاريخ؟|О чём рассказывает история?|What does history tell us about?|h_why|h_weather,h_cook,h_count
 Q איזה דבר מהרשימה הוא מהעבר?|أي شيء من هذه القائمة هو من الماضي؟|Что из этого относится к прошлому?|Which of these is from the past?|old_photo|ad_ticket,ad_toy,new_phone
+Q איך קוראים לזמן שבו אנחנו נמצאים עכשיו?|ما اسم الزمن الذي نعيش فيه الآن؟|Как называется время, в котором мы находимся сейчас?|What do we call the time we are in right now?|now|past,future,always
+E xh_pigeon|t|ביונת דואר|بحمامة زاجلة|с почтовым голубем|with a carrier pigeon
+E xh_drum|t|בתופים מגבעה לגבעה|بالطبول من تلّة إلى تلّة|барабанами с холма на холм|with drums from hill to hill
+Q איך שולחים היום הודעה מהירה לחבר שגר רחוק?|كيف نرسل اليوم رسالة سريعة لصديق يسكن بعيدًا؟|Как сегодня быстро отправить сообщение другу, который живёт далеко?|How do we send a quick message today to a friend who lives far away?|s_text|s_letter,xh_pigeon,xh_drum
+E xh_days|t|ימים רבים|أيامًا كثيرة|много дней|many days
+E xh_sec|t|שנייה אחת|ثانية واحدة|одну секунду|one second
+E xh_min|t|דקה אחת|دقيقة واحدة|одну минуту|one minute
+E xh_hour|t|שעה אחת|ساعة واحدة|один час|one hour
+Q פעם שלחו מכתב בדואר. כמה זמן חיכו לתשובה?|في الماضي أرسلوا رسالة بالبريد. كم انتظروا الردّ؟|Раньше письма отправляли по почте. Сколько ждали ответа?|Long ago people sent letters by mail. How long did they wait for an answer?|xh_days|xh_sec,xh_min,xh_hour
+E xh_grand|p|את סבא וסבתא|الجدّ والجدّة|бабушку и дедушку|Grandpa and Grandma
+E xh_baby|p|את התינוק של השכנים|طفل الجيران الرضيع|соседского малыша|the neighbors' baby
+E xh_brother|p|את אחי הקטן|أخي الصغير|моего младшего брата|my little brother
+E xh_doll|p|את הבובה שלי|دميتي|мою куклу|my doll
+Q את מי אפשר לשאול איך היו החיים לפני הרבה שנים?|من يمكن أن نسأل كيف كانت الحياة قبل سنوات كثيرة؟|Кого можно спросить, какой была жизнь много лет назад?|Who can we ask what life was like many years ago?|xh_grand|xh_baby,xh_brother,xh_doll
 S know|🏺|#a0522d|איך יודעים מה היה פעם?|كيف نعرف ماذا كان في الماضي؟|как мы узнаём, что было раньше?|How Do We Know What Happened Long Ago?
 L לא היינו שם, ובכל זאת אנחנו יודעים מה קרה לפני אלפי שנים. איך?|لم نكن هناك، ومع ذلك نعرف ماذا حدث قبل آلاف السنين. كيف؟|Нас там не было, но мы знаем, что случилось тысячи лет назад. Как?|We were not there, yet we know what happened thousands of years ago. How?
 L ארכאולוגים חופרים באדמה בזהירות ומוצאים חפצים עתיקים: כלים, מטבעות ובתים שנקברו.|يحفر علماء الآثار في الأرض بحذر ويجدون أشياء قديمة: أدوات وعملات وبيوتًا دُفنت.|Археологи осторожно копают землю и находят древние вещи: посуду, монеты и дома, засыпанные землёй.|Archaeologists dig carefully in the ground and find ancient things: tools, coins and buried houses.
@@ -263,6 +277,26 @@ Q מה עושים ארכאולוגים?|ماذا يفعل علماء الآثا�
 Q איזה חפץ יכול להיות מתקופה עתיקה?|أي شيء يمكن أن يكون من زمن قديم؟|Какая вещь может быть из древних времён?|Which object can be from an ancient time?|k_pot|k_phone,k_toy,k_bag
 Q מה אפשר ללמוד מתמונה ישנה של סבתא?|ماذا نتعلّم من صورة قديمة لجدّتي؟|Что можно узнать из старой фотографии бабушки?|What can we learn from an old photo of grandma?|k_clothes|k_game,k_lunch,k_sky
 Q מה עוזר לנו לדעת מה אנשים חשבו לפני הרבה שנים?|ما الذي يساعدنا على معرفة ما فكّر فيه الناس قبل سنوات كثيرة؟|Что помогает нам узнать, о чём думали люди много лет назад?|What helps us know what people thought many years ago?|w_writing|w_sing,w_color,w_kite
+E xh_finds|t|כלים, מטבעות ובתים עתיקים|أواني وعملات وبيوت قديمة|посуду, монеты и древние дома|tools, coins and ancient houses
+E xh_phones|t|טלפונים, מחשבים ומכוניות|هواتف وحواسيب وسيارات|телефоны, компьютеры и машины|phones, computers and cars
+E xh_newtoys|t|צעצועים חדשים מהחנות|ألعاب جديدة من المتجر|новые игрушки из магазина|new toys from the shop
+E xh_bottles|t|בקבוקי מיץ מהשבוע שעבר|زجاجات عصير من الأسبوع الماضي|бутылки сока с прошлой недели|juice bottles from last week
+Q מה מוצאים ארכאולוגים באדמה?|ماذا يجد علماء الآثار في الأرض؟|Что археологи находят в земле?|What do archaeologists find in the ground?|xh_finds|xh_phones,xh_newtoys,xh_bottles
+E xh_see|t|כדי שכולם יוכלו לראות אותם|لكي يستطيع الجميع رؤيتها|чтобы все могли их увидеть|so that everyone can see them
+E xh_sell|t|כדי למכור אותם בזול|لكي يبيعوها بسعر رخيص|чтобы дёшево их продать|so they can sell them cheaply
+E xh_hidem|t|כדי להסתיר אותם מכולם|لكي يخفوها عن الجميع|чтобы спрятать их от всех|so they can hide them from everyone
+E xh_throw|t|כדי לזרוק אותם בסוף|لكي يرموها في النهاية|чтобы потом их выбросить|so they can throw them away later
+Q למה מציגים חפצים עתיקים במוזיאון?|لماذا تُعرض الأشياء القديمة في المتحف؟|Зачем древние вещи выставляют в музее?|Why are ancient objects shown in a museum?|xh_see|xh_sell,xh_hidem,xh_throw
+E xh_hist|t|שואל שאלות ובודק מה נכון|يسأل أسئلة ويفحص ما هو صحيح|задаёт вопросы и проверяет, что правда|asks questions and checks what is true
+E xh_guess|t|מנחש מה יקרה מחר|يخمّن ماذا سيحدث غدًا|угадывает, что будет завтра|guesses what will happen tomorrow
+E xh_builder|t|בונה בתים חדשים|يبني بيوتًا جديدة|строит новые дома|builds new houses
+E xh_grow|t|מגדל ירקות בשדה|يزرع الخضار في الحقل|выращивает овощи в поле|grows vegetables in a field
+Q מה עושה היסטוריון?|ماذا يفعل المؤرّخ؟|Что делает историк?|What does a historian do?|xh_hist|xh_guess,xh_builder,xh_grow
+E xh_oldstory|t|סיפור של סבתא על הילדות שלה|قصة الجدّة عن طفولتها|рассказ бабушки о её детстве|Grandma's story about her childhood
+E xh_forecast|t|תחזית מזג האוויר למחר|نشرة الطقس لِغد|прогноз погоды на завтра|the weather forecast for tomorrow
+E xh_advert|t|פרסומת לטלפון חדש|إعلان عن هاتف جديد|реклама нового телефона|an ad for a new phone
+E xh_trip|t|תוכנית לטיול בשבוע הבא|خطة لرحلة في الأسبوع القادم|план поездки на следующей неделе|a plan for a trip next week
+Q מה מהדברים האלה מלמד אותנו על העבר?|أيّ من هذه الأشياء يعلّمنا عن الماضي؟|Что из этого рассказывает нам о прошлом?|Which of these teaches us about the past?|xh_oldstory|xh_forecast,xh_advert,xh_trip
 S jlm|🕍|#7048e8|ירושלים של פעם|القدس في الماضي|Иерусалим в давние времена|Jerusalem Long Ago
 L ירושלים היא עיר עתיקה מאוד. אנשים גרים בה כבר יותר מאלפיים שנה.|القدس مدينة قديمة جدًّا. يعيش الناس فيها منذ أكثر من ألفي سنة.|Иерусалим - очень древний город. Люди живут в нём уже больше двух тысяч лет.|Jerusalem is a very old city. People have lived in it for more than two thousand years.
 L לפני כשלושת אלפים שנה המלך דוד עשה את ירושלים לבירה של עם ישראל.|قبل نحو ثلاثة آلاف سنة جعل الملك داود القدس عاصمة لشعب إسرائيل.|Около трёх тысяч лет назад царь Давид сделал Иерусалим столицей народа Израиля.|About three thousand years ago King David made Jerusalem the capital of the people of Israel.
@@ -275,6 +309,27 @@ Q מי בנה את בית המקדש הראשון?|من بنى الهيكل ال
 Q איזו חומה נשארה מבית המקדש?|أي جدار بقي من الهيكل؟|Какая стена осталась от Храма?|Which wall is left from the Temple?|kotel|w_great,w_jericho,w_berlin
 Q לפני כמה זמן נבנתה החומה של העיר העתיקה?|قبل كم من الزمن بُني سور البلدة القديمة؟|Как давно построили стену Старого города?|How long ago was the wall of the Old City built?|a500|a5,a50,a20
 Q מי מבקר בירושלים?|من يزور القدس؟|Кто приезжает в Иерусалим?|Who visits Jerusalem?|v_all|v_none,v_birds,v_kings
+Q מי היה הבן של המלך דוד?|من كان ابن الملك داود؟|Кто был сыном царя Давида?|Who was King David's son?|king_solomon|judah,herod,pharaoh
+E xh_temple1|t|את בית המקדש הראשון|الهيكل الأول|Первый Храм|the First Temple
+E xh_oldwall|t|את החומה של העיר העתיקה|سور البلدة القديمة|стену Старого города|the wall of the Old City
+E xh_kotelb|t|את הכותל המערבי|الحائط الغربي|Западную стену|the Western Wall
+E xh_knesset|t|את בניין הכנסת|مبنى الكنيست|здание Кнессета|the Knesset building
+Q מה בנה המלך שלמה בירושלים?|ماذا بنى الملك سليمان في القدس؟|Что построил царь Соломон в Иерусалиме?|What did King Solomon build in Jerusalem?|xh_temple1|xh_oldwall,xh_kotelb,xh_knesset
+E xh_2000y|t|יותר מאלפיים שנה|أكثر من ألفي سنة|больше двух тысяч лет|more than two thousand years
+E xh_100y|t|בערך מאה שנה|نحو مئة سنة|около ста лет|about a hundred years
+E xh_20y|t|בערך עשרים שנה|نحو عشرين سنة|около двадцати лет|about twenty years
+E xh_10y|t|בערך עשר שנים|نحو عشر سنوات|около десяти лет|about ten years
+Q כמה זמן גרים אנשים בירושלים?|منذ كم من الزمن يسكن الناس في القدس؟|Сколько времени люди живут в Иерусалиме?|For how long have people lived in Jerusalem?|xh_2000y|xh_100y,xh_20y,xh_10y
+E xh_t2|t|מבית המקדש השני|من الهيكل الثاني|от Второго Храма|from the Second Temple
+E xh_t1|t|מבית המקדש הראשון|من الهيكل الأول|от Первого Храма|from the First Temple
+E xh_davpal|t|מהארמון של המלך דוד|من قصر الملك داود|от дворца царя Давида|from King David's palace
+E xh_solpal|t|מהארמון של המלך שלמה|من قصر الملك سليمان|от дворца царя Соломона|from King Solomon's palace
+Q ממה נשאר הכותל המערבי?|من أيّ بناء بقي الحائط الغربي؟|От чего осталась Западная стена?|What is the Western Wall left over from?|xh_t2|xh_t1,xh_davpal,xh_solpal
+E xh_walkw|t|לטייל עליה|أن نتجوّل عليه|гулять по ней|walk along it
+E xh_swimw|t|לשחות בה|أن نسبح فيه|плавать в ней|swim in it
+E xh_drivew|t|לנסוע עליה במכונית|أن نقود عليه سيارة|ездить по ней на машине|drive a car on it
+E xh_sleepw|t|לישון בה בלילה|أن ننام فيه ليلًا|спать в ней ночью|sleep in it at night
+Q מה אפשר לעשות היום בחומה של העיר העתיקה?|ماذا يمكن أن نفعل اليوم على سور البلدة القديمة؟|Что можно делать сегодня на стене Старого города?|What can you do today on the wall of the Old City?|xh_walkw|xh_swimw,xh_drivew,xh_sleepw
 S macc|🕎|#c92a2a|המכבים וחנוכה|المكابيون وعيد الحانوكا|Маккавеи и Ханука|The Maccabees and Hanukkah
 L לפני יותר משני אלפים שנה שלטו בארץ מלכים יוונים. הם אסרו על היהודים לקיים את המנהגים שלהם.|قبل أكثر من ألفي سنة حكم الأرضَ ملوك يونانيون. منعوا اليهود من ممارسة عاداتهم.|Больше двух тысяч лет назад страной правили греческие цари. Они запретили евреям соблюдать их обычаи.|More than two thousand years ago Greek kings ruled the land. They did not let the Jews keep their customs.
 L יהודה המכבי ואחיו לא הסכימו. הם יצאו להילחם, והיו מעטים מול צבא גדול.|لم يوافق يهوذا المكابي وإخوته. خرجوا للقتال، وكانوا قلّة أمام جيش كبير.|Иуда Маккавей и его братья не согласились. Они вышли на бой, хотя их было мало, а армия была большая.|Judah Maccabee and his brothers refused. They went out to fight, a few against a big army.
@@ -287,6 +342,22 @@ Q מה המכבים עשו כשחזרו לירושלים?|ماذا فعل الم
 Q כמה ימים דלק השמן, לפי הסיפור?|كم يومًا اشتعل الزيت حسب القصة؟|Сколько дней горело масло, по рассказу?|How many days did the oil burn, according to the story?|d8|d3,d5,d10
 Q מה מדליקים בחנוכה במשך שמונה ימים?|ماذا نُشعل في الحانوكا طوال ثمانية أيام؟|Что зажигают на Хануку восемь дней?|What do we light for eight days on Hanukkah?|candles|fireworks,bonfire,flashlights
 Q מה אוכלים בחנוכה?|ماذا نأكل في الحانوكا؟|Что едят на Хануку?|What do we eat on Hanukkah?|sufg|matza,hamantash,figs
+Q מי שלטו בארץ בזמן סיפור המכבים?|من حكم البلاد في زمن قصة المكابيين؟|Кто правил страной во времена истории Маккавеев?|Who ruled the land in the time of the Maccabees story?|greeks_p|romans,egyptians_p,babylonians_p
+E xh_custom|t|לקיים את המנהגים שלהם|أن يمارسوا عاداتهم|соблюдать свои обычаи|keep their customs
+E xh_ballp|t|לשחק בכדור ברחוב|أن يلعبوا بالكرة في الشارع|играть в мяч на улице|play ball in the street
+E xh_shoes|t|ללבוש נעליים בבית|أن يلبسوا الأحذية في البيت|носить обувь дома|wear shoes at home
+E xh_singw|t|לשיר בחתונות|أن يغنّوا في الأعراس|петь на свадьбах|sing at weddings
+Q על מה אסרו המלכים היוונים על היהודים?|ماذا منع الملوك اليونانيون اليهود أن يفعلوا؟|Что греческие цари запретили евреям?|What did the Greek kings forbid the Jews to do?|xh_custom|xh_ballp,xh_shoes,xh_singw
+E xh_jar1|t|כד אחד קטן|جرّة واحدة صغيرة|один маленький кувшин|one small jar
+E xh_jar2|t|שני כדים גדולים|جرّتان كبيرتان|два больших кувшина|two big jars
+E xh_jar10|t|עשרה כדים מלאים|عشر جرار ممتلئة|десять полных кувшинов|ten full jars
+E xh_jar100|t|מאה כדים של שמן|مئة جرّة من الزيت|сто кувшинов масла|a hundred jars of oil
+Q כמה שמן מצאו המכבים בבית המקדש, לפי הסיפור?|كم زيتًا وجد المكابيون في الهيكل، بحسب القصة؟|Сколько масла нашли Маккавеи в Храме, по рассказу?|According to the story, how much oil did the Maccabees find in the Temple?|xh_jar1|xh_jar2,xh_jar10,xh_jar100
+E xh_few|t|הם היו מעטים מול צבא גדול|كانوا قلّة أمام جيش كبير|их было мало против большой армии|they were few against a big army
+E xh_manyv|t|הם היו רבים מול צבא קטן|كانوا كثيرين أمام جيش صغير|их было много против маленькой армии|they were many against a small army
+E xh_nofight|t|הם לא נלחמו בכלל|لم يحاربوا أبدًا|они совсем не воевали|they did not fight at all
+E xh_hired|t|הם שכרו צבא מארץ אחרת|استأجروا جيشًا من بلد آخر|они наняли армию из другой страны|they hired an army from another country
+Q מה מיוחד בניצחון של המכבים?|ما المميّز في انتصار المكابيين؟|Чем особенна победа Маккавеев?|What was special about the Maccabees' victory?|xh_few|xh_manyv,xh_nofight,xh_hired
 S anc|🏛️|#907000|עמים בעולם העתיק|شعوب العالم القديم|народы древнего мира|Peoples of the Ancient World
 L במצרים העתיקה חיו מלכים שנקראו פרעוֹנים. הם בנו פירמידות גדולות, ושם קברו אותם.|في مصر القديمة عاش ملوك اسمهم الفراعنة. بنوا أهرامات كبيرة ودُفنوا فيها.|В Древнем Египте жили цари, которых называли фараонами. Они строили большие пирамиды, и там их хоронили.|In ancient Egypt lived kings called pharaohs. They built big pyramids, and were buried in them.
 L המצרים גרו ליד נהר גדול, הנילוס. המים עזרו להם לגדל אוכל.|سكن المصريون قرب نهر كبير هو النيل. وساعدتهم مياهه على زراعة الطعام.|Египтяне жили у большой реки - Нила. Вода помогала им выращивать еду.|The Egyptians lived by a big river, the Nile. Its water helped them grow food.
@@ -299,6 +370,26 @@ Q ליד איזה נהר גרו המצרים?|قرب أي نهر سكن المص
 Q באיזה מקום התחילו המשחקים האולימפיים?|أين بدأت الألعاب الأولمبية؟|Где начались Олимпийские игры?|Where did the Olympic Games begin?|greece|egypt_c,rome_c,china_c
 Q מי בנה אמות מים וכבישים ארוכים?|من بنى قنوات المياه والطرق الطويلة؟|Кто строил акведуки и длинные дороги?|Who built aqueducts and long roads?|romans|canaanites_p,babylonians_p,vikings
 Q באיזה מקום בארץ ישראל עומדת אמת מים רומית?|أين تقف قناة مياه رومانية في أرض إسرائيل؟|В каком месте в Израиле стоит римский акведук?|Where in Israel does a Roman aqueduct stand?|caesarea|beit_shean,masada,haifa_x
+E xh_nilefood|t|המים שלו עזרו לגדל אוכל|ماؤه ساعد على زراعة الطعام|его вода помогала выращивать еду|its water helped them grow food
+E xh_gold|t|בתוכו החביאו את הזהב|خبّأوا الذهب في داخله|в нём прятали золото|they hid their gold in it
+E xh_snow|t|הוא שמר עליהם מפני שלג|حماهم من الثلج|он защищал их от снега|it protected them from snow
+E xh_boatrace|t|בו ערכו מרוצי סירות|أقاموا فيه سباقات قوارب|на нём устраивали гонки лодок|they held boat races on it
+Q איך הנילוס עזר למצרים?|كيف ساعد النيل المصريين؟|Как Нил помогал египтянам?|How did the Nile help the Egyptians?|xh_nilefood|xh_gold,xh_snow,xh_boatrace
+E xh_wsb|t|כתב, ספורט ובנייה|الكتابة والرياضة والبناء|письменность, спорт и строительство|writing, sport and building
+E xh_tech|t|טלפונים ומחשבים|الهواتف والحواسيب|телефоны и компьютеры|phones and computers
+E xh_planes|t|מטוסים ורכבות|الطائرات والقطارات|самолёты и поезда|planes and trains
+E xh_tvradio|t|טלוויזיה ורדיו|التلفاز والراديو|телевидение и радио|television and radio
+Q מה למדנו מהעמים של העולם העתיק?|ماذا تعلّمنا من شعوب العالم القديم؟|Чему мы научились у народов древнего мира?|What did we learn from the peoples of the ancient world?|xh_wsb|xh_tech,xh_planes,xh_tvradio
+E xh_aqd|t|תעלות גבוהות שמובילות מים|قنوات عالية تنقل الماء|высокие каналы, по которым течёт вода|high channels that carry water
+E xh_pools|t|בריכות שחייה גדולות|برك سباحة كبيرة|большие бассейны|big swimming pools
+E xh_cups|t|כלים לשתיית מים|أوانٍ لشرب الماء|посуда для питья воды|cups for drinking water
+E xh_rboats|t|סירות ששטות על נהר|قوارب تبحر في نهر|лодки, которые плывут по реке|boats that sail on a river
+Q מה הן אמות מים?|ما هي قنوات المياه الرومانية؟|Что такое акведуки?|What are aqueducts?|xh_aqd|xh_pools,xh_cups,xh_rboats
+E xh_ran|t|רצו והתחרו|ركضوا وتنافسوا|бегали и соревновались|they ran and competed
+E xh_pyrb|t|בנו פירמידות|بنوا الأهرامات|строили пирамиды|they built pyramids
+E xh_fished|t|דגו בנילוס|اصطادوا السمك في النيل|ловили рыбу в Ниле|they fished in the Nile
+E xh_dict|t|כתבו מילון|كتبوا قاموسًا|писали словарь|they wrote a dictionary
+Q מה עשו במשחקים האולימפיים ביוון העתיקה?|ماذا فعلوا في الألعاب الأولمبية في اليونان القديمة؟|Что делали на Олимпийских играх в Древней Греции?|What did people do at the Olympic Games in ancient Greece?|xh_ran|xh_pyrb,xh_fished,xh_dict
 S exile|🧳|#1971c2|גלות ושיבה|الشتات والعودة|изгнание и возвращение|Exile and Return
 L לפני כאלפיים שנה הרומאים החריבו את בית המקדש בירושלים. הרבה יהודים נאלצו לעזוב את הארץ.|قبل نحو ألفي سنة دمّر الرومان الهيكل في القدس. واضطرّ كثير من اليهود إلى ترك البلاد.|Около двух тысяч лет назад римляне разрушили Храм в Иерусалиме. Многим евреям пришлось покинуть страну.|About two thousand years ago the Romans destroyed the Temple in Jerusalem. Many Jews had to leave the land.
 L יהודים התפזרו בארצות רבות: בספרד, בבבל, בתימן, באתיופיה, בפולין ועוד. את זה קוראים גלות.|تفرّق اليهود في بلاد كثيرة: في إسبانيا وبابل واليمن وإثيوبيا وبولندا وغيرها. وهذا يُسمّى الشتات.|Евреи рассеялись по многим странам: Испания, Вавилон, Йемен, Эфиопия, Польша и другие. Это называют изгнанием.|Jews spread to many countries: Spain, Babylon, Yemen, Ethiopia, Poland and more. This is called exile.
@@ -310,6 +401,24 @@ Q איך קוראים לזמן שבו יהודים חיו הרחק מארץ יש
 Q לאיזה כיוון התפללו היהודים בכל העולם?|إلى أي اتجاه صلّى اليهود في كل العالم؟|В какую сторону молились евреи по всему миру?|Toward which place did Jews all over the world pray?|jlm|tlv,haifa,eilat
 Q מה היהודים שמרו עליו בכל מקום שחיו בו?|على ماذا حافظ اليهود في كل مكان عاشوا فيه؟|Что евреи сохраняли везде, где жили?|What did Jews keep wherever they lived?|k_holidays|k_nothing,k_bags,k_names_e
 Q באיזו עיר נשארו יהודים בארץ במשך השנים?|في أي مدينة بقي يهود في البلاد على مرّ السنين؟|В каком городе жили евреи в стране все эти годы?|In which city did Jews stay in the land through the years?|safed|moscow,paris,cairo
+E xh_lands|t|בספרד, בבבל, בתימן, בפולין ועוד|في إسبانيا وبابل واليمن وبولندا وغيرها|в Испании, Вавилоне, Йемене, Польше и других|in Spain, Babylon, Yemen, Poland and more
+E xh_onlysp|t|רק בספרד, ולא בשום מקום אחר|في إسبانيا فقط، ولا في أي مكان آخر|только в Испании, и больше нигде|only in Spain, and nowhere else
+E xh_onlybab|t|רק בבבל, ולא בשום מקום אחר|في بابل فقط، ولا في أي مكان آخر|только в Вавилоне, и больше нигде|only in Babylon, and nowhere else
+E xh_onlypol|t|רק בפולין, ולא בשום מקום אחר|في بولندا فقط، ولا في أي مكان آخر|только в Польше, и больше нигде|only in Poland, and nowhere else
+Q איפה חיו יהודים בזמן הגלות?|أين عاش اليهود في زمن الشتات؟|Где жили евреи во времена изгнания?|Where did Jews live during the exile?|xh_lands|xh_onlysp,xh_onlybab,xh_onlypol
+E xh_return|t|לחזור לארץ ישראל|أن يعودوا إلى أرض إسرائيل|вернуться в Страну Израиля|to return to the Land of Israel
+E xh_stay|t|להישאר תמיד רחוק|أن يبقوا بعيدين دائمًا|всегда оставаться далеко|to always stay far away
+E xh_forgeth|t|לשכוח את השפה העברית|أن ينسوا اللغة العبرية|забыть иврит|to forget the Hebrew language
+E xh_island|t|לגור באי בודד|أن يسكنوا في جزيرة نائية|жить на необитаемом острове|to live on a lonely island
+Q על מה חלמו היהודים בגלות במשך שנים רבות?|بماذا حلم اليهود في الشتات سنوات طويلة؟|О чём евреи в изгнании мечтали много лет?|What did Jews in exile dream of for many years?|xh_return|xh_stay,xh_forgeth,xh_island
+E xh_tiberias|l|טבריה|طبريا|Тверия|Tiberias
+Q באיזו עיר על שפת הכנרת נשארו יהודים לאורך השנים?|في أي مدينة على شاطئ بحيرة طبريا بقي اليهود عبر السنين؟|В каком городе на берегу Кинерета евреи жили все эти годы?|In which city on the shore of the Sea of Galilee did Jews stay over the years?|xh_tiberias|moscow,paris,cairo
+Q איזו שפה שמרו היהודים בגלות?|أيّ لغة حافظ عليها اليهود في الشتات؟|Какой язык евреи сохранили в изгнании?|Which language did Jews keep in exile?|hebrew_l|french_l,japanese_l,swahili_l
+E xh_destr|t|הרומאים החריבו את בית המקדש|الرومان دمّروا الهيكل|римляне разрушили Храм|the Romans destroyed the Temple
+E xh_flood|t|שיטפון גדול כיסה את הארץ|فيضان كبير غطّى البلاد|большое наводнение залило страну|a big flood covered the land
+E xh_quake|t|רעידת אדמה הרסה את הבתים|زلزال هدم البيوت|землетрясение разрушило дома|an earthquake destroyed the houses
+E xh_cold|t|חורף קר מאוד הקפיא את השדות|شتاء بارد جدًّا جمّد الحقول|очень холодная зима заморозила поля|a very cold winter froze the fields
+Q למה יהודים רבים עזבו את הארץ לפני כאלפיים שנה?|لماذا غادر يهود كثيرون البلاد قبل نحو ألفي سنة؟|Почему многие евреи покинули страну около двух тысяч лет назад?|Why did many Jews leave the land about two thousand years ago?|xh_destr|xh_flood,xh_quake,xh_cold
 S zion|🌅|#c64c0a|הרצל והחלום לשוב לארץ|هرتسل وحلم العودة إلى البلاد|Герцль и мечта вернуться в страну|Herzl and the Dream of Returning
 L לפני יותר ממאה שנה חי עיתונאי בשם בנימין זאב הרצל. הוא ראה שיהודים רבים סובלים באירופה.|قبل أكثر من مئة سنة عاش صحفي اسمه بنيامين زئيف هرتسل. رأى أن كثيرًا من اليهود يعانون في أوروبا.|Больше ста лет назад жил журналист по имени Биньямин Зеэв Герцль. Он видел, что многим евреям в Европе тяжело.|More than a hundred years ago there lived a journalist named Binyamin Ze'ev Herzl. He saw that many Jews suffered in Europe.
 L הרצל חשב שליהודים צריך להיות בית משלהם, בארץ ישראל. הרעיון הזה נקרא ציונות.|رأى هرتسل أنه يجب أن يكون لليهود بيت خاص بهم في أرض إسرائيل. وهذه الفكرة تُسمّى الصهيونية.|Герцль считал, что у евреев должен быть свой дом в Земле Израиля. Эта идея называется сионизмом.|Herzl thought the Jews needed a home of their own in the Land of Israel. This idea is called Zionism.
@@ -322,6 +431,20 @@ Q באיזו עיר נערך הקונגרס הציוני הראשון?|في أي
 Q באיזו שנה נערך הקונגרס הציוני הראשון?|في أي سنة عُقد المؤتمر الصهيوني الأول؟|В каком году прошёл первый сионистский конгресс?|In which year was the first Zionist Congress held?|y1897|y1997,y1797,y1947
 Q מה שמו של הקיבוץ הראשון, שהוקם ליד הכנרת?|ما اسم أول كيبوتس أُقيم قرب بحيرة طبريا؟|Как называется первый кибуц, основанный у озера Кинерет?|What is the name of the first kibbutz, which was built near the Sea of Galilee?|degania|kinneret_k,ein_harod,nahalal_k
 Q מה עשו העולים החדשים באדמה?|ماذا فعل المهاجرون الجدد في الأرض؟|Что делали новые репатрианты на земле?|What did the new immigrants do on the land?|m_plant|m_sleep,m_wait,m_mine
+E xh_journal|p|עיתונאי|صحفي|журналист|a journalist
+Q מה הייתה העבודה של הרצל?|ماذا كان عمل هرتسل؟|Кем работал Герцль?|What was Herzl's job?|xh_journal|baker,dentist,driver
+E xh_quote|t|אם תרצו, אין זו אגדה|إذا أردتم، فليست هذه أسطورة|Если захотите, это не будет сказкой|If you will it, it is no legend
+E xh_q2|t|אני ואתה נשנה את העולם|أنا وأنت سنغيّر العالم|Ты и я изменим мир|You and I will change the world
+E xh_q3|t|כל העולם כולו גשר צר מאוד|العالم كلّه جسر ضيّق جدًّا|Весь мир — очень узкий мост|The whole world is a very narrow bridge
+E xh_q4|t|הבה נגילה ונשמחה|هيّا نفرح ونبتهج|Давайте радоваться и веселиться|Come, let us rejoice and be glad
+Q איזה משפט מפורסם אמר הרצל?|أيّ جملة مشهورة قالها هرتسل؟|Какую знаменитую фразу сказал Герцль?|Which famous sentence did Herzl say?|xh_quote|xh_q2,xh_q3,xh_q4
+E xh_suffer|t|שיהודים רבים סובלים|أن يهودًا كثيرين يعانون|что многие евреи страдают|that many Jews were suffering
+E xh_richj|t|שכל היהודים עשירים ומאושרים|أن كل اليهود أغنياء وسعداء|что все евреи богаты и счастливы|that all Jews were rich and happy
+E xh_noj|t|שאין שם יהודים בכלל|أنه لا يوجد يهود هناك أبدًا|что там совсем нет евреев|that there were no Jews there at all
+E xh_wantst|t|שכל היהודים רוצים להישאר שם|أن كل اليهود يريدون البقاء هناك|что все евреи хотят остаться там|that all Jews wanted to stay there
+Q מה ראה הרצל באירופה?|ماذا رأى هرتسل في أوروبا؟|Что Герцль увидел в Европе?|What did Herzl see in Europe?|xh_suffer|xh_richj,xh_noj,xh_wantst
+E xh_swiss|g|שווייץ|سويسرا|Швейцария|Switzerland
+Q באיזו מדינה נמצאת העיר בזל?|في أي دولة تقع مدينة بازل؟|В какой стране находится город Базель?|In which country is the city of Basel?|xh_swiss|france_c,greece,egypt_c
 S hebrew|🗣️|#0b7285|העברית חוזרת לדבר|العبرية تعود إلى الكلام|иврит снова становится разговорным|Hebrew Comes Back to Speech
 L במשך שנים רבות כתבו וקראו בעברית, אבל כמעט לא דיברו בה בבית ובשוק. דיברו רוסית, ערבית, אידיש, לדינו ושפות אחרות.|لسنوات طويلة كانوا يكتبون ويقرؤون بالعبرية، لكنهم لم يتحدّثوا بها تقريبًا في البيت والسوق. تحدّثوا الروسية والعربية والييدية واللادينو ولغات أخرى.|Много лет на иврите писали и читали, но почти не говорили в доме и на рынке. Говорили по-русски, по-арабски, на идиш, на ладино и на других языках.|For many years people wrote and read in Hebrew, but hardly spoke it at home or in the market. They spoke Russian, Arabic, Yiddish, Ladino and other languages.
 L אליעזר בן־יהודה חשב שעם צריך לדבר בשפה אחת משלו. הוא החליט לדבר עברית כל יום, גם בבית.|رأى إليعيزر بن يهودا أن الشعب يجب أن يتكلّم بلغة واحدة خاصة به. وقرّر أن يتكلّم العبرية كل يوم، حتى في البيت.|Элиэзер Бен-Йехуда считал, что народу нужен один общий язык. Он решил говорить на иврите каждый день, даже дома.|Eliezer Ben-Yehuda thought a people needed one language of its own. He decided to speak Hebrew every day, even at home.
@@ -333,6 +456,31 @@ Q מה כתב אליעזר בן־יהודה?|ماذا كتب إليعيزر بن
 Q איפה בן־יהודה החליט לדבר עברית?|أين قرّر بن يهودا أن يتكلّم العبرية؟|Где Бен-Йехуда решил говорить на иврите?|Where did Ben-Yehuda decide to speak Hebrew?|home_all|only_syn,only_book,only_army
 Q איזו שפה עתיקה של העם היהודי כמעט לא דיברו ביום-יום לפני בן־יהודה?|أي لغة قديمة للشعب اليهودي لم يكونوا يتحدّثون بها تقريبًا في الحياة اليومية قبل بن يهودا؟|Какой древний язык еврейского народа почти не использовали в быту до Бен-Йехуды?|Which ancient language of the Jewish people was hardly spoken in daily life before Ben-Yehuda?|hebrew_l|french_l,japanese_l,swahili_l
 Q מה בן־יהודה עשה כשחסרו מילים?|ماذا فعل بن يهودا عندما نقصت الكلمات؟|Что делал Бен-Йехуда, когда не хватало слов?|What did Ben-Yehuda do when words were missing?|invent|stopped,cried_b,hide_b
+E xh_manyl|t|רוסית, ערבית, אידיש, לדינו ועוד|الروسية والعربية واليديشية واللادينو وغيرها|русский, арабский, идиш, ладино и другие|Russian, Arabic, Yiddish, Ladino and more
+E xh_onlyheb|t|רק עברית, בכל בית ובכל שוק|العبرية فقط، في كل بيت وكل سوق|только иврит, в каждом доме и на каждом рынке|only Hebrew, in every home and market
+E xh_onlyen|t|רק אנגלית, בכל בית ובכל שוק|الإنجليزية فقط، في كل بيت وكل سوق|только английский, в каждом доме и на каждом рынке|only English, in every home and market
+E xh_onlyjp|t|רק יפנית וסינית, בכל מקום|اليابانية والصينية فقط، في كل مكان|только японский и китайский, везде|only Japanese and Chinese, everywhere
+Q באילו שפות דיברו יהודים בבית ובשוק, לפני בן־יהודה?|بأيّ لغات تكلّم اليهود في البيت والسوق قبل بن يهودا؟|На каких языках евреи говорили дома и на рынке до Бен-Йегуды?|Which languages did Jews speak at home and in the market before Ben-Yehuda?|xh_manyl|xh_onlyheb,xh_onlyen,xh_onlyjp
+E xh_glida|t|גלידה|غليدا (بوظة)|глида (мороженое)|glida (ice cream)
+E xh_ima|t|אמא|إيما (أمّ)|има (мама)|ima (mom)
+E xh_lechem|t|לחם|ليحِم (خبز)|лехем (хлеб)|lechem (bread)
+E xh_mayim|t|מים|مايِم (ماء)|маим (вода)|mayim (water)
+Q איזו מילה חסרה בעברית בזמן של בן־יהודה?|أيّ كلمة كانت ناقصة في العبرية في زمن بن يهودا؟|Какого слова не было в иврите во времена Бен-Йегуды?|Which word was missing from Hebrew in Ben-Yehuda's time?|xh_glida|xh_ima,xh_lechem,xh_mayim
+E xh_schools|t|בבתי הספר|في المدارس|в школах|in schools
+E xh_cinemas|t|בבתי הקולנוע|في دور السينما|в кинотеатрах|in cinemas
+E xh_port|t|בנמל|في الميناء|в порту|at the port
+E xh_onbus|t|באוטובוס|في الحافلة|в автобусе|on the bus
+Q איפה ילדים התחילו ללמוד בעברית?|أين بدأ الأولاد يتعلّمون بالعبرية؟|Где дети начали учиться на иврите?|Where did children start learning in Hebrew?|xh_schools|xh_cinemas,xh_port,xh_onbus
+E xh_millions|t|מיליוני אנשים|ملايين الناس|миллионы людей|millions of people
+E xh_tens|t|רק כמה עשרות אנשים|بضع عشرات من الناس فقط|только несколько десятков человек|only a few dozen people
+E xh_byfam|t|רק משפחת בן־יהודה|عائلة بن يهودا فقط|только семья Бен-Йегуды|only the Ben-Yehuda family
+E xh_nobody|t|אף אחד, רק כותבים בה|لا أحد، يكتبون بها فقط|никто, на нём только пишут|nobody, it is only written
+Q כמה אנשים מדברים עברית היום?|كم شخصًا يتكلّم العبرية اليوم؟|Сколько людей говорят на иврите сегодня?|How many people speak Hebrew today?|xh_millions|xh_tens,xh_byfam,xh_nobody
+E xh_onelang|t|כי לעם צריכה להיות שפה משלו|لأنه يجب أن تكون للشعب لغة خاصة به|потому что у народа должен быть свой язык|because a people should have its own language
+E xh_easy|t|כי עברית קלה יותר מכל שפה|لأن العبرية أسهل من كل اللغات|потому что иврит легче всех языков|because Hebrew is easier than any language
+E xh_noother|t|כי הוא לא ידע שפות אחרות|لأنه لم يعرف لغات أخرى|потому что он не знал других языков|because he did not know other languages
+E xh_ordered|t|כי הממשלה ביקשה ממנו|لأن الحكومة طلبت منه|потому что его попросило правительство|because the government asked him to
+Q למה בן־יהודה רצה שכולם ידברו עברית?|لماذا أراد بن يهودا أن يتكلّم الجميع العبرية؟|Почему Бен-Йегуда хотел, чтобы все говорили на иврите?|Why did Ben-Yehuda want everyone to speak Hebrew?|xh_onelang|xh_easy,xh_noother,xh_ordered
 S state|🇮🇱|#1a76c9|הקמת מדינת ישראל|قيام دولة إسرائيل|создание государства Израиль|The Founding of the State of Israel
 L אחרי שנים רבות של עלייה ובנייה, יהודים רבים רצו מדינה משלהם. ב־29 בנובמבר 1947 האו״ם החליט לחלק את הארץ לשתי מדינות, יהודית וערבית.|بعد سنوات طويلة من الهجرة والبناء، أراد كثير من اليهود دولة خاصة بهم. في 29 تشرين الثاني 1947 قرّرت الأمم المتحدة تقسيم البلاد إلى دولتين، يهودية وعربية.|После многих лет репатриации и строительства многие евреи захотели иметь своё государство. 29 ноября 1947 года ООН решила разделить страну на два государства - еврейское и арабское.|After many years of immigration and building, many Jews wanted a country of their own. On November 29, 1947 the United Nations decided to divide the land into two states, one Jewish and one Arab.
 L ב־5 באייר תש״ח, 14 במאי 1948, עמד דוד בן־גוריון במוזיאון בתל אביב והכריז על הקמת מדינת ישראל.|في 5 أيار العبري (14 أيار 1948) وقف دافيد بن غوريون في متحف في تل أبيب وأعلن قيام دولة إسرائيل.|5 ияра 5708 года (14 мая 1948) Давид Бен-Гурион стоял в музее в Тель-Авиве и объявил о создании государства Израиль.|On the 5th of Iyar (May 14, 1948) David Ben-Gurion stood in a museum in Tel Aviv and announced the founding of the State of Israel.
@@ -345,6 +493,26 @@ Q באיזו עיר הוכרזה הקמת המדינה?|في أي مدينة أ�
 Q מי היה ראש הממשלה הראשון?|من كان أول رئيس حكومة؟|Кто был первым премьер-министром?|Who was the first Prime Minister?|ben_gurion|weizmann,herzl,golda
 Q איך קוראים להמנון של ישראל?|ماذا يُسمّى نشيد إسرائيل؟|Как называется гимн Израиля?|What is Israel's anthem called?|hatikva|hava,shalom_song,lullaby
 Q איזה חג חוגגים על הקמת המדינה?|أي عيد نحتفل به بمناسبة قيام الدولة؟|Какой праздник отмечают в честь создания государства?|Which holiday do we celebrate for the founding of the State?|indep|yom_hazikaron,yom_yerushalayim,hanukkah
+E xh_partition|t|לחלק את הארץ לשתי מדינות|تقسيم البلاد إلى دولتين|разделить страну на два государства|to divide the land into two states
+E xh_closel|t|לסגור את הארץ לכל העולים|إغلاق البلاد أمام كل المهاجرين|закрыть страну для всех репатриантов|to close the land to all immigrants
+E xh_negevc|t|להקים עיר חדשה בנגב|إقامة مدينة جديدة في النقب|построить новый город в Негеве|to build a new city in the Negev
+E xh_buildk|t|לבנות את בניין הכנסת|بناء مبنى الكنيست|построить здание Кнессета|to build the Knesset building
+Q מה החליט האו״ם ב־29 בנובמבר 1947?|ماذا قرّرت الأمم المتحدة في 29 تشرين الثاني (نوفمبر) 1947؟|Что решила ООН 29 ноября 1947 года?|What did the UN decide on 29 November 1947?|xh_partition|xh_closel,xh_negevc,xh_buildk
+E xh_radio|t|ברדיו|في الراديو|по радио|on the radio
+E xh_tv|t|בטלוויזיה|في التلفاز|по телевизору|on television
+E xh_inet|t|באינטרנט|في الإنترنت|в интернете|on the internet
+E xh_mobile|t|בטלפון נייד|في الهاتف المحمول|по мобильному телефону|on a mobile phone
+Q איך שמעו אנשים ברחוב את ההכרזה על הקמת המדינה?|كيف سمع الناس في الشارع إعلان قيام الدولة؟|Как люди на улице услышали провозглашение государства?|How did people in the street hear the declaration of the state?|xh_radio|xh_tv,xh_inet,xh_mobile
+E xh_5iyar|t|ה׳ באייר|الخامس من شهر إيّار العبري|5 ияра|5 Iyar
+E xh_15shvat|t|ט״ו בשבט|الخامس عشر من شهر شفاط العبري|15 швата|15 Shevat
+E xh_14adar|t|י״ד באדר|الرابع عشر من شهر أدار العبري|14 адара|14 Adar
+E xh_1tishrei|t|א׳ בתשרי|الأول من شهر تشري العبري|1 тишрея|1 Tishrei
+Q באיזה תאריך עברי קמה מדינת ישראל?|في أيّ تاريخ عبري قامت دولة إسرائيل؟|В какой день по еврейскому календарю было создано Государство Израиль?|On which Hebrew date was the State of Israel founded?|xh_5iyar|xh_15shvat,xh_14adar,xh_1tishrei
+E xh_inmuseum|l|במוזיאון|في متحف|в музее|in a museum
+E xh_onbeach|l|על חוף הים|على شاطئ البحر|на пляже|on the beach
+E xh_inschool|l|בבית ספר|في مدرسة|в школе|in a school
+E xh_inmarket|l|בשוק|في السوق|на рынке|in the market
+Q באיזה מקום בתל אביב הכריז בן־גוריון על הקמת המדינה?|في أيّ مكان في تل أبيب أعلن بن غوريون قيام الدولة؟|Где в Тель-Авиве Бен-Гурион провозгласил создание государства?|Where in Tel Aviv did Ben-Gurion declare the state?|xh_inmuseum|xh_onbeach,xh_inschool,xh_inmarket
 S aliyah|✈️|#29853c|עולים חדשים מכל העולם|مهاجرون جدد من كل العالم|новые репатрианты со всего мира|New Immigrants from All Over the World
 L אחרי הקמת המדינה הגיעו אליה יהודים רבים מארצות שונות. מי שמגיע לגור בישראל נקרא עולה חדש.|بعد قيام الدولة وصل إليها كثير من اليهود من بلاد مختلفة. ومن يأتي ليسكن في إسرائيل يُسمّى مهاجرًا جديدًا (عوليه).|После создания государства в него приехали многие евреи из разных стран. Тот, кто приезжает жить в Израиль, называется новым репатриантом.|After the State was founded, many Jews came to it from different countries. Someone who comes to live in Israel is called a new immigrant.
 L בשנים 1949 ו־1950 מטוסים הביאו כמעט כל יהודי תימן לישראל. המבצע נקרא ״על כנפי נשרים״, ובפי כולם ״מרבד הקסמים״.|في عامي 1949 و1950 نقلت الطائرات تقريبًا كل يهود اليمن إلى إسرائيل. اسم العملية «على أجنحة النسور»، ويقول عنها الناس «بساط الريح».|В 1949 и 1950 годах самолёты привезли в Израиль почти всех евреев Йемена. Операция называлась «На крыльях орлов», а в народе - «Ковёр-самолёт».|In 1949 and 1950 planes brought almost all the Jews of Yemen to Israel. The operation was called "On Eagles' Wings", and many call it "Magic Carpet".
@@ -356,6 +524,31 @@ Q מאיזו מדינה הביאו המטוסים כמעט את כל היהוד�
 Q מה כל קבוצת עולים הביאה איתה?|ماذا أحضرت معها كل مجموعة مهاجرين؟|Что привезла с собой каждая группа репатриантов?|What did each group of immigrants bring with them?|food_music|nothing_b,snow_b,sand_b
 Q מאיזו מדינה בא גל גדול של עולים בשנות התשעים?|من أي دولة جاءت موجة كبيرة من المهاجرين في التسعينيات؟|Из какой страны приехала большая волна репатриантов в девяностые годы?|From which country did a big wave of immigrants come in the 1990s?|ussr|usa_c,france_c,argentina_c
 Q מאיזו מדינה באפריקה הגיעו עולים בשנים 1984 ו־1991?|من أي بلد في أفريقيا جاء مهاجرون في سنتي 1984 و1991؟|Из какой страны Африки приехали репатрианты в 1984 и 1991 годах?|From which African country did immigrants come in 1984 and 1991?|ethiopia|kenya,nigeria,ghana
+E xh_byplane|t|במטוסים|بالطائرات|на самолётах|by plane
+E xh_byship|t|באוניות|بالسفن|на кораблях|by ship
+E xh_bytrain|t|ברכבות|بالقطارات|на поездах|by train
+E xh_onfoot|t|ברגל|سيرًا على الأقدام|пешком|on foot
+Q איך הגיעו יהודי תימן לישראל ב״מרבד הקסמים״?|كيف وصل يهود اليمن إلى إسرائيل في عملية "البساط السحري"؟|Как йеменские евреи прибыли в Израиль во время операции «Волшебный ковёр»?|How did the Jews of Yemen reach Israel in "Magic Carpet"?|xh_byplane|xh_byship,xh_bytrain,xh_onfoot
+E xh_4950|y|1949 ו־1950|1949 و1950|1949 и 1950|1949 and 1950
+E xh_8491|y|1984 ו־1991|1984 و1991|1984 и 1991|1984 and 1991
+E xh_9798|y|1897 ו־1898|1897 و1898|1897 и 1898|1897 and 1898
+E xh_0304|y|2003 ו־2004|2003 و2004|2003 и 2004|2003 and 2004
+Q באילו שנים הביאו המטוסים את יהודי תימן?|في أيّ سنوات أحضرت الطائرات يهود اليمن؟|В каких годах самолёты привезли евреев Йемена?|In which years did the planes bring the Jews of Yemen?|xh_4950|xh_8491,xh_9798,xh_0304
+E xh_docs|t|רופאים, מוזיקאים ומדענים|أطبّاء وموسيقيون وعلماء|врачи, музыканты и учёные|doctors, musicians and scientists
+E xh_onlykids|t|רק ילדים קטנים, בלי הורים|أولاد صغار فقط، بلا أهل|только маленькие дети, без родителей|only small children, without parents
+E xh_onlysold|t|רק חיילים וקצינים|جنود وضبّاط فقط|только солдаты и офицеры|only soldiers and officers
+E xh_onlyfarm|t|רק חקלאים ורועי צאן|مزارعون ورعاة غنم فقط|только крестьяне и пастухи|only farmers and shepherds
+Q מי היו בין העולים מברית המועצות לשעבר?|من كان بين القادمين من الاتحاد السوفييتي السابق؟|Кто был среди репатриантов из бывшего СССР?|Who was among the immigrants from the former Soviet Union?|xh_docs|xh_onlykids,xh_onlysold,xh_onlyfarm
+E xh_90s|t|בשנות התשעים|في التسعينيات|в девяностые годы|in the 1990s
+E xh_50s|t|בשנות החמישים|في الخمسينيات|в пятидесятые годы|in the 1950s
+E xh_100ago|t|לפני מאה שנה|قبل مئة سنة|сто лет назад|a hundred years ago
+E xh_y48|t|בשנת 1948|في سنة 1948|в 1948 году|in 1948
+Q מתי הגיע הגל הגדול של העולים מברית המועצות לשעבר?|متى وصلت الموجة الكبيرة من القادمين من الاتحاد السوفييتي السابق؟|Когда приехала большая волна репатриантов из бывшего СССР?|When did the big wave of immigrants from the former Soviet Union arrive?|xh_90s|xh_50s,xh_100ago,xh_y48
+E xh_manycult|t|בית לאנשים מהרבה תרבויות|بيت لأناس من ثقافات كثيرة|дом для людей из многих культур|a home for people from many cultures
+E xh_onecult|t|מקום של תרבות אחת בלבד|مكان لثقافة واحدة فقط|место только одной культуры|a place of only one culture
+E xh_noolim|t|מקום שלא הגיעו אליו עולים|مكان لم يصل إليه مهاجرون|место, куда не приезжали репатрианты|a place where no immigrants came
+E xh_bornonly|t|בית רק למי שנולד בו|بيت فقط لمن وُلد فيه|дом только для тех, кто там родился|a home only for people born there
+Q מה ישראל היום, אחרי כל גלי העלייה?|ماذا أصبحت إسرائيل اليوم بعد كل موجات الهجرة؟|Чем стал Израиль сегодня, после всех волн репатриации?|After all the waves of immigration, what is Israel today?|xh_manycult|xh_onecult,xh_noolim,xh_bornonly
 S shoah|🕯️|#495057|יום הזיכרון לשואה|يوم ذكرى الكارثة (الشواه)|День памяти Холокоста|Holocaust Remembrance Day
 L זה נושא עצוב וחשוב. כדאי ללמוד עליו בעדינות, ואפשר לדבר עליו עם מבוגר.|هذا موضوع حزين ومهم. من الجيّد أن نتعلّم عنه بلطف، ويمكن أن نتحدّث عنه مع شخص بالغ.|Это грустная и важная тема. Лучше узнавать о ней бережно, и можно поговорить об этом со взрослым.|This is a sad and important subject. It is good to learn about it gently, and you can talk about it with a grown-up.
 L לפני יותר משמונים שנה, במלחמת העולם השנייה, הנאצים רצחו שישה מיליון יהודים. את זה מכנים השואה.|قبل أكثر من ثمانين سنة، في الحرب العالمية الثانية، قتل النازيون ستة ملايين يهودي. وهذا ما نسمّيه الكارثة (الشواه).|Больше восьмидесяти лет назад, во время Второй мировой войны, нацисты убили шесть миллионов евреев. Это называют Холокостом.|More than eighty years ago, in the Second World War, the Nazis murdered six million Jews. This is called the Holocaust.
@@ -367,6 +560,31 @@ Q כמה זמן מצפצפת הסירנה ביום השואה?|كم تدوم ص�
 Q איך קוראים לאנשים שהסתירו יהודים וסיכנו את חייהם?|ماذا نسمّي الناس الذين أخفوا يهودًا وخاطروا بحياتهم؟|Как называют людей, которые прятали евреев и рисковали жизнью?|What are the people who hid Jews and risked their lives called?|righteous|survivors_c,partisans_c,olim_c
 Q איך קוראים למוזיאון לזכר השואה בירושלים?|ماذا يُسمّى متحف ذكرى الكارثة في القدس؟|Как называется музей памяти Холокоста в Иерусалиме?|What is the Holocaust museum in Jerusalem called?|yadvashem|israelmuseum,biblelands_m,science_m
 Q למה חשוב לזכור?|لماذا من المهم أن نتذكّر؟|Почему важно помнить?|Why is it important to remember?|remember_why|forget_why,nobody_why,dont_why
+E xh_ww2|t|במלחמת העולם השנייה|في الحرب العالمية الثانية|во Второй мировой войне|in the Second World War
+E xh_ww1|t|במלחמת העולם הראשונה|في الحرب العالمية الأولى|в Первой мировой войне|in the First World War
+E xh_indepw|t|במלחמת העצמאות|في حرب الاستقلال|в Войне за независимость|in the War of Independence
+E xh_6day|t|במלחמת ששת הימים|في حرب الأيام الستة|в Шестидневной войне|in the Six-Day War
+Q באיזו מלחמה הייתה השואה?|في أيّ حرب وقعت المحرقة (الشواه)؟|Во время какой войны была Катастрофа (Холокост)?|During which war did the Holocaust happen?|xh_ww2|xh_ww1,xh_indepw,xh_6day
+E xh_names|t|את השמות והסיפורים של הנספים|أسماء الضحايا وقصصهم|имена и истории погибших|the names and stories of those who died
+E xh_tripph|t|תמונות של מקומות לטיול|صور لأماكن للرحلات|фотографии мест для поездок|photos of places to visit
+E xh_kidart|t|ציורים של ילדים על הטבע|رسومات أطفال عن الطبيعة|детские рисунки о природе|children's drawings of nature
+E xh_cookb|t|ספרי בישול ישנים|كتب طبخ قديمة|старые кулинарные книги|old cookbooks
+Q מה שומרים ביד ושם?|ماذا يحفظون في "ياد فاشيم"؟|Что хранят в «Яд ва-Шем»?|What is kept at Yad Vashem?|xh_names|xh_tripph,xh_kidart,xh_cookb
+E xh_hid|t|הסתירו יהודים וסיכנו את חייהם|خبّأوا يهودًا وعرّضوا حياتهم للخطر|прятали евреев и рисковали жизнью|they hid Jews and risked their lives
+E xh_wrote|t|כתבו ספרים על הטבע|كتبوا كتبًا عن الطبيعة|писали книги о природе|they wrote books about nature
+E xh_builtil|t|בנו בתים חדשים בישראל|بنوا بيوتًا جديدة في إسرائيل|строили новые дома в Израиле|they built new houses in Israel
+E xh_sang|t|שרו שירים ברדיו|غنّوا أغاني في الراديو|пели песни по радио|they sang songs on the radio
+Q מה עשו חסידי אומות העולם?|ماذا فعل الصالحون بين الأمم؟|Что сделали Праведники народов мира?|What did the Righteous Among the Nations do?|xh_hid|xh_wrote,xh_builtil,xh_sang
+E xh_80y|t|לפני יותר משמונים שנה|قبل أكثر من ثمانين سنة|больше восьмидесяти лет назад|more than eighty years ago
+E xh_10ya|t|לפני עשר שנים|قبل عشر سنوات|десять лет назад|ten years ago
+E xh_1000y|t|לפני אלף שנה|قبل ألف سنة|тысячу лет назад|a thousand years ago
+E xh_lastyr|t|בשנה שעברה|في السنة الماضية|в прошлом году|last year
+Q מתי הייתה השואה?|متى وقعت المحرقة (الشواه)؟|Когда была Катастрофа?|When did the Holocaust happen?|xh_80y|xh_10ya,xh_1000y,xh_lastyr
+E xh_trusted|t|עם מבוגר שאנחנו סומכים עליו|مع شخص بالغ نثق به|со взрослым, которому мы доверяем|with an adult we trust
+E xh_noone|t|עם אף אחד, שומרים בלב|مع لا أحد، نكتمه في القلب|ни с кем, держим в себе|with no one, we keep it inside
+E xh_youngkid|t|רק עם ילד קטן ממני|فقط مع ولد أصغر منّي|только с ребёнком младше меня|only with a child younger than me
+E xh_stranger|t|עם אדם זר ברחוב|مع شخص غريب في الشارع|с незнакомцем на улице|with a stranger in the street
+Q עם מי טוב לדבר על נושא עצוב כמו השואה?|مع من يحسن أن نتكلّم عن موضوع حزين مثل المحرقة؟|С кем стоит поговорить о такой грустной теме, как Катастрофа?|Who is good to talk to about a sad subject like the Holocaust?|xh_trusted|xh_noone,xh_youngkid,xh_stranger
 S people|🌟|#ca4071|אנשים שעשו היסטוריה|أشخاص صنعوا التاريخ|люди, которые творили историю|People Who Made History
 L היסטוריה לא עושים רק מלכים. גם אנשים רגילים עם רעיון טוב ועם סבלנות יכולים לשנות דברים.|التاريخ لا يصنعه الملوك فقط. فالناس العاديون أيضًا، بفكرة جيدة وصبر، يمكنهم أن يغيّروا الأشياء.|Историю делают не только цари. Обычные люди с хорошей идеей и терпением тоже могут многое изменить.|History is not made only by kings. Ordinary people with a good idea and patience can also change things.
 L בנימין זאב הרצל חלם על בית ליהודים, ואליעזר בן־יהודה החזיר את העברית לדיבור.|حلم بنيامين زئيف هرتسل ببيت لليهود، وأعاد إليعيزر بن يهودا العبرية إلى الكلام.|Биньямин Зеэв Герцль мечтал о доме для евреев, а Элиэзер Бен-Йехуда вернул иврит в разговорную речь.|Binyamin Ze'ev Herzl dreamed of a home for the Jews, and Eliezer Ben-Yehuda brought Hebrew back to speech.
@@ -380,6 +598,22 @@ Q מי חלם על בית ליהודים וכינס את הקונגרס הציו
 Q מי החזיר את העברית לדיבור?|من أعاد العبرية إلى الكلام؟|Кто вернул иврит в разговорную речь?|Who brought Hebrew back to speech?|ben_yehuda|ramon,herzl,weizmann
 Q מי היה הנשיא הראשון של ישראל?|من كان أول رئيس للدولة في إسرائيل؟|Кто был первым президентом Израиля?|Who was Israel's first President?|weizmann|ben_gurion,herzl,golda
 Q לאן טס אילן רמון?|إلى أين سافر إيلان رامون؟|Куда летал Илан Рамон?|Where did Ilan Ramon fly?|space|bottom_sea,mountain,cave
+E xh_scientist|p|מדען|عالِم|учёный|a scientist
+E xh_astro|p|אסטרונאוט|رائد فضاء|астронавт|an astronaut
+E xh_king|p|מלך|ملك|царь|a king
+Q מה היה המקצוע של חיים ויצמן?|ماذا كانت مهنة حاييم وايزمان؟|Кем по профессии был Хаим Вейцман?|What was Chaim Weizmann's profession?|xh_scientist|xh_astro,xh_journal,xh_king
+E xh_y2003|y|2003|2003|2003|2003
+Q באיזו שנה טס אילן רמון לחלל?|في أيّ سنة طار إيلان رامون إلى الفضاء؟|В каком году Илан Рамон полетел в космос?|In which year did Ilan Ramon fly to space?|xh_y2003|y1997,y1968,y1948
+E xh_anyone|t|גם אנשים רגילים עם רעיון טוב|أيضًا أناس عاديون لديهم فكرة جيدة|и обычные люди с хорошей идеей|ordinary people with a good idea too
+E xh_kingsonly|t|רק מלכים ומלכות|الملوك والملكات فقط|только цари и царицы|only kings and queens
+E xh_richonly|t|רק אנשים עשירים מאוד|الأغنياء جدًّا فقط|только очень богатые люди|only very rich people
+E xh_oldonly|t|רק אנשים זקנים מאוד|كبار السنّ جدًّا فقط|только очень старые люди|only very old people
+Q מי יכול לשנות דברים ולעשות היסטוריה?|من يستطيع أن يغيّر الأشياء ويصنع التاريخ؟|Кто может что-то изменить и войти в историю?|Who can change things and make history?|xh_anyone|xh_kingsonly,xh_richonly,xh_oldonly
+E xh_6974|y|1969 עד 1974|1969 حتى 1974|с 1969 по 1974|1969 to 1974
+E xh_4853|y|1948 עד 1953|1948 حتى 1953|с 1948 по 1953|1948 to 1953
+E xh_9704|y|1897 עד 1904|1897 حتى 1904|с 1897 по 1904|1897 to 1904
+E xh_0308|y|2003 עד 2008|2003 حتى 2008|с 2003 по 2008|2003 to 2008
+Q באילו שנים הייתה גולדה מאיר ראש הממשלה?|في أيّ سنوات كانت غولدا مئير رئيسة الحكومة؟|В какие годы Голда Меир была премьер-министром?|In which years was Golda Meir prime minister?|xh_6974|xh_4853,xh_9704,xh_0308
 S treasure|🏛️|#0b7285|אוצרות מהעבר בארץ|كنوز من الماضي في البلاد|сокровища прошлого в нашей стране|Treasures from the Past in Our Land
 L בארץ יש הרבה מקומות עתיקים שאפשר לבקר בהם. כל מקום מספר סיפור.|في البلاد أماكن قديمة كثيرة يمكن زيارتها. وكل مكان يحكي قصة.|В нашей стране много древних мест, которые можно посетить. Каждое место рассказывает свою историю.|The land has many ancient places you can visit. Every place tells a story.
 L מצדה היא מצודה על הר גבוה ליד ים המלח. המלך הורדוס בנה שם ארמונות לפני יותר מאלפיים שנה.|مسعدة قلعة على جبل عالٍ قرب البحر الميت. بنى الملك هيرودس هناك قصورًا قبل أكثر من ألفي سنة.|Масада - это крепость на высокой горе у Мёртвого моря. Царь Ирод построил там дворцы больше двух тысяч лет назад.|Masada is a fortress on a high mountain near the Dead Sea. King Herod built palaces there more than two thousand years ago.
@@ -394,4 +628,18 @@ Q באיזה מקום יש תיאטרון רומי, נמל עתיק ואמת מ�
 Q מה מצא הרועה במערות ליד ים המלח?|ماذا وجد الراعي في الكهوف قرب البحر الميت؟|Что нашёл пастух в пещерах у Мёртвого моря?|What did the shepherd find in the caves near the Dead Sea?|scrolls|gold_coins_b,dinosaur_b,old_car
 Q איפה מציגים חלק ממגילות ים המלח?|أين تُعرض بعض مخطوطات البحر الميت؟|Где выставлена часть Кумранских свитков?|Where are some of the Dead Sea Scrolls shown?|shrine|biblelands_m,natlib_m,science_m
 Q מה עושים כשמבקרים באתר עתיק?|ماذا نفعل عندما نزور موقعًا قديمًا؟|Что делают, когда приходят в древнее место?|What do we do when we visit an ancient site?|careful|climb_walls,take_stones,scribble
+E xh_romcity|t|עיר רומית שלמה|مدينة رومانية كاملة|целый римский город|a whole Roman city
+E xh_pyramid|t|פירמידה מצרית גדולה|هرم مصري كبير|большую египетскую пирамиду|a big Egyptian pyramid
+E xh_jarscr|t|מגילות עתיקות בתוך מערה|مخطوطات قديمة داخل مغارة|древние свитки в пещере|ancient scrolls inside a cave
+E xh_viking|t|ספינה של ויקינגים|سفينة للفايكنغ|корабль викингов|a Viking ship
+Q מה מצאו בחפירות בבית שאן?|ماذا وجدوا في حفريات بيت شان؟|Что нашли при раскопках в Бейт-Шеане?|What did they find in the digs at Beit She'an?|xh_romcity|xh_pyramid,xh_jarscr,xh_viking
+Q באיזו שנה נמצאו מגילות ים המלח?|في أيّ سنة وُجدت مخطوطات البحر الميت؟|В каком году нашли свитки Мёртвого моря?|In which year were the Dead Sea Scrolls found?|y1947|y1897,y1968,y1997
+E xh_shepherd|p|ילד רועה צאן|ولد راعي غنم|мальчик-пастух|a shepherd boy
+E xh_romsold|p|חייל רומי|جندي روماني|римский солдат|a Roman soldier
+Q מי מצא את מגילות ים המלח?|من وجد مخطوطات البحر الميت؟|Кто нашёл свитки Мёртвого моря?|Who found the Dead Sea Scrolls?|xh_shepherd|archaeologist,xh_romsold,herod
+E xh_clayjars|t|בכדי חרס|في جرار فخّارية|в глиняных кувшинах|in clay jars
+E xh_ironbox|t|בקופסאות ברזל|في صناديق حديد|в железных ящиках|in iron boxes
+E xh_plastic|t|בשקיות ניילון|في أكياس نايلون|в полиэтиленовых пакетах|in plastic bags
+E xh_woodbox|t|בארגזי עץ חדשים|في صناديق خشب جديدة|в новых деревянных ящиках|in new wooden crates
+Q במה היו מגילות ים המלח כשמצאו אותן?|في ماذا كانت مخطوطات البحر الميت عندما وُجدت؟|В чём лежали свитки Мёртвого моря, когда их нашли?|What were the Dead Sea Scrolls kept in when they were found?|xh_clayjars|xh_ironbox,xh_plastic,xh_woodbox
 `;
