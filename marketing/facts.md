@@ -202,13 +202,11 @@
    **ואל תצטטו את המספר בלי להריץ** — הוא נכון ליום שבו נמדד.
 5. **״הכול עובד לגמרי אופליין״ — עדיין אסור, שני חריגים.**
    `reader` שולח טקסט ל-`dicta.org.il` לניקוד
-   (`reader/index.html:819`), ו**14** אפליקציות שולחות טקסט לקול ענן (Gemini TTS)
-   כשהמשתמש מזין מפתח בעצמו — biology, civics, english, geography,
-   hebrew-arab, history, islam, kotvim, literature, lomda, motal, russian,
-   tanakh, ulpan (`grep -l generativelanguage.googleapis <app>/index.html`, 16.10.2026).
-   **לא `grep -l GEM_VOICES`** — שם הרשימה הזאת נקבה עד 16.10.2026, והוא מחזיר 18 קבצים:
-   `marketing/index.html` ועוד שלוש (`math-app`, `science`, `geography-elem`) שבהן
-   הרשימה קיימת ואין קריאה (O-179).
+   (`reader/index.html:819`), ואפליקציה אחת בלבד, `ulpan`, שולחת טקסט לקול ענן (Gemini TTS)
+   כשהמשתמש מזין מפתח בעצמו (`grep -l generativelanguage.googleapis <app>/index.html`, 17.10.2026).
+   ב-13 האפליקציות האחרות המסלול הוסר ב-17.10.2026: תנאי ה-API של גוגל
+   אוסרים לקוחות (API Clients) המיועדים לקטינים או שסביר שיגיעו אליהם קטינים,
+   ואולפן היא האפליקציה היחידה עם קהל מבוגר בלבד.
    **הניסוח המדויק:** ״האפליקציות עובדות אופליין; הניקוד
    האוטומטי והקול המשודרג דורשים רשת״.
 
