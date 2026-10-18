@@ -964,7 +964,7 @@ LESSONS.coord=[{t:L("כדי למצוא נקודה על הרשת: קודם הול
 LESSONS.mon2=[{t:L("בבעיה בשני צעדים עושים צעד אחד, ואז צעד שני עם התוצאה.","في المسألة بخطوتين نفعل خطوة ثم خطوة ثانية بالنتيجة.","В задаче в два шага делаем один шаг, потом второй с результатом.","In a two-step problem you do one step, then a second step with the result."),v:function(){return ""}},
  {t:L("כשקונים כמה דברים שווים, קודם כופלים: מחיר אחד כפול כמות.","عند شراء عدة أشياء متساوية نضرب أولًا: السعر × العدد.","Если покупаем несколько одинаковых вещей, сначала умножаем: цена × количество.","When you buy several equal things, multiply first: price × amount."),v:function(){return ""}},
  {t:L("עודף הוא מה ששילמנו פחות המחיר. מחסרים את המחיר מהתשלום.","الباقي هو ما دفعناه ناقص الثمن. نطرح الثمن من المبلغ المدفوع.","Сдача — это то, что заплатили, минус цена. Вычитаем цену из суммы.","Change is what you paid minus the price. Subtract the price from the payment."),v:function(){return ""}}];
-var BUILD="o25 · 2026-10-18";
+var BUILD="o26 · 2026-10-18";
 /* ===== UI strings ===== */
 var STR={
 he:{brand:"מתמטיקה מעבר לחשבון",title:"מתמטיקה ליסודי",tag:"צורות, מדידות, כסף, שברים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -1028,6 +1028,30 @@ function saveS(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 loadS();
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+/* כיוון נוסחאות בתוך משפט עברי/ערבי: ״4 × 3 = 12״ בלי בידוד מוצג הפוך.
+   רצף בלי אות עברית/ערבית עם ספרה, אות לטינית או סימן חשבון נעטף ב-bdi ltr.
+   textContent אינו משתנה, ולכן ההקראה והקלטות לא מושפעות. */
+var LTR_SIG=/[0-9A-Za-z\u00B2\u00B3\u00B9\u2070-\u209F=+\u2212\u00D7\u00F7\u221A\^\u00B1\u00B7\u2264\u2265\u2260\u2248]/;
+function ltrOn(){return document.documentElement.dir==="rtl"}
+function ltrRanges(t){var r=[],re=/[^\u0590-\u05FF\u0600-\u06FF\n]+/g,m,mm,s,mid;t=String(t);
+  while((m=re.exec(t))){if(!LTR_SIG.test(m[0]))continue;mm=m[0].match(/^([\s,.;:?!]*)([\s\S]*?)([\s,.;:?!]*)$/);s=m.index+mm[1].length;mid=mm[2];
+    if(m.index>0&&/[\u05D0-\u05EA]/.test(t.charAt(m.index-1))&&mid.charAt(0)==="-"){s++;mid=mid.slice(1)}
+    if(mid)r.push([s,s+mid.length])}
+  return r}
+function ltrHTML(t,escf){t=String(t);escf=escf||esc;if(!ltrOn())return escf(t);var r=ltrRanges(t),o="",p=0,i;
+  for(i=0;i<r.length;i++){o+=escf(t.slice(p,r[i][0]))+'<bdi dir="ltr">'+escf(t.slice(r[i][0],r[i][1]))+'</bdi>';p=r[i][1]}
+  return o+escf(t.slice(p))}
+function ltrTokHTML(text,mkTok){var parts=String(text).split(/(\s+)/),r=ltrOn()?ltrRanges(text):[],pos=0,open=false,buf="",o="",k,pt,fl,j,idx=0;
+  for(k=0;k<parts.length;k++){pt=parts[k];if(!pt.length)continue;
+    if(/^\s+$/.test(pt)){buf+=pt;pos+=pt.length;continue}
+    fl=false;if(!/[\u0590-\u05FF\u0600-\u06FF]/.test(pt))for(j=0;j<r.length;j++)if(pos<r[j][1]&&pos+pt.length>r[j][0]){fl=true;break}
+    if(fl&&!open){o+=buf+'<bdi dir="ltr">';open=true}
+    else if(!fl&&open){o+='</bdi>'+buf;open=false}
+    else o+=buf;
+    buf="";o+=mkTok(pt,idx++);pos+=pt.length}
+  if(open)o+='</bdi>';return o+buf}
+function onlyBdi(el){var c=el.children,i;for(i=0;i<c.length;i++)if(c[i].tagName!=="BDI")return false;return true}
+function hintHTML(h){h=String(h);return /[<&]/.test(h)?h:ltrHTML(h,function(x){return x})}
 function T(){return STR[S.lang]}
 /* זוג קואורדינטות בעמוד RTL מתהפך: "(4, 3)" מוצג "(3 ,4)" — התשובה הנכונה
    נראית הפוכה ללומד בעברית ובערבית. בידוד דו־כיווני (LRI…PDI) כמו ב-math-g7
@@ -1164,11 +1188,11 @@ function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),
 var FEM_PITCH=1.35, PITCH_BASE=1.12;
 function femLift(v){ if(!v)return 1; return vGender(v)==="m"?FEM_PITCH:1 }
 function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
-function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.raw!=null){HL.el.textContent=HL.el.dataset.raw}HL.el=null}
-function hlPrep(el,text){hlClear();if(!el||el.children.length)return;el.dataset.raw=el.textContent;HL.el=el;HL.raw=el.textContent;HL.got=false;
-  var out="",starts=[],re=/\S+|\s+/g,m,pos=0,idx=0;HL.starts=[];
-  while((m=re.exec(HL.raw))){if(/\S/.test(m[0])){HL.starts.push(m.index);out+='<span data-w="'+idx+'">'+esc(m[0])+'</span>';idx++}else out+=m[0]}
-  el.innerHTML=out}
+function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.html!=null){HL.el.innerHTML=HL.el.dataset.html}HL.el=null}
+function hlPrep(el,text){hlClear();if(!el||!onlyBdi(el))return;el.dataset.html=el.innerHTML;HL.el=el;HL.raw=el.textContent;HL.got=false;
+  var re=/\S+/g,m;HL.starts=[];
+  while((m=re.exec(HL.raw)))HL.starts.push(m.index);
+  el.innerHTML=ltrTokHTML(HL.raw,function(t,i){return '<span data-w="'+i+'">'+esc(t)+'</span>'})}
 function hlAt(ci){if(!HL.el)return;var w=-1,i;for(i=0;i<HL.starts.length;i++){if(HL.starts[i]<=ci)w=i;else break}
   var sp=HL.el.querySelectorAll("[data-w]");for(i=0;i<sp.length;i++)sp[i].className=(i===w?"hl":"")}
 function hlFallback(rate){if(!HL.el)return;var n=HL.starts.length,i=0,per=430/rate;
@@ -1191,7 +1215,7 @@ function speakDevice_(text,el,onend){var raw=String(text);
   if(!("speechSynthesis" in window)||!raw)return false;
   var fixed=speechFix(raw),spoken=heSpoken(fixed),rate=S.slow?0.7:0.95;   /* 0.95 — קצב האתר (O-227); 0.7 — ״לאט״ שהלומד בחר */
   HL.noB=false;HL.sp=null;
-  if(el&&!el.children.length&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=(fixed!==raw);
+  if(el&&onlyBdi(el)&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=(fixed!==raw);
     if(!HL.noB&&spoken!==raw){HL.sp=heStarts(spoken);if(HL.sp.length!==HL.starts.length)HL.noB=true}}
   var segs=segments(spoken),my=++_sayGen,v=pickVoice(),retried=false;
   function alive(){return my===_sayGen}
@@ -1283,7 +1307,7 @@ function unitView(){var t=T(),u=unitById(V.unit),h='<button class="btn ghost" da
   return h+'</div></div>'}
 function lessonView(){var t=T(),u=unitById(V.unit),ls=LESSONS[V.unit],st=ls[V.step],n=ls.length,txt=lt(st.t);
   var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="dots" style="margin-top:12px">'+ls.map(function(_,i){return '<i class="'+(i<V.step?"on":i===V.step?"cur":"")+'"></i>'}).join("")+'</div>';
-  h+='<div class="card stepcard"><div class="sub">'+esc(fmt(t.stepOf,{a:V.step+1,b:n}))+'</div>'+listenRow("lesson")+'<div class="qtext" id="lt" data-say>'+esc(txt)+'</div><div class="vis">'+st.v()+'</div></div>';
+  h+='<div class="card stepcard"><div class="sub">'+esc(fmt(t.stepOf,{a:V.step+1,b:n}))+'</div>'+listenRow("lesson")+'<div class="qtext" id="lt" data-say>'+ltrHTML(txt)+'</div><div class="vis">'+st.v()+'</div></div>';
   h+='<div style="margin:0 0 12px">'+tutorBtn()+'</div><div class="row">'+(V.step>0?'<button class="btn ghost" data-a="lprev">'+esc(t.prev)+'</button>':'')+(V.step<n-1?'<button class="btn next" data-a="lnext">'+esc(t.next)+'</button>':'<button class="btn next" data-a="start" data-l="1">'+esc(t.lessonEnd)+'</button>')+'</div>';return h}
 /* מפתח השוואה בלבד. ה-SVG נלקח גולמי ולא דרך lt, כדי שהבידוד הדו־כיווני
    לא ירוץ על "translate(0,64)" שבתוכו. */
@@ -1299,17 +1323,17 @@ function startRound(lv){P={unit:V.unit,lv:lv,list:[],i:0,picked:null,hints:0,hin
   for(var i=P.list.length;i<8;i++)P.list.push(mkQ(V.unit,lv));view="practice";P.cur=P.list[0];render()}
 function practiceView(){var t=T(),q=P.list[P.i],n=P.list.length,u=unitById(P.unit);
   var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="sub" style="margin-top:10px">'+esc(lt(u.n))+" · "+esc(fmt(t.qOf,{a:P.i+1,b:n}))+'</div><div class="prog"><i style="width:'+(P.i/n*100)+'%"></i></div>';
-  h+='<div class="card">'+listenRow("q")+'<div class="qtext" id="qt" data-say>'+esc(lt(q.q))+'</div>';
+  h+='<div class="card">'+listenRow("q")+'<div class="qtext" id="qt" data-say>'+ltrHTML(lt(q.q))+'</div>';
   var vis=q.visL?q.visL[S.lang]:q.vis;if(vis)h+='<div class="vis">'+vis+'</div>';
   var wide=q.o.some(function(o){return optLabel(o).length>7});h+='<div class="opts'+(wide?' wide':'')+'">';q.o.forEach(function(o,i){var cls="opt"+(P.picked!=null?(o.id===q.a?" good":(P.picked===i?" pick":"")):"");
-    h+='<div class="'+cls+'"><button class="ob" data-a="pick" data-k="'+i+'" '+(P.picked!=null?"disabled":"")+'>'+esc(optLabel(o))+'</button>'+(P.picked!=null&&o.id===q.a?'<span class="mk">✓</span>':'')+spk({a:"sayopt",k:i})+'</div>'});
+    h+='<div class="'+cls+'"><button class="ob" data-a="pick" data-k="'+i+'" '+(P.picked!=null?"disabled":"")+'>'+ltrHTML(optLabel(o))+'</button>'+(P.picked!=null&&o.id===q.a?'<span class="mk">✓</span>':'')+spk({a:"sayopt",k:i})+'</div>'});
   h+='</div>';
   if(P.picked==null){h+='<div class="row" style="margin-top:14px"><button class="btn hint" data-a="hint">'+esc(t.hint)+'</button><button class="btn ex" data-a="example">'+esc(t.example)+'</button></div><div style="margin-top:12px">'+tutorBtn()+'</div>';
-    if(P.hintShown)h+='<div class="hintbox" id="hb">'+esc(lt(q.h))+'</div>';
-    if(P.exShown){var st=LESSONS[P.unit][Math.min(q.step,LESSONS[P.unit].length-1)];h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><div id="ex" data-say>'+esc(lt(st.t))+'</div><div class="vis">'+st.v()+'</div></div></div>'}}
+    if(P.hintShown)h+='<div class="hintbox" id="hb">'+ltrHTML(lt(q.h))+'</div>';
+    if(P.exShown){var st=LESSONS[P.unit][Math.min(q.step,LESSONS[P.unit].length-1)];h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><div id="ex" data-say>'+ltrHTML(lt(st.t))+'</div><div class="vis">'+st.v()+'</div></div></div>'}}
   else{var ok=P.picked===q.o.map(function(o){return o.id}).indexOf(q.a);
     h+=ok?'<div class="ok-box" id="rb">'+esc(P.msg)+'</div>':'<div class="tbox"><img src="/img/limor.jpg" alt=""><div><b>'+esc(t.wrong)+'</b></div></div>';
-    h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><div>'+esc(t.ans)+'<b>'+esc(optLabel(q.o.filter(function(o){return o.id===q.a})[0]))+'</b></div><div id="ex" data-say>'+esc(lt(q.e))+'</div></div></div>';
+    h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><div>'+esc(t.ans)+'<b>'+ltrHTML(optLabel(q.o.filter(function(o){return o.id===q.a})[0]))+'</b></div><div id="ex" data-say>'+ltrHTML(lt(q.e))+'</div></div></div>';
     h+='<div class="row" style="margin-top:12px"><button class="btn next" data-a="next">'+esc(P.i<n-1?t.next:t.done)+'</button></div>'}
   return h+'</div>'}
 function endView(){var t=T();return '<h1 id="et" data-say>'+esc(t.finT)+'</h1><div class="card">'+listenRow("end")+'<p class="qtext" id="ex" data-say>'+esc(t.finX)+'</p><div class="row"><button class="btn next" data-a="start" data-l="'+P.lv+'">'+esc(t.again)+'</button><button class="btn ghost" data-a="home">'+esc(t.home)+'</button></div></div>'}
@@ -1386,7 +1410,7 @@ try{speechSynthesis.getVoices();
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-elem",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o25-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o26-pwa1").catch(function(){})});
 })();
 </script>
 <!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש

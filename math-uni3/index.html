@@ -792,6 +792,30 @@ if(DEMO_ON){
    ============================================================ */
 function $(s){return document.querySelector(s)}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+/* כיוון נוסחאות בתוך משפט עברי/ערבי: ״4 × 3 = 12״ בלי בידוד מוצג הפוך.
+   רצף בלי אות עברית/ערבית עם ספרה, אות לטינית או סימן חשבון נעטף ב-bdi ltr.
+   textContent אינו משתנה, ולכן ההקראה והקלטות לא מושפעות. */
+var LTR_SIG=/[0-9A-Za-z\u00B2\u00B3\u00B9\u2070-\u209F=+\u2212\u00D7\u00F7\u221A\^\u00B1\u00B7\u2264\u2265\u2260\u2248]/;
+function ltrOn(){return document.documentElement.dir==="rtl"}
+function ltrRanges(t){var r=[],re=/[^\u0590-\u05FF\u0600-\u06FF\n]+/g,m,mm,s,mid;t=String(t);
+  while((m=re.exec(t))){if(!LTR_SIG.test(m[0]))continue;mm=m[0].match(/^([\s,.;:?!]*)([\s\S]*?)([\s,.;:?!]*)$/);s=m.index+mm[1].length;mid=mm[2];
+    if(m.index>0&&/[\u05D0-\u05EA]/.test(t.charAt(m.index-1))&&mid.charAt(0)==="-"){s++;mid=mid.slice(1)}
+    if(mid)r.push([s,s+mid.length])}
+  return r}
+function ltrHTML(t,escf){t=String(t);escf=escf||esc;if(!ltrOn())return escf(t);var r=ltrRanges(t),o="",p=0,i;
+  for(i=0;i<r.length;i++){o+=escf(t.slice(p,r[i][0]))+'<bdi dir="ltr">'+escf(t.slice(r[i][0],r[i][1]))+'</bdi>';p=r[i][1]}
+  return o+escf(t.slice(p))}
+function ltrTokHTML(text,mkTok){var parts=String(text).split(/(\s+)/),r=ltrOn()?ltrRanges(text):[],pos=0,open=false,buf="",o="",k,pt,fl,j,idx=0;
+  for(k=0;k<parts.length;k++){pt=parts[k];if(!pt.length)continue;
+    if(/^\s+$/.test(pt)){buf+=pt;pos+=pt.length;continue}
+    fl=false;if(!/[\u0590-\u05FF\u0600-\u06FF]/.test(pt))for(j=0;j<r.length;j++)if(pos<r[j][1]&&pos+pt.length>r[j][0]){fl=true;break}
+    if(fl&&!open){o+=buf+'<bdi dir="ltr">';open=true}
+    else if(!fl&&open){o+='</bdi>'+buf;open=false}
+    else o+=buf;
+    buf="";o+=mkTok(pt,idx++);pos+=pt.length}
+  if(open)o+='</bdi>';return o+buf}
+function onlyBdi(el){var c=el.children,i;for(i=0;i<c.length;i++)if(c[i].tagName!=="BDI")return false;return true}
+function hintHTML(h){h=String(h);return /[<&]/.test(h)?h:ltrHTML(h,function(x){return x})}
 function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){var i,j,t;for(i=a.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));t=a[i];a[i]=a[j];a[j]=t}return a}
@@ -1012,7 +1036,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="g185 · 2026-10-18";
+var BUILD="g186 · 2026-10-18";
 var KEY="axiom3-state-v1";
 
 function blankState(){
@@ -1258,12 +1282,12 @@ function hlPrep(el,text){
   for(var i=0;i<parts.length;i++){
     var pt=parts[i];
     if(!pt.length)continue;
-    if(/^\s+$/.test(pt)){html+=pt;pos+=pt.length;continue}
+    if(/^\s+$/.test(pt)){pos+=pt.length;continue}
     HL.map.push({from:pos,to:pos+pt.length,i:idx});
-    html+='<span class="wd" data-i="'+idx+'">'+esc(pt)+'</span>';
     pos+=pt.length; idx++;
   }
   if(!HL.map.length){hlClear();return}
+  html=ltrTokHTML(String(text),function(t,i){return '<span class="wd" data-i="'+i+'">'+esc(t)+'</span>'});
   el.innerHTML=html;
   HL.spans=el.querySelectorAll(".wd");
   HL.timer=setTimeout(function(){if(!HL.got&&HL.el){HL.added=true;HL.el.classList.add("now")}},1500);
@@ -4540,7 +4564,7 @@ _f("{0}{1}>{2} רמז</button>", '<button class="btn btn-g" style="padding:9px 1
 _f("{0}{1}>{2} פתרון מודרך</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="guide"', (P.steps>0?" disabled":""), ic("steps",16))+
      (q.rule?_f("{0}{1}{2}{3} הנוסחה</button>", '<button class="btn btn-g" style="padding:9px 13px;font-size:.88rem" data-a="rule" data-r="', q.rule, '">', ic("book",16)):"")+
      '</div>';
-  if(P.hints>0&&q.hint)h+='<div class="hintbox rise"><b>'+_('רמז')+'</b><div class="sm hintxt" style="margin-top:3px">'+q.hint+'</div></div>';
+  if(P.hints>0&&q.hint)h+='<div class="hintbox rise"><b>'+_('רמז')+'</b><div class="sm hintxt" style="margin-top:3px">'+hintHTML(q.hint)+'</div></div>';
   /* תשובות */
   var keys=["1","2","3","4"];
   h+='<div class="opts">'+q.options.map(function(o,i){
@@ -12094,7 +12118,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=g185-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=g186-pwa1").catch(function(){});
   });
 }
 </script>
