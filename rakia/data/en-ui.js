@@ -238,7 +238,7 @@ RAKIA.EN_DICT = {
  "ייצוא ושיתוף:": "Export and sharing:",
  "קובץ הייצוא ותמונת השיתוף נוצרים במכשיר ונשמרים או נשלחים רק אם בוחרים בכך.": "The export file and the share image are created on the device, and saved or sent only if you choose to.",
  "ספירת כניסות:": "Visit counting:",
- "האתר סופר כניסות באופן אנונימי, ללא עוגיות, כמו בשאר האפליקציות באתר. הספירה אינה כוללת שום פרט מהמפה.": "The site counts visits anonymously, without cookies, as in the other apps on the site. The count includes no detail from the chart.",
+ "האתר סופר כניסות בעילום שם, ללא עוגיות, כמו בשאר האפליקציות באתר. הספירה אינה כוללת שום פרט מהמפה.": "The site counts visits anonymously, without cookies, as in the other apps on the site. The count includes no detail from the chart.",
  "גופנים:": "Fonts:",
  "גופן Heebo נטען מהאתר עצמו ונשמר במכשיר, כמו בכל האפליקציות באתר. הספירה היא הבקשה החיצונית היחידה.": "The Heebo font is loaded from the site itself and saved on the device, as in all the apps on the site. The visit count is the only external request.",
  "התנאים המלאים:": "The full terms:",

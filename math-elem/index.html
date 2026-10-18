@@ -479,7 +479,7 @@ G.frac=function(lv){var T=[];
   T.push(function(){var k=pick(["circle","rect"]),parts=lv===1?pick([2,4]):pick([2,4]),sh=parts===2?1:(lv>=3?pick([1,2,3]):1),txt=sh===parts/2?"1/2":sh+"/"+parts;
     return mk("shaded",L("איזה חלק צבוע?","ما الجزء الملوّن؟","Какая часть закрашена?","What part is shaded?"),fracVis(k,parts,sh),txt,["1/2","1/4","3/4","1/3","1"],
      L("סופרים כמה חלקים שווים יש, וכמה צבועים.","عدّ الأجزاء المتساوية وكم منها ملوّن.","Посчитай равные части и сколько из них закрашено.","Count the equal parts and how many are shaded."),
-     L("יש "+parts+" חלקים שווים, צבוע/ים "+sh+": "+txt+".","الأجزاء المتساوية "+parts+" والملوّن "+sh+": "+txt+".","Равных частей: "+parts+", закрашено: "+sh+". Это "+txt+".","There are "+parts+" equal parts and "+sh+" shaded: "+txt+"."),0)});
+     L("יש "+parts+" חלקים שווים, צבועים "+sh+": "+txt+".","الأجزاء المتساوية "+parts+" والملوّن "+sh+": "+txt+".","Равных частей: "+parts+", закрашено: "+sh+". Это "+txt+".","There are "+parts+" equal parts and "+sh+" shaded: "+txt+"."),0)});
   T.push(function(){var n=ri(1,lv===1?8:lv===2?15:20)*2;
     return mk("half",L("מהו חצי מ-"+n+"?","ما نصف "+n+"؟","Чему равна половина от "+n+"?","What is half of "+n+"?"),n<=20?dotsVis(n):"",n/2,near(n/2,1,45).concat([n,n/2+2]),
      L("חצי: מחלקים לשתי קבוצות שוות.","النصف: نقسم إلى مجموعتين متساويتين.","Половина: раздели на две равные группы.","Half: split into two equal groups."),
@@ -964,12 +964,12 @@ LESSONS.coord=[{t:L("כדי למצוא נקודה על הרשת: קודם הול
 LESSONS.mon2=[{t:L("בבעיה בשני צעדים עושים צעד אחד, ואז צעד שני עם התוצאה.","في المسألة بخطوتين نفعل خطوة ثم خطوة ثانية بالنتيجة.","В задаче в два шага делаем один шаг, потом второй с результатом.","In a two-step problem you do one step, then a second step with the result."),v:function(){return ""}},
  {t:L("כשקונים כמה דברים שווים, קודם כופלים: מחיר אחד כפול כמות.","عند شراء عدة أشياء متساوية نضرب أولًا: السعر × العدد.","Если покупаем несколько одинаковых вещей, сначала умножаем: цена × количество.","When you buy several equal things, multiply first: price × amount."),v:function(){return ""}},
  {t:L("עודף הוא מה ששילמנו פחות המחיר. מחסרים את המחיר מהתשלום.","الباقي هو ما دفعناه ناقص الثمن. نطرح الثمن من المبلغ المدفوع.","Сдача — это то, что заплатили, минус цена. Вычитаем цену из суммы.","Change is what you paid minus the price. Subtract the price from the payment."),v:function(){return ""}}];
-var BUILD="o24 · 2026-10-18";
+var BUILD="o25 · 2026-10-18";
 /* ===== UI strings ===== */
 var STR={
 he:{brand:"מתמטיקה מעבר לחשבון",title:"מתמטיקה ליסודי",tag:"צורות, מדידות, כסף, שברים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
  lesson:"שיעור קצר",practice:"תרגול",lvTitle:"בחרו רמה",l1:"קל",l1d:"להתחיל בנחת",l2:"בינוני",l2d:"עוד קצת",l3:"מאתגר",l3d:"לחשוב טוב",l4:"אתגר",l4d:"מעורב וקשה",
- listen:"הקראה",stop:"עצור",slow:"לאט",hint:"רמז",example:"דוגמה",next:"הבא",back:"חזרה",home:"בית",settings:"הגדרות",again:"עוד סבב",
+ listen:"הקראה",stop:"עצירה",slow:"לאט",hint:"רמז",example:"דוגמה",next:"הבא",back:"חזרה",home:"בית",settings:"הגדרות",again:"עוד סבב",
  qOf:"שאלה {a} מתוך {b}",right:["יפה מאוד!","נכון!","מצוין!","כל הכבוד על החשיבה!","בדיוק כך!","איזה כיף, נכון!"],streak:["שלוש ברצף! אתם על גל!","ועוד אחת! איזו התמדה!"],
  wrong:"כמעט. בואו נבדוק יחד.",ans:"התשובה: ",finT:"סיימתם את הסבב!",finX:"עבודה יפה. מי שרוצה יכול לתרגל עוד או לבחור נושא אחר. שאלות שהיו קשות יחזרו בפעם הבאה.",
  stepOf:"שלב {a} מתוך {b}",prev:"הקודם",done:"סיימתי",lessonEnd:"עכשיו אפשר לתרגל!",
@@ -1386,7 +1386,7 @@ try{speechSynthesis.getVoices();
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-elem",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o24-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o25-pwa1").catch(function(){})});
 })();
 </script>
 <!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
