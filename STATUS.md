@@ -25,7 +25,7 @@
 | `tanakh` | p46 · 2026-10-18 | p46-pwa1 | תואם |
 | `hebrew-arab` | y31 · 2026-10-18 | y31-pwa1 | תואם |
 | `motal` | d39 · 2026-10-18 | d39-pwa1 | תואם |
-| `math-g7` | mg28 · 2026-10-18 | mg28-pwa1 | תואם |
+| `math-g7` | mg29 · 2026-10-18 | mg29-pwa1 | תואם |
 | `electric` | e61 · 2026-10-18 | e61-pwa1 | תואם |
 | `science-mid` | scimid17 · 2026-10-16 | scimid17-pwa1 | תואם |
 | `biology` | bg28 · 2026-10-18 | bg28-pwa1 | תואם |
@@ -42,4 +42,5 @@
 | `domino` | dm24 · 2026-10-16 | dm24-pwa1 | תואם |
 | `net-elem` | ns15 · 2026-10-16 | ns15-pwa1 | תואם |
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-10-18.
+נוצר ב-`node .claude/qa/status.js --md`, 2026-10-19.
+

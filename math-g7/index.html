@@ -254,6 +254,19 @@ function vertVis(a,labs){var cx=120,cy=90,r=80,s=ray(cx,cy,r,0)+ray(cx,cy,r,180)
        "две пересекающиеся прямые и четыре угла вокруг точки пересечения",
        "two crossing lines and four angles around the crossing point")
     +(vl?FL(", המסומנות ","، المعلّمة ",", обозначены ",", marked ")+vl:""))+'</div>'}
+/* two adjacent angles on a line with their bisectors dashed; the angle between the bisectors */
+function bis90Vis(a,mark){var cx=130,cy=100,r=100,s='<line x1="'+(cx-r)+'" x2="'+(cx+r)+'" y1="'+cy+'" y2="'+cy+'" stroke="'+INK+'" stroke-width="4" stroke-linecap="round"/>';
+  s+=ray(cx,cy,88,a)+ray(cx,cy,r-8,a/2,COL.purple,true)+ray(cx,cy,r-8,(a+180)/2,COL.purple,true);
+  s+=arc(cx,cy,30,0,a,COL.red)+arc(cx,cy,44,a,180,COL.green)+arc(cx,cy,58,a/2,(a+180)/2,COL.purple,3);
+  var p=P2(cx,cy,74,a/2+45);s+=ptxt(p[0],p[1],mark,{s:15,c:COL.purple,w:800});
+  return '<div class="nl">'+svg(260,116,s,
+    FL("שתי זוויות צמודות על ישר, החוצים שלהן מסומנים בקו מקווקו סגול","زاويتان متجاورتان على مستقيم، منصّفاهما بخط متقطع بنفسجي","два смежных угла на прямой, биссектрисы показаны фиолетовым пунктиром","two adjacent angles on a line, their bisectors dashed in purple"))+'</div>'}
+/* two crossing lines with the bisectors of one vertical pair dashed: they lie on one straight line */
+function bislineVis(a){var cx=120,cy=90,r=80,s=ray(cx,cy,r,0)+ray(cx,cy,r,180)+ray(cx,cy,r,a)+ray(cx,cy,r,a+180);
+  s+=arc(cx,cy,24,0,a,COL.red,3)+arc(cx,cy,24,180,180+a,COL.red,3);
+  s+=ray(cx,cy,r-4,a/2,COL.purple,true)+ray(cx,cy,r-4,a/2+180,COL.purple,true);
+  return '<div class="nl">'+svg(240,180,s,
+    FL("שני ישרים נחתכים; החוצים של זוג זוויות קודקודיות מסומנים בקו מקווקו סגול","مستقيمان متقاطعان؛ منصّفا زاويتين متقابلتين بالرأس بخط متقطع بنفسجي","две пересекающиеся прямые; биссектрисы пары вертикальных углов показаны фиолетовым пунктиром","two crossing lines; the bisectors of a pair of vertical angles dashed in purple"))+'</div>'}
 /* triangle from angles at B and C, base horizontal. labs: [A,B,C] text at vertices; eq: sides to tick ["AB","AC","BC"]; right: vertex idx */
 function triVis(b,c,labs,o){o=o||{};var Bx=30,By=130,base=200,t1=Math.tan(b*Math.PI/180),t2=Math.tan(c*Math.PI/180),s="";
   var h,Ax;if(b===90){Ax=Bx;h=base*t2}else if(c===90){Ax=Bx+base;h=base*t1}else{h=base*t1*t2/(t1+t2);Ax=Bx+h/t1}
@@ -592,7 +605,12 @@ G.angop=function(lv){var T=[],st=lv===1?5:(lv===2?5:1);
   T.push(function(){var x=ri(10,40),c=ri(2,6)*5,t=2*x+c;
     return mk("eq",L("זווית ABD היא x°, זווית DBC היא (x + "+c+")°, וזווית ABC כולה היא "+t+"°. מהו x?","الزاوية ABD تساوي x° والزاوية DBC تساوي (x + "+c+")° والزاوية ABC كلها "+t+"°. ما قيمة x؟","Угол ABD равен x°, угол DBC равен (x + "+c+")°, весь угол ABC равен "+t+"°. Чему равен x?","Angle ABD is x°, angle DBC is (x + "+c+")°, and the whole angle ABC is "+t+"°. What is x?"),splitAng(x+c,x,["x+"+c,"x"]),x,[t/2,t-c,x+c,x-5,x+5,x-10].filter(function(z){return z>0&&z!==x&&Math.floor(z)===z}),
      L("החלקים יחד שווים לכל הזווית: x + (x + "+c+") = "+t+".","الجزآن معًا يساويان الزاوية كلها: x + (x + "+c+") = "+t+".","Части вместе равны всему углу: x + (x + "+c+") = "+t+".","The parts together equal the whole: x + (x + "+c+") = "+t+"."),
-     L("2x + "+c+" = "+t+", לכן 2x = "+(t-c)+" ו-x = "+x+".","2x + "+c+" = "+t+" إذن 2x = "+(t-c)+" وx = "+x+".","2x + "+c+" = "+t+", значит 2x = "+(t-c)+" и x = "+x+".","2x + "+c+" = "+t+", so 2x = "+(t-c)+" and x = "+x+"."),0)})}
+     L("2x + "+c+" = "+t+", לכן 2x = "+(t-c)+" ו-x = "+x+".","2x + "+c+" = "+t+" إذن 2x = "+(t-c)+" وx = "+x+".","2x + "+c+" = "+t+", значит 2x = "+(t-c)+" и x = "+x+".","2x + "+c+" = "+t+", so 2x = "+(t-c)+" and x = "+x+"."),0)})
+  T.push(function(){var c=ri(2,8)*5;
+    return mk("biseq",L("הקרן BD חוצה את זווית ABC. זווית ABD היא (x + "+c+")° וזווית DBC היא 2x°. מהו x?","الشعاع BD ينصّف الزاوية ABC. الزاوية ABD تساوي (x + "+c+")° والزاوية DBC تساوي 2x°. ما قيمة x؟","Луч BD — биссектриса угла ABC. Угол ABD равен (x + "+c+")°, угол DBC равен 2x°. Чему равен x?","Ray BD bisects angle ABC. Angle ABD is (x + "+c+")° and angle DBC is 2x°. What is x?"),
+      splitAng(2*c,2*c,["2x","x+"+c]),c,[2*c,c+10,3*c,c+20,2*c+10,4*c,c+30].filter(function(z,i,ar){return z>0&&z!==c&&ar.indexOf(z)===i}),
+      L("חוצה זווית מחלק אותה לשני חלקים שווים, לכן x + "+c+" = 2x.","منصّف الزاوية يقسمها إلى جزأين متساويين: x + "+c+" = 2x.","Биссектриса делит угол на две равные части: x + "+c+" = 2x.","A bisector splits the angle into two equal parts: x + "+c+" = 2x."),
+      L("x + "+c+" = 2x, ולכן x = "+c+".","x + "+c+" = 2x إذن x = "+c+".","x + "+c+" = 2x, значит x = "+c+".","x + "+c+" = 2x, so x = "+c+"."),0)})}
   return pick(T)()};
 /* ---------- unit 8: adjacent and vertical angles ---------- */
 G.adjvert=function(lv){var T=[];
@@ -623,6 +641,34 @@ G.adjvert=function(lv){var T=[];
     return mk("pt",L("ארבע זוויות סביב נקודה אחת: "+a+"°, "+b+"°, "+c+"° ו-x. מהו x?","أربع زوايا حول نقطة: "+a+"° و"+b+"° و"+c+"° وx. ما قيمة x؟","Четыре угла вокруг точки: "+a+"°, "+b+"°, "+c+"° и x. Чему равен x?","Four angles around a point: "+a+"°, "+b+"°, "+c+"° and x. What is x?"),"",d,[180-a-b-c>0?180-a-b-c:d+10,d+10,d-10,a+b+c,d+20,d-20].filter(function(z){return z>0&&z!==d}),
      L("סביב נקודה הזוויות מצטרפות ל-360°.","حول نقطة تجتمع الزوايا لتعطي 360°.","Вокруг точки углы в сумме дают 360°.","Around a point the angles add to 360°."),
      L("360° − "+(a+b+c)+"° = "+d+"°.","360° − "+(a+b+c)+"° = "+d+"°.","360° − "+(a+b+c)+"° = "+d+"°.","360° − "+(a+b+c)+"° = "+d+"°."),0)})}
+  if(lv>=3){
+  T.push(function(){var c1=ri(1,6)*5,c2=ri(1,6)*5;while((c1+c2)%3)c2=ri(1,6)*5;var rem=180-c1-c2,xx=rem/3;
+    return mk("adjx2",L("שתי זוויות צמודות על קו ישר: (2x + "+c1+")° ו-(x + "+c2+")°. מהו x?","زاويتان متجاورتان على مستقيم: (2x + "+c1+")° و(x + "+c2+")°. ما قيمة x؟","Два смежных угла на прямой: (2x + "+c1+")° и (x + "+c2+")°. Чему равен x?","Two adjacent angles on a straight line: (2x + "+c1+")° and (x + "+c2+")°. What is x?"),
+      adjVis(2*xx+c1,["2x+"+c1,"x+"+c2]),xx,[xx+5,xx-5,xx+10,xx-10,rem/2,2*xx+c1,xx+c2].filter(function(z,i,ar){return z>0&&z!==xx&&ar.indexOf(z)===i}),
+      L("זוויות צמודות מצטרפות ל-180°: (2x + "+c1+") + (x + "+c2+") = 180.","الزاويتان المتجاورتان مجموعهما 180°: (2x + "+c1+") + (x + "+c2+") = 180.","Смежные углы в сумме дают 180°: (2x + "+c1+") + (x + "+c2+") = 180.","Adjacent angles add to 180°: (2x + "+c1+") + (x + "+c2+") = 180."),
+      L("3x + "+(c1+c2)+" = 180, לכן 3x = "+rem+" ו-x = "+xx+".","3x + "+(c1+c2)+" = 180 إذن 3x = "+rem+" وx = "+xx+".","3x + "+(c1+c2)+" = 180, значит 3x = "+rem+" и x = "+xx+".","3x + "+(c1+c2)+" = 180, so 3x = "+rem+" and x = "+xx+"."),1)});
+  T.push(function(){var a=ri(4,14)*10;
+    return mk("bis90",L("שתי זוויות צמודות על קו ישר. החוצים שלהן מסומנים בקו מקווקו. כמה מעלות יש בין שני החוצים?","زاويتان متجاورتان على مستقيم ومنصّفاهما بخط متقطع. كم قياس الزاوية بين المنصّفين؟","Два смежных угла на прямой. Их биссектрисы показаны пунктиром. Чему равен угол между биссектрисами?","Two adjacent angles on a straight line. Their bisectors are dashed. What is the angle between the bisectors?"),
+      bis90Vis(a,"?"),90,[45,180,a/2,(180-a)/2,60,120,a/2+45].filter(function(z,i,ar){return z>0&&z!==90&&ar.indexOf(z)===i}),
+      L("כל חוצה לוקח חצי מהזווית שלו.","كل منصّف يأخذ نصف زاويته.","Каждая биссектриса берёт половину своего угла.","Each bisector takes half of its angle."),
+      L("חצי מ-"+a+"° ועוד חצי מ-"+(180-a)+"°: "+(a/2)+" + "+((180-a)/2)+" = 90°. תמיד 90°!","نصف "+a+"° ونصف "+(180-a)+"°: "+(a/2)+" + "+((180-a)/2)+" = 90°. دائمًا 90°!","Половина "+a+"° плюс половина "+(180-a)+"°: "+(a/2)+" + "+((180-a)/2)+" = 90°. Всегда 90°!","Half of "+a+"° plus half of "+(180-a)+"°: "+(a/2)+" + "+((180-a)/2)+" = 90°. Always 90°!"),1)});
+  T.push(function(){var a=ri(4,14)*10;
+    var Y=L("קו ישר אחד","مستقيم واحد","одну прямую","one straight line");
+    return mk("bisline",L("שני ישרים נחתכים. בקו מקווקו מסומנים החוצים של זוג זוויות קודקודיות. מה יוצרים שני החוצים יחד?","مستقيمان متقاطعان. بالخط المتقطع مُثّل منصّفا زاويتين متقابلتين بالرأس. ماذا يكوّن المنصّفان معًا؟","Две прямые пересекаются. Пунктиром показаны биссектрисы пары вертикальных углов. Что образуют биссектрисы вместе?","Two lines cross. The bisectors of a pair of vertical angles are dashed. What do the bisectors form together?"),
+      bislineVis(a),Y,
+      [L("זווית של 90°","زاوية قائمة 90°","угол 90°","a 90° angle"),L("זווית של 45°","زاوية 45°","угол 45°","a 45° angle"),L("זווית של 60°","زاوية 60°","угол 60°","a 60° angle")],
+      L("החוצה של זווית ממשיך בדיוק את החוצה של הזווית הקודקודית מולה.","منصّف الزاوية يمتد تمامًا مع منصّف الزاوية المقابلة بالرأس.","Биссектриса угла продолжает биссектрису вертикального с ним угла.","An angle's bisector exactly continues the bisector of its vertical angle."),
+      L("הזוויות הקודקודיות שוות, וכל חוצה מחלק לשניים — אז שני החוצים על אותו ישר: הם יוצרים קו ישר אחד.","الزاويتان المتقابلتان متساويتان وكل منصّف يقسم زاويته لنصفين — لذلك المنصّفان على مستقيم واحد.","Вертикальные углы равны, и каждая биссектриса делит угол пополам — поэтому обе лежат на одной прямой.","Vertical angles are equal and each bisector halves its angle — so both lie on one straight line."),1)});
+  T.push(function(){var a=ri(4,14)*10;
+    var C=L("חוצי זוויות צמודות תמיד מאונכים זה לזה","منصّفا الزاويتين المتجاورتين متعامدان دائمًا","биссектрисы смежных углов всегда перпендикулярны","bisectors of adjacent angles are always perpendicular");
+    return mk("ct",L("איזה משפט נכון תמיד?","أي عبارة صحيحة دائمًا؟","Какое утверждение верно всегда?","Which statement is always true?"),
+      adjVis(a,["",""]),C,
+      [L("שתי זוויות שוות הן תמיד זוויות קודקודיות","زاويتان متساويتان هما دائمًا متقابلتان بالرأس","равные углы — всегда вертикальные","equal angles are always vertical"),
+       L("זוויות צמודות תמיד שוות זו לזו","الزاويتان المتجاورتان متساويتان دائمًا","смежные углы всегда равны","adjacent angles are always equal"),
+       L("חוצי שתי זוויות כלשהן תמיד יוצרים ישר אחד","منصّفا أي زاويتين يكوّنان دائمًا مستقيمًا واحدًا","биссектрисы любых двух углов всегда образуют прямую","bisectors of any two angles always form a straight line")],
+      L("בדקו כל משפט: האם אפשר למצוא דוגמה נגדית?","افحصوا كل عبارة: هل يمكن إيجاد مثال مضاد؟","Проверь каждое утверждение: есть ли контрпример?","Check each statement: can you find a counterexample?"),
+      L("חצי ועוד חצי מ-180° הם תמיד 90°. אבל זוויות שוות יכולות להיות רחוקות זו מזו, צמודות לא בהכרח שוות, ורק חוצי זוויות קודקודיות על ישר אחד.","نصفا 180° يساويان دائمًا 90°. لكن الزاويا المتساوية قد تكون متباعدة، والمتجاورتين ليستا بالضرورة متساويتين، وفقط منصّفا المتقابلتين بالرأس على مستقيم واحد.","Половинки 180° всегда дают 90°. Но равные углы могут быть далеко, смежные не обязаны быть равными, и только биссектрисы вертикальных углов на одной прямой.","Two halves of 180° always make 90°. But equal angles can be far apart, adjacent angles need not be equal, and only bisectors of vertical angles lie on one line."),1)});
+  }
   return pick(T)()};
 
 /* ---------- unit 9: triangles ---------- */
@@ -1523,12 +1569,15 @@ var LESSONS={
   ST_("שתי זוויות סמוכות יוצרות זווית גדולה יותר: 30° + 40° = 70°.","زاويتان متجاورتان تكوّنان زاوية أكبر: 30° + 40° = 70°.","Два соседних угла образуют больший угол: 30° + 40° = 70°.","Two neighboring angles make a bigger angle: 30° + 40° = 70°.",function(){return splitAng(30,40,["30°","40°"])}),
   ST_("כשיודעים את כל הזווית ואת אחד החלקים, מחסירים: 70° − 30° = 40°.","عندما نعرف الزاوية كلها وأحد الجزأين نطرح: 70° − 30° = 40°.","Если знаем весь угол и одну часть — вычитаем: 70° − 30° = 40°.","If you know the whole angle and one part, subtract: 70° − 30° = 40°.",function(){return splitAng(30,40,["30°","?"])}),
   ST_("חוצה זווית הוא קרן שמחלקת את הזווית לשני חלקים שווים. חוצה של 80° נותן שתי זוויות של 40°.","منصّف الزاوية شعاع يقسمها إلى جزأين متساويين. منصّف 80° يعطي زاويتين 40°.","Биссектриса — луч, делящий угол на две равные части. Биссектриса угла 80° даёт два угла по 40°.","A bisector is a ray that splits an angle into two equal parts. Bisecting 80° gives two angles of 40°.",function(){return splitAng(40,40,["40°","40°"])}),
-  ST_("אפשר לכתוב משוואה: אם החלקים הם x ו-(x + 10) וכולה 90°, אז 2x + 10 = 90 ו-x = 40.","يمكن كتابة معادلة: إذا كان الجزآن x و(x + 10) والكل 90° فإن 2x + 10 = 90 وx = 40.","Можно составить уравнение: части x и (x + 10), весь угол 90°, значит 2x + 10 = 90 и x = 40.","You can write an equation: if the parts are x and (x + 10) and the whole is 90°, then 2x + 10 = 90 and x = 40.",function(){return splitAng(50,40,["x+10","x"])})],
+  ST_("אפשר לכתוב משוואה: אם החלקים הם x ו-(x + 10) וכולה 90°, אז 2x + 10 = 90 ו-x = 40.","يمكن كتابة معادلة: إذا كان الجزآن x و(x + 10) والكل 90° فإن 2x + 10 = 90 وx = 40.","Можно составить уравнение: части x и (x + 10), весь угол 90°, значит 2x + 10 = 90 и x = 40.","You can write an equation: if the parts are x and (x + 10) and the whole is 90°, then 2x + 10 = 90 and x = 40.",function(){return splitAng(50,40,["x+10","x"])}),
+  ST_("משוואה עם חוצה: אם BD חוצה את זווית ABC והחלקים (x + 10) ו-2x, אז הם שווים: x + 10 = 2x, ולכן x = 10.","معادلة مع منصّف: إذا نصّف BD الزاوية ABC وكان الجزآن (x + 10) و2x فهما متساويان: x + 10 = 2x وx = 10.","Уравнение с биссектрисой: если BD делит угол ABC пополам, а части — (x + 10) и 2x, то они равны: x + 10 = 2x, значит x = 10.","An equation with a bisector: if BD bisects angle ABC and the parts are (x + 10) and 2x, they are equal: x + 10 = 2x, so x = 10.",function(){return splitAng(20,20,["x+10","2x"])})],
  adjvert:[
   ST_("זוויות צמודות חולקות צלע, והצלעות החיצוניות שלהן הן קו ישר. יחד הן 180°.","الزاويتان المتجاورتان تتشاركان ضلعًا وضلعاهما الخارجيان مستقيم. معًا 180°.","Смежные углы имеют общую сторону, а их внешние стороны образуют прямую. Вместе 180°.","Adjacent angles share a side, and their outer sides form a straight line. Together they are 180°.",function(){return adjVis(60,["60°","120°"])}),
   ST_("כששני ישרים נחתכים נוצרות זוויות קודקודיות. אלה שמול זו שוות: 60° ו-60°, 120° ו-120°.","عندما يتقاطع مستقيمان تتكوّن زوايا متقابلة بالرأس. المتقابلتان متساويتان: 60° و60° و120° و120°.","Когда прямые пересекаются, получаются вертикальные углы. Те, что напротив, равны: 60° и 60°, 120° и 120°.","When two lines cross, vertical angles appear. Opposite ones are equal: 60° and 60°, 120° and 120°.",function(){return vertVis(60,["60°","120°","60°","120°"])}),
   ST_("שלוש זוויות או יותר על קו ישר יחד הן 180°. סביב נקודה הן 360°.","ثلاث زوايا أو أكثر على مستقيم مجموعها 180° وحول نقطة 360°.","Несколько углов на прямой вместе дают 180°. Вокруг точки — 360°.","Several angles along a straight line add up to 180°. Around a point they add up to 360°.",function(){return adjVis(100,["100°","80°"])}),
-  ST_("משוואה עוזרת: אם x ו-3x צמודות, אז 4x = 180 ו-x = 45.","المعادلة تساعد: إذا كانت x و3x متجاورتين فإن 4x = 180 وx = 45.","Уравнение помогает: если x и 3x смежные, то 4x = 180 и x = 45.","An equation helps: if x and 3x are adjacent, then 4x = 180 and x = 45.",function(){return adjVis(45,["x","3x"])})],
+  ST_("משוואה עוזרת: אם x ו-3x צמודות, אז 4x = 180 ו-x = 45.","المعادلة تساعد: إذا كانت x و3x متجاورتين فإن 4x = 180 وx = 45.","Уравнение помогает: если x и 3x смежные, то 4x = 180 и x = 45.","An equation helps: if x and 3x are adjacent, then 4x = 180 and x = 45.",function(){return adjVis(45,["x","3x"])}),
+  ST_("חוצי זוויות של שתי זוויות צמודות תמיד מאונכים זה לזה: חצי מהזווית הראשונה ועוד חצי מהשנייה הם יחד חצי מ-180°.","منصّفا زاويتين متجاورتين متعامدان دائمًا: نصف الأولى ونصف الثانية معًا نصف 180°.","Биссектрисы смежных углов всегда перпендикулярны: половина одного угла плюс половина другого — это половина 180°.","Bisectors of adjacent angles are always perpendicular: half of one plus half of the other is half of 180°.",function(){return bis90Vis(70,"90°")}),
+  ST_("חוצי זוויות של שתי זוויות קודקודיות נמצאים על ישר אחד: החוצה של האחת הוא ההמשך של החוצה של השנייה.","منصّفا زاويتين متقابلتين بالرأس يقعان على مستقيم واحد: منصّف إحداهما امتداد لمنصّف الأخرى.","Биссектрисы вертикальных углов лежат на одной прямой: одна продолжает другую.","Bisectors of vertical angles lie on one straight line: each continues the other.",function(){return bislineVis(60)})],
  tri:[
   ST_("סכום הזוויות בכל משולש הוא 180°. אם יודעים שתיים, השלישית היא 180° פחות הסכום שלהן.","مجموع زوايا أي مثلث 180°. إذا عرفنا زاويتين فالثالثة 180° ناقص مجموعهما.","Сумма углов любого треугольника 180°. Зная два угла, третий находим как 180° минус их сумма.","The angles of any triangle add up to 180°. If you know two, the third is 180° minus their sum.",function(){return triVis(50,60,["70°","50°","60°"])}),
   ST_("במשולש שווה־שוקיים שתי צלעות שוות, וגם זוויות הבסיס שוות. הסימנים האדומים מראים צלעות שוות.","في المثلث المتساوي الساقين ضلعان متساويان وزاويتا القاعدة متساويتان. العلامات الحمراء تدل على أضلاع متساوية.","В равнобедренном треугольнике две стороны равны и углы при основании равны. Красные чёрточки показывают равные стороны.","An isosceles triangle has two equal sides and equal base angles. The red marks show equal sides.",function(){return triVis(65,65,["50°","65°","65°"],{eq:[["A","B"],["A","C"]]})}),
@@ -1571,7 +1620,7 @@ var LESSONS={
   ST_("תמיד בודקים: מציבים את התשובה במשוואה. 2 · 6 + 5 = 17, נכון.","نتحقق دائمًا: نعوّض الجواب في المعادلة. 2 · 6 + 5 = 17 صحيح.","Всегда проверяй: подставь ответ в уравнение. 2 · 6 + 5 = 17, верно.","Always check: put the answer in the equation. 2 · 6 + 5 = 17, true.",function(){return ""})]
 };
 
-var BUILD="mg28 · 2026-10-18";
+var BUILD="mg29 · 2026-10-18";
 /* ===== UI strings ===== */
 var STR={
 he:{trackT:"איזה מסלול?",tr7:"כיתה ז׳",tr9:"כיתה ט׳ מצומצם",title9:"גיאומטריה לכיתה ט׳, רמה מצומצמת",tag9:"שיעור קצר ותרגול בשלוש רמות בכל נושא. הכול עם הקראה.",credit9:"תרגול כיתה ט׳ מצומצם בנוי לפי רשימת הנושאים בחוברת העבודה בגיאומטריה של מחוז תל אביב חט״ב (תשפ״ה). כל השאלות נכתבו מחדש.",soonT:"בקרוב: צורות חופפות, תיבה וקובייה, שכיחות והסתברות.",mtNote:"תרגום לערבית, רוסית ואנגלית: תרגום מכונה, ממתין לבדיקה.",credit2:"יחידת משפט פיתגורס נבנתה לפי מבנה חוברת של יניב רז, מדריך מחוזי חט״ב, מחוז ירושלים, משרד החינוך. תרגילי החלוקה ביחס בהשראת שאלה מהפיקוח על הוראת המתמטיקה, משרד החינוך.",brand:"מתמטיקה לכיתה ז׳",title:"מתמטיקה לכיתה ז׳",tag:"צירים, מספרים שליליים, זוויות, משולשים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -2099,7 +2148,7 @@ try{speechSynthesis.getVoices();
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-g7",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=mg28-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=mg29-pwa1").catch(function(){})});
 })();
 </script>
 
