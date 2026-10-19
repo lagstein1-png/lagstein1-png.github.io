@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<script>
+var INTERNAL_OK=true;
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>פיזיקה לבגרות: מכניקה, חשמל, קרינה וחומר · חינם</title>
+<meta name="description" content="שיעורים ותרגול בפיזיקה לבגרות: קינמטיקה, חוקי ניוטון, אנרגיה, תנע, מעגלים חשמליים, שדות, גלים וקרינה. בארבע שפות, עם הקראה, חינם." />
+<link rel="canonical" href="https://bekol.co.il/physics/" />
+<meta name="theme-color" content="#0e9c8d" media="(prefers-color-scheme:light)" />
+<meta name="theme-color" content="#101a1c" media="(prefers-color-scheme:dark)" />
+<script>try{var __s=JSON.parse(localStorage.getItem("physics-v1")||"{}"),__m=__s.theme||"auto",__d=__m==="dark"||(__m!=="light"&&window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches);document.documentElement.setAttribute("data-theme",__d?"dark":"light")}catch(e){}</script>
+<link rel="manifest" href="./manifest.json" />
+<!-- אייקון הלשונית ואייקון ההוספה למסך הבית. בלעדיהם iOS מצלם את
+     הדף ומייצר תמונה מטושטשת במקום אייקון, ובלשונית מופיע אייקון
+     השורש במקום של האפליקציה. אותו קובץ של המניפסט — אין כאן קובץ
+     apple-touch-icon.png נפרד, כמו ב-domino. -->
+<link rel="icon" type="image/png" sizes="192x192" href="./img/icon-192.png" />
+<link rel="apple-touch-icon" href="./img/icon-192.png" />
+<link href="/fonts/fonts.css" rel="stylesheet" />
+<style>
+:root{--paper:#f3f8f4;--card:#fff;--ink:#17333c;--ink-soft:#4c666e;--teal:#0e9c8d;--teal-deep:#0b7568;--teal-soft:#d9f2ec;--amber:#ffc531;--amber-soft:#fff3ce;--amber-deep:#8a6100;--coral:#ff6f61;--coral-soft:#ffe3de;--coral-deep:#ba3826;--sky:#58b7e0;--sky-soft:#dff1fa;--sky-deep:#246c8c;--violet:#8a63d2;--violet-soft:#ece4fa;--violet-deep:#6a45b0;--green:#1f9d4d;--green-deep:#157a3a;--red:#d93a3a;--red-deep:#a82626;--accent:var(--teal);--ar:"Noto Sans Arabic",system-ui,Arial,sans-serif;--ru:"Noto Sans",system-ui,Arial,sans-serif}
+html[data-theme=dark]{color-scheme:dark;--paper:#101a1c;--card:#1b2a2e;--ink:#e8f1ef;--ink-soft:#a9bfc0;--teal-soft:#16413c;--amber-soft:#3a2f10;--amber-deep:#ffd66b;--coral-soft:#4a2520;--sky-soft:#173543;--violet-soft:#2a2144}
+html[data-theme=dark] .brand,html[data-theme=dark] .btn.ghost,html[data-theme=dark] .credit a{color:#7fe0d3}
+html[data-theme=dark] .btn.tut{color:#d9c8ff}
+html[data-theme=dark] .unit .nm,html[data-theme=dark] .opt .ob,html[data-theme=dark] .band,html[data-theme=dark] .tog,html[data-theme=dark] .langs button,html[data-theme=dark] .lvl small{color:var(--ink)}
+html[data-theme=dark] .langs button[aria-pressed=true],html[data-theme=dark] .band[aria-pressed=true],html[data-theme=dark] .tog[aria-pressed=true]{color:#fff}
+html[data-theme=dark] .card{box-shadow:0 2px 10px rgba(0,0,0,.4)}
+html[data-theme=dark] .opt.good,html[data-theme=dark] .ok-box{background:#173a25;color:var(--ink)}
+html[data-theme=dark] .opt .mk{color:var(--ink)}
+html[data-theme=dark] .opt.good .mk{color:#7be59a}
+html[data-theme=dark] .hintbox,html[data-theme=dark] .tbox{color:var(--ink)}
+html[data-theme=dark] .prog{background:#2a3d41}
+html[data-theme=dark] .dots i{background:#3a4f53}
+html[data-theme=dark] .dots i.on{background:var(--teal)}
+html[data-theme=dark] .dots i.cur{background:var(--amber)}
+html[data-theme=dark] .set{border-bottom-color:#2a3d41}
+html[data-theme=dark] .vis svg,html[data-theme=dark] .vis .nl,html[data-theme=dark] .stepcard svg{background:#f3f8f4;border-radius:16px}
+html[data-theme=dark] .vis svg text,html[data-theme=dark] .vis .nl text{fill:#17333c}
+html[data-theme=dark] .unit .ds{color:var(--ink-soft)}
+*{box-sizing:border-box}
+html{font-size:20px}
+html.big{font-size:24px}
+/* ארבעת מצבי הנגישות שחסרו — נוספו 5.10.2026. עד אז היו כאן ערכת
+   צבע ו״אותיות גדולות״ בלבד, ו-`a11y.js` לא מדדה את האפליקציה כלל. */
+html.clear-font body,html.clear-font button,html.clear-font input,html.clear-font select,html.clear-font textarea{font-family:Tahoma,Verdana,Arial,sans-serif}
+html.spaced body{letter-spacing:.015em;word-spacing:.12em;line-height:1.8}
+html.reduce-motion *,html.reduce-motion *::before,html.reduce-motion *::after{animation:none!important;transition:none!important}
+html.hi-contrast{--paper:#fff;--card:#fff;--ink:#000;--ink-soft:#1a1a1a;--line:#000}
+html.hi-contrast body{background:#fff;color:#000}
+html.hi-contrast .card,html.hi-contrast .btn,html.hi-contrast .tog,html.hi-contrast .opt,
+html.hi-contrast .unit,html.hi-contrast .band,html.hi-contrast .lvl,html.hi-contrast .langs button{border:2px solid #000}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Heebo",system-ui,"Segoe UI",Arial,sans-serif;line-height:1.5;-webkit-text-size-adjust:100%}
+html[lang="ar"] body,html[lang="ar"] button{font-family:var(--ar)}
+html[lang="ru"] body,html[lang="ru"] button{font-family:var(--ru)}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:760px;margin:0 auto;padding:12px 14px 120px}
+.top{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.brand{font-weight:800;font-size:.85rem;line-height:1.15;flex:1;min-width:0;color:var(--teal-deep);background:none;border:0;text-align:start;padding:6px 0}
+.langs{display:flex;gap:4px}
+.langs button{min-width:46px;min-height:50px;padding:0 4px;border-radius:14px;border:2px solid var(--teal);background:var(--card);font-weight:700;font-size:.9rem}
+.langs button[aria-pressed=true]{background:var(--teal-deep);color:#fff}
+.gear{min-width:46px;padding:0;min-height:50px;border-radius:14px;border:2px solid var(--violet);background:var(--card)}
+h1{font-size:1.6rem;margin:.2em 0 .1em;line-height:1.25}
+h2{font-size:1.25rem;margin:.2em 0}
+.sub{color:var(--ink-soft);margin:0 0 12px}
+.card{background:var(--card);border-radius:20px;padding:16px;box-shadow:0 2px 10px rgba(23,51,60,.08);margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:10px 20px;border-radius:16px;border:0;font-weight:800;font-size:1rem;color:#fff;background:var(--teal-deep);box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.play{background:var(--green);font-size:1.1rem;min-height:62px;padding:10px 18px}
+.btn.stop,.btn.slow{padding:10px 14px}
+.btn.stop{background:var(--red)}
+.btn.slow{background:var(--sky-deep)}
+.btn.hint{background:var(--amber);color:#1a1300}
+.btn.ex{background:var(--violet)}
+.btn.next{background:var(--teal-deep);font-size:1.15rem;min-height:62px}
+.btn.tut{background:var(--card);color:var(--violet-deep);border:3px solid var(--violet);width:100%;box-shadow:none;justify-content:flex-start}
+.btn.tut img{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:47% 27%}
+.btn.ghost{background:var(--card);color:var(--teal-deep);border:2px solid var(--teal);box-shadow:none}
+.btn[disabled]{opacity:.45}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.bands{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.band{flex:1;min-width:150px;min-height:62px;border-radius:16px;border:3px solid var(--sky);background:var(--card);font-weight:800;font-size:1rem;padding:8px}
+.band[aria-pressed=true]{background:var(--sky-deep);color:#fff}
+.band.soon{opacity:.6;border-style:dashed}
+.band small{display:block;font-weight:500;font-size:.75rem}
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.unit{display:flex;gap:12px;align-items:center;text-align:start;background:var(--card);border:3px solid var(--c);border-radius:20px;padding:12px;min-height:96px;position:relative}
+.unit .ico{flex:none;width:68px;height:68px;border-radius:18px;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;overflow:hidden}
+.unit .nm{font-weight:800;font-size:1.15rem;line-height:1.2}
+.unit .ds{font-size:.82rem;color:var(--ink-soft);line-height:1.3}
+.unit .ok{position:absolute;top:6px;inset-inline-end:8px;color:var(--green);font-weight:900;font-size:1.3rem}
+.lvls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lvl{min-height:68px;border-radius:16px;border:0;color:#fff;font-weight:800;font-size:1.05rem}
+.lvl small{display:block;font-weight:500;font-size:.78rem;opacity:.95}
+.qtext{font-size:1.45rem;font-weight:700;line-height:1.4;margin:6px 0 8px}
+.hl{background:var(--amber);color:#1a1300;border-radius:6px;padding:0 2px}
+.vis{display:flex;justify-content:center;margin:8px 0 14px;flex-wrap:wrap}
+.vis svg{max-width:100%;height:auto}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.opts.wide{grid-template-columns:minmax(0,1fr)}
+@media(max-width:420px){.opts{grid-template-columns:1fr}}
+.opt{display:flex;align-items:center;gap:8px;background:var(--card);border:3px solid var(--sky);border-radius:18px;padding:6px;min-height:72px}
+.opt .ob{flex:1;min-width:0;overflow-wrap:anywhere;min-height:58px;border:0;background:none;font-size:1.35rem;font-weight:800;text-align:center;border-radius:12px;padding:6px}
+.opt .sp{flex:none;width:50px;height:50px;border-radius:50%;border:0;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center}
+.opt.good{border-color:var(--green);background:#e4f7ea}
+.opt.pick{border-color:var(--amber);background:var(--amber-soft)}
+.opt .mk{font-weight:900;font-size:1.3rem}
+.opt.good .mk{color:var(--green-deep)}
+.hintbox{background:var(--amber-soft);border:3px solid var(--amber);border-radius:18px;padding:12px 14px;margin:12px 0;font-size:1.1rem}
+.tbox{background:var(--violet-soft);border:3px solid var(--violet);border-radius:18px;padding:12px 14px;margin:12px 0;font-size:1.1rem;display:flex;gap:12px;align-items:flex-start}
+.tbox img{flex:none;width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:47% 27%;border:3px solid var(--violet)}
+.ok-box{background:#e4f7ea;border:3px solid var(--green);border-radius:18px;padding:12px 14px;margin:12px 0;font-size:1.15rem;font-weight:700}
+.prog{height:12px;border-radius:8px;background:#dbe7e3;overflow:hidden;margin:6px 0 12px}
+.prog i{display:block;height:100%;background:var(--teal);border-radius:8px}
+.dots{display:flex;gap:6px;justify-content:center;margin:2px 0 8px}
+.dots i{width:14px;height:14px;border-radius:50%;background:#cfe0db}
+.dots i.on{background:var(--teal)}
+.dots i.cur{background:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
+.set{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #e4eeea}
+.tog{min-width:92px;min-height:50px;border-radius:14px;border:2px solid var(--teal);background:var(--card);font-weight:800}
+.tog[aria-pressed=true]{background:var(--teal-deep);color:#fff}
+.credit{font-size:.8rem;color:var(--ink-soft);text-align:center;margin-top:20px}
+.credit a{color:var(--sky-deep)}
+canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:50}
+.stepcard svg text{font-family:inherit}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+html[dir=ltr] .qtext,html[dir=ltr] .opt .ob{direction:ltr}
+.nl{direction:ltr}
+.srOnly{position:absolute;inset-inline-start:-9999px}
+/* טבעת מיקוד אחת לכל הדף. ברירת המחדל של הדפדפן נבלעת על כפתורים
+   צבעוניים, ומי שמנווט במקלדת לא רואה איפה הוא. הועתק כלשונו
+   מ-math-uni3. אין כאן outline:none בשום מקום, ולכן אין מה להחזיר. */
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+</style>
+</head>
+<body>
+<style>#gate[hidden]{display:none!important}</style>
+<div class="wrap"><div id="live" class="srOnly" aria-live="polite"></div><div id="app"></div></div>
+<canvas id="cf"></canvas>
+<script>
+/* ===== visuals (inline SVG, no emoji fonts) ===== */
+var COL={red:"#e8453c",blue:"#2f7fd8",green:"#2eaa5b",yellow:"#f5b800",orange:"#f58a1f",purple:"#8a63d2"};
+var INK="#17333c";
+/* תחליף טקסטואלי לאיור. עד היום כל איור יצא role="img" עם
+   aria-label ריק — כלומר קורא מסך מכריז "תמונה" בלי שם, וזה גרוע
+   מאיור שקוף. יש תווית — role="img" עם שם; אין — aria-hidden,
+   והאיור אינו מוכרז כלל.
+
+   **התווית מתארת את מה שמצויר, ולעולם לא את התשובה.** במד־זווית
+   ("כמה מעלות?") וברשת המשבצות ("כמה זה 5²?") המספר הוא התשובה,
+   ולכן התווית אומרת רק מה סוג האיור. כך גם בנקודות על הצירים:
+   מוכרזות האותיות שמצוירות, לא הקואורדינטות שאותן צריך לקרוא. */
+function aesc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+function FL(h,a,r,e){return lt({he:h,ar:a,ru:r,en:e})}
+function labJoin(a){return (a||[]).filter(function(x){return x!=null&&String(x).trim()!==""}).join(", ")}
+function svg(w,h,inner,lab){return '<svg viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'" '+(lab?('role="img" aria-label="'+aesc(lab)+'"'):'aria-hidden="true"')+'>'+inner+'</svg>'}
+function ptxt(x,y,t,o){o=o||{};return '<text x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" text-anchor="'+(o.a||"middle")+'" font-size="'+(o.s||13)+'" font-weight="'+(o.w||700)+'" fill="'+(o.c||INK)+'">'+t+'</text>'}
+var LG=["he","ar","ru","en"];
+function L(h,a,r,e){return {he:h,ar:a,ru:r,en:e}}
+function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function pick(a){return a[ri(0,a.length-1)]}
+function shuffle(a){var r=a.slice(),i,j,x;for(i=r.length-1;i>0;i--){j=ri(0,i);x=r[i];r[i]=r[j];r[j]=x}return r}
+function uniq(a){var o=[];a.forEach(function(x){if(o.indexOf(x)<0)o.push(x)});return o}
+function plRu(n,a,b,c){var m=n%100,d=n%10;if(m>=11&&m<=14)return c;if(d===1)return a;if(d>=2&&d<=4)return b;return c}
+function oid(x){return (x&&typeof x==="object")?"L:"+x.he:String(x)}
+function mk(t,q,vis,ans,dist,hint,expl,step){
+  var aid=oid(ans),seen={},d=[];seen[aid]=1;
+  dist.forEach(function(x){var k=oid(x);if(!seen[k]){seen[k]=1;d.push(x)}});
+  while(d.length<3){var z=String(ri(0,99));if(!seen[z]){seen[z]=1;d.push(z)}}
+  var all=shuffle([ans].concat(shuffle(d).slice(0,3))).map(function(x){return {id:oid(x),l:(x&&typeof x==="object")?x:String(x)}});
+  return {t:t,q:fixM(q),vis:vis||"",o:all,a:aid,h:fixM(hint),e:fixM(expl),step:step==null?0:step}}
+function near(n,lo,hi){var c=[n+1,n-1,n+2,n-2,n+10,n-10,n+5].filter(function(x){return x>=lo&&x<=hi&&x!==n});return shuffle(c)}
+function fixM(o){if(o&&typeof o==="object"){var r={};LG.forEach(function(l){r[l]=isoPts(String(o[l])).replace(/([(,]\s?)-(?=\d)/g,"$1\u2212")});return r}return o}
+/* ===== generators: grade 7 ===== */
+var G={};
+function V4(fn){var s=S.lang,o={};LG.forEach(function(l){S.lang=l;o[l]=fn()});S.lang=s;return o}
+function sgn(n){return n<0?"\u2212"+(-n):String(n)}
+/* ===== physics: helpers ===== */
+function N(x){return String(Math.round(x*1000)/1000)}
+function F(h,a,r,e,v){v=v||{};var o={},s=[h,a,r,e];LG.forEach(function(l,i){o[l]=s[i].replace(/\{(\w+)\}/g,function(m,k){return v[k]!=null?v[k]:m})});return o}
+function D(ans,c,u){var o=[],seen={};seen[N(ans)]=1;u=u?" "+u:"";
+  c.concat([ans*2,ans/2,ans+1,ans+2,ans*3,ans+5,ans*4]).forEach(function(x){x=Math.round(x*1000)/1000;if(x>0&&!seen[N(x)]&&isFinite(x)){seen[N(x)]=1;o.push(N(x)+u)}});return o}
+function A(v,u){return N(v)+" "+u}
+function ST_(he,ar,ru,en,v){return {t:L(he,ar,ru,en),v:v||function(){return ""}}}
+function tx(x,y,t,o){return ptxt(x,y,t,o).replace('<text ','<text direction="ltr" unicode-bidi="bidi-override" ')}
+function arrow(x1,y1,x2,y2,c){var dx=x2-x1,dy=y2-y1,l=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/l,uy=dy/l,hx=x2-ux*10,hy=y2-uy*10;
+  return '<line x1="'+x1+'" y1="'+y1+'" x2="'+hx.toFixed(1)+'" y2="'+hy.toFixed(1)+'" stroke="'+c+'" stroke-width="4"/><polygon points="'+x2+','+y2+' '+(hx-uy*6).toFixed(1)+','+(hy+ux*6).toFixed(1)+' '+(hx+uy*6).toFixed(1)+','+(hy-ux*6).toFixed(1)+'" fill="'+c+'"/>'}
+/* v-t graph: from (0,v0) to (t,v1) */
+function vtVis(v0,v1,t){var W=240,H=150,ox=36,oy=124,mx=Math.max(v0,v1,1)*1.15,sx=(W-ox-14)/t,sy=(oy-16)/mx,
+  s='<line x1="'+ox+'" y1="'+oy+'" x2="'+(W-8)+'" y2="'+oy+'" stroke="'+INK+'" stroke-width="2.5"/><line x1="'+ox+'" y1="'+oy+'" x2="'+ox+'" y2="10" stroke="'+INK+'" stroke-width="2.5"/>';
+  s+='<polygon points="'+ox+','+oy+' '+ox+','+(oy-v0*sy)+' '+(ox+t*sx)+','+(oy-v1*sy)+' '+(ox+t*sx)+','+oy+'" fill="rgba(47,127,216,.2)"/>';
+  s+='<line x1="'+ox+'" y1="'+(oy-v0*sy)+'" x2="'+(ox+t*sx)+'" y2="'+(oy-v1*sy)+'" stroke="'+COL.blue+'" stroke-width="4"/>';
+  s+=tx(W-30,oy+16,"t (s)",{s:12,a:"end"})+tx(ox+4,12,"v (m/s)",{s:12,a:"start"})+tx(ox+t*sx,oy+14,String(t),{s:12})+tx(ox-6,oy-v1*sy+4,String(v1),{s:12,a:"end"});
+  if(v0>0)s+=tx(ox-6,oy-v0*sy+4,String(v0),{s:12,a:"end"});
+  return svg(W,H,s,FL("גרף מהירות־זמן","رسم السرعة والزمن","График скорости и времени","Velocity-time graph"))}
+/* forces on a box: right force fR (N), left force fL (N) */
+function forceVis(fR,fL,m){var s='<line x1="10" y1="104" x2="230" y2="104" stroke="'+INK+'" stroke-width="3"/><rect x="90" y="60" width="60" height="44" rx="4" fill="#ffe8a8" stroke="'+INK+'" stroke-width="3"/>'+tx(120,88,m+" kg",{s:14});
+  if(fR)s+=arrow(150,82,150+Math.min(70,fR*2.2+20),82,COL.green)+tx(190,52,fR+" N",{s:14,c:COL.green});
+  if(fL)s+=arrow(90,82,90-Math.min(70,fL*2.2+20),82,COL.red)+tx(50,52,fL+" N",{s:14,c:COL.red});
+  return svg(240,120,s,FL("גוף וכוחות הפועלים עליו","جسم والقوى المؤثرة عليه","Тело и действующие на него силы","A body and the forces acting on it"))}
+/* simple series circuit with battery V and resistors list */
+function circVis(V,rs,par){var s,n=rs.length,i;
+  if(!par){s='<rect x="20" y="30" width="200" height="90" rx="6" fill="none" stroke="'+INK+'" stroke-width="3"/>';
+    s+='<rect x="12" y="62" width="16" height="26" fill="#fff" stroke="none"/><line x1="12" y1="68" x2="28" y2="68" stroke="'+INK+'" stroke-width="4"/><line x1="16" y1="80" x2="24" y2="80" stroke="'+INK+'" stroke-width="4"/>'+tx(46,78,V+" V",{s:13,a:"start"});
+    for(i=0;i<n;i++){var x=60+i*(150/n);s+='<rect x="'+x.toFixed(0)+'" y="22" width="'+(110/n).toFixed(0)+'" height="16" fill="#fff" stroke="'+INK+'" stroke-width="3"/>'+tx(x+55/n,16,rs[i]+" \u03A9",{s:13})}}
+  else{s='<rect x="20" y="30" width="200" height="100" rx="6" fill="none" stroke="'+INK+'" stroke-width="3"/><rect x="12" y="68" width="16" height="26" fill="#fff" stroke="none"/><line x1="12" y1="74" x2="28" y2="74" stroke="'+INK+'" stroke-width="4"/><line x1="16" y1="86" x2="24" y2="86" stroke="'+INK+'" stroke-width="4"/>'+tx(46,84,V+" V",{s:13,a:"start"});
+    for(i=0;i<n;i++){var x2=100+i*60;s+='<line x1="'+x2+'" y1="30" x2="'+x2+'" y2="130" stroke="'+INK+'" stroke-width="3"/><rect x="'+(x2-8)+'" y="62" width="16" height="36" fill="#fff" stroke="'+INK+'" stroke-width="3"/>'+tx(x2+14,84,rs[i]+" \u03A9",{s:13,a:"start"})}}
+  return svg(240,150,s,FL("מעגל חשמלי","دائرة كهربائية","Электрическая цепь","An electric circuit"))}
+function waveVis(lam,unit){var s='<line x1="10" y1="70" x2="230" y2="70" stroke="#9aa" stroke-width="2"/><path d="M10 70',x;
+  for(x=0;x<=220;x+=4)s+=' L'+(10+x)+' '+(70-36*Math.sin(x/220*2*Math.PI*2));
+  s+='" fill="none" stroke="'+COL.blue+'" stroke-width="4"/>'+'<line x1="10" y1="120" x2="120" y2="120" stroke="'+COL.red+'" stroke-width="3"/><line x1="10" y1="114" x2="10" y2="126" stroke="'+COL.red+'" stroke-width="3"/><line x1="120" y1="114" x2="120" y2="126" stroke="'+COL.red+'" stroke-width="3"/>'+tx(65,112,"\u03BB = "+lam+" "+unit,{s:14,c:COL.red});
+  return svg(240,136,s,FL("גל ואורך הגל","موجة وطولها الموجي","Волна и длина волны","A wave and its wavelength"))}
+function inclineVis(m,ang){var s='<polygon points="20,120 220,120 220,40" fill="#dfe9ea" stroke="'+INK+'" stroke-width="3"/><text x="188" y="114" font-size="14" font-weight="700" fill="'+INK+'">'+ang+'\u00B0</text><g transform="translate(140,86) rotate(-'+(Math.atan(80/200)*180/Math.PI).toFixed(1)+')"><rect x="-22" y="-30" width="44" height="30" fill="#ffe8a8" stroke="'+INK+'" stroke-width="3"/></g>'+tx(140,64,m+" kg",{s:13});
+  return svg(240,136,s,FL("מישור משופע","مستوٍ مائل","Наклонная плоскость","An inclined plane"))}
+/* RTL: a closing parenthesis after a Latin formula at the end of a he/ar question drifts; an RLM after it keeps the order. */
+var _mk0=mk;mk=function(){var q=_mk0.apply(null,arguments);["he","ar"].forEach(function(l){if(q.q&&typeof q.q[l]==="string")q.q[l]=q.q[l].replace(/([)?])\s*$/,"$1\u200F")});return q};
+
+function wv(q,fn){q.visL=V4(fn);return q}
+/* ===== generators (g = 10 m/s²) ===== */
+G.kin=function(l){var T=[];
+ T.push(function(){var v0=pick([0,2,4,5,10]),a=pick([2,3,4,5]),t=pick([2,3,4,5,6]),v=v0+a*t;
+  return mk("kin",F("גוף נע בתאוצה קבועה של {a} m/s². מהירותו ההתחלתית {v0} m/s. מהי מהירותו אחרי {t} שניות?","جسم يتحرك بتسارع ثابت {a} m/s². سرعته الابتدائية {v0} m/s. ما سرعته بعد {t} ثوانٍ؟","Тело движется с постоянным ускорением {a} m/s². Начальная скорость {v0} m/s. Какая скорость через {t} с?","A body moves with constant acceleration {a} m/s². Its initial speed is {v0} m/s. What is its speed after {t} seconds?",{a:a,v0:v0,t:t}),"",A(v,"m/s"),D(v,[a*t,v0+a,v0*t+a,v+v0],"m/s"),
+   F("הנוסחה: v = v₀ + a · t.","الصيغة: v = v₀ + a · t.","Формула: v = v₀ + a · t.","The formula: v = v₀ + a · t."),
+   F("v = {v0} + {a} · {t} = {v} m/s.","v = {v0} + {a} · {t} = {v} m/s.","v = {v0} + {a} · {t} = {v} m/s.","v = {v0} + {a} · {t} = {v} m/s.",{v0:v0,a:a,t:t,v:v}),0)});
+ T.push(function(){var v0=pick([0,2,4,6]),a=pick([2,4,6]),t=pick([2,3,4,5]),x=v0*t+a*t*t/2;
+  return mk("kin",F("גוף יוצא ממהירות {v0} m/s ומאיץ בתאוצה {a} m/s² במשך {t} שניות. איזה מרחק עבר?","جسم يبدأ بسرعة {v0} m/s ويتسارع بـ {a} m/s² مدة {t} ثوانٍ. ما المسافة التي قطعها؟","Тело начинает со скорости {v0} m/s и разгоняется с ускорением {a} m/s² в течение {t} с. Какой путь оно прошло?","A body starts at {v0} m/s and accelerates at {a} m/s² for {t} seconds. How far does it travel?",{v0:v0,a:a,t:t}),"",A(x,"m"),D(x,[v0*t+a*t*t,a*t*t/2,v0*t,(v0+a*t)*t],"m"),
+   F("הנוסחה: x = v₀·t + ½·a·t².","الصيغة: x = v₀·t + ½·a·t².","Формула: x = v₀·t + ½·a·t².","The formula: x = v₀·t + ½·a·t²."),
+   F("x = {v0}·{t} + ½·{a}·{t}² = {x} m.","x = {v0}·{t} + ½·{a}·{t}² = {x} m.","x = {v0}·{t} + ½·{a}·{t}² = {x} m.","x = {v0}·{t} + ½·{a}·{t}² = {x} m.",{v0:v0,a:a,t:t,x:x}),1)});
+ T.push(function(){var v0=pick([0,4,6,10]),v1=v0+pick([6,8,10,12]),t=pick([2,3,4,5]),x=(v0+v1)*t/2,a=(v1-v0)/t;
+  return wv(mk("kin",F("בגרף מהירות־זמן המהירות עולה מ-{v0} ל-{v1} m/s ב-{t} שניות. איזה מרחק עבר הגוף?","في رسم السرعة والزمن ترتفع السرعة من {v0} إلى {v1} m/s خلال {t} ثوانٍ. ما المسافة التي قطعها الجسم؟","На графике скорость растёт от {v0} до {v1} m/s за {t} с. Какой путь прошло тело?","In a velocity-time graph the speed rises from {v0} to {v1} m/s in {t} seconds. How far does the body travel?",{v0:v0,v1:v1,t:t}),"",A(x,"m"),D(x,[v1*t,v0*t,(v1-v0)*t/2,a*t],"m"),
+   F("המרחק הוא השטח מתחת לגרף. זה טרפז.","المسافة هي المساحة تحت الرسم. إنها شبه منحرف.","Путь — это площадь под графиком. Это трапеция.","The distance is the area under the graph. It is a trapezoid."),
+   F("שטח טרפז: ({v0} + {v1}) · {t} ÷ 2 = {x} m.","مساحة شبه المنحرف: ({v0} + {v1}) · {t} ÷ 2 = {x} m.","Площадь трапеции: ({v0} + {v1}) · {t} ÷ 2 = {x} m.","Trapezoid area: ({v0} + {v1}) · {t} ÷ 2 = {x} m.",{v0:v0,v1:v1,t:t,x:x}),1),function(){return vtVis(v0,v1,t)})});
+ T.push(function(){var t=pick([1,2,3,4]),h=5*t*t;
+  return mk("kin",F("אבן נופלת חופשית מגובה {h} m (בלי התנגדות אוויר, g = 10 m/s²). כמה זמן היא נופלת?","تسقط حجر سقوطًا حرًا من ارتفاع {h} m (دون مقاومة هواء، g = 10 m/s²). كم من الزمن تسقط؟","Камень свободно падает с высоты {h} m (g = 10 m/s², без сопротивления воздуха). Сколько времени он падает?","A stone falls freely from a height of {h} m (g = 10 m/s², no air resistance). How long does it fall?",{h:h}),"",A(t,"s"),D(t,[h/10,h/5,Math.sqrt(h),h/2],"s"),
+   F("בנפילה חופשית h = ½·g·t² = 5·t².","في السقوط الحر h = ½·g·t² = 5·t².","При свободном падении h = ½·g·t² = 5·t².","In free fall h = ½·g·t² = 5·t²."),
+   F("{h} = 5·t², לכן t² = {t2} ו-t = {t} s.","{h} = 5·t²، إذن t² = {t2} و t = {t} s.","{h} = 5·t², значит t² = {t2} и t = {t} s.","{h} = 5·t², so t² = {t2} and t = {t} s.",{h:h,t2:t*t,t:t}),3)});
+ T.push(function(){var t=pick([2,3,4,5]),v=10*t;
+  return mk("kin",F("כדור נזרק מלמעלה כלפי מטה במהירות 0 ונופל חופשי {t} שניות (g = 10 m/s²). מהי מהירותו בסוף?","تُترك كرة تسقط سقوطًا حرًا من السكون مدة {t} ثوانٍ (g = 10 m/s²). ما سرعتها في النهاية؟","Шарик падает свободно из состояния покоя {t} с (g = 10 m/s²). Какова его скорость в конце?","A ball is dropped from rest and falls freely for {t} seconds (g = 10 m/s²). What is its final speed?",{t:t}),"",A(v,"m/s"),D(v,[5*t,5*t*t,10*t*t,t],"m/s"),
+   F("בנפילה חופשית התאוצה היא g = 10 m/s², ומתחילים ממנוחה.","في السقوط الحر التسارع g = 10 m/s²، وتبدأ من السكون.","При свободном падении ускорение g = 10 m/s², начало с покоя.","In free fall the acceleration is g = 10 m/s², starting from rest."),
+   F("v = g · t = 10 · {t} = {v} m/s.","v = g · t = 10 · {t} = {v} m/s.","v = g · t = 10 · {t} = {v} m/s.","v = g · t = 10 · {t} = {v} m/s.",{t:t,v:v}),3)});
+ var pool=l===1?[T[0],T[4]]:(l===2?[T[1],T[2],T[0]]:[T[1],T[2],T[3],T[4]]);return pick(pool)()};
+
+G.newton=function(l){var T=[];
+ T.push(function(){var m=pick([2,3,4,5,10]),a=pick([2,3,4,5]),f=m*a;
+  return wv(mk("newton",F("על גוף שמסתו {m} kg פועל כוח שקול שגורם לו לתאוצה {a} m/s². מהו הכוח השקול?","على جسم كتلته {m} kg تؤثر قوة محصلة تسبب له تسارعًا {a} m/s². ما القوة المحصلة؟","На тело массой {m} kg действует равнодействующая сила, дающая ускорение {a} m/s². Чему равна сила?","A body of mass {m} kg gets an acceleration of {a} m/s² from the net force. What is the net force?",{m:m,a:a}),"",A(f,"N"),D(f,[m+a,m/a,a*a,m*m],"N"),
+   F("החוק השני של ניוטון: F = m · a.","قانون نيوتن الثاني: F = m · a.","Второй закон Ньютона: F = m · a.","Newton's second law: F = m · a."),
+   F("F = {m} · {a} = {f} N.","F = {m} · {a} = {f} N.","F = {m} · {a} = {f} N.","F = {m} · {a} = {f} N.",{m:m,a:a,f:f}),1),function(){return forceVis(0,0,m).replace(/<\/svg>$/,"</svg>")})});
+ T.push(function(){var m=pick([2,3,4,5]),a=pick([1,2,3,4]),fl=pick([4,6,8,10]),fr=fl+m*a;
+  return wv(mk("newton",F("על גוף שמסתו {m} kg פועלים כוח {fr} N ימינה וכוח {fl} N שמאלה. מהי תאוצת הגוף?","على جسم كتلته {m} kg تؤثر قوة {fr} N نحو اليمين وقوة {fl} N نحو اليسار. ما تسارع الجسم؟","На тело массой {m} kg действуют сила {fr} N вправо и сила {fl} N влево. Каково ускорение?","Two forces act on a {m} kg body: {fr} N to the right and {fl} N to the left. What is its acceleration?",{m:m,fr:fr,fl:fl}),"",A(a,"m/s²"),D(a,[(fr+fl)/m,fr/m,fl/m,fr-fl],"m/s²"),
+   F("קודם מחשבים כוח שקול: מחסרים את הכוחות שפועלים בכיוונים הפוכים.","أولًا نحسب القوة المحصلة: نطرح القوتين المتعاكستين.","Сначала находим равнодействующую: вычитаем противоположные силы.","First find the net force: subtract the opposite forces."),
+   F("F שקול = {fr} − {fl} = {f} N. a = F ÷ m = {f} ÷ {m} = {a} m/s².","F المحصلة = {fr} − {fl} = {f} N. a = F ÷ m = {f} ÷ {m} = {a} m/s².","F равнодействующая = {fr} − {fl} = {f} N. a = F ÷ m = {f} ÷ {m} = {a} m/s².","Net F = {fr} − {fl} = {f} N. a = F ÷ m = {f} ÷ {m} = {a} m/s².",{fr:fr,fl:fl,f:fr-fl,m:m,a:a}),1),function(){return forceVis(fr,fl,m)})});
+ T.push(function(){var m=pick([2,4,5,10]);return mk("newton",F("מהו משקל (כוח הכובד) של גוף שמסתו {m} kg? (g = 10 m/s²)","ما وزن (قوة الجاذبية) جسم كتلته {m} kg؟ (g = 10 m/s²)","Каков вес (сила тяжести) тела массой {m} kg? (g = 10 m/s²)","What is the weight (gravity force) of a {m} kg body? (g = 10 m/s²)",{m:m}),"",A(m*10,"N"),D(m*10,[m,m/10,m+10,m*100],"N"),
+   F("משקל: W = m · g.","الوزن: W = m · g.","Вес: W = m · g.","Weight: W = m · g."),F("W = {m} · 10 = {w} N.","W = {m} · 10 = {w} N.","W = {m} · 10 = {w} N.","W = {m} · 10 = {w} N.",{m:m,w:m*10}),0)});
+ T.push(function(){var m=pick([2,3,4,5]),a=pick([1,2,3]),f=pick([2,4,6]),F1=f+m*a;
+  return mk("newton",F("מושכים ארגז שמסתו {m} kg בכוח אופקי {F1} N. החיכוך עם הרצפה {f} N. מהי תאוצת הארגז?","نسحب صندوقًا كتلته {m} kg بقوة أفقية {F1} N. الاحتكاك مع الأرض {f} N. ما تسارع الصندوق؟","Ящик массой {m} kg тянут горизонтальной силой {F1} N. Трение о пол {f} N. Каково ускорение ящика?","A {m} kg crate is pulled with a horizontal force of {F1} N. Friction with the floor is {f} N. What is its acceleration?",{m:m,F1:F1,f:f}),"",A(a,"m/s²"),D(a,[F1/m,(F1+f)/m,f/m,F1-f],"m/s²"),
+   F("החיכוך פועל נגד התנועה. קודם הכוח השקול.","الاحتكاك يعاكس الحركة. أولًا القوة المحصلة.","Трение направлено против движения. Сначала равнодействующая.","Friction opposes the motion. Find the net force first."),
+   F("F שקול = {F1} − {f} = {n} N. a = {n} ÷ {m} = {a} m/s².","F المحصلة = {F1} − {f} = {n} N. a = {n} ÷ {m} = {a} m/s².","F равнодействующая = {F1} − {f} = {n} N. a = {n} ÷ {m} = {a} m/s².","Net F = {F1} − {f} = {n} N. a = {n} ÷ {m} = {a} m/s².",{F1:F1,f:f,n:F1-f,m:m,a:a}),1)});
+ T.push(function(){var m=pick([2,4,6,10]);return wv(mk("newton",F("גוף שמסתו {m} kg מחליק ללא חיכוך על מישור משופע בזווית 30° (g = 10 m/s², sin 30° = 0.5). מהו הרכיב של כוח הכובד לאורך המישור?","ينزلق جسم كتلته {m} kg دون احتكاك على مستوٍ مائل بزاوية 30° (g = 10 m/s²، sin 30° = 0.5). ما مركّبة قوة الجاذبية على امتداد المستوى؟","Тело массой {m} kg скользит без трения по наклонной плоскости под углом 30° (g = 10 m/s², sin 30° = 0.5). Чему равна составляющая силы тяжести вдоль плоскости?","A {m} kg body slides without friction down a 30° incline (g = 10 m/s², sin 30° = 0.5). What is the component of gravity along the incline?",{m:m}),"",A(m*5,"N"),D(m*5,[m*10,m*8.66,m*10*0.5*0.5,m],"N"),
+   F("הרכיב לאורך המישור: m · g · sin θ.","المركّبة على امتداد المستوى: m · g · sin θ.","Составляющая вдоль плоскости: m · g · sin θ.","The component along the incline: m · g · sin θ."),
+   F("F = {m} · 10 · 0.5 = {f} N. התאוצה היא g · sin θ = 5 m/s².","F = {m} · 10 · 0.5 = {f} N. والتسارع g · sin θ = 5 m/s².","F = {m} · 10 · 0.5 = {f} N. Ускорение g · sin θ = 5 m/s².","F = {m} · 10 · 0.5 = {f} N. The acceleration is g · sin θ = 5 m/s².",{m:m,f:m*5}),2),function(){return inclineVis(m,30)})});
+ T.push(function(){var m=pick([40,50,60,80]),a=pick([1,2]),n=m*(10+a);
+  return mk("newton",F("אדם שמסתו {m} kg עומד במעלית שמאיצה כלפי מעלה בתאוצה {a} m/s² (g = 10 m/s²). מהו הכוח שהרצפה מפעילה עליו?","شخص كتلته {m} kg يقف في مصعد يتسارع إلى الأعلى بتسارع {a} m/s² (g = 10 m/s²). ما القوة التي تؤثر بها الأرضية عليه؟","Человек массой {m} kg стоит в лифте, который разгоняется вверх с ускорением {a} m/s² (g = 10 m/s²). С какой силой пол действует на него?","A {m} kg person stands in an elevator accelerating upward at {a} m/s² (g = 10 m/s²). What force does the floor exert on the person?",{m:m,a:a}),"",A(n,"N"),D(n,[m*10,m*(10-a),m*a,m*10+a],"N"),
+   F("כלפי מעלה: N − m·g = m·a.","إلى الأعلى: N − m·g = m·a.","Вверх: N − m·g = m·a.","Upward: N − m·g = m·a."),
+   F("N = m · (g + a) = {m} · {s} = {n} N. הכוח גדול ממשקלו.","N = m · (g + a) = {m} · {s} = {n} N. القوة أكبر من وزنه.","N = m · (g + a) = {m} · {s} = {n} N. Сила больше его веса.","N = m · (g + a) = {m} · {s} = {n} N. This is more than the person's weight.",{m:m,s:10+a,n:n}),2)});
+ var pool=l===1?[T[0],T[2]]:(l===2?[T[1],T[3],T[2]]:[T[1],T[3],T[4],T[5]]);return pick(pool)()};
+
+G.energy=function(l){var T=[];
+ T.push(function(){var f=pick([5,10,20,30,50]),d=pick([2,3,4,5,10]),w=f*d;
+  return mk("energy",F("מפעילים כוח {f} N על גוף ומזיזים אותו {d} m בכיוון הכוח. מהי העבודה של הכוח?","نؤثر بقوة {f} N على جسم ونحركه {d} m في اتجاه القوة. ما شغل القوة؟","К телу прикладывают силу {f} N и перемещают его на {d} m по направлению силы. Какую работу совершает сила?","A force of {f} N moves a body {d} m in the direction of the force. How much work does the force do?",{f:f,d:d}),"",A(w,"J"),D(w,[f+d,f/d,w*2,w/2],"J"),
+   F("עבודה: W = F · d.","الشغل: W = F · d.","Работа: W = F · d.","Work: W = F · d."),F("W = {f} · {d} = {w} J.","W = {f} · {d} = {w} J.","W = {f} · {d} = {w} J.","W = {f} · {d} = {w} J.",{f:f,d:d,w:w}),0)});
+ T.push(function(){var m=pick([2,4,6,10]),v=pick([2,4,5,10]),e=m*v*v/2;
+  return mk("energy",F("מהי האנרגיה הקינטית של גוף שמסתו {m} kg הנע במהירות {v} m/s?","ما الطاقة الحركية لجسم كتلته {m} kg يتحرك بسرعة {v} m/s؟","Какова кинетическая энергия тела массой {m} kg, движущегося со скоростью {v} m/s?","What is the kinetic energy of a {m} kg body moving at {v} m/s?",{m:m,v:v}),"",A(e,"J"),D(e,[m*v,m*v*v,m*v/2,(m*v)*(m*v)/2],"J"),
+   F("אנרגיה קינטית: Ek = ½·m·v². המהירות עולה בריבוע.","الطاقة الحركية: Ek = ½·m·v². السرعة تُربَّع.","Кинетическая энергия: Ek = ½·m·v². Скорость в квадрате.","Kinetic energy: Ek = ½·m·v². The speed is squared."),
+   F("Ek = ½ · {m} · {v}² = {e} J.","Ek = ½ · {m} · {v}² = {e} J.","Ek = ½ · {m} · {v}² = {e} J.","Ek = ½ · {m} · {v}² = {e} J.",{m:m,v:v,e:e}),2)});
+ T.push(function(){var m=pick([1,2,3,5]),h=pick([2,4,5,10,20]),e=m*10*h;
+  return mk("energy",F("גוף שמסתו {m} kg נמצא בגובה {h} m מעל הרצפה. מהי האנרגיה הפוטנציאלית הכובדית שלו? (g = 10 m/s²)","جسم كتلته {m} kg على ارتفاع {h} m فوق الأرض. ما طاقة وضعه الجاذبية؟ (g = 10 m/s²)","Тело массой {m} kg находится на высоте {h} m над полом. Чему равна его потенциальная энергия? (g = 10 m/s²)","A {m} kg body is {h} m above the floor. What is its gravitational potential energy? (g = 10 m/s²)",{m:m,h:h}),"",A(e,"J"),D(e,[m*h,m*10,10*h,e/2],"J"),
+   F("אנרגיה פוטנציאלית: Ep = m · g · h.","طاقة الوضع: Ep = m · g · h.","Потенциальная энергия: Ep = m · g · h.","Potential energy: Ep = m · g · h."),
+   F("Ep = {m} · 10 · {h} = {e} J.","Ep = {m} · 10 · {h} = {e} J.","Ep = {m} · 10 · {h} = {e} J.","Ep = {m} · 10 · {h} = {e} J.",{m:m,h:h,e:e}),1)});
+ T.push(function(){var h=pick([5,20,45,80]),v=Math.sqrt(20*h);
+  return mk("energy",F("כדור נופל חופשי מגובה {h} m (בלי התנגדות אוויר, g = 10 m/s²). מהי מהירותו ממש לפני הפגיעה בקרקע?","تسقط كرة سقوطًا حرًا من ارتفاع {h} m (دون مقاومة هواء، g = 10 m/s²). ما سرعتها قبل الاصطدام بالأرض مباشرة؟","Мяч свободно падает с высоты {h} m (g = 10 m/s², без сопротивления воздуха). Какова его скорость перед ударом о землю?","A ball falls freely from {h} m (g = 10 m/s², no air resistance). What is its speed just before it hits the ground?",{h:h}),"",A(v,"m/s"),D(v,[h,v*v,v/2,Math.sqrt(10*h)],"m/s"),
+   F("שימור אנרגיה: האנרגיה הפוטנציאלית הופכת לקינטית. m·g·h = ½·m·v². המסה מצטמצמת.","حفظ الطاقة: طاقة الوضع تتحول إلى حركية. m·g·h = ½·m·v². الكتلة تُختصر.","Закон сохранения энергии: потенциальная энергия переходит в кинетическую. m·g·h = ½·m·v². Масса сокращается.","Conservation of energy: potential energy becomes kinetic. m·g·h = ½·m·v². The mass cancels."),
+   F("v² = 2·g·h = 2 · 10 · {h} = {v2}, ולכן v = {v} m/s.","v² = 2·g·h = 2 · 10 · {h} = {v2}، إذن v = {v} m/s.","v² = 2·g·h = 2 · 10 · {h} = {v2}, значит v = {v} m/s.","v² = 2·g·h = 2 · 10 · {h} = {v2}, so v = {v} m/s.",{h:h,v2:20*h,v:v}),3)});
+ T.push(function(){var w=pick([200,300,600,1000,1200]),t=pick([2,5,10,20,30]),p=w/t;
+  return mk("energy",F("מנוע מבצע עבודה של {w} J בתוך {t} שניות. מהו ההספק שלו?","محرك ينجز شغلًا قدره {w} J خلال {t} ثانية. ما استطاعته؟","Двигатель совершает работу {w} J за {t} с. Какова его мощность?","A motor does {w} J of work in {t} seconds. What is its power?",{w:w,t:t}),"",A(p,"W"),D(p,[w*t,t/w,w+t,p*2],"W"),
+   F("הספק: P = W ÷ t, כלומר עבודה ליחידת זמן.","الاستطاعة: P = W ÷ t، أي الشغل في وحدة الزمن.","Мощность: P = W ÷ t, то есть работа за единицу времени.","Power: P = W ÷ t, work per unit time."),
+   F("P = {w} ÷ {t} = {p} W.","P = {w} ÷ {t} = {p} W.","P = {w} ÷ {t} = {p} W.","P = {w} ÷ {t} = {p} W.",{w:w,t:t,p:p}),3)});
+ var pool=l===1?[T[0],T[2]]:(l===2?[T[1],T[2],T[4]]:[T[1],T[3],T[4],T[3]]);return pick(pool)()};
+
+G.mom=function(l){var T=[];
+ T.push(function(){var m=pick([2,3,5,10,20]),v=pick([2,3,4,5,10]),p=m*v;
+  return mk("mom",F("מהו התנע של גוף שמסתו {m} kg הנע במהירות {v} m/s?","ما زخم جسم كتلته {m} kg يتحرك بسرعة {v} m/s؟","Каков импульс тела массой {m} kg, движущегося со скоростью {v} m/s?","What is the momentum of a {m} kg body moving at {v} m/s?",{m:m,v:v}),"",A(p,"kg·m/s"),D(p,[m+v,m*v*v/2,m/v,p*2],"kg·m/s"),
+   F("תנע: p = m · v.","التنع (الزخم): p = m · v.","Импульс: p = m · v.","Momentum: p = m · v."),F("p = {m} · {v} = {p} kg·m/s.","p = {m} · {v} = {p} kg·m/s.","p = {m} · {v} = {p} kg·m/s.","p = {m} · {v} = {p} kg·m/s.",{m:m,v:v,p:p}),0)});
+ T.push(function(){var f=pick([10,20,50,100]),t=pick([2,3,4,5]),dp=f*t;
+  return mk("mom",F("כוח קבוע של {f} N פועל על גוף {t} שניות. מהו שינוי התנע של הגוף?","تؤثر قوة ثابتة {f} N على جسم مدة {t} ثوانٍ. ما التغير في زخم الجسم؟","Постоянная сила {f} N действует на тело {t} с. Каково изменение импульса тела?","A constant force of {f} N acts on a body for {t} seconds. What is the change in the body's momentum?",{f:f,t:t}),"",A(dp,"kg·m/s"),D(dp,[f+t,f/t,dp*2,dp/2],"kg·m/s"),
+   F("מתקף הכוח שווה לשינוי התנע: F · Δt = Δp.","دفع القوة يساوي التغير في الزخم: F · Δt = Δp.","Импульс силы равен изменению импульса: F · Δt = Δp.","The impulse equals the change in momentum: F · Δt = Δp."),
+   F("Δp = {f} · {t} = {dp} kg·m/s.","Δp = {f} · {t} = {dp} kg·m/s.","Δp = {f} · {t} = {dp} kg·m/s.","Δp = {f} · {t} = {dp} kg·m/s.",{f:f,t:t,dp:dp}),1)});
+ T.push(function(){var m1=pick([1,2,3,4]),m2=pick([1,2,3,4]),V=pick([1,2,3,4]),v1=V*(m1+m2)/m1;
+  if(v1!==Math.round(v1))return T[2]();
+  return mk("mom",F("גוף שמסתו {m1} kg נע במהירות {v1} m/s ופוגע בגוף נייח שמסתו {m2} kg. הם נדבקים ונעים יחד. מהי מהירותם המשותפת?","جسم كتلته {m1} kg يتحرك بسرعة {v1} m/s ويصطدم بجسم ساكن كتلته {m2} kg. يلتصقان ويتحركان معًا. ما سرعتهما المشتركة؟","Тело массой {m1} kg движется со скоростью {v1} m/s и сталкивается с неподвижным телом массой {m2} kg. Они слипаются. Какова их общая скорость?","A {m1} kg body moving at {v1} m/s hits a {m2} kg body at rest. They stick together. What is their common speed?",{m1:m1,m2:m2,v1:v1}),"",A(V,"m/s"),D(V,[v1,v1/2,v1*m1,v1-m2],"m/s"),
+   F("שימור תנע: התנע לפני ההתנגשות שווה לתנע אחריה.","حفظ الزخم: الزخم قبل التصادم يساوي الزخم بعده.","Закон сохранения импульса: импульс до столкновения равен импульсу после.","Conservation of momentum: momentum before the collision equals momentum after."),
+   F("{m1} · {v1} = ({m1} + {m2}) · V, לכן V = {p} ÷ {M} = {V} m/s.","{m1} · {v1} = ({m1} + {m2}) · V، إذن V = {p} ÷ {M} = {V} m/s.","{m1} · {v1} = ({m1} + {m2}) · V, значит V = {p} ÷ {M} = {V} m/s.","{m1} · {v1} = ({m1} + {m2}) · V, so V = {p} ÷ {M} = {V} m/s.",{m1:m1,m2:m2,v1:v1,p:m1*v1,M:m1+m2,V:V}),2)});
+ T.push(function(){var pr=pick([[2,4,1],[2,4,2],[3,4,1],[3,4,2],[3,4,3],[2,6,3],[2,6,4],[4,6,3],[4,6,2],[4,6,6],[1,8,2],[1,6,3]]),m1=pr[0],v1=pr[1],m2=pr[2],vv=m1*v1/m2;
+  return mk("mom",F("תותח יורה פגז שמסתו {m1} kg במהירות {v1} m/s. מסת התותח {m2} kg. מהי מהירות הרתיעה של התותח? (התותח היה נייח)","يطلق مدفع قذيفة كتلتها {m1} kg بسرعة {v1} m/s. كتلة المدفع {m2} kg. ما سرعة ارتداد المدفع؟ (كان المدفع ساكنًا)","Пушка выпускает снаряд массой {m1} kg со скоростью {v1} m/s. Масса пушки {m2} kg. Какова скорость отдачи? (пушка была неподвижна)","A cannon fires a {m1} kg shell at {v1} m/s. The cannon's mass is {m2} kg. What is the cannon's recoil speed? (the cannon started at rest)",{m1:m1,v1:v1,m2:m2}),"",A(vv,"m/s"),D(vv,[v1,m1*v1,v1/m2,m2*v1/m1],"m/s"),
+   F("התנע הכולל לפני הירי הוא אפס, ולכן גם אחריו: התנעים שווים בגודלם ונגדיים בכיוונם.","الزخم الكلي قبل الإطلاق صفر، لذلك هو صفر بعده: الزخمان متساويان في المقدار ومتعاكسان.","Полный импульс до выстрела равен нулю и после тоже: импульсы равны по модулю и противоположны.","Total momentum before firing is zero, so it is zero after: equal and opposite momenta."),
+   F("m₂·V = m₁·v₁, לכן V = {m1} · {v1} ÷ {m2} = {vv} m/s.","m₂·V = m₁·v₁، إذن V = {m1} · {v1} ÷ {m2} = {vv} m/s.","m₂·V = m₁·v₁, значит V = {m1} · {v1} ÷ {m2} = {vv} m/s.","m₂·V = m₁·v₁, so V = {m1} · {v1} ÷ {m2} = {vv} m/s.",{m1:m1,v1:v1,m2:m2,vv:vv}),2)});
+ var pool=l===1?[T[0],T[1]]:(l===2?[T[1],T[2],T[0]]:[T[2],T[3],T[1]]);return pick(pool)()};
+
+G.circ=function(l){var T=[];
+ T.push(function(){var Tp=pick([0.5,0.25,0.2,0.1,2,4,5]),f=1/Tp;
+  return mk("circ",F("זמן המחזור של גוף בתנועה מעגלית הוא {T} שניות. מהי התדירות שלו?","زمن الدورة لجسم يتحرك حركة دائرية {T} ثانية. ما تردده؟","Период обращения тела по окружности равен {T} с. Какова его частота?","The period of a body in circular motion is {T} seconds. What is its frequency?",{T:Tp}),"",A(f,"Hz"),D(f,[Tp,Tp*2,1/(2*Tp),f*2],"Hz"),
+   F("תדירות והמחזור הפוכים זה לזה: f = 1 ÷ T.","التردد والدورة مقلوب كل منهما للآخر: f = 1 ÷ T.","Частота и период обратны друг другу: f = 1 ÷ T.","Frequency and period are reciprocals: f = 1 ÷ T."),
+   F("f = 1 ÷ {T} = {f} Hz.","f = 1 ÷ {T} = {f} Hz.","f = 1 ÷ {T} = {f} Hz.","f = 1 ÷ {T} = {f} Hz.",{T:Tp,f:f}),0)});
+ T.push(function(){var r=pick([2,4,5,10]),k=pick([2,3,4,5]),v=r*k,a=v*v/r;
+  return mk("circ",F("גוף נע במעגל ברדיוס {r} m במהירות קבועה של {v} m/s. מהי התאוצה הצנטריפטלית?","يتحرك جسم في دائرة نصف قطرها {r} m بسرعة ثابتة {v} m/s. ما التسارع المركزي؟","Тело движется по окружности радиусом {r} m с постоянной скоростью {v} m/s. Каково центростремительное ускорение?","A body moves on a circle of radius {r} m at a constant speed of {v} m/s. What is its centripetal acceleration?",{r:r,v:v}),"",A(a,"m/s²"),D(a,[v/r,v*v,v*r,a/2],"m/s²"),
+   F("תאוצה צנטריפטלית: a = v² ÷ r. היא מכוונת למרכז המעגל.","التسارع المركزي: a = v² ÷ r. يتجه نحو مركز الدائرة.","Центростремительное ускорение: a = v² ÷ r. Оно направлено к центру окружности.","Centripetal acceleration: a = v² ÷ r. It points toward the center of the circle."),
+   F("a = {v}² ÷ {r} = {a} m/s².","a = {v}² ÷ {r} = {a} m/s².","a = {v}² ÷ {r} = {a} m/s².","a = {v}² ÷ {r} = {a} m/s².",{v:v,r:r,a:a}),1)});
+ T.push(function(){var m=pick([1,2,3,5]),r=pick([2,4,5]),k=pick([2,3,4]),v=r*k/2<1?k:k,vv=pick([2,4,6,10]),F1=m*vv*vv/r;
+  if(F1!==Math.round(F1*100)/100)return T[2]();
+  return mk("circ",F("אבן שמסתה {m} kg מסתובבת על חוט באורך {r} m במהירות {v} m/s. מהו המתח בחוט (הכוח הצנטריפטלי)?","حجر كتلته {m} kg يدور بخيط طوله {r} m بسرعة {v} m/s. ما الشدّ في الخيط (القوة المركزية)؟","Камень массой {m} kg вращается на нити длиной {r} m со скоростью {v} m/s. Чему равно натяжение нити (центростремительная сила)?","A {m} kg stone spins on a string of length {r} m at {v} m/s. What is the tension in the string (the centripetal force)?",{m:m,r:r,v:vv}),"",A(F1,"N"),D(F1,[m*vv,m*vv*vv,m*vv/r,F1*2],"N"),
+   F("הכוח הצנטריפטלי: F = m · v² ÷ r.","القوة المركزية: F = m · v² ÷ r.","Центростремительная сила: F = m · v² ÷ r.","Centripetal force: F = m · v² ÷ r."),
+   F("F = {m} · {v}² ÷ {r} = {f} N.","F = {m} · {v}² ÷ {r} = {f} N.","F = {m} · {v}² ÷ {r} = {f} N.","F = {m} · {v}² ÷ {r} = {f} N.",{m:m,v:vv,r:r,f:N(F1)}),2)});
+ T.push(function(){var k=pick([2,3,4]),ans=N(1/(k*k)),lab=F("{k}²","{k}²","{k}²","{k}²",{k:k});
+  return mk("circ",F("המרחק בין שני גופים מכפיל את עצמו פי {k}. כיצד משתנה כוח המשיכה ביניהם?","تزداد المسافة بين جسمين {k} مرات. كيف تتغير قوة الجذب بينهما؟","Расстояние между двумя телами увеличили в {k} раз. Как изменится сила притяжения между ними?","The distance between two bodies grows {k} times. How does the gravitational force between them change?",{k:k}),"",F("קטן פי {kk}","تقل {kk} مرة","уменьшится в {kk} раз","decreases {kk} times",{kk:k*k}),
+   [F("קטן פי {k}","تقل {k} مرات","уменьшится в {k} раз","decreases {k} times",{k:k}),F("גדל פי {k}","تزداد {k} مرات","увеличится в {k} раз","increases {k} times",{k:k}),F("גדל פי {kk}","تزداد {kk} مرة","увеличится в {kk} раз","increases {kk} times",{kk:k*k}),F("לא משתנה","لا تتغير","не изменится","does not change")],
+   F("חוק הכבידה: F = G·M·m ÷ r². הכוח הפוך לריבוע המרחק.","قانون الجذب: F = G·M·m ÷ r². القوة عكسية مع مربع المسافة.","Закон тяготения: F = G·M·m ÷ r². Сила обратно пропорциональна квадрату расстояния.","Law of gravitation: F = G·M·m ÷ r². The force is inversely proportional to the distance squared."),
+   F("המרחק גדל פי {k}, ולכן r² גדל פי {kk} והכוח קטן פי {kk}.","المسافة تزداد {k} مرات، فيزداد r² بمقدار {kk} مرة وتقل القوة {kk} مرة.","Расстояние выросло в {k} раз, значит r² выросло в {kk} раз, а сила уменьшилась в {kk} раз.","The distance grows {k} times, so r² grows {kk} times and the force falls {kk} times.",{k:k,kk:k*k}),3)});
+ T.push(function(){var g=pick([[2,"1/4"],[3,"1/9"]]),k=g[0],a=g[1];
+  return mk("circ",F("בגובה של רדיוס אחד של כדור הארץ מעל פני השטח (המרחק מהמרכז הוא פי 2 מהרדיוס), כמה מ-g שעל פני הקרקע יהיה שם?","على ارتفاع نصف قطر واحد للأرض فوق السطح (البعد عن المركز ضعف نصف القطر)، كم يكون من g على سطح الأرض؟","На высоте одного радиуса Земли над поверхностью (расстояние от центра вдвое больше радиуса) какая доля g у поверхности там будет?","At a height of one Earth radius above the surface (the distance from the center is twice the radius), what fraction of the surface g is found there?"),"","1/4",["1/2","1/8","2","1/16"],
+   F("g תלוי ב-1 ÷ r²: g = G·M ÷ r².","g يتعلق بـ 1 ÷ r²: g = G·M ÷ r².","g зависит от 1 ÷ r²: g = G·M ÷ r².","g depends on 1 ÷ r²: g = G·M ÷ r²."),
+   F("המרחק מהמרכז הוא 2R. 1 ÷ 2² = 1 ÷ 4, ולכן g קטן פי 4.","البعد عن المركز 2R. 1 ÷ 2² = 1 ÷ 4، فيقل g أربع مرات.","Расстояние от центра 2R. 1 ÷ 2² = 1 ÷ 4, значит g уменьшилось в 4 раза.","The distance from the center is 2R. 1 ÷ 2² = 1 ÷ 4, so g is 4 times smaller."),3)});
+ var pool=l===1?[T[0],T[1]]:(l===2?[T[1],T[2],T[0]]:[T[2],T[3],T[4]]);return pick(pool)()};
+
+G.circuit=function(l){var T=[];
+ T.push(function(){var I=pick([1,2,3,4,5]),R=pick([2,3,4,5,10]),V=I*R;
+  return wv(mk("circuit",F("נגד של {R} Ω מחובר למקור מתח. הזרם בנגד {I} A. מהו המתח על הנגד?","مقاومة {R} Ω موصولة بمصدر جهد. التيار فيها {I} A. ما الجهد على المقاومة؟","Резистор {R} Ω подключён к источнику. Ток через него {I} A. Каково напряжение на резисторе?","A {R} Ω resistor is connected to a source. The current through it is {I} A. What is the voltage across it?",{R:R,I:I}),"",A(V,"V"),D(V,[R+I,R/I,I/R,V*2],"V"),
+   F("חוק אוהם: V = I · R.","قانون أوم: V = I · R.","Закон Ома: V = I · R.","Ohm's law: V = I · R."),F("V = {I} · {R} = {V} V.","V = {I} · {R} = {V} V.","V = {I} · {R} = {V} V.","V = {I} · {R} = {V} V.",{I:I,R:R,V:V}),0),function(){return circVis("?",[R])})});
+ T.push(function(){var rs=[pick([2,3,4,5]),pick([2,3,4,6]),pick([1,3,5])],V=pick([12,24,30,36,60]),R=rs[0]+rs[1]+rs[2];
+  if(V%R!==0)V=R*pick([1,2,3,4]);var I=V/R;
+  return wv(mk("circuit",F("שלושה נגדים של {a} Ω, {b} Ω ו-{c} Ω מחוברים בטור למקור של {V} V. מהו הזרם במעגל?","ثلاث مقاومات {a} Ω و{b} Ω و{c} Ω موصولة على التوالي بمصدر {V} V. ما التيار في الدائرة؟","Три резистора {a} Ω, {b} Ω и {c} Ω соединены последовательно с источником {V} V. Каков ток в цепи?","Three resistors of {a} Ω, {b} Ω and {c} Ω are connected in series to a {V} V source. What is the current in the circuit?",{a:rs[0],b:rs[1],c:rs[2],V:V}),"",A(I,"A"),D(I,[V/rs[0],V/(rs[0]*rs[1]*rs[2]),V*R,I+R],"A"),
+   F("בחיבור בטור ההתנגדויות מצטברות. אחר כך אוהם: I = V ÷ R.","في التوصيل على التوالي تُجمع المقاومات. ثم أوم: I = V ÷ R.","При последовательном соединении сопротивления складываются. Затем закон Ома: I = V ÷ R.","In series the resistances add. Then Ohm's law: I = V ÷ R."),
+   F("R = {a} + {b} + {c} = {R} Ω. I = {V} ÷ {R} = {I} A.","R = {a} + {b} + {c} = {R} Ω. I = {V} ÷ {R} = {I} A.","R = {a} + {b} + {c} = {R} Ω. I = {V} ÷ {R} = {I} A.","R = {a} + {b} + {c} = {R} Ω. I = {V} ÷ {R} = {I} A.",{a:rs[0],b:rs[1],c:rs[2],R:R,V:V,I:I}),1),function(){return circVis(V,rs)})});
+ T.push(function(){var p=pick([[6,3,2],[12,4,3],[20,5,4],[30,15,10],[6,6,3],[10,10,5],[12,6,4],[4,12,3]]),a=p[0],b=p[1],R=p[2];
+  return wv(mk("circuit",F("שני נגדים של {a} Ω ו-{b} Ω מחוברים במקביל. מהי ההתנגדות השקולה?","مقاومتان {a} Ω و{b} Ω موصولتان على التوازي. ما المقاومة المكافئة؟","Два резистора {a} Ω и {b} Ω соединены параллельно. Каково эквивалентное сопротивление?","Two resistors of {a} Ω and {b} Ω are connected in parallel. What is the equivalent resistance?",{a:a,b:b}),"",A(R,"Ω"),D(R,[a+b,(a+b)/2,a*b,Math.min(a,b)*2],"Ω"),
+   F("בחיבור במקביל: 1 ÷ R = 1 ÷ R₁ + 1 ÷ R₂. ההתנגדות השקולה קטנה מכל נגד.","في التوصيل على التوازي: 1 ÷ R = 1 ÷ R₁ + 1 ÷ R₂. المقاومة المكافئة أصغر من كل مقاومة.","При параллельном соединении: 1 ÷ R = 1 ÷ R₁ + 1 ÷ R₂. Эквивалентное сопротивление меньше каждого.","In parallel: 1 ÷ R = 1 ÷ R₁ + 1 ÷ R₂. The equivalent resistance is smaller than each resistor."),
+   F("1 ÷ R = 1 ÷ {a} + 1 ÷ {b}, ולכן R = {a}·{b} ÷ ({a} + {b}) = {R} Ω.","1 ÷ R = 1 ÷ {a} + 1 ÷ {b}، إذن R = {a}·{b} ÷ ({a} + {b}) = {R} Ω.","1 ÷ R = 1 ÷ {a} + 1 ÷ {b}, значит R = {a}·{b} ÷ ({a} + {b}) = {R} Ω.","1 ÷ R = 1 ÷ {a} + 1 ÷ {b}, so R = {a}·{b} ÷ ({a} + {b}) = {R} Ω.",{a:a,b:b,R:R}),2),function(){return circVis("",[a,b],true)})});
+ T.push(function(){var V=pick([6,12,24,220]),I=pick([1,2,3,5]),P=V*I;
+  return mk("circuit",F("מכשיר חשמלי מחובר למתח {V} V והזרם בו {I} A. מהו ההספק החשמלי שלו?","جهاز كهربائي موصول بجهد {V} V والتيار فيه {I} A. ما استطاعته الكهربائية؟","Электроприбор подключён к напряжению {V} V, ток в нём {I} A. Какова его мощность?","An appliance is connected to {V} V and draws {I} A. What is its electric power?",{V:V,I:I}),"",A(P,"W"),D(P,[V+I,V/I,I/V,P*2],"W"),
+   F("הספק חשמלי: P = V · I.","الاستطاعة الكهربائية: P = V · I.","Электрическая мощность: P = V · I.","Electric power: P = V · I."),F("P = {V} · {I} = {P} W.","P = {V} · {I} = {P} W.","P = {V} · {I} = {P} W.","P = {V} · {I} = {P} W.",{V:V,I:I,P:P}),3)});
+ T.push(function(){var V=pick([12,24,30,60]),a=pick([2,3,4,6]),b=pick([2,3,6,12]),I1=V/a,I2=V/b,I=I1+I2;
+  return wv(mk("circuit",F("שני נגדים של {a} Ω ו-{b} Ω מחוברים במקביל למקור של {V} V. מהו הזרם הכולל שיוצא מהמקור?","مقاومتان {a} Ω و{b} Ω موصولتان على التوازي بمصدر {V} V. ما التيار الكلي الخارج من المصدر؟","Два резистора {a} Ω и {b} Ω подключены параллельно к источнику {V} V. Каков полный ток от источника?","Two resistors of {a} Ω and {b} Ω are connected in parallel to a {V} V source. What total current leaves the source?",{a:a,b:b,V:V}),"",A(I,"A"),D(I,[I1,I2,V/(a+b),V*(a+b)],"A"),
+   F("על כל נגד במקביל המתח זהה. מחשבים זרם בכל נגד, ואחר כך מחברים (חוק הצמתים של קירכהוף).","على كل مقاومة موصولة على التوازي نفس الجهد. نحسب تيار كل مقاومة ثم نجمع (قانون كيرشهوف للعقد).","На параллельных резисторах одинаковое напряжение. Считаем ток в каждом и складываем (правило узлов Кирхгофа).","Parallel resistors have the same voltage. Find each current, then add them (Kirchhoff's junction rule)."),
+   F("I₁ = {V} ÷ {a} = {I1} A, I₂ = {V} ÷ {b} = {I2} A. I = {I1} + {I2} = {I} A.","I₁ = {V} ÷ {a} = {I1} A، I₂ = {V} ÷ {b} = {I2} A. I = {I1} + {I2} = {I} A.","I₁ = {V} ÷ {a} = {I1} A, I₂ = {V} ÷ {b} = {I2} A. I = {I1} + {I2} = {I} A.","I₁ = {V} ÷ {a} = {I1} A, I₂ = {V} ÷ {b} = {I2} A. I = {I1} + {I2} = {I} A.",{V:V,a:a,b:b,I1:I1,I2:I2,I:I}),2),function(){return circVis(V,[a,b],true)})});
+ var pool=l===1?[T[0],T[3]]:(l===2?[T[1],T[2],T[3]]:[T[1],T[2],T[4]]);return pick(pool)()};
+
+G.field=function(l){var T=[];
+ T.push(function(){var F1=pick([4,6,8,12,20]),q=pick([2,4]),E=F1/q;
+  return mk("field",F("בנקודה מסוימת בשדה חשמלי פועל כוח {F} N על מטען של {q} C. מהו עוצמת השדה החשמלי שם?","في نقطة من مجال كهربائي تؤثر قوة {F} N على شحنة {q} C. ما شدة المجال الكهربائي هناك؟","В некоторой точке электрического поля на заряд {q} C действует сила {F} N. Какова напряжённость поля?","At a point in an electric field a force of {F} N acts on a charge of {q} C. What is the field strength there?",{F:F1,q:q}),"",A(E,"N/C"),D(E,[F1*q,F1+q,q/F1,E*2],"N/C"),
+   F("עוצמת שדה: E = F ÷ q.","شدة المجال: E = F ÷ q.","Напряжённость поля: E = F ÷ q.","Field strength: E = F ÷ q."),F("E = {F} ÷ {q} = {E} N/C.","E = {F} ÷ {q} = {E} N/C.","E = {F} ÷ {q} = {E} N/C.","E = {F} ÷ {q} = {E} N/C.",{F:F1,q:q,E:E}),0)});
+ T.push(function(){var V=pick([100,200,400,500]),d=pick([0.02,0.04,0.05,0.1]),E=V/d;
+  return mk("field",F("בין שני לוחות מקבילים יש הפרש פוטנציאלים {V} V והמרחק ביניהם {d} m. מהי עוצמת השדה האחיד ביניהם?","بين لوحين متوازيين فرق جهد {V} V والمسافة بينهما {d} m. ما شدة المجال المنتظم بينهما؟","Между двумя параллельными пластинами разность потенциалов {V} V, расстояние {d} m. Какова напряжённость однородного поля между ними?","Two parallel plates have a potential difference of {V} V and are {d} m apart. What is the strength of the uniform field between them?",{V:V,d:d}),"",A(E,"V/m"),D(E,[V*d,V+d,d/V,E/10],"V/m"),
+   F("בשדה אחיד: E = V ÷ d.","في مجال منتظم: E = V ÷ d.","В однородном поле: E = V ÷ d.","In a uniform field: E = V ÷ d."),F("E = {V} ÷ {d} = {E} V/m.","E = {V} ÷ {d} = {E} V/m.","E = {V} ÷ {d} = {E} V/m.","E = {V} ÷ {d} = {E} V/m.",{V:V,d:d,E:E}),1)});
+ T.push(function(){var q=pick([2,4,5,10]),V=pick([10,20,50,100]),W=q*V;
+  return mk("field",F("מטען של {q} μC עובר בין שתי נקודות שההפרש ביניהן {V} V. מהי העבודה של השדה החשמלי? (תשובה במיקרו־ג׳אול)","شحنة {q} μC تنتقل بين نقطتين فرق الجهد بينهما {V} V. ما شغل المجال الكهربائي؟ (الجواب بالميكروجول)","Заряд {q} μC перемещается между двумя точками с разностью потенциалов {V} V. Какую работу совершает поле? (ответ в микроджоулях)","A charge of {q} μC moves between two points {V} V apart. How much work does the electric field do? (answer in microjoules)",{q:q,V:V}),"",A(W,"μJ"),D(W,[q+V,V/q,q/V,W*2],"μJ"),
+   F("עבודה בשדה חשמלי: W = q · V.","الشغل في المجال الكهربائي: W = q · V.","Работа в электрическом поле: W = q · V.","Work in an electric field: W = q · V."),F("W = {q} · {V} = {W} μJ.","W = {q} · {V} = {W} μJ.","W = {q} · {V} = {W} μJ.","W = {q} · {V} = {W} μJ.",{q:q,V:V,W:W}),2)});
+ T.push(function(){var n=pick([1,2,4]),r=pick([1,3]),E=9000*n/(r*r);
+  return mk("field",F("מטען נקודתי של {n} μC יוצר שדה. מהי עוצמת השדה במרחק {r} m ממנו? (k = 9·10⁹ N·m²/C²)","شحنة نقطية {n} μC تولّد مجالًا. ما شدة المجال على بعد {r} m منها؟ (k = 9·10⁹ N·m²/C²)","Точечный заряд {n} μC создаёт поле. Какова напряжённость на расстоянии {r} m? (k = 9·10⁹ N·m²/C²)","A point charge of {n} μC creates a field. What is the field strength {r} m away? (k = 9·10⁹ N·m²/C²)",{n:n,r:r}),"",A(E,"N/C"),D(E,[E*r,E*r*r,9000*n*r,E/10],"N/C"),
+   F("שדה של מטען נקודתי: E = k·Q ÷ r². המטען במיקרו־קולון: 1 μC = 10⁻⁶ C.","مجال شحنة نقطية: E = k·Q ÷ r². الشحنة بالميكروكولوم: 1 μC = 10⁻⁶ C.","Поле точечного заряда: E = k·Q ÷ r². Заряд в микрокулонах: 1 μC = 10⁻⁶ C.","Field of a point charge: E = k·Q ÷ r². The charge is in microcoulombs: 1 μC = 10⁻⁶ C."),
+   F("E = 9·10⁹ · {n}·10⁻⁶ ÷ {r}² = 9000 · {n} ÷ {rr} = {E} N/C.","E = 9·10⁹ · {n}·10⁻⁶ ÷ {r}² = 9000 · {n} ÷ {rr} = {E} N/C.","E = 9·10⁹ · {n}·10⁻⁶ ÷ {r}² = 9000 · {n} ÷ {rr} = {E} N/C.","E = 9·10⁹ · {n}·10⁻⁶ ÷ {r}² = 9000 · {n} ÷ {rr} = {E} N/C.",{n:n,r:r,rr:r*r,E:E}),3)});
+ T.push(function(){var k=pick([2,3]);return mk("field",F("מטען נקודתי יוצר שדה. מה יקרה לעוצמת השדה אם נתרחק מהמטען פי {k}?","شحنة نقطية تولّد مجالًا. ماذا يحدث لشدة المجال إذا ابتعدنا عن الشحنة {k} مرات؟","Точечный заряд создаёт поле. Что будет с напряжённостью, если отойти от заряда в {k} раз дальше?","A point charge creates a field. What happens to the field strength if we move {k} times farther from the charge?",{k:k}),"",F("קטנה פי {kk}","تقل {kk} مرة","уменьшится в {kk} раз","falls {kk} times",{kk:k*k}),
+   [F("קטנה פי {k}","تقل {k} مرات","уменьшится в {k} раз","falls {k} times",{k:k}),F("גדלה פי {kk}","تزداد {kk} مرة","увеличится в {kk} раз","grows {kk} times",{kk:k*k}),F("לא משתנה","لا تتغير","не изменится","does not change"),F("גדלה פי {k}","تزداد {k} مرات","увеличится в {k} раз","grows {k} times",{k:k})],
+   F("E = k·Q ÷ r². העוצמה הפוכה לריבוע המרחק.","E = k·Q ÷ r². الشدة عكسية مع مربع المسافة.","E = k·Q ÷ r². Напряжённость обратна квадрату расстояния.","E = k·Q ÷ r². The strength is inversely proportional to distance squared."),
+   F("המרחק גדל פי {k}, לכן r² גדל פי {kk} והשדה קטן פי {kk}.","المسافة تزداد {k} مرات، فيزداد r² {kk} مرة ويقل المجال {kk} مرة.","Расстояние выросло в {k} раз, r² — в {kk} раз, поле уменьшилось в {kk} раз.","The distance grows {k} times, r² grows {kk} times, and the field falls {kk} times.",{k:k,kk:k*k}),3)});
+ var pool=l===1?[T[0],T[1]]:(l===2?[T[1],T[2],T[0]]:[T[3],T[4],T[2]]);return pick(pool)()};
+
+G.magnet=function(l){var T=[];
+ T.push(function(){var B=pick([0.1,0.2,0.5]),I=pick([2,4,5,10]),Ln=pick([0.5,1,2]),Fm=B*I*Ln;
+  return mk("magnet",F("תיל באורך {L} m נושא זרם {I} A בניצב לשדה מגנטי של {B} T. מהו הכוח על התיל?","سلك طوله {L} m يحمل تيارًا {I} A عموديًا على مجال مغناطيسي {B} T. ما القوة المؤثرة على السلك؟","Провод длиной {L} m с током {I} A перпендикулярен магнитному полю {B} T. Какая сила действует на провод?","A {L} m wire carries {I} A perpendicular to a {B} T magnetic field. What is the force on the wire?",{L:Ln,I:I,B:B}),"",A(Fm,"N"),D(Fm,[B*I,I*Ln,B*Ln,Fm*10],"N"),
+   F("כוח על תיל נושא זרם: F = B · I · L (כשהתיל ניצב לשדה).","القوة على سلك يحمل تيارًا: F = B · I · L (عندما يكون السلك عموديًا على المجال).","Сила на проводник с током: F = B · I · L (когда проводник перпендикулярен полю).","Force on a current-carrying wire: F = B · I · L (when the wire is perpendicular to the field)."),
+   F("F = {B} · {I} · {L} = {F} N.","F = {B} · {I} · {L} = {F} N.","F = {B} · {I} · {L} = {F} N.","F = {B} · {I} · {L} = {F} N.",{B:B,I:I,L:Ln,F:N(Fm)}),0)});
+ T.push(function(){var B=pick([0.2,0.5,1,2]),Ln=pick([0.5,1,2]),v=pick([2,5,10]),e=B*Ln*v;
+  return mk("magnet",F("מוט מוליך באורך {L} m נע במהירות {v} m/s בניצב לשדה מגנטי של {B} T. מהו המתח המושרה בין קצותיו?","ساق موصلة طولها {L} m تتحرك بسرعة {v} m/s عموديًا على مجال مغناطيسي {B} T. ما القوة الدافعة الكهربائية المحتثة بين طرفيها؟","Проводящий стержень длиной {L} m движется со скоростью {v} m/s перпендикулярно магнитному полю {B} T. Какая ЭДС индукции на его концах?","A conducting rod {L} m long moves at {v} m/s perpendicular to a {B} T magnetic field. What emf is induced between its ends?",{L:Ln,v:v,B:B}),"",A(e,"V"),D(e,[B*Ln,B*v,Ln*v,e*10],"V"),
+   F("מתח מושרה בתנועה בשדה: ε = B · L · v.","القوة الدافعة المحتثة عند الحركة في مجال: ε = B · L · v.","ЭДС при движении в поле: ε = B · L · v.","Motional emf: ε = B · L · v."),
+   F("ε = {B} · {L} · {v} = {e} V.","ε = {B} · {L} · {v} = {e} V.","ε = {B} · {L} · {v} = {e} V.","ε = {B} · {L} · {v} = {e} V.",{B:B,L:Ln,v:v,e:N(e)}),2)});
+ T.push(function(){var dphi=pick([0.2,0.4,0.6,1,2]),t=pick([0.1,0.2,0.5,2]),e=dphi/t;
+  return mk("magnet",F("השטף המגנטי דרך סליל משתנה ב-{d} Wb בתוך {t} שניות. מהו המתח המושרה (סליל בעל ליפוף אחד)?","يتغير التدفق المغناطيسي عبر ملف بمقدار {d} Wb خلال {t} ثانية. ما القوة الدافعة المحتثة (ملف بلفة واحدة)؟","Магнитный поток через катушку меняется на {d} Wb за {t} с. Какова ЭДС индукции (один виток)?","The magnetic flux through a coil changes by {d} Wb in {t} seconds. What emf is induced (a single turn)?",{d:dphi,t:t}),"",A(e,"V"),D(e,[dphi*t,dphi+t,t/dphi,e*2],"V"),
+   F("חוק פרדיי: ε = ΔΦ ÷ Δt.","قانون فاراداي: ε = ΔΦ ÷ Δt.","Закон Фарадея: ε = ΔΦ ÷ Δt.","Faraday's law: ε = ΔΦ ÷ Δt."),F("ε = {d} ÷ {t} = {e} V.","ε = {d} ÷ {t} = {e} V.","ε = {d} ÷ {t} = {e} V.","ε = {d} ÷ {t} = {e} V.",{d:dphi,t:t,e:N(e)}),2)});
+ T.push(function(){var k=pick([2,3,4]);return mk("magnet",F("כוח מגנטי על תיל נושא זרם הוא F. מה יהיה הכוח אם הזרם יגדל פי {k} והשדה יישאר זהה?","القوة المغناطيسية على سلك يحمل تيارًا هي F. ماذا تصبح إذا زاد التيار {k} مرات وبقي المجال نفسه؟","Магнитная сила на проводник с током равна F. Какой станет сила, если ток увеличить в {k} раз при том же поле?","The magnetic force on a current-carrying wire is F. What will it be if the current grows {k} times and the field stays the same?",{k:k}),"",F("פי {k}","{k} مرات أكبر","в {k} раз больше","{k} times bigger",{k:k}),
+   [F("פי {kk}","{kk} مرة أكبر","в {kk} раз больше","{kk} times bigger",{kk:k*k}),F("פי {k} קטן","أصغر {k} مرات","в {k} раз меньше","{k} times smaller",{k:k}),F("לא משתנה","لا تتغير","не изменится","does not change"),F("אפס","صفر","ноль","zero")],
+   F("F = B·I·L: הכוח יחסי ישר לזרם.","F = B·I·L: القوة طردية مع التيار.","F = B·I·L: сила пропорциональна току.","F = B·I·L: the force is proportional to the current."),
+   F("הזרם גדל פי {k}, ולכן גם הכוח גדל פי {k}.","التيار يزداد {k} مرات، فتزداد القوة {k} مرات.","Ток вырос в {k} раз, значит и сила выросла в {k} раз.","The current grows {k} times, so the force grows {k} times.",{k:k}),0)});
+ T.push(function(){return mk("magnet",F("חלקיק טעון נע בכיוון מקביל לקווי שדה מגנטי. מהו הכוח המגנטי עליו?","جسيم مشحون يتحرك موازيًا لخطوط مجال مغناطيسي. ما القوة المغناطيسية عليه؟","Заряженная частица движется параллельно линиям магнитного поля. Какова магнитная сила на неё?","A charged particle moves parallel to magnetic field lines. What is the magnetic force on it?"),"",F("אפס","صفر","ноль","zero"),
+   [F("מקסימלי","أعظمية","максимальна","maximum"),F("חצי מהמקסימום","نصف الأعظمية","половина максимальной","half of the maximum"),F("תלוי רק במסה","تعتمد على الكتلة فقط","зависит только от массы","depends only on the mass")],
+   F("F = q · v · B · sin θ. הזווית בין המהירות לשדה חשובה.","F = q · v · B · sin θ. الزاوية بين السرعة والمجال مهمة.","F = q · v · B · sin θ. Важен угол между скоростью и полем.","F = q · v · B · sin θ. The angle between velocity and field matters."),
+   F("במקביל θ = 0°, ו-sin 0° = 0. לכן הכוח אפס.","عند التوازي θ = 0° و sin 0° = 0. إذن القوة صفر.","При параллельном движении θ = 0°, sin 0° = 0. Значит сила равна нулю.","For parallel motion θ = 0° and sin 0° = 0. So the force is zero."),0)});
+ var pool=l===1?[T[0],T[3]]:(l===2?[T[0],T[1],T[4]]:[T[1],T[2],T[4]]);return pick(pool)()};
+
+G.wave=function(l){var T=[];
+ T.push(function(){var f=pick([2,5,10,50,100]),lam=pick([2,3,4,5]),v=f*lam;
+  return wv(mk("wave",F("גל באורך {lam} m ובתדירות {f} Hz. מהי מהירות הגל?","موجة طولها الموجي {lam} m وترددها {f} Hz. ما سرعة الموجة؟","Волна с длиной {lam} m и частотой {f} Hz. Какова скорость волны?","A wave has wavelength {lam} m and frequency {f} Hz. What is its speed?",{lam:lam,f:f}),"",A(v,"m/s"),D(v,[f+lam,f/lam,lam/f,v*2],"m/s"),
+   F("מהירות גל: v = λ · f.","سرعة الموجة: v = λ · f.","Скорость волны: v = λ · f.","Wave speed: v = λ · f."),F("v = {lam} · {f} = {v} m/s.","v = {lam} · {f} = {v} m/s.","v = {lam} · {f} = {v} m/s.","v = {lam} · {f} = {v} m/s.",{lam:lam,f:f,v:v}),0),function(){return waveVis(lam,"m")})});
+ T.push(function(){var f=pick([2,4,5,10,20,25,50]),Tp=1/f;
+  return mk("wave",F("תדירות של גל היא {f} Hz. מהו זמן המחזור שלו?","تردد موجة {f} Hz. ما زمن دورتها؟","Частота волны {f} Hz. Каков её период?","A wave has frequency {f} Hz. What is its period?",{f:f}),"",A(Tp,"s"),D(Tp,[f,f/2,2/f,Tp*10],"s"),
+   F("T = 1 ÷ f.","T = 1 ÷ f.","T = 1 ÷ f.","T = 1 ÷ f."),F("T = 1 ÷ {f} = {T} s.","T = 1 ÷ {f} = {T} s.","T = 1 ÷ {f} = {T} s.","T = 1 ÷ {f} = {T} s.",{f:f,T:Tp}),0)});
+ T.push(function(){var p=pick([[2,1.5],[1.5,2]]);var v=pick([[2e8,"2·10⁸",1.5],[1.5e8,"1.5·10⁸",2],[1e8,"10⁸",3]]);
+  return mk("wave",F("מהירות האור בחומר שקוף היא {v} m/s. מהו מקדם השבירה שלו? (מהירות האור בריק: 3·10⁸ m/s)","سرعة الضوء في مادة شفافة {v} m/s. ما معامل انكسارها؟ (سرعة الضوء في الفراغ: 3·10⁸ m/s)","Скорость света в прозрачном веществе {v} m/s. Каков показатель преломления? (скорость света в вакууме: 3·10⁸ m/s)","The speed of light in a transparent material is {v} m/s. What is its refractive index? (speed of light in vacuum: 3·10⁸ m/s)",{v:v[1]}),"",N(v[2]),D(v[2],[1/v[2],v[2]+1,v[2]*2,v[2]/2],""),
+   F("מקדם שבירה: n = c ÷ v.","معامل الانكسار: n = c ÷ v.","Показатель преломления: n = c ÷ v.","Refractive index: n = c ÷ v."),F("n = 3·10⁸ ÷ {v} = {n}.","n = 3·10⁸ ÷ {v} = {n}.","n = 3·10⁸ ÷ {v} = {n}.","n = 3·10⁸ ÷ {v} = {n}.",{v:v[1],n:N(v[2])}),2)});
+ T.push(function(){var p=pick([[10,15,30],[10,30,15],[10,20,20],[10,12,60],[6,9,18],[6,18,9],[12,24,24],[12,18,36],[8,12,24],[20,30,60]]),f=p[0],u=p[1],v=p[2];
+  return mk("wave",F("עצם נמצא במרחק {u} cm מעדשה מרכזת שמרחקה המוקדי {f} cm. באיזה מרחק מהעדשה נוצרת הדמות?","جسم على بعد {u} cm من عدسة لامّة بعدها البؤري {f} cm. على أي بعد من العدسة تتكوّن الصورة؟","Предмет находится на расстоянии {u} cm от собирающей линзы с фокусным расстоянием {f} cm. На каком расстоянии от линзы получится изображение?","An object is {u} cm from a converging lens with focal length {f} cm. How far from the lens does the image form?",{u:u,f:f}),"",A(v,"cm"),D(v,[f+u,u-f,u*f,(u+f)/2],"cm"),
+   F("משוואת העדשה: 1 ÷ f = 1 ÷ u + 1 ÷ v.","معادلة العدسة: 1 ÷ f = 1 ÷ u + 1 ÷ v.","Формула линзы: 1 ÷ f = 1 ÷ u + 1 ÷ v.","The lens equation: 1 ÷ f = 1 ÷ u + 1 ÷ v."),
+   F("1 ÷ v = 1 ÷ {f} − 1 ÷ {u}, ולכן v = {v} cm.","1 ÷ v = 1 ÷ {f} − 1 ÷ {u}، إذن v = {v} cm.","1 ÷ v = 1 ÷ {f} − 1 ÷ {u}, значит v = {v} cm.","1 ÷ v = 1 ÷ {f} − 1 ÷ {u}, so v = {v} cm.",{f:f,u:u,v:v}),3)});
+ T.push(function(){var a=pick([20,30,40,50,60]);return mk("wave",F("קרן אור פוגעת במראה שטוחה בזווית פגיעה של {a}° (הזווית נמדדת מהניצב). מהי זווית ההחזרה?","يسقط شعاع ضوء على مرآة مستوية بزاوية سقوط {a}° (تقاس من العمود). ما زاوية الانعكاس؟","Луч света падает на плоское зеркало под углом падения {a}° (угол от нормали). Каков угол отражения?","A light ray hits a flat mirror at an angle of incidence of {a}° (measured from the normal). What is the angle of reflection?",{a:a}),"",A(a,"°").replace(" °","°"),D(a,[90-a,2*a,180-a,a/2],"°").map(function(x){return x.replace(" °","°")}),
+   F("חוק ההחזרה: זווית הפגיעה שווה לזווית ההחזרה, ושתיהן נמדדות מהניצב.","قانون الانعكاس: زاوية السقوط تساوي زاوية الانعكاس، وكلتاهما تقاسان من العمود.","Закон отражения: угол падения равен углу отражения, оба от нормали.","Law of reflection: the angle of incidence equals the angle of reflection, both from the normal."),
+   F("זווית ההחזרה שווה לזווית הפגיעה: {a}°.","زاوية الانعكاس تساوي زاوية السقوط: {a}°.","Угол отражения равен углу падения: {a}°.","The angle of reflection equals the angle of incidence: {a}°.",{a:a}),0)});
+ T.push(function(){var f=pick([[3e8,"3·10⁸",5e14,"5·10¹⁴"]]);var p=pick([[600,"600"],[500,"500"],[400,"400"]]),f14=3e8/(p[0]*1e-9)/1e14;
+  return mk("wave",F("אורך הגל של אור הוא {p} nm. מהי התדירות שלו? (c = 3·10⁸ m/s)","الطول الموجي لضوء {p} nm. ما تردده؟ (c = 3·10⁸ m/s)","Длина волны света {p} nm. Какова его частота? (c = 3·10⁸ m/s)","The wavelength of light is {p} nm. What is its frequency? (c = 3·10⁸ m/s)",{p:p[1]}),"",N(f14)+"·10¹⁴ Hz",
+   [N(f14*10)+"·10¹⁴ Hz",N(f14/10)+"·10¹⁴ Hz",N(f14*2)+"·10¹⁴ Hz"],
+   F("c = λ · f, לכן f = c ÷ λ. מקדם היחידות: 1 nm = 10⁻⁹ m.","c = λ · f، إذن f = c ÷ λ. 1 nm = 10⁻⁹ m.","c = λ · f, значит f = c ÷ λ. 1 nm = 10⁻⁹ m.","c = λ · f, so f = c ÷ λ. 1 nm = 10⁻⁹ m."),
+   F("f = 3·10⁸ ÷ ({p}·10⁻⁹) = {f}·10¹⁴ Hz.","f = 3·10⁸ ÷ ({p}·10⁻⁹) = {f}·10¹⁴ Hz.","f = 3·10⁸ ÷ ({p}·10⁻⁹) = {f}·10¹⁴ Hz.","f = 3·10⁸ ÷ ({p}·10⁻⁹) = {f}·10¹⁴ Hz.",{p:p[1],f:N(f14)}),3)});
+ var pool=l===1?[T[0],T[1],T[4]]:(l===2?[T[0],T[2],T[4],T[1]]:[T[3],T[2],T[5]]);return pick(pool)()};
+
+G.quantum=function(l){var T=[];
+ T.push(function(){var p=pick([[1240,1],[620,2],[310,4],[248,5],[155,8],[124,10]]);
+  return mk("quantum",F("אורך הגל של פוטון הוא {w} nm. מהי האנרגיה שלו באלקטרון־וולט, לפי E = 1240 ÷ λ עם λ בננומטר?","الطول الموجي لفوتون {w} nm. ما طاقته بالإلكترون فولت؟ (λ بالنانومتر، E = 1240 ÷ λ)","Длина волны фотона {w} nm. Какова его энергия в электрон-вольтах? (E = 1240 ÷ λ, λ в nm)","A photon has a wavelength of {w} nm. What is its energy in electron-volts? (E = 1240 ÷ λ, with λ in nm)",{w:p[0]}),"",A(p[1],"eV"),D(p[1],[p[0]/100,p[1]*10,p[1]/2,p[0]],"eV"),
+   F("אנרגיית פוטון: E = h·f = h·c ÷ λ. בנוחות: E(eV) = 1240 ÷ λ(nm).","طاقة الفوتون: E = h·f = h·c ÷ λ. بالتبسيط: E(eV) = 1240 ÷ λ(nm).","Энергия фотона: E = h·f = h·c ÷ λ. Удобно: E(eV) = 1240 ÷ λ(nm).","Photon energy: E = h·f = h·c ÷ λ. Handy form: E(eV) = 1240 ÷ λ(nm)."),
+   F("E = 1240 ÷ {w} = {e} eV.","E = 1240 ÷ {w} = {e} eV.","E = 1240 ÷ {w} = {e} eV.","E = 1240 ÷ {w} = {e} eV.",{w:p[0],e:p[1]}),0)});
+ T.push(function(){var Eph=pick([4,5,6,8]),Wf=pick([2,3,4]),Ek=Eph-Wf;if(Ek<=0)return T[1]();
+  return mk("quantum",F("פוטון באנרגיה {E} eV פוגע במתכת שפונקציית העבודה שלה {W} eV. מהי האנרגיה הקינטית המרבית של אלקטרון שנפלט?","فوتون طاقته {E} eV يسقط على فلز دالة الشغل فيه {W} eV. ما أعظم طاقة حركية لإلكترون ينبعث؟","Фотон с энергией {E} eV падает на металл с работой выхода {W} eV. Какова максимальная кинетическая энергия вылетевшего электрона?","A photon of energy {E} eV hits a metal whose work function is {W} eV. What is the maximum kinetic energy of an emitted electron?",{E:Eph,W:Wf}),"",A(Ek,"eV"),D(Ek,[Eph+Wf,Eph,Wf,Eph*Wf],"eV"),
+   F("האפקט הפוטואלקטרי: Ek = hf − W. האנרגיה העודפת הופכת לתנועה.","الظاهرة الكهروضوئية: Ek = hf − W. الطاقة الزائدة تتحول إلى حركة.","Фотоэффект: Ek = hf − W. Избыток энергии идёт в движение.","The photoelectric effect: Ek = hf − W. The extra energy becomes motion."),
+   F("Ek = {E} − {W} = {k} eV.","Ek = {E} − {W} = {k} eV.","Ek = {E} − {W} = {k} eV.","Ek = {E} − {W} = {k} eV.",{E:Eph,W:Wf,k:Ek}),1)});
+ T.push(function(){var Eph=pick([1,2,3]),Wf=pick([4,5,6]);return mk("quantum",F("פוטון באנרגיה {E} eV פוגע במתכת שפונקציית העבודה שלה {W} eV. האם ייפלטו אלקטרונים?","فوتون طاقته {E} eV يسقط على فلز دالة الشغل فيه {W} eV. هل ستنبعث إلكترونات؟","Фотон с энергией {E} eV падает на металл с работой выхода {W} eV. Вылетят ли электроны?","A photon of energy {E} eV hits a metal with work function {W} eV. Will electrons be emitted?",{E:Eph,W:Wf}),"",F("לא, האנרגיה קטנה מפונקציית העבודה","لا، الطاقة أقل من دالة الشغل","нет, энергия меньше работы выхода","No, the energy is below the work function"),
+   [F("כן, אם נגדיל את עוצמת האור","نعم، إذا زدنا شدة الضوء","да, если увеличить яркость света","Yes, if we increase the light intensity"),F("כן, תמיד","نعم، دائمًا","да, всегда","Yes, always"),F("תלוי רק בזמן ההארה","يعتمد على زمن الإضاءة فقط","зависит только от времени освещения","It depends only on the exposure time")],
+   F("פוטון בודד נותן את כל האנרגיה שלו לאלקטרון אחד. צריך hf ≥ W.","الفوتون الواحد يعطي كل طاقته لإلكترون واحد. يلزم hf ≥ W.","Один фотон отдаёт всю энергию одному электрону. Нужно hf ≥ W.","One photon gives all its energy to one electron. We need hf ≥ W."),
+   F("{E} < {W}, ולכן אין פליטה. הגדלת העוצמה מוסיפה פוטונים, לא אנרגיה לכל פוטון.","{E} < {W}، فلا انبعاث. زيادة الشدة تضيف فوتونات لا طاقة لكل فوتون.","{E} < {W}, значит эмиссии нет. Яркость добавляет фотоны, а не энергию каждому.","{E} < {W}, so there is no emission. More intensity adds photons, not energy per photon.",{E:Eph,W:Wf}),1)});
+ T.push(function(){var n=pick([1,2,3,4]),E={1:"−13.6",2:"−3.4",3:"−1.51",4:"−0.85"}[n];
+  return mk("quantum",F("במודל בוהר לאטום המימן E = −13.6 ÷ n². מהי האנרגיה של האטום ברמה n = {n} באלקטרון־וולט?","وفق نموذج بور لذرة الهيدروجين، ما الطاقة في المستوى n = {n}؟ (بالإلكترون فولت، E = −13.6 ÷ n²)","По модели Бора для атома водорода, какова энергия на уровне n = {n}? (E = −13.6 ÷ n², в eV)","In the Bohr model of hydrogen, what is the energy at level n = {n}? (E = −13.6 ÷ n², in eV)",{n:n}),"",E+" eV",
+   ["−13.6 eV","−3.4 eV","−1.51 eV","−0.85 eV","−6.8 eV","−27.2 eV"].filter(function(x){return x!==E+" eV"}),
+   F("הרמות מכומתות: E = −13.6 ÷ n². n = 1 היא רמת היסוד.","المستويات مكمّاة: E = −13.6 ÷ n². n = 1 هو المستوى الأساسي.","Уровни квантованы: E = −13.6 ÷ n². n = 1 — основное состояние.","Levels are quantized: E = −13.6 ÷ n². n = 1 is the ground state."),
+   F("E = −13.6 ÷ {n}² = {E} eV.","E = −13.6 ÷ {n}² = {E} eV.","E = −13.6 ÷ {n}² = {E} eV.","E = −13.6 ÷ {n}² = {E} eV.",{n:n,E:E}),2)});
+ T.push(function(){var p=pick([[2,1,"10.2"],[3,2,"1.89"],[4,2,"2.55"]]);var all=["10.2","1.89","2.55","12.1","13.6","3.4"].filter(function(x){return x!==p[2]});
+  return mk("quantum",F("אלקטרון באטום מימן עובר מרמה n = {a} לרמה n = {b}. מהי האנרגיה של הפוטון שנפלט, ב-eV? (E = −13.6 ÷ n²)","ينتقل إلكترون في ذرة هيدروجين من المستوى n = {a} إلى n = {b}. ما طاقة الفوتون المنبعث بالإلكترون فولت؟ (E = −13.6 ÷ n²)","Электрон в атоме водорода переходит с уровня n = {a} на n = {b}. Какова энергия испущенного фотона в eV? (E = −13.6 ÷ n²)","An electron in hydrogen drops from level n = {a} to n = {b}. What is the energy of the emitted photon, in eV? (E = −13.6 ÷ n²)",{a:p[0],b:p[1]}),"",p[2]+" eV",all.slice(0,3).map(function(x){return x+" eV"}),
+   F("הפוטון נושא את הפרש האנרגיות בין שתי הרמות.","الفوتون يحمل فرق الطاقة بين المستويين.","Фотон уносит разность энергий между двумя уровнями.","The photon carries the energy difference between the two levels."),
+   F("ΔE = E({a}) − E({b}), ולכן האנרגיה היא {e} eV.","ΔE = E({a}) − E({b})، إذن الطاقة {e} eV.","ΔE = E({a}) − E({b}), значит энергия {e} eV.","ΔE = E({a}) − E({b}), so the energy is {e} eV.",{a:p[0],b:p[1],e:p[2]}),2)});
+ T.push(function(){var k=pick([1,2,3,4]),T1=pick([2,5,10,30]),t=k*T1,N0=pick([80,160,320]),Nn=N0/Math.pow(2,k);
+  return mk("quantum",F("זמן מחצית החיים של חומר רדיואקטיבי הוא {T} ימים. בהתחלה יש {N0} גרם. כמה גרם נשארים אחרי {t} ימים?","عمر النصف لمادة مشعة {T} أيام. في البداية {N0} غرام. كم غرامًا يبقى بعد {t} أيام؟","Период полураспада радиоактивного вещества {T} дней. Вначале {N0} g. Сколько граммов останется через {t} дней?","A radioactive material has a half-life of {T} days. At first there are {N0} g. How many grams remain after {t} days?",{T:T1,N0:N0,t:t}),"",A(Nn,"g"),D(Nn,[N0/k,N0-t,N0/(2*k),Nn*2],"g"),
+   F("בכל זמן מחצית חיים הכמות קטנה בחצי: N = N₀ ÷ 2ⁿ.","في كل عمر نصف تقل الكمية إلى النصف: N = N₀ ÷ 2ⁿ.","За каждый период полураспада количество уменьшается вдвое: N = N₀ ÷ 2ⁿ.","Every half-life halves the amount: N = N₀ ÷ 2ⁿ."),
+   F("עברו {k} זמני מחצית חיים ({t} ÷ {T}). N = {N0} ÷ 2^{k} = {n} g.","مرّ {k} من عمر النصف ({t} ÷ {T}). N = {N0} ÷ 2^{k} = {n} g.","Прошло {k} периодов ({t} ÷ {T}). N = {N0} ÷ 2^{k} = {n} g.","{k} half-lives have passed ({t} ÷ {T}). N = {N0} ÷ 2^{k} = {n} g.",{k:k,t:t,T:T1,N0:N0,n:Nn}),3)});
+ var pool=l===1?[T[0],T[3]]:(l===2?[T[0],T[1],T[2],T[3]]:[T[4],T[5],T[1],T[2]]);return pick(pool)()};
+
+var UNITS=[
+ {id:"kin",c:"#2f7fd8",n:L("קינמטיקה","الكينماتيكا (وصف الحركة)","Кинематика","Kinematics"),d:L("מהירות, תאוצה, גרפים ונפילה חופשית","السرعة والتسارع والرسوم البيانية والسقوط الحر","Скорость, ускорение, графики и свободное падение","Speed, acceleration, graphs and free fall")},
+ {id:"newton",c:"#e8453c",n:L("חוקי ניוטון","قوانين نيوتن","Законы Ньютона","Newton's laws"),d:L("כוח שקול, מסה ותאוצה, משקל ומישור משופע","القوة المحصلة والكتلة والتسارع والوزن والمستوى المائل","Равнодействующая, масса, ускорение, вес, наклонная плоскость","Net force, mass, acceleration, weight and inclines")},
+ {id:"energy",c:"#f58a1f",n:L("עבודה ואנרגיה","الشغل والطاقة","Работа и энергия","Work and energy"),d:L("עבודה, אנרגיה קינטית ופוטנציאלית, הספק","الشغل والطاقة الحركية وطاقة الوضع والاستطاعة","Работа, кинетическая и потенциальная энергия, мощность","Work, kinetic and potential energy, power")},
+ {id:"mom",c:"#8a63d2",n:L("תנע","الزخم (كمية الحركة)","Импульс","Momentum"),d:L("תנע, מתקף והתנגשויות","الزخم والدفع والتصادمات","Импульс, импульс силы и столкновения","Momentum, impulse and collisions")},
+ {id:"circ",c:"#0e9c8d",n:L("תנועה מעגלית וגרביטציה","الحركة الدائرية والجاذبية","Движение по окружности и тяготение","Circular motion and gravity"),d:L("מחזור ותדירות, תאוצה צנטריפטלית, כבידה","الدورة والتردد والتسارع المركزي والجاذبية","Период, частота, центростремительное ускорение, тяготение","Period, frequency, centripetal acceleration, gravitation")},
+ {id:"circuit",c:"#2eaa5b",n:L("מעגלים חשמליים","الدوائر الكهربائية","Электрические цепи","Electric circuits"),d:L("אוהם, חיבור בטור ובמקביל, הספק, קירכהוף","أوم والتوصيل على التوالي والتوازي والاستطاعة وكيرشهوف","Закон Ома, последовательное и параллельное соединение, мощность","Ohm's law, series and parallel, power, Kirchhoff")},
+ {id:"field",c:"#d9a400",n:L("שדה ופוטנציאל חשמלי","المجال والجهد الكهربائي","Электрическое поле и потенциал","Electric field and potential"),d:L("עוצמת שדה, מתח, עבודה ומטען נקודתי","شدة المجال والجهد والشغل والشحنة النقطية","Напряжённость, напряжение, работа и точечный заряд","Field strength, voltage, work and point charges")},
+ {id:"magnet",c:"#c0392b",n:L("מגנטיות והשראה","المغناطيسية والحث","Магнетизм и индукция","Magnetism and induction"),d:L("כוח על תיל, תנועה בשדה, חוק פרדיי","القوة على سلك والحركة في مجال وقانون فاراداي","Сила на проводник, движение в поле, закон Фарадея","Force on a wire, motion in a field, Faraday's law")},
+ {id:"wave",c:"#3b82c4",n:L("גלים ואופטיקה","الموجات والبصريات","Волны и оптика","Waves and optics"),d:L("אורך גל, תדירות, החזרה, שבירה ועדשות","الطول الموجي والتردد والانعكاس والانكسار والعدسات","Длина волны, частота, отражение, преломление, линзы","Wavelength, frequency, reflection, refraction and lenses")},
+ {id:"quantum",c:"#6a45b0",n:L("קרינה וחומר","الإشعاع والمادة","Излучение и вещество","Radiation and matter"),d:L("פוטונים, אפקט פוטואלקטרי, בוהר, דעיכה רדיואקטיבית","الفوتونات والظاهرة الكهروضوئية وبور والاضمحلال الإشعاعي","Фотоны, фотоэффект, Бор, радиоактивный распад","Photons, photoelectric effect, Bohr model, radioactive decay")}
+];
+var LESSONS={
+kin:[
+ ST_("מהירות אומרת כמה מרחק עוברים בכל שנייה. מכונית ב-20 m/s עוברת 20 מטרים בשנייה. תאוצה אומרת כמה המהירות משתנה בכל שנייה.","السرعة تقول كم مسافة نقطع في كل ثانية. سيارة بسرعة 20 m/s تقطع 20 مترًا في الثانية. والتسارع يقول كم تتغير السرعة في كل ثانية.","Скорость показывает, какой путь проходят за секунду. Машина со скоростью 20 m/s проходит 20 метров в секунду. Ускорение показывает, насколько меняется скорость за секунду.","Speed tells how far you go each second. A car at 20 m/s covers 20 meters every second. Acceleration tells how much the speed changes each second."),
+ ST_("בתאוצה קבועה a המהירות גדלה בצעדים שווים: v = v₀ + a·t. אם מתחילים ממנוחה בתאוצה 3 m/s², אחרי 4 שניות המהירות 12 m/s.","مع تسارع ثابت a تزداد السرعة بخطوات متساوية: v = v₀ + a·t. إذا بدأنا من السكون بتسارع 3 m/s² فبعد 4 ثوانٍ تصبح السرعة 12 m/s.","При постоянном ускорении a скорость растёт равными шагами: v = v₀ + a·t. Из покоя с ускорением 3 m/s² через 4 с скорость 12 m/s.","With constant acceleration a the speed grows in equal steps: v = v₀ + a·t. From rest at 3 m/s², after 4 seconds the speed is 12 m/s."),
+ ST_("בגרף מהירות־זמן המרחק הוא השטח מתחת לגרף. המרחק בתאוצה קבועה: x = v₀·t + ½·a·t².","في رسم السرعة والزمن المسافة هي المساحة تحت الرسم. المسافة مع تسارع ثابت: x = v₀·t + ½·a·t².","На графике скорости путь — это площадь под графиком. Путь при постоянном ускорении: x = v₀·t + ½·a·t².","In a velocity-time graph the distance is the area under the graph. With constant acceleration: x = v₀·t + ½·a·t².",function(){return vtVis(0,12,4)}),
+ ST_("בנפילה חופשית כל הגופים מאיצים באותה תאוצה g = 10 m/s². אחרי שנייה 10 m/s, אחרי שתיים 20 m/s. גובה הנפילה: h = ½·g·t² = 5·t².","في السقوط الحر تتسارع كل الأجسام بالتسارع نفسه g = 10 m/s². بعد ثانية 10 m/s وبعد ثانيتين 20 m/s. ارتفاع السقوط: h = ½·g·t² = 5·t².","При свободном падении все тела ускоряются одинаково: g = 10 m/s². Через секунду 10 m/s, через две 20 m/s. Высота падения: h = ½·g·t² = 5·t².","In free fall all bodies accelerate the same, g = 10 m/s². After 1 second 10 m/s, after 2 seconds 20 m/s. Fall height: h = ½·g·t² = 5·t².")],
+newton:[
+ ST_("כוח הוא דחיפה או משיכה. הוא נמדד בניוטון (N). כשאין כוח שקול, גוף במנוחה נשאר במנוחה וגוף נע ממשיך בקו ישר במהירות קבועה. זה החוק הראשון.","القوة دفع أو سحب. تقاس بالنيوتن (N). عندما لا توجد قوة محصلة يبقى الجسم الساكن ساكنًا ويستمر الجسم المتحرك في خط مستقيم بسرعة ثابتة. هذا القانون الأول.","Сила — это толчок или притяжение. Измеряется в ньютонах (N). Если равнодействующей нет, покоящееся тело остаётся в покое, а движущееся продолжает прямолинейно с постоянной скоростью. Это первый закон.","A force is a push or a pull, measured in newtons (N). With no net force, a body at rest stays at rest and a moving body keeps going straight at constant speed. That is the first law."),
+ ST_("החוק השני: הכוח השקול גורם לתאוצה. F = m · a. אותו כוח על גוף כבד נותן תאוצה קטנה יותר.","القانون الثاني: القوة المحصلة تسبب تسارعًا. F = m · a. نفس القوة على جسم أثقل تعطي تسارعًا أصغر.","Второй закон: равнодействующая вызывает ускорение. F = m · a. Та же сила даёт тяжёлому телу меньшее ускорение.","The second law: the net force causes acceleration. F = m · a. The same force gives a heavy body less acceleration.",function(){return forceVis(20,8,3)}),
+ ST_("קודם מוצאים כוח שקול: כוחות לאותו כיוון מחברים, בכיוונים הפוכים מחסרים. 20 N ימינה ו-8 N שמאלה נותנים 12 N ימינה. משקל: W = m·g.","أولًا نجد القوة المحصلة: نجمع القوى في الاتجاه نفسه ونطرح المتعاكسة. 20 N يمينًا و8 N يسارًا تعطي 12 N يمينًا. الوزن: W = m·g.","Сначала находим равнодействующую: силы одного направления складываем, противоположных вычитаем. 20 N вправо и 8 N влево дают 12 N вправо. Вес: W = m·g.","First find the net force: add forces in the same direction, subtract opposite ones. 20 N right and 8 N left give 12 N right. Weight: W = m·g."),
+ ST_("החוק השלישי: כשגוף א׳ מפעיל כוח על גוף ב׳, גוף ב׳ מפעיל על א׳ כוח שווה והפוך. שני הכוחות פועלים על גופים שונים. במישור משופע הרכיב לאורך המישור הוא m·g·sin θ.","القانون الثالث: عندما يؤثر جسم أ بقوة على جسم ب يؤثر ب على أ بقوة مساوية ومعاكسة. القوتان تؤثران على جسمين مختلفين. على المستوى المائل المركّبة على امتداد المستوى هي m·g·sin θ.","Третий закон: если тело A действует на тело B с силой, то B действует на A с равной и противоположной силой. Силы приложены к разным телам. На наклонной плоскости составляющая вдоль плоскости равна m·g·sin θ.","The third law: if body A pushes body B, B pushes A with an equal and opposite force. The two forces act on different bodies. On an incline the component along the slope is m·g·sin θ.",function(){return inclineVis(4,30)})],
+energy:[
+ ST_("כשכוח מזיז גוף, הוא עושה עבודה: W = F·d (הכוח בכיוון התנועה). היחידה ג׳אול (J). 10 N לאורך 3 m הם 30 J.","عندما تحرك قوة جسمًا فهي تبذل شغلًا: W = F·d (القوة باتجاه الحركة). الوحدة جول (J). 10 N على طول 3 m تساوي 30 J.","Когда сила перемещает тело, она совершает работу: W = F·d (сила вдоль движения). Единица — джоуль (J). 10 N на 3 m дают 30 J.","When a force moves a body it does work: W = F·d (force along the motion). The unit is the joule (J). 10 N over 3 m is 30 J."),
+ ST_("אנרגיה קינטית היא אנרגיית תנועה: Ek = ½·m·v². כשהמהירות מוכפלת פי 2, האנרגיה גדלה פי 4.","الطاقة الحركية طاقة الحركة: Ek = ½·m·v². عندما تتضاعف السرعة مرتين تزداد الطاقة 4 مرات.","Кинетическая энергия — энергия движения: Ek = ½·m·v². Если скорость вдвое больше, энергия вчетверо больше.","Kinetic energy is the energy of motion: Ek = ½·m·v². Double the speed and the energy becomes 4 times bigger."),
+ ST_("אנרגיה פוטנציאלית כובדית: Ep = m·g·h. גוף גבוה יותר שומר יותר אנרגיה. כשהוא נופל, האנרגיה הזאת הופכת לקינטית.","طاقة الوضع الجاذبية: Ep = m·g·h. الجسم الأعلى يختزن طاقة أكبر. عندما يسقط تتحول هذه الطاقة إلى حركية.","Потенциальная энергия тяжести: Ep = m·g·h. Чем выше тело, тем больше энергии. При падении она переходит в кинетическую.","Gravitational potential energy: Ep = m·g·h. A higher body stores more energy. When it falls, that energy turns into kinetic energy."),
+ ST_("בלי חיכוך האנרגיה הכוללת נשמרת: Ek + Ep קבוע. נפילה מגובה h נותנת v = √(2·g·h). הספק הוא קצב העבודה: P = W ÷ t, ביחידות ואט (W).","بدون احتكاك تبقى الطاقة الكلية ثابتة: Ek + Ep ثابتة. السقوط من ارتفاع h يعطي v = √(2·g·h). الاستطاعة هي معدل الشغل: P = W ÷ t بوحدة الواط (W).","Без трения полная энергия сохраняется: Ek + Ep постоянна. Падение с высоты h даёт v = √(2·g·h). Мощность — это скорость работы: P = W ÷ t, в ваттах (W).","Without friction the total energy is conserved: Ek + Ep stays constant. A fall from height h gives v = √(2·g·h). Power is the rate of work: P = W ÷ t, in watts (W).")],
+mom:[
+ ST_("תנע הוא כמה קשה לעצור גוף נע: p = m·v. יחידה kg·m/s. משאית איטית יכולה להיות עם תנע גדול כמו מכונית מהירה.","الزخم هو مدى صعوبة إيقاف جسم متحرك: p = m·v. الوحدة kg·m/s. شاحنة بطيئة قد يكون زخمها كبيرًا مثل سيارة سريعة.","Импульс показывает, насколько трудно остановить движущееся тело: p = m·v. Единица kg·m/s. Медленный грузовик может иметь такой же импульс, как быстрая машина.","Momentum tells how hard it is to stop a moving body: p = m·v. Unit: kg·m/s. A slow truck can have as much momentum as a fast car."),
+ ST_("כוח שפועל פרק זמן משנה תנע: F·Δt = Δp. זה המתקף. לכן כשנוחתים מקפיצה מכופפים ברכיים: הזמן ארוך יותר והכוח קטן יותר.","القوة التي تؤثر خلال زمن تغيّر الزخم: F·Δt = Δp. هذا هو الدفع. لذلك نثني الركبتين عند الهبوط: الزمن أطول والقوة أصغر.","Сила, действующая некоторое время, меняет импульс: F·Δt = Δp. Это импульс силы. Поэтому при приземлении сгибают колени: время дольше, сила меньше.","A force acting for some time changes momentum: F·Δt = Δp. This is the impulse. That is why we bend our knees when landing: longer time, smaller force."),
+ ST_("במערכת סגורה התנע הכולל נשמר: סכום התנעים לפני שווה לסכום אחרי. בהתנגשות פלסטית שני הגופים נדבקים: m₁·v₁ = (m₁ + m₂)·V.","في نظام مغلق يُحفظ الزخم الكلي: مجموع الزخوم قبل يساوي مجموعها بعد. في التصادم عديم المرونة يلتصق الجسمان: m₁·v₁ = (m₁ + m₂)·V.","В замкнутой системе полный импульс сохраняется: сумма импульсов до равна сумме после. При слипании тел: m₁·v₁ = (m₁ + m₂)·V.","In a closed system total momentum is conserved: the sum before equals the sum after. In a sticky collision: m₁·v₁ = (m₁ + m₂)·V."),
+ ST_("ברתיעה ובפיצוץ התנע ההתחלתי אפס, ולכן הגופים נעים בכיוונים הפוכים עם תנעים שווים בגודלם: m₁·v₁ = m₂·v₂. לגוף הקל יש מהירות גדולה יותר.","في الارتداد والانفجار يكون الزخم الابتدائي صفرًا، فيتحرك الجسمان في اتجاهين متعاكسين بزخمين متساويين في المقدار: m₁·v₁ = m₂·v₂. الجسم الأخف أسرع.","При отдаче и взрыве начальный импульс равен нулю, поэтому тела движутся в противоположные стороны с равными по модулю импульсами: m₁·v₁ = m₂·v₂. Лёгкое тело быстрее.","In recoil and explosions the starting momentum is zero, so the bodies move in opposite directions with equal momenta: m₁·v₁ = m₂·v₂. The lighter body moves faster.")],
+circ:[
+ ST_("בתנועה מעגלית קבועה הגוף חוזר על עצמו. זמן מחזור T הוא הזמן לסיבוב אחד. תדירות f היא כמה סיבובים בשנייה: f = 1 ÷ T.","في الحركة الدائرية المنتظمة يكرر الجسم حركته. زمن الدورة T هو زمن دورة واحدة. التردد f هو عدد الدورات في الثانية: f = 1 ÷ T.","При равномерном движении по окружности тело повторяет движение. Период T — время одного оборота. Частота f — число оборотов в секунду: f = 1 ÷ T.","In uniform circular motion the body repeats itself. The period T is the time for one turn. The frequency f is turns per second: f = 1 ÷ T."),
+ ST_("גם כשהמהירות קבועה, הכיוון משתנה, ולכן יש תאוצה. התאוצה הצנטריפטלית מכוונת למרכז: a = v² ÷ r.","حتى عندما تكون السرعة ثابتة يتغير الاتجاه، لذلك يوجد تسارع. التسارع المركزي يتجه نحو المركز: a = v² ÷ r.","Даже при постоянной скорости направление меняется, поэтому есть ускорение. Центростремительное ускорение направлено к центру: a = v² ÷ r.","Even at constant speed the direction changes, so there is acceleration. The centripetal acceleration points to the center: a = v² ÷ r."),
+ ST_("כדי שגוף יסתובב צריך כוח אל המרכז: F = m·v² ÷ r. הוא יכול להיות מתח חוט, חיכוך או כוח הכבידה. זה לא כוח חדש, זה תפקיד של כוח קיים.","لكي يدور الجسم نحتاج قوة نحو المركز: F = m·v² ÷ r. قد تكون شدّ خيط أو احتكاكًا أو قوة جاذبية. ليست قوة جديدة بل دور لقوة موجودة.","Чтобы тело вращалось, нужна сила к центру: F = m·v² ÷ r. Это может быть натяжение нити, трение или тяготение. Это не новая сила, а роль существующей.","To keep turning, a body needs a force toward the center: F = m·v² ÷ r. It can be string tension, friction or gravity. It is not a new force, it is a role of an existing one."),
+ ST_("חוק הכבידה של ניוטון: F = G·M·m ÷ r². הכוח קטן עם ריבוע המרחק: מרחק כפול נותן רבע מהכוח. גם g קטן כך כשמתרחקים מכדור הארץ.","قانون نيوتن للجاذبية: F = G·M·m ÷ r². تقل القوة مع مربع المسافة: ضعف المسافة يعطي ربع القوة. وكذلك يقل g عند الابتعاد عن الأرض.","Закон всемирного тяготения: F = G·M·m ÷ r². Сила убывает с квадратом расстояния: вдвое дальше — в 4 раза слабее. Так же убывает и g при удалении от Земли.","Newton's law of gravitation: F = G·M·m ÷ r². The force falls with the square of distance: twice as far gives a quarter of the force. g falls the same way as we leave Earth.")],
+circuit:[
+ ST_("זרם חשמלי הוא מטענים שזורמים (A, אמפר). מתח הוא ה״דחיפה״ שמניעה אותם (V, וולט). התנגדות היא כמה הנגד מקשה על הזרם (Ω, אום).","التيار الكهربائي شحنات تتدفق (A، أمبير). الجهد هو ما يدفعها (V، فولت). المقاومة هي مدى إعاقة المقاوم للتيار (Ω، أوم).","Электрический ток — движение зарядов (A, ампер). Напряжение — то, что их толкает (V, вольт). Сопротивление — насколько резистор мешает току (Ω, ом).","Electric current is moving charge (A, ampere). Voltage is the push that moves it (V, volt). Resistance is how much a resistor hinders the current (Ω, ohm).",function(){return circVis(12,[4])}),
+ ST_("חוק אוהם: V = I·R. במתח 12 V ובנגד 4 Ω הזרם הוא 3 A. אפשר לחשב כל אחד מהשלושה מהשניים האחרים.","قانون أوم: V = I·R. عند جهد 12 V ومقاومة 4 Ω يكون التيار 3 A. يمكن حساب أي من الثلاثة من الاثنين الآخرين.","Закон Ома: V = I·R. При 12 V и 4 Ω ток равен 3 A. Любую из трёх величин можно найти по двум другим.","Ohm's law: V = I·R. At 12 V and 4 Ω the current is 3 A. You can find any of the three from the other two."),
+ ST_("בטור: אותו זרם בכל הנגדים וההתנגדויות מצטברות: R = R₁ + R₂. במקביל: אותו מתח על כל הנגדים, והזרמים מצטברים: 1 ÷ R = 1 ÷ R₁ + 1 ÷ R₂.","على التوالي: التيار نفسه في كل المقاومات وتُجمع المقاومات: R = R₁ + R₂. على التوازي: الجهد نفسه على كل المقاومات وتُجمع التيارات: 1 ÷ R = 1 ÷ R₁ + 1 ÷ R₂.","Последовательно: одинаковый ток, сопротивления складываются: R = R₁ + R₂. Параллельно: одинаковое напряжение, токи складываются: 1 ÷ R = 1 ÷ R₁ + 1 ÷ R₂.","In series: the same current everywhere and resistances add: R = R₁ + R₂. In parallel: the same voltage on each and currents add: 1 ÷ R = 1 ÷ R₁ + 1 ÷ R₂.",function(){return circVis(12,[6,3],true)}),
+ ST_("הספק חשמלי: P = V·I. חוקי קירכהוף: בצומת סכום הזרמים הנכנסים שווה לסכום היוצאים, ובלולאה סכום עליות המתח שווה לסכום הירידות.","الاستطاعة الكهربائية: P = V·I. قانونا كيرشهوف: عند العقدة مجموع التيارات الداخلة يساوي الخارجة، وفي الحلقة مجموع ارتفاعات الجهد يساوي مجموع الهبوطات.","Электрическая мощность: P = V·I. Правила Кирхгофа: в узле сумма входящих токов равна сумме выходящих, в контуре сумма подъёмов напряжения равна сумме падений.","Electric power: P = V·I. Kirchhoff's rules: at a junction the current in equals the current out, and around a loop the voltage rises equal the voltage drops.")],
+field:[
+ ST_("מטען חשמלי יכול להיות חיובי או שלילי. מטענים שווים דוחים ומטענים שונים מושכים. היחידה קולון (C).","الشحنة الكهربائية موجبة أو سالبة. الشحنات المتشابهة تتنافر والمختلفة تتجاذب. الوحدة كولوم (C).","Электрический заряд бывает положительным и отрицательным. Одноимённые отталкиваются, разноимённые притягиваются. Единица — кулон (C).","Electric charge is positive or negative. Like charges repel and unlike charges attract. The unit is the coulomb (C)."),
+ ST_("שדה חשמלי הוא האזור שבו מטען מרגיש כוח. עוצמתו: E = F ÷ q, ביחידות N/C. כיוון השדה הוא כיוון הכוח על מטען חיובי.","المجال الكهربائي هو المنطقة التي تشعر فيها الشحنة بقوة. شدته: E = F ÷ q بوحدة N/C. اتجاه المجال هو اتجاه القوة على شحنة موجبة.","Электрическое поле — область, где на заряд действует сила. Напряжённость: E = F ÷ q, в N/C. Направление поля — направление силы на положительный заряд.","An electric field is a region where a charge feels a force. Its strength: E = F ÷ q, in N/C. The field points the way a positive charge would be pushed."),
+ ST_("מטען נקודתי Q יוצר שדה E = k·Q ÷ r², כש-k = 9·10⁹ N·m²/C². השדה קטן עם ריבוע המרחק.","شحنة نقطية Q تولّد مجالًا E = k·Q ÷ r² حيث k = 9·10⁹ N·m²/C². يقل المجال مع مربع المسافة.","Точечный заряд Q создаёт поле E = k·Q ÷ r², где k = 9·10⁹ N·m²/C². Поле убывает с квадратом расстояния.","A point charge Q creates a field E = k·Q ÷ r², with k = 9·10⁹ N·m²/C². The field falls with distance squared."),
+ ST_("מתח (הפרש פוטנציאלים) V הוא האנרגיה ליחידת מטען. עבודת השדה: W = q·V. בשדה אחיד בין לוחות: E = V ÷ d.","الجهد (فرق الجهد) V هو الطاقة لكل وحدة شحنة. شغل المجال: W = q·V. في مجال منتظم بين لوحين: E = V ÷ d.","Напряжение (разность потенциалов) V — энергия на единицу заряда. Работа поля: W = q·V. В однородном поле между пластинами: E = V ÷ d.","Voltage (potential difference) V is energy per unit charge. The work of the field: W = q·V. In a uniform field between plates: E = V ÷ d.")],
+magnet:[
+ ST_("מגנט יוצר שדה מגנטי B (ביחידות טסלה, T). גם זרם חשמלי בתיל יוצר שדה מגנטי סביבו. קטבים שווים דוחים וקטבים שונים מושכים.","المغناطيس يولّد مجالًا مغناطيسيًا B (بوحدة تسلا T). والتيار الكهربائي في سلك يولّد مجالًا حوله أيضًا. الأقطاب المتشابهة تتنافر والمختلفة تتجاذب.","Магнит создаёт магнитное поле B (в теслах, T). Ток в проводе тоже создаёт поле вокруг. Одноимённые полюса отталкиваются, разноимённые притягиваются.","A magnet creates a magnetic field B (in tesla, T). A current in a wire also creates a field around it. Like poles repel and unlike poles attract."),
+ ST_("על תיל עם זרם בתוך שדה פועל כוח: F = B·I·L (כשהתיל ניצב לשדה). כיוון הכוח נקבע בכלל יד ימין והוא ניצב גם לזרם וגם לשדה.","على سلك يحمل تيارًا داخل مجال تؤثر قوة: F = B·I·L (عندما يكون السلك عموديًا على المجال). اتجاه القوة بقاعدة اليد اليمنى وهو عمودي على التيار وعلى المجال.","На провод с током в поле действует сила: F = B·I·L (когда провод перпендикулярен полю). Направление силы определяют правилом правой руки, она перпендикулярна и току, и полю.","A wire carrying current in a field feels a force: F = B·I·L (wire perpendicular to the field). The direction follows the right-hand rule and is perpendicular to both the current and the field."),
+ ST_("חלקיק טעון שנע בשדה: F = q·v·B·sin θ. כשהוא נע במקביל לשדה אין כוח. הכוח ניצב למהירות, ולכן הוא משנה כיוון ולא מהירות.","جسيم مشحون يتحرك في مجال: F = q·v·B·sin θ. عندما يتحرك موازيًا للمجال لا توجد قوة. القوة عمودية على السرعة فتغيّر الاتجاه لا مقدار السرعة.","Заряженная частица в поле: F = q·v·B·sin θ. При движении параллельно полю силы нет. Сила перпендикулярна скорости, поэтому меняет направление, а не величину скорости.","A charged particle in a field: F = q·v·B·sin θ. Moving parallel to the field gives no force. The force is perpendicular to the velocity, so it changes direction, not speed."),
+ ST_("כששטף מגנטי משתנה נוצר מתח מושרה: ε = ΔΦ ÷ Δt (חוק פרדיי). מוט שנע בשדה: ε = B·L·v. כך עובדים גנרטורים.","عندما يتغير التدفق المغناطيسي تنشأ قوة دافعة محتثة: ε = ΔΦ ÷ Δt (قانون فاراداي). ساق تتحرك في مجال: ε = B·L·v. هكذا تعمل المولدات.","Когда магнитный поток меняется, возникает ЭДС индукции: ε = ΔΦ ÷ Δt (закон Фарадея). Стержень в поле: ε = B·L·v. Так работают генераторы.","When magnetic flux changes, an emf is induced: ε = ΔΦ ÷ Δt (Faraday's law). A rod moving in a field: ε = B·L·v. This is how generators work.")],
+wave:[
+ ST_("גל מעביר אנרגיה בלי להעביר חומר. אורך גל λ הוא המרחק בין שני שיאים סמוכים. תדירות f היא כמה גלים עוברים בשנייה (Hz).","الموجة تنقل الطاقة دون نقل المادة. الطول الموجي λ هو المسافة بين قمتين متتاليتين. التردد f هو عدد الموجات في الثانية (Hz).","Волна переносит энергию, а не вещество. Длина волны λ — расстояние между соседними гребнями. Частота f — число волн в секунду (Hz).","A wave carries energy without carrying matter. The wavelength λ is the distance between two neighboring crests. The frequency f is how many waves pass per second (Hz).",function(){return waveVis(4,"m")}),
+ ST_("מהירות הגל: v = λ·f. זמן המחזור: T = 1 ÷ f. אם מגדילים את התדירות באותו חומר, אורך הגל קטן.","سرعة الموجة: v = λ·f. زمن الدورة: T = 1 ÷ f. إذا زدنا التردد في الوسط نفسه يقل الطول الموجي.","Скорость волны: v = λ·f. Период: T = 1 ÷ f. Если увеличить частоту в той же среде, длина волны уменьшится.","Wave speed: v = λ·f. Period: T = 1 ÷ f. Raise the frequency in the same medium and the wavelength shrinks."),
+ ST_("החזרה: זווית הפגיעה שווה לזווית ההחזרה (מהניצב). שבירה: אור משנה כיוון כשהוא עובר בין חומרים. מקדם השבירה n = c ÷ v, ו-n ≥ 1.","الانعكاس: زاوية السقوط تساوي زاوية الانعكاس (من العمود). الانكسار: يغيّر الضوء اتجاهه عند انتقاله بين مادتين. معامل الانكسار n = c ÷ v و n ≥ 1.","Отражение: угол падения равен углу отражения (от нормали). Преломление: свет меняет направление при переходе между средами. Показатель n = c ÷ v, n ≥ 1.","Reflection: the angle of incidence equals the angle of reflection (from the normal). Refraction: light bends when it passes between materials. The refractive index n = c ÷ v, and n ≥ 1."),
+ ST_("עדשה מרכזת: 1 ÷ f = 1 ÷ u + 1 ÷ v, כש-u מרחק העצם, v מרחק הדמות ו-f המרחק המוקדי. עצם רחוק מהמוקד יוצר דמות אמיתית והפוכה.","عدسة لامّة: 1 ÷ f = 1 ÷ u + 1 ÷ v حيث u بعد الجسم و v بعد الصورة و f البعد البؤري. جسم بعيد عن البؤرة يعطي صورة حقيقية مقلوبة.","Собирающая линза: 1 ÷ f = 1 ÷ u + 1 ÷ v, где u — расстояние до предмета, v — до изображения, f — фокусное. Предмет дальше фокуса даёт действительное перевёрнутое изображение.","A converging lens: 1 ÷ f = 1 ÷ u + 1 ÷ v, where u is the object distance, v the image distance and f the focal length. An object beyond the focus gives a real, inverted image.")],
+quantum:[
+ ST_("אור מגיע במנות קטנות שנקראות פוטונים. אנרגיית פוטון: E = h·f. בקיצור שימושי: E(eV) = 1240 ÷ λ(nm). אור כחול נושא יותר אנרגיה מאדום.","يصل الضوء في حِزم صغيرة تسمى الفوتونات. طاقة الفوتون: E = h·f. اختصار مفيد: E(eV) = 1240 ÷ λ(nm). الضوء الأزرق يحمل طاقة أكبر من الأحمر.","Свет приходит маленькими порциями — фотонами. Энергия фотона: E = h·f. Удобно: E(eV) = 1240 ÷ λ(nm). Синий свет несёт больше энергии, чем красный.","Light comes in small packets called photons. Photon energy: E = h·f. Handy form: E(eV) = 1240 ÷ λ(nm). Blue light carries more energy than red."),
+ ST_("אפקט פוטואלקטרי: אור מוציא אלקטרונים ממתכת רק אם אנרגיית הפוטון גדולה מפונקציית העבודה W. אז Ek = hf − W. עוצמה גדולה יותר נותנת יותר אלקטרונים, לא מהירים יותר.","الظاهرة الكهروضوئية: يُخرج الضوء إلكترونات من فلز فقط إذا كانت طاقة الفوتون أكبر من دالة الشغل W. عندها Ek = hf − W. شدة أكبر تعطي إلكترونات أكثر لا أسرع.","Фотоэффект: свет выбивает электроны из металла, только если энергия фотона больше работы выхода W. Тогда Ek = hf − W. Большая яркость даёт больше электронов, а не более быстрые.","The photoelectric effect: light ejects electrons from a metal only if the photon energy is above the work function W. Then Ek = hf − W. More intensity gives more electrons, not faster ones."),
+ ST_("באטום בוהר לאלקטרון יש רמות אנרגיה מסוימות בלבד. במימן: E = −13.6 ÷ n² (eV). n = 1 היא רמת היסוד.","في ذرة بور للإلكترون مستويات طاقة محددة فقط. في الهيدروجين: E = −13.6 ÷ n² (eV). n = 1 هو المستوى الأساسي.","В атоме Бора у электрона только определённые уровни энергии. Для водорода: E = −13.6 ÷ n² (eV). n = 1 — основное состояние.","In the Bohr atom the electron has only certain energy levels. For hydrogen: E = −13.6 ÷ n² (eV). n = 1 is the ground state."),
+ ST_("כשאלקטרון יורד מרמה לרמה נפלט פוטון בדיוק בהפרש האנרגיות. גרעין רדיואקטיבי דועך: בכל זמן מחצית חיים נשארת חצי מהכמות, N = N₀ ÷ 2ⁿ.","عندما ينتقل الإلكترون من مستوى إلى أدنى ينبعث فوتون طاقته تساوي فرق الطاقة بالضبط. النواة المشعة تضمحل: في كل عمر نصف تبقى نصف الكمية، N = N₀ ÷ 2ⁿ.","Когда электрон переходит на нижний уровень, излучается фотон ровно с энергией разности уровней. Радиоактивное ядро распадается: за каждый период полураспада остаётся половина, N = N₀ ÷ 2ⁿ.","When an electron drops from one level to a lower one, a photon with exactly the energy difference is emitted. A radioactive nucleus decays: every half-life leaves half the amount, N = N₀ ÷ 2ⁿ.")]
+};
+var ICONS={
+ kin:'<path d="M10 52 L58 16" stroke="#fff" stroke-width="5"/><circle cx="20" cy="45" r="5" fill="#fff"/><circle cx="44" cy="27" r="5" fill="#fff"/>',
+ newton:'<rect x="22" y="26" width="24" height="18" fill="none" stroke="#fff" stroke-width="4"/><path d="M48 35 H62 M56 29 L62 35 L56 41" fill="none" stroke="#fff" stroke-width="4"/><path d="M20 35 H8" stroke="#fff" stroke-width="4"/>',
+ energy:'<path d="M38 8 L20 38 H32 L28 60 L48 28 H35 Z" fill="#fff"/>',
+ mom:'<circle cx="18" cy="34" r="9" fill="#fff"/><circle cx="48" cy="34" r="6" fill="none" stroke="#fff" stroke-width="4"/><path d="M30 34 H40" stroke="#fff" stroke-width="4"/>',
+ circ:'<circle cx="34" cy="34" r="22" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="6 5"/><circle cx="56" cy="34" r="6" fill="#fff"/>',
+ circuit:'<rect x="10" y="16" width="48" height="36" rx="3" fill="none" stroke="#fff" stroke-width="4"/><rect x="26" y="10" width="16" height="12" fill="#fff"/>',
+ field:'<circle cx="34" cy="34" r="8" fill="#fff"/><path d="M34 22 V8 M34 46 V60 M22 34 H8 M46 34 H60" stroke="#fff" stroke-width="4"/>',
+ magnet:'<path d="M14 54 V28 A20 20 0 0 1 54 28 V54" fill="none" stroke="#fff" stroke-width="9"/>',
+ wave:'<path d="M6 34 Q14 8 22 34 T38 34 T54 34 T66 34" fill="none" stroke="#fff" stroke-width="5"/>',
+ quantum:'<circle cx="34" cy="34" r="6" fill="#fff"/><ellipse cx="34" cy="34" rx="26" ry="10" fill="none" stroke="#fff" stroke-width="3"/><ellipse cx="34" cy="34" rx="26" ry="10" fill="none" stroke="#fff" stroke-width="3" transform="rotate(60 34 34)"/>'
+};
+
+var BUILD="ph2 · 2026-10-19";
+/* ===== UI strings ===== */
+var STR={
+he:{trackT:"איזה מסלול?",tr7:"כיתה ז׳",tr9:"כיתה ט׳ מצומצם",title9:"גיאומטריה לכיתה ט׳, רמה מצומצמת",tag9:"שיעור קצר ותרגול בשלוש רמות בכל נושא. הכול עם הקראה.",credit9:"תרגול כיתה ט׳ מצומצם בנוי לפי רשימת הנושאים בחוברת העבודה בגיאומטריה של מחוז תל אביב חט״ב (תשפ״ה). כל השאלות נכתבו מחדש.",soonT:"בקרוב: נושאי הבחירה (30%).",mtNote:"תרגום לערבית, רוסית ואנגלית: תרגום מכונה, ממתין לבדיקה.",credit2:"בבחינת הבגרות מקבלים דף נוסחאות רשמי. כל השאלות כאן נכתבו מחדש, ו-g = 10 m/s².",brand:"פיזיקה לבגרות",title:"פיזיקה לבגרות",tag:"מכניקה, חשמל ומגנטיות, קרינה וחומר. שיעור קצר ותרגול בשלוש רמות. הכול מוקרא.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
+ lesson:"שיעור קצר",practice:"תרגול",lvTitle:"בחרו רמה",l1:"קל",l1d:"להתחיל בנחת",l2:"בינוני",l2d:"עוד קצת",l3:"מאתגר",l3d:"לחשוב טוב",l4:"אתגר",l4d:"מעורב וקשה",
+ listen:"הקראה",stop:"עצור",slow:"לאט",hint:"רמז",example:"דוגמה",next:"הבא",back:"חזרה",home:"בית",settings:"הגדרות",again:"עוד סבב",
+ qOf:"שאלה {a} מתוך {b}",right:["יפה מאוד!","נכון!","מצוין!","כל הכבוד על החשיבה!","בדיוק כך!","איזה כיף, נכון!"],streak:["שלוש ברצף! אתם על גל!","ועוד אחת! איזו התמדה!"],
+ wrong:"כמעט. בואו נבדוק יחד.",ans:"התשובה: ",finT:"סיימתם את הסבב!",finX:"עבודה יפה. מי שרוצה יכול לתרגל עוד או לבחור נושא אחר. שאלות שהיו קשות יחזרו בפעם הבאה.",
+ stepOf:"שלב {a} מתוך {b}",prev:"הקודם",done:"סיימתי",lessonEnd:"עכשיו אפשר לתרגל!",
+ setSlow:"הקראה איטית",setSfx:"צלילים",setBig:"אותיות גדולות",setClear:"פונט קריא",setContrast:"ניגודיות גבוהה",setSpaced:"ריווח אותיות",setMotion:"פחות תנועה",setTheme:"ערכת נושא",thAuto:"אוטומטי",thLight:"בהיר",thDark:"כהה",on:"פועל",off:"כבוי",reset:"מחיקת ההתקדמות מהמכשיר",resetAsk:"למחוק את כל ההתקדמות בנושאים?",
+ credit:"התוכן נכתב במיוחד לאתר. הנושאים לפי תכנית הלימודים בפיזיקה לחטיבה העליונה של משרד החינוך (ליבה 70%).",crediL:"מקור: משרד החינוך",privacy:"בלי הרשמה. ההתקדמות נשמרת רק במכשיר שלכם.",
+ loadingNoVoice:"אין קול בעברית במכשיר הזה. אפשר להתקין קול בהגדרות המכשיר.",ok:"✓"},
+ar:{trackT:"أي مسار؟",tr7:"الصف السابع",tr9:"الصف التاسع (مستوى مختصر)",title9:"هندسة للصف التاسع، مستوى مختصر",tag9:"درس قصير وتمرين بثلاثة مستويات في كل موضوع. وكل شيء مع قراءة صوتية.",credit9:"تمارين الصف التاسع (مستوى مختصر) مبنية على قائمة المواضيع في كراسة الهندسة لمنطقة تل أبيب، المرحلة الإعدادية (2025). كُتبت كل الأسئلة من جديد.",soonT:"قريبًا: مواضيع الاختيار (30%).",mtNote:"الترجمة إلى العربية والروسية والإنجليزية: ترجمة آلية بانتظار المراجعة.",credit2:"في امتحان البجروت يحصلون على ورقة صيغ رسمية. كُتبت كل الأسئلة هنا من جديد، و g = 10 m/s².",brand:"الفيزياء للبجروت",title:"الفيزياء للبجروت",tag:"الميكانيكا والكهرباء والمغناطيسية والإشعاع والمادة. درس قصير وتمرين بثلاثة مستويات. كل شيء مع قراءة صوتية.",pick:"اختاروا موضوعًا",band1:"الصفان الأول والثاني",band2:"الصفان الثالث والرابع",band3:"الصفان الخامس والسادس",soon:"قريبًا",
+ lesson:"درس قصير",practice:"تدريب",lvTitle:"اختاروا المستوى",l1:"سهل",l1d:"نبدأ بهدوء",l2:"متوسط",l2d:"أكثر قليلًا",l3:"صعب",l3d:"فكّروا جيدًا",l4:"تحدٍّ",l4d:"مزيج وأصعب",
+ listen:"استماع",stop:"إيقاف",slow:"ببطء",hint:"تلميح",example:"مثال",next:"التالي",back:"رجوع",home:"الرئيسية",settings:"الإعدادات",again:"جولة أخرى",
+ qOf:"السؤال {a} من {b}",right:["جميل جدًّا!","صحيح!","ممتاز!","أحسنتم التفكير!","هكذا تمامًا!","ما أجمل هذا!"],streak:["ثلاث إجابات متتالية! أنتم رائعون!","وأخرى! ما أجمل المثابرة!"],
+ wrong:"تقريبًا. لنتحقّق معًا.",ans:"الجواب: ",finT:"أنهيتم الجولة!",finX:"عمل جميل. يمكنكم التدرّب أكثر أو اختيار موضوع آخر. الأسئلة التي كانت صعبة ستعود لاحقًا.",
+ stepOf:"الخطوة {a} من {b}",prev:"السابق",done:"انتهيت",lessonEnd:"والآن يمكننا التدرّب!",
+ setSlow:"قراءة بطيئة",setSfx:"أصوات",setBig:"حروف كبيرة",setClear:"خط واضح",setContrast:"تباين عالٍ",setSpaced:"تباعد الحروف",setMotion:"حركة أقل",setTheme:"المظهر",thAuto:"تلقائي",thLight:"فاتح",thDark:"داكن",on:"يعمل",off:"متوقف",reset:"مسح التقدّم من الجهاز",resetAsk:"هل تريدون مسح كل التقدّم؟",
+ credit:"كُتب المحتوى خصيصًا لهذا الموقع. المواضيع حسب منهاج الفيزياء للمرحلة الثانوية لوزارة التربية والتعليم (النواة 70%).",crediL:"المصدر: وزارة التربية والتعليم",privacy:"بلا تسجيل. التقدّم يُحفظ على جهازكم فقط.",
+ loadingNoVoice:"لا يوجد صوت عربي في هذا الجهاز.",ok:"✓"},
+ru:{trackT:"Какой маршрут?",tr7:"7 класс",tr9:"9 класс (сокращённый уровень)",title9:"Геометрия для 9 класса, сокращённый уровень",tag9:"Короткий урок и тренировка на трёх уровнях в каждой теме. Всё с озвучиванием.",credit9:"Тренировка 9 класса (сокращённый уровень) построена по списку тем рабочей тетради по геометрии округа Тель-Авив, средняя школа (5785). Все вопросы написаны заново.",soonT:"Скоро: темы по выбору (30%).",mtNote:"Перевод на арабский, русский и английский сделан машиной и ждёт проверки.",credit2:"На экзамене выдают официальный лист формул. Все вопросы здесь написаны заново, g = 10 m/s².",brand:"Физика для бегрута",title:"Физика для бегрута",tag:"Механика, электричество и магнетизм, излучение и вещество. Короткий урок и практика на трёх уровнях. Всё с озвучиванием.",pick:"Выберите тему",band1:"1–2 классы",band2:"3–4 классы",band3:"5–6 классы",soon:"Скоро",
+ lesson:"Короткий урок",practice:"Практика",lvTitle:"Выберите уровень",l1:"Лёгкий",l1d:"начнём спокойно",l2:"Средний",l2d:"чуть сложнее",l3:"Трудный",l3d:"подумай хорошо",l4:"Вызов",l4d:"всё вперемешку",
+ listen:"Слушать",stop:"Стоп",slow:"Медленно",hint:"Подсказка",example:"Пример",next:"Дальше",back:"Назад",home:"Домой",settings:"Настройки",again:"Ещё раунд",
+ qOf:"Вопрос {a} из {b}",right:["Очень хорошо!","Верно!","Отлично!","Здорово подумал!","Именно так!","Как здорово!"],streak:["Три подряд! Ты в ударе!","И ещё один! Какое упорство!"],
+ wrong:"Почти. Давай проверим вместе.",ans:"Ответ: ",finT:"Раунд закончен!",finX:"Хорошая работа. Можно потренироваться ещё или выбрать другую тему. Трудные вопросы вернутся в следующий раз.",
+ stepOf:"Шаг {a} из {b}",prev:"Назад",done:"Готово",lessonEnd:"Теперь можно тренироваться!",
+ setSlow:"Медленное чтение",setSfx:"Звуки",setBig:"Крупный шрифт",setClear:"Простой шрифт",setContrast:"Высокий контраст",setSpaced:"Межбуквенный интервал",setMotion:"Меньше движения",setTheme:"Тема",thAuto:"Авто",thLight:"Светлая",thDark:"Тёмная",on:"вкл",off:"выкл",reset:"Стереть прогресс на устройстве",resetAsk:"Стереть весь прогресс?",
+ credit:"Содержание написано специально для сайта. Темы — по программе по физике для старшей школы Министерства образования Израиля (ядро 70%).",crediL:"Источник: Министерство образования",privacy:"Без регистрации. Прогресс хранится только на вашем устройстве.",
+ loadingNoVoice:"На этом устройстве нет русского голоса.",ok:"✓"},
+en:{trackT:"Which track?",tr7:"Grade 7",tr9:"Grade 9, reduced level",title9:"Geometry for grade 9, reduced level",tag9:"A short lesson and practice on three levels in every topic. Everything can be read aloud.",credit9:"Grade 9 reduced-level practice follows the topic list of the Tel Aviv District (middle school) geometry workbook, 5785 (2024/25). All the questions were written from scratch.",soonT:"Coming soon: the elective topics (30%).",mtNote:"Arabic, Russian and English are machine translated and awaiting review.",credit2:"The bagrut exam gives an official formula sheet. All questions here were written from scratch, and g = 10 m/s².",brand:"Physics for the bagrut",title:"Physics for the bagrut",tag:"Mechanics, electricity and magnetism, radiation and matter. A short lesson and practice on three levels. Everything can be read aloud.",pick:"Pick a topic",band1:"Grades 1–2",band2:"Grades 3–4",band3:"Grades 5–6",soon:"Soon",
+ lesson:"Short lesson",practice:"Practice",lvTitle:"Choose a level",l1:"Easy",l1d:"start gently",l2:"Medium",l2d:"a bit more",l3:"Tricky",l3d:"think it through",l4:"Challenge",l4d:"mixed and harder",
+ listen:"Listen",stop:"Stop",slow:"Slow",hint:"Hint",example:"Example",next:"Next",back:"Back",home:"Home",settings:"Settings",again:"Another round",
+ qOf:"Question {a} of {b}",right:["Very nice!","Correct!","Excellent!","Great thinking!","Exactly!","How wonderful!"],streak:["Three in a row! You are on a roll!","And another one! What persistence!"],
+ wrong:"Almost. Let us check it together.",ans:"The answer: ",finT:"You finished the round!",finX:"Nice work. Practice more or pick another topic. Questions that felt hard will come back next time.",
+ stepOf:"Step {a} of {b}",prev:"Previous",done:"I am done",lessonEnd:"Now we can practice!",
+ setSlow:"Slow reading",setSfx:"Sounds",setBig:"Large text",setClear:"Clear font",setContrast:"High contrast",setSpaced:"Letter spacing",setMotion:"Less motion",setTheme:"Theme",thAuto:"Auto",thLight:"Light",thDark:"Dark",on:"on",off:"off",reset:"Clear progress from this device",resetAsk:"Clear all progress?",
+ credit:"The content was written for this site. Topics follow the Israeli Ministry of Education high-school physics curriculum (the 70% core).",crediL:"Source: Ministry of Education",privacy:"No sign-up. Progress is saved only on your device.",
+ loadingNoVoice:"No voice for this language was found on this device.",ok:"✓"}};
+var LNAME={he:"עב",ar:"عر",ru:"Рус",en:"En"},LDIR={he:"rtl",ar:"rtl",ru:"ltr",en:"ltr"},LCODE={he:"he-IL",ar:"ar-SA",ru:"ru-RU",en:"en-US"};
+var MINUSW={he:"מינוס ",ar:"ناقص ",ru:"минус ",en:"minus "};
+function optLabel(o){var l=o.l;if(typeof l==="object")return l[S.lang];return isoPts(String(l).replace(/-(\d)/g,"\u2212$1"))}
+function isoPts(t){return String(t).replace(/\([^()]*,[^()]*\)/g,function(m){return "\u2066"+m.replace(/, /g,",")+"\u2069"}).replace(/[\dx?][\d.x?]*(?: ?: ?[\dxn?][\d.x?]*)+(?: ?= ?[\dx?][\d.x?]*(?: ?: ?[\dx?][\d.x?]*)+)?/g,function(m){return "\u2066"+m.replace(/ /g,"")+"\u2069"})}
+function optSay(o){var l=o.l;if(typeof l==="object")return l[S.lang];return speechFix(String(l).replace(/-(?=\d)/g,"\u2212"))}
+var POWW={he:" בחזקת ",ar:" أُسّ ",ru:" в степени ",en:" to the power "},SUPN={"\u00b2":2,"\u00b3":3,"\u2074":4,"\u2075":5,"\u2076":6};
+var BLANKW={he:"המספר החסר",ar:"العدد الناقص",ru:"пропущенное число",en:"the missing number"};
+var OVERW={he:" חלקי ",ar:" على ",ru:" из ",en:" over "};
+function speechFix(t){t=String(t).replace(/[\u2066\u2069]/g,"");var lg=S.lang,mw=MINUSW[lg].trim();
+  /* ה-___ של "איזה מספר חסר?" נקרא כקו תחתון גולמי, והשבר a/b לא נפתח
+     כלל (math-elem פותח אותו מאז). שתי השורות האלה סוגרות את שתיהן. */
+  t=t.replace(/_{2,}/g,BLANKW[lg]).replace(/(\d+)\/(\d+)/g,function(m,a,b){return a+OVERW[lg]+b});
+  return t.replace(/([\d)])([\u00b2\u00b3\u2074\u2075\u2076])/g,function(m,a,s){return a+POWW[lg]+SUPN[s]+" "})
+   .replace(/(^|[\s(=:,;\u00b7\u00d7\u00f7+])\u2212(?=\d)/g,function(m,p){return p+mw+" "})
+   .replace(/\u00d7/g,{he:" כפול ",ar:" ضرب ",ru:" умножить на ",en:" times "}[lg]).replace(/\u00b7/g,{he:" כפול ",ar:" ضرب ",ru:" умножить على ",en:" times "}[lg].replace("умножить на ","умножить на ").replace("умножить على ","умножить на "))
+   .replace(/\u00f7/g,{he:" חלקי ",ar:" قسمة ",ru:" разделить на ",en:" divided by "}[lg]).replace(/\u2212/g,{he:" פחות ",ar:" ناقص ",ru:" минус ",en:" minus "}[lg])
+   .replace(/\s=\s/g,{he:" שווה ",ar:" يساوي ",ru:" равно ",en:" equals "}[lg]).replace(/\s<\s/g,{he:" קטן מ ",ar:" أصغر من ",ru:" меньше ",en:" is less than "}[lg]).replace(/\s>\s/g,{he:" גדול מ ",ar:" أكبر من ",ru:" больше ",en:" is greater than "}[lg])
+   .replace(/\u221a/g,{he:"שורש ",ar:"جذر ",ru:"корень из ",en:"square root of "}[lg]).replace(/\u00b0/g,{he:" מעלות",ar:" درجة",ru:" градусов",en:" degrees"}[lg]).replace(/\?\//g,"?")}
+
+var CMW={he:"ס״מ",ar:"سم",ru:"см",en:"cm"};
+/* ===== state ===== */
+var KEY="physics-v1",S={theme:"auto",band:1,lang:"he",done:{},slow:false,sfx:true,big:false},view="home",V={unit:null,lv:2,step:0},P=null;
+function loadS(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)for(var k in o)S[k]=o[k]}catch(e){}}
+function applyTheme(){var m=S.theme||"auto",d=m==="dark"||(m!=="light"&&window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches);document.documentElement.setAttribute("data-theme",d?"dark":"light")}
+try{matchMedia("(prefers-color-scheme:dark)").addListener(function(){if((S.theme||"auto")==="auto")applyTheme()})}catch(e){}
+/* ששת מצבי הנגישות במקום אחד. עד 5.10.2026 ה-theme וה-big ישבו
+   מפוזרים ב-render, וארבעת האחרים לא היו קיימים. */
+function applyModes(){
+  var r=document.documentElement,m=S.theme||"auto",
+      d=m==="dark"||(m!=="light"&&window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches);
+  r.setAttribute("data-theme",d?"dark":"light");
+  r.classList.toggle("big",!!S.big);
+  r.classList.toggle("clear-font",!!S.clearFont);
+  r.classList.toggle("hi-contrast",!!S.contrast);
+  r.classList.toggle("spaced",!!S.spaced);
+  r.classList.toggle("reduce-motion",!!S.reduceMotion);
+}
+
+function saveS(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+loadS();
+function $(s){return document.querySelector(s)}
+/* אזור aria-live — ה-div קיים מאז ההעתקה, אבל אף אחד לא כתב אליו:
+   קורא מסך לא שמע אם התשובה נכונה. (כמו ב-math-uni/math-teen/english.) */
+function announce(m){var e=$("#live");if(e)e.textContent=m}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+/* כיוון נוסחאות בתוך משפט עברי/ערבי: ״4 × 3 = 12״ בלי בידוד מוצג הפוך.
+   רצף בלי אות עברית/ערבית עם ספרה, אות לטינית או סימן חשבון נעטף ב-bdi ltr.
+   textContent אינו משתנה, ולכן ההקראה והקלטות לא מושפעות. */
+var LTR_SIG=/[0-9A-Za-z\u00B2\u00B3\u00B9\u2070-\u209F=+\u2212\u00D7\u00F7\u221A\^\u00B1\u00B7\u2264\u2265\u2260\u2248]/;
+function ltrOn(){return document.documentElement.dir==="rtl"}
+function ltrRanges(t){var r=[],re=/[^\u0590-\u05FF\u0600-\u06FF\n]+/g,m,mm,s,mid;t=String(t);
+  while((m=re.exec(t))){if(!LTR_SIG.test(m[0]))continue;mm=m[0].match(/^([\s,.;:?!]*)([\s\S]*?)([\s,.;:?!]*)$/);s=m.index+mm[1].length;mid=mm[2];
+    if(m.index>0&&/[\u05D0-\u05EA]/.test(t.charAt(m.index-1))&&mid.charAt(0)==="-"){s++;mid=mid.slice(1)}
+    if(mid)r.push([s,s+mid.length])}
+  return r}
+function ltrHTML(t,escf){t=String(t);escf=escf||esc;if(!ltrOn())return escf(t);var r=ltrRanges(t),o="",p=0,i;
+  for(i=0;i<r.length;i++){o+=escf(t.slice(p,r[i][0]))+'<bdi dir="ltr">'+escf(t.slice(r[i][0],r[i][1]))+'</bdi>';p=r[i][1]}
+  return o+escf(t.slice(p))}
+function ltrTokHTML(text,mkTok){var parts=String(text).split(/(\s+)/),r=ltrOn()?ltrRanges(text):[],pos=0,open=false,buf="",o="",k,pt,fl,j,idx=0;
+  for(k=0;k<parts.length;k++){pt=parts[k];if(!pt.length)continue;
+    if(/^\s+$/.test(pt)){buf+=pt;pos+=pt.length;continue}
+    fl=false;if(!/[\u0590-\u05FF\u0600-\u06FF]/.test(pt))for(j=0;j<r.length;j++)if(pos<r[j][1]&&pos+pt.length>r[j][0]){fl=true;break}
+    if(fl&&!open){o+=buf+'<bdi dir="ltr">';open=true}
+    else if(!fl&&open){o+='</bdi>'+buf;open=false}
+    else o+=buf;
+    buf="";o+=mkTok(pt,idx++);pos+=pt.length}
+  if(open)o+='</bdi>';return o+buf}
+function onlyBdi(el){var c=el.children,i;for(i=0;i<c.length;i++)if(c[i].tagName!=="BDI")return false;return true}
+function hintHTML(h){h=String(h);return /[<&]/.test(h)?h:ltrHTML(h,function(x){return x})}
+function T(){return STR[S.lang]}
+function lt(o){return typeof o==="string"?o:o[S.lang]}
+function trackUnits(){return UNITS}
+function unitById(id){return UNITS.filter(function(u){return u.id===id})[0]}
+/* ===== מנוע ההקראה של "תאוריה מדברת" — חמישה מנגנונים =====
+   הועתק כלשונו מ-domino/index.html (ושם מ-rakia ומ-math-elem), כדי
+   שהעותקים לא יסחפו זה מזה. חמישה כשלים שקטים של Web Speech, שכולם
+   נראים ללומד אותו דבר — הקול מפסיק באמצע או לא מתחיל:
+     1 שומר-ער · 2 הפניה חיה ל-utterance · 3 שומר-סף ·
+     4 נפילה מקול רשת · 5 שחרור במגע (בלעדיו iOS שותק לגמרי).
+   voiceUsable הוא מפתח המיון הראשון, והמגדר בא אחריו.
+   כאן speechFix ממלא את מקומו של heSpoken שבדומינו: זהו מילון
+   ההגייה של האפליקציה הזאת (מינוס, כפול, חזקה, שבר), והוא היה
+   כאן לפני ההעתקה. */
+var HL={noB:false,el:null,raw:"",starts:[],timer:null,got:false},_u=null,_dis=null,_sayGen=0;
+/* 1 · שומר-ער. Chrome/Edge בשולחן העבודה חותכים הקראה אחרי כ-15 שניות.
+   השאלה כאן נאמרת יחד עם ארבעת המסיחים, וההסבר אחרי טעות ארוך עוד
+   יותר — שניהם נחתכים. במובייל אין את הבאג והפעולה מקרטעת שם, ולכן
+   רק בשולחן העבודה. */
+var NEEDS_KEEPALIVE=/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+                 &&!/Android|Mobile/i.test(navigator.userAgent);
+var _kaTimer=null;
+function startKeepAlive(){
+  if(!NEEDS_KEEPALIVE||!("speechSynthesis" in window)||_kaTimer)return;
+  _kaTimer=setInterval(function(){
+    try{
+      if(!speechSynthesis.speaking){stopKeepAlive();return}
+      if(speechSynthesis.paused)return;   /* עצירה מכוונת — לא נוגעים */
+      speechSynthesis.pause();speechSynthesis.resume();
+    }catch(e){stopKeepAlive()}
+  },9000);
+}
+function stopKeepAlive(){if(_kaTimer){clearInterval(_kaTimer);_kaTimer=null}}
+function maybeStopKeepAlive(){
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)return}catch(e){}
+  stopKeepAlive();
+}
+/* 3 · שומר-סף. יש מכשירים שבהם onend לא נורה: הכפתור נשאר על "עצירה"
+   וההקראה לא ממשיכה לעולם. ארבע שניות של שקט מוחלט נחשבות סוף. */
+function ttsWatchdog(alive,onSilent){
+  var idle=0,dog=setInterval(function(){
+    if(!alive()){clearInterval(dog);return}
+    var busy=false;
+    try{busy=!!(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}
+    if(busy){idle=0;return}
+    if(++idle>=4){clearInterval(dog);onSilent()}
+  },1000);
+  return function(){clearInterval(dog)};
+}
+/* 4 · קול רשת שנכשל. קול נוירלי שותק בלי אינטרנט, והלומד שומע כלום
+   בלי שגיאה. הדגל נכבה ומאותו רגע נבחר קול מקומי. */
+var _netVoiceOK=true;
+function voiceUsable(v){
+  if(!v||v.localService!==false)return 1;
+  return (_netVoiceOK&&navigator.onLine!==false)?1:0;
+}
+/* פיצול לאמירות קצרות — הועתק כלשונו מ-domino (ושם מ-rakia, ושם
+   מ"תאוריה מדברת"). מעל SEG_MAX מנועי מכשיר מאיצים ובולעים סופי
+   מילים; כל מקטע נושא את ההיסט שלו במחרוזת המלאה, כי charIndex
+   מתאפס בכל אמירה ובלעדיו ההדגשה קופצת לתחילת המשפט בכל מקטע.
+   insideNumber שומר שלא ייחתך בתוך מספר — "3.5" ו-"2:3". */
+var SEG_MAX=90, SEG_GAP=260;
+function insideNumber(str,i){ return i>0&&i+1<str.length&&/[0-9]/.test(str[i-1])&&/[0-9]/.test(str[i+1]) }
+function segments(spoken){
+  var out=[],parts=[],from=0,i,j;
+  function push(t,start){ if(String(t).trim())out.push({text:t,start:start}) }
+  for(i=0;i<spoken.length;i++){
+    if(".!?:;".indexOf(spoken[i])<0)continue;
+    if(insideNumber(spoken,i))continue;
+    j=i+1; while(j<spoken.length&&/\s/.test(spoken[j]))j++;
+    parts.push({text:spoken.slice(from,j),start:from});
+    from=j; i=j-1;
+  }
+  if(from<spoken.length)parts.push({text:spoken.slice(from),start:from});
+  for(var k=0;k<parts.length;k++){
+    var p=parts[k];
+    if(p.text.length<=SEG_MAX){ push(p.text,p.start); continue }
+    var rest=p.text,base=p.start;
+    while(rest.length>SEG_MAX){
+      var cut=rest.lastIndexOf(",",SEG_MAX);
+      while(cut>0&&insideNumber(rest,cut))cut=rest.lastIndexOf(",",cut-1);
+      if(cut<SEG_MAX*0.4)cut=rest.lastIndexOf(" ",SEG_MAX);
+      if(cut<=0)break;
+      push(rest.slice(0,cut+1),base);
+      base+=cut+1; rest=rest.slice(cut+1);
+    }
+    push(rest,base);
+  }
+  var merged=[];
+  for(i=0;i<out.length;i++){
+    if(merged.length&&out[i].text.trim().length<12&&merged[merged.length-1].text.length+out[i].text.length<=SEG_MAX*1.4){ merged[merged.length-1].text+=out[i].text; continue }
+    if(out[i].text.trim().length<12&&i+1<out.length){ out[i+1]={text:out[i].text+out[i+1].text,start:out[i].start}; continue }
+    merged.push(out[i]);
+  }
+  out=merged;
+  return out.length?out:[{text:spoken,start:0}];
+}
+var VF=/(female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
+var VM=/(\bmale\b|david|mark|asaf|hillel|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
+function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
+function vGender(v){var n=(v&&v.name)||"";return (VF.test(n)&&!VM.test(n))?"f":VM.test(n)?"m":"?"}
+/* voiceUsable הוא מפתח המיון הראשון, והמגדר בא אחריו ולא להפך:
+   קול נשי מת מנצח קול גברי חי כשהסדר מתהפך. */
+function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),
+  vs=voices().filter(function(v){return (v.lang||"").toLowerCase().replace("_","-").indexOf(pre)===0});
+  if(!vs.length)return {v:null,fem:false};
+  function grank(v){var g=vGender(v);return g==="f"?2:g==="?"?1:0}
+  /* ובתוך המגדר — האיכות. הניקוד הועתק מ-bestVoice של rakia (ושם
+     מ-english): בלעדיו נבחר הקול הנשי הראשון ברשימה ולא הטבעי —
+     Carmit המקומי ולא Hila (O-227). */
+  var want=code.toLowerCase();
+  function score(v){
+    var s=0,n=((v.name||"")+" "+(v.lang||"")).toLowerCase();
+    if(String(v.lang||"").replace("_","-").toLowerCase()===want)s+=12;
+    if(/\b(google|microsoft|apple)\b/.test(n))s+=30;
+    if(/natural|neural|enhanced|premium|wavenet|siri/.test(n))s+=22;
+    if(v.localService===false&&voiceUsable(v))s+=6;
+    if(/espeak|compact|pico/.test(n))s-=40;
+    if(v.default)s+=4;
+    return s;
+  }
+  var chosen=vs.slice().sort(function(a,b){
+    var d=voiceUsable(b)-voiceUsable(a); if(d)return d;
+    d=grank(b)-grank(a); return d||score(b)-score(a);
+  })[0];
+  return {v:chosen||null,fem:vGender(chosen)==="f"}}
+/* גובה — 1.12, הפריסט ״נשי רגוע״ של האתר, וקול גברי מורם ×1.35 עד התקרה
+   1.35 — voicePitch של rakia ו-english (O-227). עד כאן 1.05 לנשי ו-1.3 לכל
+   השאר, וההקראה כאן נשמעה אחרת מבשאר האתר. */
+var FEM_PITCH=1.35, PITCH_BASE=1.12;
+function femLift(v){ if(!v)return 1; return vGender(v)==="m"?FEM_PITCH:1 }
+function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
+function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.html!=null){HL.el.innerHTML=HL.el.dataset.html}HL.el=null}
+function hlPrep(el,text){hlClear();if(!el||!onlyBdi(el))return;el.dataset.html=el.innerHTML;HL.el=el;HL.raw=el.textContent;HL.got=false;
+  var re=/\S+/g,m;HL.starts=[];
+  while((m=re.exec(HL.raw)))HL.starts.push(m.index);
+  el.innerHTML=ltrTokHTML(HL.raw,function(t,i){return '<span data-w="'+i+'">'+esc(t)+'</span>'})}
+function hlAt(ci){if(!HL.el)return;var w=-1,i;for(i=0;i<HL.starts.length;i++){if(HL.starts[i]<=ci)w=i;else break}
+  var sp=HL.el.querySelectorAll("[data-w]");for(i=0;i<sp.length;i++)sp[i].className=(i===w?"hl":"")}
+function hlFallback(rate){if(!HL.el)return;var n=HL.starts.length,i=0,per=430/rate;
+  (function step(){if(!HL.el||HL.got)return;var sp=HL.el.querySelectorAll("[data-w]");for(var k=0;k<sp.length;k++)sp[k].className=(k===i?"hl":"");i++;if(i<=n)HL.timer=setTimeout(step,per)})()}
+function stopSpeak(){_sayGen++;try{speechSynthesis.cancel()}catch(e){}if(typeof RECORDED!=="undefined")RECORDED.stop();_u=null;stopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false)}
+var _playing=false;function setPlaying(b){_playing=b;var bs=document.querySelectorAll('[data-a="stop"]');bs.forEach(function(x){x.style.opacity=b?1:.55})}
+/* קול המכשיר, מקטע אחרי מקטע. speechSynthesis.cancel() אינו מבטל
+   setTimeout, ולכן כל הקראה מקבלת מספר דור: stopSpeak מקדם אותו,
+   ומקטע מדור ישן פשוט אינו מדבר. */
+/* מנוע ההגייה העברי — /tutor/he-speech.js (O-178, 16.10.2026).
+   **עברית בלבד**, ואחרי speechFix — כמו toSpoken ב-math-app. הקובץ
+   לא נטען — הטקסט חוזר כמות שהוא. המנוע שומר את מספר האסימונים,
+   ולכן heMap מתרגם charIndex של הנאמר למילה ה-i המוצגת: ״משלש״
+   שנאמר ״משולש״ אינו מזיז את ההדגשה של המילים שאחריו. */
+function heSpoken(t){if(S.lang!=="he"||typeof HESPEECH==="undefined")return t;try{return HESPEECH.spoken(t)}catch(e){return t}}
+function heStarts(s){var a=[],re=/\S+/g,m;while((m=re.exec(s)))a.push(m.index);return a}
+function heMap(c){var sp=HL.sp,w=-1,i;if(!sp)return c;for(i=0;i<sp.length;i++){if(sp[i]<=c)w=i;else break}return w<0?c:HL.starts[w]}
+function speakDevice(text,el,onend){var raw=String(text);
+  if(!("speechSynthesis" in window)||!raw)return false;
+  var fixed=speechFix(raw),spoken=heSpoken(fixed),rate=S.slow?0.7:0.95;   /* 0.95 — קצב האתר (O-227); 0.7 — ״לאט״ שהלומד בחר */
+  HL.noB=false;HL.sp=null;
+  if(el&&onlyBdi(el)&&el.textContent.trim()===raw.trim()){hlPrep(el,raw);HL.noB=(fixed!==raw);
+    if(!HL.noB&&spoken!==raw){HL.sp=heStarts(spoken);if(HL.sp.length!==HL.starts.length)HL.noB=true}}
+  var segs=segments(spoken),my=++_sayGen,v=pickVoice(),retried=false;
+  function alive(){return my===_sayGen}
+  function allDone(){if(!alive())return;maybeStopKeepAlive();if(_dis){_dis();_dis=null}hlClear();setPlaying(false);if(onend)onend()}
+  setPlaying(true);
+  (function sayseg(k){
+    if(!alive())return;
+    if(k>=segs.length){allDone();return}
+    var seg=segs[k],moved=false,disarm=null;
+    function next(){
+      if(moved||!alive())return;
+      moved=true;if(disarm)disarm();
+      if(k+1<segs.length)setTimeout(function(){sayseg(k+1)},SEG_GAP);
+      else allDone();
+    }
+    var u=new SpeechSynthesisUtterance(seg.text);
+    u.lang=LCODE[S.lang];if(v.v){try{u.voice=v.v}catch(e2){}}
+    u.rate=rate;u.pitch=voicePitch(v.v);
+    u.onboundary=function(e){if(HL.noB)return;if(e.name&&e.name!=="word")return;HL.got=true;hlAt(heMap(seg.start+e.charIndex))};
+    u.onend=next;
+    u.onerror=function(e){
+      if(moved||!alive())return;
+      var err=(e&&e.error)||"";
+      if(err==="canceled"||err==="interrupted"){moved=true;if(disarm)disarm();return}
+      /* 4 · נפילה מקול רשת: הדגל נכבה, נבחר קול מקומי, ואותו מקטע
+         נאמר שוב פעם אחת. בלי זה — שקט מוחלט בלי שגיאה. */
+      if(!retried&&v.v&&v.v.localService===false){
+        retried=true;_netVoiceOK=false;moved=true;
+        if(disarm)disarm();_u=null;
+        v=pickVoice();
+        setTimeout(function(){sayseg(k)},SEG_GAP);
+        return;
+      }
+      moved=true;if(disarm)disarm();allDone();
+    };
+    _u=u;   /* 2 · הפניה חיה ל-utterance — בלעדיה Chrome אוסף אותו עם onend */
+    try{if(speechSynthesis.paused)speechSynthesis.resume()}catch(e2){}
+    try{speechSynthesis.speak(u)}catch(e2){_u=null;setPlaying(false);return}
+    startKeepAlive();
+    disarm=ttsWatchdog(function(){return alive()&&!moved},next);
+    _dis=disarm;
+  })(0);
+  if(HL.el)setTimeout(function(){if(alive()&&HL.el&&!HL.got)hlFallback(rate)},900);
+  return true}
+/* שכבה 1 — קובץ מוקלט (המנוע של תאוריה מדברת, 3.10.2026). יש קובץ:
+   מנגנים וזהו — בלי הדגשה מילה־מילה (אין onboundary בקובץ). אין
+   קובץ, או שהקובץ נכשל: קול המכשיר כרגיל. */
+function speak(text,el,onend){stopSpeak();if(!text)return false;
+  if(typeof RECORDED!=="undefined"&&RECORDED.play(String(text),S.lang,{rate:S.slow?0.7:0.95,
+      onEnd:function(){setPlaying(false);if(onend)onend()},
+      onError:function(){speakDevice(text,el,onend)}})){
+    setPlaying(true);return true;
+  }
+  return speakDevice(text,el,onend)}
+function qSay(q){return lt(q.q)+". "+q.o.map(function(o,i){return optSay(o)}).join(". ")}
+/* ===== effects ===== */
+var ctx=null;function tone(f,d,t,v){if(!S.sfx)return;try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();var o=ctx.createOscillator(),g=ctx.createGain();o.type=t||"sine";o.frequency.value=f;g.gain.value=v||.08;o.connect(g);g.connect(ctx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+d);o.stop(ctx.currentTime+d)}catch(e){}}
+function sfxOk(){tone(660,.14);setTimeout(function(){tone(880,.18)},110)}function sfxSoft(){tone(330,.2,"sine",.05)}
+var cv,cx,parts=[],raf=null;
+function confetti(n){cv=$("#cf");if(!cv)return;cv.width=innerWidth;cv.height=innerHeight;cx=cv.getContext("2d");var cols=["#0e9c8d","#ffc531","#ff6f61","#58b7e0","#8a63d2","#1f9d4d"],i;
+  for(i=0;i<n;i++)parts.push({x:innerWidth/2+(Math.random()-.5)*80,y:innerHeight*.35,vx:(Math.random()-.5)*9,vy:-Math.random()*9-3,s:6+Math.random()*7,c:cols[i%6],r:Math.random()*6,l:70+Math.random()*30});
+  if(!raf)(function loop(){cx.clearRect(0,0,cv.width,cv.height);parts=parts.filter(function(p){return p.l>0});parts.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.r+=.2;p.l--;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);cx.restore()});raf=parts.length?requestAnimationFrame(loop):(cx.clearRect(0,0,cv.width,cv.height),null)})()}
+/* ===== views ===== */
+function fmt(s,v){return s.replace(/\{(\w)\}/g,function(m,k){return v[k]})}
+function header(){var t=T(),h='<div class="top"><button class="brand" data-a="home">'+esc(t.brand)+'</button><div class="langs" role="group">';
+  LG.forEach(function(l){h+='<button data-a="lang" data-l="'+l+'" aria-pressed="'+(S.lang===l)+'" lang="'+l+'">'+LNAME[l]+'</button>'});
+  return h+'</div><button class="gear" data-a="settings" aria-label="'+esc(t.settings)+'"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6a45b0" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></div>'}
+function tutorBtn(dis){return (window.TUTOR&&TUTOR.on&&TUTOR.on())?'<button class="btn tut" data-a="tutor" '+(dis?'disabled':'')+'><img src="/img/limor.jpg" alt="">'+esc(TUTOR.label())+'</button>':''}
+function listenRow(sayId){var t=T();return '<div class="row" style="margin:4px 0 8px"><button class="btn play" data-a="say" data-t="'+sayId+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M6 4l14 8-14 8z"/></svg>'+esc(t.listen)+'</button><button class="btn stop" data-a="stop"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>'+esc(t.stop)+'</button><button class="btn slow" data-a="slowsay" data-t="'+sayId+'">'+esc(t.slow)+'</button></div>'}
+function spk(a){return '<button class="sp" data-a="'+a.a+'" '+(a.k!=null?'data-k="'+a.k+'"':'')+' aria-label="'+esc(T().listen)+'"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8c2 2 2 6 0 8" stroke="#fff" fill="none" stroke-width="2"/></svg></button>'}
+function iconSvg(id){return '<svg viewBox="0 0 68 68" width="68" height="68" aria-hidden="true">'+(ICONS[id]||"")+'</svg>'}
+function homeView(){var t=T(),h='<h1 data-say id="h1">'+esc(t.title)+'</h1><p class="sub" id="hs">'+esc(t.tag)+'</p>'+listenRow("home");
+  h+='<h2>'+esc(t.pick)+'</h2><div class="units">';
+  trackUnits().forEach(function(u){h+='<button class="unit" style="--c:'+u.c+'" data-a="unit" data-u="'+u.id+'"><span class="ico">'+iconSvg(u.id)+'</span><span><span class="nm" style="display:block">'+esc(lt(u.n))+'</span><span class="ds">'+esc(lt(u.d))+'</span></span>'+(S.done[u.id]?'<span class="ok">\u2713</span>':'')+'</button>'});
+  h+='</div><p class="sub" style="margin-top:14px">'+esc(t.soonT)+'</p><p class="credit">'+esc(t.credit)+' <a href="https://pop.education.gov.il/tchumey_daat/physics/high-school/pedagogy/curriculum/" target="_blank" rel="noopener">'+esc(t.crediL)+'</a><br>'+esc(t.credit2)+'<br>'+esc(t.mtNote)+'<br>'+esc(t.privacy)+'</p>';return h}
+
+function unitView(){var t=T(),u=unitById(V.unit),h='<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1 style="color:'+u.c+'">'+esc(lt(u.n))+'</h1><p class="sub">'+esc(lt(u.d))+'</p>';
+  h+='<div class="card"><button class="btn" style="background:'+u.c+';width:100%" data-a="lesson">'+esc(t.lesson)+'</button></div>';
+  h+='<div class="card"><h2>'+esc(t.practice)+": "+esc(t.lvTitle)+'</h2><div class="lvls">';
+  [["l1","#1f9d4d"],["l2","#2f7fd8"],["l3","#f58a1f"],["l4","#8a63d2"]].forEach(function(l,i){h+='<button class="lvl" style="background:'+l[1]+'" data-a="start" data-l="'+(i+1)+'">'+esc(t[l[0]])+'<small>'+esc(t[l[0]+"d"])+'</small></button>'});
+  return h+'</div></div>'}
+function lessonView(){var t=T(),u=unitById(V.unit),ls=LESSONS[V.unit],st=ls[V.step],n=ls.length,txt=lt(st.t);
+  var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="dots" style="margin-top:12px">'+ls.map(function(_,i){return '<i class="'+(i<V.step?"on":i===V.step?"cur":"")+'"></i>'}).join("")+'</div>';
+  h+='<div class="card stepcard"><div class="sub">'+esc(fmt(t.stepOf,{a:V.step+1,b:n}))+'</div>'+listenRow("lesson")+'<div class="qtext" id="lt" data-say>'+ltrHTML(txt)+'</div><div class="vis">'+st.v()+'</div></div>';
+  h+='<div style="margin:0 0 12px">'+tutorBtn()+'</div><div class="row">'+(V.step>0?'<button class="btn ghost" data-a="lprev">'+esc(t.prev)+'</button>':'')+(V.step<n-1?'<button class="btn next" data-a="lnext">'+esc(t.next)+'</button>':'<button class="btn next" data-a="start" data-l="1">'+esc(t.lessonEnd)+'</button>')+'</div>';return h}
+/* מפתח השוואה בלבד. ה-SVG נלקח גולמי ולא דרך lt, כדי שהבידוד הדו־כיווני
+   לא ירוץ על "translate(0,64)" שבתוכו. (אומץ מ-math-elem, 4.10.2026:
+   כאן ההשוואה הייתה מול השאלה הקודמת בלבד, ו-17% מהסבבים חזרו על שאלה.) */
+function qkey(q){return lt(q.q)+"|"+(q.vis||"")+"|"+(q.visL?q.visL[S.lang]:"")}
+function mkQ(unit,lv){var g=G[unit],l=lv===4?pick([1,2,3,3]):lv,q=g(l),n=0,seen={};(P&&P.list||[]).forEach(function(p){seen[qkey(p)]=1});
+  while(n<40&&seen[qkey(q)]){q=g(l);n++}return q}
+/* "שאלות שהיו קשות יחזרו בפעם הבאה" (finX, בארבע השפות) — הבטחה שלא קוימה:
+   P.missed נאסף ונזרק עם P בסוף הסבב. כאן הוא שורד את הסבב, לפי נושא.
+   _rq מסמן שאלה שכבר חזרה, כדי שלא תסתובב בלי סוף. (מ-math-elem.) */
+var MISS={};
+function startRound(lv){P={unit:V.unit,lv:lv,list:[],i:0,picked:null,hints:0,hintShown:false,exShown:false,streak:0,missed:[]};
+  P.list=(MISS[V.unit]||[]).splice(0,3);P.list.forEach(function(x){x._rq=1});
+  for(var i=P.list.length;i<8;i++)P.list.push(mkQ(V.unit,lv));view="practice";P.cur=P.list[0];render()}
+function practiceView(){var t=T(),q=P.list[P.i],n=P.list.length,u=unitById(P.unit);
+  var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="sub" style="margin-top:10px">'+esc(lt(u.n))+" · "+esc(fmt(t.qOf,{a:P.i+1,b:n}))+'</div><div class="prog"><i style="width:'+(P.i/n*100)+'%"></i></div>';
+  h+='<div class="card">'+listenRow("q")+'<div class="qtext" id="qt" data-say>'+ltrHTML(lt(q.q))+'</div>';
+  var vis=q.visL?q.visL[S.lang]:q.vis;if(vis)h+='<div class="vis">'+vis+'</div>';
+  var wide=q.o.some(function(o){return optLabel(o).length>7});h+='<div class="opts'+(wide?' wide':'')+'">';q.o.forEach(function(o,i){var cls="opt"+(P.picked!=null?(o.id===q.a?" good":(P.picked===i?" pick":"")):"");
+    h+='<div class="'+cls+'"><button class="ob" data-a="pick" data-k="'+i+'" '+(P.picked!=null?"disabled":"")+'>'+ltrHTML(optLabel(o))+'</button>'+(P.picked!=null&&o.id===q.a?'<span class="mk">✓</span>':'')+spk({a:"sayopt",k:i})+'</div>'});
+  h+='</div>';
+  if(P.picked==null){h+='<div class="row" style="margin-top:14px"><button class="btn hint" data-a="hint">'+esc(t.hint)+'</button><button class="btn ex" data-a="example">'+esc(t.example)+'</button></div><div style="margin-top:12px">'+tutorBtn()+'</div>';
+    if(P.hintShown)h+='<div class="hintbox" id="hb">'+ltrHTML(lt(q.h))+'</div>';
+    if(P.exShown){var st=LESSONS[P.unit][Math.min(q.step,LESSONS[P.unit].length-1)];h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><div id="ex" data-say>'+ltrHTML(lt(st.t))+'</div><div class="vis">'+st.v()+'</div></div></div>'}}
+  else{var ok=P.picked===q.o.map(function(o){return o.id}).indexOf(q.a);
+    h+=ok?'<div class="ok-box" id="rb">'+esc(P.msg)+'</div>':'<div class="tbox"><img src="/img/limor.jpg" alt=""><div><b>'+esc(t.wrong)+'</b></div></div>';
+    h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><div>'+esc(t.ans)+'<b>'+ltrHTML(optLabel(q.o.filter(function(o){return o.id===q.a})[0]))+'</b></div><div id="ex" data-say>'+ltrHTML(lt(q.e))+'</div></div></div>';
+    h+='<div class="row" style="margin-top:12px"><button class="btn next" data-a="next">'+esc(P.i<n-1?t.next:t.done)+'</button></div>'}
+  return h+'</div>'}
+function endView(){var t=T();return '<h1 id="et" data-say>'+esc(t.finT)+'</h1><div class="card">'+listenRow("end")+'<p class="qtext" id="ex" data-say>'+esc(t.finX)+'</p><div class="row"><button class="btn next" data-a="start" data-l="'+P.lv+'">'+esc(t.again)+'</button><button class="btn ghost" data-a="home">'+esc(t.home)+'</button></div></div>'}
+function settingsView(){var t=T();function tg(k,l){return '<div class="set"><span>'+esc(l)+'</span><button class="tog" data-a="tog" data-k="'+k+'" aria-pressed="'+!!S[k]+'">'+esc(S[k]?t.on:t.off)+'</button></div>'}
+  return '<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1>'+esc(t.settings)+'</h1><div class="card">'+tg("slow",t.setSlow)+tg("sfx",t.setSfx)+tg("big",t.setBig)+tg("clearFont",t.setClear)+tg("contrast",t.setContrast)+tg("spaced",t.setSpaced)+tg("reduceMotion",t.setMotion)+'<div class="set"><span>'+esc(t.setTheme)+'</span><span class="row">'+[["auto",t.thAuto],["light",t.thLight],["dark",t.thDark]].map(function(x){return '<button class="tog" data-a="theme" data-th="'+x[0]+'" aria-pressed="'+((S.theme||"auto")===x[0])+'">'+esc(x[1])+'</button>'}).join("")+'</span></div>'+'<div class="set"><button class="btn ghost" data-a="reset">'+esc(t.reset)+'</button></div></div>'}
+function render(){applyModes();document.documentElement.lang=S.lang;document.documentElement.dir=LDIR[S.lang];
+  var h=header();h+=({home:homeView,unit:unitView,lesson:lessonView,practice:practiceView,end:endView,settings:settingsView})[view]();$("#app").innerHTML=h;
+  document.title=T().title+" · bekol";if(window.TUTOR&&TUTOR.refresh)try{TUTOR.refresh()}catch(e){}}
+function sayText(w){var q=P&&P.list&&P.list[P.i],t=T();
+  if(w==="home")return [t.title+". "+t.tag,$("#h1")];if(w==="lesson")return [$("#lt").textContent,$("#lt")];
+  if(w==="end")return [t.finX,$("#ex")];if(w==="q")return [qSay(q),null];return ["",null]}
+/* קודם השאלה (עם ההדגשה), ואחריה המסיחים. עד היום השרשור נעשה
+   בדריסת _u.onend מבחוץ — ועם חיתוך האמירה למקטעים _u הוא המקטע
+   הראשון בלבד, כך שהמסיחים היו נאמרים אחרי המקטע הראשון במקום
+   בסוף. הקריאה החוזרת יושבת עכשיו ב-onend של speak, שנורה פעם
+   אחת כשכל המקטעים נגמרו (וגם כשניגן קובץ מוקלט). */
+function sayQ(slow){var q=P.list[P.i],old=S.slow,sl=slow?true:old,
+  el=$("#qt"),rest=q.o.map(optSay).join(". ");
+  S.slow=sl;
+  speak(lt(q.q),el,function(){
+    hlClear();
+    S.slow=sl;speak(rest,null,function(){S.slow=old});S.slow=old;
+  });
+  S.slow=old}
+function onAct(a,el){var t=T(),q=P&&P.list&&P.list[P.i];
+  if(a==="home"){stopSpeak();view="home";render();window.scrollTo(0,0)}
+  else if(a==="track"){S.track=el.dataset.v==="g9"?"g9":"g7";saveS();render()}
+  else if(a==="band"){S.band=+el.dataset.b;saveS();render()}
+  else if(a==="lang"){stopSpeak();S.lang=el.dataset.l;saveS();render()}
+  else if(a==="theme"){S.theme=el.dataset.th;saveS();render()}
+  else if(a==="settings"){stopSpeak();view="settings";render()}
+  else if(a==="unit"){stopSpeak();V.unit=el.dataset.u||V.unit;view="unit";render();window.scrollTo(0,0)}
+  else if(a==="lesson"){stopSpeak();V.step=0;view="lesson";render()}
+  else if(a==="lnext"){stopSpeak();V.step++;render();window.scrollTo(0,0)}
+  else if(a==="lprev"){stopSpeak();V.step--;render()}
+  else if(a==="start"){stopSpeak();startRound(+el.dataset.l)}
+  else if(a==="say"||a==="slowsay"){var w=el.dataset.t;if(w==="q")sayQ(a==="slowsay");else{var r=sayText(w),o=S.slow;if(a==="slowsay")S.slow=true;speak(r[0],r[1]);S.slow=o}}
+  else if(a==="stop")stopSpeak();
+  else if(a==="tutor"){stopSpeak();if(window.TUTOR)TUTOR.open()}
+  else if(a==="sayopt"){speak(optSay(q.o[+el.dataset.k]),null)}
+  else if(a==="hint"){P.hintShown=true;render();var hb=$("#hb");speak(lt(q.h),hb)}
+  else if(a==="example"){P.exShown=true;render();speak($("#ex").textContent,$("#ex"))}
+  else if(a==="pick"){stopSpeak();var k=+el.dataset.k;P.picked=k;var ok=q.o[k].id===q.a;
+    if(ok){P.streak++;var msg=(P.streak>=3&&P.streak%3===0)?pick(t.streak):pick(t.right);P.msg=msg;sfxOk();confetti(P.streak>=3?120:50)}
+    else{P.streak=0;sfxSoft();var ms=MISS[P.unit]=MISS[P.unit]||[];
+      if(P.missed.length<3&&ms.length<6&&q.t&&!q._rq){P.missed.push(q);ms.push(q)}}
+    announce((ok?P.msg:t.wrong)+" "+t.ans+optLabel(q.o.filter(function(o){return o.id===q.a})[0]));
+    render();if(ok){var rb=$("#rb");speak(P.msg,rb)}else{speak(t.wrong+" "+t.ans+optSay(q.o.filter(function(o){return o.id===q.a})[0])+". "+lt(q.e),null)}}
+  else if(a==="next"){stopSpeak();if(P.i<P.list.length-1){P.i++;P.picked=null;P.hintShown=false;P.exShown=false;render();window.scrollTo(0,0);setTimeout(function(){sayQ(false)},250)}
+    else{S.done[P.unit]=true;saveS();view="end";render();confetti(160);window.scrollTo(0,0)}}
+  else if(a==="tog"){var kk=el.dataset.k;S[kk]=!S[kk];saveS();render()}
+  else if(a==="reset"){if(confirm(t.resetAsk)){S.done={};saveS();render()}}}
+document.addEventListener("click",function(e){var el=e.target.closest("[data-a]");if(!el||el.disabled)return;onAct(el.dataset.a,el)});
+window.addEventListener("pagehide",function(){stopSpeak()});
+/* 5 · iOS לא ישמיע כלום עד שאמירה אחת יצאה מתוך handler של מגע אמיתי.
+   קריאה ישירה, בלי המתנה לרשימת הקולות — הבטחה שוברת את שרשרת המגע
+   ו-Safari כבר לא יזהה את האמירה כיוזמת משתמש. */
+try{document.addEventListener("pointerdown",function(){
+  try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+},{once:true});}catch(e){}
+/* רשימת הקולות נטענת אסינכרונית ב-Chrome: בלי הבעיטה הזאת getVoices
+   של הלחיצה הראשונה חוזר ריק, ונבחר קול ברירת המחדל של המערכת. */
+try{speechSynthesis.getVoices();
+    speechSynthesis.addEventListener("voiceschanged",function(){try{voices()}catch(e){}});}catch(e){}
+</script>
+<script src="/tutor/josh-face.js"></script>
+<script src="/tutor/he-speech.js"></script>
+<script src="/speech/recorded.js"></script>
+<script src="/tutor/josh-state.js"></script>
+<script src="/tutor/josh-local.js"></script>
+<script src="/tutor/tutor.js"></script>
+<script src="/tutor/barak-core.js"></script>
+<script src="/legal/terms.js"></script>
+<script src="/legal/protect.js"></script>
+<script>
+/* ===== boot ===== */
+(function(){if(!INTERNAL_OK){document.getElementById("gate").hidden=false;document.title="לא פורסם";return}
+  var q=new URLSearchParams(location.search),l=q.get("lang");if(l&&STR[l])S.lang=l;
+  render();
+  var go=q.get("go");if(go){var p=go.split(":");V.unit=p[1]||V.unit;
+    if(p[0]==="unit"){view="unit";render()}else if(p[0]==="lesson"){V.step=+(p[2]||0);view="lesson";render()}
+    else if(p[0]==="practice"){startRound(+(p[2]||2));(q.get("act")||"").split(",").forEach(function(a){if(!a)return;
+      if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
+    else if(p[0]==="settings"){view="settings";render()}}
+  if(window.TUTOR){try{TUTOR.mount({app:"physics",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=ph2-pwa1").catch(function(){})});
+})();
+</script>
+
+<!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
+     (זה גם מה שכתוב בתנאים). הספירה היא לפי נתיב, ולכן כל אפליקציה
+     נמדדת בנפרד. הוסר 10.9.2026 והוחזר 15.9.2026, שניהם בהחלטת הבעלים. -->
+<script data-goatcounter="https://yehoshua-apps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>

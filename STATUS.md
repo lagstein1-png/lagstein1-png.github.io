@@ -29,6 +29,8 @@
 | `electric` | e61 · 2026-10-18 | e61-pwa1 | תואם |
 | `science-mid` | scimid17 · 2026-10-16 | scimid17-pwa1 | תואם |
 | `biology` | bg28 · 2026-10-18 | bg28-pwa1 | תואם |
+| `chemistry` | ch2 · 2026-10-19 | ch2-pwa1 | תואם |
+| `physics` | ph2 · 2026-10-19 | ph2-pwa1 | תואם |
 | `geography` | q50 · 2026-10-18 | q50-pwa1 | תואם |
 | `bagrut-history` | h139 · 2026-10-16 | h139-pwa1 | תואם |
 | `islam` | is25 · 2026-10-18 | is25-pwa1 | תואם |
@@ -43,6 +45,3 @@
 | `net-elem` | ns15 · 2026-10-16 | ns15-pwa1 | תואם |
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-10-19.
-
-
-
