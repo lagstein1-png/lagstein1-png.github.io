@@ -655,6 +655,24 @@ async function shoot(browser, app, lg) {
     await page.click(`#lang [data-l="${lg}"]`).catch(() => {});
   }
   await page.waitForTimeout(500);
+  /* אפליקציות עם שורת שפה בתוך הדף (data-a=lang) במקום שער lg —
+     בלעדיו הצילום נשאר עברית בארבע השפות (english-mid, 20.10.2026) */
+  const lb = page.locator(`button[data-a="lang"][data-l="${lg}"]`).first();
+  if (await lb.count()) { await lb.click().catch(() => {}); await page.waitForTimeout(500); }
+  /* שער התנאים, אם נפתח — מאשרים כדי להגיע לשאלה */
+  const lgok = page.locator('#lg-ok');
+  if (await lgok.count()) { await lgok.click().catch(() => {}); await page.waitForTimeout(800); }
+  /* באנר ההתקנה מכסה את הראש — מורידים לפני הצילום */
+  await page.evaluate(() => { document.querySelectorAll('.lg-install').forEach(e => e.remove()); });
+  if (app !== 'home') {
+    /* באפליקציות בלי DEMO_SCRIPT נכנסים לשאלה הראשונה דרך כרטיס הנושא */
+    const ub = page.locator('button[data-a="unit"]').first();
+    if (await ub.count()) {
+      await ub.click().catch(() => {}); await page.waitForTimeout(700);
+      const sb = page.locator('button[data-a="start"]').first();
+      if (await sb.count()) { await sb.click().catch(() => {}); await page.waitForTimeout(900); }
+    }
+  }
   if (app !== 'home') {
     /* עד השאלה הראשונה: צעדי ההדגמה שלפני צעד ההקראה, בלי להמתין
        את משך הכתובית — רק כדי שהלחיצה המושהית (430ms) תספיק. */
