@@ -32,6 +32,7 @@
 | `chemistry` | ch2 · 2026-10-19 | ch2-pwa1 | תואם |
 | `physics` | ph2 · 2026-10-19 | ph2-pwa1 | תואם |
 | `english-upper` | eu1 · 2026-10-19 | eu1-pwa1 | תואם |
+| `english-mid` | em1 · 2026-10-19 | em1-pwa1 | תואם |
 | `geography` | q50 · 2026-10-18 | q50-pwa1 | תואם |
 | `bagrut-history` | h139 · 2026-10-16 | h139-pwa1 | תואם |
 | `islam` | is25 · 2026-10-18 | is25-pwa1 | תואם |
