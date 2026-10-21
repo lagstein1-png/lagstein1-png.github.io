@@ -199,13 +199,45 @@ function segments(spoken){
    מילה־מילה (drop), ולא הדגשה שגויה. */
 const heStarts=s=>{const a=[],re=/\S+/g;let m;while((m=re.exec(s)))a.push(m.index);return a};
 const heSay=p=>{const d=sayable(p.text);if(p.lg!=='he'||typeof HESPEECH==='undefined')return {s:d};let s;try{s=HESPEECH.spoken(d)}catch(e){return {s:d}}if(s===d)return {s:d};const ds=heStarts(d),ss=heStarts(s);if(ds.length!==ss.length)return {s:s,drop:true};return {s:s,map:c=>{let k=-1;for(let j=0;j<ss.length;j++){if(ss[j]<=c)k=j;else break}return k<0?c:ds[k]}}};
-const speakParts=parts=>{if(!window.speechSynthesis)return;speechSynthesis.cancel();clearRd();stopKeepAlive();_activeU=null;const my=++_sg;parts=parts.filter(p=>p.text&&String(p.text).trim());parts=[].concat.apply([],parts.map(p=>{const h=heSay(p);return segments(h.s).map((g,k)=>Object.assign({},p,{text:g.text,off:g.start,cont:k>0,map:h.map,tr:h.drop?null:p.tr}))}));const alive=()=>my===_sg;let retried=false;
+/* מקטעים לפי כתב (O-232, 21.10.2026). בממשק ערבי, רוסי או אנגלי ההוראה
+   מתורגמת, אבל החומר הנלמד נשאר עברית: ״أكملوا: «הילדים ___ לספרייה»״,
+   ״كلمة לכן (لذلك)״. עד כאן textLang בחר קול אחד לכל המחרוזת לפי הכתב
+   שרובו בה — וקול עברי קרא את הערבית, או קול אנגלי את העברית.
+   כאן המחרוזת נחתכת לגושים לפי כתב, וכל גוש נקרא בקול של שפתו — אותו
+   רעיון כמו langSegs ב-hebrew-arab, אבל בארבעה כתבים ובגבול מילה, כי
+   כאן העברית יושבת בתוך המשפט ולא במשפט משלה.
+   מה שאינו אות — רווח, פיסוק, ספרה, קו תחתון — אינו פותח גוש: הוא נצמד
+   לגוש שלפניו עד הרווח האחרון, וגרש פותח (« או סוגר) עובר לגוש שאחריו.
+   פיסוק וספרות ערביים (، ؛ ؟, ٠–٩) נחשבים פיסוק ולא אות, אחרת ״؟״ נקרא לבדו.
+   start הוא היסט במחרוזת המלאה, כדי שההדגשה מילה־במילה תישאר במקום. */
+const SCRIPT_RX={he:/[\u0590-\u05FF\uFB1D-\uFB4F]/,ar:/[\u0620-\u065F\u066E-\u06D3\u06D5-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/,ru:/[\u0400-\u04FF]/,en:/[A-Za-z]/};
+const scriptOf=ch=>{for(const k in SCRIPT_RX)if(SCRIPT_RX[k].test(ch))return k;return ''};
+function scriptRuns(text,fb){
+  text=String(text==null?'':text);
+  const runs=[];let g0=-1;
+  for(let i=0;i<text.length;i++){
+    const k=scriptOf(text[i]);
+    if(!k){if(g0<0)g0=i;continue}
+    const last=runs[runs.length-1];
+    if(!last)runs.push({lg:k,start:0});
+    else if(last.lg!==k){
+      let cut=i;
+      if(g0>=0){const gap=text.slice(g0,i),ws=gap.search(/\s\S*$/);
+        if(ws>=0)cut=g0+ws+1;else{const op=gap.search(/[«(“„\[]/);if(op>=0)cut=g0+op}}
+      runs.push({lg:k,start:cut});
+    }
+    g0=-1;
+  }
+  if(!runs.length)return [{text:text,start:0,lg:fb}];
+  return runs.map((r,j)=>({lg:r.lg,start:r.start,text:text.slice(r.start,j+1<runs.length?runs[j+1].start:text.length)}));
+}
+const speakParts=parts=>{if(!window.speechSynthesis)return;speechSynthesis.cancel();clearRd();stopKeepAlive();_activeU=null;const my=++_sg;parts=parts.filter(p=>p.text&&String(p.text).trim());parts=[].concat.apply([],parts.map(p=>[].concat.apply([],scriptRuns(p.text,p.lg).map((r,j)=>{const h=heSay({text:r.text,lg:r.lg});return segments(h.s).map((g,k)=>Object.assign({},p,{lg:r.lg,text:g.text,off:g.start,base:r.start,cont:j>0||k>0,map:h.map,tr:h.drop?null:p.tr}))}))));const alive=()=>my===_sg;let retried=false;
   const step=i=>{if(!alive())return;if(i>=parts.length){maybeStopKeepAlive();return}const p=parts[i],code=TTS_CODE[p.lg]||TTS_CODE.he,r=pickVoice(p.lg);if(r.none&&!r.empty){if(p.lg!=='he'){vNotice(p.lg);step(i+1);return}}
     /* moved מבטיח שחלק מתקדם פעם אחת בלבד: onend ושומר הזמן יכולים שניהם
        לרצות לקדם אותו, וקידום כפול מדלג על חלק. */
     let moved=false,disarm=null;
     const go=()=>{if(moved||!alive())return;moved=true;if(disarm)disarm();if(parts[i+1]&&parts[i+1].cont)setTimeout(()=>step(i+1),SEG_GAP);else step(i+1)};
-    const u=new SpeechSynthesisUtterance(sayable(p.text));u.lang=code;u.rate=rate;if(p.tr)u.onboundary=e=>{if(e.name&&e.name!=='word')return;let ci=e.charIndex+(p.off||0);if(p.map)ci=p.map(ci);p.tr.forEach(w=>w.el.classList.remove('rd'));const w=p.tr.find(w=>ci>=w.s&&ci<w.e);if(w)w.el.classList.add('rd')};if(r.v)u.voice=r.v;u.pitch=voicePitch(r.v);
+    const u=new SpeechSynthesisUtterance(sayable(p.text));u.lang=code;u.rate=rate;if(p.tr)u.onboundary=e=>{if(e.name&&e.name!=='word')return;let ci=e.charIndex+(p.off||0);if(p.map)ci=p.map(ci);ci+=p.base||0;p.tr.forEach(w=>w.el.classList.remove('rd'));const w=p.tr.find(w=>ci>=w.s&&ci<w.e);if(w)w.el.classList.add('rd')};if(r.v)u.voice=r.v;u.pitch=voicePitch(r.v);
     u.onend=go;
     u.onerror=e=>{if(moved||!alive())return;const err=(e&&e.error)||'';
       /* ביטול יזום אינו תקלה — stopSpeech כבר ניקה אחריו */

@@ -410,7 +410,7 @@ E t_pharaohdaughter|t|בת פרעה|ابنة فرعون|дочь фараона|
 E t_rachel_n|t|רחל אשת יעקב|راحيل زوجة يعقوب|Рахиль, жена Иакова|Rachel, Jacob's wife
 E t_sarah_n|t|שרה אשת אברהם|سارة زوجة إبراهيم|Сара, жена Авраама|Sarah, Abraham's wife
 E t_eve_n|t|חוה מגן עדן|حواء من جنة عدن|Ева из Эдемского сада|Eve from the Garden of Eden
-E t_adam_n2|t|אדם הראשון|آدم|Адам|Adam from the garden
+E t_adam_n2|t|אדם הראשון|آدم|Адам из сада Эдем|Adam from the garden
 E t_noah_n2|t|נוח מהתיבה|نوح من الفلك|Ной из ковчега|Noah from the ark
 E t_abraham_n2|t|אברהם מהאוהל|إبراهيم من الخيمة|Авраам из шатра|Abraham from the tent
 E t_moses_n2|t|משה מהר סיני|موسى من جبل سيناء|Моисей с горы Синай|Moses from Mount Sinai
@@ -700,7 +700,7 @@ E t_lot|t|הוא הגריל בין שתי הנשים עם אבנים|أجرى ق
 E t_asked_king|t|הוא שאל את המלך השכן מה לעשות|سأل الملك المجاور ماذا عليه أن يفعل|он спросил соседнего царя, что надо делать|He asked the neighboring king what to do
 E t_temple|t|בית המקדש|الهيكل|Храм|the Temple
 E t_pyramid|t|פירמידה|هرمًا|пирамиду|a pyramid
-E t_ark2|t|תיבה|فلكًا|ковчег|an ark
+E t_ark2|t|תיבה|فلكًا|Ноев ковчег|an ark
 E t_tower2|t|מגדל|برجًا|башню|a tower
 E t_proverbs|t|משלי|سفر الأمثال|Притчи|Proverbs
 E t_atlas|t|אטלס|أطلس|атлас|an atlas
