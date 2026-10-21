@@ -25,6 +25,7 @@ var INTERNAL_OK=true;
 html[data-theme=dark]{color-scheme:dark;--paper:#101a1c;--card:#1b2a2e;--ink:#e8f1ef;--ink-soft:#a9bfc0;--teal-soft:#16413c;--amber-soft:#3a2f10;--amber-deep:#ffd66b;--coral-soft:#4a2520;--sky-soft:#173543;--violet-soft:#2a2144}
 html[data-theme=dark] .brand,html[data-theme=dark] .btn.ghost,html[data-theme=dark] .credit a{color:#7fe0d3}
 html[data-theme=dark] .btn.tut{color:#d9c8ff}
+html[data-theme=dark] h1.uh{color:var(--ink)!important}
 html[data-theme=dark] .unit .nm,html[data-theme=dark] .opt .ob,html[data-theme=dark] .band,html[data-theme=dark] .tog,html[data-theme=dark] .langs button,html[data-theme=dark] .lvl small{color:var(--ink)}
 html[data-theme=dark] .langs button[aria-pressed=true],html[data-theme=dark] .band[aria-pressed=true],html[data-theme=dark] .tog[aria-pressed=true]{color:#fff}
 html[data-theme=dark] .card{box-shadow:0 2px 10px rgba(0,0,0,.4)}
@@ -201,7 +202,7 @@ G.catom=function(lv){var T=[];
   });
   if(lv>=2){T.push(function(){var io=pick(IONS),f=io[0],z=io[1],el=io[2];
     return mk("ion",LL(function(l){return({he:"כמה אלקטרונים יש ביון "+f+"?",ar:"كم إلكتروناً في أيون "+f+"؟",ru:"Сколько электронов в ионе "+f+"?",en:"How many electrons are in the ion "+f+"?"})[l]}),"",el,[z,z+1,z-1,el+1,el-1,el+2].filter(function(x){return x>0&&x!==el}),
-     L("ביון חיובי נוראים אלקטרונים, וביון שלילי מתווספים.","في الأيون الموجب تُفقد إلكترونات، وفي السالب تُكتسب.","В положительном ионе электроны теряются, в отрицательном прибавляются.","A positive ion loses electrons; a negative ion gains them."),
+     L("ביון חיובי אובדים אלקטרונים, וביון שלילי מתווספים.","في الأيون الموجب تُفقد إلكترونات، وفي السالب تُكتسب.","В положительном ионе электроны теряются, в отрицательном прибавляются.","A positive ion loses electrons; a negative ion gains them."),
      LL(function(l){return({he:"המספר האטומי "+z+", ומטען היון משנה רק את האלקטרונים: ",ar:"العدد الذري "+z+"، وشحنة الأيون تغيّر الإلكترونات فقط: ",ru:"Атомный номер "+z+", а заряд иона меняет только электроны: ",en:"Atomic number "+z+", and the ion charge changes only electrons: "})[l]+el+"."}));
   });}
   if(lv>=3){T.push(function(){var z=ri(3,20),e=EL[z];
@@ -245,16 +246,16 @@ G.cper=function(lv){var T=[];
   });
   T.push(function(){var gi=ri(0,GRPS.length-1),g=GRPS[gi],z=pick(g);
     var ing=g.filter(function(x){return x!==z});
-    var outg=[];for(var i=1;i<=20;i++){if(g.indexOf(i)<0)outg.push(i)}
+    var outg=[];for(var i=2;i<=20;i++){if(g.indexOf(i)<0)outg.push(i)}
     var dd=shuffle(outg).slice(0,5).map(function(x){return elLab(x)});
     return mk("samegrp",LL(function(l){return({he:"איזה יסוד נמצא באותה קבוצה כמו ",ar:"أي عنصر يقع في نفس المجموعة مع ",ru:"Какой элемент находится в одной группе с ",en:"Which element is in the same group as "})[l]+EL[z].n[l]+" ("+EL[z].s+")?"}),"",elLab(pick(ing)),dd,
-     L("באותה קבוצה אותו מספר של אלקטרוני ערכיות.","في نفس المجموعة نفس عدد إلكترونات التكافؤ.","В одной группе одинаковое число валентных электронов.","Elements in a group share the same valence electron count."),
+     L("באותה קבוצה אותו מספר של אלקטרוני ערכיות (יוצא דופן: הליום).","في نفس المجموعة نفس عدد إلكترونات التكافؤ (باستثناء الهيليوم).","В одной группе одинаковое число валентных электронов (исключение — гелий).","Elements in a group share the same valence electron count (helium is the exception)."),
      LL(function(l){return({he:"חברי הקבוצה: ",ar:"أعضاء المجموعة: ",ru:"Члены группы: ",en:"Group members: "})[l]+g.map(function(x){return EL[x].s}).join(", ")+"."}));
   });
   if(lv>=3){T.push(function(){var fams=[[3,11,19,L("מתכת אלקלית","فلز قلوي","Щелочной металл","Alkali metal")],[9,17,L("הלוגן","هالوجين","Галоген","Halogen")],[2,10,18,L("גז אציל","غاز نبيل","Благородный газ","Noble gas")],[4,12,20,L("מתכת אלקלית-קרקע","فلز قلوي ترابي","Щёлочноземельный металл","Alkaline earth metal")]];
     var fi=ri(0,3),fm=fams[fi],mem=fm.slice(0,fm.length-1),z=pick(mem);
     var wrong=fams.filter(function(x,i){return i!==fi}).map(function(x){return x[x.length-1]});
-    return mk("family",LL(function(l){return({he:"לאיזו משפחה שייך היסוד ",ar:"إلى أي عائلة ينتمي العنصر ",ru:"К какому семейству относится элемент ",en:"Which family does the element "})[l]+EL[z].n[l]+" ("+EL[z].s+")?"}),"",fm[fm.length-1],wrong,
+    return mk("family",LL(function(l){return({he:"לאיזו משפחה שייך היסוד ",ar:"إلى أي عائلة ينتمي العنصر ",ru:"К какому семейству относится элемент ",en:"Which family does the element "})[l]+EL[z].n[l]+" ("+EL[z].s+")"+({he:"?",ar:"?",ru:"?",en:" belong to?"})[l]}),"",fm[fm.length-1],wrong,
      L("המשפחה נקבעת לפי מספר אלקטרוני הערכיות.","العائلة تتحدد حسب عدد إلكترونات التكافؤ.","Семейство определяется числом валентных электронов.","The family is set by the valence electron count."),
      LL(function(l){return EL[z].n[l]+" — "+fm[fm.length-1][l]+"."}));
   });}
@@ -274,7 +275,7 @@ G.ctrend=function(lv){var T=[];
      LL(function(l){return EL[ans].n[l]+" "+({he:"בתחתית הקבוצה, עם הכי הרבה קליפות.",ar:"في أسفل المجموعة، مع أكبر عدد من الأغلفة.",ru:"внизу группы, с наибольшим числом оболочек.",en:"is at the bottom of the group, with the most shells."})[l]}));
   });
   if(lv>=2){T.push(function(){var g=pick([GRPS[0],GRPS[1]]);
-    var ans=Math.max.apply(null,g),extra=g[0]-1;
+    var ans=Math.max.apply(null,g),extra=g[0]===3?2:10;
     return mk("metallic",LL(function(l){return({he:"איזה יסוד בעל האופי המתכתי ביותר?",ar:"أي عنصر له الطابع المعدني الأقوى؟",ru:"Какой элемент самый металлический?",en:"Which element is the most metallic?"})[l]}),"",elLab(ans),g.filter(function(x){return x!==ans}).concat([extra]).map(function(x){return elLab(x)}),
      L("האופי המתכתי גדל במורד הקבוצה.","الطابع المعدني يزداد في أسفل المجموعة.","Металлический характер растёт вниз по группе.","Metallic character increases down the group."),
      LL(function(l){return EL[ans].n[l]+" "+({he:"בתחתית הקבוצה, והאלקטרון החיצוני ניתן בקלות.",ar:"في أسفل المجموعة، وإلكترونه الخارجي يُعطى بسهولة.",ru:"внизу группы, и внешний электрон отдаётся легко.",en:"is at the bottom, and its outer electron is given up easily."})[l]}));
@@ -284,35 +285,36 @@ G.ctrend=function(lv){var T=[];
     var ans=Math.max.apply(null,zs);
     return mk("en",LL(function(l){return({he:"איזה יסוד בעל האלקטרושליליות הגבוהה ביותר?",ar:"أي عنصر له أعلى كهروسلبية؟",ru:"Какой элемент самый электроотрицательный?",en:"Which element has the highest electronegativity?"})[l]}),"",elLab(ans),zs.filter(function(x){return x!==ans}).map(function(x){return elLab(x)}),
      L("אלקטרושליליות גדלה לאורך מחזור, לכיוון פלואור.","الكهروسلبية تزداد على امتداد الدورة، باتجاه الفلور.","Электроотрицательность растёт вдоль периода, к фтору.","Electronegativity rises across a period, toward fluorine."),
-     LL(function(l){return({he:"כולם באותו מחזור, ו-",ar:"كلها في نفس الدورة، و",ru:"Все в одном периоде, и ",en:"All are in one period, and "})[l]+EL[ans].n[l]+" "+({he:"הכי קרוב לפלואור.",ar:"الأقرب إلى الفلور.",ru:"ближе всех к фтору.",en:"is closest to fluorine."})[l]}));
+     LL(function(l){return({he:"כולם באותו מחזור, ול",ar:"كلها في نفس الدورة، ولدى ",ru:"Все в одном периоде, и у элемента ",en:"All are in one period, and "})[l]+EL[ans].n[l]+" "+({he:"הכי הרבה פרוטונים, ולכן הוא מושך אלקטרונים בקשר הכי חזק.",ar:"أكبر عدد من البروتونات، لذلك يجذب إلكترونات الرابطة بأقوى شكل.",ru:"больше всего протонов, поэтому он сильнее всех притягивает электроны связи.",en:"has the most protons, so it pulls bonding electrons hardest."})[l]}));
   });}
   return pick(T)()};
 /* ----- ionic/covalent/metallic bonding ----- */
 G.cbond=function(lv){var T=[];
   var ION=L("קישור יוני","رابطة أيونية","Ионная связь","Ionic bond"),COV=L("קישור קוולנטי","رابطة تساهمية","Ковалентная связь","Covalent bond"),MET=L("קישור מתכתי","رابطة معدنية","Металлическая связь","Metallic bond");
-  var HYD=L("קשר מימן","رابطة هيدروجينية","Водородная связь","Hydrogen bond");
+  var HYD=L("קשר מימן","رابطة هيدروجينية","Водородная связь","Hydrogen bond"),NOB=L("לא נוצר קשר","لا تنشأ رابطة","Связь не образуется","No bond forms");
   var PAIRS=[[11,17,ION],[19,9,ION],[12,17,ION],[20,16,ION],[3,17,ION],[1,8,COV],[6,8,COV],[7,1,COV],[6,1,COV],[8,8,COV],[17,17,COV],[16,8,COV]];
   T.push(function(){var p=pick(PAIRS),a=EL[p[0]],b=EL[p[1]],ans=p[2];
-    return mk("bondtype",LL(function(l){return({he:"איזה סוג קשר נוצר בין ",ar:"أي نوع من الروابط ينشأ بين ",ru:"Какой тип связи образуется между ",en:"Which bond type forms between "})[l]+a.n[l]+" "+({he:"ל",ar:"و",ru:"и ",en:"and "})[l]+b.n[l]+"?"}),"",ans,[ION,COV,MET,HYD].filter(function(x){return x.he!==ans.he}),
+    return mk("bondtype",LL(function(l){return({he:"איזה סוג קשר נוצר בין ",ar:"أي نوع من الروابط ينشأ بين ",ru:"Какой тип связи образуется между ",en:"Which bond type forms between "})[l]+a.n[l]+" "+({he:"ל",ar:"و",ru:"и ",en:"and "})[l]+b.n[l]+"?"}),"",ans,[ION,COV,MET,(p[0]===1||p[1]===1)?NOB:HYD].filter(function(x){return x.he!==ans.he}),
      L("מתכת ולא-מתכת: יוני. שני לא-מתכתים: קוולנטי. מתכות: מתכתי.","فلز ولا فلز: أيونية. لا فلزين: تساهمية. فلزان: معدنية.","Металл и неметалл: ионная. Два неметалла: ковалентная. Металлы: металлическая.","Metal plus nonmetal: ionic. Two nonmetals: covalent. Metals: metallic."),
      LL(function(l){return ans.he===ION.he?({he:"מתכת ולא-מתכת, לכן הקשר יוני.",ar:"فلز ولا فلز، لذلك الرابطة أيونية.",ru:"Металл и неметалл, значит связь ионная.",en:"A metal and a nonmetal, so the bond is ionic."})[l]:({he:"שני לא-מתכתים, לכן הקשר קוולנטי.",ar:"لا فلزان، لذلك الرابطة تساهمية.",ru:"Два неметалла, значит связь ковалентная.",en:"Two nonmetals, so the bond is covalent."})[l]}));
   });
-  var FORMS=[["NaCl","NaCl",["NaCl2","Na2Cl","Na2Cl2"]],["MgCl2","MgCl2",["MgCl","Mg2Cl","Mg2Cl2"]],["Al2O3","Al2O3",["AlO","Al3O2","AlO2"]],["K2O","K2O",["KO","KO2","K2O2"]],["CaF2","CaF2",["CaF","Ca2F","Ca2F2"]],["Na2O","Na2O",["NaO","NaO2","Na2O2"]],["MgO","MgO",["MgO2","Mg2O","Mg2O2"]],["CaCl2","CaCl2",["CaCl","Ca2Cl","CaCl3"]]];
+  var FORMS=[["NaCl","NaCl",["NaCl2","Na2Cl","Na2Cl2"],"Na+","Cl-"],["MgCl2","MgCl2",["MgCl","Mg2Cl","Mg2Cl2"],"Mg2+","Cl-"],["Al2O3","Al2O3",["AlO","Al3O2","AlO2"],"Al3+","O2-"],["K2O","K2O",["KO","KO2","K2O2"],"K+","O2-"],["CaF2","CaF2",["CaF","Ca2F","Ca2F2"],"Ca2+","F-"],["Na2O","Na2O",["NaO","NaO2","Na2O2"],"Na+","O2-"],["MgO","MgO",["MgO2","Mg2O","Mg2O2"],"Mg2+","O2-"],["CaCl2","CaCl2",["CaCl","Ca2Cl","CaCl3"],"Ca2+","Cl-"]];
   T.push(function(){var f=pick(FORMS);
-    return mk("formula",LL(function(l){return({he:"מה הנוסחה הנכונה של התרכובת היונית?",ar:"ما الصيغة الصحيحة للمركب الأيوني؟",ru:"Какова правильная формула ионного соединения?",en:"What is the correct formula of the ionic compound?"})[l]}),"",f[1],f[2],
-     L("מאזנים מטענות: סך המטען החיובי שווה לשלילי.","نوازن الشحنات: مجموع الموجب يساوي السالب.","Уравновешиваем заряды: суммарный плюс равен минусу.","Balance charges: total positive equals total negative."),
+    return mk("formula",LL(function(l){return({he:"מה הנוסחה של התרכובת היונית שבנויה מהיונים "+f[3]+" ו-"+f[4]+"?",ar:"ما صيغة المركب الأيوني المكوّن من الأيونين "+f[3]+" و"+f[4]+"؟",ru:"Какова формула ионного соединения из ионов "+f[3]+" и "+f[4]+"?",en:"What is the formula of the ionic compound made of the ions "+f[3]+" and "+f[4]+"?"})[l]}),"",f[1],f[2],
+     L("מאזנים מטענים: סך המטען החיובי שווה לשלילי.","نوازن الشحنات: مجموع الموجب يساوي السالب.","Уравновешиваем заряды: суммарный плюс равен минусу.","Balance charges: total positive equals total negative."),
      LL(function(l){return({he:"המטענים מתאזנים בנוסחה ",ar:"الشحنات تتوازن في الصيغة ",ru:"Заряды уравновешены в формуле ",en:"The charges balance in "})[l]+f[1]+"."}));
   });
   if(lv>=2){T.push(function(){var e=pick([[8,2],[7,3],[6,4],[1,1],[9,1],[17,1]]),z=e[0],nb=e[1];
-    return mk("nbonds",LL(function(l){return({he:"כמה קשרים קוולנטיים יוצר בדרך כלל אטום של ",ar:"كم رابطة تساهمية يكوّن عادة ذرة ",ru:"Сколько ковалентных связей обычно образует атом ",en:"How many covalent bonds does an atom of "})[l]+EL[z].n[l]+"?"}),"",nb,[nb+1,nb+2,nb+3,Math.max(1,nb-1),valE(z)].filter(function(x){return x>0&&x!==nb}),
-     L("אטום משלים שמונה אלקטרוני ערכיות: מספר הקשרים הוא שמונה פחות אלקטרוני הערכיות.","تكمل الذرة ثمانية إلكترونات تكافؤ: عدد الروابط هو ثمانية ناقص إلكترونات التكافؤ.","Атом достраивает до восьми валентных электронов: число связей — восемь минус валентные электроны.","An atom completes eight valence electrons: bonds formed equal eight minus valence electrons."),
-     LL(function(l){return "8 − "+valE(z)+" = "+nb+"."}));
+    return mk("nbonds",LL(function(l){return({he:"כמה קשרים קוולנטיים יוצר בדרך כלל אטום של ",ar:"كم رابطة تساهمية يكوّن عادة ذرة ",ru:"Сколько ковалентных связей обычно образует атом ",en:"How many covalent bonds does an atom of "})[l]+EL[z].n[l]+({he:"?",ar:"؟",ru:"?",en:" usually form?"})[l]}),"",nb,[nb+1,nb+2,nb+3,Math.max(1,nb-1),valE(z)].filter(function(x){return x>0&&x!==nb}),
+     L("אטום משלים לשמונה אלקטרוני ערכיות (מימן משלים לשניים): מספר הקשרים הוא מספר האלקטרונים שחסרים לו.","تكمل الذرة ثمانية إلكترونات تكافؤ (الهيدروجين يكمل اثنين): عدد الروابط هو عدد الإلكترونات الناقصة.","Атом достраивает до восьми валентных электронов (водород — до двух): число связей равно числу недостающих электронов.","An atom completes eight valence electrons (hydrogen completes two): bonds formed equal the electrons it is missing."),
+     LL(function(l){var v=valE(z),nm=EL[z].n[l];if(z===1)return({he:"למימן אלקטרון אחד, וחסר לו אחד כדי להגיע לשניים כמו הליום, לכן הוא יוצר קשר אחד.",ar:"للهيدروجين إلكترون واحد، وينقصه واحد ليصل إلى اثنين مثل الهيليوم، لذلك يكوّن رابطة واحدة.",ru:"У водорода один электрон, и до двух, как у гелия, не хватает одного, поэтому он образует одну связь.",en:"Hydrogen has one electron and needs one more to reach two, like helium, so it forms one bond."})[l];
+      return({he:"ל"+nm+" יש "+v+" אלקטרוני ערכיות, ו"+(nb===1?"חסר לו אחד":"חסרים לו "+nb)+" כדי להגיע לשמונה, לכן הוא יוצר "+(nb===1?"קשר אחד.":nb+" קשרים."),ar:"لدى "+nm+" "+v+" إلكترونات تكافؤ، وينقصه "+nb+" ليصل إلى ثمانية، لذلك يكوّن "+(nb===1?"رابطة واحدة.":nb+" روابط."),ru:"Элемент "+nm+": "+v+" "+plRu(v,"валентный электрон","валентных электрона","валентных электронов")+", до восьми не хватает "+nb+", поэтому он образует "+nb+" "+plRu(nb,"связь","связи","связей")+".",en:nm+" has "+v+" valence electrons and needs "+nb+" more to reach eight, so it forms "+nb+" bond"+(nb>1?"s":"")+"."})[l]}));
   });}
   if(lv>=3){T.push(function(){var q=pick([
      [L("תרכובת יונית","مركب أيوني","Ионное соединение","An ionic compound"),L("מולקולה קוולנטית","جزيء تساهمي","Ковалентная молекула","A covalent molecule"),L("נמס במים ומוליך חשמל במצב מותך","يذوب في الماء ويوصل الكهرباء منصهراً","Растворяется в воде и проводит ток в расплаве","It dissolves in water and conducts when molten")],
      [L("תרכובת יונית","مركب أيوني","Ионное соединение","An ionic compound"),L("מולקולה קוולנטית","جزيء تساهمي","Ковалентная молекула","A covalent molecule"),L("נקודת רתיחה גבוהה בדרך כלל","نقطة غليان مرتفعة عادة","Обычно высокая точка кипения","Usually a high boiling point")]]);
-    return mk("prop",LL(function(l){return({he:"מה נכון לגבי ",ar:"ما الصحيح عن ",ru:"Что верно о ",en:"What is true of "})[l]+q[0][l]+"?"}),"",q[2],[q[1],L("אינו מוליך חשמל במצב מותך","لا يوصل الكهرباء منصهراً","Не проводит ток в расплаве","It does not conduct when molten"),L("מורכב ממתכת ולא-מתכת","يتكون من فلز ولا فلز","Состоит из металла и неметалла","It is made of a metal and a nonmetal")].filter(function(x){return true}),
-     L("תרכובות יוניות: גבישים, נמסות במים, מוליכות ממס או התכה.","المركبات الأيونية: بلورات، تذوب في الماء، توصل في المحلول أو المصهور.","Ионные соединения: кристаллы, растворимы, проводят в растворе или расплаве.","Ionic compounds are crystals, dissolve in water, and conduct in solution or melt."),
+    return mk("prop",L("מה נכון לגבי תרכובת יונית?","ما الصحيح عن المركب الأيوني؟","Что верно для ионного соединения?","What is true of an ionic compound?"),"",q[2],[L("בנוי ממולקולות נפרדות","يتكون من جزيئات منفصلة","Состоит из отдельных молекул","It is made of separate molecules"),L("אינו מוליך חשמל במצב מותך","لا يوصل الكهرباء منصهراً","Не проводит ток в расплаве","It does not conduct when molten"),L("מוליך חשמל במצב מוצק","يوصل الكهرباء وهو صلب","Проводит ток в твёрдом состоянии","It conducts electricity as a solid")],
+     L("תרכובות יוניות: גבישים, נמסות במים, מוליכות בתמיסה או בהתכה.","المركبات الأيونية: بلورات، تذوب في الماء، توصل في المحلول أو المصهور.","Ионные соединения: кристаллы, растворимы, проводят в растворе или расплаве.","Ionic compounds are crystals, dissolve in water, and conduct in solution or melt."),
      LL(function(l){return q[0][l]+": "+q[2][l]+"."}));
   });}
   return pick(T)()};
@@ -320,12 +322,12 @@ G.cbond=function(lv){var T=[];
 G.cstoi=function(lv){var T=[];
   var MM=[["H2O",18],["CO2",44],["O2",32],["N2",28],["CaCO3",100],["NaOH",40],["CH4",16],["SO2",64],["NH3",17],["MgO",40],["CaO",56],["H2",2]];
   T.push(function(){var m=pick(MM),n=ri(2,9),mass=n*m[1];
-    return mk("moles",LL(function(l){return({he:"כמה מול יש ב-",ar:"كم مول في ",ru:"Сколько моль в ",en:"How many moles are in "})[l]+mass+" "+({he:"גרם של ",ar:"غرام من ",ru:"г ",en:" grams of "})[l]+m[0]+"? (M = "+m[1]+")"}),"",n,[n+1,n-1,n*2,n+2,mass/m[1]/2].filter(function(x){return x>0&&x!==n}),
+    return mk("moles",LL(function(l){return({he:"כמה מול יש ב-",ar:"كم مول في ",ru:"Сколько моль в ",en:"How many moles are in "})[l]+mass+" "+({he:"גרם של ",ar:"غرام من ",ru:"г ",en:"grams of "})[l]+m[0]+"? (M = "+m[1]+")"}),"",n,[n+1,n-1,n*2,n+2,mass/m[1]/2].filter(function(x){return x>0&&x!==n}),
      L("מול = מסה חלקי מסה מולרית.","المول = الكتلة مقسومة على الكتلة المولية.","Моль = масса делить на молярную массу.","Moles equal mass divided by molar mass."),
      LL(function(l){return "n = "+mass+" / "+m[1]+" = "+n+"."}));
   });
   T.push(function(){var m=pick(MM),n=ri(2,9),mass=n*m[1];
-    return mk("mass",LL(function(l){return({he:"מה המסה בגרמים של ",ar:"ما كتلة ",ru:"Какова масса в граммах ",en:"What is the mass in grams of "})[l]+n+" "+({he:"מול של ",ar:"مول من ",ru:"моль ",en:" moles of "})[l]+m[0]+"? (M = "+m[1]+")"}),"",mass,[mass/m[1],mass+m[1],mass-m[1],mass*2].filter(function(x){return x>0&&x!==mass}),
+    return mk("mass",LL(function(l){return({he:"מה המסה בגרמים של ",ar:"ما كتلة ",ru:"Какова масса в граммах ",en:"What is the mass in grams of "})[l]+n+" "+({he:"מול של ",ar:"مول من ",ru:"моль ",en:"moles of "})[l]+m[0]+"? (M = "+m[1]+")"}),"",mass,[mass/m[1],mass+m[1],mass-m[1],mass*2].filter(function(x){return x>0&&x!==mass}),
      L("מסה = מול כפול מסה מולרית.","الكتلة = المول مضروباً في الكتلة المولية.","Масса = моль умножить на молярную массу.","Mass equals moles times molar mass."),
      LL(function(l){return "m = "+n+" · "+m[1]+" = "+mass+"."}));
   });
@@ -333,12 +335,12 @@ G.cstoi=function(lv){var T=[];
     if(c*100%25!==0)return G.cstoi(lv);
     var cs=String(c).replace(".",".");
     var opts=uniq([cs,String(c*2),String(c/2),String(c+0.5>0?c+0.5:c+1),String(v/n)]).filter(function(x){return x!==cs&&parseFloat(x)>0});
-    return mk("conc",LL(function(l){return({he:"מה הריכוז במול לליטר של תמיסה עם ",ar:"ما تركيز محلول يحوي ",ru:"Какова концентрация в моль/л раствора с ",en:"What is the mol/L concentration of a solution with "})[l]+n+" "+({he:"מול ב-",ar:"مول في ",ru:"моль в ",en:" moles in "})[l]+v+" "+({he:"ליטר?",ar:"لتر؟",ru:"л?",en:" L?"})[l]}),"",cs,opts.slice(0,5),
+    return mk("conc",LL(function(l){return({he:"מה הריכוז במול לליטר של תמיסה עם ",ar:"ما تركيز محلول يحوي ",ru:"Какова концентрация в моль/л раствора с ",en:"What is the mol/L concentration of a solution with "})[l]+n+" "+({he:"מול ב-",ar:"مول في ",ru:"моль в ",en:"moles in "})[l]+v+" "+({he:"ליטר?",ar:"لتر؟",ru:"л?",en:"L?"})[l]}),"",cs,opts.slice(0,5),
      L("ריכוז = מול חלקי נפח בליטר.","التركيز = المول مقسوماً على الحجم باللتر.","Концентрация = моль делить на объём в литрах.","Concentration equals moles divided by liters."),
      LL(function(l){return "c = "+n+" / "+v+" = "+cs+"."}));
   });}
   if(lv>=3){T.push(function(){var n=ri(2,8);
-    return mk("particles",LL(function(l){return({he:"כמה מולקולות יש ב-",ar:"كم جزيئاً في ",ru:"Сколько молекул в ",en:"How many molecules are in "})[l]+n+" "+({he:"מול?",ar:"مول؟",ru:"моль?",en:" moles?"})[l]}),"",n+" · 6.02×10^23",["6.02×10^23",(n*2)+" · 6.02×10^23",n+" · 6.02×10^22",n+" × 10^23"],
+    return mk("particles",LL(function(l){return({he:"כמה מולקולות יש ב-",ar:"كم جزيئاً في ",ru:"Сколько молекул в ",en:"How many molecules are in "})[l]+n+" "+({he:"מול?",ar:"مول؟",ru:"моль?",en:"moles?"})[l]}),"",n+" · 6.02×10^23",["6.02×10^23",(n*2)+" · 6.02×10^23",n+" · 6.02×10^22",n+" × 10^23"],
      L("מספר החלקיקים = מול כפול מספר אבוגדרו.","عدد الجسيمات = المول مضروباً في عدد أفوغادرو.","Число частиц = моль умножить на число Авогадро.","Particles equal moles times Avogadro's number."),
      LL(function(l){return "N = "+n+" · 6.02×10^23."}));
   });}
@@ -368,7 +370,7 @@ G.cacid=function(lv){var T=[];
   var ACID=L("חומצתי","حمضي","Кислый","Acidic"),BASE=L("בסיסי","قاعدي","Щелочной","Basic"),NEU=L("נייטרלי","متعادل","Нейтральный","Neutral");
   var AMPH=L("אמפוטרי","أمفوتيري","Амфотерный","Amphoteric");
   T.push(function(){var kind=pick(["a","b","n"]),ph=kind==="a"?ri(1,6):kind==="b"?ri(8,14):7,ans=kind==="a"?ACID:kind==="b"?BASE:NEU;
-    return mk("phclass",LL(function(l){return({he:"תמיסה עם pH של "+ph+" היא...",ar:"محلول pH له "+ph+" هو...",ru:"Раствор с pH "+ph+" — это...",en:"A solution with pH "+ph+" is..."})[l]}),"",ans,[ACID,BASE,NEU,AMPH].filter(function(x){return x.he!==ans.he}),
+    return mk("phclass",LL(function(l){return({he:"לתמיסה עם pH של "+ph+" יש אופי...",ar:"محلول pH له "+ph+" هو...",ru:"Раствор с pH "+ph+" — это...",en:"A solution with pH "+ph+" is..."})[l]}),"",ans,[ACID,BASE,NEU,AMPH].filter(function(x){return x.he!==ans.he}),
      L("מתחת ל-7 חומצתי, 7 נייטרלי, מעל 7 בסיסי.","أقل من 7 حمضي، 7 متعادل، أكثر من 7 قاعدي.","Меньше 7 — кислый, 7 — нейтральный, больше 7 — щелочной.","Below 7 is acidic, 7 is neutral, above 7 is basic."),
      LL(function(l){return "pH = "+ph+": "+ans[l]+"."}));
   });
@@ -390,10 +392,10 @@ G.cacid=function(lv){var T=[];
   return pick(T)()};
 /* ----- energetics and reaction rate ----- */
 G.cenergy=function(lv){var T=[];
-  var EXO=L("אקזותרמית — משתחרר חום","طاردة للحرارة — تطلق حرارة","Экзотермическая — выделяет тепло","Exothermic - releases heat"),ENDO=L("אנדותרמית — נספג חום","ماصة للحرارة — تمتص حرارة","Эндотермическая — поглощает тепло","Endothermic - absorbs heat");
-  var EE=[[L("שריפת נר","احتراق شمعة","Горение свечи","A burning candle"),EXO],[L("המסת קרח","ذوبان الثلج","Таяние льда","Melting ice"),ENDO],[L("בעירת גז בכיריים","احتراق الغاز على الموقد","Горение газа на плите","Burning stove gas"),EXO],[L("אידוי מים","تبخر الماء","Испарение воды","Evaporating water"),ENDO],[L("תגובה שמרתיחה את סביבתה","تفاعل يسخّن محيطه","Реакция, греющая окружение","A reaction that warms its surroundings"),EXO],[L("תגובה שמקררת את סביבתה","تفاعل يبرّد محيطه","Реакция, охлаждающая окружение","A reaction that cools its surroundings"),ENDO]];
+  var EXO=L("אקזותרמי — משתחרר חום","طاردة للحرارة — تطلق حرارة","Экзотермическая — выделяет тепло","Exothermic - releases heat"),ENDO=L("אנדותרמי — נספג חום","ماصة للحرارة — تمتص حرارة","Эндотермическая — поглощает тепло","Endothermic - absorbs heat");
+  var EE=[[L("שריפת נר","احتراق شمعة","Горение свечи","A burning candle"),EXO],[L("התכת קרח","ذوبان الثلج","Таяние льда","Melting ice"),ENDO],[L("בעירת גז בכיריים","احتراق الغاز على الموقد","Горение газа на плите","Burning stove gas"),EXO],[L("אידוי מים","تبخر الماء","Испарение воды","Evaporating water"),ENDO],[L("תגובה שמחממת את סביבתה","تفاعل يسخّن محيطه","Реакция, греющая окружение","A reaction that warms its surroundings"),EXO],[L("תגובה שמקררת את סביבתה","تفاعل يبرّد محيطه","Реакция, охлаждающая окружение","A reaction that cools its surroundings"),ENDO]];
   T.push(function(){var e=pick(EE);
-    return mk("exoendo",LL(function(l){return e[0][l]+" — "+({he:"תהליך...",ar:"عملية...",ru:"процесс...",en:"a process that is..."})[l]}),"",e[1],[e[1].he===EXO.he?ENDO:EXO,L("אינה כרוכה באנרגיה","لا تتعلق بالطاقة","Не связан с энергией","Not energy related"),L("תלוי בכמות החומר","يعتمد على كمية المادة","Зависит от количества вещества","Depends on the amount")],
+    return mk("exoendo",LL(function(l){return e[0][l]+" — "+({he:"תהליך...",ar:"عملية...",ru:"процесс...",en:"a process that is..."})[l]}),"",e[1],[e[1].he===EXO.he?ENDO:EXO,L("אינו כרוך באנרגיה","لا تتعلق بالطاقة","Не связан с энергией","Not energy related"),L("תלוי בכמות החומר","يعتمد على كمية المادة","Зависит от количества вещества","Depends on the amount")],
      L("אקזו = חום יוצא. אנדו = חום נכנס.","إكزو = حرارة تخرج. إندو = حرارة تدخل.","Экзо — тепло выходит. Эндо — тепло входит.","Exo means heat out; endo means heat in."),
      LL(function(l){return e[0][l]+": "+e[1][l]+"."}));
   });
@@ -404,9 +406,9 @@ G.cenergy=function(lv){var T=[];
      L("קצב עולה בחום, בשטח פנים גדול, בריכוז גבוה ובזרז.","السرعة تزداد بالحرارة، وسطح أكبر، وتركيز أعلى، ومحفز.","Скорость растёт с нагревом, площадью, концентрацией и катализатором.","Rate rises with heat, surface area, concentration, and a catalyst."),
      LL(function(l){return ans[l]+"."}));
   });
-  if(lv>=3){T.push(function(){return mk("catalyst",LL(function(l){return({he:"מה זרז (קטליזטור) עושה לתגובה?",ar:"ماذا يفعل المحفز (الحفاز) للتفاعل؟",ru:"Что катализатор делает с реакцией?",en:"What does a catalyst do to a reaction?"})[l]}),"",L("מאיץ אותה בלי להתכלות","يسرّعها دون أن يُستهلك","Ускоряет её, не расходуясь","Speeds it up without being consumed"),[L("מגדיל את כמות התוצר","يزيد كمية الناتج","Увеличивает количество продукта","Increases the product amount"),L("מתכלם במהלך התגובה","يُستهلك أثناء التفاعل","Расходуется в ходе реакции","Is consumed during the reaction"),L("מוריד את הטמפרטורה","يخفض درجة الحرارة","Понижает температуру","Lowers the temperature")],
-     L("זרז מוריד את אנרגיית השפעת ונשאר כמות שהיה בסוף.","المحفز يخفض طاقة التنشيط ويبقى كما هو في النهاية.","Катализатор снижает энергию активации и остаётся прежним.","A catalyst lowers activation energy and remains unchanged."),
-     LL(function(l){return({he:"הזרז מאיץ ואינו מתכלם.",ar:"المحفز يسرّع ولا يُستهلك.",ru:"Катализатор ускоряет и не расходуется.",en:"The catalyst speeds up and is not consumed."})[l]}));
+  if(lv>=3){T.push(function(){return mk("catalyst",LL(function(l){return({he:"מה זרז (קטליזטור) עושה לתגובה?",ar:"ماذا يفعل المحفز (الحفاز) للتفاعل؟",ru:"Что катализатор делает с реакцией?",en:"What does a catalyst do to a reaction?"})[l]}),"",L("מאיץ אותה בלי להתכלות","يسرّعها دون أن يُستهلك","Ускоряет её, не расходуясь","Speeds it up without being consumed"),[L("מגדיל את כמות התוצר","يزيد كمية الناتج","Увеличивает количество продукта","Increases the product amount"),L("מתכלה במהלך התגובה","يُستهلك أثناء التفاعل","Расходуется в ходе реакции","Is consumed during the reaction"),L("מוריד את הטמפרטורה","يخفض درجة الحرارة","Понижает температуру","Lowers the temperature")],
+     L("זרז מוריד את אנרגיית השפעול ונשאר כפי שהיה בסוף.","المحفز يخفض طاقة التنشيط ويبقى كما هو في النهاية.","Катализатор снижает энергию активации и остаётся прежним.","A catalyst lowers activation energy and remains unchanged."),
+     LL(function(l){return({he:"הזרז מאיץ ואינו מתכלה.",ar:"المحفز يسرّع ولا يُستهلك.",ru:"Катализатор ускоряет и не расходуется.",en:"The catalyst speeds up and is not consumed."})[l]}));
   });}
   return pick(T)()};
 /* ----- food chemistry ----- */
@@ -462,7 +464,7 @@ var LESSONS={
  ctrend:[
   ST_("לאורך מחזור האטום קטן משמאל לימין: מטען הגרעין גדל ומושך את האלקטרונים פנימה.","على امتداد الدورة تصغر الذرة من اليسار إلى اليمين: شحنة النواة تكبر وتجذب الإلكترونات.","Вдоль периода атом уменьшается слева направо: заряд ядра растёт и стягивает электроны.","Across a period the atom shrinks left to right: the nuclear charge grows and pulls electrons in."),
   ST_("במורד קבוצה האטום גדל: בכל מחזור מתווספת קליפת אלקטרונים שלמה.","في أسفل المجموعة تكبر الذرة: في كل دورة يُضاف غلاف إلكتروني كامل.","Вниз по группе атом растёт: в каждом периоде добавляется целая оболочка.","Down a group the atom grows: each period adds a whole electron shell."),
-  ST_("אופי מתכתי גדל במורד הקבוצה וקטן לאורך המחזור. המתכתים בצד שמאל, הלא-מתכתים בצד ימין.","الطابع المعدني يزداد في أسفل المجموعة وينقص عبر الدورة. الفلزات يساراً واللافلزات يميناً.","Металлический характер растёт вниз по группе и падает вдоль периода. Металлы слева, неметаллы справа.","Metallic character grows down a group and drops across a period. Metals are on the left, nonmetals on the right."),
+  ST_("אופי מתכתי גדל במורד הקבוצה וקטן לאורך המחזור. המתכות בצד שמאל, הלא-מתכתים בצד ימין.","الطابع المعدني يزداد في أسفل المجموعة وينقص عبر الدورة. الفلزات يساراً واللافلزات يميناً.","Металлический характер растёт вниз по группе и падает вдоль периода. Металлы слева, неметаллы справа.","Metallic character grows down a group and drops across a period. Metals are on the left, nonmetals on the right."),
   ST_("אלקטרושליליות היא היכולת למשוך אלקטרונים בקשר. היא גדלה לאורך מחזור, ופלואור הוא הגבוה ביותר.","الكهروسلبية هي قدرة الذرة على جذب إلكترونات الرابطة. تزداد عبر الدورة، والفلور هو الأعلى.","Электроотрицательность — способность тянуть электроны связи. Растёт вдоль периода, фтор — самый высокий.","Electronegativity is the pull on bonding electrons. It rises across a period, and fluorine is the highest.")]};
 UNITS.push(
  {id:"cbond",c:"#0f766e",n:L("קישור כימי","الرابطة الكيميائية","Химическая связь","Chemical bonding"),d:L("יוני, קוולנטי ומתכתי, נוסחאות תרכובות יוניות","أيونية وتساهمية ومعدنية، صيغ المركبات الأيونية","Ионная, ковалентная и металлическая связь, формулы","Ionic, covalent and metallic bonds, ionic formulas")},
@@ -495,13 +497,13 @@ LESSONS.cenergy=[
   ST_("בתגובה אקזותרמית משתחרר חום החוצה, ובתגובה אנדותרמית החום נספג פנימה.","في التفاعل الطارد تخرج الحرارة، وفي الماص تُمتص الحرارة.","В экзотермической реакции тепло выделяется, в эндотермической — поглощается.","An exothermic reaction lets heat out; an endothermic one takes heat in."),
   ST_("דלתא H שלילי בתגובה אקזותרמית וחיובי בתגובה אנדותרמית.","دلتا H سالب في التفاعل الطارد وموجب في الماص.","Дельта H отрицательна в экзотермической и положительна в эндотермической.","Delta H is negative for exothermic and positive for endothermic."),
   ST_("הקצב עולה כשמחממים, כשהחלקיקים קטנים, כשהריכוז גבוה וכשיש זרז.","تزداد السرعة بالتسخين، وصغر الجسيمات، وارتفاع التركيز، ووجود محفز.","Скорость растёт с нагревом, мелкими частицами, высокой концентрацией и катализатором.","Rate rises with heating, small particles, high concentration, and a catalyst."),
-  ST_("זרז מוריד את אנרגיית השפעת, מאיץ את התגובה, ונשאר בלי שינוי בסוף.","المحفز يخفض طاقة التنشيط، يسرّع التفاعل، ويبقى بلا تغيير في النهاية.","Катализатор снижает энергию активации, ускоряет реакцию и остаётся неизменным.","A catalyst lowers activation energy, speeds the reaction, and stays unchanged.")];
+  ST_("זרז מוריד את אנרגיית השפעול, מאיץ את התגובה, ונשאר בלי שינוי בסוף.","المحفز يخفض طاقة التنشيط، يسرّع التفاعل، ويبقى بلا تغيير في النهاية.","Катализатор снижает энергию активации, ускоряет реакцию и остаётся неизменным.","A catalyst lowers activation energy, speeds the reaction, and stays unchanged.")];
 LESSONS.cfood=[
   ST_("ויטמינים ומינרלים הם רכיבי מזון שהגוף צריך בכמויות קטנות, בלי אנרגיה.","الفيتامينات والمعادن مكونات غذائية يحتاجها الجسم بكميات صغيرة، بلا طاقة.","Витамины и минералы — вещества, нужные телу в малых количествах, без энергии.","Vitamins and minerals are nutrients the body needs in small amounts, with no energy."),
   ST_("ויטמינים C ו-B מסיסים במים ואינם נאגרים. ויטמינים A, D, E, K מסיסים בשומן.","فيتامينا C وB ذائبان في الماء ولا يُخزنان. A وD وE وK ذائبة في الدهون.","Витамины C и B растворимы в воде и не запасаются. A, D, E, K — в жирах.","Vitamins C and B dissolve in water and are not stored. A, D, E, K dissolve in fat."),
   ST_("חומצת שומן רוויה בנויה מקשרים בודדים בלבד. בלתי רוויה מכילה קשר כפול אחד לפחות.","الحمض الدهني المشبع مبني من روابط أحادية فقط. غير المشبع يحوي رابطة مزدوجة على الأقل.","Насыщенная жирная кислота состоит только из одинарных связей. Ненасыщенная имеет двойную.","A saturated fatty acid has only single bonds. An unsaturated one has at least one double bond."),
   ST_("טריגליצריד הוא מולקולת שומן: גליצרול מחובר לשלוש חומצות שומן.","الدهون الثلاثية جزيء دهني: غليسرول مرتبط بثلاثة أحماض دهنية.","Триглицерид — молекула жира: глицерин, связанный с тремя жирными кислотами.","A triglyceride is a fat molecule: glycerol joined to three fatty acids.")];
-var BUILD="ch2 · 2026-10-19";
+var BUILD="ch3 · 2026-10-21";
 /* ===== UI strings ===== */
 var STR={
 he:{soonT:"בקרוב: כימיה אורגנית, תמיסות וריכוזים.",mtNote:"תרגום לערבית, רוסית ואנגלית: תרגום מכונה, ממתין לבדיקה.",credit2:"כל השאלות והשיעורים נכתבו מחדש במיוחד לאתר.",brand:"כימיה לבגרות",title:"כימיה לבגרות",tag:"מבנה האטום, הטבלה המחזורית, קשרים כימיים, סטוכיומטריה ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -857,10 +859,10 @@ function homeView(){var t=T(),h='<h1 data-say id="h1">'+esc(t.title)+'</h1><p cl
   trackUnits().forEach(function(u){h+='<button class="unit" style="--c:'+u.c+'" data-a="unit" data-u="'+u.id+'"><span class="ico">'+iconSvg(u.id)+'</span><span><span class="nm" style="display:block">'+esc(lt(u.n))+'</span><span class="ds">'+esc(lt(u.d))+'</span></span>'+(S.done[u.id]?'<span class="ok">\u2713</span>':'')+'</button>'});
   h+='</div><p class="sub" style="margin-top:14px">'+esc(t.soonT)+'</p><p class="credit">'+esc(t.credit)+' <a href="https://pop.education.gov.il" target="_blank" rel="noopener">'+esc(t.crediL)+'</a><br>'+esc(t.credit2)+'<br>'+esc(t.mtNote)+'<br>'+esc(t.privacy)+'</p>';return h}
 
-function unitView(){var t=T(),u=unitById(V.unit),h='<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1 style="color:'+u.c+'">'+esc(lt(u.n))+'</h1><p class="sub">'+esc(lt(u.d))+'</p>';
+function unitView(){var t=T(),u=unitById(V.unit),h='<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1 class="uh" style="color:'+u.c+'">'+esc(lt(u.n))+'</h1><p class="sub">'+esc(lt(u.d))+'</p>';
   h+='<div class="card"><button class="btn" style="background:'+u.c+';width:100%" data-a="lesson">'+esc(t.lesson)+'</button></div>';
   h+='<div class="card"><h2>'+esc(t.practice)+": "+esc(t.lvTitle)+'</h2><div class="lvls">';
-  [["l1","#1f9d4d"],["l2","#2f7fd8"],["l3","#f58a1f"],["l4","#8a63d2"]].forEach(function(l,i){h+='<button class="lvl" style="background:'+l[1]+'" data-a="start" data-l="'+(i+1)+'">'+esc(t[l[0]])+'<small>'+esc(t[l[0]+"d"])+'</small></button>'});
+  [["l1","#166534"],["l2","#1d4ed8"],["l3","#9a3412"],["l4","#6d28d9"]].forEach(function(l,i){h+='<button class="lvl" style="background:'+l[1]+'" data-a="start" data-l="'+(i+1)+'">'+esc(t[l[0]])+'<small>'+esc(t[l[0]+"d"])+'</small></button>'});
   return h+'</div></div>'}
 function lessonView(){var t=T(),u=unitById(V.unit),ls=LESSONS[V.unit],st=ls[V.step],n=ls.length,txt=lt(st.t);
   var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="dots" style="margin-top:12px">'+ls.map(function(_,i){return '<i class="'+(i<V.step?"on":i===V.step?"cur":"")+'"></i>'}).join("")+'</div>';
@@ -976,7 +978,7 @@ try{speechSynthesis.getVoices();
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"chemistry",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=ch2-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=ch3-pwa1").catch(function(){})});
 })();
 </script>
 

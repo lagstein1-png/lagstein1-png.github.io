@@ -171,6 +171,11 @@ dl.gloss dd{margin:0}
 html[lang="en"] body{letter-spacing:0}
 /* O-94: בגלילה אל טאב, הכותרת הדביקה במחשב לא תסתיר את ראש הכרטיס */
 @media (min-width:561px){#v-chart>[id^="chart-tab-"]{scroll-margin-top:5rem}}
+/* O-133: בטלפון הכותרת העליונה אינה דביקה (שורה 150), ופס הטאבים נעלם בגלילה.
+   עכשיו הוא נשאר למעלה. הוא נשבר לשתי שורות כשאין מקום (אנגלית, טקסט ענק)
+   ולא גולל לרוחב — טאב שמוסתר מעבר לקצה הוא טאב שלא קיים. */
+@media (max-width:560px){.tabs{position:sticky;top:0;z-index:15;padding:.4rem .5rem}.tabs button{padding:.45rem .7rem}}
+[role="tabpanel"] h2:focus{outline:none}[role="tabpanel"] h2:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -193,10 +198,10 @@ html[lang="en"] body{letter-spacing:0}
   <span class="hlang" role="group" aria-label="שפה / Language"><button type="button" data-a="lang" data-v="he" class="on" lang="he" aria-pressed="true">עברית</button><button type="button" data-a="lang" data-v="en" lang="en" aria-pressed="false">English</button></span>
 </header>
 <nav class="tabs" id="chart-tabs" role="tablist" aria-label="חלקי המפה" hidden>
-  <button type="button" role="tab" data-a="ctab" data-v="wheel" aria-selected="true">הגלגל</button>
-  <button type="button" role="tab" data-a="ctab" data-v="table" aria-selected="false">הטבלה</button>
-  <button type="button" role="tab" data-a="ctab" data-v="texts" aria-selected="false">ההסברים</button>
-  <button type="button" role="tab" data-a="ctab" data-v="today" aria-selected="false">היום בשמיים</button>
+  <button type="button" role="tab" data-a="ctab" data-v="wheel" id="ctab-wheel" aria-controls="chart-tab-wheel" aria-selected="true" tabindex="0">הגלגל</button>
+  <button type="button" role="tab" data-a="ctab" data-v="table" id="ctab-table" aria-controls="chart-tab-table" aria-selected="false" tabindex="-1">הטבלה</button>
+  <button type="button" role="tab" data-a="ctab" data-v="texts" id="ctab-texts" aria-controls="chart-tab-texts" aria-selected="false" tabindex="-1">ההסברים</button>
+  <button type="button" role="tab" data-a="ctab" data-v="today" id="ctab-today" aria-controls="chart-tab-today" aria-selected="false" tabindex="-1">היום בשמיים</button>
 </nav>
 <main id="main" tabindex="-1">
 
@@ -251,10 +256,10 @@ html[lang="en"] body{letter-spacing:0}
       <button type="button" class="btn small" data-a="limor" id="btn-limor" hidden></button>
     </div>
   </div>
-  <div id="chart-tab-wheel" class="card"><h2>הגלגל</h2><div class="wheel-wrap" id="wheel"></div><p class="hint">לחיצה על שם פלנטה בגלגל או בטבלה פותחת את ההסבר שלה.</p></div>
-  <div id="chart-tab-table" class="card" hidden><h2>הטבלה</h2><div id="table"></div><h3>אספקטים</h3><div id="aspects"></div></div>
-  <div id="chart-tab-texts" class="card" hidden><h2>ההסברים</h2><p class="hint">תיאור של נטיות, לא תחזית. הפירוט במסך <a href="#" data-a="nav" data-v="accuracy">על הדיוק</a>.</p><div id="texts"></div></div>
-  <div id="chart-tab-today" class="card" hidden><h2>היום בשמיים שלך</h2><div id="today"></div></div>
+  <div id="chart-tab-wheel" class="card" role="tabpanel" aria-labelledby="ctab-wheel"><h2 tabindex="-1">הגלגל</h2><div class="wheel-wrap" id="wheel"></div><p class="hint">לחיצה על שם פלנטה בגלגל או בטבלה פותחת את ההסבר שלה.</p></div>
+  <div id="chart-tab-table" class="card" role="tabpanel" aria-labelledby="ctab-table" hidden><h2 tabindex="-1">הטבלה</h2><div id="table"></div><h3>אספקטים</h3><div id="aspects"></div></div>
+  <div id="chart-tab-texts" class="card" role="tabpanel" aria-labelledby="ctab-texts" hidden><h2 tabindex="-1">ההסברים</h2><p class="hint">תיאור של נטיות, לא תחזית. הפירוט במסך <a href="#" data-a="nav" data-v="accuracy">על הדיוק</a>.</p><div id="texts"></div></div>
+  <div id="chart-tab-today" class="card" role="tabpanel" aria-labelledby="ctab-today" hidden><h2 tabindex="-1">היום בשמיים שלך</h2><div id="today"></div></div>
 </section>
 
 <section id="v-people" class="view" hidden>
@@ -362,7 +367,7 @@ html[lang="en"] body{letter-spacing:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r56 · 2026-10-18";
+var BUILD="r57 · 2026-10-21";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -492,8 +497,15 @@ function nav(v){
 function showTab(t){
   ctab=t;
   ["wheel","table","texts","today"].forEach(function(k){ $("#chart-tab-"+k).hidden=(k!==t) });
-  $$('[data-a="ctab"]').forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.v===t))});
+  $$('[data-a="ctab"]').forEach(function(b){ var on=b.dataset.v===t; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1 });
   if(t==="today")renderToday();
+}
+/* O-133 (21.10.2026): אחרי לחיצה הפוקוס נשאר על הכפתור, וקורא מסך לא
+   הכריז על התוכן החדש. לחיצה מעבירה את הפוקוס לכותרת של התוכן;
+   החיצים, כמו בתבנית הטאבים של WAI-ARIA, עוברים בין הטאבים עצמם. */
+function focusTab(t){
+  var h=$("#chart-tab-"+t+" h2"); if(!h)return;
+  try{ h.focus({preventScroll:true}) }catch(e){ h.focus() }
 }
 /* O-94 (4.10.2026): בטלפון כרטיס ״הרגע האחד״ ממלא את המסך, ותוכן הטאב
    מתחיל מתחת לקצה (נמדד: 796px במסך של 664px באייפון 13). הלחיצה החליפה
@@ -502,7 +514,12 @@ function showTab(t){
 function revealTab(t){
   var el=$("#chart-tab-"+t); if(!el)return;
   var r=el.getBoundingClientRect();
-  if(r.top<0||r.top>window.innerHeight-120){ try{ el.scrollIntoView({block:"start"}) }catch(e){ el.scrollIntoView(true) } }
+  /* O-133: בטלפון פס הטאבים דביק ומכסה את ראש המסך — תוכן שמתחיל מתחתיו לא נראה */
+  var bar=$("#chart-tabs"), top=(bar&&getComputedStyle(bar).position==="sticky")?bar.offsetHeight:0;
+  if(r.top<top||r.top>window.innerHeight-120){
+    if(top){ window.scrollBy(0,r.top-top-8); return }  /* גובה הפס משתנה עם השפה וגודל הטקסט */
+    try{ el.scrollIntoView({block:"start"}) }catch(e){ el.scrollIntoView(true) }
+  }
 }
 
 /* ---------- חיפוש מקום ---------- */
@@ -1197,7 +1214,7 @@ document.addEventListener("click",function(e){
   var el=e.target.closest("[data-a]"); if(!el)return;
   var a=el.dataset.a, v=el.dataset.v;
   if(a==="nav"){ e.preventDefault(); nav(v) }
-  else if(a==="ctab"){ showTab(v); revealTab(v) }
+  else if(a==="ctab"){ showTab(v); revealTab(v); focusTab(v) }
   else if(a==="pl")openSheet(v);
   else if(a==="closesheet")closeSheet();
   else if(a==="say")speak(el.dataset.text,el);
@@ -1221,6 +1238,11 @@ document.addEventListener("click",function(e){
 document.addEventListener("keydown",function(e){
   var el=e.target;
   if(el&&el.matches&&el.matches('[data-a="pl"]')&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); openSheet(el.dataset.v) }
+  if(el&&el.matches&&el.matches('[data-a="ctab"]')&&/^(ArrowLeft|ArrowRight|Home|End)$/.test(e.key)){
+    var tabs=$$('[data-a="ctab"]'), i=tabs.indexOf(el), n=tabs.length, fwd=(document.documentElement.dir==="rtl")?"ArrowLeft":"ArrowRight";
+    i=e.key==="Home"?0:e.key==="End"?n-1:(i+(e.key===fwd?1:-1)+n)%n;
+    e.preventDefault(); showTab(tabs[i].dataset.v); revealTab(tabs[i].dataset.v); tabs[i].focus({preventScroll:true});
+  }
   if(e.key==="Escape"&&!$("#sheet").hidden)closeSheet();
   if(e.key==="Tab"&&!$("#sheet").hidden)sheetTrap(e);
   if(el&&el.id==="f-place"){
@@ -1248,7 +1270,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r56-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r57-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>

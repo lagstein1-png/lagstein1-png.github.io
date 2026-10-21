@@ -46,7 +46,7 @@ html[lang="ru"] body,html[lang="ru"] button{font-family:var(--ru)}
 button{font:inherit;color:inherit;cursor:pointer}
 .wrap{max-width:820px;margin:0 auto;padding:12px 14px 120px}
 .top{display:flex;align-items:center;gap:6px;margin-bottom:10px}
-.brand{font-weight:800;font-size:.9rem;line-height:1.15;flex:1;min-width:0;color:var(--teal-deep);background:none;border:0;text-align:start;padding:6px 0}
+.brand{font-weight:800;font-size:.9rem;line-height:1.15;flex:1;min-width:0;min-height:44px;color:var(--teal-deep);background:none;border:0;text-align:start;padding:6px 0}
 .langs{display:flex;gap:4px}
 .langs button{min-width:46px;min-height:50px;padding:0 4px;border-radius:14px;border:2px solid var(--teal);background:var(--card);font-weight:700;font-size:.9rem}
 /* הכפתור הנבחר בשורת השפות הוא 18px/700 — טקסט רגיל ולא גדול,
@@ -312,7 +312,7 @@ function build(setId,lv,seed){
   var deck={set:setId,lv:lv,seed:seed,cards:printed,chain:chainIds,byChain:cards};
   RNG=Math.random;return deck}
 /* ===== UI strings ===== */
-var BUILD="dm24 · 2026-10-16";
+var BUILD="dm25 · 2026-10-21";
 var STR={
 he:{brand:"דומינו לימודי",title:"דומינו לימודי להדפסה",tag:"מדפיסים 20 קלפים, גוזרים ומסדרים במעגל. כל קלף מתחבר לקלף שמתאים לו.",
  howT:"איך משחקים?",limor:"אני לימור. ככה משחקים:",how:"1. מדפיסים את הקלפים וגוזרים לפי הקו המקווקו.\n2. מערבבים את הקלפים על השולחן.\n3. מתחילים בקלף עם הכוכב. מחפשים קלף שהחצי הראשון שלו מתאים לחצי השני של הקלף הקודם.\n4. ממשיכים עד שהמעגל נסגר. הקלף האחרון מתחבר לקלף עם הכוכב.",
@@ -686,7 +686,7 @@ function boot(){var q=new URLSearchParams(location.search),l=q.get("lang");if(l&
   render();
   var pr=q.get("print");if(pr==="cards")document.documentElement.classList.add("pc");else if(pr==="key")document.documentElement.classList.add("pk");
   if(window.TUTOR){try{TUTOR.mount({app:"domino",lang:function(){return S.lang},q:function(){return null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm24-pwa1").catch(function(){})})}
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm25-pwa1").catch(function(){})})}
 if(!INTERNAL_OK){
   document.getElementById("gate").hidden=false;
   document.title="לא פורסם";

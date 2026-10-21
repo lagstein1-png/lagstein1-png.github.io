@@ -1138,7 +1138,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l174 · 2026-10-18";
+var BUILD="l175 · 2026-10-21";
 var SKEY="lomda-state-v1";
 
 function blankState(){
@@ -2021,11 +2021,11 @@ function speak(text,lang,rateMul){
   if(parts&&(function play(k){
     return RECORDED.play(parts[k],lang,{rate:state.rate,
       onEnd:function(){ if(my===_sayGen&&k+1<parts.length)play(k+1) },
-      onError:function(){ if(my===_sayGen)speakDevice(saySpell(parts.slice(k).join(" ")),code,rate) }});
+      onError:function(){ if(my===_sayGen)speakDevice(saySpell(parts.slice(k).join(" "),lang),code,rate) }});
   })(0)){
     return;
   }
-  text=saySpell(text);
+  text=saySpell(text,lang);
   speakDevice(text,code,rate);
 }
 function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();stopKeepAlive();_activeU=null;try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
@@ -2213,8 +2213,12 @@ function _rom(n){return ROM[n]||String(n)}
    בדיוק וסוף מילה. הסיכון א-סימטרי — מירכאה שהוסרה אינה יכולה
    להזיק, מירכאה שנשארה כן.
    ------------------------------------------------------------ */
-function saySpell(x){
-  return String(x==null?"":x).replace(/(^|[^A-Za-z])([IVXLC]+)(?![A-Za-z])/g,function(m,p,r,off,str){
+function saySpell(x,lang){
+  var str0=String(x==null?"":x);
+  /* בלי שפה — כמו קודם: משפט שיש בו עברית נקרא בקול עברי. */
+  if(!lang)lang=/[א-ת]/.test(str0)?"he":"";
+  var lat=SAY_LAT[lang]||null;
+  return str0.replace(/(^|[^A-Za-z])([IVXLC]+)(?![A-Za-z])/g,function(m,p,r,off,str){
     /* אות בודדת עומדת בפני עצמה גם כשאינה ספרה: "קרני X" נהגה
        "קרני 10", ו-"what I think" נהגה "what 1 think". רצף של
        שתיים ומעלה הוא תמיד ספרה; אות אחת היא ספרה רק אחרי שם
@@ -2229,20 +2233,148 @@ function saySpell(x){
   }).replace(/״/g,function(m,i,str){
     return /^[\u05D0-\u05EA](?![\u05D0-\u05EA])/.test(str.slice(i+1))?m:"";
   }).replace(/\s—\s/g,", ").replace(/(^|[^A-Za-z])(pH|(?:(?:Na|Cl|Fe|Ca|Mg|[HOCNSK])\d*)+)(?![A-Za-z0-9])/g,function(m,p,f,off,str){
-    /* סמל לטיני בתוך משפט עברי — קול עברי קורא ״pH״ ו״H2O״ כמילה
-       (O-6). רק כשיש במשפט עברית, ורק נוסחה של ממש: יש בה ספרה, או
-       סמל של שתי אותיות (Fe). ״DNA״ ו-״R1״ אינם נוסחה ונשארים. אות
-       בודדת (״O לחמצן״) נשארת: קול עברי אומר אותה נכון לבד. */
-    if(!/[א-ת]/.test(str))return m;
-    if(f==="pH")return p+"פי אייץ׳";
+    /* סמל לטיני בתוך משפט עברי, ערבי או רוסי — הקול של שפת הממשק
+       קורא ״pH״ ו״H2O״ כמילה (O-6). רק נוסחה של ממש: יש בה ספרה,
+       או סמל של שתי אותיות (Fe, NaCl). ״DNA״ ו-״R1״ אינם נוסחה —
+       אותם מטפל SAY_WORD למטה. אות בודדת (״O לחמצן״) נשארת: היא
+       שם האות עצמה, והקול אומר אותה לבד. */
+    if(!lat)return m;
+    p=sayGlue(p,str.slice(0,off),lang);
+    if(f==="pH")return p+SAY_WORD[lang].pH;
     if(!/\d|[a-z]/.test(f))return m;
+    var chem=SAY_CHEM[lang]||{};
     return p+f.match(/[A-Z][a-z]?|\d+/g).map(function(x){
-      return /\d/.test(x)?x:x.split("").map(function(c){return SAY_LAT[c.toUpperCase()]}).join(" ");
+      if(/\d/.test(x))return x;
+      return chem[x]||x.split("").map(function(c){return lat[c.toUpperCase()]}).join(" ");
+    }).join(" ");
+  }).replace(/(^|[^A-Za-z0-9])World Wide Web(?![A-Za-z0-9])/g,function(m,p,off,str){
+    /* צירוף של שלוש מילים — לפני המילים הבודדות, שאחרת ״Web״ לבדה
+       לא תימצא במילון והצירוף ייקרא חצי־חצי. */
+    return lat?sayGlue(p,str.slice(0,off),lang)+SAY_WORD[lang]["World Wide Web"]:m;
+  }).replace(/(^|[^A-Za-z0-9])([A-Za-z][A-Za-z0-9]*(?:[\/-][A-Za-z0-9]+)*)(?![A-Za-z0-9])/g,function(m,p,w,off,str){
+    /* מילה לטינית שלמה בתוך משפט בשפת הממשק (O-6). רק מה שבמילון —
+       מילה שאינה בו נשארת כמות שהיא, כי ניחוש של הגייה גרוע משתיקה.
+       ראשי תיבות נאמרים אות־אות (SAY_ACR), השאר לפי הנוהג בכל שפה. */
+    if(!lat)return m;
+    p=sayGlue(p,str.slice(0,off),lang);
+    if(Object.prototype.hasOwnProperty.call(SAY_WORD[lang],w))return p+SAY_WORD[lang][w];
+    if(SAY_ACR.indexOf(w)<0)return m;
+    var sep=lang==="ru"?"-":" ";
+    return p+w.split("/").map(function(part){
+      return part.match(/[A-Z]|\d+/g).map(function(c){return /\d/.test(c)?c:lat[c]}).join(sep);
     }).join(" ");
   });
 }
-/* שמות האותיות הלטיניות שבסמלי היסודות שבלומדה (chem.js: H2O, H2O2, CO2, Fe, pH). */
-var SAY_LAT={A:"איי",C:"סי",E:"אי",F:"אף",G:"ג׳י",H:"אייץ׳",K:"קיי",L:"אל",M:"אם",N:"אן",O:"או",S:"אס"};
+/* ------------------------------------------------------------
+   מילון ההגייה של saySpell (O-6, 21.10.2026). רץ רק בנתיב קול
+   המכשיר, אחרי חיפוש ההקלטה — ראו speak. המסך אינו משתנה.
+
+   המילים נאספו מהתוכן עצמו: כל רצף לטיני בשדות שמוקראים
+   (t, w, c, e, d, שורות הקטע, שאלה, תשובה, מסיחים, נימוקים)
+   ב-he/ar/ru של lomda/data/*.js. נמדד: 34 מילים שונות, 109 מופעים.
+   ומעליהן מה שעוד לא בתוכן אבל ייכנס עם נושא חדש: DNA, km, kg,
+   NaCl, Wi-Fi.
+
+   **ומה שאינו כאן בכוונה — תעתיקים שההגייה שלהם היא השיעור.**
+   התעתיקים הלטיניים של ״לשון״ (`lashon.js`) עברו ב-10.10.2026
+   לאפליקציה `hebrew`, ואינם בלומדה עוד. אם נושא כזה יחזור — מילה
+   שהלומד אמור לשמוע כפי שהיא כתובה — אין להוסיף אותה כאן: המילון
+   מחליף את המילה בהגייה בשפת הממשק, ושם זו בדיוק התשובה הנבדקת.
+   מאותה סיבה המילון אינו נוגע באות לטינית בודדת (x, T, D, O):
+   שם האות הוא ההגייה שלה, ו״ויטמין D״ או ״דגם T״ נשמעים נכון.
+   ------------------------------------------------------------ */
+/* ״ל-Google״ נכתב במקף כי עברית אינה נצמדת ללטינית. אחרי ההחלפה
+   המילה עברית, והמקף נשאר לבד — והקול אומר ״למד״ ואחריו ״גוגל״.
+   לכן בעברית אות־השימוש (ו, ב, ל, מ, ה, כ, ש) נצמדת חזרה למילה. */
+function sayGlue(p,before,lang){
+  if(lang==="he"&&/^[-־]$/.test(p)&&/(^|[^א-ת])[ובלמהכש]{1,3}$/.test(before))return "";
+  return p;
+}
+/* שמות האותיות הלטיניות בכל שפת ממשק. */
+var SAY_LAT={
+  he:{A:"איי",B:"בי",C:"סי",D:"די",E:"אי",F:"אף",G:"ג׳י",H:"אייץ׳",I:"איי",J:"ג׳יי",K:"קיי",L:"אל",M:"אם",
+      N:"אן",O:"או",P:"פי",Q:"קיו",R:"אר",S:"אס",T:"טי",U:"יו",V:"וי",W:"דאבליו",X:"אקס",Y:"וואי",Z:"זי"},
+  ar:{A:"إيه",B:"بي",C:"سي",D:"دي",E:"إي",F:"إف",G:"جي",H:"إتش",I:"آي",J:"جيه",K:"كيه",L:"إل",M:"إم",
+      N:"إن",O:"أو",P:"بي",Q:"كيو",R:"آر",S:"إس",T:"تي",U:"يو",V:"في",W:"دبليو",X:"إكس",Y:"واي",Z:"زد"},
+  ru:{A:"эй",B:"би",C:"си",D:"ди",E:"и",F:"эф",G:"джи",H:"эйч",I:"ай",J:"джей",K:"кей",L:"эл",M:"эм",
+      N:"эн",O:"оу",P:"пи",Q:"кью",R:"ар",S:"эс",T:"ти",U:"ю",V:"ви",W:"дабл-ю",X:"экс",Y:"уай",Z:"зед"}
+};
+/* ברוסית הנוסחה נקראת בשמות הכימיים של בית הספר — H2O הוא
+   ״аш два о״ ולא ״эйч два оу״. בעברית ובערבית — שמות האותיות. */
+var SAY_CHEM={ru:{H:"аш",O:"о",C:"цэ",N:"эн",S:"эс",K:"калий",Fe:"феррум",Na:"натрий",Cl:"хлор",Ca:"кальций",Mg:"магний"}};
+/* ראשי תיבות שנאמרים אות־אות. */
+var SAY_ACR=["DNA","RNA","TCP/IP","IP","SMS","IBM","BBC","KDKA","R1","USB","PDF","GPS","TV","PC"];
+/* מילים שנאמרות כמילה — לפי הנוהג בכל שפה. השפה בחוץ והמילה
+   בפנים, כמו ב-SAY_LAT: באנגלית המילה נשארת כמות שהיא, ולכן אין
+   כאן שדה en — ואין כאן ״חבילת שפה״ שחסר בה תרגום. */
+var SAY_WORD={
+  he:{
+    pH:"פי אייץ׳",
+    "World Wide Web":"וורלד וייד ווב",
+    km:"קילומטר",
+    kg:"קילוגרם",
+    cm:"סנטימטר",
+    "Wi-Fi":"וויי פיי",
+    Google:"גוגל",
+    YouTube:"יוטיוב",
+    iPhone:"אייפון",
+    Excel:"אקסל",
+    ARPANET:"ארפאנט",
+    CERN:"סרן",
+    PISA:"פיזה",
+    TIMSS:"טימס",
+    ILOVEYOU:"איי לאב יו",
+    SixDegrees:"סיקס דיגריז",
+    ImageNet:"אימג׳נט",
+    WannaCry:"וואנה קריי",
+    Stuxnet:"סטוקסנט",
+    Mosaic:"מוזאיק"
+  },
+  ar:{
+    pH:"بي إتش",
+    "World Wide Web":"وورلد وايد ويب",
+    km:"كيلومتر",
+    kg:"كيلوغرام",
+    cm:"سنتيمتر",
+    "Wi-Fi":"واي فاي",
+    Google:"غوغل",
+    YouTube:"يوتيوب",
+    iPhone:"آيفون",
+    Excel:"إكسل",
+    ARPANET:"أربانت",
+    CERN:"سيرن",
+    PISA:"بيزا",
+    TIMSS:"تيمس",
+    ILOVEYOU:"آي لاف يو",
+    SixDegrees:"سيكس ديغريز",
+    ImageNet:"إيمج نت",
+    WannaCry:"وانا كراي",
+    Stuxnet:"ستوكسنت",
+    Mosaic:"موزاييك"
+  },
+  ru:{
+    pH:"пэ-аш",
+    "World Wide Web":"ворлд вайд веб",
+    km:"километр",
+    kg:"килограмм",
+    cm:"сантиметр",
+    "Wi-Fi":"вай-фай",
+    Google:"гугл",
+    YouTube:"ютуб",
+    iPhone:"айфон",
+    Excel:"эксель",
+    ARPANET:"арпанет",
+    CERN:"церн",
+    PISA:"пиза",
+    TIMSS:"тимс",
+    ILOVEYOU:"ай лав ю",
+    SixDegrees:"сикс дигриз",
+    ImageNet:"имиджнет",
+    WannaCry:"ванакрай",
+    Stuxnet:"стакснет",
+    Mosaic:"мозаик"
+  }
+};
 
 /* כל האירועים מכל התוכן — משם נלקחים מסיחים כשהנושא עצמו קטן מדי,
    וגם תרגיל הסדר הכרונולוגי בין תקופות. */
@@ -4719,7 +4851,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l174-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l175-pwa1").catch(function(){});
   });
 }
 </script>
