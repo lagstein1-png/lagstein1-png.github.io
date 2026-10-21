@@ -218,6 +218,12 @@ jobs:
           TTS_BUDGET_USD: ${{ vars.TTS_BUDGET_USD || secrets.TTS_BUDGET_USD || '100' }}
           # Tier 2 (הבעלים, 3.10.2026): 6.6 משפטים לדקה במרווח 5 שניות היו 31 שעות
           TTS_PACE_MIN_MS: ${{ vars.TTS_PACE_MIN_MS || '1500' }}
+          # O-215 — היעד של הקבצים ל-`record.js --verify`: שורש עותק של
+          # bekol-audio (דלי 1) ו-bekol-audio2 (דלי 2, ON_2 ב-recorded.js).
+          # ריק = הריפו הזה, כמו היום. שלב 3 ב-docs/claude/audio-repos.md
+          # (checkout של שני הריפואים והדחיפה אליהם) ממלא את שניהם.
+          AUDIO_ROOT_1: ''
+          AUDIO_ROOT_2: ''
         run: |
           # Actions מריץ bash -e: יציאה 1 של record.js (מכסה בלי אף קובץ)
           # הפילה את הצעד לפני הבדיקה והדחיפה (ריצה 52). השגיאות כאן נבדקות ביד.
@@ -249,7 +255,14 @@ jobs:
               echo "=== $APP · מקטע עד $CH · עד $LEFT דקות ===" | tee -a /tmp/rec.log
               timeout -s INT -k 10m "${LEFT}m" node .claude/qa/record.js "$APP" --max "$CH" $EXTRA 2>&1 | tee /tmp/app.log
               cat /tmp/app.log >> /tmp/rec.log
-              if ! node .claude/qa/record.js --check; then echo "::error::המניפסט של $APP אינו תואם לדיסק — לא דוחפים"; exit 1; fi
+              # O-215: --check מחזיר 3 כשאפליקציה מכריזה קליפים ואין לה אף
+              # קובץ כאן (המתג ב-recorded.js דולק, הקבצים בריפו אחר) — זה
+              # ״לא נבדק״ ולא כישלון. ההוכחה ל-$APP היא --verify שאחריו.
+              node .claude/qa/record.js --check; RC=$?
+              if [ "$RC" -ne 0 ] && [ "$RC" -ne 3 ]; then echo "::error::המניפסט של $APP אינו תואם לדיסק — לא דוחפים"; exit 1; fi
+              # כל מזהה שהמניפסט שנכתב עכשיו מכריז — יש לו קובץ ביעד, ואף
+              # מזהה מ-HEAD לא נעלם. היעד: AUDIO_ROOT_1/2 (ראו env), ריק — כאן.
+              if ! node .claude/qa/record.js --verify "$APP"; then echo "::error::המניפסט של $APP מכריז קליפים שאין להם קובץ ביעד, או שאיבד מזהים — לא דוחפים"; exit 1; fi
               git add -- '*/audio/*'
               if [ -d .claude/qa/record-spend ]; then git add .claude/qa/record-spend; fi
               if ! git diff --cached --quiet; then

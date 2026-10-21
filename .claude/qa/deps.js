@@ -41,7 +41,7 @@ if (!ARGS.length && ALL.length < 30) {
    ומפנים לממצא. כל רשומה היא תבנית על שורת הממצא כפי שהיא מודפסת. */
 const KNOWN = [
   { re: /^math-teen: bagrut3\.js נטען אבל אינו ב-PRE/,
-    why: 'נחשף עם O-166, 16.10.2026 — math-teen/index.html:522 טוען bagrut3.js ב-document.write תחת ?bagrut3=1, והקובץ אינו ב-PRE; אופליין מסך בגרות 3 יח״ל נשען על מטמון הריצה בלבד. לא תוקן ב-sw.js: תשעת קובצי sw.js זהים (engine.js), ו-bagrut3.js קיים רק ב-math-teen' },
+    why: 'O-221, 21.10.2026 — הקובץ עדיין אינו ב-PRE (sw.js זהה לעותקים ש-engine.js בודק), אבל math-teen/index.html שומר אותו בעצמו במטמון ה-worker אחרי navigator.serviceWorker.ready, ומסך בגרות 3 יח״ל נפתח אופליין (נבדק בדפדפן). הבדיקה כאן קוראת רק את PRE, ולכן השורה נשארת דולקת' },
   { re: /^[\w-]+\/index\.html: fetch לכתובת חיצונית — https:\/\/generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-2\.5-flash-preview-tts:generateContent\?key=$/,
     why: 'קול הענן האופציונלי (gSynth, ARCHITECTURE.md §168) — נשלח רק כשהלומד הזין מפתח Gemini משלו (GKEY). תלות שקדמה לכלל; מספר האפליקציות — O-179. נחשף כאן ב-16.10.2026: legal/terms.js אינו מזכיר Gemini (grep -c ⇒ 0)' },
 ];

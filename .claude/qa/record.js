@@ -12,7 +12,8 @@
    בסביבת הפיתוח (הרשת חסומה כאן) ולא בדפדפן (מפתח בדף).
 
      node .claude/qa/record.js --plan [app...]     כמה מחרוזות, כמה תווים, כיסוי — בלי רשת
-     node .claude/qa/record.js --check             המניפסט תואם לקבצים — נכנס ל-all.js
+     node .claude/qa/record.js --check             המניפסט תואם לקבצים — נכנס ל-all.js (3 = קבצים בריפו אחר, לא נבדק)
+     node .claude/qa/record.js --verify <app...>   כל מזהה במניפסט — יש לו קובץ (AUDIO_ROOT_1/2), ולא אבד מזהה מול HEAD — ל-record.yml
      node .claude/qa/record.js --next              מי הכי חסרה — לריצה המתוזמנת
      GEMINI_API_KEY=… node .claude/qa/record.js english [--max 300]   מקליט מה שחסר (gemini)
      TTS_PROVIDER=gcloud TTS_KEY=… TTS_VOICE=he-IL-Chirp3-HD-Kore node .claude/qa/record.js english [--replace]
@@ -845,6 +846,39 @@ function plan(apps) {
 }
 
 /* --- check -------------------------------------------------------- */
+/* ===== O-215, 21.10.2026 — מניפסט מול אפס קבצים =====
+   `--check` משווה מניפסט לקבצים **שעל הדיסק הזה**. ברגע שה-MP3 יעברו
+   לריפו אחר (`docs/claude/audio-repos.md`, שלב 7), התיקייה תהיה ריקה
+   והמניפסט עדיין יכריז אלפי מזהים. שתי תשובות לשאלה ״מה זה אומר״:
+   · המתג ב-`speech/recorded.js` דולק (הקליפ נבנה על מקור אחר) — הקבצים
+     שם, ומכאן אי אפשר לראות אותם. זה **לא** ✓: זו יציאה 3 של all.js,
+     ״עבר, וחלק לא נבדק״ (O-210). ההוכחה עוברת ל-`record.js --verify`
+     ב-`record.yml`, שרואה את שני הצדדים ברגע שהוא כותב אותם.
+   · המתג כבוי — הקבצים אמורים להיות כאן, ואינם. ✗, כמו קודם.
+   המתג נקרא מ-`RECORDED.clip`, הבונה היחיד של הכתובת, ולא מ-regex
+   על הקובץ — כך אין שני מקורות אמת לשאלה ״לאן הקליפ הולך״. */
+function anyMp3(dir) {
+  if (!fs.existsSync(dir)) return false;
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (e.isFile() && e.name.endsWith('.mp3')) return true;
+    if (e.isDirectory() && anyMp3(path.join(dir, e.name))) return true;
+  }
+  return false;
+}
+function remoteHost(app) {
+  const u = R.clip('/' + app + '/audio', LANG, 'x');
+  const m = /^(https?:\/\/[^/]+)/.exec(u);
+  return m ? m[1] : '';
+}
+/* הדלי של האפליקציה — ON_2 ב-recorded.js. אינו מיוצא מהמודול, ולכן
+   נקרא מהמקור; ON_2 שלא נמצא הוא שגיאה ולא ״דלי 1״ שקט. */
+function onTwo(app) {
+  const src = fs.readFileSync(path.join(ROOT, 'speech', 'recorded.js'), 'utf8');
+  const m = /var ON_2 = \{([^}]*)\}/.exec(src);
+  if (!m) { console.error('✗ ON_2 לא נמצא ב-speech/recorded.js'); process.exit(1); }
+  return new Set([...m[1].matchAll(/"?([\w-]+)"?\s*:/g)].map(x => x[1])).has(app);
+}
+let UNCHECKED = 0;
 function check() {
   let bad = 0;
   for (const app of Object.keys(SOURCES)) {
@@ -854,6 +888,19 @@ function check() {
     if ((!m || !(((m.langs || {})[LANG] || {}).ids || []).length) && !disk.size) { console.log('· ' + app.padEnd(9) + 'אין הקלטות עדיין — קול המכשיר'); continue; }
     if (!m || m.broken) { bad++; console.log('✗ ' + app.padEnd(9) + 'יש קבצים ואין manifest.json תקין — ' + disk.size + ' קבצים לא ינוגנו'); continue; }
     const ids = ((m.langs || {})[LANG] || {}).ids || [];
+    if (ids.length && !anyMp3(dirOf(app))) {
+      const host = remoteHost(app);
+      if (host) {
+        UNCHECKED++;
+        console.log('✓? ' + app.padEnd(9) + 'המניפסט מכריז ' + ids.length + ' קליפים ואין אף קובץ בדיסק — ' +
+                    'הקבצים בריפו אחר? (' + host + ') לא נבדק. ההוכחה: record.js --verify ב-record.yml');
+      } else {
+        bad++;
+        console.log('✗ ' + app.padEnd(9) + 'המניפסט מכריז ' + ids.length + ' קליפים ואין אף קובץ בדיסק, ' +
+                    'והמתג ב-speech/recorded.js כבוי — הקבצים אמורים להיות כאן. כל קליפ ייפול ל-404 ולקול המכשיר');
+      }
+      continue;
+    }
     const set = new Set(ids);
     const ghost = ids.filter(x => !disk.has(x));
     const orphan = [...disk].filter(x => !set.has(x));
@@ -1268,8 +1315,53 @@ async function build(app, max) {
     : args.filter(a => !a.startsWith('--') && !(maxI >= 0 && a === args[maxI + 1]));
   if (args.includes('--check')) {
     const bad = check();
-    console.log(bad ? '\n' + bad + ' אפליקציות עם מניפסט שאינו תואם לדיסק' : '\nהשכבה המוקלטת: המניפסטים תואמים לדיסק');
-    process.exit(bad ? 1 : 0);
+    console.log(bad ? '\n' + bad + ' אפליקציות עם מניפסט שאינו תואם לדיסק'
+      : UNCHECKED ? '\nהשכבה המוקלטת: מה שעל הדיסק תואם, ו-' + UNCHECKED + ' אפליקציות לא נבדקו — הקבצים שלהן אינם כאן (O-215)'
+      : '\nהשכבה המוקלטת: המניפסטים תואמים לדיסק');
+    /* 3 = ״עבר, וחלק לא נבדק״ — המוסכמה של all.js (O-210) */
+    process.exit(bad ? 1 : UNCHECKED ? 3 : 0);
+  }
+  /* --verify <app>: כל מזהה שהמניפסט מכריז — יש לו קובץ. O-215.
+     זו הבדיקה של record.yml, ולכן אין בה יציאה 3: מי שכתב את הקבצים
+     רואה אותם. היעד: AUDIO_ROOT_1 / AUDIO_ROOT_2 (שורש עותק של
+     bekol-audio / bekol-audio2, אותה פריסה <app>/audio/<lang>/), לפי
+     הדלי של האפליקציה ב-recorded.js; ריק — הריפו הזה. */
+  if (args.includes('--verify')) {
+    let bad = 0;
+    for (const app of apps) {
+      const m = readManifest(app);
+      if (!m) { console.log('· ' + app.padEnd(9) + 'אין manifest.json — אין הקלטות, אין מה להכריז'); continue; }
+      if (m.broken) { bad++; console.log('✗ ' + app.padEnd(9) + 'manifest.json אינו JSON תקין'); continue; }
+      const ids = ((m.langs || {})[LANG] || {}).ids || [];
+      const root = onTwo(app) ? process.env.AUDIO_ROOT_2 : process.env.AUDIO_ROOT_1;
+      const dir = path.join(root || ROOT, app, 'audio', LANG);
+      const missing = ids.filter(id => {
+        try { return fs.statSync(path.join(dir, id + '.mp3')).size < MIN_BYTES; } catch (e) { return true; }
+      });
+      /* והמניפסט לא איבד מזהים מול הקומיט האחרון. writeManifest גוזר
+         אותו מהדיסק של הרנר — ואחרי המעבר זה דיסק שאין בו את מה שכבר
+         הוקלט. מניפסט שהתכווץ תואם לקבצים שלו ובכל זאת השתיק אלפים. */
+      const prev = spawnSync('git', ['show', 'HEAD:' + app + '/audio/manifest.json'], { cwd: ROOT, encoding: 'utf8' });
+      let lost = [];
+      if (prev.status === 0) {
+        try {
+          const now = new Set(ids);
+          lost = ((((JSON.parse(prev.stdout).langs) || {})[LANG] || {}).ids || []).filter(id => !now.has(id));
+        } catch (e) {}
+      }
+      if (lost.length) {
+        bad++;
+        console.log('✗ ' + app.padEnd(9) + lost.length + ' מזהים היו במניפסט ב-HEAD ונעלמו — למשל ' + lost.slice(0, 3).join(', '));
+      }
+      if (missing.length) {
+        bad++;
+        console.log('✗ ' + app.padEnd(9) + missing.length + ' מתוך ' + ids.length + ' מזהים במניפסט בלי קובץ ב-' + dir +
+                    ' — למשל ' + missing.slice(0, 3).join(', '));
+      } else if (!lost.length) {
+        console.log('✓ ' + app.padEnd(9) + 'כל ' + ids.length + ' המזהים במניפסט — יש להם קובץ ב-' + dir);
+      }
+    }
+    process.exit(bad || !apps.length ? 1 : 0);
   }
   /* --list: כל האפליקציות שיש להן מאגר — ל-app=all ב-record.yml */
   if (args.includes('--list')) { console.log(Object.keys(SOURCES).join(' ')); process.exit(0); }

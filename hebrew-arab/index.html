@@ -802,6 +802,11 @@ var LANGS={
   en:{name:"English", dir:"ltr", tts:"en-US"}
 };
 var EN_TTS="en-US";
+/* שפת הלימוד (O-145, כמו ב-ulpan). העברית באפשרויות, בקטעים ובנימוקים
+   היא החומר הנלמד, ולא מחרוזת ממשק ששכחו לתרגם. זו לא הצהרה בלבד:
+   langSegs שולח כל קטע עברי לקול LEARN_TTS, גם בתוך משפט ערבי. */
+var LEARN="he";
+var LEARN_TTS=LANGS[LEARN].tts;
 
 var T={};
 T.he={
@@ -1061,7 +1066,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="y31 · 2026-10-18";
+var BUILD="y32 · 2026-10-18";
 var SKEY="hebrew-arab-state-v1";
 
 function blankState(){
@@ -1666,15 +1671,37 @@ function segments(spoken){
    של 400 תווים בקול ערבי — שמבליע או מאיית אותיות שאינו מכיר.
    הכלל: משפט שיש בו אותיות עבריות ואין בו אותיות של כתב אחר נאמר
    בקול עברי (he-IL), בלי קשר לשפת הממשק. משפט בשפת הממשק — בקול
-   שלה. משפט שמערב את שני הכתבים בתוך עצמו (״ما معنى «שלום»؟״)
-   נשאר בקול שפת הממשק כמו קודם: פיצול באמצע משפט הוא הכרעת בעלים
-   שעוד לא ניתנה (O-164, ה-דרוש של 7.10).
+   שלה. משפט שמערב את שני הכתבים בתוך עצמו (״كلمة «רַמְזוֹר» نشأت…״)
+   מתפצל לרצפים לפי כתב (scriptRuns, O-145 ג׳, 21.10.2026): המילה
+   העברית בקול עברי, והערבית סביבה בקול ערבי. עד כאן המשפט כולו
+   יצא בקול ערבי, שמדלג על אותיות עבריות או מאיית אותן — ובאפליקציה
+   שמלמדת עברית, המילה העברית היא בדיוק מה שהלומד בא לשמוע.
+   בין רצפים של אותו משפט ההפסקה קצרה (SEG_TIGHT), כדי שהמשפט
+   לא יישמע כמו שלושה משפטים.
    ------------------------------------------------------------ */
 var RX_HE=/[א-תיִ-ﭏ]/,
     RX_OTHER=/[A-Za-zÀ-ɏЀ-ӿ؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/;
 function scriptOf(s){
   var he=RX_HE.test(s),ot=RX_OTHER.test(s);
   return he&&!ot?"he":ot&&!he?"ot":he?"mix":"none";
+}
+/* לרצף: גם ניקוד וגרש/גרשיים שייכים לעברית, אחרת "רֶמֶז" נחתך */
+var RX_HE_RUN=/[֑-״יִ-ﭏ]/, SEG_TIGHT=60;
+/* משפט מעורב → רצפים לפי כתב. תו בלי כתב (רווח, פיסוק, ספרה, "+")
+   מצטרף לרצף שלפניו — "רֶמֶז + אוֹר" נשאר רצף עברי אחד. ההיסט
+   של כל רצף יחסי למשפט. */
+function scriptRuns(s){
+  var runs=[],cur=null,i,ch,k;
+  for(i=0;i<s.length;i++){
+    ch=s[i];
+    k=RX_HE_RUN.test(ch)?"he":RX_OTHER.test(ch)?"ot":"";
+    if(cur&&k&&cur.k&&k!==cur.k){runs.push(cur);cur=null}
+    if(!cur){cur={text:ch,start:i,k:k};continue}
+    if(k&&!cur.k)cur.k=k;
+    cur.text+=ch;
+  }
+  if(cur)runs.push(cur);
+  return runs;
 }
 /* מחלק את הטקסט לגושים לפי כתב, על גבול משפט בלבד, ומחזיר מקטעים
    שכל אחד נושא את קוד הקול שלו. ההיסט נשמר יחסית לטקסט המלא, כדי
@@ -1692,20 +1719,27 @@ function langSegs(text,code){
   if(from<text.length)sent.push({text:text.slice(from),start:from});
   var blocks=[];
   sent.forEach(function(s){
-    var c=scriptOf(s.text), last=blocks[blocks.length-1];
-    /* משפט בלי אותיות (מספר, סוגר) מצטרף לגוש שלפניו */
-    if(last&&(c==="none"||(c==="he")===(last.he))){ last.text+=s.text; return }
-    blocks.push({text:s.text,start:s.start,he:c==="he"});
+    var c=scriptOf(s.text);
+    /* משפט מעורב — רצף־רצף; mid מסמן גוש שמתחיל באמצע משפט */
+    var pieces=c==="mix"?scriptRuns(s.text).map(function(r){
+      return {text:r.text,start:s.start+r.start,he:r.k==="he",mid:r.start>0}}):
+      [{text:s.text,start:s.start,he:c==="he",none:c==="none",mid:false}];
+    pieces.forEach(function(p){
+      var last=blocks[blocks.length-1];
+      /* משפט בלי אותיות (מספר, סוגר) מצטרף לגוש שלפניו */
+      if(last&&(p.none||p.he===last.he)){ last.text+=p.text; return }
+      blocks.push({text:p.text,start:p.start,he:p.he,mid:p.mid});
+    });
   });
   /* גוש ראשון בלי אותיות מצטרף לשני, אם יש */
   if(blocks.length>1&&scriptOf(blocks[0].text)==="none"){
-    blocks[1]={text:blocks[0].text+blocks[1].text,start:blocks[0].start,he:blocks[1].he};
+    blocks[1]={text:blocks[0].text+blocks[1].text,start:blocks[0].start,he:blocks[1].he,mid:false};
     blocks.shift();
   }
   var out=[];
   blocks.forEach(function(b){
-    segments(b.text).forEach(function(s){
-      out.push({text:s.text,start:b.start+s.start,code:b.he?LANGS.he.tts:code});
+    segments(b.text).forEach(function(s,i){
+      out.push({text:s.text,start:b.start+s.start,code:b.he?LEARN_TTS:code,tight:i===0&&!!b.mid});
     });
   });
   return out.length?out:[{text:text,start:0,code:code}];
@@ -1814,10 +1848,14 @@ function voiceCheck(){
 var _sayGen=0;
 /* מנוע ההגייה העברי — /tutor/he-speech.js (O-178, 16.10.2026, כמו
    ב-english). **עברית בלבד**: ערבית, רוסית ואנגלית עוברות כמות שהן.
-   הקובץ לא נטען — הטקסט חוזר כמות שהוא, ואין שגיאה. */
+   הקובץ לא נטען — הטקסט חוזר כמות שהוא, ואין שגיאה.
+   O-145 ג׳ (21.10.2026): רץ על כל טקסט שיש בו אות עברית, בלי קשר
+   לקוד. HESPEECH נוגע רק באסימונים עבריים, ולכן הערבית סביבם
+   עוברת כמות שהיא — והמילה העברית שבתוך משפט ערבי, שנאמרת עכשיו
+   בקול עברי, עוברת גם במילון. וכך hlPrep (שמקבל data-lang) ו-speakDevice
+   (שמקבל את הקוד אחרי ש-speak החליף אותו לעברית) רואים אותה מחרוזת. */
 function heSpoken(t,code){
-  var l=String(code||"he").slice(0,2);
-  if(l!=="he"||typeof HESPEECH==="undefined")return t;
+  if(!RX_HE.test(String(t))||typeof HESPEECH==="undefined")return t;
   try{ return HESPEECH.spoken(t) }catch(e){ return t }
 }
 function speakDevice(text,code,rate){
@@ -1857,7 +1895,8 @@ function speakDevice(text,code,rate){
         function next(){
           if(moved||!alive())return;
           moved=true; if(disarm)disarm();
-          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},SEG_GAP);
+          /* מעבר כתב באמצע משפט — הפסקה קצרה, לא סוף משפט */
+          if(k+1<segs.length) setTimeout(function(){sayseg(k+1)},segs[k+1].tight?SEG_TIGHT:SEG_GAP);
           else allDone();
         }
         var u=new SpeechSynthesisUtterance(seg.text);
@@ -4734,7 +4773,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=y31-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=y32-pwa1").catch(function(){});
   });
 }
 </script>
