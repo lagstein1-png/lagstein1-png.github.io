@@ -2,8 +2,15 @@
    בדיוק השאלה שהתלמיד מקבל מהקישור, ושהחלפה של שאלה אחת אינה
    משנה אף אחת מהשאר. */
 const {chromium}=require('./pw.js');
-const APPS=process.argv.slice(2).length?process.argv.slice(2)
-  :["math-app","math-teen","math-uni","math-uni2","math-uni3","ulpan","english","history","lomda"];
+/* O-135, 21.10.2026: הרשימה נגזרת. עד היום תשעה שמות כתובים ביד, ושתים־עשרה
+   אפליקציות נוספות שנושאות את אותו בונה מבחן (`exSlots`) — civics, tanakh,
+   biology, electric… — מעולם לא עברו כאן. אפליקציה בלי `exSlots` אין בה
+   מבחן כיתתי (משפחת UNITS, ה-elem, 806), והיא מודפסת בשורת ״·״. */
+const AL=require("./applist.js");
+const NAMED=AL.pick(process.argv.slice(2),[]);
+const APPS=NAMED.length?NAMED:AL.family("exam.js",/function exSlots\b/,
+  {floor:15,must:["math-app","math-teen","math-uni","math-uni2","math-uni3","ulpan","english","history","lomda"],
+   why:"אין בהן מבחן כיתתי (exSlots)"});
 const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 
 (async()=>{
@@ -34,6 +41,10 @@ const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 �
       break;
     }
     await page.waitForFunction(()=>typeof window.exSlots==="function",{timeout:15000});
+    /* שער התנאים יכול לעלות אחרי שלוש השניות שלמעלה כשהמכונה עמוסה
+       (נמדד 21.10.2026: ריצה מקבילה נפלה על `.lg-wrap intercepts pointer
+       events` ב-exqroll, וריצה בודדת של אותה אפליקציה עברה). */
+    try{if(await page.$("#lg-ok"))await page.click("#lg-ok",{timeout:3000})}catch(e){}
 
     const r=await page.evaluate(()=>{
       const out={};

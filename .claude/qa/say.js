@@ -1,7 +1,7 @@
 /* =====================================================================
    מה נאמר לפני שעונים — האם ההקראה מסגירה את התשובה.
 
-     node .claude/qa/say.js                      # ארבע אפליקציות החידון
+     node .claude/qa/say.js                      # כל מי שבונה P.q.say (נגזר)
      node .claude/qa/say.js history lomda        # רק אלה שנקבו בשמן
      node .claude/qa/say.js --n 120              # יותר שאלות לכל אפליקציה
 
@@ -29,7 +29,12 @@ const { chromium } = require('./pw.js');
 const argv = process.argv.slice(2);
 const N = argv.includes('--n') ? Number(argv[argv.indexOf('--n') + 1]) || 60 : 60;
 const apps = argv.filter(a => !a.startsWith('--') && !/^\d+$/.test(a)).map(a => a.replace(/\/$/, ''));
-const TARGET = apps.length ? apps : ['english', 'ulpan', 'history', 'lomda'];
+/* O-135, 21.10.2026: נגזרת. עד היום ארבעה שמות כתובים ביד, ודליפת הרווח
+   ישבה בעשר אפליקציות אחרות שכולן היו ירוקות כאן (ראו spacesay.js).
+   המשפחה היא מי שבונה `P.q.say` — בדיוק מה שהבדיקה מודדת. */
+const AL = require('./applist.js');
+const TARGET = apps.length ? apps : AL.family('say.js', /P\.q\.say\b/,
+  { floor: 10, must: ['english', 'ulpan', 'history', 'lomda'], why: 'אין בהן P.q.say' });
 const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
 
 async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.waitForTimeout(200); return true } catch (e) { return false } }
@@ -71,6 +76,17 @@ async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.
         out.n++;
         const others = (P.q.opts || []).map(o => strip(typeof o === 'string' ? o : (o && o.h)))
                                         .filter(x => x && x !== ans);
+        /* התשובה כתובה בשאלה עצמה — קטע קריאה (״שבע בערב״ בתוך ההודעה)
+           או שאלת דקדוק על משפט שמופיע בה. הרווח מקריא כאן את מה שעל
+           המסך, וזה אינו הבאג שהבדיקה צדה (`P.q.say` לפני מענה). נספר
+           בנפרד ומודפס, ואינו מפיל. נמדד 21.10.2026 ב-hebrew-arab, כשהכלי
+           הורחב מארבע אפליקציות לשלוש־עשרה — O-135. */
+        const lead = strip(P.q.lead || P.q.q || '');
+        if (sp.indexOf(ans) >= 0 && lead && lead.indexOf(ans) >= 0 && sp === lead) {
+          out.inQ = (out.inQ || 0) + 1;
+          if ((out.exQ || (out.exQ = [])).length < 2) out.exQ.push('"' + ans.slice(0, 30) + '" ← "' + sp.slice(0, 60) + '"');
+          continue;
+        }
         if (sp.indexOf(ans) >= 0 && !others.some(o => sp.indexOf(o) >= 0)) {
           out.leak++;
           out.byType[P.q.type] = (out.byType[P.q.type] || 0) + 1;
@@ -85,6 +101,7 @@ async function click(p, s) { try { await p.click(s, { timeout: 1500 }); await p.
       (r.leak ? '  ' + JSON.stringify(r.byType) : '') + (r.err ? '  ' + r.err : '') +
       (errs.length ? '  JS: ' + errs[0] : ''));
     for (const e of r.ex) console.log('     ' + e);
+    if (r.inQ) console.log(`     · ${r.inQ} שאלות שהתשובה כתובה בהן עצמן (הרווח הקריא את השאלה, לא את הפתרון): ${r.exQ.join(' · ')}`);
     await ctx.close();
   }
   await b.close();
