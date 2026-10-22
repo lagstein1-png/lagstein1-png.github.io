@@ -217,7 +217,8 @@ function iconSvg(id){var c="#fff";var m={
  pattern:'<circle cx="12" cy="34" r="8" fill="#fff"/><rect x="24" y="26" width="16" height="16" fill="#fff"/><circle cx="56" cy="34" r="8" fill="#fff"/>',
  frac:'<circle cx="34" cy="34" r="24" fill="#fff"/><path d="M34 34 L34 10 A24 24 0 0 1 34 58 Z" fill="#ff9f43"/>',
  data:'<rect x="10" y="36" width="12" height="22" fill="#fff"/><rect x="28" y="18" width="12" height="40" fill="#fff"/><rect x="46" y="28" width="12" height="30" fill="#fff"/>',
- words:'<text x="34" y="46" text-anchor="middle" font-size="34" font-weight="800" fill="#fff">+ ?</text>'};
+ words:'<text x="34" y="46" text-anchor="middle" font-size="34" font-weight="800" fill="#fff">+ ?</text>',
+ pct:'<text x="34" y="48" text-anchor="middle" font-size="38" font-weight="800" fill="#fff">%</text>'};
  return '<svg viewBox="0 0 68 68" width="68" height="68" aria-hidden="true">'+(m[id]||"")+'</svg>'}
 /* ===== band 2 visuals ===== */
 function gridVis(w,h,showLab){var u=Math.min(30,Math.floor(300/w)),s="",i,j;
@@ -783,20 +784,70 @@ G.dec3=function(lv){var T=[];
     return mk("hwhole",L("כמה זה "+a+" × "+n+"?","كم يساوي "+a+" × "+n+"؟","Сколько будет "+a+" × "+n+"?","What is "+a+" × "+n+"?"),"",s,[String(Math.round(a*n*10)/100),String(Math.round((a*n+1)*100)/100),String(Math.round(a*n*10)/10),String(Math.round((a*n-.5)*100)/100)].filter(function(x){return x!==s}),
      L("כופלים כמו במספרים שלמים, ואחר כך מחזירים את הנקודה.","نضرب كالأعداد الصحيحة ثم نضع الفاصلة.","Умножай как целые числа, потом поставь запятую.","Multiply like whole numbers, then place the point."),L(a+" × "+n+" = "+s+".",a+" × "+n+" = "+s+".",a+" × "+n+" = "+s+".",a+" × "+n+" = "+s+"."),2)});
   return pick(T)()};
+/* ===== אחוזים (כיתות ה׳–ו׳) — O-109. כל תשובה מחושבת מהנתונים שבשאלה;
+   המסיחים הם טעויות אמיתיות: האחוז עצמו במקום הכמות (25% מ-80 = 25),
+   מה שנשאר במקום מה שנלקח, ספירת עמודות במקום ריבועים, חלוקה ב-10 במקום ב-100. */
+function pctGrid(k){var u=22,s="",i;for(i=0;i<100;i++){var c=Math.floor(i/10),r=i%10;s+='<rect x="'+(10+c*u)+'" y="'+(10+r*u)+'" width="'+u+'" height="'+u+'" fill="'+(i<k?"#ff9f43":"#fff")+'" stroke="#17333c" stroke-width="1.2"/>'}
+  s+='<rect x="10" y="10" width="'+10*u+'" height="'+10*u+'" fill="none" stroke="#17333c" stroke-width="3"/>';
+  return '<div class="nl">'+svg(20+10*u,20+10*u,s,"")+'</div>'}
+function pcs(n){return n+"%"}
+function dstr(x){return String(Math.round(x*1000)/1000)}
+/* שם החלק — ar בלי ה״ا״ל כדי שיתחבר לסמיכות (״نصف 80״) */
+var PW={50:{d:2,w:L("חצי","نصف","половина","half")},25:{d:4,w:L("רבע","ربع","четверть","a quarter")},10:{d:10,w:L("עשירית","عُشر","одна десятая","a tenth")},20:{d:5,w:L("חמישית","خُمس","одна пятая","a fifth")}};
 G.pct=function(lv){var T=[];
-  T.push(function(){var p=pick([10,25,50,20]),q=100/p,n=q*ri(2,9),a=n*p/100;
-    return mk("pof",L("כמה זה "+p+"% מ-"+n+"?","كم يساوي "+p+"% من "+n+"؟","Сколько составляют "+p+"% от "+n+"?","What is "+p+"% of "+n+"?"),"",a,[n-a,a*2,a+p,n/2,a+1].filter(function(x){return x>0&&x!==a}),
-     L(p+"% הוא "+p+" מתוך 100. מחלקים ב-"+q+".",p+"% هو "+p+" من 100. نقسم على "+q+".",p+"% — это "+p+" из 100. Делим на "+q+".",p+"% is "+p+" out of 100. Divide by "+q+"."),L(n+" ÷ "+q+" = "+a+".",n+" ÷ "+q+" = "+a+".",n+" ÷ "+q+" = "+a+".",n+" ÷ "+q+" = "+a+"."),0)});
-  T.push(function(){var F=[[1,2,50],[1,4,25],[3,4,75],[1,5,20],[1,10,10],[2,5,40],[3,5,60],[7,10,70]],f=pick(F),ans=f[2]+"%";
-    return mk("f2p",L("כמה אחוזים זה "+f[0]+"/"+f[1]+"?","كم بالمئة هو "+f[0]+"/"+f[1]+"؟","Сколько процентов составляет "+f[0]+"/"+f[1]+"?","What percent is "+f[0]+"/"+f[1]+"?"),"",ans,[(f[2]+10)+"%",(f[2]>20?f[2]-10:f[2]+20)+"%",f[0]+"%",(100-f[2])+"%"].filter(function(x){return x!==ans}),
-     L("מביאים למכנה 100.","نحوّل إلى مقام 100.","Приведём к знаменателю 100.","Change the bottom to 100."),L(f[0]+"/"+f[1]+" = "+f[2]+"/100 = "+f[2]+"%.",f[0]+"/"+f[1]+" = "+f[2]+"/100 = "+f[2]+"%.",f[0]+"/"+f[1]+" = "+f[2]+"/100 = "+f[2]+"%.",f[0]+"/"+f[1]+" = "+f[2]+"/100 = "+f[2]+"%."),1)});
-  if(lv>=2)T.push(function(){var p=pick([10,20,25,50]),q=100/p,pr=q*ri(2,8)*(p===50?1:1)*(p===10?10:1)/(p===10?10:1),d=pr*p/100,r=pr-d;
-    return mk("disc",L("מחיר המוצר הוא "+pr+" שקלים ויש הנחה של "+p+"%. כמה משלמים?","سعر المنتج "+pr+" شيكل وفيه خصم "+p+"%. كم ندفع؟","Товар стоит "+pr+" ₪, скидка "+p+"%. Сколько платим?","An item costs "+pr+" shekels with a "+p+"% discount. How much do you pay?"),"",r,[d,pr+d,pr-p,r+1].filter(function(x){return x>0&&x!==r}),
-     L("קודם מחשבים כמה זו ההנחה, ואז מחסרים מהמחיר.","احسب الخصم أولًا ثم اطرحه من السعر.","Сначала найди скидку, потом вычти из цены.","First find the discount, then subtract it from the price."),L("ההנחה היא "+d+", ו-"+pr+" − "+d+" = "+r+".","الخصم "+d+" و"+pr+" − "+d+" = "+r+".","Скидка "+d+", и "+pr+" − "+d+" = "+r+".","The discount is "+d+", and "+pr+" − "+d+" = "+r+"."),2)});
-  if(lv>=3)T.push(function(){var tot=pick([20,25,50,40]),k=ri(1,tot/5-1)*5/ (tot===25?5:1),part=tot===25?ri(1,24):k,pc=part*100/tot,ans=pc+"%";
-    if(pc!==Math.round(pc))return G.pct(lv);
-    return mk("pofw",L("בכיתה "+tot+" ילדים, ו-"+part+" מהם באו עם כובע. כמה אחוזים זה?","في الصف "+tot+" طفلًا و"+part+" منهم جاؤوا بقبعة. كم النسبة المئوية؟","В классе "+tot+" детей, "+part+" пришли в шапках. Сколько это процентов?","There are "+tot+" children in the class and "+part+" wear a hat. What percent is that?"),"",ans,[(pc+10)+"%",(pc>20?pc-10:pc+20)+"%",part+"%",(100-pc)+"%"].filter(function(x){return x!==ans}),
-     L("מחלקים את החלק בשלם וכופלים ב-100.","اقسم الجزء على الكل واضرب في 100.","Раздели часть на целое и умножь на 100.","Divide the part by the whole and multiply by 100."),L(part+" ÷ "+tot+" × 100 = "+pc+".",part+" ÷ "+tot+" × 100 = "+pc+".",part+" ÷ "+tot+" × 100 = "+pc+".",part+" ÷ "+tot+" × 100 = "+pc+"."),2)});
+  function pr100(list){return list.filter(function(x){return x>=1&&x<=100})}
+  /* 0 — מה זה אחוז: לוח של 100 ריבועים */
+  if(lv<=2)T.push(function(){var k;if(lv===1)k=10*ri(1,9);else{do{k=ri(1,99)}while(k%10===0)}
+    var c=lv===1?[k/10,100-k,k+10,k-10,k+20]:[Math.floor(k/10)*10,100-k,k+10,k-10,k%10,k+1];
+    return mk("pgrid",L("כמה אחוזים מהריבועים צבועים? (יש 100 ריבועים)","ما النسبة المئوية للمربعات الملوّنة؟ (هناك 100 مربع)","Какой процент квадратиков закрашен? (всего 100 квадратиков)","What percent of the squares are shaded? (There are 100 squares.)"),pctGrid(k),pcs(k),top3(pcs(k),pr100(c).map(pcs)),
+     L("כל ריבוע הוא אחוז אחד. עמודה מלאה היא 10 ריבועים, כלומר 10%.","كل مربع يساوي 1%. العمود الكامل فيه 10 مربعات، أي 10%.","Каждый квадратик — это 1%. Полный столбик — 10 квадратиков, то есть 10%.","Each square is 1%. A full column is 10 squares, which is 10%."),
+     L("החלק הצבוע הוא "+k+" מתוך 100 ריבועים, ולכן "+k+"%.","الجزء الملوّن هو "+k+" من 100 مربع، إذن "+k+"%.","Закрашено "+k+" из 100 квадратиков, значит, это "+k+"%.","The shaded part is "+k+" out of 100 squares, so it is "+k+"%."),0)});
+  if(lv===1)T.push(function(){var M=[[100,L("כל הכמות","الكمية كلها","всё количество","the whole amount")],[50,L("חצי","النصف","половина","half")],[25,L("רבע","الربع","четверть","a quarter")],[10,L("עשירית","العُشر","одна десятая","a tenth")]],m=pick(M);
+    return mk("pmean",L("איזה חלק מהכמות הם "+m[0]+"%?","ما الجزء من الكمية الذي يساوي "+m[0]+"%؟","Какую часть количества составляют "+m[0]+"%?","What part of the amount is "+m[0]+"%?"),pctGrid(m[0]),m[1],M.filter(function(x){return x!==m}).map(function(x){return x[1]}),
+     L("אחוז הוא חלק אחד מתוך 100.","النسبة المئوية جزء واحد من 100.","Процент — это одна часть из 100.","A percent is one part out of 100."),
+     L(m[0]+"% הם "+m[0]+" מתוך 100, וזה "+m[1].he+".",m[0]+"% تعني "+m[0]+" من 100، وهذا "+m[1].ar+".",m[0]+"% — это "+m[0]+" из 100, то есть "+m[1].ru+".",m[0]+"% means "+m[0]+" out of 100, which is "+m[1].en+"."),0)});
+  /* 1 — אחוז מכמות */
+  T.push(function(){var p,n;
+    if(lv===1){p=pick([50,10]);n=10*ri(2,10)}
+    else if(lv===2){p=pick([50,25,10,20]);n=(100/p)*ri(2,p===10?20:15)}
+    else{p=pick([30,40,60,70,90,75,20,25]);n=p===75||p===25?4*ri(3,25):p===20?5*ri(3,30):10*ri(2,20)}
+    var a=n*p/100,e;
+    if(PW[p]){var w=PW[p].w;e=L(p+"% הם "+w.he+", ו"+w.he+" מ-"+n+" זה "+a+".",p+"% تعني "+w.ar+" الكمية، و"+w.ar+" "+n+" هو "+a+".",p+"% — это "+w.ru+", а "+w.ru+" от "+n+" — это "+a+".",p+"% is "+w.en+", and "+w.en+" of "+n+" is "+a+".")}
+    else if(p===75){e=L("75% הם שלושה רבעים. רבע מ-"+n+" הוא "+n/4+", ושלושה רבעים הם "+a+".","75% تعني ثلاثة أرباع. ربع "+n+" هو "+n/4+"، وثلاثة أرباع هي "+a+".","75% — это три четверти. Четверть от "+n+" — это "+n/4+", а три четверти — "+a+".","75% is three quarters. A quarter of "+n+" is "+n/4+", so three quarters is "+a+".")}
+    else{var t=n/10,k=p/10;e=L("10% מ-"+n+" הם "+t+". "+p+"% הם פי "+k+" מזה, כלומר "+a+".","10% من "+n+" هي "+t+". و"+p+"% هي "+k+" أضعاف ذلك، أي "+a+".","10% от "+n+" — это "+t+". "+p+"% — в "+k+" "+plRu(k,"раз","раза","раз")+" больше, то есть "+a+".","10% of "+n+" is "+t+". "+p+"% is "+k+" times as much, so it is "+a+".")}
+    if(p!==a)e=L(e.he+" "+p+" הוא האחוז, ולא התוצאה.",e.ar+" "+p+" هو النسبة وليس الناتج.",e.ru+" "+p+" — это процент, а не ответ.",e.en+" "+p+" is the percent, not the answer.");
+    var h=PW[p]?L(p+"% הם "+PW[p].w.he+": מחלקים את "+n+" ל-"+PW[p].d+" חלקים שווים.",p+"% تعني "+PW[p].w.ar+" الكمية: نقسم "+n+" إلى "+PW[p].d+" أجزاء متساوية.",p+"% — это "+PW[p].w.ru+": раздели "+n+" на "+PW[p].d+" равные части.",p+"% is "+PW[p].w.en+": split "+n+" into "+PW[p].d+" equal parts."):
+      p===75?L("קודם מוצאים רבע, ואז לוקחים שלושה כאלה.","أوجد الربع أولًا ثم خذ ثلاثة منه.","Сначала найди четверть, потом возьми три таких части.","First find a quarter, then take three of them."):
+      L("קודם מוצאים 10%: מחלקים ב-10. אחר כך כופלים.","أوجد 10% أولًا: نقسم على 10. ثم نضرب.","Сначала найди 10%: раздели на 10. Потом умножь.","First find 10% by dividing by 10. Then multiply.");
+    return mk("pof",L("כמה זה "+p+"% מ-"+n+"?","كم يساوي "+p+"% من "+n+"؟","Сколько составляют "+p+"% от "+n+"?","What is "+p+"% of "+n+"?"),"",a,top3(a,[p,[PW[p]?n/p:p===75?n/4:n/10,a/2,a-2,a-1].filter(function(x){return x>0&&x!==a&&x!==p&&x===Math.round(x)})[0],n-a,a*2,n-p,n/2,a*10,a+5,a-5,a+1].filter(function(x){return x>0&&x===Math.round(x)})),h,e,1)});
+  /* 2 — אחוז כשבר וכמספר עשרוני */
+  if(lv>=2)T.push(function(){var F=[[1,2,50],[1,4,25],[3,4,75],[1,5,20],[1,10,10],[2,5,40],[3,5,60],[7,10,70]],f=pick(F),ans=f[2]+"%",m=100/f[1],cat=Number(""+f[0]+f[1]);
+    return mk("f2p",L("כמה אחוזים זה "+f[0]+"/"+f[1]+"?","كم بالمئة هو "+f[0]+"/"+f[1]+"؟","Сколько процентов составляет "+f[0]+"/"+f[1]+"?","What percent is "+f[0]+"/"+f[1]+"?"),"",ans,top3(ans,pr100([f[0],cat,100-f[2],f[2]+10,f[2]>20?f[2]-10:f[2]+20,f[1]]).map(pcs)),
+     L("מביאים למכנה 100.","نحوّل إلى مقام 100.","Приведём к знаменателю 100.","Change the bottom to 100."),
+     L("כופלים את המונה ואת המכנה ב-"+m+" ומקבלים "+f[2]+"/100, כלומר "+f[2]+"%.","نضرب البسط والمقام في "+m+" فنحصل على "+f[2]+"/100، أي "+f[2]+"%.","Умножим числитель и знаменатель на "+m+": получится "+f[2]+"/100, то есть "+f[2]+"%.","Multiply the top and the bottom by "+m+" to get "+f[2]+"/100, which is "+f[2]+"%."),2)});
+  if(lv>=2)T.push(function(){var F=[[50,1,2],[25,1,4],[75,3,4],[10,1,10],[20,1,5]].concat(lv>=3?[[40,2,5],[60,3,5]]:[]),f=pick(F),p=f[0],ans=fr(f[1],f[2]),v=p/100;
+    var c=["1/"+p];if(p%10&&Math.floor(p/10)<p%10)c.push(fr(Math.floor(p/10),p%10));
+    c=c.concat(shuffle(F.filter(function(x){return x!==f}).map(function(x){return fr(x[1],x[2])})));
+    c=c.filter(function(s){var q=s.split("/");return Math.abs(q[0]/q[1]-v)>1e-9});
+    return mk("p2f",L("איזה שבר שווה ל-"+p+"%?","أي كسر يساوي "+p+"%؟","Какая дробь равна "+p+"%?","Which fraction equals "+p+"%?"),"",ans,top3(ans,c),
+     L("אחוז הוא שבר שהמכנה שלו 100.","النسبة المئوية كسر مقامه 100.","Процент — это дробь со знаменателем 100.","A percent is a fraction with 100 on the bottom."),
+     L(p+"% הם "+p+"/100. מצמצמים ומקבלים "+ans+".",p+"% هي "+p+"/100، وبعد الاختزال نحصل على "+ans+".",p+"% — это "+p+"/100. Сократим дробь и получим "+ans+".",p+"% is "+p+"/100. Simplify it to get "+ans+"."),2)});
+  if(lv>=2)T.push(function(){var p=pick(lv===2?[50,25,75,10,20,30,40]:[5,15,35,60,8,75,45]),v=p/100,ans=dstr(v);
+    var c=[p/10,p/1000,p,1-v,v*2].filter(function(x){return Math.abs(x-v)>1e-9}).map(dstr);
+    return mk("p2d",L("איך כותבים "+p+"% כמספר עשרוני?","كيف نكتب "+p+"% عددًا عشريًا؟","Как записать "+p+"% десятичной дробью?","How do you write "+p+"% as a decimal?"),"",ans,top3(ans,c),
+     L("אחוז הוא חלק מתוך 100. מחלקים ב-100.","النسبة المئوية جزء من 100. نقسم على 100.","Процент — это часть из 100. Делим на 100.","A percent is a part out of 100. Divide by 100."),
+     L(p+"% הם "+p+" מאיות. מחלקים את "+p+" ב-100 ומקבלים "+ans+".",p+"% تعني "+p+" من مئة. نقسم "+p+" على 100 فنحصل على "+ans+".",p+"% — это "+p+" сотых. Делим "+p+" на 100 и получаем "+ans+".",p+"% means "+p+" hundredths. Divide "+p+" by 100 to get "+ans+"."),2)});
+  /* 3 — הנחה, וכמה אחוזים הם חלק מקבוצה */
+  if(lv>=2)T.push(function(){var p=pick(lv===2?[10,20,25,50]:[10,20,25,30,40,50]),pr;
+    do{pr=p===25?4*ri(5,30):p===20?5*ri(4,30):p===50?2*ri(10,60):10*ri(2,15)}while(pr===100);
+    var d=pr*p/100,r=pr-d;
+    return mk("disc",L("מחיר המוצר הוא "+pr+" שקלים ויש הנחה של "+p+"%. כמה משלמים?","سعر المنتج "+pr+" شيكل وفيه خصم "+p+"%. كم ندفع؟","Товар стоит "+pr+" ₪, скидка "+p+"%. Сколько платим?","An item costs "+pr+" shekels with a "+p+"% discount. How much do you pay?"),"",r,top3(r,[d,pr-p,pr+d,pr,r+5,r-5].filter(function(x){return x>0})),
+     L("קודם מחשבים כמה זו ההנחה, ואז מחסרים מהמחיר.","احسب الخصم أولًا ثم اطرحه من السعر.","Сначала найди скидку, потом вычти из цены.","First find the discount, then subtract it from the price."),
+     L("ההנחה היא "+p+"% מ-"+pr+", כלומר "+d+" שקלים. מחסרים אותה מהמחיר ומשלמים "+r+" שקלים.","الخصم "+p+"% من "+pr+"، أي "+d+" شيكل. نطرحه من السعر فندفع "+r+" شيكل.","Скидка "+p+"% от "+pr+" — это "+d+" ₪. Вычитаем её из цены и платим "+r+" ₪.","The discount is "+p+"% of "+pr+", which is "+d+" shekels. Take it off the price: you pay "+r+" shekels."),3)});
+  if(lv>=3)T.push(function(){var tot=pick([10,20,25,50]),part=ri(1,tot-1),m=100/tot,pc=part*m,ans=pcs(pc);
+    return mk("pofw",L("בכיתה "+tot+" ילדים, ו-"+part+" מהם באו עם כובע. כמה אחוזים זה?","في الصف "+tot+" طفلًا و"+part+" منهم جاؤوا بقبعة. كم النسبة المئوية؟","В классе "+tot+" детей, из них в шапках — "+part+". Сколько это процентов?","There are "+tot+" children in the class and "+part+" wear a hat. What percent is that?"),"",ans,top3(ans,pr100([part,100-pc,pc+10,pc-10,pc+m,pc-m]).map(pcs)),
+     L("מחלקים את החלק בשלם וכופלים ב-100.","اقسم الجزء على الكل واضرب في 100.","Раздели часть на целое и умножь на 100.","Divide the part by the whole and multiply by 100."),
+     L("כופלים את "+part+" ואת "+tot+" ב-"+m+": "+part+" מתוך "+tot+" הם "+pc+" מתוך 100, כלומר "+pc+"%.","نضرب "+part+" و"+tot+" في "+m+": "+part+" من "+tot+" تساوي "+pc+" من 100، أي "+pc+"%.","Умножим "+part+" и "+tot+" на "+m+": "+part+" из "+tot+" — это "+pc+" из 100, то есть "+pc+"%.","Multiply "+part+" and "+tot+" by "+m+": "+part+" out of "+tot+" is "+pc+" out of 100, so it is "+pc+"%."),3)});
   return pick(T)()};
 G.ratio=function(lv){var T=[];
   T.push(function(){var a=ri(1,5),b=ri(1,5);if(a===b)b++;var k=ri(2,4),ans=a+":"+b;
@@ -933,6 +984,11 @@ var B2=[
  {id:"coord",c:"#0e9c8d",n:L("מערכת צירים וסימטריה","الإحداثيات والتماثل","Координаты и симметрия","Coordinates and symmetry"),d:L("נקודות על רשת וקווי סימטריה","نقاط على الشبكة ومحاور التماثل","Точки на сетке и оси симметрии","Points on a grid and lines of symmetry")},
  {id:"mon2",c:"#c99200",n:L("בעיות כסף בשני צעדים","مسائل نقود بخطوتين","Задачи про деньги в два шага","Two-step money problems"),d:L("כפל, חיבור ועודף","ضرب وجمع وباقي","Умножение, сложение и сдача","Multiplying, adding and change")}];
 B2.forEach(function(u){u.band=2;UNITS.push(u)});
+/* שכבה ג׳ (ה׳–ו׳). המחוללים fracop, dec3, ratio, tri, vol, neg ו-prob כתובים למטה אבל
+   עדיין אינם כאן — הם לא נבדקו. אחוזים נכנסו ראשונים (O-109) אחרי בדיקה חישובית. */
+var B3=[
+ {id:"pct",c:"#e8453c",n:L("אחוזים","النسبة المئوية","Проценты","Percentages"),d:L("מה זה אחוז, אחוז מכמות, שבר ועשרוני, הנחה","ما النسبة المئوية، نسبة من كمية، كسر وعدد عشري، خصم","Что такое процент, процент от числа, дробь и десятичная запись, скидка","What a percent is, percent of an amount, fraction and decimal, discount")}];
+B3.forEach(function(u){u.band=3;UNITS.push(u)});
 LESSONS.big=[{t:L("בכל מספר יש מקומות: אחדות, עשרות, מאות ואלפים. במספר 4,236 יש 4 אלפים, 2 מאות, 3 עשרות ו-6 אחדות.","في كل عدد منازل: آحاد وعشرات ومئات وآلاف. في 4,236: 4 آلاف و2 مئات و3 عشرات و6 آحاد.","В числе есть разряды: единицы, десятки, сотни и тысячи. В числе 4 236: 4 тысячи, 2 сотни, 3 десятка и 6 единиц.","Every number has places: ones, tens, hundreds and thousands. In 4,236 there are 4 thousands, 2 hundreds, 3 tens and 6 ones."),v:function(){return ""}},
  {t:L("להשוות: קודם כמה ספרות יש, ואחר כך משווים מהספרה השמאלית. 5,200 גדול מ-4,999.","للمقارنة: نعدّ الأرقام أولًا ثم نقارن من اليسار. 5,200 أكبر من 4,999.","Сравнение: сначала число цифр, потом слева направо. 5 200 больше, чем 4 999.","To compare: count the digits first, then compare from the left. 5,200 is bigger than 4,999."),v:function(){return ""}},
  {t:L("עיגול: מסתכלים על הספרה שאחרי. 5 ומעלה, עולים. 4 ומטה, נשארים. 47 מעוגל לעשרות הוא 50.","التقريب: انظر إلى الرقم التالي. 5 فأكثر نقرّب لأعلى. 4 فأقل نبقى. 47 إلى أقرب عشرة هو 50.","Округление: смотрим на следующую цифру. 5 и больше — вверх, 4 и меньше — остаёмся. 47 до десятков — 50.","Rounding: look at the next digit. 5 or more goes up, 4 or less stays. 47 rounded to tens is 50."),v:function(){return numLine(40,50,1,47,false)}}];
@@ -964,7 +1020,11 @@ LESSONS.coord=[{t:L("כדי למצוא נקודה על הרשת: קודם הול
 LESSONS.mon2=[{t:L("בבעיה בשני צעדים עושים צעד אחד, ואז צעד שני עם התוצאה.","في المسألة بخطوتين نفعل خطوة ثم خطوة ثانية بالنتيجة.","В задаче в два шага делаем один шаг, потом второй с результатом.","In a two-step problem you do one step, then a second step with the result."),v:function(){return ""}},
  {t:L("כשקונים כמה דברים שווים, קודם כופלים: מחיר אחד כפול כמות.","عند شراء عدة أشياء متساوية نضرب أولًا: السعر × العدد.","Если покупаем несколько одинаковых вещей, сначала умножаем: цена × количество.","When you buy several equal things, multiply first: price × amount."),v:function(){return ""}},
  {t:L("עודף הוא מה ששילמנו פחות המחיר. מחסרים את המחיר מהתשלום.","الباقي هو ما دفعناه ناقص الثمن. نطرح الثمن من المبلغ المدفوع.","Сдача — это то, что заплатили, минус цена. Вычитаем цену из суммы.","Change is what you paid minus the price. Subtract the price from the payment."),v:function(){return ""}}];
-var BUILD="o26 · 2026-10-18";
+LESSONS.pct=[{t:L("אחוז הוא חלק אחד מתוך 100. בלוח של 100 ריבועים, 30 ריבועים צבועים הם 30%.","النسبة المئوية جزء واحد من 100. في لوح من 100 مربع، 30 مربعًا ملوّنًا تساوي 30%.","Процент — это одна часть из 100. Если из 100 квадратиков закрашено 30, это 30%.","A percent is one part out of 100. If 30 of 100 squares are shaded, that is 30%."),v:function(){return pctGrid(30)}},
+ {t:L("50% הם חצי, 25% הם רבע ו-10% הם עשירית. 50% מ-80 הם 40, ו-10% מ-80 הם 8.","50% نصف، و25% ربع، و10% عُشر. 50% من 80 هي 40، و10% من 80 هي 8.","50% — это половина, 25% — четверть, 10% — одна десятая. 50% от 80 — это 40, а 10% от 80 — это 8.","50% is half, 25% is a quarter and 10% is a tenth. 50% of 80 is 40, and 10% of 80 is 8."),v:function(){return pctGrid(50)}},
+ {t:L("אחוז אפשר לכתוב גם כשבר וגם כמספר עשרוני. 25% הם 25/100, כלומר 1/4, וגם 0.25.","يمكن كتابة النسبة المئوية كسرًا أو عددًا عشريًا. 25% هي 25/100، أي 1/4، وأيضًا 0.25.","Процент можно записать обычной или десятичной дробью. 25% — это 25/100, то есть 1/4, или 0.25.","A percent can be written as a fraction or a decimal. 25% is 25/100, which is 1/4, or 0.25."),v:function(){return pctGrid(25)}},
+ {t:L("בהנחה מחשבים קודם כמה שקלים היא ההנחה, ואז מחסרים אותה מהמחיר. הנחה של 10% על 50 שקלים היא 5 שקלים, ומשלמים 45.","في الخصم نحسب أولًا كم شيكلًا هو الخصم ثم نطرحه من السعر. خصم 10% على 50 شيكل هو 5 شواكل، فندفع 45.","При скидке сначала считаем, сколько шекелей она составляет, потом вычитаем её из цены. Скидка 10% на 50 ₪ — это 5 ₪, и цена со скидкой — 45 ₪.","With a discount, first work out how many shekels it is, then take it off the price. 10% off 50 shekels is 5 shekels, so you pay 45."),v:function(){return ""}}];
+var BUILD="o27 · 2026-10-21";
 /* ===== UI strings ===== */
 var STR={
 he:{brand:"מתמטיקה מעבר לחשבון",title:"מתמטיקה ליסודי",tag:"צורות, מדידות, כסף, שברים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -1289,7 +1349,7 @@ function tutorBtn(dis){return (window.TUTOR&&TUTOR.on&&TUTOR.on())?'<button clas
 function listenRow(sayId){var t=T();return '<div class="row" style="margin:4px 0 8px"><button class="btn play" data-a="say" data-t="'+sayId+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M6 4l14 8-14 8z"/></svg>'+esc(t.listen)+'</button><button class="btn stop" data-a="stop"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>'+esc(t.stop)+'</button><button class="btn slow" data-a="slowsay" data-t="'+sayId+'">'+esc(t.slow)+'</button></div>'}
 function spk(a){return '<button class="sp" data-a="'+a.a+'" '+(a.k!=null?'data-k="'+a.k+'"':'')+' aria-label="'+esc(T().listen)+'"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8c2 2 2 6 0 8" stroke="#fff" fill="none" stroke-width="2"/></svg></button>'}
 function homeView(){var t=T(),h='<h1 data-say id="h1">'+esc(t.title)+'</h1><p class="sub" id="hs">'+esc(t.tag)+'</p>'+listenRow("home");
-  /* לשכבה ג׳ (ה׳–ו׳) אין עדיין נושאים. בלי הסימון הזה הלחיצה הורידה את
+  /* שכבה שאין בה עדיין נושאים מסומנת ״בקרוב״ (ג׳ קיבלה את הראשון — אחוזים, O-109). בלי הסימון הזה הלחיצה הורידה את
      הלומד למסך ריק בלי מילה — ו-S.band נשמר, כך שגם הטעינה הבאה ריקה.
      `.band.soon` ו-`t.soon` כבר קיימים בקובץ. */
   h+='<div class="bands">';
@@ -1410,7 +1470,7 @@ try{speechSynthesis.getVoices();
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-elem",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o26-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o27-pwa1").catch(function(){})});
 })();
 </script>
 <!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש

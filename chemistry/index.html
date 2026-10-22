@@ -503,7 +503,7 @@ LESSONS.cfood=[
   ST_("ויטמינים C ו-B מסיסים במים ואינם נאגרים. ויטמינים A, D, E, K מסיסים בשומן.","فيتامينا C وB ذائبان في الماء ولا يُخزنان. A وD وE وK ذائبة في الدهون.","Витамины C и B растворимы в воде и не запасаются. A, D, E, K — в жирах.","Vitamins C and B dissolve in water and are not stored. A, D, E, K dissolve in fat."),
   ST_("חומצת שומן רוויה בנויה מקשרים בודדים בלבד. בלתי רוויה מכילה קשר כפול אחד לפחות.","الحمض الدهني المشبع مبني من روابط أحادية فقط. غير المشبع يحوي رابطة مزدوجة على الأقل.","Насыщенная жирная кислота состоит только из одинарных связей. Ненасыщенная имеет двойную.","A saturated fatty acid has only single bonds. An unsaturated one has at least one double bond."),
   ST_("טריגליצריד הוא מולקולת שומן: גליצרול מחובר לשלוש חומצות שומן.","الدهون الثلاثية جزيء دهني: غليسرول مرتبط بثلاثة أحماض دهنية.","Триглицерид — молекула жира: глицерин, связанный с тремя жирными кислотами.","A triglyceride is a fat molecule: glycerol joined to three fatty acids.")];
-var BUILD="ch3 · 2026-10-21";
+var BUILD="ch4 · 2026-10-21";
 /* ===== UI strings ===== */
 var STR={
 he:{soonT:"בקרוב: כימיה אורגנית, תמיסות וריכוזים.",mtNote:"תרגום לערבית, רוסית ואנגלית: תרגום מכונה, ממתין לבדיקה.",credit2:"כל השאלות והשיעורים נכתבו מחדש במיוחד לאתר.",brand:"כימיה לבגרות",title:"כימיה לבגרות",tag:"מבנה האטום, הטבלה המחזורית, קשרים כימיים, סטוכיומטריה ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -710,8 +710,8 @@ function segments(spoken){
   out=merged;
   return out.length?out:[{text:spoken,start:0}];
 }
-var VF=/(female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
-var VM=/(\bmale\b|david|mark|asaf|hillel|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
+var VF=/(הילה|כרמית|زارية|سلمى|أمينة|هدى|فاطمة|ليلى|светлана|ирина|дарья|елена|female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
+var VM=/(אברי|אסף|הלל|نائف|ماجد|حامد|павел|дмитрий|\bmale\b|david|mark|asaf|hillel|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
 function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
 function vGender(v){var n=(v&&v.name)||"";return (VF.test(n)&&!VM.test(n))?"f":VM.test(n)?"m":"?"}
 /* voiceUsable הוא מפתח המיון הראשון, והמגדר בא אחריו ולא להפך:
@@ -978,7 +978,7 @@ try{speechSynthesis.getVoices();
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"chemistry",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=ch3-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=ch4-pwa1").catch(function(){})});
 })();
 </script>
 
