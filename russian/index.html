@@ -1066,7 +1066,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="ru27 · 2026-10-21";
+var BUILD="ru28 · 2026-10-21";
 var SKEY="russian-state-v1";
 
 function blankState(){
@@ -1810,6 +1810,56 @@ function speakDevice(text,code,rate){
   })();
   return true;
 }
+/* ------------------------------------------------------------
+   ספרה רומית — לקול המכשיר בלבד (O-6, 21.10.2026).
+   ״II спряжение״ ו-״XIX века״ נכונים על המסך, אבל קול המכשיר קורא
+   אותם כאותיות לטיניות. כאן הם הופכים למילה: ״девятнадцатого века״,
+   ״ко второму спряжению״. הצורה נקבעת מהמילה שאחרי (век/века/веке,
+   спряжение/спряжения/спряжению) או מהמילה שלפני (к, по, конец,
+   начало). אין רמז — ספרה רגילה (״19״), כמו ב-lomda.
+
+   רץ **אחרי** RECORDED.play ולא בתוך saySpell: saySpell רץ לפני
+   החיפוש, ושינוי בו היה משנה את מזהה הקליפ המוקלט (record.js
+   מחלץ אותו מכאן). אות בודדת (I, V, X) היא ספרה רק כשיש לידה
+   מילה קירילית, כדי ש-״I don't know״ באנגלית יישאר כמו שהוא.
+   ------------------------------------------------------------ */
+var SAY_ROM=["","I","II","III","IV","V","VI","VII","VIII","IX","X",
+  "XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI"];
+var SAY_ORD=["","перв","втор","трет","четвёрт","пят","шест","седьм","восьм","девят","десят",
+  "одиннадцат","двенадцат","тринадцат","четырнадцат","пятнадцат","шестнадцат","семнадцат",
+  "восемнадцат","девятнадцат","двадцат"];
+/* צורה דקדוקית לפי שם העצם שאחרי: m/n = נומינטיב זכר/סתמי, g = יחסת
+   קניין, d = יחסת נתינה, p = יחסת יחס. */
+var SAY_NOUN={"век":"m","века":"g","веков":"g","веку":"d","веке":"p","веках":"p",
+  "спряжение":"n","спряжения":"g","спряжений":"g","спряжению":"d","спряжении":"p"};
+var SAY_PREV={"к":"d","ко":"d","по":"d","конец":"g","начало":"g","середина":"g","рубеж":"g"};
+function sayOrd(n,c){
+  if(n===21)return "двадцать "+sayOrd(1,c);
+  var s=SAY_ORD[n], soft=(n===3), end;
+  if(c==="g")end=soft?"ьего":"ого";
+  else if(c==="d")end=soft?"ьему":"ому";
+  else if(c==="p")end=soft?"ьем":"ом";
+  else if(c==="n")end=soft?"ье":"ое";
+  else end=soft?"ий":(n===2||n===6||n===7||n===8)?"ой":"ый";
+  return s+end;
+}
+function sayRoman(x,lang){
+  return String(x==null?"":x).replace(/(^|[^A-Za-z])([IVX]+)(?![A-Za-z])/g,function(m,p,r,off,str){
+    var n=SAY_ROM.indexOf(r);
+    if(n<1)return m;
+    var before=str.slice(0,off+p.length), after=str.slice(off+p.length+r.length);
+    var prevW=(before.match(/([A-Za-zА-Яа-яЁё]+)[^A-Za-zА-Яа-яЁё]*$/)||[])[1]||"";
+    var nextW=(after.match(/^[^A-Za-zА-Яа-яЁё]*([A-Za-zА-Яа-яЁё]+)/)||[])[1]||"";
+    var cyr=/[А-Яа-яЁё]/;
+    if(r.length===1&&!cyr.test(prevW)&&!cyr.test(nextW))return m;
+    if(lang!=="ru")return p+n;
+    /* ״XIX–XX веков״: מדלגים על השרשרת עד שם העצם */
+    var rest=after.replace(/^(\s*[–—-]\s*[IVX]+(?![A-Za-z])|\s+и\s+[IVX]+(?![A-Za-z]))+/,"");
+    var noun=((rest.match(/^\s*([А-Яа-яЁё]+)/)||[])[1]||"").toLowerCase();
+    var c=SAY_NOUN[noun]||SAY_PREV[prevW.toLowerCase()]||"";
+    return p+(c?sayOrd(n,c):n);
+  }).replace(/(^|[^А-Яа-яЁё])([Кк])(\s+втор)/g,"$1$2о$3");   /* ״к второму״ → ״ко второму״ */
+}
 /* lang: "en" לחומר הנלמד, או קוד שפת האם להוראה. */
 function speak(text,lang,rateMul){
   /* כל טקסט שמגיע להקראה מנוקה מתגיות. חלק מהקריאות כבר מנקות
@@ -1829,10 +1879,10 @@ function speak(text,lang,rateMul){
   /* שכבה 1 - קובץ מוקלט (המנוע של תאוריה מדברת). יש קובץ:
      מנגנים וזהו; אין: קול המכשיר כרגיל. מבדק חוסרים 30.9 סעיף 4. */
   if(typeof RECORDED!=="undefined"&&RECORDED.play(text,lang,{rate:state.rate,
-      onError:function(){ if(my===_sayGen)speakDevice(text,code,rate) }})){
+      onError:function(){ if(my===_sayGen)speakDevice(sayRoman(text,lang),code,rate) }})){
     return;
   }
-  speakDevice(text,code,rate);
+  speakDevice(sayRoman(text,lang),code,rate);
 }
 function stopSpeak(){_sayGen++;gStop();if(typeof RECORDED!=="undefined")RECORDED.stop();hlClear();stopKeepAlive();_activeU=null;try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}}
 /* עוזבים את הדף — הקול נעצר. בלעדיו הוא ממשיך ברקע אחרי מעבר לטאב
@@ -4792,7 +4842,7 @@ if(window.TUTOR){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=ru27-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=ru28-pwa1").catch(function(){});
   });
 }
 </script>

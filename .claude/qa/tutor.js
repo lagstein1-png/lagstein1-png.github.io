@@ -23,11 +23,15 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const WORKER = 'file://' + path.join(ROOT, 'tutor-api', 'worker.js');
 const CLIENT = path.join(ROOT, 'tutor', 'tutor.js');
 
-/* שתים־עשרה, ועוד electric שבשלב build (24.9.2026). דף הבית אינו אפליקציית לימוד, ו״תאוריה מדברת״
-   יושבת בריפו נפרד — ראו FINDINGS. */
-const APPS = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-              'lomda', 'english', 'history', 'ulpan', 'bagrut-806', 'reader',
-              'kotvim', 'electric'];
+/* O-135, 21.10.2026: **נגזרת** — כל אפליקציה מקומית שקוראת ל-`TUTOR.mount(`
+   באחד מקובציה. עד היום שלוש־עשרה בשם, ושלושים אחרות שמחווטות ללימור
+   (משפחת ה-elem, chemistry, physics, english-mid/upper…) לא נבדקו בסעיף 7.
+   דף הבית אינו אפליקציית לימוד (סעיף 7א), ו״תאוריה מדברת״ בריפו נפרד. */
+const AL = require('./applist.js');
+const APPS = AL.family('tutor.js', /TUTOR\.mount\(/, { floor: 13,
+  must: ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'lomda', 'english',
+         'history', 'ulpan', 'bagrut-806', 'reader', 'kotvim', 'electric'],
+  why: 'אין בהן TUTOR.mount' });
 /* ״תאוריה מדברת״ אינה בריפו הזה, אבל היא באותו מקור וטוענת את
    /tutor/tutor.js מכאן — ולכן התפקיד שלה חייב להיות בשרת.
    החיווט שלה עצמו נבדק בריפו שלה, לא כאן. */
@@ -294,7 +298,6 @@ import(WORKER).then(async W => {
      מעכשיו: מי שמחווט ל-Limor חייב `ROLE`, ו-`EXTERNAL`/`ROLE_ONLY`/
      `HOME` נשארים בשם מפני שאינם נגזרים מהריפו (ריפו אחר, דף הבית,
      וחומר למורה). */
-  const AL = require('./applist.js');
   const mounted = [];
   for (const a of AL.local()) {
     const src = AL.sourceOf(a);
@@ -308,7 +311,8 @@ import(WORKER).then(async W => {
   t(`לכל אפליקציה שמחווטת ללימור יש תפקיד (${mounted.length} מחווטות)`, got, want);
   const dup = new Set(Object.values(W.ROLE));
   t('אין שני תפקידים זהים', dup.size, got.length);
-  APPS.concat(EXTERNAL, HOME).forEach(a => {
+  /* לפי המזהה שנשלח ב-mount, לא לפי שם התיקייה — science-mid שולחת "scimid". */
+  [...new Set(mounted)].concat(EXTERNAL, HOME).forEach(a => {
     const c = W.contextBlock({ app: a, lang: 'he', q: null }, 0);
     if (c.indexOf(W.ROLE[a]) !== 0) { bad++; console.log(`✗ ${a}: התפקיד אינו נשלח בראש ההקשר`) }
   });
@@ -682,19 +686,33 @@ import(WORKER).then(async W => {
     && !/localStorage\.setItem\(\s*["'].*msg/i.test(client), true);
 
   /* ---------- 7. החיווט של כל אפליקציה ---------- */
+  /* **לימור מחוברת ואין דרך לפתוח אותה — כשל ידוע, 21.10.2026 (O-135).**
+     כשהבדיקה הורחבה מ-13 ל-43 נמצאו תשע אפליקציות שקוראות ל-`TUTOR.mount`
+     ואף פעם לא ל-`TUTOR.open`, ואין בהן כפתור `data-a="tutor"`. הכפתור
+     הצף של tutor.js נבנה רק ב-`?limor2=1`, ולכן ללומד אין כניסה ללימור.
+     התיקון באפליקציות. מודפס ב-`~`; אפליקציה חדשה בלי open — נופלת,
+     ואפליקציה מכאן שחווטה — נופלת גם היא, כדי שהשורה תימחק. */
+  const NO_OPEN = new Set(['hebrew-lit', 'geography', 'tanakh-elem', 'civics-elem', 'culture-elem',
+                           'history-elem', 'science-12', 'english-elem', 'net-elem']);
+  const noOpen = [];
   APPS.forEach(a => {
     const html = fs.readFileSync(path.join(ROOT, a, 'index.html'), 'utf8');
-    const code = a === 'bagrut-806'
-      ? fs.readFileSync(path.join(ROOT, a, 'app.js'), 'utf8') : html;
+    const code = AL.sourceOf(a);
     const sw = fs.readFileSync(path.join(ROOT, a, 'sw.js'), 'utf8');
     const miss = [];
-    if (html.indexOf('<script src="/tutor/tutor.js"></script>') < 0) miss.push('תגית סקריפט');
+    /* התגית מותר שתישא מאפיינים (`onerror="void 0"` במשפחת ה-elem). */
+    if (!/<script src="\/tutor\/tutor\.js"[^>]*><\/script>/.test(html)) miss.push('תגית סקריפט');
     if (!/TUTOR\.mount\(/.test(code)) miss.push('mount');
-    if (!/TUTOR\.open\(/.test(code)) miss.push('open');
+    /* בלי `TUTOR.open` אין כפתור: הכפתור הצף של tutor.js נבנה רק
+       ב-`?limor2=1`. ראו NO_OPEN למטה — כשל ידוע, לא פטור. */
+    if (!/TUTOR\.open\(/.test(code)) {
+      if (NO_OPEN.has(a)) { noOpen.push(a) } else miss.push('open');
+    } else if (NO_OPEN.has(a)) miss.push('רשומה ב-NO_OPEN וכבר קוראת ל-TUTOR.open — מחקו את השורה');
     if (sw.indexOf('"/tutor/tutor.js"') < 0) miss.push('PRE ב-sw.js');
     if (miss.length) { bad++; console.log(`✗ ${a}: חסר ${miss.join(', ')}`) }
   });
-  console.log(`✓ שתים־עשרה האפליקציות מחווטות (תגית, mount, open, PRE)`);
+  if (noOpen.length) console.log(`~ ${noOpen.length} מחוברות ללימור בלי TUTOR.open, ידוע (NO_OPEN): ${noOpen.join(' ')}`);
+  console.log(`✓ ${APPS.length} האפליקציות מחווטות (תגית, mount, open, PRE)`);
 
   /* ---------- 7א. דף הבית — O-51 ----------
      תגית, mount עם app:"home", open, ו-tutor.js ב-PRE של השורש. ובשרת:
