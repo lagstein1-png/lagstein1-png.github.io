@@ -11,7 +11,7 @@
 | `history` | m184 · 2026-10-18 | m184-pwa1 | תואם |
 | `lomda` | l175 · 2026-10-21 | l175-pwa1 | תואם |
 | `kotvim` | k118 · 2026-10-18 | k118-pwa1 | תואם |
-| `math-elem` | o26 · 2026-10-18 | o26-pwa1 | תואם |
+| `math-elem` | o27 · 2026-10-24 | o27-pwa1 | תואם |
 | `science` | s174 · 2026-10-18 | s174-pwa1 | תואם |
 | `geography-elem` | w155 · 2026-10-18 | w155-pwa1 | תואם |
 | `reader` | — | 141-pwa1 | מפתח בלבד |
@@ -25,14 +25,14 @@
 | `tanakh` | p47 · 2026-10-21 | p47-pwa1 | תואם |
 | `hebrew-arab` | y32 · 2026-10-18 | y32-pwa1 | תואם |
 | `motal` | d40 · 2026-10-21 | d40-pwa1 | תואם |
-| `math-g7` | mg30 · 2026-10-18 | mg30-pwa1 | תואם |
+| `math-g7` | mg31 · 2026-10-24 | mg31-pwa1 | תואם |
 | `electric` | e61 · 2026-10-18 | e61-pwa1 | תואם |
-| `science-mid` | scimid17 · 2026-10-16 | scimid17-pwa1 | תואם |
+| `science-mid` | scimid18 · 2026-10-24 | scimid18-pwa1 | תואם |
 | `biology` | bg29 · 2026-10-21 | bg29-pwa1 | תואם |
-| `chemistry` | ch3 · 2026-10-21 | ch3-pwa1 | תואם |
-| `physics` | ph3 · 2026-10-19 | ph3-pwa1 | תואם |
-| `english-upper` | eu2 · 2026-10-21 | eu2-pwa1 | תואם |
-| `english-mid` | em2 · 2026-10-19 | em2-pwa1 | תואם |
+| `chemistry` | ch4 · 2026-10-24 | ch4-pwa1 | תואם |
+| `physics` | ph4 · 2026-10-24 | ph4-pwa1 | תואם |
+| `english-upper` | eu3 · 2026-10-24 | eu3-pwa1 | תואם |
+| `english-mid` | em3 · 2026-10-24 | em3-pwa1 | תואם |
 | `geography` | q51 · 2026-10-21 | q51-pwa1 | תואם |
 | `bagrut-history` | h139 · 2026-10-16 | h139-pwa1 | תואם |
 | `islam` | is26 · 2026-10-21 | is26-pwa1 | תואם |
@@ -43,7 +43,7 @@
 | `history-elem` | hk26 · 2026-10-16 | hk26-pwa1 | תואם |
 | `english-elem` | en22 · 2026-10-16 | en22-pwa1 | תואם |
 | `science-12` | sg26 · 2026-10-16 | sg26-pwa1 | תואם |
-| `domino` | dm25 · 2026-10-21 | dm25-pwa1 | תואם |
+| `domino` | dm26 · 2026-10-24 | dm26-pwa1 | תואם |
 | `net-elem` | ns15 · 2026-10-16 | ns15-pwa1 | תואם |
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-10-19.
+נוצר ב-`node .claude/qa/status.js --md`, 2026-10-24.

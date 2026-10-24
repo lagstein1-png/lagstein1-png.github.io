@@ -88,7 +88,7 @@ var UNITS=[{"id":"z0","grade":7,"t":{"he":"מתחילים לחקור בבטחה"
 <script src="/tutor/barak-core.js"></script>
 <script>
 /* ===== מנוע האפליקציה: מדע וטכנולוגיה לחטיבה (science-mid) ===== */
-var BUILD="scimid17 · 2026-10-16";
+var BUILD="scimid18 · 2026-10-24";
 var SKEY="scimid-v1";
 var LANGS=[["he","עברית","he-IL"],["ar","العربية","ar-SA"],["ru","Русский","ru-RU"],["en","English","en-US"]];
 var state={lang:"he",dark:false,rate:1,grade:7,pred:{},done:{},big:false,clear:false,spaced:false,hc:false,rm:false};
@@ -171,7 +171,7 @@ function ttsWatchdog(alive,onSilent){
   },1000);
   return function(){clearInterval(dog)};
 }
-var V_FEM=/female|woman|carmit|hila|zira|samantha|karen|tessa|moira|susan|helena|irina|milena|laila|zariyah|hoda|salma|google/i,V_MALE=/\bmale\b|david|mark|asaf|hillel|guy|filip|maged|naayf/i;
+var V_FEM=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/i,V_MALE=/(google[^a-z]{0,15}(arabic|العربية)|אברי|אסף|הילל|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|hillel|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/i;
 function vGender(v){var n=(v&&v.name)||"";return (V_FEM.test(n)&&!V_MALE.test(n))?"f":V_MALE.test(n)?"m":"?"}
 function femaleVoice(code){
   try{
@@ -533,7 +533,7 @@ function boot(){
   load();render();
   try{if(window.RECORDED)RECORDED.setup({base:"audio"})}catch(e){}
   try{if("speechSynthesis" in window)speechSynthesis.getVoices()}catch(e){}
-  try{if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js?v=scimid17-pwa1").catch(function(){})}catch(e){}
+  try{if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js?v=scimid18-pwa1").catch(function(){})}catch(e){}
   if(window.TUTOR){
     var txt=TUTOR.plain;
     TUTOR.mount({app:"scimid",
