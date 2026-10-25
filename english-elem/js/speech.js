@@ -197,16 +197,23 @@ function speakOne(s,tok,cb){
   var box=s.box?document.querySelector(s.box):null; if(box)box.classList.add("hl");
   var lang=s.lang||"he", spoken=heSpoken(s.t,lang);
   var words=spoken.split(/\s+/).filter(Boolean), cur=-1, got=false, finished=false;
-  var disarm=null, retried=false;
+  var disarm=null, retried=false, followIv=null, devOn=false;
   function hl(k){if(k===cur||!ws[k])return;if(ws[cur])ws[cur].classList.remove("hl");cur=k;ws[k].classList.add("hl");
     try{ws[k].scrollIntoView({block:"nearest"})}catch(e){}}
   function fin(){if(finished)return;finished=true;
+    if(followIv){clearInterval(followIv);followIv=null}
     if(disarm){disarm();disarm=null}
     maybeStopKeepAlive();
     SP.timers.forEach(clearTimeout);SP.timers=[];
     if(ws[cur])ws[cur].classList.remove("hl");if(box)box.classList.remove("hl");
     if(tok===SP.tok)cb()}
   function device(){
+    /* onError של קובץ יכול להגיע פעמיים (onerror של האלמנט וגם דחיית
+       play()), ושתי שרשראות היו אומרות את אותו טקסט פעמיים. ומילה
+       שהודגשה בזמן הקובץ לא נשארת מודגשת בקול המכשיר. */
+    if(devOn)return; devOn=true;
+    if(followIv){clearInterval(followIv);followIv=null}
+    if(ws[cur])ws[cur].classList.remove("hl"); cur=-1;
     if(finished||tok!==SP.tok)return;
     var starts=[],p=0;
     words.forEach(function(w){var k=spoken.indexOf(w,p);starts.push(k);p=k+w.length});
@@ -274,13 +281,37 @@ function speakOne(s,tok,cb){
     })(0);
   }
   /* layer 1: recorded file (speech/recorded.js, Kore). A file exists only for text that record.js recorded exactly,
-     in the language folder audio/<lang>/. No file, or a failed file: the device voice below. No word highlight on a file.
+     in the language folder audio/<lang>/. No file, or a failed file: the device voice below. A file has no boundary events, so followClip (below) highlights by playback time.
      The recorded id hashes the text as it is written, not the pronunciation text — heSpoken belongs to the device voice only. */
   if(typeof RECORDED!=="undefined"){
     try{speechSynthesis.cancel()}catch(e0){}
     var ok=false;
     try{ok=RECORDED.play(s.raw||s.t,lang,{rate:rate(),onEnd:fin,onError:device})}catch(e1){ok=false}
-    if(ok)return;
+    if(ok){followClip();return}
+  }
+  /* הדגשה על קובץ מוקלט. לקובץ אין onboundary, ולכן ההדגשה עוקבת אחרי
+     הזמן: החלק שכבר נוגן מתוך הקובץ, מול החלק של כל מילה באורך הטקסט.
+     מספר נאמר ארוך מכפי שהוא נכתב (״1948״ — ארבעה תווים, ״אלף תשע מאות
+     ארבעים ושמונה״), ולכן ספרה שוקלת שישה תווים. זה אומדן — שקט קצר
+     בתחילת הקובץ יזיז אותו במעט — אבל העין רואה איפה ההקראה נמצאת.
+     הבעלים, 25.10.2026: ״הקול תקין אבל אין מעקב אחר המילים״. רק כשמספר
+     המילים על המסך זהה לנאמר, כמו sameN בקול המכשיר: אחרת אין הדגשה,
+     ולא הדגשה שגויה. */
+  function followClip(){
+    var a=RECORDED._state&&RECORDED._state.el;
+    if(!a||!ws.length||ws.length!==words.length)return;
+    var ends=[],sum=0;
+    for(var j=0;j<words.length;j++){
+      var dg=(words[j].match(/[0-9]/g)||[]).length;
+      sum+=(dg?dg*6:words[j].length)+1; ends.push(sum);
+    }
+    followIv=setInterval(function(){
+      if(finished||tok!==SP.tok){clearInterval(followIv);followIv=null;return}
+      var d=a.duration; if(!d||!isFinite(d))return;
+      var at=a.currentTime/d*sum, k=0;
+      while(k<ends.length-1&&ends[k]<at)k++;
+      hl(k);
+    },120);
   }
   device();
 }

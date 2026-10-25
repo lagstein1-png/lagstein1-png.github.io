@@ -193,7 +193,7 @@ function speakOne(s,tok,cb){
   var root=s.el?document.querySelector(s.el):null, ws=root?root.querySelectorAll(".w"):[];
   var box=s.box?document.querySelector(s.box):null; if(box)box.classList.add("hl");
   var words=s.t.split(/\s+/).filter(Boolean), cur=-1, got=false, finished=false, lang=s.lang||"he";
-  var disarm=null, retried=false, followIv=null;
+  var disarm=null, retried=false, followIv=null, devOn=false;
   function hl(k){if(k===cur||!ws[k])return;if(ws[cur])ws[cur].classList.remove("hl");cur=k;ws[k].classList.add("hl");
     try{ws[k].scrollIntoView({block:"nearest"})}catch(e){}}
   function fin(){if(finished)return;finished=true;
@@ -204,7 +204,12 @@ function speakOne(s,tok,cb){
     if(ws[cur])ws[cur].classList.remove("hl");if(box)box.classList.remove("hl");
     if(tok===SP.tok)cb()}
   function device(){
+    /* onError של קובץ יכול להגיע פעמיים (onerror של האלמנט וגם דחיית
+       play()), ושתי שרשראות היו אומרות את אותו טקסט פעמיים. ומילה
+       שהודגשה בזמן הקובץ לא נשארת מודגשת בקול המכשיר. */
+    if(devOn)return; devOn=true;
     if(followIv){clearInterval(followIv);followIv=null}
+    if(ws[cur])ws[cur].classList.remove("hl"); cur=-1;
     if(finished||tok!==SP.tok)return;
     /* הנאמר עובר במנוע ההגייה, ומפת ההיסטים נמדדת **עליו**: charIndex
        מצביע לתוך מה שנאמר, ו״משלש״→״משולש״ משנה אורך. מספר האסימונים
@@ -286,15 +291,20 @@ function speakOne(s,tok,cb){
   }
   /* הדגשה על קובץ מוקלט. לקובץ אין onboundary, ולכן ההדגשה עוקבת אחרי
      הזמן: החלק שכבר נוגן מתוך הקובץ, מול החלק של כל מילה באורך הטקסט.
-     זה אומדן — שקט בתחילת הקובץ או מילה ארוכה שנאמרת מהר יזיזו אותו
-     במעט — אבל העין רואה איפה ההקראה נמצאת. הבעלים, 25.10.2026: ״הקול
-     תקין אבל אין מעקב אחר המילים״. רק כשמספר המילים על המסך זהה לנאמר,
-     כמו sameN בקול המכשיר: אחרת אין הדגשה, ולא הדגשה שגויה. */
+     מספר נאמר ארוך מכפי שהוא נכתב (״1948״ — ארבעה תווים, ״אלף תשע מאות
+     ארבעים ושמונה״), ולכן ספרה שוקלת שישה תווים. זה אומדן — שקט קצר
+     בתחילת הקובץ יזיז אותו במעט — אבל העין רואה איפה ההקראה נמצאת.
+     הבעלים, 25.10.2026: ״הקול תקין אבל אין מעקב אחר המילים״. רק כשמספר
+     המילים על המסך זהה לנאמר, כמו sameN בקול המכשיר: אחרת אין הדגשה,
+     ולא הדגשה שגויה. */
   function followClip(){
     var a=RECORDED._state&&RECORDED._state.el;
     if(!a||!ws.length||ws.length!==words.length)return;
     var ends=[],sum=0;
-    for(var j=0;j<words.length;j++){sum+=words[j].length+1;ends.push(sum)}
+    for(var j=0;j<words.length;j++){
+      var dg=(words[j].match(/[0-9]/g)||[]).length;
+      sum+=(dg?dg*6:words[j].length)+1; ends.push(sum);
+    }
     followIv=setInterval(function(){
       if(finished||tok!==SP.tok){clearInterval(followIv);followIv=null;return}
       var d=a.duration; if(!d||!isFinite(d))return;

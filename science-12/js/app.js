@@ -263,7 +263,10 @@ function edgeFirst(p){
   var txt=p.textContent;p.textContent=t("edgeHas")+" ";p.appendChild(a);
   p.appendChild(document.createElement("br"));p.appendChild(document.createTextNode(txt));
 }
-try{speechSynthesis.onvoiceschanged=function(){}}catch(e){}
+/* בכרום רשימת הקולות ריקה ברגע הטעינה, ולכן ההודעה ״אין קול נשי״ (וקישור
+   ה-Edge שבה) לא הופיעה בכניסה הראשונה — רק אחרי מעבר לשיעור וחזרה.
+   כשהקולות מגיעים, מסך הבית מצויר שוב; לא באמצע הקראה, ולא במסך אחר. */
+try{speechSynthesis.onvoiceschanged=function(){if(view==="home"&&!SP.playing&&!window.__GATED)render()}}catch(e){}
 if(!window.__GATED)render();
 /* ---------- לימור ----------
 
