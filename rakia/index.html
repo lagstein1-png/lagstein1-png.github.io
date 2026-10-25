@@ -367,7 +367,7 @@ html[lang="en"] body{letter-spacing:0}
 /* =====================================================================
    רקיע — הממשק. Vanilla JS, קובץ אחד, אפס תלות בזמן ריצה.
    ===================================================================== */
-var BUILD="r57 · 2026-10-21";
+var BUILD="r58 · 2026-10-25";
 /* מפתחות localStorage — קידומת rakia:, ולכל אפליקציה מפתחות משלה */
 var PREF_KEY="rakia:prefs";
 var PEOPLE_KEY="rakia:people";
@@ -1053,7 +1053,8 @@ function segments(spoken){
 }
 var VOICE_TUNE={he:1.0};
 function tuneRate(lang,rate){ var t=VOICE_TUNE[String(lang||"he").split("-")[0].toLowerCase()]||0.88; return Math.max(0.5,Math.min(1.6,Math.round(t*(rate||1)*100)/100)) }
-var FEM_PITCH=1.35, PITCH_BASE=1.12;
+/* 1 ולא 1.35 (הבעלים, 25.10.2026, כרום על ווינדוס: ״הקול לא תקין״). הרמה של 35% לא הופכת את Asaf לקול נשי — היא מעוותת אותו. קול גברי נשמע בגובה הבסיס, וההודעה מציעה את Edge (הילה). */
+var FEM_PITCH=1, PITCH_BASE=1.12;
 function femLift(v){ if(!v)return 1; try{ return vGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 } }
 function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 function allVoices(){ try{ return speechSynthesis.getVoices()||[] }catch(e){ return [] } }
@@ -1270,7 +1271,7 @@ function boot(){
   if(!INTL_OK){ $("#tz-manual-wrap").hidden=false; }
   try{ var last=JSON.parse(localStorage.getItem(LAST_KEY)||"null"); if(last&&last.y)fillForm(last) }catch(e){}
   if(location.hash==="#people")nav("people"); else nav("form");
-  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r57-pwa1") }catch(e){} }
+  if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js?v=r58-pwa1") }catch(e){} }
 }
 </script>
 <script>boot();</script>

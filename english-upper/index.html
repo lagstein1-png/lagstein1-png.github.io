@@ -671,7 +671,7 @@ fillGen("lit",[
 "'The classroom was a zoo.' This is a metaphor for...|a noisy, wild room|a quiet and calm room|a clean and tidy room|an empty and dark room|3|zoo = noisy and wild"
 ],L("בחרו את התשובה הנכונה על הסיפור או על הכלי הספרותי.","اختاروا الإجابة الصحيحة عن القصة أو الأداة الأدبية.","Выбери правильный ответ о рассказе или литературном приёме.","Choose the right answer about the story or the literary tool."),L("חשבו על הסיפור כמו על חלקים: דמות, מקום, בעיה, פתרון. איזה חלק נשאל?","فكروا بالقصة كأجزاء: شخصية ومكان ومشكلة وحل. أي جزء يُسأل عنه؟","Думай о рассказе как о частях: герой, место, проблема, решение. О какой части вопрос?","Think of a story as parts: character, place, problem, solution. Which part is asked about?"),E_OK);
 
-var BUILD="eu3 · 2026-10-24";
+var BUILD="eu4 · 2026-10-25";
 /* ===== UI strings ===== */
 var STR={
 he:{trackT:"איזה מסלול?",tr7:"כיתה ז׳",tr9:"כיתה ט׳ מצומצם",title9:"גיאומטריה לכיתה ט׳, רמה מצומצמת",tag9:"שיעור קצר ותרגול בשלוש רמות בכל נושא. הכול עם הקראה.",credit9:"תרגול כיתה ט׳ מצומצם בנוי לפי רשימת הנושאים בחוברת העבודה בגיאומטריה של מחוז תל אביב חט״ב (תשפ״ה). כל השאלות נכתבו מחדש.",soonT:"בקרוב: צורות חופפות, תיבה וקובייה, שכיחות והסתברות.",mtNote:"תרגום לערבית, רוסית ואנגלית: תרגום מכונה, ממתין לבדיקה.",credit2:"יחידת משפט פיתגורס נבנתה לפי מבנה חוברת של יניב רז, מדריך מחוזי חט״ב, מחוז ירושלים, משרד החינוך. תרגילי החלוקה ביחס בהשראת שאלה מהפיקוח על הוראת המתמטיקה, משרד החינוך.",brand:"מתמטיקה לכיתה ז׳",title:"מתמטיקה לכיתה ז׳",tag:"צירים, מספרים שליליים, זוויות, משולשים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -888,7 +888,8 @@ function pickVoice(){var code=LCODE[SPL()],pre=code.slice(0,2),
 /* גובה — 1.12, הפריסט ״נשי רגוע״ של האתר, וקול גברי מורם ×1.35 עד התקרה
    1.35 — voicePitch של rakia ו-english (O-227). עד כאן 1.05 לנשי ו-1.3 לכל
    השאר, וההקראה כאן נשמעה אחרת מבשאר האתר. */
-var FEM_PITCH=1.35, PITCH_BASE=1.12;
+/* 1 ולא 1.35 (הבעלים, 25.10.2026, כרום על ווינדוס: ״הקול לא תקין״). הרמה של 35% לא הופכת את Asaf לקול נשי — היא מעוותת אותו. קול גברי נשמע בגובה הבסיס, וההודעה מציעה את Edge (הילה). */
+var FEM_PITCH=1, PITCH_BASE=1.12;
 function femLift(v){ if(!v)return 1; return vGender(v)==="m"?FEM_PITCH:1 }
 function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.html!=null){HL.el.innerHTML=HL.el.dataset.html}HL.el=null}
@@ -1171,7 +1172,7 @@ function sayQ(slow){var q=P.list[P.i],old=S.slow,sl=slow?true:old;S.slow=sl;
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"english-upper",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:(x.enx||"")+" "+lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=eu3-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=eu4-pwa1").catch(function(){})});
 })();
 </script>
 

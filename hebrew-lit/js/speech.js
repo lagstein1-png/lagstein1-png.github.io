@@ -90,7 +90,8 @@ function voiceFor(lang){
    O-227). v ריק פירושו שבשפה הזאת יש רק קולות גבריים, או אין קולות:
    המכשיר מדבר בקול ברירת המחדל שלו, והוא מורם כמו קול גברי באתר — עד
    התקרה 1.35. עד כאן 1 לקול נשי ו-1.25 בלעדיו. */
-var FEM_PITCH=1.35, PITCH_BASE=1.12;
+/* 1 ולא 1.35 (הבעלים, 25.10.2026, כרום על ווינדוס: ״הקול לא תקין״). הרמה של 35% לא הופכת את Asaf לקול נשי — היא מעוותת אותו. קול גברי נשמע בגובה הבסיס, וההודעה מציעה את Edge (הילה). */
+var FEM_PITCH=1, PITCH_BASE=1.12;
 function femLift(v){return v?1:FEM_PITCH}
 function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 /* ---------- מקטעים. הועתק מ-english/index.html כלשונו ---------- */
@@ -309,7 +310,7 @@ function speakOne(s,tok,cb){
       var at=a.currentTime/d*sum, k=0;
       while(k<ends.length-1&&ends[k]<at)k++;
       hl(k);
-    },120);
+    },60);
   }
   device();
 }

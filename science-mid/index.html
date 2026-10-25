@@ -88,7 +88,7 @@ var UNITS=[{"id":"z0","grade":7,"t":{"he":"מתחילים לחקור בבטחה"
 <script src="/tutor/barak-core.js"></script>
 <script>
 /* ===== מנוע האפליקציה: מדע וטכנולוגיה לחטיבה (science-mid) ===== */
-var BUILD="scimid18 · 2026-10-24";
+var BUILD="scimid19 · 2026-10-25";
 var SKEY="scimid-v1";
 var LANGS=[["he","עברית","he-IL"],["ar","العربية","ar-SA"],["ru","Русский","ru-RU"],["en","English","en-US"]];
 var state={lang:"he",dark:false,rate:1,grade:7,pred:{},done:{},big:false,clear:false,spaced:false,hc:false,rm:false};
@@ -205,7 +205,8 @@ function femaleVoice(code){
 /* גובה — 1.12, הפריסט ״נשי רגוע״ של האתר, וקול גברי מורם ×1.35 עד התקרה
    1.35 — voicePitch של english ו-rakia (O-227). עד כאן הגובה לא נקבע כלל
    (1), וקול גברי לא הורם. */
-var FEM_PITCH=1.35, PITCH_BASE=1.12;
+/* 1 ולא 1.35 (הבעלים, 25.10.2026, כרום על ווינדוס: ״הקול לא תקין״). הרמה של 35% לא הופכת את Asaf לקול נשי — היא מעוותת אותו. קול גברי נשמע בגובה הבסיס, וההודעה מציעה את Edge (הילה). */
+var FEM_PITCH=1, PITCH_BASE=1.12;
 function femLift(v){ if(!v)return 1; return vGender(v)==="m"?FEM_PITCH:1 }
 function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 /* מקטעים. מעל SEG_MAX תווים מנועי מכשיר מאיצים ובולעים סופי מילים,
@@ -533,7 +534,7 @@ function boot(){
   load();render();
   try{if(window.RECORDED)RECORDED.setup({base:"audio"})}catch(e){}
   try{if("speechSynthesis" in window)speechSynthesis.getVoices()}catch(e){}
-  try{if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js?v=scimid18-pwa1").catch(function(){})}catch(e){}
+  try{if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js?v=scimid19-pwa1").catch(function(){})}catch(e){}
   if(window.TUTOR){
     var txt=TUTOR.plain;
     TUTOR.mount({app:"scimid",
