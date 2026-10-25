@@ -19,7 +19,7 @@
 | `theory` | — | — | אינה בריפו הזה |
 | `civics` | c54 · 2026-10-21 | c54-pwa1 | תואם |
 | `hebrew` | i46 · 2026-10-16 | i46-pwa1 | תואם |
-| `hebrew-lit` | hl28 · 2026-10-16 | hl28-pwa1 | תואם |
+| `hebrew-lit` | hl29 · 2026-10-25 | hl29-pwa1 | תואם |
 | `english-bagrut` | — | — | אינה בריפו הזה |
 | `literature` | j46 · 2026-10-21 | j46-pwa1 | תואם |
 | `tanakh` | p47 · 2026-10-21 | p47-pwa1 | תואם |
@@ -37,12 +37,12 @@
 | `bagrut-history` | h139 · 2026-10-16 | h139-pwa1 | תואם |
 | `islam` | is26 · 2026-10-21 | is26-pwa1 | תואם |
 | `russian` | ru27 · 2026-10-21 | ru27-pwa1 | תואם |
-| `tanakh-elem` | te31 · 2026-10-16 | te31-pwa1 | תואם |
-| `civics-elem` | mc29 · 2026-10-16 | mc29-pwa1 | תואם |
-| `culture-elem` | tm26 · 2026-10-16 | tm26-pwa1 | תואם |
-| `history-elem` | hk26 · 2026-10-16 | hk26-pwa1 | תואם |
-| `english-elem` | en22 · 2026-10-16 | en22-pwa1 | תואם |
-| `science-12` | sg26 · 2026-10-16 | sg26-pwa1 | תואם |
+| `tanakh-elem` | te32 · 2026-10-25 | te32-pwa1 | תואם |
+| `civics-elem` | mc30 · 2026-10-25 | mc30-pwa1 | תואם |
+| `culture-elem` | tm27 · 2026-10-25 | tm27-pwa1 | תואם |
+| `history-elem` | hk27 · 2026-10-25 | hk27-pwa1 | תואם |
+| `english-elem` | en23 · 2026-10-25 | en23-pwa1 | תואם |
+| `science-12` | sg27 · 2026-10-25 | sg27-pwa1 | תואם |
 | `domino` | dm26 · 2026-10-24 | dm26-pwa1 | תואם |
 | `net-elem` | ns15 · 2026-10-16 | ns15-pwa1 | תואם |
 

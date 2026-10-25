@@ -273,7 +273,20 @@ function render(){
     $("#resetBtn").onclick=function(){if(confirm(t("resetSure"))){state.done={};save();go("home")}};
   }
   if(!("speechSynthesis" in window)||(allVoices().length&&!voiceFor(state.lang)&&view==="home")){/* visible note, see below */
-    var n=document.createElement("p");n.className="small warn";n.textContent=t("noVoice");var m=$("main");if(m)m.appendChild(n);}
+    var n=document.createElement("p");n.className="small warn";n.textContent=t("noVoice");if("speechSynthesis" in window)edgeFirst(n);var m=$("main");if(m)m.appendChild(n);}
+}
+/* כרום על ווינדוס רואה רק את קולות המערכת, ובעברית יש שם רק את Asaf
+   הגברי — למיקרוסופט אין קול עברי נשי להתקנה. אז ההקראה יוצאת בקול גברי
+   בגובה מורם, ולימור (הקלטות בלבד) נשמעת בקול אחר. Edge נושא את הילה
+   הנוירלית בלי התקנה, ולכן הקישור אליו בא ראשון בהודעה — כמו femNoteHTML
+   ב-english (17.9.2026). הבעלים צילם את ההודעה בלי הקישור, 25.10.2026. */
+function edgeFirst(p){
+  var ua=navigator.userAgent||"";
+  if(!/Windows/i.test(ua)||/Edg\//.test(ua))return;
+  var a=document.createElement("a");a.href="microsoft-edge:"+location.href.split("#")[0];
+  a.textContent=t("openEdge");a.style.fontWeight="700";a.style.color="inherit";
+  var txt=p.textContent;p.textContent=t("edgeHas")+" ";p.appendChild(a);
+  p.appendChild(document.createElement("br"));p.appendChild(document.createTextNode(txt));
 }
 try{speechSynthesis.onvoiceschanged=function(){}}catch(e){}
 render();

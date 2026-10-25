@@ -194,16 +194,18 @@ function speakOne(s,tok,cb){
   var root=s.el?document.querySelector(s.el):null, ws=root?root.querySelectorAll(".w"):[];
   var box=s.box?document.querySelector(s.box):null; if(box)box.classList.add("hl");
   var words=s.t.split(/\s+/).filter(Boolean), cur=-1, got=false, finished=false, lang=s.lang||"he";
-  var disarm=null, retried=false;
+  var disarm=null, retried=false, followIv=null;
   function hl(k){if(k===cur||!ws[k])return;if(ws[cur])ws[cur].classList.remove("hl");cur=k;ws[k].classList.add("hl");
     try{ws[k].scrollIntoView({block:"nearest"})}catch(e){}}
   function fin(){if(finished)return;finished=true;
+    if(followIv){clearInterval(followIv);followIv=null}
     if(disarm){disarm();disarm=null}
     maybeStopKeepAlive();
     SP.timers.forEach(clearTimeout);SP.timers=[];
     if(ws[cur])ws[cur].classList.remove("hl");if(box)box.classList.remove("hl");
     if(tok===SP.tok)cb()}
   function device(){
+    if(followIv){clearInterval(followIv);followIv=null}
     if(finished||tok!==SP.tok)return;
     /* הנאמר עובר במנוע ההגייה, ומפת ההיסטים נמדדת **עליו**: charIndex
        מצביע לתוך מה שנאמר, ו״משלש״→״משולש״ משנה אורך. מספר האסימונים
@@ -276,12 +278,31 @@ function speakOne(s,tok,cb){
     })(0);
   }
   /* layer 1: recorded file (speech/recorded.js), Hebrew only. A file exists only for text that record.js recorded exactly;
-     no file or a failed file falls back to the device voice below. No word highlight on a file (no boundary events). */
+     no file or a failed file falls back to the device voice below. A file has no boundary events, so followClip (below) highlights by playback time. */
   if(lang==="he"&&typeof RECORDED!=="undefined"){
     try{speechSynthesis.cancel()}catch(e0){}
     var ok=false;
     try{ok=RECORDED.play(s.raw||s.t,"he",{rate:rate(),onEnd:fin,onError:device})}catch(e1){ok=false}
-    if(ok)return;
+    if(ok){followClip();return}
+  }
+  /* הדגשה על קובץ מוקלט. לקובץ אין onboundary, ולכן ההדגשה עוקבת אחרי
+     הזמן: החלק שכבר נוגן מתוך הקובץ, מול החלק של כל מילה באורך הטקסט.
+     זה אומדן — שקט בתחילת הקובץ או מילה ארוכה שנאמרת מהר יזיזו אותו
+     במעט — אבל העין רואה איפה ההקראה נמצאת. הבעלים, 25.10.2026: ״הקול
+     תקין אבל אין מעקב אחר המילים״. רק כשמספר המילים על המסך זהה לנאמר,
+     כמו sameN בקול המכשיר: אחרת אין הדגשה, ולא הדגשה שגויה. */
+  function followClip(){
+    var a=RECORDED._state&&RECORDED._state.el;
+    if(!a||!ws.length||ws.length!==words.length)return;
+    var ends=[],sum=0;
+    for(var j=0;j<words.length;j++){sum+=words[j].length+1;ends.push(sum)}
+    followIv=setInterval(function(){
+      if(finished||tok!==SP.tok){clearInterval(followIv);followIv=null;return}
+      var d=a.duration; if(!d||!isFinite(d))return;
+      var at=a.currentTime/d*sum, k=0;
+      while(k<ends.length-1&&ends[k]<at)k++;
+      hl(k);
+    },120);
   }
   device();
 }
