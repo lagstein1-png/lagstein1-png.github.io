@@ -30,7 +30,7 @@
 | `science-mid` | scimid19 · 2026-10-25 | scimid19-pwa1 | תואם |
 | `biology` | bg32 · 2026-10-26 | bg32-pwa1 | תואם |
 | `chemistry` | ch5 · 2026-10-25 | ch5-pwa1 | תואם |
-| `physics` | ph5 · 2026-10-25 | ph5-pwa1 | תואם |
+| `physics` | ph6 · 2026-10-26 | ph6-pwa1 | תואם |
 | `english-upper` | eu5 · 2026-10-26 | eu5-pwa1 | תואם |
 | `english-mid` | em5 · 2026-10-26 | em5-pwa1 | תואם |
 | `geography` | q52 · 2026-10-25 | q52-pwa1 | תואם |
