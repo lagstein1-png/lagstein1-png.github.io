@@ -19,7 +19,13 @@
 const { chromium } = require('./pw.js');
 
 const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
-const APPS = ['math-teen', 'math-uni', 'math-uni2', 'math-uni3'];
+/* O-135, 21.10.2026: נגזרת — כל מי שמגדיר `speakMath`, כלומר מי שיש לו שכבת
+   הקראה מתמטית למדוד. עד היום ארבעה שמות ביד, ו-electric (העתק של math-uni3
+   מ-24.9.2026, עם אותה שכבה) לא נמדדה. שם בשורת הפקודה גובר. */
+const AL = require('./applist.js');
+const NAMED = AL.pick(process.argv.slice(2), []);
+const APPS = NAMED.length ? NAMED : AL.family('saysym.js', /function speakMath\b/,
+  { floor: 4, must: ['math-teen', 'math-uni', 'math-uni2', 'math-uni3'], why: 'אין בהן speakMath' });
 /* דגימות לכל תא (נושא × רמה). ללא תקרה על סך השאלות: תקרה כזאת
    חתכה את הריצה לפני הנושאים האחרונים ברשימה, ושני באגים
    אמיתיים — cont L3 ו-lagrange3 L4 — הוסתרו מאחוריה. */
@@ -38,6 +44,19 @@ const BAD = [
   ['Σ גולמי',  /Σ/],
   ['∞ גולמי',  /∞/],
 ];
+
+/* **כשל ידוע — מוצהר, מודפס ב-`~`, ואינו מפיל.** O-135, 21.10.2026:
+   כשהכלי הורחב מארבע אפליקציות לחמש, electric החזירה `I_ דלתא` —
+   ‏`I<sub>Δ</sub>` (זרם הפחת) בצעדי הפתרון של `safety` רמות 2 ו-4.
+   ‏`speakMath` שלה מקריא כתב תחתי באות לטינית (I_L ← ״איי אל״) ולא
+   ביוונית. התיקון באפליקציה, לא כאן. כשל **אחר** באותה אפליקציה
+   מפיל כרגיל, **וכשל ידוע שנעלם מפיל גם הוא** — כדי שהשורה תימחק. */
+/* ״נעלם״ נקבע מול המקור ולא מול הדגימה: הדגימה אקראית (QA_N לתא), וריצה
+   שלא הגרילה את השאלה אינה הוכחה שהבאג תוקן. */
+const KNOWN = {
+  'electric': { '_': { why: 'I<sub>Δ</sub> בממסר פחת (safety) — speakMath אינו מקריא כתב תחתי יווני',
+                       src: /I<sub>Δ/ } },
+};
 
 async function audit(page, n) {
   return page.evaluate((perCell) => {
@@ -99,6 +118,20 @@ async function run() {
         if (re.test(item.say)) (hits[name] = hits[name] || []).push(`${item.tid} L${item.lv}`);
       }
     }
+    const known = KNOWN[app] || {};
+    for (const name of Object.keys(known)) {
+      const stillThere = known[name].src.test(AL.sourceOf(app));
+      if (hits[name]) {
+        const uniq = [...new Set(hits[name])];
+        console.log(`~ ${app.padEnd(10)} ${name}: ${hits[name].length} מופעים ב-${uniq.slice(0, 5).join(', ')} — ידוע: ${known[name].why}`);
+        delete hits[name];
+      } else if (stillThere) {
+        console.log(`~ ${app.padEnd(10)} ${name}: לא הוגרל בריצה הזאת, והמקור עדיין מכיל ${known[name].src} — ידוע`);
+      } else {
+        console.log(`✗ ${app.padEnd(10)} הכשל הידוע ״${name}״ נעלם — מחקו את השורה מ-KNOWN ב-saysym.js`);
+        bad++;
+      }
+    }
     const n = Object.values(hits).reduce((a, v) => a + v.length, 0);
     bad += n;
     const chars = res.spoken.reduce((a, s) => a + s.say.length, 0);
@@ -122,7 +155,8 @@ async function run() {
     console.log(`\n${bad} ממצאים — סימן גולמי מגיע ללומד`);
     process.exit(1);
   }
-  console.log(`\n✓ ${APPS.length} אפליקציות, ההקראה נקייה מסימנים גולמיים`);
+  const nk = APPS.filter(a => KNOWN[a]).length;
+  console.log(`\n✓ ${APPS.length} אפליקציות, ההקראה נקייה מסימנים גולמיים` + (nk ? ` (חוץ מ-${nk} ידועות, ~ למעלה)` : ''));
 }
 
 run().catch(e => { console.log('✗ ' + e.message); process.exit(1); });

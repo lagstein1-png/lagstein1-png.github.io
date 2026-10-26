@@ -39,16 +39,33 @@ const fs = require('fs'), path = require('path');
 const { chromium } = require('./pw.js');
 const ROOT = path.resolve(__dirname, '..', '..');
 const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 — O-197 */
-const APPS = process.argv.slice(2).length ? process.argv.slice(2) :
-  ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3',
-   'ulpan', 'english', 'history', 'lomda', 'reader', 'kotvim', '.'];
+/* O-135, 21.10.2026: כל אפליקציה מקומית ב-stages.json, ודף הבית. עד היום
+   אחת־עשרה בשם ועוד '.', ושלושים ושתיים אחרות — כל מה שנולד אחרי
+   16.9 — לא נבדקו. דריסה של פונקציה גלובלית אינה תלויה במשפחה. נקראות
+   רק הצהרות ב-`index.html`: באפליקציה רב־קובצית שהמנוע שלה ב-js/ זה
+   מעט או כלום, והיא מודפסת ב-״·״ ולא נספרת כבדוקה. */
+const AL = require('./applist.js');
+const NAMED = AL.pick(process.argv.slice(2), []);
+const DERIVED = AL.local();
+if (!NAMED.length && (DERIVED.length < 30 || !DERIVED.includes('math-teen'))) {
+  console.log(`✗ shadow.js: stages.json החזיר ${DERIVED.length} אפליקציות מקומיות (רצפה 30) — הגזירה נשברה`);
+  process.exit(1);
+}
+const APPS = NAMED.length ? NAMED : DERIVED.concat(['.']);
+
+/* עטיפה: המקור נשמר במשתנה, והשם מקבל פונקציה שקוראת לו עם arguments */
+function wraps(src, name) {
+  const esc = name.replace(/[$]/g, '\\$');
+  return new RegExp('var\\s+([\\w$]+)\\s*=\\s*' + esc + '\\s*;\\s*' + esc +
+    '\\s*=\\s*function\\s*\\(\\s*\\)\\s*\\{[^]{0,400}?\\1\\.apply\\([^,]*,\\s*arguments\\)').test(src);
+}
 
 /* הצהרה בתחילת שורה — כלומר בסקופ העליון של הסקריפט */
 const DECL = /^function\s+([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/gm;
 
 (async () => {
   const browser = await chromium.launch();
-  let bad = 0, checked = 0;
+  let bad = 0, checked = 0, apps = 0;
   for (const app of APPS) {
     const dir = app === '.' ? ROOT : path.join(ROOT, app);
     const file = path.join(dir, 'index.html');
@@ -65,6 +82,7 @@ const DECL = /^function\s+([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/gm;
     const names = Object.keys(want);
     if (!names.length) { console.log(`· ${app} — אין הצהרות בסקופ העליון`); continue }
 
+    apps++;
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
     await page.route('**', r => r.request().url().startsWith(BASE) ? r.continue() : r.abort());
@@ -89,6 +107,12 @@ const DECL = /^function\s+([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/gm;
       if (g === 'לא-פונקציה') {
         bad++; n++;
         console.log(`✗ ${app} — ${name} הוצהר כפונקציה, ובזמן ריצה אינו פונקציה כלל`);
+      } else if (g !== want[name] && wraps(src, name)) {
+        /* עטיפה מכוונת: `var _mk0=mk;mk=function(){…_mk0.apply(null,arguments)…}`.
+           המקור נשמר וכל הארגומנטים עוברים אליו, ולכן אין כאן דריסה אלא
+           קישוט — ב-physics הוא מוסיף סימן RLM בסוף השאלה. נמצא 21.10.2026
+           כשהכלי הורחב מ-12 דפים ל-44 (O-135). מודפס, ואינו מפיל. */
+        console.log(`~ ${app} — ${name}: עטיפה מכוונת שמעבירה את כל הארגומנטים (${want[name]} במקור, ${g} בעטיפה)`);
       } else if (g !== want[name]) {
         bad++; n++;
         console.log(`✗ ${app} — ${name}: המקור מצהיר ${want[name]} פרמטרים, ובזמן ריצה ${g}`);
@@ -97,7 +121,7 @@ const DECL = /^function\s+([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/gm;
     }
     if (!n) console.log(`✓ ${app.padEnd(10)} ${names.length} הצהרות בסקופ העליון, אף אחת לא נדרסה`);
   }
-  console.log(`\n${bad ? '✗' : '✓'} ${checked} פונקציות גלובליות נבדקו בזמן ריצה, ${bad} נדרסו`);
+  console.log(`\n${bad ? '✗' : '✓'} ${checked} פונקציות גלובליות ב-${apps} דפים נבדקו בזמן ריצה, ${bad} נדרסו`);
   await browser.close();
   process.exit(bad ? 1 : 0);
 })();

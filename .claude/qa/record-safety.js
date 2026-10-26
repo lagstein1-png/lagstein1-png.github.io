@@ -93,6 +93,9 @@ globalThis.fetch = async (url, o) => {
 `);
 
 /* --- עץ זמני ------------------------------------------------------ */
+/* O-135, 21.10.2026: **רשימה מכוונת.** אלה תיקיות בעץ זמני מזויף שהבדיקה
+   בונה לעצמה (index.html של שורה אחת), לא האפליקציות האמיתיות — אין כאן
+   מה לגזור מ-stages.json. מה ש-record.js מקליט באמת נגזר שם, לא כאן. */
 const APPS = ['english', 'history', 'ulpan', 'civics', 'literature', 'tanakh', 'hebrew-arab', 'islam', 'russian'];
 function tree(name, strings) {
   const T = path.join(BASE, name);
