@@ -471,8 +471,24 @@ const BODY = extra => Object.assign({ app: 'math-app', lang: 'he', screen: SCREE
 
   console.log('— ב. הלקוח —');
   const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: ROOT }).toString().split('\0').filter(Boolean);
-  const PAGES = ['.', 'math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'lomda',
-                 'english', 'history', 'ulpan', 'bagrut-806', 'reader', 'kotvim'];
+  /* O-135, 21.10.2026: נגזרת — כל אפליקציה מקומית שה-index.html שלה טוען את
+     barak-core.js, ודף הבית. עד היום שתים־עשרה בשם, ושלושים ואחת שנולדו
+     אחריהן (electric, משפחת ה-elem, chemistry, physics…) לא נבדקו. הקוד
+     נקרא מכל קובצי האפליקציה (`sourceOf`) — ב-806 ב-app.js, ב-elem ב-js/. */
+  const AL = require('./applist.js');
+  const idx = a => { try { return fs.readFileSync(path.join(ROOT, a, 'index.html'), 'utf8') } catch (e) { return '' } };
+  const CORE_APPS = AL.local().filter(a => idx(a).indexOf('/tutor/barak-core.js') >= 0);
+  const NO_CORE = AL.local().filter(a => !CORE_APPS.includes(a));
+  console.log(`· barak.js: ${CORE_APPS.length} אפליקציות טוענות את barak-core.js` +
+    (NO_CORE.length ? `; ${NO_CORE.length} לא: ${NO_CORE.join(' ')}` : ''));
+  t('הגזירה מצאה לפחות 12 אפליקציות עם barak-core.js (פחות = הזיהוי נשבר)', CORE_APPS.length >= 12, true);
+  const REGISTERS = AL.matching(/BARAK\.register\(/, CORE_APPS);
+  const MUST_REG = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'lomda',
+                    'english', 'history', 'ulpan', 'bagrut-806', 'reader', 'kotvim'];
+  t('שתים־עשרה הוותיקות רושמות מתאם (BARAK.register)', MUST_REG.filter(a => !REGISTERS.includes(a)), []);
+  const NO_REG = CORE_APPS.filter(a => !REGISTERS.includes(a));
+  console.log(`· ${REGISTERS.length} רושמות מתאם ונבדקות גם ב-getScreenContext; ${NO_REG.length} טוענות את הליבה בלי מתאם: ${NO_REG.join(' ')}`);
+  const PAGES = ['.'].concat(CORE_APPS);
   const CORE_JS = path.join(ROOT, 'tutor', 'barak-core.js');
   t('tutor/barak-core.js קיים', fs.existsSync(CORE_JS), true);
   const core = fs.existsSync(CORE_JS) ? fs.readFileSync(CORE_JS, 'utf8') : '';
@@ -491,13 +507,14 @@ const BODY = extra => Object.assign({ app: 'math-app', lang: 'he', screen: SCREE
       if (iB < 0) miss.push(p + ': אין תגית barak-core.js');
       else if (iT >= 0 && iB < iT) miss.push(p + ': barak-core.js נטען לפני tutor.js');
       if (sw.indexOf('"/tutor/barak-core.js"') < 0) miss.push(p + ': אינו ב-PRE');
-      const code = p === 'bagrut-806' ? fs.readFileSync(path.join(dir, 'app.js'), 'utf8') : html;
-      if (!/BARAK\.register\(/.test(code)) miss.push(p + ': אין BARAK.register');
-      if (!/getScreenContext/.test(code)) miss.push(p + ': אין getScreenContext');
+      /* מתאם רשום — רק במי שרושם אותו. אפליקציה שטוענת את הליבה בלי
+         `BARAK.register` מציגה את לימור בלי מתאם, וזה חוזה אחר ולא באג
+         (אותה הכרעה כמו ב-barak-browser.js, O-125). היא נספרת ומודפסת. */
+      if (REGISTERS.includes(p) && !/getScreenContext/.test(AL.sourceOf(p))) miss.push(p + ': אין getScreenContext');
     }
     if (!/req\.method\s*!==\s*"GET"\)\s*return/.test(sw)) miss.push(p + ': sw.js אינו מדלג על POST');
   }
-  t('שתים־עשרה האפליקציות: תגית אחרי tutor.js, PRE, register, getScreenContext; ואין מטמון ל-POST', miss, []);
+  t(`${PAGES.length - 1} האפליקציות ודף הבית: תגית אחרי tutor.js, PRE, getScreenContext במי שרושמת; ואין מטמון ל-POST`, miss, []);
   /* אין סוד בשום קובץ שנעקב. `AIza` הוא הקידומת של מפתח Gemini,
      ו-`sk-ant-` של Anthropic. הערות שמזכירות את הקידומת נחשבות
      מופע — ולכן הבדיקה דורשת קידומת + 20 תווי מפתח אחריה. */
