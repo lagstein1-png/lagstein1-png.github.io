@@ -272,6 +272,18 @@ const SOURCES = {
   tutor: ['tutor/josh-local.js', 'tutor/tutor.js']
 };
 
+/* ‏`topic()` + `Q(id,q,opts,ok,hint,ex,fig,wrong)` — חתימה אחת לשבע.
+   הרשימה אינה קשיחה: היא נגזרת מן הקוד, כדי שאפליקציה שמן שמונה תיווסף
+   מחר לא תישאר מאחור בשקט, כפי שקרה לשש האלה. */
+const Q_BANK_EMPTY = [];
+const Q_BANK_APPS = new Set(Object.keys(SOURCES).filter(app => {
+  const f = path.join(ROOT, app, 'index.html');
+  if (!fs.existsSync(f)) return false;
+  const html = fs.readFileSync(f, 'utf8');
+  return html.includes('function Q(id,q,opts,ok,hint,ex,fig,wrong)') &&
+         html.includes('\nvar TOPICS=[];') && html.includes('\nfunction itemId(');
+}));
+
 /* בדיוק מה ש-plainOf עושה באפליקציה: תגיות יורדות, ישויות נפתחות,
    רווחים מתכווצים. הטקסט הזה הוא מה שהאפליקציה מוסרת ל-play. */
 function plainOf(h) {
@@ -353,7 +365,13 @@ function sciBank(text, name) {
    רק את התחילית הקטועה ("איזה מספר בא אחרי "), מקליטה אותה, ואף
    RECORDED.play בזמן ריצה לא יתאים לה לעולם (ה-id תלוי במספר) —
    הוצאה בלי תועלת. נמצא ותוקן 3.10.2026, לפני ההקלטה הראשונה. */
-/* motal/index.html — ולמה לא הקורא הכללי.
+/* שבע אפליקציות בנות אותו מבנה — ולמה לא הקורא הכללי.
+
+   ‏motal, civics, literature, tanakh, islam, biology ו-hebrew-arab חולקות
+   חתימה אחת: `topic(id,trk,n,d,levels)` וכל רמה מערך של
+   `Q(id,q,opts,ok,hint,ex,fig,wrong)` (נמדד: `function Q(` זהה בשבע).
+   עד 26.10.2026 רק motal קיבלה קורא משלה, והשש האחרות נפלו לקורא הכללי,
+   שמקליט את הדבר הלא נכון — ולכן O-241.
 
    המבנה כאן זהה ל-literature: שלוש קריאות `topic(id,trk,n,d,levels)`,
    וכל רמה מערך של `Q(id,q,opts,ok,hint,ex,fig,wrong)`. הקורא הכללי
@@ -444,11 +462,11 @@ function geoBank(text) {
   return out;
 }
 
-function motalBank(text) {
+function qBank(app, text) {
   const vm = require('vm');
   const a = text.indexOf('\nvar TOPICS=[];');
   const b = text.indexOf('\nfunction itemId(', a);
-  if (a < 0 || b < 0) throw new Error('motal: בלוק ה-topic לא נמצא');
+  if (a < 0 || b < 0) throw new Error(app + ': בלוק ה-topic לא נמצא');
   const ctx = { TOPICS: [] };
   vm.createContext(ctx);
   vm.runInContext(
@@ -459,9 +477,13 @@ function motalBank(text) {
     text.slice(a, b).replace(/^[\s\S]*?var TOPICS=\[\];/, ''),
     ctx, { timeout: 20000 });
 
-  /* הפונקציה של motal עצמה, מחולצת — לא העתק. מזהה שגוי כאן הוא
-     קליפ שלא ינוגן לעולם, וזה בדיוק מה שהעתק שנשאר מאחור מייצר. */
-  const saySpell = appSaySpell('motal');
+  /* הפונקציה של האפליקציה עצמה, מחולצת — לא העתק. מזהה שגוי כאן הוא
+     קליפ שלא ינוגן לעולם, וזה בדיוק מה שהעתק שנשאר מאחור מייצר.
+     ‏islam ו-hebrew-arab בונות את `say` מ-`leadFor(it)` ולא מ-`gl(it.q)`,
+     ו-`leadFor` מחזירה `gl(it.q)` כש-`state.lang==="he"` — נקרא בשתיהן.
+     ההקלטה היא עברית בלבד (אין אלא `audio/he/` בכל המאגר), ולכן שבע
+     האפליקציות מייצרות כאן בדיוק את אותה מחרוזת. */
+  const saySpell = appSaySpell(app);
   const he = o => (o && o.he) || '';
 
   const out = [];
@@ -491,7 +513,12 @@ function motalBank(text) {
       if (c === '[') d++;
       if (c === ']') { d--; if (!d) { j++; break } }
     }
-    for (const c of JSON.parse(text.slice(i, j))) out.push(he(c.t) + '. ' + he(c.d));
+    /* ‏JS, לא JSON: ל-islam יש פסיק נגרר ב-CONCEPTS (`}},\n]`), ו-JSON.parse
+       נופל עליו. נקרא באותו vm כמו ה-topics. */
+    const cctx = { V: null };
+    vm.createContext(cctx);
+    vm.runInContext('V=' + text.slice(i, j), cctx, { timeout: 20000 });
+    for (const c of (cctx.V || [])) out.push(he(c.t) + '. ' + he(c.d));
   }
   return out;
 }
@@ -718,17 +745,29 @@ function corpusOf(app) {
     }
     return seen;
   }
-  if (app === 'motal') {
+  /* שבע אפליקציות באותו מבנה, קורא אחד. עד 26.10.2026 רק motal הייתה כאן;
+     השש האחרות נפלו לקורא הכללי, שהקליט את ההסבר לבדו (`ex`) — מחרוזת
+     שלעולם אינה נאמרת לבדה — והחמיץ את `say`, מה שבאמת נאמר אחרי המענה.
+     זה O-241(א). */
+  if (Q_BANK_APPS.has(app)) {
     const tf = path.join(ROOT, files[0]);
     if (!fs.existsSync(tf)) return seen;
-    for (const raw of motalBank(fs.readFileSync(tf, 'utf8'))) {
-      const text = plainOf(String(raw));
-      if (!/[\u05d0-\u05ea]/.test(text)) continue;
-      if (text.split(' ').length < 2) continue;
-      const id = R.id(text);
-      if (!seen.has(id)) seen.set(id, text);
+    const rows = qBank(app, fs.readFileSync(tf, 'utf8'))
+      .map(raw => plainOf(String(raw)))
+      .filter(text => /[\u05d0-\u05ea]/.test(text) && text.split(' ').length >= 2);
+    /* ‏russian חולקת את החתימה אבל המאגר שלה רוסי בלבד: `Q("ru-orth-1-1",{"ru":…})`
+       בלי שדה `he`, ולכן הקורא הזה מחזיר עליה אפס. ההקלטה עברית, אז אפס הוא
+       התשובה הנכונה לבנק — אבל *להחליף* 27 מחרוזות באפס הוא רגרסיה שקטה.
+       אפליקציה שהקורא הזה אינו מוציא ממנה עברית נופלת חזרה לקורא הכללי,
+       ו-`--check` אומר את שמה, כדי שזה לא ייעלם. */
+    if (!rows.length) { Q_BANK_EMPTY.push(app); }
+    else {
+      for (const text of rows) {
+        const id = R.id(text);
+        if (!seen.has(id)) seen.set(id, text);
+      }
+      return seen;
     }
-    return seen;
   }
   if (app === 'tanakh-elem') {
     const tf = path.join(ROOT, files[0]);
@@ -908,6 +947,7 @@ function onTwo(app) {
 }
 let UNCHECKED = 0;
 function check() {
+  let deadTotal = 0;
   let bad = 0;
   for (const app of Object.keys(SOURCES)) {
     const m = readManifest(app), disk = onDisk(app);
@@ -940,10 +980,38 @@ function check() {
                   (orphan.length ? orphan.length + ' קבצים שאינם במניפסט (לא ינוגנו)' : '') +
                   ' — node .claude/qa/record.js --manifest ' + app);
     } else {
+      /* ‏ids.length פחות covered = קליפים ששולמו, יושבים בדיסק, ואף אתר קריאה
+         לא יבקש אותם לעולם. זה O-241: הקורא הכללי הקליט את ההסבר לבדו. */
+      const dead = c ? ids.filter(x => !c.has(x)).length : 0;
       console.log('✓ ' + app.padEnd(9) + ids.length + ' הקלטות, המניפסט תואם לדיסק · כיסוי ' +
-                  covered + '/' + (c ? c.size : 0));
+                  covered + '/' + (c ? c.size : 0) +
+                  (dead ? ' · ' + dead + ' קליפים שאינם נאמרים' : ''));
+      deadTotal += dead;
     }
   }
+  /* ‏O-241: אפליקציה שיש בה חתימת ה-Q המשותפת חייבת להיקרא ב-qBank ולא בקורא
+     הכללי. שש אפליקציות נפלו לכללי בשקט עד 26.10.2026, והוא הקליט את הדבר
+     הלא נכון. הרשימה נגזרת, ולכן השביעית שתיכתב מחר נכנסת לבד — אבל אם מישהו
+     יקשיח אותה שוב, כאן זה נופל. */
+  const generic = Object.keys(SOURCES).filter(app => {
+    if (Q_BANK_APPS.has(app) || Q_BANK_EMPTY.includes(app)) return false;
+    const f = path.join(ROOT, app, 'index.html');
+    if (!fs.existsSync(f)) return false;
+    const html = fs.readFileSync(f, 'utf8');
+    return html.includes('function Q(id,q,opts,ok,hint,ex,fig,wrong)') &&
+           html.includes('\nvar TOPICS=[];') && html.includes('\nfunction itemId(');
+  });
+  if (generic.length) {
+    bad++;
+    console.log('✗ ' + 'קורא המאגר ' + generic.length + ' אפליקציות בחתימת Q המשותפת ' +
+                'נקראות בקורא הכללי: ' + generic.join(', ') +
+                ' — הוא מקליט את ההסבר לבדו ומחמיץ את מה שנאמר אחרי המענה (O-241)');
+  }
+  if (Q_BANK_EMPTY.length)
+    console.log('· ' + 'קורא המאגר ' + 'נפלו לקורא הכללי, אין עברית במאגר שלהן: ' +
+                Q_BANK_EMPTY.join(', '));
+  if (deadTotal)
+    console.log('· ' + 'קליפים '.padEnd(11) + deadTotal + ' קליפים בדיסק שאף אתר קריאה אינו מבקש (O-217, O-241)');
   return bad;
 }
 
