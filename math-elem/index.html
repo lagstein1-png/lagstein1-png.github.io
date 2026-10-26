@@ -1024,7 +1024,7 @@ LESSONS.pct=[{t:L("אחוז הוא חלק אחד מתוך 100. בלוח של 100
  {t:L("50% הם חצי, 25% הם רבע ו-10% הם עשירית. 50% מ-80 הם 40, ו-10% מ-80 הם 8.","50% نصف، و25% ربع، و10% عُشر. 50% من 80 هي 40، و10% من 80 هي 8.","50% — это половина, 25% — четверть, 10% — одна десятая. 50% от 80 — это 40, а 10% от 80 — это 8.","50% is half, 25% is a quarter and 10% is a tenth. 50% of 80 is 40, and 10% of 80 is 8."),v:function(){return pctGrid(50)}},
  {t:L("אחוז אפשר לכתוב גם כשבר וגם כמספר עשרוני. 25% הם 25/100, כלומר 1/4, וגם 0.25.","يمكن كتابة النسبة المئوية كسرًا أو عددًا عشريًا. 25% هي 25/100، أي 1/4، وأيضًا 0.25.","Процент можно записать обычной или десятичной дробью. 25% — это 25/100, то есть 1/4, или 0.25.","A percent can be written as a fraction or a decimal. 25% is 25/100, which is 1/4, or 0.25."),v:function(){return pctGrid(25)}},
  {t:L("בהנחה מחשבים קודם כמה שקלים היא ההנחה, ואז מחסרים אותה מהמחיר. הנחה של 10% על 50 שקלים היא 5 שקלים, ומשלמים 45.","في الخصم نحسب أولًا كم شيكلًا هو الخصم ثم نطرحه من السعر. خصم 10% على 50 شيكل هو 5 شواكل، فندفع 45.","При скидке сначала считаем, сколько шекелей она составляет, потом вычитаем её из цены. Скидка 10% на 50 ₪ — это 5 ₪, и цена со скидкой — 45 ₪.","With a discount, first work out how many shekels it is, then take it off the price. 10% off 50 shekels is 5 shekels, so you pay 45."),v:function(){return ""}}];
-var BUILD="o27 · 2026-10-21";
+var BUILD="o29 · 2026-10-26";
 /* ===== UI strings ===== */
 var STR={
 he:{brand:"מתמטיקה מעבר לחשבון",title:"מתמטיקה ליסודי",tag:"צורות, מדידות, כסף, שברים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -1213,8 +1213,8 @@ function segments(spoken){
   out=merged;
   return out.length?out:[{text:spoken,start:0}];
 }
-var VF=/(female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
-var VM=/(\bmale\b|david|mark|asaf|hillel|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
+var VF=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/i;
+var VM=/(google[^a-z]{0,15}(arabic|العربية)|אברי|אסף|הילל|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|hillel|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/i;
 function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
 function vGender(v){var n=(v&&v.name)||"";return (VF.test(n)&&!VM.test(n))?"f":VM.test(n)?"m":"?"}
 /* voiceUsable הוא מפתח המיון הראשון, והמגדר בא אחריו ולא להפך:
@@ -1245,7 +1245,8 @@ function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),
 /* גובה — 1.12, הפריסט ״נשי רגוע״ של האתר, וקול גברי מורם ×1.35 עד התקרה
    1.35 — voicePitch של rakia ו-english (O-227). עד כאן 1.05 לנשי ו-1.3 לכל
    השאר, וההקראה כאן נשמעה אחרת מבשאר האתר. */
-var FEM_PITCH=1.35, PITCH_BASE=1.12;
+/* 1 ולא 1.35 (הבעלים, 25.10.2026, כרום על ווינדוס: ״הקול לא תקין״). הרמה של 35% לא הופכת את Asaf לקול נשי — היא מעוותת אותו. קול גברי נשמע בגובה הבסיס, וההודעה מציעה את Edge (הילה). */
+var FEM_PITCH=1, PITCH_BASE=1.12;
 function femLift(v){ if(!v)return 1; return vGender(v)==="m"?FEM_PITCH:1 }
 function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.html!=null){HL.el.innerHTML=HL.el.dataset.html}HL.el=null}
@@ -1470,7 +1471,7 @@ try{speechSynthesis.getVoices();
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"math-elem",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o27-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=o29-pwa1").catch(function(){})});
 })();
 </script>
 <!-- GoatCounter — ספירת כניסות אנונימית, בלי עוגיות ובלי מזהה למשתמש
