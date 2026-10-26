@@ -55,6 +55,8 @@ html.hi-contrast .unit,html.hi-contrast .band,html.hi-contrast .lvl,html.hi-cont
 body{margin:0;background:var(--paper);color:var(--ink);font-family:"Heebo",system-ui,"Segoe UI",Arial,sans-serif;line-height:1.5;-webkit-text-size-adjust:100%}
 html[lang="ar"] body,html[lang="ar"] button{font-family:var(--ar)}
 html[lang="ru"] body,html[lang="ru"] button{font-family:var(--ru)}
+button[data-a="lang"][lang="ar"]{font-family:"Noto Sans Arabic",system-ui,sans-serif}
+button[data-a="lang"][lang="ru"]{font-family:"Noto Sans",system-ui,sans-serif}
 button{font:inherit;color:inherit;cursor:pointer}
 .wrap{max-width:760px;margin:0 auto;padding:12px 14px 120px}
 .top{display:flex;align-items:center;gap:6px;margin-bottom:10px}
@@ -64,6 +66,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .langs button[aria-pressed=true]{background:var(--teal-deep);color:#fff}
 .gear{min-width:46px;padding:0;min-height:50px;border-radius:14px;border:2px solid var(--violet);background:var(--card)}
 h1{font-size:1.6rem;margin:.2em 0 .1em;line-height:1.25}
+.uh{color:var(--cd)}html[data-theme=dark] .uh{color:var(--cl)}
 h2{font-size:1.25rem;margin:.2em 0}
 .sub{color:var(--ink-soft);margin:0 0 12px}
 .card{background:var(--card);border-radius:20px;padding:16px;box-shadow:0 2px 10px rgba(23,51,60,.08);margin-bottom:14px}
@@ -162,19 +165,22 @@ var SPLF=null;function SPL(){return SPLF||S.lang}
 var LABELS=["A","B","C","D"];
 /* mk: one multiple-choice question. ans and dist are plain English strings. */
 function oid(x){return (x&&typeof x==="object")?"L:"+x.he:String(x)}
-function mk(unit,instr,vis0,ans,dist,hint,expl,step,x){x=x||{};var stem=x.stem,say=x.say,why=x.why;
+function mk(unit,instr,vis0,ans,dist,hint,expl,step,x){x=x||{};var stem=x.stem,say=x.say,why=x.why,ws=x.ws;
   var seen={},d=[];seen[ans]=1;
   dist.forEach(function(x){if(x&&!seen[x]){seen[x]=1;d.push(x)}});
   var all=shuffle([ans].concat(shuffle(d).slice(0,3))).map(function(x){return {id:x,l:x}});
   var vis=(vis0||"")+(stem?'<div class="enx enq" lang="en" dir="ltr">'+aesc(stem)+'</div>':"");
-  var e=expl;if(why){e=L(expl.he+" "+why,expl.ar+" "+why,expl.ru+" "+why,expl.en+" "+why)}
-  return {t:unit,q:instr,vis:vis,o:all,a:ans,h:hint,e:e,eS:expl,step:0,enx:(stem||""),say:say||stem||""}}
-/* fill-in banks: item = "stem|answer|d1|d2|d3|level|why" */
+  /* O-237: ההסבר הוא משפט בשפת הלומד (ws), והנוסחה (why) נשארת שורת דוגמה באנגלית */
+  var e=expl;if(ws){e=ws}else if(why){e=L(expl.he+" "+why,expl.ar+" "+why,expl.ru+" "+why,expl.en+" "+why)}
+  return {t:unit,q:instr,vis:vis,o:all,a:ans,h:hint,e:e,eS:expl,why:ws?why:"",step:0,enx:(stem||""),say:say||stem||""}}
+/* fill-in banks: item = "stem|answer|d1|d2|d3|level|why|he|ar|ru|en"
+   why = the rule in short English (shown as a worked line);
+   he/ar/ru/en = the same rule as one plain sentence in the learner's language (O-237) */
 function fillGen(id,items,instr,hint,expl){
-  var rows=items.map(function(s){var p=s.split("|");return {stem:p[0],ans:p[1],d:[p[2],p[3],p[4]],lv:+p[5]||2,why:p[6]||""}});
+  var rows=items.map(function(s){var p=s.split("|");return {stem:p[0],ans:p[1],d:[p[2],p[3],p[4]],lv:+p[5]||2,why:p[6]||"",ws:p[10]?L(p[7],p[8],p[9],p[10]):null}});
   G[id]=function(lv){var pool=rows.filter(function(r){return r.lv===lv});if(pool.length<2)pool=rows;var r=pick(pool);
     var say=r.stem.replace(/_+/g,"blank");
-    return mk(id,instr,"",r.ans,r.d,hint,expl,0,{stem:r.stem,say:say,why:r.why})}}
+    return mk(id,instr,"",r.ans,r.d,hint,expl,0,{stem:r.stem,say:say,why:r.why,ws:r.ws})}}
 /* reading banks: passage {id,title,text,qs:[ [kind,q,ans,d1,d2,d3,lv] ]} */
 var READ=[];
 function readGen(id,kind,instr,hint,expl){
@@ -287,6 +293,9 @@ LESSONS.read9=[
 var I_FILL=L("בחרו את התשובה שמתאימה למשפט.","اختاروا الإجابة التي تناسب الجملة.","Выбери ответ, который подходит к предложению.","Choose the answer that fits the sentence.");
 var I_READ=L("קראו את הטקסט וענו על השאלה.","اقرؤوا النص وأجيبوا عن السؤال.","Прочитай текст и ответь на вопрос.","Read the text and answer the question.");
 var E_OK=L("התשובה הנכונה מתאימה לכל המשפט.","الإجابة الصحيحة تناسب الجملة كلها.","Верный ответ подходит ко всему предложению.","The right answer fits the whole sentence.");
+var E_PICK=L("התשובה «{a}» לא מתאימה כאן.","الإجابة «{a}» لا تناسب هنا.","Ответ «{a}» здесь не подходит.","The answer “{a}” does not fit here.");
+/* O-237: מה שהלומד שומע וקורא אחרי טעות — המסיח שבחר, ואחריו המשפט של הפריט */
+function whyText(q,k){var o=q.o[k],s=lt(q.e);return (o&&o.id!==q.a)?fmt(lt(E_PICK),{a:optLabel(o)})+" "+s:s}
 var E_TXT=L("התשובה כתובה בטקסט או נובעת ממנו.","الإجابة مكتوبة في النص أو تُفهم منه.","Ответ написан в тексте или следует из него.","The answer is written in the text or comes from it.");
 function H(a,b,c,d){return L(a,b,c,d)}
 
@@ -322,444 +331,470 @@ READ.push(
 {title:"The Surprise Party",text:"Noa's friends planned a surprise party for her birthday. They told her they were going to the cinema, but they took her to Dana's house instead. When Noa opened the door, everyone shouted, \"Surprise!\" She put her hands on her face and could not say a word. Then she started to laugh, and her eyes were full of tears.",qs:[
  ["b","What did the friends tell Noa?","That they were going to the cinema","That they were going to the beach","That they were going to school","That they were going to Dana's work",1],
  ["b", "How did Noa feel at the end?", "Happy and moved", "Angry and upset", "Bored and tired", "Afraid and lost", 2],
- ["b","Why could Noa not say a word?","She was very surprised","She was angry at her friends","She was sleepy and wanted to go home","She was ill and wanted to leave",3]]}
+ ["b","Why could Noa not say a word?","She was very surprised","She was angry at her friends","She was sleepy and wanted to go home","She was ill and wanted to leave",3]]},
+{title:"The Bike Ride",text:"Every Saturday morning, Omer rides his bike with his grandfather. They start at eight o'clock and ride along the river to a small café. Omer always orders hot chocolate, and his grandfather drinks black coffee. Last Saturday Omer's bike had a flat tyre, so they walked the bikes home. His grandfather fixed the tyre in the garden.",qs:[
+ ["a","Who does Omer ride with?","His grandfather","His father","His sister","His teacher",1],
+ ["a","What does Omer always order at the café?","Hot chocolate","Black coffee","Orange juice","Cold water",1],
+ ["a","What happened last Saturday?","Omer's bike had a flat tyre","Omer fell into the river","The café was closed","It rained all morning",2]]},
+{title:"A Letter from Camp",text:"Dear Mum and Dad, I am having a great time at summer camp. We sleep in tents near a forest. Every morning we swim in the lake, and in the evening we sit around a fire and sing songs. Yesterday we climbed a hill, and I saw a deer. The food is not very good, but I am never hungry. I will be home on Friday. Love, Shira",qs:[
+ ["a","Where do the children sleep?","In tents","In a hotel","In a school","On a boat",1],
+ ["a","What did Shira see yesterday?","A deer","A bear","A snake","A horse",2],
+ ["a","When will Shira be home?","On Friday","On Sunday","Tomorrow","Next month",2]]},
+{title:"The Old Map",text:"When Lior cleaned his grandmother's attic, he found an old map in a wooden box. Some streets on the map had different names, and there was no shopping centre, only fields. In one corner someone had drawn a small red house. Lior ran downstairs with the map. His grandmother looked at it for a long time, and then she smiled. \"That was my home when I was a girl,\" she said.",qs:[
+ ["b","Why were there fields and no shopping centre on the map?","The map was very old","Lior drew the fields himself","The map showed a farm in another country","The shopping centre was closed that day",1],
+ ["b","How did the grandmother probably feel when she saw the map?","She remembered happy times","She was angry with Lior","She was bored by the map","She was afraid of the attic",2],
+ ["b","What was the small red house?","The grandmother's home long ago","Lior's new school","A shop in the city centre","A house that Lior wants to buy",3]]},
+{title:"The New Student",text:"On the first day of school, a new girl named Ana sat alone at lunch. She was from Brazil and spoke only a little Hebrew. Gal saw her and remembered his own first day in a new country. He took his tray, sat next to Ana and pointed at the food. \"Pasta,\" he said in English, and she laughed. By the end of the week, they were teaching each other new words.",qs:[
+ ["b","How did Ana probably feel at the start of lunch?","Lonely","Angry","Excited","Sleepy",1],
+ ["b","Why did Gal sit next to Ana?","He knew how it feels to be new","The teacher told him to sit there","There were no other free chairs","He wanted to eat her lunch",2],
+ ["b","What does the story show?","Small acts of kindness can start a friendship","New students should always eat alone","Learning Hebrew is very easy for everyone","Pasta is the best food for a first day",3]]}
 );
 readGen("read8","a",I_READ,H("חפשו בטקסט את המילים של השאלה וקראו את המשפט שלידן.","ابحثوا في النص عن كلمات السؤال واقرؤوا الجملة بجانبها.","Найди в тексте слова из вопроса и прочитай соседнее предложение.","Find the words of the question in the text and read the sentence next to them."),E_TXT);
 readGen("read9","b",I_READ,H("חפשו רמזים. התשובה לא תמיד כתובה במילים, אבל הרמזים מובילים אליה.","ابحثوا عن تلميحات. الإجابة ليست دائمًا مكتوبة بالكلمات لكن التلميحات تقود إليها.","Ищи подсказки. Ответ не всегда написан словами, но подсказки к нему ведут.","Look for clues. The answer is not always written in words, but the clues lead to it."),E_TXT);
 
 fillGen("be",[
-"I ___ a student.|am|is|are|be|1|I am",
-"She ___ my sister.|is|am|are|have|1|she is",
-"They ___ in the garden.|are|is|am|has|1|they are",
-"We ___ good friends.|are|is|am|be|1|we are",
-"He ___ a new bike.|has|have|is|are|1|he has",
-"I ___ two brothers.|have|has|am|is|1|I have",
-"___ you ready?|Are|Is|Am|Do|1|Are you...?",
-"My dad ___ a car.|has|have|is|are|1|My dad = he → has",
-"It ___ a cold day.|is|are|am|have|2|it is",
-"There ___ three cats in the yard.|are|is|am|has|2|there are + many",
-"There ___ a book on the table.|is|are|am|have|2|there is + one",
-"___ she have a pen?|Does|Do|Is|Are|2|Does + she + have",
-"We ___ not at home.|are|is|am|do|2|are not",
-"My friends ___ from Haifa.|are|is|am|has|2|friends = they → are",
-"I ___ not have a dog.|do|does|am|is|2|I do not have",
-"___ your brother tall?|Is|Are|Do|Does|2|brother = he → Is",
-"She ___ not have any money.|does|do|is|has|3|does not have",
-"How many pens ___ you have?|do|does|are|is|3|do + you",
-"___ there any milk?|Is|Are|Do|Have|3|milk is uncountable → Is there",
-"The children ___ hungry and tired.|are|is|has|do|3|children = they → are",
-"Where ___ your parents?|are|is|do|have|3|parents = they → are",
-"He ___ not at school today.|is|are|do|does|3|He is not",
-"My cousin ___ two dogs and a cat.|has|have|is|does|3|My cousin = he/she → has",
-"___ I late?|Am|Is|Are|Do|3|Am I...?"
+"I ___ a student.|am|is|are|be|1|I am|אחרי I תמיד באה am.|بعد I نستعمل دائمًا am.|После I всегда идёт am.|After the word I, we always use am.",
+"She ___ my sister.|is|am|are|have|1|she is|אחרי she באה is.|بعد she نستعمل is.|После she идёт is.|After the word she, we use is.",
+"They ___ in the garden.|are|is|am|has|1|they are|אחרי they באה are.|بعد they نستعمل are.|После they идёт are.|After the word they, we use are.",
+"We ___ good friends.|are|is|am|be|1|we are|אחרי we באה are.|بعد we نستعمل are.|После we идёт are.|After the word we, we use are.",
+"He ___ a new bike.|has|have|is|are|1|he has|״יש לו״ אומרים he has, עם s בסוף.|لنقول «عنده» مع he نقول has.|«У него есть» — это he has, а не have.|To say what he owns, we use has, not have.",
+"I ___ two brothers.|have|has|am|is|1|I have|״יש לי״ אומרים I have. הצורה has היא רק ל-he, she ו-it.|«عندي» تُقال I have. أما has فهي لـ he وshe وit فقط.|«У меня есть» — это I have. has только для he, she, it.|To say what I own, we use I have. has is only for he, she and it.",
+"___ you ready?|Are|Is|Am|Do|1|Are you...?|שאלה עם you מתחילה ב-Are.|السؤال مع you يبدأ بـ Are.|Вопрос с you начинается с Are.|A question with you starts with Are.",
+"My dad ___ a car.|has|have|is|are|1|My dad = he → has|My dad הוא he, ולכן כותבים has.|My dad يعني he، لذلك نكتب has.|My dad — это he, поэтому пишем has.|My dad is one person, a he, so we write has.",
+"It ___ a cold day.|is|are|am|have|2|it is|אחרי it באה is.|بعد it نستعمل is.|После it идёт is.|After the word it, we use is.",
+"There ___ three cats in the yard.|are|is|am|has|2|there are + many|יש כמה חתולים, ולכן there are.|هناك عدة قطط، لذلك there are.|Кошек несколько, поэтому there are.|There are many cats, so we use there are.",
+"There ___ a book on the table.|is|are|am|have|2|there is + one|יש ספר אחד, ולכן there is.|هناك كتاب واحد، لذلك there is.|Книга одна, поэтому there is.|There is one book, so we use there is.",
+"___ she have a pen?|Does|Do|Is|Are|2|Does + she + have|שאלה על she עם have מתחילה ב-Does.|السؤال عن she مع have يبدأ بـ Does.|Вопрос про she с have начинается с Does.|A question about she with have starts with Does.",
+"We ___ not at home.|are|is|am|do|2|are not|אחרי we באה are, וגם במשפט שלילה: we are not.|بعد we نستعمل are، وفي النفي أيضًا: we are not.|После we идёт are, и в отрицании тоже: we are not.|After we we use are, also in a no sentence: we are not.",
+"My friends ___ from Haifa.|are|is|am|has|2|friends = they → are|My friends הם כמה אנשים, כמו they, ולכן are.|My friends عدة أشخاص مثل they، لذلك are.|My friends — несколько человек, как they, поэтому are.|My friends are many people, like they, so we use are.",
+"I ___ not have a dog.|do|does|am|is|2|I do not have|שלילה עם I ו-have היא I do not have.|النفي مع I وhave يكون I do not have.|Отрицание с I и have: I do not have.|The no form with I and have is I do not have.",
+"___ your brother tall?|Is|Are|Do|Does|2|brother = he → Is|your brother הוא he, ולכן השאלה מתחילה ב-Is.|your brother يعني he، لذلك يبدأ السؤال بـ Is.|your brother — это he, поэтому вопрос начинается с Is.|Your brother is a he, so the question starts with Is.",
+"She ___ not have any money.|does|do|is|has|3|does not have|שלילה עם she ו-have היא she does not have.|النفي مع she وhave يكون she does not have.|Отрицание с she и have: she does not have.|The no form with she and have is she does not have.",
+"How many pens ___ you have?|do|does|are|is|3|do + you|בשאלה עם you ו-have משתמשים ב-do.|في السؤال مع you وhave نستعمل do.|В вопросе с you и have нужен do.|In a question with you and have, we use do.",
+"___ there any milk?|Is|Are|Do|Have|3|milk is uncountable → Is there|את milk אי אפשר לספור, ולכן Is there.|الحليب milk لا يُعدّ، لذلك Is there.|milk нельзя посчитать, поэтому Is there.|We cannot count milk, so we ask Is there.",
+"The children ___ hungry and tired.|are|is|has|do|3|children = they → are|children הם כמה ילדים, כמו they, ולכן are.|children عدة أولاد مثل they، لذلك are.|children — это несколько детей, как they, поэтому are.|Children means many kids, like they, so we use are.",
+"Where ___ your parents?|are|is|do|have|3|parents = they → are|parents הם שני אנשים, כמו they, ולכן are.|parents شخصان مثل they، لذلك are.|parents — это два человека, как they, поэтому are.|Parents are two people, like they, so we use are.",
+"He ___ not at school today.|is|are|do|does|3|He is not|אחרי he באה is, וגם בשלילה: he is not.|بعد he نستعمل is، وفي النفي أيضًا: he is not.|После he идёт is, и в отрицании тоже: he is not.|After he we use is, also in a no sentence: he is not.",
+"My cousin ___ two dogs and a cat.|has|have|is|does|3|My cousin = he/she → has|My cousin הוא אדם אחד, he או she, ולכן has.|My cousin شخص واحد، he أو she، لذلك has.|My cousin — один человек, he или she, поэтому has.|My cousin is one person, he or she, so we use has.",
+"___ I late?|Am|Is|Are|Do|3|Am I...?|שאלה עם I מתחילה ב-Am.|السؤال مع I يبدأ بـ Am.|Вопрос с I начинается с Am.|A question with I starts with Am."
 ],I_FILL,H("חשבו מי עושה: I → am, he/she/it → is, you/we/they → are. ל״יש לי״: I have, she has.","فكروا بمن يفعل: I ← am وhe/she/it ← is وyou/we/they ← are. وللملكية: I have وshe has.","Подумай, кто действует: I → am, he/she/it → is, you/we/they → are. Для «есть»: I have, she has.","Think who it is: I → am, he/she/it → is, you/we/they → are. For own: I have, she has."),E_OK);
 
 fillGen("pres",[
-"She ___ to school every day.|goes|go|is going|going|1|every day: present simple",
-"Look! The baby ___.|is sleeping|sleeps|slept|sleep|1|Look! = now",
-"I ___ milk every morning.|drink|drinks|am drinking|drinking|1|every morning: present simple",
-"They ___ football now.|are playing|play|plays|played|1|now: continuous",
-"My mother ___ in a bank.|works|work|is work|working|1|she → works",
-"He ___ TV at the moment.|is watching|watches|watch|watched|1|at the moment: continuous",
-"We usually ___ at six.|eat dinner|eats dinner|are eating dinner|eating dinner|1|usually: simple",
-"The sun ___ in the east.|rises|rise|is rising|rising|1|fact: simple",
-"She ___ coffee. She likes tea.|doesn't drink|don't drink|isn't drink|doesn't drinks|2|she doesn't + base verb",
-"___ you like pizza?|Do|Does|Are|Is|2|Do you like...?",
-"What ___ he doing now?|is|does|do|are|2|now: is + ing",
-"My brother ___ to music when he studies.|listens|listen|is listen|listening|2|he → listens",
-"Be quiet! The teacher ___.|is talking|talks|talk|talked|2|now: continuous",
-"Dan ___ his teeth twice a day.|brushes|brush|is brush|brushing|2|he → brushes",
-"I ___ my homework now, so I can't talk.|am doing|do|does|did|2|now: am doing",
-"They ___ English at school.|study|studies|is studying|studying|2|they → study",
-"He ___ to be a doctor when he grows up.|wants|want|is wanting|wanting|3|want is a state verb: simple",
-"Why ___ you laughing?|are|do|does|is|3|continuous question: are + you + ing",
-"My father ___ the car every Sunday.|washes|wash|is washing|washing|3|every Sunday: simple",
-"I ___ what you mean.|understand|am understanding|understands|understanding|3|understand: simple only",
-"Listen! Someone ___ at the door.|is knocking|knocks|knock|knocked|3|Listen! = now",
-"___ your sister play the piano?|Does|Do|Is|Are|3|Does + she + base",
-"She ___ always ___ late. It's annoying.|is / coming|does / come|are / come|do / coming|3|always + continuous = annoyance",
-"Water ___ at 100 degrees.|boils|is boiling|boil|boiling|3|fact: simple"
+"She ___ to school every day.|goes|go|is going|going|1|every day: present simple|every day אומר שזה הרגל, ולכן הווה פשוט: she goes.|every day تعني عادة، لذلك المضارع البسيط: she goes.|every day — это привычка, поэтому present simple: she goes.|Every day shows a habit, so we use present simple: she goes.",
+"Look! The baby ___.|is sleeping|sleeps|slept|sleep|1|Look! = now|Look! אומר שזה קורה עכשיו, ולכן is sleeping.|Look! تعني أن هذا يحدث الآن، لذلك is sleeping.|Look! значит, это происходит сейчас, поэтому is sleeping.|Look! means it is happening now, so we use is sleeping.",
+"I ___ milk every morning.|drink|drinks|am drinking|drinking|1|every morning: present simple|every morning הוא הרגל. עם I הפועל בלי s: I drink.|every morning عادة. ومع I الفعل بلا s: I drink.|every morning — привычка. С I глагол без s: I drink.|Every morning is a habit. With I the verb has no s: I drink.",
+"They ___ football now.|are playing|play|plays|played|1|now: continuous|now אומר שזה קורה עכשיו, ולכן are playing.|now تعني الآن، لذلك are playing.|now значит «сейчас», поэтому are playing.|Now means at this moment, so we use are playing.",
+"My mother ___ in a bank.|works|work|is work|working|1|she → works|My mother היא she, ובהווה פשוט מוסיפים s: works.|My mother هي she، وفي المضارع البسيط نضيف s: works.|My mother — это she, в present simple добавляем s: works.|My mother is a she, so in present simple we add s: works.",
+"He ___ TV at the moment.|is watching|watches|watch|watched|1|at the moment: continuous|at the moment פירושו עכשיו, ולכן is watching.|at the moment تعني الآن، لذلك is watching.|at the moment значит «сейчас», поэтому is watching.|At the moment means now, so we use is watching.",
+"We usually ___ at six.|eat dinner|eats dinner|are eating dinner|eating dinner|1|usually: simple|usually אומר שזה הרגל. עם we הפועל בלי s: eat.|usually تعني عادة. ومع we الفعل بلا s: eat.|usually — это привычка. С we глагол без s: eat.|Usually shows a habit. With we the verb has no s: eat.",
+"The sun ___ in the east.|rises|rise|is rising|rising|1|fact: simple|זו עובדה שתמיד נכונה, ולכן הווה פשוט: it rises.|هذه حقيقة ثابتة، لذلك المضارع البسيط: it rises.|Это факт, он верен всегда, поэтому present simple: rises.|This is always true, so we use present simple: it rises.",
+"She ___ coffee. She likes tea.|doesn't drink|don't drink|isn't drink|doesn't drinks|2|she doesn't + base verb|שלילה עם she היא doesn't, ואחריו פועל בלי s.|النفي مع she يكون doesn't، وبعده فعل بلا s.|Отрицание с she — doesn't, а после него глагол без s.|The no form with she is doesn't, then a verb with no s.",
+"___ you like pizza?|Do|Does|Are|Is|2|Do you like...?|שאלה בהווה פשוט עם you מתחילה ב-Do.|سؤال المضارع البسيط مع you يبدأ بـ Do.|Вопрос в present simple с you начинается с Do.|A present simple question with you starts with Do.",
+"What ___ he doing now?|is|does|do|are|2|now: is + ing|doing ו-now מראים שזה קורה עכשיו. עם he צריך is.|doing وnow تدلان على الآن. ومع he نحتاج is.|doing и now — это «сейчас». С he нужен is.|Doing and now show it is happening now. With he we need is.",
+"My brother ___ to music when he studies.|listens|listen|is listen|listening|2|he → listens|זה הרגל, ו-my brother הוא he, ולכן listens עם s.|هذه عادة، وmy brother هو he، لذلك listens مع s.|Это привычка, а my brother — это he, поэтому listens с s.|This is a habit and my brother is a he, so listens with s.",
+"Be quiet! The teacher ___.|is talking|talks|talk|talked|2|now: continuous|Be quiet! אומר שהמורה מדבר עכשיו, ולכן is talking.|Be quiet! تعني أن المعلم يتكلم الآن، لذلك is talking.|Be quiet! значит, учитель говорит сейчас, поэтому is talking.|Be quiet! shows the teacher is talking now, so is talking.",
+"Dan ___ his teeth twice a day.|brushes|brush|is brush|brushing|2|he → brushes|Dan הוא he. פועל שנגמר ב-sh מקבל es: brushes.|Dan هو he. الفعل المنتهي بـ sh يأخذ es: brushes.|Dan — это he. Глагол на sh получает es: brushes.|Dan is a he. A verb ending in sh takes es: brushes.",
+"I ___ my homework now, so I can't talk.|am doing|do|does|did|2|now: am doing|now אומר שזה קורה עכשיו. עם I צריך am doing.|now تعني الآن. ومع I نحتاج am doing.|now — это «сейчас». С I нужно am doing.|Now shows it is happening now. With I we need am doing.",
+"They ___ English at school.|study|studies|is studying|studying|2|they → study|עם they הפועל בהווה פשוט בלי s: study.|مع they الفعل في المضارع البسيط بلا s: study.|С they глагол в present simple без s: study.|With they, the present simple verb has no s: study.",
+"He ___ to be a doctor when he grows up.|wants|want|is wanting|wanting|3|want is a state verb: simple|want הוא פועל של רצון, והוא לא בא עם ing. עם he: wants.|want فعل رغبة ولا يأتي مع ing. ومع he نقول wants.|want — глагол желания, он не бывает с ing. С he: wants.|Want is about a wish and is not used with ing. With he: wants.",
+"Why ___ you laughing?|are|do|does|is|3|continuous question: are + you + ing|laughing מראה שזה קורה עכשיו. עם you צריך are.|laughing تدل على الآن. ومع you نحتاج are.|laughing — это «сейчас». С you нужен are.|Laughing shows it is happening now. With you we need are.",
+"My father ___ the car every Sunday.|washes|wash|is washing|washing|3|every Sunday: simple|every Sunday הוא הרגל. עם he מוסיפים es: washes.|every Sunday عادة. ومع he نضيف es: washes.|every Sunday — привычка. С he добавляем es: washes.|Every Sunday is a habit. With he we add es: washes.",
+"I ___ what you mean.|understand|am understanding|understands|understanding|3|understand: simple only|understand הוא פועל של מחשבה, והוא לא בא עם ing.|understand فعل تفكير ولا يأتي مع ing.|understand — глагол мысли, он не бывает с ing.|Understand is about thinking, and it is not used with ing.",
+"Listen! Someone ___ at the door.|is knocking|knocks|knock|knocked|3|Listen! = now|Listen! אומר שזה קורה עכשיו, ולכן is knocking.|Listen! تعني أن هذا يحدث الآن، لذلك is knocking.|Listen! значит, это происходит сейчас, поэтому is knocking.|Listen! means it is happening now, so we use is knocking.",
+"___ your sister play the piano?|Does|Do|Is|Are|3|Does + she + base|your sister היא she, ולכן השאלה מתחילה ב-Does.|your sister هي she، لذلك يبدأ السؤال بـ Does.|your sister — это she, поэтому вопрос начинается с Does.|Your sister is a she, so the question starts with Does.",
+"She ___ always ___ late. It's annoying.|is / coming|does / come|are / come|do / coming|3|always + continuous = annoyance|always עם is ו-ing מראה דבר מרגיז שקורה שוב ושוב.|always مع is وing تدل على أمر مزعج يتكرر.|always с is и ing — то, что раздражает снова и снова.|Always with is and ing shows something annoying that keeps happening.",
+"Water ___ at 100 degrees.|boils|is boiling|boil|boiling|3|fact: simple|זו עובדה מדעית שתמיד נכונה, ולכן הווה פשוט: boils.|هذه حقيقة علمية ثابتة، لذلك المضارع البسيط: boils.|Это научный факт, он верен всегда, поэтому present simple: boils.|This science fact is always true, so we use present simple: boils."
 ],I_FILL,H("חפשו מילת זמן: every day, usually → פשוט. now, look! → ממשיך (am/is/are + ing).","ابحثوا عن كلمة زمن: every day وusually ← بسيط. now وlook! ← مستمر (am/is/are + ing).","Найди слово времени: every day, usually → simple. now, look! → continuous (am/is/are + ing).","Find a time word: every day, usually → simple. now, look! → continuous (am/is/are + ing)."),E_OK);
 
 fillGen("past",[
-"Yesterday I ___ to the beach.|went|go|goes|going|1|go → went",
-"She ___ a book last night.|read|reads|reading|readed|1|read → read",
-"We ___ pizza for dinner last night.|ate|eat|eaten|eated|1|eat → ate",
-"He ___ his bike to school yesterday.|rode|ride|rides|rided|1|ride → rode",
-"They ___ football on Friday.|played|play|plays|playing|1|play + ed",
-"I ___ my keys yesterday.|lost|lose|loses|losed|1|lose → lost",
-"She ___ a new dress last week.|bought|buy|buys|buyed|1|buy → bought",
-"We ___ a good film last night.|saw|see|seen|seed|1|see → saw",
-"Did you ___ the movie?|like|liked|likes|liking|2|after did: base verb",
-"I did not ___ the answer.|know|knew|known|knows|2|did not + base verb",
-"What time ___ you get up yesterday?|did|do|does|were|2|past question: did",
-"He ___ a lot of water after the game.|drank|drink|drunk|drinked|2|drink → drank",
-"The film ___ at eight and ended at ten.|started|start|starts|starting|2|start + ed",
-"She ___ me a letter last month.|wrote|write|written|writed|2|write → wrote",
-"They ___ home late last night.|came|come|comes|comed|2|come → came",
-"My mother ___ me a story when I was small.|told|tell|tells|telled|2|tell → told",
-"I ___ him in the park an hour ago.|met|meet|meets|meeted|3|meet → met",
-"The little girl ___ the glass of milk.|broke|break|broken|breaked|3|break → broke",
-"___ you do your homework yesterday?|Did|Do|Were|Are|3|past question: Did",
-"We ___ at the museum for three hours last Sunday.|stayed|stay|stays|staying|3|stay + ed",
-"He ___ not call me back yesterday.|did|does|do|was|3|did not + base",
-"The teacher ___ us a difficult question yesterday.|asked|ask|asks|asking|3|ask + ed",
-"She ___ happy when she saw the gift.|was|were|is|did|3|she was",
-"We ___ in Rome two years ago.|were|was|are|did|3|we were"
+"Yesterday I ___ to the beach.|went|go|goes|going|1|go → went|yesterday הוא עבר. העבר של go הוא went.|yesterday تعني الماضي. وماضي go هو went.|yesterday — это прошлое. Прошедшее от go — went.|Yesterday is in the past. The past of go is went.",
+"She ___ a book last night.|read|reads|reading|readed|1|read → read|העבר של read נכתב read, אבל נשמע כמו red.|ماضي read يُكتب read لكنه يُلفظ مثل red.|Прошедшее от read пишется read, но звучит как red.|The past of read is written read, but it sounds like red.",
+"We ___ pizza for dinner last night.|ate|eat|eaten|eated|1|eat → ate|last night הוא עבר. העבר של eat הוא ate.|last night تعني الماضي. وماضي eat هو ate.|last night — это прошлое. Прошедшее от eat — ate.|Last night is in the past. The past of eat is ate.",
+"He ___ his bike to school yesterday.|rode|ride|rides|rided|1|ride → rode|yesterday הוא עבר. העבר של ride הוא rode.|yesterday تعني الماضي. وماضي ride هو rode.|yesterday — это прошлое. Прошедшее от ride — rode.|Yesterday is in the past. The past of ride is rode.",
+"They ___ football on Friday.|played|play|plays|playing|1|play + ed|זה כבר קרה. play הוא פועל רגיל, ולכן מוסיפים ed.|هذا حدث في الماضي. play فعل عادي، لذلك نضيف ed.|Это уже было. play — обычный глагол, поэтому добавляем ed.|This already happened. Play is a regular verb, so we add ed.",
+"I ___ my keys yesterday.|lost|lose|loses|losed|1|lose → lost|yesterday הוא עבר. העבר של lose הוא lost.|yesterday تعني الماضي. وماضي lose هو lost.|yesterday — это прошлое. Прошедшее от lose — lost.|Yesterday is in the past. The past of lose is lost.",
+"She ___ a new dress last week.|bought|buy|buys|buyed|1|buy → bought|last week הוא עבר. העבר של buy הוא bought.|last week تعني الماضي. وماضي buy هو bought.|last week — это прошлое. Прошедшее от buy — bought.|Last week is in the past. The past of buy is bought.",
+"We ___ a good film last night.|saw|see|seen|seed|1|see → saw|last night הוא עבר. העבר של see הוא saw.|last night تعني الماضي. وماضي see هو saw.|last night — это прошлое. Прошедшее от see — saw.|Last night is in the past. The past of see is saw.",
+"Did you ___ the movie?|like|liked|likes|liking|2|after did: base verb|אחרי did הפועל בצורה הבסיסית, בלי ed.|بعد did يأتي الفعل بصيغته الأساسية، بلا ed.|После did глагол в начальной форме, без ed.|After did, the verb is in its base form, with no ed.",
+"I did not ___ the answer.|know|knew|known|knows|2|did not + base verb|אחרי did not הפועל בצורה הבסיסית: know.|بعد did not يأتي الفعل بصيغته الأساسية: know.|После did not глагол в начальной форме: know.|After did not, the verb is in its base form: know.",
+"What time ___ you get up yesterday?|did|do|does|were|2|past question: did|yesterday הוא עבר, ושאלה בעבר נבנית עם did.|yesterday تعني الماضي، والسؤال في الماضي يُبنى مع did.|yesterday — прошлое, а вопрос в прошлом строится с did.|Yesterday is in the past, and a past question uses did.",
+"He ___ a lot of water after the game.|drank|drink|drunk|drinked|2|drink → drank|זה קרה אחרי המשחק. העבר של drink הוא drank.|هذا حدث بعد المباراة. وماضي drink هو drank.|Это было после игры. Прошедшее от drink — drank.|It happened after the game. The past of drink is drank.",
+"The film ___ at eight and ended at ten.|started|start|starts|starting|2|start + ed|הסרט כבר נגמר. start הוא פועל רגיל, ולכן מוסיפים ed.|الفيلم انتهى. start فعل عادي، لذلك نضيف ed.|Фильм уже закончился. start — обычный глагол, добавляем ed.|The film is over. Start is a regular verb, so we add ed.",
+"She ___ me a letter last month.|wrote|write|written|writed|2|write → wrote|last month הוא עבר. העבר של write הוא wrote.|last month تعني الماضي. وماضي write هو wrote.|last month — это прошлое. Прошедшее от write — wrote.|Last month is in the past. The past of write is wrote.",
+"They ___ home late last night.|came|come|comes|comed|2|come → came|last night הוא עבר. העבר של come הוא came.|last night تعني الماضي. وماضي come هو came.|last night — это прошлое. Прошедшее от come — came.|Last night is in the past. The past of come is came.",
+"My mother ___ me a story when I was small.|told|tell|tells|telled|2|tell → told|when I was small הוא עבר. העבר של tell הוא told.|when I was small تعني الماضي. وماضي tell هو told.|when I was small — это прошлое. Прошедшее от tell — told.|When I was small is in the past. The past of tell is told.",
+"I ___ him in the park an hour ago.|met|meet|meets|meeted|3|meet → met|an hour ago הוא עבר. העבר של meet הוא met.|an hour ago تعني الماضي. وماضي meet هو met.|an hour ago — это прошлое. Прошедшее от meet — met.|An hour ago is in the past. The past of meet is met.",
+"The little girl ___ the glass of milk.|broke|break|broken|breaked|3|break → broke|זה כבר קרה. העבר של break הוא broke.|هذا حدث في الماضي. وماضي break هو broke.|Это уже случилось. Прошедшее от break — broke.|This already happened. The past of break is broke.",
+"___ you do your homework yesterday?|Did|Do|Were|Are|3|past question: Did|yesterday הוא עבר, ושאלה בעבר מתחילה ב-Did.|yesterday تعني الماضي، والسؤال في الماضي يبدأ بـ Did.|yesterday — прошлое, а вопрос в прошлом начинается с Did.|Yesterday is in the past, so the question starts with Did.",
+"We ___ at the museum for three hours last Sunday.|stayed|stay|stays|staying|3|stay + ed|last Sunday הוא עבר. stay הוא פועל רגיל, ולכן מוסיפים ed.|last Sunday تعني الماضي. stay فعل عادي، لذلك نضيف ed.|last Sunday — прошлое. stay — обычный глагол, добавляем ed.|Last Sunday is in the past. Stay is a regular verb, so we add ed.",
+"He ___ not call me back yesterday.|did|does|do|was|3|did not + base|שלילה בעבר היא did not, ואחריה פועל בצורה הבסיסית.|النفي في الماضي هو did not، وبعده الفعل بصيغته الأساسية.|Отрицание в прошлом — did not, а потом глагол в начальной форме.|The no form in the past is did not, then the base verb.",
+"The teacher ___ us a difficult question yesterday.|asked|ask|asks|asking|3|ask + ed|yesterday הוא עבר. ask הוא פועל רגיל, ולכן מוסיפים ed.|yesterday تعني الماضي. ask فعل عادي، لذلك نضيف ed.|yesterday — прошлое. ask — обычный глагол, добавляем ed.|Yesterday is in the past. Ask is a regular verb, so we add ed.",
+"She ___ happy when she saw the gift.|was|were|is|did|3|she was|saw הוא עבר. העבר של is הוא was: she was.|saw في الماضي. وماضي is هو was: she was.|saw — прошлое. Прошедшее от is — was: she was.|Saw is in the past. The past of is is was: she was.",
+"We ___ in Rome two years ago.|were|was|are|did|3|we were|two years ago הוא עבר. עם we העבר של are הוא were.|two years ago تعني الماضي. ومع we ماضي are هو were.|two years ago — прошлое. С we прошедшее от are — were.|Two years ago is in the past. With we, the past of are is were."
 ],I_FILL,H("מילות עבר: yesterday, last week, ago. פועל רגיל: ed. פועל מיוחד: צריך לזכור. אחרי did: פועל בלי ed.","كلمات الماضي: yesterday وlast week وago. فعل عادي: ed. فعل خاص: نتذكره. بعد did: فعل بلا ed.","Слова прошлого: yesterday, last week, ago. Обычный глагол: ed. Особый — надо помнить. После did: глагол без ed.","Past words: yesterday, last week, ago. Regular verb: ed. Special verb: remember it. After did: a verb without ed."),E_OK);
 
 fillGen("art",[
-"I have ___ apple.|an|a|the|some|1|apple starts with a vowel sound: an",
-"She is ___ teacher.|a|an|some|many|1|teacher starts with a consonant: a",
-"There is ___ egg in the box.|an|a|some|many|1|egg: vowel → an",
-"He is ___ honest boy.|an|a|the|some|2|honest: the h is silent → an",
-"We need ___ milk.|some|a|many|an|1|milk is uncountable: some",
-"How ___ books do you have?|many|much|a|some|1|books are countable: many",
-"How ___ water do you drink?|much|many|a|an|1|water is uncountable: much",
-"I don't have ___ money.|any|an|a|many|1|negative: any",
-"Do you have ___ brothers?|any|a|an|much|2|question + plural: any",
-"There are ___ chairs in the room.|some|a|an|much|2|plural, yes sentence: some",
-"We have ___ bread. We can make sandwiches.|some|many|an|a few|2|bread is uncountable: some",
-"I need ___ glass of water.|a|an|many|much|2|glass: consonant → a",
-"There isn't ___ juice.|any|many|an|a|2|negative uncountable: any",
-"She has ___ friends in this town.|a few|a little|much|an|2|friends are countable: a few",
-"He has ___ time to help us.|a little|a few|many|an|2|time is uncountable: a little",
-"___ sun is a star.|The|A|An|Some|2|the sun: only one",
-"There is only ___ rice left.|a little|a few|many|an|3|rice uncountable: a little",
-"There are too ___ people on the bus.|many|much|a little|an|3|people countable: many",
-"I'd like ___ umbrella, please.|an|a|some|many|3|umbrella: vowel sound → an",
-"Is there ___ sugar in your tea?|any|an|many|a few|3|question + uncountable: any",
-"He ate ___ cake and now he is full.|too much|too many|a few|many|3|cake uncountable: too much",
-"How ___ homework do you have today?|much|many|a few|an|3|homework is uncountable: much",
-"We saw ___ elephant at the zoo.|an|a|some|much|3|elephant: vowel → an",
-"She wears ___ uniform to school.|a|an|some|many|3|uniform starts with a y sound: a"
+"I have ___ apple.|an|a|the|some|1|apple starts with a vowel sound: an|apple מתחילה בצליל תנועה, ולכן an.|apple تبدأ بصوت علة، لذلك an.|apple начинается с гласного звука, поэтому an.|Apple starts with a vowel sound, so we use an.",
+"She is ___ teacher.|a|an|some|many|1|teacher starts with a consonant: a|teacher מתחילה בצליל עיצור, ולכן a.|teacher تبدأ بصوت ساكن، لذلك a.|teacher начинается с согласного звука, поэтому a.|Teacher starts with a consonant sound, so we use a.",
+"There is ___ egg in the box.|an|a|some|many|1|egg: vowel → an|egg מתחילה בצליל תנועה, ולכן an.|egg تبدأ بصوت علة، لذلك an.|egg начинается с гласного звука, поэтому an.|Egg starts with a vowel sound, so we use an.",
+"He is ___ honest boy.|an|a|the|some|2|honest: the h is silent → an|ב-honest לא שומעים את ה-h. הצליל הראשון הוא תנועה, ולכן an.|في honest لا نلفظ h. أول صوت هو علة، لذلك an.|В honest не слышно h. Первый звук гласный, поэтому an.|In honest we do not hear the h. It starts with a vowel sound, so an.",
+"We need ___ milk.|some|a|many|an|1|milk is uncountable: some|את milk אי אפשר לספור, ולכן some ולא a או many.|الحليب milk لا يُعدّ، لذلك some وليس a أو many.|milk нельзя посчитать, поэтому some, а не a или many.|We cannot count milk, so we use some, not a or many.",
+"How ___ books do you have?|many|much|a|some|1|books are countable: many|את books אפשר לספור, ולכן How many.|الكتب books تُعدّ، لذلك How many.|books можно посчитать, поэтому How many.|We can count books, so we ask How many.",
+"How ___ water do you drink?|much|many|a|an|1|water is uncountable: much|את water אי אפשר לספור, ולכן How much.|الماء water لا يُعدّ، لذلك How much.|water нельзя посчитать, поэтому How much.|We cannot count water, so we ask How much.",
+"I don't have ___ money.|any|an|a|many|1|negative: any|במשפט שלילה משתמשים ב-any.|في جملة النفي نستعمل any.|В отрицании используем any.|In a no sentence we use any.",
+"Do you have ___ brothers?|any|a|an|much|2|question + plural: any|בשאלה עם רבים משתמשים ב-any.|في السؤال مع الجمع نستعمل any.|В вопросе с множественным числом используем any.|In a question with a plural noun we use any.",
+"There are ___ chairs in the room.|some|a|an|much|2|plural, yes sentence: some|במשפט חיובי עם רבים משתמשים ב-some.|في جملة مثبتة مع الجمع نستعمل some.|В утвердительном предложении с множественным числом — some.|In a yes sentence with a plural noun we use some.",
+"We have ___ bread. We can make sandwiches.|some|many|an|a few|2|bread is uncountable: some|את bread אי אפשר לספור, ובמשפט חיובי אומרים some.|الخبز bread لا يُعدّ، وفي الجملة المثبتة نقول some.|bread нельзя посчитать, и в утверждении говорим some.|We cannot count bread, and in a yes sentence we use some.",
+"I need ___ glass of water.|a|an|many|much|2|glass: consonant → a|glass מתחילה בצליל עיצור, ולכן a.|glass تبدأ بصوت ساكن، لذلك a.|glass начинается с согласного звука, поэтому a.|Glass starts with a consonant sound, so we use a.",
+"There isn't ___ juice.|any|many|an|a|2|negative uncountable: any|במשפט שלילה, עם משהו שאי אפשר לספור, אומרים any.|في النفي مع شيء لا يُعدّ نقول any.|В отрицании с несчитаемым словом говорим any.|In a no sentence with something we cannot count, we use any.",
+"She has ___ friends in this town.|a few|a little|much|an|2|friends are countable: a few|את friends אפשר לספור, ולכן a few ולא a little.|الأصدقاء friends يُعدّون، لذلك a few وليس a little.|friends можно посчитать, поэтому a few, а не a little.|We can count friends, so we use a few, not a little.",
+"He has ___ time to help us.|a little|a few|many|an|2|time is uncountable: a little|את time כאן אי אפשר לספור, ולכן a little.|الوقت time هنا لا يُعدّ، لذلك a little.|time здесь нельзя посчитать, поэтому a little.|Here we cannot count time, so we use a little.",
+"___ sun is a star.|The|A|An|Some|2|the sun: only one|יש רק שמש אחת, ולכן the.|هناك شمس واحدة فقط، لذلك the.|Солнце только одно, поэтому the.|There is only one sun, so we use the.",
+"There is only ___ rice left.|a little|a few|many|an|3|rice uncountable: a little|את rice אי אפשר לספור, ולכן a little.|الأرز rice لا يُعدّ، لذلك a little.|rice нельзя посчитать, поэтому a little.|We cannot count rice, so we use a little.",
+"There are too ___ people on the bus.|many|much|a little|an|3|people countable: many|את people אפשר לספור, ולכן too many.|الناس people يُعدّون، لذلك too many.|people можно посчитать, поэтому too many.|We can count people, so we use too many.",
+"I'd like ___ umbrella, please.|an|a|some|many|3|umbrella: vowel sound → an|umbrella מתחילה בצליל תנועה, ולכן an.|umbrella تبدأ بصوت علة، لذلك an.|umbrella начинается с гласного звука, поэтому an.|Umbrella starts with a vowel sound, so we use an.",
+"Is there ___ sugar in your tea?|any|an|many|a few|3|question + uncountable: any|בשאלה, עם משהו שאי אפשר לספור, אומרים any.|في السؤال مع شيء لا يُعدّ نقول any.|В вопросе с несчитаемым словом говорим any.|In a question with something we cannot count, we use any.",
+"He ate ___ cake and now he is full.|too much|too many|a few|many|3|cake uncountable: too much|כאן cake היא כמות ולא עוגות שסופרים, ולכן too much.|هنا cake كمية وليست قطعًا نعدّها، لذلك too much.|Здесь cake — это количество, а не штуки, поэтому too much.|Here cake is an amount, not pieces we count, so too much.",
+"How ___ homework do you have today?|much|many|a few|an|3|homework is uncountable: much|את homework אי אפשר לספור באנגלית, ולכן How much.|الوظيفة homework لا تُعدّ في الإنجليزية، لذلك How much.|homework в английском нельзя посчитать, поэтому How much.|In English we cannot count homework, so we ask How much.",
+"We saw ___ elephant at the zoo.|an|a|some|much|3|elephant: vowel → an|elephant מתחילה בצליל תנועה, ולכן an.|elephant تبدأ بصوت علة، لذلك an.|elephant начинается с гласного звука, поэтому an.|Elephant starts with a vowel sound, so we use an.",
+"She wears ___ uniform to school.|a|an|some|many|3|uniform starts with a y sound: a|uniform מתחילה בצליל y, ולכן a.|uniform تبدأ بصوت y، لذلك a.|uniform начинается со звука «й», поэтому a.|Uniform starts with a y sound, so we use a."
 ],I_FILL,H("שאלו: אפשר לספור? אפשר → many, a few. אי אפשר → much, a little. a לפני עיצור, an לפני תנועה.","اسألوا: هل يمكن عدّه؟ نعم ← many وa few. لا ← much وa little. a قبل ساكن وan قبل علة.","Спроси: можно посчитать? Да → many, a few. Нет → much, a little. a перед согласным, an перед гласным.","Ask: can we count it? Yes → many, a few. No → much, a little. a before a consonant sound, an before a vowel sound."),E_OK);
 
 fillGen("prep",[
-"My birthday is ___ June.|in|on|at|to|1|in + month",
-"The lesson starts ___ eight o'clock.|at|in|on|by|1|at + hour",
-"We have a test ___ Monday.|on|in|at|to|1|on + day",
-"The cat is ___ the table. I can see it below.|under|on|in|behind the|1|under = below",
-"The shop is ___ the bank and the school.|between|at|on|to|1|between two things",
-"___ is your birthday? It's in May.|When|Where|Who|Why|1|When asks about time",
-"___ do you live? In Haifa.|Where|When|Who|What|1|Where asks about place",
-"___ is that girl? She is my cousin.|Who|When|Where|How many|1|Who asks about a person",
-"I go to school ___ bus.|by|in|at|with|2|by bus",
-"My grandmother lives ___ a small village.|in|on|at|to|2|in + village",
-"The picture is ___ the wall.|on|in|at|between|2|on the wall",
-"We arrive ___ the station at nine.|at|in|on|to|2|arrive at + station",
-"He is afraid ___ dogs.|of|from|for|at|2|afraid of",
-"___ do you go to school? By bike.|How|When|Who|Where|2|How asks about the way",
-"___ are you laughing? It's funny!|Why|Who|Where|When|2|Why asks for a reason",
-"I'm good ___ maths.|at|in|on|for|2|good at",
-"What ___ the weekend? Let's go to the beach.|about|for|to|at|3|What about...?",
-"We walked ___ the park to get to school.|through|between|to|at|3|through = from one side to the other",
-"The bird flew ___ the house.|over|between|at|of|3|over = above and across",
-"I'm interested ___ music.|in|at|on|for|3|interested in",
-"___ much is this T-shirt?|How|What|Which|Who|3|How much asks for a price",
-"___ of these two bags is yours?|Which|Who|Where|When|3|Which = choose from a group",
-"She has lived here ___ 2019.|since|for|in|at|3|since + point in time",
-"We stayed in Eilat ___ three days.|for|since|at|on|3|for + a length of time"
+"My birthday is ___ June.|in|on|at|to|1|in + month|לפני חודש באה in.|قبل الشهر نستعمل in.|Перед месяцем ставим in.|Before a month we use in.",
+"The lesson starts ___ eight o'clock.|at|in|on|by|1|at + hour|לפני שעה באה at.|قبل الساعة نستعمل at.|Перед временем по часам ставим at.|Before a clock time we use at.",
+"We have a test ___ Monday.|on|in|at|to|1|on + day|לפני יום בשבוע באה on.|قبل يوم من أيام الأسبوع نستعمل on.|Перед днём недели ставим on.|Before a day of the week we use on.",
+"The cat is ___ the table. I can see it below.|under|on|in|behind the|1|under = below|under פירושו מתחת, והחתול למטה.|under تعني تحت، والقط في الأسفل.|under значит «под», а кот внизу.|Under means below, and the cat is below the table.",
+"The shop is ___ the bank and the school.|between|at|on|to|1|between two things|between פירושו בין שני דברים, כמו הבנק ובית הספר.|between تعني بين شيئين، مثل البنك والمدرسة.|between значит «между двумя», как банк и школа.|Between is for a place in the middle of two things.",
+"___ is your birthday? It's in May.|When|Where|Who|Why|1|When asks about time|התשובה היא חודש, ועל זמן שואלים ב-When.|الجواب شهر، ونسأل عن الزمن بـ When.|Ответ — месяц, а о времени спрашиваем When.|The answer is a month, and we ask about time with When.",
+"___ do you live? In Haifa.|Where|When|Who|What|1|Where asks about place|התשובה היא מקום, ועל מקום שואלים ב-Where.|الجواب مكان، ونسأل عن المكان بـ Where.|Ответ — место, а о месте спрашиваем Where.|The answer is a place, and we ask about a place with Where.",
+"___ is that girl? She is my cousin.|Who|When|Where|How many|1|Who asks about a person|התשובה היא אדם, ועל אדם שואלים ב-Who.|الجواب شخص، ونسأل عن الشخص بـ Who.|Ответ — человек, а о человеке спрашиваем Who.|The answer is a person, and we ask about a person with Who.",
+"I go to school ___ bus.|by|in|at|with|2|by bus|נסיעה באוטובוס היא by bus.|للسفر بالحافلة نقول by bus.|Ехать на автобусе — by bus.|To travel on a bus, we say by bus.",
+"My grandmother lives ___ a small village.|in|on|at|to|2|in + village|לפני כפר או עיר באה in.|قبل قرية أو مدينة نستعمل in.|Перед деревней или городом ставим in.|Before a village or a city we use in.",
+"The picture is ___ the wall.|on|in|at|between|2|on the wall|תמונה שתלויה על קיר היא on the wall.|الصورة المعلّقة على الحائط هي on the wall.|Картина, которая висит на стене, — on the wall.|A picture that hangs on a wall is on the wall.",
+"We arrive ___ the station at nine.|at|in|on|to|2|arrive at + station|מגיעים לתחנה אומרים arrive at.|للوصول إلى محطة نقول arrive at.|Прибыть на станцию — arrive at.|We arrive at a station, not to it.",
+"He is afraid ___ dogs.|of|from|for|at|2|afraid of|אחרי afraid תמיד באה of.|بعد afraid تأتي دائمًا of.|После afraid всегда идёт of.|After afraid we always use of.",
+"___ do you go to school? By bike.|How|When|Who|Where|2|How asks about the way|התשובה היא דרך, ועל דרך שואלים ב-How.|الجواب طريقة، ونسأل عن الطريقة بـ How.|Ответ — способ, а о способе спрашиваем How.|The answer is a way, and we ask about the way with How.",
+"___ are you laughing? It's funny!|Why|Who|Where|When|2|Why asks for a reason|התשובה היא סיבה, ועל סיבה שואלים ב-Why.|الجواب سبب، ونسأل عن السبب بـ Why.|Ответ — причина, а о причине спрашиваем Why.|The answer is a reason, and we ask for a reason with Why.",
+"I'm good ___ maths.|at|in|on|for|2|good at|אחרי good, כשמדברים על משהו שיודעים לעשות, באה at.|بعد good، عندما نتكلم عن مهارة، تأتي at.|После good, когда речь о навыке, идёт at.|After good, when we talk about a skill, we use at.",
+"What ___ the weekend? Let's go to the beach.|about|for|to|at|3|What about...?|כדי להציע משהו אומרים What about.|لاقتراح شيء نقول What about.|Чтобы что-то предложить, говорим What about.|To suggest something, we say What about.",
+"We walked ___ the park to get to school.|through|between|to|at|3|through = from one side to the other|through פירושו לעבור מצד אחד של הפארק לצד השני.|through تعني المرور من جهة إلى الجهة الأخرى.|through значит пройти с одной стороны на другую.|Through means going in one side and out the other.",
+"The bird flew ___ the house.|over|between|at|of|3|over = above and across|over פירושו מעל הבית, מצד לצד.|over تعني فوق البيت من جهة إلى أخرى.|over значит над домом, с одной стороны на другую.|Over means above the house, from one side to the other.",
+"I'm interested ___ music.|in|at|on|for|3|interested in|אחרי interested תמיד באה in.|بعد interested تأتي دائمًا in.|После interested всегда идёт in.|After interested we always use in.",
+"___ much is this T-shirt?|How|What|Which|Who|3|How much asks for a price|כדי לשאול על מחיר אומרים How much.|للسؤال عن السعر نقول How much.|Чтобы спросить о цене, говорим How much.|To ask about a price, we say How much.",
+"___ of these two bags is yours?|Which|Who|Where|When|3|Which = choose from a group|בוחרים מתוך שני תיקים, ולכן Which.|نختار من بين حقيبتين، لذلك Which.|Выбираем из двух сумок, поэтому Which.|We choose from two bags, so we use Which.",
+"She has lived here ___ 2019.|since|for|in|at|3|since + point in time|2019 היא נקודה בזמן, ולפניה באה since.|2019 نقطة زمنية، وقبلها نستعمل since.|2019 — это момент во времени, перед ним since.|2019 is a point in time, so we use since.",
+"We stayed in Eilat ___ three days.|for|since|at|on|3|for + a length of time|three days הוא משך זמן, ולפניו באה for.|three days مدة زمنية، وقبلها نستعمل for.|three days — это период, перед ним for.|Three days is a length of time, so we use for."
 ],I_FILL,H("in: חודש, שנה. on: יום. at: שעה. מילות שאלה: who (מי), where (איפה), when (מתי), why (למה).","in: شهر وسنة. on: يوم. at: ساعة. كلمات السؤال: who (من) وwhere (أين) وwhen (متى) وwhy (لماذا).","in: месяц, год. on: день. at: час. Вопросы: who (кто), where (где), when (когда), why (почему).","in: month, year. on: day. at: hour. Question words: who, where, when, why."),E_OK);
 
 fillGen("v7",[
-"I do my ___ after school. (Hebrew: שיעורי בית)|homework|breakfast|holiday|shopping|1|homework = tasks from school",
-"My mother's brother is my ___.|uncle|cousin|nephew|grandfather|1|uncle = mother's or father's brother",
-"I eat a sandwich for ___ at noon.|lunch|breakfast|dinner|supper late|1|lunch is at noon",
-"Please close the ___. It's cold.|window|ceiling|floor|garden|1|a window can be opened and closed",
-"The ___ teaches us English.|teacher|doctor|driver|baker|1|a teacher works at school",
-"I like to ___ in the sea in summer.|swim|fly|climb|type|1|swim = move in water",
-"My father's mother is my ___.|grandmother|aunt|sister|cousin|1|grandmother",
-"We write with a ___.|pen|fork|plate|chair|1|a pen is for writing",
-"My uncle's son is my ___.|cousin|brother|nephew|grandson|2|cousin = child of an uncle or aunt",
-"At the end of the lesson there is a ___.|break|test paper|holiday|exam hall|2|break = a short rest",
-"I ___ stamps. I have a big collection.|collect|cook|throw|borrow|2|collect = keep many things of one kind",
-"We buy bread at the ___.|bakery|library|pharmacy|bank|2|a bakery sells bread",
-"I take a book from the ___.|library|bakery|cinema|zoo|2|a library lends books",
-"She wears a ___ when it rains.|raincoat|swimsuit|scarf only|uniform|2|a raincoat keeps you dry",
-"A person who plays football is a ___.|player|singer|painter|farmer|2|a player plays a game",
-"We usually ___ the table before dinner.|set|break|climb|print|2|set the table",
-"I'm really ___ because I didn't eat all day.|hungry|thirsty|sleepy|angry|3|hungry = need food",
-"My brother is very ___. He never stops talking.|talkative|quiet|shy|lazy|3|talkative = talks a lot",
-"It's a ___ day. There are no clouds.|sunny|rainy|snowy|windy|3|sunny = lots of sun",
-"I need to ___ my room. It's very messy.|clean|spill|ruin|print|3|clean = make tidy",
-"My favourite ___ is chess. I play it every Friday.|hobby|homework|subject|uniform|3|hobby = what we like to do in free time",
-"She is not at home. She is ___ the supermarket.|at|on|between|under|3|at the supermarket",
-"The opposite of 'early' is ___.|late|soon|quick|fast|3|early ≠ late",
-"The ___ of my house is red. You can't miss it.|door|ground only|ceiling only|tap|3|a door is part of a house"
+"I do my ___ after school. (Hebrew: שיעורי בית)|homework|breakfast|holiday|shopping|1|homework = tasks from school|homework הם שיעורי בית, ועושים אותם אחרי בית הספר.|homework هي الوظائف المنزلية، ونقوم بها بعد المدرسة.|homework — это домашнее задание, его делают после школы.|Homework is school work we do at home after school.",
+"My mother's brother is my ___.|uncle|cousin|nephew|grandfather|1|uncle = mother's or father's brother|האח של אמא או של אבא הוא uncle.|أخو الأم أو أخو الأب هو uncle.|Брат мамы или папы — это uncle.|The brother of your mother or father is your uncle.",
+"I eat a sandwich for ___ at noon.|lunch|breakfast|dinner|supper late|1|lunch is at noon|הארוחה של הצהריים היא lunch.|وجبة الظهر هي lunch.|Обед в полдень — это lunch.|The meal we eat at noon is lunch.",
+"Please close the ___. It's cold.|window|ceiling|floor|garden|1|a window can be opened and closed|חלון סוגרים כשקר, ולכן window.|النافذة نغلقها عندما يكون الجو باردًا، لذلك window.|Окно закрывают, когда холодно, поэтому window.|We close a window when it is cold.",
+"The ___ teaches us English.|teacher|doctor|driver|baker|1|a teacher works at school|מי שמלמד אותנו אנגלית הוא teacher.|من يعلّمنا الإنجليزية هو teacher.|Тот, кто учит нас английскому, — teacher.|The person who teaches us English is a teacher.",
+"I like to ___ in the sea in summer.|swim|fly|climb|type|1|swim = move in water|בים שוחים, ולכן swim.|في البحر نسبح، لذلك swim.|В море плавают, поэтому swim.|In the sea we swim.",
+"My father's mother is my ___.|grandmother|aunt|sister|cousin|1|grandmother|האמא של אבא היא grandmother, סבתא.|أمّ الأب هي grandmother، أي الجدّة.|Мама папы — это grandmother, бабушка.|Your father's mother is your grandmother.",
+"We write with a ___.|pen|fork|plate|chair|1|a pen is for writing|כותבים בעט, ועט הוא pen.|نكتب بالقلم، والقلم هو pen.|Пишут ручкой, а ручка — это pen.|We write with a pen.",
+"My uncle's son is my ___.|cousin|brother|nephew|grandson|2|cousin = child of an uncle or aunt|הבן של הדוד הוא בן דוד, cousin.|ابن العم أو الخال هو cousin.|Сын дяди — двоюродный брат, cousin.|The son of your uncle is your cousin.",
+"At the end of the lesson there is a ___.|break|test paper|holiday|exam hall|2|break = a short rest|בסוף השיעור יש הפסקה קצרה, break.|في نهاية الدرس هناك استراحة قصيرة، break.|В конце урока бывает короткий перерыв, break.|At the end of a lesson there is a short rest, a break.",
+"I ___ stamps. I have a big collection.|collect|cook|throw|borrow|2|collect = keep many things of one kind|מי שיש לו אוסף גדול של בולים אוסף אותם, collect.|من عنده مجموعة طوابع كبيرة يجمعها، collect.|У кого большая коллекция марок, тот их собирает, collect.|If you have a big collection of stamps, you collect them.",
+"We buy bread at the ___.|bakery|library|pharmacy|bank|2|a bakery sells bread|לחם קונים במאפייה, bakery.|نشتري الخبز من المخبز، bakery.|Хлеб покупают в пекарне, bakery.|We buy bread at a bakery.",
+"I take a book from the ___.|library|bakery|cinema|zoo|2|a library lends books|ספר לוקחים מהספרייה, library.|نأخذ الكتاب من المكتبة، library.|Книгу берут в библиотеке, library.|We take a book from a library.",
+"She wears a ___ when it rains.|raincoat|swimsuit|scarf only|uniform|2|a raincoat keeps you dry|כשיורד גשם לובשים מעיל גשם, raincoat.|عندما تمطر نلبس معطف المطر، raincoat.|Когда идёт дождь, надевают плащ, raincoat.|When it rains, we wear a raincoat.",
+"A person who plays football is a ___.|player|singer|painter|farmer|2|a player plays a game|מי שמשחק כדורגל הוא שחקן, player.|من يلعب كرة القدم لاعب، player.|Тот, кто играет в футбол, — игрок, player.|A person who plays a game is a player.",
+"We usually ___ the table before dinner.|set|break|climb|print|2|set the table|לערוך את השולחן אומרים set the table.|لترتيب المائدة نقول set the table.|Накрыть на стол — set the table.|To put plates and forks on the table is to set the table.",
+"I'm really ___ because I didn't eat all day.|hungry|thirsty|sleepy|angry|3|hungry = need food|מי שלא אכל כל היום רעב, hungry.|من لم يأكل طوال اليوم جائع، hungry.|Кто не ел весь день, тот голодный, hungry.|If you did not eat all day, you are hungry.",
+"My brother is very ___. He never stops talking.|talkative|quiet|shy|lazy|3|talkative = talks a lot|מי שלא מפסיק לדבר הוא דברן, talkative.|من لا يتوقف عن الكلام ثرثار، talkative.|Кто не перестаёт говорить, тот болтливый, talkative.|A person who never stops talking is talkative.",
+"It's a ___ day. There are no clouds.|sunny|rainy|snowy|windy|3|sunny = lots of sun|כשאין עננים יש הרבה שמש, sunny.|عندما لا توجد غيوم تكثر الشمس، sunny.|Когда нет облаков, много солнца, sunny.|When there are no clouds, the day is sunny.",
+"I need to ___ my room. It's very messy.|clean|spill|ruin|print|3|clean = make tidy|חדר מבולגן צריך לנקות, clean.|الغرفة الفوضوية نحتاج أن ننظفها، clean.|Грязную комнату надо убрать, clean.|A messy room needs to be cleaned.",
+"My favourite ___ is chess. I play it every Friday.|hobby|homework|subject|uniform|3|hobby = what we like to do in free time|מה שאוהבים לעשות בזמן הפנוי הוא תחביב, hobby.|ما نحب فعله في وقت الفراغ هواية، hobby.|То, что любят делать в свободное время, — хобби, hobby.|What you like to do in your free time is a hobby.",
+"She is not at home. She is ___ the supermarket.|at|on|between|under|3|at the supermarket|כשמישהו נמצא בחנות או בסופר אומרים at.|عندما يكون شخص في متجر أو سوبرماركت نقول at.|Когда кто-то в магазине или супермаркете, говорим at.|When someone is in a shop or a supermarket, we say at.",
+"The opposite of 'early' is ___.|late|soon|quick|fast|3|early ≠ late|ההפך של early, מוקדם, הוא late, מאוחר.|عكس early، أي مبكر، هو late، أي متأخر.|Противоположность early, «рано», — late, «поздно».|The opposite of early is late.",
+"The ___ of my house is red. You can't miss it.|door|ground only|ceiling only|tap|3|a door is part of a house|לבית יש דלת, door, ואפשר לצבוע אותה באדום.|للبيت باب، door، ويمكن أن نطليه بالأحمر.|У дома есть дверь, door, её можно покрасить в красный.|A house has a door, and a door can be red."
 ],L("בחרו את המילה או את המובן שמתאימים.","اختاروا الكلمة أو المعنى المناسب.","Выбери подходящее слово или значение.","Choose the word or meaning that fits."),H("קראו את כל המשפט. איזו מילה מתאימה למשפט?","اقرؤوا الجملة كلها. أي كلمة تناسبها؟","Прочитай всё предложение. Какое слово подходит?","Read the whole sentence. Which word fits?"),E_OK);
 
 fillGen("comp",[
-"My bag is ___ than yours.|heavier|heavy|heaviest|more heavy|1|short word + er (heavy → heavier)",
-"Dan is ___ than Ron.|taller|tall|tallest|more tall|1|tall → taller",
-"This is the ___ day of the year.|hottest|hot|hotter|more hot|1|the + hottest",
-"Mount Everest is the ___ mountain.|highest|higher|high|more high|1|the + highest",
-"A cheetah is ___ than a lion.|faster|fast|fastest|more fast|1|fast → faster",
-"This book is ___ than that one.|more interesting|interestinger|most interesting|interesting|1|long word: more",
-"She is the ___ girl in the class.|youngest|younger|young|most young|1|the + youngest",
-"Today is ___ than yesterday.|colder|cold|coldest|more cold|1|cold → colder",
-"Math is ___ than English for me.|more difficult|difficulter|most difficult|difficult|2|long word: more",
-"This is the ___ film I have ever seen.|best|better|good|goodest|2|good → better → the best",
-"My new phone is ___ than my old one.|better|good|best|gooder|2|good → better",
-"She is ___ tall as her brother.|as|than|more|the|2|as … as",
-"That was the ___ exam of the year.|worst|worse|bad|most bad|2|bad → worse → the worst",
-"The Dead Sea is ___ than the Mediterranean.|saltier|salty|saltiest|saltyer|2|salty → saltier",
-"This is the ___ beautiful place in the country.|most|more|much|very most|2|the most + long word",
-"I can run ___ than you.|faster|fastest|more fast|fast|2|fast → faster",
-"This lesson was ___ than I expected.|less boring|least boring|more less boring|boringer|3|less + adjective",
-"He is the ___ player in our team.|most talented|more talented|talentedest|talentedder|3|long word: the most",
-"The weather is getting ___ and ___.|hotter / hotter|hot / hot|more hotter|hottest / hottest|3|comparative and comparative",
-"Of the three sisters, Dana is the ___.|oldest|older|more old|old|3|three → superlative",
-"My house is not as ___ as yours.|big|bigger|biggest|more big|3|as + adjective + as",
-"The ___ you study, the better your grades.|more|most|much|many|3|the more..., the better...",
-"Her English is ___ than mine.|much better|much good|more better|very best|3|much + comparative",
-"This is by far the ___ meal I've had.|tastiest|tastier|more tasty|tasty|3|tasty → tastiest"
+"My bag is ___ than yours.|heavier|heavy|heaviest|more heavy|1|short word + er (heavy → heavier)|משווים שני דברים. ב-heavy ה-y הופכת ל-i, ומוסיפים er.|نقارن بين شيئين. في heavy تتحول y إلى i ونضيف er.|Сравниваем два предмета. В heavy y меняется на i и добавляем er.|We compare two things. In heavy the y becomes i, then we add er.",
+"Dan is ___ than Ron.|taller|tall|tallest|more tall|1|tall → taller|משווים שני אנשים, ו-tall היא מילה קצרה, ולכן taller.|نقارن بين شخصين، وtall كلمة قصيرة، لذلك taller.|Сравниваем двоих, tall — короткое слово, поэтому taller.|We compare two people, and tall is a short word, so taller.",
+"This is the ___ day of the year.|hottest|hot|hotter|more hot|1|the + hottest|the לפני המילה אומר ״הכי״. ב-hot מכפילים את t: hottest.|the قبل الكلمة تعني «الأكثر». في hot نضاعف t: hottest.|the перед словом значит «самый». В hot удваиваем t: hottest.|The before the word means the most of all. In hot we double the t.",
+"Mount Everest is the ___ mountain.|highest|higher|high|more high|1|the + highest|the אומר שזה הכי גבוה מכולם, ולכן highest.|the تعني الأعلى بين الجميع، لذلك highest.|the значит «самая высокая из всех», поэтому highest.|The shows it is the highest of all, so highest.",
+"A cheetah is ___ than a lion.|faster|fast|fastest|more fast|1|fast → faster|משווים שני בעלי חיים, ו-fast מילה קצרה, ולכן faster.|نقارن بين حيوانين، وfast كلمة قصيرة، لذلك faster.|Сравниваем двух животных, fast — короткое слово, поэтому faster.|We compare two animals, and fast is a short word, so faster.",
+"This book is ___ than that one.|more interesting|interestinger|most interesting|interesting|1|long word: more|interesting היא מילה ארוכה, ולכן more interesting.|interesting كلمة طويلة، لذلك more interesting.|interesting — длинное слово, поэтому more interesting.|Interesting is a long word, so we say more interesting.",
+"She is the ___ girl in the class.|youngest|younger|young|most young|1|the + youngest|the אומר שהיא הכי צעירה בכיתה, ולכן youngest.|the تعني الأصغر في الصف، لذلك youngest.|the значит «самая молодая в классе», поэтому youngest.|The shows she is the youngest in the whole class.",
+"Today is ___ than yesterday.|colder|cold|coldest|more cold|1|cold → colder|משווים שני ימים, ו-cold מילה קצרה, ולכן colder.|نقارن بين يومين، وcold كلمة قصيرة، لذلك colder.|Сравниваем два дня, cold — короткое слово, поэтому colder.|We compare two days, and cold is a short word, so colder.",
+"Math is ___ than English for me.|more difficult|difficulter|most difficult|difficult|2|long word: more|difficult היא מילה ארוכה, ולכן more difficult.|difficult كلمة طويلة، لذلك more difficult.|difficult — длинное слово, поэтому more difficult.|Difficult is a long word, so we say more difficult.",
+"This is the ___ film I have ever seen.|best|better|good|goodest|2|good → better → the best|״הכי טוב״ באנגלית הוא the best, ולא goodest.|«الأفضل» بالإنجليزية هو the best وليس goodest.|«Самый хороший» по-английски — the best, а не goodest.|The top form of good is the best, not goodest.",
+"My new phone is ___ than my old one.|better|good|best|gooder|2|good → better|כשמשווים שני דברים, good הופכת ל-better.|عند المقارنة بين شيئين تصبح good كلمة better.|При сравнении двух вещей good становится better.|When we compare two things, good becomes better.",
+"She is ___ tall as her brother.|as|than|more|the|2|as … as|כששני דברים שווים, אומרים as tall as.|عندما يكون الشيئان متساويين نقول as tall as.|Когда они одинаковые, говорим as tall as.|When two things are the same, we say as tall as.",
+"That was the ___ exam of the year.|worst|worse|bad|most bad|2|bad → worse → the worst|״הכי גרוע״ באנגלית הוא the worst.|«الأسوأ» بالإنجليزية هو the worst.|«Самый плохой» по-английски — the worst.|The lowest form of bad is the worst.",
+"The Dead Sea is ___ than the Mediterranean.|saltier|salty|saltiest|saltyer|2|salty → saltier|משווים שני ימים. ב-salty ה-y הופכת ל-i, ומוסיפים er.|نقارن بين بحرين. في salty تتحول y إلى i ونضيف er.|Сравниваем два моря. В salty y меняется на i и добавляем er.|We compare two seas. In salty the y becomes i, then we add er.",
+"This is the ___ beautiful place in the country.|most|more|much|very most|2|the most + long word|beautiful היא מילה ארוכה, ולכן the most beautiful.|beautiful كلمة طويلة، لذلك the most beautiful.|beautiful — длинное слово, поэтому the most beautiful.|Beautiful is a long word, so we say the most beautiful.",
+"I can run ___ than you.|faster|fastest|more fast|fast|2|fast → faster|משווים אותי ואותך, ו-fast מילה קצרה, ולכן faster.|نقارن بيني وبينك، وfast كلمة قصيرة، لذلك faster.|Сравниваем меня и тебя, fast — короткое слово, поэтому faster.|We compare me and you, and fast is a short word, so faster.",
+"This lesson was ___ than I expected.|less boring|least boring|more less boring|boringer|3|less + adjective|less לפני מילה פירושו ״פחות״, ולכן less boring.|less قبل الكلمة تعني «أقل»، لذلك less boring.|less перед словом значит «менее», поэтому less boring.|Less before a word means not as much, so less boring.",
+"He is the ___ player in our team.|most talented|more talented|talentedest|talentedder|3|long word: the most|talented היא מילה ארוכה, ועם the אומרים the most.|talented كلمة طويلة، ومع the نقول the most.|talented — длинное слово, и с the говорим the most.|Talented is a long word, so with the we say the most.",
+"The weather is getting ___ and ___.|hotter / hotter|hot / hot|more hotter|hottest / hottest|3|comparative and comparative|כשמשהו משתנה עוד ועוד, חוזרים על אותה מילת השוואה.|عندما يتغير شيء أكثر فأكثر نكرر كلمة المقارنة نفسها.|Когда что-то меняется всё больше, повторяем то же сравнение.|When something keeps changing, we repeat the same comparing word.",
+"Of the three sisters, Dana is the ___.|oldest|older|more old|old|3|three → superlative|יש שלוש אחיות, ולכן the oldest, הכי מבוגרת.|هناك ثلاث أخوات، لذلك the oldest، أي الكبرى.|Сестёр три, поэтому the oldest — самая старшая.|There are three sisters, so we use the oldest.",
+"My house is not as ___ as yours.|big|bigger|biggest|more big|3|as + adjective + as|בין as ל-as באה המילה הרגילה, בלי er: as big as.|بين as وas تأتي الكلمة العادية بلا er: as big as.|Между as и as идёт обычное слово без er: as big as.|Between as and as we use the plain word, with no er.",
+"The ___ you study, the better your grades.|more|most|much|many|3|the more..., the better...|the more, the better פירושו: ככל שיותר, כך יותר טוב.|the more, the better تعني: كلما زاد كان أفضل.|the more, the better значит «чем больше, тем лучше».|The more, the better means when one grows, the other grows too.",
+"Her English is ___ than mine.|much better|much good|more better|very best|3|much + comparative|much לפני better מחזק את ההשוואה. אין more better.|much قبل better تقوّي المقارنة، ولا نقول more better.|much перед better усиливает сравнение. more better не говорят.|Much before better makes it stronger. We never say more better.",
+"This is by far the ___ meal I've had.|tastiest|tastier|more tasty|tasty|3|tasty → tastiest|by far the אומר ״הכי״. ב-tasty ה-y הופכת ל-i: tastiest.|by far the تعني «الأكثر». في tasty تتحول y إلى i: tastiest.|by far the — «самый». В tasty y меняется на i: tastiest.|By far the means the most of all. The y becomes i: tastiest."
 ],I_FILL,H("שתי דברים → er או more. שלושה ויותר → the est או the most. מילה קצרה: er. מילה ארוכה: more.","شيئان ← er أو more. ثلاثة أو أكثر ← the est أو the most. كلمة قصيرة: er. طويلة: more.","Два предмета → er или more. Три и больше → the est или the most. Короткое слово: er. Длинное: more.","Two things → er or more. Three or more → the est or the most. Short word: er. Long word: more."),E_OK);
 
 fillGen("fut",[
-"Look at the clouds! It ___ rain.|is going to|will to|going|is will|1|you can see it: going to",
-"I think it ___ be sunny tomorrow.|will|is going|am going to|do|1|I think + will",
-"We ___ visit my aunt next week. We bought the tickets.|are going to|going to|are|do|1|plan: going to",
-"I'm cold. I ___ close the window.|will|am going|do|have|1|decision now: will",
-"She ___ be ten next month.|will|is going|does|has|1|she will be",
-"They ___ travel to Italy in the summer. It's planned.|are going to|will to|are|do|1|plan: going to",
-"I'm sure he ___ pass the test.|will|is going|does|do|1|I'm sure: will",
-"Tomorrow we ___ play football.|will|did|are|have|1|tomorrow: will",
-"The phone is ringing. I ___ answer it.|will|am going to|do|am|2|decision now: will",
-"I ___ be late. The bus is stuck.|am going to|will to|do|am|2|I can see: going to",
-"Don't worry. I ___ help you.|will|am going|do|have|2|promise: will",
-"We ___ have a party on Friday. It's all organised.|are going to|will to|are|do|2|plan: going to",
-"He ___ call you tomorrow.|will|did|is|has|2|tomorrow: will",
-"I ___ not tell anyone your secret.|will|am going|do|does|2|promise: will not",
-"What ___ you ___ do this weekend?|are / going to|will / to|did / going|are / will|2|plan question: going to",
-"___ you help me with this bag?|Will|Are|Did|Have|2|request: Will you...?",
-"By the time you arrive, we ___ eaten.|will have|will|are going|did|3|before a future time: will have + V3",
-"Next year I ___ fifteen.|will be|am being|was|have been|3|will be",
-"I think robots ___ do many jobs in the future.|will|are going|does|do|3|prediction: will",
-"The sky is dark. There ___ a storm.|is going to be|will to be|are going to be|is will be|3|evidence: going to be",
-"If it rains, we ___ stay home.|will|are going|would|did|3|if + present, will",
-"She ___ travel abroad next year, she told me.|is going to|will to|is|do|3|plan: going to",
-"Wait here. I ___ be back in five minutes.|will|am going|do|did|3|promise: will",
-"This time tomorrow I ___ on the beach.|will be lying|will lie|am lie|lay|3|in progress in the future"
+"Look at the clouds! It ___ rain.|is going to|will to|going|is will|1|you can see it: going to|רואים את העננים, ולכן יודעים שירד גשם: going to.|نرى الغيوم، فنعرف أنها ستمطر: going to.|Мы видим тучи и знаем, что будет дождь: going to.|We can see the clouds, so we know it will rain: going to.",
+"I think it ___ be sunny tomorrow.|will|is going|am going to|do|1|I think + will|I think מראה שזו רק מחשבה, ולכן will.|I think تدل على أنه مجرد رأي، لذلك will.|I think — это только мнение, поэтому will.|I think shows it is only a guess, so we use will.",
+"We ___ visit my aunt next week. We bought the tickets.|are going to|going to|are|do|1|plan: going to|כבר קנינו כרטיסים. זו תוכנית, ולכן are going to.|اشترينا التذاكر. هذه خطة، لذلك are going to.|Мы уже купили билеты. Это план, поэтому are going to.|We already bought the tickets. It is a plan, so are going to.",
+"I'm cold. I ___ close the window.|will|am going|do|have|1|decision now: will|ההחלטה נעשית עכשיו, ברגע זה, ולכן will.|القرار يُتّخذ الآن في هذه اللحظة، لذلك will.|Решение принято прямо сейчас, поэтому will.|The decision is made right now, so we use will.",
+"She ___ be ten next month.|will|is going|does|has|1|she will be|זו עובדה על העתיד, ולכן she will be.|هذه حقيقة عن المستقبل، لذلك she will be.|Это факт о будущем, поэтому she will be.|This is a fact about the future, so she will be.",
+"They ___ travel to Italy in the summer. It's planned.|are going to|will to|are|do|1|plan: going to|זו תוכנית שכבר נקבעה, ולכן are going to.|هذه خطة محددة مسبقًا، لذلك are going to.|Это план, он уже решён, поэтому are going to.|It is a plan that is already made, so are going to.",
+"I'm sure he ___ pass the test.|will|is going|does|do|1|I'm sure: will|I'm sure הוא מה שאנחנו חושבים על העתיד, ולכן will.|I'm sure رأي عن المستقبل، لذلك will.|I'm sure — это наше мнение о будущем, поэтому will.|I'm sure is what we think about the future, so will.",
+"Tomorrow we ___ play football.|will|did|are|have|1|tomorrow: will|tomorrow הוא עתיד, ואחרי will בא פועל בצורה הבסיסית.|tomorrow تعني المستقبل، وبعد will يأتي الفعل بصيغته الأساسية.|tomorrow — будущее, после will глагол в начальной форме.|Tomorrow is in the future, and after will comes the base verb.",
+"The phone is ringing. I ___ answer it.|will|am going to|do|am|2|decision now: will|הטלפון מצלצל ומחליטים לענות ברגע זה, ולכן will.|الهاتف يرنّ ونقرّر أن نجيب الآن، لذلك will.|Телефон звонит, решаем ответить сейчас, поэтому will.|The phone is ringing and we decide right now, so we use will.",
+"I ___ be late. The bus is stuck.|am going to|will to|do|am|2|I can see: going to|רואים שהאוטובוס תקוע, ולכן am going to.|نرى أن الحافلة عالقة، لذلك am going to.|Мы видим, что автобус застрял, поэтому am going to.|We can see the bus is stuck, so am going to.",
+"Don't worry. I ___ help you.|will|am going|do|have|2|promise: will|זו הבטחה, ולכן will.|هذا وعد، لذلك will.|Это обещание, поэтому will.|This is a promise, so we use will.",
+"We ___ have a party on Friday. It's all organised.|are going to|will to|are|do|2|plan: going to|הכול כבר מאורגן. זו תוכנית, ולכן are going to.|كل شيء مرتّب. هذه خطة، لذلك are going to.|Всё уже организовано. Это план, поэтому are going to.|It is all organised. It is a plan, so are going to.",
+"He ___ call you tomorrow.|will|did|is|has|2|tomorrow: will|tomorrow הוא עתיד, ולכן he will call.|tomorrow تعني المستقبل، لذلك he will call.|tomorrow — будущее, поэтому he will call.|Tomorrow is in the future, so he will call.",
+"I ___ not tell anyone your secret.|will|am going|do|does|2|promise: will not|זו הבטחה, ולכן I will not.|هذا وعد، لذلك I will not.|Это обещание, поэтому I will not.|This is a promise, so we say I will not.",
+"What ___ you ___ do this weekend?|are / going to|will / to|did / going|are / will|2|plan question: going to|שואלים על תוכנית לסוף השבוע, ולכן are you going to.|نسأل عن خطة لنهاية الأسبوع، لذلك are you going to.|Спрашиваем о планах на выходные, поэтому are you going to.|We ask about a plan for the weekend, so are you going to.",
+"___ you help me with this bag?|Will|Are|Did|Have|2|request: Will you...?|בקשה מנומסת מתחילה ב-Will you.|الطلب المهذب يبدأ بـ Will you.|Вежливая просьба начинается с Will you.|A polite request starts with Will you.",
+"By the time you arrive, we ___ eaten.|will have|will|are going|did|3|before a future time: will have + V3|עד שתגיע זה כבר ייגמר, ולכן will have eaten.|حتى تصل سيكون الأمر قد انتهى، لذلك will have eaten.|К твоему приходу это уже закончится, поэтому will have eaten.|It will be over before you arrive, so will have eaten.",
+"Next year I ___ fifteen.|will be|am being|was|have been|3|will be|next year הוא עתיד, ולכן I will be.|next year تعني المستقبل، لذلك I will be.|next year — будущее, поэтому I will be.|Next year is in the future, so I will be.",
+"I think robots ___ do many jobs in the future.|will|are going|does|do|3|prediction: will|זו תחזית, מה שאנחנו חושבים על העתיד, ולכן will.|هذا توقّع عن المستقبل، لذلك will.|Это прогноз, наше мнение о будущем, поэтому will.|This is a guess about the future, so we use will.",
+"The sky is dark. There ___ a storm.|is going to be|will to be|are going to be|is will be|3|evidence: going to be|השמיים כהים, ורואים שתהיה סערה: is going to be.|السماء مظلمة ونرى أن عاصفة قادمة: is going to be.|Небо тёмное, видно, что будет буря: is going to be.|The sky is dark, so we can see the storm coming: is going to be.",
+"If it rains, we ___ stay home.|will|are going|would|did|3|if + present, will|אחרי if בא הווה, ובחלק השני will.|بعد if يأتي المضارع، وفي الجزء الآخر will.|После if настоящее время, а во второй части will.|After if comes the present, and the other part has will.",
+"She ___ travel abroad next year, she told me.|is going to|will to|is|do|3|plan: going to|היא סיפרה על תוכנית, ולכן is going to.|أخبرتني عن خطة، لذلك is going to.|Она рассказала о плане, поэтому is going to.|She told me about a plan, so is going to.",
+"Wait here. I ___ be back in five minutes.|will|am going|do|did|3|promise: will|זו הבטחה, ולכן I will be back.|هذا وعد، لذلك I will be back.|Это обещание, поэтому I will be back.|This is a promise, so I will be back.",
+"This time tomorrow I ___ on the beach.|will be lying|will lie|am lie|lay|3|in progress in the future|מחר בשעה הזאת זה יהיה באמצע, ולכן will be lying.|غدًا في هذا الوقت سأكون في منتصف الأمر، لذلك will be lying.|Завтра в это время действие будет идти, поэтому will be lying.|At this time tomorrow it will be going on, so will be lying."
 ],I_FILL,H("תוכנית או משהו שרואים שיקרה → going to. החלטה ברגע, הבטחה או מה שחושבים → will.","خطة أو شيء نراه سيحدث ← going to. قرار في اللحظة أو وعد أو ما نظنه ← will.","План или то, что видно → going to. Решение сейчас, обещание или предположение → will.","A plan or something we can see → going to. A decision now, a promise or a guess → will."),E_OK);
 
 fillGen("perf",[
-"I ___ finished my homework.|have|has|am|did|1|I have + V3",
-"She ___ seen that film.|has|have|is|did|1|she has + V3",
-"We have ___ to Paris. (go)|been|went|go|going|1|have been to",
-"Have you ever ___ a whale? (see)|seen|saw|see|sees|1|ever + V3",
-"I have ___ my keys. (lose)|lost|lose|losing|loses|1|V3 of lose = lost",
-"He has ___ his lunch already. (eat)|eaten|ate|eat|eating|1|V3 of eat = eaten",
-"They have never ___ sushi. (try)|tried|try|tries|trying|1|never + V3",
-"She has ___ a letter. (write)|written|wrote|write|writes|1|V3 of write = written",
-"I have lived here ___ 2020.|since|for|ago|in|2|since + a point in time",
-"We have lived here ___ five years.|for|since|ago|at|2|for + a length of time",
-"Has he ___ his room yet? (clean)|cleaned|clean|cleans|cleaning|2|yet + V3",
-"I ___ never been to London.|have|did|am|was|2|have never been",
-"She ___ just left.|has|have|is|was|2|has just + V3",
-"___ you ever eaten Chinese food?|Have|Did|Are|Do|2|Have you ever...?",
-"They have ___ the film. They loved it. (watch)|watched|watch|watches|watching|2|have + V3",
-"He has ___ his arm. It hurts. (break)|broken|broke|break|breaks|2|V3 of break = broken",
-"I didn't see him yesterday, but I ___ him today.|have seen|have saw|see|am seeing|3|today still going on: present perfect",
-"She ___ to Rome three times.|has been|is|was being|went being|3|has been to",
-"My brother ___ not ___ his homework yet.|has / done|did / did|is / do|have / doing|3|has not done yet",
-"We ___ here for two hours. When will they come?|have waited|waited|wait|are waiting for|3|for + time: present perfect",
-"How long ___ you ___ this phone?|have / had|did / have|are / having|do / had|3|How long have you had...",
-"He ___ already ___ the bill.|has / paid|did / pay|is / paying|have / paid|3|already + V3",
-"It's the best book I ___ ever read.|have|did|had|am|3|superlative + ever + present perfect",
-"Since I moved here, I ___ many new friends.|have made|made|make|am making|3|since + present perfect"
+"I ___ finished my homework.|have|has|am|did|1|I have + V3|עם I אומרים have, ואחריו צורה שלישית: finished.|مع I نقول have، وبعدها التصريف الثالث: finished.|С I говорим have, а после него третья форма: finished.|With I we use have, then the third form: finished.",
+"She ___ seen that film.|has|have|is|did|1|she has + V3|עם she אומרים has, ואחריו צורה שלישית: seen.|مع she نقول has، وبعدها التصريف الثالث: seen.|С she говорим has, а после него третья форма: seen.|With she we use has, then the third form: seen.",
+"We have ___ to Paris. (go)|been|went|go|going|1|have been to|מי שביקר במקום וחזר אומר have been to.|عندما نزور مكانًا ونعود نقول have been to.|Если побывали где-то и вернулись, говорим have been to.|When you visit a place and come back, you say have been to.",
+"Have you ever ___ a whale? (see)|seen|saw|see|sees|1|ever + V3|אחרי Have you ever באה צורה שלישית: seen.|بعد Have you ever يأتي التصريف الثالث: seen.|После Have you ever идёт третья форма: seen.|After Have you ever we use the third form: seen.",
+"I have ___ my keys. (lose)|lost|lose|losing|loses|1|V3 of lose = lost|אחרי have באה צורה שלישית. של lose היא lost.|بعد have يأتي التصريف الثالث، وتصريف lose هو lost.|После have идёт третья форма. У lose это lost.|After have comes the third form. For lose it is lost.",
+"He has ___ his lunch already. (eat)|eaten|ate|eat|eating|1|V3 of eat = eaten|אחרי has באה צורה שלישית. של eat היא eaten.|بعد has يأتي التصريف الثالث، وتصريف eat هو eaten.|После has идёт третья форма. У eat это eaten.|After has comes the third form. For eat it is eaten.",
+"They have never ___ sushi. (try)|tried|try|tries|trying|1|never + V3|אחרי have never באה צורה שלישית: tried.|بعد have never يأتي التصريف الثالث: tried.|После have never идёт третья форма: tried.|After have never we use the third form: tried.",
+"She has ___ a letter. (write)|written|wrote|write|writes|1|V3 of write = written|אחרי has באה צורה שלישית. של write היא written.|بعد has يأتي التصريف الثالث، وتصريف write هو written.|После has идёт третья форма. У write это written.|After has comes the third form. For write it is written.",
+"I have lived here ___ 2020.|since|for|ago|in|2|since + a point in time|2020 היא נקודה בזמן, ולפניה באה since.|2020 نقطة زمنية، وقبلها نستعمل since.|2020 — это момент во времени, перед ним since.|2020 is a point in time, so we use since.",
+"We have lived here ___ five years.|for|since|ago|at|2|for + a length of time|five years הוא משך זמן, ולפניו באה for.|five years مدة زمنية، وقبلها نستعمل for.|five years — это период, перед ним for.|Five years is a length of time, so we use for.",
+"Has he ___ his room yet? (clean)|cleaned|clean|cleans|cleaning|2|yet + V3|אחרי Has he באה צורה שלישית: cleaned.|بعد Has he يأتي التصريف الثالث: cleaned.|После Has he идёт третья форма: cleaned.|After Has he we use the third form: cleaned.",
+"I ___ never been to London.|have|did|am|was|2|have never been|עם I אומרים I have never been.|مع I نقول I have never been.|С I говорим I have never been.|With I we say I have never been.",
+"She ___ just left.|has|have|is|was|2|has just + V3|עם she אומרים has just, ואחריו צורה שלישית.|مع she نقول has just، وبعدها التصريف الثالث.|С she говорим has just, а потом третья форма.|With she we say has just, then the third form.",
+"___ you ever eaten Chinese food?|Have|Did|Are|Do|2|Have you ever...?|שאלה עם ever ו-eaten מתחילה ב-Have.|السؤال مع ever وeaten يبدأ بـ Have.|Вопрос с ever и eaten начинается с Have.|A question with ever and eaten starts with Have.",
+"They have ___ the film. They loved it. (watch)|watched|watch|watches|watching|2|have + V3|אחרי have באה צורה שלישית: watched.|بعد have يأتي التصريف الثالث: watched.|После have идёт третья форма: watched.|After have we use the third form: watched.",
+"He has ___ his arm. It hurts. (break)|broken|broke|break|breaks|2|V3 of break = broken|אחרי has באה צורה שלישית. של break היא broken.|بعد has يأتي التصريف الثالث، وتصريف break هو broken.|После has идёт третья форма. У break это broken.|After has comes the third form. For break it is broken.",
+"I didn't see him yesterday, but I ___ him today.|have seen|have saw|see|am seeing|3|today still going on: present perfect|היום עוד לא נגמר, ולכן have seen.|اليوم لم ينتهِ بعد، لذلك have seen.|Сегодня ещё не закончилось, поэтому have seen.|Today is not over yet, so we use have seen.",
+"She ___ to Rome three times.|has been|is|was being|went being|3|has been to|היא ביקרה ברומא 3 פעמים, ולכן has been to.|زارت روما 3 مرات، لذلك has been to.|Она была в Риме 3 раза, поэтому has been to.|She visited Rome 3 times, so has been to.",
+"My brother ___ not ___ his homework yet.|has / done|did / did|is / do|have / doing|3|has not done yet|עם my brother אומרים has not, ואחריו done.|مع my brother نقول has not، وبعدها done.|С my brother говорим has not, а потом done.|With my brother we say has not, and then done.",
+"We ___ here for two hours. When will they come?|have waited|waited|wait|are waiting for|3|for + time: present perfect|מחכים כבר שעתיים ועדיין מחכים, ולכן have waited.|ننتظر منذ ساعتين وما زلنا ننتظر، لذلك have waited.|Ждём уже два часа и всё ещё ждём, поэтому have waited.|We began waiting two hours ago and still wait, so have waited.",
+"How long ___ you ___ this phone?|have / had|did / have|are / having|do / had|3|How long have you had...|How long שואל כמה זמן זה נמשך עד היום: have you had.|How long تسأل عن المدة حتى اليوم: have you had.|How long — сколько это длится до сих пор: have you had.|How long asks about time up to now: have you had.",
+"He ___ already ___ the bill.|has / paid|did / pay|is / paying|have / paid|3|already + V3|already מראה שזה כבר קרה: has paid.|already تدل على أن هذا حدث: has paid.|already значит «уже»: has paid.|Already shows it has happened: has paid.",
+"It's the best book I ___ ever read.|have|did|had|am|3|superlative + ever + present perfect|אחרי the best ו-ever באים have וצורה שלישית.|بعد the best وever نستعمل have والتصريف الثالث.|После the best и ever идут have и третья форма.|After the best and ever we use have and the third form.",
+"Since I moved here, I ___ many new friends.|have made|made|make|am making|3|since + present perfect|since מראה משהו שהתחיל בעבר ונמשך עד עכשיו: have made.|since تدل على شيء بدأ في الماضي ويستمر: have made.|since — что-то началось в прошлом и длится: have made.|Since shows something that started in the past and goes on: have made."
 ],I_FILL,H("have/has + צורה שלישית. since + נקודת זמן, for + משך זמן. ever, never, already, yet.","have/has + التصريف الثالث. since + نقطة زمنية وfor + مدة. ever وnever وalready وyet.","have/has + третья форма. since + момент, for + период. ever, never, already, yet.","have/has + third form. since + a point in time, for + a length of time. ever, never, already, yet."),E_OK);
 
 fillGen("mod",[
-"I ___ swim very well.|can|must|should|has to|1|can = I am able",
-"You ___ wear a helmet. It's the law.|must|can|might|would|1|must = duty",
-"You ___ drink more water.|should|mustn't|can't|are|1|should = advice",
-"___ I open the window, please?|Can|Must|Should|Do|1|Can I...? = ask permission",
-"She ___ play the piano.|can|cans|is can|to can|1|can + base verb",
-"He ___ be late again. He's always on time.|can't|must|has to|should|2|can't be = sure it is not true",
-"You ___ smoke here. It's forbidden.|mustn't|don't have to|needn't|can|2|mustn't = forbidden",
-"You ___ come if you don't want to.|don't have to|mustn't|can't|shouldn't|2|don't have to = not necessary",
-"You ___ eat so many sweets.|shouldn't|must|can|would|2|shouldn't = it's not good for you",
-"It's late. I ___ go home now.|have to|can|might be|would|2|have to = necessary",
-"She ___ speak three languages when she was ten.|could|can|must|should|2|could = past ability",
-"I ___ find my keys. Can you help me?|can't|must|should|may|2|can't = not able",
-"Children ___ cross the road alone. It's dangerous.|shouldn't|might|can|will|2|shouldn't = not a good idea",
-"We ___ be quiet in the library.|must|can|might|could|2|must = rule",
-"___ you pass me the salt, please?|Could|Must|Should|Are|2|Could you...? = polite request",
-"The lights are on. They ___ be at home.|must|can't|should|would|3|must be = sure it is true",
-"You look tired. You ___ go to bed early.|should|must be|can't|might not|3|advice",
-"We ___ hurry. We have plenty of time.|don't have to|mustn't|can't|shouldn't|3|don't have to = no need",
-"He ___ be at school. I saw him at the beach.|can't|must|should|has to|3|can't be = impossible",
-"It ___ rain later. Take an umbrella.|might|must|has to|should be|3|might = possible",
-"___ I use your phone, please?|May|Must|Should|Will to|3|May I...? = polite permission",
-"You ___ to see a doctor about that cough.|ought|must be|can|would|3|ought to + verb",
-"She ___ have forgotten. Let's call her.|may|should be|can't be|would|3|may have + V3",
-"I ___ help you tomorrow if you want.|can|am can|do can|can to|3|can + base verb"
+"I ___ swim very well.|can|must|should|has to|1|can = I am able|אני מסוגל לשחות, ולכן can.|أنا قادر على السباحة، لذلك can.|Я умею плавать, поэтому can.|I am able to swim, so we use can.",
+"You ___ wear a helmet. It's the law.|must|can|might|would|1|must = duty|זה החוק, ועל חובה אומרים must.|هذا قانون، وللواجب نقول must.|Это закон, а обязанность — must.|It is the law, so it is a duty: must.",
+"You ___ drink more water.|should|mustn't|can't|are|1|should = advice|זו עצה, ועל עצה אומרים should.|هذه نصيحة، وللنصيحة نقول should.|Это совет, а совет — should.|This is advice, and for advice we use should.",
+"___ I open the window, please?|Can|Must|Should|Do|1|Can I...? = ask permission|מבקשים רשות לפתוח, ולכן Can I.|نطلب الإذن لنفتح، لذلك Can I.|Просим разрешения открыть, поэтому Can I.|We ask for permission, so we say Can I.",
+"She ___ play the piano.|can|cans|is can|to can|1|can + base verb|can לא משתנה ואין cans. אחריו בא פועל בצורה הבסיסית.|can لا تتغير ولا نقول cans. وبعدها فعل بصيغته الأساسية.|can не меняется, cans не бывает. После него глагол в начальной форме.|Can never changes, and there is no cans. The base verb follows.",
+"He ___ be late again. He's always on time.|can't|must|has to|should|2|can't be = sure it is not true|הוא תמיד בזמן, ולכן בטוח שהוא לא יאחר: can't be.|هو دائمًا في الموعد، فنحن متأكدون أنه لن يتأخر: can't be.|Он всегда вовремя, мы уверены, что он не опоздает: can't be.|He is always on time, so we are sure he will not be late: can't be.",
+"You ___ smoke here. It's forbidden.|mustn't|don't have to|needn't|can|2|mustn't = forbidden|זה אסור, ועל דבר אסור אומרים mustn't.|هذا ممنوع، وللممنوع نقول mustn't.|Это запрещено, а запрет — mustn't.|It is forbidden, so we use mustn't.",
+"You ___ come if you don't want to.|don't have to|mustn't|can't|shouldn't|2|don't have to = not necessary|אתה לא חייב לבוא, ולכן don't have to.|لست مضطرًا أن تأتي، لذلك don't have to.|Ты не обязан приходить, поэтому don't have to.|You are free not to come, so we use don't have to.",
+"You ___ eat so many sweets.|shouldn't|must|can|would|2|shouldn't = it's not good for you|זו עצה לא לעשות משהו, ולכן shouldn't.|هذه نصيحة بعدم فعل شيء، لذلك shouldn't.|Это совет чего-то не делать, поэтому shouldn't.|This is advice not to do something, so we use shouldn't.",
+"It's late. I ___ go home now.|have to|can|might be|would|2|have to = necessary|צריך ללכת כי מאוחר, ולכן have to.|يجب أن أذهب لأن الوقت متأخر، لذلك have to.|Надо идти, потому что поздно, поэтому have to.|I need to go because it is late, so we use have to.",
+"She ___ speak three languages when she was ten.|could|can|must|should|2|could = past ability|היא ידעה לעשות את זה בעבר, כשהייתה בת 10, ולכן could.|كانت تستطيع ذلك في الماضي، في العاشرة، لذلك could.|Она умела это в прошлом, в 10 лет, поэтому could.|She was able to do it in the past, at 10, so we use could.",
+"I ___ find my keys. Can you help me?|can't|must|should|may|2|can't = not able|אני לא מצליח למצוא, ולכן can't.|لا أستطيع أن أجد، لذلك can't.|Я не могу найти, поэтому can't.|I am not able to find them, so we use can't.",
+"Children ___ cross the road alone. It's dangerous.|shouldn't|might|can|will|2|shouldn't = not a good idea|זה מסוכן, ולכן העצה היא לא לעשות: shouldn't.|هذا خطر، لذلك ننصح بعدم فعله: shouldn't.|Это опасно, поэтому совет — не делать: shouldn't.|It is dangerous, so the advice is not to do it: shouldn't.",
+"We ___ be quiet in the library.|must|can|might|could|2|must = rule|זה חוק של הספרייה, ולכן must.|هذه قاعدة في المكتبة، لذلك must.|Это правило библиотеки, поэтому must.|It is a library rule, so we use must.",
+"___ you pass me the salt, please?|Could|Must|Should|Are|2|Could you...? = polite request|בקשה מנומסת מתחילה ב-Could you.|الطلب المهذب يبدأ بـ Could you.|Вежливая просьба начинается с Could you.|A polite request starts with Could you.",
+"The lights are on. They ___ be at home.|must|can't|should|would|3|must be = sure it is true|האורות דולקים, ולכן בטוח שהם בבית: must be.|الأضواء مشتعلة، لذلك نحن متأكدون أنهم في البيت: must be.|Свет горит, мы уверены, что они дома: must be.|The lights are on, so we are sure they are at home: must be.",
+"You look tired. You ___ go to bed early.|should|must be|can't|might not|3|advice|זו עצה למי שעייף, ולכן should.|هذه نصيحة لشخص متعب، لذلك should.|Это совет уставшему, поэтому should.|This is advice for someone tired, so we use should.",
+"We ___ hurry. We have plenty of time.|don't have to|mustn't|can't|shouldn't|3|don't have to = no need|יש לנו הרבה זמן, ולכן לא צריך למהר: don't have to.|عندنا وقت كثير، لذلك لا يلزم أن نسرع: don't have to.|У нас много времени, спешить не нужно: don't have to.|We have plenty of time, so there is no need: don't have to.",
+"He ___ be at school. I saw him at the beach.|can't|must|should|has to|3|can't be = impossible|ראיתי אותו בים, ולכן בטוח שהוא לא בבית הספר: can't be.|رأيته على الشاطئ، فأنا متأكد أنه ليس في المدرسة: can't be.|Я видел его на пляже, значит, в школе его точно нет: can't be.|I saw him at the beach, so I am sure he is not at school: can't be.",
+"It ___ rain later. Take an umbrella.|might|must|has to|should be|3|might = possible|אולי ירד גשם, ועל דבר אפשרי אומרים might.|ربما تمطر، وللأمر الممكن نقول might.|Может быть, пойдёт дождь, а возможное — might.|Rain is possible, and for possible things we use might.",
+"___ I use your phone, please?|May|Must|Should|Will to|3|May I...? = polite permission|בקשת רשות מנומסת מאוד מתחילה ב-May I.|طلب الإذن المهذب جدًا يبدأ بـ May I.|Очень вежливая просьба разрешения начинается с May I.|A very polite way to ask permission is May I.",
+"You ___ to see a doctor about that cough.|ought|must be|can|would|3|ought to + verb|ought to פירושו ״כדאי״, והוא תמיד בא עם to.|ought to تعني «يُستحسن»، وتأتي دائمًا مع to.|ought to значит «стоит», и всегда с to.|Ought to means should, and it always comes with to.",
+"She ___ have forgotten. Let's call her.|may|should be|can't be|would|3|may have + V3|אולי היא שכחה. על עבר אפשרי אומרים may have וצורה שלישית.|ربما نسيت. عن ماضٍ ممكن نقول may have والتصريف الثالث.|Может быть, она забыла. Для возможного прошлого: may have и третья форма.|Maybe she forgot. For a possible past we use may have and the third form.",
+"I ___ help you tomorrow if you want.|can|am can|do can|can to|3|can + base verb|אחרי can בא פועל בצורה הבסיסית, בלי to ובלי am.|بعد can يأتي الفعل بصيغته الأساسية، بلا to وبلا am.|После can глагол в начальной форме, без to и без am.|After can comes the base verb, with no to and no am."
 ],I_FILL,H("can = אפשר/יכול. must = חייב. should = כדאי. mustn't = אסור. don't have to = לא חייב.","can = أستطيع. must = واجب. should = يُستحسن. mustn't = ممنوع. don't have to = لا يلزم.","can = могу. must = обязан. should = стоит. mustn't = нельзя. don't have to = не обязательно.","can = able. must = have to. should = a good idea. mustn't = forbidden. don't have to = not needed."),E_OK);
 
 fillGen("v8",[
-"You need a ___ to travel to another country.|passport|pillow|menu|ticket for bus|1|passport = official travel document",
-"We pack our ___ before a trip.|luggage|homework|hobbies|breakfast|1|luggage = bags for a trip",
-"Doctors give you ___ when you are sick.|medicine|luggage|a passport|a pillow|1|medicine helps when you are ill",
-"I have a ___. My head hurts.|headache|toothbrush|vegetable|journey|1|headache = pain in the head",
-"Fruit and vegetables are ___.|healthy|dangerous|noisy|expensive|1|healthy = good for the body",
-"A person who visits places for fun is a ___.|tourist|doctor|farmer|waiter|1|tourist = visitor",
-"My phone needs a ___ because it is dead.|charger|passport|pillow|ticket|1|charger gives power",
-"I play games ___ with my friends.|online|ill|outside the|every|1|online = on the internet",
-"The ___ from Tel Aviv to Eilat takes five hours.|journey|screen|exercise|battery|2|journey = a long trip",
-"To keep your account safe, never tell anyone your ___.|password|ticket|medicine|luggage|2|password = secret word",
-"Doing ___ every day keeps you fit.|exercise|luggage|passport|journey|2|exercise = physical activity",
-"The ___ of my laptop is very big.|screen|medicine|menu|journey|2|screen = where we look",
-"You should ___ a file from the internet only if it's safe.|download|exercise|pack|visit|2|download = copy to your device",
-"I stayed in a small ___ near the beach. (a place to sleep on a trip)|hotel|hospital|pharmacy|airport|2|hotel = a place to stay",
-"When you're ill, you need to rest in ___.|bed|a passport|a tourist|a battery|2|rest in bed",
-"The plane ___ at 8:00.|takes off|gets up|turns on|puts on|2|take off = leave the ground",
-"A person who sells medicine works in a ___.|pharmacy|bakery|library|stadium|3|pharmacy = shop for medicine",
-"Please ___ your phone. The film is starting.|turn off|take off|give up|look for|3|turn off = stop a device",
-"The flight was ___ because of the storm.|cancelled|downloaded|packed|charged|3|cancelled = not happening",
-"A ___ person always gets enough sleep and exercise.|healthy|hungry|dangerous|noisy|3|healthy = in good condition",
-"I lost my way, so I used a ___ on my phone.|map|passport|pillow|menu|3|a map shows the way",
-"The battery is ___. I must charge it.|flat|healthy|expensive journey|tourist|3|flat = no power",
-"We stayed in a ___ hotel, with a pool and a view of the sea.|luxury|flat|tiny|cheap and|3|luxury = very comfortable and expensive",
-"Washing hands helps to ___ germs from spreading.|stop|download|pack|visit|3|stop = prevent"
+"You need a ___ to travel to another country.|passport|pillow|menu|ticket for bus|1|passport = official travel document|כדי לטוס לארץ אחרת צריך דרכון, passport.|للسفر إلى بلد آخر نحتاج جواز سفر، passport.|Чтобы поехать в другую страну, нужен паспорт, passport.|To travel to another country, you need a passport.",
+"We pack our ___ before a trip.|luggage|homework|hobbies|breakfast|1|luggage = bags for a trip|לפני טיול אורזים את המזוודות והתיקים, luggage.|قبل الرحلة نحزم الحقائب، luggage.|Перед поездкой собирают багаж, luggage.|Before a trip we pack our bags, our luggage.",
+"Doctors give you ___ when you are sick.|medicine|luggage|a passport|a pillow|1|medicine helps when you are ill|כשחולים, הרופא נותן תרופה, medicine.|عندما نمرض يعطينا الطبيب دواء، medicine.|Когда болеешь, врач даёт лекарство, medicine.|When you are sick, a doctor gives you medicine.",
+"I have a ___. My head hurts.|headache|toothbrush|vegetable|journey|1|headache = pain in the head|כשהראש כואב יש כאב ראש, headache.|عندما يؤلمنا الرأس يكون عندنا صداع، headache.|Когда болит голова, это headache.|When your head hurts, you have a headache.",
+"Fruit and vegetables are ___.|healthy|dangerous|noisy|expensive|1|healthy = good for the body|פירות וירקות טובים לגוף, ולכן הם healthy.|الفواكه والخضار مفيدة للجسم، لذلك هي healthy.|Фрукты и овощи полезны для тела, поэтому они healthy.|Fruit and vegetables are good for your body, so they are healthy.",
+"A person who visits places for fun is a ___.|tourist|doctor|farmer|waiter|1|tourist = visitor|מי שמבקר במקומות להנאה הוא תייר, tourist.|من يزور أماكن للمتعة سائح، tourist.|Тот, кто ездит по местам для удовольствия, — турист, tourist.|A person who visits places for fun is a tourist.",
+"My phone needs a ___ because it is dead.|charger|passport|pillow|ticket|1|charger gives power|טלפון שהסוללה שלו נגמרה צריך מטען, charger.|الهاتف الذي نفدت بطاريته يحتاج شاحنًا، charger.|Телефону с пустой батареей нужна зарядка, charger.|A phone with no power needs a charger.",
+"I play games ___ with my friends.|online|ill|outside the|every|1|online = on the internet|לשחק עם חברים דרך האינטרנט זה online.|اللعب مع الأصدقاء عبر الإنترنت هو online.|Играть с друзьями через интернет — это online.|Playing with friends on the internet is playing online.",
+"The ___ from Tel Aviv to Eilat takes five hours.|journey|screen|exercise|battery|2|journey = a long trip|נסיעה ארוכה של חמש שעות היא journey.|السفر الطويل لخمس ساعات هو journey.|Долгая поездка на пять часов — это journey.|A long trip of five hours is a journey.",
+"To keep your account safe, never tell anyone your ___.|password|ticket|medicine|luggage|2|password = secret word|מילה סודית ששומרת על החשבון היא סיסמה, password.|الكلمة السرية التي تحمي الحساب هي password.|Секретное слово, которое защищает аккаунт, — password.|The secret word that keeps your account safe is a password.",
+"Doing ___ every day keeps you fit.|exercise|luggage|passport|journey|2|exercise = physical activity|פעילות גופנית כל יום שומרת על הכושר: exercise.|النشاط البدني كل يوم يحافظ على اللياقة: exercise.|Физические упражнения каждый день держат в форме: exercise.|Moving your body every day keeps you fit: exercise.",
+"The ___ of my laptop is very big.|screen|medicine|menu|journey|2|screen = where we look|החלק במחשב שמסתכלים עליו הוא מסך, screen.|الجزء من الحاسوب الذي ننظر إليه هو الشاشة، screen.|Часть ноутбука, на которую смотрят, — экран, screen.|The part of a laptop you look at is the screen.",
+"You should ___ a file from the internet only if it's safe.|download|exercise|pack|visit|2|download = copy to your device|להעתיק קובץ מהאינטרנט למכשיר זה download.|نسخ ملف من الإنترنت إلى الجهاز هو download.|Скопировать файл из интернета на устройство — download.|To copy a file from the internet to your device is to download it.",
+"I stayed in a small ___ near the beach. (a place to sleep on a trip)|hotel|hospital|pharmacy|airport|2|hotel = a place to stay|מקום שישנים בו בטיול הוא מלון, hotel.|المكان الذي ننام فيه في الرحلة فندق، hotel.|Место, где спят в поездке, — гостиница, hotel.|A place where you sleep on a trip is a hotel.",
+"When you're ill, you need to rest in ___.|bed|a passport|a tourist|a battery|2|rest in bed|כשחולים נחים במיטה, ולכן in bed.|عندما نمرض نرتاح في السرير، لذلك in bed.|Когда болеешь, отдыхаешь в постели, поэтому in bed.|When you are ill, you rest in bed.",
+"The plane ___ at 8:00.|takes off|gets up|turns on|puts on|2|take off = leave the ground|מטוס שעוזב את הקרקע ממריא: takes off.|الطائرة التي تغادر الأرض تُقلع: takes off.|Самолёт, который отрывается от земли, взлетает: takes off.|When a plane leaves the ground, it takes off.",
+"A person who sells medicine works in a ___.|pharmacy|bakery|library|stadium|3|pharmacy = shop for medicine|מי שמוכר תרופות עובד בבית מרקחת, pharmacy.|من يبيع الأدوية يعمل في صيدلية، pharmacy.|Тот, кто продаёт лекарства, работает в аптеке, pharmacy.|A person who sells medicine works in a pharmacy.",
+"Please ___ your phone. The film is starting.|turn off|take off|give up|look for|3|turn off = stop a device|לכבות טלפון אומרים turn off.|لإطفاء الهاتف نقول turn off.|Выключить телефон — turn off.|To stop a phone from working, we turn it off.",
+"The flight was ___ because of the storm.|cancelled|downloaded|packed|charged|3|cancelled = not happening|בגלל הסערה הטיסה לא התקיימה: cancelled.|بسبب العاصفة لم تتمّ الرحلة: cancelled.|Из-за бури полёт не состоялся: cancelled.|Because of the storm, the flight did not happen: cancelled.",
+"A ___ person always gets enough sleep and exercise.|healthy|hungry|dangerous|noisy|3|healthy = in good condition|מי שישן מספיק ועושה ספורט הוא בריא, healthy.|من ينام جيدًا ويمارس الرياضة صحيح الجسم، healthy.|Кто высыпается и занимается спортом, тот здоровый, healthy.|A person with enough sleep and exercise is healthy.",
+"I lost my way, so I used a ___ on my phone.|map|passport|pillow|menu|3|a map shows the way|מפה מראה את הדרך, ולכן map.|الخريطة تُرينا الطريق، لذلك map.|Карта показывает дорогу, поэтому map.|A map shows you the way.",
+"The battery is ___. I must charge it.|flat|healthy|expensive journey|tourist|3|flat = no power|סוללה בלי כוח היא flat, ולכן צריך לטעון אותה.|البطارية الفارغة هي flat، لذلك يجب شحنها.|Пустая батарея — flat, поэтому её надо зарядить.|A battery with no power is flat, so you must charge it.",
+"We stayed in a ___ hotel, with a pool and a view of the sea.|luxury|flat|tiny|cheap and|3|luxury = very comfortable and expensive|מלון עם בריכה ונוף לים הוא נוח ויקר: luxury.|فندق مع مسبح ومنظر للبحر مريح وغالٍ: luxury.|Отель с бассейном и видом на море удобный и дорогой: luxury.|A hotel with a pool and a sea view is a luxury hotel.",
+"Washing hands helps to ___ germs from spreading.|stop|download|pack|visit|3|stop = prevent|רחיצת ידיים עוצרת את החיידקים, ולכן stop.|غسل اليدين يوقف الجراثيم، لذلك stop.|Мытьё рук останавливает микробы, поэтому stop.|Washing hands stops germs from spreading."
 ],L("בחרו את המילה שמתאימה.","اختاروا الكلمة المناسبة.","Выбери подходящее слово.","Choose the word that fits."),H("קראו את המשפט ושאלו: איזו מילה מתאימה למשמעות?","اقرؤوا الجملة واسألوا: أي كلمة تناسب المعنى؟","Прочитай предложение и спроси: какое слово подходит по смыслу?","Read the sentence and ask: which word fits the meaning?"),E_OK);
 
 fillGen("cond",[
-"If it rains, we ___ at home.|will stay|would stay|stayed|stay will|1|if + present, will",
-"If I have time, I ___ you.|will call|would call|called|calling|1|if + present, will",
-"If you heat ice, it ___.|melts|will melted|melting|melted|1|always true: present + present",
-"If she studies, she ___ the test.|will pass|would pass|passed|passing|1|real future: will",
-"I'll tell him if I ___ him.|see|will see|saw|would see|1|after if: present, not will",
-"If we hurry, we ___ the bus.|will catch|would catch|caught|catching|1|if + present, will",
-"If it is sunny tomorrow, we ___ to the beach.|will go|would go|went|going|1|will go",
-"What will you do if you ___ the exam?|fail|will fail|failed|would fail|1|after if: present",
-"If I ___ rich, I would buy a boat.|were|am|will be|be|2|unreal now: if + past, would",
-"If she ___ more, she would know the answer.|studied|studies|will study|study|2|if + past, would",
-"I would help you if I ___ the time.|had|have|will have|would have|2|if + past",
-"If I were you, I ___ say sorry.|would|will|did|am|2|if I were you, would",
-"If we lived near the sea, we ___ swim every day.|would|will|did|are|2|would + verb",
-"If he ___ a car, he would drive to work.|had|has|have|will have|2|if + past",
-"She would be happy if you ___ her.|called|call|will call|would call|2|if + past",
-"If I knew his number, I ___ him.|would call|will call|called|am calling|2|would call",
-"If I had known, I ___ you.|would have told|will tell|would tell|told|3|if + had V3, would have V3",
-"If she had studied, she ___ the test.|would have passed|would pass|will pass|passed|3|third conditional",
-"If we ___ earlier, we wouldn't have missed the train.|had left|left|leave|would leave|3|if + had + V3",
-"I wish I ___ more time. (but I don't)|had|have|will have|would have|3|wish + past",
-"Unless you hurry, you ___ late.|will be|would be|were|are being|3|unless = if not",
-"If he ___ harder, he would have won.|had tried|tried|tries|would try|3|if + had V3",
-"I would have gone if I ___ about it.|had known|knew|know|would know|3|if + had V3",
-"If you mix red and blue, you ___ purple.|get|will got|getting|would got|3|always true"
+"If it rains, we ___ at home.|will stay|would stay|stayed|stay will|1|if + present, will|אחרי if בא הווה, ובחלק השני will: will stay.|بعد if يأتي المضارع، وفي الجزء الآخر will: will stay.|После if настоящее время, а во второй части will: will stay.|After if comes the present, and the other part has will: will stay.",
+"If I have time, I ___ you.|will call|would call|called|calling|1|if + present, will|אחרי if בא הווה, ובחלק השני will: will call.|بعد if يأتي المضارع، وفي الجزء الآخر will: will call.|После if настоящее время, а во второй части will: will call.|After if comes the present, and the other part has will: will call.",
+"If you heat ice, it ___.|melts|will melted|melting|melted|1|always true: present + present|זה תמיד נכון, ולכן הווה בשני החלקים: melts.|هذا صحيح دائمًا، لذلك المضارع في الجزأين: melts.|Это всегда так, поэтому настоящее время в обеих частях: melts.|This is always true, so both parts are in the present: melts.",
+"If she studies, she ___ the test.|will pass|would pass|passed|passing|1|real future: will|זה יכול לקרות באמת, ולכן will pass.|هذا ممكن فعلًا، لذلك will pass.|Это реально может случиться, поэтому will pass.|This can really happen, so we use will pass.",
+"I'll tell him if I ___ him.|see|will see|saw|would see|1|after if: present, not will|אחרי if לא כותבים will, אלא הווה: see.|بعد if لا نكتب will بل المضارع: see.|После if не пишем will, а настоящее время: see.|After if we do not use will. We use the present: see.",
+"If we hurry, we ___ the bus.|will catch|would catch|caught|catching|1|if + present, will|אחרי if בא הווה, ובחלק השני will: will catch.|بعد if يأتي المضارع، وفي الجزء الآخر will: will catch.|После if настоящее время, а во второй части will: will catch.|After if comes the present, and the other part has will: will catch.",
+"If it is sunny tomorrow, we ___ to the beach.|will go|would go|went|going|1|will go|זה יכול לקרות מחר, ולכן will go.|هذا ممكن غدًا، لذلك will go.|Это может случиться завтра, поэтому will go.|This can happen tomorrow, so we use will go.",
+"What will you do if you ___ the exam?|fail|will fail|failed|would fail|1|after if: present|אחרי if לא כותבים will, אלא הווה: fail.|بعد if لا نكتب will بل المضارع: fail.|После if не пишем will, а настоящее время: fail.|After if we do not use will. We use the present: fail.",
+"If I ___ rich, I would buy a boat.|were|am|will be|be|2|unreal now: if + past, would|אני לא באמת עשיר. במצב דמיוני אומרים If I were.|أنا لست غنيًا فعلًا. في الحالة الخيالية نقول If I were.|Я не богат на самом деле. В воображаемой ситуации: If I were.|I am not really rich. For an imagined case we say If I were.",
+"If she ___ more, she would know the answer.|studied|studies|will study|study|2|if + past, would|זה לא המצב עכשיו, ולכן if ועבר: studied.|هذا ليس الواقع الآن، لذلك if مع الماضي: studied.|Сейчас это не так, поэтому if и прошедшее время: studied.|It is not true now, so we use if with the past: studied.",
+"I would help you if I ___ the time.|had|have|will have|would have|2|if + past|זה לא המצב עכשיו, ולכן if ועבר: had.|هذا ليس الواقع الآن، لذلك if مع الماضي: had.|Сейчас это не так, поэтому if и прошедшее время: had.|It is not true now, so we use if with the past: had.",
+"If I were you, I ___ say sorry.|would|will|did|am|2|if I were you, would|If I were you היא עצה, ובחלק השני would.|If I were you نصيحة، وفي الجزء الآخر would.|If I were you — это совет, а во второй части would.|If I were you gives advice, and the other part has would.",
+"If we lived near the sea, we ___ swim every day.|would|will|did|are|2|would + verb|אנחנו לא גרים ליד הים. זה דמיון, ולכן would.|نحن لا نسكن قرب البحر. هذا خيال، لذلك would.|Мы не живём у моря. Это воображение, поэтому would.|We do not live near the sea. It is imagined, so we use would.",
+"If he ___ a car, he would drive to work.|had|has|have|will have|2|if + past|אין לו מכונית עכשיו, ולכן if ועבר: had.|ليس عنده سيارة الآن، لذلك if مع الماضي: had.|Сейчас у него нет машины, поэтому if и прошедшее: had.|He has no car now, so we use if with the past: had.",
+"She would be happy if you ___ her.|called|call|will call|would call|2|if + past|בחלק השני יש would, ולכן אחרי if בא עבר: called.|في الجزء الآخر would، لذلك بعد if يأتي الماضي: called.|В другой части would, поэтому после if прошедшее: called.|The other part has would, so after if we use the past: called.",
+"If I knew his number, I ___ him.|would call|will call|called|am calling|2|would call|אחרי if בא עבר, knew, ולכן בחלק השני would call.|بعد if فعل ماضٍ knew، لذلك في الجزء الآخر would call.|После if прошедшее knew, поэтому во второй части would call.|After if comes the past, knew, so the other part is would call.",
+"If I had known, I ___ you.|would have told|will tell|would tell|told|3|if + had V3, would have V3|זה עבר שלא קרה, ולכן would have told.|هذا ماضٍ لم يحدث، لذلك would have told.|Это прошлое, которого не было, поэтому would have told.|This is a past that did not happen, so would have told.",
+"If she had studied, she ___ the test.|would have passed|would pass|will pass|passed|3|third conditional|היא לא למדה, וזה כבר עבר, ולכן would have passed.|هي لم تدرس، وهذا في الماضي، لذلك would have passed.|Она не училась, и это в прошлом, поэтому would have passed.|She did not study, and it is over, so would have passed.",
+"If we ___ earlier, we wouldn't have missed the train.|had left|left|leave|would leave|3|if + had + V3|wouldn't have מראה עבר שלא קרה, ולכן אחרי if בא had left.|wouldn't have تدل على ماضٍ لم يحدث، لذلك بعد if يأتي had left.|wouldn't have — прошлое, которого не было, поэтому после if — had left.|Wouldn't have shows a past that did not happen, so had left.",
+"I wish I ___ more time. (but I don't)|had|have|will have|would have|3|wish + past|אחרי I wish, על משהו שאין עכשיו, בא עבר: had.|بعد I wish، عن شيء غير موجود الآن، يأتي الماضي: had.|После I wish, о том, чего нет сейчас, идёт прошедшее: had.|After I wish, for something not true now, we use the past: had.",
+"Unless you hurry, you ___ late.|will be|would be|were|are being|3|unless = if not|unless פירושו ״אם לא״. זה יכול לקרות, ולכן will be.|unless تعني «إذا لم». هذا ممكن، لذلك will be.|unless значит «если не». Это реально, поэтому will be.|Unless means if not. It can happen, so we use will be.",
+"If he ___ harder, he would have won.|had tried|tried|tries|would try|3|if + had V3|בחלק השני יש would have, ולכן אחרי if בא had tried.|في الجزء الآخر would have، لذلك بعد if يأتي had tried.|Во второй части would have, поэтому после if — had tried.|The other part has would have, so after if we use had tried.",
+"I would have gone if I ___ about it.|had known|knew|know|would know|3|if + had V3|בחלק השני יש would have, ולכן אחרי if בא had known.|في الجزء الآخر would have، لذلك بعد if يأتي had known.|Во второй части would have, поэтому после if — had known.|The other part has would have, so after if we use had known.",
+"If you mix red and blue, you ___ purple.|get|will got|getting|would got|3|always true|זה תמיד נכון, ולכן הווה בשני החלקים: get.|هذا صحيح دائمًا، لذلك المضارع في الجزأين: get.|Это всегда так, поэтому настоящее время в обеих частях: get.|This is always true, so both parts are in the present: get."
 ],I_FILL,H("אם אפשרי: if + הווה, will. לא אמיתי עכשיו: if + עבר, would. עבר שלא קרה: if + had + צורה 3, would have + צורה 3.","إذا ممكن: if + مضارع، will. غير حقيقي الآن: if + ماضٍ، would. ماضٍ لم يحدث: if + had + التصريف 3، would have + التصريف 3.","Возможное: if + настоящее, will. Нереальное сейчас: if + прошедшее, would. Не случилось в прошлом: if + had + V3, would have + V3.","Possible: if + present, will. Unreal now: if + past, would. Past that did not happen: if + had + V3, would have + V3."),E_OK);
 
 fillGen("pass",[
-"English ___ in many countries.|is spoken|speaks|spoke|is speaking|1|is + V3",
-"The cake ___ by my mother.|was made|made|makes|is making|1|was + V3",
-"The window ___ yesterday.|was broken|were broken|breaks|is breaking|1|was + V3",
-"These cars ___ in Japan.|are made|make|made|is made|1|are + V3",
-"The letter ___ last week.|was sent|sent|sends|is sent|1|was sent",
-"Pizza ___ in Italy.|is eaten|eats|ate|eating|1|is + V3",
-"The song ___ by a famous singer.|was sung|sang|sings|sing|1|was sung",
-"My bike ___ yesterday.|was stolen|stole|steals|is stealing|1|was stolen",
-"The room ___ every day.|is cleaned|cleans|cleaned|is cleaning|2|is + V3",
-"The homework ___ by all the students yesterday.|was done|did|do|is doing|2|was done",
-"The Eiffel Tower ___ in 1889.|was built|built|is built|builds|2|past passive",
-"The thieves ___ by the police.|were caught|caught|catch|was caught|2|plural: were",
-"A lot of rice ___ in Asia.|is grown|grows up|are grown|is growing up|2|is grown",
-"The match ___ because of the rain.|was cancelled|cancelled|cancels|is cancelling|2|was cancelled",
-"Dinner ___ at seven every day.|is served|serves|served|is serving|2|is served",
-"The books ___ in the library.|are kept|keeps|kept|is kept|2|plural: are",
-"The new school ___ next year.|will be opened|will open to|opens to|is opened|3|future passive: will be + V3",
-"The report ___ by tomorrow.|must be finished|must finish|must be finish|must finished|3|must be + V3",
-"The house ___ at the moment.|is being painted|is painted|paints|was painting|3|is being + V3",
-"I was told that the film ___ by a great director.|was made|made|makes|is making|3|was made",
-"Who ___ the telephone?|invented|was invented|did invented|is invented|3|active: who did it",
-"The window ___ by a ball. The ball ___ by Tom.|was broken / was thrown|broke / threw|was broke / was throw|is broken / throws|3|two passive verbs",
-"The package has ___ delivered.|been|be|being|was|3|has been + V3",
-"This room ___ for meetings.|is used|uses|using|use|3|is used"
+"English ___ in many countries.|is spoken|speaks|spoke|is speaking|1|is + V3|השפה לא מדברת. אנשים מדברים אותה, ולכן is spoken.|اللغة لا تتكلم. الناس يتكلمونها، لذلك is spoken.|Язык сам не говорит. На нём говорят люди, поэтому is spoken.|The language does not speak. People speak it, so is spoken.",
+"The cake ___ by my mother.|was made|made|makes|is making|1|was + V3|העוגה לא הכינה את עצמה. אמא הכינה אותה, ולכן was made.|الكعكة لم تصنع نفسها. أمي صنعتها، لذلك was made.|Торт сам себя не сделал. Его сделала мама, поэтому was made.|The cake did not make itself. Mum made it, so was made.",
+"The window ___ yesterday.|was broken|were broken|breaks|is breaking|1|was + V3|מישהו שבר את החלון אתמול. לחלון אחד אומרים was broken.|أحدهم كسر النافذة أمس. لنافذة واحدة نقول was broken.|Окно разбили вчера. Для одного окна — was broken.|Someone broke the window yesterday. One window, so was broken.",
+"These cars ___ in Japan.|are made|make|made|is made|1|are + V3|מכוניות לא מייצרות את עצמן. כשהן רבות בהווה: are made.|السيارات لا تصنع نفسها. للجمع في المضارع: are made.|Машины не делают сами себя. Их много, и это сейчас: are made.|Cars do not make themselves. Many cars, now: are made.",
+"The letter ___ last week.|was sent|sent|sends|is sent|1|was sent|המכתב לא שלח את עצמו, וזה היה בשבוע שעבר: was sent.|الرسالة لم ترسل نفسها، وهذا في الأسبوع الماضي: was sent.|Письмо само себя не отправило, это было на прошлой неделе: was sent.|The letter did not send itself, and it was last week: was sent.",
+"Pizza ___ in Italy.|is eaten|eats|ate|eating|1|is + V3|הפיצה לא אוכלת. אנשים אוכלים אותה, ולכן is eaten.|البيتزا لا تأكل. الناس يأكلونها، لذلك is eaten.|Пицца не ест. Её едят люди, поэтому is eaten.|Pizza does not eat. People eat it, so is eaten.",
+"The song ___ by a famous singer.|was sung|sang|sings|sing|1|was sung|השיר לא שר. הזמר שר אותו, ולכן was sung.|الأغنية لا تغني. المغني غنّاها، لذلك was sung.|Песня не поёт. Её спел певец, поэтому was sung.|The song does not sing. A singer sang it, so was sung.",
+"My bike ___ yesterday.|was stolen|stole|steals|is stealing|1|was stolen|האופניים לא גנבו. מישהו גנב אותם, ולכן was stolen.|الدراجة لم تسرق. أحدهم سرقها، لذلك was stolen.|Велосипед не крал. Его украли, поэтому was stolen.|The bike did not steal. Someone stole it, so was stolen.",
+"The room ___ every day.|is cleaned|cleans|cleaned|is cleaning|2|is + V3|החדר לא מנקה. מנקים אותו כל יום, ולכן is cleaned.|الغرفة لا تنظّف. ينظّفونها كل يوم، لذلك is cleaned.|Комната не убирает. Её убирают каждый день, поэтому is cleaned.|The room does not clean. Someone cleans it every day, so is cleaned.",
+"The homework ___ by all the students yesterday.|was done|did|do|is doing|2|was done|שיעורי הבית לא עשו כלום. התלמידים עשו אותם: was done.|الوظيفة لم تفعل شيئًا. الطلاب أنجزوها: was done.|Домашка сама ничего не делала. Её сделали ученики: was done.|The homework did nothing. The students did it: was done.",
+"The Eiffel Tower ___ in 1889.|was built|built|is built|builds|2|past passive|המגדל לא בנה. אנשים בנו אותו ב-1889: was built.|البرج لم يبنِ. الناس بنوه سنة 1889: was built.|Башня не строила. Её построили люди в 1889 году: was built.|The tower did not build. People built it in 1889: was built.",
+"The thieves ___ by the police.|were caught|caught|catch|was caught|2|plural: were|המשטרה תפסה את הגנבים, והם רבים: were caught.|الشرطة أمسكت اللصوص، وهم جمع: were caught.|Полиция поймала воров, их много: were caught.|The police caught the thieves, and there are many: were caught.",
+"A lot of rice ___ in Asia.|is grown|grows up|are grown|is growing up|2|is grown|האורז לא מגדל. מגדלים אותו, ולכן is grown.|الأرز لا يزرع. الناس يزرعونه، لذلك is grown.|Рис не выращивает. Его выращивают, поэтому is grown.|Rice does not grow things. People grow it, so is grown.",
+"The match ___ because of the rain.|was cancelled|cancelled|cancels|is cancelling|2|was cancelled|המשחק לא ביטל. ביטלו אותו בגלל הגשם: was cancelled.|المباراة لم تلغِ. ألغوها بسبب المطر: was cancelled.|Матч ничего не отменял. Его отменили из-за дождя: was cancelled.|The match did not cancel. Someone cancelled it: was cancelled.",
+"Dinner ___ at seven every day.|is served|serves|served|is serving|2|is served|ארוחת הערב לא מגישה. מגישים אותה כל יום: is served.|العشاء لا يقدّم. يقدّمونه كل يوم: is served.|Ужин не подаёт. Его подают каждый день: is served.|Dinner does not serve. Someone serves it every day: is served.",
+"The books ___ in the library.|are kept|keeps|kept|is kept|2|plural: are|הספרים לא שומרים. שומרים אותם, והם רבים: are kept.|الكتب لا تحفظ. يحفظونها، وهي جمع: are kept.|Книги не хранят. Их хранят, и их много: are kept.|The books do not keep. Someone keeps them, many books: are kept.",
+"The new school ___ next year.|will be opened|will open to|opens to|is opened|3|future passive: will be + V3|פותחים את בית הספר בעתיד. סביל בעתיד: will be opened.|سيفتحون المدرسة في المستقبل. المجهول في المستقبل: will be opened.|Школу откроют в будущем. Пассив в будущем: will be opened.|Someone will open the school later. Future passive: will be opened.",
+"The report ___ by tomorrow.|must be finished|must finish|must be finish|must finished|3|must be + V3|הדוח לא מסיים. מישהו חייב לסיים אותו: must be finished.|التقرير لا يُنهي. يجب أن يُنهيه أحد: must be finished.|Отчёт не заканчивает. Его должны закончить: must be finished.|The report does not finish. Someone must finish it: must be finished.",
+"The house ___ at the moment.|is being painted|is painted|paints|was painting|3|is being + V3|צובעים את הבית ממש עכשיו: is being painted.|يدهنون البيت الآن: is being painted.|Дом красят прямо сейчас: is being painted.|Someone is painting the house right now: is being painted.",
+"I was told that the film ___ by a great director.|was made|made|makes|is making|3|was made|הסרט לא עשה. במאי עשה אותו: was made.|الفيلم لم يصنع. المخرج صنعه: was made.|Фильм ничего не снимал. Его снял режиссёр: was made.|The film did not make. A director made it: was made.",
+"Who ___ the telephone?|invented|was invented|did invented|is invented|3|active: who did it|כאן שואלים מי עשה, ולכן פעיל ולא סביל: invented.|هنا نسأل من فعل، لذلك المبني للمعلوم: invented.|Здесь спрашиваем, кто сделал, поэтому актив, а не пассив: invented.|Here we ask who did it, so it is active, not passive: invented.",
+"The window ___ by a ball. The ball ___ by Tom.|was broken / was thrown|broke / threw|was broke / was throw|is broken / throws|3|two passive verbs|החלון לא שבר והכדור לא זרק. בשניהם סביל בעבר.|النافذة لم تكسر والكرة لم ترمِ. في الاثنين المجهول في الماضي.|Окно не разбивало, мяч не бросал. В обоих — пассив в прошлом.|The window did not break and the ball did not throw: both are passive.",
+"The package has ___ delivered.|been|be|being|was|3|has been + V3|אחרי has באה been, ואחריה צורה שלישית: has been delivered.|بعد has تأتي been، وبعدها التصريف الثالث: has been delivered.|После has идёт been, потом третья форма: has been delivered.|After has comes been, then the third form: has been delivered.",
+"This room ___ for meetings.|is used|uses|using|use|3|is used|החדר לא משתמש. משתמשים בו לפגישות: is used.|الغرفة لا تستعمل. يستعملونها للاجتماعات: is used.|Комната ничем не пользуется. Ею пользуются для встреч: is used.|The room does not use anything. People use it for meetings: is used."
 ],I_FILL,H("סביל: be + צורה שלישית. מי עשה? by + מי שעשה. חשוב מה קרה, לא מי עשה.","المبني للمجهول: be + التصريف الثالث. من فعل؟ by + الفاعل. المهم ما حدث.","Пассив: be + третья форма. Кто сделал? by + тот, кто сделал. Важно, что произошло.","Passive: be + third form. Who did it? by + the doer. What happened matters more."),E_OK);
 
 fillGen("rel",[
-"The girl ___ lives next door is my friend.|who|which|where|whose|1|who = person",
-"This is the book ___ I like.|which|who|where|whose|1|which = thing",
-"That is the school ___ I study.|where|who|which|whose|1|where = place",
-"The boy ___ bike is red is my cousin.|whose|who|which|where|1|whose = belongs to",
-"I know a man ___ speaks five languages.|who|which|where|whose|1|who = person",
-"The movie ___ we saw was great.|that|who|where|whose|1|that = thing or person",
-"Here is the cat ___ ate my fish.|that|where|whose|what|1|that for animals",
-"The city ___ I was born is Haifa.|where|who|which|whose|1|where = place",
-"A teacher is a person ___ teaches students.|who|which|where|whose|2|who = person",
-"The phone ___ I bought is very fast.|which|who|where|whose|2|which = thing",
-"This is the park ___ we play football.|where|who|whose|which|2|where = place",
-"She has a friend ___ father is a pilot.|whose|who|which|where|2|whose = of the friend",
-"The woman ___ helped me was kind.|who|which|whose|where|2|who = person",
-"The restaurant ___ we ate yesterday was nice.|where|which|who|whose|2|where = place",
-"Is this the bag ___ you lost?|that|who|where|whose|2|that = thing",
-"The people ___ live here are friendly.|who|which|where|whose|2|who = people",
-"The man ___ car was stolen called the police.|whose|who|which|where|3|whose = his car",
-"I read a book ___ was written 100 years ago.|which|who|where|whose|3|which = book",
-"The house, ___ was very old, was sold.|which|who|where|whose|3|which = thing (extra info)",
-"That's the reason ___ I was late.|why|where|who|whose|3|reason + why",
-"I remember the day ___ we met.|when|where|who|whose|3|day + when",
-"The girl to ___ I spoke was new.|whom|who|whose|which|3|to whom (formal)",
-"Everything ___ he said was true.|that|who|where|whose|3|everything + that",
-"My sister, ___ lives in Paris, is a doctor.|who|which|where|whose|3|who = person (extra info)"
-],I_FILL,H("who = אדם. which = דבר. where = מקום. whose = של מי. that = אדם או דבר.","who = شخص. which = شيء. where = مكان. whose = ملك مَن. that = شخص أو شيء.","who = человек. which = вещь. where = место. whose = чей. that = человек или вещь.","who = a person. which = a thing. where = a place. whose = belonging to. that = a person or a thing."),E_OK);
+"The girl ___ lives next door is my friend.|who|which|where|whose|1|who = person|girl היא אדם, ועל אדם אומרים who.|girl شخص، وللشخص نقول who.|girl — это человек, а о человеке говорим who.|A girl is a person, and for a person we use who.",
+"This is the book ___ I like.|which|who|where|whose|1|which = thing|book הוא דבר, ועל דבר אומרים which.|book شيء، وللشيء نقول which.|book — это вещь, а о вещи говорим which.|A book is a thing, and for a thing we use which.",
+"That is the school ___ I study.|where|who|which|whose|1|where = place|school הוא מקום, ועל מקום אומרים where.|school مكان، وللمكان نقول where.|school — это место, а о месте говорим where.|A school is a place, and for a place we use where.",
+"The boy ___ bike is red is my cousin.|whose|who|which|where|1|whose = belongs to|האופניים של הילד, ועל ״של מי״ אומרים whose.|الدراجة للولد، وللملكية نقول whose.|Велосипед принадлежит мальчику, а «чей» — это whose.|The bike belongs to the boy, so we use whose.",
+"I know a man ___ speaks five languages.|who|which|where|whose|1|who = person|man הוא אדם, ועל אדם אומרים who.|man شخص، وللشخص نقول who.|man — это человек, а о человеке говорим who.|A man is a person, and for a person we use who.",
+"The movie ___ we saw was great.|that|who|where|whose|1|that = thing or person|movie הוא דבר, ועל דבר אפשר להגיד that.|movie شيء، ويمكن أن نقول that عن الشيء.|movie — это вещь, а о вещи можно сказать that.|A movie is a thing, and we can use that for a thing.",
+"Here is the cat ___ ate my fish.|that|where|whose|what|1|that for animals|cat הוא בעל חיים, ועל בעל חיים אומרים that.|cat حيوان، وعن الحيوان نقول that.|cat — это животное, а о животном говорим that.|A cat is an animal, and for an animal we can use that.",
+"The city ___ I was born is Haifa.|where|who|which|whose|1|where = place|city היא מקום, ועל מקום אומרים where.|city مكان، وللمكان نقول where.|city — это место, а о месте говорим where.|A city is a place, and for a place we use where.",
+"A teacher is a person ___ teaches students.|who|which|where|whose|2|who = person|person הוא אדם, ועל אדם אומרים who.|person شخص، وللشخص نقول who.|person — это человек, а о человеке говорим who.|Person means a human, and for a person we use who.",
+"The phone ___ I bought is very fast.|which|who|where|whose|2|which = thing|phone הוא דבר, ועל דבר אומרים which.|phone شيء، وللشيء نقول which.|phone — это вещь, а о вещи говорим which.|A phone is a thing, and for a thing we use which.",
+"This is the park ___ we play football.|where|who|whose|which|2|where = place|park הוא מקום, ועל מקום אומרים where.|park مكان، وللمكان نقول where.|park — это место, а о месте говорим where.|A park is a place, and for a place we use where.",
+"She has a friend ___ father is a pilot.|whose|who|which|where|2|whose = of the friend|האבא הוא של החברה, ועל ״של מי״ אומרים whose.|الأب هو أب الصديقة، وللملكية نقول whose.|Это отец подруги, а «чей» — это whose.|The father belongs to the friend, so we use whose.",
+"The woman ___ helped me was kind.|who|which|whose|where|2|who = person|woman היא אדם, ועל אדם אומרים who.|woman شخص، وللشخص نقول who.|woman — это человек, а о человеке говорим who.|A woman is a person, and for a person we use who.",
+"The restaurant ___ we ate yesterday was nice.|where|which|who|whose|2|where = place|restaurant הוא מקום, ועל מקום אומרים where.|restaurant مكان، وللمكان نقول where.|restaurant — это место, а о месте говорим where.|A restaurant is a place, and for a place we use where.",
+"Is this the bag ___ you lost?|that|who|where|whose|2|that = thing|bag הוא דבר, ועל דבר אפשר להגיד that.|bag شيء، ويمكن أن نقول that عن الشيء.|bag — это вещь, а о вещи можно сказать that.|A bag is a thing, and we can use that for a thing.",
+"The people ___ live here are friendly.|who|which|where|whose|2|who = people|people הם אנשים, ועל אנשים אומרים who.|people أشخاص، وللأشخاص نقول who.|people — это люди, а о людях говорим who.|People are persons, and for persons we use who.",
+"The man ___ car was stolen called the police.|whose|who|which|where|3|whose = his car|המכונית היא של האיש, ועל ״של מי״ אומרים whose.|السيارة للرجل، وللملكية نقول whose.|Машина принадлежит мужчине, а «чей» — это whose.|The car belongs to the man, so we use whose.",
+"I read a book ___ was written 100 years ago.|which|who|where|whose|3|which = book|book הוא דבר, ועל דבר אומרים which.|book شيء، وللشيء نقول which.|book — это вещь, а о вещи говорим which.|A book is a thing, and for a thing we use which.",
+"The house, ___ was very old, was sold.|which|who|where|whose|3|which = thing (extra info)|house הוא דבר. כשמוסיפים מידע בין פסיקים, אומרים which.|house شيء. عندما نضيف معلومة بين فاصلتين نقول which.|house — это вещь. Когда добавляем сведения между запятыми, говорим which.|A house is a thing. For extra facts between commas, we use which.",
+"That's the reason ___ I was late.|why|where|who|whose|3|reason + why|אחרי the reason אומרים why.|بعد the reason نقول why.|После the reason говорим why.|After the reason we use why.",
+"I remember the day ___ we met.|when|where|who|whose|3|day + when|day הוא זמן, ועל זמן אומרים when.|day زمن، وللزمن نقول when.|day — это время, а о времени говорим when.|A day is a time, and for a time we use when.",
+"The girl to ___ I spoke was new.|whom|who|whose|which|3|to whom (formal)|אחרי מילת יחס כמו to, על אדם אומרים whom.|بعد حرف جر مثل to نقول whom عن الشخص.|После предлога, например to, о человеке говорим whom.|After a word like to, for a person we use whom.",
+"Everything ___ he said was true.|that|who|where|whose|3|everything + that|אחרי everything אומרים that.|بعد everything نقول that.|После everything говорим that.|After everything we use that.",
+"My sister, ___ lives in Paris, is a doctor.|who|which|where|whose|3|who = person (extra info)|sister היא אדם. גם כשמוסיפים מידע בין פסיקים, אומרים who.|sister شخص. حتى عندما نضيف معلومة بين فاصلتين نقول who.|sister — это человек. И между запятыми о человеке говорим who.|A sister is a person. Between commas too, we use who.",
+"Tom said, 'I like pizza.' Tom said that ___ liked pizza.|he|I|she|we|2|reported speech: I becomes he|Tom מדבר על עצמו, ולכן בדיבור עקיף I הופך ל-he.|Tom يتكلم عن نفسه، لذلك في الكلام المنقول تصبح I كلمة he.|Tom говорит о себе, поэтому в косвенной речи I становится he.|Tom talks about himself, so in reported speech I becomes he.",
+"Maya said, 'I love the sea.' Maya said that ___ loved the sea.|she|I|he|you|2|reported speech: I becomes she|Maya מדברת על עצמה, ולכן בדיבור עקיף I הופך ל-she.|Maya تتكلم عن نفسها، لذلك في الكلام المنقول تصبح I كلمة she.|Maya говорит о себе, поэтому в косвенной речи I становится she.|Maya talks about herself, so in reported speech I becomes she.",
+"Dan said, 'I am tired.' Dan said that he ___ tired.|was|am|were|be|2|said that: am becomes was|אחרי said הזמן זז צעד אחורה, ולכן am הופך ל-was.|بعد said نرجع خطوة إلى الماضي، لذلك تصبح am كلمة was.|После said время сдвигается назад, поэтому am становится was.|After said the tense moves one step back, so am becomes was.",
+"Noa said, 'I live in Haifa.' Noa said that she ___ in Haifa.|lived|live|living|am live|2|said that: live becomes lived|אחרי said הזמן זז צעד אחורה, ולכן live הופך ל-lived.|بعد said نرجع خطوة إلى الماضي، لذلك تصبح live كلمة lived.|После said время сдвигается назад, поэтому live становится lived.|After said the tense moves one step back, so live becomes lived.",
+"My mum ___ me that dinner was ready.|told|said|spoke|talked|2|told + a person|כשבא אחריו אדם, כמו me, אומרים told ולא said.|عندما يأتي بعده شخص مثل me نقول told وليس said.|Когда дальше идёт человек, например me, говорим told, а не said.|When a person like me comes next, we use told, not said.",
+"She ___ that she was hungry.|said|told|talked|spoke|2|said that|כשלא בא אחריו אדם, אומרים said that ולא told that.|عندما لا يأتي بعده شخص نقول said that وليس told that.|Когда дальше нет человека, говорим said that, а не told that.|When no person comes next, we use said that, not told that.",
+"Dan said, 'I will help you.' Dan said that he ___ help me.|would|will to|is|wills|3|said that: will becomes would|אחרי said הזמן זז צעד אחורה, ולכן will הופך ל-would.|بعد said نرجع خطوة إلى الماضي، لذلك تصبح will كلمة would.|После said время сдвигается назад, поэтому will становится would.|After said the tense moves one step back, so will becomes would.",
+"Maya said, 'I can swim.' Maya said that she ___ swim.|could|cans|is can|can to|3|said that: can becomes could|אחרי said הזמן זז צעד אחורה, ולכן can הופך ל-could.|بعد said نرجع خطوة إلى الماضي، لذلك تصبح can كلمة could.|После said время сдвигается назад, поэтому can становится could.|After said the tense moves one step back, so can becomes could.",
+"He asked, 'Are you ready?' He asked ___ I was ready.|if|that|what|do|3|yes or no question: asked if|שאלה של כן או לא הופכת בדיבור עקיף ל-asked if.|سؤال نعم أو لا يصبح في الكلام المنقول asked if.|Вопрос «да или нет» в косвенной речи становится asked if.|A yes or no question becomes asked if in reported speech.",
+"The teacher said, 'Close your books.' The teacher told us ___ our books.|to close|close|closing|that close|3|told us to + verb|הוראה בדיבור עקיף היא told us to, ואחריה פועל.|الأمر في الكلام المنقول هو told us to وبعده فعل.|Просьба или приказ в косвенной речи — told us to и глагол.|An order in reported speech is told us to and then a verb."
+],I_FILL,H("who = אדם. which = דבר. where = מקום. whose = של מי. that = אדם או דבר. בדיבור עקיף הזמן זז צעד אחורה: am הופך ל-was.","who = شخص. which = شيء. where = مكان. whose = ملك مَن. that = شخص أو شيء. في الكلام المنقول نرجع خطوة إلى الماضي: am تصبح was.","who = человек. which = вещь. where = место. whose = чей. that = человек или вещь. В косвенной речи время сдвигается назад: am становится was.","who = a person. which = a thing. where = a place. whose = belonging to. that = a person or a thing. In reported speech the tense moves back: am becomes was."),E_OK);
 
 fillGen("pv",[
-"Please ___ your shoes. (take them off your feet)|take off|take on|take in|take up|1|take off = remove clothes",
-"I get ___ at 6:30 every morning.|up|on|off|in|1|get up = leave the bed",
-"Can you turn ___ the music? It's too loud.|down|up to|on|into|1|turn down = make quieter",
-"Look ___! A car is coming.|out|for|after|up to|1|look out = be careful",
-"I'm looking ___ my keys. I can't find them.|for|after|up|at to|1|look for = search",
-"She takes care of her baby brother. She looks ___ him.|after|for|up|at|1|look after = take care of",
-"Please turn ___ the light.|on|up to|off to|in|1|turn on = start",
-"We have to give ___ the books on Friday.|in|up on|away to|off|1|give in = hand in",
-"He gave ___ smoking last year.|up|in on|off|away|2|give up = stop",
-"The plane will take ___ in ten minutes.|off|on|up|in|2|take off = leave the ground",
-"I don't know this word. I'll look it ___.|up|after|for|at|2|look up = check in a dictionary",
-"The meeting was put ___ until Monday.|off|on|up with|in|2|put off = delay",
-"Please ___ your coat. It's cold outside.|put on|put off|put up|put away|2|put on = wear",
-"She ran ___ of milk, so she went to the shop.|out|up|off|in|2|run out of = have none left",
-"The car broke ___ on the way to Eilat.|down|up with|out|in|2|break down = stop working",
-"Hurry ___! We're late.|up|on up|off|out|2|hurry up = go faster",
-"They called ___ the party because of the rain.|off|up|in|on|3|call off = cancel",
-"I can't ___ with this noise any more.|put up|put off|put on|put down|3|put up with = tolerate",
-"I get ___ well with my cousins.|on|off to|up to|out|3|get on well = have a good relationship",
-"We should find ___ what time the film starts.|out|up|on|off|3|find out = discover",
-"He grew ___ in a small village.|up|on|down|out|3|grow up = become an adult",
-"I'm looking forward ___ the holiday.|to|for|at|about|3|look forward to",
-"Don't give ___. Try again!|up|off|away to|on to|3|give up = stop trying",
-"The teacher told us to ___ the words on the board.|write down|write off|write up to|write out of|3|write down = note"
+"Please ___ your shoes. (take them off your feet)|take off|take on|take in|take up|1|take off = remove clothes|להוריד בגדים או נעליים אומרים take off.|لخلع الملابس أو الحذاء نقول take off.|Снять одежду или обувь — take off.|To remove shoes or clothes, we say take off.",
+"I get ___ at 6:30 every morning.|up|on|off|in|1|get up = leave the bed|לקום מהמיטה אומרים get up.|للنهوض من السرير نقول get up.|Встать с кровати — get up.|To get out of bed in the morning is to get up.",
+"Can you turn ___ the music? It's too loud.|down|up to|on|into|1|turn down = make quieter|להנמיך את המוזיקה אומרים turn down.|لخفض صوت الموسيقى نقول turn down.|Сделать музыку тише — turn down.|To make music quieter is to turn it down.",
+"Look ___! A car is coming.|out|for|after|up to|1|look out = be careful|כדי להגיד ״זהירות!״ אומרים Look out!|لنقول «انتبه!» نقول Look out!|Чтобы сказать «Осторожно!», говорим Look out!|To tell someone to be careful, we say Look out!",
+"I'm looking ___ my keys. I can't find them.|for|after|up|at to|1|look for = search|לחפש משהו אומרים look for.|للبحث عن شيء نقول look for.|Искать что-то — look for.|To search for something is to look for it.",
+"She takes care of her baby brother. She looks ___ him.|after|for|up|at|1|look after = take care of|לטפל במישהו אומרים look after.|للاعتناء بشخص نقول look after.|Заботиться о ком-то — look after.|To take care of someone is to look after them.",
+"Please turn ___ the light.|on|up to|off to|in|1|turn on = start|להדליק את האור אומרים turn on.|لإشعال الضوء نقول turn on.|Включить свет — turn on.|To make a light work is to turn it on.",
+"We have to give ___ the books on Friday.|in|up on|away to|off|1|give in = hand in|להגיש ספרים או עבודה למורה אומרים give in.|لتسليم الكتب أو الوظيفة للمعلم نقول give in.|Сдать книги или работу учителю — give in.|To hand books or work to a teacher is to give them in.",
+"He gave ___ smoking last year.|up|in on|off|away|2|give up = stop|להפסיק לעשות משהו לגמרי אומרים give up.|للتوقف عن شيء نهائيًا نقول give up.|Совсем бросить что-то — give up.|To stop doing something for good is to give it up.",
+"The plane will take ___ in ten minutes.|off|on|up|in|2|take off = leave the ground|מטוס שעוזב את הקרקע ממריא: take off.|الطائرة التي تغادر الأرض تُقلع: take off.|Самолёт отрывается от земли — take off.|When a plane leaves the ground, it takes off.",
+"I don't know this word. I'll look it ___.|up|after|for|at|2|look up = check in a dictionary|לבדוק מילה במילון אומרים look up.|للبحث عن كلمة في القاموس نقول look up.|Посмотреть слово в словаре — look up.|To check a word in a dictionary is to look it up.",
+"The meeting was put ___ until Monday.|off|on|up with|in|2|put off = delay|לדחות למועד אחר אומרים put off.|لتأجيل شيء إلى وقت آخر نقول put off.|Перенести на потом — put off.|To move something to a later time is to put it off.",
+"Please ___ your coat. It's cold outside.|put on|put off|put up|put away|2|put on = wear|ללבוש מעיל אומרים put on.|للبس المعطف نقول put on.|Надеть пальто — put on.|To wear a coat, you put it on.",
+"She ran ___ of milk, so she went to the shop.|out|up|off|in|2|run out of = have none left|כשלא נשאר חלב אומרים ran out of.|عندما لا يبقى حليب نقول ran out of.|Когда молоко закончилось, говорим ran out of.|When there is no milk left, she ran out of it.",
+"The car broke ___ on the way to Eilat.|down|up with|out|in|2|break down = stop working|על מכונית שמפסיקה לעבוד אומרים broke down.|السيارة التي تتوقف عن العمل نقول عنها broke down.|Про машину, которая перестала работать, говорят broke down.|A car that stops working has broken down.",
+"Hurry ___! We're late.|up|on up|off|out|2|hurry up = go faster|להגיד למישהו למהר אומרים Hurry up!|لنقول لأحد أن يسرع نقول Hurry up!|Сказать кому-то поторопиться — Hurry up!|To tell someone to go faster, we say Hurry up!",
+"They called ___ the party because of the rain.|off|up|in|on|3|call off = cancel|לבטל אירוע אומרים call off.|لإلغاء حدث نقول call off.|Отменить событие — call off.|To cancel an event is to call it off.",
+"I can't ___ with this noise any more.|put up|put off|put on|put down|3|put up with = tolerate|לסבול משהו מעצבן אומרים put up with.|لتحمّل شيء مزعج نقول put up with.|Терпеть что-то неприятное — put up with.|To accept something annoying is to put up with it.",
+"I get ___ well with my cousins.|on|off to|up to|out|3|get on well = have a good relationship|להסתדר טוב עם מישהו אומרים get on well with.|للتفاهم جيدًا مع شخص نقول get on well with.|Хорошо ладить с кем-то — get on well with.|To be good friends with someone is to get on well with them.",
+"We should find ___ what time the film starts.|out|up|on|off|3|find out = discover|לגלות מידע אומרים find out.|لمعرفة معلومة نقول find out.|Узнать что-то — find out.|To learn a fact you did not know is to find it out.",
+"He grew ___ in a small village.|up|on|down|out|3|grow up = become an adult|לגדול ולהיות מבוגר אומרים grow up.|لنكبر ونصبح بالغين نقول grow up.|Вырасти и стать взрослым — grow up.|To become an adult is to grow up.",
+"I'm looking forward ___ the holiday.|to|for|at|about|3|look forward to|אחרי look forward תמיד באה to.|بعد look forward تأتي دائمًا to.|После look forward всегда идёт to.|After look forward we always use to.",
+"Don't give ___. Try again!|up|off|away to|on to|3|give up = stop trying|״אל תוותר״ אומרים Don't give up.|«لا تستسلم» نقولها Don't give up.|«Не сдавайся» — это Don't give up.|To tell someone not to stop trying, we say Don't give up.",
+"The teacher told us to ___ the words on the board.|write down|write off|write up to|write out of|3|write down = note|לרשום מילים במחברת אומרים write down.|لتدوين الكلمات في الدفتر نقول write down.|Записать слова в тетрадь — write down.|To write words in your notebook is to write them down."
 ],L("בחרו את המילה שמשלימה את הפועל.","اختاروا الكلمة التي تكمل الفعل.","Выбери слово, которое завершает глагол.","Choose the word that completes the verb."),H("שני חלקים נותנים משמעות חדשה: take + off, give + up. נסו לחשוב על המשמעות.","جزءان يعطيان معنى جديدًا: take + off وgive + up. فكّروا في المعنى.","Две части дают новое значение: take + off, give + up. Подумай о смысле.","Two parts give a new meaning: take + off, give + up. Think about the meaning."),E_OK);
 
 fillGen("conn",[
-"I was tired, ___ I went to bed.|so|but|because|although|1|so = result",
-"I like tea ___ I don't like coffee.|but|so|because|and also|1|but = contrast",
-"I stayed home ___ it was raining.|because|so|but|or|1|because = reason",
-"Do you want tea ___ coffee?|or|but|so|because|1|or = choice",
-"She is smart ___ kind.|and|but|so|because|1|and = add",
-"I was late ___ the bus was stuck.|because|so|but|or|1|because gives the reason",
-"I was hungry, ___ I made a sandwich.|so|but|because|or|1|so = result",
-"He is rich ___ not happy.|but|so|because|or|1|but = contrast",
-"___ it was cold, we went swimming.|Although|Because|So|If|2|although = in spite of",
-"I'll call you ___ I arrive.|when|but|although|so|2|when = at that time",
-"She didn't come ___ she was ill.|because|so|although|but also|2|because = reason",
-"I didn't go out ___ the rain.|because of|because|although|so|2|because of + noun",
-"Wash your hands ___ you eat.|before|because|although|so|2|before = earlier than",
-"I'll wait ___ you finish.|until|because|although|so|2|until = up to that time",
-"He studied hard. ___, he failed.|However|Because|Also|So|2|however = but in the next sentence",
-"I love sport. ___, I play every day.|In fact|However|Although|Unless|2|in fact = adds a strong detail",
-"___ the rain, we had a great trip.|Despite|Although|Because|So|3|despite + noun",
-"I will go ___ you come with me or not.|whether|although|because|so|3|whether … or not",
-"She was tired. ___, she kept working.|Nevertheless|Because|So|In addition|3|nevertheless = in spite of that",
-"First, mix the eggs. ___, add the flour.|Then|However|Although|Unless|3|then = next step",
-"He is not only clever ___ also funny.|but|and|so|or|3|not only … but also",
-"I'll go out ___ it stops raining.|as soon as|although|despite|because of|3|as soon as = right when",
-"___ I like him, I don't trust him.|Although|Because|So|Unless|3|although = contrast",
-"We took an umbrella ___ it rained.|in case|although|because of|despite|3|in case = for safety"
+"I was tired, ___ I went to bed.|so|but|because|although|1|so = result|ההליכה לישון היא תוצאה של העייפות, ולכן so.|النوم نتيجة للتعب، لذلك so.|Лечь спать — это результат усталости, поэтому so.|Going to bed is the result of being tired, so we use so.",
+"I like tea ___ I don't like coffee.|but|so|because|and also|1|but = contrast|תה כן וקפה לא. זה ניגוד, ולכן but.|الشاي نعم والقهوة لا. هذا تناقض، لذلك but.|Чай — да, кофе — нет. Это контраст, поэтому but.|Tea yes, coffee no. That is a contrast, so we use but.",
+"I stayed home ___ it was raining.|because|so|but|or|1|because = reason|הגשם הוא הסיבה שנשארתי בבית, ולכן because.|المطر هو سبب بقائي في البيت، لذلك because.|Дождь — причина, почему я остался дома, поэтому because.|The rain is the reason I stayed home, so we use because.",
+"Do you want tea ___ coffee?|or|but|so|because|1|or = choice|בוחרים בין תה לקפה, ולכן or.|نختار بين الشاي والقهوة، لذلك or.|Выбираем между чаем и кофе, поэтому or.|We choose between tea and coffee, so we use or.",
+"She is smart ___ kind.|and|but|so|because|1|and = add|מוסיפים עוד דבר טוב, ולכן and.|نضيف صفة جيدة أخرى، لذلك and.|Добавляем ещё одно хорошее качество, поэтому and.|We add one more good thing, so we use and.",
+"I was late ___ the bus was stuck.|because|so|but|or|1|because gives the reason|האוטובוס התקוע הוא הסיבה לאיחור, ולכן because.|الحافلة العالقة هي سبب التأخر، لذلك because.|Застрявший автобус — причина опоздания, поэтому because.|The stuck bus is the reason I was late, so we use because.",
+"I was hungry, ___ I made a sandwich.|so|but|because|or|1|so = result|הכנת הכריך היא תוצאה של הרעב, ולכן so.|تحضير الشطيرة نتيجة للجوع، لذلك so.|Сделать бутерброд — результат голода, поэтому so.|Making a sandwich is the result of being hungry, so we use so.",
+"He is rich ___ not happy.|but|so|because|or|1|but = contrast|עשיר ולא שמח. זה ניגוד, ולכן but.|غني وغير سعيد. هذا تناقض، لذلك but.|Богатый, но несчастливый. Это контраст, поэтому but.|Rich but not happy is a contrast, so we use but.",
+"___ it was cold, we went swimming.|Although|Because|So|If|2|although = in spite of|היה קר ובכל זאת שחינו, ולכן Although.|كان الجو باردًا ومع ذلك سبحنا، لذلك Although.|Было холодно, и всё равно мы плавали, поэтому Although.|It was cold and we still swam, so we use Although.",
+"I'll call you ___ I arrive.|when|but|although|so|2|when = at that time|אתקשר ברגע שאגיע. על זמן אומרים when.|سأتصل عندما أصل. وللزمن نقول when.|Позвоню, когда приеду. О времени говорим when.|I will call at the time I arrive, so we use when.",
+"She didn't come ___ she was ill.|because|so|although|but also|2|because = reason|המחלה היא הסיבה שהיא לא באה, ולכן because.|المرض هو سبب غيابها، لذلك because.|Болезнь — причина, почему она не пришла, поэтому because.|Being ill is the reason she did not come, so we use because.",
+"I didn't go out ___ the rain.|because of|because|although|so|2|because of + noun|אחרי because of בא שם עצם, כמו the rain.|بعد because of يأتي اسم، مثل the rain.|После because of идёт существительное, например the rain.|After because of comes a noun, like the rain.",
+"Wash your hands ___ you eat.|before|because|although|so|2|before = earlier than|שוטפים ידיים לפני האוכל, ולכן before.|نغسل اليدين قبل الأكل، لذلك before.|Руки моют перед едой, поэтому before.|We wash our hands earlier than we eat, so we use before.",
+"I'll wait ___ you finish.|until|because|although|so|2|until = up to that time|אחכה עד שתסיים, ולכן until.|سأنتظر حتى تنتهي، لذلك until.|Подожду, пока ты не закончишь, поэтому until.|I will wait up to the time you finish, so we use until.",
+"He studied hard. ___, he failed.|However|Because|Also|So|2|however = but in the next sentence|הוא למד ובכל זאת נכשל. ניגוד במשפט חדש: However.|درس ومع ذلك رسب. تناقض في جملة جديدة: However.|Он учился, но провалился. Контраст в новом предложении: However.|He studied but failed. For a contrast in a new sentence: However.",
+"I love sport. ___, I play every day.|In fact|However|Although|Unless|2|in fact = adds a strong detail|המשפט השני מוסיף פרט חזק יותר, ולכן In fact.|الجملة الثانية تضيف تفصيلًا أقوى، لذلك In fact.|Второе предложение добавляет более сильную деталь, поэтому In fact.|The second sentence adds a stronger detail, so we use In fact.",
+"___ the rain, we had a great trip.|Despite|Although|Because|So|3|despite + noun|אחרי despite בא שם עצם, כמו the rain.|بعد despite يأتي اسم، مثل the rain.|После despite идёт существительное, например the rain.|After despite comes a noun, like the rain.",
+"I will go ___ you come with me or not.|whether|although|because|so|3|whether … or not|whether או or not פירושו: בכל מקרה, כן או לא.|whether مع or not تعني: في كل الأحوال، نعم أو لا.|whether с or not значит «в любом случае, да или нет».|Whether with or not means in any case, yes or no.",
+"She was tired. ___, she kept working.|Nevertheless|Because|So|In addition|3|nevertheless = in spite of that|היא הייתה עייפה ובכל זאת המשיכה. במשפט חדש: Nevertheless.|كانت متعبة ومع ذلك تابعت. في جملة جديدة: Nevertheless.|Она устала, но продолжала. В новом предложении: Nevertheless.|She was tired but went on. In a new sentence: Nevertheless.",
+"First, mix the eggs. ___, add the flour.|Then|However|Although|Unless|3|then = next step|זה השלב הבא במתכון, ולכן Then.|هذه الخطوة التالية في الوصفة، لذلك Then.|Это следующий шаг рецепта, поэтому Then.|This is the next step in the recipe, so we use Then.",
+"He is not only clever ___ also funny.|but|and|so|or|3|not only … but also|אחרי not only תמיד באה but also.|بعد not only تأتي دائمًا but also.|После not only всегда идёт but also.|After not only we always use but also.",
+"I'll go out ___ it stops raining.|as soon as|although|despite|because of|3|as soon as = right when|אצא מיד כשהגשם ייפסק, ולכן as soon as.|سأخرج فور توقف المطر، لذلك as soon as.|Выйду сразу, как кончится дождь, поэтому as soon as.|I will go out right when the rain stops, so as soon as.",
+"___ I like him, I don't trust him.|Although|Because|So|Unless|3|although = contrast|אני אוהב אותו ובכל זאת לא סומך עליו. זה ניגוד: Although.|أحبه ومع ذلك لا أثق به. هذا تناقض: Although.|Он мне нравится, но я ему не доверяю. Это контраст: Although.|I like him but I do not trust him. That is a contrast: Although.",
+"We took an umbrella ___ it rained.|in case|although|because of|despite|3|in case = for safety|לקחנו מטריה למקרה שירד גשם, ולכן in case.|أخذنا مظلة تحسّبًا للمطر، لذلك in case.|Взяли зонт на случай дождя, поэтому in case.|We took an umbrella to be safe if it rained, so in case."
 ],I_FILL,H("so = תוצאה. because = סיבה. but, although = ניגוד. and = הוספה. or = בחירה. however = אבל, במשפט חדש.","so = نتيجة. because = سبب. but وalthough = تناقض. and = إضافة. or = اختيار. however = لكن في جملة جديدة.","so = результат. because = причина. but, although = контраст. and = добавление. or = выбор. however = но, в новом предложении.","so = result. because = reason. but, although = contrast. and = add. or = choice. however = but, in a new sentence."),E_OK);
 
-var BUILD="em4 · 2026-10-25";
+var BUILD="em6 · 2026-10-26";
 /* ===== UI strings ===== */
 var STR={
 he:{trackT:"איזה מסלול?",tr7:"כיתה ז׳",tr9:"כיתה ט׳ מצומצם",title9:"גיאומטריה לכיתה ט׳, רמה מצומצמת",tag9:"שיעור קצר ותרגול בשלוש רמות בכל נושא. הכול עם הקראה.",credit9:"תרגול כיתה ט׳ מצומצם בנוי לפי רשימת הנושאים בחוברת העבודה בגיאומטריה של מחוז תל אביב חט״ב (תשפ״ה). כל השאלות נכתבו מחדש.",soonT:"בקרוב: צורות חופפות, תיבה וקובייה, שכיחות והסתברות.",mtNote:"תרגום לערבית, רוסית ואנגלית: תרגום מכונה, ממתין לבדיקה.",credit2:"יחידת משפט פיתגורס נבנתה לפי מבנה חוברת של יניב רז, מדריך מחוזי חט״ב, מחוז ירושלים, משרד החינוך. תרגילי החלוקה ביחס בהשראת שאלה מהפיקוח על הוראת המתמטיקה, משרד החינוך.",brand:"מתמטיקה לכיתה ז׳",title:"מתמטיקה לכיתה ז׳",tag:"צירים, מספרים שליליים, זוויות, משולשים ועוד. הכול מוקרא, בלי ציונים ובלי לחץ.",pick:"בחרו נושא",band1:"כיתות א׳–ב׳",band2:"כיתות ג׳–ד׳",band3:"כיתות ה׳–ו׳",soon:"בקרוב",
@@ -1105,10 +1140,13 @@ function homeView(){var t=T(),g9=S.track==="g9",h='<h1 data-say id="h1">'+esc(g9
   trackUnits().forEach(function(u){h+='<button class="unit" style="--c:'+u.c+'" data-a="unit" data-u="'+u.id+'"><span class="ico">'+iconSvg(u.id)+'</span><span><span class="nm" style="display:block">'+esc(lt(u.n))+'</span><span class="ds">'+esc(lt(u.d))+'</span></span>'+(S.done[u.id]?'<span class="ok">\u2713</span>':'')+'</button>'});
   h+='</div>'+(S.track==="g9"?'':'<p class="sub" style="margin-top:14px">'+esc(t.soonT)+'</p>')+'<p class="credit">'+esc(S.track==="g9"?t.credit9:t.credit)+' <a href="https://pop.education.gov.il" target="_blank" rel="noopener">'+esc(t.crediL)+'</a><br>'+esc(t.credit2)+'<br>'+esc(t.mtNote)+'<br>'+esc(t.privacy)+'</p>';return h}
 
-function unitView(){var t=T(),u=unitById(V.unit),h='<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1 style="color:'+u.c+'">'+esc(lt(u.n))+'</h1><p class="sub">'+esc(lt(u.d))+'</p>';
-  h+='<div class="card"><button class="btn" style="background:'+u.c+';width:100%" data-a="lesson">'+esc(t.lesson)+'</button></div>';
+/* O-237: צבע היחידה כרקע לטקסט לבן ייפל מתחת ל-4.5:1 (#f58a1f נותן 2.46).
+   [0] כהה — רקע לכפתור עם טקסט לבן, וכותרת על רקע בהיר. [1] — כותרת במצב כהה. */
+var UC={"#2f7fd8":["#1d4ed8","#2f7fd8"],"#0e9c8d":["#0b7568","#0e9c8d"],"#f58a1f":["#9a3412","#f58a1f"],"#6a45b0":["#6a45b0","#a98be6"],"#d9467d":["#be185d","#d9467d"],"#2eaa5b":["#166534","#2eaa5b"]};
+function unitView(){var t=T(),u=unitById(V.unit),uc=UC[u.c]||[u.c,u.c],h='<button class="btn ghost" data-a="home">'+esc(t.back)+'</button><h1 class="uh" style="--cd:'+uc[0]+';--cl:'+uc[1]+'">'+esc(lt(u.n))+'</h1><p class="sub">'+esc(lt(u.d))+'</p>';
+  h+='<div class="card"><button class="btn" style="background:'+uc[0]+';width:100%" data-a="lesson">'+esc(t.lesson)+'</button></div>';
   h+='<div class="card"><h2>'+esc(t.practice)+": "+esc(t.lvTitle)+'</h2><div class="lvls">';
-  [["l1","#1f9d4d"],["l2","#2f7fd8"],["l3","#f58a1f"],["l4","#8a63d2"]].forEach(function(l,i){h+='<button class="lvl" style="background:'+l[1]+'" data-a="start" data-l="'+(i+1)+'">'+esc(t[l[0]])+'<small>'+esc(t[l[0]+"d"])+'</small></button>'});
+  [["l1","#166534"],["l2","#1d4ed8"],["l3","#9a3412"],["l4","#6d28d9"]].forEach(function(l,i){h+='<button class="lvl" style="background:'+l[1]+'" data-a="start" data-l="'+(i+1)+'">'+esc(t[l[0]])+'<small>'+esc(t[l[0]+"d"])+'</small></button>'});
   return h+'</div></div>'}
 function lessonView(){var t=T(),u=unitById(V.unit),ls=LESSONS[V.unit],st=ls[V.step],n=ls.length,txt=lt(st.t);
   var h='<button class="btn ghost" data-a="unit" data-u="'+u.id+'">'+esc(t.back)+'</button><div class="dots" style="margin-top:12px">'+ls.map(function(_,i){return '<i class="'+(i<V.step?"on":i===V.step?"cur":"")+'"></i>'}).join("")+'</div>';
@@ -1139,7 +1177,7 @@ function practiceView(){var t=T(),q=P.list[P.i],n=P.list.length,u=unitById(P.uni
     if(P.exShown){var st=LESSONS[P.unit][Math.min(q.step,LESSONS[P.unit].length-1)];h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><div id="ex" data-say>'+ltrHTML(lt(st.t))+'</div><div class="vis">'+st.v()+'</div></div></div>'}}
   else{var ok=P.picked===q.o.map(function(o){return o.id}).indexOf(q.a);
     h+=ok?'<div class="ok-box" id="rb">'+esc(P.msg)+'</div>':'<div class="tbox"><img src="/img/limor.jpg" alt=""><div><b>'+esc(t.wrong)+'</b></div></div>';
-    h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><div>'+esc(t.ans)+'<b>'+ltrHTML(optLabel(q.o.filter(function(o){return o.id===q.a})[0]))+'</b></div><div id="ex" data-say>'+ltrHTML(lt(q.e))+'</div></div></div>';
+    h+='<div class="tbox"><img src="/img/limor.jpg" alt=""><div><div>'+esc(t.ans)+'<b>'+ltrHTML(optLabel(q.o.filter(function(o){return o.id===q.a})[0]))+'</b></div><div id="ex" data-say>'+ltrHTML(ok?lt(q.e):whyText(q,P.picked))+'</div>'+(q.why?'<div class="enx" lang="en" dir="ltr">'+aesc(q.why)+'</div>':'')+'</div></div>';
     h+='<div class="row" style="margin-top:12px"><button class="btn next" data-a="next">'+esc(P.i<n-1?t.next:t.done)+'</button></div>'}
   return h+'</div>'}
 function endView(){var t=T();return '<h1 id="et" data-say>'+esc(t.finT)+'</h1><div class="card">'+listenRow("end")+'<p class="qtext" id="ex" data-say>'+esc(t.finX)+'</p><div class="row"><button class="btn next" data-a="start" data-l="'+P.lv+'">'+esc(t.again)+'</button><button class="btn ghost" data-a="home">'+esc(t.home)+'</button></div></div>'}
@@ -1187,7 +1225,7 @@ function onAct(a,el){var t=T(),q=P&&P.list&&P.list[P.i];
     else{P.streak=0;sfxSoft();var ms=MISS[P.unit]=MISS[P.unit]||[];
       if(P.missed.length<3&&ms.length<6&&q.t&&!q._rq){P.missed.push(q);ms.push(q)}}
     announce((ok?P.msg:t.wrong)+" "+t.ans+optLabel(q.o.filter(function(o){return o.id===q.a})[0]));
-    render();if(ok){var rb=$("#rb");speakL(null,P.msg,rb)}else{speakL(null,t.wrong+" "+t.ans+optSay(q.o.filter(function(o){return o.id===q.a})[0])+". "+lt(q.eS||q.e),null)}}
+    render();if(ok){var rb=$("#rb");speakL(null,P.msg,rb)}else{speakL(null,t.wrong+" "+t.ans+optSay(q.o.filter(function(o){return o.id===q.a})[0])+". "+whyText(q,k),null)}}
   else if(a==="next"){stopSpeak();if(P.i<P.list.length-1){P.i++;P.picked=null;P.hintShown=false;P.exShown=false;render();window.scrollTo(0,0);setTimeout(function(){sayQ(false)},250)}
     else{S.done[P.unit]=true;saveS();view="end";render();confetti(160);window.scrollTo(0,0)}}
   else if(a==="tog"){var kk=el.dataset.k;S[kk]=!S[kk];saveS();render()}
@@ -1257,7 +1295,7 @@ function sayQ(slow){var q=P.list[P.i],old=S.slow,sl=slow?true:old;S.slow=sl;
       if(a==="right"||a==="wrong"){var qq=P.list[P.i],ids=qq.o.map(function(o){return o.id}),ai=ids.indexOf(qq.a),k=a==="right"?ai:(ai+1)%4;onAct("pick",{dataset:{k:k}})}else if(a==="next"||a==="hint"||a==="example")onAct(a,{dataset:{}})})}
     else if(p[0]==="settings"){view="settings";render()}}
   if(window.TUTOR){try{TUTOR.mount({app:"english-mid",lang:function(){return S.lang},q:function(){if(view==="lesson"&&V.unit){var st=LESSONS[V.unit][V.step];return {expr:lt(st.t),ans:"",level:"שיעור"}}var x=P&&P.list&&view==="practice"&&P.picked==null?P.list[P.i]:null;return x?{expr:(x.enx||"")+" "+lt(x.q),ans:optLabel(x.o.filter(function(o){return o.id===x.a})[0]),level:"רמה "+P.lv}:null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=em4-pwa1").catch(function(){})});
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=em6-pwa1").catch(function(){})});
 })();
 </script>
 
