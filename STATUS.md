@@ -11,7 +11,7 @@
 | `history` | m185 · 2026-10-25 | m185-pwa1 | תואם |
 | `lomda` | l177 · 2026-10-26 | l177-pwa1 | תואם |
 | `kotvim` | k119 · 2026-10-25 | k119-pwa1 | תואם |
-| `math-elem` | o30 · 2026-10-26 | o30-pwa1 | תואם |
+| `math-elem` | o31 · 2026-10-26 | o31-pwa1 | תואם |
 | `science` | s176 · 2026-10-26 | s176-pwa1 | תואם |
 | `geography-elem` | w157 · 2026-10-26 | w157-pwa1 | תואם |
 | `reader` | — | 142-pwa1 | מפתח בלבד |
@@ -23,16 +23,16 @@
 | `english-bagrut` | — | — | אינה בריפו הזה |
 | `literature` | j49 · 2026-10-26 | j49-pwa1 | תואם |
 | `tanakh` | p50 · 2026-10-26 | p50-pwa1 | תואם |
-| `hebrew-arab` | y34 · 2026-10-26 | y34-pwa1 | תואם |
+| `hebrew-arab` | y35 · 2026-10-26 | y35-pwa1 | תואם |
 | `motal` | d41 · 2026-10-25 | d41-pwa1 | תואם |
-| `math-g7` | mg33 · 2026-10-26 | mg33-pwa1 | תואם |
-| `electric` | e64 · 2026-10-26 | e64-pwa1 | תואם |
+| `math-g7` | mg34 · 2026-10-26 | mg34-pwa1 | תואם |
+| `electric` | e65 · 2026-10-26 | e65-pwa1 | תואם |
 | `science-mid` | scimid19 · 2026-10-25 | scimid19-pwa1 | תואם |
 | `biology` | bg32 · 2026-10-26 | bg32-pwa1 | תואם |
-| `chemistry` | ch5 · 2026-10-25 | ch5-pwa1 | תואם |
-| `physics` | ph6 · 2026-10-26 | ph6-pwa1 | תואם |
-| `english-upper` | eu5 · 2026-10-26 | eu5-pwa1 | תואם |
-| `english-mid` | em5 · 2026-10-26 | em5-pwa1 | תואם |
+| `chemistry` | ch6 · 2026-10-26 | ch6-pwa1 | תואם |
+| `physics` | ph7 · 2026-10-26 | ph7-pwa1 | תואם |
+| `english-upper` | eu6 · 2026-10-26 | eu6-pwa1 | תואם |
+| `english-mid` | em6 · 2026-10-26 | em6-pwa1 | תואם |
 | `geography` | q52 · 2026-10-25 | q52-pwa1 | תואם |
 | `bagrut-history` | h139 · 2026-10-16 | h139-pwa1 | תואם |
 | `islam` | is28 · 2026-10-26 | is28-pwa1 | תואם |
@@ -43,7 +43,7 @@
 | `history-elem` | hk28 · 2026-10-26 | hk28-pwa1 | תואם |
 | `english-elem` | en23 · 2026-10-25 | en23-pwa1 | תואם |
 | `science-12` | sg27 · 2026-10-25 | sg27-pwa1 | תואם |
-| `domino` | dm27 · 2026-10-25 | dm27-pwa1 | תואם |
+| `domino` | dm28 · 2026-10-26 | dm28-pwa1 | תואם |
 | `net-elem` | ns16 · 2026-10-25 | ns16-pwa1 | תואם |
 
 נוצר ב-`node .claude/qa/status.js --md`, 2026-10-26.
