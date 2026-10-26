@@ -602,22 +602,24 @@ async function run(){
      נשי, גברי גברי, ו-״Google עברית״ חייב להישאר **לא ידוע** —
      הוא שם יצרן ולא מגדר, וזה הכלל שכתוב ליד המילון עצמו.
      --------------------------------------------------------------- */
-  /* הרשימה נגזרת ואינה קשיחה. רשימה קשיחה של שמונה קבצים החזיקה
-     כאן עד 16.9.2026, והיא החמיצה חמישה עותקים שלמים: english,
-     history, ulpan, lomda ו-kotvim קוראים למילון V_F/V_M ולא
-     VOICE_F/VOICE_M, ולכן הם לא היו ברשימה — ולא נבדקו מעולם.
-     התיקון של 13.9 פסח עליהם בדיוק מאותה סיבה, והבדיקה שנכתבה
-     לתפוס אותו דיווחה ירוק. זה אותו לקח של changedSinceMain
-     ב-cache.js: מה שנספר ידנית מתיישן בעותק הבא. */
+  /* הרשימה נגזרת ואינה קשיחה — וגם ״נגזרת״ התיישנה, פעמיים.
+     רשימה קשיחה של שמונה קבצים החזיקה כאן עד 16.9.2026, והיא
+     החמיצה חמישה עותקים שלמים: english, history, ulpan, lomda
+     ו-kotvim קוראים למילון V_F/V_M ולא VOICE_F/VOICE_M, ולכן הם
+     לא היו ברשימה — ולא נבדקו מעולם. במקומה נכתבה רשימה שנגזרת
+     מן השם VOICE_F|V_F — ו**גם היא** התיישנה: משפחת VF/VM (שבע
+     אפליקציות) ו-V_FEM/V_MALE (‏science-mid) נולדו אחריה, שמונה
+     קבצים, ואף אחד מהם לא נבדק מעולם. ‏english-mid אפילו ״תוקנה״
+     ב-21.10 והמשיכה לקרוא ל-״Google עברית״ קול נשי, בלי אדום.
+
+     לכן הזיהוי כאן אינו לפי שם המשתנה אלא לפי מה שהביטוי **עושה**:
+     ביטוי בקובץ שמזכיר samantha, שאינו מתאים למחרוזת סתמית (qqqq),
+     שעונה על ארבעה שמות נשיים לפחות ועל אפס־עד־אחד גבריים — הוא
+     המילון הנשי, ולהפך. שם חדש למילון אינו מעלים אותו עוד. */
   const ROOT = path.resolve(__dirname, '..', '..');
-  const DICT = require('child_process')
-    .execSync('git ls-files "*.html" "*.js"', { cwd: ROOT, encoding: 'utf8' })
-    .split('\n')
-    .filter(f => f && !f.startsWith('.claude/') && !f.startsWith('marketing/') &&
-                 !f.startsWith('tests/') && !f.startsWith('learning-core/'))
-    .filter(f => /(?:^|[^A-Za-z_])(?:VOICE_F|V_F)\s*=\s*\/\(/
-                   .test(fs.readFileSync(path.join(ROOT, f), 'utf8')))
-    .sort();
+  const LIT  = /(?:var|let|const|,)\s*([A-Za-z_$][\w$]*)\s*=\s*(\/(?:\\.|\[(?:\\.|[^\]])*\]|[^/\\\n])+\/[gimsuy]*)/g;
+  const FEMN = ['samantha', 'karen', 'tessa', 'moira', 'carmit', 'hila', 'female', 'woman'];
+  const MASN = ['david', 'mark', 'asaf', 'hillel', 'pavel', 'dmitri'];
   const CASES = [
     ['Microsoft הילה Online (Natural) - Hebrew (Israel)', 'female'],
     ['Microsoft אברי Online (Natural) - Hebrew (Israel)', 'male'],
@@ -627,29 +629,49 @@ async function run(){
     ['Microsoft Светлана Online (Natural)',               'female'],
     ['Google עברית',                                      'unknown']
   ];
-  for(const f of DICT){
-    const src = fs.readFileSync(path.resolve(__dirname, '..', '..', f), 'utf8');
-    /* שני שמות לאותו מילון, ושניהם חוקיים: VOICE_F במשפחה אחת,
-       V_F בשנייה. ההבדל הוא היסטורי ולא מהותי. וגם ההצהרה: hebrew/app.js
-       כותבת `const V_F=` — המסנן למעלה מצא אותה, והחילוץ דרש `var`
-       ונפל על ״לא נמצא מילון״ כשהמילון קיים (qa ריצה 1124, 30.9.2026).
-       ודגלים: hebrew-lit כותבת `/…/i;` — בלי `[gimsuy]*` החילוץ רץ עד
-       סוף הקובץ ונפל על ״מילון שאינו נקרא״ (qa ריצה 1198, 3.10.2026). */
-    const mf = src.match(/(?:var|let|const) (?:VOICE_F|V_F)\s*=\s*(\/\(.*?\/[gimsuy]*)\s*[;\n]/s);
-    const mm = src.match(/(?:var|let|const) (?:VOICE_M|V_M)\s*=\s*(\/\(.*?\/[gimsuy]*)\s*[;\n]/s);
-    if(!mf || !mm){ bad++; console.log('✗ ' + f.padEnd(24) + 'לא נמצא מילון המגדר'); continue }
-    let RF, RM;
-    try{ RF = eval(mf[1]); RM = eval(mm[1]) }
-    catch(e){ bad++; console.log('✗ ' + f.padEnd(24) + 'מילון שאינו נקרא: ' + e.message); continue }
+  const SRC = require('child_process')
+    .execSync('git ls-files "*.html" "*.js"', { cwd: ROOT, encoding: 'utf8' })
+    .split('\n')
+    .filter(f => f && !f.startsWith('.claude/') && !f.startsWith('marketing/') &&
+                 !f.startsWith('tests/') && !f.startsWith('learning-core/'))
+    .sort();
+  let dicts = 0;
+  for(const f of SRC){
+    const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    if(!/samantha/i.test(src)) continue;
+    const fem = [], mas = [];
+    let m; LIT.lastIndex = 0;
+    while((m = LIT.exec(src))){
+      let r;
+      /* הדגל g זוכר lastIndex בין קריאה לקריאה של test, ולכן
+         הביטוי נבנה מחדש בלעדיו — אחרת כל בדיקה שנייה שקרית. */
+      try{ const e = eval(m[2]); r = new RegExp(e.source, e.flags.replace(/[gy]/g, '')) }
+      catch(err){ continue }
+      if(r.test('qqqq')) continue;
+      const nf = FEMN.filter(n => r.test(n + ' x')).length;
+      const nm = MASN.filter(n => r.test(n + ' x')).length;
+      if(nf >= 4 && nm <= 1) fem.push([m[1], r]);
+      else if(nm >= 3 && nf <= 1) mas.push([m[1], r]);
+    }
+    if(!fem.length && !mas.length) continue;
+    dicts++;
+    if(fem.length !== 1 || mas.length !== 1){
+      bad++;
+      console.log('✗ ' + f.padEnd(26) + 'מילון המגדר: ' +
+                  fem.length + ' נשי, ' + mas.length + ' גברי');
+      continue;
+    }
     const miss = [];
     for(const [name, want] of CASES){
       const n2 = (name + ' x').toLowerCase();
-      const got = RF.test(n2) ? 'female' : RM.test(n2) ? 'male' : 'unknown';
+      const got = fem[0][1].test(n2) ? 'female' : mas[0][1].test(n2) ? 'male' : 'unknown';
       if(got !== want) miss.push(name.slice(0, 34) + ' → ' + got + ' (צריך ' + want + ')');
     }
-    if(miss.length){ bad++; console.log('✗ ' + f.padEnd(24) + miss.join(' · ')) }
-    else console.log('✓ ' + f.padEnd(24) + CASES.length + ' שמות, בעברית ובלטינית');
+    if(miss.length){ bad++; console.log('✗ ' + f.padEnd(26) + '[' + fem[0][0] + '/' + mas[0][0] + '] ' + miss.join(' · ')) }
+    else console.log('✓ ' + f.padEnd(26) + '[' + fem[0][0] + '/' + mas[0][0] + '] ' +
+                     CASES.length + ' שמות, בעברית ובלטינית');
   }
+  console.log('· ' + 'מילוני מגדר'.padEnd(24) + dicts + ' מילונים, כולם נגזרו מהתוכן');
 /* ---------------------------------------------------------------
      תקרת גובה הקול — מספר אחד לכל העותקים
 

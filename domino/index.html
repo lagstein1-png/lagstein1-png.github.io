@@ -312,7 +312,7 @@ function build(setId,lv,seed){
   var deck={set:setId,lv:lv,seed:seed,cards:printed,chain:chainIds,byChain:cards};
   RNG=Math.random;return deck}
 /* ===== UI strings ===== */
-var BUILD="dm25 · 2026-10-21";
+var BUILD="dm27 · 2026-10-25";
 var STR={
 he:{brand:"דומינו לימודי",title:"דומינו לימודי להדפסה",tag:"מדפיסים 20 קלפים, גוזרים ומסדרים במעגל. כל קלף מתחבר לקלף שמתאים לו.",
  howT:"איך משחקים?",limor:"אני לימור. ככה משחקים:",how:"1. מדפיסים את הקלפים וגוזרים לפי הקו המקווקו.\n2. מערבבים את הקלפים על השולחן.\n3. מתחילים בקלף עם הכוכב. מחפשים קלף שהחצי הראשון שלו מתאים לחצי השני של הקלף הקודם.\n4. ממשיכים עד שהמעגל נסגר. הקלף האחרון מתחבר לקלף עם הכוכב.",
@@ -455,8 +455,8 @@ function heSpoken(t,l){
   if(l!=="he"||typeof HESPEECH==="undefined")return t;
   try{ return HESPEECH.spoken(t) }catch(e){ return t }
 }
-var VF=/(female|woman|zira|samantha|karen|tessa|moira|fiona|hila|hilla|carmit|salma|zariyah|amina|hoda|laila|fatima|mariam|maryam|svetlana|irina|milena|katya|yelena|alena|google[^a-z]{0,10}(עברית|العربية|русский)|siri)/i;
-var VM=/(\bmale\b|david|mark|asaf|hillel|avri|naayf|maged|tarik|hamed|pavel|dmitri|ivan|daniel|george|fred|alex)/i;
+var VF=/(הילה|כרמית|زارية|سلمى|أمينة|امينة|هدى|فاطمة|ليلى|نورا|светлана|дарья|ирина|екатерина|татьяна|елена|female|woman|#female|\bfem\b|carmit|hila|\bmiri\b|\bdana\b|shira|samantha|karen|moira|tessa|serena|victoria|\bava\b|allison|susan|vicki|nicky|\bzoe\b|fiona|\bkate\b|shelley|zira|hazel|aria|jenny|michelle|\bana\b|\beva\b|emma|libby|sonia|natasha|clara|\bamber\b|ashley|\bcora\b|elizabeth|monica|\bsara\b|\bsarah\b|\bjane\b|\bnancy\b|\bluna\b|\bmolly\b|irina|milena|svetlana|dariya|\belena\b|katja|ekaterina|\bkatya\b|tatyana|\balena\b|hoda|salma|zariyah|amina|\bhala\b|noura|laila|layla|fatima|zeina|\biman\b|\brana\b|\bsana\b|maryam|asma|heera|raveena|swara|neerja)/i;
+var VM=/(google[^a-z]{0,15}(arabic|العربية)|אברי|אסף|הילל|حامد|ماجد|طارق|ناصر|بسام|дмитрий|павел|юрий|максим|николай|\bmale\b|\bman\b|#male|asaf|hillel|avri|yoni|moshe|\balex\b|daniel|\bfred\b|\btom\b|aaron|arthur|oliver|rishi|gordon|\blee\b|ralph|bruce|david|\bmark\b|\bguy\b|ryan|christopher|\beric\b|brian|andrew|roger|steffan|liam|william|george|james|\bthomas\b|benjamin|brandon|\bjason\b|\btony\b|dmitry|pavel|\byuri\b|artemi|maxim|nikolai|maged|tarik|naayf|hamed|shakir|\bomar\b|tarek|\bali\b|bassel|\bmoaz\b|hamdan|saleh|abdullah|\btaim\b|fahed|rakan|yasser|hemant|madhur|prabhat)/i;
 function voices(){try{return speechSynthesis.getVoices()||[]}catch(e){return[]}}
 function vGender(v){var n=(v&&v.name)||"";return (VF.test(n)&&!VM.test(n))?"f":VM.test(n)?"m":"?"}
 /* voiceUsable הוא מפתח המיון הראשון, והמגדר בא אחריו ולא להפך:
@@ -487,7 +487,8 @@ function pickVoice(){var code=LCODE[S.lang],pre=code.slice(0,2),
 /* גובה — 1.12, הפריסט ״נשי רגוע״ של האתר, וקול גברי מורם ×1.35 עד התקרה
    1.35 — voicePitch של rakia ו-english (O-227). עד כאן 1.05 לנשי ו-1.3 לכל
    השאר, וההקראה כאן נשמעה אחרת מבשאר האתר. */
-var FEM_PITCH=1.35, PITCH_BASE=1.12;
+/* 1 ולא 1.35 (הבעלים, 25.10.2026, כרום על ווינדוס: ״הקול לא תקין״). הרמה של 35% לא הופכת את Asaf לקול נשי — היא מעוותת אותו. קול גברי נשמע בגובה הבסיס, וההודעה מציעה את Edge (הילה). */
+var FEM_PITCH=1, PITCH_BASE=1.12;
 function femLift(v){ if(!v)return 1; return vGender(v)==="m"?FEM_PITCH:1 }
 function voicePitch(v){return Math.min(1.35,PITCH_BASE*femLift(v))}
 function hlClear(){if(HL.timer){clearTimeout(HL.timer);HL.timer=null}if(HL.el&&HL.el.dataset.raw!=null){HL.el.textContent=HL.el.dataset.raw}HL.el=null}
@@ -686,7 +687,7 @@ function boot(){var q=new URLSearchParams(location.search),l=q.get("lang");if(l&
   render();
   var pr=q.get("print");if(pr==="cards")document.documentElement.classList.add("pc");else if(pr==="key")document.documentElement.classList.add("pk");
   if(window.TUTOR){try{TUTOR.mount({app:"domino",lang:function(){return S.lang},q:function(){return null},stopHost:function(){stopSpeak()}});render()}catch(e){}}
-  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm25-pwa1").catch(function(){})})}
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=dm27-pwa1").catch(function(){})})}
 if(!INTERNAL_OK){
   document.getElementById("gate").hidden=false;
   document.title="לא פורסם";
