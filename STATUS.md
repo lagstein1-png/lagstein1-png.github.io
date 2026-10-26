@@ -15,7 +15,7 @@
 | `science` | s176 · 2026-10-26 | s176-pwa1 | תואם |
 | `geography-elem` | w157 · 2026-10-26 | w157-pwa1 | תואם |
 | `reader` | — | 142-pwa1 | מפתח בלבד |
-| `rakia` | r58 · 2026-10-25 | r58-pwa1 | תואם |
+| `rakia` | r59 · 2026-10-26 | r59-pwa1 | תואם |
 | `theory` | — | — | אינה בריפו הזה |
 | `civics` | c56 · 2026-10-26 | c56-pwa1 | תואם |
 | `hebrew` | i47 · 2026-10-25 | i47-pwa1 | תואם |
@@ -25,8 +25,8 @@
 | `tanakh` | p49 · 2026-10-26 | p49-pwa1 | תואם |
 | `hebrew-arab` | y34 · 2026-10-26 | y34-pwa1 | תואם |
 | `motal` | d41 · 2026-10-25 | d41-pwa1 | תואם |
-| `math-g7` | mg32 · 2026-10-25 | mg32-pwa1 | תואם |
-| `electric` | e63 · 2026-10-26 | e63-pwa1 | תואם |
+| `math-g7` | mg33 · 2026-10-26 | mg33-pwa1 | תואם |
+| `electric` | e64 · 2026-10-26 | e64-pwa1 | תואם |
 | `science-mid` | scimid19 · 2026-10-25 | scimid19-pwa1 | תואם |
 | `biology` | bg32 · 2026-10-26 | bg32-pwa1 | תואם |
 | `chemistry` | ch5 · 2026-10-25 | ch5-pwa1 | תואם |
@@ -36,7 +36,7 @@
 | `geography` | q52 · 2026-10-25 | q52-pwa1 | תואם |
 | `bagrut-history` | h139 · 2026-10-16 | h139-pwa1 | תואם |
 | `islam` | is28 · 2026-10-26 | is28-pwa1 | תואם |
-| `russian` | ru28 · 2026-10-25 | ru28-pwa1 | תואם |
+| `russian` | ru29 · 2026-10-26 | ru29-pwa1 | תואם |
 | `tanakh-elem` | te33 · 2026-10-26 | te33-pwa1 | תואם |
 | `civics-elem` | mc31 · 2026-10-26 | mc31-pwa1 | תואם |
 | `culture-elem` | tm27 · 2026-10-25 | tm27-pwa1 | תואם |
