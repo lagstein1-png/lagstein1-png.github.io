@@ -21,8 +21,8 @@
 | `hebrew` | i47 · 2026-10-25 | i47-pwa1 | תואם |
 | `hebrew-lit` | hl29 · 2026-10-25 | hl29-pwa1 | תואם |
 | `english-bagrut` | — | — | אינה בריפו הזה |
-| `literature` | j47 · 2026-10-25 | j47-pwa1 | תואם |
-| `tanakh` | p48 · 2026-10-25 | p48-pwa1 | תואם |
+| `literature` | j48 · 2026-10-26 | j48-pwa1 | תואם |
+| `tanakh` | p49 · 2026-10-26 | p49-pwa1 | תואם |
 | `hebrew-arab` | y33 · 2026-10-25 | y33-pwa1 | תואם |
 | `motal` | d41 · 2026-10-25 | d41-pwa1 | תואם |
 | `math-g7` | mg32 · 2026-10-25 | mg32-pwa1 | תואם |
@@ -46,4 +46,4 @@
 | `domino` | dm27 · 2026-10-25 | dm27-pwa1 | תואם |
 | `net-elem` | ns16 · 2026-10-25 | ns16-pwa1 | תואם |
 
-נוצר ב-`node .claude/qa/status.js --md`, 2026-10-24.
+נוצר ב-`node .claude/qa/status.js --md`, 2026-10-26.
