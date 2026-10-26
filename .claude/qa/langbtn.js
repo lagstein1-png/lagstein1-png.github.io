@@ -64,18 +64,21 @@ const GATE = ['/', '/math-app/', '/lomda/', '/reader/'];
 const OB = ['[data-a="obnext"]', '[data-a="obnext"]', '[data-a="obnext"]',
             '[data-a="obnext"]', '[data-a="start"]'];
 
-const SETTINGS = [
-  { id: 'english',   url: '/english/',   nav: '[data-a="set"]' },
-  { id: 'history',   url: '/history/',   nav: '[data-a="set"]' },
-  { id: 'lomda',     url: '/lomda/',     nav: '[data-a="set"]' },
-  { id: 'ulpan',     url: '/ulpan/',     nav: '[data-a="set"]' },
-  { id: 'math-teen', url: '/math-teen/', nav: '[data-a="go"][data-v="settings"]', ob: OB },
-  { id: 'math-uni',  url: '/math-uni/',  nav: '[data-a="go"][data-v="settings"]', ob: OB },
-  { id: 'math-uni2', url: '/math-uni2/', nav: '[data-a="go"][data-v="settings"]', ob: OB },
-  { id: 'math-uni3', url: '/math-uni3/', nav: '[data-a="go"][data-v="settings"]', ob: OB },
-  { id: 'math-app',  url: '/math-app/',  nav: '[data-a="go"][data-v="settings"]',
-    ob: ['[data-a="selpet"]', '[data-a="startpet"]'] },
-];
+/* O-135, 21.10.2026: **נגזרת.** עד היום תשע אפליקציות בשם, ושתים־עשרה
+   נוספות עם אותם כפתורי `data-a="lang"` (electric, science, civics,
+   chemistry, physics, english-mid/upper…) לא נמדדו. הניווט אינו אחיד,
+   ולכן כל אפליקציה מנסה את שתי הצורות המוכרות — קודם בלי אונבורדינג,
+   ואם לא הגיעה, אחרי `OB_ANY`. אפליקציה נגזרת שלא הגעתי בה להגדרות, או
+   שאין בה כפתור בערבית או ברוסית, מודפסת ב-״·״ עם הסיבה ואינה נספרת.
+   התשע הוותיקות (`MUST`) חייבות להגיע — אחרת זה ✗, כמו קודם. */
+const AL = require('./applist.js');
+const NAV = ['[data-a="set"]', '[data-a="go"][data-v="settings"]'];
+const OB_ANY = ['[data-a="selpet"]', '[data-a="startpet"]'].concat(OB);
+const MUST = ['english', 'history', 'lomda', 'ulpan', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'math-app'];
+const NAMED = AL.pick(process.argv.slice(2), []);
+const SETTINGS = (NAMED.length ? NAMED : AL.family('langbtn.js', /data-a=\\?["']lang\b/,
+  { floor: 9, must: MUST, why: 'אין בהן כפתורי data-a="lang"' }))
+  .map(id => ({ id, url: '/' + id + '/' }));
 
 const dismissPopup = () => {
   const b = document.querySelector('[data-launch-popup]');
@@ -116,7 +119,7 @@ const settingsFamilies = () => {
 
 (async () => {
   const browser = await chromium.launch();
-  let checked = 0, findings = 0;
+  let checked = 0, findings = 0, skipped = 0;
 
   const open = async (url, { gate }) => {
     const page = await (await browser.newContext({ locale: 'he-IL' })).newPage();
@@ -135,6 +138,19 @@ const settingsFamilies = () => {
     return page;
   };
 
+  /* **כשל ידוע, מודפס ב-`~` ואינו מפיל** — O-135, 21.10.2026. כשהבדיקה
+     הורחבה מתשע אפליקציות לכל מי שיש לו `data-a="lang"`, נמדד ב-domino:
+     כפתורי הערבית והרוסית במסך ההגדרות יורשים `Heebo, system-ui…` בלי
+     Noto Sans Arabic / Noto Sans. ואותו דבר במסך הראשון של שש מאפליקציות
+     UNITS: יש להן `html[lang="ar"] button{…var(--ar)}`, ולכן בממשק ערבי
+     הכול תקין — אבל בממשק העברי הכפתור ״العربية״ עצמו יורש Heebo. ל-
+     science-mid יש את הכלל החסר (`button[data-a="lang"][lang="ar"]`), והיא
+     ירוקה. התיקון ב-CSS של האפליקציה. כשל ידוע שנעלם — נופל. */
+  const KNOWN = { 'הגדרות domino': ['ar', 'ru'],
+    'מסך ראשון math-g7': ['ar', 'ru'], 'מסך ראשון math-elem': ['ar', 'ru'],
+    'מסך ראשון chemistry': ['ar', 'ru'], 'מסך ראשון physics': ['ar', 'ru'],
+    'מסך ראשון english-upper': ['ar', 'ru'], 'מסך ראשון english-mid': ['ar', 'ru'] };
+  const knownSeen = {};
   const judge = (label, pairs) => {
     if (!pairs.length) {
       console.log(`✗ ${label.padEnd(22)} לא נמצאו כפתורים עם תכונת lang`);
@@ -147,6 +163,9 @@ const settingsFamilies = () => {
       checked++;
       if (sc.want.test(got)) {
         console.log(`✓ ${label.padEnd(22)} ${lg}: ${got.split(',')[0].trim()}`);
+      } else if ((KNOWN[label] || []).includes(lg)) {
+        knownSeen[label + ' ' + lg] = 1;
+        console.log(`~ ${label.padEnd(22)} ${lg}: ידוע — font-family = ${got}`);
       } else {
         findings++;
         console.log(`✗ ${label.padEnd(22)} ${lg}: ה${sc.name} תיפול לגופן המערכת — font-family = ${got}`);
@@ -171,22 +190,40 @@ const settingsFamilies = () => {
     const page = await open(app.url, { gate: false });
     /* לוחצים מתוך evaluate ולא ב-page.click: הדף מצויר מחדש בכל פעולה,
        וסרגל הניווט הדביק מכשיל את בדיקת ה-actionability של playwright. */
-    for (const sel of (app.ob || [])) {
-      await page.evaluate(tap, sel);
-      await page.waitForTimeout(400);
+    const nav = async () => {
+      for (const sel of NAV) if (await page.evaluate(tap, sel)) { await page.waitForTimeout(600); return sel }
+      return null;
+    };
+    let via = await nav();
+    if (!via) {
+      for (const sel of OB_ANY) { await page.evaluate(tap, sel); await page.waitForTimeout(400) }
+      via = await nav();
     }
-    const ok = await page.evaluate(tap, app.nav);
-    await page.waitForTimeout(600);
-    if (!ok) {
-      console.log(`\u2717 ${('הגדרות ' + app.id).padEnd(22)} לא הגעתי למסך ההגדרות — ${app.nav}`);
-      findings++;
+    const label = 'הגדרות ' + app.id;
+    const must = MUST.includes(app.id) || NAMED.length;
+    /* משפחת UNITS (chemistry, physics, math-g7…) מציגה את כפתורי השפה
+       במסך הראשון ואין לה מסך הגדרות — שם נמדד מה שיש על המסך. */
+    const here = via ? [] : await page.evaluate(settingsFamilies);
+    if (!via && here.length && !MUST.includes(app.id)) judge('מסך ראשון ' + app.id, here);
+    else if (!via) {
+      if (must) { console.log(`\u2717 ${label.padEnd(22)} לא הגעתי למסך ההגדרות — ${NAV.join(' / ')}`); findings++ }
+      else { skipped++; console.log(`· ${label.padEnd(22)} מדולגת — אין כפתור הגדרות באחת משתי הצורות המוכרות`) }
     } else {
-      judge('הגדרות ' + app.id, await page.evaluate(settingsFamilies));
+      const pairs = await page.evaluate(settingsFamilies);
+      if (!pairs.length && !must) { skipped++; console.log(`· ${label.padEnd(22)} מדולגת — אין במסך ההגדרות כפתור שפה בערבית או ברוסית`) }
+      else judge(label, pairs);
     }
     await page.close();
   }
 
+  for (const [label, lgs] of Object.entries(KNOWN)) for (const lg of lgs) {
+    const id = label.replace(/^(הגדרות|מסך ראשון) /, '');
+    if (!SETTINGS.some(a => a.id === id) || knownSeen[label + ' ' + lg]) continue;
+    findings++;
+    console.log(`✗ ${label.padEnd(22)} ${lg}: הכשל הידוע נעלם — מחקו את השורה מ-KNOWN ב-langbtn.js`);
+  }
+
   await browser.close();
-  console.log(`\n${checked} כפתורים נמדדו, ${findings} ממצאים`);
+  console.log(`\n${checked} כפתורים נמדדו ב-${SETTINGS.length - skipped} מסכי הגדרות (${skipped} מדולגים), ${findings} ממצאים`);
   process.exit(findings ? 1 : 0);
 })();

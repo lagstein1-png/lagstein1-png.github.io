@@ -18,7 +18,11 @@
    ===================================================================== */
 const fs = require('fs'), path = require('path');
 const root = process.cwd();
-const APPS = ['lomda', 'history'];
+/* O-135, 21.10.2026: נגזרת — כל מי שמגדיר `centuryStr`. היום אלה אותן
+   שתיים, אבל אפליקציה שתעתיק את הפונקציה תיבדק בלי שמישהו יזכור להוסיף. */
+const AL = require('./applist.js');
+const APPS = AL.family('century.js', /function centuryStr\b/,
+  { floor: 2, must: ['lomda', 'history'], why: 'אין בהן centuryStr' });
 
 /* מה מצפים לראות, לכל שפה, עבור מאה 19 ועבור מאה 6 לפני הספירה */
 const WANT = {
