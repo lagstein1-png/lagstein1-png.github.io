@@ -72,6 +72,9 @@ globalThis.fetch = async (url, o) => {
   const b = JSON.parse(o.body);
   if (process.env.FAKE_DELAY) await new Promise(r => realTimeout(r, Number(process.env.FAKE_DELAY)));
   if (process.env.FAKE_QUOTA) return { status: 429, ok: false, text: async () => 'RESOURCE_EXHAUSTED' };
+  /* 402 ״prepayment credits are depleted״ (14.10.2026, biology/audio/attempts.json): הסטטוס בשדה status, לא ב-message */
+  if (process.env.FAKE_402) { globalThis.__calls = (globalThis.__calls || 0) + 1; process.stderr.write('FAKECALL\\n');
+    return { status: 402, ok: false, text: async () => JSON.stringify({ error: { code: 402, message: 'Your prepayment credits are depleted. Please go to AI Studio to manage your project and billing.', status: 'RESOURCE_EXHAUSTED' } }) }; }
   if (/texttospeech/.test(url)) {
     const enc = b.audioConfig.audioEncoding;
     /* Cloud TTS: MP3 חוזר ב-32k; LINEAR16 חוזר כ-WAV */
@@ -273,6 +276,19 @@ const S = ['שלום לכולם היום', 'אנחנו לומדים יחד', 'ז
         f1 && f2 && baseUsd === 5 && total === 7, 'r1 ' + f1 + ', r2 ' + f2 + ', בסיס ' + baseUsd + ', סך ' + total);
 }
 
+/* 10. הקרדיט נגמר (O-218, 26.10.2026). ב-14.10 ענה Gemini 402, והקוד חיפש
+   RESOURCE_EXHAUSTED רק בהודעה: כל מחרוזת נרשמה ככישלון, הריצה המשיכה עד
+   הסוף, ושלוש ריצות כאלה מוציאות את החסר מהתור לתמיד (MAX_TRIES=3). צריך:
+   עצירה אחרי הבקשה הראשונה, ואף מחרוזת לא נרשמת ב-attempts.json. */
+{
+  const T = tree('prepay', { english: S });
+  manifest(T, 'english', 'Kore', []);
+  const r = run(T, ['english', '--max', '5'], { FAKE_402: '1' });
+  const calls = (r.out.match(/FAKECALL/g) || []).length, att = Object.keys(attemptsOf(T, 'english')).length;
+  check('10. 402 קרדיט: עוצרים אחרי בקשה אחת, ואף מחרוזת לא נרשמת ככישלון',
+        calls === 1 && att === 0, 'בקשות ' + calls + ', ב-attempts ' + att + ' · ' + r.out.split('\n').filter(l => /✗|נגמר|עוצרים/.test(l)).slice(0, 2).join(' | '));
+}
+
 fs.rmSync(BASE, { recursive: true, force: true });
-console.log(bad ? '\n✗ ' + bad + ' תרחישים נפלו' : '\n✓ ההקלטה בטוחה: תשעה תרחישים');
+console.log(bad ? '\n✗ ' + bad + ' תרחישים נפלו' : '\n✓ ההקלטה בטוחה: עשרה תרחישים');
 process.exit(bad ? 1 : 0);
