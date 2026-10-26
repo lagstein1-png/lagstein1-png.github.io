@@ -31,8 +31,8 @@
 | `biology` | bg32 · 2026-10-26 | bg32-pwa1 | תואם |
 | `chemistry` | ch5 · 2026-10-25 | ch5-pwa1 | תואם |
 | `physics` | ph5 · 2026-10-25 | ph5-pwa1 | תואם |
-| `english-upper` | eu4 · 2026-10-25 | eu4-pwa1 | תואם |
-| `english-mid` | em4 · 2026-10-25 | em4-pwa1 | תואם |
+| `english-upper` | eu5 · 2026-10-26 | eu5-pwa1 | תואם |
+| `english-mid` | em5 · 2026-10-26 | em5-pwa1 | תואם |
 | `geography` | q52 · 2026-10-25 | q52-pwa1 | תואם |
 | `bagrut-history` | h139 · 2026-10-16 | h139-pwa1 | תואם |
 | `islam` | is28 · 2026-10-26 | is28-pwa1 | תואם |
