@@ -1031,7 +1031,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="v187 · 2026-10-18";
+var BUILD="v188 · 2026-10-25";
 var KEY="axiom2-state-v1";
 
 function blankState(){
@@ -1597,7 +1597,8 @@ function tuneRate(lang,rate){
    הנשי בלי הקלטות ובלי שירות חיצוני. מי שמתקין קול נשי מקבל אותו
    מיד ובלי שינוי הגובה.
    ------------------------------------------------------------ */
-var FEM_PITCH=1.35;
+/* 1 ולא 1.35 (הבעלים, 25.10.2026, כרום על ווינדוס: ״הקול לא תקין״). הרמה של 35% לא הופכת את Asaf לקול נשי — היא מעוותת אותו. קול גברי נשמע בגובה הבסיס, וההודעה מציעה את Edge (הילה). */
+var FEM_PITCH=1;
 function femLift(v){
   if(!v)return 1;
   try{ return guessGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
@@ -13328,7 +13329,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=v187-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=v188-pwa1").catch(function(){});
   });
 }
 </script>

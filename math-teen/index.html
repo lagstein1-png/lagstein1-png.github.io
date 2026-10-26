@@ -3389,7 +3389,7 @@ function ic(name,size){
    4. מצב האפליקציה ושמירה מקומית
    הכול נשמר במכשיר בלבד — אין שרת ואין חשבון.
    ============================================================ */
-var BUILD="t196 · 2026-10-18";
+var BUILD="t197 · 2026-10-25";
 var KEY="shlav-state-v1";
 
 function blankState(){
@@ -3968,7 +3968,8 @@ function tuneRate(lang,rate){
    הנשי בלי הקלטות ובלי שירות חיצוני. מי שמתקין קול נשי מקבל אותו
    מיד ובלי שינוי הגובה.
    ------------------------------------------------------------ */
-var FEM_PITCH=1.35;
+/* 1 ולא 1.35 (הבעלים, 25.10.2026, כרום על ווינדוס: ״הקול לא תקין״). הרמה של 35% לא הופכת את Asaf לקול נשי — היא מעוותת אותו. קול גברי נשמע בגובה הבסיס, וההודעה מציעה את Edge (הילה). */
+var FEM_PITCH=1;
 function femLift(v){
   if(!v)return 1;
   try{ return guessGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
@@ -10787,7 +10788,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=t196-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=t197-pwa1").catch(function(){});
     /* O-221: bagrut3.js נטען רק תחת ?bagrut3=1 ואינו ב-PRE של sw.js
        (sw.js חייב להישאר זהה לעותקים ש-engine.js בודק). לכן הדף שומר
        אותו בעצמו, באותו מטמון שה-worker קורא ממנו — ומסך ״בגרות 3
