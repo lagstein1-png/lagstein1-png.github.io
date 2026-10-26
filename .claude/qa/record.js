@@ -618,7 +618,35 @@ function tutorBank(local, ui) {
             .flatMap(x => x.split(/\n+/)).map(x => x.trim()).filter(Boolean);
 }
 
+/* משפטי המשוב של משפחת elem (O-241, 26.10.2026). ״יפה מאוד!״, ״כמעט.
+   ננסה שוב, בלי למהר.״ ו״נסתכל יחד. התשובה היא:״ נאמרים דרך speakSeq
+   כמקטע נפרד, ו-RECORDED.play מקבל אותם כמו שהם (t(key)) — אבל הם
+   ב-js/i18n.js ולא ב-js/data.js, ולכן אף קורא לא אסף אותם, והלומד שמע
+   את התוכן בקול המוקלט ואת המשוב בקול המכשיר. הערך הסופי נלקח מהרצת
+   הקובץ ב-vm, כי S() מאוחר דורס מוקדם (science-12 מגדירה את good1–4
+   פעמיים). מילה בודדת כאן מותרת: זה משוב, לא מילה שהילד מפענח. */
+const ELEM_FB_APPS = new Set(['civics-elem', 'culture-elem', 'history-elem', 'tanakh-elem',
+                              'science-12', 'english-elem', 'hebrew-lit']);
+const ELEM_FB_KEYS = ['good1', 'good2', 'good3', 'good4', 'streak', 'try1', 'reveal', 'h2note'];
+function elemFeedback(app) {
+  const f = path.join(ROOT, app, 'js', 'i18n.js');
+  if (!fs.existsSync(f)) return [];
+  const ctx = { state: { lang: 'he' } };
+  try { require('vm').runInNewContext(fs.readFileSync(f, 'utf8'), ctx); } catch (e) { return []; }
+  const S = ctx._S || {};
+  return ELEM_FB_KEYS.filter(k => S[k] && S[k].he).map(k => S[k].he);
+}
 function corpus(app) {
+  const seen = corpusOf(app);
+  if (seen && ELEM_FB_APPS.has(app)) for (const raw of elemFeedback(app)) {
+    const text = plainOf(String(raw));
+    if (!/[א-ת]/.test(text)) continue;
+    const id = R.id(text);
+    if (!seen.has(id)) seen.set(id, text);
+  }
+  return seen;
+}
+function corpusOf(app) {
   const src = SOURCES[app];
   if (!src) return null;
   const files = typeof src === 'function' ? src() : src;
