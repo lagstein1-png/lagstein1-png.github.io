@@ -28,7 +28,7 @@
 | `math-g7` | mg32 · 2026-10-25 | mg32-pwa1 | תואם |
 | `electric` | e62 · 2026-10-25 | e62-pwa1 | תואם |
 | `science-mid` | scimid19 · 2026-10-25 | scimid19-pwa1 | תואם |
-| `biology` | bg30 · 2026-10-25 | bg30-pwa1 | תואם |
+| `biology` | bg31 · 2026-10-26 | bg31-pwa1 | תואם |
 | `chemistry` | ch5 · 2026-10-25 | ch5-pwa1 | תואם |
 | `physics` | ph5 · 2026-10-25 | ph5-pwa1 | תואם |
 | `english-upper` | eu4 · 2026-10-25 | eu4-pwa1 | תואם |

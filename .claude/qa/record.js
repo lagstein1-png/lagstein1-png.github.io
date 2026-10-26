@@ -94,7 +94,7 @@ const BATCH_MAX_SEC = 600;
    מול רשימת הקולות של השרת ב-5.10.2026 — אלא שהצליל עצמו נפסל
    בהאזנה. קיים אינו אומר מובן. */
 const VOICE = process.env.TTS_VOICE || process.env.GEMINI_TTS_VOICE ||
-              (PROVIDER === 'gcloud' ? 'he-IL-Chirp3-HD-Gacrux' : 'Kore');   /* הבעלים, 2.10.2026: Kore בכל האתר, כמו בתאוריה מדברת */
+              (PROVIDER === 'gcloud' ? 'he-IL-Chirp3-HD-Gacrux' : 'Gacrux');   /* Gacrux — הקול של כל המניפסטים ושל לימור (O-83, ארתור; O-242, 26.10.2026). עד כאן Kore, ואפליקציה עם מניפסט ריק הייתה מוקלטת בקול אחר */
 const API   = 'https://generativelanguage.googleapis.com/v1beta';
 const GCLOUD = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 /* מחיר למיליון תווים, כפי שכתוב ב-tools/tts-build.js של הריפו הנפרד
@@ -1023,6 +1023,11 @@ async function synth(ffmpeg, text) {
    אחרת אין לנו דרך לדעת איזה מקטע שייך לאיזו מחרוזת והאצווה כולה
    מושחרת (quarantine) — המחרוזות נשארות חסרות ויוקלטו בריצה אחרת. */
 class QuotaError extends Error {}
+/* מכסה, או קרדיט שנגמר — שניהם עוצרים את הריצה ואינם נספרים ככישלון של
+   המחרוזת. 402 ״Your prepayment credits are depleted״ (14.10.2026) נושא את
+   RESOURCE_EXHAUSTED בשדה status ולא ב-message, ולכן הביטוי הישן לא תפס
+   אותו: כל מחרוזת נרשמה ככישלון והריצה המשיכה. record-safety.js תרחיש 10. */
+const QUOTA_RE = /429|RESOURCE_EXHAUSTED|quota|\b402\b|prepayment|depleted|billing/i;
 async function synthBatch(model, texts) {
   const k = texts.length;
   const prompt = 'הקרא בקול ברור, חם וטבעי את ' + k + ' הפריטים הבאים, בדיוק כפי שהם כתובים. ' +
@@ -1231,7 +1236,7 @@ async function build(app, max) {
           return true;
         }
       } catch (e2) {
-        if (e2 instanceof QuotaError || e2 instanceof BudgetError || /429|RESOURCE_EXHAUSTED|quota/i.test(e2.message)) throw e2;
+        if (e2 instanceof QuotaError || e2 instanceof BudgetError || QUOTA_RE.test(e2.message)) throw e2;
         QUALITY.fail(attempts, pair[0], e2.message);
         return false;
       }
@@ -1286,7 +1291,7 @@ async function build(app, max) {
         await doBatch(batch, model, 0);
       } catch (e) {
         if (e instanceof BudgetError) { quota = true; STOPPED = 'budget'; console.log('  ' + e.message + ' — עוצרים. מה שנכתב נשמר.'); break; }
-        if (e instanceof QuotaError || /429|RESOURCE_EXHAUSTED|quota/i.test(e.message)) {
+        if (e instanceof QuotaError || QUOTA_RE.test(e.message)) {
           tired.add(model);
           console.log('  מכסת ' + model + ' נגמרה (' + e.message.slice(0, 100) + ') — עוברים למודל הבא');
           /* אותה אצווה תנסה שוב עם המודל הבא בסיבוב */
@@ -1321,8 +1326,8 @@ async function build(app, max) {
       if (e instanceof BudgetError) { quota = true; STOPPED = 'budget'; console.log('  ' + e.message + ' — עוצרים. מה שנכתב נשמר.'); break; }
       failed++;
       console.log('  ✗ ' + id + ' ' + e.message.slice(0, 140));
-      if (!/429|RESOURCE_EXHAUSTED|quota/i.test(e.message)) QUALITY.fail(attempts, id, e.message);
-      if (/429|RESOURCE_EXHAUSTED|quota/i.test(e.message)) { quota = true; STOPPED = 'quota'; console.log('  המכסה נגמרה. מה שנכתב נשמר; הרצה חוזרת תמשיך מכאן.'); break; }
+      if (!QUOTA_RE.test(e.message)) QUALITY.fail(attempts, id, e.message);
+      if (QUOTA_RE.test(e.message)) { quota = true; STOPPED = 'quota'; console.log('  המכסה נגמרה. מה שנכתב נשמר; הרצה חוזרת תמשיך מכאן.'); break; }
     }
     await sleep(PACE.gap);
   }
