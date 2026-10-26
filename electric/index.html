@@ -1040,7 +1040,7 @@ function guessLang(){
   return "he";
 }
 
-var BUILD="e64 · 2026-10-26";
+var BUILD="e65 · 2026-10-26";
 var KEY="electric-state-v1";
 
 function blankState(){
@@ -1879,9 +1879,17 @@ var EL_SAY=[
   [/\bAND\b/g," וגם "],[/\bOR\b/g," או "],
   [/Σ\s*I_in/g," סכום הזרמים הנכנסים "],[/Σ\s*I_out/g," סכום הזרמים היוצאים "],
   [/_in\b/g," כניסה "],[/_out\b/g," יציאה "],[/_rms\b/g," אפקטיבי "],[/_loss\b/g," הפסדים "],
+  /* ממסר פחת: I<sub>Δ</sub> הוא זרם הדלף ו-I<sub>Δn</sub> הרגישות —
+     אותן מילים כמו בשאלה ובצעדים. Δ אינה אות לטינית, ולכן כלל
+     האינדקס שמתחת לא תפס, ו-"I_Δ" הגיע למנוע כ-"I_ דלתא" (O-249). */
+  [/\bI_Δn\b/g," הרגישות "],[/\bI_Δ/g," זרם הדלף "],
   /* אינדקס על משתנה: "V_p", "R_T" — מפרידים, כדי שכללי האותיות יתפסו את שניהם */
   [/\b([A-Z])_([A-Za-z]{1,3})\b/g,"$1 $2"],[/\bT\b/g," טי "],
-  [/\bV\b/g," וי "],[/\bI\b/g," איי "],[/\bR\b/g," אר "],[/\bP\b/g," פי "],
+  /* I (זרם) מקבל מפתח משלו. עד 26.10.2026 גם I וגם A (אמפר) היו
+     " איי ", ולכן בערבית, ברוסית ובאנגלית הזרם נשמע "a" (O-249).
+     הפתח מבדיל את המפתח ומכוון את ההגייה העברית ל"אַי"; מנוע שמתעלם
+     מניקוד קורא "איי", כמו קודם. */
+  [/\bV\b/g," וי "],[/\bI\b/g," אַיי "],[/\bR\b/g," אר "],[/\bP\b/g," פי "],
   [/\bC\b/g," סי "],[/\bL\b/g," אל "],[/\bY\b/g," וואי "],[/\bN\b/g," אן "],[/\bQ\b/g," קיו "]
 ];
 var SAY_MAP=EL_SAY.concat([
@@ -8288,7 +8296,11 @@ var TR_KEYS=[
 " מתח הסוללה ",
 " אנרגיה ",
 " ההתנגדות הפנימית ",
-" אר קטנה "
+" אר קטנה ",
+/* EL_SAY: הזרם I, זרם הדלף והרגישות של ממסר הפחת, להקראה (O-249, 26.10.2026) */
+" אַיי ",
+" זרם הדלף ",
+" הרגישות "
 ];
 TOPICS.forEach(function(t){lazyTr(t,["name","desc"])});
 FORMULAS.forEach(function(f){lazyTr(f,["t","n","m"])});
@@ -13238,6 +13250,10 @@ trAt("en",TR_KEYS.indexOf("נגד קבוע מחובר למתח, ונמדד הז�
 trAt("ar",TR_KEYS.indexOf(" מתח הסוללה הראשונה $1 מתח הסוללה השנייה "),[" جهد البطارية الأولى $1 جهد البطارية الثانية "," جهد البطارية الأولى "," جهد البطارية الثانية "," جهد البطارية "," الطاقة "," المقاومة الداخلية "," آر صغيرة "]);
 trAt("ru",TR_KEYS.indexOf(" מתח הסוללה הראשונה $1 מתח הסוללה השנייה "),[" напряжение первой батареи $1 напряжение второй батареи "," напряжение первой батареи "," напряжение второй батареи "," напряжение батареи "," энергия "," внутреннее сопротивление "," малое эр "]);
 trAt("en",TR_KEYS.indexOf(" מתח הסוללה הראשונה $1 מתח הסוללה השנייה "),[" first battery voltage $1 second battery voltage "," first battery voltage "," second battery voltage "," battery voltage "," energy "," internal resistance "," small r "]);
+/* EL_SAY: הזרם I, זרם הדלף והרגישות (O-249). */
+trAt("ar",TR_KEYS.indexOf(" אַיי "),[" آي "," تيار التسرب "," الحساسية "]);
+trAt("ru",TR_KEYS.indexOf(" אַיי "),[" и "," ток утечки "," чувствительность "]);
+trAt("en",TR_KEYS.indexOf(" אַיי "),[" I "," leakage current "," the sensitivity "]);
 trBuild();
 exLoad();
 applyModes();
@@ -13272,7 +13288,7 @@ if(!INTERNAL_OK){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=e64-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=e65-pwa1").catch(function(){});
   });
 }
 </script>

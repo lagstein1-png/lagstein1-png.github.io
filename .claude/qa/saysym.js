@@ -54,8 +54,7 @@ const BAD = [
 /* ״נעלם״ נקבע מול המקור ולא מול הדגימה: הדגימה אקראית (QA_N לתא), וריצה
    שלא הגרילה את השאלה אינה הוכחה שהבאג תוקן. */
 const KNOWN = {
-  'electric': { '_': { why: 'I<sub>Δ</sub> בממסר פחת (safety) — speakMath אינו מקריא כתב תחתי יווני',
-                       src: /I<sub>Δ/ } },
+  // electric I<sub>Δ</sub>: נסגר 26.10.2026 (O-249) — EL_SAY קורא ״זרם הדלף״/״הרגישות״.
 };
 
 async function audit(page, n) {

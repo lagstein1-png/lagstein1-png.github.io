@@ -146,10 +146,9 @@ const settingsFamilies = () => {
      הכול תקין — אבל בממשק העברי הכפתור ״العربية״ עצמו יורש Heebo. ל-
      science-mid יש את הכלל החסר (`button[data-a="lang"][lang="ar"]`), והיא
      ירוקה. התיקון ב-CSS של האפליקציה. כשל ידוע שנעלם — נופל. */
-  const KNOWN = { 'הגדרות domino': ['ar', 'ru'],
-    'מסך ראשון math-g7': ['ar', 'ru'], 'מסך ראשון math-elem': ['ar', 'ru'],
-    'מסך ראשון chemistry': ['ar', 'ru'], 'מסך ראשון physics': ['ar', 'ru'],
-    'מסך ראשון english-upper': ['ar', 'ru'], 'מסך ראשון english-mid': ['ar', 'ru'] };
+  /* 26.10.2026 (O-250 א): שבע האפליקציות קיבלו את הכלל button[data-a="lang"][lang=…],
+     והרשימה התרוקנה. */
+  const KNOWN = {};
   const knownSeen = {};
   const judge = (label, pairs) => {
     if (!pairs.length) {
