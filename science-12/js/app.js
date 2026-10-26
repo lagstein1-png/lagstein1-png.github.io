@@ -244,13 +244,29 @@ function render(){
   }
   /* שתי תקלות שונות, שתי הודעות. בלי מנוע הקראה אי אפשר להקריא בכלל,
      וזה המקרה היחיד שבו נכון לבקש מהלומד לקרוא לבד. כשיש מנוע ואין בו
-     קול נשי — ההקראה כן יוצאת, בקול ברירת המחדל (speech.js, u.pitch=1.25). */
+     קול נשי — ההקראה כן יוצאת, בקול ברירת המחדל (speech.js, בגובה הבסיס 1.12). */
   var warnKey=!("speechSynthesis" in window)?"noSpeech"
              :(allVoices().length&&!voiceFor(state.lang)&&view==="home")?"noVoice":null;
   if(warnKey){
-    var n=document.createElement("p");n.className="small warn";n.textContent=t(warnKey);var m=$("main");if(m)m.appendChild(n);}
+    var n=document.createElement("p");n.className="small warn";n.textContent=t(warnKey);if(warnKey==="noVoice")edgeFirst(n);var m=$("main");if(m)m.appendChild(n);}
 }
-try{speechSynthesis.onvoiceschanged=function(){}}catch(e){}
+/* כרום על ווינדוס רואה רק את קולות המערכת, ובעברית יש שם רק את Asaf
+   הגברי — למיקרוסופט אין קול עברי נשי להתקנה. אז ההקראה יוצאת בקול גברי
+   בגובה מורם, ולימור (הקלטות בלבד) נשמעת בקול אחר. Edge נושא את הילה
+   הנוירלית בלי התקנה, ולכן הקישור אליו בא ראשון בהודעה — כמו femNoteHTML
+   ב-english (17.9.2026). הבעלים צילם את ההודעה בלי הקישור, 25.10.2026. */
+function edgeFirst(p){
+  var ua=navigator.userAgent||"";
+  if(!/Windows/i.test(ua)||/Edg\//.test(ua))return;
+  var a=document.createElement("a");a.href="microsoft-edge:"+location.href.split("#")[0];
+  a.textContent=t("openEdge");a.style.fontWeight="700";a.style.color="inherit";
+  var txt=p.textContent;p.textContent=t("edgeHas")+" ";p.appendChild(a);
+  p.appendChild(document.createElement("br"));p.appendChild(document.createTextNode(txt));
+}
+/* בכרום רשימת הקולות ריקה ברגע הטעינה, ולכן ההודעה ״אין קול נשי״ (וקישור
+   ה-Edge שבה) לא הופיעה בכניסה הראשונה — רק אחרי מעבר לשיעור וחזרה.
+   כשהקולות מגיעים, מסך הבית מצויר שוב; לא באמצע הקראה, ולא במסך אחר. */
+try{speechSynthesis.onvoiceschanged=function(){if(view==="home"&&!SP.playing&&!window.__GATED)render()}}catch(e){}
 if(!window.__GATED)render();
 /* ---------- לימור ----------
 

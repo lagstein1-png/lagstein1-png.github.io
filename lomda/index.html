@@ -910,7 +910,7 @@ T.he={
   vFemale:"קולות נשיים", vMale:"קולות גבריים", vSample:"דוגמה",
   vDevList:"קולות המכשיר", vAuto:"בחירה אוטומטית",
   vNoneLang:"אין קול בשפה הזאת במכשיר",
-  femNone:"אין במכשיר קול נשי בשפה הזאת, ולכן גובה הקול הורם. זה לא קול נשי אמיתי — כדי לקבל אחד צריך להתקין אותו.",
+  femNone:"אין במכשיר קול נשי בשפה הזאת, ולכן ההקראה בקול גברי. כדי לשמוע קול נשי צריך להתקין אחד.",
   femAndroid:"באנדרואיד: הגדרות ← נגישות ← טקסט לדיבור (בסמסונג: הגדרות ← ניהול כללי ← טקסט לדיבור) ← גלגל השיניים ליד המנוע ← התקנת נתוני קול ← לבחור וריאנט נשי.",
   femIos:"באייפון או באייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← לבחור קול נשי ולהוריד.",
   femMac:"במק: הגדרות המערכת ← נגישות ← תוכן מדובר ← קול המערכת ← ניהול קולות ← להוריד קול נשי.",
@@ -964,7 +964,7 @@ T.ar={
   vFemale:"أصوات نسائية", vMale:"أصوات رجالية", vSample:"عيّنة",
   vDevList:"أصوات الجهاز", vAuto:"اختيار تلقائي",
   vNoneLang:"لا يوجد صوت بهذه اللغة في الجهاز",
-  femNone:"لا يوجد في هذا الجهاز صوت نسائي بهذه اللغة، لذلك رُفعت طبقة الصوت. هذا ليس صوتًا نسائيًا حقيقيًا — للحصول على واحد يجب تثبيته.",
+  femNone:"لا يوجد في هذا الجهاز صوت نسائي بهذه اللغة، لذلك تتم القراءة بصوت رجالي. لسماع صوت نسائي يجب تثبيت واحد.",
   femAndroid:"في أندرويد: الإعدادات ← إمكانية الوصول ← تحويل النص إلى كلام (في سامسونغ: الإعدادات ← الإدارة العامة ← تحويل النص إلى كلام) ← الترس بجانب المحرّك ← تثبيت بيانات الصوت ← اختيار نسخة نسائية.",
   femIos:"في آيفون أو آيباد: الإعدادات ← إمكانية الوصول ← المحتوى المنطوق ← الأصوات ← اختيار صوت نسائي وتنزيله.",
   femMac:"في ماك: إعدادات النظام ← إمكانية الوصول ← المحتوى المنطوق ← صوت النظام ← إدارة الأصوات ← تنزيل صوت نسائي.",
@@ -1018,7 +1018,7 @@ T.ru={
   vFemale:"Женские голоса", vMale:"Мужские голоса", vSample:"Пример",
   vDevList:"Голоса устройства", vAuto:"Автоматически",
   vNoneLang:"На устройстве нет голоса для этого языка",
-  femNone:"На этом устройстве нет женского голоса для этого языка, поэтому тон голоса повышен. Это не настоящий женский голос — чтобы получить его, его нужно установить.",
+  femNone:"На этом устройстве нет женского голоса для этого языка, поэтому текст читает мужской голос. Чтобы услышать женский голос, его нужно установить.",
   femAndroid:"В Android: Настройки → Спец. возможности → Синтез речи (в Samsung: Настройки → Общие настройки → Синтез речи) → шестерёнка рядом с движком → Установить голосовые данные → выбрать женский вариант.",
   femIos:"В iPhone или iPad: Настройки → Универсальный доступ → Устный контент → Голоса → выбрать женский голос и загрузить.",
   femMac:"В Mac: Системные настройки → Универсальный доступ → Устный контент → Системный голос → Управление голосами → загрузить женский голос.",
@@ -1072,7 +1072,7 @@ T.en={
   vFemale:"Female voices", vMale:"Male voices", vSample:"Sample",
   vDevList:"Device voices", vAuto:"Automatic",
   vNoneLang:"No voice for this language on this device",
-  femNone:"This device has no female voice for this language, so the pitch is raised. It is not a real female voice — to get one it has to be installed.",
+  femNone:"This device has no female voice for this language, so a male voice reads the text. To hear a female voice, one has to be installed.",
   femAndroid:"On Android: Settings → Accessibility → Text-to-speech (on Samsung: Settings → General management → Text-to-speech) → the gear next to the engine → Install voice data → pick a female variant.",
   femIos:"On iPhone or iPad: Settings → Accessibility → Spoken Content → Voices → pick a female voice and download it.",
   femMac:"On Mac: System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → download a female voice.",
@@ -1138,7 +1138,7 @@ function ic(n,s){s=s||18;return '<svg viewBox="0 0 24 24" width="'+s+'" height="
 /* ============================================================
    4. מצב ושמירה
    ============================================================ */
-var BUILD="l176 · 2026-10-21";
+var BUILD="l177 · 2026-10-26";
 var SKEY="lomda-state-v1";
 
 function blankState(){
@@ -1783,7 +1783,8 @@ function tuneRate(lang,rate){
    הנשי בלי הקלטות ובלי שירות חיצוני. מי שמתקין קול נשי מקבל אותו
    מיד ובלי שינוי הגובה.
    ------------------------------------------------------------ */
-var FEM_PITCH=1.35;
+/* 1 ולא 1.35 (הבעלים, 25.10.2026, כרום על ווינדוס: ״הקול לא תקין״). הרמה של 35% לא הופכת את Asaf לקול נשי — היא מעוותת אותו. קול גברי נשמע בגובה הבסיס, וההודעה מציעה את Edge (הילה). */
+var FEM_PITCH=1;
 function femLift(v){
   if(!v)return 1;
   try{ return vGender(v)==="m"?FEM_PITCH:1 }catch(e){ return 1 }
@@ -4851,7 +4852,7 @@ render();
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=l176-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=l177-pwa1").catch(function(){});
   });
 }
 </script>
