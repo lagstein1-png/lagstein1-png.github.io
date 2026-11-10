@@ -940,11 +940,14 @@ var esc=function(x){return String(x).replace(/[&<>"']/g,function(c){
 var LKEY="site-lang", LANGS=[["he","עברית"],["ar","العربية"],["ru","Русский"],["en","English"]];
 function savedLang(){try{return localStorage.getItem(LKEY)||""}catch(e){return""}}
 /* שפת הדפדפן היא רמז ולא הוראה: מכשירים רבים בישראל מדווחים en-US
-   גם כשהמשתמש קורא עברית. לכן ברירת המחדל היא עברית, ואנגלית
-   נבחרת רק כשאין התאמה לאף אחת מהשפות שהדף באמת יודע. */
+   גם כשהמשתמש קורא עברית, וכך גם הסורק של גוגל. לכן ברירת המחדל
+   היא עברית, ורק דפדפן בערבית או ברוסית מקבל את שפתו מעצמו.
+   אנגלית נבחרת בכפתור שבראש הדף, והבחירה נשמרת.
+   עד 10.11.2026 הקוד החזיר אנגלית ל-en, בניגוד להערה הזאת, ודף
+   הבית הופיע בגוגל בכותרת אנגלית. */
 function guessLang(){
   var l=(navigator.language||"").toLowerCase().split("-")[0];
-  return {he:1,iw:1}[l]?"he":{ar:1,ru:1,en:1}[l]?l:"he";
+  return {ar:1,ru:1}[l]?l:"he";
 }
 var LG=savedLang()||guessLang(); if(!TR[LG])LG="he";
 function isWinNotEdge(){var ua=navigator.userAgent||"";return /Windows/i.test(ua)&&!/Edg\//.test(ua)}
@@ -1258,7 +1261,7 @@ document.addEventListener("DOMContentLoaded",function(){
    מייצר worker חדש ומוחק את המטמון הישן מעצמו. */
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js?v=181-pwa1").catch(function(){});
+    navigator.serviceWorker.register("sw.js?v=182-pwa1").catch(function(){});
   });
 }
 </script>
