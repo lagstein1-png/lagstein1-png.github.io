@@ -8,6 +8,9 @@ const { BASE } = require('./port.js');   /* QA_PORT, ברירת מחדל 8099 �
   const fails = [];
   const ok = (n,c)=>{ console.log((c?'PASS':'FAIL')+' '+n); if(!c) fails.push(n); };
 
+  /* O-135, 21.10.2026: בדיקה חד־פעמית מסבב ההקלטה, **אינה ב-SUITE של
+     all.js**, ולכן הרשימה כאן אינה מכסה דבר בריצה הרגילה. הבדיקה
+     הרוחבית של השכבה המוקלטת היא `recorded.js --browser`, והיא נגזרת. */
   for (const app of ['civics','literature','tanakh','hebrew-arab','hebrew']) {
     await p.goto(BASE+'/'+app+'/');
     await p.waitForTimeout(700);
