@@ -23,15 +23,25 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const WORKER = 'file://' + path.join(ROOT, 'tutor-api', 'worker.js');
 const CLIENT = path.join(ROOT, 'tutor', 'tutor.js');
 
-/* O-135, 21.10.2026: **נגזרת** — כל אפליקציה מקומית שקוראת ל-`TUTOR.mount(`
-   באחד מקובציה. עד היום שלוש־עשרה בשם, ושלושים אחרות שמחווטות ללימור
-   (משפחת ה-elem, chemistry, physics, english-mid/upper…) לא נבדקו בסעיף 7.
-   דף הבית אינו אפליקציית לימוד (סעיף 7א), ו״תאוריה מדברת״ בריפו נפרד. */
-const AL = require('./applist.js');
-const APPS = AL.family('tutor.js', /TUTOR\.mount\(/, { floor: 13,
-  must: ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'lomda', 'english',
-         'history', 'ulpan', 'bagrut-806', 'reader', 'kotvim', 'electric'],
-  why: 'אין בהן TUTOR.mount' });
+/* **הרשימה נגזרת, ולא נכתבת ביד.** עד 20.11.2026 היא הייתה שלוש־עשרה אפליקציות
+   שנכתבו בשם ב-24.9, ובינתיים **כל** אפליקציה בריפו טוענת את `/tutor/tutor.js`:
+   נמדד 43 מתוך 43. כלומר שלושים אפליקציות הטמיעו את לימור ומעולם לא נבדק בהן
+   לא הכפתור, לא תגית הסקריפט ולא ה-PRE — ושני האחרונים נכשלים **בשקט**, בדיוק
+   כפי שכתוב למעלה. זו אותה משפחה של O-239 (voice.js) ושל O-241 (record.js):
+   רשימה ידנית מדלגת בשקט על מה שנוסף אחריה.
+
+   **ולמה הרשימה היא ״כל האפליקציות״ ולא ״מי שטוענת את הקובץ״.** ניסיתי קודם
+   לגזור אותה ממי שטוען את `tutor/tutor.js`, וזה שומר חלול: כשמחקתי את התגית
+   מ-net-elem כהוכחת נפילה, האפליקציה **יצאה מהרשימה** והבדיקה נשארה ירוקה —
+   השומר נוצח בדיוק בכשל שהוא אמור לתפוס. לכן המקור הוא `stages.json`, וכל
+   אפליקציה חייבת את שלושת הדברים. מי שבכוונה בלי לימור נכתבת ב-`NO_TUTOR`
+   עם סיבה; היא ריקה היום, מפני ש-43 מתוך 43 מחווטות. דף הבית נבדק בסעיף 7א
+   בנפרד, ו״תאוריה מדברת״ יושבת בריפו נפרד. */
+const REG = JSON.parse(fs.readFileSync(path.join(__dirname, 'stages.json'), 'utf8'));
+const NO_TUTOR = new Set([]);
+const APPS = Object.keys(REG.apps)
+  .filter(a => fs.existsSync(path.join(ROOT, a)))
+  .filter(a => !NO_TUTOR.has(a));
 /* ״תאוריה מדברת״ אינה בריפו הזה, אבל היא באותו מקור וטוענת את
    /tutor/tutor.js מכאן — ולכן התפקיד שלה חייב להיות בשרת.
    החיווט שלה עצמו נבדק בריפו שלה, לא כאן. */
@@ -298,6 +308,7 @@ import(WORKER).then(async W => {
      מעכשיו: מי שמחווט ל-Limor חייב `ROLE`, ו-`EXTERNAL`/`ROLE_ONLY`/
      `HOME` נשארים בשם מפני שאינם נגזרים מהריפו (ריפו אחר, דף הבית,
      וחומר למורה). */
+  const AL = require('./applist.js');
   const mounted = [];
   for (const a of AL.local()) {
     const src = AL.sourceOf(a);
@@ -311,8 +322,18 @@ import(WORKER).then(async W => {
   t(`לכל אפליקציה שמחווטת ללימור יש תפקיד (${mounted.length} מחווטות)`, got, want);
   const dup = new Set(Object.values(W.ROLE));
   t('אין שני תפקידים זהים', dup.size, got.length);
-  /* לפי המזהה שנשלח ב-mount, לא לפי שם התיקייה — science-mid שולחת "scimid". */
-  [...new Set(mounted)].concat(EXTERNAL, HOME).forEach(a => {
+  /* המזהה שנשלח לשרת אינו תמיד שם התיקייה: `science-mid` מחווטת
+     `TUTOR.mount({app:"scimid"})` (היחידה כזאת, נמדד על 43). הבדיקה הזאת
+     עוברת על המזהים שהאפליקציות באמת שולחות, ולא על שמות התיקיות — אחרת
+     היא מדווחת ממצא על `science-mid` שאין בו דבר. */
+  const MOUNT_ID = {};
+  for (const a of AL.local()) {
+    const src = AL.sourceOf(a), k = src.indexOf('TUTOR.mount(');
+    if (k < 0) continue;
+    const m = /app:\s*["']([^"']+)["']/.exec(src.slice(k, k + 400));
+    if (m) MOUNT_ID[a] = m[1];
+  }
+  [...new Set(APPS.map(a => MOUNT_ID[a]).filter(Boolean).concat(EXTERNAL, HOME))].forEach(a => {
     const c = W.contextBlock({ app: a, lang: 'he', q: null }, 0);
     if (c.indexOf(W.ROLE[a]) !== 0) { bad++; console.log(`✗ ${a}: התפקיד אינו נשלח בראש ההקשר`) }
   });
@@ -686,33 +707,48 @@ import(WORKER).then(async W => {
     && !/localStorage\.setItem\(\s*["'].*msg/i.test(client), true);
 
   /* ---------- 7. החיווט של כל אפליקציה ---------- */
-  /* **לימור מחוברת ואין דרך לפתוח אותה — כשל ידוע, 21.10.2026 (O-135).**
-     כשהבדיקה הורחבה מ-13 ל-43 נמצאו תשע אפליקציות שקוראות ל-`TUTOR.mount`
-     ואף פעם לא ל-`TUTOR.open`, ואין בהן כפתור `data-a="tutor"`. הכפתור
-     הצף של tutor.js נבנה רק ב-`?limor2=1`, ולכן ללומד אין כניסה ללימור.
-     התיקון באפליקציות. מודפס ב-`~`; אפליקציה חדשה בלי open — נופלת,
-     ואפליקציה מכאן שחווטה — נופלת גם היא, כדי שהשורה תימחק. */
-  const NO_OPEN = new Set(['hebrew-lit', 'geography', 'tanakh-elem', 'civics-elem', 'culture-elem',
-                           'history-elem', 'science-12', 'english-elem', 'net-elem']);
+  /* **הקוד של אפליקציה אינו רק index.html.** עד 20.11.2026 היה כאן
+     `a === 'bagrut-806' ? app.js : html` — אפליקציה אחת בשם, ו-CLAUDE.md אומר
+     במפורש ש-14 אפליקציות מחזיקות JS מחוץ ל-index.html (O-165, O-173). לכן
+     משפחת `js/{app,data,engine}.js` נבדקה מול ה-HTML בלבד, ו-`TUTOR.mount(`
+     שיושב ב-`js/app.js` לא נמצא. הקוד נאסף עכשיו מן ה-HTML **ומכל קובץ JS
+     מקומי שהוא טוען**, ולכן אפליקציה חדשה לא צריכה שם כאן.
+     וגם: תגית הסקריפט נבדקה בהשוואת מחרוזת מדויקת, בעוד סעיף 7א בודק את
+     אותה עובדה בביטוי רגולרי. עכשיו שתיהן באותו ביטוי. */
+  const codeOf = a => {
+    const dir = path.join(ROOT, a);
+    const html = fs.readFileSync(path.join(dir, 'index.html'), 'utf8');
+    const srcs = [...html.matchAll(/<script[^>]*\bsrc="([^"]+)"/g)].map(m => m[1])
+      .filter(u => !/^(https?:)?\/\//.test(u) && !u.startsWith('/'));
+    const parts = [html];
+    for (const u of srcs) {
+      const f = path.join(dir, u.split('?')[0]);
+      if (fs.existsSync(f)) parts.push(fs.readFileSync(f, 'utf8'));
+    }
+    return { html, code: parts.join('\n') };
+  };
   const noOpen = [];
   APPS.forEach(a => {
-    const html = fs.readFileSync(path.join(ROOT, a, 'index.html'), 'utf8');
-    const code = AL.sourceOf(a);
+    const { html, code } = codeOf(a);
     const sw = fs.readFileSync(path.join(ROOT, a, 'sw.js'), 'utf8');
     const miss = [];
-    /* התגית מותר שתישא מאפיינים (`onerror="void 0"` במשפחת ה-elem). */
-    if (!/<script src="\/tutor\/tutor\.js"[^>]*><\/script>/.test(html)) miss.push('תגית סקריפט');
+    /* התגית נבדקת בלי לדרוש ש-src יהיה האחרון לפני `>`: ל-civics-elem יש
+       `<script src="/tutor/tutor.js" onerror="void 0">`, והתגית קיימת. */
+    if (!/<script[^>]*\bsrc="\/tutor\/tutor\.js"/.test(html)) miss.push('תגית סקריפט');
     if (!/TUTOR\.mount\(/.test(code)) miss.push('mount');
-    /* בלי `TUTOR.open` אין כפתור: הכפתור הצף של tutor.js נבנה רק
-       ב-`?limor2=1`. ראו NO_OPEN למטה — כשל ידוע, לא פטור. */
-    if (!/TUTOR\.open\(/.test(code)) {
-      if (NO_OPEN.has(a)) { noOpen.push(a) } else miss.push('open');
-    } else if (NO_OPEN.has(a)) miss.push('רשומה ב-NO_OPEN וכבר קוראת ל-TUTOR.open — מחקו את השורה');
     if (sw.indexOf('"/tutor/tutor.js"') < 0) miss.push('PRE ב-sw.js');
-    if (miss.length) { bad++; console.log(`✗ ${a}: חסר ${miss.join(', ')}`) }
+    if (miss.length) { bad++; console.log(`✗ ${a}: חסר ${miss.join(', ')}`); return }
+    /* ‏`TUTOR.open(` אינו דרישה. ‏`mount` קורא ל-`floatInit()`, שבונה את כפתור
+       לימור הצף ומחבר לו `click` שקורא ל-`open()` (‏tutor/tutor.js) — כלומר
+       ‏mount לבדו נותן ללומד פתיחה עובדת. ‏`open` נקרא רק מכפתור משל האפליקציה,
+       כפי שכתוב ליד mount עצמו, ושלוש־עשרה האפליקציות שהיו ברשימה הידנית פשוט
+       כולן כאלה. לדרוש אותו מכולן היה להמציא דרישה, ולכן זו שורת מידע. */
+    if (!/TUTOR\.open\(/.test(code)) noOpen.push(a);
   });
-  if (noOpen.length) console.log(`~ ${noOpen.length} מחוברות ללימור בלי TUTOR.open, ידוע (NO_OPEN): ${noOpen.join(' ')}`);
-  console.log(`✓ ${APPS.length} האפליקציות מחווטות (תגית, mount, open, PRE)`);
+  if (noOpen.length)
+    console.log(`· ${noOpen.length} נפתחות בכפתור הצף בלבד, בלי TUTOR.open משלהן: ` +
+                noOpen.join(', '));
+  console.log(`✓ ${APPS.length} האפליקציות שטוענות את לימור מחווטות (תגית, mount, PRE)`);
 
   /* ---------- 7א. דף הבית — O-51 ----------
      תגית, mount עם app:"home", open, ו-tutor.js ב-PRE של השורש. ובשרת:
