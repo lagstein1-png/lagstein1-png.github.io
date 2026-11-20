@@ -334,6 +334,17 @@ function sayText(app, raw) {
   return plainOf(appSaySpell(app)(String(raw == null ? '' : raw))
     .replace(/<br\s*\/?>/gi, '. '));
 }
+/* O-241, 21.10.2026: מה ש-speak עושה כשהטקסט מגיע **בלי** saySpell.
+   רמקול האפשרות (`data-say="'+esc(plainOf(o.h))`, למשל
+   civics/index.html:10707, history/index.html:8139, ובאותה תבנית
+   literature, tanakh, biology, hebrew-arab ועוד) ו-`askBox` שולחים את
+   הטקסט כמו שהוא. אפשרות עם ״ — ״ או מירכאות מבקשת אפוא מזהה אחר
+   מזה של sayText. בלי הצורה הזאת: 467 קליפים שהוקלטו לפני ש-saySpell
+   נכנס למאגר נראו ״מתים״ ובכל זאת התנגנו, וטקסט חדש כזה לא הוקלט
+   לעולם ונשמע בקול המכשיר. */
+function rawText(raw) {
+  return plainOf(String(raw == null ? '' : raw).replace(/<br\s*\/?>/gi, '. '));
+}
 
 /* science/index.html: const SCIBANK=[["bio",1,{"he":[...],"en":[...]}],...].
    המחרוזות העבריות הן המערכים שבתוך "he". קוראים את המערך בספירת
@@ -804,11 +815,18 @@ function corpusOf(app) {
     if (!fs.existsSync(path.join(ROOT, f))) continue;
     const s = fs.readFileSync(path.join(ROOT, f), 'utf8');
     for (const m of s.matchAll(/\b"?he"?\s*:\s*"((?:[^"\\]|\\.)*)"/g)) {
-      const text = sayText(app, unquote(m[1]));
-      if (!/[א-ת]/.test(text)) continue;
-      if (text.split(' ').length < 2) continue;
-      const id = R.id(text);
-      if (!seen.has(id)) seen.set(id, text);
+      /* O-241: שתי צורות. אחרי saySpell — מה שאתרי `speak(saySpell(`
+         מבקשים; והגולמית — מה שהרמקולים שאינם עוברים ב-saySpell
+         מבקשים: האפשרות (`data-say="'+esc(plainOf(o.h))`), השאלה
+         (`askBox` → `spkBtn(txt`) ושורת קטע (`sayline`). ההגדרה זהה
+         לשתיהן, ולכן כשאין ״ — ״ או מירכאות הן אותו מזהה בדיוק. */
+      const raw = unquote(m[1]);
+      for (const text of new Set([sayText(app, raw), rawText(raw)])) {
+        if (!/[א-ת]/.test(text)) continue;
+        if (text.split(' ').length < 2) continue;
+        const id = R.id(text);
+        if (!seen.has(id)) seen.set(id, text);
+      }
     }
   }
   if (app === 'lomda') for (const raw of lomdaParts(files)) {
@@ -1012,6 +1030,44 @@ function check() {
                 Q_BANK_EMPTY.join(', '));
   if (deadTotal)
     console.log('· ' + 'קליפים '.padEnd(11) + deadTotal + ' קליפים בדיסק שאף אתר קריאה אינו מבקש (O-217, O-241)');
+  return bad + rawGuard();
+}
+
+/* O-241 — שומר: אפליקציה שיש בה רמקול אפשרות גולמי
+   (`data-say="'+esc(plainOf(o.h))`, בלי saySpell) צריכה במאגר גם את
+   הצורה הגולמית של כל טקסט שלה. בלעדיה טקסט עם ״ — ״ או מירכאות לא
+   יוקלט לעולם, וקליפ ישן שעדיין מתנגן ייראה ״מת״ ל-audio-adopt.js.
+   רק אפליקציות הקורא הכללי: geography ו-motal בונות את רשימת
+   האפשרויות במפורש (geoBank, motalBank), ושם ההסבר לבדו אינו נאמר. */
+function rawGuard() {
+  let bad = 0, apps = 0, pairs = 0;
+  for (const app of Object.keys(SOURCES)) {
+    if (app === 'geography' || app === 'motal') continue;
+    /* qBank (O-241 של main, 26.10) מתאר במפורש מה נאמר — כולל האפשרויות והשאלה בצורתן
+       הגולמית — ולכן השומר הזה חל רק על מי שעדיין בקורא הכללי. */
+    if (Q_BANK_APPS.has(app)) continue;
+    const src = SOURCES[app];
+    if (!Array.isArray(src) || src.length !== 1 || src[0] !== app + '/index.html') continue;
+    const f = path.join(ROOT, src[0]);
+    if (!fs.existsSync(f)) continue;
+    const s = fs.readFileSync(f, 'utf8');
+    if (!s.includes('data-say="\'+esc(plainOf(o.h))')) continue;
+    apps++;
+    const c = corpus(app), miss = [];
+    for (const m of s.matchAll(/\b"?he"?\s*:\s*"((?:[^"\\]|\\.)*)"/g)) {
+      const raw = unquote(m[1]), text = rawText(raw);
+      if (text === sayText(app, raw)) continue;
+      if (!/[א-ת]/.test(text) || text.split(' ').length < 2) continue;
+      pairs++;
+      if (!c.has(R.id(text))) miss.push(text);
+    }
+    if (miss.length) {
+      bad++;
+      console.log('✗ ' + app.padEnd(9) + miss.length + ' טקסטים שהצורה הגולמית שלהם (בלי saySpell, כמו שרמקול האפשרות ו-askBox שולחים) אינה במאגר — ' +
+                  'לא יוקלטו לעולם (O-241). למשל: ' + miss[0].slice(0, 60));
+    }
+  }
+  if (!bad) console.log('✓ O-241: הצורה הגולמית במאגר — ' + pairs + ' טקסטים שבהם saySpell משנה, ב-' + apps + ' אפליקציות עם רמקול אפשרות גולמי');
   return bad;
 }
 
@@ -1416,7 +1472,7 @@ async function build(app, max) {
     : args.filter(a => !a.startsWith('--') && !(maxI >= 0 && a === args[maxI + 1]));
   if (args.includes('--check')) {
     const bad = check();
-    console.log(bad ? '\n' + bad + ' אפליקציות עם מניפסט שאינו תואם לדיסק'
+    console.log(bad ? '\n' + bad + ' כשלים בשכבה המוקלטת — מניפסט שאינו תואם לדיסק, או צורה גולמית שחסרה במאגר (O-241)'
       : UNCHECKED ? '\nהשכבה המוקלטת: מה שעל הדיסק תואם, ו-' + UNCHECKED + ' אפליקציות לא נבדקו — הקבצים שלהן אינם כאן (O-215)'
       : '\nהשכבה המוקלטת: המניפסטים תואמים לדיסק');
     /* 3 = ״עבר, וחלק לא נבדק״ — המוסכמה של all.js (O-210) */
