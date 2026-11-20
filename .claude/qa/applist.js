@@ -6,6 +6,7 @@
      AL.withFile('js/speech.js')     // מי שיש לו את הקובץ הזה
      AL.matching(/RECORDED\.play/)   // מי שה-index.html שלו מכיל את התבנית
      AL.pick(argv, AL.local())       // שמות מפורשים בשורת הפקודה גוברים
+     AL.family('x.js', /re/, {floor, must, why})  // matching + רצפה + שורת ״·״
 
    **למה הקובץ הזה נולד (4.10.2026).** `CLAUDE.md` קובע כבר היום
    ש״רשימת אפליקציות בבדיקה נגזרת מ-`stages.json`, לא נכתבת ביד״,
@@ -86,7 +87,33 @@ function pick(argv, fallback) {
   return named.length ? named : fallback;
 }
 
-module.exports = { ROOT, STAGES, local, stage, withFile, matching, sourceOf, pick };
+/* משפחה נגזרת, עם רצפה ושורת ״·״ — O-135, 21.10.2026.
+
+     const APPS = AL.family('exam.js', /function exSlots\b/,
+       { floor: 15, must: ['math-app', 'english'], why: 'אין מבחן כיתתי' });
+
+   **הרצפה** היא ההגנה מפני הכשל ההפוך: תבנית שהפסיקה להתאים (שם
+   פונקציה ששונה, קובץ שזז) מחזירה רשימה קצרה, והכלי עובר עליה בירוק.
+   פחות מ-`floor`, או חסרה אחת מ-`must` — הכלי נופל ואומר שהגזירה נשברה.
+   **ושורת ה-״·״** מודפסת בכל ריצה ומונה בשם את מי שלא נבדק ולמה, כדי
+   שאפליקציה שנוספה ואינה במשפחה תיראה — ולא תיעלם בשקט. */
+function family(tool, re, opts) {
+  const o = opts || {};
+  const all = o.apps || local();
+  const got = matching(re, all);
+  const must = (o.must || []).filter(a => !got.includes(a));
+  if (got.length < (o.floor || 1) || must.length) {
+    console.log(`✗ ${tool}: הגזירה החזירה ${got.length} אפליקציות (רצפה ${o.floor || 1})` +
+      (must.length ? `, וחסרות ${must.join(' ')}` : '') + ` — הזיהוי לפי ${re} נשבר, לא האפליקציות`);
+    process.exit(1);
+  }
+  const skip = all.filter(a => !got.includes(a));
+  console.log(`· ${tool}: ${got.length} מתוך ${all.length} נבדקות` +
+    (skip.length ? `; ${skip.length} מדולגות — ${o.why || 'אין ' + re}: ${skip.join(' ')}` : ''));
+  return got;
+}
+
+module.exports = { ROOT, STAGES, local, stage, withFile, matching, sourceOf, pick, family };
 
 if (require.main === module) {
   const L = local();

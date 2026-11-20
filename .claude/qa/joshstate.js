@@ -233,7 +233,7 @@ scenario('17 · ארבע נכונות ברצף מנקות גם סימן של ר�
          return want(S.state(), 'ok') });
 
 /* =====================================================================
-   החיווט — תשע אפליקציות, ארבע נגיעות בכל אחת
+   החיווט — כל מי שמזין את הגלאי (נגזר, O-135), ארבע נגיעות בכל אחת
 
    **למה זה כאן ולא ב-`tutor.js`.** הגלאי יכול להיות נקי לגמרי
    ועדיין לא להיות מחובר לשום דבר: שמונה האפליקציות שקיבלו אותו
@@ -250,15 +250,59 @@ scenario('17 · ארבע נכונות ברצף מנקות גם סימן של ר�
    מדברת״ אינה בריפו הזה; החיווט שלה נמצא ב-`tutor-api/theory.patch`,
    ואת זה בודקת `tutor.js`.
    ===================================================================== */
-const WIRED = { math:  ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3'],
-                quiz:  ['english', 'history', 'ulpan', 'lomda'] };
-/* שם פונקציית הניקוד לפי משפחה, ו-`math-app` חריגה: היא קוראת
-   לגלאי מתוך `onAns` — שני מקומות, ושניהם ברגע שבו השאלה נסגרת
-   ולא בכל לחיצה. */
-const SCORE = { math: 'scoreAnswer', quiz: 'record' };
-const WHERE = { 'math-app': 'onAns' };
+/* O-135, 21.10.2026: **הרשימה נגזרת.** עד היום תשעה שמות ביד, ו-science
+   ו-geography-elem — מחווטות במלואן, עם `jsAnswer` מתוך `onAns` — לא נבדקו.
+   המשפחה היא מי שמזין את הגלאי (`jsAnswer(` או `JOSHSTATE.answer(`),
+   ופונקציית הניקוד נמצאת לפי מה שמוגדר בקובץ: `onAns` (math-app, science,
+   geography-elem), `scoreAnswer` (משפחת המתמטיקה), `record` (החידון). */
+const AL = require('./applist.js');
+const idxOf = a => { try { return fs.readFileSync(path.join(ROOT, a, 'index.html'), 'utf8') } catch (e) { return '' } };
+const FEEDS = /\bjsAnswer\s*\(|JOSHSTATE\.answer\s*\(/;
+const NAMED = process.argv.slice(3);
+const WIRED = NAMED.length ? NAMED : AL.local().filter(a => FEEDS.test(idxOf(a)));
+const MUST = ['math-app', 'math-teen', 'math-uni', 'math-uni2', 'math-uni3', 'english', 'history', 'ulpan', 'lomda'];
+if (!NAMED.length && (WIRED.length < 9 || MUST.some(a => !WIRED.includes(a)))) {
+  console.log(`✗ הגזירה החזירה ${WIRED.length} אפליקציות מחווטות (רצפה 9), חסרות: ${MUST.filter(a => !WIRED.includes(a)).join(' ')} — הזיהוי נשבר`);
+  process.exit(1);
+}
+const SCORE_FNS = ['onAns', 'scoreAnswer', 'record'];
 
-for (const fam of Object.keys(WIRED)) for (const app of WIRED[fam]) {
+/* **טוענות את הגלאי ואינן מזינות אותו — כשל ידוע, נמדד 21.10.2026.**
+   תגית `josh-state.js` ונתיב ב-PRE, אבל אף קריאה ל-`jsAnswer` — ולכן
+   הגלאי אינו יודע אם הלומד צודק או טועה, ולימור אינה מזהה תסכול.
+   התיקון באפליקציות ובהכרעת מוצר (לחווט או להסיר את התגית), לא כאן.
+   מודפס ב-`~`. אפליקציה **חדשה** במצב הזה — נופלת; ואפליקציה מכאן
+   שהתחילה להזין — נופלת גם היא, כדי שהשורה תימחק. */
+const LOADS_ONLY = new Set(['domino', 'math-g7', 'math-elem', 'hebrew-lit', 'civics', 'hebrew',
+  'geography', 'literature', 'tanakh', 'science-mid', 'motal', 'hebrew-arab', 'tanakh-elem',
+  'civics-elem', 'islam', 'russian', 'culture-elem', 'history-elem', 'science-12', 'english-elem',
+  'biology', 'net-elem', 'chemistry', 'physics', 'english-upper', 'english-mid']);
+if (!NAMED.length) {
+  const loads = AL.local().filter(a => /src="\/tutor\/josh-state\.js"/.test(idxOf(a)));
+  const only = loads.filter(a => !WIRED.includes(a));
+  for (const a of only) {
+    if (LOADS_ONLY.has(a)) console.log('~ ' + a.padEnd(14) + 'טוענת את josh-state.js ואינה מזינה אותו (ידוע)');
+    else { bad++; console.log('✗ ' + a.padEnd(14) + 'טוענת את josh-state.js ואינה קוראת ל-jsAnswer — חיווט חלקי חדש') }
+  }
+  for (const a of LOADS_ONLY) if (!only.includes(a)) {
+    bad++; console.log('✗ ' + a.padEnd(14) + 'רשומה ב-LOADS_ONLY ואינה עוד במצב הזה — מחקו את השורה מ-joshstate.js');
+  }
+  const none = AL.local().filter(a => !loads.includes(a));
+  console.log(`· ${WIRED.length} מחווטות נבדקות בארבע נגיעות; ${only.length} טוענות בלבד; ${none.length} בלי הגלאי: ${none.join(' ')}`);
+}
+
+function bodyAt(h, decl) {
+  const at = h.indexOf(decl);
+  if (at < 0) return null;
+  let d = 0;
+  for (let k = h.indexOf('{', at); k < h.length; k++) {
+    if (h[k] === '{') d++;
+    else if (h[k] === '}') { d--; if (!d) return h.slice(at, k) }
+  }
+  return null;
+}
+
+for (const app of WIRED) {
   let html, sw;
   try {
     html = fs.readFileSync(path.join(ROOT, app, 'index.html'), 'utf8');
@@ -274,7 +318,12 @@ for (const fam of Object.keys(WIRED)) for (const app of WIRED[fam]) {
   /* הקריאה בתוך פונקציית הניקוד, ולא איפשהו בקובץ: גוף הפונקציה
      נחתך עד הסוגר שבעומק אפס. `math-app` קוראת לה `jsAnswer` מתוך
      `recordAnswer`, ולכן נבדק שם גם השם שלה. */
-  const name = WHERE[app] || SCORE[fam];
+  /* פונקציית הניקוד: הראשונה מבין SCORE_FNS שמוגדרת וקוראת לגלאי בגופה */
+  let name = SCORE_FNS.find(n => html.indexOf('function ' + n + '(') >= 0) || SCORE_FNS[0];
+  for (const n of SCORE_FNS) {
+    const b = bodyAt(html, 'function ' + n + '(');
+    if (b && (/\bjsAnswer\s*\(/.test(b) || /JOSHSTATE\.answer\s*\(/.test(b))) { name = n; break }
+  }
   const fn = 'function ' + name + '(';
   const at = html.indexOf(fn);
   if (at < 0) hit.push('לא נמצאה ' + name);
@@ -298,5 +347,5 @@ for (const fam of Object.keys(WIRED)) for (const app of WIRED[fam]) {
 
 console.log(bad
   ? `✗ ${FILE} — ${CODE.length} שאלות קוד, ${ran} תרחישים, ${bad} ממצאים`
-  : `✓ ${FILE} — ${CODE.length} שאלות קוד, ${ran} תרחישים, תשע אפליקציות מחווטות, 0 ממצאים`);
+  : `✓ ${FILE} — ${CODE.length} שאלות קוד, ${ran} תרחישים, ${WIRED.length} אפליקציות מחווטות, 0 ממצאים`);
 process.exit(bad ? 1 : 0);
